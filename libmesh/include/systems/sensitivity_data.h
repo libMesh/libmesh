@@ -43,7 +43,7 @@ public:
   public:
     Row(SensitivityData &sd, unsigned int qoi) : _sd(sd), _qoi(qoi) {}
 
-    Number& operator[] (unsigned int parameter) { return _sd.value(_qoi, parameter); }
+    Number& operator[] (unsigned int parameter) { return _sd.derivative(_qoi, parameter); }
   private:
     SensitivityData &_sd;
     unsigned int _qoi;
@@ -54,7 +54,7 @@ public:
   public:
     ConstRow(const SensitivityData &sd, unsigned int qoi) : _sd(sd), _qoi(qoi) {}
 
-    const Number& operator[] (unsigned int parameter) { return _sd.value(_qoi, parameter); }
+    const Number& operator[] (unsigned int parameter) { return _sd.derivative(_qoi, parameter); }
   private:
     const SensitivityData &_sd;
     unsigned int _qoi;
@@ -76,30 +76,59 @@ public:
   /**
    * Clears and deallocates all data
    */
-  void clear() { _data.clear(); }
+  void clear() { _grad_data.clear(); }
 
   /**
    * Given QoISet and ParameterVector, allocates space
-   * for all required sensitivities
+   * for all required first derivative data
    */
   void allocate_data(const QoISet &qoi_indices,
                      const System& sys,
                      const ParameterVector& parameter_vector);
 
   /**
+   * Given QoISet and ParameterVector, allocates space
+   * for all required second derivative data
+   */
+  void allocate_hessian_data(const QoISet &qoi_indices,
+                             const System& sys,
+                             const ParameterVector& parameter_vector);
+
+  /**
    * Returns the parameter sensitivity derivative for the specified
    * quantity of interest for the specified parameter
    */
-  const Number& value(unsigned int qoi_index,
-                      unsigned int parameter_index) const;
+  const Number& derivative (unsigned int qoi_index,
+                            unsigned int parameter_index) const;
+
+  /**
+   * Returns the parameter sensitivity derivative for the specified
+   * quantity of interest for the specified pair of parameters
+   */
+  const Number& second_derivative (unsigned int qoi_index,
+                                   unsigned int parameter_index1,
+                                   unsigned int parameter_index2) const;
 
   /**
    * Gets/sets the parameter sensitivity derivative for the specified
    * quantity of interest for the specified parameter
    */
-  Number& value(unsigned int qoi_index,
-                unsigned int parameter_index);
+  Number& derivative (unsigned int qoi_index,
+                      unsigned int parameter_index);
 
+  /**
+   * Gets/sets the parameter sensitivity second derivative for the
+   * specified quantity of interest for the specified pair of
+   * parameters
+   */
+  Number& second_derivative (unsigned int qoi_index,
+                             unsigned int parameter_index1,
+                             unsigned int parameter_index2);
+
+  /**
+   * Vector address type operator: sd[q][p] is an alias for
+   * sd.derivative(q,p)
+   */
   ConstRow operator[] (unsigned int qoi) const { return ConstRow(*this, qoi); }
 
   Row operator[] (unsigned int qoi) { return Row(*this, qoi); }
@@ -108,7 +137,8 @@ private:
   /**
    * Data storage; currently pretty trivial
    */
-  std::vector<std::vector<Number> > _data;
+  std::vector<std::vector<Number> > _grad_data;
+  std::vector<std::vector<std::vector<Number> > > _hess_data;
 };
 
 
@@ -136,39 +166,90 @@ void SensitivityData::allocate_data(const QoISet &qoi_indices,
   const unsigned int Np = parameter_vector.size();
   const unsigned int Nq = sys.qoi.size();
 
-  if (_data.size() < Nq)
-    _data.resize(Nq);
+  if (_grad_data.size() < Nq)
+    _grad_data.resize(Nq);
 
   for (unsigned int i=0; i != Nq; ++i)
     if (qoi_indices.has_index(i))
       {
-        _data[i].clear();
-        _data[i].resize(Np);
+        _grad_data[i].clear();
+        _grad_data[i].resize(Np);
       }
 }
 
 
 
 inline
-const Number& SensitivityData::value(unsigned int qoi_index,
-                                     unsigned int parameter_index) const
+void SensitivityData::allocate_hessian_data(const QoISet &qoi_indices,
+                                            const System& sys,
+                                            const ParameterVector& parameter_vector)
 {
-  libmesh_assert(qoi_index < _data.size());
-  libmesh_assert(parameter_index < _data[qoi_index].size());
+  const unsigned int Np = parameter_vector.size();
+  const unsigned int Nq = sys.qoi.size();
 
-  return _data[qoi_index][parameter_index];
+  if (_hess_data.size() < Nq)
+    _hess_data.resize(Nq);
+
+  for (unsigned int i=0; i != Nq; ++i)
+    if (qoi_indices.has_index(i))
+      {
+        _hess_data[i].clear();
+        _hess_data[i].resize(Np);
+        for (unsigned int j=0; j != Np; ++j)
+          _hess_data[i][j].resize(Np);
+      }
 }
 
 
 
 inline
-Number& SensitivityData::value(unsigned int qoi_index,
-                               unsigned int parameter_index)
+const Number& SensitivityData::derivative(unsigned int qoi_index,
+                                          unsigned int parameter_index) const
 {
-  libmesh_assert(qoi_index < _data.size());
-  libmesh_assert(parameter_index < _data[qoi_index].size());
+  libmesh_assert(qoi_index < _grad_data.size());
+  libmesh_assert(parameter_index < _grad_data[qoi_index].size());
 
-  return _data[qoi_index][parameter_index];
+  return _grad_data[qoi_index][parameter_index];
+}
+
+
+
+inline
+Number& SensitivityData::derivative(unsigned int qoi_index,
+                                    unsigned int parameter_index)
+{
+  libmesh_assert(qoi_index < _grad_data.size());
+  libmesh_assert(parameter_index < _grad_data[qoi_index].size());
+
+  return _grad_data[qoi_index][parameter_index];
+}
+
+
+
+inline
+const Number& SensitivityData::second_derivative(unsigned int qoi_index,
+                                                 unsigned int parameter_index1,
+                                                 unsigned int parameter_index2) const
+{
+  libmesh_assert(qoi_index < _hess_data.size());
+  libmesh_assert(parameter_index1 < _hess_data[qoi_index].size());
+  libmesh_assert(parameter_index2 < _hess_data[qoi_index][parameter_index1].size());
+
+  return _hess_data[qoi_index][parameter_index1][parameter_index2];
+}
+
+
+
+inline
+Number& SensitivityData::second_derivative(unsigned int qoi_index,
+                                           unsigned int parameter_index1,
+                                           unsigned int parameter_index2)
+{
+  libmesh_assert(qoi_index < _hess_data.size());
+  libmesh_assert(parameter_index1 < _hess_data[qoi_index].size());
+  libmesh_assert(parameter_index2 < _hess_data[qoi_index][parameter_index1].size());
+
+  return _hess_data[qoi_index][parameter_index1][parameter_index2];
 }
 
 #endif // #define __sensitivity_data_h__
