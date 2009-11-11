@@ -953,91 +953,44 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       // Re-center old_parameter, which may have been affected by vector
       old_parameter = *parameters[k];
 
-      // We get (partial q / partial u) from the user,
-      // but centrally difference it to get q_uk:
-      // (partial^2 q / partial u partial k)
-      // q_uk = (q_u(p+dp*e_k) - q_u(p-dp*e_k))/(2*dp)
-
-      // To avoid creating Nq temporary vectors, we add these terms to
-      // the sensitivities output one by one.
-      //
-      // FIXME: this is probably a bad order of operations for
-      // controlling floating point error.
-
-      *parameters[k] = old_parameter + delta_p;
-      this->assemble_qoi_derivative(qoi_indices);
-
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          sensitivities[i][k] += this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) / (2.*delta_p);
- 
-      *parameters[k] = old_parameter - delta_p;
-      this->assemble_qoi_derivative(qoi_indices);
-
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          sensitivities[i][k] -= this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) / (2.*delta_p);
-
-      // We get R from the user,
-      // but centrally difference it to get R_k:
+      // We get (partial q / partial u), R, and R_u from the user,
+      // but centrally difference to get q_uk, R_k, and R_uk terms:
       // (partial R / partial k)
       // R_k*sum(w_l*z^l) = (R(p+dp*e_k)*sum(w_l*z^l) - R(p-dp*e_k)*sum(w_l*z^l))/(2*dp)
-      *parameters[k] = old_parameter + delta_p;
-      this->assembly(true, false);
-
-      std::vector<Number> partialR_term(this->qoi.size());
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          partialR_term[i] = this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i));
-
-      *parameters[k] = old_parameter - delta_p;
-      this->assembly(true, false);
-
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          {
-            partialR_term[i] -= this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i));
-            partialR_term[i] /= (2.*delta_p);
-
-            // We subtract since this term is negative
-            sensitivities[i][k] -= partialR_term[i];
-          }
-
-      // We get (partial R / partial u) from the user,
-      // but centrally difference it to get R_uk*z*sum(w_l*u'_l):
+      // (partial^2 q / partial u partial k)
+      // q_uk = (q_u(p+dp*e_k) - q_u(p-dp*e_k))/(2*dp)
       // (partial^2 R / partial u partial k)
-      // R_uk*z = (R_u(p+dp*e_k)*z*sum(w_l*u'_l) - R_u(p-dp*e_k)*z*sum(w_l*u'_l))/(2*dp)
+      // R_uk*z*sum(w_l*u'_l) = (R_u(p+dp*e_k)*z*sum(w_l*u'_l) - R_u(p-dp*e_k)*z*sum(w_l*u'_l))/(2*dp)
 
-      // To avoid creating Nq temporary vectors, we again add these
-      // terms to the sensitivities output one by one.
+      // To avoid creating Nq temporary vectors for q_uk or R_uk, we add
+      // subterms to the sensitivities output one by one.
       //
       // FIXME: this is probably a bad order of operations for
       // controlling floating point error.
 
       *parameters[k] = old_parameter + delta_p;
-      this->assembly(false, true);
+      this->assembly(true, true);
+      this->assemble_qoi_derivative(qoi_indices);
 
       // Use a single temporary vector for matrix-vector-vector products
       AutoPtr<NumericVector<Number> > tempvec = this->get_weighted_sensitivity_solution().zero_clone();
       this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
+
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
-          {
-            // We subtract for the +dp component since this term is negative
-            sensitivities[i][k] -= 
-              this->get_adjoint_solution(i).dot(*tempvec) / (2.*delta_p);
-          }
-
+          sensitivities[i][k] += (this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) -
+                                  this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) -
+                                  this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
+ 
       *parameters[k] = old_parameter - delta_p;
-      this->assembly(false, true);
+      this->assembly(true, true);
+      this->assemble_qoi_derivative(qoi_indices);
 
-      this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
-          {
-            sensitivities[i][k] += 
-              this->get_adjoint_solution(i).dot(*tempvec) / (2.*delta_p);
-          }
+          sensitivities[i][k] += (-this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) +
+                                  this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) +
+                                  this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
     }
 
   // All parameters have been reset.
