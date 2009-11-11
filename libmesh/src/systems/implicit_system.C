@@ -986,6 +986,8 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       this->assembly(true, true);
       this->assemble_qoi_derivative(qoi_indices);
 
+      this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
+
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           sensitivities[i][k] += (-this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) +
