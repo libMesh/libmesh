@@ -874,13 +874,13 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       // differencing pertubation:
       // sum_l(w_l * Q''_{kl}) ~= 
       // (Q(p + dp*w_l*e_l + dp*e_k) - Q(p - dp*w_l*e_l + dp*e_k) -
-      // Q(p + dp*w_l*e_l - dp*e_k) + Q(p - dp*w_l*e_l - dp*e_k))/(4*dp)
+      // Q(p + dp*w_l*e_l - dp*e_k) + Q(p - dp*w_l*e_l - dp*e_k))/(4*dp^2)
 
       // The sum(w_l*R''_kl) term requires the same sort of pertubation,
       // and so we subtract it in at the same time:
       // sum_l(w_l * R''_{kl}) ~= 
       // (R(p + dp*w_l*e_l + dp*e_k) - R(p - dp*w_l*e_l + dp*e_k) -
-      // R(p + dp*w_l*e_l - dp*e_k) + R(p - dp*w_l*e_l - dp*e_k))/(4*dp)
+      // R(p + dp*w_l*e_l - dp*e_k) + R(p - dp*w_l*e_l - dp*e_k))/(4*dp^2)
 
       ParameterVector oldparameters, parameterperturbation;
       parameters.deep_copy(oldparameters);
@@ -939,8 +939,8 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
-            partial2q_term[i] /= (4. * delta_p);
-            partial2R_term[i] /= (4. * delta_p);
+            partial2q_term[i] /= (4. * delta_p * delta_p);
+            partial2R_term[i] /= (4. * delta_p * delta_p);
           }
 
       for (unsigned int i=0; i != Nq; ++i)
