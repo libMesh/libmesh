@@ -8721,7 +8721,9 @@ src/solvers/adaptive_time_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -8742,6 +8744,7 @@ src/solvers/adaptive_time_solver.$(obj-suffix):\
     include/partitioning/partitioner.h\
     include/solvers/adaptive_time_solver.h\
     include/solvers/euler_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/solvers/unsteady_solver.h\
     include/systems/diff_context.h\
@@ -8830,7 +8833,9 @@ src/solvers/eigen_time_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -8853,6 +8858,7 @@ src/solvers/eigen_time_solver.$(obj-suffix):\
     include/solvers/diff_solver.h\
     include/solvers/eigen_solver.h\
     include/solvers/eigen_time_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/systems/diff_context.h\
     include/systems/diff_system.h\
@@ -8891,7 +8897,9 @@ src/solvers/euler2_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -8911,6 +8919,7 @@ src/solvers/euler2_solver.$(obj-suffix):\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
     include/solvers/euler2_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/solvers/unsteady_solver.h\
     include/systems/diff_context.h\
@@ -8950,7 +8959,9 @@ src/solvers/euler_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -8970,6 +8981,7 @@ src/solvers/euler_solver.$(obj-suffix):\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
     include/solvers/euler_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/solvers/unsteady_solver.h\
     include/systems/diff_context.h\
@@ -9353,7 +9365,9 @@ src/solvers/steady_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -9373,6 +9387,7 @@ src/solvers/steady_solver.$(obj-suffix):\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
     include/solvers/diff_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/steady_solver.h\
     include/solvers/time_solver.h\
     include/systems/diff_context.h\
@@ -9413,7 +9428,9 @@ src/solvers/time_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -9435,6 +9452,7 @@ src/solvers/time_solver.$(obj-suffix):\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
     include/solvers/diff_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/systems/diff_context.h\
     include/systems/diff_system.h\
@@ -9548,7 +9566,9 @@ src/solvers/twostep_time_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -9569,6 +9589,7 @@ src/solvers/twostep_time_solver.$(obj-suffix):\
     include/partitioning/partitioner.h\
     include/solvers/adaptive_time_solver.h\
     include/solvers/euler_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/solvers/twostep_time_solver.h\
     include/solvers/unsteady_solver.h\
@@ -9610,7 +9631,9 @@ src/solvers/unsteady_solver.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -9632,6 +9655,7 @@ src/solvers/unsteady_solver.$(obj-suffix):\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
     include/solvers/diff_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/solvers/unsteady_solver.h\
     include/systems/diff_context.h\
@@ -9794,7 +9818,9 @@ src/systems/diff_system.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -9815,6 +9841,8 @@ src/systems/diff_system.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/diff_solver.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/systems/diff_context.h\
     include/systems/diff_system.h\
@@ -10082,8 +10110,10 @@ src/systems/fem_context.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_base.h\
     include/fe/fe_interface.h\
@@ -10114,6 +10144,7 @@ src/systems/fem_context.$(obj-suffix):\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
     include/quadrature/quadrature.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/solvers/unsteady_solver.h\
     include/systems/diff_context.h\
@@ -10162,8 +10193,10 @@ src/systems/fem_system.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_base.h\
     include/fe/fe_interface.h\
@@ -10195,6 +10228,7 @@ src/systems/fem_system.$(obj-suffix):\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
     include/quadrature/quadrature.h\
+    include/solvers/linear_solver.h\
     include/solvers/time_solver.h\
     include/solvers/unsteady_solver.h\
     include/systems/diff_context.h\
@@ -10299,7 +10333,9 @@ src/systems/implicit_system.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_preconditioner_type.h\
     include/enums/enum_solver_package.h\
+    include/enums/enum_solver_type.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
@@ -10319,14 +10355,24 @@ src/systems/implicit_system.$(obj-suffix):\
     include/parallel/threads.h\
     include/parallel/threads_allocators.h\
     include/partitioning/partitioner.h\
+    include/solvers/linear_solver.h\
+    include/systems/equation_systems.h\
     include/systems/explicit_system.h\
+    include/systems/frequency_system.h\
     include/systems/implicit_system.h\
+    include/systems/linear_implicit_system.h\
+    include/systems/newmark_system.h\
+    include/systems/parameter_vector.h\
     include/systems/qoi_set.h\
+    include/systems/sensitivity_data.h\
+    include/systems/steady_system.h\
     include/systems/system.h\
     include/systems/system_norm.h\
+    include/systems/transient_system.h\
     include/utils/compare_types.h\
     include/utils/mapvector.h\
     include/utils/o_string_stream.h\
+    include/utils/parameters.h\
     include/utils/perf_log.h
 src/systems/linear_implicit_system.$(obj-suffix):\
     src/systems/linear_implicit_system.C\
@@ -10378,7 +10424,6 @@ src/systems/linear_implicit_system.$(obj-suffix):\
     include/systems/newmark_system.h\
     include/systems/parameter_vector.h\
     include/systems/qoi_set.h\
-    include/systems/sensitivity_data.h\
     include/systems/steady_system.h\
     include/systems/system.h\
     include/systems/system_norm.h\
@@ -10493,7 +10538,6 @@ src/systems/nonlinear_implicit_system.$(obj-suffix):\
     include/systems/nonlinear_implicit_system.h\
     include/systems/parameter_vector.h\
     include/systems/qoi_set.h\
-    include/systems/sensitivity_data.h\
     include/systems/steady_system.h\
     include/systems/system.h\
     include/systems/system_norm.h\
@@ -10502,6 +10546,14 @@ src/systems/nonlinear_implicit_system.$(obj-suffix):\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h
+src/systems/parameter_vector.$(obj-suffix):\
+    src/systems/parameter_vector.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/print_trace.h\
+    include/systems/parameter_vector.h
 src/systems/qoi_set.$(obj-suffix):\
     src/systems/qoi_set.C\
     include/base/auto_ptr.h\
