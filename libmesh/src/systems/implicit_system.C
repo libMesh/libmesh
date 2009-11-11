@@ -830,6 +830,9 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
   // We currently get partial derivatives via finite differencing
   const Real delta_p = TOLERANCE;
 
+  // We'll use a single temporary vector for matrix-vector-vector products
+  AutoPtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
+
   const unsigned int Np = parameters.size();
   const unsigned int Nq = qoi.size();
 
@@ -972,8 +975,6 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       this->assembly(true, true);
       this->assemble_qoi_derivative(qoi_indices);
 
-      // Use a single temporary vector for matrix-vector-vector products
-      AutoPtr<NumericVector<Number> > tempvec = this->get_weighted_sensitivity_solution().zero_clone();
       this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
 
       for (unsigned int i=0; i != Nq; ++i)
