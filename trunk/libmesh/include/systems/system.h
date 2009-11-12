@@ -264,6 +264,20 @@ public:
    * \p qoi[qoi_indices], and for a vector of parameters p, the
    * parameter sensitivity Hessian H_ij is defined as 
    * H_ij = (d^2 q)/(d p_i d p_j)
+   * This Hessian is the output of this method, where for each q_i,
+   * H_jk is stored in \p hessian.second_derivative(i,j,k).  
+   *
+   * This method is only implemented in some derived classes.
+   */
+  virtual void qoi_parameter_hessian(const QoISet& qoi_indices,
+                                     const ParameterVector& parameters,
+                                     SensitivityData& hessian);
+
+  /**
+   * For each of the system's quantities of interest q in 
+   * \p qoi[qoi_indices], and for a vector of parameters p, the
+   * parameter sensitivity Hessian H_ij is defined as 
+   * H_ij = (d^2 q)/(d p_i d p_j)
    * The Hessian-vector product, for a vector v_k in parameter space, is
    * S_j = H_jk v_k
    * This product is the output of this method, where for each q_i,
@@ -1521,6 +1535,15 @@ void
 System::forward_qoi_parameter_sensitivity (const QoISet&,
                                            const ParameterVector&,
                                            SensitivityData&)
+{
+  libmesh_not_implemented();
+}
+
+inline
+void
+System::qoi_parameter_hessian(const QoISet&,
+                              const ParameterVector&,
+                              SensitivityData&)
 {
   libmesh_not_implemented();
 }
