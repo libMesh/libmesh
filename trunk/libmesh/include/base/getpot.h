@@ -100,6 +100,7 @@ class GetPot {
   inline int          operator()(const char* VarName, int         Default, unsigned Idx) const;
   inline double       operator()(const char* VarName, double      Default, unsigned Idx) const;
   inline const char*  operator()(const char* VarName, const char* Default, unsigned Idx) const;
+  inline std::string  operator()(const char* VarName, const std::string& Default, unsigned Idx) const;
   inline unsigned     vector_variable_size(const char* VarName) const;
   inline std::vector<std::string> get_variable_names() const;
   inline std::vector<std::string> get_section_names() const;
@@ -1316,6 +1317,15 @@ GetPot::operator()(const char* VarName, const char* Default, unsigned Idx) const
   return element->c_str();
 }
 
+inline std::string
+GetPot::operator()(const char* VarName, const std::string& Default, unsigned Idx) const
+{
+  const variable*  sv = __find_variable(VarName);
+  if( sv == 0 ) return Default;
+  const std::string* element = sv->get_element(Idx);     
+  if( element == 0 )  return Default;
+  return *element;
+}
 
 
 inline unsigned
