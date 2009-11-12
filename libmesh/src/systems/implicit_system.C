@@ -948,16 +948,11 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
-          sensitivities[i][k] = partial2q_term[i];
+          sensitivities[i][k] = partial2q_term[i] - partial2R_term[i];
 
-      // Don't leave the parameters changed
-      oldparameters.value_copy(parameters);
-
-      // Re-center old_parameter, which may have been affected by vector
-      old_parameter = *parameters[k];
-
-      // We get (partial q / partial u), R, and R_u from the user,
-      // but centrally difference to get q_uk, R_k, and R_uk terms:
+      // We get (partial q / partial u), R, and 
+      // (partial R / partial u) from the user, but centrally
+      // difference to get q_uk, R_k, and R_uk terms:
       // (partial R / partial k)
       // R_k*sum(w_l*z^l) = (R(p+dp*e_k)*sum(w_l*z^l) - R(p-dp*e_k)*sum(w_l*z^l))/(2*dp)
       // (partial^2 q / partial u partial k)
@@ -994,6 +989,257 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
           sensitivities[i][k] += (-this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) +
                                   this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) +
                                   this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
+    }
+
+  // All parameters have been reset.
+  // Don't leave the qoi or system changed - principle of least
+  // surprise.
+  this->assembly(true, true);
+  this->assemble_qoi(qoi_indices);
+}
+
+
+
+void ImplicitSystem::qoi_parameter_hessian
+  (const QoISet& qoi_indices,
+   const ParameterVector& parameters,
+   SensitivityData& sensitivities)
+{
+  // We currently get partial derivatives via finite differencing
+  const Real delta_p = TOLERANCE;
+
+  // We'll use one temporary vector for matrix-vector-vector products
+  AutoPtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
+
+  // And another temporary vector to hold a copy of the true solution
+  // so we can safely perturb this->solution.
+  AutoPtr<NumericVector<Number> > oldsolution = this->solution->clone();
+
+  const unsigned int Np = parameters.size();
+  const unsigned int Nq = qoi.size();
+
+  // For each quantity of interest q, the parameter sensitivity
+  // Hessian is defined as q''_{kl} = {d^2 q}/{d p_k d p_l}.
+  //
+  // We calculate it from values and partial derivatives of the
+  // quantity of interest function Q, solution u, adjoint solution z,
+  // and residual R, as:
+  //
+  // q''_{kl} =
+  // Q''_{kl} + Q''_{uk}(u)*u'_l + Q''_{ul}(u) * u'_k + 
+  // Q''_{uu}(u)*u'_k*u'_l -
+  // R''_{kl}(u,z) -
+  // R''_{uk}(u,z)*u'_l - R''_{ul}(u,z)*u'_k -
+  // R''_{uu}(u,z)*u'_k*u'_l
+  //
+  // See the adjoints model document for more details.
+
+  // We first do an adjoint solve to get z for each quantity of
+  // interest
+
+  this->adjoint_solve(qoi_indices);
+
+  // And a sensitivity solve to get u_k for each parameter
+  this->sensitivity_solve(parameters);
+
+  // Get ready to fill in second derivatives:
+  sensitivities.allocate_hessian_data(qoi_indices, *this, parameters);
+
+  for (unsigned int k=0; k != Np; ++k)
+    {
+      Number old_parameterk = *parameters[k];
+
+      // The Hessian is symmetric, so we just calculate the lower
+      // triangle and the diagonal, and we get the upper triangle from
+      // the transpose of the lower
+
+      for (unsigned int l=0; l != k+1; ++l)
+        {
+	  // The second partial derivatives with respect to parameters
+	  // are all calculated via a central finite difference
+	  // stencil:
+          // F''_{kl} ~= (F(p+dp*e_k+dp*e_l) - F(p+dp*e_k-dp*e_l) -
+          //              F(p-dp*e_k+dp*e_l) - F(p-dp*e_k-dp*e_l))/(4*dp^2)
+	  // We will add Q''_{kl}(u) and subtract R''_{kl}(u,z) at the
+	  // same time.
+
+          Number old_parameterl = *parameters[l];
+
+          *parameters[k] = old_parameterk + delta_p;
+          *parameters[l] = old_parameterl + delta_p;
+          this->assemble_qoi(qoi_indices);
+          this->assembly(true, false);
+          std::vector<Number> partial2q_term = this->qoi;
+          std::vector<Number> partial2R_term(this->qoi.size());
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));
+
+          *parameters[l] = old_parameterl - delta_p;
+          this->assemble_qoi(qoi_indices);
+          this->assembly(true, false);
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              {
+                partial2q_term[i] -= this->qoi[i];
+                partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
+              }
+
+          *parameters[k] = old_parameterk - delta_p;
+          this->assemble_qoi(qoi_indices);
+          this->assembly(true, false);
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              {
+                partial2q_term[i] += this->qoi[i];
+                partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
+              }
+
+          *parameters[l] = old_parameterl + delta_p;
+          this->assemble_qoi(qoi_indices);
+          this->assembly(true, false);
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              {
+                partial2q_term[i] -= this->qoi[i];
+                partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
+                partial2q_term[i] /= (4. * delta_p * delta_p);
+                partial2R_term[i] /= (4. * delta_p * delta_p);
+              }
+
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              {
+                Number current_terms = partial2q_term[i] - partial2R_term[i];
+                sensitivities.second_derivative(i,k,l) += current_terms;
+                if (k != l)
+                  sensitivities.second_derivative(i,l,k) += current_terms;
+              }
+
+          // Don't leave the parameters perturbed
+          *parameters[l] = old_parameterl;
+          *parameters[k] = old_parameterk;
+        }
+
+      // We get (partial q / partial u) and 
+      // (partial R / partial u) from the user, but centrally
+      // difference to get q_uk and R_uk terms:
+      // (partial^2 q / partial u partial k)
+      // q_uk*u'_l = (q_u(p+dp*e_k)*u'_l - q_u(p-dp*e_k)*u'_l)/(2*dp)
+      // R_uk*z*u'_l = (R_u(p+dp*e_k)*z*u'_l - R_u(p-dp*e_k)*z*u'_l)/(2*dp)
+      //
+      // To avoid creating Nq temporary vectors, we add these
+      // subterms to the sensitivities output one by one.
+      //
+      // FIXME: this is probably a bad order of operations for
+      // controlling floating point error.
+
+      *parameters[k] = old_parameterk + delta_p;
+      this->assembly(false, true);
+      this->assemble_qoi_derivative(qoi_indices);
+
+      for (unsigned int l=0; l != Np; ++l)
+        {
+          this->matrix->vector_mult(*tempvec, this->get_sensitivity_solution(l));
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              {
+                Number current_terms = 
+                  (this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) -
+                   tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
+                sensitivities.second_derivative(i,k,l) += current_terms;
+
+		// We use the _uk terms twice; symmetry lets us reuse
+		// these calculations for the _ul terms.
+
+                sensitivities.second_derivative(i,l,k) += current_terms;
+              }
+        }
+ 
+      *parameters[k] = old_parameterk - delta_p;
+      this->assembly(false, true);
+      this->assemble_qoi_derivative(qoi_indices);
+
+      for (unsigned int l=0; l != Np; ++l)
+        {
+          this->matrix->vector_mult(*tempvec, this->get_sensitivity_solution(l));
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              {
+                Number current_terms = 
+                  (-this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) +
+                   tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
+                sensitivities.second_derivative(i,k,l) += current_terms;
+
+		// We use the _uk terms twice; symmetry lets us reuse
+		// these calculations for the _ul terms.
+
+                sensitivities.second_derivative(i,l,k) += current_terms;
+              }
+        }
+
+      // Don't leave the parameter perturbed
+      *parameters[k] = old_parameterk;
+ 
+      // Our last remaining terms are -R_uu(u,z)*u_k*u_l and
+      // Q_uu(u)*u_k*u_l
+      //
+      // We take directional central finite differences of R_u and Q_u
+      // to approximate these terms, e.g.:
+      //
+      // Q_uu(u)*u_k ~= (Q_u(u+dp*u_k) - Q_u(u-dp*u_k))/(2*dp)
+
+      *this->solution = this->get_sensitivity_solution(k);
+      *this->solution *= delta_p;
+      *this->solution += *oldsolution;
+      this->assembly(false, true);
+      this->assemble_qoi_derivative(qoi_indices);
+
+      // The Hessian is symmetric, so we just calculate the lower
+      // triangle and the diagonal, and we get the upper triangle from
+      // the transpose of the lower
+      //
+      // Note that, because we took the directional finite difference
+      // with respect to k and not l, we've added an O(delta_p^2)
+      // error to any permutational symmetry in the Hessian...
+      for (unsigned int l=0; l != k+1; ++l)
+        {
+          this->matrix->vector_mult(*tempvec, this->get_sensitivity_solution(l));
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              {
+                Number current_terms =
+                  (this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) -
+                   tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
+                sensitivities.second_derivative(i,k,l) += current_terms;
+                if (k != l)
+                  sensitivities.second_derivative(i,l,k) += current_terms;
+              }
+        }
+
+      *this->solution = this->get_sensitivity_solution(k);
+      *this->solution *= -delta_p;
+      *this->solution += *oldsolution;
+      this->assembly(false, true);
+      this->assemble_qoi_derivative(qoi_indices);
+
+      for (unsigned int l=0; l != k+1; ++l)
+        {
+          this->matrix->vector_mult(*tempvec, this->get_sensitivity_solution(l));
+          for (unsigned int i=0; i != Nq; ++i)
+            if (qoi_indices.has_index(i))
+              {
+                Number current_terms =
+                  (-this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) +
+                   tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
+                sensitivities.second_derivative(i,k,l) += current_terms;
+                if (k != l)
+                  sensitivities.second_derivative(i,l,k) += current_terms;
+              }
+        }
+
+      // Don't leave the solution perturbed
+      *this->solution = *oldsolution;
     }
 
   // All parameters have been reset.
