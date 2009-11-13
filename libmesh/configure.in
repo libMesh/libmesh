@@ -338,7 +338,7 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
-dnl Mesh == ParallelMesh -- disabled by default
+dnl Mesh == ParallelMesh -- disabled until it's debugged/finished
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(parmesh,
               AC_HELP_STRING([--enable-parmesh],
@@ -357,7 +357,7 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
-dnl Ghosted instead of Serial local vectors -- disabled by default
+dnl Ghosted instead of Serial local vectors -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(ghosted,
               AC_HELP_STRING([--enable-ghosted],
