@@ -896,13 +896,14 @@ fi
 dnl -------------------------------------------------------------
 
 dnl -------------------------------------------------------------
-dnl libHilbert -- enabled by default, distributed in ./contrib
+dnl libHilbert -- distributed in ./contrib, but
+dnl               disabled by default pending a bugfix
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(libHilbert,
               AC_HELP_STRING([--enable-libHilbert],
                              [build with Chris Hamilton's libHilbert]),
               enablelibhilbert=$enableval,
-              enablelibhilbert=yes)
+              enablelibhilbert=no)
 
 CONFIGURE_LIBHILBERT
 dnl -------------------------------------------------------------
