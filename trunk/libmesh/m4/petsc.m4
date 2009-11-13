@@ -25,7 +25,7 @@ AC_DEFUN([CONFIGURE_PETSC],
                                  [Fortran compiler to use]),
       	          [F77="$withval"],
       	          [])	
-      AC_PROG_F77            dnl Petsc requires linking with FORTRAN libraries 
+      AC_REQUIRE([AC_PROG_F77])   dnl Petsc requires linking with FORTRAN libraries 
       AC_F77_LIBRARY_LDFLAGS
       AC_SUBST(PETSC_ARCH)
       AC_SUBST(PETSC_DIR)
