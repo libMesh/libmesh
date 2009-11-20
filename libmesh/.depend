@@ -7119,7 +7119,6 @@ src/numerics/dense_matrix.$(obj-suffix):\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
-    include/numerics/petsc_macro.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -7132,6 +7131,19 @@ src/numerics/dense_matrix_base.$(obj-suffix):\
     include/base/print_trace.h\
     include/numerics/dense_matrix_base.h\
     include/numerics/dense_vector_base.h\
+    include/utils/compare_types.h
+src/numerics/dense_matrix_blas_lapack.$(obj-suffix):\
+    src/numerics/dense_matrix_blas_lapack.C\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/print_trace.h\
+    include/numerics/dense_matrix.h\
+    include/numerics/dense_matrix_base.h\
+    include/numerics/dense_vector.h\
+    include/numerics/dense_vector_base.h\
+    include/numerics/petsc_macro.h\
     include/utils/compare_types.h
 src/numerics/dense_submatrix.$(obj-suffix):\
     src/numerics/dense_submatrix.C\

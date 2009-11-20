@@ -27,23 +27,14 @@
 #include "libmesh.h"
 
 
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
-#include "petsc_macro.h"
-
-EXTERN_C_FOR_PETSC_BEGIN
-#include <petscblaslapack.h>
-EXTERN_C_FOR_PETSC_END
-#endif
 
 // ------------------------------------------------------------
 // Dense Matrix member functions
 
-
-
 template<typename T>
 void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 {
-  if (this->use_blas)
+  if (this->use_blas_lapack)
     this->_multiply_blas(M2, LEFT_MULTIPLY);
   else
     {
@@ -70,7 +61,7 @@ void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 template<typename T>
 void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 {
-  if (this->use_blas)
+  if (this->use_blas_lapack)
     this->_multiply_blas(A, LEFT_MULTIPLY_TRANSPOSE);
   else
     {
@@ -138,7 +129,7 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 template<typename T>
 void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
 {
-  if (this->use_blas)
+  if (this->use_blas_lapack)
     this->_multiply_blas(M3, RIGHT_MULTIPLY);
   else
     {
@@ -164,7 +155,7 @@ void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
 template<typename T>
 void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 {
-  if (this->use_blas)
+  if (this->use_blas_lapack)
     this->_multiply_blas(B, RIGHT_MULTIPLY_TRANSPOSE);
   else
     {
@@ -281,24 +272,55 @@ void DenseMatrix<T>::get_transpose (DenseMatrix<T>& dest) const
 }
 
 
+
+
 template<typename T>
 void DenseMatrix<T>::lu_solve (DenseVector<T>& b,
 			       DenseVector<T>& x,
 			       const bool partial_pivot)
 {
-  // Check for a previous decomposition
+  // Check to be sure that the matrix is square before attempting
+  // an LU-solve.  In general, one can compute the LU factorization of
+  // a non-square matrix, but:
+  //
+  // Overdetermined systems (m>n) have a solution only if enough of
+  // the equations are linearly-dependent.
+  //
+  // Underdetermined systems (m<n) typically have infinitely many
+  // solutions.
+  // 
+  // We don't want to deal with either of these ambiguous cases here...
+  if (this->m() != this->n())
+    {
+      std::cout << "Error! LU solve only works for square matrices!"
+		<< std::endl;
+      libmesh_error();
+    }
+
+
   switch(this->_decomposition_type)
     {
     case NONE:
       {
-	this->_lu_decompose (partial_pivot);
+	if (this->use_blas_lapack)
+	  this->_lu_decompose_lapack();	  
+	else
+	  this->_lu_decompose (partial_pivot);
 	break;
+      }
+
+    case LU_BLAS_LAPACK:
+      {
+	// Already factored, just need to call back_substitute.
+	if (this->use_blas_lapack)
+	  break;
       }
 
     case LU:
       {
 	// Already factored, just need to call back_substitute.
-	break;
+	if ( !(this->use_blas_lapack) )
+	  break;
       }
 
     default:
@@ -310,11 +332,16 @@ void DenseMatrix<T>::lu_solve (DenseVector<T>& b,
       }
     }
 
-  // Perform back substitution
-  this->_lu_back_substitute (b, x, partial_pivot);
+  if (this->use_blas_lapack)
+     this->_lu_back_substitute_lapack (b, x);
+  else
+    this->_lu_back_substitute (b, x, partial_pivot);
 }
 
-  
+
+
+
+
 
 template<typename T>
 void DenseMatrix<T>::_lu_back_substitute (DenseVector<T>& b,
@@ -375,6 +402,12 @@ void DenseMatrix<T>::_lu_back_substitute (DenseVector<T>& b,
 }
 
 
+
+
+
+
+
+
 template<typename T>
 void DenseMatrix<T>::_lu_decompose (const bool partial_pivot)
 {
@@ -385,8 +418,6 @@ void DenseMatrix<T>::_lu_decompose (const bool partial_pivot)
   // Get the matrix size and make sure it is square
   const unsigned int
     m = this->m();
-
-  libmesh_assert (m == this->n());
 
   // A convenient reference to *this
   DenseMatrix<T>& A = *this;
@@ -428,6 +459,11 @@ void DenseMatrix<T>::_lu_decompose (const bool partial_pivot)
   // Set the flag for LU decomposition
   this->_decomposition_type = LU;
 }
+
+
+
+
+
 
 
 
@@ -599,179 +635,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
 
 
 
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
-template<typename T>
-void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
-				    _BLAS_Multiply_Flag flag)
-{
-  int result_size = 0;
-  
-  // For each case, determine the size of the final result make sure
-  // that the inner dimensions match
-  switch (flag)
-    {
-    case LEFT_MULTIPLY:
-      {
-	result_size = other.m() * this->n();
-	if (other.n() == this->m())
-	  break;
-      }
-    case RIGHT_MULTIPLY:
-      {
-	result_size = other.n() * this->m();
-	if (other.m() == this->n())
-	  break;
-      }
-    case LEFT_MULTIPLY_TRANSPOSE:
-      {
-	result_size = other.n() * this->n();
-	if (other.m() == this->m())
-	  break;
-      }
-    case RIGHT_MULTIPLY_TRANSPOSE:
-      {
-	result_size = other.m() * this->m();
-	if (other.n() == this->n())
-	  break;
-      }
-    default:
-      {
-	std::cout << "Unknown flag selected or matrices are ";
-	std::cout << "incompatible for multiplication." << std::endl;
-	libmesh_error();
-      }
-    }
-
-  // For this to work, the passed arg. must actually be a DenseMatrix<T>
-  const DenseMatrix<T>* const_that = dynamic_cast< const DenseMatrix<T>* >(&other);
-  if (!const_that)
-    {
-      std::cerr << "Unable to cast input matrix to usable type." << std::endl;
-      libmesh_error();
-    }
-
-  // Also, although 'that' is logically const in this BLAS routine,
-  // the PETSc BLAS interface does not specify that any of the inputs are
-  // const.  To use it, I must cast away const-ness.
-  DenseMatrix<T>* that = const_cast< DenseMatrix<T>* > (const_that);
-
-  // Initialize A, B pointers for LEFT_MULTIPLY* cases
-  DenseMatrix<T>
-    *A = this,
-    *B = that;
-
-  // For RIGHT_MULTIPLY* cases, swap the meaning of A and B.
-  // Here is a full table of combinations we can pass to BLASgemm, and what the answer is when finished:
-  // pass A B   -> (Fortran) -> A^T B^T -> (C++) -> (A^T B^T)^T -> (identity) -> B A   "lt multiply"
-  // pass B A   -> (Fortran) -> B^T A^T -> (C++) -> (B^T A^T)^T -> (identity) -> A B   "rt multiply"
-  // pass A B^T -> (Fortran) -> A^T B   -> (C++) -> (A^T B)^T   -> (identity) -> B^T A "lt multiply t"
-  // pass B^T A -> (Fortran) -> B A^T   -> (C++) -> (B A^T)^T   -> (identity) -> A B^T "rt multiply t"
-  if (flag==RIGHT_MULTIPLY || flag==RIGHT_MULTIPLY_TRANSPOSE)
-    std::swap(A,B);
-
-  // transa, transb values to pass to blas
-  char
-    transa[] = "n",
-    transb[] = "n";
-
-  // Integer values to pass to BLAS:
-  //
-  // M  
-  // In Fortran, the number of rows of op(A),
-  // In the BLAS documentation, typically known as 'M'.
-  //
-  // In C/C++, we set:
-  // M = n_cols(A) if (transa='n')
-  //     n_rows(A) if (transa='t')
-  int M = static_cast<int>( A->n() );
-
-  // N
-  // In Fortran, the number of cols of op(B), and also the number of cols of C.
-  // In the BLAS documentation, typically known as 'N'.
-  //	    
-  // In C/C++, we set:
-  // N = n_rows(B) if (transb='n')
-  //     n_cols(B) if (transb='t')
-  int N = static_cast<int>( B->m() );
-
-  // K
-  // In Fortran, the number of cols of op(A), and also
-  // the number of rows of op(B). In the BLAS documentation,
-  // typically known as 'K'.
-  //
-  // In C/C++, we set:
-  // K = n_rows(A) if (transa='n')
-  //     n_cols(A) if (transa='t')
-  int K = static_cast<int>( A->m() );
-
-  // LDA (leading dimension of A). In our cases,
-  // LDA is always the number of columns of A.
-  int LDA = static_cast<int>( A->n() );
-
-  // LDB (leading dimension of B).  In our cases,
-  // LDB is always the number of columns of B.
-  int LDB = static_cast<int>( B->n() );
-
-  if (flag == LEFT_MULTIPLY_TRANSPOSE)
-    {
-      transb[0] = 't';
-      N = static_cast<int>( B->n() );
-    }
-
-  else if (flag == RIGHT_MULTIPLY_TRANSPOSE)
-    {
-      transa[0] = 't';
-      std::swap(M,K);
-    }
-
-  // LDC (leading dimension of C).  LDC is the
-  // number of columns in the solution matrix.
-  int LDC = M;
-  
-  // Scalar values to pass to BLAS
-  //
-  // scalar multiplying the whole product AB 
-  T alpha = 1.;
-  
-  // scalar multiplying C, which is the original matrix.
-  T beta  = 0.;
-
-  // Storage for the result
-  std::vector<T> result (result_size);
-
-  // Finally ready to call the BLAS
-  BLASgemm_(transa, transb, &M, &N, &K, &alpha, &(A->_val[0]), &LDA, &(B->_val[0]), &LDB, &beta, &result[0], &LDC);
-
-  // Update the relevant dimension for this matrix.
-  switch (flag)
-    {
-    case LEFT_MULTIPLY:            { this->_m = other.m(); break; }
-    case RIGHT_MULTIPLY:           { this->_n = other.n(); break; }
-    case LEFT_MULTIPLY_TRANSPOSE:  { this->_m = other.n(); break; }
-    case RIGHT_MULTIPLY_TRANSPOSE: { this->_n = other.m(); break; }
-    default:
-      {
-	std::cout << "Unknown flag selected." << std::endl;
-	libmesh_error();
-      }
-    }
-  
-  // Swap my data vector with the result
-  this->_val.swap(result);
-}
-
-#else
-
-template<typename T>
-void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& ,
-				    _BLAS_Multiply_Flag )
-{
-  std::cerr << "No PETSc-provided BLAS available!" << std::endl;
-  libmesh_error();
-}
-
-#endif
 
 
 // This routine is commented out since it is not really a memory

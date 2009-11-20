@@ -311,7 +311,7 @@ public:
    * This was primarily used for testing purposes, and could be
    * removed...
    */
-  bool use_blas;
+  bool use_blas_lapack;
   
 private:
 
@@ -361,7 +361,7 @@ private:
    * any desired outcome.  This typedef keeps track of which decomposition
    * has been called for this matrix.  
    */
-  enum DecompositionType {LU=0, CHOLESKY=1, NONE};
+  enum DecompositionType {LU=0, CHOLESKY=1, LU_BLAS_LAPACK, NONE};
 
   /**
    * This flag keeps track of which type of decomposition has been
@@ -370,9 +370,8 @@ private:
   DecompositionType _decomposition_type;
 
   /**
-   * Computes A <- op(A) * op(B) using BLAS gemm function.
-   * Used in the right_multiply(), left_multiply(), right_multiply_transpose(),
-   * and left_multiply_tranpose() routines.
+   * Enumeration used to determine the behavior of the _multiply_blas
+   * function.
    */
   enum _BLAS_Multiply_Flag {
     LEFT_MULTIPLY = 0,
@@ -381,8 +380,46 @@ private:
     RIGHT_MULTIPLY_TRANSPOSE
   };
   
+  /**
+   * The _multiply_blas function computes A <- op(A) * op(B) using
+   * BLAS gemm function.  Used in the right_multiply(),
+   * left_multiply(), right_multiply_transpose(), and
+   * left_multiply_tranpose() routines.
+   * [ Implementation in dense_matrix_blas_lapack.C ]
+   */
   void _multiply_blas(const DenseMatrixBase<T>& other,
 		      _BLAS_Multiply_Flag flag);
+
+  /**
+   * Computes an LU factorization of the matrix using the
+   * Lapack routine "getrf".  This routine should only be
+   * used by the "use_blas_lapack" branch of the lu_solve()
+   * function.  After the call to this function, the matrix
+   * is replaced by its factorized version, and the
+   * DecompositionType is set to LU_BLAS_LAPACK.
+   * [ Implementation in dense_matrix_blas_lapack.C ]
+   */
+  void _lu_decompose_lapack();
+
+  /**
+   * This array is used to store pivot indices.  May be used
+   * by whatever factorization is currently active, clients of
+   * the class should not rely on it for any reason.
+   */
+  std::vector<int> _pivots;
+
+  /**
+   * Companion function to _lu_decompose_lapack().  Do not use
+   * directly, called through the public lu_solve() interface.
+   * This function is logically const in that it does not modify
+   * the matrix, but since we are just calling LAPACK routines,
+   * it's less const_cast hassle to just declare the function
+   * non-const.
+   * [ Implementation in dense_matrix_blas_lapack.C ]
+   */
+  void _lu_back_substitute_lapack (DenseVector<T>& b,
+				   DenseVector<T>& x);
+
 };
 
 
@@ -431,9 +468,9 @@ DenseMatrix<T>::DenseMatrix(const unsigned int m,
 			    const unsigned int n)
   : DenseMatrixBase<T>(m,n),
 #if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_USE_REAL_NUMBERS)
-    use_blas(true),
+    use_blas_lapack(true),
 #else
-    use_blas(false),
+    use_blas_lapack(false),
 #endif
     _decomposition_type(NONE)
 {
