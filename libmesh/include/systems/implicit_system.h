@@ -137,7 +137,7 @@ public:
    * This is undefined in ImplicitSystem; subclasses each have their
    * own way of handling assembly.
    */
-  virtual void assembly(bool get_residual, bool get_jacobian)
+  virtual void assembly(bool /* get_residual */ , bool /* get_jacobian */)
     { libmesh_error(); }
 
   /**
