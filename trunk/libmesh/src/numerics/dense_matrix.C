@@ -214,33 +214,50 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
     }
 }
 
+
+
 template<typename T>
 void DenseMatrix<T>::vector_mult (DenseVector<T>& dest, 
                                   const DenseVector<T>& arg) const
 {
-  const unsigned int n_rows = this->m();
-  const unsigned int n_cols = this->n();
+  // Make sure the input sizes are compatible
+  libmesh_assert(this->n() == arg.size());
 
-  // Make sure the sizes are compatible
-  libmesh_assert(n_cols == arg.size());
+  // Resize and clear dest.
+  // Note: DenseVector::resize() also zeros the vector.
+  dest.resize(this->m());
 
-  // Resize and clear dest
-  dest.resize(n_rows);
+  if (this->use_blas_lapack)
+    this->_matvec_blas(1., 0., dest, arg);
+  else
+    {
+      const unsigned int n_rows = this->m();
+      const unsigned int n_cols = this->n();
 
-  for(unsigned int i=0; i<n_rows; i++)
-    for(unsigned int j=0; j<n_cols; j++)
-      dest(i) += (*this)(i,j)*arg(j);
+      for(unsigned int i=0; i<n_rows; i++)
+	for(unsigned int j=0; j<n_cols; j++)
+	  dest(i) += (*this)(i,j)*arg(j);
+    }
 }
+
+
 
 template<typename T>
 void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest, 
                                       const T factor,
                                       const DenseVector<T>& arg) const
 {
-  DenseVector<T> temp(arg.size());
-  this->vector_mult(temp, arg);
-  dest.add(factor, temp);
+  if (this->use_blas_lapack)
+    this->_matvec_blas(factor, 1., dest, arg);
+  else
+    {
+      DenseVector<T> temp(arg.size());
+      this->vector_mult(temp, arg);
+      dest.add(factor, temp);
+    }
 }
+
+
 
 template<typename T>
 void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m,
@@ -255,11 +272,15 @@ void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m,
       dest(i,j) = (*this)(i,j);
 }
 
+
+
 template<typename T>
 void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m, DenseMatrix<T>& dest) const
 {
   get_principal_submatrix(sub_m, sub_m, dest);
 }
+
+
 
 template<typename T>
 void DenseMatrix<T>::get_transpose (DenseMatrix<T>& dest) const
