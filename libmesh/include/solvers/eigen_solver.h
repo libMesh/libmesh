@@ -99,7 +99,7 @@ public:
   /**
    * Returns the position of the spectrum to compute.
    */
-  PositionOfSpectrum postition_of_spectrum () const
+  PositionOfSpectrum position_of_spectrum () const
     { return _position_of_spectrum;}
 
   /**
