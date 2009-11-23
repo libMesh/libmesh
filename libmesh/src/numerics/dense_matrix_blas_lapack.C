@@ -384,10 +384,124 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (DenseVector<T>& ,
 
 
 
+
+
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
+
+template<typename T>
+void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
+				  DenseVector<T>& dest,
+				  const DenseVector<T>& arg) const
+{
+  // Ensure that dest and arg are proper size
+  // dest  ~ A     * arg
+  // (mx1)   (mxn) * (nx1)
+  if ((dest.size() != this->m()) || (arg.size() != this->n()))
+    {
+      std::cout << "Improper input argument sizes!" << std::endl;
+      libmesh_error();
+    }
+  
+  // Calling sequence for dgemv:
+  //
+  // dgemv(TRANS,M,N,ALPHA,A,LDA,X,INCX,BETA,Y,INCY)
+  
+  //   TRANS  - CHARACTER*1, 't' for transpose, 'n' for non-transpose multiply
+  char TRANS[] = "t";
+  
+  //   M      - INTEGER.
+  //            On entry, M specifies the number of rows of the matrix A.
+  // In C/C++, pass the number of *cols* of A
+  int M = this->n();
+    
+  //   N      - INTEGER.
+  //            On entry, N specifies the number of columns of the matrix A.
+  // In C/C++, pass the number of *rows* of A
+  int N = this->m();
+  
+  //   ALPHA  - DOUBLE PRECISION.
+  // The scalar constant passed to this function
+
+  //   A      - DOUBLE PRECISION array of DIMENSION ( LDA, n ).
+  //            Before entry, the leading m by n part of the array A must
+  //            contain the matrix of coefficients.
+  // The matrix, *this.  Note that _matvec_blas is called from
+  // a const function, vector_mult(), and so we have made this function const
+  // as well.  Since BLAS knows nothing about const, we have to cast it away
+  // now.
+  DenseMatrix<T>& a_ref = const_cast< DenseMatrix<T>& > ( *this );
+  std::vector<T>& a = a_ref.get_values();
+
+  //   LDA    - INTEGER.
+  //            On entry, LDA specifies the first dimension of A as declared
+  //            in the calling (sub) program. LDA must be at least
+  //            max( 1, m ).
+  int LDA = M;
+  
+  //   X      - DOUBLE PRECISION array of DIMENSION at least
+  //            ( 1 + ( n - 1 )*abs( INCX ) ) when TRANS = 'N' or 'n'
+  //            and at least
+  //            ( 1 + ( m - 1 )*abs( INCX ) ) otherwise.
+  //            Before entry, the incremented array X must contain the
+  //            vector x.
+  // Here, we must cast away the const-ness of "arg" since BLAS knows
+  // nothing about const
+  DenseVector<T>& x_ref = const_cast< DenseVector<T>& > ( arg );
+  std::vector<T>& x = x_ref.get_values();
+  
+  //   INCX   - INTEGER.
+  //            On entry, INCX specifies the increment for the elements of
+  //            X. INCX must not be zero.
+  int INCX = 1;
+  
+  //   BETA   - DOUBLE PRECISION.
+  //            On entry, BETA specifies the scalar beta. When BETA is
+  //            supplied as zero then Y need not be set on input.
+  // The second scalar constant passed to this function
+
+  //   Y      - DOUBLE PRECISION array of DIMENSION at least
+  //            ( 1 + ( m - 1 )*abs( INCY ) ) when TRANS = 'N' or 'n'
+  //            and at least
+  //            ( 1 + ( n - 1 )*abs( INCY ) ) otherwise.
+  //            Before entry with BETA non-zero, the incremented array Y
+  //            must contain the vector y. On exit, Y is overwritten by the
+  //            updated vector y.
+  // The input vector "dest"
+  std::vector<T>& y = dest.get_values();
+
+  //   INCY   - INTEGER.
+  //            On entry, INCY specifies the increment for the elements of
+  //            Y. INCY must not be zero.
+  int INCY = 1;
+  
+  // Finally, ready to call the BLAS function
+  BLASgemv_(TRANS, &M, &N, &alpha, &(a[0]), &LDA, &(x[0]), &INCX, &beta, &(y[0]), &INCY);
+}
+
+
+#else
+
+
+template<typename T>
+void DenseMatrix<T>::_matvec_blas(T , T,
+				  DenseVector<T>& ,
+				  const DenseVector<T>& ) const
+{
+  std::cerr << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
+  libmesh_error();
+}
+
+
+#endif
+
+
 //--------------------------------------------------------------
 // Explicit instantiations
 template void DenseMatrix<Real>::_multiply_blas(const DenseMatrixBase<Real>&, _BLAS_Multiply_Flag);
 template void DenseMatrix<Real>::_lu_decompose_lapack();
 template void DenseMatrix<Real>::_lu_back_substitute_lapack(DenseVector<Real>& ,
 							    DenseVector<Real>&);
+template void DenseMatrix<Real>::_matvec_blas(Real, Real,
+					      DenseVector<Real>& ,
+					      const DenseVector<Real>& ) const;
 

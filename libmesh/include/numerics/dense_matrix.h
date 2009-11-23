@@ -107,12 +107,14 @@ public:
   virtual void right_multiply (const DenseMatrixBase<T>& M3);
 
   /**
-   * Perform matrix vector multiplication.
+   * Performs the matrix-vector multiplication,
+   * \p dest := (*this) * \p arg.
    */
   void vector_mult(DenseVector<T>& dest, const DenseVector<T>& arg) const;
   
   /**
-   * Perform matrix vector multiplication and add scaled result to \p dest.
+   * Performs the scaled matrix-vector multiplication,
+   * \p dest += \p factor * (*this) * \p arg. 
    */
   void vector_mult_add (DenseVector<T>& dest, 
                         const T factor,
@@ -420,6 +422,19 @@ private:
   void _lu_back_substitute_lapack (DenseVector<T>& b,
 				   DenseVector<T>& x);
 
+  /**
+   * Uses the BLAS GEMV function (through PETSc) to compute
+   *
+   * dest := alpha*A*arg + beta*dest
+   *
+   * where alpha and beta are scalars, A is this matrix, and
+   * arg and dest are input vectors of appropriate size.
+   *
+   * [ Implementation in dense_matrix_blas_lapack.C ]
+   */
+  void _matvec_blas(T alpha, T beta,
+		    DenseVector<T>& dest,
+		    const DenseVector<T>& arg) const;
 };
 
 
