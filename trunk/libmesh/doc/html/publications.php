@@ -75,6 +75,24 @@ The University of Texas at Austin, August 2004.
 <ol>
 
 <li>
+M.&nbsp;P. L&uuml;thi.
+  Transient response of idealized glaciers to climate variations.
+  <em>Journal of Glaciology</em>, 55(193):918-930, 2009.<br />  
+<pre>
+@Article{Luethi2009,
+ author  = {M.~P.~L\"{u}thi},
+ title   = {Transient response of idealized glaciers to climate variations},
+ journal = {Journal of Glaciology},
+ year    = 2009,
+ number  = 193,
+ volume  = 55,
+ pages   = {918--930}
+}
+</pre>
+</li>
+
+
+<li>
 B.&nbsp;S. Kirk.
   Multidimensional Assessment of Modeling Error in Typical High-Speed
   Wind-Tunnel Heat-Transfer Data-Reduction Schemes.
