@@ -390,12 +390,20 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
 			 &iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Extract submatrix
+#if !PETSC_VERSION_LESS_THAN(3,0,1) || !PETSC_VERSION_RELEASE
+  ierr = MatGetSubMatrix(_mat,
+			 isrow,
+			 iscol,
+			 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
+			 &(petsc_submatrix->_mat));  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
   ierr = MatGetSubMatrix(_mat,
 			 isrow,
 			 iscol,
 			 PETSC_DECIDE,
 			 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
 			 &(petsc_submatrix->_mat));  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
 
   // Specify that the new submatrix is initialized and close it.
   petsc_submatrix->_is_initialized = true;
