@@ -312,7 +312,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
     {
       std::pair<unsigned int, Real> rval =
         linear_solver->solve (*matrix, pc,
-                              this->get_sensitivity_solution(p),
+                              this->add_sensitivity_solution(p),
                               this->get_sensitivity_rhs(p),
                               solver_params.second,
                               solver_params.first);
