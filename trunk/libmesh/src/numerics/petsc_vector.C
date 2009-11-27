@@ -580,6 +580,9 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
   libmesh_assert (this->_global_to_local_map ==
                   v._global_to_local_map);
 
+  libmesh_assert (v.closed());
+  this->_is_closed = true;
+
   if (v.size() != 0)
     {
       int ierr = 0;
