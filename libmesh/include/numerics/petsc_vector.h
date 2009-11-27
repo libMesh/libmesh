@@ -742,7 +742,7 @@ void PetscVector<T>::init (const unsigned int n,
     libmesh_error();
   
   this->_is_initialized = true;
-//  this->_is_closed = true;
+  this->_is_closed = true;
   
   
   if (fast == false)
@@ -807,7 +807,7 @@ void PetscVector<T>::init (const unsigned int n,
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
   this->_is_initialized = true;
-//  this->_is_closed = true;
+  this->_is_closed = true;
   
   if (fast == false)
     this->zero ();
