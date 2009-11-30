@@ -287,6 +287,8 @@ void System::reinit ()
   for (unsigned int i=0; i<local_size; i++)
     solution->set(i+first_local_dof,
 		  (*current_local_solution)(i+first_local_dof));
+
+  solution->close();
 #endif
 }
 
