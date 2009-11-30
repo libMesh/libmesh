@@ -203,9 +203,14 @@ int main (int argc, char** argv)
       // Read the mesh from file.
       mesh.read ("mesh.xda");
 
+      // Again do a search on the command line for the argument
+      unsigned int n_refinements = 5;
+      if(command_line.search("-n_refinements"))
+        n_refinements = command_line.next(0);
+
       // Uniformly refine the mesh 5 times
       if(!read_solution)
-        mesh_refinement.uniformly_refine (5);
+        mesh_refinement.uniformly_refine (n_refinements);
 
       // Print information about the mesh to the screen.
       mesh.print_info();
