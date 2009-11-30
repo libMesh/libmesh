@@ -33,7 +33,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 target 	    := ./ex10-$(METHOD)
 
 # Specify the number of timesteps to do when we call "make run"
-n_timesteps := 1
+n_timesteps := 25
 
 all:: $(target)
 
