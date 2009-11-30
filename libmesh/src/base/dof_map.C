@@ -1222,9 +1222,8 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
       const unsigned int ig = dof_indices[il];
 
       if (this->is_constrained_dof (ig)) has_constrained_dofs = true;
-      
-      libmesh_assert ((il >= Ug.first_local_index()) &&
-	      (il <  Ug.last_local_index()));
+
+      libmesh_assert (ig < Ug.size());
 
       Ue.el(il) = Ug(ig);
     }
