@@ -149,10 +149,22 @@ echo_cxx:
 	@echo  " " $(libmesh_CXX) " "
 
 #
+# Print the name of the C compiler, padded with whitespace
+#
+echo_cc:
+	@echo  " " $(libmesh_CC) " "
+
+#
 # Print the flags used for C++ compilation, padded with whitespace
 #
 echo_cxxflags:
 	@echo " " $(libmesh_CXXFLAGS) " "
+
+#
+# Print the flags used for C compilation, padded with whitespace
+#
+echo_cflags:
+	@echo " " $(libmesh_CFLAGS) " "
 
 #
 # Print C++ compiler include path, padded with whitespace
