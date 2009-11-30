@@ -338,6 +338,11 @@ int main (int argc, char** argv)
         {
           // Assemble & solve the linear system
           system.solve();
+
+          // Print out the H1 norm, for verification purposes:
+          Real H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
+
+          std::cout << "H1 norm = " << H1norm << std::endl;
           
           // Possibly refine the mesh
           if (r_step+1 != max_r_steps)
@@ -387,7 +392,7 @@ int main (int argc, char** argv)
             }            
         }
         
-      // Output evey 10 timesteps to file.
+      // Output every 10 timesteps to file.
       if ( (t_step+1)%10 == 0)
         {
           OStringStream file_name;
