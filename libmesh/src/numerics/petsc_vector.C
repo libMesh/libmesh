@@ -821,7 +821,7 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 
   // Only good for serial vectors.
   // libmesh_assert (this->size() == this->local_size());
-  libmesh_assert (last_local_idx > first_local_idx);
+  libmesh_assert (last_local_idx >= first_local_idx);
   libmesh_assert (send_list.size() <= this->size());
   libmesh_assert (last_local_idx < this->size());
   
