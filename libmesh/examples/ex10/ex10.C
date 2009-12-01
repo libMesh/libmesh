@@ -285,6 +285,10 @@ int main (int argc, char** argv)
   // the assemble function.
   equation_systems.parameters.set<RealVectorValue>("velocity") = 
     RealVectorValue (0.8, 0.8);
+
+  // The Convection-Diffusion system also requires a specified
+  // diffusivity.  We use an isotropic (hence Real) value.
+  equation_systems.parameters.set<Real>("diffusivity") = 0.01;
     
   // Solve the system "Convection-Diffusion".  This will be done by
   // looping over the specified time interval and calling the
@@ -525,6 +529,9 @@ void assemble_cd (EquationSystems& es,
   const RealVectorValue velocity =
     es.parameters.get<RealVectorValue> ("velocity");
 
+  const Real diffusivity =
+    es.parameters.get<Real> ("diffusivity");
+
   const Real dt = es.parameters.get<Real>   ("dt");
   const Real time = es.parameters.get<Real> ("time");
 
@@ -602,7 +609,7 @@ void assemble_cd (EquationSystems& es,
                                         (grad_u_old*velocity)*phi[i][qp] +
                                         
                                         // Diffusion term
-                                        0.01*(grad_u_old*dphi[i][qp]))     
+                                        diffusivity*(grad_u_old*dphi[i][qp]))     
                                 );
               
               for (unsigned int j=0; j<phi.size(); j++)
@@ -615,7 +622,7 @@ void assemble_cd (EquationSystems& es,
                                              // Convection term
                                              (velocity*dphi[j][qp])*phi[i][qp] +
                                              // Diffusion term
-                                             0.01*(dphi[i][qp]*dphi[j][qp]))      
+                                             diffusivity*(dphi[i][qp]*dphi[j][qp]))      
                                       );
                 }
             } 
