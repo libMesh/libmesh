@@ -260,6 +260,11 @@ int main (int argc, char** argv)
       // have to attach an init() function since we are initializing the
       // system by reading in "saved_solution.xda"
       system.attach_assemble_function (assemble_cd);
+
+      // Print out the H1 norm of the saved solution, for verification purposes:
+      Real H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
+
+      std::cout << "Initial H1 norm = " << H1norm << std::endl << std::endl;
     }
 
   // Prints information about the system to the screen.
