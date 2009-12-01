@@ -421,6 +421,14 @@ int main (int argc, char** argv)
 
   if(!read_solution)
     {
+      // Print out the H1 norm of the saved solution, for verification purposes:
+      TransientLinearImplicitSystem& system =
+	equation_systems.get_system<TransientLinearImplicitSystem>
+          ("Convection-Diffusion");
+      Real H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
+
+      std::cout << "Final H1 norm = " << H1norm << std::endl << std::endl;
+
       mesh.write("saved_mesh.xda");
       equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
     }
