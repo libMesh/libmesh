@@ -380,46 +380,46 @@ void DenseMatrix<T>::_lu_back_substitute (DenseVector<T>& b,
   // A convenient reference to *this
   const DenseMatrix<T>& A = *this;
 
-  // Transform the RHS vector
-  for (unsigned int i=0; i<(n-1); i++)
+  // Temporary vector storage.  We use this instead of
+  // overwriting the RHS.  This algorithm assumes columns
+  // scaled by the respective diagonal entries, and may
+  // be from the original numerical recipes in C...
+  DenseVector<T> z(n);
+
+  // Compute and store diagonal inverse entries, taking care
+  // not to divide by zero
+  DenseVector<T> diag_inv(n);
+  
+  for (unsigned int i=0; i<n; ++i)
     {
-      // Get the diagonal entry and take its inverse
+      // Get the ith diagonal entry and take its inverse
       const T diag = A(i,i);
       
       libmesh_assert (diag != libMesh::zero);
+	  
+      diag_inv(i) = 1./diag;
+    }
   
-      const T diag_inv = 1./diag;
-
-      // Get the entry b(i) and store it
-      const T bi = b(i);
+  // Solve Lz=b for z, using a lower-triangular solve
+  for (unsigned int i=0; i<n; ++i)
+    {
+      z(i) = b(i);
       
-      for (unsigned int j=(i+1); j<n; j++)
-	b(j) -= bi*A(j,i)*diag_inv;
+      for (unsigned int j=0; j<i; ++j)
+	z(i) -= A(i,j)*diag_inv(j)*z(j);
     }
 
+  // Solve Ux=z for x, using an upper-triangular solve
+  const unsigned int last_row = n-1;
 
-  // Perform back-substitution
-  {
-    x(n-1) = b(n-1)/A(n-1,n-1);
-
-    for (unsigned int i=0; i<=(n-1); i++)
-      {
-	const unsigned int ib = (n-1)-i;
-
-	// Get the diagonal and take its inverse
-	const T diag = A(ib,ib);
-
-	libmesh_assert (diag != libMesh::zero);
-
-	const T diag_inv = 1./diag;
+  for (int i=last_row; i>=0; --i)
+    {
+      x(i) = z(i) * diag_inv(i);
 	
-	for (unsigned int j=(ib+1); j<n; j++)
-	  {
-	    b(ib) -= A(ib,j)*x(j);
-	    x(ib)  = b(ib)*diag_inv;
-	  }
-      }
-  }
+      for (int j=last_row; j>i; --j)
+	x(i) -= A(i,j)*diag_inv(i)*x(j);
+    }
+  
 }
 
 
