@@ -269,11 +269,12 @@ public:
   { DenseMatrixBase<T>::condense (i, j, val, rhs); }
 
   /**
-   * Solve the system Ax=b given the input vector b.
+   * Solve the system Ax=b given the input vector b.  Partial pivoting
+   * is performed by default in order to keep the algorithm stable to
+   * the effects of round-off error.
    */
-  void lu_solve (DenseVector<T>& b,
-		 DenseVector<T>& x,
-		 const bool partial_pivot = false);
+  void lu_solve (const DenseVector<T>& b,
+		 DenseVector<T>& x);
 
 
 
@@ -327,16 +328,15 @@ private:
    * is private since it is only called as part of the implementation
    * of the lu_solve(...) function.
    */
-  void _lu_decompose (const bool partial_pivot = false);
+  void _lu_decompose ();
   
   /**
    * Solves the system Ax=b through back substitution.  This function
    * is private since it is only called as part of the implementation
    * of the lu_solve(...) function.
    */
-  void _lu_back_substitute (DenseVector<T>& b,
-			    DenseVector<T>& x,
-			    const bool partial_pivot = false) const;
+  void _lu_back_substitute (const DenseVector<T>& b,
+			    DenseVector<T>& x) const;
   
   /**
    * Decomposes a symmetric positive definite matrix into a
@@ -419,7 +419,7 @@ private:
    * non-const.
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _lu_back_substitute_lapack (DenseVector<T>& b,
+  void _lu_back_substitute_lapack (const DenseVector<T>& b,
 				   DenseVector<T>& x);
 
   /**

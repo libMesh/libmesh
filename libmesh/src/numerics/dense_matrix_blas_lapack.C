@@ -294,7 +294,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
-void DenseMatrix<T>::_lu_back_substitute_lapack (DenseVector<T>& b,
+void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
 						 DenseVector<T>& x) 
 {
   // The calling sequence for getrs is:
@@ -334,12 +334,12 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (DenseVector<T>& b,
   // Here, we pass a copy of the rhs vector's data array in x, so that the
   // passed right-hand side b is unmodified.  I don't see a way around this
   // copy if we want to maintain an unmodified rhs in LibMesh.
-  // x = b;
-  // std::vector<T>& x_vec = x.get_values();
+  x = b;
+  std::vector<T>& x_vec = x.get_values();
 
   // We can avoid the copy if we don't care about overwriting the RHS: just
   // pass b to the Lapack routine and then swap with x before exiting
-  std::vector<T>& x_vec = b.get_values();
+  // std::vector<T>& x_vec = b.get_values();
  
   //    LDB     (input) int*
   //            The leading dimension of the array B.  LDB >= max(1,N).
@@ -362,18 +362,19 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (DenseVector<T>& b,
       libmesh_error();
     }
 
+  // Don't do this if you already made a copy of b above
   // Swap b and x.  The solution will then be in x, and whatever was originally
   // in x, maybe garbage, maybe nothing, will be in b.
   // FIXME: Rewrite the LU and Cholesky solves to just take one input, and overwrite
   // the input.  This *should* make user code simpler, as they don't have to create
   // an extra vector just to pass it in to the solve function!
-  b.swap(x);
+  // b.swap(x);
 }
 
 #else
 
 template<typename T>
-void DenseMatrix<T>::_lu_back_substitute_lapack (DenseVector<T>& ,
+void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& ,
 						 DenseVector<T>& )
 {
   std::cerr << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
@@ -499,7 +500,7 @@ void DenseMatrix<T>::_matvec_blas(T , T,
 // Explicit instantiations
 template void DenseMatrix<Real>::_multiply_blas(const DenseMatrixBase<Real>&, _BLAS_Multiply_Flag);
 template void DenseMatrix<Real>::_lu_decompose_lapack();
-template void DenseMatrix<Real>::_lu_back_substitute_lapack(DenseVector<Real>& ,
+template void DenseMatrix<Real>::_lu_back_substitute_lapack(const DenseVector<Real>& ,
 							    DenseVector<Real>&);
 template void DenseMatrix<Real>::_matvec_blas(Real, Real,
 					      DenseVector<Real>& ,
