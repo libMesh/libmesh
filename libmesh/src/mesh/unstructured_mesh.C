@@ -530,7 +530,7 @@ void UnstructuredMesh::read (const std::string& name,
 	  // don't have libHilbert, then we'll have to skip
 	  // renumbering because we need the numbering to remain
 	  // consistent with any solution file we read in next.
-#ifdef LIBMESH_ENABLE_LIBHILBERT
+#ifdef LIBMESH_HAVE_LIBHILBERT
 	  // if (!xdr_io.libhilbert_ordering())
 	  //   skip_renumber_nodes_and_elements = true;
 #else
