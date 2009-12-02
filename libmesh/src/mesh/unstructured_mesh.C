@@ -521,6 +521,21 @@ void UnstructuredMesh::read (const std::string& name,
 	      skip_renumber_nodes_and_elements = true;
 	      MeshCommunication().broadcast(*this);
 	    }
+
+          // libHilbert-enabled libMesh builds should construct files
+          // with a canonical node ordering, which libHilbert-enabled
+          // builds will be able to read in again regardless of any
+	  // renumbering.  So in that case we're free to renumber.
+	  // However, if either the writer or the reader of this file
+	  // don't have libHilbert, then we'll have to skip
+	  // renumbering because we need the numbering to remain
+	  // consistent with any solution file we read in next.
+#ifdef LIBMESH_ENABLE_LIBHILBERT
+	  // if (!xdr_io.libhilbert_ordering())
+	  //   skip_renumber_nodes_and_elements = true;
+#else
+	  skip_renumber_nodes_and_elements = true;
+#endif
 	}      
     }
 
