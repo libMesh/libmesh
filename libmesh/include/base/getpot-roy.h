@@ -100,7 +100,7 @@ public:
     inline const std::string    operator[](unsigned int Idx) const;
     template <typename T>
     inline T                    get(unsigned int Idx, const T& Default) const;
-    inline std::string          get(unsigned int Idx, const char* Default) const;
+    inline const char*          get(unsigned int Idx, const char* Default) const;
     inline unsigned int         size() const;
 
     // (*) flags ---------------------------------------------------------------
@@ -113,11 +113,11 @@ public:
     //     -- scalar values
     template <typename T>
     inline T            operator()(const char* VarName, const T& Default) const;
-    inline std::string  operator()(const char* VarName, const char* Default) const;
+    inline const char*  operator()(const char* VarName, const char* Default) const;
     //     -- vectors
     template <typename T>
     inline T            operator()(const char* VarName, const T& Default, unsigned int Idx) const;
-    inline std::string  operator()(const char* VarName, const char* Default, unsigned int Idx) const;
+    inline const char*  operator()(const char* VarName, const char* Default, unsigned int Idx) const;
 
     //     -- setting variables
     //                  i) from outside of GetPot (considering prefix etc.)
@@ -150,15 +150,15 @@ public:
     //     -- get argument at cursor++
     template <typename T>
     inline T               next(const T&    Default);
-    inline std::string     next(const char* Default);
+    inline const char*     next(const char* Default);
     //     -- search for option and get argument at cursor++
     template <typename T>
     inline T               follow(const T&    Default, const char* Option);
-    inline std::string     follow(const char* Default, const char* Option);
+    inline const char*     follow(const char* Default, const char* Option);
     //     -- search for one of the given options and get argument that follows it
     template <typename T>
     inline T               follow(const T&    Default, unsigned int No, const char* Option, ...);
-    inline std::string     follow(const char* Default, unsigned int No, const char* Option, ...);
+    inline const char*     follow(const char* Default, unsigned int No, const char* Option, ...);
     //     -- lists of nominuses following an option
     inline std::vector<std::string> nominus_followers(const char* Option);
     inline std::vector<std::string> nominus_followers(unsigned int No, ...);
@@ -166,7 +166,7 @@ public:
     //     -- directly followed arguments
     template <typename T>
     inline T               direct_follow(const T&    Default, const char* Option);
-    inline std::string     direct_follow(const char* Default, const char* Option);
+    inline const char*     direct_follow(const char* Default, const char* Option);
 
     inline std::vector<std::string>  string_tails(const char* StartString);
     inline std::vector<int>          int_tails(const char* StartString, const int Default = 1);
@@ -259,7 +259,11 @@ private:
 
     //     -- some functions return a char pointer to a temporarily existing string
     //        this container makes them 'available' until the getpot object is destroyed.
-    std::vector<char*>    __internal_string_container;
+    mutable std::vector<char*>    __internal_string_container;
+
+    //     -- some functions return a char pointer to a temporarily existing string
+    //        this function adds them to our container
+    const char* __internal_managed_copy(const std::string& Arg) const;
 
     //     -- keeping track about arguments that are requested, so that the UFO detection
     //        can be simplified
@@ -870,6 +874,15 @@ GetPot::__convert_to_type(const std::string& String, const char*) const
     return String;
 }
 
+inline const char*
+GetPot::__internal_managed_copy(const std::string& Arg) const
+{
+    char *result = new char[Arg.length()+1];
+    strncpy(result, Arg.c_str(), Arg.length()+1);
+    __internal_string_container.push_back(result);
+    return result;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // (*) cursor oriented functions
 //.............................................................................
@@ -983,11 +996,11 @@ GetPot::get(unsigned int Idx, const T& Default) const
     return __convert_to_type(argv[Idx], Default);
 }
 
-inline std::string
+inline const char*
 GetPot::get(unsigned int Idx, const char* Default) const
 {
     if( Idx >= argv.size() ) return Default;
-    return __convert_to_type(argv[Idx], Default);
+    return argv[Idx].c_str();
 }
 
 inline unsigned int
@@ -1013,10 +1026,10 @@ GetPot::next(const T& Default)
     return Remain != "" ? __convert_to_type(Remain, Default) : Default;
 }
 
-inline std::string
+inline const char*
 GetPot::next(const char* Default)
 {
-  return next(std::string(Default));
+    return __internal_managed_copy(next(std::string(Default)));
 }
 
 //     -- follow() function group
@@ -1030,10 +1043,10 @@ GetPot::follow(const T& Default, const char* Option)
     return next(Default);
 }
 
-inline std::string
+inline const char*
 GetPot::follow(const char* Default, const char* Option)
 {
-    return follow(std::string(Default), Option);
+    return __internal_managed_copy(follow(std::string(Default), Option));
 }
 
 //     -- second follow() function group
@@ -1060,7 +1073,7 @@ GetPot::follow(const T& Default, unsigned int No, const char* P, ...)
     return Default;
 }
 
-inline std::string
+inline const char*
 GetPot::follow(const char* Default, unsigned int No, const char* P, ...)
 {
     // (*) record requested of argument is entirely handled in 'search()' and 'next()'
@@ -1156,10 +1169,10 @@ GetPot::direct_follow(const T& Default, const char* Option)
     return __convert_to_type(FollowStr, Default);
 }
 
-inline std::string
+inline const char*
 GetPot::direct_follow(const char* Default, const char* Option)
 {
-  return direct_follow(std::string(Default), Option);
+    return __internal_managed_copy(direct_follow(std::string(Default), Option));
 }
 
 inline std::vector<std::string>
@@ -1436,10 +1449,10 @@ GetPot::operator()(const char* VarName, const T& Default) const
     return __convert_to_type(sv->original, Default);
 }
 
-inline std::string
+inline const char*
 GetPot::operator()(const char* VarName, const char* Default) const
 {
-    return operator()(VarName, std::string(Default));
+    return __internal_managed_copy(operator()(VarName, std::string(Default)));
 }
 
 template <typename T>
@@ -1454,10 +1467,10 @@ GetPot::operator()(const char* VarName, const T& Default, unsigned int Idx) cons
     return __convert_to_type(*element, Default);
 }
 
-inline std::string
+inline const char*
 GetPot::operator()(const char* VarName, const char* Default, unsigned int Idx) const
 {
-    return operator()(VarName, std::string(Default), Idx);
+    return __internal_managed_copy(operator()(VarName, std::string(Default), Idx));
 }
 
 inline void 
