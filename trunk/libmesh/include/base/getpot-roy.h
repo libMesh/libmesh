@@ -458,7 +458,10 @@ GetPot::GetPot(const char* FileName,
                const char* CommentStart  /* = 0x0 */, const char* CommentEnd /* = 0x0 */,
                const char* FieldSeparator/* = 0x0 */)     
 {
-  this->parse_file(FileName, CommentStart, CommentEnd, FieldSeparator);
+  const std::string& StrCommentStart   = CommentStart   ? CommentStart   : std::string("#");
+  const std::string& StrCommentEnd     = CommentEnd     ? CommentEnd     : std::string("\n");
+  const std::string& StrFieldSeparator = FieldSeparator ? FieldSeparator : std::string(" \t\n");
+  this->parse_file(FileName, StrCommentStart, StrCommentEnd, StrFieldSeparator);
 }
 
 
