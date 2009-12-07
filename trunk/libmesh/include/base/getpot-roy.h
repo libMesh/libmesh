@@ -298,7 +298,7 @@ private:
     //        * type conversion if possible
     template <typename T>
     inline T                  __convert_to_type(const std::string& String, const T& Default) const;
-    inline bool               __convert_to_type(const std::string& String, bool Default) const;
+//    inline bool               __convert_to_type(const std::string& String, bool Default) const;
   
 /*
     inline int                __convert_to_type(const std::string& String, int Default) const;
@@ -879,8 +879,9 @@ GetPot::__convert_to_type(const std::string& String, const char*) const
     return String;
 }
 
+template<>
 inline bool
-GetPot::__convert_to_type(const std::string& String, bool Default) const
+GetPot::__convert_to_type<bool>(const std::string& String, const bool& Default) const
 {
   std::string newstring(String);
   //std::transform(newstring.begin(), newstring.end(), newstring.begin(), std::toupper);
