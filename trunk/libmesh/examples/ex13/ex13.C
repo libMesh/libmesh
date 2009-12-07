@@ -243,7 +243,7 @@ int main (int argc, char** argv)
           // is chosen (heuristically) as the square of the previous linear system residual norm.
           //Real flr2 = final_linear_residual*final_linear_residual;
           equation_systems.parameters.set<Real> ("linear solver tolerance") =
-            Utility::pow<2>(final_linear_residual);
+            std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
 
         } // end nonlinear loop
       
