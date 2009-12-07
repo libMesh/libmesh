@@ -84,10 +84,10 @@ public:
     // Re-initialization methods
     inline void parse_command_line(const int argc_, char ** argv_, 
                                    const char* FieldSeparator =0x0);
-    inline void parse_file(const std::string& FileName, 
-                           const std::string& CommentStart=std::string("#"),
-                           const std::string& CommentEnd=std::string("\n"),
-                           const std::string& FieldSeparator=std::string(" \t\n"));
+    inline void parse_input_file(const std::string& FileName, 
+                                 const std::string& CommentStart=std::string("#"),
+                                 const std::string& CommentEnd=std::string("\n"),
+                                 const std::string& FieldSeparator=std::string(" \t\n"));
 
     // (*) absorbing contents of another GetPot object
     inline void            absorb(const GetPot& That);
@@ -463,7 +463,7 @@ GetPot::GetPot(const char* FileName,
   const std::string& StrCommentStart   = CommentStart   ? CommentStart   : std::string("#");
   const std::string& StrCommentEnd     = CommentEnd     ? CommentEnd     : std::string("\n");
   const std::string& StrFieldSeparator = FieldSeparator ? FieldSeparator : std::string(" \t\n");
-  this->parse_file(FileName, StrCommentStart, StrCommentEnd, StrFieldSeparator);
+  this->parse_input_file(FileName, StrCommentStart, StrCommentEnd, StrFieldSeparator);
 }
 
 
@@ -474,16 +474,16 @@ GetPot::GetPot(const std::string& FileName,
                const std::string& CommentEnd,
                const std::string& FieldSeparator)
 {
-  this->parse_file(FileName, CommentStart, CommentEnd, FieldSeparator);
+  this->parse_input_file(FileName, CommentStart, CommentEnd, FieldSeparator);
 }
 
 
 
 inline void
-GetPot::parse_file(const std::string& FileName,
-                   const std::string& CommentStart,
-                   const std::string& CommentEnd,
-                   const std::string& FieldSeparator)
+GetPot::parse_input_file(const std::string& FileName,
+                         const std::string& CommentStart,
+                         const std::string& CommentEnd,
+                         const std::string& FieldSeparator)
 {
     __basic_initialization();
 
@@ -866,6 +866,7 @@ GetPot::__convert_to_type(const std::string& String, const T& Default) const
 {
   std::istringstream in_string(String);
   T retval;
+  in_string >> std::boolalpha;  // Read "true" or "false", etc. as booleans
   in_string >> retval;
   if (in_string.fail())
     retval = Default;
@@ -879,6 +880,7 @@ GetPot::__convert_to_type(const std::string& String, const char*) const
     return String;
 }
 
+#if 0
 template<>
 inline bool
 GetPot::__convert_to_type<bool>(const std::string& String, const bool& Default) const
@@ -894,6 +896,7 @@ GetPot::__convert_to_type<bool>(const std::string& String, const bool& Default) 
   if (newstring.find("FALSE")!=std::string::npos) return false;
   return Default;
 }
+#endif
 
 inline const char*
 GetPot::__internal_managed_copy(const std::string& Arg) const
