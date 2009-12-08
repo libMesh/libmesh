@@ -866,7 +866,6 @@ GetPot::__convert_to_type(const std::string& String, const T& Default) const
 {
   std::istringstream in_string(String);
   T retval;
-  in_string >> std::boolalpha;  // Read "true" or "false", etc. as booleans
   in_string >> retval;
   if (in_string.fail())
     retval = Default;
@@ -880,7 +879,7 @@ GetPot::__convert_to_type(const std::string& String, const char*) const
     return String;
 }
 
-#if 0
+// be more liberal than std C++ in what we interpret as a boolean
 template<>
 inline bool
 GetPot::__convert_to_type<bool>(const std::string& String, const bool& Default) const
@@ -896,7 +895,6 @@ GetPot::__convert_to_type<bool>(const std::string& String, const bool& Default) 
   if (newstring.find("FALSE")!=std::string::npos) return false;
   return Default;
 }
-#endif
 
 inline const char*
 GetPot::__internal_managed_copy(const std::string& Arg) const
