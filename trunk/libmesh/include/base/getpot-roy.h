@@ -1,12 +1,10 @@
-//  -*- c++ -*-  vim: set syntax=cpp:
-//  GetPot Version $$Version$$                                    $$Date$$
+//  -*- c++ -*-
+//  GetPot Version 1.1-libMesh_fork                            Dec/08/2009
+//  Based on "getpot-1.1.1.tgz" version from SourceForge
+//
+//  GetPot Version 1.0                                        Sept/13/2002
 //
 //  WEBSITE: http://getpot.sourceforge.net
-//
-//  NOTE: The LPGL License for this library is only valid in case that 
-//        it is not used for the production or development of applications
-//        dedicated to military industry. This is what the author calls
-//        the 'unofficial peace version of the LPGL'.
 //
 //  This library is  free software; you can redistribute  it and/or modify
 //  it  under  the terms  of  the GNU  Lesser  General  Public License  as
@@ -23,15 +21,18 @@
 //  Foundation, Inc.,  59 Temple Place,  Suite 330, Boston,  MA 02111-1307
 //  USA
 //
-//  (C) 2001-2007 Frank R. Schaefer <fschaef@users.sf.net>
+//  (C) 2001-2002 Frank R. Schaefer
 //==========================================================================
-
-#ifndef __include_guard_GETPOT_H__
-#define __include_guard_GETPOT_H__
+#ifndef __GETPOT_H__
+#define __GETPOT_H__
 
 #if defined(WIN32) || defined(SOLARIS_RAW) || (__GNUC__ == 2) || defined(__HP_aCC)
 #define strtok_r(a, b, c) strtok(a, b)
 #endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC
+
+#if defined(WIN32) 
+#define snprintf _snprintf
+#endif 
 
 extern "C" {
 //   leave the 'extern C' to make it 100% sure to work -
@@ -42,10 +43,8 @@ extern "C" {
 #endif
 #include <stdio.h>
 #include <stdarg.h>
-#include <assert.h>
-#include <string.h>
+#include <math.h>
 }
-#include <cmath>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -70,14 +69,14 @@ public:
     inline GetPot();
     inline GetPot(const GetPot&);
     inline GetPot(const int argc_, char** argv_, 
-                  const char* FieldSeparator=0x0);
+		  const char* FieldSeparator=0x0);
     inline GetPot(const char* FileName, 
-                  const char* CommentStart=0x0, const char* CommentEnd=0x0,
-                  const char* FieldSeparator=0x0);
+		  const char* CommentStart=0x0, const char* CommentEnd=0x0,
+		  const char* FieldSeparator=0x0);
     inline GetPot(const std::string& FileName, 
-                  const std::string& CommentStart=std::string("#"),
-                  const std::string& CommentEnd=std::string("\n"),
-                  const std::string& FieldSeparator=std::string(" \t\n"));
+		  const std::string& CommentStart   = std::string("#"),
+                  const std::string& CommentEnd     = std::string("\n"),
+		  const std::string& FieldSeparator = std::string(" \t\n"));
     inline ~GetPot();
     inline GetPot& operator=(const GetPot&);
 
@@ -90,43 +89,44 @@ public:
                                  const std::string& FieldSeparator=std::string(" \t\n"));
 
     // (*) absorbing contents of another GetPot object
-    inline void            absorb(const GetPot& That);
+    inline void            absorb(const GetPot& Other);
     //     -- for ufo detection: recording requested arguments, options etc.
     inline void            clear_requests();
-    inline void            disable_request_recording() { __request_recording_f = false; }
-    inline void            enable_request_recording()  { __request_recording_f = true; }
+    inline void            disable_request_recording() { request_recording_f = false; }
+    inline void            enable_request_recording()  { request_recording_f = true; }
 
     // (*) direct access to command line arguments -----------------------------
-    inline const std::string    operator[](unsigned int Idx) const;
+    inline const char*     operator[](unsigned Idx) const;
     template <typename T>
-    inline T                    get(unsigned int Idx, const T& Default) const;
-    inline const char*          get(unsigned int Idx, const char* Default) const;
-    inline unsigned int         size() const;
+    inline T               get(unsigned Idx, const T&    Default) const;
+    inline const char*     get(unsigned Idx, const char* Default) const;
+    inline unsigned        size() const;
 
     // (*) flags ---------------------------------------------------------------
     inline bool            options_contain(const char* FlagList) const;
-    inline bool            argument_contains(unsigned int Idx, const char* FlagList) const;
+    inline bool            argument_contains(unsigned Idx, const char* FlagList) const;
 
     // (*) variables -----------------------------------------------------------
     //     -- check for a variable
-    inline bool         have_variable (const char* VarName) const;
+    inline bool            have_variable(const char* VarName) const;
+    inline bool            have_variable(const std::string& VarName) const;
     //     -- scalar values
-    template <typename T>
-    inline T            operator()(const char* VarName, const T& Default) const;
-    inline const char*  operator()(const char* VarName, const char* Default) const;
+    template<typename T>
+    inline T               operator()(const char* VarName, const T&    Default) const;
+    inline const char*     operator()(const char* VarName, const char* Default) const;
     //     -- vectors
-    template <typename T>
-    inline T            operator()(const char* VarName, const T& Default, unsigned int Idx) const;
-    inline const char*  operator()(const char* VarName, const char* Default, unsigned int Idx) const;
+    template<typename T>
+    inline T               operator()(const char* VarName, const T&    Default, unsigned Idx) const;
+    inline const char*     operator()(const char* VarName, const char* Default, unsigned Idx) const;
 
     //     -- setting variables
     //                  i) from outside of GetPot (considering prefix etc.)
     //                  ii) from inside, use '__set_variable()' below
-    template <typename T>
-    inline void            set(const char* VarName, const T&    Value, const bool Requested = true);
+    template<typename T>
+    inline void            set(const char* VarName, const T& Value, const bool Requested = true);
     inline void            set(const char* VarName, const char* Value, const bool Requested = true);
     
-    inline unsigned int    vector_variable_size(const char* VarName) const;
+    inline unsigned        vector_variable_size(const char* VarName) const;
     inline STRING_VECTOR   get_variable_names() const;
     inline STRING_VECTOR   get_section_names() const;
     
@@ -146,58 +146,51 @@ public:
     //     -- search for a certain option and set cursor to position
     inline bool            search(const char* option);
     inline bool            search(const std::string& option);
-    inline bool            search(unsigned int No, const char* P, ...);
+    inline bool            search(unsigned No, const char* P, ...);
     //     -- get argument at cursor++
-    template <typename T>
+    template<typename T>
     inline T               next(const T&    Default);
     inline const char*     next(const char* Default);
     //     -- search for option and get argument at cursor++
-    template <typename T>
+    template<typename T>
     inline T               follow(const T&    Default, const char* Option);
     inline const char*     follow(const char* Default, const char* Option);
     //     -- search for one of the given options and get argument that follows it
-    template <typename T>
-    inline T               follow(const T&    Default, unsigned int No, const char* Option, ...);
-    inline const char*     follow(const char* Default, unsigned int No, const char* Option, ...);
-    //     -- lists of nominuses following an option
-    inline std::vector<std::string> nominus_followers(const char* Option);
-    inline std::vector<std::string> nominus_followers(unsigned int No, ...);
-
+    template<typename T>
+    inline T               follow(const T&    Default, unsigned No, const char* Option, ...);
+    inline const char*     follow(const char* Default, unsigned No, const char* Option, ...);
     //     -- directly followed arguments
-    template <typename T>
+    template<typename T>
     inline T               direct_follow(const T&    Default, const char* Option);
     inline const char*     direct_follow(const char* Default, const char* Option);
 
-    inline std::vector<std::string>  string_tails(const char* StartString);
-    inline std::vector<int>          int_tails(const char* StartString, const int Default = 1);
-    inline std::vector<double>       double_tails(const char* StartString, const double Default = 1.0);
-
     // (*) nominus arguments ---------------------------------------------------
+    inline void            reset_nominus_cursor();
     inline STRING_VECTOR   nominus_vector() const;
-    inline unsigned int    nominus_size() const  { return static_cast<unsigned int>(idx_nominus.size()); }
-    inline std::string     next_nominus();
+    inline unsigned        nominus_size() const  { return idx_nominus.size(); }
+    inline const char*     next_nominus();
 
     // (*) unidentified flying objects -----------------------------------------
-    inline STRING_VECTOR   unidentified_arguments(unsigned int Num, const char* Known, ...) const;
+    inline STRING_VECTOR   unidentified_arguments(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_arguments(const STRING_VECTOR& Knowns) const;
     inline STRING_VECTOR   unidentified_arguments() const;
 
-    inline STRING_VECTOR   unidentified_options(unsigned int Num, const char* Known, ...) const;
+    inline STRING_VECTOR   unidentified_options(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_options(const STRING_VECTOR& Knowns) const;
     inline STRING_VECTOR   unidentified_options() const;
 
     inline std::string     unidentified_flags(const char* Known,
-                                             int ArgumentNumber /* =-1 */) const;
+					     int ArgumentNumber /* =-1 */) const;
 
-    inline STRING_VECTOR   unidentified_variables(unsigned int Num, const char* Known, ...) const;
+    inline STRING_VECTOR   unidentified_variables(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_variables(const STRING_VECTOR& Knowns) const;
     inline STRING_VECTOR   unidentified_variables() const;
 
-    inline STRING_VECTOR   unidentified_sections(unsigned int Num, const char* Known, ...) const;
+    inline STRING_VECTOR   unidentified_sections(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_sections(const STRING_VECTOR& Knowns) const;
     inline STRING_VECTOR   unidentified_sections() const;
 
-    inline STRING_VECTOR   unidentified_nominuses(unsigned int Num, const char* Known, ...) const;
+    inline STRING_VECTOR   unidentified_nominuses(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_nominuses(const STRING_VECTOR& Knowns) const;
     inline STRING_VECTOR   unidentified_nominuses() const;
 
@@ -207,27 +200,27 @@ public:
 private:
     // (*) Type Declaration ----------------------------------------------------
     struct variable {
-        //-----------
-        // Variable to be specified on the command line or in input files.
-        // (i.e. of the form var='12 312 341')
+	//-----------
+	// Variable to be specified on the command line or in input files.
+	// (i.e. of the form var='12 312 341')
 
-        // -- constructors, destructors, assignment operator
-        variable();
-        variable(const variable&);
-        variable(const char* Name, const char* Value, const char* FieldSeparator);
-        ~variable();
-        variable& operator=(const variable& That);
+	// -- constructors, destructors, assignment operator
+	variable();
+	variable(const variable&);
+	variable(const char* Name, const char* Value, const char* FieldSeparator);
+	~variable();
+	variable& operator=(const variable& Other);
 
-        void      take(const char* Value, const char* FieldSeparator);
+	void      take(const char* Value, const char* FieldSeparator);
 
-        // -- get a specific element in the string vector
-        //    (return 0 if not present)
-        const std::string*  get_element(unsigned int Idx) const;
+	// -- get a specific element in the string vector
+	//    (return 0 if not present)
+	const std::string*  get_element(unsigned Idx) const;
 
-        // -- data memebers
-        std::string       name;      // identifier of variable
-        STRING_VECTOR     value;     // value of variable stored in vector
-        std::string       original;  // value of variable as given on command line
+	// -- data memebers
+	std::string       name;      // identifier of variable
+	STRING_VECTOR     value;     // value of variable stored in vector
+	std::string       original;  // value of variable as given on command line
     };
 
     // (*) member variables --------------------------------------------------------------
@@ -236,7 +229,7 @@ private:
     STRING_VECTOR         section_list;    // list of all parsed sections
     //     -- argument vector
     STRING_VECTOR         argv;            // vector of command line arguments stored as strings
-    unsigned int          cursor;          // cursor for argv
+    unsigned              cursor;          // cursor for argv
     bool                  search_loop_f;   // shall search start at beginning after
     //                                     // reaching end of arg array ?
     bool                  search_failed_f; // flag indicating a failed search() operation
@@ -244,7 +237,7 @@ private:
 
     //     --  nominus vector
     int                   nominus_cursor;  // cursor for nominus_pointers
-    std::vector<unsigned int> idx_nominus; // indecies of 'no minus' arguments
+    std::vector<unsigned> idx_nominus;     // indecies of 'no minus' arguments
 
     //     -- variables
     //       (arguments of the form "variable=value")
@@ -263,7 +256,7 @@ private:
 
     //     -- some functions return a char pointer to a temporarily existing string
     //        this function adds them to our container
-    const char* __internal_managed_copy(const std::string& Arg) const;
+    const char*    __internal_managed_copy(const std::string& Arg) const;
 
     //     -- keeping track about arguments that are requested, so that the UFO detection
     //        can be simplified
@@ -271,7 +264,7 @@ private:
     STRING_VECTOR   _requested_variables;
     STRING_VECTOR   _requested_sections;
 
-    bool            __request_recording_f;   // speed: request recording can be turned off
+    bool            request_recording_f;   // speed: request recording can be turned off
 
     //     -- if an argument is requested record it and the 'tag' the section branch to which 
     //        it belongs. Caution: both functions mark the sections as 'tagged'.
@@ -296,22 +289,15 @@ private:
     //        * support search for flags in a specific argument
     inline bool               __check_flags(const std::string& Str, const char* FlagList) const;
     //        * type conversion if possible
-    template <typename T>
+    template<typename T>
     inline T                  __convert_to_type(const std::string& String, const T& Default) const;
-//    inline bool               __convert_to_type(const std::string& String, bool Default) const;
-  
-/*
-    inline int                __convert_to_type(const std::string& String, int Default) const;
-    inline double             __convert_to_type(const std::string& String, double Default) const;
-    inline std::string        __convert_to_type(const std::string& String, const std::string& Default) const;
-*/
     inline std::string        __convert_to_type(const std::string& String, const char* Default) const;
     //        * prefix extraction
     const std::string         __get_remaining_string(const std::string& String, 
-                                                     const std::string& Start) const;
+						     const std::string& Start) const;
     //        * search for a specific string
     inline bool               __search_string_vector(const STRING_VECTOR& Vec,
-                                                     const std::string& Str) const;
+						     const std::string& Str) const;
 
     //     -- helpers to parse input file
     //        create an argument vector based on data found in an input file, i.e.:
@@ -329,56 +315,48 @@ private:
     inline STRING_VECTOR      __read_in_stream(std::istream& istr);
     inline STRING_VECTOR      __read_in_file(const std::string& FileName);
     inline std::string        __process_section_label(const std::string& Section,
-                                                      STRING_VECTOR& section_stack);
+						      STRING_VECTOR& section_stack);
 
     //      -- dollar bracket expressions
     std::string               __DBE_expand_string(const std::string str);
     std::string               __DBE_expand(const std::string str);
     const GetPot::variable*   __DBE_get_variable(const std::string str);
-    STRING_VECTOR             __DBE_get_expr_list(const std::string str, const unsigned int ExpectedNumber);
+    STRING_VECTOR             __DBE_get_expr_list(const std::string str, const unsigned ExpectedNumber);
 
     std::string  __double2string(const double& Value) const {
-        // -- converts a double integer into a string
-        char* tmp = new char[128];
-#ifndef WIN32
-        snprintf(tmp, (int)sizeof(char)*128, "%e", Value);
-#else
-        _snprintf(tmp, sizeof(char)*128, "%e", Value);
-#endif
-        std::string result(tmp);
-        delete [] tmp;
-        return result;
+	// -- converts a double integer into a string
+	char* tmp = new char[128];
+	snprintf(tmp, (int)sizeof(char)*128, "%e", Value);
+	std::string result(tmp);
+	delete [] tmp;
+	return result;
     }
 
     std::string  __int2string(const int& Value) const {
-        // -- converts an integer into a string
-        char* tmp = new char[128];
-#ifndef WIN32
-        snprintf(tmp, (int)sizeof(char)*128, "%i", Value);
-#else
-        _snprintf(tmp, sizeof(char)*128, "%i", Value);
-#endif
-        std::string result(tmp);
-        delete [] tmp;
-        return result;
+	// -- converts an integer into a string
+	char* tmp = new char[128];
+	snprintf(tmp, (int)sizeof(char)*128, "%i", Value);
+	std::string result(tmp);
+	delete [] tmp;
+	return result;
     }
 
     STRING_VECTOR __get_section_tree(const std::string& FullPath) {
-        // -- cuts a variable name into a tree of sub-sections. this is requested for recording
-        //    requested sections when dealing with 'ufo' detection.
-        STRING_VECTOR   result;
-        const char* Start = FullPath.c_str();
+	// -- cuts a variable name into a tree of sub-sections. this is requested for recording
+	//    requested sections when dealing with 'ufo' detection.
+	STRING_VECTOR   result;
+	const char* Start = FullPath.c_str();
 
-        for(char *p = (char*)Start; *p ; p++) {
-            if( *p == '/' ) { 
-                *p = '\0';  // set terminating zero for convinience
-                const std::string Section = Start;
-                *p = '/';   // reset slash at place
-                result.push_back(Section);
-            }
-        }
+	for(char *p = (char*)Start; *p ; p++) {
+	    if( *p == '/' ) { 
+		*p = '\0';  // set terminating zero for convinience
+		const std::string Section = Start;
+		*p = '/';   // reset slash at place
+		result.push_back(Section);
+	    }
+	}
 
-        return result;
+	return result;
     }
 };
 
@@ -395,7 +373,7 @@ GetPot::__basic_initialization()
     prefix = "";             section = "";
     
     // automatic request recording for later ufo detection
-    __request_recording_f = true;
+    request_recording_f = true;
 
     // comment start and end strings
     _comment_start = std::string("#");
@@ -417,7 +395,7 @@ GetPot::GetPot()
 
 inline
 GetPot::GetPot(const int argc_, char ** argv_, 
-               const char* FieldSeparator /* =0x0 */)     
+	       const char* FieldSeparator /* =0x0 */)     
     // leave 'char**' non-const to honor less capable compilers ... 
 {
   this->parse_command_line(argc_, argv_, FieldSeparator);
@@ -429,10 +407,6 @@ GetPot::parse_command_line(const int argc_, char ** argv_,
                            const char* FieldSeparator /* =0x0 */)     
     // leave 'char**' non-const to honor less capable compilers ... 
 {
-    // TODO: Ponder over the problem when the argument list is of size = 0.
-    //       This is 'sabotage', but it can still occur if the user specifies
-    //       it himself.
-    assert(argc_ >= 1);
     __basic_initialization();
 
     // if specified -> overwrite default string
@@ -446,19 +420,18 @@ GetPot::parse_command_line(const int argc_, char ** argv_,
     //    retrieve the name of his application by "get[0]"
     _apriori_argv.push_back(std::string(argv_[0]));
     int i=1;
-    for(; i<argc_; ++i) {
-        std::string tmp(argv_[i]);   // recall the problem with temporaries,
-        _apriori_argv.push_back(tmp);       // reference counting in arguement lists ...
+    for(; i<argc_; i++) {
+	std::string tmp(argv_[i]);   // recall the problem with temporaries,
+	_apriori_argv.push_back(tmp);       // reference counting in arguement lists ...
     }
     __parse_argument_vector(_apriori_argv);
 }
 
 
-
 inline
 GetPot::GetPot(const char* FileName,
-               const char* CommentStart  /* = 0x0 */, const char* CommentEnd /* = 0x0 */,
-               const char* FieldSeparator/* = 0x0 */)     
+	       const char* CommentStart  /* = 0x0 */, const char* CommentEnd /* = 0x0 */,
+	       const char* FieldSeparator/* = 0x0 */)     
 {
   const std::string& StrCommentStart   = CommentStart   ? CommentStart   : std::string("#");
   const std::string& StrCommentEnd     = CommentEnd     ? CommentEnd     : std::string("\n");
@@ -488,8 +461,8 @@ GetPot::parse_input_file(const std::string& FileName,
     __basic_initialization();
 
     // overwrite default strings
-    _comment_start = CommentStart;
-    _comment_end   = CommentEnd;
+    _comment_start = std::string(CommentStart);
+    _comment_end   = std::string(CommentEnd);
     _field_separator = FieldSeparator;
     
     STRING_VECTOR _apriori_argv;
@@ -497,55 +470,70 @@ GetPot::parse_input_file(const std::string& FileName,
     //    variable assignments or nominuses.
     _apriori_argv.push_back(FileName);
 
-    STRING_VECTOR args = __read_in_file(FileName);
+    STRING_VECTOR args = __read_in_file(FileName.c_str());
     _apriori_argv.insert(_apriori_argv.begin()+1, args.begin(), args.end());
     __parse_argument_vector(_apriori_argv);
 }
 
 inline
-GetPot::GetPot(const GetPot& That)
-{ GetPot::operator=(That); }
+GetPot::GetPot(const GetPot& Other)
+{ GetPot::operator=(Other); }
 
 inline
 GetPot::~GetPot()
 { 
     // may be some return strings had to be created, delete now !
     victorate(char*, __internal_string_container, it)
-        delete [] *it;  
+	delete [] *it;	
 }
 
 inline GetPot&
-GetPot::operator=(const GetPot& That)
+GetPot::operator=(const GetPot& Other)
 {
-    if (&That == this) return *this;
+    if (&Other == this) return *this;
 
-    _comment_start  = That._comment_start;
-    _comment_end    = That._comment_end;
-    argv            = That.argv;
-    variables       = That.variables;
-    prefix          = That.prefix;
+    _comment_start  = Other._comment_start;
+    _comment_end    = Other._comment_end;
+    argv            = Other.argv;
+    variables       = Other.variables;
+    prefix          = Other.prefix;
 
-    cursor          = That.cursor;
-    nominus_cursor  = That.nominus_cursor;
-    search_failed_f = That.search_failed_f;
+    cursor          = Other.cursor;
+    nominus_cursor  = Other.nominus_cursor;
+    search_failed_f = Other.search_failed_f;
 
-    idx_nominus     = That.idx_nominus;
-    search_loop_f   = That.search_loop_f;
+    idx_nominus     = Other.idx_nominus;
+    search_loop_f   = Other.search_loop_f;
 
     return *this;
 }
 
 
 inline void
-GetPot::absorb(const GetPot& That)
+GetPot::absorb(const GetPot& Other)
 {
-    if (&That == this) return;
+    if (&Other == this) return;
 
-    STRING_VECTOR  __tmp(That.argv);
+    // variables that are not influenced by absorption:
+    //               _comment_start
+    //               _comment_end 
+    //               cursor
+    //               nominus_cursor
+    //               search_failed
+    //               idx_nominus
+    //               search_loop_f
+    argv      = Other.argv;
+    variables = Other.variables;
 
-    __tmp.erase(__tmp.begin());
-
-    __parse_argument_vector(__tmp);
+    if( request_recording_f ) { 
+	_requested_arguments.insert(_requested_sections.end(), 
+				    Other._requested_arguments.begin(), Other._requested_arguments.end());
+	_requested_variables.insert(_requested_sections.end(),
+				    Other._requested_variables.begin(), Other._requested_variables.end());
+	_requested_sections.insert(_requested_sections.end(),
+				   Other._requested_sections.begin(), Other._requested_sections.end());
+    }
+	
 }
 
 inline void    
@@ -573,64 +561,56 @@ GetPot::__parse_argument_vector(const STRING_VECTOR& ARGV)
 
     // -- do not parse the first argument, so that it is not interpreted a s a nominus or so.
     argv.push_back(*it);
-    ++it;
+    it++;
 
     // -- loop over remaining arguments
-    unsigned int i=1;
-    for(; it != ARGV.end(); ++it, ++i) {
-        std::string arg = *it;
+    unsigned i=1;
+    for(; it != ARGV.end(); it++, i++) {
+	std::string arg = *it;
 
-        if( arg.length() == 0 ) continue;
+	if( arg.length() == 0 ) continue;
 
-        // -- [section] labels
-        if( arg.length() > 1 && arg[0] == '[' && arg[arg.length()-1] == ']' ) {
+	// -- [section] labels
+	if( arg.length() > 1 && arg[0] == '[' && arg[arg.length()-1] == ']' ) {
 
-            // (*) sections are considered 'requested arguments'
-            if( __request_recording_f ) _requested_arguments.push_back(arg);
-            
-            const std::string Name = __DBE_expand_string(arg.substr(1, arg.length()-2));
-            section = __process_section_label(Name, section_stack);
-            // new section --> append to list of sections
-            if( find(section_list.begin(), section_list.end(), section) == section_list.end() )
-                if( section.length() != 0 ) section_list.push_back(section);
-            argv.push_back(arg);
-        }
-        else {
-            arg = section + __DBE_expand_string(arg);
-            argv.push_back(arg);
-        }
+	    // (*) sections are considered 'requested arguments'
+	    if( request_recording_f ) _requested_arguments.push_back(arg);
+	    
+	    const std::string Name = __DBE_expand_string(arg.substr(1, arg.length()-2));
+	    section = __process_section_label(Name, section_stack);
+	    // new section --> append to list of sections
+	    if( find(section_list.begin(), section_list.end(), section) == section_list.end() )
+		if( section.length() != 0 ) section_list.push_back(section);
+	    argv.push_back(arg);
+	}
+	else {
+	    arg = section + __DBE_expand_string(arg);
+	    argv.push_back(arg);
+	}
 
-        // -- separate array for nominus arguments
-        if( arg[0] != '-' ) idx_nominus.push_back(unsigned(i));
+	// -- separate array for nominus arguments
+	if( arg[0] != '-' ) idx_nominus.push_back(unsigned(i));
 
-        // -- variables: does arg contain a '=' operator ?
-        const char* p = arg.c_str();
-        for(; *p ; p++) {
-            if( *p == '=' ) {
-                // (*) record for later ufo detection
-                //     arguments carriying variables are always treated as 'requested' arguments. 
-                //     as a whole! That is 'x=4712' is  considered a requested argument.
-                //
-                //     unrequested variables have to be detected with the ufo-variable
-                //     detection routine.
-                if( __request_recording_f ) _requested_arguments.push_back(arg);
+	// -- variables: does arg contain a '=' operator ?
+	const char* p = arg.c_str();
+	for(; *p ; p++) {
+	    if( *p == '=' ) {
+		// (*) record for later ufo detection
+		//     arguments carriying variables are always treated as 'requested' arguments. 
+		//     unrequested variables have to be detected with the ufo-variable
+		//     detection routine.
+		if( request_recording_f ) _requested_arguments.push_back(arg);
 
-                // set terminating 'zero' to treat first part as single string
-                // => arg (from start to 'p') = Name of variable
-                //    p+1     (until terminating zero) = value of variable
-                char* o = (char*)p++;
-                *o = '\0';                       // set temporary terminating zero
-                // __set_variable(...) 
-                // calls __find_variable(...) which registers the search
-                // temporarily disable this
-                const bool tmp = __request_recording_f;
-                __request_recording_f = false;
-                __set_variable(arg.c_str(), p);  // v-name = c_str() bis 'p', value = rest
-                __request_recording_f = tmp;
-                *o = '=';                        // reset the original '='
-                break;
-            }
-        }
+		// set terminating 'zero' to treat first part as single string
+		// => arg (from start to 'p') = Name of variable
+		//    p+1     (until terminating zero) = value of variable
+		char* o = (char*)p++;
+		*o = '\0';                       // set temporary terminating zero
+		__set_variable(arg.c_str(), p);  // v-name = c_str() bis 'p', value = rest
+		*o = '=';                        // reset the original '='
+		break;
+	    }
+	}
     }
 }
 
@@ -649,10 +629,10 @@ GetPot::__read_in_stream(std::istream& istr)
 {
     STRING_VECTOR  brute_tokens;
     while(istr) {
-        __skip_whitespace(istr);
-        const std::string Token = __get_next_token(istr);
-        if( Token.length() == 0 || Token[0] == EOF) break;
-        brute_tokens.push_back(Token);
+	__skip_whitespace(istr);
+	const std::string Token = __get_next_token(istr);
+	if( Token.length() == 0 || Token[0] == EOF) break;
+	brute_tokens.push_back(Token);
     }
 
     // -- reduce expressions of token1'='token2 to a single
@@ -660,28 +640,28 @@ GetPot::__read_in_stream(std::istream& istr)
     // -- copy everything into 'argv'
     // -- arguments preceded by something like '[' name ']' (section)
     //    produce a second copy of each argument with a prefix '[name]argument'
-    unsigned int i1 = 0;
-    unsigned int i2 = 1;
-    unsigned int i3 = 2;
+    unsigned i1 = 0;
+    unsigned i2 = 1;
+    unsigned i3 = 2;
 
     STRING_VECTOR  arglist;
     while( i1 < brute_tokens.size() ) {
-        const std::string& SRef = brute_tokens[i1];
-        // 1) concatinate 'abcdef' '=' 'efgasdef' to 'abcdef=efgasdef'
-        // note: java.lang.String: substring(a,b) = from a to b-1
-        //        C++ string:      substr(a,b)    = from a to a + b
-        if( i2 < brute_tokens.size() && brute_tokens[i2] == "=" ) {
-            if( i3 >= brute_tokens.size() )
-                arglist.push_back(brute_tokens[i1] + brute_tokens[i2]);
-            else
-                arglist.push_back(brute_tokens[i1] + brute_tokens[i2] + brute_tokens[i3]);
-            i1 = i3+1; i2 = i3+2; i3 = i3+3;
-            continue;
-        }
-        else {
-            arglist.push_back(SRef);
-            i1=i2; i2=i3; i3++;
-        }
+	const std::string& SRef = brute_tokens[i1];
+	// 1) concatinate 'abcdef' '=' 'efgasdef' to 'abcdef=efgasdef'
+	// note: java.lang.String: substring(a,b) = from a to b-1
+	//        C++ string:      substr(a,b)    = from a to a + b
+	if( i2 < brute_tokens.size() && brute_tokens[i2] == "=" ) {
+	    if( i3 >= brute_tokens.size() )
+		arglist.push_back(brute_tokens[i1] + brute_tokens[i2]);
+	    else
+		arglist.push_back(brute_tokens[i1] + brute_tokens[i2] + brute_tokens[i3]);
+	    i1 = i3+1; i2 = i3+2; i3 = i3+3;
+	    continue;
+	}
+	else {
+	    arglist.push_back(SRef);
+	    i1=i2; i2=i3; i3++;
+	}
     }
     return arglist;
 }
@@ -692,48 +672,45 @@ GetPot::__skip_whitespace(std::istream& istr)
 {
     int tmp = istr.get();
     do {
-        // -- search a non whitespace
-        while( isspace(tmp) ) {
-            tmp = istr.get();
-            if( ! istr ) return;
-        }
+	// -- search a non whitespace
+	while( isspace(tmp) ) {
+	    tmp = istr.get();
+	    if( ! istr ) return;
+	}
 
-        // -- look if characters match the comment starter string
-        unsigned int i=0;
-        for(; i<_comment_start.length() ; ++i) {
-            if( tmp != _comment_start[i] ) { 
-                // NOTE: Due to a 'strange behavior' in Microsoft's streaming lib we do
-                // a series of unget()s instead a quick seek. See 
-                // http://sourceforge.net/tracker/index.php?func=detail&aid=1545239&group_id=31994&atid=403915
-                // for a detailed discussion.
+	// -- look if characters match the comment starter string
+	const std::istream::pos_type  Pos = istr.tellg();
+	unsigned    i=0;
+	for(; i<_comment_start.length() ; i++) {
+	    if( tmp != _comment_start[i] ) { 
+		istr.seekg(Pos);
+		// -- one step more backwards, since 'tmp' already at non-whitespace
+		istr.unget();
+		return; 
+	    }
+	    tmp = istr.get();
+	    if( ! istr ) { istr.unget(); return; }
+	}
+	// 'tmp' contains last character of _comment_starter
 
-                // -- one step more backwards, since 'tmp' already at non-whitespace
-                do istr.unget(); while( i-- != 0 ); 
-                return; 
-            }
-            tmp = istr.get();
-            if( ! istr ) { istr.unget(); return; }
-        }
-        // 'tmp' contains last character of _comment_starter
+	// -- comment starter found -> search for comment ender
+	unsigned match_no=0;
+	while(1+1 == 2) {
+	    tmp = istr.get();
+	    if( ! istr ) { istr.unget(); return; }
 
-        // -- comment starter found -> search for comment ender
-        unsigned int match_no=0;
-        while(1+1 == 2) {
-            tmp = istr.get();
-            if( ! istr ) { istr.unget(); return; }
+	    if( tmp == _comment_end[match_no] ) { 
+		match_no++;
+		if( match_no == _comment_end.length() ) {
+		    istr.unget();
+		    break; // shuffle more whitespace, end of comment found
+		}
+	    }
+	    else
+		match_no = 0;
+	}
 
-            if( tmp == _comment_end[match_no] ) { 
-                match_no++;
-                if( match_no == _comment_end.length() ) {
-                    istr.unget();
-                    break; // shuffle more whitespace, end of comment found
-                }
-            }
-            else
-                match_no = 0;
-        }
-
-        tmp = istr.get();
+	tmp = istr.get();
 
     } while( istr );
     istr.unget();
@@ -748,27 +725,27 @@ GetPot::__get_next_token(std::istream& istr)
     int    tmp = 0;
     int    last_letter = 0;
     while(1+1 == 2) {
-        last_letter = tmp; tmp = istr.get();
-        if( tmp == EOF
-            || ((tmp == ' ' || tmp == '\t' || tmp == '\n') && last_letter != '\\') ) {
-            return token;
-        }
-        else if( tmp == '\'' && last_letter != '\\' ) {
-            // QUOTES: un-backslashed quotes => it's a string
-            token += __get_string(istr);
-            continue;
-        }
-        else if( tmp == '{' && last_letter == '$') {
-            token += '{' + __get_until_closing_bracket(istr);
-            continue;
-        }
-        else if( tmp == '$' && last_letter == '\\') {
-            token += tmp; tmp = 0;  //  so that last_letter will become = 0, not '$';
-            continue;
-        }
-        else if( tmp == '\\' && last_letter != '\\')
-            continue;              // don't append un-backslashed backslashes
-        token += tmp;
+	last_letter = tmp; tmp = istr.get();
+	if( tmp == EOF
+	    || ((tmp == ' ' || tmp == '\t' || tmp == '\n') && last_letter != '\\') ) {
+	    return token;
+	}
+	else if( tmp == '\'' && last_letter != '\\' ) {
+	    // QUOTES: un-backslashed quotes => it's a string
+	    token += __get_string(istr);
+	    continue;
+	}
+	else if( tmp == '{' && last_letter == '$') {
+	    token += '{' + __get_until_closing_bracket(istr);
+	    continue;
+	}
+	else if( tmp == '$' && last_letter == '\\') {
+	    token += tmp; tmp = 0;  //  so that last_letter will become = 0, not '$';
+	    continue;
+	}
+	else if( tmp == '\\' && last_letter != '\\')
+	    continue;              // don't append un-backslashed backslashes
+	token += tmp;
     }
 }
 
@@ -780,13 +757,13 @@ GetPot::__get_string(std::istream& istr)
     int    tmp = 0;
     int    last_letter = 0;
     while(1 + 1 == 2) {
-        last_letter = tmp; tmp = istr.get();
-        if( tmp == EOF)  return str;
-        // un-backslashed quotes => it's the end of the string
-        else if( tmp == '\'' && last_letter != '\\')  return str;
-        else if( tmp == '\\' && last_letter != '\\')  continue; // don't append
+	last_letter = tmp; tmp = istr.get();
+	if( tmp == EOF)  return str;
+	// un-backslashed quotes => it's the end of the string
+	else if( tmp == '\'' && last_letter != '\\')  return str;
+	else if( tmp == '\\' && last_letter != '\\')  continue; // don't append
 
-        str += tmp;
+	str += tmp;
     }
 }
 
@@ -799,67 +776,67 @@ GetPot::__get_until_closing_bracket(std::istream& istr)
     int    last_letter = 0;
     int    brackets = 1;
     while(1 + 1 == 2) {
-        last_letter = tmp; tmp = istr.get();
-        if( tmp == EOF) return str;
-        else if( tmp == '{' && last_letter == '$') brackets += 1;
-        else if( tmp == '}') {
-            brackets -= 1;
-            // un-backslashed brackets => it's the end of the string
-            if( brackets == 0) return str + '}';
-            else if( tmp == '\\' && last_letter != '\\')
-                continue;  // do not append an unbackslashed backslash
-        }
-        str += tmp;
+	last_letter = tmp; tmp = istr.get();
+	if( tmp == EOF) return str;
+	else if( tmp == '{' && last_letter == '$') brackets += 1;
+	else if( tmp == '}') {
+	    brackets -= 1;
+	    // un-backslashed brackets => it's the end of the string
+	    if( brackets == 0) return str + '}';
+	    else if( tmp == '\\' && last_letter != '\\')
+		continue;  // do not append an unbackslashed backslash
+	}
+	str += tmp;
     }
 }
 
 inline std::string
 GetPot::__process_section_label(const std::string& Section,
-                                STRING_VECTOR& section_stack)
+				STRING_VECTOR& section_stack)
 {
     std::string sname = Section;
     //  1) subsection of actual section ('./' prefix)
     if( sname.length() >= 2 && sname.substr(0, 2) == "./" ) {
-        sname = sname.substr(2);
+	sname = sname.substr(2);
     }
     //  2) subsection of parent section ('../' prefix)
     else if( sname.length() >= 3 && sname.substr(0, 3) == "../" ) {
-        do {
-            if( section_stack.end() != section_stack.begin() )
-                section_stack.pop_back();
-            sname = sname.substr(3);
-        } while( sname.substr(0, 3) == "../" );
+	do {
+	    if( section_stack.end() != section_stack.begin() )
+		section_stack.pop_back();
+	    sname = sname.substr(3);
+	} while( sname.substr(0, 3) == "../" );
     }
     // 3) subsection of the root-section
     else {
-        section_stack.erase(section_stack.begin(), section_stack.end());
-        // [] => back to root section
+	section_stack.erase(section_stack.begin(), section_stack.end());
+	// [] => back to root section
     }
 
     if( sname != "" ) {
-        // parse section name for 'slashes'
-        unsigned int i=0;
-        while( i < sname.length() ) {
-            if( sname[i] == '/' ) {
-                section_stack.push_back(sname.substr(0,i));
-                if( i+1 < sname.length() ) 
-                    sname = sname.substr(i+1);
-                i = 0;
-            }
-            else
-                ++i;
-        }
-        section_stack.push_back(sname);
+	// parse section name for 'slashes'
+	unsigned i=0;
+	while( i < sname.length() ) {
+	    if( sname[i] == '/' ) {
+		section_stack.push_back(sname.substr(0,i));
+		if( i+1 < sname.length()-1 )
+		    sname = sname.substr(i+1);
+		i = 0;
+	    }
+	    else
+		i++;
+	}
+	section_stack.push_back(sname);
     }
     std::string section = "";
     if( section_stack.size() != 0 ) {
-        victorate(std::string, section_stack, it)
-            section += *it + "/";
+	victorate(std::string, section_stack, it)
+	    section += *it + "/";
     }
     return section;
 }
 
-
+// Use C++ istream/ostream to handle most type conversions.
 template <typename T>
 inline T
 GetPot::__convert_to_type(const std::string& String, const T& Default) const
@@ -931,27 +908,27 @@ GetPot::search(const std::string &Option)
 inline bool
 GetPot::search(const char* Option)
 {    
-    unsigned int       OldCursor  = cursor;
+    unsigned           OldCursor = cursor;
     const std::string  SearchTerm = prefix + Option;
 
     // (*) record requested arguments for later ufo detection
-    __record_argument_request(SearchTerm);                             
+    __record_argument_request(SearchTerm);			       
 
-    if( OldCursor >= argv.size() ) OldCursor = static_cast<unsigned int>(argv.size()) - 1;
+    if( OldCursor >= argv.size() ) OldCursor = argv.size() - 1;
     search_failed_f = true;
 
     // (*) first loop from cursor position until end
-    unsigned int c = cursor;
+    unsigned  c = cursor;
     for(; c < argv.size(); c++) {
-        if( argv[c] == SearchTerm )
-        { cursor = c; search_failed_f = false; return true; }
+	if( argv[c] == SearchTerm )
+	{ cursor = c; search_failed_f = false; return true; }
     }
     if( ! search_loop_f ) return false;
 
     // (*) second loop from 0 to old cursor position
     for(c = 1; c < OldCursor; c++) {
-        if( argv[c] == SearchTerm )
-        { cursor = c; search_failed_f = false; return true; }
+	if( argv[c] == SearchTerm )
+	{ cursor = c; search_failed_f = false; return true; }
     }
     // in case nothing is found the cursor stays where it was
     return false;
@@ -959,7 +936,7 @@ GetPot::search(const char* Option)
 
 
 inline bool
-GetPot::search(unsigned int No, const char* P, ...)
+GetPot::search(unsigned No, const char* P, ...)
 {
     // (*) recording the requested arguments happens in subroutine 'search'
     if( No == 0 ) return false;
@@ -970,24 +947,25 @@ GetPot::search(unsigned int No, const char* P, ...)
     // start interpreting variable argument list
     va_list ap;
     va_start(ap, P);
-    unsigned int i = 1;
-    for(; i < No; ++i) {
-        char* Opt = va_arg(ap, char *);
-        if( search(Opt) == true ) break;
+    unsigned i = 1;
+    for(; i < No; i++) {
+	char* Opt = va_arg(ap, char *);
+	// (*) search records itself for later ufo detection
+	if( search(Opt) == true ) break;
     }
     
     if( i < No ) {
-        ++i;
-        // loop was left before end of array --> hit but 
-        // make sure that the rest of the search terms is marked
-        // as requested.
-        for(; i < No; ++i) {
-            char* Opt = va_arg(ap, char *);
-            // (*) record requested arguments for later ufo detection
-            __record_argument_request(Opt);
-        }
-        va_end(ap);
-        return true;
+	i++;
+	// loop was left before end of array --> hit but 
+	// make sure that the rest of the search terms is marked
+	// as requested.
+	for(; i < No; i++) {
+	    char* Opt = va_arg(ap, char *);
+	    // (*) record requested arguments for later ufo detection
+	    __record_argument_request(Opt);
+	}
+	va_end(ap);
+	return true;
     }
 
     va_end(ap);
@@ -1006,9 +984,9 @@ GetPot::init_multiple_occurrence()
 // (*) direct access to command line arguments
 //.............................................................................
 //
-inline const std::string
-GetPot::operator[](unsigned int idx) const
-{ return idx < argv.size() ? argv[idx] : ""; }
+inline const char*
+GetPot::operator[](unsigned idx) const
+{ return idx<argv.size() ? argv[idx].c_str() : 0; }
 
 template <typename T>
 inline T
@@ -1025,9 +1003,9 @@ GetPot::get(unsigned int Idx, const char* Default) const
     return argv[Idx].c_str();
 }
 
-inline unsigned int
+inline unsigned
 GetPot::size() const
-{ return static_cast<unsigned int>(argv.size()); }
+{ return argv.size(); }
 
 
 //     -- next() function group
@@ -1038,7 +1016,7 @@ GetPot::next(const T& Default)
     if( search_failed_f ) return Default;
     cursor++;
     if( cursor >= argv.size() )  
-    { cursor = static_cast<unsigned int>(argv.size()); return Default; }
+    { cursor = argv.size(); return Default; }
 
     // (*) record requested argument for later ufo detection
     __record_argument_request(argv[cursor]);
@@ -1083,20 +1061,20 @@ GetPot::follow(const T& Default, unsigned int No, const char* P, ...)
 
     va_list ap;
     va_start(ap, P);
-    unsigned int i=1;
-    for(; i<No; ++i) {
-        char* Opt = va_arg(ap, char *);
-        if( search(Opt) == true ) {
-            va_end(ap);
-            return next(Default);
-        }
+    unsigned i=1;
+    for(; i<No; i++) {
+	char* Opt = va_arg(ap, char *);
+	if( search(Opt) == true ) {
+	    va_end(ap);
+	    return next(Default);
+	}
     }
     va_end(ap);
     return Default;
 }
 
 inline const char*
-GetPot::follow(const char* Default, unsigned int No, const char* P, ...)
+GetPot::follow(const char* Default, unsigned No, const char* P, ...)
 {
     // (*) record requested of argument is entirely handled in 'search()' and 'next()'
     if( No == 0 ) return Default;
@@ -1104,74 +1082,17 @@ GetPot::follow(const char* Default, unsigned int No, const char* P, ...)
 
     va_list ap;
     va_start(ap, P);
-    unsigned int i=1;
-    for(; i<No; ++i) {
-        char* Opt = va_arg(ap, char *);
-        if( search(Opt) == true ) {
-            va_end(ap);
-            return next(Default);
-        }
+    unsigned i=1;
+    for(; i<No; i++) {
+	char* Opt = va_arg(ap, char *);
+	if( search(Opt) == true ) {
+	    va_end(ap);
+	    return next(Default);
+	}
     }
     va_end(ap);
     return Default;
 }
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// (*) lists of nominus following an option
-//.............................................................................
-//
-inline std::vector<std::string> 
-GetPot::nominus_followers(const char* Option)
-{
-    std::vector<std::string>  result_list;
-    if( search(Option) == false ) return result_list;
-    while( 1 + 1 == 2 ) {
-        ++cursor;
-        if( cursor >= argv.size() ) { 
-            cursor = argv.size() - 1;
-            return result_list;
-        }
-        if( argv[cursor].length() >= 1 ) {
-            if( argv[cursor][0] == '-' ) {
-                return result_list;
-            }
-            // -- record for later ufo-detection
-            __record_argument_request(argv[cursor]);
-            // -- append to the result list
-            result_list.push_back(argv[cursor]);
-        }
-    }
-}
-
-inline std::vector<std::string> 
-GetPot::nominus_followers(unsigned int No, ...)
-{
-    std::vector<std::string>  result_list;
-    // (*) record requested of argument is entirely handled in 'search()' 
-    //     and 'nominus_followers()'
-    if( No == 0 ) return result_list;
-
-    va_list ap;
-    va_start(ap, No);   
-    for(unsigned int i=0; i<No; ++i) {
-        char* Option = va_arg(ap, char *);
-        std::vector<std::string> tmp = nominus_followers(Option);
-        result_list.insert(result_list.end(), tmp.begin(), tmp.end());
-
-        // std::cerr << "option = '" << Option << "'" << std::endl;
-        // std::cerr << "length = " << tmp.size() << std::endl;
-        // std::cerr << "new result list = <";
-        // for(std::vector<std::string>::const_iterator it = result_list.begin();
-        //    it != result_list.end(); ++it) 
-        //    std::cerr << *it << ", ";
-        // std::cerr << ">\n";
-    }
-    va_end(ap);
-    return result_list;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // (*) directly connected options
@@ -1182,12 +1103,12 @@ inline T
 GetPot::direct_follow(const T& Default, const char* Option)
 {
     const char* FollowStr = __match_starting_string(Option);
-    if( FollowStr == 0x0 )  return Default;
 
     // (*) record requested of argument for later ufo-detection
     __record_argument_request(std::string(Option) + FollowStr);
 
-    if( ++cursor >= static_cast<unsigned int>(argv.size()) ) cursor = static_cast<unsigned int>(argv.size());
+    if( FollowStr == 0 )                    return Default;
+    if( ++cursor >= argv.size() ) cursor = argv.size();
     return __convert_to_type(FollowStr, Default);
 }
 
@@ -1197,161 +1118,31 @@ GetPot::direct_follow(const char* Default, const char* Option)
     return __internal_managed_copy(direct_follow(std::string(Default), Option));
 }
 
-inline std::vector<std::string>
-GetPot::string_tails(const char* StartString)
-{
-    std::vector<std::string>  result;
-    const unsigned int        N = static_cast<unsigned int>(strlen(StartString));
-
-    std::vector<std::string>::iterator it = argv.begin();
-
-    unsigned int idx = 0;
-    while( it != argv.end() ) {
-        // (*) does start string match the given option?
-        //     NO -> goto next option
-        if( strncmp(StartString, (*it).c_str(), N) != 0) { ++it; ++idx; continue; }
-
-        // append the found tail to the result vector
-        result.push_back((*it).substr(N));
-                
-        // adapt the nominus vector
-        std::vector<unsigned int>::iterator nit = idx_nominus.begin();
-        for(; nit != idx_nominus.end(); ++nit) {
-            if( *nit == idx ) {
-                idx_nominus.erase(nit);
-                for(; nit != idx_nominus.end(); ++nit) *nit -= 1;
-                break;
-            }
-        }
-        
-        // erase the found option
-        argv.erase(it);
-
-        // 100% safe solution: set iterator back to the beginning.
-        // (normally, 'it--' would be enough, but who knows how the
-        // iterator is implemented and .erase() definitely invalidates
-        // the current iterator position.
-        if( argv.empty() ) break;
-        it = argv.begin();
-    }
-    cursor = 0;
-    nominus_cursor = -1;
-    return result;
-}
-
-inline std::vector<int>
-GetPot::int_tails(const char* StartString, const int Default /* = -1 */)
-{
-    std::vector<int>   result;
-    const unsigned int N = static_cast<unsigned int>(strlen(StartString));
-
-    std::vector<std::string>::iterator it = argv.begin();
-
-    unsigned int idx = 0;
-    while( it != argv.end() ) {
-        // (*) does start string match the given option?
-        //     NO -> goto next option
-        if( strncmp(StartString, (*it).c_str(), N) != 0) { ++it; ++idx; continue; }
-            
-        // append the found tail to the result vector
-        result.push_back(__convert_to_type((*it).substr(N), Default));
-
-        // adapt the nominus vector
-        std::vector<unsigned int>::iterator nit = idx_nominus.begin();
-        for(; nit != idx_nominus.end(); ++nit) {
-            if( *nit == idx ) {
-                idx_nominus.erase(nit);
-                for(; nit != idx_nominus.end(); ++nit) *nit -= 1;
-                break;
-            }
-        }
-
-        // erase the found option
-        argv.erase(it);
-        
-        // 100% safe solution: set iterator back to the beginning.
-        // (normally, 'it--' would be enough, but who knows how the
-        // iterator is implemented and .erase() definitely invalidates
-        // the current iterator position.
-        if( argv.empty() ) break;
-        it = argv.begin();
-    }
-    cursor = 0;
-    nominus_cursor = -1;
-    return result;
-}
-
-inline std::vector<double>
-GetPot::double_tails(const char*  StartString, 
-                     const double Default /* = -1.0 */)
-{
-    std::vector<double> result;
-    const unsigned int  N = static_cast<unsigned int>(strlen(StartString));
-
-    std::vector<std::string>::iterator it = argv.begin();
-    unsigned int                       idx = 0;
-    while( it != argv.end() ) {
-        // (*) does start string match the given option?
-        //     NO -> goto next option
-        if( strncmp(StartString, (*it).c_str(), N) != 0) { ++it; ++idx; continue; }
-            
-        // append the found tail to the result vector
-        result.push_back(__convert_to_type((*it).substr(N), Default));
-
-        // adapt the nominus vector
-        std::vector<unsigned int>::iterator nit = idx_nominus.begin();
-        for(; nit != idx_nominus.end(); ++nit) {
-            if( *nit == idx ) {
-                idx_nominus.erase(nit);
-                for(; nit != idx_nominus.end(); ++nit) *nit -= 1;
-                break;
-            }
-        }
-
-        // erase the found option
-        argv.erase(it);
-        
-        // 100% safe solution: set iterator back to the beginning.
-        // (normally, 'it--' would be enough, but who knows how the
-        // iterator is implemented and .erase() definitely invalidates
-        // the current iterator position.
-        if( argv.empty() ) break;
-        it = argv.begin();
-    }
-    cursor = 0;
-    nominus_cursor = -1;
-    return result;
-}
-
-
-
-
-
 inline const char*
 GetPot::__match_starting_string(const char* StartString)
     // pointer  to the place where the string after
     //          the match inside the found argument starts.
     // 0        no argument matches the starting string.
 {
-    const unsigned int N         = static_cast<unsigned int>(strlen(StartString));
-    unsigned           OldCursor = cursor;
+    const unsigned N         = strlen(StartString);
+    unsigned       OldCursor = cursor;
 
-    if( OldCursor >= static_cast<unsigned int>(argv.size()) ) OldCursor = static_cast<unsigned int>(argv.size()) - 1;
+    if( OldCursor >= argv.size() ) OldCursor = argv.size() - 1;
     search_failed_f = true;
 
     // (*) first loop from cursor position until end
-    unsigned int c = cursor;
+    unsigned c = cursor;
     for(; c < argv.size(); c++) {
-        if( strncmp(StartString, argv[c].c_str(), N) == 0)
-        { cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
+	if( strncmp(StartString, argv[c].c_str(), N) == 0)
+	{ cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
     }
 
     if( ! search_loop_f ) return false;
 
     // (*) second loop from 0 to old cursor position
     for(c = 1; c < OldCursor; c++) {
-        if( strncmp(StartString, argv[c].c_str(), N) == 0)
-        { cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
+	if( strncmp(StartString, argv[c].c_str(), N) == 0)
+	{ cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
     }
     return 0;
 }
@@ -1366,17 +1157,17 @@ GetPot::options_contain(const char* FlagList) const
     // go through all arguments that start with a '-' (but not '--')
     std::string str;
     STRING_VECTOR::const_iterator it = argv.begin();
-    for(; it != argv.end(); ++it) {
-        str = __get_remaining_string(*it, prefix);
+    for(; it != argv.end(); it++) {
+	str = __get_remaining_string(*it, prefix);
 
-        if( str.length() >= 2 && str[0] == '-' && str[1] != '-' )
-            if( __check_flags(str, FlagList) ) return true;
+	if( str.length() >= 2 && str[0] == '-' && str[1] != '-' )
+	    if( __check_flags(str, FlagList) ) return true;
     }
     return false;
 }
 
 inline bool
-GetPot::argument_contains(unsigned int Idx, const char* FlagList) const
+GetPot::argument_contains(unsigned Idx, const char* FlagList) const
 {
     if( Idx >= argv.size() ) return false;
 
@@ -1385,21 +1176,21 @@ GetPot::argument_contains(unsigned int Idx, const char* FlagList) const
     ((GetPot*)this)->__record_argument_request(argv[Idx]);
 
     if( prefix == "" )
-        // search argument for any flag in flag list
-        return __check_flags(argv[Idx], FlagList);
+	// search argument for any flag in flag list
+	return __check_flags(argv[Idx], FlagList);
 
     // if a prefix is set, then the argument index is the index
     //   inside the 'namespace'
     // => only check list of arguments that start with prefix
-    unsigned int no_matches = 0;
-    unsigned int i=0;
-    for(; i<argv.size(); ++i) {
-        const std::string Remain = __get_remaining_string(argv[i], prefix);
-        if( Remain != "") {
-            no_matches += 1;
-            if( no_matches == Idx)
-                return __check_flags(Remain, FlagList);
-        }
+    unsigned no_matches = 0;
+    unsigned i=0;
+    for(; i<argv.size(); i++) {
+	const std::string Remain = __get_remaining_string(argv[i], prefix);
+	if( Remain != "") {
+	    no_matches += 1;
+	    if( no_matches == Idx)
+		return __check_flags(Remain, FlagList);
+	}
     }
     // no argument in this namespace
     return false;
@@ -1410,7 +1201,7 @@ GetPot::__check_flags(const std::string& Str, const char* FlagList) const
 {
     const char* p=FlagList;
     for(; *p != '\0' ; p++)
-        if( Str.find(*p) != std::string::npos ) return true; // found something
+	if( Str.find(*p) != std::string::npos ) return true; // found something
     return false;
 }
 
@@ -1421,34 +1212,35 @@ GetPot::nominus_vector() const
     // return vector of nominus arguments
 {
     STRING_VECTOR nv;
-    std::vector<unsigned int>::const_iterator it = idx_nominus.begin();
-    for(; it != idx_nominus.end(); ++it) {
-        nv.push_back(argv[*it]);
+    std::vector<unsigned>::const_iterator it = idx_nominus.begin();
+    for(; it != idx_nominus.end(); it++) {
+	nv.push_back(argv[*it]);
 
-        // (*) record for later ufo-detection
-        //     when a nominus vector is requested, the entire set of nominus arguments are 
-        //     tagged as 'requested'
-        ((GetPot*)this)->__record_argument_request(argv[*it]);
+	// (*) record for later ufo-detection
+	//     when a nominus vector is requested, the entire set of nominus arguments are 
+	//     tagged as 'requested'
+	((GetPot*)this)->__record_argument_request(argv[*it]);
     }
     return nv;
 }
 
-inline std::string
+inline const char*
 GetPot::next_nominus()
 {
     if( nominus_cursor < int(idx_nominus.size()) - 1 ) {
-        const std::string Tmp = argv[idx_nominus[++nominus_cursor]];
+	const std::string Tmp = argv[idx_nominus[++nominus_cursor]];
 
-        // (*) record for later ufo-detection
-        __record_argument_request(Tmp);
+	// (*) record for later ufo-detection
+	__record_argument_request(Tmp);
 
-        // -- cannot use the Tmp variable, since it is temporary and c_str() will return a pointer
-        //    to something that does no longer exist.
-        return Tmp; 
+	return Tmp.c_str();
     }
-    return std::string("");
+    return 0;
 }
 
+inline void
+GetPot::reset_nominus_cursor()
+{ nominus_cursor = -1; }
 ///////////////////////////////////////////////////////////////////////////////
 // (*) variables
 //.............................................................................
@@ -1498,7 +1290,7 @@ GetPot::operator()(const char* VarName, const char* Default, unsigned int Idx) c
 inline void 
 GetPot::__record_argument_request(const std::string& Name)
 {
-    if( ! __request_recording_f ) return; 
+    if( ! request_recording_f ) return; 
 
     // (*) record requested variable for later ufo detection
     _requested_arguments.push_back(Name);
@@ -1506,14 +1298,14 @@ GetPot::__record_argument_request(const std::string& Name)
     // (*) record considered section for ufo detection
     STRING_VECTOR      STree = __get_section_tree(Name);
     victorate(std::string, STree, it)
-        if( find(_requested_sections.begin(), _requested_sections.end(), *it) == _requested_sections.end() )
-            if( section.length() != 0 ) _requested_sections.push_back(*it);
+	if( find(_requested_sections.begin(), _requested_sections.end(), *it) == _requested_sections.end() )
+	    if( section.length() != 0 ) _requested_sections.push_back(*it);
 }
 
 inline void 
 GetPot::__record_variable_request(const std::string& Name)
 {
-    if( ! __request_recording_f ) return; 
+    if( ! request_recording_f ) return; 
 
     // (*) record requested variable for later ufo detection
     _requested_variables.push_back(Name);
@@ -1521,8 +1313,8 @@ GetPot::__record_variable_request(const std::string& Name)
     // (*) record considered section for ufo detection
     STRING_VECTOR      STree = __get_section_tree(Name);
     victorate(std::string, STree, it)
-        if( find(_requested_sections.begin(), _requested_sections.end(), *it) == _requested_sections.end() )
-            if( section.length() != 0 ) _requested_sections.push_back(*it);
+	if( find(_requested_sections.begin(), _requested_sections.end(), *it) == _requested_sections.end() )
+	    if( section.length() != 0 ) _requested_sections.push_back(*it);
 }
 
 // (*) following functions are to be used from 'outside', after getpot has parsed its
@@ -1534,21 +1326,6 @@ GetPot::__set_variable(const char* VarName, const char* Value)
     if( Var == 0 ) variables.push_back(variable(VarName, Value, _field_separator.c_str()));
     else           ((GetPot::variable*)Var)->take(Value, _field_separator.c_str());    
 }
-
-#if 0
-template <>
-inline void
-GetPot::set(const char* VarName, const char* Value, const bool Requested /* = yes */)
-{     
-    const std::string Arg = prefix + std::string(VarName) + std::string("=") + std::string(Value);
-    argv.push_back(Arg);
-    __set_variable(VarName, Value);
-
-    // if user does not specify the variable as 'not being requested' it will be 
-    // considered amongst the requested variables
-    if( Requested ) __record_variable_request(Arg);
-}
-#endif
 
 template <typename T>
 inline void
@@ -1565,12 +1342,12 @@ GetPot::set(const char* VarName, const char* Value, const bool Requested /* = ye
   __set_variable(VarName, Value);
 }
 
-inline unsigned int
+inline unsigned
 GetPot::vector_variable_size(const char* VarName) const
 {
     const variable*  sv = __find_variable(VarName);
     if( sv == 0 ) return 0;
-    return static_cast<unsigned int>(sv->value.size());
+    return sv->value.size();
 }
 
 inline STRING_VECTOR
@@ -1578,9 +1355,9 @@ GetPot::get_variable_names() const
 {
     STRING_VECTOR  result;
     std::vector<GetPot::variable>::const_iterator it = variables.begin();
-    for(; it != variables.end(); ++it) {
-        const std::string Tmp = __get_remaining_string((*it).name, prefix);
-        if( Tmp != "" ) result.push_back(Tmp);
+    for(; it != variables.end(); it++) {
+	const std::string Tmp = __get_remaining_string((*it).name, prefix);
+	if( Tmp != "" ) result.push_back(Tmp);
     }
     return result;
 }
@@ -1598,8 +1375,8 @@ GetPot::__find_variable(const char* VarName) const
     ((GetPot*)this)->__record_variable_request(Name);
 
     std::vector<variable>::const_iterator it = variables.begin();
-    for(; it != variables.end(); ++it) {
-        if( (*it).name == Name ) return &(*it);
+    for(; it != variables.end(); it++) {
+	if( (*it).name == Name ) return &(*it);
     }
     return 0;
 }
@@ -1611,10 +1388,10 @@ GetPot::__find_variable(const char* VarName) const
 inline int
 GetPot::print() const
 {
-    std::cout << "argc = " << static_cast<unsigned int>(argv.size()) << std::endl;
+    std::cout << "argc = " << argv.size() << std::endl;
     STRING_VECTOR::const_iterator it = argv.begin();
-    for(; it != argv.end(); ++it)
-        std::cout << *it << std::endl;
+    for(; it != argv.end(); it++)
+	std::cout << *it << std::endl;
     std::cout << std::endl;
     return 1;
 }
@@ -1673,29 +1450,29 @@ GetPot::__DBE_expand_string(const std::string str)
     // Parses for closing operators '${ }' and expands them letting
     // white spaces and other letters as they are.
     std::string   new_string = "";
-    unsigned int open_brackets = 0;
-    unsigned int first = 0;
-    unsigned int i = 0;
-    for(;  i<str.size(); ++i) {
-        if( i < str.size() - 2 && str.substr(i, 2) == "${" ) {
-            if( open_brackets == 0 ) first = i+2;
-            open_brackets++;
-        }
-        else if( str[i] == '}' && open_brackets > 0) {
-            open_brackets -= 1;
-            if( open_brackets == 0 ) {
-                const std::string Replacement = __DBE_expand(str.substr(first, i - first));
-                new_string += Replacement;
-            }
-        }
-        else if( open_brackets == 0 )
-            new_string += str[i];
+    unsigned open_brackets = 0;
+    unsigned first = 0;
+    unsigned i = 0;
+    for(;  i<str.size(); i++) {
+	if( i < str.size() - 2 && str.substr(i, 2) == "${" ) {
+	    if( open_brackets == 0 ) first = i+2;
+	    open_brackets++;
+	}
+	else if( str[i] == '}' && open_brackets > 0) {
+	    open_brackets -= 1;
+	    if( open_brackets == 0 ) {
+		const std::string Replacement = __DBE_expand(str.substr(first, i - first));
+		new_string += Replacement;
+	    }
+	}
+	else if( open_brackets == 0 )
+	    new_string += str[i];
     }
     return new_string;
 }
 
 inline STRING_VECTOR
-GetPot::__DBE_get_expr_list(const std::string str_, const unsigned int ExpectedNumber)
+GetPot::__DBE_get_expr_list(const std::string str_, const unsigned ExpectedNumber)
     // ensures that the resulting vector has the expected number
     // of arguments, but they may contain an error message
 {
@@ -1703,66 +1480,66 @@ GetPot::__DBE_get_expr_list(const std::string str_, const unsigned int ExpectedN
     // Separates expressions by non-bracketed whitespaces, expands them
     // and puts them into a list.
 
-    unsigned int i=0;
+    unsigned i=0;
     // (1) eat initial whitespaces
-    for(; i < str.size(); ++i)
-        if( ! isspace(str[i]) ) break;
+    for(; i < str.size(); i++)
+	if( ! isspace(str[i]) ) break;
 
     STRING_VECTOR   expr_list;
-    unsigned int    open_brackets = 0;
-    std::vector<unsigned int> start_idx;
-    unsigned int    start_new_string = i;
-    unsigned int    l = static_cast<unsigned int>(str.size());
+    unsigned         open_brackets = 0;
+    std::vector<unsigned> start_idx;
+    unsigned         start_new_string = i;
+    unsigned         l = str.size();
 
     // (2) search for ${ } expressions ...
     while( i < l ) {
-        const char letter = str[i];
-        // whitespace -> end of expression
-        if( isspace(letter) && open_brackets == 0) {
-            expr_list.push_back(str.substr(start_new_string, i - start_new_string));
-            bool no_breakout_f = true;
-            for(++i; i < l ; ++i) {
-                if( ! isspace(str[i]) )
-                { no_breakout_f = false; start_new_string = i; break; }
-            }
-            if( no_breakout_f ) {
-                // end of expression list
-                if( expr_list.size() < ExpectedNumber ) {
-                    const std::string   pre_tmp("<< ${ }: missing arguments>>");
-                    STRING_VECTOR tmp(ExpectedNumber - expr_list.size(), pre_tmp);
-                    expr_list.insert(expr_list.end(), tmp.begin(), tmp.end());
-                }
-                return expr_list;
-            }
-        }
+	const char letter = str[i];
+	// whitespace -> end of expression
+	if( isspace(letter) && open_brackets == 0) {
+	    expr_list.push_back(str.substr(start_new_string, i - start_new_string));
+	    bool no_breakout_f = true;
+	    for(i++; i < l ; i++) {
+		if( ! isspace(str[i]) )
+		{ no_breakout_f = false; start_new_string = i; break; }
+	    }
+	    if( no_breakout_f ) {
+		// end of expression list
+		if( expr_list.size() < ExpectedNumber ) {
+		    const std::string   pre_tmp("<< ${ }: missing arguments>>");
+		    STRING_VECTOR tmp(ExpectedNumber - expr_list.size(), pre_tmp);
+		    expr_list.insert(expr_list.end(), tmp.begin(), tmp.end());
+		}
+		return expr_list;
+	    }
+	}
 
-        // dollar-bracket expression
-        if( str.length() >= i+2 && str.substr(i, 2) == "${" ) {
-            open_brackets++;
-            start_idx.push_back(i+2);
-        }
-        else if( letter == '}' && open_brackets > 0) {
-            int start = start_idx[start_idx.size()-1];
-            start_idx.pop_back();
-            const std::string Replacement = __DBE_expand(str.substr(start, i-start));
-            if( start - 3 < (int)0)
-                str = Replacement + str.substr(i+1);
-            else
-                str = str.substr(0, start-2) + Replacement + str.substr(i+1);
-            l = static_cast<unsigned int>(str.size());
-            i = start + static_cast<unsigned int>(Replacement.size()) - 3;
-            open_brackets--;
-        }
-        ++i;
+	// dollar-bracket expression
+	if( str.length() >= i+2 && str.substr(i, 2) == "${" ) {
+	    open_brackets++;
+	    start_idx.push_back(i+2);
+	}
+	else if( letter == '}' && open_brackets > 0) {
+	    int start = start_idx[start_idx.size()-1];
+	    start_idx.pop_back();
+	    const std::string Replacement = __DBE_expand(str.substr(start, i-start));
+	    if( start - 3 < (int)0)
+		str = Replacement + str.substr(i+1);
+	    else
+		str = str.substr(0, start-2) + Replacement + str.substr(i+1);
+	    l = str.size();
+	    i = start + Replacement.size() - 3;
+	    open_brackets--;
+	}
+	i++;
     }
 
     // end of expression list
     expr_list.push_back(str.substr(start_new_string, i-start_new_string));
 
     if( expr_list.size() < ExpectedNumber ) {
-        const std::string   pre_tmp("<< ${ }: missing arguments>>");
-        STRING_VECTOR tmp(ExpectedNumber - expr_list.size(), pre_tmp);
-        expr_list.insert(expr_list.end(), tmp.begin(), tmp.end());
+	const std::string   pre_tmp("<< ${ }: missing arguments>>");
+	STRING_VECTOR tmp(ExpectedNumber - expr_list.size(), pre_tmp);
+	expr_list.insert(expr_list.end(), tmp.begin(), tmp.end());
     }
 
     return expr_list;
@@ -1788,12 +1565,8 @@ GetPot::__DBE_get_variable(std::string VarName)
 
     // error occured => variable name == ""
     char* tmp = new char[VarName.length() + 25];
-#ifndef WIN32
     snprintf(tmp, (int)sizeof(char)*(VarName.length() + 25), 
-#else
-    _snprintf(tmp, sizeof(char)*(VarName.length() + 25), 
-#endif
-             "<<${ } variable '%s' undefined>>", VarName.c_str());
+	     "<<${ } variable '%s' undefined>>", VarName.c_str());
     ev.name = "";
     ev.original = std::string(tmp);
     delete [] tmp;
@@ -1805,213 +1578,212 @@ GetPot::__DBE_expand(const std::string expr)
 {
     // ${: } pure text
     if( expr[0] == ':' )
-        return expr.substr(1);
+	return expr.substr(1);
 
     // ${& expr expr ... } text concatination
     else if( expr[0] == '&' ) {
-        const STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 1);
+	const STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 1);
 
-        STRING_VECTOR::const_iterator it = A.begin();
-        std::string result = *it++;
-        for(; it != A.end(); ++it) result += *it;
+	STRING_VECTOR::const_iterator it = A.begin();
+	std::string result = *it++;
+	for(; it != A.end(); it++) result += *it;
 
-        return result;
+	return result;
     }
 
     // ${<-> expr expr expr} text replacement
     else if( expr.length() >= 3 && expr.substr(0, 3) == "<->" ) {
-        STRING_VECTOR A = __DBE_get_expr_list(expr.substr(3), 3);
-        std::string::size_type tmp = 0;
-        const std::string::size_type L = A[1].length();
-        while( (tmp = A[0].find(A[1])) != std::string::npos ) {
-            A[0].replace(tmp, L, A[2]);
-        }
-        return A[0];
+	STRING_VECTOR A = __DBE_get_expr_list(expr.substr(3), 3);
+	unsigned tmp = 0;
+	const unsigned L = A[1].length();
+	while( (tmp = A[0].find(A[1])) != std::string::npos ) {
+	    A[0].replace(tmp, L, A[2]);
+	}
+	return A[0];
     }
     // ${+ ...}, ${- ...}, ${* ...}, ${/ ...} expressions
     else if( expr[0] == '+' ) {
-        STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
-        STRING_VECTOR::const_iterator it = A.begin();
-        double result = __convert_to_type(*it++, 0.0);
-        for(; it != A.end(); ++it)
-            result += __convert_to_type(*it, 0.0);
+	STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
+	STRING_VECTOR::const_iterator it = A.begin();
+	double result = __convert_to_type(*it++, 0.0);
+	for(; it != A.end(); it++)
+	    result += __convert_to_type(*it, 0.0);
 
-        return __double2string(result);
+	return __double2string(result);
     }
     else if( expr[0] == '-' ) {
-        STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
-        STRING_VECTOR::const_iterator it = A.begin();
-        double result = __convert_to_type(*it++, 0.0);
-        for(; it != A.end(); ++it)
-            result -= __convert_to_type(*it, 0.0);
+	STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
+	STRING_VECTOR::const_iterator it = A.begin();
+	double result = __convert_to_type(*it++, 0.0);
+	for(; it != A.end(); it++)
+	    result -= __convert_to_type(*it, 0.0);
 
-        return __double2string(result);
+	return __double2string(result);
     }
     else if( expr[0] == '*' ) {
-        STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
-        STRING_VECTOR::const_iterator it = A.begin();
-        double result = __convert_to_type(*it++, 0.0);
-        for(; it != A.end(); ++it)
-            result *= __convert_to_type(*it, 0.0);
+	STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
+	STRING_VECTOR::const_iterator it = A.begin();
+	double result = __convert_to_type(*it++, 0.0);
+	for(; it != A.end(); it++)
+	    result *= __convert_to_type(*it, 0.0);
 
-        return __double2string(result);
+	return __double2string(result);
     }
     else if( expr[0] == '/' ) {
-
-        STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
-        STRING_VECTOR::const_iterator it = A.begin();
-        double result = __convert_to_type(*it++, 0.0);
-        if( result == 0 ) return "0.0";
-        for(; it != A.end(); ++it) {
-            const double Q = __convert_to_type(*it, 0.0);
-            if( Q == 0.0 ) return "0.0";
-            result /= Q;
-        }
-        return __double2string(result);
+	STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
+	STRING_VECTOR::const_iterator it = A.begin();
+	double result = __convert_to_type(*it++, 0.0);
+	if( result == 0 ) return "0.0";
+	for(it++; it != A.end(); it++) {
+	    const double Q = __convert_to_type(*it, 0.0);
+	    if( Q == 0.0 ) return "0.0";
+	    result /= Q;
+	}
+	return __double2string(result);
     }
 
     // ${^ ... } power expressions
     else if( expr[0] == '^' ) {
-        STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
-        STRING_VECTOR::const_iterator it = A.begin();
-        double result = __convert_to_type(*it++, 0.0);
-        for(; it != A.end(); ++it)
-            result = pow(result, __convert_to_type(*it, 0.0));
-        return __double2string(result);
+	STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
+	STRING_VECTOR::const_iterator it = A.begin();
+	double result = __convert_to_type(*it++, 0.0);
+	for(; it != A.end(); it++)
+	    result = pow(result, __convert_to_type(*it, 0.0));
+	return __double2string(result);
     }
 
     // ${==  } ${<=  } ${>= } comparisons (return the number of the first 'match'
     else if( expr.length() >= 2 &&
-             ( expr.substr(0,2) == "==" || expr.substr(0,2) == ">=" ||
-               expr.substr(0,2) == "<=" || expr[0] == '>'           || expr[0] == '<')) {
-        // differentiate between two and one sign operators
-        unsigned int op = 0;
-        enum { EQ, GEQ, LEQ, GT, LT };
-        if      ( expr.substr(0, 2) == "==" ) op = EQ;
-        else if ( expr.substr(0, 2) == ">=" ) op = GEQ;
-        else if ( expr.substr(0, 2) == "<=" ) op = LEQ;
-        else if ( expr[0] == '>' )            op = GT;
-        else    /*                     "<" */ op = LT;
+	     ( expr.substr(0,2) == "==" || expr.substr(0,2) == ">=" ||
+	       expr.substr(0,2) == "<=" || expr[0] == '>'           || expr[0] == '<')) {
+	// differentiate between two and one sign operators
+	unsigned op = 0;
+	enum { EQ, GEQ, LEQ, GT, LT };
+	if      ( expr.substr(0, 2) == "==" ) op = EQ;
+	else if ( expr.substr(0, 2) == ">=" ) op = GEQ;
+	else if ( expr.substr(0, 2) == "<=" ) op = LEQ;
+	else if ( expr[0] == '>' )            op = GT;
+	else    /*                     "<" */ op = LT;
 
-        STRING_VECTOR a;
-        if ( op == GT || op == LT ) a = __DBE_get_expr_list(expr.substr(1), 2);
-        else                        a = __DBE_get_expr_list(expr.substr(2), 2);
+	STRING_VECTOR a;
+	if ( op == GT || op == LT ) a = __DBE_get_expr_list(expr.substr(1), 2);
+	else                        a = __DBE_get_expr_list(expr.substr(2), 2);
 
-        std::string   x_orig = a[0];
-        double   x = __convert_to_type(x_orig, 1e37);
-        unsigned int i = 1;
+	std::string   x_orig = a[0];
+	double   x = __convert_to_type(x_orig, 1e37);
+	unsigned i = 1;
 
-        STRING_VECTOR::const_iterator y_orig = a.begin();
-        for(y_orig++; y_orig != a.end(); y_orig++) {
-            double y = __convert_to_type(*y_orig, 1e37);
+	STRING_VECTOR::const_iterator y_orig = a.begin();
+	for(y_orig++; y_orig != a.end(); y_orig++) {
+	    double y = __convert_to_type(*y_orig, 1e37);
 
-            // set the strings as reference if one wasn't a number
-            if ( x == 1e37 || y == 1e37 ) {
-                // it's a string comparison
-                if( (op == EQ  && x_orig == *y_orig) || (op == GEQ && x_orig >= *y_orig) ||
-                    (op == LEQ && x_orig <= *y_orig) || (op == GT  && x_orig >  *y_orig) ||
-                    (op == LT  && x_orig <  *y_orig) )
-                    return __int2string(i);
-            }
-            else {
-                // it's a number comparison
-                if( (op == EQ  && x == y) || (op == GEQ && x >= y) ||
-                    (op == LEQ && x <= y) || (op == GT  && x >  y) ||
-                    (op == LT  && x <  y) )
-                    return __int2string(i);
-            }
-            ++i;
-        }
+	    // set the strings as reference if one wasn't a number
+	    if ( x == 1e37 || y == 1e37 ) {
+		// it's a string comparison
+		if( (op == EQ  && x_orig == *y_orig) || (op == GEQ && x_orig >= *y_orig) ||
+		    (op == LEQ && x_orig <= *y_orig) || (op == GT  && x_orig >  *y_orig) ||
+		    (op == LT  && x_orig <  *y_orig) )
+		    return __int2string(i);
+	    }
+	    else {
+		// it's a number comparison
+		if( (op == EQ  && x == y) || (op == GEQ && x >= y) ||
+		    (op == LEQ && x <= y) || (op == GT  && x >  y) ||
+		    (op == LT  && x <  y) )
+		    return __int2string(i);
+	    }
+	    i++;
+	}
 
-        // nothing fulfills the condition => return 0
-        return "0";
+	// nothing fulfills the condition => return 0
+	return "0";
     }
     // ${?? expr expr} select
     else if( expr.length() >= 2 && expr.substr(0, 2) == "??" ) {
-        STRING_VECTOR a = __DBE_get_expr_list(expr.substr(2), 2);
-        double x = __convert_to_type(a[0], 1e37);
-        // last element is always the default argument
-        if( x == 1e37 || x < 0 || x >= a.size() - 1 ) return a[a.size()-1];
+	STRING_VECTOR a = __DBE_get_expr_list(expr.substr(2), 2);
+	double x = __convert_to_type(a[0], 1e37);
+	// last element is always the default argument
+	if( x == 1e37 || x < 0 || x >= a.size() - 1 ) return a[a.size()-1];
 
-        // round x to closest integer
-        return a[int(x+0.5)];
+	// round x to closest integer
+	return a[int(x+0.5)];
     }
     // ${? expr expr expr} if then else conditions
     else if( expr[0] == '?' ) {
-        STRING_VECTOR a = __DBE_get_expr_list(expr.substr(1), 2);
-        if( __convert_to_type(a[0], 0.0) == 1.0 ) return a[1];
-        else if( a.size() > 2 ) return a[2];
+	STRING_VECTOR a = __DBE_get_expr_list(expr.substr(1), 2);
+	if( __convert_to_type(a[0], 0.0) == 1.0 ) return a[1];
+	else if( a.size() > 2 ) return a[2];
     }
     // ${! expr} maxro expansion
     else if( expr[0] == '!' ) {
-        const GetPot::variable* Var = __DBE_get_variable(expr.substr(1));
-        // error
-        if( Var->name == "" ) return std::string(Var->original);
+	const GetPot::variable* Var = __DBE_get_variable(expr.substr(1));
+	// error
+	if( Var->name == "" ) return std::string(Var->original);
 
-        const STRING_VECTOR A = __DBE_get_expr_list(Var->original, 2);
-        return A[0];
+	const STRING_VECTOR A = __DBE_get_expr_list(Var->original, 2);
+	return A[0];
     }
     // ${@: } - string subscription
     else if( expr.length() >= 2 && expr.substr(0,2) == "@:" ) {
-        const STRING_VECTOR A = __DBE_get_expr_list(expr.substr(2), 2);
-        double x = __convert_to_type(A[1], 1e37);
+	const STRING_VECTOR A = __DBE_get_expr_list(expr.substr(2), 2);
+	double x = __convert_to_type(A[1], 1e37);
 
-        // last element is always the default argument
-        if( x == 1e37 || x < 0 || x >= A[0].size() - 1)
-            return "<<1st index out of range>>";
+	// last element is always the default argument
+	if( x == 1e37 || x < 0 || x >= A[0].size() - 1)
+	    return "<<1st index out of range>>";
 
-        if( A.size() > 2 ) {
-            double y = __convert_to_type(A[2], 1e37);
-            if ( y != 1e37 && y > 0 && y <= A[0].size() - 1 && y > x )
-                return A[0].substr(int(x+0.5), int(y+1.5) - int(x+0.5));
-            else if( y == -1 )
-                return A[0].substr(int(x+0.5));
-            return "<<2nd index out of range>>";
-        }
-        else {
-            char* tmp = new char[2];
-            tmp[0] = A[0][int(x+0.5)]; tmp[1] = '\0';
-            std::string result(tmp);
-            delete [] tmp;
-            return result;
-        }
+	if( A.size() > 2 ) {
+	    double y = __convert_to_type(A[2], 1e37);
+	    if ( y != 1e37 && y > 0 && y <= A[0].size() - 1 && y > x )
+		return A[0].substr(int(x+0.5), int(y+1.5) - int(x+0.5));
+	    else if( y == -1 )
+		return A[0].substr(int(x+0.5));
+	    return "<<2nd index out of range>>";
+	}
+	else {
+	    char* tmp = new char[2];
+	    tmp[0] = A[0][int(x+0.5)]; tmp[1] = '\0';
+	    std::string result(tmp);
+	    delete [] tmp;
+	    return result;
+	}
     }
     // ${@ } - vector subscription
     else if( expr[0] == '@' ) {
-        STRING_VECTOR          A   = __DBE_get_expr_list(expr.substr(1), 2);
-        const GetPot::variable* Var = __DBE_get_variable(A[0]);
-        // error
-        if( Var->name == "" ) {
-            // make a copy of the string if an error occured
-            // (since the error variable is a static variable inside get_variable())
-            return std::string(Var->original);
-        }
+	STRING_VECTOR          A   = __DBE_get_expr_list(expr.substr(1), 2);
+	const GetPot::variable* Var = __DBE_get_variable(A[0]);
+	// error
+	if( Var->name == "" ) {
+	    // make a copy of the string if an error occured
+	    // (since the error variable is a static variable inside get_variable())
+	    return std::string(Var->original);
+	}
 
-        double x = __convert_to_type(A[1], 1e37);
+	double x = __convert_to_type(A[1], 1e37);
 
-        // last element is always the default argument
-        if (x == 1e37 || x < 0 || x >= Var->value.size() )
-            return "<<1st index out of range>>";
+	// last element is always the default argument
+	if (x == 1e37 || x < 0 || x >= Var->value.size() )
+	    return "<<1st index out of range>>";
 
-        if ( A.size() > 2) {
-            double y = __convert_to_type(A[2], 1e37);
-            int    begin = int(x+0.5);
-            int    end = 0;
-            if ( y != 1e37 && y > 0 && y <= Var->value.size() && y > x)
-                end = int(y+1.5);
-            else if( y == -1 )
-                end = static_cast<unsigned int>(Var->value.size());
-            else
-                return "<<2nd index out of range>>";
+	if ( A.size() > 2) {
+	    double y = __convert_to_type(A[2], 1e37);
+	    int    begin = int(x+0.5);
+	    int    end = 0;
+	    if ( y != 1e37 && y > 0 && y <= Var->value.size() && y > x)
+		end = int(y+1.5);
+	    else if( y == -1 )
+		end = Var->value.size();
+	    else
+		return "<<2nd index out of range>>";
 
-            std::string result = *(Var->get_element(begin));
-            int i = begin+1;
-            for(; i < end; ++i)
-                result += std::string(" ") + *(Var->get_element(i));
-            return result;
-        }
-        else
-            return *(Var->get_element(int(x+0.5)));
+	    std::string result = *(Var->get_element(begin));
+	    int i = begin+1;
+	    for(; i < end; i++)
+		result += std::string(" ") + *(Var->get_element(i));
+	    return result;
+	}
+	else
+	    return *(Var->get_element(int(x+0.5)));
     }
 
     const STRING_VECTOR    A = __DBE_get_expr_list(expr, 1);
@@ -2034,26 +1806,26 @@ inline bool
 GetPot::__search_string_vector(const STRING_VECTOR& VecStr, const std::string& Str) const
 {
     victorate(std::string, VecStr, itk) {
-        if( *itk == Str ) return true;
+	if( *itk == Str ) return true;
     }
     return false;
 }
 
 inline STRING_VECTOR
-GetPot::unidentified_arguments(unsigned int Num,
-                               const char* KnownArgument1, ...) const
+GetPot::unidentified_arguments(unsigned Number,
+			       const char* KnownArgument1, ...) const
 {
     STRING_VECTOR known_arguments;
 
     // (1) create a vector of known arguments
-    if( Num == 0 ) return STRING_VECTOR();
+    if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, KnownArgument1);
     known_arguments.push_back(std::string(KnownArgument1));
-    unsigned int i=1;
-    for(; i<Num; ++i)
-        known_arguments.push_back(std::string(va_arg(ap, char *)));
+    unsigned i=1;
+    for(; i<Number; i++)
+	known_arguments.push_back(std::string(va_arg(ap, char *)));
     va_end(ap);
 
     return unidentified_arguments(known_arguments);
@@ -2068,34 +1840,34 @@ GetPot::unidentified_arguments(const STRING_VECTOR& Knowns) const
 {
     STRING_VECTOR ufos;
     STRING_VECTOR::const_iterator it = argv.begin();
-    ++it; // forget about argv[0] (application or filename)
-    for(; it != argv.end(); ++it) {
-        // -- argument belongs to prefixed section ?
-        const std::string arg = __get_remaining_string(*it, prefix);
-        if( arg == "" ) continue;
+    it++; // forget about argv[0] (application or filename)
+    for(; it != argv.end(); it++) {
+	// -- argument belongs to prefixed section ?
+	const std::string arg = __get_remaining_string(*it, prefix);
+	if( arg == "" ) continue;
 
-        // -- check if in list
-        if( __search_string_vector(Knowns, arg) == false)
-            ufos.push_back(*it);
+	// -- check if in list
+	if( __search_string_vector(Knowns, arg) == false)
+	    ufos.push_back(*it);
     }
     return ufos;
 }
 
 inline STRING_VECTOR
-GetPot::unidentified_options(unsigned int Num,
-                             const char* KnownOption1, ...) const
+GetPot::unidentified_options(unsigned Number,
+			     const char* KnownOption1, ...) const
 {
     STRING_VECTOR known_options;
 
     // (1) create a vector of known arguments
-    if( Num == 0 ) return STRING_VECTOR();
+    if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, KnownOption1);
     known_options.push_back(std::string(KnownOption1));
-    unsigned int i=1;
-    for(; i<Num; ++i)
-        known_options.push_back(std::string(va_arg(ap, char *)));
+    unsigned i=1;
+    for(; i<Number; i++)
+	known_options.push_back(std::string(va_arg(ap, char *)));
     va_end(ap);
 
     return unidentified_options(known_options);
@@ -2110,13 +1882,7 @@ GetPot::unidentified_options() const
     //    THEN they were requested as 'follow' and 'next' arguments and not as real options.
     //
     // => it is not necessary to separate requested options from the list
-    STRING_VECTOR option_list;
-    victorate(std::string, _requested_arguments, it) {
-        const std::string arg = *it;
-        if( arg.length() == 0 ) continue;
-        if( arg[0] == '-' )     option_list.push_back(arg);
-    }   
-    return unidentified_options(option_list); 
+    return unidentified_arguments(_requested_arguments); 
 }
 
 inline STRING_VECTOR
@@ -2124,17 +1890,17 @@ GetPot::unidentified_options(const STRING_VECTOR& Knowns) const
 {
     STRING_VECTOR ufos;
     STRING_VECTOR::const_iterator it = argv.begin();
-    ++it; // forget about argv[0] (application or filename)
-    for(; it != argv.end(); ++it) {
-        // -- argument belongs to prefixed section ?
-        const std::string arg = __get_remaining_string(*it, prefix);
-        if( arg == "" ) continue;
+    it++; // forget about argv[0] (application or filename)
+    for(; it != argv.end(); it++) {
+	// -- argument belongs to prefixed section ?
+	const std::string arg = __get_remaining_string(*it, prefix);
+	if( arg == "" ) continue;
 
-        // is argument really an option (starting with '-') ?
-        if( arg.length() < 1 || arg[0] != '-' ) continue;
+	// is argument really an option (starting with '-') ?
+	if( arg.length() < 1 || arg[0] != '-' ) continue;
 
-        if( __search_string_vector(Knowns, arg) == false)
-            ufos.push_back(*it);
+	if( __search_string_vector(Knowns, arg) == false)
+	    ufos.push_back(*it);
     }
 
     return ufos;
@@ -2153,64 +1919,64 @@ GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) con
 
     // (2) iteration over '-' arguments (options)
     if( ArgumentNumber == -1 ) {
-        STRING_VECTOR::const_iterator it = argv.begin();
-        ++it; // forget about argv[0] (application or filename)
-        for(; it != argv.end(); ++it) {
-            // -- argument belongs to prefixed section ?
-            const std::string arg = __get_remaining_string(*it, prefix);
-            if( arg == "" ) continue;
+	STRING_VECTOR::const_iterator it = argv.begin();
+	it++; // forget about argv[0] (application or filename)
+	for(; it != argv.end(); it++) {
+	    // -- argument belongs to prefixed section ?
+	    const std::string arg = __get_remaining_string(*it, prefix);
+	    if( arg == "" ) continue;
 
-            // -- does arguments start with '-' (but not '--')
-            if     ( arg.length() < 2 ) continue;
-            else if( arg[0] != '-' )    continue;
-            else if( arg[1] == '-' )    continue;
+	    // -- does arguments start with '-' (but not '--')
+	    if     ( arg.length() < 2 ) continue;
+	    else if( arg[0] != '-' )    continue;
+	    else if( arg[1] == '-' )    continue;
 
-            // -- check out if flags inside option are contained in KnownFlagList
-            const char* p=arg.c_str();
-            p++; // skip starting minus
-            for(; *p != '\0' ; p++)
-                if( KFL.find(*p) == std::string::npos ) ufos += *p;
-        }
+	    // -- check out if flags inside option are contained in KnownFlagList
+	    const char* p=arg.c_str();
+	    p++; // skip starting minus
+	    for(; *p != '\0' ; p++)
+		if( KFL.find(*p) == std::string::npos ) ufos += *p;
+	}
     }
     // (1) check specific argument
     else {
-        // -- only check arguments that start with prefix
-        int no_matches = 0;
-        unsigned int i=1;
-        for(; i<argv.size(); ++i) {
-            const std::string Remain = __get_remaining_string(argv[i], prefix);
-            if( Remain != "") {
-                no_matches++;
-                if( no_matches == ArgumentNumber) {
-                    // -- the right argument number inside the section is found
-                    // => check it for flags
-                    const char* p = Remain.c_str();
-                    p++; // skip starting minus
-                    for(; *p != '\0' ; p++)
-                        if( KFL.find(*p) == std::string::npos ) ufos += *p;
-                    return ufos;
-                }
-            }
-        }
+	// -- only check arguments that start with prefix
+	int no_matches = 0;
+	unsigned i=1;
+	for(; i<argv.size(); i++) {
+	    const std::string Remain = __get_remaining_string(argv[i], prefix);
+	    if( Remain != "") {
+		no_matches++;
+		if( no_matches == ArgumentNumber) {
+		    // -- the right argument number inside the section is found
+		    // => check it for flags
+		    const char* p = Remain.c_str();
+		    p++; // skip starting minus
+		    for(; *p != '\0' ; p++)
+			if( KFL.find(*p) == std::string::npos ) ufos += *p;
+		    return ufos;
+		}
+	    }
+	}
     }
     return ufos;
 }
 
 inline STRING_VECTOR
-GetPot::unidentified_variables(unsigned int Num,
-                               const char* KnownVariable1, ...) const
+GetPot::unidentified_variables(unsigned Number,
+			       const char* KnownVariable1, ...) const
 {
     STRING_VECTOR known_variables;
 
     // create vector of known arguments
-    if( Num == 0 ) return STRING_VECTOR();
+    if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, KnownVariable1);
     known_variables.push_back(std::string(KnownVariable1));
-    unsigned int i=1;
-    for(; i<Num; ++i)
-        known_variables.push_back(std::string(va_arg(ap, char *)));
+    unsigned i=1;
+    for(; i<Number; i++)
+	known_variables.push_back(std::string(va_arg(ap, char *)));
     va_end(ap);
 
     return unidentified_variables(known_variables);
@@ -2222,13 +1988,13 @@ GetPot::unidentified_variables(const STRING_VECTOR& Knowns) const
     STRING_VECTOR ufos;
 
     victorate(GetPot::variable, variables, it) {
-        // -- check if variable has specific prefix
-        const std::string var_name = __get_remaining_string((*it).name, prefix);
-        if( var_name == "" ) continue;
+	// -- check if variable has specific prefix
+	const std::string var_name = __get_remaining_string((*it).name, prefix);
+	if( var_name == "" ) continue;
 
-        // -- check if variable is known
-        if( __search_string_vector(Knowns, var_name) == false)
-            ufos.push_back((*it).name);
+	// -- check if variable is known
+	if( __search_string_vector(Knowns, var_name) == false)
+	    ufos.push_back((*it).name);
     }
     return ufos;
 }
@@ -2239,23 +2005,23 @@ GetPot::unidentified_variables() const
 
 
 inline STRING_VECTOR
-GetPot::unidentified_sections(unsigned int Num,
-                              const char* KnownSection1, ...) const
+GetPot::unidentified_sections(unsigned Number,
+			      const char* KnownSection1, ...) const
 {
     STRING_VECTOR known_sections;
 
     // (1) create a vector of known arguments
-    if( Num == 0 ) return STRING_VECTOR();
+    if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, KnownSection1);
     known_sections.push_back(std::string(KnownSection1));
-    unsigned int i=1;
-    for(; i<Num; ++i) {
-        std::string tmp = std::string(va_arg(ap, char *));
-        if( tmp.length() == 0 ) continue;
-        if( tmp[tmp.length()-1] != '/' ) tmp += '/';
-        known_sections.push_back(tmp);
+    unsigned i=1;
+    for(; i<Number; i++) {
+	std::string tmp = std::string(va_arg(ap, char *));
+	if( tmp.length() == 0 ) continue;
+	if( tmp[tmp.length()-1] != '/' ) tmp += '/';
+	known_sections.push_back(tmp);
     }
     va_end(ap);
 
@@ -2272,13 +2038,13 @@ GetPot::unidentified_sections(const STRING_VECTOR& Knowns) const
     STRING_VECTOR ufos;
 
     victorate(std::string, section_list, it) {
-        // -- check if section conform to prefix
-        const std::string sec_name = __get_remaining_string(*it, prefix);
-        if( sec_name == "" ) continue;
+	// -- check if section conform to prefix
+	const std::string sec_name = __get_remaining_string(*it, prefix);
+	if( sec_name == "" ) continue;
 
-        // -- check if section is known
-        if( __search_string_vector(Knowns, sec_name) == false )
-            ufos.push_back(*it);
+	// -- check if section is known
+	if( __search_string_vector(Knowns, sec_name) == false )
+	    ufos.push_back(*it);
     }
 
     return ufos;
@@ -2286,21 +2052,21 @@ GetPot::unidentified_sections(const STRING_VECTOR& Knowns) const
 
 
 inline STRING_VECTOR
-GetPot::unidentified_nominuses(unsigned int Num, const char* Known, ...) const
+GetPot::unidentified_nominuses(unsigned Number, const char* Known, ...) const
 {
     STRING_VECTOR known_nominuses;
 
     // create vector of known arguments
-    if( Num == 0 ) return STRING_VECTOR();
+    if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, Known);
     known_nominuses.push_back(std::string(Known));
-    unsigned int i=1;
-    for(; i<Num; ++i) {
-        std::string tmp = std::string(va_arg(ap, char *));
-        if( tmp.length() == 0 ) continue;
-        known_nominuses.push_back(tmp);
+    unsigned i=1;
+    for(; i<Number; i++) {
+	std::string tmp = std::string(va_arg(ap, char *));
+	if( tmp.length() == 0 ) continue;
+	known_nominuses.push_back(tmp);
     }
     va_end(ap);
 
@@ -2326,27 +2092,27 @@ GetPot::unidentified_nominuses(const STRING_VECTOR& Knowns) const
 
     // (2) iterate over all arguments
     STRING_VECTOR::const_iterator it = argv.begin();
-    ++it; // forget about argv[0] (application or filename)
-    for(; it != argv.end(); ++it) {
-        // -- check if nominus part of prefix
-        const std::string arg = __get_remaining_string(*it, prefix);
-        if( arg == "" )                                         continue;
+    it++; // forget about argv[0] (application or filename)
+    for(; it != argv.end(); it++) {
+	// -- check if nominus part of prefix
+	const std::string arg = __get_remaining_string(*it, prefix);
+	if( arg == "" )                                         continue;
 
-        if( arg.length() < 1 )                                  continue;
-        // option ? --> not a nomius
-        if( arg[0] == '-' )                                     continue;
-        // section ? --> not a real nominus
-        if( arg[0] == '[' && arg[arg.length()-1] == ']' )       continue;
-        // variable definition ? --> not a real nominus
-        bool continue_f = false;
-        unsigned int i=0;
-        for(; i<arg.length() ; ++i)
-            if( arg[i] == '=' ) { continue_f = true; break; }
-        if( continue_f )                                        continue;
+	if( arg.length() < 1 )                                  continue;
+	// option ? --> not a nomius
+	if( arg[0] == '-' )                                     continue;
+	// section ? --> not a real nominus
+	if( arg[0] == '[' && arg[arg.length()-1] == ']' )       continue;
+	// variable definition ? --> not a real nominus
+	bool continue_f = false;
+	unsigned i=0;
+	for(; i<arg.length() ; i++)
+	    if( arg[i] == '=' ) { continue_f = true; break; }
+	if( continue_f )                                        continue;
 
-        // real nominuses are compared with the given list
-        if( __search_string_vector(Knowns, arg) == false )
-            ufos.push_back(*it);
+	// real nominuses are compared with the given list
+	if( __search_string_vector(Knowns, arg) == false )
+	    ufos.push_back(*it);
     }
     return ufos;
 }
@@ -2361,12 +2127,12 @@ GetPot::variable::variable()
 {}
 
 inline
-GetPot::variable::variable(const variable& That)
+GetPot::variable::variable(const variable& Other)
 {
 #ifdef WIN32
-    operator=(That);
+    operator=(Other);
 #else
-    GetPot::variable::operator=(That);
+    GetPot::variable::operator=(Other);
 #endif
 }
 
@@ -2380,14 +2146,12 @@ GetPot::variable::variable(const char* Name, const char* Value, const char* Fiel
 }
 
 inline const std::string*
-GetPot::variable::get_element(unsigned int Idx) const
+GetPot::variable::get_element(unsigned Idx) const
 { if( Idx >= value.size() ) return 0; else return &(value[Idx]); }
 
 inline void
 GetPot::variable::take(const char* Value, const char* FieldSeparator)
 {
-    using namespace std;
-
     original = std::string(Value);
 
     // separate string by white space delimiters using 'strtok'
@@ -2399,8 +2163,8 @@ GetPot::variable::take(const char* Value, const char* FieldSeparator)
     char* follow_token = strtok_r(copy, FieldSeparator, &spt);
     if( value.size() != 0 ) value.erase(value.begin(), value.end());
     while(follow_token != 0) {
-        value.push_back(std::string(follow_token));
-        follow_token = strtok_r(NULL, FieldSeparator, &spt);
+	value.push_back(std::string(follow_token));
+	follow_token = strtok_r(NULL, FieldSeparator, &spt);
     }
 
     delete [] copy;
@@ -2411,12 +2175,12 @@ GetPot::variable::~variable()
 {}
 
 inline GetPot::variable&
-GetPot::variable::operator=(const GetPot::variable& That)
+GetPot::variable::operator=(const GetPot::variable& Other)
 {
-    if( &That != this) {
-        name     = That.name;
-        value    = That.value;
-        original = That.original;
+    if( &Other != this) {
+	name     = Other.name;
+	value    = Other.value;
+	original = Other.original;
     }
     return *this;
 }
@@ -2424,7 +2188,6 @@ GetPot::variable::operator=(const GetPot::variable& That)
 #undef victorate
 
 
-#endif // __include_guard_GETPOT_H__
-
+#endif // __GETPOT_H__
 
 
