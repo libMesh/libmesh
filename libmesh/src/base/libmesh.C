@@ -65,6 +65,12 @@ namespace {
 #if defined(LIBMESH_HAVE_MPI)
   bool libmesh_initialized_mpi = false;
 #endif
+#if defined(LIBMESH_HAVE_PETSC)
+  bool libmesh_initialized_petsc = false;
+#endif
+#if defined(LIBMESH_HAVE_SLEPC)
+  bool libmesh_initialized_slepc = false;
+#endif
 }
 
 
@@ -157,6 +163,8 @@ void _init (int &argc, char** & argv,
   // Allow the user to bypass PETSc initialization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
+      // Check whether the calling program has already initialized
+      // MPI, and avoid duplicate Init/Finalize
       int flag;
       MPI_Initialized (&flag);
 
@@ -182,12 +190,34 @@ void _init (int &argc, char** & argv,
 	  
 	  PETSC_COMM_WORLD = libMesh::COMM_WORLD;
 
+          // Check whether the calling program has already initialized
+          // PETSc, and avoid duplicate Initialize/Finalize
+          PetscTruth petsc_already_initialized;
+          ierr = PetscInitialized(&petsc_already_initialized);
+	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          if (petsc_already_initialized != PETSC_TRUE)
+            libmesh_initialized_petsc = true;
 #  if defined(LIBMESH_HAVE_SLEPC)
-	  ierr = SlepcInitialize  (&argc, &argv, NULL, NULL);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+          // If SLEPc allows us to check whether the calling program
+          // has already initialized it, we do that, and avoid
+          // duplicate Initialize/Finalize.
+          // We assume that SLEPc will handle PETSc appropriately,
+          // which it does in the versions we've checked.
+#   if !SLEPC_VERSION_LESS_THAN(2,3,3)
+          if (!SlepcInitializeCalled)
+#   endif
+            {
+	      ierr = SlepcInitialize  (&argc, &argv, NULL, NULL);
+	             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+              libmesh_initialized_slepc = true;
+            }
 #  else
-	  ierr = PetscInitialize (&argc, &argv, NULL, NULL);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          if (libmesh_initialized_petsc)
+            {
+	      ierr = PetscInitialize (&argc, &argv, NULL, NULL);
+	             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+            }
 #  endif
 	}
 # endif
@@ -274,9 +304,11 @@ int _close ()
       if (!libMesh::on_command_line ("--disable-petsc"))
 	{
 #  if defined(LIBMESH_HAVE_SLEPC)
-	  SlepcFinalize();
+          if (libmesh_initialized_slepc)
+	    SlepcFinalize();
 #  else
-	  PetscFinalize();
+          if (libmesh_initialized_petsc)
+	    PetscFinalize();
 #  endif
 	}
 # endif
