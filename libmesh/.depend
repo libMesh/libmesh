@@ -163,6 +163,7 @@ src/base/libmesh.$(obj-suffix):\
     include/numerics/petsc_macro.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
+    include/solvers/slepc_macro.h\
     include/utils/compare_types.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
@@ -8817,6 +8818,7 @@ src/solvers/eigen_solver.$(obj-suffix):\
     include/parallel/threads.h\
     include/solvers/eigen_solver.h\
     include/solvers/slepc_eigen_solver.h\
+    include/solvers/slepc_macro.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/solvers/eigen_time_solver.$(obj-suffix):\
@@ -9350,6 +9352,7 @@ src/solvers/slepc_eigen_solver.$(obj-suffix):\
     include/parallel/threads.h\
     include/solvers/eigen_solver.h\
     include/solvers/slepc_eigen_solver.h\
+    include/solvers/slepc_macro.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
 src/solvers/steady_solver.$(obj-suffix):\

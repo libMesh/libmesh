@@ -36,6 +36,7 @@
 #if defined(LIBMESH_HAVE_MPI)
 # include <mpi.h>
 # include "petsc_macro.h"
+# include "slepc_macro.h"
 # if defined(LIBMESH_HAVE_PETSC)
 EXTERN_C_FOR_PETSC_BEGIN
 #   include <petsc.h>
