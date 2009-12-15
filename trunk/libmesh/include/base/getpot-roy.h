@@ -2,6 +2,8 @@
 //  GetPot Version 1.1-libMesh_fork                            Dec/08/2009
 //  Based on "getpot-1.1.1.tgz" version from SourceForge
 //
+//  New code (C) 2009 Roy Stogner
+//
 //  GetPot Version 1.0                                        Sept/13/2002
 //
 //  WEBSITE: http://getpot.sourceforge.net
@@ -1594,7 +1596,7 @@ GetPot::__DBE_expand(const std::string expr)
     // ${<-> expr expr expr} text replacement
     else if( expr.length() >= 3 && expr.substr(0, 3) == "<->" ) {
 	STRING_VECTOR A = __DBE_get_expr_list(expr.substr(3), 3);
-	unsigned tmp = 0;
+	size_t tmp = 0;
 	const unsigned L = A[1].length();
 	while( (tmp = A[0].find(A[1])) != std::string::npos ) {
 	    A[0].replace(tmp, L, A[2]);
