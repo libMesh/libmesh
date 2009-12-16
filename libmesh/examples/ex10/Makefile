@@ -30,13 +30,16 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	    := ./ex10-$(METHOD)
+target 	      := ./ex10-$(METHOD)
 
 # Specify the number of timesteps to do when we call "make run"
-n_timesteps := 25
+n_timesteps   := 25
 
 # Specify the amount of initial uniform refinement to do
 n_refinements := 5
+
+# Specify how often to write output files
+output_freq   := 10
 
 all:: $(target)
 
@@ -64,13 +67,13 @@ run: $(target)
 	@echo "***************************************************************"
 	@echo " "
 	@$(LIBMESH_RUN) $(target) -n_timesteps $(n_timesteps) -n_refinements $(n_refinements) \
-                   -init_timestep 0 $(LIBMESH_OPTIONS)
+                   -output_freq $(output_freq) -init_timestep 0 $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***** Finished first" $(n_timesteps) "steps, now read in" \
 	       "saved solution and continue *****"
 	@echo " "
 	@$(LIBMESH_RUN) $(target) -read_solution -n_timesteps $(n_timesteps) \
-                   -init_timestep $(n_timesteps) $(LIBMESH_OPTIONS)
+                   -output_freq $(output_freq) -init_timestep $(n_timesteps) $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) \[-read_solution\] -n_timesteps $(n_timesteps) -init_timestep \[0\|$(n_timesteps)\] $(LIBMESH_OPTIONS)

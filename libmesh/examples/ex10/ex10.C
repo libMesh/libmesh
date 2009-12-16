@@ -203,7 +203,7 @@ int main (int argc, char** argv)
       // Read the mesh from file.
       mesh.read ("mesh.xda");
 
-      // Again do a search on the command line for the argument
+      // Again do a search on the command line for an argument
       unsigned int n_refinements = 5;
       if(command_line.search("-n_refinements"))
         n_refinements = command_line.next(0);
@@ -406,8 +406,13 @@ int main (int argc, char** argv)
             }            
         }
         
+      // Again do a search on the command line for an argument
+      unsigned int output_freq = 10;
+      if(command_line.search("-output_freq"))
+        output_freq = command_line.next(0);
+
       // Output every 10 timesteps to file.
-      if ( (t_step+1)%10 == 0)
+      if ( (t_step+1)%output_freq == 0)
         {
           OStringStream file_name;
 
@@ -431,6 +436,8 @@ int main (int argc, char** argv)
 
       mesh.write("saved_mesh.xda");
       equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
+      GMVIO(mesh).write_equation_systems ("saved_solution.gmv",
+                                          equation_systems);
     }
 #endif // #ifndef LIBMESH_ENABLE_AMR
   
