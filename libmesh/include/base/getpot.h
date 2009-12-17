@@ -47,6 +47,7 @@ extern "C" {
 #include <stdarg.h>
 #include <math.h>
 }
+#include <cstring>
 #include <string>
 #include <vector>
 #include <algorithm>
