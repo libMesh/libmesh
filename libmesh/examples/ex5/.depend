@@ -1,5 +1,5 @@
 ../ex3/exact_solution.$(obj-suffix):\
-    $(LIBMESH_DIR)/examples/ex3/exact_solution.C\
+    ../ex3/exact_solution.C\
     $(LIBMESH_DIR)/include/base/libmesh_base.h\
     $(LIBMESH_DIR)/include/base/libmesh_common.h\
     $(LIBMESH_DIR)/include/base/libmesh_config.h\

@@ -24,7 +24,9 @@ ex18.$(obj-suffix):\
     $(LIBMESH_DIR)/include/enums/enum_norm_type.h\
     $(LIBMESH_DIR)/include/enums/enum_order.h\
     $(LIBMESH_DIR)/include/enums/enum_parallel_type.h\
+    $(LIBMESH_DIR)/include/enums/enum_preconditioner_type.h\
     $(LIBMESH_DIR)/include/enums/enum_solver_package.h\
+    $(LIBMESH_DIR)/include/enums/enum_solver_type.h\
     $(LIBMESH_DIR)/include/enums/enum_xdr_mode.h\
     $(LIBMESH_DIR)/include/error_estimation/error_estimator.h\
     $(LIBMESH_DIR)/include/error_estimation/jump_error_estimator.h\
@@ -63,6 +65,7 @@ ex18.$(obj-suffix):\
     $(LIBMESH_DIR)/include/partitioning/partitioner.h\
     $(LIBMESH_DIR)/include/solvers/diff_solver.h\
     $(LIBMESH_DIR)/include/solvers/euler_solver.h\
+    $(LIBMESH_DIR)/include/solvers/linear_solver.h\
     $(LIBMESH_DIR)/include/solvers/steady_solver.h\
     $(LIBMESH_DIR)/include/solvers/time_solver.h\
     $(LIBMESH_DIR)/include/solvers/unsteady_solver.h\
