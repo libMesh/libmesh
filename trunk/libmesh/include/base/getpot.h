@@ -45,9 +45,9 @@ extern "C" {
 #endif
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #include <math.h>
 }
-#include <cstring>
 #include <string>
 #include <vector>
 #include <algorithm>
