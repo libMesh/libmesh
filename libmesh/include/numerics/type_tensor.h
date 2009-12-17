@@ -110,6 +110,11 @@ public:
   T & operator () (const unsigned int i, const unsigned int j);
 
   /**
+   * Return one row of the tensor as a TypeVector.
+   */
+  TypeVector<T> row(const unsigned int r);
+
+  /**
    * Add two tensors. 
    */
   template<typename T2>
@@ -447,7 +452,17 @@ T & TypeTensor<T>::operator () (const unsigned int i,
   return _coords[i*LIBMESH_DIM+j];
 }
 
+template <typename T>
+TypeVector<T>
+TypeTensor<T>::row(const unsigned int r)
+{
+  TypeVector<T> return_vector;
 
+  for(unsigned int j=0; j<LIBMESH_DIM; j++)
+    return_vector._coords[j] = _coords[r*LIBMESH_DIM + j];
+
+  return return_vector;
+}
 
 template <typename T>
 template<typename T2>
