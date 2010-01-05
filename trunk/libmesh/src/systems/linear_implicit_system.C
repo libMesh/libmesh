@@ -324,14 +324,14 @@ LinearSolver<Number>* LinearImplicitSystem::get_linear_solver() const
 
 
 
-void LinearImplicitSystem::release_linear_solver(LinearSolver<Number>* s) const
+void LinearImplicitSystem::release_linear_solver(LinearSolver<Number>*) const
 {
 }
 
 
 
-void LinearImplicitSystem::assembly(bool get_residual, 
-				    bool get_jacobian)
+void LinearImplicitSystem::assembly(bool, 
+				    bool)
 {
   // Residual R(u(p),p) := A(p)*u(p) - b(p)
   // partial R / partial u = A
