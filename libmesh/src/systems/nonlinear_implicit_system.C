@@ -174,7 +174,7 @@ std::pair<unsigned int, Real> NonlinearImplicitSystem::get_linear_solve_paramete
 
 
 void NonlinearImplicitSystem::assembly(bool, 
-				       bool)
+				       bool get_jacobian)
 {
   if (get_jacobian)
     {
