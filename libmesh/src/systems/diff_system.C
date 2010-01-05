@@ -128,6 +128,6 @@ std::pair<unsigned int, Real> DifferentiableSystem::get_linear_solve_parameters(
 
 
 
-void DifferentiableSystem::release_linear_solver(LinearSolver<Number>* s) const
+void DifferentiableSystem::release_linear_solver(LinearSolver<Number>*) const
 {
 }

@@ -173,13 +173,15 @@ std::pair<unsigned int, Real> NonlinearImplicitSystem::get_linear_solve_paramete
 
 
 
-void NonlinearImplicitSystem::assembly(bool get_residual, 
-				       bool get_jacobian)
+void NonlinearImplicitSystem::assembly(bool, 
+				       bool)
 {
   if (get_jacobian)
-    if (nonlinear_solver->jacobian != NULL)
-      nonlinear_solver->jacobian (*current_local_solution.get(), *matrix);
-    else if (nonlinear_solver->matvec != NULL)
-      nonlinear_solver->matvec   (*current_local_solution.get(), NULL, matrix);
-    else libmesh_error();
+    {
+      if (nonlinear_solver->jacobian != NULL)
+        nonlinear_solver->jacobian (*current_local_solution.get(), *matrix);
+      else if (nonlinear_solver->matvec != NULL)
+        nonlinear_solver->matvec (*current_local_solution.get(), NULL, matrix);
+      else libmesh_error();
+    }
 }
