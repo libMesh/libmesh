@@ -71,7 +71,7 @@ public:
   LibMeshInit(int & argc, char** & argv);
 #endif
 	
-  ~LibMeshInit();
+  virtual ~LibMeshInit();
 };
 
 /**
