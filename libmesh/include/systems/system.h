@@ -1056,6 +1056,21 @@ protected:
 		       NumericVector<Number>&) const;
   
 private:
+  /**
+   * This isn't a copyable object, so let's make sure nobody tries.
+   *
+   * We won't even bother implementing this; we'll just make sure that
+   * the compiler doesn't implement a default.
+   */
+  System(const System&);
+
+  /**
+   * This isn't a copyable object, so let's make sure nobody tries.
+   *
+   * We won't even bother implementing this; we'll just make sure that
+   * the compiler doesn't implement a default.
+   */
+  System& operator=(const System&);
 
   /**
    * Finds the discrete norm for the entries in the vector
