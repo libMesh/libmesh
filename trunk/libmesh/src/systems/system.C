@@ -70,6 +70,23 @@ System::System (EquationSystems& es,
 
 
 
+// No copy construction of System objects!
+System::System (const System& other) :
+  _equation_systems(other._equation_systems),
+  _mesh(other._mesh),
+  _sys_number(other._sys_number)
+{
+  libmesh_error();
+}
+
+
+
+System& System::operator= (const System& other)
+{
+  libmesh_error();
+}
+
+
 System::~System ()
 {
   // Null-out the function pointers.  Since this
