@@ -390,10 +390,6 @@ inline
 GetPot::GetPot() 
 { 
     __basic_initialization(); 
-
-    STRING_VECTOR _apriori_argv;
-    _apriori_argv.push_back(std::string("Empty"));
-    __parse_argument_vector(_apriori_argv);
 }
 
 inline
