@@ -848,6 +848,14 @@ GetPot::__convert_to_type(const std::string& String, const T& Default) const
   return retval;
 }
 
+// copy string - operator>> would have stopped upon seeing whitespace!
+template <>
+inline std::string
+GetPot::__convert_to_type(const std::string& String, const std::string&) const
+{
+    return String;
+}
+
 // copy string
 inline std::string
 GetPot::__convert_to_type(const std::string& String, const char*) const
