@@ -62,7 +62,7 @@ class MeshBase;
 
 // ------------------------------------------------------------
 // EquationSystems class definition
-class EquationSystems
+class EquationSystems : public ReferenceCountedObject<EquationSystems>
 {
 public:
 
@@ -96,17 +96,17 @@ public:
   /**
    * Returns tha data structure to a pristine state.
    */
-  void clear ();
+  virtual void clear ();
   
   /**
    * Initialize all the systems
    */
-  void init ();
+  virtual void init ();
   
   /**
    * Reinitialize all the systems
    */
-  void reinit ();
+  virtual void reinit ();
 
   /**
    * Updates local values for all the systems
@@ -317,15 +317,15 @@ public:
    * most of the comparisons to perform to the responsible
    * systems
    */
-  bool compare (const EquationSystems& other_es, 
-                const Real threshold,
-                const bool verbose) const;
+  virtual bool compare (const EquationSystems& other_es, 
+                        const Real threshold,
+                        const bool verbose) const;
 
   /**
    * @returns a string containing information about the
    * systems, flags, and parameters.
    */
-  std::string get_info() const;
+  virtual std::string get_info() const;
     
   /**
    * Prints information about the equation systems.
