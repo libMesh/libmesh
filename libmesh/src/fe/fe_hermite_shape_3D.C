@@ -48,7 +48,7 @@ void hermite_compute_coefs(const Elem* elem)
     return;
 
   old_elem_id = elem->id();
-  
+
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
   const int n_mapping_shape_functions =
