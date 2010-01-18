@@ -42,6 +42,7 @@
 #include "dense_matrix.h"
 #include "dense_vector.h"
 #include "linear_implicit_system.h"
+#include "exodusII_io.h"
 
 // For systems of equations the \p DenseSubMatrix
 // and \p DenseSubVector provide convenient ways for
@@ -121,6 +122,8 @@ int main (int argc, char** argv)
 
   GMVIO(mesh).write_equation_systems ("out.gmv",
                                       equation_systems);
+  ExodusII_IO(mesh).write_equation_systems ("out.e",
+                                            equation_systems);
 
   // All done.  
   return 0;
