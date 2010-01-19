@@ -764,7 +764,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
     int actual_id = nodeset_id;
     
     if(nodeset_id == 0)
-      nodeset_id = 9999;
+      actual_id = 9999;
 
     ex_err = exII::ex_put_node_set_param(ex_id, actual_id, node[nodeset_id].size(), 0);
     check_err(ex_err, "Error writing nodeset parameters");
