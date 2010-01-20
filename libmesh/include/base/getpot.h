@@ -1336,7 +1336,7 @@ GetPot::__set_variable(const char* VarName, const char* Value)
 
 template <typename T>
 inline void
-GetPot::set(const char* VarName, const T& Value, const bool Requested /* = yes */)
+GetPot::set(const char* VarName, const T& Value, const bool /* Requested = yes */)
 {
   std::ostringstream string_value;
   string_value << Value;
@@ -1344,7 +1344,7 @@ GetPot::set(const char* VarName, const T& Value, const bool Requested /* = yes *
 }
 
 inline void
-GetPot::set(const char* VarName, const char* Value, const bool Requested /* = yes */)
+GetPot::set(const char* VarName, const char* Value, const bool /* Requested = yes */)
 {
   __set_variable(VarName, Value);
 }
