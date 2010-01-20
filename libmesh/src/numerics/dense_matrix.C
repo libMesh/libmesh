@@ -434,10 +434,12 @@ void DenseMatrix<T>::_lu_decompose ()
     {
       // Find the pivot row by searching down the i'th column
       _pivots[i] = i;
-      T max = std::abs( A(i,i) );
+
+      // std::abs(complex) must return a Real!
+      Real max = std::abs( A(i,i) );
       for (unsigned int j=i+1; j<m; ++j)
 	{
-	  T candidate_max = std::abs( A(j,i) );
+	  Real candidate_max = std::abs( A(j,i) );
 	  if (max < candidate_max)
 	    {
 	      max = candidate_max;
