@@ -351,7 +351,17 @@ void GmshIO::read_mesh(std::istream& in)
       if (!std::strncmp(buf,"$MeshFormat",11))
         {
           in >> version >> format >> size;
-          if(version != 2.0){
+          if ((version != 2.0) || (version != 2.1)) {
+	    // Some notes on gmsh mesh versions:
+	    //
+	    // Mesh version 2.0 goes back as far as I know.  It's not explicitly
+	    // mentioned here: http://www.geuz.org/gmsh/doc/VERSIONS.txt
+	    //
+	    // As of gmsh-2.4.0:
+	    // bumped mesh version format to 2.1 (small change in the $PhysicalNames
+            // section, where the group dimension is now required);
+	    // [Since we don't even parse the PhysicalNames section at the time
+	    //  of this writing, I don't think this change affects us.]
             std::cerr << "Error: Wrong msh file version " << version << "\n";
             libmesh_error();
           }
