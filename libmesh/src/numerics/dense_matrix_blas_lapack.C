@@ -506,3 +506,13 @@ template void DenseMatrix<Real>::_matvec_blas(Real, Real,
 					      DenseVector<Real>& ,
 					      const DenseVector<Real>& ) const;
 
+#if !(LIBMESH_USE_REAL_NUMBERS)
+template void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number>&, _BLAS_Multiply_Flag);
+template void DenseMatrix<Number>::_lu_decompose_lapack();
+template void DenseMatrix<Number>::_lu_back_substitute_lapack(const DenseVector<Number>& ,
+							      DenseVector<Number>&);
+template void DenseMatrix<Number>::_matvec_blas(Number, Number,
+					        DenseVector<Number>& ,
+					        const DenseVector<Number>& ) const;
+#endif
+
