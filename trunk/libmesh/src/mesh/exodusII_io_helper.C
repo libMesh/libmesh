@@ -31,6 +31,7 @@
 #include "system.h"
 #include "numeric_vector.h"
 
+
 #ifdef DEBUG
 #include "mesh_tools.h"  // for elem_types warning
 #endif
@@ -580,7 +581,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
       subdomain_id_type cur_subdomain = elem->subdomain_id();
       
       if(cur_subdomain == 0)
-        cur_subdomain = 9999;
+        cur_subdomain = SUBDOMAIN_ID_MAX;
 
       subdomain_map[cur_subdomain].push_back(elem->id());
     }
@@ -638,7 +639,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
         unsigned int cur_subdomain = elem->subdomain_id();
 
         if(cur_subdomain == 0)
-          cur_subdomain = 9999;
+          cur_subdomain = SUBDOMAIN_ID_MAX;
      
         subdomain_map[cur_subdomain].push_back(elem->id());
       }
@@ -727,7 +728,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     int actual_id = ss_id;
     
     if(actual_id == 0)
-      actual_id = 9999;
+      actual_id = SUBDOMAIN_ID_MAX;
 
     ex_err = exII::ex_put_side_set_param(ex_id, actual_id, elem[ss_id].size(), 4);
     check_err(ex_err, "Error writing sideset parameters");
@@ -764,7 +765,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
     int actual_id = nodeset_id;
     
     if(nodeset_id == 0)
-      actual_id = 9999;
+      actual_id = SUBDOMAIN_ID_MAX;
 
     ex_err = exII::ex_put_node_set_param(ex_id, actual_id, node[nodeset_id].size(), 0);
     check_err(ex_err, "Error writing nodeset parameters");
