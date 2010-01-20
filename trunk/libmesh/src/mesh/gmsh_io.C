@@ -351,7 +351,7 @@ void GmshIO::read_mesh(std::istream& in)
       if (!std::strncmp(buf,"$MeshFormat",11))
         {
           in >> version >> format >> size;
-          if ((version != 2.0) || (version != 2.1)) {
+          if ((version != 2.0) && (version != 2.1)) {
 	    // Some notes on gmsh mesh versions:
 	    //
 	    // Mesh version 2.0 goes back as far as I know.  It's not explicitly
