@@ -2606,10 +2606,10 @@ namespace Parallel
   inline void sum(std::vector<T> &) {}
 
   template <typename T>
-  inline void set_union(std::set<T> &data, const unsigned int root_id) {}
+  inline void set_union(std::set<T> &, const unsigned int) {}
 
   template <typename T>
-  inline void set_union(std::set<T> &data) {}
+  inline void set_union(std::set<T> &) {}
 
  //-------------------------------------------------------------------
   /**
