@@ -72,6 +72,7 @@ System::System (EquationSystems& es,
 
 // No copy construction of System objects!
 System::System (const System& other) :
+  ReferenceCountedObject<System>(),
   _equation_systems(other._equation_systems),
   _mesh(other._mesh),
   _sys_number(other._sys_number)
@@ -81,7 +82,7 @@ System::System (const System& other) :
 
 
 
-System& System::operator= (const System& other)
+System& System::operator= (const System&)
 {
   libmesh_error();
 }
