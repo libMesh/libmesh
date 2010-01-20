@@ -356,7 +356,7 @@ void Nemesis_IO_Helper::get_node_cmap()
 
       nemesis_err_flag =
 	Nemesis::ne_get_node_cmap(ex_id,
-				  node_cmap_ids.empty()         ? NULL : node_cmap_ids[i],
+				  node_cmap_ids.empty()         ? 0    : node_cmap_ids[i],
 				  node_cmap_node_ids[i].empty() ? NULL : &node_cmap_node_ids[i][0],
 				  node_cmap_proc_ids[i].empty() ? NULL : &node_cmap_proc_ids[i][0],
 				  libMesh::processor_id());
@@ -395,7 +395,7 @@ void Nemesis_IO_Helper::get_elem_cmap()
 
       nemesis_err_flag =
 	Nemesis::ne_get_elem_cmap(ex_id,
-				  elem_cmap_ids.empty()         ? NULL : elem_cmap_ids[i],
+				  elem_cmap_ids.empty()         ? 0    : elem_cmap_ids[i],
 				  elem_cmap_elem_ids[i].empty() ? NULL : &elem_cmap_elem_ids[i][0],
 				  elem_cmap_side_ids[i].empty() ? NULL : &elem_cmap_side_ids[i][0],
 				  elem_cmap_proc_ids[i].empty() ? NULL : &elem_cmap_proc_ids[i][0],
