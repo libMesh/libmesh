@@ -182,7 +182,7 @@ void compute_jacobian (const NumericVector<Number>& soln,
       //
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-          Gradient grad_u = 0;
+          Gradient grad_u;
     
           for (unsigned int i=0; i<phi.size(); i++)
             grad_u += dphi[i][qp]*soln(dof_indices[i]);
@@ -325,7 +325,7 @@ void compute_residual (const NumericVector<Number>& soln,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           Number u = 0;
-          Gradient grad_u = 0;
+          Gradient grad_u;
           
           for (unsigned int j=0; j<phi.size(); j++)
             {

@@ -187,6 +187,80 @@ src/base/reference_counter.$(obj-suffix):\
     include/parallel/threads.h\
     include/utils/o_string_stream.h\
     include/utils/perf_log.h
+src/error_estimation/adjoint_refinement_estimator.$(obj-suffix):\
+    src/error_estimation/adjoint_refinement_estimator.C\
+    include/base/auto_ptr.h\
+    include/base/dof_map.h\
+    include/base/dof_object.h\
+    include/base/id_types.h\
+    include/base/libmesh.h\
+    include/base/libmesh_base.h\
+    include/base/libmesh_common.h\
+    include/base/libmesh_config.h\
+    include/base/libmesh_exceptions.h\
+    include/base/libmesh_logging.h\
+    include/base/multi_predicates.h\
+    include/base/print_trace.h\
+    include/base/reference_counted_object.h\
+    include/base/reference_counter.h\
+    include/base/single_predicates.h\
+    include/base/variant_filter_iterator.h\
+    include/enums/enum_elem_quality.h\
+    include/enums/enum_elem_type.h\
+    include/enums/enum_fe_family.h\
+    include/enums/enum_inf_map_type.h\
+    include/enums/enum_io_package.h\
+    include/enums/enum_norm_type.h\
+    include/enums/enum_order.h\
+    include/enums/enum_parallel_type.h\
+    include/enums/enum_quadrature_type.h\
+    include/enums/enum_solver_package.h\
+    include/enums/enum_xdr_mode.h\
+    include/error_estimation/adjoint_refinement_estimator.h\
+    include/error_estimation/error_estimator.h\
+    include/fe/fe.h\
+    include/fe/fe_base.h\
+    include/fe/fe_interface.h\
+    include/fe/fe_type.h\
+    include/geom/elem.h\
+    include/geom/elem_range.h\
+    include/geom/node.h\
+    include/geom/point.h\
+    include/geom/stored_range.h\
+    include/mesh/mesh.h\
+    include/mesh/mesh_base.h\
+    include/mesh/mesh_refinement.h\
+    include/mesh/parallel_mesh.h\
+    include/mesh/serial_mesh.h\
+    include/mesh/unstructured_mesh.h\
+    include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
+    include/numerics/type_vector.h\
+    include/numerics/vector_value.h\
+    include/parallel/threads.h\
+    include/parallel/threads_allocators.h\
+    include/partitioning/partitioner.h\
+    include/quadrature/quadrature.h\
+    include/systems/equation_systems.h\
+    include/systems/explicit_system.h\
+    include/systems/frequency_system.h\
+    include/systems/implicit_system.h\
+    include/systems/linear_implicit_system.h\
+    include/systems/newmark_system.h\
+    include/systems/qoi_set.h\
+    include/systems/steady_system.h\
+    include/systems/system.h\
+    include/systems/system_norm.h\
+    include/systems/transient_system.h\
+    include/utils/compare_types.h\
+    include/utils/error_vector.h\
+    include/utils/location_maps.h\
+    include/utils/mapvector.h\
+    include/utils/o_string_stream.h\
+    include/utils/parameters.h\
+    include/utils/perf_log.h\
+    include/utils/statistics.h
 src/error_estimation/adjoint_residual_error_estimator.$(obj-suffix):\
     src/error_estimation/adjoint_residual_error_estimator.C\
     include/base/auto_ptr.h\
