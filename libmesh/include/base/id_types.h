@@ -22,7 +22,7 @@
 #ifndef __id_types_h__
 #define __id_types_h__
 
-#include <climits>
+#include <limits>
 
 // A useful way to debug:
 #if 0
@@ -37,10 +37,7 @@ bool operator<(const TestClass &l) const { return _c < l._c; }
 operator int() const { return _c; }
 };
 typedef TestClass subdomain_id_type;
-#define SUBDOMAIN_ID_MAX UINT_MAX
 #endif
 
 typedef unsigned char subdomain_id_type;
-#define SUBDOMAIN_ID_MAX UCHAR_MAX
-
 #endif // end #ifndef __id_types_h__
