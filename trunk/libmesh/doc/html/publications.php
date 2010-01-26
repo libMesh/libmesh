@@ -75,6 +75,72 @@ The University of Texas at Austin, August 2004.
 <ol>
 
 <li>
+J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
+  Multi-Resolution Simulation of Double-Diffusive Convection in Porous
+  Media.
+  <em>International Journal of Numerical Methods for Heat &amp; Fluid
+  Flow</em>, 20(1):37-65, 2010.
+  <a href="http://dx.doi.org/10.1108/09615531011008118">http://dx.doi.org/10.1108/09615531011008118</a>.<br />
+<pre>
+@Article{Peterson_2010,
+  author  = {J.~W.~Peterson and G.~F.~Carey and B.~T.~Murray},
+  title   = {{Multi-Resolution Simulation of Double-Diffusive 
+              Convection in Porous Media}},
+  journal = {International Journal of Numerical Methods for Heat \& Fluid Flow},
+  volume  = 20,
+  number  = 1,
+  year    = {2010},
+  pages   = {37--65},
+  note    = {\url{http://dx.doi.org/10.1108/09615531011008118}}
+}
+</pre>
+</li>
+
+
+<li>
+V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;Mousseau.
+  Verification of multiphysics software: Space and time convergence
+  studies for nonlinearly coupled applications.
+  In <em>International Conference on Mathematics, Computaional Methods
+  &amp; Reactor Physics (M&amp;C 2009)</em>, Saratoga Springs, New York, 2009.
+  <a href="http://www.inl.gov/technicalpublications/Documents/4247162.pdf">http://www.inl.gov/technicalpublications/Documents/4247162.pdf</a>.<br />
+<pre>
+@Conference{Mahadevan_2009,
+  author    = {V.~S.~Mahadevan and J.~C.~Ragusa and V.~Mousseau},
+  title     = {Verification of Multiphysics software: Space and time
+               convergence studies for nonlinearly coupled applications},
+  booktitle = {International Conference on Mathematics, Computaional
+               Methods \& Reactor Physics (M\&C 2009)},
+  address   = {Saratoga Springs, New York},
+  year      = {2009},
+  note      = {\url{http://www.inl.gov/technicalpublications/Documents/4247162.pdf}}
+}
+</pre>
+</li>
+
+
+<li>
+D.&nbsp;Gaston, G.&nbsp;Hansen, S.&nbsp;Kadioglu, D.&nbsp;A. Knoll, C.&nbsp;Newman, H.&nbsp;Park, C.&nbsp;Permann,
+  and W.&nbsp;Taitano.
+  Parallel multiphysics algorithms and software for computational
+  nuclear engineering.
+  <em>Journal of Physics: Conference Series</em>, 180:012012 (10pp), 2009.
+  <a href="http://stacks.iop.org/1742-6596/180/012012">http://stacks.iop.org/1742-6596/180/012012</a>.<br />
+<pre>
+@Article{Gaston_2009,
+  author = {D.~Gaston and G.~Hansen and S.~Kadioglu and D.~A.~Knoll
+            and C.~Newman and H.~Park and C.~Permann and W.~Taitano},
+  title  = {Parallel multiphysics algorithms and software for computational nuclear engineering},
+  journal= {Journal of Physics: Conference Series},
+  volume = {180},
+  pages  = {012012 (10pp)},
+  year   = {2009},
+  note   = {\url{http://stacks.iop.org/1742-6596/180/012012}}
+}
+</pre>
+</li>
+
+<li>
 M.&nbsp;P. L&uuml;thi.
   Transient response of idealized glaciers to climate variations.
   <em>Journal of Glaciology</em>, 55(193):918-930, 2009.<br />  
@@ -155,6 +221,24 @@ Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
      note = {\url{http://dx.doi.org/10.1002/fld.1635}}
 }
 </pre>  
+</li>
+
+<li>
+V.&nbsp;S. Mahadevan and J.&nbsp;C. Ragusa.
+  High-order spatio-temporal schemes for coupled, multi-physics reactor
+  simulations.
+  Technical report, Idaho National Laboratory, September 2008.
+  <a href="http://www.inl.gov/technicalpublications/Documents/4120524.pdf">http://www.inl.gov/technicalpublications/Documents/4120524.pdf</a>.<br />
+<pre>
+@TechReport{Mahadevan_2008,
+  author      = {V.~S.~Mahadevan and J.~C.~Ragusa},
+  title       = {High-order spatio-temporal schemes for coupled, multi-physics reactor simulations},
+  institution = {Idaho National Laboratory},
+  month       = {September},
+  year        = {2008},
+  note        = {\url{http://www.inl.gov/technicalpublications/Documents/4120524.pdf}}
+}
+</pre>
 </li>
 
 <br>
@@ -663,16 +747,18 @@ flow.
 A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&nbsp;A. Coutinho.
   PID adaptive control of incremental and arclength continuation in
   nonlinear applications.
-  <em>International Journal for Numerical Methods in Fluids</em>, Early
-    View, 2009.
-    <a href="http://dx.doi.org/10.1002/fld.1998">http://dx.doi.org/10.1002/fld.1998</a>.<br />
+  <em>International Journal for Numerical Methods in Fluids</em>,
+  61(11):1181-1200, 2009.
+  <a href="http://dx.doi.org/10.1002/fld.1998">http://dx.doi.org/10.1002/fld.1998</a>.<br />
 <pre>
 @Article{Valli_2009,
    author = {A. M. P. Valli and R. N. Elias and G. F. Carey and A. L. G. A. Coutinho},
     title = {{PID adaptive control of incremental and arclength continuation in nonlinear applications}},
   journal = {International Journal for Numerical Methods in Fluids},
      year = 2009,
-   volume = {Early View},
+   volume = {61},
+   number = {11},
+    pages = {1181--1200},
     note  = {\url{http://dx.doi.org/10.1002/fld.1998}}
 }
 </pre>
