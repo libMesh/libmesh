@@ -514,13 +514,35 @@ public:
   /**
    * @returns \p -1 when \p this is equivalent to \p other_vector,
    * up to the given \p threshold.  When differences occur,
-   * the return value contains the first index where
-   * the difference exceeded the threshold.  When
+   * the return value contains the first index \p i where
+   * the difference \p (a[i]-b[i]) exceeded the threshold.  When
    * no threshold is given, the \p libMesh \p TOLERANCE
    * is used.
    */
   virtual int compare (const NumericVector<T> &other_vector,
 		       const Real threshold = TOLERANCE) const;
+
+  /**
+   * @returns \p -1 when \p this is equivalent to \p other_vector,
+   * up to the given local relative \p threshold.  When differences
+   * occur, the return value contains the first index where
+   * the difference \p (a[i]-b[i])/max(a[i],b[i]) exceeded the
+   * threshold.  When no threshold is given, the \p libMesh 
+   * \p TOLERANCE is used.
+   */
+  virtual int local_relative_compare (const NumericVector<T> &other_vector,
+                                      const Real threshold = TOLERANCE) const;
+
+  /**
+   * @returns \p -1 when \p this is equivalent to \p other_vector,
+   * up to the given local relative \p threshold.  When differences
+   * occur, the return value contains the first index where
+   * the difference \p (a[i]-b[i])/max_j(a[j],b[j]) exceeded the
+   * threshold.  When no threshold is given, the \p libMesh 
+   * \p TOLERANCE is used.
+   */
+  virtual int global_relative_compare (const NumericVector<T> &other_vector,
+                                       const Real threshold = TOLERANCE) const;
 
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1

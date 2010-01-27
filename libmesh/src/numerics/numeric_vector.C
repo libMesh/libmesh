@@ -82,7 +82,107 @@ NumericVector<T>::build(const SolverPackage solver_package)
 }
 
 
+template <typename T>
+int NumericVector<T>::compare (const NumericVector<T> &other_vector,
+			       const Real threshold) const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert (other_vector.initialized());
+  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
+  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
 
+  int first_different_i = std::numeric_limits<int>::max();
+  unsigned int i = first_local_index();
+
+  do
+    {
+      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+	first_different_i = i;
+      else
+	i++;
+    }
+  while (first_different_i==std::numeric_limits<int>::max()
+         && i<last_local_index());
+
+  // Find the correct first differing index in parallel
+  Parallel::min(first_different_i);
+
+  if (first_different_i == std::numeric_limits<int>::max())
+    return -1;
+
+  return first_different_i;
+}
+
+
+template <typename T>
+int NumericVector<T>::local_relative_compare (const NumericVector<T> &other_vector,
+			                      const Real threshold) const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert (other_vector.initialized());
+  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
+  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+
+  int first_different_i = std::numeric_limits<int>::max();
+  unsigned int i = first_local_index();
+
+  do
+    {
+      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold *
+           std::max(std::abs((*this)(i)), std::abs(other_vector(i))))
+	first_different_i = i;
+      else
+	i++;
+    }
+  while (first_different_i==std::numeric_limits<int>::max()
+         && i<last_local_index());
+
+  // Find the correct first differing index in parallel
+  Parallel::min(first_different_i);
+
+  if (first_different_i == std::numeric_limits<int>::max())
+    return -1;
+
+  return first_different_i;
+}
+
+
+template <typename T>
+int NumericVector<T>::global_relative_compare (const NumericVector<T> &other_vector,
+			                       const Real threshold) const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert (other_vector.initialized());
+  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
+  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+
+  int first_different_i = std::numeric_limits<int>::max();
+  unsigned int i = first_local_index();
+
+  const Real my_norm = this->linfty_norm();
+  const Real other_norm = other_vector.linfty_norm();
+  const Real abs_threshold = std::max(my_norm, other_norm) * threshold;
+
+  do
+    {
+      if ( std::abs( (*this)(i) - other_vector(i) ) > abs_threshold )
+	first_different_i = i;
+      else
+	i++;
+    }
+  while (first_different_i==std::numeric_limits<int>::max()
+         && i<last_local_index());
+
+  // Find the correct first differing index in parallel
+  Parallel::min(first_different_i);
+
+  if (first_different_i == std::numeric_limits<int>::max())
+    return -1;
+
+  return first_different_i;
+}
+
+/*
 // Full specialization for float datatypes (DistributedVector wants this)
 
 template <>
@@ -187,6 +287,7 @@ int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
 
   return rvalue;
 }
+*/
 
 
 template <class T>
