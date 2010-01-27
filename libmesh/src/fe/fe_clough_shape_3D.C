@@ -51,6 +51,10 @@ Real clough_raw_shape(const unsigned int basis_num,
 // Compute the static coefficients for an element
 void clough_compute_coefs(const Elem* elem)
 {
+  // Using static globals for old_elem_id, etc. will fail
+  // horribly with more than one thread.
+  libmesh_assert(libMesh::n_threads() == 1);
+
   // Coefficients are cached from old elements
   if (elem->id() == old_elem_id)
     return;

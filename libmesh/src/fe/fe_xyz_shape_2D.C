@@ -73,6 +73,10 @@ Real FE<2,XYZ>::shape(const Elem* elem,
       centroid = elem->centroid();
       old_elem_id = elem->id();
     }  
+
+  // Using static globals for old_elem_id, etc. will fail
+  // horribly with more than one thread.
+  libmesh_assert(libMesh::n_threads() == 1);
   
   const Real x  = p(0);
   const Real y  = p(1);
@@ -201,6 +205,10 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
       centroid = elem->centroid();
       old_elem_id = elem->id();
     }  
+
+  // Using static globals for old_elem_id, etc. will fail
+  // horribly with more than one thread.
+  libmesh_assert(libMesh::n_threads() == 1);
   
   const Real x  = p(0);
   const Real y  = p(1);
@@ -408,6 +416,10 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
       centroid = elem->centroid();
       old_elem_id = elem->id();
     }  
+
+  // Using static globals for old_elem_id, etc. will fail
+  // horribly with more than one thread.
+  libmesh_assert(libMesh::n_threads() == 1);
   
   const Real x  = p(0);
   const Real y  = p(1);
