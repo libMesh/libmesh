@@ -687,8 +687,10 @@ GetPot::__skip_whitespace(std::istream& istr)
 		istr.unget();
 		return; 
 	    }
-	    tmp = istr.get();
-	    if( ! istr ) { istr.unget(); return; }
+
+// RHS: Why is this here?  It breaks on empty comments
+//	    tmp = istr.get();
+//	    if( ! istr ) { istr.unget(); return; }
 	}
 	// 'tmp' contains last character of _comment_starter
 
