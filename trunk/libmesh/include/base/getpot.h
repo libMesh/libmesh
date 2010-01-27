@@ -1642,10 +1642,11 @@ GetPot::__DBE_expand(const std::string expr)
 	STRING_VECTOR A = __DBE_get_expr_list(expr.substr(1), 2);
 	STRING_VECTOR::const_iterator it = A.begin();
 	double result = __convert_to_type(*it++, 0.0);
-	if( result == 0 ) return "0.0";
-	for(it++; it != A.end(); it++) {
+	if( result == 0 ) {
+            return "0.0";
+        }
+	for(; it != A.end(); it++) {
 	    const double Q = __convert_to_type(*it, 0.0);
-	    if( Q == 0.0 ) return "0.0";
 	    result /= Q;
 	}
 	return __double2string(result);
