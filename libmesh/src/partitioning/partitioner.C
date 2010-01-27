@@ -437,6 +437,11 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
       
       // For each node, set the processor ID to the min of
       // its current value and this Element's processor id.
+      // 
+      // TODO: we would probably get better parallel partitioning if
+      // we did something like "min for even numbered nodes, max for
+      // odd numbered".  We'd need to be careful about how that would
+      // affect solution ordering for I/O, though.
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
 	elem->get_node(n)->processor_id() = std::min(elem->get_node(n)->processor_id(),
 						     elem->processor_id());
