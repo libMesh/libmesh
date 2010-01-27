@@ -198,7 +198,7 @@ public:
     inline STRING_VECTOR   unidentified_nominuses() const;
 
     // (*) output --------------------------------------------------------------
-    inline int print() const;
+    inline int print(std::ostream &out_stream = std::cout) const;
 
 private:
     // (*) Type Declaration ----------------------------------------------------
@@ -1395,13 +1395,13 @@ GetPot::__find_variable(const char* VarName) const
 //.............................................................................
 //
 inline int
-GetPot::print() const
+GetPot::print(std::ostream &out_stream) const
 {
-    std::cout << "argc = " << argv.size() << std::endl;
+    out_stream << "argc = " << argv.size() << std::endl;
     STRING_VECTOR::const_iterator it = argv.begin();
     for(; it != argv.end(); it++)
-	std::cout << *it << std::endl;
-    std::cout << std::endl;
+	out_stream << *it << std::endl;
+    out_stream << std::endl;
     return 1;
 }
 
