@@ -490,7 +490,7 @@ ifeq ($(enable-optional),yes)
 
     #                    (needed by all petsc)  (needed by versions <= 2.3.3)      (needed by versions >= 3.0.0)
     libmesh_INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) -I$(PETSC_DIR)/$(PETSC_ARCH)/include \
-                         $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE)
+                         $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE) $(PACKAGES_INCLUDES)
 
     # Depending on petsc version, libs live in different locations
     ifeq ($(petsc-major-minor),2.3.x) # 2.3.x & newer does not use BOPT, has lib/ARCH/...
