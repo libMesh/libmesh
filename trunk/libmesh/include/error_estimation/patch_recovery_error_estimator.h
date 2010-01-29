@@ -122,7 +122,7 @@ private:
     ErrorVector &error_per_cell;    
   };
 
-  friend class EsitmateError;
+  friend class EstimateError;
 };
 
 
