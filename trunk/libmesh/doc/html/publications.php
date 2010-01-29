@@ -85,6 +85,28 @@ University of Oxford, Balliol College, 2008.
 <ol>
 
 <li>
+L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
+  An adaptive mesh refinement solver for large-scale simulation of
+  biological flows.
+  <em>International Journal for Numerical Methods in Biomedical
+  Engineering</em>, 26(1):86-100, 2010.
+  <a href="http://dx.doi.org/10.1002/cnm.1257">http://dx.doi.org/10.1002/cnm.1257</a>.<br />
+<pre>
+@Article{Botti_2010,
+   author = {L.~Botti and M.~Piccinelli and B.~Ene-Iordache and A.~Remuzzi and L.~Antiga},
+    title = {{An adaptive mesh refinement solver for large-scale simulation of biological flows}},
+  journal = {International Journal for Numerical Methods in Biomedical Engineering},
+     year = 2010,
+   volume = 26,
+   number = 1,
+    pages = {86--100},
+     note = {\url{http://dx.doi.org/10.1002/cnm.1257}}
+}
+</pre>
+</li>
+
+
+<li>
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
   Multi-Resolution Simulation of Double-Diffusive Convection in Porous
   Media.
@@ -110,6 +132,72 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <h2>2009</h2>
 <ol>
+
+<li>
+C.&nbsp;Barbarosie and A.-M. Toader.
+  Optimization of bodies with locally periodic microstructure.
+  Technical Report Pre-2009-021, Centro de Matemática e
+  Aplicaçoes Fundamentais (CMAF), December 2009.
+  <a href="http://cmaf.ptmat.fc.ul.pt/arquivo/docs/pre-2009-021.pdf">http://cmaf.ptmat.fc.ul.pt/arquivo/docs/pre-2009-021.pdf</a>.<br />
+<pre>
+@TechReport{Barbarosie_2009,
+  author      = {C.~Barbarosie and A.-M.~Toader},
+  title       = {{Optimization of bodies with locally periodic 
+                  microstructure}},
+  institution = {Centro de Matem\'{a}tica e Aplica\c{c}\~{o}es Fundamentais (CMAF)},
+  number      = {Pre-2009-021},
+  day         = {2},
+  month       = {December},
+  year        = {2009},
+  note        = {\url{http://cmaf.ptmat.fc.ul.pt/arquivo/docs/pre-2009-021.pdf}}
+}
+</pre>
+</li>
+
+
+<li>
+D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
+  Solving the vibrational Schrödinger equation on an arbitrary
+  multidimensional potential energy surface by the finite element method.
+  <em>Computer Physics Communications</em>, 180(11):2079-2094, 2009.
+  <a href="http://dx.doi.org/10.1016/j.cpc.2009.06.010">http://dx.doi.org/10.1016/j.cpc.2009.06.010</a>.<br />
+<pre>
+@Article{Xu_2009,
+   author = {D.~Xu and J.~Stare and A.~L.~Cooksy},
+    title = {Solving the vibrational {S}chr\"{o}dinger equation
+             on an arbitrary multidimensional potential energy
+	     surface by the finite element method},
+  journal = {Computer Physics Communications},
+   volume = {180},
+   number = {11},
+    pages = {2079--2094},
+     year = {2009},
+     note = {\url{http://dx.doi.org/10.1016/j.cpc.2009.06.010}}
+}
+</pre>
+</li>
+
+<li>
+M.&nbsp;Polidori.
+  Set Up and Preliminary Assessment of a 3D Numerical Model for the
+  Thermo-Fluid Dynamics Analysis of an Open Square Lattice Core of a Lead
+  Cooled Reactor.
+  Technical Report RSE/2009/84, Ente per le Nuove tecnologie, l'Energia
+  e l'Ambiente (ENEA), March 2009.
+<pre>
+@TechReport{Polidori_2009,
+  author      = {M.~Polidori},
+  title       = {{Set Up and Preliminary Assessment of a 3D Numerical Model 
+                  for the Thermo-Fluid Dynamics Analysis of an Open Square 
+                  Lattice Core of a Lead Cooled Reactor}},
+  institution = {Ente per le Nuove tecnologie, l'Energia e l'Ambiente (ENEA)},
+  number      = {RSE/2009/84},
+  year        = {2009},
+  month       = {March},
+  note        = {\url{http://www.enea.it/enea_paese/sistema_elettrico/Nucleare_fissione/Reattori_Innovativi/RSE84.pdf}}
+}
+</pre>
+</li>
 
 <li>
 D.&nbsp;Gaston, C.&nbsp;Newman, G.&nbsp;Hansen, and D.&nbsp;Lebrun-Grandié.
@@ -313,6 +401,29 @@ B.&nbsp;S. Kirk.
 
 <h2>2008</h2>  
 <ol>	    
+
+<li>
+R.&nbsp;H. Stogner, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
+  Approximation of Cahn-Hilliard diffuse interface models using
+  parallel adaptive mesh refinement and coarsening with <em>C</em><sup>1</sup> elements.
+  <em>International Journal for Numerical Methods in Engineering</em>,
+  76(5):636-661, 2008.
+  <a href="http://dx.doi.org/10.1002/nme.2337">http://dx.doi.org/10.1002/nme.2337</a>.<br />
+<pre>
+@Article{Stogner_2008,
+   author = {R.~H.~Stogner and G.~F.~Carey and B.~T.~Murray},
+    title = {{Approximation of Cahn-Hilliard diffuse interface models
+              using parallel adaptive mesh refinement and coarsening with
+	      $C^1$ elements}},
+  journal = {International Journal for Numerical Methods in Engineering},
+     year = 2008,
+   volume = 76,
+   number = 5,
+    pages = {636--661},
+     note = {\url{http://dx.doi.org/10.1002/nme.2337}}
+}
+</pre>
+</li>
 
 <li>
 D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
