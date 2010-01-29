@@ -72,6 +72,7 @@ The University of Texas at Austin, August 2004.
 <br>
 <h1>Publications utilizing libMesh</h1>
 
+<h2>2010</h2>
 <ol>
 
 <li>
@@ -92,6 +93,101 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
   year    = {2010},
   pages   = {37--65},
   note    = {\url{http://dx.doi.org/10.1108/09615531011008118}}
+}
+</pre>
+</li>
+</ol>
+
+
+<h2>2009</h2>
+<ol>
+
+<li>
+Jan Biermann, Otto von Estorff, Steffen Petersen, and Christina Wenterodt.
+  Higher order finite and infinite elements for the solution of
+  Helmholtz problems.
+  <em>Computer Methods in Applied Mechanics and Engineering</em>,
+    198(13-14):1171-1188, 2009.
+    <a href="http://dx.doi.org/10.1016/j.cma.2008.11.009">http://dx.doi.org/10.1016/j.cma.2008.11.009</a>.<br />
+<pre>
+@Article{Biermann_2009,
+   author = "Jan Biermann and Otto von Estorff and Steffen Petersen and Christina Wenterodt",
+    title = {{Higher order finite and infinite elements for the solution of Helmholtz problems}},
+  journal = "Computer Methods in Applied Mechanics and Engineering",
+   volume = "198",
+   number = "13--14",
+    pages = "1171--1188",
+     year = "2009",
+     note = "HOFEM07 - International Workshop on High-Order Finite Element Methods, 2007",
+     issn = "0045-7825",
+     note = {\url{http://dx.doi.org/10.1016/j.cma.2008.11.009}}
+}
+</pre>  
+</li>
+
+
+<li>
+Matthew&nbsp;F. Barone, Irina Kalashnikova, Daniel&nbsp;J. Segalman, and Heidi&nbsp;K.
+Thornquist.
+Stable Galerkin reduced order models for linearized compressible
+flow.
+<em>Journal of Computational Physics</em>, 228(6):1932-1946, April
+2009.
+<a href="http://dx.doi.org/10.1016/j.jcp.2008.11.015">http://dx.doi.org/10.1016/j.jcp.2008.11.015</a>.<br />
+<pre>
+@Article{Barone_2009,
+   author = "Matthew F. Barone and Irina Kalashnikova and Daniel J. Segalman and Heidi K. Thornquist",
+    title = {{Stable Galerkin reduced order models for linearized compressible flow}},
+  journal = "Journal of Computational Physics",
+   volume = "228",
+   number = "6",
+    pages = "1932--1946",
+     year = "2009",
+    month = apr,
+     issn = "0021-9991",
+     note = {\url{http://dx.doi.org/10.1016/j.jcp.2008.11.015}}
+}
+</pre>
+</li>
+
+
+
+<li>
+A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&nbsp;A. Coutinho.
+  PID adaptive control of incremental and arclength continuation in
+  nonlinear applications.
+  <em>International Journal for Numerical Methods in Fluids</em>,
+  61(11):1181-1200, 2009.
+  <a href="http://dx.doi.org/10.1002/fld.1998">http://dx.doi.org/10.1002/fld.1998</a>.<br />
+<pre>
+@Article{Valli_2009,
+   author = {A. M. P. Valli and R. N. Elias and G. F. Carey and A. L. G. A. Coutinho},
+    title = {{PID adaptive control of incremental and arclength continuation in nonlinear applications}},
+  journal = {International Journal for Numerical Methods in Fluids},
+     year = 2009,
+   volume = {61},
+   number = {11},
+    pages = {1181--1200},
+    note  = {\url{http://dx.doi.org/10.1002/fld.1998}}
+}
+</pre>
+</li>
+  
+<li>
+I.&nbsp;A. Jones, W.&nbsp;Ruijter, and A.&nbsp;C. Long.
+  A novel tetrahedal element for static and dynamic analysis of
+  laminated composites.
+  <em>Journal of Physics: Conference Series</em>, 181:012042 (8pp), 2009.
+  <a href="http://stacks.iop.org/1742-6596/181/012042">http://stacks.iop.org/1742-6596/181/012042</a>.<br />
+<pre>
+@Article{Jones_2009,
+  author = {I.~A.~Jones and W.~Ruijter and A.~C.~Long},
+  title  = {A novel tetrahedal element for static and dynamic analysis of laminated composites},
+  journal= {Journal of Physics: Conference Series},
+  volume = {181},
+  pages  = {012042 (8pp)},
+  note   = {\url{http://stacks.iop.org/1742-6596/181/012042}},
+  year   = {2009}
 }
 </pre>
 </li>
@@ -179,8 +275,218 @@ B.&nbsp;S. Kirk.
 </pre>
 </li>
 
+</ol>
 
-<br>
+
+
+
+
+<h2>2008</h2>  
+<ol>	    
+
+
+<li>
+S.&nbsp;Berrone and E.&nbsp;S&uuml;li.
+  Two-sided a posteriori error bounds for incompressible
+  quasi-Newtonian flows.
+  <em>IMA Journal of Numerical Analysis</em>, 28(2):382-421, 2008.
+    <a href="http://dx.doi.org/10.1093/imanum/drm017">http://dx.doi.org/10.1093/imanum/drm017</a>.<br />
+<pre>
+@Article{Berrone_2008,
+   author = {S.~Berrone and E.~S\"{u}li},
+    title = {{Two-sided a posteriori error bounds for incompressible quasi-Newtonian flows}},
+  journal = {IMA Journal of Numerical Analysis},
+     year = 2008,
+   volume = 28,
+   number = 2,
+    pages = {382--421},
+     note = {\url{http://dx.doi.org/10.1093/imanum/drm017}}
+}
+</pre>  
+</li>
+
+<li>
+Fabio Galbusera, Margherita Cioffi, and Manuela&nbsp;T. Raimondi.
+  An in silico bioreactor for simulating laboratory experiments in
+  tissue engineering.
+  <em>Biomedical Microdevices</em>, 10(4):547-554, August 2008.<br />
+<pre>
+@Article{Galbusera_2008,
+   author = {Fabio Galbusera and Margherita Cioffi and Manuela T. Raimondi},
+    title = {{An in silico bioreactor for simulating laboratory experiments in tissue engineering}},
+  journal = {Biomedical Microdevices},
+     year = 2008,
+   volume = 10,
+   number = 4,
+    month = aug,
+    pages = {547--554}
+}
+</pre>
+</li>
+
+
+
+<li>
+H.&nbsp;T. Ahn, M.&nbsp;Shashkov, and M.&nbsp;A. Christon.
+  The moment-of-fluid method in action.
+  <em>Communications in Numerical Methods in Engineering</em>,
+    25(10):1009-1018, July 2008.<br />
+<pre>
+@Article{Ahn_2008,
+   author = {{Ahn}, H.~T. and {Shashkov}, M. and M.~A.~Christon},
+    title = "{The moment-of-fluid method in action}",
+  journal = {Communications in Numerical Methods in Engineering},
+     year = 2008,
+    month = jul,
+   volume = {25},
+   number = {10},
+    pages = {1009--1018}
+}
+</pre>
+</li>
+
+
+<li>
+Marina Piccinelli, Lorenzo Botti, Bogdan Ene-Iordache, Andrea Remuzzi,
+  Alessandro Veneziani, and Luca Antiga.
+  Link between vortex structures and voronoi diagram in cerebral
+  aneurysms.
+  <em>Journal of Biomechanics</em>, 41, Supplement 1:S12, July 2008.<br />
+<pre>
+@Article{Piccinelli_2008,
+   author = {Marina Piccinelli and Lorenzo Botti and Bogdan Ene-Iordache
+             and Andrea Remuzzi and Alessandro Veneziani and Luca Antiga},
+    title = {{Link between vortex structures and voronoi diagram in cerebral aneurysms}},
+  journal = {Journal of Biomechanics},
+     year = 2008,
+    month = jul,
+   volume = {41, Supplement 1},
+    pages = {S12}
+}
+</pre>
+</li>
+
+
+
+
+
+<li>
+Koen&nbsp;Van Canneyt, Radoslav Kaminsky, Lorenzo Botti, Luca Antiga, Jan Tordoir,
+  Pascal Verdonck, and Sunny Eloot.
+  Can a kinked arterio-venous graft cause instable flow? a
+  patient-specific validated computational study.
+  <em>Journal of Biomechanics</em>, 41(Supplement 1):S210, July 2008.
+    <a href="http://dx.doi.org/10.1016/S0021-9290(08)70210-0">http://dx.doi.org/10.1016/S0021-9290(08)70210-0</a>.<br />
+<pre>
+@Article{VanCanneyt_2008,
+   author = "Koen Van Canneyt and Radoslav Kaminsky and Lorenzo Botti and
+             Luca Antiga and Jan Tordoir and Pascal Verdonck and Sunny Eloot",
+    title = "CAN A KINKED ARTERIO-VENOUS GRAFT CAUSE INSTABLE FLOW?
+             A PATIENT-SPECIFIC VALIDATED COMPUTATIONAL STUDY",
+  journal = "Journal of Biomechanics",
+   volume = "41",
+   number = "Supplement 1",
+    pages = "S210",
+     year = "2008",
+    month = jul,
+     note = "Abstracts of the 16th Congress, European Society of Biomechanics",
+     issn = "0021-9290",
+     note = {\url{http://dx.doi.org/10.1016/S0021-9290(08)70210-0}}
+}
+</pre>
+</li>
+  
+<li>
+Lorenzo Botti, Marina Piccinelli, Bogdan Ene-Iordache, Andrea Remuzzi, and Luca
+  Antiga.
+  An open source parallel AMR FE solver for biological flows based
+  on the LibMesh C++ library.
+  <em>Journal of Biomechanics</em>, 41(Supplement 1):S211, July 2008.
+    <a href="http://dx.doi.org/10.1016/S0021-9290(08)70211-2">http://dx.doi.org/10.1016/S0021-9290(08)70211-2</a>.<br />
+<pre>
+@Article{Botti_2008,
+   author = "Lorenzo Botti and Marina Piccinelli and Bogdan Ene-Iordache and Andrea Remuzzi and Luca Antiga",
+    title = "AN OPEN SOURCE PARALLEL {AMR} {FE} SOLVER FOR BIOLOGICAL FLOWS BASED ON THE {LibMesh C++} LIBRARY",
+  journal = "Journal of Biomechanics",
+   volume = "41",
+   number = "Supplement 1",
+    pages = "S211",
+     year = "2008",
+    month = jul,
+     note = "Abstracts of the 16th Congress, European Society of Biomechanics",
+     issn = "0021-9290",
+     note = {\url{http://dx.doi.org/10.1016/S0021-9290(08)70211-2}}
+}
+</pre>
+</li>
+  
+<li>
+A.&nbsp;C. Powell, IV and R.&nbsp;Arroyave.
+  Open source software for materials and process modeling.
+  <em>Journal of the Minerals, Metals and Materials Society</em>,
+    60(5):32-39, May 2008.
+    <a href="http://dx.doi.org/10.1007/s11837-008-0057-4">http://dx.doi.org/10.1007/s11837-008-0057-4</a>.<br />
+<pre>
+@Article{Powell_2008,
+   author = {{Powell}, IV, A.~C. and {Arroyave}, R.},
+    title = "{Open source software for materials and process modeling}",
+  journal = {Journal of the Minerals, Metals and Materials Society},
+     year = 2008,
+    month = may,
+   volume = 60,
+   number = 5,
+    pages = {32--39},
+     note = {\url{http://dx.doi.org/10.1007/s11837-008-0057-4}}
+}
+</pre>
+</li>
+  
+
+<li>
+M.&nbsp;Brinkmeier, U.&nbsp;Nackenhorst, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
+  A numerical model for the simulation of tire rolling noise.
+  <em>Journal of Sound and Vibration</em>, 309(1-2):20-39, January 2008.
+    <a href="http://dx.doi.org/10.1016/j.jsv.2006.11.040">http://dx.doi.org/10.1016/j.jsv.2006.11.040</a>.<br />
+<pre>
+@Article{Brinkmeier_2008,
+    author = {Brinkmeier, M. and Nackenhorst, U. and Petersen, S. and {von Estorff}, O.},
+     title = {A Numerical Model for the Simulation of Tire Rolling Noise},
+   journal = {Journal of Sound and Vibration},
+      year = {2008},
+     month = jan,
+    volume = {309},
+    number = {1--2},
+     pages = {20--39},
+      note = {\url{http://dx.doi.org/10.1016/j.jsv.2006.11.040}}
+}
+</pre>
+</li>
+
+
+
+<li>
+Tim Kr&ouml;ger and Tobias Preusser.
+  Stability of the 8-tetrahedra shortest-interior-edge partitioning
+  method.
+  <em>Numerische Mathematik</em>, 109(3):435-457, May 2008.
+    <a href="http://dx.doi.org/10.1007/s00211-008-0148-8">http://dx.doi.org/10.1007/s00211-008-0148-8</a>.<br />
+<pre>
+@Article{Kroger_2008,
+   author = {Tim Kr\"{o}ger and Tobias Preusser},
+    title = {{Stability of the 8-tetrahedra shortest-interior-edge partitioning method}},
+  journal = {Numerische Mathematik},
+     year = 2008,
+    month = may,
+   volume = 109,
+   number = 3,
+    pages = {435--457},
+     note = {\url{http://dx.doi.org/10.1007/s00211-008-0148-8}}
+}
+</pre>
+</li>
+
+
+
 <li>
 Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
   A parallel, adaptive finite element scheme for modeling chemotactic
@@ -199,7 +505,7 @@ Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
 </pre>  
 </li>
 
-<br>
+
 <li>
 Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
   Development and validation of a SUPG finite element scheme for the
@@ -241,7 +547,87 @@ V.&nbsp;S. Mahadevan and J.&nbsp;C. Ragusa.
 </pre>
 </li>
 
-<br>
+
+</ol>
+
+
+
+
+
+<h2>2007</h2>
+<ol>
+
+<li>
+M.&nbsp;Anderson and J.-H. Kimn.
+  A numerical approach to space-time finite elements for the wave
+  equation.
+  <em>Journal of Computational Physics</em>, 226:466-476, September 2007.
+    <a href="http://dx.doi.org/10.1016/j.jcp.2007.04.021">http://dx.doi.org/10.1016/j.jcp.2007.04.021</a>.<br />
+<pre>
+@Article{Anderson_2007,
+   author = {{Anderson}, M. and {Kimn}, {J.-H.}},
+    title = "{A numerical approach to space-time finite elements for the wave equation}",
+  journal = {Journal of Computational Physics},
+   eprint = {arXiv:gr-qc/0601099},
+     year = 2007,
+    month = sep,
+   volume = 226,
+    pages = {466--476},
+     note = {\url{http://dx.doi.org/10.1016/j.jcp.2007.04.021}}
+}
+</pre>
+</li>
+  
+<li>
+M.P. L&uuml;thi,
+<i>A Full Ice Stream Model for Jakobshavn Isbrae.</i>
+<a href="http://www.cosis.net/abstracts/EGU2007/02503/EGU2007-J-02503.pdf?PHPSESSID=f00857a95461bcae8e598e9edf0f1ba8">Geophysical Research Abstracts</a>, Vol 9., 2007.
+</li>
+  
+<li>
+Jan Biermann, Otto von Estorff, Steffen Petersen, and Holger Schmidt.
+  Computational model to investigate the sound radiation from rolling
+  tires.
+  <em>Tire Science and Technology</em>, 35(3):209-225, 2007.
+  <a href="http://link.aip.org/link/?TIR/35/209/1">http://link.aip.org/link/?TIR/35/209/1</a>.<br />
+<pre>
+@Article{Biermann_2007,
+  author    = {Jan Biermann and Otto von Estorff and Steffen Petersen and Holger Schmidt},
+  title     = {Computational Model to Investigate the Sound Radiation from Rolling Tires},
+  publisher = {TIRSOC},
+  year      = {2007},
+  journal   = {Tire Science and Technology},
+  volume    = {35},
+  number    = {3},
+  pages     = {209--225},
+  note      = {\url{http://link.aip.org/link/?TIR/35/209/1}}
+}
+</pre>
+</li>
+
+
+
+<li>
+M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, and A.&nbsp;di Carlo.
+  TIBERCAD: A new multiscale simulator for electronic and
+  optoelectronic devices.
+  <em>Superlattices and Microstructures</em>, 41:381-385, May 2007.
+    <a href="http://dx.doi.org/10.1016/j.spmi.2007.03.011">http://dx.doi.org/10.1016/j.spmi.2007.03.011</a>.<br />
+<pre>
+@Article{AufderMaur_2007,
+   author = {{Auf der Maur}, M. and {Povolotskyi}, M. and {Sacconi}, F. and {di Carlo}, A.},
+    title = "{TIBERCAD: A new multiscale simulator for electronic and optoelectronic devices}",
+  journal = {Superlattices and Microstructures},
+     year = 2007,
+    month = may,
+   volume = 41,
+    pages = {381--385},
+     note = {\url{http://dx.doi.org/10.1016/j.spmi.2007.03.011}}
+}
+</pre>
+</li>
+  
+
 <li>
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, D.&nbsp;J. Knezevic, and B.&nbsp;T. Murray.
   Adaptive finite element methodology for tumor angiogenesis
@@ -262,7 +648,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, D.&nbsp;J. Knezevic, and B.&nbsp;T. Murra
 </pre>
 </li>
 
-<br>
+
 <li>
 R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
   <em>C</em><sup>1</sup> macroelements in adaptive finite element methods.
@@ -281,8 +667,58 @@ R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
 }
 </pre>  
 </li>
+</ol>
 
-<br>
+
+
+
+
+<h2>2006</h2>
+<ol>
+
+
+<li>
+M.&nbsp;Schindler, P.&nbsp;Talkner, and P.&nbsp;H&auml;nggi.
+  Computing stationary free-surface shapes in microfluidics.
+  <em>Physics of Fluids</em>, 18(10):103303, October 2006.
+    <a href="http://dx.doi.org/10.1063/1.2361291">http://dx.doi.org/10.1063/1.2361291</a>.<br />
+<pre>
+@Article{Schindler_2006,
+   author = {{Schindler}, M. and {Talkner}, P. and {H{\"a}nggi}, P.},
+    title = "{Computing stationary free-surface shapes in microfluidics}",
+  journal = {Physics of Fluids},
+   eprint = {arXiv:physics/0511217},
+     year = 2006,
+    month = oct,
+   volume = 18,
+   number = 10,
+    pages = {103303},
+     note = {\url{http://dx.doi.org/10.1063/1.2361291}}
+}
+</pre>
+</li>
+
+
+<li>
+J.&nbsp;J. Marichalar, W.&nbsp;C. Rochelle, B.&nbsp;S. Kirk, and C.&nbsp;H. Campbell.
+  Boundary Layer/Streamline Surface Catalytic Heating Predictions on
+  Space Shuttle Orbiter.
+  <em>Journal of Spacecraft and Rockets</em>, 43(6):1202-1215, 2006.<br />
+<pre>
+@Article{Marichalar_2006,
+   author = {J.~J.~Marichalar and W.~C.~Rochelle and B.~S.~Kirk and C.~H.~Campbell},
+    title = {{Boundary Layer/Streamline Surface Catalytic Heating Predictions on Space Shuttle Orbiter}},
+  journal = {Journal of Spacecraft and Rockets},
+     year = 2006,
+   volume = 43,
+   number = 6,
+    pages = {1202--1215}
+}
+</pre>
+
+</li>
+
+
 <li>
 D.&nbsp;Dreyer, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
   Effectiveness and robustness of improved infinite elements for
@@ -305,7 +741,7 @@ D.&nbsp;Dreyer, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
 </pre>
 </li>
 
-<br>
+
 <li>
 Petersen S, Dreyer D, and O. von Estorff,
 <i>Assessment of finite and spectral
@@ -327,8 +763,30 @@ Volume 195, Issues 44-47, Pages 6463-6478, 2006.
 }
 </pre>  
 </li>
+</ol>
 
-<br>
+
+
+
+
+
+<h2>2005</h2>
+<ol>
+
+<li>
+Paul Simedrea, Luca Antiga, and David A. Steinman,
+<i>Towards a New Framework for Simulating Magnetic Resonance Imaging.</i>
+<a href="http://cscbc2006.cs.queensu.ca/assets/documents/Papers/paper108.pdf">
+First Canadian Student Conference on Biomedical Computing (CSCBC)</a>, 2005
+</li>
+
+
+<li>
+Jose Camata, Alvaro Coutinho, and Graham Carey,
+<i>Numerical Evaluation of the LCD Method Implemented in the libMesh Library.</i>
+<a href="http://www.inf.ufes.br/~avalli/papers/2005/CIL-0692.pdf.gz">CILAMCE</a> 2005.
+</li>
+
 <li>
 G.&nbsp;F. Carey, W.&nbsp;Barth, B.&nbsp;Kirk, and J.&nbsp;W. Peterson.
   Parallel CFD for Flow and Transport Applications Including
@@ -352,8 +810,12 @@ G.&nbsp;F. Carey, W.&nbsp;Barth, B.&nbsp;Kirk, and J.&nbsp;W. Peterson.
 }
 </pre>
 </li>
+</ol>
 
-<br>
+
+
+<h2>2004</h2>
+<ol>
 <li>
 G.&nbsp;F. Carey, M.&nbsp;Anderson, B.&nbsp;Carnes, and B.&nbsp;Kirk.
   Some aspects of adaptive grid technology related to boundary and
@@ -397,395 +859,15 @@ Graham&nbsp;F. Carey, William Barth, Juliette&nbsp;A. Woods, Ben Kirk, Michael&n
 }
 </pre>  
 </li>
+</ol>
 
 
-<br>
-<li>
-J.&nbsp;J. Marichalar, W.&nbsp;C. Rochelle, B.&nbsp;S. Kirk, and C.&nbsp;H. Campbell.
-  Boundary Layer/Streamline Surface Catalytic Heating Predictions on
-  Space Shuttle Orbiter.
-  <em>Journal of Spacecraft and Rockets</em>, 43(6):1202-1215, 2006.<br />
-<pre>
-@Article{Marichalar_2006,
-   author = {J.~J.~Marichalar and W.~C.~Rochelle and B.~S.~Kirk and C.~H.~Campbell},
-    title = {{Boundary Layer/Streamline Surface Catalytic Heating Predictions on Space Shuttle Orbiter}},
-  journal = {Journal of Spacecraft and Rockets},
-     year = 2006,
-   volume = 43,
-   number = 6,
-    pages = {1202--1215}
-}
-</pre>
-
-</li>
 
 
-<br>
-<li>
-M.&nbsp;Schindler, P.&nbsp;Talkner, and P.&nbsp;H&auml;nggi.
-  Computing stationary free-surface shapes in microfluidics.
-  <em>Physics of Fluids</em>, 18(10):103303, October 2006.
-    <a href="http://dx.doi.org/10.1063/1.2361291">http://dx.doi.org/10.1063/1.2361291</a>.<br />
-<pre>
-@Article{Schindler_2006,
-   author = {{Schindler}, M. and {Talkner}, P. and {H{\"a}nggi}, P.},
-    title = "{Computing stationary free-surface shapes in microfluidics}",
-  journal = {Physics of Fluids},
-   eprint = {arXiv:physics/0511217},
-     year = 2006,
-    month = oct,
-   volume = 18,
-   number = 10,
-    pages = {103303},
-     note = {\url{http://dx.doi.org/10.1063/1.2361291}}
-}
-</pre>
-</li>
-
-<br>
-<li>
-Paul Simedrea, Luca Antiga, and David A. Steinman,
-<i>Towards a New Framework for Simulating Magnetic Resonance Imaging.</i>
-<a href="http://cscbc2006.cs.queensu.ca/assets/documents/Papers/paper108.pdf">
-First Canadian Student Conference on Biomedical Computing (CSCBC)</a>, 2005
-</li>
-
-<br>
-<li>
-Jose Camata, Alvaro Coutinho, and Graham Carey,
-<i>Numerical Evaluation of the LCD Method Implemented in the libMesh Library.</i>
-<a href="http://www.inf.ufes.br/~avalli/papers/2005/CIL-0692.pdf.gz">CILAMCE</a> 2005.
-</li>
 
 
-<br>
-<li>
-M.&nbsp;Anderson and J.-H. Kimn.
-  A numerical approach to space-time finite elements for the wave
-  equation.
-  <em>Journal of Computational Physics</em>, 226:466-476, September 2007.
-    <a href="http://dx.doi.org/10.1016/j.jcp.2007.04.021">http://dx.doi.org/10.1016/j.jcp.2007.04.021</a>.<br />
-<pre>
-@Article{Anderson_2007,
-   author = {{Anderson}, M. and {Kimn}, {J.-H.}},
-    title = "{A numerical approach to space-time finite elements for the wave equation}",
-  journal = {Journal of Computational Physics},
-   eprint = {arXiv:gr-qc/0601099},
-     year = 2007,
-    month = sep,
-   volume = 226,
-    pages = {466--476},
-     note = {\url{http://dx.doi.org/10.1016/j.jcp.2007.04.021}}
-}
-</pre>
-</li>
 
 
-<br>
-<li>
-S.&nbsp;Berrone and E.&nbsp;S&uuml;li.
-  Two-sided a posteriori error bounds for incompressible
-  quasi-Newtonian flows.
-  <em>IMA Journal of Numerical Analysis</em>, 28(2):382-421, 2008.
-    <a href="http://dx.doi.org/10.1093/imanum/drm017">http://dx.doi.org/10.1093/imanum/drm017</a>.<br />
-<pre>
-@Article{Berrone_2008,
-   author = {S.~Berrone and E.~S\"{u}li},
-    title = {{Two-sided a posteriori error bounds for incompressible quasi-Newtonian flows}},
-  journal = {IMA Journal of Numerical Analysis},
-     year = 2008,
-   volume = 28,
-   number = 2,
-    pages = {382--421},
-     note = {\url{http://dx.doi.org/10.1093/imanum/drm017}}
-}
-</pre>  
-</li>
-
-
-<br>
-<li>
-M.P. L&uuml;thi,
-<i>A Full Ice Stream Model for Jakobshavn Isbrae.</i>
-<a href="http://www.cosis.net/abstracts/EGU2007/02503/EGU2007-J-02503.pdf?PHPSESSID=f00857a95461bcae8e598e9edf0f1ba8">Geophysical Research Abstracts</a>, Vol 9., 2007.
-</li>
-
-
-<br>
-<li>
-M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, and A.&nbsp;di Carlo.
-  TIBERCAD: A new multiscale simulator for electronic and
-  optoelectronic devices.
-  <em>Superlattices and Microstructures</em>, 41:381-385, May 2007.
-    <a href="http://dx.doi.org/10.1016/j.spmi.2007.03.011">http://dx.doi.org/10.1016/j.spmi.2007.03.011</a>.<br />
-<pre>
-@Article{AufderMaur_2007,
-   author = {{Auf der Maur}, M. and {Povolotskyi}, M. and {Sacconi}, F. and {di Carlo}, A.},
-    title = "{TIBERCAD: A new multiscale simulator for electronic and optoelectronic devices}",
-  journal = {Superlattices and Microstructures},
-     year = 2007,
-    month = may,
-   volume = 41,
-    pages = {381--385},
-     note = {\url{http://dx.doi.org/10.1016/j.spmi.2007.03.011}}
-}
-</pre>
-</li>
-
-<br>
-<li>
-Fabio Galbusera, Margherita Cioffi, and Manuela&nbsp;T. Raimondi.
-  An in silico bioreactor for simulating laboratory experiments in
-  tissue engineering.
-  <em>Biomedical Microdevices</em>, 10(4):547-554, August 2008.<br />
-<pre>
-@Article{Galbusera_2008,
-   author = {Fabio Galbusera and Margherita Cioffi and Manuela T. Raimondi},
-    title = {{An in silico bioreactor for simulating laboratory experiments in tissue engineering}},
-  journal = {Biomedical Microdevices},
-     year = 2008,
-   volume = 10,
-   number = 4,
-    month = aug,
-    pages = {547--554}
-}
-</pre>
-</li>
-
-
-<br>
-<li>
-H.&nbsp;T. Ahn, M.&nbsp;Shashkov, and M.&nbsp;A. Christon.
-  The moment-of-fluid method in action.
-  <em>Communications in Numerical Methods in Engineering</em>,
-    25(10):1009-1018, July 2008.<br />
-<pre>
-@Article{Ahn_2008,
-   author = {{Ahn}, H.~T. and {Shashkov}, M. and M.~A.~Christon},
-    title = "{The moment-of-fluid method in action}",
-  journal = {Communications in Numerical Methods in Engineering},
-     year = 2008,
-    month = jul,
-   volume = {25},
-   number = {10},
-    pages = {1009--1018}
-}
-</pre>
-</li>
-
-<br>
-<li>
-Marina Piccinelli, Lorenzo Botti, Bogdan Ene-Iordache, Andrea Remuzzi,
-  Alessandro Veneziani, and Luca Antiga.
-  Link between vortex structures and voronoi diagram in cerebral
-  aneurysms.
-  <em>Journal of Biomechanics</em>, 41, Supplement 1:S12, July 2008.<br />
-<pre>
-@Article{Piccinelli_2008,
-   author = {Marina Piccinelli and Lorenzo Botti and Bogdan Ene-Iordache
-             and Andrea Remuzzi and Alessandro Veneziani and Luca Antiga},
-    title = {{Link between vortex structures and voronoi diagram in cerebral aneurysms}},
-  journal = {Journal of Biomechanics},
-     year = 2008,
-    month = jul,
-   volume = {41, Supplement 1},
-    pages = {S12}
-}
-</pre>
-</li>
-
-
-<br>
-<li>
-M.&nbsp;Brinkmeier, U.&nbsp;Nackenhorst, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
-  A numerical model for the simulation of tire rolling noise.
-  <em>Journal of Sound and Vibration</em>, 309(1-2):20-39, January 2008.
-    <a href="http://dx.doi.org/10.1016/j.jsv.2006.11.040">http://dx.doi.org/10.1016/j.jsv.2006.11.040</a>.<br />
-<pre>
-@Article{Brinkmeier_2008,
-    author = {Brinkmeier, M. and Nackenhorst, U. and Petersen, S. and {von Estorff}, O.},
-     title = {A Numerical Model for the Simulation of Tire Rolling Noise},
-   journal = {Journal of Sound and Vibration},
-      year = {2008},
-     month = jan,
-    volume = {309},
-    number = {1--2},
-     pages = {20--39},
-      note = {\url{http://dx.doi.org/10.1016/j.jsv.2006.11.040}}
-}
-</pre>
-</li>
-
-
-<br>
-<li>
-Tim Kr&ouml;ger and Tobias Preusser.
-  Stability of the 8-tetrahedra shortest-interior-edge partitioning
-  method.
-  <em>Numerische Mathematik</em>, 109(3):435-457, May 2008.
-    <a href="http://dx.doi.org/10.1007/s00211-008-0148-8">http://dx.doi.org/10.1007/s00211-008-0148-8</a>.<br />
-<pre>
-@Article{Kroger_2008,
-   author = {Tim Kr\"{o}ger and Tobias Preusser},
-    title = {{Stability of the 8-tetrahedra shortest-interior-edge partitioning method}},
-  journal = {Numerische Mathematik},
-     year = 2008,
-    month = may,
-   volume = 109,
-   number = 3,
-    pages = {435--457},
-     note = {\url{http://dx.doi.org/10.1007/s00211-008-0148-8}}
-}
-</pre>
-</li>
-
-
-<br>
-<li>
-Koen&nbsp;Van Canneyt, Radoslav Kaminsky, Lorenzo Botti, Luca Antiga, Jan Tordoir,
-  Pascal Verdonck, and Sunny Eloot.
-  Can a kinked arterio-venous graft cause instable flow? a
-  patient-specific validated computational study.
-  <em>Journal of Biomechanics</em>, 41(Supplement 1):S210, July 2008.
-    <a href="http://dx.doi.org/10.1016/S0021-9290(08)70210-0">http://dx.doi.org/10.1016/S0021-9290(08)70210-0</a>.<br />
-<pre>
-@Article{VanCanneyt_2008,
-   author = "Koen Van Canneyt and Radoslav Kaminsky and Lorenzo Botti and
-             Luca Antiga and Jan Tordoir and Pascal Verdonck and Sunny Eloot",
-    title = "CAN A KINKED ARTERIO-VENOUS GRAFT CAUSE INSTABLE FLOW?
-             A PATIENT-SPECIFIC VALIDATED COMPUTATIONAL STUDY",
-  journal = "Journal of Biomechanics",
-   volume = "41",
-   number = "Supplement 1",
-    pages = "S210",
-     year = "2008",
-    month = jul,
-     note = "Abstracts of the 16th Congress, European Society of Biomechanics",
-     issn = "0021-9290",
-     note = {\url{http://dx.doi.org/10.1016/S0021-9290(08)70210-0}}
-}
-</pre>
-</li>
-
-<br>
-<li>
-Lorenzo Botti, Marina Piccinelli, Bogdan Ene-Iordache, Andrea Remuzzi, and Luca
-  Antiga.
-  An open source parallel AMR FE solver for biological flows based
-  on the LibMesh C++ library.
-  <em>Journal of Biomechanics</em>, 41(Supplement 1):S211, July 2008.
-    <a href="http://dx.doi.org/10.1016/S0021-9290(08)70211-2">http://dx.doi.org/10.1016/S0021-9290(08)70211-2</a>.<br />
-<pre>
-@Article{Botti_2008,
-   author = "Lorenzo Botti and Marina Piccinelli and Bogdan Ene-Iordache and Andrea Remuzzi and Luca Antiga",
-    title = "AN OPEN SOURCE PARALLEL {AMR} {FE} SOLVER FOR BIOLOGICAL FLOWS BASED ON THE {LibMesh C++} LIBRARY",
-  journal = "Journal of Biomechanics",
-   volume = "41",
-   number = "Supplement 1",
-    pages = "S211",
-     year = "2008",
-    month = jul,
-     note = "Abstracts of the 16th Congress, European Society of Biomechanics",
-     issn = "0021-9290",
-     note = {\url{http://dx.doi.org/10.1016/S0021-9290(08)70211-2}}
-}
-</pre>
-</li>
-
-<br>
-<li>
-Jan Biermann, Otto von Estorff, Steffen Petersen, and Christina Wenterodt.
-  Higher order finite and infinite elements for the solution of
-  Helmholtz problems.
-  <em>Computer Methods in Applied Mechanics and Engineering</em>,
-    198(13-14):1171-1188, 2009.
-    <a href="http://dx.doi.org/10.1016/j.cma.2008.11.009">http://dx.doi.org/10.1016/j.cma.2008.11.009</a>.<br />
-<pre>
-@Article{Biermann_2009,
-   author = "Jan Biermann and Otto von Estorff and Steffen Petersen and Christina Wenterodt",
-    title = {{Higher order finite and infinite elements for the solution of Helmholtz problems}},
-  journal = "Computer Methods in Applied Mechanics and Engineering",
-   volume = "198",
-   number = "13--14",
-    pages = "1171--1188",
-     year = "2009",
-     note = "HOFEM07 - International Workshop on High-Order Finite Element Methods, 2007",
-     issn = "0045-7825",
-     note = {\url{http://dx.doi.org/10.1016/j.cma.2008.11.009}}
-}
-</pre>  
-</li>
-
-<br>
-<li>
-Matthew&nbsp;F. Barone, Irina Kalashnikova, Daniel&nbsp;J. Segalman, and Heidi&nbsp;K.
-Thornquist.
-Stable Galerkin reduced order models for linearized compressible
-flow.
-<em>Journal of Computational Physics</em>, 228(6):1932-1946, April
-2009.
-<a href="http://dx.doi.org/10.1016/j.jcp.2008.11.015">http://dx.doi.org/10.1016/j.jcp.2008.11.015</a>.<br />
-<pre>
-@Article{Barone_2009,
-   author = "Matthew F. Barone and Irina Kalashnikova and Daniel J. Segalman and Heidi K. Thornquist",
-    title = {{Stable Galerkin reduced order models for linearized compressible flow}},
-  journal = "Journal of Computational Physics",
-   volume = "228",
-   number = "6",
-    pages = "1932--1946",
-     year = "2009",
-    month = apr,
-     issn = "0021-9991",
-     note = {\url{http://dx.doi.org/10.1016/j.jcp.2008.11.015}}
-}
-</pre>
-</li>
-
-
-<br>
-<li>
-A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&nbsp;A. Coutinho.
-  PID adaptive control of incremental and arclength continuation in
-  nonlinear applications.
-  <em>International Journal for Numerical Methods in Fluids</em>,
-  61(11):1181-1200, 2009.
-  <a href="http://dx.doi.org/10.1002/fld.1998">http://dx.doi.org/10.1002/fld.1998</a>.<br />
-<pre>
-@Article{Valli_2009,
-   author = {A. M. P. Valli and R. N. Elias and G. F. Carey and A. L. G. A. Coutinho},
-    title = {{PID adaptive control of incremental and arclength continuation in nonlinear applications}},
-  journal = {International Journal for Numerical Methods in Fluids},
-     year = 2009,
-   volume = {61},
-   number = {11},
-    pages = {1181--1200},
-    note  = {\url{http://dx.doi.org/10.1002/fld.1998}}
-}
-</pre>
-</li>
-
-
-<br>
-<li>
-A.&nbsp;C. Powell, IV and R.&nbsp;Arroyave.
-  Open source software for materials and process modeling.
-  <em>Journal of the Minerals, Metals and Materials Society</em>,
-    60(5):32-39, May 2008.
-    <a href="http://dx.doi.org/10.1007/s11837-008-0057-4">http://dx.doi.org/10.1007/s11837-008-0057-4</a>.<br />
-<pre>
-@Article{Powell_2008,
-   author = {{Powell}, IV, A.~C. and {Arroyave}, R.},
-    title = "{Open source software for materials and process modeling}",
-  journal = {Journal of the Minerals, Metals and Materials Society},
-     year = 2008,
-    month = may,
-   volume = 60,
-   number = 5,
-    pages = {32--39},
-     note = {\url{http://dx.doi.org/10.1007/s11837-008-0057-4}}
-}
-</pre>
-</li>
 
 </ol>
 
