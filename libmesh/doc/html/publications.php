@@ -67,6 +67,15 @@ The University of Texas at Austin, May 2007.
 The University of Texas at Austin, August 2004. 
 </li>
 
+<br>
+<li> David Knezevic,
+<i>Analysis and Implementation of 
+Numerical Methods for Simulating 
+Dilute Polymeric Fluids.</i>
+<a href="">PhD Thesis</a>, 
+University of Oxford, Balliol College, 2008. 
+</li>
+
 </ul>
 
 <br>
@@ -304,6 +313,28 @@ B.&nbsp;S. Kirk.
 
 <h2>2008</h2>  
 <ol>	    
+
+<li>
+D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
+  Solving the vibrational Schrödinger equation on an arbitrary
+  multidimensional potential energy surface by the finite element method.
+  Technical Report CSRCR2008-26, Computational Science Research Center,
+  San Diego State University, October 2008.<br />
+<pre>
+@TechReport{Xu_2008,
+  author      = {D.~Xu and J.~Stare and A.~L.~Cooksy},
+  title       = {{Solving the vibrational {S}chr\"{o}dinger equation
+                  on an arbitrary multidimensional potential
+		  energy surface by the finite element method}},
+  institution = {Computational Science Research Center,
+                 San Diego State University},
+  day         = {15},
+  month       = {October},
+  year        = {2008},
+  number      = {CSRCR2008-26}
+}
+</pre>
+</li>
 
 
 <li>
