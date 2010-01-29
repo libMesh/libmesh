@@ -206,7 +206,7 @@ void SystemNorm::set_type(unsigned int var, const FEMNormType &t)
   libmesh_assert (!_norms.empty());
   
   if (var >= _norms.size())
-    _norms.resize(var+1, _norms.back());
+    _norms.resize(var+1, t);
 
   _norms[var] = t;
 }
@@ -217,9 +217,7 @@ Real SystemNorm::weight(unsigned int var) const
 {
   libmesh_assert (!_weights.empty());
   
-  unsigned int i = (var < _weights.size()) ? var : _weights.size() - 1;
-
-  return _weights[i];
+  return (var < _weights.size()) ? _weights[var] : 1.0;
 }
 
 
@@ -229,9 +227,13 @@ void SystemNorm::set_weight(unsigned int var, Real w)
   libmesh_assert (!_weights.empty());
   
   if (var >= _weights.size())
-    _weights.resize(var+1, _weights.back());
+    {
+      _weights.resize(var+1, 1.0);
+      _weights_sq.resize(var+1, 1.0);
+    }
 
   _weights[var] = w;
+  _weights_sq[var] = w*w;
 }
 
 
@@ -240,9 +242,7 @@ Real SystemNorm::weight_sq(unsigned int var) const
 {
   libmesh_assert (!_weights_sq.empty());
   
-  unsigned int i = (var < _weights_sq.size()) ? var : _weights_sq.size() - 1;
-
-  return _weights_sq[i];
+  return (var < _weights_sq.size()) ? _weights_sq[var] : 1.0;
 }
 
 
