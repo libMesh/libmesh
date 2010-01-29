@@ -491,15 +491,19 @@ Tim Kr&ouml;ger and Tobias Preusser.
 Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
   A parallel, adaptive finite element scheme for modeling chemotactic
   biological systems.
-  <em>Communications in Numerical Methods in Engineering</em>, 2008.
-    <a href="http://dx.doi.org/10.1002/cnm.1173">http://dx.doi.org/10.1002/cnm.1173</a>.<br />
+  <em>Communications in Numerical Methods in Engineering</em>,
+  25(12):1162-1185, 2008.
+  <a href="http://dx.doi.org/10.1002/cnm.1173">http://dx.doi.org/10.1002/cnm.1173</a>.<br />
 <pre>
 @Article{Kirk_2008b,
    author = {Benjamin S. Kirk and Graham F. Carey},
     title = {{A parallel, adaptive finite element scheme for
               modeling chemotactic biological systems}},
   journal = {Communications in Numerical Methods in Engineering},
-     year = 2008,
+   volume = {25},
+   number = {12},
+    pages = {1162--1185},
+     year = {2008},
      note = {\url{http://dx.doi.org/10.1002/cnm.1173}}
 }
 </pre>  
