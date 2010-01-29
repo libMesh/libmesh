@@ -103,6 +103,27 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 <ol>
 
 <li>
+D.&nbsp;Gaston, C.&nbsp;Newman, G.&nbsp;Hansen, and D.&nbsp;Lebrun-Grandié.
+  Moose: A parallel computational framework for coupled systems of
+  nonlinear equations.
+  <em>Nuclear Engineering and Design</em>, 239(10):1768-1778, 2009.
+  <a href="http://dx.doi.org/10.1016/j.nucengdes.2009.05.021">http://dx.doi.org/10.1016/j.nucengdes.2009.05.021</a>.<br />
+<pre>
+@Article{Gaston_2009b,
+   author = {D.~Gaston and C.~Newman and G.~Hansen and D.~Lebrun-Grandi\'{e}},
+    title = {MOOSE: A parallel computational framework for coupled
+             systems of nonlinear equations},
+  journal = {Nuclear Engineering and Design},
+   volume = {239},
+   number = {10},
+    pages = {1768--1778},
+     year = {2009},
+     note = {\url{http://dx.doi.org/10.1016/j.nucengdes.2009.05.021}}
+}
+</pre>
+</li>
+
+<li>
 Jan Biermann, Otto von Estorff, Steffen Petersen, and Christina Wenterodt.
   Higher order finite and infinite elements for the solution of
   Helmholtz problems.
@@ -562,6 +583,26 @@ V.&nbsp;S. Mahadevan and J.&nbsp;C. Ragusa.
 <ol>
 
 <li>
+K.&nbsp;Nam and M.&nbsp;M. Aral.
+  Optimal placement of monitoring sensors in lakes.
+  In <em>Proceedings of the 2007 Georgia Water Resources Conference</em>,
+  University of Georgia, March 27-29 2007.
+  <a href="http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf">http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf</a>.<br />
+<pre>
+@InProceedings{Nam_2007,
+   author = {K.~Nam and M.~M.~Aral},
+    title = {{Optimal placement of monitoring sensors in lakes}},
+booktitle = {Proceedings of the 2007 Georgia Water Resources Conference},
+  address = {University of Georgia},
+    month = {March 27--29},
+     year = {2007},
+     note = {\url{http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf}}
+}
+</pre>
+</li>
+
+
+<li>
 M.&nbsp;Anderson and J.-H. Kimn.
   A numerical approach to space-time finite elements for the wave
   equation.
@@ -580,12 +621,6 @@ M.&nbsp;Anderson and J.-H. Kimn.
      note = {\url{http://dx.doi.org/10.1016/j.jcp.2007.04.021}}
 }
 </pre>
-</li>
-  
-<li>
-M.P. L&uuml;thi,
-<i>A Full Ice Stream Model for Jakobshavn Isbrae.</i>
-<a href="http://www.cosis.net/abstracts/EGU2007/02503/EGU2007-J-02503.pdf?PHPSESSID=f00857a95461bcae8e598e9edf0f1ba8">Geophysical Research Abstracts</a>, Vol 9., 2007.
 </li>
   
 <li>
@@ -680,6 +715,29 @@ R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
 <h2>2006</h2>
 <ol>
 
+<li>
+J.&nbsp;J. Crookston, W.&nbsp;Ruijter, A.&nbsp;C. Long, and I.&nbsp;A. Jones.
+  Modelling mechanical performance including damage development for
+  textile composites using a grid-based finite element method with adaptive
+  mesh refinement.
+  In <em>Proceedings of the 8th International Conference on Textile
+  Composites (TEXCOMP-8)</em>, Nottingham, UK, October 16-18 2006.
+  <a href="http://textiles.nottingham.ac.uk/T09-Crookston.pdf">http://textiles.nottingham.ac.uk/T09-Crookston.pdf</a>.<br />
+<pre>
+@InProceedings{Crookston_2006,
+  author     = {J.~J.~Crookston and W.~Ruijter and A.~C.~Long and I.~A.~Jones},
+  title      = {Modelling mechanical performance including damage development
+                for textile composites using a grid-based finite element method with
+                adaptive mesh refinement},
+  booktitle  = {{Proceedings of the 8th International Conference on
+                 Textile Composites (TEXCOMP-8)}},
+  month      = {October 16--18},
+  address    = {Nottingham, UK},
+  year       = {2006},
+  note       = {\url{http://textiles.nottingham.ac.uk/T09-Crookston.pdf}}
+} 
+</pre>
+</li>
 
 <li>
 M.&nbsp;Schindler, P.&nbsp;Talkner, and P.&nbsp;H&auml;nggi.
@@ -820,6 +878,32 @@ G.&nbsp;F. Carey, W.&nbsp;Barth, B.&nbsp;Kirk, and J.&nbsp;W. Peterson.
 
 <h2>2004</h2>
 <ol>
+
+<li>
+L.&nbsp;Antiga.
+  Imaging and numerical fluid dynamics for the study of the
+  cardiovascular system.
+  In M.&nbsp;Grigioni, editor, <em>III Workshop Bioflumen: Technological
+  innovation and evaluation of medical devices for the cardiovascular system</em>,
+  pages 55-59, Rome, Italy, November 2004. Istituto Superiore di Sanità.<br />
+<pre>
+@InProceedings{Antiga_2004,
+  author     = {L.~Antiga},
+  title      = {{Imaging and numerical fluid dynamics for the study of the
+                 cardiovascular system}},
+  booktitle  = {{III Workshop Bioflumen:  Technological innovation and evaluation of medical
+                 devices for the cardiovascular system}},
+  editor     = {M.~Grigioni},
+  pages      = {55--59},
+  publisher  = {Istituto Superiore di Sanit\`{a}},
+  address    = {Rome, Italy},
+  month      = {November},
+  year       = {2004}
+} 
+</pre>
+</li>
+
+
 <li>
 G.&nbsp;F. Carey, M.&nbsp;Anderson, B.&nbsp;Carnes, and B.&nbsp;Kirk.
   Some aspects of adaptive grid technology related to boundary and
