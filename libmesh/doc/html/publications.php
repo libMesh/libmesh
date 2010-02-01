@@ -85,6 +85,24 @@ University of Oxford, Balliol College, 2008.
 <ol>
 
 <li>
+M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
+  Advances on 3D geoelectric forward solver techniques.
+  <em>Int. J. Geophysics</em>, 2010.
+  <a href="http://uma.ensta.fr/var/files/publis/2009/2009-art-uma976-BlomeMaurerSchmidt2009.pdf">http://uma.ensta.fr/var/files/publis/2009/2009-art-uma976-BlomeMaurerSchmidt2009.pdf</a>.<br />
+<pre>
+@Article{Blome_2010,
+   author = {M.~Blome and H.~R.~Maurer and K.~Schmidt},
+    title = {{Advances on 3D geoelectric forward solver techniques}},
+  journal = {Int. J. Geophysics},
+     year = 2010,
+   volume = PREPRINT,
+     note = {\url{http://uma.ensta.fr/var/files/publis/2009/2009-art-uma976-BlomeMaurerSchmidt2009.pdf}}
+}
+</pre>
+</li>
+
+
+<li>
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
   An adaptive mesh refinement solver for large-scale simulation of
   biological flows.
@@ -131,7 +149,116 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 
 <h2>2009</h2>
+<!--
+<li>
+<pre>
+</pre>
+</li>
+-->  
 <ol>
+
+
+<li>
+P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
+  Analysis and visualization of the glass eel behavior (Anguilla
+  anguilla) in the Adour estuary and estimate of its upstream migration speed.
+  <em>Aquatic Living Resources</em>, 2009.
+  <a href="http://dx.doi.org/10.1051/alr/2009041">http://dx.doi.org/10.1051/alr/2009041</a>.<br />
+<pre>
+@Article{Prouet_2009,
+  author = {P.~Prouzet and M.~Odunlami and E.~Duquesne and A.~Boussouar},
+   title = {{Analysis and visualization of the glass
+             eel behavior (Anguilla anguilla) in the Adour estuary
+             and estimate of its upstream migration speed}},
+     note = {\url{http://dx.doi.org/10.1051/alr/2009041}},
+  journal = {Aquatic Living Resources},
+     year = 2009,
+   volume = PREPRINT
+}
+</pre>
+</li>
+  
+<li>
+Yujie Lu, Hidevaldo&nbsp;B. Machado, Ali Douraghy, David Stout, Harvey Herschman,
+  and Arion&nbsp;F. Chatziioannou.
+  Experimental bioluminescence tomography with fully parallel
+  radiative-transfer-based reconstruction framework.
+  <em>Optics Express</em>, 17(19):16681-16695, 2009.
+  <a href="http://www.opticsexpress.org/abstract.cfm?URI=oe-17-19-16681">http://www.opticsexpress.org/abstract.cfm?URI=oe-17-19-16681</a>.<br />
+<pre>
+@Article{Lu_2009, 
+   author = {Yujie Lu and Hidevaldo B. Machado and Ali Douraghy
+             and David Stout and Harvey Herschman and
+             Arion F. Chatziioannou}, 
+    title = {Experimental bioluminescence tomography with fully
+             parallel radiative-transfer-based reconstruction framework}, 
+  journal = {Optics Express}, 
+   number = {19}, 
+    pages = {16681--16695}, 
+   volume = {17}, 
+     year = {2009},
+     note = {\url{http://www.opticsexpress.org/abstract.cfm?URI=oe-17-19-16681}}
+}
+</pre>
+</li>
+
+
+
+<li>
+D.&nbsp;Knezevic and E.&nbsp;Süli.
+  A Deterministic Multiscale Approach for Simulating Dilute Polymeric
+  Fluids.
+  In <em>Lecture Notes in Computational Science and Engineering, BAIL
+  2008 - Boundary and Interior Layers</em>, volume&nbsp;69, pages 23-38. Springer,
+  Berlin Heidelberg, 2009.
+  <a href="http://dx.doi.org/10.1007/978-3-642-00605-0">http://dx.doi.org/10.1007/978-3-642-00605-0</a>.<br />
+<pre>
+@InCollection{Knezevic_2009,
+     author = {D.~Knezevic and E.~S\"{u}li},
+     title  = {{A Deterministic Multiscale Approach
+                for Simulating Dilute Polymeric Fluids}},
+      pages = {23--38},
+       year = 2009,
+  publisher = {Springer},
+    address = {Berlin Heidelberg},
+  booktitle = {Lecture Notes in Computational Science and Engineering,
+               BAIL 2008 - Boundary and Interior Layers},
+     volume = {69},
+       note = {\url{http://dx.doi.org/10.1007/978-3-642-00605-0}}
+}
+</pre>
+</li>
+
+
+
+<li>
+L.&nbsp;Antiga, R.&nbsp;N. Planken, K.&nbsp;Van Canneyt, L.&nbsp;Botti, A.&nbsp;Caroli, B.&nbsp;Ene-Iordache,
+  J.&nbsp;Tordoir, P.&nbsp;Verdonck, and A.&nbsp;Remuzzi.
+  Non-linear resistance associated to complex geometry at high flow
+  rates in vascular access for hemodialysis.
+  In Olaf Dössel and Wolfgang&nbsp;C. Schlegel, editors, <em>World
+  Congress on Medical Physics and Biomedical Engineering</em>, pages 543-546,
+  Munich, Germany, September 7-12 2009. Springer Berlin Heidelberg.
+  <a href="http://dx.doi.org/10.1007/978-3-642-03885-3">http://dx.doi.org/10.1007/978-3-642-03885-3</a>.<br />
+<pre>
+@InProceedings{Antiga_2009,
+  author     = {L. Antiga and R. N. Planken and K. Van Canneyt and
+                L. Botti and A. Caroli and B. Ene-Iordache and
+                J. Tordoir and P. Verdonck and A. Remuzzi},
+  title      = {{Non-linear resistance associated to complex geometry
+                 at high flow rates in vascular access for hemodialysis}},
+  booktitle  = {{World Congress on Medical Physics and Biomedical Engineering}},
+  editor     = {Olaf D\"{o}ssel and Wolfgang C. Schlegel},
+  pages      = {543--546},
+  publisher  = {Springer Berlin Heidelberg},
+  month      = {September 7--12},
+  address    = {Munich, Germany},
+  year       = {2009},
+  note       = {\url{http://dx.doi.org/10.1007/978-3-642-03885-3}}
+}
+</pre>
+</li>
+
 
 <li>
 C.&nbsp;Barbarosie and A.-M. Toader.
@@ -400,8 +527,63 @@ B.&nbsp;S. Kirk.
 
 
 <h2>2008</h2>  
+<!--
+<li>
+<pre>
+</pre>
+</li>
+-->  
 <ol>	    
 
+
+<li>
+E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
+  Topology optimization with adaptive mesh refinement.
+  In J.&nbsp;F. Abel and J.&nbsp;R. Cooke, editors, <em>Proceedings of the 6th
+  Internation Conference on Computation of Shell and Spatial Structures
+  (IASS-IACM 2008)</em>, Ithaca, NY, 2008. Cornell University.
+  <a href="http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf">
+    http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf</a>.<br />
+<pre>
+@InProceedings{DeSturler_2008,
+  author     = {E.~{De Sturler} and G.~H.~Paulino and S.~Wang},
+  title      = {Topology Optimization with Adaptive Mesh Refinement},
+  booktitle  = {{Proceedings of the 6th Internation Conference on
+                 Computation of Shell and Spatial Structures (IASS-IACM 2008)}},
+  editor     = {J.~F.~Abel and J.~R.~Cooke},
+  publisher  = {Cornell University},
+  address    = {Ithaca, NY},
+  year       = {2008},
+  note       = {\url{http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf}}
+} 
+</pre>
+</li>
+
+
+
+<li>
+O.&nbsp;von Estorff, S.&nbsp;Petersen, and D.&nbsp;Dreyer.
+  Efficient Infinite Elements based on Jacobi Polynomials.
+  In Steffen Marburg and Bodo Nolte, editors, <em>Computational
+  Acoustics of Noise Propagation in Fluids-Finite and Boundary Element
+  Methods</em>, pages 231-250. Springer Berlin Heidelberg, 2008.
+  <a href="http://dx.doi.org/10.1007/978-3-540-77448-8_9">http://dx.doi.org/10.1007/978-3-540-77448-8_9</a>.<br />
+<pre>
+@InCollection{VonEstorff_2008,
+     author = {O.~{von Estorff} and S.~Petersen and D.~Dreyer},
+      title = {{Efficient Infinite Elements based on Jacobi Polynomials}},
+      pages = {231--250},
+       year = 2008,
+  publisher = {Springer Berlin Heidelberg},
+     editor = {Steffen Marburg and Bodo Nolte},
+  booktitle = {Computational Acoustics of Noise Propagation in
+               Fluids--Finite and Boundary Element Methods},
+     volume = {},
+       note = {\url{http://dx.doi.org/10.1007/978-3-540-77448-8_9}}
+}
+</pre>
+</li>
+  
 <li>
 R.&nbsp;H. Stogner, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
   Approximation of Cahn-Hilliard diffuse interface models using
@@ -855,8 +1037,38 @@ R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
 
 
 <h2>2006</h2>
+<!--
+<li>
+<pre>
+</pre>
+</li>
+-->
+
 <ol>
 
+
+<li>
+D.&nbsp;Knezevic.
+  Finite element methods for deterministic simulation of polymeric
+  fluids.
+  Technical Report NA-06/19, Oxford University Computing Laboratory,
+  October 2006.
+  <a href="http://www.maths.warwick.ac.uk/multiscale/MSPreprints/ox-NA-19-06.pdf">
+    http://www.maths.warwick.ac.uk/multiscale/MSPreprints/ox-NA-19-06.pdf</a>.<br />
+<pre>
+@TechReport{Knezevic_2006,
+  author      = {D.~Knezevic},
+  title       = {Finite Element Methods for Deterministic Simulation
+                  of Polymeric Fluids},
+  institution = {Oxford University Computing Laboratory},
+  month       = {October},
+  year        = {2006},
+  number      = {NA-06/19},
+  note        = {\url{http://www.maths.warwick.ac.uk/multiscale/MSPreprints/ox-NA-19-06.pdf}}
+}
+</pre>
+</li>
+  
 <li>
 J.&nbsp;J. Crookston, W.&nbsp;Ruijter, A.&nbsp;C. Long, and I.&nbsp;A. Jones.
   Modelling mechanical performance including damage development for
