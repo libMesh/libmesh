@@ -290,9 +290,15 @@ public:
    * Note that the equation system can be defined without initializing
    * the data vectors to any solution values.  This can be done
    * by omitting READ_DATA in the read_flags parameter.
+   *
+   * If XdrMODE is omitted, it will be inferred as READ for filenames
+   * containing .xda or as DECODE for filenames containing .xdr
    */
   void read (const std::string& name,
 	     const libMeshEnums::XdrMODE,
+             const unsigned int read_flags=(READ_HEADER | READ_DATA));
+
+  void read (const std::string& name,
              const unsigned int read_flags=(READ_HEADER | READ_DATA));
 
   /**
@@ -306,9 +312,15 @@ public:
    *
    * Note that the solution data can be omitted by calling
    * this routine with WRITE_DATA omitted in the write_flags argument.
+   *
+   * If XdrMODE is omitted, it will be inferred as WRITE for filenames
+   * containing .xda or as ENCODE for filenames containing .xdr
    */
   void write (const std::string& name,
 	      const libMeshEnums::XdrMODE,
+              const unsigned int write_flags=(WRITE_DATA)) const;
+
+  void write (const std::string& name,
               const unsigned int write_flags=(WRITE_DATA)) const;
 
   /**
