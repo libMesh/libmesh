@@ -66,6 +66,17 @@ namespace {
 // ------------------------------------------------------------
 // EquationSystem class implementation
 void EquationSystems::read (const std::string& name,
+                            const unsigned int read_flags)
+{
+  libMeshEnums::XdrMODE mode = READ;
+  if (name.find(".xdr") != std::string::npos)
+    mode = DECODE;
+  this->read(name, mode, read_flags);
+}
+
+
+
+void EquationSystems::read (const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
                             const unsigned int read_flags)
 {
@@ -336,6 +347,17 @@ void EquationSystems::_read_impl (const std::string& name,
   
   // Localize each system's data
   this->update();
+}
+
+
+
+void EquationSystems::write(const std::string& name,
+                            const unsigned int write_flags) const
+{
+  libMeshEnums::XdrMODE mode = WRITE;
+  if (name.find(".xdr") != std::string::npos)
+    mode = ENCODE;
+  this->write(name, mode, write_flags);
 }
 
 
