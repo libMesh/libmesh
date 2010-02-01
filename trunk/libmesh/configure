@@ -14533,7 +14533,7 @@ echo "${ECHO_T}<<< Configuring library with Nemesis API support >>>" >&6; }
 if test "${enable_libHilbert+set}" = set; then
   enableval=$enable_libHilbert; enablelibhilbert=$enableval
 else
-  enablelibhilbert=yes
+  enablelibhilbert=no
 fi
 
 
