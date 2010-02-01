@@ -288,6 +288,9 @@ bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
 
   bool failure = false;
 
+  Elem *failed_elem = NULL;
+  Elem *failed_neighbor = NULL;
+
   for ( ; elem_it != elem_end && !failure; ++elem_it)
     {
       // Pointer to the element
@@ -306,6 +309,8 @@ bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
               (neighbor->p_level() > elem->p_level() + 1))
             {
               failure = true;
+              failed_elem = elem;
+              failed_neighbor = neighbor;
               break;
             }
         }
@@ -337,6 +342,8 @@ bool MeshRefinement::test_unflagged (bool libmesh_assert_pass)
   MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
+  Elem *failed_elem = NULL;
+
   for ( ; elem_it != elem_end; ++elem_it)
     {
       // Pointer to the element
@@ -348,6 +355,7 @@ bool MeshRefinement::test_unflagged (bool libmesh_assert_pass)
           elem->p_refinement_flag() == Elem::COARSEN)
         {
           found_flag = true;
+          failed_elem = elem;
           break;
         }
     }
