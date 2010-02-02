@@ -157,6 +157,45 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 -->  
 <ol>
 
+
+
+<li>
+D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
+  Reduced basis approximation and a posteriori error estimation for
+  the parametrized unsteady Boussinesq equations.
+  <em>PREPRINT, Submitted to Mathematical Models and Methods in
+  Applied Sciences</em>, 2009.
+  <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf</a>.<br />
+<pre>
+@Article{Knezevic_2009b,
+   author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
+    title = {{Reduced basis approximation and a posteriori 
+              error estimation for the parametrized unsteady 
+              Boussinesq equations}},
+  journal = {PREPRINT, Submitted to Mathematical Models and Methods in Applied Sciences},
+     year = 2009,
+     note = {\url{http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf}}
+}
+</pre>
+</li>
+  
+<li>
+L.&nbsp;Nagler and M.&nbsp;Schanz.
+  An extendable poroelastic plate formulation in dynamics.
+  <em>PREPRINT, Submitted to Archive of Applied Mechanics</em>, 2009.
+ 
+  <a href="http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf">http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf</a>.<br />
+<pre>
+@Article{Nagler_2009,
+   author = {L.~Nagler and M.~Schanz},
+    title = {{An extendable poroelastic plate formulation in dynamics}},
+  journal = {PREPRINT, Submitted to Archive of Applied Mechanics},
+     year = 2009,
+     note = {\url{http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf}}
+}
+</pre>
+</li>
+  
 <li>
 M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&nbsp;Romano,
   G.&nbsp;Penazzi, and A.&nbsp;Di Carlo.
@@ -582,6 +621,47 @@ B.&nbsp;S. Kirk.
 
 
 <li>
+A.&nbsp;Hawkins and J.&nbsp;T. Oden.
+  Toward a predictive model of tumor growth.
+  Technical report, Institute for Computational Engineering and
+  Sciences (ICES), The University of Texas at Austin, November 2008.
+  <a href="http://www.ices.utexas.edu/research/reports/2008/0829.pdf">http://www.ices.utexas.edu/research/reports/2008/0829.pdf</a>.<br />
+<pre>
+@TechReport{Hawkins_2008,
+  author      = {A.~Hawkins and J.~T.~Oden},
+  title       = {{Toward a predictive model of tumor growth}},
+  institution = {Institute for Computational Engineering and Sciences (ICES),
+                 The University of Texas at Austin},
+  day         = {20},
+  month       = {November},
+  year        = {2008},
+  note        = {\url{http://www.ices.utexas.edu/research/reports/2008/0829.pdf}}
+}
+</pre>
+</li>
+  
+
+<li>
+M.&nbsp;F. Barone, D.&nbsp;J. Segalman, H.&nbsp;Thornquist, and I.&nbsp;Kalashnikova.
+  Galerkin reduced order models for compressible flow with structural
+  interaction.
+  In <em>46th AIAA Aerospace Sciences Meeting and Exhibit</em>, Reno, NV,
+  2008.
+  <a href="http://www.stanford.edu/~irinak/reno08.pdf">http://www.stanford.edu/~irinak/reno08.pdf</a>.<br />
+<pre>
+@Conference{Barone_2008,
+  author    = {M.~F.~Barone and D.~J.~Segalman and H.~Thornquist and I.~Kalashnikova},
+  title     = {Galerkin reduced order models for compressible flow with structural interaction},
+  booktitle = {46th AIAA Aerospace Sciences Meeting and Exhibit},
+  address   = {Reno, NV},
+  year      = {2008},
+  note      = {\url{http://www.stanford.edu/~irinak/reno08.pdf}}
+}
+</pre>
+</li>
+  
+
+<li>
 E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
   Topology optimization with adaptive mesh refinement.
   In J.&nbsp;F. Abel and J.&nbsp;R. Cooke, editors, <em>Proceedings of the 6th
@@ -949,7 +1029,40 @@ V.&nbsp;S. Mahadevan and J.&nbsp;C. Ragusa.
 
 
 <h2>2007</h2>
+<!--
+<li>
+<pre>
+</pre>
+</li>
+-->  
+
+
 <ol>
+
+
+<li>
+  J.&nbsp;Steensland and J.&nbsp;W. Peterson.
+  A Study of Dynamically Adaptive Partitioning for AMR.
+  In <em>Proceedings of the 2007 International Conference on Parallel
+  and Distributed Processing Techniques and Applications (PDPTA'07) Volume 2</em>,
+  pages 503-509, Las Vegas, NV, June 25-28 2007. CSREA Press.
+  ISBN: 1-60132-021-3.<br />
+<pre>
+@InProceedings{Steensland_2007,
+  author = {J.~Steensland and J.~W.~Peterson},
+  title = {{A Study of Dynamically Adaptive Partitioning for AMR}},
+  booktitle = {{Proceedings of the 2007 International Conference on Parallel and
+                Distributed Processing Techniques and Applications (PDPTA'07)
+		Volume 2}},
+  month     = {June 25--28},
+  pages     = {503--509},
+  address   = {Las Vegas, NV},
+  publisher = {CSREA Press},
+  year      = {2007},
+  note      = {ISBN: 1-60132-021-3}
+}
+</pre>
+</li>
 
 <li>
 K.&nbsp;Nam and M.&nbsp;M. Aral.
