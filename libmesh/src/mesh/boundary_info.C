@@ -194,7 +194,7 @@ void BoundaryInfo::sync (BoundaryMesh& boundary_mesh,
   boundary_mesh.partitioner().reset(NULL);
 
   // Trim any un-used nodes from the Mesh
-  boundary_mesh.prepare_for_use();
+  boundary_mesh.prepare_for_use(/*skip_renumber =*/ false);
 }
 
 
@@ -301,7 +301,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
   boundary_mesh.partitioner().reset(NULL);
   
   // Trim any un-used nodes from the Mesh
-  boundary_mesh.prepare_for_use();
+  boundary_mesh.prepare_for_use(/*skip_renumber =*/ false);
 
   // and finally distribute element partitioning to the nodes
   Partitioner::set_node_processor_ids(boundary_mesh);

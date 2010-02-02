@@ -330,7 +330,7 @@ void UnstructuredMesh::all_first_order ()
   STOP_LOG("all_first_order()", "Mesh");
 
   // delete or renumber nodes, etc
-  this->prepare_for_use();
+  this->prepare_for_use(/*skip_renumber =*/ false);
 }
 
 
@@ -615,7 +615,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
     }
 
   // renumber nodes, elements etc
-  this->prepare_for_use();
+  this->prepare_for_use(/*skip_renumber =*/ false);
 }
 
 
@@ -983,7 +983,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   
 
   // Prepare the newly created mesh for use.
-  mesh.prepare_for_use();
+  mesh.prepare_for_use(/*skip_renumber =*/ false);
 
   // Let the new_elements and new_bndry_elements vectors go out of scope.
 }
@@ -1270,7 +1270,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 				 saved_bc_ids[e]);
 
   // Trim unused and renumber nodes and elements
-  mesh.prepare_for_use();
+  mesh.prepare_for_use(/*skip_renumber =*/ false);
 }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
