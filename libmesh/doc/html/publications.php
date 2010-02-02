@@ -157,6 +157,51 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 -->  
 <ol>
 
+<li>
+M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&nbsp;Romano,
+  G.&nbsp;Penazzi, and A.&nbsp;Di Carlo.
+  TiberCAD: towards multiscale simulation of optoelectronic devices.
+  <em>Optical and Quantum Electronics</em>, 40(14):1077-1083, 2009.
+  <a href="http://dx.doi.org/10.1007/s11082-009-9272-7">http://dx.doi.org/10.1007/s11082-009-9272-7</a>.<br />
+<pre>
+@Article{AufderMaur_2009b,
+   author = {M.~{Auf der Maur} and M.~Povolotskyi and F.~Sacconi and
+             A.~Pecchia and G.~Romano and G.~Penazzi and A.~{Di Carlo}},
+    title = {{TiberCAD: towards multiscale simulation of optoelectronic devices}},
+    pages = {1077--1083},
+     year = 2009,
+  journal = {Optical and Quantum Electronics},
+   volume = {40},
+   number = {14},
+     note = {\url{http://dx.doi.org/10.1007/s11082-009-9272-7}}
+}
+</pre>
+</li>
+
+<li>
+M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&nbsp;Penazzi,
+  A.&nbsp;Pecchia, and A.&nbsp;Di Carlo.
+  Multiscale-multiphysics simulation of nanostructured devices: the
+  TiberCAD project.
+  In <em>13th International Workshop on Computational Electronics
+  (IWCE '09)</em>. Institute of Electrical and Electronic Engineers (IEEE), May
+  27-29 2009.
+  <a href="http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf?arnumber=5091126">http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf?arnumber=5091126</a>.<br />
+<pre>
+@InProceedings{AufderMaur_2009,
+  author     = {M.~{Auf der Maur} and M.~Povolotskyi and F.~Sacconi and
+                G.~Romano and G.~Penazzi and A.~Pecchia and A.~{Di Carlo}},
+  title      = {{Multiscale-multiphysics simulation of nanostructured devices:
+                 the TiberCAD project}},
+  booktitle  = {{13th International Workshop on Computational Electronics (IWCE '09)}},
+  publisher  = {Institute of Electrical and Electronic Engineers (IEEE)},
+  month      = {May 27--29},
+  year       = {2009},
+  note       = {\url{http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf?arnumber=5091126}}
+} 
+</pre>
+</li>
+
 
 <li>
 P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
