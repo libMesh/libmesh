@@ -158,6 +158,132 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 <ol>
 
 
+<li>
+B.&nbsp;S. Kirk.
+  Adiabatic shock capturing in perfect gas hypersonic flows.
+  <em>International Journal for Numerical Methods in Fluids</em>, 2009.
+  <a href="http://dx.doi.org/10.1002/fld.2195">http://dx.doi.org/10.1002/fld.2195</a>.<br />
+<pre>
+@Article{Kirk_2009b,
+   author = {B.~S.~Kirk},
+    title = {{Adiabatic shock capturing in perfect gas hypersonic flows}},
+  journal = {International Journal for Numerical Methods in Fluids},
+     year = 2009,
+     note = {\url{http://dx.doi.org/10.1002/fld.2195}}
+}
+</pre>
+</li>
+
+
+<li>
+H.&nbsp;Class et&nbsp;al.
+  A benchmark study on problems related to CO2 storage in geologic
+  formations.
+  <em>Computational Geosciences</em>, 13(4):409-434, December 2009.
+  <a href="http://dx.doi.org/10.1007/s10596-009-9146-x">http://dx.doi.org/10.1007/s10596-009-9146-x</a>.<br />
+<pre>
+@Article{Class_2009,
+   author = {H.~Class and others},
+    title = {{A benchmark study on problems related to CO2 storage in geologic formations}},
+  journal = {Computational Geosciences},
+     year = 2009,
+   volume = 13,
+   number = 4,
+    pages = {409--434},
+    month = {December},
+     note = {\url{http://dx.doi.org/10.1007/s10596-009-9146-x}}
+}
+</pre>
+</li>
+
+
+<li>
+D.&nbsp;J. Knezevic and E.&nbsp;Süli.
+  A heterogeneous alternating-direction method for a micro-macro
+  dilute polymeric fluid model.
+  <em>European Series in Applied and Industrial Mathematics:
+  Mathematical Modelling and Numerical Analysis</em>, 43(6):1117-1156, November
+  2009.
+  <a href="http://dx.doi.org/10.1051/m2an/2009034">http://dx.doi.org/10.1051/m2an/2009034</a>.<br />
+<pre>
+@Article{Knezevic_2009d,
+   author = {D.~J.~Knezevic and E.~S\"{u}li},
+    title = {{A heterogeneous alternating-direction method
+            for a micro-macro dilute polymeric fluid model}},
+     note = {\url{http://dx.doi.org/10.1051/m2an/2009034}},
+  journal = {European Series in Applied and Industrial Mathematics:
+             Mathematical Modelling and Numerical Analysis},
+     year = 2009,
+   volume = 43,
+   number = 6,
+    pages = {1117--1156},
+    month = {November}
+}
+</pre>
+</li>
+
+
+<li>
+N.&nbsp;M. Abukhdeir and A.&nbsp;D. Rey.
+  Shape-dynamic growth, structure, and elasticity of homogeneously
+  oriented spherulites in an isotropic/smectic-A mesophase transition.
+  <em>PREPRINT, Submitted to Liquid Crystals</em>, 2009.
+  <a href="http://arxiv.org/abs/0902.1544">http://arxiv.org/abs/0902.1544</a>.<br />
+<pre>
+@Article{Abukhdeir_2009,
+   author = {N.~M.~Abukhdeir and A.~D.~Rey},
+    title = {{Shape-dynamic growth, structure, and elasticity of homogeneously 
+              oriented spherulites in an isotropic/smectic-A mesophase transition}},
+  journal = {PREPRINT, Submitted to Liquid Crystals},
+     year = 2009,
+     note = {\url{http://arxiv.org/abs/0902.1544}}
+}
+</pre>
+</li>
+
+<li>
+D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
+  A certified reduced basis method for the Fokker-Planck equation of
+  dilute polymeric fluids: FENE dumbbells in extensional flow.
+  <em>PREPRINT, Submitted to SIAM Journal on Scientific Computing</em>,
+  2009.
+  <a href="http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf">http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf</a>.<br />
+<pre>
+@Article{Knezevic_2009c,
+   author = {D.~J.~Knezevic and A.~T.~Patera},
+    title = {{A certified reduced basis method for the 
+              Fokker-Planck equation of dilute polymeric fluids: 
+              FENE dumbbells in extensional flow}},
+  journal = {PREPRINT, Submitted to SIAM Journal on Scientific Computing},
+     year = 2009,
+     note = {\url{http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf}}
+}
+</pre>
+</li>
+
+<li>
+Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
+  A parallel adaptive finite element method for the simulation of
+  photon migration with the radiative-transfer-based model.
+  <em>Communications in Numerical Methods in Engineering</em>,
+  25(6):751-770, 2009.
+  <a href="http://dx.doi.org/10.1002/cnm.1167">http://dx.doi.org/10.1002/cnm.1167</a>.<br />
+<pre>
+@Article{Lu_2009b,
+   author = {Y.~Lu and A.~F.~Chatziioannou},
+    title = {{A parallel adaptive finite element method for the
+              simulation of photon migration with the radiative-transfer-based model}},
+  journal = {Communications in Numerical Methods in Engineering},
+     year = 2009,
+   volume = 25,
+   number = 6,
+    pages = {751--770},
+     note = {\url{http://dx.doi.org/10.1002/cnm.1167}}
+}
+</pre>
+</li>
+  
+
 
 <li>
 D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
