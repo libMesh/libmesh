@@ -310,13 +310,7 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
   // solutions.
   // 
   // We don't want to deal with either of these ambiguous cases here...
-  if (this->m() != this->n())
-    {
-      std::cout << "Error! LU solve only works for square matrices!"
-		<< std::endl;
-      libmesh_error();
-    }
-
+  libmesh_assert (this->m() == this->n());
 
   switch(this->_decomposition_type)
     {
