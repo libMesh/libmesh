@@ -431,10 +431,20 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  // Now we have fully assembled the projection system
 	  // for this patch.  Project the gradient components.
 	  // MAY NEED TO USE PARTIAL PIVOTING!
-	  Kp.lu_solve(F, Pu_h);
-	  Kp.lu_solve (Fx, Pu_x_h);
-	  Kp.lu_solve (Fy, Pu_y_h);
-	  Kp.lu_solve (Fz, Pu_z_h);
+          if (error_estimator.error_norm.type(var) == L2 ||
+              error_estimator.error_norm.type(var) == L_INF)
+            {
+	      Kp.lu_solve(F, Pu_h);
+            }
+          if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+              error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+              error_estimator.error_norm.type(var) == H2_SEMINORM ||
+              error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
+            {
+	      Kp.lu_solve (Fx, Pu_x_h);
+	      Kp.lu_solve (Fy, Pu_y_h);
+	      Kp.lu_solve (Fz, Pu_z_h);
+            }
           if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
