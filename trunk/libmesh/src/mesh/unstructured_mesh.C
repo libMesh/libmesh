@@ -168,7 +168,7 @@ void UnstructuredMesh::copy_nodes_and_elements
   }
   
   //Finally prepare the Mesh for use
-  this->prepare_for_use();
+  this->prepare_for_use(/*skip_renumber =*/false);
 }
  
  
@@ -941,7 +941,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
   
 
   // Prepare the new_mesh for use
-  new_mesh.prepare_for_use();
+  new_mesh.prepare_for_use(/*skip_renumber =*/false);
   
 }
 

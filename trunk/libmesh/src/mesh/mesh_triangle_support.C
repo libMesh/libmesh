@@ -275,7 +275,7 @@ void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
     }
 
   // Prepare mesh for usage.
-  mesh_output.prepare_for_use();
+  mesh_output.prepare_for_use(/*skip_renumber =*/false);
 }
 
 

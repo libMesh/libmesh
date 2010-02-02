@@ -1321,7 +1321,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
   
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use ();  
+  mesh.prepare_for_use (/*skip_renumber =*/ false);  
 }
 
 
@@ -1720,7 +1720,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
   
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use();
+  mesh.prepare_for_use(/*skip_renumber =*/ false);
 }
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
