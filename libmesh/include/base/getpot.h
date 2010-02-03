@@ -48,14 +48,15 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 }
-#include <string>
-#include <vector>
-#include <algorithm>
 
+#include <algorithm>
 #include <fstream>
-#include <sstream>
 #include <iostream> // not every compiler distribution includes <iostream> 
 //                  // with <fstream>
+#include <set>
+#include <sstream>
+#include <string>
+#include <vector>
 
 typedef  std::vector<std::string>  STRING_VECTOR;
 
@@ -116,20 +117,30 @@ public:
     //     -- scalar values
     template<typename T>
     inline T               operator()(const char* VarName, const T&    Default) const;
+    template<typename T>
+    inline T               operator()(const std::string& VarName, const T&    Default) const;
     inline const char*     operator()(const char* VarName, const char* Default) const;
+    inline const char*     operator()(const std::string& VarName, const char* Default) const;
     //     -- vectors
     template<typename T>
     inline T               operator()(const char* VarName, const T&    Default, unsigned Idx) const;
+    template<typename T>
+    inline T               operator()(const std::string& VarName, const T&    Default, unsigned Idx) const;
     inline const char*     operator()(const char* VarName, const char* Default, unsigned Idx) const;
+    inline const char*     operator()(const std::string& VarName, const char* Default, unsigned Idx) const;
 
     //     -- setting variables
     //                  i) from outside of GetPot (considering prefix etc.)
     //                  ii) from inside, use '__set_variable()' below
     template<typename T>
     inline void            set(const char* VarName, const T& Value, const bool Requested = true);
+    template<typename T>
+    inline void            set(const std::string& VarName, const T& Value, const bool Requested = true);
     inline void            set(const char* VarName, const char* Value, const bool Requested = true);
+    inline void            set(const std::string& VarName, const char* Value, const bool Requested = true);
     
     inline unsigned        vector_variable_size(const char* VarName) const;
+    inline unsigned        vector_variable_size(const std::string& VarName) const;
     inline STRING_VECTOR   get_variable_names() const;
     inline STRING_VECTOR   get_section_names() const;
     
@@ -255,7 +266,7 @@ private:
 
     //     -- some functions return a char pointer to a temporarily existing string
     //        this container makes them 'available' until the getpot object is destroyed.
-    mutable std::vector<char*>    __internal_string_container;
+    mutable std::set<std::string> __internal_string_container;
 
     //     -- some functions return a char pointer to a temporarily existing string
     //        this function adds them to our container
@@ -481,9 +492,10 @@ GetPot::GetPot(const GetPot& Other)
 inline
 GetPot::~GetPot()
 { 
-    // may be some return strings had to be created, delete now !
-    victorate(char*, __internal_string_container, it)
-	delete [] *it;	
+    // std::set and std::string handle their own destruction now
+    // // may be some return strings had to be created, delete now !
+    // victorate(char*, __internal_string_container, it)
+	// delete [] *it;	
 }
 
 inline GetPot&
@@ -885,10 +897,7 @@ GetPot::__convert_to_type<bool>(const std::string& String, const bool& Default) 
 inline const char*
 GetPot::__internal_managed_copy(const std::string& Arg) const
 {
-    char *result = new char[Arg.length()+1];
-    strncpy(result, Arg.c_str(), Arg.length()+1);
-    __internal_string_container.push_back(result);
-    return result;
+    return __internal_string_container.insert(Arg).first->c_str();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1262,6 +1271,12 @@ GetPot::have_variable(const char* VarName) const
     return true;
 }
 
+inline bool
+GetPot::have_variable(const std::string& VarName) const
+{
+    return have_variable(VarName.c_str());
+}
+
 template <typename T>
 inline T
 GetPot::operator()(const char* VarName, const T& Default) const
@@ -1272,10 +1287,23 @@ GetPot::operator()(const char* VarName, const T& Default) const
     return __convert_to_type(sv->original, Default);
 }
 
+template <typename T>
+inline T
+GetPot::operator()(const std::string& VarName, const T& Default) const
+{
+    return operator()(VarName.c_str(), Default);
+}
+
 inline const char*
 GetPot::operator()(const char* VarName, const char* Default) const
 {
     return __internal_managed_copy(operator()(VarName, std::string(Default)));
+}
+
+inline const char*
+GetPot::operator()(const std::string& VarName, const char* Default) const
+{
+    return operator()(VarName.c_str(), Default);
 }
 
 template <typename T>
@@ -1290,10 +1318,23 @@ GetPot::operator()(const char* VarName, const T& Default, unsigned int Idx) cons
     return __convert_to_type(*element, Default);
 }
 
+template <typename T>
+inline T
+GetPot::operator()(const std::string& VarName, const T& Default, unsigned int Idx) const
+{
+    return operator()(VarName.c_str(), Default, Idx);
+}
+
 inline const char*
 GetPot::operator()(const char* VarName, const char* Default, unsigned int Idx) const
 {
     return __internal_managed_copy(operator()(VarName, std::string(Default), Idx));
+}
+
+inline const char*
+GetPot::operator()(const std::string& VarName, const char* Default, unsigned int Idx) const
+{
+    return operator()(VarName.c_str(), Default, Idx);
 }
 
 inline void 
@@ -1345,10 +1386,23 @@ GetPot::set(const char* VarName, const T& Value, const bool /* Requested = yes *
   __set_variable(VarName, string_value.str().c_str());
 }
 
+template <typename T>
+inline void
+GetPot::set(const std::string& VarName, const T& Value, const bool /* Requested = yes */)
+{
+    set(VarName.c_str(), Value);
+}
+
 inline void
 GetPot::set(const char* VarName, const char* Value, const bool /* Requested = yes */)
 {
   __set_variable(VarName, Value);
+}
+
+inline void
+GetPot::set(const std::string& VarName, const char* Value, const bool /* Requested = yes */)
+{
+    set(VarName.c_str(), Value);
 }
 
 inline unsigned
@@ -1357,6 +1411,12 @@ GetPot::vector_variable_size(const char* VarName) const
     const variable*  sv = __find_variable(VarName);
     if( sv == 0 ) return 0;
     return sv->value.size();
+}
+
+inline unsigned
+GetPot::vector_variable_size(const std::string& VarName) const
+{
+    return vector_variable_size(VarName.c_str());
 }
 
 inline STRING_VECTOR
