@@ -288,6 +288,25 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 -->  
 <ol>
 
+<li>
+M.&nbsp;F. Barone, I.&nbsp;Kalashnikova, M.&nbsp;R. Brake, and D.&nbsp;J. Segalman.
+  Reduced order modeling of fluid/structure interaction.
+  Technical Report SAND2009-7189, Sandia National Laboratories,
+  September 2009.
+  <a href="http://www.stanford.edu/~irinak/rom_ldrd_sand.pdf">
+    http://www.stanford.edu/~irinak/rom_ldrd_sand.pdf</a>.<br />
+<pre>
+@TechReport{Barone_2009b,
+  author      = {M.~F.~Barone and I.~Kalashnikova and M.~R.~Brake and D.~J.~Segalman},
+  title       = {{Reduced order modeling of fluid/structure interaction}},
+  institution = {Sandia National Laboratories},
+  month       = {September},
+  year        = {2009},
+  number      = {SAND2009-7189},
+  note        = {\url{http://www.stanford.edu/~irinak/rom_ldrd_sand.pdf}}
+}
+</pre>
+</li>
 
 <li>
 M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
