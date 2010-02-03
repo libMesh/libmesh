@@ -81,26 +81,157 @@ University of Oxford, Balliol College, 2008.
 <br>
 <h1>Publications utilizing libMesh</h1>
 
-<h2>2010</h2>
-<ol>
-
+<h2>Preprints</h2>
+<!--
 <li>
-M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
-  Advances on 3D geoelectric forward solver techniques.
-  <em>Int. J. Geophysics</em>, 2010.
-  <a href="http://uma.ensta.fr/var/files/publis/2009/2009-art-uma976-BlomeMaurerSchmidt2009.pdf">http://uma.ensta.fr/var/files/publis/2009/2009-art-uma976-BlomeMaurerSchmidt2009.pdf</a>.<br />
 <pre>
-@Article{Blome_2010,
-   author = {M.~Blome and H.~R.~Maurer and K.~Schmidt},
-    title = {{Advances on 3D geoelectric forward solver techniques}},
-  journal = {Int. J. Geophysics},
-     year = 2010,
-   volume = PREPRINT,
-     note = {\url{http://uma.ensta.fr/var/files/publis/2009/2009-art-uma976-BlomeMaurerSchmidt2009.pdf}}
+</pre>
+</li>
+-->  
+
+<ol>
+  
+<li>
+L.&nbsp;Nagler and M.&nbsp;Schanz.
+  An extendable poroelastic plate formulation in dynamics.
+  <em>PREPRINT, Submitted to Archive of Applied Mechanics</em>, 2009.
+ 
+  <a href="http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf">
+    http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf</a>.<br />
+<pre>
+@Article{Nagler_2009,
+   author = {L.~Nagler and M.~Schanz},
+    title = {{An extendable poroelastic plate formulation in dynamics}},
+  journal = {PREPRINT, Submitted to Archive of Applied Mechanics},
+     year = 2009,
+     note = {\url{http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf}}
 }
 </pre>
 </li>
 
+
+
+<li>
+D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
+  A certified reduced basis method for the Fokker-Planck equation of
+  dilute polymeric fluids: FENE dumbbells in extensional flow.
+  <em>PREPRINT, Submitted to SIAM Journal on Scientific Computing</em>,
+  2009.
+  <a href="http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf">
+    http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf</a>.<br />
+<pre>
+@Article{Knezevic_2009c,
+   author = {D.~J.~Knezevic and A.~T.~Patera},
+    title = {{A certified reduced basis method for the 
+              Fokker-Planck equation of dilute polymeric fluids: 
+              FENE dumbbells in extensional flow}},
+  journal = {PREPRINT, Submitted to SIAM Journal on Scientific Computing},
+     year = 2009,
+     note = {\url{http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf}}
+}
+</pre>
+</li>
+
+
+
+<li>
+N.&nbsp;M. Abukhdeir and A.&nbsp;D. Rey.
+  Shape-dynamic growth, structure, and elasticity of homogeneously
+  oriented spherulites in an isotropic/smectic-A mesophase transition.
+  <em>PREPRINT, Submitted to Liquid Crystals</em>, 2009.
+  <a href="http://arxiv.org/abs/0902.1544">http://arxiv.org/abs/0902.1544</a>.<br />
+<pre>
+@Article{Abukhdeir_2009,
+   author = {N.~M.~Abukhdeir and A.~D.~Rey},
+    title = {{Shape-dynamic growth, structure, and elasticity of homogeneously 
+              oriented spherulites in an isotropic/smectic-A mesophase transition}},
+  journal = {PREPRINT, Submitted to Liquid Crystals},
+     year = 2009,
+     note = {\url{http://arxiv.org/abs/0902.1544}}
+}
+</pre>
+</li>
+
+
+<li>
+D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
+  Reduced basis approximation and a posteriori error estimation for
+  the parametrized unsteady Boussinesq equations.
+  <em>PREPRINT, Submitted to Mathematical Models and Methods in
+  Applied Sciences</em>, 2009.
+  <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf">
+    http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf</a>.<br />
+<pre>
+@Article{Knezevic_2009b,
+   author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
+    title = {{Reduced basis approximation and a posteriori 
+              error estimation for the parametrized unsteady 
+              Boussinesq equations}},
+  journal = {PREPRINT, Submitted to Mathematical Models and Methods in Applied Sciences},
+     year = 2009,
+     note = {\url{http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf}}
+}
+</pre>
+</li>
+
+
+
+<li>
+P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
+  Analysis and visualization of the glass eel behavior (Anguilla
+  anguilla) in the Adour estuary and estimate of its upstream migration speed.
+  <em>Aquatic Living Resources</em>, 2009.
+  <a href="http://dx.doi.org/10.1051/alr/2009041">http://dx.doi.org/10.1051/alr/2009041</a>.<br />
+<pre>
+@Article{Prouet_2009,
+  author = {P.~Prouzet and M.~Odunlami and E.~Duquesne and A.~Boussouar},
+   title = {{Analysis and visualization of the glass
+             eel behavior (Anguilla anguilla) in the Adour estuary
+             and estimate of its upstream migration speed}},
+     note = {\url{http://dx.doi.org/10.1051/alr/2009041}},
+  journal = {Aquatic Living Resources},
+     year = 2009,
+   volume = PREPRINT
+}
+</pre>
+</li>
+</ol>
+
+
+<h2>2010</h2>
+<!--
+<li>
+<pre>
+</pre>
+</li>
+-->  
+
+
+<ol>
+
+
+<li>
+G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
+  Multiscale and hysteresis effects in vortex pattern simulations for
+  Ginzburg-Landau problems.
+  <em>International Journal for Numerical Methods in Engineering</em>,
+  81(7):866-891, 2010.
+  <a href="http://dx.doi.org/10.1002/nme.2714">http://dx.doi.org/10.1002/nme.2714</a>.<br />
+<pre>
+@Article{Carey_2010,
+   author = {G.~F.~Carey and D.~J.~Knezevic},
+    title = {{Multiscale and hysteresis effects in vortex
+              pattern simulations for Ginzburg-Landau problems}},
+  journal = {International Journal for Numerical Methods in Engineering},
+     year = 2010,
+   volume = 81,
+   number = 7,
+    pages = {866--891},
+     note = {\url{http://dx.doi.org/10.1002/nme.2714}}
+}
+</pre>
+</li>
+  
 
 <li>
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
@@ -157,6 +288,25 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 -->  
 <ol>
 
+
+<li>
+M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
+  Advances on 3D geoelectric forward solver techniques.
+  <em>Geophysical Journal International</em>, 176(3):740-752, 2009.
+  <a href="http:dx.doi.org/10.1111/j.1365-246X.2008.04006.x">http:dx.doi.org/10.1111/j.1365-246X.2008.04006.x</a>.<br />
+<pre>
+@Article{Blome_2009,
+   author = {M.~Blome and H.~R.~Maurer and K.~Schmidt},
+    title = {{Advances on 3D geoelectric forward solver techniques}},
+  journal = {Geophysical Journal International},
+     year = 2009,
+   volume = 176,
+   number = 3,
+    pages = {740--752},
+     note = {\url{http:dx.doi.org/10.1111/j.1365-246X.2008.04006.x}}
+}
+</pre>
+</li>
 
 <li>
 B.&nbsp;S. Kirk.
@@ -223,43 +373,7 @@ D.&nbsp;J. Knezevic and E.&nbsp;Süli.
 </li>
 
 
-<li>
-N.&nbsp;M. Abukhdeir and A.&nbsp;D. Rey.
-  Shape-dynamic growth, structure, and elasticity of homogeneously
-  oriented spherulites in an isotropic/smectic-A mesophase transition.
-  <em>PREPRINT, Submitted to Liquid Crystals</em>, 2009.
-  <a href="http://arxiv.org/abs/0902.1544">http://arxiv.org/abs/0902.1544</a>.<br />
-<pre>
-@Article{Abukhdeir_2009,
-   author = {N.~M.~Abukhdeir and A.~D.~Rey},
-    title = {{Shape-dynamic growth, structure, and elasticity of homogeneously 
-              oriented spherulites in an isotropic/smectic-A mesophase transition}},
-  journal = {PREPRINT, Submitted to Liquid Crystals},
-     year = 2009,
-     note = {\url{http://arxiv.org/abs/0902.1544}}
-}
-</pre>
-</li>
 
-<li>
-D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
-  A certified reduced basis method for the Fokker-Planck equation of
-  dilute polymeric fluids: FENE dumbbells in extensional flow.
-  <em>PREPRINT, Submitted to SIAM Journal on Scientific Computing</em>,
-  2009.
-  <a href="http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf">http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf</a>.<br />
-<pre>
-@Article{Knezevic_2009c,
-   author = {D.~J.~Knezevic and A.~T.~Patera},
-    title = {{A certified reduced basis method for the 
-              Fokker-Planck equation of dilute polymeric fluids: 
-              FENE dumbbells in extensional flow}},
-  journal = {PREPRINT, Submitted to SIAM Journal on Scientific Computing},
-     year = 2009,
-     note = {\url{http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf}}
-}
-</pre>
-</li>
 
 <li>
 Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
@@ -285,42 +399,7 @@ Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
   
 
 
-<li>
-D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
-  Reduced basis approximation and a posteriori error estimation for
-  the parametrized unsteady Boussinesq equations.
-  <em>PREPRINT, Submitted to Mathematical Models and Methods in
-  Applied Sciences</em>, 2009.
-  <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf</a>.<br />
-<pre>
-@Article{Knezevic_2009b,
-   author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
-    title = {{Reduced basis approximation and a posteriori 
-              error estimation for the parametrized unsteady 
-              Boussinesq equations}},
-  journal = {PREPRINT, Submitted to Mathematical Models and Methods in Applied Sciences},
-     year = 2009,
-     note = {\url{http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf}}
-}
-</pre>
-</li>
   
-<li>
-L.&nbsp;Nagler and M.&nbsp;Schanz.
-  An extendable poroelastic plate formulation in dynamics.
-  <em>PREPRINT, Submitted to Archive of Applied Mechanics</em>, 2009.
- 
-  <a href="http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf">http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf</a>.<br />
-<pre>
-@Article{Nagler_2009,
-   author = {L.~Nagler and M.~Schanz},
-    title = {{An extendable poroelastic plate formulation in dynamics}},
-  journal = {PREPRINT, Submitted to Archive of Applied Mechanics},
-     year = 2009,
-     note = {\url{http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf}}
-}
-</pre>
-</li>
   
 <li>
 M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&nbsp;Romano,
@@ -368,25 +447,6 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&n
 </li>
 
 
-<li>
-P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
-  Analysis and visualization of the glass eel behavior (Anguilla
-  anguilla) in the Adour estuary and estimate of its upstream migration speed.
-  <em>Aquatic Living Resources</em>, 2009.
-  <a href="http://dx.doi.org/10.1051/alr/2009041">http://dx.doi.org/10.1051/alr/2009041</a>.<br />
-<pre>
-@Article{Prouet_2009,
-  author = {P.~Prouzet and M.~Odunlami and E.~Duquesne and A.~Boussouar},
-   title = {{Analysis and visualization of the glass
-             eel behavior (Anguilla anguilla) in the Adour estuary
-             and estimate of its upstream migration speed}},
-     note = {\url{http://dx.doi.org/10.1051/alr/2009041}},
-  journal = {Aquatic Living Resources},
-     year = 2009,
-   volume = PREPRINT
-}
-</pre>
-</li>
   
 <li>
 Yujie Lu, Hidevaldo&nbsp;B. Machado, Ali Douraghy, David Stout, Harvey Herschman,
@@ -1473,19 +1533,8 @@ Volume 195, Issues 44-47, Pages 6463-6478, 2006.
 <h2>2005</h2>
 <ol>
 
-<li>
-Paul Simedrea, Luca Antiga, and David A. Steinman,
-<i>Towards a New Framework for Simulating Magnetic Resonance Imaging.</i>
-<a href="http://cscbc2006.cs.queensu.ca/assets/documents/Papers/paper108.pdf">
-First Canadian Student Conference on Biomedical Computing (CSCBC)</a>, 2005
-</li>
 
 
-<li>
-Jose Camata, Alvaro Coutinho, and Graham Carey,
-<i>Numerical Evaluation of the LCD Method Implemented in the libMesh Library.</i>
-<a href="http://www.inf.ufes.br/~avalli/papers/2005/CIL-0692.pdf.gz">CILAMCE</a> 2005.
-</li>
 
 <li>
 G.&nbsp;F. Carey, W.&nbsp;Barth, B.&nbsp;Kirk, and J.&nbsp;W. Peterson.
