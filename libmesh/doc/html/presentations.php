@@ -47,6 +47,7 @@
     <ul>
       <li> <a href="http://octmesh.forja.rediris.es/octmesh-cedya.pdf">OctMesh: a finite elements tool kit for Octave</a>, J. Rafael Rodríguez Galván, 2007</li>
     </ul>
+    
 </ul>
 
 
@@ -107,6 +108,17 @@
   7th World Congress on Computational Mechanics, Los Angeles,
   California, July 16-22, 2006.
   </li>
+<li>
+Paul Simedrea, Luca Antiga, and David A. Steinman,
+<i>Towards a New Framework for Simulating Magnetic Resonance Imaging.</i>
+<a href="http://cscbc2006.cs.queensu.ca/assets/documents/Papers/paper108.pdf">
+First Canadian Student Conference on Biomedical Computing (CSCBC)</a>, 2005
+</li>
+<li>
+Jose Camata, Alvaro Coutinho, and Graham Carey,
+<i>Numerical Evaluation of the LCD Method Implemented in the libMesh Library.</i>
+<a href="http://www.inf.ufes.br/~avalli/papers/2005/CIL-0692.pdf.gz">CILAMCE</a> 2005.
+</li>
   
 </ul>
 
