@@ -11189,6 +11189,10 @@ src/utils/string_to_enum.$(obj-suffix):\
     include/enums/enum_preconditioner_type.h\
     include/enums/enum_quadrature_type.h\
     include/utils/string_to_enum.h
+src/utils/timestamp.$(obj-suffix):\
+    src/utils/timestamp.C\
+    include/base/libmesh_config.h\
+    include/utils/timestamp.h
 src/utils/tree.$(obj-suffix):\
     src/utils/tree.C\
     include/base/auto_ptr.h\
