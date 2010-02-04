@@ -31,7 +31,7 @@
 
 // Local includes
 #include "perf_log.h"
-
+#include "timestamp.h"
 
 
 // ------------------------------------------------------------
@@ -95,20 +95,7 @@ std::string PerfLog::get_info_header() const
   
   if (log_events)
     {
-
-#ifdef LIBMESH_HAVE_LOCALE
-      OStringStream  dateStr;
-      time_t tm         = time(NULL);
-      struct tm* tmb    = localtime(&tm);
-      std::locale loc;
-      TimeIter            begin(dateStr);
-      const TimePut& tp = std::use_facet<TimePut>(loc);
-      tp.put(begin,
-	     dateStr,
-	     dateStr.fill(),
-	     tmb,
-	     'c');
-#endif
+      std::string date = Utility::get_timestamp();
       
       // Get system information
       struct utsname sysInfo;
@@ -151,10 +138,7 @@ std::string PerfLog::get_info_header() const
 	  nprocs_stream  << "| Num Processors: " << libMesh::n_processors();
 	}
       
-#ifdef LIBMESH_HAVE_LOCALE						       
-      time_stream    << "| Time:           " << dateStr.str()          ; 
-#endif								       
-      
+      time_stream    << "| Time:           " << date                   ; 
       os_stream      << "| OS:             " << sysInfo.sysname        ; 
       host_stream    << "| HostName:       " << sysInfo.nodename       ; 
       osrel_stream   << "| OS Release:     " << sysInfo.release        ; 

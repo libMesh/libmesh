@@ -11041,7 +11041,8 @@ src/utils/perf_log.$(obj-suffix):\
     include/base/libmesh_exceptions.h\
     include/base/print_trace.h\
     include/utils/o_string_stream.h\
-    include/utils/perf_log.h
+    include/utils/perf_log.h\
+    include/utils/timestamp.h
 src/utils/plt_loader.$(obj-suffix):\
     src/utils/plt_loader.C\
     include/base/libmesh_base.h\
@@ -11265,6 +11266,7 @@ src/utils/utility.$(obj-suffix):\
     include/base/libmesh_exceptions.h\
     include/base/print_trace.h\
     include/utils/o_string_stream.h\
+    include/utils/timestamp.h\
     include/utils/utility.h
 src/utils/xdr_cxx.$(obj-suffix):\
     src/utils/xdr_cxx.C\
