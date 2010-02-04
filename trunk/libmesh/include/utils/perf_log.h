@@ -33,10 +33,6 @@
 #include <map>
 #include <sys/time.h>
 
-#ifdef LIBMESH_HAVE_LOCALE
-#include <locale>
-#endif
-
 // Forward Declarations
 // class OStringStream;
 
@@ -411,10 +407,5 @@ double PerfLog::get_elapsed_time () const
 
 
 
-// Typedefs we might need
-#ifdef LIBMESH_HAVE_LOCALE
-typedef std::ostreambuf_iterator<char, std::char_traits<char> > TimeIter;
-typedef std::time_put<char, TimeIter> TimePut;
-#endif
 
 #endif

@@ -27,14 +27,10 @@
 #include <unistd.h>
 #include <sys/utsname.h>
 
-#ifdef LIBMESH_HAVE_LOCALE
-# include <locale>
-#endif
-
 // Local includes
 #include "o_string_stream.h"
 #include "utility.h"
-
+#include "timestamp.h"
 
 
 //-----------------------------------------------------------------------
@@ -49,22 +45,7 @@ std::string Utility::system_info()
 {
   OStringStream out;
   
-#ifdef LIBMESH_HAVE_LOCALE
-    
-  typedef std::ostreambuf_iterator<char, std::char_traits<char> > TimeIter;
-  typedef std::time_put<char, TimeIter>                           TimePut;
- 
-  std::locale loc;
-  OStringStream dateStr;
-  std::ostreambuf_iterator<char, std::char_traits<char> > begin(dateStr);
-  time_t tm         = time(NULL);
-  struct tm* tmb    = localtime(&tm);
-  const TimePut& tp = std::use_facet<TimePut>(loc);
-  tp.put(begin,
-	 dateStr,
-	 dateStr.fill(),
-	 tmb,
-	 'c');
+  std::string date = Utility::get_timestamp();
   
   // Get system information
   struct utsname sysInfo;
@@ -74,7 +55,7 @@ std::string Utility::system_info()
   struct passwd* p = getpwuid(getuid());
   out << '\n'
       << " ---------------------------------------------------------------------\n"
-      << "| Time:           " << dateStr.str()    << '\n'
+      << "| Time:           " << date             << '\n'
       << "| OS:             " << sysInfo.sysname  << '\n'
       << "| HostName:       " << sysInfo.nodename << '\n'
       << "| OS Release      " << sysInfo.release  << '\n'
@@ -83,8 +64,6 @@ std::string Utility::system_info()
       << "| Username:       " << p->pw_name       << '\n' 
       << " ---------------------------------------------------------------------\n";
 
-#endif
-  
   return out.str();
 }
 
