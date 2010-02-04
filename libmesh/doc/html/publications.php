@@ -90,6 +90,25 @@ University of Oxford, Balliol College, 2008.
 -->  
 
 <ol>
+
+<li>
+Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
+  Nonlinear axisymmetric deformations of an elastic tube under
+  external pressure.
+  <em>PREPRINT</em>, 2009.
+  <a href="http://www.maths.gla.ac.uk/~xl/yz-xyl-rwo-Oct14-2009.pdf">
+    http://www.maths.gla.ac.uk/~xl/yz-xyl-rwo-Oct14-2009.pdf</a>.<br />
+<pre>
+@Article{Zhu_preprint,
+   author = {Y.~Zhu and X.~Y.~Luo and R.~W.~Ogden},
+    title = {{Nonlinear axisymmetric deformations of an
+              elastic tube under external pressure}},
+  journal = {PREPRINT},
+     year = 2009,
+     note = {\url{http://www.maths.gla.ac.uk/~xl/yz-xyl-rwo-Oct14-2009.pdf}}
+}
+</pre>
+</li>
   
 <li>
 L.&nbsp;Nagler and M.&nbsp;Schanz.
@@ -180,7 +199,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
 P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
   Analysis and visualization of the glass eel behavior (Anguilla
   anguilla) in the Adour estuary and estimate of its upstream migration speed.
-  <em>Aquatic Living Resources</em>, 2009.
+  <em>PREPRINT, Submitted to Aquatic Living Resources</em>, 2009.
   <a href="http://dx.doi.org/10.1051/alr/2009041">http://dx.doi.org/10.1051/alr/2009041</a>.<br />
 <pre>
 @Article{Prouet_2009,
@@ -189,9 +208,8 @@ P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
              eel behavior (Anguilla anguilla) in the Adour estuary
              and estimate of its upstream migration speed}},
      note = {\url{http://dx.doi.org/10.1051/alr/2009041}},
-  journal = {Aquatic Living Resources},
-     year = 2009,
-   volume = PREPRINT
+  journal = {PREPRINT, Submitted to Aquatic Living Resources},
+     year = 2009
 }
 </pre>
 </li>
