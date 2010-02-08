@@ -119,7 +119,17 @@ Jose Camata, Alvaro Coutinho, and Graham Carey,
 <i>Numerical Evaluation of the LCD Method Implemented in the libMesh Library.</i>
 <a href="http://www.inf.ufes.br/~avalli/papers/2005/CIL-0692.pdf.gz">CILAMCE</a> 2005.
 </li>
-  
+
+<li>  A general <a href="howto/howto.pdf">HOWTO</a> document by M. Luthi containing some hints
+and programming tips for writing effective libMesh programs. </li>
+
+<li>  A <a href="xda_format/xda_format.pdf">description</a> of the XDA file format used by libMesh. </li>
+
+<li> Texas Advanced Computing Center <a href="http://www.tacc.utexas.edu/general/news/archive/20040112_01.php">press release</a> commemorating the launch of the Lonestar cluster. </li>
+
+<li>A <a href="http://ondrej.certik.cz/libmesh/fem.ps">description</a> of the Newmark System class by Ondrej Certik.</li>
+
+
 </ul>
 
 
