@@ -306,6 +306,31 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 -->  
 <ol>
 
+
+<li>
+S.&nbsp;Lu et&nbsp;al.
+  Multiscale Modeling in Rodent Ventricular Myocytes.
+  <em>IEEE Engineering in Medicine and Biology Magazine</em>,
+  28(2):46-57, March 2009.
+  <a href="http://www.ncbi.nlm.nih.gov/pubmed/19349251">http://www.ncbi.nlm.nih.gov/pubmed/19349251</a>.<br />
+<pre>
+@Article{S_Lu_2009,
+   author = {S.~Lu and others},
+    title = {{Multiscale Modeling in Rodent Ventricular Myocytes}},
+  journal = {IEEE Engineering in Medicine and Biology Magazine},
+     year = 2009,
+    month = {March},
+   volume = 28,
+   number = 2,
+    pages = {46--57},
+     note = {\url{http://www.ncbi.nlm.nih.gov/pubmed/19349251}}
+}
+</pre>
+</li>
+
+
+
+  
 <li>
 M.&nbsp;F. Barone, I.&nbsp;Kalashnikova, M.&nbsp;R. Brake, and D.&nbsp;J. Segalman.
   Reduced order modeling of fluid/structure interaction.
@@ -844,6 +869,51 @@ B.&nbsp;S. Kirk.
 
 
 <li>
+L.&nbsp;Antiga, M.&nbsp;Piccinelli, L.&nbsp;Botti, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and D.&nbsp;A.
+  Steinman.
+  An image-based modeling framework for patient-specific computational
+  hemodynamics.
+  <em>Medical and Biological Engineering and Computing</em>,
+  46(11):1097-1112, November 2008.
+  <a href="http://dx.doi.org/10.1007/s11517-008-0420-1">http://dx.doi.org/10.1007/s11517-008-0420-1</a>.<br />
+<pre>
+@Article{Antiga_2008,
+   author = {L.~Antiga and M.~Piccinelli and L.~Botti and B.~Ene-Iordache and A.~Remuzzi and D.~A.~Steinman},
+    title = {{An image-based modeling framework for patient-specific computational hemodynamics}},
+  journal = {Medical and Biological Engineering and Computing},
+     year = 2008,
+   volume = 46,
+   number = 11,
+    month = {November},
+    pages = {1097--1112},
+     note = {\url{http://dx.doi.org/10.1007/s11517-008-0420-1}}
+}
+</pre>
+</li>
+
+
+<li>
+M.&nbsp;Bhatia and E.&nbsp;Livnet.
+  Design-oriented thermostructural analysis with external and internal
+  radiation, Part 1: Steady state.
+  <em>AIAA Journal</em>, 46(3):578-590, March 2008.
+  <a href="http://dx.doi.org/10.2514/1.26236">http://dx.doi.org/10.2514/1.26236</a>.<br /><pre>
+@Article{Bhatia_2008,
+   author = {M.~Bhatia and E.~Livnet},
+    title = {{Design-oriented thermostructural analysis with external and internal radiation, Part 1: Steady state}},
+  journal = {AIAA Journal},
+     year = 2008,
+   volume = 46,
+   number = 3,
+    month = {March},
+    pages = {578--590},
+     note = {\url{http://dx.doi.org/10.2514/1.26236}}
+}
+</pre>
+</li>
+
+
+<li>
 A.&nbsp;Hawkins and J.&nbsp;T. Oden.
   Toward a predictive model of tumor growth.
   Technical report, Institute for Computational Engineering and
@@ -1188,7 +1258,7 @@ Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
   25(12):1162-1185, 2008.
   <a href="http://dx.doi.org/10.1002/cnm.1173">http://dx.doi.org/10.1002/cnm.1173</a>.<br />
 <pre>
-@Article{Kirk_2008b,
+@Article{Kirk_2009c,
    author = {Benjamin S. Kirk and Graham F. Carey},
     title = {{A parallel, adaptive finite element scheme for
               modeling chemotactic biological systems}},
@@ -1196,7 +1266,8 @@ Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
    volume = {25},
    number = {12},
     pages = {1162--1185},
-     year = {2008},
+    month = {December},
+     year = {2009},
      note = {\url{http://dx.doi.org/10.1002/cnm.1173}}
 }
 </pre>  
