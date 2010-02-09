@@ -753,7 +753,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
   //Accumulate the vectors to pass into ex_put_node_set
   for(unsigned int i = 0; i < nl.size(); i++)
-    node[il[i]].push_back(nl[i]);    
+    node[il[i]].push_back(nl[i]+1);    
   
   std::vector<short int> node_boundary_ids;
   mesh.boundary_info->build_node_boundary_ids(node_boundary_ids);
