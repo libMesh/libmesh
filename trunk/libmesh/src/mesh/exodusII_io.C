@@ -224,7 +224,7 @@ void ExodusII_IO::read (const std::string& fname)
         const std::vector<int>& node_list = exio_helper.get_node_list();
 
         for(unsigned int node=0; node<node_list.size(); node++)
-          mesh.boundary_info->add_node(node_list[node], nodeset_id);
+          mesh.boundary_info->add_node(node_list[node]-1, nodeset_id);
       }
   }
       
