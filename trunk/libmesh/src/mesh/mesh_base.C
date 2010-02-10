@@ -284,8 +284,14 @@ unsigned int MeshBase::recalculate_n_partitions()
 
 const PointLocatorBase & MeshBase::point_locator () const
 {
+  // Double checked lock pattern for efficiency
   if (_point_locator.get() == NULL)
-    _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
+  {
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    
+    if (_point_locator.get() == NULL)
+      _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
+  }
 
   return *_point_locator;
 }

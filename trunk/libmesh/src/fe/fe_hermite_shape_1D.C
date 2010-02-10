@@ -28,27 +28,30 @@
 
 // Anonymous namespace for persistant variables.
 // This allows us to cache the global-to-local mapping transformation
-// This should also screw up multithreading royally
+// This caching is turned off when TBB is enabled...
 namespace
 {
+#ifndef LIBMESH_HAVE_TBB_API
   static unsigned int old_elem_id = libMesh::invalid_uint;
   // Coefficient naming: d(1)d(2n) is the coefficient of the
   // global shape function corresponding to value 1 in terms of the
   // local shape function corresponding to normal derivative 2
   static Real d1xd1x, d2xd2x;
+#endif
 
-// Compute the static coefficients for an element
-void hermite_compute_coefs(const Elem* elem)
-{
-  // Using static globals for old_elem_id, etc. will fail
-  // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+#ifndef LIBMESH_HAVE_TBB_API
+  // Compute the static coefficients for an element
+  void hermite_compute_coefs(const Elem* elem)
+  {
+    // Coefficients are cached from old elements
+    if (elem->id() == old_elem_id)
+      return;
 
-  // Coefficients are cached from old elements
-  if (elem->id() == old_elem_id)
-    return;
-
-  old_elem_id = elem->id();
+    old_elem_id = elem->id();
+#else
+    void hermite_compute_coefs(const Elem* elem, Real & d1xd1x, Real & d2xd2x)
+  {
+#endif //LIBMESH_HAVE_TBB_API
 
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
@@ -224,7 +227,13 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
+#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
+#else
+  Real d1xd1x, d2xd2x;
+
+  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+#endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
 
@@ -299,8 +308,14 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 				const Point& p)
 {
   libmesh_assert (elem != NULL);
-
+  
+#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
+#else
+  Real d1xd1x, d2xd2x;
+
+  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+#endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
   
@@ -357,7 +372,13 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
+#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
+#else
+  Real d1xd1x, d2xd2x;
+
+  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+#endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
   

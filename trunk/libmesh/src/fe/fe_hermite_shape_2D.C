@@ -28,9 +28,10 @@
 
 // Anonymous namespace for persistant variables.
 // This allows us to cache the global-to-local mapping transformation
-// FIXME: This should also screw up multithreading royally
+// This caching is turned off when TBB is enabled...
 namespace
 {
+#ifndef LIBMESH_HAVE_TBB_API
   static unsigned int old_elem_id = libMesh::invalid_uint;
   // Mapping functions - derivatives at each dofpt
   std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
@@ -38,20 +39,28 @@ namespace
   std::vector<Real> dxdeta(2), dydxi(2);
 #endif
 
+#endif //LIBMESH_HAVE_TBB_API
 
 
-// Compute the static coefficients for an element
-void hermite_compute_coefs(const Elem* elem)
-{
-  // Using static globals for old_elem_id, etc. will fail
-  // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+#ifndef LIBMESH_HAVE_TBB_API
+  // Compute the static coefficients for an element
+  void hermite_compute_coefs(const Elem* elem)
+  {
+    // Coefficients are cached from old elements
+    if (elem->id() == old_elem_id)
+      return;
 
-  // Coefficients are cached from old elements
-  if (elem->id() == old_elem_id)
-    return;
-
-  old_elem_id = elem->id();
+    old_elem_id = elem->id();
+#else
+  void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & dxdxi
+#ifdef DEBUG
+                             ,
+                             std::vector<Real> & dxdeta,
+                             std::vector<Real> & dydxi
+#endif //DEBUG
+    )
+  {
+#endif //LIBMESH_HAVE_TBB_API
 
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
@@ -67,7 +76,7 @@ void hermite_compute_coefs(const Elem* elem)
     {
       dxdxi[0][p] = 0;
       dxdxi[1][p] = 0;
-#ifdef DEBUG
+#ifdef FDEBUG
       dxdeta[p] = 0;
       dydxi[p] = 0;
 #endif
@@ -81,7 +90,7 @@ void hermite_compute_coefs(const Elem* elem)
           dxdxi[0][p] += elem->point(i)(0) * ddxi;
           dxdxi[1][p] += elem->point(i)(1) * ddeta;
 // dxdeta and dydxi should be 0!
-#ifdef DEBUG
+#ifdef FDEBUG
           dxdeta[p] += elem->point(i)(0) * ddeta;
           dydxi[p] += elem->point(i)(1) * ddxi;
 #endif
@@ -90,7 +99,7 @@ void hermite_compute_coefs(const Elem* elem)
       libmesh_assert(dxdxi[0][p]);
       libmesh_assert(dxdxi[1][p]);
       // No non-rectilinear or non-axis-aligned elements!
-#ifdef DEBUG
+#ifdef FDEBUG
       libmesh_assert(std::abs(dxdeta[p]) < 1e-9);
       libmesh_assert(std::abs(dydxi[p]) < 1e-9);
 #endif
@@ -223,8 +232,23 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 			  const Point& p)
 {
   libmesh_assert (elem != NULL);
-
+  
+#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
+#else
+  std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
+
+#ifdef DEBUG
+  std::vector<Real> dxdeta(2), dydxi(2);
+  
+  hermite_compute_coefs(elem, dxdxi, dxdeta, dydxi);
+
+#else //DEBUG
+  
+  hermite_compute_coefs(elem, dxdxi);
+#endif //DEBUG
+
+#endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
   
@@ -283,8 +307,23 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
   libmesh_assert (j == 0 || j == 1);
-
+  
+#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
+#else
+  std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
+
+#ifdef DEBUG
+  std::vector<Real> dxdeta(2), dydxi(2);
+  
+  hermite_compute_coefs(elem, dxdxi, dxdeta, dydxi);
+
+#else //DEBUG
+  
+  hermite_compute_coefs(elem, dxdxi);
+#endif //DEBUG
+
+#endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
   
@@ -338,7 +377,22 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
   libmesh_assert (elem != NULL);
   libmesh_assert (j == 0 || j == 1 || j == 2);
 
+#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
+#else
+  std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
+
+#ifdef DEBUG
+  std::vector<Real> dxdeta(2), dydxi(2);
+  
+  hermite_compute_coefs(elem, dxdxi, dxdeta, dydxi);
+
+#else //DEBUG
+  
+  hermite_compute_coefs(elem, dxdxi);
+#endif //DEBUG
+
+#endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
   

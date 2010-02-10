@@ -36,6 +36,7 @@
 #  include "tbb/task_scheduler_init.h"
 #  include "tbb/partitioner.h"
 #  include "tbb/spin_mutex.h"
+#  include "tbb/recursive_mutex.h"
 #  include "tbb/atomic.h"
 #endif
 
@@ -186,6 +187,14 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
+   * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
+   * space for the lock to be acquired.  The same thread can aquire the
+   * same lock multiple times
+   */
+  typedef tbb::recursive_mutex recursive_mutex;
+
+  //-------------------------------------------------------------------
+  /**
    * Defines atomic operations which can only be executed on a 
    * single thread at a time.  This is used in reference counting,
    * for example, to allow count++/count-- to work.
@@ -273,6 +282,26 @@ namespace Threads
       scoped_lock () {}
       scoped_lock ( spin_mutex&  ) {} 
       void acquire ( spin_mutex& ) {}
+      void release () {}
+    };
+  };
+
+  //-------------------------------------------------------------------
+  /**
+   * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
+   * space for the lock to be acquired.
+   */
+  class recursive_mutex 
+  {
+  public:
+    recursive_mutex() {}
+
+    class scoped_lock 
+    {
+    public:
+      scoped_lock () {}
+      scoped_lock ( recursive_mutex&  ) {} 
+      void acquire ( recursive_mutex& ) {}
       void release () {}
     };
   };
@@ -432,6 +461,11 @@ namespace Threads
    * A spin mutex object which 
    */
   extern spin_mutex spin_mtx;
+
+  /**
+   * A recursive mutex object which 
+   */
+  extern recursive_mutex recursive_mtx;
 
 
 
