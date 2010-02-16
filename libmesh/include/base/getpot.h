@@ -1,8 +1,8 @@
 //  -*- c++ -*-
-//  GetPot Version 1.1-libMesh_fork                            Dec/08/2009
+//  GetPot Version 1.1-libMeshHPCT_fork                        Feb/16/2010
 //  Based on "getpot-1.1.1.tgz" version from SourceForge
 //
-//  New code (C) 2009 Roy Stogner
+//  New code (C) 2009-2010 Roy Stogner, Karl Schulz
 //
 //  GetPot Version 1.0                                        Sept/13/2002
 //
@@ -209,7 +209,12 @@ public:
     inline STRING_VECTOR   unidentified_nominuses() const;
 
     // (*) output --------------------------------------------------------------
+    // Print everything
     inline int print(std::ostream &out_stream = std::cout) const;
+    // Print everything after skipping skip_count arguments, with a
+    // custom prefix.  skip_count defaults to 1 to handle the common
+    // "executable input_file" command line case.
+    inline int print(const char *prefix, std::ostream &out_stream = std::cout, unsigned int skip_count=1) const;
 
 private:
     // (*) Type Declaration ----------------------------------------------------
@@ -1464,6 +1469,27 @@ GetPot::print(std::ostream &out_stream) const
     out_stream << std::endl;
     return 1;
 }
+
+// PECOS/HPCT Addition - add option to prepend output with a delimiter
+// while also disabling argc print and skipping first print (the name
+// of the input file) 
+// 
+// PECOS Development Team: (ks. 4/16/09)
+
+inline int
+GetPot::print(const char* prefix, std::ostream &out_stream, unsigned int skip_count) const
+{
+    STRING_VECTOR::const_iterator it = argv.begin();
+    it += skip_count;
+    for(; it != argv.end(); ++it)
+      {
+	out_stream << prefix;
+        out_stream << *it << std::endl;
+      }
+    out_stream << std::endl;
+    return 1;
+}
+
 
 // (*) dollar bracket expressions (DBEs) ------------------------------------
 //
