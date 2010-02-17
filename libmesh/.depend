@@ -162,6 +162,7 @@ src/base/libmesh.$(obj-suffix):\
     include/geom/remote_elem.h\
     include/numerics/petsc_macro.h\
     include/numerics/type_vector.h\
+    include/parallel/parallel.h\
     include/parallel/threads.h\
     include/solvers/slepc_macro.h\
     include/utils/compare_types.h\
