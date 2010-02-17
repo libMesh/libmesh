@@ -653,6 +653,7 @@ AC_ARG_ENABLE(tbb,
              enabletbb=yes)
 if (test "$enabletbb" != no) ; then
    CONFIGURE_TBB
+   AX_TLS
 fi
 dnl -------------------------------------------------------------
 

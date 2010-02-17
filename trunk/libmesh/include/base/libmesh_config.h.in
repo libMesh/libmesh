@@ -239,9 +239,6 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
-
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -268,6 +265,9 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* If the compiler supports a TLS storage class define it to that here */
+#undef TLS
 
 /* Flag indicating if the library should be built using complex numbers */
 #undef USE_COMPLEX_NUMBERS
