@@ -271,7 +271,15 @@ private:
 
     //     -- some functions return a char pointer to a temporarily existing string
     //        this container makes them 'available' until the getpot object is destroyed.
-    mutable std::set<std::string> _internal_string_container;
+    //        We use Thread Local Storage when available, to avoid
+    //        bugs when multiple threads try to request char pointer return
+    //        values at once.  Threaded user codes are recommended to
+    //        instead request std::string values.
+#ifdef TLS
+    mutable TLS std::set<std::string> _internal_string_container;
+#else
+    mutable     std::set<std::string> _internal_string_container;
+#endif
 
     //     -- some functions return a char pointer to a temporarily existing string
     //        this function adds them to our container
