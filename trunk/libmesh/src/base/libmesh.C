@@ -27,6 +27,7 @@
 #include "libmesh.h"
 #include "auto_ptr.h"
 #include "getpot.h"
+#include "parallel.h"
 #include "reference_counter.h"
 #include "remote_elem.h"
 #include "threads.h"
@@ -81,6 +82,8 @@ namespace {
 #ifdef LIBMESH_HAVE_MPI
 MPI_Comm           libMesh::COMM_WORLD = MPI_COMM_NULL;
 #endif
+
+Parallel::Communicator Parallel::Communicator_World;
 
 PerfLog            libMesh::perflog ("libMesh",
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
@@ -177,11 +180,16 @@ void _init (int &argc, char** & argv,
       
       // Duplicate the input communicator for internal use
       MPI_Comm_dup (COMM_WORLD_IN, &libMesh::COMM_WORLD);
+
+      // And get a Parallel::Communicator copy too, to use
+      // as a default for that API
+      Parallel::Communicator_World = COMM_WORLD_IN;
+
       //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
       //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
       
-      MPI_Comm_rank (libMesh::COMM_WORLD, &libMeshPrivateData::_processor_id);
-      MPI_Comm_size (libMesh::COMM_WORLD, &libMeshPrivateData::_n_processors);
+      libMeshPrivateData::_processor_id = Parallel::Communicator_World.rank();
+      libMeshPrivateData::_n_processors = Parallel::Communicator_World.size();
       
 # if defined(LIBMESH_HAVE_PETSC)
       
@@ -313,6 +321,7 @@ int _close ()
 #  endif
 	}
 # endif
+      Parallel::Communicator_World.clear();
       MPI_Comm_free (&libMesh::COMM_WORLD);
 
       if (libmesh_initialized_mpi)

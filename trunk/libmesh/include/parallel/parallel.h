@@ -74,6 +74,11 @@ namespace Parallel
    * Status object for querying messages
    */
   typedef MPI_Status status;
+
+  /**
+   * Communicator object for talking with subsets of processors
+   */
+  typedef MPI_Comm communicator;
  
   /**
    * Templated function to return the appropriate MPI datatype
@@ -97,9 +102,10 @@ namespace Parallel
   // These shouldn't actually be needed, but must be 
   // unique types for function overloading to work 
   // properly.
-  struct data_type { /* unsigned int t; */ };
-  struct request   { /* unsigned int r; */ };
-  struct status    { /* unsigned int s; */ };
+  struct data_type    { /* unsigned int t; */ };
+  struct request      { /* unsigned int r; */ };
+  struct status       { /* unsigned int s; */ };
+  struct communicator { /* unsigned int s; */ };
 
   template <typename T>
   inline data_type datatype() { return data_type(); }
@@ -162,6 +168,80 @@ namespace Parallel
   private:
 
     data_type _datatype;    
+  };
+
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Encapsulates the MPI_Comm object.  Allows the size of the group
+   * and this process's position in the group to be determined.
+   */
+  class Communicator
+  {
+  public:
+#ifdef LIBMESH_HAVE_MPI
+    Communicator () : _communicator(MPI_COMM_NULL) {}
+#else
+    Communicator () {}
+#endif
+
+    Communicator (const communicator &comm) {
+#ifdef LIBMESH_HAVE_MPI
+      if (_communicator == MPI_COMM_NULL)
+        MPI_Comm_dup(comm, &_communicator);
+#endif
+    }
+
+    ~Communicator () {
+      this->clear();
+    }
+
+    communicator& get() {
+      return _communicator;
+    }
+
+    void clear() {
+#ifdef LIBMESH_HAVE_MPI
+      if (_communicator != MPI_COMM_NULL)
+        {
+          MPI_Comm_free(&_communicator);
+          _communicator = MPI_COMM_NULL;
+        }
+#endif
+    }
+
+    void operator= (const communicator &comm) {
+#ifdef LIBMESH_HAVE_MPI
+      this->clear();
+      MPI_Comm_dup(comm, &_communicator);
+#endif
+    }
+
+    int rank() const {
+#ifdef LIBMESH_HAVE_MPI
+      int r;
+      MPI_Comm_rank(_communicator, &r);
+      libmesh_assert (r >= 0);
+      return r;
+#else
+      return 0;
+#endif
+    }
+
+    int size() const {
+#ifdef LIBMESH_HAVE_MPI
+      int sz;
+      MPI_Comm_size(_communicator, &sz);
+      libmesh_assert (sz >= 0);
+      return sz;
+#else
+      return 1;
+#endif
+    }
+  private:
+
+    communicator _communicator;
   };
 
 
@@ -345,12 +425,13 @@ namespace Parallel
 		&status);
 
       return val;
+    }
 #else
     bool test (status &)
     {
       return true;
-#endif
     }
+#endif
 
 
   private:
@@ -360,6 +441,14 @@ namespace Parallel
 
 
   
+  //-------------------------------------------------------------------
+  /* 
+   * The default libMesh communicator
+   */
+  extern Communicator Communicator_World;
+
+
+
   //-------------------------------------------------------------------
   /**
    * Pause execution until all processors reach a certain point.
