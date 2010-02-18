@@ -181,16 +181,13 @@ namespace Parallel
   {
   public:
 #ifdef LIBMESH_HAVE_MPI
-    Communicator () : _communicator(MPI_COMM_NULL) {}
+    Communicator () : _communicator(MPI_COMM_NULL), _rank(0), _size(0) {}
 #else
-    Communicator () {}
+    Communicator () : _rank(0), _size(1) {}
 #endif
 
     Communicator (const communicator &comm) {
-#ifdef LIBMESH_HAVE_MPI
-      if (_communicator == MPI_COMM_NULL)
-        MPI_Comm_dup(comm, &_communicator);
-#endif
+      this->assign(comm);
     }
 
     ~Communicator () {
@@ -212,36 +209,43 @@ namespace Parallel
     }
 
     void operator= (const communicator &comm) {
-#ifdef LIBMESH_HAVE_MPI
       this->clear();
-      MPI_Comm_dup(comm, &_communicator);
-#endif
+      this->assign(comm);
     }
 
     int rank() const {
-#ifdef LIBMESH_HAVE_MPI
-      int r;
-      MPI_Comm_rank(_communicator, &r);
-      libmesh_assert (r >= 0);
-      return r;
-#else
-      return 0;
-#endif
+      return _rank;
     }
 
     int size() const {
-#ifdef LIBMESH_HAVE_MPI
-      int sz;
-      MPI_Comm_size(_communicator, &sz);
-      libmesh_assert (sz >= 0);
-      return sz;
-#else
-      return 1;
-#endif
+      return _size;
     }
+
   private:
 
+    void assign(const communicator &comm) {
+#ifdef LIBMESH_HAVE_MPI
+      if (comm != MPI_COMM_NULL)
+        {
+          MPI_Comm_dup(comm, &_communicator);
+
+          MPI_Comm_size(_communicator, &_size);
+          libmesh_assert (_size >= 0);
+
+          MPI_Comm_rank(_communicator, &_rank);
+          libmesh_assert (_rank >= 0);
+        }
+      else
+        {
+          _communicator = MPI_COMM_NULL;
+          _rank = 0;
+          _size = 0;
+        }
+#endif
+    }
+
     communicator _communicator;
+    int _rank, _size;
   };
 
 
@@ -453,10 +457,10 @@ namespace Parallel
   /**
    * Pause execution until all processors reach a certain point.
    */
-  inline void barrier ()
+  inline void barrier (Communicator &comm = Communicator_World)
   {
 #ifdef LIBMESH_HAVE_MPI
-    MPI_Barrier (libMesh::COMM_WORLD);
+    MPI_Barrier (comm.get());
 #endif
   }    
   
@@ -465,7 +469,8 @@ namespace Parallel
    * Verify that a local variable has the same value on all processors
    */
   template <typename T>
-  inline bool verify(const T &r);
+  inline bool verify(const T &r,
+                     Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -473,7 +478,8 @@ namespace Parallel
    * on all processors
    */
   template <typename T>
-  inline void min(T &r);
+  inline void min(T &r,
+                  Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -481,7 +487,8 @@ namespace Parallel
    * of it's values on all processors
    */
   template <typename T>
-  inline void min(std::vector<T> &r);
+  inline void min(std::vector<T> &r,
+                  Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -489,7 +496,8 @@ namespace Parallel
    * on all processors
    */
   template <typename T>
-  inline void max(T &r);
+  inline void max(T &r,
+                  Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -497,7 +505,8 @@ namespace Parallel
    * of it's values on all processors
    */
   template <typename T>
-  inline void max(std::vector<T> &r);
+  inline void max(std::vector<T> &r,
+                  Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -505,7 +514,8 @@ namespace Parallel
    * on all processors
    */
   template <typename T>
-  inline void sum(T &r);
+  inline void sum(T &r,
+                  Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -513,7 +523,8 @@ namespace Parallel
    * it's values on all processors
    */
   template <typename T>
-  inline void sum(std::vector<T> &r);
+  inline void sum(std::vector<T> &r,
+                  Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -521,7 +532,8 @@ namespace Parallel
    * union over all processors, replacing the set on processor 0.
    */
   template <typename T>
-  inline void set_union(std::set<T> &data, const unsigned int root_id);
+  inline void set_union(std::set<T> &data, const unsigned int root_id,
+                        Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -529,7 +541,8 @@ namespace Parallel
    * with their union over all processors.
    */
   template <typename T>
-  inline void set_union(std::set<T> &data);
+  inline void set_union(std::set<T> &data,
+                        Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -537,7 +550,8 @@ namespace Parallel
    * examined before the message is actually received.
    */
   inline status probe (const int src_processor_id,
-		       const int tag=any_tag);
+		       const int tag=any_tag,
+                       Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -547,7 +561,8 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    const DataType &type,
-		    const int tag=0);
+		    const int tag=0,
+                    Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -558,7 +573,8 @@ namespace Parallel
 		    std::vector<T> &buf,
 		    const DataType &type,
 		    request &req,
-		    const int tag=0);
+		    const int tag=0,
+                    Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -568,24 +584,28 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
-	  tag);
+	  tag,
+          comm);
   }
 
   // Function overloading for std::complex<>
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
-	  tag);
+	  tag,
+          comm);
   }
 
 
@@ -598,13 +618,15 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    request &req,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
 	  req,
-	  tag);
+	  tag,
+          comm);
   }
 
   // Function overloading for std::complex<>
@@ -612,13 +634,15 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
 		    request &req,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
 	  req,
-	  tag);
+	  tag,
+          comm);
   }
 
 
@@ -630,7 +654,8 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    const DataType &type,
-		    const int tag=0);
+		    const int tag=0,
+                    Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -641,7 +666,8 @@ namespace Parallel
 		    std::set<T> &buf,
 		    const DataType &type,
 		    request &req,
-		    const int tag=0);
+		    const int tag=0,
+                    Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -651,24 +677,28 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
-	  tag);
+	  tag,
+          comm);
   }
 
   // Function overloading for std::complex<>
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::set<std::complex<T> > &buf,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
-	  tag);
+	  tag,
+          comm);
   }
 
 
@@ -681,13 +711,15 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    request &req,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
 	  req,
-	  tag);
+	  tag,
+          comm);
   }
 
   // Function overloading for std::complex<>
@@ -695,13 +727,15 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<std::complex<T> > &buf,
 		    request &req,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
 	  req,
-	  tag);
+	  tag,
+          comm);
   }
 
   //-------------------------------------------------------------------
@@ -713,13 +747,15 @@ namespace Parallel
 		                std::vector<T> &buf,
 		                const DataType &type,
 		                request &r,
-		                const int tag=0)
+		                const int tag=0,
+                                Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  type,
 	  r,
-	  tag);
+	  tag,
+          comm);
   }
 
   //-------------------------------------------------------------------
@@ -730,13 +766,15 @@ namespace Parallel
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<T> &buf,
 		                request &r,
-		                const int tag=0)
+		                const int tag=0,
+                                Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
 	  r,
-	  tag);
+	  tag,
+          comm);
   }
 
   // Function overloading for std::complex<>
@@ -744,13 +782,15 @@ namespace Parallel
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<std::complex<T> > &buf,
 		                request &r,
-		                const int tag=0)
+		                const int tag=0,
+                                Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
 	  datatype<T>(),
 	  r,
-	  tag);
+	  tag,
+          comm);
   }
 
   //-------------------------------------------------------------------
@@ -761,7 +801,8 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
 		         const DataType &type,
-		         const int tag=any_tag);
+		         const int tag=any_tag,
+                         Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -772,7 +813,8 @@ namespace Parallel
 		       std::vector<T> &buf,
 		       const DataType &type,
 		       request &req,
-		       const int tag=any_tag);
+		       const int tag=any_tag,
+                       Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -782,24 +824,28 @@ namespace Parallel
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
-		         const int tag=any_tag)
+		         const int tag=any_tag,
+                         Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
 		    buf,
 		    datatype<T>(),
-		    tag);
+		    tag,
+                    comm);
   }
 
   // Function overloading for std::complex<>
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<std::complex<T> > &buf,
-		         const int tag=any_tag)
+		         const int tag=any_tag,
+                         Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
 		    buf,
 		    datatype<T>(),
-		    tag);
+		    tag,
+                    comm);
   }
 
   //-------------------------------------------------------------------
@@ -811,13 +857,15 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::vector<T> &buf,
 		       request &req,
-		       const int tag=any_tag)
+		       const int tag=any_tag,
+                       Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
 	     datatype<T>(),
 	     req,
-	     tag);
+	     tag,
+             comm);
   }
 
   // Function overloading for std::complex<>
@@ -825,13 +873,15 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::vector<std::complex<T> > &buf,
 		       request &req,
-		       const int tag=any_tag)
+		       const int tag=any_tag,
+                       Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
 	     datatype<T>(),
 	     req,
-	     tag);
+	     tag,
+             comm);
   }
 
   //-------------------------------------------------------------------
@@ -842,7 +892,8 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::set<T> &buf,
 		         const DataType &type,
-		         const int tag=any_tag);
+		         const int tag=any_tag,
+                         Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -853,7 +904,8 @@ namespace Parallel
 		       std::set<T> &buf,
 		       const DataType &type,
 		       request &req,
-		       const int tag=any_tag);
+		       const int tag=any_tag,
+                       Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -863,24 +915,28 @@ namespace Parallel
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::set<T> &buf,
-		         const int tag=any_tag)
+		         const int tag=any_tag,
+                         Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
 		    buf,
 		    datatype<T>(),
-		    tag);
+		    tag,
+                    comm);
   }
 
   // Function overloading for std::complex<>
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::set<std::complex<T> > &buf,
-		         const int tag=any_tag)
+		         const int tag=any_tag,
+                         Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
 		    buf,
 		    datatype<T>(),
-		    tag);
+		    tag,
+                    comm);
   }
 
   //-------------------------------------------------------------------
@@ -892,7 +948,8 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::set<T> &buf,
 		       request &req,
-		       const int tag=any_tag)
+		       const int tag=any_tag,
+                       Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
@@ -906,13 +963,15 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::set<std::complex<T> > &buf,
 		       request &req,
-		       const int tag=any_tag)
+		       const int tag=any_tag,
+                       Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
 	     datatype<T>(),
 	     req,
-	     tag);
+	     tag,
+             comm);
   }
 
   //-------------------------------------------------------------------
@@ -924,13 +983,15 @@ namespace Parallel
 		                   std::vector<T> &buf,
 				   const DataType &type,
 		                   request &r,
-		                   const int tag=any_tag)
+		                   const int tag=any_tag,
+                                   Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
 	     type,
 	     r,
-	     tag);
+	     tag,
+             comm);
   }
 
   //-------------------------------------------------------------------
@@ -941,13 +1002,15 @@ namespace Parallel
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<T> &buf,
 		                   request &r,
-		                   const int tag=any_tag)
+		                   const int tag=any_tag,
+                                   Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
 	     datatype<T>(),
 	     r,
-	     tag);
+	     tag,
+             comm);
   }
 
   // Function overloading for std::complex<>
@@ -955,13 +1018,15 @@ namespace Parallel
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<std::complex<T> > &buf,
 		                   request &r,
-		                   const int tag=any_tag)
+		                   const int tag=any_tag,
+                                   Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
 	     datatype<T>(),
 	     r,
-	     tag);
+	     tag,
+             comm);
   }
 
   
@@ -993,7 +1058,8 @@ namespace Parallel
   inline void send_receive(const unsigned int dest_processor_id,
                            T &send,
 			   const unsigned int source_processor_id,
-                           T &recv);
+                           T &recv,
+                           Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1006,17 +1072,19 @@ namespace Parallel
                            T &send,
 			   const unsigned int source_processor_id,
                            T &recv,
-			   const DataType &type);
+			   const DataType &type,
+                           Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
-   * Take a vector of length n_processors, and on processor root_id fill in
+   * Take a vector of length comm.size(), and on processor root_id fill in
    * recv[processor_id] = the value of send on processor processor_id
    */
   template <typename T>
   inline void gather(const unsigned int root_id,
 		     T send,
-		     std::vector<T> &recv);
+		     std::vector<T> &recv,
+                     Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1025,16 +1093,18 @@ namespace Parallel
    */
   template <typename T>
   inline void gather(const unsigned int root_id,
-		     std::vector<T> &r);
+		     std::vector<T> &r,
+                     Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
-   * Take a vector of length n_processors, and fill in 
+   * Take a vector of length comm.size(), and fill in 
    * \p recv[processor_id] = the value of \p send on that processor
    */
   template <typename T>
   inline void allgather(T send,
-			std::vector<T> &recv);
+			std::vector<T> &recv,
+                        Communicator &comm = Communicator_World);
 
 
   //-------------------------------------------------------------------
@@ -1047,7 +1117,8 @@ namespace Parallel
    */
   template <typename T>
   inline void allgather(std::vector<T> &r,
-			const bool identical_buffer_sizes = false);
+			const bool identical_buffer_sizes = false,
+                        Communicator &comm = Communicator_World);
 
 
 
@@ -1058,7 +1129,8 @@ namespace Parallel
    * from processor j.
    */
   template <typename T>
-  inline void alltoall(std::vector<T> &r);
+  inline void alltoall(std::vector<T> &r,
+                       Communicator &comm = Communicator_World);
 
 
 
@@ -1069,7 +1141,8 @@ namespace Parallel
    * the processor intiating the broadcast.
    */
   template <typename T>
-  inline void broadcast(T &data, const unsigned int root_id=0);
+  inline void broadcast(T &data, const unsigned int root_id=0,
+                        Communicator &comm = Communicator_World);
 
 
 
@@ -1081,7 +1154,8 @@ namespace Parallel
    * for appropriately sizing the input buffer on all processors.
    */
   template <typename T>
-  inline void broadcast(std::vector<T> &data, const unsigned int root_id=0);
+  inline void broadcast(std::vector<T> &data, const unsigned int root_id=0,
+                        Communicator &comm = Communicator_World);
 
 
   //-------------------------------------------------------------------
@@ -1091,7 +1165,8 @@ namespace Parallel
    * the processor intiating the broadcast.
    */
   template <typename T>
-  inline void broadcast(std::set<T> &data, const unsigned int root_id=0);
+  inline void broadcast(std::set<T> &data, const unsigned int root_id=0,
+                        Communicator &comm = Communicator_World);
 
 
   //-----------------------------------------------------------------------
@@ -1171,16 +1246,17 @@ namespace Parallel
   inline data_type datatype<long double>() { return MPI_LONG_DOUBLE; }
 
   template <typename T>
-  inline bool verify(const T &r)
+  inline bool verify(const T &r,
+                     Communicator &comm)
   {
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	T tempmin = r, tempmax = r;
-	Parallel::min(tempmin);
-	Parallel::max(tempmax);
+	Parallel::min(tempmin, comm);
+	Parallel::max(tempmax, comm);
 	bool verified = (r == tempmin) &&
 	                (r == tempmax);
-	Parallel::min(verified);
+	Parallel::min(verified, comm);
 	return verified;
       }
     return true;
@@ -1188,25 +1264,27 @@ namespace Parallel
 
 
   template <>
-  inline bool verify(const std::string & r)
+  inline bool verify(const std::string & r,
+                     Communicator &comm)
   {
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	// Cannot use <char> since MPI_MIN is not
 	// strictly defined for chars!
 	std::vector<short int> temp; temp.reserve(r.size());
 	for (unsigned int i=0; i != r.size(); ++i)
 	  temp.push_back(r[i]);
-	return Parallel::verify(temp);
+	return Parallel::verify(temp, comm);
       }
     return true;
   }
 
 
   template <typename T>
-  inline void min(T &r)
+  inline void min(T &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	START_LOG("min()", "Parallel");
     
@@ -1216,7 +1294,7 @@ namespace Parallel
 		       1,
 		       datatype<T>(),
 		       MPI_MIN,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 
 	STOP_LOG("min()", "Parallel");
       }
@@ -1224,9 +1302,10 @@ namespace Parallel
 
 
   template <>
-  inline void min(bool &r)
+  inline void min(bool &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	START_LOG("min()", "Parallel");
     
@@ -1237,7 +1316,7 @@ namespace Parallel
 		       1,
 		       datatype<unsigned int>(),
 		       MPI_MIN,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 	r = temp;
 
 	STOP_LOG("min()", "Parallel");
@@ -1246,9 +1325,10 @@ namespace Parallel
 
 
   template <typename T>
-  inline void min(std::vector<T> &r)
+  inline void min(std::vector<T> &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1 && !r.empty())
+    if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("min()", "Parallel");
     
@@ -1258,7 +1338,7 @@ namespace Parallel
 		       r.size(),
 		       datatype<T>(),
 		       MPI_MIN,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 
 	STOP_LOG("min()", "Parallel");
       }
@@ -1266,9 +1346,10 @@ namespace Parallel
 
 
   template <>
-  inline void min(std::vector<bool> &r)
+  inline void min(std::vector<bool> &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1 && !r.empty())
+    if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("min()", "Parallel");
     
@@ -1280,7 +1361,7 @@ namespace Parallel
 		       ruint.size(),
 		       datatype<unsigned int>(),
 		       MPI_BAND,
-		       libMesh::COMM_WORLD);
+		       comm.get());
         unpack_vector_bool(temp, r);
 
 	STOP_LOG("min()", "Parallel");
@@ -1289,9 +1370,10 @@ namespace Parallel
 
 
   template <typename T>
-  inline void max(T &r)
+  inline void max(T &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	START_LOG("max()", "Parallel");
     
@@ -1301,7 +1383,7 @@ namespace Parallel
 		       1,
 		       datatype<T>(),
 		       MPI_MAX,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 	r = temp;
 
 	STOP_LOG("max()", "Parallel");
@@ -1310,9 +1392,10 @@ namespace Parallel
 
 
   template <>
-  inline void max(bool &r)
+  inline void max(bool &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	START_LOG("max()", "Parallel");
     
@@ -1323,7 +1406,7 @@ namespace Parallel
 		       1,
 		       datatype<unsigned int>(),
 		       MPI_MAX,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 	r = temp;
 
 	STOP_LOG("max()", "Parallel");
@@ -1332,9 +1415,10 @@ namespace Parallel
 
 
   template <typename T>
-  inline void max(std::vector<T> &r)
+  inline void max(std::vector<T> &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1 && !r.empty())
+    if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("max()", "Parallel");
     
@@ -1344,7 +1428,7 @@ namespace Parallel
 		       r.size(),
 		       datatype<T>(),
 		       MPI_MAX,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 
 	STOP_LOG("max()", "Parallel");
       }
@@ -1352,9 +1436,10 @@ namespace Parallel
 
 
   template <>
-  inline void max(std::vector<bool> &r)
+  inline void max(std::vector<bool> &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1 && !r.empty())
+    if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("max()", "Parallel");
     
@@ -1366,7 +1451,7 @@ namespace Parallel
 		       ruint.size(),
 		       datatype<unsigned int>(),
 		       MPI_BOR,
-		       libMesh::COMM_WORLD);
+		       comm.get());
         unpack_vector_bool(temp, r);
 
 	STOP_LOG("max()", "Parallel");
@@ -1375,9 +1460,10 @@ namespace Parallel
 
 
   template <typename T>
-  inline void sum(T &r)
+  inline void sum(T &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	START_LOG("sum()", "Parallel");
     
@@ -1387,7 +1473,7 @@ namespace Parallel
 		       1,
 		       datatype<T>(),
 		       MPI_SUM,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 
 	STOP_LOG("sum()", "Parallel");
       }
@@ -1395,9 +1481,10 @@ namespace Parallel
 
 
   template <typename T>
-  inline void sum(std::vector<T> &r)
+  inline void sum(std::vector<T> &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1 && !r.empty())
+    if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("sum()", "Parallel");
     
@@ -1407,7 +1494,7 @@ namespace Parallel
 		       r.size(),
 		       datatype<T>(),
 		       MPI_SUM,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 
 	STOP_LOG("sum()", "Parallel");
       }
@@ -1416,9 +1503,10 @@ namespace Parallel
 
 
   template <typename T>
-  inline void sum(std::complex<T> &r)
+  inline void sum(std::complex<T> &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	START_LOG("sum()", "Parallel");
     
@@ -1428,7 +1516,7 @@ namespace Parallel
 		       2,
 		       datatype<T>(),
 		       MPI_SUM,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 
 	STOP_LOG("sum()", "Parallel");
       }
@@ -1436,9 +1524,10 @@ namespace Parallel
 
 
   template <typename T>
-  inline void sum(std::vector<std::complex<T> > &r)
+  inline void sum(std::vector<std::complex<T> > &r,
+                  Communicator &comm)
   {
-    if (libMesh::n_processors() > 1 && !r.empty())
+    if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("sum()", "Parallel");
     
@@ -1448,7 +1537,7 @@ namespace Parallel
 		       r.size() * 2,
 		       datatype<T>(),
 		       MPI_SUM,
-		       libMesh::COMM_WORLD);
+		       comm.get());
 
 	STOP_LOG("sum()", "Parallel");
       }
@@ -1457,27 +1546,30 @@ namespace Parallel
 
 
   template <typename T>
-  inline void set_union(std::set<T> &data, const unsigned int root_id)
+  inline void set_union(std::set<T> &data, const unsigned int root_id,
+                        Communicator &comm)
   {
     std::vector<T> vecdata(data.begin(), data.end());
     Parallel::gather(root_id, vecdata);
-    if (libMesh::processor_id() == root_id)
+    if (comm.rank() == root_id)
       data.insert(vecdata.begin(), vecdata.end());
   }
 
 
 
   template <typename T>
-  inline void set_union(std::set<T> &data)
+  inline void set_union(std::set<T> &data,
+                        Communicator &comm)
   {
-    set_union(data, 0);
+    Parallel::set_union(data, 0, comm);
     broadcast(data);
   }
 
 
 
   inline status probe (const int src_processor_id,
-		       const int tag)
+		       const int tag,
+                       Communicator &comm)
   {
     START_LOG("probe()", "Parallel");
 
@@ -1485,7 +1577,7 @@ namespace Parallel
 
     MPI_Probe (src_processor_id, 
 	       tag, 
-	       libMesh::COMM_WORLD, 
+	       comm.get(), 
 	       &status);
 
     STOP_LOG("probe()", "Parallel");
@@ -1499,7 +1591,8 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    const DataType &type,
-		    const int tag)
+		    const int tag,
+                    Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
 
@@ -1512,7 +1605,7 @@ namespace Parallel
 		type,
 		dest_processor_id,
 		tag,
-		libMesh::COMM_WORLD);
+		comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);    
     
@@ -1522,12 +1615,13 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
 		    const DataType &type,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm=Communicator_World)
   {    
     START_LOG("send()", "Parallel");
 
@@ -1540,7 +1634,7 @@ namespace Parallel
 		type,
 		dest_processor_id,
 		tag,
-		libMesh::COMM_WORLD);
+		comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);    
     
@@ -1554,7 +1648,8 @@ namespace Parallel
 		    std::vector<T> &buf,
 		    const DataType &type,
 		    request &req,
-		    const int tag)
+		    const int tag,
+                    Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
 
@@ -1567,7 +1662,7 @@ namespace Parallel
 		 type,
 		 dest_processor_id,
 		 tag,
-		 libMesh::COMM_WORLD,
+		 comm.get(),
 		 &req);    
     libmesh_assert (ierr == MPI_SUCCESS);    
 
@@ -1576,13 +1671,14 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
 		    const DataType &type,
 		    request &req,
-		    const int tag=0)
+		    const int tag=0,
+                    Communicator &comm=Communicator_World)
   {
     START_LOG("send()", "Parallel");
 
@@ -1595,7 +1691,7 @@ namespace Parallel
 		 type,
 		 dest_processor_id,
 		 tag,
-		 libMesh::COMM_WORLD,
+		 comm.get(),
                  &req);    
     libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -1608,13 +1704,14 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
 		         const DataType &type,
-		         const int tag)
+		         const int tag,
+                         Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
 
     // Get the status of the message, explicitly provide the
     // datatype so we can later query the size
-    Status status(Parallel::probe(src_processor_id, tag), type);
+    Status status(Parallel::probe(src_processor_id, tag, comm), type);
 
     buf.resize(status.size());
     
@@ -1627,7 +1724,7 @@ namespace Parallel
 		type,
 		src_processor_id,
 		tag,
-		libMesh::COMM_WORLD,
+		comm.get(),
 		status);
     libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -1639,18 +1736,19 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<std::complex<T> > &buf,
 		         const DataType &type,
-		         const int tag=any_tag)
+		         const int tag=any_tag,
+                         Communicator &comm=Communicator_World)
   {
     START_LOG("receive()", "Parallel");
 
     // Get the status of the message, explicitly provide the
     // datatype so we can later query the size
-    Status status(Parallel::probe(src_processor_id, tag), datatype<T>());
+    Status status(Parallel::probe(src_processor_id, tag, comm), datatype<T>());
 
     libmesh_assert(!(status.size()%2));
     buf.resize(status.size()/2);
@@ -1664,7 +1762,7 @@ namespace Parallel
 		type,
 		src_processor_id,
 		tag,
-		libMesh::COMM_WORLD,
+		comm.get(),
 		status);
     libmesh_assert (ierr == MPI_SUCCESS);
     
@@ -1680,7 +1778,8 @@ namespace Parallel
 		       std::vector<T> &buf,
 		       const DataType &type,
 		       request &req,
-		       const int tag)
+		       const int tag,
+                       Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1693,7 +1792,7 @@ namespace Parallel
 		 type,
 		 src_processor_id,
 		 tag,
-		 libMesh::COMM_WORLD,
+		 comm.get(),
 		 &req);    
     libmesh_assert (ierr == MPI_SUCCESS);    
 
@@ -1703,13 +1802,14 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::vector<std::complex<T> > &buf,
 		       const DataType &type,
 		       request &req,
-		       const int tag=any_tag)
+		       const int tag=any_tag,
+                       Communicator &comm=Communicator_World)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1719,7 +1819,7 @@ namespace Parallel
 		type,
 		src_processor_id,
 		tag,
-		libMesh::COMM_WORLD,
+		comm.get(),
 		&req);
 
     libmesh_assert (ierr == MPI_SUCCESS);
@@ -1735,13 +1835,14 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    const DataType &type,
-		    const int tag)
+		    const int tag,
+                    Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
 
     std::vector<T> vecbuf(buf.begin(), buf.end());
     // Use Parallel::send() so we get its specialization(s)
-    Parallel::send(dest_processor_id, vecbuf, type, tag);
+    Parallel::send(dest_processor_id, vecbuf, type, tag, comm);
 
     STOP_LOG("send()", "Parallel");
   }
@@ -1753,13 +1854,14 @@ namespace Parallel
 		    std::set<T> &buf,
 		    const DataType &type,
 		    request &req,
-		    const int tag)
+		    const int tag,
+                    Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
 
     std::vector<T> vecbuf(buf.begin(), buf.end());
     // Use Parallel::send() so we get its specialization(s)
-    Parallel::send(dest_processor_id, vecbuf, type, req, tag);
+    Parallel::send(dest_processor_id, vecbuf, type, req, tag, comm);
 
     STOP_LOG("send()", "Parallel");
   }
@@ -1770,13 +1872,14 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::set<T> &buf,
 		         const DataType &type,
-		         const int tag)
+		         const int tag,
+                         Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
 
     std::vector<T> vecbuf;
     // Use Parallel::receive() so we get its specialization(s)
-    Status status = Parallel::receive(src_processor_id, vecbuf, type, tag);
+    Status status = Parallel::receive(src_processor_id, vecbuf, type, tag, comm);
     buf.assign(vecbuf.begin(), vecbuf.end());
 
     STOP_LOG("receive()", "Parallel");
@@ -1791,13 +1894,14 @@ namespace Parallel
 		       std::set<T> &buf,
 		       const DataType &type,
 		       request &req,
-		       const int tag)
+		       const int tag,
+                       Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
 
     std::vector<T> vecbuf;
     // Use Parallel::receive() so we get its specialization(s)
-    Parallel::receive(src_processor_id, vecbuf, type, req, tag);
+    Parallel::receive(src_processor_id, vecbuf, type, req, tag, comm);
     buf.assign(vecbuf.begin(), vecbuf.end());
 
     STOP_LOG("receive()", "Parallel");
@@ -1831,17 +1935,20 @@ namespace Parallel
 
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
 			   std::vector<T> &send,
 			   const unsigned int source_processor_id,
 			   std::vector<T> &recv,
-			   const DataType &type)
+			   const DataType &type,
+                           Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
 
-    if (dest_processor_id   == libMesh::processor_id() &&
-	source_processor_id == libMesh::processor_id())
+    if (dest_processor_id   == comm.rank() &&
+	source_processor_id == comm.rank())
       {
 	recv = send;
 	STOP_LOG("send_receive()", "Parallel");
@@ -1854,12 +1961,14 @@ namespace Parallel
 				send,
 				type,
 				request,
-				/* tag = */ 321);
+				/* tag = */ 321,
+                                comm);
     
     Parallel::receive (source_processor_id,
 		       recv,
 		       type,
-		       /* tag = */ 321);
+		       /* tag = */ 321,
+                       comm);
     
     Parallel::wait (request);
     
@@ -1872,12 +1981,13 @@ namespace Parallel
   inline void send_receive(const unsigned int dest_processor_id,
 			   T &send,
 			   const unsigned int source_processor_id,
-			   T &recv)
+			   T &recv,
+                           Communicator &comm)
   {
     START_LOG("send_receive()", "Parallel");
 
-    if (dest_processor_id   == libMesh::processor_id() &&
-	source_processor_id == libMesh::processor_id())
+    if (dest_processor_id   == comm.rank() &&
+	source_processor_id == comm.rank())
       {
 	recv = send;
 	STOP_LOG("send_receive()", "Parallel");
@@ -1888,7 +1998,7 @@ namespace Parallel
 		 dest_processor_id, 0,
 		 &recv, 1, datatype<T>(),
 		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
+		 comm.get(),
 		 MPI_STATUS_IGNORE);
 
     STOP_LOG("send_receive()", "Parallel");
@@ -1900,12 +2010,13 @@ namespace Parallel
   inline void send_receive(const unsigned int dest_processor_id,
 			   std::complex<T> &send,
 			   const unsigned int source_processor_id,
-			   std::complex<T> &recv)
+			   std::complex<T> &recv,
+                           Communicator &comm)
   {
     START_LOG("send_receive()", "Parallel");
 
-    if (dest_processor_id   == libMesh::processor_id() &&
-	source_processor_id == libMesh::processor_id())
+    if (dest_processor_id   == comm.rank() &&
+	source_processor_id == comm.rank())
       {
 	recv = send;
 	STOP_LOG("send_receive()", "Parallel");
@@ -1916,7 +2027,7 @@ namespace Parallel
 		 dest_processor_id, 0,
 		 &recv, 2, datatype<T>(),
 		 source_processor_id, 0,
-		 libMesh::COMM_WORLD,
+		 comm.get(),
 		 MPI_STATUS_IGNORE);
 
     STOP_LOG("send_receive()", "Parallel");
@@ -1924,11 +2035,14 @@ namespace Parallel
 
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
 			   std::vector<T> &send,
 			   const unsigned int source_processor_id,
-			   std::vector<T> &recv)
+			   std::vector<T> &recv,
+                           Communicator &comm = Communicator_World)
   {
     // Call the user-defined type version with automatic 
     // type conversion based on template argument:    
@@ -1936,21 +2050,25 @@ namespace Parallel
 		  send,
 		  source_processor_id,
 		  recv,
-		  datatype<T>());
+		  datatype<T>(),
+                  comm);
   }
 
 
 
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default argument
   template <typename T>
   inline void send_receive(const unsigned int dest_processor_id,
 			   std::vector<std::vector<T> > &send,
 			   const unsigned int source_processor_id,
-			   std::vector<std::vector<T> > &recv)
+			   std::vector<std::vector<T> > &recv,
+                           Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
 
-    if (dest_processor_id   == libMesh::processor_id() &&
-	source_processor_id == libMesh::processor_id())
+    if (dest_processor_id   == comm.rank() &&
+	source_processor_id == comm.rank())
       {
 	recv = send;
 	STOP_LOG("send_receive()", "Parallel");
@@ -1967,7 +2085,7 @@ namespace Parallel
     // The outer buffer size
     MPI_Pack_size (1,           
 		   datatype<unsigned int>(),
-		   libMesh::COMM_WORLD,
+		   comm.get(),
 		   &packedsize);
     sendsize += packedsize;
 
@@ -1976,14 +2094,14 @@ namespace Parallel
 	// The size of the ith inner buffer
 	MPI_Pack_size (1,           
 		       datatype<unsigned int>(),
-		       libMesh::COMM_WORLD,
+		       comm.get(),
 		       &packedsize);
 	sendsize += packedsize;
 
 	// The data for each inner buffer
 	MPI_Pack_size (send[i].size(),
 		       datatype<T>(),
-		       libMesh::COMM_WORLD,
+		       comm.get(),
 		       &packedsize);
 	sendsize += packedsize;
       }
@@ -1998,7 +2116,7 @@ namespace Parallel
     sendsize = send.size();
     MPI_Pack (&sendsize, 1, datatype<unsigned int>(),
 	      &sendbuf[0], sendbuf.size(), &pos,
-	      libMesh::COMM_WORLD);
+	      comm.get());
     
     for (unsigned int i=0; i<send.size(); i++)
       {
@@ -2006,13 +2124,13 @@ namespace Parallel
 	sendsize = send[i].size();
 	MPI_Pack (&sendsize, 1, datatype<unsigned int>(),
 		  &sendbuf[0], sendbuf.size(), &pos,
-		  libMesh::COMM_WORLD);
+		  comm.get());
 	
 	// ... the contents of the ith inner buffer
 	if (!send[i].empty())
 	  MPI_Pack (&send[i][0], send[i].size(), datatype<T>(),
 		    &sendbuf[0], sendbuf.size(), &pos,
-		    libMesh::COMM_WORLD);
+		    comm.get());
       }
 
     libmesh_assert (static_cast<unsigned int>(pos) == sendbuf.size());
@@ -2023,19 +2141,21 @@ namespace Parallel
 				sendbuf,
 				MPI_PACKED,
 				request,
-				/* tag = */ 123);
+				/* tag = */ 123,
+                                comm);
 
     Parallel::receive (source_processor_id,
 		       recvbuf,
 		       MPI_PACKED,
-		       /* tag = */ 123);
+		       /* tag = */ 123,
+                       comm);
 
     // Unpack the received buffer
     libmesh_assert (!recvbuf.empty());
     pos=0;
     MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
 		&sendsize, 1, datatype<unsigned int>(),
-		libMesh::COMM_WORLD);
+		comm.get());
     
     // ... size the outer buffer
     recv.resize (sendsize);
@@ -2044,7 +2164,7 @@ namespace Parallel
       {
 	MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
 		    &sendsize, 1, datatype<unsigned int>(),
-		    libMesh::COMM_WORLD);
+		    comm.get());
     
 	// ... size the inner buffer
 	recv[i].resize (sendsize);
@@ -2053,7 +2173,7 @@ namespace Parallel
 	if (!recv[i].empty())
 	  MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
 		      &recv[i][0], recv[i].size(), datatype<T>(),
-		      libMesh::COMM_WORLD);
+		      comm.get());
       }
 
     Parallel::wait (request);
@@ -2065,14 +2185,15 @@ namespace Parallel
   template <typename T>
   inline void gather(const unsigned int root_id,
 		     T send,
-		     std::vector<T> &recv)
+		     std::vector<T> &recv,
+                     Communicator &comm)
   {
-    libmesh_assert(root_id < libMesh::n_processors());
+    libmesh_assert(root_id < comm.size());
 
-    if (libMesh::processor_id() == root_id)
-      recv.resize(libMesh::n_processors());
+    if (comm.rank() == root_id)
+      recv.resize(comm.size());
     
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
         START_LOG("gather()", "Parallel");
 
@@ -2083,7 +2204,7 @@ namespace Parallel
 		   1,
 		   datatype<T>(),
 		   root_id,
-		   libMesh::COMM_WORLD);
+		   comm.get());
 
         STOP_LOG("gather()", "Parallel");
       }
@@ -2096,14 +2217,15 @@ namespace Parallel
   template <typename T>
   inline void gather(const unsigned int root_id,
 		     std::complex<T> send,
-		     std::vector<std::complex<T> > &recv)
+		     std::vector<std::complex<T> > &recv,
+                     Communicator &comm)
   {
-    libmesh_assert(root_id < libMesh::n_processors());
+    libmesh_assert(root_id < comm.size());
 
-    if (libMesh::processor_id() == root_id)
-      recv.resize(libMesh::n_processors());
+    if (comm.rank() == root_id)
+      recv.resize(comm.size());
     
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
         START_LOG("gather()", "Parallel");
 
@@ -2114,7 +2236,7 @@ namespace Parallel
 		   2,
 		   datatype<T>(),
 		   root_id,
-		   libMesh::COMM_WORLD);
+		   comm.get());
 
         STOP_LOG("gather()", "Parallel");
       }
@@ -2144,31 +2266,32 @@ namespace Parallel
    \endverbatim
    *
    * on processor root_id. This function is collective and therefore
-   * must be called by all processors.
+   * must be called by all processors in the Communicator.
    */
   template <typename T>
   inline void gather(const unsigned int root_id,
-		     std::vector<T> &r)
+		     std::vector<T> &r,
+                     Communicator &comm)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       {
-	libmesh_assert (libMesh::processor_id()==root_id);
+	libmesh_assert (comm.rank()==root_id);
 	return;
       }
     
     std::vector<int>
-      sendlengths  (libMesh::n_processors(), 0),
-      displacements(libMesh::n_processors(), 0);
+      sendlengths  (comm.size(), 0),
+      displacements(comm.size(), 0);
 
     const int mysize = r.size();
-    Parallel::allgather(mysize, sendlengths);
+    Parallel::allgather(mysize, sendlengths, comm);
     
     START_LOG("gather()", "Parallel");
 
     // Find the total size of the final array and
     // set up the displacement offsets for each processor.
     unsigned int globalsize = 0; 
-    for (unsigned int i=0; i != libMesh::n_processors(); ++i)
+    for (unsigned int i=0; i != comm.size(); ++i)
       {
 	displacements[i] = globalsize;
 	globalsize += sendlengths[i];
@@ -2186,7 +2309,7 @@ namespace Parallel
 
     // now resize it to hold the global data
     // on the receiving processor
-    if (root_id == libMesh::processor_id())
+    if (root_id == comm.rank())
       r.resize(globalsize);
 
     // and get the data from the remote processors
@@ -2198,7 +2321,7 @@ namespace Parallel
 		   r.empty() ? NULL :  &r[0], &sendlengths[0],
 		   &displacements[0], datatype<T>(),
 		   root_id,
-		   libMesh::COMM_WORLD);
+		   comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -2208,27 +2331,28 @@ namespace Parallel
 
   template <typename T>
   inline void gather(const unsigned int root_id,
-		     std::vector<std::complex<T> > &r)
+		     std::vector<std::complex<T> > &r,
+                     Communicator &comm)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       {
-	libmesh_assert (libMesh::processor_id()==root_id);
+	libmesh_assert (comm.rank()==root_id);
 	return;
       }
     
     std::vector<int>
-      sendlengths  (libMesh::n_processors(), 0),
-      displacements(libMesh::n_processors(), 0);
+      sendlengths  (comm.size(), 0),
+      displacements(comm.size(), 0);
 
     const int mysize = r.size() * 2;
-    Parallel::allgather(mysize, sendlengths);
+    Parallel::allgather(mysize, sendlengths, comm);
     
     START_LOG("gather()", "Parallel");
 
     // Find the total size of the final array and
     // set up the displacement offsets for each processor.
     unsigned int globalsize = 0; 
-    for (unsigned int i=0; i != libMesh::n_processors(); ++i)
+    for (unsigned int i=0; i != comm.size(); ++i)
       {
 	displacements[i] = globalsize;
 	globalsize += sendlengths[i];
@@ -2246,7 +2370,7 @@ namespace Parallel
 
     // now resize r to hold the global data
     // on the receiving processor
-    if (root_id == libMesh::processor_id())
+    if (root_id == comm.rank())
       r.resize(globalsize/2);
 
     // and get the data from the remote processors
@@ -2254,7 +2378,7 @@ namespace Parallel
       MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
 		   r.empty() ? NULL : &r[0], &sendlengths[0],
 		   &displacements[0], datatype<T>(),
-		   root_id, libMesh::COMM_WORLD);
+		   root_id, comm.get());
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("gather()", "Parallel");
@@ -2263,13 +2387,14 @@ namespace Parallel
 
   template <typename T>
   inline void allgather(T send,
-			std::vector<T> &recv)
+			std::vector<T> &recv,
+                        Communicator &comm)
   {
     START_LOG ("allgather()","Parallel");
     
-    recv.resize(libMesh::n_processors());
+    recv.resize(comm.size());
     
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	MPI_Allgather (&send,
 		       1,
@@ -2277,7 +2402,7 @@ namespace Parallel
 		       &recv[0],
 		       1, 
 		       datatype<T>(),
-		       libMesh::COMM_WORLD);
+		       comm.get());
       }
     else
       recv[0] = send;
@@ -2289,13 +2414,14 @@ namespace Parallel
 
   template <typename T>
   inline void allgather(std::complex<T> send,
-			std::vector<std::complex<T> > &recv)
+			std::vector<std::complex<T> > &recv,
+                        Communicator &comm)
   {
     START_LOG ("allgather()","Parallel");
 
-    recv.resize(libMesh::n_processors());
+    recv.resize(comm.size());
 
-    if (libMesh::n_processors() > 1)
+    if (comm.size() > 1)
       {
 	MPI_Allgather (&send,
 		       2,
@@ -2303,7 +2429,7 @@ namespace Parallel
 		       &recv[0],
 		       2, 
 		       datatype<T>(),
-		       libMesh::COMM_WORLD);
+		       comm.get());
       }
     else
       recv[0] = send;
@@ -2333,20 +2459,21 @@ namespace Parallel
    \endverbatim
    *
    * on each processor. This function is collective and therefore
-   * must be called by all processors.
+   * must be called by all processors in the Communicator.
    */
   template <typename T>
   inline void allgather(std::vector<T> &r,
-			const bool identical_buffer_sizes)
+			const bool identical_buffer_sizes,
+                        Communicator &comm)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       return;
 
     START_LOG("allgather()", "Parallel");
 
     if (identical_buffer_sizes)
       {
-	std::vector<T> r_src(r.size()*libMesh::n_processors());
+	std::vector<T> r_src(r.size()*comm.size());
 	r_src.swap(r);
 	MPI_Allgather (r_src.empty() ? NULL : &r_src[0],
 		       r_src.size(),
@@ -2354,22 +2481,22 @@ namespace Parallel
 		       r.empty() ? NULL : &r[0],
 		       r_src.size(), 
 		       datatype<T>(),
-		       libMesh::COMM_WORLD);
+		       comm.get());
 	STOP_LOG("allgather()", "Parallel");
 	return;
       }
 
     std::vector<int>
-      sendlengths  (libMesh::n_processors(), 0),
-      displacements(libMesh::n_processors(), 0);
+      sendlengths  (comm.size(), 0),
+      displacements(comm.size(), 0);
 
     const int mysize = r.size();
-    Parallel::allgather(mysize, sendlengths);
+    Parallel::allgather(mysize, sendlengths, comm);
 
     // Find the total size of the final array and
     // set up the displacement offsets for each processor.
     unsigned int globalsize = 0; 
-    for (unsigned int i=0; i != libMesh::n_processors(); ++i)
+    for (unsigned int i=0; i != comm.size(); ++i)
       {
 	displacements[i] = globalsize;
 	globalsize += sendlengths[i];
@@ -2394,7 +2521,7 @@ namespace Parallel
 #endif
       MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
 		      r.empty()     ? NULL : &r[0],     &sendlengths[0],
-		      &displacements[0], datatype<T>(), libMesh::COMM_WORLD);
+		      &displacements[0], datatype<T>(), comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -2403,19 +2530,20 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T>
   inline void allgather(std::vector<std::complex<T> > &r,
-			const bool identical_buffer_sizes = false)
+			const bool identical_buffer_sizes = false,
+                        Communicator &comm = Communicator_World)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       return;
 
     START_LOG("allgather()", "Parallel");
 
     if (identical_buffer_sizes)
       {
-	std::vector<std::complex<T> > r_src(r.size()*libMesh::n_processors());
+	std::vector<std::complex<T> > r_src(r.size()*comm.size());
 	r_src.swap(r);
 	MPI_Allgather (r_src.empty() ? NULL : &r_src[0],
 		       2*r_src.size(),
@@ -2423,22 +2551,22 @@ namespace Parallel
 		       r.empty() ? NULL : &r[0],
 		       2*r_src.size(), 
 		       datatype<T>(),
-		       libMesh::COMM_WORLD);
+		       comm.get());
 	STOP_LOG("allgather()", "Parallel");
 	return;
       }
 
     std::vector<int>
-      sendlengths  (libMesh::n_processors(), 0),
-      displacements(libMesh::n_processors(), 0);
+      sendlengths  (comm.size(), 0),
+      displacements(comm.size(), 0);
 
     const int mysize = r.size() * 2;
-    Parallel::allgather(mysize, sendlengths);
+    Parallel::allgather(mysize, sendlengths, comm);
 
     // Find the total size of the final array and
     // set up the displacement offsets for each processor.
     unsigned int globalsize = 0; 
-    for (unsigned int i=0; i != libMesh::n_processors(); ++i)
+    for (unsigned int i=0; i != comm.size(); ++i)
       {
 	displacements[i] = globalsize;
 	globalsize += sendlengths[i];
@@ -2461,7 +2589,7 @@ namespace Parallel
       MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
 		      r.empty()     ? NULL : &r[0],     &sendlengths[0],
 		      &displacements[0], datatype<T>(),
-		      libMesh::COMM_WORLD);
+		      comm.get());
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("allgather()", "Parallel");
@@ -2476,9 +2604,10 @@ namespace Parallel
    * processor.
    */
   template <typename T>
-  inline void alltoall(std::vector<T> &buf)
+  inline void alltoall(std::vector<T> &buf,
+                       Communicator &comm)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       return;
 
     START_LOG("alltoall()", "Parallel");
@@ -2487,9 +2616,9 @@ namespace Parallel
     // processors using MPI_Alltoall, could be variable
     // using MPI_Alltoallv
     const unsigned int size_per_proc = 
-      buf.size()/libMesh::n_processors();
+      buf.size()/comm.size();
 
-    libmesh_assert (buf.size()%libMesh::n_processors() == 0);
+    libmesh_assert (buf.size()%comm.size() == 0);
 
     std::vector<T> tmp(buf);
     
@@ -2503,7 +2632,7 @@ namespace Parallel
 		    buf.empty() ? NULL : &buf[0],
 		    size_per_proc,
 		    datatype<T>(),
-		    libMesh::COMM_WORLD);
+		    comm.get());
     libmesh_assert (ierr == MPI_SUCCESS);
     
     STOP_LOG("alltoall()", "Parallel");
@@ -2512,11 +2641,12 @@ namespace Parallel
 
 
   template <typename T>
-  inline void broadcast (T &data, const unsigned int root_id)
+  inline void broadcast (T &data, const unsigned int root_id,
+                         Communicator &comm)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       {
-	libmesh_assert (libMesh::processor_id() == root_id);
+	libmesh_assert (comm.rank() == root_id);
 	return;
       }
     
@@ -2527,7 +2657,7 @@ namespace Parallel
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
-      MPI_Bcast (&data, 1, datatype<T>(), root_id, libMesh::COMM_WORLD);
+      MPI_Bcast (&data, 1, datatype<T>(), root_id, comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -2538,11 +2668,12 @@ namespace Parallel
   // This is both a declaration and definition for a new overloaded
   // function template, so we have to re-specify the default argument
   template <typename T>
-  inline void broadcast (std::complex<T> &data, const unsigned int root_id=0)
+  inline void broadcast (std::complex<T> &data, const unsigned int root_id=0,
+                         Communicator &comm = Communicator_World)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       {
-	libmesh_assert (libMesh::processor_id() == root_id);
+	libmesh_assert (comm.rank() == root_id);
 	return;
       }
     
@@ -2550,7 +2681,7 @@ namespace Parallel
 
     // Spread data to remote processors.
     const int ierr =
-      MPI_Bcast (&data, 2, datatype<T>(), root_id, libMesh::COMM_WORLD);
+      MPI_Bcast (&data, 2, datatype<T>(), root_id, comm.get());
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
@@ -2559,33 +2690,34 @@ namespace Parallel
 
 
   template <>
-  inline void broadcast (std::string &data, const unsigned int root_id)
+  inline void broadcast (std::string &data, const unsigned int root_id,
+                         Communicator &comm)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       {
-	libmesh_assert (libMesh::processor_id() == root_id);
+	libmesh_assert (comm.rank() == root_id);
 	return;
       }
 
     START_LOG("broadcast()", "Parallel");
 
     unsigned int data_size = data.size();
-    Parallel::broadcast(data_size, root_id);
+    Parallel::broadcast(data_size, root_id, comm);
     
     std::vector<char> data_c(data_size);
     std::string orig(data);
 
-    if (libMesh::processor_id() == root_id)
+    if (comm.rank() == root_id)
       for(unsigned int i=0; i<data.size(); i++)
 	data_c[i] = data[i];
 
-    Parallel::broadcast (data_c,root_id);
+    Parallel::broadcast (data_c, root_id, comm);
     
     data.clear(); data.reserve(data_c.size());
     for(unsigned int i=0; i<data_c.size(); i++)
       data.push_back(data_c[i]);
     
-    if (libMesh::processor_id() == root_id)
+    if (comm.rank() == root_id)
       libmesh_assert(data == orig);
 
     STOP_LOG("broadcast()", "Parallel");
@@ -2594,11 +2726,12 @@ namespace Parallel
 
 
   template <typename T>
-  inline void broadcast (std::vector<T> &data, const unsigned int root_id)
+  inline void broadcast (std::vector<T> &data, const unsigned int root_id,
+                         Communicator &comm)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       {
-	libmesh_assert (libMesh::processor_id() == root_id);
+	libmesh_assert (comm.rank() == root_id);
 	return;
       }
 
@@ -2611,7 +2744,7 @@ namespace Parallel
     const int ierr =
 #endif
       MPI_Bcast (data.empty() ? NULL : &data[0], data.size(), datatype<T>(),
-		 root_id, libMesh::COMM_WORLD);
+		 root_id, comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -2623,11 +2756,12 @@ namespace Parallel
   // function template, so we have to re-specify the default argument
   template <typename T>
   inline void broadcast (std::vector<std::complex<T> > &data,
-			 const unsigned int root_id=0)
+			 const unsigned int root_id=0,
+                         Communicator &comm = Communicator_World)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       {
-	libmesh_assert (libMesh::processor_id() == root_id);
+	libmesh_assert (comm.rank() == root_id);
 	return;
       }
 
@@ -2637,7 +2771,7 @@ namespace Parallel
     // Pass NULL if our vector is empty.
     const int ierr =
       MPI_Bcast (data.empty() ? NULL : &data[0], data.size() * 2, datatype<T>(),
-		 root_id, libMesh::COMM_WORLD);
+		 root_id, comm.get());
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
@@ -2645,27 +2779,28 @@ namespace Parallel
 
 
   template <typename T>
-  inline void broadcast (std::set<T> &data, const unsigned int root_id)
+  inline void broadcast (std::set<T> &data, const unsigned int root_id,
+                         Communicator &comm)
   {
-    if (libMesh::n_processors() == 1)
+    if (comm.size() == 1)
       {
-	libmesh_assert (libMesh::processor_id() == root_id);
+	libmesh_assert (comm.rank() == root_id);
 	return;
       }
 
     START_LOG("broadcast()", "Parallel");
 
     std::vector<T> vecdata;
-    if (libMesh::processor_id() == root_id)
+    if (comm.rank() == root_id)
       vecdata.assign(data.begin(), data.end());
 
     unsigned int vecsize = vecdata.size();
-    Parallel::broadcast(vecsize, root_id);
-    if (libMesh::processor_id() != root_id)
+    Parallel::broadcast(vecsize, root_id, comm);
+    if (comm.rank() != root_id)
       vecdata.resize(vecsize);
 
-    Parallel::broadcast(vecdata, root_id);
-    if (libMesh::processor_id() != root_id)
+    Parallel::broadcast(vecdata, root_id, comm);
+    if (comm.rank() != root_id)
       data.assign(vecdata.begin(), vecdata.end());
 
     STOP_LOG("broadcast()", "Parallel");
@@ -2674,31 +2809,31 @@ namespace Parallel
 #else // LIBMESH_HAVE_MPI
 
   template <typename T>
-  inline bool verify(const T &) { return true; }
+  inline bool verify(const T &, Communicator&) { return true; }
 
   template <typename T>
-  inline void min(T &) {}
+  inline void min(T &, Communicator&) {}
 
   template <typename T>
-  inline void min(std::vector<T> &) {}
+  inline void min(std::vector<T> &, Communicator&) {}
 
   template <typename T>
-  inline void max(T &) {}
+  inline void max(T &, Communicator&) {}
 
   template <typename T>
-  inline void max(std::vector<T> &) {}
+  inline void max(std::vector<T> &, Communicator&) {}
 
   template <typename T>
-  inline void sum(T &) {}
+  inline void sum(T &, Communicator&) {}
 
   template <typename T>
-  inline void sum(std::vector<T> &) {}
+  inline void sum(std::vector<T> &, Communicator&) {}
 
   template <typename T>
-  inline void set_union(std::set<T> &, const unsigned int) {}
+  inline void set_union(std::set<T> &, const unsigned int, Communicator&) {}
 
   template <typename T>
-  inline void set_union(std::set<T> &) {}
+  inline void set_union(std::set<T> &, Communicator&) {}
 
  //-------------------------------------------------------------------
   /**
@@ -2708,7 +2843,8 @@ namespace Parallel
    * we do not currently support this operation on one processor without MPI.
    */
   inline status probe (const int,
-		       const int)
+		       const int,
+                       Communicator&)
   { libmesh_error(); status status; return status; }
 
   //-------------------------------------------------------------------
@@ -2721,7 +2857,8 @@ namespace Parallel
   inline void send (const unsigned int,
 		    std::vector<T> &,
 		    const DataType &,
-		    const int)
+		    const int,
+                    Communicator&)
   { libmesh_error(); }
 
   //-------------------------------------------------------------------
@@ -2735,7 +2872,8 @@ namespace Parallel
 		    std::vector<T> &,
 		    const DataType &,
 		    request &,
-		    const int)
+		    const int,
+                    Communicator&)
   { libmesh_error(); }
 
   //-------------------------------------------------------------------
@@ -2748,7 +2886,8 @@ namespace Parallel
   inline Status receive (const int,
 		         std::vector<T> &,
 		         const DataType &,
-		         const int)
+		         const int,
+                         Communicator&)
   { libmesh_error(); return Status(); }
 
   //-------------------------------------------------------------------
@@ -2762,7 +2901,8 @@ namespace Parallel
 		       std::vector<T> &,
 		       const DataType &,
 		       request &,
-		       const int)
+		       const int,
+                       Communicator&)
   { libmesh_error(); }
 
 
@@ -2805,7 +2945,8 @@ namespace Parallel
   inline void send_receive (const unsigned int send_tgt,
 			    T &send,
 			    const unsigned int recv_source,
-			    T &recv)
+			    T &recv,
+                            Communicator&)
   {
     libmesh_assert (send_tgt == recv_source);
     recv = send;
@@ -2814,7 +2955,8 @@ namespace Parallel
   template <typename T>
   inline void gather(const unsigned int root_id,
 		     T send,
-		     std::vector<T> &recv)
+		     std::vector<T> &recv,
+                     Communicator&)
   {
     libmesh_assert (!root_id);
     recv.resize(1);
@@ -2822,27 +2964,30 @@ namespace Parallel
   }
 
   template <typename T>
-  inline void gather(const unsigned int, std::vector<T> &) {}
+  inline void gather(const unsigned int, std::vector<T> &,
+                     Communicator&) {}
 
   template <typename T>
   inline void allgather(T send,
-			std::vector<T> &recv)
+			std::vector<T> &recv,
+                        Communicator&)
   {
     recv.resize(1);
     recv[0] = send;
   }
 
   template <typename T>
-  inline void allgather(std::vector<T> &, const bool) {}
+  inline void allgather(std::vector<T> &, const bool,
+                        Communicator&) {}
 
   template <typename T>
-  inline void alltoall(std::vector<T> &) {}
+  inline void alltoall(std::vector<T> &, Communicator&) {}
 
   template <typename T>
-    inline void broadcast (T &, const unsigned int) {}
+    inline void broadcast (T &, const unsigned int, Communicator&) {}
 
   template <typename T>
-    inline void broadcast (std::vector<T> &, const unsigned int) {}
+    inline void broadcast (std::vector<T> &, const unsigned int, Communicator&) {}
 
 #endif // LIBMESH_HAVE_MPI
 
