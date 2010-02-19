@@ -30,13 +30,16 @@
 #include "mesh_base.h"
 #include "numeric_vector.h"
 #include "parameter_vector.h"
+#include "point.h"              // For point_value
+#include "point_locator_base.h" // For point_value
 #include "qoi_set.h"
 #include "string_to_enum.h"
 #include "system.h"
 #include "utility.h"
 
-// includes for calculate_norm
+// includes for calculate_norm, point_*
 #include "fe_base.h"
+#include "fe_interface.h"
 #include "parallel.h"
 #include "quadrature.h"
 #include "tensor_value.h"
@@ -1421,3 +1424,85 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
   if(_qoi_evaluate_derivative != NULL)
     this->_qoi_evaluate_derivative(_equation_systems, this->name(), qoi_indices);
 }
+
+
+
+Number System::point_value(unsigned int var, Point &p)
+{
+  // This function must be called on every processor; there's no
+  // telling where in the partition p falls.
+  parallel_only();
+
+  // Get a reference to the mesh object associated with the system object that calls this function
+  const MeshBase &mesh = this->get_mesh();
+
+  // Use an existing PointLocator or create a new one
+  const PointLocatorBase &locator = mesh.point_locator();
+  
+  // Get a pointer to the element that contains P
+  const Elem *e = locator(p);
+
+  // Get ready to accumulate a value
+  Real u = 0;
+
+  // Make sure we got an element on our partition
+  bool I_found_p = false;
+
+  if (e && e->processor_id() == libMesh::processor_id())
+    {
+      I_found_p = true;
+
+      // Get the dof map to get the proper indices for our computation
+      const DofMap& dof_map = this->get_dof_map();
+
+      // Need dof_indices for phi[i][j]
+      std::vector<unsigned int> dof_indices;
+
+      // Fill in the dof_indices for our element
+      dof_map.dof_indices (e, dof_indices, var);
+
+      // Get the no of dofs assciated with this point
+      const unsigned int n_dofs  = dof_indices.size();
+
+      FEType fe_type = dof_map.variable_type(0);
+
+      // Build a FE again so we can calculate u(p)
+      AutoPtr<FEBase> fe (FEBase::build(2, fe_type));
+
+      // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+      // Build a vector of point co-ordinates to send to reinit
+      std::vector<Point> coor(1, FEInterface::inverse_map(2, fe_type, e, p));
+
+      // Get the shape function values
+      const std::vector<std::vector<Real> >& phi = fe->get_phi();
+    
+      // Reinitialize the element and compute the shape function values at coor
+      fe->reinit (e, &coor);
+
+      for (unsigned int l=0; l<n_dofs; l++)
+        {
+          u += phi[l][0]*this->current_solution (dof_indices[l]);
+        }
+    }
+
+  // If I have an element containing p, then let's let everyone know
+  unsigned int lowest_owner = I_found_p ? libMesh::n_processors() : libMesh::processor_id();
+  Parallel::min(lowest_owner);
+
+  // FIXME: There's a possible bug with ParallelMesh here:
+  // For points on element boundaries, PointLocator() might return
+  // different elements on different processors.  For points on
+  // partition boundaries, processor A might think processor B owns
+  // the point and vice versa.  If nobody admits owning the point, we
+  // have a problem.
+  if (lowest_owner == libMesh::n_processors())
+    libmesh_error();
+
+  // Everybody should get their value from a processor that was able
+  // to compute it.
+  Parallel::broadcast(u, lowest_owner);
+  
+  return u;
+}
+
+

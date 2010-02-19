@@ -10714,10 +10714,12 @@ src/systems/system.$(obj-suffix):\
     include/enums/enum_norm_type.h\
     include/enums/enum_order.h\
     include/enums/enum_parallel_type.h\
+    include/enums/enum_point_locator_type.h\
     include/enums/enum_quadrature_type.h\
     include/enums/enum_solver_package.h\
     include/enums/enum_xdr_mode.h\
     include/fe/fe_base.h\
+    include/fe/fe_interface.h\
     include/fe/fe_type.h\
     include/geom/elem.h\
     include/geom/elem_range.h\
@@ -10751,6 +10753,7 @@ src/systems/system.$(obj-suffix):\
     include/utils/o_string_stream.h\
     include/utils/parameters.h\
     include/utils/perf_log.h\
+    include/utils/point_locator_base.h\
     include/utils/string_to_enum.h\
     include/utils/utility.h
 src/systems/system_io.$(obj-suffix):\
