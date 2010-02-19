@@ -32,6 +32,7 @@
 #include "enum_xdr_mode.h"
 #include "fe_type.h"
 #include "libmesh_common.h"
+#include "tensor_value.h" // For point_hessian
 #include "qoi_set.h"
 #include "reference_counted_object.h"
 #include "system_norm.h"
@@ -1048,6 +1049,21 @@ public:
    * this function is parallel-only.
    */
   Gradient point_gradient(unsigned int var, Point &p);
+
+/**
+   * Returns the second derivative tensor of the solution variable \p var at the physical
+   * point \p p in the mesh.
+   *
+   * Note that this function uses \p MeshBase::point_locator(); users
+   * may or may not want to call \p MeshBase::clear_point_locator()
+   * afterward.  Also, point_locator() is expensive.  Avoid using this
+   * function in any context where you are already looping over
+   * elements.
+   *
+   * Because the element containing \p p may lie on any processor,
+   * this function is parallel-only.
+   */
+  Tensor point_hessian(unsigned int var, Point &p);
  
   /**
    * Fills the std::set with the degrees of freedom on the local
