@@ -195,14 +195,15 @@ public:
 
   /**
    * @returns true if the point p is located on the reference element
-   * for element type t, false otherwise.  Since we are doing floating
-   * point comparisons here the parameter \p eps can be specified to
-   * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
-   * \f$ x \le 1 + \epsilon \f$. 
+   * for element type t, false otherwise.
+   *
+   * Since we are doing floating point comparisons here the parameter
+   * \p eps can be specified to indicate a tolerance.  For example,
+   * \f$ \xi \le 1 \f$  becomes \f$ \xi \le 1 + \epsilon \f$. 
    */
   static bool on_reference_element(const Point& p,
 				   const ElemType t,
-				   const Real eps=1.e-6);
+				   const Real eps=TOLERANCE);
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,

@@ -1241,7 +1241,7 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
 
 
 
-bool Elem::contains_point (const Point& p) const
+bool Elem::contains_point (const Point& p, Real tol) const
 {
   // Declare a basic FEType.  Will ue a Lagrange
   // element by default.
@@ -1254,7 +1254,7 @@ bool Elem::contains_point (const Point& p) const
 						      1.e-4,
 						      false);
 
-  return FEInterface::on_reference_element(mapped_point, this->type());
+  return FEInterface::on_reference_element(mapped_point, this->type(), tol);
 }
 
 
