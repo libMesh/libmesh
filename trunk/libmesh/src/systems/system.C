@@ -1506,4 +1506,98 @@ Number System::point_value(unsigned int var, Point &p)
   return u;
 }
 
+Gradient System::point_gradient(unsigned int var, Point &p)
+{
+  // This function must be called on every processor; there's no
+  // telling where in the partition p falls.
+  parallel_only();
 
+  // Get a reference to the mesh object associated with the system object that calls this function
+  const MeshBase &mesh = this->get_mesh();
+
+  // Get the dimension of the mesh
+  const unsigned int dim = mesh.mesh_dimension();
+  
+  // Use an existing PointLocator or create a new one
+  const PointLocatorBase &locator = mesh.point_locator();
+  
+  // Get a pointer to the element that contains P
+  const Elem *e = locator(p);
+
+  // Get ready to accumulate a gradient
+  Gradient grad_u;
+
+  // Make sure we got an element on our partition
+  bool I_found_p = false;
+
+  if (e && e->processor_id() == libMesh::processor_id())
+    {
+      // Get the dof map to get the proper indices for our computation
+      const DofMap& dof_map = this->get_dof_map();
+
+      // Need dof_indices for phi[i][j]
+      std::vector<unsigned int> dof_indices;
+
+      // Fill in the dof_indices for our element
+      dof_map.dof_indices (e, dof_indices, var);
+
+      // Calculate a value for p, if we have enough local and ghosted
+      // data to do so.
+      if (dof_map.all_semilocal_indices(dof_indices))
+        {
+          I_found_p = true;
+
+          // Get the no of dofs assciated with this point
+          const unsigned int n_dofs  = dof_indices.size();
+
+          FEType fe_type = dof_map.variable_type(0);
+    
+          // Build a FE again so we can calculate u(p)
+          AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+
+          // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+          // Build a vector of point co-ordinates to send to reinit
+          std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, e, p));
+
+          // Get the values of the shape function derivatives
+	  const std::vector<std::vector<Gradient> >&  dphi = fe->get_dphi();
+    
+          // Reinitialize the element and compute the shape function values at coor
+          fe->reinit (e, &coor);
+
+          for (unsigned int l=0; l<n_dofs; l++)
+            {
+              grad_u.add_scaled (dphi[l][0], this->current_solution (dof_indices[l]));
+            }
+        }
+    }
+
+  // If I have an element containing p, then let's let everyone know
+  unsigned int lowest_owner = I_found_p ? libMesh::n_processors() : libMesh::processor_id();
+  Parallel::min(lowest_owner);
+
+  // If nobody admits owning the point, we have a problem.
+  libmesh_assert(lowest_owner != libMesh::n_processors());
+
+  // Broadcast cannot handle Gradients so we create a vector 
+  // that can be used to broadcast the computed gradient to the other procs
+  std::vector<Number> gradient_vector(dim);
+  
+  // Now loop over every dimension and fill this vector
+  for (unsigned int i=0; i<dim; i++)
+    {
+      gradient_vector[i] = grad_u(i);
+    }
+
+  // Everybody should get their value from a processor that was able
+  // to compute it.
+  Parallel::broadcast(gradient_vector, lowest_owner);
+  
+  // Now unpack
+  for (unsigned int i =0; i<dim; i++)
+    {
+      grad_u(i) = gradient_vector[i];
+    }
+
+  return grad_u;
+}
