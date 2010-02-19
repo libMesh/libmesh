@@ -186,7 +186,7 @@ namespace Parallel
     Communicator () : _rank(0), _size(1) {}
 #endif
 
-    Communicator (const communicator &comm) {
+    explicit Communicator (const communicator &comm) {
       this->assign(comm);
     }
 
@@ -195,6 +195,10 @@ namespace Parallel
     }
 
     communicator& get() {
+      return _communicator;
+    }
+
+    const communicator& get() const {
       return _communicator;
     }
 
@@ -460,7 +464,7 @@ namespace Parallel
   /**
    * Pause execution until all processors reach a certain point.
    */
-  inline void barrier (Communicator &comm = Communicator_World)
+  inline void barrier (const Communicator &comm = Communicator_World)
   {
 #ifdef LIBMESH_HAVE_MPI
     MPI_Barrier (comm.get());
@@ -473,7 +477,7 @@ namespace Parallel
    */
   template <typename T>
   inline bool verify(const T &r,
-                     Communicator &comm = Communicator_World);
+                     const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -482,7 +486,7 @@ namespace Parallel
    */
   template <typename T>
   inline void min(T &r,
-                  Communicator &comm = Communicator_World);
+                  const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -491,7 +495,7 @@ namespace Parallel
    */
   template <typename T>
   inline void min(std::vector<T> &r,
-                  Communicator &comm = Communicator_World);
+                  const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -500,7 +504,7 @@ namespace Parallel
    */
   template <typename T>
   inline void max(T &r,
-                  Communicator &comm = Communicator_World);
+                  const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -509,7 +513,7 @@ namespace Parallel
    */
   template <typename T>
   inline void max(std::vector<T> &r,
-                  Communicator &comm = Communicator_World);
+                  const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -518,7 +522,7 @@ namespace Parallel
    */
   template <typename T>
   inline void sum(T &r,
-                  Communicator &comm = Communicator_World);
+                  const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -527,7 +531,7 @@ namespace Parallel
    */
   template <typename T>
   inline void sum(std::vector<T> &r,
-                  Communicator &comm = Communicator_World);
+                  const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -536,7 +540,7 @@ namespace Parallel
    */
   template <typename T>
   inline void set_union(std::set<T> &data, const unsigned int root_id,
-                        Communicator &comm = Communicator_World);
+                        const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -545,7 +549,7 @@ namespace Parallel
    */
   template <typename T>
   inline void set_union(std::set<T> &data,
-                        Communicator &comm = Communicator_World);
+                        const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -554,7 +558,7 @@ namespace Parallel
    */
   inline status probe (const int src_processor_id,
 		       const int tag=any_tag,
-                       Communicator &comm = Communicator_World);
+                       const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -565,7 +569,7 @@ namespace Parallel
 		    std::vector<T> &buf,
 		    const DataType &type,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World);
+                    const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -577,7 +581,7 @@ namespace Parallel
 		    const DataType &type,
 		    request &req,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World);
+                    const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -588,7 +592,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World)
+                    const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -602,7 +606,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World)
+                    const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -622,7 +626,7 @@ namespace Parallel
 		    std::vector<T> &buf,
 		    request &req,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World)
+                    const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -638,7 +642,7 @@ namespace Parallel
 		    std::vector<std::complex<T> > &buf,
 		    request &req,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World)
+                    const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -658,7 +662,7 @@ namespace Parallel
 		    std::set<T> &buf,
 		    const DataType &type,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World);
+                    const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -670,7 +674,7 @@ namespace Parallel
 		    const DataType &type,
 		    request &req,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World);
+                    const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -681,7 +685,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World)
+                    const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -695,7 +699,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<std::complex<T> > &buf,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World)
+                    const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -715,7 +719,7 @@ namespace Parallel
 		    std::set<T> &buf,
 		    request &req,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World)
+                    const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -731,7 +735,7 @@ namespace Parallel
 		    std::set<std::complex<T> > &buf,
 		    request &req,
 		    const int tag=0,
-                    Communicator &comm = Communicator_World)
+                    const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -751,7 +755,7 @@ namespace Parallel
 		                const DataType &type,
 		                request &r,
 		                const int tag=0,
-                                Communicator &comm = Communicator_World)
+                                const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -770,7 +774,7 @@ namespace Parallel
 		                std::vector<T> &buf,
 		                request &r,
 		                const int tag=0,
-                                Communicator &comm = Communicator_World)
+                                const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -786,7 +790,7 @@ namespace Parallel
 		                std::vector<std::complex<T> > &buf,
 		                request &r,
 		                const int tag=0,
-                                Communicator &comm = Communicator_World)
+                                const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
 	  buf,
@@ -805,7 +809,7 @@ namespace Parallel
 		         std::vector<T> &buf,
 		         const DataType &type,
 		         const int tag=any_tag,
-                         Communicator &comm = Communicator_World);
+                         const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -817,7 +821,7 @@ namespace Parallel
 		       const DataType &type,
 		       request &req,
 		       const int tag=any_tag,
-                       Communicator &comm = Communicator_World);
+                       const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -828,7 +832,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
 		         const int tag=any_tag,
-                         Communicator &comm = Communicator_World)
+                         const Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
 		    buf,
@@ -842,7 +846,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::vector<std::complex<T> > &buf,
 		         const int tag=any_tag,
-                         Communicator &comm = Communicator_World)
+                         const Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
 		    buf,
@@ -861,7 +865,7 @@ namespace Parallel
 		       std::vector<T> &buf,
 		       request &req,
 		       const int tag=any_tag,
-                       Communicator &comm = Communicator_World)
+                       const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
@@ -877,7 +881,7 @@ namespace Parallel
 		       std::vector<std::complex<T> > &buf,
 		       request &req,
 		       const int tag=any_tag,
-                       Communicator &comm = Communicator_World)
+                       const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
@@ -896,7 +900,7 @@ namespace Parallel
 		         std::set<T> &buf,
 		         const DataType &type,
 		         const int tag=any_tag,
-                         Communicator &comm = Communicator_World);
+                         const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -908,7 +912,7 @@ namespace Parallel
 		       const DataType &type,
 		       request &req,
 		       const int tag=any_tag,
-                       Communicator &comm = Communicator_World);
+                       const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -919,7 +923,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::set<T> &buf,
 		         const int tag=any_tag,
-                         Communicator &comm = Communicator_World)
+                         const Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
 		    buf,
@@ -933,7 +937,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::set<std::complex<T> > &buf,
 		         const int tag=any_tag,
-                         Communicator &comm = Communicator_World)
+                         const Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
 		    buf,
@@ -952,7 +956,7 @@ namespace Parallel
 		       std::set<T> &buf,
 		       request &req,
 		       const int tag=any_tag,
-                       Communicator &comm = Communicator_World)
+                       const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
@@ -967,7 +971,7 @@ namespace Parallel
 		       std::set<std::complex<T> > &buf,
 		       request &req,
 		       const int tag=any_tag,
-                       Communicator &comm = Communicator_World)
+                       const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
@@ -987,7 +991,7 @@ namespace Parallel
 				   const DataType &type,
 		                   request &r,
 		                   const int tag=any_tag,
-                                   Communicator &comm = Communicator_World)
+                                   const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
@@ -1006,7 +1010,7 @@ namespace Parallel
 		                   std::vector<T> &buf,
 		                   request &r,
 		                   const int tag=any_tag,
-                                   Communicator &comm = Communicator_World)
+                                   const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
@@ -1022,7 +1026,7 @@ namespace Parallel
 		                   std::vector<std::complex<T> > &buf,
 		                   request &r,
 		                   const int tag=any_tag,
-                                   Communicator &comm = Communicator_World)
+                                   const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
 	     buf,
@@ -1062,7 +1066,7 @@ namespace Parallel
                            T &send,
 			   const unsigned int source_processor_id,
                            T &recv,
-                           Communicator &comm = Communicator_World);
+                           const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1076,7 +1080,7 @@ namespace Parallel
 			   const unsigned int source_processor_id,
                            T &recv,
 			   const DataType &type,
-                           Communicator &comm = Communicator_World);
+                           const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1087,7 +1091,7 @@ namespace Parallel
   inline void gather(const unsigned int root_id,
 		     T send,
 		     std::vector<T> &recv,
-                     Communicator &comm = Communicator_World);
+                     const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1097,7 +1101,7 @@ namespace Parallel
   template <typename T>
   inline void gather(const unsigned int root_id,
 		     std::vector<T> &r,
-                     Communicator &comm = Communicator_World);
+                     const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1107,7 +1111,7 @@ namespace Parallel
   template <typename T>
   inline void allgather(T send,
 			std::vector<T> &recv,
-                        Communicator &comm = Communicator_World);
+                        const Communicator &comm = Communicator_World);
 
 
   //-------------------------------------------------------------------
@@ -1121,7 +1125,7 @@ namespace Parallel
   template <typename T>
   inline void allgather(std::vector<T> &r,
 			const bool identical_buffer_sizes = false,
-                        Communicator &comm = Communicator_World);
+                        const Communicator &comm = Communicator_World);
 
 
 
@@ -1133,7 +1137,7 @@ namespace Parallel
    */
   template <typename T>
   inline void alltoall(std::vector<T> &r,
-                       Communicator &comm = Communicator_World);
+                       const Communicator &comm = Communicator_World);
 
 
 
@@ -1145,7 +1149,7 @@ namespace Parallel
    */
   template <typename T>
   inline void broadcast(T &data, const unsigned int root_id=0,
-                        Communicator &comm = Communicator_World);
+                        const Communicator &comm = Communicator_World);
 
 
 
@@ -1158,7 +1162,7 @@ namespace Parallel
    */
   template <typename T>
   inline void broadcast(std::vector<T> &data, const unsigned int root_id=0,
-                        Communicator &comm = Communicator_World);
+                        const Communicator &comm = Communicator_World);
 
 
   //-------------------------------------------------------------------
@@ -1169,7 +1173,7 @@ namespace Parallel
    */
   template <typename T>
   inline void broadcast(std::set<T> &data, const unsigned int root_id=0,
-                        Communicator &comm = Communicator_World);
+                        const Communicator &comm = Communicator_World);
 
 
   //-----------------------------------------------------------------------
@@ -1250,7 +1254,7 @@ namespace Parallel
 
   template <typename T>
   inline bool verify(const T &r,
-                     Communicator &comm)
+                     const Communicator &comm)
   {
     if (comm.size() > 1)
       {
@@ -1268,7 +1272,7 @@ namespace Parallel
 
   template <>
   inline bool verify(const std::string & r,
-                     Communicator &comm)
+                     const Communicator &comm)
   {
     if (comm.size() > 1)
       {
@@ -1285,7 +1289,7 @@ namespace Parallel
 
   template <typename T>
   inline void min(T &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1)
       {
@@ -1306,7 +1310,7 @@ namespace Parallel
 
   template <>
   inline void min(bool &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1)
       {
@@ -1329,7 +1333,7 @@ namespace Parallel
 
   template <typename T>
   inline void min(std::vector<T> &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1 && !r.empty())
       {
@@ -1350,7 +1354,7 @@ namespace Parallel
 
   template <>
   inline void min(std::vector<bool> &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1 && !r.empty())
       {
@@ -1374,7 +1378,7 @@ namespace Parallel
 
   template <typename T>
   inline void max(T &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1)
       {
@@ -1396,7 +1400,7 @@ namespace Parallel
 
   template <>
   inline void max(bool &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1)
       {
@@ -1419,7 +1423,7 @@ namespace Parallel
 
   template <typename T>
   inline void max(std::vector<T> &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1 && !r.empty())
       {
@@ -1440,7 +1444,7 @@ namespace Parallel
 
   template <>
   inline void max(std::vector<bool> &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1 && !r.empty())
       {
@@ -1464,7 +1468,7 @@ namespace Parallel
 
   template <typename T>
   inline void sum(T &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1)
       {
@@ -1485,7 +1489,7 @@ namespace Parallel
 
   template <typename T>
   inline void sum(std::vector<T> &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1 && !r.empty())
       {
@@ -1507,7 +1511,7 @@ namespace Parallel
 
   template <typename T>
   inline void sum(std::complex<T> &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1)
       {
@@ -1528,7 +1532,7 @@ namespace Parallel
 
   template <typename T>
   inline void sum(std::vector<std::complex<T> > &r,
-                  Communicator &comm)
+                  const Communicator &comm)
   {
     if (comm.size() > 1 && !r.empty())
       {
@@ -1550,7 +1554,7 @@ namespace Parallel
 
   template <typename T>
   inline void set_union(std::set<T> &data, const unsigned int root_id,
-                        Communicator &comm)
+                        const Communicator &comm)
   {
     std::vector<T> vecdata(data.begin(), data.end());
     Parallel::gather(root_id, vecdata);
@@ -1562,7 +1566,7 @@ namespace Parallel
 
   template <typename T>
   inline void set_union(std::set<T> &data,
-                        Communicator &comm)
+                        const Communicator &comm)
   {
     Parallel::set_union(data, 0, comm);
     broadcast(data);
@@ -1572,7 +1576,7 @@ namespace Parallel
 
   inline status probe (const int src_processor_id,
 		       const int tag,
-                       Communicator &comm)
+                       const Communicator &comm)
   {
     START_LOG("probe()", "Parallel");
 
@@ -1595,7 +1599,7 @@ namespace Parallel
 		    std::vector<T> &buf,
 		    const DataType &type,
 		    const int tag,
-                    Communicator &comm)
+                    const Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
 
@@ -1624,7 +1628,7 @@ namespace Parallel
 		    std::vector<std::complex<T> > &buf,
 		    const DataType &type,
 		    const int tag=0,
-                    Communicator &comm=Communicator_World)
+                    const Communicator &comm=Communicator_World)
   {    
     START_LOG("send()", "Parallel");
 
@@ -1652,7 +1656,7 @@ namespace Parallel
 		    const DataType &type,
 		    request &req,
 		    const int tag,
-                    Communicator &comm)
+                    const Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
 
@@ -1681,7 +1685,7 @@ namespace Parallel
 		    const DataType &type,
 		    request &req,
 		    const int tag=0,
-                    Communicator &comm=Communicator_World)
+                    const Communicator &comm=Communicator_World)
   {
     START_LOG("send()", "Parallel");
 
@@ -1708,7 +1712,7 @@ namespace Parallel
 		         std::vector<T> &buf,
 		         const DataType &type,
 		         const int tag,
-                         Communicator &comm)
+                         const Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1745,7 +1749,7 @@ namespace Parallel
 		         std::vector<std::complex<T> > &buf,
 		         const DataType &type,
 		         const int tag=any_tag,
-                         Communicator &comm=Communicator_World)
+                         const Communicator &comm=Communicator_World)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1782,7 +1786,7 @@ namespace Parallel
 		       const DataType &type,
 		       request &req,
 		       const int tag,
-                       Communicator &comm)
+                       const Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1812,7 +1816,7 @@ namespace Parallel
 		       const DataType &type,
 		       request &req,
 		       const int tag=any_tag,
-                       Communicator &comm=Communicator_World)
+                       const Communicator &comm=Communicator_World)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1839,7 +1843,7 @@ namespace Parallel
 		    std::set<T> &buf,
 		    const DataType &type,
 		    const int tag,
-                    Communicator &comm)
+                    const Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
 
@@ -1858,7 +1862,7 @@ namespace Parallel
 		    const DataType &type,
 		    request &req,
 		    const int tag,
-                    Communicator &comm)
+                    const Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
 
@@ -1876,7 +1880,7 @@ namespace Parallel
 		         std::set<T> &buf,
 		         const DataType &type,
 		         const int tag,
-                         Communicator &comm)
+                         const Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1898,7 +1902,7 @@ namespace Parallel
 		       const DataType &type,
 		       request &req,
 		       const int tag,
-                       Communicator &comm)
+                       const Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
 
@@ -1946,7 +1950,7 @@ namespace Parallel
 			   const unsigned int source_processor_id,
 			   std::vector<T> &recv,
 			   const DataType &type,
-                           Communicator &comm = Communicator_World)
+                           const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -1985,7 +1989,7 @@ namespace Parallel
 			   T &send,
 			   const unsigned int source_processor_id,
 			   T &recv,
-                           Communicator &comm)
+                           const Communicator &comm)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -2014,7 +2018,7 @@ namespace Parallel
 			   std::complex<T> &send,
 			   const unsigned int source_processor_id,
 			   std::complex<T> &recv,
-                           Communicator &comm)
+                           const Communicator &comm)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -2045,7 +2049,7 @@ namespace Parallel
 			   std::vector<T> &send,
 			   const unsigned int source_processor_id,
 			   std::vector<T> &recv,
-                           Communicator &comm = Communicator_World)
+                           const Communicator &comm = Communicator_World)
   {
     // Call the user-defined type version with automatic 
     // type conversion based on template argument:    
@@ -2066,7 +2070,7 @@ namespace Parallel
 			   std::vector<std::vector<T> > &send,
 			   const unsigned int source_processor_id,
 			   std::vector<std::vector<T> > &recv,
-                           Communicator &comm = Communicator_World)
+                           const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -2189,7 +2193,7 @@ namespace Parallel
   inline void gather(const unsigned int root_id,
 		     T send,
 		     std::vector<T> &recv,
-                     Communicator &comm)
+                     const Communicator &comm)
   {
     libmesh_assert(root_id < comm.size());
 
@@ -2221,7 +2225,7 @@ namespace Parallel
   inline void gather(const unsigned int root_id,
 		     std::complex<T> send,
 		     std::vector<std::complex<T> > &recv,
-                     Communicator &comm)
+                     const Communicator &comm)
   {
     libmesh_assert(root_id < comm.size());
 
@@ -2274,7 +2278,7 @@ namespace Parallel
   template <typename T>
   inline void gather(const unsigned int root_id,
 		     std::vector<T> &r,
-                     Communicator &comm)
+                     const Communicator &comm)
   {
     if (comm.size() == 1)
       {
@@ -2335,7 +2339,7 @@ namespace Parallel
   template <typename T>
   inline void gather(const unsigned int root_id,
 		     std::vector<std::complex<T> > &r,
-                     Communicator &comm)
+                     const Communicator &comm)
   {
     if (comm.size() == 1)
       {
@@ -2391,7 +2395,7 @@ namespace Parallel
   template <typename T>
   inline void allgather(T send,
 			std::vector<T> &recv,
-                        Communicator &comm)
+                        const Communicator &comm)
   {
     START_LOG ("allgather()","Parallel");
     
@@ -2418,7 +2422,7 @@ namespace Parallel
   template <typename T>
   inline void allgather(std::complex<T> send,
 			std::vector<std::complex<T> > &recv,
-                        Communicator &comm)
+                        const Communicator &comm)
   {
     START_LOG ("allgather()","Parallel");
 
@@ -2467,7 +2471,7 @@ namespace Parallel
   template <typename T>
   inline void allgather(std::vector<T> &r,
 			const bool identical_buffer_sizes,
-                        Communicator &comm)
+                        const Communicator &comm)
   {
     if (comm.size() == 1)
       return;
@@ -2537,7 +2541,7 @@ namespace Parallel
   template <typename T>
   inline void allgather(std::vector<std::complex<T> > &r,
 			const bool identical_buffer_sizes = false,
-                        Communicator &comm = Communicator_World)
+                        const Communicator &comm = Communicator_World)
   {
     if (comm.size() == 1)
       return;
@@ -2608,7 +2612,7 @@ namespace Parallel
    */
   template <typename T>
   inline void alltoall(std::vector<T> &buf,
-                       Communicator &comm)
+                       const Communicator &comm)
   {
     if (comm.size() == 1)
       return;
@@ -2645,7 +2649,7 @@ namespace Parallel
 
   template <typename T>
   inline void broadcast (T &data, const unsigned int root_id,
-                         Communicator &comm)
+                         const Communicator &comm)
   {
     if (comm.size() == 1)
       {
@@ -2672,7 +2676,7 @@ namespace Parallel
   // function template, so we have to re-specify the default argument
   template <typename T>
   inline void broadcast (std::complex<T> &data, const unsigned int root_id=0,
-                         Communicator &comm = Communicator_World)
+                         const Communicator &comm = Communicator_World)
   {
     if (comm.size() == 1)
       {
@@ -2694,7 +2698,7 @@ namespace Parallel
 
   template <>
   inline void broadcast (std::string &data, const unsigned int root_id,
-                         Communicator &comm)
+                         const Communicator &comm)
   {
     if (comm.size() == 1)
       {
@@ -2731,7 +2735,7 @@ namespace Parallel
 
   template <typename T>
   inline void broadcast (std::vector<T> &data, const unsigned int root_id,
-                         Communicator &comm)
+                         const Communicator &comm)
   {
     if (comm.size() == 1)
       {
@@ -2761,7 +2765,7 @@ namespace Parallel
   template <typename T>
   inline void broadcast (std::vector<std::complex<T> > &data,
 			 const unsigned int root_id=0,
-                         Communicator &comm = Communicator_World)
+                         const Communicator &comm = Communicator_World)
   {
     if (comm.size() == 1)
       {
@@ -2784,7 +2788,7 @@ namespace Parallel
 
   template <typename T>
   inline void broadcast (std::set<T> &data, const unsigned int root_id,
-                         Communicator &comm)
+                         const Communicator &comm)
   {
     if (comm.size() == 1)
       {
@@ -2813,31 +2817,31 @@ namespace Parallel
 #else // LIBMESH_HAVE_MPI
 
   template <typename T>
-  inline bool verify(const T &, Communicator&) { return true; }
+  inline bool verify(const T &, const Communicator&) { return true; }
 
   template <typename T>
-  inline void min(T &, Communicator&) {}
+  inline void min(T &, const Communicator&) {}
 
   template <typename T>
-  inline void min(std::vector<T> &, Communicator&) {}
+  inline void min(std::vector<T> &, const Communicator&) {}
 
   template <typename T>
-  inline void max(T &, Communicator&) {}
+  inline void max(T &, const Communicator&) {}
 
   template <typename T>
-  inline void max(std::vector<T> &, Communicator&) {}
+  inline void max(std::vector<T> &, const Communicator&) {}
 
   template <typename T>
-  inline void sum(T &, Communicator&) {}
+  inline void sum(T &, const Communicator&) {}
 
   template <typename T>
-  inline void sum(std::vector<T> &, Communicator&) {}
+  inline void sum(std::vector<T> &, const Communicator&) {}
 
   template <typename T>
-  inline void set_union(std::set<T> &, const unsigned int, Communicator&) {}
+  inline void set_union(std::set<T> &, const unsigned int, const Communicator&) {}
 
   template <typename T>
-  inline void set_union(std::set<T> &, Communicator&) {}
+  inline void set_union(std::set<T> &, const Communicator&) {}
 
  //-------------------------------------------------------------------
   /**
@@ -2848,7 +2852,7 @@ namespace Parallel
    */
   inline status probe (const int,
 		       const int,
-                       Communicator&)
+                       const Communicator&)
   { libmesh_error(); status status; return status; }
 
   //-------------------------------------------------------------------
@@ -2862,7 +2866,7 @@ namespace Parallel
 		    std::vector<T> &,
 		    const DataType &,
 		    const int,
-                    Communicator&)
+                    const Communicator&)
   { libmesh_error(); }
 
   //-------------------------------------------------------------------
@@ -2877,7 +2881,7 @@ namespace Parallel
 		    const DataType &,
 		    request &,
 		    const int,
-                    Communicator&)
+                    const Communicator&)
   { libmesh_error(); }
 
   //-------------------------------------------------------------------
@@ -2891,7 +2895,7 @@ namespace Parallel
 		         std::vector<T> &,
 		         const DataType &,
 		         const int,
-                         Communicator&)
+                         const Communicator&)
   { libmesh_error(); return Status(); }
 
   //-------------------------------------------------------------------
@@ -2906,7 +2910,7 @@ namespace Parallel
 		       const DataType &,
 		       request &,
 		       const int,
-                       Communicator&)
+                       const Communicator&)
   { libmesh_error(); }
 
 
@@ -2950,7 +2954,7 @@ namespace Parallel
 			    T &send,
 			    const unsigned int recv_source,
 			    T &recv,
-                            Communicator&)
+                            const Communicator&)
   {
     libmesh_assert (send_tgt == recv_source);
     recv = send;
@@ -2960,7 +2964,7 @@ namespace Parallel
   inline void gather(const unsigned int root_id,
 		     T send,
 		     std::vector<T> &recv,
-                     Communicator&)
+                     const Communicator&)
   {
     libmesh_assert (!root_id);
     recv.resize(1);
@@ -2969,12 +2973,12 @@ namespace Parallel
 
   template <typename T>
   inline void gather(const unsigned int, std::vector<T> &,
-                     Communicator&) {}
+                     const Communicator&) {}
 
   template <typename T>
   inline void allgather(T send,
 			std::vector<T> &recv,
-                        Communicator&)
+                        const Communicator&)
   {
     recv.resize(1);
     recv[0] = send;
@@ -2982,16 +2986,16 @@ namespace Parallel
 
   template <typename T>
   inline void allgather(std::vector<T> &, const bool,
-                        Communicator&) {}
+                        const Communicator&) {}
 
   template <typename T>
-  inline void alltoall(std::vector<T> &, Communicator&) {}
+  inline void alltoall(std::vector<T> &, const Communicator&) {}
 
   template <typename T>
-    inline void broadcast (T &, const unsigned int, Communicator&) {}
+    inline void broadcast (T &, const unsigned int, const Communicator&) {}
 
   template <typename T>
-    inline void broadcast (std::vector<T> &, const unsigned int, Communicator&) {}
+    inline void broadcast (std::vector<T> &, const unsigned int, const Communicator&) {}
 
 #endif // LIBMESH_HAVE_MPI
 
