@@ -1498,7 +1498,7 @@ bool DofMap::all_semilocal_indices (const std::vector<unsigned int>& dof_indices
       const unsigned int di = dof_indices[i];
       // If it's not in the local indices
       if (di < this->first_dof() ||
-          di >= this->last_dof())
+          di >= this->end_dof())
         {
           // and if it's not in the ghost indices, then we're not
           // semilocal
