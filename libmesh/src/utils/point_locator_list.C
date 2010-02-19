@@ -202,12 +202,12 @@ const Elem* PointLocatorList::operator() (const Point& p) const
 void PointLocatorList::enable_out_of_mesh_mode (void)
 {
   /* This functionality is not yet implemented for PointLocatorList.  */
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 void PointLocatorList::disable_out_of_mesh_mode (void)
 {
   /* This functionality is not yet implemented for PointLocatorList.  */
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
