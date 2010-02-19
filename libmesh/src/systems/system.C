@@ -1469,9 +1469,11 @@ Number System::point_value(unsigned int var, Point &p)
           const unsigned int n_dofs  = dof_indices.size();
 
           FEType fe_type = dof_map.variable_type(0);
+
+          unsigned int dim = mesh.mesh_dimension();
     
-          // Build a FE again so we can calculate u(p)
-          AutoPtr<FEBase> fe (FEBase::build(2, fe_type));
+          // Build a FE so we can calculate u(p)
+          AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
 
           // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
           // Build a vector of point co-ordinates to send to reinit
