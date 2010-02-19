@@ -468,8 +468,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * @returns true if the point p is contained in this element, 
    * false otherwise.
+   *
+   * Since we are doing floating point comparisons here the parameter
+   * \p tol can be specified to indicate a tolerance.  For example,
+   * \f$ \xi \le 1 \f$  becomes \f$ \xi \le 1 + \epsilon \f$. 
    */
-  virtual bool contains_point (const Point& p) const;
+  virtual bool contains_point (const Point& p, Real tol=TOLERANCE) const;
 
   /**
    * @returns true iff the element map is definitely affine (i.e. the same at
