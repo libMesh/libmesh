@@ -1493,7 +1493,7 @@ Number System::point_value(unsigned int var, Point &p)
     }
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner = I_found_p ? libMesh::n_processors() : libMesh::processor_id();
+  unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
   // If nobody admits owning the point, we have a problem.
