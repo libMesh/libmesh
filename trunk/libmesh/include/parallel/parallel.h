@@ -213,11 +213,11 @@ namespace Parallel
       this->assign(comm);
     }
 
-    int rank() const {
+    unsigned int rank() const {
       return _rank;
     }
 
-    int size() const {
+    unsigned int size() const {
       return _size;
     }
 
@@ -229,11 +229,14 @@ namespace Parallel
         {
           MPI_Comm_dup(comm, &_communicator);
 
-          MPI_Comm_size(_communicator, &_size);
-          libmesh_assert (_size >= 0);
+          int i;
+          MPI_Comm_size(_communicator, &i);
+          libmesh_assert (i >= 0);
+          _size = static_cast<unsigned int>(i);
 
-          MPI_Comm_rank(_communicator, &_rank);
-          libmesh_assert (_rank >= 0);
+          MPI_Comm_rank(_communicator, &i);
+          libmesh_assert (i >= 0);
+          _rank = static_cast<unsigned int>(i);
         }
       else
         {
@@ -245,7 +248,7 @@ namespace Parallel
     }
 
     communicator _communicator;
-    int _rank, _size;
+    unsigned int _rank, _size;
   };
 
 
@@ -2695,7 +2698,8 @@ namespace Parallel
   {
     if (comm.size() == 1)
       {
-	libmesh_assert (comm.rank() == root_id);
+	libmesh_assert (!comm.rank());
+	libmesh_assert (!root_id);
 	return;
       }
 
