@@ -1033,6 +1033,21 @@ public:
    * this function is parallel-only.
    */
   Number point_value(unsigned int var, Point &p);
+
+/**
+   * Returns the gradient of the solution variable \p var at the physical
+   * point \p p in the mesh.
+   *
+   * Note that this function uses \p MeshBase::point_locator(); users
+   * may or may not want to call \p MeshBase::clear_point_locator()
+   * afterward.  Also, point_locator() is expensive.  Avoid using this
+   * function in any context where you are already looping over
+   * elements.
+   *
+   * Because the element containing \p p may lie on any processor,
+   * this function is parallel-only.
+   */
+  Gradient point_gradient(unsigned int var, Point &p);
  
   /**
    * Fills the std::set with the degrees of freedom on the local
