@@ -1489,6 +1489,28 @@ void DofMap::SCALAR_dof_indices (std::vector<unsigned int>& di,
 }
 
 
+
+bool DofMap::all_semilocal_indices (const std::vector<unsigned int>& dof_indices)
+{
+  // We're all semilocal unless we find a counterexample
+  for (unsigned int i=0; i != dof_indices.size(); ++i)
+    {
+      const unsigned int di = dof_indices[i];
+      // If it's not in the local indices
+      if (di < this->first_dof() ||
+          di >= this->last_dof())
+        {
+          // and if it's not in the ghost indices, then we're not
+          // semilocal
+          if (!std::binary_search(_send_list.begin(), _send_list.end(), di))
+            return false;
+        }
+    }
+
+  return true;
+}
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
 void DofMap::old_dof_indices (const Elem* const elem,

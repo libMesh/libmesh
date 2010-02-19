@@ -419,6 +419,14 @@ public:
 		           const bool old_dofs=false) const;
 
   /**
+   * Returns \p true iff all degree of freedom indices in
+   * \p dof_indices are either local indices or in the \p send_list.
+   * Note that this is an O(logN) operation, not O(1); we don't cache
+   * enough information for O(1) right now.
+   */
+  bool all_semilocal_indices (const std::vector<unsigned int>& dof_indices);
+
+  /**
    * Tells other library functions whether or not this problem
    * includes coupling between dofs in neighboring cells, as can
    * currently be specified on the command line or inferred from
