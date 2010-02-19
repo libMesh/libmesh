@@ -424,7 +424,7 @@ public:
    * Note that this is an O(logN) operation, not O(1); we don't cache
    * enough information for O(1) right now.
    */
-  bool all_semilocal_indices (const std::vector<unsigned int>& dof_indices);
+  bool all_semilocal_indices (const std::vector<unsigned int>& dof_indices) const;
 
   /**
    * Tells other library functions whether or not this problem

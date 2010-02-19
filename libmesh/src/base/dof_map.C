@@ -1490,7 +1490,7 @@ void DofMap::SCALAR_dof_indices (std::vector<unsigned int>& di,
 
 
 
-bool DofMap::all_semilocal_indices (const std::vector<unsigned int>& dof_indices)
+bool DofMap::all_semilocal_indices (const std::vector<unsigned int>& dof_indices) const
 {
   // We're all semilocal unless we find a counterexample
   for (unsigned int i=0; i != dof_indices.size(); ++i)
