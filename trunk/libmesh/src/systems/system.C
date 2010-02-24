@@ -1436,6 +1436,9 @@ Number System::point_value(unsigned int var, Point &p)
   // Get a reference to the mesh object associated with the system object that calls this function
   const MeshBase &mesh = this->get_mesh();
 
+  // Get the dimension of the mesh
+  const unsigned int dim = mesh.mesh_dimension();
+
   // Use an existing PointLocator or create a new one
   const PointLocatorBase &locator = mesh.point_locator();
   
@@ -1477,7 +1480,7 @@ Number System::point_value(unsigned int var, Point &p)
 
           // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
           // Build a vector of point co-ordinates to send to reinit
-          std::vector<Point> coor(1, FEInterface::inverse_map(2, fe_type, e, p));
+          std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, e, p));
 
           // Get the shape function values
           const std::vector<std::vector<Real> >& phi = fe->get_phi();
@@ -1573,7 +1576,7 @@ Gradient System::point_gradient(unsigned int var, Point &p)
     }
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner = I_found_p ? libMesh::n_processors() : libMesh::processor_id();
+  unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
   // If nobody admits owning the point, we have a problem.
@@ -1671,7 +1674,7 @@ Tensor System::point_hessian(unsigned int var, Point &p)
     }
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner = I_found_p ? libMesh::n_processors() : libMesh::processor_id();
+  unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
   // If nobody admits owning the point, we have a problem.
