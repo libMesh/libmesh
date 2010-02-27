@@ -360,6 +360,33 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 </td>
 </tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Peterson_2010">7</a>]
+</td>
+<td>
+J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
+  Parallel adaptive solution of coupled
+  Rayleigh-Bénard-Marangoni problems with Navier-slip.
+  <em>EARLY VIEW, International Journal for Numerical Methods in
+  Fluids</em>, accepted, 2009.
+  <a href="http://dx.doi.org/10.1002/fld.2264">http://dx.doi.org/10.1002/fld.2264</a>.<br />
+<p><a name="Peterson_2010"></a><pre>
+@ARTICLE{Peterson_2010,
+  AUTHOR = {J.~W.~Peterson and G.~F.~Carey},
+  TITLE = {{Parallel adaptive solution of coupled Rayleigh--B\'{e}nard--Marangoni
+  problems with Navier-slip}},
+  JOURNAL = {EARLY VIEW, International Journal for Numerical Methods in Fluids},
+  YEAR = {accepted, 2009},
+  NOTE = {\url{http://dx.doi.org/10.1002/fld.2264}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
 </table><h2>2010</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.75
@@ -1766,6 +1793,36 @@ M.&nbsp;Brinkmeier, U.&nbsp;Nackenhorst, S.&nbsp;Petersen, and O.&nbsp;von Estor
   NUMBER = {1--2},
   PAGES = {20--39},
   NOTE = {\url{http://dx.doi.org/10.1016/j.jsv.2006.11.040}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Lu_2008">20</a>]
+</td>
+<td>
+Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
+  Parallel adaptive finite element simulation for optical molecular
+  imaging with simplified spherical harmonics approximation.
+  In P.&nbsp;Sellin, editor, <em>Nuclear Science Symposium Conference
+  Record (NSS08)</em>, pages 4039-4042. IEEE, 2008.
+  <a href="http://dx.doi.org/10.1109/NSSMIC.2008.4774171">http://dx.doi.org/10.1109/NSSMIC.2008.4774171</a>.<br />
+<p><a name="Lu_2008"></a><pre>
+@INPROCEEDINGS{Lu_2008,
+  AUTHOR = {Y.~Lu and A.~F.~Chatziioannou},
+  TITLE = {{Parallel adaptive finite element simulation for optical
+                 molecular imaging with simplified spherical harmonics approximation}},
+  BOOKTITLE = {{Nuclear Science Symposium Conference Record (NSS08)}},
+  EDITOR = {P.~Sellin},
+  PAGES = {4039--4042},
+  PUBLISHER = {IEEE},
+  YEAR = {2008},
+  NOTE = {\url{http://dx.doi.org/10.1109/NSSMIC.2008.4774171}}
 }
 </pre>
 </p>
