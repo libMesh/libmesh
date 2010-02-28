@@ -157,7 +157,7 @@ public:
    * \p p.  Customized for infinite elements, since knowledge
    * about the envelope can be helpful.
    */
-  bool contains_point (const Point& p) const;
+  bool contains_point (const Point& p, Real tol=TOLERANCE) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to

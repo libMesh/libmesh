@@ -154,7 +154,7 @@ public:
    * about the envelope can help avoiding slightly more 
    * expensive computations.
    */
-  bool contains_point (const Point& p) const;
+  bool contains_point (const Point& p, Real tol=TOLERANCE) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
