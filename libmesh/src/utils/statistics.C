@@ -388,5 +388,8 @@ std::vector<unsigned int> StatisticsVector<T>::cut_above(Real cut) const
 // Explicit Instantions
 template class StatisticsVector<float>;
 template class StatisticsVector<double>;
+#ifdef TRIPLE_PRECISION
+template class StatisticsVector<long double>;
+#endif
 template class StatisticsVector<int>;
 template class StatisticsVector<unsigned int>;

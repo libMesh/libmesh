@@ -45,7 +45,7 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
   // determine origin automatically,
   // works only if the mesh has no symmetry planes.
   const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
-  Point origin = (b_box.first + b_box.second) / 2.;
+  Point origin = (b_box.first + b_box.second) / 2;
 
   if (be_verbose && libMesh::processor_id() == 0)
     {
@@ -105,7 +105,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
     {
       // determine origin
       const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
-      const Point auto_origin = (b_box.first+b_box.second)/2.;
+      const Point auto_origin = (b_box.first+b_box.second)/2;
 
       // override default values, if necessary
       if (!origin_x.first)
@@ -501,7 +501,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
   std::set<unsigned int>::iterator on_it = onodes.begin();
   for( ; on_it != onodes.end(); ++on_it)
     {
-      Point p = (Point(this->_mesh.point(*on_it)) * 2.) - origin;
+      Point p = (Point(this->_mesh.point(*on_it)) * 2) - origin;
       if (_mesh.is_serial())
         {
           // Add with a default id in serial

@@ -164,8 +164,8 @@ Real Edge3::volume () const
 {
   // Finding the (exact) length of a general quadratic element
   // is a surprisingly complicated formula.
-  Point A = this->point(0) + this->point(1) - 2.*this->point(2);
-  Point B = 0.5*(this->point(1) - this->point(0));
+  Point A = this->point(0) + this->point(1) - 2*this->point(2);
+  Point B = (this->point(1) - this->point(0))/2;
 
   const Real a = A.size_sq(); 
   const Real b = 2.*(A*B);    

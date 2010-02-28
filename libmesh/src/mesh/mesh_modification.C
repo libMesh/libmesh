@@ -715,7 +715,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      Node* new_node = mesh.add_point((mesh.node((*el)->node(0)) +
 					       mesh.node((*el)->node(1)) +
 					       mesh.node((*el)->node(2)) +
-					       mesh.node((*el)->node(3)))*.25
+					       mesh.node((*el)->node(3)))/4
 					       );
 	  
 	      // Check for possible edge swap

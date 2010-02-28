@@ -164,7 +164,7 @@ protected:
 inline
 Point InfEdge2::origin () const
 {
-  return ( this->point(0)*2. - this->point(1) );
+  return ( this->point(0)*2 - this->point(1) );
 }
 
 

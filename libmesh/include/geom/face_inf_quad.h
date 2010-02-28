@@ -194,7 +194,7 @@ public:
 inline
 Point InfQuad::origin () const
 {
-  return ( this->point(0)*2. - this->point(this->n_vertices()/2) );
+  return ( this->point(0)*2 - this->point(this->n_vertices()/2) );
 }
 
 

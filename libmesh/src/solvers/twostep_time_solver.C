@@ -175,12 +175,12 @@ void TwostepTimeSolver::solve()
 
   const Real global_shrink_or_growth_factor =
     std::pow(this->target_tolerance / relative_error,
-	     1. / core_time_solver->error_order());
+	     static_cast<Real>(1. / core_time_solver->error_order()));
 
   const Real local_shrink_or_growth_factor =
     std::pow(this->target_tolerance /
 	     (error_norm/std::max(double_norm, single_norm)),
-	     1. / (core_time_solver->error_order()+1.));
+	     static_cast<Real>(1. / (core_time_solver->error_order()+1.)));
 
   if (!quiet)
     {
