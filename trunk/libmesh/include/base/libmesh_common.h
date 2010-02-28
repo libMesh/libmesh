@@ -143,9 +143,12 @@ namespace std {
 }
 
 // Define the type to use for complex numbers
-// Always use std::complex<double>, as required by Petsc
-typedef std::complex<double> Complex;
-typedef std::complex<double> COMPLEX;
+// Always use std::complex<double>, as required by Petsc?
+// If your version of Petsc doesn't support
+// std::complex<other_precision>, then you'd better just leave
+// Real==double
+typedef std::complex<Real> Complex;
+typedef std::complex<Real> COMPLEX;
 
 
 // Helper functions for complex/real numbers

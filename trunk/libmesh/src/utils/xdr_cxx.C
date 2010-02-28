@@ -1841,6 +1841,90 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 
 
 template <>
+void Xdr::data_stream (float *val, const unsigned int len, const unsigned int line_break)
+{
+  switch (mode)
+    {
+    case ENCODE:
+    case DECODE:
+      {
+#ifdef LIBMESH_HAVE_XDR
+
+	libmesh_assert (this->is_open());
+
+	// FIXME[RHS]: How to implement this for float?  I don't know
+	// enough about xdr or have the time.  We'll error out for
+	// now, and anyone who needs the functionality can send me a
+	// patch.  ;-)
+
+	std::cerr << "Writing binary XDR files with single precision is not\n"
+		  << "currently supported." << std::endl;
+
+	libmesh_error();
+	
+#else
+	
+	std::cerr << "ERROR: Functionality is not available." << std::endl
+		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		  << std::endl
+		  << "The XDR interface is not available in this installation"
+		  << std::endl;
+
+	libmesh_error();
+
+#endif
+	return;
+      }
+
+    case READ:
+      {
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
+
+        // FIXME[RHS]: Not sure if this will work properly...
+        libmesh_experimental();
+
+	for (unsigned int i=0; i<len; i++)
+	  {
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
+	    *in >> val[i];
+	  }
+
+	return;	
+      }
+
+    case WRITE:
+      {
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+
+	if (line_break == libMesh::invalid_uint)
+	  for (unsigned int i=0; i<len; i++)
+	    {
+	      libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+	      OFSRealscientific(*out,17,val[i]) << " ";
+	    }
+	else
+	  {
+	    unsigned int cnt=0;
+	    while (cnt < len)
+	      {
+		for (unsigned int i=0; i<std::min(line_break,len); i++)
+		  {
+		    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+		    OFSRealscientific(*out,17,val[cnt++]) << " ";
+		  }
+		libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+		*out << '\n';
+	      }
+	  }
+
+	return;	
+      }
+
+    default:
+      libmesh_error();
+    }
+}
+template <>
 void Xdr::data_stream (long double *val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)

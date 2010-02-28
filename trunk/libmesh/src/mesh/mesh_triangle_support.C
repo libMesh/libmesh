@@ -107,7 +107,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 	    // the square has straight sides, the midpoint is not
 	    // on the corner and thus it is uniquely on one of the
 	    // sides.
-	    Point side_midpoint= 0.5*( (*side->get_node(0)) + (*side->get_node(1)) );
+	    Point side_midpoint= ( (*side->get_node(0)) + (*side->get_node(1)) )/2;
 
 	    // The boundary ids are set following the same convention as Quad4 sides
 	    // bottom = 0
@@ -325,7 +325,7 @@ void TriangleInterface::triangulate()
 	    _mesh.add_point(original_points[n++]);
 
 	  else // the odd entries are the midpoints of the original PSLG segments
-	    _mesh.add_point (0.5*(original_points[n] + original_points[n-1]));
+	    _mesh.add_point ((original_points[n] + original_points[n-1])/2);
 	}
     }
   
