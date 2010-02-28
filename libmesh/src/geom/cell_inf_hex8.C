@@ -153,7 +153,7 @@ AutoPtr<Elem> InfHex8::build_edge (const unsigned int i) const
   return AutoPtr<Elem>(new SideEdge<InfEdge2,InfHex8>(this,i));
 }
 
-bool InfHex8::contains_point (const Point& p) const
+bool InfHex8::contains_point (const Point& p, Real tol) const
 {
   /*
    * For infinite elements with linear base interpolation:
@@ -207,10 +207,10 @@ bool InfHex8::contains_point (const Point& p) const
 							  fe_type,
 							  this,
 							  p,
-							  1.e-4,
+							  tol,
 							  false);
 
-      return FEInterface::on_reference_element(mapped_point, this->type());
+      return FEInterface::on_reference_element(mapped_point, this->type(), tol);
     }
 }
 

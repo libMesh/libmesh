@@ -103,7 +103,7 @@ bool InfQuad4::is_node_on_side(const unsigned int n,
   return false;
 }
 
-bool InfQuad4::contains_point (const Point& p) const
+bool InfQuad4::contains_point (const Point& p, Real tol) const
 {
   /*
    * make use of the fact that infinite elements do not
@@ -152,10 +152,10 @@ bool InfQuad4::contains_point (const Point& p) const
 							  fe_type,
 							  this,
 							  p,
-							  1.e-4,
+							  tol,
 							  false);
 
-      return FEInterface::on_reference_element(mapped_point, this->type());
+      return FEInterface::on_reference_element(mapped_point, this->type(), tol);
     }
 }
 
