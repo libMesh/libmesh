@@ -69,7 +69,12 @@ public:
    * Assignment operator.
    */
   Parameters& operator= (const Parameters&);
-  
+
+  /**
+   * Addition + Assignment operator.
+   */
+  Parameters& operator+= (const Parameters&);
+
   /**
    * @returns \p true if a parameter of type \p T
    * with a specified name exists, \p false otherwise.
@@ -305,7 +310,15 @@ Parameters& Parameters::operator= (const Parameters& rhs)
   return *this;
 }
 
-
+inline
+Parameters& Parameters::operator+= (const Parameters& rhs)
+{
+  for (Parameters::const_iterator it = rhs._values.begin();
+       it != rhs._values.end(); ++it)
+    _values[it->first] = it->second->clone();
+  
+  return *this;
+}
 
 inline
 Parameters::Parameters (const Parameters& p)
