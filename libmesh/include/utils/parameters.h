@@ -66,14 +66,17 @@ public:
   ~Parameters ();
 
   /**
-   * Assignment operator.
+   * Assignment operator.  Removes all parameters in \p this
+   * and inserts copies of all parameters from \p source
    */
-  Parameters& operator= (const Parameters&);
+  Parameters& operator= (const Parameters& source);
 
   /**
-   * Addition + Assignment operator.
+   * Addition/Assignment operator.  Inserts copies of all parameters
+   * from \p source.  Any parameters of the same name already in \p
+   * this are replaced.
    */
-  Parameters& operator+= (const Parameters&);
+  Parameters& operator+= (const Parameters& source);
 
   /**
    * @returns \p true if a parameter of type \p T
@@ -299,22 +302,18 @@ void Parameters::clear () // since this is inline we must define it
 
 
 inline
-Parameters& Parameters::operator= (const Parameters& rhs)
+Parameters& Parameters::operator= (const Parameters& source)
 {
   this->clear();
-  
-  for (Parameters::const_iterator it = rhs._values.begin();
-       it != rhs._values.end(); ++it)
-    _values[it->first] = it->second->clone();
-  
-  return *this;
+
+  return (*this += source);
 }
 
 inline
-Parameters& Parameters::operator+= (const Parameters& rhs)
+Parameters& Parameters::operator+= (const Parameters& source)
 {
-  for (Parameters::const_iterator it = rhs._values.begin();
-       it != rhs._values.end(); ++it)
+  for (Parameters::const_iterator it = source._values.begin();
+       it != source._values.end(); ++it)
     _values[it->first] = it->second->clone();
   
   return *this;
