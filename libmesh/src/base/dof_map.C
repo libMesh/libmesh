@@ -230,10 +230,6 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                   libmesh_assert(first_dof != DofObject::invalid_id);
                   requested->set_dof_number
                     (this->sys_number(), v, 0, first_dof);
-
-		  // don't forget to add these remote dofs to the _send_list
-		  for (unsigned int comp=0; comp!=n_comp; ++comp)
-		    _send_list.push_back(first_dof+comp);
                 }
             }
         }
@@ -1043,7 +1039,9 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
     }
 
   // Now loop over all non_local active elements and add any missing
-  // nodal-only neighbors
+  // nodal-only neighbors.  This will also get any dofs from nonlocal
+  // nodes on local elements, because every nonlocal node exists on a
+  // nonlocal nodal neighbor element.
   MeshBase::const_element_iterator       elem_it
     = mesh.active_elements_begin();
   const MeshBase::const_element_iterator elem_end
