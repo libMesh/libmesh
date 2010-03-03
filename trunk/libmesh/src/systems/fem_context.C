@@ -41,10 +41,10 @@
 FEMContext::FEMContext (const FEMSystem &sys)
   : DiffContext(sys),
     element_qrule(NULL), side_qrule(NULL),
-    _mesh_sys(libMesh::invalid_uint),
-    _mesh_x_var(libMesh::invalid_uint),
-    _mesh_y_var(libMesh::invalid_uint),
-    _mesh_z_var(libMesh::invalid_uint),
+    _mesh_sys(sys.get_mesh_system()),
+    _mesh_x_var(sys.get_mesh_x_var()),
+    _mesh_y_var(sys.get_mesh_y_var()),
+    _mesh_z_var(sys.get_mesh_z_var()),
     elem(NULL), side(0), dim(sys.get_mesh().mesh_dimension())
 {
   // We need to know which of our variables has the hardest
@@ -490,7 +490,7 @@ Number FEMContext::fixed_point_value(unsigned int var, Point &p)
 void FEMContext::elem_reinit(Real theta)
 {
   // Handle a moving element if necessary
-  if (_mesh_sys != libMesh::invalid_uint)
+  if (_mesh_sys)
     {
       // FIXME - not threadsafe yet!
       elem_position_set(theta);
@@ -502,7 +502,7 @@ void FEMContext::elem_reinit(Real theta)
 void FEMContext::elem_side_reinit(Real theta)
 {
   // Handle a moving element if necessary
-  if (_mesh_sys != libMesh::invalid_uint)
+  if (_mesh_sys)
     {
       // FIXME - not threadsafe yet!
       elem_position_set(theta);
@@ -541,7 +541,7 @@ void FEMContext::elem_side_fe_reinit ()
 void FEMContext::elem_position_get()
 {
   // This is too expensive to call unless we've been asked to move the mesh
-  libmesh_assert (_mesh_sys != libMesh::invalid_uint);
+  libmesh_assert (_mesh_sys);
 
   // This will probably break with threading when two contexts are
   // operating on elements which share a node
@@ -596,7 +596,7 @@ void FEMContext::elem_position_get()
 void FEMContext::elem_position_set(Real)
 {
   // This is too expensive to call unless we've been asked to move the mesh
-  libmesh_assert (_mesh_sys != libMesh::invalid_uint);
+  libmesh_assert (_mesh_sys);
 
   // This will probably break with threading when two contexts are
   // operating on elements which share a node
@@ -714,7 +714,7 @@ void FEMContext::reinit(const FEMSystem &sys, Elem *e)
   libmesh_assert(sub_dofs == n_dofs);
 
   // Moving the mesh may be necessary
-  if (_mesh_sys != libMesh::invalid_uint)
+  if (_mesh_sys)
     elem_position_set(1.);
   // Reinitializing the FE objects is definitely necessary
   this->elem_fe_reinit();
