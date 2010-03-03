@@ -281,15 +281,21 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 }
 
 
+// The libmesh_do_once macro helps us avoid redundant repeated
+// repetitions of the same warning messages
+#undef libmesh_do_once
+#define libmesh_do_once(do_this) do { static bool did_this_already = false; if (!did_this_already) { did_this_already = true; do_this; } } while (0)
+
+
 // The libmesh_experimental macro warns that you are using
 // bleeding-edge code
 #undef libmesh_experimental
-#define libmesh_experimental() do { std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; } while (0)
+#define libmesh_experimental() libmesh_do_once(std::cout << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
 
 
 // The libmesh_deprecated macro warns that you are using obsoleted code
 #undef libmesh_deprecated
-#define libmesh_deprecated() do { std::cout << "*** Warning, This code is deprecated, and likely to be removed in future library versions! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl; } while(0)
+#define libmesh_deprecated() libmesh_do_once(std::cout << "*** Warning, This code is deprecated, and likely to be removed in future library versions! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
 
 
 
