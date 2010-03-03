@@ -46,7 +46,7 @@ FEMSystem::FEMSystem (EquationSystems& es,
     extra_quadrature_order(0),
     numerical_jacobian_h(1.e-6),
     verify_analytic_jacobians(0.0),
-    _mesh_sys(libMesh::invalid_uint),
+    _mesh_sys(NULL),
     _mesh_x_var(libMesh::invalid_uint),
     _mesh_y_var(libMesh::invalid_uint),
     _mesh_z_var(libMesh::invalid_uint)
@@ -392,7 +392,7 @@ void FEMSystem::solve()
 void FEMSystem::mesh_position_set()
 {
   // If we don't need to move the mesh, we're done
-  if (_mesh_sys != this->number())
+  if (_mesh_sys != this)
     return;
 
   const MeshBase& mesh = this->get_mesh();
@@ -632,7 +632,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
 #endif
 
   Real numerical_point_h = 0.;
-  if (_mesh_sys == this->number())
+  if (_mesh_sys == this)
     numerical_point_h = numerical_jacobian_h * context.elem->hmin();
 
   for (unsigned int j = 0; j != context.dof_indices.size(); ++j)
@@ -644,7 +644,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
       // Make sure to catch any moving mesh terms
       // FIXME - this could be less ugly
       Real *coord = NULL;
-      if (_mesh_sys == this->number())
+      if (_mesh_sys == this)
         {
           if (_mesh_x_var != libMesh::invalid_uint)
             for (unsigned int k = 0;
@@ -771,51 +771,15 @@ void FEMSystem::time_evolving (unsigned int var)
 
 
 
-void FEMSystem::mesh_x_position (unsigned int sysnum, unsigned int var)
-{
-  if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
-    libmesh_error();
-  if (sysnum != this->number())
-    libmesh_not_implemented();
-  _mesh_sys = sysnum;
-  _mesh_x_var = var;
-}
-
-
-
-void FEMSystem::mesh_y_position (unsigned int sysnum, unsigned int var)
-{
-  if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
-    libmesh_error();
-  if (sysnum != this->number())
-    libmesh_not_implemented();
-  _mesh_sys = sysnum;
-  _mesh_y_var = var;
-}
-
-
-
-void FEMSystem::mesh_z_position (unsigned int sysnum, unsigned int var)
-{
-  if (_mesh_sys != libMesh::invalid_uint && _mesh_sys != sysnum)
-    libmesh_error();
-  if (sysnum != this->number())
-    libmesh_not_implemented();
-  _mesh_sys = sysnum;
-  _mesh_z_var = var;
-}
-
-
-
 void FEMSystem::mesh_position_get()
 {
   // This function makes no sense unless we've already picked out some
   // variable(s) to reflect mesh position coordinates
-  if (_mesh_sys == libMesh::invalid_uint)
+  if (!_mesh_sys)
     libmesh_error();
 
   // We currently assume mesh variables are in our own system
-  if (_mesh_sys != this->number())
+  if (_mesh_sys != this)
     libmesh_not_implemented();
 
   // Loop over every active mesh element on this processor
@@ -865,13 +829,13 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
                                    DiffContext &c)
 {
   // Only calculate a mesh movement residual if it's necessary
-  if (_mesh_sys == libMesh::invalid_uint)
+  if (_mesh_sys)
     return request_jacobian;
 
   FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
 
   // This function only supports fully coupled mesh motion for now
-  libmesh_assert(_mesh_sys == this->number());
+  libmesh_assert(_mesh_sys == this);
 
   unsigned int n_qpoints = context.element_qrule->n_points();
 
@@ -909,7 +873,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
 
       // The mesh coordinate variables themselves are Lagrangian,
       // not Eulerian, and no convective term is desired.
-      if (_mesh_sys == this->number() &&
+      if (_mesh_sys == this &&
           (var == _mesh_x_var ||
            var == _mesh_y_var ||
            var == _mesh_z_var))
@@ -917,7 +881,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
 
       // Some of this code currently relies on the assumption that
       // we can pull mesh coordinate data from our own system
-      if (_mesh_sys != this->number())
+      if (_mesh_sys != this)
         libmesh_not_implemented();
 
       // This residual should only be called by unsteady solvers:

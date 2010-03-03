@@ -226,9 +226,14 @@ public:
   void elem_position_get();
 
   /**
-   * System and variables from which to acquire moving mesh information
+   * System from which to acquire moving mesh information
    */
-  unsigned int _mesh_sys, _mesh_x_var, _mesh_y_var, _mesh_z_var;
+  const System *_mesh_sys;
+
+  /**
+   * Variables from which to acquire moving mesh information
+   */
+  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
 
   /**
    * Current element for element_* to examine

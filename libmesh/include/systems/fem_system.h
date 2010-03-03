@@ -113,7 +113,38 @@ public:
   virtual void time_evolving (unsigned int var);
 
   /**
-   * Tells the FEMSystem that variable \p var from system number \p sysnum
+   * Tells the FEMSystem that system \p sys contains the
+   * isoparametric Lagrangian variables which correspond to the
+   * coordinates of mesh nodes, in problems where the mesh itself is
+   * expected to move in time.
+   *
+   * The system with mesh coordinate data (which may be \p this system
+   * itself, for fully coupled moving mesh problems) is currently
+   * assumed to have new (end of time step) mesh coordinates stored in
+   * solution, old (beginning of time step) mesh coordinates stored in
+   * _old_nonlinear_solution, and constant velocity motion during each
+   * time step.
+   *
+   * Activating this function ensures that local (but not neighbor!) element
+   * geometry is correctly repositioned when evaluating element residuals.
+   *
+   * Currently \p sys must be \p *this for a tightly coupled moving
+   * mesh problem or NULL to stop mesh movement; loosely coupled
+   * moving mesh problems are not implemented.
+   *
+   * This code is experimental.  "Trust but verify, and not in that
+   * order"
+   */
+  virtual void set_mesh_system(System* sys);
+
+  /**
+   * Returns a reference to the system with variables corresponding to
+   * mesh nodal coordinates, or NULL if the mesh is fixed.
+   */
+  const System* get_mesh_system() const;
+
+  /**
+   * Tells the FEMSystem that variable \p var from the mesh system
    * should be used to update the x coordinate of mesh nodes, in problems where
    * the mesh itself is expected to move in time.
    *
@@ -126,19 +157,37 @@ public:
    * Activating this function ensures that local (but not neighbor!) element
    * geometry is correctly repositioned when evaluating element residuals.
    */
-  virtual void mesh_x_position(unsigned int sysnum, unsigned int var);
+  virtual void set_mesh_x_var(unsigned int var);
 
   /**
-   * Tells the FEMSystem that variable \p var from system number \p sysnum
+   * Returns the variable number corresponding to the
+   * mesh x coordinate
+   */
+  unsigned int get_mesh_x_var() const;
+
+  /**
+   * Tells the FEMSystem that variable \p var from the mesh system
    * should be used to update the y coordinate of mesh nodes.
    */
-  virtual void mesh_y_position(unsigned int sysnum, unsigned int var);
+  virtual void set_mesh_y_var(unsigned int var);
 
   /**
-   * Tells the FEMSystem that variable \p var from system number \p sysnum
+   * Returns the variable number corresponding to the
+   * mesh y coordinate
+   */
+  unsigned int get_mesh_y_var() const;
+
+  /**
+   * Tells the FEMSystem that variable \p var from the mesh system
    * should be used to update the z coordinate of mesh nodes.
    */
-  virtual void mesh_z_position(unsigned int sysnum, unsigned int var);
+  virtual void set_mesh_z_var(unsigned int var);
+
+  /**
+   * Returns the variable number corresponding to the
+   * mesh z coordinate
+   */
+  unsigned int get_mesh_z_var() const;
 
   /**
    * Tells the FEMSystem to set the degree of freedom coefficients
@@ -304,10 +353,93 @@ protected:
   void numerical_side_jacobian (FEMContext &context);
 
   /**
-   * System and variables from which to acquire moving mesh information
+   * System from which to acquire moving mesh information
    */
-  unsigned int _mesh_sys, _mesh_x_var, _mesh_y_var, _mesh_z_var;
+  System *_mesh_sys;
+
+  /**
+   * Variables from which to acquire moving mesh information
+   */
+  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
 };
+
+
+
+// ------------------------------------------------------------
+// FEMSystem inline methods
+
+
+
+inline
+void FEMSystem::set_mesh_system(System* sys)
+{
+  // For now we assume that we're doing fully coupled mesh motion
+  if (sys && sys != this)
+    libmesh_not_implemented();
+
+  // For the foreseeable future we'll assume that we keep these
+  // Systems in the same EquationSystems
+  libmesh_assert(&this->get_equation_systems() ==
+                 &sys->get_equation_systems());
+
+  _mesh_sys = sys;
+}
+
+
+
+inline
+const System* FEMSystem::get_mesh_system() const
+{
+  return _mesh_sys;
+}
+
+
+
+inline
+void FEMSystem::set_mesh_x_var (unsigned int var)
+{
+  _mesh_x_var = var;
+}
+
+
+
+inline
+unsigned int FEMSystem::get_mesh_x_var() const
+{
+  return _mesh_x_var;
+}
+
+
+
+inline
+void FEMSystem::set_mesh_y_var (unsigned int var)
+{
+  _mesh_y_var = var;
+}
+
+
+
+inline
+unsigned int FEMSystem::get_mesh_y_var() const
+{
+  return _mesh_y_var;
+}
+
+
+
+inline
+void FEMSystem::set_mesh_z_var (unsigned int var)
+{
+  _mesh_z_var = var;
+}
+
+
+
+inline
+unsigned int FEMSystem::get_mesh_z_var() const
+{
+  return _mesh_z_var;
+}
 
 
 #endif
