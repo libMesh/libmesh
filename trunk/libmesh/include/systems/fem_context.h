@@ -163,7 +163,7 @@ public:
    * Reinitialize all my FEM context data on a given
    * element for the given system
    */
-  virtual void reinit(const FEMSystem&, Elem*);
+//  virtual void reinit(const FEMSystem&, Elem*);
 
 // should be protected:
   /**
@@ -181,6 +181,11 @@ public:
   virtual void elem_side_reinit(Real theta);
 
   /**
+   * Reinitializes local data vectors/matrices on the current geometric element
+   */
+  void pre_fe_reinit(const FEMSystem&, Elem *e);
+
+  /**
    * Reinitializes interior FE objects on the current geometric element
    */
   void elem_fe_reinit();
@@ -188,7 +193,7 @@ public:
   /**
    * Reinitializes side FE objects on the current geometric element
    */
-  void elem_side_fe_reinit();
+  void side_fe_reinit();
 
 // should be protected?:
   /**
@@ -249,7 +254,32 @@ public:
    * Cached dimension of elements in this mesh
    */
   unsigned char dim;
+
+private:
+  /**
+   * Uses the coordinate data specified by mesh_*_position configuration
+   * to set the geometry of \p elem to the value it would take after a fraction
+   * \p theta of a timestep.
+   *
+   * This does the work of elem_position_set, but isn't safe to call
+   * without _mesh_sys/etc. defined first.
+   */
+  void _do_elem_position_set(Real theta);
+
 };
 
+
+
+// ------------------------------------------------------------
+// FEMContext inline methods
+
+
+
+inline
+void FEMContext::elem_position_set(Real theta)
+{
+  if (_mesh_sys)
+    this->_do_elem_position_set(theta);
+}
 
 #endif

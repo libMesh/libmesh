@@ -489,13 +489,20 @@ Number FEMContext::fixed_point_value(unsigned int var, Point &p)
 
 void FEMContext::elem_reinit(Real theta)
 {
-  // Handle a moving element if necessary
+  // Handle a moving element if necessary.
   if (_mesh_sys)
-    {
-      // FIXME - not threadsafe yet!
-      elem_position_set(theta);
-      elem_fe_reinit();
-    }
+    // We assume that the ``default'' state
+    // of the mesh is its final, theta=1.0
+    // position, so we don't bother with
+    // mesh motion in that case.
+    if (theta != 1.0)
+      {
+        // FIXME - ALE is not threadsafe yet!
+        libmesh_assert(libMesh::n_threads() == 1);
+
+        elem_position_set(theta);
+      }
+  elem_fe_reinit();
 }
 
 
@@ -506,7 +513,7 @@ void FEMContext::elem_side_reinit(Real theta)
     {
       // FIXME - not threadsafe yet!
       elem_position_set(theta);
-      elem_side_fe_reinit();
+      side_fe_reinit();
     }
 }
 
@@ -524,7 +531,7 @@ void FEMContext::elem_fe_reinit ()
 }
 
 
-void FEMContext::elem_side_fe_reinit ()
+void FEMContext::side_fe_reinit ()
 {
   // Initialize all the interior FE objects on elem/side.
   // Logging of FE::reinit is done in the FE functions
@@ -545,7 +552,7 @@ void FEMContext::elem_position_get()
 
   // This will probably break with threading when two contexts are
   // operating on elements which share a node
-  libmesh_experimental();
+  libmesh_assert(libMesh::n_threads() == 1);
 
   // If the coordinate data is in our own system, it's already
   // been set up for us
@@ -593,14 +600,19 @@ void FEMContext::elem_position_get()
 
 
 
-void FEMContext::elem_position_set(Real)
+// We can ignore the theta argument in the current use of this
+// function, because elem_subsolutions will already have been set to
+// the theta value.
+//
+// To enable loose mesh movement coupling things will need to change.
+void FEMContext::_do_elem_position_set(Real)
 {
   // This is too expensive to call unless we've been asked to move the mesh
   libmesh_assert (_mesh_sys);
 
   // This will probably break with threading when two contexts are
   // operating on elements which share a node
-  libmesh_experimental();
+  libmesh_assert(libMesh::n_threads() == 1);
 
   // If the coordinate data is in our own system, it's already
   // been set up for us, and we can ignore our input parameter theta
@@ -650,9 +662,24 @@ void FEMContext::elem_position_set(Real)
 
 
 
+/*
 void FEMContext::reinit(const FEMSystem &sys, Elem *e)
 {
+  // Initialize our elem pointer, algebraic objects
+  this->pre_fe_reinit(e);
+
+  // Moving the mesh may be necessary
+  // Reinitializing the FE objects is definitely necessary
+  this->elem_reinit(1.);
+}
+*/
+
+
+
+void FEMContext::pre_fe_reinit(const FEMSystem &sys, Elem *e)
+{
   elem = e;
+
   // Initialize the per-element data for elem.
   sys.get_dof_map().dof_indices (elem, dof_indices);
   unsigned int n_dofs = dof_indices.size();
@@ -712,10 +739,4 @@ void FEMContext::reinit(const FEMSystem &sys, Elem *e)
       sub_dofs += dof_indices_var[i].size();
     }
   libmesh_assert(sub_dofs == n_dofs);
-
-  // Moving the mesh may be necessary
-  if (_mesh_sys)
-    elem_position_set(1.);
-  // Reinitializing the FE objects is definitely necessary
-  this->elem_fe_reinit();
 }

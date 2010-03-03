@@ -147,7 +147,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   for ( ; el != end_el; ++el)
     {
-      _femcontext.reinit(*this, *el);
+      _femcontext.pre_fe_reinit(*this, *el);
+      _femcontext.elem_fe_reinit();
 
       bool jacobian_computed =
 	time_solver->element_residual(get_jacobian, _femcontext);
@@ -217,7 +218,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           // Any mesh movement has already been done (and restored,
           // if the TimeSolver isn't broken), but
           // reinitializing the side FE objects is still necessary
-          _femcontext.elem_side_fe_reinit();
+          _femcontext.side_fe_reinit();
 
           DenseMatrix<Number> old_jacobian;
           // If we're in DEBUG mode, we should always verify that the
@@ -412,12 +413,18 @@ void FEMSystem::mesh_position_set()
 
   for ( ; el != end_el; ++el)
     {
-      _femcontext.reinit(*this, *el);
+      // We need the algebraic data
+      _femcontext.pre_fe_reinit(*this, *el);
+      // And when asserts are on, we also need the FE so
+      // we can assert that the mesh data is of the right type.
+#ifndef NDEBUG
+      _femcontext.elem_fe_reinit();
+#endif
 
       // This code won't handle moving subactive elements
       libmesh_assert(!_femcontext.elem->has_children());
 
-      _femcontext.elem_position_set(0.);
+      _femcontext.elem_position_set(1.);
     }
 }
 
@@ -442,11 +449,11 @@ void FEMSystem::postprocess ()
 
   for ( ; el != end_el; ++el)
     {
-      _femcontext.reinit(*this, *el);
+      _femcontext.pre_fe_reinit(*this, *el);
 
       // Optionally initialize all the interior FE objects on elem.
-      // if (fe_reinit_during_postprocess)
-      // _femcontext.elem_fe_reinit();
+      if (fe_reinit_during_postprocess)
+        _femcontext.elem_fe_reinit();
       
       this->element_postprocess(_femcontext);
 
@@ -460,19 +467,9 @@ void FEMSystem::postprocess ()
                _femcontext.elem->neighbor(_femcontext.side) != NULL))
             continue;
 
-          // Optionally initialize all the interior FE objects on elem/side.
-          // Logging of FE::reinit is done in the FE functions
+          // Optionally initialize all the FE objects on this side.
           if (fe_reinit_during_postprocess)
-            {
-              std::map<FEType, FEBase *>::iterator fe_end =
-                _femcontext.side_fe.end();
-              for (std::map<FEType, FEBase *>::iterator i =
-                _femcontext.side_fe.begin();
-                   i != fe_end; ++i)
-                {
-		  i->second->reinit(_femcontext.elem, _femcontext.side);
-                }
-            }
+            _femcontext.side_fe_reinit();
 
           this->side_postprocess(_femcontext);
         }
@@ -508,7 +505,8 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   for ( ; el != end_el; ++el)
     {
-      _femcontext.reinit(*this, *el);
+      _femcontext.pre_fe_reinit(*this, *el);
+      _femcontext.elem_fe_reinit();
 
       this->element_qoi(_femcontext, qoi_indices);
 
@@ -522,14 +520,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
                _femcontext.elem->neighbor(_femcontext.side) != NULL))
             continue;
 
-          std::map<FEType, FEBase *>::iterator fe_end =
-            _femcontext.side_fe.end();
-          for (std::map<FEType, FEBase *>::iterator i =
-            _femcontext.side_fe.begin();
-               i != fe_end; ++i)
-            {
-              i->second->reinit(_femcontext.elem, _femcontext.side);
-            }
+          _femcontext.side_fe_reinit();
 
           this->side_qoi(_femcontext, qoi_indices);
         }
@@ -569,7 +560,8 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
 
   for ( ; el != end_el; ++el)
     {
-      _femcontext.reinit(*this, *el);
+      _femcontext.pre_fe_reinit(*this, *el);
+      _femcontext.elem_fe_reinit();
 
       this->element_qoi_derivative(_femcontext, qoi_indices);
 
@@ -583,14 +575,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
                _femcontext.elem->neighbor(_femcontext.side) != NULL))
             continue;
 
-          std::map<FEType, FEBase *>::iterator fe_end =
-            _femcontext.side_fe.end();
-          for (std::map<FEType, FEBase *>::iterator i =
-            _femcontext.side_fe.begin();
-               i != fe_end; ++i)
-            {
-              i->second->reinit(_femcontext.elem, _femcontext.side);
-            }
+          _femcontext.side_fe_reinit();
 
           this->side_qoi_derivative(_femcontext, qoi_indices);
         }
@@ -799,16 +784,10 @@ void FEMSystem::mesh_position_get()
   // Get the solution's mesh variables from every element
   for ( ; el != end_el; ++el)
     {
-      _femcontext.elem = *el;
-
-      // Initialize the per-variable data for elem.
-      for (unsigned int i=0; i != this->n_vars(); ++i)
-        {
-          dof_map.dof_indices (_femcontext.elem,
-                               _femcontext.dof_indices_var[i], i);
-        }
+      _femcontext.pre_fe_reinit(*this, *el);
 
       _femcontext.elem_position_get();
+
       if (_mesh_x_var != libMesh::invalid_uint)
         this->solution->insert(*_femcontext.elem_subsolutions[_mesh_x_var],
                                _femcontext.dof_indices_var[_mesh_x_var]);
@@ -829,7 +808,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
                                    DiffContext &c)
 {
   // Only calculate a mesh movement residual if it's necessary
-  if (_mesh_sys)
+  if (!_mesh_sys)
     return request_jacobian;
 
   FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
