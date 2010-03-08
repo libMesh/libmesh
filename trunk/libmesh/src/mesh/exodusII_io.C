@@ -251,7 +251,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
   /*const std::vector<double>& time_steps = */
   exio_helper.get_time_steps();
 
-  const std::vector<double> & nodal_values = exio_helper.get_nodal_var_values(nodal_var_name,timestep);
+  const std::vector<Real> & nodal_values = exio_helper.get_nodal_var_values(nodal_var_name,timestep);
 
   //const DofMap & dof_map = system.get_dof_map();
 
@@ -334,7 +334,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 void ExodusII_IO::write_timestep (const std::string& ,
 				  const EquationSystems& ,
 				  const int ,
-				  const double )
+				  const Real )
 {
 
   std::cerr <<  "ERROR, ExodusII API is not defined.\n"
@@ -347,7 +347,7 @@ void ExodusII_IO::write_timestep (const std::string& ,
 void ExodusII_IO::write_timestep (const std::string& fname,
 				  const EquationSystems& es,
 				  const int timestep,
-				  const double time)
+				  const Real time)
 {
   _timestep=timestep; 
   write_equation_systems(fname,es);

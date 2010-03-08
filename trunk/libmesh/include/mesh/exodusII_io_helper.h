@@ -53,7 +53,7 @@ public:
    * (on) or v=0 (off).
    */
   ExodusII_IO_Helper(bool v=false) : 
-    comp_ws(sizeof(double)),
+    comp_ws(sizeof(Real)),
     io_ws(0),
     ex_id(0),
     ex_err(0),
@@ -252,19 +252,19 @@ public:
    * @returns the \f$ i^{th} \f$
    * node's x-coordinate.
    */
-  double get_x(int i) const { return x[i]; }
+  Real get_x(int i) const { return x[i]; }
 
   /**
    * @returns the \f$ i^{th} \f$
    * node's y-coordinate.
    */
-  double get_y(int i) const { return y[i]; }
+  Real get_y(int i) const { return y[i]; }
 
   /**
    * @returns the \f$ i^{th} \f$
    * node's z-coordinate.
    */
-  double get_z(int i) const { return z[i]; }
+  Real get_z(int i) const { return z[i]; }
 
   /**
    * Opens an \p ExodusII mesh
@@ -398,7 +398,7 @@ public:
   /*
    * Returns an array containing the timesteps in the file
    */
-  const std::vector<double>& get_time_steps();
+  const std::vector<Real>& get_time_steps();
 
 
   /*
@@ -416,7 +416,7 @@ public:
    * Returns an array containing the nodal variable values
    * at the specified time
    */
-  const std::vector<double>& get_nodal_var_values(std::string nodal_var_name, int time_step);
+  const std::vector<Real>& get_nodal_var_values(std::string nodal_var_name, int time_step);
 
   // For Writing Solutions
   /**
@@ -460,7 +460,7 @@ public:
   /**
    * Writes the time for the timestep
    */
-  void write_timestep(int timestep, double time);
+  void write_timestep(int timestep, Real time);
 
   /**
    * Writes the vector of values to a nodal variable.
@@ -552,9 +552,9 @@ public:
   std::vector<int> elem_num_map;       // Optional mapping from internal [0,num_elem) to arbitrary indices
   float ex_version;                    // Version of Exodus you are using
   float ret_float;                     // Generic float returned by ex_inquire
-  std::vector<double> x;               // x locations of node points
-  std::vector<double> y;               // y locations of node points
-  std::vector<double> z;               // z locations of node points
+  std::vector<Real> x;                 // x locations of node points
+  std::vector<Real> y;                 // y locations of node points
+  std::vector<Real> z;                 // z locations of node points
   char    ret_char;                    // Generic char returned by ex_inquire
   // Use vectors of char to emulate char*'s
   std::vector<char> title;             //  Problem title
@@ -566,10 +566,10 @@ public:
     
   //Solution Data
   int num_time_steps;
-  std::vector<double> time_steps;
+  std::vector<Real> time_steps;
   int num_nodal_vars;
   std::vector<std::string> nodal_var_names;
-  std::vector<double> nodal_var_values;
+  std::vector<Real> nodal_var_values;
 
   // A pair of containers used to emulate a char** data
   // structure without having to worry about dynamic memory
