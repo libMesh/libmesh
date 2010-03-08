@@ -453,7 +453,7 @@ int ExodusII_IO_Helper::inquire(int req_info, std::string error_msg)
   return ret_int;
 }
 
-const std::vector<double>& ExodusII_IO_Helper::get_time_steps()
+const std::vector<Real>& ExodusII_IO_Helper::get_time_steps()
 {
   time_steps.resize(num_time_steps);
   exII::ex_get_all_times(ex_id, time_steps.empty() ? NULL : &time_steps[0]);
@@ -502,7 +502,7 @@ const std::vector<std::string>& ExodusII_IO_Helper::get_nodal_var_names()
 
 
 
-const std::vector<double>& ExodusII_IO_Helper::get_nodal_var_values(std::string nodal_var_name, int time_step)
+const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string nodal_var_name, int time_step)
 {
   nodal_var_values.resize(num_nodes);
     
@@ -538,9 +538,9 @@ const std::vector<double>& ExodusII_IO_Helper::get_nodal_var_values(std::string 
 
 void ExodusII_IO_Helper::create(std::string filename)
 {
-  //Store things as doubles
-  comp_ws = 8;
-  io_ws = 8;
+  //Store things based on the precision of libMesh
+  comp_ws = sizeof(Real);
+  io_ws = sizeof(Real);
     
   ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
     
@@ -817,7 +817,7 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
 
 
 
-void ExodusII_IO_Helper::write_timestep(int timestep, double time)
+void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 {
   ex_err = exII::ex_put_time(ex_id, timestep, &time);
   check_err(ex_err, "Error writing timestep.");

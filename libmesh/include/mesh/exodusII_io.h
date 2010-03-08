@@ -102,7 +102,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   void write_timestep (const std::string& fname,
 		       const EquationSystems& es,
 		       const int timestep,
-		       const double time);
+		       const Real time);
   
  private:
   /**
