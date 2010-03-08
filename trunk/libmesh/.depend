@@ -103,6 +103,8 @@ src/base/dof_map_constraints.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
@@ -301,6 +303,8 @@ src/error_estimation/adjoint_residual_error_estimator.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/patch.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -401,6 +405,8 @@ src/error_estimation/error_estimator.$(obj-suffix):\
     include/geom/point.h\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/parallel/threads.h\
@@ -1590,6 +1596,8 @@ src/fe/fe_compute_data.$(obj-suffix):\
     include/geom/point.h\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -5237,6 +5245,8 @@ src/mesh/ensight_io.$(obj-suffix):\
     include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -5298,6 +5308,8 @@ src/mesh/exodusII_io.$(obj-suffix):\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -5345,6 +5357,8 @@ src/mesh/exodusII_io_helper.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_tools.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -5464,6 +5478,8 @@ src/mesh/gmv_io.$(obj-suffix):\
     include/mesh/mesh_input.h\
     include/mesh/mesh_output.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -6044,6 +6060,8 @@ src/mesh/mesh_output.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/mesh/mesh_output.h\
     include/mesh/unstructured_mesh.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -6988,6 +7006,8 @@ src/mesh/vtk_io.$(obj-suffix):\
     include/mesh/unstructured_mesh.h\
     include/mesh/vtk_io.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -7334,6 +7354,8 @@ src/numerics/laspack_matrix.$(obj-suffix):\
     include/numerics/dense_matrix_base.h\
     include/numerics/laspack_matrix.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -7513,6 +7535,8 @@ src/numerics/petsc_matrix.$(obj-suffix):\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
@@ -7644,7 +7668,9 @@ src/numerics/sparse_matrix.$(obj-suffix):\
     include/numerics/petsc_macro.h\
     include/numerics/petsc_matrix.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
     include/numerics/trilinos_epetra_matrix.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
@@ -7755,8 +7781,10 @@ src/numerics/trilinos_epetra_matrix.$(obj-suffix):\
     include/numerics/dense_matrix_base.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
     include/numerics/trilinos_epetra_matrix.h\
     include/numerics/trilinos_epetra_vector.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
@@ -8827,6 +8855,8 @@ src/solvers/adaptive_time_solver.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -8941,6 +8971,8 @@ src/solvers/eigen_time_solver.$(obj-suffix):\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9004,6 +9036,8 @@ src/solvers/euler2_solver.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9066,6 +9100,8 @@ src/solvers/euler_solver.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9194,6 +9230,8 @@ src/solvers/newton_solver.$(obj-suffix):\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -9288,6 +9326,8 @@ src/solvers/petsc_diff_solver.$(obj-suffix):\
     include/numerics/petsc_matrix.h\
     include/numerics/petsc_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
@@ -9383,6 +9423,8 @@ src/solvers/petsc_nonlinear_solver.$(obj-suffix):\
     include/numerics/petsc_vector.h\
     include/numerics/preconditioner.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
@@ -9473,6 +9515,8 @@ src/solvers/steady_solver.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9536,6 +9580,8 @@ src/solvers/time_solver.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -9616,7 +9662,9 @@ src/solvers/trilinos_nox_nonlinear_solver.$(obj-suffix):\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
     include/numerics/trilinos_epetra_vector.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9674,6 +9722,8 @@ src/solvers/twostep_time_solver.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9739,6 +9789,8 @@ src/solvers/unsteady_solver.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -9867,6 +9919,8 @@ src/systems/diff_context.$(obj-suffix):\
     include/numerics/dense_subvector.h\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -9926,6 +9980,8 @@ src/systems/diff_system.$(obj-suffix):\
     include/numerics/dense_vector.h\
     include/numerics/dense_vector_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -9988,6 +10044,8 @@ src/systems/eigen_system.$(obj-suffix):\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -10047,6 +10105,8 @@ src/systems/equation_systems.$(obj-suffix):\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
     include/mesh/mesh_refinement.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/parallel.h\
@@ -10107,6 +10167,8 @@ src/systems/equation_systems_io.$(obj-suffix):\
     include/mesh/parallel_mesh.h\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/parallel/threads.h\
@@ -10163,6 +10225,8 @@ src/systems/explicit_system.$(obj-suffix):\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/parallel/threads.h\
@@ -10378,6 +10442,8 @@ src/systems/frequency_system.$(obj-suffix):\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -10440,6 +10506,8 @@ src/systems/implicit_system.$(obj-suffix):\
     include/mesh/unstructured_mesh.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -10502,6 +10570,8 @@ src/systems/linear_implicit_system.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -10558,6 +10628,8 @@ src/systems/newmark_system.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -10614,6 +10686,8 @@ src/systems/nonlinear_implicit_system.$(obj-suffix):\
     include/mesh/mesh_base.h\
     include/numerics/numeric_vector.h\
     include/numerics/sparse_matrix.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -10677,6 +10751,8 @@ src/systems/qoi_set.$(obj-suffix):\
     include/geom/point.h\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/threads.h\
     include/partitioning/partitioner.h\
@@ -10796,6 +10872,8 @@ src/systems/system_io.$(obj-suffix):\
     include/mesh/serial_mesh.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/parallel/parallel.h\
     include/parallel/threads.h\
@@ -10907,6 +10985,8 @@ src/systems/transient_system.$(obj-suffix):\
     include/geom/stored_range.h\
     include/mesh/mesh_base.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
@@ -10969,6 +11049,8 @@ src/utils/error_vector.$(obj-suffix):\
     include/mesh/tecplot_io.h\
     include/mesh/unstructured_mesh.h\
     include/numerics/numeric_vector.h\
+    include/numerics/tensor_value.h\
+    include/numerics/type_tensor.h\
     include/numerics/type_vector.h\
     include/numerics/vector_value.h\
     include/parallel/threads.h\
