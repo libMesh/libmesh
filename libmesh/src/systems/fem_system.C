@@ -384,8 +384,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 void FEMSystem::solve()
 {
   Parent::solve();
-
-  this->mesh_position_set();
 }
 
 
@@ -401,6 +399,14 @@ void FEMSystem::mesh_position_set()
   // This code won't work on a parallelized mesh yet -
   // it won't get ancestor elements right.
   libmesh_assert(mesh.is_serial());
+
+  // In fact it won't work in parallel at all yet - we don't have
+  // current_solution() data for non-ghost elements.  That's going to
+  // be put on hold until we're debugged in serial and until I figure
+  // out how to better abstract the "ask other procs for their local
+  // data, respond to others' queries, work on my query's results"
+  // pattern that we seem to be using a lot.
+  libmesh_assert(libMesh::n_processors() == 1);
   
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
