@@ -315,7 +315,6 @@ TODO:
 #
 .depend:
 	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
-	@echo "Updated .depend"
 
 
 
