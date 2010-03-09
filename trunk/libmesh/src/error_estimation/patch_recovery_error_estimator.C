@@ -369,7 +369,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 			u_h += (*phi)[i][qp]*system.current_solution (dof_indices[i]);
 
 		      // Patch RHS contributions
-		      for (unsigned int i=0; i<n_dofs; i++)			
+		      for (unsigned int i=0; i<psi.size(); i++)			
 			  F(i) = JxW[qp]*u_h*psi[i];			
 
 		    }		 
