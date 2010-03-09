@@ -181,9 +181,9 @@ namespace Parallel
   {
   public:
 #ifdef LIBMESH_HAVE_MPI
-    Communicator () : _communicator(MPI_COMM_NULL), _rank(0), _size(0) {}
+    Communicator () : _communicator(MPI_COMM_NULL), _rank(0), _size(0), _I_duped_it(false) {}
 #else
-    Communicator () : _rank(0), _size(1) {}
+    Communicator () : _rank(0), _size(1), _I_duped_it(false) {}
 #endif
 
     explicit Communicator (const communicator &comm) {
@@ -192,6 +192,21 @@ namespace Parallel
 
     ~Communicator () {
       this->clear();
+    }
+
+    void duplicate(const Communicator &comm) {
+      this->duplicate(comm._communicator);
+    }
+
+    void duplicate(const communicator &comm) {
+#ifdef LIBMESH_HAVE_MPI
+      if (_communicator != MPI_COMM_NULL) 
+        {
+          MPI_Comm_dup(comm, &_communicator);
+          _I_duped_it = true;
+        }
+#endif
+      this->assign(_communicator);
     }
 
     communicator& get() {
@@ -204,11 +219,13 @@ namespace Parallel
 
     void clear() {
 #ifdef LIBMESH_HAVE_MPI
-      if (_communicator != MPI_COMM_NULL)
+      if (_I_duped_it)
         {
+          libmesh_assert(_communicator != MPI_COMM_NULL);
           MPI_Comm_free(&_communicator);
           _communicator = MPI_COMM_NULL;
         }
+      _I_duped_it = false;
 #endif
     }
 
@@ -227,12 +244,18 @@ namespace Parallel
 
   private:
 
-    void assign(const communicator &comm) {
-#ifdef LIBMESH_HAVE_MPI
-      if (comm != MPI_COMM_NULL)
-        {
-          MPI_Comm_dup(comm, &_communicator);
+    explicit Communicator (const Communicator &comm) {
+      // Don't use the copy constructor, just copy by reference or
+      // pointer - it's too hard to keep a common used_tag_values if
+      // each communicator is shared by more than one Communicator
+      libmesh_error();
+    }
 
+    void assign(const communicator &comm) {
+      _communicator = comm;
+#ifdef LIBMESH_HAVE_MPI
+      if (_communicator != MPI_COMM_NULL)
+        {
           int i;
           MPI_Comm_size(_communicator, &i);
           libmesh_assert (i >= 0);
@@ -244,15 +267,16 @@ namespace Parallel
         }
       else
         {
-          _communicator = MPI_COMM_NULL;
           _rank = 0;
           _size = 0;
         }
 #endif
     }
 
-    communicator _communicator;
-    unsigned int _rank, _size;
+    communicator  _communicator;
+    unsigned int  _rank, _size;
+    std::map<int, unsigned int> used_tag_values;
+    bool          _I_duped_it;
   };
 
 
