@@ -36,6 +36,8 @@ ex2.$(obj-suffix):\
     $(LIBMESH_DIR)/include/mesh/parallel_mesh.h\
     $(LIBMESH_DIR)/include/mesh/serial_mesh.h\
     $(LIBMESH_DIR)/include/mesh/unstructured_mesh.h\
+    $(LIBMESH_DIR)/include/numerics/tensor_value.h\
+    $(LIBMESH_DIR)/include/numerics/type_tensor.h\
     $(LIBMESH_DIR)/include/numerics/type_vector.h\
     $(LIBMESH_DIR)/include/parallel/threads.h\
     $(LIBMESH_DIR)/include/partitioning/partitioner.h\
