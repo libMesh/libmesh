@@ -74,8 +74,12 @@ namespace {
     unsigned int weight() const 
     { return _weight; }
     
+// If we don't have threads we never need a join, and icpc yells a
+// warning if it sees an anonymous function that's never used
+#ifdef LIBMESH_HAVE_TBB_API
     void join (const SumElemWeight &other)
     { _weight += other.weight(); }
+#endif
 
   private:
     unsigned int _weight;
@@ -139,6 +143,9 @@ namespace {
         }
     }
 
+// If we don't have threads we never need a join, and icpc yells a
+// warning if it sees an anonymous function that's never used
+#ifdef LIBMESH_HAVE_TBB_API
     void join (const FindBBox &other)
     {
       for (unsigned int i=0; i<3; i++)
@@ -147,6 +154,7 @@ namespace {
 	  _vmax[i] = std::max(_vmax[i], other._vmax[i]);
 	}      
     }
+#endif
 
     MeshTools::BoundingBox bbox () const
     {
