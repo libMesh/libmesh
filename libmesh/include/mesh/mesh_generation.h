@@ -56,6 +56,9 @@ namespace MeshTools
      * Defaults to a unit cube (or line in 1D, square in 2D),
      * but the dimensions can be specified through the optional
      * arguments.
+     *
+     * Boundary ids are set to be equal to the side indexing on a
+     * master hex
      */  
     void build_cube (UnstructuredMesh& mesh,
 		     const unsigned int nx=0,
@@ -69,6 +72,9 @@ namespace MeshTools
 
     /**
      * A specialized \p build_cube() for 1D meshes
+     *
+     * Boundary ids are set to be equal to the side indexing on a
+     * master edge
      */
     void build_line (UnstructuredMesh& mesh,
                      const unsigned int nx,
@@ -78,6 +84,9 @@ namespace MeshTools
 
     /**
      * A specialized \p build_cube() for 2D meshes.
+     *
+     * Boundary ids are set to be equal to the side indexing on a
+     * master quad
      */
     void build_square (UnstructuredMesh& mesh,
 		       const unsigned int nx,
