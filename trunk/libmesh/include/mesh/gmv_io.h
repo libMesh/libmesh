@@ -121,6 +121,13 @@ class GMVIO : public MeshInput<MeshBase>,
    * information for the mesh.
    */
   bool & partitioning();
+
+  /**
+   * Flag to write element subdomain_id's as GMV "materials" instead
+   * of element processor_id's.  Allows you to generate exploded views
+   * on user-defined subdomains, potentially creating a pretty picture.
+   */
+  bool & write_subdomain_id_as_material();
   
   /**
    * Flag indicating whether or not to subdivide second order
@@ -215,7 +222,13 @@ private:
    * Flag to write the mesh partitioning.
    */
   bool _partitioning;
- 
+
+  /**
+   * Flag to write element subdomain_id's as GMV "materials" instead
+   * of element processor_id's.  
+   */
+  bool _write_subdomain_id_as_material;
+  
   /**
    * Flag to subdivide second order elements
    */
@@ -256,6 +269,7 @@ GMVIO::GMVIO (const MeshBase& mesh) :
   _binary                 (false),
   _discontinuous          (false),  
   _partitioning           (true),
+  _write_subdomain_id_as_material (false),
   _subdivide_second_order (true),
   _p_levels               (true),
   _next_elem_id           (0)
@@ -269,6 +283,7 @@ GMVIO::GMVIO (MeshBase& mesh) :
   _binary (false),
   _discontinuous          (false),  
   _partitioning           (true),
+  _write_subdomain_id_as_material (false),
   _subdivide_second_order (true),
   _p_levels               (true),
   _next_elem_id           (0)
@@ -297,6 +312,13 @@ inline
 bool & GMVIO::partitioning ()
 {
   return _partitioning;
+}
+
+
+inline
+bool & GMVIO::write_subdomain_id_as_material ()
+{
+  return _write_subdomain_id_as_material;
 }
 
 

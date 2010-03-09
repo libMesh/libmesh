@@ -336,30 +336,38 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   // optionally write the partition information
   if (this->partitioning())
     {
-      out << "material "
-	  << mesh.n_partitions()
-	// Note: GMV may give you errors like
-	// Error, material for cell 1 is greater than 1
-        // Error, material for cell 2 is greater than 1
-        // Error, material for cell 3 is greater than 1
-	// ... because you put the wrong number of partitions here.
-	// To ensure you write the correct number of materials, call
-	// mesh.recalculate_n_partitions() before writing out the
-	// mesh.
-	// Note: we can't call it now because the Mesh is const here and
-	// it is a non-const function.
-          << " 0\n";
+      if (this->write_subdomain_id_as_material())
+	{
+	  std::cout << "Not yet supported in GMVIO::write_ascii_new_impl" << std::endl;
+	  libmesh_error();
+	}
+      else // write processor IDs as materials.  This is the default
+	{
+	  out << "material "
+	      << mesh.n_partitions()
+	    // Note: GMV may give you errors like
+	    // Error, material for cell 1 is greater than 1
+	    // Error, material for cell 2 is greater than 1
+	    // Error, material for cell 3 is greater than 1
+	    // ... because you put the wrong number of partitions here.
+	    // To ensure you write the correct number of materials, call
+	    // mesh.recalculate_n_partitions() before writing out the
+	    // mesh.
+	    // Note: we can't call it now because the Mesh is const here and
+	    // it is a non-const function.
+	      << " 0\n";
 
-      for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
-        out << "proc_" << proc << "\n";
+	  for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
+	    out << "proc_" << proc << "\n";
       
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+	  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
-      // FIXME - don't we need to use an elementDefinition here? - RHS
-      for ( ; it != end; ++it)
-        out << (*it)->processor_id()+1 << "\n";
-      out << "\n";
+	  // FIXME - don't we need to use an elementDefinition here? - RHS
+	  for ( ; it != end; ++it)
+	    out << (*it)->processor_id()+1 << "\n";
+	  out << "\n";
+	}
     }
 
   // If there are *any* variables at all in the system (including
@@ -924,24 +932,83 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   // optionally write the partition information
   if (this->partitioning())
     {
-      out << "material "
-	  << mesh.n_partitions()
-	  << " 0"<< '\n';
+      if (this->write_subdomain_id_as_material())
+	{
+	  // Subdomain IDs can be non-contiguous and need not
+	  // necessarily start at 0.  Furthermore, since the user is
+	  // free to define subdomain_id_type to be a signed type, we
+	  // can't even assume max(subdomain_id) >= # unique subdomain ids.
 
-      for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
-	out << "proc_" << proc << '\n';
-      
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+	  // We build a map<subdomain_id, unsigned> to associate to each
+	  // user-selected subdomain ID a unique, contiguous unsigned value
+	  // which we can write to file.
+	  std::map<subdomain_id_type, unsigned> sbdid_map;
+	  typedef std::map<subdomain_id_type, unsigned>::iterator sbdid_map_iter;
+	  {
+	    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+	    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+	  
+	    for ( ; it != end; ++it)
+	      {
+		// Try to insert with dummy value
+		sbdid_map.insert( std::make_pair((*it)->subdomain_id(), 0) );
+	      }
+	  }
+	  
+	  // Map is created, iterate through it to set indices.  They will be
+	  // used repeatedly below.
+	  {
+	    unsigned ctr=0;
+	    for (sbdid_map_iter it=sbdid_map.begin(); it != sbdid_map.end(); ++it)
+	      (*it).second = ctr++;
+	  }
+	  
+	  out << "material "
+	      << sbdid_map.size()
+	      << " 0\n";
 
-      for ( ; it != end; ++it)
-        if (this->subdivide_second_order())
-	  for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-	    out << (*it)->processor_id()+1 << '\n';
-        else
-	  out << (*it)->processor_id()+1 << '\n';
+	  for (unsigned int sbdid=0; sbdid<sbdid_map.size(); sbdid++)
+	    out << "proc_" << sbdid << "\n";
+
+	  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+	  for ( ; it != end; ++it)
+	    {
+	      // Find the unique index for (*it)->subdomain_id(), print that to file
+	      sbdid_map_iter map_iter = sbdid_map.find( (*it)->subdomain_id() );
+	      unsigned gmv_mat_number = (*map_iter).second;
+	      
+	      if (this->subdivide_second_order())
+		for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+		  out << gmv_mat_number+1 << '\n';
+	      else
+		out << gmv_mat_number+1 << "\n";
+	    }
+	  out << '\n';
+	  
+	}
+      else // write processor IDs as materials.  This is the default
+	{
+	  out << "material "
+	      << mesh.n_partitions()
+	      << " 0"<< '\n';
+
+	  for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
+	    out << "proc_" << proc << '\n';
       
-      out << '\n';
+	  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+
+	  for ( ; it != end; ++it)
+	    if (this->subdivide_second_order())
+	      for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+		out << (*it)->processor_id()+1 << '\n';
+	    else
+	      out << (*it)->processor_id()+1 << '\n';
+      
+	  out << '\n';
+	}
     }
 
 
@@ -1252,38 +1319,46 @@ void GMVIO::write_binary (const std::string& fname,
   // optionally write the partition information
   if (this->partitioning())
     {
-      std::strcpy(buf, "material");
-      out.write(buf, std::strlen(buf));
+      if (this->write_subdomain_id_as_material())
+	{
+	  std::cout << "Not yet supported in GMVIO::write_binary" << std::endl;
+	  libmesh_error();
+	}
+      else
+	{
+	  std::strcpy(buf, "material");
+	  out.write(buf, std::strlen(buf));
       
-      unsigned int tmpint = mesh.n_processors();
-      std::memcpy(buf, &tmpint, sizeof(unsigned int));
-      out.write(buf, sizeof(unsigned int));
+	  unsigned int tmpint = mesh.n_processors();
+	  std::memcpy(buf, &tmpint, sizeof(unsigned int));
+	  out.write(buf, sizeof(unsigned int));
 
-      tmpint = 0; // IDs are cell based
-      std::memcpy(buf, &tmpint, sizeof(unsigned int));
-      out.write(buf, sizeof(unsigned int));
+	  tmpint = 0; // IDs are cell based
+	  std::memcpy(buf, &tmpint, sizeof(unsigned int));
+	  out.write(buf, sizeof(unsigned int));
 
 
-      for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
-        {
-          std::sprintf(buf, "proc_%d", proc);
-          out.write(buf, 8);
-        }
+	  for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
+	    {
+	      std::sprintf(buf, "proc_%d", proc);
+	      out.write(buf, 8);
+	    }
 
-      std::vector<unsigned int> proc_id (mesh.n_active_elem());
+	  std::vector<unsigned int> proc_id (mesh.n_active_elem());
       
-      unsigned int n=0;
+	  unsigned int n=0;
       
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+	  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
-      for ( ; it != end; ++it)
-        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-          proc_id[n++] = (*it)->processor_id()+1;
+	  for ( ; it != end; ++it)
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      proc_id[n++] = (*it)->processor_id()+1;
       
       
-      out.write(reinterpret_cast<char *>(&proc_id[0]),
-                sizeof(unsigned int)*proc_id.size());
+	  out.write(reinterpret_cast<char *>(&proc_id[0]),
+		    sizeof(unsigned int)*proc_id.size());
+	}
     }
 
   // If there are *any* variables at all in the system (including
@@ -1723,20 +1798,28 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   // optionally write the partition information
   if (write_partitioning)
     {
-      out << "material "
-	  << mesh.n_processors()
-	  << " 0"<< std::endl;
+      if (_write_subdomain_id_as_material)
+	{
+	  std::cout << "Not yet supported in GMVIO::write_discontinuous_gmv" << std::endl;
+	  libmesh_error();
+	}
+      else
+	{
+	  out << "material "
+	      << mesh.n_processors()
+	      << " 0"<< std::endl;
 
-      for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
-	out << "proc_" << proc << std::endl;
+	  for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
+	    out << "proc_" << proc << std::endl;
       
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+	  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+	  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
-      for ( ; it != end; ++it)
-	out << (*it)->processor_id()+1 << std::endl;
+	  for ( ; it != end; ++it)
+	    out << (*it)->processor_id()+1 << std::endl;
       
-      out << std::endl;
+	  out << std::endl;
+	}
     }
 
 
