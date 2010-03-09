@@ -54,6 +54,7 @@ namespace Parallel
   /**
    * Forward declarations of classes we will define later.
    */
+  class Communicator;
   class DataType;
   class Request;
   class Status;
@@ -114,6 +115,49 @@ namespace Parallel
   const int any_source=0;
 #endif // LIBMESH_HAVE_MPI
 
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Encapsulates the MPI tag integers.
+   */
+  class MessageTag
+  {
+  public:
+    /**
+     * Explicit constructor, to discourage using "magic numbers"
+     * as tags.  Communicator::get_unique_tag is recommended instead.
+     */
+    explicit MessageTag(int &tagvalue)
+      : _tagvalue(tagvalue), _comm(NULL) {}
+
+    /**
+     * Copy constructor.  Helps Communicator do reference counting on
+     * unique tags
+     */
+    MessageTag(const MessageTag& other);
+
+    /**
+     * Destructor.  Helps Communicator do reference counting on unique
+     * tags
+     */
+    ~MessageTag();
+
+    int value() const {
+      return _tagvalue;
+    }
+
+  private:
+    int _tagvalue;
+    Communicator *_comm;
+
+    // Constructor for reference-counted unique tags
+    MessageTag(int &tagvalue, Communicator *comm)
+      : _tagvalue(tagvalue), _comm(comm) {}
+
+    // Let Communicator handle the reference counting
+    friend class Communicator;
+  };
 
 
   //-------------------------------------------------------------------
@@ -215,6 +259,54 @@ namespace Parallel
 
     const communicator& get() const {
       return _communicator;
+    }
+
+    /**
+     * Get a tag that is unique to this Communicator.  Note that if
+     * people are also using magic numbers or copying communicators
+     * around then we can't guarantee the tag is unique to this
+     * MPI_Comm.
+     */
+    MessageTag get_unique_tag(int &tagvalue) {
+      // This had better be called in parallel.
+      // FIXME - we need a parallel_only macro to handle
+      // non-Communicator_World
+
+      if (used_tag_values.count(tagvalue))
+        {
+          // Get the largest value in the used values, and pick one
+          // larger
+          tagvalue = used_tag_values.rbegin()->first+1;
+          libmesh_assert(!used_tag_values.count(tagvalue));
+        }
+      used_tag_values[tagvalue] = 1;
+      return MessageTag(tagvalue, this);
+    }
+
+    /**
+     * Reference an already-acquired tag, so that we know it will
+     * be dereferenced multiple times before we can re-release it.
+     */
+    void reference_unique_tag(int tagvalue) {
+      // This has better be an already-acquired tag.
+      libmesh_assert(used_tag_values.count(tagvalue));
+
+      used_tag_values[tagvalue]++;
+    }
+
+    /**
+     * Dereference an already-acquired tag, and see if we can
+     * re-release it.
+     */
+    void dereference_unique_tag(int tagvalue) {
+      // This has better be an already-acquired tag.
+      libmesh_assert(used_tag_values.count(tagvalue));
+
+      used_tag_values[tagvalue]--;
+      // If we don't have any more outstanding references, we
+      // don't even need to keep this tag in our "used" set.
+      if (!used_tag_values[tagvalue])
+        used_tag_values.erase(tagvalue);
     }
 
     void clear() {
@@ -1202,6 +1294,22 @@ namespace Parallel
 
   //-----------------------------------------------------------------------
   // Parallel members
+
+  inline
+  MessageTag::~MessageTag()
+    {
+      if (_comm)
+        _comm->dereference_unique_tag(_tagvalue);
+    }
+
+  inline
+  MessageTag::MessageTag(const MessageTag &other)
+    : _tagvalue(other._tagvalue), _comm(other._comm)
+    {
+      if (_comm)
+        _comm->reference_unique_tag(_tagvalue);
+    }
+
 
   // Internal helper function to create vector<something_useable> from
   // vector<bool> for compatibility with MPI bitwise operations
