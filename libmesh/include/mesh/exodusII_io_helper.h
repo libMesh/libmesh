@@ -24,8 +24,9 @@
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
-#include <vector>
+#include <iostream>
 #include <string>
+#include <vector>
 
 #include "mesh_base.h"
 
@@ -306,10 +307,10 @@ public:
   void read_node_num_map();
   
   /**
-   * Prints the nodal information
-   * to \p std::cout.
+   * Prints the nodal information,
+   * by default to \p libMesh::out.
    */
-  void print_nodes();
+  void print_nodes(std::ostream &out = *libMesh::out);
 
   /**
    * Reads information for
@@ -502,16 +503,14 @@ public:
 
   /**
    * Prints the message defined
-   * in \p msg to \p std::cout.
-   * Can be turned off if
+   * in \p msg. Can be turned off if
    * verbosity is set to 0.
    */
   void message(const std::string msg);
 
   /**
    * Prints the message defined
-   * in \p msg to \p std::cout
-   * and appends the number
+   * in \p msg, and appends the number
    * \p i to the end of the
    * message.  Useful for
    * printing messages in loops.

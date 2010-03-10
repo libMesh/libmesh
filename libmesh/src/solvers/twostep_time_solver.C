@@ -65,8 +65,8 @@ void TwostepTimeSolver::solve()
 
       if (!quiet)
         {
-          std::cout << "\n === Computing adaptive timestep === " 
-                    << std::endl;
+          *libMesh::out << "\n === Computing adaptive timestep === " 
+                        << std::endl;
         }
 
       // Use the double-length timestep first (so the
@@ -83,7 +83,7 @@ void TwostepTimeSolver::solve()
       double_norm = calculate_norm(_system, *double_solution);
       if (!quiet)
         {
-	  std::cout << "Double norm = " << double_norm << std::endl;
+	  *libMesh::out << "Double norm = " << double_norm << std::endl;
         }
 
       // Then reset the initial guess for our single-length calcs
@@ -107,7 +107,7 @@ void TwostepTimeSolver::solve()
       single_norm = calculate_norm(_system, *_system.solution);
       if (!quiet)
         {
-          std::cout << "Single norm = " << single_norm << std::endl;
+          *libMesh::out << "Single norm = " << single_norm << std::endl;
         }
 
       // Reset the core_time_solver's reduce_deltat... value.
@@ -133,16 +133,16 @@ void TwostepTimeSolver::solve()
 
       if (!quiet)
         {
-          std::cout << "Error norm = " << error_norm << std::endl;
-          std::cout << "Local relative error = "
-		    << (error_norm /
-                        std::max(double_norm, single_norm))
-                    << std::endl;
-          std::cout << "Global relative error = "
-		    << (error_norm / _system.deltat / 
-                        std::max(double_norm, single_norm)) 
-                    << std::endl;
-          std::cout << "old delta t = " << _system.deltat << std::endl;
+          *libMesh::out << "Error norm = " << error_norm << std::endl;
+          *libMesh::out << "Local relative error = "
+		        << (error_norm /
+                            std::max(double_norm, single_norm))
+                        << std::endl;
+          *libMesh::out << "Global relative error = "
+		        << (error_norm / _system.deltat / 
+                            std::max(double_norm, single_norm)) 
+                        << std::endl;
+          *libMesh::out << "old delta t = " << _system.deltat << std::endl;
         }
 
       // If we haven't met our upper error tolerance, we'll have to
@@ -158,10 +158,10 @@ void TwostepTimeSolver::solve()
 
           if (!quiet)
             {
-              std::cout << "Failed to meet upper error tolerance" 
-                        << std::endl;
-              std::cout << "Retrying with delta t = "
-                        << _system.deltat << std::endl;
+              *libMesh::out << "Failed to meet upper error tolerance" 
+                            << std::endl;
+              *libMesh::out << "Retrying with delta t = "
+                            << _system.deltat << std::endl;
             }
         }
       else
@@ -184,10 +184,10 @@ void TwostepTimeSolver::solve()
 
   if (!quiet)
     {
-      std::cout << "The global growth/shrink factor is: "
-		<< global_shrink_or_growth_factor << std::endl;
-      std::cout << "The local growth/shrink factor is: "
-		<< local_shrink_or_growth_factor << std::endl;
+      *libMesh::out << "The global growth/shrink factor is: "
+		    << global_shrink_or_growth_factor << std::endl;
+      *libMesh::out << "The local growth/shrink factor is: "
+		    << local_shrink_or_growth_factor << std::endl;
     }
 
   // The local s.o.g. factor is based on the expected **local**
@@ -204,7 +204,7 @@ void TwostepTimeSolver::solve()
     {
       if (!quiet && this->global_tolerance)
         {
-	  std::cout << "delta t is constrained by max_growth" << std::endl;
+	  *libMesh::out << "delta t is constrained by max_growth" << std::endl;
 	}
         shrink_or_growth_factor = this->max_growth;
     }
@@ -216,8 +216,8 @@ void TwostepTimeSolver::solve()
     {
       if (!quiet)
 	{
-	  std::cout << "delta t is constrained by maximum-allowable delta t."
-                    << std::endl;
+	  *libMesh::out << "delta t is constrained by maximum-allowable delta t."
+                        << std::endl;
 	}
       _system.deltat = this->max_deltat;
     }
@@ -227,14 +227,14 @@ void TwostepTimeSolver::solve()
     {
       if (!quiet)
 	{
-	  std::cout << "delta t is constrained by minimum-allowable delta t."
-                    << std::endl;
+	  *libMesh::out << "delta t is constrained by minimum-allowable delta t."
+                        << std::endl;
 	}
       _system.deltat = this->min_deltat;
     }
   
   if (!quiet)
     {
-      std::cout << "new delta t = " << _system.deltat << std::endl;
+      *libMesh::out << "new delta t = " << _system.deltat << std::endl;
     }
 }

@@ -220,8 +220,8 @@ void LegacyXdrIO::read_binary (const std::string& name, const LegacyXdrIO::FileF
 {
 #ifndef LIBMESH_HAVE_XDR
 
-  std::cerr << "WARNING: Compiled without XDR binary support.\n"
-	    << "Will try ASCII instead" << std::endl << std::endl;
+  *libMesh::err << "WARNING: Compiled without XDR binary support.\n"
+	        << "Will try ASCII instead" << std::endl << std::endl;
 
   this->read_ascii (name);
   
@@ -252,8 +252,8 @@ void LegacyXdrIO::write_binary (const std::string& name, const LegacyXdrIO::File
 {
 #ifndef LIBMESH_HAVE_XDR
 
-  std::cerr << "WARNING: Compiled without XDR binary support.\n"
-	    << "Will try ASCII instead" << std::endl << std::endl;
+  *libMesh::err << "WARNING: Compiled without XDR binary support.\n"
+	        << "Will try ASCII instead" << std::endl << std::endl;
 
   this->write_ascii (name);
 
@@ -481,8 +481,8 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                 // If the parent was not previously added, we cannot continue.
                 if (it == parents.end())
                 {
-                  std::cerr << "Parent element with ID " << parent_ID 
-                            << " not found." << std::endl; 
+                  *libMesh::err << "Parent element with ID " << parent_ID 
+                                << " not found." << std::endl; 
                   libmesh_error();
                 }
 
@@ -581,8 +581,8 @@ void LegacyXdrIO::read_mesh (const std::string& name,
       if (mesh_data != NULL)
 	if (mesh_data->active())
 	  {
-	    std::cerr << "ERROR: MeshData not implemented for MGF-style mesh."
-		      << std::endl;
+	    *libMesh::err << "ERROR: MeshData not implemented for MGF-style mesh."
+		          << std::endl;
 	    libmesh_error();
 	  }
 #endif
@@ -910,9 +910,9 @@ void LegacyXdrIO::write_mesh (const std::string& name,
     {
       std::vector<int> bcs(numBCs*3);
     
-      //std::cout << "numBCs=" << numBCs << std::endl;
+      //*libMesh::out << "numBCs=" << numBCs << std::endl;
     
-      //std::cout << "Preparing to write boundary conditions." << std::endl;
+      //*libMesh::out << "Preparing to write boundary conditions." << std::endl;
       std::vector<unsigned int> elem_list;
       std::vector<unsigned short int> side_list;
       std::vector<short int> elem_id_list;

@@ -75,12 +75,12 @@ public:
   /**
    * Prints the nodes.
    */
-  virtual void print_nodes() const = 0;
+  virtual void print_nodes(std::ostream& out=*libMesh::out) const = 0;
 
   /**
    * Prints the nodes.
    */
-  virtual void print_elements() const = 0;
+  virtual void print_elements(std::ostream& out=*libMesh::out) const = 0;
   
   /**
    * @returns the number of active bins.

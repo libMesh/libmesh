@@ -452,7 +452,7 @@ public:
   /**
    * Prints relevant information about the mesh.
    */
-  void print_info (std::ostream& os=std::cout) const;
+  void print_info (std::ostream& os=*libMesh::out) const;
 
   /**
    * Equivalent to calling print_info() above, but now you can write:

@@ -509,8 +509,8 @@ void QJacobi::init_1D(const ElemType,
       
 	default:
 	  {
-	    std::cerr << "Quadrature rule " << _order
-		      << " not supported!" << std::endl;
+	    *libMesh::err << "Quadrature rule " << _order
+		          << " not supported!" << std::endl;
 	      
 	    libmesh_error();
 	  }
@@ -997,8 +997,8 @@ void QJacobi::init_1D(const ElemType,
       
 	default:
 	  {
-	    std::cerr << "Quadrature rule " << _order
-		      << " not supported!" << std::endl;
+	    *libMesh::err << "Quadrature rule " << _order
+		          << " not supported!" << std::endl;
 	      
 	    libmesh_error();
 	  }
@@ -1009,12 +1009,12 @@ void QJacobi::init_1D(const ElemType,
 
   else
     {
-      std::cerr << "Unsupported combination of (alpha,beta) = ("
-		<< _alpha
-		<< ","
-		<< _beta
-		<< ") requested in Jacobi-Gauss quadrature rule."
-		<< std::endl;
+      *libMesh::err << "Unsupported combination of (alpha,beta) = ("
+		    << _alpha
+		    << ","
+		    << _beta
+		    << ") requested in Jacobi-Gauss quadrature rule."
+		    << std::endl;
     }
 
   

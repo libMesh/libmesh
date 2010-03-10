@@ -60,8 +60,8 @@ void MeshData::activate (const std::string& descriptor)
 {
 #ifdef DEBUG
   if (_compatibility_mode)
-      std::cerr << "WARNING: MeshData was in compatibility mode, now being activated."
-		<< std::endl;
+      *libMesh::err << "WARNING: MeshData was in compatibility mode, now being activated."
+		    << std::endl;
 #endif
 
   _compatibility_mode = false;
@@ -91,8 +91,8 @@ void MeshData::enable_compatibility_mode (const std::string& descriptor)
     }
 #ifdef DEBUG
   else
-      std::cerr << "WARNING: MeshData was in compatibility mode, now being activated."
-		<< std::endl;
+      *libMesh::err << "WARNING: MeshData was in compatibility mode, now being activated."
+		    << std::endl;
 #endif
 }
 
@@ -144,7 +144,7 @@ void  MeshData::slim (const bool node_id_map,
 #ifdef DEBUG
   else if (this->compatibility_mode())
     {
-      std::cerr << "WARNING: No need for MeshData::slim() in compatibility mode." << std::endl;
+      *libMesh::err << "WARNING: No need for MeshData::slim() in compatibility mode." << std::endl;
     }
 #endif
 }
@@ -241,8 +241,8 @@ void MeshData::read (const std::string& name)
 
 #ifdef DEBUG
   if (this->compatibility_mode())
-      std::cerr << "WARNING: MeshData in compatibility mode, node and element ids" << std::endl
-		<< "         stored in file may be totally different from libMesh ids!" << std::endl;
+      *libMesh::err << "WARNING: MeshData in compatibility mode, node and element ids" << std::endl
+		    << "         stored in file may be totally different from libMesh ids!" << std::endl;
 #endif
 
   // Read the file based on extension.  We let all processors read the
@@ -267,12 +267,12 @@ void MeshData::read (const std::string& name)
       
       else
 	{
-	  std::cerr << " ERROR: Unrecognized file extension: " << name
-		    << "\n   I understand the following:\n\n"
-		    << "     *.xta  -- Internal ASCII data format\n"
-		    << "     *.xtr  -- Internal binary data format\n"
-		    << "     *.unv  -- I-deas format\n"
-		    << std::endl;
+	  *libMesh::err << " ERROR: Unrecognized file extension: " << name
+		        << "\n   I understand the following:\n\n"
+		        << "     *.xta  -- Internal ASCII data format\n"
+		        << "     *.xtr  -- Internal binary data format\n"
+		        << "     *.unv  -- I-deas format\n"
+		        << std::endl;
 	  libmesh_error();
 	  
 	}    
@@ -297,9 +297,9 @@ void MeshData::write (const std::string& name)
   
 #ifdef DEBUG
   if (this->compatibility_mode())
-      std::cerr << "WARNING: MeshData in compatibility mode.  Node and element ids" << std::endl
-		<< "         written to file may differ from libMesh numbering" << std::endl
-		<< "         next time this file is read!" << std::endl;
+      *libMesh::err << "WARNING: MeshData in compatibility mode.  Node and element ids" << std::endl
+		    << "         written to file may differ from libMesh numbering" << std::endl
+		    << "         next time this file is read!" << std::endl;
 #endif
 
   // Read the file based on extension
@@ -315,12 +315,12 @@ void MeshData::write (const std::string& name)
 
     else
       {
-	std::cerr << " ERROR: Unrecognized file extension: " << name
-		  << "\n   I understand the following:\n\n"
-		  << "     *.xta  -- Internal ASCII data format\n"
-		  << "     *.xtr  -- Internal binary data format\n"
-		  << "     *.unv  -- I-deas format\n"
-		  << std::endl;
+	*libMesh::err << " ERROR: Unrecognized file extension: " << name
+		      << "\n   I understand the following:\n\n"
+		      << "     *.xta  -- Internal ASCII data format\n"
+		      << "     *.xtr  -- Internal binary data format\n"
+		      << "     *.unv  -- I-deas format\n"
+		      << std::endl;
 	libmesh_error();
 
       }    
@@ -390,9 +390,9 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 
       if (pos == _id_node.end())
         {
-	  std::cerr << "ERROR: Have no Node* associated with the foreign id = "
-		    << fid
-		    << std::endl;
+	  *libMesh::err << "ERROR: Have no Node* associated with the foreign id = "
+		        << fid
+		        << std::endl;
 	  libmesh_error();
 	  return NULL;
 	}
@@ -429,10 +429,10 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
       
       if (pos == _node_id.end())
         {
-	  std::cerr << "ERROR: No foreign id stored for the node "
-		    << "with the libMesh id = "
-		    << n->id()
-		    << std::endl;
+	  *libMesh::err << "ERROR: No foreign id stored for the node "
+		        << "with the libMesh id = "
+		        << n->id()
+		        << std::endl;
 	  libmesh_error();
 	  return 0;
 	}
@@ -468,9 +468,9 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
       
       if (pos == _id_elem.end())
         {
-	  std::cerr << "ERROR: Have no Elem* associated with the foreign id = "
-		    << fid
-		    << std::endl;
+	  *libMesh::err << "ERROR: Have no Elem* associated with the foreign id = "
+		        << fid
+		        << std::endl;
 	  libmesh_error();
 	  return NULL;
 	}
@@ -506,10 +506,10 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 
       if (pos == _elem_id.end())
         {
-	  std::cerr << "ERROR: No foreign id stored for the element "
-		    << "with the libMesh id = "
-		    << e->id()
-		    << std::endl;
+	  *libMesh::err << "ERROR: No foreign id stored for the element "
+		        << "with the libMesh id = "
+		        << e->id()
+		        << std::endl;
 	  libmesh_error();
 	  return 0;
 	}
@@ -542,8 +542,8 @@ void MeshData::insert_node_data (std::map<const Node*,
 
   if (this->_node_data_closed)
     {
-      std::cerr << "ERROR: Nodal data already closed!  Use clear() first!"
-		<< std::endl;
+      *libMesh::err << "ERROR: Nodal data already closed!  Use clear() first!"
+		    << std::endl;
       libmesh_error();
     }
 
@@ -569,8 +569,8 @@ void MeshData::insert_node_data (std::map<const Node*,
   for (; nd_pos != nd_end; ++nd_pos)
     if ( (*nd_pos).second.size() != reference_length) 
       {
-	std::cerr << "ERROR: Size mismatch."
-		  << std::endl;
+	*libMesh::err << "ERROR: Size mismatch."
+		      << std::endl;
 	libmesh_error();
       }
 #endif
@@ -606,8 +606,8 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 
   if (this->_elem_data_closed)
     {
-      std::cerr << "ERROR: Element data already closed!  Use clear() first!"
-		<< std::endl;
+      *libMesh::err << "ERROR: Element data already closed!  Use clear() first!"
+		    << std::endl;
       libmesh_error();
     }
 
@@ -627,8 +627,8 @@ void MeshData::insert_elem_data (std::map<const Elem*,
   for (; ed_pos != ed_end; ++ed_pos)
     if ( (*ed_pos).second.size() != reference_length) 
       {
-	std::cerr << "ERROR: Size mismatch."
-		  << std::endl;
+	*libMesh::err << "ERROR: Size mismatch."
+		      << std::endl;
 	libmesh_error();
       }
 #endif

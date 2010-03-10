@@ -203,9 +203,9 @@ void Transient<T>::solve ()
       // Incriment the time counter
       this->time() += this->dt();
       
-      std::cout << "Solving time step "
-		<< this->time_step()
-		<< std::endl;
+      libMesh::out << "Solving time step "
+		   << this->time_step()
+		   << std::endl;
 
       // Call the base class solver
       T::solve ();	

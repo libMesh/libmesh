@@ -362,11 +362,11 @@ void GmshIO::read_mesh(std::istream& in)
             // section, where the group dimension is now required);
 	    // [Since we don't even parse the PhysicalNames section at the time
 	    //  of this writing, I don't think this change affects us.]
-            std::cerr << "Error: Wrong msh file version " << version << "\n";
+            *libMesh::err << "Error: Wrong msh file version " << version << "\n";
             libmesh_error();
           }
           if(format){
-            std::cerr << "Error: Unknown data format for mesh\n";
+            *libMesh::err << "Error: Unknown data format for mesh\n";
             libmesh_error();
           }
         }
@@ -468,12 +468,12 @@ void GmshIO::read_mesh(std::istream& in)
                     {
                       if (elem->n_nodes() != nnodes)
                         {
-                          std::cerr << "Number of nodes for element " << id
-                                    << " of type " << eletypes_imp[type].type
-                                    << " (Gmsh type " << type  
-                                    << ") does not match Libmesh definition. "
-                                    << "I expected " << elem->n_nodes()
-                                    << " nodes, but got " << nnodes << "\n";
+                          *libMesh::err << "Number of nodes for element " << id
+                                        << " of type " << eletypes_imp[type].type
+                                        << " (Gmsh type " << type  
+                                        << ") does not match Libmesh definition. "
+                                        << "I expected " << elem->n_nodes()
+                                        << " nodes, but got " << nnodes << "\n";
                           libmesh_error();
                         }
                     }
@@ -742,11 +742,11 @@ void GmshIO::write_post (const std::string& fname,
       const unsigned int n_vars = solution_names->size();
     
       if (!(v->size() == mesh.n_nodes()*n_vars))
-        std::cerr << "ERROR: v->size()=" << v->size()
-                  << ", mesh.n_nodes()=" << mesh.n_nodes()
-                  << ", n_vars=" << n_vars
-                  << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
-                  << "\n";
+        *libMesh::err << "ERROR: v->size()=" << v->size()
+                      << ", mesh.n_nodes()=" << mesh.n_nodes()
+                      << ", n_vars=" << n_vars
+                      << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
+                      << "\n";
       
       libmesh_assert (v->size() == mesh.n_nodes()*n_vars);
 
@@ -822,8 +822,8 @@ void GmshIO::write_post (const std::string& fname,
                 }
               default:
                 {
-                  std::cerr << "ERROR: Not existant element type "
-                            << (*it)->type() << std::endl;
+                  *libMesh::err << "ERROR: Not existant element type "
+                                << (*it)->type() << std::endl;
                   libmesh_error();
                 }
               }
@@ -923,9 +923,9 @@ void GmshIO::write_post (const std::string& fname,
                 if (this->binary())
                   {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-		    std::cout << "WARNING: Gmsh::write_post does not fully support "
-			      << "complex numbers. Will only write the real part of "
-			      << "variable " << varname << std::endl;
+		    *libMesh::out << "WARNING: Gmsh::write_post does not fully support "
+			          << "complex numbers. Will only write the real part of "
+			          << "variable " << varname << std::endl;
 #endif
                     double tmp = libmesh_real((*v)[elem->node(i)*n_vars + ivar]);
                     std::memcpy(buf, &tmp, sizeof(double));
@@ -934,9 +934,9 @@ void GmshIO::write_post (const std::string& fname,
                 else
 		  {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-		    std::cout << "WARNING: Gmsh::write_post does not fully support "
-			      << "complex numbers. Will only write the real part of "
-			      << "variable " << varname << std::endl;
+		    *libMesh::out << "WARNING: Gmsh::write_post does not fully support "
+			          << "complex numbers. Will only write the real part of "
+			          << "variable " << varname << std::endl;
 #endif
 		    out << libmesh_real((*v)[elem->node(i)*n_vars + ivar]) << "\n";
 		  }

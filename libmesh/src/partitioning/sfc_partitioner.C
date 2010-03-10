@@ -58,9 +58,9 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 #ifndef LIBMESH_HAVE_SFCURVES
 
   libmesh_here();
-  std::cerr << "ERROR: The library has been built without"    << std::endl
-	    << "Space Filling Curve support.  Using a linear" << std::endl
-	    << "partitioner instead!" << std::endl;
+  *libMesh::err << "ERROR: The library has been built without"    << std::endl
+	        << "Space Filling Curve support.  Using a linear" << std::endl
+	        << "partitioner instead!" << std::endl;
 
   LinearPartitioner lp;
 
@@ -146,12 +146,12 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
   else
     {
       libmesh_here();
-      std::cerr << "ERROR: Unknown type: " << _sfc_type << std::endl
-		<< " Valid types are"                   << std::endl
-		<< "  \"Hilbert\""                      << std::endl
-		<< "  \"Morton\""                       << std::endl
-		<< " "                                  << std::endl
-		<< "Proceeding with a Hilbert curve."   << std::endl;
+      *libMesh::err << "ERROR: Unknown type: " << _sfc_type << std::endl
+		    << " Valid types are"                   << std::endl
+		    << "  \"Hilbert\""                      << std::endl
+		    << "  \"Morton\""                       << std::endl
+		    << " "                                  << std::endl
+		    << "Proceeding with a Hilbert curve."   << std::endl;
       
       Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
     }

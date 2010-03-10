@@ -164,9 +164,9 @@ Real FE<3,CLOUGH>::shape(const ElemType,
 			     const unsigned int,
 			     const Point&)
 {
-  std::cerr << "Clough-Tocher elements require the real element\n"
-	    << "to construct gradient-based degrees of freedom."
-	    << std::endl;
+  *libMesh::err << "Clough-Tocher elements require the real element\n"
+	        << "to construct gradient-based degrees of freedom."
+	        << std::endl;
   
   libmesh_error();
   return 0.;
@@ -182,8 +182,8 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-  std::cerr << "3D Clough elements not yet implemented."
-	    << std::endl;
+  *libMesh::err << "3D Clough elements not yet implemented."
+	        << std::endl;
   
   libmesh_error();
 
@@ -199,13 +199,13 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 	switch (type)
 	  {
 	  default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   
@@ -222,9 +222,9 @@ Real FE<3,CLOUGH>::shape_deriv(const ElemType,
 				   const unsigned int,
 				   const Point&)
 {
-  std::cerr << "Clough-Tocher elements require the real element\n"
-	    << "to construct gradient-based degrees of freedom."
-	    << std::endl;
+  *libMesh::err << "Clough-Tocher elements require the real element\n"
+	        << "to construct gradient-based degrees of freedom."
+	        << std::endl;
 
   libmesh_error();
   return 0.;
@@ -241,8 +241,8 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-  std::cerr << "3D Clough elements not yet implemented."
-	    << std::endl;
+  *libMesh::err << "3D Clough elements not yet implemented."
+	        << std::endl;
   
   libmesh_error();
 
@@ -258,13 +258,13 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 	switch (type)
 	  {
 	  default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   
@@ -283,7 +283,7 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-  std::cerr << "3D Clough elements not yet implemented."
+  *libMesh::err << "3D Clough elements not yet implemented."
 	    << std::endl;
   
   libmesh_error();
@@ -300,13 +300,13 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
 	switch (type)
 	  {
 	  default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
+            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   

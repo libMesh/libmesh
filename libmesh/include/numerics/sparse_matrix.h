@@ -289,7 +289,7 @@ public:
    * in a uniform style, regardless of matrix/solver
    * package being used.
    */
-  void print(std::ostream& os=std::cout) const;
+  void print(std::ostream& os=*libMesh::out) const;
 
   /**
    * Same as the print method above, but allows you
@@ -302,7 +302,7 @@ public:
    * Print the contents of the matrix to the screen
    * in a package-personalized style, if available.
    */
-  virtual void print_personal(std::ostream& os=std::cout) const = 0;
+  virtual void print_personal(std::ostream& os=*libMesh::out) const = 0;
   
   /**
    * Print the contents of the matrix in Matlab's
@@ -312,8 +312,8 @@ public:
 x   */
   virtual void print_matlab(const std::string name="NULL") const
   {
-    std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
-    std::cerr << "ERROR writing MATLAB file " << name << std::endl;
+    *libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
+    *libMesh::err << "ERROR writing MATLAB file " << name << std::endl;
     libmesh_error();
   }
 
@@ -384,8 +384,8 @@ protected:
 			      const std::vector<unsigned int>& ,
 			      const bool) const
   {
-    std::cerr << "Error! This function is not yet implemented in the base class!"
-	      << std::endl;
+    *libMesh::err << "Error! This function is not yet implemented in the base class!"
+	          << std::endl;
     libmesh_error();
   }
   
@@ -430,7 +430,7 @@ void SparseMatrix<Complex>::print(std::ostream& os) const
 {
   // std::complex<>::operator<<() is defined, but use this form
 
-  std::cout << "Real part:" << std::endl;
+  os << "Real part:" << std::endl;
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)

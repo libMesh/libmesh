@@ -293,7 +293,7 @@ public:
    * limited ourselves to one PETSc implementation for
    * writing.
    */
-  void print_personal(std::ostream& os=std::cout) const;
+  void print_personal(std::ostream& os=*libMesh::out) const;
 
   /**
    * Print the contents of the matrix in Matlab's
@@ -674,7 +674,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
 
 #ifndef NDEBUG
   if (os != std::cout)
-    std::cerr << "Warning! PETSc can only print to std::cout!" << std::endl;
+    *libMesh::err << "Warning! PETSc can only print to std::cout!" << std::endl;
 #endif
   
   int ierr=0;

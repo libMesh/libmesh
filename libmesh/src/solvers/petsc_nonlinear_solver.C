@@ -60,11 +60,11 @@ extern "C"
     //int ierr=0;
 
     //if (its > 0)
-      std::cout << "  NL step "
-		<< std::setw(2) << its
-		<< std::scientific
-		<< ", |residual|_2 = " << fnorm
-		<< std::endl;
+      *libMesh::out << "  NL step "
+		    << std::setw(2) << its
+		    << std::scientific
+		    << ", |residual|_2 = " << fnorm
+		    << std::endl;
 
     //return ierr;
     return 0;

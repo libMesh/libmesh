@@ -123,9 +123,9 @@ public:
   void clear ();
 
   /**
-   * Prints the contents to the specified stream.
+   * Prints the contents, by default to libMesh::out.
    */
-  void print (std::ostream& os=std::cout) const;
+  void print (std::ostream& os=*libMesh::out) const;
   
 private:
 
@@ -388,11 +388,11 @@ const T& Parameters::get (const std::string& name) const
 {
   if (!this->have_parameter<T>(name))
     {
-      std::cerr << "ERROR: no "
-		<< typeid(T).name()
-		<< " parameter named \""
-		<< name << "\":" << std::endl
-		<< *this;
+      *libMesh::err << "ERROR: no "
+		    << typeid(T).name()
+		    << " parameter named \""
+		    << name << "\":" << std::endl
+		    << *this;
       
       libmesh_error();
     }

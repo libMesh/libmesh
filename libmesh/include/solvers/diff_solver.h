@@ -136,7 +136,7 @@ public:
   unsigned int max_nonlinear_iterations;
 
   /**
-   * The DiffSolver should not print anything to std::cout
+   * The DiffSolver should not print anything to libMesh::out
    * unless quiet is set to false
    */
   bool quiet;

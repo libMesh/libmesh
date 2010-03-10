@@ -88,8 +88,8 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 	    
 	  default:
 	    {
-	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
-			<< std::endl;
+	      *libMesh::err << "ERROR: Unsupported 2D element type!: " << type
+			    << std::endl;
 	      libmesh_error();
 	    }
 	  }
@@ -191,8 +191,8 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
 	    
 	  default:
 	    {
-	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
-			<< std::endl;
+	      *libMesh::err << "ERROR: Unsupported 2D element type!: " << type
+			    << std::endl;
 	      libmesh_error();
 	    }
 	  }
@@ -203,8 +203,8 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
       // unsupported order
     default:
       {
-	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
-		  << std::endl;
+	*libMesh::err << "ERROR: Unsupported 2D FE order!: " << order
+		      << std::endl;
 	libmesh_error();
       }
     }
@@ -340,8 +340,8 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	    
 	  default:
 	    {
-	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
-			<< std::endl;
+	      *libMesh::err << "ERROR: Unsupported 2D element type!: " << type
+			    << std::endl;
 	      libmesh_error();
 	    }
 	  }
@@ -546,8 +546,8 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 	    
 	  default:
 	    {
-	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
-			<< std::endl;
+	      *libMesh::err << "ERROR: Unsupported 2D element type!: " << type
+			    << std::endl;
 	      libmesh_error();
 	    }
 	  }
@@ -558,8 +558,8 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
       // unsupported order
     default:
       {
-	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
-		  << std::endl;
+	*libMesh::err << "ERROR: Unsupported 2D FE order!: " << order
+		      << std::endl;
 	libmesh_error();
       }
     }
@@ -642,8 +642,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 		default:
 		  {
-		    std::cerr << "ERROR: Invalid derivative requested! "
-			      << std::endl;
+		    *libMesh::err << "ERROR: Invalid derivative requested! "
+			          << std::endl;
 		    libmesh_error();
 		  }
 		}
@@ -658,8 +658,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 	  default:
 	    {
-	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
-			<< std::endl;
+	      *libMesh::err << "ERROR: Unsupported 2D element type!: " << type
+			    << std::endl;
 	      libmesh_error();
 	    }
 	    
@@ -706,8 +706,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 		      default:
 			{
-			  std::cerr << "Invalid shape function index requested!"
-				    << std::endl;
+			  *libMesh::err << "Invalid shape function index requested!"
+				        << std::endl;
 			  libmesh_error();
 			}
 		      }
@@ -744,8 +744,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 		      default:
 			{
-			  std::cerr << "Invalid shape function index requested!"
-				    << std::endl;
+			  *libMesh::err << "Invalid shape function index requested!"
+				        << std::endl;
 			  libmesh_error();
 			}
 		      }
@@ -776,8 +776,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 			
 		      default:
 			{
-			  std::cerr << "Invalid shape function index requested!"
-				    << std::endl;
+			  *libMesh::err << "Invalid shape function index requested!"
+				        << std::endl;
 			  libmesh_error();
 			}
 		      }
@@ -786,8 +786,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 		  
 		default:
 		  {
-		    std::cerr << "ERROR: Invalid derivative requested! "
-			      << std::endl;
+		    *libMesh::err << "ERROR: Invalid derivative requested! "
+			          << std::endl;
 		    libmesh_error();
 		  }
 		} // end switch (j)
@@ -824,8 +824,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 		default:
 		  {
-		    std::cerr << "ERROR: Invalid derivative requested! "
-			      << std::endl;
+		    *libMesh::err << "ERROR: Invalid derivative requested! "
+			          << std::endl;
 		    libmesh_error();
 		  }
 		}  // end switch (j)
@@ -870,8 +870,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 			
 		      default:
 			{
-			  std::cerr << "Invalid shape function index requested!"
-				    << std::endl;
+			  *libMesh::err << "Invalid shape function index requested!"
+				        << std::endl;
 			  libmesh_error();
 			}
 		      }
@@ -902,8 +902,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 		      default:
 			{
-			  std::cerr << "Invalid shape function index requested!"
-				    << std::endl;
+			  *libMesh::err << "Invalid shape function index requested!"
+				        << std::endl;
 			  libmesh_error();
 			}
 		      }
@@ -934,8 +934,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 		      default:
 			{
-			  std::cerr << "Invalid shape function index requested!"
-				    << std::endl;
+			  *libMesh::err << "Invalid shape function index requested!"
+				        << std::endl;
 			  libmesh_error();
 			} 
 		      }
@@ -943,8 +943,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 		default:
 		  {
-		    std::cerr << "ERROR: Invalid derivative requested! "
-			      << std::endl;
+		    *libMesh::err << "ERROR: Invalid derivative requested! "
+			          << std::endl;
 		    libmesh_error();
 		  }
 		} // end switch (j)
@@ -952,8 +952,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    
 	  default:
 	    {
-	      std::cerr << "ERROR: Unsupported 2D element type!: " << type
-			<< std::endl;
+	      *libMesh::err << "ERROR: Unsupported 2D element type!: " << type
+			    << std::endl;
 	      libmesh_error();
 	    }
 	  }
@@ -964,8 +964,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
       // unsupported order
     default:
       {
-	std::cerr << "ERROR: Unsupported 2D FE order!: " << order
-		  << std::endl;
+	*libMesh::err << "ERROR: Unsupported 2D FE order!: " << order
+		      << std::endl;
 	libmesh_error();
       }
       

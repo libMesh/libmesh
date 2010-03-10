@@ -240,8 +240,8 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
         }
     default:
 #ifdef DEBUG
-      std::cerr << "ERROR: Bad ElemType = " << t
-		<< std::endl;
+      *libMesh::err << "ERROR: Bad ElemType = " << t
+		    << std::endl;
 #endif
       libmesh_error();	    
     }
@@ -281,8 +281,8 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
       return ((o-1)*(o-1)*(o-1));
     default:
 #ifdef DEBUG
-      std::cerr << "ERROR: Bad ElemType = " << t
-		<< std::endl;
+      *libMesh::err << "ERROR: Bad ElemType = " << t
+		    << std::endl;
 #endif
       libmesh_error();	    
     }

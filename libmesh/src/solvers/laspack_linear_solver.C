@@ -249,9 +249,9 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
       // Unknown solver, use GMRES
     default:
       {
-	std::cerr << "ERROR:  Unsupported LASPACK Solver: "
-		  << this->_solver_type      << std::endl
-		  << "Continuing with GMRES" << std::endl;
+	*libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
+		      << this->_solver_type      << std::endl
+		      << "Continuing with GMRES" << std::endl;
 	
 	this->_solver_type = GMRES;
 	
@@ -266,7 +266,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   // Check for an error
   if (LASResult() != LASOK)
     {
-      std::cerr << "ERROR:  LASPACK Error: " << std::endl;
+      *libMesh::err << "ERROR:  LASPACK Error: " << std::endl;
       WriteLASErrDescr(stdout);
       libmesh_error();
     }
@@ -326,9 +326,9 @@ void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
 
 
     default:
-      std::cerr << "ERROR:  Unsupported LASPACK Preconditioner: "
-		<< this->_preconditioner_type << std::endl
-		<< "Continuing with ILU"      << std::endl;
+      *libMesh::err << "ERROR:  Unsupported LASPACK Preconditioner: "
+		    << this->_preconditioner_type << std::endl
+		    << "Continuing with ILU"      << std::endl;
       this->_preconditioner_type = ILU_PRECOND;
       this->set_laspack_preconditioner_type();      
     }
@@ -339,8 +339,8 @@ void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
 template <typename T>
 void LaspackLinearSolver<T>::print_converged_reason()
 {
-  std::cout << "print_converged_reason() is currently only supported"
-            << "with Petsc 2.3.1 and later." << std::endl;
+  *libMesh::out << "print_converged_reason() is currently only supported"
+                << "with Petsc 2.3.1 and later." << std::endl;
 }
 
 

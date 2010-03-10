@@ -339,9 +339,9 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
 
     default:
       {
-	std::cerr << "Error! This matrix already has a "
-		  << "different decomposition..."
-		  << std::endl;
+	*libMesh::err << "Error! This matrix already has a "
+		      << "different decomposition..."
+		      << std::endl;
 	libmesh_error();
       }
     }
@@ -441,7 +441,7 @@ void DenseMatrix<T>::_lu_decompose ()
 	    }
 	}
 
-      // std::cout << "max=" << max << " found at row " << _pivots[i] << std::endl;
+      // *libMesh::out << "max=" << max << " found at row " << _pivots[i] << std::endl;
 
       // If the max was found in a different row, interchange rows.
       // Here we interchange the *entire* row, in Gaussian elimination
@@ -456,7 +456,7 @@ void DenseMatrix<T>::_lu_decompose ()
       // If the max abs entry found is zero, the matrix is singular
       if (A(i,i) == libMesh::zero)
 	{
-	  std::cout << "Matrix A is singular!" << std::endl;
+	  *libMesh::out << "Matrix A is singular!" << std::endl;
 	  libmesh_error();
 	}
 
@@ -517,9 +517,9 @@ T DenseMatrix<T>::det ()
       }
     default:
       {
-      std::cerr << "Error! Can't compute the determinant under "
-		<< "the current decomposition."
-		<< std::endl;
+      *libMesh::err << "Error! Can't compute the determinant under "
+		    << "the current decomposition."
+		    << std::endl;
       libmesh_error();
       }
     }
@@ -581,9 +581,9 @@ void DenseMatrix<T>::cholesky_solve (DenseVector<T2>& b,
       
     default:
       {
-	std::cerr << "Error! This matrix already has a "
-		  << "different decomposition..."
-		  << std::endl;
+	*libMesh::err << "Error! This matrix already has a "
+		      << "different decomposition..."
+		      << std::endl;
 	libmesh_error();
       }
     }
@@ -627,9 +627,9 @@ void DenseMatrix<T>::_cholesky_decompose ()
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
 	      if (A(i,j) <= 0.0)
 		{
-		  std::cerr << "Error! Can only use Cholesky decomposition "
-			    << "with symmetric positive definite matrices."
-			    << std::endl;
+		  *libMesh::err << "Error! Can only use Cholesky decomposition "
+			        << "with symmetric positive definite matrices."
+			        << std::endl;
 		  libmesh_error();
 		}
 #endif

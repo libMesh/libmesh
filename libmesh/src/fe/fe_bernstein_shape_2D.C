@@ -35,9 +35,9 @@ Real FE<2,BERNSTEIN>::shape(const ElemType,
 			    const unsigned int,
 			    const Point&)
 {
-  std::cerr << "Bernstein polynomials require the element type\n"
-	    << "because edge orientation is needed."
-	    << std::endl;
+  *libMesh::err << "Bernstein polynomials require the element type\n"
+	        << "because edge orientation is needed."
+	        << std::endl;
   
   libmesh_error();
   return 0.;
@@ -366,7 +366,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	  } // case TRI6
 	default:
 	  {
-	    std::cerr << "ERROR: element order!" << std::endl;
+	    *libMesh::err << "ERROR: element order!" << std::endl;
 	    libmesh_error();
 	  }
 	  
@@ -376,7 +376,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 
     default:
       {
-	std::cerr << "ERROR: Unsupported element type!" << std::endl;
+	*libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	libmesh_error();
       }
       
@@ -938,7 +938,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
       
 //       // by default throw an error
 //     default:
-//       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+//       *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
 //       libmesh_error();
 //     }
   
@@ -955,9 +955,9 @@ Real FE<2,BERNSTEIN>::shape_deriv(const ElemType,
 				  const unsigned int,
 				  const Point&)
 {
-  std::cerr << "Bernstein polynomials require the element type\n"
-	    << "because edge orientation is needed."
-	    << std::endl;
+  *libMesh::err << "Bernstein polynomials require the element type\n"
+	        << "because edge orientation is needed."
+	        << std::endl;
   
   libmesh_error();
   return 0.;
@@ -1119,7 +1119,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
       
     default:
       {
-	std::cerr << "ERROR: Unsupported element type!" << std::endl;
+	*libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	libmesh_error();
       }
       
@@ -1777,7 +1777,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 //       }    
 //       // by default throw an error;call the orientation-independent shape functions
 //     default:
-//       std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+//       *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
 //       libmesh_error();
 //     }
   
@@ -1798,9 +1798,9 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const ElemType,
   static bool warning_given = false;
 
   if (!warning_given)
-  std::cerr << "Second derivatives for Bernstein elements "
-            << "are not yet implemented!"
-            << std::endl;
+  *libMesh::err << "Second derivatives for Bernstein elements "
+                << "are not yet implemented!"
+                << std::endl;
 
   warning_given = true;
   return 0.;
@@ -1818,9 +1818,9 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem*,
   static bool warning_given = false;
 
   if (!warning_given)
-  std::cerr << "Second derivatives for Bernstein elements "
-            << "are not yet implemented!"
-            << std::endl;
+  *libMesh::err << "Second derivatives for Bernstein elements "
+                << "are not yet implemented!"
+                << std::endl;
 
   warning_given = true;
   return 0.;

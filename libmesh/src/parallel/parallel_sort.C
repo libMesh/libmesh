@@ -359,7 +359,7 @@ const std::vector<KeyType>& Sort<KeyType>::bin()
 {
   if (!_bin_is_sorted)
     {
-      std::cout << "Warning! Bin is not yet sorted!" << std::endl; 
+      *libMesh::out << "Warning! Bin is not yet sorted!" << std::endl; 
     }
 
   return _my_bin;

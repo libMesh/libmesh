@@ -154,9 +154,9 @@ void DofObject::set_n_systems (const unsigned int ns)
 
   if (ns != static_cast<unsigned int>(static_cast<unsigned char>(ns)))
     {
-      std::cerr << "Unsigned char not big enough to hold ns!" << std::endl
-		<< "Recompile with _n_systems set to a bigger type!"
-		<< std::endl;
+      *libMesh::err << "Unsigned char not big enough to hold ns!" << std::endl
+		    << "Recompile with _n_systems set to a bigger type!"
+		    << std::endl;
       
       libmesh_error();
     }
@@ -249,9 +249,9 @@ void DofObject::set_n_vars(const unsigned int s,
 
   if (nvars != static_cast<unsigned int>(static_cast<unsigned char>(nvars)))
     {
-      std::cerr << "Unsigned char not big enough to hold nvar!" << std::endl
-		<< "Recompile with _n_vars set to a bigger type!"
-		<< std::endl;
+      *libMesh::err << "Unsigned char not big enough to hold nvar!" << std::endl
+		    << "Recompile with _n_vars set to a bigger type!"
+		    << std::endl;
       
       libmesh_error();
     }
@@ -311,9 +311,9 @@ void DofObject::set_n_comp(const unsigned int s,
 
   if (ncomp != static_cast<unsigned int>(static_cast<unsigned char>(ncomp)))
     {
-      std::cerr << "Unsigned char not big enough to hold ncomp!" << std::endl
-		<< "Recompile with _n_v_comp set to a bigger type!"
-		<< std::endl;
+      *libMesh::err << "Unsigned char not big enough to hold ncomp!" << std::endl
+		    << "Recompile with _n_v_comp set to a bigger type!"
+		    << std::endl;
       
       libmesh_error();
     }

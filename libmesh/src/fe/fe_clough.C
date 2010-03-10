@@ -101,9 +101,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  default:
 	    {
 #ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
+	      *libMesh::err << "ERROR: Bad ElemType = " << t
+			    << " for " << o << "th order approximation!" 
+			    << std::endl;
 #endif
 	      libmesh_error();	    
 	    }
@@ -120,9 +120,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  default:
 	    {
 #ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
+	      *libMesh::err << "ERROR: Bad ElemType = " << t
+			    << " for " << o << "th order approximation!" 
+			    << std::endl;
 #endif
 	      libmesh_error();	    
 	    }
@@ -176,9 +176,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  default:
 	    {
 #ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
+	      *libMesh::err << "ERROR: Bad ElemType = " << t
+			    << " for " << o << "th order approximation!" 
+			    << std::endl;
 #endif
 	      libmesh_error();	    
 	    }
@@ -213,9 +213,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  default:
 	    {
 #ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
+	      *libMesh::err << "ERROR: Bad ElemType = " << t
+			    << " for " << o << "th order approximation!" 
+			    << std::endl;
 #endif
 	      libmesh_error();	    
 	    }
@@ -255,9 +255,9 @@ unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
 	  default:
 	    {
 #ifdef DEBUG
-	      std::cerr << "ERROR: Bad ElemType = " << t
-			<< " for " << o << "th order approximation!" 
-			<< std::endl;
+	      *libMesh::err << "ERROR: Bad ElemType = " << t
+			    << " for " << o << "th order approximation!" 
+			    << std::endl;
 #endif
 	      libmesh_error();	    
 	    }

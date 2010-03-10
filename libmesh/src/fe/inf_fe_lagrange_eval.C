@@ -41,7 +41,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return 1.;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -56,7 +56,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return v+1.;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -74,7 +74,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -4.*(v+1.)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -95,7 +95,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -13.5*(v+1.)*v*(v+.6666666666666667);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -119,7 +119,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -42.66666666666667*(v+1.)*v*(v+.75)*(v+.5);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -146,7 +146,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -130.2083333333333*(v+1.)*v*(v+.8)*(v+.6)*(v+.4);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -176,7 +176,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -388.8*(v+1.)*v*(v+.8333333333333333)*(v+.6666666666666667)*(v+.5)*(v+.3333333333333333);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -209,7 +209,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -1143.809722222223*(v+1.)*v*(v+.8571428571428571)*(v+.7142857142857143)*(v+.5714285714285714)*(v+.4285714285714286)*(v+.2857142857142857);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -245,7 +245,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -3328.812698412698*(v+1.)*v*(v+.875)*(v+.75)*(v+.625)*(v+.5)*(v+.375)*(v+.25);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -284,7 +284,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -9608.643080357148*(v+1.)*v*(v+.8888888888888889)*(v+.7777777777777778)*(v+.6666666666666667)*(v+.5555555555555556)*(v+.4444444444444444)*(v+.3333333333333333)*(v+.2222222222222222);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -326,7 +326,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -27557.31922398588*(v+1.)*v*(v+.9)*(v+.8)*(v+.7)*(v+.6)*(v+.5)*(v+.4)*(v+.3)*(v+.2);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -371,7 +371,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -78624.24785356052*(v+1.)*v*(v+.9090909090909091)*(v+.8181818181818182)*(v+.7272727272727273)*(v+.6363636363636364)*(v+.5454545454545455)*(v+.4545454545454545)*(v+.3636363636363636)*(v+.2727272727272727)*(v+.1818181818181818);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -419,7 +419,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -223367.1148051951*(v+1.)*v*(v+.9166666666666667)*(v+.8333333333333333)*(v+.75)*(v+.6666666666666667)*(v+.5833333333333333)*(v+.5)*(v+.4166666666666667)*(v+.3333333333333333)*(v+.25)*(v+.1666666666666667);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -470,7 +470,7 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -632304.9998001105*(v+1.)*v*(v+.9230769230769231)*(v+.8461538461538462)*(v+.7692307692307692)*(v+.6923076923076923)*(v+.6153846153846154)*(v+.5384615384615385)*(v+.4615384615384615)*(v+.3846153846153846)*(v+.3076923076923077)*(v+.2307692307692308)*(v+.1538461538461538);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -524,15 +524,15 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
           return -1784482.047266969*(v+1.)*v*(v+.9285714285714286)*(v+.8571428571428571)*(v+.7857142857142857)*(v+.7142857142857143)*(v+.6428571428571429)*(v+.5714285714285714)*(v+.5)*(v+.4285714285714286)*(v+.3571428571428571)*(v+.2857142857142857)*(v+.2142857142857143)*(v+.1428571428571429);
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
 
     // provided the constructor worked fine, we should never end up here.
     default:
-      std::cerr << "Lagrange polynomials only defined up to 15. "
-		<< std::endl;
+      *libMesh::err << "Lagrange polynomials only defined up to 15. "
+		    << std::endl;
       libmesh_error();
     }
 
@@ -558,7 +558,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return 0.;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -573,7 +573,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return 1.;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -591,7 +591,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -8.*v-4.;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -612,7 +612,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -9.+(-45.-40.5*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -636,7 +636,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -16.+(-138.6666666666667+(-288.-170.6666666666667*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -663,7 +663,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -25.+(-320.8333333333333+(-1109.375+(-1458.333333333333-651.0416666666667*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -693,7 +693,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -36.+(-626.4+(-3132.+(-6696.+(-6480.-2332.8*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -726,7 +726,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -49.00000000000003+(-1092.700000000001+(-7294.466666666671+(-22209.25000000001+(-34431.00694444447+(-26471.02500000002-8006.66805555556*v)*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -762,7 +762,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -64.+(-1759.085714285714+(-14890.66666666667+(-59892.62222222222+(-130844.4444444444+(-159470.9333333333+(-101944.8888888889-26630.50158730159*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -801,7 +801,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -81.00000000000004+(-2666.635714285716+(-27608.92232142859+(-139731.0750000001+(-400169.7421875002+(-682015.9500000004+(-685891.0406250004+(-375804.7071428573-86477.78772321433*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -843,7 +843,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -99.99999999999998+(-3857.936507936507+(-47567.26190476189+(-292742.9453262786+(-1048784.722222222+(-2329513.888888888+(-3256944.444444444+(-2791005.29100529+(-1339285.714285714-275573.1922398588*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -888,7 +888,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -121.0000000000002+(-5376.9134920635+(-77345.59839285725+(-564323.0784171084+(-2447317.912381507+(-6769146.883506954+(-12277707.14086229+(-14559958.38538362+(-10877437.26502978+(-4645978.282255849-864866.7263891657*v)*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -936,7 +936,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -144.0000000000002+(-7268.696103896113+(-120015.3600000001+(-1017966.994285716+(-5214864.000000006+(-17396664.68571431+(-39148945.92000005+(-60006903.22285722+(-61809868.80000008+(-40950637.71428576+(-15765995.52000002-2680405.377662341*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -987,7 +987,7 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -168.9999999999998+(-9579.507720057708+(-179166.9826911975+(-1739358.918309081+(-10328458.8186393+(-40580690.36360362+(-109813061.9461516+(-208208252.9774634+(-276362669.3617079+(-251684443.4798346+(-149848802.0532203+(-52529953.82954764-8219964.997401437*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
@@ -1041,15 +1041,15 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
           return -195.9999999999997+(-12356.57404817403+(-258935.5802020198+(-2840808.212210995+(-19261146.08559668+(-87507110.40641962+(-278204754.9117691+(-632709040.3499579+(-1036229385.084443+(-1212999534.859257+(-990221053.9430438+(-535453868.1829846+(-172329980.5646387-24982748.66173757*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          std::cerr << "bad index i = " << i << std::endl;
+          *libMesh::err << "bad index i = " << i << std::endl;
           libmesh_error();
         }
 
 
     // provided the constructor worked fine, we should never end up here.
     default:
-      std::cerr << "Lagrange polynomials only defined up to 15. "
-		<< std::endl;
+      *libMesh::err << "Lagrange polynomials only defined up to 15. "
+		    << std::endl;
       libmesh_error();
     }
 

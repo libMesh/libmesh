@@ -589,8 +589,8 @@ void DistributedVector<T>::init (const unsigned int n,
   // No other options without MPI!
   if (n != n_local)
     {
-      std::cerr << "ERROR:  MPI is required for n != n_local!"
-		<< std::endl;
+      *libMesh::err << "ERROR:  MPI is required for n != n_local!"
+		    << std::endl;
       libmesh_error();
     }
   

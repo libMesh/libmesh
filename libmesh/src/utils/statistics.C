@@ -216,11 +216,11 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
   unsigned int data_index = 0;
   for (unsigned int j=0; j<bin_members.size(); j++) // bin vector indexing
     {
-      // std::cout << "(debug) Filling bin " << j << std::endl;
+      // *libMesh::out << "(debug) Filling bin " << j << std::endl;
       
       for (unsigned int i=data_index; i<n; i++) // data vector indexing
 	{
-	  //	std::cout << "(debug) Processing index=" << i << std::endl;
+	  //	*libMesh::out << "(debug) Processing index=" << i << std::endl;
 	  Real current_val = static_cast<Real>( (*this)[i] );
 	  
 	  // There may be entries in the vector smaller than the value
@@ -228,7 +228,7 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 	  // ErrorVector.)  We just skip entries like that.
 	  if ( current_val < min )
 	    {
-	      // 	    std::cout << "(debug) Skipping entry v[" << i << "]="
+	      // 	    *libMesh::out << "(debug) Skipping entry v[" << i << "]="
 	      // 		      << (*this)[i]
 	      // 		      << " which is less than the min value: min="
 	      // 		      << min << std::endl;
@@ -238,9 +238,9 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 	  if ( current_val > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
 	                                       // by bin_bounds[j] and bin_bounds[j+1])
 	    {
-	      // std::cout.precision(16);
-	      // 	    std::cout.setf(std::ios_base::fixed);
-	      // 	    std::cout << "(debug) (*this)[i]= " << (*this)[i]
+	      // *libMesh::out.precision(16);
+	      // 	    *libMesh::out.setf(std::ios_base::fixed);
+	      // 	    *libMesh::out << "(debug) (*this)[i]= " << (*this)[i]
 	      // 		      << " is greater than bin_bounds[j+1]="
 	      //		      << bin_bounds[j+1]	 << std::endl;
 	      data_index = i; // start searching here for next bin 
@@ -249,7 +249,7 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 	
 	  // Otherwise, increment current bin's count
 	  bin_members[j]++;
-	  // std::cout << "(debug) Binned index=" << i << std::endl;
+	  // *libMesh::out << "(debug) Binned index=" << i << std::endl;
 	}
     }
   
@@ -262,7 +262,7 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 
   if (n != n_binned)
     {
-      std::cout << "Warning: The number of binned entries, n_binned="
+      *libMesh::out << "Warning: The number of binned entries, n_binned="
 		<< n_binned
 		<< ", did not match the total number of entries, n="
 		<< n << "." << std::endl;

@@ -145,7 +145,7 @@ void FrequencySystem::init_data ()
         }
       else
         {
-	  std::cerr << "ERROR: Need to set frequencies before calling init(). " << std::endl;
+	  *libMesh::err << "ERROR: Need to set frequencies before calling init(). " << std::endl;
 	  libmesh_error();
 	}
     }
@@ -164,7 +164,7 @@ void FrequencySystem::assemble ()
 
   if (_finished_assemble)  
     {
-      std::cerr << "ERROR: Matrices already assembled." << std::endl;
+      *libMesh::err << "ERROR: Matrices already assembled." << std::endl;
       libmesh_error (); 
     }
 
@@ -197,8 +197,8 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
   // sanity check
   if (_finished_set_frequencies)
     {
-      std::cerr << "ERROR: frequencies already initialized." 
-		<< std::endl;
+      *libMesh::err << "ERROR: frequencies already initialized." 
+		    << std::endl;
       libmesh_error();
     }
 
@@ -240,7 +240,7 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
 
   if (_finished_set_frequencies)
     {
-      std::cerr << "ERROR: frequencies already initialized. " << std::endl;
+      *libMesh::err << "ERROR: frequencies already initialized. " << std::endl;
       libmesh_error();
     }
 
@@ -280,7 +280,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
 
   if (_finished_set_frequencies)
     {
-      std::cerr << "ERROR: frequencies already initialized. " << std::endl;
+      *libMesh::err << "ERROR: frequencies already initialized. " << std::endl;
       libmesh_error();
     }
 

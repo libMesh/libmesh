@@ -140,7 +140,7 @@ namespace MeshTools
 	  
 	  default:
 	    {
-	      std::cerr << "ERROR: Unrecognized 2D element type." << std::endl;
+	      *libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
 	      libmesh_error();
 	    }
 	  }
@@ -183,7 +183,7 @@ namespace MeshTools
 	  
 	  default:
 	    {
-	      std::cerr << "ERROR: Unrecognized element type." << std::endl;
+	      *libMesh::err << "ERROR: Unrecognized element type." << std::endl;
 	      libmesh_error();
 	    }
 	  }

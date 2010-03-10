@@ -118,7 +118,7 @@ void ExodusII_IO_Helper::check_err(const int err, const std::string msg)
 {
   if (err < 0)
     {
-      std::cout << msg << std::endl;
+      *libMesh::out << msg << std::endl;
       libmesh_error();
     }
 }
@@ -127,14 +127,14 @@ void ExodusII_IO_Helper::check_err(const int err, const std::string msg)
 
 void ExodusII_IO_Helper::message(const std::string msg)
 {
-  if (_verbose) std::cout << msg << std::endl;
+  if (_verbose) *libMesh::out << msg << std::endl;
 }
 
 
 
 void ExodusII_IO_Helper::message(const std::string msg, int i)
 {
-  if (_verbose) std::cout << msg << i << "." << std::endl;
+  if (_verbose) *libMesh::out << msg << i << "." << std::endl;
 }
 
 
@@ -148,7 +148,7 @@ void ExodusII_IO_Helper::open(const char* filename)
 			&ex_version);
   
   check_err(ex_id, "Error opening ExodusII mesh file.");
-  if (_verbose) std::cout << "File opened successfully." << std::endl;
+  if (_verbose) *libMesh::out << "File opened successfully." << std::endl;
 }
 
 
@@ -179,13 +179,13 @@ void ExodusII_IO_Helper::read_header()
 void ExodusII_IO_Helper::print_header()
 {
   if (_verbose)
-    std::cout << "Title: \t" << &title[0] << std::endl
-	      << "Mesh Dimension: \t"   << num_dim << std::endl
-	      << "Number of Nodes: \t" << num_nodes << std::endl
-	      << "Number of elements: \t" << num_elem << std::endl
-	      << "Number of elt blocks: \t" << num_elem_blk << std::endl
-	      << "Number of node sets: \t" << num_node_sets << std::endl
-	      << "Number of side sets: \t" << num_side_sets << std::endl;
+    *libMesh::out << "Title: \t" << &title[0] << std::endl
+	          << "Mesh Dimension: \t"   << num_dim << std::endl
+	          << "Number of Nodes: \t" << num_nodes << std::endl
+	          << "Number of elements: \t" << num_elem << std::endl
+	          << "Number of elt blocks: \t" << num_elem_blk << std::endl
+	          << "Number of node sets: \t" << num_node_sets << std::endl
+	          << "Number of side sets: \t" << num_side_sets << std::endl;
 }
 
 
@@ -219,19 +219,19 @@ void ExodusII_IO_Helper::read_node_num_map ()
 
   if (_verbose)
     {
-      std::cout << "[" << libMesh::processor_id() << "] node_num_map[i] = ";
+      *libMesh::out << "[" << libMesh::processor_id() << "] node_num_map[i] = ";
       for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_nodes-1)); ++i)
-        std::cout << node_num_map[i] << ", ";
-      std::cout << "... " << node_num_map.back() << std::endl;
+        *libMesh::out << node_num_map[i] << ", ";
+      *libMesh::out << "... " << node_num_map.back() << std::endl;
     }
 }
 
 
-void ExodusII_IO_Helper::print_nodes()
+void ExodusII_IO_Helper::print_nodes(std::ostream &out)
 {
   for (int i=0; i<num_nodes; i++)
     {
-      std::cout << "(" << x[i] << ", " << y[i] << ", " << z[i] << ")" << std::endl;
+      out << "(" << x[i] << ", " << y[i] << ", " << z[i] << ")" << std::endl;
     }
 }
 
@@ -274,7 +274,7 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 				   &num_nodes_per_elem,
 				   &num_attr);
   if (_verbose)
-    std::cout << "Reading a block of " << num_elem_this_blk
+    *libMesh::out << "Reading a block of " << num_elem_this_blk
 	      << " " << &elem_type[0] << "(s)"
 	      << " having " << num_nodes_per_elem
 	      << " nodes per element." << std::endl;
@@ -315,10 +315,10 @@ void ExodusII_IO_Helper::read_elem_num_map ()
 
   if (_verbose)
     {
-      std::cout << "[" << libMesh::processor_id() << "] elem_num_map[i] = ";
+      *libMesh::out << "[" << libMesh::processor_id() << "] elem_num_map[i] = ";
       for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_elem-1)); ++i)
-        std::cout << elem_num_map[i] << ", ";
-      std::cout << "... " << elem_num_map.back() << std::endl;
+        *libMesh::out << elem_num_map[i] << ", ";
+      *libMesh::out << "... " << elem_num_map.back() << std::endl;
     }
 }
 
@@ -348,7 +348,7 @@ void ExodusII_IO_Helper::read_sideset_info()
 				&ret_char);
       check_err(ex_err, "Error inquiring about side set element list length.");
 
-      //std::cout << "Value returned by ex_inquire was: " << ret_int << std::endl;
+      //*libMesh::out << "Value returned by ex_inquire was: " << ret_int << std::endl;
       num_elem_all_sidesets = ret_int;	
       elem_list.resize (num_elem_all_sidesets);
       side_list.resize (num_elem_all_sidesets);
@@ -427,7 +427,7 @@ void ExodusII_IO_Helper::print_sideset_info()
 {
   for (int i=0; i<num_elem_all_sidesets; i++)
     {
-      std::cout << elem_list[i] << " " << side_list[i] << std::endl;
+      *libMesh::out << elem_list[i] << " " << side_list[i] << std::endl;
     }
 }
 
@@ -485,9 +485,9 @@ const std::vector<std::string>& ExodusII_IO_Helper::get_nodal_var_names()
 
   if (_verbose)
     {
-      std::cout << "Read the variable(s) from the file:" << std::endl;
+      *libMesh::out << "Read the variable(s) from the file:" << std::endl;
       for (int i=0; i<num_nodal_vars; i++)
-	std::cout << "strings[" << i << "]=" << strings[i] << std::endl;
+	*libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
     }
 
   
@@ -522,7 +522,7 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
 
   if(!found)
     {
-      std::cerr << "Unable to locate variable named: " << nodal_var_name << std::endl;
+      *libMesh::err << "Unable to locate variable named: " << nodal_var_name << std::endl;
       return nodal_var_values;
     }
 
@@ -551,7 +551,7 @@ void ExodusII_IO_Helper::create(std::string filename)
 			&ex_version);
   
   check_err(ex_id, "Error creating ExodusII mesh file.");
-  if (_verbose) std::cout << "File created successfully." << std::endl;
+  if (_verbose) *libMesh::out << "File created successfully." << std::endl;
 
   _created = true;
 }
@@ -587,7 +587,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     }
   num_elem_blk = subdomain_map.size();
 
-  std::cout<<"Num elem block: "<<num_elem_blk<<std::endl;
+  *libMesh::out<<"Num elem block: "<<num_elem_blk<<std::endl;
 
   ex_err = exII::ex_put_init(ex_id,
 			     str_title.c_str(),
@@ -681,8 +681,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
               const unsigned int elem_node_index = conv.get_node_map(j);
               if (_verbose)
                 {
-                  std::cout << "Exodus node index: " << j
-                            << "=LibMesh node index " << elem_node_index << std::endl;
+                  *libMesh::out << "Exodus node index: " << j
+                                << "=LibMesh node index " << elem_node_index << std::endl;
                 }
               connect[connect_index] = elem->node(elem_node_index)+1;
             }
@@ -801,9 +801,9 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
 
   if (_verbose)
     {
-      std::cout << "Writing variable name(s) to file: " << std::endl;
+      *libMesh::out << "Writing variable name(s) to file: " << std::endl;
       for (int i=0;i<num_nodal_vars;i++)
-	std::cout << "strings[" << i << "]=" << strings[i] << std::endl;
+	*libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
     }
     
   ex_err = exII::ex_put_var_names(ex_id,
@@ -904,7 +904,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
   else
     {
-      std::cerr << "ERROR! Unrecognized element type_str: " << type_str << std::endl;
+      *libMesh::err << "ERROR! Unrecognized element type_str: " << type_str << std::endl;
       libmesh_error();
     }
 

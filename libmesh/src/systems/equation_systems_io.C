@@ -96,13 +96,13 @@ void EquationSystems::read (const std::string& name,
   // If that fails, try it again but explicitly request we look for infinite element info      
   catch (...)
     {
-      std::cout << "\n*********************************************************************\n"
-		<< "READING THE FILE \"" << name << "\" FAILED.\n"
-		<< "It is possible this file contains infinite element information,\n"
-		<< "but the version string does not contain \" with infinite elements\"\n"
-		<< "Let's try this again, but looking for infinite element information...\n"
-		<< "*********************************************************************\n"
-		<< std::endl;
+      *libMesh::out << "\n*********************************************************************\n"
+		    << "READING THE FILE \"" << name << "\" FAILED.\n"
+		    << "It is possible this file contains infinite element information,\n"
+		    << "but the version string does not contain \" with infinite elements\"\n"
+		    << "Let's try this again, but looking for infinite element information...\n"
+		    << "*********************************************************************\n"
+		    << std::endl;
 
       try
 	{
@@ -112,11 +112,11 @@ void EquationSystems::read (const std::string& name,
       // If all that failed, we are out of ideas here...
       catch (...)
 	{
-	  std::cout << "\n*********************************************************************\n"
-		    << "Well, at least we tried!\n"
-		    << "Good Luck!!\n"
-		    << "*********************************************************************\n"
-		    << std::endl;
+	  *libMesh::out << "\n*********************************************************************\n"
+		        << "Well, at least we tried!\n"
+		        << "Good Luck!!\n"
+		        << "*********************************************************************\n"
+		        << std::endl;
 	  throw;
 	}
     }
@@ -336,8 +336,8 @@ void EquationSystems::_read_impl (const std::string& name,
 	    }
 	  else
 	    {
-	      std::cerr << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
-			<< std::endl;
+	      *libMesh::err << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+			    << std::endl;
 	      libmesh_error();
 	    }	  
 	}
@@ -547,8 +547,8 @@ void EquationSystems::write(const std::string& name,
     }
   else
     {
-      std::cerr << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
-		<< std::endl;
+      *libMesh::err << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+		    << std::endl;
       libmesh_error();
     }
 }

@@ -399,7 +399,8 @@ void DofMap::reinit(MeshBase& mesh)
               if (FEInterface::max_order(base_fe_type,type) <
                   static_cast<unsigned int>(base_fe_type.order))
                 {
-                  std::cerr << "ERROR: Finite element "
+                  *libMesh::err 
+                    << "ERROR: Finite element "
                     << Utility::enum_to_string(base_fe_type.family)
                     << " on geometric element "
                     << Utility::enum_to_string(type) << std::endl
@@ -411,13 +412,14 @@ void DofMap::reinit(MeshBase& mesh)
                   libmesh_error();
                 }
 
-              std::cerr << "WARNING: Finite element "
-                    << Utility::enum_to_string(base_fe_type.family)
-                    << " on geometric element "
-                    << Utility::enum_to_string(type) << std::endl
-                    << "could not be p refined past FEInterface::max_order = " 
-                    << FEInterface::max_order(base_fe_type,type)
-                    << std::endl;
+              *libMesh::err
+                << "WARNING: Finite element "
+                << Utility::enum_to_string(base_fe_type.family)
+                << " on geometric element "
+                << Utility::enum_to_string(type) << std::endl
+                << "could not be p refined past FEInterface::max_order = " 
+                << FEInterface::max_order(base_fe_type,type)
+                << std::endl;
 #  endif
               elem->set_p_level(FEInterface::max_order(base_fe_type,type)
                                 - base_fe_type.order);
@@ -1440,8 +1442,8 @@ void DofMap::SCALAR_dof_indices (std::vector<unsigned int>& di,
 
   if(this->variable(vn).type().family != SCALAR)
   {
-    std::cerr << "ERROR: SCALAR_dof_indices called for a non-SCALAR variable."
-              << std::endl;
+    *libMesh::err << "ERROR: SCALAR_dof_indices called for a non-SCALAR variable."
+                  << std::endl;
   }
 
   // Clear the DOF indices vector

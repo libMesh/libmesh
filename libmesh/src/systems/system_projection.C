@@ -139,8 +139,8 @@ void System::project_vector (const NumericVector<Number>& old_v,
     }
   else // unknown old_v.type()
     {
-      std::cerr << "ERROR: Unknown old_v.type() == " << old_v.type() 
-		<< std::endl;
+      *libMesh::err << "ERROR: Unknown old_v.type() == " << old_v.type() 
+		    << std::endl;
       libmesh_error();
     }
   

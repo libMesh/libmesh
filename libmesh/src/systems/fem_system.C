@@ -99,19 +99,19 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
     {
 //      this->get_vector("_nonlinear_solution").close();
       this->solution->close();
-      std::cout << "|U| = "
-//                << this->get_vector("_nonlinear_solution").l1_norm()
-                << this->solution->l1_norm()
-                << std::endl;
+      *libMesh::out << "|U| = "
+//                    << this->get_vector("_nonlinear_solution").l1_norm()
+                    << this->solution->l1_norm()
+                    << std::endl;
     }
   if (print_solutions)
     {
-      unsigned int old_precision = std::cout.precision();
-      std::cout.precision(16);
-//      std::cout << "U = [" << this->get_vector("_nonlinear_solution")
-      std::cout << "U = [" << *(this->solution)
-                << "];" << std::endl;
-      std::cout.precision(old_precision);
+      unsigned int old_precision = libMesh::out->precision();
+      libMesh::out->precision(16);
+//      *libMesh::out << "U = [" << this->get_vector("_nonlinear_solution")
+      *libMesh::out << "U = [" << *(this->solution)
+                    << "];" << std::endl;
+      libMesh::out->precision(old_precision);
     }
 
   // Is this definitely necessary? [RHS]
@@ -123,10 +123,10 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   // Stupid C++ lets you set *Real* verify_analytic_jacobians = true!
   if (verify_analytic_jacobians > 0.5)
     {
-      std::cerr << "WARNING!  verify_analytic_jacobians was set "
-                << "to absurdly large value of "
-                << verify_analytic_jacobians << std::endl;
-      std::cerr << "Resetting to 1e-6!" << std::endl;
+      *libMesh::err << "WARNING!  verify_analytic_jacobians was set "
+                    << "to absurdly large value of "
+                    << verify_analytic_jacobians << std::endl;
+      *libMesh::err << "Resetting to 1e-6!" << std::endl;
       verify_analytic_jacobians = 1e-6;
     }
 
@@ -188,19 +188,19 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
           if (relative_error > verify_analytic_jacobians)
             {
-              std::cerr << "Relative error " << relative_error
-                        << " detected in analytic jacobian on element "
-                        << _femcontext.elem->id() << '!' << std::endl;
+              *libMesh::err << "Relative error " << relative_error
+                            << " detected in analytic jacobian on element "
+                            << _femcontext.elem->id() << '!' << std::endl;
 
-              unsigned int old_precision = std::cout.precision();
-              std::cout.precision(16);
-	      std::cout << "J_analytic " << _femcontext.elem->id() << " = "
+              unsigned int old_precision = libMesh::out->precision();
+              libMesh::out->precision(16);
+	      *libMesh::out << "J_analytic " << _femcontext.elem->id() << " = "
                         << _femcontext.elem_jacobian << std::endl;
               analytic_jacobian.add(1.0, _femcontext.elem_jacobian);
-	      std::cout << "J_numeric " << _femcontext.elem->id() << " = "
+	      *libMesh::out << "J_numeric " << _femcontext.elem->id() << " = "
                         << analytic_jacobian << std::endl;
 
-              std::cout.precision(old_precision);
+              libMesh::out->precision(old_precision);
 
               libmesh_error();
             }
@@ -285,20 +285,20 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
               if (relative_error > verify_analytic_jacobians)
                 {
-                  std::cerr << "Relative error " << relative_error
-                            << " detected in analytic jacobian on element "
-                            << _femcontext.elem->id()
-			    << ", side "
-                            << _femcontext.side << '!' << std::endl;
+                  *libMesh::err << "Relative error " << relative_error
+                                << " detected in analytic jacobian on element "
+                                << _femcontext.elem->id()
+			        << ", side "
+                                << _femcontext.side << '!' << std::endl;
 
-                  unsigned int old_precision = std::cout.precision();
-                  std::cout.precision(16);
-	          std::cout << "J_analytic " << _femcontext.elem->id() << " = "
-                            << _femcontext.elem_jacobian << std::endl;
+                  unsigned int old_precision = libMesh::out->precision();
+                  libMesh::out->precision(16);
+	          *libMesh::out << "J_analytic " << _femcontext.elem->id() << " = "
+                                << _femcontext.elem_jacobian << std::endl;
                   analytic_jacobian.add(1.0, _femcontext.elem_jacobian);
-	          std::cout << "J_numeric " << _femcontext.elem->id() << " = "
-                            << analytic_jacobian << std::endl;
-                  std::cout.precision(old_precision);
+	          *libMesh::out << "J_numeric " << _femcontext.elem->id() << " = "
+                                << analytic_jacobian << std::endl;
+                  libMesh::out->precision(old_precision);
 
                   libmesh_error();
                 }
@@ -334,11 +334,11 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
       if (get_jacobian && print_element_jacobians)
         {
-          unsigned int old_precision = std::cout.precision();
-          std::cout.precision(16);
-	  std::cout << "J_elem " << _femcontext.elem->id() << " = "
+          unsigned int old_precision = libMesh::out->precision();
+          libMesh::out->precision(16);
+	  *libMesh::out << "J_elem " << _femcontext.elem->id() << " = "
                     << _femcontext.elem_jacobian << std::endl;
-          std::cout.precision(old_precision);
+          libMesh::out->precision(old_precision);
         }
 
       if (get_jacobian)
@@ -353,28 +353,28 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   if (get_residual && print_residual_norms)
     {
       this->rhs->close();
-      std::cout << "|F| = " << this->rhs->l1_norm() << std::endl;
+      *libMesh::out << "|F| = " << this->rhs->l1_norm() << std::endl;
     }
   if (get_residual && print_residuals)
     {
       this->rhs->close();
-      unsigned int old_precision = std::cout.precision();
-      std::cout.precision(16);
-      std::cout << "F = [" << *(this->rhs) << "];" << std::endl;
-      std::cout.precision(old_precision);
+      unsigned int old_precision = libMesh::out->precision();
+      libMesh::out->precision(16);
+      *libMesh::out << "F = [" << *(this->rhs) << "];" << std::endl;
+      libMesh::out->precision(old_precision);
     }
   if (get_jacobian && print_jacobian_norms)
     {
       this->matrix->close();
-      std::cout << "|J| = " << this->matrix->l1_norm() << std::endl;
+      *libMesh::out << "|J| = " << this->matrix->l1_norm() << std::endl;
     }
   if (get_jacobian && print_jacobians)
     {
       this->matrix->close();
-      unsigned int old_precision = std::cout.precision();
-      std::cout.precision(16);
-      std::cout << "J = [" << *(this->matrix) << "];" << std::endl;
-      std::cout.precision(old_precision);
+      unsigned int old_precision = libMesh::out->precision();
+      libMesh::out->precision(16);
+      *libMesh::out << "J = [" << *(this->matrix) << "];" << std::endl;
+      libMesh::out->precision(old_precision);
     }
   STOP_LOG(log_name, "FEMSystem");
 }

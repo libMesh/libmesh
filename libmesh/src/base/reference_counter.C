@@ -80,11 +80,11 @@ std::string ReferenceCounter::get_info ()
 
 
 
-void ReferenceCounter::print_info ()
+void ReferenceCounter::print_info (std::ostream &out_stream)
 {
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
   
-  std::cout << ReferenceCounter::get_info();
+  out_stream << ReferenceCounter::get_info();
   
 #endif
 }

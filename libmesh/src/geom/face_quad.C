@@ -240,7 +240,7 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
       break;
       
     default:
-      std::cout << "Warning: Invalid quality measure chosen." << std::endl;
+      *libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
       bounds.first  = -1;
       bounds.second = -1;
     }
