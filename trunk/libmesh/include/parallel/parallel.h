@@ -25,6 +25,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <map>
 
 // Local includes
 #include "libmesh_common.h" // for Real
