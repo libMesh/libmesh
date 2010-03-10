@@ -68,13 +68,13 @@ Real FE<1,SZABAB>::shape(const ElemType,
 	case 8: return 1./256.*5.4772255750516611346*(5.+(-140.+(630.+(-924.+429.*xi2)*xi2)*xi2)*xi2);
 	  
 	default:
-	  std::cerr << "Invalid shape function index!" << std::endl;
+	  *libMesh::err << "Invalid shape function index!" << std::endl;
 	  libmesh_error();	    
 	}
       
 //     default:
 //       {
-// 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+// 	*libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
 // 	libmesh_error();
 //       }
 //     }
@@ -138,13 +138,13 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
 	case 8:	return 1./256.*5.4772255750516611346*(-280.+(2520.+(-5544.+3432.*xi2)*xi2)*xi2)*xi;
 	  
 	default:
-	  std::cerr << "Invalid shape function index!" << std::endl;
+	  *libMesh::err << "Invalid shape function index!" << std::endl;
 	  libmesh_error();
 	}
  
 //     default:
 //       {
-// 	std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+// 	*libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
 // 	libmesh_error();
 //       }
 //     }
@@ -180,7 +180,7 @@ Real FE<1,SZABAB>::shape_second_deriv(const ElemType,
   static bool warning_given = false;
 
   if (!warning_given)
-  std::cerr << "Second derivatives for Szabab elements "
+  *libMesh::err << "Second derivatives for Szabab elements "
             << " are not yet implemented!"
             << std::endl;
 
@@ -200,7 +200,7 @@ Real FE<1,SZABAB>::shape_second_deriv(const Elem*,
   static bool warning_given = false;
 
   if (!warning_given)
-  std::cerr << "Second derivatives for Szabab elements "
+  *libMesh::err << "Second derivatives for Szabab elements "
             << " are not yet implemented!"
             << std::endl;
 

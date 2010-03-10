@@ -273,9 +273,9 @@ public:
   bool closed() const;
   
   /**
-   * Print the contents of the matrix to the screen.
+   * Print the contents of the matrix, by default to libMesh::out.
    */
-  void print_personal(std::ostream& os=std::cout) const;
+  void print_personal(std::ostream& os=*libMesh::out) const;
 
   /**
    * Print the contents of the matrix in Matlab's

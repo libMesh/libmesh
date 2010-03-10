@@ -347,9 +347,9 @@ System & EquationSystems::add_system (const std::string& sys_type,
 
   else
     {
-      std::cerr << "ERROR: Unknown system type: "
-		<< sys_type
-		<< std::endl;
+      *libMesh::err << "ERROR: Unknown system type: "
+		    << sys_type
+		    << std::endl;
       libmesh_error();
     }
 
@@ -369,8 +369,8 @@ void EquationSystems::delete_system (const std::string& name)
 
   if (!_systems.count(name))
     {
-      std::cerr << "ERROR: no system named "
-                << name  << std::endl;
+      *libMesh::err << "ERROR: no system named "
+                    << name  << std::endl;
 
       libmesh_error();
     }
@@ -762,12 +762,12 @@ bool EquationSystems::compare (const EquationSystems& other_es,
     {
       if (verbose)
         {
-	  std::cout << "  Fatal difference. This system handles " 
-		    << this->n_systems() << " systems," << std::endl
-		    << "  while the other system handles "
-		    << other_es.n_systems() 
-		    << " systems." << std::endl
-		    << "  Aborting comparison." << std::endl;
+	  *libMesh::out << "  Fatal difference. This system handles " 
+		        << this->n_systems() << " systems," << std::endl
+		        << "  while the other system handles "
+		        << other_es.n_systems() 
+		        << " systems." << std::endl
+		        << "  Aborting comparison." << std::endl;
 	}
       return false;
     }

@@ -259,8 +259,8 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  std::cerr << "WARNING:  GMVIO::write_ascii_new_impl() not infinite-element aware!"
-	    << std::endl;
+  *libMesh::err << "WARNING:  GMVIO::write_ascii_new_impl() not infinite-element aware!"
+	        << std::endl;
   libmesh_here();
 
   this->write_ascii_old_impl (fname, v, solution_names);
@@ -338,7 +338,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
     {
       if (this->write_subdomain_id_as_material())
 	{
-	  std::cout << "Not yet supported in GMVIO::write_ascii_new_impl" << std::endl;
+	  *libMesh::out << "Not yet supported in GMVIO::write_ascii_new_impl" << std::endl;
 	  libmesh_error();
 	}
       else // write processor IDs as materials.  This is the default
@@ -465,11 +465,11 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
       const unsigned int n_vars = solution_names->size();
 
       if (!(v->size() == mesh.n_nodes()*n_vars))
-        std::cerr << "ERROR: v->size()=" << v->size()
-                  << ", mesh.n_nodes()=" << mesh.n_nodes()
-                  << ", n_vars=" << n_vars
-                  << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
-                  << "\n";
+        *libMesh::err << "ERROR: v->size()=" << v->size()
+                      << ", mesh.n_nodes()=" << mesh.n_nodes()
+                      << ", n_vars=" << n_vars
+                      << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
+                      << "\n";
       
       libmesh_assert (v->size() == mesh.n_nodes()*n_vars);
 
@@ -555,8 +555,8 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   if (!mesh.is_serial())
     {
       if (libMesh::processor_id() == 0)
-        std::cerr << "Error: GMVIO cannot yet write a ParallelMesh solution"
-                  << std::endl;
+        *libMesh::err << "Error: GMVIO cannot yet write a ParallelMesh solution"
+                      << std::endl;
       return;
     }
 
@@ -851,11 +851,11 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		
 		    else
 		      {
-		        std::cout << "Encountered an unrecognized element "
-			          << "type: " << (*it)->type()
-				  << "\nPossibly a dim-1 dimensional "
-			          << "element?  Aborting..."
-			          << std::endl;
+		        *libMesh::out << "Encountered an unrecognized element "
+			              << "type: " << (*it)->type()
+				      << "\nPossibly a dim-1 dimensional "
+			              << "element?  Aborting..."
+			              << std::endl;
 		        libmesh_error();
 		      }
 		
@@ -906,10 +906,10 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 		
 		  else
 		    {
-		      std::cout << "Encountered an unrecognized element "
-			        << "type.  Possibly a dim-1 dimensional "
-			        << "element?  Aborting..."
-			        << std::endl;
+		      *libMesh::out << "Encountered an unrecognized element "
+			            << "type.  Possibly a dim-1 dimensional "
+			            << "element?  Aborting..."
+			            << std::endl;
 		      libmesh_error();
 		    }
 		
@@ -1102,11 +1102,11 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       const unsigned int n_vars = solution_names->size();
 
       if (!(v->size() == mesh.n_nodes()*n_vars))
-	std::cerr << "ERROR: v->size()=" << v->size()
-		  << ", mesh.n_nodes()=" << mesh.n_nodes()
-		  << ", n_vars=" << n_vars
-		  << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
-		  << std::endl;
+	*libMesh::err << "ERROR: v->size()=" << v->size()
+		      << ", mesh.n_nodes()=" << mesh.n_nodes()
+		      << ", n_vars=" << n_vars
+		      << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
+		      << std::endl;
       
       libmesh_assert (v->size() == mesh.n_nodes()*n_vars);
 
@@ -1321,7 +1321,7 @@ void GMVIO::write_binary (const std::string& fname,
     {
       if (this->write_subdomain_id_as_material())
 	{
-	  std::cout << "Not yet supported in GMVIO::write_binary" << std::endl;
+	  *libMesh::out << "Not yet supported in GMVIO::write_binary" << std::endl;
 	  libmesh_error();
 	}
       else
@@ -1420,7 +1420,7 @@ void GMVIO::write_binary (const std::string& fname,
    // optionally write cell-centered data
    if ( !(this->_cell_centered_data.empty()) )
      {
-       std::cerr << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
+       *libMesh::err << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
        
 //        std::map<std::string, const std::vector<Real>* >::iterator       it  = this->_cell_centered_data.begin();
 //        const std::map<std::string, const std::vector<Real>* >::iterator end = this->_cell_centered_data.end();      
@@ -1800,7 +1800,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
     {
       if (_write_subdomain_id_as_material)
 	{
-	  std::cout << "Not yet supported in GMVIO::write_discontinuous_gmv" << std::endl;
+	  *libMesh::out << "Not yet supported in GMVIO::write_discontinuous_gmv" << std::endl;
 	  libmesh_error();
 	}
       else
@@ -1826,7 +1826,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   // Writing cell-centered data is not yet supported in discontinuous GMV files.
   if ( !(this->_cell_centered_data.empty()) )
     {
-      std::cerr << "Cell-centered data not (yet) supported for discontinuous GMV files!" << std::endl;
+      *libMesh::err << "Cell-centered data not (yet) supported for discontinuous GMV files!" << std::endl;
     }
 
   
@@ -1947,7 +1947,7 @@ void GMVIO::read (const std::string& name)
   
 #ifndef LIBMESH_HAVE_GMV
 
-  std::cerr << "Cannot read a GMV file without the GMV API." << std::endl;
+  *libMesh::err << "Cannot read a GMV file without the GMV API." << std::endl;
   libmesh_error();
 
 #else
@@ -1961,7 +1961,7 @@ void GMVIO::read (const std::string& name)
   int ierr = GMV::gmvread_open_fromfileskip(const_cast<char*>(name.c_str()));
   if (ierr != 0)
     {
-      std::cerr << "GMV::gmvread_open_fromfileskip failed!" << std::endl;
+      *libMesh::err << "GMV::gmvread_open_fromfileskip failed!" << std::endl;
       libmesh_error();
     }
 
@@ -1983,7 +1983,7 @@ void GMVIO::read (const std::string& name)
       /*  Check for GMVERROR.  */
       if (GMV::gmv_data.keyword == GMVERROR)
         {
-	  std::cerr << "Encountered GMVERROR while reading!" << std::endl;
+	  *libMesh::err << "Encountered GMVERROR while reading!" << std::endl;
 	  libmesh_error();
         }
 
@@ -1992,14 +1992,14 @@ void GMVIO::read (const std::string& name)
         {
 	case NODES:
 	  {
-	    //std::cout << "Reading nodes." << std::endl;
+	    //*libMesh::out << "Reading nodes." << std::endl;
 
 	    if (GMV::gmv_data.num2 == NODES)
 	      this->_read_nodes();
 	    
 	    else if (GMV::gmv_data.num2 == NODE_V)
 	      {
-		std::cerr << "Unsupported GMV data type NODE_V!" << std::endl;
+		*libMesh::err << "Unsupported GMV data type NODE_V!" << std::endl;
 		libmesh_error();
 	      }
 	    break;
@@ -2008,7 +2008,7 @@ void GMVIO::read (const std::string& name)
 	case CELLS:
 	  {
 	    // Read 1 cell at a time
-	    // std::cout << "\nReading one cell." << std::endl;
+	    // *libMesh::out << "\nReading one cell." << std::endl;
 	    this->_read_one_cell();
 	    break;
 	  }
@@ -2030,13 +2030,13 @@ void GMVIO::read (const std::string& name)
 	    // Check to see if we're done reading variables and break out.
 	    if (GMV::gmv_data.datatype == ENDKEYWORD)
 	      {
-		// std::cout << "Done reading GMV variables." << std::endl;
+		// *libMesh::out << "Done reading GMV variables." << std::endl;
 		break;
 	      }
 
 	    if (GMV::gmv_data.datatype == NODE)
 	      {
-		// std::cout << "Reading node field data for variable "
+		// *libMesh::out << "Reading node field data for variable "
 		// 	  << GMV::gmv_data.name1 << std::endl;
 		this->_read_var();
 		break;
@@ -2044,12 +2044,12 @@ void GMVIO::read (const std::string& name)
 	    
 	    else
 	      {
-		std::cerr << "Warning: Skipping variable: "
-			  << GMV::gmv_data.name1
-			  << " which is of unsupported GMV datatype "
-			  << GMV::gmv_data.datatype
-			  << ".  Nodal field data is currently the only type currently supported."
-			  << std::endl;
+		*libMesh::err << "Warning: Skipping variable: "
+			      << GMV::gmv_data.name1
+			      << " which is of unsupported GMV datatype "
+			      << GMV::gmv_data.datatype
+			      << ".  Nodal field data is currently the only type currently supported."
+			      << std::endl;
 		break;
 	      }
 
@@ -2057,9 +2057,9 @@ void GMVIO::read (const std::string& name)
 	  
 	default:
 	  {
-	    std::cerr << "Encountered unknown GMV keyword "
-		      << GMV::gmv_data.keyword
-		      << std::endl;
+	    *libMesh::err << "Encountered unknown GMV keyword "
+		          << GMV::gmv_data.keyword
+		          << std::endl;
 	    libmesh_error();
 	  }
         } // end switch
@@ -2096,7 +2096,7 @@ void GMVIO::_read_materials()
   libmesh_assert (GMV::gmv_data.datatype == CELL);
 
   //   // Material names: LibMesh has no use for these currently...
-  //   std::cout << "Number of material names="
+  //   *libMesh::out << "Number of material names="
   // 	    << GMV::gmv_data.num
   // 	    << std::endl;
   
@@ -2105,19 +2105,19 @@ void GMVIO::_read_materials()
   //       // Build a 32-char string from the appropriate entries
   //       std::string mat_string(&GMV::gmv_data.chardata1[i*33], 32);
 
-  //       std::cout << "Material name " << i << ": " << mat_string << std::endl;
+  //       *libMesh::out << "Material name " << i << ": " << mat_string << std::endl;
   //     }
 
   //   // Material labels: These correspond to (1-based) CPU IDs, and
   //   // there should be 1 of these for each element.
-  //   std::cout << "Number of material labels = "
+  //   *libMesh::out << "Number of material labels = "
   // 	    << GMV::gmv_data.nlongdata1
   // 	    << std::endl;
   
   for (int i = 0; i < GMV::gmv_data.nlongdata1; i++)
     {
       // Debugging Info
-      // std::cout << "Material ID " << i << ": "
+      // *libMesh::out << "Material ID " << i << ": "
       // << GMV::gmv_data.longdata1[i]
       // << std::endl;
       
@@ -2135,7 +2135,7 @@ void GMVIO::_read_nodes()
 {
 #ifdef LIBMESH_HAVE_GMV
   //   // Debug Info 
-  //   std::cout << "gmv_data.datatype="
+  //   *libMesh::out << "gmv_data.datatype="
   // 	    <<  GMV::gmv_data.datatype
   // 	    << std::endl;
 
@@ -2146,7 +2146,7 @@ void GMVIO::_read_nodes()
   // and is nnodes long
   for (int i = 0; i < GMV::gmv_data.num; i++)
     {
-      //       std::cout << "(x,y,z)="
+      //       *libMesh::out << "(x,y,z)="
       // 		<< "("
       // 		<< GMV::gmv_data.doubledata1[i]
       // 		<< ","
@@ -2170,7 +2170,7 @@ void GMVIO::_read_one_cell()
 {
 #ifdef LIBMESH_HAVE_GMV
   //   // Debug Info 
-  //   std::cout << "gmv_data.datatype="
+  //   *libMesh::out << "gmv_data.datatype="
   // 	    <<  GMV::gmv_data.datatype
   // 	    << std::endl;
 
@@ -2186,11 +2186,11 @@ void GMVIO::_read_one_cell()
 
   if (GMV::gmv_data.datatype == REGULAR)
     {
-      //       std::cout << "Name of the cell is: "
+      //       *libMesh::out << "Name of the cell is: "
       // 		<< GMV::gmv_data.name1
       // 		<< std::endl;
 
-      //       std::cout << "Cell has "
+      //       *libMesh::out << "Cell has "
       // 		<< GMV::gmv_data.num2
       // 		<< " vertices."
       // 		<< std::endl;
@@ -2212,7 +2212,7 @@ void GMVIO::_read_one_cell()
       for (int i = 0; i < GMV::gmv_data.num2; i++)
 	{
 	  // 	  // Debugging info
-	  // 	  std::cout << "Vertex " << i << " is node "
+	  // 	  *libMesh::out << "Vertex " << i << " is node "
 	  // 		    << GMV::gmv_data.longdata1[i]
 	  // 		    << std::endl;
 	  
@@ -2296,10 +2296,10 @@ ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char* elemname)
   // if (!std::strncmp(elemname,"ppyrmd13",8))
 
   // If we didn't return yet, then we didn't find the right cell!
-  std::cerr << "Uknown/unsupported element: "
-	    << elemname
-	    << " was read."
-	    << std::endl;
+  *libMesh::err << "Uknown/unsupported element: "
+	        << elemname
+	        << " was read."
+	        << std::endl;
   libmesh_error();
 }
 
@@ -2311,8 +2311,8 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
   // Check for easy return if there isn't any nodal data
   if (_nodal_data.empty())
     {
-      std::cerr << "Unable to copy nodal solution: No nodal "
-		<< "solution has been read in from file." << std::endl;
+      *libMesh::err << "Unable to copy nodal solution: No nodal "
+		    << "solution has been read in from file." << std::endl;
       return;
     }
 
@@ -2344,7 +2344,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
       for (; it != end; ++it)
 	{
 	  std::string var_name = (*it).first;
-	  // std::cout << "Searching for var " << var_name << " in system " << sys << std::endl;
+	  // *libMesh::out << "Searching for var " << var_name << " in system " << sys << std::endl;
 
 	  if (system.has_variable(var_name))
 	    {
@@ -2354,7 +2354,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
 	      
 	      const unsigned int var_num = system.variable_number(var_name);
 	      
-	      // std::cout << "Variable "
+	      // *libMesh::out << "Variable "
 	      // 			<< var_name
 	      // 			<< " is variable "
 	      // 			<< var_num 
@@ -2365,8 +2365,8 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
 	      const FEType& fe_type = system.variable_type(var_num);
 	      if ((fe_type.order != FIRST) || (fe_type.family != LAGRANGE))
 		{
-		  std::cerr << "Only FIRST-order LAGRANGE variables can be read from GMV files. "
-			    << "Skipping variable " << var_name << std::endl;
+		  *libMesh::err << "Only FIRST-order LAGRANGE variables can be read from GMV files. "
+			        << "Skipping variable " << var_name << std::endl;
 		  //libmesh_error();
 		  break;
 		}
@@ -2383,7 +2383,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
 									var_num,  /*var # */
 									0);       /*component #, always zero for LAGRANGE */
 
-		  // std::cout << "Value " << i << ": "
+		  // *libMesh::out << "Value " << i << ": "
 		  // 			    << (*it).second [i]
 		  // 			    << ", dof index="
 		  // 			    << dof_index << std::endl;
@@ -2415,10 +2415,10 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
       {
 	if (vars_copied.find( (*it).first ) == vars_copied.end())
 	  {
-	    std::cerr << "Warning: Variable "
-		      << (*it).first
-		      << " was not copied to the EquationSystems object."
-		      << std::endl;
+	    *libMesh::err << "Warning: Variable "
+		          << (*it).first
+		          << " was not copied to the EquationSystems object."
+		          << std::endl;
 	  }
       }
   }

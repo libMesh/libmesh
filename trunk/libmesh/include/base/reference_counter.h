@@ -27,6 +27,7 @@
 #include "threads.h"
 
 // C++ includes
+#include <iostream>
 #include <string>
 #include <map>
 
@@ -65,9 +66,9 @@ public:
   static std::string get_info ();
   
   /**
-   * Prints the reference information to \p std::cout.
+   * Prints the reference information, by default to \p std::cout.
    */
-  static void print_info ();
+  static void print_info (std::ostream& out = std::cout);
 
   /**
    * Prints the number of outstanding (created, but not yet

@@ -77,15 +77,15 @@ void DivaIO::write_stream (std::ostream& out)
   // Can't use a constant mesh reference since we have to
   // sync the boundary info.
   libmesh_here();
-  std::cerr << "WARNING...  Sure you want to do this?"
-	    << std::endl;
+  *libMesh::err << "WARNING...  Sure you want to do this?"
+	        << std::endl;
   MeshBase& mesh = const_cast<MeshBase&>
     (MeshOutput<MeshBase>::mesh());
 
   if (mesh.mesh_dimension() < 3)
     {
-      std::cerr << "WARNING: DIVA only supports 3D meshes.\n\n"
-		<< "Exiting without producing output.\n";
+      *libMesh::err << "WARNING: DIVA only supports 3D meshes.\n\n"
+		    << "Exiting without producing output.\n";
       return;
     }
   

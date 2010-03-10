@@ -53,10 +53,10 @@ void UCDIO::read (const std::string& file_name)
       
 #else
       
-      std::cerr << "ERROR:  You must have the zlib.h header "
-		<< "files and libraries to read and write "
-		<< "compressed streams."
-		<< std::endl;
+      *libMesh::err << "ERROR:  You must have the zlib.h header "
+		    << "files and libraries to read and write "
+		    << "compressed streams."
+		    << std::endl;
       libmesh_error();
       
 #endif
@@ -84,10 +84,10 @@ void UCDIO::write (const std::string& file_name)
       
 #else
       
-      std::cerr << "ERROR:  You must have the zlib.h header "
-		<< "files and libraries to read and write "
-		<< "compressed streams."
-		<< std::endl;
+      *libMesh::err << "ERROR:  You must have the zlib.h header "
+		    << "files and libraries to read and write "
+		    << "compressed streams."
+		    << std::endl;
       libmesh_error();
       
 #endif

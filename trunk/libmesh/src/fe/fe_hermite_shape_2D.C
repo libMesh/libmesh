@@ -215,9 +215,9 @@ Real FE<2,HERMITE>::shape(const ElemType,
 			  const unsigned int,
 			  const Point&)
 {
-  std::cerr << "Hermite elements require the real element\n"
-	    << "to construct gradient-based degrees of freedom."
-	    << std::endl;
+  *libMesh::err << "Hermite elements require the real element\n"
+	        << "to construct gradient-based degrees of freedom."
+	        << std::endl;
   
   libmesh_error();
   return 0.;
@@ -271,7 +271,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
                FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
       }
     default:
-      std::cerr << "ERROR: Unsupported element type!" << std::endl;
+      *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
       libmesh_error();
     }
   
@@ -288,9 +288,9 @@ Real FE<2,HERMITE>::shape_deriv(const ElemType,
 				const unsigned int,
 				const Point&)
 {
-  std::cerr << "Hermite elements require the real element\n"
-	    << "to construct gradient-based degrees of freedom."
-	    << std::endl;
+  *libMesh::err << "Hermite elements require the real element\n"
+	        << "to construct gradient-based degrees of freedom."
+	        << std::endl;
 
   libmesh_error();
   return 0.;
@@ -357,7 +357,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
           }
       }
     default:
-      std::cerr << "ERROR: Unsupported element type!" << std::endl;
+      *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
       libmesh_error();
     }
   
@@ -430,7 +430,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
           }
       }
     default:
-      std::cerr << "ERROR: Unsupported element type!" << std::endl;
+      *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
       libmesh_error();
     }
   

@@ -103,8 +103,8 @@ void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
   // We don't do this for 1D elements!
   //libmesh_assert (Dim != 1);
 
-  std::cerr << "ERROR: Edge conditions for infinite elements "
-	    << "not implemented!" << std::endl;
+  *libMesh::err << "ERROR: Edge conditions for infinite elements "
+	        << "not implemented!" << std::endl;
   libmesh_error();
 }
 

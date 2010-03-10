@@ -56,8 +56,8 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 #ifdef DEBUG
 	if (_order > TWENTYTHIRD)
 	  {
-	    std::cout << "WARNING: Clough quadrature implemented" << std::endl
-		      << " up to TWENTYTHIRD order." << std::endl;
+	    *libMesh::out << "WARNING: Clough quadrature implemented" << std::endl
+		          << " up to TWENTYTHIRD order." << std::endl;
 	  }
 #endif
 
@@ -71,8 +71,8 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 #ifdef DEBUG
 	if (_order > FORTYTHIRD)
 	  {
-	    std::cout << "WARNING: Gauss quadrature implemented" << std::endl
-		      << " up to FORTYTHIRD order." << std::endl;
+	    *libMesh::out << "WARNING: Gauss quadrature implemented" << std::endl
+		          << " up to FORTYTHIRD order." << std::endl;
 	  }
 #endif
 
@@ -86,14 +86,14 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 #ifdef DEBUG
 	if (_order > TWENTYTHIRD)
 	  {
-	    std::cout << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
-		      << " up to TWENTYTHIRD order." << std::endl;
+	    *libMesh::out << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
+		          << " up to TWENTYTHIRD order." << std::endl;
 	  }
 
 	if (_dim > 1)
 	  {
-	    std::cout << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
-		      << " in 1D only." << std::endl;
+	    *libMesh::out << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
+		          << " in 1D only." << std::endl;
 	  }
 #endif
 
@@ -107,14 +107,14 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 #ifdef DEBUG
 	if (_order > TWENTYTHIRD)
 	  {
-	    std::cout << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
-		      << " up to TWENTYTHIRD order." << std::endl;
+	    *libMesh::out << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
+		          << " up to TWENTYTHIRD order." << std::endl;
 	  }
 
 	if (_dim > 1)
 	  {
-	    std::cout << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
-		      << " in 1D only." << std::endl;
+	    *libMesh::out << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
+		          << " in 1D only." << std::endl;
 	  }
 #endif
 
@@ -128,8 +128,8 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 #ifdef DEBUG
 	if (_order > THIRD)
 	  {
-	    std::cout << "WARNING: Simpson rule provides only" << std::endl
-		      << " THIRD order!" << std::endl;
+	    *libMesh::out << "WARNING: Simpson rule provides only" << std::endl
+		          << " THIRD order!" << std::endl;
 	  }
 #endif
 
@@ -143,8 +143,8 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 #ifdef DEBUG
 	if (_order > FIRST)
 	  {
-	    std::cout << "WARNING: Trapezoidal rule provides only" << std::endl
-		      << " FIRST order!" << std::endl;
+	    *libMesh::out << "WARNING: Trapezoidal rule provides only" << std::endl
+		          << " FIRST order!" << std::endl;
 	  }
 #endif
 
@@ -155,7 +155,7 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 
     default:
       { 
-	std::cerr << "ERROR: Bad qt=" << _qt << std::endl;
+	*libMesh::err << "ERROR: Bad qt=" << _qt << std::endl;
 	libmesh_error();
       }
     }

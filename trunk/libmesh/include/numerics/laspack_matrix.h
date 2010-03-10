@@ -267,10 +267,10 @@ public:
   bool closed() const { return _closed; }
   
   /**
-   * Print the contents of the matrix to the screen,
-   * currently identical to \p print().
+   * Print the contents of the matrix, by default to libMesh::out.
+   * Currently identical to \p print().
    */
-  void print_personal(std::ostream& os=std::cout) const { this->print(os); }
+  void print_personal(std::ostream& os=*libMesh::out) const { this->print(os); }
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
@@ -563,7 +563,6 @@ inline
 unsigned int LaspackMatrix<T>::pos (const unsigned int i,
 				    const unsigned int j) const
 {
-  //std::cout << "m()=" << m() << std::endl;
   libmesh_assert (i < this->m());
   libmesh_assert (j < this->n());
   libmesh_assert (i+1 < _row_start.size());

@@ -51,8 +51,8 @@ PetscErrorCode
 __libmesh_petsc_diff_solver_monitor (SNES, PetscInt its,
                                      PetscReal fnorm, void *)
 {
-  std::cout << "  PetscDiffSolver step " << its
-            << ", |residual|_2 = " << fnorm << std::endl;
+  *libMesh::out << "  PetscDiffSolver step " << its
+                << ", |residual|_2 = " << fnorm << std::endl;
 
   return 0;
 }

@@ -83,7 +83,7 @@ void QTrap::init_2D(const ElemType _type,
       // Unsupported type
     default:
       {
-	std::cerr << "Element type not supported!:" << _type << std::endl;
+	*libMesh::err << "Element type not supported!:" << _type << std::endl;
 	libmesh_error();
       }
     }

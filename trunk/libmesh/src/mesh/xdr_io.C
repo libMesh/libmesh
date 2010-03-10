@@ -774,10 +774,10 @@ void XdrIO::read (const std::string& name)
     {
       io.data (n_elem);
       io.data (n_nodes);
-      io.data (this->boundary_condition_file_name()); // std::cout << "bc_file="  << this->boundary_condition_file_name() << std::endl;
-      io.data (this->subdomain_map_file_name());      // std::cout << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
-      io.data (this->partition_map_file_name());      // std::cout << "pid_file=" << this->partition_map_file_name()      << std::endl;
-      io.data (this->polynomial_level_file_name());   // std::cout << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
+      io.data (this->boundary_condition_file_name()); // *libMesh::out << "bc_file="  << this->boundary_condition_file_name() << std::endl;
+      io.data (this->subdomain_map_file_name());      // *libMesh::out << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
+      io.data (this->partition_map_file_name());      // *libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
+      io.data (this->polynomial_level_file_name());   // *libMesh::out << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
     }
 
   //TODO:[BSK] a little extra effort here could change this to two broadcasts...

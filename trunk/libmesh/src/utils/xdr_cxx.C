@@ -50,8 +50,8 @@ namespace {
      
     STOP_LOG("system(bzip2)", "XdrIO");
 #else
-    std::cerr << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
-	      << std::endl;
+    *libMesh::err << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
+	          << std::endl;
     libmesh_error();
 #endif
   }
@@ -73,8 +73,8 @@ namespace {
           libmesh_file_error(system_string);
 	STOP_LOG("system(bunzip2)", "XdrIO");
 #else
-	std::cerr << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
-		  << std::endl;
+	*libMesh::err << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
+		      << std::endl;
 	libmesh_error();
 #endif
       }
@@ -141,11 +141,11 @@ void Xdr::open (const std::string& name)
 	xdrstdio_create (xdrs, fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 	
@@ -167,8 +167,8 @@ void Xdr::open (const std::string& name)
 	    in.reset(inf);
 	    inf->open(name.c_str(), std::ios::in);
 #else
-	    std::cerr << "ERROR: need gzstream to handle .gz files!!!"
-		      << std::endl;
+	    *libMesh::err << "ERROR: need gzstream to handle .gz files!!!"
+		          << std::endl;
 	    libmesh_error();
 #endif
 	  }
@@ -200,8 +200,8 @@ void Xdr::open (const std::string& name)
 	    out.reset(outf);
 	    outf->open(name.c_str(), std::ios::out);
 #else
-	    std::cerr << "ERROR: need gzstream to handle .gz files!!!"
-		      << std::endl;
+	    *libMesh::err << "ERROR: need gzstream to handle .gz files!!!"
+		          << std::endl;
 	    libmesh_error();
 #endif
 	  }
@@ -254,11 +254,11 @@ void Xdr::close ()
 	  }
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 	
@@ -317,11 +317,11 @@ bool Xdr::is_open() const
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -369,11 +369,11 @@ void Xdr::data (int& a, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -421,11 +421,11 @@ void Xdr::data (unsigned int& a, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -473,11 +473,11 @@ void Xdr::data (short int& a, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -525,11 +525,11 @@ void Xdr::data (unsigned short int& a, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -577,11 +577,11 @@ void Xdr::data (float& a, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -629,11 +629,11 @@ void Xdr::data (double& a, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -687,11 +687,11 @@ void Xdr::data (std::complex<double>& a, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -754,11 +754,11 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -786,11 +786,11 @@ void Xdr::data (std::vector<int>& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -867,11 +867,11 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -899,11 +899,11 @@ void Xdr::data (std::vector<unsigned int>& v, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -980,11 +980,11 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1012,11 +1012,11 @@ void Xdr::data (std::vector<short int>& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1093,11 +1093,11 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1125,11 +1125,11 @@ void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1206,11 +1206,11 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1238,11 +1238,11 @@ void Xdr::data (std::vector<float>& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1319,11 +1319,11 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1354,11 +1354,11 @@ void Xdr::data (std::vector<double>& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1443,11 +1443,11 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1474,11 +1474,11 @@ void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1567,11 +1567,11 @@ void Xdr::data (std::string& s, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1602,11 +1602,11 @@ void Xdr::data (std::string& s, const char* comment)
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1673,11 +1673,11 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1700,11 +1700,11 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1781,11 +1781,11 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1857,18 +1857,18 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 	// now, and anyone who needs the functionality can send me a
 	// patch.  ;-)
 
-	std::cerr << "Writing binary XDR files with single precision is not\n"
-		  << "currently supported." << std::endl;
+	*libMesh::err << "Writing binary XDR files with single precision is not\n"
+		      << "currently supported." << std::endl;
 
 	libmesh_error();
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -1948,18 +1948,18 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 	// 	     sizeof(double),
 	// 	     (xdrproc_t) xdr_quadruple);
 
-	std::cerr << "Writing binary XDR files with long double's is not\n"
-		  << "currently supported on all platforms." << std::endl;
+	*libMesh::err << "Writing binary XDR files with long double's is not\n"
+		      << "currently supported on all platforms." << std::endl;
 
 	libmesh_error();
 	
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 
@@ -2056,11 +2056,11 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 	  }
 #else
 	
-	std::cerr << "ERROR: Functionality is not available." << std::endl
-		  << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		  << std::endl
-		  << "The XDR interface is not available in this installation"
-		  << std::endl;
+	*libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
 
 	libmesh_error();
 

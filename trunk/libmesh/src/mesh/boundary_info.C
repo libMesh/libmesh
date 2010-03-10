@@ -323,10 +323,10 @@ void BoundaryInfo::add_node(const Node* node,
 {
   if (id == invalid_id)
     {
-      std::cerr << "ERROR: You may not set a boundary ID of "
-		<< invalid_id << std::endl
-		<< " That is reserved for internal use.\n"
-		<< std::endl;
+      *libMesh::err << "ERROR: You may not set a boundary ID of "
+		    << invalid_id << std::endl
+		    << " That is reserved for internal use.\n"
+		    << std::endl;
 
       libmesh_error();
     }
@@ -369,10 +369,10 @@ void BoundaryInfo::add_side(const Elem* elem,
   
   if (id == invalid_id)
     {
-      std::cerr << "ERROR: You may not set a boundary ID of "
-		<< invalid_id << std::endl
-		<< " That is reserved for internal use.\n"
-		<< std::endl;
+      *libMesh::err << "ERROR: You may not set a boundary ID of "
+		    << invalid_id << std::endl
+		    << " That is reserved for internal use.\n"
+		    << std::endl;
 
       libmesh_error();
     }
@@ -689,14 +689,14 @@ void BoundaryInfo::build_side_list (std::vector<unsigned int>&       el,
 
 
 
-void BoundaryInfo::print_info() const
+void BoundaryInfo::print_info(std::ostream& out) const
 {
   // Print out the nodal BCs
   if (!_boundary_node_id.empty())
     {
-      std::cout << "Nodal Boundary conditions:" << std::endl
-		<< "--------------------------" << std::endl
-		<< "  (Node No., ID)               " << std::endl;
+      out << "Nodal Boundary conditions:" << std::endl
+	  << "--------------------------" << std::endl
+	  << "  (Node No., ID)               " << std::endl;
 
 //       std::for_each(_boundary_node_id.begin(),
 // 		    _boundary_node_id.end(),
@@ -706,18 +706,18 @@ void BoundaryInfo::print_info() const
       const std::multimap<const Node*, short int>::const_iterator end = _boundary_node_id.end();
 
       for (; it != end; ++it)
-	std::cout << "  (" << (*it).first->id()
-		  << ", "  << (*it).second
-		  << ")"  << std::endl;
+	out << "  (" << (*it).first->id()
+	    << ", "  << (*it).second
+	    << ")"  << std::endl;
     }
   
   // Print out the element BCs
   if (!_boundary_side_id.empty())
     {
-      std::cout << std::endl
-		<< "Side Boundary conditions:" << std::endl
-		<< "-------------------------" << std::endl
-		<< "  (Elem No., Side No., ID)      " << std::endl;
+      out << std::endl
+	  << "Side Boundary conditions:" << std::endl
+	  << "-------------------------" << std::endl
+	  << "  (Elem No., Side No., ID)      " << std::endl;
 
 //       std::for_each(_boundary_side_id.begin(),
 // 		    _boundary_side_id.end(),
@@ -728,10 +728,10 @@ void BoundaryInfo::print_info() const
       const std::multimap<const Elem*,
 	std::pair<unsigned short int, short int> >::const_iterator end = _boundary_side_id.end();
 
-     for (; it != end; ++it)
-       std::cout << "  (" << (*it).first->id()
-		 << ", "  << (*it).second.first
-		 << ", "  << (*it).second.second 
-		 << ")"   << std::endl;
+      for (; it != end; ++it)
+        out << "  (" << (*it).first->id()
+	    << ", "  << (*it).second.first
+	    << ", "  << (*it).second.second 
+	    << ")"   << std::endl;
     }
 }

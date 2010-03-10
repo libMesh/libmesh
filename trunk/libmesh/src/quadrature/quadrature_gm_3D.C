@@ -31,11 +31,11 @@ void QGrundmann_Moller::init_3D(const ElemType _type,
   // allowing rules with negative weights, we cannot continue!
   if (!allow_rules_with_negative_weights)
     {
-      std::cerr << "You requested a Grundmann-Moller rule but\n"
-		<< "are not allowing rules with negative weights!\n"
-		<< "Either select a different quadrature class or\n"
-		<< "set allow_rules_with_negative_weights==true." 
-		<< std::endl;
+      *libMesh::err << "You requested a Grundmann-Moller rule but\n"
+		    << "are not allowing rules with negative weights!\n"
+		    << "Either select a different quadrature class or\n"
+		    << "set allow_rules_with_negative_weights==true." 
+		    << std::endl;
       
       libmesh_error();
     }
@@ -57,7 +57,7 @@ void QGrundmann_Moller::init_3D(const ElemType _type,
       // Unsupported element type
     default:
       {
-	std::cerr << "ERROR: Unsupported element type: " << _type << std::endl;
+	*libMesh::err << "ERROR: Unsupported element type: " << _type << std::endl;
 	libmesh_error();
       }
     } // end switch (_type)

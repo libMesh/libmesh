@@ -148,7 +148,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
 int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT,
 	    LPINT, int, LPINT, LPINT, const char [], int, const char [], FILE*)
 {
-  std::cout<<"Starting writegr"<<std::endl;
+  *libMesh::out<<"Starting writegr"<<std::endl;
   int i;
 
   //Adjust nodal coordinates to new positions
@@ -232,7 +232,7 @@ if(me>=3){
 
 fclose(stream);
 */
-  std::cout<<"Finished writegr"<<std::endl;
+  *libMesh::out<<"Finished writegr"<<std::endl;
   return 0;
 }
 
@@ -245,7 +245,7 @@ fclose(stream);
 int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, LPLPINT cells,
 	   LPINT mcells, int, LPINT edges, LPINT hnodes, FILE *)
 {
-  std::cout<<"Sarting readgr"<<std::endl;
+  *libMesh::out<<"Sarting readgr"<<std::endl;
   int i;
  //add error messages where format can be inconsistent
 
@@ -339,7 +339,7 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
       else
 	mask[i]=0;  //Internal Node
 
-      //std::cout<<"Node: "<<i<<"  Mask: "<<mask[i]<<std::endl;
+      //*libMesh::out<<"Node: "<<i<<"  Mask: "<<mask[i]<<std::endl;
       i++;
     }
   }
@@ -433,9 +433,9 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
     for(i=0;it!=end;it++)
     {
 
-      std::cout<<"Parent 1: "<<(it->second)[0]<<std::endl;
-      std::cout<<"Parent 2: "<<(it->second)[1]<<std::endl;
-      std::cout<<"Hanging Node: "<<it->first<<std::endl<<std::endl;
+      *libMesh::out<<"Parent 1: "<<(it->second)[0]<<std::endl;
+      *libMesh::out<<"Parent 2: "<<(it->second)[1]<<std::endl;
+      *libMesh::out<<"Hanging Node: "<<it->first<<std::endl<<std::endl;
 
 
       //First Parent
@@ -450,7 +450,7 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
       i++;
     }
   }
-  std::cout<<"Finished readgr"<<std::endl;
+  *libMesh::out<<"Finished readgr"<<std::endl;
 
 return 0;
 }

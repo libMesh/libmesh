@@ -33,7 +33,7 @@ Real FE<3,SZABAB>::shape(const ElemType,
 			 const unsigned int,
 			 const Point&)
 {
-  std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
+  *libMesh::err << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
   libmesh_error();
   return 0.;
 }
@@ -46,7 +46,7 @@ Real FE<3,SZABAB>::shape(const Elem*,
 			 const unsigned int,
 			 const Point&)
 {
-  std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
+  *libMesh::err << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
   libmesh_error();
   return 0.;
 }
@@ -59,7 +59,7 @@ Real FE<3,SZABAB>::shape_deriv(const ElemType,
 			       const unsigned int,
 			       const Point& )
 {
-  std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
+  *libMesh::err << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
   libmesh_error();
   return 0.;
 }
@@ -73,7 +73,7 @@ Real FE<3,SZABAB>::shape_deriv(const Elem*,
 			       const unsigned int,
 			       const Point&)
 {
-  std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
+  *libMesh::err << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
   libmesh_error();
   return 0.;
 }
@@ -87,7 +87,7 @@ Real FE<3,SZABAB>::shape_second_deriv(const ElemType,
 			              const unsigned int,
 			              const Point&)
 {
-  std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
+  *libMesh::err << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
   libmesh_error();
   return 0.;
 }
@@ -101,7 +101,7 @@ Real FE<3,SZABAB>::shape_second_deriv(const Elem*,
 			              const unsigned int,
 			              const Point&)
 {
-  std::cerr << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
+  *libMesh::err << "Szabo-Babuska polynomials are not defined in 3D\n" << std::endl;
   libmesh_error();
   return 0.;
 }

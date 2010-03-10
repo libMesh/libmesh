@@ -495,7 +495,7 @@ public:
   /**
    * Prints the \p _dof_constraints data structure.
    */
-  void print_dof_constraints(std::ostream& os=std::cout) const;
+  void print_dof_constraints(std::ostream& os=*libMesh::out) const;
 
   /**
    * Tests the constrained degrees of freedom on the numeric vector \p v, which

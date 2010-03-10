@@ -167,9 +167,10 @@ public:
   Order get_order() const { return static_cast<Order>(_order + _p_level); }
   
   /**
-   * Prints information relevant to the quadrature rule.
+   * Prints information relevant to the quadrature rule, by default to
+   * libMesh::out.
    */
-  void print_info(std::ostream& os=std::cout) const;
+  void print_info(std::ostream& os=*libMesh::out) const;
 
   /**
    * Maps the points of a 1D interval quadrature rule (typically [-1,1])
@@ -237,8 +238,8 @@ protected:
   {}
 #else
   {  
-    std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
-	      << " is not implemented for 2D." << std::endl;
+    *libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
+	          << " is not implemented for 2D." << std::endl;
     libmesh_error();
   }
 #endif
@@ -257,8 +258,8 @@ protected:
   {}
 #else
   {  
-    std::cerr << "ERROR: Seems as if this quadrature rule" << std::endl
-	      << " is not implemented for 3D." << std::endl;
+    *libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
+	          << " is not implemented for 3D." << std::endl;
     libmesh_error();
   }
 #endif

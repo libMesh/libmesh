@@ -130,9 +130,9 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
 /*
   if (_exact_value == NULL)
     {
-      std::cerr << "Cannot compute error, you must provide a "
-		<< "function which computes the exact solution."
-		<< std::endl;
+      *libMesh::err << "Cannot compute error, you must provide a "
+		    << "function which computes the exact solution."
+		    << std::endl;
       libmesh_error();
     }
 */
@@ -143,9 +143,9 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
   
   if (sys_iter == _errors.end())
     {
-      std::cerr << "Sorry, couldn't find the requested system '"
-                << sys_name << "'."
-		<< std::endl;
+      *libMesh::err << "Sorry, couldn't find the requested system '"
+                    << sys_name << "'."
+		    << std::endl;
       libmesh_error();
     }
   
@@ -154,9 +154,9 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
 
   if (var_iter == (*sys_iter).second.end())
     {
-      std::cerr << "Sorry, couldn't find the requested variable '"
-                << unknown_name << "'."
-		<< std::endl;
+      *libMesh::err << "Sorry, couldn't find the requested variable '"
+                    << unknown_name << "'."
+		    << std::endl;
       libmesh_error();
     }
 
@@ -291,9 +291,9 @@ Real ExactSolution::h1_error(const std::string& sys_name,
 /*
   if (_exact_deriv == NULL)
     {
-      std::cerr << "Cannot compute H1 error, you must provide a "
-		<< "function which computes the gradient of the exact solution."
-		<< std::endl;
+      *libMesh::err << "Cannot compute H1 error, you must provide a "
+		    << "function which computes the gradient of the exact solution."
+		    << std::endl;
       libmesh_error();
     }
 */
@@ -322,10 +322,10 @@ Real ExactSolution::h2_error(const std::string& sys_name,
 /*
   if (_exact_deriv == NULL || _exact_hessian == NULL)
     {
-      std::cerr << "Cannot compute H2 error, you must provide functions "
-		<< "which computes the gradient and hessian of the "
-                << "exact solution."
-		<< std::endl;
+      *libMesh::err << "Cannot compute H2 error, you must provide functions "
+		    << "which computes the gradient and hessian of the "
+                    << "exact solution."
+		    << std::endl;
       libmesh_error();
     }
 */

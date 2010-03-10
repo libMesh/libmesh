@@ -52,7 +52,7 @@ PetscPreconditioner<T>::init ()
 {
   if(!this->_matrix)
   {
-    std::cerr << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;
+    *libMesh::err << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;
     libmesh_error();
   }
 
@@ -131,9 +131,9 @@ PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType 
     ierr = PCSetType (pc, (char*) PCSHELL);     CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   default:
-    std::cerr << "ERROR:  Unsupported PETSC Preconditioner: "
-              << preconditioner_type       << std::endl
-              << "Continuing with PETSC defaults" << std::endl;
+    *libMesh::err << "ERROR:  Unsupported PETSC Preconditioner: "
+                  << preconditioner_type       << std::endl
+                  << "Continuing with PETSC defaults" << std::endl;
   }
 
   //Let the commandline override stuff

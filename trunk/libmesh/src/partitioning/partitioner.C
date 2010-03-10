@@ -165,7 +165,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
 
 	}
       
-      //std::cout << "pid, #= " << pid << ", " << tgt_subdomain_size << std::endl;
+      //*libMesh::out << "pid, #= " << pid << ", " << tgt_subdomain_size << std::endl;
       if (pid == 0)
 	subdomain_bounds[0] = tgt_subdomain_size;
       else
@@ -202,7 +202,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
       libmesh_assert (subdomain_id < n_subdomains);
      
       elem->processor_id() = subdomain_id;		
-      //std::cout << "assigning " << global_index << " to " << subdomain_id << std::endl;	      
+      //*libMesh::out << "assigning " << global_index << " to " << subdomain_id << std::endl;	      
     }
 }
 
@@ -365,7 +365,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
 
 //   const unsigned int orig_n_local_nodes = mesh.n_local_nodes();
 
-//   std::cerr << "[" << libMesh::processor_id() << "]: orig_n_local_nodes="
+//   *libMesh::err << "[" << libMesh::processor_id() << "]: orig_n_local_nodes="
 // 	    << orig_n_local_nodes << std::endl;
 
   // Build up request sets.  Each node is currently owned by a processor because

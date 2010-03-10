@@ -135,10 +135,10 @@ void MeshCommunication::clear ()
 //       }
 
 //     // Print out the _neighboring_processors list
-//     std::cout << "Processor " << libMesh::processor_id()
+//     *libMesh::out << "Processor " << libMesh::processor_id()
 // 	      << " intersects:" << std::endl;
 //     for (unsigned int p=0; p<_neighboring_processors.size(); p++)
-//       std::cout << " " << _neighboring_processors[p] << std::endl;
+//       *libMesh::out << " " << _neighboring_processors[p] << std::endl;
 //   }
 // }
 // #else
@@ -595,8 +595,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		    // and can't find the parent that is a fatal error.
 		    if (parent == NULL)
 		      {
-			std::cerr << "Parent element with ID " << packed_elem.parent_id()
-				  << " not found." << std::endl; 
+			*libMesh::err << "Parent element with ID " << packed_elem.parent_id()
+				      << " not found." << std::endl; 
 			libmesh_error();
 		      }
 		    
@@ -781,10 +781,10 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   }
   
   if (true)
-    std::cout << "[" << libMesh::processor_id() << "] "
-	      << "mesh.n_nodes()=" << mesh.n_nodes() << ", "
-	      << "my_interface_node_list.size()=" << my_interface_node_list.size()
-	      << std::endl;
+    *libMesh::out << "[" << libMesh::processor_id() << "] "
+	          << "mesh.n_nodes()=" << mesh.n_nodes() << ", "
+	          << "my_interface_node_list.size()=" << my_interface_node_list.size()
+	          << std::endl;
   
   // we will now send my_interface_node_list to all of the adjacent processors.
   // note that for the time being we will copy the list to a unique buffer for 
@@ -893,12 +893,12 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	     common_interface_node_list.end());
 	  
 	  if (true)
-	    std::cout << "[" << libMesh::processor_id() << "] "
-		      << "my_interface_node_list.size()="       << my_interface_node_list.size()
-		      << ", [" << source_pid_idx << "] "
-		      << "their_interface_node_list.size()="    << their_interface_node_list_size
-		      << ", common_interface_node_list.size()=" << common_interface_node_list.size()
-		      << std::endl;
+	    *libMesh::out << "[" << libMesh::processor_id() << "] "
+		          << "my_interface_node_list.size()="       << my_interface_node_list.size()
+		          << ", [" << source_pid_idx << "] "
+		          << "their_interface_node_list.size()="    << their_interface_node_list_size
+		          << ", common_interface_node_list.size()=" << common_interface_node_list.size()
+		          << std::endl;
 	  
 	  // Check for quick return?
 	  if (common_interface_node_list.empty())
@@ -1204,8 +1204,8 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 		      // and can't find the parent that is a fatal error.
 		      if (parent == NULL)
 			{
-			  std::cerr << "Parent element with ID " << packed_elem.parent_id()
-				    << " not found." << std::endl; 
+			  *libMesh::err << "Parent element with ID " << packed_elem.parent_id()
+				        << " not found." << std::endl; 
 			  libmesh_error();
 			}
 		      
@@ -1247,8 +1247,8 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
       // Huh?
       else
 	{
-	  std::cerr << "ERROR:  unexpected number of replies: "
-		    << n_comm_steps[source_pid_idx]
+	  *libMesh::err << "ERROR:  unexpected number of replies: "
+		        << n_comm_steps[source_pid_idx]
 		    << std::endl;
 	}
     } // done catching & processing replies associated with tag ~ 100,000pi
@@ -1540,8 +1540,8 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
                 // If the parent was not previously added, we cannot continue.
                 if (my_parent == NULL)
 		  {
-		    std::cerr << "Parent element with ID " << packed_elem.parent_id()
-			      << " not found." << std::endl; 
+		    *libMesh::err << "Parent element with ID " << packed_elem.parent_id()
+			          << " not found." << std::endl; 
 		    libmesh_error();
 		  }
 		
@@ -2013,8 +2013,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 			// cannot continue.
 			if (my_parent == NULL)
 			  {
-			    std::cerr << "Parent element with ID " << packed_elem.parent_id()
-				      << " not found." << std::endl; 
+			    *libMesh::err << "Parent element with ID " << packed_elem.parent_id()
+				          << " not found." << std::endl; 
 			    libmesh_error();
 			  }
 			

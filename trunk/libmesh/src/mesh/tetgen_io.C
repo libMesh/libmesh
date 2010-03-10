@@ -61,8 +61,8 @@ void TetGenIO::read (const std::string& name)
     }
   else
     {
-      std::cerr << "ERROR: Unrecognized file name: "
-		<< name << std::endl;
+      *libMesh::err << "ERROR: Unrecognized file name: "
+		    << name << std::endl;
       libmesh_error();
     }
 	
@@ -74,13 +74,13 @@ void TetGenIO::read (const std::string& name)
 
   if ( !node_stream.good() || !ele_stream.good() )
     {
-      std::cerr << "ERROR: One or both Input file(s) not good." << std::endl
-		<< "Error checking files "
-		<< name_node << " and "
-		<< name_ele  << std::endl;
+      *libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
+		    << "Error checking files "
+		    << name_node << " and "
+		    << name_ele  << std::endl;
       libmesh_error();
     }
-  std::cout<< "found the tetgen files to read " <<std::endl; 
+  *libMesh::out<< "TetGenIO found the tetgen files to read " <<std::endl; 
 
   // Skip the comment lines at the beginning
   this->skip_comment_lines (node_stream, '#');
@@ -88,7 +88,7 @@ void TetGenIO::read (const std::string& name)
 
   // Read the nodes and elements from the streams
   this->read_nodes_and_elem (node_stream, ele_stream);
-  std::cout<< "read in nodes and elements " <<std::endl; 
+  *libMesh::out<< "TetGenIO read in nodes and elements " <<std::endl; 
 }
 
 
@@ -209,8 +209,8 @@ void TetGenIO::element_in (std::istream& ele_stream)
       
       else
 	{
-	  std::cerr << "Elements with " << n_nodes
-		    << " nodes are not supported in the LibMesh tetgen module\n";
+	  *libMesh::err << "Elements with " << n_nodes
+		        << " nodes are not supported in the LibMesh tetgen module\n";
 	  libmesh_error();
 	}
       elem->set_id(i);
@@ -256,8 +256,8 @@ void TetGenIO::write (const std::string& fname)
 
   if (!(fname.rfind(".poly") < fname.size())) 
     {
-      std::cerr << "ERROR: Unrecognized file name: "
-                << fname << std::endl;
+      *libMesh::err << "ERROR: Unrecognized file name: "
+                    << fname << std::endl;
       libmesh_error();
     }
 

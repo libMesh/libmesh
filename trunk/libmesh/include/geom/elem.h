@@ -1533,8 +1533,8 @@ unsigned int Elem::which_child_am_i (const Elem* e) const
     if (this->child(c) == e)
       return c;
 
-  std::cerr << "ERROR:  which_child_am_i() was called with a non-child!" 
-	    << std::endl;
+  *libMesh::err << "ERROR:  which_child_am_i() was called with a non-child!" 
+	        << std::endl;
 
   libmesh_error();
 
@@ -1557,10 +1557,10 @@ void Elem::set_refinement_flag(RefinementState rflag)
 #ifdef DEBUG
   if (rflag != static_cast<RefinementState>(static_cast<unsigned char>(rflag)))
     {
-      std::cerr << "ERROR: unsigned char too small to hold Elem::_rflag!"
-		<< std::endl
-		<< "Recompile with Elem:_*flag set to something bigger!"
-		<< std::endl;
+      *libMesh::err << "ERROR: unsigned char too small to hold Elem::_rflag!"
+		    << std::endl
+		    << "Recompile with Elem:_*flag set to something bigger!"
+		    << std::endl;
       libmesh_error();
     }
 #endif
@@ -1584,10 +1584,10 @@ void Elem::set_p_refinement_flag(RefinementState pflag)
 #ifdef DEBUG
   if (pflag != static_cast<RefinementState>(static_cast<unsigned char>(pflag)))
     {
-      std::cerr << "ERROR: unsigned char too small to hold Elem::_pflag!"
-		<< std::endl
-		<< "Recompile with Elem:_*flag set to something bigger!"
-		<< std::endl;
+      *libMesh::err << "ERROR: unsigned char too small to hold Elem::_pflag!"
+		    << std::endl
+		    << "Recompile with Elem:_*flag set to something bigger!"
+		    << std::endl;
       libmesh_error();
     }
 #endif
@@ -1621,10 +1621,10 @@ void Elem::set_p_level(unsigned int p)
 #ifdef DEBUG
   if (p != static_cast<unsigned int>(static_cast<unsigned char>(p)))
     {
-      std::cerr << "ERROR: unsigned char too small to hold Elem::_p_level!"
-		<< std::endl
-		<< "Recompile with Elem:_p_level set to something bigger!"
-		<< std::endl;
+      *libMesh::err << "ERROR: unsigned char too small to hold Elem::_p_level!"
+		    << std::endl
+		    << "Recompile with Elem:_p_level set to something bigger!"
+		    << std::endl;
       libmesh_error();
     }
 #endif

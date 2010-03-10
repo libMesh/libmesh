@@ -165,17 +165,17 @@ void Nonlinear<T>::solve ()
       const Real norm_delta = last_nonlinear_soln->l2_norm();
 
       // Print out convergence information
-      std::cout << "Nonlinear convergence: ||u - u_old|| = "
-		<< norm_delta
-		<< std::endl;
+      libMesh::out << "Nonlinear convergence: ||u - u_old|| = "
+		   << norm_delta
+		   << std::endl;
 
       // Terminate the solution iteration if the difference between
       // this iteration and the last is sufficiently small.
       if (norm_delta < this->nonlinear_tolerance())
 	{
-	  std::cout << " Nonlinear solver converged at step "
-		    << l
-		    << std::endl;
+	  *libMesh::out << " Nonlinear solver converged at step "
+		        << l
+		        << std::endl;
 	  break;
 	}
     }

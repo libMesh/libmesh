@@ -19,9 +19,7 @@
 
 
 // C++ includes
-#include <iterator>   // std::distance(), std::advance()
-#include <algorithm>  // std::swap
-#include <iostream>   // std::cout
+#include <algorithm>  // std::lower_bound
 
 // Local includes
 #include "libmesh_common.h"

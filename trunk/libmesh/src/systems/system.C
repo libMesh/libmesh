@@ -429,9 +429,9 @@ bool System::compare (const System& other_system,
 
   if (verbose)
     {
-      std::cout << "  Systems \"" << _sys_name << "\"" << std::endl;
-      std::cout << "   comparing matrices not supported." << std::endl;
-      std::cout << "   comparing names...";
+      *libMesh::out << "  Systems \"" << _sys_name << "\"" << std::endl;
+      *libMesh::out << "   comparing matrices not supported." << std::endl;
+      *libMesh::out << "   comparing names...";
     }
 
   // compare the name: 0 means identical
@@ -439,10 +439,10 @@ bool System::compare (const System& other_system,
   if (verbose)
     {
       if (name_result == 0)
-	std::cout << " identical." << std::endl;
+	*libMesh::out << " identical." << std::endl;
       else
-	std::cout << "  names not identical." << std::endl;
-      std::cout << "   comparing solution vector...";
+	*libMesh::out << "  names not identical." << std::endl;
+      *libMesh::out << "   comparing solution vector...";
     }
 
 
@@ -453,9 +453,9 @@ bool System::compare (const System& other_system,
   if (verbose)
     {
       if (solu_result == -1)
-	std::cout << " identical up to threshold." << std::endl;
+	*libMesh::out << " identical up to threshold." << std::endl;
       else
-	std::cout << "  first difference occured at index = " 
+	*libMesh::out << "  first difference occured at index = " 
 		  << solu_result << "." << std::endl;
     }
 
@@ -468,7 +468,7 @@ bool System::compare (const System& other_system,
     {
       if (verbose)
         {
-	  std::cout << "   Fatal difference. This system handles " 
+	  *libMesh::out << "   Fatal difference. This system handles " 
 		    << this->n_vectors() << " add'l vectors," << std::endl
 		    << "   while the other system handles "
 		    << other_system.n_vectors() 
@@ -489,7 +489,7 @@ bool System::compare (const System& other_system,
 	   pos != _vectors.end(); ++pos)
         {
 	  if (verbose)
-	      std::cout << "   comparing vector \""
+	      *libMesh::out << "   comparing vector \""
 			<< pos->first << "\" ...";
 
 	  // assume they have the same name
@@ -502,9 +502,9 @@ bool System::compare (const System& other_system,
 	  if (verbose)
 	    {
 	      if (ov_result[ov_result.size()-1] == -1)
-		std::cout << " identical up to threshold." << std::endl;
+		*libMesh::out << " identical up to threshold." << std::endl;
 	      else
-		std::cout << " first difference occured at" << std::endl
+		*libMesh::out << " first difference occured at" << std::endl
 			  << "   index = " << ov_result[ov_result.size()-1] << "." << std::endl;
 	    }
 
@@ -538,11 +538,11 @@ bool System::compare (const System& other_system,
 
   if (verbose)
     {
-      std::cout << "   finished comparisons, ";
+      *libMesh::out << "   finished comparisons, ";
       if (overall_result)
-	std::cout << "found no differences." << std::endl << std::endl;
+	*libMesh::out << "found no differences." << std::endl << std::endl;
       else 
-	std::cout << "found differences." << std::endl << std::endl;
+	*libMesh::out << "found differences." << std::endl << std::endl;
     }
 	  
   return overall_result;
@@ -655,10 +655,10 @@ const NumericVector<Number> & System::get_vector (const std::string& vec_name) c
   
   if (pos == _vectors.end())
     {
-      std::cerr << "ERROR: vector "
-		<< vec_name
-		<< " does not exist in this system!"
-		<< std::endl;      
+      *libMesh::err << "ERROR: vector "
+		    << vec_name
+		    << " does not exist in this system!"
+		    << std::endl;      
       libmesh_error();
     }
   
@@ -674,10 +674,10 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
   
   if (pos == _vectors.end())
     {
-      std::cerr << "ERROR: vector "
-		<< vec_name
-		<< " does not exist in this system!"
-		<< std::endl;      
+      *libMesh::err << "ERROR: vector "
+		    << vec_name
+		    << " does not exist in this system!"
+		    << std::endl;      
       libmesh_error();
     }
   
@@ -916,10 +916,10 @@ unsigned int System::add_variable (const std::string& var,
 	if (this->variable_type(v) == type)
 	  return _variables[v].number();
 
-	std::cerr << "ERROR: incompatible variable "
-		  << var
-		  << " has already been added for this system!"
-		  << std::endl;
+	*libMesh::err << "ERROR: incompatible variable "
+		      << var
+		      << " has already been added for this system!"
+		      << std::endl;
 	libmesh_error();
       }
 
@@ -970,10 +970,10 @@ unsigned short int System::variable_number (const std::string& var) const
   
   if (pos == _variable_numbers.end())
     {
-      std::cerr << "ERROR: variable "
-		<< var
-		<< " does not exist in this system!"
-		<< std::endl;      
+      *libMesh::err << "ERROR: variable "
+		    << var
+		    << " does not exist in this system!"
+		    << std::endl;      
       libmesh_error();
     }
   libmesh_assert (_variables[pos->second].name() == var);

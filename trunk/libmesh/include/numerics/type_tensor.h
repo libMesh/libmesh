@@ -275,9 +275,9 @@ public:
   bool operator > (const TypeTensor<T>& rhs) const;
   
   /**
-   * Formatted print to \p std::cout.
+   * Formatted print, by default to \p libMesh::out.
    */
-  void print(std::ostream& os) const;
+  void print(std::ostream& os = *libMesh::out) const;
 
   /**
    * Formatted print as above but allows you to do
@@ -438,7 +438,7 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 
   if (i >= LIBMESH_DIM || j >= LIBMESH_DIM)
     {
-//       std::cerr << "ERROR:  You are assigning to a tensor component" << std::endl
+//       *libMesh::err << "ERROR:  You are assigning to a tensor component" << std::endl
 // 		<< "that is out of range for the compiled LIBMESH_DIM!"      << std::endl
 // 		<< " LIBMESH_DIM=" << LIBMESH_DIM << " , i=" << i << " , j=" << j << std::endl;
       libmesh_error();

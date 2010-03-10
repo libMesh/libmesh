@@ -492,8 +492,8 @@ void DofObject::processor_id (const unsigned int id)
   
   if (id != static_cast<unsigned int>(static_cast<unsigned short int>(id)))
     {
-      std::cerr << "ERROR: id too large for unsigned short int!" << std::endl
-		<< "Recompile with DofObject::_processor_id larger!" << std::endl;
+      *libMesh::err << "ERROR: id too large for unsigned short int!" << std::endl
+		    << "Recompile with DofObject::_processor_id larger!" << std::endl;
       
       libmesh_error();
     }
@@ -548,9 +548,9 @@ unsigned int DofObject::n_comp(const unsigned int s,
   // Does this ever happen?  I doubt it... 3/7/2003 (BSK)
   if (var >= this->n_vars(s))
     {
-      std::cout << "s=" << s << ", var=" << var << std::endl
-		<< "this->n_vars(s)=" << this->n_vars(s) << std::endl
-		<< "this->n_systems()=" << this->n_systems() << std::endl;
+      *libMesh::err << "s=" << s << ", var=" << var << std::endl
+		    << "this->n_vars(s)=" << this->n_vars(s) << std::endl
+		    << "this->n_systems()=" << this->n_systems() << std::endl;
       libmesh_error();
     }
 # endif

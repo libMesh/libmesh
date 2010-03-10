@@ -116,7 +116,7 @@ void QTrap::init_3D(const ElemType _type,
       // Unsupported type
     default:
       {
-	std::cerr << "ERROR: Unsupported type: " << _type << std::endl;
+	*libMesh::err << "ERROR: Unsupported type: " << _type << std::endl;
 	libmesh_error();
       }
     }

@@ -173,11 +173,11 @@ void System::read_header (Xdr& io,
 	       (type.order > 1 && this->get_mesh().mesh_dimension() == 3)))
 	    {
 	      libmesh_here();
-	      std::cout << "*****************************************************************\n"
-			<< "* WARNING: reading a potentially incompatible restart file!!!   *\n"
-			<< "*  contact libmesh-users@lists.sourceforge.net for more details *\n"
-			<< "*****************************************************************"
-			<< std::endl;
+	      *libMesh::out << "*****************************************************************\n"
+			    << "* WARNING: reading a potentially incompatible restart file!!!   *\n"
+			    << "*  contact libmesh-users@lists.sourceforge.net for more details *\n"
+			    << "*****************************************************************"
+			    << std::endl;
 	    }
 			
 	// Read additional information for infinite elements	
@@ -271,8 +271,8 @@ void System::read_legacy_data (Xdr& io,
     // ordering we may have using the dof_map.
     reordered_vector.resize(global_vector.size());
 
-    //std::cout << "global_vector.size()=" << global_vector.size() << std::endl;
-    //std::cout << "this->n_dofs()=" << this->n_dofs() << std::endl;
+    //*libMesh::out << "global_vector.size()=" << global_vector.size() << std::endl;
+    //*libMesh::out << "this->n_dofs()=" << this->n_dofs() << std::endl;
     
     libmesh_assert (global_vector.size() == this->n_dofs());
 	
@@ -627,7 +627,7 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var
 
   for (unsigned int blk=0; last_object<n_objects; blk++)
     {
-      //std::cout << "Reading object block " << blk << std::endl;
+      //*libMesh::out << "Reading object block " << blk << std::endl;
       
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
@@ -742,7 +742,7 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var
 		const unsigned int dof_index = (*it)->dof_number (sys_num, var, comp);
 		libmesh_assert (dof_index >= vec.first_local_index());
 		libmesh_assert (dof_index <  vec.last_local_index());
-		//std::cout << "di=" << dof_index << ", val=" << value << std::endl;
+		//*libMesh::out << "di=" << dof_index << ", val=" << value << std::endl;
 		vec.set (dof_index, value);
 		++n_assigned_vals;
 	      }
@@ -1280,7 +1280,7 @@ void System::write_parallel_data (Xdr &io,
 	     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)      
 	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
 	  {
-	    //std::cout << "(*it)->id()=" << (*it)->id() << std::endl;
+	    //*libMesh::out << "(*it)->id()=" << (*it)->id() << std::endl;
 	    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 		    DofObject::invalid_id);
 	    
@@ -1457,7 +1457,7 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
   
   for (unsigned int blk=0; last_object<n_objects; blk++)
     {
-      //std::cout << "Writing object block " << blk << " for var " << var << std::endl;
+      //*libMesh::out << "Writing object block " << blk << " for var " << var << std::endl;
       
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).

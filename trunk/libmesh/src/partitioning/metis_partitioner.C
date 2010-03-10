@@ -65,9 +65,9 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 #ifndef LIBMESH_HAVE_METIS
 
   libmesh_here();
-  std::cerr << "ERROR: The library has been built without"    << std::endl
-	    << "Metis support.  Using a space-filling curve"  << std::endl
-	    << "partitioner instead!"                         << std::endl;
+  *libMesh::err << "ERROR: The library has been built without"    << std::endl
+	        << "Metis support.  Using a space-filling curve"  << std::endl
+	        << "partitioner instead!"                         << std::endl;
 
   SFCPartitioner sfcp;
 

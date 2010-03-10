@@ -117,10 +117,10 @@ void MeshFunction::init (const Trees::BuildType point_locator_build_type)
       
       if (master->_point_locator == NULL)
         {
-	  std::cerr << "ERROR: When the master-servant concept is used,"
-		    << std::endl
-		    << " the master has to be initialized first!"
-		    << std::endl;
+	  *libMesh::err << "ERROR: When the master-servant concept is used,"
+		        << std::endl
+		        << " the master has to be initialized first!"
+		        << std::endl;
 	  libmesh_error();
 	}
       else
@@ -229,7 +229,7 @@ void MeshFunction::operator() (const Point& p,
 	libmesh_cast_ptr<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
-	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
+	  *libMesh::err << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
 	  libmesh_error();
 	}
     }
@@ -327,7 +327,7 @@ void MeshFunction::gradient (const Point& p,
 	libmesh_cast_ptr<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
-	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
+	  *libMesh::err << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
 	  libmesh_error();
 	}
     }
@@ -416,7 +416,7 @@ void MeshFunction::hessian (const Point& p,
 	libmesh_cast_ptr<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
 	{
-	  std::cerr << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
+	  *libMesh::err << "ERROR: If you use out-of-mesh-mode in connection with master mesh functions, you must enable out-of-mesh mode for both the master and the slave mesh function." << std::endl;
 	  libmesh_error();
 	}
     }

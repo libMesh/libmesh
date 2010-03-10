@@ -110,7 +110,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
           }
 
 	  default:
-	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    *libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
 	  }
       }
@@ -176,7 +176,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
           }
 
 	  default:
-	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    *libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
 	  }
       }
@@ -244,7 +244,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
           }
 
 	  default:
-	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    *libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
 	  }
       }
@@ -257,8 +257,8 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  {
 	  case CLOUGH:
 	    {
-	      std::cout << "ERROR: Clough-Tocher elements currently only support 1D and 2D" <<
-		      std::endl;
+	      *libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
+                            << std::endl;
 	      libmesh_error();
 	    }
 	    
@@ -313,7 +313,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
           }
 
 	  default:
-	    std::cout << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    *libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
 	  }
       }
@@ -352,8 +352,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 	  {
 	  case INFINITE_MAP:
 	    {
-	      std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			<< " with FEFamily = " << fet.radial_family << std::endl;
+	      *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			    << " with FEFamily = " << fet.radial_family << std::endl;
 	      libmesh_error();
 	    }
 
@@ -367,8 +367,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -383,8 +383,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -399,8 +399,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -415,8 +415,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -424,7 +424,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
 	    
 	  default:
-	    std::cerr << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+	    *libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
 	    libmesh_error();
 	  }
 
@@ -440,8 +440,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 	  {
 	  case INFINITE_MAP:
 	    {
-	      std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			<< " with FEFamily = " << fet.radial_family << std::endl;
+	      *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			    << " with FEFamily = " << fet.radial_family << std::endl;
 	      libmesh_error();
 	    }
 
@@ -455,8 +455,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -471,8 +471,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -487,8 +487,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -503,8 +503,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -512,7 +512,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
 	    
 	  default:
-	    std::cerr << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+	    *libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
 	    libmesh_error();
 	  }
 
@@ -528,8 +528,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 	  {
 	  case INFINITE_MAP:
 	    {
-	      std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			<< " with FEFamily = " << fet.radial_family << std::endl;
+	      *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			    << " with FEFamily = " << fet.radial_family << std::endl;
 	      libmesh_error();
 	    }
 
@@ -543,8 +543,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -559,8 +559,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -575,8 +575,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -591,8 +591,8 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 		      return ap;
 		    }
 		  default:
-		    std::cerr << "ERROR: Don't build an infinite element " << std::endl
-			      << " with InfMapType = " << fet.inf_map << std::endl;
+		    *libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+			          << " with InfMapType = " << fet.inf_map << std::endl;
 		    libmesh_error();
 		}
 	    }
@@ -600,7 +600,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
 	    
 	  default:
-	    std::cerr << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+	    *libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
 	    libmesh_error();
 	  }
       }
@@ -955,7 +955,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    (zeta >= -1.-eps) &&
 	    (zeta <=  1.+eps))
 	  {
-	    //	    std::cout << "Strange Point:\n";
+	    //	    *libMesh::out << "Strange Point:\n";
 	    //	    p.print();
 	    return true;
 	  }
@@ -982,8 +982,8 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 
     case PYRAMID5:
       {
-	std::cerr << "BEN: Implement this you lazy bastard!"
-		  << std::endl;
+	*libMesh::err << "BEN: Implement this you lazy bastard!"
+		      << std::endl;
 	libmesh_error();
 
 	return false;
@@ -1022,7 +1022,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 #endif
 
     default:
-      std::cerr << "ERROR: Unknown element type " << t << std::endl;
+      *libMesh::err << "ERROR: Unknown element type " << t << std::endl;
       libmesh_error();
     }
 

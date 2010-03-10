@@ -51,9 +51,9 @@ Real FE<2,SZABAB>::shape(const ElemType,
 			 const unsigned int,
 			 const Point&)
 {
-  std::cerr << "Szabo-Babuska polynomials require the element type\n"
-	    << "because edge orientation is needed."
-	    << std::endl;
+  *libMesh::err << "Szabo-Babuska polynomials require the element type\n"
+	        << "because edge orientation is needed."
+	        << std::endl;
   
   libmesh_error();
   return 0.;
@@ -704,7 +704,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 
       // by default throw an error
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
 
     } // switch order
@@ -724,9 +724,9 @@ Real FE<2,SZABAB>::shape_deriv(const ElemType,
 				   const unsigned int,
 				   const Point&)
 {
-  std::cerr << "Szabo-Babuska polynomials require the element type\n"
-	    << "because edge orientation is needed."
-	    << std::endl;
+  *libMesh::err << "Szabo-Babuska polynomials require the element type\n"
+	        << "because edge orientation is needed."
+	        << std::endl;
 
   libmesh_error();
   return 0.;
@@ -1360,7 +1360,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
       
       // by default throw an error;call the orientation-independent shape functions
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
+      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
 
@@ -1381,9 +1381,9 @@ Real FE<2,SZABAB>::shape_second_deriv(const ElemType,
   static bool warning_given = false;
 
   if (!warning_given)
-  std::cerr << "Second derivatives for Szabab elements "
-            << " are not yet implemented!"
-            << std::endl;
+  *libMesh::err << "Second derivatives for Szabab elements "
+                << " are not yet implemented!"
+                << std::endl;
 
   warning_given = true;
   return 0.;
@@ -1401,9 +1401,9 @@ Real FE<2,SZABAB>::shape_second_deriv(const Elem*,
   static bool warning_given = false;
 
   if (!warning_given)
-  std::cerr << "Second derivatives for Szabab elements "
-            << " are not yet implemented!"
-            << std::endl;
+  *libMesh::err << "Second derivatives for Szabab elements "
+                << " are not yet implemented!"
+                << std::endl;
 
   warning_given = true;
   return 0.;

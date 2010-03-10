@@ -112,8 +112,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
   if (inf_elem_type != INFHEX8 &&
       inf_elem_type != INFPRISM6)
     {
-      std::cerr << "ERROR: InfFE::inverse_map is currently implemented only for\n"
-		<< " infinite elments of type InfHex8 and InfPrism6." << std::endl;
+      *libMesh::err << "ERROR: InfFE::inverse_map is currently implemented only for\n"
+		    << " infinite elments of type InfHex8 and InfPrism6." << std::endl;
       libmesh_error();
     }
 
@@ -160,8 +160,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 
     case 2:
       {
-	std::cerr << "ERROR: InfFE::inverse_map is not yet implemented"
-		  << " in 2d" << std::endl;
+	*libMesh::err << "ERROR: InfFE::inverse_map is not yet implemented"
+		      << " in 2d" << std::endl;
 	libmesh_error();
 	break;
       }
@@ -375,23 +375,23 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	    {
 	      libmesh_here();
 	      {
-		std::cerr << "WARNING: Newton scheme has not converged in "
-			  << cnt << " iterations:\n" 
-			  << "   physical_point="
-			  << physical_point
-			  << "   dp="
-			  << dp
-			  << "   p="
-			  << p
-			  << "   error=" << inverse_map_error
-			  << std::endl;
+		*libMesh::err << "WARNING: Newton scheme has not converged in "
+			      << cnt << " iterations:\n" 
+			      << "   physical_point="
+			      << physical_point
+			      << "   dp="
+			      << dp
+			      << "   p="
+			      << p
+			      << "   error=" << inverse_map_error
+			      << std::endl;
 	      }
 	    }
 
 	  if (cnt > 20)
 	    {
-	      std::cerr << "ERROR: Newton scheme FAILED to converge in "
-			<< cnt << " iterations!" << std::endl;
+	      *libMesh::err << "ERROR: Newton scheme FAILED to converge in "
+			    << cnt << " iterations!" << std::endl;
 	      libmesh_error();
 	    }
 
@@ -425,9 +425,9 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  if (p(0)+1 < tolerance)
 	    {
 	      libmesh_here();
-	      std::cerr << "WARNING: radial distance p(0) is "
-			<< p(0)
-			<< std::endl;
+	      *libMesh::err << "WARNING: radial distance p(0) is "
+			    << p(0)
+			    << std::endl;
 	    }
 #endif
 	  
@@ -462,7 +462,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  // if (p(1)+1 < tolerance)
 	  //  {
 	  //    libmesh_here();
-	  //    std::cerr << "WARNING: radial distance p(1) is "
+	  //    *libMesh::err << "WARNING: radial distance p(1) is "
 	  //	      << p(1)
 	  //	      << std::endl;
 	  //  }
@@ -504,7 +504,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  // if (p(2)+1 < tolerance)
 	  //  {
 	  // libmesh_here();
-	  // std::cerr << "WARNING: radial distance p(2) is "
+	  // *libMesh::err << "WARNING: radial distance p(2) is "
 	  //	      << p(2)
 	  //	      << std::endl;
 	  //  }
@@ -573,8 +573,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  if (cnt > 20)
 	    {
 	      
-	      std::cerr << "ERROR: 1D Newton scheme FAILED to converge"
-			<< std::endl;
+	      *libMesh::err << "ERROR: 1D Newton scheme FAILED to converge"
+			    << std::endl;
 	      
 	      libmesh_error();
 	    }
@@ -616,7 +616,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	if (diff.size() > tolerance)
 	{
 	libmesh_here();
-	std::cerr << "WARNING:  diff is "
+	*libMesh::err << "WARNING:  diff is "
 	<< diff.size()
 	<< std::endl;
 	}

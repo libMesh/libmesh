@@ -552,14 +552,16 @@ public:
 			       const NumericVector<T>& vec2) = 0;
 
   /**
-   * Prints the local contents of the vector to the screen.
+   * Prints the local contents of the vector, by default to
+   * libMesh::out
    */
-  virtual void print(std::ostream& os=std::cout) const;
+  virtual void print(std::ostream& os=*libMesh::out) const;
 
   /**
-   * Prints the global contents of the vector to the screen.
+   * Prints the global contents of the vector, by default to
+   * libMesh::out
    */
-  virtual void print_global(std::ostream& os=std::cout) const;
+  virtual void print_global(std::ostream& os=*libMesh::out) const;
 
   /**
    * Same as above but allows you to use stream syntax.
@@ -578,8 +580,8 @@ public:
    */
   virtual void print_matlab(const std::string name="NULL") const
   {
-    std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
-    std::cerr << "ERROR writing MATLAB file " << name << std::endl;
+    *libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
+    *libMesh::err << "ERROR writing MATLAB file " << name << std::endl;
     libmesh_error();
   }
 
@@ -592,7 +594,7 @@ public:
   virtual void create_subvector(NumericVector<T>& ,
 				const std::vector<unsigned int>& ) const
   {
-    std::cerr << "ERROR: Not Implemented in base class yet!" << std::endl;
+    *libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
     libmesh_error();
   }
     

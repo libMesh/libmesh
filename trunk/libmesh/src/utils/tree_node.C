@@ -292,8 +292,8 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    }
     
 	  default:
-	    std::cerr << "c >= N! : " << c
-		      << std::endl;
+	    *libMesh::err << "c >= N! : " << c
+		          << std::endl;
 	    libmesh_error();
 	  }
 
@@ -349,7 +349,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    }
 	    
 	  default:
-	    std::cerr << "c >= N!" << std::endl;
+	    *libMesh::err << "c >= N!" << std::endl;
 	    libmesh_error();
 	    
 	  }
@@ -358,7 +358,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
       } // case 4
 
     default:
-      std::cerr << "Only implemented for Octrees and QuadTrees!" << std::endl;
+      *libMesh::err << "Only implemented for Octrees and QuadTrees!" << std::endl;
       libmesh_error();
 
     }
@@ -373,16 +373,16 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 
 
 template <unsigned int N>
-void TreeNode<N>::print_nodes() const
+void TreeNode<N>::print_nodes(std::ostream& out) const
 {
   if (this->active())
     {
-      std::cout << "TreeNode Level: " << this->level() << std::endl;
+      out << "TreeNode Level: " << this->level() << std::endl;
       
       for (unsigned int n=0; n<nodes.size(); n++)
-	std::cout << " " << nodes[n]->id();
+	out << " " << nodes[n]->id();
       
-      std::cout << std::endl << std::endl;
+      out << std::endl << std::endl;
 	
     }
   else
@@ -395,17 +395,17 @@ void TreeNode<N>::print_nodes() const
 
 
 template <unsigned int N>
-void TreeNode<N>::print_elements() const
+void TreeNode<N>::print_elements(std::ostream& out) const
 {
   if (this->active())
     {
-      std::cout << "TreeNode Level: " << this->level() << std::endl;
+      out << "TreeNode Level: " << this->level() << std::endl;
      
       for (std::vector<const Elem*>::const_iterator pos=elements.begin();
 	   pos != elements.end(); ++pos)
-	std::cout << " " << *pos;
+	out << " " << *pos;
 
-      std::cout << std::endl << std::endl;	
+      out << std::endl << std::endl;	
     }
   else
     {

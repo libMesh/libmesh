@@ -60,8 +60,8 @@ namespace {
   // If std::cout and std::cerr are redirected, we need to
   // be a little careful and save the original streambuf objects,
   // replacing them in the destructor before program termination.
-  std::streambuf* cout_buf (NULL);
-  std::streambuf* cerr_buf (NULL);
+  std::streambuf* out_buf (NULL);
+  std::streambuf* err_buf (NULL);
   
   AutoPtr<Threads::task_scheduler_init> task_scheduler (NULL);
 #if defined(LIBMESH_HAVE_MPI)
@@ -82,6 +82,9 @@ namespace {
 #ifdef LIBMESH_HAVE_MPI
 MPI_Comm           libMesh::COMM_WORLD = MPI_COMM_NULL;
 #endif
+
+std::ostream* libMesh::out = &std::cout;
+std::ostream* libMesh::err = &std::cerr;
 
 Parallel::Communicator Parallel::Communicator_World;
 
@@ -257,13 +260,41 @@ void _init (int &argc, char** & argv,
   // some IO tests where IO peformance improves by a factor of two.
   if (!libMesh::on_command_line ("--sync-with-stdio"))
     std::ios::sync_with_stdio(false);
+
+  // Honor the --separate-libmeshout command-line option.
+  // When this is specified, the library uses an independent ostream
+  // for libMesh::out/libMesh::err messages, and
+  // std::cout and std::cerr are untouched by any other options
+  if (libMesh::on_command_line ("--separate-libmeshout"))
+    {
+      // Redirect.  We'll share streambufs with cout/cerr for now, but
+      // presumably anyone using this option will want to replace the
+      // bufs later.
+      libMesh::out = new std::ostream(std::cout.rdbuf());
+      libMesh::err = new std::ostream(std::cerr.rdbuf());
+    }
   
-  // redirect std::cout to nothing on all
+  // Honor the --redirect-stdout command-line option.
+  // When this is specified each processor sends
+  // libMesh::out/libMesh::err messages to
+  // stdout.processor.####
+  if (libMesh::on_command_line ("--redirect-stdout"))
+    {
+      char filechar[80];
+      sprintf (filechar, "stdout.processor.%04d",
+	       libMesh::processor_id());
+      _ofstream.reset (new std::ofstream (filechar));
+      // Redirect, saving the original streambufs!
+      out_buf = libMesh::out->rdbuf (_ofstream->rdbuf());
+      err_buf = libMesh::err->rdbuf (_ofstream->rdbuf());
+    }
+
+  // redirect libMesh::out to nothing on all
   // other processors unless explicitly told
   // not to via the --keep-cout command-line argument.
   if (libMesh::processor_id() != 0)
     if (!libMesh::on_command_line ("--keep-cout"))
-      std::cout.rdbuf (NULL);
+      libMesh::out->rdbuf (NULL);
   
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
@@ -304,7 +335,7 @@ int _close ()
       if (libmesh_initialized_mpi &&
           std::uncaught_exception())
         {
-          std::cerr << "Uncaught exception - aborting" << std::endl;
+          *libMesh::err << "Uncaught exception - aborting" << std::endl;
           MPI_Abort(libMesh::COMM_WORLD,1);
         }
 # if defined(LIBMESH_HAVE_PETSC) 
@@ -341,15 +372,15 @@ int _close ()
   // Print an informative message if we detect a memory leak
   if (ReferenceCounter::n_objects() != 0)
     {
-      std::cerr << "Memory leak detected!"
-		<< std::endl;
+      *libMesh::err << "Memory leak detected!"
+		    << std::endl;
       
 #if !defined(LIBMESH_ENABLE_REFERENCE_COUNTING) || defined(NDEBUG)
 
-      std::cerr << "Compile in DEBUG mode with --enable-reference-counting"
-		<< std::endl
-		<< "for more information"
-		<< std::endl;
+      *libMesh::err << "Compile in DEBUG mode with --enable-reference-counting"
+		    << std::endl
+		    << "for more information"
+		    << std::endl;
 #endif
   
     }
@@ -375,8 +406,8 @@ int _close ()
       libMesh::perflog.clear();
       
       // If stdout/stderr were redirected to files, reset them now.
-      std::cout.rdbuf (cout_buf);
-      std::cerr.rdbuf (cerr_buf);
+      libMesh::out->rdbuf (out_buf);
+      libMesh::err->rdbuf (err_buf);
     }
   
   // Return the number of outstanding objects.
@@ -425,21 +456,6 @@ LibMeshInit::LibMeshInit (int &argc, char** & argv,
 		          MPI_Comm COMM_WORLD_IN)
 {
   libMesh::_init(argc, argv, COMM_WORLD_IN);
-
-  // Honor the --redirect-stdout command-line option.
-  // When this is specified each processor sends
-  // std::cout/std::cerr messages to
-  // stdout.processor.####
-  if (libMesh::on_command_line ("--redirect-stdout"))
-    {
-      char filechar[80];
-      sprintf (filechar, "stdout.processor.%04d",
-	       libMesh::processor_id());
-      _ofstream.reset (new std::ofstream (filechar));
-      // Redirect, saving the original streambufs!
-      cout_buf = std::cout.rdbuf (_ofstream->rdbuf());
-      cerr_buf = std::cerr.rdbuf (_ofstream->rdbuf());
-    }
 }
 #endif
 

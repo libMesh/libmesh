@@ -421,21 +421,21 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 // we don't care about neighbors of subactive element.
                 if ((!neigh->active()) && (!elem->subactive()))
                 {
-                  std::cerr << "On processor " << libMesh::processor_id() 
-                            << std::endl;
-                  std::cerr << "Bad element ID = " << elem->id() 
+                  *libMesh::err << "On processor " << libMesh::processor_id() 
+                                << std::endl;
+                  *libMesh::err << "Bad element ID = " << elem->id() 
                     << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
-                  std::cerr << "Bad element proc_ID = " << elem->processor_id() 
+                  *libMesh::err << "Bad element proc_ID = " << elem->processor_id() 
                     << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
-                  std::cerr << "Bad element size = " << elem->hmin() 
+                  *libMesh::err << "Bad element size = " << elem->hmin() 
                     << ", Bad neighbor size = " << neigh->hmin() << std::endl;
-                  std::cerr << "Bad element center = " << elem->centroid() 
+                  *libMesh::err << "Bad element center = " << elem->centroid() 
                     << ", Bad neighbor center = " << neigh->centroid() << std::endl;
-                  std::cerr << "ERROR: " 
+                  *libMesh::err << "ERROR: " 
                     << (elem->active()?"Active":"Ancestor")
                     << " Element at level "
                     << elem->level() << std::endl;
-                  std::cerr << "with "
+                  *libMesh::err << "with "
                     << (elem->parent()->active()?"active":
                         (elem->parent()->subactive()?"subactive":"ancestor"))
                     << " parent share "
@@ -473,9 +473,9 @@ void UnstructuredMesh::read (const std::string& name,
     
     if (!in.good())
       {
-	std::cerr << "ERROR: cannot locate specified file:\n\t"
-		  << name
-		  << std::endl;
+	*libMesh::err << "ERROR: cannot locate specified file:\n\t"
+		      << name
+		      << std::endl;
 	libmesh_error();
       }
   }
@@ -580,9 +580,9 @@ void UnstructuredMesh::read (const std::string& name,
 	    {
 	      if (mesh_data == NULL)
 		{
-		  std::cerr << "Error! You must pass a "
-			    << "valid MeshData pointer to "
-			    << "read UNV files!" << std::endl;
+		  *libMesh::err << "Error! You must pass a "
+			        << "valid MeshData pointer to "
+			        << "read UNV files!" << std::endl;
 		  libmesh_error();
 		}
 	      UNVIO(*this, *mesh_data).read (new_name);
@@ -607,9 +607,9 @@ void UnstructuredMesh::read (const std::string& name,
       
 	  else
 	    {
-	      std::cerr << " ERROR: Unrecognized file extension: " << name
-			<< "\n   I understand the following:\n\n"
-			<< "     *.e    -- Sandia's ExodusII format\n"
+	      *libMesh::err << " ERROR: Unrecognized file extension: " << name
+			    << "\n   I understand the following:\n\n"
+			    << "     *.e    -- Sandia's ExodusII format\n"
 			<< "     *.exd  -- Sandia's ExodusII format\n"
 			<< "     *.gmv  -- LANL's General Mesh Viewer format\n"
 			<< "     *.mat  -- Matlab triangular ASCII file\n"
@@ -707,9 +707,9 @@ void UnstructuredMesh::write (const std::string& name,
 	  {
 	    if (mesh_data == NULL)
 	      {
-		std::cerr << "Error! You must pass a "
-			  << "valid MeshData pointer to "
-			  << "write UNV files!" << std::endl;
+		*libMesh::err << "Error! You must pass a "
+			      << "valid MeshData pointer to "
+			      << "write UNV files!" << std::endl;
 		libmesh_error();
 	      }
 	    UNVIO(*this, *mesh_data).write (new_name);
@@ -732,25 +732,26 @@ void UnstructuredMesh::write (const std::string& name,
 	
 	else
 	  {
-	    std::cerr << " ERROR: Unrecognized file extension: " << name
-		      << "\n   I understand the following:\n\n"
-		      << "     *.dat   -- Tecplot ASCII file\n"
-                      << "     *.e     -- Sandia's ExodusII format\n"
-                      << "     *.exd   -- Sandia's ExodusII format\n"
-		      << "     *.fro   -- ACDL's surface triangulation file\n"
-		      << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
-		      << "     *.mesh  -- MEdit mesh format\n"
-		      << "     *.mgf   -- MGF binary mesh format\n"
-		      << "     *.msh   -- GMSH ASCII file\n"
-		      << "     *.plt   -- Tecplot binary file\n"
-		      << "     *.poly  -- TetGen ASCII file\n"
-		      << "     *.ucd   -- AVS's ASCII UCD format\n"
-		      << "     *.ugrid -- Kelly's DIVA ASCII format\n"
-		      << "     *.unv   -- I-deas Universal format\n"
-		      << "     *.xda   -- libMesh ASCII format\n"
-		      << "     *.xdr   -- libMesh binary format,\n"
-		      << std::endl
-		      << "\n Exiting without writing output\n";
+	    *libMesh::err
+              << " ERROR: Unrecognized file extension: " << name
+              << "\n   I understand the following:\n\n"
+              << "     *.dat   -- Tecplot ASCII file\n"
+              << "     *.e     -- Sandia's ExodusII format\n"
+              << "     *.exd   -- Sandia's ExodusII format\n"
+              << "     *.fro   -- ACDL's surface triangulation file\n"
+              << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
+              << "     *.mesh  -- MEdit mesh format\n"
+              << "     *.mgf   -- MGF binary mesh format\n"
+              << "     *.msh   -- GMSH ASCII file\n"
+              << "     *.plt   -- Tecplot binary file\n"
+              << "     *.poly  -- TetGen ASCII file\n"
+              << "     *.ucd   -- AVS's ASCII UCD format\n"
+              << "     *.ugrid -- Kelly's DIVA ASCII format\n"
+              << "     *.unv   -- I-deas Universal format\n"
+              << "     *.xda   -- libMesh ASCII format\n"
+              << "     *.xdr   -- libMesh binary format,\n"
+              << std::endl
+              << "\n Exiting without writing output\n";
 	  }    
       }
   
@@ -805,13 +806,14 @@ void UnstructuredMesh::write (const std::string& name,
     }
   else
     {
-      std::cerr << " ERROR: Unrecognized file extension: " << name
-		<< "\n   I understand the following:\n\n"
-		<< "     *.dat  -- Tecplot ASCII file\n"
-		<< "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
-		<< "     *.plt  -- Tecplot binary file\n"
-		<< "     *.pvtu -- Paraview VTK file\n"
-		<< "\n Exiting without writing output\n";
+      *libMesh::err
+        << " ERROR: Unrecognized file extension: " << name
+	<< "\n   I understand the following:\n\n"
+	<< "     *.dat  -- Tecplot ASCII file\n"
+	<< "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
+	<< "     *.plt  -- Tecplot binary file\n"
+	<< "     *.pvtu -- Paraview VTK file\n"
+	<< "\n Exiting without writing output\n";
     }
 
   STOP_LOG("write()", "Mesh");
@@ -833,15 +835,15 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh& pid_mesh,
 #ifdef DEBUG
   if (this->n_processors() < pid)
     {
-      std::cout << "WARNING:  You are creating a "
-		<< "mesh for a processor id (="
-		<< pid
-		<< ") greater than "
-		<< "the number of processors available for "
-		<< "the calculation. (="
-		<< libMesh::n_processors()
-		<< ")."
-		<< std::endl;
+      *libMesh::out << "WARNING:  You are creating a "
+		    << "mesh for a processor id (="
+		    << pid
+		    << ") greater than "
+		    << "the number of processors available for "
+		    << "the calculation. (="
+		    << libMesh::n_processors()
+		    << ")."
+		    << std::endl;
     }
 #endif
   

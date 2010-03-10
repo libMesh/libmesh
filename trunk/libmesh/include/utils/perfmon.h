@@ -48,7 +48,7 @@ class PerfMon
 	    
   ~PerfMon ();
   void reset ();
-  double print (std::string msg="NULL");
+  double print (std::string msg="NULL", std::ostream &out = *libMesh::out);
   
  private:
 
@@ -83,7 +83,7 @@ PerfMon::reset ()
 
 inline
 double
-PerfMon::print (std::string msg)
+PerfMon::print (std::string msg, std::ostream &out)
 {  
   gettimeofday (&the_time_stop, NULL);
   
@@ -100,27 +100,27 @@ PerfMon::print (std::string msg)
       if (proc_id == 0)
 	{
 	  if (msg == "NULL")
-	    std::cout << " " << id_string
-		      << ": elapsed time: "
-		      << elapsed_time << " (sec)"
-		      << std::endl;
+	    *libMesh::out << " " << id_string
+		          << ": elapsed time: "
+		          << elapsed_time << " (sec)"
+		          << std::endl;
 	  else
-	    std::cout << " " << msg
-		      << ": elapsed time: "
-		      << elapsed_time << " (sec)"
-		      << std::endl;
+	    *libMesh::out << " " << msg
+		          << ": elapsed time: "
+		          << elapsed_time << " (sec)"
+		          << std::endl;
 	  
 #ifdef HAVE_PAPI_H
 	  if (msg == "NULL")
-	    std::cout << " " << id_string
-		      << ": mflops: "
-		      << mflops
-		      << std::endl;
+	    *libMesh::out << " " << id_string
+		          << ": mflops: "
+		          << mflops
+		          << std::endl;
 	  else
-	    std::cout << " " << msg
-		      << ": mflops: "
-		      << mflops
-		      << std::endl;
+	    *libMesh::out << " " << msg
+		          << ": mflops: "
+		          << mflops
+		          << std::endl;
       
 #endif
 

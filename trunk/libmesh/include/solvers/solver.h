@@ -159,8 +159,8 @@ Solver::~Solver ()
 inline
 void Solver::init ()
 {
-  std::cout << "Initializing $Id$"
-	    << std::endl;
+  *libMesh::out << "Initializing $Id$"
+	       << std::endl;
   
   // Initialize the system.
   this->system().init ();

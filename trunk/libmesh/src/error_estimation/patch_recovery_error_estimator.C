@@ -415,8 +415,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		          Fyz(i) += JxW[qp]*hess_u_h(1,2)*psi[i];
 		        }
 #else
-		      std::cerr << "ERROR:  --enable-second-derivatives is required\n"
-				<< "        for _sobolev_order == 2!\n";
+		      *libMesh::err << "ERROR:  --enable-second-derivatives is required\n"
+				    << "        for _sobolev_order == 2!\n";
 		      libmesh_error();
 #endif
                     }
@@ -556,8 +556,8 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	          temperr[4] -= hess_u_h(0,2);
 	          temperr[5] -= hess_u_h(1,2);
 #else
-		      std::cerr << "ERROR:  --enable-second-derivatives is required\n"
-				<< "        for _sobolev_order == 2!\n";
+		      *libMesh::err << "ERROR:  --enable-second-derivatives is required\n"
+				    << "        for _sobolev_order == 2!\n";
 		      libmesh_error();
 #endif
                 }

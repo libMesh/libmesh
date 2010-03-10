@@ -403,7 +403,7 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
     libmesh_assert (nodal_soln.size() == elem->n_nodes());
 	           
 #ifdef LIBMESH_ENABLE_COMPLEX
-    std::cerr << "Complex-valued Ensight output not yet supported" << std::endl;
+    *libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
     libmesh_not_implemented()
 #endif
                    
@@ -502,7 +502,7 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
     libmesh_assert (nodal_soln_v.size() == elem->n_nodes());
 	          
 #ifdef LIBMESH_ENABLE_COMPLEX
-    std::cerr << "Complex-valued Ensight output not yet supported" << std::endl;
+    *libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
     libmesh_not_implemented()
 #endif
                    
@@ -550,7 +550,7 @@ void EnsightIO::elem_type_to_string(ElemType type, char* buffer)
     std::strcpy(buffer,"quad8");
     break;
   case QUAD9:
-    std::cout<<"QUAD9: element not supported!"<<std::endl;
+    *libMesh::out<<"QUAD9: element not supported!"<<std::endl;
     libmesh_error();
     break;
                 
@@ -573,7 +573,7 @@ void EnsightIO::elem_type_to_string(ElemType type, char* buffer)
     std::strcpy(buffer,"hexa20");
     break;
   case HEX27:
-    std::cout<<"HEX27: element not supported!"<<std::endl;
+    *libMesh::out<<"HEX27: element not supported!"<<std::endl;
     libmesh_error();
     break;
   case PYRAMID5:

@@ -159,12 +159,12 @@ void HPCoarsenTest::select_refinement (System &system)
     {
       if (component_scale.size() != n_vars)
 	{
-	  std::cerr << "ERROR: component_scale is the wrong size:"
-		    << std::endl
-		    << " component_scale.size()=" << component_scale.size()
-		    << std::endl
-		    << " n_vars=" << n_vars
-		    << std::endl;
+	  *libMesh::err << "ERROR: component_scale is the wrong size:"
+		        << std::endl
+		        << " component_scale.size()=" << component_scale.size()
+		        << std::endl
+		        << " n_vars=" << n_vars
+		        << std::endl;
 	  libmesh_error();
 	}
     }
@@ -550,12 +550,14 @@ void HPCoarsenTest::select_refinement (System &system)
       const unsigned int new_p_dofs = dofs_per_p_elem -
         dofs_per_elem;
       
-std::cerr << "Cell " << e_id << ": h = " << elem->hmax()
-          << ", p = " << elem->p_level() + 1 << "," << std::endl 
-          << "     h_error = " << h_error_per_cell[e_id] 
-          << ", p_error = " << p_error_per_cell[e_id] << std::endl
-          << "     new_h_dofs = " << new_h_dofs
-          << ", new_p_dofs = " << new_p_dofs << std::endl;
+/*
+*libMesh::err << "Cell " << e_id << ": h = " << elem->hmax()
+              << ", p = " << elem->p_level() + 1 << "," << std::endl 
+              << "     h_error = " << h_error_per_cell[e_id] 
+              << ", p_error = " << p_error_per_cell[e_id] << std::endl
+              << "     new_h_dofs = " << new_h_dofs
+              << ", new_p_dofs = " << new_p_dofs << std::endl;
+*/
         
       if ((std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs) 
           > (std::sqrt(h_error_per_cell[e_id]) / new_h_dofs))

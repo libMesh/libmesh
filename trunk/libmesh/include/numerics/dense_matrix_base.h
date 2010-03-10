@@ -103,9 +103,9 @@ public:
   unsigned int n() const { return _n; }
   
   /**
-   * Pretty-print the matrix to \p stdout.
+   * Pretty-print the matrix, by default to \p libMesh::out.
    */
-  void print(std::ostream& os) const;
+  void print(std::ostream& os = *libMesh::out) const;
 
   /**
    * Formatted print as above but allows you to do

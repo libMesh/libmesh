@@ -68,9 +68,9 @@ LinearSolver<T>::build(const SolverPackage solver_package)
 #endif
 
     default:
-      std::cerr << "ERROR:  Unrecognized solver package: "
-		<< solver_package
-		<< std::endl;
+      *libMesh::err << "ERROR:  Unrecognized solver package: "
+		    << solver_package
+		    << std::endl;
       libmesh_error();
     }
     
@@ -104,7 +104,7 @@ LinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 {
   if(this->_is_initialized)
   {
-    std::cerr<<"Preconditioner must be attached before the solver is initialized!"<<std::endl;
+    *libMesh::err<<"Preconditioner must be attached before the solver is initialized!"<<std::endl;
     libmesh_error();
   }
   

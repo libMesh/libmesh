@@ -50,11 +50,11 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
   if (be_verbose && libMesh::processor_id() == 0)
     {
 #ifdef DEBUG
-      std::cout << " Determined origin for Infinite Elements:" 
-		<< std::endl
-		<< "  ";
-      origin.write_unformatted(std::cout);
-      std::cout << std::endl;
+      *libMesh::out << " Determined origin for Infinite Elements:" 
+		    << std::endl
+		    << "  ";
+      origin.write_unformatted(*libMesh::out);
+      *libMesh::out << std::endl;
 #endif
     }
 
@@ -117,28 +117,28 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
 
       if (be_verbose)
         {
-	  std::cout << " Origin for Infinite Elements:" << std::endl;
+	  *libMesh::out << " Origin for Infinite Elements:" << std::endl;
 
 	  if (!origin_x.first)
-	      std::cout << "  determined x-coordinate" << std::endl;
+	      *libMesh::out << "  determined x-coordinate" << std::endl;
 	  if (!origin_y.first)
-	      std::cout << "  determined y-coordinate" << std::endl;
+	      *libMesh::out << "  determined y-coordinate" << std::endl;
 	  if (!origin_z.first)
-	      std::cout << "  determined z-coordinate" << std::endl;
+	      *libMesh::out << "  determined z-coordinate" << std::endl;
 
-	  std::cout << "  coordinates: ";
-	  origin.write_unformatted(std::cout);
-	  std::cout << std::endl;
+	  *libMesh::out << "  coordinates: ";
+	  origin.write_unformatted(*libMesh::out);
+	  *libMesh::out << std::endl;
 	}
     }
 
   else if (be_verbose)
 
     {
-      std::cout << " Origin for Infinite Elements:" << std::endl;
-      std::cout << "  coordinates: ";
-      origin.write_unformatted(std::cout);
-      std::cout << std::endl;
+      *libMesh::out << " Origin for Infinite Elements:" << std::endl;
+      *libMesh::out << "  coordinates: ";
+      origin.write_unformatted(*libMesh::out);
+      *libMesh::out << std::endl;
     }
 
 
@@ -177,9 +177,9 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       if (be_verbose)
         {
 	  this->_mesh.print_info();
-	  std::cout << "Data pre-processing:" << std::endl
-		    << " convert the <int,int> list to a Node* list..."
-		    << std::endl;
+	  *libMesh::out << "Data pre-processing:" << std::endl
+		        << " convert the <int,int> list to a Node* list..."
+		        << std::endl;
 	}
 
       // First use a std::vector<unsigned int> that holds
@@ -244,8 +244,8 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
 	}
 
       if (be_verbose)
-	  std::cout << "  finished identifying " << unique_size 
-		    << " target nodes." << std::endl;  
+	  *libMesh::out << "  finished identifying " << unique_size 
+		        << " target nodes." << std::endl;  
     }
 
   else
@@ -286,10 +286,10 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
   if (be_verbose)
     {
 #ifdef DEBUG
-      std::cout << " Building Infinite Elements:" << std::endl;
-      std::cout << "  updating element neighbor tables..." << std::endl;
+      *libMesh::out << " Building Infinite Elements:" << std::endl;
+      *libMesh::out << "  updating element neighbor tables..." << std::endl;
 #else
-      std::cout << " Verbose mode disabled in non-debug mode." << std::endl;
+      *libMesh::out << " Verbose mode disabled in non-debug mode." << std::endl;
 #endif
     }
 
@@ -316,11 +316,11 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 #ifdef DEBUG
   if (be_verbose)
     {
-      std::cout << "  collecting boundary sides";
+      *libMesh::out << "  collecting boundary sides";
       if (x_sym || y_sym || z_sym)
-	std::cout << ", skipping sides in symmetry planes..." << std::endl;
+	*libMesh::out << ", skipping sides in symmetry planes..." << std::endl;
       else
-	std::cout << "..." << std::endl;
+	*libMesh::out << "..." << std::endl;
     }
 #endif
 
@@ -470,12 +470,12 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 	
 #ifdef DEBUG
   if (be_verbose)
-    std::cout << "  found " 
-	      << faces.size() 
-	      << " inner and " 
-	      << ofaces.size() 
-	      << " outer boundary faces" 
-	      << std::endl;
+    *libMesh::out << "  found " 
+	          << faces.size() 
+	          << " inner and " 
+	          << ofaces.size() 
+	          << " outer boundary faces" 
+	          << std::endl;
 #endif	
 	
   // When the user provided a non-null pointer to
@@ -586,9 +586,9 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
 	  // 1D infinite elements not supported
 	  default: 
-	    std::cout << "InfElemBuilder::build_inf_elem(Point, bool, bool, bool, bool): "
-		      << "invalid face element "
-		      << std::endl;
+	    *libMesh::out << "InfElemBuilder::build_inf_elem(Point, bool, bool, bool, bool): "
+		          << "invalid face element "
+		          << std::endl;
 	    continue;
 	}
 
@@ -640,13 +640,13 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
     pmesh->libmesh_assert_valid_parallel_ids();
 
   if (be_verbose)
-    std::cout << "  added "
-	      << this->_mesh.n_elem() - n_conventional_elem
-	      << " infinite elements and "
-	      << onodes.size() 
-	      << " nodes to the mesh"
-	      << std::endl
-	      << std::endl;
+    *libMesh::out << "  added "
+	          << this->_mesh.n_elem() - n_conventional_elem
+	          << " infinite elements and "
+	          << onodes.size() 
+	          << " nodes to the mesh"
+	          << std::endl
+	          << std::endl;
 #endif
 
   STOP_LOG("build_inf_elem()", "InfElemBuilder");

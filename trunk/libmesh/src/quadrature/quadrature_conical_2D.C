@@ -42,7 +42,7 @@ void QConical::init_2D(const ElemType _type,
       // Unsupported element type
     default:
       {
-	std::cerr << "ERROR: Unsupported element type: " << _type << std::endl;
+	*libMesh::err << "ERROR: Unsupported element type: " << _type << std::endl;
 	libmesh_error();
       }
     } // end switch (_type)

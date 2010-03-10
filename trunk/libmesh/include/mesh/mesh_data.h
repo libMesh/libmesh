@@ -177,7 +177,7 @@ public:
   /**
    * Prints relevant information about the mesh.
    */
-  void print_info (std::ostream& os=std::cout) const;
+  void print_info (std::ostream& os=*libMesh::out) const;
 
   /**
    * Same as above, but allows you to use the stream syntax.
@@ -961,7 +961,7 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 #ifdef DEBUG
   if (pos == _elem_data.end())
     {
-      std::cerr << "ERROR: No data for this element.  Use has_data() first!" << std::endl;
+      *libMesh::err << "ERROR: No data for this element.  Use has_data() first!" << std::endl;
       libmesh_error();
     }
 #endif

@@ -524,11 +524,9 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     dphidz.resize  (n_total_approx_shape_functions);
     dphidxi.resize (n_total_approx_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    static bool warning_given = false;
-    if (!warning_given)
-      std::cerr << "Second derivatives for Infinite elements"
-		<< " are not yet implemented!"
-		<< std::endl;
+    libmesh_do_once(*libMesh::err << "Second derivatives for Infinite elements"
+		                  << " are not yet implemented!"
+		                  << std::endl);
 
     d2phi.resize     (n_total_approx_shape_functions);
     d2phidx2.resize  (n_total_approx_shape_functions);
@@ -733,8 +731,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       // 1D
     case 1:
       {
-	std::cout << "ERROR: Not implemented." << std::endl;
-	libmesh_error();
+	libmesh_not_implemented();
 	break;
       }
 
@@ -744,8 +741,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       // 2D
     case 2:
       {
-	std::cout << "ERROR: Not implemented." << std::endl;
-	libmesh_error();
+	libmesh_not_implemented();
      	break;
       }
 
@@ -885,15 +881,13 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
       
     case 1:
       {
-	std::cout << "ERROR: Not implemented." << std::endl;
-	libmesh_error();
+	libmesh_not_implemented();
 	break;
       }
 
     case 2:
       {
-	std::cout << "ERROR: Not implemented." << std::endl;
-	libmesh_error();
+	libmesh_not_implemented();
 	break;
       }
     
