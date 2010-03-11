@@ -99,7 +99,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
   // Loop over the elements to find the minimum and maximum x values,
   // and also to find the element boundaries to write out as xtics
   // if requested.
-  Real x_min, x_max;
+  Real x_min=0., x_max=0.;
 
   // construct string for xtic positions at element edges
   std::stringstream xtics_stream;

@@ -363,7 +363,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		    {
 		      // Compute the solution on the current patch element
 		      // the quadrature point
-		      Number u_h;
+		      Number u_h = libMesh::zero;
 		      
 		      for (unsigned int i=0; i<n_dofs; i++)
 			u_h += (*phi)[i][qp]*system.current_solution (dof_indices[i]);
@@ -494,7 +494,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	          error_estimator.error_norm.type(var) == L_INF)
                 {
 	          // Compute the value at the current sample point
-	          Number u_h;
+	          Number u_h = libMesh::zero;
 	  
 	          for (unsigned int i=0; i<n_dofs; i++)
 		    u_h += (*phi)[i][sp]*system.current_solution (dof_indices[i]);
