@@ -243,16 +243,19 @@ namespace Parallel
       this->duplicate(comm._communicator);
     }
 
-    void duplicate(const communicator &comm) {
 #ifdef LIBMESH_HAVE_MPI
+    void duplicate(const communicator &comm) {
       if (_communicator != MPI_COMM_NULL) 
         {
           MPI_Comm_dup(comm, &_communicator);
           _I_duped_it = true;
         }
-#endif
       this->assign(_communicator);
     }
+#else
+    void duplicate(const communicator &) {
+    }
+#endif
 
     communicator& get() {
       return _communicator;
@@ -337,7 +340,7 @@ namespace Parallel
 
   private:
 
-    explicit Communicator (const Communicator &comm) {
+    explicit Communicator (const Communicator &) {
       // Don't use the copy constructor, just copy by reference or
       // pointer - it's too hard to keep a common used_tag_values if
       // each communicator is shared by more than one Communicator
@@ -581,12 +584,14 @@ namespace Parallel
   /**
    * Pause execution until all processors reach a certain point.
    */
+#ifdef LIBMESH_HAVE_MPI
   inline void barrier (const Communicator &comm = Communicator_World)
   {
-#ifdef LIBMESH_HAVE_MPI
     MPI_Barrier (comm.get());
-#endif
   }    
+#else
+  inline void barrier (const Communicator &) {}
+#endif
   
   //-------------------------------------------------------------------
   /**
