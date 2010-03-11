@@ -262,7 +262,7 @@ AutoPtr<Elem> Elem::build(const ElemType type,
            
     default:
       {
-	*libMesh::err << "ERROR: Undefined element type!." << std::endl;
+	libMesh::err << "ERROR: Undefined element type!." << std::endl;
 	libmesh_error();
       }
     }
@@ -855,7 +855,7 @@ Real Elem::quality (const ElemQuality q) const
       {
 	libmesh_here();
 
-	*libMesh::err << "ERROR:  unknown quality metric: "
+	libMesh::err << "ERROR:  unknown quality metric: "
 		      << q 
 		      << std::endl
 		      << "Cowardly returning 1."
@@ -915,7 +915,7 @@ void Elem::add_child (Elem* elem)
 	}
     }
 
-  *libMesh::err << "Error: Tried to add a child to an element with full children array"
+  libMesh::err << "Error: Tried to add a child to an element with full children array"
                 << std::endl;
   libmesh_error();
 }

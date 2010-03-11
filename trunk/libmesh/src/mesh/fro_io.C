@@ -75,7 +75,7 @@ void FroIO::write (const std::string& fname)
 	  // .fro likes TRI3's
 	  if ((*it)->type() != TRI3)
 	    {
-	      *libMesh::err << "ERROR:  .fro format only valid for triangles!\n"
+	      libMesh::err << "ERROR:  .fro format only valid for triangles!\n"
 			    << "  writing of " << fname << " aborted.\n"
 			    << std::endl;
 	      libmesh_error();
@@ -195,7 +195,7 @@ void FroIO::write (const std::string& fname)
 		    }
 		}
 
-// 		*libMesh::out << "node_list.size()=" << node_list.size()
+// 		libMesh::out << "node_list.size()=" << node_list.size()
 // 			      << ", n_edges+1=" << n_edges+1 << std::endl;		  
 	      }
 	    	    

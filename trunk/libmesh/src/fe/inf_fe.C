@@ -524,7 +524,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     dphidz.resize  (n_total_approx_shape_functions);
     dphidxi.resize (n_total_approx_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    libmesh_do_once(*libMesh::err << "Second derivatives for Infinite elements"
+    libmesh_do_once(libMesh::err << "Second derivatives for Infinite elements"
 		                  << " are not yet implemented!"
 		                  << std::endl);
 

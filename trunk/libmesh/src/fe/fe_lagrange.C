@@ -336,7 +336,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  default:
 	    {
 #ifdef DEBUG
-	      *libMesh::err << "ERROR: Bad ElemType = " << t
+	      libMesh::err << "ERROR: Bad ElemType = " << t
 			    << " for FIRST order approximation!" 
 			    << std::endl;
 #endif
@@ -384,7 +384,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 	  default:
 	    {
 #ifdef DEBUG
-	      *libMesh::err << "ERROR: Bad ElemType = " << t
+	      libMesh::err << "ERROR: Bad ElemType = " << t
 			    << " for SECOND order approximation!" 
 			    << std::endl;
 #endif
@@ -406,7 +406,7 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
           default:
             {
 #ifdef DEBUG
-              *libMesh::err << "ERROR: Bad ElemType = " << t
+              libMesh::err << "ERROR: Bad ElemType = " << t
                             << " for THIRD order approximation!" 
                             << std::endl;
 #endif
@@ -564,7 +564,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  default:
 	    {
 #ifdef DEBUG
-	      *libMesh::err << "ERROR: Bad ElemType = " << t
+	      libMesh::err << "ERROR: Bad ElemType = " << t
 			    << " for FIRST order approximation!" 
 			    << std::endl;
 #endif
@@ -594,7 +594,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  default:
 	    {
 #ifdef DEBUG
-	      *libMesh::err << "ERROR: Bad ElemType = " << t
+	      libMesh::err << "ERROR: Bad ElemType = " << t
 			    << " for SECOND order approximation!" 
 			    << std::endl;
 #endif
@@ -614,7 +614,7 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
 	  default:
 	    {
 #ifdef DEBUG
-	      *libMesh::err << "ERROR: Bad ElemType = " << t
+	      libMesh::err << "ERROR: Bad ElemType = " << t
 			    << " for THIRD order approximation!" 
 			    << std::endl;
 #endif

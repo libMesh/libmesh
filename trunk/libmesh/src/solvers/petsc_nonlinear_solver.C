@@ -60,7 +60,7 @@ extern "C"
     //int ierr=0;
 
     //if (its > 0)
-      *libMesh::out << "  NL step "
+      libMesh::out << "  NL step "
 		    << std::setw(2) << its
 		    << std::scientific
 		    << ", |residual|_2 = " << fnorm

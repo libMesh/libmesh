@@ -63,7 +63,7 @@ Preconditioner<T>::build(const SolverPackage solver_package)
 #endif
 */
     default:
-      *libMesh::err << "ERROR:  Unrecognized solver package: "
+      libMesh::err << "ERROR:  Unrecognized solver package: "
 		    << solver_package
 		    << std::endl;
       libmesh_error();

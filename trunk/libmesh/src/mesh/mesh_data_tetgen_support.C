@@ -56,7 +56,7 @@ void MeshData::read_tetgen (const std::string& name)
     }
   else
     {
-      *libMesh::err << "ERROR: Unrecognized file name: "
+      libMesh::err << "ERROR: Unrecognized file name: "
 		    << name << std::endl;
       libmesh_error();
     }
@@ -67,7 +67,7 @@ void MeshData::read_tetgen (const std::string& name)
 
   if ( !node_stream.good() || !ele_stream.good() )
     {
-      *libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
+      libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
 		    << "Error checking files "
 		    << name_node << " and "
 		    << name_ele  << std::endl;

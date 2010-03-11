@@ -117,13 +117,13 @@ public:
    * Prints the contents of the node_numbers vector if we
    * are active.
    */
-  void print_nodes(std::ostream& out=*libMesh::out) const;
+  void print_nodes(std::ostream& out=libMesh::out) const;
     
   /**
    * Prints the contents of the elements set if we
    * are active.
    */
-  void print_elements(std::ostream& out=*libMesh::out) const;
+  void print_elements(std::ostream& out=libMesh::out) const;
 
   /**
    * Transforms node numbers to element pointers.

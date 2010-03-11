@@ -268,7 +268,7 @@ void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
 
         default:
 	  {
-	    *libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
+	    libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
 	    libmesh_error();
 	  }
 	}
@@ -369,7 +369,7 @@ void TriangleInterface::triangulate()
     initial.numberofsegments = n_hole_points; // One segment for each hole point
 
   // Debugging
-  // *libMesh::out << "Number of segments set to: " << initial.numberofsegments << std::endl;
+  // libMesh::out << "Number of segments set to: " << initial.numberofsegments << std::endl;
   
   // Allocate space for the segments (2 int per segment)
   if (initial.numberofsegments > 0)
@@ -523,7 +523,7 @@ flags << "zBPQq";
       
     default:
       {
-	*libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
+	libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
 	libmesh_error();
       }
     }

@@ -170,7 +170,7 @@ public:
    * Prints information relevant to the quadrature rule, by default to
    * libMesh::out.
    */
-  void print_info(std::ostream& os=*libMesh::out) const;
+  void print_info(std::ostream& os=libMesh::out) const;
 
   /**
    * Maps the points of a 1D interval quadrature rule (typically [-1,1])
@@ -238,7 +238,7 @@ protected:
   {}
 #else
   {  
-    *libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
+    libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
 	          << " is not implemented for 2D." << std::endl;
     libmesh_error();
   }
@@ -258,7 +258,7 @@ protected:
   {}
 #else
   {  
-    *libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
+    libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
 	          << " is not implemented for 3D." << std::endl;
     libmesh_error();
   }

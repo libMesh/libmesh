@@ -51,7 +51,7 @@ Real FE<2,SZABAB>::shape(const ElemType,
 			 const unsigned int,
 			 const Point&)
 {
-  *libMesh::err << "Szabo-Babuska polynomials require the element type\n"
+  libMesh::err << "Szabo-Babuska polynomials require the element type\n"
 	        << "because edge orientation is needed."
 	        << std::endl;
   
@@ -704,7 +704,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 
       // by default throw an error
     default:
-      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
 
     } // switch order
@@ -724,7 +724,7 @@ Real FE<2,SZABAB>::shape_deriv(const ElemType,
 				   const unsigned int,
 				   const Point&)
 {
-  *libMesh::err << "Szabo-Babuska polynomials require the element type\n"
+  libMesh::err << "Szabo-Babuska polynomials require the element type\n"
 	        << "because edge orientation is needed."
 	        << std::endl;
 
@@ -1360,7 +1360,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
       
       // by default throw an error;call the orientation-independent shape functions
     default:
-      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
 
@@ -1381,7 +1381,7 @@ Real FE<2,SZABAB>::shape_second_deriv(const ElemType,
   static bool warning_given = false;
 
   if (!warning_given)
-  *libMesh::err << "Second derivatives for Szabab elements "
+  libMesh::err << "Second derivatives for Szabab elements "
                 << " are not yet implemented!"
                 << std::endl;
 
@@ -1401,7 +1401,7 @@ Real FE<2,SZABAB>::shape_second_deriv(const Elem*,
   static bool warning_given = false;
 
   if (!warning_given)
-  *libMesh::err << "Second derivatives for Szabab elements "
+  libMesh::err << "Second derivatives for Szabab elements "
                 << " are not yet implemented!"
                 << std::endl;
 

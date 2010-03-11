@@ -115,7 +115,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   const Real parent_cutoff = _coarsen_fraction*parent_error_delta + error_min;
 
 //   // Print information about the error
-//   *libMesh::out << " Error Information:"                     << std::endl
+//   libMesh::out << " Error Information:"                     << std::endl
 // 	    << " ------------------"                     << std::endl
 // 	    << "   min:              " << error_min      << std::endl
 // 	    << "   max:              " << error_max      << std::endl
@@ -272,7 +272,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   if (!_mesh.is_serial())
     {
       if (libMesh::processor_id() == 0)
-        *libMesh::err << "flag_elements_by_nelem_target does not yet "
+        libMesh::err << "flag_elements_by_nelem_target does not yet "
                       << "work on a parallel mesh." << std::endl;
       libmesh_error();
     }
@@ -415,7 +415,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   if (!_mesh.is_serial())
     {
       if (libMesh::processor_id() == 0)
-        *libMesh::err << "flag_elements_by_elem_fraction does not yet "
+        libMesh::err << "flag_elements_by_elem_fraction does not yet "
                       << "work on a parallel mesh." << std::endl;
       libmesh_error();
     }
@@ -557,7 +557,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
   if (!_mesh.is_serial())
     {
       if (libMesh::processor_id() == 0)
-        *libMesh::err << "flag_elements_by_mean_stddev does not yet "
+        libMesh::err << "flag_elements_by_mean_stddev does not yet "
                       << "work on a parallel mesh." << std::endl;
       libmesh_error();
     }

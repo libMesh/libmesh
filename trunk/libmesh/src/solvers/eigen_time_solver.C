@@ -92,7 +92,7 @@ void EigenTimeSolver::solve ()
 
   // Assemble the spatial part (matrix A) of the operator
   if (!this->quiet)
-    *libMesh::out << "Assembling matrix A." << std::endl;
+    libMesh::out << "Assembling matrix A." << std::endl;
   _system.matrix =   &( _system.get_matrix ("System Matrix") );
   this->now_assembling = Matrix_A;
   _system.assembly(true, true);
@@ -100,7 +100,7 @@ void EigenTimeSolver::solve ()
   
   // Point the system's matrix at B, call assembly again.
   if (!this->quiet)
-    *libMesh::out << "Assembling matrix B." << std::endl;
+    libMesh::out << "Assembling matrix B." << std::endl;
   _system.matrix =   &( _system.get_matrix ("B") );
   this->now_assembling = Matrix_B;
   _system.assembly(true, true);
@@ -109,7 +109,7 @@ void EigenTimeSolver::solve ()
   // Send matrices A, B to Steffen's SlepcEigenSolver interface
   //libmesh_here();
   if (!this->quiet)
-    *libMesh::out << "Calling the EigenSolver." << std::endl;
+    libMesh::out << "Calling the EigenSolver." << std::endl;
   std::pair<unsigned int, unsigned int> solve_data =
     eigen_solver->solve_generalized (_system.get_matrix ("System Matrix"),
 				     _system.get_matrix ("B"),

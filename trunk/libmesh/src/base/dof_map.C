@@ -399,7 +399,7 @@ void DofMap::reinit(MeshBase& mesh)
               if (FEInterface::max_order(base_fe_type,type) <
                   static_cast<unsigned int>(base_fe_type.order))
                 {
-                  *libMesh::err 
+                  libMesh::err 
                     << "ERROR: Finite element "
                     << Utility::enum_to_string(base_fe_type.family)
                     << " on geometric element "
@@ -412,7 +412,7 @@ void DofMap::reinit(MeshBase& mesh)
                   libmesh_error();
                 }
 
-              *libMesh::err
+              libMesh::err
                 << "WARNING: Finite element "
                 << Utility::enum_to_string(base_fe_type.family)
                 << " on geometric element "
@@ -1442,7 +1442,7 @@ void DofMap::SCALAR_dof_indices (std::vector<unsigned int>& di,
 
   if(this->variable(vn).type().family != SCALAR)
   {
-    *libMesh::err << "ERROR: SCALAR_dof_indices called for a non-SCALAR variable."
+    libMesh::err << "ERROR: SCALAR_dof_indices called for a non-SCALAR variable."
                   << std::endl;
   }
 

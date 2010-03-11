@@ -55,7 +55,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
   // (dim+1+s)! / (dim+1)! / s!
   // In 3D, this is = 1/24 * P_{i=1}^4 (s+i)
   const unsigned int n_pts = (s+4)*(s+3)*(s+2)*(s+1) / 24;
-  //*libMesh::out << "n_pts=" << n_pts << std::endl;
+  //libMesh::out << "n_pts=" << n_pts << std::endl;
 
   // Allocate space for points and weights
   _points.resize(n_pts);
@@ -76,7 +76,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
       // Get all the ordered compositions (and their permutations)
       // of |beta| = s-i into dim+1=4 parts
       compose_all(s-i, dim+1, permutations);
-      //*libMesh::out << "n. permutations=" << permutations.size() << std::endl;
+      //libMesh::out << "n. permutations=" << permutations.size() << std::endl;
 
       for (unsigned int p=0; p<permutations.size(); ++p)
 	{
@@ -168,7 +168,7 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
   while (workspace.back() != s)
     {
       // Uncomment for debugging
-      //*libMesh::out << "previous head_value=" << head_value << " -> ";
+      //libMesh::out << "previous head_value=" << head_value << " -> ";
       
       // If the previous head value is still larger than 1, reset the index
       // to "off the front" of the array
@@ -183,9 +183,9 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
       head_value = workspace[head_index];
 
       // Uncomment for debugging
-      //std::copy(workspace.begin(), workspace.end(), std::ostream_iterator<int>(*libMesh::out, " "));
-      //*libMesh::out << ", head_index=" << head_index;
-      //*libMesh::out << ", head_value=" << head_value << " -> ";
+      //std::copy(workspace.begin(), workspace.end(), std::ostream_iterator<int>(libMesh::out, " "));
+      //libMesh::out << ", head_index=" << head_index;
+      //libMesh::out << ", head_value=" << head_value << " -> ";
       
       // Put a zero into the head_index of the array.  If head_index==0,
       // this will be overwritten in the next line with head_value-1.
@@ -204,7 +204,7 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
       result.push_back(workspace);
 
       // Uncomment for debugging
-      //std::copy(workspace.begin(), workspace.end(), std::ostream_iterator<int>(*libMesh::out, " "));
-      //*libMesh::out<<"\n";
+      //std::copy(workspace.begin(), workspace.end(), std::ostream_iterator<int>(libMesh::out, " "));
+      //libMesh::out<<"\n";
     }
 }

@@ -310,7 +310,7 @@ public:
    * Prints the nodal information,
    * by default to \p libMesh::out.
    */
-  void print_nodes(std::ostream &out = *libMesh::out);
+  void print_nodes(std::ostream &out = libMesh::out);
 
   /**
    * Reads information for

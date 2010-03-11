@@ -140,13 +140,13 @@ void ContinuationSystem::initialize_tangent()
   
 //   if (!quiet)
 //     {
-//       *libMesh::out << "norm_u=" << norm_u << std::endl;
-//       *libMesh::out << "norm_previous_u=" << norm_previous_u << std::endl;
+//       libMesh::out << "norm_u=" << norm_u << std::endl;
+//       libMesh::out << "norm_previous_u=" << norm_previous_u << std::endl;
 //     }
   
 //   if (norm_u == norm_previous_u)
 //     {
-//       *libMesh::err << "Warning, it appears u and previous_u are the "
+//       libMesh::err << "Warning, it appears u and previous_u are the "
 //   		<< "same, are you sure this is correct?"
 //   		<< "It's possible you forgot to set one or the other..."
 //   		<< std::endl;
@@ -171,17 +171,17 @@ void ContinuationSystem::initialize_tangent()
   
 //   if (!quiet)
 //     {
-//       *libMesh::out << "norm_u=" << norm_u << std::endl;
-//       *libMesh::out << "norm_previous_u=" << norm_previous_u << std::endl;
-//       //*libMesh::out << "norm_delta_u=" << norm_delta_u << std::endl;
-//       *libMesh::out << "norm_delta_u/max(|u|,|u_old|)=" << norm_delta_u << std::endl;
-//       *libMesh::out << "|norm_u-norm_previous_u|=" << std::abs(norm_u - norm_previous_u) << std::endl;
+//       libMesh::out << "norm_u=" << norm_u << std::endl;
+//       libMesh::out << "norm_previous_u=" << norm_previous_u << std::endl;
+//       //libMesh::out << "norm_delta_u=" << norm_delta_u << std::endl;
+//       libMesh::out << "norm_delta_u/max(|u|,|u_old|)=" << norm_delta_u << std::endl;
+//       libMesh::out << "|norm_u-norm_previous_u|=" << std::abs(norm_u - norm_previous_u) << std::endl;
 //     }
   
 //   const Real dlambda = *continuation_parameter-old_continuation_parameter;
 
 //   if (!quiet)
-//     *libMesh::out << "dlambda=" << dlambda << std::endl;
+//     libMesh::out << "dlambda=" << dlambda << std::endl;
   
 //   Real delta_s_zero = std::sqrt(
 //   				(norm_delta_u*norm_delta_u) +
@@ -189,7 +189,7 @@ void ContinuationSystem::initialize_tangent()
 //   				);
   
 //   if (!quiet)
-//     *libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
+//     libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
 
   // 1.) + 2.)
 //   // Now approximate the initial tangent d(lambda)/ds
@@ -223,7 +223,7 @@ void ContinuationSystem::initialize_tangent()
 //       Theta = 1./solution_size;
       
 //       if (!quiet)
-// 	*libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
+// 	libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
 //     }
   
 //   // Compute d(lambda)/ds
@@ -251,7 +251,7 @@ void ContinuationSystem::initialize_tangent()
 //   const Real dlambda = *continuation_parameter-old_continuation_parameter;
 
 //   if (!quiet)
-//     *libMesh::out << "dlambda=" << dlambda << std::endl;
+//     libMesh::out << "dlambda=" << dlambda << std::endl;
   
 //   Real delta_s_zero = std::sqrt(
 //   				(Theta_LOCA*Theta_LOCA*Theta*norm_delta_u*norm_delta_u) +
@@ -263,9 +263,9 @@ void ContinuationSystem::initialize_tangent()
   
 //   if (!quiet)
 //     {
-//       *libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
-//       *libMesh::out << "initial d(lambda)/ds|_0 = " << dlambda_ds << std::endl;
-//       *libMesh::out << "initial ||du_ds||_0 = " << du_ds->l2_norm() << std::endl;
+//       libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
+//       libMesh::out << "initial d(lambda)/ds|_0 = " << dlambda_ds << std::endl;
+//       libMesh::out << "initial ||du_ds||_0 = " << du_ds->l2_norm() << std::endl;
 //     }
 
 //   // FIXME: Also store the initial finite-differenced approximation to -du/dlambda as y.
@@ -293,7 +293,7 @@ void ContinuationSystem::initialize_tangent()
   ds_current = dlambda / dlambda_ds;
 
   if (!quiet)
-    *libMesh::out << "Setting ds_current|_0=" << ds_current << std::endl;
+    libMesh::out << "Setting ds_current|_0=" << ds_current << std::endl;
   
   // Set y = -du/dlambda using finite difference approximation
   *y = *solution;
@@ -322,10 +322,10 @@ void ContinuationSystem::initialize_tangent()
   
   if (!quiet)
     {
-      *libMesh::out << "Setting initial Theta_LOCA = " << Theta_LOCA << std::endl;
-      *libMesh::out << "Theta_LOCA^2*Theta         = " << Theta_LOCA*Theta_LOCA*Theta << std::endl;
-      *libMesh::out << "initial d(lambda)/ds|_0    = " << dlambda_ds << std::endl;
-      *libMesh::out << "initial ||du_ds||_0        = " << du_ds->l2_norm() << std::endl;
+      libMesh::out << "Setting initial Theta_LOCA = " << Theta_LOCA << std::endl;
+      libMesh::out << "Theta_LOCA^2*Theta         = " << Theta_LOCA*Theta_LOCA*Theta << std::endl;
+      libMesh::out << "initial d(lambda)/ds|_0    = " << dlambda_ds << std::endl;
+      libMesh::out << "initial ||du_ds||_0        = " << du_ds->l2_norm() << std::endl;
     }
 
 
@@ -354,7 +354,7 @@ void ContinuationSystem::continuation_solve()
   // Be sure the user has set the continuation parameter pointer
   if (!continuation_parameter)
     {
-      *libMesh::err << "You must set the continuation_parameter pointer "
+      libMesh::err << "You must set the continuation_parameter pointer "
 		    << "to a member variable of the derived class, preferably in the "
 		    << "Derived class's init_data function.  This is how the ContinuationSystem "
 		    << "updates the continuation parameter."
@@ -364,9 +364,9 @@ void ContinuationSystem::continuation_solve()
     }
 
   // Use extra precision for all the numbers printed in this function.
-  unsigned int old_precision = libMesh::out->precision();
-  libMesh::out->precision(16);
-  libMesh::out->setf(std::ios_base::scientific);
+  unsigned int old_precision = libMesh::out.precision();
+  libMesh::out.precision(16);
+  libMesh::out.setf(std::ios_base::scientific);
   
   // We can't start solving the augmented PDE system unless the tangent
   // vectors have been initialized.  This only needs to occur once.
@@ -397,8 +397,8 @@ void ContinuationSystem::continuation_solve()
     {
       if (!quiet)
 	{
-	  *libMesh::out << "Current arclength stepsize, ds_current=" << ds_current << std::endl;
-	  *libMesh::out << "Current parameter value, lambda=" << *continuation_parameter << std::endl;
+	  libMesh::out << "Current arclength stepsize, ds_current=" << ds_current << std::endl;
+	  libMesh::out << "Current parameter value, lambda=" << *continuation_parameter << std::endl;
 	}
       
       // Upon exit from the nonlinear loop, the newton_converged flag
@@ -420,7 +420,7 @@ void ContinuationSystem::continuation_solve()
       // The nonlinear loop
       for (newton_step=0; newton_step<newton_solver->max_nonlinear_iterations; ++newton_step)
 	{
-	  *libMesh::out << "\n === Starting Newton step " << newton_step << " ===" << std::endl;
+	  libMesh::out << "\n === Starting Newton step " << newton_step << " ===" << std::endl;
 	  
 	  // Set the linear system solver tolerance
 // 	  // 1.) Set the current linear tolerance based as a multiple of the current residual of the system.
@@ -457,7 +457,7 @@ void ContinuationSystem::continuation_solve()
 	    }
 
 	  if (!quiet)
-	    *libMesh::out << "Using current_linear_tolerance=" << current_linear_tolerance << std::endl;
+	    libMesh::out << "Using current_linear_tolerance=" << current_linear_tolerance << std::endl;
 
 	  
 	  // Assemble the residual (and Jacobian).
@@ -479,15 +479,15 @@ void ContinuationSystem::continuation_solve()
 	      nonlinear_residual_firststep = nonlinear_residual_beforestep;
 
 	      const Real old_norm_u = solution->l2_norm();
-	      *libMesh::out << "  (before step) ||R||_{L2} = " << nonlinear_residual_beforestep << std::endl;
-	      *libMesh::out << "  (before step) ||R||_{L2}/||u|| = " << nonlinear_residual_beforestep / old_norm_u << std::endl;
+	      libMesh::out << "  (before step) ||R||_{L2} = " << nonlinear_residual_beforestep << std::endl;
+	      libMesh::out << "  (before step) ||R||_{L2}/||u|| = " << nonlinear_residual_beforestep / old_norm_u << std::endl;
 
 	      // In rare cases (very small arcsteps), it's possible that the residual is
 	      // already below our absolute linear tolerance.
 	      if (nonlinear_residual_beforestep  < solution_tolerance)
 		{
 		  if (!quiet)
-		    *libMesh::out << "Initial guess satisfied linear tolerance, exiting with zero Newton iterations!" << std::endl;
+		    libMesh::out << "Initial guess satisfied linear tolerance, exiting with zero Newton iterations!" << std::endl;
 
 		  // Since we go straight from here to the solve of the next tangent, we
 		  // have to close the matrix before it can be assembled again.
@@ -526,7 +526,7 @@ void ContinuationSystem::continuation_solve()
 		{
 		  if (newton_step==0)
 		    {
-		      *libMesh::out << "Repeating initial solve with smaller linear tolerance!" << std::endl;
+		      libMesh::out << "Repeating initial solve with smaller linear tolerance!" << std::endl;
 		      current_linear_tolerance *= initial_newton_tolerance; // reduce the linear tolerance to force the solver to do some work
 		    }
 		  else
@@ -542,7 +542,7 @@ void ContinuationSystem::continuation_solve()
 
 	  
 	  if (!quiet)
-	    *libMesh::out << "  G_u*z = G solver converged at step "
+	    libMesh::out << "  G_u*z = G solver converged at step "
 		          << rval.first
 		          << " linear tolerance = "
 		          << rval.second
@@ -557,7 +557,7 @@ void ContinuationSystem::continuation_solve()
 	  if ((rval.first == 0) && (rval.second > current_linear_tolerance*nonlinear_residual_beforestep))
 	    {
 	      if (!quiet)
-		*libMesh::out << "Linear solver exited in zero iterations!" << std::endl;
+		libMesh::out << "Linear solver exited in zero iterations!" << std::endl;
 
 	      // Try to find out the reason for convergence/divergence
 	      linear_solver->print_converged_reason();
@@ -587,7 +587,7 @@ void ContinuationSystem::continuation_solve()
 	  const Real yrhsnorm=rhs->l2_norm();
 	  if (yrhsnorm == 0.0)
 	    {
-	      *libMesh::out << "||G_Lambda|| = 0" << std::endl;
+	      libMesh::out << "||G_Lambda|| = 0" << std::endl;
 	      libmesh_error();
 	    }
 
@@ -595,7 +595,7 @@ void ContinuationSystem::continuation_solve()
 	  // tolerance but scaled by an extra term proportional to the RHS (which is not -> 0 in this case)
 	  const Real ysystemtol=current_linear_tolerance*(nonlinear_residual_beforestep/yrhsnorm);
 	  if (!quiet)
-	    *libMesh::out << "ysystemtol=" << ysystemtol << std::endl;
+	    libMesh::out << "ysystemtol=" << ysystemtol << std::endl;
 	  
 	  // Solve G_u*y = G_{\lambda}
 	  // FIXME: Initial guess?  This is really a solve for -du/dlambda so we could try
@@ -610,7 +610,7 @@ void ContinuationSystem::continuation_solve()
 	  // 	  do
 	  // 	    {
 	  // 	      if (!quiet)
-	  // 		*libMesh::out << "Trying to solve tangent system, attempt " << attempt << std::endl;
+	  // 		libMesh::out << "Trying to solve tangent system, attempt " << attempt << std::endl;
 	      
 	      rval =
 		linear_solver->solve(*matrix,
@@ -621,7 +621,7 @@ void ContinuationSystem::continuation_solve()
 				     newton_solver->max_linear_iterations);   // max linear iterations
 
 	      if (!quiet)
-		*libMesh::out << "  G_u*y = G_{lambda} solver converged at step "
+		libMesh::out << "  G_u*y = G_{lambda} solver converged at step "
 			  << rval.first
 			  << ", linear tolerance = "
 			  << rval.second
@@ -635,7 +635,7 @@ void ContinuationSystem::continuation_solve()
 	      if ((rval.first == 0) && (rval.second > ysystemtol))
 		{
 		  if (!quiet)
-		    *libMesh::out << "Linear solver exited in zero iterations!" << std::endl;
+		    libMesh::out << "Linear solver exited in zero iterations!" << std::endl;
 
 		  break; // out of Newton iterations
 		}
@@ -660,23 +660,23 @@ void ContinuationSystem::continuation_solve()
 
 	  if (!quiet)
 	    {
-	      *libMesh::out << "  N1=" << N1 << std::endl;
-	      *libMesh::out << "  N2=" << N2 << std::endl;
-	      *libMesh::out << "  N3=" << N3 << std::endl;
+	      libMesh::out << "  N1=" << N1 << std::endl;
+	      libMesh::out << "  N2=" << N2 << std::endl;
+	      libMesh::out << "  N3=" << N3 << std::endl;
 	    }
       
 	  // The arclength constraint value 
 	  const Number N = N1+N2-N3;
       
 	  if (!quiet)
-	    *libMesh::out << "  N=" << N << std::endl;
+	    libMesh::out << "  N=" << N << std::endl;
 
 	  const Number duds_dot_z = du_ds->dot(*z);
 	  const Number duds_dot_y = du_ds->dot(*y);
 
-	  //*libMesh::out << "duds_dot_z=" << duds_dot_z << std::endl;
-	  //*libMesh::out << "duds_dot_y=" << duds_dot_y << std::endl;
-	  //*libMesh::out << "dlambda_ds=" << dlambda_ds << std::endl;
+	  //libMesh::out << "duds_dot_z=" << duds_dot_z << std::endl;
+	  //libMesh::out << "duds_dot_y=" << duds_dot_y << std::endl;
+	  //libMesh::out << "dlambda_ds=" << dlambda_ds << std::endl;
 
 	  const Number delta_lambda_numerator   = -(N          + Theta_LOCA*Theta_LOCA*Theta*duds_dot_z);
 	  const Number delta_lambda_denominator =  (dlambda_ds - Theta_LOCA*Theta_LOCA*Theta*duds_dot_y);
@@ -715,7 +715,7 @@ void ContinuationSystem::continuation_solve()
 	  // likely not good cases to attempt backtracking (?).
 	  const Real norm_du_norm_R = delta_u->l2_norm() / nonlinear_residual_afterstep;
 	  if (!quiet)
-	    *libMesh::out << "  norm_du_norm_R=" << norm_du_norm_R << std::endl;
+	    libMesh::out << "  norm_du_norm_R=" << norm_du_norm_R << std::endl;
       
       
 	  // Factor to decrease the stepsize by for backtracking
@@ -732,7 +732,7 @@ void ContinuationSystem::continuation_solve()
 	  if (attempt_backtracking)
 	    {
 	      if (!quiet)
-		*libMesh::out << "Newton step did not reduce residual." << std::endl;
+		libMesh::out << "Newton step did not reduce residual." << std::endl;
 
 	      // back off the previous step.
 	      solution->add(-1., *delta_u);
@@ -746,7 +746,7 @@ void ContinuationSystem::continuation_solve()
 		  newton_stepfactor *= 0.5;
 
 		  if (!quiet)
-		    *libMesh::out << "Shrinking step size by " << newton_stepfactor << std::endl;
+		    libMesh::out << "Shrinking step size by " << newton_stepfactor << std::endl;
 	      
 		  // Take fractional step
 		  solution->add(newton_stepfactor, *delta_u);
@@ -760,7 +760,7 @@ void ContinuationSystem::continuation_solve()
 		  nonlinear_residual_afterstep = rhs->l2_norm();
 
 		  if (!quiet)
-		    *libMesh::out << "At shrink step "
+		    libMesh::out << "At shrink step "
 			      << backtrack_step
 			      << ", nonlinear_residual_afterstep="
 			      << nonlinear_residual_afterstep
@@ -769,7 +769,7 @@ void ContinuationSystem::continuation_solve()
 		  if (nonlinear_residual_afterstep < nonlinear_residual_beforestep)
 		    {
 		      if (!quiet)
-			*libMesh::out << "Backtracking succeeded!" << std::endl;
+			libMesh::out << "Backtracking succeeded!" << std::endl;
 		      
 		      break; // out of backtracking loop
 		    }
@@ -791,8 +791,8 @@ void ContinuationSystem::continuation_solve()
 	  // If we tried backtracking but the residual is still not reduced, print message.
 	  if ((attempt_backtracking) && (nonlinear_residual_afterstep > nonlinear_residual_beforestep))
 	    {
-	      //*libMesh::err << "Backtracking failed." << std::endl;
-	      *libMesh::out << "Backtracking failed." << std::endl;
+	      //libMesh::err << "Backtracking failed." << std::endl;
+	      libMesh::out << "Backtracking failed." << std::endl;
 	  
 	      // 1.) Quit, exit program.
 	      //libmesh_error();
@@ -804,7 +804,7 @@ void ContinuationSystem::continuation_solve()
 		  solution->close();
 		  *continuation_parameter += newton_stepfactor*delta_lambda;
 		  if (!quiet)
-		    *libMesh::out << "Backtracking could not reduce residual ... continuing anyway!" << std::endl;
+		    libMesh::out << "Backtracking could not reduce residual ... continuing anyway!" << std::endl;
 		}
 	      
 	      // 3.) Break out of Newton iteration loop with newton_converged = false,
@@ -825,7 +825,7 @@ void ContinuationSystem::continuation_solve()
 	      if ((nonlinear_residual_afterstep > nonlinear_residual_firststep) &&
 		  (newton_step+1 > static_cast<unsigned int>(0.5*newton_solver->max_nonlinear_iterations)))
 		{
-		  *libMesh::out << "Progress check failed: the current residual: "
+		  libMesh::out << "Progress check failed: the current residual: "
 			        << nonlinear_residual_afterstep
 			        << ", is\n"
 			        << "larger than the initial residual, and half of the allowed\n"
@@ -839,7 +839,7 @@ void ContinuationSystem::continuation_solve()
 	  // Safety check: Check the current continuation parameter against user-provided min-allowable parameter value
 	  if (*continuation_parameter < min_continuation_parameter)
 	    {
-	      *libMesh::out << "Continuation parameter fell below min-allowable value." << std::endl;
+	      libMesh::out << "Continuation parameter fell below min-allowable value." << std::endl;
 	      // libmesh_error();
 	      break; // out of Newton iteration loop, newton_converged = false
 	    }
@@ -848,7 +848,7 @@ void ContinuationSystem::continuation_solve()
 	  if ( (max_continuation_parameter != 0.0) &&
 	       (*continuation_parameter > max_continuation_parameter) )
 	    {
-	      *libMesh::out << "Current continuation parameter value: "
+	      libMesh::out << "Current continuation parameter value: "
 			    << *continuation_parameter
 			    << " exceeded max-allowable value."
 			    << std::endl;
@@ -861,11 +861,11 @@ void ContinuationSystem::continuation_solve()
 	  // enough, we can break out of the Newton iteration loop.  
 	  const Real norm_delta_u = delta_u->l2_norm();
 	  const Real norm_u = solution->l2_norm();
-	  *libMesh::out << "  delta_lambda                   = " << delta_lambda << std::endl;
-	  *libMesh::out << "  newton_stepfactor*delta_lambda = " << newton_stepfactor*delta_lambda << std::endl;
-	  *libMesh::out << "  lambda_current                 = " << *continuation_parameter << std::endl;
-	  *libMesh::out << "  ||delta_u||                    = " << norm_delta_u << std::endl;
-	  *libMesh::out << "  ||delta_u||/||u||              = " << norm_delta_u / norm_u << std::endl;
+	  libMesh::out << "  delta_lambda                   = " << delta_lambda << std::endl;
+	  libMesh::out << "  newton_stepfactor*delta_lambda = " << newton_stepfactor*delta_lambda << std::endl;
+	  libMesh::out << "  lambda_current                 = " << *continuation_parameter << std::endl;
+	  libMesh::out << "  ||delta_u||                    = " << norm_delta_u << std::endl;
+	  libMesh::out << "  ||delta_u||/||u||              = " << norm_delta_u / norm_u << std::endl;
       
 
 	  // Evaluate the residual at the current Newton iterate.  We don't want to detect
@@ -875,8 +875,8 @@ void ContinuationSystem::continuation_solve()
 		   false); // Jacobian
 	  rhs->close();
 	  const Real norm_residual = rhs->l2_norm();
-	  *libMesh::out << "  ||R||_{L2} = " << norm_residual << std::endl;
-	  *libMesh::out << "  ||R||_{L2}/||u|| = " << norm_residual / norm_u << std::endl;
+	  libMesh::out << "  ||R||_{L2} = " << norm_residual << std::endl;
+	  libMesh::out << "  ||R||_{L2}/||u|| = " << norm_residual / norm_u << std::endl;
       
       
 	  // FIXME: The norm_delta_u tolerance (at least) should be relative.
@@ -888,7 +888,7 @@ void ContinuationSystem::continuation_solve()
 	      (norm_residual      < solution_tolerance))
 	    {
 	      if (!quiet)
-		*libMesh::out << "Newton iterations converged!" << std::endl;
+		libMesh::out << "Newton iterations converged!" << std::endl;
 
 	      newton_converged = true;
 	      break; // out of Newton iterations
@@ -897,7 +897,7 @@ void ContinuationSystem::continuation_solve()
 
       if (!newton_converged)
 	{
-	  *libMesh::out << "Newton iterations of augmented system did not converge!" << std::endl;
+	  libMesh::out << "Newton iterations of augmented system did not converge!" << std::endl;
 	  
 	  // Reduce ds_current, recompute the solution and parameter, and continue to next
 	  // arcstep, if there is one.
@@ -923,17 +923,17 @@ void ContinuationSystem::continuation_solve()
   // point, we have no choice but to quit.
   if (!arcstep_converged)
     {
-      *libMesh::out << "Arcstep failed to converge after max number of reductions! Exiting..." << std::endl;
+      libMesh::out << "Arcstep failed to converge after max number of reductions! Exiting..." << std::endl;
       libmesh_error();
     }
   
   // Print converged solution control parameter and max value.
-  *libMesh::out << "lambda_current=" << *continuation_parameter << std::endl;
-  //*libMesh::out << "u_max=" << solution->max() << std::endl;
+  libMesh::out << "lambda_current=" << *continuation_parameter << std::endl;
+  //libMesh::out << "u_max=" << solution->max() << std::endl;
 
   // Reset old stream precision and flags.
-  libMesh::out->precision(old_precision);
-  libMesh::out->unsetf(std::ios_base::scientific);
+  libMesh::out.precision(old_precision);
+  libMesh::out.unsetf(std::ios_base::scientific);
 
   // Note: we don't want to go on to the next guess yet, since the user may
   // want to post-process this data.  It's up to the user to call advance_arcstep()
@@ -994,7 +994,7 @@ void ContinuationSystem::solve_tangent()
   // going to be really bad...
   
   if (!quiet)
-    *libMesh::out << "G_u*y = G_{lambda} solver converged at step "
+    libMesh::out << "G_u*y = G_{lambda} solver converged at step "
 	          << rval.first
 	          << " linear tolerance = "
 	          << rval.second
@@ -1013,14 +1013,14 @@ void ContinuationSystem::solve_tangent()
 //   //       = d(lambda)/ds - (du_ds)^t y
 //   Real denom = dlambda_ds - du_ds->dot(*y);
 
-//   //*libMesh::out << "denom=" << denom << std::endl;
+//   //libMesh::out << "denom=" << denom << std::endl;
 //   libmesh_assert (denom != 0.0);
   
 //   dlambda_ds = 1.0 / denom;
 
 
 //   if (!quiet)
-//     *libMesh::out << "dlambda_ds=" << dlambda_ds << std::endl;
+//     libMesh::out << "dlambda_ds=" << dlambda_ds << std::endl;
   
 //   // Compute the updated value of du/ds = -_dlambda_ds * y
 //   du_ds->zero();
@@ -1048,7 +1048,7 @@ void ContinuationSystem::solve_tangent()
   if (sgn_dlambda_ds < 0.)
     {
       if (!quiet)
-	*libMesh::out << "dlambda_ds is negative." << std::endl;
+	libMesh::out << "dlambda_ds is negative." << std::endl;
       
       dlambda_ds *= -1.;
     }
@@ -1060,8 +1060,8 @@ void ContinuationSystem::solve_tangent()
 
   if (!quiet)
     {
-      *libMesh::out << "d(lambda)/ds = " << dlambda_ds << std::endl;
-      *libMesh::out << "||du_ds||    = " << du_ds->l2_norm() << std::endl;
+      libMesh::out << "d(lambda)/ds = " << dlambda_ds << std::endl;
+      libMesh::out << "||du_ds||    = " << du_ds->l2_norm() << std::endl;
     }
 
   // Our next solve expects y ~ -du/dlambda, so scale it back by -1 again now.
@@ -1113,8 +1113,8 @@ void ContinuationSystem::set_Theta()
 
 //   if (normduds < 1.e-12)
 //     {
-//       *libMesh::out << "Setting initial Theta= 1./normdu/normdu" << std::endl;
-//       *libMesh::out << "normdu=" << normdu << std::endl;
+//       libMesh::out << "Setting initial Theta= 1./normdu/normdu" << std::endl;
+//       libMesh::out << "normdu=" << normdu << std::endl;
 
 //       // Don't use this scaling if the solution delta is already O(1)
 //       if (normdu > 1.)
@@ -1124,9 +1124,9 @@ void ContinuationSystem::set_Theta()
 //     }
 //   else
 //     {
-//       *libMesh::out << "Setting Theta= 1./normdu/normduds" << std::endl;
-//       *libMesh::out << "normdu=" << normdu << std::endl;
-//       *libMesh::out << "normduds=" << normduds << std::endl;
+//       libMesh::out << "Setting Theta= 1./normdu/normduds" << std::endl;
+//       libMesh::out << "normdu=" << normdu << std::endl;
+//       libMesh::out << "normduds=" << normduds << std::endl;
 
 //       // Don't use this scaling if the solution delta is already O(1)
 //       if ((normdu>1.) || (normduds>1.))
@@ -1136,7 +1136,7 @@ void ContinuationSystem::set_Theta()
 //     }
   
  if (!quiet)
-   *libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
+   libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
 }
 
 
@@ -1146,7 +1146,7 @@ void ContinuationSystem::set_Theta_LOCA()
   // We also recompute the LOCA normalization parameter based on the
   // most recently computed value of dlambda_ds
   // if (!quiet)
-  //   *libMesh::out << "(Theta_LOCA) dlambda_ds=" << dlambda_ds << std::endl;
+  //   libMesh::out << "(Theta_LOCA) dlambda_ds=" << dlambda_ds << std::endl;
 
   // Formula makes no sense if |dlambda_ds| > 1
   libmesh_assert (std::abs(dlambda_ds) < 1.);
@@ -1168,7 +1168,7 @@ void ContinuationSystem::set_Theta_LOCA()
 // 	  Theta_LOCA = 1.e8;
 
 // 	  if (!quiet)
-// 	    *libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
+// 	    libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
 // 	}
 //     }
 //   else
@@ -1186,14 +1186,14 @@ void ContinuationSystem::set_Theta_LOCA()
       Theta_LOCA = 1.e8;
       
       if (!quiet)
-	*libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
+	libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
     }
     
   // 3.) Use 1.0, i.e. don't scale
   //Theta_LOCA=1.0;
 
   if (!quiet)
-    *libMesh::out << "Setting Theta_LOCA=" << Theta_LOCA << std::endl;
+    libMesh::out << "Setting Theta_LOCA=" << Theta_LOCA << std::endl;
 }
 
 
@@ -1201,9 +1201,9 @@ void ContinuationSystem::set_Theta_LOCA()
 void ContinuationSystem::update_solution()
 {
   // Set some stream formatting flags
-  unsigned int old_precision = libMesh::out->precision();
-  libMesh::out->precision(16);
-  libMesh::out->setf(std::ios_base::scientific);
+  unsigned int old_precision = libMesh::out.precision();
+  libMesh::out.precision(16);
+  libMesh::out.setf(std::ios_base::scientific);
   
   // We must have a tangent that makes sense before we can update the solution.
   libmesh_assert (tangent_initialized);
@@ -1223,10 +1223,10 @@ void ContinuationSystem::update_solution()
   
   if (!quiet)
     {
-      *libMesh::out << "yoldnorm=" << yoldnorm << std::endl;
-      *libMesh::out << "ynorm="    << ynorm << std::endl;
-      *libMesh::out << "yoldy="    << yoldy << std::endl;
-      *libMesh::out << "yoldnorm/ynorm=" << yoldnorm/ynorm << std::endl;
+      libMesh::out << "yoldnorm=" << yoldnorm << std::endl;
+      libMesh::out << "ynorm="    << ynorm << std::endl;
+      libMesh::out << "yoldy="    << yoldy << std::endl;
+      libMesh::out << "yoldnorm/ynorm=" << yoldnorm/ynorm << std::endl;
     }      
 
   // Save the current value of ds before updating it
@@ -1297,7 +1297,7 @@ void ContinuationSystem::update_solution()
 	    static_cast<Real>(Nmax) / static_cast<Real>(newton_step+1);
 
 	  if (!quiet)
-	    *libMesh::out << "newtonstep_growthfactor=" << newtonstep_growthfactor << std::endl;
+	    libMesh::out << "newtonstep_growthfactor=" << newtonstep_growthfactor << std::endl;
 	
 	  ds_current *= newtonstep_growthfactor;
 	}
@@ -1311,13 +1311,13 @@ void ContinuationSystem::update_solution()
   // Check also for a minimum allowed stepsize.
   if (ds_current < ds_min)
     {
-      *libMesh::out << "Enforcing minimum-allowed arclength stepsize of " << ds_min << std::endl;
+      libMesh::out << "Enforcing minimum-allowed arclength stepsize of " << ds_min << std::endl;
       ds_current = ds_min;
     }
   
   if (!quiet)
     {
-      *libMesh::out << "Current step size: ds_current=" << ds_current << std::endl;
+      libMesh::out << "Current step size: ds_current=" << ds_current << std::endl;
     }
   
   // Recompute scaling factor Theta for
@@ -1328,7 +1328,7 @@ void ContinuationSystem::update_solution()
   // maintain a reasonable value of dlambda/ds
   set_Theta_LOCA();
     
-  *libMesh::out << "Theta*Theta_LOCA^2=" << Theta*Theta_LOCA*Theta_LOCA << std::endl;
+  libMesh::out << "Theta*Theta_LOCA^2=" << Theta*Theta_LOCA*Theta_LOCA << std::endl;
 
   // Based on the asymptotic singular behavior of du/dlambda near simple turning points,
   // we can compute a single parameter which may suggest that we are close to a singularity.
@@ -1339,16 +1339,16 @@ void ContinuationSystem::update_solution()
   const Real C = (std::log (Theta_LOCA*normdu) /
 		  std::log (std::abs(*continuation_parameter-old_continuation_parameter))) - 1.0;
   if (!quiet)
-    *libMesh::out << "C=" << C << std::endl;
+    libMesh::out << "C=" << C << std::endl;
   
   // Save the current value of u and lambda before updating.
   save_current_solution();
 
   if (!quiet)
     {
-      *libMesh::out << "Updating the solution with the tangent guess." << std::endl;
-      *libMesh::out << "||u_old||=" << this->solution->l2_norm() << std::endl;
-      *libMesh::out << "lambda_old=" << *continuation_parameter << std::endl;
+      libMesh::out << "Updating the solution with the tangent guess." << std::endl;
+      libMesh::out << "||u_old||=" << this->solution->l2_norm() << std::endl;
+      libMesh::out << "lambda_old=" << *continuation_parameter << std::endl;
     }
 
   // Since we solved for the tangent vector, now we can compute an
@@ -1358,13 +1358,13 @@ void ContinuationSystem::update_solution()
 
   if (!quiet)
     {
-      *libMesh::out << "||u_new||=" << this->solution->l2_norm() << std::endl;
-      *libMesh::out << "lambda_new=" << *continuation_parameter << std::endl;
+      libMesh::out << "||u_new||=" << this->solution->l2_norm() << std::endl;
+      libMesh::out << "lambda_new=" << *continuation_parameter << std::endl;
     }
   
   // Unset previous stream flags
-  libMesh::out->precision(old_precision);
-  libMesh::out->unsetf(std::ios_base::scientific);
+  libMesh::out.precision(old_precision);
+  libMesh::out.unsetf(std::ios_base::scientific);
 }
 
 

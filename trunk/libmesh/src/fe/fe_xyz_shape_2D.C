@@ -44,7 +44,7 @@ Real FE<2,XYZ>::shape(const ElemType,
 		      const unsigned int,
 		      const Point&)
 {
-  *libMesh::err << "XYZ polynomials require the element\n"
+  libMesh::err << "XYZ polynomials require the element\n"
                 << "because the centroid is needed."
                 << std::endl;
 
@@ -173,7 +173,7 @@ Real FE<2,XYZ>::shape_deriv(const ElemType,
 			    const unsigned int,
 			    const Point&)
 {
-  *libMesh::err << "XYZ polynomials require the element\n"
+  libMesh::err << "XYZ polynomials require the element\n"
                 << "because the centroid is needed."
                 << std::endl;
   
@@ -385,7 +385,7 @@ Real FE<2,XYZ>::shape_second_deriv(const ElemType,
 			           const unsigned int,
 			           const Point&)
 {
-  *libMesh::err << "XYZ polynomials require the element\n"
+  libMesh::err << "XYZ polynomials require the element\n"
                 << "because the centroid is needed."
                 << std::endl;
   

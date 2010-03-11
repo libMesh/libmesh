@@ -323,7 +323,7 @@ void BoundaryInfo::add_node(const Node* node,
 {
   if (id == invalid_id)
     {
-      *libMesh::err << "ERROR: You may not set a boundary ID of "
+      libMesh::err << "ERROR: You may not set a boundary ID of "
 		    << invalid_id << std::endl
 		    << " That is reserved for internal use.\n"
 		    << std::endl;
@@ -369,7 +369,7 @@ void BoundaryInfo::add_side(const Elem* elem,
   
   if (id == invalid_id)
     {
-      *libMesh::err << "ERROR: You may not set a boundary ID of "
+      libMesh::err << "ERROR: You may not set a boundary ID of "
 		    << invalid_id << std::endl
 		    << " That is reserved for internal use.\n"
 		    << std::endl;

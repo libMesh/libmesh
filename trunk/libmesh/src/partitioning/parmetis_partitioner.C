@@ -72,7 +72,7 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
 // #ifndef LIBMESH_HAVE_PARMETIS
 
 //   libmesh_here();
-//   *libMesh::err << "ERROR: The library has been built without"  << std::endl
+//   libMesh::err << "ERROR: The library has been built without"  << std::endl
 // 	    << "Parmetis support.  Using a Metis"           << std::endl
 // 	    << "partitioner instead!"                       << std::endl;
 
@@ -133,7 +133,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
 #ifndef LIBMESH_HAVE_PARMETIS
 
   libmesh_here();
-  *libMesh::err << "ERROR: The library has been built without"  << std::endl
+  libMesh::err << "ERROR: The library has been built without"  << std::endl
 	        << "Parmetis support.  Using a Metis"           << std::endl
 	        << "partitioner instead!"                       << std::endl;
 
@@ -355,7 +355,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
     // there must be some unpartitioned objects out there.
     if (global_index_map.size() != _global_index_by_pid_map.size())
       {
-	*libMesh::err << "ERROR:  ParmetisPartitioner cannot handle unpartitioned objects!"
+	libMesh::err << "ERROR:  ParmetisPartitioner cannot handle unpartitioned objects!"
 		      << std::endl;
 	libmesh_error();
       }    

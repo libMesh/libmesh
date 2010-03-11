@@ -167,7 +167,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T>&,
 			       const double,
 			       const unsigned int)
 {
-  *libMesh::err << "ERROR: LASPACK does not support a user-supplied preconditioner!"
+  libMesh::err << "ERROR: LASPACK does not support a user-supplied preconditioner!"
 	        << std::endl;
   libmesh_error();
 

@@ -186,7 +186,7 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
   if (forbid_constraint_overwrite)
     if (this->is_constrained_dof(dof_number))
       {
-	*libMesh::err << "ERROR: DOF " << dof_number << " was already constrained!"
+	libMesh::err << "ERROR: DOF " << dof_number << " was already constrained!"
 		      << std::endl;
 	libmesh_error();
       }
@@ -638,7 +638,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
     }
   else // unknown v->type()
     {
-      *libMesh::err << "ERROR: Unknown v->type() == " << v->type() 
+      libMesh::err << "ERROR: Unknown v->type() == " << v->type() 
 		    << std::endl;
       libmesh_error();
     }

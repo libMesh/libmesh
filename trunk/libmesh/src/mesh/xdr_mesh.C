@@ -265,7 +265,7 @@ int XdrMESH::header(XdrMHEAD *hd)
                 // If you reach an alphabetic character, this is an error
                 if (!isdigit(token[0]))
 		  {
-		    *libMesh::err << "Error: Unrecognized character detected." 
+		    libMesh::err << "Error: Unrecognized character detected." 
 			          << std::endl;
 		    libmesh_error();
 		  }

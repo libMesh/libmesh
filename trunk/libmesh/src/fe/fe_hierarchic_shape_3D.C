@@ -646,7 +646,7 @@ Real FE<3,HIERARCHIC>::shape(const ElemType,
                              const unsigned int,
                              const Point&)
 {
-  *libMesh::err << "Hierarchic polynomials require the element type\n"
+  libMesh::err << "Hierarchic polynomials require the element type\n"
                 << "because edge and face orientation is needed."
                 << std::endl;
   
@@ -712,7 +712,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
                                    const unsigned int,
                                    const Point& )
 {
-  *libMesh::err << "Hierarchic polynomials require the element type\n"
+  libMesh::err << "Hierarchic polynomials require the element type\n"
                 << "because edge and face orientation is needed."
                 << std::endl;
   libmesh_error();
@@ -785,7 +785,7 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const ElemType,
                                           const unsigned int,
                                           const Point& )
 {
-  *libMesh::err << "Hierarchic polynomials require the element type\n"
+  libMesh::err << "Hierarchic polynomials require the element type\n"
                 << "because edge and face orientation is needed."
                 << std::endl;
   libmesh_error();

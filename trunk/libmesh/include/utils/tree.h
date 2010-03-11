@@ -63,13 +63,13 @@ public:
   /**
    * Prints the nodes.
    */
-  void print_nodes(std::ostream& out=*libMesh::out) const
+  void print_nodes(std::ostream& out=libMesh::out) const
   { out << "Printing nodes...\n"; root.print_nodes(out); }
 
   /**
    * Prints the nodes.
    */
-  void print_elements(std::ostream& out=*libMesh::out) const
+  void print_elements(std::ostream& out=libMesh::out) const
   { out << "Printing elements...\n"; root.print_elements(out); }
   
   /**

@@ -270,7 +270,7 @@ public:
    * Print the contents of the matrix, by default to libMesh::out.
    * Currently identical to \p print().
    */
-  void print_personal(std::ostream& os=*libMesh::out) const { this->print(os); }
+  void print_personal(std::ostream& os=libMesh::out) const { this->print(os); }
 
   /**
    * Copies the diagonal part of the matrix into \p dest.

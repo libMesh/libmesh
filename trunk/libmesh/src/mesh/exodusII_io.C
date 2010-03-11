@@ -52,7 +52,7 @@ ExodusII_IO::~ExodusII_IO ()
 {
 #ifndef LIBMESH_HAVE_EXODUS_API
 
-  *libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
 	        << std::endl;
   libmesh_error();
     
@@ -88,7 +88,7 @@ void ExodusII_IO::read (const std::string& fname)
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 
-  *libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
 	        << "Input file " << fname << " cannot be read"
 	        << std::endl;
   libmesh_error();
@@ -151,7 +151,7 @@ void ExodusII_IO::read (const std::string& fname)
       const std::string type_str (exio_helper.get_elem_type());
       const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str); 
       //if (_verbose)
-      //*libMesh::out << "Reading a block of " << type_str << " elements." << std::endl;
+      //libMesh::out << "Reading a block of " << type_str << " elements." << std::endl;
       
       // Loop over all the faces in this block
       int jmax = nelem_last_block+exio_helper.get_num_elem_this_blk();
@@ -238,7 +238,7 @@ void ExodusII_IO::read (const std::string& fname)
 void ExodusII_IO::copy_nodal_solution(System& , std::string, unsigned int)
 {
 
-  *libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
 	        << std::endl;
   libmesh_error();
 }
@@ -281,7 +281,7 @@ void ExodusII_IO::write_nodal_data (const std::string& ,
 				    const std::vector<std::string>& )
 {
 
-  *libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
 	        << std::endl;
   libmesh_error();
 }
@@ -337,7 +337,7 @@ void ExodusII_IO::write_timestep (const std::string& ,
 				  const Real )
 {
 
-  *libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
 	        << std::endl;
   libmesh_error();
 }
@@ -364,7 +364,7 @@ void ExodusII_IO::write_timestep (const std::string& fname,
 
 void ExodusII_IO::write (const std::string& )
 {
-  *libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
 	        << std::endl;
   libmesh_error();
 }

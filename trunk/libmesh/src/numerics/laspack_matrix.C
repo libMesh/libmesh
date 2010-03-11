@@ -82,8 +82,8 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
   libmesh_assert (!this->initialized());
   this->init ();
   libmesh_assert (this->initialized());
-  //*libMesh::out << "n_rows=" << n_rows << std::endl;
-  //*libMesh::out << "m()=" << m() << std::endl;
+  //libMesh::out << "n_rows=" << n_rows << std::endl;
+  //libMesh::out << "m()=" << m() << std::endl;
   libmesh_assert (n_rows == this->m());
 
   // Tell the matrix about its structure.  Initialize it
@@ -102,12 +102,12 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 	  const unsigned int j = *(rs+l);
 
 	  // sanity check
-	  //*libMesh::out << "m()=" << m() << std::endl;
-	  //*libMesh::out << "(i,j,l) = (" << i
+	  //libMesh::out << "m()=" << m() << std::endl;
+	  //libMesh::out << "(i,j,l) = (" << i
 	  //	          << "," << j
 	  //	          << "," << l
 	  // 	          << ")" << std::endl;
-	  //*libMesh::out << "pos(i,j)=" << pos(i,j)
+	  //libMesh::out << "pos(i,j)=" << pos(i,j)
 	  //              << std::endl;	  
 	  libmesh_assert (this->pos(i,j) == l);
 	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
@@ -135,7 +135,7 @@ void LaspackMatrix<T>::init (const unsigned int m,
   libmesh_assert (nnz > 0);
 
 
-  *libMesh::err << "ERROR: Only the init() member that uses the" << std::endl
+  libMesh::err << "ERROR: Only the init() member that uses the" << std::endl
 	        << "DofMap is implemented for Laspack matrices!" << std::endl;
   libmesh_error();
 

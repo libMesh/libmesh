@@ -152,7 +152,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    
 	  default:
 	    {
-	      *libMesh::err << "ERROR: Unsupported 3D element type!: " << type
+	      libMesh::err << "ERROR: Unsupported 3D element type!: " << type
 			    << std::endl;
 	      libmesh_error();
 	    }
@@ -341,7 +341,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	    
 	  default:
 	    {
-	      *libMesh::err << "ERROR: Unsupported 3D element type!: " << type
+	      libMesh::err << "ERROR: Unsupported 3D element type!: " << type
 			    << std::endl;
 	      libmesh_error();
 	    }
@@ -352,7 +352,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
       // unsupported order
     default:
       {
-	*libMesh::err << "ERROR: Unsupported 3D FE order!: " << order
+	libMesh::err << "ERROR: Unsupported 3D FE order!: " << order
 		      << std::endl;
 	libmesh_error();
       }
@@ -687,7 +687,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    
 	  default:
 	    {
-	      *libMesh::err << "ERROR: Unsupported 3D element type!: " << type
+	      libMesh::err << "ERROR: Unsupported 3D element type!: " << type
 			    << std::endl;
 	      libmesh_error();
 	    }
@@ -1189,7 +1189,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    
 	  default:
 	    {
-	      *libMesh::err << "ERROR: Unsupported 3D element type!: " << type
+	      libMesh::err << "ERROR: Unsupported 3D element type!: " << type
 			    << std::endl;
 	      libmesh_error();
 	    }
@@ -1200,7 +1200,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
       // unsupported order
     default:
       {
-	*libMesh::err << "ERROR: Unsupported 3D FE order!: " << order
+	libMesh::err << "ERROR: Unsupported 3D FE order!: " << order
 		      << std::endl;
 	libmesh_error();
       }
@@ -1260,7 +1260,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
               static bool warning_given_HEX20 = false;
 
               if (!warning_given_HEX20)
-              *libMesh::err << "Second derivatives for 2D Lagrangian HEX20"
+              libMesh::err << "Second derivatives for 2D Lagrangian HEX20"
                             << " elements are not yet implemented!"
                             << std::endl;
               warning_given_HEX20 = true;
@@ -1395,7 +1395,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 		}
 	      else
 		{
-		  *libMesh::err << "Invalid shape function index " << i << std::endl;
+		  libMesh::err << "Invalid shape function index " << i << std::endl;
 		  libmesh_error();
 		}
 	    }
@@ -1454,7 +1454,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    
 	  default:
 	    {
-	      *libMesh::err << "ERROR: Unsupported 3D element type!: " << type
+	      libMesh::err << "ERROR: Unsupported 3D element type!: " << type
 			    << std::endl;
 	      libmesh_error();
 	    }
@@ -1465,7 +1465,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
       // unsupported order
     default:
       {
-	*libMesh::err << "ERROR: Unsupported 3D FE order!: " << order
+	libMesh::err << "ERROR: Unsupported 3D FE order!: " << order
 		      << std::endl;
 	libmesh_error();
       }

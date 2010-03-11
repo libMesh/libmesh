@@ -33,7 +33,7 @@ Real FE<2,HIERARCHIC>::shape(const ElemType,
 			     const unsigned int,
 			     const Point&)
 {
-  *libMesh::err << "Hierarchic polynomials require the element type\n"
+  libMesh::err << "Hierarchic polynomials require the element type\n"
 	        << "because edge orientation is needed."
 	        << std::endl;
   
@@ -222,7 +222,7 @@ Real FE<2,HIERARCHIC>::shape(const Elem* elem,
       }
 
     default:
-      *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+      libMesh::err << "ERROR: Unsupported element type!" << std::endl;
       libmesh_error();
     }
 
@@ -238,7 +238,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
 				   const unsigned int,
 				   const Point&)
 {
-  *libMesh::err << "Hierarchic polynomials require the element type\n"
+  libMesh::err << "Hierarchic polynomials require the element type\n"
 	        << "because edge orientation is needed."
 	        << std::endl;
 
@@ -377,7 +377,7 @@ Real FE<2,HIERARCHIC>::shape_deriv(const Elem* elem,
       }
       
     default:
-      *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+      libMesh::err << "ERROR: Unsupported element type!" << std::endl;
       libmesh_error();
     }
 
@@ -393,7 +393,7 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const ElemType,
 				          const unsigned int,
 				          const Point&)
 {
-  *libMesh::err << "Hierarchic polynomials require the element type\n"
+  libMesh::err << "Hierarchic polynomials require the element type\n"
 	        << "because edge orientation is needed."
 	        << std::endl;
 

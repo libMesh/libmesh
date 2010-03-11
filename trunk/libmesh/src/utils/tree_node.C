@@ -292,7 +292,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    }
     
 	  default:
-	    *libMesh::err << "c >= N! : " << c
+	    libMesh::err << "c >= N! : " << c
 		          << std::endl;
 	    libmesh_error();
 	  }
@@ -349,7 +349,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	    }
 	    
 	  default:
-	    *libMesh::err << "c >= N!" << std::endl;
+	    libMesh::err << "c >= N!" << std::endl;
 	    libmesh_error();
 	    
 	  }
@@ -358,7 +358,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
       } // case 4
 
     default:
-      *libMesh::err << "Only implemented for Octrees and QuadTrees!" << std::endl;
+      libMesh::err << "Only implemented for Octrees and QuadTrees!" << std::endl;
       libmesh_error();
 
     }

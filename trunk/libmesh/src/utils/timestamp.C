@@ -87,7 +87,7 @@ namespace Utility
     return std::string(time_buffer);
   else
     {
-      *libMesh::out << "Error formatting time buffer, returning empty string!" << std::endl;
+      libMesh::out << "Error formatting time buffer, returning empty string!" << std::endl;
       return std::string("");
     }
 

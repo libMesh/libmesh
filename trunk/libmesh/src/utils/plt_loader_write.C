@@ -53,12 +53,12 @@
 //   // Tell the user what files we are creating
 //   if (this->verbose())
 //     {
-//       *libMesh::out << "Plot3D output will be written to " << gname;
+//       libMesh::out << "Plot3D output will be written to " << gname;
 
 //       if (!gridonly)
-// 	*libMesh::out << " and " << qname;
+// 	libMesh::out << " and " << qname;
 
-//       *libMesh::out << std::endl;
+//       libMesh::out << std::endl;
 //     }
 
   
@@ -113,18 +113,18 @@
 //   // Ask the user which variables to write
 //   if (!gridonly)
 //     {
-//       *libMesh::out << "Variables:" << std::endl;
+//       libMesh::out << "Variables:" << std::endl;
       
 //       for (unsigned int v=0; v<this->n_vars(); v++)
-// 	*libMesh::out << " " << v << ") \"" << this->var_name(v) << "\""
+// 	libMesh::out << " " << v << ") \"" << this->var_name(v) << "\""
 // 		  << std::endl;
-//       *libMesh::out << std::endl;
+//       libMesh::out << std::endl;
 
 //       int n_write_vars = 0;
 
 //       while (true)
 // 	{
-// 	  *libMesh::out << "How many variables to write to the Plot3D file? 1<=n<=" << this->n_vars()
+// 	  libMesh::out << "How many variables to write to the Plot3D file? 1<=n<=" << this->n_vars()
 // 		    << " "
 // 		    << std::endl
 // 		    << "(-1 writes them all): ";
@@ -154,7 +154,7 @@
 // 	  libmesh_assert (n_write_vars >= 1);
 // 	  libmesh_assert (n_write_vars < static_cast<int>(this->n_vars()));
 	  
-// 	  *libMesh::out << "Select the " << n_write_vars << " variables to write to the Plot3D file: "
+// 	  libMesh::out << "Select the " << n_write_vars << " variables to write to the Plot3D file: "
 // 		    << std::endl;
 	  
 // 	  for (int wv=0; wv<n_write_vars; wv++)
@@ -169,7 +169,7 @@
 // 	    }
 // 	}
       
-//       *libMesh::out << std::endl;
+//       libMesh::out << std::endl;
 //     } // if (!gridonly)
 
 
@@ -217,7 +217,7 @@
 // 	  std::fill    (conds.begin(), conds.end(), 0.);
 
 // 	  if (zn == 0)
-// 	    *libMesh::out << "  Writing ";
+// 	    libMesh::out << "  Writing ";
 	  
 // 	  for (unsigned int i=0; i<write_vars.size(); i++)
 // 	    {
@@ -229,7 +229,7 @@
 // 	      // Tell the user what variable we are writing, but only
 // 	      // once per file.
 // 	      if (zn == 0)
-// 		*libMesh::out << "\"" << this->var_name(v) << "\" ";
+// 		libMesh::out << "\"" << this->var_name(v) << "\" ";
 	      
 // 	      unsigned int l=0;
 	      
@@ -244,7 +244,7 @@
 // 	    }
 
 // 	  if (zn == 0)
-// 	    *libMesh::out << "to " << qname << std::endl;
+// 	    libMesh::out << "to " << qname << std::endl;
 	  
 // 	  // Write to the solution file
 // 	  {
@@ -274,7 +274,7 @@
 //   if (reverse)
 //     {
 //       if (this->verbose())
-// 	*libMesh::out << "Reversing byte-ordering for output files."
+// 	libMesh::out << "Reversing byte-ordering for output files."
 // 		  << std::endl;
       
 //       Utility::reverse_endian (gname);
@@ -299,11 +299,11 @@
 
 //   if (this->verbose())
 //     {
-//       *libMesh::out << "Writing unformatted .tri file " << name
+//       libMesh::out << "Writing unformatted .tri file " << name
 // 		<< std::endl;
 
 //       if (gridonly)
-// 	*libMesh::out << "Only writing the grid to " << name
+// 	libMesh::out << "Only writing the grid to " << name
 // 		  << std::endl;
 //     }
 
@@ -404,12 +404,12 @@
 //       {
 // 	if (this->verbose())
 // 	  {
-// 	    *libMesh::out << "Writing variables ";
+// 	    libMesh::out << "Writing variables ";
 
 // 	    for (unsigned int v=3; v<this->n_vars(); v++)
-// 	      *libMesh::out << "\"" << this->var_name(v) << "\" ";
+// 	      libMesh::out << "\"" << this->var_name(v) << "\" ";
 
-// 	    *libMesh::out << "to the output file " << name
+// 	    libMesh::out << "to the output file " << name
 // 		      << std::endl;
 // 	  }
 	
@@ -437,7 +437,7 @@
 //   if (reverse)
 //     {
 //       if (this->verbose())
-// 	*libMesh::out << "Reversing byte-ordering for output files."
+// 	libMesh::out << "Reversing byte-ordering for output files."
 // 		  << std::endl;
       
 //       Utility::reverse_endian (name);
@@ -564,8 +564,8 @@ void PltLoader::write_dat (const std::string& name,
       // Otherwise, unrecognized zone type
       else
 	{
-	  *libMesh::err << "Unrecognized zone type: ";
-	  *libMesh::err << "this->zone_type(z)==" << this->zone_type(z) << std::endl;
+	  libMesh::err << "Unrecognized zone type: ";
+	  libMesh::err << "this->zone_type(z)==" << this->zone_type(z) << std::endl;
 	  libmesh_error();
 	}
     }

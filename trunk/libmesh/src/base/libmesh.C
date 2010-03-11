@@ -83,8 +83,8 @@ namespace {
 MPI_Comm           libMesh::COMM_WORLD = MPI_COMM_NULL;
 #endif
 
-std::ostream* libMesh::out = &std::cout;
-std::ostream* libMesh::err = &std::cerr;
+OStreamProxy libMesh::out = std::cout;
+OStreamProxy libMesh::err = std::cerr;
 
 Parallel::Communicator Parallel::Communicator_World;
 
@@ -270,8 +270,10 @@ void _init (int &argc, char** & argv,
       // Redirect.  We'll share streambufs with cout/cerr for now, but
       // presumably anyone using this option will want to replace the
       // bufs later.
-      libMesh::out = new std::ostream(std::cout.rdbuf());
-      libMesh::err = new std::ostream(std::cerr.rdbuf());
+      std::ostream* newout = new std::ostream(std::cout.rdbuf());
+      libMesh::out = *newout;
+      std::ostream* newerr = new std::ostream(std::cerr.rdbuf());
+      libMesh::err = *newerr;
     }
   
   // Honor the --redirect-stdout command-line option.
@@ -285,8 +287,8 @@ void _init (int &argc, char** & argv,
 	       libMesh::processor_id());
       _ofstream.reset (new std::ofstream (filechar));
       // Redirect, saving the original streambufs!
-      out_buf = libMesh::out->rdbuf (_ofstream->rdbuf());
-      err_buf = libMesh::err->rdbuf (_ofstream->rdbuf());
+      out_buf = libMesh::out.rdbuf (_ofstream->rdbuf());
+      err_buf = libMesh::err.rdbuf (_ofstream->rdbuf());
     }
 
   // redirect libMesh::out to nothing on all
@@ -294,7 +296,7 @@ void _init (int &argc, char** & argv,
   // not to via the --keep-cout command-line argument.
   if (libMesh::processor_id() != 0)
     if (!libMesh::on_command_line ("--keep-cout"))
-      libMesh::out->rdbuf (NULL);
+      libMesh::out.rdbuf (NULL);
   
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
@@ -335,7 +337,7 @@ int _close ()
       if (libmesh_initialized_mpi &&
           std::uncaught_exception())
         {
-          *libMesh::err << "Uncaught exception - aborting" << std::endl;
+          libMesh::err << "Uncaught exception - aborting" << std::endl;
           MPI_Abort(libMesh::COMM_WORLD,1);
         }
 # if defined(LIBMESH_HAVE_PETSC) 
@@ -372,12 +374,12 @@ int _close ()
   // Print an informative message if we detect a memory leak
   if (ReferenceCounter::n_objects() != 0)
     {
-      *libMesh::err << "Memory leak detected!"
+      libMesh::err << "Memory leak detected!"
 		    << std::endl;
       
 #if !defined(LIBMESH_ENABLE_REFERENCE_COUNTING) || defined(NDEBUG)
 
-      *libMesh::err << "Compile in DEBUG mode with --enable-reference-counting"
+      libMesh::err << "Compile in DEBUG mode with --enable-reference-counting"
 		    << std::endl
 		    << "for more information"
 		    << std::endl;
@@ -406,10 +408,20 @@ int _close ()
       libMesh::perflog.clear();
       
       // If stdout/stderr were redirected to files, reset them now.
-      libMesh::out->rdbuf (out_buf);
-      libMesh::err->rdbuf (err_buf);
+      libMesh::out.rdbuf (out_buf);
+      libMesh::err.rdbuf (err_buf);
     }
   
+  // If we built our own output streams, we want to clean them up.
+  if (libMesh::on_command_line ("--separate-libmeshout"))
+    {
+      delete libMesh::out.get();
+      delete libMesh::err.get();
+
+      libMesh::out.reset(std::cout);
+      libMesh::err.reset(std::cerr);
+    }
+
   // Return the number of outstanding objects.
   // This is equivalent to return 0 if all of
   // the reference counted objects have been

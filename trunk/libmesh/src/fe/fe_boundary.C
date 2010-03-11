@@ -39,7 +39,7 @@ void FE<_dim,_type>::_func(const Elem*,        \
 			   const unsigned int, \
                            const Real)         \
 {                                              \
-  *libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
+  libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
 	        << std::endl;                      \
   libmesh_error();                                     \
 }
@@ -263,7 +263,7 @@ void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
 	      dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
 	      d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
 	    }
-	  // *libMesh::out << "d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
+	  // libMesh::out << "d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
 
 	  // If we are in 3D, then our sides are 2D faces.
 	  // For the second derivatives, we must also compute the cross

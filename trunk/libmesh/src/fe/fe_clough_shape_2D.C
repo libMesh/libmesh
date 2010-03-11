@@ -93,7 +93,7 @@ void clough_compute_coefs(const Elem* elem)
 
   for (int p = 0; p != 6; ++p)
     {
-//      *libMesh::err << p << ' ' << dofpt[p];
+//      libMesh::err << p << ' ' << dofpt[p];
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
           const Real ddxi = FE<2,LAGRANGE>::shape_deriv 
@@ -101,8 +101,8 @@ void clough_compute_coefs(const Elem* elem)
           const Real ddeta = FE<2,LAGRANGE>::shape_deriv 
             (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
 
-//      *libMesh::err << ddxi << ' ';
-//      *libMesh::err << ddeta << std::endl;
+//      libMesh::err << ddxi << ' ';
+//      libMesh::err << ddeta << std::endl;
 
           dxdxi[p] += elem->point(i)(0) * ddxi;
           dydxi[p] += elem->point(i)(1) * ddxi;
@@ -111,14 +111,14 @@ void clough_compute_coefs(const Elem* elem)
         }
 
 //      for (int i = 0; i != 12; ++i)
-//          *libMesh::err << i << ' ' << clough_raw_shape(i, dofpt[p]) << std::endl;
+//          libMesh::err << i << ' ' << clough_raw_shape(i, dofpt[p]) << std::endl;
 
-//      *libMesh::err << elem->point(p)(0) << ' ';
-//      *libMesh::err << elem->point(p)(1) << ' ';
-//      *libMesh::err << dxdxi[p] << ' ';
-//      *libMesh::err << dydxi[p] << ' ';
-//      *libMesh::err << dxdeta[p] << ' ';
-//      *libMesh::err << dydeta[p] << std::endl << std::endl;
+//      libMesh::err << elem->point(p)(0) << ' ';
+//      libMesh::err << elem->point(p)(1) << ' ';
+//      libMesh::err << dxdxi[p] << ' ';
+//      libMesh::err << dydxi[p] << ' ';
+//      libMesh::err << dxdeta[p] << ' ';
+//      libMesh::err << dydeta[p] << std::endl << std::endl;
 
       const Real inv_jac = 1. / (dxdxi[p]*dydeta[p] - 
         dxdeta[p]*dydxi[p]);
@@ -176,61 +176,61 @@ void clough_compute_coefs(const Elem* elem)
   N21x /= Nlength; N21y /= Nlength;
 
 //  for (int i=0; i != 6; ++i) {
-//    *libMesh::err << elem->node(i) << ' ';
+//    libMesh::err << elem->node(i) << ' ';
 //  }
-//  *libMesh::err << std::endl;
+//  libMesh::err << std::endl;
 
 //  for (int i=0; i != 6; ++i) {
-//    *libMesh::err << elem->point(i)(0) << ' ';
-//    *libMesh::err << elem->point(i)(1) << ' ';
+//    libMesh::err << elem->point(i)(0) << ' ';
+//    libMesh::err << elem->point(i)(1) << ' ';
 //  }
-//  *libMesh::err << std::endl;
+//  libMesh::err << std::endl;
 
 
   // give normal vectors a globally unique orientation
 
   if (elem->point(2) < elem->point(1))
     {
-//      *libMesh::err << "Flipping nodes " << elem->node(2);
-//      *libMesh::err << " and " << elem->node(1);
-//      *libMesh::err << " around node " << elem->node(4);
-//      *libMesh::err << std::endl;
+//      libMesh::err << "Flipping nodes " << elem->node(2);
+//      libMesh::err << " and " << elem->node(1);
+//      libMesh::err << " around node " << elem->node(4);
+//      libMesh::err << std::endl;
       N1x = -N1x; N1y = -N1y;
       N12x = -N12x; N12y = -N12y;
       N21x = -N21x; N21y = -N21y;
     }
   else
     {
-//      *libMesh::err << "Not flipping nodes " << elem->node(2);
-//      *libMesh::err << " and " << elem->node(1);
-//      *libMesh::err << " around node " << elem->node(4);
-//      *libMesh::err << std::endl;
+//      libMesh::err << "Not flipping nodes " << elem->node(2);
+//      libMesh::err << " and " << elem->node(1);
+//      libMesh::err << " around node " << elem->node(4);
+//      libMesh::err << std::endl;
     }
   if (elem->point(0) < elem->point(2))
     {
-//      *libMesh::err << "Flipping nodes " << elem->node(0);
-//      *libMesh::err << " and " << elem->node(2);
-//      *libMesh::err << " around node " << elem->node(5);
-//      *libMesh::err << std::endl;
-//      *libMesh::err << N2x << ' ' << N2y << std::endl;
+//      libMesh::err << "Flipping nodes " << elem->node(0);
+//      libMesh::err << " and " << elem->node(2);
+//      libMesh::err << " around node " << elem->node(5);
+//      libMesh::err << std::endl;
+//      libMesh::err << N2x << ' ' << N2y << std::endl;
       N2x = -N2x; N2y = -N2y;
       N02x = -N02x; N02y = -N02y;
       N20x = -N20x; N20y = -N20y;
-//      *libMesh::err << N2x << ' ' << N2y << std::endl;
+//      libMesh::err << N2x << ' ' << N2y << std::endl;
     }
   else
     {
-//      *libMesh::err << "Not flipping nodes " << elem->node(0);
-//      *libMesh::err << " and " << elem->node(2);
-//      *libMesh::err << " around node " << elem->node(5);
-//      *libMesh::err << std::endl;
+//      libMesh::err << "Not flipping nodes " << elem->node(0);
+//      libMesh::err << " and " << elem->node(2);
+//      libMesh::err << " around node " << elem->node(5);
+//      libMesh::err << std::endl;
     }
   if (elem->point(1) < elem->point(0))
     {
-//      *libMesh::err << "Flipping nodes " << elem->node(1);
-//      *libMesh::err << " and " << elem->node(0);
-//      *libMesh::err << " around node " << elem->node(3);
-//      *libMesh::err << std::endl;
+//      libMesh::err << "Flipping nodes " << elem->node(1);
+//      libMesh::err << " and " << elem->node(0);
+//      libMesh::err << " around node " << elem->node(3);
+//      libMesh::err << std::endl;
       N3x = -N3x;
       N3y = -N3y;
       N01x = -N01x; N01y = -N01y;
@@ -238,13 +238,13 @@ void clough_compute_coefs(const Elem* elem)
     }
   else
     {
-//      *libMesh::err << "Not flipping nodes " << elem->node(1);
-//      *libMesh::err << " and " << elem->node(0);
-//      *libMesh::err << " around node " << elem->node(3);
-//      *libMesh::err << std::endl;
+//      libMesh::err << "Not flipping nodes " << elem->node(1);
+//      libMesh::err << " and " << elem->node(0);
+//      libMesh::err << " around node " << elem->node(3);
+//      libMesh::err << std::endl;
     }
 
-//  *libMesh::err << N2x << ' ' << N2y << std::endl;
+//  libMesh::err << N2x << ' ' << N2y << std::endl;
 
   // Cache basis function gradients
   // FIXME: the raw_shape calls shouldn't be done on every element!
@@ -352,23 +352,23 @@ void clough_compute_coefs(const Elem* elem)
   Real d2xd2dx    = d2xd2dxi * dxidx[1] + d2xd2deta * detadx[1];
   Real d2xd2dy    = d2xd2dxi * dxidy[1] + d2xd2deta * detady[1];
 
-//  *libMesh::err << dofpt[4](0) << ' ';
-//  *libMesh::err << dofpt[4](1) << ' ';
-//  *libMesh::err << (int)subtriangle_lookup(dofpt[5]) << ' ';
-//  *libMesh::err << dxdxi[4] << ' ';
-//  *libMesh::err << dxdeta[4] << ' ';
-//  *libMesh::err << dydxi[4] << ' ';
-//  *libMesh::err << dydeta[4] << ' ';
-//  *libMesh::err << dxidx[4] << ' ';
-//  *libMesh::err << dxidy[4] << ' ';
-//  *libMesh::err << detadx[4] << ' ';
-//  *libMesh::err << detady[4] << ' ';
-//  *libMesh::err << N1x << ' ';
-//  *libMesh::err << N1y << ' ';
-//  *libMesh::err << d2yd1ndxi << ' ';
-//  *libMesh::err << d2yd1ndeta << ' ';
-//  *libMesh::err << d2yd1ndx << ' ';
-//  *libMesh::err << d2yd1ndy << std::endl;
+//  libMesh::err << dofpt[4](0) << ' ';
+//  libMesh::err << dofpt[4](1) << ' ';
+//  libMesh::err << (int)subtriangle_lookup(dofpt[5]) << ' ';
+//  libMesh::err << dxdxi[4] << ' ';
+//  libMesh::err << dxdeta[4] << ' ';
+//  libMesh::err << dydxi[4] << ' ';
+//  libMesh::err << dydeta[4] << ' ';
+//  libMesh::err << dxidx[4] << ' ';
+//  libMesh::err << dxidy[4] << ' ';
+//  libMesh::err << detadx[4] << ' ';
+//  libMesh::err << detady[4] << ' ';
+//  libMesh::err << N1x << ' ';
+//  libMesh::err << N1y << ' ';
+//  libMesh::err << d2yd1ndxi << ' ';
+//  libMesh::err << d2yd1ndeta << ' ';
+//  libMesh::err << d2yd1ndx << ' ';
+//  libMesh::err << d2yd1ndy << std::endl;
 
   Real d2yd2dxi   = clough_raw_shape_deriv(6, 0, dofpt[1]);
   Real d2yd2deta  = clough_raw_shape_deriv(6, 1, dofpt[1]);
@@ -440,18 +440,18 @@ void clough_compute_coefs(const Elem* elem)
   d3yd3x = 1. / (d3xd3dy - d3yd3dy * d3xd3dx / d3yd3dx);
 //  d3yd3x = - d3yd3y * (d3yd3dx / d3xd3dx);
 
-//  *libMesh::err << d1xd1dx << ' ';
-//  *libMesh::err << d1xd1dy << ' ';
-//  *libMesh::err << d1yd1dx << ' ';
-//  *libMesh::err << d1yd1dy << ' ';
-//  *libMesh::err << d2xd2dx << ' ';
-//  *libMesh::err << d2xd2dy << ' ';
-//  *libMesh::err << d2yd2dx << ' ';
-//  *libMesh::err << d2yd2dy << ' ';
-//  *libMesh::err << d3xd3dx << ' ';
-//  *libMesh::err << d3xd3dy << ' ';
-//  *libMesh::err << d3yd3dx << ' ';
-//  *libMesh::err << d3yd3dy << std::endl;
+//  libMesh::err << d1xd1dx << ' ';
+//  libMesh::err << d1xd1dy << ' ';
+//  libMesh::err << d1yd1dx << ' ';
+//  libMesh::err << d1yd1dy << ' ';
+//  libMesh::err << d2xd2dx << ' ';
+//  libMesh::err << d2xd2dy << ' ';
+//  libMesh::err << d2yd2dx << ' ';
+//  libMesh::err << d2yd2dy << ' ';
+//  libMesh::err << d3xd3dx << ' ';
+//  libMesh::err << d3xd3dy << ' ';
+//  libMesh::err << d3yd3dx << ' ';
+//  libMesh::err << d3yd3dy << std::endl;
 
   // Calculate midpoint derivative adjustments to nodal derivative
   // interpolant functions
@@ -470,47 +470,47 @@ void clough_compute_coefs(const Elem* elem)
   d3yd2n = -(d3yd3y * d3yd2ndn + d3yd3x * d3xd2ndn) / d2nd2ndn;
 
   // Cross your fingers
-//  *libMesh::err << d1nd1ndn << ' ';
-//  *libMesh::err << d2xd1ndn << ' ';
-//  *libMesh::err << d2yd1ndn << ' ';
-//  *libMesh::err << std::endl;
+//  libMesh::err << d1nd1ndn << ' ';
+//  libMesh::err << d2xd1ndn << ' ';
+//  libMesh::err << d2yd1ndn << ' ';
+//  libMesh::err << std::endl;
 
-//  *libMesh::err << "Transform variables: ";
-//  *libMesh::err << d1nd1n << ' ';
-//  *libMesh::err << d2nd2n << ' ';
-//  *libMesh::err << d3nd3n << ' ';
-//  *libMesh::err << d1d2n << ' ';
-//  *libMesh::err << d1d3n << ' ';
-//  *libMesh::err << d2d3n << ' ';
-//  *libMesh::err << d2d1n << ' ';
-//  *libMesh::err << d3d1n << ' ';
-//  *libMesh::err << d3d2n << std::endl;
-//  *libMesh::err << d1xd1x << ' ';
-//  *libMesh::err << d1xd1y << ' ';
-//  *libMesh::err << d1yd1x << ' ';
-//  *libMesh::err << d1yd1y << ' ';
-//  *libMesh::err << d2xd2x << ' ';
-//  *libMesh::err << d2xd2y << ' ';
-//  *libMesh::err << d2yd2x << ' ';
-//  *libMesh::err << d2yd2y << ' ';
-//  *libMesh::err << d3xd3x << ' ';
-//  *libMesh::err << d3xd3y << ' ';
-//  *libMesh::err << d3yd3x << ' ';
-//  *libMesh::err << d3yd3y << std::endl;
-//  *libMesh::err << d1xd2n << ' ';
-//  *libMesh::err << d1yd2n << ' ';
-//  *libMesh::err << d1xd3n << ' ';
-//  *libMesh::err << d1yd3n << ' ';
-//  *libMesh::err << d2xd3n << ' ';
-//  *libMesh::err << d2yd3n << ' ';
-//  *libMesh::err << d2xd1n << ' ';
-//  *libMesh::err << d2yd1n << ' ';
-//  *libMesh::err << d3xd1n << ' ';
-//  *libMesh::err << d3yd1n << ' ';
-//  *libMesh::err << d3xd2n << ' ';
-//  *libMesh::err << d3yd2n << ' ';
-//  *libMesh::err << std::endl;
-//  *libMesh::err << std::endl;
+//  libMesh::err << "Transform variables: ";
+//  libMesh::err << d1nd1n << ' ';
+//  libMesh::err << d2nd2n << ' ';
+//  libMesh::err << d3nd3n << ' ';
+//  libMesh::err << d1d2n << ' ';
+//  libMesh::err << d1d3n << ' ';
+//  libMesh::err << d2d3n << ' ';
+//  libMesh::err << d2d1n << ' ';
+//  libMesh::err << d3d1n << ' ';
+//  libMesh::err << d3d2n << std::endl;
+//  libMesh::err << d1xd1x << ' ';
+//  libMesh::err << d1xd1y << ' ';
+//  libMesh::err << d1yd1x << ' ';
+//  libMesh::err << d1yd1y << ' ';
+//  libMesh::err << d2xd2x << ' ';
+//  libMesh::err << d2xd2y << ' ';
+//  libMesh::err << d2yd2x << ' ';
+//  libMesh::err << d2yd2y << ' ';
+//  libMesh::err << d3xd3x << ' ';
+//  libMesh::err << d3xd3y << ' ';
+//  libMesh::err << d3yd3x << ' ';
+//  libMesh::err << d3yd3y << std::endl;
+//  libMesh::err << d1xd2n << ' ';
+//  libMesh::err << d1yd2n << ' ';
+//  libMesh::err << d1xd3n << ' ';
+//  libMesh::err << d1yd3n << ' ';
+//  libMesh::err << d2xd3n << ' ';
+//  libMesh::err << d2yd3n << ' ';
+//  libMesh::err << d2xd1n << ' ';
+//  libMesh::err << d2yd1n << ' ';
+//  libMesh::err << d3xd1n << ' ';
+//  libMesh::err << d3yd1n << ' ';
+//  libMesh::err << d3xd2n << ' ';
+//  libMesh::err << d3yd2n << ' ';
+//  libMesh::err << std::endl;
+//  libMesh::err << std::endl;
 }
 
 
@@ -1442,7 +1442,7 @@ Real FE<2,CLOUGH>::shape(const ElemType,
 			     const unsigned int,
 			     const Point&)
 {
-  *libMesh::err << "Clough-Tocher elements require the real element\n"
+  libMesh::err << "Clough-Tocher elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
   
@@ -1543,7 +1543,7 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
@@ -1618,13 +1618,13 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   
@@ -1641,7 +1641,7 @@ Real FE<2,CLOUGH>::shape_deriv(const ElemType,
 				   const unsigned int,
 				   const Point&)
 {
-  *libMesh::err << "Clough-Tocher elements require the real element\n"
+  libMesh::err << "Clough-Tocher elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
 
@@ -1743,7 +1743,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
@@ -1818,13 +1818,13 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   
@@ -1926,7 +1926,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
@@ -2001,13 +2001,13 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   

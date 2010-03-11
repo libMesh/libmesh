@@ -343,7 +343,7 @@ public:
    * Prints information about the equation systems, by default to
    * libMesh::out.
    */
-  void print_info (std::ostream& os=*libMesh::out) const;
+  void print_info (std::ostream& os=libMesh::out) const;
 
   /**
    * Same as above, but allows you to also use stream syntax.
@@ -507,7 +507,7 @@ T_sys & EquationSystems::add_system (const std::string& name)
       // We now allow redundant add_system calls, to make it
       // easier to load data from files for user-derived system
       // subclasses
-//      *libMesh::err << "ERROR: There was already a system"
+//      libMesh::err << "ERROR: There was already a system"
 //		<< " named " << name
 //		<< std::endl;
 
@@ -550,7 +550,7 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
   // Check for errors
   if (pos == end)
     {
-      *libMesh::err << "ERROR: no system number " << num << " found!"
+      libMesh::err << "ERROR: no system number " << num << " found!"
 		    << std::endl;
       libmesh_error();
     }
@@ -561,7 +561,7 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
   // Check for failure of dynamic cast
   if (ptr == NULL)
     {
-      *libMesh::err << "ERROR: cannot convert system "
+      libMesh::err << "ERROR: cannot convert system "
 		    << num << " to requested type!"
 		    << std::endl;
       libmesh_error();
@@ -589,7 +589,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
   // Check for errors
   if (pos == end)
     {
-      *libMesh::err << "ERROR: no system number " << num << " found!"
+      libMesh::err << "ERROR: no system number " << num << " found!"
 		    << std::endl;
       libmesh_error();
     }
@@ -620,7 +620,7 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
   // Check for errors
   if (pos == _systems.end())
     {
-      *libMesh::err << "ERROR: no system named \"" << name << "\" found!"
+      libMesh::err << "ERROR: no system named \"" << name << "\" found!"
 		    << std::endl;
       libmesh_error();
     }
@@ -651,7 +651,7 @@ T_sys & EquationSystems::get_system (const std::string& name)
   // Check for errors
   if (pos == _systems.end())
     {
-      *libMesh::err << "ERROR: no system named " << name << " found!"
+      libMesh::err << "ERROR: no system named " << name << " found!"
 		    << std::endl;
       libmesh_error();
     }

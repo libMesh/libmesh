@@ -421,21 +421,21 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 // we don't care about neighbors of subactive element.
                 if ((!neigh->active()) && (!elem->subactive()))
                 {
-                  *libMesh::err << "On processor " << libMesh::processor_id() 
+                  libMesh::err << "On processor " << libMesh::processor_id() 
                                 << std::endl;
-                  *libMesh::err << "Bad element ID = " << elem->id() 
+                  libMesh::err << "Bad element ID = " << elem->id() 
                     << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
-                  *libMesh::err << "Bad element proc_ID = " << elem->processor_id() 
+                  libMesh::err << "Bad element proc_ID = " << elem->processor_id() 
                     << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
-                  *libMesh::err << "Bad element size = " << elem->hmin() 
+                  libMesh::err << "Bad element size = " << elem->hmin() 
                     << ", Bad neighbor size = " << neigh->hmin() << std::endl;
-                  *libMesh::err << "Bad element center = " << elem->centroid() 
+                  libMesh::err << "Bad element center = " << elem->centroid() 
                     << ", Bad neighbor center = " << neigh->centroid() << std::endl;
-                  *libMesh::err << "ERROR: " 
+                  libMesh::err << "ERROR: " 
                     << (elem->active()?"Active":"Ancestor")
                     << " Element at level "
                     << elem->level() << std::endl;
-                  *libMesh::err << "with "
+                  libMesh::err << "with "
                     << (elem->parent()->active()?"active":
                         (elem->parent()->subactive()?"subactive":"ancestor"))
                     << " parent share "
@@ -473,7 +473,7 @@ void UnstructuredMesh::read (const std::string& name,
     
     if (!in.good())
       {
-	*libMesh::err << "ERROR: cannot locate specified file:\n\t"
+	libMesh::err << "ERROR: cannot locate specified file:\n\t"
 		      << name
 		      << std::endl;
 	libmesh_error();
@@ -580,7 +580,7 @@ void UnstructuredMesh::read (const std::string& name,
 	    {
 	      if (mesh_data == NULL)
 		{
-		  *libMesh::err << "Error! You must pass a "
+		  libMesh::err << "Error! You must pass a "
 			        << "valid MeshData pointer to "
 			        << "read UNV files!" << std::endl;
 		  libmesh_error();
@@ -607,7 +607,7 @@ void UnstructuredMesh::read (const std::string& name,
       
 	  else
 	    {
-	      *libMesh::err << " ERROR: Unrecognized file extension: " << name
+	      libMesh::err << " ERROR: Unrecognized file extension: " << name
 			    << "\n   I understand the following:\n\n"
 			    << "     *.e    -- Sandia's ExodusII format\n"
 			<< "     *.exd  -- Sandia's ExodusII format\n"
@@ -707,7 +707,7 @@ void UnstructuredMesh::write (const std::string& name,
 	  {
 	    if (mesh_data == NULL)
 	      {
-		*libMesh::err << "Error! You must pass a "
+		libMesh::err << "Error! You must pass a "
 			      << "valid MeshData pointer to "
 			      << "write UNV files!" << std::endl;
 		libmesh_error();
@@ -732,7 +732,7 @@ void UnstructuredMesh::write (const std::string& name,
 	
 	else
 	  {
-	    *libMesh::err
+	    libMesh::err
               << " ERROR: Unrecognized file extension: " << name
               << "\n   I understand the following:\n\n"
               << "     *.dat   -- Tecplot ASCII file\n"
@@ -806,7 +806,7 @@ void UnstructuredMesh::write (const std::string& name,
     }
   else
     {
-      *libMesh::err
+      libMesh::err
         << " ERROR: Unrecognized file extension: " << name
 	<< "\n   I understand the following:\n\n"
 	<< "     *.dat  -- Tecplot ASCII file\n"
@@ -835,7 +835,7 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh& pid_mesh,
 #ifdef DEBUG
   if (this->n_processors() < pid)
     {
-      *libMesh::out << "WARNING:  You are creating a "
+      libMesh::out << "WARNING:  You are creating a "
 		    << "mesh for a processor id (="
 		    << pid
 		    << ") greater than "

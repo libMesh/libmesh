@@ -69,7 +69,7 @@ void PerfLog::clear()
 	     pos = log.begin(); pos != log.end(); ++pos)
 	if (pos->second.open)
 	  {
-	    *libMesh::out
+	    libMesh::out
 	      << "ERROR clearning performance log for class "
 	      << label_name << std::endl
 	      << "event " << pos->first.second << " is still being monitored!"
@@ -450,7 +450,7 @@ void PerfLog::print_log() const
       // avoid printing an unnecessary newline.
       std::string log_string = this->get_log();
       if (log_string.size() > 0)
-	*libMesh::out << log_string << std::endl;
+	libMesh::out << log_string << std::endl;
     }
 }
 

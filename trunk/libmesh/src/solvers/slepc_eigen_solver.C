@@ -578,7 +578,7 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
       // ierr = EPSSetType (_eps, (char*) EPSARPACK);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
       
     default:
-      *libMesh::err << "ERROR:  Unsupported SLEPc Eigen Solver: "
+      libMesh::err << "ERROR:  Unsupported SLEPc Eigen Solver: "
 		    << this->_eigen_solver_type         << std::endl
 		    << "Continuing with SLEPc defaults" << std::endl;
     }
@@ -604,7 +604,7 @@ void SlepcEigenSolver<T>:: set_slepc_problem_type()
       ierr = EPSSetProblemType (_eps, EPS_GHEP);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
       
     default:
-      *libMesh::err << "ERROR:  Unsupported SLEPc Eigen Problem: "
+      libMesh::err << "ERROR:  Unsupported SLEPc Eigen Problem: "
 		    << this->_eigen_problem_type        << std::endl
 		    << "Continuing with SLEPc defaults" << std::endl;
     }
@@ -634,7 +634,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
      
       
     default:
-      *libMesh::err << "ERROR:  Unsupported SLEPc position of spectrum: "
+      libMesh::err << "ERROR:  Unsupported SLEPc position of spectrum: "
 		    << this->_position_of_spectrum        << std::endl;
       libmesh_error();
     }
