@@ -211,8 +211,8 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 	  }
     }
   
-  // the element should be active
-  libmesh_assert (this->_element->active());
+  // If we found an element, it should be active
+  libmesh_assert (!this->_element || this->_element->active());
 
   // return the element
   return this->_element;
