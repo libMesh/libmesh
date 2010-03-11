@@ -590,7 +590,7 @@ namespace Parallel
     MPI_Barrier (comm.get());
   }    
 #else
-  inline void barrier (const Communicator &) {}
+  inline void barrier (const Communicator & = Communicator_World) {}
 #endif
   
   //-------------------------------------------------------------------
