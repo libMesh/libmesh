@@ -37,7 +37,7 @@ Real FE<3,BERNSTEIN>::shape(const ElemType,
 			    const unsigned int,
 			    const Point&)
 {
-  *libMesh::err << "Bernstein polynomials require the element type\n"
+  libMesh::err << "Bernstein polynomials require the element type\n"
 	        << "because edge and face orientation is needed."
 	        << std::endl;
   
@@ -1392,7 +1392,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const ElemType,
 				   const unsigned int,
 				   const Point& )
 {
-  *libMesh::err << "Bernstein polynomials require the element type\n"
+  libMesh::err << "Bernstein polynomials require the element type\n"
 	        << "because edge and face orientation is needed."
 	        << std::endl;
   libmesh_error();
@@ -2989,7 +2989,7 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const ElemType,
   static bool warning_given = false;
 
   if (!warning_given)
-  *libMesh::err << "Second derivatives for Bernstein elements "
+  libMesh::err << "Second derivatives for Bernstein elements "
                 << "are not yet implemented!"
                 << std::endl;
 
@@ -3009,7 +3009,7 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem*,
   static bool warning_given = false;
 
   if (!warning_given)
-  *libMesh::err << "Second derivatives for Bernstein elements "
+  libMesh::err << "Second derivatives for Bernstein elements "
                 << "are not yet implemented!"
                 << std::endl;
 

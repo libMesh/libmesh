@@ -105,7 +105,7 @@ public:
   /**
    * Pretty-print the matrix, by default to \p libMesh::out.
    */
-  void print(std::ostream& os = *libMesh::out) const;
+  void print(std::ostream& os = libMesh::out) const;
 
   /**
    * Formatted print as above but allows you to do

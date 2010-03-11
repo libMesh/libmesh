@@ -166,7 +166,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
 
   if (!data.good())
     {
-      *libMesh::err << "ERROR: opening output data file " << std::endl;
+      libMesh::err << "ERROR: opening output data file " << std::endl;
       libmesh_error();
     }
 

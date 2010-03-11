@@ -147,7 +147,7 @@ void TetGenWrapper::set_switches(const std::string& s)
   buffer[ s.copy( buffer , sizeof( buffer ) - 1 ) ] = '\0' ;
   
   if (!tetgen_be.parse_commandline(buffer)) 
-    *libMesh::out << "TetGen replies: Wrong switches!" << std::endl;
+    libMesh::out << "TetGen replies: Wrong switches!" << std::endl;
 }
 
 
@@ -386,7 +386,7 @@ int TetGenMeshInterface::get_node_index (const Node* inode)
     if (this->_mesh.node(i).id() == node_id)
       return i;
 
-  *libMesh::err << "Error! Node not found in the mesh!" << std::endl;
+  libMesh::err << "Error! Node not found in the mesh!" << std::endl;
   libmesh_error();
   
   return 0;
@@ -431,7 +431,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (const double quali
   
   if (visited.size() != this->_mesh.n_elem())
     {
-      *libMesh::err << "triangulate: hull not connected: element(s) not reached by others.\n";
+      libMesh::err << "triangulate: hull not connected: element(s) not reached by others.\n";
       libmesh_error();
     } 
 
@@ -459,7 +459,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 	// Check for proper element type
 	if (elem->type() != TRI3)
 	  {
-	    *libMesh::err << "ERROR: Some of the elements in the original mesh were not TRI3!" << std::endl;
+	    libMesh::err << "ERROR: Some of the elements in the original mesh were not TRI3!" << std::endl;
 	    libmesh_error();
 	  }
 
@@ -467,7 +467,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 	  {
 	    if (elem->neighbor(i) == NULL)
 	      {
-		*libMesh::err << "ERROR: Non-convex hull, cannot be tetrahedralized." << std::endl;
+		libMesh::err << "ERROR: Non-convex hull, cannot be tetrahedralized." << std::endl;
 		libmesh_error();
 	      }
 	  }

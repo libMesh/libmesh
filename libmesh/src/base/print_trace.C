@@ -112,7 +112,7 @@ std::string abi_demangle(const char *name)
 
 void print_trace(void)
 {
-*libMesh::err << "Trying print_trace()" << std::endl;
+libMesh::err << "Trying print_trace()" << std::endl;
     Dl_info info;
     void **frame = static_cast<void **>(__builtin_frame_address(0));
     void **bp = static_cast<void **>(*frame);

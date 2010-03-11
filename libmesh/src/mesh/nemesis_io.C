@@ -116,8 +116,8 @@ void Nemesis_IO::read (const std::string& base_filename)
   
   if (_verbose)
     {
-      *libMesh::out << "[" << libMesh::processor_id() << "] ";
-      *libMesh::out << "Reading Nemesis file on processor: " << libMesh::processor_id() << std::endl;
+      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "Reading Nemesis file on processor: " << libMesh::processor_id() << std::endl;
     }
   
   // Construct a filename string for this processor.
@@ -131,7 +131,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	   << '.' << libMesh::n_processors() 
 	   << '.' << libMesh::processor_id();
 
-  *libMesh::out << "Opening file: " << file_oss.str() << std::endl;
+  libMesh::out << "Opening file: " << file_oss.str() << std::endl;
 
   // Open the Exodus file
   nemhelper.open(file_oss.str().c_str());
@@ -163,7 +163,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   // Do some error checking
   if (nemhelper.num_external_nodes)
     {
-      *libMesh::err << "ERROR: there should be no external nodes in an element-based partitioning!"
+      libMesh::err << "ERROR: there should be no external nodes in an element-based partitioning!"
 		    << std::endl;
       libmesh_error();
     }
@@ -303,7 +303,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   libmesh_assert (num_nodes_i_must_number <= to_uint(nemhelper.num_internal_nodes +
 						  nemhelper.num_border_nodes));
   if (_verbose)
-    *libMesh::out << "[" << libMesh::processor_id() << "] "
+    libMesh::out << "[" << libMesh::processor_id() << "] "
 	          << "num_nodes_i_must_number="
 	          << num_nodes_i_must_number
 	          << std::endl;
@@ -386,7 +386,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   const unsigned int my_node_offset = my_next_node;
 
   if (_verbose)
-    *libMesh::out << "[" << libMesh::processor_id() << "] "
+    libMesh::out << "[" << libMesh::processor_id() << "] "
 	          << "my_node_offset="
 	          << my_node_offset
 	          << std::endl;
@@ -628,12 +628,12 @@ void Nemesis_IO::read (const std::string& base_filename)
   if (_verbose)
     {
       // Report the number of nodes which have been added locally
-      *libMesh::out << "[" << libMesh::processor_id() << "] ";
-      *libMesh::out << "mesh.n_nodes()=" << mesh.n_nodes() << std::endl;
+      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "mesh.n_nodes()=" << mesh.n_nodes() << std::endl;
       
       // Reports the number of nodes that have been added in total.
-      *libMesh::out << "[" << libMesh::processor_id() << "] ";
-      *libMesh::out << "mesh.parallel_n_nodes()=" << mesh.parallel_n_nodes() << std::endl;
+      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "mesh.parallel_n_nodes()=" << mesh.parallel_n_nodes() << std::endl;
     }
   
 
@@ -659,11 +659,11 @@ void Nemesis_IO::read (const std::string& base_filename)
     
     if (_verbose)
       {
-	*libMesh::out << "[" << libMesh::processor_id() << "] ";
-	*libMesh::out << "sum_internal_elems=" << sum_internal_elems << std::endl;
+	libMesh::out << "[" << libMesh::processor_id() << "] ";
+	libMesh::out << "sum_internal_elems=" << sum_internal_elems << std::endl;
 	
-	*libMesh::out << "[" << libMesh::processor_id() << "] ";
-	*libMesh::out << "sum_border_elems=" << sum_border_elems << std::endl;
+	libMesh::out << "[" << libMesh::processor_id() << "] ";
+	libMesh::out << "sum_border_elems=" << sum_border_elems << std::endl;
       }
     
     libmesh_assert(sum_internal_elems+sum_border_elems == nemhelper.num_elems_global);
@@ -679,7 +679,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   const unsigned int my_elem_offset = my_next_elem;
 
   if (_verbose)
-    *libMesh::out << "[" << libMesh::processor_id() << "] "
+    libMesh::out << "[" << libMesh::processor_id() << "] "
 	      << "my_elem_offset=" << my_elem_offset << std::endl;
 
 
@@ -742,7 +742,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str); 
 
       if (_verbose)
-	*libMesh::out << "Reading a block of " << type_str << " elements." << std::endl;
+	libMesh::out << "Reading a block of " << type_str << " elements." << std::endl;
       
       // Loop over all the elements in this block
       for (unsigned int j=0; j<to_uint(nemhelper.num_elem_this_blk); j++)
@@ -764,7 +764,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
 	  // Set all the nodes for this element
 	  if (_verbose)	    
-	    *libMesh::out << "[" << libMesh::processor_id() << "] "
+	    libMesh::out << "[" << libMesh::processor_id() << "] "
 		          << "Setting nodes for Elem " << elem->id() << std::endl;
 	      
 	  for (unsigned int k=0; k<to_uint(nemhelper.num_nodes_per_elem); k++)
@@ -787,12 +787,12 @@ void Nemesis_IO::read (const std::string& base_filename)
   if (_verbose)
     {
       // Report the number of elements which have been added locally
-      *libMesh::out << "[" << libMesh::processor_id() << "] ";
-      *libMesh::out << "mesh.n_elem()=" << mesh.n_elem() << std::endl;
+      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "mesh.n_elem()=" << mesh.n_elem() << std::endl;
 
       // Reports the number of elements that have been added in total.
-      *libMesh::out << "[" << libMesh::processor_id() << "] ";
-      *libMesh::out << "mesh.parallel_n_elem()=" << mesh.parallel_n_elem() << std::endl;
+      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "mesh.parallel_n_elem()=" << mesh.parallel_n_elem() << std::endl;
     }
 
   STOP_LOG ("read()","Nemesis_IO");
@@ -806,7 +806,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
 void Nemesis_IO::read (const std::string& )
 {
-  *libMesh::err <<  "ERROR, Nemesis API is not defined!" << std::endl;
+  libMesh::err <<  "ERROR, Nemesis API is not defined!" << std::endl;
   libmesh_error();
 }
 

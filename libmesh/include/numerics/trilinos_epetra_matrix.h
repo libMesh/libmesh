@@ -275,7 +275,7 @@ public:
   /**
    * Print the contents of the matrix, by default to libMesh::out.
    */
-  void print_personal(std::ostream& os=*libMesh::out) const;
+  void print_personal(std::ostream& os=libMesh::out) const;
 
   /**
    * Print the contents of the matrix in Matlab's

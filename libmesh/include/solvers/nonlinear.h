@@ -173,7 +173,7 @@ void Nonlinear<T>::solve ()
       // this iteration and the last is sufficiently small.
       if (norm_delta < this->nonlinear_tolerance())
 	{
-	  *libMesh::out << " Nonlinear solver converged at step "
+	  libMesh::out << " Nonlinear solver converged at step "
 		        << l
 		        << std::endl;
 	  break;

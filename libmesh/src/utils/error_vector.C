@@ -243,7 +243,7 @@ void ErrorVector::plot_error(const std::string& filename,
 
     //0 for the monomial basis
     const unsigned int solution_index = dof_indices[0];
-    // *libMesh::out << "elem_number=" << elem_number << std::endl;
+    // libMesh::out << "elem_number=" << elem_number << std::endl;
     libmesh_assert (elem_id < (*this).size());
 //  We may have zero error values in special circumstances
 //    libmesh_assert ((*this)[elem_id] > 0.);
@@ -267,9 +267,9 @@ void ErrorVector::plot_error(const std::string& filename,
   else
     {
       libmesh_here();
-      *libMesh::err << "Warning: ErrorVector::plot_error currently only"
+      libMesh::err << "Warning: ErrorVector::plot_error currently only"
                     << " supports .gmv and .plt output;" << std::endl;
-      *libMesh::err << "Could not recognize filename: " << filename
+      libMesh::err << "Could not recognize filename: " << filename
                     << std::endl;
     }
 }

@@ -61,7 +61,7 @@ void TetGenIO::read (const std::string& name)
     }
   else
     {
-      *libMesh::err << "ERROR: Unrecognized file name: "
+      libMesh::err << "ERROR: Unrecognized file name: "
 		    << name << std::endl;
       libmesh_error();
     }
@@ -74,13 +74,13 @@ void TetGenIO::read (const std::string& name)
 
   if ( !node_stream.good() || !ele_stream.good() )
     {
-      *libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
+      libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
 		    << "Error checking files "
 		    << name_node << " and "
 		    << name_ele  << std::endl;
       libmesh_error();
     }
-  *libMesh::out<< "TetGenIO found the tetgen files to read " <<std::endl; 
+  libMesh::out<< "TetGenIO found the tetgen files to read " <<std::endl; 
 
   // Skip the comment lines at the beginning
   this->skip_comment_lines (node_stream, '#');
@@ -88,7 +88,7 @@ void TetGenIO::read (const std::string& name)
 
   // Read the nodes and elements from the streams
   this->read_nodes_and_elem (node_stream, ele_stream);
-  *libMesh::out<< "TetGenIO read in nodes and elements " <<std::endl; 
+  libMesh::out<< "TetGenIO read in nodes and elements " <<std::endl; 
 }
 
 
@@ -209,7 +209,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
       
       else
 	{
-	  *libMesh::err << "Elements with " << n_nodes
+	  libMesh::err << "Elements with " << n_nodes
 		        << " nodes are not supported in the LibMesh tetgen module\n";
 	  libmesh_error();
 	}
@@ -256,7 +256,7 @@ void TetGenIO::write (const std::string& fname)
 
   if (!(fname.rfind(".poly") < fname.size())) 
     {
-      *libMesh::err << "ERROR: Unrecognized file name: "
+      libMesh::err << "ERROR: Unrecognized file name: "
                     << fname << std::endl;
       libmesh_error();
     }

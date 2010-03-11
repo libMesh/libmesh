@@ -37,11 +37,11 @@ void XdrMGF::fini()
   
   if (mp_xdr_handle)
     {
-      //*libMesh::out << "Destroying XDR file handle." << std::endl;
+      //libMesh::out << "Destroying XDR file handle." << std::endl;
       xdr_destroy(mp_xdr_handle);
     }
   
-  //*libMesh::out << "Deleting the file handle pointer." << std::endl;
+  //libMesh::out << "Deleting the file handle pointer." << std::endl;
   delete mp_xdr_handle;
   
   mp_xdr_handle = NULL;
@@ -50,7 +50,7 @@ void XdrMGF::fini()
   
   if (mp_fp)
     {
-      //*libMesh::out << "Closing file." << std::endl;
+      //libMesh::out << "Closing file." << std::endl;
       std::fflush(mp_fp);
       std::fclose(mp_fp);
     }
@@ -85,7 +85,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 	// Make sure the file is ready for use
 	if (!mp_fp)
 	  {
-	    *libMesh::err << "XDR Error: Accessing file: "
+	    libMesh::err << "XDR Error: Accessing file: "
 		          << fn
 		          << " failed."
 		          << std::endl;
@@ -127,7 +127,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
       
     default:
       {
-	*libMesh::out << "Unrecognized file access type!" << std::endl;
+	libMesh::out << "Unrecognized file access type!" << std::endl;
 	libmesh_error();
       }
     }
@@ -262,7 +262,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 
       else
 	{
-	  *libMesh::err << "No originating software can be determined. Error." 
+	  libMesh::err << "No originating software can be determined. Error." 
 		        << std::endl;
 	  libmesh_error();
 	}
@@ -343,7 +343,7 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
   // numvar is the problem dimension, and
   // size is the number of nodes in the problem.
   
-  //*libMesh::out << "Total amount of data to be written: " << totalSize << std::endl;
+  //libMesh::out << "Total amount of data to be written: " << totalSize << std::endl;
   
   switch (m_type)
     {

@@ -390,7 +390,7 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
       break;
       
     default:
-      *libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
       bounds.first  = -1;
       bounds.second = -1;
     }

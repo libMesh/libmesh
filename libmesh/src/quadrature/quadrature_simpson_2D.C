@@ -100,7 +100,7 @@ void QSimpson::init_2D(const ElemType _type,
       // Unsupported type
     default:
       {
-	*libMesh::err << "Element type not supported!:" << _type << std::endl;
+	libMesh::err << "Element type not supported!:" << _type << std::endl;
 	libmesh_error();
       }
     }

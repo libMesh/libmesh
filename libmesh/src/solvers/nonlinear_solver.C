@@ -54,7 +54,7 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 #endif
 
     default:
-      *libMesh::err << "ERROR:  Unrecognized solver package: "
+      libMesh::err << "ERROR:  Unrecognized solver package: "
 		    << solver_package
 		    << std::endl;
       libmesh_error();
@@ -67,7 +67,7 @@ template <typename T>
 AutoPtr<NonlinearSolver<T> >
 NonlinearSolver<T>::build(sys_type&, const SolverPackage)
 {
-  *libMesh::err << "ERROR: libMesh was compiled without nonlinear solver support"
+  libMesh::err << "ERROR: libMesh was compiled without nonlinear solver support"
 	        << std::endl;
   libmesh_not_implemented();
 }
@@ -80,7 +80,7 @@ NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 {
   if(this->_is_initialized)
   {
-    *libMesh::err << "Preconditioner must be attached before the solver is initialized!"<<std::endl;
+    libMesh::err << "Preconditioner must be attached before the solver is initialized!"<<std::endl;
     libmesh_error();
   }
   

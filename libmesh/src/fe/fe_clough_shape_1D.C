@@ -180,7 +180,7 @@ Real FE<1,CLOUGH>::shape(const ElemType,
 			     const unsigned int,
 			     const Point&)
 {
-  *libMesh::err << "Clough-Tocher elements require the real element\n"
+  libMesh::err << "Clough-Tocher elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
   
@@ -232,13 +232,13 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   
@@ -255,7 +255,7 @@ Real FE<1,CLOUGH>::shape_deriv(const ElemType,
 				   const unsigned int,
 				   const Point&)
 {
-  *libMesh::err << "Clough-Tocher elements require the real element\n"
+  libMesh::err << "Clough-Tocher elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
 
@@ -306,13 +306,13 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   
@@ -363,13 +363,13 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
 		}
 	    }
 	  default:
-            *libMesh::err << "ERROR: Unsupported element type!" << std::endl;
+            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
 	    libmesh_error();
 	  }
       }
       // by default throw an error
     default:
-      *libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
   

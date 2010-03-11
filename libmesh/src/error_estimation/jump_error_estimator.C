@@ -387,7 +387,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 	  if (n_flux_faces[i] == 0.0) // inactive or non-local element
 	    continue;
       
-	  //*libMesh::out << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
+	  //libMesh::out << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
 	  error_per_cell[i] /= static_cast<Real>(n_flux_faces[i]); 
 	}
     }

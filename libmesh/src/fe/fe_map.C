@@ -86,7 +86,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	    
 	if (jac <= 0.)
 	  {
-	    *libMesh::err << "ERROR: negative Jacobian: "
+	    libMesh::err << "ERROR: negative Jacobian: "
 		          << jac
                           << " in element " 
                           << elem->id()
@@ -165,7 +165,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	    
 	if (jac <= 0.)
 	  {
-	    *libMesh::err << "ERROR: negative Jacobian: "
+	    libMesh::err << "ERROR: negative Jacobian: "
 		          << jac
                           << " in element " 
                           << elem->id()
@@ -226,7 +226,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 
 	if (det <= 0.)
 	  {
-	    *libMesh::err << "ERROR: negative Jacobian! "
+	    libMesh::err << "ERROR: negative Jacobian! "
                           << " in element " 
                           << elem->id()
 		          << std::endl;
@@ -333,7 +333,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	    
 	if (jac <= 0.)
 	  {
-	    *libMesh::err << "ERROR: negative Jacobian: "
+	    libMesh::err << "ERROR: negative Jacobian: "
 		          << jac
                           << " in element " 
                           << elem->id()
@@ -486,7 +486,7 @@ void FEBase::compute_map(const std::vector<Real>& qw,
   if (calculate_d2phi)
     {
       libmesh_do_once(
-        *libMesh::err << "WARNING: Second derivatives are not currently "
+        libMesh::err << "WARNING: Second derivatives are not currently "
                       << "correctly calculated on non-affine elements!"
                       << std::endl;);
     }
@@ -886,7 +886,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	  if (secure)
 	    {
 	      libmesh_here();
-	      *libMesh::err << "WARNING: Newton scheme has not converged in "
+	      libMesh::err << "WARNING: Newton scheme has not converged in "
 			    << cnt << " iterations:" << std::endl
 			    << "   physical_point="
 			    << physical_point
@@ -902,7 +902,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 	      if (cnt > 20)
 		{
-		  *libMesh::err << "ERROR: Newton scheme FAILED to converge in "
+		  libMesh::err << "ERROR: Newton scheme FAILED to converge in "
 			        << cnt
 			        << " iterations!"
                                 << " in element " << elem->id()
@@ -941,13 +941,13 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       if (diff.size() > tolerance)
 	{
 	  libmesh_here();
-	  *libMesh::err << "WARNING:  diff is "
+	  libMesh::err << "WARNING:  diff is "
 		        << diff.size()
 		        << std::endl
 		        << " point="
 		        << physical_point;
-	  *libMesh::err << " local=" << check;
-	  *libMesh::err << " lref= " << p;
+	  libMesh::err << " local=" << check;
+	  libMesh::err << " lref= " << p;
 	}
     }
   

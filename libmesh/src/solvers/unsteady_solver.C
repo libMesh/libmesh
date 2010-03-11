@@ -88,7 +88,7 @@ void UnsteadySolver::solve ()
 	  for (unsigned int nr=0; nr<reduce_deltat_on_diffsolver_failure; ++nr)
 	    {
 	      _system.deltat *= 0.5;
-	      *libMesh::out << "Newton backtracking failed.  Trying with smaller timestep, dt="
+	      libMesh::out << "Newton backtracking failed.  Trying with smaller timestep, dt="
 			    << _system.deltat << std::endl;
 
 	      solve_result = _diff_solver->solve();
@@ -103,14 +103,14 @@ void UnsteadySolver::solve ()
 	      if (!backtracking_failed && !max_iterations)
 		{
 		  if (!quiet)
-		    *libMesh::out << "Reduced dt solve succeeded." << std::endl;
+		    libMesh::out << "Reduced dt solve succeeded." << std::endl;
 		  return;
 		}
 	    }
 
 	  // If we made it here, we still couldn't converge the solve after
 	  // reducing deltat
-	  *libMesh::out << "DiffSolver::solve() did not succeed after "
+	  libMesh::out << "DiffSolver::solve() did not succeed after "
 		        << reduce_deltat_on_diffsolver_failure
 		        << " attempts." << std::endl;
 	  libmesh_convergence_failure();

@@ -1092,7 +1092,7 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
 
 #if PETSC_VERSION_LESS_THAN(2,3,1)
 
-  *libMesh::out << "This method has been developed with PETSc 2.3.1.  "
+  libMesh::out << "This method has been developed with PETSc 2.3.1.  "
 	        << "No one has made it backwards compatible with older "
 	        << "versions of PETSc so far; however, it might work "
 	        << "without any change with some older version." << std::endl;

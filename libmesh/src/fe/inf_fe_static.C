@@ -77,7 +77,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
   unsigned int n_base, n_radial;
   compute_node_indices(inf_elem_type, n, n_base, n_radial);
   
-//   *libMesh::out << "elem_type=" << inf_elem_type 
+//   libMesh::out << "elem_type=" << inf_elem_type 
 // 	    << ",  fet.radial_order=" << fet.radial_order
 // 	    << ",  n=" << n 
 // 	    << ",  n_radial=" << n_radial 
@@ -123,7 +123,7 @@ void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType& /* fet */,
 #ifdef DEBUG
   if (!_warned_for_nodal_soln)
     {
-      *libMesh::err << "WARNING: nodal_soln(...) does _not_ work for infinite elements." << std::endl
+      libMesh::err << "WARNING: nodal_soln(...) does _not_ work for infinite elements." << std::endl
 		    << " Will return an empty nodal solution.  Use " << std::endl
 		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" << std::endl;
       _warned_for_nodal_soln = true;
@@ -161,7 +161,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   // this makes only sense when used for mapping
   if ((T_radial != INFINITE_MAP) && !_warned_for_shape)
     {
-      *libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
+      libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
 		    << " return the correct trial function!  Use " << std::endl
 		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" 
 		    << std::endl;
@@ -204,7 +204,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   // this makes only sense when used for mapping
   if ((T_radial != INFINITE_MAP) && !_warned_for_shape)
     {
-      *libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
+      libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
 		    << " return the correct trial function!  Use " << std::endl
 		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" 
 		    << std::endl;
@@ -339,7 +339,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
     }
   else
     {	
-      *libMesh::err << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
+      libMesh::err << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
       libmesh_error();
     }
 
@@ -375,7 +375,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
     }
   else
     {	
-      *libMesh::err << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
+      libMesh::err << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
       libmesh_error();
     }
 
@@ -595,7 +595,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
 
     default:
       { 
-        *libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type 
+        libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type 
 		      << ", node=" << outer_node_index << std::endl;
 	libmesh_error();
 	return;
@@ -693,7 +693,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
 	  }
 	default:
 	  { 
-	    *libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type 
+	    libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type 
 		          << ", node=" << outer_node_index << std::endl;
 	    libmesh_error();
 	    break;

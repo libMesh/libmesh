@@ -216,7 +216,7 @@ void LaplaceMeshSmoother::init()
 
     default:
       {
-	*libMesh::err << "At this time it is not possible "
+	libMesh::err << "At this time it is not possible "
 		      << "to smooth a dimension "
 		      << _mesh.mesh_dimension()
 		      << "mesh.  Aborting..."
@@ -234,10 +234,10 @@ void LaplaceMeshSmoother::print_graph() const
 {
   for (unsigned int i=0; i<_graph.size(); ++i)
     {
-      *libMesh::out << i << ": ";
+      libMesh::out << i << ": ";
       std::copy(_graph[i].begin(),
 		_graph[i].end(),
-		std::ostream_iterator<unsigned int>(*libMesh::out, " "));
-      *libMesh::out << std::endl;
+		std::ostream_iterator<unsigned int>(libMesh::out, " "));
+      libMesh::out << std::endl;
     }
 }

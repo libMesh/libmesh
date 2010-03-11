@@ -63,7 +63,7 @@ void MeshData::read_unv (const std::string& file_name)
       igzstream in_stream(file_name.c_str());
       this->read_unv_implementation (in_stream);
 #else
-      *libMesh::err << "ERROR:  You must have the zlib.h header "
+      libMesh::err << "ERROR:  You must have the zlib.h header "
 		    << "files and libraries to read and write "
 		    << "compressed streams."
 		    << std::endl;
@@ -96,7 +96,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
    */
   if ( !in_file.good() )
     {
-      *libMesh::err << "ERROR: Input file not good." 
+      libMesh::err << "ERROR: Input file not good." 
 		    << std::endl;
       libmesh_error();
     }
@@ -267,7 +267,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 	   */
 	  if (dataset_location != 1)
 	    {
-	      *libMesh::err << "ERROR: Currently only Data at nodes is supported." 
+	      libMesh::err << "ERROR: Currently only Data at nodes is supported." 
 			    << std::endl;
 	      libmesh_error();
 	    }
@@ -345,7 +345,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 		      values[data_cnt] = Complex(re_val,im_val);
 #else
 
-		      *libMesh::err << "ERROR: Complex data only supported" << std::endl
+		      libMesh::err << "ERROR: Complex data only supported" << std::endl
 				    << "when libMesh is configured with --enable-complex!"
 				    << std::endl;
 		      libmesh_error();
@@ -354,7 +354,7 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 
 		  else
 		    {
-		      *libMesh::err << "ERROR: Data type not supported." 
+		      libMesh::err << "ERROR: Data type not supported." 
 				    << std::endl;
 		      libmesh_error();
 		    }
@@ -420,7 +420,7 @@ void MeshData::write_unv (const std::string& file_name)
       ogzstream out_stream(file_name.c_str());
       this->write_unv_implementation (out_stream);
 #else
-      *libMesh::err << "ERROR:  You must have the zlib.h header "
+      libMesh::err << "ERROR:  You must have the zlib.h header "
 		    << "files and libraries to read and write "
 		    << "compressed streams."
 		    << std::endl;
@@ -451,7 +451,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
    */
   if ( !out_file.good() )
     {
-      *libMesh::err << "ERROR: Output file not good." 
+      libMesh::err << "ERROR: Output file not good." 
 		    << std::endl;
       libmesh_error();
     }
@@ -470,7 +470,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
   libmesh_assert (!_node_data.empty());
 
   if (!_elem_data.empty())
-      *libMesh::err << "WARNING: MeshData currently only supports nodal data for Universal files."
+      libMesh::err << "WARNING: MeshData currently only supports nodal data for Universal files."
 		    << std::endl
 		    << "         Will proceed writing only nodal data, ignoring element data."
 		    << std::endl;
@@ -530,7 +530,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
        */
       if (this->n_val_per_node() != _unv_header->nvaldc)
         {
-	  *libMesh::err << "WARNING: nvaldc=" << _unv_header->nvaldc 
+	  libMesh::err << "WARNING: nvaldc=" << _unv_header->nvaldc 
 		        << " of attached MeshDataUnvHeader object not valid!" << std::endl
 		        << "         re-set nvaldc to " << this->n_val_per_node() << std::endl;
 	  _unv_header->nvaldc = this->n_val_per_node();
@@ -550,7 +550,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
 #endif
       if (my_data_type != _unv_header->data_type)
         {
-	  *libMesh::err << "WARNING: data_type=" << _unv_header->data_type 
+	  libMesh::err << "WARNING: data_type=" << _unv_header->data_type 
 		        << " of attached MeshDataUnvHeader differs from" << std::endl
 		        << "         default value=" << my_data_type
 		        << " Perhaps the user wanted this," << std::endl
@@ -868,7 +868,7 @@ void MeshDataUnvHeader::operator = (const MeshDataUnvHeader& omduh)
   else
     {
 #  ifdef DEBUG
-      *libMesh::err << "WARNING: MeshDataUnvHeader::operator=(): Other object has data_type for" << std::endl
+      libMesh::err << "WARNING: MeshDataUnvHeader::operator=(): Other object has data_type for" << std::endl
 		    << "         real values.  Will use default data_type=5 during assignment." << std::endl
 		    << std::endl;
 #  endif
@@ -887,7 +887,7 @@ void MeshDataUnvHeader::operator = (const MeshDataUnvHeader& omduh)
   else
     {
 #  ifdef DEBUG
-      *libMesh::err << "WARNING: Other MeshDataUnvHeader has data_type for complex values." << std::endl
+      libMesh::err << "WARNING: Other MeshDataUnvHeader has data_type for complex values." << std::endl
 		    << "         Data import will likely _not_ work and result in infinite loop," << std::endl
 		    << "         provided the user forgot to re-size nvaldc to 2*nvaldc_old!" << std::endl
 		    << std::endl;

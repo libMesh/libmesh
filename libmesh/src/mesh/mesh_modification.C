@@ -456,7 +456,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
       // make sure it is linear order
       if (lo_elem->default_order() != FIRST)
         {	  
-	  *libMesh::err << "ERROR: This is not a linear element: type=" 
+	  libMesh::err << "ERROR: This is not a linear element: type=" 
 		        << lo_elem->type() << std::endl;
 	  libmesh_error();
 	}
@@ -814,7 +814,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
           // Try to ignore non-2D elements for now
 	  default:
 	    {
-	      *libMesh::err << "Warning, encountered non-2D element "
+	      libMesh::err << "Warning, encountered non-2D element "
                             << Utility::enum_to_string<ElemType>(etype)
 			    << " in MeshTools::Modification::all_tri(), hope that's OK..."
 			    << std::endl;
@@ -880,7 +880,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
 			      default:
 				{
-				  *libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+				  libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
 				  libmesh_error();
 				}
 			      }
@@ -921,7 +921,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
 			      default:
 				{
-				  *libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+				  libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
 				  libmesh_error();
 				}
 			      }

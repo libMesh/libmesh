@@ -91,7 +91,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 
   if (this->_initialized)
     {
-      *libMesh::err << "ERROR: Already initialized!  Will ignore this call..."
+      libMesh::err << "ERROR: Already initialized!  Will ignore this call..."
 		    << std::endl;
     }
 
@@ -145,7 +145,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 	    this->_tree = my_master->_tree;
 	  else
 	    {
-	      *libMesh::err << "ERROR: Initialize master first, then servants!"
+	      libMesh::err << "ERROR: Initialize master first, then servants!"
 			    << std::endl;
 	      libmesh_error();
 	    }
@@ -199,7 +199,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 
 		if (this->_element == NULL)
 		  {
-		    *libMesh::err << std::endl
+		    libMesh::err << std::endl
 			          << " ******** Serious Problem.  Could not find an Element "
 			          << "in the Mesh" 
 			          << std:: endl
@@ -234,7 +234,7 @@ void PointLocatorTree::enable_out_of_mesh_mode (void)
       for ( ; pos != end_pos; ++pos)
 	if (!(*pos)->has_affine_map())
 	  {
-	    *libMesh::err << "ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings." << std::endl;
+	    libMesh::err << "ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings." << std::endl;
 	    libmesh_error();
 	  }
 #endif

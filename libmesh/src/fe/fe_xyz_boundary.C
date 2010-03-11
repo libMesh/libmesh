@@ -41,7 +41,7 @@ void FEXYZ<0>::reinit(const Elem*,
 		      const unsigned int,
 		      const Real)
 {
-  *libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
+  libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
 	        << std::endl;
   libmesh_error();
 }
@@ -54,7 +54,7 @@ void FEXYZ<1>::reinit(const Elem*,
 		      const unsigned int,
 		      const Real)
 {
-  *libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
+  libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
 	        << std::endl;
   libmesh_error();
 }

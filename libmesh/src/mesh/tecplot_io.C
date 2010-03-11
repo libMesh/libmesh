@@ -250,7 +250,7 @@ void TecplotIO::write_binary (const std::string& fname,
   // the Tecplot binary API
 #ifndef LIBMESH_HAVE_TECPLOT_API
   
-    *libMesh::err << "WARNING: Tecplot Binary files require the Tecplot API." << std::endl
+    libMesh::err << "WARNING: Tecplot Binary files require the Tecplot API." << std::endl
 	          << "Continuing with ASCII output."
 	          << std::endl;
 

@@ -51,7 +51,7 @@ EigenSolver<T>::build(const SolverPackage solver_package)
 
 
     default:
-      *libMesh::err << "ERROR:  Unrecognized eigen solver package: "
+      libMesh::err << "ERROR:  Unrecognized eigen solver package: "
 		    << solver_package
 		    << std::endl;
       libmesh_error();

@@ -126,13 +126,13 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
   // name not found in the map
   if (!factory_map().count(name))
     {
-      *libMesh::err << "Tried to build an unknown type: " << name << std::endl;
+      libMesh::err << "Tried to build an unknown type: " << name << std::endl;
 
-      *libMesh::err << "valid options are:" << std::endl;
+      libMesh::err << "valid options are:" << std::endl;
       
       for (typename std::map<std::string,Factory<Base>*>::const_iterator
 	     it = factory_map().begin(); it != factory_map().end(); ++it)
-        *libMesh::err << "  " << it->first << std::endl;
+        libMesh::err << "  " << it->first << std::endl;
 
       libmesh_error();
       

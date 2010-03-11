@@ -209,7 +209,7 @@ void AztecLinearSolver<T>::print_converged_reason()
   libmesh_not_implemented();
 
 // #if PETSC_VERSION_LESS_THAN(2,3,1)
-//   *libMesh::out << "This method is currently not supported "
+//   libMesh::out << "This method is currently not supported "
 // 	    << "(but may work!) for Petsc 2.3.0 and earlier." << std::endl;
 // #else
 //   KSPConvergedReason reason;
@@ -228,39 +228,39 @@ void AztecLinearSolver<T>::print_converged_reason()
 //     {
 //     case KSP_CONVERGED_RTOL:
 //        {
-// 	*libMesh::out << "Linear solver converged, relative tolerance reached." << std::endl;
+// 	libMesh::out << "Linear solver converged, relative tolerance reached." << std::endl;
 // 	break;
 //        }
 //     case KSP_CONVERGED_ATOL:
 //        {
-// 	 *libMesh::out << "Linear solver converged, absolute tolerance reached." << std::endl;
+// 	 libMesh::out << "Linear solver converged, absolute tolerance reached." << std::endl;
 // 	 break;
 //        }
 
 //       // Divergence
 //     case KSP_DIVERGED_ITS:
 //        {
-// 	 *libMesh::out << "Linear solver diverged, max no. of iterations reached." << std::endl;
+// 	 libMesh::out << "Linear solver diverged, max no. of iterations reached." << std::endl;
 // 	 break;
 //        }
 //     case KSP_DIVERGED_DTOL:
 //        {
-// 	 *libMesh::out << "Linear solver diverged, residual norm increase by dtol (default 1.e5)." << std::endl;
+// 	 libMesh::out << "Linear solver diverged, residual norm increase by dtol (default 1.e5)." << std::endl;
 // 	 break;
 //        }
 //     case KSP_DIVERGED_NAN:
 //        {
-// 	 *libMesh::out << "Linear solver diverged, residual norm is NaN." << std::endl;
+// 	 libMesh::out << "Linear solver diverged, residual norm is NaN." << std::endl;
 // 	 break;
 //        }
 //     case KSP_DIVERGED_BREAKDOWN:
 //        {
-// 	 *libMesh::out << "Linear solver diverged, generic breakdown in the method." << std::endl;
+// 	 libMesh::out << "Linear solver diverged, generic breakdown in the method." << std::endl;
 // 	 break;
 //        }
 //     default:
 //       {
-// 	*libMesh::out << "Unknown/unsupported con(di)vergence reason: " << reason << std::endl;
+// 	libMesh::out << "Unknown/unsupported con(di)vergence reason: " << reason << std::endl;
 //       }
 //     }
 // #endif

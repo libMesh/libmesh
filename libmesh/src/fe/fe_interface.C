@@ -30,7 +30,7 @@
 //FEInterface class members
 FEInterface::FEInterface()
 {
-  *libMesh::err << "ERROR: Do not define an object of this type." 
+  libMesh::err << "ERROR: Do not define an object of this type." 
 	        << std::endl;
   libmesh_error();
 }
@@ -1353,7 +1353,7 @@ void FEInterface::inverse_map (const unsigned int dim,
   
   if (n_pts == 0)
     {
-      *libMesh::err << "WARNING: empty vector physical_points!"
+      libMesh::err << "WARNING: empty vector physical_points!"
 		    << std::endl;
       libmesh_here();
       return;
@@ -1370,7 +1370,7 @@ void FEInterface::inverse_map (const unsigned int dim,
       ifem_inverse_map(dim, fe_t, elem, physical_points, reference_points, tolerance, secure);
       return;
 
-//       *libMesh::err << "ERROR: Not implemented!"
+//       libMesh::err << "ERROR: Not implemented!"
 // 		<< std::endl;
 //       libmesh_error();
     }

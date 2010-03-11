@@ -523,7 +523,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 #if PETSC_VERSION_LESS_THAN(2,3,1)
   // FIXME[JWP]: There will be a bunch of unused variable warnings
   // for older PETScs here.
-  *libMesh::out << "This method has been developed with PETSc 2.3.1.  "
+  libMesh::out << "This method has been developed with PETSc 2.3.1.  "
 	        << "No one has made it backwards compatible with older "
 	        << "versions of PETSc so far; however, it might work "
 	        << "without any change with some older version." << std::endl;
@@ -617,7 +617,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 #if PETSC_VERSION_LESS_THAN(2,3,1)
   // FIXME[JWP]: There will be a bunch of unused variable warnings
   // for older PETScs here.
-  *libMesh::out << "This method has been developed with PETSc 2.3.1.  "
+  libMesh::out << "This method has been developed with PETSc 2.3.1.  "
 	        << "No one has made it backwards compatible with older "
 	        << "versions of PETSc so far; however, it might work "
 	        << "without any change with some older version." << std::endl;
@@ -754,7 +754,7 @@ Real PetscLinearSolver<T>::get_initial_residual()
   // Check no residual history
   if (its == 0)
     {
-      *libMesh::err << "No iterations have been performed, returning 0." << std::endl;
+      libMesh::err << "No iterations have been performed, returning 0." << std::endl;
       return 0.;
     }
 
@@ -810,7 +810,7 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
       ierr = KSPSetType (_ksp, (char*) KSPCHEBYCHEV);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     default:
-      *libMesh::err << "ERROR:  Unsupported PETSC Solver: "
+      libMesh::err << "ERROR:  Unsupported PETSC Solver: "
 		    << this->_solver_type               << std::endl
 		    << "Continuing with PETSC defaults" << std::endl;
     }
@@ -820,7 +820,7 @@ template <typename T>
 void PetscLinearSolver<T>::print_converged_reason()
 {
 #if PETSC_VERSION_LESS_THAN(2,3,1)
-  *libMesh::out << "This method is currently not supported "
+  libMesh::out << "This method is currently not supported "
 	        << "(but may work!) for Petsc 2.3.0 and earlier." << std::endl;
 #else
   KSPConvergedReason reason;
@@ -839,39 +839,39 @@ void PetscLinearSolver<T>::print_converged_reason()
     {
     case KSP_CONVERGED_RTOL:
        {
-	*libMesh::out << "Linear solver converged, relative tolerance reached." << std::endl;
+	libMesh::out << "Linear solver converged, relative tolerance reached." << std::endl;
 	break;
        }
     case KSP_CONVERGED_ATOL:
        {
-	 *libMesh::out << "Linear solver converged, absolute tolerance reached." << std::endl;
+	 libMesh::out << "Linear solver converged, absolute tolerance reached." << std::endl;
 	 break;
        }
 
       // Divergence
     case KSP_DIVERGED_ITS:
        {
-	 *libMesh::out << "Linear solver diverged, max no. of iterations reached." << std::endl;
+	 libMesh::out << "Linear solver diverged, max no. of iterations reached." << std::endl;
 	 break;
        }
     case KSP_DIVERGED_DTOL:
        {
-	 *libMesh::out << "Linear solver diverged, residual norm increase by dtol (default 1.e5)." << std::endl;
+	 libMesh::out << "Linear solver diverged, residual norm increase by dtol (default 1.e5)." << std::endl;
 	 break;
        }
     case KSP_DIVERGED_NAN:
        {
-	 *libMesh::out << "Linear solver diverged, residual norm is NaN." << std::endl;
+	 libMesh::out << "Linear solver diverged, residual norm is NaN." << std::endl;
 	 break;
        }
     case KSP_DIVERGED_BREAKDOWN:
        {
-	 *libMesh::out << "Linear solver diverged, generic breakdown in the method." << std::endl;
+	 libMesh::out << "Linear solver diverged, generic breakdown in the method." << std::endl;
 	 break;
        }
     default:
       {
-	*libMesh::out << "Unknown/unsupported con(di)vergence reason: " << reason << std::endl;
+	libMesh::out << "Unknown/unsupported con(di)vergence reason: " << reason << std::endl;
       }
     }
 #endif

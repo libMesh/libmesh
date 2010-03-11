@@ -88,23 +88,23 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 
   eigen_solver->set_eigenproblem_type(ept);
 
-  // *libMesh::out<< "The Problem type is set to be: "<<std::endl;
+  // libMesh::out<< "The Problem type is set to be: "<<std::endl;
 
   switch (_eigen_problem_type)
     {
-    case HEP: // *libMesh::out<<"Hermitian"<<std::endl;
+    case HEP: // libMesh::out<<"Hermitian"<<std::endl;
       break;
       
-    case NHEP: // *libMesh::out<<"Non-Hermitian"<<std::endl;
+    case NHEP: // libMesh::out<<"Non-Hermitian"<<std::endl;
       break;
       
-    case GHEP: // *libMesh::out<<"Gerneralized Hermitian"<<std::endl;
+    case GHEP: // libMesh::out<<"Gerneralized Hermitian"<<std::endl;
       break;
       
-    case GNHEP: // *libMesh::out<<"Generalized Non-Hermitian"<<std::endl;
+    case GNHEP: // libMesh::out<<"Generalized Non-Hermitian"<<std::endl;
       break;
       
-    default: // *libMesh::out<<"not properly specified"<<std::endl;
+    default: // libMesh::out<<"not properly specified"<<std::endl;
       libmesh_error();
       break;
       

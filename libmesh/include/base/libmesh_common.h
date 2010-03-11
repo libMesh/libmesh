@@ -45,6 +45,9 @@
 #include "libmesh_base.h"
 #include "libmesh_exceptions.h"
 
+// Proxy class for libMesh::out/err output
+#include "ostream_proxy.h"
+
 #ifdef LIBMESH_ENABLE_TRACEFILES
 #  include "print_trace.h"
 #endif
@@ -190,22 +193,22 @@ namespace libMesh
   extern MPI_Comm COMM_WORLD;
 #endif
 
-// Let's define a couple ostream pointers - these will default
+// Let's define a couple output streams - these will default
 // to cout/cerr, but LibMeshInit (or the user) can also set them to
 // something more sophisticated.
 //
-// We leave these as pointers rather than references so they can be
+// We use a proxy class rather than references so they can be
 // reseated at runtime.
 
-extern std::ostream* out;
-extern std::ostream* err;
+extern OStreamProxy out;
+extern OStreamProxy err;
 }
 
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
 // stick a libmesh_here(); in it, for example
 
-#define libmesh_here()     do { *libMesh::err << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
+#define libmesh_here()     do { libMesh::err << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
 // is recieved.  This is useful, for example, when determining the
@@ -215,9 +218,9 @@ extern std::ostream* err;
 // serial cases.
 #ifdef LIBMESH_HAVE_CSIGNAL
 #  include <csignal>
-#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); *libMesh::out << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); *libMesh::out << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
+#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); libMesh::out << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); libMesh::out << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
 #else
-#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); *libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
+#  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
 #endif
 
 // The libmesh_assert() macro acts like C's assert(), but throws a 
@@ -225,7 +228,7 @@ extern std::ostream* err;
 #ifdef NDEBUG
 #define libmesh_assert(asserted) 
 #else
-#define libmesh_assert(asserted)  do { if (!(asserted)) { *libMesh::err << "Assertion `" #asserted "' failed." << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert(asserted)  do { if (!(asserted)) { libMesh::err << "Assertion `" #asserted "' failed." << std::endl; libmesh_error(); } } while(0)
 #endif
 
 // The libmesh_write_traceout() macro writes stack trace files, if
@@ -299,12 +302,12 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 // The libmesh_experimental macro warns that you are using
 // bleeding-edge code
 #undef libmesh_experimental
-#define libmesh_experimental() libmesh_do_once(*libMesh::out << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
+#define libmesh_experimental() libmesh_do_once(libMesh::out << "*** Warning, This code is untested, experimental, or likely to see future API changes: " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
 
 
 // The libmesh_deprecated macro warns that you are using obsoleted code
 #undef libmesh_deprecated
-#define libmesh_deprecated() libmesh_do_once(*libMesh::out << "*** Warning, This code is deprecated, and likely to be removed in future library versions! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
+#define libmesh_deprecated() libmesh_do_once(libMesh::out << "*** Warning, This code is deprecated, and likely to be removed in future library versions! " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
 
 
 

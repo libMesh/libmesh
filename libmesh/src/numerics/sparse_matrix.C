@@ -72,7 +72,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 
 
     default:
-      *libMesh::err << "ERROR:  Unrecognized solver package: "
+      libMesh::err << "ERROR:  Unrecognized solver package: "
 		    << solver_package
 		    << std::endl;
       libmesh_error();

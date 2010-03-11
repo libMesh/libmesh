@@ -96,7 +96,7 @@ void EquationSystems::read (const std::string& name,
   // If that fails, try it again but explicitly request we look for infinite element info      
   catch (...)
     {
-      *libMesh::out << "\n*********************************************************************\n"
+      libMesh::out << "\n*********************************************************************\n"
 		    << "READING THE FILE \"" << name << "\" FAILED.\n"
 		    << "It is possible this file contains infinite element information,\n"
 		    << "but the version string does not contain \" with infinite elements\"\n"
@@ -112,7 +112,7 @@ void EquationSystems::read (const std::string& name,
       // If all that failed, we are out of ideas here...
       catch (...)
 	{
-	  *libMesh::out << "\n*********************************************************************\n"
+	  libMesh::out << "\n*********************************************************************\n"
 		        << "Well, at least we tried!\n"
 		        << "Good Luck!!\n"
 		        << "*********************************************************************\n"
@@ -336,7 +336,7 @@ void EquationSystems::_read_impl (const std::string& name,
 	    }
 	  else
 	    {
-	      *libMesh::err << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+	      libMesh::err << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
 			    << std::endl;
 	      libmesh_error();
 	    }	  
@@ -547,7 +547,7 @@ void EquationSystems::write(const std::string& name,
     }
   else
     {
-      *libMesh::err << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+      libMesh::err << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
 		    << std::endl;
       libmesh_error();
     }

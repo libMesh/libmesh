@@ -242,7 +242,7 @@ public:
   /**
    * Print the boundary information data structure.
    */
-  void print_info (std::ostream& out=*libMesh::out) const;
+  void print_info (std::ostream& out=libMesh::out) const;
   
   /**
    * Number used for internal use. This is the return value

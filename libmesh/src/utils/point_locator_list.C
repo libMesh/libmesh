@@ -85,7 +85,7 @@ void PointLocatorList::init ()
 
   if (this->_initialized)
     {
-      *libMesh::err << "ERROR: Already initialized!  Will ignore this call..."
+      libMesh::err << "ERROR: Already initialized!  Will ignore this call..."
 		    << std::endl;
     }
 
@@ -132,7 +132,7 @@ void PointLocatorList::init ()
 	    this->_list = my_master->_list;
 	  else
 	    {
-	      *libMesh::err << "ERROR: Initialize master first, then servants!"
+	      libMesh::err << "ERROR: Initialize master first, then servants!"
 			    << std::endl;
 	      libmesh_error();
 	    }

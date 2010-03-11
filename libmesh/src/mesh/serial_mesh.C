@@ -88,7 +88,7 @@ Node& SerialMesh::node (const unsigned int i)
 {
   if (i >= this->n_nodes())
     {
-      *libMesh::out << " i=" << i
+      libMesh::out << " i=" << i
 		    << ", n_nodes()=" << this->n_nodes()
 		    << std::endl;
       libmesh_error();
