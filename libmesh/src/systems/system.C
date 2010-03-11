@@ -1473,8 +1473,6 @@ Number System::point_value(unsigned int var, Point &p)
 
           FEType fe_type = dof_map.variable_type(0);
 
-          unsigned int dim = mesh.mesh_dimension();
-    
           // Build a FE so we can calculate u(p)
           AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
 

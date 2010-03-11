@@ -776,8 +776,6 @@ void FEMSystem::mesh_position_get()
   // Loop over every active mesh element on this processor
   const MeshBase& mesh = this->get_mesh();
 
-  const DofMap& dof_map = this->get_dof_map();
-
   MeshBase::const_element_iterator el =
     mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el =
