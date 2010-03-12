@@ -1451,7 +1451,11 @@ void DofMap::SCALAR_dof_indices (std::vector<unsigned int>& di,
 
   // First we need to find out the first dof
   // index for each SCALAR.
+#ifdef LIBMESH_ENABLE_AMR
   unsigned int first_SCALAR_dof_index = (old_dofs ? n_old_dofs() : n_dofs()) - n_SCALAR_dofs();
+#else
+  unsigned int first_SCALAR_dof_index = n_dofs() - n_SCALAR_dofs();
+#endif
   std::map<unsigned int, unsigned int> SCALAR_first_dof_index;
   SCALAR_first_dof_index.clear();
 
