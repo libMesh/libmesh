@@ -1446,7 +1446,7 @@ Number System::point_value(unsigned int var, Point &p)
   const Elem *e = locator(p);
 
   // Get ready to accumulate a value
-  Real u = 0;
+  Number u = 0;
 
   // Make sure we got an element on our partition
   bool I_found_p = false;
@@ -1561,7 +1561,7 @@ Gradient System::point_gradient(unsigned int var, Point &p)
           std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, e, p));
 
           // Get the values of the shape function derivatives
-	  const std::vector<std::vector<Gradient> >&  dphi = fe->get_dphi();
+	  const std::vector<std::vector<RealGradient> >&  dphi = fe->get_dphi();
     
           // Reinitialize the element and compute the shape function values at coor
           fe->reinit (e, &coor);
@@ -1659,7 +1659,7 @@ Tensor System::point_hessian(unsigned int var, Point &p)
           std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, e, p));
 
           // Get the values of the shape function derivatives
-	  const std::vector<std::vector<Tensor> >&  d2phi = fe->get_d2phi();
+	  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
     
           // Reinitialize the element and compute the shape function values at coor
           fe->reinit (e, &coor);
