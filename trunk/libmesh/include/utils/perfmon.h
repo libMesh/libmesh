@@ -100,27 +100,27 @@ PerfMon::print (std::string msg, std::ostream &out)
       if (proc_id == 0)
 	{
 	  if (msg == "NULL")
-	    libMesh::out << " " << id_string
-		          << ": elapsed time: "
-		          << elapsed_time << " (sec)"
-		          << std::endl;
+	    out << " " << id_string
+		<< ": elapsed time: "
+		<< elapsed_time << " (sec)"
+		<< std::endl;
 	  else
-	    libMesh::out << " " << msg
-		          << ": elapsed time: "
-		          << elapsed_time << " (sec)"
-		          << std::endl;
+	    out << " " << msg
+		<< ": elapsed time: "
+		<< elapsed_time << " (sec)"
+		<< std::endl;
 	  
 #ifdef HAVE_PAPI_H
 	  if (msg == "NULL")
-	    libMesh::out << " " << id_string
-		          << ": mflops: "
-		          << mflops
-		          << std::endl;
+	    out << " " << id_string
+		<< ": mflops: "
+		<< mflops
+		<< std::endl;
 	  else
-	    libMesh::out << " " << msg
-		          << ": mflops: "
-		          << mflops
-		          << std::endl;
+	    out << " " << msg
+		<< ": mflops: "
+		<< mflops
+		<< std::endl;
       
 #endif
 
