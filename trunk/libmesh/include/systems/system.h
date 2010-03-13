@@ -1140,6 +1140,14 @@ private:
 						    NumericVector<Number> &vec) const;
 
   /**
+   * Reads the SCALAR dofs from the stream \p io and assigns the values
+   * to the appropriate entries of \p vec.
+   */
+  unsigned int read_SCALAR_dofs (const unsigned int var,
+                                 Xdr &io,
+                                 NumericVector<Number> &vec) const;
+
+  /**
    * Reads a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
@@ -1157,6 +1165,13 @@ private:
 						     const iterator_type begin,
 						     const iterator_type end,
 						     Xdr &io) const;
+
+  /**
+   * Writes the SCALAR dofs associated with var to the stream \p io.
+   */   						     
+  unsigned int write_SCALAR_dofs (const NumericVector<Number> &vec,
+                                  const unsigned int var,
+				  Xdr &io) const;
 
   /**
    * Writes a vector for this System.
