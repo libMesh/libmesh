@@ -32,6 +32,7 @@
 #include "elem.h"
 #include "xdr_cxx.h"
 #include "numeric_vector.h"
+#include "dof_map.h"
 
 
 
@@ -482,8 +483,9 @@ void System::read_parallel_data (Xdr &io,
 
   unsigned int cnt=0;
   
-  // Loop over each variable and each node, and read out the value.
+  // Loop over each non-SCALAR variable and each node, and read out the value.
   for (unsigned int var=0; var<n_vars; var++)
+    if(this->variable(var).type().family != SCALAR)
     {
       // First read the node DOF values
       for (std::vector<const DofObject*>::const_iterator
@@ -507,7 +509,24 @@ void System::read_parallel_data (Xdr &io,
 	    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
 	  }      
     }
-  
+
+  // Finally, read the SCALAR variables on the last processor
+  for (unsigned int var=0; var<this->n_vars(); var++)
+    if(this->variable(var).type().family == SCALAR)
+      {
+        if (libMesh::processor_id() == (libMesh::n_processors()-1))
+          {
+            const DofMap& dof_map = this->get_dof_map();
+            std::vector<unsigned int> SCALAR_dofs;
+            dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+
+            for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+              {
+                this->solution->set( SCALAR_dofs[i], io_buffer[cnt++] );
+              }
+          }
+      }
+
   // Only read additional vectors if wanted  
   if (read_additional_data)
     {	  
@@ -525,8 +544,9 @@ void System::read_parallel_data (Xdr &io,
 	  // for the ith system to disk
 	  io.data(io_buffer);
 	  
-	  // Loop over each variable and each node, and read out the value.
+	  // Loop over each non-SCALAR variable and each node, and read out the value.
 	  for (unsigned int var=0; var<n_vars; var++)
+	    if(this->variable(var).type().family != SCALAR)
 	    {
 	      // First read the node DOF values
 	      for (std::vector<const DofObject*>::const_iterator
@@ -550,6 +570,23 @@ void System::read_parallel_data (Xdr &io,
 		    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
 		  }	      
 	    }
+
+          // Finally, read the SCALAR variables on the last processor
+          for (unsigned int var=0; var<this->n_vars(); var++)
+            if(this->variable(var).type().family == SCALAR)
+              {
+                if (libMesh::processor_id() == (libMesh::n_processors()-1))
+                  {
+                    const DofMap& dof_map = this->get_dof_map();
+                    std::vector<unsigned int> SCALAR_dofs;
+                    dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+
+                    for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+                    {
+                      this->solution->set( SCALAR_dofs[i], io_buffer[cnt++] );
+                    }
+                 }
+              }
 	}
     }
 }
@@ -752,6 +789,52 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var
   return n_assigned_vals;
 }
 
+unsigned int System::read_SCALAR_dofs (const unsigned int var,
+                                       Xdr &io,
+                                       NumericVector<Number> &vec) const
+{
+  unsigned int n_assigned_vals = 0; // the number of values assigned, this will be returned.
+
+  // Processor 0 will read the block from the buffer stream and send it to the last processor
+  const unsigned int n_SCALAR_dofs = this->variable(var).type().order;
+  std::vector<Number> input_buffer(n_SCALAR_dofs);
+  if (libMesh::processor_id() == 0)
+    {
+      io.data_stream(&input_buffer[0], n_SCALAR_dofs);
+    }
+    
+#ifdef LIBMESH_HAVE_MPI
+  if ( libMesh::n_processors() > 1 )
+    {
+      const unsigned int val_tag=1;
+      
+      // Post the receive on the last processor
+      if (libMesh::processor_id() == (libMesh::n_processors()-1))
+        Parallel::receive(0, input_buffer, val_tag);
+
+      // Send the data to processor 0
+      if (libMesh::processor_id() == 0)
+        Parallel::send(libMesh::n_processors()-1, input_buffer, val_tag);
+    }
+#endif
+  
+  // Finally, set the SCALAR values
+  if (libMesh::processor_id() == (libMesh::n_processors()-1))
+    {
+      const DofMap& dof_map = this->get_dof_map();
+      std::vector<unsigned int> SCALAR_dofs;
+      dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+
+      for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+        {
+          vec.set (SCALAR_dofs[i], input_buffer[i]);
+          ++n_assigned_vals;
+        }
+    }
+
+  return n_assigned_vals;
+}
+
 
 
 void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
@@ -782,28 +865,37 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
   
   // Loop over each variable in the system, and then each node/element in the mesh.
   for (unsigned int var=0; var<this->n_vars(); var++)
-    {      
-      //---------------------------------
-      // Collect the values for all nodes
-      n_assigned_vals +=
-	this->read_serialized_blocked_dof_objects (var,
-						   this->get_mesh().n_nodes(),
-						   this->get_mesh().local_nodes_begin(),
-						   this->get_mesh().local_nodes_end(),
-						   io,
-						   vec);
+    if(this->variable(var).type().family != SCALAR)
+      {
+        //---------------------------------
+        // Collect the values for all nodes
+        n_assigned_vals +=
+	  this->read_serialized_blocked_dof_objects (var,
+                                                     this->get_mesh().n_nodes(),
+						     this->get_mesh().local_nodes_begin(),
+						     this->get_mesh().local_nodes_end(),
+						     io,
+						     vec);
       
       
-      //------------------------------------
-      // Collect the values for all elements
-      n_assigned_vals +=
-	this->read_serialized_blocked_dof_objects (var,
-						   this->get_mesh().n_elem(),
-						   this->get_mesh().local_elements_begin(),
-						   this->get_mesh().local_elements_end(),
-						   io,
-						   vec);
-    } // end variable loop
+        //------------------------------------
+        // Collect the values for all elements
+        n_assigned_vals +=
+	  this->read_serialized_blocked_dof_objects (var,
+						     this->get_mesh().n_elem(),
+						     this->get_mesh().local_elements_begin(),
+						     this->get_mesh().local_elements_end(),
+						     io,
+						     vec);
+      } // end variable loop
+
+  // Finally loop over all the SCALAR variables
+  for (unsigned int var=0; var<this->n_vars(); var++)
+    if(this->variable(var).type().family == SCALAR)
+      {
+        n_assigned_vals +=
+          this->read_SCALAR_dofs (var, io, vec);
+      }
 
   vec.close();
 
@@ -1272,8 +1364,9 @@ void System::write_parallel_data (Xdr &io,
   const unsigned int sys_num = this->number();
   const unsigned int n_vars  = this->n_vars();
   
-  // Loop over each variable and each node, and write out the value.
+  // Loop over each non-SCALAR variable and each node, and write out the value.
   for (unsigned int var=0; var<n_vars; var++)
+    if (this->variable(var).type().family != SCALAR)
     {
       // First write the node DOF values
       for (std::vector<const DofObject*>::const_iterator
@@ -1298,6 +1391,23 @@ void System::write_parallel_data (Xdr &io,
 	    io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));    
 	  }
     }
+
+  // Finally, write the SCALAR data on the last processor
+  for (unsigned int var=0; var<this->n_vars(); var++)
+    if(this->variable(var).type().family == SCALAR)
+      {
+        if (libMesh::processor_id() == (libMesh::n_processors()-1))
+          {
+            const DofMap& dof_map = this->get_dof_map();
+            std::vector<unsigned int> SCALAR_dofs;
+            dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+
+            for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+              {
+                io_buffer.push_back( (*this->solution)(SCALAR_dofs[i]) );
+              }
+          }
+      }
   
   // 9.)
   //
@@ -1323,8 +1433,9 @@ void System::write_parallel_data (Xdr &io,
         {
 	  io_buffer.clear(); io_buffer.reserve( pos->second->local_size());
 	  
-	  // Loop over each variable and each node, and write out the value.
+	  // Loop over each non-SCALAR variable and each node, and write out the value.
 	  for (unsigned int var=0; var<n_vars; var++)
+	    if(this->variable(var).type().family != SCALAR)
 	    {
 	      // First write the node DOF values
 	      for (std::vector<const DofObject*>::const_iterator
@@ -1348,6 +1459,23 @@ void System::write_parallel_data (Xdr &io,
 		    io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));
 		  }
 	    }
+
+            // Finally, write the SCALAR data on the last processor
+            for (unsigned int var=0; var<this->n_vars(); var++)
+              if(this->variable(var).type().family == SCALAR)
+                {
+                  if (libMesh::processor_id() == (libMesh::n_processors()-1))
+                    {
+                      const DofMap& dof_map = this->get_dof_map();
+                      std::vector<unsigned int> SCALAR_dofs;
+                      dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+
+                      for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+                        {
+                          io_buffer.push_back( (*pos->second)(SCALAR_dofs[i]) );
+                        }
+                    }
+                }
 	  
 	  // 10.)
 	  //
@@ -1592,6 +1720,54 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
   return written_length;
 }
 
+unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
+                                        const unsigned int var,
+					Xdr &io) const
+{
+  unsigned int written_length=0;
+  std::vector<Number> vals; // The raw values for the local objects in the current block
+  // Collect the SCALARs for the current variable
+  if (libMesh::processor_id() == (libMesh::n_processors()-1))
+    {
+      const DofMap& dof_map = this->get_dof_map();
+      std::vector<unsigned int> SCALAR_dofs;
+      dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+
+      for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+        {
+          vals.push_back( vec(SCALAR_dofs[i]) );
+        }
+    }
+
+#ifdef LIBMESH_HAVE_MPI
+  if ( libMesh::n_processors() > 1 )
+    {
+      const unsigned int val_tag=1;
+      
+      // Post the receive on processor 0
+      if ( libMesh::processor_id() == 0 )
+        {
+          Parallel::receive(libMesh::n_processors()-1, vals, val_tag);
+        }
+
+      // Send the data to processor 0
+      if (libMesh::processor_id() == (libMesh::n_processors()-1))
+        {
+          Parallel::send(0, vals, val_tag);
+        }
+    }
+#endif
+
+  // -------------------------------------------------------
+  // Write the output on processor 0.
+  if (libMesh::processor_id() == 0)
+    {
+      io.data_stream (&vals[0], vals.size());
+      written_length += vals.size();
+    }
+
+  return written_length;
+}
 
 
 void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec) const
@@ -1607,8 +1783,9 @@ void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec)
   
   unsigned int written_length = 0;
   
-  // Loop over each variable in the system, and then each node/element in the mesh.
+  // Loop over each non-SCALAR variable in the system, and then each node/element in the mesh.
   for (unsigned int var=0; var<this->n_vars(); var++)
+    if(this->variable(var).type().family != SCALAR)
     {
       //---------------------------------
       // Collect the values for all nodes
@@ -1630,6 +1807,14 @@ void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec)
 						    this->get_mesh().local_elements_end(),
 						    io);
     } // end variable loop
+    
+  // Finally loop over all the SCALAR variables
+  for (unsigned int var=0; var<this->n_vars(); var++)
+    if(this->variable(var).type().family == SCALAR)
+      {
+        written_length +=
+          this->write_SCALAR_dofs (vec, var, io);
+      }
 
   if (libMesh::processor_id() == 0)
     libmesh_assert(written_length == vec_length);
