@@ -556,7 +556,7 @@ void System::read_parallel_data (Xdr &io,
 		    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 			    DofObject::invalid_id);
 		    libmesh_assert (cnt < io_buffer.size());
-		    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+		    pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
 		  }	     
 	      
 	      // Then read the element DOF values
@@ -567,7 +567,7 @@ void System::read_parallel_data (Xdr &io,
 		    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
 			    DofObject::invalid_id);
 		    libmesh_assert (cnt < io_buffer.size());
-		    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+		    pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
 		  }	      
 	    }
 
@@ -583,7 +583,7 @@ void System::read_parallel_data (Xdr &io,
 
                     for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
                     {
-                      this->solution->set( SCALAR_dofs[i], io_buffer[cnt++] );
+                      pos->second->set( SCALAR_dofs[i], io_buffer[cnt++] );
                     }
                  }
               }
