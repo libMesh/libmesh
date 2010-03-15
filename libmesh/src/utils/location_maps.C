@@ -60,9 +60,9 @@ void LocationMap<T>::init(MeshBase& mesh)
 
   // Cache a bounding box
   _lower_bound.clear();
-  _lower_bound.resize(3, std::numeric_limits<Real>::max());
+  _lower_bound.resize(LIBMESH_DIM, std::numeric_limits<Real>::max());
   _upper_bound.clear();
-  _upper_bound.resize(3, -std::numeric_limits<Real>::max());
+  _upper_bound.resize(LIBMESH_DIM, -std::numeric_limits<Real>::max());
 
   MeshBase::node_iterator       it  = mesh.nodes_begin();
   const MeshBase::node_iterator end = mesh.nodes_end();
@@ -71,19 +71,14 @@ void LocationMap<T>::init(MeshBase& mesh)
     {
       Node* node = *it;
 
-      // Expand the bounding box if necessary
-      _lower_bound[0] = std::min(_lower_bound[0],
-                                 (*node)(0));
-      _lower_bound[1] = std::min(_lower_bound[1],
-                                 (*node)(1));
-      _lower_bound[2] = std::min(_lower_bound[2],
-                                 (*node)(2));
-      _upper_bound[0] = std::max(_upper_bound[0],
-                                 (*node)(0));
-      _upper_bound[1] = std::max(_upper_bound[1],
-                                 (*node)(1));
-      _upper_bound[2] = std::max(_upper_bound[2],
-                                 (*node)(2));
+      for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+        {
+          // Expand the bounding box if necessary
+          _lower_bound[i] = std::min(_lower_bound[i],
+                                     (*node)(i));
+          _upper_bound[i] = std::max(_upper_bound[i],
+                                     (*node)(i));
+        }
     }
 
   // On a parallel mesh we might not yet have a full bounding box

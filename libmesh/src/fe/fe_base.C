@@ -665,8 +665,12 @@ void FEBase::compute_shape_functions (const Elem*)
 	        dphi[i][p](0) =
 		  dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
 	      
+#if LIBMESH_DIM>1
 	        dphi[i][p](1) = dphidy[i][p] = 0.;
+#endif
+#if LIBMESH_DIM>2
 	        dphi[i][p](2) = dphidz[i][p] = 0.;
+#endif
 	      }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	if (calculate_d2phi)
@@ -679,13 +683,13 @@ void FEBase::compute_shape_functions (const Elem*)
 	        d2phi[i][p](0,1) = d2phidxdy[i][p] = 
 		  d2phi[i][p](1,0) = 0.;
 	        d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
+#endif
 #if LIBMESH_DIM>2
 	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
 		  d2phi[i][p](2,0) = 0.;
 	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
 		  d2phi[i][p](2,1) = 0.;
 	        d2phi[i][p](2,2) = d2phidz2[i][p] = 0.;
-#endif
 #endif
 	      }
 #endif
