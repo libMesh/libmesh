@@ -200,6 +200,7 @@ clobber:
 # Should restore to a pristine state, except for files you
 # have added
 distclean:
+	@rm -f src/*/*.$(hosttype).*.o
 	@$(MAKE) clobber
 	@test ! -d contrib || $(MAKE) -C contrib $(MAKECMDGOALS)
 	@test ! -d examples || $(MAKE) -C examples $(MAKECMDGOALS)
