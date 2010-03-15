@@ -287,16 +287,24 @@ private:
 
     //     -- keeping track about arguments that are requested, so that the UFO detection
     //        can be simplified
-    STRING_VECTOR   _requested_arguments;
-    STRING_VECTOR   _requested_variables;
-    STRING_VECTOR   _requested_sections;
+#ifdef TLS
+    mutable TLS STRING_VECTOR   _requested_arguments;
+    mutable TLS STRING_VECTOR   _requested_variables;
+    mutable TLS STRING_VECTOR   _requested_sections;
+#else
+    mutable     STRING_VECTOR   _requested_arguments;
+    mutable     STRING_VECTOR   _requested_variables;
+    mutable     STRING_VECTOR   _requested_sections;
+#endif
 
     bool            request_recording_f;   // speed: request recording can be turned off
 
     //     -- if an argument is requested record it and the 'tag' the section branch to which 
     //        it belongs. Caution: both functions mark the sections as 'tagged'.
-    void                      _record_argument_request(const std::string& Arg);
-    void                      _record_variable_request(const std::string& Arg);
+    //        These are "const" functions but they do modify the
+    //        mutable _requested_* members
+    void                      _record_argument_request(const std::string& Arg) const;
+    void                      _record_variable_request(const std::string& Arg) const;
 
     // (*) helper functions ----------------------------------------------------
     //                  set variable from inside GetPot (no prefix considered)
@@ -350,7 +358,7 @@ private:
     const GetPot::variable*   _DBE_get_variable(const std::string str);
     STRING_VECTOR             _DBE_get_expr_list(const std::string str, const unsigned ExpectedNumber);
 
-    std::string  _double2string(const double& Value) const {
+    static std::string  _double2string(const double& Value) {
 	// -- converts a double integer into a string
 	char* tmp = new char[128];
 	snprintf(tmp, (int)sizeof(char)*128, "%e", Value);
@@ -359,7 +367,7 @@ private:
 	return result;
     }
 
-    std::string  _int2string(const int& Value) const {
+    static std::string  _int2string(const int& Value) {
 	// -- converts an integer into a string
 	char* tmp = new char[128];
 	snprintf(tmp, (int)sizeof(char)*128, "%i", Value);
@@ -368,7 +376,7 @@ private:
 	return result;
     }
 
-    STRING_VECTOR _get_section_tree(const std::string& FullPath) {
+    static STRING_VECTOR _get_section_tree(const std::string& FullPath) {
 	// -- cuts a variable name into a tree of sub-sections. this is requested for recording
 	//    requested sections when dealing with 'ufo' detection.
 	STRING_VECTOR   result;
@@ -1204,7 +1212,7 @@ GetPot::argument_contains(unsigned Idx, const char* FlagList) const
 
     // (*) record requested of argument for later ufo-detection
     //     an argument that is checked for flags is considered to be 'requested'
-    ((GetPot*)this)->_record_argument_request(argv[Idx]);
+    _record_argument_request(argv[Idx]);
 
     if( prefix == "" )
 	// search argument for any flag in flag list
@@ -1250,7 +1258,7 @@ GetPot::nominus_vector() const
 	// (*) record for later ufo-detection
 	//     when a nominus vector is requested, the entire set of nominus arguments are 
 	//     tagged as 'requested'
-	((GetPot*)this)->_record_argument_request(argv[*it]);
+	_record_argument_request(argv[*it]);
     }
     return nv;
 }
@@ -1351,7 +1359,7 @@ GetPot::operator()(const std::string& VarName, const char* Default, unsigned int
 }
 
 inline void 
-GetPot::_record_argument_request(const std::string& Name)
+GetPot::_record_argument_request(const std::string& Name) const
 {
     if( ! request_recording_f ) return; 
 
@@ -1366,7 +1374,7 @@ GetPot::_record_argument_request(const std::string& Name)
 }
 
 inline void 
-GetPot::_record_variable_request(const std::string& Name)
+GetPot::_record_variable_request(const std::string& Name) const
 {
     if( ! request_recording_f ) return; 
 
@@ -1454,7 +1462,7 @@ GetPot::_find_variable(const char* VarName) const
     const std::string Name = prefix + VarName;
 
     // (*) record requested variable for later ufo detection
-    ((GetPot*)this)->_record_variable_request(Name);
+    this->_record_variable_request(Name);
 
     std::vector<variable>::const_iterator it = variables.begin();
     for(; it != variables.end(); it++) {
