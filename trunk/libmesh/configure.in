@@ -361,7 +361,7 @@ dnl Ghosted instead of Serial local vectors -- enabled by default
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(ghosted,
               AC_HELP_STRING([--enable-ghosted],
-                             [Use experimental ghosted local vectors]),
+                             [Use ghosted local vectors when available]),
               enableghosted=$enableval,
               enableghosted=yes)
 
