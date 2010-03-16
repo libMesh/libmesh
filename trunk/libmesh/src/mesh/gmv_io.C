@@ -1947,7 +1947,7 @@ void GMVIO::read (const std::string& name)
   
 #ifndef LIBMESH_HAVE_GMV
 
-  libMesh::err << "Cannot read a GMV file without the GMV API." << std::endl;
+  libMesh::err << "Cannot read GMV file " << name << " without the GMV API." << std::endl;
   libmesh_error();
 
 #else

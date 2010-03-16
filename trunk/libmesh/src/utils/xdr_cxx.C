@@ -50,8 +50,9 @@ namespace {
      
     STOP_LOG("system(bzip2)", "XdrIO");
 #else
-    libMesh::err << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
-	          << std::endl;
+    libMesh::err << "ERROR: need bzip2/bunzip2 to create "
+		 << unzipped_name << ".bz2"
+	         << std::endl;
     libmesh_error();
 #endif
   }
@@ -61,24 +62,25 @@ namespace {
     // There's no parallel bunzip2 for us to call
     libmesh_assert(libMesh::processor_id() == 0);
 
+#ifdef LIBMESH_HAVE_BZIP
     std::string new_name = name;
     if (name.size() - name.rfind(".bz2") == 4)
       {
 	new_name.erase(new_name.end() - 4, new_name.end());
-#ifdef LIBMESH_HAVE_BZIP
 	START_LOG("system(bunzip2)", "XdrIO");
 	std::string system_string = "bunzip2 -f -k ";
 	system_string += name;
 	if (std::system(system_string.c_str()))
           libmesh_file_error(system_string);
 	STOP_LOG("system(bunzip2)", "XdrIO");
-#else
-	libMesh::err << "ERROR: need bzip2/bunzip2 to handle .bz2 files!!!"
-		      << std::endl;
-	libmesh_error();
-#endif
       }
     return new_name;
+#else
+    libMesh::err << "ERROR: need bzip2/bunzip2 to open .bz2 file "
+		 << name << std::endl;
+    libmesh_error();
+    return name;
+#endif
   }
 
   // remove an unzipped file
