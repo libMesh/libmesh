@@ -1607,6 +1607,13 @@ Gradient System::point_gradient(unsigned int var, Point &p)
 
 Tensor System::point_hessian(unsigned int var, Point &p)
 {
+  // Get ready to accumulate a hessian
+  Tensor hess_u;
+
+  // But we can only accumulate a hessian with --enable-second
+#ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  libmesh_error();
+#else
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
   parallel_only();
@@ -1622,9 +1629,6 @@ Tensor System::point_hessian(unsigned int var, Point &p)
   
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
-
-  // Get ready to accumulate a gradient
-  Tensor hess_u;
 
   // Make sure we got an element on our partition
   bool I_found_p = false;
@@ -1695,6 +1699,7 @@ Tensor System::point_hessian(unsigned int var, Point &p)
   for (unsigned int i =0; i<dim; i++)
     for (unsigned int j=0; j<dim; j++)
       hess_u(i,j) = hessian_vector[i*dim + j];
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
     
   return hess_u;
 }
