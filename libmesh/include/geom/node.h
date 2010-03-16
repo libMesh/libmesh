@@ -138,6 +138,7 @@ public:
     unsigned int id;
     unsigned int pid;
     Real x;
+// FIXME: We should drop z (and y) if libMesh is built 2D (or 1D) only
     Real y;
     Real z;
 
@@ -152,8 +153,16 @@ public:
       id(node.id()),
       pid(node.processor_id()),
       x(node(0)),
+#if LIBMESH_DIM > 1
       y(node(1)),
+#else
+      y(0.),
+#endif
+#if LIBMESH_DIM > 2
       z(node(2))
+#else
+      z(0.)
+#endif
     {}
 
     AutoPtr<Node> build_node () const
@@ -235,8 +244,12 @@ inline
 Node & Node::operator= (const Point& p)
 {
   (*this)(0) = p(0);
+#if LIBMESH_DIM > 1
   (*this)(1) = p(1);
+#endif
+#if LIBMESH_DIM > 2
   (*this)(2) = p(2);
+#endif
 
   return *this;
 }
