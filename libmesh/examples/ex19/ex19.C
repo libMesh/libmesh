@@ -397,6 +397,14 @@ int main (int argc, char** argv)
   return 0;
 #endif
 
+#ifndef LIBMESH_ENABLE_AMR
+  if (libMesh::processor_id() == 0)
+    std::cerr << "ERROR: This example requires libMesh to be\n"
+              << "compiled with AMR support!"
+              << std::endl;
+  return 0;
+#else
+
   // Create a GetPot object to parse the command line
   GetPot command_line (argc, argv);
   
@@ -518,6 +526,8 @@ int main (int argc, char** argv)
   // After solving the system write the solution
   GMVIO (mesh).write_equation_systems ("out.gmv", 
                                        equation_systems);
+#endif // #ifndef LIBMESH_ENABLE_AMR
+
   // All done. 
   return 0; 
 }

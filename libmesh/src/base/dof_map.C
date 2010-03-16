@@ -1436,7 +1436,11 @@ void DofMap::dof_indices (const Elem* const elem,
 
 void DofMap::SCALAR_dof_indices (std::vector<unsigned int>& di,
 			         const unsigned int vn,
+#ifdef LIBMESH_ENABLE_AMR
 			         const bool old_dofs) const
+#else
+			         const bool) const
+#endif
 {
   START_LOG("SCALAR_dof_indices()", "DofMap");
 

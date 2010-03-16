@@ -216,17 +216,18 @@ void LegacyXdrIO::read_ascii (const std::string& name, const LegacyXdrIO::FileFo
 
 
 
-void LegacyXdrIO::read_binary (const std::string& name, const LegacyXdrIO::FileFormat originator)
-{
 #ifndef LIBMESH_HAVE_XDR
+void LegacyXdrIO::read_binary (const std::string& name, const LegacyXdrIO::FileFormat)
+{
 
   libMesh::err << "WARNING: Compiled without XDR binary support.\n"
 	        << "Will try ASCII instead" << std::endl << std::endl;
 
   this->read_ascii (name);
-  
+}
 #else
-  
+void LegacyXdrIO::read_binary (const std::string& name, const LegacyXdrIO::FileFormat originator)
+{
   // get a writeable reference to the underlying mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
@@ -235,9 +236,8 @@ void LegacyXdrIO::read_binary (const std::string& name, const LegacyXdrIO::FileF
 
   // read the mesh
   this->read_mesh (name, originator);
-  
-#endif
 }
+#endif
 
 
 
@@ -248,21 +248,20 @@ void LegacyXdrIO::write_ascii (const std::string& name, const LegacyXdrIO::FileF
 
 
 
-void LegacyXdrIO::write_binary (const std::string& name, const LegacyXdrIO::FileFormat originator)
-{
 #ifndef LIBMESH_HAVE_XDR
-
+void LegacyXdrIO::write_binary (const std::string& name, const LegacyXdrIO::FileFormat)
+{
   libMesh::err << "WARNING: Compiled without XDR binary support.\n"
 	        << "Will try ASCII instead" << std::endl << std::endl;
 
   this->write_ascii (name);
-
-#else
-  
-  this->write_mesh (name, originator);  
-  
-#endif
 }
+#else
+void LegacyXdrIO::write_binary (const std::string& name, const LegacyXdrIO::FileFormat originator)
+{
+  this->write_mesh (name, originator);  
+}
+#endif
 
 
 
