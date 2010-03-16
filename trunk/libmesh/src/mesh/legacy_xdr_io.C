@@ -390,8 +390,8 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 
   // read in the nodal coordinates and form points.
   {
-    std::vector<Real> coords(numNodes*mesh.spatial_dimension()); // Always use three coords per node
-    m.coord(&coords[0], mesh.spatial_dimension(), numNodes);
+    std::vector<Real> coords(numNodes*3); // Always use three coords per node
+    m.coord(&coords[0], 3, numNodes);
 
 
   
@@ -881,7 +881,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
   {
     std::vector<Real> coords;
     
-    coords.resize(mesh.spatial_dimension()*node_map.size());
+    coords.resize(3*node_map.size());
     int lastIndex=0;
 
     std::map<unsigned int,unsigned int>::iterator it = node_map.begin();
@@ -897,7 +897,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
       }
    
     // Put the nodes in the XDR file
-    m.coord(&coords[0], mesh.spatial_dimension(), node_map.size()); 
+    m.coord(&coords[0], 3, node_map.size()); 
   }
 
   
