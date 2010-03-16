@@ -436,6 +436,7 @@ int main (int argc, char** argv)
 
   // The dimension of our problem 
   const unsigned int dim = 2;
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
   
   // Read number of refinements 
   int nr = 2;

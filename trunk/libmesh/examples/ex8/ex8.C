@@ -103,11 +103,11 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #ifdef LIBMESH_ENABLE_PARMESH
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example directly references\n"
-              << "all mesh nodes and is incompatible with"
-              << "ParallelMesh use."
-              << std::endl;
+  std::cout << "ERROR: This example directly references\n"
+            << "all mesh nodes and is incompatible with"
+            << "ParallelMesh use."
+            << std::endl;
+  libmesh_example_assert(false, "--disable-parmesh");
 #else
 
   // Check for proper usage.
@@ -156,7 +156,8 @@ int main (int argc, char** argv)
   // For now, restrict to dim=3, though this
   // may easily be changed, see example 4
   const unsigned int dim = 3;
-
+  libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
+  
   // Create a dim-dimensional mesh.
   Mesh mesh (dim);
   MeshData mesh_data(mesh);

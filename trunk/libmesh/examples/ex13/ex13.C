@@ -84,6 +84,7 @@ int main (int argc, char** argv)
 
   // Set the dimensionality of the mesh = 2
   const unsigned int dim = 2;     
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
   
   // Create a two-dimensional mesh.
   Mesh mesh (dim);

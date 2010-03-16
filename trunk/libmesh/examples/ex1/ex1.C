@@ -59,6 +59,9 @@ int main (int argc, char** argv)
   
   // Get the dimensionality of the mesh from argv[2]
   const unsigned int dim = std::atoi(argv[2]);
+
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
   
   // Create a mesh with the requested dimension.
   Mesh mesh(dim);

@@ -143,6 +143,9 @@ int main (int argc, char** argv)
   // example 4.  For the time being, restrict to 3 dimensions.
   const unsigned int dim=3;
   
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
+  
   // The following is identical to example 4, and therefore
   // not commented.  Differences are mentioned when present.
   Mesh mesh (dim);

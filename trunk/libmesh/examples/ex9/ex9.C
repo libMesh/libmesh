@@ -104,15 +104,15 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example requires Adaptive Mesh Refinement support - although
+  // it only refines uniformly, the refinement code used is the same
+  // underneath
 #ifndef LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with AMR support!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-amr");
 #else
 
   // Create a two-dimensional mesh.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   Mesh mesh (2);
       
   // Read the mesh from file.  This is the coarse mesh that will be used
