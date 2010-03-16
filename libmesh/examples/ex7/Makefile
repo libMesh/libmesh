@@ -57,7 +57,6 @@ distclean:
 	@$(MAKE) clobber
 	@rm -f *.o *.g.o *.pg.o
 
-ifeq ($(enable-complex),yes)
 run: $(target)
 	@echo "***************************************************************"
 	@echo "* Running Example " $(LIBMESH_RUN) $(target) -f .5 $(LIBMESH_OPTIONS)
@@ -68,12 +67,6 @@ run: $(target)
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) -f .5 $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
-else
-run: $(target)
-	@echo "***************************************************************"
-	@echo "*** Skipping Example " $(target) ", only good with --enable-complex"
-	@echo "***************************************************************"
-endif
 
 
 # include the dependency list
