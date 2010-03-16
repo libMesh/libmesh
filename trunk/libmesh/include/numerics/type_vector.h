@@ -362,19 +362,6 @@ template <typename T>
 inline
 T & TypeVector<T>::operator () (const unsigned int i)
 {
-#if LIBMESH_DIM < 3
-
-  if (i >= LIBMESH_DIM)
-    {
-//       libMesh::err << "ERROR:  You are assigning to a vector component" << std::endl
-// 		<< "that is out of range for the compiled LIBMESH_DIM!"      << std::endl
-// 		<< " LIBMESH_DIM=" << LIBMESH_DIM << " , i=" << i
-// 		<< std::endl;
-      libmesh_error();
-    }
-  
-#endif
-  
   libmesh_assert (i<LIBMESH_DIM);
   
   return _coords[i];
