@@ -88,6 +88,7 @@ int main (int argc, char** argv)
   std::cout << std::endl << std::endl;
   
   // Create a 2D mesh.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   Mesh mesh (2);
   
   

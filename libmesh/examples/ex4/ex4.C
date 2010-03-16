@@ -141,6 +141,10 @@ int main (int argc, char** argv)
   if ( command_line.search(1, "-d") )
     dim = command_line.next(dim);
   
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+    
+  // Create a mesh with user-defined dimension.
   // Read number of elements from command line
   int ps = 15;
   if ( command_line.search(1, "-n") )
@@ -156,14 +160,14 @@ int main (int argc, char** argv)
   if ( command_line.search(2, "-FEFamily", "-f") )
     family = command_line.next(family);
   
-  // Cannot use dicontinuous basis.
+  // Cannot use discontinuous basis.
   if ((family == "MONOMIAL") || (family == "XYZ"))
     {
-      std::cout << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
+      if (libMesh::processor_id() == 0)
+        std::cerr << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
       libmesh_error();
     }
     
-  // Create a mesh with user-defined dimension.
   Mesh mesh (dim);
   
 

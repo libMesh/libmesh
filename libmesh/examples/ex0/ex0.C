@@ -59,12 +59,9 @@ int main(int argc, char** argv)
   // finalized.
   LibMeshInit init (argc, argv);
 
+  // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with AMR support!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-amr");
 #else
 
   // Create a new 1 dimensional mesh

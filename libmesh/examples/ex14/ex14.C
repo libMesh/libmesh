@@ -110,12 +110,9 @@ int main(int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with AMR support!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-amr");
 #else
 
   // Parse the input file
@@ -137,6 +134,9 @@ int main(int argc, char** argv)
   dim = input_file("dimension", 2);
   const std::string indicator_type = input_file("indicator_type", "kelly");
   singularity = input_file("singularity", true);
+  
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
   
   // Output file for plotting the error as a function of
   // the number of degrees of freedom.

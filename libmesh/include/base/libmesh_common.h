@@ -255,6 +255,19 @@ extern OStreamProxy err;
 #define libmesh_file_error(filename)    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::FileError(filename)); } while(0)
 #define libmesh_convergence_failure()    do { libmesh_here(); LIBMESH_THROW(libMesh::ConvergenceFailure()); } while(0)
 
+// The libmesh_example_assert() macro prints a message and calls
+// "return 0;" if the assertion specified by the macro is not true.  This
+// macro is used in the example executables, which should run when the
+// configure-time libMesh options support them but which should exit
+// without failure otherwise.
+//
+// This macro only works in main(), because we have no better way than
+// "return 0" from main to immediately exit successfully - std::exit(0)
+// gets seen by at least some MPI stacks as failure.
+
+#define libmesh_example_assert(asserted, requirement)   do { if (!(asserted)) { libMesh::out << "Assertion `" #asserted "' failed.  Configuring libMesh with " requirement " may be required to run this code." << std::endl; return 0; } } while(0)
+
+// The libmesh_cast functions do a dynamic cast and assert the result,
 // The libmesh_cast functions do a dynamic cast and assert the result,
 // if we're in debug or development modes, but just do a faster static
 // cast if we're in optimized mode.  Use these casts when you're

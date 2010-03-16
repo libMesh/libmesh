@@ -51,11 +51,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #ifndef LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with AMR support!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-amr");
 #else
 
   // Parse the input file
@@ -73,7 +69,12 @@ int main (int argc, char** argv)
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
   const unsigned int dim               = infile("dimension", 2);
 
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+  
+  // We have only defined 2 and 3 dimensional problems
   libmesh_assert (dim == 2 || dim == 3);
+
   // Create a n-dimensional mesh.
   Mesh mesh (dim);
   

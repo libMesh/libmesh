@@ -117,11 +117,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #ifndef LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with AMR support!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-amr");
 #else
 
   // Brief message to the user regarding the program name
@@ -191,6 +187,7 @@ int main (int argc, char** argv)
 
 
   // Create a two-dimensional mesh.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   Mesh mesh (2);
 
   // Create an equation systems object.

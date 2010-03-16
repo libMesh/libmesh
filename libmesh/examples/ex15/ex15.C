@@ -111,20 +111,14 @@ int main(int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example requires Adaptive Mesh Refinement support
 #ifndef LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with AMR support!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-amr");
 #else
 
+  // This example requires second derivative calculation support
 #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example requires the library to be "
-              << "compiled with second derivatives support!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-second");
 #else
 
   // Parse the input file
@@ -146,6 +140,9 @@ int main(int argc, char** argv)
   const unsigned int max_linear_iterations =
                   input_file("max_linear_iterations", 10000);
 
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+  
   // We have only defined 2 and 3 dimensional problems
   libmesh_assert (dim == 2 || dim == 3);
 

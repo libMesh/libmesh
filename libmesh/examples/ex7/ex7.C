@@ -114,12 +114,7 @@ int main (int argc, char** argv)
   
   // This example is designed for complex numbers.   
 #ifndef USE_COMPLEX_NUMBERS
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example is intended for " << std::endl
-              << " use with complex numbers." << std::endl;
-
-  return 0;
-
+  libmesh_example_assert(false, "--enable-complex");
 #else
   
   // Check for proper usage.
@@ -146,6 +141,7 @@ int main (int argc, char** argv)
   // For now, restrict to dim=2, though this
   // may easily be changed, see example 4
   const unsigned int dim = 2;
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
   
   // Get the frequency from argv[2] as a <i>float</i>,
   // currently, solve for 1/3rd, 2/3rd and 1/1th of the given frequency

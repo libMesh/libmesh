@@ -60,14 +60,9 @@ int main (int argc, char** argv)
   // Initialize libMesh and the dependent libraries.
   LibMeshInit init (argc, argv);
 
-  // This example is designed for the SLEPc eigen solver interface.
+  // Skip SLEPc examples on a non-SLEPc libMesh build
 #ifndef LIBMESH_HAVE_SLEPC
-  if (libMesh::processor_id() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with SLEPc eigen solvers support!"
-              << std::endl;
-
-  return 0;
+  libmesh_example_assert(false, "--enable-slepc");
 }
 
 #else
@@ -94,12 +89,13 @@ int main (int argc, char** argv)
       std::cout << std::endl << std::endl;
     }
 
-  // Set the dimensionality.
-  const unsigned int dim = 2;
-
   // Get the number of eigen values to be computed from argv[2]
   const unsigned int nev = std::atoi(argv[2]);
 
+  // Set the dimensionality.
+  const unsigned int dim = 2;
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
+  
   // Create a dim-dimensional mesh.
   Mesh mesh (dim);
 
