@@ -58,6 +58,13 @@ extern "C" {
 #include <string>
 #include <vector>
 
+// We need a mutex to keep const operations thread-safe in the
+// presence of mutable containers.  Right now we're using the libMesh
+// Threads::scoped_mutex wrapper around TBB, and we're assuming that
+// users aren't doing any threaded GetPot usage when libMesh threads
+// are disabled.
+#include "threads.h"
+
 typedef  std::vector<std::string>  STRING_VECTOR;
 
 #define victorate(TYPE, VARIABLE, ITERATOR)                        \
@@ -269,17 +276,10 @@ private:
     //     -- field separator (separating elements of a vector)
     std::string           _field_separator;
 
-    //     -- some functions return a char pointer to a temporarily existing string
+    //     -- some functions return a char pointer to a string created on the fly.
     //        this container makes them 'available' until the getpot object is destroyed.
-    //        We use Thread Local Storage when available, to avoid
-    //        bugs when multiple threads try to request char pointer return
-    //        values at once.  Threaded user codes are recommended to
-    //        instead request std::string values.
-#ifdef TLS
-    mutable TLS std::set<std::string> _internal_string_container;
-#else
-    mutable     std::set<std::string> _internal_string_container;
-#endif
+    //        user codes are recommended to instead request std::string values.
+    mutable std::set<std::string> _internal_string_container;
 
     //     -- some functions return a char pointer to a temporarily existing string
     //        this function adds them to our container
@@ -287,15 +287,9 @@ private:
 
     //     -- keeping track about arguments that are requested, so that the UFO detection
     //        can be simplified
-#ifdef TLS
-    mutable TLS STRING_VECTOR   _requested_arguments;
-    mutable TLS STRING_VECTOR   _requested_variables;
-    mutable TLS STRING_VECTOR   _requested_sections;
-#else
-    mutable     STRING_VECTOR   _requested_arguments;
-    mutable     STRING_VECTOR   _requested_variables;
-    mutable     STRING_VECTOR   _requested_sections;
-#endif
+    mutable STRING_VECTOR   _requested_arguments;
+    mutable STRING_VECTOR   _requested_variables;
+    mutable STRING_VECTOR   _requested_sections;
 
     bool            request_recording_f;   // speed: request recording can be turned off
 
@@ -558,6 +552,9 @@ GetPot::absorb(const GetPot& Other)
     variables = Other.variables;
 
     if( request_recording_f ) { 
+        // Get a lock before touching anything mutable
+        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
 	_requested_arguments.insert(_requested_sections.end(), 
 				    Other._requested_arguments.begin(), Other._requested_arguments.end());
 	_requested_variables.insert(_requested_sections.end(),
@@ -571,6 +568,9 @@ GetPot::absorb(const GetPot& Other)
 inline void    
 GetPot::clear_requests()
 {
+    // Get a lock before touching anything mutable
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
     _requested_arguments.erase(_requested_arguments.begin(), _requested_arguments.end());
     _requested_variables.erase(_requested_variables.begin(), _requested_variables.end());
     _requested_sections.erase(_requested_sections.begin(), _requested_sections.end());
@@ -606,7 +606,12 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 	if( arg.length() > 1 && arg[0] == '[' && arg[arg.length()-1] == ']' ) {
 
 	    // (*) sections are considered 'requested arguments'
-	    if( request_recording_f ) _requested_arguments.push_back(arg);
+	    if( request_recording_f ) {
+                // Get a lock before touching anything mutable
+                Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                _requested_arguments.push_back(arg);
+            }
 	    
 	    const std::string Name = _DBE_expand_string(arg.substr(1, arg.length()-2));
 	    section = _process_section_label(Name, section_stack);
@@ -631,7 +636,12 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 		//     arguments carriying variables are always treated as 'requested' arguments. 
 		//     unrequested variables have to be detected with the ufo-variable
 		//     detection routine.
-		if( request_recording_f ) _requested_arguments.push_back(arg);
+		if( request_recording_f ) {
+                    // Get a lock before touching anything mutable
+                    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                    _requested_arguments.push_back(arg);
+                }
 
 		// set terminating 'zero' to treat first part as single string
 		// => arg (from start to 'p') = Name of variable
@@ -918,6 +928,8 @@ GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) c
 inline const char*
 GetPot::_internal_managed_copy(const std::string& Arg) const
 {
+    // Get a lock before touching anything mutable
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
     return _internal_string_container.insert(Arg).first->c_str();
 }
 
@@ -1363,6 +1375,9 @@ GetPot::_record_argument_request(const std::string& Name) const
 {
     if( ! request_recording_f ) return; 
 
+    // Get a lock before touching anything mutable
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
     // (*) record requested variable for later ufo detection
     _requested_arguments.push_back(Name);
 
@@ -1377,6 +1392,9 @@ inline void
 GetPot::_record_variable_request(const std::string& Name) const
 {
     if( ! request_recording_f ) return; 
+
+    // Get a lock before touching anything mutable
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
     // (*) record requested variable for later ufo detection
     _requested_variables.push_back(Name);
