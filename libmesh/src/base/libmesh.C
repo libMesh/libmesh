@@ -170,7 +170,7 @@ void _init (int &argc, char** & argv,
 
 #if defined(LIBMESH_HAVE_MPI)
 
-  // Allow the user to bypass PETSc initialization
+  // Allow the user to bypass MPI initialization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
       // Check whether the calling program has already initialized
@@ -206,7 +206,16 @@ void _init (int &argc, char** & argv,
       
 #if defined(LIBMESH_HAVE_PETSC)
       
-  if (!libMesh::on_command_line ("--disable-petsc"))
+  // Allow the user to bypass PETSc initialization
+  if (!libMesh::on_command_line ("--disable-petsc")
+
+#if defined(LIBMESH_HAVE_MPI)
+  // If the user bypassed MPI, we'd better be safe and assume that
+  // PETSc was built to require it; otherwise PETSc initialization
+  // dies.
+      && !libMesh::on_command_line ("--disable-mpi")
+#endif
+     )
     {
       int ierr=0;
 	  
@@ -341,7 +350,11 @@ int _close ()
 
 #if defined(LIBMESH_HAVE_PETSC) 
       // Allow the user to bypass PETSc finalization
-  if (!libMesh::on_command_line ("--disable-petsc"))
+  if (!libMesh::on_command_line ("--disable-petsc")
+#if defined(LIBMESH_HAVE_MPI)
+      && !libMesh::on_command_line ("--disable-mpi")
+#endif
+     )
     {
 # if defined(LIBMESH_HAVE_SLEPC)
       if (libmesh_initialized_slepc)
