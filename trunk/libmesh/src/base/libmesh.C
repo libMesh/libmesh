@@ -36,20 +36,21 @@
 
 #if defined(LIBMESH_HAVE_MPI)
 # include <mpi.h>
+#endif // #if defined(LIBMESH_HAVE_MPI)
+
+#if defined(LIBMESH_HAVE_PETSC)
 # include "petsc_macro.h"
-# include "slepc_macro.h"
-# if defined(LIBMESH_HAVE_PETSC)
 EXTERN_C_FOR_PETSC_BEGIN
-#   include <petsc.h>
-#   include <petscerror.h>
+# include <petsc.h>
+# include <petscerror.h>
 EXTERN_C_FOR_PETSC_END
-# endif // #if defined(LIBMESH_HAVE_PETSC)
 # if defined(LIBMESH_HAVE_SLEPC)
+#  include "slepc_macro.h"
 EXTERN_C_FOR_PETSC_BEGIN
-#   include <slepc.h>
+#  include <slepc.h>
 EXTERN_C_FOR_PETSC_END
 # endif // #if defined(LIBMESH_HAVE_SLEPC)
-#endif // #if defined(LIBMESH_HAVE_MPI)
+#endif // #if defined(LIBMESH_HAVE_PETSC)
 
 
 // --------------------------------------------------------
@@ -81,6 +82,8 @@ namespace {
 // libMeshdata initialization
 #ifdef LIBMESH_HAVE_MPI
 MPI_Comm           libMesh::COMM_WORLD = MPI_COMM_NULL;
+#else
+int                libMesh::COMM_WORLD = 0;
 #endif
 
 OStreamProxy libMesh::out = std::cout;
@@ -193,60 +196,54 @@ void _init (int &argc, char** & argv,
       
       libMeshPrivateData::_processor_id = Parallel::Communicator_World.rank();
       libMeshPrivateData::_n_processors = Parallel::Communicator_World.size();
-      
-# if defined(LIBMESH_HAVE_PETSC)
-      
-      if (!libMesh::on_command_line ("--disable-petsc"))
-	{
-	  int ierr=0;
-	  
-	  PETSC_COMM_WORLD = libMesh::COMM_WORLD;
-
-          // Check whether the calling program has already initialized
-          // PETSc, and avoid duplicate Initialize/Finalize
-          PetscTruth petsc_already_initialized;
-          ierr = PetscInitialized(&petsc_already_initialized);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-          if (petsc_already_initialized != PETSC_TRUE)
-            libmesh_initialized_petsc = true;
-#  if defined(LIBMESH_HAVE_SLEPC)
-
-          // If SLEPc allows us to check whether the calling program
-          // has already initialized it, we do that, and avoid
-          // duplicate Initialize/Finalize.
-          // We assume that SLEPc will handle PETSc appropriately,
-          // which it does in the versions we've checked.
-#   if !SLEPC_VERSION_LESS_THAN(2,3,3)
-          if (!SlepcInitializeCalled)
-#   endif
-            {
-	      ierr = SlepcInitialize  (&argc, &argv, NULL, NULL);
-	             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-              libmesh_initialized_slepc = true;
-            }
-#  else
-          if (libmesh_initialized_petsc)
-            {
-	      ierr = PetscInitialize (&argc, &argv, NULL, NULL);
-	             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-            }
-#  endif
-	}
-# endif
     }
 
   // Could we have gotten bad values from the above calls?
   libmesh_assert (libMeshPrivateData::_n_processors >  0);
   libmesh_assert (libMeshPrivateData::_processor_id >= 0);
 
-#else
-
-  // No MPI, can only be uniprocessor
-  // libmesh_assert (libMeshPrivateData::_n_processors == 1);
-  // libmesh_assert (libMeshPrivateData::_processor_id == 0);
-  
 #endif
-  
+      
+#if defined(LIBMESH_HAVE_PETSC)
+      
+  if (!libMesh::on_command_line ("--disable-petsc"))
+    {
+      int ierr=0;
+	  
+      PETSC_COMM_WORLD = libMesh::COMM_WORLD;
+
+      // Check whether the calling program has already initialized
+      // PETSc, and avoid duplicate Initialize/Finalize
+      PetscTruth petsc_already_initialized;
+      ierr = PetscInitialized(&petsc_already_initialized);
+             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      if (petsc_already_initialized != PETSC_TRUE)
+        libmesh_initialized_petsc = true;
+# if defined(LIBMESH_HAVE_SLEPC)
+
+      // If SLEPc allows us to check whether the calling program
+      // has already initialized it, we do that, and avoid
+      // duplicate Initialize/Finalize.
+      // We assume that SLEPc will handle PETSc appropriately,
+      // which it does in the versions we've checked.
+#  if !SLEPC_VERSION_LESS_THAN(2,3,3)
+      if (!SlepcInitializeCalled)
+#  endif
+        {
+          ierr = SlepcInitialize  (&argc, &argv, NULL, NULL);
+	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          libmesh_initialized_slepc = true;
+        }
+# else
+      if (libmesh_initialized_petsc)
+        {
+          ierr = PetscInitialize (&argc, &argv, NULL, NULL);
+	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        }
+# endif
+    }
+#endif
+
   // Re-parse the command-line arguments.  Note that PETSc and MPI
   // initialization above may have removed command line arguments
   // that are not relevant to this application in the above calls.
@@ -324,36 +321,42 @@ int _close ()
   task_scheduler.reset();
 
 #if defined(LIBMESH_HAVE_MPI)
+  // We may be here in only one process,
+  // because an uncaught libmesh_error() exception
+  // called the LibMeshInit destructor.
+  //
+  // If that's the case, we need to MPI_Abort(),
+  // not just wait for other processes that
+  // might never get to MPI_Finalize()
+  if (libmesh_initialized_mpi &&
+      std::uncaught_exception())
+    {
+      libMesh::err << "Uncaught exception - aborting" << std::endl;
+      if (libMesh::on_command_line ("--disable-mpi"))
+        exit(1);
+      else
+        MPI_Abort(libMesh::COMM_WORLD,1);
+    }
+#endif
+
+#if defined(LIBMESH_HAVE_PETSC) 
+      // Allow the user to bypass PETSc finalization
+  if (!libMesh::on_command_line ("--disable-petsc"))
+    {
+# if defined(LIBMESH_HAVE_SLEPC)
+      if (libmesh_initialized_slepc)
+        SlepcFinalize();
+# else
+      if (libmesh_initialized_petsc)
+        PetscFinalize();
+# endif
+    }
+#endif
+
+#if defined(LIBMESH_HAVE_MPI)
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
-      // We may be here in only one process,
-      // because an uncaught libmesh_error() exception
-      // called the LibMeshInit destructor.
-      //
-      // If that's the case, we need to MPI_Abort(),
-      // not just wait for other processes that
-      // might never get to MPI_Finalize()
-      if (libmesh_initialized_mpi &&
-          std::uncaught_exception())
-        {
-          libMesh::err << "Uncaught exception - aborting" << std::endl;
-          MPI_Abort(libMesh::COMM_WORLD,1);
-        }
-# if defined(LIBMESH_HAVE_PETSC) 
-
-      // Allow the user to bypass PETSc finalization
-      if (!libMesh::on_command_line ("--disable-petsc"))
-	{
-#  if defined(LIBMESH_HAVE_SLEPC)
-          if (libmesh_initialized_slepc)
-	    SlepcFinalize();
-#  else
-          if (libmesh_initialized_petsc)
-	    PetscFinalize();
-#  endif
-	}
-# endif
       Parallel::Communicator_World.clear();
       MPI_Comm_free (&libMesh::COMM_WORLD);
 

@@ -579,16 +579,11 @@ AC_ARG_ENABLE(petsc,
 
 
 dnl -------------------------------------------------------------
-dnl configure MPI only if PETSc fails
-if (test "$enablempi" != no) ; then
-  if (test "$enablepetsc" !=  no) ; then
-    CONFIGURE_PETSC
-  else
-    ACX_MPI
-  fi
+dnl configure MPI separately only if PETSc fails
+if (test "$enablepetsc" !=  no) ; then
+  CONFIGURE_PETSC
 else
-  dnl no PETSc without MPI!
-  enablepetsc=no
+  ACX_MPI
 fi
 dnl -------------------------------------------------------------
 
