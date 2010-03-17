@@ -580,7 +580,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 
       // We will have lots of simultaneous receives if we are
       // processor 0, so let's use nonblocking receives.
-      std::vector<Parallel::request>
+      std::vector<Parallel::Request>
         id_request_handles(libMesh::n_processors()-1),
         coord_request_handles(libMesh::n_processors()-1);
 

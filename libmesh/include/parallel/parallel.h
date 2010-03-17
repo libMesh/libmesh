@@ -517,6 +517,12 @@ namespace Parallel
     operator request & () 
     { return _request; }
 
+    request* get()
+    { return &_request; }
+
+    const request* get() const
+    { return &_request; }
+
     status wait ()
     {
       status status;
@@ -701,7 +707,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    const DataType &type,
-		    request &req,
+		    Request &req,
 		    const int tag=0,
                     const Communicator &comm = Communicator_World);
 
@@ -746,7 +752,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
-		    request &req,
+		    Request &req,
 		    const int tag=0,
                     const Communicator &comm = Communicator_World)
   {
@@ -762,7 +768,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
-		    request &req,
+		    Request &req,
 		    const int tag=0,
                     const Communicator &comm = Communicator_World)
   {
@@ -794,7 +800,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    const DataType &type,
-		    request &req,
+		    Request &req,
 		    const int tag=0,
                     const Communicator &comm = Communicator_World);
 
@@ -839,7 +845,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
-		    request &req,
+		    Request &req,
 		    const int tag=0,
                     const Communicator &comm = Communicator_World)
   {
@@ -855,7 +861,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::set<std::complex<T> > &buf,
-		    request &req,
+		    Request &req,
 		    const int tag=0,
                     const Communicator &comm = Communicator_World)
   {
@@ -875,7 +881,7 @@ namespace Parallel
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<T> &buf,
 		                const DataType &type,
-		                request &r,
+		                Request &r,
 		                const int tag=0,
                                 const Communicator &comm = Communicator_World)
   {
@@ -894,7 +900,7 @@ namespace Parallel
   template <typename T>
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<T> &buf,
-		                request &r,
+		                Request &r,
 		                const int tag=0,
                                 const Communicator &comm = Communicator_World)
   {
@@ -910,7 +916,7 @@ namespace Parallel
   template <typename T>
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<std::complex<T> > &buf,
-		                request &r,
+		                Request &r,
 		                const int tag=0,
                                 const Communicator &comm = Communicator_World)
   {
@@ -941,7 +947,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::vector<T> &buf,
 		       const DataType &type,
-		       request &req,
+		       Request &req,
 		       const int tag=any_tag,
                        const Communicator &comm = Communicator_World);
 
@@ -985,7 +991,7 @@ namespace Parallel
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::vector<T> &buf,
-		       request &req,
+		       Request &req,
 		       const int tag=any_tag,
                        const Communicator &comm = Communicator_World)
   {
@@ -1001,7 +1007,7 @@ namespace Parallel
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::vector<std::complex<T> > &buf,
-		       request &req,
+		       Request &req,
 		       const int tag=any_tag,
                        const Communicator &comm = Communicator_World)
   {
@@ -1032,7 +1038,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::set<T> &buf,
 		       const DataType &type,
-		       request &req,
+		       Request &req,
 		       const int tag=any_tag,
                        const Communicator &comm = Communicator_World);
 
@@ -1076,7 +1082,7 @@ namespace Parallel
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::set<T> &buf,
-		       request &req,
+		       Request &req,
 		       const int tag=any_tag,
                        const Communicator &comm = Communicator_World)
   {
@@ -1091,7 +1097,7 @@ namespace Parallel
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::set<std::complex<T> > &buf,
-		       request &req,
+		       Request &req,
 		       const int tag=any_tag,
                        const Communicator &comm = Communicator_World)
   {
@@ -1111,7 +1117,7 @@ namespace Parallel
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<T> &buf,
 				   const DataType &type,
-		                   request &r,
+		                   Request &r,
 		                   const int tag=any_tag,
                                    const Communicator &comm = Communicator_World)
   {
@@ -1130,7 +1136,7 @@ namespace Parallel
   template <typename T>
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<T> &buf,
-		                   request &r,
+		                   Request &r,
 		                   const int tag=any_tag,
                                    const Communicator &comm = Communicator_World)
   {
@@ -1146,7 +1152,7 @@ namespace Parallel
   template <typename T>
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<std::complex<T> > &buf,
-		                   request &r,
+		                   Request &r,
 		                   const int tag=any_tag,
                                    const Communicator &comm = Communicator_World)
   {
@@ -1792,7 +1798,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    const DataType &type,
-		    request &req,
+		    Request &req,
 		    const int tag,
                     const Communicator &comm)
   {    
@@ -1808,7 +1814,7 @@ namespace Parallel
 		 dest_processor_id,
 		 tag,
 		 comm.get(),
-		 &req);    
+		 req.get());    
     libmesh_assert (ierr == MPI_SUCCESS);    
 
     STOP_LOG("send()", "Parallel");
@@ -1821,7 +1827,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
 		    const DataType &type,
-		    request &req,
+		    Request &req,
 		    const int tag=0,
                     const Communicator &comm=Communicator_World)
   {
@@ -1837,7 +1843,7 @@ namespace Parallel
 		 dest_processor_id,
 		 tag,
 		 comm.get(),
-                 &req);    
+                 req.get());    
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("send()", "Parallel");
@@ -1922,7 +1928,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::vector<T> &buf,
 		       const DataType &type,
-		       request &req,
+		       Request &req,
 		       const int tag,
                        const Communicator &comm)
   {
@@ -1938,7 +1944,7 @@ namespace Parallel
 		 src_processor_id,
 		 tag,
 		 comm.get(),
-		 &req);    
+		 req.get());    
     libmesh_assert (ierr == MPI_SUCCESS);    
 
     STOP_LOG("receive()", "Parallel");
@@ -1952,7 +1958,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::vector<std::complex<T> > &buf,
 		       const DataType &type,
-		       request &req,
+		       Request &req,
 		       const int tag=any_tag,
                        const Communicator &comm=Communicator_World)
   {
@@ -1965,7 +1971,7 @@ namespace Parallel
 		src_processor_id,
 		tag,
 		comm.get(),
-		&req);
+		req.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);
     
@@ -1998,7 +2004,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    const DataType &type,
-		    request &req,
+		    Request &req,
 		    const int tag,
                     const Communicator &comm)
   {    
@@ -2038,7 +2044,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::set<T> &buf,
 		       const DataType &type,
-		       request &req,
+		       Request &req,
 		       const int tag,
                        const Communicator &comm)
   {
@@ -2100,7 +2106,7 @@ namespace Parallel
 	return;
       }
 
-    Parallel::request request;
+    Parallel::Request request;
     
     Parallel::nonblocking_send (dest_processor_id,
 				send,
@@ -2280,7 +2286,7 @@ namespace Parallel
 
     libmesh_assert (static_cast<unsigned int>(pos) == sendbuf.size());
 
-    Parallel::request request;
+    Parallel::Request request;
 
     Parallel::nonblocking_send (dest_processor_id,
 				sendbuf,
@@ -3017,7 +3023,7 @@ namespace Parallel
   inline void send (const unsigned int,
 		    std::vector<T> &,
 		    const DataType &,
-		    request &,
+		    Request &,
 		    const int,
                     const Communicator&)
   { libmesh_error(); }
@@ -3046,7 +3052,7 @@ namespace Parallel
   inline void receive (const int,
 		       std::vector<T> &,
 		       const DataType &,
-		       request &,
+		       Request &,
 		       const int,
                        const Communicator&)
   { libmesh_error(); }
@@ -3068,7 +3074,7 @@ namespace Parallel
 //   template <typename T>
 //   inline void nonblocking_send (const unsigned int,
 // 		                std::vector<T> &,
-// 		                request &,
+// 		                Request &,
 // 		                const int) {}
 
 //   // Blocking receives don't make sense on one processor
@@ -3080,7 +3086,7 @@ namespace Parallel
 //   template <typename T>
 //   inline void nonblocking_receive (const int,
 // 		                   std::vector<T> &,
-// 		                   request &,
+// 		                   Request &,
 // 		                   const int) {}
   
   inline status wait (request &) { status status; return status; }

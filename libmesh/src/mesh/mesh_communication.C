@@ -207,7 +207,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     node_bcs_sent(libMesh::n_processors()),
     element_bcs_sent(libMesh::n_processors());
     
-  std::vector<Parallel::request>
+  std::vector<Parallel::Request>
     node_send_requests, element_send_requests,
     node_bc_requests,   element_bc_requests;
 

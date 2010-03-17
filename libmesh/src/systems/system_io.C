@@ -1626,7 +1626,7 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
       
       // Note that we will actually send/receive to ourself if we are
       // processor 0, so let's use nonblocking receives.
-      std::vector<Parallel::request>
+      std::vector<Parallel::Request>
 	id_request_handles(libMesh::n_processors()),
 	val_request_handles(libMesh::n_processors());
       
