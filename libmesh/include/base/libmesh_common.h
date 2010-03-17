@@ -191,6 +191,12 @@ namespace libMesh
    * MPI Communicator to be used in the library.
    */
   extern MPI_Comm COMM_WORLD;
+#else
+  /**
+   * Something to use with CHKERRABORT if we're just using PETSc's MPI
+   * "uni" stub.
+   */
+  extern int COMM_WORLD;
 #endif
 
 // Let's define a couple output streams - these will default

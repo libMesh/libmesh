@@ -31,10 +31,22 @@ AC_DEFUN([CONFIGURE_PETSC],
       AC_SUBST(PETSC_DIR)
       AC_DEFINE(HAVE_PETSC, 1,
   	      [Flag indicating whether or not Petsc is available])
-      AC_DEFINE(HAVE_MPI, 1,
-  	      [Flag indicating whether or not MPI is available])
-      MPI_IMPL="petsc_snooped"      
-  
+
+      dnl Check for snoopable MPI
+      if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
+      	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni` 
+      elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
+      	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
+      fi		 
+      if test "x$PETSC_MPI" != x ; then
+        AC_DEFINE(HAVE_MPI, 1,
+  	        [Flag indicating whether or not MPI is available])
+        MPI_IMPL="petsc_snooped"      
+	AC_MSG_RESULT(<<< Configuring library with MPI from PETSC config >>>)
+      else
+	AC_MSG_RESULT(<<< Warning: configuring in serial - no MPI in PETSC config >>>)
+      fi
+
       dnl Some tricks to discover the version of petsc.
       dnl You have to have grep and sed for this to work.
       petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
@@ -74,7 +86,7 @@ dnl      AC_SUBST(PETSCINCLUDEDIRS)
 	AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
       fi
   
-      else
+    else
   
       dnl PETSc config failed.  Try MPI.
       enablepetsc=no
@@ -91,7 +103,6 @@ dnl ----------------------------------------------------------------------------
 dnl check for the required PETSc library
 dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_PETSc], [
-AC_REQUIRE([ACX_MPI])
 AC_REQUIRE([ACX_LAPACK])
 BLAS_LIBS="$BLAS_LIBS $FLIBS"
 LAPACK_LIBS="$LAPACK_LIBS $BLAS_LIBS"
