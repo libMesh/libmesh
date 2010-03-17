@@ -104,13 +104,9 @@ void PetscMatrix<T>::init ()
   this->_is_initialized = true;
 
   
-  int proc_id = 0;
-
-  MPI_Comm_rank (libMesh::COMM_WORLD, &proc_id);
-  
   const unsigned int m   = this->_dof_map->n_dofs();
   const unsigned int n   = m;
-  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(proc_id); 
+  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id()); 
   const unsigned int m_l = n_l;
 
 
