@@ -276,10 +276,18 @@ private:
     //     -- field separator (separating elements of a vector)
     std::string           _field_separator;
 
+    //     -- helper functor for creating sets of C-style strings
+    struct ltstr {
+      bool operator()(const char* s1, const char* s2) const {
+        return strcmp(s1, s2) < 0;
+      }
+    };
+
+
     //     -- some functions return a char pointer to a string created on the fly.
     //        this container makes them 'available' until the getpot object is destroyed.
     //        user codes are recommended to instead request std::string values.
-    mutable std::set<std::string> _internal_string_container;
+    mutable std::set<const char*, ltstr> _internal_string_container;
 
     //     -- some functions return a char pointer to a temporarily existing string
     //        this function adds them to our container
@@ -423,7 +431,7 @@ GetPot::GetPot(const int argc_, char ** argv_,
 	       const char* FieldSeparator /* =0x0 */)     
     // leave 'char**' non-const to honor less capable compilers ... 
 {
-  this->parse_command_line(argc_, argv_, FieldSeparator);
+    this->parse_command_line(argc_, argv_, FieldSeparator);
 }
 
 
@@ -472,7 +480,7 @@ GetPot::GetPot(const std::string& FileName,
                const std::string& CommentEnd,
                const std::string& FieldSeparator)
 {
-  this->parse_input_file(FileName, CommentStart, CommentEnd, FieldSeparator);
+    this->parse_input_file(FileName, CommentStart, CommentEnd, FieldSeparator);
 }
 
 
@@ -507,10 +515,10 @@ GetPot::GetPot(const GetPot& Other)
 inline
 GetPot::~GetPot()
 { 
-    // std::set and std::string handle their own destruction now
     // // may be some return strings had to be created, delete now !
-    // victorate(char*, _internal_string_container, it)
-	// delete [] *it;	
+    std::set<const char*, ltstr>::const_iterator it = _internal_string_container.begin(); \
+    for(; it != _internal_string_container.end(); it++)
+        delete [] *it;	
 }
 
 inline GetPot&
@@ -928,9 +936,24 @@ GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) c
 inline const char*
 GetPot::_internal_managed_copy(const std::string& Arg) const
 {
+    const char* arg = Arg.c_str();
+
     // Get a lock before touching anything mutable
     Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-    return _internal_string_container.insert(Arg).first->c_str();
+
+    // See if there's already an identical string saved
+    std::set<const char*,ltstr>::const_iterator it = 
+        _internal_string_container.find(arg);
+
+    // If so, return it
+    if (it != _internal_string_container.end())
+        return *it;
+
+    // Otherwise, create a new one
+    char* newcopy = new char[strlen(arg)+1];
+    strncpy(newcopy, arg, strlen(arg)+1);
+    _internal_string_container.insert(newcopy);
+    return newcopy;
 }
 
 //////////////////////////////////////////////////////////////////////////////
