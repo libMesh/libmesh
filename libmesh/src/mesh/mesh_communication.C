@@ -795,7 +795,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // adjacent processors. - BSK 11/17/2008
   std::vector<std::vector<unsigned int> > 
     my_interface_node_xfer_buffers (n_adjacent_processors, my_interface_node_list);
-  std::vector<Parallel::request> my_interface_node_list_requests (n_adjacent_processors);
+  std::vector<Parallel::Request> my_interface_node_list_requests (n_adjacent_processors);
   std::map<unsigned int, unsigned int> n_comm_steps;
 
   for (unsigned int comm_step=0; comm_step<n_adjacent_processors; comm_step++)
