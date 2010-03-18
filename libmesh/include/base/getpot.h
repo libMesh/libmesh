@@ -283,6 +283,11 @@ private:
       }
     };
 
+    //     -- we have some mutable non-thread-safe members, but we
+    //        want to be able to call const member functions from
+    //        multiple threads at once, so we'll wrap access to
+    //        mutable objects in a mutex.
+    mutable Threads::spin_mutex _getpot_mtx;
 
     //     -- some functions return a char pointer to a string created on the fly.
     //        this container makes them 'available' until the getpot object is destroyed.
@@ -561,7 +566,7 @@ GetPot::absorb(const GetPot& Other)
 
     if( request_recording_f ) { 
         // Get a lock before touching anything mutable
-        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+        Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
 
 	_requested_arguments.insert(_requested_sections.end(), 
 				    Other._requested_arguments.begin(), Other._requested_arguments.end());
@@ -577,7 +582,7 @@ inline void
 GetPot::clear_requests()
 {
     // Get a lock before touching anything mutable
-    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
 
     _requested_arguments.erase(_requested_arguments.begin(), _requested_arguments.end());
     _requested_variables.erase(_requested_variables.begin(), _requested_variables.end());
@@ -616,7 +621,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 	    // (*) sections are considered 'requested arguments'
 	    if( request_recording_f ) {
                 // Get a lock before touching anything mutable
-                Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
 
                 _requested_arguments.push_back(arg);
             }
@@ -646,7 +651,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 		//     detection routine.
 		if( request_recording_f ) {
                     // Get a lock before touching anything mutable
-                    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
 
                     _requested_arguments.push_back(arg);
                 }
@@ -939,7 +944,7 @@ GetPot::_internal_managed_copy(const std::string& Arg) const
     const char* arg = Arg.c_str();
 
     // Get a lock before touching anything mutable
-    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
 
     // See if there's already an identical string saved
     std::set<const char*,ltstr>::const_iterator it = 
@@ -1399,7 +1404,7 @@ GetPot::_record_argument_request(const std::string& Name) const
     if( ! request_recording_f ) return; 
 
     // Get a lock before touching anything mutable
-    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
 
     // (*) record requested variable for later ufo detection
     _requested_arguments.push_back(Name);
@@ -1417,7 +1422,7 @@ GetPot::_record_variable_request(const std::string& Name) const
     if( ! request_recording_f ) return; 
 
     // Get a lock before touching anything mutable
-    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
 
     // (*) record requested variable for later ufo detection
     _requested_variables.push_back(Name);
