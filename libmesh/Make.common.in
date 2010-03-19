@@ -41,6 +41,10 @@ libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
 libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
 libmesh_RPATHFLAG     = @RPATHFLAG@
 
+# Use libmesh-specific compiler flags if available, otherwise
+# use general compiler flags from environment
+libmesh_CXXFLAGS     ?= $CXXFLAGS
+
 # Complex variable support
 enable-complex       = @enablecomplex@
 ifeq ($(enable-complex),yes)
