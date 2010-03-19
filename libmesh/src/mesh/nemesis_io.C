@@ -326,6 +326,10 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   // OK, we are now in a position to request new global indices for all the nodes
   // we do not own
+
+  // Let's get a unique message tag to use for send()/receive()
+  Parallel::MessageTag nodes_tag = Parallel::Communicator_World.get_unique_tag(12345);
+
   std::vector<std::vector<int> > 
     needed_node_idxs (nemhelper.num_node_cmaps); // the indices we will ask for
     
@@ -361,7 +365,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       Parallel::send (adjcnt_pid_idx,              // destination
 		      needed_node_idxs[cmap],      // send buffer
 		      needed_nodes_requests[cmap], // request
-			 /* tag = */ 12345);      
+		      nodes_tag);      
     } // all communication requests for getting updated global indices for border
       // nodes have been initiated
 
@@ -488,7 +492,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       // query the first message which is available
       const Parallel::Status 
 	status (Parallel::probe (Parallel::any_source, 
-				 /* tag = */ 12345));
+		                 nodes_tag));      
       const unsigned int 
 	requesting_pid_idx = status.source(),
 	source_pid_idx     = status.source();
@@ -511,7 +515,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  std::vector<int> &xfer_buf (requested_node_idxs[requesting_pid_idx]);
 	    
 	  // actually receive the message.  
-	  Parallel::receive (requesting_pid_idx, xfer_buf, /* tag = */ 12345);
+	  Parallel::receive (requesting_pid_idx, xfer_buf, nodes_tag);
 	  
 	  // Fill the request
 	  for (unsigned int i=0; i<xfer_buf.size(); i++)
@@ -541,7 +545,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  Parallel::send (requesting_pid_idx,
 			  xfer_buf,
 			  requested_nodes_requests[cmap],
-			  /* tag = */ 12345);
+			  nodes_tag);
 	} // done processing the request
       
       // this is the second time we have heard from this processor, 
@@ -561,7 +565,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  // now post the receive for this cmap
 	  Parallel::receive (source_pid_idx,
 			     needed_node_idxs[cmap],
-			     /* tag = */ 12345);
+			     nodes_tag);
 	  
 	  libmesh_assert (needed_node_idxs[cmap].size() <= 
 			  nemhelper.node_cmap_node_ids[cmap].size());

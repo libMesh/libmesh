@@ -1631,7 +1631,9 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	val_request_handles(libMesh::n_processors());
       
 #ifdef LIBMESH_HAVE_MPI
-      const unsigned int id_tag=0, val_tag=1;
+      Parallel::MessageTag
+        id_tag    = Parallel::Communicator_World.get_unique_tag(2345),
+        val_tag = Parallel::Communicator_World.get_unique_tag(2346);
       
       // Post the receives -- do this on processor 0 only.
       if (libMesh::processor_id() == 0)
