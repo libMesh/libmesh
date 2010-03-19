@@ -6,6 +6,9 @@
 # Make.common is what should be included by applications
 # using the library.
 
+# Build the library by default:
+
+default: library
 
 # include the library options determined by configure
 # (now included indirectly in Makefile.const - don't want to
@@ -31,6 +34,8 @@ endif
 #
 target := $(mesh_library)
 
+library: $(mesh_library)
+
 ifeq ($(syn-mode),on)
   all:: $(objects)
 else
@@ -41,8 +46,8 @@ endif
 #
 # 
 #
-.PHONY: clean clobber distclean \
-	doc upload doc_upload log cvsweb TODO svnexpand
+.PHONY: clean clobber default distclean \
+	doc upload doc_upload library log cvsweb TODO svnexpand
 
 #
 # static library
