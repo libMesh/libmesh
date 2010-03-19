@@ -1,0 +1,143 @@
+# $Id$
+#
+# This is the Makefile for the libMesh library and helper
+# applications.  This file is specific to the project.
+# See the file Make.common for path configurations.
+# Make.common is what should be included by applications
+# using the library.
+
+
+# include the library options determined by configure
+include Make.common
+
+
+###############################################################################
+# File management.  This is where the source, header, and object files are
+# defined
+
+#
+# header files & directories
+headerfiles 	:= $(wildcard include/*/*.h)
+
+#
+# source files
+srcfiles 	:= $(wildcard src/*/*.C)
+
+#
+# examples source files
+examplesrcfiles	:= $(wildcard examples/ex*/*.C)
+
+#
+# apps source files
+appsrcfiles	:= $(wildcard src/apps/*.cc)
+
+#
+# apps binary files
+appbinfiles	:= $(patsubst %.cc, %$(bin-suffix), $(addprefix bin/, $(notdir $(appsrcfiles))))
+
+#
+# object files
+objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
+
+#
+# logged files -- all files you might want to log information for
+loggedfiles     := $(srcfiles) $(filter-out include/base/libmesh_config.h, $(headerfiles))
+###############################################################################
+
+
+
+#
+# 
+#
+.PHONY: echo echo_cxxflags echo_include echo_ldflags
+
+#
+# Useful for checking make rules
+#
+echo:
+	@echo "C++ compiler:"
+	@echo "$(libmesh_CXX)"
+	@echo
+	@echo "Source Files:"
+	@echo "$(srcfiles)"
+	@echo
+	@echo "Object Files:"
+	@echo "$(objects)"
+	@echo
+	@echo "Target:"
+	@echo "$(target)"
+	@echo
+	@echo "Examples Source Files:"
+	@echo "$(examplesrcfiles)"
+	@echo
+	@echo "libmesh_CFLAGS:"
+	@echo "$(libmesh_CFLAGS)"
+	@echo
+	@echo "libmesh_CXXFLAGS:"
+	@echo "$(libmesh_CXXFLAGS)"
+	@echo
+	@echo "libmesh_CXXSHAREDFLAG:"
+	@echo "$(libmesh_CXXSHAREDFLAG)"
+	@echo
+	@echo "libmesh_INCLUDE:"
+	@echo "$(libmesh_INCLUDE)"
+	@echo
+	@echo "libmesh_LIBS:"
+	@echo "$(libmesh_LIBS)"
+	@echo
+	@echo "libmesh_LDFLAGS:"
+	@echo "$(libmesh_LDFLAGS)"
+	@echo
+	@echo "libmesh_DLFLAGS:"
+	@echo "$(libmesh_DLFLAGS)"
+	@echo
+	@echo "EXAMPLES:"
+	@echo "$(examplesrcfiles)"
+	@echo
+
+#
+# Print the name of the C++ compiler, padded with whitespace
+#
+echo_cxx:
+	@echo  " " $(libmesh_CXX) " "
+
+#
+# Print the name of the C compiler, padded with whitespace
+#
+echo_cc:
+	@echo  " " $(libmesh_CC) " "
+
+#
+# Print the flags used for C++ compilation, padded with whitespace
+#
+echo_cxxflags:
+	@echo " " $(libmesh_CXXFLAGS) " "
+
+#
+# Print the flags used for C compilation, padded with whitespace
+#
+echo_cflags:
+	@echo " " $(libmesh_CFLAGS) " "
+
+#
+# Print C++ compiler include path, padded with whitespace
+#
+echo_include:
+	@echo " " $(libmesh_INCLUDE) " "
+
+#
+# Print the flags used to link, padded with whitespace
+#
+echo_ldflags:
+	@echo " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
+
+#
+# Make.common target.  Tell the user to run configue.
+#
+Make.common:
+	@echo "You must run ./configure first!"
+	exit 1
+
+# Local Variables:
+# mode: makefile
+# End:

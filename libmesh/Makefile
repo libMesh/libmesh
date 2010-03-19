@@ -8,7 +8,13 @@
 
 
 # include the library options determined by configure
-include Make.common
+# (now included indirectly in Makefile.const - don't want to
+# accidentally double-up on += variable modifications
+# include Make.common
+
+###############################################################################
+include Makefile.const
+
 
 
 bin-suffix := -$(METHOD)
@@ -18,40 +24,6 @@ bin-suffix := -$(METHOD)
 ifeq (x$(METHOD),xopt)
   bin-suffix := 
 endif
-
-###############################################################################
-# File management.  This is where the source, header, and object files are
-# defined
-
-#
-# header files & directories
-headerfiles 	:= $(wildcard include/*/*.h)
-
-#
-# source files
-srcfiles 	:= $(wildcard src/*/*.C)
-
-#
-# examples source files
-examplesrcfiles	:= $(wildcard examples/ex*/*.C)
-
-#
-# apps source files
-appsrcfiles	:= $(wildcard src/apps/*.cc)
-
-#
-# apps binary files
-appbinfiles	:= $(patsubst %.cc, %$(bin-suffix), $(addprefix bin/, $(notdir $(appsrcfiles))))
-
-#
-# object files
-objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
-
-#
-# logged files -- all files you might want to log information for
-loggedfiles     := $(srcfiles) $(filter-out include/base/libmesh_config.h, $(headerfiles))
-###############################################################################
-
 
 
 ###############################################################################
@@ -69,8 +41,7 @@ endif
 #
 # 
 #
-.PHONY: echo echo_cxxflags echo_include echo_ldflags \
-	clean clobber distclean \
+.PHONY: clean clobber distclean \
 	doc upload doc_upload log cvsweb TODO svnexpand
 
 #
@@ -123,60 +94,6 @@ link_examples: $(mesh_library)
 run_examples: $(mesh_library)
 	@$(MAKE) -C examples run
 
-
-#
-# Useful for checking make rules
-#
-echo:
-	@echo -e "C++ compiler:\n$(libmesh_CXX)\n"
-	@echo -e "Source Files:\n$(srcfiles)\n"
-	@echo -e "Object Files:\n$(objects)\n"
-	@echo -e "Target:\n$(target)\n"
-	@echo -e "Examples Source Files:\n$(examplesrcfiles)\n"
-	@echo -e "libmesh_CFLAGS:\n$(libmesh_CFLAGS)\n"
-	@echo -e "libmesh_CXXFLAGS:\n$(libmesh_CXXFLAGS)\n"
-	@echo -e "libmesh_CXXSHAREDFLAG:\n$(libmesh_CXXSHAREDFLAG)\n"
-	@echo -e "libmesh_INCLUDE:\n$(libmesh_INCLUDE)\n"
-	@echo -e "libmesh_LIBS:\n$(libmesh_LIBS)\n"
-	@echo -e "libmesh_LDFLAGS:\n$(libmesh_LDFLAGS)\n"
-	@echo -e "libmesh_DLFLAGS:\n$(libmesh_DLFLAGS)\n"
-	@echo -e "EXAMPLES:\n$(examplesrcfiles)\n"
-
-#
-# Print the name of the C++ compiler, padded with whitespace
-#
-echo_cxx:
-	@echo  " " $(libmesh_CXX) " "
-
-#
-# Print the name of the C compiler, padded with whitespace
-#
-echo_cc:
-	@echo  " " $(libmesh_CC) " "
-
-#
-# Print the flags used for C++ compilation, padded with whitespace
-#
-echo_cxxflags:
-	@echo " " $(libmesh_CXXFLAGS) " "
-
-#
-# Print the flags used for C compilation, padded with whitespace
-#
-echo_cflags:
-	@echo " " $(libmesh_CFLAGS) " "
-
-#
-# Print C++ compiler include path, padded with whitespace
-#
-echo_include:
-	@echo " " $(libmesh_INCLUDE) " "
-
-#
-# Print the flags used to link, padded with whitespace
-#
-echo_ldflags:
-	@echo " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
 
 #	
 # Remove object files for the current mode
@@ -317,14 +234,6 @@ TODO:
 .depend:
 	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 
-
-
-#
-# Make.common target.  Tell the user to run configue.
-#
-Make.common:
-	@echo -e "You must run ./configure first!"
-	exit 1
 
 
 #

@@ -63,7 +63,7 @@ done
 #
 # Use make to process the echo_list
 #
-make --no-print-directory -C @PWD@ $echo_list
+make --no-print-directory -C @PWD@ -f Makefile.const $echo_list
 
 # Local Variables:
 # mode: shell-script
