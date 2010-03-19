@@ -43,7 +43,7 @@ libmesh_RPATHFLAG     = @RPATHFLAG@
 
 # Use libmesh-specific compiler flags if available, otherwise
 # use general compiler flags from environment
-libmesh_CXXFLAGS     ?= $CXXFLAGS
+libmesh_CXXFLAGS     ?= $(CXXFLAGS)
 
 # Complex variable support
 enable-complex       = @enablecomplex@
