@@ -187,6 +187,14 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   Parallel::DataType packed_node_datatype = Node::PackedNode::create_mpi_datatype();
   packed_node_datatype.commit();
 
+  // Get a few unique message tags to use in communications; we'll
+  // default to some numbers around pi*1000
+  Parallel::MessageTag
+    nodestag   = Parallel::Communicator_World.get_unique_tag(3141),
+    nodebcstag = Parallel::Communicator_World.get_unique_tag(3142),
+    elemstag   = Parallel::Communicator_World.get_unique_tag(3143),
+    elembcstag = Parallel::Communicator_World.get_unique_tag(3144);
+
   // Figure out how many nodes and elements we have which are assigned to each
   // processor.  send_n_nodes_and_elem_per_proc contains the number of nodes/elements
   // we will be sending to each processor, recv_n_nodes_and_elem_per_proc contains
@@ -321,7 +329,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 			    nodes_sent[pid],
 			    packed_node_datatype,
 			    node_send_requests.back(),
-			    /* tag = */ 0);
+			    nodestag);
 
 	    if (!node_bcs_sent[pid].empty())
 	      {
@@ -330,7 +338,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		Parallel::send (pid,
 				node_bcs_sent[pid],
 				node_bc_requests.back(),
-				/* tag = */ 2);
+				nodebcstag);
 	      }
 	  }
 	
@@ -366,7 +374,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    Parallel::send (pid,
 			    elements_sent[pid],
 			    element_send_requests.back(),
-			    /* tag = */ 1);
+			    elemstag);
 
 	    // the size of the element bc buffer we will ship to pid
 	    send_n_nodes_and_elem_per_proc[5*pid+4] = element_bcs_sent[pid].size();
@@ -378,7 +386,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		Parallel::send (pid,
 				element_bcs_sent[pid],
 				element_bc_requests.back(),
-				/* tag = */ 3);
+				elembcstag);
 	      }
 	  }
       }
@@ -473,7 +481,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	  Parallel::receive (Parallel::any_source,
 			     received_nodes,
 			     packed_node_datatype,
-			     /* tag = */ 0);
+			     nodestag);
 	const unsigned int source_pid = status.source();
 	const unsigned int n_nodes_received =
 	  recv_n_nodes_and_elem_per_proc[5*source_pid+0];
@@ -499,7 +507,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	Parallel::Status status =
 	  Parallel::receive (Parallel::any_source,
 			     received_node_bcs,
-			     /* tag = */ 2);
+			     nodebcstag);
 
 	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*status.source()+3]);
 
@@ -532,7 +540,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	Parallel::Status status =
 	  Parallel::receive (Parallel::any_source,
 			     received_elements,
-			     /* tag = */ 1);
+			     elemstag);
 
 #ifndef NDEBUG
 	// Avoid declaring these variables unless asserts are enabled.
@@ -634,7 +642,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	Parallel::Status status =
 	  Parallel::receive (Parallel::any_source,
 			     received_element_bcs,
-			     /* tag = */ 3);
+			     elembcstag);
 
 	libmesh_assert (status.size() == recv_n_nodes_and_elem_per_proc[5*status.source()+4]);
 
@@ -724,6 +732,12 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   Parallel::DataType packed_node_datatype = Node::PackedNode::create_mpi_datatype();
   packed_node_datatype.commit();
 
+  // Get a few unique message tags to use in communications; we'll
+  // default to some numbers around pi*10000
+  Parallel::MessageTag
+    node_list_tag         = Parallel::Communicator_World.get_unique_tag(31415),
+    element_neighbors_tag = Parallel::Communicator_World.get_unique_tag(31416);
+
   // Now any element with a NULL neighbor either
   // (i) lives on the physical domain boundary, or
   // (ii) lives on an inter-processor boundary.
@@ -804,7 +818,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
       Parallel::send (adjacent_processors[comm_step],
 		      my_interface_node_xfer_buffers[comm_step],
 		      my_interface_node_list_requests[comm_step],
-		      /* tag = */ 314159);
+		      node_list_tag);
     }
 
   //-------------------------------------------------------------------------
@@ -857,10 +871,10 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   for (unsigned int comm_step=0; comm_step<3*n_adjacent_processors; comm_step++)
     {
       //------------------------------------------------------------------
-      // catch tag = ~100,000pi
+      // catch incoming node list
       Parallel::Status
 	status(Parallel::probe (Parallel::any_source,
-				/* tag = */ 314159));      
+				node_list_tag));      
       const unsigned int
 	source_pid_idx = status.source(),
 	dest_pid_idx   = source_pid_idx;
@@ -873,7 +887,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	  
 	  Parallel::receive (source_pid_idx,
 			     common_interface_node_list,
-			     /* tag = */ 314159);
+			     node_list_tag);
 	  const unsigned int	
 	    their_interface_node_list_size = common_interface_node_list.size();
 	  
@@ -913,18 +927,18 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 			      nodes_sent[n_node_replies_sent],
 			      packed_node_datatype,
 			      node_send_requests[n_node_replies_sent],
-			      /* tag = */ 314159);
+			      node_list_tag);
 	      n_node_replies_sent++;
 
 	      Parallel::send (dest_pid_idx,
 			      elements_sent[n_elem_replies_sent],
 			      element_send_requests[n_elem_replies_sent],
-			      /* tag = */ 314159);
+			      node_list_tag);
 
 	      Parallel::send (dest_pid_idx,
 			      element_neighbors_sent[n_elem_replies_sent],
 			      element_neighbor_send_requests[n_elem_replies_sent],
-			      /* tag = */ 314159*2);
+			      element_neighbors_tag);
 	      n_elem_replies_sent++;
 
 	      continue;
@@ -1022,7 +1036,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 			    nodes_sent[n_node_replies_sent],
 			    packed_node_datatype,
 			    node_send_requests[n_node_replies_sent],
-			    /* tag = */ 314159);
+			    node_list_tag);
 	    n_node_replies_sent++;
 	
 	    // let's pack the node bc data in the front of the element
@@ -1093,7 +1107,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	    Parallel::send (dest_pid_idx,
 			    elements_sent[n_elem_replies_sent],
 			    element_send_requests[n_elem_replies_sent],
-			    /* tag = */ 314159);
+			    node_list_tag);
 	    n_elem_replies_sent++;
 	  }
 	}
@@ -1109,7 +1123,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	  Parallel::receive (source_pid_idx,
 			     nodes_received,
 			     packed_node_datatype,
-			     /* tag = */ 314159);
+			     node_list_tag);
 	  n_node_replies_received++;
 	  
 	  // add the nodes we just received
@@ -1127,7 +1141,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 
 	  Parallel::receive (source_pid_idx,
 			     elements_received,
-			     /* tag = */ 314159);	  
+			     node_list_tag);	  
 	  n_elem_replies_received++;
 	  
 	  if (elements_received.empty())
@@ -1288,7 +1302,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	Parallel::send (dest_pid_idx,
 			element_neighbors_sent[comm_step],
 			element_neighbor_send_requests[comm_step],
-			/* tag = */ 314159*2);
+			element_neighbors_tag);
       } // done sending neighbor information
 
   // second, receive and process all face neighbor information
@@ -1297,7 +1311,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
     {
       Parallel::receive (Parallel::any_source,
 			 element_neighbors_received,
-			 /* tag = */ 314159*2);
+			 element_neighbors_tag);
 
       for (unsigned int pos=0; pos<element_neighbors_received.size(); pos+=2)
 	{

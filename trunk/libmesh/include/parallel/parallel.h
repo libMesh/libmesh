@@ -42,6 +42,16 @@
   #define parallel_only()
 #endif
 
+// Macro to identify and debug functions which should only be called in
+// parallel on every processor at once
+
+#undef parallel_only_on
+#ifndef NDEBUG
+  #define parallel_only_on(comm_arg) do { libmesh_assert(Parallel::verify(std::string(__FILE__), comm_arg)); libmesh_assert(Parallel::verify(__LINE__), comm_arg); } while (0)
+#else
+  #define parallel_only_on(comm_arg)
+#endif
+
 /**
  * The Parallel namespace is for wrapper functions
  * for common general parallel synchronization tasks.
@@ -90,11 +100,6 @@ namespace Parallel
   inline data_type datatype();
 
   /**
-   * Default message tag id
-   */
-  const int any_tag=MPI_ANY_TAG;
-
-  /**
    * Accept from any source
    */
   const int any_source=MPI_ANY_SOURCE;
@@ -112,7 +117,6 @@ namespace Parallel
   template <typename T>
   inline data_type datatype() { return data_type(); }
 
-  const int any_tag=-1;
   const int any_source=0;
 #endif // LIBMESH_HAVE_MPI
 
@@ -129,7 +133,7 @@ namespace Parallel
      * Explicit constructor, to discourage using "magic numbers"
      * as tags.  Communicator::get_unique_tag is recommended instead.
      */
-    explicit MessageTag(int &tagvalue)
+    explicit MessageTag(int tagvalue)
       : _tagvalue(tagvalue), _comm(NULL) {}
 
     /**
@@ -150,15 +154,28 @@ namespace Parallel
 
   private:
     int _tagvalue;
-    Communicator *_comm;
+    const Communicator *_comm;
 
     // Constructor for reference-counted unique tags
-    MessageTag(int &tagvalue, Communicator *comm)
+    MessageTag(int tagvalue, const Communicator *comm)
       : _tagvalue(tagvalue), _comm(comm) {}
 
     // Let Communicator handle the reference counting
     friend class Communicator;
   };
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Default message tag ids
+   */
+#ifdef LIBMESH_HAVE_MPI
+  const MessageTag any_tag = MessageTag(MPI_ANY_TAG);
+#else
+  const MessageTag any_tag = MessageTag(-1);
+#endif
+
+  const MessageTag no_tag = MessageTag(0);
 
 
   //-------------------------------------------------------------------
@@ -271,47 +288,19 @@ namespace Parallel
      * around then we can't guarantee the tag is unique to this
      * MPI_Comm.
      */
-    MessageTag get_unique_tag(int &tagvalue) {
-      // This had better be called in parallel.
-      // FIXME - we need a parallel_only macro to handle
-      // non-Communicator_World
-
-      if (used_tag_values.count(tagvalue))
-        {
-          // Get the largest value in the used values, and pick one
-          // larger
-          tagvalue = used_tag_values.rbegin()->first+1;
-          libmesh_assert(!used_tag_values.count(tagvalue));
-        }
-      used_tag_values[tagvalue] = 1;
-      return MessageTag(tagvalue, this);
-    }
+    MessageTag get_unique_tag(int tagvalue) const;
 
     /**
      * Reference an already-acquired tag, so that we know it will
      * be dereferenced multiple times before we can re-release it.
      */
-    void reference_unique_tag(int tagvalue) {
-      // This has better be an already-acquired tag.
-      libmesh_assert(used_tag_values.count(tagvalue));
-
-      used_tag_values[tagvalue]++;
-    }
+    void reference_unique_tag(int tagvalue) const;
 
     /**
      * Dereference an already-acquired tag, and see if we can
      * re-release it.
      */
-    void dereference_unique_tag(int tagvalue) {
-      // This has better be an already-acquired tag.
-      libmesh_assert(used_tag_values.count(tagvalue));
-
-      used_tag_values[tagvalue]--;
-      // If we don't have any more outstanding references, we
-      // don't even need to keep this tag in our "used" set.
-      if (!used_tag_values[tagvalue])
-        used_tag_values.erase(tagvalue);
-    }
+    void dereference_unique_tag(int tagvalue) const;
 
     void clear() {
 #ifdef LIBMESH_HAVE_MPI
@@ -340,10 +329,10 @@ namespace Parallel
 
   private:
 
+    // Don't use the copy constructor, just copy by reference or
+    // pointer - it's too hard to keep a common used_tag_values if
+    // each communicator is shared by more than one Communicator
     explicit Communicator (const Communicator &) {
-      // Don't use the copy constructor, just copy by reference or
-      // pointer - it's too hard to keep a common used_tag_values if
-      // each communicator is shared by more than one Communicator
       libmesh_error();
     }
 
@@ -371,7 +360,10 @@ namespace Parallel
 
     communicator  _communicator;
     unsigned int  _rank, _size;
-    std::map<int, unsigned int> used_tag_values;
+
+    // mutable used_tag_values - not thread-safe, but then Parallel::
+    // isn't thread-safe in general.
+    mutable std::map<int, unsigned int> used_tag_values;
     bool          _I_duped_it;
   };
 
@@ -685,7 +677,7 @@ namespace Parallel
    * examined before the message is actually received.
    */
   inline status probe (const int src_processor_id,
-		       const int tag=any_tag,
+		       const MessageTag &tag=any_tag,
                        const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -696,7 +688,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    const DataType &type,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -708,7 +700,7 @@ namespace Parallel
 		    std::vector<T> &buf,
 		    const DataType &type,
 		    Request &req,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -719,7 +711,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -733,7 +725,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -753,7 +745,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    Request &req,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -769,7 +761,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
 		    Request &req,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -789,7 +781,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    const DataType &type,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -801,7 +793,7 @@ namespace Parallel
 		    std::set<T> &buf,
 		    const DataType &type,
 		    Request &req,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -812,7 +804,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -826,7 +818,7 @@ namespace Parallel
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::set<std::complex<T> > &buf,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -846,7 +838,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    Request &req,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -862,7 +854,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<std::complex<T> > &buf,
 		    Request &req,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -882,7 +874,7 @@ namespace Parallel
 		                std::vector<T> &buf,
 		                const DataType &type,
 		                Request &r,
-		                const int tag=0,
+		                const MessageTag &tag=no_tag,
                                 const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -901,7 +893,7 @@ namespace Parallel
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<T> &buf,
 		                Request &r,
-		                const int tag=0,
+		                const MessageTag &tag=no_tag,
                                 const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -917,7 +909,7 @@ namespace Parallel
   inline void nonblocking_send (const unsigned int dest_processor_id,
 		                std::vector<std::complex<T> > &buf,
 		                Request &r,
-		                const int tag=0,
+		                const MessageTag &tag=no_tag,
                                 const Communicator &comm = Communicator_World)
   {
     send (dest_processor_id,
@@ -936,7 +928,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
 		         const DataType &type,
-		         const int tag=any_tag,
+		         const MessageTag &tag=any_tag,
                          const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -948,7 +940,7 @@ namespace Parallel
 		       std::vector<T> &buf,
 		       const DataType &type,
 		       Request &req,
-		       const int tag=any_tag,
+		       const MessageTag &tag=any_tag,
                        const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -959,7 +951,7 @@ namespace Parallel
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
-		         const int tag=any_tag,
+		         const MessageTag &tag=any_tag,
                          const Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
@@ -973,7 +965,7 @@ namespace Parallel
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::vector<std::complex<T> > &buf,
-		         const int tag=any_tag,
+		         const MessageTag &tag=any_tag,
                          const Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
@@ -992,7 +984,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::vector<T> &buf,
 		       Request &req,
-		       const int tag=any_tag,
+		       const MessageTag &tag=any_tag,
                        const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
@@ -1008,7 +1000,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::vector<std::complex<T> > &buf,
 		       Request &req,
-		       const int tag=any_tag,
+		       const MessageTag &tag=any_tag,
                        const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
@@ -1027,7 +1019,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::set<T> &buf,
 		         const DataType &type,
-		         const int tag=any_tag,
+		         const MessageTag &tag=any_tag,
                          const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -1039,7 +1031,7 @@ namespace Parallel
 		       std::set<T> &buf,
 		       const DataType &type,
 		       Request &req,
-		       const int tag=any_tag,
+		       const MessageTag &tag=any_tag,
                        const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -1050,7 +1042,7 @@ namespace Parallel
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::set<T> &buf,
-		         const int tag=any_tag,
+		         const MessageTag &tag=any_tag,
                          const Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
@@ -1064,7 +1056,7 @@ namespace Parallel
   template <typename T>
   inline Status receive (const int src_processor_id,
 		         std::set<std::complex<T> > &buf,
-		         const int tag=any_tag,
+		         const MessageTag &tag=any_tag,
                          const Communicator &comm = Communicator_World)
   {
     return receive (src_processor_id,
@@ -1083,7 +1075,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::set<T> &buf,
 		       Request &req,
-		       const int tag=any_tag,
+		       const MessageTag &tag=any_tag,
                        const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
@@ -1098,7 +1090,7 @@ namespace Parallel
   inline void receive (const int src_processor_id,
 		       std::set<std::complex<T> > &buf,
 		       Request &req,
-		       const int tag=any_tag,
+		       const MessageTag &tag=any_tag,
                        const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
@@ -1118,7 +1110,7 @@ namespace Parallel
 		                   std::vector<T> &buf,
 				   const DataType &type,
 		                   Request &r,
-		                   const int tag=any_tag,
+		                   const MessageTag &tag=any_tag,
                                    const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
@@ -1137,7 +1129,7 @@ namespace Parallel
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<T> &buf,
 		                   Request &r,
-		                   const int tag=any_tag,
+		                   const MessageTag &tag=any_tag,
                                    const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
@@ -1153,7 +1145,7 @@ namespace Parallel
   inline void nonblocking_receive (const int src_processor_id,
 		                   std::vector<std::complex<T> > &buf,
 		                   Request &r,
-		                   const int tag=any_tag,
+		                   const MessageTag &tag=any_tag,
                                    const Communicator &comm = Communicator_World)
   {
     receive (src_processor_id,
@@ -1309,18 +1301,67 @@ namespace Parallel
 
   inline
   MessageTag::~MessageTag()
-    {
-      if (_comm)
-        _comm->dereference_unique_tag(_tagvalue);
-    }
+  {
+    if (_comm)
+      _comm->dereference_unique_tag(_tagvalue);
+  }
+
 
   inline
   MessageTag::MessageTag(const MessageTag &other)
     : _tagvalue(other._tagvalue), _comm(other._comm)
-    {
-      if (_comm)
-        _comm->reference_unique_tag(_tagvalue);
-    }
+  {
+    if (_comm)
+      _comm->reference_unique_tag(_tagvalue);
+  }
+
+
+  inline
+  MessageTag Communicator::get_unique_tag(int tagvalue) const
+  {
+    if (used_tag_values.count(tagvalue))
+      {
+        // Get the largest value in the used values, and pick one
+        // larger
+        tagvalue = used_tag_values.rbegin()->first+1;
+        libmesh_assert(!used_tag_values.count(tagvalue));
+      }
+    used_tag_values[tagvalue] = 1;
+
+#ifndef NDEBUG
+    // Make sure everyone called get_unique_tag and make sure
+    // everyone got the same value
+    int maxval = tagvalue;
+    Parallel::max(maxval);
+    libmesh_assert(tagvalue == maxval);
+#endif
+
+    return MessageTag(tagvalue, this);
+  }
+
+
+  inline
+  void Communicator::reference_unique_tag(int tagvalue) const
+  {
+    // This has better be an already-acquired tag.
+    libmesh_assert(used_tag_values.count(tagvalue));
+
+    used_tag_values[tagvalue]++;
+  }
+
+
+  inline
+  void Communicator::dereference_unique_tag(int tagvalue) const
+  {
+    // This has better be an already-acquired tag.
+    libmesh_assert(used_tag_values.count(tagvalue));
+
+    used_tag_values[tagvalue]--;
+    // If we don't have any more outstanding references, we
+    // don't even need to keep this tag in our "used" set.
+    if (!used_tag_values[tagvalue])
+      used_tag_values.erase(tagvalue);
+  }
 
 
   // Internal helper function to create vector<something_useable> from
@@ -1719,7 +1760,7 @@ namespace Parallel
 
 
   inline status probe (const int src_processor_id,
-		       const int tag,
+		       const MessageTag &tag,
                        const Communicator &comm)
   {
     START_LOG("probe()", "Parallel");
@@ -1727,7 +1768,7 @@ namespace Parallel
     status status;
 
     MPI_Probe (src_processor_id, 
-	       tag, 
+	       tag.value(), 
 	       comm.get(), 
 	       &status);
 
@@ -1742,7 +1783,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
 		    const DataType &type,
-		    const int tag,
+		    const MessageTag &tag,
                     const Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
@@ -1755,7 +1796,7 @@ namespace Parallel
 		buf.size(),
 		type,
 		dest_processor_id,
-		tag,
+		tag.value(),
 		comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);    
@@ -1771,7 +1812,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<std::complex<T> > &buf,
 		    const DataType &type,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm=Communicator_World)
   {    
     START_LOG("send()", "Parallel");
@@ -1784,7 +1825,7 @@ namespace Parallel
 		buf.size() * 2,
 		type,
 		dest_processor_id,
-		tag,
+		tag.value(),
 		comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);    
@@ -1799,7 +1840,7 @@ namespace Parallel
 		    std::vector<T> &buf,
 		    const DataType &type,
 		    Request &req,
-		    const int tag,
+		    const MessageTag &tag,
                     const Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
@@ -1812,7 +1853,7 @@ namespace Parallel
 		 buf.size(),
 		 type,
 		 dest_processor_id,
-		 tag,
+		 tag.value(),
 		 comm.get(),
 		 req.get());    
     libmesh_assert (ierr == MPI_SUCCESS);    
@@ -1828,7 +1869,7 @@ namespace Parallel
 		    std::vector<std::complex<T> > &buf,
 		    const DataType &type,
 		    Request &req,
-		    const int tag=0,
+		    const MessageTag &tag=no_tag,
                     const Communicator &comm=Communicator_World)
   {
     START_LOG("send()", "Parallel");
@@ -1841,7 +1882,7 @@ namespace Parallel
 		 buf.size() * 2,
 		 type,
 		 dest_processor_id,
-		 tag,
+		 tag.value(),
 		 comm.get(),
                  req.get());    
     libmesh_assert (ierr == MPI_SUCCESS);
@@ -1855,7 +1896,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::vector<T> &buf,
 		         const DataType &type,
-		         const int tag,
+		         const MessageTag &tag,
                          const Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
@@ -1874,7 +1915,7 @@ namespace Parallel
 		buf.size(),
 		type,
 		src_processor_id,
-		tag,
+		tag.value(),
 		comm.get(),
 		status);
     libmesh_assert (ierr == MPI_SUCCESS);
@@ -1892,7 +1933,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::vector<std::complex<T> > &buf,
 		         const DataType &type,
-		         const int tag=any_tag,
+		         const MessageTag &tag=any_tag,
                          const Communicator &comm=Communicator_World)
   {
     START_LOG("receive()", "Parallel");
@@ -1912,7 +1953,7 @@ namespace Parallel
 		buf.size() * 2,
 		type,
 		src_processor_id,
-		tag,
+		tag.value(),
 		comm.get(),
 		status);
     libmesh_assert (ierr == MPI_SUCCESS);
@@ -1929,7 +1970,7 @@ namespace Parallel
 		       std::vector<T> &buf,
 		       const DataType &type,
 		       Request &req,
-		       const int tag,
+		       const MessageTag &tag,
                        const Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
@@ -1942,7 +1983,7 @@ namespace Parallel
 		 buf.size(),
 		 type,
 		 src_processor_id,
-		 tag,
+		 tag.value(),
 		 comm.get(),
 		 req.get());    
     libmesh_assert (ierr == MPI_SUCCESS);    
@@ -1959,7 +2000,7 @@ namespace Parallel
 		       std::vector<std::complex<T> > &buf,
 		       const DataType &type,
 		       Request &req,
-		       const int tag=any_tag,
+		       const MessageTag &tag=any_tag,
                        const Communicator &comm=Communicator_World)
   {
     START_LOG("receive()", "Parallel");
@@ -1969,7 +2010,7 @@ namespace Parallel
 		buf.size() * 2,
 		type,
 		src_processor_id,
-		tag,
+		tag.value(),
 		comm.get(),
 		req.get());
 
@@ -1986,7 +2027,7 @@ namespace Parallel
   inline void send (const unsigned int dest_processor_id,
 		    std::set<T> &buf,
 		    const DataType &type,
-		    const int tag,
+		    const MessageTag &tag,
                     const Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
@@ -2005,7 +2046,7 @@ namespace Parallel
 		    std::set<T> &buf,
 		    const DataType &type,
 		    Request &req,
-		    const int tag,
+		    const MessageTag &tag,
                     const Communicator &comm)
   {    
     START_LOG("send()", "Parallel");
@@ -2023,7 +2064,7 @@ namespace Parallel
   inline Status receive (const int src_processor_id,
 		         std::set<T> &buf,
 		         const DataType &type,
-		         const int tag,
+		         const MessageTag &tag,
                          const Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
@@ -2045,7 +2086,7 @@ namespace Parallel
 		       std::set<T> &buf,
 		       const DataType &type,
 		       Request &req,
-		       const int tag,
+		       const MessageTag &tag,
                        const Communicator &comm)
   {
     START_LOG("receive()", "Parallel");
@@ -2112,13 +2153,13 @@ namespace Parallel
 				send,
 				type,
 				request,
-				/* tag = */ 321,
+				MessageTag(321),
                                 comm);
     
     Parallel::receive (source_processor_id,
 		       recv,
 		       type,
-		       /* tag = */ 321,
+		       MessageTag(321),
                        comm);
     
     Parallel::wait (request);
@@ -2288,17 +2329,19 @@ namespace Parallel
 
     Parallel::Request request;
 
+    Parallel::MessageTag tag = comm.get_unique_tag(123);
+
     Parallel::nonblocking_send (dest_processor_id,
 				sendbuf,
 				MPI_PACKED,
 				request,
-				/* tag = */ 123,
+				tag,
                                 comm);
 
     Parallel::receive (source_processor_id,
 		       recvbuf,
 		       MPI_PACKED,
-		       /* tag = */ 123,
+		       tag,
                        comm);
 
     // Unpack the received buffer
