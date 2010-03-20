@@ -33,14 +33,14 @@ public:
     
     {
       Base & v = *(new Derived(global_size, local_size));
-      std::vector<Real> l(global_size);
+      std::vector<Number> l(global_size);
       
       const unsigned int 
 	first = v.first_local_index(),
 	last  = v.last_local_index();
       
       for (unsigned int n=first; n != last; n++)
-	v.set (n, static_cast<Real>(n));
+	v.set (n, static_cast<Number>(n));
       v.close();
       
       if(!to_one)
@@ -51,7 +51,7 @@ public:
       if(!to_one || libMesh::processor_id() == root_pid)
 	//Yes I really mean v.size()
 	for (unsigned int i=0; i<v.size(); i++)
-	  CPPUNIT_ASSERT_DOUBLES_EQUAL( i , l[i] , TOLERANCE*TOLERANCE );
+	  CPPUNIT_ASSERT_DOUBLES_EQUAL( libmesh_real(i) , libmesh_real(l[i]) , TOLERANCE*TOLERANCE );
 
       delete &v;
     }
@@ -64,7 +64,7 @@ public:
 
   void testLocalizeBase()
   {
-    Localize<NumericVector<Real>,DerivedClass>();
+    Localize<NumericVector<Number>,DerivedClass>();
   }
 
   void testLocalizeToOne()
@@ -74,7 +74,7 @@ public:
 
   void testLocalizeToOneBase()
   {
-    Localize<NumericVector<Real>,DerivedClass>(true);
+    Localize<NumericVector<Number>,DerivedClass>(true);
   }
 };
 

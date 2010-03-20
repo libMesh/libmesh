@@ -114,7 +114,7 @@ public:
     src_val[1] = 1;
     src_val[2] = 2;
 
-    Parallel::request request;
+    Parallel::Request request;
 
     if (libMesh::n_processors() > 1)
       {
@@ -150,7 +150,7 @@ public:
     src_val[1] = 1;
     src_val[2] = 2;
 
-    Parallel::request request;
+    Parallel::Request request;
 
     if (libMesh::n_processors() > 1)
       {
