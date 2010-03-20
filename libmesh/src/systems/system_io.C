@@ -806,7 +806,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 #ifdef LIBMESH_HAVE_MPI
   if ( libMesh::n_processors() > 1 )
     {
-      const unsigned int val_tag=1;
+      const Parallel::MessageTag val_tag(1);
       
       // Post the receive on the last processor
       if (libMesh::processor_id() == (libMesh::n_processors()-1))
@@ -1744,7 +1744,7 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
 #ifdef LIBMESH_HAVE_MPI
   if ( libMesh::n_processors() > 1 )
     {
-      const unsigned int val_tag=1;
+      const Parallel::MessageTag val_tag(1);
       
       // Post the receive on processor 0
       if ( libMesh::processor_id() == 0 )
