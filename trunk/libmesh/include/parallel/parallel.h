@@ -3038,7 +3038,7 @@ namespace Parallel
    * we do not currently support this operation on one processor without MPI.
    */
   inline status probe (const int,
-		       const int,
+		       const MessageTag&,
                        const Communicator&)
   { libmesh_error(); status status; return status; }
 
@@ -3052,7 +3052,7 @@ namespace Parallel
   inline void send (const unsigned int,
 		    std::vector<T> &,
 		    const DataType &,
-		    const int,
+		    const MessageTag &,
                     const Communicator&)
   { libmesh_error(); }
 
@@ -3067,7 +3067,7 @@ namespace Parallel
 		    std::vector<T> &,
 		    const DataType &,
 		    Request &,
-		    const int,
+		    const MessageTag &,
                     const Communicator&)
   { libmesh_error(); }
 
@@ -3081,7 +3081,7 @@ namespace Parallel
   inline Status receive (const int,
 		         std::vector<T> &,
 		         const DataType &,
-		         const int,
+		         const MessageTag &,
                          const Communicator&)
   { libmesh_error(); return Status(); }
 
@@ -3096,7 +3096,7 @@ namespace Parallel
 		       std::vector<T> &,
 		       const DataType &,
 		       Request &,
-		       const int,
+		       const MessageTag &,
                        const Communicator&)
   { libmesh_error(); }
 
