@@ -214,11 +214,13 @@ void TecplotIO::write_ascii (const std::string& fname,
 	    {
 #ifdef LIBMESH_USE_REAL_NUMBERS	      
 	      // Write real data
-	      out << (*v)[i*n_vars + c] << " ";
+	      out << std::setprecision(this->ascii_precision())
+		  << (*v)[i*n_vars + c] << " ";
 
 #else
 	      // Write complex data
-	      out << (*v)[i*n_vars + c].real() << " "
+	      out << std::setprecision(this->ascii_precision())
+		  << (*v)[i*n_vars + c].real() << " "
 		  << (*v)[i*n_vars + c].imag() << " "
 		  << std::abs((*v)[i*n_vars + c]) << " ";
 

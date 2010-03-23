@@ -70,7 +70,11 @@ class TecplotIO : public MeshOutput<MeshBase>
    * (if the tecio.a library was found by \p configure).
    */
   bool & binary ();
-  
+
+  /**
+   * Return/set the precision to use when writing ASCII files.
+   */
+  unsigned int & ascii_precision ();
   
  private:
 
@@ -101,6 +105,11 @@ class TecplotIO : public MeshOutput<MeshBase>
    * Flag to write binary data.
    */
   bool _binary;
+
+  /**
+   * Precision to use when writing ACII files.
+   */
+  unsigned int _ascii_precision;
 };
 
 
@@ -110,7 +119,8 @@ class TecplotIO : public MeshOutput<MeshBase>
 inline
 TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary) :
   MeshOutput<MeshBase> (mesh),
-  _binary (binary)
+  _binary (binary),
+  _ascii_precision (6)
 {
 }
 
@@ -120,6 +130,14 @@ inline
 bool & TecplotIO::binary ()
 {
   return _binary;
+}
+
+
+
+inline
+unsigned int & TecplotIO::ascii_precision ()
+{
+  return _ascii_precision;
 }
 
 
