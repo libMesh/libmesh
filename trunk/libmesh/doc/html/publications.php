@@ -256,115 +256,7 @@ L.&nbsp;Nagler and M.&nbsp;Schanz.
 
 <tr valign="top">
 <td align="right">
-[<a name="Abukhdeir_2009">3</a>]
-</td>
-<td>
-N.&nbsp;M. Abukhdeir and A.&nbsp;D. Rey.
-  Shape-dynamic growth, structure, and elasticity of homogeneously
-  oriented spherulites in an isotropic/smectic-A mesophase transition.
-  <em>PREPRINT, Submitted to Liquid Crystals</em>, 2009.
-  <a href="http://arxiv.org/abs/0902.1544">http://arxiv.org/abs/0902.1544</a>.<br />
-<p><a name="Abukhdeir_2009"></a><pre>
-@ARTICLE{Abukhdeir_2009,
-  AUTHOR = {N.~M.~Abukhdeir and A.~D.~Rey},
-  TITLE = {{Shape-dynamic growth, structure, and elasticity of homogeneously 
-              oriented spherulites in an isotropic/smectic-A mesophase transition}},
-  JOURNAL = {PREPRINT, Submitted to Liquid Crystals},
-  YEAR = 2009,
-  NOTE = {\url{http://arxiv.org/abs/0902.1544}}
-}
-</pre>
-</p>
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right">
-[<a name="Knezevic_2009c">4</a>]
-</td>
-<td>
-D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
-  A certified reduced basis method for the Fokker-Planck equation of
-  dilute polymeric fluids: FENE dumbbells in extensional flow.
-  <em>PREPRINT, Submitted to SIAM Journal on Scientific Computing</em>,
-  2009.
- 
-  <a href="http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf">http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf</a>.<br />
-<p><a name="Knezevic_2009c"></a><pre>
-@ARTICLE{Knezevic_2009c,
-  AUTHOR = {D.~J.~Knezevic and A.~T.~Patera},
-  TITLE = {{A certified reduced basis method for the 
-              Fokker-Planck equation of dilute polymeric fluids: 
-              FENE dumbbells in extensional flow}},
-  JOURNAL = {PREPRINT, Submitted to SIAM Journal on Scientific Computing},
-  YEAR = 2009,
-  NOTE = {\url{http://augustine.mit.edu/methodology/papers/atpSIAM_JSC_PrepintMay09.pdf}}
-}
-</pre>
-</p>
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right">
-[<a name="Prouet_2009">5</a>]
-</td>
-<td>
-P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
-  Analysis and visualization of the glass eel behavior (Anguilla
-  anguilla) in the Adour estuary and estimate of its upstream migration speed.
-  <em>PREPRINT, Submitted to Aquatic Living Resources</em>, 2009.
-  <a href="http://dx.doi.org/10.1051/alr/2009041">http://dx.doi.org/10.1051/alr/2009041</a>.<br />
-<p><a name="Prouet_2009"></a><pre>
-@ARTICLE{Prouet_2009,
-  AUTHOR = {P.~Prouzet and M.~Odunlami and E.~Duquesne and A.~Boussouar},
-  TITLE = {{Analysis and visualization of the glass
-             eel behavior (Anguilla anguilla) in the Adour estuary
-             and estimate of its upstream migration speed}},
-  NOTE = {\url{http://dx.doi.org/10.1051/alr/2009041}},
-  JOURNAL = {PREPRINT, Submitted to Aquatic Living Resources},
-  YEAR = 2009
-}
-</pre>
-</p>
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right">
-[<a name="Zhu_preprint">6</a>]
-</td>
-<td>
-Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
-  Nonlinear axisymmetric deformations of an elastic tube under
-  external pressure.
-  <em>PREPRINT</em>, 2009.
-  <a href="http://www.maths.gla.ac.uk/~xl/yz-xyl-rwo-Oct14-2009.pdf">http://www.maths.gla.ac.uk/~xl/yz-xyl-rwo-Oct14-2009.pdf</a>.<br />
-<p><a name="Zhu_preprint"></a><pre>
-@ARTICLE{Zhu_preprint,
-  AUTHOR = {Y.~Zhu and X.~Y.~Luo and R.~W.~Ogden},
-  TITLE = {{Nonlinear axisymmetric deformations of an
-              elastic tube under external pressure}},
-  JOURNAL = {PREPRINT},
-  YEAR = 2009,
-  NOTE = {\url{http://www.maths.gla.ac.uk/~xl/yz-xyl-rwo-Oct14-2009.pdf}}
-}
-</pre>
-</p>
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right">
-[<a name="Peterson_2010">7</a>]
+[<a name="Peterson_2010b">3</a>]
 </td>
 <td>
 J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
@@ -373,8 +265,8 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
   <em>EARLY VIEW, International Journal for Numerical Methods in
   Fluids</em>, accepted, 2009.
   <a href="http://dx.doi.org/10.1002/fld.2264">http://dx.doi.org/10.1002/fld.2264</a>.<br />
-<p><a name="Peterson_2010"></a><pre>
-@ARTICLE{Peterson_2010,
+<p><a name="Peterson_2010b"></a><pre>
+@ARTICLE{Peterson_2010b,
   AUTHOR = {J.~W.~Peterson and G.~F.~Carey},
   TITLE = {{Parallel adaptive solution of coupled Rayleigh--B\'{e}nard--Marangoni
   problems with Navier-slip}},
@@ -399,7 +291,160 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right">
-[<a name="Carey_2010">1</a>]
+[<a name="Pereira_2010">1</a>]
+</td>
+<td>
+F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
+  Wavelet-based algebraic multigrid method using the lifting
+  technique.
+  <em>Journal of Microwaves, Optoelectronics, and Electromagnetic
+  Applications</em>, 9(1):1-9, June 2010.
+ 
+  <a href="http://www.sel.eesc.usp.br/jmo/issues/vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf">http://www.sel.eesc.usp.br/jmo/issues/vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf</a>.<br />
+<p><a name="Pereira_2010"></a><pre>
+@ARTICLE{Pereira_2010,
+  AUTHOR = {F.~H.~Pereira and S.~I.~Nabeta},
+  TITLE = {{Wavelet-based algebraic multigrid method using the lifting technique}},
+  JOURNAL = {Journal of Microwaves, Optoelectronics, and Electromagnetic Applications},
+  YEAR = 2010,
+  VOLUME = 9,
+  NUMBER = 1,
+  PAGES = {1--9},
+  NOTE = {\url{http://www.sel.eesc.usp.br/jmo/issues/vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf}},
+  MONTH = {June}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Podgorney_2010">2</a>]
+</td>
+<td>
+R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
+  Massively parallel fully coupled implicit modeling of coupled
+  thermal-hydrological-mechanical processes for enhanced geothermal system
+  reservoirs.
+  In <em>Proceedings of the 35th Workshop on Geothermal Reservoir
+  Engineering</em>. Stanford University, February 2010.
+ 
+  <a href="http://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2010/podgorne.pdf">http://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2010/podgorne.pdf</a>.<br />
+<p><a name="Podgorney_2010"></a><pre>
+@INPROCEEDINGS{Podgorney_2010,
+  AUTHOR = {R.~Podgorney and H.~Huang and D.~Gaston},
+  TITLE = {{Massively parallel fully coupled implicit modeling of coupled
+                 thermal-hydrological-mechanical processes for enhanced geothermal
+		 system reservoirs}},
+  BOOKTITLE = {{Proceedings of the 35th Workshop on Geothermal Reservoir Engineering}},
+  PUBLISHER = {Stanford University},
+  MONTH = {February},
+  YEAR = {2010},
+  NOTE = {\url{http://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2010/podgorne.pdf}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Zhu_2010">3</a>]
+</td>
+<td>
+Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
+  Nonlinear axisymmetric deformations of an elastic tube under
+  external pressure.
+  <em>European Journal of Mechanics - A/Solids</em>, 29(2):216-229,
+  March-April 2010.
+  <a href="http://dx.doi.org/10.1016/j.euromechsol.2009.10.004">http://dx.doi.org/10.1016/j.euromechsol.2009.10.004</a>.<br />
+<p><a name="Zhu_2010"></a><pre>
+@ARTICLE{Zhu_2010,
+  AUTHOR = {Y.~Zhu and X.~Y.~Luo and R.~W.~Ogden},
+  TITLE = {{Nonlinear axisymmetric deformations of an
+              elastic tube under external pressure}},
+  JOURNAL = {European Journal of Mechanics - A/Solids},
+  YEAR = 2010,
+  VOLUME = 29,
+  NUMBER = 2,
+  MONTH = {March--April},
+  PAGES = {216--229},
+  NOTE = {\url{http://dx.doi.org/10.1016/j.euromechsol.2009.10.004}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Knezevic_2010">4</a>]
+</td>
+<td>
+D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
+  A certified reduced basis method for the Fokker-Planck equation of
+  dilute polymeric fluids: FENE dumbbells in extensional flow.
+  <em>SIAM Journal on Scientific Computing</em>, 32(2):793-817, 2010.
+  <a href="http://dx.doi.org/10.1137/090759239">http://dx.doi.org/10.1137/090759239</a>.<br />
+<p><a name="Knezevic_2010"></a><pre>
+@ARTICLE{Knezevic_2010,
+  AUTHOR = {D.~J.~Knezevic and A.~T.~Patera},
+  TITLE = {{A certified reduced basis method for the 
+              Fokker-Planck equation of dilute polymeric fluids: 
+              FENE dumbbells in extensional flow}},
+  JOURNAL = {SIAM Journal on Scientific Computing},
+  YEAR = 2010,
+  VOLUME = 32,
+  NUMBER = 2,
+  PAGES = {793--817},
+  NOTE = {\url{http://dx.doi.org/10.1137/090759239}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Zhengyong_2010">5</a>]
+</td>
+<td>
+Zhengyong Ren and Jingtian Tang.
+  3D direct current resistivity modeling with unstructured mesh by
+  adaptive finite-element method.
+  <em>Geophysics</em>, 1(75):H7-H17, 2010.
+  <a href="http://dx.doi.org/10.1190/1.3298690">http://dx.doi.org/10.1190/1.3298690</a>.<br />
+<p><a name="Zhengyong_2010"></a><pre>
+@ARTICLE{Zhengyong_2010,
+  AUTHOR = {Zhengyong Ren and Jingtian Tang},
+  TITLE = {{3D direct current resistivity modeling with
+              unstructured mesh by adaptive finite-element method}},
+  JOURNAL = {Geophysics},
+  YEAR = 2010,
+  VOLUME = 1,
+  NUMBER = 75,
+  PAGES = {H7--H17},
+  NOTE = {\url{http://dx.doi.org/10.1190/1.3298690}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Carey_2010">6</a>]
 </td>
 <td>
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -429,7 +474,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right">
-[<a name="Peterson_2010">2</a>]
+[<a name="Peterson_2010">7</a>]
 </td>
 <td>
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -459,7 +504,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right">
-[<a name="Botti_2010">3</a>]
+[<a name="Botti_2010">8</a>]
 </td>
 <td>
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
@@ -496,7 +541,38 @@ L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.
 
 <tr valign="top">
 <td align="right">
-[<a name="Class_2009">1</a>]
+[<a name="Prouet_2009">1</a>]
+</td>
+<td>
+P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
+  Analysis and visualization of the glass eel behavior (Anguilla
+  anguilla) in the Adour estuary and estimate of its upstream migration speed.
+  <em>Aquatic Living Resources</em>, 22(4):525-534, December 2009.
+  <a href="http://dx.doi.org/10.1051/alr/2009041">http://dx.doi.org/10.1051/alr/2009041</a>.<br />
+<p><a name="Prouet_2009"></a><pre>
+@ARTICLE{Prouet_2009,
+  AUTHOR = {P.~Prouzet and M.~Odunlami and E.~Duquesne and A.~Boussouar},
+  TITLE = {{Analysis and visualization of the glass
+             eel behavior (Anguilla anguilla) in the Adour estuary
+             and estimate of its upstream migration speed}},
+  NOTE = {\url{http://dx.doi.org/10.1051/alr/2009041}},
+  JOURNAL = {Aquatic Living Resources},
+  YEAR = 2009,
+  VOLUME = 22,
+  NUMBER = 4,
+  PAGES = {525--534},
+  MONTH = {December}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Class_2009">2</a>]
 </td>
 <td>
 H.&nbsp;Class et&nbsp;al.
@@ -525,7 +601,7 @@ H.&nbsp;Class et&nbsp;al.
 
 <tr valign="top">
 <td align="right">
-[<a name="Barbarosie_2009">2</a>]
+[<a name="Barbarosie_2009">3</a>]
 </td>
 <td>
 C.&nbsp;Barbarosie and A.-M. Toader.
@@ -554,7 +630,7 @@ C.&nbsp;Barbarosie and A.-M. Toader.
 
 <tr valign="top">
 <td align="right">
-[<a name="Kirk_2009c">3</a>]
+[<a name="Kirk_2009c">4</a>]
 </td>
 <td>
 Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
@@ -585,7 +661,7 @@ Benjamin&nbsp;S. Kirk and Graham&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right">
-[<a name="Knezevic_2009d">4</a>]
+[<a name="Knezevic_2009d">5</a>]
 </td>
 <td>
 D.&nbsp;J. Knezevic and E.&nbsp;Süli.
@@ -618,7 +694,7 @@ D.&nbsp;J. Knezevic and E.&nbsp;Süli.
 
 <tr valign="top">
 <td align="right">
-[<a name="Antiga_2009">5</a>]
+[<a name="Antiga_2009">6</a>]
 </td>
 <td>
 L.&nbsp;Antiga, R.&nbsp;N. Planken, K.&nbsp;Van Canneyt, L.&nbsp;Botti, A.&nbsp;Caroli, B.&nbsp;Ene-Iordache,
@@ -654,7 +730,7 @@ L.&nbsp;Antiga, R.&nbsp;N. Planken, K.&nbsp;Van Canneyt, L.&nbsp;Botti, A.&nbsp;
 
 <tr valign="top">
 <td align="right">
-[<a name="Barone_2009b">6</a>]
+[<a name="Barone_2009b">7</a>]
 </td>
 <td>
 M.&nbsp;F. Barone, I.&nbsp;Kalashnikova, M.&nbsp;R. Brake, and D.&nbsp;J. Segalman.
@@ -681,7 +757,7 @@ M.&nbsp;F. Barone, I.&nbsp;Kalashnikova, M.&nbsp;R. Brake, and D.&nbsp;J. Segalm
 
 <tr valign="top">
 <td align="right">
-[<a name="Lu_2009b">7</a>]
+[<a name="Lu_2009b">8</a>]
 </td>
 <td>
 Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
@@ -712,7 +788,7 @@ Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
 
 <tr valign="top">
 <td align="right">
-[<a name="AufderMaur_2009">8</a>]
+[<a name="AufderMaur_2009">9</a>]
 </td>
 <td>
 M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&nbsp;Penazzi,
@@ -745,7 +821,7 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&n
 
 <tr valign="top">
 <td align="right">
-[<a name="Barone_2009">9</a>]
+[<a name="Barone_2009">10</a>]
 </td>
 <td>
 Matthew&nbsp;F. Barone, Irina Kalashnikova, Daniel&nbsp;J. Segalman, and Heidi&nbsp;K.
@@ -777,7 +853,7 @@ Matthew&nbsp;F. Barone, Irina Kalashnikova, Daniel&nbsp;J. Segalman, and Heidi&n
 
 <tr valign="top">
 <td align="right">
-[<a name="Polidori_2009">10</a>]
+[<a name="Polidori_2009">11</a>]
 </td>
 <td>
 M.&nbsp;Polidori.
@@ -809,7 +885,7 @@ M.&nbsp;Polidori.
 
 <tr valign="top">
 <td align="right">
-[<a name="S_Lu_2009">11</a>]
+[<a name="S_Lu_2009">12</a>]
 </td>
 <td>
 S.&nbsp;Lu et&nbsp;al.
@@ -838,7 +914,36 @@ S.&nbsp;Lu et&nbsp;al.
 
 <tr valign="top">
 <td align="right">
-[<a name="Blome_2009">12</a>]
+[<a name="Abukhdeir_2009">13</a>]
+</td>
+<td>
+N.&nbsp;M. Abukhdeir and A.&nbsp;D. Rey.
+  Shape-dynamic growth, structure, and elasticity of homogeneously
+  oriented spherulites in an isotropic/smectic-A mesophase transition.
+  <em>Liquid Crystals</em>, 36(10-11):1125-1137, 2009.
+  <a href="http://dx.doi.org/10.1080/02678290902878754">http://dx.doi.org/10.1080/02678290902878754</a>.<br />
+<p><a name="Abukhdeir_2009"></a><pre>
+@ARTICLE{Abukhdeir_2009,
+  AUTHOR = {N.~M.~Abukhdeir and A.~D.~Rey},
+  TITLE = {{Shape-dynamic growth, structure, and elasticity of homogeneously 
+              oriented spherulites in an isotropic/smectic-A mesophase transition}},
+  JOURNAL = {Liquid Crystals},
+  YEAR = 2009,
+  VOLUME = 36,
+  NUMBER = {10--11},
+  PAGES = {1125--1137},
+  NOTE = {\url{http://dx.doi.org/10.1080/02678290902878754}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Blome_2009">14</a>]
 </td>
 <td>
 M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
@@ -865,7 +970,7 @@ M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
 
 <tr valign="top">
 <td align="right">
-[<a name="Kirk_2009b">13</a>]
+[<a name="Kirk_2009b">15</a>]
 </td>
 <td>
 B.&nbsp;S. Kirk.
@@ -889,7 +994,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right">
-[<a name="AufderMaur_2009b">14</a>]
+[<a name="AufderMaur_2009b">16</a>]
 </td>
 <td>
 M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&nbsp;Romano,
@@ -918,7 +1023,7 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&
 
 <tr valign="top">
 <td align="right">
-[<a name="Knezevic_2009">15</a>]
+[<a name="Knezevic_2009">17</a>]
 </td>
 <td>
 D.&nbsp;Knezevic and E.&nbsp;Süli.
@@ -951,7 +1056,7 @@ D.&nbsp;Knezevic and E.&nbsp;Süli.
 
 <tr valign="top">
 <td align="right">
-[<a name="Lu_2009">16</a>]
+[<a name="Lu_2009">18</a>]
 </td>
 <td>
 Yujie Lu, Hidevaldo&nbsp;B. Machado, Ali Douraghy, David Stout, Harvey Herschman,
@@ -983,7 +1088,7 @@ Yujie Lu, Hidevaldo&nbsp;B. Machado, Ali Douraghy, David Stout, Harvey Herschman
 
 <tr valign="top">
 <td align="right">
-[<a name="Xu_2009">17</a>]
+[<a name="Xu_2009">19</a>]
 </td>
 <td>
 D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
@@ -1013,7 +1118,7 @@ D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
 
 <tr valign="top">
 <td align="right">
-[<a name="Gaston_2009b">18</a>]
+[<a name="Gaston_2009b">20</a>]
 </td>
 <td>
 D.&nbsp;Gaston, C.&nbsp;Newman, G.&nbsp;Hansen, and D.&nbsp;Lebrun-Grandié.
@@ -1042,7 +1147,7 @@ D.&nbsp;Gaston, C.&nbsp;Newman, G.&nbsp;Hansen, and D.&nbsp;Lebrun-Grandié.
 
 <tr valign="top">
 <td align="right">
-[<a name="Jones_2009">19</a>]
+[<a name="Jones_2009">21</a>]
 </td>
 <td>
 I.&nbsp;A. Jones, W.&nbsp;Ruijter, and A.&nbsp;C. Long.
@@ -1069,7 +1174,7 @@ I.&nbsp;A. Jones, W.&nbsp;Ruijter, and A.&nbsp;C. Long.
 
 <tr valign="top">
 <td align="right">
-[<a name="Mahadevan_2009">20</a>]
+[<a name="Mahadevan_2009">22</a>]
 </td>
 <td>
 V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;Mousseau.
@@ -1098,7 +1203,7 @@ V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;Mousseau.
 
 <tr valign="top">
 <td align="right">
-[<a name="Gaston_2009">21</a>]
+[<a name="Gaston_2009">23</a>]
 </td>
 <td>
 D.&nbsp;Gaston, G.&nbsp;Hansen, S.&nbsp;Kadioglu, D.&nbsp;A. Knoll, C.&nbsp;Newman, H.&nbsp;Park, C.&nbsp;Permann,
@@ -1127,7 +1232,7 @@ D.&nbsp;Gaston, G.&nbsp;Hansen, S.&nbsp;Kadioglu, D.&nbsp;A. Knoll, C.&nbsp;Newm
 
 <tr valign="top">
 <td align="right">
-[<a name="Luethi2009">22</a>]
+[<a name="Luethi2009">24</a>]
 </td>
 <td>
 M.&nbsp;P. Lüthi.
@@ -1152,7 +1257,7 @@ M.&nbsp;P. Lüthi.
 
 <tr valign="top">
 <td align="right">
-[<a name="Valli_2009">23</a>]
+[<a name="Valli_2009">25</a>]
 </td>
 <td>
 A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&nbsp;A. Coutinho.
@@ -1181,7 +1286,7 @@ A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&
 
 <tr valign="top">
 <td align="right">
-[<a name="Biermann_2009">24</a>]
+[<a name="Biermann_2009">26</a>]
 </td>
 <td>
 Jan Biermann, Otto von Estorff, Steffen Petersen, and Christina Wenterodt.
@@ -1211,7 +1316,7 @@ Jan Biermann, Otto von Estorff, Steffen Petersen, and Christina Wenterodt.
 
 <tr valign="top">
 <td align="right">
-[<a name="Kirk_2009">25</a>]
+[<a name="Kirk_2009">27</a>]
 </td>
 <td>
 B.&nbsp;S. Kirk.
