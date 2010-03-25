@@ -806,7 +806,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 #ifdef LIBMESH_HAVE_MPI
   if ( libMesh::n_processors() > 1 )
     {
-      const Parallel::MessageTag val_tag(1);
+      const Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(321);
       
       // Post the receive on the last processor
       if (libMesh::processor_id() == (libMesh::n_processors()-1))
