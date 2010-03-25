@@ -160,6 +160,7 @@ template <class MT>
 inline
 MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
   _obj (&obj),
+  _ascii_precision (std::numeric_limits<Real>::digits10 + 2),
   _is_parallel_format(is_parallel_format)
 {
   if (!_is_parallel_format && !this->mesh().is_serial())
