@@ -23,7 +23,8 @@
 #define __mesh_output_h__
 
 
-// C++ inludes
+// C++ includes
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -93,6 +94,14 @@ class MeshOutput
 				 const std::vector<std::string>&)
   { libmesh_error(); }
 
+  /**
+   * Return/set the precision to use when writing ASCII files.
+   *
+   * By default we use numeric_limits<Real>::digits10 + 2, which
+   * should be enough to write out to ASCII and get the exact same
+   * Real back when reading in.
+   */
+  unsigned int & ascii_precision ();
   
  protected:
 
@@ -111,6 +120,11 @@ class MeshOutput
    * This allows us to write the object to file.
    */
   const MT* const _obj;
+
+  /**
+   * Precision to use when writing ASCII files.
+   */
+  unsigned int _ascii_precision;
 
   /**
    * Flag specifying whether this format is parallel-capable.
@@ -136,6 +150,7 @@ template <class MT>
 inline
 MeshOutput<MT>::MeshOutput (const bool is_parallel_format) :
   _obj(NULL),
+  _ascii_precision (std::numeric_limits<Real>::digits10 + 2),
   _is_parallel_format(is_parallel_format)
 {}
 
@@ -195,6 +210,16 @@ const MT& MeshOutput<MT>::mesh () const
   libmesh_assert (_obj != NULL);
   return *_obj;
 }
+
+
+
+template <class MT>
+inline
+unsigned int & MeshOutput<MT>::ascii_precision ()
+{
+  return _ascii_precision;
+}
+
 
 
 #endif // #define __mesh_io_h__
