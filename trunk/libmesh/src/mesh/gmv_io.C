@@ -263,12 +263,15 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 	        << std::endl;
   libmesh_here();
 
+  // Set it to our current precision
   this->write_ascii_old_impl (fname, v, solution_names);
 
 #else
   
   // Open the output file stream
   std::ofstream out (fname.c_str());
+
+  out << std::setprecision(this->ascii_precision());
   
   // Make sure it opened correctly
   if (!out.good())
@@ -485,7 +488,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
           out << "r_" << (*solution_names)[c] << " 1\n";
 	  
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
-            out << std::setprecision(10) << (*v)[n*n_vars + c].real() << " ";
+            out << (*v)[n*n_vars + c].real() << " ";
 
           out << "\n\n";
 
@@ -493,15 +496,14 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
           out << "i_" << (*solution_names)[c] << " 1\n";
 	  
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
-            out << std::setprecision(10) << (*v)[n*n_vars + c].imag() << " ";
+            out << (*v)[n*n_vars + c].imag() << " ";
 
           out << "\n\n";
 
           // this is the magnitude
           out << "a_" << (*solution_names)[c] << " 1\n";
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
-            out << std::setprecision(10)
-                << std::abs((*v)[n*n_vars + c]) << " ";
+            out << std::abs((*v)[n*n_vars + c]) << " ";
 
           out << "\n\n";
 
@@ -510,7 +512,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
           out << (*solution_names)[c] << " 1\n";
 	  
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
-            out << std::setprecision(10) << (*v)[n*n_vars + c] << " ";
+            out << (*v)[n*n_vars + c] << " ";
 	  
           out << "\n\n";
 
@@ -541,6 +543,9 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 {
   // Open the output file stream
   std::ofstream out (fname.c_str());
+  
+  // Set it to our current precision
+  out << std::setprecision(this->ascii_precision());
   
   // Make sure it opened correctly
   if (!out.good())
@@ -1122,7 +1127,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	  out << "r_" << (*solution_names)[c] << " 1\n";
 	  
 	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
-	    out << std::setprecision(10) << (*v)[n*n_vars + c].real() << " ";
+	    out << (*v)[n*n_vars + c].real() << " ";
 	  
 	  out << '\n' << '\n';
 
@@ -1131,15 +1136,14 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	  out << "i_" << (*solution_names)[c] << " 1\n";
 	  
 	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
-	    out << std::setprecision(10) << (*v)[n*n_vars + c].imag() << " ";
+	    out << (*v)[n*n_vars + c].imag() << " ";
 	  
 	  out << '\n' << '\n';
 
 	  // this is the magnitude
 	  out << "a_" << (*solution_names)[c] << " 1\n";
 	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
-	    out << std::setprecision(10)
-		<< std::abs((*v)[n*n_vars + c]) << " ";
+	    out << std::abs((*v)[n*n_vars + c]) << " ";
 
 	  out << '\n' << '\n';
 
@@ -1148,7 +1152,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 	  out << (*solution_names)[c] << " 1\n";
 	  
 	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
-	    out << std::setprecision(10) << (*v)[n*n_vars + c] << " ";
+	    out << (*v)[n*n_vars + c] << " ";
 	  
 	  out << '\n' << '\n';
 
@@ -1856,7 +1860,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 
           for ( ; it != end; ++it)
             for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-              out << std::setprecision(10) << v[(n++)*n_vars + c].real() << " ";	    
+              out << v[(n++)*n_vars + c].real() << " ";	    
         }	  	  
         out << std::endl << std::endl;
 
@@ -1869,7 +1873,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	    
           for ( ; it != end; ++it)
             for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-              out << std::setprecision(10) << v[(n++)*n_vars + c].imag() << " ";	    
+              out << v[(n++)*n_vars + c].imag() << " ";	    
         }	  
         out << std::endl << std::endl;
 
@@ -1881,8 +1885,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	    
           for ( ; it != end; ++it)
             for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-              out << std::setprecision(10)
-                  << std::abs(v[(n++)*n_vars + c]) << " ";	    
+              out << std::abs(v[(n++)*n_vars + c]) << " ";	    
         }
         out << std::endl << std::endl;
 
@@ -1897,7 +1900,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 	  
           for ( ; it != end; ++it)
             for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-              out << std::setprecision(10) << v[(nn++)*n_vars + c] << " ";	    
+              out << v[(nn++)*n_vars + c] << " ";	    
         }	  
         out << std::endl << std::endl;
 
