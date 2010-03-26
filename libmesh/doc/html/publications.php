@@ -45,7 +45,9 @@ B.&nbsp;Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 </td>
 </tr>
-</table><h2>Dissertations & Theses</h2>
+</table>
+<a name="Dissertations"</a>
+<h2>Dissertations & Theses</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.75
      (see http://www.lri.fr/~filliatr/bibtex2html/),
@@ -190,7 +192,10 @@ J.&nbsp;W. Peterson.
 
 </td>
 </tr>
-</table><h2>Preprints</h2>
+</table>
+
+<a name="Preprints"></a>
+<h2>Preprints</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.75
      (see http://www.lri.fr/~filliatr/bibtex2html/),
@@ -279,7 +284,10 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 </td>
 </tr>
-</table><h2>2010</h2>
+</table>
+
+<a name="Articles"></a>
+<h2>2010</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.75
      (see http://www.lri.fr/~filliatr/bibtex2html/),
