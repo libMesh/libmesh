@@ -30,24 +30,24 @@ function load_style($root)
 <?php function make_navigation($mode,$root) { ?>
  <div id="navAlpha">
     <?php echo "<a class=\"L1\" href = \"", $root, "index.php\" title=\"Main Page\">Home</a><BR>"; ?>    
+
     <?php echo "<a class=\"L1\" href = \"", $root, "publications.php\">Publications</a><BR>"; ?>
+	<?php if ($mode=="publications") {?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "publications.php#Dissertations\" title=\"Dissetations\">Dissertations</a><BR>"; ?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "publications.php#Preprints\" title=\"Dissetations\">Preprints</a><BR>"; ?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "publications.php#Articles\" title=\"Dissetations\">Articles</a><BR>"; ?>
+	<?php } ?>
+ 
     <?php echo "<a class=\"L1\" href = \"", $root, "presentations.php\">Presentations</a><BR>"; ?>
 	
-<!--     <?php echo "<a class=\"L1\" href = \"", $root, "applications.php\">Applications</a><BR>"; ?> -->
-<!--     <?php if ($mode=="applications") { ?> -->
-<!--     <?php echo "<a class=\"L2\" href = \"", $root, "application1.php\" title=\"Application 1\">Application 1</a><BR>"; ?> -->
-<!--     <?php echo "<a class=\"L2\" href = \"", $root, "application2.php\" title=\"Application 2\">Application 2</a><BR>"; ?> -->
-<!--     <?php } ?> -->
-	
     <?php echo "<a class=\"L1\" href = \"", $root, "installation.php\" title=\"Download & Installation Instructions\">Download</a><BR>"; ?>
-    <?php if ($mode=="download") { ?>
-    <?php echo "<a class=\"L2\" href = \"", $root, "installation.php\" title=\"Installation\">Installation</a><BR>"; ?>
-    <?php echo "<a class=\"L2\" href = \"", $root, "subversion.php\" title=\"SVN Repository\">SVN Repository</a><BR>"; ?>
-    <?php echo "<a class=\"L2\" href = \"", $root, "http://sourceforge.net/project/showfiles.php?group_id=71130\" title=\"Source Files\">Source Files</a><BR>"; ?>
-    <?php } ?>
+        <?php if ($mode=="download") { ?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "installation.php\" title=\"Installation\">Installation</a><BR>"; ?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "subversion.php\" title=\"SVN Repository\">SVN Repository</a><BR>"; ?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "http://sourceforge.net/project/showfiles.php?group_id=71130\" title=\"Source Files\">Source Files</a><BR>"; ?>
+        <?php } ?>
 	
     <?php echo "<a class=\"L1\" href = \"", $root, "examples.php\">Examples</a><BR>"; ?>
-
     <?php if (ereg("^ex[0-9]+|examples",$mode))
             {
               for ($i=0; $i<20; $i++)
@@ -57,6 +57,7 @@ function load_style($root)
             } ?>
 
     <?php echo "<a class=\"L1\" href = \"", $root, "developers.php\">Developers</a><BR>"; ?>
+
     <?php echo "<a class=\"L1\" href = \"", $root, "doxygen/index.php\" title=\"C++ Class Documentation\">Class Docs</a><BR>"; ?>
 	<?php if ($mode=="documentation") {?>
               <?php echo "<a class=\"L2\" href = \"", $root, "doxygen/namespaces.php\" title=\"Namespaces\">Namespaces</a><BR>"; ?>
@@ -65,7 +66,9 @@ function load_style($root)
 	<?php } ?>
  
     <?php echo "<a class=\"L1\" href = \"http://sourceforge.net/mail/?group_id=71130\" title=\"Sourceforge's Mailing List Page\">Mailing Lists</a><BR>" ?>
+
     <?php echo "<a class=\"L1\" href = \"", $root, "wiki/index.php/Gallery\" title=\"Results From Applications Which Use libMesh\">Gallery</a><BR>"; ?>
+
     <?php echo "<a class=\"L1\" href = \"", $root, "wiki\" title=\"External Wiki Page\">Wiki</a><BR>"; ?>
 </div>
 
