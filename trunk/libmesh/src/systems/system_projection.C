@@ -594,6 +594,14 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 		          FEInterface::n_dofs_at_node (dim, fe_type,
                                                        elem_type, n);
                       }
+		    const unsigned int nc =
+		      FEInterface::n_dofs_per_elem (dim, temp_fe_type,
+                                                    elem_type);
+                    for (unsigned int i=0; i != nc; ++i)
+                      {
+                        Ue(new_index++) =
+                          old_vector(old_dof_indices[old_index+i]);
+                      }
                   }
                 else if (elem->p_refinement_flag() ==
                          Elem::JUST_COARSENED)
@@ -618,6 +626,14 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
                         old_index +=
 		          FEInterface::n_dofs_at_node (dim, temp_fe_type,
                                                        elem_type, n);
+                      }
+		    const unsigned int nc =
+		      FEInterface::n_dofs_per_elem (dim, fe_type,
+                                                    elem_type);
+                    for (unsigned int i=0; i != nc; ++i)
+                      {
+                        Ue(new_index++) =
+                          old_vector(old_dof_indices[old_index+i]);
                       }
                   }
                 else
