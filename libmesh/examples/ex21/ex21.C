@@ -555,8 +555,6 @@ int main (int argc, char** argv)
       equation_system.reinit();
     }
   }
-  // We currently have to serialize for I/O.
-  equation_system.allgather();
 
   // Write out the solution
   // After solving the system write the solution
