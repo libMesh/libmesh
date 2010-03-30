@@ -197,7 +197,7 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
   const std::vector<std::vector<RealGradient> >& dphi_face = fe_elem_face->get_dphi();
   const std::vector<Real>& JxW_face = fe_elem_face->get_JxW();
   const std::vector<Point>& qface_normals = fe_elem_face->get_normals();
-  const std::vector<Point >& qface_points = fe_elem_face->get_xyz();
+  const std::vector<Point>& qface_points = fe_elem_face->get_xyz();
     
   // Data for surface integrals on the neighbor boundary
   const std::vector<std::vector<Real> >&  phi_neighbor_face = fe_neighbor_face->get_phi();
@@ -207,17 +207,17 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
   // and right-hand-side vector contribution.  Following
   // basic finite element terminology we will denote these
   // "Ke" and "Fe". 
-  DenseMatrix<Real> Ke;
-  DenseVector<Real> Fe;
+  DenseMatrix<Number> Ke;
+  DenseVector<Number> Fe;
 
   // Data structures to contain the element and neighbor boundary matrix
   // contribution. This matrices will do the coupling beetwen the dofs of
   // the element and those of his neighbors.
   // Ken: matrix coupling elem and neighbor dofs
-  DenseMatrix<Real> Kne;
-  DenseMatrix<Real> Ken;
-  DenseMatrix<Real> Kee;
-  DenseMatrix<Real> Knn;
+  DenseMatrix<Number> Kne;
+  DenseMatrix<Number> Ken;
+  DenseMatrix<Number> Kee;
+  DenseMatrix<Number> Knn;
   
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
