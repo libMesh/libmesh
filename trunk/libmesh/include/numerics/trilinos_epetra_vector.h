@@ -743,6 +743,8 @@ void EpetraVector<T>::init (const unsigned int n,
       else
         this->_type = PARALLEL;
     }
+  else if (type == GHOSTED)
+    this->_type = SERIAL;
   else
     this->_type = type;
 
