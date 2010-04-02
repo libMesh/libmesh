@@ -56,6 +56,7 @@ endif
 # applications
 enable-petsc         = @enablepetsc@
 petsc-version        = @petscversion@
+petsc-major          = @petscmajor@
 petsc-major-minor    = @petscmajorminor@
 PETSC_ARCH           = @PETSC_ARCH@
 PETSC_DIR            = @PETSC_DIR@
@@ -420,10 +421,10 @@ ifeq ($(enable-optional),yes)
     # The configure script checks that only corresponding
     # versions of PETSc and SLEPc can be used. Hence,
     # petsc-major-minor is also used to identify the SLEPc version 
-    ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
+    ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x style
       include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/slepcconf
     else
-        ifeq ($(petsc-major-minor),3.0.x)  # 3.0.x
+        ifeq ($(petsc-major),3)  # 3.0.x & newer style
 	    include ${SLEPC_DIR}/conf/slepc_common_variables
         else
             include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages	
@@ -433,10 +434,10 @@ ifeq ($(enable-optional),yes)
     libmesh_INCLUDE += -I$(SLEPC_DIR)/include
 
     # Depending on petsc version, libs live in different locations
-    ifeq ($(petsc-major-minor),2.3.x) # 2.3.x & newer does not use BOPT, has lib/ARCH/...
+    ifeq ($(petsc-major-minor),2.3.x) # 2.3.x does not use BOPT, has lib/ARCH/...
       PETSC_LIB = $(PETSC_DIR)/lib/$(PETSC_ARCH)
     else
-      ifeq ($(petsc-major-minor),3.0.x) # 3.0.x & newer does not use BOPT, has ARCH/lib/...
+      ifeq ($(petsc-major),3) # 3.0.x & newer does not use BOPT, has ARCH/lib/...
         PETSC_LIB = $(PETSC_DIR)/$(PETSC_ARCH)/lib
       else
         PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
@@ -478,10 +479,10 @@ ifeq ($(enable-optional),yes)
       include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
     else
       C_CLINKER_SLFLAG = $(libmesh_RPATHFLAG)# necessary for PETSc >= 2.1.6
-      ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
+      ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x style
         include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/petscconf # 2.3.0 or later style
       else
-        ifeq ($(petsc-major-minor),3.0.x)  # 3.0.x & newer style
+        ifeq ($(petsc-major),3)  # 3.0.x & newer style
           include $(PETSC_DIR)/$(PETSC_ARCH)/conf/petscvariables # 3.0.0 or later style
 	else
           include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
@@ -499,10 +500,10 @@ ifeq ($(enable-optional),yes)
                          $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE) $(PACKAGES_INCLUDES)
 
     # Depending on petsc version, libs live in different locations
-    ifeq ($(petsc-major-minor),2.3.x) # 2.3.x & newer does not use BOPT, has lib/ARCH/...
+    ifeq ($(petsc-major-minor),2.3.x) # 2.3.x does not use BOPT, has lib/ARCH/...
       PETSC_LIB = $(PETSC_DIR)/lib/$(PETSC_ARCH)
     else
-      ifeq ($(petsc-major-minor),3.0.x) # 3.0.x & newer does not use BOPT, has ARCH/lib/...
+      ifeq ($(petsc-major),3) # 3.0.x & newer does not use BOPT, has ARCH/lib/...
         PETSC_LIB = $(PETSC_DIR)/$(PETSC_ARCH)/lib
       else # old-schol lib/lib$BOPT/ARCH format
         PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
@@ -523,17 +524,20 @@ ifeq ($(enable-optional),yes)
                    -lpetscdm \
                    -lpetscmat \
                    -lpetscvec \
-                   -lpetscsnes \
                    -lpetsc
-    else                               # 2.2.x & newer style
-      libs-PETSC = -L$(PETSC_LIB) \
-                   -lpetscsnes \
-                   -lpetscksp \
-                   -lpetscdm \
-                   -lpetscmat \
-                   -lpetscvec \
-                   -lpetscsnes \
-                   -lpetsc
+    else
+      ifeq ($(petsc-major-minor),3.1.x) # 3.1.x PETSc is all in one library?
+        libs-PETSC = -L$(PETSC_LIB) \
+                     -lpetsc
+      else                              # 2.2.x through 3.0.x style
+        libs-PETSC = -L$(PETSC_LIB) \
+                     -lpetscsnes \
+                     -lpetscksp \
+                     -lpetscdm \
+                     -lpetscmat \
+                     -lpetscvec \
+                     -lpetsc
+      endif
     endif
 
     ifdef PACKAGES_LIBS  # Variable available in 2.3.x petscconf

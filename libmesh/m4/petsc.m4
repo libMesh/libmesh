@@ -63,6 +63,7 @@ dnl      AC_SUBST(PETSCLINKLIBS)
 dnl      AC_SUBST(PETSCINCLUDEDIRS)
 
       AC_SUBST(petscversion)
+      AC_SUBST(petscmajor)
       AC_SUBST(petscmajorminor)
       AC_SUBST(MPI_IMPL)
 
