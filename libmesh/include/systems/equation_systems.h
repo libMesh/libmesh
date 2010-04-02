@@ -184,8 +184,8 @@ public:
    * Add the system of type \p system_type named \p name to the
    * systems array.
    */
-  System & add_system (const std::string& system_type,
-		       const std::string& name);
+  virtual System & add_system (const std::string& system_type,
+		               const std::string& name);
   
   /**
    * Add the system named \p name to the systems array.
