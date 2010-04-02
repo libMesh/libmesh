@@ -149,7 +149,7 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
   // Get a reference to the LinearImplicitSystem we are solving
   LinearImplicitSystem & ellipticdg_system = es.get_system<LinearImplicitSystem> ("EllipticDG");
   // Get some parameters that we need during assembly
-  const unsigned int penalty = es.parameters.get<unsigned int> ("penalty");
+  const Real penalty = es.parameters.get<Real> ("penalty");
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
@@ -484,7 +484,7 @@ int main (int argc, char** argv)
   // Set parameters for the equation system and the solver
   equation_system.parameters.set<Real>("linear solver tolerance") = TOLERANCE * TOLERANCE;
   equation_system.parameters.set<unsigned int>("linear solver maximum iterations") = 1000;
-  equation_system.parameters.set<unsigned int>("penalty") = penalty;
+  equation_system.parameters.set<Real>("penalty") = penalty;
   equation_system.parameters.set<bool>("singularity") = singularity;
 
   // Create a system named ellipticdg
