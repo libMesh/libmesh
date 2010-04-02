@@ -304,8 +304,16 @@ void EquationSystems::update ()
 System & EquationSystems::add_system (const std::string& sys_type,
 				      const std::string& name)
 {
+  // If the user already built a system with this name, we'll
+  // trust them and we'll use it.  That way they can pre-add
+  // non-standard derived system classes, and if their restart file
+  // has some non-standard sys_type we won't throw an error.
+  if (_systems.count(name))
+    {
+      return this->get_system(name);
+    }
   // Build a Newmark system
-  if      (sys_type == "Newmark")
+  else if (sys_type == "Newmark")
     this->add_system<NewmarkSystem> (name);
 
   // Build an Explicit system
