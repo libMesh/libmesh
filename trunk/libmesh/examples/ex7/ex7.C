@@ -126,6 +126,16 @@ int main (int argc, char** argv)
       
       libmesh_error();
     }
+
+  if (libMesh::n_processors() > 1)
+    {
+      if (libMesh::processor_id() == 0)
+        {
+          std::cerr << "ERROR: Skipping example 7. " << std::endl;
+          std::cerr << "MeshData objects currently only work in serial." << std::endl;
+        }
+      return 0;
+    }
   
   // Tell the user what we are doing.
   else 
