@@ -1694,9 +1694,10 @@ namespace Parallel
 
 
 
+  // Function overloading for std::complex<>
   template <typename T>
   inline void sum(std::complex<T> &r,
-                  const Communicator &comm)
+                  const Communicator &comm = Communicator_World)
   {
     if (comm.size() > 1)
       {
@@ -1717,7 +1718,7 @@ namespace Parallel
 
   template <typename T>
   inline void sum(std::vector<std::complex<T> > &r,
-                  const Communicator &comm)
+                  const Communicator &comm = Communicator_World)
   {
     if (comm.size() > 1 && !r.empty())
       {
@@ -2203,7 +2204,7 @@ namespace Parallel
 			   std::complex<T> &send,
 			   const unsigned int source_processor_id,
 			   std::complex<T> &recv,
-                           const Communicator &comm)
+                           const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -2412,7 +2413,7 @@ namespace Parallel
   inline void gather(const unsigned int root_id,
 		     std::complex<T> send,
 		     std::vector<std::complex<T> > &recv,
-                     const Communicator &comm)
+                     const Communicator &comm = Communicator_World)
   {
     libmesh_assert(root_id < comm.size());
 
@@ -2526,7 +2527,7 @@ namespace Parallel
   template <typename T>
   inline void gather(const unsigned int root_id,
 		     std::vector<std::complex<T> > &r,
-                     const Communicator &comm)
+                     const Communicator &comm = Communicator_World)
   {
     if (comm.size() == 1)
       {
@@ -2609,7 +2610,7 @@ namespace Parallel
   template <typename T>
   inline void allgather(std::complex<T> send,
 			std::vector<std::complex<T> > &recv,
-                        const Communicator &comm)
+                        const Communicator &comm = Communicator_World)
   {
     START_LOG ("allgather()","Parallel");
 
