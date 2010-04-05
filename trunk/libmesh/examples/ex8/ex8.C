@@ -133,19 +133,25 @@ int main (int argc, char** argv)
     }
 
   // LasPack solvers don't work so well for this example
-  // (not sure why).  Print a warning to the user if PETSc
-  // is not available, or if they are using LasPack solvers.
-#ifdef LIBMESH_HAVE_PETSC
-  if ((libMesh::on_command_line("--use-laspack")) ||
-      (libMesh::on_command_line("--disable-petsc")))
-#endif
+  // (not sure why), and Trilinos matrices don't work at all.
+  // Print a warning to the user if PETSc is not in use.
+  if (libMesh::default_solver_package() == LASPACK_SOLVERS)
     {
       std::cout << "WARNING! It appears you are using the\n"
-                << "LasPack solvers.  ex8 is known not to converge\n"
+                << "LasPack solvers.  ex8 may not converge\n"
                 << "using LasPack, but should work OK with PETSc.\n"
-                << "If possible, download and install the PETSc\n"
-                << "library from www-unix.mcs.anl.gov/petsc/petsc-2/\n"
+                << "http://www.mcs.anl.gov/petsc/\n"
                 << std::endl;
+    }
+  else if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
+    {
+      std::cout << "WARNING! It appears you are using the\n"
+                << "Trilinos solvers.  The current libMesh Epetra\n"
+                << "interface does not allow sparse matrix addition,\n"
+                << "as is needed in this problem.  We recommend\n"
+                << "using PETSc: http://www.mcs.anl.gov/petsc/\n"
+                << std::endl;
+      return 0;
     }
   
   // Get the name of the mesh file
