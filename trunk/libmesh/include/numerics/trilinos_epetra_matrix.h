@@ -209,8 +209,6 @@ public:
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,
    * stores the result in \p this: 
    * \f$\texttt{this} = a*X + \texttt{this} \f$.
-   * Use this with caution, the sparse matrices need to have the
-   * same nonzero pattern, otherwise \p PETSc will crash! 
    * It is advisable to not only allocate appropriate memory with 
    * \p init() , but also explicitly zero the terms of \p this
    * whenever you add a non-zero value to \p X.  Note: \p X will 
