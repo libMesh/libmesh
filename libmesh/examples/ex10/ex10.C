@@ -120,6 +120,10 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-amr");
 #else
 
+  // Our Trilinos interface does not yet support adaptive transient
+  // problems
+  libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
+
   // Brief message to the user regarding the program name
   // and command line arguments.
 

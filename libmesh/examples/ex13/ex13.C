@@ -86,6 +86,15 @@ int main (int argc, char** argv)
   const unsigned int dim = 2;     
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
   
+  // Trilinos solver NaNs by default on the zero pressure block.
+  // We'll skip this example for now.
+  if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
+    {
+      std::cout << "We skip example 13 when using the Trilinos solvers.\n"
+                << std::endl;
+      return 0;
+    }
+
   // Create a two-dimensional mesh.
   Mesh mesh (dim);
   

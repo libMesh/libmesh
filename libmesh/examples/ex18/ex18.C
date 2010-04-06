@@ -54,6 +54,15 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-amr");
 #else
 
+  // Trilinos solver NaNs by default on the zero pressure block.
+  // We'll skip this example for now.
+  if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
+    {
+      std::cout << "We skip example 18 when using the Trilinos solvers.\n"
+                << std::endl;
+      return 0;
+    }
+
   // Parse the input file
   GetPot infile("ex18.in");
 
