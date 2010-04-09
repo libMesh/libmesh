@@ -2011,9 +2011,11 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
       std::vector<unsigned int>
 	element_dofs_i,
 	element_dofs_j,
+	neighbor_dofs,
 	dofs_to_add;
 
 
+      std::vector<const Elem*> active_neighbors;
       for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
 	for (unsigned int vi=0; vi<n_var; vi++)
 	  {
@@ -2127,6 +2129,45 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 				  SparsityPattern::sort_row (row.begin(), row.begin()+old_size, row.end());
 				}
 			    }
+         		  // Now (possibly) add dofs from neighboring elements
+         		  // TODO:[BSK] optimize this like above!
+         		  if (implicit_neighbor_dofs)
+         		    for (unsigned int s=0; s<elem->n_sides(); s++)
+         		      if (elem->neighbor(s) != NULL)
+         			{
+         			  const Elem* const neighbor_0 = elem->neighbor(s);
+         #ifdef LIBMESH_ENABLE_AMR
+         			  neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
+         #else
+         			  active_neighbors.clear();
+         			  active_neighbors.push_back(neighbor_0);
+         #endif
+         			  
+         			  for (unsigned int a=0; a != active_neighbors.size(); ++a)
+         			    {
+         			      const Elem *neighbor = active_neighbors[a];
+         			      
+         			      dof_map.dof_indices (neighbor, neighbor_dofs);
+     #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+     			            dof_map.find_connected_dofs (neighbor_dofs);
+     #endif		      	      
+     			            const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
+     			            
+     			            for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
+     			              {
+     			                const unsigned int jg = neighbor_dofs[j];
+     			                
+     			                // See if jg is in the sorted range
+     			                std::pair<SparsityPattern::Row::iterator,
+     			                          SparsityPattern::Row::iterator>
+     			                  pos = std::equal_range (row.begin(), row.end(), jg);
+     			               
+     			                // Insert jg if it wasn't found
+     			                if (pos.first == pos.second)
+     			                  row.insert (pos.first, jg);
+     			              }    
+     			          }
+     			      }
 			}
 		    }
 		}
