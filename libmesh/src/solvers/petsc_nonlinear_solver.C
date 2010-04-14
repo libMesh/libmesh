@@ -317,15 +317,19 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 // 2.3.x & newer style	
 #else
 	
- ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
-        CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  	
+  ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  ierr = SNESGetIterationNumber(_snes,&n_iterations);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 
+  ierr = SNESGetFunctionNorm(_snes,&final_residual_norm);
+	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 
 #endif
 
   SNESConvergedReason reason;
   SNESGetConvergedReason(_snes,&reason);
-  SNESGetIterationNumber(_snes,&n_iterations);
-  SNESGetFunctionNorm(_snes,&final_residual_norm);
 
   //Based on Petsc 2.3.3 documentation all diverged reasons are negative
   this->converged = reason >= 0;
