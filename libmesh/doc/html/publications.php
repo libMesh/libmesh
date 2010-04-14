@@ -45,8 +45,7 @@ B.&nbsp;Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 </td>
 </tr>
-</table>
-<a name="Dissertations"</a>
+</table><a name="Dissertations"></a>
 <h2>Dissertations & Theses</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.75
@@ -192,9 +191,7 @@ J.&nbsp;W. Peterson.
 
 </td>
 </tr>
-</table>
-
-<a name="Preprints"></a>
+</table><a name="Preprints"></a>
 <h2>Preprints</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.75
@@ -207,7 +204,33 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right">
-[<a name="Knezevic_2009b">1</a>]
+[<a name="Botti_2010p">1</a>]
+</td>
+<td>
+L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
+  A pressure-correction scheme for convection-dominated incompressible
+  flows with discontinuous velocity and continuous pressure.
+  <em>PREPRINT, Submitted to Journal of Computational Physics</em>, 2010.
+  <a href="http://hal.archives-ouvertes.fr/hal-00458293/">http://hal.archives-ouvertes.fr/hal-00458293/</a>.<br />
+<p><a name="Botti_2010p"></a><pre>
+@ARTICLE{Botti_2010p,
+  AUTHOR = {L.~Botti and D.~A.~Di Pietro},
+  TITLE = {{A pressure-correction scheme for convection-dominated incompressible flows
+    with discontinuous velocity and continuous pressure}},
+  JOURNAL = {PREPRINT, Submitted to Journal of Computational Physics},
+  YEAR = 2010,
+  NOTE = {\url{http://hal.archives-ouvertes.fr/hal-00458293/}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Knezevic_2009b">2</a>]
 </td>
 <td>
 D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
@@ -236,7 +259,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right">
-[<a name="Nagler_2009">2</a>]
+[<a name="Nagler_2009">3</a>]
 </td>
 <td>
 L.&nbsp;Nagler and M.&nbsp;Schanz.
@@ -261,7 +284,7 @@ L.&nbsp;Nagler and M.&nbsp;Schanz.
 
 <tr valign="top">
 <td align="right">
-[<a name="Peterson_2010b">3</a>]
+[<a name="Peterson_2010b">4</a>]
 </td>
 <td>
 J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
@@ -284,9 +307,7 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 </td>
 </tr>
-</table>
-
-<a name="Articles"></a>
+</table><a name="Articles"></a>
 <h2>2010</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.75
