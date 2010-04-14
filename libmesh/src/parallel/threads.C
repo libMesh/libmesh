@@ -29,3 +29,4 @@
 // Threads:: object instantiation
 Threads::spin_mutex Threads::spin_mtx;
 Threads::recursive_mutex Threads::recursive_mtx;
+bool Threads::in_threads = false;

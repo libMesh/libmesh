@@ -25,6 +25,7 @@
 
 // Local includes
 #include "libmesh_config.h"
+#include "libmesh_common.h"  // for libmesh_assert
 
 // Threading building blocks includes
 #ifdef LIBMESH_HAVE_TBB_API
@@ -47,6 +48,25 @@
  */
 namespace Threads
 {
+  /**
+   * A boolean which is true iff we are in a Threads:: function
+   * It may be useful to assert(!Threads::in_threads) in any code
+   * which is known to not be thread-safe.
+   */
+  extern bool in_threads;
+
+  /**
+   * We use a class to turn Threads::in_threads on and off, to be
+   * exception-safe.
+   */
+  class BoolAcquire {
+  public:
+    BoolAcquire(bool& b) : _b(b) { libmesh_assert(!_b); _b = true; }
+
+    ~BoolAcquire() { libmesh_assert(_b); _b = false; }
+  private:
+    bool& _b;
+  };
 
 #ifdef LIBMESH_HAVE_TBB_API
   //-------------------------------------------------------------------
@@ -75,6 +95,8 @@ namespace Threads
   inline
   void parallel_for (const Range &range, const Body &body)
   {
+    BoolAcquire b(in_threads);
+
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
@@ -103,6 +125,8 @@ namespace Threads
   inline
   void parallel_for (const Range &range, const Body &body, const Partitioner &partitioner)
   { 
+    BoolAcquire b(in_threads);
+
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
@@ -131,6 +155,8 @@ namespace Threads
   inline
   void parallel_reduce (const Range &range, Body &body)
   { 
+    BoolAcquire b(in_threads);
+
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
@@ -159,6 +185,8 @@ namespace Threads
   inline
   void parallel_reduce (const Range &range, Body &body, const Partitioner &partitioner)
   { 
+    BoolAcquire b(in_threads);
+
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
@@ -234,7 +262,10 @@ namespace Threads
   template <typename Range, typename Body>
   inline
   void parallel_for (const Range &range, const Body &body)
-  { body(range); }
+  { 
+    BoolAcquire b(in_threads);
+    body(range);
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -244,7 +275,10 @@ namespace Threads
   template <typename Range, typename Body, typename Partitioner>
   inline
   void parallel_for (const Range &range, const Body &body, const Partitioner &)
-  { body(range); }
+  {
+    BoolAcquire b(in_threads);
+    body(range);
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -254,7 +288,10 @@ namespace Threads
   template <typename Range, typename Body>
   inline
   void parallel_reduce (const Range &range, Body &body)
-  { body(range); }
+  {
+    BoolAcquire b(in_threads);
+    body(range);
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -264,7 +301,10 @@ namespace Threads
   template <typename Range, typename Body, typename Partitioner>
   inline
   void parallel_reduce (const Range &range, Body &body, const Partitioner &)
-  { body(range); }
+  {
+    BoolAcquire b(in_threads);
+    body(range);
+  }
 
   //-------------------------------------------------------------------
   /**
@@ -466,8 +506,6 @@ namespace Threads
    * A recursive mutex object which 
    */
   extern recursive_mutex recursive_mtx;
-
-
 
 } // namespace Threads
 
