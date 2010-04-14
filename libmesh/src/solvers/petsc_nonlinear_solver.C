@@ -322,14 +322,14 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   SNESConvergedReason reason;
   SNESGetConvergedReason(_snes,&reason);
-
+  SNESGetIterationNumber(_snes,&n_iterations);
+  
   //Based on Petsc 2.3.3 documentation all diverged reasons are negative
   this->converged = reason >= 0;
 
   this->clear();
 		 
-  // return the # of its. and the final residual norm.  Note that
-  // n_iterations may be zero for PETSc versions 2.2.x and greater.
+  // return the # of its. and the final residual norm.
   return std::make_pair(n_iterations, 0.);
 }
 
