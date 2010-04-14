@@ -265,6 +265,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   int ierr=0;
   int n_iterations =0;
+  // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
+  Real final_residual_norm=0.; 
 
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -323,14 +325,15 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   SNESConvergedReason reason;
   SNESGetConvergedReason(_snes,&reason);
   SNESGetIterationNumber(_snes,&n_iterations);
-  
+  SNESGetFunctionNorm(_snes,&final_residual_norm);
+
   //Based on Petsc 2.3.3 documentation all diverged reasons are negative
   this->converged = reason >= 0;
 
   this->clear();
 		 
   // return the # of its. and the final residual norm.
-  return std::make_pair(n_iterations, 0.);
+  return std::make_pair(n_iterations, final_residual_norm);
 }
 
 
