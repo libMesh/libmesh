@@ -248,12 +248,26 @@ namespace Parallel
     Communicator () : _rank(0), _size(1), _I_duped_it(false) {}
 #endif
 
+    /*
+     * Constructor from MPI_Comm
+     */
     explicit Communicator (const communicator &comm) {
       this->assign(comm);
     }
 
     ~Communicator () {
       this->clear();
+    }
+
+    /*
+     * Create a new communicator between some subset of \p this
+     */
+    void split(int color, int key, Communicator &target) {
+#ifdef LIBMESH_HAVE_MPI
+      MPI_Comm_split(this->get(), color, key, &target.get());
+#else
+      target.assign(this->get());
+#endif
     }
 
     void duplicate(const Communicator &comm) {
