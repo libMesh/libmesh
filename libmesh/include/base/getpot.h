@@ -1,5 +1,5 @@
 //  -*- c++ -*-
-//  GetPot Version 1.1-libMeshHPCT_fork                        Feb/16/2010
+//  GetPot Version libMeshHPCT_fork-1.2                        Apr/14/2010
 //  Based on "getpot-1.1.1.tgz" version from SourceForge
 //
 //  New code (C) 2009-2010 Roy Stogner, Karl Schulz
@@ -59,11 +59,16 @@ extern "C" {
 #include <vector>
 
 // We need a mutex to keep const operations thread-safe in the
-// presence of mutable containers.  Right now we're using the libMesh
+// presence of mutable containers.  Right now GetPot supports a
 // Threads::scoped_mutex wrapper around TBB, and we're assuming that
-// users aren't doing any threaded GetPot usage when libMesh threads
-// are disabled.
-#include "threads.h"
+// users aren't doing any threaded GetPot usage when TBB threads are
+// disabled.
+#if !defined(GETPOT_DISABLE_MUTEX)
+  #include "threads.h"
+  #define SCOPED_MUTEX  Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
+#else
+  #define SCOPED_MUTEX
+#endif
 
 typedef  std::vector<std::string>  STRING_VECTOR;
 
@@ -71,7 +76,13 @@ typedef  std::vector<std::string>  STRING_VECTOR;
   std::vector<TYPE>::const_iterator ITERATOR = (VARIABLE).begin(); \
   for(; (ITERATOR) != (VARIABLE).end(); (ITERATOR)++)
 
-
+// We allow GETPOT_NAMESPACE to be defined before this file is
+// included; if libraries using two different versions of GetPot might
+// be linked together, the result may be unsafe unless they're put in
+// different namespaces.
+#ifdef GETPOT_NAMESPACE
+namespace GETPOT_NAMESPACE {
+#endif
 class GetPot {
     //--------
     inline void _basic_initialization();
@@ -287,7 +298,9 @@ private:
     //        want to be able to call const member functions from
     //        multiple threads at once, so we'll wrap access to
     //        mutable objects in a mutex.
+#if !defined(GETPOT_DISABLE_MUTEX)
     mutable Threads::spin_mutex _getpot_mtx;
+#endif
 
     //     -- some functions return a char pointer to a string created on the fly.
     //        this container makes them 'available' until the getpot object is destroyed.
@@ -566,7 +579,7 @@ GetPot::absorb(const GetPot& Other)
 
     if( request_recording_f ) { 
         // Get a lock before touching anything mutable
-        Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
+        SCOPED_MUTEX;
 
 	_requested_arguments.insert(_requested_sections.end(), 
 				    Other._requested_arguments.begin(), Other._requested_arguments.end());
@@ -582,7 +595,7 @@ inline void
 GetPot::clear_requests()
 {
     // Get a lock before touching anything mutable
-    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
+    SCOPED_MUTEX;
 
     _requested_arguments.erase(_requested_arguments.begin(), _requested_arguments.end());
     _requested_variables.erase(_requested_variables.begin(), _requested_variables.end());
@@ -621,7 +634,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 	    // (*) sections are considered 'requested arguments'
 	    if( request_recording_f ) {
                 // Get a lock before touching anything mutable
-                Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
+                SCOPED_MUTEX;
 
                 _requested_arguments.push_back(arg);
             }
@@ -651,7 +664,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 		//     detection routine.
 		if( request_recording_f ) {
                     // Get a lock before touching anything mutable
-                    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
+                    SCOPED_MUTEX;
 
                     _requested_arguments.push_back(arg);
                 }
@@ -944,7 +957,7 @@ GetPot::_internal_managed_copy(const std::string& Arg) const
     const char* arg = Arg.c_str();
 
     // Get a lock before touching anything mutable
-    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
+    SCOPED_MUTEX;
 
     // See if there's already an identical string saved
     std::set<const char*,ltstr>::const_iterator it = 
@@ -1404,7 +1417,7 @@ GetPot::_record_argument_request(const std::string& Name) const
     if( ! request_recording_f ) return; 
 
     // Get a lock before touching anything mutable
-    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
+    SCOPED_MUTEX;
 
     // (*) record requested variable for later ufo detection
     _requested_arguments.push_back(Name);
@@ -1422,7 +1435,7 @@ GetPot::_record_variable_request(const std::string& Name) const
     if( ! request_recording_f ) return; 
 
     // Get a lock before touching anything mutable
-    Threads::spin_mutex::scoped_lock lock(_getpot_mtx);
+    SCOPED_MUTEX;
 
     // (*) record requested variable for later ufo detection
     _requested_variables.push_back(Name);
@@ -2343,8 +2356,11 @@ GetPot::variable::operator=(const GetPot::variable& Other)
     return *this;
 }
 
-#undef victorate
+#ifdef GETPOT_NAMESPACE
+}
+#endif
 
+#undef victorate
 
 #endif // __GETPOT_H__
 
