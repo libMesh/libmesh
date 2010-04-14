@@ -490,39 +490,47 @@ int main (int argc, char** argv)
   _equation_system = &equation_systems;
   
   // Declare the system and its variables.
-  {
-    // Creates a system named "Laplace-Young"
-    NonlinearImplicitSystem& system =
-      equation_systems.add_system<NonlinearImplicitSystem> ("Laplace-Young");
-
-
-    // Here we specify the tolerance for the nonlinear solver and 
-    // the maximum of nonlinear iterations. 
-    equation_systems.parameters.set<Real>         ("nonlinear solver tolerance")          = 1.e-12;
-    equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations") = 50;
-
-    
-    // Adds the variable "u" to "Laplace-Young".  "u"
-    // will be approximated using second-order approximation.
-    system.add_variable("u",
-                        Utility::string_to_enum<Order>   (order),
-                        Utility::string_to_enum<FEFamily>(family));
-
-    // Give the system a pointer to the functions that update 
-    // the residual and Jacobian.
-    
-    system.nonlinear_solver->residual = compute_residual;
-    system.nonlinear_solver->jacobian = compute_jacobian;
-
-    // Initialize the data structures for the equation system.
-    equation_systems.init();
-
-    // Prints information about the system to the screen.
-    equation_systems.print_info();
-  }
   
-  // Solve the system "Laplace-Young"
+  // Creates a system named "Laplace-Young"
+  NonlinearImplicitSystem& system =
+    equation_systems.add_system<NonlinearImplicitSystem> ("Laplace-Young");
+
+
+  // Here we specify the tolerance for the nonlinear solver and 
+  // the maximum of nonlinear iterations. 
+  equation_systems.parameters.set<Real>         ("nonlinear solver tolerance")          = 1.e-12;
+  equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations") = 50;
+
+    
+  // Adds the variable "u" to "Laplace-Young".  "u"
+  // will be approximated using second-order approximation.
+  system.add_variable("u",
+		      Utility::string_to_enum<Order>   (order),
+		      Utility::string_to_enum<FEFamily>(family));
+
+  // Give the system a pointer to the functions that update 
+  // the residual and Jacobian.
+  system.nonlinear_solver->residual = compute_residual;
+  system.nonlinear_solver->jacobian = compute_jacobian;
+
+  // Initialize the data structures for the equation system.
+  equation_systems.init();
+
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
+  
+  // Solve the system "Laplace-Young", print the number of iterations
+  // and final residual
   equation_systems.get_system("Laplace-Young").solve();
+
+  // Print out final convergence information.  This duplicates some
+  // output from during the solve itself, but demonstrates another way
+  // to get this information after the solve is complete.
+  std::cout << "Laplace-Young system solved at nonlinear iteration "
+	    << system.n_nonlinear_iterations()
+	    << " , final nonlinear residual norm: "
+	    << system.final_nonlinear_residual()
+	    << std::endl;
 
   // After solving the system write the solution
   GMVIO (mesh).write_equation_systems ("out.gmv", 
