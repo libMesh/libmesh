@@ -261,143 +261,153 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   // resize the vectors to hold current data
   // Phi are the shape functions used for the FE approximation
   // Phi_map are the shape functions used for the FE mapping
-  {
-    if (calculate_phi)
-      phi.resize     (n_approx_shape_functions);
-    if (calculate_dphi)
-      {
-        dphi.resize    (n_approx_shape_functions);
-        dphidx.resize  (n_approx_shape_functions);
-        dphidy.resize  (n_approx_shape_functions);
-        dphidz.resize  (n_approx_shape_functions);
-        dphidxi.resize (n_approx_shape_functions);
+  if (calculate_phi)
+    phi.resize     (n_approx_shape_functions);
+  if (Dim > 0)
+    {
+      if (calculate_dphi)
+        {
+          dphi.resize    (n_approx_shape_functions);
+          dphidx.resize  (n_approx_shape_functions);
+          dphidy.resize  (n_approx_shape_functions);
+          dphidz.resize  (n_approx_shape_functions);
+          dphidxi.resize (n_approx_shape_functions);
 
-        if (Dim > 1)
-          dphideta.resize      (n_approx_shape_functions);
+          if (Dim > 1)
+            dphideta.resize      (n_approx_shape_functions);
     
-        if (Dim == 3)
-          dphidzeta.resize     (n_approx_shape_functions);
-      }
+          if (Dim > 2)
+            dphidzeta.resize     (n_approx_shape_functions);
+        }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    if (calculate_d2phi)
-      {
-        d2phi.resize     (n_approx_shape_functions);
-        d2phidx2.resize  (n_approx_shape_functions);
-        d2phidxdy.resize (n_approx_shape_functions);
-        d2phidxdz.resize (n_approx_shape_functions);
-        d2phidy2.resize  (n_approx_shape_functions);
-        d2phidydz.resize (n_approx_shape_functions);
-        d2phidz2.resize  (n_approx_shape_functions);
-        d2phidxi2.resize (n_approx_shape_functions);
-        if (Dim > 1)
-          {
-            d2phidxideta.resize (n_approx_shape_functions);
-            d2phideta2.resize   (n_approx_shape_functions);
-          }
-        if (Dim > 2)
-          {
-            d2phidxidzeta.resize  (n_approx_shape_functions);
-            d2phidetadzeta.resize (n_approx_shape_functions);
-            d2phidzeta2.resize    (n_approx_shape_functions);
-          }
-      }
+      if (calculate_d2phi)
+        {
+          d2phi.resize     (n_approx_shape_functions);
+          d2phidx2.resize  (n_approx_shape_functions);
+          d2phidxdy.resize (n_approx_shape_functions);
+          d2phidxdz.resize (n_approx_shape_functions);
+          d2phidy2.resize  (n_approx_shape_functions);
+          d2phidydz.resize (n_approx_shape_functions);
+          d2phidz2.resize  (n_approx_shape_functions);
+          d2phidxi2.resize (n_approx_shape_functions);
+          if (Dim > 1)
+            {
+              d2phidxideta.resize (n_approx_shape_functions);
+              d2phideta2.resize   (n_approx_shape_functions);
+            }
+          if (Dim > 2)
+            {
+              d2phidxidzeta.resize  (n_approx_shape_functions);
+              d2phidetadzeta.resize (n_approx_shape_functions);
+              d2phidzeta2.resize    (n_approx_shape_functions);
+            }
+        }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    }
     
-    phi_map.resize         (n_mapping_shape_functions);
-    dphidxi_map.resize     (n_mapping_shape_functions);
+  phi_map.resize         (n_mapping_shape_functions);
+  if (Dim > 0)
+    {
+      dphidxi_map.resize     (n_mapping_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    d2phidxi2_map.resize   (n_mapping_shape_functions);
+      d2phidxi2_map.resize   (n_mapping_shape_functions);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    }
     
-    if (Dim > 1)
-      {
-        dphideta_map.resize  (n_mapping_shape_functions);
+  if (Dim > 1)
+    {
+      dphideta_map.resize  (n_mapping_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        d2phidxideta_map.resize   (n_mapping_shape_functions);
-        d2phideta2_map.resize     (n_mapping_shape_functions);
+      d2phidxideta_map.resize   (n_mapping_shape_functions);
+      d2phideta2_map.resize     (n_mapping_shape_functions);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      }
+    }
     
-    if (Dim == 3)
-      {
-        dphidzeta_map.resize (n_mapping_shape_functions);
+  if (Dim > 2)
+    {
+      dphidzeta_map.resize (n_mapping_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        d2phidxidzeta_map.resize  (n_mapping_shape_functions);
-        d2phidetadzeta_map.resize (n_mapping_shape_functions);
-        d2phidzeta2_map.resize    (n_mapping_shape_functions);
+      d2phidxidzeta_map.resize  (n_mapping_shape_functions);
+      d2phidetadzeta_map.resize (n_mapping_shape_functions);
+      d2phidzeta2_map.resize    (n_mapping_shape_functions);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      }
+    }
     
-    for (unsigned int i=0; i<n_approx_shape_functions; i++)
-      {
-	if (calculate_phi)
-	  phi[i].resize         (n_qp);
-	if (calculate_dphi)
-	  {
-	    dphi[i].resize        (n_qp);
-	    dphidx[i].resize      (n_qp);
-	    dphidy[i].resize      (n_qp);
-	    dphidz[i].resize      (n_qp);
-	    dphidxi[i].resize     (n_qp);
+  for (unsigned int i=0; i<n_approx_shape_functions; i++)
+    {
+      if (calculate_phi)
+        phi[i].resize         (n_qp);
+      if (Dim > 0)
+        {
+	  if (calculate_dphi)
+	    {
+	      dphi[i].resize        (n_qp);
+	      dphidx[i].resize      (n_qp);
+	      dphidy[i].resize      (n_qp);
+	      dphidz[i].resize      (n_qp);
+	      dphidxi[i].resize     (n_qp);
 
-	    if (Dim > 1)
-	      dphideta[i].resize  (n_qp);
+	      if (Dim > 1)
+	        dphideta[i].resize  (n_qp);
 	   
-	    if (Dim == 3)	     
-	      dphidzeta[i].resize (n_qp);
-	  }
+	      if (Dim > 2)	     
+	        dphidzeta[i].resize (n_qp);
+	    }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	if (calculate_d2phi)
-	  {
-            d2phi[i].resize     (n_qp);
-            d2phidx2[i].resize  (n_qp);
-            d2phidxdy[i].resize (n_qp);
-            d2phidxdz[i].resize (n_qp);
-            d2phidy2[i].resize  (n_qp);
-            d2phidydz[i].resize (n_qp);
-            d2phidz2[i].resize  (n_qp);
-            d2phidxi2[i].resize (n_qp);
-            if (Dim > 1)
-              {
-                d2phidxideta[i].resize (n_qp);
-                d2phideta2[i].resize   (n_qp);
-              }
-            if (Dim > 2)
-              {
-                d2phidxidzeta[i].resize  (n_qp);
-                d2phidetadzeta[i].resize (n_qp);
-                d2phidzeta2[i].resize    (n_qp);
-              }
-	  }
+	  if (calculate_d2phi)
+	    {
+              d2phi[i].resize     (n_qp);
+              d2phidx2[i].resize  (n_qp);
+              d2phidxdy[i].resize (n_qp);
+              d2phidxdz[i].resize (n_qp);
+              d2phidy2[i].resize  (n_qp);
+              d2phidydz[i].resize (n_qp);
+              d2phidz2[i].resize  (n_qp);
+              d2phidxi2[i].resize (n_qp);
+              if (Dim > 1)
+                {
+                  d2phidxideta[i].resize (n_qp);
+                  d2phideta2[i].resize   (n_qp);
+                }
+              if (Dim > 2)
+                {
+                  d2phidxidzeta[i].resize  (n_qp);
+                  d2phidetadzeta[i].resize (n_qp);
+                  d2phidzeta2[i].resize    (n_qp);
+                }
+	    }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      }
+        }
+    }
        
-    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-      {
-	phi_map[i].resize         (n_qp);
-	dphidxi_map[i].resize     (n_qp);
+  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+    {
+      phi_map[i].resize         (n_qp);
+      if (Dim > 0)
+        {
+	  dphidxi_map[i].resize     (n_qp);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	d2phidxi2_map[i].resize     (n_qp);
-	if (Dim > 1)
-          {
-            d2phidxideta_map[i].resize (n_qp);
-            d2phideta2_map[i].resize (n_qp);
-          }
-        if (Dim > 2)
-          {
-            d2phidxidzeta_map[i].resize  (n_qp);
-            d2phidetadzeta_map[i].resize (n_qp);
-            d2phidzeta2_map[i].resize    (n_qp);
-          }
+	  d2phidxi2_map[i].resize     (n_qp);
+	  if (Dim > 1)
+            {
+              d2phidxideta_map[i].resize (n_qp);
+              d2phideta2_map[i].resize (n_qp);
+            }
+          if (Dim > 2)
+            {
+              d2phidxidzeta_map[i].resize  (n_qp);
+              d2phidetadzeta_map[i].resize (n_qp);
+              d2phidzeta2_map[i].resize    (n_qp);
+            }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	   
-	if (Dim > 1)
-	  dphideta_map[i].resize  (n_qp);
+	  if (Dim > 1)
+	    dphideta_map[i].resize  (n_qp);
 	   
-	if (Dim == 3)
-	  dphidzeta_map[i].resize (n_qp);
-      }
-  }
+	  if (Dim > 2)
+	    dphidzeta_map[i].resize (n_qp);
+        }
+    }
 
 
       
@@ -428,6 +438,24 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   
   switch (Dim)
     {
+
+      //------------------------------------------------------------
+      // 0D
+    case 0:
+      {
+	// Compute the value of the approximation shape function i at quadrature point p
+	if (calculate_phi)
+	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
+	    for (unsigned int p=0; p<n_qp; p++)
+	      phi[i][p]      = FE<Dim,T>::shape       (elem, fe_type.order, i,    qp[p]);
+	for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+	  for (unsigned int p=0; p<n_qp; p++)
+	    phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+
+        break;
+      }
+
+
 
       //------------------------------------------------------------
       // 1D

@@ -41,6 +41,15 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
   switch (this->dim)
     {
       //--------------------------------------------------------------------
+      // 0D
+    case 0:
+      {
+	xyz[p] = elem->point(0);
+	JxW[p] = qw[p];
+        break;
+      }
+
+      //--------------------------------------------------------------------
       // 1D
     case 1:
       {
