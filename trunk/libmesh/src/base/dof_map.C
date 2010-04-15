@@ -637,6 +637,8 @@ void DofMap::clear()
 
   _dof_constraints.clear();
   _n_old_dfs = 0;
+  _first_old_df.clear();
+  _end_old_df.clear();
 
 #endif
 
@@ -688,7 +690,12 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   std::vector<unsigned int> dofs_on_proc(n_proc, 0);
   Parallel::allgather(next_free_dof, dofs_on_proc);
 
-  // Resize the _first_df and _end_df arrays
+  // Resize and fill the _first_df and _end_df arrays
+#ifdef LIBMESH_ENABLE_AMR
+  _first_old_df = _first_df;
+  _end_old_df = _end_df;
+#endif
+
   _first_df.resize(n_proc);
   _end_df.resize (n_proc);
 
