@@ -364,6 +364,12 @@ public:
   { libmesh_assert(proc < _first_df.size()); return _first_df[proc]; }
   
   /**
+   * Returns the first old dof index that is local to subdomain \p proc.
+   */
+  unsigned int first_old_dof(const unsigned int proc = libMesh::processor_id()) const
+  { libmesh_assert(proc < _first_old_df.size()); return _first_old_df[proc]; }
+  
+  /**
    * Returns the last dof index that is local to subdomain \p proc.
    * This function is now deprecated, because it returns nonsense in the rare
    * case where \p proc has no local dof indices.  Use end_dof() instead.
@@ -377,6 +383,13 @@ public:
    */
   unsigned int end_dof(const unsigned int proc = libMesh::processor_id()) const
   { libmesh_assert(proc < _end_df.size()); return _end_df[proc]; }
+  
+  /**
+   * Returns the first old dof index that is after all indices local to subdomain \p proc.
+   * Analogous to the end() member function of STL containers.
+   */
+  unsigned int end_old_dof(const unsigned int proc = libMesh::processor_id()) const
+  { libmesh_assert(proc < _end_old_df.size()); return _end_old_df[proc]; }
   
   /**
    * Returns the first local degree of freedom index for variable \p var.
@@ -853,6 +866,16 @@ private:
    * Total number of degrees of freedom on old dof objects
    */
   unsigned int _n_old_dfs;
+
+  /**
+   * First old DOF index on processor \p p.
+   */
+  std::vector<unsigned int> _first_old_df;
+
+  /**
+   * Last old DOF index (plus 1) on processor \p p.
+   */
+  std::vector<unsigned int> _end_old_df;
 
 #endif
 
