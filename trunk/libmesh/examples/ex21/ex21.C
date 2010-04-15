@@ -32,6 +32,7 @@
 #include "equation_systems.h"
 #include "mesh_data.h"
 #include "mesh_generation.h"
+#include "mesh_modification.h"
 #include "elem.h"
 #include "transient_system.h"
 #include "fe.h"
@@ -451,21 +452,30 @@ int main (int argc, char** argv)
 
   //Read in parameters from the input file
   const unsigned int adaptive_refinement_steps = input_file("max_adaptive_r_steps",3);
-  const unsigned int uniform_refinement_steps = input_file("uniform_h_r_steps",3);
-  const Real refine_fraction = input_file("refine_fraction",0.5);
-  const Real coarsen_fraction = input_file("coarsen_fraction",0.);
-  const unsigned int max_h_level = input_file("max_h_level", 10);
-  const std::string refinement_type = input_file("refinement_type","p");
-  Order p_order = static_cast<Order>(input_file("p_order",1));
-  const Real penalty = input_file("ip_penalty", 10.);
-  const bool singularity = input_file("singularity", true);
+  const unsigned int uniform_refinement_steps  = input_file("uniform_h_r_steps",3);
+  const Real refine_fraction                   = input_file("refine_fraction",0.5);
+  const Real coarsen_fraction                  = input_file("coarsen_fraction",0.);
+  const unsigned int max_h_level               = input_file("max_h_level", 10);
+  const std::string refinement_type            = input_file("refinement_type","p");
+  Order p_order                                = static_cast<Order>(input_file("p_order",1));
+  const std::string element_type               = input_file("element_type", "tensor");
+  const Real penalty                           = input_file("ip_penalty", 10.);
+  const bool singularity                       = input_file("singularity", true);
+  const unsigned int dim                       = input_file("dimension", 3);
 
-  // Create a 3D mesh
-  const unsigned int dim = 3;     
+  // Create or read the mesh
   Mesh mesh (dim);
 
-  // Read the mesh
-  mesh.read ("lshaped3D.xda");
+  if (dim == 1)
+    MeshTools::Generation::build_line(mesh,1,-1.,0.);
+  else if (dim == 2)
+    mesh.read("lshaped.xda");
+  else
+    mesh.read ("lshaped3D.xda");
+
+  // Use triangles if the config file says so
+  if (element_type == "simplex")
+    MeshTools::Modification::all_tri(mesh);
 
   // Mesh Refinement object 
   MeshRefinement mesh_refinement(mesh);
