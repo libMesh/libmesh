@@ -336,21 +336,17 @@ void System::update ()
 
 void System::re_update ()
 {
-  //const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
-
   // If this system is empty... don't do anything!
   if(!this->n_vars())
     return;
 
-  // Explicitly build a send_list
-  std::vector<unsigned int> send_list(solution->size());
-  Utility::iota (send_list.begin(), send_list.end(), 0);
-  
+  const std::vector<unsigned int>& send_list = this->get_dof_map().get_send_list ();
+
   // Check sizes
   libmesh_assert (current_local_solution->size()       == solution->size());
   // Not true with ghosted vectors
   // libmesh_assert (current_local_solution->local_size() == solution->size());
-  libmesh_assert (!send_list.empty());
+  // libmesh_assert (!send_list.empty());
   libmesh_assert (send_list.size() <= solution->size());
 
   // Create current_local_solution from solution.  This will
