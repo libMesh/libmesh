@@ -753,6 +753,9 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
+  const unsigned int first_old_dof = dof_map.first_old_dof();
+  const unsigned int end_old_dof   = dof_map.end_old_dof();
+
   // We can handle all the variables at once.
   // The old global DOF indices
   std::vector<unsigned int> di;
@@ -786,10 +789,22 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
 	  // Fix up the parent's p level in case we changed it
 	  (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
 	}
+      else if (elem->refinement_flag() == Elem::JUST_COARSENED)
+	{
+          std::vector<unsigned int> di_child;
+          di.clear();
+          for (unsigned int c=0; c != elem->n_children(); ++c)
+            {
+	      dof_map.old_dof_indices (elem->child(c), di_child);
+              di.insert(di.end(), di_child.begin(), di_child.end());
+            }
+        }
       else
 	dof_map.old_dof_indices (elem, di);
-      
-      this->send_list.insert(send_list.end(), di.begin(), di.end());
+
+      for (unsigned int i=0; i != di.size(); ++i)
+        if (di[i] < first_old_dof || di[i] >= end_old_dof)
+          this->send_list.push_back(di[i]);
     }  // end elem loop
 #endif // LIBMESH_ENABLE_AMR
 }
