@@ -780,11 +780,16 @@ void PetscVector<T>::init (const unsigned int n,
   int petsc_n_local=static_cast<int>(n_local);
   int petsc_n_ghost=static_cast<int>(ghost.size());
 
-  // If the mesh is disjoint, the following assertion will fail.
   // If the mesh is not disjoint, every processor will either have
   // all the dofs, none of the dofs, or some non-zero dofs at the
   // boundary between processors.
-  libmesh_assert(n_local == 0 || n_local == n || !ghost.empty());
+  //
+  // However we can't assert this, because someone might want to
+  // construct a GHOSTED vector which doesn't include neighbor element
+  // dofs.  Boyce tried to do so in user code, and we're going to want
+  // to do so in System::project_vector().
+  //
+  // libmesh_assert(n_local == 0 || n_local == n || !ghost.empty());
 
   int* petsc_ghost = ghost.empty() ? PETSC_NULL :
     const_cast<int*>(reinterpret_cast<const int*>(&ghost[0]));
