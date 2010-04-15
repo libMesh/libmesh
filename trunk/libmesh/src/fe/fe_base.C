@@ -654,7 +654,10 @@ void FEBase::compute_shape_functions (const Elem*)
   // Compute the value of the derivative shape function i at quadrature point p
   switch (dim)
     {
-      
+
+    case 0: // No derivatives in 0D
+      break;
+
     case 1:
       {
 	if (calculate_dphi)
