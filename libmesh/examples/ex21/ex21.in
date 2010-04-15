@@ -1,6 +1,12 @@
 # Solve a singular or non-singular problem
 singularity = true        
 
+# In what dimension
+dimension = 3 
+
+# With what elements ("tensor", "simplex")
+element_type = tensor
+
 # minimum approximation order
 p_order = 1 
 
