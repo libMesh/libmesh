@@ -251,7 +251,7 @@ namespace Parallel
     /*
      * Constructor from MPI_Comm
      */
-    explicit Communicator (const communicator &comm) {
+    explicit Communicator (const communicator &comm) : _I_duped_it(false) {
       this->assign(comm);
     }
 
