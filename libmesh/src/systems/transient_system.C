@@ -134,18 +134,13 @@ void TransientSystem<Base>::re_update ()
   // re_update the parent system
   Base::re_update ();
   
-  //const std::vector<unsigned int>& send_list = Base::_dof_map.get_send_list ();
-
-  // Explicitly build a send_list
-  std::vector<unsigned int> send_list(Base::solution->size());
-  Utility::iota (send_list.begin(), send_list.end(), 0);
+  const std::vector<unsigned int>& send_list = this->get_dof_map().get_send_list ();
   
   const unsigned int first_local_dof = Base::get_dof_map().first_dof();
   const unsigned int end_local_dof  = Base::get_dof_map().end_dof();
 
   // Check sizes
   libmesh_assert (end_local_dof >= first_local_dof);
-  libmesh_assert (send_list.size() >= end_local_dof - first_local_dof);
   libmesh_assert (older_local_solution->size() >= send_list.size());
   libmesh_assert (old_local_solution->size()   >= send_list.size());
 
