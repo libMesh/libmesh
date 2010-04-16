@@ -185,6 +185,12 @@ void ExactErrorEstimator::estimate_error (const System& system,
 #endif
       fe->get_xyz();
 
+      // If we compute on parent elements, we'll want to do so only
+      // once on each, so we need to keep track of which we've done.
+      std::vector<bool> computed_var_on_parent;
+      if (estimate_parent_error)
+	computed_var_on_parent.resize(error_per_cell.size(), false);
+
       // Iterate over all the active elements in the mesh
       // that live on this processor.
       MeshBase::const_element_iterator
@@ -214,15 +220,17 @@ void ExactErrorEstimator::estimate_error (const System& system,
                 compute_on_parent = false;
 
           if (compute_on_parent &&
-              !error_per_cell[parent->id()])
+              !computed_var_on_parent[parent->id()])
             {
+              computed_var_on_parent[parent->id()] = true;
+
               // Compute a projection onto the parent
               DenseVector<Number> Uparent;
               FEBase::coarsened_dof_values(*(system.current_local_solution),
                                            dof_map, parent, Uparent,
                                            var, false);
 
-              error_per_cell[parent->id()] =
+              error_per_cell[parent->id()] +=
 		find_squared_element_error(system, var_name, parent, Uparent,
                                            fe.get(), fine_values.get());
             }
@@ -235,7 +243,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
           for (unsigned int i=0; i != dof_indices.size(); ++i)
             Uelem(i) = system.current_solution(dof_indices[i]);
 
-          error_per_cell[e_id] =
+          error_per_cell[e_id] +=
             find_squared_element_error(system, var_name, elem, Uelem,
                                        fe.get(), fine_values.get());
 
