@@ -28,6 +28,7 @@
 #include "mesh_base.h"
 #include "enum_elem_type.h"
 #include "elem.h"
+#include "equation_systems.h"
 #include "system.h"
 #include "numeric_vector.h"
 #include "exodusII_io_helper.h"
@@ -287,6 +288,64 @@ void ExodusII_IO::write_nodal_data (const std::string& ,
 }
 
 #else
+void ExodusII_IO::write_discontinuous_exodusII (const std::string& name,
+				     const EquationSystems& es)
+{
+  std::vector<std::string> solution_names;
+  std::vector<Number>      v;
+
+  // Get a reference to the mesh
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  
+  es.build_variable_names  (solution_names);
+  es.build_discontinuous_solution_vector (v);
+
+  if (mesh.processor_id() != 0) return;
+
+  this->write_nodal_data_discontinuous(name, v, solution_names); 
+}
+  
+
+void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
+				    const std::vector<Number>& soln,
+				    const std::vector<std::string>& names) 
+{
+  if (libMesh::processor_id() == 0)
+    {
+      const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+      int num_vars = names.size();
+      int num_nodes = 0;
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+      for ( ; it != end; ++it)
+    	num_nodes += (*it)->n_nodes();
+  
+      // FIXME: Will we ever _not_ need to do this?
+      // DRG: Yes... when writing multiple timesteps to the same file.
+      if (!exio_helper.created())
+	{
+	  exio_helper.create(fname);
+	  exio_helper.initialize_discontinuous(fname,mesh);
+	  exio_helper.write_nodal_coordinates_discontinuous(mesh);
+	  exio_helper.write_elements_discontinuous(mesh);
+          exio_helper.write_sidesets(mesh);
+          exio_helper.write_nodesets(mesh);
+	  exio_helper.initialize_nodal_variables(names);
+	}
+    
+      for (int c=0; c<num_vars; c++)
+	{
+	  std::vector<Number> cur_soln(num_nodes);
+
+	  //Copy out this variable's solution
+	  for(int i=0; i<num_nodes; i++)
+	    cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+    
+	  exio_helper.write_nodal_values(c+1,cur_soln,_timestep);
+	}  
+    }
+}
 
 void ExodusII_IO::write_nodal_data (const std::string& fname,
 				    const std::vector<Number>& soln,
