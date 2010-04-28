@@ -599,7 +599,14 @@ namespace Parallel
 #ifdef LIBMESH_HAVE_MPI
   inline void barrier (const Communicator &comm = Communicator_World)
   {
-    MPI_Barrier (comm.get());
+    if (libMesh::n_processors() > 1)
+      {
+	START_LOG("barrier()", "Parallel");
+    
+	MPI_Barrier (comm.get());
+
+	STOP_LOG("barrier()", "Parallel");
+      }
   }    
 #else
   inline void barrier (const Communicator & = Communicator_World) {}
@@ -1492,7 +1499,7 @@ namespace Parallel
   {
     if (comm.size() > 1)
       {
-	START_LOG("min()", "Parallel");
+	START_LOG("min(scalar)", "Parallel");
     
 	T temp = r;
 	MPI_Allreduce (&temp,
@@ -1502,7 +1509,7 @@ namespace Parallel
 		       MPI_MIN,
 		       comm.get());
 
-	STOP_LOG("min()", "Parallel");
+	STOP_LOG("min(scalar)", "Parallel");
       }
   }
 
@@ -1513,7 +1520,7 @@ namespace Parallel
   {
     if (comm.size() > 1)
       {
-	START_LOG("min()", "Parallel");
+	START_LOG("min(bool)", "Parallel");
     
 	unsigned int tempsend = r;
 	unsigned int temp;
@@ -1525,7 +1532,7 @@ namespace Parallel
 		       comm.get());
 	r = temp;
 
-	STOP_LOG("min()", "Parallel");
+	STOP_LOG("min(bool)", "Parallel");
       }
   }
 
@@ -1536,7 +1543,7 @@ namespace Parallel
   {
     if (comm.size() > 1 && !r.empty())
       {
-	START_LOG("min()", "Parallel");
+	START_LOG("min(vector)", "Parallel");
     
 	std::vector<T> temp(r);
 	MPI_Allreduce (&temp[0],
@@ -1546,7 +1553,7 @@ namespace Parallel
 		       MPI_MIN,
 		       comm.get());
 
-	STOP_LOG("min()", "Parallel");
+	STOP_LOG("min(vector)", "Parallel");
       }
   }
 
@@ -1557,7 +1564,7 @@ namespace Parallel
   {
     if (comm.size() > 1 && !r.empty())
       {
-	START_LOG("min()", "Parallel");
+	START_LOG("min(vector<bool>)", "Parallel");
     
         std::vector<unsigned int> ruint;
         pack_vector_bool(r, ruint);
@@ -1570,7 +1577,7 @@ namespace Parallel
 		       comm.get());
         unpack_vector_bool(temp, r);
 
-	STOP_LOG("min()", "Parallel");
+	STOP_LOG("min(vector<bool>)", "Parallel");
       }
   }
 
@@ -1581,7 +1588,7 @@ namespace Parallel
   {
     if (comm.size() > 1)
       {
-	START_LOG("max()", "Parallel");
+	START_LOG("max(scalar)", "Parallel");
     
 	T temp;
 	MPI_Allreduce (&r,
@@ -1592,7 +1599,7 @@ namespace Parallel
 		       comm.get());
 	r = temp;
 
-	STOP_LOG("max()", "Parallel");
+	STOP_LOG("max(scalar)", "Parallel");
       }
   }
 
@@ -1603,7 +1610,7 @@ namespace Parallel
   {
     if (comm.size() > 1)
       {
-	START_LOG("max()", "Parallel");
+	START_LOG("max(bool)", "Parallel");
     
 	unsigned int tempsend = r;
 	unsigned int temp;
@@ -1615,7 +1622,7 @@ namespace Parallel
 		       comm.get());
 	r = temp;
 
-	STOP_LOG("max()", "Parallel");
+	STOP_LOG("max(bool)", "Parallel");
       }
   }
 
@@ -1626,7 +1633,7 @@ namespace Parallel
   {
     if (comm.size() > 1 && !r.empty())
       {
-	START_LOG("max()", "Parallel");
+	START_LOG("max(vector)", "Parallel");
     
 	std::vector<T> temp(r);
 	MPI_Allreduce (&temp[0],
@@ -1636,7 +1643,7 @@ namespace Parallel
 		       MPI_MAX,
 		       comm.get());
 
-	STOP_LOG("max()", "Parallel");
+	STOP_LOG("max(vector)", "Parallel");
       }
   }
 
@@ -1647,7 +1654,7 @@ namespace Parallel
   {
     if (comm.size() > 1 && !r.empty())
       {
-	START_LOG("max()", "Parallel");
+	START_LOG("max(vector<bool>)", "Parallel");
     
         std::vector<unsigned int> ruint;
         pack_vector_bool(r, ruint);
@@ -1660,7 +1667,7 @@ namespace Parallel
 		       comm.get());
         unpack_vector_bool(temp, r);
 
-	STOP_LOG("max()", "Parallel");
+	STOP_LOG("max(vector<bool>)", "Parallel");
       }
   }
 
