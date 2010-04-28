@@ -3749,9 +3749,10 @@ echo "${ECHO_T}proper compiler flags" >&6; }
     case "$target_os" in
     *darwin*)
       if test "$enableshared" = yes ; then
-        CXXFLAGS_OPT="-fno-common -Wl,-flat_namespace"
-        CXXFLAGS_DVL="-fno-common -Wl,-flat_namespace"
-        CXXFLAGS_DBG="-fno-common -Wl,-flat_namespace"
+        CXXFLAGS_OPT="-fno-common"
+        CXXFLAGS_DVL="-fno-common"
+        CXXFLAGS_DBG="-fno-common"
+        LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
         CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
         CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
       fi
@@ -4605,7 +4606,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 
@@ -4626,7 +4627,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 
@@ -10973,7 +10974,7 @@ ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
 
-rm -f conftest*
+rm -f -r conftest*
 
 # On HP/UX there is a line like: "LPATH is: /foo:/bar:/baz" where
 # /foo, /bar, and /baz are search directories for the Fortran linker.
@@ -11064,7 +11065,7 @@ ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
 
-rm -f conftest*
+rm -f -r conftest*
 
 # On HP/UX there is a line like: "LPATH is: /foo:/bar:/baz" where
 # /foo, /bar, and /baz are search directories for the Fortran linker.
