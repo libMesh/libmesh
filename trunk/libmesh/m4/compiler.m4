@@ -295,9 +295,10 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
   case "$target_os" in
     *darwin*)
       if test "$enableshared" = yes ; then
-        CXXFLAGS_OPT="-fno-common -Wl,-flat_namespace"
-        CXXFLAGS_DVL="-fno-common -Wl,-flat_namespace"
-        CXXFLAGS_DBG="-fno-common -Wl,-flat_namespace"
+        CXXFLAGS_OPT="-fno-common"
+        CXXFLAGS_DVL="-fno-common"
+        CXXFLAGS_DBG="-fno-common"
+        LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
         CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
         CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
       fi
