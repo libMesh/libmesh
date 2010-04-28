@@ -26,11 +26,13 @@
 // C++ inludes
 
 // Local includes
+#include "libmesh_common.h"
 #include "mesh_input.h"
 #include "mesh_output.h"
 #include "exodusII_io_helper.h"
 
 // Forward declarations
+class EquationSystems;
 class MeshBase;
 class System;
 
@@ -87,11 +89,25 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * to copy that nodal solution into an EquationSystems object.
    */
   void copy_nodal_solution(System& es, std::string nodal_var_name, unsigned int timestep=1);
+  
+  /**
+   * Writes a exodusII file with discontinuous data
+   */ 
+  void write_discontinuous_exodusII (const std::string& name, 
+				const EquationSystems& es);
+  
 
   /**
    * Write out a nodal solution.
    */
   void write_nodal_data (const std::string&,
+			 const std::vector<Number>&,
+			 const std::vector<std::string>&);
+
+  /**
+   * Write out a discontinuous nodal solution.
+   */
+  void write_nodal_data_discontinuous (const std::string&,
 			 const std::vector<Number>&,
 			 const std::vector<std::string>&);
 
