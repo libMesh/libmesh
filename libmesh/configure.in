@@ -58,24 +58,18 @@ AC_ARG_ENABLE(mpi,
               enablempi=yes)
 
 
-CXX_TRY_LIST="g++ icc pgCC c++"
-CC_TRY_LIST="gcc icc pgcc cc"
 
 if  (test "$enablempi" != no) ; then
   CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
   CC_TRY_LIST="mpicc $CC_TRY_LIST"
 fi
 
+dnl look for a decent C++ compiler or honor --with-cxx=...
+CXX_TRY_LIST="g++ icc pgCC c++"
 AC_ARG_WITH([cxx],
 	    AC_HELP_STRING([--with-cxx=CXX],
                            [C++ compiler to use]),
 	    [CXX="$withval"],
-	    [])
-
-AC_ARG_WITH([cc],
-	    AC_HELP_STRING([--with-cc=CC],
-                           [C compiler to use]),
-	    [CC="$withval"],
 	    [])
 
 dnl --------------------------------------------------------------
@@ -84,13 +78,38 @@ dnl already set.  If not, then searches under g++, c++, and other names.
 dnl --------------------------------------------------------------
 AC_PROG_CXX([$CXX_TRY_LIST])
 
+
+
+dnl look for a decent C compiler or honor --with-cc=...
+CC_TRY_LIST="gcc icc pgcc cc"
+AC_ARG_WITH([cc],
+	    AC_HELP_STRING([--with-cc=CC],
+                           [C compiler to use]),
+	    [CC="$withval"],
+	    [])
+
 dnl --------------------------------------------------------------
 dnl Determine a C compiler to use.  If CC is not already set, checks for
 dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
 dnl --------------------------------------------------------------
 AC_PROG_CC([$CC_TRY_LIST])
 
-AC_PROG_FC()
+
+
+dnl look for a decent F90+ compiler or honor --with-fc=...
+FC_TRY_LIST="gfortran ifort pgf90 xlf95"
+AC_ARG_WITH([fc],
+	    AC_HELP_STRING([--with-fc=FC],
+                           [Fortran compiler to use]),
+	    [FC="$withval"],
+	    [])
+
+dnl --------------------------------------------------------------
+dnl Determine a F90+ compiler to use.
+dnl --------------------------------------------------------------
+AC_PROG_FC([$FC_TRY_LIST])
+
+
 
 dnl --------------------------------------------------------------
 dnl Shared libraries - enabled by default
