@@ -204,7 +204,7 @@ cvsweb:
 	./contrib/bin/cvs2html -f -p -o doc/cvshtml/index.html -v -a -b -n 2 -C crono.html
 
 svnexpand:
-        @svn propset svn:keywords "Date Author Revision HeadURL Id" $(srcfiles) $(headerfiles)
+        svn propset svn:keywords "Date Author Revision HeadURL Id" $(srcfiles) $(headerfiles) m4/*.m4
 
 #
 # Standalone applications.  Anything in the ./src/apps directory that ends in .cc
