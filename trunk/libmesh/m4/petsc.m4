@@ -20,12 +20,20 @@ AC_DEFUN([CONFIGURE_PETSC],
 
   else
     if (test -r $PETSC_DIR/include/petsc.h) ; then
+      dnl look for a decent F77 compiler or honor --with-77=...
+      FC_TRY_LIST="g77 gfortran ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
       AC_ARG_WITH([f77],
-      		  AC_HELP_STRING([--with-f77=F77],
+      	    AC_HELP_STRING([--with-f77=F77],
                                  [Fortran compiler to use]),
-      	          [F77="$withval"],
-      	          [])	
-      AC_REQUIRE([AC_PROG_F77])   dnl Petsc requires linking with FORTRAN libraries 
+      	    [F77="$withval"],
+      	    [])
+      
+      dnl --------------------------------------------------------------
+      dnl Determine a F77 compiler to use.
+      dnl --------------------------------------------------------------
+      AC_PROG_F77([$F77_TRY_LIST])
+
+      AC_PROG_F77()   dnl Petsc requires linking with FORTRAN libraries 
       AC_F77_LIBRARY_LDFLAGS
       AC_SUBST(PETSC_ARCH)
       AC_SUBST(PETSC_DIR)
