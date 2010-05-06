@@ -383,7 +383,37 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right">
-[<a name="Zhu_2010">3</a>]
+[<a name="Fuentes_2010">3</a>]
+</td>
+<td>
+D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
+  R.&nbsp;J. Stafford.
+  Adaptive Real-Time Bioheat Transfer Models for Computer Driven
+  MR-guided Laser Induced Thermal Therapy.
+  <em>IEEE Trans. Biomed. Eng.</em>, 57(5), 2010.
+  <a href="http://www.ncbi.nlm.nih.gov/pubmed/20142153">http://www.ncbi.nlm.nih.gov/pubmed/20142153</a>.<br />
+<p><a name="Fuentes_2010"></a><pre>
+@ARTICLE{Fuentes_2010,
+  AUTHOR = {D.~Fuentes and Y.~Feng and A.~Elliott and A.~Shetty and
+   R.~J.~McNichols and J.~T.~Oden and R.~J.~Stafford},
+  TITLE = {{Adaptive Real-Time Bioheat Transfer Models for
+   Computer Driven MR-guided Laser Induced Thermal Therapy}},
+  JOURNAL = {{IEEE Trans. Biomed. Eng.}},
+  YEAR = {2010},
+  VOLUME = {57},
+  NUMBER = {5},
+  NOTE = {\url{http://www.ncbi.nlm.nih.gov/pubmed/20142153}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right">
+[<a name="Zhu_2010">4</a>]
 </td>
 <td>
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
@@ -414,7 +444,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 <tr valign="top">
 <td align="right">
-[<a name="Knezevic_2010">4</a>]
+[<a name="Knezevic_2010">5</a>]
 </td>
 <td>
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -444,7 +474,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right">
-[<a name="Zhengyong_2010">5</a>]
+[<a name="Zhengyong_2010">6</a>]
 </td>
 <td>
 Zhengyong Ren and Jingtian Tang.
@@ -473,7 +503,7 @@ Zhengyong Ren and Jingtian Tang.
 
 <tr valign="top">
 <td align="right">
-[<a name="Carey_2010">6</a>]
+[<a name="Carey_2010">7</a>]
 </td>
 <td>
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -503,7 +533,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right">
-[<a name="Peterson_2010">7</a>]
+[<a name="Peterson_2010">8</a>]
 </td>
 <td>
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -533,7 +563,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right">
-[<a name="Botti_2010">8</a>]
+[<a name="Botti_2010">9</a>]
 </td>
 <td>
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
