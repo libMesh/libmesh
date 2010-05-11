@@ -384,6 +384,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 void FEMSystem::solve()
 {
   Parent::solve();
+
+  // On a moving mesh we want the mesh to reflect the new solution
+  this->mesh_position_set();
 }
 
 
