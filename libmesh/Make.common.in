@@ -479,14 +479,10 @@ ifeq ($(enable-optional),yes)
       include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
     else
       C_CLINKER_SLFLAG = $(libmesh_RPATHFLAG)# necessary for PETSc >= 2.1.6
-      ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x style
-        include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/petscconf # 2.3.0 or later style
+      ifeq ($(petsc-major),3)  # 3.0.x & newer style
+        include $(PETSC_DIR)/conf/variables
       else
-        ifeq ($(petsc-major),3)  # 3.0.x & newer style
-          include $(PETSC_DIR)/$(PETSC_ARCH)/conf/petscvariables # 3.0.0 or later style
-	else
-          include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/packages  # 2.1.1 or later style
-        endif      
+        include $(PETSC_DIR)/bmake/common/variables  # 2.1.1 or later style
       endif      
     endif
 
@@ -516,42 +512,8 @@ ifeq ($(enable-optional),yes)
       libmesh_DLFLAGS      += $(libmesh_RPATHFLAG)$(PETSC_LIB)
     endif
 
-    # Depending on petsc version, we link with different libs :-(
-    ifeq ($(petsc-major-minor),2.1.x)  # 2.1.x & older style
-      libs-PETSC = -L$(PETSC_LIB) \
-                   -lpetscsnes \
-                   -lpetscsles \
-                   -lpetscdm \
-                   -lpetscmat \
-                   -lpetscvec \
-                   -lpetsc
-    else
-      ifeq ($(petsc-major-minor),3.1.x) # 3.1.x PETSc is all in one library?
-        libs-PETSC = -L$(PETSC_LIB) \
-                     -lpetsc
-      else                              # 2.2.x through 3.0.x style
-        libs-PETSC = -L$(PETSC_LIB) \
-                     -lpetscsnes \
-                     -lpetscksp \
-                     -lpetscdm \
-                     -lpetscmat \
-                     -lpetscvec \
-                     -lpetsc
-      endif
-    endif
-
-    ifdef PACKAGES_LIBS  # Variable available in 2.3.x petscconf
-      libmesh_LIBS += $(libs-PETSC) \
-                      $(PACKAGES_LIBS) \
-                      $(libmesh_FLIBS)
-    else                 # try to guess package dependencies
-      libmesh_LIBS += $(libs-PETSC) \
-                      $(BLOCKSOLVE_LIB) $(SPOOLES_LIB) $(HYPRE_LIB) \
-                      $(SUPERLU_DIST_LIB) $(UMFPACK_LIB) $(SUPERLU_LIB) \
-                      $(BLOPEX_LIB)  $(SPAI_LIB) \
-                      $(BLASLAPACK_LIB) $(X11_LIB) $(MATLAB_LIB) \
-                      $(libmesh_FLIBS)
-    endif #end ifdef PACKAGES_LIBS
+    # Get required PETSc link options from their variables
+    libmesh_LIBS += $(PETSC_SNES_LIB)
 
   endif #end ifeq ($(enable-petsc),yes)
 
