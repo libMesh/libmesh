@@ -803,6 +803,8 @@ void FEMSystem::mesh_position_get()
                                _femcontext.dof_indices_var[_mesh_z_var]);
     }
 
+  this->solution->close();
+
   // And make sure the current_local_solution is up to date too
   this->update();
 }
