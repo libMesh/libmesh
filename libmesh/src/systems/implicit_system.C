@@ -1069,6 +1069,7 @@ void ImplicitSystem::qoi_parameter_hessian
           *parameters[l] = old_parameterl + delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false);
+          this->rhs->close();
           std::vector<Number> partial2q_term = this->qoi;
           std::vector<Number> partial2R_term(this->qoi.size());
           for (unsigned int i=0; i != Nq; ++i)
@@ -1078,6 +1079,7 @@ void ImplicitSystem::qoi_parameter_hessian
           *parameters[l] = old_parameterl - delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false);
+          this->rhs->close();
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
@@ -1088,6 +1090,7 @@ void ImplicitSystem::qoi_parameter_hessian
           *parameters[k] = old_parameterk - delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false);
+          this->rhs->close();
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
@@ -1098,6 +1101,7 @@ void ImplicitSystem::qoi_parameter_hessian
           *parameters[l] = old_parameterl + delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false);
+          this->rhs->close();
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
@@ -1136,6 +1140,7 @@ void ImplicitSystem::qoi_parameter_hessian
 
       *parameters[k] = old_parameterk + delta_p;
       this->assembly(false, true);
+      this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices);
 
       for (unsigned int l=0; l != Np; ++l)
@@ -1144,6 +1149,7 @@ void ImplicitSystem::qoi_parameter_hessian
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
+                this->get_adjoint_rhs(i).close();
                 Number current_terms = 
                   (this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) -
                    tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
@@ -1158,6 +1164,7 @@ void ImplicitSystem::qoi_parameter_hessian
  
       *parameters[k] = old_parameterk - delta_p;
       this->assembly(false, true);
+      this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices);
 
       for (unsigned int l=0; l != Np; ++l)
@@ -1166,6 +1173,7 @@ void ImplicitSystem::qoi_parameter_hessian
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
+                this->get_adjoint_rhs(i).close();
                 Number current_terms = 
                   (-this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) +
                    tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
@@ -1193,6 +1201,7 @@ void ImplicitSystem::qoi_parameter_hessian
       *this->solution *= delta_p;
       *this->solution += *oldsolution;
       this->assembly(false, true);
+      this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices);
 
       // The Hessian is symmetric, so we just calculate the lower
@@ -1208,6 +1217,7 @@ void ImplicitSystem::qoi_parameter_hessian
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
+                this->get_adjoint_rhs(i).close();
                 Number current_terms =
                   (this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) -
                    tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
@@ -1221,6 +1231,7 @@ void ImplicitSystem::qoi_parameter_hessian
       *this->solution *= -delta_p;
       *this->solution += *oldsolution;
       this->assembly(false, true);
+      this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices);
 
       for (unsigned int l=0; l != k+1; ++l)
@@ -1229,6 +1240,7 @@ void ImplicitSystem::qoi_parameter_hessian
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
+                this->get_adjoint_rhs(i).close();
                 Number current_terms =
                   (-this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) +
                    tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
@@ -1246,6 +1258,8 @@ void ImplicitSystem::qoi_parameter_hessian
   // Don't leave the qoi or system changed - principle of least
   // surprise.
   this->assembly(true, true);
+  this->rhs->close();
+  this->matrix->close();
   this->assemble_qoi(qoi_indices);
 }
 
