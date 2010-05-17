@@ -845,7 +845,7 @@ NumericVector<Number> & System::add_adjoint_rhs (unsigned int i)
   OStringStream adjoint_rhs_name;
   adjoint_rhs_name << "adjoint_rhs" << i;
 
-  return this->add_vector(adjoint_rhs_name.str());
+  return this->add_vector(adjoint_rhs_name.str(), false);
 }
 
 
@@ -875,7 +875,7 @@ NumericVector<Number> & System::add_sensitivity_rhs (unsigned int i)
   OStringStream sensitivity_rhs_name;
   sensitivity_rhs_name << "sensitivity_rhs" << i;
 
-  return this->add_vector(sensitivity_rhs_name.str());
+  return this->add_vector(sensitivity_rhs_name.str(), false);
 }
 
 
