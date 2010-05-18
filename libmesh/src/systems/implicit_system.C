@@ -806,7 +806,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           sensitivities[i][j] = partialq_partialp[i] +
-            this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(i));
+            this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(j));
     }
 
   // All parameters have been reset.
