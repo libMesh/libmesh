@@ -815,7 +815,7 @@ NumericVector<Number> & System::add_weighted_sensitivity_adjoint_solution (unsig
   OStringStream adjoint_name;
   adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
 
-  return this->get_vector(adjoint_name.str());
+  return this->add_vector(adjoint_name.str());
 }
 
 
