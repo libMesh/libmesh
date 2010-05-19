@@ -64,6 +64,16 @@ void ParameterVector::value_copy(const ParameterVector &target) const
 
 
 
+void ParameterVector::deep_resize(unsigned int s)
+{
+  this->_params.resize(s);
+  this->_my_data.resize(s);
+  for (unsigned int i=0; i != s; ++i)
+    this->_params[i] = &this->_my_data[i];
+}
+
+
+
 ParameterVector& ParameterVector::operator *= (const Number a)
 {
   const unsigned int Np = this->_params.size();
