@@ -1059,14 +1059,17 @@ void ImplicitSystem::qoi_parameter_hessian
 	  // are all calculated via a central finite difference
 	  // stencil:
           // F''_{kl} ~= (F(p+dp*e_k+dp*e_l) - F(p+dp*e_k-dp*e_l) -
-          //              F(p-dp*e_k+dp*e_l) - F(p-dp*e_k-dp*e_l))/(4*dp^2)
+          //              F(p-dp*e_k+dp*e_l) + F(p-dp*e_k-dp*e_l))/(4*dp^2)
 	  // We will add Q''_{kl}(u) and subtract R''_{kl}(u,z) at the
 	  // same time.
+	  //
+	  // We have to be careful with the perturbations to handle
+	  // the k=l case
 
           Number old_parameterl = *parameters[l];
 
-          *parameters[k] = old_parameterk + delta_p;
-          *parameters[l] = old_parameterl + delta_p;
+          *parameters[k] += delta_p;
+          *parameters[l] += delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false);
           this->rhs->close();
@@ -1076,7 +1079,7 @@ void ImplicitSystem::qoi_parameter_hessian
             if (qoi_indices.has_index(i))
               partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));
 
-          *parameters[l] = old_parameterl - delta_p;
+          *parameters[l] -= 2.*delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false);
           this->rhs->close();
@@ -1087,7 +1090,7 @@ void ImplicitSystem::qoi_parameter_hessian
                 partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
               }
 
-          *parameters[k] = old_parameterk - delta_p;
+          *parameters[k] -= 2.*delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false);
           this->rhs->close();
@@ -1098,7 +1101,7 @@ void ImplicitSystem::qoi_parameter_hessian
                 partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
               }
 
-          *parameters[l] = old_parameterl + delta_p;
+          *parameters[l] += 2.*delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false);
           this->rhs->close();
