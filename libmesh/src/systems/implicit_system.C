@@ -912,8 +912,8 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
-            partial2q_term[i] += this->qoi[i];
-            partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
+            partial2q_term[i] -= this->qoi[i];
+            partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
           }
 
       oldparameters.value_copy(parameters);
@@ -930,8 +930,8 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
-            partial2q_term[i] += this->qoi[i];
-            partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
+            partial2q_term[i] -= this->qoi[i];
+            partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
           }
 
       *parameters[k] = old_parameter - delta_p;
