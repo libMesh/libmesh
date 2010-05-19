@@ -79,9 +79,17 @@ public:
   unsigned int size() const { return _params.size(); }
 
   /**
-   * Sets the number of parameters to be used
+   * Sets the number of parameters to be used.  This method is for
+   * resizing a ParameterVector that acts as a proxy to other
+   * parameter values
    */
   void resize(unsigned int s) { _params.resize(s); }
+
+  /**
+   * Sets the number of parameters to be used.  This method is for
+   * resizing a ParameterVector that owns its own parameter values
+   */
+  void deep_resize(unsigned int s);
 
   /**
    * Returns a pointer to a parameter value
