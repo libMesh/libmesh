@@ -456,6 +456,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
+        this->get_adjoint_rhs(i).close();
         *(temprhs[i]) -= this->get_adjoint_rhs(i);
         this->matrix->vector_mult_add(*(temprhs[i]), this->get_adjoint_solution(i));
         *(temprhs[i]) *= -1.0;
@@ -473,6 +474,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
+        this->get_adjoint_rhs(i).close();
         *(temprhs[i]) -= this->get_adjoint_rhs(i);
         this->matrix->vector_mult_add(*(temprhs[i]), this->get_adjoint_solution(i));
         *(temprhs[i]) /= (2.0*delta_p);
@@ -896,6 +898,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       *parameters[k] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false);
+      this->rhs->close();
       std::vector<Number> partial2q_term = this->qoi;
       std::vector<Number> partial2R_term(this->qoi.size());
       for (unsigned int i=0; i != Nq; ++i)
@@ -905,6 +908,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       *parameters[k] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false);
+      this->rhs->close();
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
@@ -922,6 +926,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       *parameters[k] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false);
+      this->rhs->close();
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
@@ -932,6 +937,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       *parameters[k] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false);
+      this->rhs->close();
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
@@ -968,33 +974,45 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
       *parameters[k] = old_parameter + delta_p;
       this->assembly(true, true);
+      this->rhs->close();
+      this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices);
 
       this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
 
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
-          sensitivities[i][k] += (this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) -
-                                  this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) -
-                                  this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
+          {
+            this->get_adjoint_rhs(i).close();
+            sensitivities[i][k] += (this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) -
+                                    this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) -
+                                    this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
+          }
  
       *parameters[k] = old_parameter - delta_p;
       this->assembly(true, true);
+      this->rhs->close();
+      this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices);
 
       this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
 
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
-          sensitivities[i][k] += (-this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) +
-                                  this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) +
-                                  this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
+          {
+            this->get_adjoint_rhs(i).close();
+            sensitivities[i][k] += (-this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) +
+                                    this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) +
+                                    this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
+          }
     }
 
   // All parameters have been reset.
   // Don't leave the qoi or system changed - principle of least
   // surprise.
   this->assembly(true, true);
+  this->rhs->close();
+  this->matrix->close();
   this->assemble_qoi(qoi_indices);
 }
 
