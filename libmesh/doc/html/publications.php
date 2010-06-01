@@ -202,6 +202,8 @@ J.&nbsp;W. Peterson.
 
 <table>
 
+
+
 <tr valign="top">
 <td align="right">
 [<a name="Botti_2010p">1</a>]
@@ -310,6 +312,36 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 </table><a name="Articles"></a>
 <h2>2010</h2>
 
+<tr valign="top">
+<td align="right">
+[<a name="Kirk_2010">1</a>]
+</td>
+<td>
+Benjamin&nbsp;S. Kirk, Graham&nbsp;F. Carey,
+ Validation of Fully Implicit, Parallel Finite Element Simulations
+ of Laminar Hypersonic Flows.
+ <em>AIAA Journal</em>,
+ 48(6):1025-1036, June 2010.<br/>
+<a href="http://dx.doi.org/10.2514/1.40860">http://dx.doi.org/10.2514/1.40860</a>.<br />
+<p><a name="Kirk_2010"></a><pre>
+@ARTICLE{Kirk_2010,
+  AUTHOR = {Benjamin~S.~Kirk and Graham~F.~Carey},
+  TITLE = {{Validation of Fully Implicit, Parallel Finite Element Simulations
+            of Laminar Hypersonic Flows}},
+  JOURNAL = {AIAA Journal},
+  YEAR = 2010,
+  MONTH = June,
+  VOLUME = 48,
+  NUMBER = 6,
+	 PAGES = {1025--1036},
+  NOTE = {\url{http://dx.doi.org/10.2514/1.40860}}
+}
+</pre>
+</p>
+
+</td>
+</tr>
+
 <!-- This document was automatically generated with bibtex2html 1.75
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
@@ -320,7 +352,7 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right">
-[<a name="Pereira_2010">1</a>]
+[<a name="Pereira_2010">2</a>]
 </td>
 <td>
 F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
@@ -351,7 +383,7 @@ F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
 
 <tr valign="top">
 <td align="right">
-[<a name="Podgorney_2010">2</a>]
+[<a name="Podgorney_2010">3</a>]
 </td>
 <td>
 R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
@@ -383,7 +415,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right">
-[<a name="Fuentes_2010">3</a>]
+[<a name="Fuentes_2010">4</a>]
 </td>
 <td>
 D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
@@ -413,7 +445,7 @@ D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNic
 
 <tr valign="top">
 <td align="right">
-[<a name="Zhu_2010">4</a>]
+[<a name="Zhu_2010">5</a>]
 </td>
 <td>
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
@@ -444,7 +476,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 <tr valign="top">
 <td align="right">
-[<a name="Knezevic_2010">5</a>]
+[<a name="Knezevic_2010">6</a>]
 </td>
 <td>
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -474,7 +506,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right">
-[<a name="Zhengyong_2010">6</a>]
+[<a name="Zhengyong_2010">7</a>]
 </td>
 <td>
 Zhengyong Ren and Jingtian Tang.
@@ -503,7 +535,7 @@ Zhengyong Ren and Jingtian Tang.
 
 <tr valign="top">
 <td align="right">
-[<a name="Carey_2010">7</a>]
+[<a name="Carey_2010">8</a>]
 </td>
 <td>
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -533,7 +565,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right">
-[<a name="Peterson_2010">8</a>]
+[<a name="Peterson_2010">9</a>]
 </td>
 <td>
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -563,7 +595,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right">
-[<a name="Botti_2010">9</a>]
+[<a name="Botti_2010">10</a>]
 </td>
 <td>
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
