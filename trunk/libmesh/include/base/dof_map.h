@@ -498,6 +498,18 @@ public:
   void add_constraint_row (const unsigned int dof_number,
 			   const DofConstraintRow& constraint_row,
 			   const bool forbid_constraint_overwrite = true);
+
+  /**
+   * Returns an iterator pointing to the first constraint row
+   */
+  DofConstraints::const_iterator constraint_rows_begin() const
+    { return _dof_constraints.begin(); }
+  
+  /**
+   * Returns an iterator pointing just past the last constraint row
+   */
+  DofConstraints::const_iterator constraint_rows_end() const
+    { return _dof_constraints.end(); }
   
   /**
    * @returns true if the degree of freedom dof is constrained,
