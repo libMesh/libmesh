@@ -357,13 +357,14 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_variables; var++)
     {
-      if (dof_map.variable(var).type().family == SCALAR)
-        continue;
-
       const System::Variable& variable = dof_map.variable(var);
 
+      const FEType& base_fe_type = variable.type();     
+
+      if (base_fe_type.family == SCALAR)
+        continue;
+
       // Get FE objects of the appropriate type
-      const FEType& base_fe_type = dof_map.variable_type(var);     
       AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));      
       AutoPtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));      
 
@@ -861,13 +862,14 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_variables; var++)
     {
-      if (dof_map.variable(var).type().family == SCALAR)
-        continue;
-
       const System::Variable& variable = dof_map.variable(var);
 
+      const FEType& fe_type = variable.type();     
+
+      if (fe_type.family == SCALAR)
+        continue;
+
       // Get FE objects of the appropriate type
-      const FEType& fe_type = dof_map.variable_type(var);     
       AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));      
 
       // Prepare variables for projection
