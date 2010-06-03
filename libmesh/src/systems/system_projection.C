@@ -360,6 +360,8 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
       if (dof_map.variable(var).type().family == SCALAR)
         continue;
 
+      const System::Variable& variable = dof_map.variable(var);
+
       // Get FE objects of the appropriate type
       const FEType& base_fe_type = dof_map.variable_type(var);     
       AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));      
@@ -420,6 +422,11 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	{
 	  const Elem* elem = *elem_it;
 	  const Elem* parent = elem->parent();
+
+          // Per-subdomain variables don't need to be projected on
+          // elements where they're not active
+          if (!variable.active_on_subdomain(elem->subdomain_id()))
+            continue;
 
           // Adjust the FE type for p-refined elements
           fe_type = base_fe_type;
@@ -857,6 +864,8 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
       if (dof_map.variable(var).type().family == SCALAR)
         continue;
 
+      const System::Variable& variable = dof_map.variable(var);
+
       // Get FE objects of the appropriate type
       const FEType& fe_type = dof_map.variable_type(var);     
       AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));      
@@ -903,6 +912,11 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
       for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
 	{
 	  const Elem* elem = *elem_it;
+
+          // Per-subdomain variables don't need to be projected on
+          // elements where they're not active
+          if (!variable.active_on_subdomain(elem->subdomain_id()))
+            continue;
 
 	  // Update the DOF indices for this element based on
           // the current mesh
