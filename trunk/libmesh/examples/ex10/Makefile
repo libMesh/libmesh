@@ -80,6 +80,21 @@ run: $(target)
 	@echo "***************************************************************"
 
 
+restart: $(target)
+	@echo "***************************************************************"
+	@echo "* Restarting Example " $(target)
+	@echo "***************************************************************"
+	@echo " "
+	@echo "***** Read in saved solution and continue *****"
+	@echo " "
+	@$(LIBMESH_RUN) $(target) -read_solution -n_timesteps $(n_timesteps) \
+                   -output_freq $(output_freq) -init_timestep $(n_timesteps) $(LIBMESH_OPTIONS)
+	@echo " "
+	@echo "***************************************************************"
+	@echo "* Done Restarting Example " $(target)
+	@echo "***************************************************************"
+
+
 # include the dependency list
 include .depend
 
