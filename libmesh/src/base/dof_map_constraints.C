@@ -157,8 +157,10 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   // compute_periodic_constraints requires a point_locator() from our
   // Mesh, that point_locator() construction is threaded.  Rather than
   // nest threads within threads we'll make sure it's preconstructed.
+#ifdef LIBMESH_ENABLE_PERIODIC
   if (!_periodic_boundaries.empty())
     mesh.point_locator();
+#endif
   
   // Look at all the variables in the system.  Reset the element
   // range at each iteration -- there is no need to reconstruct it.
