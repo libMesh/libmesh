@@ -74,7 +74,7 @@ R.&nbsp;H. Stogner.
   title = {{Parallel Adaptive C1 Macro-Elements for Nonlinear Thin Film and Non-Newtonian Flow Problems}},
   note = {\url{http://www.cfdlab.ae.utexas.edu/~roystgnr/
   dissertation/dissertation-stogner.pdf}},
-  month = {August},
+  month = aug,
   year = {2008}
 }
 </pre>
@@ -101,7 +101,7 @@ J.&nbsp;W. Peterson.
   school = {ASE-EM dept., The University of Texas at Austin},
   title = {{Parallel Adaptive Finite Element Methods for Problems in Natural Convection}},
   note = {\url{http://www.cfdlab.ae.utexas.edu/~peterson/diss.pdf}},
-  month = {May},
+  month = may,
   year = {2008}
 }
 </pre>
@@ -155,7 +155,7 @@ B.&nbsp;S. Kirk.
   school = {ASE-EM dept., The University of Texas at Austin},
   title = {{Adaptive Finite Element Simulation of Flow and Transport Applications on Parallel Computers}},
   note = {\url{http://www.cfdlab.ae.utexas.edu/~benkirk/dissertation.pdf}},
-  month = {May},
+  month = may,
   year = {2007}
 }
 </pre>
@@ -183,7 +183,7 @@ J.&nbsp;W. Peterson.
   school = {ASE-EM dept., The University of Texas at Austin},
   title = {{A Numerical Investigation of B\'{e}nard Convection in Small Aspect Ratio Containers}},
   note = {\url{http://www.cfdlab.ae.utexas.edu/~peterson/masters.pdf}},
-  month = {May},
+  month = may,
   year = {2003}
 }
 </pre>
@@ -422,7 +422,7 @@ F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
   pages = {1--9},
   note = {\url{http://www.sel.eesc.usp.br/jmo/issues/
      vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf}},
-  month = {June}
+  month = jun
 }
 </pre>
 
@@ -483,7 +483,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 		 system reservoirs}},
   booktitle = {{Proceedings of the 35th Workshop on Geothermal Reservoir Engineering}},
   publisher = {Stanford University},
-  month = {February},
+  month = feb,
   year = {2010},
   note = {\url{http://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2010/podgorne.pdf}}
 }
@@ -702,7 +702,7 @@ P.&nbsp;Prouzet, M.&nbsp;Odunlami, E.&nbsp;Duquesne, and A.&nbsp;Boussouar.
   volume = 22,
   number = 4,
   pages = {525--534},
-  month = {December}
+  month = dec
 }
 </pre>
 
@@ -730,7 +730,7 @@ H.&nbsp;Class et&nbsp;al.
   volume = 13,
   number = 4,
   pages = {409--434},
-  month = {December},
+  month = dec,
   note = {\url{http://dx.doi.org/10.1007/s10596-009-9146-x}}
 }
 </pre>
@@ -758,7 +758,7 @@ C.&nbsp;Barbarosie and A.-M. Toader.
   institution = {Centro de Matem\'{a}tica e Aplica\c{c}\~{o}es Fundamentais (CMAF)},
   number = {Pre-2009-021},
   day = {2},
-  month = {December},
+  month = dec,
   year = {2009},
   note = {\url{http://cmaf.ptmat.fc.ul.pt/arquivo/docs/pre-2009-021.pdf}}
 }
@@ -789,7 +789,7 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
   volume = {25},
   number = {12},
   pages = {1162--1185},
-  month = {December},
+  month = dec,
   year = {2009},
   note = {\url{http://dx.doi.org/10.1002/cnm.1173}}
 }
@@ -824,7 +824,7 @@ D.&nbsp;J. Knezevic and E.&nbsp;S&uuml;li.
   volume = 43,
   number = 6,
   pages = {1117--1156},
-  month = {November}
+  month = nov
 }
 </pre>
 
@@ -844,7 +844,7 @@ L.&nbsp;Antiga, R.&nbsp;N. Planken, K.&nbsp;Van Canneyt, L.&nbsp;Botti, A.&nbsp;
   rates in vascular access for hemodialysis.
  In Olaf D&ouml;ssel and Wolfgang&nbsp;C. Schlegel, editors, <em>World
   Congress on Medical Physics and Biomedical Engineering</em>, pages 543-546,
-  Munich, Germany, September 7-12 2009. Springer Berlin Heidelberg.
+  Munich, Germany, September&nbsp;7-12 2009. Springer Berlin Heidelberg.
  <a href="http://dx.doi.org/10.1007/978-3-642-03885-3">http://dx.doi.org/10.1007/978-3-642-03885-3</a>.
 <a name="Antiga_2009"></a><pre>
 @inproceedings{Antiga_2009,
@@ -857,7 +857,7 @@ L.&nbsp;Antiga, R.&nbsp;N. Planken, K.&nbsp;Van Canneyt, L.&nbsp;Botti, A.&nbsp;
   editor = {Olaf D\"{o}ssel and Wolfgang C. Schlegel},
   pages = {543--546},
   publisher = {Springer Berlin Heidelberg},
-  month = {September 7--12},
+  month = sep # {~7--12},
   address = {Munich, Germany},
   year = {2009},
   note = {\url{http://dx.doi.org/10.1007/978-3-642-03885-3}}
@@ -884,7 +884,7 @@ M.&nbsp;F. Barone, I.&nbsp;Kalashnikova, M.&nbsp;R. Brake, and D.&nbsp;J. Segalm
   author = {M.~F.~Barone and I.~Kalashnikova and M.~R.~Brake and D.~J.~Segalman},
   title = {{Reduced order modeling of fluid/structure interaction}},
   institution = {Sandia National Laboratories},
-  month = {September},
+  month = sep,
   year = {2009},
   number = {SAND2009-7189},
   note = {\url{http://www.stanford.edu/~irinak/rom_ldrd_sand.pdf}}
@@ -913,7 +913,7 @@ Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
   title = {{A parallel adaptive finite element method for the
               simulation of photon migration with the radiative-transfer-based model}},
   journal = {Communications in Numerical Methods in Engineering},
-  month = {June},
+  month = jun,
   year = 2009,
   volume = 25,
   number = 6,
@@ -937,8 +937,8 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&n
  Multiscale-multiphysics simulation of nanostructured devices: the
   TiberCAD project.
  In <em>13th International Workshop on Computational Electronics
-  (IWCE '09)</em>. Institute of Electrical and Electronic Engineers (IEEE), May
-  27-29 2009.
+  (IWCE '09)</em>. Institute of Electrical and Electronic Engineers (IEEE),
+  May&nbsp;27-29 2009.
  <a href="http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf">http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf</a>.
 <a name="AufderMaur_2009"></a><pre>
 @inproceedings{AufderMaur_2009,
@@ -948,7 +948,7 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&n
                  the TiberCAD project}},
   booktitle = {{13th International Workshop on Computational Electronics (IWCE '09)}},
   publisher = {Institute of Electrical and Electronic Engineers (IEEE)},
-  month = {May 27--29},
+  month = may # {~27--29},
   year = {2009},
   note = {\url{http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf}}
 }
@@ -1011,7 +1011,7 @@ M.&nbsp;Polidori.
   institution = {Ente per le Nuove tecnologie, l'Energia e l'Ambiente (ENEA)},
   number = {RSE/2009/84},
   year = {2009},
-  month = {March},
+  month = mar,
   note = {\url{http://www.enea.it/enea_paese/sistema_elettrico/
   Nucleare_fissione/Reattori_Innovativi/RSE84.pdf}}
 }
@@ -1038,7 +1038,7 @@ S.&nbsp;Lu et&nbsp;al.
   title = {{Multiscale Modeling in Rodent Ventricular Myocytes}},
   journal = {IEEE Engineering in Medicine and Biology Magazine},
   year = 2009,
-  month = {March},
+  month = mar,
   volume = 28,
   number = 2,
   pages = {46--57},
@@ -1511,7 +1511,7 @@ A.&nbsp;Hawkins and J.&nbsp;T. Oden.
   institution = {Institute for Computational Engineering and Sciences (ICES),
                  The University of Texas at Austin},
   day = {20},
-  month = {November},
+  month = nov,
   year = {2008},
   note = {\url{http://www.ices.utexas.edu/research/reports/2008/0829.pdf}}
 }
@@ -1542,7 +1542,7 @@ L.&nbsp;Antiga, M.&nbsp;Piccinelli, L.&nbsp;Botti, B.&nbsp;Ene-Iordache, A.&nbsp
   year = 2008,
   volume = 46,
   number = 11,
-  month = {November},
+  month = nov,
   pages = {1097--1112},
   note = {\url{http://dx.doi.org/10.1007/s11517-008-0420-1}}
 }
@@ -1572,7 +1572,7 @@ D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
   institution = {Computational Science Research Center,
                  San Diego State University},
   day = {15},
-  month = {October},
+  month = oct,
   year = {2008},
   number = {CSRCR2008-26}
 }
@@ -1598,7 +1598,7 @@ V.&nbsp;S. Mahadevan and J.&nbsp;C. Ragusa.
   author = {V.~S.~Mahadevan and J.~C.~Ragusa},
   title = {High-order spatio-temporal schemes for coupled, multi-physics reactor simulations},
   institution = {Idaho National Laboratory},
-  month = {September},
+  month = sep,
   year = {2008},
   note = {\url{http://www.inl.gov/technicalpublications/Documents/4120524.pdf}}
 }
@@ -1834,7 +1834,7 @@ M.&nbsp;Bhatia and E.&nbsp;Livnet.
   year = 2008,
   volume = 46,
   number = 3,
-  month = {March},
+  month = mar,
   pages = {578--590},
   note = {\url{http://dx.doi.org/10.2514/1.26236}}
 }
@@ -2128,7 +2128,7 @@ J.&nbsp;Steensland and J.&nbsp;W. Peterson.
  A Study of Dynamically Adaptive Partitioning for AMR.
  In <em>Proceedings of the 2007 International Conference on Parallel
   and Distributed Processing Techniques and Applications (PDPTA'07) Volume 2</em>,
-  pages 503-509, Las Vegas, NV, June 25-28 2007. CSREA Press.
+  pages 503-509, Las Vegas, NV, June&nbsp;25-28 2007. CSREA Press.
  ISBN: 1-60132-021-3.
 <a name="Steensland_2007"></a><pre>
 @inproceedings{Steensland_2007,
@@ -2137,7 +2137,7 @@ J.&nbsp;Steensland and J.&nbsp;W. Peterson.
   booktitle = {{Proceedings of the 2007 International Conference on Parallel and
                 Distributed Processing Techniques and Applications (PDPTA'07)
 		Volume 2}},
-  month = {June 25--28},
+  month = jun # {~25--28},
   pages = {503--509},
   address = {Las Vegas, NV},
   publisher = {CSREA Press},
@@ -2198,7 +2198,7 @@ R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
   volume = 70,
   number = 9,
   pages = {1076--1095},
-  month = {May},
+  month = may,
   year = 2007,
   note = {\url{http://dx.doi.org/10.1002/nme.1912}}
 }
@@ -2217,7 +2217,7 @@ R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
 K.&nbsp;Nam and M.&nbsp;M. Aral.
  Optimal placement of monitoring sensors in lakes.
  In <em>Proceedings of the 2007 Georgia Water Resources Conference</em>,
-  University of Georgia, March 27-29 2007.
+  University of Georgia, March&nbsp;27-29 2007.
  <a href="http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf">http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf</a>.
 <a name="Nam_2007"></a><pre>
 @inproceedings{Nam_2007,
@@ -2225,7 +2225,7 @@ K.&nbsp;Nam and M.&nbsp;M. Aral.
   title = {{Optimal placement of monitoring sensors in lakes}},
   booktitle = {Proceedings of the 2007 Georgia Water Resources Conference},
   address = {University of Georgia},
-  month = {March 27--29},
+  month = mar # {~27--29},
   year = {2007},
   note = {\url{http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf}}
 }
@@ -2311,7 +2311,7 @@ J.&nbsp;J. Crookston, W.&nbsp;Ruijter, A.&nbsp;C. Long, and I.&nbsp;A. Jones.
   textile composites using a grid-based finite element method with adaptive
   mesh refinement.
  In <em>Proceedings of the 8th International Conference on Textile
-  Composites (TEXCOMP-8)</em>, Nottingham, UK, October 16-18 2006.
+  Composites (TEXCOMP-8)</em>, Nottingham, UK, October&nbsp;16-18 2006.
  <a href="http://textiles.nottingham.ac.uk/T09-Crookston.pdf">http://textiles.nottingham.ac.uk/T09-Crookston.pdf</a>.
 <a name="Crookston_2006"></a><pre>
 @inproceedings{Crookston_2006,
@@ -2321,7 +2321,7 @@ J.&nbsp;J. Crookston, W.&nbsp;Ruijter, A.&nbsp;C. Long, and I.&nbsp;A. Jones.
                 adaptive mesh refinement},
   booktitle = {{Proceedings of the 8th International Conference on
                  Textile Composites (TEXCOMP-8)}},
-  month = {October 16--18},
+  month = oct # {~16--18},
   address = {Nottingham, UK},
   year = {2006},
   note = {\url{http://textiles.nottingham.ac.uk/T09-Crookston.pdf}}
@@ -2351,7 +2351,7 @@ D.&nbsp;J. Knezevic.
   title = {Finite Element Methods for Deterministic Simulation
                   of Polymeric Fluids},
   institution = {Oxford University Computing Laboratory},
-  month = {October},
+  month = oct,
   year = {2006},
   number = {NA-06/19},
   note = {\url{http://www.maths.warwick.ac.uk/multiscale/MSPreprints/ox-NA-19-06.pdf}}
@@ -2550,7 +2550,7 @@ L.&nbsp;Antiga.
   pages = {55--59},
   publisher = {Istituto Superiore di Sanit\`{a}},
   address = {Rome, Italy},
-  month = {November},
+  month = nov,
   year = {2004}
 }
 </pre>
