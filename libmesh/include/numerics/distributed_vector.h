@@ -555,20 +555,15 @@ void DistributedVector<T>::init (const unsigned int n,
   
 #ifdef LIBMESH_HAVE_MPI
 
-  int n_proc=0, proc_id=0;
+  std::vector<int> local_sizes (libMesh::n_processors(), 0);
   
-  MPI_Comm_rank (libMesh::COMM_WORLD, &proc_id);
-  MPI_Comm_size (libMesh::COMM_WORLD, &n_proc);
-  
-  std::vector<int> local_sizes     (n_proc, 0);
-  
-  local_sizes[proc_id] = n_local;
+  local_sizes[libMesh::processor_id()] = n_local;
 
   Parallel::sum(local_sizes);
 
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
-  for (int p=0; p<proc_id; p++)
+  for (int p=0; p<libMesh::processor_id(); p++)
     _first_local_index += local_sizes[p];
 
 
@@ -577,7 +572,7 @@ void DistributedVector<T>::init (const unsigned int n,
   // size, otherwise there is big trouble!
   int sum=0;
 
-  for (int p=0; p<n_proc; p++)
+  for (int p=0; p<libMesh::n_processors(); p++)
     sum += local_sizes[p];
 
   libmesh_assert (sum == static_cast<int>(n));
