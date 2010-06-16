@@ -55,9 +55,7 @@ class SerialMesh : public UnstructuredMesh
  public:
 
   /**
-   * Constructor.  Requires the dimension and optionally
-   * a processor id.  Note that \p proc_id should always
-   * be provided for multiprocessor applications.
+   * Constructor.  Requires the dimension.
    */
   SerialMesh (unsigned int d);
 
