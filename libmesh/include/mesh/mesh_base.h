@@ -71,9 +71,11 @@ class MeshBase
 public:
 
   /**
-   * Constructor.  Requires \p d, the dimension of the mesh.
+   * Constructor.  Takes \p dim, the dimension of the mesh.
+   * The mesh dimension can be changed (and may automatically be
+   * changed by mesh generation/loading) later.
    */
-  MeshBase (unsigned int d);
+  MeshBase (unsigned int dim=1);
   
   /**
    * Copy-constructor.

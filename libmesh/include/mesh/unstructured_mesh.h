@@ -51,11 +51,11 @@ class UnstructuredMesh : public MeshBase
  public:
 
   /**
-   * Constructor.  Requires the dimension and optionally
-   * a processor id.  Note that \p proc_id should always
-   * be provided for multiprocessor applications.
+   * Constructor.  Takes \p dim, the dimension of the mesh.
+   * The mesh dimension can be changed (and may automatically be
+   * changed by mesh generation/loading) later.
    */
-  UnstructuredMesh (unsigned int d);
+  UnstructuredMesh (unsigned int dim=1);
 
   /**
    * Destructor.
