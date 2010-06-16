@@ -258,7 +258,7 @@ public:
    * Note that the indices must necessary live on this
    * processor.
    */
-  virtual Real subset_l1_norm (const std::set<unsigned int> & indices);
+  virtual Real subset_l1_norm (const std::set<unsigned int> & indices) const;
 
   /**
    * @returns the \f$l_2\f$-norm of the vector, i.e.
@@ -269,7 +269,7 @@ public:
    * Note that the indices must necessary live on this
    * processor.
    */
-  virtual Real subset_l2_norm (const std::set<unsigned int> & indices);
+  virtual Real subset_l2_norm (const std::set<unsigned int> & indices) const;
 
   /**
    * @returns the maximum absolute value of the
@@ -279,7 +279,7 @@ public:
    * Note that the indices must necessary live on this
    * processor.
    */
-  virtual Real subset_linfty_norm (const std::set<unsigned int> & indices);
+  virtual Real subset_linfty_norm (const std::set<unsigned int> & indices) const;
 
   /**
    * @returns dimension of the vector. This

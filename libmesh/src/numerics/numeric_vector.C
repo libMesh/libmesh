@@ -291,9 +291,9 @@ int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
 
 
 template <class T>
-Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices)
+Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices) const
 {
-  NumericVector<T> & v = *this;
+  const NumericVector<T> & v = *this;
   
   std::set<unsigned int>::iterator it = indices.begin();
   const std::set<unsigned int>::iterator it_end = indices.end();
@@ -309,9 +309,9 @@ Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices)
 }
 
 template <class T>
-Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices)
+Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices) const
 {
-  NumericVector<T> & v = *this;
+  const NumericVector<T> & v = *this;
 
   std::set<unsigned int>::iterator it = indices.begin();
   const std::set<unsigned int>::iterator it_end = indices.end();
@@ -327,9 +327,9 @@ Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices)
 }
 
 template <class T>
-Real NumericVector<T>::subset_linfty_norm (const std::set<unsigned int> & indices)
+Real NumericVector<T>::subset_linfty_norm (const std::set<unsigned int> & indices) const
 {
-  NumericVector<T> & v = *this;
+  const NumericVector<T> & v = *this;
 
   std::set<unsigned int>::iterator it = indices.begin();
   const std::set<unsigned int>::iterator it_end = indices.end();
