@@ -1055,7 +1055,7 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
   }
 }
 
-Real System::discrete_var_norm(NumericVector<Number>& v,
+Real System::discrete_var_norm(const NumericVector<Number>& v,
                                unsigned int var,
                                FEMNormType norm_type) const
 {
@@ -1072,7 +1072,7 @@ Real System::discrete_var_norm(NumericVector<Number>& v,
     libmesh_error();
 }
 
-Real System::calculate_norm(NumericVector<Number>& v,
+Real System::calculate_norm(const NumericVector<Number>& v,
                             unsigned int var,
                             FEMNormType norm_type) const
 {
@@ -1093,7 +1093,7 @@ Real System::calculate_norm(NumericVector<Number>& v,
 
 
 
-Real System::calculate_norm(NumericVector<Number>& v,
+Real System::calculate_norm(const NumericVector<Number>& v,
                             const SystemNorm &norm) const
 {
   // This function must be run on all processors at once

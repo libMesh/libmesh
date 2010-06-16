@@ -811,7 +811,7 @@ public:
    * @returns a norm of variable \p var in the vector \p v, in the specified
    * norm (e.g. L2, H0, H1)
    */
-  Real calculate_norm(NumericVector<Number>& v,
+  Real calculate_norm(const NumericVector<Number>& v,
 		      unsigned int var = 0,
 		      FEMNormType norm_type = L2) const;
 
@@ -819,7 +819,7 @@ public:
    * @returns a norm of the vector \p v, using \p component_norm and \p
    * component_scale to choose and weight the norms of each variable.
    */
-  Real calculate_norm(NumericVector<Number>& v,
+  Real calculate_norm(const NumericVector<Number>& v,
 		      const SystemNorm &norm) const;
 
   /**
@@ -1122,7 +1122,7 @@ private:
    * Finds the discrete norm for the entries in the vector
    * corresponding to Dofs associated with var.
    */
-  Real discrete_var_norm(NumericVector<Number>& v,
+  Real discrete_var_norm(const NumericVector<Number>& v,
                          unsigned int var,
                          FEMNormType norm_type) const;
 
