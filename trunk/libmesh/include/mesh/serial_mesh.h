@@ -55,9 +55,11 @@ class SerialMesh : public UnstructuredMesh
  public:
 
   /**
-   * Constructor.  Requires the dimension.
+   * Constructor.  Takes \p dim, the dimension of the mesh.
+   * The mesh dimension can be changed (and may automatically be
+   * changed by mesh generation/loading) later.
    */
-  SerialMesh (unsigned int d);
+  SerialMesh (unsigned int dim=1);
 
   /**
    * Copy-constructor.  This should be able to take a
