@@ -905,6 +905,12 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	  Elem *parent = (parent_id == libMesh::invalid_uint) ? NULL : mesh.elem(parent_id);
 
 	  Elem *elem = Elem::build (elem_type, parent).release();
+
+          // We can't store higher dimensional elements on a lower
+          // dimensional mesh, but we can bump up the mesh dimension
+          if (mesh.mesh_dimension() < elem->dim())
+            mesh.set_mesh_dimension(elem->dim());
+
 	  elem->set_id() = e;
 	  elem->processor_id() = processor_id;
 	  elem->subdomain_id() = subdomain_id;
