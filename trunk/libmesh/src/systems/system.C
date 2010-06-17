@@ -1154,6 +1154,13 @@ Real System::calculate_norm(const NumericVector<Number>& v,
       if (norm.weight(var) == 0.0)
         continue;
 
+      // We currently don't support non-Hilbert norms/seminorms
+      libmesh_assert(norm.type(var) == L2 ||
+                     norm.type(var) == H1 ||
+                     norm.type(var) == H2 ||
+                     norm.type(var) == H1_SEMINORM ||
+                     norm.type(var) == H2_SEMINORM);
+
       const FEType& fe_type = this->get_dof_map().variable_type(var);
       AutoPtr<QBase> qrule =
         fe_type.default_quadrature_rule (dim);
