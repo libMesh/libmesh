@@ -1394,7 +1394,6 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 					  const unsigned int nr,
 					  const ElemType type)
 {
-  libmesh_assert (mesh.mesh_dimension() != 1);
   libmesh_assert (rad > 0.);
   //libmesh_assert (nr > 0); // must refine at least once otherwise will end up with a square/cube
   
@@ -1410,6 +1409,16 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
   
   switch (mesh.mesh_dimension())
     {
+      //-----------------------------------------------------------------
+      // Build a line in one dimension
+    case 1:
+      {
+        build_line (mesh, 3, -rad, rad, type);
+      }
+
+
+
+
       //-----------------------------------------------------------------
       // Build a circle in two dimensions
     case 2:
