@@ -47,11 +47,11 @@ class Mesh : public DefaultMesh
  public:
 
   /**
-   * Constructor.  Requires the dimension and optionally
-   * a processor id.  Note that \p proc_id should always
-   * be provided for multiprocessor applications.
+   * Constructor.  Takes \p dim, the dimension of the mesh.
+   * The mesh dimension can be changed (and may automatically be
+   * changed by mesh generation/loading) later.
    */
-  Mesh (unsigned int d) : DefaultMesh(d) {}
+  Mesh (unsigned int dim=1) : DefaultMesh(dim) {}
 
   /**
    * Copy-constructor.  This should be able to take a
