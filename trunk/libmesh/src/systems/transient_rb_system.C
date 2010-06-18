@@ -42,11 +42,10 @@
 #include <sys/stat.h>
 
 // Need SLEPc to get the POD eigenvalues
-#include "libmesh_config.h"
 #if defined(LIBMESH_HAVE_SLEPC)
-
 // LAPACK include (via SLEPc)
 #include <slepcblaslapack.h>
+#endif // LIBMESH_HAVE_SLEPC
 
 TransientRBSystem::TransientRBSystem (EquationSystems& es,
 		    const std::string& name,
@@ -1025,6 +1024,8 @@ void TransientRBSystem::add_IC_to_RB_space()
 
 void TransientRBSystem::enrich_RB_space()
 {
+// Need SLEPc to get the POD eigenvalues
+#if defined(LIBMESH_HAVE_SLEPC)
   START_LOG("enrich_RB_space()", "TransientRBSystem");
 
   // With the "method of snapshots", the size of
@@ -1183,7 +1184,11 @@ void TransientRBSystem::enrich_RB_space()
     }
 
   STOP_LOG("enrich_RB_space()", "TransientRBSystem");
+#else
+  libmesh_not_implemented();
+#endif
 }
+
 
 void TransientRBSystem::update_system()
 {
@@ -2700,5 +2705,3 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
 
   STOP_LOG("read_offline_data_from_files()", "TransientRBSystem");
 }
-
-#endif // LIBMESH_HAVE_SLEPC
