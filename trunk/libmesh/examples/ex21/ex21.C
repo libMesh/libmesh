@@ -463,6 +463,9 @@ int main (int argc, char** argv)
   const bool singularity                       = input_file("singularity", true);
   const unsigned int dim                       = input_file("dimension", 3);
 
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+    
   // Create or read the mesh
   Mesh mesh (dim);
 
