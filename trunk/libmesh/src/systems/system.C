@@ -1107,22 +1107,21 @@ Real System::calculate_norm(const NumericVector<Number>& v,
   if (norm.is_discrete())
     {
       STOP_LOG ("calculate_norm()", "System");
-      //Check to see if all weights are 1.0
+      //Check to see if all weights are 1.0 and all types are equal
+      FEMNormType norm_type0 = norm.type(0);
       unsigned int check_var = 0;
       for (; check_var != this->n_vars(); ++check_var)
-        if(norm.weight(check_var) != 1.0)
+        if((norm.weight(check_var) != 1.0) || (norm.type(check_var) != norm_type0))
           break;
 
       //All weights were 1.0 so just do the full vector discrete norm
       if(check_var == this->n_vars())
         {
-          FEMNormType norm_type = norm.type(0);
-          
-          if(norm_type == DISCRETE_L1)
+          if(norm_type0 == DISCRETE_L1)
             return v.l1_norm();
-          if(norm_type == DISCRETE_L2)
+          if(norm_type0 == DISCRETE_L2)
             return v.l2_norm();
-          if(norm_type == DISCRETE_L_INF)
+          if(norm_type0 == DISCRETE_L_INF)
             return v.linfty_norm();
           else
             libmesh_error();
@@ -1154,12 +1153,13 @@ Real System::calculate_norm(const NumericVector<Number>& v,
       if (norm.weight(var) == 0.0)
         continue;
 
-      // We currently don't support non-Hilbert norms/seminorms
-      libmesh_assert(norm.type(var) == L2 ||
-                     norm.type(var) == H1 ||
-                     norm.type(var) == H2 ||
-                     norm.type(var) == H1_SEMINORM ||
-                     norm.type(var) == H2_SEMINORM);
+      // Check for unimplemented norms (rather than just returning 0).
+      if((norm.type(var)!=H1) &&
+	 (norm.type(var)!=H2) &&
+	 (norm.type(var)!=L2) &&
+	 (norm.type(var)!=H1_SEMINORM) &&
+	 (norm.type(var)!=H2_SEMINORM))
+	libmesh_not_implemented();
 
       const FEType& fe_type = this->get_dof_map().variable_type(var);
       AutoPtr<QBase> qrule =
