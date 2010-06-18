@@ -82,9 +82,8 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
-  // Set the dimensionality of the mesh = 2
-  const unsigned int dim = 2;     
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
+  // Skip this example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   
   // Trilinos solver NaNs by default on the zero pressure block.
   // We'll skip this example for now.
@@ -95,14 +94,14 @@ int main (int argc, char** argv)
       return 0;
     }
 
-  // Create a two-dimensional mesh.
-  Mesh mesh (dim);
+  // Create a mesh.
+  Mesh mesh;
   
   // Use the MeshTools::Generation mesh generator to create a uniform
-  // grid on the square [-1,1]^D.  We instruct the mesh generator
-  // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
-  // elements in 3D.  Building these higher-order elements allows
-  // us to use higher-order approximation, as in example 3.
+  // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
+  // to build a mesh of 8x8 \p Quad9 elements in 2D.  Building these
+  // higher-order elements allows us to use higher-order
+  // approximation, as in example 3.
   MeshTools::Generation::build_square (mesh,
                                        20, 20,
                                        0., 1.,

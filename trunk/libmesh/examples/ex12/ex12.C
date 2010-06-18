@@ -208,7 +208,7 @@ int main (int argc, char** argv)
     // Below we require a 3-dim mesh, therefore assert
     // it.
     libmesh_assert (dim == 3);
-    Mesh mesh(dim);
+    Mesh mesh;
     MeshData mesh_data(mesh);
   
     // Activate the <code>MeshData</code> of the mesh, so that

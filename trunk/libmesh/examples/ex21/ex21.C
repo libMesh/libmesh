@@ -467,7 +467,7 @@ int main (int argc, char** argv)
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
     
   // Create or read the mesh
-  Mesh mesh (dim);
+  Mesh mesh;
 
   if (dim == 1)
     MeshTools::Generation::build_line(mesh,1,-1.,0.);

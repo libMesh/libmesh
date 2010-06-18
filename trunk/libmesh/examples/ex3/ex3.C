@@ -87,13 +87,13 @@ int main (int argc, char** argv)
   
   std::cout << std::endl << std::endl;
   
-  // Create a 2D mesh.
+  // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  Mesh mesh (2);
+  Mesh mesh;
   
   
   // Use the MeshTools::Generation mesh generator to create a uniform
-  // grid on the square [-1,1]^2.  We instruct the mesh generator
+  // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
   // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
   // elements instead of the default QUAD4's we used in example 2
   // allow us to use higher-order approximation.

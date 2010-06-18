@@ -148,18 +148,16 @@ int main (int argc, char** argv)
       std::cout << std::endl << std::endl;
     }
   
-  // For now, restrict to dim=2, though this
-  // may easily be changed, see example 4
-  const unsigned int dim = 2;
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
-  
   // Get the frequency from argv[2] as a <i>float</i>,
   // currently, solve for 1/3rd, 2/3rd and 1/1th of the given frequency
   const Real frequency_in = atof(argv[2]);
   const unsigned int n_frequencies = 3;        
   
-  // Create a dim-dimensional mesh.
-  Mesh mesh (dim);
+  // Skip this 2D example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  
+  // Create a mesh.
+  Mesh mesh;
 
   // Create a corresponding MeshData
   // and activate it. For more information on this object

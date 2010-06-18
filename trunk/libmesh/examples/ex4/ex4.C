@@ -168,7 +168,7 @@ int main (int argc, char** argv)
       libmesh_error();
     }
     
-  Mesh mesh (dim);
+  Mesh mesh;
   
 
   // Use the MeshTools::Generation mesh generator to create a uniform

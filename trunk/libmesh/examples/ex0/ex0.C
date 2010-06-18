@@ -64,9 +64,8 @@ int main(int argc, char** argv)
   libmesh_example_assert(false, "--enable-amr");
 #else
 
-  // Create a new 1 dimensional mesh
-  const unsigned int dim = 1;
-  Mesh mesh(dim);
+  // Create a new mesh
+  Mesh mesh;
 
   // Build a 1D mesh with 4 elements from x=0 to x=1, using 
   // EDGE3 (i.e. quadratic) 1D elements. They are called EDGE3 elements

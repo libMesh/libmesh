@@ -111,14 +111,15 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-amr");
 #else
 
-  // Create a two-dimensional mesh.
+  // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  Mesh mesh (2);
-      
+
   // Read the mesh from file.  This is the coarse mesh that will be used
   // in example 10 to demonstrate adaptive mesh refinement.  Here we will
   // simply read it in and uniformly refine it 5 times before we compute
   // with it.
+  Mesh mesh;
+      
   mesh.read ("../ex10/mesh.xda");
   
   // Create a MeshRefinement object to handle refinement of our mesh.

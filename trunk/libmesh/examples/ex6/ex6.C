@@ -88,15 +88,14 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-ifem");
 #else
   
-  // For the moment, only allow 3D     
-  const unsigned int dim = 3; 
-  libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
+  // Skip this 3D example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
   
   // Tell the user what we are doing.
-  std::cout << "Running ex6 with dim = " << dim << std::endl << std::endl;        
+  std::cout << "Running ex6 with dim = 3" << std::endl << std::endl;        
   
-  // Create a mesh with user-defined dimension 
-  Mesh mesh (dim);
+  // Create a mesh
+  Mesh mesh;
 
   // Use the internal mesh generator to create elements
   // on the square [-1,1]^3, of type Hex8.

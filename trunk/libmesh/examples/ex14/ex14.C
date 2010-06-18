@@ -164,8 +164,8 @@ int main(int argc, char** argv)
   out << "% dofs     L2-error     H1-error" << std::endl;
   out << "e = [" << std::endl;
   
-  // Create an n-dimensional mesh.
-  Mesh mesh (dim);
+  // Create a mesh.
+  Mesh mesh;
   
   // Read in the mesh
   if (dim == 1)
