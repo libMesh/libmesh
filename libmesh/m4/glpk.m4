@@ -44,7 +44,7 @@ AC_DEFUN([CONFIGURE_GLPK],
   if (test $enableglpk = yes); then
   
      dnl Check for existence of a header file in the specified location
-     dnl AC_CHECK_FILE([$GLPK_INC/glpkConfigure.h], [glpkincFound="OK"], [glpkincFound="FAIL"])
+     dnl AC_CHECK_FILE([$GLPK_INC/glpk.h], [glpkincFound="OK"], [glpkincFound="FAIL"])
      glpkincFound=no;
      AC_CHECK_HEADERS($GLPK_INC/glpk.h, glpkincFound=yes)
 
