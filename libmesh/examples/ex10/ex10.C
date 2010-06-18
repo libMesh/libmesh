@@ -190,9 +190,11 @@ int main (int argc, char** argv)
     }
 
 
-  // Create a two-dimensional mesh.
+  // Skip this example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  Mesh mesh (2);
+
+  // Create a new mesh.
+  Mesh mesh;
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);

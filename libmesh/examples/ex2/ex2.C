@@ -70,11 +70,11 @@ int main (int argc, char** argv)
     std::cout << " " << argv[i];
   std::cout << std::endl << std::endl;
   
-  // Create a 2D mesh.
-  Mesh mesh (2);
+  // Create a mesh.
+  Mesh mesh;
   
   // Use the MeshTools::Generation mesh generator to create a uniform
-  // grid on the unit square.  By default a mesh of QUAD4
+  // 2D grid on the unit square.  By default a mesh of QUAD4
   // elements will be created.  We instruct the mesh generator
   // to build a mesh of 5x5 elements.
   MeshTools::Generation::build_square (mesh, 5, 5);

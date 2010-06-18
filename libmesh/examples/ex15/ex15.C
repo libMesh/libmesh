@@ -149,8 +149,8 @@ int main(int argc, char** argv)
   // Currently only the Hermite cubics give a 3D C^1 basis
   libmesh_assert (dim == 2 || approx_type == "HERMITE");
 
-  // Create a dim-dimensional mesh.
-  Mesh mesh (dim);
+  // Create a mesh.
+  Mesh mesh;
   
   // Output file for plotting the error 
   std::string output_file = "";

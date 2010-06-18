@@ -106,22 +106,22 @@ int main (int argc, char** argv)
 
   std::cout << std::endl << std::endl;
 
-  // Create a two-dimensional mesh.
+  // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  Mesh mesh (2);
+
+  // Create a mesh
+  Mesh mesh;
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
   MeshRefinement mesh_refinement (mesh);
 
-  MeshTools::Generation::build_cube (mesh,
-				     16,
-				     16,
-				     0,
-				     -1., 1.,
-				     -1., 1.,
-				     0., 0.,
-				     QUAD4);
+  MeshTools::Generation::build_square (mesh,
+				       16,
+				       16,
+				       -1., 1.,
+				       -1., 1.,
+				       QUAD4);
   
   LinearImplicitSystem & system = 
     equation_systems.add_system<LinearImplicitSystem> 

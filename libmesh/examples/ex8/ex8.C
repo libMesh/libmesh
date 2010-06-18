@@ -159,13 +159,11 @@ int main (int argc, char** argv)
   std::string mesh_file = argv[1];
   std::cout << "Mesh file is: " << mesh_file << std::endl;
 
-  // For now, restrict to dim=3, though this
-  // may easily be changed, see example 4
-  const unsigned int dim = 3;
-  libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
+  // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
+  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
   
-  // Create a dim-dimensional mesh.
-  Mesh mesh (dim);
+  // Create a mesh.
+  Mesh mesh;
   MeshData mesh_data(mesh);
   
   // Read the meshfile specified in the command line or

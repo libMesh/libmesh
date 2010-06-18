@@ -92,15 +92,14 @@ int main (int argc, char** argv)
   // Get the number of eigen values to be computed from argv[2]
   const unsigned int nev = std::atoi(argv[2]);
 
-  // Set the dimensionality.
-  const unsigned int dim = 2;
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
+  // Skip this example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   
-  // Create a dim-dimensional mesh.
-  Mesh mesh (dim);
+  // Create a mesh.
+  Mesh mesh;
 
   // Use the internal mesh generator to create a uniform
-  // grid on a square.
+  // 2D grid on a square.
   MeshTools::Generation::build_square (mesh, 
                                        20, 20,
                                        -1., 1.,

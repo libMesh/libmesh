@@ -84,8 +84,8 @@ int main (int argc, char** argv)
   // We have only defined 2 and 3 dimensional problems
   libmesh_assert (dim == 2 || dim == 3);
 
-  // Create a n-dimensional mesh.
-  Mesh mesh (dim);
+  // Create a mesh.
+  Mesh mesh;
   
   // And an object to refine it
   MeshRefinement mesh_refinement(mesh);

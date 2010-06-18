@@ -63,8 +63,8 @@ int main (int argc, char** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
   
-  // Create a mesh with the requested dimension.
-  Mesh mesh(dim);
+  // Create a mesh
+  Mesh mesh;
   
   // Read the input mesh.
   mesh.read (argv[3]);

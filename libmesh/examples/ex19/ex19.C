@@ -434,10 +434,6 @@ int main (int argc, char** argv)
     }
   
 
-  // The dimension of our problem 
-  const unsigned int dim = 2;
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
-  
   // Read number of refinements 
   int nr = 2;
   if ( command_line.search(1, "-r") )
@@ -473,8 +469,11 @@ int main (int argc, char** argv)
 #endif //LIBMESH_HAVE_PETSC
     }  
     
-  // Create a mesh with user-defined dimension.
-  Mesh mesh (dim);    
+  // Skip this 2D example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  
+  // Create a mesh from file.
+  Mesh mesh;    
   mesh.read ("lshaped.xda");
 
   if (order != "FIRST")

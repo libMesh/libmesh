@@ -138,17 +138,12 @@ int main (int argc, char** argv)
   // Set the quadrature rule type that the user wants from argv[2]
   quad_type = static_cast<QuadratureType>(std::atoi(argv[2]));
 
-
-  // Independence of dimension has already been shown in
-  // example 4.  For the time being, restrict to 3 dimensions.
-  const unsigned int dim=3;
-  
-  // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
+  // Skip this 3D example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
   
   // The following is identical to example 4, and therefore
   // not commented.  Differences are mentioned when present.
-  Mesh mesh (dim);
+  Mesh mesh;
 
   // We will use a linear approximation space in this example,
   // hence 8-noded hexahedral elements are sufficient.  This
