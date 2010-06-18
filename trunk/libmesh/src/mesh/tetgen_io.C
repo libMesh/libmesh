@@ -40,7 +40,7 @@ void TetGenIO::read (const std::string& name)
   std::string name_node, name_ele, dummy;
 
   // tetgen only works in 3D
-  libmesh_assert (MeshInput<MeshBase>::mesh().mesh_dimension() == 3);
+  MeshInput<MeshBase>::mesh().set_mesh_dimension(3);
 
   // Check name for *.node or *.ele extension.
   // Set std::istream for node_stream and ele_stream.

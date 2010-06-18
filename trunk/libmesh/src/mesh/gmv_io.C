@@ -1955,7 +1955,12 @@ void GMVIO::read (const std::string& name)
 
 #else
   // Clear the mesh so we are sure to start from a pristeen state.
-  MeshInput<MeshBase>::mesh().clear();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  mesh.clear();
+  
+  // Keep track of what kinds of elements this file contains
+  elems_of_dimension.clear();
+  elems_of_dimension.resize(4, false);
   
   // It is apparently possible for gmv files to contain
   // a "fromfile" directive (?) But we currently don't make
@@ -2068,11 +2073,16 @@ void GMVIO::read (const std::string& name)
         } // end switch
     } // end while
 
+  // Set the mesh dimension to the largest encountered for an element
+  for (unsigned int i=0; i!=4; ++i)
+    if (elems_of_dimension[i])
+      mesh.set_mesh_dimension(i);
+
   // Done reading in the mesh, now call find_neighbors, etc.
-  // MeshInput<MeshBase>::mesh().find_neighbors();
+  // mesh.find_neighbors();
   
   // Pass true flag to skip renumbering nodes and elements
-  MeshInput<MeshBase>::mesh().prepare_for_use(true);
+  mesh.prepare_for_use(true);
 #endif
 }
 
@@ -2186,6 +2196,7 @@ void GMVIO::_read_one_cell()
 #endif
     libmesh_assert (recognized);
 
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
   if (GMV::gmv_data.datatype == REGULAR)
     {
@@ -2220,11 +2231,13 @@ void GMVIO::_read_one_cell()
 	  // 		    << std::endl;
 	  
 	  // Note: Node numbers are 1-based
-	  elem->set_node(i) = MeshInput<MeshBase>::mesh().node_ptr(GMV::gmv_data.longdata1[i]-1);
+	  elem->set_node(i) = mesh.node_ptr(GMV::gmv_data.longdata1[i]-1);
 	}
 
+      elems_of_dimension[elem->dim()] = true;
+
       // Add the newly-created element to the mesh
-      MeshInput<MeshBase>::mesh().add_elem(elem);
+      mesh.add_elem(elem);
     }
 
 

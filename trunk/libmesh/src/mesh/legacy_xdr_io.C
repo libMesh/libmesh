@@ -280,6 +280,10 @@ void LegacyXdrIO::read_mesh (const std::string& name,
   // clear any data in the mesh
   mesh.clear();
   
+  // Keep track of what kinds of elements this file contains
+  elems_of_dimension.clear();
+  elems_of_dimension.resize(4, false);
+  
   // Create an XdrMESH object.
   XdrMESH m;
 
@@ -527,10 +531,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
               elem = Elem::build(etypes[idx]).release();
               elem->set_id(_next_elem_id++);
 
-              // We can't store higher dimensional elements on a lower
-              // dimensional mesh, but we can bump up the mesh dimension
-              if (mesh.mesh_dimension() < elem->dim())
-                mesh.set_mesh_dimension(elem->dim());
+              elems_of_dimension[elem->dim()] = true;
 
               mesh.add_elem(elem);
             }
@@ -570,10 +571,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                 {
                   elem->set_id(_next_elem_id++);
 
-                  // We can't store higher dimensional elements on a lower
-                  // dimensional mesh, but we can bump up the mesh dimension
-                  if (mesh.mesh_dimension() < elem->dim())
-                    mesh.set_mesh_dimension(elem->dim());
+                  elems_of_dimension[elem->dim()] = true;
 
                   mesh.add_elem(elem);
                 }
@@ -603,10 +601,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 	  Elem* elem = new Hex27;
           elem->set_id(ielm);
 
-          // We can't store higher dimensional elements on a lower
-          // dimensional mesh, but we can bump up the mesh dimension
-          if (mesh.mesh_dimension() < elem->dim())
-            mesh.set_mesh_dimension(elem->dim());
+          elems_of_dimension[elem->dim()] = true;
 
 	  mesh.add_elem(elem);
 	  
@@ -615,6 +610,10 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 	}
     }
 
+  // Set the mesh dimension to the largest encountered for an element
+  for (unsigned int i=0; i!=4; ++i)
+    if (elems_of_dimension[i])
+      mesh.set_mesh_dimension(i);
   
   // tell the MeshData object that we are finished 
   // reading data

@@ -26,6 +26,7 @@
 // C++ inludes
 #include <istream>
 #include <string>
+#include <vector>
 
 // Local includes
 #include "libmesh_common.h"
@@ -81,6 +82,12 @@ class MeshInput
    * Returns the object as a writeable reference.
    */
   MT& mesh ();
+  
+  /**
+   * A vector of bools describing what dimension elements
+   * have been encountered when reading a mesh.
+   */
+  std::vector<bool> elems_of_dimension;
   
   /**
    * Reads input from \p in, skipping all the lines

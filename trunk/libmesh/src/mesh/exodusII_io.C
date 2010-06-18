@@ -102,8 +102,9 @@ void ExodusII_IO::read (const std::string& fname)
   // Clear any existing mesh data
   mesh.clear();
   
-  if (mesh.mesh_dimension() == 1) // No support for 1D ExodusII meshes
-    libmesh_not_implemented();
+  // Keep track of what kinds of elements this file contains
+  elems_of_dimension.clear();
+  elems_of_dimension.resize(4, false);
   
 #ifdef DEBUG
   this->verbose(true);
@@ -162,6 +163,9 @@ void ExodusII_IO::read (const std::string& fname)
 	  libmesh_assert (elem);
           elem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id) ;
           //elem->set_id(j);// Don't try to second guess the Element ID setting scheme!
+
+          elems_of_dimension[elem->dim()] = true;
+
 	  elem = mesh.add_elem (elem); // Catch the Elem pointer that the Mesh throws back
 
           exodus_id_to_mesh_id[j+1] = elem->id();
@@ -228,6 +232,11 @@ void ExodusII_IO::read (const std::string& fname)
           mesh.boundary_info->add_node(node_list[node]-1, nodeset_id);
       }
   }
+
+  // Set the mesh dimension to the largest encountered for an element
+  for (unsigned int i=0; i!=4; ++i)
+    if (elems_of_dimension[i])
+      mesh.set_mesh_dimension(i);
       
 #endif
 }

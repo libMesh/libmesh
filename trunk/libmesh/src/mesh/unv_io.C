@@ -111,6 +111,9 @@ void UNVIO::read_implementation (std::istream& in_stream)
   // we can start from scratch
   this->clear ();
 
+  // Keep track of what kinds of elements this file contains
+  elems_of_dimension.clear();
+  elems_of_dimension.resize(4, false);
 
    // Note that we read this file
    // @e twice.  First time to
@@ -254,6 +257,10 @@ void UNVIO::read_implementation (std::istream& in_stream)
 	  libmesh_error();
       }
 
+    // Set the mesh dimension to the largest encountered for an element
+    for (unsigned int i=0; i!=4; ++i)
+      if (elems_of_dimension[i])
+        MeshInput<MeshBase>::mesh().set_mesh_dimension(i);
 
     // tell the MeshData object that we are finished 
     // reading data
@@ -933,7 +940,9 @@ void UNVIO::element_in (std::istream& in_file)
 	  elem->set_node(assign_elem_nodes[j]) =
 	    mesh.node_ptr(assigned_node);
 	}
-      
+
+      elems_of_dimension[elem->dim()] = true;
+
       // add elem to the Mesh & 
       // tell the MeshData object the foreign elem id
       // (note that mesh.add_elem() returns a pointer to the new element)

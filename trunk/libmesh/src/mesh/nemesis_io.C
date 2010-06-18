@@ -151,7 +151,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   nemhelper.print_header();
   
   // Be sure number of dimensions is equal to the number of dimensions in the mesh supplied.
-  libmesh_assert(static_cast<unsigned int>(nemhelper.num_dim) == mesh.mesh_dimension());
+  mesh.set_mesh_dimension(static_cast<unsigned int>(nemhelper.num_dim));
   
   // Get global information: number of nodes, elems, blocks, nodesets and sidesets
   nemhelper.get_init_global();
