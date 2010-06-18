@@ -51,7 +51,7 @@ void MatlabIO::read_stream(std::istream& in)
   mesh.clear();
   
   // PDE toolkit only works in 2D
-  libmesh_assert(mesh.mesh_dimension() == 2);
+  mesh.set_mesh_dimension(2);
 
   // Check the input buffer
   libmesh_assert (in.good());

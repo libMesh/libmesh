@@ -116,9 +116,10 @@ void UCDIO::read_implementation (std::istream& in)
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
-  // UCD doesn't work in 1D
-  libmesh_assert (mesh.mesh_dimension() != 1);
-
+  // Keep track of what kinds of elements this file contains
+  elems_of_dimension.clear();
+  elems_of_dimension.resize(4, false);
+  
   this->skip_comment_lines (in, '#');
   
   unsigned int nNodes=0, nElem=0, dummy=0;
@@ -202,10 +203,17 @@ void UCDIO::read_implementation (std::istream& in)
 	      mesh.node_ptr(node); // assign the node
 	  }
 
+        elems_of_dimension[elem->dim()] = true;
+
 	// Add the element to the mesh
 	elem->set_id(i);
 	mesh.add_elem (elem);
       }
+
+    // Set the mesh dimension to the largest encountered for an element
+    for (unsigned int i=0; i!=4; ++i)
+      if (elems_of_dimension[i])
+        mesh.set_mesh_dimension(i);
   }  
 }
 

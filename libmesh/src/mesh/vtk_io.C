@@ -453,6 +453,10 @@ void VTKIO::read (const std::string& name)
   // broadcast later
   libmesh_assert(libMesh::processor_id() == 0);
 
+  // Keep track of what kinds of elements this file contains
+  elems_of_dimension.clear();
+  elems_of_dimension.resize(4, false);
+
 #ifndef LIBMESH_HAVE_VTK
   libMesh::err << "Cannot read VTK file: " << name
 	        << "\nYou must have VTK installed and correctly configured to read VTK meshes."
@@ -501,6 +505,7 @@ void VTKIO::read (const std::string& name)
       Elem* elem = NULL;  // Initialize to avoid compiler warning
       switch(cell->GetCellType())
 	{
+        // FIXME - we're not supporting 2D VTK input yet!? [RHS]
 	case VTK_TETRA:
 	  elem = new Tet4();
 	  break;
@@ -537,9 +542,17 @@ void VTKIO::read (const std::string& name)
 	  elem->set_node(j) = mesh.node_ptr(conn[j]);
   } 
   elem->set_id(i);
+
+  elems_of_dimension[elem->dim()] = true;
+
   mesh.add_elem(elem);
   } // end loop over VTK cells
   _vtk_grid->Delete();
+
+  // Set the mesh dimension to the largest encountered for an element
+  for (unsigned int i=0; i!=4; ++i)
+    if (elems_of_dimension[i])
+      mesh.set_mesh_dimension(i);
 #endif // LIBMESH_HAVE_VTK
 }
 

@@ -826,6 +826,10 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
+  // Keep track of what kinds of elements this file contains
+  elems_of_dimension.clear();
+  elems_of_dimension.resize(4, false);
+
   std::vector<unsigned int> conn, input_buffer(100 /* oversized ! */);
 
   int level=-1;
@@ -906,11 +910,6 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 
 	  Elem *elem = Elem::build (elem_type, parent).release();
 
-          // We can't store higher dimensional elements on a lower
-          // dimensional mesh, but we can bump up the mesh dimension
-          if (mesh.mesh_dimension() < elem->dim())
-            mesh.set_mesh_dimension(elem->dim());
-
 	  elem->set_id() = e;
 	  elem->processor_id() = processor_id;
 	  elem->subdomain_id() = subdomain_id;
@@ -933,9 +932,15 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 		mesh.add_point (Point(), global_node_number);
 	    }
 	  
+          elems_of_dimension[elem->dim()] = true;
 	  mesh.add_elem(elem);
 	}
     }
+
+  // Set the mesh dimension to the largest encountered for an element
+  for (unsigned int i=0; i!=4; ++i)
+    if (elems_of_dimension[i])
+      mesh.set_mesh_dimension(i);
 }
 
 
