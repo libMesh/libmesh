@@ -96,6 +96,7 @@ enable-tetgen        = @enabletetgen@
 enable-triangle      = @enabletriangle@
 enable-gmv           = @enablegmv@
 enable-vtk           = @enablevtk@
+enable-glpk          = @enableglpk@
 enable-exodus	     = @enableexodus@
 enable-netcdf	     = @enablenetcdf@
 enable-nemesis	     = @enablenemesis@
