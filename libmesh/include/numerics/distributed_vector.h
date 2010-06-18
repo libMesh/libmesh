@@ -563,7 +563,7 @@ void DistributedVector<T>::init (const unsigned int n,
 
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
-  for (int p=0; p<libMesh::processor_id(); p++)
+  for (unsigned int p=0; p!=libMesh::processor_id(); p++)
     _first_local_index += local_sizes[p];
 
 
@@ -572,7 +572,7 @@ void DistributedVector<T>::init (const unsigned int n,
   // size, otherwise there is big trouble!
   int sum=0;
 
-  for (int p=0; p<libMesh::n_processors(); p++)
+  for (unsigned int p=0; p!=libMesh::n_processors(); p++)
     sum += local_sizes[p];
 
   libmesh_assert (sum == static_cast<int>(n));
