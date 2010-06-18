@@ -355,8 +355,174 @@ bool Xdr::is_open() const
 }
 
 
+#ifdef LIBMESH_HAVE_XDR
 
-void Xdr::data (int& a, const char* comment)
+// Anonymous namespace for Xdr::data helper functions
+namespace
+{
+
+template <typename T>
+xdrproc_t xdr_translator();
+
+template <typename T>
+bool xdr_translate(XDR* x, T& a) {return (xdr_translator<T>())(x, &a); }
+
+template <>
+bool xdr_translate(XDR* x, std::string& s) {
+  char* sptr = new char[xdr_MAX_STRING_LENGTH+1];
+  std::copy(s.begin(), s.end(), sptr);
+  sptr[s.size()] = 0;
+  unsigned int length = xdr_MAX_STRING_LENGTH;
+  bool b = xdr_string(x, &sptr, length);
+
+  // This is necessary when reading, but inefficient when writing...
+  length = std::strlen(sptr);
+  s.resize(length);
+  std::copy(sptr, sptr+length, s.begin());
+
+  delete [] sptr;
+  return b;
+}
+
+template <typename T>
+bool xdr_translate(XDR* x, std::complex<T>& a) {
+  bool b1 = xdr_translate(x, &a.real());
+  bool b2 = xdr_translate(x, &a.imag());
+  return (b1 && b2);
+}
+
+template <typename T>
+bool xdr_translate(XDR* x, std::vector<T>& a) {
+  unsigned int length = a.size();
+  xdr_u_int(x, &length);
+  a.resize(length);
+  return xdr_vector(x, (char*) &a[0], length, sizeof(T),
+                    xdr_translator<T>());
+}
+
+template <typename T>
+bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
+  unsigned int length = a.size();
+  bool b = xdr_u_int(x, &length);
+  a.resize(length);
+  std::vector< std::complex<double> >::iterator iter = a.begin();
+  for (; iter != a.end(); ++iter)
+    if (!xdr_translate(x, *iter))
+      b = false;
+  return b;
+}
+
+template <>
+xdrproc_t xdr_translator<int>() { return (xdrproc_t)(xdr_int); }
+
+template <>
+xdrproc_t xdr_translator<unsigned int>() { return (xdrproc_t)(xdr_u_int); }
+
+template <>
+xdrproc_t xdr_translator<short int>() { return (xdrproc_t)(xdr_short); }
+
+template <>
+xdrproc_t xdr_translator<unsigned short int>() { return (xdrproc_t)(xdr_u_short); }
+
+template <>
+xdrproc_t xdr_translator<float>() { return (xdrproc_t)(xdr_float); }
+
+template <>
+xdrproc_t xdr_translator<double>() { return (xdrproc_t)(xdr_double); }
+
+} // end anonymous namespace
+
+#endif
+
+template <typename T>
+void Xdr::do_read(T& a) {
+  *in >> a; 
+  in->getline(comm, comm_len);
+}
+
+template <typename T>
+void Xdr::do_read(std::complex<T>& a) {
+  *in >> a.real() >> a.imag();
+  in->getline(comm, comm_len);
+}
+
+template <>
+void Xdr::do_read(std::string& a) {
+  in->getline(comm, comm_len);
+
+  a = "";
+
+  for (unsigned int c=0; c<std::strlen(comm); c++)
+    {
+      if (comm[c] == '\t') 
+        break;
+      a.push_back(comm[c]);
+    }
+}
+
+template <typename T>
+void Xdr::do_read(std::vector<T>& a) {
+  unsigned int length=0;
+  data(length, "# vector length");
+  a.resize(length);
+
+  for (unsigned int i=0; i<a.size(); i++)
+    {
+      libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
+      *in >> a[i]; 
+    }
+  in->getline(comm, comm_len);
+}
+
+template <typename T>
+void Xdr::do_read(std::vector<std::complex<T> >& a) {
+  unsigned int length=0;
+  data(length, "# vector length x 2 (complex)");
+  a.resize(length);
+
+  for (unsigned int i=0; i<a.size(); i++)
+    {
+      libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
+      *in >> a[i].real() >> a[i].imag();
+    }
+}
+
+template <typename T>
+void Xdr::do_write(T& a) { *out << a; }
+
+template <typename T>
+void Xdr::do_write(std::complex<T>& a) { 
+  *out << a.real() << "\t " << a.imag();
+}
+
+template <typename T>
+void Xdr::do_write(std::vector<T>& a) { 
+  unsigned int length=a.size();
+  data(length, "# vector length");
+
+  for (unsigned int i=0; i<a.size(); i++)
+    {
+      libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+      this->do_write(a[i]);
+    }
+}
+
+template <typename T>
+void Xdr::do_write(std::vector<std::complex<T> >& a) { 
+  unsigned int length=a.size();
+  data(length, "# vector length x 2 (complex)");
+
+  for (unsigned int i=0; i<a.size(); i++)
+    {
+      libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+      this->do_write(a[i]);
+    }
+}
+
+
+
+template <typename T>
+void Xdr::data (T& a, const char* comment)
 {
   switch (mode)
     {
@@ -367,7 +533,7 @@ void Xdr::data (int& a, const char* comment)
 
 	libmesh_assert (is_open());
 
-	xdr_int(xdrs, &a);
+	xdr_translate(xdrs, a);
 
 #else
 	
@@ -387,7 +553,7 @@ void Xdr::data (int& a, const char* comment)
       {
 	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	
-	*in >> a; in->getline(comm, comm_len);
+	this->do_read(a);
 
 	return;
       }
@@ -396,7 +562,8 @@ void Xdr::data (int& a, const char* comment)
       {
 	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	
-	*out << a << "\t " << comment << '\n';
+	this->do_write(a);
+        *out << "\t " << comment << '\n';
 
 	return;
       }
@@ -405,1254 +572,6 @@ void Xdr::data (int& a, const char* comment)
       libmesh_error();
     }
 }
-
-
-
-void Xdr::data (unsigned int& a, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (this->is_open());
-
-	xdr_u_int(xdrs, &a);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	
-	*in >> a; in->getline(comm, comm_len);
-
-	return;
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	*out << a << "\t " << comment << '\n';
-	
-	return;
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (short int& a, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	xdr_short(xdrs, &a);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	
-	*in >> a; in->getline(comm, comm_len);
-
-	return;
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	*out << a << "\t " << comment << '\n';
-	
-	return;
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (unsigned short int& a, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	xdr_u_short(xdrs, &a);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	
-	*in >> a; in->getline(comm, comm_len);
-
-	return;
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	*out << a << "\t " << comment << '\n';
-	
-	return;
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (float& a, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	xdr_float(xdrs, &a);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	
-	*in >> a; in->getline(comm, comm_len);
-
-	return;
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	*out << a << "\t " << comment << '\n';
-	
-	return;
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (double& a, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	xdr_double(xdrs, &a);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	
-	*in >> a; in->getline(comm, comm_len);
-
-	return;
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	*out << a << "\t " << comment << '\n';
-	
-	return;
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-void Xdr::data (std::complex<double>& a, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-	double
-	  _r=a.real(),
-	  _i=a.imag();
-	xdr_double(xdrs, &_r);
-	xdr_double(xdrs, &_i);
-	a = std::complex<double>(_r,_i);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	
-	double _r, _i;
-	*in >> _r;
-	*in >> _i;
-	a = std::complex<double>(_r,_i);
-        in->getline(comm, comm_len);
-
-	return;
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	*out << a.real() << "\t " 
-	    << a.imag() << "\t "
-	    << comment << '\n';
-	
-	return;
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-#endif // LIBMESH_USE_COMPLEX_NUMBERS
-
-
-
-void Xdr::data (std::vector<int>& v, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length = v.size();
-
-	data(length, "# vector length");
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(int),
-		   (xdrproc_t) xdr_int);
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(int),
-		   (xdrproc_t) xdr_int);
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	    *in >> v[i];
-	  }
-
-	in->getline(comm, comm_len);
-
-	return;	
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	unsigned int length=v.size();
-
-	data(length, "# vector length");
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-	    *out << v[i] << " ";
-	  }
-
-	*out << "\t " << comment << '\n';
-
-	return;	
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (std::vector<unsigned int>& v, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length = v.size();
-
-	data(length, "# vector length");
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(unsigned int),
-		   (xdrproc_t) xdr_u_int);
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(unsigned int),
-		   (xdrproc_t) xdr_u_int);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif	
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	    *in >> v[i];
-	  }
-
-	in->getline(comm, comm_len);
-
-	return;	
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	unsigned int length=v.size();
-
-	data(length, "# vector length");
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-	    *out << v[i] << " ";
-	  }
-
-	*out << "\t " << comment << '\n';
-
-	return;	
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (std::vector<short int>& v, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length = v.size();
-
-	data(length, "# vector length");
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(short int),
-		   (xdrproc_t) xdr_short);
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(short int),
-		   (xdrproc_t) xdr_short);
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	    *in >> v[i];
-	  }
-
-	in->getline(comm, comm_len);
-
-	return;	
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	unsigned int length=v.size();
-
-	data(length, "# vector length");
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-	    *out << v[i] << " ";
-	  }
-
-	*out << "\t " << comment << '\n';
-
-	return;	
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (std::vector<unsigned short int>& v, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length = v.size();
-
-	data(length, "# vector length");
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(unsigned short int),
-		   (xdrproc_t) xdr_u_short);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif	
-	return;
-      }
-
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(unsigned short int),
-		   (xdrproc_t) xdr_u_short);
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	    *in >> v[i];
-	  }
-
-	in->getline(comm, comm_len);
-
-	return;	
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	unsigned int length=v.size();
-
-	data(length, "# vector length");
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-	    *out << v[i] << " ";
-	  }
-
-	*out << "\t " << comment << '\n';
-
-	return;	
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (std::vector<float>& v, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length = v.size();
-
-	data(length, "# vector length");
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(float),
-		   (xdrproc_t) xdr_float);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif	
-	return;
-      }
-
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(float),
-		   (xdrproc_t) xdr_float);
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-	unsigned int length=0;
-
-	data(length, "# vector length");
-
-	v.resize(length);
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	    *in >> v[i];
-	  }
-
-	in->getline(comm, comm_len);
-
-	return;	
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	unsigned int length=v.size();
-
-	data(length, "# vector length");
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-	    OFSRealscientific(*out,17,v[i]) << " ";
- 	  }
-
-	*out << "\t " << comment << '\n';
-
-	return;	
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-void Xdr::data (std::vector<double>& v, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (this->is_open());
-
-	unsigned int length = v.size();
-
-	this->data(length, "# vector length");
-
-	xdr_vector(xdrs, 
-		   (char*) &v[0],
-		   length,
-		   sizeof(double),
-		   (xdrproc_t) xdr_double);
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif	
-	return;
-      }
-
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (this->is_open());
-
-	unsigned int length=0;
-
-	this->data(length, "# vector length");
-
-	v.resize(length);
-
-	// Note: GCC 3.4.1 will crash in debug mode here if length
-	// is zero and you attempt to access the zeroth index of v.
-	if (length > 0)
-	  xdr_vector(xdrs, 
-		     (char*) &v[0],
-		     length,
-		     sizeof(double),
-		     (xdrproc_t) xdr_double);
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-	unsigned int length=0;
-
-	this->data(length, "# vector length");
-	
-	// If you were expecting to read in a vector at this
-	// point, it's not going to happen if length == 0!
-	// libmesh_assert (length != 0);
-	
-	v.resize(length);
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	    *in >> v[i];
-	  }
-
-	in->getline(comm, comm_len);
-
-	return;	
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	unsigned int length=v.size();
-
-	data(length, "# vector length");
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-	    OFSRealscientific(*out,17,v[i]) << " ";
- 	  }
-
-
-
-	*out << "\t " << comment << '\n';
-
-	return;	
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-
-
-
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-void Xdr::data (std::vector< std::complex<double> >& v, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length = v.size();
-
-	data(length, "# vector length x 2 (complex)");
-
-	std::vector< std::complex<double> >::iterator iter = v.begin();
-	
-	for (; iter != v.end(); ++iter)
-	    data(*iter, "");
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif	
-	return;
-      }
-
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	unsigned int length=0;
-
-	data(length, "# vector length x 2 (complex)");
-
-	v.resize(length);
-
-	std::vector< std::complex<double> >::iterator iter = v.begin();
-	
-	for (; iter != v.end(); ++iter)
-	    data(*iter, "");
-	
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-	unsigned int length=0;
-
-	data(length, "# vector length x 2 (complex)");
-
-	v.resize(length);
-
-	for (unsigned int i=0; i<v.size(); i++)
-	  {
-	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	
-	    double _r, _i;
-	    *in >> _r;
-	    *in >> _i;
-	    v[i] = std::complex<double>(_r,_i);
-	  }
-
-	in->getline(comm, comm_len);
-
-	return;	
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	unsigned int length=v.size();
-
-	data(length, "# vector length x 2 (complex)");
-
- 	for (unsigned int i=0; i<v.size(); i++)
- 	  {
- 	    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-	    OFSNumberscientific(*out,17,v[i]) << " ";
- 	  }
-
-	*out << "\t " << comment << '\n';
-
-	return;	
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
-#endif // ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-
-
-
-void Xdr::data (std::string& s, const char* comment)
-{
-  switch (mode)
-    {
-    case ENCODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	{
-	  char* sptr = new char[s.size()+1];
-
-	  for (unsigned int c=0; c<s.size(); c++)
-	    sptr[c] = s[c];
-	
-	  sptr[s.size()] = '\0';
-	  
-	  xdr_string(xdrs,
-		     &sptr,
-		     std::strlen(sptr));
-
-	  delete [] sptr;
-	}
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-	libmesh_assert (is_open());
-
-	{
-	  char* sptr = new char[xdr_MAX_STRING_LENGTH];
-	  
-	  xdr_string(xdrs,
-		     &sptr,
-		     xdr_MAX_STRING_LENGTH);
-
-	  s.resize(std::strlen(sptr));
-
-	  for (unsigned int c=0; c<s.size(); c++)
-	    s[c] = sptr[c];
-	  
-	  delete [] sptr;  
-	}
-
-#else
-	
-	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
-		      << std::endl
-		      << "The XDR interface is not available in this installation"
-		      << std::endl;
-
-	libmesh_error();
-
-#endif
-	return;
-      }
-
-    case READ:
-      {
-	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-	in->getline(comm, comm_len);
-
-//#ifndef LIBMESH_BROKEN_IOSTREAM
-//	s.clear();
-//#else
-	s = "";
-//#endif
-
-	for (unsigned int c=0; c<std::strlen(comm); c++)
-	  {
-	    if (comm[c] == '\t') 
-	      break;
-	    
-	    s.push_back(comm[c]);
-	  }
-
-	return;	
-      }
-
-    case WRITE:
-      {
-	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-
-	*out << s << "\t " << comment << '\n';
-
-	return;	
-      }
-
-    default:
-      libmesh_error();
-    }
-}
-
 
 
 template <typename T>
@@ -2154,5 +1073,18 @@ void Xdr::comment (std::string &comment)
 
 
 //
+template void Xdr::data<int>                              (int&,                             const char*);
+template void Xdr::data<unsigned int>                     (unsigned int&,                    const char*);
+template void Xdr::data<unsigned short int>               (unsigned short int&,              const char*);
+template void Xdr::data<short int>                        (short int&,                       const char*);
+template void Xdr::data<float>                            (float&,                           const char*);
+template void Xdr::data<double>                           (double&,                          const char*);
+template void Xdr::data<std::string>                      (std::string&,                     const char*);
+template void Xdr::data<std::vector<int> >                (std::vector<int>&,                const char*);
+template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned int>&,       const char*);
+template void Xdr::data<std::vector<short int> >          (std::vector<short int>&,          const char*);
+template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int>&, const char*);
+template void Xdr::data<std::vector<float> >              (std::vector<float>&,              const char*);
+template void Xdr::data<std::vector<double> >             (std::vector<double>&,             const char*);
 template void Xdr::data_stream<int>          (int *val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int> (unsigned int *val, const unsigned int len, const unsigned int line_break);

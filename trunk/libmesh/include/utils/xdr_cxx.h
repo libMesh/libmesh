@@ -114,302 +114,23 @@ public:
   // Data access methods
 
   /**
-   * Inputs or outputs a single integer.
+   * Inputs or outputs a single value.
    */
-  void data(int& a, const char* comment="");
+  template <typename T>
+  void data(T& a, const char* comment="");
 
   /**
    * Same, but provides an \p ostream like interface.
    */
-  Xdr& operator << (int& a) { libmesh_assert (writing()); data(a); return *this; }
+  template <typename T>
+  Xdr& operator << (T& a) { libmesh_assert (writing()); data(a); return *this; }
 
   /**
    * Same, but provides an \p istream like interface.
    */
-  Xdr& operator >> (int& a) { libmesh_assert (reading()); data(a); return *this; }
+  template <typename T>
+  Xdr& operator >> (T& a) { libmesh_assert (reading()); data(a); return *this; }
   
-  /**
-   * Inputs or outputs a single unsigned integer.
-   */
-  void data(unsigned int& a, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (unsigned int& a) { libmesh_assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (unsigned int& a) { libmesh_assert (reading()); data(a); return *this; }
-
-  /**
-   * Inputs or outputs a single short integer.
-   */
-  void data(short int& a, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (short int& a) { libmesh_assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (short int& a) { libmesh_assert (reading()); data(a); return *this; }
-
-  /**
-   * Inputs or outputs a single unsigned short integer.
-   */
-  void data(unsigned short int& a, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (unsigned short int& a) { libmesh_assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (unsigned short int& a) { libmesh_assert (reading()); data(a); return *this; }
-
-  /**
-   * Inputs or outputs a single float.
-   */
-  void data(float& a, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (float& a) { libmesh_assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (float& a) { libmesh_assert (reading()); data(a); return *this; }
-
-  /**
-   * Inputs or outputs a single double.
-   */
-  void data(double& a, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (double& a) { libmesh_assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (double& a) { libmesh_assert (reading()); data(a); return *this; }
-
-  /**
-   * Inputs or outputs a single long double, but in double precision.
-   */
-  void data(long double& a, const char* comment="") 
-    { double ad = a;
-      data(ad, comment); }
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (long double& a) { libmesh_assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (long double& a) { libmesh_assert (reading()); data(a); return *this; }
-
-
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-  /**
-   * Inputs or outputs a single complex<double>.
-   */
-  void data(std::complex<double>& a, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::complex<double>& a) { libmesh_assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::complex<double>& a) { libmesh_assert (reading()); data(a); return *this; }
-
-  /**
-   * Inputs or outputs a single complex<long double>, but in double
-   * precision.
-   */
-  void data(std::complex<long double>& a, const char* comment="")
-    { std::complex<double> ad (a);
-      data(ad, comment); }
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::complex<long double>& a) { libmesh_assert (writing()); data(a); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::complex<long double>& a) { libmesh_assert (reading()); data(a); return *this; }
-
-#endif
-
-
-  /**
-   * Inputs or outputs a vector of integers.
-   */
-  void data(std::vector<int>& v, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector<int>& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector<int>& v) { libmesh_assert (reading()); data(v); return *this; }
-
-  /**
-   * Inputs or outputs a vector of unsigned integers.
-   */
-  void data(std::vector<unsigned int>& v, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector<unsigned int>& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector<unsigned int>& v) { libmesh_assert (reading()); data(v); return *this; }
-
-  /**
-   * Inputs or outputs a vector of short integers.
-   */
-  void data(std::vector<short int>& v, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector<short int>& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector<short int>& v) { libmesh_assert (reading()); data(v); return *this; }
-
-  /**
-   * Inputs or outputs a vector of unsigned short integers.
-   */
-  void data(std::vector<unsigned short int>& v, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector<unsigned short int>& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector<unsigned short int>& v) { libmesh_assert (reading()); data(v); return *this; }
-
-  /**
-   * Inputs or outputs a vector of floats.
-   */
-  void data(std::vector<float>& v, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector<float>& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector<float>& v) { libmesh_assert (reading()); data(v); return *this; }
-
-  /**
-   * Inputs or outputs a vector of doubles.
-   */
-  void data(std::vector<double>& v, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector<double>& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector<double>& v) { libmesh_assert (reading()); data(v); return *this; }
-
-  /**
-   * Inputs or outputs a vector of long doubles, but in double
-   * precision.
-   */
-  void data(std::vector<long double>& v, const char* comment="")
-    { std::vector<double> vd(v.size());
-      for (unsigned int i = 0; i != v.size(); ++i)
-	vd[i] = static_cast<double>(v[i]);
-      data(vd, comment);
-      v.resize(vd.size());
-      for (unsigned int i = 0; i != vd.size(); ++i)
-	v[i] = static_cast<long double>(vd[i]);
-    }
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector<long double>& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector<long double>& v) { libmesh_assert (reading()); data(v); return *this; }
-
-
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-  /**
-   * Inputs or outputs a vector of complex<double>.
-   */
-  void data(std::vector< std::complex<double> >& v, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::vector< std::complex<double> >& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::vector< std::complex<double> >& v) { libmesh_assert (reading()); data(v); return *this; }
-
-#endif
-
-
-  /**
-   * Inputs or outputs a single string.
-   */
-  void data(std::string& s, const char* comment="");
-
-  /**
-   * Same, but provides an \p ostream like interface.
-   */
-  Xdr& operator << (std::string& v) { libmesh_assert (writing()); data(v); return *this; }
-
-  /**
-   * Same, but provides an \p istream like interface.
-   */
-  Xdr& operator >> (std::string& v) { libmesh_assert (reading()); data(v); return *this; }
-
-
   /**
    * Inputs or outputs a raw data stream.
    */
@@ -423,6 +144,36 @@ public:
   
 
 private:
+
+  /**
+   * Helper method for reading different data types
+   */
+  template <typename T>
+  void do_read(T& a);
+
+  template <typename T>
+  void do_read(std::complex<T>& a);
+
+  template <typename T>
+  void do_read(std::vector<T>& a);
+
+  template <typename T>
+  void do_read(std::vector<std::complex<T> >& a);
+
+  /**
+   * Helper method for writing different data types
+   */
+  template <typename T>
+  void do_write(T& a);
+
+  template <typename T>
+  void do_write(std::complex<T>& a);
+
+  template <typename T>
+  void do_write(std::vector<T>& a);
+
+  template <typename T>
+  void do_write(std::vector<std::complex<T> >& a);
 
   /**
    * The mode used for accessing the file.
