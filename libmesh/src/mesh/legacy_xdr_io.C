@@ -526,6 +526,12 @@ void LegacyXdrIO::read_mesh (const std::string& name,
             {
               elem = Elem::build(etypes[idx]).release();
               elem->set_id(_next_elem_id++);
+
+              // We can't store higher dimensional elements on a lower
+              // dimensional mesh, but we can bump up the mesh dimension
+              if (mesh.mesh_dimension() < elem->dim())
+                mesh.set_mesh_dimension(elem->dim());
+
               mesh.add_elem(elem);
             }
             
@@ -563,6 +569,12 @@ void LegacyXdrIO::read_mesh (const std::string& name,
               if (elem)
                 {
                   elem->set_id(_next_elem_id++);
+
+                  // We can't store higher dimensional elements on a lower
+                  // dimensional mesh, but we can bump up the mesh dimension
+                  if (mesh.mesh_dimension() < elem->dim())
+                    mesh.set_mesh_dimension(elem->dim());
+
                   mesh.add_elem(elem);
                 }
               else
@@ -590,6 +602,12 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 	{
 	  Elem* elem = new Hex27;
           elem->set_id(ielm);
+
+          // We can't store higher dimensional elements on a lower
+          // dimensional mesh, but we can bump up the mesh dimension
+          if (mesh.mesh_dimension() < elem->dim())
+            mesh.set_mesh_dimension(elem->dim());
+
 	  mesh.add_elem(elem);
 	  
 	  for (int innd=0; innd < 27; ++innd)
