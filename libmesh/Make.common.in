@@ -355,6 +355,12 @@ ifeq ($(enable-optional),yes)
     libmesh_INCLUDE += @VTK_INCLUDE@
   endif
 
+  # Link against the GLPK APIs to perform linear programs
+  ifeq ($(enable-glpk),yes)
+    libmesh_LIBS    += @GLPK_LIBRARY@
+    libmesh_INCLUDE += @GLPK_INCLUDE@
+  endif
+
   # if TetGen is used:
   ifeq ($(enable-tetgen),yes)
     libmesh_LIBS     += @TETGEN_LIBRARY@
