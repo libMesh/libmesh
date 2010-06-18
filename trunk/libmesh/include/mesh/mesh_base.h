@@ -137,17 +137,19 @@ public:
   virtual void delete_remote_elements () {}
   
   /**
-   * @returns the logical dimension of the mesh.
+   * @returns the logical dimension of the mesh; i.e. the manifold
+   * dimension of the elements in the mesh.  If we ever support
+   * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
+   * then this will return the largest such dimension.
    */
   unsigned int mesh_dimension () const
   { return static_cast<unsigned int>(_dim); }
   
   /**
    * Resets the logical dimension of the mesh.
-   * Should only be called on an empty mesh.
    */
   void set_mesh_dimension (unsigned int d)
-  { libmesh_assert(!this->n_elem()); _dim = d; }
+  { _dim = d; }
   
   /**
    * Returns the spatial dimension of the mesh.  Note that this is
