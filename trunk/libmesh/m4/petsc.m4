@@ -7,6 +7,14 @@ dnl Petsc
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_PETSC], 
 [
+  dnl AC_REQUIRE:
+  dnl If the M4 macro AC_PROG_F77 has not already been called, call
+  dnl it (without any arguments). Make sure to quote AC_PROG_F77 with
+  dnl square brackets. AC_PROG_F77 must have been defined using
+  dnl AC_DEFUN or else contain a call to AC_PROVIDE to indicate
+  dnl that it has been called.
+  AC_REQUIRE([AC_PROG_F77])
+
   AC_CHECK_FILE($PETSC_DIR/include/petsc.h,
                 PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
 
