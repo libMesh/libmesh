@@ -651,8 +651,13 @@ RBBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
   // Note: #define PCType char*, and PCGetType just sets a pointer.  We'll use
   // the string below to make a real copy, and set the PC back to its original
   // type at the end of the function.
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+  PCType orig_petsc_pc_type;
+  KSPType orig_petsc_ksp_type;
+#else
   const PCType orig_petsc_pc_type;
   const KSPType orig_petsc_ksp_type;
+#endif
   int ierr = 0;
 
   if (petsc_linear_solver)
@@ -692,7 +697,9 @@ RBBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
 	  // Need to call the equivalent for the command line options:
 	  // -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package mumps
 	  ierr = PCSetType(pc, PCLU); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#if !(PETSC_VERSION_LESS_THAN(3,0,0))
 	  ierr = PCFactorSetMatSolverPackage(pc,"mumps"); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
 	}
     }
   else
