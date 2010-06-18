@@ -1387,14 +1387,16 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
   unsigned int n_elem       = mesh.n_elem();
   unsigned int n_levels     = MeshTools::n_levels(mesh);
   unsigned int total_weight = MeshTools::total_weight(mesh);
+  unsigned int dimension    = mesh.mesh_dimension();
 
   // Broadcast the sizes
   {
-    std::vector<unsigned int> buf (3);
+    std::vector<unsigned int> buf (4);
     
     buf[0] = n_nodes;
     buf[1] = n_elem;
     buf[2] = total_weight;
+    buf[3] = dimension;
     
     // Broadcast
     Parallel::broadcast (buf);
@@ -1404,6 +1406,7 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
 	n_nodes      = buf[0];
 	n_elem       = buf[1];
 	total_weight = buf[2];
+        mesh.set_mesh_dimension(buf[3]);
       }	
   }  
 
