@@ -29,6 +29,7 @@
 #include "utility.h"
 #include "dof_map.h"
 #include "numeric_vector.h"
+#include "rb_system.h"
 
 
 // ------------------------------------------------------------
@@ -192,3 +193,4 @@ Number TransientSystem<Base>::older_solution (const unsigned int global_dof_numb
 template class TransientSystem<LinearImplicitSystem>;
 template class TransientSystem<NonlinearImplicitSystem>;
 template class TransientSystem<ExplicitSystem>;
+template class TransientSystem<RBSystem>;
