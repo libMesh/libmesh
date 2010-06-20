@@ -382,7 +382,7 @@ void QNTransientRBSystem::initialize_truth ()
   STOP_LOG("initialize_truth()", "QNTransientRBSystem");
 }
 
-Number QNTransientRBSystem::truth_solve(int write_interval)
+Real QNTransientRBSystem::truth_solve(int write_interval)
 {
   START_LOG("truth_solve()", "QNTransientRBSystem");
 
@@ -598,7 +598,7 @@ Number QNTransientRBSystem::truth_solve(int write_interval)
     matrix->vector_mult(*inner_product_storage_vector, *current_newton_iterate);
   }
 
-  Number final_truth_L2_norm = std::sqrt(inner_product_storage_vector->dot(*current_newton_iterate));
+  Real final_truth_L2_norm = std::sqrt(inner_product_storage_vector->dot(*current_newton_iterate));
 
   STOP_LOG("truth_solve()", "QNTransientRBSystem");
 
@@ -612,7 +612,7 @@ Number QNTransientRBSystem::truth_solve(int write_interval)
 
 
 
-Number QNTransientRBSystem::RB_solve(unsigned int N)
+Real QNTransientRBSystem::RB_solve(unsigned int N)
 {
   START_LOG("RB_solve()", "QNTransientRBSystem");
 
@@ -1141,7 +1141,7 @@ void QNTransientRBSystem::update_RB_system_matrices()
   STOP_LOG("update_RB_system_matrices()", "QNTransientRBSystem");
 }
 
-void QNTransientRBSystem::set_context_solution_vec(NumericVector<Real>& vec)
+void QNTransientRBSystem::set_context_solution_vec(NumericVector<Number>& vec)
 {
   // Set current_local_solution = vec so that we can access
   // vec from QNTransientRBContext during assembly

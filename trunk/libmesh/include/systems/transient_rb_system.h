@@ -73,12 +73,12 @@ public:
    * Perform online solve with the N basis functions for
    * current_params.
    */
-  virtual Number RB_solve(unsigned int N);
+  virtual Real RB_solve(unsigned int N);
 
   /**
    * Perform a truth solve at the current parameter.
    */
-  virtual Number truth_solve(int write_interval);
+  virtual Real truth_solve(int write_interval);
 
   /**
    * Function that indicates when to terminate the Greedy
@@ -119,15 +119,15 @@ public:
    * to input_matrix.
    */
   void add_scaled_mass_matrix(Real scalar,
-                              SparseMatrix<Real>* input_matrix);
+                              SparseMatrix<Number>* input_matrix);
 
   /**
    * Perform a matrix-vector multiplication with the current mass matrix
    * and store the result in dest.
    */
   void mass_matrix_scaled_matvec(Real scalar,
-                                 NumericVector<Real>& dest,
-                                 NumericVector<Real>& arg);
+                                 NumericVector<Number>& dest,
+                                 NumericVector<Number>& arg);
 
   /**
    * Overload to also recompute RB_ic_proj_rhs_all_N if 
@@ -165,7 +165,7 @@ public:
   /**
    * Get a pointer to M_q.
    */
-  SparseMatrix<Real>* get_M_q(unsigned int q);
+  SparseMatrix<Number>* get_M_q(unsigned int q);
   
   /**
    * Evaluate theta_q_m at the current parameter.
@@ -259,17 +259,17 @@ public:
   /**
    * Dense RB L2 matrix.
    */
-  DenseMatrix<Real> RB_L2_matrix;
+  DenseMatrix<Number> RB_L2_matrix;
 
   /**
    * Vector storing the Q_m matrices from the mass operator
    */
-  std::vector< SparseMatrix<Real>* > M_q_vector;
+  std::vector< SparseMatrix<Number>* > M_q_vector;
 
   /**
    * Dense matrices for the RB mass matrices.
    */
-  std::vector< DenseMatrix<Real> > RB_M_q_vector;
+  std::vector< DenseMatrix<Number> > RB_M_q_vector;
 
   /**
    * The inner product matrix. This should be close to the identity,
@@ -277,7 +277,7 @@ public:
    * to accurately perform projections since orthogonality degrades
    * with increasing N.
    */
-  DenseMatrix<Real> RB_inner_product_matrix;
+  DenseMatrix<Number> RB_inner_product_matrix;
 
   /**
    * Vector storing initial L2 error for all
@@ -289,13 +289,13 @@ public:
    * The RB initial conditions (i.e. L2 projection of the truth
    * initial condition) for each N.
    */
-  std::vector< DenseVector<Real> > RB_initial_condition_all_N;
+  std::vector< DenseVector<Number> > RB_initial_condition_all_N;
 
   /**
    * The error bound data for all time-levels from the
    * most recent RB_solve.
    */
-  std::vector< Number > error_bound_all_k;
+  std::vector< Real > error_bound_all_k;
 
   /**
    * The true error data for all time-levels from the
@@ -329,7 +329,7 @@ public:
   /**
    * Array storing the solution data at each time level from the most recent solve.
    */
-  std::vector< DenseVector<Real> > RB_temporal_solution_data;
+  std::vector< DenseVector<Number> > RB_temporal_solution_data;
 
   /**
    * Boolean flag to indicate whether we are using a non-zero initialization.
@@ -385,7 +385,7 @@ protected:
    * saved in RB_solution. This function uses the cached time-independent
    * data.
    */
-  virtual Number compute_residual_dual_norm(const unsigned int N);
+  virtual Real compute_residual_dual_norm(const unsigned int N);
   
   /**
    * Compute the dual norm of the residual for the solution
@@ -393,7 +393,7 @@ protected:
    * data and therefore also works when the parameter changes as
    * a function of time.
    */
-  virtual Number uncached_compute_residual_dual_norm(const unsigned int N);
+  virtual Real uncached_compute_residual_dual_norm(const unsigned int N);
 
   /**
    * Compute the reduced basis matrices for the current basis.
@@ -418,21 +418,21 @@ protected:
    * be used in the a posteriori error bound. Overload
    * in subclass in order to obtain the desired error bound.
    */
-  virtual Number residual_scaling_numer(Number alpha_LB);
+  virtual Real residual_scaling_numer(Real alpha_LB);
 
   /**
    * Specifies the residual scaling on the denominator to
    * be used in the a posteriori error bound. Overload
    * in subclass in order to obtain the desired error bound.
    */
-  virtual Number residual_scaling_denom(Number alpha_LB);
+  virtual Real residual_scaling_denom(Real alpha_LB);
 
   /**
    * Set column k (i.e. the current time level) of temporal_data to the
    * difference between the current solution and the orthogonal
    * projection of the current solution onto the current RB space.
    */
-  Real set_error_temporal_data();
+  Number set_error_temporal_data();
 
 
   //----------- PROTECTED DATA MEMBERS -----------//
@@ -510,7 +510,7 @@ protected:
    * The vector that stores the right-hand side for the initial
    * condition projections.
    */
-  DenseVector<Real> RB_ic_proj_rhs_all_N;
+  DenseVector<Number> RB_ic_proj_rhs_all_N;
 
 private:
 
@@ -532,17 +532,17 @@ private:
   /**
    * Dense matrix to store the data that we use for the temporal POD.
    */
-  std::vector< NumericVector<Real>* > temporal_data;
+  std::vector< NumericVector<Number>* > temporal_data;
   
   /**
    * Cached residual terms.
    */
-  Real cached_Fq_term;
-  DenseVector<Real> cached_Fq_Aq_vector;
-  DenseMatrix<Real> cached_Aq_Aq_matrix;
-  DenseVector<Real> cached_Fq_Mq_vector;
-  DenseMatrix<Real> cached_Aq_Mq_matrix;
-  DenseMatrix<Real> cached_Mq_Mq_matrix;
+  Number cached_Fq_term;
+  DenseVector<Number> cached_Fq_Aq_vector;
+  DenseMatrix<Number> cached_Aq_Aq_matrix;
+  DenseVector<Number> cached_Fq_Mq_vector;
+  DenseMatrix<Number> cached_Aq_Mq_matrix;
+  DenseMatrix<Number> cached_Mq_Mq_matrix;
 
 };
 

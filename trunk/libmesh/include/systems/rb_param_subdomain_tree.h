@@ -73,7 +73,7 @@ public:
   /**
    * Determine the subdomain containing the parameter new_param
    */
-  RBParamSubdomainNode * determine_subdomain(const std::vector<Real>& new_param);
+  RBParamSubdomainNode * determine_subdomain(const std::vector<Number>& new_param);
 
   /**
    * Writes the tree data required for online binary search to a file

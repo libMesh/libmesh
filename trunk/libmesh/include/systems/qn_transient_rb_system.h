@@ -107,7 +107,7 @@ public:
    * Overload to solve the nonlinear truth system
    * using Newton's method.
    */
-  virtual Number truth_solve(int write_interval);
+  virtual Real truth_solve(int write_interval);
 
   /**
    * Perform online solve for current_params
@@ -115,7 +115,7 @@ public:
    * to solve the nonlinear RB system using
    * Newton's method.
    */
-  virtual Number RB_solve(unsigned int N);
+  virtual Real RB_solve(unsigned int N);
 
   /**
    * Set the nonlinear tolerance for Newton's
@@ -167,7 +167,7 @@ public:
   /**
    * Overload this function to set current_newton_iterate = vec.
    */
-  virtual void set_context_solution_vec(NumericVector<Real>& vec);
+  virtual void set_context_solution_vec(NumericVector<Number>& vec);
 
   /**
    * Compute the trilinear form operators for _all_ basis functions.

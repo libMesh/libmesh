@@ -423,8 +423,8 @@ void TransientRBSystem::add_scaled_mass_matrix(Real scalar, SparseMatrix<Number>
 }
 
 void TransientRBSystem::mass_matrix_scaled_matvec(Real scalar,
-                                                  NumericVector<Real>& dest,
-                                                  NumericVector<Real>& arg)
+                                                  NumericVector<Number>& dest,
+                                                  NumericVector<Number>& arg)
 {
   START_LOG("mass_matrix_scaled_matvec()", "TransientRBSystem");
   
@@ -754,7 +754,7 @@ void TransientRBSystem::assemble_misc_matrices()
   Parent::assemble_misc_matrices();
 }
 
-Number TransientRBSystem::truth_solve(int write_interval)
+Real TransientRBSystem::truth_solve(int write_interval)
 {
   START_LOG("truth_solve()", "TransientRBSystem");
 
@@ -853,7 +853,7 @@ Number TransientRBSystem::truth_solve(int write_interval)
     matrix->vector_mult(*inner_product_storage_vector, *solution);
   }
 
-  Number final_truth_L2_norm = std::sqrt(inner_product_storage_vector->dot(*solution));
+  Real final_truth_L2_norm = libmesh_real(std::sqrt(inner_product_storage_vector->dot(*solution)));
 
 
   STOP_LOG("truth_solve()", "TransientRBSystem");
@@ -873,7 +873,7 @@ bool TransientRBSystem::greedy_termination_test(Real training_greedy_error, int 
   return Parent::greedy_termination_test(training_greedy_error, count);
 }
 
-Real TransientRBSystem::set_error_temporal_data()
+Number TransientRBSystem::set_error_temporal_data()
 {
   START_LOG("set_error_temporal_data()", "TransientRBSystem");
 
@@ -910,7 +910,7 @@ Real TransientRBSystem::set_error_temporal_data()
     // diagonality degrades as N increases
 
     // Get an appropriately sized copy of RB_inner_product_matrix
-    DenseMatrix<Real> RB_inner_product_matrix_N(RB_size,RB_size);
+    DenseMatrix<Number> RB_inner_product_matrix_N(RB_size,RB_size);
     for(unsigned int i=0; i<RB_size; i++)
       for(unsigned int j=0; j<RB_size; j++)
       {
@@ -918,13 +918,13 @@ Real TransientRBSystem::set_error_temporal_data()
       }
 
     // Compute the projection RHS
-    DenseVector<Real> RB_proj_rhs(RB_size);
+    DenseVector<Number> RB_proj_rhs(RB_size);
     for(unsigned int i=0; i<RB_size; i++)
     {
       RB_proj_rhs(i) = temp->dot(get_bf(i));
     }
 
-    DenseVector<Real> RB_proj(RB_size);
+    DenseVector<Number> RB_proj(RB_size);
 
     // Now solve the linear system
     RB_inner_product_matrix_N.lu_solve(RB_proj_rhs, RB_proj);
@@ -997,7 +997,7 @@ void TransientRBSystem::add_IC_to_RB_space()
 
   // load the new basis function into the basis_functions vector.
   basis_functions.push_back( NumericVector<Number>::build().release() );
-  NumericVector<Real>& current_bf = *(basis_functions[basis_functions.size()-1]);
+  NumericVector<Number>& current_bf = *(basis_functions[basis_functions.size()-1]);
   current_bf.init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   current_bf = *solution;
 
@@ -1011,7 +1011,7 @@ void TransientRBSystem::add_IC_to_RB_space()
     assemble_inner_product_matrix(matrix);
     matrix->vector_mult(*inner_product_storage_vector,*solution);
   }
-  Real current_bf_norm = std::sqrt( current_bf.dot(*inner_product_storage_vector) );
+  Real current_bf_norm = libmesh_real(std::sqrt( current_bf.dot(*inner_product_storage_vector) ));
   current_bf.scale(1./current_bf_norm);
 
   unsigned int saved_delta_N = get_delta_N();
@@ -1120,7 +1120,7 @@ void TransientRBSystem::enrich_RB_space()
     {
       // load the new basis function into the basis_functions vector.
       basis_functions.push_back( NumericVector<Number>::build().release() );
-      NumericVector<Real>& current_bf = *(basis_functions[basis_functions.size()-1]);
+      NumericVector<Number>& current_bf = *(basis_functions[basis_functions.size()-1]);
       current_bf.init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       current_bf.zero();
 
@@ -1202,7 +1202,7 @@ void TransientRBSystem::update_system()
   update_RB_initial_condition_all_N();
 }
 
-Number TransientRBSystem::RB_solve(unsigned int N)
+Real TransientRBSystem::RB_solve(unsigned int N)
 {
   START_LOG("RB_solve()", "TransientRBSystem");
 
@@ -1219,25 +1219,25 @@ Number TransientRBSystem::RB_solve(unsigned int N)
   }
 
   // First assemble the mass matrix
-  DenseMatrix<Real> RB_mass_matrix_N(N,N);
+  DenseMatrix<Number> RB_mass_matrix_N(N,N);
   RB_mass_matrix_N.zero();
-  DenseMatrix<Real> RB_M_q_m;
+  DenseMatrix<Number> RB_M_q_m;
   for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
   {
     RB_M_q_vector[q_m].get_principal_submatrix(N, RB_M_q_m);
     RB_mass_matrix_N.add(eval_theta_q_m(q_m), RB_M_q_m);
   }
 
-  DenseMatrix<Real> RB_LHS_matrix(N,N);
+  DenseMatrix<Number> RB_LHS_matrix(N,N);
   RB_LHS_matrix.zero();
 
-  DenseMatrix<Real> RB_RHS_matrix(N,N);
+  DenseMatrix<Number> RB_RHS_matrix(N,N);
   RB_RHS_matrix.zero();
 
   RB_LHS_matrix.add(1./dt, RB_mass_matrix_N);
   RB_RHS_matrix.add(1./dt, RB_mass_matrix_N);
 
-  DenseMatrix<Real> RB_A_q_a;
+  DenseMatrix<Number> RB_A_q_a;
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
   {
     RB_A_q_vector[q_a].get_principal_submatrix(N, RB_A_q_a);
@@ -1260,7 +1260,7 @@ Number TransientRBSystem::RB_solve(unsigned int N)
   old_RB_solution.resize(N);
 
   // Initialize the RB rhs
-  DenseVector<Real> RB_rhs(N);
+  DenseVector<Number> RB_rhs(N);
   RB_rhs.zero();
 
   // Initialize the vectors storing solution data
@@ -1278,7 +1278,7 @@ Number TransientRBSystem::RB_solve(unsigned int N)
   error_bound_all_k[_k] = std::sqrt(error_bound_sum);
 
   // Compute the outputs and associated error bounds at _k=0
-  DenseVector<Real> RB_output_vector_N;
+  DenseVector<Number> RB_output_vector_N;
   for(unsigned int n=0; n<get_n_outputs(); n++)
   {
     RB_outputs_all_k[n][_k] = 0.;
@@ -1288,7 +1288,7 @@ Number TransientRBSystem::RB_solve(unsigned int N)
       RB_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
     }
     
-    Real output_bound_sq = 0.;
+    Number output_bound_sq = 0.;
     unsigned int q=0;
     for(unsigned int q_l1=0; q_l1<get_Q_l(n); q_l1++)
     {
@@ -1317,7 +1317,7 @@ Number TransientRBSystem::RB_solve(unsigned int N)
     RB_RHS_matrix.vector_mult(RB_rhs, old_RB_solution);
 
     // Add forcing terms
-    DenseVector<Real> RB_F_q_f;
+    DenseVector<Number> RB_F_q_f;
     for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
     {
       RB_F_q_vector[q_f].get_principal_subvector(N, RB_F_q_f);
@@ -1339,7 +1339,7 @@ Number TransientRBSystem::RB_solve(unsigned int N)
     error_bound_all_k[_k] = std::sqrt(error_bound_sum/residual_scaling_denom(alpha_LB));
 
     // Now compute the outputs and associated errors
-    DenseVector<Real> RB_output_vector_N;
+    DenseVector<Number> RB_output_vector_N;
     for(unsigned int n=0; n<get_n_outputs(); n++)
     {
       RB_outputs_all_k[n][_k] = 0.;
@@ -1349,7 +1349,7 @@ Number TransientRBSystem::RB_solve(unsigned int N)
         RB_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
       }
       
-      Real output_bound_sq = 0.;
+      Number output_bound_sq = 0.;
       unsigned int q=0;
       for(unsigned int q_l1=0; q_l1<get_Q_l(n); q_l1++)
       {
@@ -1368,22 +1368,22 @@ Number TransientRBSystem::RB_solve(unsigned int N)
   // Now compute the L2 norm of the RB solution at time-level _K
   // to normalize the error bound
   // We reuse RB_rhs here
-  DenseMatrix<Real> RB_L2_matrix_N;
+  DenseMatrix<Number> RB_L2_matrix_N;
   RB_L2_matrix.get_principal_submatrix(N,RB_L2_matrix_N);
   RB_L2_matrix_N.vector_mult(RB_rhs, RB_solution);
-  Real final_RB_L2_norm = std::sqrt(RB_solution.dot(RB_rhs));
+  Real final_RB_L2_norm = libmesh_real(std::sqrt(RB_solution.dot(RB_rhs)));
 
   STOP_LOG("RB_solve()", "TransientRBSystem");
 
   return ( return_rel_error_bound ? error_bound_all_k[_K]/final_RB_L2_norm : error_bound_all_k[_K] );
 }
 
-Number TransientRBSystem::residual_scaling_numer(Number)
+Real TransientRBSystem::residual_scaling_numer(Real)
 {
   return get_dt();
 }
 
-Number TransientRBSystem::residual_scaling_denom(Number alpha_LB)
+Real TransientRBSystem::residual_scaling_denom(Real alpha_LB)
 {
   return alpha_LB;
 }
@@ -1409,7 +1409,7 @@ void TransientRBSystem::load_RB_solution()
 
   solution->zero();
 
-  DenseVector<Real> RB_solution_vector_k = RB_temporal_solution_data[_k];
+  DenseVector<Number> RB_solution_vector_k = RB_temporal_solution_data[_k];
 
   if(RB_solution_vector_k.size() > basis_functions.size())
   {
@@ -1444,7 +1444,7 @@ void TransientRBSystem::update_RB_system_matrices()
   {
     for(unsigned int j=0; j<RB_size; j++)
     {
-      Real value = 0.;
+      Number value = 0.;
       
       // Compute reduced L2 matrix
       temp->zero();
@@ -1761,8 +1761,8 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
 
 
   // Now compute the projection for each N
-  DenseMatrix<Real> RB_L2_matrix_N;
-  DenseVector<Real> RB_rhs_N;
+  DenseMatrix<Number> RB_L2_matrix_N;
+  DenseVector<Number> RB_rhs_N;
   for(unsigned int N=(RB_size-delta_N); N<RB_size; N++)
   {
     // We have to index here by N+1 since the loop index is zero-based.
@@ -1770,7 +1770,7 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
     
     RB_ic_proj_rhs_all_N.get_principal_subvector(N+1, RB_rhs_N);
 
-    DenseVector<Real> RB_ic_N(N+1);
+    DenseVector<Number> RB_ic_N(N+1);
 
     // Now solve the linear system
     RB_L2_matrix_N.lu_solve(RB_rhs_N, RB_ic_N);
@@ -1801,7 +1801,7 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
     {
       matrix->vector_mult(*temp2, *temp1);
     }
-    initial_L2_error_all_N[N] = std::sqrt(temp2->dot(*temp1));
+    initial_L2_error_all_N[N] = libmesh_real(std::sqrt(temp2->dot(*temp1)));
   }
 
   STOP_LOG("update_RB_initial_condition_all_N()", "TransientRBSystem");
@@ -1922,7 +1922,7 @@ void TransientRBSystem::cache_online_residual_terms(const unsigned int N)
   STOP_LOG("cache_online_residual_terms()", "TransientRBSystem");
 }
 
-Number TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
+Real TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 {
   START_LOG("compute_residual_dual_norm()", "TransientRBSystem");
 
@@ -1931,15 +1931,15 @@ Number TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 
   const Real dt = get_dt();
 
-  DenseVector<Real> RB_u_euler_theta(N);
-  DenseVector<Real> mass_coeffs(N);
+  DenseVector<Number> RB_u_euler_theta(N);
+  DenseVector<Number> mass_coeffs(N);
   for(unsigned int i=0; i<N; i++)
   {
     RB_u_euler_theta(i)  = euler_theta*RB_solution(i) + (1.-euler_theta)*old_RB_solution(i);
     mass_coeffs(i) = -(RB_solution(i) - old_RB_solution(i))/dt;
   }
 
-  Real residual_norm_sq = cached_Fq_term;
+  Number residual_norm_sq = cached_Fq_term;
   
   residual_norm_sq += RB_u_euler_theta.dot(cached_Fq_Aq_vector);
   residual_norm_sq += mass_coeffs.dot(cached_Fq_Mq_vector);
@@ -1953,7 +1953,7 @@ Number TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
     }
 
 
-  if(residual_norm_sq < 0)
+  if(libmesh_real(residual_norm_sq) < 0)
   {
     std::cout << "Warning: Square of residual norm is negative "
               << "in TransientRBSystem::compute_residual_dual_norm()" << std::endl;
@@ -1962,7 +1962,7 @@ Number TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
     // but error is on the order of 1.e-10, so shouldn't
     // affect result
 //    libmesh_error();
-     residual_norm_sq = fabs(residual_norm_sq);
+     residual_norm_sq = std::abs(residual_norm_sq);
   }
 
 //   std::cout << "slow residual_sq = " << slow_residual_norm_sq
@@ -1970,11 +1970,11 @@ Number TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 
   STOP_LOG("compute_residual_dual_norm()", "TransientRBSystem");
 
-  return std::sqrt( residual_norm_sq );
+  return libmesh_real(std::sqrt( residual_norm_sq ));
 }
 
 
-Number TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N)
+Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N)
 {
   START_LOG("uncached_compute_residual_dual_norm()", "TransientRBSystem");
 
@@ -2081,7 +2081,7 @@ Number TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int
     mass_coeffs[i] = -(RB_solution(i) - old_RB_solution(i))/dt;
   }
 
-  Real residual_norm_sq = 0.;
+  Number residual_norm_sq = 0.;
 
   unsigned int q=0;
   for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
@@ -2188,7 +2188,7 @@ Number TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int
     }
   }
   
-  if(residual_norm_sq < 0)
+  if(libmesh_real(residual_norm_sq) < 0)
   {
     std::cout << "Warning: Square of residual norm is negative "
               << "in TransientRBSystem::compute_residual_dual_norm()" << std::endl;
@@ -2197,7 +2197,7 @@ Number TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int
     // but error is on the order of 1.e-10, so shouldn't
     // affect result
 //    libmesh_error();
-     residual_norm_sq = fabs(residual_norm_sq);
+     residual_norm_sq = std::abs(residual_norm_sq);
   }
 
 //   std::cout << "slow residual_sq = " << slow_residual_norm_sq
@@ -2205,7 +2205,7 @@ Number TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int
 
   STOP_LOG("uncached_compute_residual_dual_norm()", "TransientRBSystem");
 
-  return std::sqrt( residual_norm_sq );
+  return libmesh_real(std::sqrt( residual_norm_sq ));
 }
 
 
