@@ -386,8 +386,8 @@ bool xdr_translate(XDR* x, std::string& s) {
 
 template <typename T>
 bool xdr_translate(XDR* x, std::complex<T>& a) {
-  bool b1 = xdr_translate(x, &a.real());
-  bool b2 = xdr_translate(x, &a.imag());
+  bool b1 = xdr_translate(x, a.real());
+  bool b2 = xdr_translate(x, a.imag());
   return (b1 && b2);
 }
 
@@ -405,7 +405,7 @@ bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
   unsigned int length = a.size();
   bool b = xdr_u_int(x, &length);
   a.resize(length);
-  std::vector< std::complex<double> >::iterator iter = a.begin();
+  typename std::vector<std::complex<T> >::iterator iter = a.begin();
   for (; iter != a.end(); ++iter)
     if (!xdr_translate(x, *iter))
       b = false;
@@ -1079,6 +1079,8 @@ template void Xdr::data<unsigned short int>               (unsigned short int&, 
 template void Xdr::data<short int>                        (short int&,                       const char*);
 template void Xdr::data<float>                            (float&,                           const char*);
 template void Xdr::data<double>                           (double&,                          const char*);
+template void Xdr::data<std::complex<float> >             (std::complex<float>&,             const char*);
+template void Xdr::data<std::complex<double> >            (std::complex<double>&,            const char*);
 template void Xdr::data<std::string>                      (std::string&,                     const char*);
 template void Xdr::data<std::vector<int> >                (std::vector<int>&,                const char*);
 template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned int>&,       const char*);
@@ -1086,5 +1088,7 @@ template void Xdr::data<std::vector<short int> >          (std::vector<short int
 template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int>&, const char*);
 template void Xdr::data<std::vector<float> >              (std::vector<float>&,              const char*);
 template void Xdr::data<std::vector<double> >             (std::vector<double>&,             const char*);
+template void Xdr::data<std::vector<std::complex<float> > >  (std::vector<std::complex<float> >&,  const char*);
+template void Xdr::data<std::vector<std::complex<double> > > (std::vector<std::complex<double> >&, const char*);
 template void Xdr::data_stream<int>          (int *val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int> (unsigned int *val, const unsigned int len, const unsigned int line_break);
