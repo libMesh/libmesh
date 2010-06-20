@@ -99,14 +99,14 @@ void RBBase<Base>::init_data ()
 }
 
 template <class Base>
-std::vector<Real> RBBase<Base>::get_training_parameter(unsigned int index) const
+std::vector<Number> RBBase<Base>::get_training_parameter(unsigned int index) const
 {
   libmesh_assert(training_parameters_initialized);
 
   libmesh_assert( (this->get_first_local_training_index() <= index) &&
                   (index < this->get_last_local_training_index()) );
 
-  std::vector<Real> parameter(this->get_n_params());
+  std::vector<Number> parameter(this->get_n_params());
   for(unsigned int i=0; i<parameter.size(); i++)
     parameter[i] = (*training_parameters[i])(index);
 
@@ -125,7 +125,7 @@ void RBBase<Base>::load_training_parameter_globally(unsigned int index)
   libmesh_assert(training_parameters_initialized);
 
   unsigned int root_id = 0;
-  std::vector<Real> new_param(get_n_params());
+  std::vector<Number> new_param(get_n_params());
   if( (this->get_first_local_training_index() <= index) &&
       (index < this->get_last_local_training_index()) )
   {
@@ -204,15 +204,15 @@ void RBBase<Base>::attach_theta_q_a(theta_q_fptr theta_q_a)
 }
 
 template <class Base>
-void RBBase<Base>::set_current_parameters(const std::vector<Real>& params)
+void RBBase<Base>::set_current_parameters(const std::vector<Number>& params)
 {
   libmesh_assert(training_parameters_initialized);
 
   libmesh_assert(params.size() == get_n_params());
 
   for(unsigned int i=0; i<params.size(); i++)
-    libmesh_assert( (mu_min_vector[i] <= params[i]) &&
-                    (params[i] <= mu_max_vector[i]) );
+    libmesh_assert( (mu_min_vector[i] <= libmesh_real(params[i])) &&
+                    (libmesh_real(params[i]) <= mu_max_vector[i]) );
 
   current_parameters = params;
 }
@@ -328,7 +328,7 @@ void RBBase<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>& erro
 }
 
 template <class Base>
-void RBBase<Base>::load_training_set(std::vector< std::vector<Real> >& new_training_set)
+void RBBase<Base>::load_training_set(std::vector< std::vector<Number> >& new_training_set)
 {
   // First, make sure that an initial training set has already been
   // generated
@@ -382,7 +382,7 @@ void RBBase<Base>::load_training_set(std::vector< std::vector<Real> >& new_train
 
 template <class Base>
 void RBBase<Base>::generate_training_parameters_random(const std::vector<bool> log_param_scale,
-                                                       std::vector< NumericVector<Real>* >& training_parameters_in,
+                                                       std::vector< NumericVector<Number>* >& training_parameters_in,
                                                        const unsigned int n_training_samples_in,
                                                        const std::vector<Real>& min_parameters,
                                                        const std::vector<Real>& max_parameters,
@@ -466,7 +466,7 @@ void RBBase<Base>::generate_training_parameters_random(const std::vector<bool> l
 
 template <class Base>
 void RBBase<Base>::generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
-                                                              std::vector< NumericVector<Real>* >& training_parameters_in,
+                                                              std::vector< NumericVector<Number>* >& training_parameters_in,
                                                               const unsigned int n_training_samples_in,
                                                               const std::vector<Real>& min_parameters,
                                                               const std::vector<Real>& max_parameters)

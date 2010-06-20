@@ -98,7 +98,7 @@ public:
    * Perform online solve with the N RB basis functions, for the
    * set of parameters in current_params, where 1 <= N <= RB_size.
    */
-  virtual Number RB_solve(unsigned int N);
+  virtual Real RB_solve(unsigned int N);
 
   /**
    * Perform a "truth" solve, i.e. solve the finite element system at
@@ -106,7 +106,7 @@ public:
    * extensively in training the reduced basis, since "truth snapshots"
    * are employed as basis functions.
    */
-  virtual Number truth_solve(int plot_solution);
+  virtual Real truth_solve(int plot_solution);
 
   /**
    * Train the reduced basis. This is the crucial function in the Offline
@@ -139,9 +139,9 @@ public:
   /**
    * Get/set the tolerance for the basis training.
    */
-  void set_training_tolerance(Number training_tolerance)
+  void set_training_tolerance(Real training_tolerance)
     {this->training_tolerance = training_tolerance; }
-  Number get_training_tolerance() { return training_tolerance; }
+  Real get_training_tolerance() { return training_tolerance; }
 
   /**
    * Get/set Nmax, the maximum number of RB
@@ -264,7 +264,7 @@ public:
   /**
    * Get a pointer to A_q.
    */
-  SparseMatrix<Real>* get_A_q(unsigned int q);
+  SparseMatrix<Number>* get_A_q(unsigned int q);
 
   /**
    * Evaluate theta_q_f at the current parameter.
@@ -319,7 +319,7 @@ public:
    * we symmetrize Aq before adding it.
    */
   void add_scaled_Aq(Real scalar, unsigned int q_a,
-                     SparseMatrix<Real>* input_matrix,
+                     SparseMatrix<Number>* input_matrix,
                      bool symmetrize);
 
   /**
@@ -351,7 +351,7 @@ public:
    * chosen for the next snapshot in the Greedy basis
    * training.
    */
-  std::vector<Number> training_error_bounds;
+  std::vector<Real> training_error_bounds;
 
   /**
    * The inner product matrix.
@@ -373,23 +373,23 @@ public:
   /**
    * Dense matrices for the RB computations.
    */
-  std::vector< DenseMatrix<Real> > RB_A_q_vector;
+  std::vector< DenseMatrix<Number> > RB_A_q_vector;
 
   /**
    * Dense vector for the RHS.
    */
-  std::vector< DenseVector<Real> > RB_F_q_vector;
+  std::vector< DenseVector<Number> > RB_F_q_vector;
 
   /**
    * The RB solution vector.
    */
-  DenseVector<Real> RB_solution;
+  DenseVector<Number> RB_solution;
 
   /**
    * Vector storing the truth output values from the most
    * recent truth solve.
    */
-  std::vector< Real > truth_outputs;
+  std::vector< Number > truth_outputs;
 
   /**
    * The vector storing the dual norm inner product terms
@@ -400,7 +400,7 @@ public:
   /**
    * The vectors storing the RB output vectors.
    */
-  std::vector< std::vector< DenseVector<Real> > > RB_output_vectors;
+  std::vector< std::vector< DenseVector<Number> > > RB_output_vectors;
 
   /**
    * The vectors storing the RB output values and
@@ -549,7 +549,7 @@ protected:
    * from RBContext during assembly. Overload in subclasses if
    * different behavior is required (e.g. in QNTransientRBSystem)
    */
-  virtual void set_context_solution_vec(NumericVector<Real>& vec);
+  virtual void set_context_solution_vec(NumericVector<Number>& vec);
 
   /**
    * This function loops over the mesh and assembles the
@@ -559,8 +559,8 @@ protected:
   void assemble_scaled_matvec(Real scalar,
                               affine_assembly_fptr intrr_assembly,
                               affine_assembly_fptr bndry_assembly,
-                              NumericVector<Real>& dest,
-                              NumericVector<Real>& arg);
+                              NumericVector<Number>& dest,
+                              NumericVector<Number>& arg);
 
   /**
    * Assemble and store all the inner-product
@@ -590,7 +590,7 @@ protected:
    * Compute the dual norm of the residual for the solution
    * saved in RB_solution_vector.
    */
-  virtual Number compute_residual_dual_norm(const unsigned int N);
+  virtual Real compute_residual_dual_norm(const unsigned int N);
 
   /**
    * Compute and store the dual norm of each output functional.
@@ -614,24 +614,24 @@ protected:
    * in training_parameters and return the pair containing the max
    * error and the index of the parameter that induces that error.
    */
-  virtual Number compute_a_posteriori_bounds();
+  virtual Real compute_a_posteriori_bounds();
 
   /**
    * Get the SCM lower bound at the current parameter value.
    */
-  virtual Number get_SCM_lower_bound();
+  virtual Real get_SCM_lower_bound();
 
   /**
    * Get the SCM upper bound at the current parameter value.
    */
-  virtual Number get_SCM_upper_bound();
+  virtual Real get_SCM_upper_bound();
 
   /**
    * Specifies the residual scaling on the denominator to
    * be used in the a posteriori error bound. Overload
    * in subclass in order to obtain the desired error bound.
    */
-  virtual Number residual_scaling_denom(Number alpha_LB);
+  virtual Real residual_scaling_denom(Real alpha_LB);
 
   /**
    * Compute the reduced basis matrices for the current basis.
@@ -667,7 +667,7 @@ protected:
    * the set global_dirichlet_dofs) to zero
    * in the vector temp.
    */
-  void zero_dirichlet_dofs_on_vector(NumericVector<Real>& temp);
+  void zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp);
 
 
   //----------- PROTECTED DATA MEMBERS -----------//
@@ -732,9 +732,9 @@ protected:
    * Vectors storing the residual representor inner products
    * to be used in computing the residuals online.
    */
-  std::vector<Number> Fq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
+  std::vector<Real> Fq_representor_norms;
+  std::vector< std::vector< std::vector<Real> > > Fq_Aq_representor_norms;
+  std::vector< std::vector< std::vector<Real> > > Aq_Aq_representor_norms;
 
   /**
    * The name of the RBSCMSystem system that performs
@@ -809,7 +809,7 @@ private:
   /**
    * Vector storing the Q_a matrices from the affine expansion
    */
-  std::vector< SparseMatrix<Real>* > A_q_vector;
+  std::vector< SparseMatrix<Number>* > A_q_vector;
 
   /**
    * Vector storing the Q_f vectors in the affine decomposition
@@ -826,7 +826,7 @@ private:
   /**
    * Tolerance for training reduced basis using the Greedy scheme.
    */
-  Number training_tolerance;
+  Real training_tolerance;
 
   /**
    * A boolean flag to indicate whether or not update_residual_terms has

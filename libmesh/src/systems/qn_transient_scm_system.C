@@ -342,7 +342,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
 
   // Initialize a temporary training set (distributed across processors)
   // that doesn't include time
-  std::vector< NumericVector<Real>* > dist_temp_training_parameters;
+  std::vector< NumericVector<Number>* > dist_temp_training_parameters;
 
   // Strip off the time parameter from log_param_scale, mu_min/max_vector
   unsigned int temp_n_params = log_param_scale.size()-1;
@@ -467,7 +467,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
 
   // Initialize a temporary training set (distributed across processors)
   // that doesn't include time. This is where we load the training set into.
-  std::vector< NumericVector<Real>* > dist_temp_training_parameters(get_n_params()-1);
+  std::vector< NumericVector<Number>* > dist_temp_training_parameters(get_n_params()-1);
   unsigned int n_global_training_samples;
 
   {

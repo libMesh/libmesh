@@ -57,7 +57,7 @@ public:
   /**
    * Constructor. Initializes required data structures.
    */
-  RBParamSubdomainNode (RBParamSubdomainTree& tree, const std::vector<Real>& anchor);
+  RBParamSubdomainNode (RBParamSubdomainTree& tree, const std::vector<Number>& anchor);
 
   /**
    * Destructor.
@@ -107,13 +107,13 @@ public:
    * the input parameter. Each component of the anchor and new_param are mapped to
    * (0,1) before computing the distance.
    */
-  Real dist_from_anchor(const std::vector<Real>& new_param) const;
+  Real dist_from_anchor(const std::vector<Number>& new_param) const;
 
   /**
    * Add a new (LEFT or RIGHT) child RBParamSubdomainNode. Virtual function so
    * subclasses can add children of the same type.
    */
-  virtual void add_child(const std::vector<Real>& child_anchor, Child c);
+  virtual void add_child(const std::vector<Number>& child_anchor, Child c);
 
   /**
    * Copy the training set from the associated RBSystem to this
@@ -148,7 +148,7 @@ public:
    * Returns the i^th training parameter in the parameter set
    * stored on this processor.
    */
-  std::vector<Real> get_local_training_parameter(unsigned int i);
+  std::vector<Number> get_local_training_parameter(unsigned int i);
 
   /**
    * Returns the corners of a box containing the current train sample
@@ -179,13 +179,13 @@ public:
   /**
    * The anchor parameter value.
    */
-  std::vector<Real> anchor;
+  std::vector<Number> anchor;
 
   /**
    * The set of training points for the parameter
    * subdomain corresponding to this node.
    */
-  std::vector< std::vector<Real> > training_set;
+  std::vector< std::vector<Number> > training_set;
 
   /**
    * Number of model associated with node

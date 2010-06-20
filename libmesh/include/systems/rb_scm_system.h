@@ -250,7 +250,7 @@ protected:
    * index of the parameter in the training set at which the max
    * error is achieved.
    */
-  virtual std::pair<unsigned int,Real> compute_SCM_bounds_on_training_set();
+  virtual std::pair<unsigned int,Number> compute_SCM_bounds_on_training_set();
 
   /**
    * Enrich C_J by adding the element of SCM_training_samples
