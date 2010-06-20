@@ -402,7 +402,7 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
 	                                        
     libmesh_assert (nodal_soln.size() == elem->n_nodes());
 	           
-#ifdef LIBMESH_ENABLE_COMPLEX
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
     libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
     libmesh_not_implemented()
 #endif
