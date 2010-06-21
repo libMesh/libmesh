@@ -35,10 +35,6 @@ namespace
   static unsigned int old_elem_id = libMesh::invalid_uint;
   // Mapping functions - derivatives at each dofpt
   std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
-#ifdef DEBUG
-  std::vector<Real> dxdeta(2), dydxi(2);
-#endif
-
 #endif //LIBMESH_HAVE_TBB_API
 
 
@@ -52,16 +48,13 @@ namespace
 
     old_elem_id = elem->id();
 #else
-  void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & dxdxi
-#ifdef DEBUG
-                             ,
-                             std::vector<Real> & dxdeta,
-                             std::vector<Real> & dydxi
-#endif //DEBUG
-    )
+  void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & dxdxi)
   {
 #endif //LIBMESH_HAVE_TBB_API
 
+#ifdef DEBUG
+  std::vector<Real> dxdeta(2), dydxi(2);
+#endif //DEBUG
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
   const int n_mapping_shape_functions =
@@ -76,7 +69,7 @@ namespace
     {
       dxdxi[0][p] = 0;
       dxdxi[1][p] = 0;
-#ifdef FDEBUG
+#ifdef DEBUG
       dxdeta[p] = 0;
       dydxi[p] = 0;
 #endif
@@ -90,7 +83,7 @@ namespace
           dxdxi[0][p] += elem->point(i)(0) * ddxi;
           dxdxi[1][p] += elem->point(i)(1) * ddeta;
 // dxdeta and dydxi should be 0!
-#ifdef FDEBUG
+#ifdef DEBUG
           dxdeta[p] += elem->point(i)(0) * ddeta;
           dydxi[p] += elem->point(i)(1) * ddxi;
 #endif
@@ -99,7 +92,7 @@ namespace
       libmesh_assert(dxdxi[0][p]);
       libmesh_assert(dxdxi[1][p]);
       // No non-rectilinear or non-axis-aligned elements!
-#ifdef FDEBUG
+#ifdef DEBUG
       libmesh_assert(std::abs(dxdeta[p]) < 1e-9);
       libmesh_assert(std::abs(dydxi[p]) < 1e-9);
 #endif
@@ -238,16 +231,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 #else
   std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
 
-#ifdef DEBUG
-  std::vector<Real> dxdeta(2), dydxi(2);
-  
-  hermite_compute_coefs(elem, dxdxi, dxdeta, dydxi);
-
-#else //DEBUG
-  
   hermite_compute_coefs(elem, dxdxi);
-#endif //DEBUG
-
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
@@ -313,16 +297,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 #else
   std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
 
-#ifdef DEBUG
-  std::vector<Real> dxdeta(2), dydxi(2);
-  
-  hermite_compute_coefs(elem, dxdxi, dxdeta, dydxi);
-
-#else //DEBUG
-  
   hermite_compute_coefs(elem, dxdxi);
-#endif //DEBUG
-
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
@@ -382,16 +357,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
 #else
   std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
 
-#ifdef DEBUG
-  std::vector<Real> dxdeta(2), dydxi(2);
-  
-  hermite_compute_coefs(elem, dxdxi, dxdeta, dydxi);
-
-#else //DEBUG
-  
   hermite_compute_coefs(elem, dxdxi);
-#endif //DEBUG
-
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
