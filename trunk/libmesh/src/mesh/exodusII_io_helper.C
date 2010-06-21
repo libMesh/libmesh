@@ -815,8 +815,6 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
           elem_num_map.push_back(elem_id);
           libmesh_elem_num_to_exodus[elem_id] = elem_num_map.size();
           
-          Elem * elem = mesh.elem(elem_id);
-          
           for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
             {  
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
