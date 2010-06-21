@@ -3,7 +3,7 @@ dnl $Id$
 dnl -------------------------------------------------------------
 
 dnl -------------------------------------------------------------
-dnl Petsc
+dnl PETSc
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_PETSC], 
 [
@@ -28,25 +28,24 @@ AC_DEFUN([CONFIGURE_PETSC],
 
   else
     if (test -r $PETSC_DIR/include/petsc.h) ; then
-      dnl look for a decent F77 compiler or honor --with-77=...
-      FC_TRY_LIST="g77 gfortran ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
-      AC_ARG_WITH([f77],
-      	    AC_HELP_STRING([--with-f77=F77],
-                                 [Fortran compiler to use]),
-      	    [F77="$withval"],
-      	    [])
-      
-      dnl --------------------------------------------------------------
-      dnl Determine a F77 compiler to use.
-      dnl --------------------------------------------------------------
-      AC_PROG_F77([$F77_TRY_LIST])
+dnl      dnl look for a decent F77 compiler or honor --with-77=...
+dnl      FC_TRY_LIST="g77 gfortran ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
+dnl      AC_ARG_WITH([f77],
+dnl      	    AC_HELP_STRING([--with-f77=F77],
+dnl                                 [Fortran compiler to use]),
+dnl      	    [F77="$withval"],
+dnl      	    [])
+dnl      
+dnl      dnl --------------------------------------------------------------
+dnl      dnl Determine a F77 compiler to use.
+dnl      dnl --------------------------------------------------------------
+dnl      AC_PROG_F77([$F77_TRY_LIST])
 
-      AC_PROG_F77()   dnl Petsc requires linking with FORTRAN libraries 
       AC_F77_LIBRARY_LDFLAGS
       AC_SUBST(PETSC_ARCH)
       AC_SUBST(PETSC_DIR)
       AC_DEFINE(HAVE_PETSC, 1,
-  	      [Flag indicating whether or not Petsc is available])
+  	      [Flag indicating whether or not PETSc is available])
 
       dnl Check for snoopable MPI
       if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
@@ -99,7 +98,7 @@ dnl      AC_SUBST(PETSCINCLUDEDIRS)
       	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
       fi		 
       if test "x$HYPRE_LIB" != x ; then
-        AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not Petsc was compiled with Hypre support])
+        AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])
 	AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
       fi
   

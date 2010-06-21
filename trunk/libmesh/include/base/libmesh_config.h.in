@@ -142,10 +142,10 @@
 /* Flag indicating whether or not ParMetis is available */
 #undef HAVE_PARMETIS
 
-/* Flag indicating whether or not Petsc is available */
+/* Flag indicating whether or not PETSc is available */
 #undef HAVE_PETSC
 
-/* Flag indicating whether or not Petsc was compiled with Hypre support */
+/* Flag indicating whether or not PETSc was compiled with Hypre support */
 #undef HAVE_PETSC_HYPRE
 
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
@@ -242,31 +242,28 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
-
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* The size of `double', as computed by sizeof. */
+/* The size of a `double', as computed by sizeof. */
 #undef SIZEOF_DOUBLE
 
-/* The size of `float', as computed by sizeof. */
+/* The size of a `float', as computed by sizeof. */
 #undef SIZEOF_FLOAT
 
-/* The size of `function_pointer', as computed by sizeof. */
+/* The size of a `function_pointer', as computed by sizeof. */
 #undef SIZEOF_FUNCTION_POINTER
 
-/* The size of `int', as computed by sizeof. */
+/* The size of a `int', as computed by sizeof. */
 #undef SIZEOF_INT
 
-/* The size of `long int', as computed by sizeof. */
+/* The size of a `long int', as computed by sizeof. */
 #undef SIZEOF_LONG_INT
 
-/* The size of `short int', as computed by sizeof. */
+/* The size of a `short int', as computed by sizeof. */
 #undef SIZEOF_SHORT_INT
 
-/* The size of `void *', as computed by sizeof. */
+/* The size of a `void *', as computed by sizeof. */
 #undef SIZEOF_VOID_P
 
 /* Define to 1 if you have the ANSI C header files. */
