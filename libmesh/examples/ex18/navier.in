@@ -1,5 +1,7 @@
 
-Reynolds = 0.
+# Note - the time scaling in this problem's nondimensionalization is
+# such that we cannot solve transient Re=0
+Reynolds = 1.
 
 verify_analytic_jacobians = false
 print_jacobians = false
