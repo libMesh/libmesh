@@ -123,6 +123,13 @@ public:
    */
   void set_nonlinear_tolerance(Number nonlinear_tolerance)
     { this->nonlinear_tolerance = nonlinear_tolerance; }
+    
+  /**
+   * Get the nonlinear tolerance for Newton's
+   * method for both the truth and RB solves.
+   */
+  Real get_nonlinear_tolerance()
+    { return nonlinear_tolerance; }
 
   /**
    * Set the maximum number of Newton steps
@@ -130,6 +137,13 @@ public:
    */
   void set_n_newton_steps(unsigned int n_newton_steps_in)
     { this->n_newton_steps = n_newton_steps_in; }
+    
+  /**
+   * Get the maximum number of Newton steps
+   * for both the truth and RB solves.
+   */
+  unsigned int get_n_newton_steps()
+    { return n_newton_steps; }
 
   /**
    * Get a pointer to C_n, the n^th affine operator

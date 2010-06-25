@@ -433,7 +433,14 @@ protected:
    * projection of the current solution onto the current RB space.
    */
   Number set_error_temporal_data();
-
+  
+  
+  /**
+   * Helper function for caching the terms in the
+   * online residual assembly that do not change in time.
+   * (This is only useful when the parameter is fixed in time.)
+   */
+  void cache_online_residual_terms(const unsigned int N);
 
   //----------- PROTECTED DATA MEMBERS -----------//
 
@@ -519,13 +526,6 @@ private:
    * the code to clear the basis-function-related data.
    */
   void clear_basis_helper();
-  
-  /**
-   * Private helper function for caching the terms in the
-   * online residual assembly that do not change in time.
-   * (This is only useful when the parameter is fixed in time.)
-   */
-  void cache_online_residual_terms(const unsigned int N);
 
   //----------- PRIVATE DATA MEMBERS -----------//
 
