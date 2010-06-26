@@ -770,10 +770,13 @@ Real TransientRBSystem::truth_solve(int write_interval)
 
   // Now compute the truth outputs
   for(unsigned int n=0; n<get_n_outputs(); n++)
+  {
+    truth_outputs_all_k[n][_k] = 0.;
     for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
     {
-      truth_outputs_all_k[n][_k] = eval_theta_q_l(n,q_l)*get_output_vector(n,q_l)->dot(*solution);
+      truth_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*get_output_vector(n,q_l)->dot(*solution);
     }
+  }
 
   // Load initial projection error into temporal_data dense matrix
   set_error_temporal_data();
@@ -813,10 +816,13 @@ Real TransientRBSystem::truth_solve(int write_interval)
 
     // Now compute the truth outputs
     for(unsigned int n=0; n<get_n_outputs(); n++)
+    {
+      truth_outputs_all_k[n][_k] = 0.;
       for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
       {
-        truth_outputs_all_k[n][_k] = eval_theta_q_l(n,q_l)*get_output_vector(n,q_l)->dot(*solution);
+        truth_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*get_output_vector(n,q_l)->dot(*solution);
       }
+    }
 
     // load projection error into column _k of temporal_data matrix
     set_error_temporal_data();
