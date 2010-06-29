@@ -106,8 +106,8 @@ extern "C"
 
     R.zero();
 
-    if      (solver->residual != NULL) solver->residual (*sys.current_local_solution.get(), R);
-    else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), &R, NULL);
+    if      (solver->residual != NULL) solver->residual (*sys.current_local_solution.get(), R, sys);
+    else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), &R, NULL, sys);
     else libmesh_error();
     
     R.close();
@@ -154,8 +154,8 @@ extern "C"
 
     PC.zero();
 
-    if      (solver->jacobian != NULL) solver->jacobian (*sys.current_local_solution.get(), PC);
-    else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), NULL, &PC);
+    if      (solver->jacobian != NULL) solver->jacobian (*sys.current_local_solution.get(), PC, sys);
+    else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), NULL, &PC, sys);
     else libmesh_error();
     
     PC.close();
