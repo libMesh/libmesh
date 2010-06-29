@@ -106,14 +106,16 @@ public:
    * at the input iterate \p X.
    */
   void (* residual) (const NumericVector<Number>& X,
-		     NumericVector<Number>& R);
+		     NumericVector<Number>& R,
+                     sys_type& S);
 
   /**
    * Function that computes the Jacobian \p J(X) of the nonlinear system
    * at the input iterate \p X.
    */
   void (* jacobian) (const NumericVector<Number>& X,
-		     SparseMatrix<Number>& J);
+		     SparseMatrix<Number>& J,
+                     sys_type& S);
 
   /**
    * Function that computes either the residual \f$ R(X) \f$ or the
@@ -123,7 +125,8 @@ public:
    */
   void (* matvec) (const NumericVector<Number>& X,
 		   NumericVector<Number>* R,
-		   SparseMatrix<Number>*  J);
+		   SparseMatrix<Number>*  J,
+                   sys_type& S);
 
   /**
    * @returns a constant reference to the system we are solving.

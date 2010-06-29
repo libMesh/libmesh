@@ -179,9 +179,9 @@ void NonlinearImplicitSystem::assembly(bool,
   if (get_jacobian)
     {
       if (nonlinear_solver->jacobian != NULL)
-        nonlinear_solver->jacobian (*current_local_solution.get(), *matrix);
+        nonlinear_solver->jacobian (*current_local_solution.get(), *matrix, *this);
       else if (nonlinear_solver->matvec != NULL)
-        nonlinear_solver->matvec (*current_local_solution.get(), NULL, matrix);
+        nonlinear_solver->matvec (*current_local_solution.get(), NULL, matrix, *this);
       else libmesh_error();
     }
 }
