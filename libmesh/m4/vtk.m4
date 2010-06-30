@@ -7,14 +7,27 @@ dnl VTK Mesh I/O API (by Wout Ruijter) requires VTK headers and lib
 dnl ----------------------------------------------------------------
 AC_DEFUN([CONFIGURE_VTK], 
 [
-  dnl Default path to VTK's include and lib files
-  if (test -d /usr/include/vtk-5.0); then
-    VTK_INC="/usr/include/vtk-5.0"
-  else
-    VTK_INC="/usr/include/vtk"
+  dnl Look for VTK location in the environment, then default paths
+  if test "x$VTK_INC" = x; then
+    if test "x$VTK_INCLUDE" != x; then
+      VTK_INC=$VTK_INCLUDE
+    elif test "x$VTK_DIR" != x; then
+      VTK_INC=$VTK_DIR/include
+    elif (test -d /usr/include/vtk-5.0); then
+      VTK_INC="/usr/include/vtk-5.0"
+    else
+      VTK_INC="/usr/include/vtk"
+    fi
   fi
-  VTK_LIB="/usr/lib"
-  
+
+  if test "x$VTK_LIB" = x; then
+    if test "x$VTK_DIR" != x; then
+      VTK_LIB=$VTK_DIR/lib
+    else
+      VTK_LIB="/usr/lib"
+    fi
+  fi
+
   dnl User-specific include path
   AC_ARG_WITH(vtk-include,
               AC_HELP_STRING([--with-vtk-include=PATH],[Specify the path for VTK header files]),
