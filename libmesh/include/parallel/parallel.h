@@ -262,13 +262,15 @@ namespace Parallel
     /*
      * Create a new communicator between some subset of \p this
      */
-    void split(int color, int key, Communicator &target) {
 #ifdef LIBMESH_HAVE_MPI
+    void split(int color, int key, Communicator &target) {
       MPI_Comm_split(this->get(), color, key, &target.get());
-#else
-      target.assign(this->get());
-#endif
     }
+#else
+    void split(int, int, Communicator &target) {
+      target.assign(this->get());
+    }
+#endif
 
     void duplicate(const Communicator &comm) {
       this->duplicate(comm._communicator);
