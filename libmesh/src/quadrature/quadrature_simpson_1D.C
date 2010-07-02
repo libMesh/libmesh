@@ -21,6 +21,9 @@
 
 // Local includes
 #include "quadrature_simpson.h"
+
+namespace libMesh
+{
  
 
 
@@ -42,3 +45,5 @@ void QSimpson::init_1D(const ElemType,
   
   return;
 }
+
+} // namespace libMesh

@@ -27,6 +27,9 @@
 #include "mesh_input.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 
@@ -151,5 +154,7 @@ bool & GmshIO::binary ()
   return _binary;
 }
 
+
+} // namespace libMesh
 
 #endif // #define __gmsh_io_h__

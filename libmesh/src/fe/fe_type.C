@@ -23,6 +23,9 @@
 #include "quadrature_clough.h"
 #include "quadrature_gauss.h"
 
+namespace libMesh
+{
+
 // ---------------------------------------
 // FEType class members
 
@@ -49,3 +52,5 @@ FEType::default_quadrature_rule (const unsigned int dim,
     (new QGauss(dim, static_cast<Order>(this->default_quadrature_order()
                                         + extraorder)));
 }
+
+} // namespace libMesh

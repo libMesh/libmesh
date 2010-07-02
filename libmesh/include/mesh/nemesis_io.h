@@ -30,6 +30,9 @@
 //#include "mesh_output.h" // eventually...
 #include "nemesis_io_helper.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class ParallelMesh;
 
@@ -85,6 +88,8 @@ private:
   bool _verbose;
 };
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __nemesis_io_h__

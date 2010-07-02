@@ -29,6 +29,9 @@
 // Local Includes
 #include "rb_context.h"
 
+namespace libMesh
+{
+
 // Forward declaration
 class QNTransientRBSystem;
 class FEBase;
@@ -106,6 +109,8 @@ public:
   DenseVector<Number> elem_old_solution;
   std::vector<DenseSubVector<Number> *> elem_old_subsolutions;
 };
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 

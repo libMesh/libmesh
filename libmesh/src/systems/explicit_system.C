@@ -26,6 +26,9 @@
 #include "numeric_vector.h"
 #include "parallel.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // ExplicitSystem implementation
@@ -137,3 +140,5 @@ void ExplicitSystem::add_system_rhs ()
 
   libmesh_assert (rhs != NULL);
 }
+
+} // namespace libMesh

@@ -33,6 +33,9 @@
 #include "perf_log.h"
 #include "timestamp.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // PerfLog class member funcions
@@ -496,3 +499,5 @@ void PerfLog::_character_line(const unsigned int n,
   for (unsigned int i=0; i<n; ++i)
     out << c;
 }
+
+} // namespace libMesh

@@ -33,6 +33,9 @@
 #include "enum_quadrature_type.h"
 #include "enum_preconditioner_type.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // Anonymous namespace to hold local data & methods
@@ -590,6 +593,8 @@ namespace Utility {
   }
   
 }
+
+} // namespace libMesh
 
 
 

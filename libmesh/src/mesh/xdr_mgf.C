@@ -22,6 +22,9 @@
 // Local includes
 #include "xdr_mgf.h"
 
+namespace libMesh
+{
+
 // XdrMGF member functions
 XdrMGF::~XdrMGF()
 {
@@ -403,3 +406,5 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
       
   return totalSize;
 }
+
+} // namespace libMesh

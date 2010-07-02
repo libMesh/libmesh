@@ -23,6 +23,9 @@
 // Local Includes
 #include "threads.h"
 
+namespace libMesh
+{
+
 
 
 //-------------------------------------------------------------------------
@@ -30,3 +33,5 @@
 Threads::spin_mutex Threads::spin_mtx;
 Threads::recursive_mutex Threads::recursive_mtx;
 bool Threads::in_threads = false;
+
+} // namespace libMesh

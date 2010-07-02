@@ -53,6 +53,9 @@
 // The definition of a geometric element
 #include "elem.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side.
 void assemble_stokes (EquationSystems& es,

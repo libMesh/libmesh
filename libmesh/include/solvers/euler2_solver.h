@@ -27,6 +27,9 @@
 // Local includes
 #include "unsteady_solver.h"
 
+namespace libMesh
+{
+
 /**
  * This class defines a theta-method (defaulting to Backward
  * Euler with theta = 1.0) solver to handle
@@ -96,6 +99,8 @@ public:
   Real theta;
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __euler2_solver_h__

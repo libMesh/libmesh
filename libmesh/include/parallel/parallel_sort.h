@@ -28,6 +28,9 @@
 #include "parallel.h"
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 
 namespace Parallel
 {
@@ -137,4 +140,6 @@ private:
   
 };
 }
+
+} // namespace libMesh
 #endif

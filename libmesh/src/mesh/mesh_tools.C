@@ -47,6 +47,9 @@
 // ------------------------------------------------------------
 // anonymous namespace for helper classes
 namespace {
+
+  using namespace libMesh;
+
   /**
    * SumElemWeight(Range) sums the number of nodes per element 
    * for each element in the provided range. The join() method
@@ -172,6 +175,9 @@ namespace {
   };
 }
 
+
+namespace libMesh
+{
 
 
 // ------------------------------------------------------------
@@ -1057,3 +1063,5 @@ void MeshTools::Private::fix_broken_node_and_element_numbering (ParallelMesh &me
 	it->second->set_id() = it->first;
   }
 }
+
+} // namespace libMesh

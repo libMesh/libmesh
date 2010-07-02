@@ -30,6 +30,9 @@
 
 #include "cell_inf.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -141,6 +144,8 @@ InfPrism::InfPrism(const unsigned int nn, Elem* p) :
 //   }
 // }
 
+
+} // namespace libMesh
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

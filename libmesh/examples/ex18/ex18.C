@@ -44,6 +44,9 @@
 #include "euler_solver.h"
 #include "steady_solver.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // The main program.
 int main (int argc, char** argv)
 {

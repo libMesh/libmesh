@@ -47,6 +47,8 @@
 #include "kelly_error_estimator.h"
 #include "mesh_refinement.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
 
 void assemble_1D(EquationSystems& es, const std::string& system_name);
 

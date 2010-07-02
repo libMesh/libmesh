@@ -25,6 +25,9 @@
 // Local Includes
 #include "function_base.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -41,6 +44,8 @@ FunctionBase::FunctionBase (const FunctionBase* master) :
 FunctionBase::~FunctionBase ()
 {
 }
+
+} // namespace libMesh
 
 
 

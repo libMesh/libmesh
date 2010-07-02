@@ -71,6 +71,9 @@
 #include <petsc.h>
 #endif
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // A reference to our equation system
 EquationSystems *_equation_system = NULL;
 

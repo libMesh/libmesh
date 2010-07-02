@@ -30,6 +30,9 @@
 #include "mesh_input.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 class MeshData;
@@ -153,6 +156,8 @@ TetGenIO::TetGenIO (const MeshBase& mesh, MeshData* mesh_data) :
 {
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __tetgen_io_h__

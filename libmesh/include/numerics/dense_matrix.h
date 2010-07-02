@@ -30,6 +30,9 @@
 #include "libmesh_common.h"
 #include "dense_matrix_base.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 template <typename T> class DenseVector;
 
@@ -815,6 +818,8 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 
 
 
+
+} // namespace libMesh
 
 
 

@@ -27,6 +27,9 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // LinearPartitioner implementation
@@ -74,3 +77,5 @@ void LinearPartitioner::_do_partition (MeshBase& mesh,
     STOP_LOG ("partition()", "LinearPartitioner");
   }
 }
+
+} // namespace libMesh

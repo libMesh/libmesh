@@ -23,6 +23,9 @@
 // Local includes
 #include "xdr_mgf.h"
 
+namespace libMesh
+{
+
 // forward declarations
 class XdrSHEAD; 
 
@@ -84,5 +87,7 @@ private:
   int m_wrtVar;
 };
 
+
+} // namespace libMesh
 
 #endif // #ifndef __xdr_soln_h__

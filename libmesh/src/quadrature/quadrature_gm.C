@@ -20,6 +20,9 @@
 
 #include "quadrature_gm.h"
 
+namespace libMesh
+{
+
 // See also the file:
 // quadrature_gm_3D.C
 // for additional implementation.
@@ -208,3 +211,5 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
       //libMesh::out<<"\n";
     }
 }
+
+} // namespace libMesh

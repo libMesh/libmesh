@@ -36,6 +36,9 @@
 // Local includes
 #include "inf_fe_macro.h"
 
+namespace libMesh
+{
+
 
 /** 
  * Collect all 3D explicit instantiations for class InfFE
@@ -46,6 +49,8 @@ INSTANTIATE_INF_FE(3,CARTESIAN);
 
 /* INSTANTIATE_INF_FE(3,ELLIPSOIDAL); */
 
+
+} // namespace libMesh
 
 
 #endif

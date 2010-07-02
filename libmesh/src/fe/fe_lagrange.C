@@ -27,6 +27,9 @@
 #include "elem.h"
 #include "threads.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -803,3 +806,5 @@ template void FE<3,LAGRANGE>::compute_constraints(DofConstraints&, DofMap&,
 						  const unsigned int,
 						  const Elem*);
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+} // namespace libMesh

@@ -30,6 +30,9 @@
 #include "point_locator_base.h"
 #include "tree_base.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 class MeshBase;
@@ -158,6 +161,8 @@ protected:
 // ------------------------------------------------------------
 // PointLocatorTree inline methods
 
+
+} // namespace libMesh
 
 #endif
 

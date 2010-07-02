@@ -31,6 +31,9 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 // forward declarations
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
@@ -254,6 +257,8 @@ NonlinearSolver<T>::~NonlinearSolver ()
   this->clear ();
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifdef __solver_h__

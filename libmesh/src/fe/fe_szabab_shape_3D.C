@@ -26,6 +26,9 @@
 
 #include "fe.h"
 
+namespace libMesh
+{
+
 
 template <>
 Real FE<3,SZABAB>::shape(const ElemType,
@@ -105,6 +108,8 @@ Real FE<3,SZABAB>::shape_second_deriv(const Elem*,
   libmesh_error();
   return 0.;
 }
+
+} // namespace libMesh
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 

@@ -30,10 +30,13 @@
 #include "point.h"
 #include "libmesh.h"
 
+#ifdef LIBMESH_HAVE_TRIANGLE
+
+namespace libMesh
+{
+
 // Forward Declarations
 class UnstructuredMesh;
-
-#ifdef LIBMESH_HAVE_TRIANGLE
 
 // Note: libmesh_common.h defines REAL, which is required by triangle.
 // Therefore, we need to include it first.
@@ -454,6 +457,8 @@ namespace MeshTools
   }
 }
 
+
+} // namespace libMesh
 
 
 

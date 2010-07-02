@@ -33,6 +33,9 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 // forward declarations
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
@@ -173,6 +176,8 @@ Preconditioner<T>::set_type (const PreconditionerType pct)
   _is_initialized = false;
   _preconditioner_type = pct;
 }
+
+} // namespace libMesh
 
 
 #endif // #ifdef __preconditioner_h__

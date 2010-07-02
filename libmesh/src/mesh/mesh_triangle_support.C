@@ -30,6 +30,9 @@
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
+namespace libMesh
+{
+
 // Triangulates a 2D rectangular region with or without holes
 void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 						  const unsigned int nx, // num. of elements in x-dir
@@ -560,6 +563,8 @@ flags << "zBPQq";
   Triangle::destroy(final,        Triangle::OUTPUT);
   
 }
+
+} // namespace libMesh
 
 
 

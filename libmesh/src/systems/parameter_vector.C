@@ -26,6 +26,9 @@
 // Local Includes -----------------------------------
 #include "parameter_vector.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // ParameterVector implementation
 
@@ -99,3 +102,5 @@ ParameterVector& ParameterVector::operator += (const ParameterVector& a)
   (*this) += a;
   return *this;
 }
+
+} // namespace libMesh

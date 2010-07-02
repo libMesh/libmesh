@@ -30,6 +30,9 @@
 #include "libmesh_common.h"
 #include "enum_elem_type.h"
 
+namespace libMesh
+{
+
 
 // forward declarations
 class BoundaryInfo;
@@ -413,6 +416,8 @@ inline bool FEInterface::is_InfFE_elem(const ElemType et)
 #endif //ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS 
 
 
+
+} // namespace libMesh
 
 
 

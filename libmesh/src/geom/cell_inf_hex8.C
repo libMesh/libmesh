@@ -34,6 +34,9 @@
 #include "fe_type.h"
 #include "side.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // InfHex8 class member functions
@@ -309,5 +312,7 @@ const float InfHex8::_embedding_matrix[4][8][8] =
 
 
 #endif
+
+} // namespace libMesh
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

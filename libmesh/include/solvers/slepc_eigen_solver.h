@@ -48,6 +48,9 @@ extern "C"
 # include <slepcversion.h>
 #endif
 
+namespace libMesh
+{
+
 
 /**
  * This class provides an interface to the SLEPc
@@ -275,6 +278,8 @@ SlepcEigenSolver<T>::~SlepcEigenSolver ()
 {
   this->clear ();
 }
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_SLEPC

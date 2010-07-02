@@ -21,6 +21,9 @@
 // Local Includes
 #include "dense_subvector.h"
 
+namespace libMesh
+{
+
 //--------------------------------------------------------------
 // Explicit instantiations
 template class DenseSubVector<Real>;
@@ -28,3 +31,5 @@ template class DenseSubVector<Real>;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseSubVector<Complex>;
 #endif
+
+} // namespace libMesh

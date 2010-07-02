@@ -28,6 +28,9 @@
 #include "elem.h"
 #include "boundary_info.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // DivaIO class members
 void DivaIO::write (const std::string& fname)
@@ -381,3 +384,5 @@ void DivaIO::write_stream (std::ostream& out)
 	    }
 	}
 }
+
+} // namespace libMesh

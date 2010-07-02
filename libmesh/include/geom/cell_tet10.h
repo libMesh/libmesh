@@ -27,6 +27,9 @@
 // Local includes
 #include "cell_tet.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -245,6 +248,8 @@ Tet10::Tet10(Elem* p) :
 #endif
 {
 }
+
+} // namespace libMesh
 
 
 #endif

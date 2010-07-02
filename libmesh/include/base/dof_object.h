@@ -30,6 +30,9 @@
 #include "libmesh.h" // libMesh::invalid_uint
 #include "reference_counted_object.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class DofObject;
 
@@ -601,6 +604,8 @@ bool DofObject::has_dofs (const unsigned int sys) const
 }
   
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __dof_object_h__

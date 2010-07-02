@@ -56,6 +56,9 @@
 #include "elem.h"
 #include "tensor_value.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // Function prototype.  This is the function that will assemble
 // the linear system for our Biharmonic problem.  Note that the
 // function will take the \p EquationSystems object and the

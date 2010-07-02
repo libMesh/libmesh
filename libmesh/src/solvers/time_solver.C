@@ -24,6 +24,9 @@
 #include "numeric_vector.h"
 #include "time_solver.h"
 
+namespace libMesh
+{
+
 
 
 TimeSolver::TimeSolver (sys_type& s)
@@ -84,3 +87,5 @@ void TimeSolver::advance_timestep ()
 void TimeSolver::adjoint_recede_timestep ()
 {
 }
+
+} // namespace libMesh

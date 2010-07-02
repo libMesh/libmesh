@@ -30,6 +30,9 @@
 // Local Includes
 #include "point_locator_base.h"
 
+namespace libMesh
+{
+
 
 
 // Forward Declarations
@@ -138,6 +141,8 @@ protected:
 // ------------------------------------------------------------
 // PointLocatorList inline methods
 
+
+} // namespace libMesh
 
 #endif
 

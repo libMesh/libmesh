@@ -43,6 +43,8 @@
 // anonymous namespace for implementation details
 namespace {
 
+  using libMesh::Elem;
+
   /**
    * Specific weak ordering for Elem*'s to be used in a set.
    * We use the id, but first sort by level.  This guarantees 
@@ -76,6 +78,9 @@ namespace {
 			   32 }; // face 5 neighbor
 }
 
+
+namespace libMesh
+{
 
 
 // ------------------------------------------------------------
@@ -2562,3 +2567,5 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
 //   for (unsigned int n=0; n<elem->n_nodes(); n++)
 //     conn.push_back (elem->node(n));		
 // }
+
+} // namespace libMesh

@@ -28,6 +28,9 @@
 #include "libmesh_common.h"
 #include "compare_types.h"
 
+namespace libMesh
+{
+
 // Forward Delcarations
 template <typename T> class DenseVectorBase;
 
@@ -191,6 +194,8 @@ DenseMatrixBase<T>::add (const T2 factor,
       this->el(i,j) += factor*mat.el(i,j);
 }
 
+
+} // namespace libMesh
 
 #endif // #ifndef __dense_matrix_base_h__
 

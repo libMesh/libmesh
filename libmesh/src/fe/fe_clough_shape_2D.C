@@ -30,6 +30,8 @@
 // FIXME: This should also screw up multithreading royally
 namespace
 {
+  using namespace libMesh;
+
   static unsigned int old_elem_id = libMesh::invalid_uint;
   // Coefficient naming: d(1)d(2n) is the coefficient of the
   // global shape function corresponding to value 1 in terms of the
@@ -1435,6 +1437,9 @@ Real clough_raw_shape(const unsigned int basis_num,
 } // end anonymous namespace
 
 
+namespace libMesh
+{
+
 
 template <>
 Real FE<2,CLOUGH>::shape(const ElemType,
@@ -2014,3 +2019,5 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
   libmesh_error();
   return 0.;
 }
+
+} // namespace libMesh

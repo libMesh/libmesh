@@ -27,6 +27,9 @@
 // Local includes
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 
@@ -76,6 +79,8 @@ public:
 
 };
 
+
+} // namespace libMesh
 
 
 #endif

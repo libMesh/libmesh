@@ -24,7 +24,7 @@
 
 // ------------------------------------------------------------
 // enum PointLocatorType definition
-namespace MeshEnums {
+namespace libMeshEnums {
   
   /**
    * \enum MeshEnums::PointLocatorType defines an \p enum for the types
@@ -36,7 +36,7 @@ namespace MeshEnums {
 			 INVALID_LOCATOR};
 }
 
-using namespace MeshEnums;
+using namespace libMeshEnums;
 
 #endif // #ifndef __enum_point_locator_type_h__
 

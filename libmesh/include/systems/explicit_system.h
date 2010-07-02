@@ -27,6 +27,9 @@
 // Local Includes
 #include "system.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 
@@ -145,6 +148,8 @@ private:
 
 // ------------------------------------------------------------
 // ExplicitSystem inline methods
+
+} // namespace libMesh
 
 
 #endif

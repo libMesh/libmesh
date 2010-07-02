@@ -30,6 +30,9 @@
 // Local includes
 #include "libmesh_common.h" // for Real
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // The Utility namespace is for functions
@@ -332,5 +335,7 @@ namespace Utility
 
   
 }
+
+} // namespace libMesh
 
 #endif // #define __utility_h__

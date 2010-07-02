@@ -35,6 +35,9 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 // forward declarations
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
@@ -249,6 +252,8 @@ EigenSolver<T>::~EigenSolver ()
 {
   this->clear ();
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC
 

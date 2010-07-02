@@ -22,6 +22,9 @@
 // Local includes
 #include "tensor_shell_matrix.h"
 
+namespace libMesh
+{
+
 template <typename T>
 void TensorShellMatrix<T>::vector_mult (NumericVector<T>& dest,
 					const NumericVector<T>& arg) const
@@ -52,4 +55,6 @@ void TensorShellMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 //------------------------------------------------------------------
 // Explicit instantiations
 template class TensorShellMatrix<Number>;
+
+} // namespace libMesh
 

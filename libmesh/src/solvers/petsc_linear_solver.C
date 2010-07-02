@@ -31,6 +31,9 @@
 #include "shell_matrix.h"
 #include "petsc_preconditioner.h"
 
+namespace libMesh
+{
+
 extern "C"
 {
 #if PETSC_VERSION_LESS_THAN(2,2,1)
@@ -929,6 +932,8 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, V
 //------------------------------------------------------------------
 // Explicit instantiations
 template class PetscLinearSolver<Number>;
+
+} // namespace libMesh
  
 
 

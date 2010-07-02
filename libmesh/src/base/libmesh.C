@@ -56,6 +56,9 @@ EXTERN_C_FOR_PETSC_END
 // --------------------------------------------------------
 // Local anonymous namespace to hold miscelaneous variables
 namespace {
+
+  using libMesh::AutoPtr;
+
   AutoPtr<GetPot> command_line (NULL);
   AutoPtr<std::ofstream> _ofstream (NULL);
   // If std::cout and std::cerr are redirected, we need to
@@ -64,7 +67,7 @@ namespace {
   std::streambuf* out_buf (NULL);
   std::streambuf* err_buf (NULL);
   
-  AutoPtr<Threads::task_scheduler_init> task_scheduler (NULL);
+  AutoPtr<libMesh::Threads::task_scheduler_init> task_scheduler (NULL);
 #if defined(LIBMESH_HAVE_MPI)
   bool libmesh_initialized_mpi = false;
 #endif
@@ -77,21 +80,24 @@ namespace {
 }
 
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // libMeshdata initialization
 #ifdef LIBMESH_HAVE_MPI
-MPI_Comm           libMesh::COMM_WORLD = MPI_COMM_NULL;
+MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
 #else
-int                libMesh::COMM_WORLD = 0;
+int                COMM_WORLD = 0;
 #endif
 
-OStreamProxy libMesh::out = std::cout;
-OStreamProxy libMesh::err = std::cerr;
+OStreamProxy out = std::cout;
+OStreamProxy err = std::cerr;
 
 Parallel::Communicator Parallel::Communicator_World;
 
-PerfLog            libMesh::perflog ("libMesh",
+PerfLog            perflog ("libMesh",
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
 				     true
 #else
@@ -100,16 +106,16 @@ PerfLog            libMesh::perflog ("libMesh",
 				     );
 
 
-const Real         libMesh::pi = 3.1415926535897932384626433832795029L;
+const Real         pi = 3.1415926535897932384626433832795029L;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-const Number       libMesh::imaginary (0., 1.);
-const Number       libMesh::zero      (0., 0.);
+const Number       imaginary (0., 1.);
+const Number       zero      (0., 0.);
 #else
-const Number       libMesh::zero = 0.;
+const Number       zero = 0.;
 #endif
 
-const unsigned int libMesh::invalid_uint = static_cast<unsigned int>(-1);
+const unsigned int invalid_uint = static_cast<unsigned int>(-1);
 
 
 
@@ -136,7 +142,6 @@ SolverPackage libMesh::libMeshPrivateData::_solver_package =
 
 // ------------------------------------------------------------
 // libMesh functions
-namespace libMesh {
 #ifndef LIBMESH_HAVE_MPI
 void _init (int &argc, char** & argv)
 #else
@@ -444,18 +449,17 @@ int _close ()
   // deleted.
   return static_cast<int>(ReferenceCounter::n_objects());
 }
-}
 
 
 
 #ifndef LIBMESH_HAVE_MPI
-void libMesh::init (int &argc, char** & argv)
+void init (int &argc, char** & argv)
 {
   libmesh_deprecated();  // Use LibMeshInit instead
   libMesh::_init(argc, argv);
 }
 #else
-void libMesh::init (int &argc, char** & argv,
+void init (int &argc, char** & argv,
 		    MPI_Comm COMM_WORLD_IN)
 {
   libmesh_deprecated();  // Use LibMeshInit instead
@@ -466,7 +470,7 @@ void libMesh::init (int &argc, char** & argv,
 
 
 
-int libMesh::close ()
+int close ()
 {
   libmesh_deprecated();  // Use LibMeshInit instead
   return libMesh::_close();
@@ -495,7 +499,7 @@ LibMeshInit::~LibMeshInit()
 
 
 
-bool libMesh::on_command_line (const std::string& arg)
+bool on_command_line (const std::string& arg)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert (command_line.get() != NULL);
@@ -506,7 +510,7 @@ bool libMesh::on_command_line (const std::string& arg)
 
 
 template <typename T>
-T libMesh::command_line_value (const std::string &name, T value)
+T command_line_value (const std::string &name, T value)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert (command_line.get() != NULL);
@@ -519,7 +523,7 @@ T libMesh::command_line_value (const std::string &name, T value)
 }
 
 
-SolverPackage libMesh::default_solver_package ()
+SolverPackage default_solver_package ()
 {
   libmesh_assert (libMesh::initialized());
   
@@ -561,6 +565,8 @@ SolverPackage libMesh::default_solver_package ()
 
 
 //-------------------------------------------------------------------------------
-template int          libMesh::command_line_value<int>         (const std::string&, int);
-template Real         libMesh::command_line_value<Real>        (const std::string&, Real);
-template std::string  libMesh::command_line_value<std::string> (const std::string&, std::string);
+template int          command_line_value<int>         (const std::string&, int);
+template Real         command_line_value<Real>        (const std::string&, Real);
+template std::string  command_line_value<std::string> (const std::string&, std::string);
+
+} // namespace libMesh

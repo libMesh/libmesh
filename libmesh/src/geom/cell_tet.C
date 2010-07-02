@@ -25,6 +25,9 @@
 #include "cell_tet4.h"
 #include "face_tri3.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -191,3 +194,5 @@ std::pair<Real, Real> Tet::qual_bounds (const ElemQuality q) const
 
   return bounds;
 }
+
+} // namespace libMesh

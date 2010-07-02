@@ -28,6 +28,9 @@
 #include "libmesh.h"
 #include "auto_ptr.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class MeshBase;
 
@@ -140,6 +143,8 @@ protected:
   static const unsigned int communication_blocksize;
 };
 
+
+} // namespace libMesh
 
 
 

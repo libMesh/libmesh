@@ -32,6 +32,9 @@
 #include "error_estimator.h"
 #include "fe_base.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class Point;
 class Elem;
@@ -155,6 +158,8 @@ protected:
   AutoPtr<FEBase> fe_fine, fe_coarse;
 };
 
+
+} // namespace libMesh
 
 #endif
 

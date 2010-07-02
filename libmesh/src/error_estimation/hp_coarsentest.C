@@ -39,6 +39,9 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
+namespace libMesh
+{
+
 //-----------------------------------------------------------------
 // HPCoarsenTest implementations
 
@@ -574,5 +577,7 @@ libMesh::err << "Cell " << e_id << ": h = " << elem->hmax()
 
   STOP_LOG("select_refinement()", "HPCoarsenTest");
 }
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR

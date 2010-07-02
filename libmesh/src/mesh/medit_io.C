@@ -29,6 +29,9 @@
 #include "medit_io.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // MEDITIO  members
@@ -220,6 +223,8 @@ void MEDITIO::write_ascii (const std::string& fname,
       bbout << "\n";
     } // endif
 }
+
+} // namespace libMesh
 
 
 

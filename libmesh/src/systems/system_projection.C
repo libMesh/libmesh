@@ -37,6 +37,9 @@
 #include "dense_vector.h"
 #include "threads.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // System implementation
@@ -1419,3 +1422,5 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
         }  // end elem loop
     } // end variables loop
 }
+
+} // namespace libMesh

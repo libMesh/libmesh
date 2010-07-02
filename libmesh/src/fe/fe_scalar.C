@@ -25,6 +25,9 @@
 #include "fe_macro.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -114,3 +117,5 @@ INSTANTIATE_MBRF(0,SCALAR);
 INSTANTIATE_MBRF(1,SCALAR);
 INSTANTIATE_MBRF(2,SCALAR);
 INSTANTIATE_MBRF(3,SCALAR);
+
+} // namespace libMesh

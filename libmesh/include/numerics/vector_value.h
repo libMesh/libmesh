@@ -27,6 +27,9 @@
 // Local includes
 #include "type_vector.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -137,5 +140,7 @@ VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,
 }
 #endif
 
+
+} // namespace libMesh
 
 #endif // #define __vector_value_h__

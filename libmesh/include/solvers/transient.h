@@ -28,6 +28,9 @@
 #include "libmesh_common.h"
 #include "linear.h"
 
+namespace libMesh
+{
+
 
 /**
  * This is a generic class that defines a transient to be used in a
@@ -213,6 +216,8 @@ void Transient<T>::solve ()
   while ((this->time_step() < this->max_time_steps()) &&
 	 (this->time()      < this->t_end()));
 }
+
+} // namespace libMesh
 
 
 #endif // #define __transient_h__

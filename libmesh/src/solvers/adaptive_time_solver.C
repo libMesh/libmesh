@@ -22,6 +22,9 @@
 #include "euler_solver.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 
 
 AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
@@ -140,3 +143,5 @@ Real AdaptiveTimeSolver::calculate_norm(System &s,
 {
   return s.calculate_norm(v, component_norm);
 }
+
+} // namespace libMesh

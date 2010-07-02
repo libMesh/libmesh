@@ -26,6 +26,9 @@
 #include "mesh_base.h"
 #include "face_tri3.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // MatlabIO class members
 
@@ -101,3 +104,5 @@ void MatlabIO::read_stream(std::istream& in)
   }
   
 }
+
+} // namespace libMesh

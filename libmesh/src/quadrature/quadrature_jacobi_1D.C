@@ -21,6 +21,9 @@
 
 // Local includes
 #include "quadrature_jacobi.h"
+
+namespace libMesh
+{
  
 
 
@@ -1020,5 +1023,7 @@ void QJacobi::init_1D(const ElemType,
   
   return;
 }
+
+} // namespace libMesh
  
 

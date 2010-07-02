@@ -28,6 +28,9 @@
 #include "system.h"
 
 
+namespace libMesh
+{
+
 // Forward declarations
 class LinearImplicitSystem;
 class NonlinearImplicitSystem;
@@ -164,6 +167,8 @@ std::string TransientSystem<Base>::system_type () const
 }
 
 
+
+} // namespace libMesh
 
 
 

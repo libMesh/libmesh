@@ -25,6 +25,9 @@
 
 #include "edge_inf_edge2.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // InfEdge2 class member functions
@@ -94,6 +97,8 @@ void InfEdge2::connectivity(const unsigned int se,
 
   libmesh_error();
 }
+
+} // namespace libMesh
 
 
 #endif

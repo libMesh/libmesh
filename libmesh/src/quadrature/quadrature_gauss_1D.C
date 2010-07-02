@@ -23,6 +23,9 @@
 
 // Local includes
 #include "quadrature_gauss.h"
+
+namespace libMesh
+{
  
 
 
@@ -786,5 +789,7 @@ void QGauss::init_1D(const ElemType,
 
   return;
 }
+
+} // namespace libMesh
  
 

@@ -22,6 +22,9 @@
 // Local includes
 #include "sparse_shell_matrix.h"
 
+namespace libMesh
+{
+
 template <typename T>
 void SparseShellMatrix<T>::vector_mult (NumericVector<T>& dest,
 					const NumericVector<T>& arg) const
@@ -43,4 +46,6 @@ void SparseShellMatrix<T>::vector_mult_add (NumericVector<T>& dest,
 //------------------------------------------------------------------
 // Explicit instantiations
 template class SparseShellMatrix<Number>;
+
+} // namespace libMesh
 

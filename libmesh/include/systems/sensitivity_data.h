@@ -31,6 +31,9 @@
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
   /**
    * Data structure for holding completed parameter sensitivity
    * calculations.
@@ -251,5 +254,7 @@ Number& SensitivityData::second_derivative(unsigned int qoi_index,
 
   return _hess_data[qoi_index][parameter_index1][parameter_index2];
 }
+
+} // namespace libMesh
 
 #endif // #define __sensitivity_data_h__

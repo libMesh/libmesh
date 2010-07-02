@@ -27,6 +27,9 @@
 #include "sensitivity_data.h"
 #include "time_solver.h"
 
+namespace libMesh
+{
+
 
 
 DifferentiableSystem::DifferentiableSystem
@@ -132,3 +135,5 @@ std::pair<unsigned int, Real> DifferentiableSystem::get_linear_solve_parameters(
 void DifferentiableSystem::release_linear_solver(LinearSolver<Number>*) const
 {
 }
+
+} // namespace libMesh

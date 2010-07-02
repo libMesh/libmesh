@@ -37,6 +37,9 @@
 #include "string_to_enum.h"
 #include "unstructured_mesh.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // MeshTools::Modification functions for mesh modification
@@ -1295,6 +1298,8 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
           }
     }
 }
+
+} // namespace libMesh
 
 
 

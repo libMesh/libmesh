@@ -23,7 +23,6 @@
 #define __libmesh_base_h__
 
 
-
 namespace libMesh {
   
   /**
@@ -103,6 +102,21 @@ unsigned int libMesh::n_threads()
   return static_cast<unsigned int>(libMeshPrivateData::_n_threads);
 }
 
+
+// We now put everything we can into a separate libMesh namespace;
+// code which forward declares libMesh classes or which specializes
+// libMesh templates may want to know whether it is compiling under
+// such conditions, to be backward compatible with older libMesh
+// versions:
+#define LIBMESH_USE_SEPARATE_NAMESPACE 1
+
+
+// Unless configured otherwise, we import all of namespace libMesh,
+// for backwards compatibility with pre-namespaced codes.
+
+#ifndef LIBMESH_REQUIRE_SEPARATE_NAMESPACE
+using namespace libMesh;
+#endif
 
 
 #endif // #define __libmesh_base_h__

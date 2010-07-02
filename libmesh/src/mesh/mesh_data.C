@@ -28,6 +28,9 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 //------------------------------------------------------
 // MeshData functions
@@ -763,3 +766,5 @@ void MeshData::assign (const MeshData& omd)
   this->_node_data = omd._node_data;
   this->_elem_data = omd._elem_data;
 }
+
+} // namespace libMesh

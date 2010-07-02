@@ -25,6 +25,9 @@
 #include "mesh_output.h"
 
 
+namespace libMesh
+{
+
 // forward declaration
 class MeshBase;
 
@@ -111,6 +114,8 @@ class GnuPlotIO : public MeshOutput<MeshBase>
   bool _grid;
   bool _png_output;
 };
+
+} // namespace libMesh
 
     
 #endif

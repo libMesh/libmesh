@@ -27,6 +27,9 @@
 // Local Includes -----------------------------------
 #include "mesh_base.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class MeshData;
 
@@ -158,5 +161,7 @@ class UnstructuredMesh : public MeshBase
 
 };
 
+
+} // namespace libMesh
 
 #endif

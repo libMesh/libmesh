@@ -23,6 +23,9 @@
 #include "libmesh_common.h"
 #include <vector>
 
+namespace libMesh
+{
+
 // Forward declaration
 class RBSystem;
 class RBParamSubdomainTree;
@@ -199,5 +202,7 @@ public:
   bool training_set_initialized;
 
 };
+
+} // namespace libMesh
 
 #endif

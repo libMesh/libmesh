@@ -24,6 +24,9 @@
 #include "edge_edge3.h"
 #include "face_quad8.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -428,4 +431,6 @@ Quad8::second_order_child_vertex (const unsigned int n) const
     (_second_order_vertex_child_number[n],
      _second_order_vertex_child_index[n]);
 }
+
+} // namespace libMesh
 

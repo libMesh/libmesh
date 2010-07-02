@@ -37,6 +37,9 @@
 
 
 
+namespace libMesh
+{
+
 void
 DiscontinuityMeasure::initialize(const System& system,
                                  ErrorVector&,
@@ -172,3 +175,5 @@ DiscontinuityMeasure::attach_essential_bc_function
   else
     integrate_boundary_sides = false;
 }
+
+} // namespace libMesh

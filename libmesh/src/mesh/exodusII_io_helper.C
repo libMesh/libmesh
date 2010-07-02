@@ -36,6 +36,9 @@
 #include "mesh_tools.h"  // for elem_types warning
 #endif
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // ExodusII_IO_Helper::ElementMaps static data
 
@@ -1154,6 +1157,8 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   const Conversion conv(tri3_node_map, tri_edge_map, tri_inverse_edge_map, TRI3, "TRI3"); // dummy
   return conv;  
 }
+
+} // namespace libMesh
 
 
 

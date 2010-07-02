@@ -27,6 +27,9 @@
 // Local Includes
 #include "explicit_system.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 template <typename T> class LinearSolver;
 template <typename T> class SparseMatrix;
@@ -378,5 +381,7 @@ unsigned int ImplicitSystem::n_matrices () const
  return _matrices.size(); 
 }
 
+
+} // namespace libMesh
 
 #endif

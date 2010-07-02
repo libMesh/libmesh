@@ -30,6 +30,9 @@
 #include "mesh_communication.h"
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -552,3 +555,5 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   
   STOP_LOG("set_node_processor_ids()","Partitioner");
 }
+
+} // namespace libMesh

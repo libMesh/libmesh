@@ -28,6 +28,9 @@
 #include "mesh_base.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // TreeNode class methods
 template <unsigned int N>
@@ -603,6 +606,8 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
 // Explicit Instantiations
 template class TreeNode<4>;
 template class TreeNode<8>;
+
+} // namespace libMesh
 
 
 

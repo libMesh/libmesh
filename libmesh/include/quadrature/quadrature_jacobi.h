@@ -27,6 +27,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // QJacobi class definition
@@ -121,6 +124,8 @@ QuadratureType QJacobi::type() const
     }
 }
 
+
+} // namespace libMesh
 
 
 #endif

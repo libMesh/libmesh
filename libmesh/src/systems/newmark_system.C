@@ -28,6 +28,9 @@
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -289,3 +292,5 @@ void NewmarkSystem::set_newmark_parameters (const Real delta_T,
   _a_6 = delta_T*(1.-delta);
   _a_7 = delta*delta_T;
 }
+
+} // namespace libMesh

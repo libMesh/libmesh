@@ -27,6 +27,9 @@
 // Local includes
 #include "unsteady_solver.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class System;
 
@@ -184,6 +187,8 @@ protected:
   virtual Real calculate_norm(System &, NumericVector<Number> &);
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __adaptive_time_solver_

@@ -29,6 +29,9 @@
 // Local Includes
 #include "jump_error_estimator.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class Point;
 
@@ -117,6 +120,8 @@ protected:
 					 const std::string& var_name);
 };
 
+
+} // namespace libMesh
 
 #endif
 

@@ -33,6 +33,9 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 // forward declarations
 template <typename T> class SparseMatrix;
 template <typename T> class DenseMatrix;
@@ -459,6 +462,8 @@ std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)
   return os;
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __sparse_matrix_h__

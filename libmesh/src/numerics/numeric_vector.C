@@ -30,6 +30,9 @@
 #include "trilinos_epetra_vector.h"
 #include "shell_matrix.h"
 
+namespace libMesh
+{
+
 
 
 //------------------------------------------------------------------
@@ -362,3 +365,5 @@ void NumericVector<T>::add_vector (const NumericVector<T>& v,
 //------------------------------------------------------------------
 // Explicit instantiations
 template class NumericVector<Number>;
+
+} // namespace libMesh

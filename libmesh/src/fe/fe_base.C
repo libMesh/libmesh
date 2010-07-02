@@ -36,6 +36,9 @@
 #include "quadrature_gauss.h"
 #include "threads.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -2189,3 +2192,5 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 
 #endif // LIBMESH_ENABLE_PERIODIC
 
+
+} // namespace libMesh

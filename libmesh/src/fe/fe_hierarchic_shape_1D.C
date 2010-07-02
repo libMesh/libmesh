@@ -26,6 +26,9 @@
 #include "utility.h"
 
 
+namespace libMesh
+{
+
 
 
 template <>
@@ -275,3 +278,5 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const Elem* elem,
   return FE<1,HIERARCHIC>::shape_second_deriv(elem->type(),
 				              static_cast<Order>(order + elem->p_level()), i, j, p);
 }
+
+} // namespace libMesh

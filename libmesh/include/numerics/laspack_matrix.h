@@ -36,6 +36,9 @@
 
 #include <qmatrix.h>
 
+namespace libMesh
+{
+
 
 
 // Forward declarations
@@ -585,6 +588,8 @@ unsigned int LaspackMatrix<T>::pos (const unsigned int i,
   return std::distance (_row_start[i], p.first);
 }
 
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK
 #endif // #ifdef __laspack_matrix_h__

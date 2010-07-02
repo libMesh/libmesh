@@ -33,6 +33,9 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 // forward declarations
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
@@ -287,6 +290,8 @@ LinearSolver<T>::solve (const ShellMatrix<T>&  mat,
   else
     return this->solve(mat, sol, rhs, tol, n_iter);
 }
+
+} // namespace libMesh
 
 
 #endif // #ifdef __solver_h__

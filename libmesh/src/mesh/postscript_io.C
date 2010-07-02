@@ -25,6 +25,9 @@
 #include "mesh_tools.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 // Transformation map between monomial (physical space) and Bezier bases.
 const float PostscriptIO::_bezier_transform[3][3] =
@@ -291,3 +294,5 @@ void PostscriptIO::_compute_edge_bezier_coeffs(const Elem* elem)
 	_bezier_coeffs[j](i) = phys_coords[j];
     }
 }
+
+} // namespace libMesh

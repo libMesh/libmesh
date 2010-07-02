@@ -36,6 +36,9 @@
 #include "enum_quadrature_type.h"
 #include "auto_ptr.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -363,5 +366,7 @@ void QBase::print_info(std::ostream& os) const
 	 << "  w=" << _weights[qp] << "\n" << std::endl;
     }
 }
+
+} // namespace libMesh
 
 #endif

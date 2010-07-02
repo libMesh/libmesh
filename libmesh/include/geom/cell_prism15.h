@@ -27,6 +27,9 @@
 // Local includes
 #include "cell_prism.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -216,6 +219,8 @@ Prism15::Prism15(Elem* p) :
 {
 }
 
+
+} // namespace libMesh
 
 #endif // #define __cell_prism15_h__
 

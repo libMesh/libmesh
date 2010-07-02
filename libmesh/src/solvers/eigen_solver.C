@@ -28,6 +28,9 @@
 #include "slepc_eigen_solver.h"
 #include "auto_ptr.h"
 
+namespace libMesh
+{
+
 
 //------------------------------------------------------------------
 // EigenSolver members
@@ -66,6 +69,8 @@ EigenSolver<T>::build(const SolverPackage solver_package)
 //------------------------------------------------------------------
 // Explicit instantiations
 template class EigenSolver<Number>;
+
+} // namespace libMesh
 
 
 #endif // LIBMESH_HAVE_SLEPC

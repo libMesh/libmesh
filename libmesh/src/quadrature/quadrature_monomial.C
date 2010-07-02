@@ -20,6 +20,9 @@
 
 #include "quadrature_monomial.h"
 
+namespace libMesh
+{
+
 
 // See the files:
 
@@ -367,3 +370,5 @@ void QMonomial::kim_rule(const Real rule_data[][4],
 	} // end switch(rule_id[i])
     }
 }
+
+} // namespace libMesh

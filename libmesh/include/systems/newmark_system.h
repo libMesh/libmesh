@@ -27,6 +27,9 @@
 // Local Includes
 #include "linear_implicit_system.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 
 
@@ -171,6 +174,8 @@ private:
 
 };
 
+
+} // namespace libMesh
 
 
 // ------------------------------------------------------------

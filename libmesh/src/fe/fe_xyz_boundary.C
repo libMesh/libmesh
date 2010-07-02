@@ -31,6 +31,9 @@
 #include "fe_macro.h"
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -372,3 +375,5 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 template class FEXYZ<2>;
 template class FEXYZ<3>;
 
+
+} // namespace libMesh

@@ -45,6 +45,8 @@
 // Anonymous namespace to hold helper classes
 namespace {
 
+using namespace libMesh;
+
   class ComputeConstraints
   {
   public:
@@ -103,6 +105,9 @@ namespace {
 }
 
 
+
+namespace libMesh
+{
 
 // ------------------------------------------------------------
 // DofMap member functions
@@ -1351,3 +1356,5 @@ const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
 }
 
 #endif
+
+} // namespace libMesh

@@ -47,6 +47,9 @@
 
 
 
+namespace libMesh
+{
+
 
 
 //-----------------------------------------------------------------------------
@@ -1267,4 +1270,6 @@ void UNVIO::element_out(std::ostream& out_file)
   // Write end of dataset
   out_file << "    -1\n";
 }
+
+} // namespace libMesh
 

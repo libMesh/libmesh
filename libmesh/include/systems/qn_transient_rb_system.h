@@ -29,6 +29,9 @@
 
 #include "transient_rb_system.h"
 
+namespace libMesh
+{
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -368,6 +371,8 @@ private:
   theta_q_fptr theta_c;
 
 };
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 

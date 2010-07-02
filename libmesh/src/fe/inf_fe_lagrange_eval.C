@@ -23,6 +23,9 @@
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "inf_fe.h"
 
+namespace libMesh
+{
+
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
@@ -1079,6 +1082,8 @@ template Real InfFE<2,LAGRANGE,CARTESIAN>::eval(const Real,const Order,const uns
 template Real InfFE<2,LAGRANGE,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
 template Real InfFE<3,LAGRANGE,CARTESIAN>::eval(const Real,const Order,const unsigned int);
 template Real InfFE<3,LAGRANGE,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
+
+} // namespace libMesh
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

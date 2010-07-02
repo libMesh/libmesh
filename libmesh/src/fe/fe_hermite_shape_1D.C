@@ -31,6 +31,8 @@
 // This caching is turned off when TBB is enabled...
 namespace
 {
+  using namespace libMesh;
+
 #ifndef LIBMESH_HAVE_TBB_API
   static unsigned int old_elem_id = libMesh::invalid_uint;
   // Coefficient naming: d(1)d(2n) is the coefficient of the
@@ -88,6 +90,9 @@ namespace
 
 } // end anonymous namespace
 
+
+namespace libMesh
+{
 
 
 template<>
@@ -423,3 +428,5 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
   libmesh_error();
   return 0.;
 }
+
+} // namespace libMesh

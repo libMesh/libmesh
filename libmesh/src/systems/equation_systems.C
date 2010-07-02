@@ -40,6 +40,9 @@
 // overlapping forward declarations.
 #include "equation_systems.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 
 
@@ -934,3 +937,5 @@ void EquationSystems::_add_system_to_nodes_and_elems()
   for ( ; elem_it != elem_end; ++elem_it)
     (*elem_it)->add_system();
 }
+
+} // namespace libMesh

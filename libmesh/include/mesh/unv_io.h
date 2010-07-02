@@ -32,6 +32,9 @@
 #include "mesh_input.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 class MeshData;
@@ -333,6 +336,8 @@ Real UNVIO::D_to_e (std::string& number) const
   return std::atof (number.c_str());
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __unv_io_h__

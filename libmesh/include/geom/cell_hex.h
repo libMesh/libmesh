@@ -27,6 +27,9 @@
 // Local includes
 #include "cell.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -139,5 +142,7 @@ Hex::Hex(const unsigned int nn, Elem* p) :
   Cell(nn, Hex::n_sides(), p) 
 {
 }
+
+} // namespace libMesh
 
 #endif

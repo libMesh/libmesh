@@ -29,6 +29,9 @@
 
 #include <set>
 
+namespace libMesh
+{
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -374,6 +377,8 @@ private:
   static PerfLog pl;
 
 };
+
+} // namespace libMesh
 
 
 #endif

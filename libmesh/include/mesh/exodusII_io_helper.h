@@ -30,6 +30,9 @@
 
 #include "mesh_base.h"
 
+namespace libMesh
+{
+
 
 namespace exII {
   extern "C" {
@@ -906,6 +909,8 @@ public:
   ExodusII_IO_Helper::Conversion assign_conversion(const ElemType type);
 };
 
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_EXODUS_API
 

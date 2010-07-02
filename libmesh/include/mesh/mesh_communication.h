@@ -30,6 +30,9 @@
 #include "libmesh_common.h"
 #include "mesh_tools.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 class ParallelMesh;
@@ -206,5 +209,7 @@ private:
 //--------------------------------------------------------------
 // MeshCommunication inline members
 
+
+} // namespace libMesh
 
 #endif // end #ifndef __mesh_communication_h__ 

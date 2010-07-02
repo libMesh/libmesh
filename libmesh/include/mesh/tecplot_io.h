@@ -26,6 +26,9 @@
 #include "libmesh_common.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 
@@ -121,6 +124,8 @@ bool & TecplotIO::binary ()
   return _binary;
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __tecplot_io_h__

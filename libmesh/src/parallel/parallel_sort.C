@@ -31,6 +31,9 @@
 #  include "hilbert.h"
 #endif
 
+namespace libMesh
+{
+
 
 namespace Parallel {
   
@@ -375,3 +378,5 @@ template class Parallel::Sort<double>;
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 template class Parallel::Sort<Hilbert::HilbertIndices>;
 #endif
+
+} // namespace libMesh

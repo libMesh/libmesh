@@ -25,6 +25,9 @@
 #include "fe_macro.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -1152,3 +1155,5 @@ template void FE<2,XYZ>::compute_constraints(DofConstraints&, DofMap&,
 template void FE<3,XYZ>::compute_constraints(DofConstraints&, DofMap&, 
 					     const unsigned int, const Elem*);
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+} // namespace libMesh

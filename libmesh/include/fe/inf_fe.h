@@ -30,6 +30,9 @@
 
 #include "fe_base.h"
 
+namespace libMesh
+{
+
 
 // forward declarations
 class Elem;
@@ -849,6 +852,8 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
 // ------------------------------------------------------------
 // InfFE::Base class inline members
 
+
+} // namespace libMesh
 
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

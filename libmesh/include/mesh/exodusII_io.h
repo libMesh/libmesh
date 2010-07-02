@@ -31,6 +31,9 @@
 #include "mesh_output.h"
 #include "exodusII_io_helper.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class EquationSystems;
 class MeshBase;
@@ -141,6 +144,8 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   bool _verbose;
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __exodusII_io_h__

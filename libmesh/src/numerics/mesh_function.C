@@ -35,6 +35,9 @@
 #include "mesh.h"
 #include "point.h"
 
+namespace libMesh
+{
+
 
 //------------------------------------------------------------------
 // MeshFunction methods
@@ -515,4 +518,6 @@ void MeshFunction::disable_out_of_mesh_mode(void)
   _point_locator->disable_out_of_mesh_mode();
   _out_of_mesh_mode = false;
 }
+
+} // namespace libMesh
 

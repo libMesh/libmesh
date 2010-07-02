@@ -31,6 +31,9 @@
 #include "slepc_eigen_solver.h"
 #include "shell_matrix.h"
 
+namespace libMesh
+{
+
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
@@ -747,6 +750,8 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
 //------------------------------------------------------------------
 // Explicit instantiations
 template class SlepcEigenSolver<Number>;
+
+} // namespace libMesh
  
 
 

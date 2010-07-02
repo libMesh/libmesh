@@ -28,6 +28,9 @@
 // Local includes
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -705,6 +708,8 @@ PltLoader::get_data () const
 
 
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __plt_loader_h__

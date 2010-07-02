@@ -37,12 +37,17 @@
 //--------------------------------------------------------------------------
 namespace
 {
+  using libMesh::Real;
+
   // 10 bits per coordinate, to work with 32+ bit machines
   const unsigned int chunkmax = 1024;
   const Real chunkfloat = 1024.0;
 }
 
 
+
+namespace libMesh
+{
 
 //--------------------------------------------------------------------------
 template <typename T>
@@ -228,3 +233,5 @@ void LocationMap<Elem>::fill(MeshBase& mesh)
 
 template class LocationMap<Elem>;
 template class LocationMap<Node>;
+
+} // namespace libMesh

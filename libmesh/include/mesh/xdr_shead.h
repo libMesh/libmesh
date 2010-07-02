@@ -24,6 +24,9 @@
 #include "xdr_head.h" // for base class
 #include "xdr_soln.h" // for friend
 
+namespace libMesh
+{
+
 /**
  * The \p XdrSHEAD class.  This class is responsible for
  * reading/writing \p xdr solution file headers.
@@ -124,5 +127,7 @@ public:
 
 };
 
+
+} // namespace libMesh
 
 #endif // #ifndef __xdr_shead_h__

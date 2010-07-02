@@ -27,6 +27,9 @@
 #include "mesh_input.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 
@@ -107,6 +110,8 @@ UCDIO::UCDIO (const MeshBase& mesh) :
 {
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __ucd_io_h__

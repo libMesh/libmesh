@@ -25,6 +25,9 @@
 // Mesh library includes
 #include "libmesh_common.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 
 
 

@@ -32,6 +32,9 @@
 #include "point.h"
 #include "elem_range.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class Elem;
 
@@ -125,6 +128,8 @@ private:
   friend class EstimateError;
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __patch_recovery_error_estimator_h__

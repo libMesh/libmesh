@@ -36,6 +36,9 @@ EXTERN_C_FOR_PETSC_BEGIN
 # include <petscsnes.h>
 EXTERN_C_FOR_PETSC_END
 
+namespace libMesh
+{
+
 /**
  * This class defines a solver which uses a PETSc SNES 
  * context to handle a DifferentiableSystem
@@ -97,6 +100,8 @@ protected:
    */
   SNES _snes;
 };
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
 

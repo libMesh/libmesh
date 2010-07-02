@@ -28,6 +28,9 @@
 #include "fe_compute_data.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // InfFE class static member initialization
@@ -989,6 +992,8 @@ INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,compute_data(const FEType&,const Elem*,
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
+
+} // namespace libMesh
 					   
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

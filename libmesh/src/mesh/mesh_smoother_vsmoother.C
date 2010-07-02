@@ -31,6 +31,9 @@
 #include "unstructured_mesh.h"
 #include "utility.h"
 
+namespace libMesh
+{
+
 // Optimization at -O2 or greater seem to break Intel's icc. So if we are
 // being compiled with icc let's dumb-down the optimizations for this file
 #ifdef __INTEL_COMPILER
@@ -2972,5 +2975,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[], char metr[], int n, int
 
 return;
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_ENABLE_VSMOOTHER

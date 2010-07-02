@@ -59,6 +59,9 @@
 // indexing.
 #include "dof_map.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // Function prototype.  This is the function that will assemble
 // the linear system for our Poisson problem.  Note that the
 // function will take the  EquationSystems object and the

@@ -57,6 +57,9 @@
 #include "transient_system.h"
 #include "explicit_system.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 
 
 int main (int argc, char** argv)

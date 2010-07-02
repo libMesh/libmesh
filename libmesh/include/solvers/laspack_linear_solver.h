@@ -40,6 +40,9 @@
 #include <rtc.h>
 #include <errhandl.h>
 
+namespace libMesh
+{
+
 
 
 /**
@@ -174,6 +177,8 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T>&,
   std::pair<unsigned int, Real> p;
   return p;
 }
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK
 #endif // #ifndef __laspack_linear_solver_h__

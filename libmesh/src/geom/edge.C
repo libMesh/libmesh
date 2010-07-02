@@ -23,6 +23,9 @@
 #include "edge.h"
 #include "node_elem.h"
 
+namespace libMesh
+{
+
 
 AutoPtr<DofObject> Edge::side (const unsigned int i) const
 {
@@ -55,3 +58,5 @@ bool Edge::is_child_on_side(const unsigned int c,
 
 
 
+
+} // namespace libMesh

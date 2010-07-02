@@ -81,6 +81,9 @@ extern "C"
 } // end extern "C"
 
 
+namespace libMesh
+{
+
 /**
  * This class provides an interface to PETSc
  * iterative solvers that is compatible with the \p libMesh
@@ -271,6 +274,8 @@ PetscLinearSolver<T>::~PetscLinearSolver ()
   this->clear ();
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC

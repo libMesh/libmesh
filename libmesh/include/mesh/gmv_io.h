@@ -32,6 +32,9 @@
 #include "mesh_input.h"
 #include "elem_type.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 
@@ -347,6 +350,8 @@ void GMVIO::to_binary_stream(std::ostream& out,
   memcpy(buf, &i, sizeof(T));
   out.write(buf, sizeof(T));
 }
+
+} // namespace libMesh
 
 
 #endif // #define __gmv_io_h__

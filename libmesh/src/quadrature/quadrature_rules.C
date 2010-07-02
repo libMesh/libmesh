@@ -25,6 +25,9 @@
 #include "libmesh_common.h"
 #include "quadrature_rules.h"
 
+namespace libMesh
+{
+
 
 
 std::string QuadratureRules::name (const QuadratureType q) 
@@ -64,6 +67,8 @@ std::string QuadratureRules::name (const QuadratureType q)
   
   return its_name;
 }
+
+} // namespace libMesh
 
 
 

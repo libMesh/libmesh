@@ -34,6 +34,9 @@
 #include "time_solver.h"
 #include "unsteady_solver.h" // For euler_residual
 
+namespace libMesh
+{
+
 
 
 
@@ -1019,3 +1022,5 @@ bool FEMSystem::mass_residual (bool request_jacobian,
 
   return request_jacobian;
 }
+
+} // namespace libMesh

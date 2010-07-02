@@ -34,6 +34,9 @@
 #include "time_solver.h"
 #include "unsteady_solver.h" // For euler_residual
 
+namespace libMesh
+{
+
 
 
 
@@ -740,3 +743,5 @@ void FEMContext::pre_fe_reinit(const FEMSystem &sys, Elem *e)
     }
   libmesh_assert(sub_dofs == n_dofs);
 }
+
+} // namespace libMesh

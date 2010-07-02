@@ -26,6 +26,9 @@
 #include "dense_vector.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -751,3 +754,5 @@ template class DenseMatrix<Complex>;
 template void DenseMatrix<Complex>::cholesky_solve(DenseVector<Complex>&,DenseVector<Complex>&);
 template void DenseMatrix<Complex>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&) const;
 #endif
+
+} // namespace libMesh

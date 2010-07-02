@@ -38,6 +38,8 @@
 #include <cxxabi.h>
 #include <cstdlib>
 
+namespace libMesh
+{
 
 std::string abi_demangle(const char *name)
 {
@@ -84,9 +86,11 @@ void print_trace(std::ostream &out)
   std::free(strings);
 }
 
+} // namespace libMesh
+
 #else
 
-void print_trace(std::ostream &) {}
+void libMesh::print_trace(std::ostream &) {}
 
 #endif
 
@@ -98,6 +102,9 @@ void print_trace(std::ostream &) {}
 #include <string>
 #include <cstdlib>
 #include <cstring>
+
+namespace libMesh
+{
 
 std::string abi_demangle(const char *name)
 {
@@ -132,5 +139,7 @@ info.dli_fname << '\n';
     if (dlerr)
       std::cout << "dlerror() = " << dlerr << std::endl;
 }
+
+} // namespace libMesh
 
 #endif

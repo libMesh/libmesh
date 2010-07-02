@@ -37,6 +37,9 @@
 #endif
 
 
+namespace libMesh
+{
+
 
 
 
@@ -290,3 +293,5 @@ void UCDIO::write_implementation (std::ostream& out)
       }
   }
 }
+
+} // namespace libMesh

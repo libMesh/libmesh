@@ -32,6 +32,9 @@
 #include "libmesh_common.h"
 #include "mesh_base.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -179,6 +182,8 @@ void MeshInput<MT>::skip_comment_lines (std::istream &in,
   in.putback (c);
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __mesh_io_h__

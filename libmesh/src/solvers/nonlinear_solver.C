@@ -27,6 +27,9 @@
 #include "trilinos_nox_nonlinear_solver.h"
 #include "auto_ptr.h"
 
+namespace libMesh
+{
+
 
 //------------------------------------------------------------------
 // NonlinearSolver members
@@ -91,6 +94,8 @@ NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 //------------------------------------------------------------------
 // Explicit instantiations
 template class NonlinearSolver<Number>;
+
+} // namespace libMesh
 
 
 

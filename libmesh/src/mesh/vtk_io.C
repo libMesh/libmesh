@@ -92,6 +92,9 @@
 #include "vtkPoints.h"
 #endif //LIBMESH_HAVE_VTK
 
+namespace libMesh
+{
+
 //static unsigned int vtk_tet4_mapping[4]= {0,1,2,3};
 //static unsigned int vtk_pyramid5_mapping[5]= {0,3,2,1,4};
 //static unsigned int vtk_wedge6_mapping[6]= {0,2,1,3,5,4};
@@ -662,5 +665,7 @@ void VTKIO::write (const std::string& name)
   }
 #endif // LIBMESH_HAVE_VTK
 }
+
+} // namespace libMesh
 
 //  vim: sw=3 ts=3  

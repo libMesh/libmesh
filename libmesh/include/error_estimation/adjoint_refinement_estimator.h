@@ -29,6 +29,9 @@
 #include "error_estimator.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 #ifdef LIBMESH_ENABLE_AMR
 
 /**
@@ -117,6 +120,8 @@ protected:
 };
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+} // namespace libMesh
 
 #endif
 

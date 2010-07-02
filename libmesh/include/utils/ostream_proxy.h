@@ -32,6 +32,9 @@
 // #include "libmesh_common.h"
 
 
+namespace libMesh
+{
+
 // Forward Declarations
 
 
@@ -198,6 +201,8 @@
  };
 
 typedef BasicOStreamProxy<> OStreamProxy;
+
+} // namespace libMesh
 
 #endif // ifndef __ostream_proxy_h__
 

@@ -21,6 +21,9 @@
 // Local includes
 #include "quadrature_conical.h"
 
+namespace libMesh
+{
+
 
 
 void QConical::init_2D(const ElemType _type,
@@ -52,3 +55,5 @@ void QConical::init_2D(const ElemType _type,
   libmesh_error();
   return;
 }
+
+} // namespace libMesh

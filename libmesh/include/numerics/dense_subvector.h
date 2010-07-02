@@ -28,6 +28,9 @@
 #include "libmesh_common.h"
 #include "dense_vector.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -187,6 +190,8 @@ T & DenseSubVector<T>::operator () (const unsigned int i)
   return _parent_vector (i + this->i_off());
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __dense_vector_h__

@@ -31,6 +31,9 @@
 #include "libmesh_common.h"
 #include "system_norm.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class ErrorVector;
 class EquationSystems;
@@ -146,6 +149,8 @@ protected:
   void reduce_error (std::vector<float>& error_per_cell) const;
 };
 
+
+} // namespace libMesh
 
 #endif
 

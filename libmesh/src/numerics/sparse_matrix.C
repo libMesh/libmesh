@@ -30,6 +30,9 @@
 #include "trilinos_epetra_matrix.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 
 //------------------------------------------------------------------
 // SparseMatrix Methods
@@ -213,3 +216,5 @@ void SparseMatrix<T>::print(std::ostream& os) const
 //------------------------------------------------------------------
 // Explicit instantiations
 template class SparseMatrix<Number>;
+
+} // namespace libMesh

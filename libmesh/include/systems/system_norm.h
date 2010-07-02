@@ -29,6 +29,9 @@
 #include "libmesh_common.h" // for Real
 #include "enum_norm_type.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 
 /**
@@ -245,5 +248,7 @@ Real SystemNorm::weight_sq(unsigned int var) const
   return (var < _weights_sq.size()) ? _weights_sq[var] : 1.0;
 }
 
+
+} // namespace libMesh
 
 #endif // #define __system_norm_h__

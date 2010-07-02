@@ -29,6 +29,9 @@
 #include <vector>
 #include <iterator>
 
+namespace libMesh
+{
+
 namespace Parallel {
 
 template <typename KeyType>
@@ -78,5 +81,7 @@ unsigned int BinSorter<KeyType>::sizeof_bin (const unsigned int bin) const
 }
 
 }
+
+} // namespace libMesh
 #endif
 

@@ -32,6 +32,9 @@
 #include <fstream>
 #include <sstream>
 
+namespace libMesh
+{
+
 
 RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::string& parameters_filename)
   : root_node(NULL),
@@ -305,3 +308,5 @@ void RBParamSubdomainTree::reconstruct_tree(RBParamSubdomainNode * current_node,
     reconstruct_tree(current_node->right_child, stream);
    }
 }
+
+} // namespace libMesh

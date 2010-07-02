@@ -47,6 +47,9 @@
 #include <slepcblaslapack.h>
 #endif // LIBMESH_HAVE_SLEPC
 
+namespace libMesh
+{
+
 TransientRBSystem::TransientRBSystem (EquationSystems& es,
 		    const std::string& name,
 		    const unsigned int number)
@@ -2711,3 +2714,5 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
 
   STOP_LOG("read_offline_data_from_files()", "TransientRBSystem");
 }
+
+} // namespace libMesh

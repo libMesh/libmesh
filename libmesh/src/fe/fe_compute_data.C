@@ -20,6 +20,9 @@
 #include "fe_compute_data.h"
 #include "equation_systems.h"
 
+namespace libMesh
+{
+
 
 
 void FEComputeData::clear () 
@@ -61,3 +64,5 @@ void FEComputeData::init ()
 #endif
 }
 
+
+} // namespace libMesh

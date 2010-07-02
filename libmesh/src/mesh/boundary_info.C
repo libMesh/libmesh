@@ -30,6 +30,9 @@
 #include "mesh_data.h"
 #include "parallel.h"
 
+namespace libMesh
+{
+
 
 
 //------------------------------------------------------
@@ -735,3 +738,5 @@ void BoundaryInfo::print_info(std::ostream& out) const
 	    << ")"   << std::endl;
     }
 }
+
+} // namespace libMesh

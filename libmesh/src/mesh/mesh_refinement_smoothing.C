@@ -31,6 +31,9 @@
 #include "parallel.h"
 #include "remote_elem.h"
 
+namespace libMesh
+{
+
 
 
 //-----------------------------------------------------------------
@@ -422,6 +425,8 @@ bool MeshRefinement::eliminate_unrefined_patches ()
 
   return flags_changed;
 }
+
+} // namespace libMesh
 
 
 #endif

@@ -24,6 +24,9 @@
 #include "enum_elem_type.h"
 #include "id_types.h"
 
+namespace libMesh
+{
+
 /**
  * This file declares several predicates in the Predicates namespace.  They
  * are called "single predicates" since the purpose of each one is to act
@@ -287,5 +290,7 @@ namespace Predicates
 
 }
 
+
+} // namespace libMesh
 
 #endif

@@ -28,6 +28,9 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 #ifdef LIBMESH_HAVE_SFCURVES
   namespace Sfc {
     extern "C" {
@@ -187,3 +190,5 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 #endif
   
 }
+
+} // namespace libMesh

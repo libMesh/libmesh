@@ -28,6 +28,9 @@
 
 
 
+namespace libMesh
+{
+
 // ErrorEstimator functions
 void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal>& error_per_cell) const
 {
@@ -131,3 +134,5 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
   // Restore our old state before returning
   this->error_norm = old_error_norm;
 }
+
+} // namespace libMesh

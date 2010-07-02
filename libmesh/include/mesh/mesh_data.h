@@ -30,6 +30,9 @@
 #include "libmesh.h"
 #include "enum_xdr_mode.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 class Node;
@@ -1092,5 +1095,7 @@ void MeshData::set_unv_header (MeshDataUnvHeader* unv_header)
 //-----------------------------------------------------------
 // MeshDataUnvHeader inline methods
 
+
+} // namespace libMesh
 
 #endif

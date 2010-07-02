@@ -28,6 +28,9 @@
 #include "parallel.h"
 #include "parmetis_partitioner.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // ParallelMesh class member functions
 ParallelMesh::ParallelMesh (unsigned int d) :
@@ -958,3 +961,5 @@ void ParallelMesh::allgather()
   this->libmesh_assert_valid_parallel_flags();
 #endif
 }
+
+} // namespace libMesh

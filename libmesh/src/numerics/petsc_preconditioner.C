@@ -33,6 +33,9 @@
 
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 template <typename T>
 void
 PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
@@ -144,5 +147,7 @@ PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType 
 //------------------------------------------------------------------
 // Explicit instantiations
 template class PetscPreconditioner<Number>;
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_PETSC

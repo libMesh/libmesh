@@ -31,6 +31,9 @@
 #include "qoi_set.h"
 #include "reference_counted_object.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class DiffSolver;
 class DifferentiableSystem;
@@ -289,6 +292,8 @@ protected:
   unsigned int _solve_result;
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __diff_solver_h__

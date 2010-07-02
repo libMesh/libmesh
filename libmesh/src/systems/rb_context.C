@@ -28,6 +28,9 @@
 #include "quadrature.h"
 #include "dof_map.h"
 
+namespace libMesh
+{
+
 
 
 RBContext::RBContext (const RBSystem& sys) :
@@ -326,3 +329,5 @@ void RBContext::reinit(RBSystem &sys, Elem *e)
   // Reinitializing the FE objects is definitely necessary
   this->elem_fe_reinit();
 }
+
+} // namespace libMesh

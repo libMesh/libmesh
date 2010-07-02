@@ -30,6 +30,9 @@
 #include "quadrature_trap.h"
 #include "string_to_enum.h"
 
+namespace libMesh
+{
+
 
 
 //---------------------------------------------------------------
@@ -165,4 +168,6 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
   AutoPtr<QBase> ap(NULL);
   return ap;
 }
+
+} // namespace libMesh
 

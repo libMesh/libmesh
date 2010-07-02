@@ -33,6 +33,13 @@
 #include <math.h>
 #include <time.h>
 
+// Local Includes -----------------------------------
+#include "mesh_smoother.h"
+#include "unstructured_mesh.h"
+
+namespace libMesh
+{
+
 //jj
 typedef double     * LPDOUBLE;
 typedef LPDOUBLE   * LPLPDOUBLE;
@@ -42,10 +49,6 @@ typedef LPVOID   * LPLPVOID;
 typedef int  * LPINT;
 typedef LPINT  * LPLPINT;
 typedef unsigned int uint;
-
-// Local Includes -----------------------------------
-#include "mesh_smoother.h"
-#include "unstructured_mesh.h"
 
 /**
  * This is an implementation of Larisa Branets smoothing
@@ -310,6 +313,8 @@ private:
               LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin, 
               int adp, LPDOUBLE afun, FILE *sout);
 };
+
+} // namespace libMesh
 
 #endif // LIBMESH_ENABLE_VSMOOTHER
 

@@ -50,6 +50,9 @@
 #include "mesh_modification.h"
 #include "mesh_smoother_laplace.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // MeshTools::Generation function for mesh generation
 void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
@@ -1734,3 +1737,5 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
 
+
+} // namespace libMesh

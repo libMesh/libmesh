@@ -30,6 +30,9 @@
 
 #include "cell_inf_hex.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -204,6 +207,8 @@ InfHex8::InfHex8(Elem* p) :
 {
 }
 
+
+} // namespace libMesh
 
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

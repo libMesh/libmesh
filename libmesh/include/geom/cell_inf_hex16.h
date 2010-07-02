@@ -30,6 +30,9 @@
 
 #include "cell_inf_hex.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -229,6 +232,8 @@ InfHex16::InfHex16(Elem* p) :
 {
 }
 
+
+} // namespace libMesh
 
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

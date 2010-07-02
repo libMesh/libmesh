@@ -29,6 +29,9 @@
 #include "libmesh_common.h"
 #include "compare_types.h"
 
+namespace libMesh
+{
+
 // Forward declaration for friend class
 template <typename T>
 class TypeTensor;
@@ -815,5 +818,7 @@ bool TypeVector<Real>::operator != (const TypeVector<Real>& rhs) const
 {
   return (!(*this == rhs));
 }
+
+} // namespace libMesh
 
 #endif // #define __type_vector_h__

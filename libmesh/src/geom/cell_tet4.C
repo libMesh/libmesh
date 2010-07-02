@@ -26,6 +26,9 @@
 #include "edge_edge2.h"
 #include "face_tri3.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -503,3 +506,5 @@ void Tet4::reselect_optimal_diagonal (const Diagonal exclude_this)
   reselect_diagonal (use_this);  
 } 
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+} // namespace libMesh

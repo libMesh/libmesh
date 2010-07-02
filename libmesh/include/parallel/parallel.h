@@ -31,6 +31,9 @@
 #include "libmesh_common.h" // for Real
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once
@@ -3212,5 +3215,7 @@ namespace Parallel
 
 
 }
+
+} // namespace libMesh
 
 #endif // #define __parallel_h__

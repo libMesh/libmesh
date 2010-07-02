@@ -36,6 +36,9 @@
 #include "dof_map.h"
 #include "preconditioner.h"
 
+namespace libMesh
+{
+
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
 // methods as needed.
@@ -346,6 +349,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 //------------------------------------------------------------------
 // Explicit instantiations
 template class PetscNonlinearSolver<Number>;
+
+} // namespace libMesh
  
 
 

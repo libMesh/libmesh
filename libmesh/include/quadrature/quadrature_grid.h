@@ -25,6 +25,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -86,6 +89,8 @@ QGrid::~QGrid()
 {
 }
 
+
+} // namespace libMesh
 
 
 

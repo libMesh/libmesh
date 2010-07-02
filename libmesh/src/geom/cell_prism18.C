@@ -27,6 +27,9 @@
 #include "face_quad9.h"
 #include "face_tri6.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -808,3 +811,5 @@ const float Prism18::_embedding_matrix[8][18][18] =
 };
 
 #endif
+
+} // namespace libMesh

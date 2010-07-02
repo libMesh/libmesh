@@ -27,6 +27,9 @@
 // Local includes
 #include "type_tensor.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -206,5 +209,7 @@ TensorValue<T>::TensorValue (const TypeTensor<Real>& p_re,
 }
 #endif
 
+
+} // namespace libMesh
 
 #endif // #define __tensor_value_h__

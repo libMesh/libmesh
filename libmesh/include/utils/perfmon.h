@@ -37,6 +37,9 @@ namespace Papi {
 }
 #endif
 
+namespace libMesh
+{
+
 
 
 class PerfMon
@@ -152,6 +155,8 @@ PerfMon::~PerfMon ()
 
 
 
+
+} // namespace libMesh
 
 
 #endif

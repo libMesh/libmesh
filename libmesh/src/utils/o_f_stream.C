@@ -31,6 +31,9 @@
 #ifdef LIBMESH_BROKEN_IOSTREAM
 
 
+namespace libMesh
+{
+
 
 // the template for reals
 template <typename T>
@@ -79,6 +82,8 @@ template OFStream& OFStream::scientific (const sizetype w,
 
 template OFStream& OFStream::scientific (const sizetype w,
 					 const float r);
+
+} // namespace libMesh
 
 
 

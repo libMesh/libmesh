@@ -28,6 +28,9 @@
 #include "libmesh_common.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class Point;
 class Node;
@@ -231,5 +234,7 @@ class SideEdge : public EdgeType
   const unsigned int _edge_number;
 };
 
+
+} // namespace libMesh
 
 #endif // end #ifndef __side_h__

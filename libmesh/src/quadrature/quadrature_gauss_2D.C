@@ -23,6 +23,9 @@
 #include "quadrature_gauss.h"
 #include "quadrature_conical.h"
 
+namespace libMesh
+{
+
 
 void QGauss::init_2D(const ElemType _type,
                      unsigned int p)
@@ -1299,3 +1302,5 @@ void QGauss::init_2D(const ElemType _type,
 
 #endif
 }
+
+} // namespace libMesh

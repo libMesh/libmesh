@@ -23,6 +23,9 @@
 // Local includes
 #include "elem_type.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // Element type definitions
 
@@ -294,3 +297,5 @@ std::string ElementTypes::name(const ElemType t)
     }
   return its_name;
 }
+
+} // namespace libMesh

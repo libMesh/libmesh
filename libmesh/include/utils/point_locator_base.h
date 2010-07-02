@@ -33,6 +33,9 @@
 #include "auto_ptr.h"
 #include "enum_point_locator_type.h"
 
+namespace libMesh
+{
+
 
 
 // Forward Declarations
@@ -151,6 +154,8 @@ bool PointLocatorBase::initialized () const
 {
   return (this->_initialized);
 }
+
+} // namespace libMesh
 
 #endif
 

@@ -30,6 +30,9 @@
 #include "enum_elem_type.h"
 #include "enum_elem_quality.h"
 
+namespace libMesh
+{
+
 
 /**
  * A namespace for quality utility functions.
@@ -62,5 +65,7 @@ namespace Quality
   std::vector<ElemQuality> valid    (const ElemType    t);
 }
 
+
+} // namespace libMesh
 
 #endif

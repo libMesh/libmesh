@@ -28,6 +28,9 @@
 // Local includes
 #include "type_vector.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -108,6 +111,8 @@ Point::Point (const TypeVector<Real>& p) :
   TypeVector<Real> (p)
 {
 }
+
+} // namespace libMesh
 
 
 #endif // #define __point_h__

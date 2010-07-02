@@ -40,6 +40,9 @@
 #include "parallel_mesh.h"
 #endif
 
+namespace libMesh
+{
+
 const Point InfElemBuilder::build_inf_elem(bool be_verbose)
 {
   // determine origin automatically,
@@ -651,6 +654,8 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
   STOP_LOG("build_inf_elem()", "InfElemBuilder");
 }
+
+} // namespace libMesh
 
 
 

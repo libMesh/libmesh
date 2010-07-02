@@ -24,6 +24,9 @@
 #include "fe.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -105,3 +108,5 @@ Real FE<0,HERMITE>::shape_second_deriv(const Elem*,
   libmesh_error();
   return 0.;
 }
+
+} // namespace libMesh

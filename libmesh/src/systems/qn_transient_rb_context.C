@@ -34,6 +34,9 @@
 #include "quadrature.h"
 #include "dof_map.h"
 
+namespace libMesh
+{
+
 QNTransientRBContext::QNTransientRBContext (const QNTransientRBSystem& sys) :
   RBContext(sys)
 {
@@ -239,6 +242,8 @@ void QNTransientRBContext::reinit(RBSystem &sys, Elem *e)
   // Reinitializing the FE objects is definitely necessary
   this->elem_fe_reinit();
 }
+
+} // namespace libMesh
 
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK

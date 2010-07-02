@@ -20,6 +20,9 @@
 // Local includes
 #include "xdr_head.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // XdrHEAD members
 XdrHEAD::XdrHEAD() 
@@ -68,3 +71,5 @@ char* XdrHEAD::cpyString(const char* src, int len)
     }
   return temp;
 }
+
+} // namespace libMesh

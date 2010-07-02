@@ -38,6 +38,9 @@
 #include "linear_solver.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -435,6 +438,8 @@ std::string FrequencySystem::form_solu_vec_name(const unsigned int n) const
   sprintf(buf, "solution %04d", n);
   return (buf);
 }
+
+} // namespace libMesh
 
 
 #endif // if defined(LIBMESH_USE_COMPLEX_NUMBERS)

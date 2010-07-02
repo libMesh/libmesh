@@ -24,6 +24,9 @@
 #include "numeric_vector.h"
 #include "unsteady_solver.h"
 
+namespace libMesh
+{
+
 
 
 UnsteadySolver::UnsteadySolver (sys_type& s)
@@ -159,3 +162,5 @@ Real UnsteadySolver::du(const SystemNorm &norm) const
 
   return _system.calculate_norm(*solution_copy, norm);
 }
+
+} // namespace libMesh

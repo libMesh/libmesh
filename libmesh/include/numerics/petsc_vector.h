@@ -43,6 +43,9 @@ EXTERN_C_FOR_PETSC_BEGIN
 # include <petscvec.h>
 EXTERN_C_FOR_PETSC_END
 
+namespace libMesh
+{
+
 
 
 // forward declarations
@@ -1233,6 +1236,8 @@ void PetscVector<T>::_restore_array(void) const
     }
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC

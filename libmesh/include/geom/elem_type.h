@@ -29,6 +29,9 @@
 #include "libmesh_common.h"
 #include "enum_elem_type.h"
 
+namespace libMesh
+{
+
 
 
 // A namespace for element type utility
@@ -63,6 +66,8 @@ namespace ElementTypes
    */
   std::string name (const ElemType t);
 }
+
+} // namespace libMesh
 
 #endif
 

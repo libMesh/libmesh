@@ -27,6 +27,9 @@
 // Local Includes
 #include "statistics.h"
 
+namespace libMesh
+{
+
 // Now defined in libmesh_common.h:
 // typedef float ErrorVectorReal;
 
@@ -162,6 +165,8 @@ protected:
   MeshBase *_mesh;
 };
 
+
+} // namespace libMesh
 
 #endif
 

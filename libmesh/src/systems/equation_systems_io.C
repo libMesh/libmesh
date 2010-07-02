@@ -34,6 +34,9 @@
 #include "serial_mesh.h"
 #include "xdr_cxx.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 
 // Anonymous namespace for implementation details.
@@ -552,3 +555,5 @@ void EquationSystems::write(const std::string& name,
       libmesh_error();
     }
 }
+
+} // namespace libMesh

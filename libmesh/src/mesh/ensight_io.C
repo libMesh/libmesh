@@ -33,6 +33,9 @@
 
 #include "ensight_io.h"
 
+namespace libMesh
+{
+
 
 EnsightIO::EnsightIO (const std::string &filename, const EquationSystems &eq) :
   MeshOutput<MeshBase> (eq.get_mesh()),
@@ -583,3 +586,5 @@ void EnsightIO::elem_type_to_string(ElemType type, char* buffer)
     break;
   }
 }
+
+} // namespace libMesh

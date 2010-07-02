@@ -32,6 +32,17 @@
 #include "perf_log.h"
 #include "enum_solver_package.h"
 
+/**
+ * The \p libMesh namespace provides an interface to certain functionality
+ * in the library.  It provides a uniform \p init() method that
+ * initializes any other dependent libraries (e.g. MPI or PETSC),
+ * and a \p close() method for closing those libraries.  It also
+ * provides a centralized place for performance logging and other
+ * functionality.
+ */
+namespace libMesh
+{
+
 
 // Forward declaration, required when included
 // in perf_log.{C,h} because the preceeding
@@ -74,15 +85,6 @@ public:
   virtual ~LibMeshInit();
 };
 
-/**
- * The \p libMesh namespace provides an interface to certain functionality
- * in the library.  It provides a uniform \p init() method that
- * initializes any other dependent libraries (e.g. MPI or PETSC),
- * and a \p close() method for closing those libraries.  It also
- * provides a centralized place for performance logging and other
- * functionality.
- */
-namespace libMesh {
 
 #ifndef LIBMESH_HAVE_MPI
   
@@ -213,7 +215,9 @@ namespace libMesh {
      */
     extern SolverPackage _solver_package;
   }
-}
+
+
+} // namespace libMesh
 
 
 
@@ -232,7 +236,6 @@ bool libMesh::closed()
 {
   return !libMesh::initialized();
 }
-
 
 
 #endif // #define __libmesh_h__

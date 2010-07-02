@@ -37,6 +37,9 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
+namespace libMesh
+{
+
 // Forward Declarations
 class Elem;
 class Point;
@@ -151,6 +154,8 @@ protected:
   DenseVector<Number> Uc;
   DenseVector<Number> Up;
 };
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

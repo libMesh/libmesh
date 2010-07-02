@@ -29,6 +29,9 @@
 // Local Includes
 #include "jump_error_estimator.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -74,6 +77,8 @@ protected:
   virtual void internal_side_integration();
 };
 
+
+} // namespace libMesh
 
 #endif
 

@@ -29,6 +29,9 @@
 #include "libmesh_logging.h"
 #include "fe_macro.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -1009,3 +1012,5 @@ INSTANTIATE_MAP(1);
 INSTANTIATE_MAP(2);
 INSTANTIATE_MAP(3);
 #endif
+
+} // namespace libMesh

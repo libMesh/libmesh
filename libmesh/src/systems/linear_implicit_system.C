@@ -29,6 +29,9 @@
 #include "parameter_vector.h"
 #include "sparse_matrix.h" // for get_transpose
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // LinearImplicitSystem implementation
@@ -343,3 +346,5 @@ void LinearImplicitSystem::assembly(bool,
   *(this->rhs) *= -1.0;
   this->rhs->add_vector(*this->solution, *this->matrix);
 }
+
+} // namespace libMesh

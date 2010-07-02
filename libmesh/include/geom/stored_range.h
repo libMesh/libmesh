@@ -28,6 +28,9 @@
 // Local includes
 #include "threads.h"
 
+namespace libMesh
+{
+
 
 /**
  * The \p StoredRange class defined a contiguous, divisible set of objects
@@ -228,5 +231,7 @@ private:
   unsigned int _grainsize;
   std::vector<object_type> _objs;
 };
+
+} // namespace libMesh
 
 #endif // end #ifndef __stored_range_h__

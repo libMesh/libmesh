@@ -33,6 +33,9 @@
 #include "tensor_value.h"
 #endif
 
+namespace libMesh
+{
+
 // Forward Declarations
 
 class FEBase;
@@ -281,5 +284,7 @@ void FEMContext::elem_position_set(Real theta)
   if (_mesh_sys)
     this->_do_elem_position_set(theta);
 }
+
+} // namespace libMesh
 
 #endif

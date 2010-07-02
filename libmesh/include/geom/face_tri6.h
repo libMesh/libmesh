@@ -29,6 +29,9 @@
 #include "libmesh_common.h"
 #include "face_tri.h"
 
+namespace libMesh
+{
+
 
 
 // Forward declarations
@@ -221,5 +224,7 @@ private:
   static const unsigned short int _second_order_vertex_child_index[6];
 };
 
+
+} // namespace libMesh
 
 #endif

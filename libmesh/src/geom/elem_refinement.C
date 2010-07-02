@@ -26,6 +26,9 @@
 #include "mesh_refinement.h"
 #include "remote_elem.h"
 
+namespace libMesh
+{
+
 
 //--------------------------------------------------------------------
 // Elem methods
@@ -264,4 +267,6 @@ void Elem::contract()
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
+
+} // namespace libMesh
 

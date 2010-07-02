@@ -35,6 +35,9 @@
 // TetGen include file
 #include "tetgen.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 class UnstructuredMesh;
@@ -277,6 +280,8 @@ protected:
   UnstructuredMesh& _mesh;
 
 };
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_TETGEN
 

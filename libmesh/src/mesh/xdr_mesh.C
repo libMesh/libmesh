@@ -22,6 +22,9 @@
 #include "xdr_mhead.h"
 #include "enum_elem_type.h" // for ElemType
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // XdrMESH members
 int XdrMESH::header(XdrMHEAD *hd)
@@ -354,3 +357,5 @@ int XdrMESH::header(XdrMHEAD *hd)
   
   return 1;
 }
+
+} // namespace libMesh

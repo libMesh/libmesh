@@ -30,6 +30,9 @@
 #include "libmesh_common.h"
 #include "face_tri.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 
@@ -170,5 +173,7 @@ protected:
     
 };
 
+
+} // namespace libMesh
 
 #endif

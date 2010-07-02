@@ -34,6 +34,9 @@
 // Local includes
 #include "point.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class MeshBase;
 class Node;
@@ -122,6 +125,8 @@ private:
   MeshBase& _mesh;
 };
 
+
+} // namespace libMesh
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
 #endif

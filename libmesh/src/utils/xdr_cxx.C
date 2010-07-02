@@ -96,6 +96,9 @@ namespace {
   }
 }
 
+namespace libMesh
+{
+
 //-------------------------------------------------------------
 // Xdr class implementation
 Xdr::Xdr (const std::string& name, const XdrMODE m) :
@@ -1092,3 +1095,5 @@ template void Xdr::data<std::vector<std::complex<float> > >  (std::vector<std::c
 template void Xdr::data<std::vector<std::complex<double> > > (std::vector<std::complex<double> >&, const char*);
 template void Xdr::data_stream<int>          (int *val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int> (unsigned int *val, const unsigned int len, const unsigned int line_break);
+
+} // namespace libMesh

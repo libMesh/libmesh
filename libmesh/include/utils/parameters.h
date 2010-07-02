@@ -31,6 +31,9 @@
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -481,5 +484,7 @@ Parameters::const_iterator Parameters::end() const
 {
   return _values.end();
 }
+
+} // namespace libMesh
 
 #endif // #define __parameters_h__

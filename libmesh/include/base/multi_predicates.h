@@ -24,6 +24,9 @@
 #include "libmesh_base.h" // for libMesh::processor_id()
 #include "single_predicates.h"
 
+namespace libMesh
+{
+
 /**
  * This namespace defines several multi_predicates which are used by
  * the element and node iterators.  These classes are not in general
@@ -452,5 +455,7 @@ namespace Predicates
   
 }
 
+
+} // namespace libMesh
 
 #endif

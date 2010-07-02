@@ -26,6 +26,9 @@
 #include "metis_partitioner.h"
 #include "serial_mesh.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // SerialMesh class member functions
 SerialMesh::SerialMesh (unsigned int d) :
@@ -492,3 +495,5 @@ unsigned int SerialMesh::n_active_elem () const
   return static_cast<unsigned int>(std::distance (this->active_elements_begin(),
 						  this->active_elements_end()));
 }
+
+} // namespace libMesh

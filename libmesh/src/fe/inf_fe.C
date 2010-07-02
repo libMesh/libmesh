@@ -27,6 +27,9 @@
 #include "elem.h"
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -968,6 +971,8 @@ bool InfFE<Dim,T_radial,T_map>::shapes_need_reinit() const
 { 
   return false; 
 }
+
+} // namespace libMesh
 
 
 //--------------------------------------------------------------

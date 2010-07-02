@@ -23,6 +23,9 @@
 #include "equation_systems.h"
 #include "unstructured_mesh.h"
 
+namespace libMesh
+{
+
 template <class MT>
 void MeshOutput<MT>::
 _build_variable_names_and_solution_vector (const EquationSystems& es,
@@ -42,3 +45,5 @@ _build_variable_names_and_solution_vector (const EquationSystems& es,
 // move any functions in this file to the header file instead.
 template class MeshOutput<MeshBase>;
 template class MeshOutput<UnstructuredMesh>;
+
+} // namespace libMesh

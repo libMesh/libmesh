@@ -26,6 +26,9 @@
 #include "face_quad4.h"
 #include "face_tri3.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // Prism class member functions
@@ -207,3 +210,5 @@ const unsigned short int Prism::_second_order_adjacent_vertices[9][2] =
   { 4,  5}, // vertices adjacent to node 13
   { 3,  5}  // vertices adjacent to node 14
 };
+
+} // namespace libMesh

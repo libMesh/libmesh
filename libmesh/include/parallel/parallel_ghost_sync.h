@@ -31,6 +31,9 @@
 #include "mesh_base.h"
 #include "parallel.h"
 
+namespace libMesh
+{
+
 
 
 //--------------------------------------------------------------------------
@@ -418,5 +421,7 @@ void sync_element_data_by_parent_id(MeshBase&,
 
 
 }
+
+} // namespace libMesh
 
 #endif // #define __parallel_ghost_sync_h__

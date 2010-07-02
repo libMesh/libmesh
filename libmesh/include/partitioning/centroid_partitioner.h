@@ -29,6 +29,9 @@
 #include "partitioner.h"
 #include "point.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 class Elem;
@@ -157,6 +160,8 @@ private:
    */
   std::vector<std::pair<Point, Elem*> > _elem_centroids;
 };
+
+} // namespace libMesh
 
 
 #endif

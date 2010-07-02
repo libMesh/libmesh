@@ -31,6 +31,9 @@
 #include "numeric_vector.h"
 #include "rb_system.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // TransientSystem implementation
@@ -194,3 +197,5 @@ template class TransientSystem<LinearImplicitSystem>;
 template class TransientSystem<NonlinearImplicitSystem>;
 template class TransientSystem<ExplicitSystem>;
 template class TransientSystem<RBSystem>;
+
+} // namespace libMesh

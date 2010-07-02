@@ -26,6 +26,9 @@
 // Local Includes
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -106,6 +109,8 @@ public:
 
 
 
+
+} // namespace libMesh
 
 
 

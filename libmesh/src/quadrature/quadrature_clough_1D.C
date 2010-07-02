@@ -24,6 +24,9 @@
 // Local includes
 #include "quadrature_clough.h"
 #include "quadrature_gauss.h"
+
+namespace libMesh
+{
  
 
 
@@ -38,5 +41,7 @@ void QClough::init_1D(const ElemType _elemtype,
 
   return;
 }
+
+} // namespace libMesh
  
 

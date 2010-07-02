@@ -27,6 +27,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // QTrap class definition
@@ -81,6 +84,8 @@ QTrap::QTrap(const unsigned int d) : QBase(d,FIRST)
     init(EDGE2);
 }
 
+
+} // namespace libMesh
 
 
 

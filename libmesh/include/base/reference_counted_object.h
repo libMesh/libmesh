@@ -28,6 +28,9 @@
 // Local includes
 #include "reference_counter.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -101,6 +104,8 @@ private:
 
 };
 
+
+} // namespace libMesh
 
 
 #endif // end #ifndef __reference_counted_object_h__

@@ -25,6 +25,9 @@
 #include "mesh_base.h"
 #include "face_tri3.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -116,3 +119,5 @@ void OFFIO::read_stream(std::istream& in)
       elem->set_node(2) = mesh.node_ptr(n2);
     }  
 }
+
+} // namespace libMesh

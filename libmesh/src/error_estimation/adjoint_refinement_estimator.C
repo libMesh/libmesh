@@ -19,6 +19,11 @@
 
 #if 0
 
+#ifdef LIBMESH_ENABLE_AMR
+
+namespace libMesh
+{
+
 // C++ includes
 #include <algorithm> // for std::fill
 #include <cmath>    // for sqrt
@@ -39,8 +44,6 @@
 #include "quadrature.h"
 #include "system.h"
 #include "adjoint_refinement_estimator.h"
-
-#ifdef LIBMESH_ENABLE_AMR
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
@@ -500,6 +503,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // Restore old partitioner settings
   mesh.partitioner() = old_partitioner;
 }
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

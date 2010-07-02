@@ -40,6 +40,8 @@
 #include "threads_allocators.h"
 #include "elem_range.h"
 
+namespace libMesh
+{
 
 // Forward Declarations
 class DofMap;
@@ -1078,5 +1080,7 @@ inline void DofMap::enforce_constraints_exactly (const System &,
 				                 NumericVector<Number> *) const {}
 
 #endif // !defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_PERIODIC)
+
+} // namespace libMesh
 
 #endif // __dof_map_h__

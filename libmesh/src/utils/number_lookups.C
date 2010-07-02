@@ -22,6 +22,9 @@
 // Local includes
 #include "number_lookups.h"
 
+namespace libMesh
+{
+
 // These numbers need to go up to at least maximum_totalorder - 2
 
 // triangular_number_*: indices for triangle interiors
@@ -416,3 +419,5 @@ const unsigned char cube_number_page[] = {
  9, 9, 9,
  9
 };
+
+} // namespace libMesh

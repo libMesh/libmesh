@@ -82,6 +82,9 @@
 // The definition of a geometric vertex associated with a Mesh
 #include "node.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // Function prototype for creating artificial nodal data
 // that can be inserted into a <code>MeshData</code> object.
 void create_artificial_data (const Mesh& mesh,

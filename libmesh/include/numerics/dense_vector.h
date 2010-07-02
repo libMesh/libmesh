@@ -30,6 +30,9 @@
 #include "compare_types.h"
 #include "dense_vector_base.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 
 
@@ -548,6 +551,8 @@ void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
   for(unsigned int i=0; i<sub_n; i++)
     dest(i) = (*this)(i);
 }
+
+} // namespace libMesh
 
 #endif // #ifndef __dense_vector_h__
 

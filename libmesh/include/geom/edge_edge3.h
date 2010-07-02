@@ -27,6 +27,9 @@
 #include "libmesh_common.h"
 #include "edge.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -182,6 +185,8 @@ protected:
 
 #endif
 };
+
+} // namespace libMesh
 
 
 #endif

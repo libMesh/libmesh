@@ -36,6 +36,9 @@
 #include "mesh_base.h"
 #include "parallel.h"
 
+namespace libMesh
+{
+
 
 
 //-----------------------------------------------------------------
@@ -676,5 +679,7 @@ void MeshRefinement::clean_refinement_flags ()
         } 
     }
 }
+
+} // namespace libMesh
 
 #endif

@@ -31,6 +31,8 @@
 // This caching is turned off when TBB is enabled...
 namespace
 {
+  using namespace libMesh;
+
 #ifndef LIBMESH_HAVE_TBB_API
   static unsigned int old_elem_id = libMesh::invalid_uint;
   static std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
@@ -390,6 +392,9 @@ Real hermite_bases_3D
 } // end anonymous namespace
 
 
+namespace libMesh
+{
+
 
 template <>
 Real FE<3,HERMITE>::shape(const ElemType,
@@ -681,3 +686,5 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
   libmesh_error();
   return 0.;
 }
+
+} // namespace libMesh

@@ -24,6 +24,9 @@
 // System includes
 #include <string.h>
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -200,5 +203,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
   
   return 1;
 }
+
+} // namespace libMesh
   
 

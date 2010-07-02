@@ -31,6 +31,9 @@
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 // Forward Declarations -----------------------------
 class System;
 
@@ -229,5 +232,7 @@ Real QoISet::weight(unsigned int i) const
     return 1.0;
   return _weights[i];
 }
+
+} // namespace libMesh
 
 #endif // #define __qoi_set_h__

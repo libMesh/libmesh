@@ -41,6 +41,9 @@
 #  include "tbb/atomic.h"
 #endif
 
+namespace libMesh
+{
+
 
 /**
  * The Threads namespace is for wrapper functions
@@ -508,5 +511,7 @@ namespace Threads
   extern recursive_mutex recursive_mtx;
 
 } // namespace Threads
+
+} // namespace libMesh
 
 #endif // #define __threads_h__

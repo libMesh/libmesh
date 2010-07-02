@@ -21,6 +21,9 @@
 #ifndef __number_lookups_h__
 #define __number_lookups_h__
 
+namespace libMesh
+{
+
 // Lookup tables for hierarchic numbering of basis functions
 extern const unsigned char triangular_number_row[];
 extern const unsigned char triangular_number_column[];
@@ -29,5 +32,7 @@ extern const unsigned char square_number_column[];
 extern const unsigned char cube_number_row[];
 extern const unsigned char cube_number_column[];
 extern const unsigned char cube_number_page[];
+
+} // namespace libMesh
 
 #endif // ifndef __number_lookups_h__

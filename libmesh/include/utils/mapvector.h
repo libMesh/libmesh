@@ -25,6 +25,9 @@
 // C++ Includes   -----------------------------------
 #include <map>
 
+namespace libMesh
+{
+
 /**
  * This \p mapvector templated class is intended to provide the
  * performance characteristics of a std::map with an interface more
@@ -138,5 +141,7 @@ public:
     return const_veclike_iterator(maptype::end());
   }
 };
+
+} // namespace libMesh
 
 #endif // __mapvector_h__

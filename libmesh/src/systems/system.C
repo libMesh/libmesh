@@ -45,6 +45,9 @@
 #include "tensor_value.h"
 #include "vector_value.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // System implementation
@@ -1713,3 +1716,5 @@ Tensor System::point_hessian(unsigned int, Point &)
   return Tensor();
 }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+} // namespace libMesh

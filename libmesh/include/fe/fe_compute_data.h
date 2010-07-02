@@ -28,6 +28,9 @@
 // Local includes
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class EquationSystems;
 class Point;
@@ -123,6 +126,8 @@ public:
   void init () ;
 };
 
+
+} // namespace libMesh
 
 #endif // #ifndef __fe_compute_data_h__
 

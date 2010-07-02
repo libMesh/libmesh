@@ -24,6 +24,9 @@
 #include "edge_edge3.h"
 #include "face_tri6.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -378,3 +381,5 @@ const unsigned short int Tri6::_second_order_vertex_child_index[6] =
   99,99,99, // Vertices
   1,2,2     // Edges
 };
+
+} // namespace libMesh

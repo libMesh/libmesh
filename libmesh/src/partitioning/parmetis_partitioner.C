@@ -47,6 +47,9 @@ namespace Parmetis {
 
 #endif // #ifdef LIBMESH_HAVE_PARMETIS ... else ...
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -649,3 +652,5 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 }
 
 #endif // #ifdef LIBMESH_HAVE_PARMETIS
+
+} // namespace libMesh

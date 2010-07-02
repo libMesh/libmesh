@@ -25,6 +25,9 @@
 #include "libmesh_common.h"
 #include "mesh_input.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 
@@ -114,6 +117,8 @@ inline
 MatlabIO::MatlabIO (MeshBase& mesh) :
   MeshInput<MeshBase>  (mesh)
 {}
+
+} // namespace libMesh
 
 
 #endif // #define __matlab_io_h__

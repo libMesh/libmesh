@@ -29,6 +29,9 @@
 #include "dense_matrix.h"
 #include "petsc_vector.h"
 
+namespace libMesh
+{
+
 
 
 //-----------------------------------------------------------------------
@@ -477,6 +480,8 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 //------------------------------------------------------------------
 // Explicit instantiations
 template class PetscMatrix<Number>;
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC

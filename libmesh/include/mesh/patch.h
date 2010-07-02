@@ -28,6 +28,9 @@
 #include <string>
 #include <set>
 
+namespace libMesh
+{
+
 // Forward Declarations
 class Elem;
 
@@ -108,6 +111,8 @@ protected:
    */
   void find_point_neighbors(std::set<const Elem *> &neighbor_set);
 };
+
+} // namespace libMesh
 
 
 #endif // #define __patch_h__

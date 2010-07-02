@@ -26,6 +26,9 @@
 #include "edge_edge3.h"
 #include "face_quad9.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -961,3 +964,5 @@ const float Hex27::_embedding_matrix[8][27][27] =
 };
 
 #endif
+
+} // namespace libMesh

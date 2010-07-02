@@ -31,6 +31,9 @@
 #include "parallel.h"
 #include "parallel_conversion_utils.h"
 
+namespace libMesh
+{
+
 
 
 namespace Parallel {
@@ -143,4 +146,6 @@ template class Parallel::BinSorter<double>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
 template class Parallel::BinSorter<Hilbert::HilbertIndices>;
 #endif
+
+} // namespace libMesh
 

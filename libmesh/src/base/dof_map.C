@@ -42,6 +42,9 @@
 #include "threads_allocators.h"
 
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // DofMap member functions
 
@@ -2259,3 +2262,5 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 	}
     }
 }
+
+} // namespace libMesh

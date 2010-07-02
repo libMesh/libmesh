@@ -35,6 +35,9 @@
 #include "tensor_value.h"
 #include "vector_value.h"
 
+namespace libMesh
+{
+
 ExactSolution::ExactSolution(const EquationSystems& es) :
   _exact_value (NULL),
   _exact_deriv (NULL),
@@ -549,3 +552,5 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   Parallel::sum(error_vals);
   error_vals[4] = l_infty_norm;
 }
+
+} // namespace libMesh

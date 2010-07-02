@@ -30,6 +30,9 @@
 #include "libmesh_common.h"
 #include "face.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 
@@ -138,6 +141,8 @@ public:
 
 // ------------------------------------------------------------
 // Tri class member functions
+
+} // namespace libMesh
 
 #endif
 

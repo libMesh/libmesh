@@ -30,6 +30,9 @@
 #include "node.h"
 #include "unstructured_mesh.h"
 
+namespace libMesh
+{
+
 
 
 // Prototype this function so we can delcare it a friend.
@@ -410,5 +413,7 @@ private:
   typedef mapvector<Node*>::const_veclike_iterator const_node_iterator_imp;
 };
 
+
+} // namespace libMesh
 
 #endif

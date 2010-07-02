@@ -31,6 +31,9 @@
 #include "boundary_info.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -209,3 +212,5 @@ void FroIO::write (const std::string& fname)
       }      
     }
 }
+
+} // namespace libMesh

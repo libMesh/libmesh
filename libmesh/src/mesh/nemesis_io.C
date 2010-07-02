@@ -29,6 +29,9 @@
 #include "parallel.h"
 #include "utility.h" // is_sorted, deallocate
 
+namespace libMesh
+{
+
 
 //-----------------------------------------------
 // anonymous namespace for implementation details
@@ -815,3 +818,5 @@ void Nemesis_IO::read (const std::string& )
 }
 
 #endif
+
+} // namespace libMesh

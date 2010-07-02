@@ -31,6 +31,9 @@
 #include "dense_subvector.h"
 #include "dense_vector.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class DifferentiableSystem;
 
@@ -159,6 +162,8 @@ public:
   std::vector<unsigned int> dof_indices;
   std::vector<std::vector<unsigned int> > dof_indices_var;
 };
+
+} // namespace libMesh
 
 
 #endif

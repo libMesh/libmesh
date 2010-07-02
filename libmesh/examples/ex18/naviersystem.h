@@ -20,6 +20,8 @@
 // DiffSystem framework files
 #include "fem_system.h"
 
+using namespace libMesh;
+
 // The Navier-Stokes system class.
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals

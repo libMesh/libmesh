@@ -36,6 +36,9 @@
 
 #include "dense_vector.h"
 
+namespace libMesh
+{
+
 
 
 void
@@ -176,3 +179,5 @@ KellyErrorEstimator::attach_flux_bc_function (std::pair<bool,Real> fptr(const Sy
   else
     integrate_boundary_sides = false;
 }
+
+} // namespace libMesh

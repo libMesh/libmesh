@@ -46,7 +46,8 @@
 #ifndef __auto_ptr_h__
 #define __auto_ptr_h__
 
-
+namespace libMesh
+{
 
 /**
  *  A wrapper class to provide AutoPtr with reference semantics.  For
@@ -312,5 +313,6 @@ public:
 
 
 
+} // namespace libMesh
 
 #endif /* __auto_ptr_h__ */

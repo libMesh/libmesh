@@ -31,6 +31,9 @@ EXTERN_C_FOR_PETSC_BEGIN
 EXTERN_C_FOR_PETSC_END
 #endif
 
+namespace libMesh
+{
+
 
 
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
@@ -515,4 +518,6 @@ template void DenseMatrix<Number>::_matvec_blas(Number, Number,
 					        DenseVector<Number>& ,
 					        const DenseVector<Number>& ) const;
 #endif
+
+} // namespace libMesh
 

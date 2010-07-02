@@ -78,6 +78,9 @@
 // data about the mesh when reading in files, etc.
 #include "mesh_data.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // Function prototype.  This is the function that will assemble
 // the linear system for our problem, governed by the linear
 // wave equation.

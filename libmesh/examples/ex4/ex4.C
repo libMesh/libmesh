@@ -79,6 +79,9 @@
 #include "string_to_enum.h"
 #include "getpot.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 
 
 // Function prototype.  This is the function that will assemble

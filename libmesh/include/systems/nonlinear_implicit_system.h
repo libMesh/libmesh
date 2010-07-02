@@ -27,6 +27,9 @@
 // Local Includes
 #include "implicit_system.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 template<typename T> class NonlinearSolver;
@@ -151,6 +154,8 @@ protected:
 };
 
 
+
+} // namespace libMesh
 
 // ------------------------------------------------------------
 // NonlinearImplicitSystem inline methods

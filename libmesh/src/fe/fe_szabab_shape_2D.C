@@ -36,6 +36,8 @@
 // Anonymous namespace to hold static std::sqrt values
 namespace
 {
+  using libMesh::Real;
+
   static const Real sqrt2  = std::sqrt(2.);
   static const Real sqrt6  = std::sqrt(6.);
   static const Real sqrt10 = std::sqrt(10.);
@@ -44,6 +46,9 @@ namespace
   static const Real sqrt26 = std::sqrt(26.);
 }
 
+
+namespace libMesh
+{
 
 template <>
 Real FE<2,SZABAB>::shape(const ElemType,
@@ -1408,6 +1413,8 @@ Real FE<2,SZABAB>::shape_second_deriv(const Elem*,
   warning_given = true;
   return 0.;
 }
+
+} // namespace libMesh
 
 
 #endif	// LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
