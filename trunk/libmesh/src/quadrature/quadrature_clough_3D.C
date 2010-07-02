@@ -22,6 +22,9 @@
 // Local includes
 #include "quadrature_clough.h"
 
+namespace libMesh
+{
+
 
 void QClough::init_3D(const ElemType _type,
                       unsigned int)
@@ -46,3 +49,5 @@ void QClough::init_3D(const ElemType _type,
   
 #endif
 }
+
+} // namespace libMesh

@@ -25,6 +25,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -150,6 +153,8 @@ class QGrundmann_Moller : public QBase
 };
 
 
+
+} // namespace libMesh
 
 
 

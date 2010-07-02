@@ -27,6 +27,9 @@
 // Local Includes
 #include "fem_system.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 template <typename T> class LinearSolver;
 class NewtonSolver;
@@ -424,5 +427,7 @@ private:
    */
   unsigned int newton_step;
 };
+
+} // namespace libMesh
 
 #endif

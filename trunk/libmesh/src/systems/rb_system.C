@@ -46,6 +46,9 @@
 #include <fstream>
 #include <sstream>
 
+namespace libMesh
+{
+
 RBSystem::RBSystem (EquationSystems& es,
 		    const std::string& name,
 		    const unsigned int number)
@@ -3194,6 +3197,8 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
     } // end if (store_representors)
   STOP_LOG("read_offline_data_from_files()", "RBSystem");
 }
+
+} // namespace libMesh
 
 
 

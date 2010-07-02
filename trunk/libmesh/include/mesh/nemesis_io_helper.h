@@ -27,6 +27,9 @@
 #include <vector>
 #include "exodusII_io_helper.h"
 
+namespace libMesh
+{
+
 // The Nemesis API header file.  Should already be
 // correctly extern C'd but it doesn't hurt :)
 namespace Nemesis {
@@ -287,6 +290,8 @@ private:
   //  bool _verbose;
   
 };
+
+} // namespace libMesh
 
 #endif // #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 #endif // #ifndef __nemesis_io_helper_h__

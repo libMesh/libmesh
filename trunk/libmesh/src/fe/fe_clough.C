@@ -26,6 +26,9 @@
 
 
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // Hierarchic-specific implementations
@@ -324,3 +327,5 @@ template void FE<3,CLOUGH>::compute_constraints(DofConstraints&, DofMap&,
                                                 const unsigned int,
                                                 const Elem*);
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+} // namespace libMesh

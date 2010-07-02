@@ -32,6 +32,9 @@
 #include "utility.h"
 #include "timestamp.h"
 
+namespace libMesh
+{
+
 
 //-----------------------------------------------------------------------
 // Utility members
@@ -104,3 +107,5 @@ void Utility::prepare_complex_data(const std::vector<Complex>& source,
 }
 
 #endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+
+} // namespace libMesh

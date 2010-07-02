@@ -29,14 +29,17 @@
 #include "mesh_input.h"
 #include "mesh_output.h"
 
-
 // Forward declarations
-class MeshBase;
-class MeshData;
 
 class vtkUnstructuredGrid;
 class vtkPoints;
 class vtkCellArray;
+
+namespace libMesh
+{
+
+class MeshBase;
+class MeshData;
 
 /**
  * This class implements reading and writing meshes in the VTK format.
@@ -161,6 +164,8 @@ VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
   libmesh_experimental();
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __vtk_io_h__

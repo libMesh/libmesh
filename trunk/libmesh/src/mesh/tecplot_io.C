@@ -35,6 +35,9 @@ extern "C" {
 #endif
 
 
+namespace libMesh
+{
+
 
 //--------------------------------------------------------
 // Macros for handling Tecplot API data
@@ -430,4 +433,6 @@ void TecplotIO::write_binary (const std::string& fname,
       
 #endif
 }
+
+} // namespace libMesh
 

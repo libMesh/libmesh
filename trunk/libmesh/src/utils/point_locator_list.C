@@ -26,6 +26,9 @@
 #include "elem.h"
 #include "point_locator_list.h"
 
+namespace libMesh
+{
+
 
 // typedefs
 typedef std::vector<Point>::const_iterator   const_list_iterator;
@@ -210,4 +213,6 @@ void PointLocatorList::disable_out_of_mesh_mode (void)
   /* This functionality is not yet implemented for PointLocatorList.  */
   libmesh_not_implemented();
 }
+
+} // namespace libMesh
 

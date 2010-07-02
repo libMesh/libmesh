@@ -83,6 +83,9 @@
 // data about the mesh when reading in files, etc.
 #include "mesh_data.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // This problem is only defined on complex-valued fields, for
 // which libMesh must be configured with Number == complex.
 

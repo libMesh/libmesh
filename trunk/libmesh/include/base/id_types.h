@@ -24,6 +24,9 @@
 
 #include <limits>
 
+namespace libMesh
+{
+
 // A useful way to debug:
 #if 0
 class TestClass {
@@ -40,4 +43,7 @@ typedef TestClass subdomain_id_type;
 #endif
 
 typedef unsigned char subdomain_id_type;
+
+} // namespace libMesh
+
 #endif // end #ifndef __id_types_h__

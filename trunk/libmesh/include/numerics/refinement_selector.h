@@ -28,6 +28,9 @@
 // Local Includes
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class EquationSystems;
 class System;
@@ -74,6 +77,8 @@ public:
    */
   std::vector<float> component_scale;
 };
+
+} // namespace libMesh
 
 
 #endif

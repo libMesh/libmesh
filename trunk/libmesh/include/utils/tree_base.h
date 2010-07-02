@@ -27,6 +27,9 @@
 // Local includes
 #include "reference_counted_object.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 class TreeBase;
@@ -112,6 +115,8 @@ TreeBase::TreeBase (const MeshBase& m) :
   mesh(m)
 {
 }
+
+} // namespace libMesh
 
 
 #endif

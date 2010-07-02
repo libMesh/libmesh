@@ -25,6 +25,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -119,6 +122,8 @@ QGauss::~QGauss()
 {
 }
 
+
+} // namespace libMesh
 
 
 

@@ -25,6 +25,9 @@
 #include "dof_object.h"
 
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -356,3 +359,5 @@ void DofObject::set_dof_number(const unsigned int s,
 
   libmesh_assert(this->dof_number(s, var, comp) == dn);
 }
+
+} // namespace libMesh

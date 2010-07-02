@@ -27,6 +27,9 @@
 // Local includes
 #include "type_vector.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -183,3 +186,5 @@ template class TypeVector<Real>;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class TypeVector<Complex>;
 #endif
+
+} // namespace libMesh

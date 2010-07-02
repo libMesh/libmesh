@@ -50,6 +50,9 @@
 // For checking for the existence of files
 #include <sys/stat.h>
 
+namespace libMesh
+{
+
 QNTransientRBSystem::QNTransientRBSystem (EquationSystems& es,
                                           const std::string& name,
                                           const unsigned int number)
@@ -1976,5 +1979,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
 
   STOP_LOG("read_offline_data_from_files()", "QNTransientRBSystem");
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK

@@ -46,6 +46,9 @@
 #endif
 
 
+namespace libMesh
+{
+
 
 
 
@@ -1068,3 +1071,5 @@ void LegacyXdrIO::write_soln (const std::string& name,
   
   s.values(&soln[0], mesh.n_nodes());
 }
+
+} // namespace libMesh

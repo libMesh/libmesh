@@ -48,6 +48,9 @@
 #include "numeric_vector.h"
 #include "dof_map.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // Function prototype.  This is the function that will assemble
 // the eigen system. Here, we will simply assemble a mass matrix.
 void assemble_mass(EquationSystems& es,

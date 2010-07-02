@@ -30,6 +30,9 @@
 // Local includes
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 class Elem;
@@ -374,5 +377,7 @@ void BoundaryInfo::remove (const Elem* elem)
   // Erase everything associated with elem
   _boundary_side_id.erase (elem);
 }
+
+} // namespace libMesh
 
 #endif

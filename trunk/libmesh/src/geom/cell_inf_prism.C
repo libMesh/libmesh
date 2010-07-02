@@ -30,6 +30,9 @@
 #include "face_tri3.h"
 #include "face_inf_quad4.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -164,6 +167,8 @@ bool InfPrism::is_child_on_side(const unsigned int c,
 
   return (s == 0 || c+1 == s || c == s%3);
 }
+
+} // namespace libMesh
 
 
 

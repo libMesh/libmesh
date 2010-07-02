@@ -22,6 +22,9 @@
 // Local includes
 #include "quadrature_trap.h"
 
+namespace libMesh
+{
+
 
 
 void QTrap::init_2D(const ElemType _type,
@@ -94,3 +97,5 @@ void QTrap::init_2D(const ElemType _type,
 
 #endif
 }
+
+} // namespace libMesh

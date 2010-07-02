@@ -79,6 +79,9 @@ namespace {
 }
 
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // UnstructuredMesh class member functions
@@ -1012,6 +1015,8 @@ bool UnstructuredMesh::contract ()
   return mesh_changed;
 }
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+} // namespace libMesh
 
 
 

@@ -27,6 +27,10 @@
 #include "fe.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
+
 
 // ------------------------------------------------------------
 // InfFE::Base class members
@@ -161,6 +165,8 @@ INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Base::n_base_mapping_sf(const E
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
+
+} // namespace libMesh
 								
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

@@ -26,6 +26,9 @@
 // Local includes
 #include "reference_counter.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -96,3 +99,5 @@ void ReferenceCounter::print_info (std::ostream & /* out_stream */)
 {}
 
 #endif
+
+} // namespace libMesh

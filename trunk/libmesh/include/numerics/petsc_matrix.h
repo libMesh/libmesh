@@ -51,10 +51,6 @@
 #endif
 
 
-// Forward Declarations
-template <typename T> class DenseMatrix;
-
-
 /**
  * Petsc include files.
  */
@@ -62,6 +58,13 @@ EXTERN_C_FOR_PETSC_BEGIN
 # include <petscmat.h>
 EXTERN_C_FOR_PETSC_END
 
+
+
+namespace libMesh
+{
+
+// Forward Declarations
+template <typename T> class DenseMatrix;
 
 
 /**
@@ -682,6 +685,8 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
   ierr = MatView(_mat, PETSC_VIEWER_STDOUT_SELF);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
 #endif // #ifdef __petsc_matrix_h__

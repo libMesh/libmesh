@@ -27,10 +27,15 @@
 // Local Includes
 #include "linear_implicit_system.h"
 
+namespace libMesh
+{
+
 
 // The SteadySystem is now simply a typedef for an
 // implicit system
 typedef LinearImplicitSystem SteadyLinearSystem;
 
+
+} // namespace libMesh
 
 #endif // #ifndef __steady_system__

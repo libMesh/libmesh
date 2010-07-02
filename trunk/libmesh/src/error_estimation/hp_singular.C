@@ -28,6 +28,9 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
+namespace libMesh
+{
+
 //-----------------------------------------------------------------
 // HPSingularity implementations
 
@@ -71,5 +74,7 @@ void HPSingularity::select_refinement (System &system)
 
   STOP_LOG("select_refinement()", "HPSingularity");
 }
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR

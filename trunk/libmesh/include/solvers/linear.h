@@ -28,6 +28,9 @@
 #include "libmesh_common.h"
 #include "solver.h"
 
+namespace libMesh
+{
+
 
 /**
  * This is a generic class that defines a linear to be used in a
@@ -95,6 +98,8 @@ Linear<T>::~Linear ()
 {
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __linear_h__

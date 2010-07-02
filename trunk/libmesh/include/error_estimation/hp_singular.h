@@ -35,6 +35,9 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
+namespace libMesh
+{
+
 // Forward Declarations
 class Point;
 class System;
@@ -81,6 +84,8 @@ public:
    */
   std::list<Point> singular_points;
 };
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

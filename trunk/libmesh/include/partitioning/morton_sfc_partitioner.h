@@ -27,6 +27,9 @@
 // Local Includes -----------------------------------
 #include "sfc_partitioner.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -70,6 +73,8 @@ protected:
 private:
   
 };
+
+} // namespace libMesh
 
 
 #endif // #define __morton_sfc_partitioner_h__

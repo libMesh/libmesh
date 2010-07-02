@@ -31,6 +31,9 @@
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 
   /**
    * Data structure for specifying which Parameters should be
@@ -155,5 +158,7 @@ Number*& ParameterVector::operator[] (unsigned int i)
 
   return _params[i];
 }
+
+} // namespace libMesh
 
 #endif // #define __parameter_vector_h__

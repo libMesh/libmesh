@@ -24,6 +24,9 @@
 // Local includes
 #include "boundary_mesh.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -39,3 +42,5 @@ BoundaryMesh::~BoundaryMesh()
 {
   this->clear();
 }
+
+} // namespace libMesh

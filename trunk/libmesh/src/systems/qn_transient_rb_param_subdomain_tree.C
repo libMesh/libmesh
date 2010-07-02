@@ -27,6 +27,9 @@
 #include "qn_transient_scm_system.h"
 #include "rb_system.h"
 
+namespace libMesh
+{
+
 
 QNTransientRBParamSubdomainTree::QNTransientRBParamSubdomainTree(RBSystem& system,
                     const std::string& parameters_filename,
@@ -40,5 +43,7 @@ void QNTransientRBParamSubdomainTree::build_root_node()
   libmesh_assert(root_node == NULL);
   root_node = new QNTransientRBParamSubdomainNode(*this, _rb_system.get_current_parameters());
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK

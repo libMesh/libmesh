@@ -24,6 +24,9 @@
 #include "dense_matrix_base.h"
 #include "dense_vector_base.h"
 
+namespace libMesh
+{
+
 
 
 template<typename T>
@@ -153,3 +156,5 @@ template class DenseMatrixBase<Real>;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseMatrixBase<Complex>;
 #endif
+
+} // namespace libMesh

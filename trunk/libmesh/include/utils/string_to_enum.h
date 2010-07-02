@@ -27,6 +27,9 @@
 // C++ includes
 #include <string>
 
+namespace libMesh
+{
+
 // Local includes
 
 
@@ -52,6 +55,8 @@ namespace Utility {
   template <typename T>
   std::string enum_to_string (const T e);
 }
+
+} // namespace libMesh
 
 
 #endif // #define __string_to_enum_h__

@@ -34,6 +34,9 @@
 #include "linear_implicit_system.h"
 #include "transient_system.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class TimeSolver;
 
@@ -442,6 +445,8 @@ protected:
    */
   std::vector<bool> _time_evolving;
 };
+
+} // namespace libMesh
 
 
 #endif

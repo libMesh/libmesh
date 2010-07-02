@@ -25,6 +25,9 @@
 // System includes
 #include <complex>
 
+namespace libMesh
+{
+
 // Copy of boost's enable_if_c
 
 namespace boostcopy {
@@ -202,5 +205,7 @@ struct CompareTypes<S, std::complex<T> > {
   typedef std::complex<typename CompareTypes<S, T>::supertype> supertype;
 };
 */
+
+} // namespace libMesh
 
 #endif // __compare_types_h__

@@ -33,6 +33,9 @@
 #include "petsc_macro.h"
 #include "utility.h"
 
+namespace libMesh
+{
+
 
 
 //-----------------------------------------------------------------------
@@ -1312,6 +1315,8 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
 //------------------------------------------------------------------
 // Explicit instantiations
 template class PetscVector<Number>;
+
+} // namespace libMesh
 
 
 

@@ -33,6 +33,9 @@
 #endif
 
 
+namespace libMesh
+{
+
 //------------------------------------------------------
 // MeshData UNV support functions
 void MeshData::read_unv (const std::string& file_name)
@@ -932,6 +935,8 @@ bool MeshDataUnvHeader::operator == (const MeshDataUnvHeader& omduh) const
 
 	  this->_desired_dataset_label == omduh._desired_dataset_label);
 }
+
+} // namespace libMesh
 
 
 

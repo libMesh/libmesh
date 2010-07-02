@@ -30,6 +30,9 @@
 #include "shell_matrix.h"
 #include "sparse_matrix.h"
 
+namespace libMesh
+{
+
 
 /**
  * This class allows to use any SparseMatrix object as a shell matrix.
@@ -135,6 +138,8 @@ void SparseShellMatrix<T>::get_diagonal(NumericVector<T>& dest) const
   _m.get_diagonal(dest);
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __sparse_shell_matrix_h__

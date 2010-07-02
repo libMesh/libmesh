@@ -28,6 +28,9 @@
 
 // Local Includes -----------------------------------
 
+namespace libMesh
+{
+
 // forward declarations
 class UnstructuredMesh;
 
@@ -70,6 +73,8 @@ protected:
   UnstructuredMesh& _mesh;
   
 };
+
+} // namespace libMesh
 
 
 #endif

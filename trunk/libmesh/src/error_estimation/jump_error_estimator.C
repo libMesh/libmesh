@@ -39,6 +39,9 @@
 #include "dense_vector.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 //-----------------------------------------------------------------
 // JumpErrorEstimator implementations
 void JumpErrorEstimator::initialize (const System&,
@@ -449,3 +452,5 @@ float JumpErrorEstimator::coarse_n_flux_faces_increment ()
 
   return 1.0 / static_cast<Real>(divisor);
 }
+
+} // namespace libMesh

@@ -41,6 +41,9 @@
 #include "multi_predicates.h"
 #include "variant_filter_iterator.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 class MeshRefinement;
@@ -2063,6 +2066,8 @@ variant_filter_iterator<Elem::Predicate,
 };
 
 
+
+} // namespace libMesh
 
 
 #endif // end #ifndef __elem_h__

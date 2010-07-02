@@ -28,6 +28,9 @@
 // Local Includes -----------------------------------
 #include "partitioner.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -98,6 +101,8 @@ void SFCPartitioner::set_sfc_type (const std::string& sfc_type)
   _sfc_type = sfc_type;
 }
 
+
+} // namespace libMesh
 
 
 

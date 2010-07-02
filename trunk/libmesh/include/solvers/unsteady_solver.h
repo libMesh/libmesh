@@ -30,6 +30,9 @@
 #include "numeric_vector.h"
 #include "time_solver.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class UnsteadySolver;
 
@@ -124,6 +127,8 @@ protected:
   bool first_solve;
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __time_solver_h__

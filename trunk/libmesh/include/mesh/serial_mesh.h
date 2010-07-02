@@ -27,6 +27,9 @@
 // Local Includes -----------------------------------
 #include "unstructured_mesh.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -330,6 +333,8 @@ private:
 };
 
 
+
+} // namespace libMesh
 
 
 

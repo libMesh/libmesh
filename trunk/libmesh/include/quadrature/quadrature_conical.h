@@ -24,6 +24,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 /**
  * This class implements the so-called conical product quadrature
  * rules for Tri and Tet elements. These rules are generally
@@ -96,6 +99,8 @@ class QConical : public QBase
   void conical_product_pyramid(unsigned int p);
 };
 
+
+} // namespace libMesh
 
 #endif // #ifndef __quadrature_conical_h__
 

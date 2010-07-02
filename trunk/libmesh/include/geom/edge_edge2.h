@@ -29,6 +29,9 @@
 #include "libmesh_common.h"
 #include "edge.h"
 
+namespace libMesh
+{
+
 
 /**
  * The \p Edge2 is an element in 1D composed of 2 nodes. It is numbered
@@ -151,6 +154,8 @@ protected:
   
 #endif
 };
+
+} // namespace libMesh
 
 
 #endif

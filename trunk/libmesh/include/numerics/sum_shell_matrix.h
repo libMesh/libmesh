@@ -33,6 +33,9 @@
 #include "libmesh.h"
 #include "shell_matrix.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -128,6 +131,8 @@ inline
 SumShellMatrix<T>::~SumShellMatrix ()
 {}
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __sum_shell_matrix_h__

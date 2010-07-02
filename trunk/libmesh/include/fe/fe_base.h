@@ -37,6 +37,9 @@
 #include "tensor_value.h"
 #endif
 
+namespace libMesh
+{
+
 
 // forward declarations
 template <typename T> class DenseMatrix;
@@ -1279,5 +1282,7 @@ inline
 FEBase::~FEBase()
 {
 }
+
+} // namespace libMesh
 
 #endif

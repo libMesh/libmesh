@@ -29,6 +29,9 @@
 #include "patch.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 //-----------------------------------------------------------------
@@ -221,3 +224,5 @@ void Patch::build_around_element (const Elem* e0,
 #endif
 
 }
+
+} // namespace libMesh

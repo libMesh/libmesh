@@ -28,6 +28,9 @@
 #include "point_locator_tree.h"
 #include "mesh_tools.h"
 
+namespace libMesh
+{
+
 
 
 //------------------------------------------------------------------
@@ -247,4 +250,6 @@ void PointLocatorTree::disable_out_of_mesh_mode (void)
 {
   _out_of_mesh_mode = false;
 }
+
+} // namespace libMesh
 

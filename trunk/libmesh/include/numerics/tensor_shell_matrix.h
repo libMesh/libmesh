@@ -30,6 +30,9 @@
 #include "shell_matrix.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 /**
  * Shell matrix that is given by a tensor of two vectors, i.e. A =
  * v*w^T.
@@ -134,6 +137,8 @@ unsigned int TensorShellMatrix<T>::n () const
   return _w.size();
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __tensor_shell_matrix_h__

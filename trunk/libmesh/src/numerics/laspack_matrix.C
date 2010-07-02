@@ -29,6 +29,9 @@
 #include "laspack_matrix.h"
 #include "dof_map.h"
 
+namespace libMesh
+{
+
 
 //-----------------------------------------------------------------------
 // LaspackMatrix members
@@ -214,6 +217,8 @@ void LaspackMatrix<T>::get_transpose (SparseMatrix<T>& /*dest*/) const
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LaspackMatrix<Number>;
+
+} // namespace libMesh
  
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK

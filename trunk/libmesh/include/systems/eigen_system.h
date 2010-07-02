@@ -33,6 +33,9 @@
 #include "system.h"
 #include "eigen_solver.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 template <typename T> class SparseMatrix;
@@ -212,6 +215,8 @@ private:
 
 // ------------------------------------------------------------
 // EigenSystem inline methods
+
+} // namespace libMesh
 
 
 #endif // LIBMESH_HAVE_SLEPC

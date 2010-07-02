@@ -29,6 +29,9 @@
 #include "elem.h"
 #include "unstructured_mesh.h"
 
+namespace libMesh
+{
+
 // Member functions for the Laplace smoother
 void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 {
@@ -241,3 +244,5 @@ void LaplaceMeshSmoother::print_graph() const
       libMesh::out << std::endl;
     }
 }
+
+} // namespace libMesh

@@ -29,6 +29,9 @@
 #include "numeric_vector.h"
 #include "linear.h"
 
+namespace libMesh
+{
+
 /**
  * This is a generic class that defines a nonlinear to be used in a
  * simulation.  A user can define a nonlinear by deriving from this
@@ -180,6 +183,8 @@ void Nonlinear<T>::solve ()
 	}
     }
 }
+
+} // namespace libMesh
 
 
 #endif // #define __nonlinear_h__

@@ -27,6 +27,9 @@
 // Local includes
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 class Mesh;
@@ -159,5 +162,7 @@ class Edge : public Elem
 
 // ------------------------------------------------------------
 // Edge class member functions
+
+} // namespace libMesh
 
 #endif

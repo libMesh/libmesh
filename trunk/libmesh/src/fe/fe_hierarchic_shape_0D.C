@@ -25,6 +25,9 @@
 #include "elem.h"
 
 
+namespace libMesh
+{
+
 
 
 template <>
@@ -105,3 +108,5 @@ Real FE<0,HIERARCHIC>::shape_second_deriv(const Elem*,
   libmesh_error();
   return 0.;
 }
+
+} // namespace libMesh

@@ -27,6 +27,9 @@
 // Local includes
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 
@@ -221,5 +224,7 @@ protected:
 
 // ------------------------------------------------------------
 // NodeElem class member functions
+
+} // namespace libMesh
 
 #endif

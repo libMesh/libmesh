@@ -32,6 +32,9 @@
 #include "libmesh_common.h"
 #include "mesh_base.h"
 
+namespace libMesh
+{
+
 // Forward declares
 class EquationSystems;
 
@@ -221,6 +224,8 @@ unsigned int & MeshOutput<MT>::ascii_precision ()
   return _ascii_precision;
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __mesh_io_h__

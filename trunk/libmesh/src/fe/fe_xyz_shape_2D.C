@@ -33,9 +33,12 @@
 namespace
 {
   static unsigned int old_elem_id = libMesh::invalid_uint;
-  static Point centroid;
+  static libMesh::Point centroid;
 }
 
+
+namespace libMesh
+{
 
 
 template <>
@@ -628,3 +631,5 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 
 #endif
 }
+
+} // namespace libMesh

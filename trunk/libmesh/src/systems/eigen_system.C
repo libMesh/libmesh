@@ -35,6 +35,9 @@
 #include "mesh.h"
 #include "qoi_set.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // EigenSystem implementation
@@ -235,5 +238,7 @@ std::pair<Real, Real> EigenSystem::get_eigenpair (unsigned int i)
   // call the eigen_solver get_eigenpair method
   return eigen_solver->get_eigenpair (i, *solution);
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC

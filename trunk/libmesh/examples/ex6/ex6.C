@@ -72,6 +72,9 @@
 // The definition of a geometric element
 #include "elem.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // Function prototype.  This is similar to the Poisson
 // assemble function of example 4.  
 void assemble_wave (EquationSystems& es,

@@ -65,7 +65,7 @@ extern "C" {
 // disabled.
 #if !defined(GETPOT_DISABLE_MUTEX)
   #include "threads.h"
-  #define SCOPED_MUTEX  Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
+  #define SCOPED_MUTEX  libMesh::Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
 #else
   #define SCOPED_MUTEX
 #endif
@@ -299,7 +299,7 @@ private:
     //        multiple threads at once, so we'll wrap access to
     //        mutable objects in a mutex.
 #if !defined(GETPOT_DISABLE_MUTEX)
-    mutable Threads::spin_mutex _getpot_mtx;
+    mutable libMesh::Threads::spin_mutex _getpot_mtx;
 #endif
 
     //     -- some functions return a char pointer to a string created on the fly.

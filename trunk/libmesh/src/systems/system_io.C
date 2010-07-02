@@ -38,6 +38,8 @@
 
 // Anonymous namespace for implementation details.
 namespace {
+
+  using libMesh::DofObject;
   
   // Comments:
   // ---------
@@ -72,6 +74,9 @@ namespace {
   };
 }
 
+
+namespace libMesh
+{
 
 
 // ------------------------------------------------------------
@@ -1821,5 +1826,7 @@ void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec)
   if (libMesh::processor_id() == 0)
     libmesh_assert(written_length == vec_length);
 }
+
+} // namespace libMesh
 
 

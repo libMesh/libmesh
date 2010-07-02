@@ -26,6 +26,9 @@
 #include "edge_edge3.h"
 #include "face_tri6.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -681,3 +684,5 @@ float Tet10::embedding_matrix (const unsigned int i,
 }
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+} // namespace libMesh

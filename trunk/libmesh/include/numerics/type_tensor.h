@@ -29,6 +29,9 @@
 #include "libmesh_common.h"
 #include "type_vector.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -935,5 +938,7 @@ bool TypeTensor<T>::operator == (const TypeTensor<T>& rhs) const
 #endif
   
 }
+
+} // namespace libMesh
 
 #endif // #define __type_tensor_h__

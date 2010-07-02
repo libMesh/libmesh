@@ -25,6 +25,9 @@
 #include "libmesh_common.h"
 #include "elem_quality.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // Quality function definitions
 
@@ -456,3 +459,5 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
   
   return v;
 }
+
+} // namespace libMesh

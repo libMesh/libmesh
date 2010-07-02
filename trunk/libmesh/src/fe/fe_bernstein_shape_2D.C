@@ -28,6 +28,9 @@
 #include "utility.h"
 
 
+namespace libMesh
+{
+
 
 template <>
 Real FE<2,BERNSTEIN>::shape(const ElemType,
@@ -1825,6 +1828,8 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem*,
   warning_given = true;
   return 0.;
 }
+
+} // namespace libMesh
 
 
 #endif	// LIBMESH_ENABLE_HIGHER_ORDER_SHAPES

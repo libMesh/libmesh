@@ -27,6 +27,9 @@
 // Local includes
 #include "adaptive_time_solver.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class System;
 
@@ -70,6 +73,8 @@ public:
   void solve();
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __twostep_time_solver_

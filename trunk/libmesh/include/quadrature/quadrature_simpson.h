@@ -25,6 +25,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -86,6 +89,8 @@ QSimpson::QSimpson(const unsigned int d) : QBase(d,THIRD)
     init(EDGE2);
 }
 
+
+} // namespace libMesh
 
 
 

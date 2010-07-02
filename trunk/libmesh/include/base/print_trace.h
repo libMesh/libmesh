@@ -24,9 +24,14 @@
 
 #include "libmesh_config.h"
 
+namespace libMesh
+{
+
 /*
  * Print a stack trace (for code compiled with gcc)
  */
 void print_trace(std::ostream &out = std::cerr);
+
+} // namespace libMesh
 
 #endif

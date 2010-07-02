@@ -26,6 +26,9 @@
 #include "rb_base.h"
 #include "rb_context.h"
 
+namespace libMesh
+{
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -852,5 +855,7 @@ private:
    */
   bool RB_system_initialized;
 };
+
+} // namespace libMesh
 
 #endif

@@ -24,6 +24,9 @@
 #include "fe_macro.h"
 
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -345,3 +348,5 @@ template void FE<3,HIERARCHIC>::compute_constraints(DofConstraints&, DofMap&,
 						    const unsigned int,
 						    const Elem*);
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+} // namespace libMesh

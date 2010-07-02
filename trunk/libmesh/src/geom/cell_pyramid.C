@@ -26,6 +26,9 @@
 #include "face_tri3.h"
 #include "face_quad4.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // Pyramid class member functions
@@ -172,3 +175,5 @@ bool Pyramid::is_child_on_side(const unsigned int c,
       return true;
   return false;
 }
+
+} // namespace libMesh

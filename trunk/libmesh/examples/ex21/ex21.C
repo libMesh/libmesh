@@ -57,6 +57,9 @@
 #include "exact_solution.h"
 //#define QORDER TWENTYSIXTH 
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 Number exact_solution (const Point& p, const Parameters& parameters, const std::string&, const std::string&) 
 {
   const Real x = p(0);

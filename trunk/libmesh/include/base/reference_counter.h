@@ -31,6 +31,9 @@
 #include <string>
 #include <map>
 
+namespace libMesh
+{
+
 
 
 /**
@@ -179,6 +182,8 @@ void ReferenceCounter::increment_destructor_count (const std::string&)
 }
 #endif
 
+
+} // namespace libMesh
 
 
 #endif // end #ifndef __reference_counter_h__

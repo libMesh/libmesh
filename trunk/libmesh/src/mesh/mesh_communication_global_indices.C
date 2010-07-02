@@ -40,6 +40,8 @@
 #ifdef LIBMESH_HAVE_LIBHILBERT 
 namespace { // anonymous namespace for helper functions
 
+  using namespace libMesh;
+
   // Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
   // [0,max_inttype]^3 for computing Hilbert keys
   void get_hilbert_coords (const Point &p,
@@ -164,6 +166,9 @@ namespace { // anonymous namespace for helper functions
 }
 #endif
 
+
+namespace libMesh
+{
 
 
 // ------------------------------------------------------------
@@ -756,3 +761,5 @@ template void MeshCommunication::find_global_indices<MeshBase::element_iterator>
 											const MeshBase::element_iterator &,
 											const MeshBase::element_iterator &,
 											std::vector<unsigned int> &) const;
+
+} // namespace libMesh

@@ -25,6 +25,9 @@
 
 #include <ctime>
 
+namespace libMesh
+{
+
 RBParamSubdomainNode::RBParamSubdomainNode(RBParamSubdomainTree& tree_in, const std::vector<Number>& anchor_in)
   : left_child(NULL),
     right_child(NULL),
@@ -501,5 +504,7 @@ std::vector< std::vector<Real> > RBParamSubdomainNode::get_training_bbox()
 
   return corner_values;
 }
+
+} // namespace libMesh
 
 

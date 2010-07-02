@@ -40,6 +40,9 @@
 #include "partitioner.h"
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 
 //-----------------------------------------------
 // anonymous namespace for implementation details
@@ -1118,3 +1121,5 @@ void XdrIO::pack_element (std::vector<unsigned int> &conn, const Elem *elem,
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     conn.push_back (elem->node(n));                 
 }
+
+} // namespace libMesh

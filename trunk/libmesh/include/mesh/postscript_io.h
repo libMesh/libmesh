@@ -31,6 +31,9 @@
 #include "dense_matrix.h"
 #include "point.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 class Elem;
@@ -141,5 +144,7 @@ private:
    */ 
   std::ofstream _out;
 };
+
+} // namespace libMesh
 
 #endif // #ifndef __postscript_io_h__

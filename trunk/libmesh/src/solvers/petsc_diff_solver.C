@@ -29,6 +29,9 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
+namespace libMesh
+{
+
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
 // methods as needed.
@@ -282,5 +285,7 @@ unsigned int PetscDiffSolver::solve()
   
   return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_PETSC

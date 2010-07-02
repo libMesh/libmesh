@@ -18,6 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "libmesh_config.h"
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 
 // C++ includes
 #include <algorithm> // for std::fill
@@ -37,8 +40,9 @@
 #include "dense_vector.h"
 
 
+namespace libMesh
+{
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 void
 LaplacianErrorEstimator::initialize(const System&,
@@ -107,7 +111,14 @@ LaplacianErrorEstimator::internal_side_integration ()
     error * coarse_elem->hmax() * error_norm.weight(var);
 }
 
+} // namespace libMesh
+
 #else // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
+
+#include "fourth_error_estimators.h"
+
+namespace libMesh
+{
 
 void
 LaplacianErrorEstimator::initialize(const System&,
@@ -129,6 +140,8 @@ LaplacianErrorEstimator::internal_side_integration ()
                 << "--enable-second" << std::endl;
   libmesh_error();
 }
+
+} // namespace libMesh
 
 #endif // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
 

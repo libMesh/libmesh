@@ -27,6 +27,9 @@
 // Local includes
 #include "type_tensor.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -192,3 +195,5 @@ template class TypeTensor<Real>;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class TypeTensor<Complex>;
 #endif
+
+} // namespace libMesh

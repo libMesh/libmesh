@@ -26,6 +26,9 @@
 #include "mesh_base.h"
 #include "mesh_tools.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -90,6 +93,8 @@ const Elem* Tree<N>::find_element(const Point& p) const
 // Explicit Instantiations
 template class Tree<4>;
 template class Tree<8>;
+
+} // namespace libMesh
 
 
 

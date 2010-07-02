@@ -35,6 +35,10 @@
 #include "mesh_base.h"
 #include "point.h" // some compilers want the full definition - I think so they can do 
                    // return-value-optimization for BoundingBox'es - BSK
+
+namespace libMesh
+{
+
 // forward declarations
 class SerialMesh;
 class ParallelMesh;
@@ -394,6 +398,8 @@ namespace MeshTools
   } // end namespace Private
   
 } // end namespace MeshTools
+
+} // namespace libMesh
 
 
 #endif // #define __mesh_tools_h__

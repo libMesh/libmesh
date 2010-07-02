@@ -28,6 +28,9 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 // forward declarations
 template <typename T> class NumericVector;
 
@@ -102,6 +105,8 @@ inline
 ShellMatrix<T>::~ShellMatrix ()
 {}
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __shell_matrix_h__

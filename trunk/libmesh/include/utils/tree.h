@@ -28,6 +28,9 @@
 #include "tree_node.h"
 #include "tree_base.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class MeshBase;
 
@@ -151,6 +154,8 @@ const Elem* Tree<N>::operator() (const Point& p) const
   return this->find_element(p);
 }
 
+
+} // namespace libMesh
 
 
 #endif

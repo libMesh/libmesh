@@ -36,6 +36,9 @@
 #include <unistd.h>  // needed for getpid()
 #include <complex>
 // #include <cassert>  // Use libmesh_assert() now
+#ifdef LIBMESH_HAVE_CSIGNAL
+#  include <csignal>
+#endif
 #ifdef LIBMESH_HAVE_STDLIB_H
 # include <cstdlib>
 #endif
@@ -51,6 +54,43 @@
 #ifdef LIBMESH_ENABLE_TRACEFILES
 #  include "print_trace.h"
 #endif
+
+// For some reason the real std::max, std::min
+// don't handle mixed compatible types
+namespace std {
+  inline long double max(long double a, double b)
+  { return (a>b?a:b); }
+  inline long double min(long double a, double b)
+  { return (a<b?a:b); }
+
+  inline long double max(double a, long double b)
+  { return (a>b?a:b); }
+  inline long double min(double a, long double b)
+  { return (a<b?a:b); }
+
+  inline double max(double a, float b)
+  { return (a>b?a:b); }
+  inline double min(double a, float b)
+  { return (a<b?a:b); }
+
+  inline double max(float a, double b)
+  { return (a>b?a:b); }
+  inline double min(float a, double b)
+  { return (a<b?a:b); }
+
+  inline long double max(long double a, float b)
+  { return (a>b?a:b); }
+  inline long double min(long double a, float b)
+  { return (a<b?a:b); }
+
+  inline long double max(float a, long double b)
+  { return (a>b?a:b); }
+  inline long double min(float a, long double b)
+  { return (a<b?a:b); }
+}
+
+namespace libMesh
+{
 
 
 
@@ -110,40 +150,6 @@
   # define MPI_REAL MPI_FLOAT
 #endif
 
-// For some reason the real std::max, std::min
-// don't handle mixed compatible types
-namespace std {
-  inline long double max(long double a, double b)
-  { return (a>b?a:b); }
-  inline long double min(long double a, double b)
-  { return (a<b?a:b); }
-
-  inline long double max(double a, long double b)
-  { return (a>b?a:b); }
-  inline long double min(double a, long double b)
-  { return (a<b?a:b); }
-
-  inline double max(double a, float b)
-  { return (a>b?a:b); }
-  inline double min(double a, float b)
-  { return (a<b?a:b); }
-
-  inline double max(float a, double b)
-  { return (a>b?a:b); }
-  inline double min(float a, double b)
-  { return (a<b?a:b); }
-
-  inline long double max(long double a, float b)
-  { return (a>b?a:b); }
-  inline long double min(long double a, float b)
-  { return (a<b?a:b); }
-
-  inline long double max(float a, long double b)
-  { return (a>b?a:b); }
-  inline long double min(float a, long double b)
-  { return (a<b?a:b); }
-}
-
 // Define the type to use for complex numbers
 // Always use std::complex<double>, as required by Petsc?
 // If your version of Petsc doesn't support
@@ -184,8 +190,6 @@ typedef float ErrorVectorReal;
 #define MPI_ERRORVECTORREAL MPI_FLOAT
 
 
-namespace libMesh
-{
 #ifdef LIBMESH_HAVE_MPI
   /**
    * MPI Communicator to be used in the library.
@@ -208,7 +212,6 @@ namespace libMesh
 
 extern OStreamProxy out;
 extern OStreamProxy err;
-}
 
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
@@ -223,7 +226,6 @@ extern OStreamProxy err;
 // memory can be obtained from a ps or top.  This macro only works for
 // serial cases.
 #ifdef LIBMESH_HAVE_CSIGNAL
-#  include <csignal>
 #  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); libMesh::out << "Stopping process " << getpid() << "..." << std::endl; std::raise(SIGSTOP); libMesh::out << "Continuing process " << getpid() << "..." << std::endl; } } while(0)
 #else
 #  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
@@ -240,7 +242,7 @@ extern OStreamProxy err;
 // The libmesh_write_traceout() macro writes stack trace files, if
 // that feature has been configured.
 #ifdef LIBMESH_ENABLE_TRACEFILES
-  #define libmesh_write_traceout()   do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); print_trace(traceout); } while(0)
+  #define libmesh_write_traceout()   do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); libMesh::print_trace(traceout); } while(0)
 #else
   #define libmesh_write_traceout()   do { } while (0)
 #endif
@@ -338,7 +340,6 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 
 
 
-
-
+} // namespace libMesh
 
 #endif // #define __libmesh_common_h__

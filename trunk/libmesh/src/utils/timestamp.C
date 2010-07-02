@@ -29,6 +29,9 @@
 // Local includes
 #include "timestamp.h"
 
+namespace libMesh
+{
+
 namespace Utility
 {
   // If the locale header is available, we will use the "C++" way of
@@ -124,3 +127,5 @@ namespace Utility
   // Example: "%d %B %Y %I:%M:%S %p"
   // 04 February 2010 01:44:10 PM
 }
+
+} // namespace libMesh

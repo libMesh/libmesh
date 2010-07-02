@@ -26,6 +26,9 @@
 #include "fe_compute_data.h"
 #include "dof_map.h"
 
+namespace libMesh
+{
+
 //------------------------------------------------------------
 //FEInterface class members
 FEInterface::FEInterface()
@@ -2287,3 +2290,5 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
 	return true;
     }
 }
+
+} // namespace libMesh

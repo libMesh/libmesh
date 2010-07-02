@@ -28,6 +28,9 @@
 // Local Includes
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -175,6 +178,8 @@ bool CouplingMatrix::empty() const
   return (_size == 0);
 }
 
+
+} // namespace libMesh
 
 
 #endif

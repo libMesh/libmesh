@@ -30,6 +30,9 @@
 #include "hilbert.h"
 #endif
 
+namespace libMesh
+{
+
 
 
 //--------------------------------------------------------------------------
@@ -105,5 +108,7 @@ namespace Parallel {
 #endif // LIBMESH_HAVE_LIBHILBERT
   }
 }
+
+} // namespace libMesh
 
 #endif // #define __parallel_conversion_utils_h__

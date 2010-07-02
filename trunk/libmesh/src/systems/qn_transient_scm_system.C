@@ -40,6 +40,9 @@
 #include "equation_systems.h"
 #include "parallel.h"
 
+namespace libMesh
+{
+
 QNTransientSCMSystem::QNTransientSCMSystem (EquationSystems& es,
                                             const std::string& name,
                                             const unsigned int number)
@@ -671,5 +674,7 @@ void QNTransientSCMSystem::read_offline_data_from_files(const std::string& direc
 
   STOP_LOG("read_offline_data_from_files()", "QNTransientSCMSystem");
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK

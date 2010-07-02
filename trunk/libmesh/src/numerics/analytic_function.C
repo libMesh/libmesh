@@ -25,6 +25,9 @@
 // Local Includes
 #include "analytic_function.h"
 
+namespace libMesh
+{
+
 
 
 //------------------------------------------------------------------
@@ -70,3 +73,5 @@ void AnalyticFunction::init ()
   // definitely ready
   this->_initialized = true;
 }
+
+} // namespace libMesh

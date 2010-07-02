@@ -27,6 +27,9 @@
 #include "qn_transient_scm_system.h"
 #include "rb_system.h"
 
+namespace libMesh
+{
+
 QNTransientRBParamSubdomainNode::QNTransientRBParamSubdomainNode(QNTransientRBParamSubdomainTree& tree, const std::vector<Real>& anchor)
   : Parent(tree, anchor),
     _scm_system(tree._scm_system)
@@ -86,5 +89,7 @@ void QNTransientRBParamSubdomainNode::write_subdomain_data_to_files()
   const std::string& directory_name = dir_name_stream.str();
   _scm_system.write_offline_data_to_files(directory_name);
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK

@@ -20,6 +20,9 @@
 
 #include "plt_loader.h"
 
+namespace libMesh
+{
+
 
 
 //---------------------------------------------------------
@@ -98,3 +101,5 @@ void PltLoader::set_n_zones (const unsigned int nz)
     for (unsigned int z=0; z<this->n_zones(); z++)
       _data[z].resize (this->n_vars());
 }
+
+} // namespace libMesh

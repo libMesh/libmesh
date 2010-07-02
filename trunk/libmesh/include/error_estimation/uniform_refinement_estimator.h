@@ -31,6 +31,9 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
+namespace libMesh
+{
+
 /**
  * This class implements a ``brute force'' error estimator
  * which integrates differences between the current solution
@@ -126,6 +129,8 @@ protected:
 			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
 				bool estimate_parent_error = false);
 };
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

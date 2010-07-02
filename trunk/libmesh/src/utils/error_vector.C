@@ -35,6 +35,9 @@
 #include "gmv_io.h"
 #include "tecplot_io.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -273,4 +276,6 @@ void ErrorVector::plot_error(const std::string& filename,
                     << std::endl;
     }
 }
+
+} // namespace libMesh
 

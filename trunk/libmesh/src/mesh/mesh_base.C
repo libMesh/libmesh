@@ -37,6 +37,9 @@
 #include "partitioner.h"
 #include "point_locator_base.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -302,6 +305,8 @@ void MeshBase::clear_point_locator ()
 {
   _point_locator.reset(NULL);
 }
+
+} // namespace libMesh
 
 
 

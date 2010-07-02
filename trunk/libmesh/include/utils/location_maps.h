@@ -43,6 +43,9 @@
 #include "libmesh_common.h"
 #include "point.h"
 
+namespace libMesh
+{
+
 // Forward Declarations -----------------------------
 class Elem;
 class MeshBase;
@@ -101,6 +104,8 @@ private:
   std::vector<Real> _lower_bound;
   std::vector<Real> _upper_bound;
 };
+
+} // namespace libMesh
 
 
 #endif // #define __location_maps_h__

@@ -33,6 +33,9 @@
 #include "libmesh.h"        // needed for libMesh::invalid_uint
 #include "point.h"
 
+namespace libMesh
+{
+
 // forward declarations
 class UnstructuredMesh;
 
@@ -194,5 +197,7 @@ namespace MeshTools
   } // end namespace Meshtools::Generation
 } // end namespace MeshTools
 
+
+} // namespace libMesh
 
 #endif // #define __mesh_generation_h__

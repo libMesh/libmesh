@@ -22,6 +22,9 @@
 // Local includes
 #include "quadrature_simpson.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -149,3 +152,5 @@ void QSimpson::init_3D(const ElemType _type,
   
 #endif
 }
+
+} // namespace libMesh

@@ -27,6 +27,9 @@
 #include "fe_interface.h"
 #include "inf_fe.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -985,6 +988,8 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 
   return;
 }
+
+} // namespace libMesh
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

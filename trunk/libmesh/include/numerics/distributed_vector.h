@@ -39,6 +39,9 @@
 #include "numeric_vector.h"
 #include "parallel.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -865,6 +868,8 @@ void DistributedVector<T>::swap (NumericVector<T> &other)
   // This should be O(1) with any reasonable STL implementation
   std::swap(_values, v._values);
 }
+
+} // namespace libMesh
 
 
 #endif  // #ifdef __distributed_vector_h__

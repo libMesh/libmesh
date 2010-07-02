@@ -23,6 +23,9 @@
 #include "face_tri.h"
 #include "edge_edge2.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -214,3 +217,5 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
 
   return bounds;
 }
+
+} // namespace libMesh

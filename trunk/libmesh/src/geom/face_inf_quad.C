@@ -29,6 +29,9 @@
 #include "edge_edge2.h"
 #include "edge_inf_edge2.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // InfQuad class member functions
@@ -210,6 +213,8 @@ std::pair<Real, Real> InfQuad::qual_bounds (const ElemQuality q) const
 
   return bounds;
 }
+
+} // namespace libMesh
 
 
 

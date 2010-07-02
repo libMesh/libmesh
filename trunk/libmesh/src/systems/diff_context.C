@@ -21,6 +21,9 @@
 #include "diff_context.h"
 #include "diff_system.h"
 
+namespace libMesh
+{
+
 
 
 DiffContext::DiffContext (const DifferentiableSystem& sys) :
@@ -81,6 +84,8 @@ DiffContext::~DiffContext ()
         delete elem_subjacobians[i][j];
     }
 }
+
+} // namespace libMesh
 
 
 

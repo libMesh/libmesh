@@ -25,11 +25,18 @@
 
 #ifdef LIBMESH_ENABLE_PARMESH
 #include "parallel_mesh.h"
+namespace libMesh {
   typedef ParallelMesh DefaultMesh;
+}
 #else
 #include "serial_mesh.h"
+namespace libMesh {
   typedef SerialMesh DefaultMesh;
+}
 #endif
+
+namespace libMesh
+{
 
 // Forward declarations don't like typedefs...
 // typedef SerialMesh Mesh;
@@ -66,6 +73,8 @@ class Mesh : public DefaultMesh
 };
 
 
+
+} // namespace libMesh
 
 
 

@@ -23,6 +23,9 @@
 #include "quadrature_clough.h"
 #include "quadrature_gauss.h"
 
+namespace libMesh
+{
+
 
 void QClough::init_2D(const ElemType _type,
                       unsigned int p)
@@ -83,3 +86,5 @@ void QClough::init_2D(const ElemType _type,
 
 #endif
 }
+
+} // namespace libMesh

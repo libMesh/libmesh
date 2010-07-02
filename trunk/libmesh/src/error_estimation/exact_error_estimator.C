@@ -39,6 +39,9 @@
 #include "quadrature.h"
 #include "system.h"
 
+namespace libMesh
+{
+
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
 void ExactErrorEstimator::attach_exact_value (Number fptr(const Point& p,
@@ -410,3 +413,5 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	  
   return error_val;
 }
+
+} // namespace libMesh

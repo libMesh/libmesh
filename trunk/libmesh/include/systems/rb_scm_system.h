@@ -30,6 +30,9 @@
 #include "eigen_system.h"
 #include "rb_base.h"
 
+namespace libMesh
+{
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -380,6 +383,8 @@ protected:
 private:
 
 };
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 

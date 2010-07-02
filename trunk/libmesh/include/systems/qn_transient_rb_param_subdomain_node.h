@@ -29,6 +29,9 @@
 
 #include "rb_param_subdomain_node.h"
 
+namespace libMesh
+{
+
 // Forward declaration
 class QNTransientSCMSystem;
 class QNTransientRBParamSubdomainTree;
@@ -86,6 +89,8 @@ public:
   QNTransientSCMSystem& _scm_system;
 
 };
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 

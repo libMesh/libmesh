@@ -26,6 +26,9 @@
 
 
 
+namespace libMesh
+{
+
 
 template <>
 Real FE<0,BERNSTEIN>::shape(const ElemType,
@@ -105,3 +108,5 @@ Real FE<0,BERNSTEIN>::shape_second_deriv(const Elem*,
   libmesh_error();
   return 0.;
 }
+
+} // namespace libMesh

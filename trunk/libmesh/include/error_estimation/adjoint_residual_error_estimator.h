@@ -36,6 +36,9 @@
 
 
 
+namespace libMesh
+{
+
 
 /**
  * This class implements a goal oriented error indicator, by weighting
@@ -128,6 +131,8 @@ protected:
   QoISet _qoi_set;
 };
 
+
+} // namespace libMesh
 
 #endif //__adjoint_residual_error_estimator_h__
 

@@ -30,6 +30,9 @@
 #include "reference_counted_object.h"
 #include "diff_solver.h"
 
+namespace libMesh
+{
+
 /**
  * This class defines a solver which uses the default
  * libMesh linear solver in a quasiNewton method to handle a 
@@ -146,6 +149,8 @@ protected:
 			bool linear_solve_finished);
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __newton_solver_h__

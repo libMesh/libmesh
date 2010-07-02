@@ -28,6 +28,9 @@
 #include "cell_tet10.h"
 #include "mesh_data.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // TetgenIO class members
 void TetGenIO::read (const std::string& name)
@@ -308,4 +311,6 @@ void TetGenIO::write (const std::string& fname)
   out << "0\n"; // no holes output!
   out << "\n\n# end of file\n";
 }
+
+} // namespace libMesh
 

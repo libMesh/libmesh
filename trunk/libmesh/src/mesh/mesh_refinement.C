@@ -46,6 +46,9 @@
 #endif // DEBUG
 
 
+namespace libMesh
+{
+
 //-----------------------------------------------------------------
 // Mesh refinement methods
 MeshRefinement::MeshRefinement (MeshBase& m) :
@@ -1656,6 +1659,8 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
   // Finally, the new mesh needs to be prepared for use
   _mesh.prepare_for_use (/*skip_renumber =*/false);
 }
+
+} // namespace libMesh
 
 
 #endif

@@ -30,6 +30,9 @@
 #include "dense_subvector.h"
 #include "parallel.h"
 
+namespace libMesh
+{
+
 
 
 //--------------------------------------------------------------------------
@@ -573,3 +576,5 @@ void DistributedVector<T>::pointwise_mult (const NumericVector<T>&,
 //--------------------------------------------------------------
 // Explicit instantiations
 template class DistributedVector<Number>;
+
+} // namespace libMesh

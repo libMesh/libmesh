@@ -24,6 +24,9 @@
 #include "fe.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -345,3 +348,5 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const Elem* elem,
   return FE<1,LAGRANGE>::shape_second_deriv(elem->type(),
 				            static_cast<Order>(order + elem->p_level()), i, j, p);
 }
+
+} // namespace libMesh

@@ -27,6 +27,9 @@
 // Local Includes -----------------------------------
 #include "mesh.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -56,6 +59,8 @@ class BoundaryMesh : public Mesh
 };
 
 
+
+} // namespace libMesh
 
 
 #endif

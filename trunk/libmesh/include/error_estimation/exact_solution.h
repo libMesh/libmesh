@@ -29,6 +29,9 @@
 #include "libmesh_common.h" // for Number
 #include "enum_norm_type.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 class Point;
@@ -271,6 +274,8 @@ private:
 };
 
 
+
+} // namespace libMesh
 
 
 #endif

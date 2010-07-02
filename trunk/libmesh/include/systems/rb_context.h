@@ -31,6 +31,9 @@
 #include "vector_value.h"
 #include "fe_type.h"
 
+namespace libMesh
+{
+
 // Forward declaration
 class RBSystem;
 class FEBase;
@@ -177,6 +180,8 @@ public:
    */
   unsigned char dim;
 };
+
+} // namespace libMesh
 
 
 #endif

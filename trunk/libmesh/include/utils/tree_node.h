@@ -29,6 +29,9 @@
 #include "libmesh_common.h"
 #include "point.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class MeshBase;
 class Node;
@@ -253,6 +256,8 @@ unsigned int TreeNode<N>::level () const
   return 0;
 }
 
+
+} // namespace libMesh
 
 
 #endif

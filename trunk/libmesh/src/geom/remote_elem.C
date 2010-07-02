@@ -22,6 +22,11 @@
 // Local includes
 #include "remote_elem.h"
 
+namespace libMesh
+{
+
 // Pointer to singleton Remote Element (to be created in
 // libMesh::init()
 const RemoteElem* remote_elem;
+
+} // namespace libMesh

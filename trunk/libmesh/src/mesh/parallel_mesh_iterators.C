@@ -26,6 +26,9 @@
 #include "parallel_mesh.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 // This file contains the implementation of all the different iterator
 // functions for the mesh class.  They were put here to save space in the
 // header files.
@@ -1042,3 +1045,5 @@ ParallelMesh::pid_nodes_end (const unsigned int proc_id) const
   Predicates::PID<const_node_iterator_imp> p(proc_id);
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
 }
+
+} // namespace libMesh

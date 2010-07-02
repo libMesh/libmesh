@@ -29,7 +29,12 @@
 #include "node.h"
 #include "stored_range.h"
 
+namespace libMesh
+{
+
 typedef StoredRange<MeshBase::node_iterator,             Node*>      NodeRange;
 typedef StoredRange<MeshBase::const_node_iterator, const Node*> ConstNodeRange;
+
+} // namespace libMesh
 
 #endif // end #ifndef __node_range_h__

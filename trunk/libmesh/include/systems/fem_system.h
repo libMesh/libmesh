@@ -29,6 +29,9 @@
 #include "diff_system.h"
 #include "fem_context.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 
 
@@ -443,6 +446,8 @@ unsigned int FEMSystem::get_mesh_z_var() const
 {
   return _mesh_z_var;
 }
+
+} // namespace libMesh
 
 
 #endif

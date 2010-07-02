@@ -30,6 +30,9 @@
 #include "libmesh_common.h"
 #include "face.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 
@@ -154,5 +157,7 @@ public:
 // ------------------------------------------------------------
 // Quad class member functions
 
+
+} // namespace libMesh
 
 #endif

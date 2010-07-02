@@ -31,6 +31,9 @@
 #include "parameter_vector.h"
 #include "sparse_matrix.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // NonlinearImplicitSystem implementation
 NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
@@ -185,3 +188,5 @@ void NonlinearImplicitSystem::assembly(bool,
       else libmesh_error();
     }
 }
+
+} // namespace libMesh

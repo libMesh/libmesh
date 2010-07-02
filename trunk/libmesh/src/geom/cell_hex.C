@@ -26,6 +26,9 @@
 #include "cell_hex8.h"
 #include "face_quad4.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -448,3 +451,5 @@ const unsigned short int Hex::_second_order_adjacent_vertices[12][2] =
   { 6,  7}, // vertices adjacent to node 18
   { 4,  7}  // vertices adjacent to node 19
 };
+
+} // namespace libMesh

@@ -34,6 +34,9 @@
 // Local Includes
 #include "linear_implicit_system.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -284,6 +287,8 @@ std::pair<unsigned int, Real> FrequencySystem::get_rval (unsigned int n) const
   return vec_rval[n];
 }
 
+
+} // namespace libMesh
 
 #endif // if defined(LIBMESH_USE_COMPLEX_NUMBERS)
 

@@ -32,6 +32,9 @@
 #include "trilinos_epetra_matrix.h"
 #include "trilinos_epetra_vector.h"
 
+namespace libMesh
+{
+
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
@@ -270,6 +273,8 @@ void AztecLinearSolver<T>::print_converged_reason()
 //------------------------------------------------------------------
 // Explicit instantiations
 template class AztecLinearSolver<Number>;
+
+} // namespace libMesh
  
 
 

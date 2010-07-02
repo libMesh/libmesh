@@ -45,6 +45,9 @@
 #include "NOX_Epetra_Group.H"	// class definition
 #include "NOX_Epetra_Vector.H"
 
+namespace libMesh
+{
+
 class Problem_Interface : public NOX::Epetra::Interface::Required,
 			  public NOX::Epetra::Interface::Jacobian,
 			  public NOX::Epetra::Interface::Preconditioner
@@ -263,6 +266,8 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
 //------------------------------------------------------------------
 // Explicit instantiations
 template class NoxNonlinearSolver<Number>;
+
+} // namespace libMesh
  
 
 

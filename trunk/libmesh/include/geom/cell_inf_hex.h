@@ -29,6 +29,9 @@
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "cell_inf.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -179,6 +182,8 @@ InfHex::InfHex(const unsigned int nn, Elem* p) :
 //   }
 // }
 
+
+} // namespace libMesh
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

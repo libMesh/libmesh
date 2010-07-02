@@ -25,6 +25,9 @@
 // Local Includes
 #include "dense_vector_base.h"
 
+namespace libMesh
+{
+
 template<typename T>
 void DenseVectorBase<T>::print_scientific (std::ostream& os) const
 {
@@ -74,3 +77,5 @@ template class DenseVectorBase<Real>;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseVectorBase<Complex>;
 #endif
+
+} // namespace libMesh

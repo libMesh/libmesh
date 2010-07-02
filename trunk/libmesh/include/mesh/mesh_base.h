@@ -27,14 +27,6 @@
 // C++ Includes   -----------------------------------
 #include <string>
 
-// forward declarations
-class Elem;
-class Node;
-class Point;
-class BoundaryInfo;
-class PointLocatorBase;
-class MeshData;
-
 // Local Includes -----------------------------------
 #include "auto_ptr.h"
 #include "dof_object.h" // for invalid_processor_id
@@ -43,6 +35,17 @@ class MeshData;
 #include "multi_predicates.h"
 #include "partitioner.h"
 #include "variant_filter_iterator.h"
+
+namespace libMesh
+{
+
+// forward declarations
+class Elem;
+class Node;
+class Point;
+class BoundaryInfo;
+class PointLocatorBase;
+class MeshData;
 
 
 
@@ -859,5 +862,7 @@ variant_filter_iterator<MeshBase::Predicate,
   }
 };
 
+
+} // namespace libMesh
 
 #endif

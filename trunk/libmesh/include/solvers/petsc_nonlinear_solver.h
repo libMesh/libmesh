@@ -38,6 +38,9 @@ EXTERN_C_FOR_PETSC_BEGIN
 # include <petscsnes.h>
 EXTERN_C_FOR_PETSC_END
 
+namespace libMesh
+{
+
 
 
 /**
@@ -120,6 +123,8 @@ PetscNonlinearSolver<T>::~PetscNonlinearSolver ()
   this->clear ();
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC

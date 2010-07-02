@@ -27,6 +27,9 @@
 // Local Includes -----------------------------------
 #include "partitioner.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -68,6 +71,8 @@ private:
   
 };
 
+
+} // namespace libMesh
 
 
 

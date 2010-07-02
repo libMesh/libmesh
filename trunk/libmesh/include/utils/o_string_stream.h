@@ -183,6 +183,9 @@ typedef std::ostringstream OStringStream;
 // # define OSSOStringStream           OStringStream
 
 
+namespace libMesh
+{
+
 
  /**
   * This class provides a compatibility class for broken
@@ -378,6 +381,8 @@ typedef std::ostringstream OStringStream;
      *this << c;
  }
 
+
+} // namespace libMesh
 
 #endif // ifndef ... else ... LIBMESH_BROKEN_IOSTREAM
 

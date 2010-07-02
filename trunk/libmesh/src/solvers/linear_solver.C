@@ -30,6 +30,9 @@
 #include "auto_ptr.h"
 #include "preconditioner.h"
 
+namespace libMesh
+{
+
 //------------------------------------------------------------------
 // LinearSolver members
 template <typename T>
@@ -116,6 +119,8 @@ LinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LinearSolver<Number>;
+
+} // namespace libMesh
 
 
 

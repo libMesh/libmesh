@@ -23,6 +23,9 @@
 // Local includes
 #include "xdr_mgf.h"
 
+namespace libMesh
+{
+
 /**
  * The \p XdrHEAD class.  This is a base class for deriving either
  * solution (\p XdrSHEAD) or mesh (\p XdrMHEAD) header interface
@@ -200,6 +203,8 @@ private:
   const XdrHEAD& operator=(const XdrHEAD&);
 };
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __xdr_head_h__

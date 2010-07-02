@@ -32,6 +32,9 @@
 #include "face_inf_quad6.h"
 #include "side.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // InfHex16 class static member initializations
@@ -401,5 +404,7 @@ const float InfHex16::_embedding_matrix[4][16][16] =
 
 
 #endif
+
+} // namespace libMesh
 
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

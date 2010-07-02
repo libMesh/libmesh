@@ -24,6 +24,9 @@
 #include "fe.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -1309,3 +1312,5 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const Elem* elem,
   // call the orientation-independent shape function derivatives
   return FE<3,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
 }
+
+} // namespace libMesh

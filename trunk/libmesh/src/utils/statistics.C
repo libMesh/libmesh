@@ -27,6 +27,9 @@
 #include "statistics.h"
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -393,3 +396,5 @@ template class StatisticsVector<long double>;
 #endif
 template class StatisticsVector<int>;
 template class StatisticsVector<unsigned int>;
+
+} // namespace libMesh

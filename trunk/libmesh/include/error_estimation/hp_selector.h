@@ -30,6 +30,9 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
+namespace libMesh
+{
+
 // Forward Declarations
 class System;
 
@@ -75,6 +78,8 @@ public:
    */
   std::vector<float> component_scale;
 };
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

@@ -26,6 +26,9 @@
 #include "utility.h"
 #include "plt_loader.h"
 
+namespace libMesh
+{
+
 
 
 //-----------------------------------------------------------------------------
@@ -1170,3 +1173,5 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
       }
   }
 }
+
+} // namespace libMesh

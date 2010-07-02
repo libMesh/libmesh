@@ -30,6 +30,9 @@
 #include "quadrature.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -281,6 +284,8 @@ INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,edge_reinit(const Elem*,const unsigned 
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
+
+} // namespace libMesh
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

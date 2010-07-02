@@ -29,6 +29,9 @@
 // Local Includes
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 
 
 // Forward Declarations
@@ -155,5 +158,7 @@ void FunctionBase::operator() (const Point& p,
   // Call the time-dependent function with t=0.
   this->operator()(p, 0., output);
 }
+
+} // namespace libMesh
 
 #endif

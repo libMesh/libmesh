@@ -22,6 +22,9 @@
 // Local includes
 #include "edge_edge4.h"
 
+namespace libMesh
+{
+
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Edge4::_embedding_matrix[2][4][4] =
@@ -162,3 +165,5 @@ void Edge4::connectivity(const unsigned int sc,
   }
 
 }
+
+} // namespace libMesh

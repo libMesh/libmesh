@@ -26,6 +26,9 @@
 #include "preconditioner.h"
 #include "petsc_preconditioner.h"
 
+namespace libMesh
+{
+
 //------------------------------------------------------------------
 // Preconditioner members
 template <typename T>
@@ -77,6 +80,8 @@ Preconditioner<T>::build(const SolverPackage solver_package)
 //------------------------------------------------------------------
 // Explicit instantiations
 template class Preconditioner<Number>;
+
+} // namespace libMesh
 
 
 

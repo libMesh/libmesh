@@ -33,6 +33,9 @@
 // Local includes
 #include "face_inf_quad.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -200,6 +203,8 @@ private:
 
 };
 
+
+} // namespace libMesh
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

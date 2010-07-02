@@ -38,6 +38,9 @@
 #include "NOX_Epetra_Interface_Preconditioner.H" // base class	
 #include "NOX.H"
 
+namespace libMesh
+{
+
 // Forward declarations
 class Problem_Interface;
 
@@ -120,6 +123,8 @@ NoxNonlinearSolver<T>::~NoxNonlinearSolver ()
   this->clear ();
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_NOX

@@ -24,6 +24,9 @@
 // Local includes
 #include "plt_loader.h"
 
+namespace libMesh
+{
+
 
 
 // extern "C" {
@@ -570,3 +573,5 @@ void PltLoader::write_dat (const std::string& name,
 	}
     }
 }
+
+} // namespace libMesh

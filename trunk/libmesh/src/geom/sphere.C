@@ -27,6 +27,9 @@
 #include "tensor_value.h"
 #include "sphere.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -200,3 +203,5 @@ Point Sphere::unit_normal (const Point& p) const
 
   return n.unit();
 }
+
+} // namespace libMesh

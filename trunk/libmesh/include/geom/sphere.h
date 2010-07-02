@@ -30,6 +30,9 @@
 #include "surface.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 
 /**
  * This class defines a sphere.  It also computes coordinate
@@ -223,6 +226,8 @@ Point Sphere::world_coords (const Point& sph) const
 }
 
 
+
+} // namespace libMesh
 
 
 #endif

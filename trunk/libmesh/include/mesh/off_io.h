@@ -24,6 +24,9 @@
 #include "libmesh_common.h"
 #include "mesh_input.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 
@@ -69,6 +72,8 @@ OFFIO::OFFIO (MeshBase& mesh) :
   MeshInput<MeshBase> (mesh)
 {}
 
+
+} // namespace libMesh
 
 
 #endif

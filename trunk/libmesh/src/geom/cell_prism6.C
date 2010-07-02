@@ -27,6 +27,9 @@
 #include "face_quad4.h"
 #include "face_tri3.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -440,4 +443,6 @@ Real Prism6::volume () const
 
   // Done with all sub-volumes, so return
   return vol;
- }
+}
+
+} // namespace libMesh

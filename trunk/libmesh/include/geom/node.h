@@ -30,6 +30,9 @@
 #include "reference_counted_object.h"
 #include "auto_ptr.h"
 
+namespace libMesh
+{
+
 
 // forward declarations
 class Node;
@@ -294,6 +297,8 @@ bool Node::active () const
   return (this->id() != Node::invalid_id);
 }
 
+
+} // namespace libMesh
 
 
 #endif

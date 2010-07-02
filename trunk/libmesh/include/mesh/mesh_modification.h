@@ -29,6 +29,9 @@
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 // forward declarations
 class MeshBase;
 
@@ -137,6 +140,8 @@ namespace MeshTools
 
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools
+
+} // namespace libMesh
 
 
 #endif // #define __mesh_modification_h__

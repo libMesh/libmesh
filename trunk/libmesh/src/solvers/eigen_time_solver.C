@@ -28,6 +28,9 @@
 #include "eigen_solver.h"
 #include "sparse_matrix.h"
 
+namespace libMesh
+{
+
 // Constructor
 EigenTimeSolver::EigenTimeSolver (sys_type& s)
   : Parent(s),
@@ -210,5 +213,7 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
       return false;
     }
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC

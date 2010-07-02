@@ -29,6 +29,9 @@
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -80,6 +83,8 @@ Point InfCell::origin () const
   return ( this->point(0)*2 - this->point( this->n_vertices()/2 ) );
 }
 
+
+} // namespace libMesh
 
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

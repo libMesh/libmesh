@@ -30,6 +30,9 @@
 #include "dense_matrix.h"
 #include "parallel.h"
 
+namespace libMesh
+{
+
 
 
 //-----------------------------------------------------------------------
@@ -385,6 +388,8 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T>&) const
 //------------------------------------------------------------------
 // Explicit instantiations
 template class EpetraMatrix<Number>;
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_TRILINOS

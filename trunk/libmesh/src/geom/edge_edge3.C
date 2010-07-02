@@ -22,6 +22,9 @@
 // Local includes
 #include "edge_edge3.h"
 
+namespace libMesh
+{
+
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Edge3::_embedding_matrix[2][3][3] =
@@ -188,3 +191,5 @@ Real Edge3::volume () const
 			   (ca - 0.25*ba*ba)*std::log( (1.-0.5*ba+s1)/(-1.-0.5*ba+s2) )
 			   );
 }
+
+} // namespace libMesh

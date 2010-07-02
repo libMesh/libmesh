@@ -27,6 +27,9 @@
 // Local includes
 #include "cell.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -124,5 +127,7 @@ Pyramid::Pyramid(const unsigned int nn, Elem* p) :
   Cell(nn, Pyramid::n_sides(), p) 
 {
 }
+
+} // namespace libMesh
 
 #endif

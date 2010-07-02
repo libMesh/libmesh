@@ -27,6 +27,9 @@
 #include "mesh_base.h"
 #include "gnuplot_io.h"
 
+namespace libMesh
+{
+
 GnuPlotIO::GnuPlotIO(const MeshBase& mesh,
 		     const std::string& title, 
                      int mesh_properties)
@@ -221,3 +224,5 @@ void GnuPlotIO::write_solution(const std::string& fname,
 
   data.close();
 }
+
+} // namespace libMesh

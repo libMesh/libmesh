@@ -56,6 +56,9 @@
 #endif
 
 
+namespace libMesh
+{
+
 /**
  * This class is taken directly from MGF.  It facilitates reading
  * and writing binary solution/mesh files using the \p xdr binary
@@ -270,6 +273,8 @@ private:
   }
 };
 
+
+} // namespace libMesh
 
   
 #endif // #ifndef __xdr_mgf_h__

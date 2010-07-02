@@ -27,6 +27,9 @@
 #include "face_quad8.h"
 #include "face_tri6.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -323,6 +326,8 @@ Prism15::second_order_child_vertex (const unsigned int n) const
     (_second_order_vertex_child_number[n],
      _second_order_vertex_child_index[n]);
 }
+
+} // namespace libMesh
 
 
 

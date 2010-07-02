@@ -31,6 +31,9 @@
 #include "qoi_set.h"
 
 
+namespace libMesh
+{
+
 //-----------------------------------------------------------------
 // AdjointResidualErrorEstimator implementations
 AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
@@ -125,3 +128,5 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
 
   STOP_LOG("estimate_error()", "AdjointResidualErrorEstimator");
 }
+
+} // namespace libMesh

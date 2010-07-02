@@ -31,6 +31,9 @@
 #include "face_quad4.h"
 #include "face_inf_quad4.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -435,6 +438,8 @@ const unsigned short int InfHex::_second_order_vertex_child_index[18] =
   5,6,7,7,2,               // Faces
   6                        // Interior
 };
+
+} // namespace libMesh
 
 
 

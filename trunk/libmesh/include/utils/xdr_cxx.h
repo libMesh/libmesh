@@ -48,6 +48,9 @@
 #define xdr_REAL xdr_float
 #endif
 
+namespace libMesh
+{
+
 
 
 //--------------------------------------------------------------
@@ -225,6 +228,8 @@ private:
   bool bzipped_file;
 };
 
+
+} // namespace libMesh
 
 
 #endif

@@ -27,6 +27,9 @@
 // Local includes
 #include "cell_pyramid.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -170,6 +173,8 @@ Pyramid5::Pyramid5(Elem* p) :
   Pyramid(Pyramid5::n_nodes(), p) 
 {
 }
+
+} // namespace libMesh
 
 
 #endif

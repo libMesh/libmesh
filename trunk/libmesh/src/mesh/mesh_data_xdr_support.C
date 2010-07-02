@@ -28,6 +28,9 @@
 #include "xdr_cxx.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 //------------------------------------------------------
 // MeshData functions
@@ -488,5 +491,7 @@ better_you_choke_this...
       }
     }
 }
+
+} // namespace libMesh
 
 

@@ -22,6 +22,9 @@
 // Local includes
 #include "quadrature_gm.h"
 
+namespace libMesh
+{
+
 
 
 void QGrundmann_Moller::init_3D(const ElemType _type,
@@ -67,3 +70,5 @@ void QGrundmann_Moller::init_3D(const ElemType _type,
   libmesh_error();
   return;
 }
+
+} // namespace libMesh

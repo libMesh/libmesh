@@ -27,6 +27,9 @@
 #include "utility.h"
 
 
+namespace libMesh
+{
+
 template <>
 Real FE<2,HIERARCHIC>::shape(const ElemType,
 			     const Order,
@@ -453,3 +456,5 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem* elem,
 	  FE<2,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm)
 	  )/2./eps;
 }
+
+} // namespace libMesh

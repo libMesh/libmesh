@@ -24,6 +24,9 @@
 #include "edge_edge2.h"
 #include "face_tri3.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -233,3 +236,5 @@ std::pair<Real, Real> Tri3::min_and_max_angle() const
   return std::make_pair(std::min(theta0, std::min(theta1,theta2)),
 			std::max(theta0, std::max(theta1,theta2)));
 }
+
+} // namespace libMesh

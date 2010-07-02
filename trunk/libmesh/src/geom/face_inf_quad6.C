@@ -30,6 +30,9 @@
 #include "side.h"
 #include "edge_inf_edge2.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -260,6 +263,8 @@ InfQuad6::second_order_child_vertex (const unsigned int n) const
   return std::pair<unsigned short int, unsigned short int>
     (0, 2*n-7);
 }
+
+} // namespace libMesh
 
 
 

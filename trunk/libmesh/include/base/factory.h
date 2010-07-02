@@ -31,6 +31,9 @@
 #include "libmesh_common.h"
 #include "auto_ptr.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -173,5 +176,7 @@ AutoPtr<Base> FactoryImp<Derived,Base>::create ()
   return ret_val;
 }
 
+
+} // namespace libMesh
 
 #endif

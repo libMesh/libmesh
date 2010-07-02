@@ -30,6 +30,9 @@
 
 #include "cell_inf_prism.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -205,6 +208,8 @@ InfPrism6::InfPrism6(Elem* p) :
 {
 }
 
+
+} // namespace libMesh
 
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

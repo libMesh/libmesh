@@ -29,6 +29,9 @@
 // Local includes
 #include "libmesh_common.h"
 
+namespace libMesh
+{
+
 /**
  * The StatisticsVector class is derived from
  * the std::vector<> and therefore has all of
@@ -224,5 +227,7 @@ class StatisticsVector : public std::vector<T>
  private:
   
 };
+
+} // namespace libMesh
 
 #endif

@@ -29,6 +29,9 @@
 // Local Includes
 #include "error_estimator.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class Elem;
 class FEBase;
@@ -197,6 +200,8 @@ private:
   int _extra_order;
 };
 
+
+} // namespace libMesh
 
 #endif
 

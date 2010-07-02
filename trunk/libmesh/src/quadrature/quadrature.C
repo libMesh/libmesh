@@ -23,6 +23,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 void QBase::init(const ElemType t,
                  unsigned int p)
 {
@@ -198,3 +201,5 @@ std::ostream& operator << (std::ostream& os, const QBase& q)
   q.print_info(os);
   return os;
 }
+
+} // namespace libMesh

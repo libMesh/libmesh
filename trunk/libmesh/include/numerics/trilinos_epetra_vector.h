@@ -41,6 +41,9 @@
 class Epetra_IntSerialDenseVector;
 class Epetra_SerialDenseVector;
 
+namespace libMesh
+{
+
 // forward declarations
 template <typename T> class SparseMatrix;
 
@@ -964,6 +967,8 @@ void EpetraVector<T>::swap (NumericVector<T> &other)
   std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
 }
+
+} // namespace libMesh
 
 
 #endif // #ifdef HAVE_EPETRA

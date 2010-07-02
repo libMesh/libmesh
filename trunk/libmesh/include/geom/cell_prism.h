@@ -27,6 +27,9 @@
 // Local includes
 #include "cell.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -131,5 +134,7 @@ Prism::Prism(const unsigned int nn, Elem* p) :
   Cell(nn, Prism::n_sides(), p) 
 {
 }
+
+} // namespace libMesh
 
 #endif

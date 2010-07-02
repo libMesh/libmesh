@@ -32,6 +32,9 @@
 #include "mesh_refinement.h"
 #include "mesh.h"
 
+namespace libMesh
+{
+
 /**
  * This is a generic class that defines a adaptive to be used in a
  * simulation.  A user can define a adaptive by deriving from this
@@ -195,6 +198,8 @@ void Adaptive<T>::solve ()
       T::solve ();
     }
 }
+
+} // namespace libMesh
 
 
 #endif // #define __adaptive_h__

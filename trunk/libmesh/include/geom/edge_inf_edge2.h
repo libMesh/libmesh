@@ -30,6 +30,9 @@
 
 #include "edge.h"
 
+namespace libMesh
+{
+
 
 /**
  * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes. 
@@ -167,6 +170,8 @@ Point InfEdge2::origin () const
   return ( this->point(0)*2 - this->point(1) );
 }
 
+
+} // namespace libMesh
 
 #endif
 

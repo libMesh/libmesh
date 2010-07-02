@@ -27,6 +27,9 @@
 #include "face_tri3.h"
 #include "face_quad4.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -278,3 +281,5 @@ Real Pyramid5::volume () const
   // Finally, ready to return the volume!
   return (1./6.)*(v40*(v13.cross(v02))) + (1./12.)*(v02*(v01.cross(v03)));
 }
+
+} // namespace libMesh

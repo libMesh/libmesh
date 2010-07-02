@@ -31,6 +31,9 @@
 
 #include "libmesh_common.h" // for libmesh_assert()
 
+namespace libMesh
+{
+
 namespace Parallel {
 
   /**
@@ -159,6 +162,8 @@ double Histogram<KeyType>::upper_bound (const unsigned int bin) const
 }
 
 }
+
+} // namespace libMesh
 
 #endif
 

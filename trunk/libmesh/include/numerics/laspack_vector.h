@@ -44,6 +44,9 @@
 #include <qvector.h>
 #include <operats.h>
 
+namespace libMesh
+{
+
 
 // Forward declarations
 template <typename T> class LaspackLinearSolver;
@@ -741,6 +744,8 @@ void LaspackVector<T>::swap (NumericVector<T> &other)
   std::swap(_vec.Cmp, v._vec.Cmp);
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK

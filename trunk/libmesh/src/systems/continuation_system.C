@@ -24,6 +24,9 @@
 #include "newton_solver.h"
 #include "sparse_matrix.h"
 
+namespace libMesh
+{
+
 ContinuationSystem::ContinuationSystem (EquationSystems& es,
 					const std::string& name,
 					const unsigned int number)
@@ -1419,3 +1422,5 @@ void ContinuationSystem::apply_predictor()
     }
   
 }
+
+} // namespace libMesh

@@ -27,6 +27,9 @@
 #include "mesh.h"
 #include "quadrature.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 
 void NavierSystem::init_data ()
 {

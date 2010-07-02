@@ -30,6 +30,9 @@
 // Local includes
 #include "time_solver.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 template <typename T> class EigenSolver;
 
@@ -206,6 +209,8 @@ private:
   NowAssembling now_assembling;
   
 };
+
+} // namespace libMesh
 
 
 #endif // LIBMESH_HAVE_SLEPC

@@ -98,6 +98,9 @@
 // # define OFSOFStream                    OFStream
 
 
+namespace libMesh
+{
+
 
  /**
   * This class provides a compatibility class for broken
@@ -137,6 +140,8 @@
 
  };
 
+
+} // namespace libMesh
 
  // ------------------------------------------------------------
  // OFStream inline methods

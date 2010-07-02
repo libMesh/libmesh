@@ -29,6 +29,9 @@
 #include "mesh_input.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 class MeshData;
@@ -214,6 +217,8 @@ class LegacyXdrIO : public MeshInput<MeshBase>,
 };
 
 
+
+} // namespace libMesh
 
 
 

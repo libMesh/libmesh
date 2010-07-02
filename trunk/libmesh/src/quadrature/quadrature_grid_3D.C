@@ -22,6 +22,9 @@
 // Local includes
 #include "quadrature_grid.h"
 
+namespace libMesh
+{
+
 
 void QGrid::init_3D(const ElemType _type,
                     unsigned int)
@@ -148,3 +151,5 @@ void QGrid::init_3D(const ElemType _type,
   
 #endif
 }
+
+} // namespace libMesh

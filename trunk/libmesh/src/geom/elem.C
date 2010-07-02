@@ -57,6 +57,9 @@
 #include "remote_elem.h"
 #include "mesh_base.h"
 
+namespace libMesh
+{
+
 // Initialize static member variables
 const unsigned int Elem::_bp1 = 65449;
 const unsigned int Elem::_bp2 = 48661;
@@ -1607,3 +1610,5 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
   
   return elem;
 }
+
+} // namespace libMesh

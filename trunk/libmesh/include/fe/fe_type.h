@@ -31,6 +31,9 @@
 #include "enum_fe_family.h"
 #include "enum_inf_map_type.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class QBase;
 
@@ -192,6 +195,8 @@ Order FEType::default_quadrature_order () const
 {
   return static_cast<Order>(2*static_cast<unsigned int>(order) + 1);
 }
+
+} // namespace libMesh
 
 
 #endif // #ifndef __fe_type_h__

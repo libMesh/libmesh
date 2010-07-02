@@ -31,6 +31,9 @@
 // Basic include files needed for the mesh functionality.
 #include "mesh.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 int main (int argc, char** argv)
 {
   // Initialize the library.  This is necessary because the library

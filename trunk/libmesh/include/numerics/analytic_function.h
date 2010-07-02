@@ -28,6 +28,9 @@
 // Local Includes
 #include "function_base.h"
 
+namespace libMesh
+{
+
 
 
 // Forward Declarations
@@ -130,6 +133,8 @@ void AnalyticFunction::operator() (const Point& p,
   return;
 }
 
+
+} // namespace libMesh
 
 
 #endif

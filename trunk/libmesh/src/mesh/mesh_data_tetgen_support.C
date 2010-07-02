@@ -25,6 +25,9 @@
 // Local includes
 #include "mesh_data.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -172,3 +175,5 @@ void MeshData::read_tetgen (const std::string& name)
   node_stream.close();
   ele_stream.close();
 }
+
+} // namespace libMesh

@@ -21,6 +21,9 @@
 // Local Includes
 #include "dense_submatrix.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -69,3 +72,5 @@ template class DenseSubMatrix<Real>;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseSubMatrix<Complex>;
 #endif
+
+} // namespace libMesh

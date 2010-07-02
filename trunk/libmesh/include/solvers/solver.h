@@ -29,6 +29,9 @@
 #include "reference_counted_object.h"
 #include "equation_systems.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class MeshBase;
 class Solver;
@@ -201,6 +204,8 @@ void Solver::post_process ()
 //  std::cout << "Post-processing"
 //	    << std::endl;
 }
+
+} // namespace libMesh
 
 
 #endif // #define __solver_h__

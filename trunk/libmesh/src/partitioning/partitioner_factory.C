@@ -31,6 +31,9 @@
 #include "morton_sfc_partitioner.h"
 #include "factory.h"
 
+namespace libMesh
+{
+
 
 //-------------------------------------------------
 // Full specialization for the Factory<Partitioner>
@@ -68,3 +71,5 @@ namespace {
   FactoryImp<CentroidPartitioner,   Partitioner> centroid ("Centroid");
   
 }
+
+} // namespace libMesh

@@ -21,6 +21,9 @@
 // Local Includes
 #include "dense_vector.h"
 
+namespace libMesh
+{
+
 
 
 //--------------------------------------------------------------
@@ -30,3 +33,5 @@ template class DenseVector<Real>;
 //#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseVector<Complex>;
 //#endif
+
+} // namespace libMesh

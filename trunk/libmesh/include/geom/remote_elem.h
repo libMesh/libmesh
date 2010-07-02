@@ -25,6 +25,9 @@
 // Local includes
 #include "elem.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 
 
@@ -166,5 +169,7 @@ class RemoteElem : public Elem
 
 // Singleton RemoteElem
 extern const RemoteElem* remote_elem;
+
+} // namespace libMesh
 
 #endif // end #ifndef __remote_elem_h__

@@ -28,6 +28,9 @@
 #include "fe_base.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 // forward declarations
 class DofConstraints;
 class DofMap;
@@ -828,5 +831,7 @@ FEScalar<Dim>::FEScalar (const FEType& fet) :
   FE<Dim,SCALAR> (fet)
 {
 }
+
+} // namespace libMesh
 
 #endif

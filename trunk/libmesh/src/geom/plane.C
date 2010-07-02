@@ -24,6 +24,9 @@
 // Local includes
 #include "plane.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -184,3 +187,5 @@ Point Plane::unit_normal (const Point&) const
 {
   return _normal;
 }
+
+} // namespace libMesh

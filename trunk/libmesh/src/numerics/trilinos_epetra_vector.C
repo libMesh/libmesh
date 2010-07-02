@@ -41,6 +41,9 @@
 #include <Epetra_SerialDenseVector.h>
 #include <Epetra_Vector.h>
 
+namespace libMesh
+{
+
 template <typename T>
 T EpetraVector<T>::sum () const
 {
@@ -1059,5 +1062,7 @@ void EpetraVector<T>::destroyNonlocalData()
 //------------------------------------------------------------------
 // Explicit instantiations
 template class EpetraVector<Number>;
+
+} // namespace libMesh
 
 #endif // #ifdef HAVE_EPETRA

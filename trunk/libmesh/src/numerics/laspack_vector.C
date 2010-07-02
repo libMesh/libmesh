@@ -32,6 +32,9 @@
 
 #ifdef LIBMESH_HAVE_LASPACK
 
+namespace libMesh
+{
+
 template <typename T>
 T LaspackVector<T>::sum () const
 {
@@ -460,6 +463,8 @@ Real LaspackVector<T>::min () const
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LaspackVector<Number>;
+
+} // namespace libMesh
  
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK

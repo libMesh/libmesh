@@ -34,6 +34,9 @@
 
 #include <ctime>
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // RBBase implementation
 
@@ -757,3 +760,5 @@ template class RBBase<EigenSystem>;
 #endif
 
 template class RBBase<LinearImplicitSystem>;
+
+} // namespace libMesh

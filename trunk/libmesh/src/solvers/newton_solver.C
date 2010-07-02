@@ -30,6 +30,9 @@
 #include "parameter_vector.h"
 #include "sparse_matrix.h"
 
+namespace libMesh
+{
+
 // SIGN from Numerical Recipes
 template <typename T>
 inline
@@ -613,3 +616,5 @@ void NewtonSolver::print_convergence(unsigned int step_num,
                     << std::endl;
     }
 }
+
+} // namespace libMesh

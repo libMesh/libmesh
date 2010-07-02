@@ -35,6 +35,9 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
+namespace libMesh
+{
+
 
 // forward declarations
 template <typename T> class NumericVector;
@@ -843,6 +846,8 @@ void  NumericVector<T>::swap (NumericVector<T> &v)
   std::swap(_type, v._type);
 }
 
+
+} // namespace libMesh
 
 
 #endif  // #ifdef __numeric_vector_h__

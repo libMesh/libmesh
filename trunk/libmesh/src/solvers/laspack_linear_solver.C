@@ -30,6 +30,9 @@
 #include "laspack_linear_solver.h"
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 // #ifndef LIBMESH_USE_COMPLEX_NUMBERS
 // extern "C"
 // {
@@ -348,6 +351,8 @@ void LaspackLinearSolver<T>::print_converged_reason()
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LaspackLinearSolver<Number>;
+
+} // namespace libMesh
  
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK

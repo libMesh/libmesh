@@ -27,6 +27,9 @@
 #include "point_locator_tree.h"
 #include "point_locator_list.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -83,4 +86,6 @@ AutoPtr<PointLocatorBase> PointLocatorBase::build (const PointLocatorType t,
   AutoPtr<PointLocatorBase> ap(NULL);
   return ap;
 }
+
+} // namespace libMesh
 

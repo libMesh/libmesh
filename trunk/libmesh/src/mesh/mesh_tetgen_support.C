@@ -31,6 +31,9 @@
 #include "unstructured_mesh.h"
 #include "mesh_tetgen_support.h"
 
+namespace libMesh
+{
+
 
 //----------------------------------------------------------------------
 // TetGenMeshInterface functions
@@ -577,6 +580,8 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
       this->_mesh.add_elem(elem);
     }
 }
+
+} // namespace libMesh
 
 
 #endif // #ifdef LIBMESH_HAVE_TETGEN

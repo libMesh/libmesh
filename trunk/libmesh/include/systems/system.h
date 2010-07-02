@@ -37,6 +37,9 @@
 #include "reference_counted_object.h"
 #include "system_norm.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class System;
 class EquationSystems;
@@ -1633,5 +1636,7 @@ System::qoi_parameter_hessian_vector_product(const QoISet&,
 {
   libmesh_not_implemented();
 }
+
+} // namespace libMesh
 
 #endif // #define __system_h__

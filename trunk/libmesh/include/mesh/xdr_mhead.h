@@ -28,6 +28,9 @@
 #include "xdr_mesh.h" // for friend
 #include "enum_elem_type.h" // for ElemType
 
+namespace libMesh
+{
+
 /**
  * The \p XdrMHEAD class.
  * This class is responsible
@@ -150,5 +153,7 @@ private:
   std::vector<unsigned int> num_elem_each_block;
 
 };
+
+} // namespace libMesh
 
 #endif // #ifndef __xdr_mhead_h__

@@ -28,6 +28,9 @@
 // Local includes
 #include "enum_quadrature_type.h"
 
+namespace libMesh
+{
+
 
 /**
  * A namespace for utility functions for
@@ -66,6 +69,8 @@ namespace QuadratureRules
    */
   std::string name (const QuadratureType t);
 }
+
+} // namespace libMesh
 
 #endif
 

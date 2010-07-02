@@ -22,6 +22,9 @@
 #include "quadrature_gauss.h"
 #include "quadrature_jacobi.h"
 
+namespace libMesh
+{
+
 // See also the files:
 // quadrature_conical_2D.C
 // quadrature_conical_3D.C
@@ -208,3 +211,5 @@ void QConical::conical_product_pyramid(unsigned int p)
   
   
 }
+
+} // namespace libMesh

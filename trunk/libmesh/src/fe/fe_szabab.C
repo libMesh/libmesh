@@ -27,6 +27,9 @@
 #include "fe_macro.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -1233,5 +1236,7 @@ INSTANTIATE_MBRF(0,SZABAB);
 INSTANTIATE_MBRF(1,SZABAB);
 INSTANTIATE_MBRF(2,SZABAB);
 INSTANTIATE_MBRF(3,SZABAB);
+
+} // namespace libMesh
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES

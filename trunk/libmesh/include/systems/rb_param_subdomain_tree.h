@@ -23,6 +23,9 @@
 #include "libmesh_common.h"
 #include <vector>
 
+namespace libMesh
+{
+
 // Forward declaration
 class RBSystem;
 class RBParamSubdomainNode;
@@ -160,5 +163,7 @@ public:
   int leaf_node_index;
 
 };
+
+} // namespace libMesh
 
 #endif

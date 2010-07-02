@@ -27,6 +27,9 @@
 // Local Includes
 #include "implicit_system.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 template <typename T> class LinearSolver;
@@ -186,6 +189,8 @@ protected:
 
 };
 
+
+} // namespace libMesh
 
 
 // ------------------------------------------------------------

@@ -28,6 +28,9 @@
 // Local includes
 #include "time_solver.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class DiffContext;
 class DifferentiableSystem;
@@ -100,6 +103,8 @@ public:
   virtual Real du(const SystemNorm&) const { return 0; };
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __steady_solver_h__

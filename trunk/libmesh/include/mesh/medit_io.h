@@ -26,6 +26,9 @@
 #include "libmesh_common.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations:
 class MeshBase;
 
@@ -124,6 +127,8 @@ bool & MEDITIO::binary ()
   return _binary;
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __medit_io_h__

@@ -24,6 +24,9 @@
 #include "fe.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 template <>
 Real FE<1,SCALAR>::shape(const ElemType,
 			   const Order,
@@ -81,3 +84,5 @@ Real FE<1,SCALAR>::shape_second_deriv(const Elem*,
 {
   return 0.;
 }
+
+} // namespace libMesh

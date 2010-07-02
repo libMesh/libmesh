@@ -30,6 +30,9 @@
 #include "dense_matrix.h"
 #include "dense_subvector.h"
 
+namespace libMesh
+{
+
 
 
 /**
@@ -255,6 +258,8 @@ T & DenseSubMatrix<T>::operator () (const unsigned int i,
 			 j + this->j_off());
 }
 
+
+} // namespace libMesh
 
 
 #endif // #ifndef __dense_matrix_h__

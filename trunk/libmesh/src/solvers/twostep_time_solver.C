@@ -23,6 +23,9 @@
 #include "euler_solver.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 
 
 TwostepTimeSolver::TwostepTimeSolver (sys_type& s)
@@ -238,3 +241,5 @@ void TwostepTimeSolver::solve()
       libMesh::out << "new delta t = " << _system.deltat << std::endl;
     }
 }
+
+} // namespace libMesh

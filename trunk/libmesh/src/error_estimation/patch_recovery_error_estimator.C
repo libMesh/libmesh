@@ -41,6 +41,9 @@
 #include "numeric_vector.h"
 #include "tensor_value.h"
 
+namespace libMesh
+{
+
 
 //-----------------------------------------------------------------
 // PatchRecoveryErrorEstimator implementations
@@ -606,3 +609,5 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 
     } // end element loop
 }
+
+} // namespace libMesh

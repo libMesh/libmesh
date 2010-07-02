@@ -27,6 +27,9 @@
 // Local includes
 #include "cell.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -115,5 +118,7 @@ Tet::Tet(const unsigned int nn, Elem* p) :
   Cell(nn, Tet::n_sides(), p) 
 {
 }
+
+} // namespace libMesh
 
 #endif

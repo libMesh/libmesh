@@ -23,6 +23,9 @@
 // Local includes
 #include "node.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -73,3 +76,5 @@ MPI_Datatype Node::PackedNode::create_mpi_datatype ()
   return packed_node_type;
 }
 #endif // #ifdef LIBMESH_HAVE_MPI
+
+} // namespace libMesh

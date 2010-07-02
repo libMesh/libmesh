@@ -40,6 +40,9 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
+namespace libMesh
+{
+
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
 void UniformRefinementEstimator::estimate_error (const System& _system,
@@ -633,5 +636,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   // Restore old partitioner settings
   mesh.partitioner() = old_partitioner;
 }
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR

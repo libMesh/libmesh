@@ -22,6 +22,9 @@
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
+namespace libMesh
+{
+
 
 // Initialize the various integer members to zero.  We can check
 // these later to see if they've been properly initialized...
@@ -426,5 +429,7 @@ void Nemesis_IO_Helper::get_elem_cmap()
 	}
     }
 }
+
+} // namespace libMesh
 
 #endif // #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)

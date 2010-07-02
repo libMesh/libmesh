@@ -27,6 +27,9 @@
 // Local includes
 #include "surface.h"
 
+namespace libMesh
+{
+
 
 /**
  * This class defines a plane.
@@ -152,5 +155,7 @@ const Point & Plane::normal () const
 {
   return _normal;
 }
+
+} // namespace libMesh
 
 #endif

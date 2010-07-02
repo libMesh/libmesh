@@ -23,6 +23,9 @@
 // Local Includes
 #include "xdr_mgf.h"
 
+namespace libMesh
+{
+
 // forward declarations
 class XdrMHEAD; 
 
@@ -109,5 +112,7 @@ private:
    */
   int m_dim;
 };
+
+} // namespace libMesh
 
 #endif // #ifndef __xdr_mesh_h__

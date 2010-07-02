@@ -33,6 +33,9 @@
 #include <map>
 #include <sys/time.h>
 
+namespace libMesh
+{
+
 // Forward Declarations
 // class OStringStream;
 
@@ -405,6 +408,8 @@ double PerfLog::get_elapsed_time () const
   return elapsed_time;
 }
 
+
+} // namespace libMesh
 
 
 

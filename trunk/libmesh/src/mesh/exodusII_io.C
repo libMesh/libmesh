@@ -33,6 +33,9 @@
 #include "numeric_vector.h"
 #include "exodusII_io_helper.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -461,3 +464,5 @@ void ExodusII_IO::write (const std::string& fname)
 }
 
 #endif
+
+} // namespace libMesh

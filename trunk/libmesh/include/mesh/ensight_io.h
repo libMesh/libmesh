@@ -34,6 +34,9 @@
 #include "mesh.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 
 /**
  * This class implements writing meshes and solutions in Ensight's Gold format.
@@ -130,6 +133,8 @@ private:
   const EquationSystems &_equation_systems;		
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __ensight_io_h__

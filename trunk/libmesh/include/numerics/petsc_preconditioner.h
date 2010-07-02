@@ -39,6 +39,9 @@
 // Petsc includes
 #include "petscpc.h"
 
+namespace libMesh
+{
+
 // forward declarations
 template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
@@ -127,6 +130,8 @@ PetscPreconditioner<T>::~PetscPreconditioner ()
 {
   this->clear ();
 }
+
+} // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
 #endif // #ifdef __petsc_linear_solver_h__

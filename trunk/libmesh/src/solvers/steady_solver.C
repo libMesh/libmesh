@@ -22,6 +22,9 @@
 #include "diff_system.h"
 #include "steady_solver.h"
 
+namespace libMesh
+{
+
 
 
 SteadySolver::~SteadySolver ()
@@ -83,4 +86,6 @@ bool SteadySolver::side_residual(bool request_jacobian,
   
   return jacobian_computed2;
 }
+
+} // namespace libMesh
 

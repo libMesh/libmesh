@@ -25,6 +25,9 @@
 #include "libmesh_common.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 
@@ -76,5 +79,7 @@ DivaIO::DivaIO (const MeshBase& mesh) :
   MeshOutput<MeshBase>  (mesh)
 {}
 
+
+} // namespace libMesh
 
 #endif // #define __diva_io_h__

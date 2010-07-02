@@ -28,6 +28,9 @@
 #include "elem.h"
 
 
+namespace libMesh
+{
+
 // Forward declarations
 class Mesh;
 
@@ -87,6 +90,8 @@ public:
 #endif
 
 };
+
+} // namespace libMesh
 
 #endif
 

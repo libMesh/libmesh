@@ -33,6 +33,9 @@
 #include "qoi_set.h"
 #include "reference_counted_object.h"
 
+namespace libMesh
+{
+
 // Forward Declarations
 class DiffContext;
 class DiffSolver;
@@ -213,6 +216,8 @@ protected:
   AutoPtr<NumericVector<Number> > old_local_nonlinear_solution;
 };
 
+
+} // namespace libMesh
 
 
 #endif // #define __time_solver_h__

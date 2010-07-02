@@ -28,6 +28,9 @@
 #include "inf_fe_macro.h"
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -673,6 +676,8 @@ INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,inverse_map(const Elem*,const std::vect
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,const Real, const bool));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,const Real, const bool));
 
+
+} // namespace libMesh
 
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

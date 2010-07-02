@@ -32,6 +32,9 @@
 #include "edge_edge2.h"
 #include "edge_inf_edge2.h"
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -234,6 +237,8 @@ void InfQuad4::connectivity(const unsigned int sf,
   
   libmesh_error();
 }
+
+} // namespace libMesh
 
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

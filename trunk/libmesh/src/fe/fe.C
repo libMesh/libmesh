@@ -27,6 +27,9 @@
 #include "quadrature.h"
 
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // FE class members
@@ -715,3 +718,5 @@ INSTANTIATE_FE(2);
 
 INSTANTIATE_FE(3);
 
+
+} // namespace libMesh

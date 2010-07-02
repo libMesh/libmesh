@@ -45,6 +45,9 @@
 #endif
 
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // MetisPartitioner implementation
@@ -293,5 +296,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   STOP_LOG("partition()", "MetisPartitioner");
 #endif
 }
+
+} // namespace libMesh
   
 

@@ -22,6 +22,9 @@
 // Local includes
 #include "edge_edge2.h"
 
+namespace libMesh
+{
+
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -116,3 +119,5 @@ Real Edge2::volume () const
   // Elem::hmax() for the Edge2, but here it is nonetheless...
   return (this->point(1) - this->point(0)).size();
 }
+
+} // namespace libMesh

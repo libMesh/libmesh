@@ -28,6 +28,9 @@
 #include "elem.h"
 
 
+namespace libMesh
+{
+
 
 
 // ------------------------------------------------------------
@@ -1645,5 +1648,7 @@ INSTANTIATE_MBRF(0,BERNSTEIN);
 INSTANTIATE_MBRF(1,BERNSTEIN);
 INSTANTIATE_MBRF(2,BERNSTEIN);
 INSTANTIATE_MBRF(3,BERNSTEIN);
+
+} // namespace libMesh
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES

@@ -43,6 +43,9 @@
 // glpk includes
 #include <glpk.h>
 
+namespace libMesh
+{
+
 RBSCMSystem::RBSCMSystem (EquationSystems& es,
                           const std::string& name,
                           const unsigned int number)
@@ -1096,5 +1099,7 @@ void RBSCMSystem::read_offline_data_from_files(const std::string& directory_name
 
   STOP_LOG("read_offline_data_from_files()", "RBSCMSystem");
 }
+
+} // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK

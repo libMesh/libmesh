@@ -31,6 +31,9 @@
 #include "fe_macro.h"
 #include "libmesh_logging.h"
 
+namespace libMesh
+{
+
 //-------------------------------------------------------
 // Full specializations for useless methods in 0D, 1D
 #define REINIT_ERROR(_dim, _type, _func)       \
@@ -763,3 +766,5 @@ template void FE<3,XYZ>::edge_reinit(Elem const*, unsigned int, Real);
 
 // Intel 9.1 complained it needed this in devel mode.
 template void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
+
+} // namespace libMesh

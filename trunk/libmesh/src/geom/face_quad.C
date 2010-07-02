@@ -23,6 +23,9 @@
 #include "face_quad.h"
 #include "edge_edge2.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // Quad class member functions
@@ -276,3 +279,5 @@ const unsigned short int Quad::_second_order_vertex_child_index[9] =
   1,2,3,3,     // Edges
   2            // Interior
 };
+
+} // namespace libMesh

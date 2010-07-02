@@ -33,6 +33,9 @@
 #include "tensor_value.h"
 #include "tree_base.h"
 
+namespace libMesh
+{
+
 
 // Forward Declarations
 template <typename T> class DenseVector;
@@ -243,6 +246,8 @@ protected:
 // ------------------------------------------------------------
 // MeshFunction inline methods
 
+
+} // namespace libMesh
 
 
 #endif

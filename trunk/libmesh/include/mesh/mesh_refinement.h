@@ -36,6 +36,9 @@
 #include "libmesh.h" // libMesh::invalid_uint
 #include "location_maps.h"
 
+namespace libMesh
+{
+
 // Forward Declarations -----------------------------
 class MeshBase;
 class Point;
@@ -684,6 +687,8 @@ inline unsigned char& MeshRefinement::node_level_mismatch_limit()
 {
   return _node_level_mismatch_limit;
 }
+
+} // namespace libMesh
 
 #endif // end #ifdef LIBMESH_ENABLE_AMR
 #endif // end #ifndef __mesh_refinement_h__ 

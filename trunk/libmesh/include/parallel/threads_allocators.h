@@ -33,6 +33,9 @@
 #  include "tbb/scalable_allocator.h"
 #endif
 
+namespace libMesh
+{
+
 
 /**
  * The Threads namespace is for wrapper functions
@@ -120,5 +123,7 @@ namespace Threads
 #endif // #ifdef LIBMESH_HAVE_TBB_API
 
 } // namespace Threads
+
+} // namespace libMesh
 
 #endif // #define __threads_allocators_h__

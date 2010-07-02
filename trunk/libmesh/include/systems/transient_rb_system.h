@@ -23,6 +23,9 @@
 #include "transient_system.h"
 #include "rb_system.h"
 
+namespace libMesh
+{
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -545,5 +548,7 @@ private:
   DenseMatrix<Number> cached_Mq_Mq_matrix;
 
 };
+
+} // namespace libMesh
 
 #endif

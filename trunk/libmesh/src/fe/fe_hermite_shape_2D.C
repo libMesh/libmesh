@@ -31,6 +31,8 @@
 // This caching is turned off when TBB is enabled...
 namespace
 {
+  using namespace libMesh;
+
 #ifndef LIBMESH_HAVE_TBB_API
   static unsigned int old_elem_id = libMesh::invalid_uint;
   // Mapping functions - derivatives at each dofpt
@@ -200,6 +202,9 @@ Real hermite_bases_2D
 
 } // end anonymous namespace
 
+
+namespace libMesh
+{
 
 
 template <>
@@ -403,3 +408,5 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
   libmesh_error();
   return 0.;
 }
+
+} // namespace libMesh

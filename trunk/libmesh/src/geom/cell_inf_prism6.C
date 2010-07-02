@@ -34,6 +34,9 @@
 #include "face_inf_quad4.h"
 #include "face_tri3.h"
 
+namespace libMesh
+{
+
 
 // ------------------------------------------------------------
 // InfPrism6 class static member initializations
@@ -300,5 +303,7 @@ const float InfPrism6::_embedding_matrix[4][6][6] =
 
 
 #endif
+
+} // namespace libMesh
 
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

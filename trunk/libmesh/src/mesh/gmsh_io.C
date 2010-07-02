@@ -307,6 +307,9 @@ namespace
 } // end anonymous namespace
 
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // GmshIO  members
 void GmshIO::read (const std::string& name)
@@ -957,4 +960,6 @@ void GmshIO::write_post (const std::string& fname,
     }
 
 }
+
+} // namespace libMesh
 

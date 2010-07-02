@@ -23,6 +23,9 @@
 #include "sum_shell_matrix.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 template <typename T>
 unsigned int SumShellMatrix<T>::m () const
 {
@@ -90,4 +93,6 @@ void SumShellMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 //------------------------------------------------------------------
 // Explicit instantiations
 template class SumShellMatrix<Number>;
+
+} // namespace libMesh
 

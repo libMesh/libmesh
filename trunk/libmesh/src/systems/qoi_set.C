@@ -28,6 +28,9 @@
 #include "qoi_set.h"
 #include "system.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // QoISet implementation
 
@@ -70,3 +73,5 @@ void QoISet::remove_indices(const std::vector<unsigned int> &indices)
        i != indices.end(); ++i)
     _indices[*i] = false;
 }
+
+} // namespace libMesh

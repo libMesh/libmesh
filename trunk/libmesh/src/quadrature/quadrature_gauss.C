@@ -20,6 +20,9 @@
 
 #include "quadrature_gauss.h"
 
+namespace libMesh
+{
+
 // See the files:
 
 // quadrature_gauss_1D.C
@@ -361,5 +364,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 	}
     }
 }
+
+} // namespace libMesh
 
 

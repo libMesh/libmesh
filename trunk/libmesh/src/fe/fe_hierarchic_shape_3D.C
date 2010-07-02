@@ -25,6 +25,9 @@
 #include "elem.h"
 #include "number_lookups.h"
 
+namespace libMesh
+{
+
 // anonymous namespace for local helper functions
 namespace
 {
@@ -870,3 +873,5 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem* elem,
           FE<3,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm))
           / 2. / eps;
 }
+
+} // namespace libMesh

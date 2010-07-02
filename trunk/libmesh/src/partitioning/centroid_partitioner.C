@@ -25,6 +25,9 @@
 #include "mesh_base.h"
 #include "elem.h"
 
+namespace libMesh
+{
+
 
 //---------------------------------------------------------
 // CentroidPartitioner methods
@@ -173,3 +176,5 @@ bool CentroidPartitioner::sort_radial (const std::pair<Point, Elem*>& lhs,
 {
   return (lhs.first.size() < rhs.first.size());
 }
+
+} // namespace libMesh

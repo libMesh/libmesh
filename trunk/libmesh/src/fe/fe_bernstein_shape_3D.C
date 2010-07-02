@@ -29,6 +29,9 @@
 #include "elem.h"
 
 
+namespace libMesh
+{
+
 
 
 template <>
@@ -3016,6 +3019,8 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem*,
   warning_given = true;
   return 0.;
 }
+
+} // namespace libMesh
 
 
 

@@ -219,6 +219,9 @@ namespace
 } // end anonymous namespace
 
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // GMVIO  members
 void GMVIO::write (const std::string& fname)
@@ -2440,3 +2443,5 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
   }
   
 }
+
+} // namespace libMesh

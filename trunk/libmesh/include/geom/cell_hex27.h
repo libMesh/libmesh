@@ -27,6 +27,9 @@
 // Local includes
 #include "cell_hex.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -246,5 +249,7 @@ Hex27::Hex27(Elem* p) :
 {
 }
 
+
+} // namespace libMesh
 
 #endif

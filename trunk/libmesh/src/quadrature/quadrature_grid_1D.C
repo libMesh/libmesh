@@ -23,6 +23,9 @@
 
 // Local includes
 #include "quadrature_grid.h"
+
+namespace libMesh
+{
  
 
 
@@ -43,5 +46,7 @@ void QGrid::init_1D(const ElemType,
     }
   return;
 }
+
+} // namespace libMesh
  
 

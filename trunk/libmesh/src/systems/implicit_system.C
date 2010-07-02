@@ -35,6 +35,9 @@
 #include "sensitivity_data.h"
 #include "sparse_matrix.h"
 
+namespace libMesh
+{
+
 // ------------------------------------------------------------
 // ImplicitSystem implementation
 ImplicitSystem::ImplicitSystem (EquationSystems& es,
@@ -1305,4 +1308,6 @@ void ImplicitSystem::release_linear_solver(LinearSolver<Number>* s) const
 {
   delete s;
 }
+
+} // namespace libMesh
 

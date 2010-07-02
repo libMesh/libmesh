@@ -26,6 +26,9 @@
 #include "libmesh_common.h"
 #include "mesh_output.h"
 
+namespace libMesh
+{
+
 // Forward declarations
 class MeshBase;
 
@@ -70,6 +73,8 @@ FroIO::FroIO (const MeshBase& mesh) :
 {
 }
 
+
+} // namespace libMesh
 
 
 #endif // #define __fro_io_h__

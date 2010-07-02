@@ -25,6 +25,9 @@
 #include <iostream>
 #include <string>
 
+namespace libMesh
+{
+
 namespace Utility
 {
   // Two helpful utility programs for getting and printing a timestamp in
@@ -38,6 +41,8 @@ namespace Utility
   }
 
 }
+
+} // namespace libMesh
 
 
 #endif

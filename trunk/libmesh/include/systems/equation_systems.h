@@ -42,6 +42,9 @@
 # include "steady_system.h"
 #endif
 
+namespace libMesh
+{
+
 // Forward Declarations
 class MeshData;
 class Elem;
@@ -707,6 +710,8 @@ System & EquationSystems::get_system (const unsigned int num)
   return this->get_system<System>(num);
 }
 
+
+} // namespace libMesh
 
 
 #endif

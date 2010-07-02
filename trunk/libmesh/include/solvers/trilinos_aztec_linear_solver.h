@@ -38,6 +38,9 @@
 // C++ includes
 #include <vector>
 
+namespace libMesh
+{
+
 /**
  * This class provides an interface to AztecOO
  * iterative solvers that is compatible with the \p libMesh
@@ -174,6 +177,8 @@ AztecLinearSolver<T>::~AztecLinearSolver ()
 {
   this->clear ();
 }
+
+} // namespace libMesh
 
 
 

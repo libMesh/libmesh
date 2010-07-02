@@ -25,6 +25,9 @@
 // Local includes
 #include "quadrature.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -185,6 +188,8 @@ class QMonomial : public QBase
 };
 
 
+
+} // namespace libMesh
 
 
 

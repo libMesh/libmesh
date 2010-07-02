@@ -27,6 +27,9 @@
 // Local includes
 #include "cell_hex.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -185,5 +188,7 @@ Hex8::Hex8(Elem* p) :
 {
 }
 
+
+} // namespace libMesh
 
 #endif

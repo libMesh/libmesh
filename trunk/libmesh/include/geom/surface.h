@@ -27,6 +27,9 @@
 // Local includes
 #include "point.h"
 
+namespace libMesh
+{
+
 
 /**
  * This class defines a surface.  A surface is a two-dimensional
@@ -134,6 +137,8 @@ Point Surface::world_coords (const Point& surf_coords) const
 
 
 
+
+} // namespace libMesh
 
 
 #endif

@@ -24,6 +24,9 @@
 // Local includes
 #include "node_elem.h"
 
+namespace libMesh
+{
+
 
 // Forward declarations
 
@@ -47,3 +50,5 @@ const float NodeElem::_embedding_matrix[1][1][1] =
 };
 
 #endif
+
+} // namespace libMesh

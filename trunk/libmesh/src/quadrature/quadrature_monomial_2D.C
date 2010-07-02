@@ -23,6 +23,9 @@
 #include "quadrature_monomial.h"
 #include "quadrature_gauss.h"
 
+namespace libMesh
+{
+
 
 void QMonomial::init_2D(const ElemType _type,
 			unsigned int p)
@@ -524,3 +527,5 @@ void QMonomial::init_2D(const ElemType _type,
       }
     } // end switch (_type)
 }
+
+} // namespace libMesh

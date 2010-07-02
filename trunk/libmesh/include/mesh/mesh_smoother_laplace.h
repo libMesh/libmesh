@@ -33,6 +33,9 @@
 // Local Includes -----------------------------------
 #include "mesh_smoother.h"
 
+namespace libMesh
+{
+
 
 /**
  * This class defines the data structures necessary
@@ -109,5 +112,7 @@ private:
   std::vector<std::vector<unsigned int> > _graph;
 };
 
+
+} // namespace libMesh
 
 #endif

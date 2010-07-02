@@ -22,6 +22,9 @@
 #include "euler_solver.h"
 #include "numeric_vector.h"
 
+namespace libMesh
+{
+
 
 
 EulerSolver::EulerSolver (sys_type& s)
@@ -252,3 +255,5 @@ bool EulerSolver::side_residual (bool request_jacobian,
 
   return jacobian_computed;
 }
+
+} // namespace libMesh

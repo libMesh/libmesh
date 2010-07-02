@@ -26,6 +26,9 @@
 #include "edge_edge2.h"
 #include "face_quad4.h"
 
+namespace libMesh
+{
+
 
 
 
@@ -427,3 +430,5 @@ Real Hex8::volume () const
   
   return vol;
 }
+
+} // namespace libMesh
