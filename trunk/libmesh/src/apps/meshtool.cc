@@ -3,7 +3,7 @@
 // C++ includes
 #include <algorithm>
 #include <fstream>
-#ifdef HAVE_GETOPT_H
+#ifdef LIBMESH_HAVE_GETOPT_H
 // GCC 2.95.3 (and maybe others) do not include
 // getopt.h in unistd.h...  Hower IBM xlC has no
 // getopt.h!  This works around that.
@@ -61,7 +61,7 @@ void usage(char *progName)
     "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
     "    -h                            Print help menu\n"
     "    -p <count>                    Partition into <count> subdomains\n"
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
     "    -r <count>                    Globally refine <count> times\n"
 #endif
     "    -t (-d 2 only)                Convert to triangles first\n"
@@ -73,7 +73,7 @@ void usage(char *progName)
     "                                  Quad4 -> Quad8, Tet4 -> Tet10 etc\n"
     "    -3                            Same, but to the highest possible:\n"
     "                                  Quad4 -> Quad9, Hex8 -> Hex27 etc\n"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   "\n    -a                            Add infinite elements\n"
     "    -x <coord>                    Specify infinite element origin\n"
     "    -y <coord>                    coordinates. If none given, origin\n"
@@ -104,7 +104,7 @@ void usage(char *progName)
     " will read a 3D MGF mesh from the file bench12.mesh.0000, read a\n"
     " solution from bench12.soln.0137, and write the output in GMV format\n"
     " to out.gmv\n"
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     "\n"
     " and\n"
     "\n"
@@ -178,7 +178,7 @@ void process_cmd_line(int argc, char **argv,
                       bool& triangulate,
                       bool& addinfelems,
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                       InfElemBuilder::InfElemOriginValue& origin_x,
                       InfElemBuilder::InfElemOriginValue& origin_y,
                       InfElemBuilder::InfElemOriginValue& origin_z,
@@ -190,7 +190,7 @@ void process_cmd_line(int argc, char **argv,
                       )
 {
 
-#ifndef ENABLE_INFINITE_ELEMENTS
+#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /*
    * initialize these to some values,
@@ -384,7 +384,7 @@ void process_cmd_line(int argc, char **argv,
           }
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
           /**
            * Add infinite elements
@@ -438,7 +438,7 @@ void process_cmd_line(int argc, char **argv,
             break;
           }
 
-#endif //ifdef ENABLE_INFINITE_ELEMENTS
+#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 
@@ -486,7 +486,7 @@ int main (int argc, char** argv)
   bool addinfelems = false;
   bool triangulate = false;
   
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   InfElemBuilder::InfElemOriginValue origin_x(false, 0.);
   InfElemBuilder::InfElemOriginValue origin_y(false, 0.);
   InfElemBuilder::InfElemOriginValue origin_z(false, 0.);
@@ -510,7 +510,7 @@ int main (int argc, char** argv)
 
                    addinfelems,
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                    origin_x, origin_y, origin_z, 
 #endif
 
@@ -561,7 +561,7 @@ int main (int argc, char** argv)
              
 
 
-#ifdef ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if(addinfelems)
     {
@@ -758,7 +758,7 @@ int main (int argc, char** argv)
     }
 
   
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
   
   /**
    * Possibly refine the mesh

@@ -23,7 +23,7 @@ void assemble(EquationSystems& es,
 
 
 
-#ifdef ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
 int main (int argc, char** argv)
 {
   LibMeshInit init(argc, argv);
