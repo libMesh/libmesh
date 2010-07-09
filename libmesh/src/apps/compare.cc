@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#ifdef HAVE_GETOPT_H
+#ifdef LIBMESH_HAVE_GETOPT_H
 // GCC 2.95.3 (and maybe others) do not include
 // getopt.h in unistd.h...  Hower IBM xlC has no
 // getopt.h!  This works around that.
