@@ -39,6 +39,7 @@ ReferenceCounter::Counts ReferenceCounter::_counts;
 
 #endif
 
+bool ReferenceCounter::_enable_print_counter = true;
 Threads::atomic<unsigned int> ReferenceCounter::_n_objects;
 Threads::spin_mutex  ReferenceCounter::_mutex;
 
@@ -88,9 +89,7 @@ std::string ReferenceCounter::get_info ()
 
 void ReferenceCounter::print_info (std::ostream &out_stream)
 {
-  
-  out_stream << ReferenceCounter::get_info();
-  
+  if( _enable_print_counter ) out_stream << ReferenceCounter::get_info();
 }
 
 #else
@@ -99,5 +98,17 @@ void ReferenceCounter::print_info (std::ostream & /* out_stream */)
 {}
 
 #endif
+
+void ReferenceCounter::enable_print_counter_info()
+{
+  _enable_print_counter = true;
+  return;
+}
+
+void ReferenceCounter::disable_print_counter_info()
+{
+  _enable_print_counter = false;
+  return;
+}
 
 } // namespace libMesh

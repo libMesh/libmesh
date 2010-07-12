@@ -25,6 +25,7 @@
 // Local includes
 #include "libmesh_config.h"
 #include "threads.h"
+#include "libmesh.h" // libMesh::on_command_line
 
 // C++ includes
 #include <iostream>
@@ -80,6 +81,13 @@ public:
   static unsigned int n_objects ()
   { return _n_objects; }
 
+  /**
+   * Methods to enable/disable the reference counter output
+   * from print_info()
+   */
+  static void enable_print_counter_info();
+  static void disable_print_counter_info();
+  
   
 protected:
 
@@ -125,6 +133,12 @@ protected:
    * Mutual exclusion object to enable thread-safe reference counting.
    */
   static Threads::spin_mutex _mutex;
+
+  /**
+   * Flag to control whether reference count information
+   * is printed when print_info is called.
+   */
+  static bool _enable_print_counter;
 };
 
 
@@ -134,6 +148,11 @@ protected:
 inline ReferenceCounter::ReferenceCounter()
 {
   _n_objects++;
+
+  // Check command line to override printing
+  // of reference count information.
+  if(libMesh::on_command_line("--disable-refcount-printing") )
+    _enable_print_counter=false;
 }
 
 
