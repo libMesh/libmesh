@@ -298,8 +298,8 @@ Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices) c
 {
   const NumericVector<T> & v = *this;
   
-  std::set<unsigned int>::iterator it = indices.begin();
-  const std::set<unsigned int>::iterator it_end = indices.end();
+  std::set<unsigned int>::const_iterator it = indices.begin();
+  const std::set<unsigned int>::const_iterator it_end = indices.end();
 
   Real norm = 0;
   
@@ -316,8 +316,8 @@ Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices) c
 {
   const NumericVector<T> & v = *this;
 
-  std::set<unsigned int>::iterator it = indices.begin();
-  const std::set<unsigned int>::iterator it_end = indices.end();
+  std::set<unsigned int>::const_iterator it = indices.begin();
+  const std::set<unsigned int>::const_iterator it_end = indices.end();
 
   Real norm = 0;
   
@@ -334,8 +334,8 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<unsigned int> & indice
 {
   const NumericVector<T> & v = *this;
 
-  std::set<unsigned int>::iterator it = indices.begin();
-  const std::set<unsigned int>::iterator it_end = indices.end();
+  std::set<unsigned int>::const_iterator it = indices.begin();
+  const std::set<unsigned int>::const_iterator it_end = indices.end();
 
   Real norm = 0;
   
