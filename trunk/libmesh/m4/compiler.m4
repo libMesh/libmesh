@@ -104,8 +104,10 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
     dnl Check for IBM xlC. For some reasons, depending on some environment
     dnl variables, moon position, and other reasons unknown to me, the
     dnl compiler displays different names in the first line of output, so
-    dnl check various possibilities
-    is_ibm_xlc="`($CXX 2>&1) | egrep 'xlc'`"
+    dnl check various possibilities.  Calling xlC with no arguments displays
+    dnl the man page.  Grepping for case-sensitive xlc is not enough if the
+    dnl user wants xlC, so we used case-insensitive grep instead.
+    is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
     if test "x$is_ibm_xlc" != "x"  ; then
       dnl IBM's C++ compiler.
       AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
