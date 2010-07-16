@@ -308,6 +308,11 @@ void _init (int &argc, char** & argv,
   if (libMesh::processor_id() != 0)
     if (!libMesh::on_command_line ("--keep-cout"))
       libMesh::out.rdbuf (NULL);
+
+  // Check command line to override printing
+  // of reference count information.
+  if(libMesh::on_command_line("--disable-refcount-printing") )
+    ReferenceCounter::disable_print_counter_info();
   
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
