@@ -148,11 +148,6 @@ protected:
 inline ReferenceCounter::ReferenceCounter()
 {
   _n_objects++;
-
-  // Check command line to override printing
-  // of reference count information.
-  if(libMesh::on_command_line("--disable-refcount-printing") )
-    _enable_print_counter=false;
 }
 
 
