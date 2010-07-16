@@ -204,26 +204,26 @@ public:
 
     // (*) unidentified flying objects -----------------------------------------
     inline STRING_VECTOR   unidentified_arguments(unsigned Number, const char* Known, ...) const;
-    inline STRING_VECTOR   unidentified_arguments(const STRING_VECTOR& Knowns) const;
+    inline STRING_VECTOR   unidentified_arguments(const std::set<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_arguments() const;
 
     inline STRING_VECTOR   unidentified_options(unsigned Number, const char* Known, ...) const;
-    inline STRING_VECTOR   unidentified_options(const STRING_VECTOR& Knowns) const;
+    inline STRING_VECTOR   unidentified_options(const std::set<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_options() const;
 
     inline std::string     unidentified_flags(const char* Known,
 					     int ArgumentNumber /* =-1 */) const;
 
     inline STRING_VECTOR   unidentified_variables(unsigned Number, const char* Known, ...) const;
-    inline STRING_VECTOR   unidentified_variables(const STRING_VECTOR& Knowns) const;
+    inline STRING_VECTOR   unidentified_variables(const std::set<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_variables() const;
 
     inline STRING_VECTOR   unidentified_sections(unsigned Number, const char* Known, ...) const;
-    inline STRING_VECTOR   unidentified_sections(const STRING_VECTOR& Knowns) const;
+    inline STRING_VECTOR   unidentified_sections(const std::set<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_sections() const;
 
     inline STRING_VECTOR   unidentified_nominuses(unsigned Number, const char* Known, ...) const;
-    inline STRING_VECTOR   unidentified_nominuses(const STRING_VECTOR& Knowns) const;
+    inline STRING_VECTOR   unidentified_nominuses(const std::set<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_nominuses() const;
 
     // (*) output --------------------------------------------------------------
@@ -305,6 +305,9 @@ private:
     //     -- some functions return a char pointer to a string created on the fly.
     //        this container makes them 'available' until the getpot object is destroyed.
     //        user codes are recommended to instead request std::string values.
+    //        We use char* here because c_str() results are only
+    //        guaranteed to remain valid until a non-const string
+    //        method is called
     mutable std::set<const char*, ltstr> _internal_string_container;
 
     //     -- some functions return a char pointer to a temporarily existing string
@@ -313,9 +316,9 @@ private:
 
     //     -- keeping track about arguments that are requested, so that the UFO detection
     //        can be simplified
-    mutable STRING_VECTOR   _requested_arguments;
-    mutable STRING_VECTOR   _requested_variables;
-    mutable STRING_VECTOR   _requested_sections;
+    mutable std::set<std::string> _requested_arguments;
+    mutable std::set<std::string> _requested_variables;
+    mutable std::set<std::string> _requested_sections;
 
     bool            request_recording_f;   // speed: request recording can be turned off
 
@@ -581,12 +584,9 @@ GetPot::absorb(const GetPot& Other)
         // Get a lock before touching anything mutable
         SCOPED_MUTEX;
 
-	_requested_arguments.insert(_requested_sections.end(), 
-				    Other._requested_arguments.begin(), Other._requested_arguments.end());
-	_requested_variables.insert(_requested_sections.end(),
-				    Other._requested_variables.begin(), Other._requested_variables.end());
-	_requested_sections.insert(_requested_sections.end(),
-				   Other._requested_sections.begin(), Other._requested_sections.end());
+	_requested_arguments.insert(Other._requested_arguments.begin(), Other._requested_arguments.end());
+	_requested_variables.insert(Other._requested_variables.begin(), Other._requested_variables.end());
+	_requested_sections.insert(Other._requested_sections.begin(), Other._requested_sections.end());
     }
 	
 }
@@ -597,9 +597,9 @@ GetPot::clear_requests()
     // Get a lock before touching anything mutable
     SCOPED_MUTEX;
 
-    _requested_arguments.erase(_requested_arguments.begin(), _requested_arguments.end());
-    _requested_variables.erase(_requested_variables.begin(), _requested_variables.end());
-    _requested_sections.erase(_requested_sections.begin(), _requested_sections.end());
+    _requested_arguments.clear();
+    _requested_variables.clear();
+    _requested_sections.clear();
 }
 
 inline void
@@ -636,7 +636,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
                 // Get a lock before touching anything mutable
                 SCOPED_MUTEX;
 
-                _requested_arguments.push_back(arg);
+                _requested_arguments.insert(arg);
             }
 	    
 	    const std::string Name = _DBE_expand_string(arg.substr(1, arg.length()-2));
@@ -666,7 +666,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
                     // Get a lock before touching anything mutable
                     SCOPED_MUTEX;
 
-                    _requested_arguments.push_back(arg);
+                    _requested_arguments.insert(arg);
                 }
 
 		// set terminating 'zero' to treat first part as single string
@@ -1420,13 +1420,13 @@ GetPot::_record_argument_request(const std::string& Name) const
     SCOPED_MUTEX;
 
     // (*) record requested variable for later ufo detection
-    _requested_arguments.push_back(Name);
+    _requested_arguments.insert(Name);
 
     // (*) record considered section for ufo detection
     STRING_VECTOR      STree = _get_section_tree(Name);
     victorate(std::string, STree, it)
-	if( find(_requested_sections.begin(), _requested_sections.end(), *it) == _requested_sections.end() )
-	    if( section.length() != 0 ) _requested_sections.push_back(*it);
+	if( _requested_sections.find(*it) == _requested_sections.end() )
+	    if( section.length() != 0 ) _requested_sections.insert(*it);
 }
 
 inline void 
@@ -1438,13 +1438,13 @@ GetPot::_record_variable_request(const std::string& Name) const
     SCOPED_MUTEX;
 
     // (*) record requested variable for later ufo detection
-    _requested_variables.push_back(Name);
+    _requested_variables.insert(Name);
 
     // (*) record considered section for ufo detection
     STRING_VECTOR      STree = _get_section_tree(Name);
     victorate(std::string, STree, it)
-	if( find(_requested_sections.begin(), _requested_sections.end(), *it) == _requested_sections.end() )
-	    if( section.length() != 0 ) _requested_sections.push_back(*it);
+	if( _requested_sections.find(*it) == _requested_sections.end() )
+	    if( section.length() != 0 ) _requested_sections.insert(*it);
 }
 
 // (*) following functions are to be used from 'outside', after getpot has parsed its
@@ -1986,17 +1986,17 @@ inline STRING_VECTOR
 GetPot::unidentified_arguments(unsigned Number,
 			       const char* KnownArgument1, ...) const
 {
-    STRING_VECTOR known_arguments;
+    std::set<std::string> known_arguments;
 
     // (1) create a vector of known arguments
     if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, KnownArgument1);
-    known_arguments.push_back(std::string(KnownArgument1));
+    known_arguments.insert(std::string(KnownArgument1));
     unsigned i=1;
     for(; i<Number; i++)
-	known_arguments.push_back(std::string(va_arg(ap, char *)));
+	known_arguments.insert(std::string(va_arg(ap, char *)));
     va_end(ap);
 
     return unidentified_arguments(known_arguments);
@@ -2007,7 +2007,7 @@ GetPot::unidentified_arguments() const
 { return unidentified_arguments(_requested_arguments); }
 
 inline STRING_VECTOR
-GetPot::unidentified_arguments(const STRING_VECTOR& Knowns) const
+GetPot::unidentified_arguments(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
     STRING_VECTOR::const_iterator it = argv.begin();
@@ -2018,7 +2018,7 @@ GetPot::unidentified_arguments(const STRING_VECTOR& Knowns) const
 	if( arg == "" ) continue;
 
 	// -- check if in list
-	if( _search_string_vector(Knowns, arg) == false)
+	if( Knowns.find(arg) == Knowns.end() )
 	    ufos.push_back(*it);
     }
     return ufos;
@@ -2028,17 +2028,17 @@ inline STRING_VECTOR
 GetPot::unidentified_options(unsigned Number,
 			     const char* KnownOption1, ...) const
 {
-    STRING_VECTOR known_options;
+    std::set<std::string> known_options;
 
     // (1) create a vector of known arguments
     if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, KnownOption1);
-    known_options.push_back(std::string(KnownOption1));
+    known_options.insert(std::string(KnownOption1));
     unsigned i=1;
     for(; i<Number; i++)
-	known_options.push_back(std::string(va_arg(ap, char *)));
+	known_options.insert(std::string(va_arg(ap, char *)));
     va_end(ap);
 
     return unidentified_options(known_options);
@@ -2057,7 +2057,7 @@ GetPot::unidentified_options() const
 }
 
 inline STRING_VECTOR
-GetPot::unidentified_options(const STRING_VECTOR& Knowns) const
+GetPot::unidentified_options(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
     STRING_VECTOR::const_iterator it = argv.begin();
@@ -2070,7 +2070,7 @@ GetPot::unidentified_options(const STRING_VECTOR& Knowns) const
 	// is argument really an option (starting with '-') ?
 	if( arg.length() < 1 || arg[0] != '-' ) continue;
 
-	if( _search_string_vector(Knowns, arg) == false)
+	if( Knowns.find(arg) == Knowns.end() )
 	    ufos.push_back(*it);
     }
 
@@ -2137,24 +2137,24 @@ inline STRING_VECTOR
 GetPot::unidentified_variables(unsigned Number,
 			       const char* KnownVariable1, ...) const
 {
-    STRING_VECTOR known_variables;
+    std::set<std::string> known_variables;
 
     // create vector of known arguments
     if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, KnownVariable1);
-    known_variables.push_back(std::string(KnownVariable1));
+    known_variables.insert(std::string(KnownVariable1));
     unsigned i=1;
     for(; i<Number; i++)
-	known_variables.push_back(std::string(va_arg(ap, char *)));
+	known_variables.insert(std::string(va_arg(ap, char *)));
     va_end(ap);
 
     return unidentified_variables(known_variables);
 }
 
 inline STRING_VECTOR
-GetPot::unidentified_variables(const STRING_VECTOR& Knowns) const
+GetPot::unidentified_variables(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
 
@@ -2164,7 +2164,7 @@ GetPot::unidentified_variables(const STRING_VECTOR& Knowns) const
 	if( var_name == "" ) continue;
 
 	// -- check if variable is known
-	if( _search_string_vector(Knowns, var_name) == false)
+	if( Knowns.find(var_name) == Knowns.end() )
 	    ufos.push_back((*it).name);
     }
     return ufos;
@@ -2179,20 +2179,20 @@ inline STRING_VECTOR
 GetPot::unidentified_sections(unsigned Number,
 			      const char* KnownSection1, ...) const
 {
-    STRING_VECTOR known_sections;
+    std::set<std::string> known_sections;
 
     // (1) create a vector of known arguments
     if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, KnownSection1);
-    known_sections.push_back(std::string(KnownSection1));
+    known_sections.insert(std::string(KnownSection1));
     unsigned i=1;
     for(; i<Number; i++) {
 	std::string tmp = std::string(va_arg(ap, char *));
 	if( tmp.length() == 0 ) continue;
 	if( tmp[tmp.length()-1] != '/' ) tmp += '/';
-	known_sections.push_back(tmp);
+	known_sections.insert(tmp);
     }
     va_end(ap);
 
@@ -2204,7 +2204,7 @@ GetPot::unidentified_sections() const
 { return unidentified_sections(_requested_sections); }
 
 inline STRING_VECTOR
-GetPot::unidentified_sections(const STRING_VECTOR& Knowns) const
+GetPot::unidentified_sections(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
 
@@ -2214,7 +2214,7 @@ GetPot::unidentified_sections(const STRING_VECTOR& Knowns) const
 	if( sec_name == "" ) continue;
 
 	// -- check if section is known
-	if( _search_string_vector(Knowns, sec_name) == false )
+	if( Knowns.find(sec_name) == Knowns.end() )
 	    ufos.push_back(*it);
     }
 
@@ -2225,19 +2225,19 @@ GetPot::unidentified_sections(const STRING_VECTOR& Knowns) const
 inline STRING_VECTOR
 GetPot::unidentified_nominuses(unsigned Number, const char* Known, ...) const
 {
-    STRING_VECTOR known_nominuses;
+    std::set<std::string> known_nominuses;
 
     // create vector of known arguments
     if( Number == 0 ) return STRING_VECTOR();
 
     va_list ap;
     va_start(ap, Known);
-    known_nominuses.push_back(std::string(Known));
+    known_nominuses.insert(std::string(Known));
     unsigned i=1;
     for(; i<Number; i++) {
 	std::string tmp = std::string(va_arg(ap, char *));
 	if( tmp.length() == 0 ) continue;
-	known_nominuses.push_back(tmp);
+	known_nominuses.insert(tmp);
     }
     va_end(ap);
 
@@ -2257,7 +2257,7 @@ GetPot::unidentified_nominuses() const {
 }
 
 inline STRING_VECTOR
-GetPot::unidentified_nominuses(const STRING_VECTOR& Knowns) const
+GetPot::unidentified_nominuses(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
 
@@ -2282,7 +2282,7 @@ GetPot::unidentified_nominuses(const STRING_VECTOR& Knowns) const
 	if( continue_f )                                        continue;
 
 	// real nominuses are compared with the given list
-	if( _search_string_vector(Knowns, arg) == false )
+	if( Knowns.find(arg) == Knowns.end() )
 	    ufos.push_back(*it);
     }
     return ufos;
