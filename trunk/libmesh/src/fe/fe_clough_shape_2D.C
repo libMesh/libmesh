@@ -1476,6 +1476,10 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
       // 2nd-order restricted Clough-Tocher element
     case SECOND:
       {
+        // There may be a bug in the 2nd order case; the 3rd order
+        // Clough-Tocher elements are pretty uniformly better anyways
+        // so use those instead.
+        libmesh_experimental();
 	switch (type)
 	  {
 	    // C1 functions on the Clough-Tocher triangle.
@@ -1676,6 +1680,10 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
       // 2nd-order restricted Clough-Tocher element
     case SECOND:
       {
+        // There may be a bug in the 2nd order case; the 3rd order
+        // Clough-Tocher elements are pretty uniformly better anyways
+        // so use those instead.
+        libmesh_experimental();
 	switch (type)
 	  {
 	    // C1 functions on the Clough-Tocher triangle.
