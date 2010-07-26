@@ -135,6 +135,17 @@ public:
    * @returns SECOND
    */
   Order default_order() const { return SECOND; }
+
+  /**
+   * @returns an id associated with the \p s side of this element.
+   * The id is not necessariy unique, but should be close.  This is
+   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   *
+   * We reimplemenet this method here for the \p Prism18 since we can
+   * use the center node of each quad face to provide a perfect (unique)
+   * key.
+   */
+  unsigned int key (const unsigned int s) const;
   
   /**
    * Builds a \p QUAD9 or \p TRI6 built coincident with face i. 

@@ -138,6 +138,43 @@ bool Prism18::has_affine_map() const
 
 
 
+unsigned int Prism18::key (const unsigned int s) const
+{
+  libmesh_assert (s < this->n_sides());
+
+  switch (s)
+    {
+    case 0:  // the triangular face at z=0
+      {
+	return Prism::key(0);
+      }
+    case 1:  // the quad face at y=0
+      {
+	return Elem::compute_key (this->node(15));
+      }
+    case 2:  // the other quad face
+      {
+	return Elem::compute_key (this->node(16));
+      }
+    case 3: // the quad face at x=0
+      {
+	return Elem::compute_key (this->node(17));
+      }
+    case 4: // the triangular face at z=1
+      {
+	return Prism::key(4);
+      }
+    }
+
+  // We'll never get here.
+  libmesh_error();
+  return 0;
+}
+
+
+
+
+
 AutoPtr<Elem> Prism18::build_side (const unsigned int i,
 				   bool proxy) const
 {
