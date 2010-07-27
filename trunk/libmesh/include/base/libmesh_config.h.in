@@ -85,6 +85,9 @@
 /* Define to 1 if you have the <getopt.h> header file. */
 #undef HAVE_GETOPT_H
 
+/* Flag indicating if the library should be built with calls to getpwuid() */
+#undef HAVE_GETPWUID
+
 /* define if the compiler supports glibc backtrace */
 #undef HAVE_GLIBC_BACKTRACE
 

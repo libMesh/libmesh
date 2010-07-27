@@ -105,7 +105,18 @@ std::string PerfLog::get_info_header() const
       uname(&sysInfo);
       
       // Get user information
+      //
+      // Some systems, for example Crays, actually have getpwuid on the head-node
+      // but (if I understand correctly) a dynamically-linked glibc is not available
+      // on the backend, which is running a reduced operating system like Compute
+      // Node Linux.  Thus functions like getpwuid cannot be called.  This makes
+      // automatically testing for the existence of getpwuid on the login node
+      // difficult.  The configure test would work on the login node but will fail
+      // on the backend.  Hence we have added a configure flag, --disable-getpwuid,
+      // to manually turn this off.
+#ifdef LIBMESH_HAVE_GETPWUID
       struct passwd* p = getpwuid(getuid());
+#endif
       out << "\n";
 
       // Construct string stream objects for each of the outputs
@@ -147,7 +158,11 @@ std::string PerfLog::get_info_header() const
       osrel_stream   << "| OS Release:     " << sysInfo.release        ; 
       osver_stream   << "| OS Version:     " << sysInfo.version        ; 
       machine_stream << "| Machine:        " << sysInfo.machine        ; 
+#ifdef LIBMESH_HAVE_GETPWUID
       user_stream    << "| Username:       " << p->pw_name             ;
+#else
+      user_stream    << "| Username:       " << "Unknown"              ;
+#endif
       config_stream  << "| Configuration:  " << LIBMESH_CONFIGURE_INFO;
       
       // Find the longest string, use that to set the line length for formatting.
