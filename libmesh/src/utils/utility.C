@@ -55,7 +55,11 @@ std::string Utility::system_info()
   uname(&sysInfo);
   
   // Get user information
-  struct passwd* p = getpwuid(getuid());
+#ifdef LIBMESH_HAVE_GETPWUID
+      struct passwd* p = getpwuid(getuid());
+#endif
+
+      
   out << '\n'
       << " ---------------------------------------------------------------------\n"
       << "| Time:           " << date             << '\n'
@@ -64,7 +68,11 @@ std::string Utility::system_info()
       << "| OS Release      " << sysInfo.release  << '\n'
       << "| OS Version:     " << sysInfo.version  << '\n'
       << "| Machine:        " << sysInfo.machine  << '\n'
-      << "| Username:       " << p->pw_name       << '\n' 
+#ifdef LIBMESH_HAVE_GETPWUID
+      << "| Username:       " << p->pw_name       << '\n'
+#else
+      << "| Username:       " << "Unknown"        << '\n'
+#endif
       << " ---------------------------------------------------------------------\n";
 
   return out.str();

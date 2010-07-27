@@ -144,6 +144,31 @@ dnl --------------------------------------------------------------
 
 
 dnl --------------------------------------------------------------
+dnl getpwuid - enabled by default
+dnl Some systems, for example Crays, actually have getpwuid on the head-node
+dnl but (if I understand correctly) a dynamically-linked glibc is not available
+dnl on the backend, which is running a reduced operating system like Compute
+dnl Node Linux.  Thus functions like getpwuid cannot be called.  This makes
+dnl automatically testing for the existence of getpwuid on the login node
+dnl difficult.  If you know that you are on such a system, configure with
+dnl --disable-getpwuid.
+dnl --------------------------------------------------------------
+AC_ARG_ENABLE(getpwuid,
+              AC_HELP_STRING([--enable-getpwuid],
+                             [allow calls to getpwuid]),
+              enablegetpwuid=$enableval,
+              enablegetpwuid=yes)
+
+if test "$enablegetpwuid" != no ; then
+  AC_DEFINE(HAVE_GETPWUID, 1,
+           [Flag indicating if the library should be built with calls to getpwuid()])
+  AC_MSG_RESULT(<<< Configuring library with getpwuid >>>)
+fi
+dnl --------------------------------------------------------------
+
+
+
+dnl --------------------------------------------------------------
 dnl Shared libraries - enabled by default
 dnl --------------------------------------------------------------
 AC_ARG_ENABLE(shared,
