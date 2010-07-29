@@ -216,28 +216,27 @@ endif
 ###############################################################################
 # Compiler flags, different for optimized, debug, and profiler modes.
 ifeq ($(opt-mode),on)
-  libmesh_CPPFLAGS += -DNDEBUG @CPPFLAGS_OPT@
+  libmesh_CPPFLAGS += -DNDEBUG
   libmesh_CXXFLAGS += @CXXFLAGS_OPT@
   libmesh_CFLAGS   += @CFLAGS_OPT@
 endif
 
 
 ifeq ($(devel-mode),on)
-  libmesh_CPPFLAGS += @CPPFLAGS_DVL@
   libmesh_CXXFLAGS += @CXXFLAGS_DVL@
   libmesh_CFLAGS   += @CFLAGS_DVL@
 endif
 
 
 ifeq ($(debug-mode),on)
-  libmesh_CPPFLAGS += -DDEBUG @CPPFLAGS_DBG@
+  libmesh_CPPFLAGS += -DDEBUG
   libmesh_CXXFLAGS += @CXXFLAGS_DBG@
   libmesh_CFLAGS   += @CFLAGS_DBG@
 endif
 
 
 ifeq ($(prof-mode),on)
-  libmesh_CPPFLAGS += -DNDEBUG @CPPFLAGS_OPT@
+  libmesh_CPPFLAGS += -DNDEBUG
   libmesh_CXXFLAGS += @CXXFLAGS_OPT@ @PROFILING_FLAGS@
   libmesh_CFLAGS   += @CFLAGS_OPT@ @PROFILING_FLAGS@ 
 endif
@@ -248,7 +247,6 @@ endif
 
 
 ifeq ($(oprof-mode),on)
-  libmesh_CPPFLAGS += @CPPFLAGS_OPT@
   libmesh_CXXFLAGS += @CXXFLAGS_OPT@ @OPROFILE_FLAGS@
   libmesh_CFLAGS   += @CFLAGS_OPT@ @OPROFILE_FLAGS@ 
 endif
