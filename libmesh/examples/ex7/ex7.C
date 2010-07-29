@@ -89,7 +89,7 @@ using namespace libMesh;
 // This problem is only defined on complex-valued fields, for
 // which libMesh must be configured with Number == complex.
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 // Function prototype.  This is the function that will assemble
 // the mass, damping and stiffness matrices.  It will <i>not</i>
 // form an overall system matrix ready for solution.
@@ -116,7 +116,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
   
   // This example is designed for complex numbers.   
-#ifndef USE_COMPLEX_NUMBERS
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
   libmesh_example_assert(false, "--enable-complex");
 #else
   
@@ -277,7 +277,7 @@ int main (int argc, char** argv)
 }
 
 
-#ifdef USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 // Here we define the matrix assembly routine for
 // the Helmholtz system.  This function will be
 // called to form the stiffness matrix and right-hand side.
@@ -646,4 +646,4 @@ void add_M_C_K_helmholtz(EquationSystems& es,
   // The "matrix" and "rhs" are now ready for solution   
 }
 
-#endif // USE_COMPLEX_NUMBERS
+#endif // LIBMESH_USE_COMPLEX_NUMBERS

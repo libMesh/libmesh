@@ -47,10 +47,6 @@ libmesh_CXXFLAGS     ?= $(CXXFLAGS)
 
 # Complex variable support
 enable-complex       = @enablecomplex@
-ifeq ($(enable-complex),yes)
-  libmesh_CXXFLAGS     += -DUSE_COMPLEX_NUMBERS
-  libmesh_CFLAGS       += -DUSE_REAL_NUMBERS
-endif
 
 # Petsc iterative solvers for parallel and uniprocessor
 # applications
