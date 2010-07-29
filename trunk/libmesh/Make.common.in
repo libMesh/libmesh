@@ -44,6 +44,7 @@ libmesh_RPATHFLAG     = @RPATHFLAG@
 # Use libmesh-specific compiler flags if available, otherwise
 # use general compiler flags from environment
 libmesh_CXXFLAGS     ?= $(CXXFLAGS)
+libmesh_CPPFLAGS     ?= $(CPPFLAGS)
 
 # Complex variable support
 enable-complex       = @enablecomplex@
@@ -215,26 +216,30 @@ endif
 ###############################################################################
 # Compiler flags, different for optimized, debug, and profiler modes.
 ifeq ($(opt-mode),on)
-  libmesh_CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@
-  libmesh_CFLAGS   += -DNDEBUG @CFLAGS_OPT@
+  libmesh_CPPFLAGS += -DNDEBUG @CPPFLAGS_OPT@
+  libmesh_CXXFLAGS += @CXXFLAGS_OPT@
+  libmesh_CFLAGS   += @CFLAGS_OPT@
 endif
 
 
 ifeq ($(devel-mode),on)
+  libmesh_CPPFLAGS += @CPPFLAGS_DVL@
   libmesh_CXXFLAGS += @CXXFLAGS_DVL@
   libmesh_CFLAGS   += @CFLAGS_DVL@
 endif
 
 
 ifeq ($(debug-mode),on)
-  libmesh_CXXFLAGS += -DDEBUG @CXXFLAGS_DBG@
-  libmesh_CFLAGS   += -DDEBUG @CFLAGS_DBG@
+  libmesh_CPPFLAGS += -DDEBUG @CPPFLAGS_DBG@
+  libmesh_CXXFLAGS += @CXXFLAGS_DBG@
+  libmesh_CFLAGS   += @CFLAGS_DBG@
 endif
 
 
 ifeq ($(prof-mode),on)
-  libmesh_CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@ @PROFILING_FLAGS@
-  libmesh_CFLAGS   += -DNDEBUG @CFLAGS_OPT@ @PROFILING_FLAGS@ 
+  libmesh_CPPFLAGS += -DNDEBUG @CPPFLAGS_OPT@
+  libmesh_CXXFLAGS += @CXXFLAGS_OPT@ @PROFILING_FLAGS@
+  libmesh_CFLAGS   += @CFLAGS_OPT@ @PROFILING_FLAGS@ 
 endif
 
 ifeq ($(prof-mode),on)
@@ -243,8 +248,9 @@ endif
 
 
 ifeq ($(oprof-mode),on)
-  libmesh_CXXFLAGS += -DNDEBUG @CXXFLAGS_OPT@ @OPROFILE_FLAGS@
-  libmesh_CFLAGS   += -DNDEBUG @CFLAGS_OPT@ @OPROFILE_FLAGS@ 
+  libmesh_CPPFLAGS += @CPPFLAGS_OPT@
+  libmesh_CXXFLAGS += @CXXFLAGS_OPT@ @OPROFILE_FLAGS@
+  libmesh_CFLAGS   += @CFLAGS_OPT@ @OPROFILE_FLAGS@ 
 endif
 ###############################################################################
 
@@ -412,7 +418,7 @@ ifeq ($(enable-optional),yes)
           include @NOX_MAKEFILE_EXPORT@
           libmesh_LIBS    += $(NOX_LIBS)
           libmesh_INCLUDE += $(NOX_INCLUDES)
-          libmesh_CXXFLAGS     += -DHAVE_CONFIG_H
+          libmesh_CPPFLAGS     += -DHAVE_CONFIG_H
       endif	
   endif	
 
@@ -463,8 +469,7 @@ ifeq ($(enable-optional),yes)
 
     # define BOPT first since it may be used in the packages file
     ifeq ($(enable-complex),yes)
-      libmesh_CXXFLAGS     += -DPETSC_USE_COMPLEX
-      libmesh_CFLAGS       += -DPETSC_USE_COMPLEX
+      libmesh_CPPFLAGS     += -DPETSC_USE_COMPLEX
       PETSC_BOPT.g = g_complex
       PETSC_BOPT.o = O_complex
     else
@@ -510,8 +515,7 @@ ifeq ($(enable-optional),yes)
     endif
 
     ifeq ($(enable-shared),yes)
-      libmesh_CXXFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
-      libmesh_CFLAGS       += -DPETSC_USE_DYNAMIC_LIBRARIES 
+      libmesh_CPPFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
       libmesh_DLFLAGS      += $(libmesh_RPATHFLAG)$(PETSC_LIB)
     endif
 
@@ -556,7 +560,7 @@ libmesh_LIBS += $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
 #
 %.$(obj-suffix) : %.C
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 ##################################
 # C rules                        #
@@ -569,7 +573,7 @@ ifeq (x$(included-from-laspack),x)
   #
 %.$(obj-suffix) : %.c
 	@echo "Compiling C (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CC) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 else
 
@@ -579,14 +583,14 @@ else
     # complex: C++ rules for .c Laspack code
 %.$(obj-suffix) : %.c
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
   else
 
     # real: C rules for .c Laspack code
 %.$(obj-suffix) : %.c
 	@echo "Compiling C (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CC) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
   endif
 endif
