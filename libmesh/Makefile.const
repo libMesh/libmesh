@@ -70,6 +70,9 @@ echo:
 	@echo "Examples Source Files:"
 	@echo "$(examplesrcfiles)"
 	@echo
+	@echo "libmesh_CPPFLAGS:"
+	@echo "$(libmesh_CPPFLAGS)"
+	@echo
 	@echo "libmesh_CFLAGS:"
 	@echo "$(libmesh_CFLAGS)"
 	@echo
@@ -106,6 +109,12 @@ echo_cxx:
 #
 echo_cc:
 	@echo  " " $(libmesh_CC) " "
+
+#
+# Print the flags used for the C preprocessor, padded with whitespace
+#
+echo_cppflags:
+	@echo " " $(libmesh_CPPFLAGS) " "
 
 #
 # Print the flags used for C++ compilation, padded with whitespace

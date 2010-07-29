@@ -213,15 +213,15 @@ svnexpand:
 #
 bin/%$(bin-suffix) : src/apps/%.cc $(mesh_library)
 	@echo "Building $@"
-	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $(patsubst %.cc,%.o,$<) 
-	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(patsubst %.cc,%.o,$<) -o $@ $(libmesh_LIBS) $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $(patsubst %.cc,%.o,$<) 
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(patsubst %.cc,%.o,$<) -o $@ $(libmesh_LIBS) $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
 
 #
 # In the contrib/bin directory, we run the test_headers.sh shell
 # script.  This is a make rule for those tests.
 #
 contrib/bin/%.o : contrib/bin/%.cc
-	$(libmesh_CXX) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 #
 # Make a TODO list
@@ -249,7 +249,7 @@ TODO:
 # VTK headers.
 src/mesh/vtk_io.$(obj-suffix) : src/mesh/vtk_io.C
 	@echo "Compiling using special rule for vtk_io.C (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CXX) -Wno-deprecated $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_CXX) -Wno-deprecated $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 
 

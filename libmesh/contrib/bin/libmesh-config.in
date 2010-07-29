@@ -6,7 +6,7 @@
 
 usage ()
 {
-  echo "usage: $0 --cxxflags --include --ldflags"
+  echo "usage: $0 --cppflags --cxxflags --include --ldflags"
   echo "       $0 --cxx"
   echo "       $0 --cc"
   exit
@@ -36,6 +36,10 @@ while [ "x$1" != "x" ]; do
 	    echo_list="echo_cc $echo_list"
 	    ;;
 
+	"--cppflags")
+	    echo_list="echo_cppflags $echo_list"
+	    ;;
+	
 	"--cxxflags")
 	    echo_list="echo_cxxflags $echo_list"
 	    ;;
