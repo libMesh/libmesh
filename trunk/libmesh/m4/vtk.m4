@@ -8,13 +8,14 @@ dnl ----------------------------------------------------------------
 AC_DEFUN([CONFIGURE_VTK], 
 [
   dnl Look for VTK location in the environment, then default paths
+  VTK_LS_CHECK=$(dirname $(ls -d /usr/include/vtk*/vtkConfigure.h 2>/dev/null | tail -n 1))
   if test "x$VTK_INC" = x; then
     if test "x$VTK_INCLUDE" != x; then
       VTK_INC=$VTK_INCLUDE
     elif test "x$VTK_DIR" != x; then
       VTK_INC=$VTK_DIR/include
-    elif (test -d /usr/include/vtk-5.0); then
-      VTK_INC="/usr/include/vtk-5.0"
+    elif (test -d $VTK_LS_CHECK); then
+      VTK_INC=$VTK_LS_CHECK
     else
       VTK_INC="/usr/include/vtk"
     fi

@@ -15,6 +15,13 @@ AC_DEFUN([CONFIGURE_PETSC],
   dnl that it has been called.
   AC_REQUIRE([AC_PROG_F77])
 
+  dnl If the user doesn't have any PETSC directory specified, let's check to
+  dnl see if it's installed via Ubuntu module
+  if test "x$PETSC_DIR" = x ; then
+    PETSC_DIR=/usr/lib/petsc
+    PETSC_ARCH=linux-gnu-c-opt
+  fi
+
   AC_CHECK_FILE($PETSC_DIR/include/petsc.h,
                 PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
 
@@ -40,8 +47,8 @@ dnl      dnl --------------------------------------------------------------
 dnl      dnl Determine a F77 compiler to use.
 dnl      dnl --------------------------------------------------------------
 dnl      AC_PROG_F77([$F77_TRY_LIST])
+dnl      AC_F77_LIBRARY_LDFLAGS
 
-      AC_F77_LIBRARY_LDFLAGS
       AC_SUBST(PETSC_ARCH)
       AC_SUBST(PETSC_DIR)
       AC_DEFINE(HAVE_PETSC, 1,
@@ -103,6 +110,8 @@ dnl      AC_SUBST(PETSCINCLUDEDIRS)
       fi
   
     else
+
+      AC_MSG_RESULT(<<< PETSc disabled.  No \$PETSC_DIR/include/petsc.h header found. >>>)
   
       dnl PETSc config failed.  Try MPI.
       enablepetsc=no

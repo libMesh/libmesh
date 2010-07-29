@@ -668,7 +668,7 @@ AC_ARG_ENABLE(slepc,
               AC_HELP_STRING([--enable-slepc],
                              [build with SLEPc eigen solver support]),
      enableslepc=$enableval,
-     enableslepc=no)
+     enableslepc=yes)
 
 if test "$enableslepc" != no ; then
    CONFIGURE_SLEPC
