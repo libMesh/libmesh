@@ -451,12 +451,11 @@ ifeq ($(enable-optional),yes)
       endif
     endif
 
-    libs-SLEPC = -L$(SLEPC_LIB) \
-                 -lslepc
+    libs-SLEPC = $(SLEPC_LIB)
 
     libmesh_LIBS += $(libs-SLEPC) $(ARPACK_LIB)
 
-    libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(SLEPC_LIB)
+    libmesh_DLFLAGS += $(SLEPC_LIB)
 
   endif #end ifeq ($(enable-slepc),yes)
 
