@@ -204,194 +204,23 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010p">1</a>]
+[<a name="Berrone_2010">1</a>]
 </td>
 <td class="bibtexitem">
-L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
- A pressure-correction scheme for convection-dominated incompressible
-  flows with discontinuous velocity and continuous pressure.
- <em>PREPRINT, Submitted to Journal of Computational Physics</em>, 2010.
- <a href="http://hal.archives-ouvertes.fr/hal-00458293/">http://hal.archives-ouvertes.fr/hal-00458293/</a>.
-<a name="Botti_2010p"></a><pre>
-@article{Botti_2010p,
-  author = {L.~Botti and D.~A.~Di Pietro},
-  title = {{A pressure-correction scheme for convection-dominated incompressible flows
-    with discontinuous velocity and continuous pressure}},
-  journal = {PREPRINT, Submitted to Journal of Computational Physics},
-  year = 2010,
-  note = {\url{http://hal.archives-ouvertes.fr/hal-00458293/}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Knezevic_2009b">2</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
- Reduced basis approximation and a posteriori error estimation for
-  the parametrized unsteady Boussinesq equations.
- <em>PREPRINT, Submitted to Mathematical Models and Methods in
-  Applied Sciences</em>, 2009.
- <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf</a>.
-<a name="Knezevic_2009b"></a><pre>
-@article{Knezevic_2009b,
-  author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
-  title = {{Reduced basis approximation and a posteriori 
-              error estimation for the parametrized unsteady 
-              Boussinesq equations}},
-  journal = {PREPRINT, Submitted to Mathematical Models and Methods in Applied Sciences},
-  year = 2009,
-  note = {\url{http://augustine.mit.edu/methodology/
-     papers/atp_M3AS_preprint_Nov09.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Nagler_2009">3</a>]
-</td>
-<td class="bibtexitem">
-L.&nbsp;Nagler and M.&nbsp;Schanz.
- An extendable poroelastic plate formulation in dynamics.
- <em>PREPRINT, Submitted to Archive of Applied Mechanics</em>, 2009.
- <a href="http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf">http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf</a>.
-<a name="Nagler_2009"></a><pre>
-@article{Nagler_2009,
-  author = {L.~Nagler and M.~Schanz},
-  title = {{An extendable poroelastic plate formulation in dynamics}},
-  journal = {PREPRINT, Submitted to Archive of Applied Mechanics},
-  year = 2009,
-  note = {\url{http://portal.tugraz.at/portal/page/
-     portal/Files/i2610/files/Forschung/Veroeffentl/preprint_02_09.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010">4</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
- A High-Performance Parallel Implementation of the Certified Reduced
-  Basis Method.
- <em>Comput. Meth. Appl. Mech. Eng.</em>, submitted May 2010.
- <a href="http://www.tacc.utexas.edu/~peterson/articles/2010_rboomit_cmame_preprint.pdf">http://www.tacc.utexas.edu/~peterson/articles/2010_rboomit_cmame_preprint.pdf</a>.
-<a name="Knezevic_2010"></a><pre>
-@article{Knezevic_2010,
-  author = {D.~J.~Knezevic and J.~W.~Peterson},
-  title = {{A High-Performance Parallel Implementation of the Certified Reduced Basis Method}},
-  journal = {Comput. Meth. Appl. Mech. Eng.},
-  year = {submitted May 2010},
-  note = {\url{http://www.tacc.utexas.edu/~peterson/
-     articles/2010_rboomit_cmame_preprint.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">5</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
- High-Fidelity Real-Time Simulation on Deployed Platforms.
- <em>Computers &amp; Fluids</em>, submitted Apr 2010.
- Special Issue: Proceedings of the Symposium on High Accuracy Flow
-  Simulations (HAFS), &Eacute;cole Polytechnique F&eacute;d&eacute;rale de Lausanne,
-  February 15-16, 2010.
-<a name="Huynh_2010"></a><pre>
-@article{Huynh_2010,
-  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and J.~W.~Peterson and A.~T.~Patera},
-  title = {{High-Fidelity Real-Time Simulation on Deployed Platforms}},
-  journal = {Computers \& Fluids},
-  year = {submitted Apr 2010},
-  note = {Special Issue: Proceedings of the Symposium on High Accuracy Flow Simulations (HAFS),
-    \'{E}cole Polytechnique F\'{e}d\'{e}rale de Lausanne, February 15--16, 2010}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Peterson_2010b">6</a>]
-</td>
-<td class="bibtexitem">
-J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
- Parallel adaptive solution of coupled
-  Rayleigh-B&eacute;nard-Marangoni problems with Navier-slip.
- <em>EARLY VIEW, International Journal for Numerical Methods in
-  Fluids</em>, accepted, 2009.
- <a href="http://dx.doi.org/10.1002/fld.2264">http://dx.doi.org/10.1002/fld.2264</a>.
-<a name="Peterson_2010b"></a><pre>
-@article{Peterson_2010b,
-  author = {J.~W.~Peterson and G.~F.~Carey},
-  title = {{Parallel adaptive solution of coupled Rayleigh--B\'{e}nard--Marangoni
-  problems with Navier-slip}},
-  journal = {EARLY VIEW, International Journal for Numerical Methods in Fluids},
-  year = {accepted, 2009},
-  note = {\url{http://dx.doi.org/10.1002/fld.2264}}
-}
-</pre>
-
-
-</td>
-</tr>
-</table><a name="Articles"></a>
-<h2>2010</h2>
-
-<!-- This document was automatically generated with bibtex2html 1.95
-     (see http://www.lri.fr/~filliatr/bibtex2html/),
-     with the following command:
-     bibtex2html -d -r --nodoc --single -nofooter ten.bib  -->
-
-
-<table>
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Kirk_2010">1</a>]
-</td>
-<td class="bibtexitem">
-B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
- Validation of Fully Implicit, Parallel Finite Element Simulations of
-  Laminar Hypersonic Flows.
- <em>AIAA Journal</em>, 48(6):1025-1036, June 2010.
- <a href="http://dx.doi.org/10.2514/1.40860">http://dx.doi.org/10.2514/1.40860</a>.
-<a name="Kirk_2010"></a><pre>
-@article{Kirk_2010,
-  author = {B.~S.~Kirk and G.~F.~Carey},
-  title = {{Validation of Fully Implicit, Parallel Finite Element Simulations of Laminar Hypersonic Flows}},
-  journal = {AIAA Journal},
+S.&nbsp;Berrone and M.&nbsp;Verani.
+ A new marking strategy for the adaptive finite element approximation
+  of optimal control constrained problems.
+ <em>EARLY VIEW, Optimization Methods and Software</em>, June 2010.
+ <a href="http://dx.doi.org/10.1080/10556788.2010.491866">http://dx.doi.org/10.1080/10556788.2010.491866</a>.
+<a name="Berrone_2010"></a><pre>
+@article{Berrone_2010,
+  author = {S.~Berrone and M.~Verani},
+  title = {{A new marking strategy for the adaptive finite element
+    approximation of optimal control constrained problems}},
+  journal = {EARLY VIEW, Optimization Methods and Software},
   year = 2010,
   month = jun,
-  volume = 48,
-  number = 6,
-  pages = {1025--1036},
-  note = {\url{http://dx.doi.org/10.2514/1.40860}}
+  note = {\url{http://dx.doi.org/10.1080/10556788.2010.491866}}
 }
 </pre>
 
@@ -433,7 +262,376 @@ F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2010">3</a>]
+[<a name="Nagler_2010">3</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Nagler and M.&nbsp;Schanz.
+ An extendable poroelastic plate formulation in dynamics.
+ <em>EARLY VIEW, Archive of Applied Mechanics</em>, May 2010.
+ <a href="http://dx.doi.org/10.1007/s00419-010-0429-4">http://dx.doi.org/10.1007/s00419-010-0429-4</a>.
+<a name="Nagler_2010"></a><pre>
+@article{Nagler_2010,
+  author = {L.~Nagler and M.~Schanz},
+  title = {{An extendable poroelastic plate formulation in dynamics}},
+  journal = {EARLY VIEW, Archive of Applied Mechanics},
+  year = 2010,
+  month = may,
+  note = {\url{http://dx.doi.org/10.1007/s00419-010-0429-4}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Brown_2010">4</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;Brown.
+ Efficient Nonlinear Solvers for Nodal High-Order Finite Elements in
+  3D.
+ <em>EARLY VIEW, Journal of Scientific Computing</em>, 2010.
+ <a href="http://dx.doi.org/10.1007/s10915-010-9396-8">http://dx.doi.org/10.1007/s10915-010-9396-8</a>.
+<a name="Brown_2010"></a><pre>
+@article{Brown_2010,
+  author = {J.~Brown},
+  title = {{Efficient Nonlinear Solvers for Nodal High-Order Finite Elements in 3D}},
+  journal = {EARLY VIEW, Journal of Scientific Computing},
+  year = 2010,
+  note = {\url{http://dx.doi.org/10.1007/s10915-010-9396-8}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fuentes_2010">5</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
+  R.&nbsp;J. Stafford.
+ Adaptive Real-Time Bioheat Transfer Models for Computer Driven
+  MR-guided Laser Induced Thermal Therapy.
+ <em>EARLY VIEW, IEEE Trans. Biomed. Eng.</em>, 57(5), 2010.
+ <a href="http://www.ncbi.nlm.nih.gov/pubmed/20142153">http://www.ncbi.nlm.nih.gov/pubmed/20142153</a>.
+<a name="Fuentes_2010"></a><pre>
+@article{Fuentes_2010,
+  author = {D.~Fuentes and Y.~Feng and A.~Elliott and A.~Shetty and
+   R.~J.~McNichols and J.~T.~Oden and R.~J.~Stafford},
+  title = {{Adaptive Real-Time Bioheat Transfer Models for
+   Computer Driven MR-guided Laser Induced Thermal Therapy}},
+  journal = {{EARLY VIEW, IEEE Trans. Biomed. Eng.}},
+  year = {2010},
+  volume = {57},
+  number = {5},
+  note = {\url{http://www.ncbi.nlm.nih.gov/pubmed/20142153}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Botti_2010b">6</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
+ A pressure-correction scheme for convection-dominated incompressible
+  flows with discontinuous velocity and continuous pressure.
+ <em>PREPRINT, Submitted to Journal of Computational Physics</em>, 2010.
+ <a href="http://hal.archives-ouvertes.fr/hal-00458293/">http://hal.archives-ouvertes.fr/hal-00458293/</a>.
+<a name="Botti_2010b"></a><pre>
+@article{Botti_2010b,
+  author = {L.~Botti and D.~A.~Di Pietro},
+  title = {{A pressure-correction scheme for convection-dominated incompressible flows
+    with discontinuous velocity and continuous pressure}},
+  journal = {PREPRINT, Submitted to Journal of Computational Physics},
+  year = 2010,
+  note = {\url{http://hal.archives-ouvertes.fr/hal-00458293/}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Knezevic_2009b">7</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
+ Reduced basis approximation and a posteriori error estimation for
+  the parametrized unsteady Boussinesq equations.
+ <em>PREPRINT, Submitted to Mathematical Models and Methods in
+  Applied Sciences</em>, 2009.
+ <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf</a>.
+<a name="Knezevic_2009b"></a><pre>
+@article{Knezevic_2009b,
+  author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
+  title = {{Reduced basis approximation and a posteriori 
+              error estimation for the parametrized unsteady 
+              Boussinesq equations}},
+  journal = {PREPRINT, Submitted to Mathematical Models and Methods in Applied Sciences},
+  year = 2009,
+  note = {\url{http://augustine.mit.edu/methodology/
+     papers/atp_M3AS_preprint_Nov09.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kirk_2009b">8</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;S. Kirk.
+ Adiabatic shock capturing in perfect gas hypersonic flows.
+ <em>EARLY VIEW, International Journal for Numerical Methods in
+  Fluids</em>, 2009.
+ <a href="http://dx.doi.org/10.1002/fld.2195">http://dx.doi.org/10.1002/fld.2195</a>.
+<a name="Kirk_2009b"></a><pre>
+@article{Kirk_2009b,
+  author = {B.~S.~Kirk},
+  title = {{Adiabatic shock capturing in perfect gas hypersonic flows}},
+  journal = {EARLY VIEW, International Journal for Numerical Methods in Fluids},
+  year = 2009,
+  note = {\url{http://dx.doi.org/10.1002/fld.2195}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Eftang_2010">9</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, A.&nbsp;T. Patera, and E.&nbsp;M. R&oslash;nquist.
+ An <em>hp</em> Certified Reduced Basis Method for Parameterized Parabolic
+  Partial Differential Equations.
+ <em>PREPRINT, Mathematical and Computer Modelling of Dynamical
+  Systems</em>, submitted Apr 2010.
+ <a href="http://augustine.mit.edu/methodology/papers/atp_MCMDS_preprint_Apr2010.pdf">http://augustine.mit.edu/methodology/papers/atp_MCMDS_preprint_Apr2010.pdf</a>.
+<a name="Eftang_2010"></a><pre>
+@article{Eftang_2010,
+  author = {J.~L.~Eftang and D.~J.~Knezevic and A.~T.~Patera and E.~M.~R{\o}nquist},
+  title = {{An $hp$ Certified Reduced Basis Method for Parameterized Parabolic Partial Differential Equations}},
+  journal = {PREPRINT, Mathematical and Computer Modelling of Dynamical Systems},
+  year = {submitted Apr 2010},
+  note = {\url{http://augustine.mit.edu/methodology/
+     papers/atp_MCMDS_preprint_Apr2010.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Knezevic_2010">10</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
+ A High-Performance Parallel Implementation of the Certified Reduced
+  Basis Method.
+ <em>PREPRINT, Comput. Meth. Appl. Mech. Eng.</em>, submitted May 2010.
+ <a href="http://www.tacc.utexas.edu/~peterson/articles/2010_rboomit_cmame_preprint.pdf">http://www.tacc.utexas.edu/~peterson/articles/2010_rboomit_cmame_preprint.pdf</a>.
+<a name="Knezevic_2010"></a><pre>
+@article{Knezevic_2010,
+  author = {D.~J.~Knezevic and J.~W.~Peterson},
+  title = {{A High-Performance Parallel Implementation of the Certified Reduced Basis Method}},
+  journal = {PREPRINT, Comput. Meth. Appl. Mech. Eng.},
+  year = {submitted May 2010},
+  note = {\url{http://www.tacc.utexas.edu/~peterson/
+     articles/2010_rboomit_cmame_preprint.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Huynh_2010">11</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
+ High-Fidelity Real-Time Simulation on Deployed Platforms.
+ <em>PREPRINT, Computers &amp; Fluids</em>, submitted Apr 2010.
+ Special Issue: Proceedings of the Symposium on High Accuracy Flow
+  Simulations (HAFS), &Eacute;cole Polytechnique F&eacute;d&eacute;rale de Lausanne,
+  February 15-16, 2010.
+<a name="Huynh_2010"></a><pre>
+@article{Huynh_2010,
+  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and J.~W.~Peterson and A.~T.~Patera},
+  title = {{High-Fidelity Real-Time Simulation on Deployed Platforms}},
+  journal = {PREPRINT, Computers \& Fluids},
+  year = {submitted Apr 2010},
+  note = {Special Issue: Proceedings of the Symposium on High Accuracy Flow Simulations (HAFS),
+    \'{E}cole Polytechnique F\'{e}d\'{e}rale de Lausanne, February 15--16, 2010}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Peterson_2010b">12</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
+ Parallel adaptive solution of coupled
+  Rayleigh-B&eacute;nard-Marangoni problems with Navier-slip.
+ <em>EARLY VIEW, International Journal for Numerical Methods in
+  Fluids</em>, accepted, 2009.
+ <a href="http://dx.doi.org/10.1002/fld.2264">http://dx.doi.org/10.1002/fld.2264</a>.
+<a name="Peterson_2010b"></a><pre>
+@article{Peterson_2010b,
+  author = {J.~W.~Peterson and G.~F.~Carey},
+  title = {{Parallel adaptive solution of coupled Rayleigh--B\'{e}nard--Marangoni
+  problems with Navier-slip}},
+  journal = {EARLY VIEW, International Journal for Numerical Methods in Fluids},
+  year = {accepted, 2009},
+  note = {\url{http://dx.doi.org/10.1002/fld.2264}}
+}
+</pre>
+
+
+</td>
+</tr>
+</table><a name="Articles"></a>
+<h2>2010</h2>
+
+<!-- This document was automatically generated with bibtex2html 1.95
+     (see http://www.lri.fr/~filliatr/bibtex2html/),
+     with the following command:
+     bibtex2html -d -r --nodoc --single -nofooter ten.bib  -->
+
+
+<table>
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Lu_2010">1</a>]
+</td>
+<td class="bibtexitem">
+Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E.&nbsp;M. Sevick-Muraca.
+ A parallel adaptive finite element simplified spherical harmonics
+  approximation solver for frequency domain fluorescence molecular imaging.
+ <em>Physics in Medicine and Biololgy</em>, 55(16):4625-4645, August
+  2010.
+ <a href="http://dx.doi.org/10.1088/0031-9155/55/16/002">http://dx.doi.org/10.1088/0031-9155/55/16/002</a>.
+<a name="Lu_2010"></a><pre>
+@article{Lu_2010,
+  author = {Y.~Lu and B.~Zhu and H.~Shen and J.~C.~Rasmussen
+             and G.~Wang and E.~M.~Sevick-Muraca},
+  title = {{A parallel adaptive finite element simplified
+              spherical harmonics approximation solver for
+	      frequency domain fluorescence molecular imaging}},
+  journal = {Physics in Medicine and Biololgy},
+  year = 2010,
+  volume = 55,
+  number = 16,
+  month = aug,
+  pages = {4625--4645},
+  note = {\url{http://dx.doi.org/10.1088/0031-9155/55/16/002}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kirk_2010">2</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
+ Validation of Fully Implicit, Parallel Finite Element Simulations of
+  Laminar Hypersonic Flows.
+ <em>AIAA Journal</em>, 48(6):1025-1036, June 2010.
+ <a href="http://dx.doi.org/10.2514/1.40860">http://dx.doi.org/10.2514/1.40860</a>.
+<a name="Kirk_2010"></a><pre>
+@article{Kirk_2010,
+  author = {B.~S.~Kirk and G.~F.~Carey},
+  title = {{Validation of Fully Implicit, Parallel Finite Element Simulations of Laminar Hypersonic Flows}},
+  journal = {AIAA Journal},
+  year = 2010,
+  month = jun,
+  volume = 48,
+  number = 6,
+  pages = {1025--1036},
+  note = {\url{http://dx.doi.org/10.2514/1.40860}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Berrone_2010a">3</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Berrone.
+ Skipping transition conditions in a posteriori error estimates for
+  finite element discretizations of parabolic equations.
+ <em>Mathematical Modelling and Numerical Analysis (M2AN)</em>,
+  44(3):455-484, May 2010.
+ <a href="http://dx.doi.org/10.1051/m2an/2010009">http://dx.doi.org/10.1051/m2an/2010009</a>.
+<a name="Berrone_2010a"></a><pre>
+@article{Berrone_2010a,
+  author = {S.~Berrone},
+  title = {{Skipping transition conditions in a posteriori error
+estimates for finite element discretizations of parabolic equations}},
+  journal = {Mathematical Modelling and Numerical Analysis (M2AN)},
+  month = may,
+  year = 2010,
+  volume = 44,
+  number = 3,
+  pages = {455--484},
+  note = {\url{http://dx.doi.org/10.1051/m2an/2010009}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Zhu_2010">4</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
@@ -464,7 +662,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2010">4</a>]
+[<a name="Podgorney_2010">5</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
@@ -496,37 +694,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2010">5</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
-  R.&nbsp;J. Stafford.
- Adaptive Real-Time Bioheat Transfer Models for Computer Driven
-  MR-guided Laser Induced Thermal Therapy.
- <em>IEEE Trans. Biomed. Eng.</em>, 57(5), 2010.
- <a href="http://www.ncbi.nlm.nih.gov/pubmed/20142153">http://www.ncbi.nlm.nih.gov/pubmed/20142153</a>.
-<a name="Fuentes_2010"></a><pre>
-@article{Fuentes_2010,
-  author = {D.~Fuentes and Y.~Feng and A.~Elliott and A.~Shetty and
-   R.~J.~McNichols and J.~T.~Oden and R.~J.~Stafford},
-  title = {{Adaptive Real-Time Bioheat Transfer Models for
-   Computer Driven MR-guided Laser Induced Thermal Therapy}},
-  journal = {{IEEE Trans. Biomed. Eng.}},
-  year = {2010},
-  volume = {57},
-  number = {5},
-  note = {\url{http://www.ncbi.nlm.nih.gov/pubmed/20142153}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010">6</a>]
+[<a name="Knezevic_2010a">6</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -534,8 +702,8 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
   dilute polymeric fluids: FENE dumbbells in extensional flow.
  <em>SIAM Journal on Scientific Computing</em>, 32(2):793-817, 2010.
  <a href="http://dx.doi.org/10.1137/090759239">http://dx.doi.org/10.1137/090759239</a>.
-<a name="Knezevic_2010"></a><pre>
-@article{Knezevic_2010,
+<a name="Knezevic_2010a"></a><pre>
+@article{Knezevic_2010a,
   author = {D.~J.~Knezevic and A.~T.~Patera},
   title = {{A certified reduced basis method for the 
               Fokker-Planck equation of dilute polymeric fluids: 
@@ -844,7 +1012,7 @@ L.&nbsp;Antiga, R.&nbsp;N. Planken, K.&nbsp;Van Canneyt, L.&nbsp;Botti, A.&nbsp;
   rates in vascular access for hemodialysis.
  In Olaf D&ouml;ssel and Wolfgang&nbsp;C. Schlegel, editors, <em>World
   Congress on Medical Physics and Biomedical Engineering</em>, pages 543-546,
-  Munich, Germany, September&nbsp;7-12 2009. Springer Berlin Heidelberg.
+  Munich, Germany, September&nbsp;7-12, 2009. Springer Berlin Heidelberg.
  <a href="http://dx.doi.org/10.1007/978-3-642-03885-3">http://dx.doi.org/10.1007/978-3-642-03885-3</a>.
 <a name="Antiga_2009"></a><pre>
 @inproceedings{Antiga_2009,
@@ -857,7 +1025,7 @@ L.&nbsp;Antiga, R.&nbsp;N. Planken, K.&nbsp;Van Canneyt, L.&nbsp;Botti, A.&nbsp;
   editor = {Olaf D\"{o}ssel and Wolfgang C. Schlegel},
   pages = {543--546},
   publisher = {Springer Berlin Heidelberg},
-  month = sep # {~7--12},
+  month = sep # {~7--12,},
   address = {Munich, Germany},
   year = {2009},
   note = {\url{http://dx.doi.org/10.1007/978-3-642-03885-3}}
@@ -938,7 +1106,7 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&n
   TiberCAD project.
  In <em>13th International Workshop on Computational Electronics
   (IWCE '09)</em>. Institute of Electrical and Electronic Engineers (IEEE),
-  May&nbsp;27-29 2009.
+  May&nbsp;27-29, 2009.
  <a href="http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf">http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf</a>.
 <a name="AufderMaur_2009"></a><pre>
 @inproceedings{AufderMaur_2009,
@@ -948,7 +1116,7 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&n
                  the TiberCAD project}},
   booktitle = {{13th International Workshop on Computational Electronics (IWCE '09)}},
   publisher = {Institute of Electrical and Electronic Engineers (IEEE)},
-  month = may # {~27--29},
+  month = may # {~27--29,},
   year = {2009},
   note = {\url{http://ieeexplore.ieee.org/iel5/5091069/5091070/05091126.pdf}}
 }
@@ -1109,31 +1277,7 @@ M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2009b">15</a>]
-</td>
-<td class="bibtexitem">
-B.&nbsp;S. Kirk.
- Adiabatic shock capturing in perfect gas hypersonic flows.
- <em>International Journal for Numerical Methods in Fluids</em>, 2009.
- <a href="http://dx.doi.org/10.1002/fld.2195">http://dx.doi.org/10.1002/fld.2195</a>.
-<a name="Kirk_2009b"></a><pre>
-@article{Kirk_2009b,
-  author = {B.~S.~Kirk},
-  title = {{Adiabatic shock capturing in perfect gas hypersonic flows}},
-  journal = {International Journal for Numerical Methods in Fluids},
-  year = 2009,
-  note = {\url{http://dx.doi.org/10.1002/fld.2195}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="AufderMaur_2009b">16</a>]
+[<a name="AufderMaur_2009b">15</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&nbsp;Romano,
@@ -1162,7 +1306,7 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2009">17</a>]
+[<a name="Knezevic_2009">16</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and E.&nbsp;S&uuml;li.
@@ -1195,7 +1339,7 @@ D.&nbsp;J. Knezevic and E.&nbsp;S&uuml;li.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lu_2009">18</a>]
+[<a name="Lu_2009">17</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Lu, H.&nbsp;B. Machado, A.&nbsp;Douraghy, D.&nbsp;Stout, H.&nbsp;Herschman, and A.&nbsp;F.
@@ -1227,7 +1371,7 @@ Y.&nbsp;Lu, H.&nbsp;B. Machado, A.&nbsp;Douraghy, D.&nbsp;Stout, H.&nbsp;Herschm
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Xu_2009">19</a>]
+[<a name="Xu_2009">18</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
@@ -1257,7 +1401,7 @@ D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2009b">20</a>]
+[<a name="Gaston_2009b">19</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Gaston, C.&nbsp;Newman, G.&nbsp;Hansen, and D.&nbsp;Lebrun-Grandi&eacute;.
@@ -1286,7 +1430,7 @@ D.&nbsp;Gaston, C.&nbsp;Newman, G.&nbsp;Hansen, and D.&nbsp;Lebrun-Grandi&eacute
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Jones_2009">21</a>]
+[<a name="Jones_2009">20</a>]
 </td>
 <td class="bibtexitem">
 I.&nbsp;A. Jones, W.&nbsp;Ruijter, and A.&nbsp;C. Long.
@@ -1313,7 +1457,7 @@ I.&nbsp;A. Jones, W.&nbsp;Ruijter, and A.&nbsp;C. Long.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2009">22</a>]
+[<a name="Mahadevan_2009">21</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;Mousseau.
@@ -1342,7 +1486,7 @@ V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;Mousseau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2009">23</a>]
+[<a name="Gaston_2009">22</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Gaston, G.&nbsp;Hansen, S.&nbsp;Kadioglu, D.&nbsp;A. Knoll, C.&nbsp;Newman, H.&nbsp;Park, C.&nbsp;Permann,
@@ -1371,7 +1515,7 @@ D.&nbsp;Gaston, G.&nbsp;Hansen, S.&nbsp;Kadioglu, D.&nbsp;A. Knoll, C.&nbsp;Newm
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Luethi2009">24</a>]
+[<a name="Luethi2009">23</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;P. L&uuml;thi.
@@ -1398,7 +1542,7 @@ M.&nbsp;P. L&uuml;thi.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Valli_2009">25</a>]
+[<a name="Valli_2009">24</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&nbsp;A. Coutinho.
@@ -1427,7 +1571,7 @@ A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Biermann_2009">26</a>]
+[<a name="Biermann_2009">25</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Biermann, O.&nbsp;von Estorff, S.&nbsp;Petersen, and C.&nbsp;Wenterodt.
@@ -1457,7 +1601,7 @@ J.&nbsp;Biermann, O.&nbsp;von Estorff, S.&nbsp;Petersen, and C.&nbsp;Wenterodt.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2009">27</a>]
+[<a name="Kirk_2009">26</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -1913,8 +2057,7 @@ E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
  In J.&nbsp;F. Abel and J.&nbsp;R. Cooke, editors, <em>Proceedings of the 6th
   Internation Conference on Computation of Shell and Spatial Structures
   (IASS-IACM 2008)</em>, Ithaca, NY, 2008. Cornell University.
- 
-  <a href="http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf">http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf</a>.
+ <a href="http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf">http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf</a>.
 <a name="DeSturler_2008"></a><pre>
 @inproceedings{DeSturler_2008,
   author = {E.~{De Sturler} and G.~H.~Paulino and S.~Wang},
@@ -1925,7 +2068,8 @@ E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
   publisher = {Cornell University},
   address = {Ithaca, NY},
   year = {2008},
-  note = {\url{http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf}}
+  note = {\url{http://www.math.vt.edu/people/sturler/
+  publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf}}
 }
 </pre>
 
@@ -2128,7 +2272,7 @@ J.&nbsp;Steensland and J.&nbsp;W. Peterson.
  A Study of Dynamically Adaptive Partitioning for AMR.
  In <em>Proceedings of the 2007 International Conference on Parallel
   and Distributed Processing Techniques and Applications (PDPTA'07) Volume 2</em>,
-  pages 503-509, Las Vegas, NV, June&nbsp;25-28 2007. CSREA Press.
+  pages 503-509, Las Vegas, NV, June&nbsp;25-28, 2007. CSREA Press.
  ISBN: 1-60132-021-3.
 <a name="Steensland_2007"></a><pre>
 @inproceedings{Steensland_2007,
@@ -2137,7 +2281,7 @@ J.&nbsp;Steensland and J.&nbsp;W. Peterson.
   booktitle = {{Proceedings of the 2007 International Conference on Parallel and
                 Distributed Processing Techniques and Applications (PDPTA'07)
 		Volume 2}},
-  month = jun # {~25--28},
+  month = jun # {~25--28,},
   pages = {503--509},
   address = {Las Vegas, NV},
   publisher = {CSREA Press},
@@ -2217,7 +2361,7 @@ R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
 K.&nbsp;Nam and M.&nbsp;M. Aral.
  Optimal placement of monitoring sensors in lakes.
  In <em>Proceedings of the 2007 Georgia Water Resources Conference</em>,
-  University of Georgia, March&nbsp;27-29 2007.
+  University of Georgia, March&nbsp;27-29, 2007.
  <a href="http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf">http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf</a>.
 <a name="Nam_2007"></a><pre>
 @inproceedings{Nam_2007,
@@ -2225,7 +2369,7 @@ K.&nbsp;Nam and M.&nbsp;M. Aral.
   title = {{Optimal placement of monitoring sensors in lakes}},
   booktitle = {Proceedings of the 2007 Georgia Water Resources Conference},
   address = {University of Georgia},
-  month = mar # {~27--29},
+  month = mar # {~27--29,},
   year = {2007},
   note = {\url{http://www.uga.edu/water/publication/uploads/2007/3.6.4.pdf}}
 }
@@ -2303,7 +2447,38 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, D.&nbsp;J. Knezevic, and B.&nbsp;T. Murra
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Crookston_2006">1</a>]
+[<a name="Berrone_2006">1</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Berrone.
+ Robust a posteriori error estimates for finite element
+  discretizations of the heat equation with discontinuous coefficients.
+ <em>Mathematical Modelling and Numerical Analysis (M2AN)</em>,
+  40(6):991-1021, November 2006.
+ <a href="http://dx.doi.org/10.1051/m2an:2006034">http://dx.doi.org/10.1051/m2an:2006034</a>.
+<a name="Berrone_2006"></a><pre>
+@article{Berrone_2006,
+  author = {S.~Berrone},
+  title = {{Robust a posteriori error estimates for finite element
+discretizations of the heat equation with discontinuous coefficients}},
+  journal = {Mathematical Modelling and Numerical Analysis (M2AN)},
+  month = nov,
+  year = 2006,
+  volume = 40,
+  number = 6,
+  pages = {991--1021},
+  note = {\url{http://dx.doi.org/10.1051/m2an:2006034}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Crookston_2006">2</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Crookston, W.&nbsp;Ruijter, A.&nbsp;C. Long, and I.&nbsp;A. Jones.
@@ -2311,7 +2486,7 @@ J.&nbsp;J. Crookston, W.&nbsp;Ruijter, A.&nbsp;C. Long, and I.&nbsp;A. Jones.
   textile composites using a grid-based finite element method with adaptive
   mesh refinement.
  In <em>Proceedings of the 8th International Conference on Textile
-  Composites (TEXCOMP-8)</em>, Nottingham, UK, October&nbsp;16-18 2006.
+  Composites (TEXCOMP-8)</em>, Nottingham, UK, October&nbsp;16-18, 2006.
  <a href="http://textiles.nottingham.ac.uk/T09-Crookston.pdf">http://textiles.nottingham.ac.uk/T09-Crookston.pdf</a>.
 <a name="Crookston_2006"></a><pre>
 @inproceedings{Crookston_2006,
@@ -2321,7 +2496,7 @@ J.&nbsp;J. Crookston, W.&nbsp;Ruijter, A.&nbsp;C. Long, and I.&nbsp;A. Jones.
                 adaptive mesh refinement},
   booktitle = {{Proceedings of the 8th International Conference on
                  Textile Composites (TEXCOMP-8)}},
-  month = oct # {~16--18},
+  month = oct # {~16--18,},
   address = {Nottingham, UK},
   year = {2006},
   note = {\url{http://textiles.nottingham.ac.uk/T09-Crookston.pdf}}
@@ -2335,7 +2510,7 @@ J.&nbsp;J. Crookston, W.&nbsp;Ruijter, A.&nbsp;C. Long, and I.&nbsp;A. Jones.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2006">2</a>]
+[<a name="Knezevic_2006">3</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic.
@@ -2365,7 +2540,7 @@ D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Schindler_2006">3</a>]
+[<a name="Schindler_2006">4</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Schindler, P.&nbsp;Talkner, and P.&nbsp;H&auml;nggi.
@@ -2394,7 +2569,36 @@ M.&nbsp;Schindler, P.&nbsp;Talkner, and P.&nbsp;H&auml;nggi.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Marichalar_2006">4</a>]
+[<a name="Estorff_2006">5</a>]
+</td>
+<td class="bibtexitem">
+O.&nbsp;von Estorff and S.&nbsp;Petersen.
+ Vibro-acoustic investigations using finite and infinite elements.
+ <em>Proceedings of the Gesellschaft f&uuml;r Angewandte Mathematik
+  und Mechanik (GAMM) Annual Meeting 2006 (PAMM)</em>, 6(1):615-616, 2006.
+ <a href="http://dx.doi.org/10.1002/pamm.200610288">http://dx.doi.org/10.1002/pamm.200610288</a>.
+<a name="Estorff_2006"></a><pre>
+@article{Estorff_2006,
+  author = {O.~von~Estorff and S.~Petersen},
+  title = {{Vibro-acoustic investigations using finite and infinite elements}},
+  journal = {{Proceedings of the Gesellschaft f\"{u}r Angewandte Mathematik und Mechanik
+              (GAMM) Annual Meeting 2006 (PAMM)}},
+  year = 2006,
+  volume = 6,
+  number = 1,
+  pages = {615--616},
+  note = {\url{http://dx.doi.org/10.1002/pamm.200610288}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Marichalar_2006">6</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Marichalar, W.&nbsp;C. Rochelle, B.&nbsp;S. Kirk, and C.&nbsp;H. Campbell.
@@ -2422,7 +2626,7 @@ J.&nbsp;J. Marichalar, W.&nbsp;C. Rochelle, B.&nbsp;S. Kirk, and C.&nbsp;H. Camp
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petersen_2006">5</a>]
+[<a name="Petersen_2006">7</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Petersen, D.&nbsp;Dreyer, and O.&nbsp;von Estorff.
@@ -2452,7 +2656,7 @@ S.&nbsp;Petersen, D.&nbsp;Dreyer, and O.&nbsp;von Estorff.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Dreyer_2006">6</a>]
+[<a name="Dreyer_2006">8</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Dreyer, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
