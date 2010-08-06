@@ -8843,15 +8843,46 @@ fi
   fi
 
   if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
-    TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
-    TECPLOT_INCLUDE=-I$TECPLOT_INCLUDE_PATH
+
+                save_CPPFLAGS=$CPPFLAGS
+    save_LIBS=$LIBS
+
+    CPPFLAGS="-I$TECPLOT_INCLUDE_PATH $CPPFLAGS"
+    LIBS="$TECPLOT_LIBRARY_PATH/tecio.a $LIBS"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <TECIO.h>
+int
+main ()
+{
+ int ierr = TECEND ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                   TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
+                   TECPLOT_INCLUDE=-I$TECPLOT_INCLUDE_PATH
 
 
 
 $as_echo "#define HAVE_TECPLOT_API 1" >>confdefs.h
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Tecplot API support >>>" >&5
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Tecplot API support >>>" >&5
 $as_echo "<<< Configuring library with Tecplot API support >>>" >&6; }
+
+else
+
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: WARNING: Found $TECPLOT_LIBRARY_PATH/tecio.a but cannot link with it! " >&5
+$as_echo "WARNING: Found $TECPLOT_LIBRARY_PATH/tecio.a but cannot link with it! " >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+    LIBS=$save_LIBS
+    CPPFLAGS=$save_CPPFLAGS
   fi
 
 fi
