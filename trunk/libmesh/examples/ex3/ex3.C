@@ -37,7 +37,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "linear_implicit_system.h"
 #include "equation_systems.h"
 
@@ -150,9 +150,11 @@ int main (int argc, char** argv)
   // built PETSc.
   equation_systems.get_system("Poisson").solve();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   // After solving the system write the solution
-  // to a GMV-formatted plot file.
-  GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
+  // to a ExodusII-formatted plot file.
+  ExodusII_IO (mesh).write_equation_systems ("out.exd", equation_systems);
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // All done.  
   return 0;

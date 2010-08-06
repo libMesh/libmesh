@@ -32,7 +32,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -122,8 +122,10 @@ int main (int argc, char** argv)
   // then write the solution.
   equation_systems.get_system("Stokes").solve();
 
-  GMVIO(mesh).write_equation_systems ("out.gmv",
+#ifdef LIBMESH_HAVE_EXODUS_API
+  ExodusII_IO(mesh).write_equation_systems ("out.exd",
                                       equation_systems);
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // All done.  
   return 0;

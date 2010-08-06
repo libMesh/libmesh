@@ -319,11 +319,12 @@ int main (int argc, char** argv)
 	          GMVIO(mesh).write_equation_systems (buf,equation_systems);
 
 		  }else{
+#ifdef LIBMESH_HAVE_VTK
 			  // VTK viewers are generally not happy with two dots in a filename
-			  sprintf (buf, "out_%03d.pvtu", time_step);
+			  sprintf (buf, "out_%03d.exd", time_step);
 
 	          VTKIO(mesh).write_equation_systems (buf,equation_systems);
-
+#endif // #ifdef LIBMESH_HAVE_VTK
 		  }
         }
 

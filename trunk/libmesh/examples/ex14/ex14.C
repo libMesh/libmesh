@@ -47,7 +47,7 @@
 #include "mesh.h"
 #include "equation_systems.h"
 #include "linear_implicit_system.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "tecplot_io.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -252,15 +252,18 @@ int main(int argc, char** argv)
                 << system.final_linear_residual()
                 << std::endl;
       
+#ifdef LIBMESH_HAVE_EXODUS_API
       // After solving the system write the solution
-      // to a GMV-formatted plot file.
+      // to a ExodusII-formatted plot file.
       if (output_intermediate)
         {
           OStringStream outfile;
-          outfile << "lshaped.gmv." << r_step;
-          GMVIO (mesh).write_equation_systems (outfile.str(),
+          outfile << "lshaped_" << r_step;
+          ExodusII_IO (mesh).write_equation_systems (outfile.str(),
                                                equation_systems);
+          outfile << ".exd" << r_step;
         }
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
       // Compute the error.
       exact_sol.compute_error("Laplace", "u");
@@ -408,11 +411,13 @@ int main(int argc, char** argv)
         }
     }            
   
+#ifdef LIBMESH_HAVE_EXODUS_API
   // Write out the solution
   // After solving the system write the solution
-  // to a GMV-formatted plot file.
-  GMVIO (mesh).write_equation_systems ("lshaped.gmv",
+  // to a ExodusII-formatted plot file.
+  ExodusII_IO (mesh).write_equation_systems ("lshaped.exd",
                                        equation_systems);
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // Close up the output file.
   out << "];" << std::endl;
