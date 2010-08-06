@@ -24,7 +24,7 @@
  // Navier-Stokes equations for low-speed incompressible fluid flow.  This
  // example introduces the concept of the inner nonlinear loop for each
  // timestep, and requires a good deal of linear algebra number-crunching
- // at each step.  If you have the General Mesh Viewer (GMV) installed,
+ // at each step.  If you have a ExodusII viewer such as ParaView installed,
  // the script movie.sh in this directory will also take appropriate screen
  // shots of each of the solution files in the time sequence.  These rgb files
  // can then be animated with the "animate" utility of ImageMagick if it is
@@ -42,7 +42,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -262,17 +262,20 @@ int main (int argc, char** argv)
       // Write out every nth timestep to file.
       const unsigned int write_interval = 1;
       
+#ifdef LIBMESH_HAVE_EXODUS_API
       if ((t_step+1)%write_interval == 0)
         {
           OStringStream file_name;
 
-          // We write the file name in the gmv auto-read format.
-          file_name << "out.gmv.";
+          // We write the file in the ExodusII format.
+          file_name << "out_";
           OSSRealzeroright(file_name,3,0, t_step + 1);
+          file_name << ".exd";
           
-          GMVIO(mesh).write_equation_systems (file_name.str(),
+          ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);
         }
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
     } // end timestep loop.
   
   // All done.  

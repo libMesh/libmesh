@@ -40,10 +40,10 @@
 #include <math.h>
 
 // Basic include file needed for the mesh functionality.
+#include "exodusII_io.h"
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
 #include "linear_implicit_system.h"
 #include "equation_systems.h"
 
@@ -113,7 +113,7 @@ int main (int argc, char** argv)
   mesh.print_info();
 
   // Write the mesh before the infinite elements are added
-  GMVIO(mesh).write ("orig_mesh.gmv");
+  ExodusII_IO(mesh).write ("orig_mesh.exd");
 
   // Normally, when a mesh is imported or created in
   // libMesh, only conventional elements exist.  The infinite
@@ -138,7 +138,7 @@ int main (int argc, char** argv)
 
   // Write the mesh with the infinite elements added.
   // Compare this to the original mesh.
-  GMVIO(mesh).write ("ifems_added.gmv");
+  ExodusII_IO(mesh).write ("ifems_added.exd");
 
   // After building infinite elements, we have to let 
   // the elements find their neighbors again.

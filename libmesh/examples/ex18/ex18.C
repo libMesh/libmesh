@@ -27,7 +27,7 @@
 #include "equation_systems.h"
 #include "error_vector.h"
 #include "getpot.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "kelly_error_estimator.h"
 #include "mesh.h"
 #include "mesh_generation.h"
@@ -279,18 +279,21 @@ int main (int argc, char** argv)
       // Advance to the next timestep in a transient problem
       system.time_solver->advance_timestep();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
       // Write out this timestep if we're requested to
       if ((t_step+1)%write_interval == 0)
         {
           OStringStream file_name;
 
-          // We write the file name in the gmv auto-read format.
-          file_name << "out.gmv.";
+          // We write the file in the ExodusII format.
+          file_name << "out_";
           OSSRealzeroright(file_name,3,0, t_step + 1);
+          file_name << ".exd";
 
-          GMVIO(mesh).write_equation_systems (file_name.str(),
+          ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);
         }
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }
 #endif // #ifndef LIBMESH_ENABLE_AMR
   

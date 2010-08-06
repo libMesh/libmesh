@@ -38,7 +38,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "linear_implicit_system.h"
 #include "equation_systems.h"
 
@@ -179,10 +179,12 @@ int main (int argc, char** argv)
   // "Personalize" the output, with the
   // number of the quadrature rule appended.
   std::ostringstream f_name;
-  f_name << "out_" << quad_type << ".gmv";
+  f_name << "out_" << quad_type << ".exd";
 
-  GMVIO(mesh).write_equation_systems (f_name.str(),
+#ifdef LIBMESH_HAVE_EXODUS_API
+  ExodusII_IO(mesh).write_equation_systems (f_name.str(),
                                       equation_systems);
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // All done.
   return 0;

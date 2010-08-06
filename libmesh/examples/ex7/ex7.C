@@ -48,7 +48,6 @@
 #include "libmesh_logging.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
 #include "equation_systems.h"
 #include "elem.h"
 
@@ -250,17 +249,11 @@ int main (int argc, char** argv)
       f_system.solve (n,n);
       
       // After solving the system, write the solution
-      // to a GMV-formatted plot file, for every frequency.  
-      // Now this is nice ;-) : we have the <i>identical</i> 
-      // interface to the mesh write method as in the real-only 
-      // case, but we output the real and imaginary 
-      // part, and the magnitude, where the variable 
-      // "p" is prepended with "r_", "i_", and "a_", 
-      // respectively.
+      // to an ExodusII-formatted plot file, for every frequency.  
       char buf[14];
-      sprintf (buf, "out%04d.gmv", n);
+      sprintf (buf, "out%04d.exd", n);
 
-      GMVIO(mesh).write_equation_systems (buf,
+      ExodusII_IO(mesh).write_equation_systems (buf,
                                           equation_systems);
     }
   

@@ -38,7 +38,7 @@
 #include "mesh.h"
 #include "equation_systems.h"
 #include "linear_implicit_system.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "fe.h"
 #include "quadrature.h"
 #include "dense_matrix.h"
@@ -175,8 +175,8 @@ int main(int argc, char** argv)
   else
     output_file += "uniform";
 
-  std::string gmv_file = output_file;
-  gmv_file += ".gmv";
+  std::string exd_file = output_file;
+  exd_file += ".exd";
   output_file += ".m";
 
   std::ofstream out (output_file.c_str());
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
 
   // Convert the mesh to second order: necessary for computing with
   // Clough-Tocher elements, useful for getting slightly less 
-  // broken gmv output with Hermite elements
+  // broken visualization output with Hermite elements
   mesh.all_second_order();
 
   // Convert it to triangles if necessary
@@ -350,11 +350,13 @@ int main(int argc, char** argv)
         }
     }            
   
+#ifdef LIBMESH_HAVE_EXODUS_API
   // Write out the solution
   // After solving the system write the solution
-  // to a GMV-formatted plot file.
-  GMVIO (mesh).write_equation_systems (gmv_file,
-                                           equation_systems);
+  // to a ExodusII-formatted plot file.
+  ExodusII_IO (mesh).write_equation_systems (exd_file,
+                                       equation_systems);
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // Close up the output file.
   out << "];\n"

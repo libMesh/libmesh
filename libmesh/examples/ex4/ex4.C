@@ -46,7 +46,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "gnuplot_io.h"
 #include "linear_implicit_system.h"
 #include "equation_systems.h"
@@ -252,11 +252,13 @@ int main (int argc, char** argv)
     GnuPlotIO plot(mesh,"Example 4, 1D",GnuPlotIO::GRID_ON);
     plot.write_equation_systems("out_1",equation_systems);
   }
+#ifdef LIBMESH_HAVE_EXODUS_API
   else
   {
-    GMVIO (mesh).write_equation_systems ((dim == 3) ? 
-      "out_3.gmv" : "out_2.gmv",equation_systems);
+    ExodusII_IO (mesh).write_equation_systems ((dim == 3) ? 
+      "out_3.exd" : "out_2.exd",equation_systems);
   }
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
   
   // All done.  
   return 0;

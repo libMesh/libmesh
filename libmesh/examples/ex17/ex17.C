@@ -38,7 +38,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "eigen_system.h"
 #include "equation_systems.h"
 #include "fe.h"
@@ -180,8 +180,10 @@ int main (int argc, char** argv)
     {
       eigen_system.get_eigenpair(nconv-1);
       
+#ifdef LIBMESH_HAVE_EXODUS_API
       // Write the eigen vector to file.
-      GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
+      ExodusII_IO (mesh).write_equation_systems ("out.exd", equation_systems);
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }
   else
     {
