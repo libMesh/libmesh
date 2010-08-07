@@ -48,6 +48,7 @@
 #include "libmesh_logging.h"
 #include "mesh.h"
 #include "mesh_generation.h"
+#include "exodusII_io.h"
 #include "equation_systems.h"
 #include "elem.h"
 
