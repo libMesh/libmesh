@@ -1149,19 +1149,42 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
   unsigned int dim = this->get_mesh().mesh_dimension();
 
+  // I'm not sure how best to mix Hilbert norms on some variables (for
+  // which we'll want to square then sum then square root) with norms
+  // like L_inf (for which we'll just want to take an absolute value
+  // and then sum).
+  bool can_add_hilbert_norm = true,
+       can_add_nonhilbert_norm = true;
+
   // Loop over all variables
   for (unsigned int var=0; var != this->n_vars(); ++var)
     {
       // Skip any variables we don't need to integrate
-      if (norm.weight(var) == 0.0)
+      Real norm_weight_sq = norm.weight_sq(var);
+      if (norm_weight_sq == 0.0)
         continue;
+      Real norm_weight = norm.weight(var);
 
       // Check for unimplemented norms (rather than just returning 0).
-      if((norm.type(var)!=H1) &&
-	 (norm.type(var)!=H2) &&
-	 (norm.type(var)!=L2) &&
-	 (norm.type(var)!=H1_SEMINORM) &&
-	 (norm.type(var)!=H2_SEMINORM))
+      FEMNorm norm_type = norm.type(var);
+      if((norm_type==H1) ||
+	 (norm_type==H2) ||
+	 (norm_type==L2) ||
+	 (norm_type==H1_SEMINORM) ||
+	 (norm_type==H2_SEMINORM))
+        {
+          if (!can_add_hilbert_norm)
+            libmesh_not_implemented();
+          can_add_nonhilbert_norm = false;
+        }
+      else if ((norm_type==L1) ||
+	       (norm_type==L_INF))
+        {
+          if (!can_add_nonhilbert_norm)
+            libmesh_not_implemented();
+          can_add_hilbert_norm = false;
+        }
+      else
 	libmesh_not_implemented();
 
       const FEType& fe_type = this->get_dof_map().variable_type(var);
@@ -1173,20 +1196,22 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
       const std::vector<Real>&               JxW = fe->get_JxW();
       const std::vector<std::vector<Real> >* phi = NULL;
-      if (norm.type(var) == H1 ||
-          norm.type(var) == H2 ||
-          norm.type(var) == L2)
+      if (norm_type == H1 ||
+          norm_type == H2 ||
+          norm_type == L2 ||
+          norm_type == L1 ||
+          norm_type == L_INF)
         phi = &(fe->get_phi());
 
       const std::vector<std::vector<RealGradient> >* dphi = NULL;
-      if (norm.type(var) == H1 ||
-          norm.type(var) == H2 ||
-          norm.type(var) == H1_SEMINORM)
+      if (norm_type == H1 ||
+          norm_type == H2 ||
+          norm_type == H1_SEMINORM)
         dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       const std::vector<std::vector<RealTensor> >*   d2phi = NULL;
-      if (norm.type(var) == H2 ||
-          norm.type(var) == H2_SEMINORM)
+      if (norm_type == H2 ||
+          norm_type == H2_SEMINORM)
         d2phi = &(fe->get_d2phi());
 #endif
 
@@ -1213,36 +1238,53 @@ Real System::calculate_norm(const NumericVector<Number>& v,
           // Begin the loop over the Quadrature points.
           for (unsigned int qp=0; qp<n_qp; qp++)
             {
-              if (norm.type(var) == H1 ||
-                  norm.type(var) == H2 ||
-                  norm.type(var) == L2)
+              if (norm_type == L1)
                 {
                   Number u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-	          v_norm += norm.weight_sq(var) *
+	          v_norm += norm_weight *
+                            JxW[qp] * std::abs(u_h);
+                }
+
+              if (norm_type == L_INF)
+                {
+                  Number u_h = 0.;
+                  for (unsigned int i=0; i != n_sf; ++i)
+                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
+	          v_norm = std::max(v_norm, norm_weight * std::abs(u_h));
+                }
+
+              if (norm_type == H1 ||
+                  norm_type == H2 ||
+                  norm_type == L2)
+                {
+                  Number u_h = 0.;
+                  for (unsigned int i=0; i != n_sf; ++i)
+                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
+	          v_norm += norm_weight_sq *
                             JxW[qp] * libmesh_norm(u_h);
                 }
 
-              if (norm.type(var) == H1 ||
-                  norm.type(var) == H2 ||
-                  norm.type(var) == H1_SEMINORM)
+              if (norm_type == H1 ||
+                  norm_type == H2 ||
+                  norm_type == H1_SEMINORM)
                 {
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += norm.weight_sq(var) *
+                  v_norm += norm_weight_sq *
                             JxW[qp] * grad_u_h.size_sq();
                 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              if (norm.type(var) == H2 ||
-                  norm.type(var) == H2_SEMINORM)
+              if (norm_type == H2 ||
+                  norm_type == H2_SEMINORM)
                 {
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += norm.weight_sq(var) *
+                  v_norm += norm_weight_sq *
                             JxW[qp] * hess_u_h.size_sq();
                 }
 #endif
