@@ -1166,7 +1166,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
       Real norm_weight = norm.weight(var);
 
       // Check for unimplemented norms (rather than just returning 0).
-      FEMNorm norm_type = norm.type(var);
+      FEMNormType norm_type = norm.type(var);
       if((norm_type==H1) ||
 	 (norm_type==H2) ||
 	 (norm_type==L2) ||
