@@ -44,6 +44,7 @@
 // Need SLEPc to get the POD eigenvalues
 #if defined(LIBMESH_HAVE_SLEPC)
 // LAPACK include (via SLEPc)
+#include <petscsys.h>
 #include <slepcblaslapack.h>
 #endif // LIBMESH_HAVE_SLEPC
 
