@@ -151,7 +151,7 @@ private:
 
 // ------------------------------------------------------------
 // Plane class inline members
-const Point & Plane::normal () const
+inline const Point & Plane::normal () const
 {
   return _normal;
 }
