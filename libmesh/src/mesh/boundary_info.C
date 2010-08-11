@@ -48,6 +48,39 @@ BoundaryInfo::BoundaryInfo(const MeshBase& m) :
 {
 }
 
+BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
+{
+  /**
+   * A quick note: We're going to attempt to pull _new_ pointers out of the mesh assigned to this boundary info.
+   * This will only work if the mesh assigned to this BoundaryInfo is the same mesh object as other_boundary_info
+   * _or_ was constructed in exactly the same way (or constructed as a copy).
+   */
+
+  {
+    std::multimap<const Node*, short int>::const_iterator it = other_boundary_info._boundary_node_id.begin();
+    const std::multimap<const Node*, short int>::const_iterator end = other_boundary_info._boundary_node_id.end();
+
+    for(; it != end; ++it)
+    {
+      const Node * other_node = it->first;
+      _boundary_node_id.insert( std::pair<const Node*, short int>(_mesh.node_ptr(other_node->id()), it->second) );
+    }
+  }
+  
+
+  {
+    std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator it = other_boundary_info._boundary_side_id.begin();
+    const std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator end = other_boundary_info._boundary_side_id.end();
+
+    for(; it != end; ++it)
+    {
+      const Elem * other_elem = it->first;
+      _boundary_side_id.insert( std::pair<const Elem*, std::pair<unsigned short int, short int> >(_mesh.elem(other_elem->id()), it->second) );
+    }
+  }
+
+  _boundary_ids = other_boundary_info._boundary_ids;
+}
 
 
 BoundaryInfo::~BoundaryInfo()

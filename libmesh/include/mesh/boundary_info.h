@@ -69,6 +69,13 @@ protected:
   BoundaryInfo (const MeshBase& m);
 
 public:
+  /**
+   * Actual copying operation.
+   *
+   * Note that it does not copy the mesh over (for obvious reasons).
+   */
+  BoundaryInfo& operator=(const BoundaryInfo& other_boundary_info);
+
 
   /**
    * Destructor.  Not much to do.
