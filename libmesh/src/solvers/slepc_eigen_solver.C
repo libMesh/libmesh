@@ -702,11 +702,10 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T>& deflation_vec
   Vec* deflation_space = &deflation_vector;
 #if SLEPC_VERSION_LESS_THAN(3,1,0)
   ierr = EPSAttachDeflationSpace(_eps, 1, deflation_space, PETSC_FALSE);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
   ierr = EPSSetDeflationSpace(_eps, 1, deflation_space);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 template <typename T>
