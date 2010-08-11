@@ -141,6 +141,8 @@ void UnstructuredMesh::copy_nodes_and_elements
       AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
       Elem * elem = ap.release();
 
+      elem->subdomain_id() = old->subdomain_id();
+
 #ifdef LIBMESH_ENABLE_AMR
       //Create the parent's child pointers if necessary
       if (newparent)
