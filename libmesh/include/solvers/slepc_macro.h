@@ -30,18 +30,9 @@
  * SLEPc include files. SLEPc can only be used
  * together with PETSc.
  */
-#if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_PETSC)
+#ifdef LIBMESH_HAVE_SLEPC
 
-#ifndef LIBMESH_USE_COMPLEX_NUMBERS
-extern "C"
-{
-# include <slepceps.h>
 # include <slepcversion.h>
-}
-#else
-# include <slepceps.h>
-# include <slepcversion.h>
-#endif
 
 // A convenient macro for comparing SLEPc versions.
 // Returns 1 if the current SLEPc version is < major.minor.subminor
@@ -52,6 +43,14 @@ extern "C"
 				  (SLEPC_VERSION_MINOR == (minor) &&		    \
 				   SLEPC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
+// Make up for missing extern "C" in old SLEPc versions
+#if !defined(LIBMESH_USE_COMPLEX_NUMBERS) && SLEPC_VERSION_LESS_THAN(3,0,0)
+#  define EXTERN_C_FOR_SLEPC_BEGIN extern "C" {
+#  define EXTERN_C_FOR_SLEPC_END }
+#else
+#  define EXTERN_C_FOR_SLEPC_BEGIN 
+#  define EXTERN_C_FOR_SLEPC_END
+#endif
 
-#endif // #if LIBMESH_HAVE_SLEPC & LIBMESH_HAVE_PETSC
+#endif // #if LIBMESH_HAVE_SLEPC
 #endif // #ifdef __slepc_macro_h__

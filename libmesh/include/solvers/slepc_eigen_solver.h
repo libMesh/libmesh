@@ -30,23 +30,15 @@
 #include "petsc_matrix.h"
 #include "slepc_macro.h"
 
+#ifdef LIBMESH_HAVE_SLEPC
 
 /**
- * SLEPc include files. SLEPs can only be used
- * together with PETSc.
+ * SLEPc include files.
  */
-#if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_PETSC)
+EXTERN_C_FOR_SLEPC_BEGIN
+# include <slepceps.h>
+EXTERN_C_FOR_SLEPC_END
 
-#ifndef LIBMESH_USE_COMPLEX_NUMBERS
-extern "C"
-{
-# include <slepceps.h>
-# include <slepcversion.h>
-}
-#else
-# include <slepceps.h>
-# include <slepcversion.h>
-#endif
 
 namespace libMesh
 {
