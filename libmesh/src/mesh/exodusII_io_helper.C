@@ -593,8 +593,6 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
     }
   num_elem_blk = subdomain_map.size();
 
-  libMesh::out<<"Num elem block: "<<num_elem_blk<<std::endl;
-
   ex_err = exII::ex_put_init(ex_id,
 			     str_title.c_str(),
 			     num_dim,
@@ -635,8 +633,6 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
       subdomain_map[cur_subdomain].push_back(elem->id());
     }
   num_elem_blk = subdomain_map.size();
-
-  libMesh::out<<"Num elem block: "<<num_elem_blk<<std::endl;
 
   ex_err = exII::ex_put_init(ex_id,
 			     str_title.c_str(),
