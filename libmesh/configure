@@ -8040,10 +8040,10 @@ if test "$enableslepc" != no ; then
     SLEPC_DIR=/usr/lib/slepc
   fi
 
-      if test "x$SLEPC_DIR" = x ; then
+      if test "x$SLEPC_DIR" = x || test "x$petscversion" = x; then
     enableslepc=no
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly. >>>" >&5
-$as_echo "<<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly. >>>" >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly and enable PETSc. >>>" >&5
+$as_echo "<<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly and enable PETSc. >>>" >&6; }
 
   else
     as_ac_File=`$as_echo "ac_cv_file_$SLEPC_DIR/include/slepc.h" | $as_tr_sh`

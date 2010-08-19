@@ -13,11 +13,11 @@ AC_DEFUN([CONFIGURE_SLEPC],
     SLEPC_DIR=/usr/lib/slepc
   fi
 
-  dnl Test to see if SLEPC_DIR set by user or autodetection.  If not set, then
-  dnl disable slepc, print a message.
-  if test "x$SLEPC_DIR" = x ; then
+  dnl Test to see if SLEPC_DIR and petscversion were set by user or
+  dnl autodetection.  If not set, then disable slepc, print a message.
+  if test "x$SLEPC_DIR" = x || test "x$petscversion" = x; then
     enableslepc=no
-    AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly. >>>)
+    AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly and enable PETSc. >>>)
 
   else
     AC_CHECK_FILE($SLEPC_DIR/include/slepc.h,
