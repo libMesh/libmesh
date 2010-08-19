@@ -6,8 +6,8 @@ INCLUDE = -I.
 
 # Package name and additional flags required for library compilation
 pkgname  := tetgen
-#libmesh_CXXFLAGS += -DTRILIBRARY
-libmesh_CXXFLAGS := -DNDEBUG -DTRILIBRARY -fPIC
+#libmesh_CXXFLAGS += -DTETLIBRARY
+libmesh_CXXFLAGS := -DNDEBUG -DTETLIBRARY -fPIC
 
 # (Relative) Path to location of shared libs
 libpath := ../lib
