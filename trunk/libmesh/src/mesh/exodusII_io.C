@@ -458,7 +458,6 @@ void ExodusII_IO::write (const std::string& fname)
       exio_helper.write_elements(mesh);
       exio_helper.write_sidesets(mesh);
       exio_helper.write_nodesets(mesh);
-
       // Note: the file is closed automatically by the ExodusII_IO destructor.
     }
 }
