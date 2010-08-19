@@ -9,13 +9,11 @@ pkgname  := nemesis
 libpath := ../../lib
 
 # Only one source file for triangle
-SRC     := $(shell find ./ -name "*.c")
+SRC     := $(shell find ./ -name "*.c" -a ! -name "ne_test.c")
 OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 
 
 .PHONY: clean clobber distclean
-
-
 
 target := $(EXTERNAL_LIBDIR)/lib$(pkgname)$(static_libext)
 
