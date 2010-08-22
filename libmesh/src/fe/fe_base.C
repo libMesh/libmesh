@@ -2126,23 +2126,23 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
                         recursive_constraint[js] = true;
 	            }
                 }
-	      for (unsigned int is = 0; is != n_side_dofs; ++is)
+	      for (unsigned int js = 0; js != n_side_dofs; ++js)
 	        {
-	          const unsigned int i = neigh_side_dofs[is];
-	          const unsigned int their_dof_g = neigh_dof_indices[i];
-                  libmesh_assert(their_dof_g != DofObject::invalid_id);
+                  if (recursive_constraint[js])
+                    continue;
 
-	          for (unsigned int js = 0; js != n_side_dofs; ++js)
+	          const unsigned int j = my_side_dofs[js];
+	          const unsigned int my_dof_g = my_dof_indices[j];
+                  libmesh_assert(my_dof_g != DofObject::invalid_id);
+
+                  if (dof_map.is_constrained_dof(my_dof_g))
+                    continue;
+
+	          for (unsigned int is = 0; is != n_side_dofs; ++is)
 	            {
-                      if (recursive_constraint[js])
-                        continue;
-
-	              const unsigned int j = my_side_dofs[js];
-	              const unsigned int my_dof_g = my_dof_indices[j];
-                      libmesh_assert(my_dof_g != DofObject::invalid_id);
-
-                      if (dof_map.is_constrained_dof(my_dof_g))
-                        continue;
+	              const unsigned int i = neigh_side_dofs[is];
+	              const unsigned int their_dof_g = neigh_dof_indices[i];
+                      libmesh_assert(their_dof_g != DofObject::invalid_id);
 
 		      const Real their_dof_value = Ue[is](js);
 		      if (their_dof_g == my_dof_g)
