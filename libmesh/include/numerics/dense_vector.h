@@ -395,7 +395,7 @@ Number DenseVector<T>::dot (const DenseVector<T2>& vec) const
   Number val = 0.;
 
   for (unsigned int i=0; i<this->size(); i++)
-    val += (*this)(i)*vec(i);
+    val += (*this)(i)*libmesh_conj(vec(i));
 
   return val;
 }
