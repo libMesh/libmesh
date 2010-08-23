@@ -199,6 +199,13 @@ public:
 			 const unsigned short int side) const;
 
   /**
+   * Returns the list of boundary ids associated with the \p side side of
+   * element \p elem.
+   */
+  std::vector<short int> boundary_ids (const Elem* const elem,
+       const unsigned short int side) const;
+
+  /**
    * Returns a side of element \p elem whose associated boundary id is 
    * \p boundary_id if such a side exists.
    * If multiple sides of \p elem have the same id, only the lowest numbered
