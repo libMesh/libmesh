@@ -171,7 +171,7 @@ void RBSCMSystem::resize_SCM_vectors()
   B_max.resize(get_Q_a());
 }
 
-void RBSCMSystem::add_scaled_symm_Aq(unsigned int q_a, Real scalar)
+void RBSCMSystem::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
 {
   START_LOG("add_scaled_symm_Aq()", "RBSCMSystem");
 
@@ -426,11 +426,11 @@ void RBSCMSystem::evaluate_stability_constant()
     // Compute and store the vector y = (y_1, \ldots, y_Q) for the
     // eigenvector currently stored in eigen_system.solution.
     // We use this later to compute the SCM upper bounds.
-    Real norm_B2 = B_inner_product(*solution, *solution);
+    Real norm_B2 = libmesh_real( B_inner_product(*solution, *solution) );
 
     for(unsigned int q=0; q<get_Q_a(); q++)
     {
-      Real norm_Aq2 = Aq_inner_product(q, *solution, *solution);
+      Real norm_Aq2 = libmesh_real( Aq_inner_product(q, *solution, *solution) );
 
       set_SCM_UB_vector(j,q,norm_Aq2/norm_B2);
     }
@@ -445,14 +445,14 @@ void RBSCMSystem::evaluate_stability_constant()
   STOP_LOG("evaluate_stability_constant()", "RBSCMSystem");
 }
 
-Real RBSCMSystem::B_inner_product(const NumericVector<Number>& v, const NumericVector<Number>& w) const
+Number RBSCMSystem::B_inner_product(const NumericVector<Number>& v, const NumericVector<Number>& w) const
 {
   matrix_B->vector_mult(*inner_product_storage_vector, w);
 
   return v.dot(*inner_product_storage_vector);
 }
 
-Real RBSCMSystem::Aq_inner_product(unsigned int q,
+Number RBSCMSystem::Aq_inner_product(unsigned int q,
                                     const NumericVector<Number>& v,
                                     const NumericVector<Number>& w)
 {
@@ -653,7 +653,7 @@ std::pair<unsigned int,Real> RBSCMSystem::compute_SCM_bounds_on_training_set()
   return error_pair;
 }
 
-Number RBSCMSystem::get_SCM_LB()
+Real RBSCMSystem::get_SCM_LB()
 {
   START_LOG("get_SCM_LB()", "RBSCMSystem");
 
@@ -715,7 +715,7 @@ Number RBSCMSystem::get_SCM_LB()
   unsigned int matrix_size = n_rows*get_Q_a();
   std::vector<int> ia(matrix_size+1);
   std::vector<int> ja(matrix_size+1);
-  std::vector<double> ar(matrix_size+1);
+  std::vector<Real> ar(matrix_size+1);
   unsigned int count=0;
   for(unsigned int m=0; m<n_rows; m++)
   {
@@ -735,7 +735,7 @@ Number RBSCMSystem::get_SCM_LB()
 
         ia[count] = m+1;
         ja[count] = q+1;
-        ar[count] = eval_theta_q_a(q);
+        ar[count] = libmesh_real( eval_theta_q_a(q) ); // This can only handle Reals right now
       }
   }
   glp_load_matrix(lp, matrix_size, &ia[0], &ja[0], &ar[0]);
@@ -745,7 +745,7 @@ Number RBSCMSystem::get_SCM_LB()
   reload_current_parameters();
   for(unsigned int q=0; q<get_Q_a(); q++)
     {
-      glp_set_obj_coef(lp,q+1, eval_theta_q_a(q) );
+      glp_set_obj_coef(lp,q+1, libmesh_real( eval_theta_q_a(q) ) );
     }
 
   // Use this command to initialize the basis for the LP
@@ -778,7 +778,7 @@ Number RBSCMSystem::get_SCM_LB()
   return min_J_obj;
 }
 
-Number RBSCMSystem::get_SCM_UB()
+Real RBSCMSystem::get_SCM_UB()
 {
   START_LOG("get_SCM_UB()", "RBSCMSystem");
 
@@ -818,7 +818,7 @@ Number RBSCMSystem::get_SCM_UB()
     Real J_obj = 0.;
     for(unsigned int q=0; q<get_Q_a(); q++)
       {
-        J_obj += eval_theta_q_a(q)*UB_vector[q];
+        J_obj += libmesh_real( eval_theta_q_a(q) )*UB_vector[q];
       }
 
     if( (m==0) || (J_obj < min_J_obj) )

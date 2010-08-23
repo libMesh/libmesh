@@ -382,7 +382,7 @@ SparseMatrix<Number>* TransientRBSystem::get_M_q(unsigned int q)
   return M_q_vector[q];
 }
 
-Real TransientRBSystem::eval_theta_q_m(unsigned int q)
+Number TransientRBSystem::eval_theta_q_m(unsigned int q)
 {
   if(q >= get_Q_m())
   {
@@ -408,7 +408,7 @@ void TransientRBSystem::assemble_mass_matrix(SparseMatrix<Number>* input_matrix)
   add_scaled_mass_matrix(1., input_matrix);
 }
 
-void TransientRBSystem::add_scaled_mass_matrix(Real scalar, SparseMatrix<Number>* input_matrix)
+void TransientRBSystem::add_scaled_mass_matrix(Number scalar, SparseMatrix<Number>* input_matrix)
 {
   if(!low_memory_mode)
   {
@@ -426,7 +426,7 @@ void TransientRBSystem::add_scaled_mass_matrix(Real scalar, SparseMatrix<Number>
   }
 }
 
-void TransientRBSystem::mass_matrix_scaled_matvec(Real scalar,
+void TransientRBSystem::mass_matrix_scaled_matvec(Number scalar,
                                                   NumericVector<Number>& dest,
                                                   NumericVector<Number>& arg)
 {
@@ -1043,7 +1043,7 @@ void TransientRBSystem::enrich_RB_space()
   // of time-steps (rather than the number of spatial dofs).
   int eigen_size = temporal_data.size();
   int LDA = eigen_size; // The leading order of correlation_matrix
-  std::vector<Real> correlation_matrix(LDA*eigen_size);
+  std::vector<Number> correlation_matrix(LDA*eigen_size);
 
   // set values of the correlation matrix
   if(low_memory_mode)
@@ -1064,7 +1064,7 @@ void TransientRBSystem::enrich_RB_space()
     {
        // Scale the inner products by the number of time-steps to normalize the
        // POD energy norm appropriately
-      Real inner_prod = temporal_data[j]->dot(*inner_product_storage_vector) / (_K+1);
+      Number inner_prod = (temporal_data[j]->dot(*inner_product_storage_vector)) / (Real)(_K+1);
 
       // Fill upper triangular part of correlation_matrix
       correlation_matrix[j*eigen_size+i] = inner_prod;
@@ -1089,13 +1089,13 @@ void TransientRBSystem::enrich_RB_space()
   std::vector<Real> W(eigen_size); // (output) the eigenvalues
 
   int LDZ = eigen_size; // The leading order of Z
-  std::vector<Real> Z(LDZ*eigen_size); // (output) the eigenvectors
+  std::vector<Number> Z(LDZ*eigen_size); // (output) the eigenvectors
 
   std::vector<int> ISUPPZ(2*eigen_size); // Indicates which evecs in Z are nonzero
   
   // Work array, sized according to lapack documentation
   int LWORK = 26*eigen_size;
-  std::vector<Real> WORK(LWORK);
+  std::vector<Number> WORK(LWORK);
   
   // Work array, sized according to lapack documentation
   int LIWORK = 10*eigen_size;
@@ -1103,11 +1103,28 @@ void TransientRBSystem::enrich_RB_space()
   
   int INFO = 0;
   
+#ifdef LIBMESH_USE_REAL_NUMBERS // Use real numbers
   // Call the eigensolver for symmetric eigenvalue problems.
   // NOTE: evals in W are in ascending order
   LAPACKsyevr_(&JOBZ, &RANGE, &UPLO, &eigen_size, &correlation_matrix[0],
                &LDA, &VL, &VU, &IL, &IU, &ABSTOL, &M, &W[0], &Z[0], &LDZ,
                &ISUPPZ[0], &WORK[0], &LWORK, &IWORK[0], &LIWORK, &INFO );
+#endif
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS // Use complex numbers
+  // Need some extra data in the complex case
+  
+  // Work array, sized according to lapack documentation
+  int LRWORK = 24*eigen_size;
+  std::vector<Real> RWORK(LRWORK);
+
+  // Call the eigensolver for symmetric eigenvalue problems.
+  // NOTE: evals in W are in ascending order
+  LAPACKsyevr_(&JOBZ, &RANGE, &UPLO, &eigen_size, &correlation_matrix[0],
+               &LDA, &VL, &VU, &IL, &IU, &ABSTOL, &M, &W[0], &Z[0], &LDZ,
+               &ISUPPZ[0], &WORK[0], &LWORK, &RWORK[0], &LRWORK, &IWORK[0],
+               &LIWORK, &INFO );
+#endif
 
   if (INFO != 0)
   {
@@ -1153,7 +1170,7 @@ void TransientRBSystem::enrich_RB_space()
 	{
 	  matrix->vector_mult(*inner_product_storage_vector,current_bf);
 	}
-      Real current_bf_norm = std::sqrt( current_bf.dot(*inner_product_storage_vector) );
+      Real current_bf_norm = std::abs( std::sqrt( current_bf.dot(*inner_product_storage_vector) ) );
       current_bf.scale(1./current_bf_norm);
 
       // Increment count here since we use the incremented counter
@@ -1825,7 +1842,7 @@ void TransientRBSystem::cache_online_residual_terms(const unsigned int N)
   unsigned int q=0;
   for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
   {
-    Real cached_theta_q_f1 = eval_theta_q_f(q_f1);
+    Number cached_theta_q_f1 = eval_theta_q_f(q_f1);
     for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
@@ -1838,10 +1855,10 @@ void TransientRBSystem::cache_online_residual_terms(const unsigned int N)
   cached_Fq_Aq_vector.resize(N);
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
   {
-    Real cached_theta_q_f = eval_theta_q_f(q_f);
+    Number cached_theta_q_f = eval_theta_q_f(q_f);
     for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
     {
-      Real cached_theta_q_a = eval_theta_q_a(q_a);
+      Number cached_theta_q_a = eval_theta_q_a(q_a);
       for(unsigned int i=0; i<N; i++)
       {
         cached_Fq_Aq_vector(i) += 2.*cached_theta_q_f*cached_theta_q_a*
@@ -1854,10 +1871,10 @@ void TransientRBSystem::cache_online_residual_terms(const unsigned int N)
   q=0;
   for(unsigned int q_a1=0; q_a1<get_Q_a(); q_a1++)
   {
-    Real cached_theta_q_a1 = eval_theta_q_a(q_a1);
+    Number cached_theta_q_a1 = eval_theta_q_a(q_a1);
     for(unsigned int q_a2=q_a1; q_a2<get_Q_a(); q_a2++)
     {
-      Real cached_theta_q_a2 = eval_theta_q_a(q_a2);
+      Number cached_theta_q_a2 = eval_theta_q_a(q_a2);
       Real delta = (q_a1==q_a2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -1876,10 +1893,10 @@ void TransientRBSystem::cache_online_residual_terms(const unsigned int N)
   cached_Fq_Mq_vector.resize(N);
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
   {
-    Real cached_theta_q_f = eval_theta_q_f(q_f);
+    Number cached_theta_q_f = eval_theta_q_f(q_f);
     for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
     {
-      Real cached_theta_q_m = eval_theta_q_m(q_m);
+      Number cached_theta_q_m = eval_theta_q_m(q_m);
       for(unsigned int i=0; i<N; i++)
       {
         cached_Fq_Mq_vector(i) += 2.*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_norms[q_f][q_m][i];
@@ -1890,11 +1907,11 @@ void TransientRBSystem::cache_online_residual_terms(const unsigned int N)
   cached_Aq_Mq_matrix.resize(N,N);
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
   {
-    Real cached_theta_q_a = eval_theta_q_a(q_a);
+    Number cached_theta_q_a = eval_theta_q_a(q_a);
     
     for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
     {
-      Real cached_theta_q_m = eval_theta_q_m(q_m);
+      Number cached_theta_q_m = eval_theta_q_m(q_m);
       
       for(unsigned int i=0; i<N; i++)
       {
@@ -1910,10 +1927,10 @@ void TransientRBSystem::cache_online_residual_terms(const unsigned int N)
   q=0;
   for(unsigned int q_m1=0; q_m1<get_Q_m(); q_m1++)
   {
-    Real cached_theta_q_m1 = eval_theta_q_m(q_m1);
+    Number cached_theta_q_m1 = eval_theta_q_m(q_m1);
     for(unsigned int q_m2=q_m1; q_m2<get_Q_m(); q_m2++)
     {
-      Real cached_theta_q_m2 = eval_theta_q_m(q_m2);
+      Number cached_theta_q_m2 = eval_theta_q_m(q_m2);
       Real delta = (q_m1==q_m2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -1974,9 +1991,6 @@ Real TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 //    libmesh_error();
      residual_norm_sq = std::abs(residual_norm_sq);
   }
-
-//   std::cout << "slow residual_sq = " << slow_residual_norm_sq
-//             << ", fast residual_sq = " << residual_norm_sq << std::endl;
 
   STOP_LOG("compute_residual_dual_norm()", "TransientRBSystem");
 
@@ -2096,7 +2110,7 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
   unsigned int q=0;
   for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
   {
-    Real cached_theta_q_f1 = eval_theta_q_f(q_f1);
+    Number cached_theta_q_f1 = eval_theta_q_f(q_f1);
     for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
@@ -2108,10 +2122,10 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
 
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
   {
-    Real cached_theta_q_f = eval_theta_q_f(q_f);
+    Number cached_theta_q_f = eval_theta_q_f(q_f);
     for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
     {
-      Real cached_theta_q_a = eval_theta_q_a(q_a);
+      Number cached_theta_q_a = eval_theta_q_a(q_a);
       for(unsigned int i=0; i<N; i++)
       {
         residual_norm_sq += 2.*RB_u_euler_theta[i]*cached_theta_q_f*cached_theta_q_a*
@@ -2123,10 +2137,10 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
   q=0;
   for(unsigned int q_a1=0; q_a1<get_Q_a(); q_a1++)
   {
-    Real cached_theta_q_a1 = eval_theta_q_a(q_a1);
+    Number cached_theta_q_a1 = eval_theta_q_a(q_a1);
     for(unsigned int q_a2=q_a1; q_a2<get_Q_a(); q_a2++)
     {
-      Real cached_theta_q_a2 = eval_theta_q_a(q_a2);
+      Number cached_theta_q_a2 = eval_theta_q_a(q_a2);
       Real delta = (q_a1==q_a2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -2146,10 +2160,10 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
   q=0;
   for(unsigned int q_m1=0; q_m1<get_Q_m(); q_m1++)
   {
-    Real cached_theta_q_m1 = eval_theta_q_m(q_m1);
+    Number cached_theta_q_m1 = eval_theta_q_m(q_m1);
     for(unsigned int q_m2=q_m1; q_m2<get_Q_m(); q_m2++)
     {
-      Real cached_theta_q_m2 = eval_theta_q_m(q_m2);
+      Number cached_theta_q_m2 = eval_theta_q_m(q_m2);
       Real delta = (q_m1==q_m2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -2167,10 +2181,10 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
 
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
   {
-    Real cached_theta_q_f = eval_theta_q_f(q_f);
+    Number cached_theta_q_f = eval_theta_q_f(q_f);
     for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
     {
-      Real cached_theta_q_m = eval_theta_q_m(q_m);
+      Number cached_theta_q_m = eval_theta_q_m(q_m);
       for(unsigned int i=0; i<N; i++)
       {
         residual_norm_sq += 2.*mass_coeffs[i]*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_norms[q_f][q_m][i];
@@ -2180,11 +2194,11 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
 
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
   {
-    Real cached_theta_q_a = eval_theta_q_a(q_a);
+    Number cached_theta_q_a = eval_theta_q_a(q_a);
     
     for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
     {
-      Real cached_theta_q_m = eval_theta_q_m(q_m);
+      Number cached_theta_q_m = eval_theta_q_m(q_m);
       
       for(unsigned int i=0; i<N; i++)
       {
