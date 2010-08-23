@@ -103,7 +103,7 @@ public:
   /**
    * Evaluate theta_q_c at the current parameter.
    */
-  Real eval_theta_c();
+  Number eval_theta_c();
 
   /**
    * Perform a truth solve at the current parameter.
@@ -124,7 +124,7 @@ public:
    * Set the nonlinear tolerance for Newton's
    * method for both the truth and RB solves.
    */
-  void set_nonlinear_tolerance(Number nonlinear_tolerance)
+  void set_nonlinear_tolerance(Real nonlinear_tolerance)
     { this->nonlinear_tolerance = nonlinear_tolerance; }
     
   /**
@@ -160,7 +160,7 @@ public:
    * This will typically be overloaded in a subclass
    * to be a function of the current parameters.
    */
-  virtual Number get_nominal_rho_LB() { return 1.; }
+  virtual Real get_nominal_rho_LB() { return 1.; }
 
   /**
    * Assemble matrix C_n, i.e. c(\xi_n, \phi_j, \phi_i), where
@@ -172,14 +172,14 @@ public:
    * Add a scaled version of matrix C_n to input_matrix. If symmetrize==true,
    * then we add symmetrized C_n.
    */
-  void add_scaled_Cn(Real scalar, unsigned int n, SparseMatrix<Number>* input_matrix, bool symmetrize);
+  void add_scaled_Cn(Number scalar, unsigned int n, SparseMatrix<Number>* input_matrix, bool symmetrize);
 
   /**
    * Assemble matrix C (the assembly depends on the value of current_newton_iterate)
    * and add to input_matrix. If symmetrize==true,
    * then we add symmetrized C.
    */
-  void add_scaled_current_C(Real scalar, SparseMatrix<Number>* input_matrix, bool symmetrize);
+  void add_scaled_current_C(Number scalar, SparseMatrix<Number>* input_matrix, bool symmetrize);
 
   /**
    * Overload this function to set current_newton_iterate = vec.
@@ -291,7 +291,7 @@ protected:
    * saved in RB_solution. Overloaded to handle the
    * quadratic nonlinearity as well.
    */
-  virtual Number compute_residual_dual_norm(const unsigned int N);
+  virtual Real compute_residual_dual_norm(const unsigned int N);
 
   /**
    * Get the SCM lower bound for the current parameters
@@ -312,7 +312,7 @@ private:
   /**
    * The nonlinear tolerance for the Newton iteration.
    */
-  Number nonlinear_tolerance;
+  Real nonlinear_tolerance;
 
   /**
    * The maximum number of Newton iterations.
@@ -330,7 +330,7 @@ private:
   /**
    * We store Nmax trilinear form operators to speed up RB matrix assembly.
    */
-  std::vector< SparseMatrix<Real>* > C_n_vector;
+  std::vector< SparseMatrix<Number>* > C_n_vector;
 
   /**
    * Vectors storing the representors for the residual terms arising

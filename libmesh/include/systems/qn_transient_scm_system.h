@@ -107,14 +107,14 @@ public:
   /**
    * Evaluate theta_c at the current parameter.
    */
-  Real eval_theta_c();
+  Number eval_theta_c();
 
   /**
    * Overload eval_theta_q_a because the first n_bfs functions
    * have to be given a special definition, i.e. they now
    * come from the RB coefficients.
    */
-  virtual Real eval_theta_q_a(unsigned int q);
+  virtual Number eval_theta_q_a(unsigned int q);
 
   /**
    * Overload get_Q_a to increment by n_bfs.
@@ -125,18 +125,18 @@ public:
    * Get the specified entry of RB_solution_data, the RB coefficients
    * corresponding to the training parameters.
    */
-  std::vector<Real> get_training_RB_coeffs(unsigned int index);
+  std::vector<Number> get_training_RB_coeffs(unsigned int index);
 
   /**
    * Set the specified entry of training_RB_coeffs, the RB coefficients
    * corresponding to the training parameters.
    */
-  void set_training_RB_coeffs(unsigned int index, std::vector<Real> coeffs);
+  void set_training_RB_coeffs(unsigned int index, std::vector<Number> coeffs);
 
   /**
    * Set current_RB_coeffs.
    */
-  void set_current_RB_coeffs(std::vector<Real> coeffs) { current_RB_coeffs = coeffs; }
+  void set_current_RB_coeffs(std::vector<Number> coeffs) { current_RB_coeffs = coeffs; }
 
   /**
    * Get/set the n_bfs parameter; this determines the number of
@@ -154,8 +154,8 @@ public:
   /**
    * Get/set the time-step size.
    */
-  Number get_dt() { return dt; }
-  void set_dt(Number dt) { this->dt = dt; }
+  Real get_dt() { return dt; }
+  void set_dt(Real dt) { this->dt = dt; }
 
   /**
    * Useful function that helps us explore the magnitude of the
@@ -164,14 +164,14 @@ public:
    * doesn't rely on RB approximation. Must be implemented in
    * a derived class.
    */
-  virtual Number compute_truth_stability_constant() { libmesh_not_implemented(); return 0.; }
+  virtual Real compute_truth_stability_constant() { libmesh_not_implemented(); return 0.; }
 
   /**
    * Overload training parameter initialization to also include time
    * as a parameter.
    */
-  virtual void initialize_training_parameters(const std::vector<Number>& mu_min_vector,
-                                              const std::vector<Number>& mu_max_vector,
+  virtual void initialize_training_parameters(const std::vector<Real>& mu_min_vector,
+                                              const std::vector<Real>& mu_max_vector,
                                               const unsigned int n_param_samples,
                                               const std::vector<bool> log_param_scale,
                                               const bool deterministic=true);
@@ -180,7 +180,7 @@ public:
    * Overwrite the training parameters with new_training_set. Overloaded to also
    * handle the extra temporal parameters in the QNTransientSCM case.
    */
-  virtual void load_training_set(std::vector< std::vector<Number> >& new_training_set);
+  virtual void load_training_set(std::vector< std::vector<Real> >& new_training_set);
 
   /**
    * Write out all the data to text files in order to segregate the
@@ -206,7 +206,7 @@ protected:
    * Load the n_bfs trilinear form operators from the
    * associated RB system.
    */
-  virtual void add_scaled_symm_Aq(unsigned int q_a, Real scalar);
+  virtual void add_scaled_symm_Aq(unsigned int q_a, Number scalar);
 
   /**
    * Load the specified training parameter into current_params.
@@ -242,7 +242,7 @@ protected:
    * Static utility function for rounding to the nearest
    * integer.
    */
-  static int round(Number x)
+  static int round(Real x)
   {
     return static_cast<int>(x > 0.0 ? x + 0.5 : x - 0.5);
   }
@@ -294,7 +294,7 @@ private:
   /**
    * The time-step size.
    */
-  Number dt;
+  Real dt;
 
   /**
    * The number of training samples in time for each parameter

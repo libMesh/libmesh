@@ -119,6 +119,8 @@ public:
    * reduced basis error bound is largest, then performing a truth_solve
    * at that parameter and enriching the reduced basis with the corresponding
    * snapshot.
+   *
+   * @returns the final maximum a posteriori error bound on the training set.
    */
   Real train_reduced_basis(const std::string& directory_name = "offline_data");
 
@@ -132,7 +134,7 @@ public:
    * Return the parameters chosen during the i^th step of
    * the Greedy algorithm.
    */
-  std::vector<Number> get_greedy_parameter(unsigned int i);
+  std::vector<Real> get_greedy_parameter(unsigned int i);
 
   /**
    * Set the name of the eigen_system that performs the SCM.
@@ -272,12 +274,12 @@ public:
   /**
    * Evaluate theta_q_f at the current parameter.
    */
-  Real eval_theta_q_f(unsigned int q);
+  Number eval_theta_q_f(unsigned int q);
 
   /**
    * Evaluate theta_q_l at the current parameter.
    */
-  Real eval_theta_q_l(unsigned int output_index, unsigned int q_l);
+  Number eval_theta_q_l(unsigned int output_index, unsigned int q_l);
 
   /**
    * Assemble and store the Dirichlet dof lists, the
@@ -321,7 +323,7 @@ public:
    * Add the scaled q^th affine matrix to input_matrix. If symmetrize==true, then
    * we symmetrize Aq before adding it.
    */
-  void add_scaled_Aq(Real scalar, unsigned int q_a,
+  void add_scaled_Aq(Number scalar, unsigned int q_a,
                      SparseMatrix<Number>* input_matrix,
                      bool symmetrize);
 
@@ -415,7 +417,7 @@ public:
   /**
    * The list of parameters selected by the Greedy algorithm.
    */
-  std::vector< std::vector<Number> > greedy_param_list;
+  std::vector< std::vector<Real> > greedy_param_list;
 
   /**
    * Boolean flag to indicate whether this is a constrained problem
@@ -540,7 +542,7 @@ protected:
    * If symmetrize==true then we assemble the symmetric part
    * of the matrix, 0.5*(A + A^T)
    */
-  void add_scaled_matrix_and_vector(Real scalar,
+  void add_scaled_matrix_and_vector(Number scalar,
                                     affine_assembly_fptr intrr_assembly,
                                     affine_assembly_fptr bndry_assembly,
                                     SparseMatrix<Number>* input_matrix,
@@ -559,7 +561,7 @@ protected:
    * matrix-vector product and stores the scaled result
    * in dest.
    */
-  void assemble_scaled_matvec(Real scalar,
+  void assemble_scaled_matvec(Number scalar,
                               affine_assembly_fptr intrr_assembly,
                               affine_assembly_fptr bndry_assembly,
                               NumericVector<Number>& dest,
@@ -735,9 +737,9 @@ protected:
    * Vectors storing the residual representor inner products
    * to be used in computing the residuals online.
    */
-  std::vector<Real> Fq_representor_norms;
-  std::vector< std::vector< std::vector<Real> > > Fq_Aq_representor_norms;
-  std::vector< std::vector< std::vector<Real> > > Aq_Aq_representor_norms;
+  std::vector<Number> Fq_representor_norms;
+  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
+  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
 
   /**
    * The name of the RBSCMSystem system that performs

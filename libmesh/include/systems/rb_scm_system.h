@@ -135,12 +135,12 @@ public:
   /**
    * Evaluate single SCM lower bound.
    */
-  virtual Number get_SCM_LB();
+  virtual Real get_SCM_LB();
 
   /**
    * Evaluate single SCM upper bound.
    */
-  virtual Number get_SCM_UB();
+  virtual Real get_SCM_UB();
 
   /**
    * Get stability constraints (i.e. the values of coercivity/
@@ -220,7 +220,7 @@ protected:
    * Add the scaled symmetrized affine matrix from the
    * associated RBSystem to matrix_A.
    */
-  virtual void add_scaled_symm_Aq(unsigned int q_a, Real scalar);
+  virtual void add_scaled_symm_Aq(unsigned int q_a, Number scalar);
 
   /**
    * Copy over the matrix to store in matrix_B,
@@ -253,7 +253,7 @@ protected:
    * index of the parameter in the training set at which the max
    * error is achieved.
    */
-  virtual std::pair<unsigned int,Number> compute_SCM_bounds_on_training_set();
+  virtual std::pair<unsigned int,Real> compute_SCM_bounds_on_training_set();
 
   /**
    * Enrich C_J by adding the element of SCM_training_samples
@@ -286,13 +286,13 @@ protected:
    * Compute the inner product between two vectors using the system's
    * matrix_B.
    */
-  Real B_inner_product(const NumericVector<Number>& v, const NumericVector<Number>& w) const;
+  Number B_inner_product(const NumericVector<Number>& v, const NumericVector<Number>& w) const;
 
   /**
    * Compute the inner product between two vectors using
    * matrix Aq.
    */
-  Real Aq_inner_product(unsigned int q,
+  Number Aq_inner_product(unsigned int q,
                         const NumericVector<Number>& v,
                         const NumericVector<Number>& w);
 

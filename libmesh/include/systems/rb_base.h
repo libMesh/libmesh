@@ -52,7 +52,7 @@ namespace libMesh
  * Typedef for theta_q function pointers, need a
  * typedef for the std::vector templating to work.
  */
-typedef Real (*theta_q_fptr)(std::vector<Number>&);
+typedef Number (*theta_q_fptr)(std::vector<Real>&);
 
 // ------------------------------------------------------------
 // RBBase class definition
@@ -121,7 +121,7 @@ public:
   /**
    * return the specified training parameter.
    */
-  std::vector<Number> get_training_parameter(unsigned int index) const;
+  std::vector<Real> get_training_parameter(unsigned int index) const;
 
   /**
    * Load the specified training parameter into current_params.
@@ -149,7 +149,7 @@ public:
   /**
    * Overwrite the training parameters with new_training_set.
    */
-  virtual void load_training_set(std::vector< std::vector<Number> >& new_training_set);
+  virtual void load_training_set(std::vector< std::vector<Real> >& new_training_set);
 
   /**
    * Get the number of parameters. Value is determined
@@ -172,8 +172,8 @@ public:
   /**
    * Get/set current parameters.
    */
-  const std::vector<Number>& get_current_parameters() const { return current_parameters; };
-  void set_current_parameters(const std::vector<Number>& params);
+  const std::vector<Real>& get_current_parameters() const { return current_parameters; };
+  void set_current_parameters(const std::vector<Real>& params);
 
   /**
    * Print the current parameters.
@@ -214,7 +214,7 @@ public:
    * if the theta functions need to be treated differently
    * in subclasses.
    */
-  virtual Real eval_theta_q_a(unsigned int q);
+  virtual Number eval_theta_q_a(unsigned int q);
 
   /**
    * Write out all the data to text files in order to segregate the
@@ -279,7 +279,7 @@ public:
   /**
    * The training samples.
    */
-  std::vector< NumericVector<Number>* > training_parameters;
+  std::vector< NumericVector<Real>* > training_parameters;
 
   /**
    * If < 0, use std::time() * processor_id() to seed the random
@@ -313,7 +313,7 @@ protected:
    * Static helper function for generating a randomized set of parameters.
    */
   static void generate_training_parameters_random(const std::vector<bool> log_param_scale,
-                                                  std::vector< NumericVector<Number>* >& training_parameters_in,
+                                                  std::vector< NumericVector<Real>* >& training_parameters_in,
                                                   const unsigned int n_training_samples_in,
                                                   const std::vector<Real>& min_parameters,
                                                   const std::vector<Real>& max_parameters,
@@ -324,7 +324,7 @@ protected:
    * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
    */
   static void generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
-                                                         std::vector< NumericVector<Number>* >& training_parameters_in,
+                                                         std::vector< NumericVector<Real>* >& training_parameters_in,
                                                          const unsigned int n_training_samples_in,
                                                          const std::vector<Real>& min_parameters,
                                                          const std::vector<Real>& max_parameters);
@@ -347,7 +347,7 @@ protected:
   /**
    * Vector storing the current parameters.
    */
-  std::vector<Number> current_parameters;
+  std::vector<Real> current_parameters;
 
   /**
    * Set this string to specify an alternative solver used in the set_alternative_solver()
