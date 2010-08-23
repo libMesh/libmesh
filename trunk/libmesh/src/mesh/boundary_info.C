@@ -80,6 +80,8 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
   }
 
   _boundary_ids = other_boundary_info._boundary_ids;
+
+  return *this;
 }
 
 
