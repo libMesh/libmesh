@@ -166,7 +166,7 @@ void RBParamSubdomainTree::hp_greedy()
   root_node->hp_greedy(h_tol, p_tol, N_bar, conserv_factor, use_delta_N_in_h_stage);
 }
 
-RBParamSubdomainNode * RBParamSubdomainTree::determine_subdomain(const std::vector<Number>& new_param)
+RBParamSubdomainNode * RBParamSubdomainTree::determine_subdomain(const std::vector<Real>& new_param)
 {
   RBParamSubdomainNode * current_node = root_node;
 

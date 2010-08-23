@@ -322,7 +322,7 @@ void RBSystem::init_data ()
   std::vector<Real> mu_min_vector(n_parameters);
   std::vector<Real> mu_max_vector(n_parameters);
   std::vector<bool> log_scaling(n_parameters);
-  std::vector<Number> init_mu_vector(n_parameters);
+  std::vector<Real> init_mu_vector(n_parameters);
   for(unsigned int i=0; i<n_parameters; i++)
   {
     // Read vector-based mu_min values.
@@ -667,7 +667,7 @@ AutoPtr<RBContext> RBSystem::build_context ()
   return AutoPtr<RBContext>(new RBContext(*this));
 }
 
-void RBSystem::add_scaled_matrix_and_vector(Real scalar,
+void RBSystem::add_scaled_matrix_and_vector(Number scalar,
                                  affine_assembly_fptr intrr_assembly,
                                  affine_assembly_fptr bndry_assembly,
                                  SparseMatrix<Number>* input_matrix,
@@ -778,7 +778,7 @@ void RBSystem::set_context_solution_vec(NumericVector<Number>& vec)
     (*current_local_solution, this->get_dof_map().get_send_list());
 }
 
-void RBSystem::assemble_scaled_matvec(Real scalar,
+void RBSystem::assemble_scaled_matvec(Number scalar,
                                       affine_assembly_fptr intrr_assembly,
                                       affine_assembly_fptr bndry_assembly,
                                       NumericVector<Number>& dest,
@@ -1074,7 +1074,7 @@ void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_ma
   add_scaled_matrix_and_vector(1., A_q_intrr_assembly_vector[q], A_q_bndry_assembly_vector[q], input_matrix, NULL);
 }
 
-void RBSystem::add_scaled_Aq(Real scalar, unsigned int q_a, SparseMatrix<Number>* input_matrix, bool symmetrize)
+void RBSystem::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Number>* input_matrix, bool symmetrize)
 {
   START_LOG("add_scaled_Aq()", "RBSystem");
 
@@ -1254,7 +1254,7 @@ void RBSystem::update_greedy_param_list()
   greedy_param_list.push_back( get_current_parameters() );
 }
 
-std::vector<Number> RBSystem::get_greedy_parameter(unsigned int i)
+std::vector<Real> RBSystem::get_greedy_parameter(unsigned int i)
 {
   if( i >= greedy_param_list.size() )
   {
@@ -1413,7 +1413,7 @@ unsigned int RBSystem::get_Q_l(unsigned int index) const
   return theta_q_l_vector[index].size();
 }
 
-Real RBSystem::eval_theta_q_f(unsigned int q)
+Number RBSystem::eval_theta_q_f(unsigned int q)
 {
   if(q >= get_Q_f())
   {
@@ -1427,7 +1427,7 @@ Real RBSystem::eval_theta_q_f(unsigned int q)
   return theta_q_f_vector[q](current_parameters);
 }
 
-Real RBSystem::eval_theta_q_l(unsigned int output_index, unsigned int q_l)
+Number RBSystem::eval_theta_q_l(unsigned int output_index, unsigned int q_l)
 {
   if( (output_index >= get_n_outputs()) || (q_l >= get_Q_l(output_index)) )
   {
@@ -1929,7 +1929,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 
 	    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
 	      {
-		Fq_representor_norms[q] = libmesh_real(F_q_representor[q_f2]->dot(*inner_product_storage_vector));
+		Fq_representor_norms[q] = F_q_representor[q_f2]->dot(*inner_product_storage_vector);
 
 		q++;
 	      }
@@ -2039,7 +2039,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
 		{
 		  Fq_Aq_representor_norms[q_f][q_a][i] =
-		    libmesh_real(A_q_representor[q_a][i]->dot(*inner_product_storage_vector));
+		    A_q_representor[q_a][i]->dot(*inner_product_storage_vector);
 		}
 	    }
 	}
@@ -2061,7 +2061,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 			{
 			  matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][j]);
 			}
-		      Aq_Aq_representor_norms[q][i][j] = libmesh_real(A_q_representor[q_a1][i]->dot(*inner_product_storage_vector));
+		      Aq_Aq_representor_norms[q][i][j] = A_q_representor[q_a1][i]->dot(*inner_product_storage_vector);
 
 		      if(i != j)
 			{
@@ -2073,7 +2073,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 			    {
 			      matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][i]);
 			    }
-			  Aq_Aq_representor_norms[q][j][i] = libmesh_real(A_q_representor[q_a1][j]->dot(*inner_product_storage_vector));
+			  Aq_Aq_representor_norms[q][j][i] = A_q_representor[q_a1][j]->dot(*inner_product_storage_vector);
 			}
 		    }
 		}
@@ -2369,8 +2369,8 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
     }
   }
 
-  if(libmesh_real(residual_norm_sq) < 0.)
-  {
+//  if(libmesh_real(residual_norm_sq) < 0.)
+//  {
 //    std::cout << "Warning: Square of residual norm is negative "
 //              << "in RBSystem::compute_residual_dual_norm()" << std::endl;
 
@@ -2378,8 +2378,8 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
     // but error is on the order of 1.e-10, so shouldn't
     // affect error bound much...
 //     libmesh_error();
-    residual_norm_sq = std::abs(residual_norm_sq);
-  }
+//    residual_norm_sq = std::abs(residual_norm_sq);
+//  }
 
 //   std::cout << "Slow residual norm squared = " << slow_residual_norm_sq
 //             << ", fast residual norm squared = " << residual_norm_sq << std::endl;

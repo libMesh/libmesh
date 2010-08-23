@@ -149,14 +149,14 @@ void QNTransientSCMSystem::perform_SCM_greedy()
   // associated RBSystem
   resize_to_new_n_bfs();
 
-  std::vector<Number> previous_mu(get_n_params()-1);
+  std::vector<Real> previous_mu(get_n_params()-1);
   for(unsigned int i=this->get_first_local_training_index();
                    i<this->get_last_local_training_index(); i++)
   {
     // Construct a parameter vector that does not include time
     // so we can pass it to system
-    std::vector<Number> eigen_mu = this->get_training_parameter(i);
-    std::vector<Number> mu(this->get_n_params()-1);
+    std::vector<Real> eigen_mu = this->get_training_parameter(i);
+    std::vector<Real> mu(this->get_n_params()-1);
     for(unsigned int j=0; j<mu.size(); j++)
       mu[j] = eigen_mu[j];
 
@@ -203,14 +203,14 @@ void QNTransientSCMSystem::attach_theta_c(theta_q_fptr theta_c_in)
   theta_c = theta_c_in;
 }
 
-Real QNTransientSCMSystem::eval_theta_c()
+Number QNTransientSCMSystem::eval_theta_c()
 {
   libmesh_assert(theta_c != NULL);
 
   return theta_c(current_parameters);
 }
 
-Real QNTransientSCMSystem::eval_theta_q_a(unsigned int q)
+Number QNTransientSCMSystem::eval_theta_q_a(unsigned int q)
 {
   if(q < get_n_basis_functions())
   {
@@ -223,21 +223,21 @@ Real QNTransientSCMSystem::eval_theta_q_a(unsigned int q)
   }
 }
 
-std::vector<Real> QNTransientSCMSystem::get_training_RB_coeffs(unsigned int index)
+std::vector<Number> QNTransientSCMSystem::get_training_RB_coeffs(unsigned int index)
 {
   libmesh_assert(training_parameters_initialized);
 
   libmesh_assert( (this->get_first_local_training_index() <= index) &&
                   (index < this->get_last_local_training_index()) );
 
-  std::vector<Real> coeffs(this->get_n_basis_functions());
+  std::vector<Number> coeffs(this->get_n_basis_functions());
   for(unsigned int i=0; i<coeffs.size(); i++)
     coeffs[i] = (*training_RB_coeffs[i])(index);
 
   return coeffs;
 }
 
-void QNTransientSCMSystem::set_training_RB_coeffs(unsigned int index, std::vector<Real> coeffs)
+void QNTransientSCMSystem::set_training_RB_coeffs(unsigned int index, std::vector<Number> coeffs)
 {
   libmesh_assert(training_parameters_initialized);
 
@@ -250,7 +250,7 @@ void QNTransientSCMSystem::set_training_RB_coeffs(unsigned int index, std::vecto
   }
 }
 
-void QNTransientSCMSystem::add_scaled_symm_Aq(unsigned int q_a, Real scalar)
+void QNTransientSCMSystem::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
 {
   START_LOG("add_scaled_symm_Aq()", "QNTransientSCMSystem");
 
@@ -284,7 +284,7 @@ void QNTransientSCMSystem::load_training_parameter_globally(unsigned int index)
 
   // Also, load RB_coeffs
   unsigned int root_id = 0;
-  std::vector<Real> new_RB_coeffs(get_n_basis_functions());
+  std::vector<Number> new_RB_coeffs(get_n_basis_functions());
   if( (this->get_first_local_training_index() <= index) &&
       (index < this->get_last_local_training_index()) )
   {
@@ -345,7 +345,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
 
   // Initialize a temporary training set (distributed across processors)
   // that doesn't include time
-  std::vector< NumericVector<Number>* > dist_temp_training_parameters;
+  std::vector< NumericVector<Real>* > dist_temp_training_parameters;
 
   // Strip off the time parameter from log_param_scale, mu_min/max_vector
   unsigned int temp_n_params = log_param_scale.size()-1;
@@ -406,7 +406,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
 
   for(unsigned int i=0; i<get_n_params(); i++)
   {
-    training_parameters[i] = NumericVector<Number>::build().release();
+    training_parameters[i] = NumericVector<Real>::build().release();
     training_parameters[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
@@ -470,7 +470,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
 
   // Initialize a temporary training set (distributed across processors)
   // that doesn't include time. This is where we load the training set into.
-  std::vector< NumericVector<Number>* > dist_temp_training_parameters(get_n_params()-1);
+  std::vector< NumericVector<Real>* > dist_temp_training_parameters(get_n_params()-1);
   unsigned int n_global_training_samples;
 
   {
@@ -481,7 +481,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
 
     for(unsigned int i=0; i<dist_temp_training_parameters.size(); i++)
     {
-      dist_temp_training_parameters[i] = NumericVector<Number>::build().release();
+      dist_temp_training_parameters[i] = NumericVector<Real>::build().release();
       dist_temp_training_parameters[i]->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
     }
 
@@ -535,7 +535,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
   training_parameters.resize(get_n_params());
   for(unsigned int i=0; i<get_n_params(); i++)
   {
-    training_parameters[i] = NumericVector<Number>::build().release();
+    training_parameters[i] = NumericVector<Real>::build().release();
     training_parameters[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 

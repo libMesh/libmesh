@@ -350,11 +350,11 @@ void QNTransientRBSystem::truth_assembly()
   STOP_LOG("truth_assembly()", "QNTransientRBSystem");
 }
 
-Real QNTransientRBSystem::eval_theta_c()
+Number QNTransientRBSystem::eval_theta_c()
 {
   libmesh_assert(theta_c != NULL);
 
-  std::vector<Number> cp = get_current_parameters();
+  std::vector<Real> cp = get_current_parameters();
   return theta_c( cp );
 }
 
@@ -601,7 +601,7 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
     matrix->vector_mult(*inner_product_storage_vector, *current_newton_iterate);
   }
 
-  Real final_truth_L2_norm = std::sqrt(inner_product_storage_vector->dot(*current_newton_iterate));
+  Real final_truth_L2_norm = libmesh_real(std::sqrt( inner_product_storage_vector->dot(*current_newton_iterate)));
 
   STOP_LOG("truth_solve()", "QNTransientRBSystem");
 
@@ -631,15 +631,15 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
     libmesh_error();
   }
 
-  DenseMatrix<Real> Base_RB_LHS_matrix(N,N);
+  DenseMatrix<Number> Base_RB_LHS_matrix(N,N);
   Base_RB_LHS_matrix.zero();
 
-  DenseMatrix<Real> RB_RHS_Aq_matrix(N,N);
+  DenseMatrix<Number> RB_RHS_Aq_matrix(N,N);
   RB_RHS_Aq_matrix.zero();
 
-  DenseMatrix<Real> RB_mass_matrix_N(N,N);
+  DenseMatrix<Number> RB_mass_matrix_N(N,N);
   RB_mass_matrix_N.zero();
-  DenseMatrix<Real> RB_M_q_m;
+  DenseMatrix<Number> RB_M_q_m;
   for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
   {
     RB_M_q_vector[q_m].get_principal_submatrix(N, RB_M_q_m);
@@ -650,7 +650,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
 
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
   {
-    Real cached_theta_q_a = eval_theta_q_a(q_a);
+    Number cached_theta_q_a = eval_theta_q_a(q_a);
     for(unsigned int i=0; i<N; i++)
     {
       for(unsigned int j=0; j<N; j++)
@@ -666,11 +666,11 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
   set_time_level(0);
 
   // This is the actual LHS matrix
-  DenseMatrix<Real> RB_LHS_matrix(N,N);
+  DenseMatrix<Number> RB_LHS_matrix(N,N);
   RB_LHS_matrix.zero();
 
   // Initialize a vector to store our current Newton iterate
-  DenseVector<Real> RB_u_bar(N);
+  DenseVector<Number> RB_u_bar(N);
   RB_u_bar.zero();
 
   // Load the initial condition into RB_u_bar
@@ -694,7 +694,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
   error_bound_all_k[_k] = std::sqrt(error_bound_sum);
 
   // Compute the outputs and associated error bounds at _k=0
-  DenseVector<Real> RB_output_vector_N;
+  DenseVector<Number> RB_output_vector_N;
   for(unsigned int n=0; n<get_n_outputs(); n++)
   {
     RB_outputs_all_k[n][_k] = 0.;
@@ -704,7 +704,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
       RB_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_u_bar);
     }
     
-    Real output_bound_sq = 0.;
+    Number output_bound_sq = 0.;
     unsigned int q=0;
     for(unsigned int q_l1=0; q_l1<get_Q_l(n); q_l1++)
     {
@@ -720,23 +720,23 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
   }
 
   // Initialize a vector to store the solution from the old time-step
-  DenseVector<Real> RB_u_old(N);
+  DenseVector<Number> RB_u_old(N);
   RB_u_old.zero();
 
   // Initialize a vector to store the Newton increment, RB_delta_u
-  DenseVector<Real> RB_delta_u(N);
+  DenseVector<Number> RB_delta_u(N);
   RB_delta_u.zero();
 
   // Initialize the RB rhs
-  DenseVector<Real> RB_rhs(N);
+  DenseVector<Number> RB_rhs(N);
   RB_rhs.zero();
 
   // Initialize the RB_u_euler_theta
-  DenseVector<Real> RB_u_euler_theta(N);
+  DenseVector<Number> RB_u_euler_theta(N);
   RB_u_euler_theta.zero();
 
   // Pre-compute eval_theta_c()
-  Real cached_theta_c = eval_theta_c();
+  Number cached_theta_c = eval_theta_c();
 
   // These vectors allow us to plot the rho upper and lower bounds
   rho_LB_vector.resize(_K+1);
@@ -780,7 +780,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
       RB_rhs.zero();
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
-        Real cached_theta_f = eval_theta_q_f(q_f);
+        Number cached_theta_f = eval_theta_q_f(q_f);
         for(unsigned int i=0; i<N; i++)
         {
           RB_rhs(i) += cached_theta_f*RB_F_q_vector[q_f](i);
@@ -800,7 +800,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
       {
         for(unsigned int j=0; j<N; j++)
         {
-          Real RB_u_euler_theta_j = RB_u_euler_theta(j);
+          Number RB_u_euler_theta_j = RB_u_euler_theta(j);
           for(unsigned int n=0; n<N; n++)
           {
             RB_rhs(i) += -cached_theta_c*RB_u_euler_theta(n)*RB_u_euler_theta_j*RB_trilinear_form[n][i][j];
@@ -816,17 +816,17 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
       // Compute the l2 norm of RB_delta_u
       Real RB_delta_u_norm = RB_delta_u.l2_norm();
 
-      if(!quiet)
-      {
-        std::cout << "||RB_delta_u|| = " << RB_delta_u_norm << std::endl;
-      }
+//      if(!quiet)
+//      {
+//        std::cout << "||RB_delta_u|| = " << RB_delta_u_norm << std::endl;
+//      }
 
       if( RB_delta_u_norm < nonlinear_tolerance)
       {
-        if(!quiet)
-        {
-          std::cout << "RB Newton solve converged at step " << l << std::endl << std::endl;
-        }
+//        if(!quiet)
+//        {
+//          std::cout << "RB Newton solve converged at step " << l << std::endl << std::endl;
+//        }
         break;
       }
 
@@ -857,7 +857,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
     error_bound_all_k[_k] = std::sqrt(error_bound_sum/residual_scaling_denom(rho_LB));
 
     // Now compute the outputs and associated errors
-    DenseVector<Real> RB_output_vector_N;
+    DenseVector<Number> RB_output_vector_N;
     for(unsigned int n=0; n<get_n_outputs(); n++)
     {
       RB_outputs_all_k[n][_k] = 0.;
@@ -867,7 +867,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
         RB_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_u_bar);
       }
       
-      Real output_bound_sq = 0.;
+      Number output_bound_sq = 0.;
       unsigned int q=0;
       for(unsigned int q_l1=0; q_l1<get_Q_l(n); q_l1++)
       {
@@ -879,7 +879,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
         }
       }
 
-      RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * std::sqrt( output_bound_sq );
+      RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * libmesh_real(std::sqrt( output_bound_sq) );
     }
   }
 
@@ -887,7 +887,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
   // to normalize the error bound
   // We reuse RB_rhs here
   RB_mass_matrix_N.vector_mult(RB_rhs, RB_u_bar);
-  Real final_RB_L2_norm = std::sqrt(RB_u_bar.dot(RB_rhs));
+  Real final_RB_L2_norm = libmesh_real(std::sqrt( RB_u_bar.dot(RB_rhs) ));
 
   STOP_LOG("RB_solve()", "QNTransientRBSystem");
 
@@ -912,7 +912,7 @@ void QNTransientRBSystem::update_system()
   Parent::update_system();
 }
 
-Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
+Real QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 {
   START_LOG("compute_residual_dual_norm()", "QNTransientRBSystem");
 
@@ -994,7 +994,7 @@ Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
   // to evaluate the residual dual norm
   const Real dt = get_dt();
 
-  Real residual_norm_sq = 0.;
+  Number residual_norm_sq = 0.;
 
   // Use TransientRBSystem to compute all the linear terms
   residual_norm_sq += pow( TransientRBSystem::uncached_compute_residual_dual_norm(N), 2.);
@@ -1009,12 +1009,12 @@ Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
   }
 
   // Pre-compute eval_theta_c()
-  Real cached_theta_c = eval_theta_c();
+  Number cached_theta_c = eval_theta_c();
 
   // All residual terms can be treated as positive quantities...
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
   {
-    Real cached_theta_q_f = eval_theta_q_f(q_f);
+    Number cached_theta_q_f = eval_theta_q_f(q_f);
     for(unsigned int n1=0; n1<N; n1++)
     {
       for(unsigned int j1=0; j1<N; j1++)
@@ -1027,7 +1027,7 @@ Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 
   for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
   {
-    Real cached_theta_q_m = eval_theta_q_m(q_m);
+    Number cached_theta_q_m = eval_theta_q_m(q_m);
     for(unsigned int i=0; i<N; i++)
     {
       for(unsigned int n1=0; n1<N; n1++)
@@ -1044,7 +1044,7 @@ Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
   {
-    Real cached_theta_q_a = eval_theta_q_a(q_a);
+    Number cached_theta_q_a = eval_theta_q_a(q_a);
     for(unsigned int i=0; i<N; i++)
     {
       for(unsigned int n1=0; n1<N; n1++)
@@ -1063,14 +1063,14 @@ Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
   {
     for(unsigned int j1=0; j1<N; j1++)
     {
-      Real RB_u_euler_theta_1 = RB_u_euler_theta[n1]*RB_u_euler_theta[j1];
+      Number RB_u_euler_theta_1 = RB_u_euler_theta[n1]*RB_u_euler_theta[j1];
 
       for(unsigned int n2=n1; n2<N; n2++)
       {
         unsigned int init_j2_index = (n2 == n1) ? j1 : 0;
         for(unsigned int j2=init_j2_index; j2<N; j2++)
         {
-          Real RB_u_euler_theta_2 = RB_u_euler_theta[n2]*RB_u_euler_theta[j2];
+          Number RB_u_euler_theta_2 = RB_u_euler_theta[n2]*RB_u_euler_theta[j2];
 
           Real delta = ( (n2 == n1) && (j2 == j1) ) ? 1. : 2.;
 
@@ -1084,7 +1084,7 @@ Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
     }
   }
 
-  if(residual_norm_sq < 0)
+  if(libmesh_real(residual_norm_sq) < 0.)
   {
     std::cerr << "Warning: Square of residual norm is negative "
               << "in QNTransientRBSystem::compute_residual_dual_norm " << std::endl;
@@ -1093,7 +1093,7 @@ Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
     // but this error shouldn't affect the error bound
     // too much...
 //     libmesh_error();
-    residual_norm_sq = fabs(residual_norm_sq);
+    residual_norm_sq = std::abs(residual_norm_sq);
   }
 
 //  std::cout << "slow residual_sq = " << slow_residual_norm_sq
@@ -1101,7 +1101,7 @@ Number QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 
   STOP_LOG("compute_residual_dual_norm()", "QNTransientRBSystem");
 
-  return std::sqrt( residual_norm_sq );
+  return libmesh_real(std::sqrt( residual_norm_sq ));
 }
 
 void QNTransientRBSystem::update_RB_system_matrices()
@@ -1458,7 +1458,7 @@ void QNTransientRBSystem::assemble_C_n_matrix(unsigned int n, SparseMatrix<Numbe
                                NULL);
 }
 
-void QNTransientRBSystem::add_scaled_Cn(Real scalar, unsigned int n, SparseMatrix<Real>* input_matrix, bool symmetrize)
+void QNTransientRBSystem::add_scaled_Cn(Number scalar, unsigned int n, SparseMatrix<Number>* input_matrix, bool symmetrize)
 {
   START_LOG("add_scaled_Cn()", "QNTransientRBSystem");
 
@@ -1491,7 +1491,7 @@ void QNTransientRBSystem::add_scaled_Cn(Real scalar, unsigned int n, SparseMatri
   STOP_LOG("add_scaled_Cn()", "QNTransientRBSystem");
 }
 
-void QNTransientRBSystem::add_scaled_current_C(Real scalar, SparseMatrix<Real>* input_matrix, bool symmetrize)
+void QNTransientRBSystem::add_scaled_current_C(Number scalar, SparseMatrix<Number>* input_matrix, bool symmetrize)
 {
   START_LOG("add_scaled_current_C()", "QNTransientRBSystem");
 
@@ -1514,7 +1514,7 @@ Real QNTransientRBSystem::get_SCM_lower_bound()
 
   // Create a parameter vector in which the current time-level
   // is appended to current_parameters.
-  std::vector<Number> params(get_n_params()+1);
+  std::vector<Real> params(get_n_params()+1);
   for(unsigned int i=0; i<get_n_params(); i++)
     params[i] = get_current_parameters()[i];
 
@@ -1539,7 +1539,7 @@ Real QNTransientRBSystem::get_SCM_upper_bound()
 
   // Create a parameter vector in which the current time-level
   // is appended to current_parameters.
-  std::vector<Number> params(get_n_params()+1);
+  std::vector<Real> params(get_n_params()+1);
   for(unsigned int i=0; i<get_n_params(); i++)
     params[i] = get_current_parameters()[i];
 

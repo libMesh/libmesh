@@ -28,7 +28,7 @@
 namespace libMesh
 {
 
-RBParamSubdomainNode::RBParamSubdomainNode(RBParamSubdomainTree& tree_in, const std::vector<Number>& anchor_in)
+RBParamSubdomainNode::RBParamSubdomainNode(RBParamSubdomainTree& tree_in, const std::vector<Real>& anchor_in)
   : left_child(NULL),
     right_child(NULL),
     _tree(tree_in),
@@ -300,7 +300,7 @@ void RBParamSubdomainNode::write_subdomain_data_to_files()
   _rb_system.write_offline_data_to_files(directory_name);
 }
 
-void RBParamSubdomainNode::add_child(const std::vector<Number>& new_anchor, Child c)
+void RBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child c)
 {
   if(c == LEFT)
   {
@@ -345,7 +345,7 @@ void RBParamSubdomainNode::refine_training_set(const unsigned int new_local_trai
   // we obtain reproducible training sets
   //std::srand((unsigned)( (1+libMesh::processor_id()) ));
 
-  std::vector<Number> random_point(training_set.size());
+  std::vector<Real> random_point(training_set.size());
   std::vector< std::vector<Real> > corners = get_training_bbox();
 
   while (n_local_training_parameters() < new_local_training_set_size)
@@ -393,7 +393,7 @@ void RBParamSubdomainNode::initialize_child_training_sets()
 
   for(unsigned int i=0; i<n_local_training_parameters(); i++)
   {
-    std::vector<Number> next_param = get_local_training_parameter(i);
+    std::vector<Real> next_param = get_local_training_parameter(i);
     Real left_dist  = left_child->dist_from_anchor(next_param);
     Real right_dist = right_child->dist_from_anchor(next_param);
     if( left_dist <= right_dist )
@@ -424,7 +424,7 @@ void RBParamSubdomainNode::copy_training_set_from_system()
   training_set_initialized = true;
 }
 
-Real RBParamSubdomainNode::dist_from_anchor(const std::vector<Number>& new_param) const
+Real RBParamSubdomainNode::dist_from_anchor(const std::vector<Real>& new_param) const
 {
   if(new_param.size() != anchor.size())
   {
@@ -438,8 +438,8 @@ Real RBParamSubdomainNode::dist_from_anchor(const std::vector<Number>& new_param
   {
     // Map anchor[i] and new_param[i] to (0,1) before computing distance
     Real jacobian = _rb_system.get_parameter_max(i) - _rb_system.get_parameter_min(i);
-    Number anchor_mapped = (anchor[i] - _rb_system.get_parameter_min(i))/jacobian;
-    Number new_param_mapped = (new_param[i] - _rb_system.get_parameter_min(i))/jacobian;
+    Real anchor_mapped = (anchor[i] - _rb_system.get_parameter_min(i))/jacobian;
+    Real new_param_mapped = (new_param[i] - _rb_system.get_parameter_min(i))/jacobian;
     sum += libmesh_norm(anchor_mapped - new_param_mapped);
     //sum += std::pow((anchor[i] - new_param[i]), 2.);
   }
@@ -447,7 +447,7 @@ Real RBParamSubdomainNode::dist_from_anchor(const std::vector<Number>& new_param
   return std::sqrt(sum);
 }
 
-std::vector<Number> RBParamSubdomainNode::get_local_training_parameter(unsigned int i)
+std::vector<Real> RBParamSubdomainNode::get_local_training_parameter(unsigned int i)
 {
   if(i >= n_local_training_parameters())
   {
@@ -455,7 +455,7 @@ std::vector<Number> RBParamSubdomainNode::get_local_training_parameter(unsigned 
               << std::endl;
   }
 
-  std::vector<Number> param(training_set.size());
+  std::vector<Real> param(training_set.size());
   for(unsigned int j=0; j<param.size(); j++)
     param[j] = training_set[j][i];
 
