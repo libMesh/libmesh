@@ -121,14 +121,14 @@ public:
    * Add the scaled mass matrix (assembled for the current parameter)
    * to input_matrix.
    */
-  void add_scaled_mass_matrix(Real scalar,
+  void add_scaled_mass_matrix(Number scalar,
                               SparseMatrix<Number>* input_matrix);
 
   /**
    * Perform a matrix-vector multiplication with the current mass matrix
    * and store the result in dest.
    */
-  void mass_matrix_scaled_matvec(Real scalar,
+  void mass_matrix_scaled_matvec(Number scalar,
                                  NumericVector<Number>& dest,
                                  NumericVector<Number>& arg);
 
@@ -173,7 +173,7 @@ public:
   /**
    * Evaluate theta_q_m at the current parameter.
    */
-  Real eval_theta_q_m(unsigned int q);
+  Number eval_theta_q_m(unsigned int q);
 
   /**
    * Assemble the truth system in the transient linear case.
