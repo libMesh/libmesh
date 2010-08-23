@@ -492,6 +492,45 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
 }
 
 
+std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
+                                                   const unsigned short int side) const
+{
+  libmesh_assert (elem != NULL);
+
+  // Only level-0 elements store BCs.  If this is not a level-0
+  // element get its level-0 parent and infer the BCs.
+  const Elem*  searched_elem = elem;
+  if (elem->level() != 0)
+    searched_elem = elem->top_parent ();
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::const_iterator >
+    e = _boundary_side_id.equal_range(searched_elem);
+
+  std::vector<short int> ids;
+  // elem not in the data structure
+  if (e.first == e.second)
+    return ids;
+
+  // elem is there, maybe multiple occurances
+  while (e.first != e.second)
+    {
+      // if this is true we found the requested side of the element
+      if (e.first->second.first == side)
+        ids.push_back(e.first->second.second);
+
+      ++e.first;
+    }
+
+  // if we get here, we found elem in the data structure but not
+  // the requested side, so return the default value
+  return ids;
+
+}
+
+
 void BoundaryInfo::remove_side (const Elem* elem,
                                 const unsigned short int side)
 {
