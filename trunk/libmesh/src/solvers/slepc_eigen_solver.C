@@ -28,6 +28,8 @@
 
 // Local Includes
 #include "libmesh_logging.h"
+#include "petsc_matrix.h"
+#include "petsc_vector.h"
 #include "slepc_eigen_solver.h"
 #include "shell_matrix.h"
 
