@@ -26,7 +26,7 @@
 
 // Local Includes
 #include "libmesh_config.h"
-#include "elem_type.h" // For ElemType declaration below
+#include "enum_elem_type.h" // For ElemType declaration below
 #include "point.h"
 #include "libmesh.h"
 
