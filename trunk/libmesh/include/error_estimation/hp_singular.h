@@ -26,12 +26,8 @@
 #include <list>
 
 // Local Includes
-#include "auto_ptr.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "fe.h"         // MipsPro requires fe.h and quadrature.h in order to
-#include "quadrature.h" //  delete AutoPtrs<> upon destruction
 #include "libmesh_common.h"
+#include "point.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -39,7 +35,6 @@ namespace libMesh
 {
 
 // Forward Declarations
-class Point;
 class System;
 
 
