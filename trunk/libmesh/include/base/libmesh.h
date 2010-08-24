@@ -195,47 +195,7 @@ public:
    * an invalid or uninitialized value.
    */
   extern const unsigned int invalid_uint;
-  
-  /**
-   * Namespaces don't provide private data,
-   * so let's take the data we would like
-   * private and put it in an obnoxious
-   * namespace.  At least that way it is a
-   * pain to use, thus discouraging errors.
-   */
-  namespace libMeshPrivateData {
-    
-    /**
-     * Flag that tells if \p init() has been called.
-     */
-    extern bool _is_initialized;
-    
-    /**
-     * The default solver package to use.
-     */
-    extern SolverPackage _solver_package;
-  }
-
 
 } // namespace libMesh
-
-
-
-// ------------------------------------------------------------
-// libMesh inline member functions
-inline
-bool libMesh::initialized()
-{
-  return libMeshPrivateData::_is_initialized;
-}
-
-
-
-inline
-bool libMesh::closed()
-{
-  return !libMesh::initialized();
-}
-
 
 #endif // #define __libmesh_h__
