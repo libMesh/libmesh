@@ -21,9 +21,10 @@
 
 #include "dof_map.h"
 #include "elem.h"
+#include "equation_systems.h"
 #include "fe_base.h"
 #include "fe_interface.h"
-#include "equation_systems.h"
+#include "fem_context.h"
 #include "fem_system.h"
 #include "libmesh_logging.h"
 #include "mesh_base.h"

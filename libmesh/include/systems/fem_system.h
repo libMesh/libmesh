@@ -27,12 +27,13 @@
 
 // Local Includes
 #include "diff_system.h"
-#include "fem_context.h"
 
 namespace libMesh
 {
 
 // Forward Declarations
+class DiffContext;
+class FEMContext;
 
 
 /**
