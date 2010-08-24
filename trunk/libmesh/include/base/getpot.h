@@ -205,10 +205,12 @@ public:
     // (*) unidentified flying objects -----------------------------------------
     inline STRING_VECTOR   unidentified_arguments(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_arguments(const std::set<std::string>& Knowns) const;
+    inline STRING_VECTOR   unidentified_arguments(const std::vector<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_arguments() const;
 
     inline STRING_VECTOR   unidentified_options(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_options(const std::set<std::string>& Knowns) const;
+    inline STRING_VECTOR   unidentified_options(const std::vector<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_options() const;
 
     inline std::string     unidentified_flags(const char* Known,
@@ -216,14 +218,17 @@ public:
 
     inline STRING_VECTOR   unidentified_variables(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_variables(const std::set<std::string>& Knowns) const;
+    inline STRING_VECTOR   unidentified_variables(const std::vector<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_variables() const;
 
     inline STRING_VECTOR   unidentified_sections(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_sections(const std::set<std::string>& Knowns) const;
+    inline STRING_VECTOR   unidentified_sections(const std::vector<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_sections() const;
 
     inline STRING_VECTOR   unidentified_nominuses(unsigned Number, const char* Known, ...) const;
     inline STRING_VECTOR   unidentified_nominuses(const std::set<std::string>& Knowns) const;
+    inline STRING_VECTOR   unidentified_nominuses(const std::vector<std::string>& Knowns) const;
     inline STRING_VECTOR   unidentified_nominuses() const;
 
     // (*) output --------------------------------------------------------------
@@ -2007,6 +2012,14 @@ GetPot::unidentified_arguments() const
 { return unidentified_arguments(_requested_arguments); }
 
 inline STRING_VECTOR
+GetPot::unidentified_arguments(const std::vector<std::string>& Knowns) const
+{
+    // We use set for efficiency, but want to support vector inputs for
+    // backwards compatibility.
+    return unidentified_arguments(std::set<std::string> (Knowns.begin(), Knowns.end()));
+}
+
+inline STRING_VECTOR
 GetPot::unidentified_arguments(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
@@ -2054,6 +2067,14 @@ GetPot::unidentified_options() const
     //
     // => it is not necessary to separate requested options from the list
     return unidentified_arguments(_requested_arguments); 
+}
+
+inline STRING_VECTOR
+GetPot::unidentified_options(const std::vector<std::string>& Knowns) const
+{
+    // We use set for efficiency, but want to support vector inputs for
+    // backwards compatibility.
+    return unidentified_options(std::set<std::string> (Knowns.begin(), Knowns.end()));
 }
 
 inline STRING_VECTOR
@@ -2154,6 +2175,14 @@ GetPot::unidentified_variables(unsigned Number,
 }
 
 inline STRING_VECTOR
+GetPot::unidentified_variables(const std::vector<std::string>& Knowns) const
+{
+    // We use set for efficiency, but want to support vector inputs for
+    // backwards compatibility.
+    return unidentified_variables(std::set<std::string> (Knowns.begin(), Knowns.end()));
+}
+
+inline STRING_VECTOR
 GetPot::unidentified_variables(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
@@ -2202,6 +2231,14 @@ GetPot::unidentified_sections(unsigned Number,
 inline STRING_VECTOR
 GetPot::unidentified_sections() const
 { return unidentified_sections(_requested_sections); }
+
+inline STRING_VECTOR
+GetPot::unidentified_sections(const std::vector<std::string>& Knowns) const
+{
+    // We use set for efficiency, but want to support vector inputs for
+    // backwards compatibility.
+    return unidentified_sections(std::set<std::string> (Knowns.begin(), Knowns.end()));
+}
 
 inline STRING_VECTOR
 GetPot::unidentified_sections(const std::set<std::string>& Knowns) const
@@ -2254,6 +2291,14 @@ GetPot::unidentified_nominuses() const {
     // => it is not necessary to separate requested nominus from the list
 
     return unidentified_nominuses(_requested_arguments);
+}
+
+inline STRING_VECTOR
+GetPot::unidentified_nominuses(const std::vector<std::string>& Knowns) const
+{
+    // We use set for efficiency, but want to support vector inputs for
+    // backwards compatibility.
+    return unidentified_nominuses(std::set<std::string> (Knowns.begin(), Knowns.end()));
 }
 
 inline STRING_VECTOR
