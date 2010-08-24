@@ -33,7 +33,6 @@
 #include "dense_vector.h"
 #include "libmesh_logging.h"
 #include "system.h" // needed by enforce_constraints_exactly()
-#include "mesh.h"   // as is this
 #include "numeric_vector.h" // likewise
 #include "parallel.h"
 #include "periodic_boundaries.h"

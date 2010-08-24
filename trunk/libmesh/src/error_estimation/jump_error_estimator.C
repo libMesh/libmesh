@@ -33,7 +33,7 @@
 #include "quadrature_gauss.h"
 #include "libmesh_logging.h"
 #include "elem.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "system.h"
 
 #include "dense_vector.h"

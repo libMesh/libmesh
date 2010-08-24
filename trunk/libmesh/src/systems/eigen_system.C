@@ -32,7 +32,7 @@
 #include "sparse_matrix.h"
 #include "eigen_solver.h"
 #include "dof_map.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "qoi_set.h"
 
 namespace libMesh

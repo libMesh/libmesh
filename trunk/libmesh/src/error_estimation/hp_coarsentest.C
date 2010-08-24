@@ -32,7 +32,7 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 #include "error_vector.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "quadrature.h"
 #include "system.h"
 #include "tensor_value.h"

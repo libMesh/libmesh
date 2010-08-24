@@ -27,7 +27,7 @@
 #include "implicit_system.h"
 #include "libmesh_logging.h"
 #include "linear_solver.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "numeric_vector.h"
 #include "parameters.h"
 #include "parameter_vector.h"

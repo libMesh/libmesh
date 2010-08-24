@@ -27,7 +27,7 @@
 #include "equation_systems.h"
 #include "fe.h"
 #include "fe_interface.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "mesh_function.h"
 #include "numeric_vector.h"
 #include "parallel.h"
