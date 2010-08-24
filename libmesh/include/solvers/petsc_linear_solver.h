@@ -27,11 +27,10 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 // C++ includes
+#include <vector>
 
 // Local includes
 #include "linear_solver.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
 #include "petsc_macro.h"
 
 /**
@@ -83,6 +82,9 @@ extern "C"
 
 namespace libMesh
 {
+
+// forward declarations
+template <typename T> class PetscMatrix;
 
 /**
  * This class provides an interface to PETSc
