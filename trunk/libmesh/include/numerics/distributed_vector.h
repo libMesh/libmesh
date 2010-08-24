@@ -32,7 +32,6 @@
 // C++ includes
 #include <vector>
 #include <algorithm>
-#include <complex>
 #include <limits>
 
 // Local includes

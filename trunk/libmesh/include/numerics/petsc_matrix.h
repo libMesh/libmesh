@@ -31,7 +31,6 @@
 
 // Local includes
 #include "sparse_matrix.h"
-#include "parallel.h"
 #include "petsc_macro.h"
 
 // Macro to identify and debug functions which should be called in
@@ -41,6 +40,8 @@
 #undef semiparallel_only
 #ifndef NDEBUG
   #include <cstring>
+
+  #include "parallel.h"
 
   #define semiparallel_only() do { if (this->initialized()) { const char *mytype; \
     MatGetType(_mat,&mytype); \
