@@ -27,6 +27,7 @@
 #ifdef LIBMESH_HAVE_LASPACK
 
 #include "laspack_matrix.h"
+#include "dense_matrix.h"
 #include "dof_map.h"
 #include "sparsity_pattern.h"
 
@@ -195,6 +196,24 @@ void LaspackMatrix<T>::init ()
   this->_is_initialized = true;
   
   libmesh_assert (m == this->m());
+}
+
+
+
+template <typename T> 
+void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
+				  const std::vector<unsigned int>& rows,
+				  const std::vector<unsigned int>& cols)
+		    
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert (dm.m() == rows.size());
+  libmesh_assert (dm.n() == cols.size());
+
+  
+  for (unsigned int i=0; i<rows.size(); i++)
+    for (unsigned int j=0; j<cols.size(); j++)
+      this->add(rows[i],cols[j],dm(i,j));
 }
 
 

@@ -31,7 +31,6 @@
 
 // Local includes
 #include "sparse_matrix.h"
-#include "dense_matrix.h"
 
 
 #include <qmatrix.h>
@@ -42,6 +41,7 @@ namespace libMesh
 
 
 // Forward declarations
+template <typename T> class DenseMatrix;
 template <typename T> class LaspackVector;
 template <typename T> class LaspackLinearSolver;
 
@@ -479,25 +479,6 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				  const std::vector<unsigned int>& dof_indices)
 {
   this->add_matrix (dm, dof_indices, dof_indices);
-}
-
-
-
-template <typename T> 
-inline
-void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				  const std::vector<unsigned int>& rows,
-				  const std::vector<unsigned int>& cols)
-		    
-{
-  libmesh_assert (this->initialized());
-  libmesh_assert (dm.m() == rows.size());
-  libmesh_assert (dm.n() == cols.size());
-
-  
-  for (unsigned int i=0; i<rows.size(); i++)
-    for (unsigned int j=0; j<cols.size(); j++)
-      this->add(rows[i],cols[j],dm(i,j));
 }
 
 
