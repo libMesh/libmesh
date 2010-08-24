@@ -29,7 +29,9 @@
 #include "libmesh_logging.h"
 #include "petsc_linear_solver.h"
 #include "shell_matrix.h"
+#include "petsc_matrix.h"
 #include "petsc_preconditioner.h"
+#include "petsc_vector.h"
 
 namespace libMesh
 {
