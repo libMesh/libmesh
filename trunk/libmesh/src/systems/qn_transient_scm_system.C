@@ -345,7 +345,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
 
   // Initialize a temporary training set (distributed across processors)
   // that doesn't include time
-  std::vector< NumericVector<Real>* > dist_temp_training_parameters;
+  std::vector< NumericVector<Number>* > dist_temp_training_parameters;
 
   // Strip off the time parameter from log_param_scale, mu_min/max_vector
   unsigned int temp_n_params = log_param_scale.size()-1;
@@ -379,7 +379,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
 
   // dist_temp_training_parameters is now a distributed training set, so
   // first localize and then delete the distributed vectors
-  std::vector< std::vector<Real> >
+  std::vector< std::vector<Number> >
     temp_training_parameters( dist_temp_training_parameters.size() );
   for(unsigned int i=0; i<dist_temp_training_parameters.size(); i++)
   {
@@ -406,7 +406,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
 
   for(unsigned int i=0; i<get_n_params(); i++)
   {
-    training_parameters[i] = NumericVector<Real>::build().release();
+    training_parameters[i] = NumericVector<Number>::build().release();
     training_parameters[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
@@ -419,7 +419,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
   {
     std::vector<Real> params_i( get_n_params()-1 );
     for(unsigned int j=0; j<(get_n_params()-1); j++)
-      params_i[j] = temp_training_parameters[j][i];
+      params_i[j] = libmesh_real(temp_training_parameters[j][i]);
     params_i.push_back(0.);
 
     for(unsigned int j=1; j<=n_time_samples; j++)
@@ -441,7 +441,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
   training_parameters_initialized = true;
 }
 
-void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& new_training_set)
+void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Number> >& new_training_set)
 {
   // First, make sure that an initial training set has already been
   // generated
@@ -470,7 +470,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
 
   // Initialize a temporary training set (distributed across processors)
   // that doesn't include time. This is where we load the training set into.
-  std::vector< NumericVector<Real>* > dist_temp_training_parameters(get_n_params()-1);
+  std::vector< NumericVector<Number>* > dist_temp_training_parameters(get_n_params()-1);
   unsigned int n_global_training_samples;
 
   {
@@ -481,7 +481,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
 
     for(unsigned int i=0; i<dist_temp_training_parameters.size(); i++)
     {
-      dist_temp_training_parameters[i] = NumericVector<Real>::build().release();
+      dist_temp_training_parameters[i] = NumericVector<Number>::build().release();
       dist_temp_training_parameters[i]->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
     }
 
@@ -499,7 +499,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
   // THE CODE BELOW IS MOSTLY COPIED FROM QNTransientSCMSystem::initialize_training_parameters
   // dist_temp_training_parameters is now a distributed training set, so
   // first localize and then delete the distributed vectors
-  std::vector< std::vector<Real> >
+  std::vector< std::vector<Number> >
     temp_training_parameters( dist_temp_training_parameters.size() );
   for(unsigned int i=0; i<dist_temp_training_parameters.size(); i++)
   {
@@ -535,7 +535,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
   training_parameters.resize(get_n_params());
   for(unsigned int i=0; i<get_n_params(); i++)
   {
-    training_parameters[i] = NumericVector<Real>::build().release();
+    training_parameters[i] = NumericVector<Number>::build().release();
     training_parameters[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
@@ -548,7 +548,7 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Real> >& n
   {
     std::vector<Real> params_i( get_n_params()-1 );
     for(unsigned int j=0; j<(get_n_params()-1); j++)
-      params_i[j] = temp_training_parameters[j][i];
+      params_i[j] = libmesh_real(temp_training_parameters[j][i]);
     params_i.push_back(0.);
 
     for(unsigned int j=1; j<=n_time_samples; j++)

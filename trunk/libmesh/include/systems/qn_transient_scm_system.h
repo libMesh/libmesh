@@ -180,7 +180,7 @@ public:
    * Overwrite the training parameters with new_training_set. Overloaded to also
    * handle the extra temporal parameters in the QNTransientSCM case.
    */
-  virtual void load_training_set(std::vector< std::vector<Real> >& new_training_set);
+  virtual void load_training_set(std::vector< std::vector<Number> >& new_training_set);
 
   /**
    * Write out all the data to text files in order to segregate the

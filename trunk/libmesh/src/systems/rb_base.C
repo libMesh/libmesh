@@ -111,7 +111,7 @@ std::vector<Real> RBBase<Base>::get_training_parameter(unsigned int index) const
 
   std::vector<Real> parameter(this->get_n_params());
   for(unsigned int i=0; i<parameter.size(); i++)
-    parameter[i] = (*training_parameters[i])(index);
+    parameter[i] = libmesh_real((*training_parameters[i])(index));
 
   return parameter;
 }
@@ -331,7 +331,7 @@ void RBBase<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>& erro
 }
 
 template <class Base>
-void RBBase<Base>::load_training_set(std::vector< std::vector<Real> >& new_training_set)
+void RBBase<Base>::load_training_set(std::vector< std::vector<Number> >& new_training_set)
 {
   // First, make sure that an initial training set has already been
   // generated
@@ -367,7 +367,7 @@ void RBBase<Base>::load_training_set(std::vector< std::vector<Real> >& new_train
 
   for(unsigned int i=0; i<get_n_params(); i++)
   {
-    training_parameters[i] = NumericVector<Real>::build().release();
+    training_parameters[i] = NumericVector<Number>::build().release();
     training_parameters[i]->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
@@ -385,7 +385,7 @@ void RBBase<Base>::load_training_set(std::vector< std::vector<Real> >& new_train
 
 template <class Base>
 void RBBase<Base>::generate_training_parameters_random(const std::vector<bool> log_param_scale,
-                                                       std::vector< NumericVector<Real>* >& training_parameters_in,
+                                                       std::vector< NumericVector<Number>* >& training_parameters_in,
                                                        const unsigned int n_training_samples_in,
                                                        const std::vector<Real>& min_parameters,
                                                        const std::vector<Real>& max_parameters,
@@ -437,7 +437,7 @@ void RBBase<Base>::generate_training_parameters_random(const std::vector<bool> l
 
   for(unsigned int i=0; i<num_params; i++)
   {
-    training_parameters_in[i] = NumericVector<Real>::build().release();
+    training_parameters_in[i] = NumericVector<Number>::build().release();
     training_parameters_in[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
@@ -469,7 +469,7 @@ void RBBase<Base>::generate_training_parameters_random(const std::vector<bool> l
 
 template <class Base>
 void RBBase<Base>::generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
-                                                              std::vector< NumericVector<Real>* >& training_parameters_in,
+                                                              std::vector< NumericVector<Number>* >& training_parameters_in,
                                                               const unsigned int n_training_samples_in,
                                                               const std::vector<Real>& min_parameters,
                                                               const std::vector<Real>& max_parameters)
@@ -511,7 +511,7 @@ void RBBase<Base>::generate_training_parameters_deterministic(const std::vector<
 
   for(unsigned int i=0; i<num_params; i++)
   {
-    training_parameters_in[i] = NumericVector<Real>::build().release();
+    training_parameters_in[i] = NumericVector<Number>::build().release();
     training_parameters_in[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 

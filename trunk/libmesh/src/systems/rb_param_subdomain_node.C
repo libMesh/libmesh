@@ -457,7 +457,7 @@ std::vector<Real> RBParamSubdomainNode::get_local_training_parameter(unsigned in
 
   std::vector<Real> param(training_set.size());
   for(unsigned int j=0; j<param.size(); j++)
-    param[j] = training_set[j][i];
+    param[j] = libmesh_real(training_set[j][i]);
 
   return param;
 }

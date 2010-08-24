@@ -149,7 +149,7 @@ public:
   /**
    * Overwrite the training parameters with new_training_set.
    */
-  virtual void load_training_set(std::vector< std::vector<Real> >& new_training_set);
+  virtual void load_training_set(std::vector< std::vector<Number> >& new_training_set);
 
   /**
    * Get the number of parameters. Value is determined
@@ -279,7 +279,7 @@ public:
   /**
    * The training samples.
    */
-  std::vector< NumericVector<Real>* > training_parameters;
+  std::vector< NumericVector<Number>* > training_parameters;
 
   /**
    * If < 0, use std::time() * processor_id() to seed the random
@@ -313,7 +313,7 @@ protected:
    * Static helper function for generating a randomized set of parameters.
    */
   static void generate_training_parameters_random(const std::vector<bool> log_param_scale,
-                                                  std::vector< NumericVector<Real>* >& training_parameters_in,
+                                                  std::vector< NumericVector<Number>* >& training_parameters_in,
                                                   const unsigned int n_training_samples_in,
                                                   const std::vector<Real>& min_parameters,
                                                   const std::vector<Real>& max_parameters,
@@ -324,7 +324,7 @@ protected:
    * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
    */
   static void generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
-                                                         std::vector< NumericVector<Real>* >& training_parameters_in,
+                                                         std::vector< NumericVector<Number>* >& training_parameters_in,
                                                          const unsigned int n_training_samples_in,
                                                          const std::vector<Real>& min_parameters,
                                                          const std::vector<Real>& max_parameters);
