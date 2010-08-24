@@ -28,7 +28,7 @@
 
 // libMesh includes
 #include "libmesh.h"
-#include "elem_type.h"
+#include "enum_elem_type.h"
 #include "mesh_base.h"
 #include "mesh_output.h"
 

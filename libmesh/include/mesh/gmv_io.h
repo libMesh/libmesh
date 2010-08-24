@@ -30,7 +30,7 @@
 #include "libmesh_common.h"
 #include "mesh_output.h"
 #include "mesh_input.h"
-#include "elem_type.h"
+#include "enum_elem_type.h"
 
 namespace libMesh
 {
