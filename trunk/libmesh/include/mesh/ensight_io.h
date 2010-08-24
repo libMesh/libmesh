@@ -28,15 +28,15 @@
 
 // libMesh includes
 #include "libmesh.h"
-#include "equation_systems.h"
-#include "linear_implicit_system.h"
-#include "elem.h"
-#include "mesh.h"
+#include "elem_type.h"
+#include "mesh_base.h"
 #include "mesh_output.h"
 
 namespace libMesh
 {
 
+// Forward declarations
+class EquationSystems;
 
 /**
  * This class implements writing meshes and solutions in Ensight's Gold format.
