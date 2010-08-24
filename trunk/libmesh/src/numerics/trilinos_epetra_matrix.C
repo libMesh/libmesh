@@ -29,6 +29,7 @@
 #include "dof_map.h"
 #include "dense_matrix.h"
 #include "parallel.h"
+#include "sparsity_pattern.h"
 
 namespace libMesh
 {

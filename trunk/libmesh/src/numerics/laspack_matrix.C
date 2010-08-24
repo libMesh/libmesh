@@ -28,6 +28,7 @@
 
 #include "laspack_matrix.h"
 #include "dof_map.h"
+#include "sparsity_pattern.h"
 
 namespace libMesh
 {
