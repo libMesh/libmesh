@@ -26,13 +26,8 @@
 // C++ includes
 
 // Local Includes
-#include "dense_matrix.h"
-#include "dense_submatrix.h"
-#include "dense_subvector.h"
-#include "dense_vector.h"
 #include "diff_context.h"
-#include "linear_implicit_system.h"
-#include "transient_system.h"
+#include "implicit_system.h"
 
 namespace libMesh
 {
