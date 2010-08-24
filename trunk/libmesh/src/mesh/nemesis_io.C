@@ -22,9 +22,11 @@
 #include <numeric> // std::accumulate
 
 // LibMesh includes
+#include "elem.h"
 #include "exodusII_io.h"
 #include "nemesis_io.h"
 #include "nemesis_io_helper.h"
+#include "node.h"
 #include "parallel_mesh.h"
 #include "parallel.h"
 #include "utility.h" // is_sorted, deallocate

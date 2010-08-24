@@ -25,14 +25,15 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "elem.h"
 #include "mapvector.h"
-#include "node.h"
 #include "unstructured_mesh.h"
 
 namespace libMesh
 {
 
+// Forward declarations
+class Elem;
+class Node;
 
 
 // Prototype this function so we can delcare it a friend.
