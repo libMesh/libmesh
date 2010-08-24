@@ -360,7 +360,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_variables; var++)
     {
-      const System::Variable& variable = dof_map.variable(var);
+      const Variable& variable = dof_map.variable(var);
 
       const FEType& base_fe_type = variable.type();     
 
@@ -865,7 +865,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_variables; var++)
     {
-      const System::Variable& variable = dof_map.variable(var);
+      const Variable& variable = dof_map.variable(var);
 
       const FEType& fe_type = variable.type();     
 

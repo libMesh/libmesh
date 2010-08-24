@@ -595,9 +595,9 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
       
       for (unsigned int var=0; var<nv_sys; var++)
 	{
-	  const FEType& fe_type                   = system.variable_type(var);
-	  const System::Variable &var_description = system.variable(var);
-	  const DofMap &dof_map                   = system.get_dof_map();
+	  const FEType& fe_type           = system.variable_type(var);
+	  const Variable &var_description = system.variable(var);
+	  const DofMap &dof_map           = system.get_dof_map();
 
 	  std::fill (repeat_count.begin(), repeat_count.end(), 0);
 

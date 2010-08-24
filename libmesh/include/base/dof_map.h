@@ -35,7 +35,7 @@
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
 #include "vector_value.h" // RealVectorValue
-#include "system.h" // System::Variable
+#include "variable.h"
 #include "threads.h"
 #include "threads_allocators.h"
 #include "elem_range.h"
@@ -44,13 +44,14 @@ namespace libMesh
 {
 
 // Forward Declarations
+class CouplingMatrix;
 class DofMap;
 class DofObject;
 class Elem;
+class FEType;
 class MeshBase;
 class Mesh;
-class FEType;
-class CouplingMatrix;
+class System;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -312,12 +313,12 @@ public:
    * Add an unknown of order \p order and finite element type
    * \p type to the system of equations.
    */
-  void add_variable (const System::Variable &var);
+  void add_variable (const Variable &var);
   
   /**
    * @returns the variable description object for variable \p c.
    */
-  const System::Variable& variable (const unsigned int c) const;
+  const Variable& variable (const unsigned int c) const;
 
   /**
    * @returns the approximation order for variable \p c.
@@ -816,7 +817,7 @@ private:
   /**
    * The finite element type for each variable.
    */
-  std::vector<System::Variable> _variables;
+  std::vector<Variable> _variables;
 
   /**
    * The number of the system we manage DOFs for.
