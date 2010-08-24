@@ -26,11 +26,9 @@
 
 // Local includes
 #include "auto_ptr.h"
-#include "system_norm.h"
 #include "libmesh_common.h"
 #include "linear_solver.h"
 #include "numeric_vector.h"
-#include "qoi_set.h"
 #include "reference_counted_object.h"
 
 namespace libMesh
@@ -39,9 +37,10 @@ namespace libMesh
 // Forward Declarations
 class DiffContext;
 class DiffSolver;
-class TimeSolver;
 class DifferentiableSystem;
 class ParameterVector;
+class SystemNorm;
+class TimeSolver;
 
 /**
  * This is a generic class that defines a solver to handle

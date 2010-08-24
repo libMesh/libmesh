@@ -25,6 +25,7 @@
 // C++ includes
 
 // Local includes
+#include "system_norm.h"
 #include "unsteady_solver.h"
 
 namespace libMesh
