@@ -83,6 +83,26 @@ namespace {
 namespace libMesh
 {
 
+  /**
+   * Namespaces don't provide private data,
+   * so let's take the data we would like
+   * private and put it in an obnoxious
+   * namespace.  At least that way it is a
+   * pain to use, thus discouraging errors.
+   */
+  namespace libMeshPrivateData {
+    
+    /**
+     * Flag that tells if \p init() has been called.
+     */
+    extern bool _is_initialized;
+    
+    /**
+     * The default solver package to use.
+     */
+    extern SolverPackage _solver_package;
+  }
+
 
 // ------------------------------------------------------------
 // libMeshdata initialization
@@ -142,6 +162,21 @@ SolverPackage libMesh::libMeshPrivateData::_solver_package =
 
 // ------------------------------------------------------------
 // libMesh functions
+
+bool initialized()
+{
+  return libMeshPrivateData::_is_initialized;
+}
+
+
+
+bool closed()
+{
+  return !libMeshPrivateData::_is_initialized;
+}
+
+
+
 #ifndef LIBMESH_HAVE_MPI
 void _init (int &argc, char** & argv)
 #else
