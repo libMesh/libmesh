@@ -28,7 +28,6 @@
 // Local includes
 #include "auto_ptr.h"
 #include "libmesh_common.h"
-#include "qoi_set.h"
 #include "reference_counted_object.h"
 
 namespace libMesh

@@ -26,7 +26,6 @@
 
 // Local Includes
 #include "libmesh_common.h"
-#include "dense_matrix_base.h"
 #include "dense_matrix.h"
 #include "dense_subvector.h"
 

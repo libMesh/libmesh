@@ -23,7 +23,6 @@
 #define __parmetis_partitioner_h__
 
 // C++ Includes   -----------------------------------
-#include <string>
 #include <vector>
 #include <map>
 
