@@ -189,6 +189,7 @@ int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT
     _dist_norm=sqrt(_dist_norm/_mesh.n_nodes());
   }
   /*
+int scanned;
 if(me>=3){
 	fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,ncells,nedges);
 
@@ -211,24 +212,38 @@ if(me>=3){
 	int lo, Ncells;
 	double d1;
 	stream1=fopen(grid_old,"r");
-	fscanf(stream1,"%d \n%d \n%d \n%d \n",&lo,&i,&Ncells,&nedges);
+	scanned = fscanf(stream1,"%d \n%d \n%d \n%d \n",&lo,&i,&Ncells,&nedges);
+	libmesh_assert(scanned != EOF);
 	fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,Ncells,nedges);
 
 	for(i=0;i<N;i++){//node coordinates
-		for(unsigned int j=0;j<n;j++) {fprintf(stream,"%e ",R[i][j]); fscanf(stream1,"%le ",&d1);}
-	fprintf(stream,"%d \n",mask[i]); fscanf(stream1,"%d \n",&lo);
+		for(unsigned int j=0;j<n;j++) {fprintf(stream,"%e ",R[i][j]);
+		scanned = fscanf(stream1,"%le ",&d1);
+		libmesh_assert(scanned != EOF);
+	}
+	fprintf(stream,"%d \n",mask[i]); 
+	scanned = fscanf(stream1,"%d \n",&lo);
+	libmesh_assert(scanned != EOF);
     }
 	for(i=0;i<Ncells;i++){
 		for(unsigned int j=0;j<=3*n+n%2;j++){
-			fscanf(stream1,"%d ",&lo); fprintf(stream,"%d ",lo);
+			scanned = fscanf(stream1,"%d ",&lo);
+			libmesh_assert(scanned != EOF);
+			fprintf(stream,"%d ",lo);
 		}
-		fscanf(stream1,"\n"); fprintf(stream,"\n");
+		scanned = fscanf(stream1,"\n");
+		libmesh_assert(scanned != EOF);
+		fprintf(stream,"\n");
 	}
 	for(i=0;i<nedges;i++){
 		for(unsigned int j=0;j<3;j++){
-	    fscanf(stream1,"%d ",&lo); fprintf(stream,"%d ",lo);
+		scanned = fscanf(stream1,"%d ",&lo);
+		libmesh_assert(scanned != EOF);
+		fprintf(stream,"%d ",lo);
 		}
-	fscanf(stream1,"\n"); fprintf(stream,"\n");
+	scanned = fscanf(stream1,"\n");
+	libmesh_assert(scanned != EOF);
+	fprintf(stream,"\n");
 	}
 	fclose(stream1);
 }
@@ -464,15 +479,18 @@ return 0;
 //int VariationalMeshSmoother::readmetr(char *name, LPLPLPDOUBLE H, int ncells, int n, FILE *sout)
 int VariationalMeshSmoother::readmetr(char *name, LPLPLPDOUBLE H, int ncells, int n, FILE *)
 {
-int i, j, k;
+int i, j, k, scanned;
 double d;
 FILE *stream;
 
    stream=fopen(name,"r");
    for(i=0;i<ncells;i++)
 	  for(j=0;j<n;j++){
-	  for(k=0;k<n;k++){fscanf(stream,"%le ",&d); H[i][j][k]=d;}
-		  fscanf(stream,"\n");
+	  for(k=0;k<n;k++){scanned = fscanf(stream,"%le ",&d); 
+            libmesh_assert(scanned != EOF);
+            H[i][j][k]=d;}
+		  scanned = fscanf(stream,"\n");
+		  libmesh_assert(scanned != EOF);
 	  }
 
    fclose(stream);
@@ -2593,7 +2611,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[], char metr[], int n, int
   LPLPDOUBLE Q;
   double K[9], a1[3], a2[3], a3[3];
   double det, g1, g2, g3, det_o, g1_o, g2_o, g3_o, eps=1e-3;
-  int  i, j, k, l, N, ncells, Ncells, nvert;
+  int  i, j, k, l, N, ncells, Ncells, nvert, scanned;
   FILE *stream;
 
   Q = alloc_d_n1_n2(3, 10);
@@ -2601,7 +2619,8 @@ void VariationalMeshSmoother::metr_data_gen(char grid[], char metr[], int n, int
 
   //read the initial mesh
   stream=fopen(grid,"r");
-  fscanf(stream, "%d \n%d \n%d \n%d \n",&i,&N,&ncells,&j);
+  scanned = fscanf(stream, "%d \n%d \n%d \n%d \n",&i,&N,&ncells,&j);
+  libmesh_assert(scanned != EOF);
   fclose(stream);
 
   mask=alloc_i_n1(N);
