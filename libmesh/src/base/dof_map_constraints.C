@@ -36,6 +36,7 @@
 #include "mesh.h"   // as is this
 #include "numeric_vector.h" // likewise
 #include "parallel.h"
+#include "periodic_boundaries.h"
 #include "point_locator_base.h"
 #include "elem_range.h"
 #include "threads_allocators.h"
@@ -163,7 +164,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   // Mesh, that point_locator() construction is threaded.  Rather than
   // nest threads within threads we'll make sure it's preconstructed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (!_periodic_boundaries.empty())
+  if (!_periodic_boundaries->empty())
     mesh.point_locator();
 #endif
   
@@ -175,7 +176,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
 			   ComputeConstraints (_dof_constraints,
 					       *this,
 #ifdef LIBMESH_ENABLE_PERIODIC
-					       _periodic_boundaries,
+					       *_periodic_boundaries,
 #endif
 					       mesh,
 					       variable_number));
@@ -1327,8 +1328,8 @@ void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
   std::pair<unsigned int, PeriodicBoundary> ibp
     (boundary.pairedboundary, inverse_boundary);
 
-  _periodic_boundaries.insert(bp);
-  _periodic_boundaries.insert(ibp);
+  _periodic_boundaries->insert(bp);
+  _periodic_boundaries->insert(ibp);
 }
 
 

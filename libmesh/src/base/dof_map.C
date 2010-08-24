@@ -37,6 +37,7 @@
 #include "mesh_tools.h"
 #include "numeric_vector.h"
 #include "parallel.h"
+#include "periodic_boundaries.h"
 #include "sparse_matrix.h"
 #include "sparsity_pattern.h"
 #include "string_to_enum.h"
@@ -49,11 +50,45 @@ namespace libMesh
 // ------------------------------------------------------------
 // DofMap member functions
 
+DofMap::DofMap(const unsigned int number) :
+  _dof_coupling(NULL),
+  _sys_number(number),
+//  _matrix(NULL),
+  _n_dfs(0),
+  _n_SCALAR_dofs(0)
+#ifdef LIBMESH_ENABLE_AMR
+  , _n_old_dfs(0)
+#endif
+#ifdef LIBMESH_ENABLE_PERIODIC
+  , _periodic_boundaries(new PeriodicBoundaries)
+#endif
+{
+  _matrices.clear();
+}
+
+
+
 // Destructor
 DofMap::~DofMap()
 {
   this->clear();
+#ifdef LIBMESH_ENABLE_PERIODIC
+  delete _periodic_boundaries;
+#endif
 }
+
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+
+bool DofMap::is_periodic_boundary (const unsigned int boundaryid) const
+{
+  if (_periodic_boundaries->count(boundaryid) != 0)
+    return true;
+
+  return false;
+}
+
+#endif
 
 
 
