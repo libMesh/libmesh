@@ -28,7 +28,7 @@
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_output.h"
-#include "dense_matrix.h"
+//#include "dense_matrix.h"
 #include "point.h"
 
 namespace libMesh
