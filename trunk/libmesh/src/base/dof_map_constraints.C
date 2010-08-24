@@ -68,7 +68,7 @@ using namespace libMesh;
 
     void operator()(const ConstElemRange &range) const
     {
-      const System::Variable &var_description = _dof_map.variable(_variable_number);
+      const Variable &var_description = _dof_map.variable(_variable_number);
 
       for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
 	if (var_description.active_on_subdomain((*it)->subdomain_id()))

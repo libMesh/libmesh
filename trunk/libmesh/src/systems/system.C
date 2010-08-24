@@ -35,6 +35,7 @@
 #include "qoi_set.h"
 #include "string_to_enum.h"
 #include "system.h"
+#include "system_norm.h"
 #include "utility.h"
 
 // includes for calculate_norm, point_*

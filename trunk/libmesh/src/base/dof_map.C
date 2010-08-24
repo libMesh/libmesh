@@ -56,14 +56,14 @@ DofMap::~DofMap()
 
 
 
-void DofMap::add_variable (const System::Variable &var)
+void DofMap::add_variable (const Variable &var)
 {
   _variables.push_back (var);
 }
 
 
 
-const System::Variable & DofMap::variable (const unsigned int c) const
+const Variable & DofMap::variable (const unsigned int c) const
 {
   libmesh_assert (c < _variables.size());
 
@@ -357,7 +357,7 @@ void DofMap::reinit(MeshBase& mesh)
   // Next allocate space for the DOF indices
   for (unsigned int var=0; var<this->n_variables(); var++)
     {
-      const System::Variable &var_description =	this->variable(var);
+      const Variable &var_description =	this->variable(var);
       const FEType& base_fe_type              = this->variable_type(var);
 
       // Don't need to loop over elements for a SCALAR variable
@@ -890,7 +890,7 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
     {
       _var_first_local_df.push_back(next_free_dof);
 
-      const System::Variable var_description = this->variable(var);
+      const Variable var_description = this->variable(var);
 
       // Skip the SCALAR dofs
       if(var_description.type().family == SCALAR)
