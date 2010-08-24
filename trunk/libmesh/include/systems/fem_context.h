@@ -27,7 +27,7 @@
 
 // Local Includes
 #include "diff_context.h"
-#include "elem.h"
+#include "vector_value.h"
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "tensor_value.h"
@@ -37,7 +37,7 @@ namespace libMesh
 {
 
 // Forward Declarations
-
+class Elem;
 class FEBase;
 class FEMSystem;
 class QBase;
