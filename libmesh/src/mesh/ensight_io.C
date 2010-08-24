@@ -25,13 +25,14 @@
 #include <cstring>
 #include <stdio.h>
 
-#include "libmesh.h"
 #include "dof_map.h"
-#include "system.h"
-#include "o_string_stream.h"
-#include "fe_interface.h"
-
 #include "ensight_io.h"
+#include "equation_systems.h"
+#include "fe_interface.h"
+#include "libmesh.h"
+#include "o_string_stream.h"
+#include "system.h"
+
 
 namespace libMesh
 {
