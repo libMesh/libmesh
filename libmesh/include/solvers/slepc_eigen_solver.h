@@ -26,8 +26,6 @@
 
 // Local includes
 #include "eigen_solver.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
 #include "slepc_macro.h"
 
 #ifdef LIBMESH_HAVE_SLEPC
