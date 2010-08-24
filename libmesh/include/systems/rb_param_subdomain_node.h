@@ -188,7 +188,7 @@ public:
    * The set of training points for the parameter
    * subdomain corresponding to this node.
    */
-  std::vector< std::vector<Real> > training_set;
+  std::vector< std::vector<Number> > training_set;
 
   /**
    * Number of model associated with node
