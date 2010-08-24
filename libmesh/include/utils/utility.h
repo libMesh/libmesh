@@ -24,7 +24,6 @@
 // System includes
 #include <string>
 #include <vector>
-#include <cmath>
 #include <algorithm> // for std::lower_bound
 
 // Local includes
