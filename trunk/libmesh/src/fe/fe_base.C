@@ -32,6 +32,7 @@
 #include "elem.h"
 #include "fe_interface.h"
 #include "numeric_vector.h"
+#include "periodic_boundaries.h"
 #include "quadrature.h"
 #include "quadrature_gauss.h"
 #include "threads.h"

@@ -34,7 +34,6 @@
 #include "enum_order.h"
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
-#include "vector_value.h" // RealVectorValue
 #include "variable.h"
 #include "threads.h"
 #include "threads_allocators.h"
@@ -51,6 +50,8 @@ class Elem;
 class FEType;
 class MeshBase;
 class Mesh;
+class PeriodicBoundary;
+class PeriodicBoundaries;
 namespace SparsityPattern { class Build; }
 class System;
 template <typename T> class DenseVectorBase;
@@ -87,54 +88,6 @@ class DofConstraints : public std::map<unsigned int,
 #endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
   
-// ------------------------------------------------------------
-// Periodic boundary conditions information
-
-#ifdef LIBMESH_ENABLE_PERIODIC
-/**
- * The definition of a periodic boundary.
- */
-class PeriodicBoundary
-{
-public:
-  // The boundary ID of this boundary and it's counterpart
-  unsigned int myboundary,
-	       pairedboundary;
-
-  // One of these days we'll support rotated boundaries
-  // RealTensor rotation_matrix;
-
-  // The vector which is added to points in myboundary
-  // to produce corresponding points in pairedboundary
-  RealVectorValue translation_vector;
-};
-
-
-/** 
- * The constraint matrix storage format. 
- * We're using a class instead of a typedef to allow forward
- * declarations and future flexibility.  Is there some issue with
- * deriving from standard containers, i.e. don't do it because they
- * don't have virtual destructors?
- */
-class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary>
-{
-public:
-  PeriodicBoundary *boundary(unsigned int id);
-
-  PeriodicBoundaries() {}
-
-  ~PeriodicBoundaries();
-
-  // The periodic neighbor of \p e in direction \p side, if it
-  // exists.  NULL otherwise
-  const Elem *neighbor(unsigned int boundary_id, const MeshBase &mesh, const Elem *e, unsigned int side);
-
-private:
-};
-#endif // LIBMESH_ENABLE_PERIODIC
-
-
   
 // ------------------------------------------------------------
 // DofMap class definition
@@ -817,30 +770,15 @@ private:
    * Data structure containing periodic boundaries.  The ith
    * entry is the constraint matrix row for boundaryid i.
    */
-  PeriodicBoundaries _periodic_boundaries;
+  PeriodicBoundaries *_periodic_boundaries;
 #endif
 
   friend class SparsityPattern::Build;
 };
 
 
-
 // ------------------------------------------------------------
 // Dof Map inline member functions
-inline
-DofMap::DofMap(const unsigned int number) :
-  _dof_coupling(NULL),
-  _sys_number(number),
-//  _matrix(NULL),
-  _n_dfs(0),
-  _n_SCALAR_dofs(0)
-#ifdef LIBMESH_ENABLE_AMR
-  , _n_old_dfs(0)
-#endif
-{
-  _matrices.clear();
-}
-
 
 #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
@@ -856,42 +794,12 @@ bool DofMap::is_constrained_dof (const unsigned int dof) const
 #endif
 
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-
-inline
-bool DofMap::is_periodic_boundary (const unsigned int boundaryid) const
-{
-  if (_periodic_boundaries.count(boundaryid) != 0)
-    return true;
-
-  return false;
-}
-
-#endif
-
-
 inline
 unsigned int DofMap::sys_number() const
 {
   return _sys_number;
 }
 
-
-
-// ------------------------------------------------------------
-// PeriodicBoundary inline member functions
-#ifdef LIBMESH_ENABLE_PERIODIC
-
-inline
-PeriodicBoundary *PeriodicBoundaries::boundary(unsigned int id)
-{
-  iterator i = this->find(id);
-  if (i == this->end())
-    return NULL;
-  return &i->second;
-}
-
-#endif // LIBMESH_ENABLE_PERIODIC
 
 #if !defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_PERIODIC)
   //--------------------------------------------------------------------
