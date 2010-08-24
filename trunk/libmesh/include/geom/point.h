@@ -22,9 +22,6 @@
 #ifndef __point_h__
 #define __point_h__
 
-// C++ includes
-#include <cmath>
-
 // Local includes
 #include "type_vector.h"
 
