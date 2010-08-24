@@ -32,7 +32,7 @@
 #include "fe_base.h"
 #include "fe_interface.h"
 #include "fe_compute_data.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "point.h"
 
 namespace libMesh

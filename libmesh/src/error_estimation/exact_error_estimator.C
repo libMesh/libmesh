@@ -33,7 +33,7 @@
 #include "fe_interface.h"
 #include "libmesh_logging.h"
 #include "elem.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "mesh_function.h"
 #include "numeric_vector.h"
 #include "quadrature.h"

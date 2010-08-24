@@ -31,7 +31,7 @@
 #include "fe_interface.h"
 #include "libmesh_common.h"
 #include "libmesh_logging.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "mesh_refinement.h"
 #include "numeric_vector.h"
 #include "quadrature.h"

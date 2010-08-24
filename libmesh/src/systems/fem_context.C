@@ -27,7 +27,7 @@
 #include "fem_context.h"
 #include "fem_system.h"
 #include "libmesh_logging.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "numeric_vector.h"
 #include "quadrature.h"
 #include "sparse_matrix.h"

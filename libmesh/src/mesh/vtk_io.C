@@ -24,7 +24,6 @@
 // Local includes
 #include "vtk_io.h"
 #include "mesh_base.h"
-#include "mesh.h"
 #include "equation_systems.h"
 #include "cell_tet4.h"
 #include "cell_tet10.h"

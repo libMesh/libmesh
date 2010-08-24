@@ -23,7 +23,7 @@
 #include "elem.h"
 #include "hp_singular.h"
 #include "libmesh_logging.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "system.h"
 
 #ifdef LIBMESH_ENABLE_AMR

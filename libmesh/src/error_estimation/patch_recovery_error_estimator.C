@@ -37,7 +37,7 @@
 #include "patch.h"
 #include "quadrature_grid.h"
 #include "system.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "numeric_vector.h"
 #include "tensor_value.h"
 

@@ -24,7 +24,7 @@
 
 // Local includes
 #include "system.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "elem.h"
 #include "dof_map.h"
 #include "fe_interface.h"

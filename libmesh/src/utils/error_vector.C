@@ -30,7 +30,7 @@
 #include "dof_map.h"
 #include "equation_systems.h"
 #include "explicit_system.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "numeric_vector.h"
 #include "gmv_io.h"
 #include "tecplot_io.h"

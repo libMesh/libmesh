@@ -26,7 +26,7 @@
 #include "gmv_io.h"
 #include "linear_solver.h"
 #include "getpot.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "parallel.h"
 #include "xdr_cxx.h"
 #include "timestamp.h"

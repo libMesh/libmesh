@@ -26,7 +26,7 @@
 #include "equation_systems.h"
 #include "fem_system.h"
 #include "libmesh_logging.h"
-#include "mesh.h"
+#include "mesh_base.h"
 #include "numeric_vector.h"
 #include "parallel.h"
 #include "quadrature.h"
