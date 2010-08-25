@@ -2497,9 +2497,12 @@ namespace Parallel
   {
     if (comm.size() == 1)
       {
-	libmesh_assert (comm.rank()==root_id);
+	libmesh_assert (!comm.rank());
+	libmesh_assert (!root_id);
 	return;
       }
+
+    libmesh_assert(root_id < comm.size());
     
     std::vector<int>
       sendlengths  (comm.size(), 0),
@@ -2558,9 +2561,12 @@ namespace Parallel
   {
     if (comm.size() == 1)
       {
-	libmesh_assert (comm.rank()==root_id);
+	libmesh_assert (!comm.rank());
+	libmesh_assert (!root_id);
 	return;
       }
+    
+    libmesh_assert(root_id < comm.size());
     
     std::vector<int>
       sendlengths  (comm.size(), 0),
@@ -2614,6 +2620,7 @@ namespace Parallel
   {
     START_LOG ("allgather()","Parallel");
     
+    libmesh_assert(comm.size());
     recv.resize(comm.size());
     
     if (comm.size() > 1)
@@ -2641,6 +2648,7 @@ namespace Parallel
   {
     START_LOG ("allgather()","Parallel");
 
+    libmesh_assert(comm.size());
     recv.resize(comm.size());
 
     if (comm.size() > 1)
@@ -2688,7 +2696,7 @@ namespace Parallel
 			const bool identical_buffer_sizes,
                         const Communicator &comm)
   {
-    if (comm.size() == 1)
+    if (comm.size() < 2)
       return;
 
     START_LOG("allgather()", "Parallel");
@@ -2758,7 +2766,7 @@ namespace Parallel
 			const bool identical_buffer_sizes = false,
                         const Communicator &comm = Communicator_World)
   {
-    if (comm.size() == 1)
+    if (comm.size() < 2)
       return;
 
     START_LOG("allgather()", "Parallel");
@@ -2829,7 +2837,7 @@ namespace Parallel
   inline void alltoall(std::vector<T> &buf,
                        const Communicator &comm)
   {
-    if (comm.size() == 1)
+    if (comm.size() < 2)
       return;
 
     START_LOG("alltoall()", "Parallel");
@@ -2868,9 +2876,12 @@ namespace Parallel
   {
     if (comm.size() == 1)
       {
-	libmesh_assert (comm.rank() == root_id);
+	libmesh_assert (!comm.rank());
+	libmesh_assert (!root_id);
 	return;
       }
+
+    libmesh_assert(root_id < comm.size());
     
     START_LOG("broadcast()", "Parallel");
 
@@ -2895,9 +2906,12 @@ namespace Parallel
   {
     if (comm.size() == 1)
       {
-	libmesh_assert (comm.rank() == root_id);
+	libmesh_assert (!comm.rank());
+	libmesh_assert (!root_id);
 	return;
       }
+    
+    libmesh_assert(root_id < comm.size());
     
     START_LOG("broadcast()", "Parallel");
 
@@ -2922,6 +2936,8 @@ namespace Parallel
 	return;
       }
 
+    libmesh_assert(root_id < comm.size());
+    
     START_LOG("broadcast()", "Parallel");
 
     unsigned int data_size = data.size();
@@ -2954,10 +2970,13 @@ namespace Parallel
   {
     if (comm.size() == 1)
       {
-	libmesh_assert (comm.rank() == root_id);
+	libmesh_assert (!comm.rank());
+	libmesh_assert (!root_id);
 	return;
       }
 
+    libmesh_assert(root_id < comm.size());
+    
     START_LOG("broadcast()", "Parallel");
 
     // and get the data from the remote processors.
@@ -2984,10 +3003,13 @@ namespace Parallel
   {
     if (comm.size() == 1)
       {
-	libmesh_assert (comm.rank() == root_id);
+	libmesh_assert (!comm.rank());
+	libmesh_assert (!root_id);
 	return;
       }
 
+    libmesh_assert(root_id < comm.size());
+    
     START_LOG("broadcast()", "Parallel");
 
     // and get the data from the remote processors.
@@ -3007,10 +3029,13 @@ namespace Parallel
   {
     if (comm.size() == 1)
       {
-	libmesh_assert (comm.rank() == root_id);
+	libmesh_assert (!comm.rank());
+	libmesh_assert (!root_id);
 	return;
       }
 
+    libmesh_assert(root_id < comm.size());
+    
     START_LOG("broadcast()", "Parallel");
 
     std::vector<T> vecdata;
