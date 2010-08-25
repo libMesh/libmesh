@@ -1108,7 +1108,8 @@ namespace Parallel
 	     buf,
 	     datatype<T>(),
 	     req,
-	     tag);
+	     tag,
+             comm);
   }
 
   // Function overloading for std::complex<>
@@ -1769,7 +1770,7 @@ namespace Parallel
                         const Communicator &comm)
   {
     std::vector<T> vecdata(data.begin(), data.end());
-    Parallel::gather(root_id, vecdata);
+    Parallel::gather(root_id, vecdata, comm);
     if (comm.rank() == root_id)
       data.insert(vecdata.begin(), vecdata.end());
   }
@@ -1781,7 +1782,7 @@ namespace Parallel
                         const Communicator &comm)
   {
     Parallel::set_union(data, 0, comm);
-    broadcast(data);
+    Parallel::broadcast(data, comm);
   }
 
 
