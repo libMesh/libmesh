@@ -24,6 +24,7 @@
 #include "boundary_info.h"
 #include "fe_base.h"
 #include "fe_interface.h"
+#include "fem_context.h"
 #include "mesh.h"
 #include "quadrature.h"
 
