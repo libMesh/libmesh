@@ -1327,7 +1327,7 @@ Real TransientRBSystem::RB_solve(unsigned int N)
       }
     }
 
-    RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * std::sqrt( output_bound_sq );
+    RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * libmesh_real( std::sqrt(output_bound_sq) );
   }
 
   Real alpha_LB = get_SCM_lower_bound();
@@ -1388,7 +1388,7 @@ Real TransientRBSystem::RB_solve(unsigned int N)
         }
       }
 
-      RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * std::sqrt( output_bound_sq );
+      RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * libmesh_real( std::sqrt(output_bound_sq) );
     }
   }
 
@@ -2500,7 +2500,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
   {
     for(unsigned int j=0; j<n_bfs; j++)
     {
-      Real value;
+      Number value;
       RB_L2_matrix_in >> value;
       RB_L2_matrix(i,j) = value;
     }
@@ -2526,7 +2526,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
     {
       for(unsigned int j=0; j<n_bfs; j++)
       {
-        Real value;
+        Number value;
         RB_M_q_m_in >> value;
         RB_M_q_vector[q_m](i,j) = value;
       }
@@ -2550,7 +2550,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
   {
     for(unsigned int j=0; j<n_bfs; j++)
     {
-      Real value;
+      Number value;
       RB_inner_product_matrix_in >> value;
       RB_inner_product_matrix(i,j) = value;
     }

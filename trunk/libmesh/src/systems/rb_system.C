@@ -1697,7 +1697,7 @@ Real RBSystem::RB_solve(unsigned int N)
 
     RB_rhs.add(eval_theta_q_f(q_f), RB_F_q_f);
   }
-
+  
   // Solve the linear system
   RB_system_matrix.lu_solve(RB_rhs, RB_solution);
 
@@ -2908,7 +2908,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 
       for(unsigned int j=0; j<n_bfs; j++)
       {
-        Real value;
+        Number  value;
         output_n_in >> value;
         RB_output_vectors[n][q_l](j) = value;
       }
@@ -2933,7 +2933,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 
     for(unsigned int i=0; i<n_bfs; i++)
     {
-      Real value;
+      Number  value;
       RB_F_q_f_in >> value;
       RB_F_q_vector[q_f](i) = value;
     }
@@ -2959,7 +2959,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
     {
       for(unsigned int j=0; j<n_bfs; j++)
       {
-        Real value;
+        Number  value;
         RB_A_q_a_in >> value;
         RB_A_q_vector[q_a](i,j) = value;
       }

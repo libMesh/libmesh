@@ -412,7 +412,7 @@ public:
    * corresponding error bounds.
    */
   std::vector< Number > RB_outputs;
-  std::vector< Number > RB_output_error_bounds;
+  std::vector< Real > RB_output_error_bounds;
 
   /**
    * The list of parameters selected by the Greedy algorithm.
