@@ -716,7 +716,7 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
       }
     }
 
-    RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * std::sqrt( output_bound_sq );
+    RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * libmesh_real( std::sqrt(output_bound_sq) );
   }
 
   // Initialize a vector to store the solution from the old time-step

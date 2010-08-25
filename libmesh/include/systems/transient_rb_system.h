@@ -316,7 +316,7 @@ public:
    * The error bounds for each RB output for all
    * time-levels from the most recent RB_solve.
    */
-  std::vector< std::vector<Number> > RB_output_error_bounds_all_k;
+  std::vector< std::vector<Real> > RB_output_error_bounds_all_k;
 
   /**
    * The truth outputs for all time-levels from the
