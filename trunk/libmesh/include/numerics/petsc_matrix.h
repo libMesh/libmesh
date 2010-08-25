@@ -32,6 +32,7 @@
 // Local includes
 #include "sparse_matrix.h"
 #include "petsc_macro.h"
+#include "parallel.h"
 
 // Macro to identify and debug functions which should be called in
 // parallel on parallel matrices but which may be called in serial on
@@ -40,8 +41,6 @@
 #undef semiparallel_only
 #ifndef NDEBUG
   #include <cstring>
-
-  #include "parallel.h"
 
   #define semiparallel_only() do { if (this->initialized()) { const char *mytype; \
     MatGetType(_mat,&mytype); \
@@ -399,7 +398,7 @@ template <typename T>
 inline
 void PetscMatrix<T>::close () const
 {
-  parallel_only();
+  semiparallel_only();
 
   // BSK - 1/19/2004
   // strictly this check should be OK, but it seems to
