@@ -988,7 +988,7 @@ AC_ARG_ENABLE(libHilbert,
               AC_HELP_STRING([--enable-libHilbert],
                              [build with Chris Hamilton's libHilbert]),
               enablelibhilbert=$enableval,
-              enablelibhilbert=no)
+              enablelibhilbert=yes)
 
 CONFIGURE_LIBHILBERT
 dnl -------------------------------------------------------------
