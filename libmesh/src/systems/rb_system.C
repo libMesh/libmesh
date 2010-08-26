@@ -33,7 +33,7 @@
 #include "petsc_linear_solver.h"
 #include "parallel.h"
 
-#include "rb_context.h"
+#include "fem_context.h"
 #include "rb_system.h"
 #include "rb_scm_system.h"
 
@@ -568,8 +568,8 @@ void RBSystem::initialize_dirichlet_dofs()
     {
       const MeshBase& mesh = this->get_equation_systems().get_mesh();
 
-      AutoPtr<RBContext> c = this->build_context();
-      RBContext &context  = libmesh_cast_ref<RBContext&>(*c);
+      AutoPtr<FEMContext> c = this->build_context();
+      FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
 
       this->init_context(context);
 
@@ -578,7 +578,8 @@ void RBSystem::initialize_dirichlet_dofs()
 
       for ( ; el != end_el; ++el)
 	{
-	  context.reinit(*this, *el);
+	  context.pre_fe_reinit(*this, *el);
+          context.elem_fe_reinit();
 
 	  for (context.side = 0;
 	       context.side != context.elem->n_sides();
@@ -588,7 +589,7 @@ void RBSystem::initialize_dirichlet_dofs()
 	      if ( (context.elem->neighbor(context.side) != NULL) && !impose_internal_dirichlet_BCs )
 		continue;
 
-	      context.elem_side_fe_reinit();
+	      context.side_fe_reinit();
 	      _dirichlet_list_init(context, *this, dirichlet_dofs_set);
 	    }
 	}
@@ -662,9 +663,9 @@ void RBSystem::perform_initial_assembly()
   this->compute_output_dual_norms();
 }
 
-AutoPtr<RBContext> RBSystem::build_context ()
+AutoPtr<FEMContext> RBSystem::build_context ()
 {
-  return AutoPtr<RBContext>(new RBContext(*this));
+  return AutoPtr<FEMContext>(new FEMContext(*this));
 }
 
 void RBSystem::add_scaled_matrix_and_vector(Number scalar,
@@ -692,8 +693,8 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
 
   const MeshBase& mesh = this->get_mesh();
 
-  AutoPtr<RBContext> c = this->build_context();
-  RBContext &context  = libmesh_cast_ref<RBContext&>(*c);
+  AutoPtr<FEMContext> c = this->build_context();
+  FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
 
   this->init_context(context);
 
@@ -702,7 +703,8 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
 
   for ( ; el != end_el; ++el)
   {
-    context.reinit(*this, *el);
+    context.pre_fe_reinit(*this, *el);
+    context.elem_fe_reinit();
     if(intrr_assembly != NULL)
       intrr_assembly(context, *this);
 
@@ -717,7 +719,7 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
       // Impose boundary (e.g. Neumann) term
       if( bndry_assembly != NULL )
       {
-        context.elem_side_fe_reinit();
+        context.side_fe_reinit();
         bndry_assembly(context, *this);
       }
     }
@@ -727,14 +729,14 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
     if(assemble_matrix && symmetrize)
     {
       DenseMatrix<Number> Ke_transpose;
-      context.elem_matrix.get_transpose(Ke_transpose);
-      context.elem_matrix += Ke_transpose;
-      context.elem_matrix *= 0.5;
+      context.elem_jacobian.get_transpose(Ke_transpose);
+      context.elem_jacobian += Ke_transpose;
+      context.elem_jacobian *= 0.5;
     }
 
     // Apply constraints, e.g. periodic constraints
     this->get_dof_map().constrain_element_matrix_and_vector
-      (context.elem_matrix, context.elem_vector, context.dof_indices);
+      (context.elem_jacobian, context.elem_residual, context.dof_indices);
       
     // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
     // Note that this cannot be inside the side-loop since non-boundary
@@ -745,20 +747,20 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
       iter = global_dirichlet_dofs_set.find( context.dof_indices[n] );
       if(iter != global_dirichlet_dofs_set.end())
       {
-	context.elem_matrix.condense
-	  (n,n,0.,context.elem_vector);
+	context.elem_jacobian.condense
+	  (n,n,0.,context.elem_residual);
       }
     }
 
     // Scale and add to global matrix and/or vector
-    context.elem_matrix *= scalar;
-    context.elem_vector *= scalar;
+    context.elem_jacobian *= scalar;
+    context.elem_residual *= scalar;
 
     if(assemble_matrix)
-      input_matrix->add_matrix (context.elem_matrix,
+      input_matrix->add_matrix (context.elem_jacobian,
                                 context.dof_indices);
     if(assemble_vector)
-      input_vector->add_vector (context.elem_vector,
+      input_vector->add_vector (context.elem_residual,
                                 context.dof_indices);
   }
 
@@ -773,7 +775,7 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
 void RBSystem::set_context_solution_vec(NumericVector<Number>& vec)
 {
   // Set current_local_solution = vec so that we can access
-  // vec from RBContext during assembly
+  // vec from FEMContext during assembly
   vec.localize
     (*current_local_solution, this->get_dof_map().get_send_list());
 }
@@ -789,15 +791,15 @@ void RBSystem::assemble_scaled_matvec(Number scalar,
   dest.zero();
 
   // Set current_local_solution to be arg so that we
-  // can access it from the RBContext. Do this in a
+  // can access it from the FEMContext. Do this in a
   // function call so that it can be overloaded as
   // necessary (e.g. for QNTransientRBSystem)
   this->set_context_solution_vec(arg);
 
   const MeshBase& mesh = this->get_mesh();
 
-  AutoPtr<RBContext> c = this->build_context();
-  RBContext &context  = libmesh_cast_ref<RBContext&>(*c);
+  AutoPtr<FEMContext> c = this->build_context();
+  FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
 
   this->init_context(context);
 
@@ -806,7 +808,8 @@ void RBSystem::assemble_scaled_matvec(Number scalar,
 
   for ( ; el != end_el; ++el)
   {
-    context.reinit(*this, *el);
+    context.pre_fe_reinit(*this, *el);
+    context.elem_fe_reinit();
     if(intrr_assembly != NULL)
       intrr_assembly(context, *this);
 
@@ -820,34 +823,34 @@ void RBSystem::assemble_scaled_matvec(Number scalar,
 
       if( bndry_assembly != NULL )
         {
-          context.elem_side_fe_reinit();
+          context.side_fe_reinit();
           bndry_assembly(context, *this);
         }
     }
 
 
     // Now perform the local matrix multiplcation
-    context.elem_matrix.vector_mult(context.elem_vector, context.elem_solution);
-    context.elem_vector *= scalar;
+    context.elem_jacobian.vector_mult(context.elem_residual, context.elem_solution);
+    context.elem_residual *= scalar;
 
     // Apply constraints, e.g. periodic constraints
     this->get_dof_map().constrain_element_matrix_and_vector
-      (context.elem_matrix, context.elem_vector, context.dof_indices);
+      (context.elem_jacobian, context.elem_residual, context.dof_indices);
       
     // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
-    // This zeros the Dirichlet dofs in context.elem_vector
+    // This zeros the Dirichlet dofs in context.elem_residual
     std::set<unsigned int>::const_iterator iter;
     for(unsigned int n=0; n<context.dof_indices.size(); n++)
     {
       iter = global_dirichlet_dofs_set.find( context.dof_indices[n] );
       if(iter != global_dirichlet_dofs_set.end())
       {
-        context.elem_matrix.condense
-          (n,n,0.,context.elem_vector);
+        context.elem_jacobian.condense
+          (n,n,0.,context.elem_residual);
       }
     }
 
-    dest.add_vector (context.elem_vector,
+    dest.add_vector (context.elem_residual,
                       context.dof_indices);
   }
 
@@ -897,14 +900,14 @@ void RBSystem::truth_assembly()
 
     const MeshBase& mesh = this->get_mesh();
 
-    std::vector<RBContext*> Aq_context(get_Q_a());
+    std::vector<FEMContext*> Aq_context(get_Q_a());
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
     {
       Aq_context[q_a] = this->build_context().release();
       this->init_context(*Aq_context[q_a]);
     }
 
-    std::vector<RBContext*> Fq_context(get_Q_f());
+    std::vector<FEMContext*> Fq_context(get_Q_f());
     for(unsigned int q_f=0; q_f<Fq_context.size(); q_f++)
     {
       Fq_context[q_f] = this->build_context().release();
@@ -918,14 +921,16 @@ void RBSystem::truth_assembly()
     {
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
-        Aq_context[q_a]->reinit(*this, *el);
+        Aq_context[q_a]->pre_fe_reinit(*this, *el);
+        Aq_context[q_a]->elem_fe_reinit();
         if(A_q_intrr_assembly_vector[q_a] != NULL)
           this->A_q_intrr_assembly_vector[q_a](*Aq_context[q_a], *this);
       }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
-        Fq_context[q_f]->reinit(*this, *el);
+        Fq_context[q_f]->pre_fe_reinit(*this, *el);
+        Fq_context[q_f]->elem_fe_reinit();
         if(F_q_intrr_assembly_vector[q_f] != NULL)
           this->F_q_intrr_assembly_vector[q_f](*Fq_context[q_f], *this);
       }
@@ -946,7 +951,7 @@ void RBSystem::truth_assembly()
 
           if( A_q_bndry_assembly_vector[q_a] != NULL )
           {
-            Aq_context[q_a]->elem_side_fe_reinit();
+            Aq_context[q_a]->side_fe_reinit();
             this->A_q_bndry_assembly_vector[q_a](*Aq_context[q_a], *this);
           }
         }
@@ -959,7 +964,7 @@ void RBSystem::truth_assembly()
 
           if( F_q_bndry_assembly_vector[q_f] != NULL )
           {
-            Fq_context[q_f]->elem_side_fe_reinit();
+            Fq_context[q_f]->side_fe_reinit();
             this->F_q_bndry_assembly_vector[q_f](*Fq_context[q_f], *this);
           }
         }
@@ -969,13 +974,13 @@ void RBSystem::truth_assembly()
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
         this->get_dof_map().constrain_element_matrix
-          (Aq_context[q_a]->elem_matrix, Aq_context[q_a]->dof_indices);
+          (Aq_context[q_a]->elem_jacobian, Aq_context[q_a]->dof_indices);
       }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
         this->get_dof_map().constrain_element_vector
-          (Fq_context[q_f]->elem_vector, Fq_context[q_f]->dof_indices);
+          (Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
       }
       
       // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
@@ -989,14 +994,14 @@ void RBSystem::truth_assembly()
 	{
 	  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
 	  {
-	    Aq_context[q_a]->elem_matrix.condense
-	      (n,n,0.,Aq_context[q_a]->elem_vector);
+	    Aq_context[q_a]->elem_jacobian.condense
+	      (n,n,0.,Aq_context[q_a]->elem_residual);
 	  }
 
 	  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
 	  {
-	    Fq_context[q_f]->elem_matrix.condense
-	      (n,n,0.,Fq_context[q_f]->elem_vector);
+	    Fq_context[q_f]->elem_jacobian.condense
+	      (n,n,0.,Fq_context[q_f]->elem_residual);
 	  }
 	}
       }
@@ -1005,16 +1010,16 @@ void RBSystem::truth_assembly()
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
         // Scale by theta_q_a
-        Aq_context[q_a]->elem_matrix *= eval_theta_q_a(q_a);
-        this->matrix->add_matrix (Aq_context[q_a]->elem_matrix,
+        Aq_context[q_a]->elem_jacobian *= eval_theta_q_a(q_a);
+        this->matrix->add_matrix (Aq_context[q_a]->elem_jacobian,
                                   Aq_context[q_a]->dof_indices);
       }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
         // Scale by theta_q_f
-        Fq_context[q_f]->elem_vector *= eval_theta_q_f(q_f);
-        this->rhs->add_vector (Fq_context[q_f]->elem_vector,
+        Fq_context[q_f]->elem_residual *= eval_theta_q_f(q_f);
+        this->rhs->add_vector (Fq_context[q_f]->elem_residual,
                               Fq_context[q_f]->dof_indices);
       }
     }
@@ -1022,7 +1027,7 @@ void RBSystem::truth_assembly()
     if(constrained_problem)
       add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
 
-    // Delete all the ptrs to RBContexts!
+    // Delete all the ptrs to FEMContexts!
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
     {
       delete Aq_context[q_a];

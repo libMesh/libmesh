@@ -27,7 +27,9 @@
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
 // Local Includes
-#include "rb_context.h"
+#include "elem.h"
+#include "fe_type.h"
+#include "fem_context.h"
 
 namespace libMesh
 {
@@ -49,7 +51,7 @@ class QBase;
 // ------------------------------------------------------------
 // QNTransientRBContext class definition
 
-class QNTransientRBContext : public RBContext
+class QNTransientRBContext : public FEMContext
 {
 public:
 
@@ -100,7 +102,7 @@ public:
    * also reinitialize the solution data from
    * the previous time step.
    */
-  virtual void reinit(RBSystem&, Elem*);
+  virtual void pre_fe_reinit(const System&, Elem*);
 
   /**
    * Element by element components of nonlinear_solution
