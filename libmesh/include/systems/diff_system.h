@@ -368,14 +368,6 @@ public:
   AutoPtr<TimeSolver> time_solver;
 
   /**
-   * For time-dependent problems, this is the time t at the beginning of
-   * the current timestep.  But do *not* access this time during an
-   * assembly!  Use the DiffContext::time value instead to get correct
-   * results.
-   */
-  Real time;
-
-  /**
    * For time-dependent problems, this is the amount delta t to advance the
    * solution in time.
    */
@@ -417,15 +409,6 @@ public:
    * Set print_element_jacobians to true to print each J_elem contribution.
    */
   bool print_element_jacobians;
-
-  /**
-   * A boolean to be set to true by systems using elem_fixed_solution,
-   * so that the library code will create it.
-   * False by default.
-   * Warning: if this variable is set to true, it must be before init_data() is
-   * called.
-   */
-  bool use_fixed_solution;
 
 protected:
   /**

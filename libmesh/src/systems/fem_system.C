@@ -47,13 +47,8 @@ FEMSystem::FEMSystem (EquationSystems& es,
                       const unsigned int number)
   : Parent(es, name, number),
     fe_reinit_during_postprocess(true),
-    extra_quadrature_order(0),
     numerical_jacobian_h(1.e-6),
-    verify_analytic_jacobians(0.0),
-    _mesh_sys(NULL),
-    _mesh_x_var(libMesh::invalid_uint),
-    _mesh_y_var(libMesh::invalid_uint),
-    _mesh_z_var(libMesh::invalid_uint)
+    verify_analytic_jacobians(0.0)
 {
 }
 

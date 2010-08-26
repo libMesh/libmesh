@@ -26,7 +26,7 @@ namespace libMesh
 
 
 
-DiffContext::DiffContext (const DifferentiableSystem& sys) :
+DiffContext::DiffContext (const System& sys) :
   time(sys.time),
   elem_solution_derivative(1.),
   fixed_solution_derivative(0.),

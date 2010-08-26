@@ -889,6 +889,31 @@ public:
   virtual void prolong_vectors ();
 
   /**
+   * Returns a reference to the system with variables corresponding to
+   * mesh nodal coordinates, or NULL if the mesh is fixed.
+   * Useful for ALE calculations.
+   */
+  const System* get_mesh_system() const;
+
+  /**
+   * Returns the variable number corresponding to the
+   * mesh x coordinate. Useful for ALE calculations.
+   */
+  unsigned int get_mesh_x_var() const;
+
+  /**
+   * Returns the variable number corresponding to the
+   * mesh y coordinate. Useful for ALE calculations.
+   */
+  unsigned int get_mesh_y_var() const;
+
+  /**
+   * Returns the variable number corresponding to the
+   * mesh z coordinate. Useful for ALE calculations.
+   */
+  unsigned int get_mesh_z_var() const;
+
+  /**
    * Flag which tells the system to whether or not to
    * call the user assembly function during each call to solve().
    * By default, every call to solve() begins with a call to the
@@ -908,6 +933,32 @@ public:
    * be replaced with this more general concept.
    */
   bool assemble_before_solve;
+
+  /**
+   * A boolean to be set to true by systems using elem_fixed_solution,
+   * for optional use by e.g. stabilized methods.
+   * False by default.
+   *
+   * Note for FEMSystem users:
+   * Warning: if this variable is set to true, it must be before init_data() is
+   * called.
+   */
+  bool use_fixed_solution;
+  
+  /**
+   * A member int that can be employed to indicate increased or
+   * reduced quadrature order.
+   *
+   * Note for FEMSystem users:
+   * By default, when calling the user-defined residual functions, the
+   * FEMSystem will first set up an appropriate
+   * FEType::default_quadrature_rule() object for performing the integration.
+   * This rule will integrate elements of order up to 2*p+1 exactly (where p is
+   * the sum of the base FEType and local p refinement levels), but if
+   * additional (or reduced) quadrature accuracy is desired then this
+   * extra_quadrature_order (default 0) will be added.
+   */
+  int extra_quadrature_order;
 
 
   //--------------------------------------------------
@@ -935,6 +986,17 @@ public:
    * vectors.
    */
   AutoPtr<NumericVector<Number> > current_local_solution;
+
+  /**
+   * For time-dependent problems, this is the time t at the beginning of
+   * the current timestep.
+   *
+   * Note for DifferentiableSystem users:
+   * do *not* access this time during an assembly!
+   * Use the DiffContext::time value instead to get correct
+   * results.
+   */
+  Real time;
 
   /**
    * Values of the quantities of interest.  This vector needs
@@ -1024,6 +1086,16 @@ protected:
    */
   void project_vector (const NumericVector<Number>&,
 		       NumericVector<Number>&) const;
+
+  /**
+   * System from which to acquire moving mesh information
+   */
+  System *_mesh_sys;
+
+  /**
+   * Variables from which to acquire moving mesh information
+   */
+  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
   
 private:
   /**
@@ -1556,6 +1628,30 @@ System::qoi_parameter_hessian_vector_product(const QoISet&,
                                              SensitivityData&)
 {
   libmesh_not_implemented();
+}
+
+inline
+const System* System::get_mesh_system() const
+{
+  return _mesh_sys;
+}
+
+inline
+unsigned int System::get_mesh_x_var() const
+{
+  return _mesh_x_var;
+}
+
+inline
+unsigned int System::get_mesh_y_var() const
+{
+  return _mesh_y_var;
+}
+
+inline
+unsigned int System::get_mesh_z_var() const
+{
+  return _mesh_z_var;
 }
 
 } // namespace libMesh

@@ -142,12 +142,6 @@ public:
   virtual void set_mesh_system(System* sys);
 
   /**
-   * Returns a reference to the system with variables corresponding to
-   * mesh nodal coordinates, or NULL if the mesh is fixed.
-   */
-  const System* get_mesh_system() const;
-
-  /**
    * Tells the FEMSystem that variable \p var from the mesh system
    * should be used to update the x coordinate of mesh nodes, in problems where
    * the mesh itself is expected to move in time.
@@ -164,34 +158,16 @@ public:
   virtual void set_mesh_x_var(unsigned int var);
 
   /**
-   * Returns the variable number corresponding to the
-   * mesh x coordinate
-   */
-  unsigned int get_mesh_x_var() const;
-
-  /**
    * Tells the FEMSystem that variable \p var from the mesh system
    * should be used to update the y coordinate of mesh nodes.
    */
   virtual void set_mesh_y_var(unsigned int var);
 
   /**
-   * Returns the variable number corresponding to the
-   * mesh y coordinate
-   */
-  unsigned int get_mesh_y_var() const;
-
-  /**
    * Tells the FEMSystem that variable \p var from the mesh system
    * should be used to update the z coordinate of mesh nodes.
    */
   virtual void set_mesh_z_var(unsigned int var);
-
-  /**
-   * Returns the variable number corresponding to the
-   * mesh z coordinate
-   */
-  unsigned int get_mesh_z_var() const;
 
   /**
    * Tells the FEMSystem to set the degree of freedom coefficients
@@ -291,17 +267,6 @@ public:
   bool fe_reinit_during_postprocess;
 
   /**
-   * By default, when calling the user-defined residual functions, the
-   * FEMSystem will first set up an appropriate
-   * FEType::default_quadrature_rule() object for performing the integration.
-   * This rule will integrate elements of order up to 2*p+1 exactly (where p is
-   * the sum of the base FEType and local p refinement levels), but if
-   * additional (or reduced) quadrature accuracy is desired then this
-   * extra_quadrature_order (default 0) will be added.
-   */
-  int extra_quadrature_order;
-
-  /**
    * If calculating numeric jacobians is required, the FEMSystem
    * will perturb each solution vector entry by numerical_jacobian_h
    * when calculating finite differences.
@@ -355,16 +320,6 @@ protected:
    * on an element's side.
    */
   void numerical_side_jacobian (FEMContext &context);
-
-  /**
-   * System from which to acquire moving mesh information
-   */
-  System *_mesh_sys;
-
-  /**
-   * Variables from which to acquire moving mesh information
-   */
-  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
 };
 
 
@@ -395,25 +350,9 @@ void FEMSystem::set_mesh_system(System* sys)
 
 
 inline
-const System* FEMSystem::get_mesh_system() const
-{
-  return _mesh_sys;
-}
-
-
-
-inline
 void FEMSystem::set_mesh_x_var (unsigned int var)
 {
   _mesh_x_var = var;
-}
-
-
-
-inline
-unsigned int FEMSystem::get_mesh_x_var() const
-{
-  return _mesh_x_var;
 }
 
 
@@ -427,25 +366,9 @@ void FEMSystem::set_mesh_y_var (unsigned int var)
 
 
 inline
-unsigned int FEMSystem::get_mesh_y_var() const
-{
-  return _mesh_y_var;
-}
-
-
-
-inline
 void FEMSystem::set_mesh_z_var (unsigned int var)
 {
   _mesh_z_var = var;
-}
-
-
-
-inline
-unsigned int FEMSystem::get_mesh_z_var() const
-{
-  return _mesh_z_var;
 }
 
 } // namespace libMesh
