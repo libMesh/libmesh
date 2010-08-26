@@ -508,21 +508,21 @@ void TransientRBSystem::truth_assembly()
 
     const MeshBase& mesh = this->get_mesh();
     
-    std::vector<RBContext*> Mq_context(get_Q_m());
+    std::vector<FEMContext*> Mq_context(get_Q_m());
     for(unsigned int q_m=0; q_m<Mq_context.size(); q_m++)
     {
       Mq_context[q_m] = this->build_context().release();
       this->init_context(*Mq_context[q_m]);
     }
 
-    std::vector<RBContext*> Aq_context(get_Q_a());
+    std::vector<FEMContext*> Aq_context(get_Q_a());
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
     {
       Aq_context[q_a] = this->build_context().release();
       this->init_context(*Aq_context[q_a]);
     }
 
-    std::vector<RBContext*> Fq_context(get_Q_f());
+    std::vector<FEMContext*> Fq_context(get_Q_f());
     for(unsigned int q_f=0; q_f<Fq_context.size(); q_f++)
     {
       Fq_context[q_f] = this->build_context().release();
@@ -536,29 +536,32 @@ void TransientRBSystem::truth_assembly()
     {
       for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
       {
-        Mq_context[q_m]->reinit(*this, *el);
+        Mq_context[q_m]->pre_fe_reinit(*this, *el);
+        Mq_context[q_m]->elem_fe_reinit();
         if( M_q_intrr_assembly_vector[q_m] != NULL )
         {
           this->M_q_intrr_assembly_vector[q_m](*Mq_context[q_m], *this);
           // Now overwrite the local matrix with a matrix multiplication
-          Mq_context[q_m]->elem_matrix.vector_mult(Mq_context[q_m]->elem_vector, Mq_context[q_m]->elem_solution);
+          Mq_context[q_m]->elem_jacobian.vector_mult(Mq_context[q_m]->elem_residual, Mq_context[q_m]->elem_solution);
         }
       }
 
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
-        Aq_context[q_a]->reinit(*this, *el);
+        Aq_context[q_a]->pre_fe_reinit(*this, *el);
+        Aq_context[q_a]->elem_fe_reinit();
         if( A_q_intrr_assembly_vector[q_a] != NULL )
         {
           this->A_q_intrr_assembly_vector[q_a](*Aq_context[q_a], *this);
           // Now overwrite the local matrix with a matrix multiplication
-          Aq_context[q_a]->elem_matrix.vector_mult(Aq_context[q_a]->elem_vector, Aq_context[q_a]->elem_solution);
+          Aq_context[q_a]->elem_jacobian.vector_mult(Aq_context[q_a]->elem_residual, Aq_context[q_a]->elem_solution);
         }
       }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
-        Fq_context[q_f]->reinit(*this, *el);
+        Fq_context[q_f]->pre_fe_reinit(*this, *el);
+        Fq_context[q_f]->elem_fe_reinit();
         if(F_q_intrr_assembly_vector[q_f] != NULL)
           this->F_q_intrr_assembly_vector[q_f](*Fq_context[q_f], *this);
       }
@@ -577,7 +580,7 @@ void TransientRBSystem::truth_assembly()
 
           if( M_q_bndry_assembly_vector[q_m] != NULL )
           {
-            Mq_context[q_m]->elem_side_fe_reinit();
+            Mq_context[q_m]->side_fe_reinit();
             this->M_q_bndry_assembly_vector[q_m](*Mq_context[q_m], *this);
           }
         }
@@ -588,7 +591,7 @@ void TransientRBSystem::truth_assembly()
 
           if( A_q_bndry_assembly_vector[q_a] != NULL )
           {
-            Aq_context[q_a]->elem_side_fe_reinit();
+            Aq_context[q_a]->side_fe_reinit();
             this->A_q_bndry_assembly_vector[q_a](*Aq_context[q_a], *this);
           }
         }
@@ -601,7 +604,7 @@ void TransientRBSystem::truth_assembly()
 
           if( F_q_bndry_assembly_vector[q_f] != NULL )
           {
-            Fq_context[q_f]->elem_side_fe_reinit();
+            Fq_context[q_f]->side_fe_reinit();
             this->F_q_bndry_assembly_vector[q_f](*Fq_context[q_f], *this);
           }
         }
@@ -611,19 +614,19 @@ void TransientRBSystem::truth_assembly()
       for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
       {
         this->get_dof_map().constrain_element_matrix_and_vector
-          (Mq_context[q_m]->elem_matrix, Mq_context[q_m]->elem_vector, Mq_context[q_m]->dof_indices);
+          (Mq_context[q_m]->elem_jacobian, Mq_context[q_m]->elem_residual, Mq_context[q_m]->dof_indices);
       }
 
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
         this->get_dof_map().constrain_element_matrix_and_vector
-          (Aq_context[q_a]->elem_matrix, Aq_context[q_a]->elem_vector, Aq_context[q_a]->dof_indices);
+          (Aq_context[q_a]->elem_jacobian, Aq_context[q_a]->elem_residual, Aq_context[q_a]->dof_indices);
       }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
         this->get_dof_map().constrain_element_matrix_and_vector
-          (Fq_context[q_f]->elem_matrix, Fq_context[q_f]->elem_vector, Fq_context[q_f]->dof_indices);
+          (Fq_context[q_f]->elem_jacobian, Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
       }
         
       // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
@@ -637,20 +640,20 @@ void TransientRBSystem::truth_assembly()
 	{
 	  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
 	  {
-	    Aq_context[q_a]->elem_matrix.condense
-	      (n,n,0.,Aq_context[q_a]->elem_vector);
+	    Aq_context[q_a]->elem_jacobian.condense
+	      (n,n,0.,Aq_context[q_a]->elem_residual);
 	  }
 
 	  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
 	  {
-	    Fq_context[q_f]->elem_matrix.condense
-	      (n,n,0.,Fq_context[q_f]->elem_vector);
+	    Fq_context[q_f]->elem_jacobian.condense
+	      (n,n,0.,Fq_context[q_f]->elem_residual);
 	  }
 
 	  for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
 	  {
-	    Mq_context[q_m]->elem_matrix.condense
-	      (n,n,0.,Mq_context[q_m]->elem_vector);
+	    Mq_context[q_m]->elem_jacobian.condense
+	      (n,n,0.,Mq_context[q_m]->elem_residual);
 	  }
 	}
       }
@@ -658,28 +661,28 @@ void TransientRBSystem::truth_assembly()
       // Finally, add local matrices/vectors to the global system
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
-        Aq_context[q_a]->elem_matrix *= get_euler_theta()*eval_theta_q_a(q_a);
-        this->matrix->add_matrix (Aq_context[q_a]->elem_matrix,
+        Aq_context[q_a]->elem_jacobian *= get_euler_theta()*eval_theta_q_a(q_a);
+        this->matrix->add_matrix (Aq_context[q_a]->elem_jacobian,
                                   Aq_context[q_a]->dof_indices);
-        Aq_context[q_a]->elem_vector *= -(1.-get_euler_theta())*eval_theta_q_a(q_a);
-        this->rhs->add_vector    (Aq_context[q_a]->elem_vector,
+        Aq_context[q_a]->elem_residual *= -(1.-get_euler_theta())*eval_theta_q_a(q_a);
+        this->rhs->add_vector    (Aq_context[q_a]->elem_residual,
                                   Aq_context[q_a]->dof_indices);
       }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
-        Fq_context[q_f]->elem_vector *= eval_theta_q_f(q_f);
-        this->rhs->add_vector (Fq_context[q_f]->elem_vector,
+        Fq_context[q_f]->elem_residual *= eval_theta_q_f(q_f);
+        this->rhs->add_vector (Fq_context[q_f]->elem_residual,
                                Fq_context[q_f]->dof_indices);
       }
 
       for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
       {
-        Mq_context[q_m]->elem_matrix *= 1./get_dt()*eval_theta_q_m(q_m);
-        this->matrix->add_matrix (Mq_context[q_m]->elem_matrix,
+        Mq_context[q_m]->elem_jacobian *= 1./get_dt()*eval_theta_q_m(q_m);
+        this->matrix->add_matrix (Mq_context[q_m]->elem_jacobian,
                                   Mq_context[q_m]->dof_indices);
-        Mq_context[q_m]->elem_vector *= 1./get_dt()*eval_theta_q_m(q_m);
-        this->rhs->add_vector    (Mq_context[q_m]->elem_vector,
+        Mq_context[q_m]->elem_residual *= 1./get_dt()*eval_theta_q_m(q_m);
+        this->rhs->add_vector    (Mq_context[q_m]->elem_residual,
                                   Mq_context[q_m]->dof_indices);
       }
     }
@@ -687,7 +690,7 @@ void TransientRBSystem::truth_assembly()
     if(constrained_problem)
       add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
 
-    // Delete all the ptrs to RBContexts!
+    // Delete all the ptrs to FEMContexts!
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
     {
       delete Aq_context[q_a];

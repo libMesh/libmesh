@@ -322,9 +322,9 @@ void QNTransientRBSystem::init_data ()
 
 }
 
-AutoPtr<RBContext> QNTransientRBSystem::build_context ()
+AutoPtr<FEMContext> QNTransientRBSystem::build_context ()
 {
-  return AutoPtr<RBContext>(new QNTransientRBContext(*this));
+  return AutoPtr<FEMContext>(new QNTransientRBContext(*this));
 }
 
 void QNTransientRBSystem::truth_assembly()

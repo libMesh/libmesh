@@ -249,7 +249,7 @@ protected:
    * evaluations on each element. Overload to create a
    * QNTransientRBContext.
    */
-  virtual AutoPtr<RBContext> build_context();
+  virtual AutoPtr<FEMContext> build_context();
 
   /**
    * Update the system after enriching the RB space.

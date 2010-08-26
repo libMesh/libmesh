@@ -24,7 +24,7 @@
 #include "dense_vector.h"
 #include "dense_matrix.h"
 #include "rb_base.h"
-#include "rb_context.h"
+#include "fem_context.h"
 
 namespace libMesh
 {
@@ -42,14 +42,14 @@ namespace libMesh
  * The function pointer typedef for
  * assembly of affine operators.
  */
-typedef void (*affine_assembly_fptr)(RBContext&, RBSystem&);
+typedef void (*affine_assembly_fptr)(FEMContext&, System&);
 
 /**
  * The function pointer typedef for
  * assembly of Dirichlet and non-Dirichlet
  * dof lists.
  */
-typedef void (*dirichlet_list_fptr)(RBContext&, RBSystem&, std::set<unsigned int>&);
+typedef void (*dirichlet_list_fptr)(FEMContext&, System&, std::set<unsigned int>&);
 
 // ------------------------------------------------------------
 // RBSystem class definition
@@ -511,10 +511,10 @@ protected:
   virtual void truth_assembly();
 
   /**
-   * Builds a RBContext object with enough information to do
+   * Builds a FEMContext object with enough information to do
    * evaluations on each element.
    */
-  virtual AutoPtr<RBContext> build_context();
+  virtual AutoPtr<FEMContext> build_context();
   
   /**
    * Define the matrix assembly for the output residual dual
@@ -551,7 +551,7 @@ protected:
 
   /**
    * Set current_local_solution = vec so that we can access vec
-   * from RBContext during assembly. Overload in subclasses if
+   * from FEMContext during assembly. Overload in subclasses if
    * different behavior is required (e.g. in QNTransientRBSystem)
    */
   virtual void set_context_solution_vec(NumericVector<Number>& vec);
@@ -653,12 +653,12 @@ protected:
   virtual void update_residual_terms(bool compute_inner_products=true);
 
   /**
-   * Initialize the RBContext prior to performing
+   * Initialize the FEMContext prior to performing
    * an element loop.
    * Reimplement this in derived classes in order to
    * call FE::get_*() as the particular physics requires.
    */
-  virtual void init_context(RBContext& ) {}
+  virtual void init_context(FEMContext& ) {}
 
   /**
    * Set the dofs on the Dirichlet boundary (stored in

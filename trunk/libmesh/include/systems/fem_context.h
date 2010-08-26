@@ -185,7 +185,7 @@ public:
   /**
    * Reinitializes local data vectors/matrices on the current geometric element
    */
-  void pre_fe_reinit(const System&, Elem *e);
+  virtual void pre_fe_reinit(const System&, Elem *e);
 
   /**
    * Reinitializes interior FE objects on the current geometric element

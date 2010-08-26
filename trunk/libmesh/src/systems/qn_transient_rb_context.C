@@ -38,7 +38,7 @@ namespace libMesh
 {
 
 QNTransientRBContext::QNTransientRBContext (const QNTransientRBSystem& sys) :
-  RBContext(sys)
+  FEMContext(sys)
 {
   unsigned int n_vars = sys.n_vars();
   elem_old_subsolutions.reserve(n_vars);
@@ -177,15 +177,12 @@ Number QNTransientRBContext::old_point_value(unsigned int var, Point &p)
   return u_old;
 }
 
-void QNTransientRBContext::reinit(RBSystem &sys, Elem *e)
+void QNTransientRBContext::pre_fe_reinit(const System &sys, Elem *e)
 {
+  FEMContext::pre_fe_reinit(sys, e);
+        
   // sys must be a QNTransientRBSystem
-  QNTransientRBSystem& qn_system = libmesh_cast_ref<QNTransientRBSystem&>(sys);
-
-  // Copy most of the code from RBContext::reinit,
-  // except replace call to current_solution
-  // with current_newton_iterate, and add
-  // old_solution data
+  const QNTransientRBSystem& qn_system = libmesh_cast_ref<const QNTransientRBSystem&>(sys);
 
   elem = e;
   // Initialize the per-element data for elem.
@@ -193,17 +190,14 @@ void QNTransientRBContext::reinit(RBSystem &sys, Elem *e)
   unsigned int n_dofs = dof_indices.size();
 
   elem_old_solution.resize(n_dofs);
-  elem_solution.resize(n_dofs);
 
   for (unsigned int i=0; i != n_dofs; ++i)
   {
     elem_old_solution(i) = qn_system.old_solution(dof_indices[i]);
+
+    // overwrite with current_newton_iterate data
     elem_solution(i) = (*qn_system.current_newton_iterate)(dof_indices[i]);
   }
-
-  // These resize calls also zero out the vector and matrix
-  elem_vector.resize(n_dofs);
-  elem_matrix.resize(n_dofs, n_dofs);
 
   // Initialize the per-variable data for elem.
   unsigned int sub_dofs = 0;
@@ -214,33 +208,9 @@ void QNTransientRBContext::reinit(RBSystem &sys, Elem *e)
       elem_old_subsolutions[i]->reposition
         (sub_dofs, dof_indices_var[i].size());
 
-      elem_subsolutions[i]->reposition
-        (sub_dofs, dof_indices_var[i].size());
-
-      elem_subvectors[i]->reposition
-        (sub_dofs, dof_indices_var[i].size());
-
-      for (unsigned int j=0; j != i; ++j)
-        {
-          elem_submatrices[i][j]->reposition
-            (sub_dofs, elem_subvectors[j]->i_off(),
-             dof_indices_var[i].size(),
-             dof_indices_var[j].size());
-          elem_submatrices[j][i]->reposition
-            (elem_subvectors[j]->i_off(), sub_dofs,
-             dof_indices_var[j].size(),
-             dof_indices_var[i].size());
-        }
-      elem_submatrices[i][i]->reposition
-        (sub_dofs, sub_dofs,
-         dof_indices_var[i].size(),
-         dof_indices_var[i].size());
       sub_dofs += dof_indices_var[i].size();
     }
   libmesh_assert(sub_dofs == n_dofs);
-
-  // Reinitializing the FE objects is definitely necessary
-  this->elem_fe_reinit();
 }
 
 } // namespace libMesh
