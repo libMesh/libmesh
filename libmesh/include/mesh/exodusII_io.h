@@ -29,13 +29,13 @@
 #include "libmesh_common.h"
 #include "mesh_input.h"
 #include "mesh_output.h"
-#include "exodusII_io_helper.h"
 
 namespace libMesh
 {
 
 // Forward declarations
 class EquationSystems;
+class ExodusII_IO_Helper;
 class MeshBase;
 class System;
 
@@ -130,7 +130,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * functionality when LIBMESH_HAVE_EXODUS_API is not defined.
    */
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO_Helper exio_helper;
+  ExodusII_IO_Helper *exio_helper;
 #endif
 
   /**

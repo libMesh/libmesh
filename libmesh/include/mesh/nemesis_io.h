@@ -28,13 +28,13 @@
 // Local includes
 #include "mesh_input.h"
 //#include "mesh_output.h" // eventually...
-#include "nemesis_io_helper.h"
 
 namespace libMesh
 {
 
 // Forward declarations
 class ParallelMesh;
+class Nemesis_IO_Helper;
 
 
 /**
@@ -82,7 +82,7 @@ class Nemesis_IO : public MeshInput<ParallelMesh>
   
 private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  Nemesis_IO_Helper nemhelper;
+  Nemesis_IO_Helper *nemhelper;
 #endif
 
   bool _verbose;
