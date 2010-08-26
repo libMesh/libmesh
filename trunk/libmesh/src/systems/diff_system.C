@@ -41,7 +41,6 @@ DifferentiableSystem::DifferentiableSystem
   postprocess_sides(false),
   assemble_qoi_sides(false),
   time_solver (NULL),
-  time(0.),
   deltat(1.),
   print_solution_norms(false),
   print_solutions(false),
@@ -49,8 +48,7 @@ DifferentiableSystem::DifferentiableSystem
   print_residuals(false),
   print_jacobian_norms(false),
   print_jacobians(false),
-  print_element_jacobians(false),
-  use_fixed_solution(false)
+  print_element_jacobians(false)
 {
 }
 

@@ -39,7 +39,6 @@ namespace libMesh
 // Forward Declarations
 class Elem;
 class FEBase;
-class FEMSystem;
 class QBase;
 template <typename T> class NumericVector;
 
@@ -65,7 +64,7 @@ public:
   /**
    * Constructor.  Allocates some but fills no data structures.
    */
-  FEMContext (const FEMSystem &sys);
+  FEMContext (const System &sys);
 
   /**
    * Destructor.
@@ -186,7 +185,7 @@ public:
   /**
    * Reinitializes local data vectors/matrices on the current geometric element
    */
-  void pre_fe_reinit(const FEMSystem&, Elem *e);
+  void pre_fe_reinit(const System&, Elem *e);
 
   /**
    * Reinitializes interior FE objects on the current geometric element

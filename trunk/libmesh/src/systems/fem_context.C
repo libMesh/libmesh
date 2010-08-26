@@ -41,7 +41,7 @@ namespace libMesh
 
 
 
-FEMContext::FEMContext (const FEMSystem &sys)
+FEMContext::FEMContext (const System &sys)
   : DiffContext(sys),
     element_qrule(NULL), side_qrule(NULL),
     _mesh_sys(sys.get_mesh_system()),
@@ -679,7 +679,7 @@ void FEMContext::reinit(const FEMSystem &sys, Elem *e)
 
 
 
-void FEMContext::pre_fe_reinit(const FEMSystem &sys, Elem *e)
+void FEMContext::pre_fe_reinit(const System &sys, Elem *e)
 {
   elem = e;
 

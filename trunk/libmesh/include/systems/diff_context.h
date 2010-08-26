@@ -35,7 +35,7 @@ namespace libMesh
 {
 
 // Forward declarations
-class DifferentiableSystem;
+class System;
 
 /**
  * This class provides all data required for a physics package
@@ -60,7 +60,7 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  DiffContext (const DifferentiableSystem &);
+  DiffContext (const System &);
 
   /**
    * Destructor.
