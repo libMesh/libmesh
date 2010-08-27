@@ -136,10 +136,10 @@ void PetscMatrix<T>::init ()
     {
       libmesh_assert ((m_l == m) && (n_l == n));
       if (n_nz.empty())
-        ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
+        ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, m_global, n_global,
 			        PETSC_NULL, (int*) PETSC_NULL, &_mat);
       else
-        ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
+        ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, m_global, n_global,
 			        PETSC_NULL, (int*) &n_nz[0], &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
