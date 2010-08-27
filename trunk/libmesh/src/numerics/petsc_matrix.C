@@ -69,7 +69,7 @@ void PetscMatrix<T>::init (const unsigned int m,
       libmesh_assert ((m_l == m) && (n_l == n));
 
       // Create matrix.  Revisit later to do preallocation and make more efficient
-      ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, n_global, n_global,
+      ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, m_global, n_global,
 			      n_nz, PETSC_NULL, &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
