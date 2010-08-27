@@ -482,7 +482,10 @@ namespace Utility {
     std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
     
     if (!fefamily_to_enum.count(upper))
-      libmesh_error();
+      {
+	libMesh::err << "ERROR: could not convert '" << upper << "' to enum." << std::endl;
+	libmesh_error();
+      }
     
     return fefamily_to_enum[upper];
   }
