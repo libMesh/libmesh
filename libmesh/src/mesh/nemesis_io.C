@@ -89,7 +89,9 @@ Nemesis_IO::Nemesis_IO (ParallelMesh& mesh) :
 
 Nemesis_IO::~Nemesis_IO ()
 {
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   delete nemhelper;
+#endif
 }
 
 
