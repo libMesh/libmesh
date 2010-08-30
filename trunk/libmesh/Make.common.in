@@ -239,14 +239,12 @@ ifeq ($(prof-mode),on)
   libmesh_CPPFLAGS += -DNDEBUG
   libmesh_CXXFLAGS += @CXXFLAGS_OPT@ @PROFILING_FLAGS@
   libmesh_CFLAGS   += @CFLAGS_OPT@ @PROFILING_FLAGS@ 
-endif
-
-ifeq ($(prof-mode),on)
   libmesh_LIBS += @PROFILING_FLAGS@
 endif
 
 
 ifeq ($(oprof-mode),on)
+  libmesh_CPPFLAGS += -DNDEBUG
   libmesh_CXXFLAGS += @CXXFLAGS_OPT@ @OPROFILE_FLAGS@
   libmesh_CFLAGS   += @CFLAGS_OPT@ @OPROFILE_FLAGS@ 
 endif
