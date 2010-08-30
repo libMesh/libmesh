@@ -13,8 +13,13 @@ dnl ----------------------------------------------------------------
 AC_DEFUN([CONFIGURE_GLPK], 
 [
   dnl Default path to GLPK's include and lib files
-  GLPK_INC="/usr/local/include"
-  GLPK_LIB="/usr/local/lib"
+  if [ -f /usr/local/include/glpk.h ]; then
+    GLPK_INC="/usr/local/include"
+    GLPK_LIB="/usr/local/lib"
+  else
+    GLPK_INC="/usr/include"
+    GLPK_LIB="/usr/lib"
+  fi
   
   dnl User-specific include path
   AC_ARG_WITH(glpk-include,
