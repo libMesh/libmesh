@@ -522,6 +522,12 @@ protected:
    * for steady state problems.
    */
   virtual void assemble_matrix_for_output_dual_solves();
+  
+  /**
+   * Evaluate the dual norm of output \p n
+   * for the current parameters.
+   */
+  Real eval_output_dual_norm(unsigned int n);
 
   /**
    * Function that indicates when to terminate the Greedy
