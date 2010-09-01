@@ -1235,6 +1235,23 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
   return training_greedy_error;
 }
 
+Real RBSystem::eval_output_dual_norm(unsigned int n)
+{
+  Number output_bound_sq = 0.;    
+  unsigned int q=0;
+  for(unsigned int q_l1=0; q_l1<get_Q_l(n); q_l1++)
+  {
+    for(unsigned int q_l2=q_l1; q_l2<get_Q_l(n); q_l2++)
+    {
+      Real delta = (q_l1==q_l2) ? 1. : 2.;
+      output_bound_sq += delta*eval_theta_q_l(n,q_l1)*eval_theta_q_l(n,q_l2) * output_dual_norms[n][q];
+      q++;
+    }
+  }
+    
+  return libmesh_real(std::sqrt( output_bound_sq ));
+}
+
 bool RBSystem::greedy_termination_test(Real training_greedy_error, int)
 {
   if(training_greedy_error < this->training_tolerance)
@@ -1252,7 +1269,6 @@ bool RBSystem::greedy_termination_test(Real training_greedy_error, int)
 
   return false;
 }
-
 
 void RBSystem::update_greedy_param_list()
 {
@@ -1731,19 +1747,7 @@ Real RBSystem::RB_solve(unsigned int N)
       RB_outputs[n] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
     }
     
-    Number output_bound_sq = 0.;    
-    unsigned int q=0;
-    for(unsigned int q_l1=0; q_l1<get_Q_l(n); q_l1++)
-    {
-      for(unsigned int q_l2=q_l1; q_l2<get_Q_l(n); q_l2++)
-      {
-        Real delta = (q_l1==q_l2) ? 1. : 2.;
-        output_bound_sq += delta*eval_theta_q_l(n,q_l1)*eval_theta_q_l(n,q_l2) * output_dual_norms[n][q];
-        q++;
-      }
-    }
-    
-    RB_output_error_bounds[n] = abs_error_bound * libmesh_real(std::sqrt( output_bound_sq ));
+    RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n);
   }
 
   STOP_LOG("RB_solve()", "RBSystem");

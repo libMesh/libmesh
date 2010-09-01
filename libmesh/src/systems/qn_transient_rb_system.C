@@ -703,20 +703,8 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
       RB_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_u_bar);
     }
-    
-    Number output_bound_sq = 0.;
-    unsigned int q=0;
-    for(unsigned int q_l1=0; q_l1<get_Q_l(n); q_l1++)
-    {
-      for(unsigned int q_l2=q_l1; q_l2<get_Q_l(n); q_l2++)
-      {
-        Real delta = (q_l1==q_l2) ? 1. : 2.;
-        output_bound_sq += delta*eval_theta_q_l(n,q_l1)*eval_theta_q_l(n,q_l2) * output_dual_norms[n][q];
-        q++;
-      }
-    }
 
-    RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * libmesh_real( std::sqrt(output_bound_sq) );
+    RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * eval_output_dual_norm(n);
   }
 
   // Initialize a vector to store the solution from the old time-step
@@ -866,20 +854,8 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
         RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
         RB_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_u_bar);
       }
-      
-      Number output_bound_sq = 0.;
-      unsigned int q=0;
-      for(unsigned int q_l1=0; q_l1<get_Q_l(n); q_l1++)
-      {
-        for(unsigned int q_l2=q_l1; q_l2<get_Q_l(n); q_l2++)
-        {
-          Real delta = (q_l1==q_l2) ? 1. : 2.;
-          output_bound_sq += delta*eval_theta_q_l(n,q_l1)*eval_theta_q_l(n,q_l2) * output_dual_norms[n][q];
-          q++;
-        }
-      }
 
-      RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * libmesh_real(std::sqrt( output_bound_sq) );
+      RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * eval_output_dual_norm(n);
     }
   }
 
