@@ -80,6 +80,7 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx)
   {
+    START_LOG("residual()", "PetscNonlinearSolver");
     int ierr=0;
 
     libmesh_assert (x   != NULL);
@@ -115,6 +116,8 @@ extern "C"
     
     R.close();
     X_global.close();
+
+    STOP_LOG("residual()", "PetscNonlinearSolver");
     
     return ierr;
   }
@@ -126,6 +129,7 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx)
   {
+    START_LOG("jacobian()", "PetscNonlinearSolver");
     int ierr=0;
     
     libmesh_assert (ctx != NULL);
@@ -167,6 +171,8 @@ extern "C"
     
     *msflag = SAME_NONZERO_PATTERN;
     
+    STOP_LOG("jacobian()", "PetscNonlinearSolver");
+
     return ierr;
   }
     
@@ -259,6 +265,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 				const double,              // Stopping tolerance
 				const unsigned int) 
 {
+  START_LOG("solve()", "PetscNonlinearSolver");
   this->init ();
   
   // Make sure the data passed in are really of Petsc types
@@ -338,6 +345,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   this->converged = reason >= 0;
 
   this->clear();
+
+  STOP_LOG("solve()", "PetscNonlinearSolver");
 		 
   // return the # of its. and the final residual norm.
   return std::make_pair(n_iterations, final_residual_norm);
