@@ -1244,7 +1244,8 @@ Real RBSystem::eval_output_dual_norm(unsigned int n)
     for(unsigned int q_l2=q_l1; q_l2<get_Q_l(n); q_l2++)
     {
       Real delta = (q_l1==q_l2) ? 1. : 2.;
-      output_bound_sq += delta*eval_theta_q_l(n,q_l1)*eval_theta_q_l(n,q_l2) * output_dual_norms[n][q];
+      output_bound_sq += delta * libmesh_real(
+        libmesh_conj(eval_theta_q_l(n,q_l1))*eval_theta_q_l(n,q_l2) * output_dual_norms[n][q] );
       q++;
     }
   }
@@ -1319,7 +1320,7 @@ Real RBSystem::truth_solve(int plot_solution)
   {
     truth_outputs[n] = 0.;
     for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
-      truth_outputs[n] += eval_theta_q_l(n, q_l)*get_output_vector(n,q_l)->dot(*solution);
+      truth_outputs[n] += libmesh_conj(eval_theta_q_l(n, q_l))*get_output_vector(n,q_l)->dot(*solution);
   }
 
   if(plot_solution > 0)
@@ -1513,7 +1514,7 @@ void RBSystem::enrich_RB_space()
     {
       matrix->vector_mult(*inner_product_storage_vector,*proj_index);
     }
-    Number scalar = new_bf->dot(*inner_product_storage_vector);
+    Number scalar = inner_product_storage_vector->dot(*new_bf);
     proj_sum->add( scalar, *proj_index);
   }
   new_bf->add(-1.,*proj_sum);
@@ -1527,7 +1528,7 @@ void RBSystem::enrich_RB_space()
   {
     matrix->vector_mult(*inner_product_storage_vector,*new_bf);
   }
-  Number new_bf_norm = std::sqrt( new_bf->dot(*inner_product_storage_vector) );
+  Number new_bf_norm = std::sqrt( inner_product_storage_vector->dot(*new_bf) );
   new_bf->scale(1./new_bf_norm);
 
   // load the new basis function into the basis_functions vector.
@@ -1724,9 +1725,9 @@ Real RBSystem::RB_solve(unsigned int N)
     for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
     {
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs[n] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
+      RB_outputs[n] += libmesh_conj(eval_theta_q_l(n,q_l))*RB_output_vector_N.dot(RB_solution);
     }
-    
+
     RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n);
   }
 
@@ -1785,7 +1786,7 @@ void RBSystem::update_RB_system_matrices()
           matrix->vector_mult(*temp, *basis_functions[j]);
         }
 
-        value = (*basis_functions[i]).dot(*temp);
+        value = (*temp).dot(*basis_functions[i]);
         RB_A_q_vector[q_a](i,j) = value;
 
         if(i!=j)
@@ -1801,7 +1802,7 @@ void RBSystem::update_RB_system_matrices()
             matrix->vector_mult(*temp, *basis_functions[i]);
           }
 
-          value = (*basis_functions[j]).dot(*temp);
+          value = (*temp).dot(*basis_functions[j]);
           RB_A_q_vector[q_a](j,i) = value;
         }
       }
@@ -1918,7 +1919,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 
 	    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
 	      {
-		Fq_representor_norms[q] = F_q_representor[q_f2]->dot(*inner_product_storage_vector);
+		Fq_representor_norms[q] = inner_product_storage_vector->dot(*F_q_representor[q_f2]);
 
 		q++;
 	      }
@@ -2028,7 +2029,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
 		{
 		  Fq_Aq_representor_norms[q_f][q_a][i] =
-		    A_q_representor[q_a][i]->dot(*inner_product_storage_vector);
+		    inner_product_storage_vector->dot(*A_q_representor[q_a][i]);
 		}
 	    }
 	}
@@ -2050,7 +2051,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 			{
 			  matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][j]);
 			}
-		      Aq_Aq_representor_norms[q][i][j] = A_q_representor[q_a1][i]->dot(*inner_product_storage_vector);
+		      Aq_Aq_representor_norms[q][i][j] = inner_product_storage_vector->dot(*A_q_representor[q_a1][i]);
 
 		      if(i != j)
 			{
@@ -2062,7 +2063,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 			    {
 			      matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][i]);
 			    }
-			  Aq_Aq_representor_norms[q][j][i] = A_q_representor[q_a1][j]->dot(*inner_product_storage_vector);
+			  Aq_Aq_representor_norms[q][j][i] = inner_product_storage_vector->dot(*A_q_representor[q_a1][j]);
 			}
 		    }
 		}
@@ -2328,7 +2329,8 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
     for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
-      residual_norm_sq += delta*eval_theta_q_f(q_f1)*eval_theta_q_f(q_f2) * Fq_representor_norms[q];
+      residual_norm_sq += delta * libmesh_real(
+        eval_theta_q_f(q_f1) * libmesh_conj(eval_theta_q_f(q_f2)) * Fq_representor_norms[q] );
 
       q++;
     }
@@ -2342,7 +2344,8 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
       {
         Real delta = 2.;
         residual_norm_sq +=
-          RB_solution(i)*delta*eval_theta_q_f(q_f)*eval_theta_q_a(q_a) * Fq_Aq_representor_norms[q_f][q_a][i];
+          delta * libmesh_real( eval_theta_q_f(q_f) * libmesh_conj(eval_theta_q_a(q_a)) *
+          libmesh_conj(RB_solution(i)) * Fq_Aq_representor_norms[q_f][q_a][i] );
       }
     }
   }
@@ -2359,8 +2362,8 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
         for(unsigned int j=0; j<N; j++)
         {
           residual_norm_sq +=
-            RB_solution(i)*RB_solution(j)* delta * eval_theta_q_a(q_a1) * eval_theta_q_a(q_a2) *
-            Aq_Aq_representor_norms[q][i][j];
+            delta * libmesh_real( libmesh_conj(eval_theta_q_a(q_a1)) * eval_theta_q_a(q_a2) *
+            libmesh_conj(RB_solution(i)) * RB_solution(j) * Aq_Aq_representor_norms[q][i][j] );
         }
       }
 
@@ -2385,7 +2388,7 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
 
   STOP_LOG("compute_residual_dual_norm()", "RBSystem");
 
-  return libmesh_real(std::sqrt( residual_norm_sq ));
+  return std::sqrt( libmesh_real(residual_norm_sq) );
 }
 
 SparseMatrix<Number>* RBSystem::get_A_q(unsigned int q)
