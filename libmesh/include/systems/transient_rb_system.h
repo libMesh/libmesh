@@ -335,6 +335,19 @@ public:
   std::vector< DenseVector<Number> > RB_temporal_solution_data;
 
   /**
+   * Vectors storing the mass matrix representors.
+   */
+  std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
+
+  /**
+   * Vectors storing the residual representor inner products
+   * to be used in computing the residuals online.
+   */
+  std::vector< std::vector< std::vector<Number> > > Fq_Mq_representor_norms;
+  std::vector< std::vector< std::vector<Number> > > Mq_Mq_representor_norms;
+  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_Mq_representor_norms;
+
+  /**
    * Boolean flag to indicate whether we are using a non-zero initialization.
    * If we are, then an initialization function must be attached to the system.
    */
@@ -446,20 +459,6 @@ protected:
   void cache_online_residual_terms(const unsigned int N);
 
   //----------- PROTECTED DATA MEMBERS -----------//
-
-
-  /**
-   * Vectors storing the mass matrix representors.
-   */
-  std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
-
-  /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
-   */
-  std::vector< std::vector< std::vector<Number> > > Fq_Mq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Mq_Mq_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_Mq_representor_norms;
 
   /**
    * Time step size.

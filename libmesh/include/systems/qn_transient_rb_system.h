@@ -236,6 +236,21 @@ public:
   std::vector<Real> rho_LB_vector;
   std::vector<Real> rho_UB_vector;
 
+  /**
+   * Vectors storing the representors for the residual terms arising
+   * from the quadratic nonlinearity.
+   */
+  std::vector< std::vector< NumericVector<Number>* > > C_representor;
+
+  /**
+   * Vectors storing the residual representor inner products
+   * to be used in computing the residuals online.
+   */
+  std::vector< std::vector< std::vector<Number> > > Fq_C_representor_norms;
+  std::vector< std::vector< std::vector< std::vector<Number> > > > Mq_C_representor_norms;
+  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_C_representor_norms;
+  std::vector< std::vector< std::vector< std::vector<Number> > > > C_C_representor_norms;
+
 protected:
 
   /**
@@ -331,21 +346,6 @@ private:
    * We store Nmax trilinear form operators to speed up RB matrix assembly.
    */
   std::vector< SparseMatrix<Number>* > C_n_vector;
-
-  /**
-   * Vectors storing the representors for the residual terms arising
-   * from the quadratic nonlinearity.
-   */
-  std::vector< std::vector< NumericVector<Number>* > > C_representor;
-
-  /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
-   */
-  std::vector< std::vector< std::vector<Number> > > Fq_C_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Mq_C_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_C_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > C_C_representor_norms;
 
   /**
    * Function pointer for assembling the trilinear
