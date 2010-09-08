@@ -77,8 +77,8 @@ RBSystem::RBSystem (EquationSystems& es,
     eigen_system_name(""),
     inner_prod_assembly(NULL),
     constraint_assembly(NULL),
-    training_tolerance(-1.),
     update_residual_terms_called(false),
+    training_tolerance(-1.),
     _dirichlet_list_init(NULL),
     initial_Nmax(0),
     RB_system_initialized(false)
@@ -1479,27 +1479,7 @@ void RBSystem::load_basis_function(unsigned int i)
 
   *solution = *basis_functions[i];
 
-  // synchronise solution and current_local_solution
   this->update();
-
-  STOP_LOG("load_basis_function()", "RBSystem");
-}
-
-void RBSystem::load_basis_function(unsigned int i, NumericVector<Number>& vec)
-{
-  START_LOG("load_basis_function()", "RBSystem");
-
-  if(!initialize_calN_dependent_data)
-  {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to load basis function."
-              << std::endl;
-    libmesh_error();
-  }
-
-  libmesh_assert(i < basis_functions.size());
-
-  vec = *basis_functions[i];
 
   STOP_LOG("load_basis_function()", "RBSystem");
 }
@@ -1598,7 +1578,7 @@ Real RBSystem::compute_a_posteriori_bounds()
 {
   START_LOG("compute_a_posteriori_bounds()", "RBSystem");
 
-  unsigned int RB_size = basis_functions.size();
+  unsigned int RB_size = get_n_basis_functions();
 
 
   training_error_bounds.resize(this->get_local_n_training_samples());
@@ -2325,7 +2305,17 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
 // //     libmesh_error();
 //   }
 //
-//   Real slow_residual_norm_sq = inner_product( *solution, *solution );
+//   if(!low_memory_mode)
+//   {
+//     inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+//   }
+//   else
+//   {
+//     assemble_inner_product_matrix(matrix);
+//     matrix->vector_mult(*inner_product_storage_vector, *solution);
+//   }
+//
+//   Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
 
 
   // Use the stored representor inner product values
@@ -2708,36 +2698,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
   }
 
   // Now write out the basis functions if requested
-  if(store_basis_functions)
-  {
-    std::cout << "Writing out the basis functions..." << std::endl;
-
-    std::ostringstream file_name;
-    const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
-
-    // Use System::write_serialized_data to write out the basis functions
-    // by copying them into this->solution one at a time.
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      // No need to copy, just swap
-      // *solution = *basis_functions[i];
-      basis_functions[i]->swap(*solution);
-
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/bf" << i << basis_function_suffix;
-
-      Xdr bf_data(file_name.str(),
-		  write_binary_basis_functions ? ENCODE : WRITE);
-
-      write_serialized_data(bf_data, false);
-
-      // Synchronize before moving on
-      Parallel::barrier();
-
-      // Swap back
-      basis_functions[i]->swap(*solution);
-    }
-  }
+  write_out_basis_functions(directory_name, precision_level);
 
   // Write out residual representors if requested
   if (store_representors)
@@ -3048,53 +3009,14 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
   // Resize basis_functions even if we don't read them in so that
   // get_n_bfs() returns the correct value. Initialize the pointers
   // to NULL
-  basis_functions.resize(n_bfs);
-  for(unsigned int i=0; i<n_bfs; i++)
+  set_n_basis_functions(n_bfs);
+  for(unsigned int i=0; i<basis_functions.size(); i++)
     {
       basis_functions[i] = NULL;
     }
 
-  if(store_basis_functions)
-  {
-    std::cout << "Reading in the basis functions..." << std::endl;
-
-    std::ostringstream file_name;
-    const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
-    struct stat stat_info;
-
-    // Use System::read_serialized_data to read in the basis functions
-    // into this->solution and then swap with the appropriate
-    // of basis function.
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/bf" << i << basis_function_suffix;
-
-      // On processor zero check to be sure the file exists
-      if (libMesh::processor_id() == 0)
-	{
-	  int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-	  if (stat_result != 0)
-	    {
-	      std::cout << "File does not exist: " << file_name.str() << std::endl;
-	      libmesh_error();
-	    }
-	}
-
-      Xdr bf_data(file_name.str(),
-		  read_binary_basis_functions ? DECODE : READ);
-
-      read_serialized_data(bf_data, false);
-
-      basis_functions[i] = NumericVector<Number>::build().release();
-      basis_functions[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-
-      // No need to copy, just swap
-      // *basis_functions[i] = *solution;
-      basis_functions[i]->swap(*solution);
-    }
-  }
+  // Read in the basis functions if requested.
+  read_in_basis_functions(directory_name);
 
   // Read in the representor vectors if requested
   if (store_representors)
@@ -3205,6 +3127,86 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 	  }
     } // end if (store_representors)
   STOP_LOG("read_offline_data_from_files()", "RBSystem");
+}
+
+void RBSystem::write_out_basis_functions(const std::string& directory_name,
+                                         const unsigned int)
+{
+  if(store_basis_functions)
+  {
+    std::cout << "Writing out the basis functions..." << std::endl;
+
+    std::ostringstream file_name;
+    const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
+
+    // Use System::write_serialized_data to write out the basis functions
+    // by copying them into this->solution one at a time.
+    for(unsigned int i=0; i<basis_functions.size(); i++)
+    {
+      // No need to copy, just swap
+      // *solution = *basis_functions[i];
+      basis_functions[i]->swap(*solution);
+
+      file_name.str(""); // reset the string
+      file_name << directory_name << "/bf" << i << basis_function_suffix;
+
+      Xdr bf_data(file_name.str(),
+		  write_binary_basis_functions ? ENCODE : WRITE);
+
+      write_serialized_data(bf_data, false);
+
+      // Synchronize before moving on
+      Parallel::barrier();
+
+      // Swap back
+      basis_functions[i]->swap(*solution);
+    }
+  }
+}
+
+void RBSystem::read_in_basis_functions(const std::string& directory_name)
+{
+  if(store_basis_functions)
+  {
+    std::cout << "Reading in the basis functions..." << std::endl;
+
+    std::ostringstream file_name;
+    const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
+    struct stat stat_info;
+
+    // Use System::read_serialized_data to read in the basis functions
+    // into this->solution and then swap with the appropriate
+    // of basis function.
+    for(unsigned int i=0; i<basis_functions.size(); i++)
+    {
+      file_name.str(""); // reset the string
+      file_name << directory_name << "/bf" << i << basis_function_suffix;
+
+      // On processor zero check to be sure the file exists
+      if (libMesh::processor_id() == 0)
+	{
+	  int stat_result = stat(file_name.str().c_str(), &stat_info);
+
+	  if (stat_result != 0)
+	    {
+	      std::cout << "File does not exist: " << file_name.str() << std::endl;
+	      libmesh_error();
+	    }
+	}
+
+      Xdr bf_data(file_name.str(),
+		  read_binary_basis_functions ? DECODE : READ);
+
+      read_serialized_data(bf_data, false);
+
+      basis_functions[i] = NumericVector<Number>::build().release();
+      basis_functions[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+
+      // No need to copy, just swap
+      // *basis_functions[i] = *solution;
+      basis_functions[i]->swap(*solution);
+    }
+  }
 }
 
 } // namespace libMesh

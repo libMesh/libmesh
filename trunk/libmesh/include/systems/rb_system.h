@@ -153,7 +153,7 @@ public:
    * functions we are willing to compute.
    */
   unsigned int get_Nmax() const    { return Nmax; }
-  void set_Nmax(unsigned int Nmax);
+  virtual void set_Nmax(unsigned int Nmax);
 
   /**
    * Get Q_f, the number of terms in the affine
@@ -183,17 +183,18 @@ public:
    * Load the i^th RB function into the RBSystem
    * solution vector.
    */
-  void load_basis_function(unsigned int i);
-
-  /**
-   * Load the i^th RB function into vec.
-   */
-  void load_basis_function(unsigned int i, NumericVector<Number>& vec);
+  virtual void load_basis_function(unsigned int i);
 
   /**
    * Get the current number of basis functions.
    */
-  unsigned int get_n_basis_functions() const { return basis_functions.size(); }
+  virtual unsigned int get_n_basis_functions() const { return basis_functions.size(); }
+  
+  /**
+   * Set the number of basis functions. Useful when reading in
+   * stored data.
+   */
+  virtual void set_n_basis_functions(unsigned int n_bfs) { basis_functions.resize(n_bfs); }
 
   /**
    * Get a const reference to basis function i.
@@ -418,6 +419,20 @@ public:
    * The list of parameters selected by the Greedy algorithm.
    */
   std::vector< std::vector<Real> > greedy_param_list;
+
+  /**
+   * Vectors storing the residual representors.
+   */
+  std::vector< NumericVector<Number>* > F_q_representor;
+  std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
+
+  /**
+   * Vectors storing the residual representor inner products
+   * to be used in computing the residuals online.
+   */
+  std::vector<Number> Fq_representor_norms;
+  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
+  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
 
   /**
    * Boolean flag to indicate whether this is a constrained problem
@@ -657,6 +672,17 @@ protected:
    * data from files.
    */
   virtual void update_residual_terms(bool compute_inner_products=true);
+  
+  /**
+   * If store_basis_functions=true, write out all the basis functions to file.
+   * Precision level specifies the number of significant digits to write out.
+   */
+  virtual void write_out_basis_functions(const std::string& directory_name, const unsigned int precision_level);
+  
+  /**
+   * If store_basis_functions=true, read in all the basis functions from file.
+   */
+  virtual void read_in_basis_functions(const std::string& directory_name);
 
   /**
    * Initialize the FEMContext prior to performing
@@ -734,20 +760,6 @@ protected:
   bool quiet;
 
   /**
-   * Vectors storing the residual representors.
-   */
-  std::vector< NumericVector<Number>* > F_q_representor;
-  std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
-
-  /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
-   */
-  std::vector<Number> Fq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
-
-  /**
    * The name of the RBSCMSystem system that performs
    * the SCM.
    */
@@ -797,6 +809,13 @@ protected:
    */
   std::vector< std::vector<affine_assembly_fptr> > output_bndry_assembly_vector;
 
+  /**
+   * A boolean flag to indicate whether or not update_residual_terms has
+   * been called before --- used to make sure that the representors for
+   * the Fq are only computed on the first call to update_residual_terms.
+   */
+  bool update_residual_terms_called;
+
 private:
 
   /**
@@ -838,13 +857,6 @@ private:
    * Tolerance for training reduced basis using the Greedy scheme.
    */
   Real training_tolerance;
-
-  /**
-   * A boolean flag to indicate whether or not update_residual_terms has
-   * been called before --- used to make sure that the representors for
-   * the Fq are only computed on the first call to update_residual_terms.
-   */
-  bool update_residual_terms_called;
 
   /**
    * Function that initializes the lists of Dirichlet and
