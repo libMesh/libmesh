@@ -77,38 +77,43 @@ void DerivedRBSystem<RBSystem>::update_RB_system_matrices()
   EquationSystems& es = this->get_equation_systems();
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
 
-  unsigned int RB_size = get_n_basis_functions();
-
+  unsigned int derived_RB_size = get_n_basis_functions();
+  unsigned int uber_RB_size    = uber_system.get_n_basis_functions();
+  
+  DenseVector<Number> temp_vector;
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
   {
-    for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
+    for(unsigned int i=(derived_RB_size-delta_N); i<derived_RB_size; i++)
     {
-      RB_F_q_vector[q_f](i) = uber_system.RB_F_q_vector[q_f].dot(derived_basis_functions[i]);
+      uber_system.RB_F_q_vector[q_f].get_principal_subvector(uber_RB_size, temp_vector);
+      RB_F_q_vector[q_f](i) = temp_vector.dot(derived_basis_functions[i]);
     }
   }
 
-  for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
+  DenseMatrix<Number> temp_matrix;
+  for(unsigned int i=(derived_RB_size-delta_N); i<derived_RB_size; i++)
   {
     for(unsigned int n=0; n<get_n_outputs(); n++)
       for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
       {
-        RB_output_vectors[n][q_l](i) = uber_system.RB_output_vectors[n][q_l].dot(derived_basis_functions[i]);
+        uber_system.RB_output_vectors[n][q_l].get_principal_subvector(uber_RB_size, temp_vector);
+        RB_output_vectors[n][q_l](i) = temp_vector.dot(derived_basis_functions[i]);
       }
 
-    for(unsigned int j=0; j<RB_size; j++)
+    for(unsigned int j=0; j<derived_RB_size; j++)
     {
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
         // Compute reduced A_q matrix
-        DenseVector<Number> temp;
-        uber_system.RB_A_q_vector[q_a].vector_mult(temp, derived_basis_functions[j]);
-        RB_A_q_vector[q_a](i,j) = derived_basis_functions[i].dot(temp);
+        uber_system.RB_A_q_vector[q_a].get_principal_submatrix(uber_RB_size, temp_matrix);
+        temp_matrix.vector_mult(temp_vector, derived_basis_functions[j]);
+        RB_A_q_vector[q_a](i,j) = derived_basis_functions[i].dot(temp_vector);
 
         if(i!=j)
         {
-          temp.zero();
-          uber_system.RB_A_q_vector[q_a].vector_mult(temp, derived_basis_functions[i]);
-          RB_A_q_vector[q_a](j,i) = (derived_basis_functions[j]).dot(temp);
+          temp_vector.zero();
+          temp_matrix.vector_mult(temp_vector, derived_basis_functions[i]);
+          RB_A_q_vector[q_a](j,i) = (derived_basis_functions[j]).dot(temp_vector);
         }
       }
     }
@@ -133,7 +138,9 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
       // First we need to compute the representors of
       // each basis function using inner_product_matrix
 
-      unsigned int RB_size = get_n_basis_functions();
+      unsigned int derived_RB_size = get_n_basis_functions();
+      unsigned int uber_RB_size = uber_system.get_n_basis_functions();
+      DenseVector<Number> temp_vector1, temp_vector2;
 
       // We only need to compute the representors for
       // the right-hand side once.  Note: this will be called at least
@@ -151,7 +158,9 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
 	  {
 	    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
 	      {
-		Fq_representor_norms[q] = uber_system.RB_F_q_vector[q_f2].dot( uber_system.RB_F_q_vector[q_f1] );
+                uber_system.RB_F_q_vector[q_f2].get_principal_subvector(uber_RB_size, temp_vector1);
+                uber_system.RB_F_q_vector[q_f1].get_principal_subvector(uber_RB_size, temp_vector2);
+		Fq_representor_norms[q] = temp_vector1.dot( temp_vector2 );
 		q++;
 	      }
 	  }
@@ -163,16 +172,17 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
       if (compute_inner_products)
       {
 
-        DenseVector<Number> temp1;
-        DenseVector<Number> temp2;
+        DenseMatrix<Number> temp_matrix;
         for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
 	  {
 	    for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
 	      {
-	        for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
+	        for(unsigned int i=(derived_RB_size-delta_N); i<derived_RB_size; i++)
 		  {
-                    uber_system.RB_A_q_vector[q_a].vector_mult(temp1, derived_basis_functions[i]);
-		    Fq_Aq_representor_norms[q_f][q_a][i] = -temp1.dot(uber_system.RB_F_q_vector[q_f]);
+                    uber_system.RB_A_q_vector[q_a].get_principal_submatrix(uber_RB_size, temp_matrix);
+                    temp_matrix.vector_mult(temp_vector1, derived_basis_functions[i]);
+                    uber_system.RB_F_q_vector[q_f].get_principal_subvector(uber_RB_size, temp_vector2);
+		    Fq_Aq_representor_norms[q_f][q_a][i] = -temp_vector1.dot(temp_vector2);
 		  }
 	      }
 	  }
@@ -182,19 +192,23 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
 	  {
 	    for(unsigned int q_a2=q_a1; q_a2<get_Q_a(); q_a2++)
 	      {
-	        for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
+	        for(unsigned int i=(derived_RB_size-delta_N); i<derived_RB_size; i++)
 		  {
-		    for(unsigned int j=0; j<RB_size; j++)
+		    for(unsigned int j=0; j<derived_RB_size; j++)
 		      {
-                        uber_system.RB_A_q_vector[q_a1].vector_mult(temp1, derived_basis_functions[i]);
-                        uber_system.RB_A_q_vector[q_a2].vector_mult(temp2, derived_basis_functions[j]);
-		        Aq_Aq_representor_norms[q][i][j] = temp1.dot(temp2);
+                        uber_system.RB_A_q_vector[q_a1].get_principal_submatrix(uber_RB_size, temp_matrix);
+                        temp_matrix.vector_mult(temp_vector1, derived_basis_functions[i]);
+                        uber_system.RB_A_q_vector[q_a2].get_principal_submatrix(uber_RB_size, temp_matrix);
+                        temp_matrix.vector_mult(temp_vector2, derived_basis_functions[j]);
+		        Aq_Aq_representor_norms[q][i][j] = temp_vector1.dot(temp_vector2);
 
 		        if(i != j)
 			  {
-                            uber_system.RB_A_q_vector[q_a1].vector_mult(temp1, derived_basis_functions[j]);
-                            uber_system.RB_A_q_vector[q_a2].vector_mult(temp2, derived_basis_functions[i]);
-			    Aq_Aq_representor_norms[q][j][i] = temp1.dot(temp2);
+                            uber_system.RB_A_q_vector[q_a1].get_principal_submatrix(uber_RB_size, temp_matrix);
+                            temp_matrix.vector_mult(temp_vector1, derived_basis_functions[j]);
+                            uber_system.RB_A_q_vector[q_a2].get_principal_submatrix(uber_RB_size, temp_matrix);
+                            temp_matrix.vector_mult(temp_vector2, derived_basis_functions[i]);
+			    Aq_Aq_representor_norms[q][j][i] = temp_vector1.dot(temp_vector2);
 			  }
 		      }
 		  }
