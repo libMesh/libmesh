@@ -9437,14 +9437,6 @@ fi
 
 
 
-    if  -f /usr/local/include/glpk.h ; then
-    GLPK_INC="/usr/local/include"
-    GLPK_LIB="/usr/local/lib"
-  else
-    GLPK_INC="/usr/include"
-    GLPK_LIB="/usr/lib"
-  fi
-
 
 # Check whether --with-glpk-include was given.
 if test "${with_glpk_include+set}" = set; then :
@@ -9463,12 +9455,28 @@ else
 fi
 
 
-  if (test $withglpkinc != no); then
+    if (test $withglpkinc != no); then
     GLPK_INC="$withglpkinc"
+  elif test "x$GLPK_INC" != x -a -f $GLPK_INC/glpk.h; then
+    echo "Environment GLPK_INC=$GLPK_INC"
+  elif test "x$GLPK_DIR" != x -a -f $GLPK_DIR/include/glpk.h; then
+    GLPK_INC="$GLPK_DIR/include"
+  elif test -f /usr/local/include/glpk.h; then
+    GLPK_INC="/usr/local/include"
+  else
+    GLPK_INC="/usr/include"
   fi
 
   if (test $withglpklib != no); then
     GLPK_LIB="$withglpklib"
+  elif test "x$GLPK_LIB" != x; then
+    echo "Environment GLPK_LIB=$GLPK_INC"
+  elif test "x$GLPK_DIR" != x; then
+    GLPK_LIB="$GLPK_DIR/lib"
+  elif test -f /usr/local/include/glpk.h; then
+    GLPK_LIB="/usr/local/lib"
+  else
+    GLPK_LIB="/usr/lib"
   fi
 
     GLPK_INCLUDE=""
