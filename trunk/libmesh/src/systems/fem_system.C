@@ -136,6 +136,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+  this->init_context(_femcontext);
 
   // Build the residual and jacobian contributions on every active
   // mesh element on this processor
@@ -412,6 +413,7 @@ void FEMSystem::mesh_position_set()
   
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+  this->init_context(_femcontext);
 
   // Move every mesh element we can
   MeshBase::const_element_iterator el =
@@ -448,6 +450,7 @@ void FEMSystem::postprocess ()
 
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+  this->init_context(_femcontext);
 
   // Loop over every active mesh element on this processor
   MeshBase::const_element_iterator el =
@@ -498,6 +501,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+  this->init_context(_femcontext);
 
   // the quantity of interest is assumed to be a sum of element and
   // side terms
@@ -553,6 +557,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
 
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+  this->init_context(_femcontext);
 
   // The quantity of interest derivative assembly accumulates on
   // initially zero vectors
@@ -741,7 +746,7 @@ AutoPtr<DiffContext> FEMSystem::build_context ()
 
 void FEMSystem::init_context(DiffContext &c)
 {
-  Parent::init_context(c);
+  // Parent::init_context(c);  // may be a good idea in derived classes
 
   FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
 
