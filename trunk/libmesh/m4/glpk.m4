@@ -32,7 +32,7 @@ AC_DEFUN([CONFIGURE_GLPK],
     echo "Environment GLPK_INC=$GLPK_INC"
   elif test "x$GLPK_DIR" != x -a -f $GLPK_DIR/include/glpk.h; then
     GLPK_INC="$GLPK_DIR/include"
-  elif [ -f /usr/local/include/glpk.h ]; then
+  elif test -f /usr/local/include/glpk.h; then
     GLPK_INC="/usr/local/include"
   else
     GLPK_INC="/usr/include"
@@ -44,7 +44,7 @@ AC_DEFUN([CONFIGURE_GLPK],
     echo "Environment GLPK_LIB=$GLPK_INC"
   elif test "x$GLPK_DIR" != x; then
     GLPK_LIB="$GLPK_DIR/lib"
-  elif [ -f /usr/local/include/glpk.h ]; then
+  elif test -f /usr/local/include/glpk.h; then
     GLPK_LIB="/usr/local/lib"
   else
     GLPK_LIB="/usr/lib"
