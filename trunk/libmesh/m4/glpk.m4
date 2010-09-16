@@ -4,23 +4,15 @@ dnl -------------------------------------------------------------
 
 dnl ----------------------------------------------------------------
 dnl Certain parts of rbOOmit require GLPK, the GNU Linear Programming
-dnl Kit.  By default we check /usr/local/include and /usr/local/lib
-dnl for the GLPK installation files, unless the user provides us with
-dnl --with-glpk-include=xxx and --with-glpk-lib=yyy arguments during
-dnl configure.
+dnl Kit.  By default we check for the GLPK installation files in 
+dnl --with-glpk-include=xxx and --with-glpk-lib=yyy arguments provided to
+dnl configure, or if those don't exist in $GLPK_INC and $GPLK_LIB
+dnl directories, or in $GLPK_DIR/include and $GLPK_DIR/lib directories, or
+dnl in /usr/local, or in /usr.
 dnl ----------------------------------------------------------------
 
 AC_DEFUN([CONFIGURE_GLPK], 
 [
-  dnl Default path to GLPK's include and lib files
-  if [ -f /usr/local/include/glpk.h ]; then
-    GLPK_INC="/usr/local/include"
-    GLPK_LIB="/usr/local/lib"
-  else
-    GLPK_INC="/usr/include"
-    GLPK_LIB="/usr/lib"
-  fi
-  
   dnl User-specific include path
   AC_ARG_WITH(glpk-include,
               AC_HELP_STRING([--with-glpk-include=PATH],[Specify the path for GLPK header files]),
@@ -33,12 +25,29 @@ AC_DEFUN([CONFIGURE_GLPK],
               withglpklib=$withval,
               withglpklib=no)
 
+  dnl Fall back on default paths to GLPK's include and lib files
   if (test $withglpkinc != no); then
     GLPK_INC="$withglpkinc"
+  elif test "x$GLPK_INC" != x -a -f $GLPK_INC/glpk.h; then
+    echo "Environment GLPK_INC=$GLPK_INC"
+  elif test "x$GLPK_DIR" != x -a -f $GLPK_DIR/include/glpk.h; then
+    GLPK_INC="$GLPK_DIR/include"
+  elif [ -f /usr/local/include/glpk.h ]; then
+    GLPK_INC="/usr/local/include"
+  else
+    GLPK_INC="/usr/include"
   fi
 
   if (test $withglpklib != no); then
     GLPK_LIB="$withglpklib"
+  elif test "x$GLPK_LIB" != x; then
+    echo "Environment GLPK_LIB=$GLPK_INC"
+  elif test "x$GLPK_DIR" != x; then
+    GLPK_LIB="$GLPK_DIR/lib"
+  elif [ -f /usr/local/include/glpk.h ]; then
+    GLPK_LIB="/usr/local/lib"
+  else
+    GLPK_LIB="/usr/lib"
   fi
 
   dnl Initialize Makefile/config.h substitution variables
