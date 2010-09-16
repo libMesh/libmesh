@@ -6,9 +6,9 @@
 # Make.common is what should be included by applications
 # using the library.
 
-# Build the library by default:
+# Build the library and all utility applications by default:
 
-default: library
+default: all
 
 # include the library options determined by configure
 # (now included indirectly in Makefile.const - don't want to
@@ -19,16 +19,6 @@ default: library
 include Makefile.const
 
 
-
-bin-suffix := -$(METHOD)
-# If the user is using METHOD=opt,
-# the utility programs get no suffix
-
-ifeq (x$(METHOD),xopt)
-  bin-suffix := 
-endif
-
-
 ###############################################################################
 # Target:
 #
@@ -36,18 +26,15 @@ target := $(mesh_library)
 
 library: $(mesh_library)
 
-ifeq ($(syn-mode),on)
-  all:: $(objects)
-else
-  all:: $(target) $(appbinfiles)
-endif
+all:: $(target) $(appbinfiles)
+
 ###############################################################################
 
 #
 # 
 #
-.PHONY: clean clobber default distclean \
-	doc upload doc_upload library log cvsweb TODO svnexpand
+.PHONY: all clean clobber default distclean library target \
+	doc upload doc_upload log cvsweb TODO svnexpand
 
 #
 # static library
@@ -207,20 +194,23 @@ svnexpand:
         svn propset svn:keywords "Date Author Revision HeadURL Id" $(srcfiles) $(headerfiles) m4/*.m4
 
 #
-# Standalone applications.  Anything in the ./src/apps directory that ends in .cc
-# can be compiled with this rule.  For example, if ./src/apps/foo.cc contains a main()
+# Standalone applications.  Anything in the ./src/apps directory that ends in .C
+# can be compiled with this rule.  For example, if ./src/apps/foo.C contains a main()
 # and is a standalone program, then make bin/foo will work.
 #
-bin/%$(bin-suffix) : src/apps/%.cc $(mesh_library)
+bin/%$(bin-suffix) : src/apps/%.$(obj-suffix) $(mesh_library)
+	@echo "Linking $@"
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(patsubst %.C,%.$(obj-suffix),$<) -o $@ $(libmesh_LIBS) $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
+
+src/apps/%.$(obj-suffix) : src/apps/%.C
 	@echo "Building $@"
-	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $(patsubst %.cc,%.o,$<) 
-	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(patsubst %.cc,%.o,$<) -o $@ $(libmesh_LIBS) $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $(patsubst %.C,%.$(obj-suffix),$<) 
 
 #
 # In the contrib/bin directory, we run the test_headers.sh shell
 # script.  This is a make rule for those tests.
 #
-contrib/bin/%.o : contrib/bin/%.cc
+contrib/bin/%.o : contrib/bin/%.C
 	$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 #
@@ -237,7 +227,7 @@ TODO:
 # Dependencies
 #
 .depend:
-	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) $(appsrcfiles) > .depend
 
 
 

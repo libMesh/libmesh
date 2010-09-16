@@ -15,25 +15,34 @@ include Make.common
 # File management.  This is where the source, header, and object files are
 # defined
 
+
+# Suffix for application utilities
+bin-suffix := -$(METHOD)
+
+
 #
 # header files & directories
 headerfiles 	:= $(wildcard include/*/*.h)
 
 #
-# source files
-srcfiles 	:= $(wildcard src/*/*.C)
+# apps source files
+appsrcfiles	:= $(wildcard src/apps/*.C)
+
+#
+#
+# library source files
+srcfiles 	:= $(filter-out $(appsrcfiles), $(wildcard src/*/*.C))
 
 #
 # examples source files
 examplesrcfiles	:= $(wildcard examples/ex*/*.C)
 
-#
-# apps source files
-appsrcfiles	:= $(wildcard src/apps/*.cc)
+# apps object files
+appobjects	:= $(patsubst %.C, %.$(obj-suffix), $(appsrcfiles))
 
 #
 # apps binary files
-appbinfiles	:= $(patsubst %.cc, %$(bin-suffix), $(addprefix bin/, $(notdir $(appsrcfiles))))
+appbinfiles	:= $(patsubst %.C, %$(bin-suffix), $(addprefix bin/, $(notdir $(appsrcfiles))))
 
 #
 # object files
@@ -63,6 +72,9 @@ echo:
 	@echo
 	@echo "Object Files:"
 	@echo "$(objects)"
+	@echo
+	@echo "Application object Files:"
+	@echo "$(appobjects)"
 	@echo
 	@echo "Target:"
 	@echo "$(target)"
