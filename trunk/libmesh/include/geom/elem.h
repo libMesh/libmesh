@@ -1383,10 +1383,14 @@ bool Elem::has_ancestor_children() const
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
 inline
-bool Elem::is_ancestor_of(const Elem *descendant) const
+bool Elem::is_ancestor_of(const Elem *
+#ifdef LIBMESH_ENABLE_AMR
+			  descendant
+#endif
+			  ) const
 {
+#ifdef LIBMESH_ENABLE_AMR
   const Elem *e = descendant;
   while (e)
     {
@@ -1394,10 +1398,6 @@ bool Elem::is_ancestor_of(const Elem *descendant) const
         return true;
       e = e->parent();
     }
-#else
-inline
-bool Elem::is_ancestor_of(const Elem *) const
-{
 #endif
   return false;
 }
