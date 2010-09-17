@@ -40,14 +40,15 @@ class ParameterVector;
 
 /**
  * This is a generic class that defines a solver to handle
- * DifferentiableSystems  A user can define a solver by 
+ * ImplicitSystem classes, including NonlinearImplicitSystem and
+ * DifferentiableSystem   A user can define a solver by 
  * deriving from this class and implementing certain functions.
  *
  * This class is part of the new DifferentiableSystem framework,
  * which is still experimental.  Users of this framework should
  * beware of bugs and future API changes.
  *
- * @author Roy H. Stogner 2006
+ * @author Roy H. Stogner 2006-2010
  */
 
 // ------------------------------------------------------------
@@ -139,7 +140,7 @@ public:
 
   /**
    * The DiffSolver should not print anything to libMesh::out
-   * unless quiet is set to false
+   * unless quiet is set to false; default is true.
    */
   bool quiet;
 
