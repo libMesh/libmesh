@@ -71,7 +71,7 @@ __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
 
   PetscDiffSolver& solver =
     *(static_cast<PetscDiffSolver*> (ctx));
-  DifferentiableSystem &sys = solver.system();
+  ImplicitSystem &sys = solver.system();
 
   PetscVector<Number>& X_system =
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
@@ -116,7 +116,7 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *j, Mat *pc,
 
   PetscDiffSolver& solver =
     *(static_cast<PetscDiffSolver*> (ctx));
-  DifferentiableSystem &sys = solver.system();
+  ImplicitSystem &sys = solver.system();
 
   PetscVector<Number>& X_system =
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());

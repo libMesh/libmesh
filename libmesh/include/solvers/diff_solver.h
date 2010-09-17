@@ -35,7 +35,7 @@ namespace libMesh
 
 // Forward Declarations
 class DiffSolver;
-class DifferentiableSystem;
+class ImplicitSystem;
 class ParameterVector;
 
 /**
@@ -58,7 +58,7 @@ public:
   /**
    * The type of system
    */
-  typedef DifferentiableSystem sys_type;
+  typedef ImplicitSystem sys_type;
   
   /**
    * Constructor. Requires a reference to the system
