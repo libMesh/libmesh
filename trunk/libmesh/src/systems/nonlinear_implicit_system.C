@@ -208,17 +208,36 @@ std::pair<unsigned int, Real> NonlinearImplicitSystem::get_linear_solve_paramete
 
 
 
-void NonlinearImplicitSystem::assembly(bool, 
+void NonlinearImplicitSystem::assembly(bool get_residual, 
 				       bool get_jacobian)
 {
+  // Get current_local_solution in sync
+  this->update();
+
   if (get_jacobian)
     {
       if (nonlinear_solver->jacobian != NULL)
         nonlinear_solver->jacobian (*current_local_solution.get(), *matrix, *this);
       else if (nonlinear_solver->matvec != NULL)
-        nonlinear_solver->matvec (*current_local_solution.get(), NULL, matrix, *this);
+        nonlinear_solver->matvec (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
       else libmesh_error();
     }
+
+  if (get_residual)
+    {
+      if (nonlinear_solver->residual != NULL)
+        nonlinear_solver->residual (*current_local_solution.get(), *rhs, *this);
+      else if (nonlinear_solver->matvec != NULL)
+        {
+          // we might have already grabbed the residual and jacobian together
+          if (!get_jacobian)
+            nonlinear_solver->matvec (*current_local_solution.get(), rhs, NULL, *this);
+        }
+      else
+        libmesh_error();
+    }
+  else
+    libmesh_assert(false);  // I can't believe you really wanted to assemble *nothing*
 }
 
 } // namespace libMesh
