@@ -379,46 +379,38 @@ unsigned int NewtonSolver::solve()
       newton_iterate.add (-1., linear_solution);
       newton_iterate.close();
 
-      // Check residual with full Newton step
-      _system.assembly(true, false);
-
-      rhs.close();
-      current_residual = rhs.l2_norm();
-      if (!quiet)
-        libMesh::out << "  Current Residual: "
-                      << current_residual << std::endl;
-
-// A potential method for avoiding oversolving?
-/*
-      Real predicted_absolute_error =
-        current_residual * norm_delta / last_residual;
-
-      Real predicted_relative_error =
-        predicted_absolute_error / max_solution_norm;
-
-      libMesh::out << "Predicted absolute error = " <<
-        predicted_absolute_error << std::endl;
-
-      libMesh::out << "Predicted relative error = " <<
-        predicted_relative_error << std::endl;
-*/
-
-      // don't fiddle around if we've already converged
-      if (test_convergence(current_residual, norm_delta,
-                           linear_solve_finished))
+      // Check residual with full Newton step, if that's useful for determining
+      // whether to line search, whether to quit early, or whether to die after
+      // hitting our max iteration count
+      if (this->require_residual_reduction ||
+          _outer_iterations+1 < max_nonlinear_iterations ||
+          !continue_after_max_iterations)
         {
+          _system.assembly(true, false);
+
+          rhs.close();
+          current_residual = rhs.l2_norm();
           if (!quiet)
-            print_convergence(_outer_iterations, current_residual,
-                              norm_delta, linear_solve_finished);
-          _outer_iterations++;
-          break; // out of _outer_iterations for loop
+            libMesh::out << "  Current Residual: "
+                          << current_residual << std::endl;
+
+          // don't fiddle around if we've already converged
+          if (test_convergence(current_residual, norm_delta,
+                               linear_solve_finished))
+            {
+              if (!quiet)
+                print_convergence(_outer_iterations, current_residual,
+                                  norm_delta, linear_solve_finished);
+              _outer_iterations++;
+              break; // out of _outer_iterations for loop
+            }
         }
 
-      // otherwise, backtrack if necessary
-      Real steplength =
-        this->line_search(std::sqrt(TOLERANCE),
-                          last_residual, current_residual,
-                          newton_iterate, linear_solution);
+      // since we're not converged, backtrack if necessary
+      Real steplength = 1;
+      this->line_search(std::sqrt(TOLERANCE),
+                        last_residual, current_residual,
+                        newton_iterate, linear_solution);
       norm_delta *= steplength;
 
       // Check to see if backtracking failed,
@@ -426,7 +418,24 @@ unsigned int NewtonSolver::solve()
       if (_solve_result == DiffSolver::DIVERGED_BACKTRACKING_FAILURE)
         {
           _outer_iterations++;
-	  break; // out of _outer_iterations for loop
+          break; // out of _outer_iterations for loop
+        }
+
+      if (_outer_iterations + 1 >= max_nonlinear_iterations)
+        {
+          libMesh::out << "  Nonlinear solver reached maximum step "
+                        << _outer_iterations << " with norm "
+                        << norm_total << std::endl;
+          if (continue_after_max_iterations)
+	    {
+	      _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+	      libMesh::out << "  Continuing..." << std::endl;
+	    }
+          else
+	    {
+	      libmesh_convergence_failure();
+	    }
+          continue;
         }
 
       // Compute the l2 norm of the whole solution
@@ -444,32 +453,15 @@ unsigned int NewtonSolver::solve()
 
       // Terminate the solution iteration if the difference between
       // this iteration and the last is sufficiently small.
-      if (!quiet)
-        print_convergence(_outer_iterations, current_residual,
-                          norm_delta / steplength,
-                          linear_solve_finished);
       if (test_convergence(current_residual, norm_delta / steplength,
                            linear_solve_finished))
         {
+          if (!quiet)
+            print_convergence(_outer_iterations, current_residual,
+                              norm_delta / steplength,
+                              linear_solve_finished);
           _outer_iterations++;
 	  break; // out of _outer_iterations for loop
-        }
-
-      if (_outer_iterations >= max_nonlinear_iterations - 1)
-        {
-          libMesh::out << "  Nonlinear solver FAILED TO CONVERGE by step "
-                        << _outer_iterations << " with norm "
-                        << norm_total << std::endl;
-          if (continue_after_max_iterations)
-	    {
-	      _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
-	      libMesh::out << "  Continuing anyway..." << std::endl;
-	    }
-          else
-	    {
-	      libmesh_convergence_failure();
-	    }
-          continue;
         }
     } // end nonlinear loop
 
