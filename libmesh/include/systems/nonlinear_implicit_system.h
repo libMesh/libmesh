@@ -32,6 +32,7 @@ namespace libMesh
 
 
 // Forward declarations
+class DiffSolver;
 template<typename T> class NonlinearSolver;
 
 
@@ -116,12 +117,18 @@ public:
   virtual std::string system_type () const { return "NonlinearImplicit"; }
 
   /**
-   * The \p NonlinearSolver defines the interface used to
+   * The \p NonlinearSolver defines the default interface used to
    * solve the nonlinear_implicit system.  This class handles all the
    * details of interfacing with various nonlinear algebra packages
    * like PETSc or LASPACK.
    */
   AutoPtr<NonlinearSolver<Number> > nonlinear_solver;
+
+  /**
+   * The \p DiffSolver defines an optional interface used to
+   * solve the nonlinear_implicit system.
+   */
+  AutoPtr<DiffSolver> diff_solver;
   
   /**
    * Returns  the number of iterations 

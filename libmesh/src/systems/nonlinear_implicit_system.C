@@ -23,6 +23,7 @@
 
 // Local includes
 #include "nonlinear_implicit_system.h"
+#include "diff_solver.h"
 #include "equation_systems.h"
 #include "libmesh_logging.h"
 #include "linear_solver.h"
@@ -42,6 +43,7 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
   
   Parent                    (es, name, number),
   nonlinear_solver          (NonlinearSolver<Number>::build(*this)),
+  diff_solver               (NULL),
   _n_nonlinear_iterations   (0),
   _final_nonlinear_residual (1.e20)
 {
@@ -85,6 +87,9 @@ void NonlinearImplicitSystem::reinit ()
 {
   // re-initialize the nonlinear solver interface
   nonlinear_solver->clear();
+
+  if (diff_solver.get())
+    diff_solver->reinit();
   
   // initialize parent data
   Parent::reinit();  
@@ -137,6 +142,18 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   nonlinear_solver->max_linear_iterations = maxlinearits;
   nonlinear_solver->initial_linear_tolerance = linear_tol;
   nonlinear_solver->minimum_linear_tolerance = linear_min_tol;
+
+  if (diff_solver.get())
+    {
+      diff_solver->max_nonlinear_iterations = maxits;
+      diff_solver->absolute_residual_tolerance = abs_resid_tol;
+      diff_solver->relative_residual_tolerance = rel_resid_tol;
+      diff_solver->absolute_step_tolerance = abs_step_tol;
+      diff_solver->relative_step_tolerance = rel_step_tol;
+      diff_solver->max_linear_iterations = maxlinearits;
+      diff_solver->initial_linear_tolerance = linear_tol;
+      diff_solver->minimum_linear_tolerance = linear_min_tol;
+    }
 }
 
 
@@ -148,16 +165,28 @@ void NonlinearImplicitSystem::solve ()
   
   this->set_solver_parameters();
 
-  // Solve the nonlinear system.
-  const std::pair<unsigned int, Real> rval =
-    nonlinear_solver->solve (*matrix, *solution, *rhs, 
-			     nonlinear_solver->relative_residual_tolerance,
-                             nonlinear_solver->max_linear_iterations);
+  if (diff_solver.get())
+    {
+      diff_solver->solve();
 
-  // Store the number of nonlinear iterations required to
-  // solve and the final residual.
-  _n_nonlinear_iterations   = rval.first;
-  _final_nonlinear_residual = rval.second;
+      // Store the number of nonlinear iterations required to
+      // solve and the final residual.
+      _n_nonlinear_iterations   = diff_solver->total_outer_iterations();
+      _final_nonlinear_residual = 0.; // FIXME - support this!
+    }
+  else
+    {
+      // Solve the nonlinear system.
+      const std::pair<unsigned int, Real> rval =
+        nonlinear_solver->solve (*matrix, *solution, *rhs, 
+			         nonlinear_solver->relative_residual_tolerance,
+                                 nonlinear_solver->max_linear_iterations);
+
+      // Store the number of nonlinear iterations required to
+      // solve and the final residual.
+      _n_nonlinear_iterations   = rval.first;
+      _final_nonlinear_residual = rval.second;
+    }
     
   // Stop logging the nonlinear solve
   STOP_LOG("solve()", "System");
@@ -170,6 +199,9 @@ void NonlinearImplicitSystem::solve ()
 
 std::pair<unsigned int, Real> NonlinearImplicitSystem::get_linear_solve_parameters() const
 {
+  if (diff_solver.get())
+    return std::make_pair(this->diff_solver->max_linear_iterations,
+                        this->diff_solver->relative_residual_tolerance);
   return std::make_pair(this->nonlinear_solver->max_linear_iterations,
                         this->nonlinear_solver->relative_residual_tolerance);
 }
