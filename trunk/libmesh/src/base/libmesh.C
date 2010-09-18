@@ -190,6 +190,12 @@ void _init (int &argc, char** & argv,
   // Build a command-line parser.
   command_line.reset (new GetPot (argc, argv));
 
+  // Disable performance logging upon request
+  {
+    if (libMesh::on_command_line ("--disable-perflog"))
+      libMesh::perflog.disable_logging();
+  }
+
   // Build a task scheduler
   {
     // Get the requested number of threads, defaults to 1 to avoid MPI and 
