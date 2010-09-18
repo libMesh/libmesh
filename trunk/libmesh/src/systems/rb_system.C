@@ -31,11 +31,11 @@
 #include "xdr_cxx.h"
 #include "timestamp.h"
 #include "petsc_linear_solver.h"
-#include "parallel.h"
 
 #include "fem_context.h"
 #include "rb_system.h"
 #include "rb_scm_system.h"
+#include "rb_eim_system.h"
 
 // For creating a directory
 #include <sys/types.h>
@@ -64,8 +64,8 @@ RBSystem::RBSystem (EquationSystems& es,
     write_data_during_training(false),
     impose_internal_dirichlet_BCs(false),
     impose_internal_fluxes(false),
+    compute_RB_inner_product(false),
     parameters_filename(""),
-    extra_quadrature_order(0),
     enforce_constraints_exactly(false),
     Nmax(0),
     delta_N(1),
@@ -81,7 +81,8 @@ RBSystem::RBSystem (EquationSystems& es,
     training_tolerance(-1.),
     _dirichlet_list_init(NULL),
     initial_Nmax(0),
-    RB_system_initialized(false)
+    RB_system_initialized(false),
+    current_EIM_system(NULL)
 {
   RB_solution.resize(0);
 
@@ -97,6 +98,14 @@ RBSystem::RBSystem (EquationSystems& es,
   theta_q_f_vector.clear();
   F_q_intrr_assembly_vector.clear();
   F_q_bndry_assembly_vector.clear();
+
+  // Make sure we clear EIM vectors so we can then push_back
+  A_EIM_intrr_assembly_vector.clear();
+  A_EIM_bndry_assembly_vector.clear();
+
+  F_EIM_systems_vector.clear();
+  F_EIM_intrr_assembly_vector.clear();
+  F_EIM_bndry_assembly_vector.clear();
 
   theta_q_l_vector.clear();
   output_intrr_assembly_vector.clear();
@@ -118,7 +127,7 @@ void RBSystem::clear()
 {
   Parent::clear();
 
-  for(unsigned int q=0; q<get_Q_a(); q++)
+  for(unsigned int q=0; q<A_q_vector.size(); q++)
   {
     if(A_q_vector[q])
     {
@@ -127,7 +136,7 @@ void RBSystem::clear()
     }
   }
 
-  for(unsigned int q=0; q<get_Q_f(); q++)
+  for(unsigned int q=0; q<F_q_vector.size(); q++)
   {
     if(F_q_vector[q])
     {
@@ -136,8 +145,8 @@ void RBSystem::clear()
     }
   }
 
-  for(unsigned int i=0; i<get_n_outputs(); i++)
-    for(unsigned int q_l=0; q_l<get_Q_l(i); q_l++)
+  for(unsigned int i=0; i<outputs_vector.size(); i++)
+    for(unsigned int q_l=0; q_l<outputs_vector[i].size(); q_l++)
       if(outputs_vector[i][q_l])
       {
         delete outputs_vector[i][q_l];
@@ -179,7 +188,7 @@ void RBSystem::clear_basis_helper()
   basis_functions.resize(0);
 
   // Also delete the representors
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<F_q_representor.size(); q_f++)
   {
     if(F_q_representor[q_f])
     {
@@ -188,7 +197,7 @@ void RBSystem::clear_basis_helper()
     }
   }
 
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
+  for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
   {
     for(unsigned int i=0; i<A_q_representor[q_a].size(); i++)
     {
@@ -356,8 +365,10 @@ void RBSystem::init_data ()
   std::cout << "Nmax: " << Nmax << std::endl;
   if(training_tolerance > 0.)
     std::cout << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
-  std::cout << "Q_a: " << get_Q_a() << std::endl;
-  std::cout << "Q_f: " << get_Q_f() << std::endl;
+  std::cout << "A_q operators attached: " << get_Q_a() << std::endl;
+  std::cout << "F_q functions attached: " << get_Q_f() << std::endl;
+  std::cout << "Number of A EIM systems: " << get_n_A_EIM_systems() << std::endl;
+  std::cout << "Number of F EIM systems: " << get_n_F_EIM_systems() << std::endl;
   std::cout << "n_outputs: " << get_n_outputs() << std::endl;
   for(unsigned int n=0; n<get_n_outputs(); n++)
     std::cout << "output " << n << ", Q_l = " << get_Q_l(n) << std::endl;
@@ -412,6 +423,116 @@ void RBSystem::init_data ()
   // Now that input parameters (e.g. Q_a) have been read in,
   // call the Parent's initialization routine.
   Parent::init_data();
+}
+
+void RBSystem::attach_dirichlet_dof_initialization (dirichlet_list_fptr dirichlet_init)
+{
+  libmesh_assert (dirichlet_init != NULL);
+
+  _dirichlet_list_init = dirichlet_init;
+}
+
+void RBSystem::initialize_dirichlet_dofs()
+{
+  START_LOG("initialize_dirichlet_dofs()", "RBSystem");
+
+  if(!initialize_calN_dependent_data)
+  {
+    std::cerr << "Error: We must initialize the calN dependent "
+              << "data structures in order to initialize Dirichlet dofs."
+              << std::endl;
+    libmesh_error();
+  }
+
+  // Create a set to store the Dirichlet dofs on this processor
+  std::set<unsigned int> dirichlet_dofs_set;
+  dirichlet_dofs_set.clear();
+
+  // Initialize the lists of Dirichlet and non-Dirichlet degrees-of-freedom
+  if (_dirichlet_list_init != NULL)
+    {
+      const MeshBase& mesh = this->get_equation_systems().get_mesh();
+
+      AutoPtr<FEMContext> c = this->build_context();
+      FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
+
+      this->init_context(context);
+
+      MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+      const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+      for ( ; el != end_el; ++el)
+	{
+	  context.pre_fe_reinit(*this, *el);
+          context.elem_fe_reinit();
+
+	  for (context.side = 0;
+	       context.side != context.elem->n_sides();
+	       ++context.side)
+	    {
+	      // Skip over non-boundary sides if we don't have internal Dirichlet BCs
+	      if ( (context.elem->neighbor(context.side) != NULL) && !impose_internal_dirichlet_BCs )
+		continue;
+
+	      context.side_fe_reinit();
+	      _dirichlet_list_init(context, *this, dirichlet_dofs_set);
+	    }
+	}
+    }
+
+  // Initialize the dirichlet dofs vector on each processor
+  std::vector<unsigned int> dirichlet_dofs_vector;
+  dirichlet_dofs_vector.clear();
+
+  std::set<unsigned int>::iterator iter     = dirichlet_dofs_set.begin();
+  std::set<unsigned int>::iterator iter_end = dirichlet_dofs_set.end();
+
+  for ( ; iter != iter_end; ++iter)
+  {
+    unsigned int dirichlet_dof_index = *iter;
+    dirichlet_dofs_vector.push_back(dirichlet_dof_index);
+  }
+
+  // Now take the union over all processors
+  Parallel::allgather(dirichlet_dofs_vector);
+
+  // Put all local dofs into non_dirichlet_dofs_set and
+  // then erase the Dirichlet dofs
+  // Note that this approach automatically ignores non-local Dirichlet dofs
+  std::set<unsigned int> non_dirichlet_dofs_set;
+  for(unsigned int i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
+    non_dirichlet_dofs_set.insert(i);
+
+  // Also, initialize the member data structure global_dirichlet_dofs_set
+  global_dirichlet_dofs_set.clear();
+
+  for (unsigned int ii=0; ii<dirichlet_dofs_vector.size(); ii++)
+  {
+    non_dirichlet_dofs_set.erase(dirichlet_dofs_vector[ii]);
+    global_dirichlet_dofs_set.insert(dirichlet_dofs_vector[ii]);
+  }
+
+  // Finally, load the non-Dirichlet dofs into the system
+  iter     = non_dirichlet_dofs_set.begin();
+  iter_end = non_dirichlet_dofs_set.end();
+
+  this->non_dirichlet_dofs_vector.clear();
+
+  for ( ; iter != iter_end; ++iter)
+    {
+      unsigned int non_dirichlet_dof_index = *iter;
+
+      this->non_dirichlet_dofs_vector.push_back(non_dirichlet_dof_index);
+    }
+
+  STOP_LOG("initialize_dirichlet_dofs()", "RBSystem");
+}
+
+void RBSystem::initialize_RB_system(bool online_mode)
+{
+  // Resize/clear inner product matrix
+  if(compute_RB_inner_product)
+    RB_inner_product_matrix.resize(Nmax,Nmax);
 
   // Resize vectors for storing calN-dependent data but only
   // initialize if initialize_calN_dependent_data == true
@@ -538,129 +659,26 @@ void RBSystem::init_data ()
   RB_output_error_bounds.resize(get_n_outputs());
 
   RB_system_initialized = true;
-}
 
-void RBSystem::attach_dirichlet_dof_initialization (dirichlet_list_fptr dirichlet_init)
-{
-  libmesh_assert (dirichlet_init != NULL);
-
-  _dirichlet_list_init = dirichlet_init;
-}
-
-void RBSystem::initialize_dirichlet_dofs()
-{
-  START_LOG("initialize_dirichlet_dofs()", "RBSystem");
-
-  if(!initialize_calN_dependent_data)
+  if(!online_mode)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to initialize Dirichlet dofs."
-              << std::endl;
-    libmesh_error();
-  }
+    // Initialize the non-Dirichlet and Dirichlet dofs lists
+    this->initialize_dirichlet_dofs();
 
-  // Create a set to store the Dirichlet dofs on this processor
-  std::set<unsigned int> dirichlet_dofs_set;
-  dirichlet_dofs_set.clear();
-
-  // Initialize the lists of Dirichlet and non-Dirichlet degrees-of-freedom
-  if (_dirichlet_list_init != NULL)
+    // Assemble and store all of the matrices if we're
+    // not in low-memory mode
+    if(!low_memory_mode)
     {
-      const MeshBase& mesh = this->get_equation_systems().get_mesh();
-
-      AutoPtr<FEMContext> c = this->build_context();
-      FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
-
-      this->init_context(context);
-
-      MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-      for ( ; el != end_el; ++el)
-	{
-	  context.pre_fe_reinit(*this, *el);
-          context.elem_fe_reinit();
-
-	  for (context.side = 0;
-	       context.side != context.elem->n_sides();
-	       ++context.side)
-	    {
-	      // Skip over non-boundary sides if we don't have internal Dirichlet BCs
-	      if ( (context.elem->neighbor(context.side) != NULL) && !impose_internal_dirichlet_BCs )
-		continue;
-
-	      context.side_fe_reinit();
-	      _dirichlet_list_init(context, *this, dirichlet_dofs_set);
-	    }
-	}
+      this->assemble_misc_matrices();
+      this->assemble_all_affine_operators();
     }
 
-  // Initialize the dirichlet dofs vector on each processor
-  std::vector<unsigned int> dirichlet_dofs_vector;
-  dirichlet_dofs_vector.clear();
+    this->assemble_all_affine_vectors();
+    this->assemble_all_output_vectors();
 
-  std::set<unsigned int>::iterator iter     = dirichlet_dofs_set.begin();
-  std::set<unsigned int>::iterator iter_end = dirichlet_dofs_set.end();
-
-  for ( ; iter != iter_end; ++iter)
-  {
-    unsigned int dirichlet_dof_index = *iter;
-    dirichlet_dofs_vector.push_back(dirichlet_dof_index);
+    // Compute the dual norms of the outputs
+    this->compute_output_dual_norms();
   }
-
-  // Now take the union over all processors
-  Parallel::allgather(dirichlet_dofs_vector);
-
-  // Put all local dofs into non_dirichlet_dofs_set and
-  // then erase the Dirichlet dofs
-  // Note that this approach automatically ignores non-local Dirichlet dofs
-  std::set<unsigned int> non_dirichlet_dofs_set;
-  for(unsigned int i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
-    non_dirichlet_dofs_set.insert(i);
-
-  // Also, initialize the member data structure global_dirichlet_dofs_set
-  global_dirichlet_dofs_set.clear();
-
-  for (unsigned int ii=0; ii<dirichlet_dofs_vector.size(); ii++)
-  {
-    non_dirichlet_dofs_set.erase(dirichlet_dofs_vector[ii]);
-    global_dirichlet_dofs_set.insert(dirichlet_dofs_vector[ii]);
-  }
-
-  // Finally, load the non-Dirichlet dofs into the system
-  iter     = non_dirichlet_dofs_set.begin();
-  iter_end = non_dirichlet_dofs_set.end();
-
-  this->non_dirichlet_dofs_vector.clear();
-
-  for ( ; iter != iter_end; ++iter)
-    {
-      unsigned int non_dirichlet_dof_index = *iter;
-
-      this->non_dirichlet_dofs_vector.push_back(non_dirichlet_dof_index);
-    }
-
-  STOP_LOG("initialize_dirichlet_dofs()", "RBSystem");
-}
-
-void RBSystem::perform_initial_assembly()
-{
-  // Initialize the non-Dirichlet and Dirichlet dofs lists
-  this->initialize_dirichlet_dofs();
-
-  // Assemble and store all of the matrices if we're
-  // not in low-memory mode
-  if(!low_memory_mode)
-  {
-    this->assemble_misc_matrices();
-    this->assemble_all_affine_operators();
-  }
-
-  this->assemble_all_affine_vectors();
-  this->assemble_all_output_vectors();
-
-  // Compute the dual norms of the outputs
-  this->compute_output_dual_norms();
 }
 
 AutoPtr<FEMContext> RBSystem::build_context ()
@@ -1076,7 +1094,32 @@ void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_ma
   }
 
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., A_q_intrr_assembly_vector[q], A_q_bndry_assembly_vector[q], input_matrix, NULL);
+
+  if(!is_A_EIM_operator(q))
+  {
+    add_scaled_matrix_and_vector(1.,
+                                 A_q_intrr_assembly_vector[q],
+                                 A_q_bndry_assembly_vector[q],
+                                 input_matrix,
+                                 NULL);
+  }
+  else // We have an EIM function
+  {
+    // Find out the LHS EIM system index and the associated function index that corresponds to q
+    std::pair<unsigned int, unsigned int> A_EIM_indices = get_A_EIM_indices(q);
+    
+    unsigned int system_id = A_EIM_indices.first;
+    current_EIM_system = A_EIM_systems_vector[system_id];
+    
+    // Cache a GHOSTED version of the EIM basis function corresponding to the current EIM function index
+    current_EIM_system->cache_ghosted_basis_function(A_EIM_indices.second);
+    
+    add_scaled_matrix_and_vector(1.,
+                                 A_EIM_intrr_assembly_vector[system_id],
+                                 A_EIM_bndry_assembly_vector[system_id],
+                                 input_matrix,
+                                 NULL);
+  }
 }
 
 void RBSystem::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Number>* input_matrix, bool symmetrize)
@@ -1097,12 +1140,33 @@ void RBSystem::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Numbe
   }
   else
   {
-    add_scaled_matrix_and_vector(scalar,
-                                 A_q_intrr_assembly_vector[q_a],
-                                 A_q_bndry_assembly_vector[q_a],
-                                 input_matrix,
-                                 NULL,
-                                 symmetrize);
+    if(!is_A_EIM_operator(q_a))
+    {
+      add_scaled_matrix_and_vector(scalar,
+                                   A_q_intrr_assembly_vector[q_a],
+                                   A_q_bndry_assembly_vector[q_a],
+                                   input_matrix,
+                                   NULL,
+                                   symmetrize);
+    }
+    else // We have an EIM function
+    {
+      // Find out the LHS EIM system index and the associated function index that corresponds to q_a
+      std::pair<unsigned int, unsigned int> A_EIM_indices = get_A_EIM_indices(q_a);
+
+      unsigned int system_id = A_EIM_indices.first;
+      current_EIM_system = A_EIM_systems_vector[system_id];
+      
+      // Cache a GHOSTED version of the EIM basis function corresponding to the current EIM function index
+      current_EIM_system->cache_ghosted_basis_function(A_EIM_indices.second);
+
+      add_scaled_matrix_and_vector(scalar,
+                                   A_EIM_intrr_assembly_vector[system_id],
+                                   A_EIM_bndry_assembly_vector[system_id],
+                                   input_matrix,
+                                   NULL,
+                                   symmetrize);
+    }
   }
 
   STOP_LOG("add_scaled_Aq()", "RBSystem");
@@ -1139,8 +1203,32 @@ void RBSystem::assemble_all_affine_vectors()
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
   {
     get_F_q(q_f)->zero();
-    add_scaled_matrix_and_vector(1., F_q_intrr_assembly_vector[q_f],
-                                 F_q_bndry_assembly_vector[q_f], NULL, get_F_q(q_f));
+    
+    if(!is_F_EIM_function(q_f))
+    {
+      add_scaled_matrix_and_vector(1.,
+                                   F_q_intrr_assembly_vector[q_f],
+                                   F_q_bndry_assembly_vector[q_f],
+                                   NULL,
+                                   get_F_q(q_f));
+    }
+    else // We have an EIM function
+    {
+      // Find out the LHS EIM system index and the associated function index that corresponds to q
+      std::pair<unsigned int, unsigned int> F_EIM_indices = get_F_EIM_indices(q_f);
+    
+      unsigned int system_id = F_EIM_indices.first;
+      current_EIM_system = F_EIM_systems_vector[system_id];
+      
+      // Cache a GHOSTED version of the EIM basis function corresponding to the current EIM function index
+      current_EIM_system->cache_ghosted_basis_function(F_EIM_indices.second);
+    
+      add_scaled_matrix_and_vector(1.,
+                                   F_EIM_intrr_assembly_vector[system_id],
+                                   F_EIM_bndry_assembly_vector[system_id],
+                                   NULL,
+                                   get_F_q(q_f));
+    }
   }
 }
 
@@ -1376,6 +1464,21 @@ void RBSystem::set_Nmax(unsigned int Nmax_in)
   this->Nmax = Nmax_in;
 }
 
+unsigned int RBSystem::get_n_F_EIM_systems() const
+{
+  return F_EIM_systems_vector.size();
+}
+
+unsigned int RBSystem::get_n_F_EIM_functions() const
+{
+  unsigned int count = 0;
+  
+  for(unsigned int i=0; i<F_EIM_systems_vector.size(); i++)
+    count += F_EIM_systems_vector[i]->get_n_affine_functions();
+
+  return count;
+}
+
 void RBSystem::attach_A_q(theta_q_fptr theta_q_a,
                                    affine_assembly_fptr A_q_intrr_assembly,
                                    affine_assembly_fptr A_q_bndry_assembly)
@@ -1392,6 +1495,24 @@ void RBSystem::attach_F_q(theta_q_fptr theta_q_f,
   theta_q_f_vector.push_back(theta_q_f);
   F_q_intrr_assembly_vector.push_back(F_q_intrr_assembly);
   F_q_bndry_assembly_vector.push_back(F_q_bndry_assembly);
+}
+
+void RBSystem::attach_A_EIM_operators(RBEIMSystem* eim_system,
+                                        affine_assembly_fptr EIM_intrr_assembly,
+                                        affine_assembly_fptr EIM_bndry_assembly)
+{
+  A_EIM_systems_vector.push_back( eim_system );
+  A_EIM_intrr_assembly_vector.push_back(EIM_intrr_assembly);
+  A_EIM_bndry_assembly_vector.push_back(EIM_bndry_assembly);
+}
+
+void RBSystem::attach_F_EIM_vectors(RBEIMSystem* eim_system,
+                                      affine_assembly_fptr EIM_intrr_assembly,
+                                      affine_assembly_fptr EIM_bndry_assembly)
+{
+  F_EIM_systems_vector.push_back( eim_system );
+  F_EIM_intrr_assembly_vector.push_back(EIM_intrr_assembly);
+  F_EIM_bndry_assembly_vector.push_back(EIM_bndry_assembly);
 }
 
 void RBSystem::attach_output(std::vector<theta_q_fptr> theta_q_l,
@@ -1412,6 +1533,13 @@ void RBSystem::attach_output(std::vector<theta_q_fptr> theta_q_l,
               << std::endl;
     libmesh_error();
   }
+}
+
+bool RBSystem::is_F_EIM_function(unsigned int q)
+{
+  libmesh_assert(q < get_Q_f());
+
+  return (q >= theta_q_f_vector.size());
 }
 
 void RBSystem::attach_inner_prod_assembly(affine_assembly_fptr IP_assembly)
@@ -1444,9 +1572,44 @@ Number RBSystem::eval_theta_q_f(unsigned int q)
     libmesh_error();
   }
 
-  libmesh_assert(theta_q_f_vector[q] != NULL);
+  if( q < theta_q_f_vector.size() )
+  {
+    libmesh_assert(theta_q_f_vector[q] != NULL);
+    return theta_q_f_vector[q](current_parameters);
+  }
+  else
+  {
+    // Find out the RHS EIM system index and the associated function index that corresponds to q
+    std::pair<unsigned int, unsigned int> F_EIM_indices = get_F_EIM_indices(q);
 
-  return theta_q_f_vector[q](current_parameters);
+    RBEIMSystem& eim_system = *F_EIM_systems_vector[F_EIM_indices.first];
+    eim_system.set_current_parameters(get_current_parameters());
+    eim_system.RB_solve(eim_system.get_n_basis_functions());
+
+    return eim_system.RB_solution(F_EIM_indices.second);
+  }
+}
+
+std::pair<unsigned int, unsigned int> RBSystem::get_F_EIM_indices(unsigned int q)
+{
+  // Find out which EIM system q refers to
+  int function_index = q - theta_q_f_vector.size();
+  unsigned int system_index = 0;
+
+  if( function_index != 0)
+  {
+    for(system_index = 0; system_index<F_EIM_systems_vector.size(); system_index++)
+    {
+      unsigned int increment = F_EIM_systems_vector[system_index]->get_n_affine_functions();
+      if( (static_cast<int>(function_index - increment)) < 0)
+        break;
+    
+      function_index -= increment;
+    }
+  }
+
+  std::pair<unsigned int, unsigned int> EIM_indices(system_index, function_index);
+  return EIM_indices;
 }
 
 Number RBSystem::eval_theta_q_l(unsigned int output_index, unsigned int q_l)
@@ -1579,9 +1742,6 @@ Real RBSystem::compute_a_posteriori_bounds()
 {
   START_LOG("compute_a_posteriori_bounds()", "RBSystem");
 
-  unsigned int RB_size = get_n_basis_functions();
-
-
   training_error_bounds.resize(this->get_local_n_training_samples());
 
   // keep track of the maximum error
@@ -1595,7 +1755,7 @@ Real RBSystem::compute_a_posteriori_bounds()
     // locally since the RB solves are local.
     set_current_parameters( get_training_parameter(first_index+i) );
 
-    training_error_bounds[i] = RB_solve(RB_size);
+    training_error_bounds[i] = get_RB_error_bound();
 //     std::cout << "Error bound at training index " << first_index+i << " is "
 //               << training_error_bounds[i] << std::endl;
 
@@ -1771,6 +1931,30 @@ void RBSystem::update_RB_system_matrices()
     for(unsigned int j=0; j<RB_size; j++)
     {
       Number value = 0.;
+      
+      if(compute_RB_inner_product)
+      {
+        // Compute reduced inner_product_matrix
+        temp->zero();
+        if(!low_memory_mode)
+        {
+          inner_product_matrix->vector_mult(*temp, *basis_functions[j]);
+        }
+        else
+        {
+          assemble_inner_product_matrix(matrix);
+          matrix->vector_mult(*temp, *basis_functions[j]);
+        }
+
+        value = basis_functions[i]->dot(*temp);
+        RB_inner_product_matrix(i,j) = value;
+        if(i!=j)
+        {
+          // The inner product matrix is assumed
+          // to be symmetric
+          RB_inner_product_matrix(j,i) = value;
+        }
+      }
 
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
@@ -2409,6 +2593,35 @@ SparseMatrix<Number>* RBSystem::get_A_q(unsigned int q)
   return A_q_vector[q];
 }
 
+RBEIMSystem& RBSystem::get_A_EIM_system(unsigned int index)
+{
+  if(index >= A_EIM_systems_vector.size())
+  {
+    std::cerr << "Error: We must have index < get_n_A_EIM_systems() in get_A_EIM_system."
+              << std::endl;
+    libmesh_error();
+  }
+  
+  return *A_EIM_systems_vector[index];
+}
+
+RBEIMSystem& RBSystem::get_F_EIM_system(unsigned int index)
+{
+  if(index >= F_EIM_systems_vector.size())
+  {
+    std::cerr << "Error: We must have index < get_n_F_EIM_systems() in get_F_EIM_system."
+              << std::endl;
+    libmesh_error();
+  }
+  
+  return *F_EIM_systems_vector[index];
+}
+
+std::vector<Number> RBSystem::evaluate_current_EIM_function(Elem& element, const std::vector<Point>& qpoints)
+{
+  return current_EIM_system->evaluate_current_affine_function(element, qpoints);
+}
+
 NumericVector<Number>* RBSystem::get_F_q(unsigned int q)
 {
   if(q >= get_Q_f())
@@ -2575,6 +2788,32 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
         }
         output_n_out.close();
       }
+    }
+    
+    if(compute_RB_inner_product)
+    {
+      // Next write out the inner product matrix
+      std::ofstream RB_inner_product_matrix_out;
+      {
+        OStringStream file_name;
+        file_name << directory_name << "/RB_inner_product_matrix.dat";
+        RB_inner_product_matrix_out.open(file_name.str().c_str());
+      }
+      if ( !RB_inner_product_matrix_out.good() )
+      {
+        std::cerr << "Error opening RB_inner_product_matrix.dat" << std::endl;
+        libmesh_error();
+      }
+      RB_inner_product_matrix_out.precision(precision_level);
+      for(unsigned int i=0; i<n_bfs; i++)
+      {
+        for(unsigned int j=0; j<n_bfs; j++)
+        {
+          RB_inner_product_matrix_out << std::scientific
+            << RB_inner_product_matrix(i,j) << " ";
+        }
+      }
+      RB_inner_product_matrix_out.close();
     }
 
     // Next write out the F_q vectors
@@ -2887,6 +3126,32 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
       }
       output_n_in.close();
     }
+  }
+  
+  if(compute_RB_inner_product)
+  {
+    // Next read in the inner product matrix
+    std::ifstream RB_inner_product_matrix_in;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/RB_inner_product_matrix.dat";
+      RB_inner_product_matrix_in.open(file_name.str().c_str());
+    }
+    if ( !RB_inner_product_matrix_in.good() )
+    {
+      std::cerr << "Error opening RB_inner_product_matrix.dat" << std::endl;
+      libmesh_error();
+    }
+    for(unsigned int i=0; i<n_bfs; i++)
+    {
+      for(unsigned int j=0; j<n_bfs; j++)
+      {
+        Number value;
+        RB_inner_product_matrix_in >> value;
+        RB_inner_product_matrix(i,j) = value;
+      }
+    }
+    RB_inner_product_matrix_in.close();
   }
 
   // Next read in the F_q vectors

@@ -147,8 +147,11 @@ void TransientRBSystem::clear_basis_helper()
 
 void TransientRBSystem::init_data ()
 {
+  // Indicate that we need to compute the RB
+  // inner product matrix in this case
+  compute_RB_inner_product = true;
 
-  // First read in data from parameters_filename
+  // Read in data from parameters_filename
   GetPot infile(parameters_filename);
 
   nonzero_initialization = infile("nonzero_initialization",nonzero_initialization);
@@ -168,16 +171,6 @@ void TransientRBSystem::init_data ()
   set_max_truth_solves(max_truth_solves_in);
   set_delta_N(delta_N_in);
 
-
-  // Resize vectors for storing calN-dependent data but only
-  // initialize if initialize_calN_dependent_data == true
-  unsigned int n_time_levels = _K+1;
-  temporal_data.resize(n_time_levels);
-  
-  // Resize vectors for storing calN-dependent data but only
-  // initialize if initialize_calN_dependent_data == true
-  M_q_vector.resize(get_Q_m());
-
   // We read this in here also (the member variable is initialized in RBSystem, but
   // we need to know its value here as well in order to initialize properly)
   initialize_calN_dependent_data = infile("initialize_calN_dependent_data",
@@ -186,32 +179,6 @@ void TransientRBSystem::init_data ()
   {
     // Call the Parent's initialization routine.
     Parent::init_data();
-
-    // Only initialize the mass matrices if we
-    // are not in low-memory mode
-    if(!low_memory_mode)
-    {
-      DofMap& dof_map = this->get_dof_map();
-
-      dof_map.attach_matrix(*L2_matrix);
-      L2_matrix->init();
-      L2_matrix->zero();
-      
-      for(unsigned int q=0; q<get_Q_m(); q++)
-      {
-        // Initialize the memory for the matrices
-        M_q_vector[q] = SparseMatrix<Number>::build().release();
-        dof_map.attach_matrix(*M_q_vector[q]);
-        M_q_vector[q]->init();
-        M_q_vector[q]->zero();
-      }
-    }
-
-    for(unsigned int i=0; i<n_time_levels; i++)
-    {
-      temporal_data[i] = (NumericVector<Number>::build().release());
-      temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-    }
   }
   else
   {
@@ -240,9 +207,50 @@ void TransientRBSystem::init_data ()
     std::cout << "Using zero initial condition" << std::endl;
   }
   std::cout << std::endl;
+}
 
+void TransientRBSystem::initialize_RB_system(bool online_mode)
+{
+  // Resize vectors for storing calN-dependent data but only
+  // initialize if initialize_calN_dependent_data == true
+  unsigned int n_time_levels = get_K()+1;
+  temporal_data.resize(n_time_levels);
+  
+  // Resize vectors for storing calN-dependent data but only
+  // initialize if initialize_calN_dependent_data == true
+  M_q_vector.resize(get_Q_m());
+  
+  if(initialize_calN_dependent_data)
+  {
+    // Only initialize the mass matrices if we
+    // are not in low-memory mode
+    if(!low_memory_mode)
+    {
+      DofMap& dof_map = this->get_dof_map();
 
+      dof_map.attach_matrix(*L2_matrix);
+      L2_matrix->init();
+      L2_matrix->zero();
+      
+      for(unsigned int q=0; q<get_Q_m(); q++)
+      {
+        // Initialize the memory for the matrices
+        M_q_vector[q] = SparseMatrix<Number>::build().release();
+        dof_map.attach_matrix(*M_q_vector[q]);
+        M_q_vector[q]->init();
+        M_q_vector[q]->zero();
+      }
+    }
 
+    for(unsigned int i=0; i<n_time_levels; i++)
+    {
+      temporal_data[i] = (NumericVector<Number>::build().release());
+      temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    }
+  }
+
+  Parent::initialize_RB_system(online_mode);
+  
   // Resize M_q_representor, has to be after Parent::init_data call
   // since Nmax is read in in RBSystem
   M_q_representor.resize(get_Q_m());
@@ -263,9 +271,6 @@ void TransientRBSystem::init_data ()
     // Initialize the memory for the RB matrices
     RB_M_q_vector[q].resize(Nmax,Nmax);
   }
-
-  // Resize/clear inner product matrix
-  RB_inner_product_matrix.resize(Nmax,Nmax);
 
   // Initialize vectors for the norms of the representors
   Fq_Mq_representor_norms.resize(get_Q_f());
@@ -329,39 +334,35 @@ void TransientRBSystem::init_data ()
   {
     truth_outputs_all_k[n].resize(_K+1);
   }
-}
-
-void TransientRBSystem::perform_initial_assembly()
-{
-  Parent::perform_initial_assembly();
   
   // Now update RB_ic_proj_rhs_all_N if necessary.
   // This allows us to compute the L2 projection
   // of the initial condition into the RB space
-  if(get_n_basis_functions() > 0)
-  {
-    // Load the initial condition into the solution vector
-    initialize_truth();
-
-    AutoPtr< NumericVector<Number> > temp1 = NumericVector<Number>::build();
-    temp1->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-
-    // First compute the right-hand side vector for the L2 projection
-    if(!low_memory_mode)
+  if(online_mode)
+    if(get_n_basis_functions() > 0)
     {
-      L2_matrix->vector_mult(*temp1, *solution);
-    }
-    else
-    {
-      assemble_L2_matrix(matrix);
-      matrix->vector_mult(*temp1, *solution);
-    }
+      // Load the initial condition into the solution vector
+      initialize_truth();
 
-    for(unsigned int i=0; i<get_n_basis_functions(); i++)
-    {
-      RB_ic_proj_rhs_all_N(i) = temp1->dot(*basis_functions[i]);
+      AutoPtr< NumericVector<Number> > temp1 = NumericVector<Number>::build();
+      temp1->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+
+      // First compute the right-hand side vector for the L2 projection
+      if(!low_memory_mode)
+      {
+        L2_matrix->vector_mult(*temp1, *solution);
+      }
+      else
+      {
+        assemble_L2_matrix(matrix);
+        matrix->vector_mult(*temp1, *solution);
+      }
+
+      for(unsigned int i=0; i<get_n_basis_functions(); i++)
+      {
+        RB_ic_proj_rhs_all_N(i) = temp1->dot(*basis_functions[i]);
+      }
     }
-  }
 }
 
 SparseMatrix<Number>* TransientRBSystem::get_M_q(unsigned int q)
@@ -1497,27 +1498,6 @@ void TransientRBSystem::update_RB_system_matrices()
         }
       }
       
-      // Compute reduced inner_product_matrix
-      temp->zero();
-      if(!low_memory_mode)
-      {
-        inner_product_matrix->vector_mult(*temp, *basis_functions[j]);
-      }
-      else
-      {
-        assemble_inner_product_matrix(matrix);
-        matrix->vector_mult(*temp, *basis_functions[j]);
-      }
-
-      value = basis_functions[i]->dot(*temp);
-      RB_inner_product_matrix(i,j) = value;
-      if(i!=j)
-      {
-        // The inner product matrix is assumed
-        // to be symmetric
-        RB_inner_product_matrix(j,i) = value;
-      }
-      
     }
   }
 
@@ -2268,29 +2248,6 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
       RB_M_q_m_out.close();
     }
 
-    // Next write out the inner product matrix
-    std::ofstream RB_inner_product_matrix_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/RB_inner_product_matrix.dat";
-      RB_inner_product_matrix_out.open(file_name.str().c_str());
-    }
-    if ( !RB_inner_product_matrix_out.good() )
-    {
-      std::cerr << "Error opening RB_inner_product_matrix.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_inner_product_matrix_out.precision(precision_level);
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        RB_inner_product_matrix_out << std::scientific
-          << RB_inner_product_matrix(i,j) << " ";
-      }
-    }
-    RB_inner_product_matrix_out.close();
-
     // Write out the initial condition data
     // and the initial L2 error for all N
     std::ofstream initial_conditions_out;
@@ -2512,29 +2469,6 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
     }
     RB_M_q_m_in.close();
   }
-
-  // Next read in the inner product matrix
-  std::ifstream RB_inner_product_matrix_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/RB_inner_product_matrix.dat";
-    RB_inner_product_matrix_in.open(file_name.str().c_str());
-  }
-  if ( !RB_inner_product_matrix_in.good() )
-  {
-    std::cerr << "Error opening RB_inner_product_matrix.dat" << std::endl;
-    libmesh_error();
-  }
-  for(unsigned int i=0; i<n_bfs; i++)
-  {
-    for(unsigned int j=0; j<n_bfs; j++)
-    {
-      Number value;
-      RB_inner_product_matrix_in >> value;
-      RB_inner_product_matrix(i,j) = value;
-    }
-  }
-  RB_inner_product_matrix_in.close();
 
 
   // Read in the initial condition data

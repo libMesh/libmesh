@@ -24,6 +24,7 @@
 #include "dof_map.h"
 #include "equation_systems.h"
 #include "parallel.h"
+#include "rb_eim_system.h"
 
 // For the solver switching stuff.
 #include "petsc_linear_solver.h"
@@ -53,12 +54,16 @@ RBBase<Base>::RBBase (EquationSystems& es,
     training_parameters_initialized(false),
     initialize_calN_dependent_data(true),
     training_parameters_random_seed(-1), // by default, use std::time to seed RNG
+    serial_training_set(false),
     alternative_solver("unchanged")
 {
   training_parameters.clear();
 
   // Make sure we clear theta_q_a_vector so we can then push_back
   theta_q_a_vector.clear();
+  
+  // Make sure we clear A_EIM_systems_vector so we can then push_back
+  A_EIM_systems_vector.clear();
   
   // The rbOOmit code is still in a state of flux
   libmesh_experimental();
@@ -159,7 +164,8 @@ void RBBase<Base>::initialize_training_parameters(const std::vector<Real>& mu_mi
                                                training_parameters,
                                                n_training_samples,
                                                mu_min_vector,
-                                               mu_max_vector);
+                                               mu_max_vector,
+                                               serial_training_set);
   }
   else
   {
@@ -168,7 +174,8 @@ void RBBase<Base>::initialize_training_parameters(const std::vector<Real>& mu_mi
                                         n_training_samples,
                                         mu_min_vector,
                                         mu_max_vector,
-					this->training_parameters_random_seed);
+					this->training_parameters_random_seed,
+					serial_training_set);
   }
 
   training_parameters_initialized = true;
@@ -199,11 +206,44 @@ Real RBBase<Base>::get_parameter_max(unsigned int i) const
 }
 
 template <class Base>
+unsigned int  RBBase<Base>::get_n_A_EIM_systems() const
+{
+  return A_EIM_systems_vector.size();
+}
+
+template <class Base>
+unsigned int  RBBase<Base>::get_n_A_EIM_operators() const
+{
+  unsigned int count = 0;
+  
+  for(unsigned int i=0; i<A_EIM_systems_vector.size(); i++)
+    count += A_EIM_systems_vector[i]->get_n_affine_functions();
+
+  return count;
+}
+
+template <class Base>
 void RBBase<Base>::attach_theta_q_a(theta_q_fptr theta_q_a)
 {
   libmesh_assert(theta_q_a != NULL);
 
   theta_q_a_vector.push_back(theta_q_a);
+}
+
+template <class Base>
+void RBBase<Base>::attach_A_EIM_system(RBEIMSystem* eim_system)
+{
+  libmesh_assert(eim_system != NULL);
+
+  A_EIM_systems_vector.push_back( eim_system );
+}
+
+template <class Base>
+bool RBBase<Base>::is_A_EIM_operator(unsigned int q)
+{
+  libmesh_assert(q < get_Q_a());
+
+  return (q >= theta_q_a_vector.size());
 }
 
 template <class Base>
@@ -239,10 +279,46 @@ Number RBBase<Base>::eval_theta_q_a(unsigned int q)
               << std::endl;
     libmesh_error();
   }
+  
+  if(!is_A_EIM_operator(q))
+  {
+    return theta_q_a_vector[q](current_parameters);
+  }
+  else
+  {
+    // Find out the LHS EIM system index and the associated function index that corresponds to q
+    std::pair<unsigned int, unsigned int> A_EIM_indices = get_A_EIM_indices(q);
 
-  libmesh_assert(theta_q_a_vector[q] != NULL);
+    RBEIMSystem& eim_system = *A_EIM_systems_vector[A_EIM_indices.first];
+    eim_system.set_current_parameters(get_current_parameters());
+    eim_system.RB_solve(eim_system.get_n_basis_functions());
 
-  return theta_q_a_vector[q](current_parameters);
+    return eim_system.RB_solution(A_EIM_indices.second);
+  }
+
+}
+
+template <class Base>
+std::pair<unsigned int, unsigned int> RBBase<Base>::get_A_EIM_indices(unsigned int q)
+{
+  // Find out which EIM system q refers to
+  int function_index = q - theta_q_a_vector.size();
+  unsigned int system_index = 0;
+
+  if( function_index != 0)
+  {
+    for(system_index = 0; system_index<A_EIM_systems_vector.size(); system_index++)
+    {
+      unsigned int increment = A_EIM_systems_vector[system_index]->get_n_affine_functions();
+      if( (static_cast<int>(function_index - increment)) < 0)
+        break;
+    
+      function_index -= increment;
+    }
+  }
+  
+  std::pair<unsigned int, unsigned int> EIM_indices(system_index, function_index);
+  return EIM_indices;
 }
 
 template <class Base>
@@ -389,7 +465,8 @@ void RBBase<Base>::generate_training_parameters_random(const std::vector<bool> l
                                                        const unsigned int n_training_samples_in,
                                                        const std::vector<Real>& min_parameters,
                                                        const std::vector<Real>& max_parameters,
-						       int training_parameters_random_seed)
+						       int training_parameters_random_seed,
+						       bool serial_training_set)
 {
   libmesh_assert( min_parameters.size() == max_parameters.size() );
   const unsigned int num_params = min_parameters.size();
@@ -409,42 +486,68 @@ void RBBase<Base>::generate_training_parameters_random(const std::vector<bool> l
 
   if (training_parameters_random_seed < 0)
     {
-      // seed the random number generator with the system time
-      // and the processor ID so that the seed is different
-      // on different processors
-      std::srand( static_cast<unsigned>( std::time(0)*(1+libMesh::processor_id()) ));
+      
+      if(!serial_training_set)
+      {
+        // seed the random number generator with the system time
+        // and the processor ID so that the seed is different
+        // on different processors
+        std::srand( static_cast<unsigned>( std::time(0)*(1+libMesh::processor_id()) ));
+      }
+      else
+      {
+        // seed the random number generator with the system time
+        // only so that the seed is the same on all processors
+        std::srand( static_cast<unsigned>( std::time(0) ));
+      }
     }
   else
     {
-      // seed the random number generator with the provided value
-      // and the processor ID so that the seed is different
-      // on different processors
-      std::srand( static_cast<unsigned>( training_parameters_random_seed*(1+libMesh::processor_id()) ));
+      if(!serial_training_set)
+      {
+        // seed the random number generator with the provided value
+        // and the processor ID so that the seed is different
+        // on different processors
+        std::srand( static_cast<unsigned>( training_parameters_random_seed*(1+libMesh::processor_id()) ));
+      }
+      else
+      {
+        // seed the random number generator with the provided value
+        // so that the seed is the same on all processors
+        std::srand( static_cast<unsigned>( training_parameters_random_seed ));
+      }
     }
 
   
   // Initialize num_params NumericVectors
   training_parameters_in.resize(num_params);
 
-  // Calculate the number of training parameters local to this processor
-  unsigned int n_local_training_samples;
-  unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
-  unsigned int remainder = n_training_samples_in%libMesh::n_processors();
-  if(libMesh::processor_id() < remainder)
-    n_local_training_samples = (quotient + 1);
-  else
-    n_local_training_samples = quotient;
-
   for(unsigned int i=0; i<num_params; i++)
   {
     training_parameters_in[i] = NumericVector<Number>::build().release();
-    training_parameters_in[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+    if(!serial_training_set)
+    {
+      // Calculate the number of training parameters local to this processor
+      unsigned int n_local_training_samples;
+      unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
+      unsigned int remainder = n_training_samples_in%libMesh::n_processors();
+      if(libMesh::processor_id() < remainder)
+        n_local_training_samples = (quotient + 1);
+      else
+        n_local_training_samples = quotient;
+
+      training_parameters_in[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+    }
+    else
+    {
+      training_parameters_in[i]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+    }
   }
 
   for(unsigned int j=0; j<num_params; j++)
   {
     unsigned int first_index = training_parameters_in[j]->first_local_index();
-    for(unsigned int i=0; i<n_local_training_samples; i++)
+    for(unsigned int i=0; i<training_parameters_in[j]->local_size(); i++)
     {
       unsigned int index = first_index + i;
       Real random_number = ((double)std::rand())/RAND_MAX; // in range [0,1]
@@ -472,7 +575,8 @@ void RBBase<Base>::generate_training_parameters_deterministic(const std::vector<
                                                               std::vector< NumericVector<Number>* >& training_parameters_in,
                                                               const unsigned int n_training_samples_in,
                                                               const std::vector<Real>& min_parameters,
-                                                              const std::vector<Real>& max_parameters)
+                                                              const std::vector<Real>& max_parameters,
+                                                              bool serial_training_set)
 {
   libmesh_assert( min_parameters.size() == max_parameters.size() );
   const unsigned int num_params = min_parameters.size();
@@ -500,26 +604,33 @@ void RBBase<Base>::generate_training_parameters_deterministic(const std::vector<
   // Initialize num_params NumericVectors
   training_parameters_in.resize(num_params);
 
-  // Calculate the number of training parameters local to this processor
-  unsigned int n_local_training_samples;
-  unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
-  unsigned int remainder = n_training_samples_in%libMesh::n_processors();
-  if(libMesh::processor_id() < remainder)
-    n_local_training_samples = (quotient + 1);
-  else
-    n_local_training_samples = quotient;
-
   for(unsigned int i=0; i<num_params; i++)
   {
     training_parameters_in[i] = NumericVector<Number>::build().release();
-    training_parameters_in[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+    if(!serial_training_set)
+    {
+      // Calculate the number of training parameters local to this processor
+      unsigned int n_local_training_samples;
+      unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
+      unsigned int remainder = n_training_samples_in%libMesh::n_processors();
+      if(libMesh::processor_id() < remainder)
+        n_local_training_samples = (quotient + 1);
+      else
+        n_local_training_samples = quotient;
+
+      training_parameters_in[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+    }
+    else
+    {
+      training_parameters_in[i]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+    }
   }
 
 
   if(num_params == 1)
   {
     unsigned int first_index = training_parameters_in[0]->first_local_index();
-    for(unsigned int i=0; i<n_local_training_samples; i++)
+    for(unsigned int i=0; i<training_parameters_in[0]->local_size(); i++)
     {
       unsigned int index = first_index+i;
       if(log_param_scale[0])
