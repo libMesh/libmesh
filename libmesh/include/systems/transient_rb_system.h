@@ -133,11 +133,13 @@ public:
                                  NumericVector<Number>& arg);
 
   /**
+   * Resize all the RB matrices.
+   * Optionally perform the initial assembly of affine operators.
    * Overload to also recompute RB_ic_proj_rhs_all_N if 
    * get_n_basis_functions() > 0 so that we can continue
    * an offline computation.
    */
-  virtual void perform_initial_assembly();
+  virtual void initialize_RB_system(bool online_mode);
   
   /**
    * Get Q_m, the number of terms in the affine
@@ -273,14 +275,6 @@ public:
    * Dense matrices for the RB mass matrices.
    */
   std::vector< DenseMatrix<Number> > RB_M_q_vector;
-
-  /**
-   * The inner product matrix. This should be close to the identity,
-   * we need to calculate this rather than assume diagonality in order
-   * to accurately perform projections since orthogonality degrades
-   * with increasing N.
-   */
-  DenseMatrix<Number> RB_inner_product_matrix;
 
   /**
    * Vector storing initial L2 error for all

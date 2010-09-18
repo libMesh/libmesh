@@ -86,6 +86,12 @@ public:
    * Overloaded to also clear the C-dependent data.
    */
   virtual void clear_basis_function_dependent_data();
+  
+  /**
+   * Resize all the RB matrices.
+   * Optionally perform the initial assembly of affine operators.
+   */
+  virtual void initialize_RB_system(bool online_mode);
 
   /**
    * Attach user-defined assembly routine

@@ -48,6 +48,9 @@ namespace libMesh
  * @author David J. Knezevic, 2009
  */
 
+// Forward declare RBEIMSystem 
+class RBEIMSystem;
+
 /**
  * Typedef for theta_q function pointers, need a
  * typedef for the std::vector templating to work.
@@ -167,7 +170,18 @@ public:
    * Get Q_a, the number of terms in the affine
    * expansion for the bilinear form.
    */
-  virtual unsigned int get_Q_a() { return theta_q_a_vector.size(); }
+  virtual unsigned int get_Q_a() { return theta_q_a_vector.size() + get_n_A_EIM_operators(); }
+
+  /**
+   * Get the number of EIM systems that will provide operators on
+   * the "left-hand side" of the PDE.
+   */
+  unsigned int get_n_A_EIM_systems() const;
+  
+  /**
+   * Get the number of EIM LHS operators that are currently attached.
+   */
+  unsigned int get_n_A_EIM_operators() const;
 
   /**
    * Get/set current parameters.
@@ -195,19 +209,16 @@ public:
   virtual void attach_theta_q_a(theta_q_fptr theta_q_a);
 
   /**
-   * Return the specified function pointer for theta_q_a.
+   * Attach an EIM system which provides a set of affine
+   * functions based on empirical interpolation.
    */
-  theta_q_fptr get_theta_q_a_fptr(unsigned int q)
-  {
-    if(q >= get_Q_a())
-    {
-      std::cerr << "Error: We must have q < Q_a in get_theta_q_a_fptr."
-                << std::endl;
-      libmesh_error();
-    }
-
-    return theta_q_a_vector[q];
-  }
+  virtual void attach_A_EIM_system(RBEIMSystem* eim_system);
+  
+  /**
+   * @return a boolean to indicate whether the index q refers
+   * to an LHS EIM operator.
+   */
+  bool is_A_EIM_operator(unsigned int q);
 
   /**
    * Evaluate theta_q_a at the current parameter. Overload
@@ -317,7 +328,8 @@ protected:
                                                   const unsigned int n_training_samples_in,
                                                   const std::vector<Real>& min_parameters,
                                                   const std::vector<Real>& max_parameters,
-						  int training_parameters_random_seed=-1);
+						  int training_parameters_random_seed=-1,
+						  bool serial_training_set=false);
 
   /**
    * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
@@ -327,9 +339,25 @@ protected:
                                                          std::vector< NumericVector<Number>* >& training_parameters_in,
                                                          const unsigned int n_training_samples_in,
                                                          const std::vector<Real>& min_parameters,
-                                                         const std::vector<Real>& max_parameters);
+                                                         const std::vector<Real>& max_parameters,
+						         bool serial_training_set=false);
+
+  /**
+   * @return the EIM system and affine function indices associated with
+   * the LHS index q.
+   */
+  std::pair<unsigned int, unsigned int> get_A_EIM_indices(unsigned int q);
+
 
   //----------- PROTECTED DATA MEMBERS -----------//
+  
+  /**
+   * This boolean flag indicates whether or not the training set should
+   * be the same on all processors. By default it is false, but in the
+   * case of the Empirical Interpolation Method (RBEIMSystem), for example,
+   * we need the training set to be identical on all processors.
+   */
+  bool serial_training_set;
 
   /**
    * We keep an extra temporary vector that is useful for
@@ -367,6 +395,12 @@ protected:
    * Vector storing the function pointers to the theta_q.
    */
   std::vector<theta_q_fptr> theta_q_a_vector;
+  
+  /**
+   * Vector storing the EIM systems that provide additional affine operators
+   * on the "left-hand side" of the PDE.
+   */
+  std::vector< RBEIMSystem* > A_EIM_systems_vector;
   
 private:
 

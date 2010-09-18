@@ -197,6 +197,10 @@ void QNTransientRBSystem::init_data ()
   std::cout << "Nonlinear tolerance: " << nonlinear_tolerance << std::endl;
   std::cout << "Maximum number of Newton steps: " << n_newton_steps << std::endl;
   std::cout << std::endl;
+}
+
+void QNTransientRBSystem::initialize_RB_system(bool online_mode)
+{
 
   // Resize C_n_vector
   C_n_vector.resize(Nmax);
@@ -232,6 +236,8 @@ void QNTransientRBSystem::init_data ()
         C_n_vector[n]->init();
       }
   }
+  
+  Parent::initialize_RB_system(online_mode);
 
   // Initialize the N (i.e. RB) dependent data structures
 

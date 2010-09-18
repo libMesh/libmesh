@@ -159,7 +159,18 @@ public:
    * Get Q_f, the number of terms in the affine
    * expansion for the right-hand side.
    */
-  unsigned int get_Q_f() const { return theta_q_f_vector.size(); }
+  unsigned int get_Q_f() const { return theta_q_f_vector.size() + get_n_F_EIM_functions(); }
+
+  /**
+   * Get the number of EIM systems that will provide vectors on
+   * the "right-hand side" of the PDE.
+   */
+  unsigned int get_n_F_EIM_systems() const;
+
+  /**
+   * Get the number of EIM RHS functions that are currently attached.
+   */
+  unsigned int get_n_F_EIM_functions() const;
 
   /**
    * Get n_outputs, the number output functionals.
@@ -231,6 +242,16 @@ public:
   }
 
   /**
+   * Override attach_A_EIM_system to just throw an error. Should
+   * use attach_A_EIM_system in RBSystem and its subclasses.
+   */
+  virtual void attach_A_EIM_system(RBEIMSystem*)
+  {
+    std::cout << "Error: Cannot use attach_theta_q_a in RBSystem. Use attach_A_q instead." << std::endl;
+    libmesh_error();
+  }
+
+  /**
    * Attach parameter-dependent function and user-defined assembly routine
    * for affine operator (both interior and boundary assembly).
    */
@@ -245,6 +266,30 @@ public:
   void attach_F_q(theta_q_fptr theta_q_f,
                   affine_assembly_fptr F_q_intrr_assembly,
                   affine_assembly_fptr F_q_bdnry_assembly);
+
+  /**
+   * Attach an EIM system and a corresponding function pointers to
+   * specify the assembly operation. Together these will provide
+   * a set of LHS affine operators.
+   */
+  void attach_A_EIM_operators(RBEIMSystem* eim_system,
+                                affine_assembly_fptr EIM_intrr_assembly,
+                                affine_assembly_fptr EIM_bndry_assembly);
+  
+  /**
+   * Attach an EIM system and a corresponding function pointers to
+   * specify the assembly operation. Together these will provide
+   * a set of RHS affine functions.
+   */
+  void attach_F_EIM_vectors(RBEIMSystem* eim_system,
+                              affine_assembly_fptr EIM_intrr_assembly,
+                              affine_assembly_fptr EIM_bndry_assembly);
+
+  /**
+   * @return a boolean to indicate whether the index q refers
+   * to an RHS EIM operator.
+   */
+  bool is_F_EIM_function(unsigned int q);
 
   /**
    * Attach user-defined assembly routine
@@ -271,6 +316,25 @@ public:
    * Get a pointer to A_q.
    */
   SparseMatrix<Number>* get_A_q(unsigned int q);
+  
+  /**
+   * Get a reference to the specified LHS EIM system.
+   */
+  RBEIMSystem& get_A_EIM_system(unsigned int index);
+  
+  /**
+   * Get a reference to the specified RHS EIM system.
+   */
+  RBEIMSystem& get_F_EIM_system(unsigned int index);
+  
+  /**
+   * Evaluate the EIM function that is currently being employed
+   * for affine assembly.
+   * @return the function values at the \p qpoints, where qpoints
+   * are on \p element.
+   */
+  std::vector<Number> evaluate_current_EIM_function(Elem& element,
+                                                    const std::vector<Point>& qpoints);
 
   /**
    * Evaluate theta_q_f at the current parameter.
@@ -283,12 +347,13 @@ public:
   Number eval_theta_q_l(unsigned int output_index, unsigned int q_l);
 
   /**
-   * Assemble and store the Dirichlet dof lists, the
+   * Resize all the RB matrices.
+   * Optionally assemble and store the Dirichlet dof lists, the
    * affine and output vectors.
-   * Assemble and store all the affine matrices if we
+   * Optionally assemble and store all the affine matrices if we
    * are not in low-memory mode.
    */
-  virtual void perform_initial_assembly();
+  virtual void initialize_RB_system(bool online_mode);
 
   /**
    * Get a pointer to F_q.
@@ -375,6 +440,14 @@ public:
    * of the RB basis functions.
    */
   std::vector< NumericVector<Number>* > basis_functions;
+
+  /**
+   * The inner product matrix. This should be close to the identity,
+   * we need to calculate this rather than assume diagonality in order
+   * to accurately perform projections since orthogonality degrades
+   * with increasing N.
+   */
+  DenseMatrix<Number> RB_inner_product_matrix;
 
   /**
    * Dense matrices for the RB computations.
@@ -491,18 +564,17 @@ public:
    * boundaries.
    */
   bool impose_internal_fluxes;
+  
+  /**
+   * Boolean flag to indicate whether we compute the RB_inner_product_matrix
+   */
+  bool compute_RB_inner_product;
 
   /**
    * The filename of the text file from which we read in the
    * problem parameters. We use getpot.h to perform the reading.
    */
   std::string parameters_filename;
-
-  /**
-   * Defines extra quadrature order (can be positive or negative).
-   * Default value is 0.
-   */
-  int extra_quadrature_order;
   
   /**
    * Public member variable which we use to determine whether or
@@ -641,6 +713,12 @@ protected:
    * error and the index of the parameter that induces that error.
    */
   virtual Real compute_a_posteriori_bounds();
+  
+  /**
+   * This function returns the RB error bound for the current parameters and
+   * is used in the Greedy algorithm to select the next parameter.
+   */
+  virtual Real get_RB_error_bound() { return RB_solve(get_n_basis_functions()); }
 
   /**
    * Get the SCM lower bound at the current parameter value.
@@ -705,6 +783,12 @@ protected:
    * in the vector temp.
    */
   void zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp);
+  
+  /**
+   * @return the EIM system and affine function indices associated with
+   * the RHS index q.
+   */
+  std::pair<unsigned int, unsigned int> get_F_EIM_indices(unsigned int q);
 
 
   //----------- PROTECTED DATA MEMBERS -----------//
@@ -835,6 +919,26 @@ private:
    * Vector storing the function pointers to the theta_q_l (for the outputs).
    */
   std::vector< std::vector<theta_q_fptr> > theta_q_l_vector;
+  
+  /**
+   * Vector storing the EIM systems that provide additional affine functions
+   * on the "right-hand side" of the PDE.
+   */
+  std::vector< RBEIMSystem* > F_EIM_systems_vector;
+
+  /**
+   * Vector storing the function pointers to the assembly
+   * routines for the LHS EIM affine operators.
+   */
+  std::vector<affine_assembly_fptr> A_EIM_intrr_assembly_vector;
+  std::vector<affine_assembly_fptr> A_EIM_bndry_assembly_vector;
+
+  /**
+   * Vector storing the function pointers to the assembly
+   * routines for the RHS EIM affine operators.
+   */
+  std::vector<affine_assembly_fptr> F_EIM_intrr_assembly_vector;
+  std::vector<affine_assembly_fptr> F_EIM_bndry_assembly_vector;
 
   /**
    * Vector storing the Q_a matrices from the affine expansion
@@ -874,6 +978,14 @@ private:
    * Boolean flag to indicate whether the RBSystem has been initialized.
    */
   bool RB_system_initialized;
+  
+  /**
+   * Pointer to the current LHS or RHS EIM systems. This pointer
+   * is used during assembly routines in order to loop over the
+   * set of LHS and RHS EIM functions. The user can access the results
+   * of EIM function evaluation via evaluate_current_EIM_function.
+   */
+  RBEIMSystem* current_EIM_system;
 };
 
 } // namespace libMesh
