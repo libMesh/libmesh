@@ -30,7 +30,8 @@
 namespace libMesh
 {
 
-QNTransientRBParamSubdomainNode::QNTransientRBParamSubdomainNode(QNTransientRBParamSubdomainTree& tree, const std::vector<Real>& anchor)
+QNTransientRBParamSubdomainNode::QNTransientRBParamSubdomainNode(QNTransientRBParamSubdomainTree& tree,
+                                                                 const std::vector<Real>& anchor)
   : Parent(tree, anchor),
     _scm_system(tree._scm_system)
 {
@@ -39,7 +40,8 @@ QNTransientRBParamSubdomainNode::QNTransientRBParamSubdomainNode(QNTransientRBPa
 void QNTransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child c)
 {
   // cast the tree reference to a QNTransientRBParamSubdomainTree
-  QNTransientRBParamSubdomainTree& qn_tree = libmesh_cast_ref<QNTransientRBParamSubdomainTree&>(_tree);
+  QNTransientRBParamSubdomainTree& qn_tree =
+    libmesh_cast_ref<QNTransientRBParamSubdomainTree&>(_tree);
 
   if(c == LEFT)
   {

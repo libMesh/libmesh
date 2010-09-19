@@ -41,10 +41,7 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
     _rb_system(rb_system_in),
     h_tol(0.),
     p_tol(0.),
-    conserv_factor(-1.),
     N_bar(1),
-    use_delta_N_in_h_stage(false),
-    min_training_set_size(0),
     bbox_margin(0.),
     leaf_node_index(0)
 {
@@ -54,66 +51,12 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
   // Set hp-Greedy tolerances
   h_tol = infile("h_tol",h_tol);
   p_tol = infile("p_tol",p_tol);
-  conserv_factor = infile("conserv_factor",conserv_factor);
-  if(conserv_factor > 0.)
-    libmesh_assert(conserv_factor >= 1.);
 
   N_bar = infile("N_bar",N_bar);
   if(N_bar > _rb_system.get_Nmax())
   {
     std::cout << "Error: Cannot set N_bar larger than Nmax for an RBParamSubdomainTree."
               << std::endl;
-    libmesh_error();
-  }
-
-  // Set the boolean that indicates whether we use delta_N or the POD_tol
-  // in order to determine how many basis functions we add in the h-stage
-  // refinement for a time-dependent problem.
-  use_delta_N_in_h_stage = infile("use_delta_N_in_h_stage",use_delta_N_in_h_stage);
-
-  // If we have a TransientRBSystem, conserv_factor cannot be negative
-  TransientRBSystem* trans_rb_ptr = dynamic_cast<TransientRBSystem*>(&_rb_system);
-  if(trans_rb_ptr)
-  {
-    // Dynamic cast succeeded, hence we have a TransientRBSystem
-    if(conserv_factor < 0.)
-    {
-      std::cout << "Error: Cannot set conserv_factor < 0 in time-dependent problem."
-                << std::endl;
-      libmesh_error();
-    }
-  }
-  else
-  {
-    // conserv factor cannot be positive for a steady-state problem
-    if(conserv_factor > 0.)
-    {
-      std::cout << "Error: Cannot set conserv_factor > 0 in a steady-state problem."
-                << std::endl;
-      libmesh_error();
-    }
-
-    // use_delta_N_in_h_stage cannot be true for a steady-state problem
-    if(use_delta_N_in_h_stage)
-    {
-      std::cout << "Error: Cannot set use_delta_N_in_h_stage to true in a steady-state problem."
-                << std::endl;
-      libmesh_error();
-    }
-  }
-
-  // Set the size of refined training set on this processor to be
-  // double the size of local training set in _rb_system at the time
-  // that the RBParamSubdomainTree is constructed.
-  refined_training_set_size = 2*_rb_system.get_local_n_training_samples();
-
-  // Minimum size of the training set of an RBParamSubdomainNode
-  min_training_set_size = infile("min_training_set_size",min_training_set_size);
-
-  if(min_training_set_size > _rb_system.get_n_training_samples())
-  {
-    std::cout << "Error: The minimum training set size must be smaller than "
-              << "the number of points in the initial training set" << std::endl;
     libmesh_error();
   }
 
@@ -124,14 +67,6 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
   std::cout << "h_tol: " << h_tol << std::endl;
   std::cout << "p_tol: " << p_tol << std::endl;
   std::cout << "N_bar: " << N_bar << std::endl;
-  std::cout << "Conservativity factor: " << conserv_factor << std::endl;
-  std::cout << "Using delta_N in h-stage: " << use_delta_N_in_h_stage << std::endl;
-
-  // Sum local training set sizes for printing
-  unsigned int global_refined_training_set_size = refined_training_set_size;
-  Parallel::sum(global_refined_training_set_size);
-  std::cout << "Global size of training set after refinement: " << global_refined_training_set_size << std::endl;
-  std::cout << "Minimum global training set size after splitting: " << min_training_set_size << std::endl;
   std::cout << "Bounding-box margin fraction: " << bbox_margin << std::endl;
   std::cout << std::endl;
   
@@ -163,7 +98,7 @@ void RBParamSubdomainTree::hp_greedy()
 
   root_node->copy_training_set_from_system();
 
-  root_node->hp_greedy(h_tol, p_tol, N_bar, conserv_factor, use_delta_N_in_h_stage);
+  root_node->hp_greedy(h_tol, p_tol, N_bar);
 }
 
 RBParamSubdomainNode * RBParamSubdomainTree::determine_subdomain(const std::vector<Real>& new_param)
