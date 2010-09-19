@@ -252,10 +252,10 @@ Real RBEIMSystem::RB_solve(unsigned int N)
 
   // Compute the a posteriori error bound
   // First, sample the parametrized function at x_{N+1}
-  Real g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
+  Number g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
 
   // Next, evaluate the EIM approximation at x_{N+1}
-  Real EIM_approx_at_next_x = 0.;
+  Number EIM_approx_at_next_x = 0.;
   for(unsigned int j=0; j<N; j++)
     EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
       
@@ -323,7 +323,7 @@ void RBEIMSystem::enrich_RB_space()
   // the "EIM residual") has maximum absolute value
   // by looping over the mesh
   Point optimal_point;
-  Real optimal_value = 0.;
+  Number optimal_value = 0.;
   unsigned int optimal_var;
   
   // Compute truth representation via projection
@@ -361,25 +361,14 @@ void RBEIMSystem::enrich_RB_space()
     }
   }
   
-  Real global_min_value = optimal_value;
-  Parallel::min(global_min_value);
-  
-  Real global_max_value = optimal_value;
-  Parallel::max(global_max_value);
-  
-  // Set optimal value to be min_value or max_value depending on which
-  // has the larger absolute value
-  Real global_optimal_value = ( std::abs(global_max_value) >= std::abs(global_min_value) ) ?
-                                global_max_value : global_min_value;
-
-  // Scale the solution
-  solution->scale(1./global_optimal_value);
+  Real global_abs_value = std::abs(optimal_value);
+  Parallel::max(global_abs_value);
   
   // Find processors for which the Parallel::max operation
   // didn't change anything to identify which processor(s)
   // contained the optimal value
   unsigned int proc_ID_index;
-  if( global_optimal_value == optimal_value )
+  if( global_abs_value == std::abs(optimal_value) )
   {
     // Then this processor is one of the procs
     // that contains the maximum error
@@ -406,8 +395,12 @@ void RBEIMSystem::enrich_RB_space()
   optimal_point(0) = global_optimal_point[0];
   optimal_point(1) = global_optimal_point[1];
   optimal_point(2) = global_optimal_point[2];
-  // Also broadcast the corresponding optimal_var
+  // Also broadcast the corresponding optimal_var and optimal_value
   Parallel::broadcast(optimal_var, proc_ID_index);
+  Parallel::broadcast(optimal_value, proc_ID_index);
+
+  // Scale the solution
+  solution->scale(1./optimal_value);
 
   // Store optimal point in interpolation_points
   interpolation_points.push_back(optimal_point);
@@ -434,8 +427,6 @@ Real RBEIMSystem::compute_best_fit_error()
   // load the parametrized function into the solution vector
   truth_solve(-1);
 
-  Real best_fit_error;
-  
   switch(best_fit_type_flag)
   {
     case(PROJECTION_BEST_FIT):
@@ -474,11 +465,11 @@ Real RBEIMSystem::compute_best_fit_error()
     solution->add(-RB_solution(i), *basis_functions[i]);
   }
   inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
-  best_fit_error = std::sqrt( inner_product_storage_vector->dot(*solution) );
+  Number best_fit_error = std::sqrt( inner_product_storage_vector->dot(*solution) );
   
   STOP_LOG("compute_best_fit_error()", "RBEIMSystem");
   
-  return best_fit_error;
+  return libmesh_real(best_fit_error);
 }
 
 Real RBEIMSystem::truth_solve(int plot_solution)
@@ -788,7 +779,7 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   for(unsigned int i=0; i<=n_bfs; i++)
   {
-    Number x_val, y_val, z_val;
+    Real x_val, y_val, z_val;
     interpolation_points_in >> x_val;
     interpolation_points_in >> y_val;
     interpolation_points_in >> z_val;
