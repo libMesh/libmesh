@@ -951,9 +951,20 @@ GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) c
     newstring[i]=toupper(newstring[i]);
   }
   
+  // "true"/"True"/"TRUE" should work
   if (newstring.find("TRUE")!=std::string::npos)  return true;
   if (newstring.find("FALSE")!=std::string::npos) return false;
-  return Default;
+  
+  // And if we don't find that, let's search for an integer and use C unsigned
+  // int->bool conversion before giving up; i.e. a user could specify "0" for
+  // false or "1" for true
+  std::istringstream in_string(String);
+  unsigned int retval;
+  in_string >> retval;
+  if (in_string.fail())
+    return Default;
+
+  return retval;
 }
 
 inline const char*
