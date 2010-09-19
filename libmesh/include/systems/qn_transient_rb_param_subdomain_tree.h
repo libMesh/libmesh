@@ -27,13 +27,14 @@
 // available if SLEPc is defined.
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
-#include "rb_param_subdomain_tree.h"
+#include "transient_rb_param_subdomain_tree.h"
+#include "qn_transient_rb_param_subdomain_node.h"
 
 namespace libMesh
 {
 
 // Forward declaration
-class RBSystem;
+class TransientRBSystem;
 class QNTransientSCMSystem;
 
 /**
@@ -51,7 +52,7 @@ class QNTransientSCMSystem;
 // ------------------------------------------------------------
 // RBParamSubdomainTree class definition
 
-class QNTransientRBParamSubdomainTree : public RBParamSubdomainTree
+class QNTransientRBParamSubdomainTree : public TransientRBParamSubdomainTree
 {
 public:
 
@@ -59,19 +60,15 @@ public:
    * Constructor. Initializes required
    * data structures.
    */
-  QNTransientRBParamSubdomainTree (RBSystem& system,
+  QNTransientRBParamSubdomainTree
+                   (TransientRBSystem& system,
                     const std::string& parameters_filename,
                     QNTransientSCMSystem& scm_system);
 
   /**
-   * Destructor.
-   */
-  virtual ~QNTransientRBParamSubdomainTree() {}
-
-  /**
    * The type of the parent.
    */
-  typedef RBParamSubdomainTree Parent;
+  typedef TransientRBParamSubdomainTree Parent;
 
   /**
    * Build a QNTransientRBParamSubdomainNode. Overloaded virtual function.
@@ -79,8 +76,9 @@ public:
   virtual void build_root_node();
 
   /**
-   * Reference to the RBSystem that is used
-   * to actually perform the truth and RB solves.
+   * Reference to the SCM system that is used
+   * to actually perform SCM calculations on 
+   * each subdomain.
    */
   QNTransientSCMSystem & _scm_system;
 

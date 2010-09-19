@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -78,7 +78,7 @@ public:
    * subdivision of parameter space and builds the reduced basis
    * spaces on each subdomain.
    */
-  void hp_greedy(Real h_tol, Real p_tol, unsigned int N_bar, Real conserv_factor, bool use_delta_N_in_h_stage);
+  virtual void hp_greedy(Real h_tol, Real p_tol, unsigned int N_bar);
 
   /**
    * Split the current subdomain into two new subdomains.
@@ -88,11 +88,11 @@ public:
   void split_this_subdomain(bool h_stage_split);
 
   /**
-   * Virtual function that performs the p-stage of the HP greedy.
-   * Overload in subclass to perform extra functionality.
+   * This function performs the "p" stage of the "hp"
+   * greedy algorithm.
    */
-  virtual Real perform_p_stage(Real greedy_bound, Real p_tol, Real conserv_factor);
-  
+  virtual Real perform_p_stage(Real greedy_bound, Real p_tol);
+
   /**
    * Write out the offline data for the current subdomain. Overload
    * in subdomain in order to perform extra funcitonality, e.g.
@@ -183,6 +183,11 @@ public:
    * The anchor parameter value.
    */
   std::vector<Real> anchor;
+
+  /**
+   * The distance to the sibling subdomain anchor point
+   */
+  Real distance_between_anchors;
 
   /**
    * The set of training points for the parameter

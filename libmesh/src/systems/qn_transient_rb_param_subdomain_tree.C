@@ -25,18 +25,19 @@
 #include "qn_transient_rb_param_subdomain_tree.h"
 #include "qn_transient_rb_param_subdomain_node.h"
 #include "qn_transient_scm_system.h"
-#include "rb_system.h"
+#include "transient_rb_system.h"
 
 namespace libMesh
 {
 
+QNTransientRBParamSubdomainTree::QNTransientRBParamSubdomainTree
+                 (TransientRBSystem& system,
+                  const std::string& parameters_filename,
+                  QNTransientSCMSystem& scm_system)
+    : Parent(system, parameters_filename),
+      _scm_system(scm_system)
+  { }
 
-QNTransientRBParamSubdomainTree::QNTransientRBParamSubdomainTree(RBSystem& system,
-                    const std::string& parameters_filename,
-                    QNTransientSCMSystem& scm_system)
-  : Parent(system, parameters_filename),
-    _scm_system(scm_system)
-{ }
 
 void QNTransientRBParamSubdomainTree::build_root_node()
 {

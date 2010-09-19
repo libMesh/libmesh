@@ -111,7 +111,7 @@ template <class Base>
 void DerivedRBSystem<Base>::write_out_basis_functions(const std::string& directory_name,
                                                       const unsigned int precision_level)
 {
-  if(Base::store_basis_functions)
+  if( Base::store_basis_functions && (libMesh::processor_id() == 0) ) // Only write out on proc 0
   {
     std::cout << "Writing out the basis functions..." << std::endl;
 

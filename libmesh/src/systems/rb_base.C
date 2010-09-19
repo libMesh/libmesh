@@ -353,57 +353,13 @@ void RBBase<Base>::broadcast_current_parameters(unsigned int proc_id)
 template <class Base>
 void RBBase<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>& error_pair)
 {
-  Real max_global_error = error_pair.second;
-
-  // Debugging the Parallel::max timing stuff: add a barrier beforehand
-  // Parallel::barrier();
-
-  // Can't really use START/STOP_LOG macros, since this uses the global libmesh
-  // logging object, and this event will be paused internal to Parallel::max while
-  // its own timer is pushed and popped from the stack.
-  // START_LOG("Parallel::max()", "RBBase");
-  // STOP_LOG("Parallel::max()", "RBBase");
-
-  // Also, this function is static, so it can't use a data member.  Compiler says:
-  // error: a nonstatic member reference must be relative to a specific object
-  // this->pl.push("Parallel::max(max_global_error)");
-  // this->pl.pop("Parallel::max(max_global_error)");
-
-  {
-    //PerfLog pl("RBBase");
-//    pl.push("Parallel::max(max_global_error)");
-    Parallel::max(max_global_error);
-//    pl.pop("Parallel::max(max_global_error)");
-  }
-  
+  // Set error_pair.second to the maximum global value and also
+  // find which processor contains the maximum value
   unsigned int proc_ID_index;
-  // Find processors for which the Parallel::max operation
-  // didn't change anything
-  if( max_global_error == error_pair.second )
-  {
-    // Then this processor is one of the procs
-    // that contains the maximum error
-    proc_ID_index = libMesh::processor_id();
-  }
-  else
-  {
-    // This processor does not contain the maximum
-    // error, so set proc_ID_index to n_procs+1
-    // so it cannot be returned by the min operation
-    proc_ID_index = libMesh::n_processors() + 1;
-  }
-
-  // Find the processor with the minimum value
-  // of proc_ID_index, this uniquely defines
-  // one of the processors with the largest error
-  Parallel::min(proc_ID_index);
-  unsigned int global_error_index = error_pair.first;
-
-  // Broadcast the error and index!
-  Parallel::broadcast(global_error_index, proc_ID_index);
-
-  error_pair.first  = global_error_index;
-  error_pair.second = max_global_error;
+  Parallel::maxloc(error_pair.second, proc_ID_index);
+  
+  // Then broadcast error_pair.first from proc_ID_index
+  Parallel::broadcast(error_pair.first, proc_ID_index);
 }
 
 template <class Base>
