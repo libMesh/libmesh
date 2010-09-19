@@ -103,9 +103,28 @@ namespace Parallel
   inline data_type datatype();
 
   /**
+   * Templated function to return the appropriate MPI datatype
+   * for use with built-in C types when combined with an int
+   */
+  template <typename T>
+  inline data_type dataplusint_type();
+
+  /**
+   * Types combined with an int
+   */
+  template <typename T>
+  class DataPlusInt
+  {
+    public:
+      T val;
+      int rank;
+  };
+
+  /**
    * Accept from any source
    */
   const int any_source=MPI_ANY_SOURCE;
+
   
 #else
 
@@ -645,6 +664,26 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Take a local variable and replace it with the minimum of it's values
+   * on all processors
+   */
+  template <typename T>
+  inline void minloc(T &r,
+                     unsigned int &min_id,
+                     const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a vector of local variables and replace each entry with the minimum
+   * of it's values on all processors
+   */
+  template <typename T>
+  inline void minloc(std::vector<T> &r,
+                     std::vector<unsigned int> &min_id,
+                     const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
    * Take a local variable and replace it with the maximum of it's values
    * on all processors
    */
@@ -660,6 +699,27 @@ namespace Parallel
   template <typename T>
   inline void max(std::vector<T> &r,
                   const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a local variable and replace it with the maximum of it's values
+   * on all processors, returning the minimum rank of a processor
+   * which originally held the maximum value.
+   */
+  template <typename T>
+  inline void maxloc(T &r,
+                     unsigned int &max_id,
+                     const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Take a vector of local variables and replace each entry with the maximum
+   * of it's values on all processors
+   */
+  template <typename T>
+  inline void maxloc(std::vector<T> &r,
+                     std::vector<unsigned int> &r,
+                     const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1431,11 +1491,11 @@ namespace Parallel
   }
 
 #ifdef LIBMESH_HAVE_MPI
- template<>
- inline data_type datatype<char>() { return MPI_CHAR; }
+  template<>
+  inline data_type datatype<char>() { return MPI_CHAR; }
 
- template<>
- inline data_type datatype<unsigned char>() { return MPI_UNSIGNED_CHAR; }
+  template<>
+  inline data_type datatype<unsigned char>() { return MPI_UNSIGNED_CHAR; }
 
   template<>
   inline data_type datatype<short int>() { return MPI_SHORT; }
@@ -1463,6 +1523,24 @@ namespace Parallel
 
   template<>
   inline data_type datatype<long double>() { return MPI_LONG_DOUBLE; }
+
+  template<>
+  inline data_type dataplusint_type<short int>() { return MPI_SHORT_INT; }
+
+  template<>
+  inline data_type dataplusint_type<int>() { return MPI_2INT; }
+
+  template<>
+  inline data_type dataplusint_type<long>() { return MPI_LONG_INT; }
+
+  template<>
+  inline data_type dataplusint_type<float>() { return MPI_FLOAT_INT; }
+
+  template<>
+  inline data_type dataplusint_type<double>() { return MPI_DOUBLE_INT; }
+
+  template<>
+  inline data_type dataplusint_type<long double>() { return MPI_LONG_DOUBLE_INT; }
 
   template <typename T>
   inline bool verify(const T &r,
@@ -1589,6 +1667,140 @@ namespace Parallel
 
 
   template <typename T>
+  inline void minloc(T &r,
+                     unsigned int &min_id,
+                     const Communicator &comm)
+  {
+    if (comm.size() > 1)
+      {
+	START_LOG("minloc(scalar)", "Parallel");
+    
+	DataPlusInt<T> in;
+        in.val = r;
+        in.rank = comm.rank();
+	DataPlusInt<T> out;
+	MPI_Allreduce (&in,
+		       &out,
+		       1,
+		       dataplusint_type<T>(),
+		       MPI_MINLOC,
+		       comm.get());
+	r = out.val;
+        min_id = out.rank;
+
+	STOP_LOG("minloc(scalar)", "Parallel");
+      }
+    else
+      min_id = comm.rank();
+  }
+
+
+  template <>
+  inline void minloc(bool &r,
+                     unsigned int &min_id,
+                     const Communicator &comm)
+  {
+    if (comm.size() > 1)
+      {
+	START_LOG("minloc(bool)", "Parallel");
+    
+	DataPlusInt<int> in;
+        in.val = r;
+        in.rank = comm.rank();
+	DataPlusInt<int> out;
+	MPI_Allreduce (&in,
+		       &out,
+		       1,
+		       dataplusint_type<int>(),
+		       MPI_MINLOC,
+		       comm.get());
+	r = out.val;
+        min_id = out.rank;
+
+	STOP_LOG("minloc(bool)", "Parallel");
+      }
+    else
+      min_id = comm.rank();
+  }
+
+
+  template <typename T>
+  inline void minloc(std::vector<T> &r,
+                     std::vector<unsigned int> &min_id,
+                     const Communicator &comm)
+  {
+    if (comm.size() > 1 && !r.empty())
+      {
+	START_LOG("minloc(vector)", "Parallel");
+    
+	std::vector<DataPlusInt<T> > in(r.size());
+        for (unsigned int i=0; i != r.size(); ++i)
+          {
+            in[i].val  = r[i];
+            in[i].rank = comm.rank();
+          }
+	std::vector<DataPlusInt<T> > out(r.size());
+	MPI_Allreduce (&in[0],
+		       &out[0],
+		       r.size(),
+		       dataplusint_type<T>(),
+		       MPI_MINLOC,
+		       comm.get());
+        for (unsigned int i=0; i != r.size(); ++i)
+          {
+            r[i]      = out[i].val;
+            min_id[i] = out[i].rank;
+          }
+
+	STOP_LOG("minloc(vector)", "Parallel");
+      }
+    else if (!r.empty())
+      {
+        for (unsigned int i=0; i != r.size(); ++i)
+          min_id[i] = comm.rank();
+      }
+  }
+
+
+  template <>
+  inline void minloc(std::vector<bool> &r,
+                     std::vector<unsigned int> &min_id,
+                     const Communicator &comm)
+  {
+    if (comm.size() > 1 && !r.empty())
+      {
+	START_LOG("minloc(vector<bool>)", "Parallel");
+    
+	std::vector<DataPlusInt<int> > in(r.size());
+        for (unsigned int i=0; i != r.size(); ++i)
+          {
+            in[i].val  = r[i];
+            in[i].rank = comm.rank();
+          }
+	std::vector<DataPlusInt<int> > out(r.size());
+	MPI_Allreduce (&in[0],
+		       &out[0],
+		       r.size(),
+		       datatype<int>(),
+		       MPI_MINLOC,
+		       comm.get());
+        for (unsigned int i=0; i != r.size(); ++i)
+          {
+            r[i]      = out[i].val;
+            min_id[i] = out[i].rank;
+          }
+
+	STOP_LOG("minloc(vector<bool>)", "Parallel");
+      }
+    else if (!r.empty())
+      {
+        for (unsigned int i=0; i != r.size(); ++i)
+          min_id[i] = comm.rank();
+      }
+  }
+
+
+  template <typename T>
   inline void max(T &r,
                   const Communicator &comm)
   {
@@ -1674,6 +1886,140 @@ namespace Parallel
         unpack_vector_bool(temp, r);
 
 	STOP_LOG("max(vector<bool>)", "Parallel");
+      }
+  }
+
+
+  template <typename T>
+  inline void maxloc(T &r,
+                     unsigned int &max_id,
+                     const Communicator &comm)
+  {
+    if (comm.size() > 1)
+      {
+	START_LOG("maxloc(scalar)", "Parallel");
+    
+	DataPlusInt<T> in;
+        in.val = r;
+        in.rank = comm.rank();
+	DataPlusInt<T> out;
+	MPI_Allreduce (&in,
+		       &out,
+		       1,
+		       dataplusint_type<T>(),
+		       MPI_MAXLOC,
+		       comm.get());
+	r = out.val;
+        max_id = out.rank;
+
+	STOP_LOG("maxloc(scalar)", "Parallel");
+      }
+    else
+      max_id = comm.rank();
+  }
+
+
+  template <>
+  inline void maxloc(bool &r,
+                     unsigned int &max_id,
+                     const Communicator &comm)
+  {
+    if (comm.size() > 1)
+      {
+	START_LOG("maxloc(bool)", "Parallel");
+    
+	DataPlusInt<int> in;
+        in.val = r;
+        in.rank = comm.rank();
+	DataPlusInt<int> out;
+	MPI_Allreduce (&in,
+		       &out,
+		       1,
+		       dataplusint_type<int>(),
+		       MPI_MAXLOC,
+		       comm.get());
+	r = out.val;
+        max_id = out.rank;
+
+	STOP_LOG("maxloc(bool)", "Parallel");
+      }
+    else
+      max_id = comm.rank();
+  }
+
+
+  template <typename T>
+  inline void maxloc(std::vector<T> &r,
+                     std::vector<unsigned int> &max_id,
+                     const Communicator &comm)
+  {
+    if (comm.size() > 1 && !r.empty())
+      {
+	START_LOG("maxloc(vector)", "Parallel");
+    
+	std::vector<DataPlusInt<T> > in(r.size());
+        for (unsigned int i=0; i != r.size(); ++i)
+          {
+            in[i].val  = r[i];
+            in[i].rank = comm.rank();
+          }
+	std::vector<DataPlusInt<T> > out(r.size());
+	MPI_Allreduce (&in[0],
+		       &out[0],
+		       r.size(),
+		       dataplusint_type<T>(),
+		       MPI_MAXLOC,
+		       comm.get());
+        for (unsigned int i=0; i != r.size(); ++i)
+          {
+            r[i]      = out[i].val;
+            max_id[i] = out[i].rank;
+          }
+
+	STOP_LOG("maxloc(vector)", "Parallel");
+      }
+    else if (!r.empty())
+      {
+        for (unsigned int i=0; i != r.size(); ++i)
+          min_id[i] = comm.rank();
+      }
+  }
+
+
+  template <>
+  inline void maxloc(std::vector<bool> &r,
+                     std::vector<unsigned int> &max_id,
+                     const Communicator &comm)
+  {
+    if (comm.size() > 1 && !r.empty())
+      {
+	START_LOG("maxloc(vector<bool>)", "Parallel");
+    
+	std::vector<DataPlusInt<int> > in(r.size());
+        for (unsigned int i=0; i != r.size(); ++i)
+          {
+            in[i].val  = r[i];
+            in[i].rank = comm.rank();
+          }
+	std::vector<DataPlusInt<int> > out(r.size());
+	MPI_Allreduce (&in[0],
+		       &out[0],
+		       r.size(),
+		       datatype<int>(),
+		       MPI_MAXLOC,
+		       comm.get());
+        for (unsigned int i=0; i != r.size(); ++i)
+          {
+            r[i]      = out[i].val;
+            max_id[i] = out[i].rank;
+          }
+
+	STOP_LOG("maxloc(vector<bool>)", "Parallel");
+      }
+    else if (!r.empty())
+      {
+        for (unsigned int i=0; i != r.size(); ++i)
+          max_id[i] = comm.rank();
       }
   }
 
@@ -3066,10 +3412,24 @@ namespace Parallel
   inline void min(std::vector<T> &, const Communicator&) {}
 
   template <typename T>
+  inline void minloc(T &, unsigned int &min_id, const Communicator&) { min_id = 0; }
+
+  template <typename T>
+  inline void minloc(std::vector<T> &r, std::vector<unsigned int &min_id, const Communicator&)
+    { for (unsigned int i=0; i!= r.size(); ++i) min_id[i] = 0; }
+
+  template <typename T>
   inline void max(T &, const Communicator&) {}
 
   template <typename T>
   inline void max(std::vector<T> &, const Communicator&) {}
+
+  template <typename T>
+  inline void maxloc(T &, unsigned int &max_id, const Communicator&) { max_id = 0; }
+
+  template <typename T>
+  inline void maxloc(std::vector<T> &r, std::vector<unsigned int &max_id, const Communicator&)
+    { for (unsigned int i=0; i!= r.size(); ++i) max_id[i] = 0; }
 
   template <typename T>
   inline void sum(T &, const Communicator&) {}
