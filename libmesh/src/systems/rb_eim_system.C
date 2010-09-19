@@ -362,29 +362,9 @@ void RBEIMSystem::enrich_RB_space()
   }
   
   Real global_abs_value = std::abs(optimal_value);
-  Parallel::max(global_abs_value);
-  
-  // Find processors for which the Parallel::max operation
-  // didn't change anything to identify which processor(s)
-  // contained the optimal value
   unsigned int proc_ID_index;
-  if( global_abs_value == std::abs(optimal_value) )
-  {
-    // Then this processor is one of the procs
-    // that contains the maximum error
-    proc_ID_index = libMesh::processor_id();
-  }
-  else
-  {
-    // This processor does not contain the maximum
-    // error, so set proc_ID_index to n_procs+1
-    // so it cannot be returned by the min operation
-    proc_ID_index = libMesh::n_processors() + 1;
-  }
-
-  // Get the lowest rank processor that contains the optimal value
-  Parallel::min(proc_ID_index);
-
+  Parallel::maxloc(global_abs_value, proc_ID_index);
+  
   // Broadcast the optimal point from proc_ID_index
   // First need to store optimal_point as a vector
   std::vector<Real> global_optimal_point(3);
