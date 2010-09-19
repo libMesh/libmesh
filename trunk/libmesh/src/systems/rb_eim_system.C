@@ -35,6 +35,7 @@
 #include <fstream>
 #include <sstream>
 #include "o_string_stream.h"
+#include "gmv_io.h"
 
 #include "fem_context.h"
 #include "rb_eim_system.h"
@@ -294,9 +295,6 @@ void RBEIMSystem::enrich_RB_space()
 {
   START_LOG("enrich_RB_space()", "RBEIMSystem");
   
-  // load the parametrized function into solution
-  load_calN_parametrized_function();
-  
   // If we have at least one basis function we need to use
   // RB_solve, otherwise just use new_bf as is
   if(get_n_basis_functions() > 0)
@@ -434,7 +432,7 @@ Real RBEIMSystem::compute_best_fit_error()
   const unsigned int RB_size = get_n_basis_functions();
   
   // load the parametrized function into the solution vector
-  load_calN_parametrized_function();
+  truth_solve(-1);
 
   Real best_fit_error;
   
@@ -483,14 +481,14 @@ Real RBEIMSystem::compute_best_fit_error()
   return best_fit_error;
 }
 
-void RBEIMSystem::load_calN_parametrized_function()
+Real RBEIMSystem::truth_solve(int plot_solution)
 {
-  START_LOG("load_calN_parametrized_function()", "RBEIMSystem");
+  START_LOG("truth_solve()", "RBEIMSystem");
         
   if(!initialize_calN_dependent_data)
   {
     std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to compute best fit."
+              << "data structures in order to load the truth solution."
               << std::endl;
     libmesh_error();
   }
@@ -569,8 +567,17 @@ void RBEIMSystem::load_calN_parametrized_function()
                 << this->n_linear_iterations() << std::endl << std::endl;
 //     libmesh_error();
   }
+
+  if(plot_solution > 0)
+  {
+    const MeshBase& mesh = get_mesh();
+    GMVIO(mesh).write_equation_systems ("truth.gmv",
+                                        this->get_equation_systems());
+  }
   
-  STOP_LOG("load_calN_parametrized_function()", "RBEIMSystem");
+  STOP_LOG("truth_solve()", "RBEIMSystem");
+  
+  return 0.;
 }
 
 void RBEIMSystem::init_context(FEMContext &c)
