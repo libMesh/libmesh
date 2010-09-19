@@ -1981,7 +1981,7 @@ namespace Parallel
     else if (!r.empty())
       {
         for (unsigned int i=0; i != r.size(); ++i)
-          min_id[i] = comm.rank();
+          max_id[i] = comm.rank();
       }
   }
 
