@@ -85,10 +85,14 @@ public:
   virtual void initialize_RB_system(bool online_mode);
  
   /**
-   * truth_solve is no-op here, but needs to be defined so that
-   * we can reuse RBSystem::train_reduced_basis.
+   * Load the truth representation of the parametrized function
+   * at the current parameters into the solution vector.
+   * The truth representation is the projection of
+   * parametrized_function into the finite element space.
+   * If \p plot_solution > 0 the solution will be plotted
+   * to an output file.
    */
-  virtual Real truth_solve(int ) { return 0.; }
+  virtual Real truth_solve(int plot_solution);
   
   /**
    * Calculate the EIM approximation to parametrized_function
@@ -119,16 +123,7 @@ public:
    * relevant to the projection calculations in
    * load_calN_parametrized_function.
    */
-  virtual void init_context(FEMContext &c);
-
-  /**
-   * Load the truth representation of the parametrized function
-   * at the current parameters into the solution vector.
-   * The truth representation is the projection of
-   * parametrized_function into the finite element space.
-   */
-  void load_calN_parametrized_function();
-  
+  virtual void init_context(FEMContext &c);  
 
   /**
    * Override attach_theta_q_a to just throw an error. Should
