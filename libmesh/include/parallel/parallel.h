@@ -718,7 +718,7 @@ namespace Parallel
    */
   template <typename T>
   inline void maxloc(std::vector<T> &r,
-                     std::vector<unsigned int> &r,
+                     std::vector<unsigned int> &max_id,
                      const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
