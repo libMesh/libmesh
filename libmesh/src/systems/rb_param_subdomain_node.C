@@ -137,7 +137,7 @@ void RBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
     }
 }
 
-void RBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
+void RBParamSubdomainNode::split_this_subdomain(bool )
 {
     this->add_child( _rb_system.get_greedy_parameter(0), RBParamSubdomainNode::LEFT);
     this->add_child( _rb_system.get_greedy_parameter(1), RBParamSubdomainNode::RIGHT);
