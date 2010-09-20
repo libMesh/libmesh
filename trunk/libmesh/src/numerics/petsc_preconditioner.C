@@ -46,7 +46,8 @@ PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
   Vec x_vec = x_pvec.vec();
   Vec y_vec = y_pvec.vec();
 
-  PCApply(_pc,x_vec,y_vec);
+  int ierr = PCApply(_pc,x_vec,y_vec);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 template <typename T>
@@ -63,14 +64,18 @@ PetscPreconditioner<T>::init ()
   if(!this->_is_initialized)
   {
     //Create the preconditioning object
-    PCCreate(libMesh::COMM_WORLD,&_pc);
+    int ierr = PCCreate(libMesh::COMM_WORLD,&_pc);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
     //Set the PCType
     set_petsc_preconditioner_type(this->_preconditioner_type, _pc);
 
 #ifdef LIBMESH_HAVE_PETSC_HYPRE
     if(this->_preconditioner_type == AMG_PRECOND)
-      PCHYPRESetType(this->_pc, "boomeramg");
+      {
+	PCHYPRESetType(this->_pc, "boomeramg");
+	CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      }
 #endif
 
     PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
@@ -78,7 +83,8 @@ PetscPreconditioner<T>::init ()
     _mat = pmatrix->mat();
   }
   
-  PCSetOperators(_pc,_mat,_mat,SAME_NONZERO_PATTERN);
+  int ierr = PCSetOperators(_pc,_mat,_mat,SAME_NONZERO_PATTERN);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   this->_is_initialized = true;
 }
@@ -141,7 +147,10 @@ PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType 
 
   //Let the commandline override stuff
   if( preconditioner_type != AMG_PRECOND )
-    PCSetFromOptions(pc);
+    {
+      PCSetFromOptions(pc);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 }
 
 //------------------------------------------------------------------
