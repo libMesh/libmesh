@@ -29,9 +29,12 @@ headerfiles 	:= $(wildcard include/*/*.h)
 appsrcfiles	:= $(wildcard src/apps/*.C)
 
 #
-#
-# library source files
+# library C++ source files
 srcfiles 	:= $(filter-out $(appsrcfiles), $(wildcard src/*/*.C))
+
+#
+# library C source files
+csrcfiles 	:= $(filter-out $(appsrcfiles), $(wildcard src/*/*.c))
 
 #
 # examples source files
@@ -46,7 +49,7 @@ appbinfiles	:= $(patsubst %.C, %$(bin-suffix), $(addprefix bin/, $(notdir $(apps
 
 #
 # object files
-objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
+objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles)) $(patsubst %.c, %.$(obj-suffix), $(csrcfiles))
 
 #
 # logged files -- all files you might want to log information for
