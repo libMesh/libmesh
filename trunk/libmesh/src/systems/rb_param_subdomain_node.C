@@ -149,69 +149,19 @@ void RBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
     {
         distance_between_children_anchors += std::pow((left_child->anchor[i] - right_child->anchor[i]),2.);
     }
-    distance_between_anchors = std::sqrt(distance_between_anchors);
+    distance_between_children_anchors = std::sqrt(distance_between_children_anchors);
     left_child->distance_between_anchors = distance_between_children_anchors;
     right_child->distance_between_anchors = distance_between_children_anchors;
 
-
-    bool anchors_are_equal = (distance_between_anchors == 0.);
-
-    if (h_stage_split)
+    // Make sure that the anchor points of the children are different
+    if (distance_between_children_anchors == 0.)
     {
-        if (anchors_are_equal)
-        {
-            std::cout << "Error: Anchor points for children are equal!"
-                      << std::endl;
-            libmesh_error();
-        }
-    }
-    else
-    {
-        if (anchors_are_equal)
-        {
-            for (unsigned int i=2; i< _rb_system.greedy_param_list.size() ; i++)
-            {
-                bool parameters_are_equal = true;
-                for (unsigned int  j = 0; j < left_child->anchor.size(); j++)
-                {
-                    parameters_are_equal = ( parameters_are_equal && (left_child->anchor[j] == _rb_system.get_greedy_parameter(i)[j]));
-                }
-                if (!parameters_are_equal)
-                {
-                    right_child->anchor = _rb_system.get_greedy_parameter(i);
-                    anchors_are_equal = false;
-                    break;
-                }
-            }
-            
-            // anchors_are_equal has been updated, check if we have found different point.
-            if(anchors_are_equal) 
-            {
-                std::cout << "Error: Unable to find distinct anchors in additional splitting step." << std::endl;
-                libmesh_error();
-            }
-        }
-    }
-
-    this->initialize_child_training_sets();
-
-    if ( (left_child->n_global_training_parameters()  == 0) ||
-         (right_child->n_global_training_parameters() == 0) )
-    {
-        std::cout << "Error: Child training set is empty after initialization." << std::endl
-                  << "At least the training set should contain the anchor point!" << std::endl;
+        std::cout << "Error: Anchor points for children are equal!"
+                  << std::endl;
         libmesh_error();
     }
 
-    if (left_child->n_global_training_parameters() < this->n_global_training_parameters())
-    {
-        left_child->refine_training_set(this->n_local_training_parameters());
-    }
-
-    if (right_child->n_global_training_parameters() < this->n_global_training_parameters())
-    {
-        right_child->refine_training_set(this->n_local_training_parameters());
-    }
+    this->initialize_child_training_sets();
 }
 
 Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_tol)
@@ -334,6 +284,7 @@ void RBParamSubdomainNode::initialize_child_training_sets()
         right_child->training_set[i].clear();
     }
 
+    // Split this training set among the children
     for (unsigned int i=0; i<n_local_training_parameters(); i++)
     {
         std::vector<Real> next_param = get_local_training_parameter(i);
@@ -349,6 +300,27 @@ void RBParamSubdomainNode::initialize_child_training_sets()
             for (unsigned int i=0; i<next_param.size(); i++)
                 right_child->training_set[i].push_back(next_param[i]);
         }
+    }
+
+    // Make sure that each child has at least one training point
+    if ( (left_child->n_global_training_parameters()  == 0) ||
+         (right_child->n_global_training_parameters() == 0) )
+    {
+        std::cout << "Error: Child training set is empty after initialization." << std::endl
+                  << "At least the training set should contain the anchor point!" << std::endl;
+        libmesh_error();
+    }
+
+    // We generally also have to enrich each child's training set further in order to
+    // reach the specified number of training parameters
+    if (left_child->n_global_training_parameters() < this->n_global_training_parameters())
+    {
+        left_child->refine_training_set(this->n_local_training_parameters());
+    }
+
+    if (right_child->n_global_training_parameters() < this->n_global_training_parameters())
+    {
+        right_child->refine_training_set(this->n_local_training_parameters());
     }
 
     left_child->training_set_initialized  = true;

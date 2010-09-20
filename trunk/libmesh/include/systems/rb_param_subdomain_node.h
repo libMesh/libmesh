@@ -85,7 +85,7 @@ public:
    * The argument h_stage_split indicates whether or not
    * this is called during the h-stage or the p-stage.
    */
-  void split_this_subdomain(bool h_stage_split);
+  virtual void split_this_subdomain(bool h_stage_split);
 
   /**
    * This function performs the "p" stage of the "hp"
