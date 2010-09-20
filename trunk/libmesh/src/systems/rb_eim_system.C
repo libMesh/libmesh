@@ -140,6 +140,21 @@ void RBEIMSystem::initialize_RB_system(bool online_mode)
 #else
     current_ghosted_bf->init (this->n_dofs(), false, SERIAL);
 #endif
+
+  
+    // Load up the inner product matrix
+    // We only need one matrix in this class, so we
+    // can set matrix to inner_product_matrix here
+    if(!low_memory_mode)
+    {
+      matrix->zero();
+      matrix->add(1., *inner_product_matrix);
+    }
+    else
+    {
+      assemble_inner_product_matrix(matrix);
+    }
+
   }
 }
 
@@ -415,7 +430,14 @@ Real RBEIMSystem::compute_best_fit_error()
       DenseVector<Number> best_fit_rhs(RB_size);
       for(unsigned int i=0; i<RB_size; i++)
       {
-        inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+        if(!low_memory_mode)
+        {
+          inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+        }
+        else // In low memory mode we loaded the inner-product matrix into matrix during initialization
+        {
+          matrix->vector_mult(*inner_product_storage_vector, *solution);
+        }
         best_fit_rhs(i) = inner_product_storage_vector->dot(*basis_functions[i]);
       }
 
@@ -444,7 +466,14 @@ Real RBEIMSystem::compute_best_fit_error()
   {
     solution->add(-RB_solution(i), *basis_functions[i]);
   }
-  inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+  if(!low_memory_mode)
+  {
+    inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+  }
+  else  // In low memory mode we loaded the inner-product matrix into matrix during initialization
+  {
+    matrix->vector_mult(*inner_product_storage_vector, *solution);
+  }
   Number best_fit_error = std::sqrt( inner_product_storage_vector->dot(*solution) );
   
   STOP_LOG("compute_best_fit_error()", "RBEIMSystem");
@@ -464,16 +493,16 @@ Real RBEIMSystem::truth_solve(int plot_solution)
     libmesh_error();
   }
   
-  // Load up the inner product matrix
-  if(!low_memory_mode)
-  {
-    matrix->zero();
-    matrix->add(1., *inner_product_matrix);
-  }
-  else
-  {
-    assemble_inner_product_matrix(matrix);
-  }
+//  matrix should have been set to inner_product_matrix during initialization
+//  if(!low_memory_mode)
+//  {
+//    matrix->zero();
+//    matrix->add(1., *inner_product_matrix);
+//  }
+//  else
+//  {
+//    assemble_inner_product_matrix(matrix);
+//  }
 
   // Compute truth representation via projection
   const MeshBase& mesh = this->get_mesh();
@@ -526,6 +555,13 @@ Real RBEIMSystem::truth_solve(int plot_solution)
   solve();
   update(); // put the solution into current_local_solution as well in case we want to plot it
   solution->localize(*serialized_vector);
+  
+  if(reuse_preconditioner)
+  {
+    // After we've done a solve we can now reuse the preconditioner
+    // because the matrix is not changing
+    linear_solver->same_preconditioner = true;
+  }
   
   // Make sure we didn't max out the number of iterations
   if( (this->n_linear_iterations() >=
