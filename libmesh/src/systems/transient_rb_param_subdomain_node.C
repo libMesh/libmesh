@@ -174,4 +174,67 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_to
     return greedy_bound;
 }
 
+void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
+{
+    // These first few lines are the same as RBParamSubdomainNode::split_this_subdomain
+    this->add_child( _rb_system.get_greedy_parameter(0), RBParamSubdomainNode::LEFT);
+    this->add_child( _rb_system.get_greedy_parameter(1), RBParamSubdomainNode::RIGHT);
+
+    // Compute distance between the children anchor points, and pass to children (JLE 2010-09-16)
+    Real distance_between_children_anchors = 0.;
+    for (unsigned int i = 0; i < left_child->anchor.size(); i++)
+    {
+        distance_between_children_anchors += std::pow((left_child->anchor[i] - right_child->anchor[i]),2.);
+    }
+    distance_between_children_anchors = std::sqrt(distance_between_children_anchors);
+    left_child->distance_between_anchors = distance_between_children_anchors;
+    right_child->distance_between_anchors = distance_between_children_anchors;
+
+
+    // We now need some code specific to the transient case because it
+    // is possible that we have repeated selection of training points
+    // in the transient case (due to the POD-Greedy) and hence we
+    // may have distance_between_children_anchors == 0.
+    bool anchors_are_equal = (distance_between_children_anchors == 0.);
+
+    if (h_stage_split)
+    {
+        if (anchors_are_equal)
+        {
+            std::cout << "Error: Anchor points for children are equal!"
+                      << std::endl;
+            libmesh_error();
+        }
+    }
+    else
+    {
+        if (anchors_are_equal)
+        {
+            for (unsigned int i=2; i< _rb_system.greedy_param_list.size() ; i++)
+            {
+                bool parameters_are_equal = true;
+                for (unsigned int  j = 0; j < left_child->anchor.size(); j++)
+                {
+                    parameters_are_equal = ( parameters_are_equal && (left_child->anchor[j] == _rb_system.get_greedy_parameter(i)[j]));
+                }
+                if (!parameters_are_equal)
+                {
+                    right_child->anchor = _rb_system.get_greedy_parameter(i);
+                    anchors_are_equal = false;
+                    break;
+                }
+            }
+            
+            // anchors_are_equal has been updated, check if we have found different point.
+            if(anchors_are_equal) 
+            {
+                std::cout << "Error: Unable to find distinct anchors in additional splitting step." << std::endl;
+                libmesh_error();
+            }
+        }
+    }
+
+    this->initialize_child_training_sets();
+}
+
 } // namespace libMesh

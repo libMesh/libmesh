@@ -71,6 +71,17 @@ public:
   virtual void hp_greedy(Real h_tol, Real p_tol, unsigned int N_bar);
 
   /**
+   * Split the current subdomain into two new subdomains.
+   * The argument h_stage_split indicates whether or not
+   * this is called during the h-stage or the p-stage.
+   * Overloaded because we need specific behavior in case
+   * the POD-Greedy selected parameters more than once;
+   * need to be careful not to set the same anchor point
+   * in both child nodes.
+   */
+  virtual void split_this_subdomain(bool h_stage_split);
+
+  /**
    * This function performs the "p" stage of the "hp"
    * greedy algorithm.
    */
