@@ -50,7 +50,8 @@ RBEIMSystem::RBEIMSystem (EquationSystems& es,
     best_fit_type_flag(PROJECTION_BEST_FIT),
     mesh_function(NULL),
     performing_extra_greedy_step(false),
-    current_variable_number(0)
+    current_variable_number(0),
+    eval_error_estimate(false)
 {}
 
 RBEIMSystem::~RBEIMSystem ()
@@ -272,23 +273,27 @@ Real RBEIMSystem::RB_solve(unsigned int N)
   
   interpolation_matrix_N.lu_solve(EIM_rhs, RB_solution);
 
-  // Compute the a posteriori error bound
-  // First, sample the parametrized function at x_{N+1}
-  Number g_at_next_x;
-  if(N == get_n_basis_functions())
-    g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var, extra_interpolation_point);
-  else
-    g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
-
-  // Next, evaluate the EIM approximation at x_{N+1}
-  Number EIM_approx_at_next_x = 0.;
-  for(unsigned int j=0; j<N; j++)
+  Real error_estimate = -1.;
+  if(eval_error_estimate)
+  {
+    // Compute the a posteriori error bound
+    // First, sample the parametrized function at x_{N+1}
+    Number g_at_next_x;
     if(N == get_n_basis_functions())
-      EIM_approx_at_next_x += RB_solution(j) * extra_interpolation_matrix_row(j);
+      g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var, extra_interpolation_point);
     else
-      EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
+      g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
+
+    // Next, evaluate the EIM approximation at x_{N+1}
+    Number EIM_approx_at_next_x = 0.;
+    for(unsigned int j=0; j<N; j++)
+      if(N == get_n_basis_functions())
+        EIM_approx_at_next_x += RB_solution(j) * extra_interpolation_matrix_row(j);
+      else
+        EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
       
-  Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
+    error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
+  }
   
   STOP_LOG("RB_solve()", "RBEIMSystem");
   
@@ -472,7 +477,10 @@ Real RBEIMSystem::compute_best_fit_error()
     }
     case(EIM_BEST_FIT):
     {
+      // Turn off error estimation here, we use the linfty norm instead
+      eval_error_estimate = false;
       RB_solve(RB_size);
+      eval_error_estimate = true;
       break;
     }
     default:
@@ -487,19 +495,12 @@ Real RBEIMSystem::compute_best_fit_error()
   {
     solution->add(-RB_solution(i), *basis_functions[i]);
   }
-  if(!low_memory_mode)
-  {
-    inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
-  }
-  else  // In low memory mode we loaded the inner-product matrix into matrix during initialization
-  {
-    matrix->vector_mult(*inner_product_storage_vector, *solution);
-  }
-  Number best_fit_error = std::sqrt( inner_product_storage_vector->dot(*solution) );
+
+  Real best_fit_error = solution->linfty_norm();
   
   STOP_LOG("compute_best_fit_error()", "RBEIMSystem");
   
-  return libmesh_real(best_fit_error);
+  return best_fit_error;
 }
 
 Real RBEIMSystem::truth_solve(int plot_solution)

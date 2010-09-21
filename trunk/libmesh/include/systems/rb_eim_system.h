@@ -100,7 +100,7 @@ public:
    * solution coefficients in the member RB_solution.
    * @return the EIM a posteriori error bound.
    */
-  virtual Real RB_solve(unsigned int );
+  virtual Real RB_solve(unsigned int N);
   
   /**
    * Calculate the EIM approximation for the given
@@ -307,6 +307,13 @@ private:
    * in parallel.
    */
   AutoPtr< NumericVector<Number> > serialized_vector;
+  
+  /**
+   * This flag indicates whether or not we evaluate the error
+   * estimate in RB_solve. We need this to turn off error
+   * estimation during the Greedy algorithm.
+   */
+  bool eval_error_estimate;
 
 };
 
