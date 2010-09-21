@@ -47,6 +47,9 @@
 // _basic_ library functionality
 #include "libmesh_base.h"
 #include "libmesh_exceptions.h"
+extern "C" {
+#include "libmesh_C_isnan.h"
+}
 
 // Proxy class for libMesh::out/err output
 #include "ostream_proxy.h"
@@ -173,6 +176,15 @@ inline T libmesh_norm(std::complex<T> a) { return std::norm(a); }
 
 template<typename T>
 inline std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }
+
+// isnan isn't actually C++ standard yet; in contexts where it's not defined in
+// cmath, libmesh_isnan will just end up returning false.
+inline bool libmesh_isnan(float a) { return libmesh_C_isnan_float(a); }
+inline bool libmesh_isnan(double a) { return libmesh_C_isnan_double(a); }
+inline bool libmesh_isnan(long double a) { return libmesh_C_isnan_longdouble(a); }
+
+template <typename T>
+inline bool libmesh_isnan(std::complex<T> a) { return (libmesh_isnan(std::real(a)) || libmesh_isnan(std::imag(a))); }
 
 
 // Define the value type for unknowns in simulations.
