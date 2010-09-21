@@ -164,6 +164,12 @@ public:
    * this basis function.
    */
   void cache_ghosted_basis_function(unsigned int function_index);
+
+  /**
+   * Clear the basis functions and all basis-function-dependent data.
+   * Overload in subclasses to clear any extra data.
+   */
+  virtual void clear_basis_function_dependent_data();
   
   /**
    * Write out all the data to text files in order to segregate the
@@ -196,6 +202,20 @@ public:
    * the interpolation points were identified.
    */
   std::vector<unsigned int> interpolation_points_var;
+  
+  /**
+   * We also need an extra interpolation point and associated
+   * variable for the "extra" solve we do at the end of
+   * the Greedy algorithm.
+   */
+  Point extra_interpolation_point;
+  unsigned int extra_interpolation_point_var;
+  
+  /**
+   * We also need a DenseVector to represent the corresponding
+   * "extra" row of the interpolation matrix.
+   */
+  DenseVector<Number> extra_interpolation_matrix_row;
   
   /**
    * Enum that indicates which type of "best fit" algorithm

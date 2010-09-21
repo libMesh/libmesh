@@ -131,6 +131,7 @@ void RBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
             std::cout << "p tolerance satisfied, subdomain " << _tree.leaf_node_index << " is a leaf node..." << std::endl;
 
             // Finally, write out the data for this subdomain
+            this->model_number = _tree.leaf_node_index;
             write_subdomain_data_to_files();
             _tree.leaf_node_index++;
         }
