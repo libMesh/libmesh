@@ -116,7 +116,10 @@ void RBEIMSystem::initialize_RB_system(bool online_mode)
   // Resize the data structures relevant to the EIM system
   interpolation_points.clear();
   interpolation_points_var.clear();
-  interpolation_matrix.resize(Nmax+1,Nmax); // include an extra row due to the "extra Greedy step"
+  interpolation_matrix.resize(Nmax,Nmax);
+  
+  // Resize the "extra" row due to the "extra Greedy step"
+  extra_interpolation_matrix_row.resize(Nmax);
   
   if(initialize_calN_dependent_data)
   {
@@ -141,18 +144,20 @@ void RBEIMSystem::initialize_RB_system(bool online_mode)
     current_ghosted_bf->init (this->n_dofs(), false, SERIAL);
 #endif
 
-  
-    // Load up the inner product matrix
-    // We only need one matrix in this class, so we
-    // can set matrix to inner_product_matrix here
-    if(!low_memory_mode)
+    if(!online_mode)
     {
-      matrix->zero();
-      matrix->add(1., *inner_product_matrix);
-    }
-    else
-    {
-      assemble_inner_product_matrix(matrix);
+      // Load up the inner product matrix
+      // We only need one matrix in this class, so we
+      // can set matrix to inner_product_matrix here
+      if(!low_memory_mode)
+      {
+        matrix->zero();
+        matrix->add(1., *inner_product_matrix);
+      }
+      else
+      {
+        assemble_inner_product_matrix(matrix);
+      }
     }
 
   }
@@ -259,6 +264,8 @@ Real RBEIMSystem::RB_solve(unsigned int N)
   {
     EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i], interpolation_points[i]);
   }
+  
+  
 
   DenseMatrix<Number> interpolation_matrix_N;
   interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
@@ -267,12 +274,19 @@ Real RBEIMSystem::RB_solve(unsigned int N)
 
   // Compute the a posteriori error bound
   // First, sample the parametrized function at x_{N+1}
-  Number g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
+  Number g_at_next_x;
+  if(N == get_n_basis_functions())
+    g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var, extra_interpolation_point);
+  else
+    g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
 
   // Next, evaluate the EIM approximation at x_{N+1}
   Number EIM_approx_at_next_x = 0.;
   for(unsigned int j=0; j<N; j++)
-    EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
+    if(N == get_n_basis_functions())
+      EIM_approx_at_next_x += RB_solution(j) * extra_interpolation_matrix_row(j);
+    else
+      EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
       
   Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
   
@@ -333,6 +347,9 @@ void RBEIMSystem::enrich_RB_space()
       solution->add(-RB_solution(i), *basis_functions[i]);
     }
   }
+
+  // need to update since context uses current_local_solution
+  update();
 
   // Find the quadrature point at which solution (which now stores
   // the "EIM residual") has maximum absolute value
@@ -398,16 +415,20 @@ void RBEIMSystem::enrich_RB_space()
   solution->scale(1./optimal_value);
 
   // Store optimal point in interpolation_points
-  interpolation_points.push_back(optimal_point);
-  interpolation_points_var.push_back(optimal_var);
-
-  // Do not add the basis function associated with the "extra greedy step"
   if(!performing_extra_greedy_step)
   {
+    interpolation_points.push_back(optimal_point);
+    interpolation_points_var.push_back(optimal_var);
+
     NumericVector<Number>* new_bf = NumericVector<Number>::build().release();
     new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     *new_bf = *solution;
     basis_functions.push_back( new_bf );
+  }
+  else
+  {
+    extra_interpolation_point = optimal_point;
+    extra_interpolation_point_var = optimal_var;
   }
   
   STOP_LOG("enrich_RB_space()", "RBEIMSystem");
@@ -599,6 +620,14 @@ void RBEIMSystem::init_context(FEMContext &c)
   }
 }
 
+void RBEIMSystem::clear_basis_function_dependent_data()
+{
+  Parent::clear_basis_function_dependent_data();
+  
+  interpolation_points.clear();
+  interpolation_points_var.clear();
+}
+
 void RBEIMSystem::update_RB_system_matrices()
 {
   START_LOG("update_RB_system_matrices()", "RBEIMSystem");
@@ -610,15 +639,19 @@ void RBEIMSystem::update_RB_system_matrices()
   // update the EIM interpolation matrix
   for(unsigned int j=0; j<RB_size; j++)
   {
-    unsigned int row = performing_extra_greedy_step ? RB_size : (RB_size-1);
-    Point interp_point = interpolation_points[row];
-
     // Sample the basis functions at the
     // new interpolation point
     basis_functions[j]->localize(*serialized_vector);
-    interpolation_matrix(row,j) = (*mesh_function)(interp_point);
-  }
 
+    if(!performing_extra_greedy_step)
+    {
+      interpolation_matrix(RB_size-1,j) = (*mesh_function)(interpolation_points[RB_size-1]);
+    }
+    else
+    {
+      extra_interpolation_matrix_row(j) = (*mesh_function)(extra_interpolation_point);
+    }
+  }
 
   STOP_LOG("update_RB_system_matrices()", "RBEIMSystem");
 }
@@ -634,6 +667,7 @@ bool RBEIMSystem::greedy_termination_test(Real training_greedy_error, int)
   if(performing_extra_greedy_step)
   {
     std::cout << "Extra Greedy iteration finished." << std::endl;
+    performing_extra_greedy_step = false;
     return true;
   }
 
@@ -693,11 +727,24 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
           << interpolation_matrix(i,j) << " ";
       }
     }
-    // Finally, write out the last row
+    
+    // Also, write out the "extra" row
+    std::ofstream extra_interpolation_matrix_row_out;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/extra_interpolation_matrix_row.dat";
+      extra_interpolation_matrix_row_out.open(file_name.str().c_str());
+    }
+    if ( !extra_interpolation_matrix_row_out.good() )
+    {
+      std::cerr << "Error opening extra_interpolation_matrix_row.dat" << std::endl;
+      libmesh_error();
+    }
+    extra_interpolation_matrix_row_out.precision(precision_level);
     for(unsigned int j=0; j<n_bfs; j++)
-      interpolation_matrix_out << std::scientific
-          << interpolation_matrix(n_bfs,j) << " ";
-    interpolation_matrix_out.close();
+      extra_interpolation_matrix_row_out << std::scientific
+          << extra_interpolation_matrix_row(j) << " ";
+    extra_interpolation_matrix_row_out.close();
     
     // Next write out interpolation_points
     std::ofstream interpolation_points_out;
@@ -712,12 +759,30 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
       libmesh_error();
     }
     interpolation_points_out.precision(precision_level);
-    for(unsigned int i=0; i<=n_bfs; i++)
+    for(unsigned int i=0; i<n_bfs; i++)
       interpolation_points_out << std::scientific
           << interpolation_points[i](0) << " "
           << interpolation_points[i](1) << " "
           << interpolation_points[i](2) << " ";
-    interpolation_points_out.close();
+
+    // Also, write out the "extra" interpolation point
+    std::ofstream extra_interpolation_point_out;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/extra_interpolation_point.dat";
+      extra_interpolation_point_out.open(file_name.str().c_str());
+    }
+    if ( !extra_interpolation_point_out.good() )
+    {
+      std::cerr << "Error opening extra_interpolation_point.dat" << std::endl;
+      libmesh_error();
+    }
+    extra_interpolation_point_out.precision(precision_level);
+    extra_interpolation_point_out << std::scientific
+          << extra_interpolation_point(0) << " "
+          << extra_interpolation_point(1) << " "
+          << extra_interpolation_point(2) << " ";
+    extra_interpolation_point_out.close();
     
     // Next write out interpolation_points_var
     std::ofstream interpolation_points_var_out;
@@ -732,10 +797,26 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
       libmesh_error();
     }
     interpolation_points_var_out.precision(precision_level);
-    for(unsigned int i=0; i<=n_bfs; i++)
+    for(unsigned int i=0; i<n_bfs; i++)
       interpolation_points_var_out << std::scientific
           << interpolation_points_var[i] << " ";
-    interpolation_points_var_out.close();
+
+    // Also, write out the "extra" interpolation variable
+    std::ofstream extra_interpolation_point_var_out;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/extra_interpolation_point_var.dat";
+      extra_interpolation_point_var_out.open(file_name.str().c_str());
+    }
+    if ( !extra_interpolation_point_var_out.good() )
+    {
+      std::cerr << "Error opening extra_interpolation_point_var.dat" << std::endl;
+      libmesh_error();
+    }
+    extra_interpolation_point_var_out.precision(precision_level);
+    extra_interpolation_point_var_out << std::scientific
+          << extra_interpolation_point_var << " ";
+    extra_interpolation_point_var_out.close();
   }
 
   STOP_LOG("write_offline_data_to_files()", "RBEIMSystem");
@@ -772,14 +853,26 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
       interpolation_matrix(i,j) = value;
     }
   }
-  // Finally, read in the last row
+
+  // Also, read in the "extra" row
+  std::ifstream extra_interpolation_matrix_row_in;
+  {
+    OStringStream file_name;
+    file_name << directory_name << "/extra_interpolation_matrix_row.dat";
+    extra_interpolation_matrix_row_in.open(file_name.str().c_str());
+  }
+  if ( !extra_interpolation_matrix_row_in.good() )
+  {
+    std::cerr << "Error opening extra_interpolation_matrix_row.dat" << std::endl;
+    libmesh_error();
+  }
   for(unsigned int j=0; j<n_bfs; j++)
   {
     Number value;
-    interpolation_matrix_in >> value;
-    interpolation_matrix(n_bfs,j) = value;
+    extra_interpolation_matrix_row_in >> value;
+    extra_interpolation_matrix_row(j) = value;
   }
-  interpolation_matrix_in.close();
+  extra_interpolation_matrix_row_in.close();
 
   // Next read in interpolation_points
   std::ifstream interpolation_points_in;
@@ -793,7 +886,7 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
     std::cerr << "Error opening interpolation_points.dat" << std::endl;
     libmesh_error();
   }
-  for(unsigned int i=0; i<=n_bfs; i++)
+  for(unsigned int i=0; i<n_bfs; i++)
   {
     Real x_val, y_val, z_val;
     interpolation_points_in >> x_val;
@@ -803,6 +896,30 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
     interpolation_points.push_back(p);
   }
   interpolation_points_in.close();
+  
+  // Also, read in the extra interpolation point
+  std::ifstream extra_interpolation_point_in;
+  {
+    OStringStream file_name;
+    file_name << directory_name << "/extra_interpolation_point.dat";
+    extra_interpolation_point_in.open(file_name.str().c_str());
+  }
+  if ( !extra_interpolation_point_in.good() )
+  {
+    std::cerr << "Error opening extra_interpolation_point.dat" << std::endl;
+    libmesh_error();
+  }
+  for(unsigned int i=0; i<n_bfs; i++)
+  {
+    Real x_val, y_val, z_val;
+    extra_interpolation_point_in >> x_val;
+    extra_interpolation_point_in >> y_val;
+    extra_interpolation_point_in >> z_val;
+    Point p(x_val, y_val, z_val);
+    extra_interpolation_point = p;
+  }
+  extra_interpolation_point_in.close();
+  
 
   // Next read in interpolation_points_var
   std::ifstream interpolation_points_var_in;
@@ -823,6 +940,26 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
     interpolation_points_var.push_back(var);
   }
   interpolation_points_var_in.close();
+  
+  // Also, read in extra_interpolation_point_var
+  std::ifstream extra_interpolation_point_var_in;
+  {
+    OStringStream file_name;
+    file_name << directory_name << "/extra_interpolation_point_var.dat";
+    extra_interpolation_point_var_in.open(file_name.str().c_str());
+  }
+  if ( !extra_interpolation_point_var_in.good() )
+  {
+    std::cerr << "Error opening extra_interpolation_point_var.dat" << std::endl;
+    libmesh_error();
+  }
+  for(unsigned int i=0; i<=n_bfs; i++)
+  {
+    unsigned int var;
+    extra_interpolation_point_var_in >> var;
+    extra_interpolation_point_var = var;
+  }
+  extra_interpolation_point_var_in.close();
   
   STOP_LOG("read_offline_data_from_files()", "RBEIMSystem");
 }
