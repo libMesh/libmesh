@@ -18,8 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "cmath" // For isnan(), when it's defined
-
 #include "diff_system.h"
 #include "dof_map.h"
 #include "equation_systems.h"
@@ -61,11 +59,12 @@ Real NewtonSolver::line_search(Real tol,
 
   // Find bx, a step length that gives lower residual than ax or cx
   Real bx = 1.;
-  while (current_residual > last_residual)
+
+  while (libmesh_isnan(current_residual) || (current_residual > last_residual))
     {
       // Reduce step size to 1/2, 1/4, etc.
       Real substepdivision;
-      if (brent_line_search)
+      if (brent_line_search && !libmesh_isnan(current_residual))
         {
           substepdivision = std::min(0.5, last_residual/current_residual);
           substepdivision = std::max(substepdivision, tol*2.);
@@ -91,7 +90,8 @@ Real NewtonSolver::line_search(Real tol,
                   << current_residual << std::endl;
 
       if (bx/2. < minsteplength && 
-          current_residual > last_residual)
+          (libmesh_isnan(current_residual) || 
+           (current_residual > last_residual)))
         {
           libMesh::out << "Inexact Newton step FAILED at step "
                     << _outer_iterations << std::endl;
@@ -300,9 +300,7 @@ unsigned int NewtonSolver::solve()
       Real current_residual = rhs.l2_norm();
       last_residual = current_residual;
 
-// isnan() isn't standard C++ yet
-#ifdef isnan
-      if (isnan(current_residual))
+      if (libmesh_isnan(current_residual))
         {
           libMesh::out << "  Nonlinear solver DIVERGED at step " << last_residual
                         << " with norm Not-a-Number"
@@ -310,7 +308,6 @@ unsigned int NewtonSolver::solve()
           libmesh_convergence_failure();
           continue;
         }
-#endif // isnan
 
       max_residual_norm = std::max (current_residual,
                                     max_residual_norm);
