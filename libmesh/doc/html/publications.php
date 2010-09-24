@@ -204,7 +204,67 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010">1</a>]
+[<a name="Knezevic_2010b">1</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
+ Reduced basis approximation and a posteriori error estimation for
+  the parametrized unsteady Boussinesq equations.
+ <em>PREPRINT, Accepted in Mathematical Models and Methods in Applied
+  Sciences</em>, August 2010.
+ <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf</a>.
+<a name="Knezevic_2010b"></a><pre>
+@article{Knezevic_2010b,
+  author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
+  title = {{Reduced basis approximation and a posteriori 
+              error estimation for the parametrized unsteady 
+              Boussinesq equations}},
+  journal = {PREPRINT, Accepted in Mathematical Models and Methods in Applied Sciences},
+  month = aug,
+  year = 2010,
+  note = {\url{http://augustine.mit.edu/methodology/
+     papers/atp_M3AS_preprint_Nov09.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Huynh_2010">2</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
+ High-Fidelity Real-Time Simulation on Deployed Platforms.
+ <em>PREPRINT, Computers &amp; Fluids</em>, July 2010.
+ Special Issue: Proceedings of the Symposium on High Accuracy Flow
+  Simulations (HAFS), &Eacute;cole Polytechnique F&eacute;d&eacute;rale de Lausanne,
+  February 15-16, 2010,
+  DOI:&nbsp;<a href="http://dx.doi.org/10.1016/j.compfluid.2010.07.007">http://dx.doi.org/10.1016/j.compfluid.2010.07.007</a>.
+<a name="Huynh_2010"></a><pre>
+@article{Huynh_2010,
+  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and J.~W.~Peterson and A.~T.~Patera},
+  title = {{High-Fidelity Real-Time Simulation on Deployed Platforms}},
+  journal = {PREPRINT, Computers \& Fluids},
+  year = {2010},
+  month = jul,
+  note = {Special Issue: Proceedings of the Symposium on High Accuracy Flow Simulations (HAFS),
+    \'{E}cole Polytechnique F\'{e}d\'{e}rale de Lausanne, February 15--16, 2010,
+    DOI:~\url{http://dx.doi.org/10.1016/j.compfluid.2010.07.007}    }
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Berrone_2010">3</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone and M.&nbsp;Verani.
@@ -231,118 +291,7 @@ S.&nbsp;Berrone and M.&nbsp;Verani.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Pereira_2010">2</a>]
-</td>
-<td class="bibtexitem">
-F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
- Wavelet-based algebraic multigrid method using the lifting
-  technique.
- <em>Journal of Microwaves, Optoelectronics, and Electromagnetic
-  Applications</em>, 9(1):1-9, June 2010.
- <a href="http://www.sel.eesc.usp.br/jmo/issues/vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf">http://www.sel.eesc.usp.br/jmo/issues/vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf</a>.
-<a name="Pereira_2010"></a><pre>
-@article{Pereira_2010,
-  author = {F.~H.~Pereira and S.~I.~Nabeta},
-  title = {{Wavelet-based algebraic multigrid method using the lifting technique}},
-  journal = {Journal of Microwaves, Optoelectronics, and Electromagnetic Applications},
-  year = 2010,
-  volume = 9,
-  number = 1,
-  pages = {1--9},
-  note = {\url{http://www.sel.eesc.usp.br/jmo/issues/
-     vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf}},
-  month = jun
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Nagler_2010">3</a>]
-</td>
-<td class="bibtexitem">
-L.&nbsp;Nagler and M.&nbsp;Schanz.
- An extendable poroelastic plate formulation in dynamics.
- <em>EARLY VIEW, Archive of Applied Mechanics</em>, May 2010.
- <a href="http://dx.doi.org/10.1007/s00419-010-0429-4">http://dx.doi.org/10.1007/s00419-010-0429-4</a>.
-<a name="Nagler_2010"></a><pre>
-@article{Nagler_2010,
-  author = {L.~Nagler and M.~Schanz},
-  title = {{An extendable poroelastic plate formulation in dynamics}},
-  journal = {EARLY VIEW, Archive of Applied Mechanics},
-  year = 2010,
-  month = may,
-  note = {\url{http://dx.doi.org/10.1007/s00419-010-0429-4}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Brown_2010">4</a>]
-</td>
-<td class="bibtexitem">
-J.&nbsp;Brown.
- Efficient Nonlinear Solvers for Nodal High-Order Finite Elements in
-  3D.
- <em>EARLY VIEW, Journal of Scientific Computing</em>, 2010.
- <a href="http://dx.doi.org/10.1007/s10915-010-9396-8">http://dx.doi.org/10.1007/s10915-010-9396-8</a>.
-<a name="Brown_2010"></a><pre>
-@article{Brown_2010,
-  author = {J.~Brown},
-  title = {{Efficient Nonlinear Solvers for Nodal High-Order Finite Elements in 3D}},
-  journal = {EARLY VIEW, Journal of Scientific Computing},
-  year = 2010,
-  note = {\url{http://dx.doi.org/10.1007/s10915-010-9396-8}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Fuentes_2010">5</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
-  R.&nbsp;J. Stafford.
- Adaptive Real-Time Bioheat Transfer Models for Computer Driven
-  MR-guided Laser Induced Thermal Therapy.
- <em>EARLY VIEW, IEEE Trans. Biomed. Eng.</em>, 57(5), 2010.
- <a href="http://www.ncbi.nlm.nih.gov/pubmed/20142153">http://www.ncbi.nlm.nih.gov/pubmed/20142153</a>.
-<a name="Fuentes_2010"></a><pre>
-@article{Fuentes_2010,
-  author = {D.~Fuentes and Y.~Feng and A.~Elliott and A.~Shetty and
-   R.~J.~McNichols and J.~T.~Oden and R.~J.~Stafford},
-  title = {{Adaptive Real-Time Bioheat Transfer Models for
-   Computer Driven MR-guided Laser Induced Thermal Therapy}},
-  journal = {{EARLY VIEW, IEEE Trans. Biomed. Eng.}},
-  year = {2010},
-  volume = {57},
-  number = {5},
-  note = {\url{http://www.ncbi.nlm.nih.gov/pubmed/20142153}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Botti_2010b">6</a>]
+[<a name="Botti_2010b">4</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
@@ -368,36 +317,7 @@ L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2009b">7</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
- Reduced basis approximation and a posteriori error estimation for
-  the parametrized unsteady Boussinesq equations.
- <em>PREPRINT, Submitted to Mathematical Models and Methods in
-  Applied Sciences</em>, 2009.
- <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf</a>.
-<a name="Knezevic_2009b"></a><pre>
-@article{Knezevic_2009b,
-  author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
-  title = {{Reduced basis approximation and a posteriori 
-              error estimation for the parametrized unsteady 
-              Boussinesq equations}},
-  journal = {PREPRINT, Submitted to Mathematical Models and Methods in Applied Sciences},
-  year = 2009,
-  note = {\url{http://augustine.mit.edu/methodology/
-     papers/atp_M3AS_preprint_Nov09.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Kirk_2009b">8</a>]
+[<a name="Kirk_2009b">5</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -422,21 +342,21 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2010">9</a>]
+[<a name="Eftang_2010">6</a>]
 </td>
 <td class="bibtexitem">
-J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, A.&nbsp;T. Patera, and E.&nbsp;M. R&oslash;nquist.
+J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
  An <em>hp</em> Certified Reduced Basis Method for Parameterized Parabolic
   Partial Differential Equations.
  <em>PREPRINT, Mathematical and Computer Modelling of Dynamical
-  Systems</em>, submitted Apr 2010.
+  Systems</em>, revised July 2010.
  <a href="http://augustine.mit.edu/methodology/papers/atp_MCMDS_preprint_Apr2010.pdf">http://augustine.mit.edu/methodology/papers/atp_MCMDS_preprint_Apr2010.pdf</a>.
 <a name="Eftang_2010"></a><pre>
 @article{Eftang_2010,
-  author = {J.~L.~Eftang and D.~J.~Knezevic and A.~T.~Patera and E.~M.~R{\o}nquist},
+  author = {J.~L.~Eftang and D.~J.~Knezevic and A.~T.~Patera},
   title = {{An $hp$ Certified Reduced Basis Method for Parameterized Parabolic Partial Differential Equations}},
   journal = {PREPRINT, Mathematical and Computer Modelling of Dynamical Systems},
-  year = {submitted Apr 2010},
+  year = {revised July 2010},
   note = {\url{http://augustine.mit.edu/methodology/
      papers/atp_MCMDS_preprint_Apr2010.pdf}}
 }
@@ -449,7 +369,7 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, A.&nbsp;T. Patera, and E.&nbsp;M. R&osla
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010">10</a>]
+[<a name="Knezevic_2010">7</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
@@ -475,34 +395,7 @@ D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">11</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
- High-Fidelity Real-Time Simulation on Deployed Platforms.
- <em>PREPRINT, Computers &amp; Fluids</em>, submitted Apr 2010.
- Special Issue: Proceedings of the Symposium on High Accuracy Flow
-  Simulations (HAFS), &Eacute;cole Polytechnique F&eacute;d&eacute;rale de Lausanne,
-  February 15-16, 2010.
-<a name="Huynh_2010"></a><pre>
-@article{Huynh_2010,
-  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and J.~W.~Peterson and A.~T.~Patera},
-  title = {{High-Fidelity Real-Time Simulation on Deployed Platforms}},
-  journal = {PREPRINT, Computers \& Fluids},
-  year = {submitted Apr 2010},
-  note = {Special Issue: Proceedings of the Symposium on High Accuracy Flow Simulations (HAFS),
-    \'{E}cole Polytechnique F\'{e}d\'{e}rale de Lausanne, February 15--16, 2010}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Peterson_2010b">12</a>]
+[<a name="Peterson_2010b">8</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
@@ -538,7 +431,36 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lu_2010">1</a>]
+[<a name="Brown_2010">1</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;Brown.
+ Efficient Nonlinear Solvers for Nodal High-Order Finite Elements in
+  3D.
+ <em>Journal of Scientific Computing</em>, 45:48-63, October 2010.
+ <a href="http://dx.doi.org/10.1007/s10915-010-9396-8">http://dx.doi.org/10.1007/s10915-010-9396-8</a>.
+<a name="Brown_2010"></a><pre>
+@article{Brown_2010,
+  author = {J.~Brown},
+  title = {{Efficient Nonlinear Solvers for Nodal High-Order Finite Elements in 3D}},
+  journal = {Journal of Scientific Computing},
+  year = 2010,
+  volume = 45,
+  issue = {1--3},
+  month = oct,
+  pages = {48--63},
+  note = {\url{http://dx.doi.org/10.1007/s10915-010-9396-8}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Lu_2010">2</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E.&nbsp;M. Sevick-Muraca.
@@ -571,7 +493,38 @@ Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2010">2</a>]
+[<a name="Pereira_2010">3</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
+ Wavelet-based algebraic multigrid method using the lifting
+  technique.
+ <em>Journal of Microwaves, Optoelectronics, and Electromagnetic
+  Applications</em>, 9(1):1-9, June 2010.
+ <a href="http://www.sel.eesc.usp.br/jmo/issues/vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf">http://www.sel.eesc.usp.br/jmo/issues/vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf</a>.
+<a name="Pereira_2010"></a><pre>
+@article{Pereira_2010,
+  author = {F.~H.~Pereira and S.~I.~Nabeta},
+  title = {{Wavelet-based algebraic multigrid method using the lifting technique}},
+  journal = {Journal of Microwaves, Optoelectronics, and Electromagnetic Applications},
+  year = 2010,
+  volume = 9,
+  number = 1,
+  pages = {1--9},
+  note = {\url{http://www.sel.eesc.usp.br/jmo/issues/
+     vol_9/v9_n1/v9_n1_paper_pdf/regular/v9n1a1.pdf}},
+  month = jun
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kirk_2010">4</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
@@ -600,7 +553,68 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010a">3</a>]
+[<a name="Nagler_2010">5</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Nagler and M.&nbsp;Schanz.
+ An extendable poroelastic plate formulation in dynamics.
+ <em>Archive of Applied Mechanics</em>, 80:1177-1195, May 2010.
+ <a href="http://dx.doi.org/10.1007/s00419-010-0429-4">http://dx.doi.org/10.1007/s00419-010-0429-4</a>.
+<a name="Nagler_2010"></a><pre>
+@article{Nagler_2010,
+  author = {L.~Nagler and M.~Schanz},
+  title = {{An extendable poroelastic plate formulation in dynamics}},
+  journal = {Archive of Applied Mechanics},
+  year = 2010,
+  month = may,
+  volume = 80,
+  issue = 10,
+  month = oct,
+  pages = {1177--1195},
+  note = {\url{http://dx.doi.org/10.1007/s00419-010-0429-4}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fuentes_2010">6</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
+  R.&nbsp;J. Stafford.
+ Adaptive Real-Time Bioheat Transfer Models for Computer Driven
+  MR-guided Laser Induced Thermal Therapy.
+ <em>IEEE Trans. Biomed. Eng.</em>, 57(5):1024-1030, May 2010.
+ <a href="http://www.ncbi.nlm.nih.gov/pubmed/20142153">http://www.ncbi.nlm.nih.gov/pubmed/20142153</a>.
+<a name="Fuentes_2010"></a><pre>
+@article{Fuentes_2010,
+  author = {D.~Fuentes and Y.~Feng and A.~Elliott and A.~Shetty and
+   R.~J.~McNichols and J.~T.~Oden and R.~J.~Stafford},
+  title = {{Adaptive Real-Time Bioheat Transfer Models for
+   Computer Driven MR-guided Laser Induced Thermal Therapy}},
+  journal = {{IEEE Trans. Biomed. Eng.}},
+  year = {2010},
+  volume = {57},
+  number = {5},
+  month = may,
+  pages = {1024--1030},
+  note = {\url{http://www.ncbi.nlm.nih.gov/pubmed/20142153}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Berrone_2010a">7</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone.
@@ -631,7 +645,7 @@ estimates for finite element discretizations of parabolic equations}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2010">4</a>]
+[<a name="Zhu_2010">8</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
@@ -662,7 +676,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2010">5</a>]
+[<a name="Podgorney_2010">9</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
@@ -694,7 +708,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010a">6</a>]
+[<a name="Knezevic_2010a">10</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -724,7 +738,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhengyong_2010">7</a>]
+[<a name="Zhengyong_2010">11</a>]
 </td>
 <td class="bibtexitem">
 Z.&nbsp;Ren and J.&nbsp;Tang.
@@ -753,7 +767,7 @@ Z.&nbsp;Ren and J.&nbsp;Tang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2010">8</a>]
+[<a name="Carey_2010">12</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -783,7 +797,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010">9</a>]
+[<a name="Peterson_2010">13</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -813,7 +827,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010">10</a>]
+[<a name="Botti_2010">14</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
