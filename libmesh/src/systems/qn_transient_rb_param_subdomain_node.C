@@ -26,6 +26,7 @@
 #include "qn_transient_rb_param_subdomain_tree.h"
 #include "qn_transient_scm_system.h"
 #include "rb_system.h"
+#include "libmesh_logging.h"
 
 namespace libMesh
 {
@@ -39,6 +40,8 @@ QNTransientRBParamSubdomainNode::QNTransientRBParamSubdomainNode(QNTransientRBPa
 
 void QNTransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child c)
 {
+  START_LOG("add_child()", "QNTransientRBParamSubdomainNode");
+
   // cast the tree reference to a QNTransientRBParamSubdomainTree
   QNTransientRBParamSubdomainTree& qn_tree =
     libmesh_cast_ref<QNTransientRBParamSubdomainTree&>(_tree);
@@ -72,10 +75,14 @@ void QNTransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_anc
       right_child = new QNTransientRBParamSubdomainNode(qn_tree, new_anchor);
     }
   }
+
+  STOP_LOG("add_child()", "QNTransientRBParamSubdomainNode");
 }
 
 void QNTransientRBParamSubdomainNode::write_subdomain_data_to_files()
 {
+  START_LOG("write_subdomain_data_to_files()", "QNTransientRBParamSubdomainNode");
+
   RBParamSubdomainNode::write_subdomain_data_to_files();
   
   // Finally, perform the SCM stage on this subdomain
@@ -90,6 +97,8 @@ void QNTransientRBParamSubdomainNode::write_subdomain_data_to_files()
   dir_name_stream << "offline_data_hp" << _tree.leaf_node_index;
   const std::string& directory_name = dir_name_stream.str();
   _scm_system.write_offline_data_to_files(directory_name);
+
+  STOP_LOG("write_subdomain_data_to_files()", "QNTransientRBParamSubdomainNode");
 }
 
 } // namespace libMesh

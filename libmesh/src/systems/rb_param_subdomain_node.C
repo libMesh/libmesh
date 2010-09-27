@@ -21,6 +21,7 @@
 #include "rb_param_subdomain_tree.h"
 #include "rb_system.h"
 #include "parallel.h"
+#include "libmesh_logging.h"
 
 #include <ctime>
 
@@ -92,7 +93,18 @@ unsigned int RBParamSubdomainNode::n_global_training_parameters() const
 void RBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
 {
     _rb_system.clear_basis_function_dependent_data();
-    _rb_system.load_training_set( this->training_set );
+
+    // Load the (full or subsampled) training set
+    if(_tree.n_subsampled_training_points >= n_global_training_parameters())
+    {
+      _rb_system.load_training_set( training_set );
+    }
+    else
+    {
+      std::vector< std::vector<Number> > subsampled_training_set = get_subsampled_training_set();
+      _rb_system.load_training_set( subsampled_training_set );
+    }
+
     _rb_system.set_current_parameters( this->anchor );
     _rb_system.set_training_tolerance(h_tol);
 
@@ -140,22 +152,17 @@ void RBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
 
 void RBParamSubdomainNode::split_this_subdomain(bool )
 {
+    START_LOG("split_this_subdomain()", "RBParamSubdomainNode");
+
     this->add_child( _rb_system.get_greedy_parameter(0), RBParamSubdomainNode::LEFT);
     this->add_child( _rb_system.get_greedy_parameter(1), RBParamSubdomainNode::RIGHT);
 
-
-    // Compute distance between the children anchor points, and pass to children (JLE 2010-09-16)
-    Real distance_between_children_anchors = 0.;
-    for (unsigned int i = 0; i < left_child->anchor.size(); i++)
-    {
-        distance_between_children_anchors += std::pow((left_child->anchor[i] - right_child->anchor[i]),2.);
-    }
-    distance_between_children_anchors = std::sqrt(distance_between_children_anchors);
-    left_child->distance_between_anchors = distance_between_children_anchors;
-    right_child->distance_between_anchors = distance_between_children_anchors;
+    // Set the distance_between_anchors member of the children
+    left_child->distance_between_anchors = right_child->distance_between_anchors = 
+      distance(left_child->anchor, right_child->anchor);
 
     // Make sure that the anchor points of the children are different
-    if (distance_between_children_anchors == 0.)
+    if (left_child->distance_between_anchors == 0.)
     {
         std::cout << "Error: Anchor points for children are equal!"
                   << std::endl;
@@ -163,10 +170,14 @@ void RBParamSubdomainNode::split_this_subdomain(bool )
     }
 
     this->initialize_child_training_sets();
+
+    STOP_LOG("split_this_subdomain()", "RBParamSubdomainNode");
 }
 
 Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_tol)
 {
+    START_LOG("perform_p_stage()", "RBParamSubdomainNode");
+
     // Continue the greedy process on this subdomain, i.e.
     // we do not discard the basis functions generated for
     // this subdomain in the h-refinement phase
@@ -179,11 +190,15 @@ Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_tol)
         greedy_bound = _rb_system.train_reduced_basis();
     }
 
+    STOP_LOG("perform_p_stage()", "RBParamSubdomainNode");
+
     return greedy_bound;
 }
 
 void RBParamSubdomainNode::write_subdomain_data_to_files()
 {
+    START_LOG("write_subdomain_data_to_files()", "RBParamSubdomainNode");
+
     std::cout << "Writing out RB data for leaf subdomain "
               << _tree.leaf_node_index << std::endl;
 
@@ -191,10 +206,14 @@ void RBParamSubdomainNode::write_subdomain_data_to_files()
     dir_name_stream << "offline_data_hp" << _tree.leaf_node_index;
     const std::string& directory_name = dir_name_stream.str();
     _rb_system.write_offline_data_to_files(directory_name);
+
+    STOP_LOG("write_subdomain_data_to_files()", "RBParamSubdomainNode");
 }
 
 void RBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child c)
 {
+    START_LOG("add_child()", "RBParamSubdomainNode");
+
     if (c == LEFT)
     {
         if (left_child != NULL)
@@ -224,11 +243,14 @@ void RBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child 
             right_child = new RBParamSubdomainNode(_tree, new_anchor);
         }
     }
+
+    STOP_LOG("add_child()", "RBParamSubdomainNode");
 }
 
 
 void RBParamSubdomainNode::refine_training_set(const unsigned int new_local_training_set_size)
 {
+    START_LOG("refine_training_set()", "RBParamSubdomainNode");
 
     // seed the random number generator with the system time
     // and the processor ID so that the seed is different
@@ -262,14 +284,18 @@ void RBParamSubdomainNode::refine_training_set(const unsigned int new_local_trai
 //   // Print out the training sample
 //   for (unsigned int j=0; j <n_training_parameters(); j++)
 //     std :: cout << training_set[0][j] << " " << training_set[1][j] << std :: endl;
+
+    STOP_LOG("refine_training_set()", "RBParamSubdomainNode");
 }
 
 void RBParamSubdomainNode::initialize_child_training_sets()
 {
+    START_LOG("initialize_child_training_sets()", "RBParamSubdomainNode");
+    
     if ( (left_child == NULL) || (right_child == NULL) )
     {
         std::cout << "ERROR: Children cannot be NULL in initialize_child_training_sets()."
-        << std::endl;
+                  << std::endl;
         libmesh_error();
     }
 
@@ -311,60 +337,96 @@ void RBParamSubdomainNode::initialize_child_training_sets()
                   << "At least the training set should contain the anchor point!" << std::endl;
         libmesh_error();
     }
-
-    // We generally also have to enrich each child's training set further in order to
-    // reach the specified number of training parameters
-    if (left_child->n_global_training_parameters() < this->n_global_training_parameters())
+    
+    // Calculate the target number of local training samples. The global target
+    // is min(_tree.n_subsampled_training_points, n_global_training_parameters())
+    unsigned int target_n_local_training_samples;
+    if( _tree.n_subsampled_training_points >= n_global_training_parameters() )
     {
-        left_child->refine_training_set(this->n_local_training_parameters());
+        target_n_local_training_samples = this->n_local_training_parameters();
+    }
+    else
+    {
+        // Calculate the minimum number of training points that this processor must
+        // contain in order for this subdomain to have at least _tree.n_subsampled_training_points
+        // in total
+        unsigned int quotient  = _tree.n_subsampled_training_points/libMesh::n_processors();
+        unsigned int remainder = _tree.n_subsampled_training_points%libMesh::n_processors();
+        target_n_local_training_samples =
+          (libMesh::processor_id() < remainder) ? (quotient + 1) : quotient;
     }
 
-    if (right_child->n_global_training_parameters() < this->n_global_training_parameters())
+    // Finally, perform the actual training set refinement
+    if (left_child->n_local_training_parameters() < target_n_local_training_samples)
     {
-        right_child->refine_training_set(this->n_local_training_parameters());
+        left_child->refine_training_set(target_n_local_training_samples);
+    }
+
+    if (right_child->n_local_training_parameters() < target_n_local_training_samples)
+    {
+        right_child->refine_training_set(target_n_local_training_samples);
     }
 
     left_child->training_set_initialized  = true;
     right_child->training_set_initialized = true;
+
+    STOP_LOG("initialize_child_training_sets()", "RBParamSubdomainNode");
 }
 
 
 
 void RBParamSubdomainNode::copy_training_set_from_system()
 {
+    START_LOG("copy_training_set_from_system()", "RBParamSubdomainNode");
+    
     training_set.resize(_rb_system.get_n_params());
 
     for (unsigned int i=0; i<training_set.size(); i++)
-        _rb_system.training_parameters[i]->localize(training_set[i]);
+      for (unsigned int j=_rb_system.training_parameters[i]->first_local_index();
+                        j<_rb_system.training_parameters[i]->last_local_index();
+                        j++)
+        training_set[i].push_back( (*_rb_system.training_parameters[i])(j) );
 
     training_set_initialized = true;
+
+    STOP_LOG("copy_training_set_from_system()", "RBParamSubdomainNode");
 }
 
-Real RBParamSubdomainNode::dist_from_anchor(const std::vector<Real>& new_param) const
+Real RBParamSubdomainNode::distance(const std::vector<Real>& p1, const std::vector<Real>& p2) const
 {
-    if (new_param.size() != anchor.size())
+    START_LOG("distance()", "RBParamSubdomainNode");
+    
+    if (p1.size() != p2.size())
     {
-        std::cout << "Error: Input vector is of incorrect size in dist_from_anchor."
-        << std::endl;
+        std::cout << "Error: Input vectors must have the same size in RBParamSubdomain::distance."
+                  << std::endl;
         libmesh_error();
     }
 
     Real sum = 0.;
-    for (unsigned int i=0; i<anchor.size(); i++)
+    for (unsigned int i=0; i<p1.size(); i++)
     {
         // Map anchor[i] and new_param[i] to (0,1) before computing distance
         Real jacobian = _rb_system.get_parameter_max(i) - _rb_system.get_parameter_min(i);
-        Real anchor_mapped = (anchor[i] - _rb_system.get_parameter_min(i))/jacobian;
-        Real new_param_mapped = (new_param[i] - _rb_system.get_parameter_min(i))/jacobian;
-        sum += libmesh_norm(anchor_mapped - new_param_mapped);
-        //sum += std::pow((anchor[i] - new_param[i]), 2.);
+        Real p1_mapped = (p1[i] - _rb_system.get_parameter_min(i))/jacobian;
+        Real p2_mapped = (p2[i] - _rb_system.get_parameter_min(i))/jacobian;
+        sum += libmesh_norm(p1_mapped - p2_mapped);
     }
+    
+    STOP_LOG("distance()", "RBParamSubdomainNode");
 
     return std::sqrt(sum);
 }
 
+Real RBParamSubdomainNode::dist_from_anchor(const std::vector<Real>& new_param) const
+{
+    return distance(anchor, new_param);
+}
+
 std::vector<Real> RBParamSubdomainNode::get_local_training_parameter(unsigned int i)
 {
+    START_LOG("get_local_training_parameter()", "RBParamSubdomainNode");
+    
     if (i >= n_local_training_parameters())
     {
         std::cout << "Error: Argument is too large in get_training_parameter."
@@ -375,14 +437,14 @@ std::vector<Real> RBParamSubdomainNode::get_local_training_parameter(unsigned in
     for (unsigned int j=0; j<param.size(); j++)
         param[j] = libmesh_real(training_set[j][i]);
 
+    STOP_LOG("get_local_training_parameter()", "RBParamSubdomainNode");
+
     return param;
 }
 
 std::vector< std::vector<Real> > RBParamSubdomainNode::get_training_bbox()
 {
-    std::vector <Real> max_values(training_set.size());
-    std::vector <Real> min_values(training_set.size());
-    std::vector <Real> range(training_set.size());
+    START_LOG("get_training_bbox()", "RBParamSubdomainNode");
 
     std::vector <std::vector<Real> > corner_values(2);
     corner_values[0].resize(training_set.size());
@@ -390,27 +452,10 @@ std::vector< std::vector<Real> > RBParamSubdomainNode::get_training_bbox()
 
     for (unsigned int i=0; i<training_set.size(); i++)
     {
-        min_values[i] = libmesh_real(training_set[i][0]);
-        max_values[i] = libmesh_real(training_set[i][0]);
-    }
-
-    for (unsigned int i=0; i<training_set.size(); i++)
-    {
-        for (unsigned int j=1; j<training_set[0].size(); j++)
-        {
-            if (libmesh_real(training_set[i][j]) < min_values[i])
-                min_values[i] = libmesh_real(training_set[i][j]);
-
-            if (libmesh_real(training_set[i][j]) > max_values[i])
-                max_values[i] = libmesh_real(training_set[i][j]);
-        }
-    }
-
-    for (unsigned int i=0; i<training_set.size(); i++)
-    {
         corner_values[0][i] = anchor[i] - _tree.bbox_margin*this->distance_between_anchors;
         corner_values[1][i] = anchor[i] + _tree.bbox_margin*this->distance_between_anchors;
 
+        // Might have to set corner_values to the parameter domain boundaries
         if (corner_values[0][i] < _rb_system.get_parameter_min(i))
             corner_values[0][i] = _rb_system.get_parameter_min(i);
         if (corner_values[1][i] > _rb_system.get_parameter_max(i))
@@ -429,9 +474,50 @@ std::vector< std::vector<Real> > RBParamSubdomainNode::get_training_bbox()
     }
     libmesh_assert (!trivial_bbox);
 #endif
-    
+
+    STOP_LOG("get_training_bbox()", "RBParamSubdomainNode");
 
     return corner_values;
+}
+
+std::vector< std::vector<Number> > RBParamSubdomainNode::get_subsampled_training_set()
+{
+  START_LOG("get_subsampled_training_set()", "RBParamSubdomainNode");
+
+  // Return the full training set if the subsampled set size is big enough
+  if(_tree.n_subsampled_training_points >= n_global_training_parameters())
+  {
+    STOP_LOG("get_subsampled_training_set()", "RBParamSubdomainNode");
+    return training_set;
+  }
+  
+  // Otherwise, build a new set of size n_subsampled_training_points
+  unsigned int quotient  = _tree.n_subsampled_training_points/libMesh::n_processors();
+  unsigned int remainder = _tree.n_subsampled_training_points%libMesh::n_processors();
+  unsigned int target_n_local_training_samples =
+    (libMesh::processor_id() < remainder) ? (quotient + 1) : quotient;
+
+  // Seed the random number generator
+  std::srand((unsigned)( std::time(0)*(1+libMesh::processor_id()) ));
+  std::vector< std::vector<Number> > subsampled_training_set(anchor.size());
+  for(unsigned int i=0; i<subsampled_training_set.size(); i++)
+    subsampled_training_set[i].clear();
+  
+  // Now add the subsampled training points to the set
+  for(unsigned int i=0; i<target_n_local_training_samples; i++)
+  {
+    unsigned int random_index = std::rand() % n_local_training_parameters();
+    std::vector<Real> sample = get_local_training_parameter(random_index);
+
+    for (unsigned int j=0; j<subsampled_training_set.size(); j++)
+    {
+      subsampled_training_set[j].push_back( sample[j] );
+    }
+  }
+
+  STOP_LOG("get_subsampled_training_set()", "RBParamSubdomainNode");
+
+  return subsampled_training_set;
 }
 
 } // namespace libMesh

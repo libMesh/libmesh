@@ -127,27 +127,23 @@ public:
   Real conserv_factor;
 
   /**
-   * Number of basis functions during "h-type" stage
+   * Number of basis functions during "h-type" stage of the "hp-greedy".
+   * In particular, on each subdomain we perform the Greedy algorithm
+   * with Nmax <-- N_bar and if the h-tolerance is not satisfied we
+   * split that subdomain and repeat the process recursively.
    */
   unsigned int N_bar;
 
   /**
-   * Flag that indicates whether we use delta_N or the POD-tolerance
-   * to govern how many basis functions we add in a time-dependent
-   * hp-greedy.
+   * We will typically perform the hp-Greedy with a large number of
+   * training points associated with the root node of the tree and
+   * then split that training set up adaptively as we build the tree
+   * data structure. The variable n_subsampled_training_points indicates
+   * the number of training points that we subsample so that the Greedy
+   * associated with each subdomain is not burdened by an excessively
+   * large number of training points.
    */
-  bool use_delta_N_in_h_stage;
-
-  /**
-   * The number of training parameters in a subdomain's
-   * training set _after_ the initial call to refine_training_set.
-   */
-  unsigned int refined_training_set_size;
-
-  /**
-   * The minimum number of training parameters in an RBParamSubdomainNode training set.
-   */
-  unsigned int min_training_set_size;
+  unsigned int n_subsampled_training_points;
 
   /**
    * This value (between 0 and 1) defines an extra margin
