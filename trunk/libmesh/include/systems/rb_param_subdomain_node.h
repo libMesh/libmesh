@@ -106,6 +106,13 @@ public:
   unsigned int get_n_params() const { return anchor.size(); }
 
   /**
+   * Returns the "weighted Euclidean distance" between two points in the parameter
+   * domain. Each component of the each parameter is mapped to the interval
+   * (0,1) in order to compute an appropriately scaled distance.
+   */
+  Real distance(const std::vector<Real>& p1, const std::vector<Real>& p2) const;
+
+  /**
    * Returns the "weighted Euclidean distance" from the anchor point to
    * the input parameter. Each component of the anchor and new_param are mapped to
    * (0,1) before computing the distance.
@@ -161,6 +168,13 @@ public:
    */
   std::vector< std::vector<Real> > get_training_bbox();
 
+  /**
+   * Returns a new training set which is a random sample of
+   * _tree.n_subsampled_training_points from the training set.
+   * If the subsample size is greater than the training set size
+   * just return the full training set.
+   */
+  std::vector< std::vector<Number> > get_subsampled_training_set();
 
   /**
    * Pointers to the child RBParamSubdomainNodes.

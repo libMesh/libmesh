@@ -20,6 +20,7 @@
 #include "transient_rb_param_subdomain_node.h"
 #include "transient_rb_param_subdomain_tree.h"
 #include "transient_rb_system.h"
+#include "libmesh_logging.h"
 
 namespace libMesh
 {
@@ -31,6 +32,8 @@ TransientRBParamSubdomainNode::TransientRBParamSubdomainNode(TransientRBParamSub
 
 void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child c)
 {
+  START_LOG("add_child()", "TransientRBParamSubdomainNode");
+
   // cast the tree reference to a TransientRBParamSubdomainTree
   TransientRBParamSubdomainTree& trans_tree =
     libmesh_cast_ref<TransientRBParamSubdomainTree&>(_tree);
@@ -64,12 +67,25 @@ void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_ancho
       right_child = new TransientRBParamSubdomainNode(trans_tree, new_anchor);
     }
   }
+
+  STOP_LOG("add_child()", "TransientRBParamSubdomainNode");
 }
 
 void TransientRBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
 {
     _rb_system.clear_basis_function_dependent_data();
-    _rb_system.load_training_set( this->training_set );
+
+    // Load the (full or subsampled) training set
+    if(_tree.n_subsampled_training_points >= n_global_training_parameters())
+    {
+      _rb_system.load_training_set( training_set );
+    }
+    else
+    {
+      std::vector< std::vector<Number> > subsampled_training_set = get_subsampled_training_set();
+      _rb_system.load_training_set( subsampled_training_set );
+    }
+
     _rb_system.set_current_parameters( this->anchor );
     _rb_system.set_training_tolerance(h_tol);
 
@@ -149,6 +165,8 @@ void TransientRBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned i
 
 Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_tol)
 {
+    START_LOG("perform_p_stage()", "TransientRBParamSubdomainNode");
+    
     // Continue the greedy process on this subdomain, i.e.
     // we do not discard the basis functions generated for
     // this subdomain in the h-refinement phase
@@ -171,11 +189,15 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_to
         greedy_bound = _rb_system.train_reduced_basis();
     }
 
+    STOP_LOG("perform_p_stage()", "TransientRBParamSubdomainNode");
+
     return greedy_bound;
 }
 
 void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
 {
+    START_LOG("split_this_subdomain()", "TransientRBParamSubdomainNode");
+
     // These first few lines are the same as RBParamSubdomainNode::split_this_subdomain
     this->add_child( _rb_system.get_greedy_parameter(0), RBParamSubdomainNode::LEFT);
     this->add_child( _rb_system.get_greedy_parameter(1), RBParamSubdomainNode::RIGHT);
@@ -235,6 +257,8 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
     }
 
     this->initialize_child_training_sets();
+
+    STOP_LOG("split_this_subdomain()", "TransientRBParamSubdomainNode");
 }
 
 } // namespace libMesh

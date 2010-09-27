@@ -42,6 +42,7 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
     h_tol(0.),
     p_tol(0.),
     N_bar(1),
+    n_subsampled_training_points(0),
     bbox_margin(0.),
     leaf_node_index(0)
 {
@@ -59,15 +60,19 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
               << std::endl;
     libmesh_error();
   }
+  
+  // by default use all training points
+  n_subsampled_training_points = infile( "n_subsampled_training_points", _rb_system.get_n_training_samples() );
 
   // Set the subdomain bounding-box margin fraction
   bbox_margin = infile("bbox_margin",bbox_margin);
 
   std::cout << std::endl << "RBParamSubdomainTree parameters:" << std::endl;
-  std::cout << "h_tol: " << h_tol << std::endl;
-  std::cout << "p_tol: " << p_tol << std::endl;
-  std::cout << "N_bar: " << N_bar << std::endl;
-  std::cout << "Bounding-box margin fraction: " << bbox_margin << std::endl;
+  std::cout << "Tolerance for the h-stage (h_tol): " << h_tol << std::endl;
+  std::cout << "Tolerance for the p-stage (p_tol): " << p_tol << std::endl;
+  std::cout << "Nmax during h-stage (N_bar): " << N_bar << std::endl;
+  std::cout << "n_subsampled_training_points: " << n_subsampled_training_points << std::endl;
+  std::cout << "Bounding-box margin fraction for subdomain training set enrichment: " << bbox_margin << std::endl;
   std::cout << std::endl;
   
   // The rbOOmit code is still in a state of flux
@@ -91,6 +96,8 @@ void RBParamSubdomainTree::build_root_node()
 
 void RBParamSubdomainTree::hp_greedy()
 {
+  START_LOG("hp_greedy()", "RBParamSubdomainTree");
+
   // Build the root node rather than in the ctor
   // so we can use virtual function
   if(!root_node)
@@ -99,10 +106,14 @@ void RBParamSubdomainTree::hp_greedy()
   root_node->copy_training_set_from_system();
 
   root_node->hp_greedy(h_tol, p_tol, N_bar);
+
+  STOP_LOG("hp_greedy()", "RBParamSubdomainTree");
 }
 
 RBParamSubdomainNode * RBParamSubdomainTree::determine_subdomain(const std::vector<Real>& new_param)
 {
+  START_LOG("determine_subdomain()", "RBParamSubdomainTree");
+
   RBParamSubdomainNode * current_node = root_node;
 
   while ( (current_node->left_child != NULL) && (current_node->right_child != NULL) )
@@ -112,11 +123,16 @@ RBParamSubdomainNode * RBParamSubdomainTree::determine_subdomain(const std::vect
       else
 	current_node = current_node->right_child;
     }
+
+  STOP_LOG("determine_subdomain()", "RBParamSubdomainTree");
+
   return current_node;
 }
 
 void RBParamSubdomainTree::write_tree_data_to_file(const std::string& directory_name)
 {
+  START_LOG("write_tree_data_to_file()", "RBParamSubdomainTree");
+
   if(libMesh::processor_id() == 0)
     {
 
@@ -159,9 +175,13 @@ void RBParamSubdomainTree::write_tree_data_to_file(const std::string& directory_
 	tree_out.close();
       }
     }
+
+  STOP_LOG("write_tree_data_to_file()", "RBParamSubdomainTree");
 }
 
-void RBParamSubdomainTree::write_tree_data_to_file_recursively(RBParamSubdomainNode * current_node,  std::ofstream& stream, std::vector<int>& bool_vec)
+void RBParamSubdomainTree::write_tree_data_to_file_recursively(RBParamSubdomainNode * current_node,
+                                                               std::ofstream& stream,
+                                                               std::vector<int>& bool_vec)
 {
   if (current_node != NULL)
     {
@@ -199,6 +219,8 @@ void RBParamSubdomainTree::write_tree_data_to_file_recursively(RBParamSubdomainN
 
 void RBParamSubdomainTree::read_tree_data_from_file(const std::string& directory_name)
 {
+  START_LOG("read_tree_data_from_file()", "RBParamSubdomainTree");
+  
   std::cout << "Reading tree data from tree_data/tree.dat" << std::endl;
 
   // First, need to build a root node
@@ -217,10 +239,13 @@ void RBParamSubdomainTree::read_tree_data_from_file(const std::string& directory
   reconstruct_tree(root_node, tree_in);
   tree_in.close();
 
+  STOP_LOG("read_tree_data_from_file()", "RBParamSubdomainTree");
 }
 
 void RBParamSubdomainTree::reconstruct_tree(RBParamSubdomainNode * current_node,  std::ifstream& stream)
 {
+  START_LOG("reconstruct_tree()", "RBParamSubdomainTree");
+
  std::string bool_vec_string;
 
  stream >> bool_vec_string;
@@ -242,6 +267,8 @@ void RBParamSubdomainTree::reconstruct_tree(RBParamSubdomainNode * current_node,
     reconstruct_tree(current_node->left_child, stream);
     reconstruct_tree(current_node->right_child, stream);
    }
+
+  STOP_LOG("reconstruct_tree()", "RBParamSubdomainTree");
 }
 
 } // namespace libMesh
