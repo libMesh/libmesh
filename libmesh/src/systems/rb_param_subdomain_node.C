@@ -127,7 +127,7 @@ void RBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
         left_child->hp_greedy(h_tol,p_tol,Nbar);
         right_child->hp_greedy(h_tol,p_tol,Nbar);
     }
-    else // terminate branch, populate the model with standard p-type,write out subelement data
+    else // terminate branch, populate the model with standard p-type, write out subelement data
     {
         std::cout << "h tolerance satisfied, performing p-refinement..." << std::endl;
         greedy_bound = perform_p_stage(greedy_bound, p_tol);
@@ -324,6 +324,12 @@ void RBParamSubdomainNode::initialize_child_training_sets()
             for (unsigned int i=0; i<next_param.size(); i++)
                 right_child->training_set[i].push_back(next_param[i]);
         }
+    }
+    
+    // possibly clear the parent node's training set
+    if(_tree.clear_training_sets_during_hp)
+    {
+        clear_training_set();
     }
 
     // Make sure that each child has at least one training point
@@ -527,6 +533,18 @@ std::vector< std::vector<Number> > RBParamSubdomainNode::get_subsampled_training
   STOP_LOG("get_subsampled_training_set()", "RBParamSubdomainNode");
 
   return subsampled_training_set;
+}
+
+void RBParamSubdomainNode::clear_training_set()
+{
+  START_LOG("clear_training_set()", "RBParamSubdomainNode");
+
+  // Use the "swapping idiom" to clear the capacity of each
+  // vector in the training set.
+  for(unsigned int i=0; i<training_set.size(); i++)
+    std::vector<Number>().swap(training_set[i]);
+
+  STOP_LOG("clear_training_set()", "RBParamSubdomainNode");
 }
 
 } // namespace libMesh

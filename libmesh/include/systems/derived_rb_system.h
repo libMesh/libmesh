@@ -78,6 +78,15 @@ public:
   virtual Real truth_solve(int plot_solution);
   
   /**
+   * Set the uber_system's current_parameters to
+   * match unter_system's current_parameters. We
+   * require a virtual function here in case the
+   * unter system has fewer parameters than the uber
+   * system, for example.
+   */
+  virtual void set_uber_current_parameters();
+  
+  /**
    * Load the RB solution from the most recent solve
    * into the libMesh solution vector.
    */
