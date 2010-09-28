@@ -63,8 +63,10 @@ RBParamSubdomainNode::~RBParamSubdomainNode()
 
 bool RBParamSubdomainNode::operator== (const RBParamSubdomainNode& node) const
 {
+    START_LOG("operator==", "RBParamSubdomainNode");
+
     // We consider two RBParamSubdomainNodes to be equal if they have the
-    // same anchor and training set
+    // same model number, anchor and training set
 
     if (this->n_local_training_parameters() == node.n_local_training_parameters())
     {
@@ -73,8 +75,11 @@ bool RBParamSubdomainNode::operator== (const RBParamSubdomainNode& node) const
             for (unsigned int j=0; j<this->n_local_training_parameters(); j++)
                 equal = equal && (this->training_set[i][j] == node.training_set[i][j]);
 
-        return equal && (this->anchor == node.anchor);
+        STOP_LOG("operator==", "RBParamSubdomainNode");
+        return equal && (this->model_number == node.model_number) && (this->anchor == node.anchor);
     }
+
+    STOP_LOG("operator==", "RBParamSubdomainNode");
 
     return false;
 }
@@ -91,7 +96,7 @@ unsigned int RBParamSubdomainNode::n_global_training_parameters() const
     return global_training_set_size;
 }
 
-void RBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
+void RBParamSubdomainNode::hp_greedy()
 {
     _rb_system.clear_basis_function_dependent_data();
 
@@ -107,11 +112,11 @@ void RBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
     }
 
     _rb_system.set_current_parameters( this->anchor );
-    _rb_system.set_training_tolerance(h_tol);
+    _rb_system.set_training_tolerance(_tree.h_tol);
 
+    // Save _rb_system's Nmax and set Nmax to N_bar
     const unsigned int initial_Nmax = _rb_system.get_Nmax();
-    // Set Nmax to Nbar in the time-dependent case
-    _rb_system.set_Nmax(Nbar);
+    _rb_system.set_Nmax(_tree.N_bar);
 
     Real greedy_bound = _rb_system.train_reduced_basis();
 
@@ -119,25 +124,25 @@ void RBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
     _rb_system.set_Nmax(initial_Nmax);
 
 
-    if ( greedy_bound > h_tol) // recursive call to hp_greedy
+    if ( greedy_bound > _tree.h_tol) // recursive call to hp_greedy
     {
         std::cout << "h tolerance not satisfied, splitting subdomain..." << std::endl;
         split_this_subdomain(true);
 
-        left_child->hp_greedy(h_tol,p_tol,Nbar);
-        right_child->hp_greedy(h_tol,p_tol,Nbar);
+        left_child->hp_greedy();
+        right_child->hp_greedy();
     }
     else // terminate branch, populate the model with standard p-type, write out subelement data
     {
         std::cout << "h tolerance satisfied, performing p-refinement..." << std::endl;
-        greedy_bound = perform_p_stage(greedy_bound, p_tol);
-        if (greedy_bound > p_tol)
+        greedy_bound = perform_p_stage(greedy_bound);
+        if (greedy_bound > _tree.p_tol)
         {
             std::cout << "p tolerance not satisfied, splitting subdomain..." << std::endl;
             split_this_subdomain(false);
 
-            left_child->hp_greedy(h_tol,p_tol,Nbar);
-            right_child->hp_greedy(h_tol,p_tol,Nbar);
+            left_child->hp_greedy();
+            right_child->hp_greedy();
         }
         else
         {
@@ -175,18 +180,18 @@ void RBParamSubdomainNode::split_this_subdomain(bool )
     STOP_LOG("split_this_subdomain()", "RBParamSubdomainNode");
 }
 
-Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_tol)
+Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound)
 {
     START_LOG("perform_p_stage()", "RBParamSubdomainNode");
 
     // Continue the greedy process on this subdomain, i.e.
     // we do not discard the basis functions generated for
     // this subdomain in the h-refinement phase
-    _rb_system.set_training_tolerance(p_tol);
+    _rb_system.set_training_tolerance(_tree.p_tol);
 
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy
-    if ( (greedy_bound > p_tol) || (_rb_system.get_n_basis_functions() < _rb_system.get_Nmax()) )
+    if ( (greedy_bound > _tree.p_tol) || (_rb_system.get_n_basis_functions() < _rb_system.get_Nmax()) )
     {
         greedy_bound = _rb_system.train_reduced_basis();
     }
@@ -325,12 +330,6 @@ void RBParamSubdomainNode::initialize_child_training_sets()
                 right_child->training_set[i].push_back(next_param[i]);
         }
     }
-    
-    // possibly clear the parent node's training set
-    if(_tree.clear_training_sets_during_hp)
-    {
-        clear_training_set();
-    }
 
     // Make sure that each child has at least one training point
     if ( (left_child->n_global_training_parameters()  == 0) ||
@@ -370,6 +369,13 @@ void RBParamSubdomainNode::initialize_child_training_sets()
     if (right_child->n_local_training_parameters() < target_n_local_training_samples)
     {
         right_child->refine_training_set(target_n_local_training_samples);
+    }
+    
+    // possibly clear the parent node's training set once the children
+    // sets have been initialized
+    if(_tree.clear_training_sets_during_hp)
+    {
+        clear_training_set();
     }
 
     left_child->training_set_initialized  = true;

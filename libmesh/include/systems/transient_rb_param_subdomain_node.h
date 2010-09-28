@@ -68,7 +68,7 @@ public:
   /**
    * Recursive function that performs the "hp" greedy algorithm.
    */
-  virtual void hp_greedy(Real h_tol, Real p_tol, unsigned int N_bar);
+  virtual void hp_greedy();
 
   /**
    * Split the current subdomain into two new subdomains.
@@ -85,7 +85,7 @@ public:
    * This function performs the "p" stage of the "hp"
    * greedy algorithm.
    */
-  virtual Real perform_p_stage(Real greedy_bound, Real p_tol);
+  virtual Real perform_p_stage(Real greedy_bound);
 
 };
 

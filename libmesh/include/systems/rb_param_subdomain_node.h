@@ -78,7 +78,7 @@ public:
    * subdivision of parameter space and builds the reduced basis
    * spaces on each subdomain.
    */
-  virtual void hp_greedy(Real h_tol, Real p_tol, unsigned int N_bar);
+  virtual void hp_greedy();
 
   /**
    * Split the current subdomain into two new subdomains.
@@ -91,7 +91,7 @@ public:
    * This function performs the "p" stage of the "hp"
    * greedy algorithm.
    */
-  virtual Real perform_p_stage(Real greedy_bound, Real p_tol);
+  virtual Real perform_p_stage(Real greedy_bound);
 
   /**
    * Write out the offline data for the current subdomain. Overload
@@ -199,28 +199,41 @@ public:
   RBSystem& _rb_system;
 
   /**
-   * The anchor parameter value.
+   * The anchor parameter value. The anchor point is used
+   * in order to determine which subdomain a parameter 
+   * belongs to based on proximity. At each step in descending
+   * the tree data structure we go "left" or "right"
+   * depending on whether a given parameter value is closer
+   * to the left child's or right child's anchor point.
    */
   std::vector<Real> anchor;
 
   /**
-   * The distance to the sibling subdomain anchor point
+   * The distance to the sibling subdomain anchor point. This
+   * is used to construct an approximate bounding box around
+   * the subdomain when we wish to enrich a subdomain's training
+   * set.
    */
   Real distance_between_anchors;
 
   /**
    * The set of training points for the parameter
-   * subdomain corresponding to this node.
+   * subdomain corresponding to this node. We copy
+   * this training set to _rb_system in order to
+   * generate a reduced basis for this subdomain.
    */
   std::vector< std::vector<Number> > training_set;
 
   /**
-   * Number of model associated with node
+   * An index to identify "leaf nodes" of an hp-tree
+   * data structure. The leaf nodes must be distinguished
+   * from one another since they will be used for Online
+   * reduced basis calculations.
    */
   int model_number;
 
   /**
-   * Boolean flag to indicate whether the training
+   * Boolean flag to indicate whether or not the training
    * set has been initialized.
    */
   bool training_set_initialized;
