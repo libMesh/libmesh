@@ -106,7 +106,7 @@ void RBParamSubdomainTree::hp_greedy()
 
   root_node->copy_training_set_from_system();
 
-  root_node->hp_greedy(h_tol, p_tol, N_bar);
+  root_node->hp_greedy();
 
   STOP_LOG("hp_greedy()", "RBParamSubdomainTree");
 }

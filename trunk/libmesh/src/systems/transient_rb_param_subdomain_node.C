@@ -71,7 +71,7 @@ void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_ancho
   STOP_LOG("add_child()", "TransientRBParamSubdomainNode");
 }
 
-void TransientRBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned int Nbar)
+void TransientRBParamSubdomainNode::hp_greedy()
 {
     _rb_system.clear_basis_function_dependent_data();
 
@@ -87,7 +87,7 @@ void TransientRBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned i
     }
 
     _rb_system.set_current_parameters( this->anchor );
-    _rb_system.set_training_tolerance(h_tol);
+    _rb_system.set_training_tolerance(_tree.h_tol);
 
     Real greedy_bound;
 
@@ -97,12 +97,12 @@ void TransientRBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned i
 
     TransientRBSystem& trans_rb = libmesh_cast_ref<TransientRBSystem&>(_rb_system);
 
-    // Set the maximum number of truth solve to Nbar in the time-dependent case
-    trans_rb.set_max_truth_solves(Nbar);
+    // Set the maximum number of truth solves to N_bar in the time-dependent case
+    trans_rb.set_max_truth_solves(_tree.N_bar);
 
     if (!trans_tree.use_delta_N_in_h_stage)
     {
-        trans_rb.set_POD_tol(h_tol/trans_tree.conserv_factor);
+        trans_rb.set_POD_tol(_tree.h_tol/trans_tree.conserv_factor);
     }
     else
     {
@@ -119,7 +119,7 @@ void TransientRBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned i
 
     trans_rb.set_current_parameters(this->anchor);
     Real RB_error = trans_rb.RB_solve(trans_rb.get_n_basis_functions());
-    if (RB_error > h_tol/trans_tree.conserv_factor)
+    if (RB_error > _tree.h_tol/trans_tree.conserv_factor)
     {
         std::cout << "Error: The h-tolerance was not satisfied at the "
         << "anchor point hence h-type refinement may not converge."
@@ -130,25 +130,25 @@ void TransientRBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned i
 
 
 
-    if ( greedy_bound > h_tol) // recursive call to hp_greedy
+    if ( greedy_bound > _tree.h_tol) // recursive call to hp_greedy
     {
         std::cout << "h tolerance not satisfied, splitting subdomain..." << std::endl;
         split_this_subdomain(true);
 
-        left_child->hp_greedy(h_tol,p_tol,Nbar);
-        right_child->hp_greedy(h_tol,p_tol,Nbar);
+        left_child->hp_greedy();
+        right_child->hp_greedy();
     }
     else // terminate branch, populate the model with standard p-type,write out subelement data
     {
         std::cout << "h tolerance satisfied, performing p-refinement..." << std::endl;
-        greedy_bound = perform_p_stage(greedy_bound, p_tol);
-        if (greedy_bound > p_tol)
+        greedy_bound = perform_p_stage(greedy_bound);
+        if (greedy_bound > _tree.p_tol)
         {
             std::cout << "p tolerance not satisfied, splitting subdomain..." << std::endl;
             split_this_subdomain(false);
 
-            left_child->hp_greedy(h_tol,p_tol,Nbar);
-            right_child->hp_greedy(h_tol,p_tol,Nbar);
+            left_child->hp_greedy();
+            right_child->hp_greedy();
         }
         else
         {
@@ -163,14 +163,14 @@ void TransientRBParamSubdomainNode::hp_greedy(Real h_tol, Real p_tol, unsigned i
     }
 }
 
-Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_tol)
+Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound)
 {
     START_LOG("perform_p_stage()", "TransientRBParamSubdomainNode");
     
     // Continue the greedy process on this subdomain, i.e.
     // we do not discard the basis functions generated for
     // this subdomain in the h-refinement phase
-    _rb_system.set_training_tolerance(p_tol);
+    _rb_system.set_training_tolerance(_tree.p_tol);
 
     TransientRBSystem& trans_rb = libmesh_cast_ref<TransientRBSystem&>(_rb_system);
 
@@ -184,7 +184,7 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound, Real p_to
 
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy
-    if ( (greedy_bound > p_tol) || (_rb_system.get_n_basis_functions() < _rb_system.get_Nmax()) )
+    if ( (greedy_bound > _tree.p_tol) || (_rb_system.get_n_basis_functions() < _rb_system.get_Nmax()) )
     {
         greedy_bound = _rb_system.train_reduced_basis();
     }
