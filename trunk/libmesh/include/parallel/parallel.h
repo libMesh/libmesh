@@ -3415,7 +3415,7 @@ namespace Parallel
   inline void minloc(T &, unsigned int &min_id, const Communicator&) { min_id = 0; }
 
   template <typename T>
-  inline void minloc(std::vector<T> &r, std::vector<unsigned int &min_id, const Communicator&)
+  inline void minloc(std::vector<T> &r, std::vector<unsigned int> &min_id, const Communicator&)
     { for (unsigned int i=0; i!= r.size(); ++i) min_id[i] = 0; }
 
   template <typename T>
@@ -3428,7 +3428,7 @@ namespace Parallel
   inline void maxloc(T &, unsigned int &max_id, const Communicator&) { max_id = 0; }
 
   template <typename T>
-  inline void maxloc(std::vector<T> &r, std::vector<unsigned int &max_id, const Communicator&)
+  inline void maxloc(std::vector<T> &r, std::vector<unsigned int> &max_id, const Communicator&)
     { for (unsigned int i=0; i!= r.size(); ++i) max_id[i] = 0; }
 
   template <typename T>
