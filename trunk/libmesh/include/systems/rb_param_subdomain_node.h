@@ -175,6 +175,11 @@ public:
    * just return the full training set.
    */
   std::vector< std::vector<Number> > get_subsampled_training_set();
+  
+  /**
+   * Clear the training set associated with this subdomain.
+   */
+  void clear_training_set();
 
   /**
    * Pointers to the child RBParamSubdomainNodes.

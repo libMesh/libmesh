@@ -40,6 +40,16 @@ std::string DerivedRBSystem<Base>::system_type () const
   return "DerivedRBSystem";
 }
 
+
+template<class Base>
+void DerivedRBSystem<Base>::set_uber_current_parameters()
+{
+  EquationSystems& es = this->get_equation_systems();
+  RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
+
+  uber_system.set_current_parameters( Base::get_current_parameters() );
+}
+
 template <class Base>
 void DerivedRBSystem<Base>::generate_residual_terms_wrt_truth()
 {

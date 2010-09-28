@@ -18,7 +18,7 @@ Real DerivedRBSystem<RBSystem>::truth_solve(int plot_solution)
   EquationSystems& es = this->get_equation_systems();
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
 
-  uber_system.set_current_parameters( get_current_parameters() );
+  set_uber_current_parameters();
   
   uber_system.RB_solve(uber_system.get_n_basis_functions());
   
@@ -36,7 +36,6 @@ Real DerivedRBSystem<RBSystem>::truth_solve(int plot_solution)
   // Don't bother returning the norm of the uber solution
   return 0.;
 }
-
 
 template <>
 void DerivedRBSystem<RBSystem>::enrich_RB_space()

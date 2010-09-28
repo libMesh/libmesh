@@ -44,7 +44,8 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
     N_bar(1),
     n_subsampled_training_points(0),
     bbox_margin(0.),
-    leaf_node_index(0)
+    leaf_node_index(0),
+    clear_training_sets_during_hp(true)
 {
   // Read in properties from parameters_filename
   GetPot infile(parameters_filename);

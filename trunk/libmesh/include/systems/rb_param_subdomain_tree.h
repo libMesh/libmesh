@@ -157,6 +157,13 @@ public:
    * "leaf nodes"
    */
   int leaf_node_index;
+  
+  /**
+   * Boolean flag to indicate whether to clear the
+   * training set during the "hp" greedy algorithm
+   * once children subdomains have been initialized.
+   */
+  bool clear_training_sets_during_hp;
 
 };
 
