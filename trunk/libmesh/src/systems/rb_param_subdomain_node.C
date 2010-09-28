@@ -22,6 +22,7 @@
 #include "rb_system.h"
 #include "parallel.h"
 #include "libmesh_logging.h"
+#include "utility.h"
 
 #include <ctime>
 
@@ -43,7 +44,7 @@ RBParamSubdomainNode::RBParamSubdomainNode(RBParamSubdomainTree& tree_in,
     // Clear the training set to begin with
     training_set.resize(get_n_params());
     for (unsigned int i=0; i<get_n_params(); i++)
-        training_set[i].resize(0);
+        training_set[i].clear();
 }
 
 RBParamSubdomainNode::~RBParamSubdomainNode()
@@ -234,7 +235,7 @@ void RBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child 
         if (right_child != NULL)
         {
             std::cout << "Error: Child already exists!"
-            << std::endl;
+                      << std::endl;
             libmesh_error();
         }
         else
@@ -280,10 +281,6 @@ void RBParamSubdomainNode::refine_training_set(const unsigned int new_local_trai
                 training_set[i].push_back(random_point[i]);
         }
     }
-
-//   // Print out the training sample
-//   for (unsigned int j=0; j <n_training_parameters(); j++)
-//     std :: cout << training_set[0][j] << " " << training_set[1][j] << std :: endl;
 
     STOP_LOG("refine_training_set()", "RBParamSubdomainNode");
 }
@@ -340,6 +337,8 @@ void RBParamSubdomainNode::initialize_child_training_sets()
     
     // Calculate the target number of local training samples. The global target
     // is min(_tree.n_subsampled_training_points, n_global_training_parameters())
+    // since we just want to ignore n_subsampled_training_points if it is larger
+    // than the original training set
     unsigned int target_n_local_training_samples;
     if( _tree.n_subsampled_training_points >= n_global_training_parameters() )
     {
@@ -382,10 +381,13 @@ void RBParamSubdomainNode::copy_training_set_from_system()
     training_set.resize(_rb_system.get_n_params());
 
     for (unsigned int i=0; i<training_set.size(); i++)
+    {
+      training_set[i].clear();
       for (unsigned int j=_rb_system.training_parameters[i]->first_local_index();
                         j<_rb_system.training_parameters[i]->last_local_index();
                         j++)
         training_set[i].push_back( (*_rb_system.training_parameters[i])(j) );
+    }
 
     training_set_initialized = true;
 
@@ -430,7 +432,7 @@ std::vector<Real> RBParamSubdomainNode::get_local_training_parameter(unsigned in
     if (i >= n_local_training_parameters())
     {
         std::cout << "Error: Argument is too large in get_training_parameter."
-        << std::endl;
+                  << std::endl;
     }
 
     std::vector<Real> param(training_set.size());
@@ -503,11 +505,18 @@ std::vector< std::vector<Number> > RBParamSubdomainNode::get_subsampled_training
   for(unsigned int i=0; i<subsampled_training_set.size(); i++)
     subsampled_training_set[i].clear();
   
-  // Now add the subsampled training points to the set
-  for(unsigned int i=0; i<target_n_local_training_samples; i++)
+  // Create a vector of the local indices
+  std::vector<unsigned int> local_index_set( n_local_training_parameters() );
+  Utility::iota(local_index_set.begin(), local_index_set.end(), 0);
+
+  while(subsampled_training_set[0].size() < target_n_local_training_samples)
   {
-    unsigned int random_index = std::rand() % n_local_training_parameters();
+    unsigned int position = std::rand() % local_index_set.size();
+    unsigned int random_index = local_index_set[position];
+    
+    // Make sure that we don't add repeated parameters to subsampled_training_set
     std::vector<Real> sample = get_local_training_parameter(random_index);
+    local_index_set.erase(local_index_set.begin() + position);
 
     for (unsigned int j=0; j<subsampled_training_set.size(); j++)
     {
