@@ -62,7 +62,7 @@ for i in $inc_line_nums; do
   cat $1 | sed "${i}d" > $temp_file.C;
 
   # Attempt to compile $temp_file
-  g++ `libmesh-config --cxxflags --include` -c $temp_file.C &> /dev/null #$temp_file.log;
+  g++ `./libmesh-config --cxxflags --include` -c $temp_file.C &> /dev/null #$temp_file.log;
 
   # If an object file is successfully created, the compilation succeeds!
   if [ -f $temp_file.o ]; then
