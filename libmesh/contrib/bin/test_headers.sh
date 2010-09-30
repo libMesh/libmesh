@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/bin/bash
+
+# Note: script was /bin/sh but I don't think -n, -e are POSIX
+# arguments to echo
 
 headers_to_test=`ls ../../include/*/*.h`
 
@@ -26,7 +29,7 @@ errlog=test_headers.log
 
 for i in $headers_to_test; do
     header_name=`basename $i`
-    source_file=TestHeader_$header_name.cc
+    source_file=TestHeader_$header_name.C # Use .C here, take advantage of our make rule
     app_file=TestHeader_$header_name.o
 
     rm -f $source_file $app_file
@@ -35,7 +38,8 @@ for i in $headers_to_test; do
     echo "int main () { return 0; }" >> $source_file
 
     echo -n "Testing Header File $header_name ... "
-        
+
+	# Use make -s for silent operation
     if make -s -C ../.. contrib/bin/$app_file 2> $errlog; then
 	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
     else
