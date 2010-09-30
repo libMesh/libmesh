@@ -24,10 +24,12 @@
 #define __fem_context_h__
 
 // C++ includes
+#include <map>
 
 // Local Includes
 #include "diff_context.h"
 #include "vector_value.h"
+#include "fe_type.h"
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "tensor_value.h"
@@ -36,11 +38,12 @@
 namespace libMesh
 {
 
-// Forward Declarations
-class Elem;
-class FEBase;
-class QBase;
-template <typename T> class NumericVector;
+  // Forward Declarations
+  class Elem;
+  class FEBase;
+  class QBase;
+  class Point;
+  template <typename T> class NumericVector;
 
 /**
  * This class provides all data required for a physics package
