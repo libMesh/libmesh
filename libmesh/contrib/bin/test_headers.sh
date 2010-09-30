@@ -3,7 +3,11 @@
 # Note: script was /bin/sh but I don't think -n, -e are POSIX
 # arguments to echo
 
-headers_to_test=`ls ../../include/*/*.h`
+if [ "x$LIBMESH_DIR" = x ]; then
+  export LIBMESH_DIR=../..
+fi
+
+headers_to_test=`ls $LIBMESH_DIR/include/*/*.h`
 
 if test $# -ge 1; then
     headers_to_test=$*
@@ -29,8 +33,10 @@ errlog=test_headers.log
 
 for i in $headers_to_test; do
     header_name=`basename $i`
-    source_file=TestHeader_$header_name.C # Use .C here, take advantage of our make rule
-    app_file=TestHeader_$header_name.o
+    source_name=TestHeader_$header_name.C # Use .C here, take advantage of our make rule
+    source_file=$LIBMESH_DIR/contrib/bin/$source_name
+    app_name=TestHeader_$header_name.o
+    app_file=$LIBMESH_DIR/contrib/bin/$app_name
 
     rm -f $source_file $app_file
     
@@ -39,8 +45,8 @@ for i in $headers_to_test; do
 
     echo -n "Testing Header File $header_name ... "
 
-	# Use make -s for silent operation
-    if make -s -C ../.. contrib/bin/$app_file 2> $errlog; then
+    # Use make -s for silent operation
+    if make -s -C $LIBMESH_DIR contrib/bin/$app_name 2>> $errlog; then
 	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
     else
 	echo -e $gotocolumn $white"["$red" FAILED "$white"]";
