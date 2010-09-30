@@ -1,5 +1,5 @@
 
-// $Id: dof_map.h 3916 2010-08-24 20:44:12Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner

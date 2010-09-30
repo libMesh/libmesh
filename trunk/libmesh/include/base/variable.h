@@ -1,4 +1,4 @@
-// $Id: system.h 3874 2010-07-02 21:57:26Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
