@@ -28,6 +28,7 @@
 // Local Includes
 #include "error_estimator.h"
 #include "libmesh.h"
+#include "qoi_set.h"
 
 namespace libMesh
 {
