@@ -48,7 +48,7 @@ Real NewtonSolver::line_search(Real tol,
   // Take a full step if we got a residual reduction or if we
   // aren't substepping
   if (current_residual < last_residual ||
-      !require_residual_reduction)
+      !(require_residual_reduction || require_finite_residual))
     return 1.;
 
   // The residual vector
@@ -60,7 +60,9 @@ Real NewtonSolver::line_search(Real tol,
   // Find bx, a step length that gives lower residual than ax or cx
   Real bx = 1.;
 
-  while (libmesh_isnan(current_residual) || (current_residual > last_residual))
+  while (libmesh_isnan(current_residual) || 
+         (current_residual > last_residual &&
+          require_residual_reduction))
     {
       // Reduce step size to 1/2, 1/4, etc.
       Real substepdivision;
@@ -232,6 +234,7 @@ Real NewtonSolver::line_search(Real tol,
 NewtonSolver::NewtonSolver (sys_type& s)
   : Parent(s),
     require_residual_reduction(true),
+    require_finite_residual(true),
     brent_line_search(true),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
@@ -380,6 +383,7 @@ unsigned int NewtonSolver::solve()
       // whether to line search, whether to quit early, or whether to die after
       // hitting our max iteration count
       if (this->require_residual_reduction ||
+          this->require_finite_residual ||
           _outer_iterations+1 < max_nonlinear_iterations ||
           !continue_after_max_iterations)
         {

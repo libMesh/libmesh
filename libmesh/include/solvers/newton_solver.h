@@ -85,6 +85,15 @@ public:
   bool require_residual_reduction;
 
   /**
+   * If this is set to true, the solver is forced to test the residual
+   * after each Newton step, and to reduce the length of its steps
+   * whenever necessary to avoid an infinite or NaN residual.
+   * It is currently set to true by default; set it to false to
+   * avoid unnecessary residual assembly on well-behaved systems.
+   */
+  bool require_finite_residual;
+
+  /**
    * If require_residual_reduction is true, the solver may reduce step
    * lengths when required.  If so, brent_line_search is an option.
    * If brent_line_search is set to false, the solver reduces the
