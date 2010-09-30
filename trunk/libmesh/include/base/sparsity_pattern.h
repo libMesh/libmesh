@@ -21,9 +21,21 @@
 #ifndef __sparsity_pattern_h__
 #define __sparsity_pattern_h__
 
+// C++ includes
+#include <vector>
+
+// Local Includes
+#include "threads_allocators.h"
+
 namespace libMesh
 {
 
+  // Forward declaractions
+  class MeshBase;
+  class DofMap;
+  class CouplingMatrix;
+  class ConstElemRange;
+  
 // ------------------------------------------------------------
 // Sparsity Pattern
 
