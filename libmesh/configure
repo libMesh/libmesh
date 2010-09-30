@@ -3393,6 +3393,16 @@ $as_echo "<<< C++ compiler is unknown but accepted gcc version >>>" >&6; }
   	GXX_VERSION=gcc-other
   	;;
     esac
+        case "$GXX_VERSION_STRING" in
+      *Apple*)
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is built by Apple >>>" >&5
+$as_echo "<<< C++ compiler is built by Apple >>>" >&6; }
+        APPLE_GCC=true
+        ;;
+      *)
+        APPLE_GCC=false
+        ;;
+    esac
   else
 
                             is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
@@ -4431,7 +4441,11 @@ fi
         CXXFLAGS_DVL="-fno-common"
         CXXFLAGS_DBG="-fno-common"
         LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
-        CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+        if test $APPLE_GCC = true ; then
+          CXXSHAREDFLAG="-ldylib1.o -dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace,-no_compact_linkedit"
+        else
+          CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+        fi
         CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
       fi
       ;;
@@ -4489,13 +4503,23 @@ fi
                               gcc4.3)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
-         CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
-  	 ;;
+
+         if test $APPLE_GCC = true ; then
+           CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
+         else
+           CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+         fi
+	 ;;
 
       gcc3.* | gcc4.*)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual -Wdisabled-optimization"
-         CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+
+         if test $APPLE_GCC = true ; then
+	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
+	 else
+	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+	 fi
   	 ;;
       *)
          ;;
