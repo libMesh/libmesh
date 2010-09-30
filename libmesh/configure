@@ -2594,8 +2594,6 @@ ac_config_files="$ac_config_files contrib/bin/create_libmesh_release"
 
 ac_config_files="$ac_config_files doc/dot"
 
-ac_config_files="$ac_config_files include/base/libmesh_contrib_config.h"
-
 ac_config_headers="$ac_config_headers include/base/libmesh_config.h.tmp:include/base/libmesh_config.h.in"
 
 ac_config_commands="$ac_config_commands include/base/libmesh_config.h"
@@ -10431,7 +10429,6 @@ do
     "contrib/bin/xda2mgf") CONFIG_FILES="$CONFIG_FILES contrib/bin/xda2mgf" ;;
     "contrib/bin/create_libmesh_release") CONFIG_FILES="$CONFIG_FILES contrib/bin/create_libmesh_release" ;;
     "doc/dot") CONFIG_FILES="$CONFIG_FILES doc/dot" ;;
-    "include/base/libmesh_contrib_config.h") CONFIG_FILES="$CONFIG_FILES include/base/libmesh_contrib_config.h" ;;
     "include/base/libmesh_config.h.tmp") CONFIG_HEADERS="$CONFIG_HEADERS include/base/libmesh_config.h.tmp:include/base/libmesh_config.h.in" ;;
     "include/base/libmesh_config.h") CONFIG_COMMANDS="$CONFIG_COMMANDS include/base/libmesh_config.h" ;;
 

@@ -19,7 +19,6 @@ AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmes
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
 AC_CONFIG_FILES(contrib/bin/create_libmesh_release, [chmod +x contrib/bin/create_libmesh_release])
 AC_CONFIG_FILES(doc/dot,                            [chmod +x doc/dot])
-AC_CONFIG_FILES(include/base/libmesh_contrib_config.h)
 dnl Create a temporary file with e.g. HAVE_MPI
 AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h.in)
 dnl Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
