@@ -98,6 +98,16 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   	GXX_VERSION=gcc-other
   	;;
     esac
+    dnl Check for Apple compilers
+    case "$GXX_VERSION_STRING" in
+      *Apple*)
+        AC_MSG_RESULT(<<< C++ compiler is built by Apple >>>)
+        APPLE_GCC=true
+        ;;
+      *)
+        APPLE_GCC=false
+        ;;
+    esac
   else
     dnl Check other (non-gcc) compilers
   
@@ -301,7 +311,11 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
         CXXFLAGS_DVL="-fno-common"
         CXXFLAGS_DBG="-fno-common"
         LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
-        CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+        if test $APPLE_GCC = true ; then
+          CXXSHAREDFLAG="-ldylib1.o -dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace,-no_compact_linkedit"
+        else
+          CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+        fi
         CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
       fi
       ;;
@@ -379,13 +393,23 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
       gcc4.3)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
-         CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
-  	 ;;
+
+         if test $APPLE_GCC = true ; then
+           CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
+         else
+           CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+         fi
+	 ;;
 
       gcc3.* | gcc4.*)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual -Wdisabled-optimization"
-         CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+         
+         if test $APPLE_GCC = true ; then
+	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
+	 else    
+	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"	
+	 fi
   	 ;;
       *)
          ;;
