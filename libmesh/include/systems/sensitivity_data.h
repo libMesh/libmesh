@@ -30,10 +30,15 @@
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
+#include "parameter_vector.h"
+#include "system.h"
 
 namespace libMesh
 {
 
+  // Forward declaractions
+  class QoISet;
+  
   /**
    * Data structure for holding completed parameter sensitivity
    * calculations.
