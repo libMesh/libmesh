@@ -86,6 +86,14 @@ link_examples: $(mesh_library)
 run_examples: $(mesh_library)
 	@$(MAKE) -C examples run
 
+#
+# Test the header files to make sure they all compile stand-alone
+# Also a cheat here: removing an ex-configure-output so it isn't
+# detected as an invalid header for people without fresh checkouts
+#
+test_headers:
+	@rm -f include/base/libmesh_contrib_config.h
+	@contrib/bin/test_headers.sh
 
 #	
 # Remove object files for the current mode
