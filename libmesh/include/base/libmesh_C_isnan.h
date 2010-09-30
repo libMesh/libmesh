@@ -1,5 +1,5 @@
 
-// $Id: libmesh.h 3919 2010-08-24 21:36:44Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
