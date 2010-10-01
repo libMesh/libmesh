@@ -206,7 +206,7 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
     Real distance_between_children_anchors = 0.;
     for (unsigned int i = 0; i < left_child->anchor.size(); i++)
     {
-        distance_between_children_anchors += std::pow((left_child->anchor[i] - right_child->anchor[i]),2.);
+        distance_between_children_anchors += std::pow((left_child->anchor[i] - right_child->anchor[i]),Real(2.));
     }
     distance_between_children_anchors = std::sqrt(distance_between_children_anchors);
     left_child->distance_between_anchors = distance_between_children_anchors;
