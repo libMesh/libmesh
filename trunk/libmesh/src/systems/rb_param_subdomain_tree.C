@@ -21,6 +21,7 @@
 #include "rb_param_subdomain_tree.h"
 #include "rb_system.h"
 #include "getpot.h"
+#include "libmesh_logging.h"
 
 // FOR CREATING A DIRECTORY
 #include <sys/types.h>
