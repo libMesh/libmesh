@@ -463,7 +463,17 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
   // element get its level-0 parent and infer the BCs.
   const Elem*  searched_elem = elem;
   if (elem->level() != 0)
-    searched_elem = elem->top_parent ();
+  {
+    if (elem->side(side).get() == NULL)
+      searched_elem = elem->top_parent ();
+    else
+      while (searched_elem->parent() != NULL) {
+        const Elem * parent = searched_elem->parent();
+        if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+          return invalid_id;
+        searched_elem = parent;
+      }
+  }
   
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::const_iterator,
@@ -497,11 +507,23 @@ std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
 {
   libmesh_assert (elem != NULL);
 
+  std::vector<short int> ids;
+
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
   const Elem*  searched_elem = elem;
   if (elem->level() != 0)
-    searched_elem = elem->top_parent ();
+  {
+    if (elem->side(side).get() == NULL)
+      searched_elem = elem->top_parent ();
+    else
+      while (searched_elem->parent() != NULL) {
+        const Elem * parent = searched_elem->parent();
+        if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+          return ids;
+        searched_elem = parent;
+      }
+  }
 
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::const_iterator,
@@ -509,7 +531,6 @@ std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
                           std::pair<unsigned short int, short int> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
-  std::vector<short int> ids;
   // elem not in the data structure
   if (e.first == e.second)
     return ids;
@@ -610,19 +631,34 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
                           std::pair<unsigned short int, short int> >::const_iterator > 
     e = _boundary_side_id.equal_range(searched_elem);
 
-  // elem not in the data structure
-  if (e.first == e.second)
-    return libMesh::invalid_uint;
-
-  // elem is there, maybe multiple occurances
-  while (e.first != e.second)
+  // elem may have zero or multiple occurances
+  for (; e.first != e.second; ++e.first)
     {
       // if this is true we found the requested boundary_id
       // of the element and want to return the side
       if (e.first->second.second == boundary_id)
-	return e.first->second.first;
+        {
+         unsigned int side = e.first->second.first;
 
-      ++e.first;
+         // If we're on this external boundary then we share this
+         // external boundary id
+         if (elem->neighbor(side) == NULL)
+           return side;
+
+         // If we're on an internal boundary then we need to be sure
+         // it's the same internal boundary as our top_parent
+         const Elem *p = elem;
+         while (p != NULL)
+           {
+             const Elem *parent = p->parent();
+             if (!parent->is_child_on_side(parent->which_child_am_i(p), side))
+               break;
+             p = parent;
+           }
+         // We're on that side of our top_parent; return it
+         if (!p)
+           return side;
+       }
     }
 
   // if we get here, we found elem in the data structure but not
