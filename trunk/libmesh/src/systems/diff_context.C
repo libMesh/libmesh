@@ -28,9 +28,11 @@ namespace libMesh
 
 DiffContext::DiffContext (const System& sys) :
   time(sys.time),
+  system_time(sys.time),
   elem_solution_derivative(1.),
   fixed_solution_derivative(0.),
-  dof_indices_var(sys.n_vars())
+  dof_indices_var(sys.n_vars()),
+  _deltat(NULL)
 {
   // Finally initialize solution/residual/jacobian data structures
   unsigned int n_vars = sys.n_vars();
@@ -84,6 +86,21 @@ DiffContext::~DiffContext ()
         delete elem_subjacobians[i][j];
     }
 }
+
+
+  void DiffContext::set_deltat_pointer(Real* dt)
+  {
+    // We may actually want to be able to set this pointer to NULL, so
+    // don't report an error for that.
+    _deltat = dt;
+  }
+
+  Real DiffContext::get_deltat_value()
+  {
+    libmesh_assert(_deltat != NULL);
+    
+    return *_deltat;
+  }
 
 } // namespace libMesh
 

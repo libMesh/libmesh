@@ -738,7 +738,11 @@ void FEMSystem::numerical_side_jacobian (FEMContext &context)
 
 AutoPtr<DiffContext> FEMSystem::build_context ()
 {
-  return AutoPtr<DiffContext>(new FEMContext(*this));
+  AutoPtr<DiffContext> ap(new FEMContext(*this));
+
+  ap->set_deltat_pointer( &deltat );
+  
+  return ap;
 }
 
 
@@ -747,6 +751,16 @@ void FEMSystem::init_context(DiffContext &c)
 {
   // Parent::init_context(c);  // may be a good idea in derived classes
 
+  // Although we do this in DiffSystem::build_context() and
+  // FEMSystem::build_context() as well, we do it here just to be
+  // extra sure that the deltat pointer gets set.  Since the
+  // intended behavior is for classes derived from FEMSystem to
+  // call Parent::init_context() in their own init_context()
+  // overloads, we can ensure that those classes get the correct
+  // deltat pointers even if they have different build_context()
+  // overloads.
+  c.set_deltat_pointer ( &deltat );
+  
   FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
 
   // Make sure we're prepared to do mass integration

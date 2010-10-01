@@ -94,6 +94,15 @@ public:
   Real time;
 
   /**
+   * This is the time stored in the System class at the time this context
+   * was created, i.e. the time at the beginning of the current timestep.
+   * This value gets set in the constructor and unlike DiffContext::time,
+   * is not tweaked mid-timestep by transient solvers: it remains equal
+   * to the value it was assigned at construction.
+   */
+  const Real system_time;
+
+  /**
    * Element by element components of nonlinear_solution
    * as adjusted by a time_solver
    */
@@ -161,6 +170,32 @@ public:
    */
   std::vector<unsigned int> dof_indices;
   std::vector<std::vector<unsigned int> > dof_indices_var;
+
+  /**
+   * Points the _deltat member of this class at a timestep value
+   * stored in the creating System, for example DiffSystem::deltat
+   */
+  void set_deltat_pointer(Real* dt);
+
+  /**
+   * Returns the value currently pointed to by this class's _deltat
+   * member
+   */
+  Real get_deltat_value();
+  
+private:
+  /**
+   * Default NULL, can optionally be used to point to a timestep value
+   * in the System-derived class responsible for creating this DiffContext.
+   *
+   * In DiffSystem's build_context() function, is assigned to point to
+   * the deltat member of that class.
+   *
+   * Accessible via public get_deltat()/set_deltat() methods of this class.
+   *
+   * Always test for NULL before using!
+   */
+  Real* _deltat;
 };
 
 } // namespace libMesh

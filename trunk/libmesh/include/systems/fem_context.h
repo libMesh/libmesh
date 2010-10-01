@@ -270,7 +270,13 @@ private:
    * without _mesh_sys/etc. defined first.
    */
   void _do_elem_position_set(Real theta);
-
+  
+  /**
+   * Update the time in the context object for the given value of
+   * theta, based on the values of "time" and "deltat" stored in the
+   * system which created this context.
+   */
+  void _update_time_from_system(Real theta);
 };
 
 
