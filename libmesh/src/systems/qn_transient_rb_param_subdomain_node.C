@@ -25,7 +25,6 @@
 #include "qn_transient_rb_param_subdomain_node.h"
 #include "qn_transient_rb_param_subdomain_tree.h"
 #include "qn_transient_scm_system.h"
-#include "rb_system.h"
 #include "libmesh_logging.h"
 
 namespace libMesh

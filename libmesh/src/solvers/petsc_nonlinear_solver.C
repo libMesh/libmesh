@@ -32,7 +32,6 @@
 #include "petsc_linear_solver.h"
 #include "petsc_vector.h"
 #include "petsc_matrix.h"
-#include "system.h"
 #include "dof_map.h"
 #include "preconditioner.h"
 

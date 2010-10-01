@@ -20,8 +20,6 @@
 #include "rb_base.h"
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
-#include "sparse_matrix.h"
-#include "dof_map.h"
 #include "equation_systems.h"
 #include "parallel.h"
 #include "rb_eim_system.h"

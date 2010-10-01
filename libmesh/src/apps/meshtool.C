@@ -32,7 +32,6 @@
 #include "mesh_modification.h"
 #include "mesh_refinement.h"
 #include "perfmon.h"
-#include "point.h"
 #include "statistics.h"
 
 

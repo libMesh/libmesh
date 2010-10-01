@@ -20,11 +20,6 @@
 
 #include "diff_solver.h"
 #include "diff_system.h"
-#include "dof_map.h"
-#include "numeric_vector.h"
-#include "parameter_vector.h"
-#include "qoi_set.h"
-#include "sensitivity_data.h"
 #include "time_solver.h"
 
 namespace libMesh

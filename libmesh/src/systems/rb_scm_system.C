@@ -29,7 +29,6 @@
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 #include "sparse_matrix.h"
-#include "dof_map.h"
 #include "equation_systems.h"
 #include "getpot.h"
 #include "rb_system.h"

@@ -24,7 +24,6 @@
 // Local includes
 #include "explicit_system.h"
 #include "numeric_vector.h"
-#include "parallel.h"
 
 namespace libMesh
 {

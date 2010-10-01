@@ -24,12 +24,10 @@
 // C++ includes
 
 // Local Includes
-#include "auto_ptr.h"
 #include "petsc_preconditioner.h"
 #include "petsc_macro.h"
 #include "petsc_matrix.h"
 #include "petsc_vector.h"
-#include "petsc_macro.h"
 
 #include "libmesh_common.h"
 

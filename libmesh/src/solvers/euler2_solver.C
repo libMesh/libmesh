@@ -20,7 +20,6 @@
 
 #include "diff_system.h"
 #include "euler2_solver.h"
-#include "numeric_vector.h"
 
 namespace libMesh
 {

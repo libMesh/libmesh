@@ -28,15 +28,8 @@
 
 #include "numeric_vector.h"
 #include "libmesh_logging.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
 #include "dof_map.h"
-#include "sparse_matrix.h"
-#include "dense_matrix.h"
-#include "dense_submatrix.h"
-#include "dense_vector.h"
 #include "getpot.h"
-#include "linear_solver.h"
 #include "equation_systems.h"
 #include "parallel.h"
 
