@@ -489,6 +489,9 @@ Number FEMContext::fixed_point_value(unsigned int var, Point &p)
 
 void FEMContext::elem_reinit(Real theta)
 {
+  // Update the "time" variable of this context object
+  this->_update_time_from_system(theta);
+  
   // Handle a moving element if necessary.
   if (_mesh_sys)
     // We assume that the ``default'' state
@@ -508,6 +511,9 @@ void FEMContext::elem_reinit(Real theta)
 
 void FEMContext::elem_side_reinit(Real theta)
 {
+  // Update the "time" variable of this context object
+  this->_update_time_from_system(theta);
+  
   // Handle a moving element if necessary
   if (_mesh_sys)
     {
@@ -740,5 +746,19 @@ void FEMContext::pre_fe_reinit(const System &sys, Elem *e)
     }
   libmesh_assert(sub_dofs == n_dofs);
 }
+
+
+
+void FEMContext::_update_time_from_system(Real theta)
+{
+  // Update the "time" variable based on the value of theta.  For this
+  // to work, we need to know the value of deltat, a pointer to which is now
+  // stored by our parent DiffContext class.  Note: get_deltat_value() will
+  // assert in debug mode if the requested pointer is NULL.
+  const Real deltat = this->get_deltat_value();
+
+  this->time = theta*(this->system_time + deltat) + (1.-theta)*this->system_time;
+}
+
 
 } // namespace libMesh
