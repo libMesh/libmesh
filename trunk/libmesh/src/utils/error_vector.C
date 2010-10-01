@@ -25,7 +25,6 @@
 #include "elem.h"
 #include "error_vector.h"
 #include "libmesh_logging.h"
-#include "mesh_base.h"
 
 #include "dof_map.h"
 #include "equation_systems.h"

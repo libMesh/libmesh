@@ -26,7 +26,7 @@
 #include "linear_solver.h"
 #include "equation_systems.h"
 #include "numeric_vector.h" // for parameter sensitivity calcs
-#include "parameter_vector.h"
+//#include "parameter_vector.h"
 #include "sparse_matrix.h" // for get_transpose
 
 namespace libMesh

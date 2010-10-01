@@ -29,10 +29,6 @@
 #include "elem.h"
 #include "fe_base.h"
 #include "fe_interface.h"
-#include "equation_systems.h"
-#include "mesh_base.h"
-#include "quadrature.h"
-#include "dof_map.h"
 
 namespace libMesh
 {

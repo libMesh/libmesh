@@ -20,9 +20,7 @@
 #include "rb_param_subdomain_node.h"
 #include "rb_param_subdomain_tree.h"
 #include "rb_system.h"
-#include "transient_rb_system.h"
 #include "getpot.h"
-#include "parallel.h"
 
 // FOR CREATING A DIRECTORY
 #include <sys/types.h>
@@ -30,7 +28,6 @@
 
 #include "o_string_stream.h"
 #include <fstream>
-#include <sstream>
 
 namespace libMesh
 {

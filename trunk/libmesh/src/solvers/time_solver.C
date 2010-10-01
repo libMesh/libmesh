@@ -20,8 +20,7 @@
 
 #include "diff_solver.h"
 #include "diff_system.h"
-#include "dof_map.h"
-#include "numeric_vector.h"
+#include "linear_solver.h"
 #include "time_solver.h"
 
 namespace libMesh

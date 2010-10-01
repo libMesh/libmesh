@@ -21,8 +21,6 @@
 #include "diff_system.h"
 #include "dof_map.h"
 #include "libmesh_logging.h"
-#include "linear_solver.h"
-#include "parameter_vector.h"
 #include "petsc_diff_solver.h"
 #include "petsc_matrix.h"
 #include "petsc_vector.h"

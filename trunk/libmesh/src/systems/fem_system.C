@@ -23,7 +23,6 @@
 #include "elem.h"
 #include "equation_systems.h"
 #include "fe_base.h"
-#include "fe_interface.h"
 #include "fem_context.h"
 #include "fem_system.h"
 #include "libmesh_logging.h"
@@ -33,7 +32,7 @@
 #include "quadrature.h"
 #include "sparse_matrix.h"
 #include "time_solver.h"
-#include "unsteady_solver.h" // For euler_residual
+#include "unsteady_solver.h" // For eulerian_residual
 
 namespace libMesh
 {

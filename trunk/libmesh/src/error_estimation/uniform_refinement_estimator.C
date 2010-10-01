@@ -28,7 +28,6 @@
 #include "equation_systems.h"
 #include "error_vector.h"
 #include "fe.h"
-#include "fe_interface.h"
 #include "libmesh_common.h"
 #include "libmesh_logging.h"
 #include "mesh_base.h"

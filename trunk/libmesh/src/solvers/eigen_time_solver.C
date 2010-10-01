@@ -22,7 +22,6 @@
 #include "libmesh_config.h"
 #ifdef LIBMESH_HAVE_SLEPC
 
-#include "diff_solver.h"
 #include "diff_system.h"
 #include "eigen_time_solver.h"
 #include "eigen_solver.h"

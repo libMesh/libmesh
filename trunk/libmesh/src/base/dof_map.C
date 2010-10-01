@@ -41,7 +41,7 @@
 #include "sparse_matrix.h"
 #include "sparsity_pattern.h"
 #include "string_to_enum.h"
-#include "threads_allocators.h"
+#include "threads.h"
 
 
 namespace libMesh

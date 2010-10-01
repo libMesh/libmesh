@@ -26,10 +26,7 @@
 #include "diff_solver.h"
 #include "equation_systems.h"
 #include "libmesh_logging.h"
-#include "linear_solver.h"
 #include "nonlinear_solver.h"
-#include "numeric_vector.h"
-#include "parameter_vector.h"
 #include "sparse_matrix.h"
 
 namespace libMesh

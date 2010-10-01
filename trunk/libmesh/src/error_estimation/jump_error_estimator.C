@@ -28,7 +28,7 @@
 #include "jump_error_estimator.h"
 #include "dof_map.h"
 #include "error_vector.h"
-#include "fe.h"
+#include "fe_base.h"
 #include "fe_interface.h"
 #include "quadrature_gauss.h"
 #include "libmesh_logging.h"

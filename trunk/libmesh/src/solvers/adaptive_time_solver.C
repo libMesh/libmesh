@@ -19,7 +19,6 @@
 
 #include "adaptive_time_solver.h"
 #include "diff_system.h"
-#include "euler_solver.h"
 #include "numeric_vector.h"
 
 namespace libMesh

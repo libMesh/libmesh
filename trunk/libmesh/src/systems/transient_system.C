@@ -26,7 +26,6 @@
 #include "explicit_system.h"
 #include "linear_implicit_system.h"
 #include "nonlinear_implicit_system.h"
-#include "utility.h"
 #include "dof_map.h"
 #include "numeric_vector.h"
 #include "rb_system.h"

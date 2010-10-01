@@ -28,7 +28,6 @@
 #include "fe.h"
 #include "quadrature.h"
 #include "elem.h"
-#include "fe_macro.h"
 #include "libmesh_logging.h"
 
 namespace libMesh

@@ -23,14 +23,11 @@
 #include "elem.h"
 #include "fe_base.h"
 #include "fe_interface.h"
-#include "equation_systems.h"
 #include "fem_context.h"
-#include "fem_system.h"
 #include "libmesh_logging.h"
 #include "mesh_base.h"
-#include "numeric_vector.h"
 #include "quadrature.h"
-#include "sparse_matrix.h"
+#include "system.h"
 #include "time_solver.h"
 #include "unsteady_solver.h" // For euler_residual
 

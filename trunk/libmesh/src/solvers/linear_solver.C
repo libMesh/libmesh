@@ -27,7 +27,6 @@
 #include "laspack_linear_solver.h"
 #include "petsc_linear_solver.h"
 #include "trilinos_aztec_linear_solver.h"
-#include "auto_ptr.h"
 #include "preconditioner.h"
 
 namespace libMesh

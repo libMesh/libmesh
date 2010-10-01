@@ -24,7 +24,6 @@
 #include <set>
 
 // Local includes
-#include "boundary_info.h"
 #include "elem.h"
 #include "elem_range.h"
 #include "location_maps.h"

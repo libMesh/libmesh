@@ -32,7 +32,6 @@
 #include "boundary_info.h"
 #include "elem.h"
 #include "mesh_base.h"
-#include "mesh_tools.h"
 #include "parallel.h"
 #include "partitioner.h"
 #include "point_locator_base.h"
