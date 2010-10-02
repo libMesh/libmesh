@@ -1,5 +1,9 @@
 # $Id: Makefile,v 1.1.1.1 2009/03/19 20:28:07 dave Exp $
 
+
+# The location of the mesh library
+LIBMESH_DIR ?= ../..
+
 # include the library options determined by configure.  This will
 # set the variables INCLUDE and LIBS that we will need to build and
 # link with the library.
