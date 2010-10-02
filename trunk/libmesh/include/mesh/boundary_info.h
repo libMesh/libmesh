@@ -262,6 +262,11 @@ public:
   void print_info (std::ostream& out=libMesh::out) const;
   
   /**
+   * Print a summary of the boundary information.
+   */
+  void print_summary (std::ostream& out=libMesh::out) const;
+  
+  /**
    * Number used for internal use. This is the return value
    * if a boundary condition is not specified.
    */
