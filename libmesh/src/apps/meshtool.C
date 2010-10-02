@@ -169,7 +169,7 @@ void process_cmd_line(int argc, char **argv,
                       std::vector<std::string>& names,
                       unsigned int& n_subdomains,
                       unsigned int& n_rsteps,
-                      unsigned int& dim,
+//                      unsigned int& dim,
                       double& dist_fact,
                       bool& verbose,
                       BoundaryMeshWriteMode& write_bndry,
@@ -272,14 +272,17 @@ void process_cmd_line(int argc, char **argv,
             break;
           }
 
+
           /**
            * Get the mesh dimension
            */
+/*
         case 'd':
           {
             dim = atoi(optarg);
             break;
           }
+*/
 
           /**
            * Get the mesh distortion factor
@@ -477,7 +480,7 @@ int main (int argc, char** argv)
   
   unsigned int n_subdomains = 1;
   unsigned int n_rsteps = 0;
-  unsigned int dim = static_cast<unsigned int>(-1); // invalid dimension
+//  unsigned int dim = static_cast<unsigned int>(-1); // invalid dimension
   double dist_fact = 0.;
   bool verbose = false;
   BoundaryMeshWriteMode write_bndry = BM_DISABLED;
@@ -502,7 +505,7 @@ int main (int argc, char** argv)
 
   process_cmd_line(argc, argv, names,
                    n_subdomains, n_rsteps,
-                   dim, dist_fact, verbose, write_bndry, 
+                   dist_fact, verbose, write_bndry, 
                    convert_second_order,
 
                    triangulate,
@@ -515,6 +518,7 @@ int main (int argc, char** argv)
 
                    x_sym, y_sym, z_sym);
 
+/*
   if (dim == static_cast<unsigned int>(-1))
     {
       std::cout << "ERROR:  you must specify the dimension on "
@@ -522,8 +526,9 @@ int main (int argc, char** argv)
                 << argv[0] << " -d 3 ... for example\n\n";
       libmesh_error();
     }
+*/
 
-  Mesh mesh(dim);
+  Mesh mesh;
   MeshData mesh_data(mesh);
   
   /**
@@ -629,9 +634,10 @@ int main (int argc, char** argv)
   /**
    * Maybe Triangulate
    */
-  if (dim == 2 && triangulate)
+//  if (dim == 2 && triangulate)
+  if (triangulate)
     {
-      if (verbose) std::cout << "...Converting to all triangles...\n";
+      if (verbose) std::cout << "...Converting to all simplices...\n";
                      
       MeshTools::Modification::all_tri(mesh);
     }
@@ -867,7 +873,7 @@ int main (int argc, char** argv)
             if (verbose)
                 std::cout << " Mesh got refined, will write only _active_ elements." << std::endl;
 
-            Mesh new_mesh (dim);
+            Mesh new_mesh (mesh.mesh_dimension());
 
             construct_mesh_of_active_elements(new_mesh, mesh);
 
