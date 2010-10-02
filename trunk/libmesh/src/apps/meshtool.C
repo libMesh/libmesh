@@ -169,7 +169,7 @@ void process_cmd_line(int argc, char **argv,
                       std::vector<std::string>& names,
                       unsigned int& n_subdomains,
                       unsigned int& n_rsteps,
-//                      unsigned int& dim,
+                      unsigned int& dim,
                       double& dist_fact,
                       bool& verbose,
                       BoundaryMeshWriteMode& write_bndry,
@@ -276,13 +276,11 @@ void process_cmd_line(int argc, char **argv,
           /**
            * Get the mesh dimension
            */
-/*
         case 'd':
           {
             dim = atoi(optarg);
             break;
           }
-*/
 
           /**
            * Get the mesh distortion factor
@@ -480,7 +478,7 @@ int main (int argc, char** argv)
   
   unsigned int n_subdomains = 1;
   unsigned int n_rsteps = 0;
-//  unsigned int dim = static_cast<unsigned int>(-1); // invalid dimension
+  unsigned int dim = static_cast<unsigned int>(-1); // invalid dimension
   double dist_fact = 0.;
   bool verbose = false;
   BoundaryMeshWriteMode write_bndry = BM_DISABLED;
@@ -504,7 +502,7 @@ int main (int argc, char** argv)
   std::vector<Number>      soln;
 
   process_cmd_line(argc, argv, names,
-                   n_subdomains, n_rsteps,
+                   n_subdomains, n_rsteps, dim,
                    dist_fact, verbose, write_bndry, 
                    convert_second_order,
 
@@ -518,17 +516,17 @@ int main (int argc, char** argv)
 
                    x_sym, y_sym, z_sym);
 
-/*
+  AutoPtr<Mesh> mesh_ptr;
   if (dim == static_cast<unsigned int>(-1))
     {
-      std::cout << "ERROR:  you must specify the dimension on "
-                << "the command line!\n\n"
-                << argv[0] << " -d 3 ... for example\n\n";
-      libmesh_error();
+      mesh_ptr.reset(new Mesh());
     }
-*/
+  else
+    {
+      mesh_ptr.reset(new Mesh(dim));
+    }
 
-  Mesh mesh;
+  Mesh& mesh = *mesh_ptr;
   MeshData mesh_data(mesh);
   
   /**
