@@ -553,7 +553,10 @@ int main (int argc, char** argv)
       mesh.read(names[0]);
 
       if (verbose)
-        mesh.print_info();
+        {
+          mesh.print_info();
+          mesh.boundary_info->print_summary();
+        }
 
     }
   
@@ -605,7 +608,10 @@ int main (int argc, char** argv)
 
       
       if (verbose)
-        mesh.print_info();
+        {
+          mesh.print_info();
+          mesh.boundary_info->print_summary();
+        }
 
     }
 
@@ -759,7 +765,10 @@ int main (int argc, char** argv)
       mesh.all_second_order(second_order_mode);
       
       if (verbose)
-        mesh.print_info();
+        {
+          mesh.print_info();
+          mesh.boundary_info->print_summary();
+        }
     }
 
   
@@ -779,7 +788,10 @@ int main (int argc, char** argv)
       mesh_refinement.uniformly_refine(n_rsteps);
       
       if (verbose)
-        mesh.print_info();
+        {
+          mesh.print_info();
+          mesh.boundary_info->print_summary();
+        }
     }
 
   

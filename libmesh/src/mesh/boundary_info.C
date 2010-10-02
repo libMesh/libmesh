@@ -849,4 +849,60 @@ void BoundaryInfo::print_info(std::ostream& out) const
     }
 }
 
+
+
+void BoundaryInfo::print_summary(std::ostream& out) const
+{
+  // Print out the nodal BCs
+  if (!_boundary_node_id.empty())
+    {
+      out << "Nodal Boundary conditions:" << std::endl
+	  << "--------------------------" << std::endl
+	  << "  (ID, number of nodes)   " << std::endl;
+
+      std::map<short int, unsigned int> ID_counts;
+
+      std::multimap<const Node*, short int>::const_iterator it        = _boundary_node_id.begin();
+      const std::multimap<const Node*, short int>::const_iterator end = _boundary_node_id.end();
+
+      for (; it != end; ++it)
+        ID_counts[(*it).second]++;
+
+      std::map<short int, unsigned int>::const_iterator ID_it        = ID_counts.begin();
+      const std::map<short int, unsigned int>::const_iterator ID_end = ID_counts.end();
+
+      for (; ID_it != ID_end; ++ID_it)
+	out << "  (" << (*ID_it).first
+	    << ", "  << (*ID_it).second
+	    << ")"  << std::endl;
+    }
+  
+  // Print out the element BCs
+  if (!_boundary_side_id.empty())
+    {
+      out << std::endl
+	  << "Side Boundary conditions:" << std::endl
+	  << "-------------------------" << std::endl
+	  << "  (ID, number of sides)   " << std::endl;
+
+      std::map<short int, unsigned int> ID_counts;
+
+      std::multimap<const Elem*,
+	std::pair<unsigned short int, short int> >::const_iterator it = _boundary_side_id.begin();
+      const std::multimap<const Elem*,
+	std::pair<unsigned short int, short int> >::const_iterator end = _boundary_side_id.end();
+
+      for (; it != end; ++it)
+        ID_counts[(*it).second.second]++;
+
+      std::map<short int, unsigned int>::const_iterator ID_it        = ID_counts.begin();
+      const std::map<short int, unsigned int>::const_iterator ID_end = ID_counts.end();
+
+      for (; ID_it != ID_end; ++ID_it)
+	out << "  (" << (*ID_it).first
+	    << ", "  << (*ID_it).second
+	    << ")"  << std::endl;
+    }
+}
+
 } // namespace libMesh
