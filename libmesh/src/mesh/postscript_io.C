@@ -19,6 +19,8 @@
 
 // C++ includes
 #include <ctime>
+#include <iomanip>
+#include <iostream>
 
 // Local includes
 #include "postscript_io.h"
