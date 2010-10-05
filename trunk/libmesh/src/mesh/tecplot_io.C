@@ -21,6 +21,7 @@
 
 // C++ includes
 #include <fstream>
+#include <iomanip>
 
 // Local includes
 #include "libmesh_config.h"
