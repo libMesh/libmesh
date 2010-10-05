@@ -93,6 +93,14 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+#if !defined(LIBMESH_HAVE_XDR)
+  // We need XDR support to write out reduced bases
+  libmesh_example_assert(false, "--enable-xdr");
+#elif !defined(LIBMESH_HAVE_PETSC)
+  // FIXME: This example currently segfaults with Trilinos?
+  libmesh_example_assert(false, "--enable-petsc");
+#endif
+
   // Parse the input file (ex23.in) using GetPot
   std::string parameters_filename = "ex23.in";
   GetPot infile(parameters_filename);
