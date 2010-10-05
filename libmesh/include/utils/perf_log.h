@@ -382,7 +382,18 @@ void PerfLog::pop (const std::string &label,
 
 #ifndef NDEBUG
       PerfData *perf_data = &(log[std::make_pair(header,label)]);
-      libmesh_assert (perf_data == log_stack.top());
+      if (perf_data != log_stack.top())
+        {
+          std::cerr << "PerfLog can't pop (" << header << ',' << label << ')' << std::endl;
+          std::cerr << "From top of stack of running logs:" << std::endl;
+          std::map<std::pair<std::string, std::string>, PerfData>::iterator
+            i = log.begin(), endi = log.end();
+          for (; i != endi; ++i)
+            if (&(i->second) == log_stack.top())
+              std::cerr << '(' << i->first.first << ',' << i->first.second << ')' << std::endl;
+            
+          libmesh_assert(perf_data == log_stack.top());
+        }
 #endif
 
       total_time += log_stack.top()->stopit();
