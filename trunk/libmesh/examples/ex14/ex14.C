@@ -64,6 +64,7 @@
 #include "hp_singular.h"
 #include "mesh_generation.h"
 #include "mesh_modification.h"
+#include "o_string_stream.h"
 #include "getpot.h"
 #include "exact_solution.h"
 #include "dof_map.h"
