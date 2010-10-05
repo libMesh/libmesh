@@ -233,8 +233,8 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
       else
         libmesh_error();
     }
-  else if (!get_jacobian)
-    libmesh_assert(false);  // I can't believe you really wanted to assemble *nothing*
+  else
+    libmesh_assert(get_jacobian);  // I can't believe you really wanted to assemble *nothing*
 }
 
 } // namespace libMesh
