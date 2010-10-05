@@ -65,6 +65,7 @@
 #include "mesh_generation.h"
 #include "mesh_modification.h"
 #include "o_string_stream.h"
+#include "perf_log.h"
 #include "getpot.h"
 #include "exact_solution.h"
 #include "dof_map.h"
