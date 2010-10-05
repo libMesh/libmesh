@@ -29,7 +29,6 @@
 // Local includes
 #include "libmesh_common.h"
 #include "libmesh_base.h"
-#include "perf_log.h"
 #include "enum_solver_package.h"
 
 /**
@@ -42,16 +41,6 @@
  */
 namespace libMesh
 {
-
-
-// Forward declaration, required when included
-// in perf_log.{C,h} because the preceeding
-// #include "perf_log.h" is ineffective.
-// Multiple inclusion avoidance problem...
-// __perf_log_h__ already #define'd, but the
-// class has not been declared yet!.
-class PerfLog;
-
 
 
 /**
@@ -144,12 +133,6 @@ public:
    */
   bool closed ();
   
-  /**
-   * A \p PerfLog object to log performance.  If the library is configured
-   * with \p --enable-perflog then it will log key functions.
-   */
-  extern PerfLog perflog;
-
   /**
    * @returns true if the argument \p arg was specified on the command line,
    * \p false otherwise.
