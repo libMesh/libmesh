@@ -55,6 +55,7 @@
 #include "numeric_vector.h"
 #include "elem.h"
 #include "tensor_value.h"
+#include "perf_log.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
