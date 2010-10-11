@@ -336,7 +336,7 @@ private:
 
     // (*) helper functions ----------------------------------------------------
     //                  set variable from inside GetPot (no prefix considered)
-    inline void               _set_variable(const char* VarName, const char* Value);
+    inline void               _set_variable(const char* VarName, const char* Value, const bool Requested);
 
     //     -- produce three basic data vectors:
     //          - argument vector
@@ -347,6 +347,8 @@ private:
     //     -- helpers for argument list processing
     //        * search for a variable in 'variables' array
     inline const variable*    _find_variable(const char*) const;
+    //        * search (and record request) for a variable in 'variables' array
+    inline const variable*    _request_variable(const char*) const;
     //        * support finding directly followed arguments
     inline const char*        _match_starting_string(const char* StartString);
     //        * support search for flags in a specific argument
@@ -678,9 +680,9 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 		// => arg (from start to 'p') = Name of variable
 		//    p+1     (until terminating zero) = value of variable
 		char* o = (char*)p++;
-		*o = '\0';                       // set temporary terminating zero
-		_set_variable(arg.c_str(), p);  // v-name = c_str() bis 'p', value = rest
-		*o = '=';                        // reset the original '='
+		*o = '\0';                            // set temporary terminating zero
+		_set_variable(arg.c_str(), p, false); // v-name = c_str() bis 'p', value = rest
+		*o = '=';                             // reset the original '='
 		break;
 	    }
 	}
@@ -1356,7 +1358,7 @@ GetPot::reset_nominus_cursor()
 inline bool
 GetPot::have_variable(const char* VarName) const
 {
-    const variable* sv = _find_variable(VarName);
+    const variable* sv = _request_variable(VarName);
     if (sv == 0) return false;
     return true;
 }
@@ -1371,8 +1373,8 @@ template <typename T>
 inline T
 GetPot::operator()(const char* VarName, const T& Default) const
 {
-    // (*) recording of requested variables happens in '_find_variable()'
-    const variable*  sv = _find_variable(VarName);
+    // (*) recording of requested variables happens in '_request_variable()'
+    const variable*  sv = _request_variable(VarName);
     if( sv == 0 ) return Default;
     return _convert_to_type(sv->original, Default);
 }
@@ -1400,8 +1402,8 @@ template <typename T>
 inline T
 GetPot::operator()(const char* VarName, const T& Default, unsigned int Idx) const
 {
-    // (*) recording of requested variables happens in '_find_variable()'
-    const variable* sv = _find_variable(VarName);
+    // (*) recording of requested variables happens in '_request_variable()'
+    const variable* sv = _request_variable(VarName);
     if( sv == 0 ) return Default;
     const std::string*  element = sv->get_element(Idx);
     if( element == 0 ) return Default;
@@ -1466,45 +1468,45 @@ GetPot::_record_variable_request(const std::string& Name) const
 // (*) following functions are to be used from 'outside', after getpot has parsed its
 //     arguments => append an argument in the argument vector that reflects the addition
 inline void
-GetPot::_set_variable(const char* VarName, const char* Value)
+GetPot::_set_variable(const char* VarName, const char* Value, const bool Requested /* = true */)
 {
-    const GetPot::variable* Var = _find_variable(VarName);
+    const GetPot::variable* Var = Requested ? _request_variable(VarName) : _find_variable(VarName);
     if( Var == 0 ) variables.push_back(variable(VarName, Value, _field_separator.c_str()));
     else           ((GetPot::variable*)Var)->take(Value, _field_separator.c_str());    
 }
 
 template <typename T>
 inline void
-GetPot::set(const char* VarName, const T& Value, const bool /* Requested = yes */)
+GetPot::set(const char* VarName, const T& Value, const bool Requested /* = true */)
 {
   std::ostringstream string_value;
   string_value << Value;
-  _set_variable(VarName, string_value.str().c_str());
+  _set_variable(VarName, string_value.str().c_str(), Requested);
 }
 
 template <typename T>
 inline void
-GetPot::set(const std::string& VarName, const T& Value, const bool /* Requested = yes */)
+GetPot::set(const std::string& VarName, const T& Value, const bool Requested /* = true */)
 {
-    set(VarName.c_str(), Value);
+    set(VarName.c_str(), Value, Requested);
 }
 
 inline void
-GetPot::set(const char* VarName, const char* Value, const bool /* Requested = yes */)
+GetPot::set(const char* VarName, const char* Value, const bool Requested /* = true */)
 {
-  _set_variable(VarName, Value);
+  _set_variable(VarName, Value, Requested);
 }
 
 inline void
-GetPot::set(const std::string& VarName, const char* Value, const bool /* Requested = yes */)
+GetPot::set(const std::string& VarName, const char* Value, const bool Requested /* = true */)
 {
-    set(VarName.c_str(), Value);
+    set(VarName.c_str(), Value, Requested);
 }
 
 inline unsigned
 GetPot::vector_variable_size(const char* VarName) const
 {
-    const variable*  sv = _find_variable(VarName);
+    const variable*  sv = _request_variable(VarName);
     if( sv == 0 ) return 0;
     return sv->value.size();
 }
@@ -1536,14 +1538,20 @@ GetPot::_find_variable(const char* VarName) const
 {
     const std::string Name = prefix + VarName;
 
-    // (*) record requested variable for later ufo detection
-    this->_record_variable_request(Name);
-
     std::vector<variable>::const_iterator it = variables.begin();
     for(; it != variables.end(); it++) {
 	if( (*it).name == Name ) return &(*it);
     }
     return 0;
+}
+
+inline const GetPot::variable*
+GetPot::_request_variable(const char* VarName) const
+{
+    // (*) record requested variable for later ufo detection
+    this->_record_variable_request(VarName);
+
+    return this->_find_variable(VarName);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1739,12 +1747,12 @@ GetPot::_DBE_get_variable(std::string VarName)
 
     prefix = section;
     // (1) first search in currently active section
-    const GetPot::variable* var = _find_variable(VarName.c_str());
+    const GetPot::variable* var = _request_variable(VarName.c_str());
     if( var != 0 ) { prefix = secure_Prefix; return var; }
 
     // (2) search in root name space
     prefix = "";
-    var = _find_variable(VarName.c_str());
+    var = _request_variable(VarName.c_str());
     if( var != 0 ) { prefix = secure_Prefix; return var; }
 
     prefix = secure_Prefix;
