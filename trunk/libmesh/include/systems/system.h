@@ -31,6 +31,7 @@
 #include "elem_range.h"
 #include "enum_norm_type.h"
 #include "enum_xdr_mode.h"
+#include "enum_parallel_type.h"
 #include "fe_type.h"
 #include "libmesh_common.h"
 #include "tensor_value.h" // For point_hessian
@@ -447,7 +448,8 @@ public:
    * second argument
    */
   NumericVector<Number> & add_vector (const std::string& vec_name,
-				      const bool projections=true);
+				                              const bool projections=true,
+				                              const ParallelType type = PARALLEL);
 
   /**
    * Tells the System whether or not to project the solution vector onto new
@@ -1265,6 +1267,11 @@ private:
    * onto a changed grid, false if it should be zeroed.
    */
   std::map<std::string, bool> _vector_projections;
+
+  /**
+   * Holds the type of a vector
+   */
+  std::map<std::string, ParallelType> _vector_types;
 
   /**
    * Holds true if the solution vector should be projected
