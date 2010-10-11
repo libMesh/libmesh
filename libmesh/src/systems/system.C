@@ -182,6 +182,7 @@ void System::clear ()
     
     _vectors.clear();
     _vector_projections.clear();
+    _vector_types.clear();
     _can_add_vectors = true;
   }
 
@@ -245,7 +246,22 @@ void System::init_data ()
 
   // initialize & zero other vectors, if necessary
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
-      pos->second->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
+  {
+    ParallelType type = _vector_types[pos->first];
+    
+    if(type == GHOSTED)
+    {
+#ifdef LIBMESH_ENABLE_GHOSTED
+      pos->second->init (this->n_dofs(), this->n_local_dofs(),
+                         _dof_map->get_send_list(), false,
+                         GHOSTED);
+#else
+      libmesh_error("Cannot initialize ghosted vectors when they are not enabled.");
+#endif
+    }
+    else
+      pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+  }
 }
 
 
@@ -261,7 +277,22 @@ void System::restrict_vectors ()
       if (_vector_projections[pos->first])
 	this->project_vector (*v);
       else
-        v->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
+      {
+        ParallelType type = _vector_types[pos->first];
+        
+        if(type == GHOSTED)
+        {
+#ifdef LIBMESH_ENABLE_GHOSTED
+          pos->second->init (this->n_dofs(), this->n_local_dofs(),
+                         _dof_map->get_send_list(), false,
+                         GHOSTED);
+#else
+          libmesh_error("Cannot initialize ghosted vectors when they are not enabled.");
+#endif
+        }
+        else
+          pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+      }
     }
 
   const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
@@ -579,7 +610,8 @@ void System::update_global_solution (std::vector<Number>& global_soln,
 
 
 NumericVector<Number> & System::add_vector (const std::string& vec_name,
-                                            const bool projections)
+                                            const bool projections,
+                                            const ParallelType type)
 {
   // Return the vector if it is already there.
   if (this->have_vector(vec_name))
@@ -590,9 +622,24 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
   _vectors.insert (std::make_pair (vec_name, buf));
   _vector_projections.insert (std::make_pair (vec_name, projections));
 
+  _vector_types.insert (std::make_pair (vec_name, type));
+
   // Initialize it if necessary
   if (!_can_add_vectors)
-    buf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
+  {
+    if(type == GHOSTED)
+    {
+#ifdef LIBMESH_ENABLE_GHOSTED
+      buf->init (this->n_dofs(), this->n_local_dofs(),
+                 _dof_map->get_send_list(), false,
+                 GHOSTED);
+#else
+      libmesh_error("Cannot initialize ghosted vectors when they are not enabled.");
+#endif
+    }
+    else
+      buf->init (this->n_dofs(), this->n_local_dofs(), false, type);
+  }
 
   return *buf;
 }
