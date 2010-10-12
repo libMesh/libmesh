@@ -38,10 +38,10 @@ TransientRBParamSubdomainTree::TransientRBParamSubdomainTree
   // refinement for a time-dependent problem.
   use_delta_N_in_h_stage = infile("use_delta_N_in_h_stage",use_delta_N_in_h_stage);
 
-  std::cout << std::endl << "TransientRBParamSubdomainTree parameters:" << std::endl;
-  std::cout << "Conservativity factor: " << conserv_factor << std::endl;
-  std::cout << "Using delta_N in h-stage: " << use_delta_N_in_h_stage << std::endl;
-  std::cout << std::endl;
+  libMesh::out << std::endl << "TransientRBParamSubdomainTree parameters:" << std::endl;
+  libMesh::out << "Conservativity factor: " << conserv_factor << std::endl;
+  libMesh::out << "Using delta_N in h-stage: " << use_delta_N_in_h_stage << std::endl;
+  libMesh::out << std::endl;
 }
 
 void TransientRBParamSubdomainTree::build_root_node()

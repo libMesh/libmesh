@@ -555,14 +555,14 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
 			  values,
 			  row_indices);
 
-  //std::cout << "row_length=" << row_length << std::endl;
+  //libMesh::out << "row_length=" << row_length << std::endl;
 
   int *index = std::lower_bound (row_indices, row_indices+row_length, j);
 
   libmesh_assert (*index < row_length);
   libmesh_assert (static_cast<unsigned int>(row_indices[*index]) == j);
 
-  //std::cout << "val=" << values[*index] << std::endl;
+  //libMesh::out << "val=" << values[*index] << std::endl;
   
   return values[*index];
 }

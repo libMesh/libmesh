@@ -78,9 +78,9 @@ void DerivedRBSystem<Base>::load_basis_function(unsigned int i)
 
   if(!Base::initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to load basis function."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to load basis function."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -123,7 +123,7 @@ void DerivedRBSystem<Base>::write_out_basis_functions(const std::string& directo
 {
   if( Base::store_basis_functions && (libMesh::processor_id() == 0) ) // Only write out on proc 0
   {
-    std::cout << "Writing out the basis functions..." << std::endl;
+    libMesh::out << "Writing out the basis functions..." << std::endl;
 
     std::ostringstream file_name;
 
@@ -135,7 +135,7 @@ void DerivedRBSystem<Base>::write_out_basis_functions(const std::string& directo
       
       if ( !derived_bf_out.good() )
       {
-        std::cerr << "Error opening derived_bf" << i << ".dat" << std::endl;
+        libMesh::err << "Error opening derived_bf" << i << ".dat" << std::endl;
         libmesh_error();
       }
       
@@ -157,7 +157,7 @@ void DerivedRBSystem<Base>::write_out_basis_functions(const std::string& directo
       }
       if ( !derived_bf_size_out.good() )
       {
-        std::cerr << "Error opening derived_bf_size.dat" << std::endl;
+        libMesh::err << "Error opening derived_bf_size.dat" << std::endl;
         libmesh_error();
       }
       derived_bf_size_out << derived_basis_functions[0].size();
@@ -171,7 +171,7 @@ void DerivedRBSystem<Base>::read_in_basis_functions(const std::string& directory
 {
   if(Base::store_basis_functions)
   {
-    std::cout << "Reading in the basis functions..." << std::endl;
+    libMesh::out << "Reading in the basis functions..." << std::endl;
     
     // First, get the number of size of the derived basis functions
     unsigned int derived_bf_size;
@@ -182,7 +182,7 @@ void DerivedRBSystem<Base>::read_in_basis_functions(const std::string& directory
 
       if ( !derived_bf_size_in.good() )
       {
-        std::cerr << "Error opening derived_bf_size.dat" << std::endl;
+        libMesh::err << "Error opening derived_bf_size.dat" << std::endl;
         libmesh_error();
       }
 
@@ -205,7 +205,7 @@ void DerivedRBSystem<Base>::read_in_basis_functions(const std::string& directory
 
 	  if (stat_result != 0)
 	    {
-	      std::cout << "File does not exist: " << file_name.str() << std::endl;
+	      libMesh::out << "File does not exist: " << file_name.str() << std::endl;
 	      libmesh_error();
 	    }
 	}

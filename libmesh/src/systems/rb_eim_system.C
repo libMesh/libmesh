@@ -80,8 +80,8 @@ void RBEIMSystem::init_data ()
   
   if(n_vars() != get_n_parametrized_functions() )
   {
-    std::cout << "Error: The number of parametrized_functions must match n_vars in RBEIMSystem."
-              << std::endl;
+    libMesh::out << "Error: The number of parametrized_functions must match n_vars in RBEIMSystem."
+                 << std::endl;
     libmesh_error();
   }
   
@@ -100,14 +100,14 @@ void RBEIMSystem::init_data ()
   }
   else
   {
-    std::cout << "Error: invalid best_fit_type in input file" << std::endl;
+    libMesh::out << "Error: invalid best_fit_type in input file" << std::endl;
     libmesh_error();
   }
   
-  std::cout << std::endl << "RBEIMSystem parameters:" << std::endl;
-  std::cout << "best fit type: " << best_fit_type_string << std::endl;
-  std::cout << "number of parametrized functions: " << get_n_parametrized_functions() << std::endl;
-  std::cout << std::endl;
+  libMesh::out << std::endl << "RBEIMSystem parameters:" << std::endl;
+  libMesh::out << "best fit type: " << best_fit_type_string << std::endl;
+  libMesh::out << "number of parametrized functions: " << get_n_parametrized_functions() << std::endl;
+  libMesh::out << std::endl;
 }
 
 void RBEIMSystem::initialize_RB_system(bool online_mode)
@@ -168,8 +168,8 @@ Number RBEIMSystem::evaluate_parametrized_function(unsigned int var, const Point
 {
   if(var >= get_n_parametrized_functions())
   {
-    std::cerr << "Error: We must have var < get_n_parametrized_functions() in evaluate_parametrized_function."
-              << std::endl;
+    libMesh::err << "Error: We must have var < get_n_parametrized_functions() in evaluate_parametrized_function."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -224,8 +224,8 @@ void RBEIMSystem::cache_ghosted_basis_function(unsigned int function_index)
 
   if(function_index > get_n_affine_functions())
   {
-    std::cout << "Error: index cannot be larger than the number of affine functions in evaluate_affine_function"
-              << std::endl;
+    libMesh::out << "Error: index cannot be larger than the number of affine functions in evaluate_affine_function"
+                 << std::endl;
     libmesh_error();
   }
         
@@ -248,13 +248,13 @@ Real RBEIMSystem::RB_solve(unsigned int N)
 
   if(N > get_n_basis_functions())
   {
-    std::cerr << "ERROR: N cannot be larger than the number "
-              << "of basis functions in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N cannot be larger than the number "
+                 << "of basis functions in RB_solve" << std::endl;
     libmesh_error();
   }
   if(N==0)
   {
-    std::cerr << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
     libmesh_error();
   }
 
@@ -306,13 +306,13 @@ void RBEIMSystem::RB_solve(DenseVector<Number>& EIM_rhs)
   
   if(EIM_rhs.size() > get_n_basis_functions())
   {
-    std::cerr << "ERROR: N cannot be larger than the number "
-              << "of basis functions in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N cannot be larger than the number "
+                 << "of basis functions in RB_solve" << std::endl;
     libmesh_error();
   }
   if(EIM_rhs.size()==0)
   {
-    std::cerr << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
     libmesh_error();
   }
   
@@ -485,7 +485,7 @@ Real RBEIMSystem::compute_best_fit_error()
     }
     default:
     {
-      std::cout << "Should not reach here" << std::endl;
+      libMesh::out << "Should not reach here" << std::endl;
       libmesh_error();
     }
   }
@@ -509,9 +509,9 @@ Real RBEIMSystem::truth_solve(int plot_solution)
         
   if(!initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to load the truth solution."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to load the truth solution."
+                 << std::endl;
     libmesh_error();
   }
   
@@ -591,9 +591,9 @@ Real RBEIMSystem::truth_solve(int plot_solution)
       (this->final_linear_residual() >
        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
   {
-      std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-                << this->final_linear_residual() << ", number of iterations = "
-                << this->n_linear_iterations() << std::endl << std::endl;
+      libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+                   << this->final_linear_residual() << ", number of iterations = "
+                   << this->n_linear_iterations() << std::endl << std::endl;
 //     libmesh_error();
   }
 
@@ -659,7 +659,7 @@ void RBEIMSystem::update_RB_system_matrices()
 
 void RBEIMSystem::update_system()
 {
-  std::cout << "Updating RB matrices" << std::endl;
+  libMesh::out << "Updating RB matrices" << std::endl;
   update_RB_system_matrices();
 }
 
@@ -667,7 +667,7 @@ bool RBEIMSystem::greedy_termination_test(Real training_greedy_error, int)
 {
   if(performing_extra_greedy_step)
   {
-    std::cout << "Extra Greedy iteration finished." << std::endl;
+    libMesh::out << "Extra Greedy iteration finished." << std::endl;
     performing_extra_greedy_step = false;
     return true;
   }
@@ -676,15 +676,15 @@ bool RBEIMSystem::greedy_termination_test(Real training_greedy_error, int)
 
   if(training_greedy_error < get_training_tolerance())
   {
-    std::cout << "Specified error tolerance reached." << std::endl
-              << "Perform one more Greedy iteration for error bounds." << std::endl;
+    libMesh::out << "Specified error tolerance reached." << std::endl
+                 << "Perform one more Greedy iteration for error bounds." << std::endl;
     performing_extra_greedy_step = true;
     return false;
   }
 
   if(get_n_basis_functions() >= this->get_Nmax())
   {
-    std::cout << "Maximum number of basis functions reached: Nmax = "
+    libMesh::out << "Maximum number of basis functions reached: Nmax = "
               << get_Nmax() << "." << std::endl
               << "Perform one more Greedy iteration for error bounds." << std::endl;
     performing_extra_greedy_step = true;
@@ -716,7 +716,7 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !interpolation_matrix_out.good() )
     {
-      std::cerr << "Error opening interpolation_matrix.dat" << std::endl;
+      libMesh::err << "Error opening interpolation_matrix.dat" << std::endl;
       libmesh_error();
     }
     interpolation_matrix_out.precision(precision_level);
@@ -738,7 +738,7 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !extra_interpolation_matrix_row_out.good() )
     {
-      std::cerr << "Error opening extra_interpolation_matrix_row.dat" << std::endl;
+      libMesh::err << "Error opening extra_interpolation_matrix_row.dat" << std::endl;
       libmesh_error();
     }
     extra_interpolation_matrix_row_out.precision(precision_level);
@@ -756,7 +756,7 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !interpolation_points_out.good() )
     {
-      std::cerr << "Error opening interpolation_points.dat" << std::endl;
+      libMesh::err << "Error opening interpolation_points.dat" << std::endl;
       libmesh_error();
     }
     interpolation_points_out.precision(precision_level);
@@ -775,7 +775,7 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !extra_interpolation_point_out.good() )
     {
-      std::cerr << "Error opening extra_interpolation_point.dat" << std::endl;
+      libMesh::err << "Error opening extra_interpolation_point.dat" << std::endl;
       libmesh_error();
     }
     extra_interpolation_point_out.precision(precision_level);
@@ -794,7 +794,7 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !interpolation_points_var_out.good() )
     {
-      std::cerr << "Error opening interpolation_points_var.dat" << std::endl;
+      libMesh::err << "Error opening interpolation_points_var.dat" << std::endl;
       libmesh_error();
     }
     interpolation_points_var_out.precision(precision_level);
@@ -811,7 +811,7 @@ void RBEIMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !extra_interpolation_point_var_out.good() )
     {
-      std::cerr << "Error opening extra_interpolation_point_var.dat" << std::endl;
+      libMesh::err << "Error opening extra_interpolation_point_var.dat" << std::endl;
       libmesh_error();
     }
     extra_interpolation_point_var_out.precision(precision_level);
@@ -842,7 +842,7 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !interpolation_matrix_in.good() )
   {
-    std::cerr << "Error opening interpolation_matrix.dat" << std::endl;
+    libMesh::err << "Error opening interpolation_matrix.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int i=0; i<n_bfs; i++)
@@ -864,7 +864,7 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !extra_interpolation_matrix_row_in.good() )
   {
-    std::cerr << "Error opening extra_interpolation_matrix_row.dat" << std::endl;
+    libMesh::err << "Error opening extra_interpolation_matrix_row.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int j=0; j<n_bfs; j++)
@@ -884,7 +884,7 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !interpolation_points_in.good() )
   {
-    std::cerr << "Error opening interpolation_points.dat" << std::endl;
+    libMesh::err << "Error opening interpolation_points.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int i=0; i<n_bfs; i++)
@@ -907,7 +907,7 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !extra_interpolation_point_in.good() )
   {
-    std::cerr << "Error opening extra_interpolation_point.dat" << std::endl;
+    libMesh::err << "Error opening extra_interpolation_point.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int i=0; i<n_bfs; i++)
@@ -931,7 +931,7 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !interpolation_points_var_in.good() )
   {
-    std::cerr << "Error opening interpolation_points_var.dat" << std::endl;
+    libMesh::err << "Error opening interpolation_points_var.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int i=0; i<=n_bfs; i++)
@@ -951,7 +951,7 @@ void RBEIMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !extra_interpolation_point_var_in.good() )
   {
-    std::cerr << "Error opening extra_interpolation_point_var.dat" << std::endl;
+    libMesh::err << "Error opening extra_interpolation_point_var.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int i=0; i<=n_bfs; i++)

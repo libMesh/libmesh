@@ -313,9 +313,9 @@ public:
 //     inline
 //     void operator() (const std::pair<const Node*, short int>& np) const
 //     {
-//       std::cout << "  (" << np.first->id()
-// 		<< ", "  << np.second
-// 		<< ")"  << std::endl;
+//       libMesh::out << "  (" << np.first->id()
+// 		      << ", "  << np.second
+// 		      << ")"  << std::endl;
 //     }
 //   };
 
@@ -331,10 +331,10 @@ public:
 //     inline
 //     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
 //     {
-//       std::cout << "  (" << sp.first->id()
-// 		<< ", "  << sp.second.first
-// 		<< ", "  << sp.second.second 
-// 		<< ")"   << std::endl;
+//       libMesh::out << "  (" << sp.first->id()
+// 		      << ", "  << sp.second.first
+// 		      << ", "  << sp.second.second 
+// 		      << ")"   << std::endl;
 //     }
 //   };
 

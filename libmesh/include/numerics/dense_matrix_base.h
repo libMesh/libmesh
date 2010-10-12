@@ -113,7 +113,7 @@ public:
   /**
    * Formatted print as above but allows you to do
    * DenseMatrix K;
-   * std::cout << K << std::endl;
+   * libMesh::out << K << std::endl;
    */
   friend std::ostream& operator << (std::ostream& os, const DenseMatrixBase<T>& m)
   {

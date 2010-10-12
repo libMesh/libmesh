@@ -42,8 +42,8 @@ void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_ancho
   {
     if(left_child != NULL)
     {
-      std::cout << "Error: Child already exists!"
-                << std::endl;
+      libMesh::out << "Error: Child already exists!"
+                   << std::endl;
       libmesh_error();
     }
     else
@@ -57,8 +57,8 @@ void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_ancho
   {
     if(right_child != NULL)
     {
-      std::cout << "Error: Child already exists!"
-                << std::endl;
+      libMesh::out << "Error: Child already exists!"
+                   << std::endl;
       libmesh_error();
     }
     else
@@ -121,9 +121,9 @@ void TransientRBParamSubdomainNode::hp_greedy()
     Real RB_error = trans_rb.RB_solve(trans_rb.get_n_basis_functions());
     if (RB_error > _tree.h_tol/trans_tree.conserv_factor)
     {
-        std::cout << "Error: The h-tolerance was not satisfied at the "
-        << "anchor point hence h-type refinement may not converge."
-        << std::endl;
+        libMesh::out << "Error: The h-tolerance was not satisfied at the "
+                     << "anchor point hence h-type refinement may not converge."
+                     << std::endl;
         libmesh_error();
     }
 
@@ -132,7 +132,7 @@ void TransientRBParamSubdomainNode::hp_greedy()
 
     if ( greedy_bound > _tree.h_tol) // recursive call to hp_greedy
     {
-        std::cout << "h tolerance not satisfied, splitting subdomain..." << std::endl;
+        libMesh::out << "h tolerance not satisfied, splitting subdomain..." << std::endl;
         split_this_subdomain(true);
 
         left_child->hp_greedy();
@@ -140,11 +140,11 @@ void TransientRBParamSubdomainNode::hp_greedy()
     }
     else // terminate branch, populate the model with standard p-type,write out subelement data
     {
-        std::cout << "h tolerance satisfied, performing p-refinement..." << std::endl;
+        libMesh::out << "h tolerance satisfied, performing p-refinement..." << std::endl;
         greedy_bound = perform_p_stage(greedy_bound);
         if (greedy_bound > _tree.p_tol)
         {
-            std::cout << "p tolerance not satisfied, splitting subdomain..." << std::endl;
+            libMesh::out << "p tolerance not satisfied, splitting subdomain..." << std::endl;
             split_this_subdomain(false);
 
             left_child->hp_greedy();
@@ -152,9 +152,9 @@ void TransientRBParamSubdomainNode::hp_greedy()
         }
         else
         {
-            std::cout << "p tolerance satisfied, subdomain "
-                      << _tree.leaf_node_index << " is a leaf node..."
-                      << std::endl;
+            libMesh::out << "p tolerance satisfied, subdomain "
+                         << _tree.leaf_node_index << " is a leaf node..."
+                         << std::endl;
 
             // Finally, write out the data for this subdomain
             write_subdomain_data_to_files();
@@ -223,8 +223,8 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
     {
         if (anchors_are_equal)
         {
-            std::cout << "Error: Anchor points for children are equal!"
-                      << std::endl;
+            libMesh::out << "Error: Anchor points for children are equal!"
+                         << std::endl;
             libmesh_error();
         }
     }
@@ -250,7 +250,7 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
             // anchors_are_equal has been updated, check if we have found different point.
             if(anchors_are_equal) 
             {
-                std::cout << "Error: Unable to find distinct anchors in additional splitting step." << std::endl;
+                libMesh::out << "Error: Unable to find distinct anchors in additional splitting step." << std::endl;
                 libmesh_error();
             }
         }

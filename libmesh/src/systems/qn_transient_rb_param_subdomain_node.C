@@ -49,8 +49,8 @@ void QNTransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_anc
   {
     if(left_child != NULL)
     {
-      std::cout << "Error: Child already exists!"
-                << std::endl;
+      libMesh::out << "Error: Child already exists!"
+                   << std::endl;
       libmesh_error();
     }
     else
@@ -64,8 +64,8 @@ void QNTransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_anc
   {
     if(right_child != NULL)
     {
-      std::cout << "Error: Child already exists!"
-                << std::endl;
+      libMesh::out << "Error: Child already exists!"
+                   << std::endl;
       libmesh_error();
     }
     else
@@ -85,8 +85,8 @@ void QNTransientRBParamSubdomainNode::write_subdomain_data_to_files()
   RBParamSubdomainNode::write_subdomain_data_to_files();
   
   // Finally, perform the SCM stage on this subdomain
-  std::cout << std::endl << "Perform SCM greedy for leaf subdomain " << _tree.leaf_node_index
-            << std::endl << std::endl;
+  libMesh::out << std::endl << "Perform SCM greedy for leaf subdomain " << _tree.leaf_node_index
+               << std::endl << std::endl;
   _scm_system.resize_to_new_n_bfs();
   _scm_system.load_training_set(this->training_set);
   _scm_system.perform_SCM_greedy();

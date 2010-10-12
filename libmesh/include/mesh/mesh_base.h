@@ -464,7 +464,7 @@ public:
   /**
    * Equivalent to calling print_info() above, but now you can write:
    * Mesh mesh;
-   * std::cout << mesh << std::endl;
+   * libMesh::out << mesh << std::endl;
    */
   friend std::ostream& operator << (std::ostream& os, const MeshBase& m);
 
@@ -798,7 +798,7 @@ variant_filter_iterator<MeshBase::Predicate,
 			    Elem* const&,
 			    Elem* const*>(rhs)
   {
-    // std::cout << "Called element_iterator conversion-to-const ctor." << std::endl;
+    // libMesh::out << "Called element_iterator conversion-to-const ctor." << std::endl;
   }
 };
 
@@ -858,7 +858,7 @@ variant_filter_iterator<MeshBase::Predicate,
 			    Node* const &,
 			    Node* const *>(rhs)
   {
-    // std::cout << "Called node_iterator conversion-to-const ctor." << std::endl;
+    // libMesh::out << "Called node_iterator conversion-to-const ctor." << std::endl;
   }
 };
 

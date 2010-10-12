@@ -84,11 +84,11 @@ void QNTransientSCMSystem::init_data()
 
   Parent::init_data();
 
-  std::cout << std::endl << "QNTransientSCMSystem parameters:" << std::endl;
-  std::cout << "K: " << get_K() << std::endl;
-  std::cout << "dt: " << get_dt() << std::endl;
-  std::cout << "Number of training samples in time for each parameter: " << n_time_samples << std::endl;
-  std::cout << std::endl;
+  libMesh::out << std::endl << "QNTransientSCMSystem parameters:" << std::endl;
+  libMesh::out << "K: " << get_K() << std::endl;
+  libMesh::out << "dt: " << get_dt() << std::endl;
+  libMesh::out << "Number of training samples in time for each parameter: " << n_time_samples << std::endl;
+  libMesh::out << std::endl;
 }
 
 
@@ -133,7 +133,7 @@ void QNTransientSCMSystem::resize_SCM_vectors()
 void QNTransientSCMSystem::perform_SCM_greedy()
 {
   // Solve the RB system at each different mu in the SCM training set
-  std::cout << "Performing RB solves at each parameter in SCM training set..." << std::endl << std::endl;
+  libMesh::out << "Performing RB solves at each parameter in SCM training set..." << std::endl << std::endl;
   EquationSystems& es = this->get_equation_systems();
   QNTransientRBSystem& RB_system = es.get_system<QNTransientRBSystem>(RB_system_name);
   const unsigned int RB_size = RB_system.get_n_basis_functions();
@@ -326,7 +326,7 @@ void QNTransientSCMSystem::initialize_training_parameters(const std::vector<Real
 {
   if( (_K % n_time_samples) != 0)
   {
-    std::cout << "ERROR: K must be divisible by n_SCM_time_samples" << std::endl;
+    libMesh::out << "ERROR: K must be divisible by n_SCM_time_samples" << std::endl;
     libmesh_error();
   }
 
@@ -440,8 +440,8 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Number> >&
   // generated
   if(!training_parameters_initialized)
   {
-    std::cout << "Error: load_training_set cannot be used to initialize parameters"
-              << std::endl;
+    libMesh::out << "Error: load_training_set cannot be used to initialize parameters"
+                 << std::endl;
     libmesh_error();
   }
 
@@ -449,15 +449,15 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Number> >&
   // (excluding the time "parameter")
   if(new_training_set.size() != (get_n_params()-1))
   {
-    std::cout << "Error: Incorrect number of parameters in load_training_set."
-              << std::endl;
+    libMesh::out << "Error: Incorrect number of parameters in load_training_set."
+                 << std::endl;
     libmesh_error();
   }
 
   // Make sure n_time_samples is valid
   if( (_K % n_time_samples) != 0)
   {
-    std::cout << "ERROR: K must be divisible by n_SCM_time_samples" << std::endl;
+    libMesh::out << "ERROR: K must be divisible by n_SCM_time_samples" << std::endl;
     libmesh_error();
   }
 
@@ -561,15 +561,15 @@ void QNTransientSCMSystem::load_training_set(std::vector< std::vector<Number> >&
   }
 
 //  // Print out the training set
-//  std::cout << "n_training_samples = " << n_training_samples_in << std::endl;
+//  libMesh::out << "n_training_samples = " << n_training_samples_in << std::endl;
 //  for(unsigned int index=0; index<n_training_samples_in; index++)
 //  {
-//    std::cout << "training parameters for index="<<index<<":"<<std::endl;
+//    libMesh::out << "training parameters for index="<<index<<":"<<std::endl;
 //    for(unsigned int param=0; param<get_n_params(); param++)
 //    {
-//      std::cout << " " << (*training_parameters[param])(index);
+//      libMesh::out << " " << (*training_parameters[param])(index);
 //    }
-//    std::cout << std::endl << std::endl;
+//    libMesh::out << std::endl << std::endl;
 //  }
 
   // Finally, clear and reinitialize vectors to store the RB coefficients
@@ -610,7 +610,7 @@ void QNTransientSCMSystem::write_offline_data_to_files(const std::string& direct
     }
     if ( !C_J_RB_coeffs_out.good() )
     {
-      std::cerr << "Error opening C_J_RB_coeffs.dat" << std::endl;
+      libMesh::err << "Error opening C_J_RB_coeffs.dat" << std::endl;
       libmesh_error();
     }
     C_J_RB_coeffs_out.precision(precision_level);
@@ -636,7 +636,7 @@ void QNTransientSCMSystem::read_offline_data_from_files(const std::string& direc
   resize_to_new_n_bfs();
   if(get_n_basis_functions() == 0)
   {
-    std::cout << "Error: The RBSystem associated to this QNTransientSCMSystem needs to be initialized first.";
+    libMesh::out << "Error: The RBSystem associated to this QNTransientSCMSystem needs to be initialized first.";
     libmesh_error();
   }
 
@@ -651,7 +651,7 @@ void QNTransientSCMSystem::read_offline_data_from_files(const std::string& direc
   }
   if ( !C_J_RB_coeffs_in.good() )
   {
-    std::cerr << "Error opening C_J_RB_coeffs.dat" << std::endl;
+    libMesh::err << "Error opening C_J_RB_coeffs.dat" << std::endl;
     libmesh_error();
   }
   C_J_RB_coeffs.resize( C_J_stability_vector.size() );
