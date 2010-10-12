@@ -137,6 +137,18 @@ namespace libMesh
   streamT& flush () { return _target->flush(); }
 
   /**
+   * Get the associated format flags
+   */
+  std::ios_base::fmtflags flags ( ) const
+    { return _target->flags(); }
+
+  /**
+   * Set/get the associated format flags
+   */
+  std::ios_base::fmtflags flags ( std::ios_base::fmtflags fmtfl ) 
+    { return _target->flags(fmtfl); }
+
+  /**
    * Set the associated flags
    */
   std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl ) 
