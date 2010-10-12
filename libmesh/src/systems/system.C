@@ -256,7 +256,8 @@ void System::init_data ()
                          _dof_map->get_send_list(), false,
                          GHOSTED);
 #else
-      libmesh_error("Cannot initialize ghosted vectors when they are not enabled.");
+      libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
+      libmesh_error();
 #endif
     }
     else
@@ -287,7 +288,8 @@ void System::restrict_vectors ()
                          _dof_map->get_send_list(), false,
                          GHOSTED);
 #else
-          libmesh_error("Cannot initialize ghosted vectors when they are not enabled.");
+          libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
+          libmesh_error();
 #endif
         }
         else
@@ -634,7 +636,8 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
                  _dof_map->get_send_list(), false,
                  GHOSTED);
 #else
-      libmesh_error("Cannot initialize ghosted vectors when they are not enabled.");
+      std::cerr << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
+      libmesh_error();
 #endif
     }
     else
