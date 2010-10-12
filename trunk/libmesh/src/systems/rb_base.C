@@ -263,9 +263,9 @@ void RBBase<Base>::print_current_parameters()
 {
   for(unsigned int j=0; j<get_n_params(); j++)
   {
-    std::cout << "mu[" << j << "] = " << current_parameters[j] << std::endl;
+    libMesh::out << "mu[" << j << "] = " << current_parameters[j] << std::endl;
   }
-  std::cout << std::endl;
+  libMesh::out << std::endl;
 }
 
 template <class Base>
@@ -273,8 +273,8 @@ Number RBBase<Base>::eval_theta_q_a(unsigned int q)
 {
   if(q >= get_Q_a())
   {
-    std::cerr << "Error: We must have q < Q_a in eval_theta_q_a."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_a in eval_theta_q_a."
+                 << std::endl;
     libmesh_error();
   }
   
@@ -367,16 +367,16 @@ void RBBase<Base>::load_training_set(std::vector< std::vector<Number> >& new_tra
   // generated
   if(!training_parameters_initialized)
   {
-    std::cout << "Error: load_training_set cannot be used to initialize parameters"
-              << std::endl;
+    libMesh::out << "Error: load_training_set cannot be used to initialize parameters"
+                 << std::endl;
     libmesh_error();
   }
 
   // Make sure that the training set has the correct number of parameters
   if(new_training_set.size() != get_n_params())
   {
-    std::cout << "Error: Incorrect number of parameters in load_training_set."
-              << std::endl;
+    libMesh::out << "Error: Incorrect number of parameters in load_training_set."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -540,8 +540,8 @@ void RBBase<Base>::generate_training_parameters_deterministic(const std::vector<
 
   if(num_params > 2)
   {
-    std::cout << "ERROR: Deterministic training sample generation "
-              << " not implemented for more than two parameters." << std::endl;
+    libMesh::out << "ERROR: Deterministic training sample generation "
+                 << " not implemented for more than two parameters." << std::endl;
     libmesh_not_implemented();
   }
 
@@ -624,9 +624,9 @@ void RBBase<Base>::generate_training_parameters_deterministic(const std::vector<
     unsigned int n_training_parameters_per_var = static_cast<unsigned int>( std::sqrt(n_training_samples_in) );
     if( (n_training_parameters_per_var*n_training_parameters_per_var) != n_training_samples_in)
     {
-      std::cout << "Error: Number of training parameters = " << n_training_samples_in << "." << std::endl
-                << "Deterministic training set generation with two parameters requires " << std::endl
-                << "the number of training parameters to be a perfect square." << std::endl;
+      libMesh::out << "Error: Number of training parameters = " << n_training_samples_in << "." << std::endl
+                   << "Deterministic training set generation with two parameters requires " << std::endl
+                   << "the number of training parameters to be a perfect square." << std::endl;
       libmesh_error();
     }
 
@@ -686,15 +686,15 @@ void RBBase<Base>::generate_training_parameters_deterministic(const std::vector<
       }
     }
 
-//     std::cout << "n_training_samples = " << n_training_samples_in << std::endl;
+//     libMesh::out << "n_training_samples = " << n_training_samples_in << std::endl;
 //     for(unsigned int index=0; index<n_training_samples_in; index++)
 //     {
-//         std::cout << "training parameters for index="<<index<<":"<<std::endl;
+//         libMesh::out << "training parameters for index="<<index<<":"<<std::endl;
 //         for(unsigned int param=0; param<num_params; param++)
 //         {
-//           std::cout << " " << (*training_parameters_in[param])(index);
+//           libMesh::out << " " << (*training_parameters_in[param])(index);
 //         }
-//         std::cout << std::endl << std::endl;
+//         libMesh::out << std::endl << std::endl;
 //     }
 
   }
@@ -736,7 +736,7 @@ RBBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
       KSP ksp = petsc_linear_solver->ksp();
       ierr = KSPGetType(ksp, &orig_petsc_ksp_type); CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
-      // std::cout << "orig_petsc_pc_type (before)=" << orig_petsc_pc_type << std::endl;
+      // libMesh::out << "orig_petsc_pc_type (before)=" << orig_petsc_pc_type << std::endl;
       // Make actual copies of the original PC and KSP types
       orig_petsc_pc_type_string = orig_petsc_pc_type;
       orig_petsc_ksp_type_string = orig_petsc_ksp_type;
@@ -773,8 +773,8 @@ RBBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
   else
     {
       // Otherwise, the cast failed and we are not using PETSc...
-      std::cout << "You are not using PETSc, so don't know how to set AMG PC." << std::endl;
-      std::cout << "Returning empty string!" << std::endl;
+      libMesh::out << "You are not using PETSc, so don't know how to set AMG PC." << std::endl;
+      libMesh::out << "Returning empty string!" << std::endl;
     }
 #endif // LIBMESH_HAVE_PETSC
 

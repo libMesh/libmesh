@@ -237,7 +237,7 @@ public:
    */
   virtual void attach_theta_q_a(theta_q_fptr )
   {
-    std::cout << "Error: Cannot use attach_theta_q_a in RBSystem. Use attach_A_q instead." << std::endl;
+    libMesh::out << "Error: Cannot use attach_theta_q_a in RBSystem. Use attach_A_q instead." << std::endl;
     libmesh_error();
   }
 
@@ -247,7 +247,7 @@ public:
    */
   virtual void attach_A_EIM_system(RBEIMSystem*)
   {
-    std::cout << "Error: Cannot use attach_theta_q_a in RBSystem. Use attach_A_q instead." << std::endl;
+    libMesh::out << "Error: Cannot use attach_theta_q_a in RBSystem. Use attach_A_q instead." << std::endl;
     libmesh_error();
   }
 

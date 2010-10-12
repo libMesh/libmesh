@@ -311,10 +311,10 @@ void RBSystem::init_data ()
   // when we also want to read in the basis functions.
   if(!initialize_calN_dependent_data && store_basis_functions)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures if we want to read in basis "
-              << "functions."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures if we want to read in basis "
+                 << "functions."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -359,63 +359,63 @@ void RBSystem::init_data ()
   // Set the initial parameter value
   set_current_parameters(init_mu_vector);
 
-  std::cout << std::endl << "RBSystem parameters:" << std::endl;
-  std::cout << "system name: " << this->name() << std::endl;
-  std::cout << "constrained_problem: " << constrained_problem << std::endl;
-  std::cout << "Nmax: " << Nmax << std::endl;
+  libMesh::out << std::endl << "RBSystem parameters:" << std::endl;
+  libMesh::out << "system name: " << this->name() << std::endl;
+  libMesh::out << "constrained_problem: " << constrained_problem << std::endl;
+  libMesh::out << "Nmax: " << Nmax << std::endl;
   if(training_tolerance > 0.)
-    std::cout << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
-  std::cout << "A_q operators attached: " << get_Q_a() << std::endl;
-  std::cout << "F_q functions attached: " << get_Q_f() << std::endl;
-  std::cout << "Number of A EIM systems: " << get_n_A_EIM_systems() << std::endl;
-  std::cout << "Number of F EIM systems: " << get_n_F_EIM_systems() << std::endl;
-  std::cout << "n_outputs: " << get_n_outputs() << std::endl;
+    libMesh::out << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
+  libMesh::out << "A_q operators attached: " << get_Q_a() << std::endl;
+  libMesh::out << "F_q functions attached: " << get_Q_f() << std::endl;
+  libMesh::out << "Number of A EIM systems: " << get_n_A_EIM_systems() << std::endl;
+  libMesh::out << "Number of F EIM systems: " << get_n_F_EIM_systems() << std::endl;
+  libMesh::out << "n_outputs: " << get_n_outputs() << std::endl;
   for(unsigned int n=0; n<get_n_outputs(); n++)
-    std::cout << "output " << n << ", Q_l = " << get_Q_l(n) << std::endl;
+    libMesh::out << "output " << n << ", Q_l = " << get_Q_l(n) << std::endl;
   for(unsigned int i=0; i<n_parameters; i++)
   {
-    std::cout <<   "Parameter " << i
-              << ": Min = " << get_parameter_min(i)
-              << ", Max = " << get_parameter_max(i)
-              << ", log scaling = " << log_scaling[i] << std::endl;
+    libMesh::out <<   "Parameter " << i
+                 << ": Min = " << get_parameter_min(i)
+                 << ", Max = " << get_parameter_max(i)
+                 << ", log scaling = " << log_scaling[i] << std::endl;
   }
-  std::cout << "n_training_samples: " << get_n_training_samples() << std::endl;
-  std::cout << "using deterministic training samples? " << deterministic_training << std::endl;
-  std::cout << "store/load basis functions? " << store_basis_functions << std::endl;
+  libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
+  libMesh::out << "using deterministic training samples? " << deterministic_training << std::endl;
+  libMesh::out << "store/load basis functions? " << store_basis_functions << std::endl;
   if(store_basis_functions)
   {
-    std::cout << "  write out basis functions in binary format? "
-              << write_binary_basis_functions << std::endl;
-    std::cout << "  read in basis functions in binary format? "
-              << read_binary_basis_functions << std::endl;
+    libMesh::out << "  write out basis functions in binary format? "
+                 << write_binary_basis_functions << std::endl;
+    libMesh::out << "  read in basis functions in binary format? "
+                 << read_binary_basis_functions << std::endl;
   }
-  std::cout << "store/load residual representors? " << store_representors << std::endl;
+  libMesh::out << "store/load residual representors? " << store_representors << std::endl;
   if(store_representors)
   {
-    std::cout << "  write out residual representors in binary format? "
-              << write_binary_residual_representors << std::endl;
-    std::cout << "  read in residual representors in binary format? "
-              << read_binary_residual_representors << std::endl;
+    libMesh::out << "  write out residual representors in binary format? "
+                 << write_binary_residual_representors << std::endl;
+    libMesh::out << "  read in residual representors in binary format? "
+                 << read_binary_residual_representors << std::endl;
   }
-  std::cout << "low-memory mode? " << low_memory_mode << std::endl;
-  std::cout << "reuse preconditioner? " << reuse_preconditioner << std::endl;
-  std::cout << "return a relative error bound from RB_solve? " << return_rel_error_bound << std::endl;
-  std::cout << "write out data during basis training? " << write_data_during_training << std::endl;
-  std::cout << "initializing calN-dependent data structures? "
-            << initialize_calN_dependent_data << std::endl;
-  std::cout << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
-  std::cout << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
-  std::cout << "quiet mode? " << quiet << std::endl;
-  std::cout << "initial parameter: ";
+  libMesh::out << "low-memory mode? " << low_memory_mode << std::endl;
+  libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
+  libMesh::out << "return a relative error bound from RB_solve? " << return_rel_error_bound << std::endl;
+  libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
+  libMesh::out << "initializing calN-dependent data structures? "
+               << initialize_calN_dependent_data << std::endl;
+  libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
+  libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
+  libMesh::out << "quiet mode? " << quiet << std::endl;
+  libMesh::out << "initial parameter: ";
   for(unsigned int i=0; i<n_parameters; i++)
   {
-    std::cout << "mu[" << i << "] = " << get_current_parameters()[i];
+    libMesh::out << "mu[" << i << "] = " << get_current_parameters()[i];
     if(i < (n_parameters-1))
-      std::cout << ", ";
+      libMesh::out << ", ";
     else
-      std::cout << std::endl;
+      libMesh::out << std::endl;
   }
-  std::cout << std::endl;
+  libMesh::out << std::endl;
 
   // We need Nmax to be initialized
   libmesh_assert(Nmax > 0);
@@ -438,9 +438,9 @@ void RBSystem::initialize_dirichlet_dofs()
 
   if(!initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to initialize Dirichlet dofs."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to initialize Dirichlet dofs."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -697,9 +697,9 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
 
   if(!initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to perform add_scaled_matrix_and_vector."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to perform add_scaled_matrix_and_vector."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1088,8 +1088,8 @@ void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_ma
 {
   if(q >= get_Q_a())
   {
-    std::cerr << "Error: We must have q < Q_a in assemble_Aq_matrix."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_a in assemble_Aq_matrix."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1128,8 +1128,8 @@ void RBSystem::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Numbe
 
   if(q_a >= get_Q_a())
   {
-    std::cerr << "Error: We must have q < Q_a in add_scaled_Aq."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_a in add_scaled_Aq."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1176,7 +1176,7 @@ void RBSystem::assemble_misc_matrices()
 {
   if(low_memory_mode)
   {
-    std::cout << "Error: Cannot store misc matrices in low-memory mode." << std::endl;
+    libMesh::out << "Error: Cannot store misc matrices in low-memory mode." << std::endl;
     libmesh_error();
   }
 
@@ -1190,7 +1190,7 @@ void RBSystem::assemble_all_affine_operators()
 {
   if(low_memory_mode)
   {
-    std::cout << "Error: Cannot store affine matrices in low-memory mode." << std::endl;
+    libMesh::out << "Error: Cannot store affine matrices in low-memory mode." << std::endl;
     libmesh_error();
   }
 
@@ -1251,9 +1251,9 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
 
   if(!initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to train reduced basis."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to train reduced basis."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1274,7 +1274,7 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
 
   while(true)
   {
-    std::cout << std::endl << "---- Training solve " << count << " ----" << std::endl;
+    libMesh::out << std::endl << "---- Training solve " << count << " ----" << std::endl;
     print_current_parameters();
 
     // Update the list of Greedily selected parameters
@@ -1284,26 +1284,26 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
     truth_solve(-1);
 
     // Add orthogonal part of the snapshot to the RB space
-    std::cout << std::endl << "Enriching the RB space" << std::endl;
+    libMesh::out << std::endl << "Enriching the RB space" << std::endl;
     enrich_RB_space();
 
     unsigned int RB_size = get_n_basis_functions();
-    std::cout << "Reduced basis dimension = " << RB_size << std::endl;
+    libMesh::out << "Reduced basis dimension = " << RB_size << std::endl;
 
     update_system();
 
-    std::cout << "Performing RB solves on training set" << std::endl;
+    libMesh::out << "Performing RB solves on training set" << std::endl;
     training_greedy_error = compute_a_posteriori_bounds();
 
 
-    std::cout << "Maximum a posteriori error is "
+    libMesh::out << "Maximum a posteriori error is "
               << training_greedy_error << std::endl << std::endl;
 
     if(write_data_during_training)
     {
       OStringStream new_dir_name;
       new_dir_name << directory_name << "_" << get_n_basis_functions();
-      std::cout << "Writing out RB data to " << new_dir_name.str() << std::endl;
+      libMesh::out << "Writing out RB data to " << new_dir_name.str() << std::endl;
       write_offline_data_to_files(new_dir_name.str());
     }
 
@@ -1345,14 +1345,14 @@ bool RBSystem::greedy_termination_test(Real training_greedy_error, int)
 {
   if(training_greedy_error < this->training_tolerance)
   {
-    std::cout << "Specified error tolerance reached." << std::endl;
+    libMesh::out << "Specified error tolerance reached." << std::endl;
     return true;
   }
 
   if(get_n_basis_functions() >= this->get_Nmax())
   {
-    std::cout << "Maximum number of basis functions reached: Nmax = "
-              << get_Nmax() << std::endl;
+    libMesh::out << "Maximum number of basis functions reached: Nmax = "
+                 << get_Nmax() << std::endl;
     return true;
   }
 
@@ -1368,8 +1368,8 @@ std::vector<Real> RBSystem::get_greedy_parameter(unsigned int i)
 {
   if( i >= greedy_param_list.size() )
   {
-    std::cout << "Error: Argument in RBSystem::get_greedy_parameter is too large."
-              << std::endl;
+    libMesh::out << "Error: Argument in RBSystem::get_greedy_parameter is too large."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1382,9 +1382,9 @@ Real RBSystem::truth_solve(int plot_solution)
 
   if(!initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to do a truth solve."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to do a truth solve."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1397,9 +1397,9 @@ Real RBSystem::truth_solve(int plot_solution)
       (this->final_linear_residual() >
        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
   {
-      std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-                << this->final_linear_residual() << ", number of iterations = "
-                << this->n_linear_iterations() << std::endl << std::endl;
+      libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+                   << this->final_linear_residual() << ", number of iterations = "
+                   << this->n_linear_iterations() << std::endl << std::endl;
 //     libmesh_error();
   }
 
@@ -1449,15 +1449,15 @@ void RBSystem::set_Nmax(unsigned int Nmax_in)
   // cannot be increased above initial_Nmax
   if(RB_system_initialized && (Nmax_in > initial_Nmax))
   {
-    std::cerr << "Error: System was initialized with Nmax = " << initial_Nmax
-              << ", cannot set Nmax higher than this value."  << std::endl;
+    libMesh::err << "Error: System was initialized with Nmax = " << initial_Nmax
+                 << ", cannot set Nmax higher than this value."  << std::endl;
     libmesh_error();
   }
 
   if(RB_system_initialized && (Nmax_in < this->get_n_basis_functions()))
   {
-    std::cerr << "Error: Cannot set Nmax to be less than the "
-              << "current number of basis functions."  << std::endl;
+    libMesh::err << "Error: Cannot set Nmax to be less than the "
+                 << "current number of basis functions."  << std::endl;
     libmesh_error();
   }
 
@@ -1529,8 +1529,8 @@ void RBSystem::attach_output(std::vector<theta_q_fptr> theta_q_l,
   }
   else
   {
-    std::cout << "Error: The input vectors in attach_output must all be the same size in attach_output"
-              << std::endl;
+    libMesh::out << "Error: The input vectors in attach_output must all be the same size in attach_output"
+                 << std::endl;
     libmesh_error();
   }
 }
@@ -1556,8 +1556,8 @@ unsigned int RBSystem::get_Q_l(unsigned int index) const
 {
   if(index >= get_n_outputs())
   {
-    std::cerr << "Error: We must have index < n_outputs in get_Q_l."
-              << std::endl;
+    libMesh::err << "Error: We must have index < n_outputs in get_Q_l."
+                 << std::endl;
     libmesh_error();
   }
   return theta_q_l_vector[index].size();
@@ -1567,8 +1567,8 @@ Number RBSystem::eval_theta_q_f(unsigned int q)
 {
   if(q >= get_Q_f())
   {
-    std::cerr << "Error: We must have q < Q_f in eval_theta_q_f."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_f in eval_theta_q_f."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1616,14 +1616,14 @@ Number RBSystem::eval_theta_q_l(unsigned int output_index, unsigned int q_l)
 {
   if( (output_index >= get_n_outputs()) || (q_l >= get_Q_l(output_index)) )
   {
-    std::cerr << "Error: We must have output_index < n_outputs and "
-              << "q_l < get_Q_l(output_index) in eval_theta_q_l."
-              << std::endl;
+    libMesh::err << "Error: We must have output_index < n_outputs and "
+                 << "q_l < get_Q_l(output_index) in eval_theta_q_l."
+                 << std::endl;
     libmesh_error();
   }
 
   libmesh_assert(theta_q_l_vector[output_index][q_l] != NULL);
-
+   
   return theta_q_l_vector[output_index][q_l](current_parameters);
 }
 
@@ -1633,9 +1633,9 @@ void RBSystem::load_basis_function(unsigned int i)
 
   if(!initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to load basis function."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to load basis function."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1702,10 +1702,10 @@ void RBSystem::enrich_RB_space()
 
 void RBSystem::update_system()
 {
-  std::cout << "Updating RB matrices" << std::endl;
+  libMesh::out << "Updating RB matrices" << std::endl;
   update_RB_system_matrices();
 
-  std::cout << "Updating RB residual terms" << std::endl;
+  libMesh::out << "Updating RB residual terms" << std::endl;
 
   // Note: the solves in this function employ a single system matrix and multiple
   // right-hand sides, so we may get better performance using a different
@@ -1756,8 +1756,8 @@ Real RBSystem::compute_a_posteriori_bounds()
     set_current_parameters( get_training_parameter(first_index+i) );
 
     training_error_bounds[i] = get_RB_error_bound();
-//     std::cout << "Error bound at training index " << first_index+i << " is "
-//               << training_error_bounds[i] << std::endl;
+//     libMesh::out << "Error bound at training index " << first_index+i << " is "
+//                  << training_error_bounds[i] << std::endl;
 
     if(training_error_bounds[i] > max_err)
     {
@@ -1796,7 +1796,7 @@ Real RBSystem::get_SCM_lower_bound()
   eigen_system.set_current_parameters( this->get_current_parameters() );
   return eigen_system.get_SCM_LB();
 #else
-  std::cout << "SLEPc and GLPK must be installed for SCM functions to work." << std::endl;
+  libMesh::out << "SLEPc and GLPK must be installed for SCM functions to work." << std::endl;
   libmesh_error();
 #endif // defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 }
@@ -1811,7 +1811,7 @@ Real RBSystem::get_SCM_upper_bound()
   eigen_system.set_current_parameters( this->get_current_parameters() );
   return eigen_system.get_SCM_UB();
 #else
-  std::cout << "SLEPc and GLPK must be installed for SCM functions to work." << std::endl;
+  libMesh::out << "SLEPc and GLPK must be installed for SCM functions to work." << std::endl;
   libmesh_error();
 #endif // defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 }
@@ -1823,13 +1823,13 @@ Real RBSystem::RB_solve(unsigned int N)
 
   if(N > get_n_basis_functions())
   {
-    std::cerr << "ERROR: N cannot be larger than the number "
-              << "of basis functions in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N cannot be larger than the number "
+                 << "of basis functions in RB_solve" << std::endl;
     libmesh_error();
   }
   if(N==0)
   {
-    std::cerr << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
     libmesh_error();
   }
 
@@ -2045,21 +2045,21 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 	solution->zero();
 
 	if (!quiet)
-	  std::cout << "Starting solve q_f=" << q_f
-		    << " in RBSystem::update_residual_terms() at "
-		    << Utility::get_timestamp() << std::endl;
+	  libMesh::out << "Starting solve q_f=" << q_f
+		       << " in RBSystem::update_residual_terms() at "
+		       << Utility::get_timestamp() << std::endl;
 
 	solve();
 
 	if (!quiet)
 	  {
-	    std::cout << "Finished solve q_f=" << q_f
-		      << " in RBSystem::update_residual_terms() at "
-		      << Utility::get_timestamp() << std::endl;
+	    libMesh::out << "Finished solve q_f=" << q_f
+		         << " in RBSystem::update_residual_terms() at "
+		         << Utility::get_timestamp() << std::endl;
 
-	    std::cout << this->n_linear_iterations()
-		      << " iterations, final residual "
-		      << this->final_linear_residual() << std::endl;
+	    libMesh::out << this->n_linear_iterations()
+		         << " iterations, final residual "
+		         << this->final_linear_residual() << std::endl;
 	  }
 
 	// Make sure we didn't max out the number of iterations
@@ -2068,9 +2068,9 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 	    (this->final_linear_residual() >
 	     this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
 	  {
-	    std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-		      << this->final_linear_residual() << ", number of iterations = "
-		      << this->n_linear_iterations() << std::endl << std::endl;
+	    libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+		         << this->final_linear_residual() << ", number of iterations = "
+		         << this->n_linear_iterations() << std::endl << std::endl;
 	    //         libmesh_error();
 
 	  }
@@ -2148,18 +2148,18 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       solution->zero();
       if (!quiet)
 	    {
-        std::cout << "Starting solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBSystem::update_residual_terms() at "
-                  << Utility::get_timestamp() << std::endl;
+        libMesh::out << "Starting solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBSystem::update_residual_terms() at "
+                     << Utility::get_timestamp() << std::endl;
 	    }
 
       solve();
 
       if (!quiet)
 	    {
-        std::cout << "Finished solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBSystem::update_residual_terms() at "
-                  << Utility::get_timestamp() << std::endl;
-        std::cout << this->n_linear_iterations() << " iterations, final residual "
-                  << this->final_linear_residual() << std::endl;
+        libMesh::out << "Finished solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBSystem::update_residual_terms() at "
+                     << Utility::get_timestamp() << std::endl;
+        libMesh::out << this->n_linear_iterations() << " iterations, final residual "
+                     << this->final_linear_residual() << std::endl;
 	    }
 
       // Make sure we didn't max out the number of iterations
@@ -2168,9 +2168,9 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
           (this->final_linear_residual() >
           this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
       {
-        std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-                  << this->final_linear_residual() << ", number of iterations = "
-                  << this->n_linear_iterations() << std::endl << std::endl;
+        libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+                     << this->final_linear_residual() << ", number of iterations = "
+                     << this->n_linear_iterations() << std::endl << std::endl;
 //         libmesh_error();
       }
 
@@ -2333,21 +2333,21 @@ void RBSystem::compute_output_dual_norms()
       solution->zero();
 
       if (!quiet)
-        std::cout << "Starting solve n=" << n << ", q_l=" << q_l
-            << " in RBSystem::compute_output_dual_norms() at "
-            << Utility::get_timestamp() << std::endl;
+        libMesh::out << "Starting solve n=" << n << ", q_l=" << q_l
+               << " in RBSystem::compute_output_dual_norms() at "
+               << Utility::get_timestamp() << std::endl;
 
       solve();
 
       if (!quiet)
         {
-          std::cout << "Finished solve n=" << n << ", q_l=" << q_l
-                    << " in RBSystem::compute_output_dual_norms() at "
-                    << Utility::get_timestamp() << std::endl;
+          libMesh::out << "Finished solve n=" << n << ", q_l=" << q_l
+                       << " in RBSystem::compute_output_dual_norms() at "
+                       << Utility::get_timestamp() << std::endl;
 
-          std::cout << this->n_linear_iterations()
-                    << " iterations, final residual "
-                    << this->final_linear_residual() << std::endl;
+          libMesh::out << this->n_linear_iterations()
+                       << " iterations, final residual "
+                       << this->final_linear_residual() << std::endl;
         }
 
       // Make sure we didn't max out the number of iterations
@@ -2356,9 +2356,9 @@ void RBSystem::compute_output_dual_norms()
           (this->final_linear_residual() >
            this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
          {
-           std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-                     << this->final_linear_residual() << ", number of iterations = "
-                     << this->n_linear_iterations() << std::endl << std::endl;
+           libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+                        << this->final_linear_residual() << ", number of iterations = "
+                        << this->n_linear_iterations() << std::endl << std::endl;
            // libmesh_error();
 
          }
@@ -2384,7 +2384,7 @@ void RBSystem::compute_output_dual_norms()
       for(unsigned int q_l2=q_l1; q_l2<get_Q_l(n); q_l2++)
       {
         output_dual_norms[n][q] = L_q_representor[q_l2]->dot(*inner_product_storage_vector);
-        std::cout << "output_dual_norms[" << n << "][" << q << "] = " << output_dual_norms[n][q] << std::endl;
+        libMesh::out << "output_dual_norms[" << n << "][" << q << "] = " << output_dual_norms[n][q] << std::endl;
         
         q++;
       }
@@ -2421,9 +2421,9 @@ void RBSystem::load_RB_solution()
 
   if(!initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to load RB solution."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to load RB solution."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -2431,9 +2431,9 @@ void RBSystem::load_RB_solution()
 
   if(RB_solution.size() > basis_functions.size())
   {
-    std::cerr << "ERROR: System contains " << basis_functions.size() << " basis functions."
-              << " RB_solution vector constains " << RB_solution.size() << " entries."
-              << " RB_solution in RBSystem::load_RB_solution is too long!" << std::endl;
+    libMesh::err << "ERROR: System contains " << basis_functions.size() << " basis functions."
+                 << " RB_solution vector constains " << RB_solution.size() << " entries."
+                 << " RB_solution in RBSystem::load_RB_solution is too long!" << std::endl;
     libmesh_error();
   }
 
@@ -2484,9 +2484,9 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
 //       (this->final_linear_residual() >
 //        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
 //   {
-//     std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-//               << this->final_linear_residual() << ", number of iterations = "
-//               << this->n_linear_iterations() << std::endl << std::endl;
+//     libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+//                  << this->final_linear_residual() << ", number of iterations = "
+//                  << this->n_linear_iterations() << std::endl << std::endl;
 // //     libmesh_error();
 //   }
 //
@@ -2557,8 +2557,8 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
 
 //  if(libmesh_real(residual_norm_sq) < 0.)
 //  {
-//    std::cout << "Warning: Square of residual norm is negative "
-//              << "in RBSystem::compute_residual_dual_norm()" << std::endl;
+//    libMesh::out << "Warning: Square of residual norm is negative "
+//                 << "in RBSystem::compute_residual_dual_norm()" << std::endl;
 
     // Sometimes this is negative due to rounding error,
     // but error is on the order of 1.e-10, so shouldn't
@@ -2567,8 +2567,8 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
 //    residual_norm_sq = std::abs(residual_norm_sq);
 //  }
 
-//   std::cout << "Slow residual norm squared = " << slow_residual_norm_sq
-//             << ", fast residual norm squared = " << residual_norm_sq << std::endl;
+//   libMesh::out << "Slow residual norm squared = " << slow_residual_norm_sq
+//                << ", fast residual norm squared = " << residual_norm_sq << std::endl;
 
   STOP_LOG("compute_residual_dual_norm()", "RBSystem");
 
@@ -2579,14 +2579,14 @@ SparseMatrix<Number>* RBSystem::get_A_q(unsigned int q)
 {
   if(low_memory_mode)
   {
-    std::cerr << "Error: The affine matrices are not store in low-memory mode." << std::endl;
+    libMesh::err << "Error: The affine matrices are not store in low-memory mode." << std::endl;
     libmesh_error();
   }
 
   if(q >= get_Q_a())
   {
-    std::cerr << "Error: We must have q < Q_a in get_A_q."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_a in get_A_q."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -2597,8 +2597,8 @@ RBEIMSystem& RBSystem::get_A_EIM_system(unsigned int index)
 {
   if(index >= A_EIM_systems_vector.size())
   {
-    std::cerr << "Error: We must have index < get_n_A_EIM_systems() in get_A_EIM_system."
-              << std::endl;
+    libMesh::err << "Error: We must have index < get_n_A_EIM_systems() in get_A_EIM_system."
+                 << std::endl;
     libmesh_error();
   }
   
@@ -2609,8 +2609,8 @@ RBEIMSystem& RBSystem::get_F_EIM_system(unsigned int index)
 {
   if(index >= F_EIM_systems_vector.size())
   {
-    std::cerr << "Error: We must have index < get_n_F_EIM_systems() in get_F_EIM_system."
-              << std::endl;
+    libMesh::err << "Error: We must have index < get_n_F_EIM_systems() in get_F_EIM_system."
+                 << std::endl;
     libmesh_error();
   }
   
@@ -2626,8 +2626,8 @@ NumericVector<Number>* RBSystem::get_F_q(unsigned int q)
 {
   if(q >= get_Q_f())
   {
-    std::cerr << "Error: We must have q < Q_f in get_F_q."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_f in get_F_q."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -2638,9 +2638,9 @@ NumericVector<Number>* RBSystem::get_output_vector(unsigned int n, unsigned int 
 {
   if( (n >= get_n_outputs()) || (q_l >= get_Q_l(n)) )
   {
-    std::cerr << "Error: We must have n < n_outputs and "
-              << "q_l < get_Q_l(n) in get_output_vector."
-              << std::endl;
+    libMesh::err << "Error: We must have n < n_outputs and "
+                 << "q_l < get_Q_l(n) in get_output_vector."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -2693,8 +2693,8 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
     // Make a directory to store all the data files
     if( mkdir(directory_name.c_str(), 0777) == -1)
     {
-      std::cout << "In RBSystem::write_offline_data_to_files, directory "
-                << directory_name << " already exists, overwriting contents." << std::endl;
+      libMesh::out << "In RBSystem::write_offline_data_to_files, directory "
+                   << directory_name << " already exists, overwriting contents." << std::endl;
     }
 
     // First, write out how many basis functions we have generated
@@ -2707,7 +2707,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
       }
       if ( !n_bfs_out.good() )
       {
-        std::cerr << "Error opening n_bfs.dat" << std::endl;
+        libMesh::err << "Error opening n_bfs.dat" << std::endl;
         libmesh_error();
       }
       n_bfs_out << n_bfs;
@@ -2724,7 +2724,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
       }
       if ( !greedy_params_out.good() )
       {
-        std::cerr << "Error opening greedy_params.dat" << std::endl;
+        libMesh::err << "Error opening greedy_params.dat" << std::endl;
         libmesh_error();
       }
       for(unsigned int i=0; i<greedy_param_list.size(); i++)
@@ -2751,7 +2751,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
       }
       if ( !output_dual_norms_out.good() )
       {
-        std::cerr << "Error opening output " << n << " dual norms file" << std::endl;
+        libMesh::err << "Error opening output " << n << " dual norms file" << std::endl;
         libmesh_error();
       }
       output_dual_norms_out.precision(precision_level);
@@ -2777,7 +2777,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
         }
         if( !output_n_out.good() )
         {
-          std::cerr << "Error opening output file for output " << n << std::endl;
+          libMesh::err << "Error opening output file for output " << n << std::endl;
           libmesh_error();
         }
         output_n_out.precision(precision_level);
@@ -2801,7 +2801,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
       }
       if ( !RB_inner_product_matrix_out.good() )
       {
-        std::cerr << "Error opening RB_inner_product_matrix.dat" << std::endl;
+        libMesh::err << "Error opening RB_inner_product_matrix.dat" << std::endl;
         libmesh_error();
       }
       RB_inner_product_matrix_out.precision(precision_level);
@@ -2827,7 +2827,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
 
       if ( !RB_F_q_f_out.good() )
       {
-        std::cerr << "Error opening RB_F_" << q_f << ".dat" << std::endl;
+        libMesh::err << "Error opening RB_F_" << q_f << ".dat" << std::endl;
         libmesh_error();
       }
 
@@ -2850,7 +2850,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
 
       if ( !RB_A_q_a_out.good() )
       {
-        std::cerr << "Error opening RB_A_" << q_a << ".dat" << std::endl;
+        libMesh::err << "Error opening RB_A_" << q_a << ".dat" << std::endl;
         libmesh_error();
       }
 
@@ -2875,7 +2875,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !RB_Fq_norms_out.good() )
     {
-      std::cerr << "Error opening Fq_norms.dat" << std::endl;
+      libMesh::err << "Error opening Fq_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_Fq_norms_out.precision(precision_level);
@@ -2895,7 +2895,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !RB_Fq_Aq_norms_out.good() )
     {
-      std::cerr << "Error opening Fq_Aq_norms.dat" << std::endl;
+      libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_Fq_Aq_norms_out.precision(precision_level);
@@ -2920,7 +2920,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !RB_Aq_Aq_norms_out.good() )
     {
-      std::cerr << "Error opening Aq_Aq_norms.dat" << std::endl;
+      libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_Aq_Aq_norms_out.precision(precision_level);
@@ -2949,7 +2949,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
       // so you don't have to recompute them all over again.  There should be
       // Q_f of these.
       if (!quiet)
-	std::cout << "Writing out the F_q_representors..." << std::endl;
+	libMesh::out << "Writing out the F_q_representors..." << std::endl;
 
       std::ostringstream file_name;
       const std::string residual_representor_suffix = (write_binary_residual_representors ? ".xdr" : ".dat");
@@ -2959,7 +2959,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
       std::string residual_representors_dir = "residual_representors";
       if ( libMesh::processor_id() == 0)
 	if ( mkdir(residual_representors_dir.c_str(), 0755) != 0)
-	  std::cout << "Skipping creating residual_representors directory: " << strerror(errno) << std::endl;
+	  libMesh::out << "Skipping creating residual_representors directory: " << strerror(errno) << std::endl;
 
       for (unsigned int i=0; i<F_q_representor.size(); ++i)
 	{
@@ -3013,14 +3013,14 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
       // so you don't have to recompute them all over again.  There should be
       // Q_a * this->get_n_basis_functions() of these.
       if (!quiet)
-	std::cout << "Writing out the A_q_representors..." << std::endl;
+	libMesh::out << "Writing out the A_q_representors..." << std::endl;
 
       const unsigned int jstop  = this->get_n_basis_functions();
       const unsigned int jstart = jstop-delta_N;
       for (unsigned int i=0; i<A_q_representor.size(); ++i)
 	for (unsigned int j=jstart; j<jstop; ++j)
 	  {
-	    std::cout << "Writing out A_q_representor[" << i << "][" << j << "]..." << std::endl;
+	    libMesh::out << "Writing out A_q_representor[" << i << "][" << j << "]..." << std::endl;
 	    libmesh_assert(A_q_representor[i][j] != NULL);
 
 	    file_name.str(""); // reset filename
@@ -3067,7 +3067,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 
     if ( !n_bfs_in.good() )
     {
-      std::cerr << "Error opening n_bfs.dat" << std::endl;
+      libMesh::err << "Error opening n_bfs.dat" << std::endl;
       libmesh_error();
     }
 
@@ -3089,7 +3089,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
     }
     if ( !output_dual_norms_in.good() )
     {
-      std::cerr << "Error opening input " << n << " dual norms file" << std::endl;
+      libMesh::err << "Error opening input " << n << " dual norms file" << std::endl;
       libmesh_error();
     }
     
@@ -3114,7 +3114,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
       }
       if( !output_n_in.good() )
       {
-        std::cerr << "Error opening input file for output " << n << std::endl;
+        libMesh::err << "Error opening input file for output " << n << std::endl;
         libmesh_error();
       }
 
@@ -3139,7 +3139,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
     }
     if ( !RB_inner_product_matrix_in.good() )
     {
-      std::cerr << "Error opening RB_inner_product_matrix.dat" << std::endl;
+      libMesh::err << "Error opening RB_inner_product_matrix.dat" << std::endl;
       libmesh_error();
     }
     for(unsigned int i=0; i<n_bfs; i++)
@@ -3165,7 +3165,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 
     if ( !RB_F_q_f_in.good() )
     {
-      std::cerr << "Error opening RB_F_" << q_f << ".dat" << std::endl;
+      libMesh::err << "Error opening RB_F_" << q_f << ".dat" << std::endl;
       libmesh_error();
     }
 
@@ -3189,7 +3189,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 
     if ( !RB_A_q_a_in.good() )
     {
-      std::cerr << "Error opening RB_A_" << q_a << ".dat" << std::endl;
+      libMesh::err << "Error opening RB_A_" << q_a << ".dat" << std::endl;
       libmesh_error();
     }
 
@@ -3215,7 +3215,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
   }
   if ( !RB_Fq_norms_in.good() )
   {
-    std::cerr << "Error opening Fq_norms.dat" << std::endl;
+    libMesh::err << "Error opening Fq_norms.dat" << std::endl;
     libmesh_error();
   }
   unsigned int Q_f_hat = get_Q_f()*(get_Q_f()+1)/2;
@@ -3234,7 +3234,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
   }
   if ( !RB_Fq_Aq_norms_in.good() )
   {
-    std::cerr << "Error opening Fq_Aq_norms.dat" << std::endl;
+    libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
@@ -3258,7 +3258,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
   }
   if ( !RB_Aq_Aq_norms_in.good() )
   {
-    std::cerr << "Error opening Aq_Aq_norms.dat" << std::endl;
+    libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
     libmesh_error();
   }
   unsigned int Q_a_hat = get_Q_a()*(get_Q_a()+1)/2;
@@ -3289,7 +3289,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
   // Read in the representor vectors if requested
   if (store_representors)
     {
-      std::cout << "Reading in the F_q_representors..." << std::endl;
+      libMesh::out << "Reading in the F_q_representors..." << std::endl;
 
       const std::string residual_representors_dir = "residual_representors";
       const std::string residual_representor_suffix = (read_binary_residual_representors ? ".xdr" : ".dat");
@@ -3302,8 +3302,8 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 	{
 	  if (F_q_representor[i] != NULL)
 	    {
-	      std::cout << "Error, must delete existing F_q_representor before reading in from file."
-			<< std::endl;
+	      libMesh::out << "Error, must delete existing F_q_representor before reading in from file."
+			   << std::endl;
 	      libmesh_error();
 	    }
 	}
@@ -3322,7 +3322,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 
 	      if (stat_result != 0)
 		{
-		  std::cout << "File does not exist: " << file_name.str() << std::endl;
+		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
 		  libmesh_error();
 		}
 	    }
@@ -3344,7 +3344,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
       // the F_q_representors as we have already read them in from file!
       update_residual_terms_called=true;
 
-      std::cout << "Reading in the A_q_representors..." << std::endl;
+      libMesh::out << "Reading in the A_q_representors..." << std::endl;
 
       // Read in the A_q representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
       // read in [Q_a][this->get_n_basis_functions()].  FIXME:
@@ -3354,8 +3354,8 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 	  {
 	    if (A_q_representor[i][j] != NULL)
 	      {
-		std::cout << "Error, must delete existing A_q_representor before reading in from file."
-			  << std::endl;
+		libMesh::out << "Error, must delete existing A_q_representor before reading in from file."
+			     << std::endl;
 		libmesh_error();
 	      }
 	  }
@@ -3375,7 +3375,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 
 	      if (stat_result != 0)
 		{
-		  std::cout << "File does not exist: " << file_name.str() << std::endl;
+		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
 		  libmesh_error();
 		}
 	    }
@@ -3402,7 +3402,7 @@ void RBSystem::write_out_basis_functions(const std::string& directory_name,
 {
   if(store_basis_functions)
   {
-    std::cout << "Writing out the basis functions..." << std::endl;
+    libMesh::out << "Writing out the basis functions..." << std::endl;
 
     std::ostringstream file_name;
     const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
@@ -3436,7 +3436,7 @@ void RBSystem::read_in_basis_functions(const std::string& directory_name)
 {
   if(store_basis_functions)
   {
-    std::cout << "Reading in the basis functions..." << std::endl;
+    libMesh::out << "Reading in the basis functions..." << std::endl;
 
     std::ostringstream file_name;
     const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
@@ -3457,7 +3457,7 @@ void RBSystem::read_in_basis_functions(const std::string& directory_name)
 
 	  if (stat_result != 0)
 	    {
-	      std::cout << "File does not exist: " << file_name.str() << std::endl;
+	      libMesh::out << "File does not exist: " << file_name.str() << std::endl;
 	      libmesh_error();
 	    }
 	}

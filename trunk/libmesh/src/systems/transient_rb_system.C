@@ -188,25 +188,25 @@ void TransientRBSystem::init_data ()
     RBSystem::init_data();
   }
 
-  std::cout << std::endl << "TransientRBSystem parameters:" << std::endl;
-  std::cout << "Q_m: " << get_Q_m() << std::endl;
-  std::cout << "Number of time-steps: " << get_K() << std::endl;
-  std::cout << "dt: " << get_dt() << std::endl;
-  std::cout << "euler_theta (time discretization parameter): " << get_euler_theta() << std::endl;
+  libMesh::out << std::endl << "TransientRBSystem parameters:" << std::endl;
+  libMesh::out << "Q_m: " << get_Q_m() << std::endl;
+  libMesh::out << "Number of time-steps: " << get_K() << std::endl;
+  libMesh::out << "dt: " << get_dt() << std::endl;
+  libMesh::out << "euler_theta (time discretization parameter): " << get_euler_theta() << std::endl;
   if(get_POD_tol() > 0.)
-    std::cout << "POD_tol: " << get_POD_tol() << std::endl;
+    libMesh::out << "POD_tol: " << get_POD_tol() << std::endl;
   if(max_truth_solves > 0)
-    std::cout << "Maximum number of truth solves: " << max_truth_solves << std::endl;
-  std::cout << "delta_N (number of basis functions to add each POD-Greedy step): " << get_delta_N() << std::endl;
+    libMesh::out << "Maximum number of truth solves: " << max_truth_solves << std::endl;
+  libMesh::out << "delta_N (number of basis functions to add each POD-Greedy step): " << get_delta_N() << std::endl;
   if(nonzero_initialization)
   {
-    std::cout << "Reading initial condition from " << init_filename << std::endl;
+    libMesh::out << "Reading initial condition from " << init_filename << std::endl;
   }
   else
   {
-    std::cout << "Using zero initial condition" << std::endl;
+    libMesh::out << "Using zero initial condition" << std::endl;
   }
-  std::cout << std::endl;
+  libMesh::out << std::endl;
 }
 
 void TransientRBSystem::initialize_RB_system(bool online_mode)
@@ -369,14 +369,14 @@ SparseMatrix<Number>* TransientRBSystem::get_M_q(unsigned int q)
 {
   if(low_memory_mode)
   {
-    std::cerr << "Error: The affine matrices are not store in low-memory mode." << std::endl;
+    libMesh::err << "Error: The affine matrices are not store in low-memory mode." << std::endl;
     libmesh_error();
   }
 
   if(q >= get_Q_m())
   {
-    std::cerr << "Error: We must have q < Q_m in get_M_q."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_m in get_M_q."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -387,8 +387,8 @@ Number TransientRBSystem::eval_theta_q_m(unsigned int q)
 {
   if(q >= get_Q_m())
   {
-    std::cerr << "Error: We must have q < Q_m in eval_theta_q_m."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_m in eval_theta_q_m."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -738,8 +738,8 @@ void TransientRBSystem::assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>*
 {
   if(q >= get_Q_m())
   {
-    std::cerr << "Error: We must have q < Q_m in assemble_Mq_matrix."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_m in assemble_Mq_matrix."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -811,9 +811,9 @@ Real TransientRBSystem::truth_solve(int write_interval)
         (this->final_linear_residual() >
         this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
     {
-      std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-                << this->final_linear_residual() << ", number of iterations = "
-                << this->n_linear_iterations() << std::endl << std::endl;
+      libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+                   << this->final_linear_residual() << ", number of iterations = "
+                   << this->n_linear_iterations() << std::endl << std::endl;
 //       libmesh_error();
     }
 
@@ -837,7 +837,7 @@ Real TransientRBSystem::truth_solve(int write_interval)
 
     if ( (write_interval > 0) && (_k%write_interval == 0) )
       {
-        std::cout << std::endl << "Truth solve, plotting time step " << _k << std::endl;
+        libMesh::out << std::endl << "Truth solve, plotting time step " << _k << std::endl;
 
         OStringStream file_name;
 
@@ -879,8 +879,8 @@ bool TransientRBSystem::greedy_termination_test(Real training_greedy_error, int 
 {
   if ( (get_max_truth_solves()>0) && (count >= get_max_truth_solves()) )
     {
-      std::cout << "Maximum number of truth solves reached: max = "
-                << count << std::endl;
+      libMesh::out << "Maximum number of truth solves reached: max = "
+                   << count << std::endl;
       return true;
     }
 
@@ -996,14 +996,14 @@ void TransientRBSystem::add_IC_to_RB_space()
 
   if (get_n_basis_functions() > 0)
   {
-    std::cout << "Error: Should not call TransientRBSystem::add_IC_to_RB_space() "
-              << "on a system that already contains basis functions." << std::endl;
+    libMesh::out << "Error: Should not call TransientRBSystem::add_IC_to_RB_space() "
+                 << "on a system that already contains basis functions." << std::endl;
     libmesh_error();
   }
   if (!nonzero_initialization)
   {
-    std::cout << "Error: Should not call TransientRBSystem::add_IC_to_RB_space() "
-              << "when nonzero_initialization==false." << std::endl;
+    libMesh::out << "Error: Should not call TransientRBSystem::add_IC_to_RB_space() "
+                 << "when nonzero_initialization==false." << std::endl;
     libmesh_error();
   }
 
@@ -1132,18 +1132,18 @@ void TransientRBSystem::enrich_RB_space()
 
   if (INFO != 0)
   {
-    std::cout << "Error in LAPACK syev eigensolver routine, INFO = " << INFO << std::endl;
+    libMesh::out << "Error in LAPACK syev eigensolver routine, INFO = " << INFO << std::endl;
     libmesh_error();
   }
 
   // eval and evec now hold the sorted eigenvalues/eigenvectors
-  std::cout << std::endl << "POD Eigenvalues:" << std::endl;
+  libMesh::out << std::endl << "POD Eigenvalues:" << std::endl;
   for(unsigned int i=0; i<=2; i++)
   {
-    std::cout << "eigenvalue " << i << " = " << W[eigen_size-1-i] << std::endl;
+    libMesh::out << "eigenvalue " << i << " = " << W[eigen_size-1-i] << std::endl;
   }
-  std::cout << "eigenvalue K = " << W[0] << std::endl;
-  std::cout << std::endl;
+  libMesh::out << "eigenvalue K = " << W[0] << std::endl;
+  libMesh::out << std::endl;
 
   // Now load the new basis functions
   unsigned int count = 0;
@@ -1229,7 +1229,7 @@ void TransientRBSystem::update_system()
 
   Parent::update_system();
 
-  std::cout << "Updating RB initial conditions" << std::endl;
+  libMesh::out << "Updating RB initial conditions" << std::endl;
   update_RB_initial_condition_all_N();
 }
 
@@ -1239,13 +1239,13 @@ Real TransientRBSystem::RB_solve(unsigned int N)
 
   if(N > get_n_basis_functions())
   {
-    std::cerr << "ERROR: N cannot be larger than the number "
-              << "of basis functions in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N cannot be larger than the number "
+                 << "of basis functions in RB_solve" << std::endl;
     libmesh_error();
   }
   if(N==0)
   {
-    std::cerr << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
     libmesh_error();
   }
 
@@ -1420,9 +1420,9 @@ void TransientRBSystem::load_RB_solution()
 
   if(RB_solution_vector_k.size() > basis_functions.size())
   {
-    std::cerr << "ERROR: System contains " << basis_functions.size() << " basis functions."
-              << " RB_solution vector constains " << RB_solution.size() << " entries."
-              << " RB_solution in TransientRBSystem::load_RB_solution is too long!" << std::endl;
+    libMesh::err << "ERROR: System contains " << basis_functions.size() << " basis functions."
+                 << " RB_solution vector constains " << RB_solution.size() << " entries."
+                 << " RB_solution in TransientRBSystem::load_RB_solution is too long!" << std::endl;
     libmesh_error();
   }
 
@@ -1563,20 +1563,20 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
       solution->zero();
 
       if (!quiet)
-        std::cout << "Starting solve i="
-      << i << " in TransientRBSystem::update_residual_terms() at "
-      << Utility::get_timestamp() << std::endl;
+        libMesh::out << "Starting solve i="
+                     << i << " in TransientRBSystem::update_residual_terms() at "
+                     << Utility::get_timestamp() << std::endl;
       solve();
 
       if (!quiet)
         {
-    std::cout << "Finished solve i="
-        << i << " in TransientRBSystem::update_residual_terms() at "
-        << Utility::get_timestamp() << std::endl;
+          libMesh::out << "Finished solve i="
+                       << i << " in TransientRBSystem::update_residual_terms() at "
+                       << Utility::get_timestamp() << std::endl;
 
-    std::cout << this->n_linear_iterations()
-        << " iterations, final residual "
-        << this->final_linear_residual() << std::endl;
+          libMesh::out << this->n_linear_iterations()
+                       << " iterations, final residual "
+                       << this->final_linear_residual() << std::endl;
         }
 
       // Make sure we didn't max out the number of iterations
@@ -1585,9 +1585,9 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
           (this->final_linear_residual() >
           this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
       {
-        std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-                  << this->final_linear_residual() << ", number of iterations = "
-                  << this->n_linear_iterations() << std::endl << std::endl;
+        libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+                     << this->final_linear_residual() << ", number of iterations = "
+                     << this->n_linear_iterations() << std::endl << std::endl;
   //       libmesh_error();
       }
 
@@ -1941,8 +1941,8 @@ Real TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 
   if(libmesh_real(residual_norm_sq) < 0)
   {
-    std::cout << "Warning: Square of residual norm is negative "
-              << "in TransientRBSystem::compute_residual_dual_norm()" << std::endl;
+    libMesh::out << "Warning: Square of residual norm is negative "
+                 << "in TransientRBSystem::compute_residual_dual_norm()" << std::endl;
 
     // Sometimes this is negative due to rounding error,
     // but error is on the order of 1.e-10, so shouldn't
@@ -2029,9 +2029,9 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
 //       (this->final_linear_residual() >
 //        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
 //   {
-//     std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-//               << this->final_linear_residual() << ", number of iterations = "
-//               << this->n_linear_iterations() << std::endl << std::endl;
+//     libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+//                  << this->final_linear_residual() << ", number of iterations = "
+//                  << this->n_linear_iterations() << std::endl << std::endl;
 // //     libmesh_error();
 //   }
 //
@@ -2173,8 +2173,8 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
   
   if(libmesh_real(residual_norm_sq) < 0)
   {
-    std::cout << "Warning: Square of residual norm is negative "
-              << "in TransientRBSystem::compute_residual_dual_norm()" << std::endl;
+    libMesh::out << "Warning: Square of residual norm is negative "
+                 << "in TransientRBSystem::compute_residual_dual_norm()" << std::endl;
 
     // Sometimes this is negative due to rounding error,
     // but error is on the order of 1.e-10, so shouldn't
@@ -2183,8 +2183,8 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
      residual_norm_sq = std::abs(residual_norm_sq);
   }
 
-//   std::cout << "slow residual_sq = " << slow_residual_norm_sq
-//             << ", fast residual_sq = " << residual_norm_sq << std::endl;
+//   libMesh::out << "slow residual_sq = " << slow_residual_norm_sq
+//                << ", fast residual_sq = " << residual_norm_sq << std::endl;
 
   STOP_LOG("uncached_compute_residual_dual_norm()", "TransientRBSystem");
 
@@ -2233,7 +2233,7 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
 
       if ( !RB_M_q_m_out.good() )
       {
-        std::cerr << "Error opening RB_M_" << q_m << ".dat" << std::endl;
+        libMesh::err << "Error opening RB_M_" << q_m << ".dat" << std::endl;
         libmesh_error();
       }
 
@@ -2264,7 +2264,7 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
     }
     if (!initial_conditions_out.good() || !initial_L2_error_out.good())
     {
-      std::cerr << "Error opening initial conditions output files" << std::endl;
+      libMesh::err << "Error opening initial conditions output files" << std::endl;
       libmesh_error();
     }
 
@@ -2291,7 +2291,7 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
     }
     if ( !RB_Fq_Mq_norms_out.good() )
     {
-      std::cerr << "Error opening Fq_Mq_norms.dat" << std::endl;
+      libMesh::err << "Error opening Fq_Mq_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_Fq_Mq_norms_out.precision(precision_level);
@@ -2316,7 +2316,7 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
     }
     if ( !RB_Mq_Mq_norms_out.good() )
     {
-      std::cerr << "Error opening RB_Mq_Mq_norms_out.dat" << std::endl;
+      libMesh::err << "Error opening RB_Mq_Mq_norms_out.dat" << std::endl;
       libmesh_error();
     }
     RB_Mq_Mq_norms_out.precision(precision_level);
@@ -2342,7 +2342,7 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
     }
     if ( !RB_Aq_Mq_norms_out.good() )
     {
-      std::cerr << "Error opening Aq_Mq_norms.dat" << std::endl;
+      libMesh::err << "Error opening Aq_Mq_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_Aq_Mq_norms_out.precision(precision_level);
@@ -2368,7 +2368,7 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
       // Write out the M_q_representors.  These are useful to have when restarting,
       // so you don't have to recompute them all over again.  There should be
       // this->get_n_basis_functions() of these.
-      std::cout << "Writing out the M_q_representors..." << std::endl;
+      libMesh::out << "Writing out the M_q_representors..." << std::endl;
 
       std::ostringstream file_name;
       const std::string residual_representor_suffix = (write_binary_residual_representors ? ".xdr" : ".dat");
@@ -2382,7 +2382,7 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
       for (unsigned int q=0; q<M_q_representor.size(); ++q)
         for (unsigned int i=istart; i<istop; ++i)
 	{
-	  std::cout << "Writing out M_q_representor[" << q << "][" << i << "]..." << std::endl;
+	  libMesh::out << "Writing out M_q_representor[" << q << "][" << i << "]..." << std::endl;
 	  libmesh_assert(M_q_representor[q][i] != NULL);
 
 	  file_name.str(""); // reset filename
@@ -2454,7 +2454,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
 
     if ( !RB_M_q_m_in.good() )
     {
-      std::cerr << "Error opening RB_M_" << q_m << ".dat" << std::endl;
+      libMesh::err << "Error opening RB_M_" << q_m << ".dat" << std::endl;
       libmesh_error();
     }
 
@@ -2487,7 +2487,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
   }
   if (!initial_conditions_in.good() || !initial_L2_error_in.good())
   {
-    std::cerr << "Error opening initial conditions output files" << std::endl;
+    libMesh::err << "Error opening initial conditions output files" << std::endl;
     libmesh_error();
   }
 
@@ -2511,7 +2511,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
   }
   if ( !RB_Fq_Mq_norms_in.good() )
   {
-    std::cerr << "Error opening Fq_Mq_norms.dat" << std::endl;
+    libMesh::err << "Error opening Fq_Mq_norms.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
@@ -2535,7 +2535,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
   }
   if ( !RB_Mq_Mq_norms_in.good() )
   {
-    std::cerr << "Error opening RB_Mq_Mq_norms_in.dat" << std::endl;
+    libMesh::err << "Error opening RB_Mq_Mq_norms_in.dat" << std::endl;
     libmesh_error();
   }
   unsigned int Q_m_hat = get_Q_m()*(get_Q_m()+1)/2;
@@ -2560,7 +2560,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
   }
   if ( !RB_Aq_Mq_norms_in.good() )
   {
-    std::cerr << "Error opening Aq_Mq_norms.dat" << std::endl;
+    libMesh::err << "Error opening Aq_Mq_norms.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
@@ -2589,7 +2589,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
       struct stat stat_info;
       
 
-      std::cout << "Reading in the M_q_representors..." << std::endl;
+      libMesh::out << "Reading in the M_q_representors..." << std::endl;
 
       // Read in the A_q representors.  The class makes room for [Q_m][Nmax] of these.  We are going to
       // read in [Q_m][this->get_n_basis_functions()].  FIXME:
@@ -2599,8 +2599,8 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
 	  {
 	    if (M_q_representor[i][j] != NULL)
 	      {
-		std::cout << "Error, must delete existing M_q_representor before reading in from file."
-			  << std::endl;
+		libMesh::out << "Error, must delete existing M_q_representor before reading in from file."
+			     << std::endl;
 		libmesh_error();
 	      }
 	  }
@@ -2620,7 +2620,7 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
 
 	      if (stat_result != 0)
 		{
-		  std::cout << "File does not exist: " << file_name.str() << std::endl;
+		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
 		  libmesh_error();
 		}
 	    }

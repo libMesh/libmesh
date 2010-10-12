@@ -127,7 +127,7 @@ libMesh::err << "Trying print_trace()" << std::endl;
 
     while(bp && ip && dladdr(ip, &info))
     {
-        std::cout << ip << ": " << abi_demangle(info.dli_sname) << " in " <<
+        libMesh::out << ip << ": " << abi_demangle(info.dli_sname) << " in " <<
 info.dli_fname << '\n';
 
         if(info.dli_sname && !strcmp(info.dli_sname, "main")) break;
@@ -137,7 +137,7 @@ info.dli_fname << '\n';
     }
     char *dlerr = dlerror();
     if (dlerr)
-      std::cout << "dlerror() = " << dlerr << std::endl;
+      libMesh::out << "dlerror() = " << dlerr << std::endl;
 }
 
 } // namespace libMesh

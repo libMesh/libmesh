@@ -55,8 +55,8 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
   N_bar = infile("N_bar",N_bar);
   if(N_bar > _rb_system.get_Nmax())
   {
-    std::cout << "Error: Cannot set N_bar larger than Nmax for an RBParamSubdomainTree."
-              << std::endl;
+    libMesh::out << "Error: Cannot set N_bar larger than Nmax for an RBParamSubdomainTree."
+                 << std::endl;
     libmesh_error();
   }
   
@@ -66,13 +66,13 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
   // Set the subdomain bounding-box margin fraction
   bbox_margin = infile("bbox_margin",bbox_margin);
 
-  std::cout << std::endl << "RBParamSubdomainTree parameters:" << std::endl;
-  std::cout << "Tolerance for the h-stage (h_tol): " << h_tol << std::endl;
-  std::cout << "Tolerance for the p-stage (p_tol): " << p_tol << std::endl;
-  std::cout << "Nmax during h-stage (N_bar): " << N_bar << std::endl;
-  std::cout << "n_subsampled_training_points: " << n_subsampled_training_points << std::endl;
-  std::cout << "Bounding-box margin fraction for subdomain training set enrichment: " << bbox_margin << std::endl;
-  std::cout << std::endl;
+  libMesh::out << std::endl << "RBParamSubdomainTree parameters:" << std::endl;
+  libMesh::out << "Tolerance for the h-stage (h_tol): " << h_tol << std::endl;
+  libMesh::out << "Tolerance for the p-stage (p_tol): " << p_tol << std::endl;
+  libMesh::out << "Nmax during h-stage (N_bar): " << N_bar << std::endl;
+  libMesh::out << "n_subsampled_training_points: " << n_subsampled_training_points << std::endl;
+  libMesh::out << "Bounding-box margin fraction for subdomain training set enrichment: " << bbox_margin << std::endl;
+  libMesh::out << std::endl;
   
   // The rbOOmit code is still in a state of flux
   libmesh_experimental();
@@ -135,11 +135,11 @@ void RBParamSubdomainTree::write_tree_data_to_file(const std::string& directory_
   if(libMesh::processor_id() == 0)
     {
 
-      std::cout << std::endl << "Writing tree data to tree_data/tree.dat" << std::endl;
+      libMesh::out << std::endl << "Writing tree data to tree_data/tree.dat" << std::endl;
 
       if( mkdir(directory_name.c_str(), 0777) == -1)
 	{
-	  std::cout << "Directory " << directory_name << " already exists, overwriting contents." << std::endl;
+	  libMesh::out << "Directory " << directory_name << " already exists, overwriting contents." << std::endl;
 	}
       {
 	std::ofstream n_leaves_out;
@@ -148,7 +148,7 @@ void RBParamSubdomainTree::write_tree_data_to_file(const std::string& directory_
 	n_leaves_out.open( file_name.str().c_str() );
 	if ( !n_leaves_out.good() )
 	  {
-	    std::cerr << "Error opening n_leaves.dat" << std::endl;
+	    libMesh::err << "Error opening n_leaves.dat" << std::endl;
 	    libmesh_error();
 	  }
 	n_leaves_out << leaf_node_index;
@@ -162,7 +162,7 @@ void RBParamSubdomainTree::write_tree_data_to_file(const std::string& directory_
 	tree_out.open( file_name.str().c_str() );
 	if ( !tree_out.good() )
 	  {
-	    std::cerr << "Error opening tree.dat" << std::endl;
+	    libMesh::err << "Error opening tree.dat" << std::endl;
 	    libmesh_error();
 	  }
 
@@ -220,7 +220,7 @@ void RBParamSubdomainTree::read_tree_data_from_file(const std::string& directory
 {
   START_LOG("read_tree_data_from_file()", "RBParamSubdomainTree");
   
-  std::cout << "Reading tree data from tree_data/tree.dat" << std::endl;
+  libMesh::out << "Reading tree data from tree_data/tree.dat" << std::endl;
 
   // First, need to build a root node
   if(!root_node)
@@ -231,7 +231,7 @@ void RBParamSubdomainTree::read_tree_data_from_file(const std::string& directory
   std::ifstream tree_in(file_name.str().c_str());
   if ( !tree_in.good() )
     {
-      std::cerr << "Error opening tree.dat" << std::endl;
+      libMesh::err << "Error opening tree.dat" << std::endl;
       libmesh_error();
     }
   // Actual reading is performed recursively
@@ -254,10 +254,10 @@ void RBParamSubdomainTree::reconstruct_tree(RBParamSubdomainNode * current_node,
 
  stream >> current_node->model_number;
 
-//  std::cout << bool_vec_string << " ";
+//  libMesh::out << bool_vec_string << " ";
 //  for (unsigned i = 0 ; i < _rb_system.get_n_params(); i++)
-//    std::cout<< current_node->anchor[i] << " ";
-//  std::cout << current_node->model_number << std::endl;
+//    libMesh::out<< current_node->anchor[i] << " ";
+//  libMesh::out << current_node->model_number << std::endl;
 
  if (current_node->model_number == -1)
    {

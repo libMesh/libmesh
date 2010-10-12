@@ -126,7 +126,7 @@ void RBParamSubdomainNode::hp_greedy()
 
     if ( greedy_bound > _tree.h_tol) // recursive call to hp_greedy
     {
-        std::cout << "h tolerance not satisfied, splitting subdomain..." << std::endl;
+        libMesh::out << "h tolerance not satisfied, splitting subdomain..." << std::endl;
         split_this_subdomain(true);
 
         left_child->hp_greedy();
@@ -134,11 +134,11 @@ void RBParamSubdomainNode::hp_greedy()
     }
     else // terminate branch, populate the model with standard p-type, write out subelement data
     {
-        std::cout << "h tolerance satisfied, performing p-refinement..." << std::endl;
+        libMesh::out << "h tolerance satisfied, performing p-refinement..." << std::endl;
         greedy_bound = perform_p_stage(greedy_bound);
         if (greedy_bound > _tree.p_tol)
         {
-            std::cout << "p tolerance not satisfied, splitting subdomain..." << std::endl;
+            libMesh::out << "p tolerance not satisfied, splitting subdomain..." << std::endl;
             split_this_subdomain(false);
 
             left_child->hp_greedy();
@@ -146,7 +146,7 @@ void RBParamSubdomainNode::hp_greedy()
         }
         else
         {
-            std::cout << "p tolerance satisfied, subdomain " << _tree.leaf_node_index << " is a leaf node..." << std::endl;
+            libMesh::out << "p tolerance satisfied, subdomain " << _tree.leaf_node_index << " is a leaf node..." << std::endl;
 
             // Finally, write out the data for this subdomain
             this->model_number = _tree.leaf_node_index;
@@ -170,8 +170,8 @@ void RBParamSubdomainNode::split_this_subdomain(bool )
     // Make sure that the anchor points of the children are different
     if (left_child->distance_between_anchors == 0.)
     {
-        std::cout << "Error: Anchor points for children are equal!"
-                  << std::endl;
+        libMesh::out << "Error: Anchor points for children are equal!"
+                     << std::endl;
         libmesh_error();
     }
 
@@ -205,8 +205,8 @@ void RBParamSubdomainNode::write_subdomain_data_to_files()
 {
     START_LOG("write_subdomain_data_to_files()", "RBParamSubdomainNode");
 
-    std::cout << "Writing out RB data for leaf subdomain "
-              << _tree.leaf_node_index << std::endl;
+    libMesh::out << "Writing out RB data for leaf subdomain "
+                 << _tree.leaf_node_index << std::endl;
 
     std::stringstream dir_name_stream;
     dir_name_stream << "offline_data_hp" << _tree.leaf_node_index;
@@ -224,8 +224,8 @@ void RBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child 
     {
         if (left_child != NULL)
         {
-            std::cout << "Error: Child already exists!"
-            << std::endl;
+            libMesh::out << "Error: Child already exists!"
+                         << std::endl;
             libmesh_error();
         }
         else
@@ -239,8 +239,8 @@ void RBParamSubdomainNode::add_child(const std::vector<Real>& new_anchor, Child 
     {
         if (right_child != NULL)
         {
-            std::cout << "Error: Child already exists!"
-                      << std::endl;
+            libMesh::out << "Error: Child already exists!"
+                         << std::endl;
             libmesh_error();
         }
         else
@@ -296,8 +296,8 @@ void RBParamSubdomainNode::initialize_child_training_sets()
     
     if ( (left_child == NULL) || (right_child == NULL) )
     {
-        std::cout << "ERROR: Children cannot be NULL in initialize_child_training_sets()."
-                  << std::endl;
+        libMesh::out << "ERROR: Children cannot be NULL in initialize_child_training_sets()."
+                     << std::endl;
         libmesh_error();
     }
 
@@ -335,8 +335,8 @@ void RBParamSubdomainNode::initialize_child_training_sets()
     if ( (left_child->n_global_training_parameters()  == 0) ||
          (right_child->n_global_training_parameters() == 0) )
     {
-        std::cout << "Error: Child training set is empty after initialization." << std::endl
-                  << "At least the training set should contain the anchor point!" << std::endl;
+        libMesh::out << "Error: Child training set is empty after initialization." << std::endl
+                     << "At least the training set should contain the anchor point!" << std::endl;
         libmesh_error();
     }
     
@@ -412,8 +412,8 @@ Real RBParamSubdomainNode::distance(const std::vector<Real>& p1, const std::vect
     
     if (p1.size() != p2.size())
     {
-        std::cout << "Error: Input vectors must have the same size in RBParamSubdomain::distance."
-                  << std::endl;
+        libMesh::out << "Error: Input vectors must have the same size in RBParamSubdomain::distance."
+                     << std::endl;
         libmesh_error();
     }
 
@@ -443,8 +443,8 @@ std::vector<Real> RBParamSubdomainNode::get_local_training_parameter(unsigned in
     
     if (i >= n_local_training_parameters())
     {
-        std::cout << "Error: Argument is too large in get_training_parameter."
-                  << std::endl;
+        libMesh::out << "Error: Argument is too large in get_training_parameter."
+                     << std::endl;
     }
 
     std::vector<Real> param(training_set.size());

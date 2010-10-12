@@ -189,10 +189,10 @@ void QNTransientRBSystem::init_data ()
   // By default we enforce constraints exactly in the nonlinear case
   enforce_constraints_exactly = true;
 
-  std::cout << std::endl << "QNTransientRBSystem parameters:" << std::endl;
-  std::cout << "Nonlinear tolerance: " << nonlinear_tolerance << std::endl;
-  std::cout << "Maximum number of Newton steps: " << n_newton_steps << std::endl;
-  std::cout << std::endl;
+  libMesh::out << std::endl << "QNTransientRBSystem parameters:" << std::endl;
+  libMesh::out << "Nonlinear tolerance: " << nonlinear_tolerance << std::endl;
+  libMesh::out << "Maximum number of Newton steps: " << n_newton_steps << std::endl;
+  libMesh::out << std::endl;
 }
 
 void QNTransientRBSystem::initialize_RB_system(bool online_mode)
@@ -339,7 +339,7 @@ void QNTransientRBSystem::truth_assembly()
 
   if( (truth_intrr_assembly == NULL) && (truth_bndry_assembly == NULL) )
   {
-    std::cout << "Error: Truth assembly not attached to the system." << std::endl;
+    libMesh::out << "Error: Truth assembly not attached to the system." << std::endl;
     libmesh_error();
   }
 
@@ -415,7 +415,7 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
 
       if(!quiet)
       {
-        std::cout << std::endl << "Truth solve, time step " << _k << std::endl;
+        libMesh::out << std::endl << "Truth solve, time step " << _k << std::endl;
       }
 
       // Set the old solution to be the result of the previous Newton loop
@@ -443,7 +443,7 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
 	  // If we print this out, we can compare how much the previous linear iterations
 	  // have "oversolved" the system, if at all.
 	  if(!quiet)
-	    std::cout << "Current nonlinear residual: " << rhs_norm << std::endl;
+	    libMesh::out << "Current nonlinear residual: " << rhs_norm << std::endl;
 
 	  // Assume fixed tolerance == eisenstat_eta0
 	  Real current_linear_tolerance = eisenstat_eta0;
@@ -477,7 +477,7 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
 	  this->get_equation_systems().parameters.set<Real>("linear solver tolerance") = current_linear_tolerance;
 
 	  if(!quiet)
-	    std::cout << "Using relative linear tolerance: " << current_linear_tolerance << std::endl;
+	    libMesh::out << "Using relative linear tolerance: " << current_linear_tolerance << std::endl;
 
           // We're solving for delta_u, so set our intial guess to zero
           solution->zero(); // Do this after assembly to be sure
@@ -515,12 +515,12 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
           if(!quiet)
           {
 	    // Save cout flags
-	    std::ios_base::fmtflags flags = std::cout.flags();
+	    std::ios_base::fmtflags flags = libMesh::out.flags();
 
 	    // Use scientific formatting for these numbers
-	    std::cout.setf(std::ios::scientific);
+	    libMesh::out.setf(std::ios::scientific);
 
-            std::cout << "Linear solver converged at step: "
+            libMesh::out << "Linear solver converged at step: "
                       << n_linear_iterations
                       << ", final residual: "
                       << final_linear_residual
@@ -529,7 +529,7 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
                       << std::endl;
 
 	    // reset the original format flags
-	    std::cout.flags(flags);
+	    libMesh::out.flags(flags);
           }
 
           if ((norm_delta < nonlinear_tolerance) &&
@@ -537,7 +537,7 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
             {
               if(!quiet)
               {
-                std::cout << " Nonlinear solver converged at step "
+                libMesh::out << " Nonlinear solver converged at step "
                           << l
                           << std::endl << std::endl << std::endl;
               }
@@ -548,7 +548,7 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
           if( (l==(n_newton_steps-1)) &&
               ((norm_delta > nonlinear_tolerance) || (final_linear_residual > nonlinear_tolerance)) )
           {
-            std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
+            libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
                       << this->final_linear_residual() << ", number of iterations = "
                       << this->n_linear_iterations() << std::endl << std::endl;
 //             libmesh_error();
@@ -623,13 +623,13 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
 
   if(N > get_n_basis_functions())
   {
-    std::cerr << "ERROR: N cannot be larger than the number "
-              << "of basis functions in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N cannot be larger than the number "
+                 << "of basis functions in RB_solve" << std::endl;
     libmesh_error();
   }
   if(N==0)
   {
-    std::cerr << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
     libmesh_error();
   }
 
@@ -808,21 +808,21 @@ Real QNTransientRBSystem::RB_solve(unsigned int N)
 
 //      if(!quiet)
 //      {
-//        std::cout << "||RB_delta_u|| = " << RB_delta_u_norm << std::endl;
+//        libMesh::out << "||RB_delta_u|| = " << RB_delta_u_norm << std::endl;
 //      }
 
       if( RB_delta_u_norm < nonlinear_tolerance)
       {
 //        if(!quiet)
 //        {
-//          std::cout << "RB Newton solve converged at step " << l << std::endl << std::endl;
+//          libMesh::out << "RB Newton solve converged at step " << l << std::endl << std::endl;
 //        }
         break;
       }
 
       if( (l==(n_newton_steps-1)) && (RB_delta_u_norm > nonlinear_tolerance) )
       {
-        std::cout << "ERROR: RB Newton loop did not converge" << std::endl << std::endl;
+        libMesh::out << "ERROR: RB Newton loop did not converge" << std::endl << std::endl;
         libmesh_error();
       }
     }
@@ -883,7 +883,7 @@ void QNTransientRBSystem::update_system()
 
   if(!low_memory_mode)
   {
-    std::cout << "Updating trilinear form operators" << std::endl;
+    libMesh::out << "Updating trilinear form operators" << std::endl;
     update_trilinear_form_operators();
   }
 
@@ -958,9 +958,9 @@ Real QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 //       (this->final_linear_residual() >
 //        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
 //   {
-//     std::cout << "Warning: Linear solver may not have converged! Final linear residual = "
-//               << this->final_linear_residual() << ", number of iterations = "
-//               << this->n_linear_iterations() << std::endl << std::endl;
+//     libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+//                  << this->final_linear_residual() << ", number of iterations = "
+//                  << this->n_linear_iterations() << std::endl << std::endl;
 // //     libmesh_error();
 //   }
 //
@@ -1064,8 +1064,8 @@ Real QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
 
   if(libmesh_real(residual_norm_sq) < 0.)
   {
-    std::cerr << "Warning: Square of residual norm is negative "
-              << "in QNTransientRBSystem::compute_residual_dual_norm " << std::endl;
+    libMesh::err << "Warning: Square of residual norm is negative "
+                 << "in QNTransientRBSystem::compute_residual_dual_norm " << std::endl;
 
     // Sometimes this is negative due to rounding error,
     // but this error shouldn't affect the error bound
@@ -1074,8 +1074,8 @@ Real QNTransientRBSystem::compute_residual_dual_norm(const unsigned int N)
     residual_norm_sq = std::abs(residual_norm_sq);
   }
 
-//  std::cout << "slow residual_sq = " << slow_residual_norm_sq
-//            << ", fast residual_sq = " << residual_norm_sq << std::endl;
+//  libMesh::out << "slow residual_sq = " << slow_residual_norm_sq
+//               << ", fast residual_sq = " << residual_norm_sq << std::endl;
 
   STOP_LOG("compute_residual_dual_norm()", "QNTransientRBSystem");
 
@@ -1194,21 +1194,21 @@ void QNTransientRBSystem::update_residual_terms(bool compute_inner_products)
         solution->zero();
 
 	if (!quiet)
-	  std::cout << "Starting solve [n][j]=["
-		    << n <<"]["<< j << "] in QNTransientRBSystem::update_residual_terms() at "
-		    << Utility::get_timestamp() << std::endl;
+	  libMesh::out << "Starting solve [n][j]=["
+		       << n <<"]["<< j << "] in QNTransientRBSystem::update_residual_terms() at "
+		       << Utility::get_timestamp() << std::endl;
 
         solve();
 
 	if (!quiet)
 	  {
-	    std::cout << "Finished solve [n][j]=["
-		      << n <<"]["<< j << "] in QNTransientRBSystem::update_residual_terms() at "
-		      << Utility::get_timestamp() << std::endl;
+	    libMesh::out << "Finished solve [n][j]=["
+		         << n <<"]["<< j << "] in QNTransientRBSystem::update_residual_terms() at "
+		         << Utility::get_timestamp() << std::endl;
 
-	    std::cout << this->n_linear_iterations()
-		      << " iterations, final residual "
-		      << this->final_linear_residual() << std::endl;
+	    libMesh::out << this->n_linear_iterations()
+		         << " iterations, final residual "
+		         << this->final_linear_residual() << std::endl;
 	  }
 
         // Make sure we didn't max out the number of iterations
@@ -1217,9 +1217,9 @@ void QNTransientRBSystem::update_residual_terms(bool compute_inner_products)
             (this->final_linear_residual() >
             this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
         {
-          std::cout << "Warning: Linear solver may not have converged. Final linear residual = "
-                    << this->final_linear_residual() << ", number of iterations = "
-                    << this->n_linear_iterations() << std::endl << std::endl;
+          libMesh::out << "Warning: Linear solver may not have converged. Final linear residual = "
+                       << this->final_linear_residual() << ", number of iterations = "
+                       << this->n_linear_iterations() << std::endl << std::endl;
 //           libmesh_error();
         }
 
@@ -1401,14 +1401,14 @@ SparseMatrix<Number>* QNTransientRBSystem::get_C_n(unsigned int n)
 {
   if(low_memory_mode)
   {
-    std::cerr << "Error: The C matrices are not stored in low-memory mode." << std::endl;
+    libMesh::err << "Error: The C matrices are not stored in low-memory mode." << std::endl;
     libmesh_error();
   }
 
   if(n >= get_n_basis_functions())
   {
-    std::cerr << "Error: We must have n < get_n_basis_functions() in get_C_n."
-              << std::endl;
+    libMesh::err << "Error: We must have n < get_n_basis_functions() in get_C_n."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1419,8 +1419,8 @@ void QNTransientRBSystem::assemble_C_n_matrix(unsigned int n, SparseMatrix<Numbe
 {
   if(n >= get_n_basis_functions())
   {
-    std::cerr << "Error: We must have n < get_n_basis_functions() in assemble_C_n_matrix."
-              << std::endl;
+    libMesh::err << "Error: We must have n < get_n_basis_functions() in assemble_C_n_matrix."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1442,8 +1442,8 @@ void QNTransientRBSystem::add_scaled_Cn(Number scalar, unsigned int n, SparseMat
 
   if(n >= get_n_basis_functions())
   {
-    std::cerr << "Error: We must have n < get_n_basis_functions() in add_scaled_Cn."
-              << std::endl;
+    libMesh::err << "Error: We must have n < get_n_basis_functions() in add_scaled_Cn."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -1559,7 +1559,7 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
     }
     if ( !RB_trilinear_form_out.good() )
     {
-      std::cerr << "Error opening RB_trilinear_form.dat" << std::endl;
+      libMesh::err << "Error opening RB_trilinear_form.dat" << std::endl;
       libmesh_error();
     }
     RB_trilinear_form_out.precision(precision_level);
@@ -1585,7 +1585,7 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
     }
     if ( !RB_Fq_C_norms_out.good() )
     {
-      std::cerr << "Error opening Fq_C_norms.dat" << std::endl;
+      libMesh::err << "Error opening Fq_C_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_Fq_C_norms_out.precision(precision_level);
@@ -1610,7 +1610,7 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
     }
     if ( !RB_Mq_C_norms_out.good() )
     {
-      std::cerr << "Error opening Mq_C_norms.dat" << std::endl;
+      libMesh::err << "Error opening Mq_C_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_Mq_C_norms_out.precision(precision_level);
@@ -1638,7 +1638,7 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
     }
     if ( !RB_Aq_C_norms_out.good() )
     {
-      std::cerr << "Error opening Aq_C_norms.dat" << std::endl;
+      libMesh::err << "Error opening Aq_C_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_Aq_C_norms_out.precision(precision_level);
@@ -1666,7 +1666,7 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
     }
     if ( !RB_C_C_norms_out.good() )
     {
-      std::cerr << "Error opening C_C_norms.dat" << std::endl;
+      libMesh::err << "Error opening C_C_norms.dat" << std::endl;
       libmesh_error();
     }
     RB_C_C_norms_out.precision(precision_level);
@@ -1693,7 +1693,7 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
       // so you don't have to recompute them all over again.  There should be
       // Nmax^2 of these, but we only write out up to N, where N is the current RB
       // dimension.
-      std::cout << "Writing out the C_representors..." << std::endl;
+      libMesh::out << "Writing out the C_representors..." << std::endl;
 
       std::ostringstream file_name;
       const std::string residual_representor_suffix = (write_binary_residual_representors ? ".xdr" : ".dat");
@@ -1711,7 +1711,7 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
 	    if ( (i >= new_start_index) || // do all columns in the new rows
 		 (j >= new_start_index) )  // in old rows, just do new columns
 	      {
-		std::cout << "Writing out C_representor[" << i << "][" << j << "]..." << std::endl;
+		libMesh::out << "Writing out C_representor[" << i << "][" << j << "]..." << std::endl;
 		libmesh_assert(C_representor[i][j] != NULL);
 
 		file_name.str(""); // reset filename
@@ -1766,7 +1766,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
   }
   if ( !RB_trilinear_form_in.good() )
   {
-    std::cerr << "Error opening RB_trilinear_form.dat" << std::endl;
+    libMesh::err << "Error opening RB_trilinear_form.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int i=0; i<n_bfs; i++)
@@ -1790,7 +1790,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
   }
   if ( !RB_Fq_C_norms_in.good() )
   {
-    std::cerr << "Error opening Fq_C_norms.dat" << std::endl;
+    libMesh::err << "Error opening Fq_C_norms.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
@@ -1814,7 +1814,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
   }
   if ( !RB_Mq_C_norms_in.good() )
   {
-    std::cerr << "Error opening Mq_C_norms.dat" << std::endl;
+    libMesh::err << "Error opening Mq_C_norms.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
@@ -1841,7 +1841,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
   }
   if ( !RB_Aq_C_norms_in.good() )
   {
-    std::cerr << "Error opening Aq_C_norms.dat" << std::endl;
+    libMesh::err << "Error opening Aq_C_norms.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
@@ -1868,7 +1868,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
   }
   if ( !RB_C_C_norms_in.good() )
   {
-    std::cerr << "Error opening C_C_norms.dat" << std::endl;
+    libMesh::err << "Error opening C_C_norms.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int n1=0; n1<n_bfs; n1++)
@@ -1890,7 +1890,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
   if (store_representors)
     {
       if (!quiet)
-	std::cout << "Reading in the C_representors..." << std::endl;
+	libMesh::out << "Reading in the C_representors..." << std::endl;
 
       const std::string residual_representors_dir = "residual_representors";
       const std::string residual_representor_suffix =
@@ -1907,8 +1907,8 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
 	  {
             if (C_representor[i][j] != NULL)
 	    {
-	      std::cout << "Error, must delete existing C_representor before reading in from file."
-			<< std::endl;
+	      libMesh::out << "Error, must delete existing C_representor before reading in from file."
+			   << std::endl;
 	      libmesh_error();
 	    }
 
@@ -1923,7 +1923,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
 
                 if (stat_result != 0)
                   {
-                    std::cout << "File does not exist: " << file_name.str() << std::endl;
+                    libMesh::out << "File does not exist: " << file_name.str() << std::endl;
                     libmesh_error();
                   }
               }
@@ -1947,7 +1947,7 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
       // therefore if we are in high-memory mode we need to recompute all the trilinear form matrices
       if(store_basis_functions && !low_memory_mode)
         {
-          std::cout << "Updating trilinear form operators" << std::endl;
+          libMesh::out << "Updating trilinear form operators" << std::endl;
           update_all_trilinear_form_operators();
         }
 

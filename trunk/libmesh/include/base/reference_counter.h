@@ -70,9 +70,9 @@ public:
   static std::string get_info ();
   
   /**
-   * Prints the reference information, by default to \p std::cout.
+   * Prints the reference information, by default to \p libMesh::out.
    */
-  static void print_info (std::ostream& out = std::cout);
+  static void print_info (std::ostream& out = libMesh::out);
 
   /**
    * Prints the number of outstanding (created, but not yet

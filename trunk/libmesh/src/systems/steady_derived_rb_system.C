@@ -291,7 +291,7 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
 
     default:
     {
-      std::cout << "Invalid RESIDUAL_TYPE in update_residual_terms" << std::endl;
+      libMesh::out << "Invalid RESIDUAL_TYPE in update_residual_terms" << std::endl;
       break;
     }
   }
@@ -306,9 +306,9 @@ void DerivedRBSystem<RBSystem>::load_RB_solution()
 
   if(!initialize_calN_dependent_data)
   {
-    std::cerr << "Error: We must initialize the calN dependent "
-              << "data structures in order to load RB solution."
-              << std::endl;
+    libMesh::err << "Error: We must initialize the calN dependent "
+                 << "data structures in order to load RB solution."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -316,9 +316,9 @@ void DerivedRBSystem<RBSystem>::load_RB_solution()
 
   if(RB_solution.size() > get_n_basis_functions())
   {
-    std::cerr << "ERROR: System contains " << get_n_basis_functions() << " basis functions."
-              << " RB_solution vector constains " << RB_solution.size() << " entries."
-              << " RB_solution in RBSystem::load_RB_solution is too long!" << std::endl;
+    libMesh::err << "ERROR: System contains " << get_n_basis_functions() << " basis functions."
+                 << " RB_solution vector constains " << RB_solution.size() << " entries."
+                 << " RB_solution in RBSystem::load_RB_solution is too long!" << std::endl;
     libmesh_error();
   }
 

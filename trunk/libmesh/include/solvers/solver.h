@@ -174,8 +174,8 @@ void Solver::init ()
 inline
 void Solver::pre_process ()
 {
-//  std::cout << "Pre-processing"
-//	    << std::endl;
+//  libMesh::out << "Pre-processing"
+//	         << std::endl;
 }
 
 
@@ -186,8 +186,8 @@ void Solver::solve ()
   // Perform any necessary pre-processing
   Solver::pre_process ();
   
-//  std::cout << "Solving $Id$"
-//	    << std::endl;
+//  libMesh::out << "Solving $Id$"
+//	         << std::endl;
 
   // Solve the system
   this->system().solve ();
@@ -201,8 +201,8 @@ void Solver::solve ()
 inline
 void Solver::post_process ()
 {
-//  std::cout << "Post-processing"
-//	    << std::endl;
+//  libMesh::out << "Post-processing"
+//	         << std::endl;
 }
 
 } // namespace libMesh

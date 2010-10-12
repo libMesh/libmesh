@@ -291,7 +291,7 @@ std::string ElementTypes::name(const ElemType t)
       
     default:
       {
-	std::cout << "Undefined element type!." << std::endl;
+	libMesh::err << "Undefined element type!." << std::endl;
 	libmesh_error();
       }
     }

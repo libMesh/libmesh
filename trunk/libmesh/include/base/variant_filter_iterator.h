@@ -119,7 +119,7 @@ public:
     Iter (const IterType& v) :
       iter_data (v)
     {
-      // std::cout << "In Iter<IterType>::Iter(const IterType& v)" << std::endl;
+      // libMesh::out << "In Iter<IterType>::Iter(const IterType& v)" << std::endl;
     }
     
 
@@ -205,7 +205,7 @@ public:
       // Check for failed cast
       if (p == NULL)
 	{
-	  // std::cerr << "Dynamic cast failed in Iter::equal(...)" << std::endl;
+	  // libMesh::err << "Dynamic cast failed in Iter::equal(...)" << std::endl;
 	  std::abort();
 	}
       
@@ -298,8 +298,8 @@ public:
       // Check for failure
       if ( p == NULL )
 	{
-	  // std::cerr << "Dynamic cast failed in Pred::op()" << std::endl;
-	  // std::cerr << "typeid(IterType).name()=" << typeid(IterType).name() << std::endl;
+	  // libMesh::err << "Dynamic cast failed in Pred::op()" << std::endl;
+	  // libMesh::err << "typeid(IterType).name()=" << typeid(IterType).name() << std::endl;
 	  std::abort();
 	}
       
@@ -395,7 +395,7 @@ public:
       end  (rhs.end  != NULL ? rhs.end->const_clone()  : NULL),
       pred (rhs.pred != NULL ? rhs.pred->const_clone() : NULL)
   {
-    // std::cout << "Called templated copy constructor for variant_filter_iterator" << std::endl;
+    // libMesh::out << "Called templated copy constructor for variant_filter_iterator" << std::endl;
   }
 
 

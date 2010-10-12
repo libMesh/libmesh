@@ -135,23 +135,23 @@ void RBSCMSystem::init_data ()
   // Call the Parent's initialization routine once the parameters are all set.
   Parent::init_data();
 
-  std::cout << std::endl << "RBSCMSystem parameters:" << std::endl;
-  std::cout << "system name: " << this->name() << std::endl;
-  std::cout << "Q_a: " << get_Q_a() << std::endl;
-  std::cout << "SCM_eps: " << get_SCM_eps() << std::endl;
-  std::cout << "SCM_M: " << get_SCM_M() << std::endl;
+  libMesh::out << std::endl << "RBSCMSystem parameters:" << std::endl;
+  libMesh::out << "system name: " << this->name() << std::endl;
+  libMesh::out << "Q_a: " << get_Q_a() << std::endl;
+  libMesh::out << "SCM_eps: " << get_SCM_eps() << std::endl;
+  libMesh::out << "SCM_M: " << get_SCM_M() << std::endl;
   for(unsigned int i=0; i<n_SCM_parameters; i++)
   {
-    std::cout <<   "SCM Parameter " << i
-              << ": Min = " << get_parameter_min(i)
-              << ", Max = " << get_parameter_max(i)
-              << ", log scaling = " << log_scaling[i] << std::endl;
+    libMesh::out <<   "SCM Parameter " << i
+                 << ": Min = " << get_parameter_min(i)
+                 << ", Max = " << get_parameter_max(i)
+                 << ", log scaling = " << log_scaling[i] << std::endl;
   }
-  std::cout << "n_training_samples: " << get_n_training_samples() << std::endl;
-  std::cout << "using deterministic training samples? " << deterministic_training << std::endl;
-  std::cout << "initializing calN-dependent data structures "
-            << initialize_calN_dependent_data << std::endl;
-  std::cout << std::endl;
+  libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
+  libMesh::out << "using deterministic training samples? " << deterministic_training << std::endl;
+  libMesh::out << "initializing calN-dependent data structures "
+               << initialize_calN_dependent_data << std::endl;
+  libMesh::out << std::endl;
 }
 
 void RBSCMSystem::resize_SCM_vectors()
@@ -309,20 +309,20 @@ void RBSCMSystem::perform_SCM_greedy()
 
     std::pair<unsigned int,Real> SCM_error_pair = compute_SCM_bounds_on_training_set();
 
-    std::cout << "SCM iteration " << SCM_iter
-              << ", max_SCM_error = " << SCM_error_pair.second << std::endl;
+    libMesh::out << "SCM iteration " << SCM_iter
+                 << ", max_SCM_error = " << SCM_error_pair.second << std::endl;
 
     if( SCM_error_pair.second < SCM_eps )
     {
-      std::cout << std::endl << "SCM tolerance of " << SCM_eps << " reached."
-                << std::endl << std::endl;
+      libMesh::out << std::endl << "SCM tolerance of " << SCM_eps << " reached."
+                   << std::endl << std::endl;
       break;
     }
 
     // If we need another SCM iteration, then enrich C_J
     enrich_C_J(SCM_error_pair.first);
 
-    std::cout << std::endl << "-----------------------------------" << std::endl << std::endl;
+    libMesh::out << std::endl << "-----------------------------------" << std::endl << std::endl;
 
     SCM_iter++;
   }
@@ -353,11 +353,11 @@ void RBSCMSystem::compute_SCM_bounding_box()
       libmesh_assert(eval.second < TOLERANCE);
 
       set_B_min(q, eval.first);
-      std::cout << std::endl << "B_min("<<q<<") = " << get_B_min(q) << std::endl;
+      libMesh::out << std::endl << "B_min("<<q<<") = " << get_B_min(q) << std::endl;
     }
     else
     {
-      std::cerr << "Eigen solver for computing B_min did not converge" << std::endl;
+      libMesh::err << "Eigen solver for computing B_min did not converge" << std::endl;
       libmesh_error();
     }
 
@@ -375,11 +375,11 @@ void RBSCMSystem::compute_SCM_bounding_box()
       libmesh_assert(eval.second < TOLERANCE);
 
       set_B_max(q,eval.first);
-      std::cout << "B_max("<<q<<") = " << get_B_max(q) << std::endl;
+      libMesh::out << "B_max("<<q<<") = " << get_B_max(q) << std::endl;
     }
     else
     {
-      std::cerr << "Eigen solver for computing B_max did not converge" << std::endl;
+      libMesh::err << "Eigen solver for computing B_max did not converge" << std::endl;
       libmesh_error();
     }
   }
@@ -419,8 +419,8 @@ void RBSCMSystem::evaluate_stability_constant()
 
     // Store the coercivity constant corresponding to mu_star
     set_C_J_stability_constraint(j,eval.first);
-    std::cout << std::endl << "Stability constant for C_J("<<j<<") = "
-              << get_C_J_stability_constraint(j) << std::endl << std::endl;
+    libMesh::out << std::endl << "Stability constant for C_J("<<j<<") = "
+                 << get_C_J_stability_constraint(j) << std::endl << std::endl;
 
     // Compute and store the vector y = (y_1, \ldots, y_Q) for the
     // eigenvector currently stored in eigen_system.solution.
@@ -436,8 +436,8 @@ void RBSCMSystem::evaluate_stability_constant()
   }
   else
   {
-    std::cerr << "Error: Eigensolver did not converge in evaluate_stability_constant"
-              << std::endl;
+    libMesh::err << "Error: Eigensolver did not converge in evaluate_stability_constant"
+                 << std::endl;
     libmesh_error();
   }
 
@@ -457,8 +457,8 @@ Number RBSCMSystem::Aq_inner_product(unsigned int q,
 {
   if(q >= get_Q_a())
   {
-    std::cerr << "Error: We must have q < Q_a in Aq_inner_product."
-              << std::endl;
+    libMesh::err << "Error: We must have q < Q_a in Aq_inner_product."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -474,7 +474,7 @@ void RBSCMSystem::set_C_J_stability_constraint(unsigned int j, Real stability_co
 {
   if(j >= C_J_stability_vector.size())
   {
-    std::cerr << "Error: Input parameter j is too large in set_C_J_stability_constraint.";
+    libMesh::err << "Error: Input parameter j is too large in set_C_J_stability_constraint.";
     libmesh_error();
   }
 
@@ -489,7 +489,7 @@ Real RBSCMSystem::get_C_J_stability_constraint(unsigned int j) const
 {
   if(j >= C_J_stability_vector.size())
   {
-    std::cerr << "Error: Input parameter j is too large in get_C_J_stability_constraint.";
+    libMesh::err << "Error: Input parameter j is too large in get_C_J_stability_constraint.";
     libmesh_error();
   }
 
@@ -501,14 +501,14 @@ void RBSCMSystem::set_SCM_UB_vector(unsigned int j, unsigned int q, Real y_q)
   // First make sure that j <= J
   if(j >= SCM_UB_vectors.size())
   {
-    std::cerr << "Error: We must have j < J in set_SCM_UB_vector.";
+    libMesh::err << "Error: We must have j < J in set_SCM_UB_vector.";
     libmesh_error();
   }
   // Next make sure that q <= Q_a or Q_a_hat
   if(q >= SCM_UB_vectors[0].size())
   {
-    std::cerr << "Error: q is too large in set_SCM_UB_vector."
-              << std::endl;
+    libMesh::err << "Error: q is too large in set_SCM_UB_vector."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -520,13 +520,13 @@ Real RBSCMSystem::get_SCM_UB_vector(unsigned int j, unsigned int q)
   // First make sure that j <= J
   if(j >= SCM_UB_vectors.size())
   {
-    std::cerr << "Error: We must have j < J in get_SCM_UB_vector.";
+    libMesh::err << "Error: We must have j < J in get_SCM_UB_vector.";
     libmesh_error();
   }
   if(q >= SCM_UB_vectors[0].size())
   {
-    std::cerr << "Error: q is too large in get_SCM_UB_vector."
-              << std::endl;
+    libMesh::err << "Error: q is too large in get_SCM_UB_vector."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -541,13 +541,13 @@ void RBSCMSystem::enrich_C_J(unsigned int new_C_J_index)
 
   C_J.push_back(get_current_parameters());
 
-  std::cout << std::endl << "SCM: Added mu = (";
+  libMesh::out << std::endl << "SCM: Added mu = (";
   for(unsigned int i=0; i<get_n_params(); i++)
   {
-    std::cout << C_J[C_J.size()-1][i];
-    if(i < (get_n_params()-1)) std::cout << ",";
+    libMesh::out << C_J[C_J.size()-1][i];
+    if(i < (get_n_params()-1)) libMesh::out << ",";
   }
-  std::cout << ")" << std::endl;
+  libMesh::out << ")" << std::endl;
 
   // Finally, resize C_J_stability_vector and SCM_UB_vectors
   C_J_stability_vector.push_back(0.);
@@ -562,7 +562,7 @@ std::vector<Real> RBSCMSystem::get_C_J_entry(unsigned int j)
 {
   if(j >= C_J.size())
   {
-    std::cerr << "Error: Input parameter j is too large in get_C_J.";
+    libMesh::err << "Error: Input parameter j is too large in get_C_J.";
     libmesh_error();
   }
 
@@ -573,8 +573,8 @@ Real RBSCMSystem::get_B_min(unsigned int q) const
 {
   if(q >= B_min.size())
   {
-    std::cerr << "Error: q is too large in get_B_min."
-              << std::endl;
+    libMesh::err << "Error: q is too large in get_B_min."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -586,8 +586,8 @@ Real RBSCMSystem::get_B_max(unsigned int q) const
 {
   if(q >= B_max.size())
   {
-    std::cerr << "Error: q is too large in get_B_max."
-              << std::endl;
+    libMesh::err << "Error: q is too large in get_B_max."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -598,8 +598,8 @@ void RBSCMSystem::set_B_min(unsigned int q, Real B_min_val)
 {
   if(q >= B_min.size())
   {
-    std::cerr << "Error: q is too large in set_B_min."
-              << std::endl;
+    libMesh::err << "Error: q is too large in set_B_min."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -610,8 +610,8 @@ void RBSCMSystem::set_B_max(unsigned int q, Real B_max_val)
 {
   if(q >= B_max.size())
   {
-    std::cerr << "Error: q is too large in set_B_max."
-              << std::endl;
+    libMesh::err << "Error: q is too large in set_B_max."
+                 << std::endl;
     libmesh_error();
   }
 
@@ -761,7 +761,7 @@ Real RBSCMSystem::get_SCM_LB()
 //   int simplex_status =  glp_get_status(lp);
 //   if(simplex_status == GLP_UNBND)
 //   {
-//     std::cout << "Simplex method gave unbounded solution." << std::endl;
+//     libMesh::out << "Simplex method gave unbounded solution." << std::endl;
 //     min_J_obj = std::numeric_limits<Real>::quiet_NaN();
 //   }
 //   else
@@ -870,8 +870,8 @@ void RBSCMSystem::write_offline_data_to_files(const std::string& directory_name)
     // Make a directory to store all the data files
     if( mkdir(directory_name.c_str(), 0777) == -1)
     {
-      std::cout << "In RBSCMSystem::write_offline_data_to_files, directory "
-                << directory_name << " already exists, overwriting contents." << std::endl;
+      libMesh::out << "In RBSCMSystem::write_offline_data_to_files, directory "
+                   << directory_name << " already exists, overwriting contents." << std::endl;
     }
 
     // Write out the bounding box min values
@@ -883,7 +883,7 @@ void RBSCMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !B_min_out.good() )
     {
-      std::cerr << "Error opening B_min.dat" << std::endl;
+      libMesh::err << "Error opening B_min.dat" << std::endl;
       libmesh_error();
     }
     B_min_out.precision(precision_level);
@@ -904,7 +904,7 @@ void RBSCMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !B_max_out.good() )
     {
-      std::cerr << "Error opening B_max.dat" << std::endl;
+      libMesh::err << "Error opening B_max.dat" << std::endl;
       libmesh_error();
     }
     B_max_out.precision(precision_level);
@@ -924,7 +924,7 @@ void RBSCMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !C_J_stability_vector_out.good() )
     {
-      std::cerr << "Error opening C_J_stability_vector.dat" << std::endl;
+      libMesh::err << "Error opening C_J_stability_vector.dat" << std::endl;
       libmesh_error();
     }
     C_J_stability_vector_out.precision(precision_level);
@@ -944,7 +944,7 @@ void RBSCMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !C_J_out.good() )
     {
-      std::cerr << "Error opening C_J_out.dat" << std::endl;
+      libMesh::err << "Error opening C_J_out.dat" << std::endl;
       libmesh_error();
     }
     C_J_out.precision(precision_level);
@@ -967,7 +967,7 @@ void RBSCMSystem::write_offline_data_to_files(const std::string& directory_name)
     }
     if ( !SCM_UB_vectors_out.good() )
     {
-      std::cerr << "Error opening SCM_UB_vectors.dat" << std::endl;
+      libMesh::err << "Error opening SCM_UB_vectors.dat" << std::endl;
       libmesh_error();
     }
     SCM_UB_vectors_out.precision(precision_level);
@@ -998,7 +998,7 @@ void RBSCMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !B_min_in.good() )
   {
-    std::cerr << "Error opening B_min.dat" << std::endl;
+    libMesh::err << "Error opening B_min.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int i=0; i<B_min.size(); i++)
@@ -1017,7 +1017,7 @@ void RBSCMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !B_max_in.good() )
   {
-    std::cerr << "Error opening B_max.dat" << std::endl;
+    libMesh::err << "Error opening B_max.dat" << std::endl;
     libmesh_error();
   }
   for(unsigned int i=0; i<B_max.size(); i++)
@@ -1036,7 +1036,7 @@ void RBSCMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !C_J_stability_vector_in.good() )
   {
-    std::cerr << "Error opening C_J_stability_vector.dat" << std::endl;
+    libMesh::err << "Error opening C_J_stability_vector.dat" << std::endl;
     libmesh_error();
   }
   C_J_stability_vector.clear();
@@ -1056,7 +1056,7 @@ void RBSCMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !C_J_in.good() )
   {
-    std::cerr << "Error opening C_J_in.dat" << std::endl;
+    libMesh::err << "Error opening C_J_in.dat" << std::endl;
     libmesh_error();
   }
   // Resize C_J based on C_J_stability_vector and Q_a
@@ -1081,7 +1081,7 @@ void RBSCMSystem::read_offline_data_from_files(const std::string& directory_name
   }
   if ( !SCM_UB_vectors_in.good() )
   {
-    std::cerr << "Error opening SCM_UB_vectors.dat" << std::endl;
+    libMesh::err << "Error opening SCM_UB_vectors.dat" << std::endl;
     libmesh_error();
   }
   // Resize SCM_UB_vectors based on C_J_stability_vector and Q_a
