@@ -152,6 +152,14 @@ public:
 		 const short int id);
 
   /**
+   * Add side \p side of element \p elem with boundary ids \p ids
+   * to the boundary information data structure.
+   */
+  void add_side (const Elem* elem,
+		 const unsigned short int side,
+		 const std::vector<short int>& ids);
+
+  /**
    * Removes the boundary conditions associated with node \p node,
    * if any exist.
    */
@@ -203,6 +211,15 @@ public:
    * element \p elem.
    */
   std::vector<short int> boundary_ids (const Elem* const elem,
+       const unsigned short int side) const;
+
+  /**
+   * Returns the list of raw boundary ids associated with the \p side
+   * side of element \p elem.  These ids are ``raw'' because they
+   * exclude ids which are implicit, such as a child's inheritance of
+   * its ancestors' boundary id.
+   */
+  std::vector<short int> raw_boundary_ids (const Elem* const elem,
        const unsigned short int side) const;
 
   /**
