@@ -436,6 +436,51 @@ void BoundaryInfo::add_side(const Elem* elem,
 
 
 
+void BoundaryInfo::add_side(const Elem* elem,
+			    const unsigned short int side,
+			    const std::vector<short int>& ids)
+{
+  libmesh_assert (elem != NULL);
+
+  // Only add BCs for level-0 elements.
+  libmesh_assert (elem->level() == 0);
+  
+  // A convenient typedef
+  typedef std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator Iter;
+	      
+  // Don't add the same ID twice
+  std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(elem);
+
+  for (unsigned int i=0; i!= ids.size(); ++i)
+    {
+      short int id=ids[i];
+
+      if (id == invalid_id)
+        {
+          libMesh::err << "ERROR: You may not set a boundary ID of "
+		        << invalid_id << std::endl
+		        << " That is reserved for internal use.\n"
+		        << std::endl;
+
+          libmesh_error();
+        }
+  
+      for (Iter p = pos.first;p != pos.second; ++p)
+        if (p->second.first == side &&
+            p->second.second == id)
+          continue;
+
+      std::pair<unsigned short int, short int> p(side,id);
+      std::pair<const Elem*, std::pair<unsigned short int, short int> >
+        kv (elem, p);
+  
+      _boundary_side_id.insert(kv);
+      _boundary_ids.insert(id);
+    }
+}
+
+
+
 std::vector<short int> BoundaryInfo::boundary_ids(const Node* node) const
 {
   std::vector<short int> ids;
@@ -502,6 +547,7 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
 }
 
 
+
 std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
                                                    const unsigned short int side) const
 {
@@ -550,6 +596,42 @@ std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
   return ids;
 
 }
+
+
+
+std::vector<short int> BoundaryInfo::raw_boundary_ids (const Elem* const elem,
+                                                       const unsigned short int side) const
+{
+  libmesh_assert (elem != NULL);
+
+  std::vector<short int> ids;
+
+  // Only level-0 elements store BCs.
+  if (elem->parent())
+    return ids;
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, short int> >::const_iterator >
+    e = _boundary_side_id.equal_range(elem);
+
+  // Check any occurances
+  while (e.first != e.second)
+    {
+      // if this is true we found the requested side of the element
+      if (e.first->second.first == side)
+        ids.push_back(e.first->second.second);
+
+      ++e.first;
+    }
+
+  // if nothing got pushed back, we didn't find elem in the data
+  // structure with the requested side, so return the default empty
+  // vector 
+  return ids;
+}
+
 
 
 void BoundaryInfo::remove_side (const Elem* elem,
