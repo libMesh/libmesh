@@ -312,11 +312,10 @@ void UnstructuredMesh::all_first_order ()
 	
       for (unsigned int s=0; s<so_elem->n_sides(); s++)
 	{
-	  const short int boundary_id =
-	    this->boundary_info->boundary_id (so_elem, s);
+	  const std::vector<short int> boundary_ids =
+	    this->boundary_info->raw_boundary_ids (so_elem, s);
 	    
-	  if (boundary_id != this->boundary_info->invalid_id)
-	    this->boundary_info->add_side (lo_elem, s, boundary_id);
+	  this->boundary_info->add_side (lo_elem, s, boundary_ids);
 	}
 
       /*
@@ -583,11 +582,10 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	
       for (unsigned int s=0; s<lo_elem->n_sides(); s++)
 	{
-	  const short int boundary_id =
-	    this->boundary_info->boundary_id (lo_elem, s);
+	  const std::vector<short int> boundary_ids =
+	    this->boundary_info->raw_boundary_ids (so_elem, s);
 	    
-	  if (boundary_id != this->boundary_info->invalid_id)
-	    this->boundary_info->add_side (so_elem, s, boundary_id);
+	  this->boundary_info->add_side (lo_elem, s, boundary_ids);
 	}
 
       /*
