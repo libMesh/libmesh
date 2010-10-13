@@ -440,6 +440,9 @@ void BoundaryInfo::add_side(const Elem* elem,
 			    const unsigned short int side,
 			    const std::vector<short int>& ids)
 {
+  if (ids.empty())
+    return;
+
   libmesh_assert (elem != NULL);
 
   // Only add BCs for level-0 elements.
