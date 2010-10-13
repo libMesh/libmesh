@@ -546,14 +546,9 @@ void ExodusII_IO_Helper::create(std::string filename)
   io_ws = sizeof(Real);
     
   ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
-    
-  ex_id = exII::ex_open(filename.c_str(),
-			EX_WRITE,
-			&comp_ws,
-			&io_ws,
-			&ex_version);
-  
+
   check_err(ex_id, "Error creating ExodusII mesh file.");
+
   if (_verbose) libMesh::out << "File created successfully." << std::endl;
 
   _created = true;
