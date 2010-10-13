@@ -955,6 +955,9 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 {
   ex_err = exII::ex_put_time(ex_id, timestep, &time);
   check_err(ex_err, "Error writing timestep.");
+
+  ex_err = exII::ex_update(ex_id);
+  check_err(ex_err, "Error flushing buffers to file.");
 }
 
 
