@@ -708,7 +708,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   std::vector<int> idx(n); Utility::iota (idx.begin(), idx.end(), 0);
 
   // Create the index set & scatter object
-  ierr = ISCreateGeneral(libMesh::COMM_WORLD, n, &idx[0], PETSC_USE_POINTER, &is);
+  ierr = ISCreateLibMesh(libMesh::COMM_WORLD, n, &idx[0], PETSC_USE_POINTER, &is);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = VecScatterCreate(_vec,          is,
@@ -779,10 +779,10 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   
   // Create the index set & scatter object
   if (idx.empty())
-    ierr = ISCreateGeneral(libMesh::COMM_WORLD,
+    ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
                            n_sl+this->local_size(), PETSC_NULL, PETSC_USE_POINTER, &is);
   else
-    ierr = ISCreateGeneral(libMesh::COMM_WORLD,
+    ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
 			   n_sl+this->local_size(), &idx[0], PETSC_USE_POINTER, &is);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -870,7 +870,7 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
     Utility::iota (idx.begin(), idx.end(), first_local_idx);
 
     // Create the index set & scatter object
-    ierr = ISCreateGeneral(libMesh::COMM_WORLD, local_size, &idx[0], PETSC_USE_POINTER, &is);
+    ierr = ISCreateLibMesh(libMesh::COMM_WORLD, local_size, &idx[0], PETSC_USE_POINTER, &is);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
     ierr = VecScatterCreate(_vec,              is,
@@ -1257,13 +1257,13 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
   Utility::iota (idx.begin(), idx.end(), 0);
 
   // Construct index sets
-  ierr = ISCreateGeneral(libMesh::COMM_WORLD,
+  ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
 			 rows.size(),
 			 (int*) &rows[0],
 			 PETSC_USE_POINTER,
 			 &parent_is); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  ierr = ISCreateGeneral(libMesh::COMM_WORLD,
+  ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
 			 rows.size(),
 			 (int*) &idx[0],
 			 PETSC_USE_POINTER,
