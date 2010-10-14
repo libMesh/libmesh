@@ -1745,7 +1745,7 @@ Real RBSystem::compute_a_posteriori_bounds()
   training_error_bounds.resize(this->get_local_n_training_samples());
 
   // keep track of the maximum error
-  unsigned int max_err_index = 0.;
+  unsigned int max_err_index = 0;
   Real max_err = 0.;
 
   unsigned int first_index = get_first_local_training_index();
