@@ -85,6 +85,14 @@ EXTERN_C_FOR_PETSC_END
 
 #if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
 typedef PetscTruth PetscBool;
+// libMesh currently holds zero long-lived IS, it always creates an IS with a std::vector<int>,
+// uses it through the Vec or Mat API, and destroys the IS.  This can always be done without a
+// copy, so we assume mode = PETSC_USE_POINTER (the IS just uses the array, without ownership).
+#  if PETSC_VERSION_LESS_THAN(2,2,1)         // Cannot avoid a copy
+#    define ISCreateGeneral(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(is))
+#  else
+#    define ISCreateGeneral(comm,n,idx,mode,is) ISCreateGeneralWithArray((comm),(n),(idx),(is))
+#  endif
 #endif
 
 #endif // LIBMESH_HAVE_PETSC

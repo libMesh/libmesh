@@ -381,11 +381,13 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   ierr = ISCreateGeneral(libMesh::COMM_WORLD,
 			 rows.size(),
 			 (int*) &rows[0],
+			 PETSC_USE_POINTER,
 			 &isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = ISCreateGeneral(libMesh::COMM_WORLD,
 			 cols.size(),
 			 (int*) &cols[0],
+			 PETSC_USE_POINTER,
 			 &iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Extract submatrix
