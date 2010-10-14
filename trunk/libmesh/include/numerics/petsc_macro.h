@@ -83,6 +83,9 @@ EXTERN_C_FOR_PETSC_BEGIN
 #include <petsc.h>
 EXTERN_C_FOR_PETSC_END
 
+#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+typedef PetscTruth PetscBool;
+#endif
 
 #endif // LIBMESH_HAVE_PETSC
 

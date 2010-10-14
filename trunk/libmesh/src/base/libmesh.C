@@ -269,7 +269,7 @@ void _init (int &argc, char** & argv,
 
       // Check whether the calling program has already initialized
       // PETSc, and avoid duplicate Initialize/Finalize
-      PetscTruth petsc_already_initialized;
+      PetscBool petsc_already_initialized;
       ierr = PetscInitialized(&petsc_already_initialized);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
       if (petsc_already_initialized != PETSC_TRUE)

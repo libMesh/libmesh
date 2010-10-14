@@ -648,7 +648,7 @@ bool PetscMatrix<T>::closed() const
   libmesh_assert (this->initialized());
   
   int ierr=0;
-  PetscTruth assembled;
+  PetscBool assembled;
 
   ierr = MatAssembled(_mat, &assembled);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
