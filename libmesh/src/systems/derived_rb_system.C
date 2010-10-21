@@ -53,6 +53,8 @@ void DerivedRBSystem<Base>::set_uber_current_parameters()
 template <class Base>
 void DerivedRBSystem<Base>::generate_residual_terms_wrt_truth()
 {
+  START_LOG("generate_residual_terms_wrt_truth()", "DerivedRBSystem");
+
   if(residual_type_flag != RESIDUAL_WRT_TRUTH)
   {
     // Set flag to compute residual wrt truth space
@@ -69,6 +71,7 @@ void DerivedRBSystem<Base>::generate_residual_terms_wrt_truth()
   
     Base::delta_N = saved_delta_N;
   }
+  STOP_LOG("generate_residual_terms_wrt_truth()", "DerivedRBSystem");
 }
 
 template <class Base>
