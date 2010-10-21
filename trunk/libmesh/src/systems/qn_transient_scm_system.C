@@ -200,7 +200,7 @@ Number QNTransientSCMSystem::eval_theta_c()
 {
   libmesh_assert(theta_c != NULL);
 
-  return theta_c(current_parameters);
+  return theta_c(theta_data);
 }
 
 Number QNTransientSCMSystem::eval_theta_q_a(unsigned int q)

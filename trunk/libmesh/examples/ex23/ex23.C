@@ -69,19 +69,19 @@ void initialize_dirichlet_dofs(FEMContext &c,
                                std::set<unsigned int>& dirichlet_dofs_set);
 
 // Expansion of the PDE operator
-Number theta_a_0(std::vector<Real>& ) { return 0.05; }
+Number theta_a_0(RBThetaData& ) { return 0.05; }
 void A0(FEMContext&, System&);
-Number theta_a_1(std::vector<Real>& mu) { return mu[0]; }
+Number theta_a_1(RBThetaData& data) { return data.get_mu()[0]; }
 void A1(FEMContext&, System&);
-Number theta_a_2(std::vector<Real>& mu) { return mu[1]; }
+Number theta_a_2(RBThetaData& data) { return data.get_mu()[1]; }
 void A2(FEMContext&, System&);
 
 // Expansion of the RHS
-Number theta_f_0(std::vector<Real>& ) { return 1.; }
+Number theta_f_0(RBThetaData& ) { return 1.; }
 void F0(FEMContext&, System&);
 
 // Expansion of the outputs
-Number theta_l(std::vector<Real>& ) { return 1.; }
+Number theta_l(RBThetaData& ) { return 1.; }
 void L0_assembly(FEMContext&, System&);
 void L1_assembly(FEMContext&, System&);
 void L2_assembly(FEMContext&, System&);

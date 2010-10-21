@@ -93,6 +93,9 @@ void RBBase<Base>::clear ()
 template <class Base>
 void RBBase<Base>::init_data ()
 {
+  // Initialize the RBThetaData object
+  init_theta_data();
+
   if(initialize_calN_dependent_data)
   {
     Base::init_data();
@@ -280,7 +283,7 @@ Number RBBase<Base>::eval_theta_q_a(unsigned int q)
   
   if(!is_A_EIM_operator(q))
   {
-    return theta_q_a_vector[q](current_parameters);
+    return theta_q_a_vector[q](theta_data);
   }
   else
   {
@@ -410,6 +413,13 @@ void RBBase<Base>::load_training_set(std::vector< std::vector<Number> >& new_tra
       training_parameters[j]->set(index, new_training_set[j][i]);
     }
   }
+}
+
+
+template <class Base>
+void RBBase<Base>::init_theta_data()
+{
+  theta_data.point_to_parameters(current_parameters);
 }
 
 
