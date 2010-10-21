@@ -22,6 +22,7 @@
 
 #include "system.h"
 #include "numeric_vector.h"
+#include "rb_theta_data.h"
 
 // For the solver switching stuff.
 #include "linear_solver.h"
@@ -54,7 +55,7 @@ class RBEIMSystem;
 /**
  * Typedef for theta_q function pointers.
  */
-typedef Number (*theta_q_fptr)(std::vector<Real>&);
+typedef Number (*theta_q_fptr)(RBThetaData&);
 
 // ------------------------------------------------------------
 // RBBase class definition
@@ -152,6 +153,12 @@ public:
    * Overwrite the training parameters with new_training_set.
    */
   virtual void load_training_set(std::vector< std::vector<Number> >& new_training_set);
+  
+  /**
+   * Initialize the theta_data structure. In this base class
+   * this just involves setting the pointer to current_parameters.
+   */
+  virtual void init_theta_data();
 
   /**
    * Get the number of parameters. Value is determined
@@ -298,6 +305,12 @@ public:
    * number generator seed.
    */
   int training_parameters_random_seed;
+  
+  /**
+   * This data structure stores the data relevant to the evaluation
+   * of the theta_q functions.
+   */
+  RBThetaData theta_data;
   
 protected:
 

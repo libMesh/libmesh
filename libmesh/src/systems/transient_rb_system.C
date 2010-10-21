@@ -338,7 +338,9 @@ void TransientRBSystem::initialize_RB_system(bool online_mode)
   // Now update RB_ic_proj_rhs_all_N if necessary.
   // This allows us to compute the L2 projection
   // of the initial condition into the RB space
-  if(online_mode)
+  // so that we can continue to enrich a given RB
+  // space.
+  if(!online_mode)
     if(get_n_basis_functions() > 0)
     {
       // Load the initial condition into the solution vector
@@ -394,7 +396,7 @@ Number TransientRBSystem::eval_theta_q_m(unsigned int q)
 
   libmesh_assert(theta_q_m_vector[q] != NULL);
 
-  return theta_q_m_vector[q](current_parameters);
+  return theta_q_m_vector[q](theta_data);
 }
 
 void TransientRBSystem::assemble_L2_matrix(SparseMatrix<Number>* input_matrix)

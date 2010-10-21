@@ -1577,7 +1577,7 @@ Number RBSystem::eval_theta_q_f(unsigned int q)
   if( q < theta_q_f_vector.size() )
   {
     libmesh_assert(theta_q_f_vector[q] != NULL);
-    return theta_q_f_vector[q](current_parameters);
+    return theta_q_f_vector[q](theta_data);
   }
   else
   {
@@ -1626,7 +1626,7 @@ Number RBSystem::eval_theta_q_l(unsigned int output_index, unsigned int q_l)
 
   libmesh_assert(theta_q_l_vector[output_index][q_l] != NULL);
    
-  return theta_q_l_vector[output_index][q_l](current_parameters);
+  return theta_q_l_vector[output_index][q_l](theta_data);
 }
 
 void RBSystem::load_basis_function(unsigned int i)

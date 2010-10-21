@@ -356,8 +356,7 @@ Number QNTransientRBSystem::eval_theta_c()
 {
   libmesh_assert(theta_c != NULL);
 
-  std::vector<Real> cp = get_current_parameters();
-  return theta_c( cp );
+  return theta_c( theta_data );
 }
 
 void QNTransientRBSystem::initialize_truth ()
