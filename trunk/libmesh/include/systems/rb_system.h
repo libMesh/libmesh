@@ -295,7 +295,7 @@ public:
    * Attach user-defined assembly routine
    * for the inner-product matrix.
    */
-  void attach_inner_prod_assembly(affine_assembly_fptr IP_assembly);
+  void attach_inner_prod_assembly(affine_assembly_fptr IP_assembly, affine_assembly_fptr IP_bndry_assembly=NULL);
 
   /**
    * Attach user-defined assembly routine
@@ -850,10 +850,11 @@ protected:
   std::string eigen_system_name;
 
   /**
-   * Function pointer for assembling the inner product
+   * Function pointers for assembling the inner product
    * matrix.
    */
   affine_assembly_fptr inner_prod_assembly;
+  affine_assembly_fptr inner_prod_bndry_assembly;
 
   /**
    * Function pointer for assembling the constraint

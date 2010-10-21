@@ -48,12 +48,11 @@ namespace libMesh
  * @author David J. Knezevic, 2009
  */
 
-// Forward declare RBEIMSystem 
+// Forward declarations
 class RBEIMSystem;
 
 /**
- * Typedef for theta_q function pointers, need a
- * typedef for the std::vector templating to work.
+ * Typedef for theta_q function pointers.
  */
 typedef Number (*theta_q_fptr)(std::vector<Real>&);
 

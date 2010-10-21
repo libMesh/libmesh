@@ -76,6 +76,7 @@ RBSystem::RBSystem (EquationSystems& es,
     quiet(true),
     eigen_system_name(""),
     inner_prod_assembly(NULL),
+    inner_prod_bndry_assembly(NULL),
     constraint_assembly(NULL),
     update_residual_terms_called(false),
     training_tolerance(-1.),
@@ -1070,7 +1071,7 @@ void RBSystem::truth_assembly()
 void RBSystem::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix)
 {
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., inner_prod_assembly, NULL, input_matrix, NULL);
+  add_scaled_matrix_and_vector(1., inner_prod_assembly, inner_prod_bndry_assembly, input_matrix, NULL);
 }
 
 void RBSystem::assemble_constraint_matrix(SparseMatrix<Number>* input_matrix)
@@ -1542,9 +1543,10 @@ bool RBSystem::is_F_EIM_function(unsigned int q)
   return (q >= theta_q_f_vector.size());
 }
 
-void RBSystem::attach_inner_prod_assembly(affine_assembly_fptr IP_assembly)
+void RBSystem::attach_inner_prod_assembly(affine_assembly_fptr IP_assembly, affine_assembly_fptr IP_bndry_assembly)
 {
   inner_prod_assembly = IP_assembly;
+  inner_prod_bndry_assembly = IP_bndry_assembly;
 }
 
 void RBSystem::attach_constraint_assembly(affine_assembly_fptr constraint_assembly_in)
