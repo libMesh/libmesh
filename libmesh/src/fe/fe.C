@@ -145,7 +145,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // the case of the hierarchics) the shape functions need
   // reinit, since they depend on the particular element shape
   else 
-    {
+    {      
       libmesh_assert (qrule   != NULL);
       qrule->init(elem->type(), elem->p_level());
 
@@ -178,8 +178,8 @@ void FE<Dim,T>::reinit(const Elem* elem,
           else
             for (unsigned int n = 1; n < elem->n_nodes(); ++n)
               {
-                if ((elem->point(n) - elem->point(0)) !=
-                    (cached_nodes[n] - cached_nodes[0]))
+                if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals(
+                      (cached_nodes[n] - cached_nodes[0]), 1e-13))
                   {
                     cached_nodes_still_fit = false;
                     break;
