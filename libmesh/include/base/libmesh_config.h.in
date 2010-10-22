@@ -1,5 +1,14 @@
 /* include/base/libmesh_config.h.in.  Generated from configure.in by autoheader.  */
 
+/* definition of the final detected unordered_map type */
+#undef BEST_UNORDERED_MAP
+
+/* definition of the final detected unordered_multimap type */
+#undef BEST_UNORDERED_MULTIMAP
+
+/* definition of the final detected unordered_set type */
+#undef BEST_UNORDERED_SET
+
 /* This compiler is known not to support some iostream functionality */
 #undef BROKEN_IOSTREAM
 
@@ -76,6 +85,9 @@
 /* define if the compiler supports __gnu_cxx::hash_map */
 #undef HAVE_EXT_HASH_MAP
 
+/* define if the compiler supports __gnu_cxx::hash_multimap */
+#undef HAVE_EXT_HASH_MULTIMAP
+
 /* define if the compiler supports __gnu_cxx::hash_set */
 #undef HAVE_EXT_HASH_SET
 
@@ -102,6 +114,9 @@
 
 /* define if the compiler supports std::hash_map */
 #undef HAVE_HASH_MAP
+
+/* define if the compiler supports std::hash_multimap */
+#undef HAVE_HASH_MULTIMAP
 
 /* define if the compiler supports std::hash_set */
 #undef HAVE_HASH_SET
@@ -169,6 +184,15 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
+/* define if the compiler supports std::unordered_map */
+#undef HAVE_STD_UNORDERED_MAP
+
+/* define if the compiler supports std::unordered_multimap */
+#undef HAVE_STD_UNORDERED_MULTIMAP
+
+/* define if the compiler supports std::unordered_set */
+#undef HAVE_STD_UNORDERED_SET
+
 /* define if the compiler has stringstream functionality */
 #undef HAVE_STRINGSTREAM
 
@@ -204,6 +228,9 @@
 /* define if the compiler supports std::tr1::unordered_map */
 #undef HAVE_TR1_UNORDERED_MAP
 
+/* define if the compiler supports std::tr1::unordered_multimap */
+#undef HAVE_TR1_UNORDERED_MULTIMAP
+
 /* define if the compiler supports std::tr1::unordered_set */
 #undef HAVE_TR1_UNORDERED_SET
 
@@ -218,12 +245,6 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* define if the compiler supports std::unordered_map */
-#undef HAVE_UNORDERED_MAP
-
-/* define if the compiler supports std::unordered_set */
-#undef HAVE_UNORDERED_SET
-
 /* Flag indicating whether the library will be compiled with VTK support */
 #undef HAVE_VTK
 
@@ -232,6 +253,15 @@
 
 /* Define to 1 if you have the <zlib.h> header file. */
 #undef HAVE_ZLIB_H
+
+/* header file for the final detected unordered_map type */
+#undef INCLUDE_UNORDERED_MAP
+
+/* header file for the final detected unordered_multimap type */
+#undef INCLUDE_UNORDERED_MULTIMAP
+
+/* header file for the final detected unordered_set type */
+#undef INCLUDE_UNORDERED_SET
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

@@ -51,17 +51,7 @@
 #include "legacy_xdr_io.h"
 #include "vtk_io.h"
 
-#if   defined(LIBMESH_HAVE_TR1_UNORDERED_MAP)
-# include <tr1/unordered_map>
-#elif defined(LIBMESH_HAVE_UNORDERED_MAP)
-# include <unordered_map>
-#elif defined(LIBMESH_HAVE_HASH_MAP)
-# include <hash_map>
-#elif defined(LIBMESH_HAVE_EXT_HASH_MAP)
-# include <ext/hash_map>
-#else
-# include <map>
-#endif
+#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 
 
@@ -223,25 +213,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     typedef std::pair<Elem*, unsigned char> val_type;
     typedef std::pair<key_type, val_type>   key_val_pair;
     
-#if   defined(LIBMESH_HAVE_UNORDERED_MAP)
-    typedef std::unordered_multimap<key_type, val_type> map_type;    
-#elif defined(LIBMESH_HAVE_TR1_UNORDERED_MAP)
-    typedef std::tr1::unordered_multimap<key_type, val_type> map_type;    
-#elif defined(LIBMESH_HAVE_HASH_MAP)    
-    typedef std::hash_multimap<key_type, val_type> map_type;    
-#elif defined(LIBMESH_HAVE_EXT_HASH_MAP)
-# if    (__GNUC__ == 3) && (__GNUC_MINOR__ == 0) // gcc 3.0   
-    typedef std::hash_multimap<key_type, val_type> map_type;
-# elif (__GNUC__ >= 3)                          // gcc 3.1 & newer
-    typedef __gnu_cxx::hash_multimap<key_type, val_type> map_type;
-# else
-// XLC and who knows what other compilers get here.
-// Try the most standard thing we can:
-    typedef std::multimap<key_type, val_type>  map_type;
-# endif
-#else
-    typedef std::multimap<key_type, val_type>  map_type;
-#endif
+    typedef LIBMESH_BEST_UNORDERED_MULTIMAP<key_type, val_type> map_type;    
     
     // A map from side keys to corresponding elements & side numbers  
     map_type side_to_elem_map;
