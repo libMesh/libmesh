@@ -260,20 +260,15 @@ AC_ARG_ENABLE(unordered-containers,
               enableunorderedcontainers=yes)
 
   if test "$enableunorderedcontainers" != no ; then
-    dnl Just checking for the headers is insufficient in all cases... we need to see if the compiler can actually compile a test code.
-    dnl AC_CHECK_HEADERS(unordered_map,[],[AC_CHECK_HEADERS(tr1/unordered_map,[],[AC_CHECK_HEADERS(hash_map, [], [AC_CHECK_HEADERS(ext/hash_map)])])])
-    dnl AC_CHECK_HEADERS(unordered_set,[],[AC_CHECK_HEADERS(tr1/unordered_set,[],[AC_CHECK_HEADERS(hash_set, [], [AC_CHECK_HEADERS(ext/hash_set)])])])
-
-    dnl The following routines, defined in aclocal.m4, check to see if the compiler can compile programs using
-    dnl various non-standard hash containers.
-    ACX_TR1_UNORDERED_MAP
-    ACX_TR1_UNORDERED_SET
-    ACX_UNORDERED_MAP
-    ACX_UNORDERED_SET
-    ACX_EXT_HASH_MAP
-    ACX_EXT_HASH_SET
-    ACX_HASH_MAP
-    ACX_HASH_SET
+    dnl The following routines, defined in unordered.m4, check to see if the compiler can compile programs using
+    dnl various quasi-standard hash containers.
+    ACX_BEST_UNORDERED_MULTIMAP
+    ACX_BEST_UNORDERED_MAP
+    ACX_BEST_UNORDERED_SET
+  else
+    ACX_STD_MAP
+    ACX_STD_MULTIMAP
+    ACX_STD_SET
   fi
 
 AC_CHECK_HEADERS(dlfcn.h)
