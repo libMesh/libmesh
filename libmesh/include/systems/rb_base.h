@@ -153,12 +153,18 @@ public:
    * Overwrite the training parameters with new_training_set.
    */
   virtual void load_training_set(std::vector< std::vector<Number> >& new_training_set);
-  
+
   /**
    * Initialize the theta_data structure. In this base class
    * this just involves setting the pointer to current_parameters.
    */
-  virtual void init_theta_data();
+  virtual AutoPtr<RBThetaData> build_theta_data();
+
+  /**
+   * Initialize the theta_data structure. In this base class
+   * this just involves setting the pointer to current_parameters.
+   */
+  virtual void init_theta_data(RBThetaData& theta_data);
 
   /**
    * Get the number of parameters. Value is determined
@@ -310,7 +316,7 @@ public:
    * This data structure stores the data relevant to the evaluation
    * of the theta_q functions.
    */
-  RBThetaData theta_data;
+  RBThetaData* theta_data;
   
 protected:
 

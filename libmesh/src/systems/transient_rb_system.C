@@ -396,7 +396,7 @@ Number TransientRBSystem::eval_theta_q_m(unsigned int q)
 
   libmesh_assert(theta_q_m_vector[q] != NULL);
 
-  return theta_q_m_vector[q](theta_data);
+  return theta_q_m_vector[q](*theta_data);
 }
 
 void TransientRBSystem::assemble_L2_matrix(SparseMatrix<Number>* input_matrix)

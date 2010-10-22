@@ -33,7 +33,7 @@ namespace libMesh
  *
  * @author David J. Knezevic, 2009
  */
-class RBThetaData
+class RBThetaData : public ReferenceCountedObject<RBThetaData>
 {
 public:
 
@@ -42,6 +42,11 @@ public:
    * data structures.
    */
   RBThetaData () {};
+  
+  /**
+   * Destructor.
+   */
+  virtual ~RBThetaData () {};
   
   /**
    * Store a const pointer to an associated system's

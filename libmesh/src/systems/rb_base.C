@@ -52,6 +52,7 @@ RBBase<Base>::RBBase (EquationSystems& es,
     training_parameters_initialized(false),
     initialize_calN_dependent_data(true),
     training_parameters_random_seed(-1), // by default, use std::time to seed RNG
+    theta_data(NULL),
     serial_training_set(false),
     alternative_solver("unchanged")
 {
@@ -78,6 +79,13 @@ void RBBase<Base>::clear ()
 {
   // clear the parent data
   Base::clear();
+  
+  // clear the RBThetaData object
+  if(theta_data)
+  {
+    delete theta_data;
+    theta_data = NULL;
+  }
 
   for(unsigned int i=0; i<training_parameters.size(); i++)
   {
@@ -94,7 +102,8 @@ template <class Base>
 void RBBase<Base>::init_data ()
 {
   // Initialize the RBThetaData object
-  init_theta_data();
+  theta_data = build_theta_data().release();
+  init_theta_data(*theta_data);
 
   if(initialize_calN_dependent_data)
   {
@@ -283,7 +292,7 @@ Number RBBase<Base>::eval_theta_q_a(unsigned int q)
   
   if(!is_A_EIM_operator(q))
   {
-    return theta_q_a_vector[q](theta_data);
+    return theta_q_a_vector[q](*theta_data);
   }
   else
   {
@@ -417,9 +426,18 @@ void RBBase<Base>::load_training_set(std::vector< std::vector<Number> >& new_tra
 
 
 template <class Base>
-void RBBase<Base>::init_theta_data()
+AutoPtr<RBThetaData> RBBase<Base>::build_theta_data ()
 {
-  theta_data.point_to_parameters(current_parameters);
+  AutoPtr<RBThetaData> ap(new RBThetaData());
+  
+  return ap;
+}
+
+
+template <class Base>
+void RBBase<Base>::init_theta_data(RBThetaData& data)
+{
+  data.point_to_parameters(current_parameters);
 }
 
 
