@@ -337,7 +337,7 @@ AC_DEFUN([ACX_EXT_HASH],
 ac_cv_cxx_ext_hash,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <ext/functional>],
+ AC_TRY_COMPILE([#include <ext/hash_set>],
 [
   __gnu_cxx::hash<int> m;
   std::size_t hashed = m(12345);
@@ -350,7 +350,7 @@ if test "$ac_cv_cxx_ext_hash" = yes; then
             [define if the compiler supports __gnu_cxx::hash])
   AC_DEFINE(BEST_HASH,__gnu_cxx::hash,
             [definition of the final detected hash type])
-  AC_DEFINE(INCLUDE_HASH,<ext/functional>,
+  AC_DEFINE(INCLUDE_HASH,<ext/hash_set>,
             [header file for the final detected hash type])
 fi
 ])
