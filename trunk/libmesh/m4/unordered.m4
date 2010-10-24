@@ -259,7 +259,7 @@ ac_cv_cxx_ext_hash_map,
 if test "$ac_cv_cxx_ext_hash_map" = yes; then
   AC_DEFINE(HAVE_EXT_HASH_MAP,1,
             [define if the compiler supports __gnu_cxx::hash_map])
-  AC_DEFINE(BEST_UNORDERED_MAP,__gnu_cxx::unordered_map,
+  AC_DEFINE(BEST_UNORDERED_MAP,__gnu_cxx::hash_map,
             [definition of the final detected unordered_map type])
   AC_DEFINE(INCLUDE_UNORDERED_MAP,<ext/hash_map>,
             [header file for the final detected unordered_map type])
@@ -290,7 +290,7 @@ ac_cv_cxx_ext_hash_multimap,
 if test "$ac_cv_cxx_ext_hash_multimap" = yes; then
   AC_DEFINE(HAVE_EXT_HASH_MULTIMAP,1,
             [define if the compiler supports __gnu_cxx::hash_multimap])
-  AC_DEFINE(BEST_UNORDERED_MULTIMAP,__gnu_cxx::unordered_map,
+  AC_DEFINE(BEST_UNORDERED_MULTIMAP,__gnu_cxx::hash_multimap,
             [definition of the final detected unordered_multimap type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<ext/hash_map>,
             [header file for the final detected unordered_multimap type])
@@ -319,7 +319,7 @@ ac_cv_cxx_ext_hash_set,
 if test "$ac_cv_cxx_ext_hash_set" = yes; then
   AC_DEFINE(HAVE_EXT_HASH_SET,1,
             [define if the compiler supports __gnu_cxx::hash_set])
-  AC_DEFINE(BEST_UNORDERED_SET,__gnu_cxx::unordered_set,
+  AC_DEFINE(BEST_UNORDERED_SET,__gnu_cxx::hash_set,
             [definition of the final detected unordered_set type])
   AC_DEFINE(INCLUDE_UNORDERED_SET,<ext/hash_set>,
             [header file for the final detected unordered_set type])
