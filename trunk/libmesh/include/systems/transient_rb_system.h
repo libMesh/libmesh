@@ -515,6 +515,16 @@ protected:
    */
   DenseVector<Number> RB_ic_proj_rhs_all_N;
 
+  /**
+   * Cached residual terms.
+   */
+  Number cached_Fq_term;
+  DenseVector<Number> cached_Fq_Aq_vector;
+  DenseMatrix<Number> cached_Aq_Aq_matrix;
+  DenseVector<Number> cached_Fq_Mq_vector;
+  DenseMatrix<Number> cached_Aq_Mq_matrix;
+  DenseMatrix<Number> cached_Mq_Mq_matrix;
+
 private:
 
   /**
@@ -529,16 +539,6 @@ private:
    * Dense matrix to store the data that we use for the temporal POD.
    */
   std::vector< NumericVector<Number>* > temporal_data;
-  
-  /**
-   * Cached residual terms.
-   */
-  Number cached_Fq_term;
-  DenseVector<Number> cached_Fq_Aq_vector;
-  DenseMatrix<Number> cached_Aq_Aq_matrix;
-  DenseVector<Number> cached_Fq_Mq_vector;
-  DenseMatrix<Number> cached_Aq_Mq_matrix;
-  DenseMatrix<Number> cached_Mq_Mq_matrix;
 
 };
 
