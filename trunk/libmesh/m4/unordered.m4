@@ -26,6 +26,14 @@ if test "$ac_cv_cxx_tr1_unordered_map" = yes; then
             [definition of the final detected unordered_map type])
   AC_DEFINE(INCLUDE_UNORDERED_MAP,<tr1/unordered_map>,
             [header file for the final detected unordered_map type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -57,6 +65,14 @@ if test "$ac_cv_cxx_tr1_unordered_multimap" = yes; then
             [definition of the final detected unordered_multimap type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<tr1/unordered_map>,
             [header file for the final detected unordered_multimap type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -86,6 +102,14 @@ if test "$ac_cv_cxx_tr1_unordered_set" = yes; then
             [definition of the final detected unordered_set type])
   AC_DEFINE(INCLUDE_UNORDERED_SET,<tr1/unordered_set>,
             [header file for the final detected unordered_set type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -115,6 +139,14 @@ if test "$ac_cv_cxx_tr1_hash" = yes; then
             [definition of the final detected hash type])
   AC_DEFINE(INCLUDE_HASH,<tr1/functional>,
             [header file for the final detected hash type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -144,6 +176,14 @@ if test "$ac_cv_cxx_unordered_map" = yes; then
             [definition of the final detected unordered_map type])
   AC_DEFINE(INCLUDE_UNORDERED_MAP,<unordered_map>,
             [header file for the final detected unordered_map type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -175,6 +215,14 @@ if test "$ac_cv_cxx_unordered_multimap" = yes; then
             [definition of the final detected unordered_multimap type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<unordered_map>,
             [header file for the final detected unordered_multimap type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -204,6 +252,14 @@ if test "$ac_cv_cxx_unordered_set" = yes; then
             [definition of the final detected unordered_set type])
   AC_DEFINE(INCLUDE_UNORDERED_SET,<unordered_set>,
             [header file for the final detected unordered_set type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -233,6 +289,14 @@ if test "$ac_cv_cxx_hash" = yes; then
             [definition of the final detected hash type])
   AC_DEFINE(INCLUDE_HASH,<functional>,
             [header file for the final detected hash type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -263,6 +327,13 @@ if test "$ac_cv_cxx_ext_hash_map" = yes; then
             [definition of the final detected unordered_map type])
   AC_DEFINE(INCLUDE_UNORDERED_MAP,<ext/hash_map>,
             [header file for the final detected unordered_map type])
+  AC_DEFINE(DEFINE_HASH_STRING,[namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}],
+            [workaround for potentially missing hash<string>])
+  ac_cv_cxx_hash_string=yes
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -294,6 +365,13 @@ if test "$ac_cv_cxx_ext_hash_multimap" = yes; then
             [definition of the final detected unordered_multimap type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<ext/hash_map>,
             [header file for the final detected unordered_multimap type])
+  AC_DEFINE(DEFINE_HASH_STRING,[namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}],
+            [workaround for potentially missing hash<string>])
+  ac_cv_cxx_hash_string=yes
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -323,6 +401,13 @@ if test "$ac_cv_cxx_ext_hash_set" = yes; then
             [definition of the final detected unordered_set type])
   AC_DEFINE(INCLUDE_UNORDERED_SET,<ext/hash_set>,
             [header file for the final detected unordered_set type])
+  AC_DEFINE(DEFINE_HASH_STRING,[namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}],
+            [workaround for potentially missing hash<string>])
+  ac_cv_cxx_hash_string=yes
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -352,6 +437,13 @@ if test "$ac_cv_cxx_ext_hash" = yes; then
             [definition of the final detected hash type])
   AC_DEFINE(INCLUDE_HASH,<ext/hash_set>,
             [header file for the final detected hash type])
+  AC_DEFINE(DEFINE_HASH_STRING,[namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}],
+            [workaround for potentially missing hash<string>])
+  ac_cv_cxx_hash_string=yes
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -381,6 +473,14 @@ if test "$ac_cv_cxx_hash_map" = yes; then
             [definition of the final detected unordered_map type])
   AC_DEFINE(INCLUDE_UNORDERED_MAP,<hash_map>,
             [header file for the final detected unordered_map type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -410,6 +510,14 @@ if test "$ac_cv_cxx_hash_multimap" = yes; then
             [definition of the final detected unordered_multimap type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<hash_map>,
             [header file for the final detected unordered_multimap type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -437,6 +545,14 @@ if test "$ac_cv_cxx_set" = yes; then
             [definition of the final detected unordered_set type])
   AC_DEFINE(INCLUDE_UNORDERED_SET,<set>,
             [header file for the final detected unordered_set type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -463,6 +579,14 @@ if test "$ac_cv_cxx_map" = yes; then
             [definition of the final detected unordered_map type])
   AC_DEFINE(INCLUDE_UNORDERED_MAP,<map>,
             [header file for the final detected unordered_map type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -490,6 +614,14 @@ if test "$ac_cv_cxx_multimap" = yes; then
             [definition of the final detected unordered_multimap type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<map>,
             [header file for the final detected unordered_multimap type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -519,6 +651,14 @@ if test "$ac_cv_cxx_hash_set" = yes; then
             [definition of the final detected unordered_set type])
   AC_DEFINE(INCLUDE_UNORDERED_SET,<hash_set>,
             [header file for the final detected unordered_set type])
+  if test "$ac_cv_cxx_hash_string" != yes; then
+    AC_DEFINE(DEFINE_HASH_STRING,,
+              [workaround for potentially missing hash<string>])
+  fi
+  [$1]
+else
+  false
+  [$2]
 fi
 ])
 
@@ -529,11 +669,11 @@ dnl Choose the best unordered_map implementation available
 dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_BEST_UNORDERED_MAP],
 [
-ACX_STD_MAP
-ACX_HASH_MAP
-ACX_EXT_HASH_MAP
-ACX_TR1_UNORDERED_MAP
-ACX_STD_UNORDERED_MAP
+ACX_STD_UNORDERED_MAP([],
+ACX_TR1_UNORDERED_MAP([],
+ACX_EXT_HASH_MAP([],
+ACX_HASH_MAP([],
+ACX_STD_MAP([],[])))))
 ])
 
 
@@ -543,11 +683,11 @@ dnl Choose the best unordered_multimap implementation available
 dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_BEST_UNORDERED_MULTIMAP],
 [
-ACX_STD_MULTIMAP
-ACX_HASH_MULTIMAP
-ACX_EXT_HASH_MULTIMAP
-ACX_TR1_UNORDERED_MULTIMAP
-ACX_STD_UNORDERED_MULTIMAP
+ACX_STD_UNORDERED_MULTIMAP([],
+ACX_TR1_UNORDERED_MULTIMAP([],
+ACX_EXT_HASH_MULTIMAP([],
+ACX_HASH_MULTIMAP([],
+ACX_STD_MULTIMAP([],[])))))
 ])
 
 
@@ -557,11 +697,11 @@ dnl Choose the best unordered_set implementation available
 dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_BEST_UNORDERED_SET],
 [
-ACX_STD_SET
-ACX_HASH_SET
-ACX_EXT_HASH_SET
-ACX_TR1_UNORDERED_SET
-ACX_STD_UNORDERED_SET
+ACX_STD_UNORDERED_SET([],
+ACX_TR1_UNORDERED_SET([],
+ACX_EXT_HASH_SET([],
+ACX_HASH_SET([],
+ACX_STD_SET([],[])))))
 ])
 
 
@@ -571,7 +711,7 @@ dnl Choose the best hash implementation available
 dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_BEST_HASH],
 [
-ACX_EXT_HASH
-ACX_TR1_HASH
-ACX_STD_HASH
+ACX_STD_HASH([],
+ACX_TR1_HASH([],
+ACX_EXT_HASH([],[])))
 ])
