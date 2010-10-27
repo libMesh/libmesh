@@ -61,7 +61,49 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
   const Order o = fe_t.order;
   
   switch (dim)
-    {
+     {
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<0,CLOUGH>::n_shape_functions(t, o);
+	    
+	  case HERMITE:
+	    return FE<0,HERMITE>::n_shape_functions(t, o);
+	    
+	  case HIERARCHIC:
+	    return FE<0,HIERARCHIC>::n_shape_functions(t, o);
+	    
+	  case LAGRANGE:
+	    return FE<0,LAGRANGE>::n_shape_functions(t, o);
+	    
+	  case MONOMIAL:
+	    return FE<0,MONOMIAL>::n_shape_functions(t, o);
+
+          case SCALAR:
+            return FE<0,SCALAR>::n_shape_functions(t, o);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<0,BERNSTEIN>::n_shape_functions(t, o);
+
+	  case SZABAB:
+	    return FE<0,SZABAB>::n_shape_functions(t, o);
+
+#endif
+	    
+	  case XYZ:
+	    return FEXYZ<0>::n_shape_functions(t, o);
+
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
       // 1D
     case 1:
       {
@@ -214,6 +256,47 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
   switch (dim)
     {
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<0,CLOUGH>::n_dofs(t, o);
+	    
+	  case HERMITE:
+	    return FE<0,HERMITE>::n_dofs(t, o);
+	    
+	  case HIERARCHIC:
+	    return FE<0,HIERARCHIC>::n_dofs(t, o);
+	    
+	  case LAGRANGE:
+	    return FE<0,LAGRANGE>::n_dofs(t, o);
+	    
+	  case MONOMIAL:
+	    return FE<0,MONOMIAL>::n_dofs(t, o);
+
+          case SCALAR:
+            return FE<0,SCALAR>::n_dofs(t, o);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<0,BERNSTEIN>::n_dofs(t, o);
+
+	  case SZABAB:
+	    return FE<0,SZABAB>::n_dofs(t, o);
+
+#endif
+	    
+	  case XYZ:
+	    return FEXYZ<0>::n_dofs(t, o);
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
       // 1D
     case 1:
       {
@@ -365,6 +448,47 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
   
   switch (dim)
     {
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<0,CLOUGH>::n_dofs_at_node(t, o, n);
+	    
+	  case HERMITE:
+	    return FE<0,HERMITE>::n_dofs_at_node(t, o, n);
+	    
+	  case HIERARCHIC:
+	    return FE<0,HIERARCHIC>::n_dofs_at_node(t, o, n);
+	    
+	  case LAGRANGE:
+	    return FE<0,LAGRANGE>::n_dofs_at_node(t, o, n);
+	    
+	  case MONOMIAL:
+	    return FE<0,MONOMIAL>::n_dofs_at_node(t, o, n);
+
+          case SCALAR:
+            return FE<0,SCALAR>::n_dofs_at_node(t, o, n);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<0,BERNSTEIN>::n_dofs_at_node(t, o, n);
+
+	  case SZABAB:
+	    return FE<0,SZABAB>::n_dofs_at_node(t, o, n);
+
+#endif
+	    
+	  case XYZ:
+	    return FEXYZ<0>::n_dofs_at_node(t, o, n);
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
       // 1D
     case 1:
       {
@@ -516,7 +640,49 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
   switch (dim)
     {
-      // 1D
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<0,CLOUGH>::n_dofs_per_elem(t, o);
+	    
+	  case HERMITE:
+	    return FE<0,HERMITE>::n_dofs_per_elem(t, o);
+	    
+	  case HIERARCHIC:
+	    return FE<0,HIERARCHIC>::n_dofs_per_elem(t, o);
+	    
+	  case LAGRANGE:
+	    return FE<0,LAGRANGE>::n_dofs_per_elem(t, o);
+	    
+	  case MONOMIAL:
+	    return FE<0,MONOMIAL>::n_dofs_per_elem(t, o);
+
+          case SCALAR:
+            return FE<0,SCALAR>::n_dofs_per_elem(t, o);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<0,BERNSTEIN>::n_dofs_per_elem(t, o);
+
+	  case SZABAB:
+	    return FE<0,SZABAB>::n_dofs_per_elem(t, o);
+
+#endif
+	    
+	  case XYZ:
+	    return FEXYZ<0>::n_dofs_per_elem(t, o);
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
+
+       // 1D
     case 1:
       {
 	switch (fe_t.family)
@@ -661,7 +827,58 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 
   switch (dim)
     {
-      // 1D
+       // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    FE<0,CLOUGH>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case HERMITE:
+	    FE<0,HERMITE>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case HIERARCHIC:
+	    FE<0,HIERARCHIC>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case LAGRANGE:
+	    FE<0,LAGRANGE>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case MONOMIAL:
+	    FE<0,MONOMIAL>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  case SCALAR:
+	    FE<0,SCALAR>::dofs_on_side(elem, o, s, di);
+            return;
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<0,BERNSTEIN>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  case SZABAB:
+	    FE<0,SZABAB>::dofs_on_side(elem, o, s, di);
+            return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<0>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
+      
+       // 1D
     case 1:
       {
 	switch (fe_t.family)
@@ -829,6 +1046,57 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 
   switch (dim)
     {
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    FE<0,CLOUGH>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case HERMITE:
+	    FE<0,HERMITE>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case HIERARCHIC:
+	    FE<0,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case LAGRANGE:
+	    FE<0,LAGRANGE>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case MONOMIAL:
+	    FE<0,MONOMIAL>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  case SCALAR:
+	    FE<0,SCALAR>::dofs_on_edge(elem, o, e, di);
+            return;
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<0,BERNSTEIN>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  case SZABAB:
+	    FE<0,SZABAB>::dofs_on_edge(elem, o, e, di);
+            return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<0>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
+      
       // 1D
     case 1:
       {
@@ -1008,6 +1276,66 @@ void FEInterface::nodal_soln(const unsigned int dim,
   
   switch (dim)
     {
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    FE<0,CLOUGH>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+	    
+	  case HERMITE:
+	    FE<0,HERMITE>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+	    
+	  case HIERARCHIC:
+	    FE<0,HIERARCHIC>::nodal_soln(elem, order,
+					 elem_soln, nodal_soln);
+	    return;
+
+	  case LAGRANGE:
+	    FE<0,LAGRANGE>::nodal_soln(elem, order,
+				       elem_soln, nodal_soln);
+	    return;
+   
+	  case MONOMIAL:
+	    FE<0,MONOMIAL>::nodal_soln(elem, order,
+				       elem_soln, nodal_soln);
+	    return;
+
+	  case SCALAR:
+	    FE<0,SCALAR>::nodal_soln(elem, order,
+				       elem_soln, nodal_soln);
+	    return;
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<0,BERNSTEIN>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+
+	  case SZABAB:
+	    FE<0,SZABAB>::nodal_soln(elem, order,
+				     elem_soln, nodal_soln);
+	    return;
+
+#endif
+
+	  case XYZ:
+	    FEXYZ<0>::nodal_soln(elem, order,
+				 elem_soln, nodal_soln);
+	    return;
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
+      
       // 1D
     case 1:
       {
@@ -1207,6 +1535,48 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
   switch (dim)
     {
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<0,CLOUGH>::inverse_map(elem, p, tolerance, secure);
+	    
+	  case HERMITE:
+	    return FE<0,HERMITE>::inverse_map(elem, p, tolerance, secure);
+	    
+	  case HIERARCHIC:
+	    return FE<0,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
+	    
+	  case LAGRANGE:
+	    return FE<0,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
+	    
+	  case MONOMIAL:
+	    return FE<0,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
+
+	  case SCALAR:
+	    return FE<0,SCALAR>::inverse_map(elem, p, tolerance, secure);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<0,BERNSTEIN>::inverse_map(elem, p, tolerance, secure);
+
+	  case SZABAB:
+	    return FE<0,SZABAB>::inverse_map(elem, p, tolerance, secure);
+
+#endif
+	  case XYZ:
+	    return FEXYZ<0>::inverse_map(elem, p, tolerance, secure);
+
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
+      
       // 1D
     case 1:
       {
@@ -1382,6 +1752,57 @@ void FEInterface::inverse_map (const unsigned int dim,
 
   switch (dim)
     {
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    FE<0,CLOUGH>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
+	  case HERMITE:
+	    FE<0,HERMITE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
+	  case HIERARCHIC:
+	    FE<0,HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
+	  case LAGRANGE:
+	    FE<0,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
+	  case MONOMIAL:
+	    FE<0,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+
+	  case SCALAR:
+	    FE<0,SCALAR>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    FE<0,BERNSTEIN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+
+	  case SZABAB:
+	    FE<0,SZABAB>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+
+#endif
+	    
+	  case XYZ:
+	    FEXYZ<0>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
+      
       // 1D
     case 1:
       {
@@ -1569,7 +1990,48 @@ Real FEInterface::shape(const unsigned int dim,
   
   switch (dim)
     {
-      // 1D
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<0,CLOUGH>::shape(t,o,i,p);
+	    
+	  case HERMITE:
+	    return FE<0,HERMITE>::shape(t,o,i,p);
+	    
+	  case HIERARCHIC:
+	    return FE<0,HIERARCHIC>::shape(t,o,i,p);
+	    
+	  case LAGRANGE:
+	    return FE<0,LAGRANGE>::shape(t,o,i,p);
+	    
+	  case MONOMIAL:
+	    return FE<0,MONOMIAL>::shape(t,o,i,p);
+
+	  case SCALAR:
+	    return FE<0,SCALAR>::shape(t,o,i,p);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<0,BERNSTEIN>::shape(t,o,i,p);
+
+	  case SZABAB:
+	    return FE<0,SZABAB>::shape(t,o,i,p);
+
+#endif
+	    
+	  case XYZ:
+	    return FEXYZ<0>::shape(t,o,i,p);
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
+       // 1D
     case 1:
       {
 	switch (fe_t.family)
@@ -1721,7 +2183,48 @@ Real FEInterface::shape(const unsigned int dim,
 
   switch (dim)
     {
-      // 1D
+      // 0D
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<0,CLOUGH>::shape(elem,o,i,p);
+	    
+	  case HERMITE:
+	    return FE<0,HERMITE>::shape(elem,o,i,p);
+	    
+	  case HIERARCHIC:
+	    return FE<0,HIERARCHIC>::shape(elem,o,i,p);
+	    
+	  case LAGRANGE:
+	    return FE<0,LAGRANGE>::shape(elem,o,i,p);
+	    
+	  case MONOMIAL:
+	    return FE<0,MONOMIAL>::shape(elem,o,i,p);
+
+	  case SCALAR:
+	    return FE<0,SCALAR>::shape(elem,o,i,p);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<0,BERNSTEIN>::shape(elem,o,i,p);
+
+	  case SZABAB:
+	    return FE<0,SZABAB>::shape(elem,o,i,p);
+
+#endif
+	    
+	  case XYZ:
+	    return FEXYZ<0>::shape(elem,o,i,p);
+
+	  default:
+	    libmesh_error();
+	  }
+      }
+
+       // 1D
     case 1:
       {
 	switch (fe_t.family)
@@ -1903,9 +2406,10 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
   
   switch (elem->dim())
     {
+    case 0:
     case 1:
       {
-	// No constraints in 1D.
+	// No constraints in 0D/1D.
 	return;
       }
 

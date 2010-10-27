@@ -660,6 +660,42 @@ void FEBase::compute_shape_functions (const Elem*)
     {
 
     case 0: // No derivatives in 0D
+	if (calculate_dphi)
+	  for (unsigned int i=0; i<dphi.size(); i++)
+	    for (unsigned int p=0; p<dphi[i].size(); p++)
+	      {
+	        dphi[i][p](0) = 0.;
+	      
+#if LIBMESH_DIM>1
+	        dphi[i][p](1) = dphidy[i][p] = 0.;
+#endif
+#if LIBMESH_DIM>2
+	        dphi[i][p](2) = dphidz[i][p] = 0.;
+#endif
+	      }
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+	if (calculate_d2phi)
+	  for (unsigned int i=0; i<d2phi.size(); i++)
+	    for (unsigned int p=0; p<d2phi[i].size(); p++)
+	      {
+	        d2phi[i][p](0,0) = d2phidx2[i][p] = 0.;
+#if LIBMESH_DIM>1
+	        d2phi[i][p](0,1) = d2phidxdy[i][p] = 
+		  d2phi[i][p](1,0) = 0.;
+	        d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
+#endif
+#if LIBMESH_DIM>2
+	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
+		  d2phi[i][p](2,0) = 0.;
+	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
+		  d2phi[i][p](2,1) = 0.;
+	        d2phi[i][p](2,2) = d2phidz2[i][p] = 0.;
+#endif
+	      }
+#endif
+
+	// All done
+	
       break;
 
     case 1:
