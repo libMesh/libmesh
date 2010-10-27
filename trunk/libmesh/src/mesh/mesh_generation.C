@@ -49,6 +49,7 @@
 #include "sphere.h"
 #include "mesh_modification.h"
 #include "mesh_smoother_laplace.h"
+#include "node_elem.h"
 
 namespace libMesh
 {
@@ -173,13 +174,33 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
     mesh.set_mesh_dimension(3);
   else if (ny != 0)
     mesh.set_mesh_dimension(2);
-  else
+  else if (nx != 0)
     mesh.set_mesh_dimension(1);
+  else
+    mesh.set_mesh_dimension(0);
   
   switch (mesh.mesh_dimension())
     {
+      //---------------------------------------------------------------------
+      // Build a 0D point 
+    case 0:
+      {
+	libmesh_assert (nx == 0);
+	libmesh_assert (ny == 0);
+	libmesh_assert (nz == 0);
 
-      
+        libmesh_assert (type == INVALID_ELEM || type == NODEELEM);
+
+        // Build one nodal element for the mesh
+        mesh.add_point (Point(0, 0, 0), 0);
+        Elem* elem = mesh.add_elem (new NodeElem);
+        elem->set_node(0) = mesh.node_ptr(0);
+
+	break;
+      }
+
+
+
       //---------------------------------------------------------------------
       // Build a 1D line
     case 1:      
@@ -1418,6 +1439,24 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 }
 
 
+
+void MeshTools::Generation::build_point (UnstructuredMesh& mesh,
+                                         const ElemType type,
+                                         const bool gauss_lobatto_grid)
+{
+    // This method only makes sense in 0D!
+    // But we now just turn a non-0D mesh into a 0D mesh
+    //libmesh_assert(mesh.mesh_dimension() == 1);
+
+    build_cube(mesh,
+               0, 0, 0,
+               0., 0.,
+               0., 0.,
+               0., 0.,
+               type,
+               gauss_lobatto_grid);
+}
+                                        
 
 void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
                                         const unsigned int nx,

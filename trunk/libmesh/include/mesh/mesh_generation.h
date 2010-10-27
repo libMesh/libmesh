@@ -74,6 +74,14 @@ namespace MeshTools
 		     const bool gauss_lobatto_grid=false);
 
     /**
+     * A specialized \p build_cube() for 0D meshes.  The resulting
+     * mesh is a single NodeElem suitable for ODE tests
+     */
+    void build_point (UnstructuredMesh& mesh,
+                      const ElemType type=INVALID_ELEM,
+                      const bool gauss_lobatto_grid=false);
+
+    /**
      * A specialized \p build_cube() for 1D meshes
      *
      * Boundary ids are set to be equal to the side indexing on a
