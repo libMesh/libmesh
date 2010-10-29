@@ -35,6 +35,7 @@
 #include "parallel.h"
 #include "partitioner.h"
 #include "point_locator_base.h"
+#include "threads.h"
 
 namespace libMesh
 {
@@ -286,16 +287,13 @@ unsigned int MeshBase::recalculate_n_partitions()
 
 const PointLocatorBase & MeshBase::point_locator () const
 {
-  // Double checked lock pattern for efficiency
   if (_point_locator.get() == NULL)
-  {
-    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-    
-    if (_point_locator.get() == NULL)
-      _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
-  }
+    {
+      // PointLocator construction may not be safe within threads
+      libmesh_assert(!Threads::in_threads);
 
-  return *_point_locator;
+      _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
+    }
 }
 
 
