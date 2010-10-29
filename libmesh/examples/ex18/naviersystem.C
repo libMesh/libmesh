@@ -68,7 +68,7 @@ void NavierSystem::init_data ()
 
   // Useful debugging options
   // Set verify_analytic_jacobians to 1e-6 to use
-  this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0);
+  this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
   this->print_jacobians = infile("print_jacobians", false);
   this->print_element_jacobians = infile("print_element_jacobians", false);
 }
