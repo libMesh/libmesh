@@ -109,7 +109,9 @@ int main (int argc, char** argv)
                                        20, 20,
                                        0., 1.,
                                        0., 1.,
-                                       QUAD9);
+                                       QUAD4);
+
+  mesh.all_second_order();
   
   // Print information about the mesh to the screen.
   mesh.print_info();
