@@ -15,6 +15,9 @@
 /* Configuration information. */
 #undef CONFIGURE_INFO
 
+/* workaround for potentially missing hash<string> */
+#undef DEFINE_HASH_STRING
+
 /* PETSc's major version number, as detected by LibMesh */
 #undef DETECTED_PETSC_VERSION_MAJOR
 

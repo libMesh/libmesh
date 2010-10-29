@@ -5730,223 +5730,6 @@ fi
 
   if test "$enableunorderedcontainers" != no ; then
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::multimap" >&5
-$as_echo_n "checking whether the compiler supports std::multimap... " >&6; }
-if test "${ac_cv_cxx_multimap+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
- cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <map>
-int
-main ()
-{
-
-  std::multimap<int, int> m;
-  m.insert(std::make_pair(1, 2));
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_multimap=yes
-else
-  ac_cv_cxx_multimap=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_multimap" >&5
-$as_echo "$ac_cv_cxx_multimap" >&6; }
-if test "$ac_cv_cxx_multimap" = yes; then
-
-$as_echo "#define BEST_UNORDERED_MULTIMAP std::multimap" >>confdefs.h
-
-
-$as_echo "#define INCLUDE_UNORDERED_MULTIMAP <map>" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash_multimap" >&5
-$as_echo_n "checking whether the compiler supports std::hash_multimap... " >&6; }
-if test "${ac_cv_cxx_hash_multimap+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
- cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <hash_map>
-int
-main ()
-{
-
-  std::hash_multimap<int, int> m;
-  m.insert(std::make_pair(1, 2));
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_hash_multimap=yes
-else
-  ac_cv_cxx_hash_multimap=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_hash_multimap" >&5
-$as_echo "$ac_cv_cxx_hash_multimap" >&6; }
-if test "$ac_cv_cxx_hash_multimap" = yes; then
-
-$as_echo "#define HAVE_HASH_MULTIMAP 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_MULTIMAP std::hash_multimap" >>confdefs.h
-
-
-$as_echo "#define INCLUDE_UNORDERED_MULTIMAP <hash_map>" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __gnu_cxx::hash_multimap" >&5
-$as_echo_n "checking whether the compiler supports __gnu_cxx::hash_multimap... " >&6; }
-if test "${ac_cv_cxx_ext_hash_multimap+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
- cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <ext/hash_map>
-int
-main ()
-{
-
-  __gnu_cxx::hash_multimap<int, int> m;
-  m.insert(std::make_pair(1, 2));
-  m.insert(std::make_pair(1, 3));
-  if (m.size() != 2) return 1;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_ext_hash_multimap=yes
-else
-  ac_cv_cxx_ext_hash_multimap=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_ext_hash_multimap" >&5
-$as_echo "$ac_cv_cxx_ext_hash_multimap" >&6; }
-if test "$ac_cv_cxx_ext_hash_multimap" = yes; then
-
-$as_echo "#define HAVE_EXT_HASH_MULTIMAP 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_MULTIMAP __gnu_cxx::hash_multimap" >>confdefs.h
-
-
-$as_echo "#define INCLUDE_UNORDERED_MULTIMAP <ext/hash_map>" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::tr1::unordered_multimap" >&5
-$as_echo_n "checking whether the compiler supports std::tr1::unordered_multimap... " >&6; }
-if test "${ac_cv_cxx_tr1_unordered_multimap+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
- cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <tr1/unordered_map>
-int
-main ()
-{
-
-  std::tr1::unordered_multimap<int, int> m;
-  m.insert(std::make_pair(1, 2));
-  m.insert(std::make_pair(1, 3));
-  if (m.size() != 2) return 1;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_tr1_unordered_multimap=yes
-else
-  ac_cv_cxx_tr1_unordered_multimap=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_tr1_unordered_multimap" >&5
-$as_echo "$ac_cv_cxx_tr1_unordered_multimap" >&6; }
-if test "$ac_cv_cxx_tr1_unordered_multimap" = yes; then
-
-$as_echo "#define HAVE_TR1_UNORDERED_MULTIMAP 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_MULTIMAP std::tr1::unordered_multimap" >>confdefs.h
-
-
-$as_echo "#define INCLUDE_UNORDERED_MULTIMAP <tr1/unordered_map>" >>confdefs.h
-
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::unordered_multimap" >&5
 $as_echo_n "checking whether the compiler supports std::unordered_multimap... " >&6; }
 if test "${ac_cv_cxx_unordered_multimap+set}" = set; then :
@@ -6001,172 +5784,17 @@ $as_echo "#define BEST_UNORDERED_MULTIMAP std::unordered_multimap" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <unordered_map>" >>confdefs.h
 
-fi
+  if test "$ac_cv_cxx_hash_string" != yes; then
 
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
 
+  fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::map" >&5
-$as_echo_n "checking whether the compiler supports std::map... " >&6; }
-if test "${ac_cv_cxx_map+set}" = set; then :
-  $as_echo_n "(cached) " >&6
 else
-
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
- cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <map>
-int
-main ()
-{
-
-  std::map<int, int> m;
-  m.insert(std::make_pair(1, 2));
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_map=yes
-else
-  ac_cv_cxx_map=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_map" >&5
-$as_echo "$ac_cv_cxx_map" >&6; }
-if test "$ac_cv_cxx_map" = yes; then
-
-$as_echo "#define BEST_UNORDERED_MAP std::map" >>confdefs.h
-
-
-$as_echo "#define INCLUDE_UNORDERED_MAP <map>" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash_map" >&5
-$as_echo_n "checking whether the compiler supports std::hash_map... " >&6; }
-if test "${ac_cv_cxx_hash_map+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
- cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <hash_map>
-int
-main ()
-{
-
-  std::hash_map<int, int> m;
-  m.insert(std::make_pair(1, 2));
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_hash_map=yes
-else
-  ac_cv_cxx_hash_map=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_hash_map" >&5
-$as_echo "$ac_cv_cxx_hash_map" >&6; }
-if test "$ac_cv_cxx_hash_map" = yes; then
-
-$as_echo "#define HAVE_HASH_MAP 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_MAP std::hash_map" >>confdefs.h
-
-
-$as_echo "#define INCLUDE_UNORDERED_MAP <hash_map>" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __gnu_cxx::hash_map" >&5
-$as_echo_n "checking whether the compiler supports __gnu_cxx::hash_map... " >&6; }
-if test "${ac_cv_cxx_ext_hash_map+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
- cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <ext/hash_map>
-int
-main ()
-{
-
-  __gnu_cxx::hash_map<int, int> m;
-  m.insert(std::make_pair(1, 2));
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_ext_hash_map=yes
-else
-  ac_cv_cxx_ext_hash_map=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_ext_hash_map" >&5
-$as_echo "$ac_cv_cxx_ext_hash_map" >&6; }
-if test "$ac_cv_cxx_ext_hash_map" = yes; then
-
-$as_echo "#define HAVE_EXT_HASH_MAP 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_MAP __gnu_cxx::hash_map" >>confdefs.h
-
-
-$as_echo "#define INCLUDE_UNORDERED_MAP <ext/hash_map>" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::tr1::unordered_map" >&5
-$as_echo_n "checking whether the compiler supports std::tr1::unordered_map... " >&6; }
-if test "${ac_cv_cxx_tr1_unordered_map+set}" = set; then :
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::tr1::unordered_multimap" >&5
+$as_echo_n "checking whether the compiler supports std::tr1::unordered_multimap... " >&6; }
+if test "${ac_cv_cxx_tr1_unordered_multimap+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
 
@@ -6183,17 +5811,19 @@ int
 main ()
 {
 
-  std::tr1::unordered_map<int, int> m;
+  std::tr1::unordered_multimap<int, int> m;
   m.insert(std::make_pair(1, 2));
+  m.insert(std::make_pair(1, 3));
+  if (m.size() != 2) return 1;
 
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_tr1_unordered_map=yes
+  ac_cv_cxx_tr1_unordered_multimap=yes
 else
-  ac_cv_cxx_tr1_unordered_map=no
+  ac_cv_cxx_tr1_unordered_multimap=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
  ac_ext=cpp
@@ -6204,19 +5834,216 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_tr1_unordered_map" >&5
-$as_echo "$ac_cv_cxx_tr1_unordered_map" >&6; }
-if test "$ac_cv_cxx_tr1_unordered_map" = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_tr1_unordered_multimap" >&5
+$as_echo "$ac_cv_cxx_tr1_unordered_multimap" >&6; }
+if test "$ac_cv_cxx_tr1_unordered_multimap" = yes; then
 
-$as_echo "#define HAVE_TR1_UNORDERED_MAP 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_MAP std::tr1::unordered_map" >>confdefs.h
+$as_echo "#define HAVE_TR1_UNORDERED_MULTIMAP 1" >>confdefs.h
 
 
-$as_echo "#define INCLUDE_UNORDERED_MAP <tr1/unordered_map>" >>confdefs.h
+$as_echo "#define BEST_UNORDERED_MULTIMAP std::tr1::unordered_multimap" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTIMAP <tr1/unordered_map>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __gnu_cxx::hash_multimap" >&5
+$as_echo_n "checking whether the compiler supports __gnu_cxx::hash_multimap... " >&6; }
+if test "${ac_cv_cxx_ext_hash_multimap+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ext/hash_map>
+int
+main ()
+{
+
+  __gnu_cxx::hash_multimap<int, int> m;
+  m.insert(std::make_pair(1, 2));
+  m.insert(std::make_pair(1, 3));
+  if (m.size() != 2) return 1;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_ext_hash_multimap=yes
+else
+  ac_cv_cxx_ext_hash_multimap=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
 
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_ext_hash_multimap" >&5
+$as_echo "$ac_cv_cxx_ext_hash_multimap" >&6; }
+if test "$ac_cv_cxx_ext_hash_multimap" = yes; then
+
+$as_echo "#define HAVE_EXT_HASH_MULTIMAP 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_MULTIMAP __gnu_cxx::hash_multimap" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTIMAP <ext/hash_map>" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_STRING namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}" >>confdefs.h
+
+  ac_cv_cxx_hash_string=yes
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash_multimap" >&5
+$as_echo_n "checking whether the compiler supports std::hash_multimap... " >&6; }
+if test "${ac_cv_cxx_hash_multimap+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <hash_map>
+int
+main ()
+{
+
+  std::hash_multimap<int, int> m;
+  m.insert(std::make_pair(1, 2));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_hash_multimap=yes
+else
+  ac_cv_cxx_hash_multimap=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_hash_multimap" >&5
+$as_echo "$ac_cv_cxx_hash_multimap" >&6; }
+if test "$ac_cv_cxx_hash_multimap" = yes; then
+
+$as_echo "#define HAVE_HASH_MULTIMAP 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_MULTIMAP std::hash_multimap" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTIMAP <hash_map>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::multimap" >&5
+$as_echo_n "checking whether the compiler supports std::multimap... " >&6; }
+if test "${ac_cv_cxx_multimap+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <map>
+int
+main ()
+{
+
+  std::multimap<int, int> m;
+  m.insert(std::make_pair(1, 2));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_multimap=yes
+else
+  ac_cv_cxx_multimap=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_multimap" >&5
+$as_echo "$ac_cv_cxx_multimap" >&6; }
+if test "$ac_cv_cxx_multimap" = yes; then
+
+$as_echo "#define BEST_UNORDERED_MULTIMAP std::multimap" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_MULTIMAP <map>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::unordered_map" >&5
 $as_echo_n "checking whether the compiler supports std::unordered_map... " >&6; }
@@ -6270,13 +6097,17 @@ $as_echo "#define BEST_UNORDERED_MAP std::unordered_map" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MAP <unordered_map>" >>confdefs.h
 
-fi
+  if test "$ac_cv_cxx_hash_string" != yes; then
 
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
 
+  fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::set" >&5
-$as_echo_n "checking whether the compiler supports std::set... " >&6; }
-if test "${ac_cv_cxx_set+set}" = set; then :
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::tr1::unordered_map" >&5
+$as_echo_n "checking whether the compiler supports std::tr1::unordered_map... " >&6; }
+if test "${ac_cv_cxx_tr1_unordered_map+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
 
@@ -6288,22 +6119,22 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <set>
+#include <tr1/unordered_map>
 int
 main ()
 {
 
-  std::set<int> m;
-  m.insert(1);  m.insert(2);
+  std::tr1::unordered_map<int, int> m;
+  m.insert(std::make_pair(1, 2));
 
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_set=yes
+  ac_cv_cxx_tr1_unordered_map=yes
 else
-  ac_cv_cxx_set=no
+  ac_cv_cxx_tr1_unordered_map=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
  ac_ext=cpp
@@ -6314,20 +6145,29 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_set" >&5
-$as_echo "$ac_cv_cxx_set" >&6; }
-if test "$ac_cv_cxx_set" = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_tr1_unordered_map" >&5
+$as_echo "$ac_cv_cxx_tr1_unordered_map" >&6; }
+if test "$ac_cv_cxx_tr1_unordered_map" = yes; then
 
-$as_echo "#define BEST_UNORDERED_SET std::set" >>confdefs.h
+$as_echo "#define HAVE_TR1_UNORDERED_MAP 1" >>confdefs.h
 
 
-$as_echo "#define INCLUDE_UNORDERED_SET <set>" >>confdefs.h
+$as_echo "#define BEST_UNORDERED_MAP std::tr1::unordered_map" >>confdefs.h
 
-fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash_set" >&5
-$as_echo_n "checking whether the compiler supports std::hash_set... " >&6; }
-if test "${ac_cv_cxx_hash_set+set}" = set; then :
+$as_echo "#define INCLUDE_UNORDERED_MAP <tr1/unordered_map>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __gnu_cxx::hash_map" >&5
+$as_echo_n "checking whether the compiler supports __gnu_cxx::hash_map... " >&6; }
+if test "${ac_cv_cxx_ext_hash_map+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
 
@@ -6339,22 +6179,22 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <hash_set>
+#include <ext/hash_map>
 int
 main ()
 {
 
-  std::hash_set<int> m;
-  m.insert(1);  m.insert(2);
+  __gnu_cxx::hash_map<int, int> m;
+  m.insert(std::make_pair(1, 2));
 
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_hash_set=yes
+  ac_cv_cxx_ext_hash_map=yes
 else
-  ac_cv_cxx_hash_set=no
+  ac_cv_cxx_ext_hash_map=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
  ac_ext=cpp
@@ -6365,23 +6205,28 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_hash_set" >&5
-$as_echo "$ac_cv_cxx_hash_set" >&6; }
-if test "$ac_cv_cxx_hash_set" = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_ext_hash_map" >&5
+$as_echo "$ac_cv_cxx_ext_hash_map" >&6; }
+if test "$ac_cv_cxx_ext_hash_map" = yes; then
 
-$as_echo "#define HAVE_HASH_SET 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_SET std::hash_set" >>confdefs.h
+$as_echo "#define HAVE_EXT_HASH_MAP 1" >>confdefs.h
 
 
-$as_echo "#define INCLUDE_UNORDERED_SET <hash_set>" >>confdefs.h
+$as_echo "#define BEST_UNORDERED_MAP __gnu_cxx::hash_map" >>confdefs.h
 
-fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __gnu_cxx::hash_set" >&5
-$as_echo_n "checking whether the compiler supports __gnu_cxx::hash_set... " >&6; }
-if test "${ac_cv_cxx_ext_hash_set+set}" = set; then :
+$as_echo "#define INCLUDE_UNORDERED_MAP <ext/hash_map>" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_STRING namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}" >>confdefs.h
+
+  ac_cv_cxx_hash_string=yes
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash_map" >&5
+$as_echo_n "checking whether the compiler supports std::hash_map... " >&6; }
+if test "${ac_cv_cxx_hash_map+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
 
@@ -6393,22 +6238,22 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <ext/hash_set>
+#include <hash_map>
 int
 main ()
 {
 
-  __gnu_cxx::hash_set<int> m;
-  m.insert(1);  m.insert(2);
+  std::hash_map<int, int> m;
+  m.insert(std::make_pair(1, 2));
 
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_ext_hash_set=yes
+  ac_cv_cxx_hash_map=yes
 else
-  ac_cv_cxx_ext_hash_set=no
+  ac_cv_cxx_hash_map=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
  ac_ext=cpp
@@ -6419,23 +6264,29 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_ext_hash_set" >&5
-$as_echo "$ac_cv_cxx_ext_hash_set" >&6; }
-if test "$ac_cv_cxx_ext_hash_set" = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_hash_map" >&5
+$as_echo "$ac_cv_cxx_hash_map" >&6; }
+if test "$ac_cv_cxx_hash_map" = yes; then
 
-$as_echo "#define HAVE_EXT_HASH_SET 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_SET __gnu_cxx::hash_set" >>confdefs.h
+$as_echo "#define HAVE_HASH_MAP 1" >>confdefs.h
 
 
-$as_echo "#define INCLUDE_UNORDERED_SET <ext/hash_set>" >>confdefs.h
+$as_echo "#define BEST_UNORDERED_MAP std::hash_map" >>confdefs.h
 
-fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::tr1::unordered_set" >&5
-$as_echo_n "checking whether the compiler supports std::tr1::unordered_set... " >&6; }
-if test "${ac_cv_cxx_tr1_unordered_set+set}" = set; then :
+$as_echo "#define INCLUDE_UNORDERED_MAP <hash_map>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::map" >&5
+$as_echo_n "checking whether the compiler supports std::map... " >&6; }
+if test "${ac_cv_cxx_map+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
 
@@ -6447,22 +6298,22 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <tr1/unordered_set>
+#include <map>
 int
 main ()
 {
 
-  std::tr1::unordered_set<int> m;
-  m.insert(1);  m.insert(2);
+  std::map<int, int> m;
+  m.insert(std::make_pair(1, 2));
 
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_cxx_tr1_unordered_set=yes
+  ac_cv_cxx_map=yes
 else
-  ac_cv_cxx_tr1_unordered_set=no
+  ac_cv_cxx_map=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
  ac_ext=cpp
@@ -6473,19 +6324,35 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_tr1_unordered_set" >&5
-$as_echo "$ac_cv_cxx_tr1_unordered_set" >&6; }
-if test "$ac_cv_cxx_tr1_unordered_set" = yes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_map" >&5
+$as_echo "$ac_cv_cxx_map" >&6; }
+if test "$ac_cv_cxx_map" = yes; then
 
-$as_echo "#define HAVE_TR1_UNORDERED_SET 1" >>confdefs.h
-
-
-$as_echo "#define BEST_UNORDERED_SET std::tr1::unordered_set" >>confdefs.h
+$as_echo "#define BEST_UNORDERED_MAP std::map" >>confdefs.h
 
 
-$as_echo "#define INCLUDE_UNORDERED_SET <tr1/unordered_set>" >>confdefs.h
+$as_echo "#define INCLUDE_UNORDERED_MAP <map>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
 
 fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::unordered_set" >&5
 $as_echo_n "checking whether the compiler supports std::unordered_set... " >&6; }
@@ -6538,6 +6405,259 @@ $as_echo "#define BEST_UNORDERED_SET std::unordered_set" >>confdefs.h
 
 
 $as_echo "#define INCLUDE_UNORDERED_SET <unordered_set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::tr1::unordered_set" >&5
+$as_echo_n "checking whether the compiler supports std::tr1::unordered_set... " >&6; }
+if test "${ac_cv_cxx_tr1_unordered_set+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <tr1/unordered_set>
+int
+main ()
+{
+
+  std::tr1::unordered_set<int> m;
+  m.insert(1);  m.insert(2);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_tr1_unordered_set=yes
+else
+  ac_cv_cxx_tr1_unordered_set=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_tr1_unordered_set" >&5
+$as_echo "$ac_cv_cxx_tr1_unordered_set" >&6; }
+if test "$ac_cv_cxx_tr1_unordered_set" = yes; then
+
+$as_echo "#define HAVE_TR1_UNORDERED_SET 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_SET std::tr1::unordered_set" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_SET <tr1/unordered_set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __gnu_cxx::hash_set" >&5
+$as_echo_n "checking whether the compiler supports __gnu_cxx::hash_set... " >&6; }
+if test "${ac_cv_cxx_ext_hash_set+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ext/hash_set>
+int
+main ()
+{
+
+  __gnu_cxx::hash_set<int> m;
+  m.insert(1);  m.insert(2);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_ext_hash_set=yes
+else
+  ac_cv_cxx_ext_hash_set=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_ext_hash_set" >&5
+$as_echo "$ac_cv_cxx_ext_hash_set" >&6; }
+if test "$ac_cv_cxx_ext_hash_set" = yes; then
+
+$as_echo "#define HAVE_EXT_HASH_SET 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_SET __gnu_cxx::hash_set" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_SET <ext/hash_set>" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_STRING namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}" >>confdefs.h
+
+  ac_cv_cxx_hash_string=yes
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash_set" >&5
+$as_echo_n "checking whether the compiler supports std::hash_set... " >&6; }
+if test "${ac_cv_cxx_hash_set+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <hash_set>
+int
+main ()
+{
+
+  std::hash_set<int> m;
+  m.insert(1);  m.insert(2);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_hash_set=yes
+else
+  ac_cv_cxx_hash_set=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_hash_set" >&5
+$as_echo "$ac_cv_cxx_hash_set" >&6; }
+if test "$ac_cv_cxx_hash_set" = yes; then
+
+$as_echo "#define HAVE_HASH_SET 1" >>confdefs.h
+
+
+$as_echo "#define BEST_UNORDERED_SET std::hash_set" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_SET <hash_set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::set" >&5
+$as_echo_n "checking whether the compiler supports std::set... " >&6; }
+if test "${ac_cv_cxx_set+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <set>
+int
+main ()
+{
+
+  std::set<int> m;
+  m.insert(1);  m.insert(2);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_set=yes
+else
+  ac_cv_cxx_set=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_set" >&5
+$as_echo "$ac_cv_cxx_set" >&6; }
+if test "$ac_cv_cxx_set" = yes; then
+
+$as_echo "#define BEST_UNORDERED_SET std::set" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_UNORDERED_SET <set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+
+fi
+
+fi
+
+fi
+
+fi
 
 fi
 
@@ -6592,6 +6712,15 @@ $as_echo "#define BEST_UNORDERED_MAP std::map" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MAP <map>" >>confdefs.h
 
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+
 fi
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::multimap" >&5
@@ -6643,6 +6772,15 @@ $as_echo "#define BEST_UNORDERED_MULTIMAP std::multimap" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <map>" >>confdefs.h
 
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+
 fi
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::set" >&5
@@ -6693,6 +6831,15 @@ $as_echo "#define BEST_UNORDERED_SET std::set" >>confdefs.h
 
 
 $as_echo "#define INCLUDE_UNORDERED_SET <set>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_string" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+  fi
+
+else
+  false
 
 fi
 
