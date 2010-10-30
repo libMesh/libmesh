@@ -313,6 +313,16 @@ public:
                      std::vector<affine_assembly_fptr> output_bndry_assembly);
 
   /**
+   * Attach user-defined assembly routine for output. 
+   * (Interior assembly and boundary assembly).
+   * This function provides simpler syntax in the case that Q_l = 1; we
+   * do not need to use a vector in this case.
+   */
+  void attach_output(theta_q_fptr theta_q_l,
+                     affine_assembly_fptr output_intrr_assembly,
+                     affine_assembly_fptr output_bndry_assembly);
+
+  /**
    * Get a pointer to A_q.
    */
   SparseMatrix<Number>* get_A_q(unsigned int q);
