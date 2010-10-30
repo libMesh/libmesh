@@ -141,16 +141,10 @@ int main (int argc, char** argv)
   system.attach_F_q(theta_f_0, F0, NULL);
   
   // Attach output assembly
-  std::vector<theta_q_fptr> theta_l_vector(1); theta_l_vector[0] = theta_l;
-  std::vector<affine_assembly_fptr> L_bndry_vector(1);  L_bndry_vector[0] = NULL;
-  std::vector<affine_assembly_fptr> L0_intrr_vector(1); L0_intrr_vector[0] = L0_assembly;
-  std::vector<affine_assembly_fptr> L1_intrr_vector(1); L1_intrr_vector[0] = L1_assembly;
-  std::vector<affine_assembly_fptr> L2_intrr_vector(1); L2_intrr_vector[0] = L2_assembly;
-  std::vector<affine_assembly_fptr> L3_intrr_vector(1); L3_intrr_vector[0] = L3_assembly;
-  system.attach_output(theta_l_vector, L0_intrr_vector, L_bndry_vector);
-  system.attach_output(theta_l_vector, L1_intrr_vector, L_bndry_vector);
-  system.attach_output(theta_l_vector, L2_intrr_vector, L_bndry_vector);
-  system.attach_output(theta_l_vector, L3_intrr_vector, L_bndry_vector);
+  system.attach_output(theta_l, L0_assembly, NULL);
+  system.attach_output(theta_l, L1_assembly, NULL);
+  system.attach_output(theta_l, L2_assembly, NULL);
+  system.attach_output(theta_l, L3_assembly, NULL);
   
   // We reuse the operator A0 as the inner product matrix
   system.attach_inner_prod_assembly(A0);

@@ -1536,6 +1536,17 @@ void RBSystem::attach_output(std::vector<theta_q_fptr> theta_q_l,
   }
 }
 
+void RBSystem::attach_output(theta_q_fptr theta_q_l,
+                             affine_assembly_fptr output_intrr_assembly,
+                             affine_assembly_fptr output_bndry_assembly)
+{
+  std::vector<theta_q_fptr> theta_l_vector(1); theta_l_vector[0] = theta_q_l;
+  std::vector<affine_assembly_fptr> L_intrr_vector(1); L_intrr_vector[0] = output_intrr_assembly;
+  std::vector<affine_assembly_fptr> L_bndry_vector(1); L_bndry_vector[0] = output_bndry_assembly;
+
+  attach_output(theta_l_vector, L_intrr_vector, L_bndry_vector);
+}
+
 bool RBSystem::is_F_EIM_function(unsigned int q)
 {
   libmesh_assert(q < get_Q_f());
