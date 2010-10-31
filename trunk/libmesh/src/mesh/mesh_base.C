@@ -294,6 +294,8 @@ const PointLocatorBase & MeshBase::point_locator () const
 
       _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
     }
+
+  return *_point_locator;
 }
 
 
