@@ -204,7 +204,32 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010b">1</a>]
+[<a name="Griffiths_2010">1</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;E. Griffith and X.&nbsp;Luo.
+ Immersed boundary method with finite element elasticity.
+ <em>SUBMITTED</em>, October 2010.
+ <a href="http://www.cims.nyu.edu/~griffith/docs/griffith_ibfem_sub.pdf">http://www.cims.nyu.edu/~griffith/docs/griffith_ibfem_sub.pdf</a>.
+<a name="Griffiths_2010"></a><pre>
+@article{Griffiths_2010,
+  author = {B.~E.~Griffith and X.~Luo},
+  title = {{Immersed boundary method with finite element elasticity}},
+  journal = {SUBMITTED},
+  year = 2010,
+  month = oct,
+  note = {\url{http://www.cims.nyu.edu/~griffith/docs/griffith_ibfem_sub.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Knezevic_2010b">2</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
@@ -234,7 +259,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">2</a>]
+[<a name="Huynh_2010">3</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
@@ -264,7 +289,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010">3</a>]
+[<a name="Berrone_2010">4</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone and M.&nbsp;Verani.
@@ -291,7 +316,7 @@ S.&nbsp;Berrone and M.&nbsp;Verani.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010b">4</a>]
+[<a name="Botti_2010b">5</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
@@ -307,31 +332,6 @@ L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
   journal = {PREPRINT, Submitted to Journal of Computational Physics},
   year = 2010,
   note = {\url{http://hal.archives-ouvertes.fr/hal-00458293/}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Kirk_2009b">5</a>]
-</td>
-<td class="bibtexitem">
-B.&nbsp;S. Kirk.
- Adiabatic shock capturing in perfect gas hypersonic flows.
- <em>EARLY VIEW, International Journal for Numerical Methods in
-  Fluids</em>, 2009.
- <a href="http://dx.doi.org/10.1002/fld.2195">http://dx.doi.org/10.1002/fld.2195</a>.
-<a name="Kirk_2009b"></a><pre>
-@article{Kirk_2009b,
-  author = {B.~S.~Kirk},
-  title = {{Adiabatic shock capturing in perfect gas hypersonic flows}},
-  journal = {EARLY VIEW, International Journal for Numerical Methods in Fluids},
-  year = 2009,
-  note = {\url{http://dx.doi.org/10.1002/fld.2195}}
 }
 </pre>
 
@@ -431,7 +431,67 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brown_2010">1</a>]
+[<a name="Kirk_2010b">1</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;S. Kirk.
+ Adiabatic shock capturing in perfect gas hypersonic flows.
+ <em>International Journal for Numerical Methods in Fluids</em>,
+  64(9):1041-1062, November 2010.
+ <a href="http://dx.doi.org/10.1002/fld.2195">http://dx.doi.org/10.1002/fld.2195</a>.
+<a name="Kirk_2010b"></a><pre>
+@article{Kirk_2010b,
+  author = {B.~S.~Kirk},
+  title = {{Adiabatic shock capturing in perfect gas hypersonic flows}},
+  journal = {International Journal for Numerical Methods in Fluids},
+  year = 2010,
+  month = nov,
+  volume = 64,
+  number = 9,
+  pages = {1041--1062},
+  note = {\url{http://dx.doi.org/10.1002/fld.2195}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fuentes_2010b">2</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Fuentes, R.&nbsp;Cardan, R.&nbsp;J. Stafford, J.&nbsp;Yung, G.&nbsp;D.&nbsp;Dodd III, and Y.&nbsp;Feng.
+ High-fidelity computer models for prospective treatment planning of
+  radiofrequency ablation with in vitro experimental correlation.
+ <em>Journal of Vascular and Interventional Radiology</em>,
+  21(11):1725-1732, November 2010.
+ <a href="http://dx.doi.org/10.1016/j.jvir.2010.07.022">http://dx.doi.org/10.1016/j.jvir.2010.07.022</a>.
+<a name="Fuentes_2010b"></a><pre>
+@article{Fuentes_2010b,
+  author = {D.~Fuentes and R.~Cardan and R.~J.~Stafford and J.~Yung and G.~D.~Dodd~III and Y.~Feng},
+  title = {High-fidelity Computer Models for Prospective Treatment Planning
+         of Radiofrequency Ablation with In Vitro Experimental Correlation},
+  journal = {Journal of Vascular and Interventional Radiology},
+  volume = 21,
+  number = 11,
+  month = nov,
+  year = {2010},
+  pages = {1725--1732},
+  note = {\url{http://dx.doi.org/10.1016/j.jvir.2010.07.022}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Brown_2010">3</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Brown.
@@ -460,7 +520,7 @@ J.&nbsp;Brown.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lu_2010">2</a>]
+[<a name="Lu_2010">4</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E.&nbsp;M. Sevick-Muraca.
@@ -493,7 +553,7 @@ Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Pereira_2010">3</a>]
+[<a name="Pereira_2010">5</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
@@ -524,7 +584,7 @@ F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2010">4</a>]
+[<a name="Kirk_2010a">6</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
@@ -532,8 +592,8 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
   Laminar Hypersonic Flows.
  <em>AIAA Journal</em>, 48(6):1025-1036, June 2010.
  <a href="http://dx.doi.org/10.2514/1.40860">http://dx.doi.org/10.2514/1.40860</a>.
-<a name="Kirk_2010"></a><pre>
-@article{Kirk_2010,
+<a name="Kirk_2010a"></a><pre>
+@article{Kirk_2010a,
   author = {B.~S.~Kirk and G.~F.~Carey},
   title = {{Validation of Fully Implicit, Parallel Finite Element Simulations of Laminar Hypersonic Flows}},
   journal = {AIAA Journal},
@@ -553,7 +613,7 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_2010">5</a>]
+[<a name="Nagler_2010">7</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler and M.&nbsp;Schanz.
@@ -582,7 +642,7 @@ L.&nbsp;Nagler and M.&nbsp;Schanz.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2010">6</a>]
+[<a name="Fuentes_2010a">8</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
@@ -591,8 +651,8 @@ D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNic
   MR-guided Laser Induced Thermal Therapy.
  <em>IEEE Trans. Biomed. Eng.</em>, 57(5):1024-1030, May 2010.
  <a href="http://www.ncbi.nlm.nih.gov/pubmed/20142153">http://www.ncbi.nlm.nih.gov/pubmed/20142153</a>.
-<a name="Fuentes_2010"></a><pre>
-@article{Fuentes_2010,
+<a name="Fuentes_2010a"></a><pre>
+@article{Fuentes_2010a,
   author = {D.~Fuentes and Y.~Feng and A.~Elliott and A.~Shetty and
    R.~J.~McNichols and J.~T.~Oden and R.~J.~Stafford},
   title = {{Adaptive Real-Time Bioheat Transfer Models for
@@ -614,7 +674,7 @@ D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNic
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010a">7</a>]
+[<a name="Berrone_2010a">9</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone.
@@ -645,7 +705,7 @@ estimates for finite element discretizations of parabolic equations}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2010">8</a>]
+[<a name="Zhu_2010">10</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
@@ -676,7 +736,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2010">9</a>]
+[<a name="Podgorney_2010">11</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
@@ -708,7 +768,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010a">10</a>]
+[<a name="Knezevic_2010a">12</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -738,7 +798,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhengyong_2010">11</a>]
+[<a name="Zhengyong_2010">13</a>]
 </td>
 <td class="bibtexitem">
 Z.&nbsp;Ren and J.&nbsp;Tang.
@@ -767,7 +827,7 @@ Z.&nbsp;Ren and J.&nbsp;Tang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2010">12</a>]
+[<a name="Carey_2010">14</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -797,7 +857,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010">13</a>]
+[<a name="Peterson_2010">15</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -827,7 +887,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010">14</a>]
+[<a name="Botti_2010">16</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
