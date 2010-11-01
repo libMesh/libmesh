@@ -497,6 +497,14 @@ public:
   void add_periodic_boundary (const PeriodicBoundary& periodic_boundary);
 
   /**
+   * Add a periodic boundary pair
+   *
+   * @param boundary - primary boundary
+   * @param inverse_boundary - inverse boundary
+   */
+  void add_periodic_boundary (PeriodicBoundary * boundary, PeriodicBoundary * inverse_boundary);
+
+  /**
    * @returns true if the boundary given by \p boundaryid is periodic,
    * false otherwise
    */

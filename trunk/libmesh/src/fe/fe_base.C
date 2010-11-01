@@ -2064,9 +2064,9 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 
               // Translate the quadrature points over to the
               // neighbor's boundary
-              std::vector<Point> neigh_point = q_point;
+              std::vector<Point> neigh_point(q_point.size());
               for (unsigned int i=0; i != neigh_point.size(); ++i)
-                neigh_point[i] += periodic->translation_vector;
+                neigh_point[i] = periodic->get_corresponding_pos(q_point[i]);
 
 	      FEInterface::inverse_map (Dim, base_fe_type, neigh,
                                         neigh_point, neigh_qface);

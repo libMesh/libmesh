@@ -17,8 +17,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-
 // C++ Includes -------------------------------------
 #include <set>
 #include <algorithm> // for std::count, std::fill
@@ -1316,27 +1314,37 @@ void DofMap::constrain_p_dofs (unsigned int var,
 
 void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
 {
-  PeriodicBoundary boundary = periodic_boundary;
-  PeriodicBoundary inverse_boundary;
-  inverse_boundary.myboundary = boundary.pairedboundary;
-  inverse_boundary.pairedboundary = boundary.myboundary;
-  inverse_boundary.translation_vector = -boundary.translation_vector;
+  PeriodicBoundary *boundary = new PeriodicBoundary(periodic_boundary);
+  PeriodicBoundary *inverse_boundary = new PeriodicBoundary(periodic_boundary, true);
 
-  std::pair<unsigned int, PeriodicBoundary> bp
-    (boundary.myboundary, boundary);
-  std::pair<unsigned int, PeriodicBoundary> ibp
-    (boundary.pairedboundary, inverse_boundary);
+  std::pair<unsigned int, PeriodicBoundary *> bp
+    (boundary->myboundary, boundary);
+  std::pair<unsigned int, PeriodicBoundary *> ibp
+    (boundary->pairedboundary, inverse_boundary);
 
   _periodic_boundaries->insert(bp);
   _periodic_boundaries->insert(ibp);
 }
 
+void DofMap::add_periodic_boundary (PeriodicBoundary * boundary, PeriodicBoundary * inverse_boundary)
+{
+  libmesh_assert(boundary->myboundary == inverse_boundary->pairedboundary);
+  libmesh_assert(boundary->pairedboundary == inverse_boundary->myboundary);
+
+  std::pair<unsigned int, PeriodicBoundary *> bp(boundary->myboundary, boundary);
+  std::pair<unsigned int, PeriodicBoundary *> ibp(inverse_boundary->myboundary, inverse_boundary);
+
+  _periodic_boundaries->insert(bp);
+  _periodic_boundaries->insert(ibp);
+}
 
 // ------------------------------------------------------------
 // PeriodicBoundaries member functions
 
 PeriodicBoundaries::~PeriodicBoundaries()
 {
+  for (std::map<unsigned, PeriodicBoundary *>::iterator it = begin(); it != end(); ++it)
+    delete it->second;
 }
 
 const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
@@ -1350,7 +1358,7 @@ const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
 
   PeriodicBoundary *b = this->boundary(boundary_id);
   libmesh_assert (b);
-  p += b->translation_vector;
+  p = b->get_corresponding_pos(p);
 
   return mesh.point_locator().operator()(p);
 }
