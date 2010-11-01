@@ -51,6 +51,32 @@ public:
   unsigned int myboundary,
 	       pairedboundary;
 
+  PeriodicBoundary()
+  {}
+
+  PeriodicBoundary(const PeriodicBoundary & o, bool inverse = false) :
+      myboundary(o.myboundary),
+      pairedboundary(o.pairedboundary),
+      translation_vector(o.translation_vector)
+  {
+    if (inverse)
+    {
+      std::swap(myboundary, pairedboundary);
+      translation_vector *= -1.0;
+    }
+  }
+
+  PeriodicBoundary(const RealVectorValue & vector) :
+    translation_vector (vector)
+  {
+  }
+
+  virtual Point get_corresponding_pos(const Point & pt)
+  {
+    return pt + translation_vector;
+  }
+
+protected:
   // One of these days we'll support rotated boundaries
   // RealTensor rotation_matrix;
 
@@ -67,7 +93,7 @@ public:
  * deriving from standard containers, i.e. don't do it because they
  * don't have virtual destructors?
  */
-class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary>
+class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary *>
 {
 public:
   PeriodicBoundary *boundary(unsigned int id);
@@ -94,7 +120,7 @@ PeriodicBoundary *PeriodicBoundaries::boundary(unsigned int id)
   iterator i = this->find(id);
   if (i == this->end())
     return NULL;
-  return &i->second;
+  return i->second;
 }
 
 } // namespace libMesh
