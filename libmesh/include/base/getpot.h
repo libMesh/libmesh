@@ -721,22 +721,57 @@ GetPot::_read_in_stream(std::istream& istr)
 
     STRING_VECTOR  arglist;
     while( i1 < brute_tokens.size() ) {
-	const std::string& SRef = brute_tokens[i1];
-	// 1) concatinate 'abcdef' '=' 'efgasdef' to 'abcdef=efgasdef'
+	// 1) concatenate 'abcdef' '=' 'efgasdef' to 'abcdef=efgasdef'
 	// note: java.lang.String: substring(a,b) = from a to b-1
 	//        C++ string:      substr(a,b)    = from a to a + b
+        std::string result;
 	if( i2 < brute_tokens.size() && brute_tokens[i2] == "=" ) {
 	    if( i3 >= brute_tokens.size() )
-		arglist.push_back(brute_tokens[i1] + brute_tokens[i2]);
+              result = brute_tokens[i1] + brute_tokens[i2];
 	    else
-		arglist.push_back(brute_tokens[i1] + brute_tokens[i2] + brute_tokens[i3]);
+              result = brute_tokens[i1] + brute_tokens[i2] + brute_tokens[i3];
 	    i1 = i3+1; i2 = i3+2; i3 = i3+3;
-	    continue;
 	}
+        else if ( i2 < brute_tokens.size() && brute_tokens[i2][0] == '=' ) {
+          result = brute_tokens[i1] + brute_tokens[i2];
+          i1 = i3; i2 = i3+1; i3 = i3+2;
+        }
+        else if ( i2 < brute_tokens.size() && brute_tokens[i1][brute_tokens[i1].size()-1] == '=' ) {
+          result = brute_tokens[i1] + brute_tokens[i2];
+          i1 = i3; i2 = i3+1; i3 = i3+2;
+        }
 	else {
-	    arglist.push_back(SRef);
-	    i1=i2; i2=i3; i3++;
+          result = brute_tokens[i1];
+          i1=i2; i2=i3; i3++;
 	}
+        // Now strip out any comment
+        size_t comment_start_loc = result.find(_comment_start, 0);
+        if (comment_start_loc != std::string::npos) 
+        {
+          // If the comment is in a quoted string, ignore it
+          char quote_char[] = { '\'', '"' };
+          for (unsigned i(0); i < 2; ++i) {
+            size_t search_loc(0);
+            while (comment_start_loc != std::string::npos && search_loc != std::string::npos) {
+              size_t quote_start_loc = result.find(quote_char[i], search_loc);
+              if (quote_start_loc < comment_start_loc) {
+                size_t quote_end_loc = result.find(quote_char[i], quote_start_loc);
+                if (quote_end_loc > comment_start_loc) {
+                  // Comment is in quotes.  Ignore it.
+                  search_loc = comment_start_loc = std::string::npos;
+                }
+                else {
+                  search_loc = quote_end_loc;
+                }
+              }
+              else {
+                search_loc = std::string::npos;
+              }
+            }
+          }
+          result = result.substr(0, comment_start_loc);
+        }
+        arglist.push_back(result);
     }
     return arglist;
 }
