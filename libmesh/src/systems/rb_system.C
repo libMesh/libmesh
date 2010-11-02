@@ -1294,7 +1294,7 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
     update_system();
 
     libMesh::out << "Performing RB solves on training set" << std::endl;
-    training_greedy_error = compute_a_posteriori_bounds();
+    training_greedy_error = compute_max_error_bound();
 
 
     libMesh::out << "Maximum a posteriori error is "
@@ -1751,9 +1751,9 @@ void RBSystem::recompute_all_residual_terms()
   delta_N = saved_delta_N;
 }
 
-Real RBSystem::compute_a_posteriori_bounds()
+Real RBSystem::compute_max_error_bound()
 {
-  START_LOG("compute_a_posteriori_bounds()", "RBSystem");
+  START_LOG("compute_max_error_bound()", "RBSystem");
 
   training_error_bounds.resize(this->get_local_n_training_samples());
 
@@ -1794,7 +1794,7 @@ Real RBSystem::compute_a_posteriori_bounds()
   Parallel::sum(root_id); // root_id is only non-zero on one processor
   broadcast_current_parameters(root_id);
 
-  STOP_LOG("compute_a_posteriori_bounds()", "RBSystem");
+  STOP_LOG("compute_max_error_bound()", "RBSystem");
 
   return error_pair.second;
 }

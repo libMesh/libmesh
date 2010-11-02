@@ -125,6 +125,13 @@ public:
   Real train_reduced_basis(const std::string& directory_name = "offline_data");
 
   /**
+   * (i) Compute the a posteriori error bound for each set of parameters
+   * in the training set, (ii) set current_parameters to the parameters that
+   * maximize the error bound, and (iii) return the maximum error bound.
+   */
+  virtual Real compute_max_error_bound();
+
+  /**
    * Clear the basis functions and all basis-function-dependent data.
    * Overload in subclasses to clear any extra data.
    */
@@ -716,13 +723,6 @@ protected:
    * a series of functions to update the system properly.
    */
   virtual void update_system();
-
-  /**
-   * Compute the a posteriori error bound for each set of parameters
-   * in training_parameters and return the pair containing the max
-   * error and the index of the parameter that induces that error.
-   */
-  virtual Real compute_a_posteriori_bounds();
   
   /**
    * This function returns the RB error bound for the current parameters and
