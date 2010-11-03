@@ -33,6 +33,7 @@
 #include <map>
 
 // Local Includes -----------------------------------
+#include "point.h"
 #include "vector_value.h" // RealVectorValue
 
 namespace libMesh {
