@@ -93,7 +93,7 @@ run_examples: $(mesh_library)
 #
 test_headers:
 	@rm -f include/base/libmesh_contrib_config.h
-	@contrib/bin/test_headers.sh
+	@cd contrib/bin && ./test_headers.sh
 
 #	
 # Remove object files for the current mode
