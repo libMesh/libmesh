@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Note: script was /bin/sh but I don't think -n, -e are POSIX
 # arguments to echo
