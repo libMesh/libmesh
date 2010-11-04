@@ -532,13 +532,6 @@ namespace Parallel
 
     ~Request ()
     {
-#ifdef LIBMESH_HAVE_MPI
-      // explicitly free this request if not 
-      // done so already, otherwise this would
-      // be a memory leak!
-      if (_request != MPI_REQUEST_NULL)
-	MPI_Request_free (&_request);
-#endif
     }
 
     operator const request & () const
@@ -549,6 +542,14 @@ namespace Parallel
 
     request* get()
     { return &_request; }
+
+    void free (void)
+    {
+#ifdef LIBMESH_HAVE_MPI
+      if (_request != MPI_REQUEST_NULL)
+	MPI_Request_free (&_request);
+#endif
+    }
 
     const request* get() const
     { return &_request; }
