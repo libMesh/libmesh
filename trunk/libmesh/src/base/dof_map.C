@@ -1031,6 +1031,8 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
 void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 {
   START_LOG("add_neighbors_to_send_list()", "DofMap");
+
+  const unsigned int sys_num = this->sys_number();
   
   //-------------------------------------------------------------------------
   // We need to add the DOFs from elements that live on neighboring processors
@@ -1052,9 +1054,29 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
     {
       const Elem* elem = *local_elem_it;
 
-      // Flag all the nodes of active local elements as seen
       for (unsigned int n=0; n!=elem->n_nodes(); n++)
-        node_on_processor[elem->node(n)] = true;
+        {
+	  // Flag all the nodes of active local elements as seen, so
+	  // we can add nodal neighbor dofs to the send_list later.
+          node_on_processor[elem->node(n)] = true;
+
+          // Add all remote dofs on these nodes to the send_list.
+          // This is necessary in case those dofs are *not* also dofs
+          // on neighbors; e.g. in the case of a HIERARCHIC's local
+          // side which is only a vertex on the neighbor that owns it.
+          const Node* node = elem->get_node(n);
+          const unsigned n_vars = node->n_vars(sys_num);
+          for (unsigned int v=0; v != n_vars; ++v)
+            {
+              const unsigned int n_comp = node->n_comp(sys_num, v);
+              for (unsigned int c=0; c != n_comp; ++c)
+                {
+                  const unsigned int di = node->dof_number(sys_num, v, c);
+		  if (di < this->first_dof() || di >= this->end_dof())
+	            _send_list.push_back(di);
+                }
+            }
+        }
 
       // Loop over the neighbors of those elements
       for (unsigned int s=0; s<elem->n_neighbors(); s++)
