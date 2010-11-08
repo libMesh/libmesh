@@ -260,10 +260,9 @@ int main(int argc, char** argv)
       if (output_intermediate)
         {
           OStringStream outfile;
-          outfile << "lshaped_" << r_step;
+          outfile << "lshaped_" << r_step << ".exd";
           ExodusII_IO (mesh).write_equation_systems (outfile.str(),
                                                equation_systems);
-          outfile << ".exd" << r_step;
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
