@@ -761,6 +761,8 @@ with_cxx
 with_cc
 with_fc
 with_f77
+enable_singleprecision
+enable_tripleprecision
 enable_getpwuid
 enable_shared
 enable_exceptions
@@ -1445,6 +1447,10 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-mpi            build with MPI message passing support
+  --enable-singleprecision
+                          Use single-precision scalars
+  --enable-tripleprecision
+                          Use triple-precision scalars
   --enable-getpwuid       allow calls to getpwuid
   --enable-shared         build shared libraries
   --enable-exceptions     throw exceptions on unexpected errors
@@ -4390,6 +4396,58 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+
+
+
+
+# Check whether --enable-singleprecision was given.
+if test "${enable_singleprecision+set}" = set; then :
+  enableval=$enable_singleprecision; enablesingleprecision=$enableval
+else
+  enablesingleprecision=no
+fi
+
+
+# Check whether --enable-tripleprecision was given.
+if test "${enable_tripleprecision+set}" = set; then :
+  enableval=$enable_tripleprecision; enabletripleprecision=$enableval
+else
+  enabletripleprecision=no
+fi
+
+
+if test "$enablesingleprecision" != no ; then
+  if test "$enabletripleprecision" != no ; then
+    as_fn_error $? "<<< Cannot simultaneously default to single and triple precision >>>" "$LINENO" 5
+  else
+
+$as_echo "#define SINGLE_PRECISION 1" >>confdefs.h
+
+
+$as_echo "#define SCALAR_TYPE float" >>confdefs.h
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is single precision (float) >>>" >&5
+$as_echo "<<< Default floating point is single precision (float) >>>" >&6; }
+  fi
+elif test "$enabletripleprecision" != no ; then
+
+$as_echo "#define TRIPLE_PRECISION 1" >>confdefs.h
+
+
+$as_echo "#define SCALAR_TYPE long double" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is triple precision (long double) >>>" >&5
+$as_echo "<<< Default floating point is triple precision (long double) >>>" >&6; }
+else
+
+$as_echo "#define DOUBLE_PRECISION 1" >>confdefs.h
+
+
+$as_echo "#define SCALAR_TYPE double" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Default floating point is double precision (double) >>>" >&5
+$as_echo "<<< Default floating point is double precision (double) >>>" >&6; }
+fi
 
 
 

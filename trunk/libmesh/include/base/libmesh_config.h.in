@@ -30,6 +30,10 @@
 /* Flag indicating if the library should be built with 2D support only */
 #undef DIM
 
+/* Flag indicating if double-precision (double) should be used for most
+   floating-point calculations */
+#undef DOUBLE_PRECISION
+
 /* Flag indicating if the library should be built with AMR support */
 #undef ENABLE_AMR
 
@@ -284,6 +288,13 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Data type to be used for most floating-point calculations */
+#undef SCALAR_TYPE
+
+/* Flag indicating if single-precision (float) should be used for most
+   floating-point calculations */
+#undef SINGLE_PRECISION
+
 /* The size of `double', as computed by sizeof. */
 #undef SIZEOF_DOUBLE
 
@@ -310,6 +321,10 @@
 
 /* If the compiler supports a TLS storage class define it to that here */
 #undef TLS
+
+/* Flag indicating if triple-precision (long double) should be used for most
+   floating-point calculations */
+#undef TRIPLE_PRECISION
 
 /* Flag indicating if the library should be built using complex numbers */
 #undef USE_COMPLEX_NUMBERS
