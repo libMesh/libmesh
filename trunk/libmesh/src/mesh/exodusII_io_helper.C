@@ -24,6 +24,8 @@
 #ifdef LIBMESH_HAVE_EXODUS_API
 
 #include <cstring>
+#include <algorithm>
+#include <functional>
 
 #include "boundary_info.h"
 #include "enum_elem_type.h"
@@ -754,6 +756,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
         }
     ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
     check_err(ex_err, "Error writing element connectivities");
+
+    // write out the element number map
+    std::vector<unsigned int> elem_map(tmp_vec.size());
+    std::transform(tmp_vec.begin(), tmp_vec.end(), elem_map.begin(),
+                   std::bind2nd(std::plus<unsigned int>(), 1));  // Add one to each id for exodus!
+    ex_err = exII::ex_put_elem_num_map(ex_id, (int *)&elem_map[0]);
+    check_err(ex_err, "Error writing element map");
   }
 
 //  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
@@ -823,6 +832,13 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
         }
     ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
     check_err(ex_err, "Error writing element connectivities");
+
+    // write out the element number map
+    std::vector<unsigned int> elem_map(tmp_vec.size());
+    std::transform(tmp_vec.begin(), tmp_vec.end(), elem_map.begin(),
+                   std::bind2nd(std::plus<unsigned int>(), 1));  // Add one to each id for exodus!
+    ex_err = exII::ex_put_elem_num_map(ex_id, (int *)&elem_map[0]);
+    check_err(ex_err, "Error writing element map");
   }
 
 //  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
@@ -846,10 +862,26 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   //Accumulate the vectors to pass into ex_put_side_set
   for(unsigned int i = 0; i < el.size(); i++)
   {
-    const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(el[i])->type());
+    std::vector<const Elem *> family;
+#ifdef LIBMESH_ENABLE_AMR
+    /**
+     * We need to build up active elements if AMR is enabled and add
+     * them to the exodus sidesets instead of the potentially inactive "parent" elements
+     */
+    mesh.elem(el[i])->active_family_tree_by_side(family, sl[i], false);
+#else
+    family.push_back(el[i]);
+#endif
 
-    elem[il[i]].push_back(el[i]+1);
-    side[il[i]].push_back(conv.get_inverse_side_map(sl[i]));    
+    for(unsigned int j = 0; j < family.size(); ++j)
+    {
+      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(family[j]->id())->type());
+
+      // Use the libmesh to exodus datastructure map to get the proper sideset IDs
+      // The datastructure contains the "collapsed" contiguous ids
+      elem[il[i]].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
+      side[il[i]].push_back(conv.get_inverse_side_map(sl[i]));
+    }
   }
   
   std::vector<short int> side_boundary_ids;
