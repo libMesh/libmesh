@@ -131,24 +131,21 @@ namespace libMesh
    
 // Define the type to use for real numbers
 
-#define DOUBLE_PRECISION
+typedef LIBMESH_SCALAR_TYPE Real;
 
 // Define a corresponding tolerance.  This is what should be
 // considered "good enough" when doing floating point comparisons.
 // For example, v == 0 is changed to std::abs(v) < TOLERANCE.
 
-#ifndef SINGLE_PRECISION
-  #ifdef TRIPLE_PRECISION
-    typedef long double Real;
+#ifndef LIBMESH_SINGLE_PRECISION
+  #ifdef LIBMESH_TRIPLE_PRECISION
   # define TOLERANCE 1.e-8
   # define MPI_REAL MPI_LONG_DOUBLE
   #else
-    typedef double Real;
   # define TOLERANCE 1.e-6
   # define MPI_REAL MPI_DOUBLE
   #endif
 #else
-  typedef float Real;
   # define TOLERANCE 1.e-3
   # define MPI_REAL MPI_FLOAT
 #endif
