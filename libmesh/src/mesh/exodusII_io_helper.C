@@ -982,6 +982,52 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
 }
 
 
+void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::string> & names)
+{
+  if (_global_vars_initialized) 
+  {
+    return;
+  }
+  _global_vars_initialized = true;
+  
+  num_globals = names.size();
+
+  ex_err = exII::ex_put_var_param(ex_id, "g", num_globals);
+  check_err(ex_err, "Error setting number of global vars.");
+
+  // Use the vvc and strings objects to emulate the behavior of
+  // a char** object.
+  vvc.resize(num_globals);
+  strings.resize(num_globals);
+
+  // For each string in names, allocate enough space in vvc and copy from
+  // the C++ string into vvc for passing to the C interface.
+  for (int i=0; i<num_globals; i++)
+    {
+      vvc[i].resize(names[i].size()+1);
+      std::strcpy(&(vvc[i][0]), names[i].c_str());
+    }
+
+  for (int i=0; i<num_globals; i++)
+    strings[i] = &(vvc[i][0]); // set pointer into vvc only *after* all resizing is complete
+
+  if (_verbose)
+    {
+      libMesh::out << "Writing variable name(s) to file: " << std::endl;
+      for (int i(0); i < num_globals; ++i)
+	libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
+    }
+
+  ex_err = exII::ex_put_var_names(ex_id,
+				  "g",
+				  num_globals,
+				  &strings[0]
+				  );
+    
+  check_err(ex_err, "Error setting global variable names.");
+}
+
+
 
 void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 {
@@ -998,6 +1044,14 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number
 {
   ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
   check_err(ex_err, "Error writing nodal values.");
+}
+
+
+
+void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values, int timestep)
+{
+  ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_globals, &values[0]);
+  check_err(ex_err, "Error writing global values.");
 }  
 
 

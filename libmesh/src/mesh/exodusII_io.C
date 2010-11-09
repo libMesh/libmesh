@@ -403,6 +403,41 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
 #endif
 
+#ifndef LIBMESH_HAVE_EXODUS_API
+
+void ExodusII_IO::write_global_data (const std::string& ,
+				    const std::vector<Number>& ,
+				    const std::vector<std::string>& )
+{
+
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+	        << std::endl;
+  libmesh_error();
+}
+
+#else
+
+void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
+                                     const std::vector<std::string>& names)
+{
+  if (libMesh::processor_id() == 0)
+    {
+  
+      if (!exio_helper->created())
+	{
+          libMesh::err << "ERROR, ExodusII file must be initialized "
+                       << "before outputting global variables.\n"
+                       << std::endl;
+          libmesh_error();
+	}
+
+      exio_helper->initialize_global_variables( names );
+      exio_helper->write_global_values( soln, _timestep );
+    }
+}
+
+#endif
+
 
 
 #ifndef LIBMESH_HAVE_EXODUS_API
