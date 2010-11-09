@@ -36,8 +36,8 @@
 
 #ifdef LIBMESH_HAVE_XDR
 #  include <rpc/rpc.h>
-#  ifndef SINGLE_PRECISION
-#    ifdef TRIPLE_PRECISION
+#  ifndef LIBMESH_SINGLE_PRECISION
+#    ifdef LIBMESH_TRIPLE_PRECISION
 // #      define xdr_REAL xdr_quadruple
 // For some reason my xdr implementation doesn't define
 // xdr_quadruple... - RHS
