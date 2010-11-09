@@ -1069,7 +1069,7 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
    
       /* have buffers of the real and imaginary part of v_local.
        * Once MPI_Reduce() collected all the real and imaginary
-       * parts in these std::vector<double>, the values can be 
+       * parts in these std::vector<Real>, the values can be 
        * copied to v_local
        */
       std::vector<Real> real_v_local(n);
@@ -1077,11 +1077,11 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 
       // collect entries from other proc's in real_v_local, imag_v_local
       MPI_Reduce (&real_local_values[0], &real_v_local[0], n, 
-		  MPI_DOUBLE, MPI_SUM,
+		  MPI_REAL, MPI_SUM,
 		  pid, libMesh::COMM_WORLD);	
 
       MPI_Reduce (&imag_local_values[0], &imag_v_local[0], n, 
-		  MPI_DOUBLE, MPI_SUM,
+		  MPI_REAL, MPI_SUM,
 		  pid, libMesh::COMM_WORLD);	
 
       // copy real_v_local and imag_v_local to v_local
