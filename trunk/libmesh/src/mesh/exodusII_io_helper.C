@@ -715,7 +715,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   std::vector<int> elem_num_map;
 
   std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
-  
+
+  // element map vector
+  std::vector<unsigned int> elem_map(mesh.n_active_elem());
+  std::vector<unsigned int>::iterator curr_elem_map_end = elem_map.begin();
   for(it = subdomain_map.begin() ; it != subdomain_map.end(); it++)
     {
       std::vector<unsigned int> & tmp_vec = (*it).second;
@@ -758,8 +761,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
     check_err(ex_err, "Error writing element connectivities");
 
     // write out the element number map
-    std::vector<unsigned int> elem_map(tmp_vec.size());
-    std::transform(tmp_vec.begin(), tmp_vec.end(), elem_map.begin(),
+    curr_elem_map_end = std::transform(tmp_vec.begin(), tmp_vec.end(), curr_elem_map_end,
                    std::bind2nd(std::plus<unsigned int>(), 1));  // Add one to each id for exodus!
     ex_err = exII::ex_put_elem_num_map(ex_id, (int *)&elem_map[0]);
     check_err(ex_err, "Error writing element map");
