@@ -625,12 +625,12 @@ Point NavierSystem::forcing(const Point& p)
 	  w=(Reynolds+1)*(x*x + y*y);
 
 	if (this->get_mesh().mesh_dimension() == 2)
-	  return 2.*Reynolds*(Reynolds+1.)*Point(v*y,
-						 u*x);
+	  return 2*Reynolds*(Reynolds+1)*Point(v*y,
+					       u*x);
 	else
-	  return 2.*Reynolds*(Reynolds+1.)*Point(v*y + w*z,
-						 u*x + w*z,
-						 u*x + v*y);
+	  return 2*Reynolds*(Reynolds+1)*Point(v*y + w*z,
+					       u*x + w*z,
+					       u*x + v*y);
       }
 
     default:
