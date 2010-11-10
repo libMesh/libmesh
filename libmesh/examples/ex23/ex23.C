@@ -96,6 +96,9 @@ int main (int argc, char** argv)
 #if !defined(LIBMESH_HAVE_XDR)
   // We need XDR support to write out reduced bases
   libmesh_example_assert(false, "--enable-xdr");
+#elif defined(LIBMESH_SINGLE_PRECISION)
+  // XDR binary support requires double precision
+  libmesh_example_assert(false, "--disable-singleprecision");
 #elif !defined(LIBMESH_HAVE_PETSC)
   // FIXME: This example currently segfaults with Trilinos?
   libmesh_example_assert(false, "--enable-petsc");

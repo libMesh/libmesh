@@ -53,6 +53,11 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example fails without at least double precision FP
+#ifdef LIBMESH_SINGLE_PRECISION
+  libmesh_example_assert(false, "--disable-singleprecision");
+#endif
+
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_assert(false, "--enable-amr");
 #else
