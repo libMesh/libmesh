@@ -706,7 +706,10 @@ GetPot::_read_in_stream(std::istream& istr)
     while(istr) {
 	_skip_whitespace(istr);
 	const std::string Token = _get_next_token(istr);
-	if( Token.length() == 0 || Token[0] == EOF) break;
+        // Allow 'keyword =' to parse with an empty string as value.
+        // Only break at EOF.
+// 	if( Token.length() == 0 || Token[0] == EOF) break;
+	if( Token[0] == EOF) break;
 	brute_tokens.push_back(Token);
     }
 
@@ -733,6 +736,8 @@ GetPot::_read_in_stream(std::istream& istr)
 	    i1 = i3+1; i2 = i3+2; i3 = i3+3;
 	}
         else if ( i2 < brute_tokens.size() && brute_tokens[i2][0] == '=' ) {
+          // This case should not be hit if '=' at the beginning of a word
+          //   is always separated into its own word
           result = brute_tokens[i1] + brute_tokens[i2];
           i1 = i3; i2 = i3+1; i3 = i3+2;
         }
@@ -746,29 +751,8 @@ GetPot::_read_in_stream(std::istream& istr)
 	}
         // Now strip out any comment
         size_t comment_start_loc = result.find(_comment_start, 0);
-        if (comment_start_loc != std::string::npos) 
+        if (comment_start_loc != std::string::npos)
         {
-          // If the comment is in a quoted string, ignore it
-          char quote_char[] = { '\'', '"' };
-          for (unsigned i(0); i < 2; ++i) {
-            size_t search_loc(0);
-            while (comment_start_loc != std::string::npos && search_loc != std::string::npos) {
-              size_t quote_start_loc = result.find(quote_char[i], search_loc);
-              if (quote_start_loc < comment_start_loc) {
-                size_t quote_end_loc = result.find(quote_char[i], quote_start_loc);
-                if (quote_end_loc > comment_start_loc) {
-                  // Comment is in quotes.  Ignore it.
-                  search_loc = comment_start_loc = std::string::npos;
-                }
-                else {
-                  search_loc = quote_end_loc;
-                }
-              }
-              else {
-                search_loc = std::string::npos;
-              }
-            }
-          }
           result = result.substr(0, comment_start_loc);
         }
         arglist.push_back(result);
@@ -830,7 +814,7 @@ GetPot::_skip_whitespace(std::istream& istr)
 
 inline const std::string
 GetPot::_get_next_token(std::istream& istr)
-    // get next concatinates string token. consider quotes that embrace
+    // get next concatenates string token. consider quotes that embrace
     // whitespaces
 {
     std::string token;
@@ -838,7 +822,14 @@ GetPot::_get_next_token(std::istream& istr)
     int    last_letter = 0;
     while(1+1 == 2) {
 	last_letter = tmp; tmp = istr.get();
-	if( tmp == EOF
+        if( tmp == '=' )
+        {
+          // Always break at '='.
+          // This separates '=' at the beginning of a word into its own word.
+          token += tmp;
+          return token;
+        }
+        else if( tmp == EOF
 	    || ((tmp == ' ' || tmp == '\t' || tmp == '\n') && last_letter != '\\') ) {
 	    return token;
 	}
