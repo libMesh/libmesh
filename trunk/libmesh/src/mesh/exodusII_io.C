@@ -405,8 +405,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 
-void ExodusII_IO::write_global_data (const std::string& ,
-				    const std::vector<Number>& ,
+void ExodusII_IO::write_global_data (const std::vector<Number>& ,
 				    const std::vector<std::string>& )
 {
 
