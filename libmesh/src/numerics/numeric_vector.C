@@ -237,7 +237,7 @@ int NumericVector<double>::compare (const NumericVector<double> &other_vector,
   return rvalue;
 }
 
-#ifdef TRIPLE_PRECISION
+#ifdef LIBMESH_TRIPLE_PRECISION
 // Full specialization for long double datatypes
 template <>
 int NumericVector<long double>::compare (const NumericVector<long double> &other_vector,
