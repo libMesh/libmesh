@@ -87,6 +87,12 @@ run_examples: $(mesh_library)
 	@$(MAKE) -C examples run
 
 #
+# Clean the examples
+#
+clean_examples:
+	@$(MAKE) -C examples clean
+
+#
 # Test the header files to make sure they all compile stand-alone
 # Also a cheat here: removing an ex-configure-output so it isn't
 # detected as an invalid header for people without fresh checkouts
