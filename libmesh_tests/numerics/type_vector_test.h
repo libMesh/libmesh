@@ -76,13 +76,13 @@ public:
 
   void testValue()
   {
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (*m_1_1_1)(0));
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (*m_1_1_1)(1));
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (*m_1_1_1)(2));
+    CPPUNIT_ASSERT_EQUAL( Real(1), (*m_1_1_1)(0));
+    CPPUNIT_ASSERT_EQUAL( Real(1), (*m_1_1_1)(1));
+    CPPUNIT_ASSERT_EQUAL( Real(1), (*m_1_1_1)(2));
 
-    CPPUNIT_ASSERT_EQUAL( -1.0 , (*m_n1_1_n1)(0));
-    CPPUNIT_ASSERT_EQUAL( 1.0  , (*m_n1_1_n1)(1));
-    CPPUNIT_ASSERT_EQUAL( -1.0 , (*m_n1_1_n1)(2));
+    CPPUNIT_ASSERT_EQUAL( Real(-1), (*m_n1_1_n1)(0));
+    CPPUNIT_ASSERT_EQUAL( Real(1) , (*m_n1_1_n1)(1));
+    CPPUNIT_ASSERT_EQUAL( Real(-1), (*m_n1_1_n1)(2));
   }
 
   void testZero()
@@ -90,9 +90,9 @@ public:
     DerivedClass avector(1,1,1);
     avector.zero();
     
-    CPPUNIT_ASSERT_EQUAL( 0.0 , avector(0));
-    CPPUNIT_ASSERT_EQUAL( 0.0 , avector(1));
-    CPPUNIT_ASSERT_EQUAL( 0.0 , avector(2));
+    CPPUNIT_ASSERT_EQUAL( Real(0), avector(0));
+    CPPUNIT_ASSERT_EQUAL( Real(0), avector(1));
+    CPPUNIT_ASSERT_EQUAL( Real(0), avector(2));
   }
   
   void testSize()
@@ -121,9 +121,9 @@ public:
   {
     DerivedClass avector = (*m_1_1_1);
     
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (avector)(0) );
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (avector)(1) );
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (avector)(2) );
+    CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(0) );
+    CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(1) );
+    CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(2) );
   }
 
   void testScalarMult()
@@ -211,13 +211,13 @@ public:
 
   void testValueBase()
   {
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (*basem_1_1_1)(0));
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (*basem_1_1_1)(1));
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (*basem_1_1_1)(2));
+    CPPUNIT_ASSERT_EQUAL( Real(1), (*basem_1_1_1)(0));
+    CPPUNIT_ASSERT_EQUAL( Real(1), (*basem_1_1_1)(1));
+    CPPUNIT_ASSERT_EQUAL( Real(1), (*basem_1_1_1)(2));
 
-    CPPUNIT_ASSERT_EQUAL( -1.0 , (*basem_n1_1_n1)(0));
-    CPPUNIT_ASSERT_EQUAL( 1.0  , (*basem_n1_1_n1)(1));
-    CPPUNIT_ASSERT_EQUAL( -1.0 , (*basem_n1_1_n1)(2));
+    CPPUNIT_ASSERT_EQUAL( Real(-1), (*basem_n1_1_n1)(0));
+    CPPUNIT_ASSERT_EQUAL( Real(1 ), (*basem_n1_1_n1)(1));
+    CPPUNIT_ASSERT_EQUAL( Real(-1), (*basem_n1_1_n1)(2));
   }
 
   void testZeroBase()
@@ -225,9 +225,9 @@ public:
     TypeVector<Real> avector((*basem_1_1_1));
     avector.zero();
     
-    CPPUNIT_ASSERT_EQUAL( 0.0 , avector(0));
-    CPPUNIT_ASSERT_EQUAL( 0.0 , avector(1));
-    CPPUNIT_ASSERT_EQUAL( 0.0 , avector(2));
+    CPPUNIT_ASSERT_EQUAL( Real(0), avector(0));
+    CPPUNIT_ASSERT_EQUAL( Real(0), avector(1));
+    CPPUNIT_ASSERT_EQUAL( Real(0), avector(2));
   }
   
   void testSizeBase()
@@ -256,9 +256,9 @@ public:
   {
     TypeVector<Real> avector = (*m_1_1_1);
     
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (avector)(0) );
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (avector)(1) );
-    CPPUNIT_ASSERT_EQUAL( 1.0 , (avector)(2) );
+    CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(0) );
+    CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(1) );
+    CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(2) );
   }
 
   void testScalarMultBase()
