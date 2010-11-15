@@ -391,7 +391,7 @@ std::vector<unsigned int> StatisticsVector<T>::cut_above(Real cut) const
 // Explicit Instantions
 template class StatisticsVector<float>;
 template class StatisticsVector<double>;
-#ifdef LIBMESH_TRIPLE_PRECISION
+#ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
 template class StatisticsVector<long double>;
 #endif
 template class StatisticsVector<int>;

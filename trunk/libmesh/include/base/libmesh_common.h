@@ -131,14 +131,14 @@ namespace libMesh
    
 // Define the type to use for real numbers
 
-typedef LIBMESH_SCALAR_TYPE Real;
+typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
 
 // Define a corresponding tolerance.  This is what should be
 // considered "good enough" when doing floating point comparisons.
 // For example, v == 0 is changed to std::abs(v) < TOLERANCE.
 
-#ifndef LIBMESH_SINGLE_PRECISION
-  #ifdef LIBMESH_TRIPLE_PRECISION
+#ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
+  #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
   # define TOLERANCE 1.e-8
   # define MPI_REAL MPI_LONG_DOUBLE
   #else
