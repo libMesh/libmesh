@@ -146,7 +146,7 @@ typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
   # define MPI_REAL MPI_DOUBLE
   #endif
 #else
-  # define TOLERANCE 1.e-3
+  # define TOLERANCE 2.5e-3
   # define MPI_REAL MPI_FLOAT
 #endif
 
