@@ -54,7 +54,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
   // This example fails without at least double precision FP
-#ifdef LIBMESH_SINGLE_PRECISION
+#ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
   libmesh_example_assert(false, "--disable-singleprecision");
 #endif
 

@@ -42,7 +42,7 @@
 
 #define xdr_MAX_STRING_LENGTH 256
 
-#ifndef LIBMESH_SINGLE_PRECISION
+#ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
 #define xdr_REAL xdr_double
 #else
 #define xdr_REAL xdr_float
