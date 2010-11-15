@@ -638,6 +638,9 @@ void RBSystem::initialize_RB_system(bool online_mode)
     }
   }
 
+  // Resize truth_outputs vector
+  truth_outputs.resize(this->get_n_outputs());
+
   // Initialize the RB output vectors
   RB_output_vectors.resize(get_n_outputs());
   for(unsigned int n=0; n<get_n_outputs(); n++)
@@ -1404,7 +1407,6 @@ Real RBSystem::truth_solve(int plot_solution)
 //     libmesh_error();
   }
 
-  truth_outputs.resize(this->get_n_outputs());
   for(unsigned int n=0; n<get_n_outputs(); n++)
   {
     truth_outputs[n] = 0.;
@@ -3487,6 +3489,8 @@ void RBSystem::read_in_basis_functions(const std::string& directory_name)
       // *basis_functions[i] = *solution;
       basis_functions[i]->swap(*solution);
     }
+
+    libMesh::out << "Finished reading in the basis functions..." << std::endl;
   }
 }
 
