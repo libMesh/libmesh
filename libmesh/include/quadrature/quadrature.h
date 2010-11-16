@@ -190,6 +190,15 @@ public:
   friend std::ostream& operator << (std::ostream& os, const QBase& q);
 
   /**
+   * Returns true if the shape functions need to be recalculated.
+   *
+   * This can happen if the number of points or their positions change.
+   *
+   * By default this will return false.
+   */
+  virtual bool shapes_need_reinit() { return false; }
+
+  /**
    * Flag (default true) controlling the use of quadrature rules with negative
    * weights.  Set this to false to ONLY use (potentially) safer but more expensive
    * rules with all positive weights.

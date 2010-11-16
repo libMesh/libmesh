@@ -121,7 +121,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // Try to avoid calling init_shape_functions
   // even when shapes_need_reinit
   bool cached_nodes_still_fit = false;
-
+  
   // Initialize the shape functions at the user-specified
   // points
   if (pts != NULL)
@@ -148,6 +148,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
     {      
       libmesh_assert (qrule   != NULL);
       qrule->init(elem->type(), elem->p_level());
+      
+      if(qrule->shapes_need_reinit())
+        shapes_on_quadrature = false;
 
       if (elem_type != elem->type() ||
           _p_level != elem->p_level() ||
