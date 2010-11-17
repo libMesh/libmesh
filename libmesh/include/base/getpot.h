@@ -735,7 +735,9 @@ GetPot::_read_in_stream(std::istream& istr)
               result = brute_tokens[i1] + brute_tokens[i2] + brute_tokens[i3];
 	    i1 = i3+1; i2 = i3+2; i3 = i3+3;
 	}
-        else if ( i2 < brute_tokens.size() && brute_tokens[i2][0] == '=' ) {
+        else if ( i2 < brute_tokens.size() &&
+		  brute_tokens[i2].length() > 0 &&
+		  brute_tokens[i2][0] == '=' ) {
           // This case should not be hit if '=' at the beginning of a word
           //   is always separated into its own word
           result = brute_tokens[i1] + brute_tokens[i2];
