@@ -510,6 +510,11 @@ public:
    */
   bool is_periodic_boundary (const unsigned int boundaryid) const;
 
+  PeriodicBoundaries * get_periodic_boundaries()
+    {
+      return _periodic_boundaries;
+    }
+
 #endif // LIBMESH_ENABLE_PERIODIC
 
 

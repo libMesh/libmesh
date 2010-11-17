@@ -48,6 +48,9 @@ namespace libMesh
 class MeshBase;
 class MeshRefinement;
 class Elem;
+#ifdef LIBMESH_ENABLE_PERIODIC
+class PeriodicBoundaries;
+#endif
 
 /**
  * This is the base class from which all geometric entities
@@ -167,6 +170,22 @@ class Elem : public ReferenceCountedObject<Elem>,
    * a boundary of the domain. 
    */
   Elem* neighbor (const unsigned int i) const;
+
+#ifdef LIBMESH_ENABLE_PERIODIC  
+  /**
+   * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element
+   * for interior elements.  If an element is on a periodic
+   * boundary, it will return a corresponding element on the opposite
+   * side. 
+   */
+  Elem* topological_neighbor (const unsigned int i, const MeshBase & mesh, PeriodicBoundaries * pb) const;
+
+  /**
+   * @return \p true if the element \p elem in question is a neighbor or
+   * topological neighbor of this element, \p false otherwise.
+   */
+  bool has_topological_neighbor (const Elem* elem, const MeshBase & mesh, PeriodicBoundaries * pb) const;
+#endif   
 
   /**
    * Assigns \p n as the \f$ i^{th} \f$ neighbor.

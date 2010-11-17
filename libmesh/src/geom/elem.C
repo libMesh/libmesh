@@ -57,6 +57,12 @@
 #include "remote_elem.h"
 #include "mesh_base.h"
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+#include "mesh.h"
+#include "periodic_boundaries.h"
+#include "boundary_info.h"
+#endif
+
 namespace libMesh
 {
 
@@ -578,7 +584,57 @@ void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
   while (old_size != neighbor_set.size());
 }
 
+#ifdef LIBMESH_ENABLE_PERIODIC
 
+Elem* Elem::topological_neighbor (const unsigned int i, const MeshBase & mesh, PeriodicBoundaries * pb) const
+{
+  libmesh_assert (i < this->n_neighbors());
+
+  Elem * neighbor = _neighbors[i];
+  if (neighbor != NULL)
+    return neighbor;
+  
+  if (pb)
+  {  
+    // Since the neighbor is NULL it must be on a boundary. We need
+    // see if this is a periodic boundary in which case it will have a
+    // topological neighbor
+
+    std::vector<short int> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
+    for (std::vector<short int>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
+      if (pb->boundary(*j))
+      {
+        // Since the point locator inside of periodic boundaries
+        // returns a const pointer we will retrieve the proper
+        // pointer directly from the mesh object.  Also since coarse
+        // elements do not have more refined neighbors we need to make
+        // sure that we don't return one of these types of neighbors.
+        neighbor = mesh.elem(pb->neighbor(*j, mesh, this, i)->id());
+        if (level() < neighbor->level())
+          neighbor = neighbor->parent();
+        return neighbor; 
+      }
+  }
+  
+  return NULL;
+}
+
+
+bool Elem::has_topological_neighbor (const Elem* elem, const MeshBase & mesh, PeriodicBoundaries * pb) const
+{
+  // First see if this is a normal "interior" neighbor
+  if (has_neighbor(elem))
+    return true;
+
+  for (unsigned int n=0; n<this->n_neighbors(); n++)
+    if (this->topological_neighbor(n, mesh, pb))
+      return true;
+
+  return false;
+}
+
+
+#endif
 
 #ifdef DEBUG
 
