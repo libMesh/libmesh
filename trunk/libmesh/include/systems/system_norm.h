@@ -28,6 +28,7 @@
 // Local includes
 #include "libmesh_common.h" // for Real
 #include "enum_norm_type.h"
+#include "system.h"
 
 namespace libMesh
 {
@@ -81,6 +82,15 @@ public:
   SystemNorm(const std::vector<FEMNormType> &norms, std::vector<Real> &weights);
 
   /**
+   * Constructor, for weighted sobolev norms on systems with multiple 
+   * variables and their adjoints
+   *
+   * For a system with n variables, the final norm computed will be of the form 
+   * norm_u^T*R*norm_z where R is a scaling matrix
+   */
+  SystemNorm(const std::vector<FEMNormType> &norms, std::vector<std::vector<Real> > &weights);
+
+  /**
    * Copy Constructor
    */
   SystemNorm(const SystemNorm &s);
@@ -116,11 +126,28 @@ public:
    */
   Real weight_sq(unsigned int var) const;
 
+  /**
+   * Returns the weighted norm v^T*W*v where W represents our
+   * weights matrix or weights vector times identity matrix.
+   */
+  Real calculate_norm(const std::vector<Real>& v);
+
+  /**
+   * Returns the weighted inner product v1^T*W*v2 where R is our weights
+   */
+  Real calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2);
+
 private:
   std::vector<FEMNormType> _norms;
 
   std::vector<Real> _weights;
   std::vector<Real> _weights_sq;
+
+  /**
+   * One more data structure needed to store the off diagonal 
+   * components for the generalize SystemNorm case
+   */  
+  std::vector<std::vector<Real> > _off_diagonal_weights;
 };
 
 
@@ -169,6 +196,37 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
       _weights_sq[i] = _weights[i] * _weights[i];
 }
 
+inline
+  SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
+			 std::vector<std::vector<Real> > &weights):
+  _norms(norms), _weights(weights.size()), _off_diagonal_weights(weights)
+{
+  if(_norms.empty())
+    _norms.push_back(DISCRETE_L2);
+
+  if (_weights.empty())
+    {
+      _weights.push_back(1.0);
+      _weights_sq.push_back(1.0);
+    }
+  else
+    {
+      // Loop over the entries of the user provided matrix and store its entries in 
+      // the _off_diagonal_weights or _diagonal_weights
+      for(unsigned int i=0; i!=_off_diagonal_weights.size(); ++i)
+        {
+          if(_off_diagonal_weights[i].size() > i)
+            {
+              _weights[i] = _off_diagonal_weights[i][i];
+              _off_diagonal_weights[i][i] = 0;
+            }
+          else
+            _weights[i] = 1.0;
+        }
+      for (unsigned int i=0; i != _weights.size(); ++i)
+        _weights_sq[i] = _weights[i] * _weights[i];
+    }
+}
 
 inline
 SystemNorm::SystemNorm(const SystemNorm &s) :
@@ -246,6 +304,61 @@ Real SystemNorm::weight_sq(unsigned int var) const
   libmesh_assert (!_weights_sq.empty());
   
   return (var < _weights_sq.size()) ? _weights_sq[var] : 1.0;
+}
+
+
+inline
+Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2) 
+{
+  // The vectors are assumed to both be vectors of the (same number
+  // of) components
+  unsigned int vsize = v1.size();
+  libmesh_assert(vsize == v2.size());
+
+  // We'll support implicitly defining weights, but if the user sets
+  // more weights than he uses then something's probably wrong
+  unsigned int diagsize = this->_weights.size();
+  libmesh_assert(vsize >= diagsize);
+
+  // Initialize the variable val
+  Real val = 0.;
+  
+  // Loop over all the components of the system with explicit
+  // weights
+  for(unsigned int i = 0; i != diagsize; i++)
+    {            		
+      val += this->_weights[i] * v1[i] * v2[i];		
+    }
+  // Loop over all the components of the system with implicit
+  // weights
+  for(unsigned int i = diagsize; i < vsize; i++)
+    {            		
+      val += v1[i] * v2[i];		
+    }
+    
+  // Loop over the components of the system
+  unsigned int nrows = this->_off_diagonal_weights.size();
+  libmesh_assert(vsize <= nrows);
+
+  for(unsigned int i = 0; i != nrows; i++)
+    {		
+      unsigned int ncols = this->_off_diagonal_weights[i].size();
+      for(unsigned int j=0; j != ncols; j++)
+        {
+          // Note that the diagonal weights here were set to zero
+          // in the constructor
+          val += this->_off_diagonal_weights[i][j] * v1[i] * v2[j];	    
+        }
+    }
+    
+    return(val);
+  }
+
+
+inline
+Real SystemNorm::calculate_norm(const std::vector<Real>& v1) 
+{
+  return this->calculate_norm(v1,v1);
 }
 
 
