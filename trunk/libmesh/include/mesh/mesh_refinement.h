@@ -35,6 +35,7 @@
 #include "libmesh_common.h"
 #include "libmesh.h" // libMesh::invalid_uint
 #include "location_maps.h"
+#include "elem.h"
 
 namespace libMesh
 {
@@ -43,8 +44,8 @@ namespace libMesh
 class MeshBase;
 class Point;
 class Node;
-class Elem;
 class ErrorVector;
+class PeriodicBoundaries;
 
 
 
@@ -76,6 +77,8 @@ private:
 
 public:
 
+  void set_periodic_boundaries_ptr(PeriodicBoundaries * pb_ptr);
+  
   /**
    * Destructor. Deletes all the elements that are currently stored.
    */
@@ -579,17 +582,28 @@ private:
    * so that level-one dependency is satisfied.
    */
   bool make_refinement_compatible (const bool);
-  
+
   /**
    * Copy refinement flags on ghost elements from their
    * local processors.  Return true if any flags changed.
    */
   bool make_flags_parallel_consistent ();
+
+  /**
+   * Local dispatch function for getting the correct topological
+   * neighbor from the Elem class
+   */
+  Elem* topological_neighbor (Elem *elem, const unsigned int side);
+
+  /**
+   * Local dispatch function for checking the correct has_neighbor
+   * function from the Elem class
+   */
+  bool has_topological_neighbor (Elem *elem, Elem *neighbor);
   
   /**
    * Data structure that holds the new nodes information.
    */
-  
   LocationMap<Node> _new_nodes_map;
 
   /**
@@ -624,6 +638,10 @@ private:
 
   unsigned char _face_level_mismatch_limit, _edge_level_mismatch_limit,
 	        _node_level_mismatch_limit;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  PeriodicBoundaries * _periodic_boundaries;
+#endif
 };
 
 
@@ -687,6 +705,25 @@ inline unsigned char& MeshRefinement::node_level_mismatch_limit()
 {
   return _node_level_mismatch_limit;
 }
+
+inline Elem* MeshRefinement::topological_neighbor(Elem *elem, const unsigned int side)
+{
+#ifdef LIBMESH_ENABLE_PERIODIC                    
+  return elem->topological_neighbor(side, _mesh, _periodic_boundaries);
+#else
+  return elem->neighbor(side);
+#endif
+}
+
+inline bool MeshRefinement::has_topological_neighbor(Elem *elem, Elem *neighbor)
+{
+#ifdef LIBMESH_ENABLE_PERIODIC
+  return elem->has_topological_neighbor(neighbor, _mesh, _periodic_boundaries);
+#else
+  return elem->has_neighbor(neighbor);
+#endif  
+}
+
 
 } // namespace libMesh
 

@@ -984,6 +984,10 @@ bool UnstructuredMesh::contract ()
   // Strip any newly-created NULL voids out of the element array
   this->renumber_nodes_and_elements();
 
+  // FIXME: Need to understand why deleting subactive children
+  // invalidates the point locator.  For now we will clear it explicitly
+  this->clear_point_locator();
+
   STOP_LOG ("contract()", "Mesh");
   
   return mesh_changed;

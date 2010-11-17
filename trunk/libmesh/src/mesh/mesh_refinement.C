@@ -29,7 +29,6 @@
 #ifdef LIBMESH_ENABLE_AMR
 
 #include "boundary_info.h"
-#include "elem.h"
 #include "error_vector.h"
 #include "libmesh_logging.h"
 #include "mesh_base.h"
@@ -45,6 +44,9 @@
 #include "parallel_mesh.h"
 #endif // DEBUG
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+#include "periodic_boundaries.h"
+#endif
 
 namespace libMesh
 {
@@ -64,9 +66,21 @@ MeshRefinement::MeshRefinement (MeshBase& m) :
   _face_level_mismatch_limit(1),
   _edge_level_mismatch_limit(0),
   _node_level_mismatch_limit(0)
+#ifdef LIBMESH_ENABLE_PERIODIC
+  , _periodic_boundaries(NULL)
+#endif  
 {
 }
 
+
+
+#ifdef LIBMESH_ENABLE_PERIODIC  
+void MeshRefinement::set_periodic_boundaries_ptr(PeriodicBoundaries * pb_ptr)
+{
+  _periodic_boundaries = pb_ptr;
+}
+#endif
+  
 
 
 MeshRefinement::~MeshRefinement ()
@@ -301,7 +315,7 @@ bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
-          Elem *neighbor = elem->neighbor(n);
+          Elem *neighbor = topological_neighbor(elem, n);      
 
           if (!neighbor || !neighbor->active() ||
               neighbor == remote_elem)
@@ -949,13 +963,14 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 		  const unsigned int my_level = elem->level();
 		  
 		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
-		    if (elem->neighbor(n) != NULL &&      // I have a
-		        elem->neighbor(n) != remote_elem) // neighbor here
+                  {
+                    const Elem* neighbor = topological_neighbor(elem, n);
+
+                    if (neighbor != NULL &&      // I have a
+		        neighbor != remote_elem) // neighbor here
                       {
-		        if (elem->neighbor(n)->active()) // and it is active
+		        if (neighbor->active()) // and it is active
 			  {
-			    const Elem* neighbor = elem->neighbor(n);
-			  
 			    if ((neighbor->level() == my_level) &&
 			        (neighbor->refinement_flag() == Elem::REFINE)) // the neighbor is at my level
 	        	                                                       // and wants to be refined
@@ -975,6 +990,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                             break;
 			  }
                       }
+                  }
 		}
 	      if (elem->p_refinement_flag() == Elem::COARSEN) // If
                 // the element is active and the order reduction flag is set
@@ -982,13 +998,14 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 		  const unsigned int my_p_level = elem->p_level();
 
 		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
-		    if (elem->neighbor(n) != NULL &&      // I have a
-		        elem->neighbor(n) != remote_elem) // neighbor here
-		      {
-		        if (elem->neighbor(n)->active()) // and it is active
-			  {
-			    const Elem* neighbor = elem->neighbor(n);
+                  {
+                    const Elem* neighbor = topological_neighbor(elem, n);
 
+                    if (neighbor != NULL &&      // I have a
+		        neighbor != remote_elem) // neighbor here
+		      {
+		        if (neighbor->active()) // and it is active
+			  {
                             if ((neighbor->p_level() > my_p_level &&
                                  neighbor->p_refinement_flag() != Elem::COARSEN)
                                 || (neighbor->p_level() == my_p_level &&
@@ -1006,7 +1023,6 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                              // Because we currently have level one h
                              // compatibility, we don't need to check
                              // grandchildren
-			    const Elem* neighbor = elem->neighbor(n);
 
                              libmesh_assert(neighbor->has_children());
 	                     for (unsigned int c=0; c!=neighbor->n_children(); c++)
@@ -1014,7 +1030,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                                  Elem *subneighbor = neighbor->child(c);
                                  if (subneighbor != remote_elem &&
                                      subneighbor->active() &&
-                                     subneighbor->has_neighbor(elem))
+                                     has_topological_neighbor(subneighbor, elem))
                                    if ((subneighbor->p_level() > my_p_level &&
                                        subneighbor->p_refinement_flag() != Elem::COARSEN)
                                        || (subneighbor->p_level() == my_p_level &&
@@ -1029,6 +1045,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                                break;
 			  }
 		      }
+                  }
 		}
 		  
 	      // If the current element's flag changed, we hadn't
@@ -1044,7 +1061,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	      if (my_flag_changed && !_mesh.is_serial())
               for (unsigned int n=0; n != elem->n_neighbors(); ++n)
                 {
-                  Elem *neigh = elem->neighbor(n);
+                  Elem* neigh = topological_neighbor(elem, n);
+
                   if (!neigh)
                     continue;
                   if (neigh == remote_elem ||
@@ -1222,14 +1240,13 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 	    
 		for (unsigned int side=0; side != elem->n_sides(); side++)
                   {
-		    Elem* neighbor = elem->neighbor(side);
-		    if (neighbor != NULL        && // I have a
+                    Elem* neighbor = topological_neighbor(elem, side);
+
+                    if (neighbor != NULL        && // I have a
 		        neighbor != remote_elem && // neighbor here
 		        neighbor->active()) // and it is active
 		      {
-			
-			
-			// Case 1:  The neighbor is at the same level I am.
+                        // Case 1:  The neighbor is at the same level I am.
 			//        1a: The neighbor will be refined       -> NO PROBLEM
 			//        1b: The neighbor won't be refined      -> NO PROBLEM
 			//        1c: The neighbor wants to be coarsened -> PROBLEM			 
@@ -1292,8 +1309,9 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
 		for (unsigned int side=0; side != elem->n_sides(); side++)
                   {
-                    Elem *neighbor = elem->neighbor(side);
-		    if (neighbor != NULL &&      // I have a
+                    Elem* neighbor = topological_neighbor(elem, side);
+
+                    if (neighbor != NULL &&      // I have a
 		        neighbor != remote_elem) // neighbor here
 		      {
 		        if (neighbor->active()) // and it is active
@@ -1322,7 +1340,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                                 if (subneighbor == remote_elem)
                                   continue;
                                 if (subneighbor->active() &&
-                                    subneighbor->has_neighbor(elem))
+                                    has_topological_neighbor(subneighbor, elem))
                                   {
                                     if (subneighbor->p_level() < my_p_level &&
                                         subneighbor->p_refinement_flag() != Elem::REFINE)
