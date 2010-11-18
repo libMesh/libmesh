@@ -406,7 +406,8 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
   // Load initial projection error into temporal_data dense matrix
   solution->zero();
   solution->add(1., *current_newton_iterate);
-  set_error_temporal_data();
+  if(compute_truth_projection_error)
+    set_error_temporal_data();
 
   for(unsigned int time_level=1; time_level<=_K; time_level++)
     {
@@ -586,7 +587,8 @@ Real QNTransientRBSystem::truth_solve(int write_interval)
       // Load projection error into temporal_data dense matrix
       solution->zero();
       solution->add(1., *current_newton_iterate);
-      set_error_temporal_data();
+      if(compute_truth_projection_error)
+        set_error_temporal_data();
 
     }
 

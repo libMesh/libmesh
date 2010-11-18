@@ -57,6 +57,7 @@ TransientRBSystem::TransientRBSystem (EquationSystems& es,
   : Parent(es, name, number),
     L2_matrix(SparseMatrix<Number>::build()),
     nonzero_initialization(false),
+    compute_truth_projection_error(false),
     init_filename(""),
     dt(0.05),
     euler_theta(1.),
@@ -365,6 +366,15 @@ void TransientRBSystem::initialize_RB_system(bool online_mode)
         RB_ic_proj_rhs_all_N(i) = temp1->dot(*basis_functions[i]);
       }
     }
+}
+
+Real TransientRBSystem::train_reduced_basis(const std::string& directory_name)
+{
+  compute_truth_projection_error = true;
+  Real value = Parent::train_reduced_basis(directory_name);
+  compute_truth_projection_error = false;
+  
+  return value;
 }
 
 SparseMatrix<Number>* TransientRBSystem::get_M_q(unsigned int q)
@@ -789,7 +799,8 @@ Real TransientRBSystem::truth_solve(int write_interval)
   }
 
   // Load initial projection error into temporal_data dense matrix
-  set_error_temporal_data();
+  if(compute_truth_projection_error)
+    set_error_temporal_data();
 
   if(reuse_preconditioner)
   {
@@ -835,7 +846,8 @@ Real TransientRBSystem::truth_solve(int write_interval)
     }
 
     // load projection error into column _k of temporal_data matrix
-    set_error_temporal_data();
+    if(compute_truth_projection_error)
+      set_error_temporal_data();
 
     if ( (write_interval > 0) && (_k%write_interval == 0) )
       {
