@@ -910,6 +910,13 @@ protected:
    * the Fq are only computed on the first call to update_residual_terms.
    */
   bool update_residual_terms_called;
+  
+  /**
+   * A boolean flag to indicate whether or not the output dual norms
+   * have already been computed --- used to make sure that we don't
+   * recompute them unnecessarily.
+   */
+  bool output_dual_norms_computed;
 
 private:
 
