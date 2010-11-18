@@ -32,7 +32,12 @@ DerivedRBSystem<Base>::DerivedRBSystem (EquationSystems& es,
 		    const unsigned int number)
   : Base(es, name, number),
     residual_type_flag(RESIDUAL_WRT_UBER)
-  {}
+  {
+    // We do not want to compute the output dual norms in
+    // a derived system, we just copy them over from the
+    // primary system
+    Base::output_dual_norms_computed = true;
+  }
 
 template <class Base>
 std::string DerivedRBSystem<Base>::system_type () const

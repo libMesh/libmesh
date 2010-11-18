@@ -79,6 +79,7 @@ RBSystem::RBSystem (EquationSystems& es,
     inner_prod_bndry_assembly(NULL),
     constraint_assembly(NULL),
     update_residual_terms_called(false),
+    output_dual_norms_computed(false),
     training_tolerance(-1.),
     _dirichlet_list_init(NULL),
     initial_Nmax(0),
@@ -679,9 +680,6 @@ void RBSystem::initialize_RB_system(bool online_mode)
 
     this->assemble_all_affine_vectors();
     this->assemble_all_output_vectors();
-
-    // Compute the dual norms of the outputs
-    this->compute_output_dual_norms();
   }
 }
 
@@ -1275,6 +1273,11 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
   // we might already be at the max number of basis functions.
   // If so, we can just return.
   if (this->get_n_basis_functions() >= Nmax) return 0.;
+  
+
+  // Compute the dual norms of the outputs if we haven't already done so
+  if(!output_dual_norms_computed)
+    this->compute_output_dual_norms();
 
   while(true)
   {
@@ -2041,6 +2044,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
   // will already be set.
   if(!update_residual_terms_called)
   {
+
     if(low_memory_mode)
     {
       assemble_inner_product_matrix(matrix);
@@ -2295,6 +2299,8 @@ void RBSystem::compute_output_dual_norms()
 {
   START_LOG("compute_output_dual_norms()", "RBSystem");
   
+  libMesh::out << "Compute output dual norms" << std::endl;
+  
   // Note: the solves in this function employ a single system matrix and multiple
   // right-hand sides, so we may get better performance using a different
   // preconditioner, or even a direct solver.
@@ -2421,6 +2427,8 @@ void RBSystem::compute_output_dual_norms()
       L_q_representor[q] = NULL;
     }
   }
+  
+  output_dual_norms_computed = true;
 
   // Change the preconditioner, Krylov solver back to their original
   // value.  Note: does nothing if RBBase::alternative_solver ==
@@ -3114,6 +3122,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
       output_dual_norms_in >> output_dual_norms[n][q];
     }
     output_dual_norms_in.close();
+    output_dual_norms_computed = true;
     
     for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
     {
