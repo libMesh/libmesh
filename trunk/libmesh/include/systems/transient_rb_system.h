@@ -84,6 +84,15 @@ public:
   virtual Real truth_solve(int write_interval);
 
   /**
+   * Train the reduced basis. Overloaded so that we can set the
+   * flag compute_truth_projection_error to true so that the calls
+   * to truth_solve during the basis construction will compute the
+   * projection error. Other calls to truth_solve generally do not
+   * need to perform these projection calculations.
+   */
+  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data");
+
+  /**
    * Function that indicates when to terminate the Greedy
    * basis training.
    */
@@ -346,6 +355,13 @@ public:
    * If we are, then an initialization function must be attached to the system.
    */
   bool nonzero_initialization;
+  
+  /**
+   * Boolean flag that indicates whether we will compute the projection error
+   * for the truth solution into the RB space (at every time level).
+   * This typically only needs to true during a call to train_reduced_basis.
+   */
+  bool compute_truth_projection_error;
 
   /**
    * The filename of the file containing the initial condition.

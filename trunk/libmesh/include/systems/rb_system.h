@@ -122,7 +122,7 @@ public:
    *
    * @returns the final maximum a posteriori error bound on the training set.
    */
-  Real train_reduced_basis(const std::string& directory_name = "offline_data");
+  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data");
 
   /**
    * (i) Compute the a posteriori error bound for each set of parameters
