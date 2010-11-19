@@ -55,9 +55,10 @@ public:
   void point_to_parameters(const std::vector<Real>& mu_in);
   
   /**
-   * Return a const reference to mu.
+   * Return a const reference to mu. Overload in order to
+   * provide different behavior.
    */
-  const std::vector<Real>& get_mu();
+  virtual const std::vector<Real>& get_mu();
 
   /**
    * A pointer to the parameters in an associated system.
