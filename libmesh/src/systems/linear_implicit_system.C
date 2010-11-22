@@ -28,6 +28,7 @@
 #include "numeric_vector.h" // for parameter sensitivity calcs
 //#include "parameter_vector.h"
 #include "sparse_matrix.h" // for get_transpose
+#include "system_subset.h"
 
 namespace libMesh
 {
@@ -43,7 +44,9 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
   linear_solver          (LinearSolver<Number>::build()),
   _n_linear_iterations   (0),
   _final_linear_residual (1.e20),
-  _shell_matrix(NULL)
+  _shell_matrix(NULL),
+  _subset(NULL),
+  _subset_solve_mode(SUBSET_ZERO)
 {
 }
 
@@ -61,6 +64,8 @@ void LinearImplicitSystem::clear ()
 {
   // clear the linear solver
   linear_solver->clear();
+
+  this->restrict_solve_to(NULL);
   
   // clear the parent data
   Parent::clear();
@@ -75,6 +80,19 @@ void LinearImplicitSystem::reinit ()
   
   // initialize parent data
   Parent::reinit();  
+}
+
+
+
+void LinearImplicitSystem::restrict_solve_to (const SystemSubset* subset,
+					      const SubsetSolveMode subset_solve_mode)
+{
+  _subset = subset;
+  _subset_solve_mode = subset_solve_mode;
+  if(subset!=NULL)
+    {
+      libmesh_assert(&subset->get_system()==this);
+    }
 }
 
 
@@ -101,6 +119,11 @@ void LinearImplicitSystem::solve ()
   const unsigned int maxits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
+  if(_subset!=NULL)
+    {
+      linear_solver->restrict_solve_to(&_subset->dof_ids(),_subset_solve_mode);
+    }
+
   // Solve the linear system.  Several cases:
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
   if(_shell_matrix)
@@ -109,6 +132,11 @@ void LinearImplicitSystem::solve ()
   else
     // 2.) No shell matrix, with or without user-supplied preconditioner
     rval = linear_solver->solve (*matrix, this->request_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
+
+  if(_subset!=NULL)
+    {
+      linear_solver->restrict_solve_to(NULL);
+    }
 
   // Store the number of linear iterations required to
   // solve and the final residual.

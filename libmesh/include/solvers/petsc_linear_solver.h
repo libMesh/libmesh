@@ -122,6 +122,17 @@ public:
    * Initialize data structures if not done so already plus much more
    */
   void init (PetscMatrix<T>* matrix);
+
+  /**
+   * After calling this method, all successive solves will be
+   * restricted to the given set of dofs, which must contain local
+   * dofs on each processor only and not contain any duplicates.  This
+   * mode can be disabled by calling this method with \p dofs being a
+   * \p NULL pointer.
+   */
+  virtual void restrict_solve_to (const std::vector<unsigned int>* const dofs,
+				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+
   /**
    * Call the Petsc solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
@@ -232,6 +243,11 @@ private:
   /**
    * Internal function if shell matrix mode is used.
    */
+  static PetscErrorCode _petsc_shell_matrix_mult_add(Mat mat, Vec arg, Vec add, Vec dest);
+
+  /**
+   * Internal function if shell matrix mode is used.
+   */
   static PetscErrorCode _petsc_shell_matrix_get_diagonal(Mat mat, Vec dest);
 
   // SLES removed from >= PETSc 2.2.0
@@ -253,13 +269,49 @@ private:
    * Krylov subspace context
    */
   KSP _ksp;
+
+  /**
+   * PETSc index set containing the dofs on which to solve (\p NULL
+   * means solve on all dofs).
+   */
+  IS _restrict_solve_to_is;
+
+  /**
+   * PETSc index set, complement to \p _restrict_solve_to_is.  This
+   * will be created on demand by the method \p
+   * _create_complement_is().
+   */
+  IS _restrict_solve_to_is_complement;
+
+  /**
+   * Internal method that returns the local size of \p
+   * _restrict_solve_to_is.
+   */
+  size_t _restrict_solve_to_is_local_size(void)const;
+
+  /**
+   * Creates \p _restrict_solve_to_is_complement to contain all
+   * indices that are local in \p vec_in, except those that are
+   * contained in \p _restrict_solve_to_is.
+   */
+  void _create_complement_is (const NumericVector<T> &vec_in);
+
+  /**
+   * If restrict-solve-to-subset mode is active, this member decides
+   * what happens with the dofs outside the subset.
+   */
+  SubsetSolveMode _subset_solve_mode;
+
 };
 
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-PetscLinearSolver<T>::PetscLinearSolver ()
+  PetscLinearSolver<T>::PetscLinearSolver ():
+    _restrict_solve_to_is(NULL),
+    _restrict_solve_to_is_complement(NULL),
+    _subset_solve_mode(SUBSET_ZERO)
 {
   if (libMesh::n_processors() == 1)
     this->_preconditioner_type = ILU_PRECOND;
@@ -275,6 +327,40 @@ PetscLinearSolver<T>::~PetscLinearSolver ()
 {
   this->clear ();
 }
+
+
+
+template <typename T>
+inline size_t
+PetscLinearSolver<T>::
+_restrict_solve_to_is_local_size(void)const
+{
+  libmesh_assert(_restrict_solve_to_is!=NULL);
+
+  PetscInt s;
+  int ierr = ISGetLocalSize(_restrict_solve_to_is,&s);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  return static_cast<size_t>(s);
+}
+
+
+
+template <typename T>
+void
+PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &vec_in)
+{
+  libmesh_assert(_restrict_solve_to_is!=NULL);
+  if(_restrict_solve_to_is_complement==NULL)
+    {
+      int ierr = ISComplement(_restrict_solve_to_is,
+			      vec_in.first_local_index(),
+			      vec_in.last_local_index(),
+			      &_restrict_solve_to_is_complement);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+}
+
 
 
 } // namespace libMesh

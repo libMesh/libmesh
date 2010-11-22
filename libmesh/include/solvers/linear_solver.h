@@ -24,12 +24,14 @@
 
 
 // C++ includes
+#include <vector>
 
 // Local includes
 #include "libmesh_common.h"
 #include "enum_solver_package.h"
 #include "enum_solver_type.h"
 #include "enum_preconditioner_type.h"
+#include "enum_subset_solve_mode.h"
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
@@ -115,6 +117,16 @@ public:
    * Attaches a Preconditioner object to be used
    */
   void attach_preconditioner(Preconditioner<T> * preconditioner);
+
+  /**
+   * After calling this method, all successive solves will be
+   * restricted to the given set of dofs, which must contain local
+   * dofs on each processor only and not contain any duplicates.  This
+   * mode can be disabled by calling this method with \p dofs being a
+   * \p NULL pointer.
+   */
+  virtual void restrict_solve_to (const std::vector<unsigned int>* const dofs,
+				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
 
   /**
    * This function calls the solver
