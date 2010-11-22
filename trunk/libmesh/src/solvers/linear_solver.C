@@ -114,6 +114,18 @@ LinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
   _preconditioner = preconditioner;
 }
 
+template <typename T>
+void
+LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
+				   const SubsetSolveMode /*subset_solve_mode*/)
+{
+  if(dofs!=NULL)
+    {
+      libmesh_not_implemented();
+    }
+}
+
+
 
 //------------------------------------------------------------------
 // Explicit instantiations

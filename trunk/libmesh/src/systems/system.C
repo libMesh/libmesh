@@ -402,6 +402,17 @@ void System::re_update ()
 
 
 
+void System::restrict_solve_to (const SystemSubset* subset,
+				const SubsetSolveMode /*subset_solve_mode*/)
+{
+  if(subset!=NULL)
+    {
+      libmesh_not_implemented();
+    }
+}
+
+
+
 void System::assemble ()
 {
   // Log how long the user's matrix assembly code takes

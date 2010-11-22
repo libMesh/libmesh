@@ -31,6 +31,7 @@
 #include "elem_range.h"
 #include "enum_norm_type.h"
 #include "enum_xdr_mode.h"
+#include "enum_subset_solve_mode.h"
 #include "enum_parallel_type.h"
 #include "fe_type.h"
 #include "libmesh_common.h"
@@ -57,6 +58,7 @@ template <typename T> class NumericVector;
 template <typename T> class VectorValue;
 typedef VectorValue<Number> NumberVectorValue;
 typedef NumberVectorValue Gradient;
+class SystemSubset;
 
 /**
  * This is the base class for classes which contain 
@@ -163,6 +165,14 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+
+  /**
+   * After calling this method, any solve will be restricted to the
+   * given subdomain.  To disable this mode, call this method with \p
+   * subset being a \p NULL pointer.
+   */
+  virtual void restrict_solve_to (const SystemSubset* subset,
+				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
  
   /**
    * Solves the system.  Must be overloaded in derived systems.

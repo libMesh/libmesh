@@ -100,6 +100,14 @@ public:
   virtual void assemble () { ImplicitSystem::assemble(); }
  
   /**
+   * After calling this method, any solve will be limited to the given
+   * subset.  To disable this mode, call this method with \p subset
+   * being a \p NULL pointer.
+   */
+  virtual void restrict_solve_to (const SystemSubset* subset,
+				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+ 
+  /**
    * Assembles & solves the linear system A*x=b. 
    */
   virtual void solve ();
@@ -187,6 +195,16 @@ protected:
    */
   ShellMatrix<Number>* _shell_matrix;
 
+  /**
+   * The current subset on which to solve (or \p NULL if none).
+   */
+  const SystemSubset* _subset;
+
+  /**
+   * If restrict-solve-to-subset mode is active, this member decides
+   * what happens with the dofs outside the subset.
+   */
+  SubsetSolveMode _subset_solve_mode;
 };
 
 

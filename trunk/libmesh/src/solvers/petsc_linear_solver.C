@@ -98,6 +98,22 @@ void PetscLinearSolver<T>::clear ()
 {
   if (this->initialized())
     {
+      /* If we were restricted to some subset, this restriction must
+	 be removed and the subset index set destroyed.  */
+      if(_restrict_solve_to_is!=NULL)
+	{
+	  int ierr = ISDestroy(_restrict_solve_to_is);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  _restrict_solve_to_is = NULL;
+	}
+      
+      if(_restrict_solve_to_is_complement!=NULL)
+	{
+	  int ierr = ISDestroy(_restrict_solve_to_is_complement);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  _restrict_solve_to_is_complement = NULL;
+	}
+      
       this->_is_initialized = false;
 
       int ierr=0;
@@ -294,7 +310,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       // Set operators. The input matrix works as the preconditioning matrix
-      ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat(),SAME_NONZERO_PATTERN);
+      ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat(),DIFFERENT_NONZERO_PATTERN);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);       
 
       // Set user-specified  solver and preconditioner types
@@ -360,6 +376,36 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 
 
 
+template <typename T>
+void
+PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int>* const dofs,
+					 const SubsetSolveMode subset_solve_mode)
+{
+  int ierr=0;
+
+  /* The preconditioner (in particular if a default preconditioner)
+     will have to be reset.  We call this->clear() to do that.  This
+     call will also remove and free any previous subset that may have
+     been set before.  */
+  this->clear();
+
+  _subset_solve_mode = subset_solve_mode;
+
+  if(dofs!=NULL)
+    {
+      PetscInt* petsc_dofs = NULL;
+      ierr = PetscMalloc(dofs->size()*sizeof(PetscInt), &petsc_dofs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      for(size_t i=0; i<dofs->size(); i++)
+	{
+	  petsc_dofs[i] = (*dofs)[i];
+	}
+
+      ierr = ISCreateGeneralNC(libMesh::COMM_WORLD,dofs->size(),petsc_dofs,&_restrict_solve_to_is);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+}
 
 
 
@@ -400,16 +446,17 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 //       this->set_petsc_preconditioner_type ();
 //     }
 
-  if(this->_preconditioner)
-    this->_preconditioner->set_matrix(matrix_in);
-
-  
 // 2.1.x & earlier style      
 #if PETSC_VERSION_LESS_THAN(2,2,0)
+
+  if(_restrict_solve_to_is!=NULL)
+    {
+      libmesh_not_implemented();
+    }
       
   // Set operators. The input matrix works as the preconditioning matrix
   ierr = SLESSetOperators(_sles, matrix->mat(), precond->mat(),
-			  SAME_NONZERO_PATTERN);
+			  DIFFERENT_NONZERO_PATTERN);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
@@ -430,6 +477,11 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
 // 2.2.0
 #elif PETSC_VERSION_LESS_THAN(2,2,1)
+      
+  if(_restrict_solve_to_is!=NULL)
+    {
+      libmesh_not_implemented();
+    }
       
   // Set operators. The input matrix works as the preconditioning matrix
   //ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
@@ -475,19 +527,139 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 // 2.2.1 & newer style
 #else
       
-  // Set operators. The input matrix works as the preconditioning matrix
-  if(!this->same_preconditioner)
-  {
-    ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-	  		   SAME_NONZERO_PATTERN);
-           CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  }
+  Mat submat = NULL;
+  Mat subprecond = NULL;
+  Vec subrhs = NULL;
+  Vec subsolution = NULL;
+  VecScatter scatter = NULL;
+  PetscMatrix<Number>* subprecond_matrix = NULL;
+
+  // Set operators.  Also restrict rhs and solution vector to
+  // subdomain if neccessary.
+  if(_restrict_solve_to_is!=NULL)
+    {
+      size_t is_local_size = this->_restrict_solve_to_is_local_size();
+
+      ierr = VecCreate(libMesh::COMM_WORLD,&subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetSizes(subrhs,is_local_size,PETSC_DECIDE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetFromOptions(subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecCreate(libMesh::COMM_WORLD,&subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetSizes(subsolution,is_local_size,PETSC_DECIDE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetFromOptions(subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs,NULL, &scatter);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterBegin(scatter,solution->vec(),subsolution,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,solution->vec(),subsolution,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+      ierr = MatGetSubMatrix(matrix->mat(),
+			     _restrict_solve_to_is,_restrict_solve_to_is,
+			     PETSC_DECIDE,MAT_INITIAL_MATRIX,&submat);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatGetSubMatrix(precond->mat(),
+			     _restrict_solve_to_is,_restrict_solve_to_is,
+			     PETSC_DECIDE,MAT_INITIAL_MATRIX,&subprecond);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+      ierr = MatGetSubMatrix(matrix->mat(),
+			     _restrict_solve_to_is,_restrict_solve_to_is,
+			     MAT_INITIAL_MATRIX,&submat);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatGetSubMatrix(precond->mat(),
+			     _restrict_solve_to_is,_restrict_solve_to_is,
+			     MAT_INITIAL_MATRIX,&subprecond);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+      /* Since removing columns of the matrix changes the equation
+	 system, we will now change the right hand side to compensate
+	 for this.  Note that this is not necessary if \p SUBSET_ZERO
+	 has been selected.  */
+      if(_subset_solve_mode!=SUBSET_ZERO)
+	{
+	  _create_complement_is(rhs_in);
+	  size_t is_complement_local_size = rhs_in.local_size()-is_local_size;
+
+	  Vec subvec1 = NULL;
+	  Mat submat1 = NULL;
+	  VecScatter scatter1 = NULL;
+
+	  ierr = VecCreate(libMesh::COMM_WORLD,&subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetSizes(subvec1,is_complement_local_size,PETSC_DECIDE);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetFromOptions(subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1,NULL, &scatter1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecScatterEnd(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScale(subvec1,-1.0);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+	  ierr = MatGetSubMatrix(matrix->mat(),
+				 _restrict_solve_to_is,_restrict_solve_to_is_complement,
+				 PETSC_DECIDE,MAT_INITIAL_MATRIX,&submat1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+	  ierr = MatGetSubMatrix(matrix->mat(),
+				 _restrict_solve_to_is,_restrict_solve_to_is_complement,
+				 MAT_INITIAL_MATRIX,&submat1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+	  ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScatterDestroy(scatter1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecDestroy(subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = MatDestroy(submat1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	}
+
+      ierr = KSPSetOperators(_ksp, submat, subprecond,
+			     this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if(this->_preconditioner)
+	{
+	  subprecond_matrix = new PetscMatrix<Number>(subprecond);
+	  this->_preconditioner->set_matrix(*subprecond_matrix);
+	}
+    }
   else
-  {
-    ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-               SAME_PRECONDITIONER);
-           CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  }
+    {
+      ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
+			     this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if(this->_preconditioner)
+	this->_preconditioner->set_matrix(matrix_in);
+    }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
@@ -496,8 +668,16 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Solve the linear system
-  ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if(_restrict_solve_to_is!=NULL)
+    {
+      ierr = KSPSolve (_ksp, subrhs, subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+  else
+    {
+      ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 	 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
@@ -507,6 +687,52 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
+  if(_restrict_solve_to_is!=NULL)
+    {
+      switch(_subset_solve_mode)
+	{
+	case SUBSET_ZERO:
+	  ierr = VecZeroEntries(solution->vec());
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  break;
+
+	case SUBSET_COPY_RHS:
+	  ierr = VecCopy(rhs->vec(),solution->vec());
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  break;
+
+	case SUBSET_DONT_TOUCH:
+	  /* Nothing to do here.  */
+	  break;
+
+	}
+      ierr = VecScatterBegin(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterDestroy(scatter);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if(this->_preconditioner)
+	{
+	  /* Before we delete subprecond_matrix, we should give the
+	     _preconditioner a different matrix.  */
+	  this->_preconditioner->set_matrix(matrix_in);
+	  delete subprecond_matrix;
+	  subprecond_matrix = NULL;
+	}
+
+      ierr = VecDestroy(subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecDestroy(subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatDestroy(submat);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatDestroy(subprecond);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+
 #endif
 
   STOP_LOG("solve()", "PetscLinearSolver");
@@ -537,6 +763,18 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
 #else
 
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+  if(_restrict_solve_to_is!=NULL)
+    {
+      libmesh::out << "The current implementation of subset solves with "
+		   << "shell matrices requires PETSc version 3.1 or above.  "
+		   << "Older PETSc version do not support automatic "
+		   << "submatrix generation of shell matrices."
+		   << std::endl;
+      libmesh_error();
+    }
+#endif
+
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
@@ -548,6 +786,11 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   int ierr=0;
   int its=0, max_its = static_cast<int>(m_its);
   PetscReal final_resid=0.;
+
+  Mat submat = NULL;
+  Vec subrhs = NULL;
+  Vec subsolution = NULL;
+  VecScatter scatter = NULL;
 
   // Close the matrices and vectors in case this wasn't already done.
   solution->close ();
@@ -569,13 +812,135 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat,MATOP_MULT_ADD,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult_add));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  // Set operators. The input matrix works as the preconditioning matrix
-  ierr = KSPSetOperators(_ksp, mat, mat,
-			 SAME_NONZERO_PATTERN);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // Restrict rhs and solution vectors and set operators.  The input
+  // matrix works as the preconditioning matrix.
+  if(_restrict_solve_to_is!=NULL)
+    {
+      size_t is_local_size = this->_restrict_solve_to_is_local_size();
+
+      ierr = VecCreate(libMesh::COMM_WORLD,&subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetSizes(subrhs,is_local_size,PETSC_DECIDE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetFromOptions(subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecCreate(libMesh::COMM_WORLD,&subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetSizes(subsolution,is_local_size,PETSC_DECIDE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetFromOptions(subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs,NULL, &scatter);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterBegin(scatter,solution->vec(),subsolution,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,solution->vec(),subsolution,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+      /* This point can't be reached, see above.  */
+      libmesh_assert(false);
+#else
+      ierr = MatGetSubMatrix(mat,
+			     _restrict_solve_to_is,_restrict_solve_to_is,
+			     MAT_INITIAL_MATRIX,&submat);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+      /* Since removing columns of the matrix changes the equation
+	 system, we will now change the right hand side to compensate
+	 for this.  Note that this is not necessary if \p SUBSET_ZERO
+	 has been selected.  */
+      if(_subset_solve_mode!=SUBSET_ZERO)
+	{
+	  _create_complement_is(rhs_in);
+	  size_t is_complement_local_size = rhs_in.local_size()-is_local_size;
+
+	  Vec subvec1 = NULL;
+	  Mat submat1 = NULL;
+	  VecScatter scatter1 = NULL;
+
+	  ierr = VecCreate(libMesh::COMM_WORLD,&subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetSizes(subvec1,is_complement_local_size,PETSC_DECIDE);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetFromOptions(subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1,NULL, &scatter1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecScatterEnd(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScale(subvec1,-1.0);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+	  /* This point can't be reached, see above.  */
+	  libmesh_assert(false);
+#else
+	  ierr = MatGetSubMatrix(mat,
+				 _restrict_solve_to_is,_restrict_solve_to_is_complement,
+				 MAT_INITIAL_MATRIX,&submat1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+	  // The following lines would be correct, but don't work
+	  // correctly in PETSc up to 3.1.0-p5.  See discussion in
+	  // petsc-users of Nov 9, 2010.
+	  //
+	  // ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
+	  // CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  //
+	  // We workaround by using a temporary vector.  Note that the
+	  // fix in PETsc 3.1.0-p6 uses a temporary vector internally,
+	  // so this is no effective performance loss.
+	  Vec subvec2 = NULL;
+	  ierr = VecCreate(libMesh::COMM_WORLD,&subvec2);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetSizes(subvec2,is_local_size,PETSC_DECIDE);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetFromOptions(subvec2);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = MatMult(submat1,subvec1,subvec2);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecAXPY(subrhs,1.0,subvec2);
+
+	  ierr = VecScatterDestroy(scatter1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecDestroy(subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = MatDestroy(submat1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	}
+
+      ierr = KSPSetOperators(_ksp, submat, submat,
+			     DIFFERENT_NONZERO_PATTERN);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+  else
+    {
+      ierr = KSPSetOperators(_ksp, mat, mat,
+			     DIFFERENT_NONZERO_PATTERN);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
@@ -584,8 +949,16 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Solve the linear system
-  ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if(_restrict_solve_to_is!=NULL)
+    {
+      ierr = KSPSolve (_ksp, subrhs, subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+  else
+    {
+      ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 	 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
@@ -594,6 +967,41 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  if(_restrict_solve_to_is!=NULL)
+    {
+      switch(_subset_solve_mode)
+	{
+	case SUBSET_ZERO:
+	  ierr = VecZeroEntries(solution->vec());
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  break;
+
+	case SUBSET_COPY_RHS:
+	  ierr = VecCopy(rhs->vec(),solution->vec());
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  break;
+
+	case SUBSET_DONT_TOUCH:
+	  /* Nothing to do here.  */
+	  break;
+
+	}
+      ierr = VecScatterBegin(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterDestroy(scatter);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecDestroy(subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecDestroy(subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatDestroy(submat);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 
   // Destroy the matrix.
   ierr = MatDestroy(mat);
@@ -631,6 +1039,18 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
 #else
 
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+  if(_restrict_solve_to_is!=NULL)
+    {
+      libmesh::out << "The current implementation of subset solves with "
+		   << "shell matrices requires PETSc version 3.1 or above.  "
+		   << "Older PETSc version do not support automatic "
+		   << "submatrix generation of shell matrices."
+		   << std::endl;
+      libmesh_error();
+    }
+#endif
+
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
@@ -643,6 +1063,13 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   int ierr=0;
   int its=0, max_its = static_cast<int>(m_its);
   PetscReal final_resid=0.;
+
+  Mat submat = NULL;
+  Mat subprecond = NULL;
+  Vec subrhs = NULL;
+  Vec subsolution = NULL;
+  VecScatter scatter = NULL;
+  PetscMatrix<Number>* subprecond_matrix = NULL;
 
   // Close the matrices and vectors in case this wasn't already done.
   solution->close ();
@@ -664,16 +1091,148 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatShellSetOperation(mat,MATOP_MULT_ADD,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult_add));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  // Set operators. The input matrix works as the preconditioning matrix
-  ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T>*>(precond)->mat(),
-			 DIFFERENT_NONZERO_PATTERN);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // Restrict rhs and solution vectors and set operators.  The input
+  // matrix works as the preconditioning matrix.
+  if(_restrict_solve_to_is!=NULL)
+    {
+      size_t is_local_size = this->_restrict_solve_to_is_local_size();
 
-  if(this->_preconditioner)
-    this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
+      ierr = VecCreate(libMesh::COMM_WORLD,&subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetSizes(subrhs,is_local_size,PETSC_DECIDE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetFromOptions(subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecCreate(libMesh::COMM_WORLD,&subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetSizes(subsolution,is_local_size,PETSC_DECIDE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecSetFromOptions(subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is, subrhs,NULL, &scatter);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterBegin(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,rhs->vec(),subrhs,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterBegin(scatter,solution->vec(),subsolution,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,solution->vec(),subsolution,INSERT_VALUES,SCATTER_FORWARD);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+      /* This point can't be reached, see above.  */
+      libmesh_assert(false);
+#else
+      ierr = MatGetSubMatrix(mat,
+			     _restrict_solve_to_is,_restrict_solve_to_is,
+			     MAT_INITIAL_MATRIX,&submat);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatGetSubMatrix(const_cast<PetscMatrix<T>*>(precond)->mat(),
+			     _restrict_solve_to_is,_restrict_solve_to_is,
+			     MAT_INITIAL_MATRIX,&subprecond);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+      /* Since removing columns of the matrix changes the equation
+	 system, we will now change the right hand side to compensate
+	 for this.  Note that this is not necessary if \p SUBSET_ZERO
+	 has been selected.  */
+      if(_subset_solve_mode!=SUBSET_ZERO)
+	{
+	  _create_complement_is(rhs_in);
+	  size_t is_complement_local_size = rhs_in.local_size()-is_local_size;
+
+	  Vec subvec1 = NULL;
+	  Mat submat1 = NULL;
+	  VecScatter scatter1 = NULL;
+
+	  ierr = VecCreate(libMesh::COMM_WORLD,&subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetSizes(subvec1,is_complement_local_size,PETSC_DECIDE);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetFromOptions(subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScatterCreate(rhs->vec(),_restrict_solve_to_is_complement, subvec1,NULL, &scatter1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecScatterEnd(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+	  ierr = VecScale(subvec1,-1.0);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+	  /* This point can't be reached, see above.  */
+	  libmesh_assert(false);
+#else
+	  ierr = MatGetSubMatrix(mat,
+				 _restrict_solve_to_is,_restrict_solve_to_is_complement,
+				 MAT_INITIAL_MATRIX,&submat1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+	  // The following lines would be correct, but don't work
+	  // correctly in PETSc up to 3.1.0-p5.  See discussion in
+	  // petsc-users of Nov 9, 2010.
+	  //
+	  // ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
+	  // CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  //
+	  // We workaround by using a temporary vector.  Note that the
+	  // fix in PETsc 3.1.0-p6 uses a temporary vector internally,
+	  // so this is no effective performance loss.
+	  Vec subvec2 = NULL;
+	  ierr = VecCreate(libMesh::COMM_WORLD,&subvec2);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetSizes(subvec2,is_local_size,PETSC_DECIDE);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecSetFromOptions(subvec2);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = MatMult(submat1,subvec1,subvec2);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecAXPY(subrhs,1.0,subvec2);
+	  
+	  ierr = VecScatterDestroy(scatter1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = VecDestroy(subvec1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = MatDestroy(submat1);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	}
+
+      ierr = KSPSetOperators(_ksp, submat, subprecond,
+			     DIFFERENT_NONZERO_PATTERN);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if(this->_preconditioner)
+	{
+	  subprecond_matrix = new PetscMatrix<Number>(subprecond);
+	  this->_preconditioner->set_matrix(*subprecond_matrix);
+	}
+    }
+  else
+    {
+      ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T>*>(precond)->mat(),
+			     DIFFERENT_NONZERO_PATTERN);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if(this->_preconditioner)
+	this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
+    }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
@@ -682,8 +1241,16 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Solve the linear system
-  ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if(_restrict_solve_to_is!=NULL)
+    {
+      ierr = KSPSolve (_ksp, subrhs, subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+  else
+    {
+      ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 	 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
@@ -692,6 +1259,52 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  if(_restrict_solve_to_is!=NULL)
+    {
+      switch(_subset_solve_mode)
+	{
+	case SUBSET_ZERO:
+	  ierr = VecZeroEntries(solution->vec());
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  break;
+
+	case SUBSET_COPY_RHS:
+	  ierr = VecCopy(rhs->vec(),solution->vec());
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  break;
+
+	case SUBSET_DONT_TOUCH:
+	  /* Nothing to do here.  */
+	  break;
+
+	}
+      ierr = VecScatterBegin(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      ierr = VecScatterDestroy(scatter);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if(this->_preconditioner)
+	{
+	  /* Before we delete subprecond_matrix, we should give the
+	     _preconditioner a different matrix.  */
+	  this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
+	  delete subprecond_matrix;
+	  subprecond_matrix = NULL;
+	}
+
+      ierr = VecDestroy(subsolution);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = VecDestroy(subrhs);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatDestroy(submat);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatDestroy(subprecond);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 
   // Destroy the matrix.
   ierr = MatDestroy(mat);
@@ -902,6 +1515,36 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, 
 
   /* Call the user function.  */
   shell_matrix.vector_mult(dest_global,arg_global);
+
+  return ierr;
+}
+
+
+
+template <typename T>
+PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec arg, Vec add, Vec dest)
+{
+  /* Get the matrix context.  */
+  int ierr=0;
+  void* ctx;
+  ierr = MatShellGetContext(mat,&ctx);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  /* Get user shell matrix object.  */
+  const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
+
+  /* Make \p NumericVector instances around the vectors.  */
+  PetscVector<T> arg_global(arg);
+  PetscVector<T> dest_global(dest);
+  PetscVector<T> add_global(add);
+
+  if(add!=arg)
+    {
+      arg_global = add_global;
+    }
+
+  /* Call the user function.  */
+  shell_matrix.vector_mult_add(dest_global,arg_global);
 
   return ierr;
 }
