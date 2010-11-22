@@ -766,7 +766,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 #if PETSC_VERSION_LESS_THAN(3,1,0)
   if(_restrict_solve_to_is!=NULL)
     {
-      libmesh::out << "The current implementation of subset solves with "
+      libMesh::out << "The current implementation of subset solves with "
 		   << "shell matrices requires PETSc version 3.1 or above.  "
 		   << "Older PETSc version do not support automatic "
 		   << "submatrix generation of shell matrices."
@@ -1042,7 +1042,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 #if PETSC_VERSION_LESS_THAN(3,1,0)
   if(_restrict_solve_to_is!=NULL)
     {
-      libmesh::out << "The current implementation of subset solves with "
+      libMesh::out << "The current implementation of subset solves with "
 		   << "shell matrices requires PETSc version 3.1 or above.  "
 		   << "Older PETSc version do not support automatic "
 		   << "submatrix generation of shell matrices."
