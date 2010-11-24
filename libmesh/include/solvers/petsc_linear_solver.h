@@ -351,6 +351,9 @@ void
 PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &vec_in)
 {
   libmesh_assert(_restrict_solve_to_is!=NULL);
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+  libmesh_not_implemented();
+#else
   if(_restrict_solve_to_is_complement==NULL)
     {
       int ierr = ISComplement(_restrict_solve_to_is,
@@ -359,6 +362,7 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &vec_in)
 			      &_restrict_solve_to_is_complement);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
+#endif
 }
 
 
