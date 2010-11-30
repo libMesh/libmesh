@@ -19,7 +19,7 @@
 
 
 
- // <h1>Example 42 - Solving a 1D, 2D, or 3D Poisson on a subdomain</h1>
+ // <h1>Example 25 - Solving a 1D, 2D, or 3D Poisson on a subdomain</h1>
  //
  // This example builds on the example 4 by showing what to do in
  // order to solve an equation only on a subdomain.
@@ -97,6 +97,10 @@ int main (int argc, char** argv)
 {
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
+
+  // Only our PETSc interface currently supports solves restricted to
+  // subdomains
+  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Declare a performance log for the main program
   // PerfLog perf_main("Main Program");
