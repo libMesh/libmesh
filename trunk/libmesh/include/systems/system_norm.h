@@ -101,6 +101,22 @@ public:
   bool is_discrete() const;
 
   /**
+   * Returns the weighted norm v^T*W*v where W represents our
+   * weights matrix or weights vector times identity matrix.
+   */
+  Real calculate_norm(const std::vector<Real>& v);
+
+  /**
+   * Returns the weighted inner product v1^T*W*v2 where R is our weights
+   */
+  Real calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2);
+
+   /**
+   * Returns true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false   
+   */
+  bool is_identity();
+
+  /**
    * Returns the type of the norm in variable \p var
    */
   FEMNormType type(unsigned int var) const;
@@ -121,21 +137,17 @@ public:
   void set_weight(unsigned int var, Real w);
 
   /**
+   * Sets the weight corresponding to the norm from the variable pair v1(var1) coming from v2(var2). See calculate_norm
+   */
+  void set_off_diagonal_weight(unsigned int i, unsigned int j, Real w);
+
+  /**
    * Returns the squared weight corresponding to the norm in variable
    * \p var.  We cache that at construction time to save a few flops.
    */
   Real weight_sq(unsigned int var) const;
 
-  /**
-   * Returns the weighted norm v^T*W*v where W represents our
-   * weights matrix or weights vector times identity matrix.
-   */
-  Real calculate_norm(const std::vector<Real>& v);
 
-  /**
-   * Returns the weighted inner product v1^T*W*v2 where R is our weights
-   */
-  Real calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2);
 
 private:
   std::vector<FEMNormType> _norms;
@@ -297,6 +309,25 @@ void SystemNorm::set_weight(unsigned int var, Real w)
   _weights_sq[var] = w*w;
 }
 
+inline
+  void SystemNorm::set_off_diagonal_weight(unsigned int i, unsigned int j, Real w)
+{
+  libmesh_assert (!_weights.empty());
+  
+  if (i >= _off_diagonal_weights.size())
+    {      
+      _off_diagonal_weights.resize(i+1);      
+    }
+
+  if (j >= _off_diagonal_weights[i].size())
+    {
+      _off_diagonal_weights[i].resize(j+1, 0.);
+    }
+
+  _off_diagonal_weights[i][j] = w;
+  
+}
+
 
 inline
 Real SystemNorm::weight_sq(unsigned int var) const
@@ -354,14 +385,40 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<R
     return(val);
   }
 
-
 inline
 Real SystemNorm::calculate_norm(const std::vector<Real>& v1) 
 {
   return this->calculate_norm(v1,v1);
 }
 
+inline
+bool SystemNorm::is_identity()
+{
+  unsigned int nrows = this->_off_diagonal_weights.size();
+  
+  // If any of the off-diagonal elements is not 0, then we are in the non-identity case
+  for(unsigned int i = 0; i != nrows; i++)
+    {
+      unsigned int ncols = this->_off_diagonal_weights[i].size();
+      for(unsigned int j = 0; j != ncols; j++)
+        {
+          if(_off_diagonal_weights[i][j] != 0)
+            {
+              return(false);
+            }
+        }
+    }
 
+  // If any of the diagonal elements is not 1, then we are in the non-identity case
+  nrows = this->_weights.size();
+  for(unsigned int i = 0; i != nrows; i++)
+    if(_weights[i] != 1)
+      return(false);
+
+  // If all the off-diagonals elements are 0, and diagonal elements 1, then we are in an identity case
+  return(true);
+}
+	
 } // namespace libMesh
 
 #endif // #define __system_norm_h__
