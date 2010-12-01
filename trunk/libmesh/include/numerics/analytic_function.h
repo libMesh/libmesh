@@ -93,6 +93,11 @@ public:
   void init ();
 
   /**
+   * Clears the function.
+   */
+  void clear ();
+
+  /**
    * @returns the value at point \p p and time 
    * \p time, which defaults to zero.
    */
