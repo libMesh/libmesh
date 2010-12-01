@@ -74,4 +74,17 @@ void AnalyticFunction::init ()
   this->_initialized = true;
 }
 
+
+
+void AnalyticFunction::clear ()
+{
+  // We probably need a method to reset these later...
+  _number_fptr = NULL;
+  _vector_fptr = NULL;
+
+  // definitely not ready
+  this->_initialized = false;
+}
+
+
 } // namespace libMesh
