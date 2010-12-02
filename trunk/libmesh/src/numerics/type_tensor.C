@@ -42,7 +42,7 @@ void TypeTensor<T>::print(std::ostream& os) const
 {
 #if LIBMESH_DIM == 1
   
-  os << "x=" << (*this)(0) << std::endl;
+  os << "x=" << (*this)(0,0) << std::endl;
   
 #endif
 #if LIBMESH_DIM == 2
