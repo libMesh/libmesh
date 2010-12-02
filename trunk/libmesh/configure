@@ -8884,21 +8884,11 @@ fi
       slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
 
 
-      if (test $slepcversion != $petscversion) ; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: WARNING:" >&5
-$as_echo "WARNING:" >&6; }
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Different version numbers for SLEPc and PETSc <<<" >&5
-$as_echo ">>> Different version numbers for SLEPc and PETSc <<<" >&6; }
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: Will skip SLEPc support" >&5
-$as_echo "Will skip SLEPc support" >&6; }
-        enableslepc=no
-      else
 
 $as_echo "#define HAVE_SLEPC 1" >>confdefs.h
 
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
 $as_echo "<<< Configuring library with SLEPc version $slepcversion support >>>" >&6; }
-      fi
     else
       enableslepc=no
     fi
