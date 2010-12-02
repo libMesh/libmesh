@@ -53,7 +53,7 @@ Basic include files needed for overall functionality.
         #include "libmesh_logging.h"
         #include "mesh.h"
         #include "mesh_generation.h"
-        #include "gmv_io.h"
+        #include "exodusII_io.h"
         #include "equation_systems.h"
         #include "elem.h"
         
@@ -140,6 +140,28 @@ data about the mesh when reading in files, etc.
 </pre>
 </div>
 <div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
+This problem is only defined on complex-valued fields, for
+which libMesh must be configured with Number == complex.
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+        #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+</pre>
+</div>
+<div class = "comment">
 Function prototype.  This is the function that will assemble
 the mass, damping and stiffness matrices.  It will <i>not</i>
 form an overall system matrix ready for solution.
@@ -148,7 +170,7 @@ form an overall system matrix ready for solution.
 <div class ="fragment">
 <pre>
         void assemble_helmholtz(EquationSystems& es,
-        			const std::string& system_name);
+                                const std::string& system_name);
         
 </pre>
 </div>
@@ -161,7 +183,8 @@ to the overall matrix, which then renders ready for solution.
 <div class ="fragment">
 <pre>
         void add_M_C_K_helmholtz(EquationSystems& es,
-        			 const std::string& system_name);
+                                 const std::string& system_name);
+        #endif
         
 </pre>
 </div>
@@ -182,12 +205,12 @@ routines in both libraries.
 </pre>
 </div>
 <div class = "comment">
-Initialize Petsc, like in example 2.
+Initialize libraries, like in example 2.
 </div>
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
+          LibMeshInit init (argc, argv);
           
 </pre>
 </div>
@@ -197,25 +220,10 @@ This example is designed for complex numbers.
 
 <div class ="fragment">
 <pre>
-        #ifndef USE_COMPLEX_NUMBERS
-        
-          std::cerr &lt;&lt; "ERROR: This example is intended for " &lt;&lt; std::endl
-        	    &lt;&lt; " use with complex numbers." &lt;&lt; std::endl;
-          here();
-        
-          return 0;
-        
+        #ifndef LIBMESH_USE_COMPLEX_NUMBERS
+          libmesh_example_assert(false, "--enable-complex");
         #else
           
-</pre>
-</div>
-<div class = "comment">
-Braces are used to force object scope, like in example 2
-</div>
-
-<div class ="fragment">
-<pre>
-          {
 </pre>
 </div>
 <div class = "comment">
@@ -224,14 +232,25 @@ Check for proper usage.
 
 <div class ="fragment">
 <pre>
-            if (argc &lt; 3)
-              {
-        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -f [frequency]"
-        		  &lt;&lt; std::endl;
-        	
-        	error();
-              }
-            
+          if (argc &lt; 3)
+            {
+              if (libMesh::processor_id() == 0)
+                std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -f [frequency]"
+                          &lt;&lt; std::endl;
+              
+              libmesh_error();
+            }
+        
+          if (libMesh::n_processors() &gt; 1)
+            {
+              if (libMesh::processor_id() == 0)
+                {
+                  std::cerr &lt;&lt; "ERROR: Skipping example 7. " &lt;&lt; std::endl;
+                  std::cerr &lt;&lt; "MeshData objects currently only work in serial." &lt;&lt; std::endl;
+                }
+              return 0;
+            }
+          
 </pre>
 </div>
 <div class = "comment">
@@ -240,27 +259,16 @@ Tell the user what we are doing.
 
 <div class ="fragment">
 <pre>
-            else 
-              {
-        	std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-        	
-        	for (int i=1; i&lt;argc; i++)
-        	  std::cout &lt;&lt; " " &lt;&lt; argv[i];
-        	
-        	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-              }
-            
-</pre>
-</div>
-<div class = "comment">
-For now, restrict to dim=2, though this
-may easily be changed, see example 4
-</div>
-
-<div class ="fragment">
-<pre>
-            const unsigned int dim = 2;
-            
+          else 
+            {
+              std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
+              
+              for (int i=1; i&lt;argc; i++)
+                std::cout &lt;&lt; " " &lt;&lt; argv[i];
+              
+              std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+            }
+          
 </pre>
 </div>
 <div class = "comment">
@@ -270,18 +278,28 @@ currently, solve for 1/3rd, 2/3rd and 1/1th of the given frequency
 
 <div class ="fragment">
 <pre>
-            const Real frequency_in = atof(argv[2]);
-            const unsigned int n_frequencies = 3;        
-            
+          const Real frequency_in = atof(argv[2]);
+          const unsigned int n_frequencies = 3;        
+          
 </pre>
 </div>
 <div class = "comment">
-Create a dim-dimensional mesh.
+Skip this 2D example if libMesh was compiled as 1D-only.
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (dim);
+          libmesh_example_assert(2 &lt;= LIBMESH_DIM, "2D support");
+          
+</pre>
+</div>
+<div class = "comment">
+Create a mesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh;
         
 </pre>
 </div>
@@ -293,8 +311,8 @@ cf. example 12.
 
 <div class ="fragment">
 <pre>
-            MeshData mesh_data(mesh);
-            mesh_data.activate();
+          MeshData mesh_data(mesh);
+          mesh_data.activate();
         
 </pre>
 </div>
@@ -305,7 +323,7 @@ an L--shaped domain in .unv format.
 
 <div class ="fragment">
 <pre>
-            mesh.read("lshape.unv", &mesh_data);
+          mesh.read("lshape.unv", &mesh_data);
         
 </pre>
 </div>
@@ -315,7 +333,7 @@ Print information about the mesh to the screen.
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();    
+          mesh.print_info();    
         
 </pre>
 </div>
@@ -328,7 +346,7 @@ velocities.
 
 <div class ="fragment">
 <pre>
-            mesh_data.read("lshape_data.unv");
+          mesh_data.read("lshape_data.unv");
         
 </pre>
 </div>
@@ -338,7 +356,7 @@ Print information about the mesh to the screen.
 
 <div class ="fragment">
 <pre>
-            mesh_data.print_info();
+          mesh_data.print_info();
         
 </pre>
 </div>
@@ -351,8 +369,8 @@ accessed in the matrix and rhs assembly.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh, &mesh_data);
-            
+          EquationSystems equation_systems (mesh, &mesh_data);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -362,9 +380,9 @@ reference to it.
 
 <div class ="fragment">
 <pre>
-            FrequencySystem & f_system =      
-              equation_systems.add_system&lt;FrequencySystem&gt; ("Helmholtz");
-            
+          FrequencySystem & f_system =      
+            equation_systems.add_system&lt;FrequencySystem&gt; ("Helmholtz");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -374,8 +392,8 @@ will be approximated using second-order approximation.
 
 <div class ="fragment">
 <pre>
-            f_system.add_variable("p", SECOND);
-            
+          f_system.add_variable("p", SECOND);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -386,9 +404,9 @@ solve function has to be attached.
 
 <div class ="fragment">
 <pre>
-            f_system.attach_assemble_function (assemble_helmholtz);
-            f_system.attach_solve_function    (add_M_C_K_helmholtz);
-            
+          f_system.attach_assemble_function (assemble_helmholtz);
+          f_system.attach_solve_function    (add_M_C_K_helmholtz);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -402,11 +420,11 @@ fast matrix addition method can be used, as will be shown later.
 
 <div class ="fragment">
 <pre>
-            f_system.add_matrix ("stiffness");
-            f_system.add_matrix ("damping");
-            f_system.add_matrix ("mass");
-            f_system.add_vector ("rhs");
-            
+          f_system.add_matrix ("stiffness");
+          f_system.add_matrix ("damping");
+          f_system.add_matrix ("mass");
+          f_system.add_vector ("rhs");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -419,10 +437,10 @@ Will solve for 1/3rd, 2/3rd and 1/1th of the given frequency
 
 <div class ="fragment">
 <pre>
-            f_system.set_frequencies_by_steps (frequency_in/n_frequencies,
-        				       frequency_in,
-        				       n_frequencies);
-            
+          f_system.set_frequencies_by_steps (frequency_in/n_frequencies,
+                                             frequency_in,
+                                             n_frequencies);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -434,9 +452,9 @@ these may be overridden, as shown here.
 
 <div class ="fragment">
 <pre>
-            equation_systems.parameters.set&lt;Real&gt; ("wave speed") = 1.;
-            equation_systems.parameters.set&lt;Real&gt; ("rho")        = 1.;
-            
+          equation_systems.parameters.set&lt;Real&gt; ("wave speed") = 1.;
+          equation_systems.parameters.set&lt;Real&gt; ("rho")        = 1.;
+          
 </pre>
 </div>
 <div class = "comment">
@@ -446,8 +464,8 @@ prior to this, the frequencies have to be communicated to the system.
 
 <div class ="fragment">
 <pre>
-            equation_systems.init ();
-            
+          equation_systems.init ();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -456,10 +474,10 @@ Prints information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-            equation_systems.print_info ();
+          equation_systems.print_info ();
         
-            for (unsigned int n=0; n &lt; n_frequencies; n++)
-              {
+          for (unsigned int n=0; n &lt; n_frequencies; n++)
+            {
 </pre>
 </div>
 <div class = "comment">
@@ -473,41 +491,37 @@ the system only for specific frequencies.
 
 <div class ="fragment">
 <pre>
-                f_system.solve (n,n);
-        	
+              f_system.solve (n,n);
+              
 </pre>
 </div>
 <div class = "comment">
 After solving the system, write the solution
-to a GMV-formatted plot file, for every frequency.  
-Now this is nice ;-) : we have the <i>identical</i> 
-interface to the mesh write method as in the real-only 
-case, but we output the real and imaginary 
-part, and the magnitude, where the variable 
-"p" is prepended with "r_", "i_", and "a_", 
-respectively.
+to an ExodusII-formatted plot file, for every frequency.  
 </div>
 
 <div class ="fragment">
 <pre>
-                char buf[14];
-        	sprintf (buf, "out%04d.gmv", n);
-        	GMVIO(mesh).write_equation_systems (buf,
-        					    equation_systems);
-              }
-            
+              char buf[14];
+              sprintf (buf, "out%04d.exd", n);
+        
+              ExodusII_IO(mesh).write_equation_systems (buf,
+                                                  equation_systems);
+            }
+          
 </pre>
 </div>
 <div class = "comment">
 Alternatively, the whole EquationSystems object can be
 written to disk.  By default, the additional vectors are also
 saved.
-</div>
+
+
+<br><br></div>
 
 <div class ="fragment">
 <pre>
-            equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
-          }
+          equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
           
 </pre>
 </div>
@@ -517,12 +531,13 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close ();
+          return 0;
         
         #endif 
         }
         
         
+        #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 </pre>
 </div>
 <div class = "comment">
@@ -534,9 +549,8 @@ called to form the stiffness matrix and right-hand side.
 <div class ="fragment">
 <pre>
         void assemble_helmholtz(EquationSystems& es,
-        			const std::string& system_name)
+                                const std::string& system_name)
         {
-        #ifdef USE_COMPLEX_NUMBERS
             
 </pre>
 </div>
@@ -547,7 +561,7 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Helmholtz");
+          libmesh_assert (system_name == "Helmholtz");
           
 </pre>
 </div>
@@ -557,7 +571,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
           
 </pre>
 </div>
@@ -758,8 +772,8 @@ contribution.
 
 <div class ="fragment">
 <pre>
-          MeshBase::const_element_iterator           el = mesh.local_elements_begin();
-          const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+          MeshBase::const_element_iterator           el = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
           
           for ( ; el != end_el; ++el)
             {
@@ -823,11 +837,11 @@ is quite necessary.
               {
                 const unsigned int n_dof_indices = dof_indices.size();
         
-        	Ke.resize          (n_dof_indices, n_dof_indices);
-        	Ce.resize          (n_dof_indices, n_dof_indices);
-        	Me.resize          (n_dof_indices, n_dof_indices);
-        	zero_matrix.resize (n_dof_indices, n_dof_indices);
-        	Fe.resize          (n_dof_indices);
+                Ke.resize          (n_dof_indices, n_dof_indices);
+                Ce.resize          (n_dof_indices, n_dof_indices);
+                Me.resize          (n_dof_indices, n_dof_indices);
+                zero_matrix.resize (n_dof_indices, n_dof_indices);
+                Fe.resize          (n_dof_indices);
               }
               
 </pre>
@@ -852,7 +866,7 @@ the numeric integration.
               START_LOG("stiffness & mass","assemble_helmholtz");
         
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-        	{
+                {
 </pre>
 </div>
 <div class = "comment">
@@ -866,12 +880,12 @@ Real*(Point*Point) = Real, and not something else...
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    for (unsigned int j=0; j&lt;phi.size(); j++)
-        	      {
-        		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-        		Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
-        	      }	  
-        	}
+                    for (unsigned int j=0; j&lt;phi.size(); j++)
+                      {
+                        Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                        Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
+                      }          
+                }
         
               STOP_LOG("stiffness & mass","assemble_helmholtz");
         
@@ -885,17 +899,17 @@ element lies on the boundary.
 <br><br>The following loops over the sides of the element.
 If the element has no neighbor on a side then that
 side MUST live on a boundary of the domain.
-	 
+         
 
 <br><br></div>
 
 <div class ="fragment">
 <pre>
               for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-        	if (elem-&gt;neighbor(side) == NULL)
-        	  {
-        	    START_LOG("damping","assemble_helmholtz");
-        	      
+                if (elem-&gt;neighbor(side) == NULL)
+                  {
+                    START_LOG("damping","assemble_helmholtz");
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -906,7 +920,7 @@ boundary integration.
 <div class ="fragment">
 <pre>
                     AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -918,7 +932,7 @@ of the element.
 <div class ="fragment">
 <pre>
                     QGauss qface(dim-1, SECOND);
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -929,7 +943,7 @@ quadrature rule.
 <div class ="fragment">
 <pre>
                     fe_face-&gt;attach_quadrature_rule (&qface);
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -940,8 +954,8 @@ points.
 <div class ="fragment">
 <pre>
                     const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face =
-        	      fe_face-&gt;get_phi();
-        	      
+                      fe_face-&gt;get_phi();
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -952,7 +966,7 @@ points on the face.
 <div class ="fragment">
 <pre>
                     const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -963,7 +977,7 @@ face.
 <div class ="fragment">
 <pre>
                     fe_face-&gt;reinit(elem, side);
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -974,7 +988,7 @@ at some parts of the bounfdary
 <div class ="fragment">
 <pre>
                     const Real an_value = 1.;
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -984,8 +998,8 @@ Loop over the face quadrature points for integration.
 <div class ="fragment">
 <pre>
                     for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-        	      {
-        		
+                      {
+                        
 </pre>
 </div>
 <div class = "comment">
@@ -996,18 +1010,29 @@ admittance boundary conditions.
 <div class ="fragment">
 <pre>
                         for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		  for (unsigned int j=0; j&lt;phi_face.size(); j++)
-        		    Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
-        	      }
+                          for (unsigned int j=0; j&lt;phi_face.size(); j++)
+                            Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
+                      }
         
-        	    STOP_LOG("damping","assemble_helmholtz");
-        	  }
+                    STOP_LOG("damping","assemble_helmholtz");
+                  }
         
-             
 </pre>
 </div>
 <div class = "comment">
-Finally, simply add the contributions to the additional
+If this assembly program were to be used on an adaptive mesh,
+we would have to apply any hanging node constraint equations
+by uncommenting the following lines:
+std::vector<unsigned int> dof_indicesC = dof_indices;
+std::vector<unsigned int> dof_indicesM = dof_indices;
+dof_map.constrain_element_matrix (Ke, dof_indices);
+dof_map.constrain_element_matrix (Ce, dof_indicesC);
+dof_map.constrain_element_matrix (Me, dof_indicesM);
+
+
+<br><br>     
+
+<br><br>Finally, simply add the contributions to the additional
 matrices and vector.
 </div>
 
@@ -1067,7 +1092,7 @@ i.e. one value per node
 
 <div class ="fragment">
 <pre>
-            assert(mesh_data.n_val_per_node() == 1);
+            libmesh_assert(mesh_data.n_val_per_node() == 1);
         
             MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
             const MeshBase::const_node_iterator node_end = mesh.nodes_end();
@@ -1094,8 +1119,8 @@ and do for all components
 <div class ="fragment">
 <pre>
                 if (mesh_data.has_data(node))
-        	  for (unsigned int comp=0; comp&lt;node-&gt;n_comp(0,0); comp++)
-        	    {
+                  for (unsigned int comp=0; comp&lt;node-&gt;n_comp(0,0); comp++)
+                    {
 </pre>
 </div>
 <div class = "comment">
@@ -1115,7 +1140,7 @@ set the nodal value
 <div class ="fragment">
 <pre>
                       freq_indep_rhs.set(dn, mesh_data.get_data(node)[0]);
-        	    }
+                    }
               }
          
         
@@ -1130,7 +1155,6 @@ All done!
 
 <div class ="fragment">
 <pre>
-        #endif
         }
         
         
@@ -1145,10 +1169,8 @@ damping matrices into a single system matrix.
 <div class ="fragment">
 <pre>
         void add_M_C_K_helmholtz(EquationSystems& es,
-        			 const std::string& system_name)
+                                 const std::string& system_name)
         {
-        #ifdef USE_COMPLEX_NUMBERS
-        
           START_LOG("init phase","add_M_C_K_helmholtz");
           
 </pre>
@@ -1160,7 +1182,7 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Helmholtz");
+          libmesh_assert (system_name == "Helmholtz");
           
 </pre>
 </div>
@@ -1299,9 +1321,9 @@ The "matrix" and "rhs" are now ready for solution
 
 <div class ="fragment">
 <pre>
-        #endif
         }
         
+        #endif // LIBMESH_USE_COMPLEX_NUMBERS
 </pre>
 </div>
 
@@ -1317,7 +1339,7 @@ The "matrix" and "rhs" are now ready for solution
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh_logging.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
@@ -1337,116 +1359,126 @@ The "matrix" and "rhs" are now ready for solution
   
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_data.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
+  
+  #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_helmholtz(EquationSystems&amp; es,
-  			<B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+                          <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   <B><FONT COLOR="#228B22">void</FONT></B> add_M_C_K_helmholtz(EquationSystems&amp; es,
-  			 <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+                           <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+  #endif
   
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
+    LibMeshInit init (argc, argv);
     
-  #ifndef USE_COMPLEX_NUMBERS
-  
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example is intended for &quot;</FONT></B> &lt;&lt; std::endl
-  	    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; use with complex numbers.&quot;</FONT></B> &lt;&lt; std::endl;
-    here();
-  
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
-  
+  #ifndef LIBMESH_USE_COMPLEX_NUMBERS
+    libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-complex&quot;</FONT></B>);
   #<B><FONT COLOR="#A020F0">else</FONT></B>
     
-    {
-      <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -f [frequency]&quot;</FONT></B>
-  		  &lt;&lt; std::endl;
-  	
-  	error();
-        }
-      
-      <B><FONT COLOR="#A020F0">else</FONT></B> 
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
-  	
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
-  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
-  	
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-        }
-      
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;
-      
-      <B><FONT COLOR="#228B22">const</FONT></B> Real frequency_in = atof(argv[2]);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_frequencies = 3;        
-      
-      Mesh mesh (dim);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
+      {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::processor_id() == 0)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -f [frequency]&quot;</FONT></B>
+                    &lt;&lt; std::endl;
+        
+        libmesh_error();
+      }
   
-      MeshData mesh_data(mesh);
-      mesh_data.activate();
-  
-      mesh.read(<B><FONT COLOR="#BC8F8F">&quot;lshape.unv&quot;</FONT></B>, &amp;mesh_data);
-  
-      mesh.print_info();    
-  
-      mesh_data.read(<B><FONT COLOR="#BC8F8F">&quot;lshape_data.unv&quot;</FONT></B>);
-  
-      mesh_data.print_info();
-  
-      EquationSystems equation_systems (mesh, &amp;mesh_data);
-      
-      FrequencySystem &amp; f_system =      
-        equation_systems.add_system&lt;FrequencySystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Helmholtz&quot;</FONT></B>);
-      
-      f_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, SECOND);
-      
-      f_system.attach_assemble_function (assemble_helmholtz);
-      f_system.attach_solve_function    (add_M_C_K_helmholtz);
-      
-      f_system.add_matrix (<B><FONT COLOR="#BC8F8F">&quot;stiffness&quot;</FONT></B>);
-      f_system.add_matrix (<B><FONT COLOR="#BC8F8F">&quot;damping&quot;</FONT></B>);
-      f_system.add_matrix (<B><FONT COLOR="#BC8F8F">&quot;mass&quot;</FONT></B>);
-      f_system.add_vector (<B><FONT COLOR="#BC8F8F">&quot;rhs&quot;</FONT></B>);
-      
-      f_system.set_frequencies_by_steps (frequency_in/n_frequencies,
-  				       frequency_in,
-  				       n_frequencies);
-      
-      equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;wave speed&quot;</FONT></B>) = 1.;
-      equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;rho&quot;</FONT></B>)        = 1.;
-      
-      equation_systems.init ();
-      
-      equation_systems.print_info ();
-  
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n &lt; n_frequencies; n++)
-        {
-  	f_system.solve (n,n);
-  	
-  	<B><FONT COLOR="#228B22">char</FONT></B> buf[14];
-  	sprintf (buf, <B><FONT COLOR="#BC8F8F">&quot;out%04d.gmv&quot;</FONT></B>, n);
-  	GMVIO(mesh).write_equation_systems (buf,
-  					    equation_systems);
-        }
-      
-      equation_systems.write (<B><FONT COLOR="#BC8F8F">&quot;eqn_sys.dat&quot;</FONT></B>, libMeshEnums::WRITE);
-    }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::n_processors() &gt; 1)
+      {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::processor_id() == 0)
+          {
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: Skipping example 7. &quot;</FONT></B> &lt;&lt; std::endl;
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;MeshData objects currently only work in serial.&quot;</FONT></B> &lt;&lt; std::endl;
+          }
+        <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+      }
     
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    <B><FONT COLOR="#A020F0">else</FONT></B> 
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+        
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+        
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+      }
+    
+    <B><FONT COLOR="#228B22">const</FONT></B> Real frequency_in = atof(argv[2]);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_frequencies = 3;        
+    
+    libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
+    
+    Mesh mesh;
+  
+    MeshData mesh_data(mesh);
+    mesh_data.activate();
+  
+    mesh.read(<B><FONT COLOR="#BC8F8F">&quot;lshape.unv&quot;</FONT></B>, &amp;mesh_data);
+  
+    mesh.print_info();    
+  
+    mesh_data.read(<B><FONT COLOR="#BC8F8F">&quot;lshape_data.unv&quot;</FONT></B>);
+  
+    mesh_data.print_info();
+  
+    EquationSystems equation_systems (mesh, &amp;mesh_data);
+    
+    FrequencySystem &amp; f_system =      
+      equation_systems.add_system&lt;FrequencySystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Helmholtz&quot;</FONT></B>);
+    
+    f_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, SECOND);
+    
+    f_system.attach_assemble_function (assemble_helmholtz);
+    f_system.attach_solve_function    (add_M_C_K_helmholtz);
+    
+    f_system.add_matrix (<B><FONT COLOR="#BC8F8F">&quot;stiffness&quot;</FONT></B>);
+    f_system.add_matrix (<B><FONT COLOR="#BC8F8F">&quot;damping&quot;</FONT></B>);
+    f_system.add_matrix (<B><FONT COLOR="#BC8F8F">&quot;mass&quot;</FONT></B>);
+    f_system.add_vector (<B><FONT COLOR="#BC8F8F">&quot;rhs&quot;</FONT></B>);
+    
+    f_system.set_frequencies_by_steps (frequency_in/n_frequencies,
+                                       frequency_in,
+                                       n_frequencies);
+    
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;wave speed&quot;</FONT></B>) = 1.;
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;rho&quot;</FONT></B>)        = 1.;
+    
+    equation_systems.init ();
+    
+    equation_systems.print_info ();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n &lt; n_frequencies; n++)
+      {
+        f_system.solve (n,n);
+        
+        <B><FONT COLOR="#228B22">char</FONT></B> buf[14];
+        sprintf (buf, <B><FONT COLOR="#BC8F8F">&quot;out%04d.exd&quot;</FONT></B>, n);
+  
+        ExodusII_IO(mesh).write_equation_systems (buf,
+                                            equation_systems);
+      }
+    
+  
+    equation_systems.write (<B><FONT COLOR="#BC8F8F">&quot;eqn_sys.dat&quot;</FONT></B>, libMeshEnums::WRITE);
+    
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   
   #endif 
   }
   
   
+  #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_helmholtz(EquationSystems&amp; es,
-  			<B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+                          <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-  #ifdef USE_COMPLEX_NUMBERS
       
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Helmholtz&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Helmholtz&quot;</FONT></B>);
     
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
     
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
     
@@ -1484,8 +1516,8 @@ The "matrix" and "rhs" are now ready for solution
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
   
-    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator           el = mesh.local_elements_begin();
-    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator           el = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
@@ -1500,11 +1532,11 @@ The "matrix" and "rhs" are now ready for solution
         {
           <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_dof_indices = dof_indices.size();
   
-  	Ke.resize          (n_dof_indices, n_dof_indices);
-  	Ce.resize          (n_dof_indices, n_dof_indices);
-  	Me.resize          (n_dof_indices, n_dof_indices);
-  	zero_matrix.resize (n_dof_indices, n_dof_indices);
-  	Fe.resize          (n_dof_indices);
+          Ke.resize          (n_dof_indices, n_dof_indices);
+          Ce.resize          (n_dof_indices, n_dof_indices);
+          Me.resize          (n_dof_indices, n_dof_indices);
+          zero_matrix.resize (n_dof_indices, n_dof_indices);
+          Fe.resize          (n_dof_indices);
         }
         
         STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;assemble_helmholtz&quot;</FONT></B>);
@@ -1512,48 +1544,49 @@ The "matrix" and "rhs" are now ready for solution
         START_LOG(<B><FONT COLOR="#BC8F8F">&quot;stiffness &amp; mass&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;assemble_helmholtz&quot;</FONT></B>);
   
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-  	{
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
-  	      {
-  		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-  		Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
-  	      }	  
-  	}
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
+                {
+                  Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                  Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
+                }          
+          }
   
         STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;stiffness &amp; mass&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;assemble_helmholtz&quot;</FONT></B>);
   
-  	 
+           
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
-  	<B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
-  	  {
-  	    START_LOG(<B><FONT COLOR="#BC8F8F">&quot;damping&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;assemble_helmholtz&quot;</FONT></B>);
-  	      
-  	    AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-  	      
-  	    QGauss qface(dim-1, SECOND);
-  	      
-  	    fe_face-&gt;attach_quadrature_rule (&amp;qface);
-  	      
-  	    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face =
-  	      fe_face-&gt;get_phi();
-  	      
-  	    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-  	      
-  	    fe_face-&gt;reinit(elem, side);
-  	      
-  	    <B><FONT COLOR="#228B22">const</FONT></B> Real an_value = 1.;
-  	      
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
-  	      {
-  		
-  		<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
-  		    Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
-  	      }
+          <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
+            {
+              START_LOG(<B><FONT COLOR="#BC8F8F">&quot;damping&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;assemble_helmholtz&quot;</FONT></B>);
+                
+              AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
+                
+              QGauss qface(dim-1, SECOND);
+                
+              fe_face-&gt;attach_quadrature_rule (&amp;qface);
+                
+              <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face =
+                fe_face-&gt;get_phi();
+                
+              <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+                
+              fe_face-&gt;reinit(elem, side);
+                
+              <B><FONT COLOR="#228B22">const</FONT></B> Real an_value = 1.;
+                
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                {
+                  
+                  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
+                      Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
+                }
   
-  	    STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;damping&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;assemble_helmholtz&quot;</FONT></B>);
-  	  }
+              STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;damping&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;assemble_helmholtz&quot;</FONT></B>);
+            }
+  
   
        
         stiffness.add_matrix      (Ke, dof_indices);
@@ -1570,40 +1603,37 @@ The "matrix" and "rhs" are now ready for solution
       
       <B><FONT COLOR="#228B22">const</FONT></B> MeshData&amp; mesh_data = es.get_mesh_data();
   
-      assert(mesh_data.n_val_per_node() == 1);
+      libmesh_assert(mesh_data.n_val_per_node() == 1);
   
       <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_node_iterator       node_it  = mesh.nodes_begin();
       <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_node_iterator node_end = mesh.nodes_end();
       
       <B><FONT COLOR="#A020F0">for</FONT></B> ( ; node_it != node_end; ++node_it)
         {
-  	<B><FONT COLOR="#228B22">const</FONT></B> Node* node = *node_it;
+          <B><FONT COLOR="#228B22">const</FONT></B> Node* node = *node_it;
   
-  	<B><FONT COLOR="#A020F0">if</FONT></B> (mesh_data.has_data(node))
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> comp=0; comp&lt;node-&gt;n_comp(0,0); comp++)
-  	    {
-  	      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dn = node-&gt;dof_number(0,0,comp);
+          <B><FONT COLOR="#A020F0">if</FONT></B> (mesh_data.has_data(node))
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> comp=0; comp&lt;node-&gt;n_comp(0,0); comp++)
+              {
+                <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dn = node-&gt;dof_number(0,0,comp);
   
-  	      freq_indep_rhs.set(dn, mesh_data.get_data(node)[0]);
-  	    }
+                freq_indep_rhs.set(dn, mesh_data.get_data(node)[0]);
+              }
         }
    
   
       STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;rhs&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;assemble_helmholtz&quot;</FONT></B>);
     }
   
-  #endif
   }
   
   
   <B><FONT COLOR="#228B22">void</FONT></B> add_M_C_K_helmholtz(EquationSystems&amp; es,
-  			 <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+                           <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-  #ifdef USE_COMPLEX_NUMBERS
-  
     START_LOG(<B><FONT COLOR="#BC8F8F">&quot;init phase&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;add_M_C_K_helmholtz&quot;</FONT></B>);
     
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Helmholtz&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Helmholtz&quot;</FONT></B>);
     
     FrequencySystem &amp; f_system =
       es.get_system&lt;FrequencySystem&gt; (system_name);
@@ -1646,16 +1676,16 @@ The "matrix" and "rhs" are now ready for solution
   
     STOP_LOG(<B><FONT COLOR="#BC8F8F">&quot;global matrix &amp; vector additions&quot;</FONT></B>,<B><FONT COLOR="#BC8F8F">&quot;add_M_C_K_helmholtz&quot;</FONT></B>);
     
-  #endif
   }
   
+  #endif <I><FONT COLOR="#B22222">// LIBMESH_USE_COMPLEX_NUMBERS
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-*** Skipping Example  ./ex7-devel , only good with --enable-complex
-***************************************************************
+Compiling C++ (in optimized mode) ex7.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex7.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

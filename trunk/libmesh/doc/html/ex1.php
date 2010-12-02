@@ -20,15 +20,7 @@ information is printed to the screen, and the mesh is then
 written.
 
 
-<br><br></div>
-
-<div class ="fragment">
-<pre>
-        #undef SEEK_SET
-</pre>
-</div>
-<div class = "comment">
-C++ include files that we need
+<br><br>C++ include files that we need
 </div>
 
 <div class ="fragment">
@@ -53,6 +45,16 @@ Basic include files needed for the mesh functionality.
 <pre>
         #include "mesh.h"
         
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
         int main (int argc, char** argv)
         {
 </pre>
@@ -60,25 +62,15 @@ Basic include files needed for the mesh functionality.
 <div class = "comment">
 Initialize the library.  This is necessary because the library
 may depend on a number of other libraries (i.e. MPI  and Petsc)
-that require initialization before use.
+that require initialization before use.  When the LibMeshInit
+object goes out of scope, other libraries and resources are
+finalized.
 </div>
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
-</pre>
-</div>
-<div class = "comment">
-Force all our objects to have local scope.  By declaring
-libMesh objects in the next pair of braces we can assert
-that they will go out of scope (and should have been deleted)
-before we return from main.  This allows the library to do
-internal reference counting and assure memory is not leaked.
-</div>
-
-<div class ="fragment">
-<pre>
-          {    
+          LibMeshInit init (argc, argv);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -91,11 +83,12 @@ a filename to write the mesh into.
 
 <div class ="fragment">
 <pre>
-            if (argc &lt; 4)
-              {
-        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2 in.mesh [out.mesh]"
-        		  &lt;&lt; std::endl;
-        	
+          if (argc &lt; 4)
+            {
+              if (libMesh::processor_id() == 0)
+                std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -d 2 in.mesh [out.mesh]"
+                          &lt;&lt; std::endl;
+              
 </pre>
 </div>
 <div class = "comment">
@@ -106,9 +99,9 @@ exception handling.
 
 <div class ="fragment">
 <pre>
-                error();
-              }
-            
+              libmesh_error();
+            }
+          
 </pre>
 </div>
 <div class = "comment">
@@ -117,18 +110,28 @@ Get the dimensionality of the mesh from argv[2]
 
 <div class ="fragment">
 <pre>
-            const unsigned int dim = std::atoi(argv[2]);
-            
+          const unsigned int dim = std::atoi(argv[2]);
+        
 </pre>
 </div>
 <div class = "comment">
-Create a mesh with the requested dimension.
+Skip higher-dimensional examples on a lower-dimensional libMesh build
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh(dim);
-            
+          libmesh_example_assert(dim &lt;= LIBMESH_DIM, "2D/3D support");
+          
+</pre>
+</div>
+<div class = "comment">
+Create a mesh
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh;
+          
 </pre>
 </div>
 <div class = "comment">
@@ -137,9 +140,9 @@ Read the input mesh.
 
 <div class ="fragment">
 <pre>
-            mesh.read (argv[3]);
-            
-            mesh.find_neighbors();
+          mesh.read (argv[3]);
+          
+          mesh.find_neighbors();
         
 </pre>
 </div>
@@ -149,8 +152,8 @@ Print information about the mesh to the screen.
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();
-            
+          mesh.print_info();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -160,31 +163,21 @@ output file name.
 
 <div class ="fragment">
 <pre>
-            if (argc == 5)
-              mesh.write (argv[4]);
+          if (argc == 5)
+            mesh.write (argv[4]);
+        
 </pre>
 </div>
 <div class = "comment">
-At this closing brace all of our objects will be forced
-out of scope and will get deconstructed.
+All done.  libMesh objects are destroyed here.  Because the
+LibMeshInit object was created first, its destruction occurs
+last, and it's destructor finalizes any external libraries and
+checks for leaked memory.
 </div>
 
 <div class ="fragment">
 <pre>
-          }
-</pre>
-</div>
-<div class = "comment">
-All done.  Call the libMesh::close() function to close any
-external libraries and check for leaked memory.  To be absolutey
-certain this is called last we will return its value.  This
-also allows main to return nonzero if memory is leaked, which
-can be useful for testing purposes.
-</div>
-
-<div class ="fragment">
-<pre>
-          return libMesh::close();
+          return 0;
         }
 </pre>
 </div>
@@ -193,61 +186,49 @@ can be useful for testing purposes.
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
-  #undef SEEK_SET
   #include &lt;iostream&gt;
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
-    {    
-      <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 4)
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -d 2 in.mesh [out.mesh]&quot;</FONT></B>
-  		  &lt;&lt; std::endl;
-  	
-  	error();
-        }
-      
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = std::atoi(argv[2]);
-      
-      Mesh mesh(dim);
-      
-      mesh.read (argv[3]);
-      
-      mesh.find_neighbors();
+    LibMeshInit init (argc, argv);
   
-      mesh.print_info();
-      
-      <B><FONT COLOR="#A020F0">if</FONT></B> (argc == 5)
-        mesh.write (argv[4]);
-    }
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 4)
+      {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::processor_id() == 0)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -d 2 in.mesh [out.mesh]&quot;</FONT></B>
+                    &lt;&lt; std::endl;
+        
+        libmesh_error();
+      }
+    
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = std::atoi(argv[2]);
+  
+    libmesh_example_assert(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
+    
+    Mesh mesh;
+    
+    mesh.read (argv[3]);
+    
+    mesh.find_neighbors();
+  
+    mesh.print_info();
+    
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc == 5)
+      mesh.write (argv[4]);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex1-devel -d 3 ../../reference_elements/3D/one_hex27.xda
-***************************************************************
- 
- Mesh Information:
-  mesh_dimension()=3
-  spatial_dimension()=3
-  n_nodes()=27
-  n_elem()=1
-   n_local_elem()=1
-   n_active_elem()=1
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- 
-***************************************************************
-* Done Running Example  ./ex1-devel -d 3 ../../reference_elements/3D/one_hex27.xda
-***************************************************************
+Compiling C++ (in optimized mode) ex1.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex1.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

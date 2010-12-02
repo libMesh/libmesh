@@ -44,10 +44,10 @@ Basic include file needed for the mesh functionality.
 
 <div class ="fragment">
 <pre>
+        #include "exodusII_io.h"
         #include "libmesh.h"
         #include "mesh.h"
         #include "mesh_generation.h"
-        #include "gmv_io.h"
         #include "linear_implicit_system.h"
         #include "equation_systems.h"
         
@@ -121,6 +121,16 @@ The definition of a geometric element
 </pre>
 </div>
 <div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
 Function prototype.  This is similar to the Poisson
 assemble function of example 4.  
 </div>
@@ -128,7 +138,7 @@ assemble function of example 4.
 <div class ="fragment">
 <pre>
         void assemble_wave (EquationSystems& es,
-        		    const std::string& system_name);
+                            const std::string& system_name);
         
 </pre>
 </div>
@@ -148,7 +158,7 @@ Initialize libMesh, like in example 2.
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
+          LibMeshInit init (argc, argv);
           
 </pre>
 </div>
@@ -158,35 +168,20 @@ This example requires Infinite Elements
 
 <div class ="fragment">
 <pre>
-        #ifndef ENABLE_INFINITE_ELEMENTS
-        
-          std::cerr &lt;&lt; "ERROR: This example requires the library to be compiled with Infinite Element support!"
-        	    &lt;&lt; std::endl;
-          here();
-        
-          return 0;
-        
+        #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
+          libmesh_example_assert(false, "--enable-ifem");
         #else
           
 </pre>
 </div>
 <div class = "comment">
-Braces are used to force object scope, like in example 2      
+Skip this 3D example if libMesh was compiled as 1D/2D-only.
 </div>
 
 <div class ="fragment">
 <pre>
-          {        
-</pre>
-</div>
-<div class = "comment">
-For the moment, only allow 3D     
-</div>
-
-<div class ="fragment">
-<pre>
-            const unsigned int dim = 3; 
-            
+          libmesh_example_assert(3 &lt;= LIBMESH_DIM, "3D support");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -195,17 +190,17 @@ Tell the user what we are doing.
 
 <div class ="fragment">
 <pre>
-            std::cout &lt;&lt; "Running ex6 with dim = " &lt;&lt; dim &lt;&lt; std::endl &lt;&lt; std::endl;        
-            
+          std::cout &lt;&lt; "Running ex6 with dim = 3" &lt;&lt; std::endl &lt;&lt; std::endl;        
+          
 </pre>
 </div>
 <div class = "comment">
-Create a mesh with user-defined dimension 
+Create a mesh
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (dim);
+          Mesh mesh;
         
 </pre>
 </div>
@@ -216,13 +211,13 @@ on the square [-1,1]^3, of type Hex8.
 
 <div class ="fragment">
 <pre>
-            MeshTools::Generation::build_cube (mesh,
-        				       4, 4, 4,
-        				       -1., 1.,
-        				       -1., 1.,
-        				       -1., 1.,
-        				       HEX8);
-            
+          MeshTools::Generation::build_cube (mesh,
+                                             4, 4, 4,
+                                             -1., 1.,
+                                             -1., 1.,
+                                             -1., 1.,
+                                             HEX8);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -231,7 +226,7 @@ Print information about the mesh to the screen.
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();
+          mesh.print_info();
         
 </pre>
 </div>
@@ -241,8 +236,8 @@ Write the mesh before the infinite elements are added
 
 <div class ="fragment">
 <pre>
-            GMVIO(mesh).write ("orig_mesh.gmv");
-            
+          ExodusII_IO(mesh).write ("orig_mesh.exd");
+        
 </pre>
 </div>
 <div class = "comment">
@@ -265,8 +260,8 @@ verbose.
 
 <div class ="fragment">
 <pre>
-            InfElemBuilder builder(mesh);
-            builder.build_inf_elem(true);
+          InfElemBuilder builder(mesh);
+          builder.build_inf_elem(true);
         
 </pre>
 </div>
@@ -276,7 +271,7 @@ Print information about the mesh to the screen.
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();
+          mesh.print_info();
         
 </pre>
 </div>
@@ -287,8 +282,8 @@ Compare this to the original mesh.
 
 <div class ="fragment">
 <pre>
-            GMVIO(mesh).write ("ifems_added.gmv");
-            
+          ExodusII_IO(mesh).write ("ifems_added.exd");
+        
 </pre>
 </div>
 <div class = "comment">
@@ -298,8 +293,8 @@ the elements find their neighbors again.
 
 <div class ="fragment">
 <pre>
-            mesh.find_neighbors();
-            
+          mesh.find_neighbors();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -311,28 +306,20 @@ system possible.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh);
-            
+          EquationSystems equation_systems (mesh);
+          
 </pre>
 </div>
 <div class = "comment">
 Declare the system and its variables.
-</div>
-
-<div class ="fragment">
-<pre>
-            {
-</pre>
-</div>
-<div class = "comment">
 Create a system named "Wave".  This can
 be a simple, steady system
 </div>
 
 <div class ="fragment">
 <pre>
-              equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Wave");
-                    
+          equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Wave");
+                
 </pre>
 </div>
 <div class = "comment">
@@ -345,8 +332,8 @@ approximation.
 
 <div class ="fragment">
 <pre>
-              FEType fe_type(FIRST);
-              
+          FEType fe_type(FIRST);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -359,8 +346,8 @@ is used.
 
 <div class ="fragment">
 <pre>
-              equation_systems.get_system("Wave").add_variable("p", fe_type);
-              
+          equation_systems.get_system("Wave").add_variable("p", fe_type);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -370,8 +357,8 @@ function.
 
 <div class ="fragment">
 <pre>
-              equation_systems.get_system("Wave").attach_assemble_function (assemble_wave);
-              
+          equation_systems.get_system("Wave").attach_assemble_function (assemble_wave);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -382,9 +369,9 @@ so that \p assemble_wave() can access it.
 
 <div class ="fragment">
 <pre>
-              equation_systems.parameters.set&lt;Real&gt;("speed")          = 1.;
-              equation_systems.parameters.set&lt;Real&gt;("fluid density")  = 1.;
-              
+          equation_systems.parameters.set&lt;Real&gt;("speed")          = 1.;
+          equation_systems.parameters.set&lt;Real&gt;("fluid density")  = 1.;
+          
 </pre>
 </div>
 <div class = "comment">
@@ -393,8 +380,8 @@ Initialize the data structures for the equation system.
 
 <div class ="fragment">
 <pre>
-              equation_systems.init();
-              
+          equation_systems.init();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -403,9 +390,8 @@ Prints information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-              equation_systems.print_info();
-            }
-            
+          equation_systems.print_info();
+        
 </pre>
 </div>
 <div class = "comment">
@@ -414,8 +400,8 @@ Solve the system "Wave".
 
 <div class ="fragment">
 <pre>
-            equation_systems.get_system("Wave").solve();
-            
+          equation_systems.get_system("Wave").solve();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -431,8 +417,7 @@ infinite element.
 
 <div class ="fragment">
 <pre>
-            equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
-          }
+          equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
           
 </pre>
 </div>
@@ -442,9 +427,9 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close ();
+          return 0;
         
-        #endif // else part of ifndef ENABLE_INFINITE_ELEMENTS
+        #endif // else part of ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
         }
         
 </pre>
@@ -457,7 +442,7 @@ for the discrete form of our wave equation.
 <div class ="fragment">
 <pre>
         void assemble_wave(EquationSystems& es,
-        		   const std::string& system_name)
+                           const std::string& system_name)
         {
 </pre>
 </div>
@@ -468,10 +453,10 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Wave");
+          libmesh_assert (system_name == "Wave");
         
         
-        #ifdef ENABLE_INFINITE_ELEMENTS
+        #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
           
 </pre>
 </div>
@@ -481,7 +466,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -631,16 +616,12 @@ the element degrees of freedom get mapped.
 Now we will loop over all the elements in the mesh.
 We will compute the element matrix and right-hand-side
 contribution.
-const_local_elem_iterator           el (mesh.elements_begin());
-const const_local_elem_iterator end_el (mesh.elements_end());
-
-
-<br><br></div>
+</div>
 
 <div class ="fragment">
 <pre>
-          MeshBase::const_element_iterator           el = mesh.local_elements_begin();
-          const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+          MeshBase::const_element_iterator           el = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
           
           for ( ; el != end_el; ++el)
             {      
@@ -700,7 +681,7 @@ have.  Aske the element of what type it is:
 <div class ="fragment">
 <pre>
               if (elem-&gt;infinite())
-                {	   
+                {           
 </pre>
 </div>
 <div class = "comment">
@@ -708,31 +689,31 @@ We have an infinite element.  Let \p cfe point
 to our \p InfFE object.  This is handled through
 an AutoPtr.  Through the \p AutoPtr::get() we "borrow"
 the pointer, while the \p  AutoPtr \p inf_fe is
-still in charge of memory management.	   
+still in charge of memory management.           
 </div>
 
 <div class ="fragment">
 <pre>
                   cfe = inf_fe.get(); 
-        	}
+                }
               else
                 {
 </pre>
 </div>
 <div class = "comment">
-This is a conventional finite element.  Let \p fe handle it.	   
+This is a conventional finite element.  Let \p fe handle it.           
 </div>
 
 <div class ="fragment">
 <pre>
                     cfe = fe.get();
-        	  
+                  
 </pre>
 </div>
 <div class = "comment">
 Boundary conditions.
 Here we just zero the rhs-vector. For natural boundary 
-conditions check e.g. previous examples.	   
+conditions check e.g. previous examples.           
 </div>
 
 <div class ="fragment">
@@ -741,16 +722,16 @@ conditions check e.g. previous examples.
 </pre>
 </div>
 <div class = "comment">
-Zero the RHS for this element. 	       
+Zero the RHS for this element.                
 </div>
 
 <div class ="fragment">
 <pre>
                     Fe.resize (dof_indices.size());
-        	    
-        	    system.rhs-&gt;add_vector (Fe, dof_indices);
-        	  } // end boundary condition section	     
-        	} // else ( if (elem-&gt;infinite())) )
+                    
+                    system.rhs-&gt;add_vector (Fe, dof_indices);
+                  } // end boundary condition section             
+                } // else ( if (elem-&gt;infinite())) )
         
 </pre>
 </div>
@@ -858,14 +839,14 @@ Loop over the quadrature points.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;max_qp; qp++)
-                {	  
+                {          
 </pre>
 </div>
 <div class = "comment">
 Similar to the modified access to the number of quadrature 
 points, the number of shape functions may also be obtained
 in a different manner.  This offers the great advantage
-of being valid for both finite and infinite elements.	   
+of being valid for both finite and infinite elements.           
 </div>
 
 <div class ="fragment">
@@ -889,14 +870,14 @@ trial functions:   phi[j][qp]
 phase term:        phase[qp]
 
 <br><br>derivatives are similar, but note that these are of type
-Point, not of type Real.	   
+Point, not of type Real.           
 </div>
 
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_sf; i++)
-        	    for (unsigned int j=0; j&lt;n_sf; j++)
-        	      {
+                    for (unsigned int j=0; j&lt;n_sf; j++)
+                      {
 </pre>
 </div>
 <div class = "comment">
@@ -906,13 +887,13 @@ Point, not of type Real.
 <div class ="fragment">
 <pre>
                         Ke(i,j) +=
-        		  (                            //    (                         
-        		   (                           //      (                       
-        		    dweight[qp] * phi[i][qp]   //        Point * Real  = Point 
-        		    +                          //        +                     
-        		    dphi[i][qp] * weight[qp]   //        Point * Real  = Point 
-        		    ) * dphi[j][qp]            //      )       * Point = Real  
-        		   ) * JxW[qp];                //    )         * Real  = Real  
+                          (                            //    (                         
+                           (                           //      (                       
+                            dweight[qp] * phi[i][qp]   //        Point * Real  = Point 
+                            +                          //        +                     
+                            dphi[i][qp] * weight[qp]   //        Point * Real  = Point 
+                            ) * dphi[j][qp]            //      )       * Point = Real  
+                           ) * JxW[qp];                //    )         * Real  = Real  
         
 </pre>
 </div>
@@ -923,17 +904,17 @@ Point, not of type Real.
 <div class ="fragment">
 <pre>
                         Ce(i,j) +=
-        		  (                                //    (                         
-        		   (dphase[qp] * dphi[j][qp])      //      (Point * Point) = Real  
-        		   * weight[qp] * phi[i][qp]       //      * Real * Real   = Real  
-        		   -                               //      -                       
-        		   (dweight[qp] * dphase[qp])      //      (Point * Point) = Real  
-        		   * phi[i][qp] * phi[j][qp]       //      * Real * Real   = Real  
-        		   -                               //      -                       
-        		   (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real  
-        		   * weight[qp] * phi[j][qp]       //      * Real * Real   = Real  
-        		   ) * JxW[qp];                    //    )         * Real  = Real  
-        		
+                          (                                //    (                         
+                           (dphase[qp] * dphi[j][qp])      //      (Point * Point) = Real  
+                           * weight[qp] * phi[i][qp]       //      * Real * Real   = Real  
+                           -                               //      -                       
+                           (dweight[qp] * dphase[qp])      //      (Point * Point) = Real  
+                           * phi[i][qp] * phi[j][qp]       //      * Real * Real   = Real  
+                           -                               //      -                       
+                           (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real  
+                           * weight[qp] * phi[j][qp]       //      * Real * Real   = Real  
+                           ) * JxW[qp];                    //    )         * Real  = Real  
+                        
 </pre>
 </div>
 <div class = "comment">
@@ -943,13 +924,13 @@ Point, not of type Real.
 <div class ="fragment">
 <pre>
                         Me(i,j) +=
-        		  (                                       //    (                                  
-        		   (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real 
-        		   * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real 
-        		   ) * JxW[qp];                           //    ) * Real                    = Real 
+                          (                                       //    (                                  
+                           (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real 
+                           * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real 
+                           ) * JxW[qp];                           //    ) * Real                    = Real 
         
-        	      } // end of the matrix summation loop
-        	} // end of quadrature point loop
+                      } // end of the matrix summation loop
+                } // end of quadrature point loop
         
 </pre>
 </div>
@@ -963,6 +944,17 @@ The \p SparseMatrix::add_matrix() member does this for us.
 <pre>
               Ke.add(1./speed        , Ce);
               Ke.add(1./(speed*speed), Me);
+        
+</pre>
+</div>
+<div class = "comment">
+If this assembly program were to be used on an adaptive mesh,
+we would have to apply any hanging node constraint equations
+</div>
+
+<div class ="fragment">
+<pre>
+              dof_map.constrain_element_matrix(Ke, dof_indices);
         
               system.matrix-&gt;add_matrix (Ke, dof_indices);
             } // end of element loop
@@ -980,15 +972,16 @@ Here we apply a unit load at the node located at (0,0,0).
 </pre>
 </div>
 <div class = "comment">
-Number of nodes in the mesh.     
+Iterate over local nodes
 </div>
 
 <div class ="fragment">
 <pre>
-            const unsigned int n_nodes = mesh.n_nodes();
+            MeshBase::const_node_iterator           nd = mesh.local_nodes_begin();
+            const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
             
-            for (unsigned int n_cnt=0; n_cnt&lt;n_nodes; n_cnt++)
-              {	
+            for (; nd != nd_end; ++nd)
+              {        
 </pre>
 </div>
 <div class = "comment">
@@ -997,8 +990,8 @@ Get a reference to the current node.
 
 <div class ="fragment">
 <pre>
-                const Node& curr_node = mesh.node(n_cnt);
-        	
+                const Node& node = **nd;
+                
 </pre>
 </div>
 <div class = "comment">
@@ -1007,10 +1000,10 @@ Check the location of the current node.
 
 <div class ="fragment">
 <pre>
-                if (fabs(curr_node(0)) &lt; TOLERANCE &&
-        	    fabs(curr_node(1)) &lt; TOLERANCE &&
-        	    fabs(curr_node(2)) &lt; TOLERANCE)
-        	  {
+                if (fabs(node(0)) &lt; TOLERANCE &&
+                    fabs(node(1)) &lt; TOLERANCE &&
+                    fabs(node(2)) &lt; TOLERANCE)
+                  {
 </pre>
 </div>
 <div class = "comment">
@@ -1019,10 +1012,10 @@ The global number of the respective degree of freedom.
 
 <div class ="fragment">
 <pre>
-                    unsigned int dn = curr_node.dof_number(0,0,0);
+                    unsigned int dn = node.dof_number(0,0,0);
         
-        	    system.rhs-&gt;add (dn, 1.);
-        	  }
+                    system.rhs-&gt;add (dn, 1.);
+                  }
               }
           }
         
@@ -1036,9 +1029,9 @@ dummy assert
 
 <div class ="fragment">
 <pre>
-          assert(es.get_mesh().mesh_dimension() != 1);
+          libmesh_assert(es.get_mesh().mesh_dimension() != 1);
         
-        #endif //ifdef ENABLE_INFINITE_ELEMENTS
+        #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
           
 </pre>
 </div>
@@ -1062,10 +1055,10 @@ All done!
   #include &lt;algorithm&gt;
   #include &lt;math.h&gt;
   
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   
@@ -1086,88 +1079,80 @@ All done!
   
   #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_wave (EquationSystems&amp; es,
-  		    <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+                      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
+    LibMeshInit init (argc, argv);
     
-  #ifndef ENABLE_INFINITE_ELEMENTS
-  
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires the library to be compiled with Infinite Element support!&quot;</FONT></B>
-  	    &lt;&lt; std::endl;
-    here();
-  
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
-  
+  #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-ifem&quot;</FONT></B>);
   #<B><FONT COLOR="#A020F0">else</FONT></B>
     
-    {        
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 3; 
-      
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running ex6 with dim = &quot;</FONT></B> &lt;&lt; dim &lt;&lt; std::endl &lt;&lt; std::endl;        
-      
-      Mesh mesh (dim);
-  
-      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
-  				       4, 4, 4,
-  				       -1., 1.,
-  				       -1., 1.,
-  				       -1., 1.,
-  				       HEX8);
-      
-      mesh.print_info();
-  
-      GMVIO(mesh).write (<B><FONT COLOR="#BC8F8F">&quot;orig_mesh.gmv&quot;</FONT></B>);
-      
-      InfElemBuilder builder(mesh);
-      builder.build_inf_elem(true);
-  
-      mesh.print_info();
-  
-      GMVIO(mesh).write (<B><FONT COLOR="#BC8F8F">&quot;ifems_added.gmv&quot;</FONT></B>);
-      
-      mesh.find_neighbors();
-      
-      EquationSystems equation_systems (mesh);
-      
-      {
-        equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
-              
-        FEType fe_type(FIRST);
-        
-        equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, fe_type);
-        
-        equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>).attach_assemble_function (assemble_wave);
-        
-        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;speed&quot;</FONT></B>)          = 1.;
-        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;fluid density&quot;</FONT></B>)  = 1.;
-        
-        equation_systems.init();
-        
-        equation_systems.print_info();
-      }
-      
-      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>).solve();
-      
-      equation_systems.write (<B><FONT COLOR="#BC8F8F">&quot;eqn_sys.dat&quot;</FONT></B>, libMeshEnums::WRITE);
-    }
+    libmesh_example_assert(3 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
     
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running ex6 with dim = 3&quot;</FONT></B> &lt;&lt; std::endl &lt;&lt; std::endl;        
+    
+    Mesh mesh;
   
-  #endif <I><FONT COLOR="#B22222">// else part of ifndef ENABLE_INFINITE_ELEMENTS
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
+                                       4, 4, 4,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       HEX8);
+    
+    mesh.print_info();
+  
+    ExodusII_IO(mesh).write (<B><FONT COLOR="#BC8F8F">&quot;orig_mesh.exd&quot;</FONT></B>);
+  
+    InfElemBuilder builder(mesh);
+    builder.build_inf_elem(true);
+  
+    mesh.print_info();
+  
+    ExodusII_IO(mesh).write (<B><FONT COLOR="#BC8F8F">&quot;ifems_added.exd&quot;</FONT></B>);
+  
+    mesh.find_neighbors();
+    
+    EquationSystems equation_systems (mesh);
+    
+    equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+          
+    FEType fe_type(FIRST);
+    
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, fe_type);
+    
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>).attach_assemble_function (assemble_wave);
+    
+    equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;speed&quot;</FONT></B>)          = 1.;
+    equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;fluid density&quot;</FONT></B>)  = 1.;
+    
+    equation_systems.init();
+    
+    equation_systems.print_info();
+  
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>).solve();
+    
+    equation_systems.write (<B><FONT COLOR="#BC8F8F">&quot;eqn_sys.dat&quot;</FONT></B>, libMeshEnums::WRITE);
+    
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  
+  #endif <I><FONT COLOR="#B22222">// else part of ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
 </FONT></I>  }
   
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_wave(EquationSystems&amp; es,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+                     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
   
   
-  #ifdef ENABLE_INFINITE_ELEMENTS
+  #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
     LinearImplicitSystem &amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
     
@@ -1196,9 +1181,8 @@ All done!
     
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
     
-  
-    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator           el = mesh.local_elements_begin();
-    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator           el = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {      
@@ -1210,19 +1194,19 @@ All done!
         FEBase* cfe=NULL;
         
         <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;infinite())
-          {	   
-  	  cfe = inf_fe.get(); 
-  	}
+          {           
+            cfe = inf_fe.get(); 
+          }
         <B><FONT COLOR="#A020F0">else</FONT></B>
           {
-    	  cfe = fe.get();
-  	  
-  	  {	      
-  	    Fe.resize (dof_indices.size());
-  	    
-  	    system.rhs-&gt;add_vector (Fe, dof_indices);
-  	  } <I><FONT COLOR="#B22222">// end boundary condition section	     
-</FONT></I>  	} <I><FONT COLOR="#B22222">// else ( if (elem-&gt;infinite())) )
+              cfe = fe.get();
+            
+            {              
+              Fe.resize (dof_indices.size());
+              
+              system.rhs-&gt;add_vector (Fe, dof_indices);
+            } <I><FONT COLOR="#B22222">// end boundary condition section             
+</FONT></I>          } <I><FONT COLOR="#B22222">// else ( if (elem-&gt;infinite())) )
 </FONT></I>  
         <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = cfe-&gt;get_JxW();
         
@@ -1243,71 +1227,74 @@ All done!
         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_qp = cfe-&gt;n_quadrature_points();
         
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;max_qp; qp++)
-          {	  
-  	  <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_sf = cfe-&gt;n_shape_functions();
+          {          
+            <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_sf = cfe-&gt;n_shape_functions();
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_sf; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_sf; j++)
-  	      {
-  		Ke(i,j) +=
-  		  (                            <I><FONT COLOR="#B22222">//    (                         
-</FONT></I>  		   (                           <I><FONT COLOR="#B22222">//      (                       
-</FONT></I>  		    dweight[qp] * phi[i][qp]   <I><FONT COLOR="#B22222">//        Point * Real  = Point 
-</FONT></I>  		    +                          <I><FONT COLOR="#B22222">//        +                     
-</FONT></I>  		    dphi[i][qp] * weight[qp]   <I><FONT COLOR="#B22222">//        Point * Real  = Point 
-</FONT></I>  		    ) * dphi[j][qp]            <I><FONT COLOR="#B22222">//      )       * Point = Real  
-</FONT></I>  		   ) * JxW[qp];                <I><FONT COLOR="#B22222">//    )         * Real  = Real  
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_sf; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_sf; j++)
+                {
+                  Ke(i,j) +=
+                    (                            <I><FONT COLOR="#B22222">//    (                         
+</FONT></I>                     (                           <I><FONT COLOR="#B22222">//      (                       
+</FONT></I>                      dweight[qp] * phi[i][qp]   <I><FONT COLOR="#B22222">//        Point * Real  = Point 
+</FONT></I>                      +                          <I><FONT COLOR="#B22222">//        +                     
+</FONT></I>                      dphi[i][qp] * weight[qp]   <I><FONT COLOR="#B22222">//        Point * Real  = Point 
+</FONT></I>                      ) * dphi[j][qp]            <I><FONT COLOR="#B22222">//      )       * Point = Real  
+</FONT></I>                     ) * JxW[qp];                <I><FONT COLOR="#B22222">//    )         * Real  = Real  
 </FONT></I>  
-  		Ce(i,j) +=
-  		  (                                <I><FONT COLOR="#B22222">//    (                         
-</FONT></I>  		   (dphase[qp] * dphi[j][qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
-</FONT></I>  		   * weight[qp] * phi[i][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
-</FONT></I>  		   -                               <I><FONT COLOR="#B22222">//      -                       
-</FONT></I>  		   (dweight[qp] * dphase[qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
-</FONT></I>  		   * phi[i][qp] * phi[j][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
-</FONT></I>  		   -                               <I><FONT COLOR="#B22222">//      -                       
-</FONT></I>  		   (dphi[i][qp] * dphase[qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
-</FONT></I>  		   * weight[qp] * phi[j][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
-</FONT></I>  		   ) * JxW[qp];                    <I><FONT COLOR="#B22222">//    )         * Real  = Real  
-</FONT></I>  		
-  		Me(i,j) +=
-  		  (                                       <I><FONT COLOR="#B22222">//    (                                  
-</FONT></I>  		   (1. - (dphase[qp] * dphase[qp]))       <I><FONT COLOR="#B22222">//      (Real  - (Point * Point)) = Real 
-</FONT></I>  		   * phi[i][qp] * phi[j][qp] * weight[qp] <I><FONT COLOR="#B22222">//      * Real *  Real  * Real    = Real 
-</FONT></I>  		   ) * JxW[qp];                           <I><FONT COLOR="#B22222">//    ) * Real                    = Real 
+                  Ce(i,j) +=
+                    (                                <I><FONT COLOR="#B22222">//    (                         
+</FONT></I>                     (dphase[qp] * dphi[j][qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
+</FONT></I>                     * weight[qp] * phi[i][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
+</FONT></I>                     -                               <I><FONT COLOR="#B22222">//      -                       
+</FONT></I>                     (dweight[qp] * dphase[qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
+</FONT></I>                     * phi[i][qp] * phi[j][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
+</FONT></I>                     -                               <I><FONT COLOR="#B22222">//      -                       
+</FONT></I>                     (dphi[i][qp] * dphase[qp])      <I><FONT COLOR="#B22222">//      (Point * Point) = Real  
+</FONT></I>                     * weight[qp] * phi[j][qp]       <I><FONT COLOR="#B22222">//      * Real * Real   = Real  
+</FONT></I>                     ) * JxW[qp];                    <I><FONT COLOR="#B22222">//    )         * Real  = Real  
+</FONT></I>                  
+                  Me(i,j) +=
+                    (                                       <I><FONT COLOR="#B22222">//    (                                  
+</FONT></I>                     (1. - (dphase[qp] * dphase[qp]))       <I><FONT COLOR="#B22222">//      (Real  - (Point * Point)) = Real 
+</FONT></I>                     * phi[i][qp] * phi[j][qp] * weight[qp] <I><FONT COLOR="#B22222">//      * Real *  Real  * Real    = Real 
+</FONT></I>                     ) * JxW[qp];                           <I><FONT COLOR="#B22222">//    ) * Real                    = Real 
 </FONT></I>  
-  	      } <I><FONT COLOR="#B22222">// end of the matrix summation loop
-</FONT></I>  	} <I><FONT COLOR="#B22222">// end of quadrature point loop
+                } <I><FONT COLOR="#B22222">// end of the matrix summation loop
+</FONT></I>          } <I><FONT COLOR="#B22222">// end of quadrature point loop
 </FONT></I>  
         Ke.add(1./speed        , Ce);
         Ke.add(1./(speed*speed), Me);
+  
+        dof_map.constrain_element_matrix(Ke, dof_indices);
   
         system.matrix-&gt;add_matrix (Ke, dof_indices);
       } <I><FONT COLOR="#B22222">// end of element loop
 </FONT></I>  
     {
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_nodes = mesh.n_nodes();
+      <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_node_iterator           nd = mesh.local_nodes_begin();
+      <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
       
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_cnt=0; n_cnt&lt;n_nodes; n_cnt++)
-        {	
-  	<B><FONT COLOR="#228B22">const</FONT></B> Node&amp; curr_node = mesh.node(n_cnt);
-  	
-  	<B><FONT COLOR="#A020F0">if</FONT></B> (fabs(curr_node(0)) &lt; TOLERANCE &amp;&amp;
-  	    fabs(curr_node(1)) &lt; TOLERANCE &amp;&amp;
-  	    fabs(curr_node(2)) &lt; TOLERANCE)
-  	  {
-  	    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dn = curr_node.dof_number(0,0,0);
+      <B><FONT COLOR="#A020F0">for</FONT></B> (; nd != nd_end; ++nd)
+        {        
+          <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; node = **nd;
+          
+          <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(node(0)) &lt; TOLERANCE &amp;&amp;
+              fabs(node(1)) &lt; TOLERANCE &amp;&amp;
+              fabs(node(2)) &lt; TOLERANCE)
+            {
+              <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dn = node.dof_number(0,0,0);
   
-  	    system.rhs-&gt;add (dn, 1.);
-  	  }
+              system.rhs-&gt;add (dn, 1.);
+            }
         }
     }
   
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
-    assert(es.get_mesh().mesh_dimension() != 1);
+    libmesh_assert(es.get_mesh().mesh_dimension() != 1);
   
-  #endif <I><FONT COLOR="#B22222">//ifdef ENABLE_INFINITE_ELEMENTS
+  #endif <I><FONT COLOR="#B22222">//ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 </FONT></I>    
     <B><FONT COLOR="#A020F0">return</FONT></B>;
   }
@@ -1316,16 +1303,9 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex6-devel
-***************************************************************
- 
-ERROR: This example requires the library to be compiled with Infinite Element support!
-[0] ex6.C, line 91, compiled Jun  6 2007 at 11:54:44
- 
-***************************************************************
-* Done Running Example  ./ex6-devel
-***************************************************************
+Compiling C++ (in optimized mode) ex6.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex6.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

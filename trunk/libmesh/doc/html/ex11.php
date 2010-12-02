@@ -39,7 +39,7 @@ Basic include file needed for the mesh functionality.
         #include "libmesh.h"
         #include "mesh.h"
         #include "mesh_generation.h"
-        #include "gmv_io.h"
+        #include "exodusII_io.h"
         #include "equation_systems.h"
         #include "fe.h"
         #include "quadrature_gauss.h"
@@ -77,6 +77,16 @@ The definition of a geometric element
 </pre>
 </div>
 <div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
 Function prototype.  This function will assemble the system
 matrix and right-hand-side.
 </div>
@@ -84,7 +94,7 @@ matrix and right-hand-side.
 <div class ="fragment">
 <pre>
         void assemble_stokes (EquationSystems& es,
-        		      const std::string& system_name);
+                              const std::string& system_name);
         
 </pre>
 </div>
@@ -104,46 +114,46 @@ Initialize libMesh.
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
-          {    
+          LibMeshInit init (argc, argv);
+        
 </pre>
 </div>
 <div class = "comment">
-Set the dimensionality of the mesh = 2
+Skip this 2D example if libMesh was compiled as 1D-only.
 </div>
 
 <div class ="fragment">
 <pre>
-            const unsigned int dim = 2;     
+          libmesh_example_assert(2 &lt;= LIBMESH_DIM, "2D support");
             
 </pre>
 </div>
 <div class = "comment">
-Create a two-dimensional mesh.
+Create a mesh.
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (dim);
+          Mesh mesh;
             
 </pre>
 </div>
 <div class = "comment">
 Use the MeshTools::Generation mesh generator to create a uniform
-grid on the square [-1,1]^D.  We instruct the mesh generator
-to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
-elements in 3D.  Building these higher-order elements allows
-us to use higher-order approximation, as in example 3.
+2D grid on the square [-1,1]^2.  We instruct the mesh generator
+to build a mesh of 8x8 \p Quad9 elements.  Building these
+higher-order elements allows us to use higher-order
+approximation, as in example 3.
 </div>
 
 <div class ="fragment">
 <pre>
-            MeshTools::Generation::build_square (mesh,
-        					 15, 15,
-        					 0., 1.,
-        					 0., 1.,
-        					 QUAD9);
-            
+          MeshTools::Generation::build_square (mesh,
+                                               15, 15,
+                                               0., 1.,
+                                               0., 1.,
+                                               QUAD9);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -152,8 +162,8 @@ Print information about the mesh to the screen.
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();
-            
+          mesh.print_info();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -162,28 +172,20 @@ Create an equation systems object.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh);
-            
+          EquationSystems equation_systems (mesh);
+          
 </pre>
 </div>
 <div class = "comment">
 Declare the system and its variables.
+Create a transient system named "Convection-Diffusion"
 </div>
 
 <div class ="fragment">
 <pre>
-            {
-</pre>
-</div>
-<div class = "comment">
-Creates a transient system named "Convection-Diffusion"
-</div>
-
-<div class ="fragment">
-<pre>
-              LinearImplicitSystem & system = 
-        	equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Stokes");
-              
+          LinearImplicitSystem & system = 
+            equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Stokes");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -193,8 +195,8 @@ will be approximated using second-order approximation.
 
 <div class ="fragment">
 <pre>
-              system.add_variable ("u", SECOND);
-              system.add_variable ("v", SECOND);
+          system.add_variable ("u", SECOND);
+          system.add_variable ("v", SECOND);
         
 </pre>
 </div>
@@ -206,7 +208,7 @@ providing an LBB-stable pressure-velocity pair.
 
 <div class ="fragment">
 <pre>
-              system.add_variable ("p", FIRST);
+          system.add_variable ("p", FIRST);
         
 </pre>
 </div>
@@ -217,8 +219,8 @@ function.
 
 <div class ="fragment">
 <pre>
-              system.attach_assemble_function (assemble_stokes);
-              
+          system.attach_assemble_function (assemble_stokes);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -227,10 +229,10 @@ Initialize the data structures for the equation system.
 
 <div class ="fragment">
 <pre>
-              equation_systems.init ();
+          equation_systems.init ();
         
-              equation_systems.parameters.set&lt;unsigned int&gt;("linear solver maximum iterations") = 250;
-              equation_systems.parameters.set&lt;Real&gt;        ("linear solver tolerance") = TOLERANCE;
+          equation_systems.parameters.set&lt;unsigned int&gt;("linear solver maximum iterations") = 250;
+          equation_systems.parameters.set&lt;Real&gt;        ("linear solver tolerance") = TOLERANCE;
               
 </pre>
 </div>
@@ -240,8 +242,7 @@ Prints information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-              equation_systems.print_info();
-            }
+          equation_systems.print_info();
             
 </pre>
 </div>
@@ -252,12 +253,13 @@ then write the solution.
 
 <div class ="fragment">
 <pre>
-            equation_systems.get_system("Stokes").solve();
+          equation_systems.get_system("Stokes").solve();
         
-            GMVIO(mesh).write_equation_systems ("out.gmv",
-        					equation_systems);
-          }
-          
+        #ifdef LIBMESH_HAVE_EXODUS_API
+          ExodusII_IO(mesh).write_equation_systems ("out.exd",
+                                              equation_systems);
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+        
 </pre>
 </div>
 <div class = "comment">
@@ -266,11 +268,11 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close ();
+          return 0;
         }
         
         void assemble_stokes (EquationSystems& es,
-        		      const std::string& system_name)
+                              const std::string& system_name)
         {
 </pre>
 </div>
@@ -281,7 +283,7 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Stokes");
+          libmesh_assert (system_name == "Stokes");
           
 </pre>
 </div>
@@ -291,7 +293,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
           
 </pre>
 </div>
@@ -483,11 +485,10 @@ the element degrees of freedom get mapped.
 <div class = "comment">
 Now we will loop over all the elements in the mesh that
 live on the local processor. We will compute the element
-matrix and right-hand-side contribution.  Since the mesh
-will be refined we want to only consider the ACTIVE elements,
-hence we use a variant of the \p active_elem_iterator.
-const_active_local_elem_iterator           el (mesh.elements_begin());
-const const_active_local_elem_iterator end_el (mesh.elements_end());
+matrix and right-hand-side contribution.  In case users later
+modify this program to include refinement, we will be safe and
+will only consider the active elements; hence we use a variant of
+the \p active_elem_iterator.
 
 
 <br><br></div>
@@ -606,7 +607,7 @@ Now we will build the element matrix.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-        	{
+                {
 </pre>
 </div>
 <div class = "comment">
@@ -617,8 +618,8 @@ uu coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_u_dofs; i++)
-        	    for (unsigned int j=0; j&lt;n_u_dofs; j++)
-        	      Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                    for (unsigned int j=0; j&lt;n_u_dofs; j++)
+                      Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         
 </pre>
 </div>
@@ -629,8 +630,8 @@ up coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_u_dofs; i++)
-        	    for (unsigned int j=0; j&lt;n_p_dofs; j++)
-        	      Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
+                    for (unsigned int j=0; j&lt;n_p_dofs; j++)
+                      Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
         
         
 </pre>
@@ -643,8 +644,8 @@ vv coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_v_dofs; i++)
-        	    for (unsigned int j=0; j&lt;n_v_dofs; j++)
-        	      Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                    for (unsigned int j=0; j&lt;n_v_dofs; j++)
+                      Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         
 </pre>
 </div>
@@ -655,10 +656,10 @@ vp coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_v_dofs; i++)
-        	    for (unsigned int j=0; j&lt;n_p_dofs; j++)
-        	      Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
+                    for (unsigned int j=0; j&lt;n_p_dofs; j++)
+                      Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
         
-        	  
+                  
 </pre>
 </div>
 <div class = "comment">
@@ -669,8 +670,8 @@ pu coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_p_dofs; i++)
-        	    for (unsigned int j=0; j&lt;n_u_dofs; j++)
-        	      Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+                    for (unsigned int j=0; j&lt;n_u_dofs; j++)
+                      Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
         
 </pre>
 </div>
@@ -681,10 +682,10 @@ pv coupling
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;n_p_dofs; i++)
-        	    for (unsigned int j=0; j&lt;n_v_dofs; j++)
-        	      Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-        	  
-        	} // end of the quadrature point qp-loop
+                    for (unsigned int j=0; j&lt;n_v_dofs; j++)
+                      Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+                  
+                } // end of the quadrature point qp-loop
         
 </pre>
 </div>
@@ -713,10 +714,10 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
-        	  if (elem-&gt;neighbor(s) == NULL)
-        	    {
-        	      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
-        	      	      
+                  if (elem-&gt;neighbor(s) == NULL)
+                    {
+                      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
+                                    
 </pre>
 </div>
 <div class = "comment">
@@ -726,21 +727,21 @@ Loop over the nodes on the side.
 <div class ="fragment">
 <pre>
                       for (unsigned int ns=0; ns&lt;side-&gt;n_nodes(); ns++)
-        		{
+                        {
 </pre>
 </div>
 <div class = "comment">
 The location on the boundary of the current
 node.
-		   
+                   
 
-<br><br></div>
+<br><br>const Real xf = side->point(ns)(0);
+</div>
 
 <div class ="fragment">
 <pre>
-                          const Real xf = side-&gt;point(ns)(0);
-        		  const Real yf = side-&gt;point(ns)(1);
-        		  
+                          const Real yf = side-&gt;point(ns)(1);
+                          
 </pre>
 </div>
 <div class = "comment">
@@ -750,12 +751,12 @@ The penalty value.  \f$ \frac{1}{\epsilon \f$
 <div class ="fragment">
 <pre>
                           const Real penalty = 1.e10;
-        		  
+                          
 </pre>
 </div>
 <div class = "comment">
 The boundary values.
-		   
+                   
 
 <br><br>Set u = 1 on the top boundary, 0 everywhere else
 </div>
@@ -763,7 +764,7 @@ The boundary values.
 <div class ="fragment">
 <pre>
                           const Real u_value = (yf &gt; .99) ? 1. : 0.;
-        		  
+                          
 </pre>
 </div>
 <div class = "comment">
@@ -773,7 +774,7 @@ Set v = 0 everywhere
 <div class ="fragment">
 <pre>
                           const Real v_value = 0.;
-        		  
+                          
 </pre>
 </div>
 <div class = "comment">
@@ -785,8 +786,8 @@ the boundary condition will be applied.
 <div class ="fragment">
 <pre>
                           for (unsigned int n=0; n&lt;elem-&gt;n_nodes(); n++)
-        		    if (elem-&gt;node(n) == side-&gt;node(ns))
-        		      {
+                            if (elem-&gt;node(n) == side-&gt;node(ns))
+                              {
 </pre>
 </div>
 <div class = "comment">
@@ -796,8 +797,8 @@ Matrix contribution.
 <div class ="fragment">
 <pre>
                                 Kuu(n,n) += penalty;
-        			Kvv(n,n) += penalty;
-        		  		  
+                                Kvv(n,n) += penalty;
+                                            
 </pre>
 </div>
 <div class = "comment">
@@ -807,19 +808,30 @@ Right-hand-side contribution.
 <div class ="fragment">
 <pre>
                                 Fu(n) += penalty*u_value;
-        			Fv(n) += penalty*v_value;
-        		      }
-        		} // end face node loop	  
-        	    } // end if (elem-&gt;neighbor(side) == NULL)
-              } // end boundary condition section	  
+                                Fv(n) += penalty*v_value;
+                              }
+                        } // end face node loop          
+                    } // end if (elem-&gt;neighbor(side) == NULL)
+              } // end boundary condition section          
               
+</pre>
+</div>
+<div class = "comment">
+If this assembly program were to be used on an adaptive mesh,
+we would have to apply any hanging node constraint equations.
+</div>
+
+<div class ="fragment">
+<pre>
+              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+        
 </pre>
 </div>
 <div class = "comment">
 The element matrix and right-hand-side are now built
 for this element.  Add them to the global matrix and
-right-hand-side vector.  The \p PetscMatrix::add_matrix()
-and \p PetscVector::add_vector() members do this for us.
+right-hand-side vector.  The \p NumericMatrix::add_matrix()
+and \p NumericVector::add_vector() members do this for us.
 </div>
 
 <div class ="fragment">
@@ -852,7 +864,7 @@ That's it.
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
@@ -868,61 +880,62 @@ That's it.
   
   #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_stokes (EquationSystems&amp; es,
-  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
-    {    
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;     
-      
-      Mesh mesh (dim);
-      
-      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
-  					 15, 15,
-  					 0., 1.,
-  					 0., 1.,
-  					 QUAD9);
-      
-      mesh.print_info();
-      
-      EquationSystems equation_systems (mesh);
-      
-      {
-        LinearImplicitSystem &amp; system = 
-  	equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>);
-        
-        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND);
-        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, SECOND);
+    LibMeshInit init (argc, argv);
   
-        system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
-  
-        system.attach_assemble_function (assemble_stokes);
-        
-        equation_systems.init ();
-  
-        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>) = 250;
-        equation_systems.parameters.set&lt;Real&gt;        (<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = TOLERANCE;
-        
-        equation_systems.print_info();
-      }
+    libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
       
-      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>).solve();
-  
-      GMVIO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.gmv&quot;</FONT></B>,
-  					equation_systems);
-    }
+    Mesh mesh;
+      
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
+                                         15, 15,
+                                         0., 1.,
+                                         0., 1.,
+                                         QUAD9);
     
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    mesh.print_info();
+    
+    EquationSystems equation_systems (mesh);
+    
+    LinearImplicitSystem &amp; system = 
+      equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>);
+    
+    system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND);
+    system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, SECOND);
+  
+    system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
+  
+    system.attach_assemble_function (assemble_stokes);
+    
+    equation_systems.init ();
+  
+    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>) = 250;
+    equation_systems.parameters.set&lt;Real&gt;        (<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = TOLERANCE;
+        
+    equation_systems.print_info();
+      
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>).solve();
+  
+  #ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.exd&quot;</FONT></B>,
+                                        equation_systems);
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_stokes (EquationSystems&amp; es,
-  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Stokes&quot;</FONT></B>);
     
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
     
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
     
@@ -1013,67 +1026,68 @@ That's it.
         Fp.reposition (p_var*n_u_dofs, n_p_dofs);
         
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-  	{
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
-  	      Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+                Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_p_dofs; j++)
-  	      Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_u_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_p_dofs; j++)
+                Kup(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](0);
   
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
-  	      Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+                Kvv(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_p_dofs; j++)
-  	      Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_p_dofs; j++)
+                Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
   
-  	  
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_p_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
-  	      Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+            
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_p_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
+                Kpu(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](0);
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_p_dofs; i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
-  	      Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-  	  
-  	} <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_p_dofs; i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+                Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+            
+          } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
 </FONT></I>  
         {
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
-  	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
-  	    {
-  	      AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
-  	      	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
-  		{
-  		   
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real xf = side-&gt;point(ns)(0);
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real yf = side-&gt;point(ns)(1);
-  		  
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
-  		  
-  		   
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real u_value = (yf &gt; .99) ? 1. : 0.;
-  		  
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real v_value = 0.;
-  		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
-  		    <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;node(n) == side-&gt;node(ns))
-  		      {
-  			Kuu(n,n) += penalty;
-  			Kvv(n,n) += penalty;
-  		  		  
-  			Fu(n) += penalty*u_value;
-  			Fv(n) += penalty*v_value;
-  		      }
-  		} <I><FONT COLOR="#B22222">// end face node loop	  
-</FONT></I>  	    } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
-</FONT></I>        } <I><FONT COLOR="#B22222">// end boundary condition section	  
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
+              {
+                AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
+                              
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
+                  {
+                     
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real yf = side-&gt;point(ns)(1);
+                    
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+                    
+                     
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real u_value = (yf &gt; .99) ? 1. : 0.;
+                    
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real v_value = 0.;
+                    
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;elem-&gt;n_nodes(); n++)
+                      <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;node(n) == side-&gt;node(ns))
+                        {
+                          Kuu(n,n) += penalty;
+                          Kvv(n,n) += penalty;
+                                      
+                          Fu(n) += penalty*u_value;
+                          Fv(n) += penalty*v_value;
+                        }
+                  } <I><FONT COLOR="#B22222">// end face node loop          
+</FONT></I>              } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
+</FONT></I>        } <I><FONT COLOR="#B22222">// end boundary condition section          
 </FONT></I>        
+        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+  
         system.matrix-&gt;add_matrix (Ke, dof_indices);
         system.rhs-&gt;add_vector    (Fe, dof_indices);
       } <I><FONT COLOR="#B22222">// end of element loop
@@ -1084,37 +1098,9 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex11-devel
-***************************************************************
- 
- Mesh Information:
-  mesh_dimension()=2
-  spatial_dimension()=3
-  n_nodes()=961
-  n_elem()=225
-   n_local_elem()=225
-   n_active_elem()=225
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Stokes"
-    Type "LinearImplicit"
-    Variables="u" "v" "p" 
-    Finite Element Types="LAGRANGE" "LAGRANGE" "LAGRANGE" 
-    Approximation Orders="SECOND" "SECOND" "FIRST" 
-    n_dofs()=2178
-    n_local_dofs()=2178
-    n_constrained_dofs()=0
-    n_vectors()=1
-
- 
-***************************************************************
-* Done Running Example  ./ex11-devel
-***************************************************************
+Compiling C++ (in optimized mode) ex11.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex11.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

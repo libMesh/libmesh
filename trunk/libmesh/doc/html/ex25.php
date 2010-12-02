@@ -7,27 +7,15 @@
  
 <body>
  
-<?php make_navigation("ex4",$root)?>
+<?php make_navigation("ex25",$root)?>
  
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-<h1>Example 4 - Solving a 1D, 2D or 3D Poisson Problem in Parallel</h1>
+<h1>Example 25 - Solving a 1D, 2D, or 3D Poisson on a subdomain</h1>
 
-<br><br>This is the fourth example program.  It builds on
-the third example program by showing how to formulate
-the code in a dimension-independent way.  Very minor
-changes to the example will allow the problem to be
-solved in one, two or three dimensions.
-
-<br><br>This example will also introduce the PerfLog class
-as a way to monitor your code's performance.  We will
-use it to instrument the matrix assembly code and look
-for bottlenecks where we should focus optimization efforts.
-
-<br><br>This example also shows how to extend example 3 to run in
-parallel.  Notice how litte has changed!  The significant
-differences are marked with "PARALLEL CHANGE".
+<br><br>This example builds on the example 4 by showing what to do in
+order to solve an equation only on a subdomain.
 
 
 <br><br>
@@ -53,6 +41,7 @@ Basic include file needed for the mesh functionality.
         #include "mesh.h"
         #include "mesh_generation.h"
         #include "exodusII_io.h"
+        #include "gmv_io.h"
         #include "gnuplot_io.h"
         #include "linear_implicit_system.h"
         #include "equation_systems.h"
@@ -124,6 +113,18 @@ The definition of a geometric element
 <pre>
         #include "elem.h"
         
+        #include "mesh_refinement.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Classes needed for subdomain computation.
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "system_subset_by_subdomain.h"
+        
         #include "string_to_enum.h"
         #include "getpot.h"
         
@@ -186,6 +187,17 @@ Initialize libMesh and any dependent libaries, like in example 2.
 <div class ="fragment">
 <pre>
           LibMeshInit init (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+Only our PETSc interface currently supports solves restricted to
+subdomains
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
         
 </pre>
 </div>
@@ -294,7 +306,7 @@ Read FE order from command line
 
 <div class ="fragment">
 <pre>
-          std::string order = "SECOND"; 
+          std::string order = "FIRST"; 
           if ( command_line.search(2, "-Order", "-o") )
             order = command_line.next(order);
         
@@ -380,7 +392,94 @@ solving with low-order finite elements.
                                                  ((dim == 2) ? QUAD9 : HEX27));
             }
         
-          
+        
+</pre>
+</div>
+<div class = "comment">
+To demonstate solving on a subdomain, we will solve only on the
+interior of a circle (ball in 3d) with radius 0.8.  So show that
+this also works well on locally refined meshes, we refine once
+all elements that are located on the boundary of this circle (or
+ball).
+</div>
+
+<div class ="fragment">
+<pre>
+          {
+</pre>
+</div>
+<div class = "comment">
+A MeshRefinement object is needed to refine meshes.
+</div>
+
+<div class ="fragment">
+<pre>
+            MeshRefinement meshRefinement(mesh);
+        
+</pre>
+</div>
+<div class = "comment">
+Loop over all elements.
+</div>
+
+<div class ="fragment">
+<pre>
+            MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+            const MeshBase::element_iterator elem_end = mesh.elements_end(); 
+            for (; elem_it != elem_end; ++elem_it)
+              {
+        	Elem* elem = *elem_it;
+        	if(elem-&gt;active())
+        	  {
+</pre>
+</div>
+<div class = "comment">
+Just check whether the current element has at least one
+node inside and one node outside the circle.
+</div>
+
+<div class ="fragment">
+<pre>
+                    bool node_in = false;
+        	    bool node_out = false;
+        	    for(unsigned int i=0; i&lt;elem-&gt;n_nodes(); i++)
+        	      {
+        		double d = elem-&gt;point(i).size();
+        		if(d&lt;0.8)
+        		  {
+        		    node_in = true;
+        		  }
+        		else
+        		  {
+        		    node_out = true;
+        		  }
+        	      }
+        	    if(node_in && node_out)
+        	      {
+        		elem-&gt;set_refinement_flag(Elem::REFINE);
+        	      }
+        	    else
+        	      {
+        		elem-&gt;set_refinement_flag(Elem::DO_NOTHING);
+        	      }
+        	  }
+        	else
+        	  {
+        	    elem-&gt;set_refinement_flag(Elem::INACTIVE);
+        	  }
+              }
+        
+</pre>
+</div>
+<div class = "comment">
+Now actually refine.
+</div>
+
+<div class ="fragment">
+<pre>
+            meshRefinement.refine_elements();
+          }
+        
 </pre>
 </div>
 <div class = "comment">
@@ -391,7 +490,37 @@ Print information about the mesh to the screen.
 <pre>
           mesh.print_info();
           
-          
+</pre>
+</div>
+<div class = "comment">
+Now set the subdomain_id of all elements whose centroid is inside
+the circle to 1.
+</div>
+
+<div class ="fragment">
+<pre>
+          {
+</pre>
+</div>
+<div class = "comment">
+Loop over all elements.
+</div>
+
+<div class ="fragment">
+<pre>
+            MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+            const MeshBase::element_iterator elem_end = mesh.elements_end(); 
+            for (; elem_it != elem_end; ++elem_it)
+              {
+        	Elem* elem = *elem_it;
+        	double d = elem-&gt;centroid().size();
+        	if(d&lt;0.8)
+        	  {
+        	    elem-&gt;subdomain_id() = 1;
+        	  }
+              }
+          }
+        
 </pre>
 </div>
 <div class = "comment">
@@ -463,7 +592,26 @@ Print information about the system to the screen.
 </pre>
 </div>
 <div class = "comment">
-Solve the system "Poisson", just like example 2.
+Restrict solves to those elements that have subdomain_id set to 1.
+</div>
+
+<div class ="fragment">
+<pre>
+          std::set&lt;subdomain_id_type&gt; id_list;
+          id_list.insert(1);
+          SystemSubsetBySubdomain::SubdomainSelectionByList selection(id_list);
+          SystemSubsetBySubdomain subset(system,selection);
+          system.restrict_solve_to(&subset,SUBSET_ZERO);
+        
+</pre>
+</div>
+<div class = "comment">
+Note that using \p SUBSET_ZERO will cause all dofs outside the
+subdomain to be cleared.  This will, however, cause some hanging
+nodes outside the subdomain to have inconsistent values.
+  
+
+<br><br>Solve the system "Poisson", just like example 2.
 </div>
 
 <div class ="fragment">
@@ -484,14 +632,16 @@ to a GMV-formatted plot file.
             GnuPlotIO plot(mesh,"Example 4, 1D",GnuPlotIO::GRID_ON);
             plot.write_equation_systems("out_1",equation_systems);
           }
-        #ifdef LIBMESH_HAVE_EXODUS_API
           else
           {
+            GMVIO (mesh).write_equation_systems ((dim == 3) ? 
+              "out_3.gmv" : "out_2.gmv",equation_systems);
+        #ifdef LIBMESH_HAVE_EXODUS_API
             ExodusII_IO (mesh).write_equation_systems ((dim == 3) ? 
               "out_3.exd" : "out_2.exd",equation_systems);
-          }
         #endif // #ifdef LIBMESH_HAVE_EXODUS_API
-          
+          }
+        
 </pre>
 </div>
 <div class = "comment">
@@ -761,18 +911,6 @@ element iterators.
 </pre>
 </div>
 <div class = "comment">
-Start logging the shape function initialization.
-This is done through a simple function call with
-the name of the event to log.
-</div>
-
-<div class ="fragment">
-<pre>
-              perf_log.push("elem init");      
-        
-</pre>
-</div>
-<div class = "comment">
 Store a pointer to the element we are currently
 working on.  This allows for nicer syntax later.
 </div>
@@ -784,6 +922,29 @@ working on.  This allows for nicer syntax later.
 </pre>
 </div>
 <div class = "comment">
+Elements with subdomain_id other than 1 are not in the active
+subdomain.  We don't assemble anything for them.
+</div>
+
+<div class ="fragment">
+<pre>
+              if(elem-&gt;subdomain_id()==1)
+        	{
+</pre>
+</div>
+<div class = "comment">
+Start logging the shape function initialization.
+This is done through a simple function call with
+the name of the event to log.
+</div>
+
+<div class ="fragment">
+<pre>
+                  perf_log.push("elem init");      
+        	  
+</pre>
+</div>
+<div class = "comment">
 Get the degree of freedom indices for the
 current element.  These define where in the global
 matrix and right-hand-side this element will
@@ -792,8 +953,8 @@ contribute to.
 
 <div class ="fragment">
 <pre>
-              dof_map.dof_indices (elem, dof_indices);
-        
+                  dof_map.dof_indices (elem, dof_indices);
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -805,8 +966,8 @@ quadrature points (q_point) and the shape functions
 
 <div class ="fragment">
 <pre>
-              fe-&gt;reinit (elem);
-        
+                  fe-&gt;reinit (elem);
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -820,11 +981,11 @@ triangle, now we are on a quadrilateral).
 
 <div class ="fragment">
 <pre>
-              Ke.resize (dof_indices.size(),
-                         dof_indices.size());
-        
-              Fe.resize (dof_indices.size());
-        
+                  Ke.resize (dof_indices.size(),
+        		     dof_indices.size());
+        	  
+        	  Fe.resize (dof_indices.size());
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -835,8 +996,8 @@ object will probably catch the error and abort.
 
 <div class ="fragment">
 <pre>
-              perf_log.pop("elem init");      
-        
+                  perf_log.pop("elem init");      
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -853,14 +1014,14 @@ computation seperately.
 
 <div class ="fragment">
 <pre>
-              perf_log.push ("Ke");
-        
-              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                for (unsigned int i=0; i&lt;phi.size(); i++)
-                  for (unsigned int j=0; j&lt;phi.size(); j++)
-                    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-                    
-        
+                  perf_log.push ("Ke");
+        	  
+        	  for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
+        	    for (unsigned int i=0; i&lt;phi.size(); i++)
+        	      for (unsigned int j=0; j&lt;phi.size(); j++)
+        		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+        	  
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -869,8 +1030,8 @@ Stop logging the matrix computation
 
 <div class ="fragment">
 <pre>
-              perf_log.pop ("Ke");
-        
+                  perf_log.pop ("Ke");
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -883,10 +1044,10 @@ This involves a single loop in which we integrate the
 
 <div class ="fragment">
 <pre>
-              perf_log.push ("Fe");
-              
-              for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-                {
+                  perf_log.push ("Fe");
+        	  
+        	  for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
+        	    {
 </pre>
 </div>
 <div class = "comment">
@@ -908,26 +1069,26 @@ we will compute it here, outside of the i-loop
 
 <div class ="fragment">
 <pre>
-                  const Real x = q_point[qp](0);
-                  const Real y = q_point[qp](1);
-                  const Real z = q_point[qp](2);
-                  const Real eps = 1.e-3;
-        
-                  const Real uxx = (exact_solution(x-eps,y,z) +
-                                    exact_solution(x+eps,y,z) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
+                      const Real x = q_point[qp](0);
+        	      const Real y = q_point[qp](1);
+        	      const Real z = q_point[qp](2);
+        	      const Real eps = 1.e-3;
+        	      
+        	      const Real uxx = (exact_solution(x-eps,y,z) +
+        				exact_solution(x+eps,y,z) +
+        				-2.*exact_solution(x,y,z))/eps/eps;
                       
-                  const Real uyy = (exact_solution(x,y-eps,z) +
-                                    exact_solution(x,y+eps,z) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
-                  
-                  const Real uzz = (exact_solution(x,y,z-eps) +
-                                    exact_solution(x,y,z+eps) +
-                                    -2.*exact_solution(x,y,z))/eps/eps;
-        
-                  Real fxy;
-                  if(dim==1)
-                  {
+        	      const Real uyy = (exact_solution(x,y-eps,z) +
+        				exact_solution(x,y+eps,z) +
+        				-2.*exact_solution(x,y,z))/eps/eps;
+        	      
+        	      const Real uzz = (exact_solution(x,y,z-eps) +
+        				exact_solution(x,y,z+eps) +
+        				-2.*exact_solution(x,y,z))/eps/eps;
+        	      
+        	      Real fxy;
+        	      if(dim==1)
+        		{
 </pre>
 </div>
 <div class = "comment">
@@ -937,14 +1098,14 @@ exact solution twice.
 
 <div class ="fragment">
 <pre>
-                    const Real pi = libMesh::pi;
-                    fxy = (0.25*pi*pi)*sin(.5*pi*x);
-                  }
-                  else
-                  {
-                    fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-                  } 
-        
+                          const Real pi = libMesh::pi;
+        		  fxy = (0.25*pi*pi)*sin(.5*pi*x);
+        		}
+        	      else
+        		{
+        		  fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+        		} 
+        	      
 </pre>
 </div>
 <div class = "comment">
@@ -953,10 +1114,10 @@ Add the RHS contribution
 
 <div class ="fragment">
 <pre>
-                  for (unsigned int i=0; i&lt;phi.size(); i++)
-                    Fe(i) += JxW[qp]*fxy*phi[i][qp];          
-                }
-              
+                      for (unsigned int i=0; i&lt;phi.size(); i++)
+        		Fe(i) += JxW[qp]*fxy*phi[i][qp];          
+        	    }
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -965,8 +1126,8 @@ Stop logging the right-hand-side computation
 
 <div class ="fragment">
 <pre>
-              perf_log.pop ("Fe");
-        
+                  perf_log.pop ("Fe");
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -980,8 +1141,8 @@ example 3.
 
 <div class ="fragment">
 <pre>
-              {
-                
+                  {
+        	    
 </pre>
 </div>
 <div class = "comment">
@@ -990,22 +1151,26 @@ Start logging the boundary condition computation
 
 <div class ="fragment">
 <pre>
-                perf_log.push ("BCs");
-        
+                    perf_log.push ("BCs");
+        	    
 </pre>
 </div>
 <div class = "comment">
-The following loops over the sides of the element.
-If the element has no neighbor on a side then that
-side MUST live on a boundary of the domain.
+The following loops over the sides of the element.  If
+the element has no neighbor on a side then that side
+MUST live on a boundary of the domain.  If there is a
+neighbor, check that neighbor's subdomain_id; if that
+is different from 1, the side is also located on the
+boundary.
 </div>
 
 <div class ="fragment">
 <pre>
-                for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-                  if (elem-&gt;neighbor(side) == NULL)
-                    {
-                    
+                    for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
+        	      if ((elem-&gt;neighbor(side) == NULL) ||
+        		  (elem-&gt;neighbor(side)-&gt;subdomain_id()!=1))
+        		{
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1015,8 +1180,8 @@ in the discussion above.
 
 <div class ="fragment">
 <pre>
-                      const Real penalty = 1.e10;
-        
+                          const Real penalty = 1.e10;
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1026,8 +1191,8 @@ points.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
-        
+                          const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1037,8 +1202,8 @@ points on the face.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
-        
+                          const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1049,8 +1214,8 @@ we will interpolate the boundary value function.
 
 <div class ="fragment">
 <pre>
-                      const std::vector&lt;Point &gt;& qface_point = fe_face-&gt;get_xyz();
-        
+                          const std::vector&lt;Point &gt;& qface_point = fe_face-&gt;get_xyz();
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1060,8 +1225,8 @@ face.
 
 <div class ="fragment">
 <pre>
-                      fe_face-&gt;reinit(elem, side);
-        
+                          fe_face-&gt;reinit(elem, side);
+        		  
 </pre>
 </div>
 <div class = "comment">
@@ -1070,8 +1235,8 @@ Loop over the face quadrature points for integration.
 
 <div class ="fragment">
 <pre>
-                      for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-                      {
+                          for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+        		    {
 </pre>
 </div>
 <div class = "comment">
@@ -1081,11 +1246,11 @@ face quadrature point.
 
 <div class ="fragment">
 <pre>
-                        const Real xf = qface_point[qp](0);
-                        const Real yf = qface_point[qp](1);
-                        const Real zf = qface_point[qp](2);
-        
-        
+                              const Real xf = qface_point[qp](0);
+        		      const Real yf = qface_point[qp](1);
+        		      const Real zf = qface_point[qp](2);
+        		      
+        		      
 </pre>
 </div>
 <div class = "comment">
@@ -1094,8 +1259,8 @@ The boundary value.
 
 <div class ="fragment">
 <pre>
-                        const Real value = exact_solution(xf, yf, zf);
-        
+                              const Real value = exact_solution(xf, yf, zf);
+        		      
 </pre>
 </div>
 <div class = "comment">
@@ -1104,10 +1269,10 @@ Matrix contribution of the L2 projection.
 
 <div class ="fragment">
 <pre>
-                        for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                          for (unsigned int j=0; j&lt;phi_face.size(); j++)
-                            Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-        
+                              for (unsigned int i=0; i&lt;phi_face.size(); i++)
+        			for (unsigned int j=0; j&lt;phi_face.size(); j++)
+        			  Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+        		      
 </pre>
 </div>
 <div class = "comment">
@@ -1117,12 +1282,12 @@ projection.
 
 <div class ="fragment">
 <pre>
-                        for (unsigned int i=0; i&lt;phi_face.size(); i++)
-                          Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                      } 
-                    }
+                              for (unsigned int i=0; i&lt;phi_face.size(); i++)
+        			Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+        		    } 
+        		}
                     
-                
+        	    
 </pre>
 </div>
 <div class = "comment">
@@ -1131,9 +1296,9 @@ Stop logging the boundary condition computation
 
 <div class ="fragment">
 <pre>
-                perf_log.pop ("BCs");
-              } 
-              
+                    perf_log.pop ("BCs");
+        	  } 
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -1143,8 +1308,8 @@ we would have to apply any hanging node constraint equations
 
 <div class ="fragment">
 <pre>
-              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-        
+                  dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -1158,11 +1323,11 @@ matrix and vector into the global matrix and vector
 
 <div class ="fragment">
 <pre>
-              perf_log.push ("matrix insertion");
-              
-              system.matrix-&gt;add_matrix (Ke, dof_indices);
-              system.rhs-&gt;add_vector    (Fe, dof_indices);
-        
+                  perf_log.push ("matrix insertion");
+        	  
+        	  system.matrix-&gt;add_matrix (Ke, dof_indices);
+        	  system.rhs-&gt;add_vector    (Fe, dof_indices);
+        	  
 </pre>
 </div>
 <div class = "comment">
@@ -1172,7 +1337,8 @@ matrix and vector into the global matrix and vector
 
 <div class ="fragment">
 <pre>
-              perf_log.pop ("matrix insertion");
+                  perf_log.pop ("matrix insertion");
+        	}
             }
         
 </pre>
@@ -1202,6 +1368,7 @@ it will print its log to the screen. Pretty easy, huh?
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;gnuplot_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
@@ -1221,6 +1388,10 @@ it will print its log to the screen. Pretty easy, huh?
   
   #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;system_subset_by_subdomain.h&quot;</FONT></B>
+  
   #include <B><FONT COLOR="#BC8F8F">&quot;string_to_enum.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
   
@@ -1238,6 +1409,8 @@ it will print its log to the screen. Pretty easy, huh?
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
     LibMeshInit init (argc, argv);
+  
+    libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, <B><FONT COLOR="#BC8F8F">&quot;--enable-petsc&quot;</FONT></B>);
   
     
     GetPot command_line (argc, argv);
@@ -1273,7 +1446,7 @@ it will print its log to the screen. Pretty easy, huh?
     <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(1, <B><FONT COLOR="#BC8F8F">&quot;-n&quot;</FONT></B>) )
       ps = command_line.next(ps);
     
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string order = <B><FONT COLOR="#BC8F8F">&quot;SECOND&quot;</FONT></B>; 
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string order = <B><FONT COLOR="#BC8F8F">&quot;FIRST&quot;</FONT></B>; 
     <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(2, <B><FONT COLOR="#BC8F8F">&quot;-Order&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;-o&quot;</FONT></B>) )
       order = command_line.next(order);
   
@@ -1321,10 +1494,65 @@ it will print its log to the screen. Pretty easy, huh?
                                            ((dim == 2) ? QUAD9 : HEX27));
       }
   
-    
+  
+    {
+      MeshRefinement meshRefinement(mesh);
+  
+      <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::element_iterator       elem_it  = mesh.elements_begin();
+      <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::element_iterator elem_end = mesh.elements_end(); 
+      <B><FONT COLOR="#A020F0">for</FONT></B> (; elem_it != elem_end; ++elem_it)
+        {
+  	Elem* elem = *elem_it;
+  	<B><FONT COLOR="#A020F0">if</FONT></B>(elem-&gt;active())
+  	  {
+  	    <B><FONT COLOR="#228B22">bool</FONT></B> node_in = false;
+  	    <B><FONT COLOR="#228B22">bool</FONT></B> node_out = false;
+  	    <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;elem-&gt;n_nodes(); i++)
+  	      {
+  		<B><FONT COLOR="#228B22">double</FONT></B> d = elem-&gt;point(i).size();
+  		<B><FONT COLOR="#A020F0">if</FONT></B>(d&lt;0.8)
+  		  {
+  		    node_in = true;
+  		  }
+  		<B><FONT COLOR="#A020F0">else</FONT></B>
+  		  {
+  		    node_out = true;
+  		  }
+  	      }
+  	    <B><FONT COLOR="#A020F0">if</FONT></B>(node_in &amp;&amp; node_out)
+  	      {
+  		elem-&gt;set_refinement_flag(Elem::REFINE);
+  	      }
+  	    <B><FONT COLOR="#A020F0">else</FONT></B>
+  	      {
+  		elem-&gt;set_refinement_flag(Elem::DO_NOTHING);
+  	      }
+  	  }
+  	<B><FONT COLOR="#A020F0">else</FONT></B>
+  	  {
+  	    elem-&gt;set_refinement_flag(Elem::INACTIVE);
+  	  }
+        }
+  
+      meshRefinement.refine_elements();
+    }
+  
     mesh.print_info();
     
-    
+    {
+      <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::element_iterator       elem_it  = mesh.elements_begin();
+      <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::element_iterator elem_end = mesh.elements_end(); 
+      <B><FONT COLOR="#A020F0">for</FONT></B> (; elem_it != elem_end; ++elem_it)
+        {
+  	Elem* elem = *elem_it;
+  	<B><FONT COLOR="#228B22">double</FONT></B> d = elem-&gt;centroid().size();
+  	<B><FONT COLOR="#A020F0">if</FONT></B>(d&lt;0.8)
+  	  {
+  	    elem-&gt;subdomain_id() = 1;
+  	  }
+        }
+    }
+  
     EquationSystems equation_systems (mesh);
     
     LinearImplicitSystem&amp; system =
@@ -1342,6 +1570,13 @@ it will print its log to the screen. Pretty easy, huh?
     equation_systems.print_info();
     mesh.print_info();
   
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;subdomain_id_type&gt; id_list;
+    id_list.insert(1);
+    <B><FONT COLOR="#5F9EA0">SystemSubsetBySubdomain</FONT></B>::SubdomainSelectionByList selection(id_list);
+    SystemSubsetBySubdomain subset(system,selection);
+    system.restrict_solve_to(&amp;subset,SUBSET_ZERO);
+  
+    
     equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
   
     <B><FONT COLOR="#A020F0">if</FONT></B>(dim == 1)
@@ -1349,14 +1584,16 @@ it will print its log to the screen. Pretty easy, huh?
       GnuPlotIO plot(mesh,<B><FONT COLOR="#BC8F8F">&quot;Example 4, 1D&quot;</FONT></B>,GnuPlotIO::GRID_ON);
       plot.write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;out_1&quot;</FONT></B>,equation_systems);
     }
-  #ifdef LIBMESH_HAVE_EXODUS_API
     <B><FONT COLOR="#A020F0">else</FONT></B>
     {
+      GMVIO (mesh).write_equation_systems ((dim == 3) ? 
+        <B><FONT COLOR="#BC8F8F">&quot;out_3.gmv&quot;</FONT></B> : <B><FONT COLOR="#BC8F8F">&quot;out_2.gmv&quot;</FONT></B>,equation_systems);
+  #ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO (mesh).write_equation_systems ((dim == 3) ? 
         <B><FONT COLOR="#BC8F8F">&quot;out_3.exd&quot;</FONT></B> : <B><FONT COLOR="#BC8F8F">&quot;out_2.exd&quot;</FONT></B>,equation_systems);
-    }
   #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
-</FONT></I>    
+</FONT></I>    }
+  
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
@@ -1411,117 +1648,121 @@ it will print its log to the screen. Pretty easy, huh?
   
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
-        perf_log.push(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
-  
         <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
   
-        dof_map.dof_indices (elem, dof_indices);
-  
-        fe-&gt;reinit (elem);
-  
-        Ke.resize (dof_indices.size(),
-                   dof_indices.size());
-  
-        Fe.resize (dof_indices.size());
-  
-        perf_log.pop(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
-  
-        perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
-  
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
-              Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-              
-  
-        perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
-  
-        perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;Fe&quot;</FONT></B>);
-        
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-          {
-            <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
-            <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
-            <B><FONT COLOR="#228B22">const</FONT></B> Real z = q_point[qp](2);
-            <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
-  
-            <B><FONT COLOR="#228B22">const</FONT></B> Real uxx = (exact_solution(x-eps,y,z) +
-                              exact_solution(x+eps,y,z) +
-                              -2.*exact_solution(x,y,z))/eps/eps;
+        <B><FONT COLOR="#A020F0">if</FONT></B>(elem-&gt;subdomain_id()==1)
+  	{
+  	  perf_log.push(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
+  	  
+  	  dof_map.dof_indices (elem, dof_indices);
+  	  
+  	  fe-&gt;reinit (elem);
+  	  
+  	  Ke.resize (dof_indices.size(),
+  		     dof_indices.size());
+  	  
+  	  Fe.resize (dof_indices.size());
+  	  
+  	  perf_log.pop(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
+  	  
+  	  perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
+  	  
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
+  		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+  	  
+  	  
+  	  perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
+  	  
+  	  perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;Fe&quot;</FONT></B>);
+  	  
+  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
+  	    {
+  	      <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
+  	      <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
+  	      <B><FONT COLOR="#228B22">const</FONT></B> Real z = q_point[qp](2);
+  	      <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
+  	      
+  	      <B><FONT COLOR="#228B22">const</FONT></B> Real uxx = (exact_solution(x-eps,y,z) +
+  				exact_solution(x+eps,y,z) +
+  				-2.*exact_solution(x,y,z))/eps/eps;
                 
-            <B><FONT COLOR="#228B22">const</FONT></B> Real uyy = (exact_solution(x,y-eps,z) +
-                              exact_solution(x,y+eps,z) +
-                              -2.*exact_solution(x,y,z))/eps/eps;
-            
-            <B><FONT COLOR="#228B22">const</FONT></B> Real uzz = (exact_solution(x,y,z-eps) +
-                              exact_solution(x,y,z+eps) +
-                              -2.*exact_solution(x,y,z))/eps/eps;
-  
-            Real fxy;
-            <B><FONT COLOR="#A020F0">if</FONT></B>(dim==1)
-            {
-              <B><FONT COLOR="#228B22">const</FONT></B> Real pi = libMesh::pi;
-              fxy = (0.25*pi*pi)*sin(.5*pi*x);
-            }
-            <B><FONT COLOR="#A020F0">else</FONT></B>
-            {
-              fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-            } 
-  
-            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-              Fe(i) += JxW[qp]*fxy*phi[i][qp];          
-          }
-        
-        perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;Fe&quot;</FONT></B>);
-  
-        {
-          
-          perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
-  
-          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
-            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
-              {
+  	      <B><FONT COLOR="#228B22">const</FONT></B> Real uyy = (exact_solution(x,y-eps,z) +
+  				exact_solution(x,y+eps,z) +
+  				-2.*exact_solution(x,y,z))/eps/eps;
+  	      
+  	      <B><FONT COLOR="#228B22">const</FONT></B> Real uzz = (exact_solution(x,y,z-eps) +
+  				exact_solution(x,y,z+eps) +
+  				-2.*exact_solution(x,y,z))/eps/eps;
+  	      
+  	      Real fxy;
+  	      <B><FONT COLOR="#A020F0">if</FONT></B>(dim==1)
+  		{
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real pi = libMesh::pi;
+  		  fxy = (0.25*pi*pi)*sin(.5*pi*x);
+  		}
+  	      <B><FONT COLOR="#A020F0">else</FONT></B>
+  		{
+  		  fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+  		} 
+  	      
+  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+  		Fe(i) += JxW[qp]*fxy*phi[i][qp];          
+  	    }
+  	  
+  	  perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;Fe&quot;</FONT></B>);
+  	  
+  	  {
+  	    
+  	    perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
+  	    
+  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+  	      <B><FONT COLOR="#A020F0">if</FONT></B> ((elem-&gt;neighbor(side) == NULL) ||
+  		  (elem-&gt;neighbor(side)-&gt;subdomain_id()!=1))
+  		{
+  		  
+  		  <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+  		  
+  		  <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+  		  
+  		  <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+  		  
+  		  <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
+  		  
+  		  fe_face-&gt;reinit(elem, side);
+  		  
+  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+  		    {
+  		      <B><FONT COLOR="#228B22">const</FONT></B> Real xf = qface_point[qp](0);
+  		      <B><FONT COLOR="#228B22">const</FONT></B> Real yf = qface_point[qp](1);
+  		      <B><FONT COLOR="#228B22">const</FONT></B> Real zf = qface_point[qp](2);
+  		      
+  		      
+  		      <B><FONT COLOR="#228B22">const</FONT></B> Real value = exact_solution(xf, yf, zf);
+  		      
+  		      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+  			<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
+  			  Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+  		      
+  		      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+  			Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+  		    } 
+  		}
               
-                <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
-  
-                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
-  
-                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-  
-                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
-  
-                fe_face-&gt;reinit(elem, side);
-  
-                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
-                {
-                  <B><FONT COLOR="#228B22">const</FONT></B> Real xf = qface_point[qp](0);
-                  <B><FONT COLOR="#228B22">const</FONT></B> Real yf = qface_point[qp](1);
-                  <B><FONT COLOR="#228B22">const</FONT></B> Real zf = qface_point[qp](2);
-  
-  
-                  <B><FONT COLOR="#228B22">const</FONT></B> Real value = exact_solution(xf, yf, zf);
-  
-                  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
-                      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-  
-                  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-                    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                } 
-              }
-              
-          
-          perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
-        } 
-        
-        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-  
-        perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
-        
-        system.matrix-&gt;add_matrix (Ke, dof_indices);
-        system.rhs-&gt;add_vector    (Fe, dof_indices);
-  
-        perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
+  	    
+  	    perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
+  	  } 
+  	  
+  	  dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+  	  
+  	  perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
+  	  
+  	  system.matrix-&gt;add_matrix (Ke, dof_indices);
+  	  system.rhs-&gt;add_vector    (Fe, dof_indices);
+  	  
+  	  perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
+  	}
       }
   
   }
@@ -1529,9 +1770,9 @@ it will print its log to the screen. Pretty easy, huh?
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in optimized mode) ex4.C...
+Compiling C++ (in optimized mode) ex25.C...
 /org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
-make[1]: *** [ex4.x86_64-unknown-linux-gnu.opt.o] Error 1
+make[1]: *** [ex25.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

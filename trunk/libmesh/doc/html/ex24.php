@@ -7,23 +7,16 @@
  
 <body>
  
-<?php make_navigation("ex10",$root)?>
+<?php make_navigation("ex24",$root)?>
  
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-<h1>Example 10 - Solving a Transient System with Adaptive Mesh Refinement</h1>
+<h1>Example 24 - Periodic Boundary Conditions with Adaptive Mesh Refinement</h1>
 
-<br><br>This example shows how a simple, linear transient
-system can be solved in parallel.  The system is simple
-scalar convection-diffusion with a specified external
-velocity.  The initial condition is given, and the
-solution is advanced in time with a standard Crank-Nicolson
-time-stepping strategy.
-
-<br><br>Also, we use this example to demonstrate writing out and reading
-in of solutions. We do 25 time steps, then save the solution
-and do another 25 time steps starting from the saved solution.
+<br><br>This example uses the same simple, linear transient
+system as in example 18; however in this case periodic boundary
+conditions are applied at the sides of the domain.
  
 
 <br><br>C++ include files that we need
@@ -47,6 +40,7 @@ Basic include file needed for the mesh functionality.
         #include "mesh.h"
         #include "mesh_refinement.h"
         #include "gmv_io.h"
+        #include "exodusII_io.h"
         #include "equation_systems.h"
         #include "fe.h"
         #include "quadrature_gauss.h"
@@ -55,6 +49,9 @@ Basic include file needed for the mesh functionality.
         #include "numeric_vector.h"
         #include "dense_matrix.h"
         #include "dense_vector.h"
+        
+        #include "periodic_boundaries.h"
+        #include "mesh_generation.h"
         
         #include "getpot.h"
         
@@ -196,8 +193,10 @@ Initialize libMesh.
 <pre>
           LibMeshInit init (argc, argv);
         
-        #ifndef LIBMESH_ENABLE_AMR
+        #if !defined(LIBMESH_ENABLE_AMR)
           libmesh_example_assert(false, "--enable-amr");
+        #elif !defined(LIBMESH_ENABLE_PERIODIC)
+          libmesh_example_assert(false, "--enable-periodic");
         #else
         
 </pre>
@@ -352,7 +351,7 @@ Create a new mesh.
 
 <div class ="fragment">
 <pre>
-          Mesh mesh;
+          Mesh mesh(2);
         
 </pre>
 </div>
@@ -378,12 +377,12 @@ First we process the case where we do not read in the solution
 </pre>
 </div>
 <div class = "comment">
-Read the mesh from file.
+mesh.read("mesh.xda");
 </div>
 
 <div class ="fragment">
 <pre>
-              mesh.read ("mesh.xda");
+              MeshTools::Generation::build_square(mesh, 2, 2, 0., 2., 0., 2., QUAD4);
         
 </pre>
 </div>
@@ -570,6 +569,7 @@ Prints information about the system to the screen.
             ("linear solver tolerance") = TOLERANCE;
             
           if(!read_solution)
+          {
 </pre>
 </div>
 <div class = "comment">
@@ -580,7 +580,11 @@ Write out the initial condition
 <pre>
             GMVIO(mesh).write_equation_systems ("out.gmv.000",
                                                 equation_systems);
+            ExodusII_IO(mesh).write_equation_systems ("out.e.000",
+                                                equation_systems);
+          }
           else
+          {
 </pre>
 </div>
 <div class = "comment">
@@ -591,6 +595,10 @@ Write out the solution that was read in
 <pre>
             GMVIO(mesh).write_equation_systems ("solution_read_in.gmv",
                                                 equation_systems);
+            ExodusII_IO(mesh).write_equation_systems ("solution_read_in.e",
+                                                equation_systems);
+          }
+          
         
 </pre>
 </div>
@@ -630,7 +638,99 @@ system and call the linear solver.
 <pre>
           const Real dt = 0.025;
           Real time     = init_timestep*dt;
+        
+</pre>
+</div>
+<div class = "comment">
+Creating and attaching Periodic Boundaries
+</div>
+
+<div class ="fragment">
+<pre>
+          TransientLinearImplicitSystem& system =
+        	equation_systems.get_system&lt;TransientLinearImplicitSystem&gt;
+                  ("Convection-Diffusion");
+          DofMap & dof_map = system.get_dof_map();
+        
           
+</pre>
+</div>
+<div class = "comment">
+Create a boundary periodic with one displaced 2.0 in the x
+direction
+</div>
+
+<div class ="fragment">
+<pre>
+          PeriodicBoundary horz(RealVectorValue(2.0, 0., 0.));
+        
+</pre>
+</div>
+<div class = "comment">
+Connect boundary ids 3 and 1 with it
+</div>
+
+<div class ="fragment">
+<pre>
+          horz.myboundary = 3;
+          horz.pairedboundary = 1;
+        
+</pre>
+</div>
+<div class = "comment">
+Add it to the PeriodicBoundaries
+</div>
+
+<div class ="fragment">
+<pre>
+          dof_map.add_periodic_boundary(horz);
+        
+          
+</pre>
+</div>
+<div class = "comment">
+Create a boundary periodic with one displaced 2.0 in the y
+direction
+</div>
+
+<div class ="fragment">
+<pre>
+          PeriodicBoundary vert(RealVectorValue(0., 2.0, 0.));
+        
+</pre>
+</div>
+<div class = "comment">
+Connect boundary ids 0 and 2 with it
+</div>
+
+<div class ="fragment">
+<pre>
+          vert.myboundary = 0;
+          vert.pairedboundary = 2;
+        
+</pre>
+</div>
+<div class = "comment">
+Add it to the PeriodicBoundaries
+</div>
+
+<div class ="fragment">
+<pre>
+          dof_map.add_periodic_boundary(vert);
+          
+          
+</pre>
+</div>
+<div class = "comment">
+Tell the MeshRefinement object about the periodic boundaries so
+that it can get heuristics like level-one conformity and
+unrefined island elimination right.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh_refinement.set_periodic_boundaries_ptr(dof_map.get_periodic_boundaries());
+        
 </pre>
 </div>
 <div class = "comment">
@@ -786,7 +886,7 @@ ErrorEstimator* error_estimator = new KellyErrorEstimator;
 <div class ="fragment">
 <pre>
                       KellyErrorEstimator error_estimator;
-                      
+        
 </pre>
 </div>
 <div class = "comment">
@@ -869,12 +969,16 @@ Output every 10 timesteps to file.
 <pre>
               if ( (t_step+1)%output_freq == 0)
                 {
-                  OStringStream file_name;
+                  OStringStream file_name, exodus_file_name;
         
                   file_name &lt;&lt; "out.gmv.";
                   OSSRealzeroright(file_name,3,0,t_step+1);
         
                   GMVIO(mesh).write_equation_systems (file_name.str(),
+                                                      equation_systems);
+                  exodus_file_name &lt;&lt; "out.e.";
+                  OSSRealzeroright(exodus_file_name,3,0,t_step+1);
+                  ExodusII_IO(mesh).write_equation_systems (exodus_file_name.str(),
                                                       equation_systems);
                 }
             }
@@ -899,6 +1003,8 @@ Print out the H1 norm of the saved solution, for verification purposes:
               mesh.write("saved_mesh.xda");
               equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
               GMVIO(mesh).write_equation_systems ("saved_solution.gmv",
+                                                  equation_systems);
+              ExodusII_IO(mesh).write_equation_systems ("saved_solution.e",
                                                   equation_systems);
             }
         #endif // #ifndef LIBMESH_ENABLE_AMR
@@ -1515,6 +1621,7 @@ Finished computing the sytem matrix and right-hand side.
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
@@ -1523,6 +1630,9 @@ Finished computing the sytem matrix and right-hand side.
   #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;periodic_boundaries.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
   
   #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
   
@@ -1563,8 +1673,10 @@ Finished computing the sytem matrix and right-hand side.
   {
     LibMeshInit init (argc, argv);
   
-  #ifndef LIBMESH_ENABLE_AMR
+  #<B><FONT COLOR="#A020F0">if</FONT></B> !defined(LIBMESH_ENABLE_AMR)
     libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-amr&quot;</FONT></B>);
+  #elif !defined(LIBMESH_ENABLE_PERIODIC)
+    libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-periodic&quot;</FONT></B>);
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
     libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, <B><FONT COLOR="#BC8F8F">&quot;--enable-petsc&quot;</FONT></B>);
@@ -1613,14 +1725,14 @@ Finished computing the sytem matrix and right-hand side.
   
     libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
   
-    Mesh mesh;
+    Mesh mesh(2);
   
     EquationSystems equation_systems (mesh);
     MeshRefinement mesh_refinement (mesh);
   
     <B><FONT COLOR="#A020F0">if</FONT></B>(!read_solution)
       {
-        mesh.read (<B><FONT COLOR="#BC8F8F">&quot;mesh.xda&quot;</FONT></B>);
+        <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square(mesh, 2, 2, 0., 2., 0., 2., QUAD4);
   
         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_refinements = 5;
         <B><FONT COLOR="#A020F0">if</FONT></B>(command_line.search(<B><FONT COLOR="#BC8F8F">&quot;-n_refinements&quot;</FONT></B>))
@@ -1672,11 +1784,20 @@ Finished computing the sytem matrix and right-hand side.
       (<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = TOLERANCE;
       
     <B><FONT COLOR="#A020F0">if</FONT></B>(!read_solution)
+    {
       GMVIO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.gmv.000&quot;</FONT></B>,
                                           equation_systems);
+      ExodusII_IO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.e.000&quot;</FONT></B>,
+                                          equation_systems);
+    }
     <B><FONT COLOR="#A020F0">else</FONT></B>
+    {
       GMVIO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;solution_read_in.gmv&quot;</FONT></B>,
                                           equation_systems);
+      ExodusII_IO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;solution_read_in.e&quot;</FONT></B>,
+                                          equation_systems);
+    }
+    
   
     equation_systems.parameters.set&lt;RealVectorValue&gt;(<B><FONT COLOR="#BC8F8F">&quot;velocity&quot;</FONT></B>) = 
       RealVectorValue (0.8, 0.8);
@@ -1685,7 +1806,31 @@ Finished computing the sytem matrix and right-hand side.
       
     <B><FONT COLOR="#228B22">const</FONT></B> Real dt = 0.025;
     Real time     = init_timestep*dt;
+  
+    TransientLinearImplicitSystem&amp; system =
+  	equation_systems.get_system&lt;TransientLinearImplicitSystem&gt;
+            (<B><FONT COLOR="#BC8F8F">&quot;Convection-Diffusion&quot;</FONT></B>);
+    DofMap &amp; dof_map = system.get_dof_map();
+  
     
+    PeriodicBoundary horz(RealVectorValue(2.0, 0., 0.));
+  
+    horz.myboundary = 3;
+    horz.pairedboundary = 1;
+  
+    dof_map.add_periodic_boundary(horz);
+  
+    
+    PeriodicBoundary vert(RealVectorValue(0., 2.0, 0.));
+  
+    vert.myboundary = 0;
+    vert.pairedboundary = 2;
+  
+    dof_map.add_periodic_boundary(vert);
+    
+    
+    mesh_refinement.set_periodic_boundaries_ptr(dof_map.get_periodic_boundaries());
+  
     <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> t_step=init_timestep; 
                      t_step&lt;(init_timestep+n_timesteps); 
                      t_step++)
@@ -1729,7 +1874,7 @@ Finished computing the sytem matrix and right-hand side.
                 ErrorVector error;
   
                 KellyErrorEstimator error_estimator;
-                
+  
                 error_estimator.estimate_error (system,
                                                 error);
                 
@@ -1750,12 +1895,16 @@ Finished computing the sytem matrix and right-hand side.
   
         <B><FONT COLOR="#A020F0">if</FONT></B> ( (t_step+1)%output_freq == 0)
           {
-            OStringStream file_name;
+            OStringStream file_name, exodus_file_name;
   
             file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out.gmv.&quot;</FONT></B>;
             OSSRealzeroright(file_name,3,0,t_step+1);
   
             GMVIO(mesh).write_equation_systems (file_name.str(),
+                                                equation_systems);
+            exodus_file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out.e.&quot;</FONT></B>;
+            OSSRealzeroright(exodus_file_name,3,0,t_step+1);
+            ExodusII_IO(mesh).write_equation_systems (exodus_file_name.str(),
                                                 equation_systems);
           }
       }
@@ -1772,6 +1921,8 @@ Finished computing the sytem matrix and right-hand side.
         mesh.write(<B><FONT COLOR="#BC8F8F">&quot;saved_mesh.xda&quot;</FONT></B>);
         equation_systems.write(<B><FONT COLOR="#BC8F8F">&quot;saved_solution.xda&quot;</FONT></B>, libMeshEnums::WRITE);
         GMVIO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;saved_solution.gmv&quot;</FONT></B>,
+                                            equation_systems);
+        ExodusII_IO(mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;saved_solution.e&quot;</FONT></B>,
                                             equation_systems);
       }
   #endif <I><FONT COLOR="#B22222">// #ifndef LIBMESH_ENABLE_AMR
@@ -1931,9 +2082,9 @@ Finished computing the sytem matrix and right-hand side.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in optimized mode) ex10.C...
+Compiling C++ (in optimized mode) ex24.C...
 /org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
-make[1]: *** [ex10.x86_64-unknown-linux-gnu.opt.o] Error 1
+make[1]: *** [ex24.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

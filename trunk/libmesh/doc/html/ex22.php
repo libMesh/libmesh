@@ -7,26 +7,17 @@
  
 <body>
  
-<?php make_navigation("ex13",$root)?>
+<?php make_navigation("ex22",$root)?>
  
 <div class="content">
 <a name="comments"></a> 
 <div class = "comment">
-<h1>Example 13 - Unsteady Navier-Stokes Equations - Unsteady Nonlinear Systems of Equations</h1>
+<h1>Example 22 - Unsteady Navier-Stokes Equations - SCALAR variables</h1>
 
-<br><br>This example shows how a simple, unsteady, nonlinear system of equations
-can be solved in parallel.  The system of equations are the familiar
-Navier-Stokes equations for low-speed incompressible fluid flow.  This
-example introduces the concept of the inner nonlinear loop for each
-timestep, and requires a good deal of linear algebra number-crunching
-at each step.  If you have a ExodusII viewer such as ParaView installed,
-the script movie.sh in this directory will also take appropriate screen
-shots of each of the solution files in the time sequence.  These rgb files
-can then be animated with the "animate" utility of ImageMagick if it is
-installed on your system.  On a PIII 1GHz machine in debug mode, this
-example takes a little over a minute to run.  If you would like to see
-a more detailed time history, or compute more timesteps, that is certainly
-possible by changing the n_timesteps and dt variables below.
+<br><br>This example shows how the transient Navier-Stokes problem from
+example 13 can be solved using a scalar Lagrange multiplier formulation to
+constrain the integral of the pressure variable, rather than pinning the
+pressure at a single point.
 
 
 <br><br>C++ include files that we need
@@ -193,9 +184,7 @@ approximation, as in example 3.
                                                20, 20,
                                                0., 1.,
                                                0., 1.,
-                                               QUAD4);
-        
-          mesh.all_second_order();
+                                               QUAD9);
           
 </pre>
 </div>
@@ -252,6 +241,17 @@ providing an LBB-stable pressure-velocity pair.
 <div class ="fragment">
 <pre>
           system.add_variable ("p", FIRST);
+        
+</pre>
+</div>
+<div class = "comment">
+Add a scalar Lagrange multiplier to constrain the
+pressure to have zero mean.
+</div>
+
+<div class ="fragment">
+<pre>
+          system.add_variable ("alpha", FIRST, SCALAR);
         
 </pre>
 </div>
@@ -676,6 +676,7 @@ Numeric ids corresponding to each variable in the system
           const unsigned int u_var = navier_stokes_system.variable_number ("u");
           const unsigned int v_var = navier_stokes_system.variable_number ("v");
           const unsigned int p_var = navier_stokes_system.variable_number ("p");
+          const unsigned int alpha_var = navier_stokes_system.variable_number ("alpha");
           
 </pre>
 </div>
@@ -822,6 +823,7 @@ basic finite element terminology we will denote these
             Kuu(Ke), Kuv(Ke), Kup(Ke),
             Kvu(Ke), Kvv(Ke), Kvp(Ke),
             Kpu(Ke), Kpv(Ke), Kpp(Ke);
+          DenseSubMatrix&lt;Number&gt; Kalpha_p(Ke), Kp_alpha(Ke);
         
           DenseSubVector&lt;Number&gt;
             Fu(Fe),
@@ -842,6 +844,7 @@ the element degrees of freedom get mapped.
           std::vector&lt;unsigned int&gt; dof_indices_u;
           std::vector&lt;unsigned int&gt; dof_indices_v;
           std::vector&lt;unsigned int&gt; dof_indices_p;
+          std::vector&lt;unsigned int&gt; dof_indices_alpha;
         
 </pre>
 </div>
@@ -914,6 +917,7 @@ contribute to.
               dof_map.dof_indices (elem, dof_indices_u, u_var);
               dof_map.dof_indices (elem, dof_indices_v, v_var);
               dof_map.dof_indices (elem, dof_indices_p, p_var);
+              dof_map.dof_indices (elem, dof_indices_alpha, alpha_var);
         
               const unsigned int n_dofs   = dof_indices.size();
               const unsigned int n_u_dofs = dof_indices_u.size(); 
@@ -981,6 +985,18 @@ takes the (row_offset, row_size)
               Kpu.reposition (p_var*n_u_dofs, u_var*n_u_dofs, n_p_dofs, n_u_dofs);
               Kpv.reposition (p_var*n_u_dofs, v_var*n_u_dofs, n_p_dofs, n_v_dofs);
               Kpp.reposition (p_var*n_u_dofs, p_var*n_u_dofs, n_p_dofs, n_p_dofs);
+        
+</pre>
+</div>
+<div class = "comment">
+Also, add a row and a column to constrain the pressure
+</div>
+
+<div class ="fragment">
+<pre>
+              Kp_alpha.reposition (p_var*n_u_dofs, p_var*n_u_dofs+n_p_dofs, n_p_dofs, 1);
+              Kalpha_p.reposition (p_var*n_u_dofs+n_p_dofs, p_var*n_u_dofs, 1, n_p_dofs);
+        
         
               Fu.reposition (u_var*n_u_dofs, n_u_dofs);
               Fv.reposition (v_var*n_u_dofs, n_v_dofs);
@@ -1165,6 +1181,8 @@ negative one.  Here we do not.
 <pre>
                   for (unsigned int i=0; i&lt;n_p_dofs; i++)
                     {
+                      Kp_alpha(i,0) += JxW[qp]*psi[i][qp];
+                      Kalpha_p(0,i) += JxW[qp]*psi[i][qp];
                       for (unsigned int j=0; j&lt;n_u_dofs; j++)
                         {
                           Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
@@ -1303,31 +1321,8 @@ Right-hand-side contribution.
                               }
                         } // end face node loop          
                     } // end if (elem-&gt;neighbor(side) == NULL)
-                
-</pre>
-</div>
-<div class = "comment">
-Pin the pressure to zero at global node number "pressure_node".
-This effectively removes the non-trivial null space of constant
-pressure solutions.
-</div>
-
-<div class ="fragment">
-<pre>
-                const bool pin_pressure = true;
-                if (pin_pressure)
-                  {
-                    const unsigned int pressure_node = 0;
-                    const Real p_value               = 0.0;
-                    for (unsigned int c=0; c&lt;elem-&gt;n_nodes(); c++)
-                      if (elem-&gt;node(c) == pressure_node)
-                        {
-                          Kpp(c,c) += penalty;
-                          Fp(c)    += penalty*p_value;
-                        }
-                  }
               } // end boundary condition section          
-              
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1353,7 +1348,17 @@ and \p PetscVector::add_vector() members do this for us.
               navier_stokes_system.matrix-&gt;add_matrix (Ke, dof_indices);
               navier_stokes_system.rhs-&gt;add_vector    (Fe, dof_indices);
             } // end of element loop
-          
+        
+</pre>
+</div>
+<div class = "comment">
+We can set the mean of the pressure by setting Falpha
+</div>
+
+<div class ="fragment">
+<pre>
+          navier_stokes_system.rhs-&gt;add(navier_stokes_system.rhs-&gt;size()-1,10.);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1424,9 +1429,7 @@ That's it.
                                          20, 20,
                                          0., 1.,
                                          0., 1.,
-                                         QUAD4);
-  
-    mesh.all_second_order();
+                                         QUAD9);
     
     mesh.print_info();
     
@@ -1439,6 +1442,8 @@ That's it.
     system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, SECOND);
   
     system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
+  
+    system.add_variable (<B><FONT COLOR="#BC8F8F">&quot;alpha&quot;</FONT></B>, FIRST, SCALAR);
   
     system.attach_assemble_function (assemble_stokes);
     
@@ -1559,6 +1564,7 @@ That's it.
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = navier_stokes_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = navier_stokes_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>);
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> p_var = navier_stokes_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> alpha_var = navier_stokes_system.variable_number (<B><FONT COLOR="#BC8F8F">&quot;alpha&quot;</FONT></B>);
     
     FEType fe_vel_type = navier_stokes_system.variable_type(u_var);
     
@@ -1591,6 +1597,7 @@ That's it.
       Kuu(Ke), Kuv(Ke), Kup(Ke),
       Kvu(Ke), Kvv(Ke), Kvp(Ke),
       Kpu(Ke), Kpv(Ke), Kpp(Ke);
+    DenseSubMatrix&lt;Number&gt; Kalpha_p(Ke), Kp_alpha(Ke);
   
     DenseSubVector&lt;Number&gt;
       Fu(Fe),
@@ -1601,6 +1608,7 @@ That's it.
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_u;
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_v;
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_p;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_alpha;
   
     <B><FONT COLOR="#228B22">const</FONT></B> Real dt    = es.parameters.get&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;dt&quot;</FONT></B>);
     <B><FONT COLOR="#228B22">const</FONT></B> Real theta = 1.;
@@ -1616,6 +1624,7 @@ That's it.
         dof_map.dof_indices (elem, dof_indices_u, u_var);
         dof_map.dof_indices (elem, dof_indices_v, v_var);
         dof_map.dof_indices (elem, dof_indices_p, p_var);
+        dof_map.dof_indices (elem, dof_indices_alpha, alpha_var);
   
         <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_dofs   = dof_indices.size();
         <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = dof_indices_u.size(); 
@@ -1639,6 +1648,10 @@ That's it.
         Kpu.reposition (p_var*n_u_dofs, u_var*n_u_dofs, n_p_dofs, n_u_dofs);
         Kpv.reposition (p_var*n_u_dofs, v_var*n_u_dofs, n_p_dofs, n_v_dofs);
         Kpp.reposition (p_var*n_u_dofs, p_var*n_u_dofs, n_p_dofs, n_p_dofs);
+  
+        Kp_alpha.reposition (p_var*n_u_dofs, p_var*n_u_dofs+n_p_dofs, n_p_dofs, 1);
+        Kalpha_p.reposition (p_var*n_u_dofs+n_p_dofs, p_var*n_u_dofs, 1, n_p_dofs);
+  
   
         Fu.reposition (u_var*n_u_dofs, n_u_dofs);
         Fv.reposition (v_var*n_u_dofs, n_v_dofs);
@@ -1720,6 +1733,8 @@ That's it.
   
             <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_p_dofs; i++)
               {
+                Kp_alpha(i,0) += JxW[qp]*psi[i][qp];
+                Kalpha_p(0,i) += JxW[qp]*psi[i][qp];
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_u_dofs; j++)
                   {
                     Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
@@ -1760,36 +1775,25 @@ That's it.
                         }
                   } <I><FONT COLOR="#B22222">// end face node loop          
 </FONT></I>              } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
-</FONT></I>          
-          <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> pin_pressure = true;
-          <B><FONT COLOR="#A020F0">if</FONT></B> (pin_pressure)
-            {
-              <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> pressure_node = 0;
-              <B><FONT COLOR="#228B22">const</FONT></B> Real p_value               = 0.0;
-              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> c=0; c&lt;elem-&gt;n_nodes(); c++)
-                <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;node(c) == pressure_node)
-                  {
-                    Kpp(c,c) += penalty;
-                    Fp(c)    += penalty*p_value;
-                  }
-            }
-        } <I><FONT COLOR="#B22222">// end boundary condition section          
-</FONT></I>        
+</FONT></I>        } <I><FONT COLOR="#B22222">// end boundary condition section          
+</FONT></I>  
         dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
   
         navier_stokes_system.matrix-&gt;add_matrix (Ke, dof_indices);
         navier_stokes_system.rhs-&gt;add_vector    (Fe, dof_indices);
       } <I><FONT COLOR="#B22222">// end of element loop
-</FONT></I>    
+</FONT></I>  
+    navier_stokes_system.rhs-&gt;add(navier_stokes_system.rhs-&gt;size()-1,10.);
+  
     <B><FONT COLOR="#A020F0">return</FONT></B>;
   }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in optimized mode) ex13.C...
+Compiling C++ (in optimized mode) ex22.C...
 /org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
-make[1]: *** [ex13.x86_64-unknown-linux-gnu.opt.o] Error 1
+make[1]: *** [ex22.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>
