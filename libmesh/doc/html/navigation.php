@@ -50,7 +50,7 @@ function load_style($root)
     <?php echo "<a class=\"L1\" href = \"", $root, "examples.php\">Examples</a><BR>"; ?>
     <?php if (ereg("^ex[0-9]+|examples",$mode))
             {
-              for ($i=0; $i<20; $i++)
+              for ($i=0; $i<26; $i++)
                 {
                   make_example_subs($i, $root, $mode);
                 }

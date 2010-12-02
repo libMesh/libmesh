@@ -15,7 +15,7 @@
 <h1>Example 24 - Periodic Boundary Conditions with Adaptive Mesh Refinement</h1>
 
 <br><br>This example uses the same simple, linear transient
-system as in example 18; however in this case periodic boundary
+system as in example 10; however in this case periodic boundary
 conditions are applied at the sides of the domain.
  
 
@@ -351,7 +351,7 @@ Create a new mesh.
 
 <div class ="fragment">
 <pre>
-          Mesh mesh(2);
+          Mesh mesh;
         
 </pre>
 </div>
@@ -374,14 +374,6 @@ First we process the case where we do not read in the solution
 <pre>
           if(!read_solution)
             {
-</pre>
-</div>
-<div class = "comment">
-mesh.read("mesh.xda");
-</div>
-
-<div class ="fragment">
-<pre>
               MeshTools::Generation::build_square(mesh, 2, 2, 0., 2., 0., 2., QUAD4);
         
 </pre>
@@ -1725,7 +1717,7 @@ Finished computing the sytem matrix and right-hand side.
   
     libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
   
-    Mesh mesh(2);
+    Mesh mesh;
   
     EquationSystems equation_systems (mesh);
     MeshRefinement mesh_refinement (mesh);
