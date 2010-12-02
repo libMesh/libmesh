@@ -104,6 +104,9 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-petsc");
 #endif
 
+  // Skip this 2D example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  
   // Parse the input file (ex23.in) using GetPot
   std::string parameters_filename = "ex23.in";
   GetPot infile(parameters_filename);
