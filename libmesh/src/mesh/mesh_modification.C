@@ -837,97 +837,101 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      {
 		for (unsigned int sn=0; sn<(*el)->n_sides(); ++sn)
 		  {
-		    short int b_id = mesh.boundary_info->boundary_id(*el, sn);
+                    const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*el, sn);
+                    for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                      {
+                        const short int b_id = *id_it;
 
-		    if (b_id != BoundaryInfo::invalid_id)
-		      {
-			// Add the boundary ID to the list of new boundary ids
-			new_bndry_ids.push_back(b_id);
+		        if (b_id != BoundaryInfo::invalid_id)
+		          {
+			    // Add the boundary ID to the list of new boundary ids
+			    new_bndry_ids.push_back(b_id);
 			  
-			// Convert the boundary side information of the old element to
-			// boundary side information for the new element.
-			if (!edge_swap)
-			  {
-			    switch (sn)
+			    // Convert the boundary side information of the old element to
+			    // boundary side information for the new element.
+			    if (!edge_swap)
 			      {
-			      case 0:
-				{
-				  // New boundary side is Tri 0, side 0
-				  new_bndry_elements.push_back(tri0);
-				  new_bndry_sides.push_back(0);
-				  break;
-				}
-			      case 1:
-				{
-				  // New boundary side is Tri 0, side 1
-				  new_bndry_elements.push_back(tri0);
-				  new_bndry_sides.push_back(1);
-				  break;
-				}
-			      case 2:
-				{
-				  // New boundary side is Tri 1, side 1
-				  new_bndry_elements.push_back(tri1);
-				  new_bndry_sides.push_back(1);
-				  break;
-				}
-			      case 3:
-				{
-				  // New boundary side is Tri 1, side 2
-				  new_bndry_elements.push_back(tri1);
-				  new_bndry_sides.push_back(2);
-				  break;
-				}
+			        switch (sn)
+			          {
+			          case 0:
+				    {
+				      // New boundary side is Tri 0, side 0
+				      new_bndry_elements.push_back(tri0);
+				      new_bndry_sides.push_back(0);
+				      break;
+				    }
+			          case 1:
+				    {
+				      // New boundary side is Tri 0, side 1
+				      new_bndry_elements.push_back(tri0);
+				      new_bndry_sides.push_back(1);
+				      break;
+				    }
+			          case 2:
+				    {
+				      // New boundary side is Tri 1, side 1
+				      new_bndry_elements.push_back(tri1);
+				      new_bndry_sides.push_back(1);
+				      break;
+				    }
+			          case 3:
+				    {
+				      // New boundary side is Tri 1, side 2
+				      new_bndry_elements.push_back(tri1);
+				      new_bndry_sides.push_back(2);
+				      break;
+				    }
 
-			      default:
-				{
-				  libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-				  libmesh_error();
-				}
+			          default:
+				    {
+				      libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+				      libmesh_error();
+				    }
+			          }
 			      }
-			  }
 
-			else // edge_swap==true
-			  {
-			    switch (sn)
+			    else // edge_swap==true
 			      {
-			      case 0:
-				{
-				  // New boundary side is Tri 0, side 0
-				  new_bndry_elements.push_back(tri0);
-				  new_bndry_sides.push_back(0);
-				  break;
-				}
-			      case 1:
-				{
-				  // New boundary side is Tri 1, side 0
-				  new_bndry_elements.push_back(tri1);
-				  new_bndry_sides.push_back(0);
-				  break;
-				}
-			      case 2:
-				{
-				  // New boundary side is Tri 1, side 1
-				  new_bndry_elements.push_back(tri1);
-				  new_bndry_sides.push_back(1);
-				  break;
-				}
-			      case 3:
-				{
-				  // New boundary side is Tri 0, side 2
-				  new_bndry_elements.push_back(tri0);
-				  new_bndry_sides.push_back(2);
-				  break;
-				}
+			        switch (sn)
+			          {
+			          case 0:
+				    {
+				      // New boundary side is Tri 0, side 0
+				      new_bndry_elements.push_back(tri0);
+				      new_bndry_sides.push_back(0);
+				      break;
+				    }
+			          case 1:
+				    {
+				      // New boundary side is Tri 1, side 0
+				      new_bndry_elements.push_back(tri1);
+				      new_bndry_sides.push_back(0);
+				      break;
+				    }
+			          case 2:
+				    {
+				      // New boundary side is Tri 1, side 1
+				      new_bndry_elements.push_back(tri1);
+				      new_bndry_sides.push_back(1);
+				      break;
+				    }
+			          case 3:
+				    {
+				      // New boundary side is Tri 0, side 2
+				      new_bndry_elements.push_back(tri0);
+				      new_bndry_sides.push_back(2);
+				      break;
+				    }
 
-			      default:
-				{
-				  libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-				  libmesh_error();
-				}
-			      }
-			  } // end edge_swap==true
-		      } // end if (b_id != BoundaryInfo::invalid_id)
+			          default:
+				    {
+				      libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+				      libmesh_error();
+				    }
+			          }
+			      } // end edge_swap==true
+		          } // end if (b_id != BoundaryInfo::invalid_id)
+                      } // end for loop over boundary IDs
 		  } // end for loop over sides
 
 		// Remove the original element from the BoundaryInfo structure.
@@ -1221,13 +1225,17 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	for (unsigned int s=0; s<elem->n_sides(); s++)
 	    if (elem->neighbor(s) == NULL)
 	      {
-		short int bc_id = mesh.boundary_info->boundary_id (elem,s);
+                const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
+                for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                  {
+		    const short int bc_id = *id_it;
 
-		if (bc_id != BoundaryInfo::invalid_id)
-		  {
-		    saved_boundary_elements.push_back(copy);
-		    saved_bc_ids.push_back(bc_id);
-		    saved_bc_sides.push_back(s);
+		    if (bc_id != BoundaryInfo::invalid_id)
+		      {
+		        saved_boundary_elements.push_back(copy);
+		        saved_bc_ids.push_back(bc_id);
+		        saved_bc_sides.push_back(s);
+                      }
 		  }
 	      }
 
@@ -1289,11 +1297,16 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
       Elem *elem = *el;
       unsigned int n_sides = elem->n_sides();
       for (unsigned int s=0; s != n_sides; ++s)
-        if (mesh.boundary_info->boundary_id(elem, s) == old_id)
-          {
-            mesh.boundary_info->remove_side(elem, s, old_id);
-            mesh.boundary_info->add_side(elem, s, new_id);
-          }
+        {
+          const std::vector<short int>& old_ids = mesh.boundary_info->boundary_ids(elem, s);
+          if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
+            {
+              std::vector<short int> new_ids(old_ids);
+              std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
+              mesh.boundary_info->remove_side(elem, s);
+              mesh.boundary_info->add_side(elem, s, new_ids);
+            }
+        }
     }
 }
 

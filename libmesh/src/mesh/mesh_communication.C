@@ -361,13 +361,19 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	        if ((*elem_it)->level() == 0)
 		  for (unsigned int s=0; s<(*elem_it)->n_sides(); s++)
 		    if ((*elem_it)->neighbor(s) == NULL)
-		      if (mesh.boundary_info->boundary_id (*elem_it, s) !=
-			  mesh.boundary_info->invalid_id)
-			{
-			  element_bcs_sent[pid].push_back ((*elem_it)->id());
-			  element_bcs_sent[pid].push_back (s);
-			  element_bcs_sent[pid].push_back (mesh.boundary_info->boundary_id (*elem_it, s));
-			}
+                      {
+                        const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*elem_it, s);
+                        for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                          {
+                            const short int bc_id = *id_it;
+		            if (bc_id != mesh.boundary_info->invalid_id)
+			      {
+			        element_bcs_sent[pid].push_back ((*elem_it)->id());
+			        element_bcs_sent[pid].push_back (s);
+			        element_bcs_sent[pid].push_back (bc_id);
+			      }
+                          }
+                      }
 	      }
 	    
 	    // the packed connectivity size to send to this processor
@@ -1077,13 +1083,19 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 		if ((*elem_it)->level() == 0)
 		  for (unsigned int s=0; s<(*elem_it)->n_sides(); s++)
 		    if ((*elem_it)->neighbor(s) == NULL)
-		      if (mesh.boundary_info->boundary_id (*elem_it, s) !=
-			  mesh.boundary_info->invalid_id)
-			{
-			  element_bcs_sent.push_back ((*elem_it)->id());
-			  element_bcs_sent.push_back (s);
-			  element_bcs_sent.push_back (mesh.boundary_info->boundary_id (*elem_it, s));
-			}
+                      {
+                        const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*elem_it, s);
+                        for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                          {
+                            const short int bc_id = *id_it;
+		            if (bc_id != mesh.boundary_info->invalid_id)
+			      {
+			        element_bcs_sent.push_back ((*elem_it)->id());
+			        element_bcs_sent.push_back (s);
+			        element_bcs_sent.push_back (bc_id);
+			      }
+                          }
+                      }
 	      }
 	    element_neighbors_sent[n_elem_replies_sent].push_back (dest_pid_idx);
 	    elements_to_send.clear();

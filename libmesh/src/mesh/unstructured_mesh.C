@@ -911,11 +911,17 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
       // Maybe add boundary conditions for this element
       for (unsigned int s=0; s<old_elem->n_sides(); s++)
 	if (old_elem->neighbor(s) == NULL)
-	  if (this->boundary_info->boundary_id (old_elem, s) !=
-	      this->boundary_info->invalid_id)
-	    new_mesh.boundary_info->add_side (new_elem,
-					     s,
-					     this->boundary_info->boundary_id (old_elem, s));
+          {
+            const std::vector<short int>& bc_ids = this->boundary_info->boundary_ids(old_elem, s);
+            for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+              {
+                const short int bc_id = *id_it;
+	        if (bc_id != this->boundary_info->invalid_id)
+	        new_mesh.boundary_info->add_side (new_elem,
+					          s,
+					          bc_id);
+              }
+          }
     } // end loop over elements
   
 
