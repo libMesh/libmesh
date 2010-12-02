@@ -144,9 +144,14 @@ distclean:
 
 
 #
+# all documentation
+#
+doc: doxygen_doc examples_doc
+
+#
 # doxygen documentation
 #
-doc:
+doxygen_doc:
 	$(doxygen) ./doc/Doxyfile
 	@rm -rf doc/html/doxygen/*.map
 	@rm -rf doc/html/doxygen/*.md5
@@ -157,7 +162,7 @@ doc:
 # examples documentation
 #
 examples_doc:
-	cd contrib/bin && ./create_example_docs.sh
+	contrib/bin/create_example_docs.sh
 
 #
 # Upload the web page to sourceforge.  We need a way to specify usernames
