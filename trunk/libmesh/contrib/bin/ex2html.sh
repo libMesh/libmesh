@@ -13,7 +13,7 @@
 
 input_file=$1;
 base=`basename $input_file | cut -d"." -f1`;
-output_file=$base.php;
+output_file=../../doc/html/$base.php;
 
 # First we put our special php headings in
 echo "<?php \$root=\"\"; ?>" > $output_file;
@@ -64,9 +64,6 @@ echo "\#Local Variables:" >> $output_file;
 echo "\#mode: html" >> $output_file;
 echo "\#End:" >> $output_file;
 echo "<?php } ?>" >> $output_file;
-
-# Finally, move the output_file to the html directory
-mv $output_file ../../doc/html
 
 # Local Variables:
 # mode: shell-script
