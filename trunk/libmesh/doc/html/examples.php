@@ -243,6 +243,19 @@ library with the --enable-ifem option</i>
 
 <li><L1><a href="ex19.php">Solving the 2D Young Laplace Problem using nonlinear solvers</a></L1></li>
 
+<li><L1><a href="ex20.php">Using a Shell Matrix</a></L1></li>
+
+<li><L1><a href="ex21.php">Interior Penalty Discontinuous Galerkin</a></L1></li>
+
+<li><L1><a href="ex22.php">Navier-Stokes Using a SCALAR Lagrange Multiplier Variable</a></L1></li>
+
+<li><L1><a href="ex23.php">Certified Reduced Basis Method</a></L1></li>
+
+<li><L1><a href="ex24.php">Periodic Boundary Conditions</a></L1></li>
+
+<li><L1><a href="ex25.php">Solving on a Subdomain</a></L1></li>
+
+
 </ul>
 
 </div>
