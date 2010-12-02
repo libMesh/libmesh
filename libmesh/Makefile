@@ -154,6 +154,12 @@ doc:
 	@rm -rf doc/html/doxygen/formula.repository
 
 #
+# examples documentation
+#
+examples_doc:
+	cd contrib/bin && ./create_example_docs.sh
+
+#
 # Upload the web page to sourceforge.  We need a way to specify usernames
 # other than $USER when connecting to sourceforge servers... Please set the
 # environment variable: $LIBMESH_SVN_USER if your sourceforge username
