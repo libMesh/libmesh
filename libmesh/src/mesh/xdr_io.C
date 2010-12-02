@@ -700,14 +700,17 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
       for (unsigned int s=0; s<elem->n_sides(); s++)
 	if (elem->neighbor(s) == NULL)
 	  {
-	    const short int bc_id = 
-	      boundary_info.boundary_id (elem, s);
-
-	    if (bc_id != BoundaryInfo::invalid_id)
+	    const std::vector<short int>& bc_ids =
+	      boundary_info.boundary_ids (elem, s);
+	    for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
 	      {
-		xfer_bcs.push_back (n_local_level_0_elem); 
-		xfer_bcs.push_back (s) ;
-		xfer_bcs.push_back (bc_id);
+		const short int bc_id = *id_it;
+		if (bc_id != BoundaryInfo::invalid_id)
+		  {
+		    xfer_bcs.push_back (n_local_level_0_elem);
+		    xfer_bcs.push_back (s) ;
+		    xfer_bcs.push_back (bc_id);
+		  }
 	      }
 	  }
     }
