@@ -112,6 +112,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 	      // If the mesh is planar XY, we want to build a QuadTree
 	      // to search efficiently.  If the mesh is truly a manifold,
 	      // then we need an octree
+#if LIBMESH_DIM > 2
 	      bool is_planar_xy = false;
 	      
 	      // Build the bounding box for the mesh.  If the delta-z bound is
@@ -128,9 +129,10 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 	      }
 	      		    
 	      if (is_planar_xy)
-		_tree = new Trees::QuadTree (this->_mesh, 200, build_type);
-	      else
 		_tree = new Trees::OctTree (this->_mesh, 200, build_type);
+	      else
+#endif
+		_tree = new Trees::QuadTree (this->_mesh, 200, build_type);
 	    }
 	}
 
