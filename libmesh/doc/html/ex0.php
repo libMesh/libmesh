@@ -47,6 +47,15 @@ example which are explained more fully in subsequent examples.
         #include "kelly_error_estimator.h"
         #include "mesh_refinement.h"
         
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
         
         void assemble_1D(EquationSystems& es, const std::string& system_name);
         
@@ -57,31 +66,36 @@ example which are explained more fully in subsequent examples.
 <div class = "comment">
 Initialize the library.  This is necessary because the library
 may depend on a number of other libraries (i.e. MPI  and Petsc)
-that require initialization before use. 
+that require initialization before use.  When the LibMeshInit
+object goes out of scope, other libraries and resources are
+finalized.
 </div>
 
 <div class ="fragment">
 <pre>
-          libMesh::init(argc, argv);
+          LibMeshInit init (argc, argv);
         
-        #ifndef ENABLE_AMR
-          std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
-                    &lt;&lt; "compiled with AMR support!"
-                    &lt;&lt; std::endl;
-          return 0;
-        #else
-        
-          {
 </pre>
 </div>
 <div class = "comment">
-Create a new 1 dimensional mesh
+Skip adaptive examples on a non-adaptive libMesh build
 </div>
 
 <div class ="fragment">
 <pre>
-            const unsigned int dim = 1;
-            Mesh mesh(dim);
+        #ifndef LIBMESH_ENABLE_AMR
+          libmesh_example_assert(false, "--enable-amr");
+        #else
+        
+</pre>
+</div>
+<div class = "comment">
+Create a new mesh
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh;
         
 </pre>
 </div>
@@ -93,7 +107,7 @@ because a quadratic element contains 3 nodes.
 
 <div class ="fragment">
 <pre>
-            MeshTools::Generation::build_line(mesh,4,0.,1.,EDGE3);
+          MeshTools::Generation::build_line(mesh,4,0.,1.,EDGE3);
         
 </pre>
 </div>
@@ -104,9 +118,9 @@ to solve. See Example 2 for more details.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems(mesh);
-            LinearImplicitSystem& system = equation_systems.add_system
-              &lt;LinearImplicitSystem&gt;("1D");
+          EquationSystems equation_systems(mesh);
+          LinearImplicitSystem& system = equation_systems.add_system
+            &lt;LinearImplicitSystem&gt;("1D");
         
 </pre>
 </div>
@@ -116,7 +130,7 @@ Add a variable "u" to the system, using second-order approximation
 
 <div class ="fragment">
 <pre>
-            system.add_variable("u",SECOND);
+          system.add_variable("u",SECOND);
         
 </pre>
 </div>
@@ -127,7 +141,7 @@ will be called when needed by the library.
 
 <div class ="fragment">
 <pre>
-            system.attach_assemble_function(assemble_1D);
+          system.attach_assemble_function(assemble_1D);
         
 </pre>
 </div>
@@ -138,7 +152,7 @@ refining the mesh.
 
 <div class ="fragment">
 <pre>
-            MeshRefinement mesh_refinement(mesh);
+          MeshRefinement mesh_refinement(mesh);
         
 </pre>
 </div>
@@ -151,8 +165,8 @@ of the minimum error on any element might be coarsened
 
 <div class ="fragment">
 <pre>
-            mesh_refinement.refine_fraction()  = 0.7;
-            mesh_refinement.coarsen_fraction() = 0.3;
+          mesh_refinement.refine_fraction()  = 0.7;
+          mesh_refinement.coarsen_fraction() = 0.3;
 </pre>
 </div>
 <div class = "comment">
@@ -161,7 +175,7 @@ We won't refine any element more than 5 times in total
 
 <div class ="fragment">
 <pre>
-            mesh_refinement.max_h_level()      = 5;
+          mesh_refinement.max_h_level()      = 5;
         
 </pre>
 </div>
@@ -171,7 +185,7 @@ Initialize the data structures for the equation system.
 
 <div class ="fragment">
 <pre>
-            equation_systems.init();
+          equation_systems.init();
         
 </pre>
 </div>
@@ -181,7 +195,7 @@ Refinement parameters
 
 <div class ="fragment">
 <pre>
-            const unsigned int max_r_steps = 5; // Refine the mesh 5 times
+          const unsigned int max_r_steps = 5; // Refine the mesh 5 times
         
 </pre>
 </div>
@@ -191,7 +205,7 @@ Define the refinement loop
 
 <div class ="fragment">
 <pre>
-            for(unsigned int r_step=0; r_step&lt;=max_r_steps; r_step++)
+          for(unsigned int r_step=0; r_step&lt;=max_r_steps; r_step++)
             {
 </pre>
 </div>
@@ -214,17 +228,17 @@ going to solve the equation system for that refined mesh.
 <div class ="fragment">
 <pre>
               if(r_step != max_r_steps)
-              {
+                {
 </pre>
 </div>
 <div class = "comment">
-Define object for error estimation, see Example 10 for more details.
+Objects for error estimation, see Example 10 for more details.
 </div>
 
 <div class ="fragment">
 <pre>
-                ErrorVector error;
-                KellyErrorEstimator error_estimator;
+                  ErrorVector error;
+                  KellyErrorEstimator error_estimator;
         
 </pre>
 </div>
@@ -234,7 +248,7 @@ Compute the error for each active element
 
 <div class ="fragment">
 <pre>
-                error_estimator.estimate_error(system, error);
+                  error_estimator.estimate_error(system, error);
         
 </pre>
 </div>
@@ -244,7 +258,7 @@ Flag elements to be refined and coarsened
 
 <div class ="fragment">
 <pre>
-                mesh_refinement.flag_elements_by_error_fraction (error);
+                  mesh_refinement.flag_elements_by_error_fraction (error);
         
 </pre>
 </div>
@@ -254,7 +268,7 @@ Perform refinement and coarsening
 
 <div class ="fragment">
 <pre>
-                mesh_refinement.refine_and_coarsen_elements();
+                  mesh_refinement.refine_and_coarsen_elements();
         
 </pre>
 </div>
@@ -266,10 +280,8 @@ new mesh
 
 <div class ="fragment">
 <pre>
-                equation_systems.reinit();
-              }
-        
-        
+                  equation_systems.reinit();
+                }
             }
         
 </pre>
@@ -282,7 +294,7 @@ show the edges of each element in the mesh.
 
 <div class ="fragment">
 <pre>
-            GnuPlotIO plot(mesh,"Example 0", GnuPlotIO::GRID_ON);
+          GnuPlotIO plot(mesh,"Example 0", GnuPlotIO::GRID_ON);
         
 </pre>
 </div>
@@ -293,23 +305,21 @@ Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
 
 <div class ="fragment">
 <pre>
-            plot.write_equation_systems("gnuplot_script",equation_systems);
-          }  
-        #endif // #ifndef ENABLE_AMR
+          plot.write_equation_systems("gnuplot_script",equation_systems);
+        #endif // #ifndef LIBMESH_ENABLE_AMR
           
 </pre>
 </div>
 <div class = "comment">
-All done.  Call the libMesh::close() function to close any
-external libraries and check for leaked memory.  To be absolutey
-certain this is called last we will return its value.  This
-also allows main to return nonzero if memory is leaked, which
-can be useful for testing purposes.
+All done.  libMesh objects are destroyed here.  Because the
+LibMeshInit object was created first, its destruction occurs
+last, and it's destructor finalizes any external libraries and
+checks for leaked memory.
 </div>
 
 <div class ="fragment">
 <pre>
-          return libMesh::close();
+          return 0;
         }
         
         
@@ -326,7 +336,7 @@ Define the matrix assembly function for the 1D PDE we are solving
         void assemble_1D(EquationSystems& es, const std::string& system_name)
         {
         
-        #ifdef ENABLE_AMR
+        #ifdef LIBMESH_ENABLE_AMR
         
 </pre>
 </div>
@@ -336,7 +346,7 @@ It is a good idea to check we are solving the correct system
 
 <div class ="fragment">
 <pre>
-          assert(system_name == "1D");
+          libmesh_assert(system_name == "1D");
         
 </pre>
 </div>
@@ -346,7 +356,7 @@ Get a reference to the mesh object
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -484,8 +494,8 @@ el_end const as it is used only for the stopping condition of the loop.
 
 <div class ="fragment">
 <pre>
-          MeshBase::const_element_iterator el     = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator el_end = mesh.active_elements_end();
+          MeshBase::const_element_iterator el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator el_end = mesh.active_local_elements_end();
         
 </pre>
 </div>
@@ -654,7 +664,7 @@ Add Ke and Fe to the global matrix and right-hand-side.
             system.matrix-&gt;add_matrix(Ke, dof_indices);
             system.rhs-&gt;add_vector(Fe, dof_indices);
           }
-        #endif // #ifdef ENABLE_AMR
+        #endif // #ifdef LIBMESH_ENABLE_AMR
         }
 </pre>
 </div>
@@ -680,72 +690,65 @@ Add Ke and Fe to the global matrix and right-hand-side.
   #include <B><FONT COLOR="#BC8F8F">&quot;kelly_error_estimator.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
   
+  using namespace libMesh;
   
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_1D(EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   <B><FONT COLOR="#228B22">int</FONT></B> main(<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {   
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init(argc, argv);
+    LibMeshInit init (argc, argv);
   
-  #ifndef ENABLE_AMR
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
-              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with AMR support!&quot;</FONT></B>
-              &lt;&lt; std::endl;
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  #ifndef LIBMESH_ENABLE_AMR
+    libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-amr&quot;</FONT></B>);
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
-    {
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 1;
-      Mesh mesh(dim);
+    Mesh mesh;
   
-      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_line(mesh,4,0.,1.,EDGE3);
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_line(mesh,4,0.,1.,EDGE3);
   
-      EquationSystems equation_systems(mesh);
-      LinearImplicitSystem&amp; system = equation_systems.add_system
-        &lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>);
+    EquationSystems equation_systems(mesh);
+    LinearImplicitSystem&amp; system = equation_systems.add_system
+      &lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>);
   
-      system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>,SECOND);
+    system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>,SECOND);
   
-      system.attach_assemble_function(assemble_1D);
+    system.attach_assemble_function(assemble_1D);
   
-      MeshRefinement mesh_refinement(mesh);
+    MeshRefinement mesh_refinement(mesh);
   
-      mesh_refinement.refine_fraction()  = 0.7;
-      mesh_refinement.coarsen_fraction() = 0.3;
-      mesh_refinement.max_h_level()      = 5;
+    mesh_refinement.refine_fraction()  = 0.7;
+    mesh_refinement.coarsen_fraction() = 0.3;
+    mesh_refinement.max_h_level()      = 5;
   
-      equation_systems.init();
+    equation_systems.init();
   
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_steps = 5; <I><FONT COLOR="#B22222">// Refine the mesh 5 times
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_steps = 5; <I><FONT COLOR="#B22222">// Refine the mesh 5 times
 </FONT></I>  
-      <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> r_step=0; r_step&lt;=max_r_steps; r_step++)
+    <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> r_step=0; r_step&lt;=max_r_steps; r_step++)
       {
         equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>).solve();
   
         <B><FONT COLOR="#A020F0">if</FONT></B>(r_step != max_r_steps)
-        {
-          ErrorVector error;
-          KellyErrorEstimator error_estimator;
+          {
+            ErrorVector error;
+            KellyErrorEstimator error_estimator;
   
-          error_estimator.estimate_error(system, error);
+            error_estimator.estimate_error(system, error);
   
-          mesh_refinement.flag_elements_by_error_fraction (error);
+            mesh_refinement.flag_elements_by_error_fraction (error);
   
-          mesh_refinement.refine_and_coarsen_elements();
+            mesh_refinement.refine_and_coarsen_elements();
   
-          equation_systems.reinit();
-        }
-  
-  
+            equation_systems.reinit();
+          }
       }
   
-      GnuPlotIO plot(mesh,<B><FONT COLOR="#BC8F8F">&quot;Example 0&quot;</FONT></B>, GnuPlotIO::GRID_ON);
+    GnuPlotIO plot(mesh,<B><FONT COLOR="#BC8F8F">&quot;Example 0&quot;</FONT></B>, GnuPlotIO::GRID_ON);
   
-      plot.write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;gnuplot_script&quot;</FONT></B>,equation_systems);
-    }  
-  #endif <I><FONT COLOR="#B22222">// #ifndef ENABLE_AMR
+    plot.write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;gnuplot_script&quot;</FONT></B>,equation_systems);
+  #endif <I><FONT COLOR="#B22222">// #ifndef LIBMESH_ENABLE_AMR
 </FONT></I>    
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
   
@@ -754,11 +757,11 @@ Add Ke and Fe to the global matrix and right-hand-side.
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_1D(EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
   
-  #ifdef ENABLE_AMR
+  #ifdef LIBMESH_ENABLE_AMR
   
-    assert(system_name == <B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>);
+    libmesh_assert(system_name == <B><FONT COLOR="#BC8F8F">&quot;1D&quot;</FONT></B>);
   
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
@@ -785,8 +788,8 @@ Add Ke and Fe to the global matrix and right-hand-side.
   
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
-    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator el     = mesh.active_elements_begin();
-    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator el_end = mesh.active_elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator el_end = mesh.active_local_elements_end();
   
     <B><FONT COLOR="#A020F0">for</FONT></B>( ; el != el_end; ++el)
     {
@@ -834,24 +837,15 @@ Add Ke and Fe to the global matrix and right-hand-side.
       system.matrix-&gt;add_matrix(Ke, dof_indices);
       system.rhs-&gt;add_vector(Fe, dof_indices);
     }
-  #endif <I><FONT COLOR="#B22222">// #ifdef ENABLE_AMR
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_ENABLE_AMR
 </FONT></I>  }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in development mode) ex0.C...
-Linking ex0-devel...
-/home/peterson/code/libmesh/contrib/tecplot/lib/i686-pc-linux-gnu/tecio.a(tecxxx.o): In function `tecini':
-tecxxx.c:(.text+0x1a7): warning: the use of `mktemp' is dangerous, better use `mkstemp'
-***************************************************************
-* Running Example  ./ex0-devel
-***************************************************************
- 
- 
-***************************************************************
-* Done Running Example  ./ex0-devel
-***************************************************************
+Compiling C++ (in optimized mode) ex0.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex0.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

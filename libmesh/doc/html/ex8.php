@@ -47,6 +47,7 @@ Basic include file needed for the mesh functionality.
         #include "libmesh.h"
         #include "mesh.h"
         #include "gmv_io.h"
+        #include "vtk_io.h"
         #include "newmark_system.h"
         #include "equation_systems.h"
         
@@ -140,6 +141,16 @@ data about the mesh when reading in files, etc.
 </pre>
 </div>
 <div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
 Function prototype.  This is the function that will assemble
 the linear system for our problem, governed by the linear
 wave equation.
@@ -148,7 +159,7 @@ wave equation.
 <div class ="fragment">
 <pre>
         void assemble_wave(EquationSystems& es,
-        		   const std::string& system_name);
+                           const std::string& system_name);
         
         
 </pre>
@@ -161,7 +172,7 @@ initial conditions.
 <div class ="fragment">
 <pre>
         void apply_initial(EquationSystems& es,
-        		   const std::string& system_name);
+                           const std::string& system_name);
         
 </pre>
 </div>
@@ -174,7 +185,7 @@ method after the system is assembled.
 <div class ="fragment">
 <pre>
         void fill_dirichlet_bc(EquationSystems& es,
-        		       const std::string& system_name);
+                               const std::string& system_name);
         
 </pre>
 </div>
@@ -194,17 +205,16 @@ Initialize Petsc, like in example 2.
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
+          LibMeshInit init (argc, argv);
         
-</pre>
-</div>
-<div class = "comment">
-Braces are used to force object scope.
-</div>
-
-<div class ="fragment">
-<pre>
-          {
+        #ifdef LIBMESH_ENABLE_PARMESH
+          std::cout &lt;&lt; "ERROR: This example directly references\n"
+                    &lt;&lt; "all mesh nodes and is incompatible with"
+                    &lt;&lt; "ParallelMesh use."
+                    &lt;&lt; std::endl;
+          libmesh_example_assert(false, "--disable-parmesh");
+        #else
+        
 </pre>
 </div>
 <div class = "comment">
@@ -213,14 +223,15 @@ Check for proper usage.
 
 <div class ="fragment">
 <pre>
-            if (argc &lt; 2)
-              {
-        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " [meshfile]"
-        		  &lt;&lt; std::endl;
-        	
-        	error();
-              }
-            
+          if (argc &lt; 2)
+            {
+              if (libMesh::processor_id() == 0)
+                std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " [meshfile]"
+                          &lt;&lt; std::endl;
+              
+              libmesh_error();
+            }
+          
 </pre>
 </div>
 <div class = "comment">
@@ -229,40 +240,46 @@ Tell the user what we are doing.
 
 <div class ="fragment">
 <pre>
-            else 
-              {
-        	std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-        	
-        	for (int i=1; i&lt;argc; i++)
-        	  std::cout &lt;&lt; " " &lt;&lt; argv[i];
-        	
-        	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+          else 
+            {
+              std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
+              
+              for (int i=1; i&lt;argc; i++)
+                std::cout &lt;&lt; " " &lt;&lt; argv[i];
+              
+              std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
         
-              }
+            }
         
 </pre>
 </div>
 <div class = "comment">
 LasPack solvers don't work so well for this example
-(not sure why).  Print a warning to the user if PETSc
-is not available, or if they are using LasPack solvers.
+(not sure why), and Trilinos matrices don't work at all.
+Print a warning to the user if PETSc is not in use.
 </div>
 
 <div class ="fragment">
 <pre>
-        #ifdef HAVE_PETSC
-            if ((libMesh::on_command_line("--use-laspack")) ||
-        	(libMesh::on_command_line("--disable-petsc")))
-        #endif
-              {
-        	std::cerr &lt;&lt; "WARNING! It appears you are using the\n"
-        		  &lt;&lt; "LasPack solvers.  ex8 is known not to converge\n"
-        		  &lt;&lt; "using LasPack, but should work OK with PETSc.\n"
-        		  &lt;&lt; "If possible, download and install the PETSc\n"
-        		  &lt;&lt; "library from www-unix.mcs.anl.gov/petsc/petsc-2/\n"
-        		  &lt;&lt; std::endl;
-              }
-            
+          if (libMesh::default_solver_package() == LASPACK_SOLVERS)
+            {
+              std::cout &lt;&lt; "WARNING! It appears you are using the\n"
+                        &lt;&lt; "LasPack solvers.  ex8 may not converge\n"
+                        &lt;&lt; "using LasPack, but should work OK with PETSc.\n"
+                        &lt;&lt; "http://www.mcs.anl.gov/petsc/\n"
+                        &lt;&lt; std::endl;
+            }
+          else if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
+            {
+              std::cout &lt;&lt; "WARNING! It appears you are using the\n"
+                        &lt;&lt; "Trilinos solvers.  The current libMesh Epetra\n"
+                        &lt;&lt; "interface does not allow sparse matrix addition,\n"
+                        &lt;&lt; "as is needed in this problem.  We recommend\n"
+                        &lt;&lt; "using PETSc: http://www.mcs.anl.gov/petsc/\n"
+                        &lt;&lt; std::endl;
+              return 0;
+            }
+          
 </pre>
 </div>
 <div class = "comment">
@@ -272,31 +289,30 @@ from the command line.
 
 <div class ="fragment">
 <pre>
-            std::string mesh_file = argv[1];
-            std::cout &lt;&lt; "Mesh file is: " &lt;&lt; mesh_file &lt;&lt; std::endl;
+          std::string mesh_file = argv[1];
+          std::cout &lt;&lt; "Mesh file is: " &lt;&lt; mesh_file &lt;&lt; std::endl;
         
 </pre>
 </div>
 <div class = "comment">
-For now, restrict to dim=3, though this
-may easily be changed, see example 4
+Skip this 3D example if libMesh was compiled as 1D or 2D-only.
 </div>
 
 <div class ="fragment">
 <pre>
-            const unsigned int dim = 3;
-        
+          libmesh_example_assert(3 &lt;= LIBMESH_DIM, "3D support");
+          
 </pre>
 </div>
 <div class = "comment">
-Create a dim-dimensional mesh.
+Create a mesh.
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (dim);
-            MeshData mesh_data(mesh);
-            
+          Mesh mesh;
+          MeshData mesh_data(mesh);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -307,8 +323,8 @@ grid on an elongated cube.
 
 <div class ="fragment">
 <pre>
-            mesh.read(mesh_file, &mesh_data);
-             
+          mesh.read(mesh_file, &mesh_data);
+           
 </pre>
 </div>
 <div class = "comment">
@@ -324,7 +340,7 @@ HEX8);
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();
+          mesh.print_info();
         
 </pre>
 </div>
@@ -334,9 +350,9 @@ The node that should be monitored.
 
 <div class ="fragment">
 <pre>
-            const unsigned int result_node = 274;
+          const unsigned int result_node = 274;
         
-            
+          
 </pre>
 </div>
 <div class = "comment">
@@ -350,7 +366,7 @@ in the \pEquationSystems object.
 
 <div class ="fragment">
 <pre>
-            const Real delta_t = .0000625;
+          const Real delta_t = .0000625;
         
 </pre>
 </div>
@@ -360,8 +376,8 @@ The number of time steps.
 
 <div class ="fragment">
 <pre>
-            unsigned int n_time_steps = 300;
-            
+          unsigned int n_time_steps = 300;
+          
 </pre>
 </div>
 <div class = "comment">
@@ -370,26 +386,18 @@ Create an equation systems object.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh);
+          EquationSystems equation_systems (mesh);
         
 </pre>
 </div>
 <div class = "comment">
 Declare the system and its variables.
+Create a NewmarkSystem named "Wave"
 </div>
 
 <div class ="fragment">
 <pre>
-            {
-</pre>
-</div>
-<div class = "comment">
-Creates a NewmarkSystem named "Wave"
-</div>
-
-<div class ="fragment">
-<pre>
-              equation_systems.add_system&lt;NewmarkSystem&gt; ("Wave");
+          equation_systems.add_system&lt;NewmarkSystem&gt; ("Wave");
         
 </pre>
 </div>
@@ -399,18 +407,18 @@ Use a handy reference to this system
 
 <div class ="fragment">
 <pre>
-              NewmarkSystem & t_system = equation_systems.get_system&lt;NewmarkSystem&gt; ("Wave");
-              
+          NewmarkSystem & t_system = equation_systems.get_system&lt;NewmarkSystem&gt; ("Wave");
+          
 </pre>
 </div>
 <div class = "comment">
-Adds the variable "p" to "Wave".   "p"
+Add the variable "p" to "Wave".   "p"
 will be approximated using first-order approximation.
 </div>
 
 <div class ="fragment">
 <pre>
-              t_system.add_variable("p", FIRST);
+          t_system.add_variable("p", FIRST);
         
 </pre>
 </div>
@@ -422,9 +430,9 @@ below.
 
 <div class ="fragment">
 <pre>
-              t_system.attach_assemble_function  (assemble_wave);
-              t_system.attach_init_function      (apply_initial);
-          
+          t_system.attach_assemble_function  (assemble_wave);
+          t_system.attach_init_function      (apply_initial);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -437,7 +445,7 @@ for \p alpha=.25  and \p delta=.5.
 
 <div class ="fragment">
 <pre>
-              t_system.set_newmark_parameters(delta_t);
+          t_system.set_newmark_parameters(delta_t);
         
 </pre>
 </div>
@@ -449,8 +457,8 @@ so that \p assemble_wave() can access it.
 
 <div class ="fragment">
 <pre>
-              equation_systems.parameters.set&lt;Real&gt;("speed")          = 1000.;
-              equation_systems.parameters.set&lt;Real&gt;("fluid density")  = 1000.;
+          equation_systems.parameters.set&lt;Real&gt;("speed")          = 1000.;
+          equation_systems.parameters.set&lt;Real&gt;("fluid density")  = 1000.;
         
 </pre>
 </div>
@@ -462,7 +470,7 @@ Store the current time as an
 
 <div class ="fragment">
 <pre>
-              equation_systems.parameters.set&lt;Real&gt;("time")           = 0.;
+          equation_systems.parameters.set&lt;Real&gt;("time")           = 0.;
         
 </pre>
 </div>
@@ -472,7 +480,7 @@ Initialize the data structures for the equation system.
 
 <div class ="fragment">
 <pre>
-              equation_systems.init();
+          equation_systems.init();
         
 </pre>
 </div>
@@ -482,8 +490,7 @@ Prints information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-              equation_systems.print_info();
-            }
+          equation_systems.print_info();
         
 </pre>
 </div>
@@ -493,7 +500,7 @@ A file to store the results at certain nodes.
 
 <div class ="fragment">
 <pre>
-            std::ofstream res_out("pressure_node.res");
+          std::ofstream res_out("pressure_node.res");
         
 </pre>
 </div>
@@ -504,20 +511,10 @@ should be monitored.
 
 <div class ="fragment">
 <pre>
-            const unsigned int res_node_no = result_node;
-            const Node& res_node = mesh.node(res_node_no-1);
-            unsigned int dof_no = res_node.dof_number(0,0,0);
+          const unsigned int res_node_no = result_node;
+          const Node& res_node = mesh.node(res_node_no-1);
+          unsigned int dof_no = res_node.dof_number(0,0,0);
         
-</pre>
-</div>
-<div class = "comment">
-Use a handy reference to this system
-</div>
-
-<div class ="fragment">
-<pre>
-            NewmarkSystem& t_system = equation_systems.get_system&lt;NewmarkSystem&gt; ("Wave");
-               
 </pre>
 </div>
 <div class = "comment">
@@ -529,7 +526,7 @@ conditions.
 
 <div class ="fragment">
 <pre>
-            t_system.assemble();
+          t_system.assemble();
         
 </pre>
 </div>
@@ -544,14 +541,14 @@ to the nodal result file
 
 <div class ="fragment">
 <pre>
-            Real t_time = 0.;
-            res_out &lt;&lt; "# pressure at node " &lt;&lt; res_node_no &lt;&lt; "\n"
-        	    &lt;&lt; "# time\tpressure\n"
-        	    &lt;&lt; t_time &lt;&lt; "\t" &lt;&lt; 0 &lt;&lt; std::endl;
+          Real t_time = 0.;
+          res_out &lt;&lt; "# pressure at node " &lt;&lt; res_node_no &lt;&lt; "\n"
+                  &lt;&lt; "# time\tpressure\n"
+                  &lt;&lt; t_time &lt;&lt; "\t" &lt;&lt; 0 &lt;&lt; std::endl;
         
         
-            for (unsigned int time_step=0; time_step&lt;n_time_steps; time_step++)
-              {
+          for (unsigned int time_step=0; time_step&lt;n_time_steps; time_step++)
+            {
 </pre>
 </div>
 <div class = "comment">
@@ -561,8 +558,8 @@ Update the time.  Both here and in the
 
 <div class ="fragment">
 <pre>
-                t_time += delta_t;
-        	equation_systems.parameters.set&lt;Real&gt;("time")  = t_time;
+              t_time += delta_t;
+              equation_systems.parameters.set&lt;Real&gt;("time")  = t_time;
         
 </pre>
 </div>
@@ -572,7 +569,7 @@ Update the rhs.
 
 <div class ="fragment">
 <pre>
-                t_system.update_rhs();
+              t_system.update_rhs();
         
 </pre>
 </div>
@@ -587,8 +584,8 @@ the rhs vector is considered in each time step.
 
 <div class ="fragment">
 <pre>
-                if (time_step == 0)
-        	  {
+              if (time_step == 0)
+                {
 </pre>
 </div>
 <div class = "comment">
@@ -601,9 +598,9 @@ false, simply do not set it.
 
 <div class ="fragment">
 <pre>
-                    equation_systems.parameters.set&lt;bool&gt;("Newmark set BC for Matrix") = true;
+                  equation_systems.parameters.set&lt;bool&gt;("Newmark set BC for Matrix") = true;
         
-        	    fill_dirichlet_bc(equation_systems, "Wave");
+                  fill_dirichlet_bc(equation_systems, "Wave");
         
 </pre>
 </div>
@@ -613,10 +610,10 @@ unset the flag, so that it returns false
 
 <div class ="fragment">
 <pre>
-                    equation_systems.parameters.set&lt;bool&gt;("Newmark set BC for Matrix") = false;
-        	  }
-        	else
-        	  fill_dirichlet_bc(equation_systems, "Wave");
+                  equation_systems.parameters.set&lt;bool&gt;("Newmark set BC for Matrix") = false;
+                }
+              else
+                fill_dirichlet_bc(equation_systems, "Wave");
         
 </pre>
 </div>
@@ -626,7 +623,7 @@ Solve the system "Wave".
 
 <div class ="fragment">
 <pre>
-                t_system.solve();
+              t_system.solve();
         
 </pre>
 </div>
@@ -638,14 +635,32 @@ Do only for a few time steps.
 
 <div class ="fragment">
 <pre>
-                if (time_step == 30 || time_step == 60 ||
-        	    time_step == 90 || time_step == 120 )
-        	  {
-        	    char buf[14];
-        	    sprintf (buf, "out.%03d.gmv", time_step);
-        	    GMVIO(mesh).write_equation_systems (buf,
-        						equation_systems);
-        	  }
+              if (time_step == 30 || time_step == 60 ||
+                  time_step == 90 || time_step == 120 )
+                {
+                  char buf[14];
+        
+        		  if (!libMesh::on_command_line("--vtk")){
+        			  sprintf (buf, "out.%03d.gmv", time_step);
+        
+        	          GMVIO(mesh).write_equation_systems (buf,equation_systems);
+        
+        		  }else{
+        #ifdef LIBMESH_HAVE_VTK
+</pre>
+</div>
+<div class = "comment">
+VTK viewers are generally not happy with two dots in a filename
+</div>
+
+<div class ="fragment">
+<pre>
+                                  sprintf (buf, "out_%03d.exd", time_step);
+        
+        	          VTKIO(mesh).write_equation_systems (buf,equation_systems);
+        #endif // #ifdef LIBMESH_HAVE_VTK
+        		  }
+                }
         
 </pre>
 </div>
@@ -655,7 +670,7 @@ Update the p, v and a.
 
 <div class ="fragment">
 <pre>
-                t_system.update_u_v_a();
+              t_system.update_u_v_a();
         
 </pre>
 </div>
@@ -666,10 +681,10 @@ global displacement vector
 
 <div class ="fragment">
 <pre>
-                NumericVector&lt;Number&gt; &displacement
-                  = t_system.get_vector("displacement");
-                std::vector&lt;Number&gt; global_displacement(displacement.size());
-                displacement.localize(global_displacement);
+              NumericVector&lt;Number&gt; &displacement
+                = t_system.get_vector("displacement");
+              std::vector&lt;Number&gt; global_displacement(displacement.size());
+              displacement.localize(global_displacement);
         
 </pre>
 </div>
@@ -681,11 +696,11 @@ be viewed with e.g. gnuplot (run gnuplot and type
 
 <div class ="fragment">
 <pre>
-                res_out &lt;&lt; t_time &lt;&lt; "\t"
-        		&lt;&lt; global_displacement[dof_no]
-        		&lt;&lt; std::endl;
-              }
-          }
+              res_out &lt;&lt; t_time &lt;&lt; "\t"
+                      &lt;&lt; global_displacement[dof_no]
+                      &lt;&lt; std::endl;
+            }
+        #endif
           
 </pre>
 </div>
@@ -695,7 +710,7 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close ();
+          return 0;
         }
         
 </pre>
@@ -708,7 +723,7 @@ for our wave equation.
 <div class ="fragment">
 <pre>
         void assemble_wave(EquationSystems& es,
-        		   const std::string& system_name)
+                           const std::string& system_name)
         {  
 </pre>
 </div>
@@ -719,7 +734,7 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Wave");
+          libmesh_assert (system_name == "Wave");
         
 </pre>
 </div>
@@ -729,7 +744,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -915,16 +930,12 @@ the element degrees of freedom get mapped.
 Now we will loop over all the elements in the mesh.
 We will compute the element matrix and right-hand-side
 contribution.
-const_elem_iterator           el (mesh.elements_begin());
-const const_elem_iterator end_el (mesh.elements_end());
-
-
-<br><br></div>
+</div>
 
 <div class ="fragment">
 <pre>
-          MeshBase::const_element_iterator       el     = mesh.elements_begin();
-          const MeshBase::const_element_iterator end_el = mesh.elements_end();
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
           
           for ( ; el != end_el; ++el)
             {
@@ -981,11 +992,11 @@ and now have a PRISM6).
               {
                 const unsigned int n_dof_indices = dof_indices.size();
         
-        	Ke.resize          (n_dof_indices, n_dof_indices);
-        	Ce.resize          (n_dof_indices, n_dof_indices);
-        	Me.resize          (n_dof_indices, n_dof_indices);
-        	zero_matrix.resize (n_dof_indices, n_dof_indices);
-        	Fe.resize          (n_dof_indices);
+                Ke.resize          (n_dof_indices, n_dof_indices);
+                Ce.resize          (n_dof_indices, n_dof_indices);
+                Me.resize          (n_dof_indices, n_dof_indices);
+                zero_matrix.resize (n_dof_indices, n_dof_indices);
+                Fe.resize          (n_dof_indices);
               }
         
 </pre>
@@ -998,7 +1009,7 @@ the numeric integration.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-        	{
+                {
 </pre>
 </div>
 <div class = "comment">
@@ -1010,13 +1021,13 @@ the trial functions (j).
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    for (unsigned int j=0; j&lt;phi.size(); j++)
-        	      {
-        		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-        		Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
-        		           *1./(speed*speed);
-        	      } // end of the matrix summation loop	  
-        	} // end of quadrature point loop
+                    for (unsigned int j=0; j&lt;phi.size(); j++)
+                      {
+                        Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                        Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
+                                   *1./(speed*speed);
+                      } // end of the matrix summation loop          
+                } // end of quadrature point loop
         
 </pre>
 </div>
@@ -1042,7 +1053,7 @@ be extended.
 <div class ="fragment">
 <pre>
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-        	  if (!true)
+                  if (!true)
 </pre>
 </div>
 <div class = "comment">
@@ -1062,7 +1073,7 @@ boundary integration.
 <div class ="fragment">
 <pre>
                       AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -1074,7 +1085,7 @@ of the element.
 <div class ="fragment">
 <pre>
                       QGauss qface(dim-1, SECOND);
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -1085,7 +1096,7 @@ quadrature rule.
 <div class ="fragment">
 <pre>
                       fe_face-&gt;attach_quadrature_rule (&qface);
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -1096,7 +1107,7 @@ points.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -1107,7 +1118,7 @@ points on the face.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -1129,7 +1140,7 @@ the whole boundary of our mesh.
 <div class ="fragment">
 <pre>
                       const Real acc_n_value = 1.0;
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -1139,7 +1150,7 @@ Loop over the face quadrature points for integration.
 <div class ="fragment">
 <pre>
                       for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-        		{
+                        {
 </pre>
 </div>
 <div class = "comment">
@@ -1150,20 +1161,20 @@ normal acceleration.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    {
-        		      Fe(i) += acc_n_value*rho
-        			*phi_face[i][qp]*JxW_face[qp];
-        		    }
-        		} // end face quadrature point loop	  
-        	    } // end if (elem-&gt;neighbor(side) == NULL)
-        	
+                            {
+                              Fe(i) += acc_n_value*rho
+                                *phi_face[i][qp]*JxW_face[qp];
+                            }
+                        } // end face quadrature point loop          
+                    } // end if (elem-&gt;neighbor(side) == NULL)
+                
 </pre>
 </div>
 <div class = "comment">
 In this example the Dirichlet boundary conditions will be 
 imposed via panalty method after the
 system is assembled.
-	
+        
 
 <br><br></div>
 
@@ -1174,7 +1185,17 @@ system is assembled.
 </pre>
 </div>
 <div class = "comment">
-Finally, simply add the contributions to the additional
+If this assembly program were to be used on an adaptive mesh,
+we would have to apply any hanging node constraint equations
+by uncommenting the following lines:
+std::vector<unsigned int> dof_indicesC = dof_indices;
+std::vector<unsigned int> dof_indicesM = dof_indices;
+dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+dof_map.constrain_element_matrix (Ce, dof_indicesC);
+dof_map.constrain_element_matrix (Me, dof_indicesM);
+
+
+<br><br>Finally, simply add the contributions to the additional
 matrices and vector.
 </div>
 
@@ -1220,7 +1241,7 @@ This function applies the initial conditions
 <div class ="fragment">
 <pre>
         void apply_initial(EquationSystems& es,
-        		   const std::string& system_name)
+                           const std::string& system_name)
         {
 </pre>
 </div>
@@ -1269,7 +1290,7 @@ This function applies the Dirichlet boundary conditions
 <div class ="fragment">
 <pre>
         void fill_dirichlet_bc(EquationSystems& es,
-        		       const std::string& system_name)
+                               const std::string& system_name)
         {
 </pre>
 </div>
@@ -1280,7 +1301,7 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Wave");
+          libmesh_assert (system_name == "Wave");
         
 </pre>
 </div>
@@ -1311,7 +1332,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -1382,7 +1403,7 @@ pipe-mesh in this directory.
               const Real z_coo = 4.;
         
               if (fabs(curr_node(2)-z_coo) &lt; TOLERANCE)
-        	{
+                {
 </pre>
 </div>
 <div class = "comment">
@@ -1413,10 +1434,10 @@ at one end of the pipe-mesh.
 <div class ="fragment">
 <pre>
                   Real p_value;
-        	  if (current_time &lt; .002 )
-        	    p_value = sin(2*pi*current_time/.002);
-        	  else
-        	    p_value = .0;
+                  if (current_time &lt; .002 )
+                    p_value = sin(2*pi*current_time/.002);
+                  else
+                    p_value = .0;
         
 </pre>
 </div>
@@ -1438,8 +1459,8 @@ if desired.
 <div class ="fragment">
 <pre>
                   if (do_for_matrix)
-        	    matrix.add(dn, dn, penalty);
-        	}
+                    matrix.add(dn, dn, penalty);
+                }
             } // loop n_cnt
         }
 </pre>
@@ -1458,6 +1479,7 @@ if desired.
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;vtk_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;newmark_system.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   
@@ -1479,164 +1501,186 @@ if desired.
   
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_data.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_wave(EquationSystems&amp; es,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+                     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   
   <B><FONT COLOR="#228B22">void</FONT></B> apply_initial(EquationSystems&amp; es,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+                     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   <B><FONT COLOR="#228B22">void</FONT></B> fill_dirichlet_bc(EquationSystems&amp; es,
-  		       <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+                         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
+    LibMeshInit init (argc, argv);
   
-    {
-      <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 2)
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; [meshfile]&quot;</FONT></B>
-  		  &lt;&lt; std::endl;
-  	
-  	error();
-        }
-      
-      <B><FONT COLOR="#A020F0">else</FONT></B> 
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
-  	
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
-  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
-  	
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+  #ifdef LIBMESH_ENABLE_PARMESH
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example directly references\n&quot;</FONT></B>
+              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;all mesh nodes and is incompatible with&quot;</FONT></B>
+              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ParallelMesh use.&quot;</FONT></B>
+              &lt;&lt; std::endl;
+    libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--disable-parmesh&quot;</FONT></B>);
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
   
-        }
-  
-  #ifdef HAVE_PETSC
-      <B><FONT COLOR="#A020F0">if</FONT></B> ((libMesh::on_command_line(<B><FONT COLOR="#BC8F8F">&quot;--use-laspack&quot;</FONT></B>)) ||
-  	(libMesh::on_command_line(<B><FONT COLOR="#BC8F8F">&quot;--disable-petsc&quot;</FONT></B>)))
-  #endif
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;WARNING! It appears you are using the\n&quot;</FONT></B>
-  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;LasPack solvers.  ex8 is known not to converge\n&quot;</FONT></B>
-  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;using LasPack, but should work OK with PETSc.\n&quot;</FONT></B>
-  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;If possible, download and install the PETSc\n&quot;</FONT></B>
-  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;library from www-unix.mcs.anl.gov/petsc/petsc-2/\n&quot;</FONT></B>
-  		  &lt;&lt; std::endl;
-        }
-      
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string mesh_file = argv[1];
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Mesh file is: &quot;</FONT></B> &lt;&lt; mesh_file &lt;&lt; std::endl;
-  
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 3;
-  
-      Mesh mesh (dim);
-      MeshData mesh_data(mesh);
-      
-      mesh.read(mesh_file, &amp;mesh_data);
-       
-  
-      mesh.print_info();
-  
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> result_node = 274;
-  
-      
-      <B><FONT COLOR="#228B22">const</FONT></B> Real delta_t = .0000625;
-  
-      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_time_steps = 300;
-      
-      EquationSystems equation_systems (mesh);
-  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 2)
       {
-        equation_systems.add_system&lt;NewmarkSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
-  
-        NewmarkSystem &amp; t_system = equation_systems.get_system&lt;NewmarkSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+        <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::processor_id() == 0)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; [meshfile]&quot;</FONT></B>
+                    &lt;&lt; std::endl;
         
-        t_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
-  
-        t_system.attach_assemble_function  (assemble_wave);
-        t_system.attach_init_function      (apply_initial);
+        libmesh_error();
+      }
     
-        t_system.set_newmark_parameters(delta_t);
+    <B><FONT COLOR="#A020F0">else</FONT></B> 
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+        
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+        
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
   
-        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;speed&quot;</FONT></B>)          = 1000.;
-        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;fluid density&quot;</FONT></B>)  = 1000.;
-  
-        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>)           = 0.;
-  
-        equation_systems.init();
-  
-        equation_systems.print_info();
       }
   
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::ofstream res_out(<B><FONT COLOR="#BC8F8F">&quot;pressure_node.res&quot;</FONT></B>);
-  
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> res_node_no = result_node;
-      <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; res_node = mesh.node(res_node_no-1);
-      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dof_no = res_node.dof_number(0,0,0);
-  
-      NewmarkSystem&amp; t_system = equation_systems.get_system&lt;NewmarkSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
-         
-      t_system.assemble();
-  
-      Real t_time = 0.;
-      res_out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;# pressure at node &quot;</FONT></B> &lt;&lt; res_node_no &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n&quot;</FONT></B>
-  	    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;# time\tpressure\n&quot;</FONT></B>
-  	    &lt;&lt; t_time &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\t&quot;</FONT></B> &lt;&lt; 0 &lt;&lt; std::endl;
-  
-  
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> time_step=0; time_step&lt;n_time_steps; time_step++)
-        {
-  	t_time += delta_t;
-  	equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>)  = t_time;
-  
-  	t_system.update_rhs();
-  
-  	<B><FONT COLOR="#A020F0">if</FONT></B> (time_step == 0)
-  	  {
-  	    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">bool</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;Newmark set BC for Matrix&quot;</FONT></B>) = true;
-  
-  	    fill_dirichlet_bc(equation_systems, <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
-  
-  	    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">bool</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;Newmark set BC for Matrix&quot;</FONT></B>) = false;
-  	  }
-  	<B><FONT COLOR="#A020F0">else</FONT></B>
-  	  fill_dirichlet_bc(equation_systems, <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
-  
-  	t_system.solve();
-  
-  	<B><FONT COLOR="#A020F0">if</FONT></B> (time_step == 30 || time_step == 60 ||
-  	    time_step == 90 || time_step == 120 )
-  	  {
-  	    <B><FONT COLOR="#228B22">char</FONT></B> buf[14];
-  	    sprintf (buf, <B><FONT COLOR="#BC8F8F">&quot;out.%03d.gmv&quot;</FONT></B>, time_step);
-  	    GMVIO(mesh).write_equation_systems (buf,
-  						equation_systems);
-  	  }
-  
-  	t_system.update_u_v_a();
-  
-          NumericVector&lt;Number&gt; &amp;displacement
-            = t_system.get_vector(<B><FONT COLOR="#BC8F8F">&quot;displacement&quot;</FONT></B>);
-          <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Number&gt; global_displacement(displacement.size());
-          displacement.localize(global_displacement);
-  
-          res_out &lt;&lt; t_time &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\t&quot;</FONT></B>
-  		&lt;&lt; global_displacement[dof_no]
-  		&lt;&lt; std::endl;
-        }
-    }
+    <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::default_solver_package() == LASPACK_SOLVERS)
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;WARNING! It appears you are using the\n&quot;</FONT></B>
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;LasPack solvers.  ex8 may not converge\n&quot;</FONT></B>
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;using LasPack, but should work OK with PETSc.\n&quot;</FONT></B>
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;http://www.mcs.anl.gov/petsc/\n&quot;</FONT></B>
+                  &lt;&lt; std::endl;
+      }
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::default_solver_package() == TRILINOS_SOLVERS)
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;WARNING! It appears you are using the\n&quot;</FONT></B>
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Trilinos solvers.  The current libMesh Epetra\n&quot;</FONT></B>
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;interface does not allow sparse matrix addition,\n&quot;</FONT></B>
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;as is needed in this problem.  We recommend\n&quot;</FONT></B>
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;using PETSc: http://www.mcs.anl.gov/petsc/\n&quot;</FONT></B>
+                  &lt;&lt; std::endl;
+        <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+      }
     
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string mesh_file = argv[1];
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Mesh file is: &quot;</FONT></B> &lt;&lt; mesh_file &lt;&lt; std::endl;
+  
+    libmesh_example_assert(3 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
+    
+    Mesh mesh;
+    MeshData mesh_data(mesh);
+    
+    mesh.read(mesh_file, &amp;mesh_data);
+     
+  
+    mesh.print_info();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> result_node = 274;
+  
+    
+    <B><FONT COLOR="#228B22">const</FONT></B> Real delta_t = .0000625;
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_time_steps = 300;
+    
+    EquationSystems equation_systems (mesh);
+  
+    equation_systems.add_system&lt;NewmarkSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+  
+    NewmarkSystem &amp; t_system = equation_systems.get_system&lt;NewmarkSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+    
+    t_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
+  
+    t_system.attach_assemble_function  (assemble_wave);
+    t_system.attach_init_function      (apply_initial);
+  
+    t_system.set_newmark_parameters(delta_t);
+  
+    equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;speed&quot;</FONT></B>)          = 1000.;
+    equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;fluid density&quot;</FONT></B>)  = 1000.;
+  
+    equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>)           = 0.;
+  
+    equation_systems.init();
+  
+    equation_systems.print_info();
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::ofstream res_out(<B><FONT COLOR="#BC8F8F">&quot;pressure_node.res&quot;</FONT></B>);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> res_node_no = result_node;
+    <B><FONT COLOR="#228B22">const</FONT></B> Node&amp; res_node = mesh.node(res_node_no-1);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dof_no = res_node.dof_number(0,0,0);
+  
+    t_system.assemble();
+  
+    Real t_time = 0.;
+    res_out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;# pressure at node &quot;</FONT></B> &lt;&lt; res_node_no &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n&quot;</FONT></B>
+            &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;# time\tpressure\n&quot;</FONT></B>
+            &lt;&lt; t_time &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\t&quot;</FONT></B> &lt;&lt; 0 &lt;&lt; std::endl;
+  
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> time_step=0; time_step&lt;n_time_steps; time_step++)
+      {
+        t_time += delta_t;
+        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;time&quot;</FONT></B>)  = t_time;
+  
+        t_system.update_rhs();
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B> (time_step == 0)
+          {
+            equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">bool</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;Newmark set BC for Matrix&quot;</FONT></B>) = true;
+  
+            fill_dirichlet_bc(equation_systems, <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+  
+            equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">bool</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;Newmark set BC for Matrix&quot;</FONT></B>) = false;
+          }
+        <B><FONT COLOR="#A020F0">else</FONT></B>
+          fill_dirichlet_bc(equation_systems, <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+  
+        t_system.solve();
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B> (time_step == 30 || time_step == 60 ||
+            time_step == 90 || time_step == 120 )
+          {
+            <B><FONT COLOR="#228B22">char</FONT></B> buf[14];
+  
+  		  <B><FONT COLOR="#A020F0">if</FONT></B> (!libMesh::on_command_line(<B><FONT COLOR="#BC8F8F">&quot;--vtk&quot;</FONT></B>)){
+  			  sprintf (buf, <B><FONT COLOR="#BC8F8F">&quot;out.%03d.gmv&quot;</FONT></B>, time_step);
+  
+  	          GMVIO(mesh).write_equation_systems (buf,equation_systems);
+  
+  		  }<B><FONT COLOR="#A020F0">else</FONT></B>{
+  #ifdef LIBMESH_HAVE_VTK
+  			  sprintf (buf, <B><FONT COLOR="#BC8F8F">&quot;out_%03d.exd&quot;</FONT></B>, time_step);
+  
+  	          VTKIO(mesh).write_equation_systems (buf,equation_systems);
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_VTK
+</FONT></I>  		  }
+          }
+  
+        t_system.update_u_v_a();
+  
+        NumericVector&lt;Number&gt; &amp;displacement
+          = t_system.get_vector(<B><FONT COLOR="#BC8F8F">&quot;displacement&quot;</FONT></B>);
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Number&gt; global_displacement(displacement.size());
+        displacement.localize(global_displacement);
+  
+        res_out &lt;&lt; t_time &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\t&quot;</FONT></B>
+                &lt;&lt; global_displacement[dof_no]
+                &lt;&lt; std::endl;
+      }
+  #endif
+    
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_wave(EquationSystems&amp; es,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+                     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {  
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
   
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
@@ -1675,9 +1719,8 @@ if desired.
   
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
-  
-    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.elements_begin();
-    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
@@ -1690,55 +1733,56 @@ if desired.
         {
           <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_dof_indices = dof_indices.size();
   
-  	Ke.resize          (n_dof_indices, n_dof_indices);
-  	Ce.resize          (n_dof_indices, n_dof_indices);
-  	Me.resize          (n_dof_indices, n_dof_indices);
-  	zero_matrix.resize (n_dof_indices, n_dof_indices);
-  	Fe.resize          (n_dof_indices);
+          Ke.resize          (n_dof_indices, n_dof_indices);
+          Ce.resize          (n_dof_indices, n_dof_indices);
+          Me.resize          (n_dof_indices, n_dof_indices);
+          zero_matrix.resize (n_dof_indices, n_dof_indices);
+          Fe.resize          (n_dof_indices);
         }
   
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-  	{
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
-  	      {
-  		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-  		Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
-  		           *1./(speed*speed);
-  	      } <I><FONT COLOR="#B22222">// end of the matrix summation loop	  
-</FONT></I>  	} <I><FONT COLOR="#B22222">// end of quadrature point loop
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
+                {
+                  Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                  Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
+                             *1./(speed*speed);
+                } <I><FONT COLOR="#B22222">// end of the matrix summation loop          
+</FONT></I>          } <I><FONT COLOR="#B22222">// end of quadrature point loop
 </FONT></I>  
         {
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
-  	  <B><FONT COLOR="#A020F0">if</FONT></B> (!true)
-  	    {
-  	      AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-  	      
-  	      QGauss qface(dim-1, SECOND);
-  	      
-  	      fe_face-&gt;attach_quadrature_rule (&amp;qface);
-  	      
-  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
-  	      
-  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-  	      
-  	      fe_face-&gt;reinit(elem, side);
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (!true)
+              {
+                AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
+                
+                QGauss qface(dim-1, SECOND);
+                
+                fe_face-&gt;attach_quadrature_rule (&amp;qface);
+                
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+                
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+                
+                fe_face-&gt;reinit(elem, side);
   
-  	      <B><FONT COLOR="#228B22">const</FONT></B> Real acc_n_value = 1.0;
-  	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
-  		{
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    {
-  		      Fe(i) += acc_n_value*rho
-  			*phi_face[i][qp]*JxW_face[qp];
-  		    }
-  		} <I><FONT COLOR="#B22222">// end face quadrature point loop	  
-</FONT></I>  	    } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
-</FONT></I>  	
-  	
-        } <I><FONT COLOR="#B22222">// end boundary condition section	  
+                <B><FONT COLOR="#228B22">const</FONT></B> Real acc_n_value = 1.0;
+                
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                  {
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                      {
+                        Fe(i) += acc_n_value*rho
+                          *phi_face[i][qp]*JxW_face[qp];
+                      }
+                  } <I><FONT COLOR="#B22222">// end face quadrature point loop          
+</FONT></I>              } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
+</FONT></I>          
+          
+        } <I><FONT COLOR="#B22222">// end boundary condition section          
 </FONT></I>  
+  
         stiffness.add_matrix (Ke, dof_indices);
         damping.add_matrix   (Ce, dof_indices);
         mass.add_matrix      (Me, dof_indices);
@@ -1753,7 +1797,7 @@ if desired.
   }
   
   <B><FONT COLOR="#228B22">void</FONT></B> apply_initial(EquationSystems&amp; es,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+                     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
     NewmarkSystem &amp; t_system = es.get_system&lt;NewmarkSystem&gt; (system_name);
     
@@ -1767,16 +1811,16 @@ if desired.
   }
   
   <B><FONT COLOR="#228B22">void</FONT></B> fill_dirichlet_bc(EquationSystems&amp; es,
-  		       <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+                         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Wave&quot;</FONT></B>);
   
     NewmarkSystem &amp; t_system = es.get_system&lt;NewmarkSystem&gt; (system_name);
   
     SparseMatrix&lt;Number&gt;&amp;  matrix = *t_system.matrix;
     NumericVector&lt;Number&gt;&amp; rhs    = *t_system.rhs;
   
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
     <B><FONT COLOR="#228B22">const</FONT></B> Real pi = libMesh::pi;
   
@@ -1794,62 +1838,31 @@ if desired.
         <B><FONT COLOR="#228B22">const</FONT></B> Real z_coo = 4.;
   
         <B><FONT COLOR="#A020F0">if</FONT></B> (fabs(curr_node(2)-z_coo) &lt; TOLERANCE)
-  	{
-  	  <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dn = curr_node.dof_number(0,0,0);
+          {
+            <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dn = curr_node.dof_number(0,0,0);
   
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+            <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
   
-  	  Real p_value;
-  	  <B><FONT COLOR="#A020F0">if</FONT></B> (current_time &lt; .002 )
-  	    p_value = sin(2*pi*current_time/.002);
-  	  <B><FONT COLOR="#A020F0">else</FONT></B>
-  	    p_value = .0;
+            Real p_value;
+            <B><FONT COLOR="#A020F0">if</FONT></B> (current_time &lt; .002 )
+              p_value = sin(2*pi*current_time/.002);
+            <B><FONT COLOR="#A020F0">else</FONT></B>
+              p_value = .0;
   
-  	  rhs.add(dn, p_value*penalty);
+            rhs.add(dn, p_value*penalty);
   
-  	  <B><FONT COLOR="#A020F0">if</FONT></B> (do_for_matrix)
-  	    matrix.add(dn, dn, penalty);
-  	}
+            <B><FONT COLOR="#A020F0">if</FONT></B> (do_for_matrix)
+              matrix.add(dn, dn, penalty);
+          }
       } <I><FONT COLOR="#B22222">// loop n_cnt
 </FONT></I>  }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex8-devel pipe-mesh.unv
-***************************************************************
- 
-Running ./ex8-devel pipe-mesh.unv
-
-Mesh file is: pipe-mesh.unv
- Mesh Information:
-  mesh_dimension()=3
-  spatial_dimension()=3
-  n_nodes()=3977
-  n_elem()=3520
-   n_local_elem()=3520
-   n_active_elem()=3520
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Wave"
-    Type "Newmark"
-    Variables="p" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
-    n_dofs()=3977
-    n_local_dofs()=3977
-    n_constrained_dofs()=0
-    n_vectors()=9
-
- 
-***************************************************************
-* Done Running Example  ./ex8-devel pipe-mesh.unv
-***************************************************************
+Compiling C++ (in optimized mode) ex8.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex8.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

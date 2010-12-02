@@ -43,7 +43,7 @@ Basic include file needed for the mesh functionality.
         #include "libmesh.h"
         #include "mesh.h"
         #include "mesh_generation.h"
-        #include "gmv_io.h"
+        #include "exodusII_io.h"
         #include "linear_implicit_system.h"
         #include "equation_systems.h"
         
@@ -114,6 +114,16 @@ The definition of a geometric element
 <pre>
         #include "elem.h"
         
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
         
         
         
@@ -142,8 +152,8 @@ Exact solution function prototype, as before.
 <div class ="fragment">
 <pre>
         Real exact_solution (const Real x,
-        		     const Real y,
-        		     const Real z = 0.);
+                             const Real y,
+                             const Real z = 0.);
         
         
 </pre>
@@ -168,7 +178,6 @@ Begin the main program.
 <pre>
         int main (int argc, char** argv)
         {
-          
 </pre>
 </div>
 <div class = "comment">
@@ -177,18 +186,8 @@ Initialize libMesh and any dependent libaries, like in example 2.
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
+          LibMeshInit init (argc, argv);
           
-          
-</pre>
-</div>
-<div class = "comment">
-Braces are used to force object scope, like in example 2   
-</div>
-
-<div class ="fragment">
-<pre>
-          {
 </pre>
 </div>
 <div class = "comment">
@@ -198,13 +197,15 @@ must be given at run time.
 
 <div class ="fragment">
 <pre>
-            if (argc &lt; 3)
-              {
-        	std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -q n"
-        		  &lt;&lt; std::endl;
-        	std::cerr &lt;&lt; "  where n stands for:" &lt;&lt; std::endl;
+          if (argc &lt; 3)
+            {
+              if (libMesh::processor_id() == 0)
+                {
+                  std::cerr &lt;&lt; "Usage: " &lt;&lt; argv[0] &lt;&lt; " -q n"
+                            &lt;&lt; std::endl;
+                  std::cerr &lt;&lt; "  where n stands for:" &lt;&lt; std::endl;
         
-        	
+              
 </pre>
 </div>
 <div class = "comment">
@@ -216,17 +217,18 @@ included in QGauss.
 
 <div class ="fragment">
 <pre>
-                for (unsigned int n=0; n&lt;QuadratureRules::num_valid_elem_rules; n++)
-        	  std::cerr &lt;&lt; "  " &lt;&lt; QuadratureRules::valid_elem_rules[n] &lt;&lt; "    " 
-        		    &lt;&lt; QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
-        		    &lt;&lt; std::endl;
-        	
-        	std::cerr &lt;&lt; std::endl;
-        	
-        	error();
-              }
-            
-            
+                  for (unsigned int n=0; n&lt;QuadratureRules::num_valid_elem_rules; n++)
+                    std::cerr &lt;&lt; "  " &lt;&lt; QuadratureRules::valid_elem_rules[n] &lt;&lt; "    " 
+                              &lt;&lt; QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
+                              &lt;&lt; std::endl;
+              
+                  std::cerr &lt;&lt; std::endl;
+                }
+              
+              libmesh_error();
+            }
+          
+          
 </pre>
 </div>
 <div class = "comment">
@@ -235,16 +237,16 @@ Tell the user what we are doing.
 
 <div class ="fragment">
 <pre>
-            else 
-              {
-        	std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-        	
-        	for (int i=1; i&lt;argc; i++)
-        	  std::cout &lt;&lt; " " &lt;&lt; argv[i];
-        	
-        	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-              }
-            
+          else 
+            {
+              std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
+              
+              for (int i=1; i&lt;argc; i++)
+                std::cout &lt;&lt; " " &lt;&lt; argv[i];
+              
+              std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+            }
+          
         
 </pre>
 </div>
@@ -254,20 +256,18 @@ Set the quadrature rule type that the user wants from argv[2]
 
 <div class ="fragment">
 <pre>
-            quad_type = static_cast&lt;QuadratureType&gt;(std::atoi(argv[2]));
-        
+          quad_type = static_cast&lt;QuadratureType&gt;(std::atoi(argv[2]));
         
 </pre>
 </div>
 <div class = "comment">
-Independence of dimension has already been shown in
-example 4.  For the time being, restrict to 3 dimensions.
+Skip this 3D example if libMesh was compiled as 1D-only.
 </div>
 
 <div class ="fragment">
 <pre>
-            const unsigned int dim=3;
-            
+          libmesh_example_assert(3 &lt;= LIBMESH_DIM, "3D support");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -277,7 +277,7 @@ not commented.  Differences are mentioned when present.
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (dim);
+          Mesh mesh;
         
 </pre>
 </div>
@@ -291,30 +291,28 @@ space.
 
 <div class ="fragment">
 <pre>
-            MeshTools::Generation::build_cube (mesh,
-        				       16, 16, 16,
-        				       -1., 1.,
-        				       -1., 1.,
-        				       -1., 1.,
-        				       HEX8);
-            
-            mesh.print_info();
-            
-            EquationSystems equation_systems (mesh);
-            
-            {
-              equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Poisson");
-              
-              equation_systems.get_system("Poisson").add_variable("u", FIRST);
+          MeshTools::Generation::build_cube (mesh,
+                                             16, 16, 16,
+                                             -1., 1.,
+                                             -1., 1.,
+                                             -1., 1.,
+                                             HEX8);
+          
+          mesh.print_info();
+          
+          EquationSystems equation_systems (mesh);
+          
+          equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Poisson");
+          
+          equation_systems.get_system("Poisson").add_variable("u", FIRST);
         
-              equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+          equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
         
-              equation_systems.init();
-              
-              equation_systems.print_info();
-            }
+          equation_systems.init();
+          
+          equation_systems.print_info();
         
-            equation_systems.get_system("Poisson").solve();
+          equation_systems.get_system("Poisson").solve();
         
 </pre>
 </div>
@@ -325,13 +323,13 @@ number of the quadrature rule appended.
 
 <div class ="fragment">
 <pre>
-            std::ostringstream f_name;
-            f_name &lt;&lt; "out_" &lt;&lt; quad_type &lt;&lt; ".gmv";
+          std::ostringstream f_name;
+          f_name &lt;&lt; "out_" &lt;&lt; quad_type &lt;&lt; ".exd";
         
-            GMVIO(mesh).write_equation_systems (f_name.str(),
-        					equation_systems);
-          }
-        
+        #ifdef LIBMESH_HAVE_EXODUS_API
+          ExodusII_IO(mesh).write_equation_systems (f_name.str(),
+                                              equation_systems);
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
         
 </pre>
 </div>
@@ -341,7 +339,7 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close ();
+          return 0;
         }
         
         
@@ -350,9 +348,9 @@ All done.
         void assemble_poisson(EquationSystems& es,
                               const std::string& system_name)
         {
-          assert (system_name == "Poisson");
+          libmesh_assert (system_name == "Poisson");
         
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
         
           const unsigned int dim = mesh.mesh_dimension();
         
@@ -447,9 +445,9 @@ they clean up themselves.
 <div class ="fragment">
 <pre>
           AutoPtr&lt;QBase&gt;  qface (QBase::build(quad_type,
-        				      dim-1, 
-        				      THIRD));
-        	      
+                                              dim-1, 
+                                              THIRD));
+                      
           
 </pre>
 </div>
@@ -467,7 +465,7 @@ points to.  This behavior may be overridden using
 <div class ="fragment">
 <pre>
           fe_face-&gt;attach_quadrature_rule (qface.get());
-        	      
+                      
         
           
 </pre>
@@ -500,16 +498,12 @@ This is again identical to example 4, and not commented.
 <div class = "comment">
 Now we will loop over all the elements in the mesh.
 See example 3 for details.
-const_elem_iterator           el (mesh.elements_begin());
-const const_elem_iterator end_el (mesh.elements_end());
-
-
-<br><br></div>
+</div>
 
 <div class ="fragment">
 <pre>
-          MeshBase::const_element_iterator       el     = mesh.elements_begin();
-          const MeshBase::const_element_iterator end_el = mesh.elements_end();
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
           
           for ( ; el != end_el; ++el)
             {
@@ -520,7 +514,7 @@ const const_elem_iterator end_el (mesh.elements_end());
               fe-&gt;reinit (elem);
               
               Ke.resize (dof_indices.size(),
-        		 dof_indices.size());
+                         dof_indices.size());
               
               Fe.resize (dof_indices.size());
               
@@ -538,7 +532,7 @@ access to the QBase members!
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule-&gt;n_points(); qp++)
-        	{
+                {
 </pre>
 </div>
 <div class = "comment">
@@ -548,10 +542,10 @@ Add the matrix contribution
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    for (unsigned int j=0; j&lt;phi.size(); j++)
-        	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-        	  
-        	  
+                    for (unsigned int j=0; j&lt;phi.size(); j++)
+                      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                  
+                  
 </pre>
 </div>
 <div class = "comment">
@@ -568,30 +562,30 @@ u(i,j-1) + u(i,j+1) +
 
 <br><br>Since the value of the forcing function depends only
 on the location of the quadrature point (q_point[qp])
-we will compute it here, outside of the i-loop	  
+we will compute it here, outside of the i-loop          
 </div>
 
 <div class ="fragment">
 <pre>
                   const Real x = q_point[qp](0);
-        	  const Real y = q_point[qp](1);
-        	  const Real z = q_point[qp](2);
-        	  const Real eps = 1.e-3;
+                  const Real y = q_point[qp](1);
+                  const Real z = q_point[qp](2);
+                  const Real eps = 1.e-3;
         
-        	  const Real uxx = (exact_solution(x-eps,y,z) +
-        			    exact_solution(x+eps,y,z) +
-        			    -2.*exact_solution(x,y,z))/eps/eps;
-        	      
-        	  const Real uyy = (exact_solution(x,y-eps,z) +
-        			    exact_solution(x,y+eps,z) +
-        			    -2.*exact_solution(x,y,z))/eps/eps;
-        	  
-        	  const Real uzz = (exact_solution(x,y,z-eps) +
-        			    exact_solution(x,y,z+eps) +
-        			    -2.*exact_solution(x,y,z))/eps/eps;
+                  const Real uxx = (exact_solution(x-eps,y,z) +
+                                    exact_solution(x+eps,y,z) +
+                                    -2.*exact_solution(x,y,z))/eps/eps;
+                      
+                  const Real uyy = (exact_solution(x,y-eps,z) +
+                                    exact_solution(x,y+eps,z) +
+                                    -2.*exact_solution(x,y,z))/eps/eps;
+                  
+                  const Real uzz = (exact_solution(x,y,z-eps) +
+                                    exact_solution(x,y,z+eps) +
+                                    -2.*exact_solution(x,y,z))/eps/eps;
         
-        	  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-        	  
+                  const Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+                  
         
 </pre>
 </div>
@@ -602,8 +596,8 @@ Add the RHS contribution
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    Fe(i) += JxW[qp]*fxy*phi[i][qp];	  
-        	}
+                    Fe(i) += JxW[qp]*fxy*phi[i][qp];          
+                }
         
         
         
@@ -620,14 +614,14 @@ for the build routines of QBase, described below
 <div class ="fragment">
 <pre>
               {
-        	for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-        	  if (elem-&gt;neighbor(side) == NULL)
-        	    {	      
-        	      const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi_face    = fe_face-&gt;get_phi();
-        	      const std::vector&lt;Real&gt;&               JxW_face    = fe_face-&gt;get_JxW();	      
-        	      const std::vector&lt;Point &gt;&             qface_point = fe_face-&gt;get_xyz();
-        	      
-        	      
+                for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
+                  if (elem-&gt;neighbor(side) == NULL)
+                    {              
+                      const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi_face    = fe_face-&gt;get_phi();
+                      const std::vector&lt;Real&gt;&               JxW_face    = fe_face-&gt;get_JxW();              
+                      const std::vector&lt;Point &gt;&             qface_point = fe_face-&gt;get_xyz();
+                      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -638,8 +632,8 @@ face.
 <div class ="fragment">
 <pre>
                       fe_face-&gt;reinit(elem, side);
-        	      
-        	      
+                      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -656,38 +650,45 @@ to "safe pointers".
 <div class ="fragment">
 <pre>
                       for (unsigned int qp=0; qp&lt;qface-&gt;n_points(); qp++)
-        		{
-        		  const Real xf = qface_point[qp](0);
-        		  const Real yf = qface_point[qp](1);
-        		  const Real zf = qface_point[qp](2);
-        		  
-        		  const Real penalty = 1.e10;
-        		  
-        		  const Real value = exact_solution(xf, yf, zf);
-        		  
-        		  for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    for (unsigned int j=0; j&lt;phi_face.size(); j++)
-        		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-        		  
-        		  
-        		  for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-        		  
-        		} // end face quadrature point loop	  
-        	    } // end if (elem-&gt;neighbor(side) == NULL)
-              } // end boundary condition section	  
+                        {
+                          const Real xf = qface_point[qp](0);
+                          const Real yf = qface_point[qp](1);
+                          const Real zf = qface_point[qp](2);
+                          
+                          const Real penalty = 1.e10;
+                          
+                          const Real value = exact_solution(xf, yf, zf);
+                          
+                          for (unsigned int i=0; i&lt;phi_face.size(); i++)
+                            for (unsigned int j=0; j&lt;phi_face.size(); j++)
+                              Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+                          
+                          
+                          for (unsigned int i=0; i&lt;phi_face.size(); i++)
+                            Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                          
+                        } // end face quadrature point loop          
+                    } // end if (elem-&gt;neighbor(side) == NULL)
+              } // end boundary condition section          
               
-              
-              
-              
+</pre>
+</div>
+<div class = "comment">
+If this assembly program were to be used on an adaptive mesh,
+we would have to apply any hanging node constraint equations
+</div>
+
+<div class ="fragment">
+<pre>
+              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
               
 </pre>
 </div>
 <div class = "comment">
 The element matrix and right-hand-side are now built
 for this element.  Add them to the global matrix and
-right-hand-side vector.  The \p PetscMatrix::add_matrix()
-and \p PetscVector::add_vector() members do this for us.
+right-hand-side vector.  The \p SparseMatrix::add_matrix()
+and \p NumericVector::add_vector() members do this for us.
 </div>
 
 <div class ="fragment">
@@ -726,7 +727,7 @@ All done!
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   
@@ -745,6 +746,8 @@ All done!
   
   #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
   
   
   
@@ -757,8 +760,8 @@ All done!
   
   
   Real exact_solution (<B><FONT COLOR="#228B22">const</FONT></B> Real x,
-  		     <B><FONT COLOR="#228B22">const</FONT></B> Real y,
-  		     <B><FONT COLOR="#228B22">const</FONT></B> Real z = 0.);
+                       <B><FONT COLOR="#228B22">const</FONT></B> Real y,
+                       <B><FONT COLOR="#228B22">const</FONT></B> Real z = 0.);
   
   
   QuadratureType quad_type=INVALID_Q_RULE;
@@ -767,81 +770,78 @@ All done!
   
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
+    LibMeshInit init (argc, argv);
     
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
-    
-    
-    {
-      <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -q n&quot;</FONT></B>
-  		  &lt;&lt; std::endl;
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;  where n stands for:&quot;</FONT></B> &lt;&lt; std::endl;
-  
-  	
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;QuadratureRules::num_valid_elem_rules; n++)
-  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;  &quot;</FONT></B> &lt;&lt; QuadratureRules::valid_elem_rules[n] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;    &quot;</FONT></B> 
-  		    &lt;&lt; QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
-  		    &lt;&lt; std::endl;
-  	
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; std::endl;
-  	
-  	error();
-        }
-      
-      
-      <B><FONT COLOR="#A020F0">else</FONT></B> 
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
-  	
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
-  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
-  	
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-        }
-      
-  
-      quad_type = static_cast&lt;QuadratureType&gt;(std::atoi(argv[2]));
-  
-  
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim=3;
-      
-      Mesh mesh (dim);
-  
-      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
-  				       16, 16, 16,
-  				       -1., 1.,
-  				       -1., 1.,
-  				       -1., 1.,
-  				       HEX8);
-      
-      mesh.print_info();
-      
-      EquationSystems equation_systems (mesh);
-      
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
       {
-        equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
-        
-        equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST);
+        <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::processor_id() == 0)
+          {
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -q n&quot;</FONT></B>
+                      &lt;&lt; std::endl;
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;  where n stands for:&quot;</FONT></B> &lt;&lt; std::endl;
   
-        equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).attach_assemble_function (assemble_poisson);
-  
-        equation_systems.init();
         
-        equation_systems.print_info();
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n=0; n&lt;QuadratureRules::num_valid_elem_rules; n++)
+              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;  &quot;</FONT></B> &lt;&lt; QuadratureRules::valid_elem_rules[n] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;    &quot;</FONT></B> 
+                        &lt;&lt; QuadratureRules::name(QuadratureRules::valid_elem_rules[n])
+                        &lt;&lt; std::endl;
+        
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; std::endl;
+          }
+        
+        libmesh_error();
       }
+    
+    
+    <B><FONT COLOR="#A020F0">else</FONT></B> 
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+        
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+        
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+      }
+    
   
-      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
+    quad_type = static_cast&lt;QuadratureType&gt;(std::atoi(argv[2]));
   
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::ostringstream f_name;
-      f_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out_&quot;</FONT></B> &lt;&lt; quad_type &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.gmv&quot;</FONT></B>;
+    libmesh_example_assert(3 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
+    
+    Mesh mesh;
   
-      GMVIO(mesh).write_equation_systems (f_name.str(),
-  					equation_systems);
-    }
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
+                                       16, 16, 16,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       HEX8);
+    
+    mesh.print_info();
+    
+    EquationSystems equation_systems (mesh);
+    
+    equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+    
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST);
   
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).attach_assemble_function (assemble_poisson);
   
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    equation_systems.init();
+    
+    equation_systems.print_info();
+  
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::ostringstream f_name;
+    f_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out_&quot;</FONT></B> &lt;&lt; quad_type &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.exd&quot;</FONT></B>;
+  
+  #ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO(mesh).write_equation_systems (f_name.str(),
+                                        equation_systems);
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
   
@@ -850,9 +850,9 @@ All done!
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
                         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
   
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
@@ -877,12 +877,12 @@ All done!
     
     
     AutoPtr&lt;QBase&gt;  qface (QBase::build(quad_type,
-  				      dim-1, 
-  				      THIRD));
-  	      
+                                        dim-1, 
+                                        THIRD));
+                
     
     fe_face-&gt;attach_quadrature_rule (qface.get());
-  	      
+                
   
     
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW = fe-&gt;get_JxW();
@@ -902,9 +902,8 @@ All done!
     
     
     
-  
-    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.elements_begin();
-    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
@@ -915,7 +914,7 @@ All done!
         fe-&gt;reinit (elem);
         
         Ke.resize (dof_indices.size(),
-  		 dof_indices.size());
+                   dof_indices.size());
         
         Fe.resize (dof_indices.size());
         
@@ -923,35 +922,35 @@ All done!
   
         
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); qp++)
-  	{
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
-  	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-  	  
-  	  
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real z = q_point[qp](2);
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
+                Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+            
+            
+            <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
+            <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
+            <B><FONT COLOR="#228B22">const</FONT></B> Real z = q_point[qp](2);
+            <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
   
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real uxx = (exact_solution(x-eps,y,z) +
-  			    exact_solution(x+eps,y,z) +
-  			    -2.*exact_solution(x,y,z))/eps/eps;
-  	      
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real uyy = (exact_solution(x,y-eps,z) +
-  			    exact_solution(x,y+eps,z) +
-  			    -2.*exact_solution(x,y,z))/eps/eps;
-  	  
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real uzz = (exact_solution(x,y,z-eps) +
-  			    exact_solution(x,y,z+eps) +
-  			    -2.*exact_solution(x,y,z))/eps/eps;
+            <B><FONT COLOR="#228B22">const</FONT></B> Real uxx = (exact_solution(x-eps,y,z) +
+                              exact_solution(x+eps,y,z) +
+                              -2.*exact_solution(x,y,z))/eps/eps;
+                
+            <B><FONT COLOR="#228B22">const</FONT></B> Real uyy = (exact_solution(x,y-eps,z) +
+                              exact_solution(x,y+eps,z) +
+                              -2.*exact_solution(x,y,z))/eps/eps;
+            
+            <B><FONT COLOR="#228B22">const</FONT></B> Real uzz = (exact_solution(x,y,z-eps) +
+                              exact_solution(x,y,z+eps) +
+                              -2.*exact_solution(x,y,z))/eps/eps;
   
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-  	  
+            <B><FONT COLOR="#228B22">const</FONT></B> Real fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+            
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	    Fe(i) += JxW[qp]*fxy*phi[i][qp];	  
-  	}
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+              Fe(i) += JxW[qp]*fxy*phi[i][qp];          
+          }
   
   
   
@@ -959,42 +958,40 @@ All done!
         
         
         {
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
-  	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
-  	    {	      
-  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi_face    = fe_face-&gt;get_phi();
-  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp;               JxW_face    = fe_face-&gt;get_JxW();	      
-  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt;&amp;             qface_point = fe_face-&gt;get_xyz();
-  	      
-  	      
-  	      fe_face-&gt;reinit(elem, side);
-  	      
-  	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface-&gt;n_points(); qp++)
-  		{
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real xf = qface_point[qp](0);
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real yf = qface_point[qp](1);
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real zf = qface_point[qp](2);
-  		  
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
-  		  
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real value = exact_solution(xf, yf, zf);
-  		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
-  		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-  		  
-  		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-  		  
-  		} <I><FONT COLOR="#B22222">// end face quadrature point loop	  
-</FONT></I>  	    } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
-</FONT></I>        } <I><FONT COLOR="#B22222">// end boundary condition section	  
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
+              {              
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi_face    = fe_face-&gt;get_phi();
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp;               JxW_face    = fe_face-&gt;get_JxW();              
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt;&amp;             qface_point = fe_face-&gt;get_xyz();
+                
+                
+                fe_face-&gt;reinit(elem, side);
+                
+                
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface-&gt;n_points(); qp++)
+                  {
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real xf = qface_point[qp](0);
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real yf = qface_point[qp](1);
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real zf = qface_point[qp](2);
+                    
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+                    
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real value = exact_solution(xf, yf, zf);
+                    
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
+                        Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+                    
+                    
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                    
+                  } <I><FONT COLOR="#B22222">// end face quadrature point loop          
+</FONT></I>              } <I><FONT COLOR="#B22222">// end if (elem-&gt;neighbor(side) == NULL)
+</FONT></I>        } <I><FONT COLOR="#B22222">// end boundary condition section          
 </FONT></I>        
-        
-        
-        
+        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
         
         system.matrix-&gt;add_matrix (Ke, dof_indices);
         system.rhs-&gt;add_vector    (Fe, dof_indices);
@@ -1010,39 +1007,9 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex5-devel -q 0
-***************************************************************
- 
-Running ./ex5-devel -q 0
-
- Mesh Information:
-  mesh_dimension()=3
-  spatial_dimension()=3
-  n_nodes()=4913
-  n_elem()=4096
-   n_local_elem()=4096
-   n_active_elem()=4096
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Poisson"
-    Type "LinearImplicit"
-    Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
-    n_dofs()=4913
-    n_local_dofs()=4913
-    n_constrained_dofs()=0
-    n_vectors()=1
-
- 
-***************************************************************
-* Done Running Example  ./ex5-devel -q 0
-***************************************************************
+Compiling C++ (in optimized mode) ex5.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex5.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

@@ -43,7 +43,7 @@ Basic include files needed for the mesh functionality.
         #include "libmesh.h"
         #include "mesh.h"
         #include "mesh_generation.h"
-        #include "gmv_io.h"
+        #include "exodusII_io.h"
         #include "linear_implicit_system.h"
         #include "equation_systems.h"
         
@@ -92,8 +92,16 @@ indexing.
 <div class ="fragment">
 <pre>
         #include "dof_map.h"
-        #include "boundary_mesh.h"
-        #include "boundary_info.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
         
 </pre>
 </div>
@@ -120,33 +128,21 @@ Function prototype for the exact solution.
 <div class ="fragment">
 <pre>
         Real exact_solution (const Real x,
-        		     const Real y,
-        		     const Real z = 0.);
+                             const Real y,
+                             const Real z = 0.);
         
         int main (int argc, char** argv)
         {
-          
 </pre>
 </div>
 <div class = "comment">
-Initialize Petsc, like in example 2.
+Initialize libraries, like in example 2.
 </div>
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
+          LibMeshInit init (argc, argv);
         
-          
-</pre>
-</div>
-<div class = "comment">
-Braces are used to force object scope, like in example 2
-</div>
-
-<div class ="fragment">
-<pre>
-          {
-            
 </pre>
 </div>
 <div class = "comment">
@@ -156,29 +152,30 @@ and command line arguments.
 
 <div class ="fragment">
 <pre>
-            std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-            
-            for (int i=1; i&lt;argc; i++)
-              std::cout &lt;&lt; " " &lt;&lt; argv[i];
-            
-            std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-            
+          std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
+          
+          for (int i=1; i&lt;argc; i++)
+            std::cout &lt;&lt; " " &lt;&lt; argv[i];
+          
+          std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+          
 </pre>
 </div>
 <div class = "comment">
-Create a 2D mesh.
+Skip this 2D example if libMesh was compiled as 1D-only.
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (2);
-            
-            
+          libmesh_example_assert(2 &lt;= LIBMESH_DIM, "2D support");
+          Mesh mesh;
+          
+          
 </pre>
 </div>
 <div class = "comment">
 Use the MeshTools::Generation mesh generator to create a uniform
-grid on the square [-1,1]^2.  We instruct the mesh generator
+2D grid on the square [-1,1]^2.  We instruct the mesh generator
 to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
 elements instead of the default QUAD4's we used in example 2
 allow us to use higher-order approximation.
@@ -186,11 +183,11 @@ allow us to use higher-order approximation.
 
 <div class ="fragment">
 <pre>
-            MeshTools::Generation::build_square (mesh, 
-        					 15, 15,
-        					 -1., 1.,
-        					 -1., 1.,
-        					 QUAD9);
+          MeshTools::Generation::build_square (mesh, 
+                                               15, 15,
+                                               -1., 1.,
+                                               -1., 1.,
+                                               QUAD9);
         
 </pre>
 </div>
@@ -202,8 +199,8 @@ so this mesh is significantly larger than the one in example 2.
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();
-            
+          mesh.print_info();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -212,8 +209,8 @@ Create an equation systems object.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh);
-            
+          EquationSystems equation_systems (mesh);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -223,7 +220,7 @@ The Poisson system is another example of a steady system.
 
 <div class ="fragment">
 <pre>
-            equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Poisson");
+          equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Poisson");
         
 </pre>
 </div>
@@ -234,7 +231,7 @@ will be approximated using second-order approximation.
 
 <div class ="fragment">
 <pre>
-            equation_systems.get_system("Poisson").add_variable("u", SECOND);
+          equation_systems.get_system("Poisson").add_variable("u", SECOND);
         
 </pre>
 </div>
@@ -246,8 +243,8 @@ library.
 
 <div class ="fragment">
 <pre>
-            equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
-            
+          equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -256,8 +253,8 @@ Initialize the data structures for the equation system.
 
 <div class ="fragment">
 <pre>
-            equation_systems.init();
-            
+          equation_systems.init();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -266,7 +263,7 @@ Prints information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-            equation_systems.print_info();
+          equation_systems.print_info();
         
 </pre>
 </div>
@@ -290,36 +287,20 @@ built PETSc.
 
 <div class ="fragment">
 <pre>
-            equation_systems.get_system("Poisson").solve();
+          equation_systems.get_system("Poisson").solve();
         
+        #ifdef LIBMESH_HAVE_EXODUS_API
 </pre>
 </div>
 <div class = "comment">
 After solving the system write the solution
-to a GMV-formatted plot file.
+to a ExodusII-formatted plot file.
 </div>
 
 <div class ="fragment">
 <pre>
-            GMVIO (mesh).write_equation_systems ("out.gmv", equation_systems);
-        
-            for (unsigned int i=0; i&lt;3; i++)
-              {
-        	here();
-        	equation_systems.get_system("Poisson").solve();
-                BoundaryMesh boundary_mesh (mesh.mesh_dimension()-1);
-                mesh.boundary_info-&gt;sync(boundary_mesh, false);
-</pre>
-</div>
-<div class = "comment">
-GMVIO(boundary_mesh).write("boundary.gmv");
-</div>
-
-<div class ="fragment">
-<pre>
-              }
-        
-          }
+          ExodusII_IO (mesh).write_equation_systems ("out.exd", equation_systems);
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
         
 </pre>
 </div>
@@ -329,7 +310,7 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close();
+          return 0;
         }
         
         
@@ -359,7 +340,7 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Poisson");
+          libmesh_assert (system_name == "Poisson");
         
           
 </pre>
@@ -370,7 +351,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -567,25 +548,21 @@ Now we will loop over all the elements in the mesh.
 We will compute the element matrix and right-hand-side
 contribution.
 
-<br><br>Element iterators are a nice way to iterate through
-all the elements, or all the elements that have some property.
-There are many types of element iterators, but here we will
-use the most basic type, the  const_elem_iterator.  The iterator
-el will iterate from the first to the last element.  The
-iterator  end_el tells us when to stop.  It is smart to make
-this one  const so that we don't accidentally mess it up!
-const_elem_iterator           el (mesh.elements_begin());
-const const_elem_iterator end_el (mesh.elements_end());
-
-
-<br><br></div>
+<br><br>Element iterators are a nice way to iterate through all the
+elements, or all the elements that have some property.  The
+iterator el will iterate from the first to the last element on
+the local processor.  The iterator end_el tells us when to stop.
+It is smart to make this one const so that we don't accidentally
+mess it up!  In case users later modify this program to include
+refinement, we will be safe and will only consider the active
+elements; hence we use a variant of the \p active_elem_iterator.
+</div>
 
 <div class ="fragment">
 <pre>
-          MeshBase::const_element_iterator       el     = mesh.elements_begin();
-          const MeshBase::const_element_iterator end_el = mesh.elements_end();
-        
-        
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+         
 </pre>
 </div>
 <div class = "comment">
@@ -654,7 +631,7 @@ members will automatically zero out the matrix  and vector.
 <div class ="fragment">
 <pre>
               Ke.resize (dof_indices.size(),
-        		 dof_indices.size());
+                         dof_indices.size());
         
               Fe.resize (dof_indices.size());
         
@@ -668,7 +645,7 @@ the numeric integration.
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-        	{
+                {
         
 </pre>
 </div>
@@ -681,11 +658,11 @@ the trial functions (j).
 <div class ="fragment">
 <pre>
                   for (unsigned int i=0; i&lt;phi.size(); i++)
-        	    for (unsigned int j=0; j&lt;phi.size(); j++)
-        	      {
-        		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-        	      }
-        	  
+                    for (unsigned int j=0; j&lt;phi.size(); j++)
+                      {
+                        Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                      }
+                  
 </pre>
 </div>
 <div class = "comment">
@@ -698,10 +675,10 @@ This involves a single loop in which we integrate the
 <div class ="fragment">
 <pre>
                   {
-        	    const Real x = q_point[qp](0);
-        	    const Real y = q_point[qp](1);
-        	    const Real eps = 1.e-3;
-        	    
+                    const Real x = q_point[qp](0);
+                    const Real y = q_point[qp](1);
+                    const Real eps = 1.e-3;
+                    
         
 </pre>
 </div>
@@ -725,15 +702,15 @@ we will compute it here, outside of the i-loop
 <div class ="fragment">
 <pre>
                     const Real fxy = -(exact_solution(x,y-eps) +
-        			       exact_solution(x,y+eps) +
-        			       exact_solution(x-eps,y) +
-        			       exact_solution(x+eps,y) -
-        			       4.*exact_solution(x,y))/eps/eps;
-        	    
-        	    for (unsigned int i=0; i&lt;phi.size(); i++)
-        	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
-        	  } 
-        	} 
+                                       exact_solution(x,y+eps) +
+                                       exact_solution(x-eps,y) +
+                                       exact_solution(x+eps,y) -
+                                       4.*exact_solution(x,y))/eps/eps;
+                    
+                    for (unsigned int i=0; i&lt;phi.size(); i++)
+                      Fe(i) += JxW[qp]*fxy*phi[i][qp];
+                  } 
+                } 
               
 </pre>
 </div>
@@ -785,8 +762,8 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
-        	  if (elem-&gt;neighbor(side) == NULL)
-        	    {
+                  if (elem-&gt;neighbor(side) == NULL)
+                    {
 </pre>
 </div>
 <div class = "comment">
@@ -797,7 +774,7 @@ points.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -808,7 +785,7 @@ points on the face.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -820,7 +797,7 @@ we will interpolate the boundary value function.
 <div class ="fragment">
 <pre>
                       const std::vector&lt;Point &gt;& qface_point = fe_face-&gt;get_xyz();
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -831,7 +808,7 @@ face.
 <div class ="fragment">
 <pre>
                       fe_face-&gt;reinit(elem, side);
-        	      
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -841,7 +818,7 @@ Loop over the face quadrature points for integration.
 <div class ="fragment">
 <pre>
                       for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-        		{
+                        {
         
 </pre>
 </div>
@@ -853,7 +830,7 @@ face quadrature point.
 <div class ="fragment">
 <pre>
                           const Real xf = qface_point[qp](0);
-        		  const Real yf = qface_point[qp](1);
+                          const Real yf = qface_point[qp](1);
         
 </pre>
 </div>
@@ -875,7 +852,7 @@ The boundary value.
 <div class ="fragment">
 <pre>
                           const Real value = exact_solution(xf, yf);
-        		  
+                          
 </pre>
 </div>
 <div class = "comment">
@@ -885,8 +862,8 @@ Matrix contribution of the L2 projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    for (unsigned int j=0; j&lt;phi_face.size(); j++)
-        		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+                            for (unsigned int j=0; j&lt;phi_face.size(); j++)
+                              Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
         
 </pre>
 </div>
@@ -898,9 +875,9 @@ projection.
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;phi_face.size(); i++)
-        		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-        		} 
-        	    }
+                            Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                        } 
+                    }
               }
               
 </pre>
@@ -909,7 +886,19 @@ projection.
 We have now finished the quadrature point loop,
 and have therefore applied all the boundary conditions.
 
-<br><br>The element matrix and right-hand-side are now built
+
+<br><br>If this assembly program were to be used on an adaptive mesh,
+we would have to apply any hanging node constraint equations
+</div>
+
+<div class ="fragment">
+<pre>
+              dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+        
+</pre>
+</div>
+<div class = "comment">
+The element matrix and right-hand-side are now built
 for this element.  Add them to the global matrix and
 right-hand-side vector.  The  SparseMatrix::add_matrix()
 and  NumericVector::add_vector() members do this for us.
@@ -944,7 +933,7 @@ All done!
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   
@@ -959,69 +948,58 @@ All done!
   #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   
   #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;boundary_mesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;boundary_info.h&quot;</FONT></B>
+  
+  using namespace libMesh;
   
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_poisson(EquationSystems&amp; es,
                         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   Real exact_solution (<B><FONT COLOR="#228B22">const</FONT></B> Real x,
-  		     <B><FONT COLOR="#228B22">const</FONT></B> Real y,
-  		     <B><FONT COLOR="#228B22">const</FONT></B> Real z = 0.);
+                       <B><FONT COLOR="#228B22">const</FONT></B> Real y,
+                       <B><FONT COLOR="#228B22">const</FONT></B> Real z = 0.);
   
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
+    LibMeshInit init (argc, argv);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
     
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
-  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
     
-    {
-      
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
-      
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
-        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
-      
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-      
-      Mesh mesh (2);
-      
-      
-      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh, 
-  					 15, 15,
-  					 -1., 1.,
-  					 -1., 1.,
-  					 QUAD9);
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+    
+    libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
+    Mesh mesh;
+    
+    
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh, 
+                                         15, 15,
+                                         -1., 1.,
+                                         -1., 1.,
+                                         QUAD9);
   
-      mesh.print_info();
-      
-      EquationSystems equation_systems (mesh);
-      
-      equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+    mesh.print_info();
+    
+    EquationSystems equation_systems (mesh);
+    
+    equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
   
-      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND);
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, SECOND);
   
-      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).attach_assemble_function (assemble_poisson);
-      
-      equation_systems.init();
-      
-      equation_systems.print_info();
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).attach_assemble_function (assemble_poisson);
+    
+    equation_systems.init();
+    
+    equation_systems.print_info();
   
-      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
   
-      GMVIO (mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.gmv&quot;</FONT></B>, equation_systems);
-  
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;3; i++)
-        {
-  	here();
-  	equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>).solve();
-          BoundaryMesh boundary_mesh (mesh.mesh_dimension()-1);
-          mesh.boundary_info-&gt;sync(boundary_mesh, false);
-        }
-  
-    }
-  
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
+  #ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO (mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.exd&quot;</FONT></B>, equation_systems);
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
   
@@ -1030,10 +1008,10 @@ All done!
                         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
     
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Poisson&quot;</FONT></B>);
   
     
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
@@ -1069,11 +1047,9 @@ All done!
   
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
-  
-    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.elements_begin();
-    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
-  
-  
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+   
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el ; ++el)
       {
         <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
@@ -1085,69 +1061,72 @@ All done!
   
   
         Ke.resize (dof_indices.size(),
-  		 dof_indices.size());
+                   dof_indices.size());
   
         Fe.resize (dof_indices.size());
   
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-  	{
+          {
   
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
-  	      {
-  		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-  	      }
-  	  
-  	  {
-  	    <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
-  	    <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
-  	    <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
-  	    
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
+                {
+                  Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                }
+            
+            {
+              <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
+              <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
+              <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
+              
   
-  	    <B><FONT COLOR="#228B22">const</FONT></B> Real fxy = -(exact_solution(x,y-eps) +
-  			       exact_solution(x,y+eps) +
-  			       exact_solution(x-eps,y) +
-  			       exact_solution(x+eps,y) -
-  			       4.*exact_solution(x,y))/eps/eps;
-  	    
-  	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	      Fe(i) += JxW[qp]*fxy*phi[i][qp];
-  	  } 
-  	} 
+              <B><FONT COLOR="#228B22">const</FONT></B> Real fxy = -(exact_solution(x,y-eps) +
+                                 exact_solution(x,y+eps) +
+                                 exact_solution(x-eps,y) +
+                                 exact_solution(x+eps,y) -
+                                 4.*exact_solution(x,y))/eps/eps;
+              
+              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+                Fe(i) += JxW[qp]*fxy*phi[i][qp];
+            } 
+          } 
         
         {
   
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
-  	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
-  	    {
-  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
-  	      
-  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
-  	      
-  	      <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
-  	      
-  	      fe_face-&gt;reinit(elem, side);
-  	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
-  		{
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
+              {
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
+                
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
+                
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt;&amp; qface_point = fe_face-&gt;get_xyz();
+                
+                fe_face-&gt;reinit(elem, side);
+                
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                  {
   
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real xf = qface_point[qp](0);
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real yf = qface_point[qp](1);
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real xf = qface_point[qp](0);
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real yf = qface_point[qp](1);
   
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
   
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Real value = exact_solution(xf, yf);
-  		  
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
-  		      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real value = exact_solution(xf, yf);
+                    
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi_face.size(); j++)
+                        Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
   
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
-  		    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-  		} 
-  	    }
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi_face.size(); i++)
+                      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                  } 
+              }
         }
         
+  
+        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+  
         system.matrix-&gt;add_matrix (Ke, dof_indices);
         system.rhs-&gt;add_vector    (Fe, dof_indices);
       }
@@ -1157,42 +1136,9 @@ All done!
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex3-devel
-***************************************************************
- 
-Running ./ex3-devel
-
- Mesh Information:
-  mesh_dimension()=2
-  spatial_dimension()=3
-  n_nodes()=961
-  n_elem()=225
-   n_local_elem()=225
-   n_active_elem()=225
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Poisson"
-    Type "LinearImplicit"
-    Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="SECOND" 
-    n_dofs()=961
-    n_local_dofs()=961
-    n_constrained_dofs()=0
-    n_vectors()=1
-
-[0] ex3.C, line 162, compiled Jun  6 2007 at 11:54:25
-[0] ex3.C, line 162, compiled Jun  6 2007 at 11:54:25
-[0] ex3.C, line 162, compiled Jun  6 2007 at 11:54:25
- 
-***************************************************************
-* Done Running Example  ./ex3-devel
-***************************************************************
+Compiling C++ (in optimized mode) ex3.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex3.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

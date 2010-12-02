@@ -19,7 +19,7 @@
         #include "libmesh.h"
         #include "mesh.h"
         #include "mesh_generation.h"
-        #include "gmv_io.h"
+        #include "exodusII_io.h"
         #include "eigen_system.h"
         #include "equation_systems.h"
         #include "fe.h"
@@ -28,6 +28,16 @@
         #include "sparse_matrix.h"
         #include "numeric_vector.h"
         #include "dof_map.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
         
         
 </pre>
@@ -40,7 +50,7 @@ the eigen system. Here, we will simply assemble a mass matrix.
 <div class ="fragment">
 <pre>
         void assemble_mass(EquationSystems& es,
-        		   const std::string& system_name);
+                           const std::string& system_name);
         
         
         
@@ -54,7 +64,7 @@ Initialize libMesh and the dependent libraries.
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
+          LibMeshInit init (argc, argv);
         
 </pre>
 </div>
@@ -64,25 +74,15 @@ This example is designed for the SLEPc eigen solver interface.
 
 <div class ="fragment">
 <pre>
-        #ifndef HAVE_SLEPC
-        
-          std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
-        	    &lt;&lt; "compiled with SLEPc eigen solvers support!"
-        	    &lt;&lt; std::endl;
+        #ifndef LIBMESH_HAVE_SLEPC
+          if (libMesh::processor_id() == 0)
+            std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
+                      &lt;&lt; "compiled with SLEPc eigen solvers support!"
+                      &lt;&lt; std::endl;
         
           return 0;
         #else
         
-        
-</pre>
-</div>
-<div class = "comment">
-Braces are used to force object scope.  
-</div>
-
-<div class ="fragment">
-<pre>
-          {
 </pre>
 </div>
 <div class = "comment">
@@ -91,14 +91,15 @@ Check for proper usage.
 
 <div class ="fragment">
 <pre>
-            if (argc &lt; 3)
-              {
-        	std::cerr &lt;&lt; "\nUsage: " &lt;&lt; argv[0]
-        		  &lt;&lt; " -n &lt;number of eigen values&gt;"
-        		  &lt;&lt; std::endl;
-        	error();
-              }
-            
+          if (argc &lt; 3)
+            {
+              if (libMesh::processor_id() == 0)
+                std::cerr &lt;&lt; "\nUsage: " &lt;&lt; argv[0]
+                          &lt;&lt; " -n &lt;number of eigen values&gt;"
+                          &lt;&lt; std::endl;
+              libmesh_error();
+            }
+          
 </pre>
 </div>
 <div class = "comment">
@@ -107,25 +108,15 @@ Tell the user what we are doing.
 
 <div class ="fragment">
 <pre>
-            else 
-              {
-        	std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-        	
-        	for (int i=1; i&lt;argc; i++)
-        	  std::cout &lt;&lt; " " &lt;&lt; argv[i];
-        	
-        	std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-              }
-        
-</pre>
-</div>
-<div class = "comment">
-Set the dimensionality.
-</div>
-
-<div class ="fragment">
-<pre>
-            const unsigned int dim = 2;
+          else 
+            {
+              std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
+              
+              for (int i=1; i&lt;argc; i++)
+                std::cout &lt;&lt; " " &lt;&lt; argv[i];
+              
+              std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+            }
         
 </pre>
 </div>
@@ -135,32 +126,42 @@ Get the number of eigen values to be computed from argv[2]
 
 <div class ="fragment">
 <pre>
-            const unsigned int nev = std::atoi(argv[2]);
+          const unsigned int nev = std::atoi(argv[2]);
         
 </pre>
 </div>
 <div class = "comment">
-Create a dim-dimensional mesh.
+Skip this 2D example if libMesh was compiled as 1D-only.
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (dim);
+          libmesh_example_assert(2 &lt;= LIBMESH_DIM, "2D support");
+          
+</pre>
+</div>
+<div class = "comment">
+Create a mesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh;
         
 </pre>
 </div>
 <div class = "comment">
 Use the internal mesh generator to create a uniform
-grid on a square.
+2D grid on a square.
 </div>
 
 <div class ="fragment">
 <pre>
-            MeshTools::Generation::build_square (mesh, 
-        					 20, 20,
-        					 -1., 1.,
-        					 -1., 1.,
-        					 QUAD4);
+          MeshTools::Generation::build_square (mesh, 
+                                               20, 20,
+                                               -1., 1.,
+                                               -1., 1.,
+                                               QUAD4);
         
 </pre>
 </div>
@@ -170,8 +171,8 @@ Print information about the mesh to the screen.
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();
-            
+          mesh.print_info();
+          
 </pre>
 </div>
 <div class = "comment">
@@ -180,7 +181,7 @@ Create an equation systems object.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh);
+          EquationSystems equation_systems (mesh);
         
 </pre>
 </div>
@@ -191,28 +192,20 @@ use a reference to the system we create.
 
 <div class ="fragment">
 <pre>
-            EigenSystem & eigen_system =
-              equation_systems.add_system&lt;EigenSystem&gt; ("Eigensystem");
+          EigenSystem & eigen_system =
+            equation_systems.add_system&lt;EigenSystem&gt; ("Eigensystem");
         
 </pre>
 </div>
 <div class = "comment">
 Declare the system variables.
-</div>
-
-<div class ="fragment">
-<pre>
-            {
-</pre>
-</div>
-<div class = "comment">
 Adds the variable "p" to "Eigensystem".   "p"
 will be approximated using second-order approximation.
 </div>
 
 <div class ="fragment">
 <pre>
-              eigen_system.add_variable("p", FIRST);
+          eigen_system.add_variable("p", FIRST);
         
 </pre>
 </div>
@@ -223,7 +216,7 @@ function defined below.
 
 <div class ="fragment">
 <pre>
-              eigen_system.attach_assemble_function (assemble_mass);
+          eigen_system.attach_assemble_function (assemble_mass);
         
 </pre>
 </div>
@@ -236,32 +229,29 @@ ncv >= nev must hold and ncv >= 2*nev is recommended.
 
 <div class ="fragment">
 <pre>
-              equation_systems.parameters.set&lt;unsigned int&gt;("eigenpairs")    = nev;
-              equation_systems.parameters.set&lt;unsigned int&gt;("basis vectors") = nev*3;
+          equation_systems.parameters.set&lt;unsigned int&gt;("eigenpairs")    = nev;
+          equation_systems.parameters.set&lt;unsigned int&gt;("basis vectors") = nev*3;
         
 </pre>
 </div>
 <div class = "comment">
-Set the eigen solver type. SLEPc offers various solvers such as
-the Arnoldi and subspace method. It
-also offers interfaces to other solver packages (e.g. ARPACK).
+You may optionally change the default eigensolver used by SLEPc. 
+The Krylov-Schur method is mathematically equivalent to implicitly
+restarted Arnoldi, the method of Arpack, so there is currently no
+point in using SLEPc with Arpack.
+ARNOLDI     = default in SLEPc 2.3.1 and earlier
+KRYLOVSCHUR default in SLEPc 2.3.2 and later
+eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR); 
+
+
+<br><br>Set the solver tolerance and the maximum number of iterations. 
 </div>
 
 <div class ="fragment">
 <pre>
-              eigen_system.eigen_solver-&gt;set_eigensolver_type(ARNOLDI);
-        
-</pre>
-</div>
-<div class = "comment">
-Set the solver tolerance and the maximum number of iterations. 
-</div>
-
-<div class ="fragment">
-<pre>
-              equation_systems.parameters.set&lt;Real&gt;("linear solver tolerance") = pow(TOLERANCE, 5./3.);
-              equation_systems.parameters.set&lt;unsigned int&gt;
-        	("linear solver maximum iterations") = 1000;
+          equation_systems.parameters.set&lt;Real&gt;("linear solver tolerance") = pow(TOLERANCE, 5./3.);
+          equation_systems.parameters.set&lt;unsigned int&gt;
+            ("linear solver maximum iterations") = 1000;
         
 </pre>
 </div>
@@ -272,7 +262,7 @@ a generalized Hermitian problem.
 
 <div class ="fragment">
 <pre>
-              eigen_system.set_eigenproblem_type(GHEP);
+          eigen_system.set_eigenproblem_type(GHEP);
         
 </pre>
 </div>
@@ -287,7 +277,7 @@ eigen_system.eigen_solver->set_position_of_spectrum(SMALLEST_MAGNITUDE);
 
 <div class ="fragment">
 <pre>
-              equation_systems.init();
+          equation_systems.init();
         
 </pre>
 </div>
@@ -297,10 +287,8 @@ Prints information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-              equation_systems.print_info();
-        
-            }
-               
+          equation_systems.print_info();
+             
 </pre>
 </div>
 <div class = "comment">
@@ -309,7 +297,7 @@ Solve the system "Eigensystem".
 
 <div class ="fragment">
 <pre>
-            eigen_system.solve();
+          eigen_system.solve();
         
 </pre>
 </div>
@@ -319,10 +307,10 @@ Get the number of converged eigen pairs.
 
 <div class ="fragment">
 <pre>
-            unsigned int nconv = eigen_system.get_n_converged();
+          unsigned int nconv = eigen_system.get_n_converged();
         
-            std::cout &lt;&lt; "Number of converged eigenpairs: " &lt;&lt; nconv
-        	      &lt;&lt; "\n" &lt;&lt; std::endl;
+          std::cout &lt;&lt; "Number of converged eigenpairs: " &lt;&lt; nconv
+                    &lt;&lt; "\n" &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -332,10 +320,11 @@ Get the last converged eigenpair
 
 <div class ="fragment">
 <pre>
-            if (nconv != 0)
-              {
-        	eigen_system.get_eigenpair(nconv-1);
-        	
+          if (nconv != 0)
+            {
+              eigen_system.get_eigenpair(nconv-1);
+              
+        #ifdef LIBMESH_HAVE_EXODUS_API
 </pre>
 </div>
 <div class = "comment">
@@ -344,17 +333,15 @@ Write the eigen vector to file.
 
 <div class ="fragment">
 <pre>
-                char buf[14];
-        	sprintf (buf, "out.gmv");
-        	GMVIO (mesh).write_equation_systems (buf, equation_systems);
-              }
-            else
-              {
-        	std::cout &lt;&lt; "WARNING: Solver did not converge!\n" &lt;&lt; nconv &lt;&lt; std::endl;
-              }
-          }
+              ExodusII_IO (mesh).write_equation_systems ("out.exd", equation_systems);
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+            }
+          else
+            {
+              std::cout &lt;&lt; "WARNING: Solver did not converge!\n" &lt;&lt; nconv &lt;&lt; std::endl;
+            }
         
-        #endif // HAVE_SLEPC
+        #endif // LIBMESH_HAVE_SLEPC
         
 </pre>
 </div>
@@ -364,14 +351,13 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close ();
+          return 0;
         }
         
         
         
-        
         void assemble_mass(EquationSystems& es,
-        		   const std::string& system_name)
+                           const std::string& system_name)
         {
           
 </pre>
@@ -383,9 +369,9 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Eigensystem");
+          libmesh_assert (system_name == "Eigensystem");
         
-        #ifdef HAVE_SLEPC
+        #ifdef LIBMESH_HAVE_SLEPC
         
 </pre>
 </div>
@@ -395,7 +381,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -543,16 +529,18 @@ the element degrees of freedom get mapped.
 </pre>
 </div>
 <div class = "comment">
-Now we will loop over all the elements in the mesh.
-We will compute the element matrix contribution.
-
-
-<br><br></div>
+Now we will loop over all the elements in the mesh that
+live on the local processor. We will compute the element
+matrix and right-hand-side contribution.  In case users
+later modify this program to include refinement, we will
+be safe and will only consider the active elements;
+hence we use a variant of the \p active_elem_iterator.
+</div>
 
 <div class ="fragment">
 <pre>
-          MeshBase::const_element_iterator       el     = mesh.elements_begin();
-          const MeshBase::const_element_iterator end_el = mesh.elements_end();
+          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
          
           for ( ; el != end_el; ++el)
             {
@@ -623,17 +611,30 @@ the trial functions (j).
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp&lt;qrule.n_points(); qp++)
-        	for (unsigned int i=0; i&lt;phi.size(); i++)
-        	  for (unsigned int j=0; j&lt;phi.size(); j++)
-        	    {
-        	      Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
-        	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-        	    }
+                for (unsigned int i=0; i&lt;phi.size(); i++)
+                  for (unsigned int j=0; j&lt;phi.size(); j++)
+                    {
+                      Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
+                      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                    }
         
 </pre>
 </div>
 <div class = "comment">
-Finally, simply add the element contribution to the
+On an unrefined mesh, constrain_element_matrix does
+nothing.  If this assembly function is ever repurposed to
+run on a refined mesh, getting the hanging node constraints
+right will be important.  Note that, even with
+asymmetric_constraint_rows = false, the constrained dof
+diagonals still exist in the matrix, with diagonal entries
+that are there to ensure non-singular matrices for linear
+solves but which would generate positive non-physical
+eigenvalues for eigensolves.
+dof_map.constrain_element_matrix(Ke, dof_indices, false);
+dof_map.constrain_element_matrix(Me, dof_indices, false);
+
+
+<br><br>Finally, simply add the element contribution to the
 overall matrices A and B.
 </div>
 
@@ -645,7 +646,7 @@ overall matrices A and B.
             } // end of element loop
         
         
-        #endif // HAVE_SLEPC
+        #endif // LIBMESH_HAVE_SLEPC
         
           /**
            * All done!
@@ -686,7 +687,7 @@ overall matrices A and B.
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;eigen_system.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
@@ -696,125 +697,120 @@ overall matrices A and B.
   #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
   
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_mass(EquationSystems&amp; es,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
+                     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   
   
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
+    LibMeshInit init (argc, argv);
   
-  #ifndef HAVE_SLEPC
-  
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
-  	    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with SLEPc eigen solvers support!&quot;</FONT></B>
-  	    &lt;&lt; std::endl;
+  #ifndef LIBMESH_HAVE_SLEPC
+    <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::processor_id() == 0)
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
+                &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with SLEPc eigen solvers support!&quot;</FONT></B>
+                &lt;&lt; std::endl;
   
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
-  
-    {
-      <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\nUsage: &quot;</FONT></B> &lt;&lt; argv[0]
-  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -n &lt;number of eigen values&gt;&quot;</FONT></B>
-  		  &lt;&lt; std::endl;
-  	error();
-        }
-      
-      <B><FONT COLOR="#A020F0">else</FONT></B> 
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
-  	
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
-  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
-  	
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-        }
-  
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = 2;
-  
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nev = std::atoi(argv[2]);
-  
-      Mesh mesh (dim);
-  
-      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh, 
-  					 20, 20,
-  					 -1., 1.,
-  					 -1., 1.,
-  					 QUAD4);
-  
-      mesh.print_info();
-      
-      EquationSystems equation_systems (mesh);
-  
-      EigenSystem &amp; eigen_system =
-        equation_systems.add_system&lt;EigenSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Eigensystem&quot;</FONT></B>);
-  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 3)
       {
-        eigen_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
-  
-        eigen_system.attach_assemble_function (assemble_mass);
-  
-        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;eigenpairs&quot;</FONT></B>)    = nev;
-        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;basis vectors&quot;</FONT></B>) = nev*3;
-  
-        eigen_system.eigen_solver-&gt;set_eigensolver_type(ARNOLDI);
-  
-        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = pow(TOLERANCE, 5./3.);
-        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;
-  	(<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>) = 1000;
-  
-        eigen_system.set_eigenproblem_type(GHEP);
-  
-  
-        equation_systems.init();
-  
-        equation_systems.print_info();
-  
+        <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::processor_id() == 0)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\nUsage: &quot;</FONT></B> &lt;&lt; argv[0]
+                    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -n &lt;number of eigen values&gt;&quot;</FONT></B>
+                    &lt;&lt; std::endl;
+        libmesh_error();
       }
-         
-      eigen_system.solve();
+    
+    <B><FONT COLOR="#A020F0">else</FONT></B> 
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+        
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+        
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+      }
   
-      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nconv = eigen_system.get_n_converged();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nev = std::atoi(argv[2]);
   
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Number of converged eigenpairs: &quot;</FONT></B> &lt;&lt; nconv
-  	      &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n&quot;</FONT></B> &lt;&lt; std::endl;
+    libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
+    
+    Mesh mesh;
   
-      <B><FONT COLOR="#A020F0">if</FONT></B> (nconv != 0)
-        {
-  	eigen_system.get_eigenpair(nconv-1);
-  	
-  	<B><FONT COLOR="#228B22">char</FONT></B> buf[14];
-  	sprintf (buf, <B><FONT COLOR="#BC8F8F">&quot;out.gmv&quot;</FONT></B>);
-  	GMVIO (mesh).write_equation_systems (buf, equation_systems);
-        }
-      <B><FONT COLOR="#A020F0">else</FONT></B>
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;WARNING: Solver did not converge!\n&quot;</FONT></B> &lt;&lt; nconv &lt;&lt; std::endl;
-        }
-    }
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh, 
+                                         20, 20,
+                                         -1., 1.,
+                                         -1., 1.,
+                                         QUAD4);
   
-  #endif <I><FONT COLOR="#B22222">// HAVE_SLEPC
+    mesh.print_info();
+    
+    EquationSystems equation_systems (mesh);
+  
+    EigenSystem &amp; eigen_system =
+      equation_systems.add_system&lt;EigenSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Eigensystem&quot;</FONT></B>);
+  
+    eigen_system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, FIRST);
+  
+    eigen_system.attach_assemble_function (assemble_mass);
+  
+    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;eigenpairs&quot;</FONT></B>)    = nev;
+    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;basis vectors&quot;</FONT></B>) = nev*3;
+  
+  
+    equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) = pow(TOLERANCE, 5./3.);
+    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;
+      (<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>) = 1000;
+  
+    eigen_system.set_eigenproblem_type(GHEP);
+  
+  
+    equation_systems.init();
+  
+    equation_systems.print_info();
+       
+    eigen_system.solve();
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nconv = eigen_system.get_n_converged();
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Number of converged eigenpairs: &quot;</FONT></B> &lt;&lt; nconv
+              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n&quot;</FONT></B> &lt;&lt; std::endl;
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (nconv != 0)
+      {
+        eigen_system.get_eigenpair(nconv-1);
+        
+  #ifdef LIBMESH_HAVE_EXODUS_API
+        ExodusII_IO (mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;out.exd&quot;</FONT></B>, equation_systems);
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>      }
+    <B><FONT COLOR="#A020F0">else</FONT></B>
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;WARNING: Solver did not converge!\n&quot;</FONT></B> &lt;&lt; nconv &lt;&lt; std::endl;
+      }
+  
+  #endif <I><FONT COLOR="#B22222">// LIBMESH_HAVE_SLEPC
 </FONT></I>  
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
   
   
-  
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_mass(EquationSystems&amp; es,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
+                     <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
     
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Eigensystem&quot;</FONT></B>);
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Eigensystem&quot;</FONT></B>);
   
-  #ifdef HAVE_SLEPC
+  #ifdef LIBMESH_HAVE_SLEPC
   
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
@@ -845,9 +841,8 @@ overall matrices A and B.
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
   
   
-  
-    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.elements_begin();
-    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.elements_end();
+    <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
    
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
@@ -861,12 +856,13 @@ overall matrices A and B.
         Me.resize (dof_indices.size(), dof_indices.size());
   
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule.n_points(); qp++)
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
-  	    {
-  	      Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
-  	      Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-  	    }
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;phi.size(); i++)
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;phi.size(); j++)
+              {
+                Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
+                Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+              }
+  
   
         matrix_A.add_matrix (Ke, dof_indices);
         matrix_B.add_matrix (Me, dof_indices);
@@ -874,7 +870,7 @@ overall matrices A and B.
       } <I><FONT COLOR="#B22222">// end of element loop
 </FONT></I>  
   
-  #endif <I><FONT COLOR="#B22222">// HAVE_SLEPC
+  #endif <I><FONT COLOR="#B22222">// LIBMESH_HAVE_SLEPC
 </FONT></I>  
     <I><FONT COLOR="#B22222">/**
      * All done!
@@ -910,41 +906,9 @@ overall matrices A and B.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex17-devel -n 5
-***************************************************************
-
-Running ./ex17-devel -n 5
-
- Mesh Information:
-  mesh_dimension()=2
-  spatial_dimension()=3
-  n_nodes()=441
-  n_elem()=400
-   n_local_elem()=400
-   n_active_elem()=400
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Eigensystem"
-    Type "Eigen"
-    Variables="p"
-    Finite Element Types="LAGRANGE"
-    Approximation Orders="FIRST"
-    n_dofs()=441
-    n_local_dofs()=441
-    n_constrained_dofs()=0
-    n_vectors()=0
-
-Number of converged eigenpairs: 5
-
-
-***************************************************************
-* Done Running Example  ./ex17-devel -n 5
-***************************************************************
+Compiling C++ (in optimized mode) ex17.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex17.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

@@ -47,7 +47,7 @@ elements which will be refined / coarsened at each step.
         #include "mesh.h"
         #include "equation_systems.h"
         #include "linear_implicit_system.h"
-        #include "gmv_io.h"
+        #include "exodusII_io.h"
         #include "tecplot_io.h"
         #include "fe.h"
         #include "quadrature_gauss.h"
@@ -64,12 +64,24 @@ elements which will be refined / coarsened at each step.
         #include "hp_singular.h"
         #include "mesh_generation.h"
         #include "mesh_modification.h"
+        #include "o_string_stream.h"
+        #include "perf_log.h"
         #include "getpot.h"
         #include "exact_solution.h"
         #include "dof_map.h"
         #include "numeric_vector.h"
         #include "elem.h"
         #include "string_to_enum.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
         
 </pre>
 </div>
@@ -98,9 +110,9 @@ for setting boundary conditions.
 <div class ="fragment">
 <pre>
         Number exact_solution(const Point& p,
-        		      const Parameters&,   // EquationSystem parameters, not needed
-        		      const std::string&,  // sys_name, not needed
-        		      const std::string&); // unk_name, not needed);
+                              const Parameters&,   // EquationSystem parameters, not needed
+                              const std::string&,  // sys_name, not needed
+                              const std::string&); // unk_name, not needed);
         
 </pre>
 </div>
@@ -111,9 +123,9 @@ Prototype for calculation of the gradient of the exact solution.
 <div class ="fragment">
 <pre>
         Gradient exact_derivative(const Point& p,
-        			  const Parameters&,   // EquationSystems parameters, not needed
-        			  const std::string&,  // sys_name, not needed
-        			  const std::string&); // unk_name, not needed);
+                                  const Parameters&,   // EquationSystems parameters, not needed
+                                  const std::string&,  // sys_name, not needed
+                                  const std::string&); // unk_name, not needed);
         
         
 </pre>
@@ -151,16 +163,20 @@ Initialize libMesh.
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
+          LibMeshInit init (argc, argv);
         
-        #ifndef ENABLE_AMR
-          std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
-                    &lt;&lt; "compiled with AMR support!"
-                    &lt;&lt; std::endl;
-          return 0;
+</pre>
+</div>
+<div class = "comment">
+Skip adaptive examples on a non-adaptive libMesh build
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef LIBMESH_ENABLE_AMR
+          libmesh_example_assert(false, "--enable-amr");
         #else
         
-          {
 </pre>
 </div>
 <div class = "comment">
@@ -169,7 +185,7 @@ Parse the input file
 
 <div class ="fragment">
 <pre>
-            GetPot input_file("ex14.in");
+          GetPot input_file("ex14.in");
         
 </pre>
 </div>
@@ -179,21 +195,32 @@ Read in parameters from the input file
 
 <div class ="fragment">
 <pre>
-            const unsigned int max_r_steps    = input_file("max_r_steps", 3);
-            const unsigned int max_r_level    = input_file("max_r_level", 3);
-            const Real refine_percentage      = input_file("refine_percentage", 0.5);
-            const Real coarsen_percentage     = input_file("coarsen_percentage", 0.5);
-            const unsigned int uniform_refine = input_file("uniform_refine",0);
-            const std::string refine_type     = input_file("refinement_type", "h");
-            const std::string approx_type     = input_file("approx_type", "LAGRANGE");
-            const unsigned int approx_order   = input_file("approx_order", 1);
-            const std::string element_type    = input_file("element_type", "tensor");
-            const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
-            const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
-            dim = input_file("dimension", 2);
-            const std::string indicator_type = input_file("indicator_type", "kelly");
-            singularity = input_file("singularity", true);
-            
+          const unsigned int max_r_steps    = input_file("max_r_steps", 3);
+          const unsigned int max_r_level    = input_file("max_r_level", 3);
+          const Real refine_percentage      = input_file("refine_percentage", 0.5);
+          const Real coarsen_percentage     = input_file("coarsen_percentage", 0.5);
+          const unsigned int uniform_refine = input_file("uniform_refine",0);
+          const std::string refine_type     = input_file("refinement_type", "h");
+          const std::string approx_type     = input_file("approx_type", "LAGRANGE");
+          const unsigned int approx_order   = input_file("approx_order", 1);
+          const std::string element_type    = input_file("element_type", "tensor");
+          const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
+          const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
+          const bool output_intermediate    = input_file("output_intermediate", false);
+          dim = input_file("dimension", 2);
+          const std::string indicator_type = input_file("indicator_type", "kelly");
+          singularity = input_file("singularity", true);
+          
+</pre>
+</div>
+<div class = "comment">
+Skip higher-dimensional examples on a lower-dimensional libMesh build
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_assert(dim &lt;= LIBMESH_DIM, "2D/3D support");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -203,40 +230,40 @@ the number of degrees of freedom.
 
 <div class ="fragment">
 <pre>
-            std::string approx_name = "";
-            if (element_type == "tensor")
-              approx_name += "bi";
-            if (approx_order == 1)
-              approx_name += "linear";
-            else if (approx_order == 2)
-              approx_name += "quadratic";
-            else if (approx_order == 3)
-              approx_name += "cubic";
-            else if (approx_order == 4)
-              approx_name += "quartic";
+          std::string approx_name = "";
+          if (element_type == "tensor")
+            approx_name += "bi";
+          if (approx_order == 1)
+            approx_name += "linear";
+          else if (approx_order == 2)
+            approx_name += "quadratic";
+          else if (approx_order == 3)
+            approx_name += "cubic";
+          else if (approx_order == 4)
+            approx_name += "quartic";
         
-            std::string output_file = approx_name;
-            output_file += "_";
-            output_file += refine_type;
-            if (uniform_refine == 0)
-              output_file += "_adaptive.m";
-            else
-              output_file += "_uniform.m";
-            
-            std::ofstream out (output_file.c_str());
-            out &lt;&lt; "% dofs     L2-error     H1-error" &lt;&lt; std::endl;
-            out &lt;&lt; "e = [" &lt;&lt; std::endl;
-            
+          std::string output_file = approx_name;
+          output_file += "_";
+          output_file += refine_type;
+          if (uniform_refine == 0)
+            output_file += "_adaptive.m";
+          else
+            output_file += "_uniform.m";
+          
+          std::ofstream out (output_file.c_str());
+          out &lt;&lt; "% dofs     L2-error     H1-error" &lt;&lt; std::endl;
+          out &lt;&lt; "e = [" &lt;&lt; std::endl;
+          
 </pre>
 </div>
 <div class = "comment">
-Create an n-dimensional mesh.
+Create a mesh.
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (dim);
-            
+          Mesh mesh;
+          
 </pre>
 </div>
 <div class = "comment">
@@ -245,12 +272,12 @@ Read in the mesh
 
 <div class ="fragment">
 <pre>
-            if (dim == 1)
-              MeshTools::Generation::build_line(mesh,1,-1.,0.);
-            else if (dim == 2)
-              mesh.read("lshaped.xda");
-            else
-              mesh.read("lshaped3D.xda");
+          if (dim == 1)
+            MeshTools::Generation::build_line(mesh,1,-1.,0.);
+          else if (dim == 2)
+            mesh.read("lshaped.xda");
+          else
+            mesh.read("lshaped3D.xda");
         
 </pre>
 </div>
@@ -260,8 +287,8 @@ Use triangles if the config file says so
 
 <div class ="fragment">
 <pre>
-            if (element_type == "simplex")
-              MeshTools::Modification::all_tri(mesh);
+          if (element_type == "simplex")
+            MeshTools::Modification::all_tri(mesh);
         
 </pre>
 </div>
@@ -273,8 +300,8 @@ of freedom
 
 <div class ="fragment">
 <pre>
-            if (approx_order &gt; 1 || refine_type != "h")
-              mesh.all_second_order();
+          if (approx_order &gt; 1 || refine_type != "h")
+            mesh.all_second_order();
         
 </pre>
 </div>
@@ -284,10 +311,10 @@ Mesh Refinement object
 
 <div class ="fragment">
 <pre>
-            MeshRefinement mesh_refinement(mesh);
-            mesh_refinement.refine_fraction() = refine_percentage;
-            mesh_refinement.coarsen_fraction() = coarsen_percentage;
-            mesh_refinement.max_h_level() = max_r_level;
+          MeshRefinement mesh_refinement(mesh);
+          mesh_refinement.refine_fraction() = refine_percentage;
+          mesh_refinement.coarsen_fraction() = coarsen_percentage;
+          mesh_refinement.max_h_level() = max_r_level;
         
 </pre>
 </div>
@@ -297,28 +324,20 @@ Create an equation systems object.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh);
+          EquationSystems equation_systems (mesh);
         
 </pre>
 </div>
 <div class = "comment">
 Declare the system and its variables.
-</div>
-
-<div class ="fragment">
-<pre>
-            {
-</pre>
-</div>
-<div class = "comment">
 Creates a system named "Laplace"
 </div>
 
 <div class ="fragment">
 <pre>
-              LinearImplicitSystem& system =
-        	equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Laplace");
-              
+          LinearImplicitSystem& system =
+            equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Laplace");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -329,8 +348,8 @@ in the config file
 
 <div class ="fragment">
 <pre>
-              system.add_variable("u", static_cast&lt;Order&gt;(approx_order),
-                                  Utility::string_to_enum&lt;FEFamily&gt;(approx_type));
+          system.add_variable("u", static_cast&lt;Order&gt;(approx_order),
+                              Utility::string_to_enum&lt;FEFamily&gt;(approx_type));
         
 </pre>
 </div>
@@ -341,7 +360,7 @@ function.
 
 <div class ="fragment">
 <pre>
-              system.attach_assemble_function (assemble_laplace);
+          system.attach_assemble_function (assemble_laplace);
         
 </pre>
 </div>
@@ -351,7 +370,7 @@ Initialize the data structures for the equation system.
 
 <div class ="fragment">
 <pre>
-              equation_systems.init();
+          equation_systems.init();
         
 </pre>
 </div>
@@ -361,8 +380,8 @@ Set linear solver max iterations
 
 <div class ="fragment">
 <pre>
-              equation_systems.parameters.set&lt;unsigned int&gt;("linear solver maximum iterations")
-                = max_linear_iterations;
+          equation_systems.parameters.set&lt;unsigned int&gt;("linear solver maximum iterations")
+            = max_linear_iterations;
         
 </pre>
 </div>
@@ -372,9 +391,9 @@ Linear solver tolerance.
 
 <div class ="fragment">
 <pre>
-              equation_systems.parameters.set&lt;Real&gt;("linear solver tolerance") =
-                TOLERANCE * TOLERANCE * TOLERANCE;
-              
+          equation_systems.parameters.set&lt;Real&gt;("linear solver tolerance") =
+            TOLERANCE * TOLERANCE * TOLERANCE;
+          
 </pre>
 </div>
 <div class = "comment">
@@ -383,8 +402,7 @@ Prints information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-              equation_systems.print_info();
-            }
+          equation_systems.print_info();
         
 </pre>
 </div>
@@ -394,9 +412,9 @@ Construct ExactSolution object and attach solution functions
 
 <div class ="fragment">
 <pre>
-            ExactSolution exact_sol(equation_systems);
-            exact_sol.attach_exact_value(exact_solution);
-            exact_sol.attach_exact_deriv(exact_derivative);
+          ExactSolution exact_sol(equation_systems);
+          exact_sol.attach_exact_value(exact_solution);
+          exact_sol.attach_exact_deriv(exact_derivative);
         
 </pre>
 </div>
@@ -406,18 +424,7 @@ Use higher quadrature order for more accurate error results
 
 <div class ="fragment">
 <pre>
-            exact_sol.extra_quadrature_order(extra_error_quadrature);
-        
-</pre>
-</div>
-<div class = "comment">
-Convenient reference to the system
-</div>
-
-<div class ="fragment">
-<pre>
-            LinearImplicitSystem& system =
-              equation_systems.get_system&lt;LinearImplicitSystem&gt;("Laplace");
+          exact_sol.extra_quadrature_order(extra_error_quadrature);
         
 </pre>
 </div>
@@ -427,10 +434,10 @@ A refinement loop.
 
 <div class ="fragment">
 <pre>
-            for (unsigned int r_step=0; r_step&lt;max_r_steps; r_step++)
-              {
-        	std::cout &lt;&lt; "Beginning Solve " &lt;&lt; r_step &lt;&lt; std::endl;
-        	
+          for (unsigned int r_step=0; r_step&lt;max_r_steps; r_step++)
+            {
+              std::cout &lt;&lt; "Beginning Solve " &lt;&lt; r_step &lt;&lt; std::endl;
+              
 </pre>
 </div>
 <div class = "comment">
@@ -439,18 +446,37 @@ Solve the system "Laplace", just like example 2.
 
 <div class ="fragment">
 <pre>
-                system.solve();
+              system.solve();
         
-        	std::cout &lt;&lt; "System has: " &lt;&lt; equation_systems.n_active_dofs()
-        		  &lt;&lt; " degrees of freedom."
-        		  &lt;&lt; std::endl;
+              std::cout &lt;&lt; "System has: " &lt;&lt; equation_systems.n_active_dofs()
+                        &lt;&lt; " degrees of freedom."
+                        &lt;&lt; std::endl;
         
-        	std::cout &lt;&lt; "Linear solver converged at step: "
-        		  &lt;&lt; system.n_linear_iterations()
-        		  &lt;&lt; ", final residual: "
-        		  &lt;&lt; system.final_linear_residual()
-        		  &lt;&lt; std::endl;
-        	
+              std::cout &lt;&lt; "Linear solver converged at step: "
+                        &lt;&lt; system.n_linear_iterations()
+                        &lt;&lt; ", final residual: "
+                        &lt;&lt; system.final_linear_residual()
+                        &lt;&lt; std::endl;
+              
+        #ifdef LIBMESH_HAVE_EXODUS_API
+</pre>
+</div>
+<div class = "comment">
+After solving the system write the solution
+to a ExodusII-formatted plot file.
+</div>
+
+<div class ="fragment">
+<pre>
+              if (output_intermediate)
+                {
+                  OStringStream outfile;
+                  outfile &lt;&lt; "lshaped_" &lt;&lt; r_step &lt;&lt; ".exd";
+                  ExodusII_IO (mesh).write_equation_systems (outfile.str(),
+                                                       equation_systems);
+                }
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+        
 </pre>
 </div>
 <div class = "comment">
@@ -459,7 +485,7 @@ Compute the error.
 
 <div class ="fragment">
 <pre>
-                exact_sol.compute_error("Laplace", "u");
+              exact_sol.compute_error("Laplace", "u");
         
 </pre>
 </div>
@@ -469,12 +495,12 @@ Print out the error values
 
 <div class ="fragment">
 <pre>
-                std::cout &lt;&lt; "L2-Error is: "
-        		  &lt;&lt; exact_sol.l2_error("Laplace", "u")
-        		  &lt;&lt; std::endl;
-        	std::cout &lt;&lt; "H1-Error is: "
-        		  &lt;&lt; exact_sol.h1_error("Laplace", "u")
-        		  &lt;&lt; std::endl;
+              std::cout &lt;&lt; "L2-Error is: "
+                        &lt;&lt; exact_sol.l2_error("Laplace", "u")
+                        &lt;&lt; std::endl;
+              std::cout &lt;&lt; "H1-Error is: "
+                        &lt;&lt; exact_sol.h1_error("Laplace", "u")
+                        &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -484,9 +510,9 @@ Print to output file
 
 <div class ="fragment">
 <pre>
-                out &lt;&lt; equation_systems.n_active_dofs() &lt;&lt; " "
-        	    &lt;&lt; exact_sol.l2_error("Laplace", "u") &lt;&lt; " "
-        	    &lt;&lt; exact_sol.h1_error("Laplace", "u") &lt;&lt; std::endl;
+              out &lt;&lt; equation_systems.n_active_dofs() &lt;&lt; " "
+                  &lt;&lt; exact_sol.l2_error("Laplace", "u") &lt;&lt; " "
+                  &lt;&lt; exact_sol.h1_error("Laplace", "u") &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -496,12 +522,12 @@ Possibly refine the mesh
 
 <div class ="fragment">
 <pre>
-                if (r_step+1 != max_r_steps)
-        	  {
-        	    std::cout &lt;&lt; "  Refining the mesh..." &lt;&lt; std::endl;
+              if (r_step+1 != max_r_steps)
+                {
+                  std::cout &lt;&lt; "  Refining the mesh..." &lt;&lt; std::endl;
         
-        	    if (uniform_refine == 0)
-                      {
+                  if (uniform_refine == 0)
+                    {
         
 </pre>
 </div>
@@ -512,10 +538,10 @@ for computing error information on a finite element mesh.
 
 <div class ="fragment">
 <pre>
-                        ErrorVector error;
-        		
-                        if (indicator_type == "exact")
-                          {
+                      ErrorVector error;
+                      
+                      if (indicator_type == "exact")
+                        {
 </pre>
 </div>
 <div class = "comment">
@@ -534,25 +560,19 @@ solution.
 
 <div class ="fragment">
 <pre>
-                            ExactErrorEstimator error_estimator;
+                          ExactErrorEstimator error_estimator;
         
-                            error_estimator.attach_exact_value(exact_solution);
-                            error_estimator.attach_exact_deriv(exact_derivative);
+                          error_estimator.attach_exact_value(exact_solution);
+                          error_estimator.attach_exact_deriv(exact_derivative);
         
 </pre>
 </div>
 <div class = "comment">
-We optimize in H1 norm
-</div>
+We optimize in H1 norm, the default
+error_estimator.error_norm = H1;
 
-<div class ="fragment">
-<pre>
-                            error_estimator.sobolev_order() = 1;
-        
-</pre>
-</div>
-<div class = "comment">
-Compute the error for each active element using
+
+<br><br>Compute the error for each active element using
 the provided indicator.  Note in general you
 will need to provide an error estimator
 specifically designed for your application.
@@ -560,10 +580,10 @@ specifically designed for your application.
 
 <div class ="fragment">
 <pre>
-                            error_estimator.estimate_error (system, error);
-                          }
-                        else if (indicator_type == "patch")
-                          {
+                          error_estimator.estimate_error (system, error);
+                        }
+                      else if (indicator_type == "patch")
+                        {
 </pre>
 </div>
 <div class = "comment">
@@ -574,12 +594,12 @@ error.
 
 <div class ="fragment">
 <pre>
-                            PatchRecoveryErrorEstimator error_estimator;
+                          PatchRecoveryErrorEstimator error_estimator;
         
-        		    error_estimator.estimate_error (system, error);
-                          }
-                        else if (indicator_type == "uniform")
-                          {
+                          error_estimator.estimate_error (system, error);
+                        }
+                      else if (indicator_type == "uniform")
+                        {
 </pre>
 </div>
 <div class = "comment">
@@ -589,13 +609,13 @@ is reliable, but very expensive.
 
 <div class ="fragment">
 <pre>
-                            UniformRefinementEstimator error_estimator;
+                          UniformRefinementEstimator error_estimator;
         
-        		    error_estimator.estimate_error (system, error);
-                          }
-                        else
-                          {
-                            assert (indicator_type == "kelly");
+                          error_estimator.estimate_error (system, error);
+                        }
+                      else
+                        {
+                          libmesh_assert (indicator_type == "kelly");
         
 </pre>
 </div>
@@ -608,11 +628,11 @@ driving adaptive refinement in many problems
 
 <div class ="fragment">
 <pre>
-                            KellyErrorEstimator error_estimator;
+                          KellyErrorEstimator error_estimator;
         
-        		    error_estimator.estimate_error (system, error);
-                          }
-        		
+                          error_estimator.estimate_error (system, error);
+                        }
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -627,7 +647,7 @@ coarsened.
 
 <div class ="fragment">
 <pre>
-                        mesh_refinement.flag_elements_by_error_fraction (error);
+                      mesh_refinement.flag_elements_by_error_fraction (error);
         
 </pre>
 </div>
@@ -638,8 +658,8 @@ elements flagged for that instead.
 
 <div class ="fragment">
 <pre>
-                        if (refine_type == "p")
-                          mesh_refinement.switch_h_to_p_refinement();
+                      if (refine_type == "p")
+                        mesh_refinement.switch_h_to_p_refinement();
 </pre>
 </div>
 <div class = "comment">
@@ -649,8 +669,8 @@ flag elements for both h and p
 
 <div class ="fragment">
 <pre>
-                        if (refine_type == "matchedhp")
-                          mesh_refinement.add_p_to_h_refinement();
+                      if (refine_type == "matchedhp")
+                        mesh_refinement.add_p_to_h_refinement();
 </pre>
 </div>
 <div class = "comment">
@@ -660,11 +680,11 @@ try switching some elements from h to p
 
 <div class ="fragment">
 <pre>
-                        if (refine_type == "hp")
-        	          {
-        		    HPCoarsenTest hpselector;
-                            hpselector.select_refinement(system);
-        	          }
+                      if (refine_type == "hp")
+                        {
+                          HPCoarsenTest hpselector;
+                          hpselector.select_refinement(system);
+                        }
 </pre>
 </div>
 <div class = "comment">
@@ -674,8 +694,8 @@ try switching most elements from h to p
 
 <div class ="fragment">
 <pre>
-                        if (refine_type == "singularhp")
-        	          {
+                      if (refine_type == "singularhp")
+                        {
 </pre>
 </div>
 <div class = "comment">
@@ -685,8 +705,8 @@ the singular problem
 
 <div class ="fragment">
 <pre>
-                            assert (singularity);
-        		    HPSingularity hpselector;
+                          libmesh_assert (singularity);
+                          HPSingularity hpselector;
 </pre>
 </div>
 <div class = "comment">
@@ -695,10 +715,10 @@ Our only singular point is at the origin
 
 <div class ="fragment">
 <pre>
-                            hpselector.singular_points.push_back(Point());
-                            hpselector.select_refinement(system);
-        	          }
-        		
+                          hpselector.singular_points.push_back(Point());
+                          hpselector.select_refinement(system);
+                        }
+                      
 </pre>
 </div>
 <div class = "comment">
@@ -708,19 +728,19 @@ elements.
 
 <div class ="fragment">
 <pre>
-                        mesh_refinement.refine_and_coarsen_elements();
-        	      }
+                      mesh_refinement.refine_and_coarsen_elements();
+                    }
         
-        	    else if (uniform_refine == 1)
-                      {
-                        if (refine_type == "h" || refine_type == "hp" ||
-                            refine_type == "matchedhp")
-                          mesh_refinement.uniformly_refine(1);
-                        if (refine_type == "p" || refine_type == "hp" ||
-                            refine_type == "matchedhp")
-                          mesh_refinement.uniformly_p_refine(1);
-                      }
-        	    
+                  else if (uniform_refine == 1)
+                    {
+                      if (refine_type == "h" || refine_type == "hp" ||
+                          refine_type == "matchedhp")
+                        mesh_refinement.uniformly_refine(1);
+                      if (refine_type == "p" || refine_type == "hp" ||
+                          refine_type == "matchedhp")
+                        mesh_refinement.uniformly_p_refine(1);
+                    }
+                
 </pre>
 </div>
 <div class = "comment">
@@ -733,25 +753,24 @@ the current one.
 
 <div class ="fragment">
 <pre>
-                    equation_systems.reinit ();
-        	  }
-              }	    
-            
-            
-        
-            
+                  equation_systems.reinit ();
+                }
+            }            
+          
+        #ifdef LIBMESH_HAVE_EXODUS_API
 </pre>
 </div>
 <div class = "comment">
 Write out the solution
 After solving the system write the solution
-to a GMV-formatted plot file.
+to a ExodusII-formatted plot file.
 </div>
 
 <div class ="fragment">
 <pre>
-            GMVIO (mesh).write_equation_systems ("lshaped.gmv",
-            					 equation_systems);
+          ExodusII_IO (mesh).write_equation_systems ("lshaped.exd",
+                                               equation_systems);
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
         
 </pre>
 </div>
@@ -761,10 +780,10 @@ Close up the output file.
 
 <div class ="fragment">
 <pre>
-            out &lt;&lt; "];" &lt;&lt; std::endl;
-            out &lt;&lt; "hold on" &lt;&lt; std::endl;
-            out &lt;&lt; "plot(e(:,1), e(:,2), 'bo-');" &lt;&lt; std::endl;
-            out &lt;&lt; "plot(e(:,1), e(:,3), 'ro-');" &lt;&lt; std::endl;
+          out &lt;&lt; "];" &lt;&lt; std::endl;
+          out &lt;&lt; "hold on" &lt;&lt; std::endl;
+          out &lt;&lt; "plot(e(:,1), e(:,2), 'bo-');" &lt;&lt; std::endl;
+          out &lt;&lt; "plot(e(:,1), e(:,3), 'ro-');" &lt;&lt; std::endl;
 </pre>
 </div>
 <div class = "comment">
@@ -774,9 +793,9 @@ out << "set(gca,'YScale', 'Log');" << std::endl;
 
 <div class ="fragment">
 <pre>
-            out &lt;&lt; "xlabel('dofs');" &lt;&lt; std::endl;
-            out &lt;&lt; "title('" &lt;&lt; approx_name &lt;&lt; " elements');" &lt;&lt; std::endl;
-            out &lt;&lt; "legend('L2-error', 'H1-error');" &lt;&lt; std::endl;
+          out &lt;&lt; "xlabel('dofs');" &lt;&lt; std::endl;
+          out &lt;&lt; "title('" &lt;&lt; approx_name &lt;&lt; " elements');" &lt;&lt; std::endl;
+          out &lt;&lt; "legend('L2-error', 'H1-error');" &lt;&lt; std::endl;
 </pre>
 </div>
 <div class = "comment">
@@ -788,8 +807,7 @@ out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
 
 <div class ="fragment">
 <pre>
-          }
-        #endif // #ifndef ENABLE_AMR
+        #endif // #ifndef LIBMESH_ENABLE_AMR
           
 </pre>
 </div>
@@ -799,7 +817,7 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close ();
+          return 0;
         }
         
         
@@ -816,9 +834,9 @@ quadrant.
 <div class ="fragment">
 <pre>
         Number exact_solution(const Point& p,
-        		      const Parameters&,  // parameters, not needed
-        		      const std::string&, // sys_name, not needed
-        		      const std::string&) // unk_name, not needed
+                              const Parameters&,  // parameters, not needed
+                              const std::string&, // sys_name, not needed
+                              const std::string&) // unk_name, not needed
         {
           const Real x = p(0);
           const Real y = (dim &gt; 1) ? p(1) : 0.;
@@ -856,7 +874,7 @@ Make the 3D solution similar
 <div class ="fragment">
 <pre>
               const Real z = (dim &gt; 2) ? p(2) : 0;
-        		  
+                          
               return pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
             }
           else
@@ -891,9 +909,9 @@ quadrant.
 <div class ="fragment">
 <pre>
         Gradient exact_derivative(const Point& p,
-        			  const Parameters&,  // parameters, not needed
-        			  const std::string&, // sys_name, not needed
-        			  const std::string&) // unk_name, not needed
+                                  const Parameters&,  // parameters, not needed
+                                  const std::string&, // sys_name, not needed
+                                  const std::string&) // unk_name, not needed
         {
 </pre>
 </div>
@@ -926,7 +944,7 @@ We can't compute the gradient at x=0, it is not defined.
 
 <div class ="fragment">
 <pre>
-              assert (x != 0.);
+              libmesh_assert (x != 0.);
         
 </pre>
 </div>
@@ -1029,7 +1047,7 @@ via a penalty method.
         void assemble_laplace(EquationSystems& es,
                               const std::string& system_name)
         {
-        #ifdef ENABLE_AMR
+        #ifdef LIBMESH_ENABLE_AMR
 </pre>
 </div>
 <div class = "comment">
@@ -1039,7 +1057,7 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          assert (system_name == "Laplace");
+          libmesh_assert (system_name == "Laplace");
         
         
 </pre>
@@ -1063,7 +1081,7 @@ Get a constant reference to the mesh object.
 
 <div class ="fragment">
 <pre>
-          const Mesh& mesh = es.get_mesh();
+          const MeshBase& mesh = es.get_mesh();
         
 </pre>
 </div>
@@ -1262,7 +1280,7 @@ the name of the event to log.
 
 <div class ="fragment">
 <pre>
-              perf_log.start_event("elem init");      
+              perf_log.push("elem init");      
         
 </pre>
 </div>
@@ -1315,7 +1333,7 @@ triangle, now we are on a quadrilateral).
 <div class ="fragment">
 <pre>
               Ke.resize (dof_indices.size(),
-        		 dof_indices.size());
+                         dof_indices.size());
         
               Fe.resize (dof_indices.size());
         
@@ -1329,7 +1347,7 @@ object will probably catch the error and abort.
 
 <div class ="fragment">
 <pre>
-              perf_log.stop_event("elem init");      
+              perf_log.pop("elem init");      
         
 </pre>
 </div>
@@ -1343,12 +1361,12 @@ the trial functions (j).
 
 <div class ="fragment">
 <pre>
-              perf_log.start_event ("Ke");
+              perf_log.push ("Ke");
         
               for (unsigned int qp=0; qp&lt;qrule-&gt;n_points(); qp++)
-        	for (unsigned int i=0; i&lt;dphi.size(); i++)
-        	  for (unsigned int j=0; j&lt;dphi.size(); j++)
-        	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                for (unsigned int i=0; i&lt;dphi.size(); i++)
+                  for (unsigned int j=0; j&lt;dphi.size(); j++)
+                    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         
 </pre>
 </div>
@@ -1376,7 +1394,7 @@ Stop logging the matrix computation
 
 <div class ="fragment">
 <pre>
-              perf_log.stop_event ("Ke");
+              perf_log.pop ("Ke");
         
         
 </pre>
@@ -1406,7 +1424,7 @@ Start logging the boundary condition computation
 
 <div class ="fragment">
 <pre>
-                perf_log.start_event ("BCs");
+                perf_log.push ("BCs");
         
 </pre>
 </div>
@@ -1429,16 +1447,16 @@ side MUST live on a boundary of the domain.
 <div class ="fragment">
 <pre>
                 for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
-        	  if (elem-&gt;neighbor(s) == NULL)
-        	    {
-        	      fe_face-&gt;reinit(elem,s);
-        	      
-        	      for (unsigned int qp=0; qp&lt;qface-&gt;n_points(); qp++)
-        		{
-        		  const Number value = exact_solution (qface_points[qp],
-        						       es.parameters,
-        						       "null",
-        						       "void");
+                  if (elem-&gt;neighbor(s) == NULL)
+                    {
+                      fe_face-&gt;reinit(elem,s);
+                      
+                      for (unsigned int qp=0; qp&lt;qface-&gt;n_points(); qp++)
+                        {
+                          const Number value = exact_solution (qface_points[qp],
+                                                               es.parameters,
+                                                               "null",
+                                                               "void");
         
 </pre>
 </div>
@@ -1449,7 +1467,7 @@ RHS contribution
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;psi.size(); i++)
-        		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
+                            Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
         
 </pre>
 </div>
@@ -1460,11 +1478,11 @@ Matrix contribution
 <div class ="fragment">
 <pre>
                           for (unsigned int i=0; i&lt;psi.size(); i++)
-        		    for (unsigned int j=0; j&lt;psi.size(); j++)
-        		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
-        		}
-        	    } 
-        	
+                            for (unsigned int j=0; j&lt;psi.size(); j++)
+                              Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
+                        }
+                    } 
+                
 </pre>
 </div>
 <div class = "comment">
@@ -1473,7 +1491,7 @@ Stop logging the boundary condition computation
 
 <div class ="fragment">
 <pre>
-                perf_log.stop_event ("BCs");
+                perf_log.pop ("BCs");
               } 
               
         
@@ -1490,7 +1508,7 @@ matrix and vector into the global matrix and vector
 
 <div class ="fragment">
 <pre>
-              perf_log.start_event ("matrix insertion");
+              perf_log.push ("matrix insertion");
         
               dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
               system.matrix-&gt;add_matrix (Ke, dof_indices);
@@ -1505,7 +1523,7 @@ matrix and vector into the global matrix and vector
 
 <div class ="fragment">
 <pre>
-              perf_log.stop_event ("matrix insertion");
+              perf_log.pop ("matrix insertion");
             }
         
 </pre>
@@ -1518,7 +1536,7 @@ it will print its log to the screen. Pretty easy, huh?
 
 <div class ="fragment">
 <pre>
-        #endif // #ifdef ENABLE_AMR
+        #endif // #ifdef LIBMESH_ENABLE_AMR
         }
 </pre>
 </div>
@@ -1530,7 +1548,7 @@ it will print its log to the screen. Pretty easy, huh?
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;tecplot_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
@@ -1547,6 +1565,8 @@ it will print its log to the screen. Pretty easy, huh?
   #include <B><FONT COLOR="#BC8F8F">&quot;hp_singular.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_modification.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;o_string_stream.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;perf_log.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;exact_solution.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
@@ -1554,19 +1574,21 @@ it will print its log to the screen. Pretty easy, huh?
   #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;string_to_enum.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_laplace(EquationSystems&amp; es,
                         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name);
   
   
   Number exact_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
-  		      <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// EquationSystem parameters, not needed
-</FONT></I>  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;); <I><FONT COLOR="#B22222">// unk_name, not needed);
+                        <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// EquationSystem parameters, not needed
+</FONT></I>                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;); <I><FONT COLOR="#B22222">// unk_name, not needed);
 </FONT></I>  
   Gradient exact_derivative(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
-  			  <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// EquationSystems parameters, not needed
-</FONT></I>  			  <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  			  <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;); <I><FONT COLOR="#B22222">// unk_name, not needed);
+                            <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,   <I><FONT COLOR="#B22222">// EquationSystems parameters, not needed
+</FONT></I>                            <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,  <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>                            <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;); <I><FONT COLOR="#B22222">// unk_name, not needed);
 </FONT></I>  
   
   
@@ -1577,240 +1599,241 @@ it will print its log to the screen. Pretty easy, huh?
   
   <B><FONT COLOR="#228B22">int</FONT></B> main(<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
+    LibMeshInit init (argc, argv);
   
-  #ifndef ENABLE_AMR
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
-              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with AMR support!&quot;</FONT></B>
-              &lt;&lt; std::endl;
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  #ifndef LIBMESH_ENABLE_AMR
+    libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-amr&quot;</FONT></B>);
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
-    {
-      GetPot input_file(<B><FONT COLOR="#BC8F8F">&quot;ex14.in&quot;</FONT></B>);
+    GetPot input_file(<B><FONT COLOR="#BC8F8F">&quot;ex14.in&quot;</FONT></B>);
   
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_steps    = input_file(<B><FONT COLOR="#BC8F8F">&quot;max_r_steps&quot;</FONT></B>, 3);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_level    = input_file(<B><FONT COLOR="#BC8F8F">&quot;max_r_level&quot;</FONT></B>, 3);
-      <B><FONT COLOR="#228B22">const</FONT></B> Real refine_percentage      = input_file(<B><FONT COLOR="#BC8F8F">&quot;refine_percentage&quot;</FONT></B>, 0.5);
-      <B><FONT COLOR="#228B22">const</FONT></B> Real coarsen_percentage     = input_file(<B><FONT COLOR="#BC8F8F">&quot;coarsen_percentage&quot;</FONT></B>, 0.5);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> uniform_refine = input_file(<B><FONT COLOR="#BC8F8F">&quot;uniform_refine&quot;</FONT></B>,0);
-      <B><FONT COLOR="#228B22">const</FONT></B> std::string refine_type     = input_file(<B><FONT COLOR="#BC8F8F">&quot;refinement_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;h&quot;</FONT></B>);
-      <B><FONT COLOR="#228B22">const</FONT></B> std::string approx_type     = input_file(<B><FONT COLOR="#BC8F8F">&quot;approx_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> approx_order   = input_file(<B><FONT COLOR="#BC8F8F">&quot;approx_order&quot;</FONT></B>, 1);
-      <B><FONT COLOR="#228B22">const</FONT></B> std::string element_type    = input_file(<B><FONT COLOR="#BC8F8F">&quot;element_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;tensor&quot;</FONT></B>);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> extra_error_quadrature  = input_file(<B><FONT COLOR="#BC8F8F">&quot;extra_error_quadrature&quot;</FONT></B>, 0);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_linear_iterations   = input_file(<B><FONT COLOR="#BC8F8F">&quot;max_linear_iterations&quot;</FONT></B>, 5000);
-      dim = input_file(<B><FONT COLOR="#BC8F8F">&quot;dimension&quot;</FONT></B>, 2);
-      <B><FONT COLOR="#228B22">const</FONT></B> std::string indicator_type = input_file(<B><FONT COLOR="#BC8F8F">&quot;indicator_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;kelly&quot;</FONT></B>);
-      singularity = input_file(<B><FONT COLOR="#BC8F8F">&quot;singularity&quot;</FONT></B>, true);
-      
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string approx_name = <B><FONT COLOR="#BC8F8F">&quot;&quot;</FONT></B>;
-      <B><FONT COLOR="#A020F0">if</FONT></B> (element_type == <B><FONT COLOR="#BC8F8F">&quot;tensor&quot;</FONT></B>)
-        approx_name += <B><FONT COLOR="#BC8F8F">&quot;bi&quot;</FONT></B>;
-      <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order == 1)
-        approx_name += <B><FONT COLOR="#BC8F8F">&quot;linear&quot;</FONT></B>;
-      <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order == 2)
-        approx_name += <B><FONT COLOR="#BC8F8F">&quot;quadratic&quot;</FONT></B>;
-      <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order == 3)
-        approx_name += <B><FONT COLOR="#BC8F8F">&quot;cubic&quot;</FONT></B>;
-      <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order == 4)
-        approx_name += <B><FONT COLOR="#BC8F8F">&quot;quartic&quot;</FONT></B>;
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_steps    = input_file(<B><FONT COLOR="#BC8F8F">&quot;max_r_steps&quot;</FONT></B>, 3);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_r_level    = input_file(<B><FONT COLOR="#BC8F8F">&quot;max_r_level&quot;</FONT></B>, 3);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real refine_percentage      = input_file(<B><FONT COLOR="#BC8F8F">&quot;refine_percentage&quot;</FONT></B>, 0.5);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real coarsen_percentage     = input_file(<B><FONT COLOR="#BC8F8F">&quot;coarsen_percentage&quot;</FONT></B>, 0.5);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> uniform_refine = input_file(<B><FONT COLOR="#BC8F8F">&quot;uniform_refine&quot;</FONT></B>,0);
+    <B><FONT COLOR="#228B22">const</FONT></B> std::string refine_type     = input_file(<B><FONT COLOR="#BC8F8F">&quot;refinement_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;h&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> std::string approx_type     = input_file(<B><FONT COLOR="#BC8F8F">&quot;approx_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> approx_order   = input_file(<B><FONT COLOR="#BC8F8F">&quot;approx_order&quot;</FONT></B>, 1);
+    <B><FONT COLOR="#228B22">const</FONT></B> std::string element_type    = input_file(<B><FONT COLOR="#BC8F8F">&quot;element_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;tensor&quot;</FONT></B>);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> extra_error_quadrature  = input_file(<B><FONT COLOR="#BC8F8F">&quot;extra_error_quadrature&quot;</FONT></B>, 0);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_linear_iterations   = input_file(<B><FONT COLOR="#BC8F8F">&quot;max_linear_iterations&quot;</FONT></B>, 5000);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> output_intermediate    = input_file(<B><FONT COLOR="#BC8F8F">&quot;output_intermediate&quot;</FONT></B>, false);
+    dim = input_file(<B><FONT COLOR="#BC8F8F">&quot;dimension&quot;</FONT></B>, 2);
+    <B><FONT COLOR="#228B22">const</FONT></B> std::string indicator_type = input_file(<B><FONT COLOR="#BC8F8F">&quot;indicator_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;kelly&quot;</FONT></B>);
+    singularity = input_file(<B><FONT COLOR="#BC8F8F">&quot;singularity&quot;</FONT></B>, true);
+    
+    libmesh_example_assert(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
+    
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string approx_name = <B><FONT COLOR="#BC8F8F">&quot;&quot;</FONT></B>;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (element_type == <B><FONT COLOR="#BC8F8F">&quot;tensor&quot;</FONT></B>)
+      approx_name += <B><FONT COLOR="#BC8F8F">&quot;bi&quot;</FONT></B>;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order == 1)
+      approx_name += <B><FONT COLOR="#BC8F8F">&quot;linear&quot;</FONT></B>;
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order == 2)
+      approx_name += <B><FONT COLOR="#BC8F8F">&quot;quadratic&quot;</FONT></B>;
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order == 3)
+      approx_name += <B><FONT COLOR="#BC8F8F">&quot;cubic&quot;</FONT></B>;
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order == 4)
+      approx_name += <B><FONT COLOR="#BC8F8F">&quot;quartic&quot;</FONT></B>;
   
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string output_file = approx_name;
-      output_file += <B><FONT COLOR="#BC8F8F">&quot;_&quot;</FONT></B>;
-      output_file += refine_type;
-      <B><FONT COLOR="#A020F0">if</FONT></B> (uniform_refine == 0)
-        output_file += <B><FONT COLOR="#BC8F8F">&quot;_adaptive.m&quot;</FONT></B>;
-      <B><FONT COLOR="#A020F0">else</FONT></B>
-        output_file += <B><FONT COLOR="#BC8F8F">&quot;_uniform.m&quot;</FONT></B>;
-      
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::ofstream out (output_file.c_str());
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;% dofs     L2-error     H1-error&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;e = [&quot;</FONT></B> &lt;&lt; std::endl;
-      
-      Mesh mesh (dim);
-      
-      <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 1)
-        <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_line(mesh,1,-1.,0.);
-      <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
-        mesh.read(<B><FONT COLOR="#BC8F8F">&quot;lshaped.xda&quot;</FONT></B>);
-      <B><FONT COLOR="#A020F0">else</FONT></B>
-        mesh.read(<B><FONT COLOR="#BC8F8F">&quot;lshaped3D.xda&quot;</FONT></B>);
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string output_file = approx_name;
+    output_file += <B><FONT COLOR="#BC8F8F">&quot;_&quot;</FONT></B>;
+    output_file += refine_type;
+    <B><FONT COLOR="#A020F0">if</FONT></B> (uniform_refine == 0)
+      output_file += <B><FONT COLOR="#BC8F8F">&quot;_adaptive.m&quot;</FONT></B>;
+    <B><FONT COLOR="#A020F0">else</FONT></B>
+      output_file += <B><FONT COLOR="#BC8F8F">&quot;_uniform.m&quot;</FONT></B>;
+    
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::ofstream out (output_file.c_str());
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;% dofs     L2-error     H1-error&quot;</FONT></B> &lt;&lt; std::endl;
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;e = [&quot;</FONT></B> &lt;&lt; std::endl;
+    
+    Mesh mesh;
+    
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 1)
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_line(mesh,1,-1.,0.);
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
+      mesh.read(<B><FONT COLOR="#BC8F8F">&quot;lshaped.xda&quot;</FONT></B>);
+    <B><FONT COLOR="#A020F0">else</FONT></B>
+      mesh.read(<B><FONT COLOR="#BC8F8F">&quot;lshaped3D.xda&quot;</FONT></B>);
   
-      <B><FONT COLOR="#A020F0">if</FONT></B> (element_type == <B><FONT COLOR="#BC8F8F">&quot;simplex&quot;</FONT></B>)
-        <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Modification::all_tri(mesh);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (element_type == <B><FONT COLOR="#BC8F8F">&quot;simplex&quot;</FONT></B>)
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Modification::all_tri(mesh);
   
-      <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order &gt; 1 || refine_type != <B><FONT COLOR="#BC8F8F">&quot;h&quot;</FONT></B>)
-        mesh.all_second_order();
+    <B><FONT COLOR="#A020F0">if</FONT></B> (approx_order &gt; 1 || refine_type != <B><FONT COLOR="#BC8F8F">&quot;h&quot;</FONT></B>)
+      mesh.all_second_order();
   
-      MeshRefinement mesh_refinement(mesh);
-      mesh_refinement.refine_fraction() = refine_percentage;
-      mesh_refinement.coarsen_fraction() = coarsen_percentage;
-      mesh_refinement.max_h_level() = max_r_level;
+    MeshRefinement mesh_refinement(mesh);
+    mesh_refinement.refine_fraction() = refine_percentage;
+    mesh_refinement.coarsen_fraction() = coarsen_percentage;
+    mesh_refinement.max_h_level() = max_r_level;
   
-      EquationSystems equation_systems (mesh);
+    EquationSystems equation_systems (mesh);
   
+    LinearImplicitSystem&amp; system =
+      equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>);
+    
+    system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, static_cast&lt;Order&gt;(approx_order),
+                        <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::string_to_enum&lt;FEFamily&gt;(approx_type));
+  
+    system.attach_assemble_function (assemble_laplace);
+  
+    equation_systems.init();
+  
+    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>)
+      = max_linear_iterations;
+  
+    equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) =
+      TOLERANCE * TOLERANCE * TOLERANCE;
+    
+    equation_systems.print_info();
+  
+    ExactSolution exact_sol(equation_systems);
+    exact_sol.attach_exact_value(exact_solution);
+    exact_sol.attach_exact_deriv(exact_derivative);
+  
+    exact_sol.extra_quadrature_order(extra_error_quadrature);
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> r_step=0; r_step&lt;max_r_steps; r_step++)
       {
-        LinearImplicitSystem&amp; system =
-  	equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>);
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Beginning Solve &quot;</FONT></B> &lt;&lt; r_step &lt;&lt; std::endl;
         
-        system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, static_cast&lt;Order&gt;(approx_order),
-                            <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::string_to_enum&lt;FEFamily&gt;(approx_type));
+        system.solve();
   
-        system.attach_assemble_function (assemble_laplace);
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;System has: &quot;</FONT></B> &lt;&lt; equation_systems.n_active_dofs()
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; degrees of freedom.&quot;</FONT></B>
+                  &lt;&lt; std::endl;
   
-        equation_systems.init();
-  
-        equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver maximum iterations&quot;</FONT></B>)
-          = max_linear_iterations;
-  
-        equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) =
-          TOLERANCE * TOLERANCE * TOLERANCE;
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Linear solver converged at step: &quot;</FONT></B>
+                  &lt;&lt; system.n_linear_iterations()
+                  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, final residual: &quot;</FONT></B>
+                  &lt;&lt; system.final_linear_residual()
+                  &lt;&lt; std::endl;
         
-        equation_systems.print_info();
-      }
+  #ifdef LIBMESH_HAVE_EXODUS_API
+        <B><FONT COLOR="#A020F0">if</FONT></B> (output_intermediate)
+          {
+            OStringStream outfile;
+            outfile &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;lshaped_&quot;</FONT></B> &lt;&lt; r_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.exd&quot;</FONT></B>;
+            ExodusII_IO (mesh).write_equation_systems (outfile.str(),
+                                                 equation_systems);
+          }
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>  
+        exact_sol.compute_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
   
-      ExactSolution exact_sol(equation_systems);
-      exact_sol.attach_exact_value(exact_solution);
-      exact_sol.attach_exact_deriv(exact_derivative);
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;L2-Error is: &quot;</FONT></B>
+                  &lt;&lt; exact_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
+                  &lt;&lt; std::endl;
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;H1-Error is: &quot;</FONT></B>
+                  &lt;&lt; exact_sol.h1_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
+                  &lt;&lt; std::endl;
   
-      exact_sol.extra_quadrature_order(extra_error_quadrature);
+        out &lt;&lt; equation_systems.n_active_dofs() &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B>
+            &lt;&lt; exact_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>) &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B>
+            &lt;&lt; exact_sol.h1_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>) &lt;&lt; std::endl;
   
-      LinearImplicitSystem&amp; system =
-        equation_systems.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>);
+        <B><FONT COLOR="#A020F0">if</FONT></B> (r_step+1 != max_r_steps)
+          {
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;  Refining the mesh...&quot;</FONT></B> &lt;&lt; std::endl;
   
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> r_step=0; r_step&lt;max_r_steps; r_step++)
-        {
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Beginning Solve &quot;</FONT></B> &lt;&lt; r_step &lt;&lt; std::endl;
-  	
-  	system.solve();
+            <B><FONT COLOR="#A020F0">if</FONT></B> (uniform_refine == 0)
+              {
   
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;System has: &quot;</FONT></B> &lt;&lt; equation_systems.n_active_dofs()
-  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; degrees of freedom.&quot;</FONT></B>
-  		  &lt;&lt; std::endl;
+                ErrorVector error;
+                
+                <B><FONT COLOR="#A020F0">if</FONT></B> (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>)
+                  {
+                    ExactErrorEstimator error_estimator;
   
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Linear solver converged at step: &quot;</FONT></B>
-  		  &lt;&lt; system.n_linear_iterations()
-  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, final residual: &quot;</FONT></B>
-  		  &lt;&lt; system.final_linear_residual()
-  		  &lt;&lt; std::endl;
-  	
-  	exact_sol.compute_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
+                    error_estimator.attach_exact_value(exact_solution);
+                    error_estimator.attach_exact_deriv(exact_derivative);
   
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;L2-Error is: &quot;</FONT></B>
-  		  &lt;&lt; exact_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
-  		  &lt;&lt; std::endl;
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;H1-Error is: &quot;</FONT></B>
-  		  &lt;&lt; exact_sol.h1_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
-  		  &lt;&lt; std::endl;
   
-  	out &lt;&lt; equation_systems.n_active_dofs() &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B>
-  	    &lt;&lt; exact_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>) &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B>
-  	    &lt;&lt; exact_sol.h1_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>) &lt;&lt; std::endl;
+                    error_estimator.estimate_error (system, error);
+                  }
+                <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;patch&quot;</FONT></B>)
+                  {
+                    PatchRecoveryErrorEstimator error_estimator;
   
-  	<B><FONT COLOR="#A020F0">if</FONT></B> (r_step+1 != max_r_steps)
-  	  {
-  	    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;  Refining the mesh...&quot;</FONT></B> &lt;&lt; std::endl;
+                    error_estimator.estimate_error (system, error);
+                  }
+                <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;uniform&quot;</FONT></B>)
+                  {
+                    UniformRefinementEstimator error_estimator;
   
-  	    <B><FONT COLOR="#A020F0">if</FONT></B> (uniform_refine == 0)
-                {
+                    error_estimator.estimate_error (system, error);
+                  }
+                <B><FONT COLOR="#A020F0">else</FONT></B>
+                  {
+                    libmesh_assert (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;kelly&quot;</FONT></B>);
   
-  		ErrorVector error;
-  		
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>)
-                    {
-                      ExactErrorEstimator error_estimator;
+                    KellyErrorEstimator error_estimator;
   
-                      error_estimator.attach_exact_value(exact_solution);
-                      error_estimator.attach_exact_deriv(exact_derivative);
+                    error_estimator.estimate_error (system, error);
+                  }
+                
+                mesh_refinement.flag_elements_by_error_fraction (error);
   
-                      error_estimator.sobolev_order() = 1;
+                <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>)
+                  mesh_refinement.switch_h_to_p_refinement();
+                <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;matchedhp&quot;</FONT></B>)
+                  mesh_refinement.add_p_to_h_refinement();
+                <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;hp&quot;</FONT></B>)
+                  {
+                    HPCoarsenTest hpselector;
+                    hpselector.select_refinement(system);
+                  }
+                <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;singularhp&quot;</FONT></B>)
+                  {
+                    libmesh_assert (singularity);
+                    HPSingularity hpselector;
+                    hpselector.singular_points.push_back(Point());
+                    hpselector.select_refinement(system);
+                  }
+                
+                mesh_refinement.refine_and_coarsen_elements();
+              }
   
-  		    error_estimator.estimate_error (system, error);
-                    }
-                  <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;patch&quot;</FONT></B>)
-                    {
-  		    PatchRecoveryErrorEstimator error_estimator;
-  
-  		    error_estimator.estimate_error (system, error);
-                    }
-                  <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;uniform&quot;</FONT></B>)
-                    {
-                      UniformRefinementEstimator error_estimator;
-  
-  		    error_estimator.estimate_error (system, error);
-                    }
-                  <B><FONT COLOR="#A020F0">else</FONT></B>
-                    {
-                      assert (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;kelly&quot;</FONT></B>);
-  
-  		    KellyErrorEstimator error_estimator;
-  
-  		    error_estimator.estimate_error (system, error);
-                    }
-  		
-  		mesh_refinement.flag_elements_by_error_fraction (error);
-  
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>)
-                    mesh_refinement.switch_h_to_p_refinement();
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;matchedhp&quot;</FONT></B>)
-                    mesh_refinement.add_p_to_h_refinement();
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;hp&quot;</FONT></B>)
-  	          {
-  		    HPCoarsenTest hpselector;
-                      hpselector.select_refinement(system);
-  	          }
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;singularhp&quot;</FONT></B>)
-  	          {
-                      assert (singularity);
-  		    HPSingularity hpselector;
-                      hpselector.singular_points.push_back(Point());
-                      hpselector.select_refinement(system);
-  	          }
-  		
-  		mesh_refinement.refine_and_coarsen_elements();
-  	      }
-  
-  	    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (uniform_refine == 1)
-                {
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;h&quot;</FONT></B> || refine_type == <B><FONT COLOR="#BC8F8F">&quot;hp&quot;</FONT></B> ||
-                      refine_type == <B><FONT COLOR="#BC8F8F">&quot;matchedhp&quot;</FONT></B>)
-                    mesh_refinement.uniformly_refine(1);
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B> || refine_type == <B><FONT COLOR="#BC8F8F">&quot;hp&quot;</FONT></B> ||
-                      refine_type == <B><FONT COLOR="#BC8F8F">&quot;matchedhp&quot;</FONT></B>)
-                    mesh_refinement.uniformly_p_refine(1);
-                }
-  	    
-  	    equation_systems.reinit ();
-  	  }
-        }	    
-      
-      
-  
-      
-      GMVIO (mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;lshaped.gmv&quot;</FONT></B>,
-      					 equation_systems);
-  
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;];&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;hold on&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;plot(e(:,1), e(:,2), 'bo-');&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;plot(e(:,1), e(:,3), 'ro-');&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;xlabel('dofs');&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;title('&quot;</FONT></B> &lt;&lt; approx_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; elements');&quot;</FONT></B> &lt;&lt; std::endl;
-      out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;legend('L2-error', 'H1-error');&quot;</FONT></B> &lt;&lt; std::endl;
-    }
-  #endif <I><FONT COLOR="#B22222">// #ifndef ENABLE_AMR
+            <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (uniform_refine == 1)
+              {
+                <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;h&quot;</FONT></B> || refine_type == <B><FONT COLOR="#BC8F8F">&quot;hp&quot;</FONT></B> ||
+                    refine_type == <B><FONT COLOR="#BC8F8F">&quot;matchedhp&quot;</FONT></B>)
+                  mesh_refinement.uniformly_refine(1);
+                <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B> || refine_type == <B><FONT COLOR="#BC8F8F">&quot;hp&quot;</FONT></B> ||
+                    refine_type == <B><FONT COLOR="#BC8F8F">&quot;matchedhp&quot;</FONT></B>)
+                  mesh_refinement.uniformly_p_refine(1);
+              }
+          
+            equation_systems.reinit ();
+          }
+      }            
+    
+  #ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO (mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;lshaped.exd&quot;</FONT></B>,
+                                         equation_systems);
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>  
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;];&quot;</FONT></B> &lt;&lt; std::endl;
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;hold on&quot;</FONT></B> &lt;&lt; std::endl;
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;plot(e(:,1), e(:,2), 'bo-');&quot;</FONT></B> &lt;&lt; std::endl;
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;plot(e(:,1), e(:,3), 'ro-');&quot;</FONT></B> &lt;&lt; std::endl;
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;xlabel('dofs');&quot;</FONT></B> &lt;&lt; std::endl;
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;title('&quot;</FONT></B> &lt;&lt; approx_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; elements');&quot;</FONT></B> &lt;&lt; std::endl;
+    out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;legend('L2-error', 'H1-error');&quot;</FONT></B> &lt;&lt; std::endl;
+  #endif <I><FONT COLOR="#B22222">// #ifndef LIBMESH_ENABLE_AMR
 </FONT></I>    
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
   
   
   
   Number exact_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
-  		      <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  		      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
+                        <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
     <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
     <B><FONT COLOR="#228B22">const</FONT></B> Real y = (dim &gt; 1) ? p(1) : 0.;
@@ -1823,7 +1846,7 @@ it will print its log to the screen. Pretty easy, huh?
           theta += 2. * libMesh::pi;
   
         <B><FONT COLOR="#228B22">const</FONT></B> Real z = (dim &gt; 2) ? p(2) : 0;
-  		  
+                    
         <B><FONT COLOR="#A020F0">return</FONT></B> pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
       }
     <B><FONT COLOR="#A020F0">else</FONT></B>
@@ -1839,9 +1862,9 @@ it will print its log to the screen. Pretty easy, huh?
   
   
   Gradient exact_derivative(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
-  			  <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
-</FONT></I>  			  <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
-</FONT></I>  			  <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
+                            <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp;,  <I><FONT COLOR="#B22222">// parameters, not needed
+</FONT></I>                            <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;, <I><FONT COLOR="#B22222">// sys_name, not needed
+</FONT></I>                            <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
     Gradient gradu;
     
@@ -1850,7 +1873,7 @@ it will print its log to the screen. Pretty easy, huh?
   
     <B><FONT COLOR="#A020F0">if</FONT></B> (singularity)
       {
-        assert (x != 0.);
+        libmesh_assert (x != 0.);
   
         <B><FONT COLOR="#228B22">const</FONT></B> Real tt = 2./3.;
         <B><FONT COLOR="#228B22">const</FONT></B> Real ot = 1./3.;
@@ -1892,13 +1915,13 @@ it will print its log to the screen. Pretty easy, huh?
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_laplace(EquationSystems&amp; es,
                         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-  #ifdef ENABLE_AMR
-    assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>);
+  #ifdef LIBMESH_ENABLE_AMR
+    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>);
   
   
     PerfLog perf_log (<B><FONT COLOR="#BC8F8F">&quot;Matrix Assembly&quot;</FONT></B>,false);
     
-    <B><FONT COLOR="#228B22">const</FONT></B> Mesh&amp; mesh = es.get_mesh();
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
   
@@ -1939,7 +1962,7 @@ it will print its log to the screen. Pretty easy, huh?
     
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
-        perf_log.start_event(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
+        perf_log.push(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
   
         <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
   
@@ -1948,18 +1971,18 @@ it will print its log to the screen. Pretty easy, huh?
         fe-&gt;reinit (elem);
   
         Ke.resize (dof_indices.size(),
-  		 dof_indices.size());
+                   dof_indices.size());
   
         Fe.resize (dof_indices.size());
   
-        perf_log.stop_event(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
+        perf_log.pop(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
   
-        perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
+        perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
   
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); qp++)
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;dphi.size(); i++)
-  	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;dphi.size(); j++)
-  	    Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;dphi.size(); i++)
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;dphi.size(); j++)
+              Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
   
         <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 1)
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); qp++)
@@ -1971,133 +1994,57 @@ it will print its log to the screen. Pretty easy, huh?
                 Fe(i) += JxW[qp]*phi[i][qp]*f;
             }
   
-        perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
+        perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
   
   
         {
-  	perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
+          perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
   
-  	<B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
+          <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e10;
   
-  	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
-  	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
-  	    {
-  	      fe_face-&gt;reinit(elem,s);
-  	      
-  	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface-&gt;n_points(); qp++)
-  		{
-  		  <B><FONT COLOR="#228B22">const</FONT></B> Number value = exact_solution (qface_points[qp],
-  						       es.parameters,
-  						       <B><FONT COLOR="#BC8F8F">&quot;null&quot;</FONT></B>,
-  						       <B><FONT COLOR="#BC8F8F">&quot;void&quot;</FONT></B>);
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
+              {
+                fe_face-&gt;reinit(elem,s);
+                
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface-&gt;n_points(); qp++)
+                  {
+                    <B><FONT COLOR="#228B22">const</FONT></B> Number value = exact_solution (qface_points[qp],
+                                                         es.parameters,
+                                                         <B><FONT COLOR="#BC8F8F">&quot;null&quot;</FONT></B>,
+                                                         <B><FONT COLOR="#BC8F8F">&quot;void&quot;</FONT></B>);
   
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;psi.size(); i++)
-  		    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;psi.size(); i++)
+                      Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
   
-  		  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;psi.size(); i++)
-  		    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;psi.size(); j++)
-  		      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
-  		}
-  	    } 
-  	
-  	perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;psi.size(); i++)
+                      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;psi.size(); j++)
+                        Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
+                  }
+              } 
+          
+          perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
         } 
         
   
-        perf_log.start_event (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
+        perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
   
         dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
         system.matrix-&gt;add_matrix (Ke, dof_indices);
         system.rhs-&gt;add_vector    (Fe, dof_indices);
   
-        perf_log.stop_event (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
+        perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
       }
   
-  #endif <I><FONT COLOR="#B22222">// #ifdef ENABLE_AMR
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_ENABLE_AMR
 </FONT></I>  }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex14-devel
-***************************************************************
- 
- EquationSystems
-  n_systems()=1
-   System "Laplace"
-    Type "LinearImplicit"
-    Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="SECOND" 
-    n_dofs()=21
-    n_local_dofs()=21
-    n_constrained_dofs()=0
-    n_vectors()=1
-
-Beginning Solve 0
-System has: 21 degrees of freedom.
-Linear solver converged at step: 32, final residual: 1.19434e-18
-L2-Error is: 0.0150899
-H1-Error is: 0.125332
-  Refining the mesh...
-Beginning Solve 1
-System has: 65 degrees of freedom.
-Linear solver converged at step: 20, final residual: 4.1598e-18
-L2-Error is: 0.00515425
-H1-Error is: 0.0777803
-  Refining the mesh...
-Beginning Solve 2
-System has: 97 degrees of freedom.
-Linear solver converged at step: 22, final residual: 3.12684e-18
-L2-Error is: 0.00199025
-H1-Error is: 0.0494318
-  Refining the mesh...
-Beginning Solve 3
-System has: 129 degrees of freedom.
-Linear solver converged at step: 29, final residual: 3.7861e-18
-L2-Error is: 0.000890215
-H1-Error is: 0.0320056
-  Refining the mesh...
-Beginning Solve 4
-System has: 161 degrees of freedom.
-Linear solver converged at step: 30, final residual: 3.91646e-18
-L2-Error is: 0.000559523
-H1-Error is: 0.0215069
-  Refining the mesh...
-Beginning Solve 5
-System has: 193 degrees of freedom.
-Linear solver converged at step: 37, final residual: 2.81216e-18
-L2-Error is: 0.000483386
-H1-Error is: 0.0154837
-  Refining the mesh...
-Beginning Solve 6
-System has: 225 degrees of freedom.
-Linear solver converged at step: 42, final residual: 2.80178e-18
-L2-Error is: 0.000467457
-H1-Error is: 0.0123018
-  Refining the mesh...
-Beginning Solve 7
-System has: 257 degrees of freedom.
-Linear solver converged at step: 44, final residual: 3.93336e-18
-L2-Error is: 0.000463656
-H1-Error is: 0.0107815
-  Refining the mesh...
-Beginning Solve 8
-System has: 341 degrees of freedom.
-Linear solver converged at step: 52, final residual: 4.58993e-18
-L2-Error is: 0.000301328
-H1-Error is: 0.00820153
-  Refining the mesh...
-Beginning Solve 9
-System has: 445 degrees of freedom.
-Linear solver converged at step: 60, final residual: 3.05606e-18
-L2-Error is: 0.000182515
-H1-Error is: 0.00601168
- 
-***************************************************************
-* Done Running Example  ./ex14-devel
-***************************************************************
+Compiling C++ (in optimized mode) ex14.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex14.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

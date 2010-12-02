@@ -27,7 +27,7 @@ DiffSystem class framework
         #include "equation_systems.h"
         #include "error_vector.h"
         #include "getpot.h"
-        #include "gmv_io.h"
+        #include "exodusII_io.h"
         #include "kelly_error_estimator.h"
         #include "mesh.h"
         #include "mesh_generation.h"
@@ -61,6 +61,16 @@ The systems and solvers we may use
 </pre>
 </div>
 <div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
 The main program.
 </div>
 
@@ -76,16 +86,40 @@ Initialize libMesh.
 
 <div class ="fragment">
 <pre>
-          libMesh::init (argc, argv);
+          LibMeshInit init (argc, argv);
         
-        #ifndef ENABLE_AMR
-          std::cerr &lt;&lt; "ERROR: This example requires libMesh to be\n"
-                    &lt;&lt; "compiled with AMR support!"
-                    &lt;&lt; std::endl;
-          return 0;
+</pre>
+</div>
+<div class = "comment">
+This example fails without at least double precision FP
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
+          libmesh_example_assert(false, "--disable-singleprecision");
+        #endif
+        
+        #ifndef LIBMESH_ENABLE_AMR
+          libmesh_example_assert(false, "--enable-amr");
         #else
         
-          {    
+</pre>
+</div>
+<div class = "comment">
+Trilinos solver NaNs by default on the zero pressure block.
+We'll skip this example for now.
+</div>
+
+<div class ="fragment">
+<pre>
+          if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
+            {
+              std::cout &lt;&lt; "We skip example 18 when using the Trilinos solvers.\n"
+                        &lt;&lt; std::endl;
+              return 0;
+            }
+        
 </pre>
 </div>
 <div class = "comment">
@@ -94,7 +128,7 @@ Parse the input file
 
 <div class ="fragment">
 <pre>
-            GetPot infile("ex18.in");
+          GetPot infile("ex18.in");
         
 </pre>
 </div>
@@ -104,28 +138,47 @@ Read in parameters from the input file
 
 <div class ="fragment">
 <pre>
-            const Real global_tolerance          = infile("global_tolerance", 0.);
-            const unsigned int nelem_target      = infile("n_elements", 400);
-            const bool transient                 = infile("transient", true);
-            const Real deltat                    = infile("deltat", 0.005);
-            unsigned int n_timesteps             = infile("n_timesteps", 20);
-            const unsigned int write_interval    = infile("write_interval", 5);
-            const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
-            const unsigned int coarserefinements = infile("coarserefinements", 0);
-            const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
-            const unsigned int dim               = infile("dimension", 2);
+          const Real global_tolerance          = infile("global_tolerance", 0.);
+          const unsigned int nelem_target      = infile("n_elements", 400);
+          const bool transient                 = infile("transient", true);
+          const Real deltat                    = infile("deltat", 0.005);
+          unsigned int n_timesteps             = infile("n_timesteps", 20);
+          const unsigned int write_interval    = infile("write_interval", 5);
+          const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
+          const unsigned int coarserefinements = infile("coarserefinements", 0);
+          const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
+          const unsigned int dim               = infile("dimension", 2);
         
-            assert (dim == 2 || dim == 3);
 </pre>
 </div>
 <div class = "comment">
-Create a n-dimensional mesh.
+Skip higher-dimensional examples on a lower-dimensional libMesh build
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (dim);
-            
+          libmesh_example_assert(dim &lt;= LIBMESH_DIM, "2D/3D support");
+          
+</pre>
+</div>
+<div class = "comment">
+We have only defined 2 and 3 dimensional problems
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_assert (dim == 2 || dim == 3);
+        
+</pre>
+</div>
+<div class = "comment">
+Create a mesh.
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh;
+          
 </pre>
 </div>
 <div class = "comment">
@@ -134,13 +187,13 @@ And an object to refine it
 
 <div class ="fragment">
 <pre>
-            MeshRefinement mesh_refinement(mesh);
-            mesh_refinement.coarsen_by_parents() = true;
-            mesh_refinement.absolute_global_tolerance() = global_tolerance;
-            mesh_refinement.nelem_target() = nelem_target;
-            mesh_refinement.refine_fraction() = 0.3;
-            mesh_refinement.coarsen_fraction() = 0.3;
-            mesh_refinement.coarsen_threshold() = 0.1;
+          MeshRefinement mesh_refinement(mesh);
+          mesh_refinement.coarsen_by_parents() = true;
+          mesh_refinement.absolute_global_tolerance() = global_tolerance;
+          mesh_refinement.nelem_target() = nelem_target;
+          mesh_refinement.refine_fraction() = 0.3;
+          mesh_refinement.coarsen_fraction() = 0.3;
+          mesh_refinement.coarsen_threshold() = 0.1;
         
 </pre>
 </div>
@@ -154,24 +207,24 @@ us to use higher-order approximation, as in example 3.
 
 <div class ="fragment">
 <pre>
-            if (dim == 2)
-              MeshTools::Generation::build_square (mesh,
-                                                   coarsegridsize,
-                                                   coarsegridsize,
-                                                   0., 1.,
-                                                   0., 1.,
-                                                   QUAD9);
-            else if (dim == 3)
-              MeshTools::Generation::build_cube (mesh,
-                                                 coarsegridsize,
+          if (dim == 2)
+            MeshTools::Generation::build_square (mesh,
                                                  coarsegridsize,
                                                  coarsegridsize,
                                                  0., 1.,
                                                  0., 1.,
-                                                 0., 1.,
-                                                 HEX27);
+                                                 QUAD9);
+          else if (dim == 3)
+            MeshTools::Generation::build_cube (mesh,
+                                               coarsegridsize,
+                                               coarsegridsize,
+                                               coarsegridsize,
+                                               0., 1.,
+                                               0., 1.,
+                                               0., 1.,
+                                               HEX27);
         
-            mesh_refinement.uniformly_refine(coarserefinements);
+          mesh_refinement.uniformly_refine(coarserefinements);
         
 </pre>
 </div>
@@ -181,7 +234,7 @@ Print information about the mesh to the screen.
 
 <div class ="fragment">
 <pre>
-            mesh.print_info();
+          mesh.print_info();
         
 </pre>
 </div>
@@ -191,7 +244,7 @@ Create an equation systems object.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh);
+          EquationSystems equation_systems (mesh);
         
 </pre>
 </div>
@@ -201,8 +254,8 @@ Declare the system "Navier-Stokes" and its variables.
 
 <div class ="fragment">
 <pre>
-            NavierSystem & system = 
-              equation_systems.add_system&lt;NavierSystem&gt; ("Navier-Stokes");
+          NavierSystem & system = 
+            equation_systems.add_system&lt;NavierSystem&gt; ("Navier-Stokes");
         
 </pre>
 </div>
@@ -212,15 +265,15 @@ Solve this as a time-dependent or steady system
 
 <div class ="fragment">
 <pre>
-            if (transient)
+          if (transient)
+            system.time_solver =
+              AutoPtr&lt;TimeSolver&gt;(new EulerSolver(system));
+          else
+            {
               system.time_solver =
-                AutoPtr&lt;TimeSolver&gt;(new EulerSolver(system));
-            else
-              {
-                system.time_solver =
-                  AutoPtr&lt;TimeSolver&gt;(new SteadySolver(system));
-                assert(n_timesteps == 1);
-              }
+                AutoPtr&lt;TimeSolver&gt;(new SteadySolver(system));
+              libmesh_assert(n_timesteps == 1);
+            }
         
 </pre>
 </div>
@@ -230,7 +283,7 @@ Initialize the system
 
 <div class ="fragment">
 <pre>
-            equation_systems.init ();
+          equation_systems.init ();
         
 </pre>
 </div>
@@ -240,7 +293,7 @@ Set the time stepping options
 
 <div class ="fragment">
 <pre>
-            system.deltat = deltat;
+          system.deltat = deltat;
         
 </pre>
 </div>
@@ -250,15 +303,17 @@ And the nonlinear solver options
 
 <div class ="fragment">
 <pre>
-            DiffSolver &solver = *(system.time_solver-&gt;diff_solver().get());
-            solver.quiet = infile("solver_quiet", true);
-            solver.max_nonlinear_iterations =
-              infile("max_nonlinear_iterations", 15);
-            solver.relative_step_tolerance =
-              infile("relative_step_tolerance", 1.e-3);
-            solver.relative_residual_tolerance =
-              infile("relative_residual_tolerance", 0.0);
-        
+          DiffSolver &solver = *(system.time_solver-&gt;diff_solver().get());
+          solver.quiet = infile("solver_quiet", true);
+          solver.max_nonlinear_iterations =
+            infile("max_nonlinear_iterations", 15);
+          solver.relative_step_tolerance =
+            infile("relative_step_tolerance", 1.e-3);
+          solver.relative_residual_tolerance =
+            infile("relative_residual_tolerance", 0.0);
+          solver.absolute_residual_tolerance =
+            infile("absolute_residual_tolerance", 0.0);
+            
 </pre>
 </div>
 <div class = "comment">
@@ -267,10 +322,10 @@ And the linear solver options
 
 <div class ="fragment">
 <pre>
-            solver.max_linear_iterations =
-              infile("max_linear_iterations", 50000);
-            solver.initial_linear_tolerance =
-              infile("initial_linear_tolerance", 1.e-3);
+          solver.max_linear_iterations =
+            infile("max_linear_iterations", 50000);
+          solver.initial_linear_tolerance =
+            infile("initial_linear_tolerance", 1.e-3);
         
 </pre>
 </div>
@@ -280,7 +335,7 @@ Print information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-            equation_systems.print_info();
+          equation_systems.print_info();
         
 </pre>
 </div>
@@ -291,8 +346,8 @@ solution of the equations.
 
 <div class ="fragment">
 <pre>
-            for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
-              {
+          for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
+            {
 </pre>
 </div>
 <div class = "comment">
@@ -301,8 +356,8 @@ A pretty update message
 
 <div class ="fragment">
 <pre>
-                std::cout &lt;&lt; " Solving time step " &lt;&lt; t_step &lt;&lt; ", time = "
-                          &lt;&lt; system.time &lt;&lt; std::endl;
+              std::cout &lt;&lt; "\n\nSolving time step " &lt;&lt; t_step &lt;&lt; ", time = "
+                        &lt;&lt; system.time &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -312,14 +367,14 @@ Adaptively solve the timestep
 
 <div class ="fragment">
 <pre>
-                unsigned int a_step = 0;
-                for (; a_step != max_adaptivesteps; ++a_step)
-                  {
-                    system.solve();
+              unsigned int a_step = 0;
+              for (; a_step != max_adaptivesteps; ++a_step)
+                {
+                  system.solve();
         
-                    ErrorVector error;
+                  ErrorVector error;
         
-                    AutoPtr&lt;ErrorEstimator&gt; error_estimator;
+                  AutoPtr&lt;ErrorEstimator&gt; error_estimator;
         
 </pre>
 </div>
@@ -330,8 +385,8 @@ need a better estimator than Kelly
 
 <div class ="fragment">
 <pre>
-                    if (global_tolerance != 0.)
-                      {
+                  if (global_tolerance != 0.)
+                    {
 </pre>
 </div>
 <div class = "comment">
@@ -341,26 +396,26 @@ size at once
 
 <div class ="fragment">
 <pre>
-                        assert (nelem_target == 0);
+                      libmesh_assert (nelem_target == 0);
         
-                        UniformRefinementEstimator *u =
-                          new UniformRefinementEstimator;
+                      UniformRefinementEstimator *u =
+                        new UniformRefinementEstimator;
         
 </pre>
 </div>
 <div class = "comment">
 The lid-driven cavity problem isn't in H1, so
-lets estimate H0 (i.e. L2) error
+lets estimate L2 error
 </div>
 
 <div class ="fragment">
 <pre>
-                        u-&gt;sobolev_order() = 0;
+                      u-&gt;error_norm = L2;
         
-                        error_estimator.reset(u);
-                      }
-                    else
-                      {
+                      error_estimator.reset(u);
+                    }
+                  else
+                    {
 </pre>
 </div>
 <div class = "comment">
@@ -370,7 +425,7 @@ target mesh size
 
 <div class ="fragment">
 <pre>
-                        assert (nelem_target &gt; 0);
+                      libmesh_assert (nelem_target &gt; 0);
         
 </pre>
 </div>
@@ -383,24 +438,34 @@ maximum level of our adaptivity eventually
 
 <div class ="fragment">
 <pre>
-                        error_estimator.reset(new KellyErrorEstimator);
-                      }
+                      error_estimator.reset(new KellyErrorEstimator);
+                    }
         
 </pre>
 </div>
 <div class = "comment">
-Calculate error based on u and v but not p
+Calculate error based on u and v (and w?) but not p
 </div>
 
 <div class ="fragment">
 <pre>
-                    error_estimator-&gt;component_scale.push_back(1.0); // u
-                    error_estimator-&gt;component_scale.push_back(1.0); // v
-                    if (dim == 3)
-                      error_estimator-&gt;component_scale.push_back(1.0); // w
-                    error_estimator-&gt;component_scale.push_back(0.0); // p
+                  std::vector&lt;Real&gt; weights(2,1.0);  // u, v
+                  if (dim == 3)
+                    weights.push_back(1.0);          // w
+                  weights.push_back(0.0);            // p
+</pre>
+</div>
+<div class = "comment">
+Keep the same default norm type.
+</div>
+
+<div class ="fragment">
+<pre>
+                  std::vector&lt;FEMNormType&gt;
+        	    norms(1, error_estimator-&gt;error_norm.type(0));
+        	  error_estimator-&gt;error_norm = SystemNorm(norms, weights);
         
-                    error_estimator-&gt;estimate_error(system, error);
+                  error_estimator-&gt;estimate_error(system, error);
         
 </pre>
 </div>
@@ -410,21 +475,21 @@ Print out status at each adaptive step.
 
 <div class ="fragment">
 <pre>
-                    Real global_error = error.l2_norm();
-                    std::cout &lt;&lt; "adaptive step " &lt;&lt; a_step &lt;&lt; ": ";
-                    if (global_tolerance != 0.)
-                      std::cout &lt;&lt; "global_error = " &lt;&lt; global_error
-                                &lt;&lt; " with ";
-                    std::cout &lt;&lt; mesh.n_active_elem()
-                              &lt;&lt; " active elements and "
-                              &lt;&lt; equation_systems.n_active_dofs()
-                              &lt;&lt; " active dofs." &lt;&lt; std::endl;
-                    if (global_tolerance != 0.)
-                      std::cout &lt;&lt; "worst element error = " &lt;&lt; error.maximum()
-                                &lt;&lt; ", mean = " &lt;&lt; error.mean() &lt;&lt; std::endl;
+                  Real global_error = error.l2_norm();
+                  std::cout &lt;&lt; "adaptive step " &lt;&lt; a_step &lt;&lt; ": ";
+                  if (global_tolerance != 0.)
+                    std::cout &lt;&lt; "global_error = " &lt;&lt; global_error
+                              &lt;&lt; " with ";
+                  std::cout &lt;&lt; mesh.n_active_elem()
+                            &lt;&lt; " active elements and "
+                            &lt;&lt; equation_systems.n_active_dofs()
+                            &lt;&lt; " active dofs." &lt;&lt; std::endl;
+                  if (global_tolerance != 0.)
+                    std::cout &lt;&lt; "worst element error = " &lt;&lt; error.maximum()
+                              &lt;&lt; ", mean = " &lt;&lt; error.mean() &lt;&lt; std::endl;
         
-                    if (global_tolerance != 0.)
-                      {
+                  if (global_tolerance != 0.)
+                    {
 </pre>
 </div>
 <div class = "comment">
@@ -434,12 +499,12 @@ don't need any more adaptive steps
 
 <div class ="fragment">
 <pre>
-                        if (global_error &lt; global_tolerance)
-                          break;
-                        mesh_refinement.flag_elements_by_error_tolerance(error);
-                      }
-                    else
-                      {
+                      if (global_error &lt; global_tolerance)
+                        break;
+                      mesh_refinement.flag_elements_by_error_tolerance(error);
+                    }
+                  else
+                    {
 </pre>
 </div>
 <div class = "comment">
@@ -449,14 +514,14 @@ should be our last adaptive step.
 
 <div class ="fragment">
 <pre>
-                        if (mesh_refinement.flag_elements_by_nelem_target(error))
-                          {
-                            mesh_refinement.refine_and_coarsen_elements();
-                            equation_systems.reinit();
-                            a_step = max_adaptivesteps;
-                            break;
-                          }
-                      }
+                      if (mesh_refinement.flag_elements_by_nelem_target(error))
+                        {
+                          mesh_refinement.refine_and_coarsen_elements();
+                          equation_systems.reinit();
+                          a_step = max_adaptivesteps;
+                          break;
+                        }
+                    }
         
 </pre>
 </div>
@@ -466,9 +531,9 @@ Carry out the adaptive mesh refinement/coarsening
 
 <div class ="fragment">
 <pre>
-                    mesh_refinement.refine_and_coarsen_elements();
-                    equation_systems.reinit();
-                  }
+                  mesh_refinement.refine_and_coarsen_elements();
+                  equation_systems.reinit();
+                }
 </pre>
 </div>
 <div class = "comment">
@@ -477,10 +542,10 @@ Do one last solve if necessary
 
 <div class ="fragment">
 <pre>
-                if (a_step == max_adaptivesteps)
-                  {
-                    system.solve();
-                  }
+              if (a_step == max_adaptivesteps)
+                {
+                  system.solve();
+                }
         
 </pre>
 </div>
@@ -490,8 +555,9 @@ Advance to the next timestep in a transient problem
 
 <div class ="fragment">
 <pre>
-                system.time_solver-&gt;advance_timestep();
+              system.time_solver-&gt;advance_timestep();
         
+        #ifdef LIBMESH_HAVE_EXODUS_API
 </pre>
 </div>
 <div class = "comment">
@@ -500,27 +566,28 @@ Write out this timestep if we're requested to
 
 <div class ="fragment">
 <pre>
-                if ((t_step+1)%write_interval == 0)
-                  {
-                    OStringStream file_name;
+              if ((t_step+1)%write_interval == 0)
+                {
+                  OStringStream file_name;
         
 </pre>
 </div>
 <div class = "comment">
-We write the file name in the gmv auto-read format.
+We write the file in the ExodusII format.
 </div>
 
 <div class ="fragment">
 <pre>
-                    file_name &lt;&lt; "out.gmv.";
-                    OSSRealzeroright(file_name,3,0, t_step + 1);
+                  file_name &lt;&lt; "out_";
+                  OSSRealzeroright(file_name,3,0, t_step + 1);
+                  file_name &lt;&lt; ".exd";
         
-                    GMVIO(mesh).write_equation_systems (file_name.str(),
-                                                        equation_systems);
-                  }
-              }
-          }
-        #endif // #ifndef ENABLE_AMR
+                  ExodusII_IO(mesh).write_equation_systems (file_name.str(),
+                                                      equation_systems);
+                }
+        #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+            }
+        #endif // #ifndef LIBMESH_ENABLE_AMR
           
 </pre>
 </div>
@@ -530,7 +597,7 @@ All done.
 
 <div class ="fragment">
 <pre>
-          return libMesh::close ();
+          return 0;
         }
 </pre>
 </div>
@@ -542,7 +609,7 @@ All done.
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;error_vector.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;gmv_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;kelly_error_estimator.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
@@ -556,245 +623,219 @@ All done.
   #include <B><FONT COLOR="#BC8F8F">&quot;euler_solver.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;steady_solver.h&quot;</FONT></B>
   
+  using namespace libMesh;
+  
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
+    LibMeshInit init (argc, argv);
   
-  #ifndef ENABLE_AMR
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;ERROR: This example requires libMesh to be\n&quot;</FONT></B>
-              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;compiled with AMR support!&quot;</FONT></B>
-              &lt;&lt; std::endl;
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
+    libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--disable-singleprecision&quot;</FONT></B>);
+  #endif
+  
+  #ifndef LIBMESH_ENABLE_AMR
+    libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-amr&quot;</FONT></B>);
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
-    {    
-      GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;ex18.in&quot;</FONT></B>);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::default_solver_package() == TRILINOS_SOLVERS)
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;We skip example 18 when using the Trilinos solvers.\n&quot;</FONT></B>
+                  &lt;&lt; std::endl;
+        <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+      }
   
-      <B><FONT COLOR="#228B22">const</FONT></B> Real global_tolerance          = infile(<B><FONT COLOR="#BC8F8F">&quot;global_tolerance&quot;</FONT></B>, 0.);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nelem_target      = infile(<B><FONT COLOR="#BC8F8F">&quot;n_elements&quot;</FONT></B>, 400);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> transient                 = infile(<B><FONT COLOR="#BC8F8F">&quot;transient&quot;</FONT></B>, true);
-      <B><FONT COLOR="#228B22">const</FONT></B> Real deltat                    = infile(<B><FONT COLOR="#BC8F8F">&quot;deltat&quot;</FONT></B>, 0.005);
-      <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_timesteps             = infile(<B><FONT COLOR="#BC8F8F">&quot;n_timesteps&quot;</FONT></B>, 20);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> write_interval    = infile(<B><FONT COLOR="#BC8F8F">&quot;write_interval&quot;</FONT></B>, 5);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarsegridsize    = infile(<B><FONT COLOR="#BC8F8F">&quot;coarsegridsize&quot;</FONT></B>, 1);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarserefinements = infile(<B><FONT COLOR="#BC8F8F">&quot;coarserefinements&quot;</FONT></B>, 0);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_adaptivesteps = infile(<B><FONT COLOR="#BC8F8F">&quot;max_adaptivesteps&quot;</FONT></B>, 10);
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim               = infile(<B><FONT COLOR="#BC8F8F">&quot;dimension&quot;</FONT></B>, 2);
+    GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;ex18.in&quot;</FONT></B>);
   
-      assert (dim == 2 || dim == 3);
-      Mesh mesh (dim);
-      
-      MeshRefinement mesh_refinement(mesh);
-      mesh_refinement.coarsen_by_parents() = true;
-      mesh_refinement.absolute_global_tolerance() = global_tolerance;
-      mesh_refinement.nelem_target() = nelem_target;
-      mesh_refinement.refine_fraction() = 0.3;
-      mesh_refinement.coarsen_fraction() = 0.3;
-      mesh_refinement.coarsen_threshold() = 0.1;
+    <B><FONT COLOR="#228B22">const</FONT></B> Real global_tolerance          = infile(<B><FONT COLOR="#BC8F8F">&quot;global_tolerance&quot;</FONT></B>, 0.);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nelem_target      = infile(<B><FONT COLOR="#BC8F8F">&quot;n_elements&quot;</FONT></B>, 400);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> transient                 = infile(<B><FONT COLOR="#BC8F8F">&quot;transient&quot;</FONT></B>, true);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real deltat                    = infile(<B><FONT COLOR="#BC8F8F">&quot;deltat&quot;</FONT></B>, 0.005);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_timesteps             = infile(<B><FONT COLOR="#BC8F8F">&quot;n_timesteps&quot;</FONT></B>, 20);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> write_interval    = infile(<B><FONT COLOR="#BC8F8F">&quot;write_interval&quot;</FONT></B>, 5);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarsegridsize    = infile(<B><FONT COLOR="#BC8F8F">&quot;coarsegridsize&quot;</FONT></B>, 1);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarserefinements = infile(<B><FONT COLOR="#BC8F8F">&quot;coarserefinements&quot;</FONT></B>, 0);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_adaptivesteps = infile(<B><FONT COLOR="#BC8F8F">&quot;max_adaptivesteps&quot;</FONT></B>, 10);
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim               = infile(<B><FONT COLOR="#BC8F8F">&quot;dimension&quot;</FONT></B>, 2);
   
-      <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
-        <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
-                                             coarsegridsize,
-                                             coarsegridsize,
-                                             0., 1.,
-                                             0., 1.,
-                                             QUAD9);
-      <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
-        <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
-                                           coarsegridsize,
+    libmesh_example_assert(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
+    
+    libmesh_assert (dim == 2 || dim == 3);
+  
+    Mesh mesh;
+    
+    MeshRefinement mesh_refinement(mesh);
+    mesh_refinement.coarsen_by_parents() = true;
+    mesh_refinement.absolute_global_tolerance() = global_tolerance;
+    mesh_refinement.nelem_target() = nelem_target;
+    mesh_refinement.refine_fraction() = 0.3;
+    mesh_refinement.coarsen_fraction() = 0.3;
+    mesh_refinement.coarsen_threshold() = 0.1;
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
                                            coarsegridsize,
                                            coarsegridsize,
                                            0., 1.,
                                            0., 1.,
-                                           0., 1.,
-                                           HEX27);
+                                           QUAD9);
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
+                                         coarsegridsize,
+                                         coarsegridsize,
+                                         coarsegridsize,
+                                         0., 1.,
+                                         0., 1.,
+                                         0., 1.,
+                                         HEX27);
   
-      mesh_refinement.uniformly_refine(coarserefinements);
+    mesh_refinement.uniformly_refine(coarserefinements);
   
-      mesh.print_info();
+    mesh.print_info();
   
-      EquationSystems equation_systems (mesh);
+    EquationSystems equation_systems (mesh);
   
-      NavierSystem &amp; system = 
-        equation_systems.add_system&lt;NavierSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
+    NavierSystem &amp; system = 
+      equation_systems.add_system&lt;NavierSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
   
-      <B><FONT COLOR="#A020F0">if</FONT></B> (transient)
+    <B><FONT COLOR="#A020F0">if</FONT></B> (transient)
+      system.time_solver =
+        AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> EulerSolver(system));
+    <B><FONT COLOR="#A020F0">else</FONT></B>
+      {
         system.time_solver =
-          AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> EulerSolver(system));
-      <B><FONT COLOR="#A020F0">else</FONT></B>
-        {
-          system.time_solver =
-            AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> SteadySolver(system));
-          assert(n_timesteps == 1);
-        }
+          AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> SteadySolver(system));
+        libmesh_assert(n_timesteps == 1);
+      }
   
-      equation_systems.init ();
+    equation_systems.init ();
   
-      system.deltat = deltat;
+    system.deltat = deltat;
   
-      DiffSolver &amp;solver = *(system.time_solver-&gt;diff_solver().get());
-      solver.quiet = infile(<B><FONT COLOR="#BC8F8F">&quot;solver_quiet&quot;</FONT></B>, true);
-      solver.max_nonlinear_iterations =
-        infile(<B><FONT COLOR="#BC8F8F">&quot;max_nonlinear_iterations&quot;</FONT></B>, 15);
-      solver.relative_step_tolerance =
-        infile(<B><FONT COLOR="#BC8F8F">&quot;relative_step_tolerance&quot;</FONT></B>, 1.e-3);
-      solver.relative_residual_tolerance =
-        infile(<B><FONT COLOR="#BC8F8F">&quot;relative_residual_tolerance&quot;</FONT></B>, 0.0);
+    DiffSolver &amp;solver = *(system.time_solver-&gt;diff_solver().get());
+    solver.quiet = infile(<B><FONT COLOR="#BC8F8F">&quot;solver_quiet&quot;</FONT></B>, true);
+    solver.max_nonlinear_iterations =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;max_nonlinear_iterations&quot;</FONT></B>, 15);
+    solver.relative_step_tolerance =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;relative_step_tolerance&quot;</FONT></B>, 1.e-3);
+    solver.relative_residual_tolerance =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;relative_residual_tolerance&quot;</FONT></B>, 0.0);
+    solver.absolute_residual_tolerance =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;absolute_residual_tolerance&quot;</FONT></B>, 0.0);
+      
+    solver.max_linear_iterations =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;max_linear_iterations&quot;</FONT></B>, 50000);
+    solver.initial_linear_tolerance =
+      infile(<B><FONT COLOR="#BC8F8F">&quot;initial_linear_tolerance&quot;</FONT></B>, 1.e-3);
   
-      solver.max_linear_iterations =
-        infile(<B><FONT COLOR="#BC8F8F">&quot;max_linear_iterations&quot;</FONT></B>, 50000);
-      solver.initial_linear_tolerance =
-        infile(<B><FONT COLOR="#BC8F8F">&quot;initial_linear_tolerance&quot;</FONT></B>, 1.e-3);
+    equation_systems.print_info();
   
-      equation_systems.print_info();
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> t_step=0; t_step != n_timesteps; ++t_step)
+      {
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;\n\nSolving time step &quot;</FONT></B> &lt;&lt; t_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, time = &quot;</FONT></B>
+                  &lt;&lt; system.time &lt;&lt; std::endl;
   
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> t_step=0; t_step != n_timesteps; ++t_step)
-        {
-          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; Solving time step &quot;</FONT></B> &lt;&lt; t_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, time = &quot;</FONT></B>
-                    &lt;&lt; system.time &lt;&lt; std::endl;
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> a_step = 0;
+        <B><FONT COLOR="#A020F0">for</FONT></B> (; a_step != max_adaptivesteps; ++a_step)
+          {
+            system.solve();
   
-          <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> a_step = 0;
-          <B><FONT COLOR="#A020F0">for</FONT></B> (; a_step != max_adaptivesteps; ++a_step)
-            {
-              system.solve();
+            ErrorVector error;
   
-              ErrorVector error;
+            AutoPtr&lt;ErrorEstimator&gt; error_estimator;
   
-              AutoPtr&lt;ErrorEstimator&gt; error_estimator;
+            <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
+              {
+                libmesh_assert (nelem_target == 0);
   
-              <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
-                {
-                  assert (nelem_target == 0);
+                UniformRefinementEstimator *u =
+                  <B><FONT COLOR="#A020F0">new</FONT></B> UniformRefinementEstimator;
   
-                  UniformRefinementEstimator *u =
-                    <B><FONT COLOR="#A020F0">new</FONT></B> UniformRefinementEstimator;
+                u-&gt;error_norm = L2;
   
-                  u-&gt;sobolev_order() = 0;
+                error_estimator.reset(u);
+              }
+            <B><FONT COLOR="#A020F0">else</FONT></B>
+              {
+                libmesh_assert (nelem_target &gt; 0);
   
-                  error_estimator.reset(u);
-                }
-              <B><FONT COLOR="#A020F0">else</FONT></B>
-                {
-                  assert (nelem_target &gt; 0);
+                error_estimator.reset(<B><FONT COLOR="#A020F0">new</FONT></B> KellyErrorEstimator);
+              }
   
-                  error_estimator.reset(<B><FONT COLOR="#A020F0">new</FONT></B> KellyErrorEstimator);
-                }
+  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Real&gt; weights(2,1.0);  <I><FONT COLOR="#B22222">// u, v
+</FONT></I>            <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+              weights.push_back(1.0);          <I><FONT COLOR="#B22222">// w
+</FONT></I>            weights.push_back(0.0);            <I><FONT COLOR="#B22222">// p
+</FONT></I>  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;FEMNormType&gt;
+  	    norms(1, error_estimator-&gt;error_norm.type(0));
+  	  error_estimator-&gt;error_norm = SystemNorm(norms, weights);
   
-              error_estimator-&gt;component_scale.push_back(1.0); <I><FONT COLOR="#B22222">// u
-</FONT></I>              error_estimator-&gt;component_scale.push_back(1.0); <I><FONT COLOR="#B22222">// v
-</FONT></I>              <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
-                error_estimator-&gt;component_scale.push_back(1.0); <I><FONT COLOR="#B22222">// w
-</FONT></I>              error_estimator-&gt;component_scale.push_back(0.0); <I><FONT COLOR="#B22222">// p
-</FONT></I>  
-              error_estimator-&gt;estimate_error(system, error);
+            error_estimator-&gt;estimate_error(system, error);
   
-              Real global_error = error.l2_norm();
-              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;adaptive step &quot;</FONT></B> &lt;&lt; a_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;: &quot;</FONT></B>;
-              <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
-                <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;global_error = &quot;</FONT></B> &lt;&lt; global_error
-                          &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; with &quot;</FONT></B>;
-              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; mesh.n_active_elem()
-                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active elements and &quot;</FONT></B>
-                        &lt;&lt; equation_systems.n_active_dofs()
-                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active dofs.&quot;</FONT></B> &lt;&lt; std::endl;
-              <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
-                <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;worst element error = &quot;</FONT></B> &lt;&lt; error.maximum()
-                          &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, mean = &quot;</FONT></B> &lt;&lt; error.mean() &lt;&lt; std::endl;
+            Real global_error = error.l2_norm();
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;adaptive step &quot;</FONT></B> &lt;&lt; a_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;: &quot;</FONT></B>;
+            <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
+              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;global_error = &quot;</FONT></B> &lt;&lt; global_error
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; with &quot;</FONT></B>;
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; mesh.n_active_elem()
+                      &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active elements and &quot;</FONT></B>
+                      &lt;&lt; equation_systems.n_active_dofs()
+                      &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active dofs.&quot;</FONT></B> &lt;&lt; std::endl;
+            <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
+              <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;worst element error = &quot;</FONT></B> &lt;&lt; error.maximum()
+                        &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, mean = &quot;</FONT></B> &lt;&lt; error.mean() &lt;&lt; std::endl;
   
-              <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
-                {
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (global_error &lt; global_tolerance)
+            <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
+              {
+                <B><FONT COLOR="#A020F0">if</FONT></B> (global_error &lt; global_tolerance)
+                  <B><FONT COLOR="#A020F0">break</FONT></B>;
+                mesh_refinement.flag_elements_by_error_tolerance(error);
+              }
+            <B><FONT COLOR="#A020F0">else</FONT></B>
+              {
+                <B><FONT COLOR="#A020F0">if</FONT></B> (mesh_refinement.flag_elements_by_nelem_target(error))
+                  {
+                    mesh_refinement.refine_and_coarsen_elements();
+                    equation_systems.reinit();
+                    a_step = max_adaptivesteps;
                     <B><FONT COLOR="#A020F0">break</FONT></B>;
-                  mesh_refinement.flag_elements_by_error_tolerance(error);
-                }
-              <B><FONT COLOR="#A020F0">else</FONT></B>
-                {
-                  <B><FONT COLOR="#A020F0">if</FONT></B> (mesh_refinement.flag_elements_by_nelem_target(error))
-                    {
-                      mesh_refinement.refine_and_coarsen_elements();
-                      equation_systems.reinit();
-                      a_step = max_adaptivesteps;
-                      <B><FONT COLOR="#A020F0">break</FONT></B>;
-                    }
-                }
+                  }
+              }
   
-              mesh_refinement.refine_and_coarsen_elements();
-              equation_systems.reinit();
-            }
-          <B><FONT COLOR="#A020F0">if</FONT></B> (a_step == max_adaptivesteps)
-            {
-              system.solve();
-            }
+            mesh_refinement.refine_and_coarsen_elements();
+            equation_systems.reinit();
+          }
+        <B><FONT COLOR="#A020F0">if</FONT></B> (a_step == max_adaptivesteps)
+          {
+            system.solve();
+          }
   
-          system.time_solver-&gt;advance_timestep();
+        system.time_solver-&gt;advance_timestep();
   
-          <B><FONT COLOR="#A020F0">if</FONT></B> ((t_step+1)%write_interval == 0)
-            {
-              OStringStream file_name;
+  #ifdef LIBMESH_HAVE_EXODUS_API
+        <B><FONT COLOR="#A020F0">if</FONT></B> ((t_step+1)%write_interval == 0)
+          {
+            OStringStream file_name;
   
-              file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out.gmv.&quot;</FONT></B>;
-              OSSRealzeroright(file_name,3,0, t_step + 1);
+            file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out_&quot;</FONT></B>;
+            OSSRealzeroright(file_name,3,0, t_step + 1);
+            file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.exd&quot;</FONT></B>;
   
-              GMVIO(mesh).write_equation_systems (file_name.str(),
-                                                  equation_systems);
-            }
-        }
-    }
-  #endif <I><FONT COLOR="#B22222">// #ifndef ENABLE_AMR
+            ExodusII_IO(mesh).write_equation_systems (file_name.str(),
+                                                equation_systems);
+          }
+  #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
+</FONT></I>      }
+  #endif <I><FONT COLOR="#B22222">// #ifndef LIBMESH_ENABLE_AMR
 </FONT></I>    
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close ();
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex18-devel
-***************************************************************
- 
- Mesh Information:
-  mesh_dimension()=2
-  spatial_dimension()=3
-  n_nodes()=1681
-  n_elem()=400
-   n_local_elem()=400
-   n_active_elem()=400
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
-*** Warning, This code is untested, experimental, or likely to see future API changes: src/solvers/diff_system.C, line 29, compiled Jun  1 2007 at 14:30:46 ***
- EquationSystems
-  n_systems()=1
-   System "Navier-Stokes"
-    Type "Implicit"
-    Variables="u" "v" "p" 
-    Finite Element Types="LAGRANGE" "LAGRANGE" "LAGRANGE" 
-    Approximation Orders="SECOND" "SECOND" "FIRST" 
-    n_dofs()=3803
-    n_local_dofs()=3803
-    n_constrained_dofs()=0
-    n_vectors()=2
-
- Solving time step 0, time = 0
- Solving time step 1, time = 0.005
- Solving time step 2, time = 0.01
- Solving time step 3, time = 0.015
- Solving time step 4, time = 0.02
- Solving time step 5, time = 0.025
- Solving time step 6, time = 0.03
- Solving time step 7, time = 0.035
- Solving time step 8, time = 0.04
- Solving time step 9, time = 0.045
- Solving time step 10, time = 0.05
- Solving time step 11, time = 0.055
- Solving time step 12, time = 0.06
- Solving time step 13, time = 0.065
- Solving time step 14, time = 0.07
- 
-***************************************************************
-* Done Running Example  ./ex18-devel
-***************************************************************
+Compiling C++ (in optimized mode) ex18.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex18.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>

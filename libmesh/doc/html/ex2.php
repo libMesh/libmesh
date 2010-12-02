@@ -83,21 +83,34 @@ Include files that define a simple steady system
 <pre>
         #include "linear_implicit_system.h"
         #include "transient_system.h"
+        #include "explicit_system.h"
         
-        int main (int argc, char** argv)
-        {
-          libMesh::init (argc, argv);
 </pre>
 </div>
 <div class = "comment">
-This set of braces are used to force object scope.  This
-way we can guarantee all our objects are destroyed before calling
-libMesh::close() at the end of the program.
+Bring in everything from the libMesh namespace
 </div>
 
 <div class ="fragment">
 <pre>
-          {
+        using namespace libMesh;
+        
+        
+        
+        int main (int argc, char** argv)
+        {
+          LibMeshInit init (argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
+Skip this 2D example if libMesh was compiled as 1D-only.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_assert(2 &lt;= LIBMESH_DIM, "2D support");
+          
 </pre>
 </div>
 <div class = "comment">
@@ -107,43 +120,33 @@ exact name of the program being run, and its command line.
 
 <div class ="fragment">
 <pre>
-            std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
-            for (int i=1; i&lt;argc; i++)
-              std::cout &lt;&lt; " " &lt;&lt; argv[i];
-            std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-            
+          std::cout &lt;&lt; "Running " &lt;&lt; argv[0];
+          for (int i=1; i&lt;argc; i++)
+            std::cout &lt;&lt; " " &lt;&lt; argv[i];
+          std::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+          
 </pre>
 </div>
 <div class = "comment">
-Create a 2D mesh.
+Create a mesh.
 </div>
 
 <div class ="fragment">
 <pre>
-            Mesh mesh (2);
-            
+          Mesh mesh;
+          
 </pre>
 </div>
 <div class = "comment">
 Use the MeshTools::Generation mesh generator to create a uniform
-grid on the unit square.  By default a mesh of QUAD4
+2D grid on the unit square.  By default a mesh of QUAD4
 elements will be created.  We instruct the mesh generator
 to build a mesh of 5x5 elements.
 </div>
 
 <div class ="fragment">
 <pre>
-            MeshTools::Generation::build_cube (mesh, 5, 5);
-            
-</pre>
-</div>
-<div class = "comment">
-Print information about the mesh to the screen.
-</div>
-
-<div class ="fragment">
-<pre>
-            mesh.print_info();
+          MeshTools::Generation::build_square (mesh, 5, 5);
         
 </pre>
 </div>
@@ -161,8 +164,8 @@ object, so the order of construction here is important.
 
 <div class ="fragment">
 <pre>
-            EquationSystems equation_systems (mesh);
-            
+          EquationSystems equation_systems (mesh);
+          
 </pre>
 </div>
 <div class = "comment">
@@ -172,8 +175,8 @@ helps in inter-system communication.
 
 <div class ="fragment">
 <pre>
-            equation_systems.parameters.set&lt;bool&gt; ("test") = true;
-              
+          equation_systems.parameters.set&lt;bool&gt; ("test") = true;
+            
 </pre>
 </div>
 <div class = "comment">
@@ -183,8 +186,8 @@ This helps in inter-system-communication.
 
 <div class ="fragment">
 <pre>
-            equation_systems.parameters.set&lt;Real&gt; ("dummy") = 42.;
-              
+          equation_systems.parameters.set&lt;Real&gt; ("dummy") = 42.;
+            
 </pre>
 </div>
 <div class = "comment">
@@ -193,21 +196,21 @@ Set another simulation-specific parameter
 
 <div class ="fragment">
 <pre>
-            equation_systems.parameters.set&lt;Real&gt; ("nobody") = 0.;
-            
+          equation_systems.parameters.set&lt;Real&gt; ("nobody") = 0.;
+          
 </pre>
 </div>
 <div class = "comment">
 Now we declare the system and its variables.
-We begin by adding a "SteadyStytem" to the
+We begin by adding a "TransientLinearImplicitSystem" to the
 EquationSystems object, and we give it the name
 "Simple System".
 </div>
 
 <div class ="fragment">
 <pre>
-            equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; ("Simple System");
-              
+          equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; ("Simple System");
+            
 </pre>
 </div>
 <div class = "comment">
@@ -217,8 +220,35 @@ will be approximated using first-order approximation.
 
 <div class ="fragment">
 <pre>
-            equation_systems.get_system("Simple System").add_variable("u", FIRST);
-              
+          equation_systems.get_system("Simple System").add_variable("u", FIRST);
+        
+</pre>
+</div>
+<div class = "comment">
+Next we'll by add an "ExplicitSystem" to the
+EquationSystems object, and we give it the name
+"Complex System".
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.add_system&lt;ExplicitSystem&gt; ("Complex System");
+        
+</pre>
+</div>
+<div class = "comment">
+Give "Complex System" three variables -- each with a different approximation
+order.  Variables "c" and "T" will use first-order Lagrange approximation, 
+while variable "dv" will use a second-order discontinuous
+approximation space.
+</div>
+
+<div class ="fragment">
+<pre>
+          equation_systems.get_system("Complex System").add_variable("c", FIRST);
+          equation_systems.get_system("Complex System").add_variable("T", FIRST);
+          equation_systems.get_system("Complex System").add_variable("dv", SECOND, MONOMIAL);
+            
 </pre>
 </div>
 <div class = "comment">
@@ -227,8 +257,17 @@ Initialize the data structures for the equation system.
 
 <div class ="fragment">
 <pre>
-            equation_systems.init();
-              
+          equation_systems.init();
+                
+</pre>
+</div>
+<div class = "comment">
+Print information about the mesh to the screen.
+</div>
+
+<div class ="fragment">
+<pre>
+          mesh.print_info();
 </pre>
 </div>
 <div class = "comment">
@@ -237,7 +276,7 @@ Prints information about the system to the screen.
 
 <div class ="fragment">
 <pre>
-            equation_systems.print_info();
+          equation_systems.print_info();
         
 </pre>
 </div>
@@ -257,12 +296,12 @@ this data later.
 
 <div class ="fragment">
 <pre>
-            if (argc == 2)
-              if (argv[1][0] != '-')
-        	{
-        	  std::cout &lt;&lt; "&lt;&lt;&lt; Writing system to file " &lt;&lt; argv[1]
-        		    &lt;&lt; std::endl;
-        	  
+          if (argc &gt; 1)
+            if (argv[1][0] != '-')
+              {
+                std::cout &lt;&lt; "&lt;&lt;&lt; Writing system to file " &lt;&lt; argv[1]
+                          &lt;&lt; std::endl;
+                
 </pre>
 </div>
 <div class = "comment">
@@ -271,8 +310,8 @@ Write the system.
 
 <div class ="fragment">
 <pre>
-                  equation_systems.write (argv[1], libMeshEnums::WRITE);
-        	  
+                equation_systems.write (argv[1], libMeshEnums::WRITE);
+                
 </pre>
 </div>
 <div class = "comment">
@@ -281,11 +320,11 @@ Clear the equation systems data structure.
 
 <div class ="fragment">
 <pre>
-                  equation_systems.clear ();
+                equation_systems.clear ();
         
-        	  std::cout &lt;&lt; "&gt;&gt;&gt; Reading system from file " &lt;&lt; argv[1]
-        		    &lt;&lt; std::endl &lt;&lt; std::endl;
-        	  
+                std::cout &lt;&lt; "&gt;&gt;&gt; Reading system from file " &lt;&lt; argv[1]
+                          &lt;&lt; std::endl &lt;&lt; std::endl;
+                
 </pre>
 </div>
 <div class = "comment">
@@ -295,7 +334,7 @@ work!
 
 <div class ="fragment">
 <pre>
-                  equation_systems.read (argv[1], libMeshEnums::READ);
+                equation_systems.read (argv[1], libMeshEnums::READ);
         
 </pre>
 </div>
@@ -305,31 +344,21 @@ Print the information again.
 
 <div class ="fragment">
 <pre>
-                  equation_systems.print_info();
-        	}
-            
+                equation_systems.print_info();
+              }
+          
 </pre>
 </div>
 <div class = "comment">
-All our objects will be destroyed at this closing brace.
-That way we can safely call PetscFinalize() and be sure we
-don't have any Petsc-dependent objects lurking around!
+All done.  libMesh objects are destroyed here.  Because the
+LibMeshInit object was created first, its destruction occurs
+last, and it's destructor finalizes any external libraries and
+checks for leaked memory.
 </div>
 
 <div class ="fragment">
 <pre>
-          }
-        
-</pre>
-</div>
-<div class = "comment">
-Call libMesh::close(), which in turn finalizes PETSc and/or
-MPI.
-</div>
-
-<div class ="fragment">
-<pre>
-          return libMesh::close();
+          return 0;
         }
 </pre>
 </div>
@@ -345,138 +374,77 @@ MPI.
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;transient_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;explicit_system.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  
   
   <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
-    <B><FONT COLOR="#5F9EA0">libMesh</FONT></B>::init (argc, argv);
-    {
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
-      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
-        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
-      
-      Mesh mesh (2);
-      
-      <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh, 5, 5);
-      
-      mesh.print_info();
+    LibMeshInit init (argc, argv);
   
-      EquationSystems equation_systems (mesh);
+    libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
+    
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Running &quot;</FONT></B> &lt;&lt; argv[0];
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">int</FONT></B> i=1; i&lt;argc; i++)
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; &quot;</FONT></B> &lt;&lt; argv[i];
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; std::endl &lt;&lt; std::endl;
+    
+    Mesh mesh;
+    
+    <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh, 5, 5);
+  
+    EquationSystems equation_systems (mesh);
+    
+    equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">bool</FONT></B>&gt; (<B><FONT COLOR="#BC8F8F">&quot;test&quot;</FONT></B>) = true;
       
-      equation_systems.parameters.set&lt;<B><FONT COLOR="#228B22">bool</FONT></B>&gt; (<B><FONT COLOR="#BC8F8F">&quot;test&quot;</FONT></B>) = true;
-        
-      equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;dummy&quot;</FONT></B>) = 42.;
-        
-      equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;nobody&quot;</FONT></B>) = 0.;
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;dummy&quot;</FONT></B>) = 42.;
       
-      equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Simple System&quot;</FONT></B>);
-        
-      equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Simple System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST);
-        
-      equation_systems.init();
-        
-      equation_systems.print_info();
-  
-      <B><FONT COLOR="#A020F0">if</FONT></B> (argc == 2)
-        <B><FONT COLOR="#A020F0">if</FONT></B> (argv[1][0] != <B><FONT COLOR="#BC8F8F">'-'</FONT></B>)
-  	{
-  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;&lt;&lt;&lt; Writing system to file &quot;</FONT></B> &lt;&lt; argv[1]
-  		    &lt;&lt; std::endl;
-  	  
-  	  equation_systems.write (argv[1], libMeshEnums::WRITE);
-  	  
-  	  equation_systems.clear ();
-  
-  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;&gt;&gt;&gt; Reading system from file &quot;</FONT></B> &lt;&lt; argv[1]
-  		    &lt;&lt; std::endl &lt;&lt; std::endl;
-  	  
-  	  equation_systems.read (argv[1], libMeshEnums::READ);
-  
-  	  equation_systems.print_info();
-  	}
+    equation_systems.parameters.set&lt;Real&gt; (<B><FONT COLOR="#BC8F8F">&quot;nobody&quot;</FONT></B>) = 0.;
+    
+    equation_systems.add_system&lt;TransientLinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Simple System&quot;</FONT></B>);
       
-    }
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Simple System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST);
   
-    <B><FONT COLOR="#A020F0">return</FONT></B> libMesh::close();
+    equation_systems.add_system&lt;ExplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Complex System&quot;</FONT></B>);
+  
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Complex System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;c&quot;</FONT></B>, FIRST);
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Complex System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;T&quot;</FONT></B>, FIRST);
+    equation_systems.get_system(<B><FONT COLOR="#BC8F8F">&quot;Complex System&quot;</FONT></B>).add_variable(<B><FONT COLOR="#BC8F8F">&quot;dv&quot;</FONT></B>, SECOND, MONOMIAL);
+      
+    equation_systems.init();
+          
+    mesh.print_info();
+    equation_systems.print_info();
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &gt; 1)
+      <B><FONT COLOR="#A020F0">if</FONT></B> (argv[1][0] != <B><FONT COLOR="#BC8F8F">'-'</FONT></B>)
+        {
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;&lt;&lt;&lt; Writing system to file &quot;</FONT></B> &lt;&lt; argv[1]
+                    &lt;&lt; std::endl;
+          
+          equation_systems.write (argv[1], libMeshEnums::WRITE);
+          
+          equation_systems.clear ();
+  
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;&gt;&gt;&gt; Reading system from file &quot;</FONT></B> &lt;&lt; argv[1]
+                    &lt;&lt; std::endl &lt;&lt; std::endl;
+          
+          equation_systems.read (argv[1], libMeshEnums::READ);
+  
+          equation_systems.print_info();
+        }
+    
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-***************************************************************
-* Running Example  ./ex2-devel
-***************************************************************
- 
-Running ./ex2-devel
-
- Mesh Information:
-  mesh_dimension()=2
-  spatial_dimension()=3
-  n_nodes()=36
-  n_elem()=25
-   n_local_elem()=25
-   n_active_elem()=25
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Simple System"
-    Type "TransientLinearImplicit"
-    Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
-    n_dofs()=36
-    n_local_dofs()=36
-    n_constrained_dofs()=0
-    n_vectors()=3
-
- 
-Running ./ex2-devel eqn_sys.dat
-
- Mesh Information:
-  mesh_dimension()=2
-  spatial_dimension()=3
-  n_nodes()=36
-  n_elem()=25
-   n_local_elem()=25
-   n_active_elem()=25
-  n_subdomains()=1
-  n_processors()=1
-  processor_id()=0
-
- EquationSystems
-  n_systems()=1
-   System "Simple System"
-    Type "TransientLinearImplicit"
-    Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
-    n_dofs()=36
-    n_local_dofs()=36
-    n_constrained_dofs()=0
-    n_vectors()=3
-
-<<< Writing system to file eqn_sys.dat
->>> Reading system from file eqn_sys.dat
-
- EquationSystems
-  n_systems()=1
-   System "Simple System"
-    Type "TransientLinearImplicit"
-    Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
-    n_dofs()=36
-    n_local_dofs()=36
-    n_constrained_dofs()=0
-    n_vectors()=3
-
- 
-***************************************************************
-* Done Running Example  ./ex2-devel
-***************************************************************
+Compiling C++ (in optimized mode) ex2.C...
+/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
+make[1]: *** [ex2.x86_64-unknown-linux-gnu.opt.o] Error 1
 </pre>
 </div>
 <?php make_footer() ?>
