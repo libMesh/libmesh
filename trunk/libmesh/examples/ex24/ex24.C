@@ -20,7 +20,7 @@
   // <h1>Example 24 - Periodic Boundary Conditions with Adaptive Mesh Refinement</h1>
   // 
   // This example uses the same simple, linear transient
-  // system as in example 18; however in this case periodic boundary
+  // system as in example 10; however in this case periodic boundary
   // conditions are applied at the sides of the domain.
  
 // C++ include files that we need
@@ -196,7 +196,7 @@ int main (int argc, char** argv)
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
   // Create a new mesh.
-  Mesh mesh(2);
+  Mesh mesh;
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
@@ -205,7 +205,6 @@ int main (int argc, char** argv)
   // First we process the case where we do not read in the solution
   if(!read_solution)
     {
-//      mesh.read("mesh.xda");
       MeshTools::Generation::build_square(mesh, 2, 2, 0., 2., 0., 2., QUAD4);
 
       // Again do a search on the command line for an argument
