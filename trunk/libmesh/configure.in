@@ -446,8 +446,14 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
-dnl 2D only -- disabled by default
+dnl 1D or 1D/2D only -- disabled by default
 dnl -------------------------------------------------------------
+AC_ARG_ENABLE(1D-only,
+              AC_HELP_STRING([--enable-1D-only],
+                             [build with support for 1D meshes only]),
+              enable1D=$enableval,
+              enable1D=no)
+
 AC_ARG_ENABLE(2D-only,
               AC_HELP_STRING([--enable-2D-only],
                              [build with support for 1D and 2D meshes only]),
@@ -456,8 +462,12 @@ AC_ARG_ENABLE(2D-only,
 
 if test "$enable2D" != no ; then
   AC_DEFINE(DIM, 2,
-           [Flag indicating if the library should be built with 2D support only])
-  AC_MSG_RESULT(<<< Configuring library for 2D meshes only >>>)
+           [Integer indicating the highest spatial dimensionality supported by libMesh])
+  AC_MSG_RESULT(<<< Configuring library for 1D/2D meshes only >>>)
+elif test "$enable1D" != no ; then
+  AC_DEFINE(DIM, 1,
+           [Integer indicating the highest spatial dimensionality supported by libMesh])
+  AC_MSG_RESULT(<<< Configuring library for 1D meshes only >>>)
 fi
 dnl -------------------------------------------------------------
 

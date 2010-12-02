@@ -774,6 +774,7 @@ enable_vsmoother
 enable_periodic
 enable_parmesh
 enable_ghosted
+enable_1D_only
 enable_2D_only
 enable_pfem
 enable_ifem
@@ -1463,6 +1464,7 @@ Optional Features:
   --enable-periodic       build with periodic boundary condition suppport
   --enable-parmesh        Use experimental ParallelMesh as Mesh
   --enable-ghosted        Use ghosted local vectors when available
+  --enable-1D-only        build with support for 1D meshes only
   --enable-2D-only        build with support for 1D and 2D meshes only
   --enable-pfem           build with support for higher order p-FEM shapes
   --enable-ifem           build with infinite elements
@@ -7240,6 +7242,14 @@ fi
 
 
 
+# Check whether --enable-1D-only was given.
+if test "${enable_1D_only+set}" = set; then :
+  enableval=$enable_1D_only; enable1D=$enableval
+else
+  enable1D=no
+fi
+
+
 # Check whether --enable-2D-only was given.
 if test "${enable_2D_only+set}" = set; then :
   enableval=$enable_2D_only; enable2D=$enableval
@@ -7252,8 +7262,14 @@ if test "$enable2D" != no ; then
 
 $as_echo "#define DIM 2" >>confdefs.h
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library for 2D meshes only >>>" >&5
-$as_echo "<<< Configuring library for 2D meshes only >>>" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library for 1D/2D meshes only >>>" >&5
+$as_echo "<<< Configuring library for 1D/2D meshes only >>>" >&6; }
+elif test "$enable1D" != no ; then
+
+$as_echo "#define DIM 1" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library for 1D meshes only >>>" >&5
+$as_echo "<<< Configuring library for 1D meshes only >>>" >&6; }
 fi
 
 
@@ -7914,6 +7930,7 @@ $as_echo "#define HAVE_PETSC 1" >>confdefs.h
 
             if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then                 	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni`
       elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
+      elif (test -r $PETSC_DIR/conf/petscvariables) ; then       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
       fi
       if test "x$PETSC_MPI" != x ; then
 
@@ -8884,6 +8901,12 @@ fi
       slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
 
 
+      if (test $slepcversion != $petscversion) ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: WARNING:" >&5
+$as_echo "WARNING:" >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Different version numbers for SLEPc and PETSc <<<" >&5
+$as_echo ">>> Different version numbers for SLEPc and PETSc <<<" >&6; }
+      fi
 
 $as_echo "#define HAVE_SLEPC 1" >>confdefs.h
 
