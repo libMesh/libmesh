@@ -95,7 +95,7 @@ int main (int argc, char** argv)
   // Get the number of eigen values to be computed from argv[2]
   const unsigned int nev = std::atoi(argv[2]);
 
-  // Skip this example if libMesh was compiled as 1D-only.
+  // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   
   // Create a mesh.

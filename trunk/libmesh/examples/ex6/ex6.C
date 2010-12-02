@@ -91,7 +91,7 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-ifem");
 #else
   
-  // Skip this 3D example if libMesh was compiled as 1D-only.
+  // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
   
   // Tell the user what we are doing.
