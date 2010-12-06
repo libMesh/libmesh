@@ -662,6 +662,85 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 }
 
 
+void EquationSystems::get_solution (std::vector<Number>& soln,
+                                    std::vector<std::string> & names ) const
+{
+  // This function must be run on all processors at once
+  parallel_only();
+
+  libmesh_assert (this->n_systems());
+
+  const unsigned int ne  = _mesh.n_elem();
+
+  libmesh_assert (ne == _mesh.max_elem_id());
+
+  soln.clear();
+  names.clear();
+
+  std::vector<Number>  sys_soln;
+
+  const FEType type(CONSTANT, MONOMIAL);
+
+  // For each system in this EquationSystems object,
+  // update the global solution and collect the
+  // CONSTANT MONOMIALs.  The entries are in variable-major
+  // format.
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
+
+  for (; pos != end; ++pos)
+    {
+      const System& system  = *(pos->second);
+      const unsigned int nv_sys = system.n_vars();
+
+      system.update_global_solution (sys_soln);
+
+      std::vector<unsigned int> dof_indices; // The DOF indices for the finite element
+
+      // Loop over the variable names and load them in order
+      for (unsigned int var=0; var < nv_sys; ++var)
+      {
+        if ( system.variable_type( var ) != type )
+        {
+          continue;
+        }
+
+        names.push_back( system.variable_name( var ) );
+
+        // Record the offset for the first element for this variable.
+        const unsigned int offset( soln.size() );
+        // Increase size of soln for this variable.
+        soln.resize( offset + ne );
+
+        const Variable & variable = system.variable(var);
+        const DofMap & dof_map = system.get_dof_map();
+
+        MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
+        const MeshBase::element_iterator end = _mesh.active_local_elements_end();
+
+        for ( ; it != end; ++it)
+        {
+          if (variable.active_on_subdomain((*it)->subdomain_id()))
+          {
+            const Elem* elem = *it;
+
+            dof_map.dof_indices (elem, dof_indices, var);
+
+            libmesh_assert( 1 == dof_indices.size() );
+
+            soln[offset+elem->id()] = sys_soln[dof_indices[0]];
+          }
+        }
+
+      } // end loop on variables in this system
+
+    } // end loop over systems
+
+  // Now each processor has computed contributions to the
+  // soln vector.  Gather them all up.
+  Parallel::sum(soln);
+}
+
 
 
 void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& soln) const
