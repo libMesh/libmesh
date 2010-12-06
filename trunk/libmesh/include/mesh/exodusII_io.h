@@ -101,6 +101,11 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   
 
   /**
+   * Write out element solution.
+   */
+  void write_element_data (const EquationSystems& es);
+
+  /**
    * Write out a nodal solution.
    */
   void write_nodal_data (const std::string&,

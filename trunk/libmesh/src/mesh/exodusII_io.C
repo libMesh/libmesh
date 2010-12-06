@@ -292,6 +292,55 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
 
 
 
+
+#ifndef LIBMESH_HAVE_EXODUS_API
+
+void ExodusII_IO::write_element_data (const EquationSystems& es,
+                                      const std::vector<std::string>&)
+{
+
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+	        << std::endl;
+  libmesh_error();
+}
+
+#else
+
+void ExodusII_IO::write_element_data (const EquationSystems & es)
+{
+  // The first step is to collect the element data onto this processor.
+  // We want the constant monomial data.
+
+  std::vector<Number> soln;
+  std::vector<std::string> names;
+  es.get_solution( soln, names );
+
+  // The data must ultimately be written block by block.  This means that this data
+  // must be sorted appropriately.
+
+
+  if (libMesh::processor_id() == 0)
+    {
+      if (!exio_helper->created())
+	{
+          libMesh::err << "ERROR, ExodusII file must be initialized "
+                       << "before outputting element variables.\n"
+                       << std::endl;
+          libmesh_error();
+	}
+
+      const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+      exio_helper->initialize_element_variables( names );
+      exio_helper->write_element_values(mesh,soln,_timestep);
+
+    }
+}
+
+#endif
+
+
+
 #ifndef LIBMESH_HAVE_EXODUS_API
 
 void ExodusII_IO::write_nodal_data (const std::string& ,
@@ -436,7 +485,6 @@ void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
 }
 
 #endif
-
 
 
 #ifndef LIBMESH_HAVE_EXODUS_API

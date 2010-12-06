@@ -80,6 +80,7 @@ public:
     num_time_steps(0),
     _created(false),
     _verbose(v),
+    _elem_vars_initialized(false),
     _global_vars_initialized(false)
 
   {
@@ -483,6 +484,11 @@ public:
   /**
    * Sets up the nodal variables
    */
+  void initialize_element_variables(std::vector<std::string> names);
+
+  /**
+   * Sets up the nodal variables
+   */
   void initialize_nodal_variables(std::vector<std::string> names);
 
   /**
@@ -494,6 +500,11 @@ public:
    * Writes the time for the timestep
    */
   void write_timestep(int timestep, Real time);
+
+  /**
+   * Writes the vector of values to the element variables.
+   */
+  void write_element_values(const MeshBase & mesh, const std::vector<Number> & values, int timestep);
 
   /**
    * Writes the vector of values to a nodal variable.
@@ -608,6 +619,8 @@ public:
   std::vector<std::string> nodal_var_names;
   std::vector<Real> nodal_var_values;
 
+  int num_elem_vars;
+
   // A pair of containers used to emulate a char** data
   // structure without having to worry about dynamic memory
   // allocation ourselves.
@@ -617,6 +630,7 @@ public:
  protected:
   bool _created; // This flag gets set after the the create() function has been successfully called.
   bool _verbose; // On/Off message flag
+  bool _elem_vars_initialized; // True once the elem vars are initialized
   bool _global_vars_initialized; // True once the global vars are initialized
 };
 

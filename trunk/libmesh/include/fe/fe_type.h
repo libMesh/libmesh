@@ -144,6 +144,14 @@ public:
   }
 
   /**
+   * Tests inequality
+   */
+  bool operator!= (const FEType &f2) const
+  {
+    return !(*this == f2);
+  }
+
+  /**
    * An ordering to make FEType useful as a std::map key
    */
   bool operator< (const FEType &f2) const

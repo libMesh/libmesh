@@ -275,6 +275,12 @@ public:
   void build_solution_vector (std::vector<Number>& soln) const;
   
   /**
+   * Retrieve the solution data for CONSTANT MONOMIALs.
+   */
+  void get_solution( std::vector<Number> & soln,
+                     std::vector<std::string> & names) const;
+
+  /**
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names()).

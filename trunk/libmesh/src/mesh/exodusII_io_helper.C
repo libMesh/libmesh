@@ -717,10 +717,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
 
   // element map vector
+  block_ids.clear();
   std::vector<unsigned int> elem_map(mesh.n_active_elem());
   std::vector<unsigned int>::iterator curr_elem_map_end = elem_map.begin();
   for(it = subdomain_map.begin() ; it != subdomain_map.end(); it++)
     {
+      block_ids.push_back((*it).first);
+
       std::vector<unsigned int> & tmp_vec = (*it).second;
 
       ExodusII_IO_Helper::ElementMaps em;
@@ -944,6 +947,57 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 }
 
 
+void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names)
+{
+  if (_elem_vars_initialized)
+  {
+    return;
+  }
+  _elem_vars_initialized = true;
+
+  num_elem_vars = names.size();
+
+  if ( num_elem_vars == 0 )
+  {
+    return;
+  }
+
+  ex_err = exII::ex_put_var_param(ex_id, "e", num_elem_vars);
+  check_err(ex_err, "Error setting number of element vars.");
+
+  // Use the vvc and strings objects to emulate the behavior of
+  // a char** object.
+  vvc.resize(num_elem_vars);
+  strings.resize(num_elem_vars);
+
+  // For each string in names, allocate enough space in vvc and copy from
+  // the C++ string into vvc for passing to the C interface.
+  for (int i(0); i < num_elem_vars; ++i)
+    {
+      vvc[i].resize(names[i].size()+1);
+      std::strcpy(&(vvc[i][0]), names[i].c_str());
+    }
+
+  for (int i=0; i<num_elem_vars; ++i)
+    strings[i] = &(vvc[i][0]); // set pointer into vvc only *after* all resizing is complete
+
+  if (_verbose)
+    {
+      libMesh::out << "Writing variable name(s) to file: " << std::endl;
+      for (int i(0); i < num_elem_vars; ++i)
+	libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
+    }
+
+  ex_err = exII::ex_put_var_names(ex_id,
+				  "e",
+				  num_elem_vars,
+				  &strings[0]//var_names
+				  );
+
+  check_err(ex_err, "Error setting element variable names.");
+}
+
+
 void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> names)
 {
   num_nodal_vars = names.size();
@@ -1040,6 +1094,54 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
   check_err(ex_err, "Error flushing buffers to file.");
 }
 
+
+
+void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::vector<Number> & values, int timestep)
+{
+
+  // Loop over the element blocks and write the data one block at a time
+  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
+
+  const unsigned int num_vars = values.size() / num_elem;
+
+  //loop through element and map between block and element vector
+  for(unsigned int i=0; i<static_cast<unsigned int>(num_elem); ++i)
+    {
+      Elem * elem = mesh.elem(i);
+
+      //Only write out the active elements
+      if(elem->active())
+      {
+        unsigned int cur_subdomain = elem->subdomain_id();
+
+        if(cur_subdomain == 0)
+          cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
+
+        subdomain_map[cur_subdomain].push_back(elem->id());
+      }
+    }
+
+  for (unsigned int l(0); l < num_vars; ++l)
+  {
+    // The size of the subdomain map is the number of blocks.
+    std::map<unsigned int, std::vector<unsigned int>  >::iterator it( subdomain_map.begin() );
+
+    for(unsigned int j(0); it != subdomain_map.end(); ++it, ++j)
+    {
+      const std::vector<unsigned int> & elem_nums = (*it).second;
+      const unsigned int num_elems_this_block = elem_nums.size();
+      std::vector<Number> data( num_elems_this_block );
+      for (unsigned int k(0); k < num_elems_this_block; ++k)
+      {
+        data[k] = values[l*num_elem+elem_nums[k]];
+      }
+
+      ex_err = exII::ex_put_elem_var(ex_id, timestep, l+1, get_block_id(j), num_elems_this_block, &data[0]);
+      check_err(ex_err, "Error writing element values.");
+
+    }
+  }
+}
 
 
 void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number> & values, int timestep)
