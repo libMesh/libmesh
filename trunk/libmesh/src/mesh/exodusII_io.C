@@ -295,8 +295,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 
-void ExodusII_IO::write_element_data (const EquationSystems& es,
-                                      const std::vector<std::string>&)
+void ExodusII_IO::write_element_data (const EquationSystems& es)
 {
 
   libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
