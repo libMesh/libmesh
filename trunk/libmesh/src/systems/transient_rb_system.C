@@ -986,6 +986,15 @@ Number TransientRBSystem::set_error_temporal_data()
   return solution->dot(*inner_product_storage_vector);
 }
 
+const NumericVector<Number>& TransientRBSystem::get_error_temporal_data()
+{
+  START_LOG("get_error_temporal_data()", "TransientRBSystem");
+  
+  return *temporal_data[get_time_level()];
+  
+  STOP_LOG("get_error_temporal_data()", "TransientRBSystem");
+}
+
 void TransientRBSystem::initialize_truth ()
 {
   if (nonzero_initialization)
