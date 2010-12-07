@@ -42,7 +42,8 @@
 /* PETSc's subminor version number, as detected by LibMesh */
 #undef DETECTED_PETSC_VERSION_SUBMINOR
 
-/* Flag indicating if the library should be built with 1D support only */
+/* Integer indicating the highest spatial dimensionality supported by libMesh
+   */
 #undef DIM
 
 /* Flag indicating if the library should be built with AMR support */
