@@ -249,6 +249,14 @@ public:
   virtual void load_RB_solution();
 
   /**
+   * Get column k (i.e. the current time level) of temporal_data.
+   * This gives access to the truth projection error data. If
+   * the RB basis is empty, then this corresponds to the truth
+   * solution data itself.
+   */
+  const NumericVector<Number>& get_error_temporal_data();
+
+  /**
    * Overload write_offline_data_to_files in order to
    * write out the mass matrix and initial condition
    * data as well.
@@ -459,7 +467,6 @@ protected:
    * projection of the current solution onto the current RB space.
    */
   Number set_error_temporal_data();
-  
   
   /**
    * Helper function for caching the terms in the
