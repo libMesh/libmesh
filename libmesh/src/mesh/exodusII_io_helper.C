@@ -543,9 +543,10 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
 
 void ExodusII_IO_Helper::create(std::string filename)
 {
-  //Store things based on the precision of libMesh
-  comp_ws = sizeof(Real);
-  io_ws = sizeof(Real);
+  //Fall back on double precision when necessary since ExodusII
+  //doesn't seem to support long double
+  comp_ws = std::min(sizeof(Real),sizeof(double));
+  io_ws = std::min(sizeof(Real),sizeof(double));
     
   ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
 
