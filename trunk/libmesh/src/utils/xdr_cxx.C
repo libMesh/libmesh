@@ -866,8 +866,8 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 	// FIXME[JWP]: How to implement this for long double?  Mac OS
 	// X defines 'xdr_quadruple' but AFAICT, it does not exist for
 	// Linux... for now, reading/writing XDR files with long
-	// doubles is disabled, but you can still write long double
-	// ASCII files of course.
+	// doubles drops back to double precision, but you can still
+	// write long double ASCII files of course.
 	// if (len > 0)
 	//   xdr_vector(xdrs, 
 	// 	     (char*) val,
@@ -875,10 +875,28 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 	// 	     sizeof(double),
 	// 	     (xdrproc_t) xdr_quadruple);
 
-	libMesh::err << "Writing binary XDR files with long double's is not\n"
-		      << "currently supported on all platforms." << std::endl;
-
-	libmesh_error();
+	if (len > 0)
+	  {
+	    std::vector<double> io_buffer (len);
+	    
+	    // Fill io_buffer if we are writing.
+	    if (mode == ENCODE)
+	      for (unsigned int i=0, cnt=0; i<len; i++)
+		io_buffer[cnt++] = val[i];
+	      
+	    xdr_vector(xdrs, 
+		       (char*) &io_buffer[0],
+		       len,
+		       sizeof(double),
+		       (xdrproc_t) xdr_double);
+	    
+	    // Fill val array if we are reading.
+	    if (mode == DECODE)
+	      for (unsigned int i=0, cnt=0; i<len; i++)
+		{
+		  val[i] = io_buffer[cnt++];
+		} 
+	  }
 	
 #else
 	
@@ -1029,6 +1047,113 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 		    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 		    OFSRealscientific(*out,17,val[cnt].real()) << " ";
 		    OFSRealscientific(*out,17,val[cnt].imag()) << " ";
+		    cnt++;
+		  }
+		libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+		*out << '\n';
+	      }
+	  }
+
+	return;	
+      }
+
+    default:
+      libmesh_error();
+    }
+}
+
+template <>
+void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, const unsigned int line_break)
+{
+  switch (mode)
+    {
+    case ENCODE:
+    case DECODE:
+      {
+#ifdef LIBMESH_HAVE_XDR
+
+	libmesh_assert (this->is_open());
+
+	// FIXME[JWP]: How to implement this for long double?  Mac OS
+	// X defines 'xdr_quadruple' but AFAICT, it does not exist for
+	// Linux... for now, reading/writing XDR files with long
+	// doubles drops back to double precision, but you can still
+	// write long double ASCII files of course.
+
+	if (len > 0)
+	  {
+	    std::vector<double> io_buffer (2*len);
+	    
+	    // Fill io_buffer if we are writing.
+	    if (mode == ENCODE)
+	      for (unsigned int i=0, cnt=0; i<len; i++)
+		{
+		  io_buffer[cnt++] = val[i].real();
+		  io_buffer[cnt++] = val[i].imag();
+		} 
+	      
+	    xdr_vector(xdrs, 
+		       (char*) &io_buffer[0],
+		       2*len,
+		       sizeof(double),
+		       (xdrproc_t) xdr_double);
+	    
+	    // Fill val array if we are reading.
+	    if (mode == DECODE)
+	      for (unsigned int i=0, cnt=0; i<len; i++)
+		{
+		  val[i].real() = io_buffer[cnt++];
+		  val[i].imag() = io_buffer[cnt++];
+		} 
+	  }
+#else
+	
+	libMesh::err << "ERROR: Functionality is not available." << std::endl
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << std::endl
+		      << "The XDR interface is not available in this installation"
+		      << std::endl;
+
+	libmesh_error();
+
+#endif
+	return;
+      }
+
+    case READ:
+      {
+	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
+
+	for (unsigned int i=0; i<len; i++)
+	  {
+	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
+	    *in >> val[i].real() >> val[i].imag();
+	  }
+
+	return;	
+      }
+
+    case WRITE:
+      {
+	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+
+	if (line_break == libMesh::invalid_uint)
+	  for (unsigned int i=0; i<len; i++)
+	    {
+	      libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+	      OFSRealscientific(*out,std::numeric_limits<long double>::digits10,val[i].real()) << " ";
+	      OFSRealscientific(*out,std::numeric_limits<long double>::digits10,val[i].imag()) << " ";
+	    }
+	else
+	  {
+	    unsigned int cnt=0;
+	    while (cnt < len)
+	      {
+		for (unsigned int i=0; i<std::min(line_break,len); i++)
+		  {
+		    libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
+		    OFSRealscientific(*out,std::numeric_limits<long double>::digits10,val[cnt].real()) << " ";
+		    OFSRealscientific(*out,std::numeric_limits<long double>::digits10,val[cnt].imag()) << " ";
 		    cnt++;
 		  }
 		libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
