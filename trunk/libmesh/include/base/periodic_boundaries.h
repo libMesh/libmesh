@@ -52,13 +52,16 @@ public:
   unsigned int myboundary,
 	       pairedboundary;
 
-  PeriodicBoundary()
-  {}
+  PeriodicBoundary() :
+    var_set(false)
+  {
+  }
 
   PeriodicBoundary(const PeriodicBoundary & o, bool inverse = false) :
       myboundary(o.myboundary),
       pairedboundary(o.pairedboundary),
-      translation_vector(o.translation_vector)
+      translation_vector(o.translation_vector),
+      var_set(o.var_set)
   {
     if (inverse)
     {
@@ -68,13 +71,27 @@ public:
   }
 
   PeriodicBoundary(const RealVectorValue & vector) :
-    translation_vector (vector)
+    translation_vector (vector),
+    var_set(false)
   {
   }
 
   virtual Point get_corresponding_pos(const Point & pt)
   {
     return pt + translation_vector;
+  }
+
+  void set_variable(unsigned int var)
+  {
+    variable = var;
+    var_set = true;
+  }
+
+  bool is_my_variable(unsigned int var_num)
+  {
+    bool a = !var_set || (var_set && variable == var_num);
+    std::cout << "a = " << a << " for var_num = " << var_num << std::endl;
+    return a;
   }
 
 protected:
@@ -84,6 +101,9 @@ protected:
   // The vector which is added to points in myboundary
   // to produce corresponding points in pairedboundary
   RealVectorValue translation_vector;
+
+  bool var_set;
+  unsigned int variable;
 };
 
 

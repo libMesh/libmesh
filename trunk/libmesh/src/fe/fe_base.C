@@ -2020,7 +2020,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
         {
           const unsigned int boundary_id = *id_it;
           PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
-          if (periodic)
+          if (periodic && periodic->is_my_variable(variable_number))
             {
               // Get pointers to the element's neighbor.
               const Elem* neigh = boundaries.neighbor(boundary_id, mesh, elem, s);
