@@ -90,7 +90,6 @@ public:
   bool is_my_variable(unsigned int var_num)
   {
     bool a = !var_set || (var_set && variable == var_num);
-    std::cout << "a = " << a << " for var_num = " << var_num << std::endl;
     return a;
   }
 
