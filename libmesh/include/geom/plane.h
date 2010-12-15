@@ -130,6 +130,12 @@ public:
    */
   Point unit_normal (const Point& p) const;
 
+  /**
+   * @returns a point on the plane useful
+   * for determining position
+   */
+  const Point & get_planar_point() const;
+  
   
 private:
 

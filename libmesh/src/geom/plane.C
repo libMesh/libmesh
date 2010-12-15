@@ -188,4 +188,9 @@ Point Plane::unit_normal (const Point&) const
   return _normal;
 }
 
+const Point & Plane::get_planar_point() const
+{
+  return _point;
+}
+  
 } // namespace libMesh
