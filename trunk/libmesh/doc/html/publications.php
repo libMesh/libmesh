@@ -58,7 +58,33 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_Dissertation">1</a>]
+[<a name="Petrolati_Dissertation">1</a>]
+</td>
+<td class="bibtexitem">
+E.&nbsp;Petrolati.
+ <em>Study and Optimization of Polariton LASERs</em>.
+ PhD thesis, Universit&agrave; Degli Studi Di Roma &ldquo;Tor Vergata&rdquo;,
+  December 2008.
+ <a href="http://art.torvergata.it/bitstream/2108/1116/1/FINALE.pdf">http://art.torvergata.it/bitstream/2108/1116/1/FINALE.pdf</a>.
+<a name="Petrolati_Dissertation"></a><pre>
+@phdthesis{Petrolati_Dissertation,
+  author = {E.~Petrolati},
+  school = {Universit\`{a} Degli Studi Di Roma ``Tor Vergata''},
+  title = {{Study and Optimization of Polariton LASERs}},
+  note = {\url{http://art.torvergata.it/bitstream/2108/1116/1/FINALE.pdf}},
+  month = dec,
+  year = {2008}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Stogner_Dissertation">2</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner.
@@ -86,7 +112,7 @@ R.&nbsp;H. Stogner.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Dissertation">2</a>]
+[<a name="Peterson_Dissertation">3</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -113,7 +139,7 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_Dissertation">3</a>]
+[<a name="Knezevic_Dissertation">4</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic.
@@ -140,7 +166,7 @@ D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_Dissertation">4</a>]
+[<a name="Kirk_Dissertation">5</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -167,7 +193,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Thesis">5</a>]
+[<a name="Peterson_Thesis">6</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -204,15 +230,41 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffiths_2010">1</a>]
+[<a name="Eftang_2010b">1</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
+ A two-step certified reduced basis method.
+ <em>SUBMITTED, Journal of Scientific Computing</em>, October 2010.
+ <a href="http://augustine.mit.edu/methodology/papers/atp_JSC_preprint_Oct2010.pdf">http://augustine.mit.edu/methodology/papers/atp_JSC_preprint_Oct2010.pdf</a>.
+<a name="Eftang_2010b"></a><pre>
+@article{Eftang_2010b,
+  author = {J.~L.~Eftang and D.~B.~P.~Huynh and D.~J.~Knezevic and A.~T.~Patera},
+  title = {{A two-step certified reduced basis method}},
+  journal = {SUBMITTED, Journal of Scientific Computing},
+  year = 2010,
+  month = oct,
+  note = {\url{http://augustine.mit.edu/methodology/papers/
+     atp_JSC_preprint_Oct2010.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Griffith_2010">2</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
  Immersed boundary method with finite element elasticity.
  <em>SUBMITTED</em>, October 2010.
  <a href="http://www.cims.nyu.edu/~griffith/docs/griffith_ibfem_sub.pdf">http://www.cims.nyu.edu/~griffith/docs/griffith_ibfem_sub.pdf</a>.
-<a name="Griffiths_2010"></a><pre>
-@article{Griffiths_2010,
+<a name="Griffith_2010"></a><pre>
+@article{Griffith_2010,
   author = {B.~E.~Griffith and X.~Luo},
   title = {{Immersed boundary method with finite element elasticity}},
   journal = {SUBMITTED},
@@ -229,7 +281,7 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010b">2</a>]
+[<a name="Knezevic_2010b">3</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
@@ -259,7 +311,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">3</a>]
+[<a name="Huynh_2010">4</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
@@ -289,7 +341,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010">4</a>]
+[<a name="Berrone_2010">5</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone and M.&nbsp;Verani.
@@ -316,33 +368,7 @@ S.&nbsp;Berrone and M.&nbsp;Verani.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010b">5</a>]
-</td>
-<td class="bibtexitem">
-L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
- A pressure-correction scheme for convection-dominated incompressible
-  flows with discontinuous velocity and continuous pressure.
- <em>PREPRINT, Submitted to Journal of Computational Physics</em>, 2010.
- <a href="http://hal.archives-ouvertes.fr/hal-00458293/">http://hal.archives-ouvertes.fr/hal-00458293/</a>.
-<a name="Botti_2010b"></a><pre>
-@article{Botti_2010b,
-  author = {L.~Botti and D.~A.~Di Pietro},
-  title = {{A pressure-correction scheme for convection-dominated incompressible flows
-    with discontinuous velocity and continuous pressure}},
-  journal = {PREPRINT, Submitted to Journal of Computational Physics},
-  year = 2010,
-  note = {\url{http://hal.archives-ouvertes.fr/hal-00458293/}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Eftang_2010">6</a>]
+[<a name="Eftang_2010a">6</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -351,8 +377,8 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
  <em>PREPRINT, Mathematical and Computer Modelling of Dynamical
   Systems</em>, revised July 2010.
  <a href="http://augustine.mit.edu/methodology/papers/atp_MCMDS_preprint_Apr2010.pdf">http://augustine.mit.edu/methodology/papers/atp_MCMDS_preprint_Apr2010.pdf</a>.
-<a name="Eftang_2010"></a><pre>
-@article{Eftang_2010,
+<a name="Eftang_2010a"></a><pre>
+@article{Eftang_2010a,
   author = {J.~L.~Eftang and D.~J.~Knezevic and A.~T.~Patera},
   title = {{An $hp$ Certified Reduced Basis Method for Parameterized Parabolic Partial Differential Equations}},
   journal = {PREPRINT, Mathematical and Computer Modelling of Dynamical Systems},
@@ -419,7 +445,46 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 </td>
 </tr>
 </table><a name="Articles"></a>
-<h2>2010</h2>
+<h2>2011</h2>
+
+<!-- This document was automatically generated with bibtex2html 1.95
+     (see http://www.lri.fr/~filliatr/bibtex2html/),
+     with the following command:
+     bibtex2html -d -r --nodoc --single -nofooter eleven.bib  -->
+
+
+<table>
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Botti_2011">1</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
+ A pressure-correction scheme for convection-dominated incompressible
+  flows with discontinuous velocity and continuous pressure.
+ <em>Journal of Computational Physics</em>, 230(3):572-585, February
+  2011.
+ <a href="http://dx.doi.org/10.1016/j.jcp.2010.10.004">http://dx.doi.org/10.1016/j.jcp.2010.10.004</a>.
+<a name="Botti_2011"></a><pre>
+@article{Botti_2011,
+  author = {L.~Botti and D.~A.~Di Pietro},
+  title = {{A pressure-correction scheme for convection-dominated incompressible flows
+    with discontinuous velocity and continuous pressure}},
+  journal = {Journal of Computational Physics},
+  year = 2011,
+  volume = 230,
+  number = 3,
+  month = feb,
+  pages = {572--585},
+  note = {\url{http://dx.doi.org/10.1016/j.jcp.2010.10.004}}
+}
+</pre>
+
+
+</td>
+</tr>
+</table><h2>2010</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.95
      (see http://www.lri.fr/~filliatr/bibtex2html/),
@@ -520,7 +585,66 @@ J.&nbsp;Brown.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lu_2010">4</a>]
+[<a name="Olivera_2010">4</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
+ Finding the elastic coefficients of a damaged zone in a concrete dam
+  using material optimization to fit measured modal parameters.
+ In <em>Proceedings of the 2nd International Conference on
+  Engineering Optimization</em>, Lisbon, Portugal, September&nbsp;6-9, 2010.
+ <a href="http://lemac1.dem.ist.utl.pt/engopt2010/Book_and_CD/Papers_CD_Final_Version/pdf/12/01122-01.pdf">http://lemac1.dem.ist.utl.pt/engopt2010/Book_and_CD/Papers_CD_Final_Version/pdf/12/01122-01.pdf</a>.
+<a name="Olivera_2010"></a><pre>
+@inproceedings{Olivera_2010,
+  author = {S.~Oliveira and A.-M.~Toader and P.~Vieira},
+  title = {Finding the elastic coefficients of a damaged zone in
+  a concrete dam using material optimization to fit measured modal parameters},
+  booktitle = {{Proceedings of the 2nd International Conference on
+                 Engineering Optimization}},
+  month = sep # {~6--9,},
+  address = {Lisbon, Portugal},
+  year = {2010},
+  note = {\url{http://lemac1.dem.ist.utl.pt/engopt2010/Book_and_CD/
+  Papers_CD_Final_Version/pdf/12/01122-01.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Ragusa_2010">5</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;Ragusa, A.&nbsp;Siegel, and J.-M. Ruggieri.
+ Neutronic/Thermalhydraulic Coupling Technigues for Sodium Cooled
+  Fast Reactor Simulations.
+ Technical Report 14837, Department of Energy, September 2010.
+ <a href="http://dx.doi/org/10.2172/992636">http://dx.doi/org/10.2172/992636</a>.
+<a name="Ragusa_2010"></a><pre>
+@techreport{Ragusa_2010,
+  author = {J.~Ragusa and A.~Siegel and J.-M.~Ruggieri},
+  title = {{Neutronic/Thermalhydraulic Coupling Technigues for Sodium Cooled Fast Reactor Simulations}},
+  institution = {Department of Energy},
+  day = 28,
+  month = sep,
+  year = {2010},
+  number = {14837},
+  note = {\url{http://dx.doi/org/10.2172/992636}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Lu_2010">6</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E.&nbsp;M. Sevick-Muraca.
@@ -553,7 +677,7 @@ Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Pereira_2010">5</a>]
+[<a name="Pereira_2010">7</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
@@ -584,7 +708,7 @@ F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2010a">6</a>]
+[<a name="Kirk_2010a">8</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
@@ -613,7 +737,38 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_2010">7</a>]
+[<a name="Pecchia_2010">9</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Pecchia.
+ Transport at the nanoscale: integration of micro-macro scales for
+  electrothermal device simulations.
+ Technical Report A029035, University of Rome, &ldquo;Tor Vergata&rdquo;, May
+  2010.
+ <a href="http://www.dtic.mil/cgi-bin/GetTRDoc?Location=U2&doc=GetTRDoc.pdf&AD=ADA530920">http://www.dtic.mil/cgi-bin/GetTRDoc?Location=U2&doc=GetTRDoc.pdf&AD=ADA530920</a>.
+<a name="Pecchia_2010"></a><pre>
+@techreport{Pecchia_2010,
+  author = {A.~Pecchia},
+  title = {{Transport at the nanoscale: integration of micro-macro
+                  scales for electrothermal device simulations}},
+  institution = {University of Rome, ``Tor Vergata''},
+  day = 27,
+  month = may,
+  year = {2010},
+  number = {A029035},
+  note = {\url{http://www.dtic.mil/cgi-bin/GetTRDoc?
+                      Location=U2&doc=GetTRDoc.pdf&AD=ADA530920}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Nagler_2010">10</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler and M.&nbsp;Schanz.
@@ -642,7 +797,7 @@ L.&nbsp;Nagler and M.&nbsp;Schanz.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2010a">8</a>]
+[<a name="Fuentes_2010a">11</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
@@ -674,7 +829,7 @@ D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNic
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010a">9</a>]
+[<a name="Berrone_2010a">12</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone.
@@ -705,7 +860,7 @@ estimates for finite element discretizations of parabolic equations}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2010">10</a>]
+[<a name="Zhu_2010">13</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
@@ -736,7 +891,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2010">11</a>]
+[<a name="Podgorney_2010">14</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
@@ -768,7 +923,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010a">12</a>]
+[<a name="Knezevic_2010a">15</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -798,7 +953,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhengyong_2010">13</a>]
+[<a name="Zhengyong_2010">16</a>]
 </td>
 <td class="bibtexitem">
 Z.&nbsp;Ren and J.&nbsp;Tang.
@@ -827,7 +982,7 @@ Z.&nbsp;Ren and J.&nbsp;Tang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2010">14</a>]
+[<a name="Carey_2010">17</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -857,7 +1012,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010">15</a>]
+[<a name="Peterson_2010">18</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -887,7 +1042,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010">16</a>]
+[<a name="Botti_2010">19</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
@@ -1714,7 +1869,38 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hawkins_2008">1</a>]
+[<a name="Cervone_2008">1</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Cervone and S.&nbsp;Manservisi.
+ A three-dimensional CFD program for the simulation of the
+  thermo-hydraulic behaviour of an open core liquid metal reactor.
+ Technical Report RSE/2009/85, ENEA: Ente per le Nuove tecnologie,
+  l'Energia e l'Ambiente, December 2008.
+ <a href="http://www.enea.it/attivita_ricerca/energia/sistema_elettrico/Nucleare_fissione/Reattori_Innovativi/RSE85.pdf">http://www.enea.it/attivita_ricerca/energia/sistema_elettrico/Nucleare_fissione/Reattori_Innovativi/RSE85.pdf</a>.
+<a name="Cervone_2008"></a><pre>
+@techreport{Cervone_2008,
+  author = {A.~Cervone and S.~Manservisi},
+  title = {{A three-dimensional CFD program for the simulation of
+                  the thermo-hydraulic behaviour of an open core liquid metal reactor}},
+  institution = {ENEA: Ente per le Nuove tecnologie, l'Energia e l'Ambiente},
+  day = 16,
+  month = dec,
+  year = 2008,
+  number = {RSE/2009/85},
+  note = {\url{http://www.enea.it/attivita_ricerca/energia/
+  sistema_elettrico/Nucleare_fissione/Reattori_Innovativi/RSE85.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hawkins_2008">2</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Hawkins and J.&nbsp;T. Oden.
@@ -1742,7 +1928,7 @@ A.&nbsp;Hawkins and J.&nbsp;T. Oden.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Antiga_2008">2</a>]
+[<a name="Antiga_2008">3</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Antiga, M.&nbsp;Piccinelli, L.&nbsp;Botti, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and D.&nbsp;A.
@@ -1773,7 +1959,7 @@ L.&nbsp;Antiga, M.&nbsp;Piccinelli, L.&nbsp;Botti, B.&nbsp;Ene-Iordache, A.&nbsp
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Xu_2008">3</a>]
+[<a name="Xu_2008">4</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
@@ -1803,7 +1989,7 @@ D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2008">4</a>]
+[<a name="Mahadevan_2008">5</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan and J.&nbsp;C. Ragusa.
@@ -1829,7 +2015,7 @@ V.&nbsp;S. Mahadevan and J.&nbsp;C. Ragusa.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Galbusera_2008">5</a>]
+[<a name="Galbusera_2008">6</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;Galbusera, M.&nbsp;Cioffi, and M.&nbsp;T. Raimondi.
@@ -1858,7 +2044,7 @@ F.&nbsp;Galbusera, M.&nbsp;Cioffi, and M.&nbsp;T. Raimondi.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Piccinelli_2008">6</a>]
+[<a name="Piccinelli_2008">7</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Piccinelli, L.&nbsp;Botti, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, A.&nbsp;Veneziani, and
@@ -1886,7 +2072,7 @@ M.&nbsp;Piccinelli, L.&nbsp;Botti, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, A.&nbs
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="VanCanneyt_2008">7</a>]
+[<a name="VanCanneyt_2008">8</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Van Canneyt, R.&nbsp;Kaminsky, L.&nbsp;Botti, L.&nbsp;Antiga, J.&nbsp;Tordoir, P.&nbsp;Verdonck, and
@@ -1919,7 +2105,7 @@ K.&nbsp;Van Canneyt, R.&nbsp;Kaminsky, L.&nbsp;Botti, L.&nbsp;Antiga, J.&nbsp;To
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2008">8</a>]
+[<a name="Botti_2008">9</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
@@ -1949,7 +2135,7 @@ L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Ahn_2008">9</a>]
+[<a name="Ahn_2008">10</a>]
 </td>
 <td class="bibtexitem">
 H.&nbsp;T. Ahn, M.&nbsp;Shashkov, and M.&nbsp;A. Christon.
@@ -1978,7 +2164,7 @@ H.&nbsp;T. Ahn, M.&nbsp;Shashkov, and M.&nbsp;A. Christon.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Powell_2008">10</a>]
+[<a name="Powell_2008">11</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;C. Powell, IV and R.&nbsp;Arroyave.
@@ -2007,7 +2193,7 @@ A.&nbsp;C. Powell, IV and R.&nbsp;Arroyave.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kroger_2008">11</a>]
+[<a name="Kroger_2008">12</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;Kr&ouml;ger and T.&nbsp;Preusser.
@@ -2036,7 +2222,7 @@ T.&nbsp;Kr&ouml;ger and T.&nbsp;Preusser.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bhatia_2008">12</a>]
+[<a name="Bhatia_2008">13</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Bhatia and E.&nbsp;Livnet.
@@ -2065,7 +2251,7 @@ M.&nbsp;Bhatia and E.&nbsp;Livnet.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Barone_2008">13</a>]
+[<a name="Barone_2008">14</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;F. Barone, D.&nbsp;J. Segalman, H.&nbsp;Thornquist, and I.&nbsp;Kalashnikova.
@@ -2092,7 +2278,7 @@ M.&nbsp;F. Barone, D.&nbsp;J. Segalman, H.&nbsp;Thornquist, and I.&nbsp;Kalashni
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="VonEstorff_2008">14</a>]
+[<a name="VonEstorff_2008">15</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;von Estorff, S.&nbsp;Petersen, and D.&nbsp;Dreyer.
@@ -2123,7 +2309,7 @@ O.&nbsp;von Estorff, S.&nbsp;Petersen, and D.&nbsp;Dreyer.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="DeSturler_2008">15</a>]
+[<a name="DeSturler_2008">16</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
@@ -2154,7 +2340,7 @@ E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_2008">16</a>]
+[<a name="Stogner_2008">17</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -2185,7 +2371,7 @@ R.&nbsp;H. Stogner, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2008">17</a>]
+[<a name="Berrone_2008">18</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone and E.&nbsp;S&uuml;li.
@@ -2213,7 +2399,7 @@ S.&nbsp;Berrone and E.&nbsp;S&uuml;li.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2008a">18</a>]
+[<a name="Kirk_2008a">19</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
@@ -2244,7 +2430,7 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brinkmeier_2008">19</a>]
+[<a name="Brinkmeier_2008">20</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Brinkmeier, U.&nbsp;Nackenhorst, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
@@ -2272,7 +2458,7 @@ M.&nbsp;Brinkmeier, U.&nbsp;Nackenhorst, S.&nbsp;Petersen, and O.&nbsp;von Estor
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lu_2008">20</a>]
+[<a name="Lu_2008">21</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
