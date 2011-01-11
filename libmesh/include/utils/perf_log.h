@@ -57,6 +57,8 @@ class PerfData
   PerfData () :
     tot_time(0.),
     tot_time_incl_sub(0.),
+    tstart(),
+    tstart_incl_sub(),
     count(0),
     open(false),
     called_recursively(0)
