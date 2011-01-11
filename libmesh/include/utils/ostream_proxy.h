@@ -77,7 +77,7 @@ namespace libMesh
    * responsible for ensuring that this target exists for as long as
    * the proxies do.
    */
-  BasicOStreamProxy (BasicOstreamProxy& old) : _target(old._target) {}
+  BasicOStreamProxy (BasicOStreamProxy& old) : _target(old._target) {}
 
   /**
    * Default destructor.
