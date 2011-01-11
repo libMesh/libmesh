@@ -80,6 +80,24 @@ namespace libMesh
   BasicOStreamProxy (BasicOStreamProxy& old) : _target(old._target) {}
 
   /**
+   * Reset the internal target to a new \p target output stream.
+   */
+  BasicOStreamProxy& operator= (streamT& target)
+    { 
+       _target = &target; 
+       return *this;
+    }
+
+  /**
+   * Reset the target to the same output stream as in \p old
+   */
+  BasicOStreamProxy& operator= (const BasicOStreamProxy& old)
+    {
+      _target = old._target;
+      return *this;
+    }
+
+  /**
    * Default destructor.
    */
   ~BasicOStreamProxy () {}
