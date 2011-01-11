@@ -112,8 +112,8 @@ MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
 int                COMM_WORLD = 0;
 #endif
 
-OStreamProxy out = std::cout;
-OStreamProxy err = std::cerr;
+OStreamProxy out(std::cout);
+OStreamProxy err(std::cerr);
 
 Parallel::Communicator Parallel::Communicator_World;
 
