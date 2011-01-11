@@ -69,12 +69,20 @@ namespace libMesh
    * to which we pass output.  The user is responsible for ensuring
    * that this target exists for as long as the proxy does.
    */
-  BasicOStreamProxy (streamT& target) : _target(&target) {};
+  BasicOStreamProxy (streamT& target) : _target(&target) {}
+
+  /**
+   * Shallow copy constructor.  Output in the new object is passed to
+   * the same target ostream as in the old object.  The user is
+   * responsible for ensuring that this target exists for as long as
+   * the proxies do.
+   */
+  BasicOStreamProxy (BasicOstreamProxy& old) : _target(old._target) {}
 
   /**
    * Default destructor.
    */
-  ~BasicOStreamProxy () {};
+  ~BasicOStreamProxy () {}
 
   // 
   // Functions that get passed to the proxied target:
