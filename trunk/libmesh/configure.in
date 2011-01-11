@@ -698,7 +698,7 @@ AC_ARG_ENABLE(trilinos,
                              [build with Trilinos suppport]),
               enabletrilinos=$enableval,
               enabletrilinos=yes)
-if test "$enablecomplex" == no ; then
+if test "$enablecomplex" = no ; then
    if test "$enabletrilinos" != no ; then
       CONFIGURE_TRILINOS
       dnl ----------------------------------------------------------

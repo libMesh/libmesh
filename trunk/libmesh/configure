@@ -8930,7 +8930,7 @@ else
   enabletrilinos=yes
 fi
 
-if test "$enablecomplex" == no ; then
+if test "$enablecomplex" = no ; then
    if test "$enabletrilinos" != no ; then
 
   if test "x$TRILINOS_DIR" = "x"; then
