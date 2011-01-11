@@ -46,15 +46,44 @@ std::string abi_demangle(const char *name)
   int status = 0;
   char *d = 0;
   std::string fullname = name;
-  size_t namestart = fullname.find('(');
+  std::string saved_begin, saved_end;
+  size_t namestart, nameend;
+
+  /**
+   * The Apple backtrace function return more information than the Linux version.
+   * We need to pass only the function name to the demangler or it won't decode it for us.
+   *
+   * lineno: stackframeno                 address functionname + offset
+   */
+  
+#ifdef __APPLE__
+  namestart = fullname.find("0x");
+  if (namestart != std::string::npos)
+  {
+    namestart = fullname.find(' ', namestart) + 1;
+    saved_begin = fullname.substr(0, namestart);
+  }
+  nameend = fullname.find('+');
+  if (nameend == std::string::npos ||
+      nameend <= namestart)
+    nameend = fullname.size();
+  else
+  {
+    nameend -= 1;
+    saved_end = fullname.substr(nameend, fullname.length());
+  }
+#else
+  namestart = fullname.find('(');
   if (namestart == std::string::npos)
     return fullname;
   else
     namestart++;
-  size_t nameend = fullname.find('+');
+  nameend = fullname.find('+');
   if (nameend == std::string::npos ||
       nameend <= namestart)
     return fullname;
+#endif
+  
   std::string funcname = fullname.substr(namestart, nameend - namestart);
   std::string goodname = funcname;
   try { if ( (d = abi::__cxa_demangle(funcname.c_str(), 0, 0, &status)) ) goodname = d; }
@@ -66,7 +95,7 @@ std::string abi_demangle(const char *name)
   ret.append(fullname.substr(nameend, fullname.length() - nameend));
   return ret;
 */
-  return goodname;
+  return saved_begin + goodname + saved_end;
 }
 
 void print_trace(std::ostream &out)
