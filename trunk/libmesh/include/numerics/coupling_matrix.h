@@ -110,7 +110,7 @@ private:
 // CouplingMatrix inline methods
 inline
 CouplingMatrix::CouplingMatrix (const unsigned int n) :
-  _size(n)
+  _values(), _size(n)
 {
   this->resize(n);
 }
