@@ -52,7 +52,8 @@ public:
 	    const FEType &var_type) :
     _name(var_name),
     _number(var_number),
-    _type(var_type)
+    _type(var_type),
+    _active_subdomains()
   {}
   
   /**
