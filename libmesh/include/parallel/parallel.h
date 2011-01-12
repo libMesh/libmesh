@@ -207,7 +207,7 @@ namespace Parallel
   class DataType
   {
   public:
-    DataType () {}
+    DataType () : _datatype() {}
 
     DataType (const DataType &other) :
       _datatype(other._datatype)
@@ -264,16 +264,33 @@ namespace Parallel
   class Communicator
   {
   public:
+    Communicator () :
 #ifdef LIBMESH_HAVE_MPI
-    Communicator () : _communicator(MPI_COMM_NULL), _rank(0), _size(0), _I_duped_it(false) {}
+      _communicator(MPI_COMM_NULL),
+      _rank(0),
+      _size(0),
 #else
-    Communicator () : _rank(0), _size(1), _I_duped_it(false) {}
+      _rank(0), 
+      _size(1), 
 #endif
+      used_tag_values(),
+      _I_duped_it(false) {}
 
     /*
      * Constructor from MPI_Comm
      */
-    explicit Communicator (const communicator &comm) : _I_duped_it(false) {
+    explicit Communicator (const communicator &comm) : 
+#ifdef LIBMESH_HAVE_MPI
+      _communicator(MPI_COMM_NULL),
+      _rank(0),
+      _size(0),
+#else
+      _rank(0), 
+      _size(1), 
+#endif
+      used_tag_values(),
+      _I_duped_it(false)
+    {
       this->assign(comm);
     }
 
@@ -352,9 +369,10 @@ namespace Parallel
 #endif
     }
 
-    void operator= (const communicator &comm) {
+    Communicator& operator= (const communicator &comm) {
       this->clear();
       this->assign(comm);
+      return *this;
     }
 
     unsigned int rank() const {
@@ -370,7 +388,18 @@ namespace Parallel
     // Don't use the copy constructor, just copy by reference or
     // pointer - it's too hard to keep a common used_tag_values if
     // each communicator is shared by more than one Communicator
-    explicit Communicator (const Communicator &) {
+    explicit Communicator (const Communicator &) :
+#ifdef LIBMESH_HAVE_MPI
+      _communicator(MPI_COMM_NULL),
+      _rank(0),
+      _size(0),
+#else
+      _rank(0), 
+      _size(1), 
+#endif
+      used_tag_values(),
+      _I_duped_it(false)
+    {
       libmesh_error();
     }
 
@@ -415,14 +444,19 @@ namespace Parallel
   class Status
   {
   public:
-    Status () {}
+    Status () :
+      _status(),
+      _datatype()           
+    {}
     
     Status (const data_type &type) :
-    _datatype(type)           
+      _status(),
+      _datatype(type)           
     {}
 
     Status (const status &status) :
-      _status(status)
+      _status(status),
+      _datatype()           
     {}
 
     Status (const status    &status,
@@ -513,12 +547,13 @@ namespace Parallel
   class Request
   {
   public:
-    Request () 
-    {
+    Request () :
 #ifdef LIBMESH_HAVE_MPI
-      _request = MPI_REQUEST_NULL;
+      _request(MPI_REQUEST_NULL)
+#else
+      _request()
 #endif
-    }
+    {}
 
     Request (const request &r) :
       _request(r)
@@ -530,9 +565,7 @@ namespace Parallel
     Request & operator = (const request &r)
     { _request = r; return *this; }
 
-    ~Request ()
-    {
-    }
+    ~Request () {}
 
     operator const request & () const
     { return _request; }
