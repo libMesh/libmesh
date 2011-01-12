@@ -147,6 +147,7 @@ public:
 
     PackedNode () :
       id(0),
+      pid(DofObject::invalid_processor_id),
       x(0.),
       y(0.),
       z(0.)
