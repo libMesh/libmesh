@@ -57,6 +57,8 @@ public:
   {
   }
 
+  ~PeriodicBoundary() {}
+
   PeriodicBoundary(const PeriodicBoundary & o, bool inverse = false) :
       myboundary(o.myboundary),
       pairedboundary(o.pairedboundary),
