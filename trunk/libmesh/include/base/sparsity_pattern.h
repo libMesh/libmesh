@@ -99,7 +99,10 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
       dof_map(dof_map_in),
       dof_coupling(dof_coupling_in),
       implicit_neighbor_dofs(implicit_neighbor_dofs_in),
-      need_full_sparsity_pattern(need_full_sparsity_pattern_in)
+      need_full_sparsity_pattern(need_full_sparsity_pattern_in),
+      sparsity_pattern(),
+      n_nz(),
+      n_oz()
     {}
 
     Build (Build &other, Threads::split) :
@@ -107,7 +110,10 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
       dof_map(other.dof_map),
       dof_coupling(other.dof_coupling),
       implicit_neighbor_dofs(other.implicit_neighbor_dofs),
-      need_full_sparsity_pattern(other.need_full_sparsity_pattern)
+      need_full_sparsity_pattern(other.need_full_sparsity_pattern),
+      sparsity_pattern(),
+      n_nz(),
+      n_oz()
     {}
 
     void operator()(const ConstElemRange &range);
