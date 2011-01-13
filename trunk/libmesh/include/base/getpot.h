@@ -449,15 +449,53 @@ GetPot::_basic_initialization()
 }
 
 inline
-GetPot::GetPot() 
+GetPot::GetPot() :
+  prefix(),
+  section(),
+  section_list(),
+  argv(),
+  cursor(),
+  search_loop_f(),
+  search_failed_f(),
+  nominus_cursor(),
+  idx_nominus(),
+  variables(),
+  _comment_start(),
+  _comment_end(),
+  _field_separator(),
+  _getpot_mtx(),
+  _internal_string_container(),
+  _requested_arguments(),
+  _requested_variables(),
+  _requested_sections(),
+  request_recording_f()
 { 
     _basic_initialization(); 
 }
 
 inline
 GetPot::GetPot(const int argc_, char ** argv_, 
-	       const char* FieldSeparator /* =0x0 */)     
+	       const char* FieldSeparator /* =0x0 */) :
     // leave 'char**' non-const to honor less capable compilers ... 
+  prefix(),
+  section(),
+  section_list(),
+  argv(),
+  cursor(),
+  search_loop_f(),
+  search_failed_f(),
+  nominus_cursor(),
+  idx_nominus(),
+  variables(),
+  _comment_start(),
+  _comment_end(),
+  _field_separator(),
+  _getpot_mtx(),
+  _internal_string_container(),
+  _requested_arguments(),
+  _requested_variables(),
+  _requested_sections(),
+  request_recording_f()
 {
     this->parse_command_line(argc_, argv_, FieldSeparator);
 }
@@ -492,7 +530,26 @@ GetPot::parse_command_line(const int argc_, char ** argv_,
 inline
 GetPot::GetPot(const char* FileName,
 	       const char* CommentStart  /* = 0x0 */, const char* CommentEnd /* = 0x0 */,
-	       const char* FieldSeparator/* = 0x0 */)     
+	       const char* FieldSeparator/* = 0x0 */) :
+  prefix(),
+  section(),
+  section_list(),
+  argv(),
+  cursor(),
+  search_loop_f(),
+  search_failed_f(),
+  nominus_cursor(),
+  idx_nominus(),
+  variables(),
+  _comment_start(),
+  _comment_end(),
+  _field_separator(),
+  _getpot_mtx(),
+  _internal_string_container(),
+  _requested_arguments(),
+  _requested_variables(),
+  _requested_sections(),
+  request_recording_f()
 {
   const std::string& StrCommentStart   = CommentStart   ? CommentStart   : std::string("#");
   const std::string& StrCommentEnd     = CommentEnd     ? CommentEnd     : std::string("\n");
@@ -506,7 +563,26 @@ inline
 GetPot::GetPot(const std::string& FileName,
                const std::string& CommentStart,
                const std::string& CommentEnd,
-               const std::string& FieldSeparator)
+               const std::string& FieldSeparator) :
+  prefix(),
+  section(),
+  section_list(),
+  argv(),
+  cursor(),
+  search_loop_f(),
+  search_failed_f(),
+  nominus_cursor(),
+  idx_nominus(),
+  variables(),
+  _comment_start(),
+  _comment_end(),
+  _field_separator(),
+  _getpot_mtx(),
+  _internal_string_container(),
+  _requested_arguments(),
+  _requested_variables(),
+  _requested_sections(),
+  request_recording_f()
 {
     this->parse_input_file(FileName, CommentStart, CommentEnd, FieldSeparator);
 }
@@ -537,15 +613,48 @@ GetPot::parse_input_file(const std::string& FileName,
 }
 
 inline
-GetPot::GetPot(const GetPot& Other)
-{ GetPot::operator=(Other); }
+GetPot::GetPot(const GetPot& Other) :
+  prefix(Other.prefix),
+  section(Other.section),
+  section_list(Other.section_list),
+  argv(Other.argv),
+  cursor(Other.cursor),
+  search_loop_f(Other.search_loop_f),
+  search_failed_f(Other.search_failed_f),
+  nominus_cursor(Other.nominus_cursor),
+  idx_nominus(Other.idx_nominus),
+  variables(Other.variables),
+  _comment_start(Other._comment_start),
+  _comment_end(Other._comment_end),
+  _field_separator(Other._field_separator),
+  _getpot_mtx(Other._getpot_mtx),
+  _internal_string_container(),
+  _requested_arguments(Other._requested_arguments),
+  _requested_variables(Other._requested_variables),
+  _requested_sections(Other._requested_sections),
+  request_recording_f(Other.request_recording_f)
+{
+    std::set<const char*,ltstr>::const_iterator it = 
+      Other._internal_string_container.begin();
+
+    const std::set<const char*,ltstr>::const_iterator end = 
+      Other._internal_string_container.end();
+
+    for (; it != end; ++it) {
+        const char* otherstr = *it;
+        char* newcopy = new char[strlen(otherstr)+1];
+        strncpy(newcopy, otherstr, strlen(otherstr)+1);
+        this->_internal_string_container.insert(newcopy);
+    }
+}
 
 inline
 GetPot::~GetPot()
 { 
     // // may be some return strings had to be created, delete now !
-    std::set<const char*, ltstr>::const_iterator it = _internal_string_container.begin(); \
-    for(; it != _internal_string_container.end(); it++)
+    std::set<const char*, ltstr>::const_iterator        it = _internal_string_container.begin();
+    const std::set<const char*, ltstr>::const_iterator end = _internal_string_container.end();
+    for(; it != end; it++)
         delete [] *it;	
 }
 
@@ -554,18 +663,46 @@ GetPot::operator=(const GetPot& Other)
 {
     if (&Other == this) return *this;
 
-    _comment_start  = Other._comment_start;
-    _comment_end    = Other._comment_end;
-    argv            = Other.argv;
-    variables       = Other.variables;
-    prefix          = Other.prefix;
+    prefix               = Other.prefix;
+    section              = Other.section;
+    section_list         = Other.section_list;
+    argv                 = Other.argv;
+    cursor               = Other.cursor;
+    search_loop_f        = Other.search_loop_f;
+    search_failed_f      = Other.search_failed_f;
+    nominus_cursor       = Other.nominus_cursor;
+    idx_nominus          = Other.idx_nominus;
+    variables            = Other.variables;
+    _comment_start       = Other._comment_start;
+    _comment_end         = Other._comment_end;
+    _field_separator     = Other._field_separator;
+    _getpot_mtx          = Other._getpot_mtx;
+    _requested_arguments = Other._requested_arguments;
+    _requested_variables = Other._requested_variables;
+    _requested_sections  = Other._requested_sections;
+    request_recording_f  = Other.request_recording_f;
 
-    cursor          = Other.cursor;
-    nominus_cursor  = Other.nominus_cursor;
-    search_failed_f = Other.search_failed_f;
+    std::set<const char*, ltstr>::const_iterator        my_it =
+      _internal_string_container.begin();
+    const std::set<const char*, ltstr>::const_iterator my_end =
+      _internal_string_container.end();
 
-    idx_nominus     = Other.idx_nominus;
-    search_loop_f   = Other.search_loop_f;
+    for(; my_it != my_end; my_it++)
+        delete [] *my_it;	
+
+    _internal_string_container.clear();
+
+    std::set<const char*,ltstr>::const_iterator it = 
+      Other._internal_string_container.begin();
+    const std::set<const char*,ltstr>::const_iterator end = 
+      Other._internal_string_container.end();
+
+    for (; it != end; ++it) {
+        const char* otherstr = *it;
+        char* newcopy = new char[strlen(otherstr)+1];
+        strncpy(newcopy, otherstr, strlen(otherstr)+1);
+        this->_internal_string_container.insert(newcopy);
+    }
 
     return *this;
 }
