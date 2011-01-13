@@ -1344,11 +1344,13 @@ private:
 
   public:
     BuildProjectionList (const System &system_in) :
-    system(system_in)
+      system(system_in),
+      send_list()
     {}
 
     BuildProjectionList (BuildProjectionList &other, Threads::split) :
-     system(other.system)
+      system(other.system),
+      send_list()
     {}
     
     void unique();

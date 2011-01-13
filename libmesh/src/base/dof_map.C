@@ -52,12 +52,24 @@ namespace libMesh
 
 DofMap::DofMap(const unsigned int number) :
   _dof_coupling(NULL),
+  _variables(),
   _sys_number(number),
-//  _matrix(NULL),
+  _matrices(),
+  _first_df(),
+  _end_df(),
+  _var_first_local_df(),
+  _send_list(),
+  _n_nz(),
+  _n_oz(),
   _n_dfs(0),
   _n_SCALAR_dofs(0)
 #ifdef LIBMESH_ENABLE_AMR
-  , _n_old_dfs(0)
+  , _n_old_dfs(0),
+  _first_old_df(),
+  _end_old_df()
+#endif
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+  , _dof_constraints()
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
   , _periodic_boundaries(new PeriodicBoundaries)

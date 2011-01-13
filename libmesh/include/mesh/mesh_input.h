@@ -124,6 +124,7 @@ class MeshInput
 template <class MT>
 inline
 MeshInput<MT>::MeshInput (const bool is_parallel_format) :
+  elems_of_dimension(),
   _obj (NULL),
   _is_parallel_format(is_parallel_format)
 {
@@ -134,6 +135,7 @@ MeshInput<MT>::MeshInput (const bool is_parallel_format) :
 template <class MT>
 inline
 MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
+  elems_of_dimension(),
   _obj (&obj),
   _is_parallel_format(is_parallel_format)
 {
