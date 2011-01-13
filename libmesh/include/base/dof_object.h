@@ -78,6 +78,11 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
   
   /**
+   * Deep-copying assignment operator
+   */ 
+  DofObject& operator= (const DofObject& dof_obj);
+
+  /**
    * This object on the last mesh.  Useful for projecting
    * solutions from one mesh to another.
    */
