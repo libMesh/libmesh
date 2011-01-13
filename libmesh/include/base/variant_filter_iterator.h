@@ -70,7 +70,7 @@ public:
     virtual ~IterBase() {}
     virtual  IterBase* clone() const = 0 ;
     virtual ReferenceType operator*() const = 0;    // <-- CUSTOM INTERFACE METHOD
-    virtual void operator++() = 0;          // <-- CUSTOM INTERFACE METHOD
+    virtual IterBase& operator++() = 0;          // <-- CUSTOM INTERFACE METHOD
     virtual bool equal(const IterBase *other) const = 0;
 
     // Similar to clone function above, but returns a pointer to a copy of a different type.
@@ -182,9 +182,10 @@ public:
     /**
      * Custom interface method.
      */
-    virtual void operator++()         // <-- CUSTOM INTERFACE METHOD
+    virtual Iter& operator++()         // <-- CUSTOM INTERFACE METHOD
     {
       ++iter_data;
+      return *this;
     }
 
     /**
