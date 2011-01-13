@@ -117,6 +117,67 @@ DofObject::DofObject (const DofObject& dof_obj) :
 
 
 
+// Deep-copying assignment operator
+DofObject& DofObject::operator= (const DofObject& dof_obj)
+{
+#ifdef LIBMESH_ENABLE_AMR
+  this->clear_old_dof_object();
+  
+  this->old_dof_object = new DofObject(*(dof_obj.old_dof_object));
+#endif
+
+  _id = dof_obj._id;
+  _processor_id = dof_obj._processor_id;
+  this->set_n_systems(dof_obj._n_systems);
+  
+  // If n_systems==0, we don't enter this for loop.
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {
+      // In case you have a system with no variables, it is undefined
+      // behavior (UB) to allocate a zero-length array here.
+      if (dof_obj.n_vars(s) > 0)
+	{
+	  _n_v_comp[s] = new unsigned char [dof_obj.n_vars(s)+1]; 
+	  _dof_ids[s]  = new unsigned int  [dof_obj.n_vars(s)];
+	  
+	  _n_v_comp[s][0] = dof_obj.n_vars(s);
+
+	}
+      for (unsigned int v=0; v<this->n_vars(s); v++)
+	{
+	  _n_v_comp[s][v+1]  = dof_obj.n_comp(s,v);
+
+	  if (this->n_comp(s,v) > 0)
+	    _dof_ids[s][v] = dof_obj.dof_number(s,v,0);
+          else
+	    _dof_ids[s][v] = invalid_id;
+	}
+    }
+
+  // Check that everything worked
+#ifdef DEBUG
+
+  libmesh_assert (this->n_systems() == dof_obj.n_systems());
+
+  for (unsigned int s=0; s<this->n_systems(); s++)
+    {
+      libmesh_assert (this->n_vars(s) == dof_obj.n_vars(s));
+
+      for (unsigned int v=0; v<this->n_vars(s); v++)
+	{
+	  libmesh_assert (this->n_comp(s,v) == dof_obj.n_comp(s,v));
+
+	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
+	    libmesh_assert (this->dof_number(s,v,c) == dof_obj.dof_number(s,v,c));
+	}
+    }
+  
+#endif
+}
+
+
+
+
 
 #ifdef LIBMESH_ENABLE_AMR
 
