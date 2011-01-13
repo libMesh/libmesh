@@ -53,6 +53,10 @@ public:
 	       pairedboundary;
 
   PeriodicBoundary() :
+    myboundary(-1),
+    pairedboundary(-1),
+    translation_vector(),
+    variable(0),
     var_set(false)
   {
   }
@@ -60,10 +64,11 @@ public:
   ~PeriodicBoundary() {}
 
   PeriodicBoundary(const PeriodicBoundary & o, bool inverse = false) :
-      myboundary(o.myboundary),
-      pairedboundary(o.pairedboundary),
-      translation_vector(o.translation_vector),
-      var_set(o.var_set)
+    myboundary(o.myboundary),
+    pairedboundary(o.pairedboundary),
+    translation_vector(o.translation_vector),
+    variable(0),
+    var_set(o.var_set)
   {
     if (inverse)
     {
@@ -73,7 +78,10 @@ public:
   }
 
   PeriodicBoundary(const RealVectorValue & vector) :
+    myboundary(-1),
+    pairedboundary(-1),
     translation_vector (vector),
+    variable(0),
     var_set(false)
   {
   }
@@ -103,8 +111,8 @@ protected:
   // to produce corresponding points in pairedboundary
   RealVectorValue translation_vector;
 
-  bool var_set;
   unsigned int variable;
+  bool var_set;
 };
 
 
