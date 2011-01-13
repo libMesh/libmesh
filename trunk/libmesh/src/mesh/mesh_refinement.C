@@ -485,10 +485,16 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   const bool coarsening_changed_mesh =
     this->_coarsen_elements ();
 
-  if (_maintain_level_one)
-    libmesh_assert(test_level_one(true));
-  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
-  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
+// FIXME: test_level_one now tests consistency across periodic
+// boundaries, which requires a point_locator, which just got
+// invalidated by _coarsen_elements() and hasn't yet been cleared by
+// prepare_for_use().
+
+//  if (_maintain_level_one)
+//    libmesh_assert(test_level_one(true));
+//  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
+//  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
+
 // FIXME: This won't pass unless we add a redundant find_neighbors()
 // call or replace find_neighbors() with on-the-fly neighbor updating
 // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -502,15 +508,6 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   const bool refining_changed_mesh =
     this->_refine_elements();
 
-  if (_maintain_level_one)
-    libmesh_assert(test_level_one(true));
-  libmesh_assert(test_unflagged(true));
-  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
-  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
-// FIXME: This won't pass unless we add a redundant find_neighbors()
-// call or replace find_neighbors() with on-the-fly neighbor updating
-// libmesh_assert(!this->eliminate_unrefined_patches());
-
   // Finally, the new mesh needs to be prepared for use
   if (coarsening_changed_mesh || refining_changed_mesh)
     {
@@ -519,9 +516,27 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
       if (pmesh)
         pmesh->libmesh_assert_valid_parallel_ids();
 #endif
+
       _mesh.prepare_for_use (/*skip_renumber =*/false);
       
+      if (_maintain_level_one)
+        libmesh_assert(test_level_one(true));
+      libmesh_assert(test_unflagged(true));
+      libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
+      libmesh_assert(this->make_refinement_compatible(maintain_level_one));
+// FIXME: This won't pass unless we add a redundant find_neighbors()
+// call or replace find_neighbors() with on-the-fly neighbor updating
+// libmesh_assert(!this->eliminate_unrefined_patches());
+
       return true;
+    }
+  else
+    {
+      if (_maintain_level_one)
+        libmesh_assert(test_level_one(true));
+      libmesh_assert(test_unflagged(true));
+      libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
+      libmesh_assert(this->make_refinement_compatible(maintain_level_one));
     }
 
   // Otherwise there was no change in the mesh,
