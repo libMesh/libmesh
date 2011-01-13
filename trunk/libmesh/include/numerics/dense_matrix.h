@@ -490,7 +490,9 @@ DenseMatrix<T>::DenseMatrix(const unsigned int m,
 #else
     use_blas_lapack(false),
 #endif
-    _decomposition_type(NONE)
+    _val(),
+    _decomposition_type(NONE),
+    _pivots()
 {
   this->resize(m,n);
 }

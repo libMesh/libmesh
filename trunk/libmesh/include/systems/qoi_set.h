@@ -94,7 +94,7 @@ public:
    * it doesn't even know how many QoIs your system has, it
    * just knows to instruct a function to use all of them.
    */
-  QoISet() {}
+  QoISet() : _indices(), _weights() {}
 
   /**
    * Default constructor: "calculate all QoIs in the System",
@@ -106,7 +106,8 @@ public:
    * Constructor-from-vector-of-bool: "calculate the QoIs for which
    * \p indices[q] is true"
    */
-  QoISet(const std::vector<bool> &indices) : _indices(indices) {}
+  QoISet(const std::vector<bool> &indices) :
+    _indices(indices), _weights() {}
 
   /**
    * Constructor-from-vector: "calculate the listed QoIs", "give every
@@ -180,7 +181,8 @@ private:
 
 
 inline
-QoISet::QoISet(const std::vector<unsigned int> &indices) 
+QoISet::QoISet(const std::vector<unsigned int> &indices) :
+  _indices(), _weights()
 {
   this->add_indices(indices);
 }

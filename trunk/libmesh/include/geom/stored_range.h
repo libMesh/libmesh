@@ -64,7 +64,12 @@ public:
    * execution.
    */
   StoredRange (const unsigned int grainsize = 1000) :
-  _grainsize(grainsize)
+    _end(),
+    _begin(),
+    _last(),
+    _first(),
+    _grainsize(grainsize),
+    _objs()
   {}
 
   /**
@@ -76,7 +81,12 @@ public:
   StoredRange (const iterator_type &first,
 	       const iterator_type &last,
 	       const unsigned int grainsize = 1000) :
-  _grainsize(grainsize)
+    _end(),
+    _begin(),
+    _last(),
+    _first(),
+    _grainsize(grainsize),
+    _objs()
   {
     this->reset(first, last);
   }
@@ -99,7 +109,8 @@ public:
     _begin(er._begin),
     _last(er._last),
     _first(er._first),
-    _grainsize(er._grainsize)
+    _grainsize(er._grainsize),
+    _objs()
   {
     // specifically, do *not* copy the vector
   }
@@ -114,7 +125,8 @@ public:
     _begin(r._begin),
     _last(r._last),
     _first(r._first),
-    _grainsize(r._grainsize)
+    _grainsize(r._grainsize),
+    _objs()
   {
     const_iterator
       beginning = r._begin,
