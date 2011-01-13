@@ -913,11 +913,6 @@ protected:
   std::vector<Real>  dzetadz_map;
 
   /**
-   * Shape function values.
-   */
-  std::vector<std::vector<Real> >   phi;
-
-  /**
    * Have calculations with this object already been started?
    * Then all get_* functions should already have been called.
    */
@@ -937,6 +932,11 @@ protected:
    * Should we calculate shape function hessians?
    */
   mutable bool calculate_d2phi;
+
+  /**
+   * Shape function values.
+   */
+  std::vector<std::vector<Real> >   phi;
 
   /**
    * Shape function derivative values.
@@ -1264,10 +1264,81 @@ inline
 FEBase::FEBase(const unsigned int d,
 	       const FEType& fet) :
   dim(d),
+  xyz(),
+  dxyzdxi_map(),
+  dxyzdeta_map(),
+  dxyzdzeta_map(),
+  d2xyzdxi2_map(),
+  d2xyzdxideta_map(),
+  d2xyzdeta2_map(),
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  d2xyzdxidzeta_map(),
+  d2xyzdetadzeta_map(),
+  d2xyzdzeta2_map(),
+#endif
+  dxidx_map(),
+  dxidy_map(),
+  dxidz_map(),
+  detadx_map(),
+  detady_map(),
+  detadz_map(),
+  dzetadx_map(),
+  dzetady_map(),
+  dzetadz_map(),
   calculations_started(false),
   calculate_phi(false),
   calculate_dphi(false),
   calculate_d2phi(false),
+  phi(),
+  dphi(),
+  dphidxi(),
+  dphideta(),
+  dphidzeta(),
+  dphidx(),
+  dphidy(),
+  dphidz(),
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  d2phi(),
+  d2phidxi2(),
+  d2phidxideta(),
+  d2phidxidzeta(),
+  d2phideta2(),
+  d2phidetadzeta(),
+  d2phidzeta2(),
+  d2phidx2(),
+  d2phidxdy(),
+  d2phidxdz(),
+  d2phidy2(),
+  d2phidydz(),
+  d2phidz2(),
+#endif
+  phi_map(),
+  dphidxi_map(),
+  dphideta_map(),
+  dphidzeta_map(),
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  d2phidxi2_map(),
+  d2phidxideta_map(),
+  d2phidxidzeta_map(),
+  d2phideta2_map(),
+  d2phidetadzeta_map(),
+  d2phidzeta2_map(),
+#endif
+  psi_map(),
+  dpsidxi_map(),
+  dpsideta_map(),
+  d2psidxi2_map(),
+  d2psidxideta_map(),
+  d2psideta2_map(),
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  dphase(),
+  dweight(),
+  weight(),
+#endif
+  tangents(),
+  normals(),
+  curvatures(),
+  JxW(),
   fe_type(fet),
   elem_type(INVALID_ELEM),
   _p_level(0),
