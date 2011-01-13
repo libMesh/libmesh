@@ -1097,17 +1097,20 @@ inline
 Elem::Elem(const unsigned int nn,
 	   const unsigned int ns,
 	   Elem* p) :
-  _parent(p)
+  _nodes(NULL),
+  _neighbors(NULL),
+  _parent(p),
 #ifdef LIBMESH_ENABLE_AMR
-  , _p_level(0)
+  _children(NULL),
+  _rflag(Elem::DO_NOTHING),
+  _pflag(Elem::DO_NOTHING),
+  _p_level(0),
 #endif
+  _sbd_id(0)
 {
-  this->subdomain_id() = 0;
   this->processor_id() = DofObject::invalid_processor_id;
   
   // Initialize the nodes data structure
-  _nodes = NULL;
-  
   if (nn != 0)
     {
       _nodes = new Node*[nn]; 
@@ -1117,8 +1120,6 @@ Elem::Elem(const unsigned int nn,
     }
   
   // Initialize the neighbors data structure
-  _neighbors = NULL;
-  
   if (ns != 0)
     {
       _neighbors = new Elem*[ns]; 
@@ -1135,18 +1136,8 @@ Elem::Elem(const unsigned int nn,
     }  
 
 #ifdef LIBMESH_ENABLE_AMR
-  
-  _children = NULL;
-
-  this->set_refinement_flag(Elem::DO_NOTHING);
-
-  this->set_p_refinement_flag(Elem::DO_NOTHING);
-
   if (this->parent())
     this->set_p_level(parent()->p_level());
-  else
-    this->set_p_level(0);
-
 #endif
 }
 
@@ -1946,6 +1937,7 @@ public:
   SideIter(const unsigned int side_number,
 	   Elem* parent)
     : _side_number(side_number),
+      _side(),
       _side_ptr(NULL),
       _parent(parent)
   {}
@@ -1954,6 +1946,7 @@ public:
   // Empty constructor.
   SideIter()
     : _side_number(libMesh::invalid_uint),
+      _side(),
       _side_ptr(NULL),
       _parent(NULL)
   {}
@@ -1962,6 +1955,8 @@ public:
   // Copy constructor
   SideIter(const SideIter& other)
     : _side_number(other._side_number),
+      _side(),
+      _side_ptr(NULL),
       _parent(other._parent)
   {}
 
