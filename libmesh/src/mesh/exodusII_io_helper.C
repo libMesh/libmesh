@@ -1153,6 +1153,19 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number
 
 
 
+void ExodusII_IO_Helper::write_information_records(const std::vector<std::string> & records)
+{
+  int num_records = records.size();
+  std::vector<char *> info(num_records);
+  for ( int i(0); i < num_records;  ++i )
+  {
+    info[i] = (char*)records[i].c_str();
+  }
+  ex_err = exII::ex_put_info(ex_id, num_records, &info[0]);
+  check_err(ex_err, "Error writing global values.");
+}
+
+
 void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values, int timestep)
 {
   ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_globals, &values[0]);

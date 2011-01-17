@@ -120,10 +120,15 @@ class ExodusII_IO : public MeshInput<MeshBase>,
 			 const std::vector<std::string>&);
 
   /**
-   * Write out a global variables.
+   * Write out global variables.
    */
   void write_global_data (const std::vector<Number>&,
                           const std::vector<std::string>&);
+
+  /**
+   * Write out information records.
+   */
+  void write_information_records (const std::vector<std::string>&);
 
   /**
    * Writes out the solution at a specific timestep.

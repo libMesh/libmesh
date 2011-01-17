@@ -512,6 +512,11 @@ public:
   void write_nodal_values(int var_id, const std::vector<Number> & values, int timestep);
 
   /**
+   * Writes the vector of information records.
+   */
+  void write_information_records(const std::vector<std::string> & records);
+
+  /**
    * Writes the vector of global variables.
    */
   void write_global_values(const std::vector<Number> & values, int timestep);

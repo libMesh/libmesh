@@ -453,6 +453,37 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 
+void ExodusII_IO::write_information_records ( const std::vector<std::string>& )
+{
+
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+	        << std::endl;
+  libmesh_error();
+}
+
+#else
+
+void ExodusII_IO::write_information_records (const std::vector<std::string>& records)
+{
+  if (libMesh::processor_id() == 0)
+    {
+
+      if (!exio_helper->created())
+	{
+          libMesh::err << "ERROR, ExodusII file must be initialized "
+                       << "before outputting information records.\n"
+                       << std::endl;
+          libmesh_error();
+	}
+
+      exio_helper->write_information_records( records );
+    }
+}
+
+#endif
+
+#ifndef LIBMESH_HAVE_EXODUS_API
+
 void ExodusII_IO::write_global_data (const std::vector<Number>& ,
 				    const std::vector<std::string>& )
 {
