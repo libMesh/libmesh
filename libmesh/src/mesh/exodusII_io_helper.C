@@ -636,7 +636,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 			     str_title.c_str(),
 			     num_dim,
 			     num_nodes,
-			     num_elem,
+			     mesh.n_active_elem(),
 			     num_elem_blk,
 			     num_node_sets,
 			     num_side_sets);
