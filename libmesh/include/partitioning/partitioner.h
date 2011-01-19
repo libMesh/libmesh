@@ -33,7 +33,7 @@ namespace libMesh
 
 // Forward Declarations
 class MeshBase;
-
+class ErrorVector;
 
 
 /**
@@ -52,7 +52,7 @@ class Partitioner
   /**
    * Constructor.
    */
-  Partitioner () {}
+  Partitioner ():_weights(NULL) {}
   
   /**
    * Destructor. Virtual so that we can derive from this class.
@@ -109,6 +109,13 @@ class Partitioner
    * processor ID for all of the elements which share the node.
    */
   static void set_node_processor_ids(MeshBase& mesh);
+
+  /**
+   * Attach weights that can be used for partitioning.  This ErrorVector should be
+   * _exactly_ the same on every processor and should have mesh->max_elem_id()
+   * entries.
+   */
+  virtual void attach_weights(ErrorVector * weights) { libmesh_not_implemented(); }
   
 protected:
 
@@ -141,6 +148,11 @@ protected:
    * maximum vector size which can be used in a single communication step.
    */
   static const unsigned int communication_blocksize;
+
+  /**
+   * The weights that might be used for partitioning.
+   */
+  ErrorVector * _weights;
 };
 
 

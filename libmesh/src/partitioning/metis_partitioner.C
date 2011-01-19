@@ -29,6 +29,7 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 #include "mesh_communication.h"
+#include "error_vector.h"
 
 #ifdef LIBMESH_HAVE_METIS
 // MIPSPro 7.4.2 gets confused about these nested namespaces
@@ -159,7 +160,10 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
 	// maybe there is a better weight?
 	// The weight is used to define what a balanced graph is
-	vwgt[elem_global_index] = elem->n_nodes(); 
+        if(!_weights)
+          vwgt[elem_global_index] = elem->n_nodes();
+        else
+          vwgt[elem_global_index] = (*_weights)[elem->id()];
 
 	// Loop over the element's neighbors.  An element
 	// adjacency corresponds to a face neighbor
