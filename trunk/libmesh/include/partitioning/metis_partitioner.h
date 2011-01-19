@@ -30,8 +30,6 @@
 namespace libMesh
 {
 
-
-
 /**
  * The \p MetisPartitioner uses the Metis graph partitioner
  * to partition the elements.
@@ -58,14 +56,14 @@ class MetisPartitioner : public Partitioner
     return cloned_partitioner;
   }
 
+  virtual void attach_weights(ErrorVector * weights) { _weights = weights; }
+  
 protected:
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
   virtual void _do_partition (MeshBase& mesh,
 			      const unsigned int n);
-
-private:
 };
 
 
