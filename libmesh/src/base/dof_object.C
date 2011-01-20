@@ -173,6 +173,8 @@ DofObject& DofObject::operator= (const DofObject& dof_obj)
     }
   
 #endif
+
+  return *this;
 }
 
 

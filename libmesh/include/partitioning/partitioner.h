@@ -115,7 +115,7 @@ class Partitioner
    * _exactly_ the same on every processor and should have mesh->max_elem_id()
    * entries.
    */
-  virtual void attach_weights(ErrorVector * weights) { libmesh_not_implemented(); }
+  virtual void attach_weights(ErrorVector * /*weights*/) { libmesh_not_implemented(); }
   
 protected:
 
