@@ -878,7 +878,39 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
 	      next_free_dof += elem->n_comp(sys_num,var);
 	    }
     } // done looping over elements
+    
 
+  // we may have missed assigning DOFs to nodes that we own
+  // but to which we have no connected elements matching our
+  // variable restriction criterion.  this will happen, for example,
+  // if variable V is restricted to subdomain S.  We may not own
+  // any elements which live in S, but we may own nodes which are
+  // *connected* to elements which do.  in this scenario these nodes
+  // will presently have unnumbered DOFs. we need to take care of
+  // them here since we own them and no other processor will touch them.
+  {
+    MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
+    const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+    
+    for (; node_it != node_end; ++node_it)
+      {
+	Node *node = *node_it;
+	libmesh_assert(node);
+
+	for (unsigned var=0; var<n_vars; var++)	  
+	  if (node->n_comp(sys_num,var))
+	    if (node->dof_number(sys_num,var,0) == DofObject::invalid_id)
+	      {		
+		node->set_dof_number (sys_num,
+				      var,
+				      0,
+				      next_free_dof);
+		
+		next_free_dof += node->n_comp(sys_num,var);
+	      }
+      }
+  }
+  
   // Finally, count up the SCALAR dofs
   this->_n_SCALAR_dofs = 0;
   for (unsigned var=0; var<n_vars; var++)
@@ -896,25 +928,27 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
     next_free_dof += _n_SCALAR_dofs;
 
 #ifdef DEBUG
-// Make sure we didn't miss any nodes
-  MeshTools::libmesh_assert_valid_node_procids(mesh);
-
-  MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.local_nodes_end();
-  for (; node_it != node_end; ++node_it)
-    {
-      Node *obj = *node_it;
-      libmesh_assert(obj);
-      unsigned int n_variables = obj->n_vars(this->sys_number());
-      for (unsigned int v=0; v != n_variables; ++v)
-        {
-          unsigned int n_comp =
-            obj->n_comp(this->sys_number(), v);
-          unsigned int first_dof = n_comp ?
-            obj->dof_number(this->sys_number(), v, 0) : 0;
-          libmesh_assert(first_dof != DofObject::invalid_id);
-        }
-    }
+  {
+    // Make sure we didn't miss any nodes
+    MeshTools::libmesh_assert_valid_node_procids(mesh);
+    
+    MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
+    const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+    for (; node_it != node_end; ++node_it)
+      {
+	Node *obj = *node_it;
+	libmesh_assert(obj);
+	unsigned int n_variables = obj->n_vars(this->sys_number());
+	for (unsigned int v=0; v != n_variables; ++v)
+	  {
+	    unsigned int n_comp =
+	      obj->n_comp(this->sys_number(), v);
+	    unsigned int first_dof = n_comp ?
+	      obj->dof_number(this->sys_number(), v, 0) : 0;
+	    libmesh_assert(first_dof != DofObject::invalid_id);
+	  }
+      }
+  }
 #endif // DEBUG
 }
 
@@ -994,6 +1028,36 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
               next_free_dof += elem->n_comp(sys_num,var);
             }
         } // end loop on elements
+      
+      // we may have missed assigning DOFs to nodes that we own
+      // but to which we have no connected elements matching our
+      // variable restriction criterion.  this will happen, for example,
+      // if variable V is restricted to subdomain S.  We may not own
+      // any elements which live in S, but we may own nodes which are
+      // *connected* to elements which do.  in this scenario these nodes
+      // will presently have unnumbered DOFs. we need to take care of
+      // them here since we own them and no other processor will touch them.
+      {
+	MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
+	const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+	
+	for (; node_it != node_end; ++node_it)
+	  {
+	    Node *node = *node_it;
+	    libmesh_assert(node);
+	    
+	    if (node->n_comp(sys_num,var))
+	      if (node->dof_number(sys_num,var,0) == DofObject::invalid_id)
+		{		
+		  node->set_dof_number (sys_num,
+					var,
+					0,
+					next_free_dof);
+		  
+		  next_free_dof += node->n_comp(sys_num,var);
+		}
+	  }
+      }
     } // end loop on variables
 
   // Finally, count up the SCALAR dofs
@@ -1014,27 +1078,29 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
 
   // Cache the last local dof number too
   _var_first_local_df.push_back(next_free_dof);
-
+  
 #ifdef DEBUG
-  // Make sure we didn't miss any nodes
-  MeshTools::libmesh_assert_valid_node_procids(mesh);
-
-  MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.local_nodes_end();
-  for (; node_it != node_end; ++node_it)
-    {
-      Node *obj = *node_it;
-      libmesh_assert(obj);
-      unsigned int n_variables = obj->n_vars(this->sys_number());
-      for (unsigned int v=0; v != n_variables; ++v)
-        {
-          unsigned int n_comp =
-            obj->n_comp(this->sys_number(), v);
-          unsigned int first_dof = n_comp ?
-            obj->dof_number(this->sys_number(), v, 0) : 0;
-          libmesh_assert(first_dof != DofObject::invalid_id);
-        }
-    }
+  {
+    // Make sure we didn't miss any nodes
+    MeshTools::libmesh_assert_valid_node_procids(mesh);
+    
+    MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
+    const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+    for (; node_it != node_end; ++node_it)
+      {
+	Node *obj = *node_it;
+	libmesh_assert(obj);
+	unsigned int n_variables = obj->n_vars(this->sys_number());
+	for (unsigned int v=0; v != n_variables; ++v)
+	  {
+	    unsigned int n_comp =
+	      obj->n_comp(this->sys_number(), v);
+	    unsigned int first_dof = n_comp ?
+	      obj->dof_number(this->sys_number(), v, 0) : 0;
+	    libmesh_assert(first_dof != DofObject::invalid_id);
+	  }
+      }
+  }
 #endif // DEBUG
 }
 
