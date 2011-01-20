@@ -149,6 +149,42 @@ ACX_CHOOSE_PRECISION
 
 
 dnl --------------------------------------------------------------
+dnl Determine support for the C99 "restrict" keyword in the C++
+dnl compiler.  This should place a pound-define statement in the
+dnl config file along the lines of:
+dnl
+dnl #define _libmesh_restrict __restrict
+dnl
+dnl The restrict keyword allows the compiler to make
+dnl certain optimizations which require non-overlapping pointer
+dnl addresses, i.e. in a call to:
+dnl
+dnl foo(int* restrict a, int* restrict b)
+dnl
+dnl the compiler may assume that the memory addresses pointed to
+dnl by a and b do not overlap, and therefore certain low-level
+dnl optimizations can be made.  From the Autoconf documentation:
+dnl
+dnl If the C compiler recognizes a variant spelling for the restrict
+dnl keyword (__restrict, __restrict__, or _Restrict), then define restrict
+dnl to that; this is more likely to do the right thing with compilers that
+dnl support language variants where plain restrict is not a
+dnl keyword. Otherwise, if the C compiler recognizes the restrict keyword,
+dnl don't do anything. Otherwise, define restrict to be empty. Thus,
+dnl programs may simply use restrict as if every C compiler supported it;
+dnl for those that do not, the makefile or configuration header defines it
+dnl away.
+dnl 
+dnl Although support in C++ for the restrict keyword is not required,
+dnl several C++ compilers do accept the keyword. This macro works for
+dnl them, too.
+dnl 
+dnl This macro caches 'no' in the ac_cv_c_restrict variable if restrict is
+dnl not supported, and a supported spelling otherwise.
+AC_C_RESTRICT
+
+
+dnl --------------------------------------------------------------
 dnl getpwuid - enabled by default
 dnl Some systems, for example Crays, actually have getpwuid on the head-node
 dnl but (if I understand correctly) a dynamically-linked glibc is not available
