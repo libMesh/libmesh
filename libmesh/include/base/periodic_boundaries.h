@@ -55,9 +55,7 @@ public:
   PeriodicBoundary() :
     myboundary(-1),
     pairedboundary(-1),
-    translation_vector(),
-    variable(0),
-    var_set(false)
+    translation_vector()
   {
   }
 
@@ -67,8 +65,7 @@ public:
     myboundary(o.myboundary),
     pairedboundary(o.pairedboundary),
     translation_vector(o.translation_vector),
-    variable(0),
-    var_set(o.var_set)
+    variables(o.variables)
   {
     if (inverse)
     {
@@ -80,9 +77,7 @@ public:
   PeriodicBoundary(const RealVectorValue & vector) :
     myboundary(-1),
     pairedboundary(-1),
-    translation_vector (vector),
-    variable(0),
-    var_set(false)
+    translation_vector (vector)
   {
   }
 
@@ -93,13 +88,17 @@ public:
 
   void set_variable(unsigned int var)
   {
-    variable = var;
-    var_set = true;
+    variables.insert(var);
+  }
+
+  void merge(const PeriodicBoundary & pb)
+  {
+    variables.insert(pb.variables.begin(), pb.variables.end());
   }
 
   bool is_my_variable(unsigned int var_num)
   {
-    bool a = !var_set || (var_set && variable == var_num);
+    bool a = variables.empty() || (!variables.empty() && variables.find(var_num) != variables.end());
     return a;
   }
 
@@ -111,8 +110,8 @@ protected:
   // to produce corresponding points in pairedboundary
   RealVectorValue translation_vector;
 
-  unsigned int variable;
-  bool var_set;
+  // Set of variables for this periodiv boundary, empty means all varaibles possible
+  std::set<unsigned int> variables;
 };
 
 
