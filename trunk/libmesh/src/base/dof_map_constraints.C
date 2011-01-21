@@ -1314,16 +1314,26 @@ void DofMap::constrain_p_dofs (unsigned int var,
 
 void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
 {
-  PeriodicBoundary *boundary = new PeriodicBoundary(periodic_boundary);
-  PeriodicBoundary *inverse_boundary = new PeriodicBoundary(periodic_boundary, true);
+  if (_periodic_boundaries->boundary(periodic_boundary.myboundary) == NULL)
+  {
+    PeriodicBoundary *boundary = new PeriodicBoundary(periodic_boundary);
+    PeriodicBoundary *inverse_boundary = new PeriodicBoundary(periodic_boundary, true);
 
-  std::pair<unsigned int, PeriodicBoundary *> bp
-    (boundary->myboundary, boundary);
-  std::pair<unsigned int, PeriodicBoundary *> ibp
-    (boundary->pairedboundary, inverse_boundary);
+    std::pair<unsigned int, PeriodicBoundary *> bp
+      (boundary->myboundary, boundary);
+    std::pair<unsigned int, PeriodicBoundary *> ibp
+      (boundary->pairedboundary, inverse_boundary);
 
-  _periodic_boundaries->insert(bp);
-  _periodic_boundaries->insert(ibp);
+    _periodic_boundaries->insert(bp);
+    _periodic_boundaries->insert(ibp);
+  }
+  else
+  {
+    PeriodicBoundary *boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
+    boundary->merge(periodic_boundary);
+    PeriodicBoundary *inverse_boundary = _periodic_boundaries->boundary(periodic_boundary.pairedboundary);
+    inverse_boundary->merge(periodic_boundary);
+  }
 }
 
 void DofMap::add_periodic_boundary (PeriodicBoundary * boundary, PeriodicBoundary * inverse_boundary)
