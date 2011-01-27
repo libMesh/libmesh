@@ -378,6 +378,12 @@ const float Hex8::_embedding_matrix[8][8][8] =
   }
 };
 
+
+// This map is here to return the proper child taking into account
+// the fact that some children numbers don't match their parent vertices
+const unsigned int Hex8::node_child_map[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
+
+
 #endif
 
 

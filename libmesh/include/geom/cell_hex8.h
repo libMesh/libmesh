@@ -148,6 +148,8 @@ public:
    */
   static const unsigned int edge_nodes_map[12][2];
 
+  static const unsigned int node_child_map[8];
+
   /**
    * A specialization for computing the area of a hexahedron
    * with flat sides.
