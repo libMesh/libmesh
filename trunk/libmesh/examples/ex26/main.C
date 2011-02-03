@@ -17,7 +17,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  U$ */
 
- // <h1>Example 2x - Laplace Equation in the L-Shaped Domain with Adjoint based mesh refinement</h1>
+ // <h1>Example 26 - Laplace Equation in the L-Shaped Domain with Adjoint based mesh refinement</h1>
  //
  // This example solves the Laplace equation on the classic "L-shaped"
  // domain with adaptive mesh refinement. The exact
@@ -37,14 +37,14 @@
  // Element 1: [ 0,1]x[ 0,1]
  // Element 2: [-1,0]x[-1,0]
  // The mesh is provided in the standard libMesh ASCII format file
- // named "lshaped.xda".  In addition, an input file named "ex2x.in"
+ // named "lshaped.xda".  In addition, an input file named "ex26.in"
  // is provided which allows the user to set several parameters for
  // the solution so that the problem can be re-run without a
  // re-compile.  The solution technique employed is to have a
  // refinement loop with a linear (forward and adjoint) solve inside followed by a
  // refinement of the grid and projection of the solution to the new grid
  // In the final loop iteration, there is no additional
- // refinement after the solve.  In the input file "ex2x.in", the variable
+ // refinement after the solve.  In the input file "general.in", the variable
  // "max_adaptivesteps" controls the number of refinement steps, and
  // "refine_fraction" / "coarsen_fraction" determine the number of
  // elements which will be refined / coarsened at each step.
