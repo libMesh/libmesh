@@ -368,14 +368,18 @@ int main (int argc, char** argv)
 	std::cout << "Postprocessing: " << std::endl; 
 	system.postprocess_sides = true;
 	system.postprocess();
-	Real QoI_0_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 0);
-	Real QoI_0_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 0);
-	Real QoI_1_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 1);
-	Real QoI_1_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 1);
+	Number QoI_0_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 0);
+	Number QoI_0_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 0);
+	Number QoI_1_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 1);
+	Number QoI_1_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 1);
 		
-	std::cout<< "The error in QoI 0 is " << std::setprecision(17) << fabs(QoI_0_computed - QoI_0_exact)/QoI_0_exact << std::endl;
+	std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
+                 << std::abs(QoI_0_computed - QoI_0_exact) /
+                    std::abs(QoI_0_exact) << std::endl;
 		
-	std::cout<< "The error in QoI 1 is " << std::setprecision(17) << fabs(QoI_1_computed - QoI_1_exact)/QoI_1_exact << std::endl << std::endl;
+	std::cout<< "The relative error in QoI 1 is " << std::setprecision(17) 
+                 << std::abs(QoI_1_computed - QoI_1_exact) /
+                    std::abs(QoI_1_exact) << std::endl << std::endl;
 	
 	// Now we construct the data structures for the mesh refinement process	
 	ErrorVector error;
@@ -466,14 +470,18 @@ int main (int argc, char** argv)
 	system.postprocess_sides = true;
 	system.postprocess();
 	
-	Real QoI_0_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 0);
-	Real QoI_0_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 0);
-	Real QoI_1_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 1);
-	Real QoI_1_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 1);
+	Number QoI_0_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 0);
+	Number QoI_0_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 0);
+	Number QoI_1_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 1);
+	Number QoI_1_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 1);
 	
-	std::cout<< "The error in QoI 0 is " << std::setprecision(17) << fabs(QoI_0_computed - QoI_0_exact)/QoI_0_exact << std::endl;
+	std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
+                 << std::abs(QoI_0_computed - QoI_0_exact) /
+                    std::abs(QoI_0_exact) << std::endl;
 	
-	std::cout<< "The error in QoI 1 is " << std::setprecision(17) << fabs(QoI_1_computed - QoI_1_exact)/QoI_1_exact << std::endl << std::endl;
+	std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
+                 << std::abs(QoI_1_computed - QoI_1_exact) /
+                    std::abs(QoI_1_exact) << std::endl << std::endl;
 	
 	ErrorVector error;
 	

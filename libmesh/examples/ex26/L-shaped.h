@@ -28,7 +28,7 @@ public:
 
   virtual void postprocess(void);
 
-  Real &get_QoI_value(std::string type, unsigned int QoI_index)
+  Number &get_QoI_value(std::string type, unsigned int QoI_index)
     {
       if(type == "exact")
 	{
@@ -78,11 +78,11 @@ public:
 
   // Variables to hold the computed QoIs
   
-  Real computed_QoI[2];
+  Number computed_QoI[2];
 
   // Variables to read in the exact QoIs from l-shaped.in
  
-  Real exact_QoI[2];
+  Number exact_QoI[2];
   
   // The FE type to use
   std::string _fe_family;

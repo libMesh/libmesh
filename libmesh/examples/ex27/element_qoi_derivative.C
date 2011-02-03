@@ -38,7 +38,6 @@ void LaplaceSystem::element_qoi_derivative (DiffContext &context,
 
   // The basis functions for the element
   const std::vector<std::vector<Real> >          &phi = c.element_fe_var[0]->get_phi();
-  const std::vector<std::vector<RealGradient> > &dphi = c.element_fe_var[0]->get_dphi();
   
   // The element quadrature points
   const std::vector<Point > &q_point = c.element_fe_var[0]->get_xyz();

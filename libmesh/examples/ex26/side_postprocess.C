@@ -46,7 +46,7 @@ void LaplaceSystem::side_postprocess(DiffContext &context)
 
   unsigned int n_qpoints = c.side_qrule->n_points();  
   
-  Real dQoI_1 = 0. ;
+  Number dQoI_1 = 0. ;
 
   // Loop over qp's, compute the function at each qp and add
   // to get the QoI

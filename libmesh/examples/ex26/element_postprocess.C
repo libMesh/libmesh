@@ -45,7 +45,7 @@ void LaplaceSystem::element_postprocess (DiffContext &context)
   // The function R = int_{omega} T dR 
   // omega is a subset of Omega (the whole domain), omega = [0.75, 1.0] x [0.0, 0.25]
 
-  Real dQoI_0 = 0.;
+  Number dQoI_0 = 0.;
   
   // Loop over quadrature points  
   
