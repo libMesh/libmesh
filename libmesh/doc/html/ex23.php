@@ -1229,9 +1229,414 @@ all boundary dofs are Dirichlet.
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
 Updated .depend
-Compiling C++ (in optimized mode) ex23.C...
-/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/libexec/gcc/x86_64-unknown-linux-gnu/4.5.1/cc1plus: error while loading shared libraries: libmpc.so.2: cannot open shared object file: No such file or directory
-make[1]: *** [ex23.x86_64-unknown-linux-gnu.opt.o] Error 1
+***************************************************************
+* Running  ./ex23-opt
+***************************************************************
+ 
+*** Warning, This code is untested, experimental, or likely to see future API changes: src/systems/rb_base.C, line 68, compiled Feb  1 2011 at 13:24:01 ***
+
+RBSystem parameters:
+system name: RBConvectionDiffusion
+constrained_problem: 0
+Nmax: 20
+A_q operators attached: 3
+F_q functions attached: 1
+Number of A EIM systems: 0
+Number of F EIM systems: 0
+n_outputs: 4
+output 0, Q_l = 1
+output 1, Q_l = 1
+output 2, Q_l = 1
+output 3, Q_l = 1
+Parameter 0: Min = -2, Max = 2, log scaling = 0
+Parameter 1: Min = -2, Max = 2, log scaling = 0
+n_training_samples: 100
+using deterministic training samples? 1
+store/load basis functions? 1
+  write out basis functions in binary format? 1
+  read in basis functions in binary format? 1
+store/load residual representors? 0
+low-memory mode? 0
+reuse preconditioner? 1
+return a relative error bound from RB_solve? 1
+write out data during basis training? 0
+initializing calN-dependent data structures? 1
+impose internal Dirichlet BCs? 0
+impose internal fluxes? 0
+quiet mode? 1
+initial parameter: mu[0] = 2, mu[1] = 2
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=2601
+    n_local_nodes()=2601
+  n_elem()=2500
+    n_local_elem()=2500
+    n_active_elem()=2500
+  n_subdomains()=1
+  n_processors()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System "RBConvectionDiffusion"
+    Type "RBSystem"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=2601
+    n_local_dofs()=2601
+    n_constrained_dofs()=0
+    n_vectors()=1
+
+Compute output dual norms
+output_dual_norms[0][0] = 0.323675
+output_dual_norms[1][0] = 0.323675
+output_dual_norms[2][0] = 0.323675
+output_dual_norms[3][0] = 0.323675
+
+---- Training solve 1 ----
+mu[0] = 2
+mu[1] = 2
+
+
+Enriching the RB space
+Reduced basis dimension = 1
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.875694
+
+
+---- Training solve 2 ----
+mu[0] = -2
+mu[1] = -2
+
+
+Enriching the RB space
+Reduced basis dimension = 2
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.510877
+
+
+---- Training solve 3 ----
+mu[0] = -2
+mu[1] = 2
+
+
+Enriching the RB space
+Reduced basis dimension = 3
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.47092
+
+
+---- Training solve 4 ----
+mu[0] = 2
+mu[1] = -2
+
+
+Enriching the RB space
+Reduced basis dimension = 4
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.245027
+
+
+---- Training solve 5 ----
+mu[0] = 0.222222
+mu[1] = 0.222222
+
+
+Enriching the RB space
+Reduced basis dimension = 5
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.193299
+
+
+---- Training solve 6 ----
+mu[0] = -0.666667
+mu[1] = -0.666667
+
+
+Enriching the RB space
+Reduced basis dimension = 6
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.176492
+
+
+---- Training solve 7 ----
+mu[0] = -0.222222
+mu[1] = 2
+
+
+Enriching the RB space
+Reduced basis dimension = 7
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.173431
+
+
+---- Training solve 8 ----
+mu[0] = 2
+mu[1] = -0.222222
+
+
+Enriching the RB space
+Reduced basis dimension = 8
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.146806
+
+
+---- Training solve 9 ----
+mu[0] = -2
+mu[1] = 0.222222
+
+
+Enriching the RB space
+Reduced basis dimension = 9
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.13704
+
+
+---- Training solve 10 ----
+mu[0] = 0.666667
+mu[1] = -1.11111
+
+
+Enriching the RB space
+Reduced basis dimension = 10
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.10405
+
+
+---- Training solve 11 ----
+mu[0] = -0.222222
+mu[1] = -2
+
+
+Enriching the RB space
+Reduced basis dimension = 11
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0896627
+
+
+---- Training solve 12 ----
+mu[0] = -0.666667
+mu[1] = 0.666667
+
+
+Enriching the RB space
+Reduced basis dimension = 12
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0612686
+
+
+---- Training solve 13 ----
+mu[0] = 0.666667
+mu[1] = 1.11111
+
+
+Enriching the RB space
+Reduced basis dimension = 13
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0488624
+
+
+---- Training solve 14 ----
+mu[0] = 0.666667
+mu[1] = -0.222222
+
+
+Enriching the RB space
+Reduced basis dimension = 14
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0459427
+
+
+---- Training solve 15 ----
+mu[0] = -0.222222
+mu[1] = -0.222222
+
+
+Enriching the RB space
+Reduced basis dimension = 15
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0325616
+
+
+---- Training solve 16 ----
+mu[0] = -1.11111
+mu[1] = 1.55556
+
+
+Enriching the RB space
+Reduced basis dimension = 16
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0315341
+
+
+---- Training solve 17 ----
+mu[0] = 1.11111
+mu[1] = 0.666667
+
+
+Enriching the RB space
+Reduced basis dimension = 17
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0291748
+
+
+---- Training solve 18 ----
+mu[0] = 0.222222
+mu[1] = -0.666667
+
+
+Enriching the RB space
+Reduced basis dimension = 18
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0273367
+
+
+---- Training solve 19 ----
+mu[0] = -2
+mu[1] = -0.666667
+
+
+Enriching the RB space
+Reduced basis dimension = 19
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0266323
+
+
+---- Training solve 20 ----
+mu[0] = -1.11111
+mu[1] = 0.222222
+
+
+Enriching the RB space
+Reduced basis dimension = 20
+Updating RB matrices
+Updating RB residual terms
+Performing RB solves on training set
+Maximum a posteriori error is 0.0222554
+
+Maximum number of basis functions reached: Nmax = 20
+In RBSystem::write_offline_data_to_files, directory offline_data already exists, overwriting contents.
+Writing out the basis functions...
+
+-------------------------------------------------------------------
+| Time:           Thu Feb  3 12:13:01 2011                         |
+| OS:             Linux                                            |
+| HostName:       daedalus                                         |
+| OS Release:     2.6.32-26-generic                                |
+| OS Version:     #46-Ubuntu SMP Tue Oct 26 16:47:18 UTC 2010      |
+| Machine:        x86_64                                           |
+| Username:       roystgnr                                         |
+| Configuration:  ./configure run on Tue Feb  1 12:58:27 CST 2011  |
+-------------------------------------------------------------------
+ ---------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=1.08326, Active time=1.06499                                                  |
+ ---------------------------------------------------------------------------------------------------------------
+| Event                             nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                             w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|---------------------------------------------------------------------------------------------------------------|
+|                                                                                                               |
+|                                                                                                               |
+| DofMap                                                                                                        |
+|   add_neighbors_to_send_list()    1         0.0005      0.000452    0.0005      0.000452    0.04     0.04     |
+|   compute_sparsity()              1         0.0030      0.002950    0.0038      0.003843    0.28     0.36     |
+|   create_dof_constraints()        1         0.0003      0.000272    0.0003      0.000272    0.03     0.03     |
+|   distribute_dofs()               1         0.0009      0.000902    0.0028      0.002773    0.08     0.26     |
+|   dof_indices()                   52500     0.0150      0.000000    0.0150      0.000000    1.41     1.41     |
+|   prepare_send_list()             1         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                        1         0.0019      0.001869    0.0019      0.001869    0.18     0.18     |
+|                                                                                                               |
+| FE                                                                                                            |
+|   compute_affine_map()            25200     0.0123      0.000000    0.0123      0.000000    1.16     1.16     |
+|   compute_face_map()              200       0.0004      0.000002    0.0008      0.000004    0.04     0.08     |
+|   compute_shape_functions()       25200     0.0060      0.000000    0.0060      0.000000    0.56     0.56     |
+|   init_face_shape_functions()     105       0.0001      0.000000    0.0001      0.000000    0.00     0.00     |
+|   init_shape_functions()          210       0.0007      0.000003    0.0007      0.000003    0.07     0.07     |
+|   inverse_map()                   800       0.0007      0.000001    0.0007      0.000001    0.07     0.07     |
+|                                                                                                               |
+| Mesh                                                                                                          |
+|   find_neighbors()                1         0.0030      0.002984    0.0030      0.002984    0.28     0.28     |
+|   renumber_nodes_and_elem()       2         0.0001      0.000056    0.0001      0.000056    0.01     0.01     |
+|                                                                                                               |
+| MeshTools::Generation                                                                                         |
+|   build_cube()                    1         0.0007      0.000746    0.0007      0.000746    0.07     0.07     |
+|                                                                                                               |
+| Parallel                                                                                                      |
+|   allgather()                     1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   receive()                       80        0.0001      0.000001    0.0001      0.000001    0.01     0.01     |
+|   send()                          80        0.0002      0.000002    0.0002      0.000002    0.01     0.01     |
+|                                                                                                               |
+| Partitioner                                                                                                   |
+|   single_partition()              1         0.0003      0.000253    0.0003      0.000253    0.02     0.02     |
+|                                                                                                               |
+| PetscLinearSolver                                                                                             |
+|   solve()                         85        0.5664      0.006663    0.5664      0.006663    53.18    53.18    |
+|                                                                                                               |
+| RBSystem                                                                                                      |
+|   RB_solve()                      2000      0.0174      0.000009    0.0752      0.000038    1.64     7.06     |
+|   add_scaled_matrix_and_vector()  9         0.0625      0.006940    0.0978      0.010863    5.87     9.18     |
+|   compute_max_error_bound()       20        0.0019      0.000093    0.0772      0.003858    0.17     7.24     |
+|   compute_output_dual_norms()     1         0.0047      0.004748    0.0357      0.035689    0.45     3.35     |
+|   compute_residual_dual_norm()    2000      0.0576      0.000029    0.0576      0.000029    5.41     5.41     |
+|   enrich_RB_space()               20        0.0127      0.000635    0.0127      0.000635    1.19     1.19     |
+|   initialize_dirichlet_dofs()     1         0.0072      0.007170    0.0131      0.013078    0.67     1.23     |
+|   train_reduced_basis()           1         0.0013      0.001349    0.8949      0.894937    0.13     84.03    |
+|   truth_assembly()                20        0.0218      0.001090    0.0218      0.001090    2.05     2.05     |
+|   truth_solve()                   20        0.0023      0.000114    0.1177      0.005884    0.21     11.05    |
+|   update_RB_system_matrices()     20        0.0651      0.003256    0.0651      0.003256    6.11     6.11     |
+|   update_residual_terms()         20        0.1424      0.007118    0.5852      0.029261    13.37    54.95    |
+|   write_offline_data_to_files()   1         0.0547      0.054738    0.0550      0.054978    5.14     5.16     |
+|   zero_dirichlet_dofs_on_rhs()    65        0.0001      0.000001    0.0010      0.000015    0.01     0.09     |
+|   zero_dirichlet_dofs_on_vector() 65        0.0009      0.000014    0.0009      0.000014    0.09     0.09     |
+ ---------------------------------------------------------------------------------------------------------------
+| Totals:                           108735    1.0650                                          100.00            |
+ ---------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running  ./ex23-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>
