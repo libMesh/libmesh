@@ -57,7 +57,7 @@ coarsen_fraction = 0.0
 coarsen_threshold = 0
 
 # The maximum number of adaptive steps per timestep
-max_adaptivesteps = 4
+max_adaptivesteps = 3
 
 # Use what finite element space?
 fe_family = LAGRANGE
