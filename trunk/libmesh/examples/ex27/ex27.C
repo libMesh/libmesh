@@ -355,10 +355,10 @@ int main (int argc, char** argv)
 
 	GetPot infile("l-shaped.in");
 
-	Real sensitivity_QoI_0_0_computed = sensitivities[0][0];
-	Real sensitivity_QoI_0_0_exact = infile("sensitivity_0_0", 0.0);
-	Real sensitivity_QoI_0_1_computed = sensitivities[0][1];
-	Real sensitivity_QoI_0_1_exact = infile("sensitivity_0_1", 0.0);
+	Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
+	Number sensitivity_QoI_0_0_exact = infile("sensitivity_0_0", 0.0);
+	Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
+	Number sensitivity_QoI_0_1_exact = infile("sensitivity_0_1", 0.0);
 		
 	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
                       << " active elements and "
@@ -368,8 +368,14 @@ int main (int argc, char** argv)
 	std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
 	std::cout<<"Sensitivity of QoI one to Parameter two is "<<sensitivity_QoI_0_1_computed<<std::endl;
 
-	std::cout<< "The error in sensitivity QoI_0_0 is " << std::setprecision(17) << fabs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact << std::endl;
-	std::cout<< "The error in sensitivity QoI_0_1 is " << std::setprecision(17) << fabs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact << std::endl<< std::endl;						       			
+	std::cout<< "The relative error in sensitivity QoI_0_0 is " 
+		 << std::setprecision(17) 
+                 << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact) /
+                    std::abs(sensitivity_QoI_0_0_exact) << std::endl;
+	std::cout<< "The relative error in sensitivity QoI_0_1 is " 
+                 << std::setprecision(17) 
+                 << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact) /
+                    std::abs(sensitivity_QoI_0_1_exact) << std::endl << std::endl;						       			
 
 	// Get a pointer to the solution vector of the adjoint problem for QoI 0
 	PetscVector<Number> &dual_solution_0 = dynamic_cast<PetscVector<Number> &>(system.get_adjoint_solution(0));
@@ -464,10 +470,10 @@ int main (int argc, char** argv)
 	
 	GetPot infile("l-shaped.in");
 
-	Real sensitivity_QoI_0_0_computed = sensitivities[0][0];
-	Real sensitivity_QoI_0_0_exact = infile("sensitivity_0_0", 0.0);
-	Real sensitivity_QoI_0_1_computed = sensitivities[0][1];
-	Real sensitivity_QoI_0_1_exact = infile("sensitivity_0_1", 0.0);
+	Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
+	Number sensitivity_QoI_0_0_exact = infile("sensitivity_0_0", 0.0);
+	Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
+	Number sensitivity_QoI_0_1_exact = infile("sensitivity_0_1", 0.0);
 		
 	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
 		  << " active elements and "
@@ -477,8 +483,12 @@ int main (int argc, char** argv)
 	std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
 	std::cout<<"Sensitivity of QoI one to Parameter two is "<<sensitivity_QoI_0_1_computed<<std::endl;
 
-	std::cout<< "The error in sensitivity QoI_0_0 is " << std::setprecision(17) << fabs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact << std::endl;
-	std::cout<< "The error in sensitivity QoI_0_1 is " << std::setprecision(17) << fabs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact << std::endl << std::endl;
+	std::cout<< "The error in sensitivity QoI_0_0 is "
+                 << std::setprecision(17)
+                 << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact << std::endl;
+	std::cout<< "The error in sensitivity QoI_0_1 is "
+                 << std::setprecision(17)
+                 << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact << std::endl << std::endl;
 		
 	PetscVector<Number> &dual_solution_0 = dynamic_cast<PetscVector<Number> &>(system.get_adjoint_solution(0));
 	

@@ -36,13 +36,9 @@ void LaplaceSystem::element_qoi (DiffContext &context,
 
   const std::vector<Point> &xyz = c.element_fe_var[0]->get_xyz();
 
-  // The number of local degrees of freedom in each variable
-
-  const unsigned int n_T_dofs = c.dof_indices_var[0].size();
-
   unsigned int n_qpoints = c.element_qrule->n_points();
   
-  Real dQoI_0 = 0.;
+  Number dQoI_0 = 0.;
   
   // Loop over quadrature points  
   

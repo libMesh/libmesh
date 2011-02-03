@@ -30,7 +30,7 @@ public:
 
   virtual void postprocess(void);
 
-  Real &get_QoI_value(std::string type, unsigned int QoI_index)
+  Number &get_QoI_value(std::string type, unsigned int QoI_index)
     {
       if(type == "exact")
 	{
@@ -42,7 +42,7 @@ public:
 	}
     }
 
-  Real &get_parameter_value(unsigned int parameter_index)
+  Number &get_parameter_value(unsigned int parameter_index)
     {
       return parameters[parameter_index];
     }
@@ -87,7 +87,7 @@ public:
   Number exact_solution (const Point&);
 
   // Parameters associated with the system
-  std::vector<Real> parameters;
+  std::vector<Number> parameters;
   
   // The ParameterVector object that will contain pointers to
   // the system parameters
@@ -95,11 +95,11 @@ public:
 
   // Variables to hold the computed QoIs
   
-  Real computed_QoI[2];
+  Number computed_QoI[2];
 
   // Variables to read in the exact QoIs from l-shaped.in
  
-  Real exact_QoI[2];
+  Number exact_QoI[2];
   
   // The FE type to use
   std::string _fe_family;

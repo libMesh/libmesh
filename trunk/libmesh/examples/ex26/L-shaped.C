@@ -139,7 +139,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
       Number T = c.side_value(0, qp);
             
       // We get the Dirichlet bcs from the exact solution
-      Real u_dirichlet = exact_solution (qside_point[qp]);
+      Number u_dirichlet = exact_solution (qside_point[qp]);
 
       // The residual from the boundary terms, penalize non-zero temperature
       for (unsigned int i=0; i != n_T_dofs; i++)

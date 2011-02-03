@@ -68,13 +68,9 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> &JxW = c.element_fe_var[0]->get_JxW();
 
-  // Element basis functions
-  const std::vector<std::vector<Real> >          &phi = c.element_fe_var[0]->get_phi();
+  // Element basis function gradients
   const std::vector<std::vector<RealGradient> > &dphi = c.element_fe_var[0]->get_dphi();
   
-  // The quadrature points
-  const std::vector<Point > &q_point = c.element_fe_var[0]->get_xyz(); 
-
   // The number of local degrees of freedom in each variable
   const unsigned int n_T_dofs = c.dof_indices_var[0].size(); 
 
@@ -97,12 +93,12 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 
       // The residual contribution from this element
       for (unsigned int i=0; i != n_T_dofs; i++)
-        F(i) += JxW[qp] * (parameters[0] + (2*parameters[1])) * ( grad_T * dphi[i][qp] ) ;
+        F(i) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( grad_T * dphi[i][qp] ) ;
       if (compute_jacobian)
         for (unsigned int i=0; i != n_T_dofs; i++)
           for (unsigned int j=0; j != n_T_dofs; ++j)
 	    // The analytic jacobian
-            K(i,j) += JxW[qp] * (parameters[0] + (2*parameters[1])) * ( dphi[i][qp] * dphi[j][qp] );
+            K(i,j) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( dphi[i][qp] * dphi[j][qp] );
     } // end of the quadrature point qp-loop
   
   return compute_jacobian;
@@ -140,19 +136,13 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
 
   Real penalty = 1.e10;
 
-  Real TOL = 1.e-10;
-
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
-      // x and y co-ordinates
-      const Real x = qside_point[qp](0);
-      const Real y = qside_point[qp](1);
-
       // Compute the solution at the old Newton iterate
       Number T = c.side_value(0, qp);
             
       // We get the Dirichlet bcs from the exact solution
-      Real u_dirichlet = exact_solution (qside_point[qp]);
+      Number u_dirichlet = exact_solution (qside_point[qp]);
 
       // The residual from the boundary terms, penalize non-zero temperature
       for (unsigned int i=0; i != n_T_dofs; i++)
@@ -197,6 +187,5 @@ Number LaplaceSystem::exact_solution(const Point& p)// xyz location
   if (theta < 0)
     theta += 2. * libMesh::pi;
     
-  return (parameters[0] + (2*parameters[1])) * pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
-           
+  return (parameters[0] + (2.*parameters[1])) * pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
 }
