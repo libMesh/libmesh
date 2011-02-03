@@ -255,6 +255,10 @@ library with the --enable-ifem option</i>
 
 <li><L1><a href="ex25.php">Solving on a Subdomain</a></L1></li>
 
+<li><L1><a href="ex26.php">Adjoint-based Goal Oriented Refinement</a></L1></li>
+
+<li><L1><a href="ex27.php">Adjoint-based Parameter Sensitivities</a></L1></li>
+
 
 </ul>
 
