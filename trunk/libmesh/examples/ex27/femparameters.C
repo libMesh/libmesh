@@ -16,8 +16,6 @@ void FEMParameters::read(GetPot &input)
     std::vector<std::string> variable_names;
    
     
-    GETPOT_INT_INPUT(dimension);        
-    GETPOT_INPUT(elementorder);    
     GETPOT_INT_INPUT(coarserefinements);  
     GETPOT_INPUT(domainfile);
 

@@ -1,10 +1,8 @@
 #include "enum_fe_family.h"
 #include "fem_system.h"
-#include "system.h"
-
 #include "parameter_vector.h"
-
-#include "trilinos_epetra_matrix.h"
+#include "qoi_set.h"
+#include "system.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

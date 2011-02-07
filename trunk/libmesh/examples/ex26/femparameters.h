@@ -2,10 +2,9 @@
 #define __fem_parameters_h__
 
 #include <limits>
+#include <string>
 
 #include "libmesh_common.h"
-#include "dof_map.h"
-#include "enum_norm_type.h"
 #include "getpot.h"
 
 // Bring in everything from the libMesh namespace
@@ -15,8 +14,6 @@ class FEMParameters
 {
 public:
     FEMParameters() :  
-      dimension(2),       
-      elementorder(2),
       domainfile("lshaped.xda"),
       coarserefinements(0),            
       solver_quiet(true),
@@ -39,8 +36,6 @@ public:
 
     void read(GetPot &input);
    
-    unsigned int dimension;  
-    Real elementorder;    
     std::string domainfile;
     unsigned int coarserefinements;
             

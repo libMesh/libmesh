@@ -1,24 +1,13 @@
-#include "L-shaped.h"
-#include "fe_base.h"
-#include "quadrature.h"
-#include "elem.h"
-#include "fem_context.h"
-
-// Some (older) compilers do not offer full stream functionality, OStringStream works around this.
-
-#include "o_string_stream.h"
-
-#include <iostream>
+// General libMesh includes
 #include "libmesh_common.h"
-#include "getpot.h"
-
-// Including files for ofstream objects
-
-#include <fstream>
-#include <sstream>
-
-#include "point_locator_tree.h"
+#include "elem.h"
+#include "fe_base.h"
+#include "fem_context.h"
 #include "point.h"
+#include "quadrature.h"
+
+// Local includes
+#include "L-shaped.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
