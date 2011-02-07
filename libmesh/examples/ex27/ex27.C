@@ -328,7 +328,8 @@ int main (int argc, char** argv)
 	write_output(equation_systems, a_step, "primal", param);
 	
 	// Get a pointer to the primal solution vector
-	PetscVector<Number> &primal_solution = dynamic_cast<PetscVector<Number> &>(*system.solution);
+	NumericVector<Number> &primal_solution =
+          dynamic_cast<NumericVector<Number> &>(*system.solution);
 	
 	// Declare a QoISet object, we need this object to set weights for our QoI error contributions
 	QoISet qois;
@@ -378,7 +379,8 @@ int main (int argc, char** argv)
                     std::abs(sensitivity_QoI_0_1_exact) << std::endl << std::endl;						       			
 
 	// Get a pointer to the solution vector of the adjoint problem for QoI 0
-	PetscVector<Number> &dual_solution_0 = dynamic_cast<PetscVector<Number> &>(system.get_adjoint_solution(0));
+	NumericVector<Number> &dual_solution_0 =
+          dynamic_cast<NumericVector<Number> &>(system.get_adjoint_solution(0));
 
 	// Swap the primal and dual solutions so we can write out the adjoint solution
 	primal_solution.swap(dual_solution_0);	    
@@ -450,7 +452,8 @@ int main (int argc, char** argv)
 	
 	write_output(equation_systems, a_step, "primal", param);	    
 
-	PetscVector<Number> &primal_solution = dynamic_cast<PetscVector<Number> &>(*system.solution);
+	NumericVector<Number> &primal_solution =
+          dynamic_cast<NumericVector<Number> &>(*system.solution);
 				     	
 	QoISet qois;
 	
@@ -490,7 +493,8 @@ int main (int argc, char** argv)
                  << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact << std::endl << std::endl;
 		
-	PetscVector<Number> &dual_solution_0 = dynamic_cast<PetscVector<Number> &>(system.get_adjoint_solution(0));
+	NumericVector<Number> &dual_solution_0 =
+          dynamic_cast<NumericVector<Number> &>(system.get_adjoint_solution(0));
 	
 	primal_solution.swap(dual_solution_0);	    
 	write_output(equation_systems, a_step, "adjoint_0", param);
