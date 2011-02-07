@@ -102,7 +102,7 @@ void fill_dirichlet_bc(EquationSystems& es,
 // The main program
 int main (int argc, char** argv)
 {
-  // Initialize Petsc, like in example 2.
+  // Initialize libraries, like in example 2.
   LibMeshInit init (argc, argv);
 
 #ifdef LIBMESH_ENABLE_PARMESH

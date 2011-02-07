@@ -425,7 +425,7 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
       
           // The element and neighbor boundary matrix are now built
           // for this side.  Add them to the global matrix 
-          // The \p PetscMatrix::add_matrix() members do this for us.
+          // The \p SparseMatrix::add_matrix() members do this for us.
           ellipticdg_system.matrix->add_matrix(Kne,neighbor_dof_indices,dof_indices);
           ellipticdg_system.matrix->add_matrix(Ken,dof_indices,neighbor_dof_indices);
           ellipticdg_system.matrix->add_matrix(Kee,dof_indices);
@@ -435,8 +435,8 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
     }
     // The element interior matrix and right-hand-side are now built
     // for this element.  Add them to the global matrix and
-    // right-hand-side vector.  The \p PetscMatrix::add_matrix()
-    // and \p PetscVector::add_vector() members do this for us.
+    // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+    // and \p NumericVector::add_vector() members do this for us.
     ellipticdg_system.matrix->add_matrix(Ke, dof_indices);
     ellipticdg_system.rhs->add_vector(Fe, dof_indices);
   }

@@ -654,8 +654,8 @@ void assemble_stokes (EquationSystems& es,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p PetscMatrix::add_matrix()
-      // and \p PetscVector::add_vector() members do this for us.
+      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+      // and \p NumericVector::add_vector() members do this for us.
       navier_stokes_system.matrix->add_matrix (Ke, dof_indices);
       navier_stokes_system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop

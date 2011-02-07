@@ -767,8 +767,8 @@ void assemble_laplace(EquationSystems& es,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The \p PetscMatrix::add_matrix()
-      // and \p PetscVector::add_vector() members do this for us.
+      // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+      // and \p NumericVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
       perf_log.push ("matrix insertion");

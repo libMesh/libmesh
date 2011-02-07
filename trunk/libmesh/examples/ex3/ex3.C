@@ -135,13 +135,13 @@ int main (int argc, char** argv)
 
   // Solve the system "Poisson".  Note that calling this
   // member will assemble the linear system and invoke
-  // the default Petsc solver, however the solver can be
+  // the default numerical solver.  With PETSc the solver can be
   // controlled from the command line.  For example,
   // you can invoke conjugate gradient with:
   //
   // ./ex3 -ksp_type cg
   //
-  // and you can get a nice X-window that monitors the solver
+  // You can also get a nice X-window that monitors the solver
   // convergence with:
   //
   // ./ex3 -ksp_xmonitor
