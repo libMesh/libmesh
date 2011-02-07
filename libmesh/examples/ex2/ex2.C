@@ -21,27 +21,27 @@
  //
  // This is the second example program.  It demonstrates how to
  // create an equation system for a simple scalar system.  This
- // example will also introduce some of the issues involved with using Petsc
+ // example will also introduce some of the issues involved with using PETSc
  // in your application.
  //
  // This is the first example program that indirectly
- // uses the Petsc library.  By default equation data is stored
- // in Petsc vectors, which may span multiple processors.  Before
- // Petsc is used it must be initialized via libMesh::init().  Note that
- // by passing argc and argv to Petsc you may specify
- // command line arguments to Petsc.  For example, you might
+ // uses the PETSc library.  By default equation data is stored
+ // in PETSc vectors, which may span multiple processors.  Before
+ // PETSc is used it must be initialized via libMesh::init().  Note that
+ // by passing argc and argv to PETSc you may specify
+ // command line arguments to PETSc.  For example, you might
  // try running this example as:
  //
  // ./ex2 -log_info
  //
- // to see what Petsc is doing behind the scenes or
+ // to see what PETSc is doing behind the scenes or
  //
  // ./ex2 -log_summary
  // 
- // to get a summary of what Petsc did.
+ // to get a summary of what PETSc did.
  // Among other things, libMesh::init() initializes the MPI
- // communications library on your system if you haven't already
- // done so.
+ // communications library and PETSc numeric library on your system if
+ // you haven't already done so.
 
 // C++ include files that we need
 #include <iostream>
