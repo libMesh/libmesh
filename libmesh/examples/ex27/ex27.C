@@ -57,27 +57,16 @@
 
 // C++ includes
 #include <iostream>
-#include <sys/time.h>
 
 // General libMesh includes
-#include "twostep_time_solver.h"
 #include "equation_systems.h"
 #include "error_vector.h"
-#include "euler_solver.h"
-#include "euler2_solver.h"
 #include "mesh.h"
-#include "serial_mesh.h"
-#include "mesh_tools.h"
-#include "mesh_base.h"
 #include "mesh_refinement.h"
 #include "newton_solver.h"
 #include "numeric_vector.h"
-#include "petsc_diff_solver.h"
 #include "steady_solver.h"
 #include "system_norm.h"
-#include "tecplot_io.h"
-#include "trilinos_epetra_matrix.h"
-#include "petsc_vector.h"
 
 // Sensitivity Calculation related includes
 #include "parameter_vector.h"
@@ -111,7 +100,7 @@ using namespace libMesh;
 // Number output files, the files are give a prefix of primal or adjoint_i depending on
 // whether the output is the primal solution or the dual solution for the ith QoI
 
-// Write tecplot, gmv and xda/xdr output
+// Write gmv output
 
 void write_output(EquationSystems &es,		                   
 		  unsigned int a_step, // The adaptive step count
@@ -266,7 +255,7 @@ int main (int argc, char** argv)
   param.read(infile);
 
   // Create a mesh.
-  SerialMesh mesh (param.dimension);
+  Mesh mesh;
 
   // And an object to refine it
   AutoPtr<MeshRefinement> mesh_refinement =
@@ -278,7 +267,7 @@ int main (int argc, char** argv)
   std::cout << "Reading in and building the mesh" << std::endl;
 
    // Read in the mesh
-  mesh.read("lshaped.xda");
+  mesh.read(param.domainfile.c_str());
   // Make all the elements of the mesh second order so we can compute
   // with a higher order basis
   mesh.all_second_order();

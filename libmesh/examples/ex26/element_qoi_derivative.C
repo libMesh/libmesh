@@ -1,15 +1,13 @@
 // General libMesh includes
 #include "libmesh_common.h"
-#include "point.h"
-#include "fem_context.h"
-#include "fe_base.h"
-#include "quadrature.h"
 #include "elem.h"
+#include "fe_base.h"
+#include "fem_context.h"
+#include "point.h"
+#include "quadrature.h"
 
 // Local includes
 #include "L-shaped.h"
-
-#define optassert(X) {if (!(X)) libmesh_error();}
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

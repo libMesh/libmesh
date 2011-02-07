@@ -3,14 +3,10 @@
 // General libMesh includes
 #include "getpot.h"
 #include "fe_base.h"
-#include "fe_interface.h"
-#include "mesh.h"
 #include "quadrature.h"
 #include "string_to_enum.h"
-#include "equation_systems.h"
 #include "parallel.h"
 #include "fem_context.h"
-#include "femparameters.h"
 
 // Local includes
 #include "L-shaped.h"
