@@ -58,6 +58,12 @@ void OFFIO::read_stream(std::istream& in)
   // STL only works in 2D
   mesh.set_mesh_dimension(2);
 
+#if LIBMESH_DIM < 2
+  libMesh::err << "Cannot open dimension 2 mesh file when configured without 2D support." <<
+                  std::endl;
+  libmesh_error();
+#endif
+
   // Check the input buffer
   libmesh_assert (in.good());
 

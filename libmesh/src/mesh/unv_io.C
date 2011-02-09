@@ -265,6 +265,18 @@ void UNVIO::read_implementation (std::istream& in_stream)
       if (elems_of_dimension[i])
         MeshInput<MeshBase>::mesh().set_mesh_dimension(i);
 
+#if LIBMESH_DIM < 3
+    if (MeshInput<MeshBase>::mesh().mesh_dimension() > LIBMESH_DIM)
+      {
+        libMesh::err << "Cannot open dimension " <<
+		        MeshInput<MeshBase>::mesh().mesh_dimension() <<
+		        " mesh file when configured without " <<
+                        MeshInput<MeshBase>::mesh().mesh_dimension() << "D support." <<
+                        std::endl;
+        libmesh_error();
+      }
+#endif
+
     // tell the MeshData object that we are finished 
     // reading data
     this->_mesh_data.close_foreign_id_maps ();

@@ -947,6 +947,18 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
   for (unsigned int i=0; i!=4; ++i)
     if (elems_of_dimension[i])
       mesh.set_mesh_dimension(i);
+
+#if LIBMESH_DIM < 3
+  if (mesh.mesh_dimension() > LIBMESH_DIM)
+    {
+      libMesh::err << "Cannot open dimension " <<
+		      mesh.mesh_dimension() <<
+		      " mesh file when configured without " <<
+                      mesh.mesh_dimension() << "D support." <<
+                      std::endl;
+      libmesh_error();
+    }
+#endif
 }
 
 

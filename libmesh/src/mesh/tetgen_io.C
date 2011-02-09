@@ -45,6 +45,12 @@ void TetGenIO::read (const std::string& name)
   // tetgen only works in 3D
   MeshInput<MeshBase>::mesh().set_mesh_dimension(3);
 
+#if LIBMESH_DIM < 3
+  libMesh::err << "Cannot open dimension 3 mesh file when configured without 3D support." <<
+                  std::endl;
+  libmesh_error();
+#endif
+
   // Check name for *.node or *.ele extension.
   // Set std::istream for node_stream and ele_stream.
   //
