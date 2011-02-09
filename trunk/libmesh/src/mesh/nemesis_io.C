@@ -163,6 +163,18 @@ void Nemesis_IO::read (const std::string& base_filename)
   
   // Be sure number of dimensions is equal to the number of dimensions in the mesh supplied.
   mesh.set_mesh_dimension(static_cast<unsigned int>(nemhelper->num_dim));
+
+#if LIBMESH_DIM < 3
+  if (mesh.mesh_dimension() > LIBMESH_DIM)
+    {
+      libMesh::err << "Cannot open dimension " <<
+		      mesh.mesh_dimension() <<
+		      " mesh file when configured without " <<
+                      mesh.mesh_dimension() << "D support." <<
+                      std::endl;
+      libmesh_error();
+    }
+#endif
   
   // Get global information: number of nodes, elems, blocks, nodesets and sidesets
   nemhelper->get_init_global();
