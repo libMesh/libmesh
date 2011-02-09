@@ -20,6 +20,7 @@
 
 // C/C++ includes
 #include <cstring>
+#include <limits>
 
 // Local includes
 #include "xdr_cxx.h"
