@@ -240,6 +240,9 @@ int main (int argc, char** argv)
   FEMParameters param;
   param.read(infile);
 
+  // Skip this default-2D example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  
   // Create a mesh.
   Mesh mesh;
 
