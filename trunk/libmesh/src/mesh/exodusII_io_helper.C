@@ -620,16 +620,19 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   
   //loop through element and map between block and element vector
   std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
-  for(int i=0;i<num_elem;i++)
-    {
-      Elem * elem = mesh.elem(i);
-      subdomain_id_type cur_subdomain = elem->subdomain_id();
+
+  MeshBase::const_element_iterator it = mesh.active_elements_begin(); 
+  const MeshBase::const_element_iterator end = mesh.active_elements_end();
+  for (; it != end; ++it)
+  {
+    Elem * elem = *it;
+    subdomain_id_type cur_subdomain = elem->subdomain_id();
       
-      if(cur_subdomain == 0)
-        cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
+    if(cur_subdomain == 0)
+      cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
 
       subdomain_map[cur_subdomain].push_back(elem->id());
-    }
+  }
   num_elem_blk = subdomain_map.size();
 
   ex_err = exII::ex_put_init(ex_id,
@@ -695,23 +698,21 @@ void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & 
 void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 {
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
-  
+
+  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin(); 
+  const MeshBase::const_element_iterator end = mesh.active_elements_end();
   //loop through element and map between block and element vector
-  for(unsigned int i=0; i<static_cast<unsigned int>(num_elem); i++)
-    {
-      Elem * elem = mesh.elem(i);
+  for (; mesh_it != end; ++mesh_it)
+  {
+    Elem * elem = *mesh_it;
 
-      //Only write out the active elements
-      if(elem->active())
-      {
-        unsigned int cur_subdomain = elem->subdomain_id();
+    unsigned int cur_subdomain = elem->subdomain_id();
 
-        if(cur_subdomain == 0)
-          cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
+    if(cur_subdomain == 0)
+      cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
      
-        subdomain_map[cur_subdomain].push_back(elem->id());
-      }
-    }
+    subdomain_map[cur_subdomain].push_back(elem->id());
+  }
 
   std::vector<int> elem_num_map;
 
