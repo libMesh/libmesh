@@ -118,12 +118,6 @@ public:
   std::vector<DenseSubVector<Number> *> elem_fixed_subsolutions;
 
   /**
-   * A boolean to be set to true by the library whenever a jacobian
-   * evaluation is being requested.
-   */
-  bool request_jacobian;
-
-  /**
    * The derivative of elem_solution with respect to the nonlinear solution,
    * for use by systems constructing jacobians with elem_fixed_solution
    * based methods
