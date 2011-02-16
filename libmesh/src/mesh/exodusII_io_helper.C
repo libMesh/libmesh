@@ -579,9 +579,10 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
   
   //loop through element and map between block and element vector
   std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
-  for(int i=0;i<num_elem;i++)
+
+  for(it = mesh.active_elements_begin(); it != end; ++it)
     {
-      Elem * elem = mesh.elem(i);
+      Elem * elem = *it;
       subdomain_id_type cur_subdomain = elem->subdomain_id();
       
       if(cur_subdomain == 0)
@@ -779,11 +780,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 {
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
-  
+
+  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin(); 
+  const MeshBase::const_element_iterator end = mesh.active_elements_end();
   //loop through element and map between block and element vector
-  for(unsigned int i=0; i<static_cast<unsigned int>(num_elem); i++)
+  for(; mesh_it != end; ++mesh_it)
     {
-      Elem * elem = mesh.elem(i);
+      Elem * elem = *mesh_it;
 
       //Only write out the active elements
       if(elem->active())
@@ -1106,10 +1109,12 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
 
   const unsigned int num_vars = values.size() / num_elem;
 
+  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin(); 
+  const MeshBase::const_element_iterator end = mesh.active_elements_end();
   //loop through element and map between block and element vector
-  for(unsigned int i=0; i<static_cast<unsigned int>(num_elem); ++i)
+  for( ; mesh_it != end; ++mesh_it)
     {
-      Elem * elem = mesh.elem(i);
+      Elem * elem = *mesh_it;
 
       //Only write out the active elements
       if(elem->active())
