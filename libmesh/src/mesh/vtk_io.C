@@ -356,10 +356,10 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 			System::const_vectors_iterator it = sys.vectors_begin();
 			for(;it!= v_end;++it){ // for all vectors on this system
 				std::vector<Number> values; 	
-				libMesh::out<<"it "<<it->first<<std::endl;  
+//				libMesh::out<<"it "<<it->first<<std::endl;  
 
 				it->second->localize_to_one(values,0);
-				libMesh::out<<"finish localize"<<std::endl;  
+//				libMesh::out<<"finish localize"<<std::endl;  
 				vecs[it->first] = values;
 			}
 		}
@@ -602,15 +602,15 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 		*/
 	  _vtk_grid = vtkUnstructuredGrid::New();
 	  vtkXMLPUnstructuredGridWriter* writer= vtkXMLPUnstructuredGridWriter::New();
-	  libMesh::out<<"get points "<<std::endl;  
+//	  libMesh::out<<"get points "<<std::endl;  
 	  vtkPoints* pnts = nodes_to_vtk((const MeshBase&)es.get_mesh());
 	  _vtk_grid->SetPoints(pnts);
 	 
 	  int * types = new int[es.get_mesh().n_active_elem()];
-	  libMesh::out<<"get cells"<<std::endl;  
+//	  libMesh::out<<"get cells"<<std::endl;  
 	  vtkCellArray* cells = cells_to_vtk((const MeshBase&)es.get_mesh(), types);
 
-	  libMesh::out<<"set cells"<<std::endl;  
+//	  libMesh::out<<"set cells"<<std::endl;  
 	  _vtk_grid->SetCells(types,cells);
 	  
 	  // I'd like to write out meshdata, but this requires some coding, in
@@ -619,7 +619,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  //   if(es.has_mesh_data())
 	  //      meshdata_to_vtk(md,_vtk_grid);
 	  //   libmesh_assert (soln.size() ==mesh.n_nodes()*names.size());
-	  libMesh::out<<"write solution"<<std::endl;  
+//	  libMesh::out<<"write solution"<<std::endl;  
 	  solution_to_vtk(es,_vtk_grid);
 
 //#ifdef DEBUG
@@ -659,11 +659,11 @@ void VTKIO::write (const std::string& name)
 	  MeshBase& mesh = MeshInput<MeshBase>::mesh();
 	  _vtk_grid = vtkUnstructuredGrid::New();
 	  vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
-	  libMesh::out<<"write nodes "<<std::endl;  
+//	  libMesh::out<<"write nodes "<<std::endl;  
 	  vtkPoints* pnts = nodes_to_vtk(mesh);
 	  _vtk_grid->SetPoints(pnts);
 
-	  libMesh::out<<"write elements "<<std::endl;  
+//	  libMesh::out<<"write elements "<<std::endl;  
 	  int * types = new int[mesh.n_active_elem()];
 	  vtkCellArray* cells = cells_to_vtk(mesh,types);
 	  _vtk_grid->SetCells(types,cells);
