@@ -85,7 +85,7 @@
 #include "vtkQuadraticTetra.h"
 #include "vtkBiQuadraticQuad.h"
 */
-#include "vtkFloatArray.h"
+//#include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
@@ -317,11 +317,11 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 
 				std::string name = sys.variable_name(j);
 
-				vtkFloatArray *data = vtkFloatArray::New(); 
+				vtkDoubleArray *data = vtkDoubleArray::New(); 
 
 				data->SetName(name.c_str());
 
-				data->SetNumberOfValues(sys.solution->size());
+				data->SetNumberOfValues(n_nodes);
 
 				for(unsigned int k=0;k<n_nodes;++k){
 
@@ -369,7 +369,7 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 
 		for(;it!=vecs.end();++it){
 
-			vtkFloatArray *data = vtkFloatArray::New(); 
+			vtkDoubleArray *data = vtkDoubleArray::New(); 
 
 			data->SetName(it->first.c_str());
 
