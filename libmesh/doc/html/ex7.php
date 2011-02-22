@@ -1683,6 +1683,8 @@ The "matrix" and "rhs" are now ready for solution
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in optimized mode) ex7.C...
+Linking ex7-opt...
 ***************************************************************
 * Running Example  mpirun -np 2 ./ex7-opt -f .5 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
@@ -1694,11 +1696,11 @@ Assertion `false' failed.  Configuring libMesh with --enable-complex may be requ
 
 ---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
 
-./ex7-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Thu Feb  3 12:13:34 2011
+./ex7-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Tue Feb 22 12:24:52 2011
 Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
 
                          Max       Max/Min        Avg      Total 
-Time (sec):           4.880e-04      1.02709   4.816e-04
+Time (sec):           4.799e-04      1.02967   4.730e-04
 Objects:              0.000e+00      0.00000   0.000e+00
 Flops:                0.000e+00      0.00000   0.000e+00  0.000e+00
 Flops/sec:            0.000e+00      0.00000   0.000e+00  0.000e+00
@@ -1712,7 +1714,7 @@ Flop counting convention: 1 flop = 1 real number operation of type (multiply/div
 
 Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
                         Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 4.5657e-04  94.8%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
+ 0:      Main Stage: 4.4489e-04  94.1%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
 
 ------------------------------------------------------------------------------------------------------------------------
 See the 'Profiling' chapter of the users' manual for details on interpreting output.
@@ -1746,9 +1748,9 @@ Reports information only for process 0.
 --- Event Stage 0: Main Stage
 
 ========================================================================================================================
-Average time to get PetscTime(): 0
+Average time to get PetscTime(): 9.53674e-08
 Average time for MPI_Barrier(): 1.00136e-06
-Average time for zero size MPI_Send(): 8.9407e-06
+Average time for zero size MPI_Send(): 7.98702e-06
 #PETSc Option Table entries:
 -f .5
 -ksp_right_pc

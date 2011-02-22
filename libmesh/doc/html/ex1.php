@@ -61,7 +61,7 @@ Bring in everything from the libMesh namespace
 </div>
 <div class = "comment">
 Initialize the library.  This is necessary because the library
-may depend on a number of other libraries (i.e. MPI  and Petsc)
+may depend on a number of other libraries (i.e. MPI and PETSc)
 that require initialization before use.  When the LibMeshInit
 object goes out of scope, other libraries and resources are
 finalized.
@@ -226,6 +226,8 @@ checks for leaked memory.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in optimized mode) ex1.C...
+Linking ex1-opt...
 ***************************************************************
 * Running Example  mpirun -np 2 ./ex1-opt -d 3 /h2/roystgnr/libmesh/svn/reference_elements/3D/one_hex27.xda -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
@@ -248,11 +250,11 @@ checks for leaked memory.
 
 ---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
 
-./ex1-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Thu Feb  3 12:09:28 2011
+./ex1-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Tue Feb 22 12:19:26 2011
 Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
 
                          Max       Max/Min        Avg      Total 
-Time (sec):           1.387e-03      1.00000   1.387e-03
+Time (sec):           1.694e-02      1.00000   1.694e-02
 Objects:              0.000e+00      0.00000   0.000e+00
 Flops:                0.000e+00      0.00000   0.000e+00  0.000e+00
 Flops/sec:            0.000e+00      0.00000   0.000e+00  0.000e+00
@@ -266,7 +268,7 @@ Flop counting convention: 1 flop = 1 real number operation of type (multiply/div
 
 Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
                         Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 1.3590e-03  98.0%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
+ 0:      Main Stage: 1.6917e-02  99.9%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
 
 ------------------------------------------------------------------------------------------------------------------------
 See the 'Profiling' chapter of the users' manual for details on interpreting output.
@@ -301,8 +303,8 @@ Reports information only for process 0.
 
 ========================================================================================================================
 Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 1.19209e-06
-Average time for zero size MPI_Send(): 7.98702e-06
+Average time for MPI_Barrier(): 1.23978e-06
+Average time for zero size MPI_Send(): 6.55651e-06
 #PETSc Option Table entries:
 -d 3
 -ksp_right_pc
@@ -332,52 +334,6 @@ Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/b
 Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/bin/mpif90 -fPIC -Wall -Wno-unused-variable -O3  
 Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -lHYPRE -lsuperlu_dist_2.4 -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lm -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/lib -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib/gcc/x86_64-unknown-linux-gnu/4.5.1 -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib/gcc/x86_64-unknown-linux-gnu/4.5.1 -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib64 -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib64 -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib -ldl -lmpich -lopa -lpthread -lrt -lgcc_s -lmpichf90 -lgfortran -lm -lm -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lpthread -lrt -lgcc_s -ldl  
 ------------------------------------------
-
--------------------------------------------------------------------
-| Processor id:   0                                                |
-| Num Processors: 2                                                |
-| Time:           Thu Feb  3 12:09:28 2011                         |
-| OS:             Linux                                            |
-| HostName:       daedalus                                         |
-| OS Release:     2.6.32-26-generic                                |
-| OS Version:     #46-Ubuntu SMP Tue Oct 26 16:47:18 UTC 2010      |
-| Machine:        x86_64                                           |
-| Username:       roystgnr                                         |
-| Configuration:  ./configure run on Tue Feb  1 12:58:27 CST 2011  |
--------------------------------------------------------------------
- -----------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.007535, Active time=0.00048                                             |
- -----------------------------------------------------------------------------------------------------------
-| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|-----------------------------------------------------------------------------------------------------------|
-|                                                                                                           |
-|                                                                                                           |
-| Mesh                                                                                                      |
-|   find_neighbors()            2         0.0000      0.000020    0.0001      0.000029    8.33     12.08    |
-|   renumber_nodes_and_elem()   2         0.0000      0.000001    0.0000      0.000001    0.42     0.42     |
-|                                                                                                           |
-| Parallel                                                                                                  |
-|   allgather()                 1         0.0000      0.000022    0.0000      0.000022    4.58     4.58     |
-|   broadcast()                 23        0.0000      0.000002    0.0000      0.000001    7.71     6.25     |
-|   gather()                    1         0.0000      0.000018    0.0000      0.000018    3.75     3.75     |
-|   max(scalar)                 2         0.0000      0.000009    0.0000      0.000009    3.75     3.75     |
-|   probe()                     2         0.0000      0.000005    0.0000      0.000005    2.29     2.29     |
-|   receive()                   2         0.0000      0.000007    0.0000      0.000013    2.92     5.42     |
-|   send()                      2         0.0000      0.000010    0.0000      0.000010    3.96     3.96     |
-|   send_receive()              2         0.0000      0.000002    0.0001      0.000031    1.04     12.92    |
-|   wait()                      2         0.0000      0.000006    0.0000      0.000006    2.50     2.50     |
-|                                                                                                           |
-| Partitioner                                                                                               |
-|   set_node_processor_ids()    1         0.0000      0.000021    0.0001      0.000083    4.37     17.29    |
-|   single_partition()          1         0.0000      0.000004    0.0000      0.000004    0.83     0.83     |
-|                                                                                                           |
-| XdrIO                                                                                                     |
-|   read()                      1         0.0003      0.000257    0.0003      0.000273    53.54    56.87    |
- -----------------------------------------------------------------------------------------------------------
-| Totals:                       44        0.0005                                          100.00            |
- -----------------------------------------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  mpirun -np 2 ./ex1-opt -d 3 /h2/roystgnr/libmesh/svn/reference_elements/3D/one_hex27.xda -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary

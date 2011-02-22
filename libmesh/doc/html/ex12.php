@@ -1182,6 +1182,8 @@ the current node in the map.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in optimized mode) ex12.C...
+Linking ex12-opt...
 ***************************************************************
 * Running Example  mpirun -np 2 ./ex12-opt -d 3 /h2/roystgnr/libmesh/svn/examples/ex8/pipe-mesh.unv -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
@@ -1194,11 +1196,11 @@ MeshData objects currently only work in serial.
 
 ---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
 
-./ex12-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Thu Feb  3 12:09:33 2011
+./ex12-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Tue Feb 22 12:19:38 2011
 Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
 
                          Max       Max/Min        Avg      Total 
-Time (sec):           5.178e-04      1.14076   4.859e-04
+Time (sec):           5.019e-04      1.13845   4.714e-04
 Objects:              0.000e+00      0.00000   0.000e+00
 Flops:                0.000e+00      0.00000   0.000e+00  0.000e+00
 Flops/sec:            0.000e+00      0.00000   0.000e+00  0.000e+00
@@ -1212,7 +1214,7 @@ Flop counting convention: 1 flop = 1 real number operation of type (multiply/div
 
 Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
                         Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 4.5991e-04  94.7%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
+ 0:      Main Stage: 4.4537e-04  94.5%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
 
 ------------------------------------------------------------------------------------------------------------------------
 See the 'Profiling' chapter of the users' manual for details on interpreting output.
@@ -1247,8 +1249,8 @@ Reports information only for process 0.
 
 ========================================================================================================================
 Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 1.00136e-06
-Average time for zero size MPI_Send(): 8.9407e-06
+Average time for MPI_Barrier(): 1.19209e-06
+Average time for zero size MPI_Send(): 6.4373e-06
 #PETSc Option Table entries:
 -d 3
 -ksp_right_pc
