@@ -259,6 +259,8 @@ library with the --enable-ifem option</i>
 
 <li><L1><a href="ex27.php">Adjoint-based Parameter Sensitivities</a></L1></li>
 
+<li><L1><a href="ex28.php">Subdomain-Restricted Variables</a></L1></li>
+
 
 </ul>
 

@@ -52,9 +52,6 @@ elements which will be refined / coarsened at each step.
 <div class ="fragment">
 <pre>
         #include &lt;iostream&gt;
-        #include &lt;sys/time.h&gt;
-        #include &lt;boost/bind.hpp&gt;
-        #include &lt;boost/function.hpp&gt;
         
 </pre>
 </div>
@@ -64,24 +61,14 @@ General libMesh includes
 
 <div class ="fragment">
 <pre>
-        #include "twostep_time_solver.h"
         #include "equation_systems.h"
         #include "error_vector.h"
-        #include "euler_solver.h"
-        #include "euler2_solver.h"
         #include "mesh.h"
-        #include "serial_mesh.h"
-        #include "mesh_tools.h"
-        #include "mesh_base.h"
         #include "mesh_refinement.h"
         #include "newton_solver.h"
         #include "numeric_vector.h"
-        #include "petsc_diff_solver.h"
         #include "steady_solver.h"
         #include "system_norm.h"
-        #include "tecplot_io.h"
-        #include "trilinos_epetra_matrix.h"
-        #include "petsc_vector.h"
         
 </pre>
 </div>
@@ -158,7 +145,7 @@ Local function declarations
 whether the output is the primal solution or the dual solution for the ith QoI
 
 
-<br><br>Write tecplot, gmv and xda/xdr output
+<br><br>Write gmv output
 
 
 <br><br></div>
@@ -389,12 +376,22 @@ Read in parameters from the input file
 </pre>
 </div>
 <div class = "comment">
+Skip this default-2D example if libMesh was compiled as 1D-only.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_assert(2 &lt;= LIBMESH_DIM, "2D support");
+          
+</pre>
+</div>
+<div class = "comment">
 Create a mesh.
 </div>
 
 <div class ="fragment">
 <pre>
-          SerialMesh mesh (param.dimension);
+          Mesh mesh;
         
 </pre>
 </div>
@@ -427,7 +424,7 @@ Read in the mesh
 
 <div class ="fragment">
 <pre>
-          mesh.read("lshaped.xda");
+          mesh.read(param.domainfile.c_str());
 </pre>
 </div>
 <div class = "comment">
@@ -561,7 +558,8 @@ Get a pointer to the primal solution vector
 
 <div class ="fragment">
 <pre>
-                PetscVector&lt;Number&gt; &primal_solution = dynamic_cast&lt;PetscVector&lt;Number&gt; &&gt;(*system.solution);
+                NumericVector&lt;Number&gt; &primal_solution =
+                  dynamic_cast&lt;NumericVector&lt;Number&gt; &&gt;(*system.solution);
         
 </pre>
 </div>
@@ -627,7 +625,8 @@ Get a pointer to the solution vector of the adjoint problem for QoI 0
 
 <div class ="fragment">
 <pre>
-                PetscVector&lt;Number&gt; &dual_solution_0 = dynamic_cast&lt;PetscVector&lt;Number&gt; &&gt;(system.get_adjoint_solution(0));
+                NumericVector&lt;Number&gt; &dual_solution_0 =
+                  dynamic_cast&lt;NumericVector&lt;Number&gt; &&gt;(system.get_adjoint_solution(0));
         
 </pre>
 </div>
@@ -658,7 +657,8 @@ Get a pointer to the solution vector of the adjoint problem for QoI 0
 
 <div class ="fragment">
 <pre>
-                PetscVector&lt;Number&gt; &dual_solution_1 = dynamic_cast&lt;PetscVector&lt;Number&gt; &&gt;(system.get_adjoint_solution(1));
+                NumericVector&lt;Number&gt; &dual_solution_1 =
+                  dynamic_cast&lt;NumericVector&lt;Number&gt; &&gt;(system.get_adjoint_solution(1));
         	
 </pre>
 </div>
@@ -697,14 +697,18 @@ Postprocess, compute the approximate QoIs and write them out to the console
                 std::cout &lt;&lt; "Postprocessing: " &lt;&lt; std::endl; 
         	system.postprocess_sides = true;
         	system.postprocess();
-        	Real QoI_0_computed = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("computed", 0);
-        	Real QoI_0_exact = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("exact", 0);
-        	Real QoI_1_computed = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("computed", 1);
-        	Real QoI_1_exact = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("exact", 1);
+        	Number QoI_0_computed = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("computed", 0);
+        	Number QoI_0_exact = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("exact", 0);
+        	Number QoI_1_computed = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("computed", 1);
+        	Number QoI_1_exact = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("exact", 1);
         		
-        	std::cout&lt;&lt; "The error in QoI 0 is " &lt;&lt; std::setprecision(17) &lt;&lt; fabs(QoI_0_computed - QoI_0_exact)/QoI_0_exact &lt;&lt; std::endl;
+        	std::cout&lt;&lt; "The relative error in QoI 0 is " &lt;&lt; std::setprecision(17)
+                         &lt;&lt; std::abs(QoI_0_computed - QoI_0_exact) /
+                            std::abs(QoI_0_exact) &lt;&lt; std::endl;
         		
-        	std::cout&lt;&lt; "The error in QoI 1 is " &lt;&lt; std::setprecision(17) &lt;&lt; fabs(QoI_1_computed - QoI_1_exact)/QoI_1_exact &lt;&lt; std::endl &lt;&lt; std::endl;
+        	std::cout&lt;&lt; "The relative error in QoI 1 is " &lt;&lt; std::setprecision(17) 
+                         &lt;&lt; std::abs(QoI_1_computed - QoI_1_exact) /
+                            std::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
         	
 </pre>
 </div>
@@ -814,7 +818,8 @@ Do one last solve if necessary
         	
         	write_output(equation_systems, a_step, "primal");
         
-        	PetscVector&lt;Number&gt; &primal_solution = dynamic_cast&lt;PetscVector&lt;Number&gt; &&gt;(*system.solution);
+        	NumericVector&lt;Number&gt; &primal_solution =
+                  dynamic_cast&lt;NumericVector&lt;Number&gt; &&gt;(*system.solution);
         	
         	QoISet qois;
         	std::vector&lt;unsigned int&gt; qoi_indices;
@@ -829,14 +834,16 @@ Do one last solve if necessary
         	system.assemble_qoi_sides = true;
         	system.adjoint_solve();
         		
-        	PetscVector&lt;Number&gt; &dual_solution_0 = dynamic_cast&lt;PetscVector&lt;Number&gt; &&gt;(system.get_adjoint_solution(0));
+        	NumericVector&lt;Number&gt; &dual_solution_0 =
+                  dynamic_cast&lt;NumericVector&lt;Number&gt; &&gt;(system.get_adjoint_solution(0));
         	
         	primal_solution.swap(dual_solution_0);	    
         	write_output(equation_systems, a_step, "adjoint_0");
         
         	primal_solution.swap(dual_solution_0);
         	
-        	PetscVector&lt;Number&gt; &dual_solution_1 = dynamic_cast&lt;PetscVector&lt;Number&gt; &&gt;(system.get_adjoint_solution(1));
+        	NumericVector&lt;Number&gt; &dual_solution_1 =
+                  dynamic_cast&lt;NumericVector&lt;Number&gt; &&gt;(system.get_adjoint_solution(1));
         	
         	primal_solution.swap(dual_solution_1);	    
         	write_output(equation_systems, a_step, "adjoint_1");
@@ -852,14 +859,18 @@ Do one last solve if necessary
         	system.postprocess_sides = true;
         	system.postprocess();
         	
-        	Real QoI_0_computed = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("computed", 0);
-        	Real QoI_0_exact = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("exact", 0);
-        	Real QoI_1_computed = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("computed", 1);
-        	Real QoI_1_exact = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("exact", 1);
+        	Number QoI_0_computed = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("computed", 0);
+        	Number QoI_0_exact = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("exact", 0);
+        	Number QoI_1_computed = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("computed", 1);
+        	Number QoI_1_exact = (dynamic_cast&lt;LaplaceSystem&&gt;(system)).get_QoI_value("exact", 1);
         	
-        	std::cout&lt;&lt; "The error in QoI 0 is " &lt;&lt; std::setprecision(17) &lt;&lt; fabs(QoI_0_computed - QoI_0_exact)/QoI_0_exact &lt;&lt; std::endl;
+        	std::cout&lt;&lt; "The relative error in QoI 0 is " &lt;&lt; std::setprecision(17)
+                         &lt;&lt; std::abs(QoI_0_computed - QoI_0_exact) /
+                            std::abs(QoI_0_exact) &lt;&lt; std::endl;
         	
-        	std::cout&lt;&lt; "The error in QoI 1 is " &lt;&lt; std::setprecision(17) &lt;&lt; fabs(QoI_1_computed - QoI_1_exact)/QoI_1_exact &lt;&lt; std::endl &lt;&lt; std::endl;
+        	std::cout&lt;&lt; "The relative error in QoI 1 is " &lt;&lt; std::setprecision(17)
+                         &lt;&lt; std::abs(QoI_1_computed - QoI_1_exact) /
+                            std::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
         	
         	ErrorVector error;
         	
@@ -897,28 +908,15 @@ All done.
   
   
   #include &lt;iostream&gt;
-  #include &lt;sys/time.h&gt;
-  #include &lt;boost/bind.hpp&gt;
-  #include &lt;boost/function.hpp&gt;
   
-  #include <B><FONT COLOR="#BC8F8F">&quot;twostep_time_solver.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;error_vector.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;euler_solver.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;euler2_solver.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;serial_mesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_tools.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_base.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;newton_solver.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;petsc_diff_solver.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;steady_solver.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;system_norm.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;tecplot_io.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;trilinos_epetra_matrix.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;petsc_vector.h&quot;</FONT></B>
   
   #include <B><FONT COLOR="#BC8F8F">&quot;kelly_error_estimator.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;patch_recovery_error_estimator.h&quot;</FONT></B>
@@ -1072,7 +1070,9 @@ All done.
     FEMParameters param;
     param.read(infile);
   
-    SerialMesh mesh (param.dimension);
+    libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
+    
+    Mesh mesh;
   
     AutoPtr&lt;MeshRefinement&gt; mesh_refinement =
       build_mesh_refinement(mesh, param);
@@ -1081,7 +1081,7 @@ All done.
   
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Reading in and building the mesh&quot;</FONT></B> &lt;&lt; std::endl;
   
-    mesh.read(<B><FONT COLOR="#BC8F8F">&quot;lshaped.xda&quot;</FONT></B>);
+    mesh.read(param.domainfile.c_str());
     mesh.all_second_order();
   
     MeshRefinement initial_uniform_refinements(mesh);
@@ -1114,7 +1114,8 @@ All done.
   
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;primal&quot;</FONT></B>);
   	
-  	PetscVector&lt;Number&gt; &amp;primal_solution = dynamic_cast&lt;PetscVector&lt;Number&gt; &amp;&gt;(*system.solution);
+  	NumericVector&lt;Number&gt; &amp;primal_solution =
+            dynamic_cast&lt;NumericVector&lt;Number&gt; &amp;&gt;(*system.solution);
   
   	QoISet qois;
   
@@ -1130,14 +1131,16 @@ All done.
   
   	system.adjoint_solve();
   
-  	PetscVector&lt;Number&gt; &amp;dual_solution_0 = dynamic_cast&lt;PetscVector&lt;Number&gt; &amp;&gt;(system.get_adjoint_solution(0));
+  	NumericVector&lt;Number&gt; &amp;dual_solution_0 =
+            dynamic_cast&lt;NumericVector&lt;Number&gt; &amp;&gt;(system.get_adjoint_solution(0));
   
   	primal_solution.swap(dual_solution_0);	    
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;adjoint_0&quot;</FONT></B>);
   
   	primal_solution.swap(dual_solution_0);
   	
-  	PetscVector&lt;Number&gt; &amp;dual_solution_1 = dynamic_cast&lt;PetscVector&lt;Number&gt; &amp;&gt;(system.get_adjoint_solution(1));
+  	NumericVector&lt;Number&gt; &amp;dual_solution_1 =
+            dynamic_cast&lt;NumericVector&lt;Number&gt; &amp;&gt;(system.get_adjoint_solution(1));
   	
   	primal_solution.swap(dual_solution_1);	    
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;adjoint_1&quot;</FONT></B>);
@@ -1152,14 +1155,18 @@ All done.
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Postprocessing: &quot;</FONT></B> &lt;&lt; std::endl; 
   	system.postprocess_sides = true;
   	system.postprocess();
-  	Real QoI_0_computed = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 0);
-  	Real QoI_0_exact = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 0);
-  	Real QoI_1_computed = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 1);
-  	Real QoI_1_exact = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 1);
+  	Number QoI_0_computed = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 0);
+  	Number QoI_0_exact = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 0);
+  	Number QoI_1_computed = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 1);
+  	Number QoI_1_exact = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 1);
   		
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17) &lt;&lt; fabs(QoI_0_computed - QoI_0_exact)/QoI_0_exact &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
+                   &lt;&lt; std::abs(QoI_0_computed - QoI_0_exact) /
+                      <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_0_exact) &lt;&lt; std::endl;
   		
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17) &lt;&lt; fabs(QoI_1_computed - QoI_1_exact)/QoI_1_exact &lt;&lt; std::endl &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17) 
+                   &lt;&lt; std::abs(QoI_1_computed - QoI_1_exact) /
+                      <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
   	
   	ErrorVector error;
   	
@@ -1201,7 +1208,8 @@ All done.
   	
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;primal&quot;</FONT></B>);
   
-  	PetscVector&lt;Number&gt; &amp;primal_solution = dynamic_cast&lt;PetscVector&lt;Number&gt; &amp;&gt;(*system.solution);
+  	NumericVector&lt;Number&gt; &amp;primal_solution =
+            dynamic_cast&lt;NumericVector&lt;Number&gt; &amp;&gt;(*system.solution);
   	
   	QoISet qois;
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; qoi_indices;
@@ -1216,14 +1224,16 @@ All done.
   	system.assemble_qoi_sides = true;
   	system.adjoint_solve();
   		
-  	PetscVector&lt;Number&gt; &amp;dual_solution_0 = dynamic_cast&lt;PetscVector&lt;Number&gt; &amp;&gt;(system.get_adjoint_solution(0));
+  	NumericVector&lt;Number&gt; &amp;dual_solution_0 =
+            dynamic_cast&lt;NumericVector&lt;Number&gt; &amp;&gt;(system.get_adjoint_solution(0));
   	
   	primal_solution.swap(dual_solution_0);	    
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;adjoint_0&quot;</FONT></B>);
   
   	primal_solution.swap(dual_solution_0);
   	
-  	PetscVector&lt;Number&gt; &amp;dual_solution_1 = dynamic_cast&lt;PetscVector&lt;Number&gt; &amp;&gt;(system.get_adjoint_solution(1));
+  	NumericVector&lt;Number&gt; &amp;dual_solution_1 =
+            dynamic_cast&lt;NumericVector&lt;Number&gt; &amp;&gt;(system.get_adjoint_solution(1));
   	
   	primal_solution.swap(dual_solution_1);	    
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;adjoint_1&quot;</FONT></B>);
@@ -1239,14 +1249,18 @@ All done.
   	system.postprocess_sides = true;
   	system.postprocess();
   	
-  	Real QoI_0_computed = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 0);
-  	Real QoI_0_exact = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 0);
-  	Real QoI_1_computed = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 1);
-  	Real QoI_1_exact = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 1);
+  	Number QoI_0_computed = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 0);
+  	Number QoI_0_exact = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 0);
+  	Number QoI_1_computed = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 1);
+  	Number QoI_1_exact = (dynamic_cast&lt;LaplaceSystem&amp;&gt;(system)).get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 1);
   	
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17) &lt;&lt; fabs(QoI_0_computed - QoI_0_exact)/QoI_0_exact &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
+                   &lt;&lt; std::abs(QoI_0_computed - QoI_0_exact) /
+                      <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_0_exact) &lt;&lt; std::endl;
   	
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17) &lt;&lt; fabs(QoI_1_computed - QoI_1_exact)/QoI_1_exact &lt;&lt; std::endl &lt;&lt; std::endl;
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
+                   &lt;&lt; std::abs(QoI_1_computed - QoI_1_exact) /
+                      <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
   	
   	ErrorVector error;
   	
@@ -1271,6 +1285,14 @@ All done.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in optimized mode) element_postprocess.C...
+Compiling C++ (in optimized mode) element_qoi_derivative.C...
+Compiling C++ (in optimized mode) ex26.C...
+Compiling C++ (in optimized mode) femparameters.C...
+Compiling C++ (in optimized mode) L-shaped.C...
+Compiling C++ (in optimized mode) side_postprocess.C...
+Compiling C++ (in optimized mode) side_qoi_derivative.C...
+Linking ./ex26-opt...
 ***************************************************************
 * Running Example  mpirun -np 2 ./ex26-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
@@ -1296,9 +1318,8 @@ Initializing systems
    System "LaplaceSystem"
     Type "Implicit"
     Variables="T" 
-    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="SECOND", "THIRD" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="SECOND" 
     n_dofs()=833
     n_local_dofs()=433
     n_constrained_dofs()=0
@@ -1314,8 +1335,8 @@ Trying full Newton step
   Nonlinear solver relative step size inf > 1e-08
 Adaptive step 0, we have 192 active elements and 833 active dofs.
 Postprocessing: 
-The error in QoI 0 is 0.00016365688099197935
-The error in QoI 1 is 0.00032228775655961795
+The relative error in QoI 0 is 0.00016365688099197935
+The relative error in QoI 1 is 0.00032228775655961795
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
 Assembling the System
@@ -1328,8 +1349,8 @@ Trying full Newton step
   Nonlinear solver relative step size 0.0011166144801248779 > 1e-08
 Adaptive step 1, we have 222 active elements and 943 active dofs.
 Postprocessing: 
-The error in QoI 0 is 4.9719364089729268e-05
-The error in QoI 1 is 7.8937527867902526e-05
+The relative error in QoI 0 is 4.9719364089729268e-05
+The relative error in QoI 1 is 7.8937527867902526e-05
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
 Assembling the System
@@ -1342,8 +1363,8 @@ Trying full Newton step
   Nonlinear solver relative step size 0.00056434343309561452 > 1e-08
 Adaptive step 2, we have 267 active elements and 1117 active dofs.
 Postprocessing: 
-The error in QoI 0 is 1.9351576491789132e-05
-The error in QoI 1 is 2.6065414311629888e-07
+The relative error in QoI 0 is 1.9351576491789132e-05
+The relative error in QoI 1 is 2.6065414311629888e-07
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
 Assembling the System
@@ -1356,8 +1377,8 @@ Trying full Newton step
   Nonlinear solver relative step size 0.00034212214213161246 > 1e-08
 Adaptive step 3, we have 312 active elements and 1287 active dofs.
 Postprocessing: 
-The error in QoI 0 is 7.1570030459360749e-06
-The error in QoI 1 is 3.8377315458006266e-06
+The relative error in QoI 0 is 7.1570030459360749e-06
+The relative error in QoI 1 is 3.8377315458006266e-06
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
 Assembling the System
@@ -1370,8 +1391,8 @@ Trying full Newton step
   Nonlinear solver relative step size 0.00019305877998599563 > 1e-08
 Adaptive step 4, we have 363 active elements and 1483 active dofs.
 Postprocessing: 
-The error in QoI 0 is 2.4148442282445063e-06
-The error in QoI 1 is 9.8808967341529639e-06
+The relative error in QoI 0 is 2.4148442282445063e-06
+The relative error in QoI 1 is 9.8808967341529639e-06
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
 Assembling the System
@@ -1384,8 +1405,8 @@ Trying full Newton step
   Continuing...
 Adaptive step 5, we have 420 active elements and 1701 active dofs.
 Postprocessing: 
-The error in QoI 0 is 5.2931276195391376e-07
-The error in QoI 1 is 1.8488725104388126e-06
+The relative error in QoI 0 is 5.2931276195391376e-07
+The relative error in QoI 1 is 1.8488725104388126e-06
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
 Assembling the System
@@ -1398,8 +1419,8 @@ Trying full Newton step
   Nonlinear solver relative step size 6.6469881637661968e-05 > 1e-08
 Adaptive step 6, we have 486 active elements and 1951 active dofs.
 Postprocessing: 
-The error in QoI 0 is 5.1247810322998242e-08
-The error in QoI 1 is 1.5614371976136709e-06
+The relative error in QoI 0 is 5.1247810322998242e-08
+The relative error in QoI 1 is 1.5614371976136709e-06
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
 [1] Completing output.
@@ -1410,14 +1431,14 @@ Using Adjoint Residual Error Estimator with Patch Recovery Weights
 
 ---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
 
-./ex26-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Thu Feb  3 12:13:10 2011
+./ex26-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Tue Feb 22 12:24:15 2011
 Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
 
                          Max       Max/Min        Avg      Total 
-Time (sec):           1.843e+00      1.00291   1.841e+00
+Time (sec):           1.601e+00      1.00264   1.599e+00
 Objects:              1.281e+03      1.00000   1.281e+03
 Flops:                2.533e+08      1.08533   2.434e+08  4.867e+08
-Flops/sec:            1.374e+08      1.08218   1.322e+08  2.644e+08
+Flops/sec:            1.582e+08      1.08248   1.522e+08  3.044e+08
 MPI Messages:         1.208e+03      1.00000   1.208e+03  2.416e+03
 MPI Message Lengths:  1.417e+06      1.01556   1.164e+03  2.812e+06
 MPI Reductions:       3.057e+03      1.00000
@@ -1428,7 +1449,7 @@ Flop counting convention: 1 flop = 1 real number operation of type (multiply/div
 
 Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
                         Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 1.8406e+00 100.0%  4.8672e+08 100.0%  2.416e+03 100.0%  1.164e+03      100.0%  2.673e+03  87.4% 
+ 0:      Main Stage: 1.5989e+00 100.0%  4.8672e+08 100.0%  2.416e+03 100.0%  1.164e+03      100.0%  2.673e+03  87.4% 
 
 ------------------------------------------------------------------------------------------------------------------------
 See the 'Profiling' chapter of the users' manual for details on interpreting output.
@@ -1452,34 +1473,34 @@ Event                Count      Time (sec)     Flops                            
 
 --- Event Stage 0: Main Stage
 
-KSPGMRESOrthog       379 1.0 7.8912e-03 1.4 1.06e+07 1.0 0.0e+00 0.0e+00 3.8e+02  0  4  0  0 12   0  4  0  0 14  2631
-KSPSetup              42 1.0 2.3317e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve              21 1.0 4.6056e-01 1.0 2.53e+08 1.1 8.0e+02 4.2e+02 8.9e+02 25100 33 12 29  25100 33 12 33  1057
-PCSetUp               42 1.0 3.6896e-01 1.1 1.54e+08 1.1 0.0e+00 0.0e+00 9.3e+01 19 61  0  0  3  19 61  0  0  3   800
-PCSetUpOnBlocks       21 1.0 3.6835e-01 1.1 1.54e+08 1.1 0.0e+00 0.0e+00 9.3e+01 19 61  0  0  3  19 61  0  0  3   801
-PCApply              400 1.0 3.8940e-02 1.1 7.86e+07 1.1 0.0e+00 0.0e+00 0.0e+00  2 31  0  0  0   2 31  0  0  0  3862
-VecMDot              379 1.0 6.3627e-03 1.6 5.30e+06 1.0 0.0e+00 0.0e+00 3.8e+02  0  2  0  0 12   0  2  0  0 14  1631
-VecNorm              449 1.0 6.5522e-03 1.0 6.60e+05 1.0 0.0e+00 0.0e+00 4.5e+02  0  0  0  0 15   0  0  0  0 17   197
-VecScale             400 1.0 2.2340e-04 1.0 2.93e+05 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2572
-VecCopy               81 1.0 4.7922e-05 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet               590 1.0 2.2936e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY               49 1.0 8.2016e-05 1.1 7.29e+04 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  1742
-VecMAXPY             400 1.0 1.4949e-03 1.0 5.86e+06 1.0 0.0e+00 0.0e+00 0.0e+00  0  2  0  0  0   0  2  0  0  0  7675
-VecAssemblyBegin     329 1.0 7.7894e-03 1.6 0.00e+00 0.0 1.0e+02 2.1e+02 7.4e+02  0  0  4  1 24   0  0  4  1 27     0
-VecAssemblyEnd       329 1.0 1.5926e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin      644 1.0 1.1880e-03 1.0 0.00e+00 0.0 1.1e+03 1.0e+03 0.0e+00  0  0 46 40  0   0  0 46 40  0     0
-VecScatterEnd        644 1.0 6.4212e-02 1.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  3  0  0  0  0   3  0  0  0  0     0
-VecNormalize         400 1.0 3.3655e-03 1.1 8.80e+05 1.0 0.0e+00 0.0e+00 4.0e+02  0  0  0  0 13   0  0  0  0 15   512
-MatMult              400 1.0 7.3036e-02 1.7 8.92e+06 1.1 8.0e+02 4.2e+02 0.0e+00  3  4 33 12  0   3  4 33 12  0   238
-MatSolve             400 1.0 3.6645e-02 1.1 7.86e+07 1.1 0.0e+00 0.0e+00 0.0e+00  2 31  0  0  0   2 31  0  0  0  4104
-MatLUFactorNum        21 1.0 1.2115e-01 1.1 1.54e+08 1.1 0.0e+00 0.0e+00 0.0e+00  6 61  0  0  0   6 61  0  0  0  2436
-MatILUFactorSym       21 1.0 2.4588e-01 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 2.1e+01 13  0  0  0  1  13  0  0  0  1     0
-MatAssemblyBegin      63 1.0 3.6271e-03 1.4 0.00e+00 0.0 9.0e+01 1.6e+03 1.3e+02  0  0  4  5  4   0  0  4  5  5     0
-MatAssemblyEnd        63 1.0 3.7966e-03 1.0 0.00e+00 0.0 5.6e+01 1.1e+02 1.5e+02  0  0  2  0  5   0  0  2  0  5     0
-MatGetRowIJ           21 1.0 7.8678e-06 1.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering        21 1.0 4.8995e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 7.2e+01  0  0  0  0  2   0  0  0  0  3     0
-MatZeroEntries        28 1.0 1.5402e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatTranspose           7 1.0 5.2490e-03 1.0 0.00e+00 0.0 7.0e+01 7.8e+02 6.3e+01  0  0  3  2  2   0  0  3  2  2     0
+KSPGMRESOrthog       379 1.0 7.9799e-03 1.4 1.06e+07 1.0 0.0e+00 0.0e+00 3.8e+02  0  4  0  0 12   0  4  0  0 14  2602
+KSPSetup              42 1.0 2.3699e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSolve              21 1.0 4.6235e-01 1.0 2.53e+08 1.1 8.0e+02 4.2e+02 8.9e+02 29100 33 12 29  29100 33 12 33  1052
+PCSetUp               42 1.0 3.7043e-01 1.1 1.54e+08 1.1 0.0e+00 0.0e+00 9.3e+01 22 61  0  0  3  22 61  0  0  3   797
+PCSetUpOnBlocks       21 1.0 3.6981e-01 1.1 1.54e+08 1.1 0.0e+00 0.0e+00 9.3e+01 22 61  0  0  3  22 61  0  0  3   798
+PCApply              400 1.0 3.9100e-02 1.1 7.86e+07 1.1 0.0e+00 0.0e+00 0.0e+00  2 31  0  0  0   2 31  0  0  0  3846
+VecMDot              379 1.0 6.4294e-03 1.6 5.30e+06 1.0 0.0e+00 0.0e+00 3.8e+02  0  2  0  0 12   0  2  0  0 14  1614
+VecNorm              449 1.0 6.5663e-03 1.0 6.60e+05 1.0 0.0e+00 0.0e+00 4.5e+02  0  0  0  0 15   0  0  0  0 17   197
+VecScale             400 1.0 2.3532e-04 1.0 2.93e+05 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2442
+VecCopy               81 1.0 4.4584e-05 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecSet               590 1.0 2.3460e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAXPY               49 1.0 7.8201e-05 1.2 7.29e+04 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  1827
+VecMAXPY             400 1.0 1.5182e-03 1.0 5.86e+06 1.0 0.0e+00 0.0e+00 0.0e+00  0  2  0  0  0   0  2  0  0  0  7557
+VecAssemblyBegin     329 1.0 5.8289e-03 1.6 0.00e+00 0.0 1.0e+02 2.1e+02 7.4e+02  0  0  4  1 24   0  0  4  1 27     0
+VecAssemblyEnd       329 1.0 1.6284e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecScatterBegin      644 1.0 1.1535e-03 1.0 0.00e+00 0.0 1.1e+03 1.0e+03 0.0e+00  0  0 46 40  0   0  0 46 40  0     0
+VecScatterEnd        644 1.0 6.6599e-02 2.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  3  0  0  0  0   3  0  0  0  0     0
+VecNormalize         400 1.0 3.3822e-03 1.0 8.80e+05 1.0 0.0e+00 0.0e+00 4.0e+02  0  0  0  0 13   0  0  0  0 15   510
+MatMult              400 1.0 7.5426e-02 1.8 8.92e+06 1.1 8.0e+02 4.2e+02 0.0e+00  4  4 33 12  0   4  4 33 12  0   230
+MatSolve             400 1.0 3.6803e-02 1.1 7.86e+07 1.1 0.0e+00 0.0e+00 0.0e+00  2 31  0  0  0   2 31  0  0  0  4086
+MatLUFactorNum        21 1.0 1.2201e-01 1.1 1.54e+08 1.1 0.0e+00 0.0e+00 0.0e+00  7 61  0  0  0   7 61  0  0  0  2419
+MatILUFactorSym       21 1.0 2.4646e-01 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 2.1e+01 15  0  0  0  1  15  0  0  0  1     0
+MatAssemblyBegin      63 1.0 3.0406e-03 1.7 0.00e+00 0.0 9.0e+01 1.6e+03 1.3e+02  0  0  4  5  4   0  0  4  5  5     0
+MatAssemblyEnd        63 1.0 3.7935e-03 1.0 0.00e+00 0.0 5.6e+01 1.1e+02 1.5e+02  0  0  2  0  5   0  0  2  0  5     0
+MatGetRowIJ           21 1.0 6.9141e-06 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetOrdering        21 1.0 4.9257e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 7.2e+01  0  0  0  0  2   0  0  0  0  3     0
+MatZeroEntries        28 1.0 1.7214e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatTranspose           7 1.0 5.2724e-03 1.0 0.00e+00 0.0 7.0e+01 7.8e+02 6.3e+01  0  0  3  2  2   0  0  3  2  2     0
 ------------------------------------------------------------------------------------------------------------------------
 
 Memory usage is given in bytes:
@@ -1497,9 +1518,9 @@ Reports information only for process 0.
    IS L to G Mapping    21             21        40904     0
               Matrix    63             63     28934468     0
 ========================================================================================================================
-Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 2.38419e-06
-Average time for zero size MPI_Send(): 6.07967e-06
+Average time to get PetscTime(): 0
+Average time for MPI_Barrier(): 1.62125e-06
+Average time for zero size MPI_Send(): 5.48363e-06
 #PETSc Option Table entries:
 -ksp_right_pc
 -log_summary
@@ -1528,134 +1549,6 @@ Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/b
 Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/bin/mpif90 -fPIC -Wall -Wno-unused-variable -O3  
 Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -lHYPRE -lsuperlu_dist_2.4 -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lm -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/lib -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib/gcc/x86_64-unknown-linux-gnu/4.5.1 -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib/gcc/x86_64-unknown-linux-gnu/4.5.1 -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib64 -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib64 -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib -ldl -lmpich -lopa -lpthread -lrt -lgcc_s -lmpichf90 -lgfortran -lm -lm -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lpthread -lrt -lgcc_s -ldl  
 ------------------------------------------
-
--------------------------------------------------------------------
-| Processor id:   0                                                |
-| Num Processors: 2                                                |
-| Time:           Thu Feb  3 12:13:10 2011                         |
-| OS:             Linux                                            |
-| HostName:       daedalus                                         |
-| OS Release:     2.6.32-26-generic                                |
-| OS Version:     #46-Ubuntu SMP Tue Oct 26 16:47:18 UTC 2010      |
-| Machine:        x86_64                                           |
-| Username:       roystgnr                                         |
-| Configuration:  ./configure run on Tue Feb  1 12:58:27 CST 2011  |
--------------------------------------------------------------------
- -------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=1.85177, Active time=1.80323                                                |
- -------------------------------------------------------------------------------------------------------------
-| Event                           nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                           w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|-------------------------------------------------------------------------------------------------------------|
-|                                                                                                             |
-|                                                                                                             |
-| AdjointResidualErrorEstimator                                                                               |
-|   estimate_error()              7         0.0594      0.008489    1.0213      0.145901    3.30     56.64    |
-|                                                                                                             |
-| DofMap                                                                                                      |
-|   add_neighbors_to_send_list()  21        0.0020      0.000096    0.0022      0.000106    0.11     0.12     |
-|   build_constraint_matrix()     5170      0.0070      0.000001    0.0070      0.000001    0.39     0.39     |
-|   cnstrn_elem_mat_vec()         1034      0.0020      0.000002    0.0020      0.000002    0.11     0.11     |
-|   compute_sparsity()            7         0.0063      0.000895    0.0073      0.001040    0.35     0.40     |
-|   constrain_elem_matrix()       1034      0.0017      0.000002    0.0017      0.000002    0.10     0.10     |
-|   constrain_elem_vector()       3102      0.0009      0.000000    0.0009      0.000000    0.05     0.05     |
-|   create_dof_constraints()      21        0.0048      0.000226    0.0064      0.000303    0.26     0.35     |
-|   distribute_dofs()             21        0.0071      0.000340    0.0183      0.000871    0.40     1.01     |
-|   dof_indices()                 117334    0.0494      0.000000    0.0494      0.000000    2.74     2.74     |
-|   enforce_constraints_exactly() 48        0.0041      0.000085    0.0041      0.000085    0.23     0.23     |
-|   old_dof_indices()             6204      0.0025      0.000000    0.0025      0.000000    0.14     0.14     |
-|   prepare_send_list()           21        0.0001      0.000003    0.0001      0.000003    0.00     0.00     |
-|   reinit()                      21        0.0104      0.000495    0.0104      0.000495    0.58     0.58     |
-|                                                                                                             |
-| FE                                                                                                          |
-|   compute_affine_map()          95573     0.0958      0.000001    0.0958      0.000001    5.31     5.31     |
-|   compute_face_map()            1810      0.0066      0.000004    0.0161      0.000009    0.37     0.89     |
-|   compute_shape_functions()     95573     0.0552      0.000001    0.0552      0.000001    3.06     3.06     |
-|   init_face_shape_functions()   440       0.0003      0.000001    0.0003      0.000001    0.02     0.02     |
-|   init_shape_functions()        5235      0.0627      0.000012    0.0627      0.000012    3.48     3.48     |
-|   inverse_map()                 16485     0.0225      0.000001    0.0225      0.000001    1.25     1.25     |
-|                                                                                                             |
-| FEMSystem                                                                                                   |
-|   assemble_qoi_derivative()     7         0.0124      0.001775    0.0271      0.003874    0.69     1.50     |
-|   assembly()                    7         0.0173      0.002474    0.0488      0.006966    0.96     2.70     |
-|   assembly(get_jacobian)        7         0.0166      0.002375    0.0474      0.006765    0.92     2.63     |
-|   assembly(get_residual)        7         0.0087      0.001249    0.0217      0.003100    0.48     1.20     |
-|   numerical_elem_jacobian()     2260      0.0229      0.000010    0.0229      0.000010    1.27     1.27     |
-|   numerical_side_jacobian()     724       0.0084      0.000012    0.0084      0.000012    0.47     0.47     |
-|   postprocess()                 7         0.0057      0.000812    0.0164      0.002350    0.32     0.91     |
-|                                                                                                             |
-| GMVIO                                                                                                       |
-|   write_nodal_data()            21        0.0768      0.003656    0.0768      0.003656    4.26     4.26     |
-|                                                                                                             |
-| ImplicitSystem                                                                                              |
-|   adjoint_solve()               7         0.0073      0.001036    0.3900      0.055716    0.40     21.63    |
-|                                                                                                             |
-| LocationMap                                                                                                 |
-|   find()                        3220      0.0019      0.000001    0.0019      0.000001    0.11     0.11     |
-|   init()                        15        0.0029      0.000193    0.0029      0.000193    0.16     0.16     |
-|                                                                                                             |
-| Mesh                                                                                                        |
-|   all_first_order()             14        0.0018      0.000132    0.0018      0.000132    0.10     0.10     |
-|   all_second_order()            1         0.0000      0.000036    0.0000      0.000036    0.00     0.00     |
-|   contract()                    6         0.0001      0.000025    0.0004      0.000061    0.01     0.02     |
-|   find_neighbors()              37        0.0236      0.000638    0.0242      0.000655    1.31     1.34     |
-|   renumber_nodes_and_elem()     78        0.0024      0.000031    0.0024      0.000031    0.13     0.13     |
-|                                                                                                             |
-| MeshCommunication                                                                                           |
-|   broadcast_bcs()               1         0.0000      0.000005    0.0000      0.000006    0.00     0.00     |
-|   broadcast_mesh()              1         0.0001      0.000054    0.0001      0.000071    0.00     0.00     |
-|   compute_hilbert_indices()     38        0.0179      0.000472    0.0179      0.000472    0.99     0.99     |
-|   find_global_indices()         38        0.0033      0.000086    0.0237      0.000623    0.18     1.31     |
-|   parallel_sort()               38        0.0015      0.000040    0.0018      0.000048    0.08     0.10     |
-|                                                                                                             |
-| MeshRefinement                                                                                              |
-|   _coarsen_elements()           12        0.0002      0.000019    0.0003      0.000021    0.01     0.01     |
-|   _refine_elements()            15        0.0036      0.000238    0.0084      0.000562    0.20     0.47     |
-|   add_point()                   3220      0.0024      0.000001    0.0046      0.000001    0.13     0.25     |
-|   make_coarsening_compatible()  15        0.0033      0.000218    0.0033      0.000218    0.18     0.18     |
-|   make_refinement_compatible()  15        0.0003      0.000017    0.0003      0.000020    0.01     0.02     |
-|                                                                                                             |
-| MetisPartitioner                                                                                            |
-|   partition()                   37        0.0161      0.000435    0.0398      0.001075    0.89     2.20     |
-|                                                                                                             |
-| NewtonSolver                                                                                                |
-|   solve()                       7         0.0075      0.001065    0.2371      0.033878    0.41     13.15    |
-|                                                                                                             |
-| Parallel                                                                                                    |
-|   allgather()                   102       0.0003      0.000003    0.0003      0.000003    0.02     0.02     |
-|   broadcast()                   9         0.0000      0.000005    0.0000      0.000003    0.00     0.00     |
-|   gather()                      1         0.0000      0.000003    0.0000      0.000003    0.00     0.00     |
-|   max(bool)                     49        0.0001      0.000002    0.0001      0.000002    0.01     0.01     |
-|   max(scalar)                   112       0.0010      0.000009    0.0010      0.000009    0.05     0.05     |
-|   max(vector)                   38        0.0001      0.000002    0.0001      0.000002    0.00     0.00     |
-|   min(bool)                     30        0.0001      0.000003    0.0001      0.000003    0.01     0.01     |
-|   min(vector)                   44        0.0003      0.000007    0.0003      0.000007    0.02     0.02     |
-|   probe()                       234       0.0003      0.000001    0.0003      0.000001    0.02     0.02     |
-|   receive()                     234       0.0004      0.000002    0.0007      0.000003    0.02     0.04     |
-|   send()                        234       0.0002      0.000001    0.0002      0.000001    0.01     0.01     |
-|   send_receive()                310       0.0005      0.000002    0.0016      0.000005    0.03     0.09     |
-|   sum()                         218       0.0163      0.000075    0.0163      0.000075    0.90     0.90     |
-|   wait()                        234       0.0001      0.000000    0.0001      0.000000    0.01     0.01     |
-|                                                                                                             |
-| Partitioner                                                                                                 |
-|   set_node_processor_ids()      37        0.0072      0.000194    0.0077      0.000208    0.40     0.43     |
-|   set_parent_processor_ids()    37        0.0012      0.000033    0.0012      0.000033    0.07     0.07     |
-|                                                                                                             |
-| PatchRecoveryErrorEstimator                                                                                 |
-|   estimate_error()              21        0.6295      0.029978    0.8895      0.042357    34.91    49.33    |
-|                                                                                                             |
-| PetscLinearSolver                                                                                           |
-|   solve()                       21        0.4648      0.022133    0.4648      0.022133    25.78    25.78    |
-|                                                                                                             |
-| ProjectVector                                                                                               |
-|   operator()                    18        0.0079      0.000440    0.0154      0.000854    0.44     0.85     |
-|                                                                                                             |
-| System                                                                                                      |
-|   project_vector()              18        0.0068      0.000376    0.0251      0.001396    0.38     1.39     |
- -------------------------------------------------------------------------------------------------------------
-| Totals:                         361017    1.8032                                          100.00            |
- -------------------------------------------------------------------------------------------------------------
-
  
 ***************************************************************
 * Done Running Example  mpirun -np 2 ./ex26-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
