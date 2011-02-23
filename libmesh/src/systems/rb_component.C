@@ -272,7 +272,7 @@ void RBComponent::load_component_solution(DenseVector<Number>& global_solution)
   {
     // We assume that bubble_functions have been
     // set to the appopriate truth source bubble function
-    Real scalar = global_solution(interface_function_global_indices[index]);
+    Number scalar = global_solution(interface_function_global_indices[index]);
     ref_component.solution->add(scalar, *ref_component.bubble_functions[index]);
     ref_component.solution->add(scalar, *ref_component.interface_function_representors[index]);
   }
