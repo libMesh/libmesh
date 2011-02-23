@@ -93,21 +93,6 @@ public:
    * to an output file.
    */
   virtual Real truth_solve(int plot_solution);
-  
-  /**
-   * Calculate the EIM approximation to parametrized_function
-   * using the first \p N EIM basis functions. Store the
-   * solution coefficients in the member RB_solution.
-   * @return the EIM a posteriori error bound.
-   */
-  virtual Real RB_solve(unsigned int N);
-  
-  /**
-   * Calculate the EIM approximation for the given
-   * right-hand side vector \p EIM_rhs. Store the
-   * solution coefficients in the member RB_solution.
-   */
-  void RB_solve(DenseVector<Number>& EIM_rhs);
 
   /**
    * We compute the best fit of parametrized_function
@@ -123,7 +108,13 @@ public:
    * relevant to the projection calculations in
    * load_calN_parametrized_function.
    */
-  virtual void init_context(FEMContext &c);  
+  virtual void init_context(FEMContext &c);
+  
+  /**
+   * Build a new RBEIMEvaluation object and add
+   * it to the rb_evaluation_objects vector.
+   */
+  virtual void add_new_rb_evaluation_object();
 
   /**
    * Override attach_theta_q_a to just throw an error. Should
@@ -165,57 +156,7 @@ public:
    */
   void cache_ghosted_basis_function(unsigned int function_index);
 
-  /**
-   * Clear the basis functions and all basis-function-dependent data.
-   * Overload in subclasses to clear any extra data.
-   */
-  virtual void clear_basis_function_dependent_data();
-  
-  /**
-   * Write out all the data to text files in order to segregate the
-   * Offline stage from the Online stage.
-   */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data");
-  
-  /**
-   * Read in the saved Offline reduced basis data
-   * to initialize the system for Online solves.
-   */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
-
   //----------- PUBLIC DATA MEMBERS -----------//
-  
-  /**
-   * Dense matrix that stores the lower triangular
-   * interpolation matrix that can be used 
-   */
-  DenseMatrix<Number> interpolation_matrix;
-  
-  /**
-   * The list of interpolation points, i.e. locations at 
-   * which the basis functions are maximized.
-   */
-  std::vector<Point> interpolation_points;
-  
-  /**
-   * The corresponding list of variables indices at which
-   * the interpolation points were identified.
-   */
-  std::vector<unsigned int> interpolation_points_var;
-  
-  /**
-   * We also need an extra interpolation point and associated
-   * variable for the "extra" solve we do at the end of
-   * the Greedy algorithm.
-   */
-  Point extra_interpolation_point;
-  unsigned int extra_interpolation_point_var;
-  
-  /**
-   * We also need a DenseVector to represent the corresponding
-   * "extra" row of the interpolation matrix.
-   */
-  DenseVector<Number> extra_interpolation_matrix_row;
   
   /**
    * Enum that indicates which type of "best fit" algorithm
@@ -227,13 +168,21 @@ public:
    * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;
+
+  /**
+   * This flag indicates whether or not we evaluate the error
+   * estimate in RB_solve. We need this to turn off error
+   * estimation during the Greedy algorithm.
+   */
+  bool eval_error_estimate;
   
 protected:
+
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * Read parameters in from file and set up this system
+   * accordingly.
    */
-  virtual void init_data ();
+  virtual void process_parameters_file ();
 
   /**
    * Add a new basis function to the RB space. Overload
@@ -307,13 +256,6 @@ private:
    * in parallel.
    */
   AutoPtr< NumericVector<Number> > serialized_vector;
-  
-  /**
-   * This flag indicates whether or not we evaluate the error
-   * estimate in RB_solve. We need this to turn off error
-   * estimation during the Greedy algorithm.
-   */
-  bool eval_error_estimate;
 
 };
 

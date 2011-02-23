@@ -25,6 +25,7 @@
 
 #include "qn_transient_scm_system.h"
 #include "qn_transient_rb_system.h"
+#include "qn_transient_rb_evaluation.h"
 
 #include "numeric_vector.h"
 #include "libmesh_logging.h"
@@ -69,9 +70,8 @@ void QNTransientSCMSystem::clear()
   Parent::clear();
 }
 
-void QNTransientSCMSystem::init_data()
+void QNTransientSCMSystem::initialize_SCM_system()
 {
-  // Set parameters before calling Parent::init
   GetPot infile(parameters_filename);
 
   const unsigned int K_in     = infile("K", _K);
@@ -81,8 +81,8 @@ void QNTransientSCMSystem::init_data()
   set_dt(dt_in);
 
   n_time_samples = infile("n_SCM_time_samples", n_time_samples);
-
-  Parent::init_data();
+  
+  Parent::initialize_SCM_system();
 
   libMesh::out << std::endl << "QNTransientSCMSystem parameters:" << std::endl;
   libMesh::out << "K: " << get_K() << std::endl;
@@ -168,20 +168,21 @@ void QNTransientSCMSystem::perform_SCM_greedy()
     if( !same_mu )
     {
       RB_system.set_current_parameters(mu);
-      RB_system.RB_solve(RB_size);
+      RB_system.rb_eval->RB_solve(RB_size);
     }
 
     unsigned int time_level = round( eigen_mu[this->get_n_params()-1] );
 
     std::vector<Number> RB_u_euler_theta(RB_size);
+    QNTransientRBEvaluation* qn_rb_eval = libmesh_cast_ptr<QNTransientRBEvaluation*>(RB_system.rb_eval);
     for(unsigned int j=0; j<RB_size; j++)
     {
       // The training parameters should be generated such that
       // we never get time_level == 0
       libmesh_assert(time_level > 0);
 
-      RB_u_euler_theta[j] = RB_system.get_euler_theta() *RB_system.RB_temporal_solution_data[time_level]  (j)
-                + (1.-RB_system.get_euler_theta())*RB_system.RB_temporal_solution_data[time_level-1](j);
+      RB_u_euler_theta[j] = RB_system.get_euler_theta() *qn_rb_eval->RB_temporal_solution_data[time_level]  (j)
+                + (1.-RB_system.get_euler_theta())*qn_rb_eval->RB_temporal_solution_data[time_level-1](j);
     }
     this->set_training_RB_coeffs(i, RB_u_euler_theta);
 

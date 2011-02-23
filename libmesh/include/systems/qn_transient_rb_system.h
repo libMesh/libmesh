@@ -86,12 +86,6 @@ public:
    * Overloaded to also clear the C-dependent data.
    */
   virtual void clear_basis_function_dependent_data();
-  
-  /**
-   * Resize all the RB matrices.
-   * Optionally perform the initial assembly of affine operators.
-   */
-  virtual void initialize_RB_system(bool online_mode);
 
   /**
    * Attach user-defined assembly routine
@@ -117,14 +111,6 @@ public:
    * using Newton's method.
    */
   virtual Real truth_solve(int write_interval);
-
-  /**
-   * Perform online solve for current_params
-   * with the N basis functions. Overload this
-   * to solve the nonlinear RB system using
-   * Newton's method.
-   */
-  virtual Real RB_solve(unsigned int N);
 
   /**
    * Set the nonlinear tolerance for Newton's
@@ -200,6 +186,24 @@ public:
   void update_all_trilinear_form_operators();
 
   /**
+   * Build a new QNTransientRBEvaluation object and add
+   * it to the rb_evaluation_objects vector.
+   */
+  virtual void add_new_rb_evaluation_object();
+
+  /**
+   * Get the SCM lower bound for the current parameters
+   * from the associated SCM system.
+   */
+  virtual Real get_SCM_lower_bound();
+
+  /**
+   * Get the SCM upper bound for the current parameters
+   * from the associated SCM system.
+   */
+  virtual Real get_SCM_upper_bound();
+
+  /**
    * Overload this function to write out the extra
    * Offline data specific to quadratically nonlinear
    * problems.
@@ -223,12 +227,6 @@ public:
   AutoPtr< NumericVector<Number> > current_newton_iterate;
 
   /**
-   * Storage for the reduced basis trilinear form that arises
-   * from the quadratic nonlinearity.
-   */
-  std::vector< std::vector< std::vector<Number> > > RB_trilinear_form;
-
-  /**
    * Boolean flag to indicate whether we should use a nominal value
    * of rho_LB (i.e. lower bound for the stability constant) or
    * compute a lower bound using the SCM.
@@ -248,22 +246,19 @@ public:
    */
   std::vector< std::vector< NumericVector<Number>* > > C_representor;
 
-  /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
-   */
-  std::vector< std::vector< std::vector<Number> > > Fq_C_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Mq_C_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_C_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > C_C_representor_norms;
-
 protected:
 
   /**
-   * Initializes the member data fields associated with
-   * the system.
+   * Read in the parameters from file and set up the system
+   * accordingly.
    */
-  virtual void init_data ();
+  virtual void process_parameters_file ();
+
+  /**
+   * Helper function that actually allocates all the data
+   * structures required by this class.
+   */
+  virtual void allocate_data_structures();
 
   /**
    * Builds a RBContext object with enough information to do
@@ -306,25 +301,6 @@ protected:
    * the term due to the quadratic nonlinearity.
    */
   virtual void truth_assembly();
-
-  /**
-   * Compute the dual norm of the residual for the solution
-   * saved in RB_solution. Overloaded to handle the
-   * quadratic nonlinearity as well.
-   */
-  virtual Real compute_residual_dual_norm(const unsigned int N);
-
-  /**
-   * Get the SCM lower bound for the current parameters
-   * from the associated SCM system.
-   */
-  virtual Real get_SCM_lower_bound();
-
-  /**
-   * Get the SCM upper bound for the current parameters
-   * from the associated SCM system.
-   */
-  virtual Real get_SCM_upper_bound();
 
 private:
 

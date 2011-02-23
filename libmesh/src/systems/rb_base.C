@@ -23,6 +23,7 @@
 #include "equation_systems.h"
 #include "parallel.h"
 #include "rb_eim_system.h"
+#include "rb_eim_evaluation.h"
 
 // For the solver switching stuff.
 #include "petsc_linear_solver.h"
@@ -301,9 +302,11 @@ Number RBBase<Base>::eval_theta_q_a(unsigned int q)
 
     RBEIMSystem& eim_system = *A_EIM_systems_vector[A_EIM_indices.first];
     eim_system.set_current_parameters(get_current_parameters());
-    eim_system.RB_solve(eim_system.get_n_basis_functions());
+    
+    RBEIMEvaluation* eim_eval = libmesh_cast_ptr<RBEIMEvaluation*>(eim_system.rb_eval);
+    eim_eval->RB_solve(eim_system.get_n_basis_functions());
 
-    return eim_system.RB_solution(A_EIM_indices.second);
+    return eim_system.rb_eval->RB_solution(A_EIM_indices.second);
   }
 
 }

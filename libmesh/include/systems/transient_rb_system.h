@@ -73,12 +73,6 @@ public:
   virtual void clear ();
 
   /**
-   * Perform online solve with the N basis functions for
-   * current_params.
-   */
-  virtual Real RB_solve(unsigned int N);
-
-  /**
    * Perform a truth solve at the current parameter.
    */
   virtual Real truth_solve(int write_interval);
@@ -142,13 +136,10 @@ public:
                                  NumericVector<Number>& arg);
 
   /**
-   * Resize all the RB matrices.
-   * Optionally perform the initial assembly of affine operators.
-   * Overload to also recompute RB_ic_proj_rhs_all_N if 
-   * get_n_basis_functions() > 0 so that we can continue
-   * an offline computation.
+   * Build a new TransientRBEvaluation object and add
+   * it to the rb_evaluation_objects vector.
    */
-  virtual void initialize_RB_system(bool online_mode);
+  virtual void add_new_rb_evaluation_object();
   
   /**
    * Get Q_m, the number of terms in the affine
@@ -185,6 +176,12 @@ public:
    * Evaluate theta_q_m at the current parameter.
    */
   Number eval_theta_q_m(unsigned int q);
+
+  /**
+   * Override initialize_RB_system to also initialize
+   * RB_ic_proj_rhs_all_N, if necessary.
+   */
+  virtual void initialize_RB_system(bool do_not_assemble);
 
   /**
    * Assemble the truth system in the transient linear case.
@@ -257,6 +254,27 @@ public:
   const NumericVector<Number>& get_error_temporal_data();
 
   /**
+   * Compute the L2 projection of the initial condition
+   * onto the RB space for 1 <= N <= RB_size and store
+   * each projection in RB_initial_condition_matrix.
+   */
+  void update_RB_initial_condition_all_N();
+
+  /**
+   * Specifies the residual scaling on the numerator to
+   * be used in the a posteriori error bound. Overload
+   * in subclass in order to obtain the desired error bound.
+   */
+  virtual Real residual_scaling_numer(Real alpha_LB);
+
+  /**
+   * Specifies the residual scaling on the denominator to
+   * be used in the a posteriori error bound. Overload
+   * in subclass in order to obtain the desired error bound.
+   */
+  virtual Real residual_scaling_denom(Real alpha_LB);
+
+  /**
    * Overload write_offline_data_to_files in order to
    * write out the mass matrix and initial condition
    * data as well.
@@ -277,39 +295,11 @@ public:
    * The L2 matrix.
    */
   AutoPtr< SparseMatrix<Number> > L2_matrix;
-  
-  /**
-   * Dense RB L2 matrix.
-   */
-  DenseMatrix<Number> RB_L2_matrix;
 
   /**
    * Vector storing the Q_m matrices from the mass operator
    */
   std::vector< SparseMatrix<Number>* > M_q_vector;
-
-  /**
-   * Dense matrices for the RB mass matrices.
-   */
-  std::vector< DenseMatrix<Number> > RB_M_q_vector;
-
-  /**
-   * Vector storing initial L2 error for all
-   * 1 <= N <= RB_size.
-   */
-  std::vector<Real> initial_L2_error_all_N;
-
-  /**
-   * The RB initial conditions (i.e. L2 projection of the truth
-   * initial condition) for each N.
-   */
-  std::vector< DenseVector<Number> > RB_initial_condition_all_N;
-
-  /**
-   * The error bound data for all time-levels from the
-   * most recent RB_solve.
-   */
-  std::vector< Real > error_bound_all_k;
 
   /**
    * The true error data for all time-levels from the
@@ -318,45 +308,15 @@ public:
 //   std::vector< Number > true_error_all_k;
 
   /**
-   * The RB outputs for all time-levels from the
-   * most recent RB_solve.
-   */
-  std::vector< std::vector<Number> > RB_outputs_all_k;
-
-  /**
-   * The error bounds for each RB output for all
-   * time-levels from the most recent RB_solve.
-   */
-  std::vector< std::vector<Real> > RB_output_error_bounds_all_k;
-
-  /**
    * The truth outputs for all time-levels from the
    * most recent truth_solve.
    */
   std::vector< std::vector<Number> > truth_outputs_all_k;
 
   /**
-   * The RB solution at the previous time-level.
-   */
-  DenseVector<Number> old_RB_solution;
-
-  /**
-   * Array storing the solution data at each time level from the most recent solve.
-   */
-  std::vector< DenseVector<Number> > RB_temporal_solution_data;
-
-  /**
    * Vectors storing the mass matrix representors.
    */
   std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
-
-  /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
-   */
-  std::vector< std::vector< std::vector<Number> > > Fq_Mq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Mq_Mq_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_Mq_representor_norms;
 
   /**
    * Boolean flag to indicate whether we are using a non-zero initialization.
@@ -372,16 +332,29 @@ public:
   bool compute_truth_projection_error;
 
   /**
-   * The filename of the file containing the initial condition.
+   * The filename of the file containing the initial
+   * condition projected onto the truth mesh.
    */
   std::string init_filename;
 
 protected:
+
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * Initializes the mesh-dependent data.
    */
   virtual void init_data ();
+
+  /**
+   * Read in the parameters from file and set up the system
+   * accordingly.
+   */
+  virtual void process_parameters_file ();
+
+  /**
+   * Helper function that actually allocates all the data
+   * structures required by this class.
+   */
+  virtual void allocate_data_structures();
 
   /**
    * This function imposes a truth initial condition,
@@ -415,21 +388,6 @@ protected:
   virtual void update_system();
 
   /**
-   * Compute the dual norm of the residual for the solution
-   * saved in RB_solution. This function uses the cached time-independent
-   * data.
-   */
-  virtual Real compute_residual_dual_norm(const unsigned int N);
-  
-  /**
-   * Compute the dual norm of the residual for the solution
-   * saved in RB_solution. This function does not used the cached
-   * data and therefore also works when the parameter changes as
-   * a function of time.
-   */
-  virtual Real uncached_compute_residual_dual_norm(const unsigned int N);
-
-  /**
    * Compute the reduced basis matrices for the current basis.
    */
   virtual void update_RB_system_matrices();
@@ -441,39 +399,11 @@ protected:
   virtual void update_residual_terms(bool compute_inner_products);
 
   /**
-   * Compute the L2 projection of the initial condition
-   * onto the RB space for 1 <= N <= RB_size and store
-   * each projection in RB_initial_condition_matrix.
-   */
-  void update_RB_initial_condition_all_N();
-
-  /**
-   * Specifies the residual scaling on the numerator to
-   * be used in the a posteriori error bound. Overload
-   * in subclass in order to obtain the desired error bound.
-   */
-  virtual Real residual_scaling_numer(Real alpha_LB);
-
-  /**
-   * Specifies the residual scaling on the denominator to
-   * be used in the a posteriori error bound. Overload
-   * in subclass in order to obtain the desired error bound.
-   */
-  virtual Real residual_scaling_denom(Real alpha_LB);
-
-  /**
    * Set column k (i.e. the current time level) of temporal_data to the
    * difference between the current solution and the orthogonal
    * projection of the current solution onto the current RB space.
    */
   Number set_error_temporal_data();
-  
-  /**
-   * Helper function for caching the terms in the
-   * online residual assembly that do not change in time.
-   * (This is only useful when the parameter is fixed in time.)
-   */
-  void cache_online_residual_terms(const unsigned int N);
 
   //----------- PROTECTED DATA MEMBERS -----------//
 
@@ -537,16 +467,6 @@ protected:
    * condition projections.
    */
   DenseVector<Number> RB_ic_proj_rhs_all_N;
-
-  /**
-   * Cached residual terms.
-   */
-  Number cached_Fq_term;
-  DenseVector<Number> cached_Fq_Aq_vector;
-  DenseMatrix<Number> cached_Aq_Aq_matrix;
-  DenseVector<Number> cached_Fq_Mq_vector;
-  DenseMatrix<Number> cached_Aq_Mq_matrix;
-  DenseMatrix<Number> cached_Mq_Mq_matrix;
 
 private:
 

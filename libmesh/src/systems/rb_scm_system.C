@@ -83,7 +83,7 @@ void RBSCMSystem::clear()
   Parent::clear();
 }
 
-void RBSCMSystem::init_data ()
+void RBSCMSystem::initialize_SCM_system ()
 {
   // First read in data from parameters_filename
   GetPot infile(parameters_filename);
@@ -103,11 +103,6 @@ void RBSCMSystem::init_data ()
   // Resize the bounding box vectors
   B_min.resize(get_Q_a());
   B_max.resize(get_Q_a());
-
-  // Tell the system whether or not to initialize \calN dependent data
-  // structures.
-  initialize_calN_dependent_data = infile("initialize_calN_dependent_data",
-                                          initialize_calN_dependent_data);
 
   std::vector<Real> mu_min_vector(n_SCM_parameters);
   std::vector<Real> mu_max_vector(n_SCM_parameters);
@@ -131,9 +126,6 @@ void RBSCMSystem::init_data ()
                                  n_SCM_training_samples,
                                  log_scaling,
                                  deterministic_training);
-
-  // Call the Parent's initialization routine once the parameters are all set.
-  Parent::init_data();
 
   libMesh::out << std::endl << "RBSCMSystem parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;

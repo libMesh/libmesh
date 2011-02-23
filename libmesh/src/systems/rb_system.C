@@ -36,6 +36,7 @@
 #include "rb_system.h"
 #include "rb_scm_system.h"
 #include "rb_eim_system.h"
+#include "rb_eim_evaluation.h"
 
 // For creating a directory
 #include <sys/types.h>
@@ -53,6 +54,7 @@ RBSystem::RBSystem (EquationSystems& es,
 		    const std::string& name,
 		    const unsigned int number)
   : Parent(es, name, number),
+    rb_eval(NULL),
     inner_product_matrix(SparseMatrix<Number>::build()),
     constraint_matrix(SparseMatrix<Number>::build()),
     constrained_problem(false),
@@ -65,12 +67,13 @@ RBSystem::RBSystem (EquationSystems& es,
     impose_internal_dirichlet_BCs(false),
     impose_internal_fluxes(false),
     compute_RB_inner_product(false),
+    store_non_dirichlet_operators(false),
     parameters_filename(""),
     enforce_constraints_exactly(false),
-    Nmax(0),
-    delta_N(1),
     write_binary_basis_functions(true),
     read_binary_basis_functions(true),
+    Nmax(0),
+    delta_N(1),
     write_binary_residual_representors(true),
     read_binary_residual_representors(true),
     quiet(true),
@@ -86,11 +89,7 @@ RBSystem::RBSystem (EquationSystems& es,
     RB_system_initialized(false),
     current_EIM_system(NULL)
 {
-  RB_solution.resize(0);
-
-  Fq_representor_norms.clear();
-  Fq_Aq_representor_norms.clear();
-  Aq_Aq_representor_norms.clear();
+  rb_evaluation_objects.clear();
 
   // Clear the theta and assembly vectors so that we can push_back
   theta_q_a_vector.clear();
@@ -147,6 +146,27 @@ void RBSystem::clear()
     }
   }
 
+  if(store_non_dirichlet_operators)
+  {
+    for(unsigned int q=0; q<non_dirichlet_A_q_vector.size(); q++)
+    {
+      if(non_dirichlet_A_q_vector[q])
+      {
+        delete non_dirichlet_A_q_vector[q];
+        non_dirichlet_A_q_vector[q] = NULL;
+      }
+    }
+
+    for(unsigned int q=0; q<non_dirichlet_F_q_vector.size(); q++)
+    {
+      if(non_dirichlet_F_q_vector[q])
+      {
+        delete non_dirichlet_F_q_vector[q];
+        non_dirichlet_F_q_vector[q] = NULL;
+      }
+    }
+  }
+
   for(unsigned int i=0; i<outputs_vector.size(); i++)
     for(unsigned int q_l=0; q_l<outputs_vector[i].size(); q_l++)
       if(outputs_vector[i][q_l])
@@ -158,7 +178,28 @@ void RBSystem::clear()
   // Clear the basis functions and the
   // basis-function-dependent data using
   // the non-virtual helper function
-  this->clear_basis_helper();
+  clear_basis_helper();
+
+  // Call the destructor on all the RBEvaluation objects
+  std::vector<RBEvaluation*>::iterator iter = rb_evaluation_objects.begin();
+  for( ; iter != rb_evaluation_objects.end(); iter++)
+  {
+    RBEvaluation* eval = *iter;
+    if(eval)
+    {
+      eval->clear(); 
+      delete eval;
+      eval = NULL;
+    }
+  }
+  rb_evaluation_objects.clear();
+
+  // Also, clear the rb_eval pointer. (The object should have been
+  // deleted above, just need to set the pointer to NULL)
+  if(rb_eval)
+  {
+    rb_eval = NULL;
+  }
 }
 
 void RBSystem::clear_basis_function_dependent_data()
@@ -170,25 +211,11 @@ void RBSystem::clear_basis_function_dependent_data()
     greedy_param_list[i].clear();
   greedy_param_list.clear();
 
-  // Call non-virtual helper class to clear the
-  // basis related data
   clear_basis_helper();
 }
 
 void RBSystem::clear_basis_helper()
 {
-  // Clear the basis functions
-  for(unsigned int i=0; i<basis_functions.size(); i++)
-    {
-      if (basis_functions[i])
-	{
-	  basis_functions[i]->clear();
-	  delete basis_functions[i];
-	  basis_functions[i] = NULL;
-	}
-    }
-  basis_functions.resize(0);
-
   // Also delete the representors
   for(unsigned int q_f=0; q_f<F_q_representor.size(); q_f++)
   {
@@ -210,7 +237,12 @@ void RBSystem::clear_basis_helper()
       }
     }
   }
-
+  
+  // Clear the current RBEvaluation object
+  if(rb_eval)
+  {
+    rb_eval->clear();
+  }
 }
 
 std::string RBSystem::system_type () const
@@ -218,7 +250,7 @@ std::string RBSystem::system_type () const
   return "RBSystem";
 }
 
-void RBSystem::init_data ()
+void RBSystem::process_parameters_file ()
 {
   // First read in data from parameters_filename
   GetPot infile(parameters_filename);
@@ -286,11 +318,6 @@ void RBSystem::init_data ()
   write_data_during_training = infile("write_data_during_training",
                                       write_data_during_training);
 
-  // Tell the system whether or not to initialize \calN dependent data
-  // structures.
-  initialize_calN_dependent_data = infile("initialize_calN_dependent_data",
-                                          initialize_calN_dependent_data);
-
   // Set boolean which turns on/off storing the representor residuals
   impose_internal_dirichlet_BCs = infile("impose_internal_dirichlet_BCs",
                                           impose_internal_dirichlet_BCs);
@@ -298,6 +325,11 @@ void RBSystem::init_data ()
   // Set boolean which turns on/off storing the representor residuals
   impose_internal_fluxes = infile("impose_internal_fluxes",
                                    impose_internal_fluxes);
+
+  // Set boolean which turns on/off storing a second set of affine
+  // operators and vectors which do not have Dirichlet BCs enforced
+  store_non_dirichlet_operators = infile("store_non_dirichlet_operators",
+                                          store_non_dirichlet_operators);
 
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
@@ -405,6 +437,7 @@ void RBSystem::init_data ()
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "initializing calN-dependent data structures? "
                << initialize_calN_dependent_data << std::endl;
+  libMesh::out << "store non-Dirichlet affine operators? " << store_non_dirichlet_operators << std::endl;
   libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
   libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
   libMesh::out << "quiet mode? " << quiet << std::endl;
@@ -421,10 +454,150 @@ void RBSystem::init_data ()
 
   // We need Nmax to be initialized
   libmesh_assert(Nmax > 0);
+}
 
-  // Now that input parameters (e.g. Q_a) have been read in,
-  // call the Parent's initialization routine.
-  Parent::init_data();
+void RBSystem::initialize_RB_system(bool do_not_assemble)
+{
+  process_parameters_file();
+  allocate_data_structures();
+
+  // Build a new RBEvaluation object
+  libmesh_assert( rb_evaluation_objects.empty() );
+  add_new_rb_evaluation_object();
+  
+  // And initialize rb_eval
+  rb_eval = rb_evaluation_objects[0];
+  rb_eval->initialize();
+
+  RB_system_initialized = true;
+
+  if(!do_not_assemble)
+  {
+    // Initialize the non-Dirichlet and Dirichlet dofs lists
+    this->initialize_dirichlet_dofs();
+
+    // Assemble and store all of the matrices if we're
+    // not in low-memory mode
+    if(!low_memory_mode)
+    {
+      this->assemble_misc_matrices();
+      this->assemble_all_affine_operators();
+    }
+
+    this->assemble_all_affine_vectors();
+    this->assemble_all_output_vectors();
+  }
+}
+
+void RBSystem::allocate_data_structures()
+{
+  // Resize vectors for storing calN-dependent data but only
+  // initialize if initialize_calN_dependent_data == true
+  A_q_vector.resize(get_Q_a());
+  F_q_vector.resize(get_Q_f());
+  F_q_representor.resize(get_Q_f());
+  A_q_representor.resize(get_Q_a());
+  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
+  {
+    A_q_representor[q_a].resize(Nmax);
+  }
+  outputs_vector.resize(get_n_outputs());
+  for(unsigned int n=0; n<get_n_outputs(); n++)
+    outputs_vector[n].resize( get_Q_l(n) );
+
+  output_dual_norms.resize(get_n_outputs());
+  for(unsigned int n=0; n<get_n_outputs(); n++)
+  {
+    unsigned int Q_l_hat = get_Q_l(n)*(get_Q_l(n)+1)/2;
+    output_dual_norms[n].resize(Q_l_hat);
+  }
+
+  if(initialize_calN_dependent_data)
+  {
+    // Only initialize matrices if we're not in low-memory mode
+    if(!low_memory_mode)
+    {
+      DofMap& dof_map = this->get_dof_map();
+
+      dof_map.attach_matrix(*inner_product_matrix);
+      inner_product_matrix->init();
+      inner_product_matrix->zero();
+
+      if(this->constrained_problem)
+      {
+        dof_map.attach_matrix(*constraint_matrix);
+        constraint_matrix->init();
+        constraint_matrix->zero();
+      }
+
+      for(unsigned int q=0; q<get_Q_a(); q++)
+      {
+        // Initialize the memory for the matrices
+        A_q_vector[q] = SparseMatrix<Number>::build().release();
+        dof_map.attach_matrix(*A_q_vector[q]);
+        A_q_vector[q]->init();
+        A_q_vector[q]->zero();
+      }
+      
+      // We also need to initialize a second set of non-Dirichlet operators
+      if(store_non_dirichlet_operators)
+      {
+        non_dirichlet_A_q_vector.resize(get_Q_a());
+        for(unsigned int q=0; q<get_Q_a(); q++)
+        {
+          // Initialize the memory for the matrices
+          non_dirichlet_A_q_vector[q] = SparseMatrix<Number>::build().release();
+          dof_map.attach_matrix(*non_dirichlet_A_q_vector[q]);
+          non_dirichlet_A_q_vector[q]->init();
+          non_dirichlet_A_q_vector[q]->zero();
+        }
+      }
+    }
+
+    // Initialize the vectors even if we are in low-memory mode
+    for(unsigned int q=0; q<get_Q_f(); q++)
+    {
+      // Initialize the memory for the vectors
+      F_q_vector[q] = NumericVector<Number>::build().release();
+      F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    }
+
+    // We also need to initialize a second set of non-Dirichlet operators
+    if(store_non_dirichlet_operators)
+    {
+      non_dirichlet_F_q_vector.resize(get_Q_f());
+      for(unsigned int q=0; q<get_Q_f(); q++)
+      {
+        // Initialize the memory for the vectors
+        non_dirichlet_F_q_vector[q] = NumericVector<Number>::build().release();
+        non_dirichlet_F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      }
+    }
+
+    for(unsigned int n=0; n<get_n_outputs(); n++)
+      for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
+      {
+        // Initialize the memory for the truth output vectors
+        outputs_vector[n][q_l] = (NumericVector<Number>::build().release());
+        outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      }
+  }
+
+  // Resize truth_outputs vector
+  truth_outputs.resize(this->get_n_outputs());
+}
+
+NumericVector<Number>& RBSystem::get_basis_function(unsigned int i)
+{
+  libmesh_assert(i<=rb_eval->basis_functions.size());
+
+  return *(rb_eval->basis_functions[i]);
+}
+
+void RBSystem::add_new_rb_evaluation_object()
+{
+  RBEvaluation* e = new RBEvaluation(*this);
+  rb_evaluation_objects.push_back(e);
 }
 
 void RBSystem::attach_dirichlet_dof_initialization (dirichlet_list_fptr dirichlet_init)
@@ -530,159 +703,6 @@ void RBSystem::initialize_dirichlet_dofs()
   STOP_LOG("initialize_dirichlet_dofs()", "RBSystem");
 }
 
-void RBSystem::initialize_RB_system(bool online_mode)
-{
-  // Resize/clear inner product matrix
-  if(compute_RB_inner_product)
-    RB_inner_product_matrix.resize(Nmax,Nmax);
-
-  // Resize vectors for storing calN-dependent data but only
-  // initialize if initialize_calN_dependent_data == true
-  A_q_vector.resize(get_Q_a());
-  F_q_vector.resize(get_Q_f());
-  F_q_representor.resize(get_Q_f());
-  A_q_representor.resize(get_Q_a());
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-  {
-    A_q_representor[q_a].resize(Nmax);
-  }
-  outputs_vector.resize(get_n_outputs());
-  for(unsigned int n=0; n<get_n_outputs(); n++)
-    outputs_vector[n].resize( get_Q_l(n) );
-
-  if(initialize_calN_dependent_data)
-  {
-    // Only initialize matrices if we're not in low-memory mode
-    if(!low_memory_mode)
-    {
-      DofMap& dof_map = this->get_dof_map();
-
-      dof_map.attach_matrix(*inner_product_matrix);
-      inner_product_matrix->init();
-      inner_product_matrix->zero();
-
-      if(this->constrained_problem)
-      {
-        dof_map.attach_matrix(*constraint_matrix);
-        constraint_matrix->init();
-        constraint_matrix->zero();
-      }
-
-      for(unsigned int q=0; q<get_Q_a(); q++)
-      {
-        // Initialize the memory for the matrices
-        A_q_vector[q] = SparseMatrix<Number>::build().release();
-        dof_map.attach_matrix(*A_q_vector[q]);
-        A_q_vector[q]->init();
-        A_q_vector[q]->zero();
-      }
-    }
-
-    // Initialize the vectors even if we are in low-memory mode
-    for(unsigned int q=0; q<get_Q_f(); q++)
-    {
-      // Initialize the memory for the vectors
-      F_q_vector[q] = NumericVector<Number>::build().release();
-      F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-    }
-
-    for(unsigned int n=0; n<get_n_outputs(); n++)
-      for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
-      {
-        // Initialize the memory for the truth output vectors
-        outputs_vector[n][q_l] = (NumericVector<Number>::build().release());
-        outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-      }
-  }
-
-  // Now allocate the N (i.e. RB) dependent data structures
-
-  // Allocate dense matrices for RB solves
-  RB_A_q_vector.resize(get_Q_a());
-
-  for(unsigned int q=0; q<get_Q_a(); q++)
-  {
-    // Initialize the memory for the RB matrices
-    RB_A_q_vector[q].resize(Nmax,Nmax);
-  }
-
-  RB_F_q_vector.resize(get_Q_f());
-
-  for(unsigned int q=0; q<get_Q_f(); q++)
-  {
-    // Initialize the memory for the RB vectors
-    RB_F_q_vector[q].resize(Nmax);
-  }
-
-  // Initialize vectors for the norms of the representors
-  unsigned int Q_f_hat = get_Q_f()*(get_Q_f()+1)/2;
-  Fq_representor_norms.resize(Q_f_hat);
-
-  Fq_Aq_representor_norms.resize(get_Q_f());
-  for(unsigned int i=0; i<get_Q_f(); i++)
-  {
-    Fq_Aq_representor_norms[i].resize(get_Q_a());
-    for(unsigned int j=0; j<get_Q_a(); j++)
-    {
-      Fq_Aq_representor_norms[i][j].resize(Nmax);
-    }
-  }
-
-  unsigned int Q_a_hat = get_Q_a()*(get_Q_a()+1)/2;
-  Aq_Aq_representor_norms.resize(Q_a_hat);
-  for(unsigned int i=0; i<Q_a_hat; i++)
-  {
-    Aq_Aq_representor_norms[i].resize(Nmax);
-    for(unsigned int j=0; j<Nmax; j++)
-    {
-      Aq_Aq_representor_norms[i][j].resize(Nmax);
-    }
-  }
-
-  // Resize truth_outputs vector
-  truth_outputs.resize(this->get_n_outputs());
-
-  // Initialize the RB output vectors
-  RB_output_vectors.resize(get_n_outputs());
-  for(unsigned int n=0; n<get_n_outputs(); n++)
-  {
-    RB_output_vectors[n].resize(get_Q_l(n));
-    for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
-    {
-      RB_output_vectors[n][q_l].resize(Nmax);
-    }
-  }
-
-  // Initialize vectors storing output data
-  output_dual_norms.resize(get_n_outputs());
-  for(unsigned int n=0; n<get_n_outputs(); n++)
-  {
-    unsigned int Q_l_hat = get_Q_l(n)*(get_Q_l(n)+1)/2;
-    output_dual_norms[n].resize(Q_l_hat);
-  }
-  RB_outputs.resize(get_n_outputs());
-  RB_output_error_bounds.resize(get_n_outputs());
-
-  RB_system_initialized = true;
-
-  if(!online_mode)
-  {
-    // Initialize the non-Dirichlet and Dirichlet dofs lists
-    this->initialize_dirichlet_dofs();
-
-    // Assemble and store all of the matrices if we're
-    // not in low-memory mode
-    if(!low_memory_mode)
-    {
-      this->assemble_misc_matrices();
-      this->assemble_all_affine_operators();
-    }
-
-    this->assemble_all_affine_vectors();
-    this->assemble_all_output_vectors();
-  }
-}
-
 AutoPtr<FEMContext> RBSystem::build_context ()
 {
   return AutoPtr<FEMContext>(new FEMContext(*this));
@@ -693,7 +713,8 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
                                  affine_assembly_fptr bndry_assembly,
                                  SparseMatrix<Number>* input_matrix,
                                  NumericVector<Number>* input_vector,
-                                 bool symmetrize)
+                                 bool symmetrize,
+                                 bool apply_dirichlet_bc)
 {
   START_LOG("add_scaled_matrix_and_vector()", "RBSystem");
 
@@ -757,18 +778,21 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
     // Apply constraints, e.g. periodic constraints
     this->get_dof_map().constrain_element_matrix_and_vector
       (context.elem_jacobian, context.elem_residual, context.dof_indices);
-      
-    // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
-    // Note that this cannot be inside the side-loop since non-boundary
-    // elements may contain boundary dofs
-    std::set<unsigned int>::const_iterator iter;
-    for(unsigned int n=0; n<context.dof_indices.size(); n++)
+
+    if(apply_dirichlet_bc)
     {
-      iter = global_dirichlet_dofs_set.find( context.dof_indices[n] );
-      if(iter != global_dirichlet_dofs_set.end())
+      // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
+      // Note that this cannot be inside the side-loop since non-boundary
+      // elements may contain boundary dofs
+      std::set<unsigned int>::const_iterator iter;
+      for(unsigned int n=0; n<context.dof_indices.size(); n++)
       {
-	context.elem_jacobian.condense
-	  (n,n,0.,context.elem_residual);
+        iter = global_dirichlet_dofs_set.find( context.dof_indices[n] );
+        if(iter != global_dirichlet_dofs_set.end())
+        {
+	  context.elem_jacobian.condense
+	    (n,n,0.,context.elem_residual);
+        }
       }
     }
 
@@ -1086,7 +1110,7 @@ void RBSystem::assemble_and_add_constraint_matrix(SparseMatrix<Number>* input_ma
   add_scaled_matrix_and_vector(1., constraint_assembly, NULL, input_matrix, NULL);
 }
 
-void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix)
+void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
 {
   if(q >= get_Q_a())
   {
@@ -1103,7 +1127,9 @@ void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_ma
                                  A_q_intrr_assembly_vector[q],
                                  A_q_bndry_assembly_vector[q],
                                  input_matrix,
-                                 NULL);
+                                 NULL,
+                                 false, /* symmetrize */
+                                 apply_dirichlet_bc);
   }
   else // We have an EIM function
   {
@@ -1120,7 +1146,9 @@ void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_ma
                                  A_EIM_intrr_assembly_vector[system_id],
                                  A_EIM_bndry_assembly_vector[system_id],
                                  input_matrix,
-                                 NULL);
+                                 NULL,
+                                 false, /* symmetrize */
+                                 apply_dirichlet_bc);
   }
 }
 
@@ -1198,39 +1226,68 @@ void RBSystem::assemble_all_affine_operators()
 
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
     assemble_Aq_matrix(q_a, get_A_q(q_a));
+
+  if(store_non_dirichlet_operators)
+  {
+    for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
+      assemble_Aq_matrix(q_a, get_non_dirichlet_A_q(q_a), false);
+  }
 }
 
 void RBSystem::assemble_all_affine_vectors()
 {
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
+    assemble_Fq_vector(q_f, get_F_q(q_f));
+
+  if(store_non_dirichlet_operators)
   {
-    get_F_q(q_f)->zero();
+    for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
+      assemble_Fq_vector(q_f, get_non_dirichlet_F_q(q_f), false);
+  }
+
+}
+
+void RBSystem::assemble_Fq_vector(unsigned int q,
+                                  NumericVector<Number>* input_vector,
+                                  bool apply_dirichlet_bc)
+{
+  if(q >= get_Q_f())
+  {
+    libMesh::err << "Error: We must have q < Q_f in assemble_Fq_vector."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  input_vector->zero();
     
-    if(!is_F_EIM_function(q_f))
-    {
-      add_scaled_matrix_and_vector(1.,
-                                   F_q_intrr_assembly_vector[q_f],
-                                   F_q_bndry_assembly_vector[q_f],
-                                   NULL,
-                                   get_F_q(q_f));
-    }
-    else // We have an EIM function
-    {
-      // Find out the LHS EIM system index and the associated function index that corresponds to q
-      std::pair<unsigned int, unsigned int> F_EIM_indices = get_F_EIM_indices(q_f);
+  if(!is_F_EIM_function(q))
+  {
+    add_scaled_matrix_and_vector(1.,
+                                 F_q_intrr_assembly_vector[q],
+                                 F_q_bndry_assembly_vector[q],
+                                 NULL,
+                                 input_vector,
+                                 false,             /* symmetrize */
+                                 apply_dirichlet_bc /* apply_dirichlet_bc */);
+  }
+  else // We have an EIM function
+  {
+    // Find out the LHS EIM system index and the associated function index that corresponds to q
+    std::pair<unsigned int, unsigned int> F_EIM_indices = get_F_EIM_indices(q);
     
-      unsigned int system_id = F_EIM_indices.first;
-      current_EIM_system = F_EIM_systems_vector[system_id];
+    unsigned int system_id = F_EIM_indices.first;
+    current_EIM_system = F_EIM_systems_vector[system_id];
       
-      // Cache a GHOSTED version of the EIM basis function corresponding to the current EIM function index
-      current_EIM_system->cache_ghosted_basis_function(F_EIM_indices.second);
+    // Cache a GHOSTED version of the EIM basis function corresponding to the current EIM function index
+    current_EIM_system->cache_ghosted_basis_function(F_EIM_indices.second);
     
-      add_scaled_matrix_and_vector(1.,
-                                   F_EIM_intrr_assembly_vector[system_id],
-                                   F_EIM_bndry_assembly_vector[system_id],
-                                   NULL,
-                                   get_F_q(q_f));
-    }
+    add_scaled_matrix_and_vector(1.,
+                                 F_EIM_intrr_assembly_vector[system_id],
+                                 F_EIM_bndry_assembly_vector[system_id],
+                                 NULL,
+                                 input_vector,
+                                 false,             /* symmetrize */
+                                 apply_dirichlet_bc /* apply_dirichlet_bc */);
   }
 }
 
@@ -1396,6 +1453,9 @@ Real RBSystem::truth_solve(int plot_solution)
   }
 
   truth_assembly();
+  
+  // Safer to zero the solution first, especially when using iterative solvers
+  solution->zero();
   solve();
 
   // Make sure we didn't max out the number of iterations
@@ -1602,9 +1662,11 @@ Number RBSystem::eval_theta_q_f(unsigned int q)
 
     RBEIMSystem& eim_system = *F_EIM_systems_vector[F_EIM_indices.first];
     eim_system.set_current_parameters(get_current_parameters());
-    eim_system.RB_solve(eim_system.get_n_basis_functions());
+    
+    RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(*eim_system.rb_eval);
+    eim_eval.RB_solve(eim_system.get_n_basis_functions());
 
-    return eim_system.RB_solution(F_EIM_indices.second);
+    return eim_system.rb_eval->RB_solution(F_EIM_indices.second);
   }
 }
 
@@ -1657,9 +1719,9 @@ void RBSystem::load_basis_function(unsigned int i)
     libmesh_error();
   }
 
-  libmesh_assert(i < basis_functions.size());
+  libmesh_assert(i < get_n_basis_functions());
 
-  *solution = *basis_functions[i];
+  *solution = get_basis_function(i);
 
   this->update();
 
@@ -1683,10 +1745,10 @@ void RBSystem::enrich_RB_space()
   if(low_memory_mode)
     assemble_inner_product_matrix(matrix);
 
-  for(unsigned int index=0; index<basis_functions.size(); index++)
+  for(unsigned int index=0; index<get_n_basis_functions(); index++)
   {
     // invoke copy constructor for NumericVector
-    *proj_index = *basis_functions[index];
+    *proj_index = get_basis_function(index);
     if(!low_memory_mode)
     {
       inner_product_matrix->vector_mult(*inner_product_storage_vector,*proj_index);
@@ -1710,10 +1772,18 @@ void RBSystem::enrich_RB_space()
     matrix->vector_mult(*inner_product_storage_vector,*new_bf);
   }
   Number new_bf_norm = std::sqrt( inner_product_storage_vector->dot(*new_bf) );
-  new_bf->scale(1./new_bf_norm);
+  
+  if(new_bf_norm == 0.)
+  {
+    new_bf->zero(); // avoid potential nan's
+  }
+  else
+  {
+    new_bf->scale(1./new_bf_norm);
+  }
 
   // load the new basis function into the basis_functions vector.
-  basis_functions.push_back( new_bf );
+  rb_eval->basis_functions.push_back( new_bf );
 
   STOP_LOG("enrich_RB_space()", "RBSystem");
 }
@@ -1834,86 +1904,6 @@ Real RBSystem::get_SCM_upper_bound()
 #endif // defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 }
 
-
-Real RBSystem::RB_solve(unsigned int N)
-{
-  START_LOG("RB_solve()", "RBSystem");
-
-  if(N > get_n_basis_functions())
-  {
-    libMesh::err << "ERROR: N cannot be larger than the number "
-                 << "of basis functions in RB_solve" << std::endl;
-    libmesh_error();
-  }
-  if(N==0)
-  {
-    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
-    libmesh_error();
-  }
-
-  // Resize (and clear) the solution vector
-  RB_solution.resize(N);
-
-  // Assemble the RB system
-  DenseMatrix<Number> RB_system_matrix(N,N);
-  RB_system_matrix.zero();
-
-  DenseMatrix<Number> RB_A_q_a;
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-  {
-    RB_A_q_vector[q_a].get_principal_submatrix(N, RB_A_q_a);
-
-    RB_system_matrix.add(eval_theta_q_a(q_a), RB_A_q_a);
-  }
-
-  // Assemble the RB rhs
-  DenseVector<Number> RB_rhs(N);
-  RB_rhs.zero();
-
-  DenseVector<Number> RB_F_q_f;
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    RB_F_q_vector[q_f].get_principal_subvector(N, RB_F_q_f);
-
-    RB_rhs.add(eval_theta_q_f(q_f), RB_F_q_f);
-  }
-  
-  // Solve the linear system
-  RB_system_matrix.lu_solve(RB_rhs, RB_solution);
-
-  // Evaluate the dual norm of the residual for RB_solution_vector
-  Real epsilon_N = compute_residual_dual_norm(N);
-
-  // Get lower bound for coercivity constant
-  const Real alpha_LB = get_SCM_lower_bound();
-  // alpha_LB needs to be positive to get a valid error bound
-  libmesh_assert( alpha_LB > 0. );
-
-  // Store (absolute) error bound
-  Real abs_error_bound = epsilon_N / residual_scaling_denom(alpha_LB);
-
-  // Compute the norm of RB_solution
-  Real RB_solution_norm = RB_solution.l2_norm();
-
-  // Now compute the outputs and associated errors
-  DenseVector<Number> RB_output_vector_N;
-  for(unsigned int n=0; n<get_n_outputs(); n++)
-  {
-    RB_outputs[n] = 0.;
-    for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
-    {
-      RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs[n] += libmesh_conj(eval_theta_q_l(n,q_l))*RB_output_vector_N.dot(RB_solution);
-    }
-
-    RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n);
-  }
-
-  STOP_LOG("RB_solve()", "RBSystem");
-
-  return ( return_rel_error_bound ? abs_error_bound/RB_solution_norm : abs_error_bound );
-}
-
 Real RBSystem::residual_scaling_denom(Real alpha_LB)
 {
   // Here we implement the residual scaling for a coercive
@@ -1934,7 +1924,7 @@ void RBSystem::update_RB_system_matrices()
   {
     for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
     {
-      RB_F_q_vector[q_f](i) = get_F_q(q_f)->dot(*basis_functions[i]);
+      rb_eval->RB_F_q_vector[q_f](i) = get_F_q(q_f)->dot(get_basis_function(i));
     }
   }
 
@@ -1943,7 +1933,7 @@ void RBSystem::update_RB_system_matrices()
     for(unsigned int n=0; n<get_n_outputs(); n++)
       for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
       {
-        RB_output_vectors[n][q_l](i) = get_output_vector(n,q_l)->dot(*basis_functions[i]);
+        rb_eval->RB_output_vectors[n][q_l](i) = get_output_vector(n,q_l)->dot(get_basis_function(i));
       }
 
     for(unsigned int j=0; j<RB_size; j++)
@@ -1956,21 +1946,21 @@ void RBSystem::update_RB_system_matrices()
         temp->zero();
         if(!low_memory_mode)
         {
-          inner_product_matrix->vector_mult(*temp, *basis_functions[j]);
+          inner_product_matrix->vector_mult(*temp, get_basis_function(j));
         }
         else
         {
           assemble_inner_product_matrix(matrix);
-          matrix->vector_mult(*temp, *basis_functions[j]);
+          matrix->vector_mult(*temp, get_basis_function(j));
         }
 
-        value = basis_functions[i]->dot(*temp);
-        RB_inner_product_matrix(i,j) = value;
+        value = get_basis_function(i).dot(*temp);
+        rb_eval->RB_inner_product_matrix(i,j) = value;
         if(i!=j)
         {
           // The inner product matrix is assumed
           // to be symmetric
-          RB_inner_product_matrix(j,i) = value;
+          rb_eval->RB_inner_product_matrix(j,i) = value;
         }
       }
 
@@ -1980,32 +1970,32 @@ void RBSystem::update_RB_system_matrices()
         temp->zero();
         if(!low_memory_mode)
         {
-          get_A_q(q_a)->vector_mult(*temp, *basis_functions[j]);
+          get_A_q(q_a)->vector_mult(*temp, get_basis_function(j));
         }
         else
         {
           assemble_Aq_matrix(q_a,matrix);
-          matrix->vector_mult(*temp, *basis_functions[j]);
+          matrix->vector_mult(*temp, get_basis_function(j));
         }
 
-        value = (*temp).dot(*basis_functions[i]);
-        RB_A_q_vector[q_a](i,j) = value;
+        value = (*temp).dot(get_basis_function(i));
+        rb_eval->RB_A_q_vector[q_a](i,j) = value;
 
         if(i!=j)
         {
           temp->zero();
           if(!low_memory_mode)
           {
-            get_A_q(q_a)->vector_mult(*temp, *basis_functions[i]);
+            get_A_q(q_a)->vector_mult(*temp, get_basis_function(i));
           }
           else
           {
             // matrix should still hold affine matrix q_a
-            matrix->vector_mult(*temp, *basis_functions[i]);
+            matrix->vector_mult(*temp, get_basis_function(i));
           }
 
-          value = (*temp).dot(*basis_functions[j]);
-          RB_A_q_vector[q_a](j,i) = value;
+          value = (*temp).dot(get_basis_function(j));
+          rb_eval->RB_A_q_vector[q_a](j,i) = value;
         }
       }
     }
@@ -2122,7 +2112,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 
 	    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
 	      {
-		Fq_representor_norms[q] = inner_product_storage_vector->dot(*F_q_representor[q_f2]);
+		rb_eval->Fq_representor_norms[q] = inner_product_storage_vector->dot(*F_q_representor[q_f2]);
 
 		q++;
 	      }
@@ -2151,7 +2141,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       rhs->zero();
       if(!low_memory_mode)
       {
-        get_A_q(q_a)->vector_mult(*rhs, *basis_functions[i]);
+        get_A_q(q_a)->vector_mult(*rhs, get_basis_function(i));
       }
       else
       {
@@ -2159,7 +2149,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
                                A_q_intrr_assembly_vector[q_a],
                                A_q_bndry_assembly_vector[q_a],
                                *rhs,
-                               *basis_functions[i]);
+                               get_basis_function(i));
       }
       rhs->scale(-1.);
       zero_dirichlet_dofs_on_rhs();
@@ -2231,7 +2221,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 	    {
 	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
 		{
-		  Fq_Aq_representor_norms[q_f][q_a][i] =
+		  rb_eval->Fq_Aq_representor_norms[q_f][q_a][i] =
 		    inner_product_storage_vector->dot(*A_q_representor[q_a][i]);
 		}
 	    }
@@ -2254,7 +2244,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 			{
 			  matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][j]);
 			}
-		      Aq_Aq_representor_norms[q][i][j] = inner_product_storage_vector->dot(*A_q_representor[q_a1][i]);
+		      rb_eval->Aq_Aq_representor_norms[q][i][j] = inner_product_storage_vector->dot(*A_q_representor[q_a1][i]);
 
 		      if(i != j)
 			{
@@ -2266,7 +2256,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 			    {
 			      matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][i]);
 			    }
-			  Aq_Aq_representor_norms[q][j][i] = inner_product_storage_vector->dot(*A_q_representor[q_a1][j]);
+			  rb_eval->Aq_Aq_representor_norms[q][j][i] = inner_product_storage_vector->dot(*A_q_representor[q_a1][j]);
 			}
 		    }
 		}
@@ -2452,17 +2442,17 @@ void RBSystem::load_RB_solution()
 
   solution->zero();
 
-  if(RB_solution.size() > basis_functions.size())
+  if(rb_eval->RB_solution.size() > get_n_basis_functions())
   {
-    libMesh::err << "ERROR: System contains " << basis_functions.size() << " basis functions."
-                 << " RB_solution vector constains " << RB_solution.size() << " entries."
+    libMesh::err << "ERROR: System contains " << get_n_basis_functions() << " basis functions."
+                 << " RB_solution vector constains " << rb_eval->RB_solution.size() << " entries."
                  << " RB_solution in RBSystem::load_RB_solution is too long!" << std::endl;
     libmesh_error();
   }
 
-  for(unsigned int i=0; i<RB_solution.size(); i++)
+  for(unsigned int i=0; i<rb_eval->RB_solution.size(); i++)
   {
-    solution->add(RB_solution(i), *basis_functions[i]);
+    solution->add(rb_eval->RB_solution(i), get_basis_function(i));
   }
 
   update();
@@ -2470,10 +2460,12 @@ void RBSystem::load_RB_solution()
   STOP_LOG("load_RB_solution()", "RBSystem");
 }
 
-Real RBSystem::compute_residual_dual_norm(const unsigned int N)
-{
-  START_LOG("compute_residual_dual_norm()", "RBSystem");
-
+// The slow (but simple, non-error prone) way to compute the residual dual norm
+// Useful for error checking
+//Real RBSystem::compute_residual_dual_norm(const unsigned int N)
+//{
+//  START_LOG("compute_residual_dual_norm()", "RBSystem");
+//
 //   // Put the residual in rhs in order to compute the norm of the Riesz representor
 //   // Note that this only works in serial since otherwise each processor will
 //   // have a different parameter value during the Greedy training.
@@ -2486,7 +2478,7 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
 //
 //   for(unsigned int i=0; i<N; i++)
 //   {
-//     RB_sol->add(RB_solution(i), *basis_functions[i]);
+//     RB_sol->add(RB_solution(i), get_basis_function(i));
 //   }
 //
 //   this->truth_assembly();
@@ -2524,85 +2516,17 @@ Real RBSystem::compute_residual_dual_norm(const unsigned int N)
 //   }
 //
 //   Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
-
-
-  // Use the stored representor inner product values
-  // to evaluate the residual norm
-  Number residual_norm_sq = 0.;
-
-  unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
-  {
-    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
-    {
-      Real delta = (q_f1==q_f2) ? 1. : 2.;
-      residual_norm_sq += delta * libmesh_real(
-        eval_theta_q_f(q_f1) * libmesh_conj(eval_theta_q_f(q_f2)) * Fq_representor_norms[q] );
-
-      q++;
-    }
-  }
-
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-    {
-      for(unsigned int i=0; i<N; i++)
-      {
-        Real delta = 2.;
-        residual_norm_sq +=
-          delta * libmesh_real( eval_theta_q_f(q_f) * libmesh_conj(eval_theta_q_a(q_a)) *
-          libmesh_conj(RB_solution(i)) * Fq_Aq_representor_norms[q_f][q_a][i] );
-      }
-    }
-  }
-
-  q=0;
-  for(unsigned int q_a1=0; q_a1<get_Q_a(); q_a1++)
-  {
-    for(unsigned int q_a2=q_a1; q_a2<get_Q_a(); q_a2++)
-    {
-      Real delta = (q_a1==q_a2) ? 1. : 2.;
-
-      for(unsigned int i=0; i<N; i++)
-      {
-        for(unsigned int j=0; j<N; j++)
-        {
-          residual_norm_sq +=
-            delta * libmesh_real( libmesh_conj(eval_theta_q_a(q_a1)) * eval_theta_q_a(q_a2) *
-            libmesh_conj(RB_solution(i)) * RB_solution(j) * Aq_Aq_representor_norms[q][i][j] );
-        }
-      }
-
-      q++;
-    }
-  }
-
-//  if(libmesh_real(residual_norm_sq) < 0.)
-//  {
-//    libMesh::out << "Warning: Square of residual norm is negative "
-//                 << "in RBSystem::compute_residual_dual_norm()" << std::endl;
-
-    // Sometimes this is negative due to rounding error,
-    // but error is on the order of 1.e-10, so shouldn't
-    // affect error bound much...
-//     libmesh_error();
-//    residual_norm_sq = std::abs(residual_norm_sq);
-//  }
-
-//   libMesh::out << "Slow residual norm squared = " << slow_residual_norm_sq
-//                << ", fast residual norm squared = " << residual_norm_sq << std::endl;
-
-  STOP_LOG("compute_residual_dual_norm()", "RBSystem");
-
-  return std::sqrt( libmesh_real(residual_norm_sq) );
-}
+//
+//  STOP_LOG("compute_residual_dual_norm()", "RBSystem");
+//
+//  return std::sqrt( libmesh_real(slow_residual_norm_sq) );
+//}
 
 SparseMatrix<Number>* RBSystem::get_A_q(unsigned int q)
 {
   if(low_memory_mode)
   {
-    libMesh::err << "Error: The affine matrices are not store in low-memory mode." << std::endl;
+    libMesh::err << "Error: The affine matrices are not stored in low-memory mode." << std::endl;
     libmesh_error();
   }
 
@@ -2614,6 +2538,30 @@ SparseMatrix<Number>* RBSystem::get_A_q(unsigned int q)
   }
 
   return A_q_vector[q];
+}
+
+SparseMatrix<Number>* RBSystem::get_non_dirichlet_A_q(unsigned int q)
+{
+  if(!store_non_dirichlet_operators)
+  {
+    libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_A_q." << std::endl;
+    libmesh_error();
+  }
+
+  if(low_memory_mode)
+  {
+    libMesh::err << "Error: The affine matrices are not stored in low-memory mode." << std::endl;
+    libmesh_error();
+  }
+
+  if(q >= get_Q_a())
+  {
+    libMesh::err << "Error: We must have q < Q_a in get_A_q."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  return non_dirichlet_A_q_vector[q];
 }
 
 RBEIMSystem& RBSystem::get_A_EIM_system(unsigned int index)
@@ -2657,6 +2605,24 @@ NumericVector<Number>* RBSystem::get_F_q(unsigned int q)
   return F_q_vector[q];
 }
 
+NumericVector<Number>* RBSystem::get_non_dirichlet_F_q(unsigned int q)
+{
+  if(!store_non_dirichlet_operators)
+  {
+    libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_F_q." << std::endl;
+    libmesh_error();
+  }
+
+  if(q >= get_Q_f())
+  {
+    libMesh::err << "Error: We must have q < Q_f in get_F_q."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  return non_dirichlet_F_q_vector[q];
+}
+
 NumericVector<Number>* RBSystem::get_output_vector(unsigned int n, unsigned int q_l)
 {
   if( (n >= get_n_outputs()) || (q_l >= get_Q_l(n)) )
@@ -2691,7 +2657,9 @@ void RBSystem::zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp)
   {
     unsigned int index = *iter;
     if( (dof_map.first_dof() <= index) && (index < dof_map.end_dof()) )
+    {
       temp.set(index, 0.);
+    }
   }
   temp.close();
 
@@ -2705,10 +2673,9 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
 {
   START_LOG("write_offline_data_to_files()", "RBSystem");
 
-  const unsigned int precision_level = 14;
+  rb_eval->write_offline_data_to_files(directory_name);
 
-  const unsigned int n_bfs = get_n_basis_functions();
-  libmesh_assert( n_bfs <= Nmax );
+  const unsigned int precision_level = 14;
 
   if(libMesh::processor_id() == 0)
   {
@@ -2718,23 +2685,6 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
     {
       libMesh::out << "In RBSystem::write_offline_data_to_files, directory "
                    << directory_name << " already exists, overwriting contents." << std::endl;
-    }
-
-    // First, write out how many basis functions we have generated
-    {
-      std::ofstream n_bfs_out;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/n_bfs.dat";
-        n_bfs_out.open(file_name.str().c_str());
-      }
-      if ( !n_bfs_out.good() )
-      {
-        libMesh::err << "Error opening n_bfs.dat" << std::endl;
-        libmesh_error();
-      }
-      n_bfs_out << n_bfs;
-      n_bfs_out.close();
     }
 
     // Also, write out the greedily selected parameters
@@ -2785,185 +2735,8 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
         output_dual_norms_out << std::scientific << output_dual_norms[n][q] << " ";
       }
       output_dual_norms_out.close();
-      
-      for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
-      {
-        std::ofstream output_n_out;
-        {
-          OStringStream file_name;
-          file_name << directory_name << "/output_";
-          OSSRealzeroright(file_name,3,0,n);
-          file_name << "_";
-          OSSRealzeroright(file_name,3,0,q_l);
-          file_name << ".dat";
-          output_n_out.open(file_name.str().c_str());
-        }
-        if( !output_n_out.good() )
-        {
-          libMesh::err << "Error opening output file for output " << n << std::endl;
-          libmesh_error();
-        }
-        output_n_out.precision(precision_level);
-
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          output_n_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
-        }
-        output_n_out.close();
-      }
     }
-    
-    if(compute_RB_inner_product)
-    {
-      // Next write out the inner product matrix
-      std::ofstream RB_inner_product_matrix_out;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/RB_inner_product_matrix.dat";
-        RB_inner_product_matrix_out.open(file_name.str().c_str());
-      }
-      if ( !RB_inner_product_matrix_out.good() )
-      {
-        libMesh::err << "Error opening RB_inner_product_matrix.dat" << std::endl;
-        libmesh_error();
-      }
-      RB_inner_product_matrix_out.precision(precision_level);
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          RB_inner_product_matrix_out << std::scientific
-            << RB_inner_product_matrix(i,j) << " ";
-        }
-      }
-      RB_inner_product_matrix_out.close();
-    }
-
-    // Next write out the F_q vectors
-    for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/RB_F_";
-      OSSRealzeroright(file_name,3,0,q_f);
-      file_name << ".dat";
-      std::ofstream RB_F_q_f_out(file_name.str().c_str());
-
-      if ( !RB_F_q_f_out.good() )
-      {
-        libMesh::err << "Error opening RB_F_" << q_f << ".dat" << std::endl;
-        libmesh_error();
-      }
-
-      RB_F_q_f_out.precision(precision_level);
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        RB_F_q_f_out << std::scientific << RB_F_q_vector[q_f](i) << " ";
-      }
-      RB_F_q_f_out.close();
-    }
-
-    // Next write out the A_q matrices
-    for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/RB_A_";
-      OSSRealzeroright(file_name,3,0,q_a);
-      file_name << ".dat";
-      std::ofstream RB_A_q_a_out(file_name.str().c_str());
-
-      if ( !RB_A_q_a_out.good() )
-      {
-        libMesh::err << "Error opening RB_A_" << q_a << ".dat" << std::endl;
-        libmesh_error();
-      }
-
-      RB_A_q_a_out.precision(precision_level);
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          RB_A_q_a_out << std::scientific << RB_A_q_vector[q_a](i,j) << " ";
-        }
-      }
-      RB_A_q_a_out.close();
-    }
-
-
-    // Next write out F_q representor norm data
-    std::ofstream RB_Fq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Fq_norms.dat";
-      RB_Fq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Fq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Fq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Fq_norms_out.precision(precision_level);
-    unsigned int Q_f_hat = get_Q_f()*(get_Q_f()+1)/2;
-    for(unsigned int i=0; i<Q_f_hat; i++)
-    {
-      RB_Fq_norms_out << std::scientific << Fq_representor_norms[i] << " ";
-    }
-    RB_Fq_norms_out.close();
-
-    // Next write out Fq_Aq representor norm data
-    std::ofstream RB_Fq_Aq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Fq_Aq_norms.dat";
-      RB_Fq_Aq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Fq_Aq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Fq_Aq_norms_out.precision(precision_level);
-    for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-    {
-      for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-      {
-        for(unsigned int i=0; i<n_bfs; i++)
-        {
-          RB_Fq_Aq_norms_out << std::scientific << Fq_Aq_representor_norms[q_f][q_a][i] << " ";
-        }
-      }
-    }
-    RB_Fq_Aq_norms_out.close();
-
-    // Next write out Aq_Aq representor norm data
-    std::ofstream RB_Aq_Aq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Aq_Aq_norms.dat";
-      RB_Aq_Aq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Aq_Aq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Aq_Aq_norms_out.precision(precision_level);
-    unsigned int Q_a_hat = get_Q_a()*(get_Q_a()+1)/2;
-    for(unsigned int i=0; i<Q_a_hat; i++)
-    {
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        for(unsigned int l=0; l<n_bfs; l++)
-        {
-          RB_Aq_Aq_norms_out << std::scientific << Aq_Aq_representor_norms[i][j][l] << " ";
-        }
-      }
-    }
-    RB_Aq_Aq_norms_out.close();
-
   }
-
-  // Now write out the basis functions if requested
-  write_out_basis_functions(directory_name, precision_level);
 
   // Write out residual representors if requested
   if (store_representors)
@@ -3081,23 +2854,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
 {
   START_LOG("read_offline_data_from_files()", "RBSystem");
 
-  // First, find out how many basis functions we had when Greedy terminated
-  unsigned int n_bfs;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/n_bfs.dat";
-    std::ifstream n_bfs_in(file_name.str().c_str());
-
-    if ( !n_bfs_in.good() )
-    {
-      libMesh::err << "Error opening n_bfs.dat" << std::endl;
-      libmesh_error();
-    }
-
-    n_bfs_in >> n_bfs;
-    n_bfs_in.close();
-  }
-  libmesh_assert( n_bfs <= Nmax );
+  rb_eval->read_offline_data_from_files(directory_name);
 
   // Read in output data
   for(unsigned int n=0; n<get_n_outputs(); n++)
@@ -3123,192 +2880,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
     }
     output_dual_norms_in.close();
     output_dual_norms_computed = true;
-    
-    for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
-    {
-      std::ifstream output_n_in;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/output_";
-        OSSRealzeroright(file_name,3,0,n);
-        file_name << "_";
-        OSSRealzeroright(file_name,3,0,q_l);
-        file_name << ".dat";
-        output_n_in.open(file_name.str().c_str());
-      }
-      if( !output_n_in.good() )
-      {
-        libMesh::err << "Error opening input file for output " << n << std::endl;
-        libmesh_error();
-      }
-
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        Number  value;
-        output_n_in >> value;
-        RB_output_vectors[n][q_l](j) = value;
-      }
-      output_n_in.close();
-    }
   }
-  
-  if(compute_RB_inner_product)
-  {
-    // Next read in the inner product matrix
-    std::ifstream RB_inner_product_matrix_in;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/RB_inner_product_matrix.dat";
-      RB_inner_product_matrix_in.open(file_name.str().c_str());
-    }
-    if ( !RB_inner_product_matrix_in.good() )
-    {
-      libMesh::err << "Error opening RB_inner_product_matrix.dat" << std::endl;
-      libmesh_error();
-    }
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        Number value;
-        RB_inner_product_matrix_in >> value;
-        RB_inner_product_matrix(i,j) = value;
-      }
-    }
-    RB_inner_product_matrix_in.close();
-  }
-
-  // Next read in the F_q vectors
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/RB_F_";
-    OSSRealzeroright(file_name,3,0,q_f);
-    file_name << ".dat";
-    std::ifstream RB_F_q_f_in(file_name.str().c_str());
-
-    if ( !RB_F_q_f_in.good() )
-    {
-      libMesh::err << "Error opening RB_F_" << q_f << ".dat" << std::endl;
-      libmesh_error();
-    }
-
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      Number  value;
-      RB_F_q_f_in >> value;
-      RB_F_q_vector[q_f](i) = value;
-    }
-    RB_F_q_f_in.close();
-  }
-
-  // Next read in the A_q matrices
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/RB_A_";
-    OSSRealzeroright(file_name,3,0,q_a);
-    file_name << ".dat";
-    std::ifstream RB_A_q_a_in(file_name.str().c_str());
-
-    if ( !RB_A_q_a_in.good() )
-    {
-      libMesh::err << "Error opening RB_A_" << q_a << ".dat" << std::endl;
-      libmesh_error();
-    }
-
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        Number  value;
-        RB_A_q_a_in >> value;
-        RB_A_q_vector[q_a](i,j) = value;
-      }
-    }
-    RB_A_q_a_in.close();
-  }
-
-
-  // Next read in F_q representor norm data
-  std::ifstream RB_Fq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Fq_norms.dat";
-    RB_Fq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Fq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Fq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  unsigned int Q_f_hat = get_Q_f()*(get_Q_f()+1)/2;
-  for(unsigned int i=0; i<Q_f_hat; i++)
-  {
-    RB_Fq_norms_in >> Fq_representor_norms[i];
-  }
-  RB_Fq_norms_in.close();
-
-  // Next read in Fq_Aq representor norm data
-  std::ifstream RB_Fq_Aq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Fq_Aq_norms.dat";
-    RB_Fq_Aq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Fq_Aq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-    {
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        RB_Fq_Aq_norms_in >> Fq_Aq_representor_norms[q_f][q_a][i];
-      }
-    }
-  }
-  RB_Fq_Aq_norms_in.close();
-
-  // Next read in Aq_Aq representor norm data
-  std::ifstream RB_Aq_Aq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Aq_Aq_norms.dat";
-    RB_Aq_Aq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Aq_Aq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  unsigned int Q_a_hat = get_Q_a()*(get_Q_a()+1)/2;
-  for(unsigned int i=0; i<Q_a_hat; i++)
-  {
-    for(unsigned int j=0; j<n_bfs; j++)
-    {
-      for(unsigned int l=0; l<n_bfs; l++)
-      {
-        RB_Aq_Aq_norms_in >> Aq_Aq_representor_norms[i][j][l];
-      }
-    }
-  }
-  RB_Aq_Aq_norms_in.close();
-
-  // Resize basis_functions even if we don't read them in so that
-  // get_n_bfs() returns the correct value. Initialize the pointers
-  // to NULL
-  set_n_basis_functions(n_bfs);
-  for(unsigned int i=0; i<basis_functions.size(); i++)
-    {
-      basis_functions[i] = NULL;
-    }
-
-  // Read in the basis functions if requested.
-  read_in_basis_functions(directory_name);
 
   // Read in the representor vectors if requested
   if (store_representors)
@@ -3421,87 +2993,6 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name)
   STOP_LOG("read_offline_data_from_files()", "RBSystem");
 }
 
-void RBSystem::write_out_basis_functions(const std::string& directory_name,
-                                         const unsigned int)
-{
-  if(store_basis_functions)
-  {
-    libMesh::out << "Writing out the basis functions..." << std::endl;
-
-    std::ostringstream file_name;
-    const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
-
-    // Use System::write_serialized_data to write out the basis functions
-    // by copying them into this->solution one at a time.
-    for(unsigned int i=0; i<basis_functions.size(); i++)
-    {
-      // No need to copy, just swap
-      // *solution = *basis_functions[i];
-      basis_functions[i]->swap(*solution);
-
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/bf" << i << basis_function_suffix;
-
-      Xdr bf_data(file_name.str(),
-		  write_binary_basis_functions ? ENCODE : WRITE);
-
-      write_serialized_data(bf_data, false);
-
-      // Synchronize before moving on
-      Parallel::barrier();
-
-      // Swap back
-      basis_functions[i]->swap(*solution);
-    }
-  }
-}
-
-void RBSystem::read_in_basis_functions(const std::string& directory_name)
-{
-  if(store_basis_functions)
-  {
-    libMesh::out << "Reading in the basis functions..." << std::endl;
-
-    std::ostringstream file_name;
-    const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
-    struct stat stat_info;
-
-    // Use System::read_serialized_data to read in the basis functions
-    // into this->solution and then swap with the appropriate
-    // of basis function.
-    for(unsigned int i=0; i<basis_functions.size(); i++)
-    {
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/bf" << i << basis_function_suffix;
-
-      // On processor zero check to be sure the file exists
-      if (libMesh::processor_id() == 0)
-	{
-	  int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-	  if (stat_result != 0)
-	    {
-	      libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-	      libmesh_error();
-	    }
-	}
-
-      Xdr bf_data(file_name.str(),
-		  read_binary_basis_functions ? DECODE : READ);
-
-      read_serialized_data(bf_data, false);
-
-      basis_functions[i] = NumericVector<Number>::build().release();
-      basis_functions[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-
-      // No need to copy, just swap
-      // *basis_functions[i] = *solution;
-      basis_functions[i]->swap(*solution);
-    }
-
-    libMesh::out << "Finished reading in the basis functions..." << std::endl;
-  }
-}
 
 } // namespace libMesh
 

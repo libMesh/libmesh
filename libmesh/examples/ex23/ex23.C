@@ -131,6 +131,20 @@ int main (int argc, char** argv)
   SimpleRB & system =
     equation_systems.add_system<SimpleRB> ("RBConvectionDiffusion");
 
+
+  // Initialize the data structures for the equation system.
+  equation_systems.init ();
+
+  if(system.initialize_calN_dependent_data)
+  {
+    // Print out some information about the "truth" discretization
+    equation_systems.print_info();
+    mesh.print_info();
+  }
+
+  // Now that the libMesh data structures have been initialized
+  // in equation_systems.init(), we can set up the Reduced Basis system.
+  
   // Point the systems to the input file defining the problem
   system.parameters_filename = parameters_filename;
 
@@ -154,16 +168,6 @@ int main (int argc, char** argv)
   
   // We reuse the operator A0 as the inner product matrix
   system.attach_inner_prod_assembly(A0);
-
-  // Initialize the data structures for the equation system.
-  equation_systems.init ();
-
-  if(system.initialize_calN_dependent_data)
-  {
-    // Print out some information about the "truth" discretization
-    mesh.print_info();
-    equation_systems.print_info();
-  }
   
   // Initialize the RB data structures.
   // If we're in Offline Mode (online_mode == false) then
@@ -198,20 +202,20 @@ int main (int argc, char** argv)
     system.print_current_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
-    system.RB_solve(online_N);
+    system.rb_eval->RB_solve(online_N);
 
     // Print out outputs as well as the corresponding output error bounds.
-    std::cout << "output 1, value = " << system.RB_outputs[0]
-              << ", bound = " << system.RB_output_error_bounds[0]
+    std::cout << "output 1, value = " << system.rb_eval->RB_outputs[0]
+              << ", bound = " << system.rb_eval->RB_output_error_bounds[0]
               << std::endl;
-    std::cout << "output 2, value = " << system.RB_outputs[1]
-              << ", bound = " << system.RB_output_error_bounds[1]
+    std::cout << "output 2, value = " << system.rb_eval->RB_outputs[1]
+              << ", bound = " << system.rb_eval->RB_output_error_bounds[1]
               << std::endl;
-    std::cout << "output 3, value = " << system.RB_outputs[2]
-              << ", bound = " << system.RB_output_error_bounds[2]
+    std::cout << "output 3, value = " << system.rb_eval->RB_outputs[2]
+              << ", bound = " << system.rb_eval->RB_output_error_bounds[2]
               << std::endl;
-    std::cout << "output 4, value = " << system.RB_outputs[3]
-              << ", bound = " << system.RB_output_error_bounds[3]
+    std::cout << "output 4, value = " << system.rb_eval->RB_outputs[3]
+              << ", bound = " << system.rb_eval->RB_output_error_bounds[3]
               << std::endl;
 
     // If we stored the basis functions in the offline_data directory, plot the RB solution
