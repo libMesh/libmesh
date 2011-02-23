@@ -85,6 +85,12 @@ public:
    * system, for example.
    */
   virtual void set_uber_current_parameters();
+
+  /**
+   * Build a new DerivedRBEvaluation object and add
+   * it to the rb_evaluation_objects vector.
+   */
+  virtual void add_new_rb_evaluation_object();
   
   /**
    * Load the RB solution from the most recent solve
@@ -96,19 +102,6 @@ public:
    * Load the i^th derived basis function into vec.
    */
   virtual void load_basis_function(unsigned int i);
-  
-  /**
-   * Overload to return the number of derived basis
-   * functions.
-   */
-  virtual unsigned int get_n_basis_functions() const { return derived_basis_functions.size(); }
-  
-  /**
-   * Set the number of basis functions. Useful when reading in
-   * stored data. Overload to resize derived_basis_functions instead
-   * of basis_functions.
-   */
-  virtual void set_n_basis_functions(unsigned int n_bfs) { derived_basis_functions.resize(n_bfs); }
   
   /**
    * This function recomputes all the residual terms in order
@@ -134,13 +127,6 @@ public:
 
 
   //----------- PUBLIC DATA MEMBERS -----------//
-
-  
-  /**
-   * The dense vectors that define the derived basis
-   * functions based on the uber system.
-   */
-   std::vector< DenseVector<Number> > derived_basis_functions;
    
   /**
    * The name of the uber RB system, i.e. the RB system
@@ -157,6 +143,11 @@ public:
   DERIVED_RESIDUAL_TYPE residual_type_flag;
    
 protected:
+
+  /**
+   * Get a copy of the specific derived basis function.
+   */
+  DenseVector<Number> get_derived_basis_function(unsigned int i);
 
   /**
    * Add a new basis function to the RB space. Overload
@@ -181,19 +172,6 @@ protected:
    * system.
    */
   virtual void update_residual_terms(bool compute_inner_products=true);
-  
-  /**
-   * If store_basis_functions=true, write out all the basis functions to file.
-   * Overloaded to write out the derived basis functions.
-   */
-  virtual void write_out_basis_functions(const std::string& directory_name,
-                                         const unsigned int precision_level);
-  
-  /**
-   * If store_basis_functions=true, read in all the basis functions from file.
-   * Overloaded to read in the derived basis functions.
-   */
-  virtual void read_in_basis_functions(const std::string& directory_name);
   
 private:
 

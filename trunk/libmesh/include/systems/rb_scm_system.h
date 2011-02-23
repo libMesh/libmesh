@@ -91,6 +91,12 @@ public:
   virtual void solve();
 
   /**
+   * Read in the parameters from file and set up the system
+   * accordingly.
+   */
+  virtual void initialize_SCM_system ();
+
+  /**
    * Overload get_eigenpair to retrieve the eigenpair for
    * the condensed eigensolve.
    */
@@ -209,12 +215,6 @@ public:
   std::string parameters_filename;
 
 protected:
-
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void init_data ();
 
   /**
    * Add the scaled symmetrized affine matrix from the

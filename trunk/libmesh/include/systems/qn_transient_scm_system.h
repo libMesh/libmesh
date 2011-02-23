@@ -78,6 +78,12 @@ public:
   virtual void clear ();
 
   /**
+   * Read in the parameters from file and set up the system
+   * accordingly.
+   */
+  virtual void initialize_SCM_system ();
+
+  /**
    * If the number of basis functions in the associated RBSystem
    * changes then call this function to bring this SCM system
    * up to date.
@@ -195,12 +201,6 @@ public:
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
 
 protected:
-
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void init_data ();
 
   /**
    * Load the n_bfs trilinear form operators from the

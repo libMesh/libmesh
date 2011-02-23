@@ -34,6 +34,7 @@
 #include "xdr_cxx.h"
 #include "timestamp.h"
 #include "parallel.h"
+#include "transient_rb_evaluation.h"
 
 #include <fstream>
 #include <sstream>
@@ -67,15 +68,7 @@ TransientRBSystem::TransientRBSystem (EquationSystems& es,
     max_truth_solves(-1),
     L2_assembly(NULL)
 {
-  old_RB_solution.resize(0);
-
   temporal_data.resize(0);
-
-  initial_L2_error_all_N.resize(0);
-
-  Fq_Mq_representor_norms.clear();
-  Mq_Mq_representor_norms.clear();
-  Aq_Mq_representor_norms.clear();
   
   // Clear the theta and assembly vectors so that we can push_back
   theta_q_m_vector.clear();
@@ -146,8 +139,30 @@ void TransientRBSystem::clear_basis_helper()
   }
 }
 
-void TransientRBSystem::init_data ()
+void TransientRBSystem::init_data()
 {
+  // Use the boolean initialize_calN_dependent_data
+  // to determine whether or not we initialize the libMesh
+  // mesh-dependent data.
+
+  if(initialize_calN_dependent_data)
+  {
+    // Call the Parent's initialization routine.
+    Parent::init_data();
+  }
+  else
+  {
+    // If we do not initialize calN-dependent data, then we
+    // must skip initialization of Parent (=TransientSystem<RBSystem>)
+    // and just initialize RBSystem.
+    RBSystem::init_data();
+  }
+}
+
+void TransientRBSystem::process_parameters_file ()
+{
+  Parent::process_parameters_file();
+
   // Indicate that we need to compute the RB
   // inner product matrix in this case
   compute_RB_inner_product = true;
@@ -172,23 +187,6 @@ void TransientRBSystem::init_data ()
   set_max_truth_solves(max_truth_solves_in);
   set_delta_N(delta_N_in);
 
-  // We read this in here also (the member variable is initialized in RBSystem, but
-  // we need to know its value here as well in order to initialize properly)
-  initialize_calN_dependent_data = infile("initialize_calN_dependent_data",
-                                          initialize_calN_dependent_data);
-  if(initialize_calN_dependent_data)
-  {
-    // Call the Parent's initialization routine.
-    Parent::init_data();
-  }
-  else
-  {
-    // If we do not initialize calN-dependent data, then we
-    // must skip initialization of Parent (=TransientSystem<RBSystem>)
-    // and just initialize RBSystem.
-    RBSystem::init_data();
-  }
-
   libMesh::out << std::endl << "TransientRBSystem parameters:" << std::endl;
   libMesh::out << "Q_m: " << get_Q_m() << std::endl;
   libMesh::out << "Number of time-steps: " << get_K() << std::endl;
@@ -210,8 +208,10 @@ void TransientRBSystem::init_data ()
   libMesh::out << std::endl;
 }
 
-void TransientRBSystem::initialize_RB_system(bool online_mode)
+void TransientRBSystem::allocate_data_structures()
 {
+  Parent::allocate_data_structures();
+
   // Resize vectors for storing calN-dependent data but only
   // initialize if initialize_calN_dependent_data == true
   unsigned int n_time_levels = get_K()+1;
@@ -220,7 +220,6 @@ void TransientRBSystem::initialize_RB_system(bool online_mode)
   // Resize vectors for storing calN-dependent data but only
   // initialize if initialize_calN_dependent_data == true
   M_q_vector.resize(get_Q_m());
-  
   if(initialize_calN_dependent_data)
   {
     // Only initialize the mass matrices if we
@@ -249,8 +248,6 @@ void TransientRBSystem::initialize_RB_system(bool online_mode)
       temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     }
   }
-
-  Parent::initialize_RB_system(online_mode);
   
   // Resize M_q_representor, has to be after Parent::init_data call
   // since Nmax is read in in RBSystem
@@ -260,75 +257,6 @@ void TransientRBSystem::initialize_RB_system(bool online_mode)
     M_q_representor[q_m].resize(Nmax);
   }
 
-
-  // Now allocate the N (i.e. RB) dependent data structures
-
-  RB_L2_matrix.resize(Nmax,Nmax);
-
-  // Allocate dense matrices for RB solves
-  RB_M_q_vector.resize(get_Q_m());
-  for(unsigned int q=0; q<get_Q_m(); q++)
-  {
-    // Initialize the memory for the RB matrices
-    RB_M_q_vector[q].resize(Nmax,Nmax);
-  }
-
-  // Initialize vectors for the norms of the representors
-  Fq_Mq_representor_norms.resize(get_Q_f());
-  for(unsigned int i=0; i<get_Q_f(); i++)
-  {
-    Fq_Mq_representor_norms[i].resize(get_Q_m());
-    for(unsigned int j=0; j<get_Q_m(); j++)
-    {
-      Fq_Mq_representor_norms[i][j].resize(Nmax);
-    }
-  }
-
-  unsigned int Q_m_hat = get_Q_m()*(get_Q_m()+1)/2;
-  Mq_Mq_representor_norms.resize(Q_m_hat);
-  for(unsigned int i=0; i<Q_m_hat; i++)
-  {
-    Mq_Mq_representor_norms[i].resize(Nmax);
-    for(unsigned int j=0; j<Nmax; j++)
-    {
-      Mq_Mq_representor_norms[i][j].resize(Nmax);
-    }
-  }
-
-  Aq_Mq_representor_norms.resize(get_Q_a());
-  for(unsigned int i=0; i<get_Q_a(); i++)
-  {
-    Aq_Mq_representor_norms[i].resize(get_Q_m());
-    for(unsigned int j=0; j<get_Q_m(); j++)
-    {
-      Aq_Mq_representor_norms[i][j].resize(Nmax);
-      for(unsigned int k=0; k<Nmax; k++)
-      {
-        Aq_Mq_representor_norms[i][j][k].resize(Nmax);
-      }
-    }
-  }
-
-  // Initialize the initial condition storage
-  RB_initial_condition_all_N.resize(Nmax);
-  for(unsigned int i=0; i<RB_initial_condition_all_N.size(); i++)
-  {
-    // The i^th row holds a vector of lenght i+1
-    RB_initial_condition_all_N[i].resize(i+1);
-  }
-
-  RB_ic_proj_rhs_all_N.resize(Nmax);
-  initial_L2_error_all_N.resize(Nmax);
-
-  // Resize the RB output vectors
-  RB_outputs_all_k.resize(get_n_outputs());
-  RB_output_error_bounds_all_k.resize(get_n_outputs());
-  for(unsigned int n=0; n<get_n_outputs(); n++)
-  {
-    RB_outputs_all_k[n].resize(_K+1);
-    RB_output_error_bounds_all_k[n].resize(_K+1);
-  }
-
   // and the truth output vectors
   truth_outputs_all_k.resize(get_n_outputs());
   for(unsigned int n=0; n<get_n_outputs(); n++)
@@ -336,12 +264,22 @@ void TransientRBSystem::initialize_RB_system(bool online_mode)
     truth_outputs_all_k[n].resize(_K+1);
   }
   
+  // This vector is for storing rhs entries for
+  // computing the projection of the initial condition
+  // into the RB space
+  RB_ic_proj_rhs_all_N.resize(Nmax);
+}
+
+void TransientRBSystem::initialize_RB_system(bool do_not_assemble)
+{
+  Parent::initialize_RB_system(do_not_assemble);
+  
   // Now update RB_ic_proj_rhs_all_N if necessary.
   // This allows us to compute the L2 projection
   // of the initial condition into the RB space
   // so that we can continue to enrich a given RB
   // space.
-  if(!online_mode)
+  if(!do_not_assemble)
     if(get_n_basis_functions() > 0)
     {
       // Load the initial condition into the solution vector
@@ -363,9 +301,15 @@ void TransientRBSystem::initialize_RB_system(bool online_mode)
 
       for(unsigned int i=0; i<get_n_basis_functions(); i++)
       {
-        RB_ic_proj_rhs_all_N(i) = temp1->dot(*basis_functions[i]);
+        RB_ic_proj_rhs_all_N(i) = temp1->dot(get_basis_function(i));
       }
     }
+}
+
+void TransientRBSystem::add_new_rb_evaluation_object()
+{
+  TransientRBEvaluation* e = new TransientRBEvaluation(*this);
+  rb_evaluation_objects.push_back(e);
 }
 
 Real TransientRBSystem::train_reduced_basis(const std::string& directory_name)
@@ -908,7 +852,7 @@ Number TransientRBSystem::set_error_temporal_data()
   // first compute the projection of solution onto the current
   // RB space
 
-  if(basis_functions.size() == 0)
+  if(get_n_basis_functions() == 0)
   {
     // If the basis is empty, then the error is the solution itself
     temporal_data[_k]->zero();
@@ -942,14 +886,14 @@ Number TransientRBSystem::set_error_temporal_data()
     for(unsigned int i=0; i<RB_size; i++)
       for(unsigned int j=0; j<RB_size; j++)
       {
-        RB_inner_product_matrix_N(i,j) = RB_inner_product_matrix(i,j);
+        RB_inner_product_matrix_N(i,j) = rb_eval->RB_inner_product_matrix(i,j);
       }
 
     // Compute the projection RHS
     DenseVector<Number> RB_proj_rhs(RB_size);
     for(unsigned int i=0; i<RB_size; i++)
     {
-      RB_proj_rhs(i) = temp->dot(get_bf(i));
+      RB_proj_rhs(i) = temp->dot(get_basis_function(i));
     }
 
     DenseVector<Number> RB_proj(RB_size);
@@ -961,7 +905,7 @@ Number TransientRBSystem::set_error_temporal_data()
     temp->zero();
     for(unsigned int i=0; i<RB_size; i++)
     {
-      temp->add(RB_proj(i), get_bf(i));
+      temp->add(RB_proj(i), get_basis_function(i));
     }
 
     temp->add(-1., *solution);
@@ -1033,8 +977,8 @@ void TransientRBSystem::add_IC_to_RB_space()
   initialize_truth();
 
   // load the new basis function into the basis_functions vector.
-  basis_functions.push_back( NumericVector<Number>::build().release() );
-  NumericVector<Number>& current_bf = *(basis_functions[basis_functions.size()-1]);
+  rb_eval->basis_functions.push_back( NumericVector<Number>::build().release() );
+  NumericVector<Number>& current_bf = get_basis_function(get_n_basis_functions()-1);
   current_bf.init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   current_bf = *solution;
 
@@ -1173,8 +1117,8 @@ void TransientRBSystem::enrich_RB_space()
   while (true)
     {
       // load the new basis function into the basis_functions vector.
-      basis_functions.push_back( NumericVector<Number>::build().release() );
-      NumericVector<Number>& current_bf = *(basis_functions[basis_functions.size()-1]);
+      rb_eval->basis_functions.push_back( NumericVector<Number>::build().release() );
+      NumericVector<Number>& current_bf = get_basis_function(get_n_basis_functions()-1);
       current_bf.init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       current_bf.zero();
 
@@ -1214,7 +1158,7 @@ void TransientRBSystem::enrich_RB_space()
 
 	  // We need to define the updated RB system matrices before the RB solve
 	  update_system();
-	  Real error_bound = RB_solve(get_n_basis_functions());
+	  Real error_bound = rb_eval->RB_solve(get_n_basis_functions());
 
 	  if ( (error_bound <= POD_tol) || (get_n_basis_functions()==get_Nmax()) )
 	    {
@@ -1256,158 +1200,6 @@ void TransientRBSystem::update_system()
   update_RB_initial_condition_all_N();
 }
 
-Real TransientRBSystem::RB_solve(unsigned int N)
-{
-  START_LOG("RB_solve()", "TransientRBSystem");
-
-  if(N > get_n_basis_functions())
-  {
-    libMesh::err << "ERROR: N cannot be larger than the number "
-                 << "of basis functions in RB_solve" << std::endl;
-    libmesh_error();
-  }
-  if(N==0)
-  {
-    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
-    libmesh_error();
-  }
-
-  // First assemble the mass matrix
-  DenseMatrix<Number> RB_mass_matrix_N(N,N);
-  RB_mass_matrix_N.zero();
-  DenseMatrix<Number> RB_M_q_m;
-  for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-  {
-    RB_M_q_vector[q_m].get_principal_submatrix(N, RB_M_q_m);
-    RB_mass_matrix_N.add(eval_theta_q_m(q_m), RB_M_q_m);
-  }
-
-  DenseMatrix<Number> RB_LHS_matrix(N,N);
-  RB_LHS_matrix.zero();
-
-  DenseMatrix<Number> RB_RHS_matrix(N,N);
-  RB_RHS_matrix.zero();
-
-  RB_LHS_matrix.add(1./dt, RB_mass_matrix_N);
-  RB_RHS_matrix.add(1./dt, RB_mass_matrix_N);
-
-  DenseMatrix<Number> RB_A_q_a;
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-  {
-    RB_A_q_vector[q_a].get_principal_submatrix(N, RB_A_q_a);
-
-    RB_LHS_matrix.add(       euler_theta*eval_theta_q_a(q_a), RB_A_q_a);
-    RB_RHS_matrix.add( -(1.-euler_theta)*eval_theta_q_a(q_a), RB_A_q_a);
-  }
-
-  // Set system time level to 0
-  error_bound_all_k.resize(_K+1);
-  set_time_level(0); // Sets the member variable _k to zero
-
-  // Resize/clear the solution vector
-  RB_solution.resize(N);
-
-  // Load the initial condition into RB_solution
-  RB_solution = RB_initial_condition_all_N[N-1];
-
-  // Resize/clear the old solution vector
-  old_RB_solution.resize(N);
-
-  // Initialize the RB rhs
-  DenseVector<Number> RB_rhs(N);
-  RB_rhs.zero();
-
-  // Initialize the vectors storing solution data
-  RB_temporal_solution_data.resize(_K+1);
-  for(unsigned int time_level=0; time_level<=_K; time_level++)
-  {
-    RB_temporal_solution_data[time_level].resize(N);
-  }
-  // and load the _k=0 data
-  RB_temporal_solution_data[_k] = RB_solution;
-
-  Real error_bound_sum = pow( initial_L2_error_all_N[N-1], 2.);
-
-  // Set error bound at _k=0
-  error_bound_all_k[_k] = std::sqrt(error_bound_sum);
-
-  // Compute the outputs and associated error bounds at _k=0
-  DenseVector<Number> RB_output_vector_N;
-  for(unsigned int n=0; n<get_n_outputs(); n++)
-  {
-    RB_outputs_all_k[n][_k] = 0.;
-    for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
-    {
-      RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
-    }
-
-    RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * eval_output_dual_norm(n);
-  }
-
-  Real alpha_LB = get_SCM_lower_bound();
-  
-  // Precompute time-invariant parts of the dual norm of the residual.
-  cache_online_residual_terms(N);
-
-  for(unsigned int time_level=1; time_level<=_K; time_level++)
-  {
-    set_time_level(time_level); // This updates the member variable _k
-    old_RB_solution = RB_solution;
-
-    // Compute RB_rhs, as RB_LHS_matrix x old_RB_solution
-    RB_RHS_matrix.vector_mult(RB_rhs, old_RB_solution);
-
-    // Add forcing terms
-    DenseVector<Number> RB_F_q_f;
-    for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-    {
-      RB_F_q_vector[q_f].get_principal_subvector(N, RB_F_q_f);
-      RB_rhs.add(eval_theta_q_f(q_f), RB_F_q_f);
-    }
-
-    RB_LHS_matrix.lu_solve(RB_rhs, RB_solution);
-
-    // Save RB_solution for current time level
-    RB_temporal_solution_data[_k] = RB_solution;
-
-    // Evaluate the dual norm of the residual for RB_solution_vector
-//    Real epsilon_N = uncached_compute_residual_dual_norm(N);
-    Real epsilon_N = compute_residual_dual_norm(N);
-
-    error_bound_sum += residual_scaling_numer(alpha_LB) * pow(epsilon_N, 2.);
-
-    // store error bound at time-level _k
-    error_bound_all_k[_k] = std::sqrt(error_bound_sum/residual_scaling_denom(alpha_LB));
-
-    // Now compute the outputs and associated errors
-    DenseVector<Number> RB_output_vector_N;
-    for(unsigned int n=0; n<get_n_outputs(); n++)
-    {
-      RB_outputs_all_k[n][_k] = 0.;
-      for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
-      {
-        RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-        RB_outputs_all_k[n][_k] += eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
-      }
-
-      RB_output_error_bounds_all_k[n][_k] = error_bound_all_k[_k] * eval_output_dual_norm(n);
-    }
-  }
-
-  // Now compute the L2 norm of the RB solution at time-level _K
-  // to normalize the error bound
-  // We reuse RB_rhs here
-  DenseMatrix<Number> RB_L2_matrix_N;
-  RB_L2_matrix.get_principal_submatrix(N,RB_L2_matrix_N);
-  RB_L2_matrix_N.vector_mult(RB_rhs, RB_solution);
-  Real final_RB_L2_norm = libmesh_real(std::sqrt(RB_solution.dot(RB_rhs)));
-
-  STOP_LOG("RB_solve()", "TransientRBSystem");
-
-  return ( return_rel_error_bound ? error_bound_all_k[_K]/final_RB_L2_norm : error_bound_all_k[_K] );
-}
-
 Real TransientRBSystem::residual_scaling_numer(Real)
 {
   return get_dt();
@@ -1439,19 +1231,20 @@ void TransientRBSystem::load_RB_solution()
 
   solution->zero();
 
-  DenseVector<Number> RB_solution_vector_k = RB_temporal_solution_data[_k];
+  TransientRBEvaluation* trans_rb_eval = libmesh_cast_ptr<TransientRBEvaluation*>(rb_eval);
+  DenseVector<Number> RB_solution_vector_k = trans_rb_eval->RB_temporal_solution_data[_k];
 
-  if(RB_solution_vector_k.size() > basis_functions.size())
+  if(RB_solution_vector_k.size() > get_n_basis_functions())
   {
-    libMesh::err << "ERROR: System contains " << basis_functions.size() << " basis functions."
-                 << " RB_solution vector constains " << RB_solution.size() << " entries."
+    libMesh::err << "ERROR: System contains " << get_n_basis_functions() << " basis functions."
+                 << " RB_solution vector constains " << RB_solution_vector_k.size() << " entries."
                  << " RB_solution in TransientRBSystem::load_RB_solution is too long!" << std::endl;
     libmesh_error();
   }
 
   for(unsigned int i=0; i<RB_solution_vector_k.size(); i++)
   {
-    solution->add(RB_solution_vector_k(i), *basis_functions[i]);
+    solution->add(RB_solution_vector_k(i), get_basis_function(i));
   }
 
   update();
@@ -1464,6 +1257,8 @@ void TransientRBSystem::update_RB_system_matrices()
   START_LOG("update_RB_system_matrices()", "TransientRBSystem");
 
   RBSystem::update_RB_system_matrices();
+  
+  TransientRBEvaluation* trans_rb_eval = libmesh_cast_ptr<TransientRBEvaluation*>(rb_eval);
 
   unsigned int RB_size = get_n_basis_functions();
 
@@ -1480,20 +1275,20 @@ void TransientRBSystem::update_RB_system_matrices()
       temp->zero();
       if(!low_memory_mode)
       {
-        L2_matrix->vector_mult(*temp, *basis_functions[j]);
+        L2_matrix->vector_mult(*temp, get_basis_function(j));
       }
       else
       {
         assemble_L2_matrix(matrix);
-        matrix->vector_mult(*temp, *basis_functions[j]);
+        matrix->vector_mult(*temp, get_basis_function(j));
       }
-      value = basis_functions[i]->dot(*temp);
-      RB_L2_matrix(i,j) = value;
+      value = get_basis_function(i).dot(*temp);
+      trans_rb_eval->RB_L2_matrix(i,j) = value;
       if(i!=j)
       {
         // The L2 matrix is assumed
         // to be symmetric
-        RB_L2_matrix(j,i) = value;
+        trans_rb_eval->RB_L2_matrix(j,i) = value;
       }
 
       for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
@@ -1502,22 +1297,22 @@ void TransientRBSystem::update_RB_system_matrices()
         temp->zero();
         if(!low_memory_mode)
         {
-          get_M_q(q_m)->vector_mult(*temp, *basis_functions[j]);
+          get_M_q(q_m)->vector_mult(*temp, get_basis_function(j));
         }
         else
         {
           assemble_Mq_matrix(q_m,matrix);
-          matrix->vector_mult(*temp, *basis_functions[j]);
+          matrix->vector_mult(*temp, get_basis_function(j));
         }
 
-        value = (*basis_functions[i]).dot(*temp);
-        RB_M_q_vector[q_m](i,j) = value;
+        value = (get_basis_function(i)).dot(*temp);
+        trans_rb_eval->RB_M_q_vector[q_m](i,j) = value;
 
         if(i!=j)
         {
           // Each mass matrix term is assumed
           // to be symmetric
-          RB_M_q_vector[q_m](j,i) = value;
+          trans_rb_eval->RB_M_q_vector[q_m](j,i) = value;
         }
       }
       
@@ -1535,6 +1330,8 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
   START_LOG("update_residual_terms()", "TransientRBSystem");
 
   RBSystem::update_residual_terms(compute_inner_products);
+
+  TransientRBEvaluation* trans_rb_eval = libmesh_cast_ptr<TransientRBEvaluation*>(rb_eval);
 
   unsigned int RB_size = get_n_basis_functions();
 
@@ -1571,7 +1368,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
       rhs->zero();
       if(!low_memory_mode)
       {
-        M_q_vector[q_m]->vector_mult(*rhs, *basis_functions[i]);
+        M_q_vector[q_m]->vector_mult(*rhs, get_basis_function(i));
       }
       else
       {
@@ -1579,7 +1376,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
                                M_q_intrr_assembly_vector[q_m],
                                M_q_bndry_assembly_vector[q_m],
                                *rhs,
-                               *basis_functions[i]);
+                               get_basis_function(i));
       }
       zero_dirichlet_dofs_on_rhs();
 
@@ -1650,7 +1447,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 	    {
 	      for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
 		{
-		  Fq_Mq_representor_norms[q_f][q_m][i] =
+		  trans_rb_eval->Fq_Mq_representor_norms[q_f][q_m][i] =
 		    M_q_representor[q_m][i]->dot(*inner_product_storage_vector);
 		} // end for q_m
 	    } // end for i
@@ -1673,7 +1470,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 			{
 			  matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m2][j]);
 			}
-		      Mq_Mq_representor_norms[q][i][j] = M_q_representor[q_m1][i]->dot(*inner_product_storage_vector);
+		      trans_rb_eval->Mq_Mq_representor_norms[q][i][j] = M_q_representor[q_m1][i]->dot(*inner_product_storage_vector);
 
 		      if(i != j)
 			{
@@ -1685,7 +1482,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 			    {
 			      matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m2][i]);
 			    }
-			  Mq_Mq_representor_norms[q][j][i] = M_q_representor[q_m1][j]->dot(*inner_product_storage_vector);
+			  trans_rb_eval->Mq_Mq_representor_norms[q][j][i] = M_q_representor[q_m1][j]->dot(*inner_product_storage_vector);
 			}
 		    } // end for j
 		} // end for i
@@ -1710,7 +1507,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 			{
 			  matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m][j]);
 			}
-		      Aq_Mq_representor_norms[q_a][q_m][i][j] =
+		      trans_rb_eval->Aq_Mq_representor_norms[q_a][q_m][i][j] =
 			A_q_representor[q_a][i]->dot(*inner_product_storage_vector);
 
 		      if(i != j)
@@ -1723,7 +1520,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 			    {
 			      matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m][i]);
 			    }
-			  Aq_Mq_representor_norms[q_a][q_m][j][i] =
+			  trans_rb_eval->Aq_Mq_representor_norms[q_a][q_m][j][i] =
 			    A_q_representor[q_a][j]->dot(*inner_product_storage_vector);
 			}
 		    } // end for q_m
@@ -1740,6 +1537,8 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
 {
   START_LOG("update_RB_initial_condition_all_N()", "TransientRBSystem");
 
+  TransientRBEvaluation* trans_rb_eval = libmesh_cast_ptr<TransientRBEvaluation*>(rb_eval);
+
   // Load the initial condition into the solution vector
   initialize_truth();
 
@@ -1750,7 +1549,7 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
   temp2->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
 
-  unsigned int RB_size = basis_functions.size();
+  unsigned int RB_size = get_n_basis_functions();
 
   // First compute the right-hand side vector for the L2 projection
   if(!low_memory_mode)
@@ -1765,7 +1564,7 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
 
   for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
   {
-    RB_ic_proj_rhs_all_N(i) = temp1->dot(*basis_functions[i]);
+    RB_ic_proj_rhs_all_N(i) = temp1->dot(get_basis_function(i));
   }
 
 
@@ -1775,7 +1574,7 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
   for(unsigned int N=(RB_size-delta_N); N<RB_size; N++)
   {
     // We have to index here by N+1 since the loop index is zero-based.
-    RB_L2_matrix.get_principal_submatrix(N+1, RB_L2_matrix_N);
+    trans_rb_eval->RB_L2_matrix.get_principal_submatrix(N+1, RB_L2_matrix_N);
     
     RB_ic_proj_rhs_all_N.get_principal_subvector(N+1, RB_rhs_N);
 
@@ -1785,7 +1584,7 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
     RB_L2_matrix_N.lu_solve(RB_rhs_N, RB_ic_N);
 
     // Load RB_ic_N into RB_initial_condition_all_N
-    RB_initial_condition_all_N[N] = RB_ic_N;
+    trans_rb_eval->RB_initial_condition_all_N[N] = RB_ic_N;
 
     // Compute the L2 error for the RB initial condition
     // This part is dependent on the truth space.
@@ -1794,7 +1593,7 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
     temp1->zero();
     for(unsigned int i=0; i<N+1; i++)
     {
-      temp1->add(RB_ic_N(i), *basis_functions[i]);
+      temp1->add(RB_ic_N(i), get_basis_function(i));
     }
 
     // subtract truth initial condition from RB_ic_N
@@ -1810,180 +1609,16 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
     {
       matrix->vector_mult(*temp2, *temp1);
     }
-    initial_L2_error_all_N[N] = libmesh_real(std::sqrt(temp2->dot(*temp1)));
+    trans_rb_eval->initial_L2_error_all_N[N] = libmesh_real(std::sqrt(temp2->dot(*temp1)));
   }
 
   STOP_LOG("update_RB_initial_condition_all_N()", "TransientRBSystem");
 }
 
-void TransientRBSystem::cache_online_residual_terms(const unsigned int N)
-{
-  START_LOG("cache_online_residual_terms()", "TransientRBSystem");
-
-  cached_Fq_term = 0.;
-  unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
-  {
-    Number cached_theta_q_f1 = eval_theta_q_f(q_f1);
-    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
-    {
-      Real delta = (q_f1==q_f2) ? 1. : 2.;
-      cached_Fq_term += delta*cached_theta_q_f1*eval_theta_q_f(q_f2) * Fq_representor_norms[q];
-
-      q++;
-    }
-  }
-
-  cached_Fq_Aq_vector.resize(N);
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    Number cached_theta_q_f = eval_theta_q_f(q_f);
-    for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-    {
-      Number cached_theta_q_a = eval_theta_q_a(q_a);
-      for(unsigned int i=0; i<N; i++)
-      {
-        cached_Fq_Aq_vector(i) += 2.*cached_theta_q_f*cached_theta_q_a*
-                                  Fq_Aq_representor_norms[q_f][q_a][i];
-      }
-    }
-  }
-
-  cached_Aq_Aq_matrix.resize(N,N);
-  q=0;
-  for(unsigned int q_a1=0; q_a1<get_Q_a(); q_a1++)
-  {
-    Number cached_theta_q_a1 = eval_theta_q_a(q_a1);
-    for(unsigned int q_a2=q_a1; q_a2<get_Q_a(); q_a2++)
-    {
-      Number cached_theta_q_a2 = eval_theta_q_a(q_a2);
-      Real delta = (q_a1==q_a2) ? 1. : 2.;
-
-      for(unsigned int i=0; i<N; i++)
-      {
-        for(unsigned int j=0; j<N; j++)
-        {
-          cached_Aq_Aq_matrix(i,j) += delta*
-                                      cached_theta_q_a1*cached_theta_q_a2*
-                                      Aq_Aq_representor_norms[q][i][j];
-        }
-      }
-      q++;
-    }
-  }
-
-  cached_Fq_Mq_vector.resize(N);
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    Number cached_theta_q_f = eval_theta_q_f(q_f);
-    for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-    {
-      Number cached_theta_q_m = eval_theta_q_m(q_m);
-      for(unsigned int i=0; i<N; i++)
-      {
-        cached_Fq_Mq_vector(i) += 2.*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_norms[q_f][q_m][i];
-      }
-    }
-  }
-
-  cached_Aq_Mq_matrix.resize(N,N);
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-  {
-    Number cached_theta_q_a = eval_theta_q_a(q_a);
-    
-    for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-    {
-      Number cached_theta_q_m = eval_theta_q_m(q_m);
-      
-      for(unsigned int i=0; i<N; i++)
-      {
-        for(unsigned int j=0; j<N; j++)
-        {
-          cached_Aq_Mq_matrix(i,j) += 2.*cached_theta_q_a*cached_theta_q_m*Aq_Mq_representor_norms[q_a][q_m][i][j];
-        }
-      }
-    }
-  }
-  
-  cached_Mq_Mq_matrix.resize(N,N);
-  q=0;
-  for(unsigned int q_m1=0; q_m1<get_Q_m(); q_m1++)
-  {
-    Number cached_theta_q_m1 = eval_theta_q_m(q_m1);
-    for(unsigned int q_m2=q_m1; q_m2<get_Q_m(); q_m2++)
-    {
-      Number cached_theta_q_m2 = eval_theta_q_m(q_m2);
-      Real delta = (q_m1==q_m2) ? 1. : 2.;
-
-      for(unsigned int i=0; i<N; i++)
-      {
-        for(unsigned int j=0; j<N; j++)
-        {
-          cached_Mq_Mq_matrix(i,j) += delta*
-                                      cached_theta_q_m1*cached_theta_q_m2*
-                                      Mq_Mq_representor_norms[q][i][j];
-        }
-      }
-      q++;
-    }
-  }
-  
-  STOP_LOG("cache_online_residual_terms()", "TransientRBSystem");
-}
-
-Real TransientRBSystem::compute_residual_dual_norm(const unsigned int N)
-{
-  START_LOG("compute_residual_dual_norm()", "TransientRBSystem");
-
-  // This assembly assumes we have already called cache_online_residual_terms
-  // and that the RB_solve parameter is constant in time
-
-  const Real dt = get_dt();
-
-  DenseVector<Number> RB_u_euler_theta(N);
-  DenseVector<Number> mass_coeffs(N);
-  for(unsigned int i=0; i<N; i++)
-  {
-    RB_u_euler_theta(i)  = euler_theta*RB_solution(i) + (1.-euler_theta)*old_RB_solution(i);
-    mass_coeffs(i) = -(RB_solution(i) - old_RB_solution(i))/dt;
-  }
-
-  Number residual_norm_sq = cached_Fq_term;
-  
-  residual_norm_sq += RB_u_euler_theta.dot(cached_Fq_Aq_vector);
-  residual_norm_sq += mass_coeffs.dot(cached_Fq_Mq_vector);
-
-  for(unsigned int i=0; i<N; i++)
-    for(unsigned int j=0; j<N; j++)
-    {
-      residual_norm_sq += RB_u_euler_theta(i)*RB_u_euler_theta(j)*cached_Aq_Aq_matrix(i,j);
-      residual_norm_sq += mass_coeffs(i)*mass_coeffs(j)*cached_Mq_Mq_matrix(i,j);
-      residual_norm_sq += RB_u_euler_theta(i)*mass_coeffs(j)*cached_Aq_Mq_matrix(i,j);
-    }
-
-
-  if(libmesh_real(residual_norm_sq) < 0)
-  {
-    libMesh::out << "Warning: Square of residual norm is negative "
-                 << "in TransientRBSystem::compute_residual_dual_norm()" << std::endl;
-
-    // Sometimes this is negative due to rounding error,
-    // but error is on the order of 1.e-10, so shouldn't
-    // affect result
-//    libmesh_error();
-     residual_norm_sq = std::abs(residual_norm_sq);
-  }
-
-  STOP_LOG("compute_residual_dual_norm()", "TransientRBSystem");
-
-  return libmesh_real(std::sqrt( residual_norm_sq ));
-}
-
-
-Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N)
-{
-  START_LOG("uncached_compute_residual_dual_norm()", "TransientRBSystem");
-
+//Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N)
+//{
+//  START_LOG("uncached_compute_residual_dual_norm()", "TransientRBSystem");
+//
 //   // This is the "slow" way of computing the residual, but it is useful
 //   // for validating the "fast" way.
 //   // Note that this only works in serial since otherwise each processor will
@@ -2008,8 +1643,8 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
 //
 //   for(unsigned int i=0; i<N; i++)
 //   {
-//     RB_sol->add(RB_solution(i), *basis_functions[i]);
-//     parallel_temp->add(old_RB_solution(i), *basis_functions[i]);
+//     RB_sol->add(RB_solution(i), get_basis_function(i));
+//     parallel_temp->add(old_RB_solution(i), get_basis_function(i));
 //   }
 //
 //   // Load parallel_temp into current_local_solution in order to do assembly
@@ -2069,150 +1704,12 @@ Real TransientRBSystem::uncached_compute_residual_dual_norm(const unsigned int N
 //  }
 //
 //  Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
-
-
-
-
-
-  // Use the stored representor inner product values
-  // to evaluate the residual norm
-
-  const Real dt = get_dt();
-
-  std::vector<Number> RB_u_euler_theta(N);
-  std::vector<Number> mass_coeffs(N);
-  for(unsigned int i=0; i<N; i++)
-  {
-    RB_u_euler_theta[i]  = euler_theta*RB_solution(i) + (1.-euler_theta)*old_RB_solution(i);
-    mass_coeffs[i] = -(RB_solution(i) - old_RB_solution(i))/dt;
-  }
-
-  Number residual_norm_sq = 0.;
-
-  unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
-  {
-    Number cached_theta_q_f1 = eval_theta_q_f(q_f1);
-    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
-    {
-      Real delta = (q_f1==q_f2) ? 1. : 2.;
-      residual_norm_sq += delta*cached_theta_q_f1*eval_theta_q_f(q_f2) * Fq_representor_norms[q];
-
-      q++;
-    }
-  }
-
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    Number cached_theta_q_f = eval_theta_q_f(q_f);
-    for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-    {
-      Number cached_theta_q_a = eval_theta_q_a(q_a);
-      for(unsigned int i=0; i<N; i++)
-      {
-        residual_norm_sq += 2.*RB_u_euler_theta[i]*cached_theta_q_f*cached_theta_q_a*
-                               Fq_Aq_representor_norms[q_f][q_a][i];
-      }
-    }
-  }
-
-  q=0;
-  for(unsigned int q_a1=0; q_a1<get_Q_a(); q_a1++)
-  {
-    Number cached_theta_q_a1 = eval_theta_q_a(q_a1);
-    for(unsigned int q_a2=q_a1; q_a2<get_Q_a(); q_a2++)
-    {
-      Number cached_theta_q_a2 = eval_theta_q_a(q_a2);
-      Real delta = (q_a1==q_a2) ? 1. : 2.;
-
-      for(unsigned int i=0; i<N; i++)
-      {
-        for(unsigned int j=0; j<N; j++)
-        {
-          residual_norm_sq += delta*RB_u_euler_theta[i]*RB_u_euler_theta[j]*
-                              cached_theta_q_a1*cached_theta_q_a2*
-                              Aq_Aq_representor_norms[q][i][j];
-        }
-      }
-      q++;
-    }
-  }
-
-  // Now add the terms due to the time-derivative
-  q=0;
-  for(unsigned int q_m1=0; q_m1<get_Q_m(); q_m1++)
-  {
-    Number cached_theta_q_m1 = eval_theta_q_m(q_m1);
-    for(unsigned int q_m2=q_m1; q_m2<get_Q_m(); q_m2++)
-    {
-      Number cached_theta_q_m2 = eval_theta_q_m(q_m2);
-      Real delta = (q_m1==q_m2) ? 1. : 2.;
-
-      for(unsigned int i=0; i<N; i++)
-      {
-        for(unsigned int j=0; j<N; j++)
-        {
-          residual_norm_sq += delta*mass_coeffs[i]*mass_coeffs[j]*
-                              cached_theta_q_m1*cached_theta_q_m2*
-                              Mq_Mq_representor_norms[q][i][j];
-        }
-      }
-      q++;
-    }
-  }
-
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    Number cached_theta_q_f = eval_theta_q_f(q_f);
-    for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-    {
-      Number cached_theta_q_m = eval_theta_q_m(q_m);
-      for(unsigned int i=0; i<N; i++)
-      {
-        residual_norm_sq += 2.*mass_coeffs[i]*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_norms[q_f][q_m][i];
-      }
-    }
-  }
-
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-  {
-    Number cached_theta_q_a = eval_theta_q_a(q_a);
-    
-    for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-    {
-      Number cached_theta_q_m = eval_theta_q_m(q_m);
-      
-      for(unsigned int i=0; i<N; i++)
-      {
-        for(unsigned int j=0; j<N; j++)
-        {
-          residual_norm_sq += 2.*RB_u_euler_theta[i]*mass_coeffs[j]*
-                                         cached_theta_q_a*cached_theta_q_m*
-                                         Aq_Mq_representor_norms[q_a][q_m][i][j];
-        }
-      }
-    }
-  }
-  
-  if(libmesh_real(residual_norm_sq) < 0)
-  {
-    libMesh::out << "Warning: Square of residual norm is negative "
-                 << "in TransientRBSystem::compute_residual_dual_norm()" << std::endl;
-
-    // Sometimes this is negative due to rounding error,
-    // but error is on the order of 1.e-10, so shouldn't
-    // affect result
-//    libmesh_error();
-     residual_norm_sq = std::abs(residual_norm_sq);
-  }
-
-//   libMesh::out << "slow residual_sq = " << slow_residual_norm_sq
-//                << ", fast residual_sq = " << residual_norm_sq << std::endl;
-
-  STOP_LOG("uncached_compute_residual_dual_norm()", "TransientRBSystem");
-
-  return libmesh_real(std::sqrt( residual_norm_sq ));
-}
+//
+//
+//  STOP_LOG("uncached_compute_residual_dual_norm()", "TransientRBSystem");
+//
+//  return libmesh_real(std::sqrt( slow_residual_norm_sq ));
+//}
 
 
 void TransientRBSystem::write_offline_data_to_files(const std::string& directory_name)
@@ -2220,170 +1717,6 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
   START_LOG("write_offline_data_to_files()", "TransientRBSystem");
 
   Parent::write_offline_data_to_files(directory_name);
-
-  const unsigned int n_bfs = get_n_basis_functions();
-  libmesh_assert( n_bfs <= Nmax );
-
-  const unsigned int precision_level = 14;
-
-  if(libMesh::processor_id() == 0)
-  {
-    // Write out the L2 matrix
-    std::ofstream RB_L2_matrix_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/RB_L2_matrix.dat";
-      RB_L2_matrix_out.open(file_name.str().c_str());
-    }
-    RB_L2_matrix_out.precision(precision_level);
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        RB_L2_matrix_out << std::scientific << RB_L2_matrix(i,j) << " ";
-      }
-    }
-    RB_L2_matrix_out.close();
-          
-    // Write out the M_q matrices
-    for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/RB_M_";
-      OSSRealzeroright(file_name,3,0,q_m);
-      file_name << ".dat";
-      std::ofstream RB_M_q_m_out(file_name.str().c_str());
-
-      if ( !RB_M_q_m_out.good() )
-      {
-        libMesh::err << "Error opening RB_M_" << q_m << ".dat" << std::endl;
-        libmesh_error();
-      }
-
-      RB_M_q_m_out.precision(precision_level);
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          RB_M_q_m_out << std::scientific << RB_M_q_vector[q_m](i,j) << " ";
-        }
-      }
-      RB_M_q_m_out.close();
-    }
-
-    // Write out the initial condition data
-    // and the initial L2 error for all N
-    std::ofstream initial_conditions_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/initial_conditions.dat";
-      initial_conditions_out.open(file_name.str().c_str());
-    }
-    std::ofstream initial_L2_error_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/initial_L2_error.dat";
-      initial_L2_error_out.open(file_name.str().c_str());
-    }
-    if (!initial_conditions_out.good() || !initial_L2_error_out.good())
-    {
-      libMesh::err << "Error opening initial conditions output files" << std::endl;
-      libmesh_error();
-    }
-
-    initial_conditions_out.precision(precision_level);
-    initial_L2_error_out.precision(precision_level);
-
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      initial_L2_error_out << initial_L2_error_all_N[i] << " ";
-      for(unsigned int j=0; j<=i; j++)
-      {
-        initial_conditions_out << std::scientific << RB_initial_condition_all_N[i](j) << " ";
-      }
-    }
-    initial_conditions_out.close();
-    initial_L2_error_out.close();
-
-    // Next write out the Fq_Mq representor norm data
-    std::ofstream RB_Fq_Mq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Fq_Mq_norms.dat";
-      RB_Fq_Mq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Fq_Mq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Fq_Mq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Fq_Mq_norms_out.precision(precision_level);
-    for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-    {
-      for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-      {
-        for(unsigned int i=0; i<n_bfs; i++)
-        {
-          RB_Fq_Mq_norms_out << std::scientific << Fq_Mq_representor_norms[q_f][q_m][i] << " ";
-        }
-      }
-    }
-    RB_Fq_Mq_norms_out.close();
-
-    // Next write out the Mq_Mq representor norm data
-    std::ofstream RB_Mq_Mq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Mq_Mq_norms.dat";
-      RB_Mq_Mq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Mq_Mq_norms_out.good() )
-    {
-      libMesh::err << "Error opening RB_Mq_Mq_norms_out.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Mq_Mq_norms_out.precision(precision_level);
-    unsigned int Q_m_hat = get_Q_m()*(get_Q_m()+1)/2;
-    for(unsigned int q=0; q<Q_m_hat; q++)
-    {
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          RB_Mq_Mq_norms_out << std::scientific << Mq_Mq_representor_norms[q][i][j] << " ";
-        }
-      }
-    }
-    RB_Mq_Mq_norms_out.close();
-
-    // Next write out the Aq_Mq representor norm data
-    std::ofstream RB_Aq_Mq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Aq_Mq_norms.dat";
-      RB_Aq_Mq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Aq_Mq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Aq_Mq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Aq_Mq_norms_out.precision(precision_level);
-    for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-    {
-      for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-      {
-        for(unsigned int i=0; i<n_bfs; i++)
-        {
-          for(unsigned int j=0; j<n_bfs; j++)
-          {
-            RB_Aq_Mq_norms_out << std::scientific << Aq_Mq_representor_norms[q_a][q_m][i][j] << " ";
-          }
-        }
-      }
-    }
-    RB_Aq_Mq_norms_out.close();
-  }
 
   // Write out the residual representors to file if requested
   if (store_representors)
@@ -2444,162 +1777,6 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
   START_LOG("read_offline_data_from_files()", "TransientRBSystem");
 
   Parent::read_offline_data_from_files(directory_name);
-
-  // First, find out how many basis functions we had when Greedy terminated
-  // This was set in RBSystem::read_offline_data_from_files
-  unsigned int n_bfs = this->get_n_basis_functions();
-  
-  std::ifstream RB_L2_matrix_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/RB_L2_matrix.dat";
-    RB_L2_matrix_in.open(file_name.str().c_str());
-  }
-  for(unsigned int i=0; i<n_bfs; i++)
-  {
-    for(unsigned int j=0; j<n_bfs; j++)
-    {
-      Number value;
-      RB_L2_matrix_in >> value;
-      RB_L2_matrix(i,j) = value;
-    }
-  }
-  RB_L2_matrix_in.close();
-
-  // Read in the M_q matrices
-  for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/RB_M_";
-    OSSRealzeroright(file_name,3,0,q_m);
-    file_name << ".dat";
-    std::ifstream RB_M_q_m_in(file_name.str().c_str());
-
-    if ( !RB_M_q_m_in.good() )
-    {
-      libMesh::err << "Error opening RB_M_" << q_m << ".dat" << std::endl;
-      libmesh_error();
-    }
-
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        Number value;
-        RB_M_q_m_in >> value;
-        RB_M_q_vector[q_m](i,j) = value;
-      }
-    }
-    RB_M_q_m_in.close();
-  }
-
-
-  // Read in the initial condition data
-  // and the initial L2 error for all N
-  std::ifstream initial_conditions_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/initial_conditions.dat";
-    initial_conditions_in.open(file_name.str().c_str());
-  }
-  std::ifstream initial_L2_error_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/initial_L2_error.dat";
-    initial_L2_error_in.open(file_name.str().c_str());
-  }
-  if (!initial_conditions_in.good() || !initial_L2_error_in.good())
-  {
-    libMesh::err << "Error opening initial conditions output files" << std::endl;
-    libmesh_error();
-  }
-
-  for(unsigned int i=0; i<n_bfs; i++)
-  {
-    initial_L2_error_in >> initial_L2_error_all_N[i];
-    for(unsigned int j=0; j<=i; j++)
-    {
-      initial_conditions_in >> RB_initial_condition_all_N[i](j);
-    }
-  }
-  initial_conditions_in.close();
-  initial_L2_error_in.close();
-
-  // Next read in the Fq_Mq representor norm data
-  std::ifstream RB_Fq_Mq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Fq_Mq_norms.dat";
-    RB_Fq_Mq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Fq_Mq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Fq_Mq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-  {
-    for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-    {
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        RB_Fq_Mq_norms_in >> Fq_Mq_representor_norms[q_f][q_m][i];
-      }
-    }
-  }
-  RB_Fq_Mq_norms_in.close();
-
-  // Next read in the Mq_Mq representor norm data
-  std::ifstream RB_Mq_Mq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Mq_Mq_norms.dat";
-    RB_Mq_Mq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Mq_Mq_norms_in.good() )
-  {
-    libMesh::err << "Error opening RB_Mq_Mq_norms_in.dat" << std::endl;
-    libmesh_error();
-  }
-  unsigned int Q_m_hat = get_Q_m()*(get_Q_m()+1)/2;
-  for(unsigned int q=0; q<Q_m_hat; q++)
-  {
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        RB_Mq_Mq_norms_in >> Mq_Mq_representor_norms[q][i][j];
-      }
-    }
-  }
-  RB_Mq_Mq_norms_in.close();
-
-  // Next read in the Aq_Mq representor norm data
-  std::ifstream RB_Aq_Mq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Aq_Mq_norms.dat";
-    RB_Aq_Mq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Aq_Mq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Aq_Mq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-  {
-    for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-    {
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          RB_Aq_Mq_norms_in >> Aq_Mq_representor_norms[q_a][q_m][i][j];
-        }
-      }
-    }
-  }
-  RB_Aq_Mq_norms_in.close();
 
   // Read in the representors if requested
   if (store_representors)

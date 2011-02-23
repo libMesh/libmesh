@@ -25,6 +25,7 @@
 #include "dense_matrix.h"
 #include "rb_base.h"
 #include "fem_context.h"
+#include "rb_evaluation.h"
 
 namespace libMesh
 {
@@ -96,12 +97,6 @@ public:
    * @returns a string indicating the type of the system.
    */
   virtual std::string system_type () const;
-
-  /**
-   * Perform online solve with the N RB basis functions, for the
-   * set of parameters in current_params, where 1 <= N <= RB_size.
-   */
-  virtual Real RB_solve(unsigned int N);
 
   /**
    * Perform a "truth" solve, i.e. solve the finite element system at
@@ -206,20 +201,12 @@ public:
   /**
    * Get the current number of basis functions.
    */
-  virtual unsigned int get_n_basis_functions() const { return basis_functions.size(); }
-  
-  /**
-   * Set the number of basis functions. Useful when reading in
-   * stored data.
-   */
-  virtual void set_n_basis_functions(unsigned int n_bfs) { basis_functions.resize(n_bfs); }
+  virtual unsigned int get_n_basis_functions() const { return rb_eval->get_n_basis_functions(); }
 
   /**
-   * Get a const reference to basis function i.
+   * Get a const reference to the i^th basis function stored in rb_eval.
    */
-  const NumericVector<Number> & get_bf(unsigned int i) const
-    { libmesh_assert(i<=basis_functions.size());
-      return *basis_functions[i]; };
+  NumericVector<Number>& get_basis_function(unsigned int i);
 
   /**
    * Load the RB solution from the most recent solve
@@ -262,17 +249,17 @@ public:
    * Attach parameter-dependent function and user-defined assembly routine
    * for affine operator (both interior and boundary assembly).
    */
-  void attach_A_q(theta_q_fptr theta_q_a,
-                  affine_assembly_fptr A_q_intrr_assembly,
-                  affine_assembly_fptr A_q_bndry_assembly);
+  virtual void attach_A_q(theta_q_fptr theta_q_a,
+                          affine_assembly_fptr A_q_intrr_assembly,
+                          affine_assembly_fptr A_q_bndry_assembly);
 
   /**
    * Attach parameter-dependent function and user-defined assembly routine
    * for affine vector. (Interior assembly and boundary assembly).
    */
-  void attach_F_q(theta_q_fptr theta_q_f,
-                  affine_assembly_fptr F_q_intrr_assembly,
-                  affine_assembly_fptr F_q_bdnry_assembly);
+  virtual void attach_F_q(theta_q_fptr theta_q_f,
+                          affine_assembly_fptr F_q_intrr_assembly,
+                          affine_assembly_fptr F_q_bdnry_assembly);
 
   /**
    * Attach an EIM system and a corresponding function pointers to
@@ -333,6 +320,11 @@ public:
    * Get a pointer to A_q.
    */
   SparseMatrix<Number>* get_A_q(unsigned int q);
+
+  /**
+   * Get a pointer to non_dirichlet_A_q.
+   */
+  SparseMatrix<Number>* get_non_dirichlet_A_q(unsigned int q);
   
   /**
    * Get a reference to the specified LHS EIM system.
@@ -356,7 +348,7 @@ public:
   /**
    * Evaluate theta_q_f at the current parameter.
    */
-  Number eval_theta_q_f(unsigned int q);
+  virtual Number eval_theta_q_f(unsigned int q);
 
   /**
    * Evaluate theta_q_l at the current parameter.
@@ -369,13 +361,21 @@ public:
    * affine and output vectors.
    * Optionally assemble and store all the affine matrices if we
    * are not in low-memory mode.
+   * The boolean argument \p do_not_assemble is true, then
+   * we do not perform the initial assembly of affine operators
+   * and vectors.
    */
-  virtual void initialize_RB_system(bool online_mode);
+  virtual void initialize_RB_system(bool do_not_assemble);
 
   /**
    * Get a pointer to F_q.
    */
   NumericVector<Number>* get_F_q(unsigned int q);
+
+  /**
+   * Get a pointer to non-Dirichlet F_q.
+   */
+  NumericVector<Number>* get_non_dirichlet_F_q(unsigned int q);
 
   /**
    * Get a pointer to the n^th output.
@@ -400,7 +400,12 @@ public:
   /**
    * Assemble the q^th affine matrix and store it in input_matrix.
    */
-  void assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix);
+  void assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
+
+  /**
+   * Assemble the q^th affine vector and store it in input_matrix.
+   */
+  void assemble_Fq_vector(unsigned int q, NumericVector<Number>* input_vector, bool apply_dirichlet_bc=true);
 
   /**
    * Add the scaled q^th affine matrix to input_matrix. If symmetrize==true, then
@@ -428,9 +433,54 @@ public:
    */
   virtual void recompute_all_residual_terms();
 
+  /**
+   * Build a new RBEvaluation object and add
+   * it to the rb_evaluation_objects vector.
+   */
+  virtual void add_new_rb_evaluation_object();
+  
+  /**
+   * Evaluate the dual norm of output \p n
+   * for the current parameters.
+   */
+  Real eval_output_dual_norm(unsigned int n);
+
+  /**
+   * Specifies the residual scaling on the denominator to
+   * be used in the a posteriori error bound. Overload
+   * in subclass in order to obtain the desired error bound.
+   */
+  virtual Real residual_scaling_denom(Real alpha_LB);
+
+  /**
+   * Get the SCM lower bound at the current parameter value.
+   */
+  virtual Real get_SCM_lower_bound();
+
+  /**
+   * Get the SCM upper bound at the current parameter value.
+   */
+  virtual Real get_SCM_upper_bound();
+
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
+  /**
+   * The current RBEvaluation object we are using.
+   */
+  RBEvaluation* rb_eval;
+
+  /**
+   * The set of RBEvaluation objects. These perform all
+   * the "online" RB evaluation calculations, and store
+   * the associated data required for those calculations.
+   *
+   * Often we will just have one RBEvaluation object
+   * associated with an RBSystem, but it can be useful
+   * to be able to "switch contexts" between different
+   * RBEvaluations, e.g. in the context of the hp-RB method.
+   */
+  std::vector<RBEvaluation*> rb_evaluation_objects;
 
   /**
    * Vector storing the values of the error bound
@@ -453,35 +503,6 @@ public:
   AutoPtr< SparseMatrix<Number> > constraint_matrix;
 
   /**
-   * The libMesh vectors storing the finite element coefficients
-   * of the RB basis functions.
-   */
-  std::vector< NumericVector<Number>* > basis_functions;
-
-  /**
-   * The inner product matrix. This should be close to the identity,
-   * we need to calculate this rather than assume diagonality in order
-   * to accurately perform projections since orthogonality degrades
-   * with increasing N.
-   */
-  DenseMatrix<Number> RB_inner_product_matrix;
-
-  /**
-   * Dense matrices for the RB computations.
-   */
-  std::vector< DenseMatrix<Number> > RB_A_q_vector;
-
-  /**
-   * Dense vector for the RHS.
-   */
-  std::vector< DenseVector<Number> > RB_F_q_vector;
-
-  /**
-   * The RB solution vector.
-   */
-  DenseVector<Number> RB_solution;
-
-  /**
    * Vector storing the truth output values from the most
    * recent truth solve.
    */
@@ -494,18 +515,6 @@ public:
   std::vector< std::vector< Number > > output_dual_norms;
 
   /**
-   * The vectors storing the RB output vectors.
-   */
-  std::vector< std::vector< DenseVector<Number> > > RB_output_vectors;
-
-  /**
-   * The vectors storing the RB output values and
-   * corresponding error bounds.
-   */
-  std::vector< Number > RB_outputs;
-  std::vector< Real > RB_output_error_bounds;
-
-  /**
    * The list of parameters selected by the Greedy algorithm.
    */
   std::vector< std::vector<Real> > greedy_param_list;
@@ -515,14 +524,6 @@ public:
    */
   std::vector< NumericVector<Number>* > F_q_representor;
   std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
-
-  /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
-   */
-  std::vector<Number> Fq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
 
   /**
    * Boolean flag to indicate whether this is a constrained problem
@@ -588,6 +589,13 @@ public:
   bool compute_RB_inner_product;
 
   /**
+   * Boolean flag to indicate whether we store a second copy of each
+   * affine operator and vector which does not have Dirichlet bcs
+   * enforced.
+   */
+  bool store_non_dirichlet_operators;
+
+  /**
    * The filename of the text file from which we read in the
    * problem parameters. We use getpot.h to perform the reading.
    */
@@ -601,12 +609,35 @@ public:
    */
   bool enforce_constraints_exactly;
 
-protected:
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * Controls whether or not XDR (binary) files are written out for
+   * the basis functions.  The binary file size can be as small
+   * as 1/3 the size of an ASCII file.
    */
-  virtual void init_data ();
+  bool write_binary_basis_functions;
+
+  /**
+   * Controls wether XDR (binary) files are read for
+   * the basis functions.  Note: if you wrote ASCII basis functions
+   * during a previous run but want to start writing XDR, set
+   * read_binary_basis_functions = false and
+   * write_binary_basis_functions = true.
+   */
+  bool read_binary_basis_functions;
+
+protected:
+
+  /**
+   * Read in the parameters from file and set up the system
+   * accordingly.
+   */
+  virtual void process_parameters_file();
+  
+  /**
+   * Helper function that actually allocates all the data
+   * structures required by this class.
+   */
+  virtual void allocate_data_structures();
 
   /**
    * Assemble the truth matrix and right-hand side
@@ -626,12 +657,6 @@ protected:
    * for steady state problems.
    */
   virtual void assemble_matrix_for_output_dual_solves();
-  
-  /**
-   * Evaluate the dual norm of output \p n
-   * for the current parameters.
-   */
-  Real eval_output_dual_norm(unsigned int n);
 
   /**
    * Function that indicates when to terminate the Greedy
@@ -657,7 +682,8 @@ protected:
                                     affine_assembly_fptr bndry_assembly,
                                     SparseMatrix<Number>* input_matrix,
                                     NumericVector<Number>* input_vector,
-                                    bool symmetrize=false);
+                                    bool symmetrize=false,
+                                    bool apply_dirichlet_bc=true);
 
   /**
    * Set current_local_solution = vec so that we can access vec
@@ -694,18 +720,12 @@ protected:
   /**
    * Assemble and store the affine RHS vectors.
    */
-  void assemble_all_affine_vectors();
+  virtual void assemble_all_affine_vectors();
 
   /**
    * Assemble and store the output vectors.
    */
   void assemble_all_output_vectors();
-
-  /**
-   * Compute the dual norm of the residual for the solution
-   * saved in RB_solution_vector.
-   */
-  virtual Real compute_residual_dual_norm(const unsigned int N);
 
   /**
    * Compute and store the dual norm of each output functional.
@@ -728,24 +748,7 @@ protected:
    * This function returns the RB error bound for the current parameters and
    * is used in the Greedy algorithm to select the next parameter.
    */
-  virtual Real get_RB_error_bound() { return RB_solve(get_n_basis_functions()); }
-
-  /**
-   * Get the SCM lower bound at the current parameter value.
-   */
-  virtual Real get_SCM_lower_bound();
-
-  /**
-   * Get the SCM upper bound at the current parameter value.
-   */
-  virtual Real get_SCM_upper_bound();
-
-  /**
-   * Specifies the residual scaling on the denominator to
-   * be used in the a posteriori error bound. Overload
-   * in subclass in order to obtain the desired error bound.
-   */
-  virtual Real residual_scaling_denom(Real alpha_LB);
+  virtual Real get_RB_error_bound() { return rb_eval->RB_solve(get_n_basis_functions()); }
 
   /**
    * Compute the reduced basis matrices for the current basis.
@@ -760,17 +763,6 @@ protected:
    * data from files.
    */
   virtual void update_residual_terms(bool compute_inner_products=true);
-  
-  /**
-   * If store_basis_functions=true, write out all the basis functions to file.
-   * Precision level specifies the number of significant digits to write out.
-   */
-  virtual void write_out_basis_functions(const std::string& directory_name, const unsigned int precision_level);
-  
-  /**
-   * If store_basis_functions=true, read in all the basis functions from file.
-   */
-  virtual void read_in_basis_functions(const std::string& directory_name);
 
   /**
    * Initialize the FEMContext prior to performing
@@ -814,22 +806,6 @@ protected:
    * This defaults to 1 in the steady case.
    */
   unsigned int delta_N;
-
-  /**
-   * Controls whether or not XDR (binary) files are written out for
-   * the basis functions.  The binary file size can be as small
-   * as 1/3 the size of an ASCII file.
-   */
-  bool write_binary_basis_functions;
-
-  /**
-   * Controls wether XDR (binary) files are read for
-   * the basis functions.  Note: if you wrote ASCII basis functions
-   * during a previous run but want to start writing XDR, set
-   * read_binary_basis_functions = false and
-   * write_binary_basis_functions = true.
-   */
-  bool read_binary_basis_functions;
 
   /**
    * Controls whether or not XDR (binary) files are written out for
@@ -968,6 +944,14 @@ private:
    * of the right-hand side.
    */
   std::vector< NumericVector<Number>* > F_q_vector;
+
+  /**
+   * We sometimes also need a second set of matrices/vectors
+   * that do not have the Dirichlet boundary conditions
+   * enforced.
+   */
+  std::vector< SparseMatrix<Number>* > non_dirichlet_A_q_vector;
+  std::vector< NumericVector<Number>* > non_dirichlet_F_q_vector;
 
   /**
    * The libMesh vectors that define the output functionals.
