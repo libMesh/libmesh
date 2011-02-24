@@ -17,6 +17,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// Configuration data
+#include "libmesh_config.h"
+
+// Depends on the QNTransientRBSystem, which requires SLEPC
+#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+
 #include "qn_transient_rb_evaluation.h"
 #include "qn_transient_rb_system.h"
 #include "libmesh_logging.h"
@@ -856,3 +862,5 @@ void QNTransientRBEvaluation::read_offline_data_from_files(const std::string& di
 }
 
 } // namespace libMesh
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
