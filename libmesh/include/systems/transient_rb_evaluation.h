@@ -21,6 +21,7 @@
 #define __transient_rb_evaluation_h__
 
 #include "rb_evaluation.h"
+#include "transient_rb_system.h"
 
 namespace libMesh
 {
@@ -45,7 +46,7 @@ public:
   /**
    * Constructor.
    */
-  TransientRBEvaluation (RBSystem& rb_sys_in);
+  TransientRBEvaluation (TransientRBSystem& rb_sys_in);
 
   /**
    * The type of the parent.

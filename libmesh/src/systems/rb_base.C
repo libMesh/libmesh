@@ -51,7 +51,7 @@ RBBase<Base>::RBBase (EquationSystems& es,
                       const unsigned int number)
   : Base(es, name, number),
     training_parameters_initialized(false),
-    initialize_calN_dependent_data(true),
+    initialize_mesh_dependent_data(true),
     training_parameters_random_seed(-1), // by default, use std::time to seed RNG
     theta_data(NULL),
     serial_training_set(false),
@@ -106,7 +106,7 @@ void RBBase<Base>::init_data ()
   theta_data = build_theta_data().release();
   init_theta_data(*theta_data);
 
-  if(initialize_calN_dependent_data)
+  if(initialize_mesh_dependent_data)
   {
     Base::init_data();
 

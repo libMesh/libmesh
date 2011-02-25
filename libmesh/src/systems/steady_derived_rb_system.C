@@ -331,9 +331,9 @@ void DerivedRBSystem<RBSystem>::load_RB_solution()
 {
   START_LOG("load_RB_solution()", "DerivedRBSystem");
 
-  if(!initialize_calN_dependent_data)
+  if(!initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to load RB solution."
                  << std::endl;
     libmesh_error();

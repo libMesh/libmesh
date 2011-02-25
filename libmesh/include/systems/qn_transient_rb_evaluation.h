@@ -21,6 +21,7 @@
 #define __qn_transient_rb_evaluation_h__
 
 #include "transient_rb_evaluation.h"
+#include "qn_transient_rb_system.h"
 
 namespace libMesh
 {
@@ -48,7 +49,7 @@ public:
   /**
    * Constructor.
    */
-  QNTransientRBEvaluation (RBSystem& rb_sys_in);
+  QNTransientRBEvaluation (QNTransientRBSystem& rb_sys_in);
 
   /**
    * The type of the parent.
