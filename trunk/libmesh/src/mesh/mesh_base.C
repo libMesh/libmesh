@@ -60,13 +60,14 @@ MeshBase::MeshBase (unsigned int d) :
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
-  boundary_info  (new BoundaryInfo(*this)), // no copy constructor defined for BoundaryInfo?
+  boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (other_mesh._n_parts),
   _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (NULL),
   _partitioner   (other_mesh._partitioner->clone())
 {
+  *boundary_info = *other_mesh.boundary_info;
 }
 
 
