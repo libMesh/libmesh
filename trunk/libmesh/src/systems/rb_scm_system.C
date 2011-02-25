@@ -141,8 +141,8 @@ void RBSCMSystem::initialize_SCM_system ()
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "using deterministic training samples? " << deterministic_training << std::endl;
-  libMesh::out << "initializing calN-dependent data structures "
-               << initialize_calN_dependent_data << std::endl;
+  libMesh::out << "initializing mesh-dependent data structures "
+               << initialize_mesh_dependent_data << std::endl;
   libMesh::out << std::endl;
 }
 

@@ -115,7 +115,7 @@ void RBEIMSystem::initialize_RB_system(bool do_not_assemble)
 {
   Parent::initialize_RB_system(do_not_assemble);
   
-  if(initialize_calN_dependent_data)
+  if(initialize_mesh_dependent_data)
   {
     // initialize a serial vector that we will use for MeshFunction evaluations
     serialized_vector = NumericVector<Number>::build();
@@ -419,9 +419,9 @@ Real RBEIMSystem::truth_solve(int plot_solution)
 {
   START_LOG("truth_solve()", "RBEIMSystem");
         
-  if(!initialize_calN_dependent_data)
+  if(!initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to load the truth solution."
                  << std::endl;
     libmesh_error();

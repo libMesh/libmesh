@@ -29,7 +29,7 @@
 namespace libMesh
 {
 
-TransientRBEvaluation::TransientRBEvaluation (RBSystem& rb_sys_in)
+TransientRBEvaluation::TransientRBEvaluation (TransientRBSystem& rb_sys_in)
   :
   Parent(rb_sys_in)
 {

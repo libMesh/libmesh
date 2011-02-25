@@ -341,11 +341,11 @@ void RBSystem::process_parameters_file ()
   const bool quiet_in = infile("quiet", quiet);
   set_quiet(quiet_in);
 
-  // Throw an error if we try to not initialize calN-dependent data
+  // Throw an error if we try to not initialize mesh-dependent data
   // when we also want to read in the basis functions.
-  if(!initialize_calN_dependent_data && store_basis_functions)
+  if(!initialize_mesh_dependent_data && store_basis_functions)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures if we want to read in basis "
                  << "functions."
                  << std::endl;
@@ -435,8 +435,8 @@ void RBSystem::process_parameters_file ()
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "return a relative error bound from RB_solve? " << return_rel_error_bound << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
-  libMesh::out << "initializing calN-dependent data structures? "
-               << initialize_calN_dependent_data << std::endl;
+  libMesh::out << "initializing mesh-dependent data structures? "
+               << initialize_mesh_dependent_data << std::endl;
   libMesh::out << "store non-Dirichlet affine operators? " << store_non_dirichlet_operators << std::endl;
   libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
   libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
@@ -491,8 +491,8 @@ void RBSystem::initialize_RB_system(bool do_not_assemble)
 
 void RBSystem::allocate_data_structures()
 {
-  // Resize vectors for storing calN-dependent data but only
-  // initialize if initialize_calN_dependent_data == true
+  // Resize vectors for storing mesh-dependent data but only
+  // initialize if initialize_mesh_dependent_data == true
   A_q_vector.resize(get_Q_a());
   F_q_vector.resize(get_Q_f());
   F_q_representor.resize(get_Q_f());
@@ -512,7 +512,7 @@ void RBSystem::allocate_data_structures()
     output_dual_norms[n].resize(Q_l_hat);
   }
 
-  if(initialize_calN_dependent_data)
+  if(initialize_mesh_dependent_data)
   {
     // Only initialize matrices if we're not in low-memory mode
     if(!low_memory_mode)
@@ -611,9 +611,9 @@ void RBSystem::initialize_dirichlet_dofs()
 {
   START_LOG("initialize_dirichlet_dofs()", "RBSystem");
 
-  if(!initialize_calN_dependent_data)
+  if(!initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to initialize Dirichlet dofs."
                  << std::endl;
     libmesh_error();
@@ -718,9 +718,9 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
 {
   START_LOG("add_scaled_matrix_and_vector()", "RBSystem");
 
-  if(!initialize_calN_dependent_data)
+  if(!initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to perform add_scaled_matrix_and_vector."
                  << std::endl;
     libmesh_error();
@@ -1308,9 +1308,9 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
 {
   START_LOG("train_reduced_basis()", "RBSystem");
 
-  if(!initialize_calN_dependent_data)
+  if(!initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to train reduced basis."
                  << std::endl;
     libmesh_error();
@@ -1444,9 +1444,9 @@ Real RBSystem::truth_solve(int plot_solution)
 {
   START_LOG("truth_solve()", "RBSystem");
 
-  if(!initialize_calN_dependent_data)
+  if(!initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to do a truth solve."
                  << std::endl;
     libmesh_error();
@@ -1711,9 +1711,9 @@ void RBSystem::load_basis_function(unsigned int i)
 {
   START_LOG("load_basis_function()", "RBSystem");
 
-  if(!initialize_calN_dependent_data)
+  if(!initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to load basis function."
                  << std::endl;
     libmesh_error();
@@ -2432,9 +2432,9 @@ void RBSystem::load_RB_solution()
 {
   START_LOG("load_RB_solution()", "RBSystem");
 
-  if(!initialize_calN_dependent_data)
+  if(!initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to load RB solution."
                  << std::endl;
     libmesh_error();

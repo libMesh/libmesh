@@ -83,9 +83,9 @@ void DerivedRBSystem<Base>::load_basis_function(unsigned int i)
 {
   START_LOG("load_basis_function()", "DerivedRBSystem");
 
-  if(!Base::initialize_calN_dependent_data)
+  if(!Base::initialize_mesh_dependent_data)
   {
-    libMesh::err << "Error: We must initialize the calN dependent "
+    libMesh::err << "Error: We must initialize the mesh dependent "
                  << "data structures in order to load basis function."
                  << std::endl;
     libmesh_error();

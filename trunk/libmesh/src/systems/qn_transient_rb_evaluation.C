@@ -34,7 +34,7 @@
 namespace libMesh
 {
         
-QNTransientRBEvaluation::QNTransientRBEvaluation (RBSystem& rb_sys_in)
+QNTransientRBEvaluation::QNTransientRBEvaluation (QNTransientRBSystem& rb_sys_in)
   :
   Parent(rb_sys_in)
 {

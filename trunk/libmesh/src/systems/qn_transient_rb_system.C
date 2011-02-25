@@ -187,8 +187,8 @@ void QNTransientRBSystem::allocate_data_structures()
     }
   }
 
-  // Optionally initialize the calN dependent data structures
-  if(initialize_calN_dependent_data)
+  // Optionally initialize the mesh dependent data structures
+  if(initialize_mesh_dependent_data)
   {
     DofMap& dof_map = this->get_dof_map();
 
@@ -908,7 +908,7 @@ void QNTransientRBSystem::update_trilinear_form_operators()
 
 void QNTransientRBSystem::update_all_trilinear_form_operators()
 {
-  if(!low_memory_mode && initialize_calN_dependent_data)
+  if(!low_memory_mode && initialize_mesh_dependent_data)
   {
     unsigned int saved_delta_N = delta_N;
     delta_N = get_n_basis_functions();

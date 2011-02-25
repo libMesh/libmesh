@@ -141,18 +141,18 @@ void TransientRBSystem::clear_basis_helper()
 
 void TransientRBSystem::init_data()
 {
-  // Use the boolean initialize_calN_dependent_data
+  // Use the boolean initialize_mesh_dependent_data
   // to determine whether or not we initialize the libMesh
   // mesh-dependent data.
 
-  if(initialize_calN_dependent_data)
+  if(initialize_mesh_dependent_data)
   {
     // Call the Parent's initialization routine.
     Parent::init_data();
   }
   else
   {
-    // If we do not initialize calN-dependent data, then we
+    // If we do not initialize mesh-dependent data, then we
     // must skip initialization of Parent (=TransientSystem<RBSystem>)
     // and just initialize RBSystem.
     RBSystem::init_data();
@@ -212,15 +212,15 @@ void TransientRBSystem::allocate_data_structures()
 {
   Parent::allocate_data_structures();
 
-  // Resize vectors for storing calN-dependent data but only
-  // initialize if initialize_calN_dependent_data == true
+  // Resize vectors for storing mesh-dependent data but only
+  // initialize if initialize_mesh_dependent_data == true
   unsigned int n_time_levels = get_K()+1;
   temporal_data.resize(n_time_levels);
   
-  // Resize vectors for storing calN-dependent data but only
-  // initialize if initialize_calN_dependent_data == true
+  // Resize vectors for storing mesh-dependent data but only
+  // initialize if initialize_mesh_dependent_data == true
   M_q_vector.resize(get_Q_m());
-  if(initialize_calN_dependent_data)
+  if(initialize_mesh_dependent_data)
   {
     // Only initialize the mass matrices if we
     // are not in low-memory mode

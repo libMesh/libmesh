@@ -294,10 +294,10 @@ public:
 
   /**
    * Boolean flag to indicate whether or not we initialize
-   * \calN (i.e. "truth" mesh) dependent matrices and
-   * vectors when init_data is called. Default value is true.
+   * mesh dependent matrices and vectors when init_data
+   * is called. Default value is true.
    */
-  bool initialize_calN_dependent_data;
+  bool initialize_mesh_dependent_data;
 
   /**
    * The training samples.
