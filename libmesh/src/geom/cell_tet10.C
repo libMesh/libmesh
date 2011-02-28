@@ -101,22 +101,22 @@ bool Tet10::has_affine_map() const
 {
   // Make sure edges are straight
   if (!this->point(4).relative_fuzzy_equals
-      (this->point(0) + this->point(1)/2))
+      ((this->point(0) + this->point(1))/2))
     return false;
   if (!this->point(5).relative_fuzzy_equals
-      (this->point(1) + this->point(2)/2))
+      ((this->point(1) + this->point(2))/2))
     return false;
   if (!this->point(6).relative_fuzzy_equals
-      (this->point(2) + this->point(0)/2))
+      ((this->point(2) + this->point(0))/2))
     return false;
   if (!this->point(7).relative_fuzzy_equals
-      (this->point(3) + this->point(0)/2))
+      ((this->point(3) + this->point(0))/2))
     return false;
   if (!this->point(8).relative_fuzzy_equals
-      (this->point(3) + this->point(1)/2))
+      ((this->point(3) + this->point(1))/2))
     return false;
   if (!this->point(9).relative_fuzzy_equals
-      (this->point(3) + this->point(2)/2))
+      ((this->point(3) + this->point(2))/2))
     return false;
   return true;
 }
