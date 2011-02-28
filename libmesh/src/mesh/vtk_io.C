@@ -300,16 +300,19 @@ void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid
 }*/
 
 void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& grid){
-	// write only single processor
-	if(libMesh::processor_id()==0){
 
-		const MeshBase& mesh = (MeshBase&)es.get_mesh();
+        const MeshBase& mesh = es.get_mesh();
+        const unsigned int n_nodes = mesh.n_nodes();
 
-		const unsigned int n_nodes = es.get_mesh().n_nodes();
-		// loop over the systems
-		for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
-			
-			const System& sys = es.get_system(i);
+	// loop over the systems
+	for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
+
+                const System& sys = es.get_system(i);
+                std::vector<Number> soln;
+                sys.solution->localize_to_one(soln);
+
+                // write only on one processor
+                if(libMesh::processor_id()==0){
 
 			const unsigned int n_vars = sys.n_vars();
 			// loop over variables
@@ -328,9 +331,9 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 					const unsigned int dof_nr = mesh.node(k).dof_number(i,j,0);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-					data->SetValue(k,sys.current_solution(dof_nr).real());
+					data->SetValue(k,soln[dof_nr].real());
 #else
-					data->SetValue(k,sys.current_solution(dof_nr));
+					data->SetValue(k,soln[dof_nr]);
 #endif
 
 				} 
@@ -592,26 +595,34 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
   libmesh_error();
   
 #else
-  if (libMesh::processor_id() == 0)
-		{
+
+  vtkXMLPUnstructuredGridWriter* writer = 0;
+  vtkPoints* pnts = 0;
+  vtkCellArray* cells = 0;
+  int * types = 0;
+
+  if (libMesh::processor_id() == 0){
 
 	  // check if the filename extension is pvtu
 	  libmesh_assert(fname.substr(fname.rfind("."),fname.size())==".pvtu");
+
+	  const MeshBase& mesh = es.get_mesh();
+
 	  /*
 		* we only use Unstructured grids
 		*/
 	  _vtk_grid = vtkUnstructuredGrid::New();
-	  vtkXMLPUnstructuredGridWriter* writer= vtkXMLPUnstructuredGridWriter::New();
+	  writer = vtkXMLPUnstructuredGridWriter::New();
 //	  libMesh::out<<"get points "<<std::endl;  
-	  vtkPoints* pnts = nodes_to_vtk((const MeshBase&)es.get_mesh());
+	  pnts = nodes_to_vtk(mesh);
 	  _vtk_grid->SetPoints(pnts);
 	 
-	  int * types = new int[es.get_mesh().n_active_elem()];
+	  types = new int[mesh.n_active_elem()];
 //	  libMesh::out<<"get cells"<<std::endl;  
-	  vtkCellArray* cells = cells_to_vtk((const MeshBase&)es.get_mesh(), types);
-
+	  cells = cells_to_vtk(mesh, types);
 //	  libMesh::out<<"set cells"<<std::endl;  
 	  _vtk_grid->SetCells(types,cells);
+  }
 	  
 	  // I'd like to write out meshdata, but this requires some coding, in
 	  // particular, non_const meshdata iterators
@@ -620,12 +631,16 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  //      meshdata_to_vtk(md,_vtk_grid);
 	  //   libmesh_assert (soln.size() ==mesh.n_nodes()*names.size());
 //	  libMesh::out<<"write solution"<<std::endl;  
+
+          // call solution_to_vtk on all processors to allow localization of the solution in it
 	  solution_to_vtk(es,_vtk_grid);
 
 //#ifdef DEBUG
 //     if(true) // add some condition here, although maybe it is more sensible to give each vector a flag on whether it is to be written out or not
 //       system_vectors_to_vtk(es,_vtk_grid);
 //#endif
+
+  if (libMesh::processor_id() == 0){
 	  writer->SetInput(_vtk_grid);
 	  writer->SetFileName(fname.c_str());
 	  writer->SetDataModeToAscii();
@@ -636,7 +651,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  cells->Delete();
 	  _vtk_grid->Delete();
 	  writer->Delete();
-	}
+  }
 #endif
 }
 
