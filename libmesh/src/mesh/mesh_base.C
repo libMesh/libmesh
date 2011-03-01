@@ -67,7 +67,6 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _point_locator (NULL),
   _partitioner   (other_mesh._partitioner->clone())
 {
-  *boundary_info = *other_mesh.boundary_info;
 }
 
 

@@ -51,6 +51,7 @@ SerialMesh::SerialMesh (const SerialMesh &other_mesh) :
   UnstructuredMesh (other_mesh)
 {
   this->copy_nodes_and_elements(other_mesh);
+  *this->boundary_info = *other_mesh.boundary_info;
 }
 
 
@@ -58,6 +59,7 @@ SerialMesh::SerialMesh (const UnstructuredMesh &other_mesh) :
   UnstructuredMesh (other_mesh)
 {
   this->copy_nodes_and_elements(other_mesh);
+  *this->boundary_info = *other_mesh.boundary_info;
 }
 
 

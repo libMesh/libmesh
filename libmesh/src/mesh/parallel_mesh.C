@@ -62,6 +62,7 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
   _n_elem  = other_mesh.n_elem();
   _max_node_id = other_mesh.max_node_id();
   _max_elem_id = other_mesh.max_elem_id();
+  *this->boundary_info = *other_mesh.boundary_info;
 }
 
 
@@ -74,6 +75,7 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
   _n_elem  = other_mesh.n_elem();
   _max_node_id = other_mesh.max_node_id();
   _max_elem_id = other_mesh.max_elem_id();
+  *this->boundary_info = *other_mesh.boundary_info;
 }
 
 
