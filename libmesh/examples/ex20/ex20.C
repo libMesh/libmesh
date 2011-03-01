@@ -44,7 +44,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_refinement.h"
-#include "exodusII_io.h"
+#include "vtk_io.h"
 #include "equation_systems.h"
 #include "fe.h"
 #include "quadrature_gauss.h"
@@ -221,16 +221,10 @@ int main (int argc, char** argv)
   // Print a nice message.
   std::cout << "Solved linear system in " << system.n_linear_iterations() << " iterations, residual norm is " << system.final_linear_residual() << "." << std::endl;
   
-#ifdef LIBMESH_HAVE_EXODUS_API
+#ifdef LIBMESH_HAVE_VTK
   // Write result to file.
-  {
-    OStringStream file_name;
-    
-    file_name << "out.exd";
-    ExodusII_IO(mesh).write_equation_systems (file_name.str(),
-					equation_systems);
-  }
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+  VTKIO(mesh).write_equation_systems ("out.pvtu", equation_systems);
+#endif // #ifdef LIBMESH_HAVE_VTK
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
   
