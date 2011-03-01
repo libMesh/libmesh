@@ -211,6 +211,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
           libmesh_assert (error_estimator.error_norm.type(var) == L2 ||
 			  error_estimator.error_norm.type(var) == H1_SEMINORM ||
                           error_estimator.error_norm.type(var) == H2_SEMINORM ||
+			  error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
+			  error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
+			  error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
                           error_estimator.error_norm.type(var) == L_INF ||
                           error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
                           error_estimator.error_norm.type(var) == W2_INF_SEMINORM);
@@ -218,6 +221,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
           libmesh_assert (error_estimator.error_norm.type(var) == L2 ||
 			  error_estimator.error_norm.type(var) == L_INF ||
 			  error_estimator.error_norm.type(var) == H1_SEMINORM ||
+			  error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
+			  error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
+			  error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
                           error_estimator.error_norm.type(var) == W1_INF_SEMINORM);
   #endif
           if (var > 0)
@@ -227,6 +233,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                               error_estimator.error_norm.type(var) == H2_SEMINORM) &&
                              (error_estimator.error_norm.type(var-1) == L2 ||
 			      error_estimator.error_norm.type(var-1) == H1_SEMINORM ||
+			      error_estimator.error_norm.type(var-1) == H1_X_SEMINORM ||
+			      error_estimator.error_norm.type(var-1) == H1_Y_SEMINORM ||
+			      error_estimator.error_norm.type(var-1) == H1_Z_SEMINORM ||
                               error_estimator.error_norm.type(var-1) == H2_SEMINORM)) ||
                             ((error_estimator.error_norm.type(var) == L_INF ||
                               error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
@@ -274,6 +283,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 
 	  const std::vector<std::vector<RealGradient> > *dphi = NULL;
           if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+	      error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
+	      error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
+	      error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
               error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
             dphi = &(fe->get_dphi());
 
@@ -309,7 +321,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
             {
               F.resize(matsize); Pu_h.resize(matsize);
             }
-          if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+          else if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
               error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
               error_estimator.error_norm.type(var) == H2_SEMINORM ||
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
@@ -318,6 +330,19 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
               Fy.resize(matsize); Pu_y_h.resize(matsize); // stores yy in W2 cases
               Fz.resize(matsize); Pu_z_h.resize(matsize); // stores zz in W2 cases
             }
+	  else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
+	    {
+	      Fx.resize(matsize); Pu_x_h.resize(matsize); // Only need to compute the x gradient for the x component seminorm
+	    }
+	  else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
+	    {
+	      Fy.resize(matsize); Pu_y_h.resize(matsize); // Only need to compute the y gradient for the y component seminorm
+	    }
+          else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
+	    {
+	      Fz.resize(matsize); Pu_z_h.resize(matsize); // Only need to compute the z gradient for the z component seminorm
+	    }          
+
           if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
@@ -394,6 +419,54 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		          Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
 		        }
                     }
+		  else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
+                    {
+		      // Compute the gradient on the current patch element
+		      // at the quadrature point
+		      Gradient grad_u_h;
+
+		      for (unsigned int i=0; i<n_dofs; i++)
+		        grad_u_h.add_scaled ((*dphi)[i][qp],
+					     system.current_solution(dof_indices[i]));
+		  
+		      // Patch RHS contributions
+		      for (unsigned int i=0; i<psi.size(); i++)
+		        {
+		          Fx(i) += JxW[qp]*grad_u_h(0)*psi[i];		          
+		        }
+                    }
+                  else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
+                    {
+		      // Compute the gradient on the current patch element
+		      // at the quadrature point
+		      Gradient grad_u_h;
+
+		      for (unsigned int i=0; i<n_dofs; i++)
+		        grad_u_h.add_scaled ((*dphi)[i][qp],
+					     system.current_solution(dof_indices[i]));
+		  
+		      // Patch RHS contributions
+		      for (unsigned int i=0; i<psi.size(); i++)
+		        {		          
+		          Fy(i) += JxW[qp]*grad_u_h(1)*psi[i];		         
+		        }
+                    }
+                  else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
+                    {
+		      // Compute the gradient on the current patch element
+		      // at the quadrature point
+		      Gradient grad_u_h;
+
+		      for (unsigned int i=0; i<n_dofs; i++)
+		        grad_u_h.add_scaled ((*dphi)[i][qp],
+					     system.current_solution(dof_indices[i]));
+		  
+		      // Patch RHS contributions
+		      for (unsigned int i=0; i<psi.size(); i++)
+		        {
+		          Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
+		        }
+                    }                  
                   else if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
                            error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
                     {
@@ -438,15 +511,28 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
             {
 	      Kp.lu_solve(F, Pu_h);
             }
-          if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
-              error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
-              error_estimator.error_norm.type(var) == H2_SEMINORM ||
-              error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
+          else if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
+                   error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+                   error_estimator.error_norm.type(var) == H2_SEMINORM ||
+                   error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
 	      Kp.lu_solve (Fx, Pu_x_h);
 	      Kp.lu_solve (Fy, Pu_y_h);
 	      Kp.lu_solve (Fz, Pu_z_h);
             }
+	  else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
+	    {
+	      Kp.lu_solve (Fx, Pu_x_h); 
+	    }
+	  else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
+	    {
+	      Kp.lu_solve (Fy, Pu_y_h); 
+	    }	  
+          else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
+	    {
+	      Kp.lu_solve (Fz, Pu_z_h); 
+	    }	          
+
           if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
@@ -530,6 +616,54 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	          temperr[1] -= grad_u_h(1);
 	          temperr[2] -= grad_u_h(2);
                 }
+	      else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
+                {
+	          // Compute the gradient at the current sample point
+	          Gradient grad_u_h;
+	  
+	          for (unsigned int i=0; i<n_dofs; i++)
+	            grad_u_h.add_scaled ((*dphi)[i][sp],
+			                 system.current_solution(dof_indices[i]));
+	          // Compute the phi values at the current sample point
+	          std::vector<Real> psi(specpoly(dim, element_order, q_point[sp], matsize));
+	          for (unsigned int i=0; i<matsize; i++)
+	            {
+	              temperr[0] += psi[i]*Pu_x_h(i);	              
+	            }
+	          temperr[0] -= grad_u_h(0);
+                }
+              else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
+                {
+	          // Compute the gradient at the current sample point
+	          Gradient grad_u_h;
+	  
+	          for (unsigned int i=0; i<n_dofs; i++)
+	            grad_u_h.add_scaled ((*dphi)[i][sp],
+			                 system.current_solution(dof_indices[i]));
+	          // Compute the phi values at the current sample point
+	          std::vector<Real> psi(specpoly(dim, element_order, q_point[sp], matsize));
+	          for (unsigned int i=0; i<matsize; i++)
+	            {
+	              temperr[1] += psi[i]*Pu_y_h(i);	       
+	            }	    
+	          temperr[1] -= grad_u_h(1);	          
+                }
+              else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
+                {
+	          // Compute the gradient at the current sample point
+	          Gradient grad_u_h;
+	  
+	          for (unsigned int i=0; i<n_dofs; i++)
+	            grad_u_h.add_scaled ((*dphi)[i][sp],
+			                 system.current_solution(dof_indices[i]));
+	          // Compute the phi values at the current sample point
+	          std::vector<Real> psi(specpoly(dim, element_order, q_point[sp], matsize));
+	          for (unsigned int i=0; i<matsize; i++)
+	            {
+	              temperr[2] += psi[i]*Pu_z_h(i);
+	            }	          
+	          temperr[2] -= grad_u_h(2);
+                }              
               else if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
                        error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
                 {
@@ -576,6 +710,12 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
               else if (error_estimator.error_norm.type(var) == H1_SEMINORM)
                 for (unsigned int i=0; i != 3; ++i)
                   element_error += JxW[sp]*libmesh_norm(temperr[i]);
+	      else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
+		element_error += JxW[sp]*libmesh_norm(temperr[0]);
+	      else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
+		element_error += JxW[sp]*libmesh_norm(temperr[1]);
+	      else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
+		element_error += JxW[sp]*libmesh_norm(temperr[2]);
               else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
                 {
                   for (unsigned int i=0; i != 3; ++i)
@@ -595,6 +735,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	    error_per_cell[e_id] += error_estimator.error_norm.weight(var) * element_error;	  
           else if (error_estimator.error_norm.type(var) == L2 ||
 		   error_estimator.error_norm.type(var) == H1_SEMINORM ||
+		   error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
+		   error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
+		   error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
                    error_estimator.error_norm.type(var) == H2_SEMINORM)
 	    error_per_cell[e_id] += error_estimator.error_norm.weight_sq(var) * element_error;	  
           else
@@ -603,6 +746,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 
       if (error_estimator.error_norm.type(0) == L2 ||
 	  error_estimator.error_norm.type(0) == H1_SEMINORM ||
+	  error_estimator.error_norm.type(0) == H1_X_SEMINORM ||
+	  error_estimator.error_norm.type(0) == H1_Y_SEMINORM ||
+	  error_estimator.error_norm.type(0) == H1_Z_SEMINORM ||
           error_estimator.error_norm.type(0) == H2_SEMINORM)
         error_per_cell[e_id] = std::sqrt(error_per_cell[e_id]);
 
