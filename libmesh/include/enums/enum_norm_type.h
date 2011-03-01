@@ -39,15 +39,22 @@ namespace libMeshEnums {
                     L_INF           = 6,
 
 		    H1_SEMINORM     = 10,
+		    
 		    H2_SEMINORM     = 11,
-
+		    
                     W1_INF_SEMINORM = 15,
                     W2_INF_SEMINORM = 16,
 
-                    // discrete vector norms
+                    // discrete norms on coefficient vectors
                     DISCRETE_L1     = 20,
 		    DISCRETE_L2     = 21,
 		    DISCRETE_L_INF  = 22,
+
+                    // Seminorms based on only individual gradient
+                    // directional components
+		    H1_X_SEMINORM    = 31,
+		    H1_Y_SEMINORM    = 32,
+		    H1_Z_SEMINORM    = 33,
 
 		    INVALID_NORM    = 42};
 }
