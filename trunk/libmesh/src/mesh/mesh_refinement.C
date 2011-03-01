@@ -300,6 +300,13 @@ bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
   // This function must be run on all processors at once
   parallel_only();
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // And it'll need a PointLocator for topological_neighbor() tests
+  // later, which we need to make sure gets constructed on all
+  // processors at once.
+  _mesh.point_locator();
+#endif
+
   MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
@@ -882,6 +889,13 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // This function must be run on all processors at once
   parallel_only();
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // And it'll need a PointLocator for topological_neighbor() tests
+  // later, which we need to make sure gets constructed on all
+  // processors at once.
+  _mesh.point_locator();
+#endif
+
   START_LOG ("make_coarsening_compatible()", "MeshRefinement");
   
   bool _maintain_level_one = maintain_level_one;
@@ -1212,6 +1226,13 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 {
   // This function must be run on all processors at once
   parallel_only();
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // And it'll need a PointLocator for topological_neighbor() tests
+  // later, which we need to make sure gets constructed on all
+  // processors at once.
+  _mesh.point_locator();
+#endif
 
   START_LOG ("make_refinement_compatible()", "MeshRefinement");
   
