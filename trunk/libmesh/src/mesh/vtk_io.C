@@ -106,7 +106,7 @@ vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 
 			vtkPoints* points = vtkPoints::New();
 			vtkDoubleArray* pcoords = vtkDoubleArray::New();
-			pcoords->SetNumberOfComponents(3);
+			pcoords->SetNumberOfComponents(LIBMESH_DIM);
 			pcoords->SetNumberOfTuples(mesh.n_nodes());
 
 			// FIXME change to local iterators when I've figured out how to write in parallel
@@ -119,8 +119,8 @@ vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 			for (;nd!=nd_end;++nd)
 			{
 				Node* node = (*nd);
-				float* pnt = new float[3];
-				for(unsigned int i=0;i<3;++i){
+				float* pnt = new float[LIBMESH_DIM];
+				for(unsigned int i=0;i<LIBMESH_DIM;++i){
 					pnt[i] = (*node)(i);
 				} 
 				//     pcoords->InsertNextTuple(pnt);
