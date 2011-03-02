@@ -31,9 +31,9 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
-// DofObject class static member initialization
-const unsigned int       DofObject::invalid_id           = libMesh::invalid_uint;
-const unsigned short int DofObject::invalid_processor_id = static_cast<unsigned short int>(-1);
+// DofObject class static member -now initialized in header
+const unsigned int       DofObject::invalid_id;
+const unsigned short int DofObject::invalid_processor_id;
 
 
 

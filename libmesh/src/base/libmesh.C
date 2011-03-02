@@ -126,16 +126,19 @@ PerfLog            perflog ("libMesh",
 				     );
 
 
-const Real         pi = 3.1415926535897932384626433832795029L;
+// const Real         pi = 3.1415926535897932384626433832795029L;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 const Number       imaginary (0., 1.);
-const Number       zero      (0., 0.);
+// const Number       zero      (0., 0.);
 #else
-const Number       zero = 0.;
+// const Number       zero = 0.;
 #endif
 
-const unsigned int invalid_uint = static_cast<unsigned int>(-1);
+// This is now a static constant in the header; no reason not to let
+// the compiler inline it.
+
+// const unsigned int invalid_uint = static_cast<unsigned int>(-1);
 
 
 
