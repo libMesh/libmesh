@@ -653,8 +653,14 @@ PetscVector<T>::PetscVector (Vec v)
   ierr = VecGetLocalSize(_vec, &petsc_local_size);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  /* Get the vector type from PETSc*/
+  // Get the vector type from PETSc.
+  // As of Petsc 3.0.0, the VecType #define lost its const-ness, so we
+  // need to have it in the code
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+  VecType type;
+#else
   const VecType type;
+#endif
   ierr = VecGetType(_vec, &type);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
