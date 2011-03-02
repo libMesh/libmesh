@@ -654,7 +654,7 @@ PetscVector<T>::PetscVector (Vec v)
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   /* Get the vector type from PETSc*/
-  VecType type;
+  const VecType type;
   ierr = VecGetType(_vec, &type);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
