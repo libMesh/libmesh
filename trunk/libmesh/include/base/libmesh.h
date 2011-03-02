@@ -166,18 +166,18 @@ public:
   /**
    * \f$ \pi=3.14159... \f$.
    */
-  extern const Real pi;
+  const Real pi = 3.1415926535897932384626433832795029L;
 
   /**
    * \f$ zero=0. \f$.
    */
-  extern const Number zero;
+  const Number zero = 0.;
 
   /**
    * A number which is used quite often to represent
    * an invalid or uninitialized value.
    */
-  extern const unsigned int invalid_uint;
+  const unsigned int invalid_uint = static_cast<unsigned int>(-1);
 
 } // namespace libMesh
 

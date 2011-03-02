@@ -262,13 +262,13 @@ public:
   /**
    * An invaild \p id to distinguish an uninitialized \p DofObject
    */
-  static const unsigned int invalid_id;
+  static const unsigned int invalid_id = libMesh::invalid_uint;
 
   /**
    * An invalid \p processor_id to distinguish DOFs that have
    * not been assigned to a processor.
    */
-  static const unsigned short int invalid_processor_id;
+  static const unsigned short int invalid_processor_id = static_cast<unsigned short int>(-1);
 
   
 private:
