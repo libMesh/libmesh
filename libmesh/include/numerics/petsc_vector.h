@@ -648,35 +648,35 @@ PetscVector<T>::PetscVector (Vec v)
 
   /* We need to ask PETSc about the (local to global) ghost value
      mapping and create the inverse mapping out of it.  */
-  int ierr=0, petsc_size=0, petsc_local_size=0;
-  ierr = VecGetSize(_vec, &petsc_size);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  int ierr=0;
+  int petsc_local_size=0;
   ierr = VecGetLocalSize(_vec, &petsc_local_size);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  /* \p petsc_local_size is the number of non-ghost values.  If it
-     equals the global size, then we are a serial vector, and there
-     are no ghost values.  */
-  if(petsc_size!=petsc_local_size)
-    {
-      ISLocalToGlobalMapping mapping = _vec->mapping;
+  /* Get the vector type from PETSc*/
+  VecType type;
+  ierr = VecGetType(_vec, &type);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      // If is a sparsely stored vector, set up our new mapping
-      if (mapping)
-        {
-          const unsigned int local_size = static_cast<unsigned int>(petsc_local_size);
-          const unsigned int ghost_begin = static_cast<unsigned int>(petsc_local_size);
-          const unsigned int ghost_end = static_cast<unsigned int>(mapping->n);
-          for(unsigned int i=ghost_begin; i<ghost_end; i++)
-	    _global_to_local_map[mapping->indices[i]] = i-local_size;
-	  this->_type = GHOSTED;
-	}
-      else
-	this->_type = PARALLEL;
+  if((strcmp(type,VECSHARED) == 0) || (strcmp(type,VECMPI) == 0))
+  {
+    ISLocalToGlobalMapping mapping = _vec->mapping;
+
+    // If is a sparsely stored vector, set up our new mapping
+    if (mapping)
+    {
+      const unsigned int local_size = static_cast<unsigned int>(petsc_local_size);
+      const unsigned int ghost_begin = static_cast<unsigned int>(petsc_local_size);
+      const unsigned int ghost_end = static_cast<unsigned int>(mapping->n);
+      for(unsigned int i=ghost_begin; i<ghost_end; i++)
+        _global_to_local_map[mapping->indices[i]] = i-local_size;
+      this->_type = GHOSTED;
     }
+    else
+      this->_type = PARALLEL;
+  }
   else
     this->_type = SERIAL;
-
 }
 
 

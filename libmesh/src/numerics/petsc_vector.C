@@ -581,53 +581,53 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
   libmesh_assert (this->size() == v.size());
   libmesh_assert (this->local_size() == v.local_size());
   libmesh_assert (v.closed());
-  this->_is_closed = true;
 
   int ierr = 0;
 
-  if((this->type()==PARALLEL) && (v.type()==GHOSTED))
-    {
-      /* Allow assignment of a ghosted to a parallel vector since this
-	 causes no difficulty.  See discussion in libmesh-devel of
-	 June 24, 2010.  */
-      ierr = VecCopy (v._vec, this->_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
+  if((this->type()==PARALLEL) && (v.type()==GHOSTED) || (this->type()==GHOSTED) && (v.type()==PARALLEL))
+  {
+    /* Allow assignment of a ghosted to a parallel vector since this
+       causes no difficulty.  See discussion in libmesh-devel of
+       June 24, 2010.  */
+    ierr = VecCopy (v._vec, this->_vec);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  }
   else
-    {
-      /* In all other cases, we assert that both vectors are of equal
-	 type.  */
-      libmesh_assert (this->_type == v._type);
-      libmesh_assert (this->_global_to_local_map ==
-		      v._global_to_local_map);
+  {
+    /* In all other cases, we assert that both vectors are of equal
+       type.  */
+    libmesh_assert (this->_type == v._type);
+    libmesh_assert (this->_global_to_local_map == v._global_to_local_map);
       
-      if (v.size() != 0)
-	{
-	  if(this->type() != GHOSTED)
-	    {
-	      ierr = VecCopy (v._vec, this->_vec);
-	      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    if (v.size() != 0)
+    {
+      if(this->type() != GHOSTED)
+      {
+        ierr = VecCopy (v._vec, this->_vec);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	    }
-	  else
-	    {
-	      Vec loc_vec;
-	      Vec v_loc_vec;
-	      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
-	      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	      ierr = VecGhostGetLocalForm (v._vec,&v_loc_vec);
-	      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      else
+      {
+        Vec loc_vec;
+        Vec v_loc_vec;
+        ierr = VecGhostGetLocalForm (_vec,&loc_vec);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        ierr = VecGhostGetLocalForm (v._vec,&v_loc_vec);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	      
-	      ierr = VecCopy (v_loc_vec, loc_vec);
-	      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        ierr = VecCopy (v_loc_vec, loc_vec);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	      
-	      ierr = VecGhostRestoreLocalForm (v._vec,&v_loc_vec);
-	      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
-	      CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	    }
-	}
+        ierr = VecGhostRestoreLocalForm (v._vec,&v_loc_vec);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
+        CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      }
     }
-  
+  }
+
+  close();
+
   return *this;
 }
 
