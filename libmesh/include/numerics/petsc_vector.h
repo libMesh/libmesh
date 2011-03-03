@@ -31,6 +31,7 @@
 
 // C++ includes
 #include <vector>
+#include "string.h" // Needed for strcmp with gcc-4.4.3
 
 // Local includes
 #include "numeric_vector.h"
