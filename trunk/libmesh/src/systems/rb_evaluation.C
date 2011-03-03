@@ -264,20 +264,17 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
     }
   }
 
-//  if(libmesh_real(residual_norm_sq) < 0.)
-//  {
+  if(libmesh_real(residual_norm_sq) < 0.)
+  {
 //    libMesh::out << "Warning: Square of residual norm is negative "
 //                 << "in RBSystem::compute_residual_dual_norm()" << std::endl;
 
-    // Sometimes this is negative due to rounding error,
-    // but error is on the order of 1.e-10, so shouldn't
-    // affect error bound much...
+//     Sometimes this is negative due to rounding error,
+//     but when this occurs the error is on the order of 1.e-10,
+//     so shouldn't affect error bound much...
 //     libmesh_error();
-//    residual_norm_sq = std::abs(residual_norm_sq);
-//  }
-
-//   libMesh::out << "Slow residual norm squared = " << slow_residual_norm_sq
-//                << ", fast residual norm squared = " << residual_norm_sq << std::endl;
+    residual_norm_sq = std::abs(residual_norm_sq);
+  }
 
   STOP_LOG("compute_residual_dual_norm()", "RBEvaluation");
 
