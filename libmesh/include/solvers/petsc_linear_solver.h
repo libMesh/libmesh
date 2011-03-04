@@ -348,10 +348,17 @@ _restrict_solve_to_is_local_size(void)const
 
 template <typename T>
 void
-PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &vec_in)
+PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+                                             // unnamed to avoid compiler "unused parameter" warning
+#else
+                                             vec_in
+#endif
+  )
 {
   libmesh_assert(_restrict_solve_to_is!=NULL);
 #if PETSC_VERSION_LESS_THAN(3,0,0)
+  // No ISComplement in PETSc 2.3.3
   libmesh_not_implemented();
 #else
   if(_restrict_solve_to_is_complement==NULL)
