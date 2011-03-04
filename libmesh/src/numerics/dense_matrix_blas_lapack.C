@@ -516,7 +516,11 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
 #else
 
 template<typename T>
-void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma)
+void DenseMatrix<T>::_svd_helper (char,
+                                  char,
+                                  std::vector<T>&,
+                                  std::vector<T>&,
+                                  std::vector<T>&)
 {
   libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
   libmesh_error();
