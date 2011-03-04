@@ -343,12 +343,20 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   //Based on Petsc 2.3.3 documentation all diverged reasons are negative
   this->converged = reason >= 0;
 
-  this->clear();
-
   STOP_LOG("solve()", "PetscNonlinearSolver");
 		 
   // return the # of its. and the final residual norm.
   return std::make_pair(n_iterations, final_residual_norm);
+}
+
+
+
+template <typename T>
+void PetscNonlinearSolver<T>::print_converged_reason()
+{
+  SNESConvergedReason reason;
+  SNESGetConvergedReason(_snes, &reason);
+  libMesh::out << "Nonlinear solver convergence/divergence reason: " << SNESConvergedReasons[reason] << std::endl;
 }
 
 

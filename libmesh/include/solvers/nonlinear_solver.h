@@ -105,6 +105,12 @@ public:
 					       const unsigned int) = 0; // N. Iterations
 
   /**
+   * Prints a useful message about why the latest nonlinear solve
+   * con(di)verged.
+   */
+  virtual void print_converged_reason() { libmesh_not_implemented(); }
+
+  /**
    * Function that computes the residual \p R(X) of the nonlinear system
    * at the input iterate \p X.
    */

@@ -95,7 +95,11 @@ public:
 					       const double,        // Stopping tolerance
 					       const unsigned int); // N. Iterations
 
-
+  /**
+   * Prints a useful message about why the latest nonlinear solve
+   * con(di)verged.
+   */
+  virtual void print_converged_reason();
   
 private:
 
