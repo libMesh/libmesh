@@ -53,8 +53,8 @@ public:
 	       pairedboundary;
 
   PeriodicBoundary() :
-    myboundary(-1),
-    pairedboundary(-1),
+    myboundary(libMesh::invalid_uint),
+    pairedboundary(libMesh::invalid_uint),
     translation_vector()
   {
   }
@@ -75,8 +75,8 @@ public:
   }
 
   PeriodicBoundary(const RealVectorValue & vector) :
-    myboundary(-1),
-    pairedboundary(-1),
+    myboundary(libMesh::invalid_uint),
+    pairedboundary(libMesh::invalid_uint),
     translation_vector (vector)
   {
   }
