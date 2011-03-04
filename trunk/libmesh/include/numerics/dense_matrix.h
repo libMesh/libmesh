@@ -294,6 +294,31 @@ public:
   void cholesky_solve(DenseVector<T2>& b,
 		      DenseVector<T2>& x);
 
+
+  /**
+   * Compute the Singular Value Decomposition of the matrix.
+   * On exit, sigma holds all of the singular values (in
+   * descending order).
+   *
+   * The implementation uses PETSc's interface to blas/lapack.
+   * If this is not available, this function throws an error.
+   */
+  void svd(DenseVector<T>& sigma);
+
+
+  /**
+   * Compute the "reduced" Singular Value Decomposition of the matrix.
+   * On exit, sigma holds all of the singular values (in
+   * descending order), U holds the left singular vectors,
+   * and VT holds the transpose of the right singular vectors.
+   * In the reduced SVD, U has min(m,n) columns and VT has
+   * min(m,n) rows. (In the "full" SVD, U and VT would be square.)
+   *
+   * The implementation uses PETSc's interface to blas/lapack.
+   * If this is not available, this function throws an error.
+   */
+  void svd(DenseVector<T>& sigma, DenseMatrix<T>& U, DenseMatrix<T>& VT);
+
   
   /**
    * @returns the determinant of the matrix.  Note that this means
@@ -405,6 +430,32 @@ private:
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
   void _lu_decompose_lapack();
+
+  /**
+   * Computes an SVD of the matrix using the
+   * Lapack routine "getsvd".
+   * [ Implementation in dense_matrix_blas_lapack.C ]
+   */
+  void _svd_lapack(DenseVector<T>& sigma);
+  
+  /**
+   * Computes a "reduced" SVD of the matrix using the
+   * Lapack routine "getsvd".
+   * [ Implementation in dense_matrix_blas_lapack.C ]
+   */
+  void _svd_lapack(DenseVector<T>& sigma,
+                   DenseMatrix<T>& U,
+                   DenseMatrix<T>& VT);
+
+  /**
+   * Helper function that actually performs the SVD.
+   * [ Implementation in dense_matrix_blas_lapack.C ]
+   */
+  void _svd_helper (char JOBU,
+                    char JOBVT,
+                    std::vector<T>& sigma_val,
+                    std::vector<T>& U_val,
+                    std::vector<T>& VT_val);
 
   /**
    * This array is used to store pivot indices.  May be used
