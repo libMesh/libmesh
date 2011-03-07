@@ -16,18 +16,27 @@ fi
 
 # Terminal commands to goto specific columns
 rescol=65;
-gotocolumn="\e["$rescol"G";
-#testnamecolumn=15;
-#gotoname="\e["$testnamecolumn"G";
+
+
+# [JWP] My Mac did not recognize the \e commands below, but it did
+# recognize \033 commands, and they seem to work on Linux as well.  
 
 # Terminal commands for setting the color
-white="\e[01;37m";
-green="\e[01;32m";
-red="\e[01;31m";
-#grey="\e[00;37m";
+# gotocolumn="\e["$rescol"G";
+# white="\e[01;37m";
+# green="\e[01;32m";
+# red="\e[01;31m";
+# #grey="\e[00;37m";
+# colorreset="\e[m"; # Terminal command to reset to terminal default
 
-# Terminal command to reset to terminal default
-colorreset="\e[m";
+
+gotocolumn="\033["$rescol"G";
+white="\033[01;37m";
+green="\033[01;32m";
+red="\033[01;31m";
+#grey="\033[00;37m";
+colorreset="\033[m";
+
 
 # Errors during the tests will be printed here
 errlog=test_headers.log
