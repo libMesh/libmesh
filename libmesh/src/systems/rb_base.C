@@ -29,7 +29,7 @@
 #include "petsc_linear_solver.h"
 
 // Includes for template instantiation
-#include "eigen_system.h"
+#include "condensed_eigen_system.h"
 #include "linear_implicit_system.h"
 
 #include <ctime>
@@ -852,7 +852,7 @@ void RBBase<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
 
 // EigenSystem is only defined if we have SLEPc
 #if defined(LIBMESH_HAVE_SLEPC)
-template class RBBase<EigenSystem>;
+template class RBBase<CondensedEigenSystem>;
 #endif
 
 template class RBBase<LinearImplicitSystem>;

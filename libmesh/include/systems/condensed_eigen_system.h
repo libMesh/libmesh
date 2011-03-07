@@ -1,0 +1,129 @@
+// $Id: eigen_system.h 3874 2010-07-02 21:57:26Z roystgnr $
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributd in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+#ifndef __condensed_eigen_system_h__
+#define __condensed_eigen_system_h__
+
+#include "libmesh_config.h"
+
+// Currently, the EigenSystem should only be available
+// if SLEPc support is enabled. 
+#if defined(LIBMESH_HAVE_SLEPC)
+
+// C++ includes
+
+// Local Includes
+#include "eigen_system.h"
+#include "sparse_matrix.h"
+
+namespace libMesh
+{
+
+/**
+ * This class extends EigenSystem to allow a simple way of solving 
+ * (standard or generalized) eigenvalue problems in the case where
+ * we want to remove certain degrees of freedom from the system.
+ * This is useful, for example, in the case that one wants to solve
+ * eigenvalue problems with Dirichlet boundary conditions.
+ */
+
+// ------------------------------------------------------------
+// CondensedEigenSystem class definition
+
+class CondensedEigenSystem : public EigenSystem
+{
+public:
+
+  /**
+   * Constructor.  Optionally initializes required
+   * data structures.
+   */
+  CondensedEigenSystem (EquationSystems& es,
+	                const std::string& name,
+	                const unsigned int number);
+ 
+  /**
+   * The type of system.
+   */
+  typedef CondensedEigenSystem sys_type;
+
+  /**
+   * The type of the parent
+   */
+  typedef EigenSystem Parent;
+  
+  /**
+   * @returns a clever pointer to the system.
+   */
+  sys_type & system () { return *this; }
+
+  /**
+   * Set local_non_condensed_dofs_vector to the vector \p non_condensed_dofs_in.
+   */
+  void set_local_non_condensed_dofs(std::vector<unsigned int>& non_condensed_dofs_in);
+
+  /**
+   * Override to solve the condensed eigenproblem with
+   * the dofs in local_non_condensed_dofs_vector
+   * stripped out of the system matrices on each processor.
+   */
+  virtual void solve();
+
+  /**
+   * Overload get_eigenpair to retrieve the eigenpair for
+   * the condensed eigensolve. We only set the non-condensed
+   * entries of the solution vector (the condensed
+   * entries are set to zero by default).
+   */
+  virtual std::pair<Real, Real> get_eigenpair(unsigned int i);
+  
+  /**
+   * @returns \p "CondensedEigen".  Helps in identifying
+   * the system type in an equation system file.
+   */
+  virtual std::string system_type () const { return "CondensedEigen"; }
+  
+  /**
+   * The (condensed) system matrix for standard eigenvalue problems.
+   */
+  AutoPtr< SparseMatrix<Number> > condensed_matrix_A;
+
+  /**
+   * A second (condensed) system matrix for generalized eigenvalue problems.
+   */
+  AutoPtr< SparseMatrix<Number> > condensed_matrix_B;
+
+  /**
+   * Vector storing the local dof indices that will not be condensed.
+   * All dofs that are not in this vector will be eliminated from
+   * the system when we perform a solve.
+   */
+  std::vector<unsigned int> local_non_condensed_dofs_vector;
+
+  
+};
+
+
+} // namespace libMesh
+
+
+#endif // LIBMESH_HAVE_SLEPC
+
+#endif

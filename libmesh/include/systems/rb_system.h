@@ -526,6 +526,18 @@ public:
   std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
 
   /**
+   * Set storing the global Dirichlet dof indices.
+   * We update this set in initialize_dirichlet_dofs().
+   */
+  std::set<unsigned int> global_dirichlet_dofs_set;
+
+  /**
+   * Vector storing the local non-Dirichlet dof indices.
+   * We update this vector in initialize_dirichlet_dofs().
+   */
+  std::vector<unsigned int> non_dirichlet_dofs_vector;
+
+  /**
    * Boolean flag to indicate whether this is a constrained problem
    * (e.g. Stokes) or not.
    */

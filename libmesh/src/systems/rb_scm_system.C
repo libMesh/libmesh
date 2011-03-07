@@ -50,8 +50,6 @@ RBSCMSystem::RBSCMSystem (EquationSystems& es,
                           const unsigned int number)
   : Parent(es, name, number),
     parameters_filename(""),
-    condensed_matrix_A(SparseMatrix<Number>::build()),
-    condensed_matrix_B(SparseMatrix<Number>::build()),
     SCM_eps(0.5),
     SCM_M(1),
     RB_system_name("")
@@ -175,104 +173,6 @@ void RBSCMSystem::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
   STOP_LOG("add_scaled_symm_Aq()", "RBSCMSystem");
 }
 
-void RBSCMSystem::solve()
-{
-  START_LOG("solve()", "RBSCMSystem");
-
-  // Make sure we have initialized the non-Dirichlet DOFs
-  libmesh_assert(!non_dirichlet_dofs_vector.empty());
-
-  // Need to get a global copy of non_dirichlet_dofs_vector on all processors
-  std::vector<unsigned int> global_non_dirichlet_dofs_vector = non_dirichlet_dofs_vector;
-  Parallel::allgather(global_non_dirichlet_dofs_vector);
-
-  matrix_A->create_submatrix(*condensed_matrix_A,
-                             non_dirichlet_dofs_vector,
-                             global_non_dirichlet_dofs_vector);
-
-  matrix_B->create_submatrix(*condensed_matrix_B,
-                             non_dirichlet_dofs_vector,
-                             global_non_dirichlet_dofs_vector);
-
-  // A reference to the EquationSystems
-  EquationSystems& es = this->get_equation_systems();
-
-  // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
-
-  // Get the tolerance for the solver and the maximum
-  // number of iterations. Here, we simply adopt the linear solver
-  // specific parameters.
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
-
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
-
-  const unsigned int nev    =
-    es.parameters.get<unsigned int>("eigenpairs");
-
-  const unsigned int ncv    =
-    es.parameters.get<unsigned int>("basis vectors");
-
-  std::pair<unsigned int, unsigned int> solve_data;
-
-  // call the solver depending on the type of eigenproblem
-  if ( generalized() )
-    {
-      //in case of a generalized eigenproblem
-      solve_data = eigen_solver->solve_generalized
-        (*condensed_matrix_A,*condensed_matrix_B, nev, ncv, tol, maxits);
-    }
-
-  else
-    {
-      libmesh_assert (matrix_B == NULL);
-
-      //in case of a standard eigenproblem
-      solve_data = eigen_solver->solve_standard (*condensed_matrix_A, nev, ncv, tol, maxits);
-    }
-
-  set_n_converged(solve_data.first);
-  set_n_iterations(solve_data.second);
-
-  STOP_LOG("solve()", "RBSCMSystem");
-}
-
-
-
-std::pair<Real, Real> RBSCMSystem::get_eigenpair(unsigned int i)
-{
-  START_LOG("get_eigenpair()", "RBSCMSystem");
-
-  // This function assumes that condensed_solve has just been called.
-  // If this is not the case, then we will trip an asset in get_eigenpair
-  AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
-  unsigned int n_local = non_dirichlet_dofs_vector.size();
-  unsigned int n       = n_local;
-  Parallel::sum(n);
-
-  temp->init (n, n_local, false, libMeshEnums::PARALLEL);
-
-  std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp);
-
-  // Now map temp to solution. Loop over local entries of non_dirichlet_dofs_vector
-  this->solution->zero();
-  for(unsigned int i=0; i<non_dirichlet_dofs_vector.size(); i++)
-  {
-    unsigned int index = non_dirichlet_dofs_vector[i];
-    solution->set(index,(*temp)(temp->first_local_index()+i));
-  }
-
-  solution->close();
-  this->update();
-
-  STOP_LOG("get_eigenpair()", "RBSCMSystem");
-
-  return eval;
-}
-
 void RBSCMSystem::perform_SCM_greedy()
 {
   START_LOG("perform_SCM_greedy()", "RBSCMSystem");
@@ -282,8 +182,7 @@ void RBSCMSystem::perform_SCM_greedy()
   // the associated RBSystem
   EquationSystems& es = this->get_equation_systems();
   RBSystem& rb_system = es.get_system<RBSystem>(RB_system_name);
-  this->non_dirichlet_dofs_vector = rb_system.non_dirichlet_dofs_vector;
-  this->global_dirichlet_dofs_set = rb_system.global_dirichlet_dofs_set;
+  this->set_local_non_condensed_dofs(rb_system.non_dirichlet_dofs_vector);
 
   load_matrix_B();
 
