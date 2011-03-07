@@ -20,6 +20,12 @@
 #ifndef __rb_theta_data_h__
 #define __rb_theta_data_h__
 
+// C++ includes
+#include <vector>
+
+// Local includes
+#include "reference_counted_object.h"
+
 namespace libMesh
 {
 
