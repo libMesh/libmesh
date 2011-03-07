@@ -20,6 +20,13 @@
 #ifndef __qn_transient_rb_evaluation_h__
 #define __qn_transient_rb_evaluation_h__
 
+// Configuration data
+#include "libmesh_config.h"
+
+// This class requires QNTransientRBSystem, which is not
+// defined if SLEPc is not present.
+#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+
 #include "transient_rb_evaluation.h"
 #include "qn_transient_rb_system.h"
 
@@ -114,5 +121,7 @@ public:
 };
 
 }
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 #endif
