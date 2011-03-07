@@ -277,16 +277,6 @@ public:
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
-   * Vector storing the local non-Dirichlet dof indices.
-   */
-  std::vector<unsigned int> non_dirichlet_dofs_vector;
-
-  /**
-   * Set storing the global Dirichlet dof indices.
-   */
-  std::set<unsigned int> global_dirichlet_dofs_set;
-
-  /**
    * Boolean flag to indicate whether or not the
    * parameter ranges have been initialized.
    */

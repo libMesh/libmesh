@@ -27,7 +27,7 @@
 // if SLEPc is enabled.
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
-#include "eigen_system.h"
+#include "condensed_eigen_system.h"
 #include "rb_base.h"
 
 namespace libMesh
@@ -45,7 +45,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // RBSCMSystem class definition
 
-class RBSCMSystem : public RBBase<EigenSystem>
+class RBSCMSystem : public RBBase<CondensedEigenSystem>
 {
 public:
 
@@ -70,7 +70,7 @@ public:
   /**
    * The type of the parent.
    */
-  typedef RBBase<EigenSystem> Parent;
+  typedef RBBase<CondensedEigenSystem> Parent;
 
   /**
    * Clear all the data structures associated with
@@ -85,22 +85,10 @@ public:
   virtual void resize_SCM_vectors ();
 
   /**
-   * Overload the solve function to solve the condensed
-   * eigenproblem with constrained DOFs stripped out.
-   */
-  virtual void solve();
-
-  /**
    * Read in the parameters from file and set up the system
    * accordingly.
    */
   virtual void initialize_SCM_system ();
-
-  /**
-   * Overload get_eigenpair to retrieve the eigenpair for
-   * the condensed eigensolve.
-   */
-  virtual std::pair<Real, Real> get_eigenpair(unsigned int i);
 
   /**
    * This function is called before truth eigensolves in
@@ -326,12 +314,6 @@ protected:
 
 
   //----------- PROTECTED DATA MEMBERS -----------//
-
-  /**
-   * The condensed matrices, with Dirichlet dofs removed.
-   */
-  AutoPtr< SparseMatrix<Number> > condensed_matrix_A;
-  AutoPtr< SparseMatrix<Number> > condensed_matrix_B;
 
   /**
    * SCM tolerance, where SCM_eps \in (0,1).
