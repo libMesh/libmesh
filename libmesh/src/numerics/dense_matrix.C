@@ -245,6 +245,41 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
 
 
 
+
+template<typename T>
+void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest, 
+                                            const DenseVector<T>& arg) const
+{
+  // Make sure the input sizes are compatible
+  libmesh_assert(this->m() == arg.size());
+
+  // Resize and clear dest.
+  // Note: DenseVector::resize() also zeros the vector.
+  dest.resize(this->n());
+
+  if (this->use_blas_lapack)
+    {
+      this->_matvec_blas(1., 0., dest, arg, /*trans=*/true); 
+    }
+  else
+    {
+      const unsigned int n_rows = this->m();
+      const unsigned int n_cols = this->n();
+
+      // WORKS
+      // for(unsigned int j=0; j<n_cols; j++)
+      //   for(unsigned int i=0; i<n_rows; i++)
+      //     dest(j) += (*this)(i,j)*arg(i);
+
+      // ALSO WORKS, (i,j) just swapped
+      for(unsigned int i=0; i<n_cols; i++)
+	for(unsigned int j=0; j<n_rows; j++)
+	  dest(i) += (*this)(j,i)*arg(j);
+    }
+}
+
+
+
 template<typename T>
 void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest, 
                                       const T factor,

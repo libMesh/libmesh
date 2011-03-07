@@ -114,6 +114,12 @@ public:
    * \p dest := (*this) * \p arg.
    */
   void vector_mult(DenseVector<T>& dest, const DenseVector<T>& arg) const;
+
+  /**
+   * Performs the matrix-vector multiplication,
+   * \p dest := (*this)^T * \p arg.
+   */
+  void vector_mult_transpose(DenseVector<T>& dest, const DenseVector<T>& arg) const;
   
   /**
    * Performs the scaled matrix-vector multiplication,
@@ -482,13 +488,16 @@ private:
    * dest := alpha*A*arg + beta*dest
    *
    * where alpha and beta are scalars, A is this matrix, and
-   * arg and dest are input vectors of appropriate size.
+   * arg and dest are input vectors of appropriate size.  If
+   * trans is true, the transpose matvec is computed instead.
+   * By default, trans==false.
    *
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
   void _matvec_blas(T alpha, T beta,
 		    DenseVector<T>& dest,
-		    const DenseVector<T>& arg) const;
+		    const DenseVector<T>& arg,
+		    bool trans=false) const;
 };
 
 

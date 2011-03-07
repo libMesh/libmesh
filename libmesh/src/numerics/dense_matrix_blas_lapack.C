@@ -633,15 +633,31 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& ,
 template<typename T>
 void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
 				  DenseVector<T>& dest,
-				  const DenseVector<T>& arg) const
+				  const DenseVector<T>& arg,
+                                  bool trans) const
 {
-  // Ensure that dest and arg are proper size
-  // dest  ~ A     * arg
-  // (mx1)   (mxn) * (nx1)
-  if ((dest.size() != this->m()) || (arg.size() != this->n()))
+  // Ensure that dest and arg sizes are compatible
+  if (!trans)
     {
-      libMesh::out << "Improper input argument sizes!" << std::endl;
-      libmesh_error();
+      // dest  ~ A     * arg
+      // (mx1)   (mxn) * (nx1)
+      if ((dest.size() != this->m()) || (arg.size() != this->n()))
+	{
+	  libMesh::out << "Improper input argument sizes!" << std::endl;
+	  libmesh_error();
+	}
+    }
+
+  else // trans == true
+    {
+      // Ensure that dest and arg are proper size
+      // dest  ~ A^T   * arg
+      // (nx1)   (nxm) * (mx1)
+      if ((dest.size() != this->n()) || (arg.size() != this->m()))
+	{
+	  libMesh::out << "Improper input argument sizes!" << std::endl;
+	  libmesh_error();
+	}
     }
   
   // Calling sequence for dgemv:
@@ -649,7 +665,11 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
   // dgemv(TRANS,M,N,ALPHA,A,LDA,X,INCX,BETA,Y,INCY)
   
   //   TRANS  - CHARACTER*1, 't' for transpose, 'n' for non-transpose multiply
+  // We store everything in row-major order, so pass the transpose flag for
+  // non-transposed matvecs and the 'n' flag for transposed matvecs
   char TRANS[] = "t";
+  if (trans)
+    TRANS[0] = 'n';
   
   //   M      - INTEGER.
   //            On entry, M specifies the number of rows of the matrix A.
@@ -727,7 +747,8 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
 template<typename T>
 void DenseMatrix<T>::_matvec_blas(T , T,
 				  DenseVector<T>& ,
-				  const DenseVector<T>& ) const
+				  const DenseVector<T>&,
+                                  bool ) const
 {
   libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
   libmesh_error();
@@ -745,7 +766,8 @@ template void DenseMatrix<Real>::_lu_back_substitute_lapack(const DenseVector<Re
 							    DenseVector<Real>&);
 template void DenseMatrix<Real>::_matvec_blas(Real, Real,
 					      DenseVector<Real>& ,
-					      const DenseVector<Real>& ) const;
+					      const DenseVector<Real>&,
+					      bool ) const;
 template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real>&);
 template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real>&, DenseMatrix<Real>&, DenseMatrix<Real>&);
 template void DenseMatrix<Real>::_svd_helper (char, char, std::vector<Real>&,
@@ -759,7 +781,8 @@ template void DenseMatrix<Number>::_lu_back_substitute_lapack(const DenseVector<
 							      DenseVector<Number>&);
 template void DenseMatrix<Number>::_matvec_blas(Number, Number,
 					        DenseVector<Number>& ,
-					        const DenseVector<Number>& ) const;
+					        const DenseVector<Number>&,
+						bool ) const;
 template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&);
 template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&, DenseMatrix<Number>&, DenseMatrix<Number>&);
 template void DenseMatrix<Number>::_svd_helper (char, char, std::vector<Number>&,
