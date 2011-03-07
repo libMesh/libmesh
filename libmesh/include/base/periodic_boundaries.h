@@ -31,6 +31,7 @@
 
 // C++ Includes   -----------------------------------
 #include <map>
+#include <set>
 
 // Local Includes -----------------------------------
 #include "point.h"
