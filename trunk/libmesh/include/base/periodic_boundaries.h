@@ -36,6 +36,7 @@
 // Local Includes -----------------------------------
 #include "point.h"
 #include "vector_value.h" // RealVectorValue
+#include "libmesh.h" // libMesh::invalid_uint
 
 namespace libMesh {
 
