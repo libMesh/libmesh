@@ -424,7 +424,7 @@ unsigned int NewtonSolver::solve()
       if (_outer_iterations + 1 >= max_nonlinear_iterations)
         {
           libMesh::out << "  Nonlinear solver reached maximum step "
-                        << _outer_iterations << " with norm "
+                        << max_nonlinear_iterations << " with norm "
                         << norm_total << std::endl;
           if (continue_after_max_iterations)
 	    {
