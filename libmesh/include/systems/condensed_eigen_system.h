@@ -82,6 +82,11 @@ public:
   void initialize_condensed_dofs(std::set<unsigned int>& global_dirichlet_dofs_set);
 
   /**
+   * @return the global number of non-condensed dofs in the system.
+   */
+  unsigned int n_global_non_condensed_dofs() const;
+
+  /**
    * Override to solve the condensed eigenproblem with
    * the dofs in local_non_condensed_dofs_vector
    * stripped out of the system matrices on each processor.
