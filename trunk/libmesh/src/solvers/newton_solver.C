@@ -45,8 +45,9 @@ Real NewtonSolver::line_search(Real tol,
 {
   // Take a full step if we got a residual reduction or if we
   // aren't substepping
-  if (current_residual < last_residual ||
-      !(require_residual_reduction || require_finite_residual))
+  if ((current_residual < last_residual) ||
+      (!require_residual_reduction &&
+       (!require_finite_residual || !libmesh_isnan(current_residual))))
     return 1.;
 
   // The residual vector
