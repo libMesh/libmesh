@@ -80,6 +80,21 @@ void CondensedEigenSystem::initialize_condensed_dofs(std::set<unsigned int>& glo
   condensed_dofs_initialized = true;
 }
 
+unsigned int CondensedEigenSystem::n_global_non_condensed_dofs() const
+{
+  if(!condensed_dofs_initialized)
+  {
+    return this->n_dofs();
+  }
+  else
+  {
+    unsigned int n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
+    Parallel::sum(n_global_non_condensed_dofs);
+
+    return n_global_non_condensed_dofs;
+  }
+}
+
 
 void CondensedEigenSystem::solve()
 {
@@ -89,6 +104,7 @@ void CondensedEigenSystem::solve()
   // just use the default eigen_system
   if(!condensed_dofs_initialized)
   {
+    STOP_LOG("solve()", "CondensedEigenSystem");
     Parent::solve();
     return;
   }
@@ -170,6 +186,7 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
   // just use the default eigen_system
   if(!condensed_dofs_initialized)
   {
+    STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
     return Parent::get_eigenpair(i);
   }
 
