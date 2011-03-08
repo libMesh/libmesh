@@ -182,7 +182,7 @@ void RBSCMSystem::perform_SCM_greedy()
   // the associated RBSystem
   EquationSystems& es = this->get_equation_systems();
   RBSystem& rb_system = es.get_system<RBSystem>(RB_system_name);
-  this->set_local_non_condensed_dofs(rb_system.non_dirichlet_dofs_vector);
+  this->initialize_condensed_dofs(rb_system.global_dirichlet_dofs_set);
 
   load_matrix_B();
 

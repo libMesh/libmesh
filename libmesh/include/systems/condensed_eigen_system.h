@@ -75,9 +75,11 @@ public:
   sys_type & system () { return *this; }
 
   /**
-   * Set local_non_condensed_dofs_vector to the vector \p non_condensed_dofs_in.
+   * Loop over the dofs on each processor to initialize the list
+   * of non-condensed dofs. These are the dofs in the system that
+   * are not contained in \p global_dirichlet_dofs_set.
    */
-  void set_local_non_condensed_dofs(std::vector<unsigned int>& non_condensed_dofs_in);
+  void initialize_condensed_dofs(std::set<unsigned int>& global_dirichlet_dofs_set);
 
   /**
    * Override to solve the condensed eigenproblem with
@@ -117,6 +119,13 @@ public:
    */
   std::vector<unsigned int> local_non_condensed_dofs_vector;
 
+private:
+
+  /**
+   * A private flag to indicate whether the condensed dofs
+   * have been initialized.
+   */
+  bool condensed_dofs_initialized;
   
 };
 

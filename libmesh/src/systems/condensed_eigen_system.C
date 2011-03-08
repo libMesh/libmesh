@@ -27,8 +27,7 @@
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 #include "equation_systems.h"
-#include "getpot.h"
-#include "rb_system.h"
+#include "dof_map.h"
 #include "parallel.h"
 
 namespace libMesh
@@ -39,21 +38,73 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems& es,
                                             const unsigned int number)
   : Parent(es, name, number),
     condensed_matrix_A(SparseMatrix<Number>::build()),
-    condensed_matrix_B(SparseMatrix<Number>::build())
+    condensed_matrix_B(SparseMatrix<Number>::build()),
+    condensed_dofs_initialized(false)
 {
 }
 
-void CondensedEigenSystem::set_local_non_condensed_dofs(std::vector<unsigned int>& non_condensed_dofs_in)
+void CondensedEigenSystem::initialize_condensed_dofs(std::set<unsigned int>& global_dirichlet_dofs_set)
 {
-  local_non_condensed_dofs_vector = non_condensed_dofs_in;
+  // First, put all local dofs into non_dirichlet_dofs_set and
+  std::set<unsigned int> local_non_condensed_dofs_set;
+  for(unsigned int i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
+    local_non_condensed_dofs_set.insert(i);
+
+  // Now erase the condensed dofs
+  std::set<unsigned int>::iterator iter     = global_dirichlet_dofs_set.begin();
+  std::set<unsigned int>::iterator iter_end = global_dirichlet_dofs_set.end();
+  
+  for ( ; iter != iter_end ; iter++)
+  {
+    unsigned int condensed_dof_index = *iter;
+    if ( (this->get_dof_map().first_dof() <= condensed_dof_index) &&
+         (condensed_dof_index < this->get_dof_map().end_dof()) )
+    {
+      local_non_condensed_dofs_set.erase(condensed_dof_index);
+    }
+  }
+
+  // Finally, move local_non_condensed_dofs_set over to a vector for convenience in solve()
+  iter     = local_non_condensed_dofs_set.begin();
+  iter_end = local_non_condensed_dofs_set.end();
+
+  this->local_non_condensed_dofs_vector.clear();
+
+  for ( ; iter != iter_end; ++iter)
+    {
+      unsigned int non_condensed_dof_index = *iter;
+
+      this->local_non_condensed_dofs_vector.push_back(non_condensed_dof_index);
+    }
+
+  condensed_dofs_initialized = true;
 }
 
 
 void CondensedEigenSystem::solve()
 {
   START_LOG("solve()", "CondensedEigenSystem");
+  
+  // If we haven't initialized any condensed dofs,
+  // just use the default eigen_system
+  if(!condensed_dofs_initialized)
+  {
+    Parent::solve();
+    return;
+  }
 
-  // Make sure we have initialized the non-condensed DOFs
+  // A reference to the EquationSystems
+  EquationSystems& es = this->get_equation_systems();
+
+  // check that necessary parameters have been set
+  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
+  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
+
+  if (this->assemble_before_solve)
+    // Assemble the linear system
+    this->assemble ();
+
+  // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
 
   // Need to get a global copy of local_non_condensed_dofs_vector on all processors
@@ -69,12 +120,6 @@ void CondensedEigenSystem::solve()
                              local_non_condensed_dofs_vector,
                              global_non_condensed_dofs_vector);
 
-  // A reference to the EquationSystems
-  EquationSystems& es = this->get_equation_systems();
-
-  // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
 
   // Get the tolerance for the solver and the maximum
   // number of iterations. Here, we simply adopt the linear solver
@@ -121,7 +166,14 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
 {
   START_LOG("get_eigenpair()", "CondensedEigenSystem");
 
-  // Make sure we have initialized the non-condensed DOFs
+  // If we haven't initialized any condensed dofs,
+  // just use the default eigen_system
+  if(!condensed_dofs_initialized)
+  {
+    return Parent::get_eigenpair(i);
+  }
+
+  // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
 
   // This function assumes that condensed_solve has just been called.
