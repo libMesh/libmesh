@@ -671,34 +671,13 @@ void RBSystem::initialize_dirichlet_dofs()
   // Now take the union over all processors
   Parallel::allgather(dirichlet_dofs_vector);
 
-  // Put all local dofs into non_dirichlet_dofs_set and
-  // then erase the Dirichlet dofs
-  // Note that this approach automatically ignores non-local Dirichlet dofs
-  std::set<unsigned int> non_dirichlet_dofs_set;
-  for(unsigned int i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
-    non_dirichlet_dofs_set.insert(i);
-
   // Also, initialize the member data structure global_dirichlet_dofs_set
   global_dirichlet_dofs_set.clear();
 
   for (unsigned int ii=0; ii<dirichlet_dofs_vector.size(); ii++)
   {
-    non_dirichlet_dofs_set.erase(dirichlet_dofs_vector[ii]);
     global_dirichlet_dofs_set.insert(dirichlet_dofs_vector[ii]);
   }
-
-  // Finally, load the non-Dirichlet dofs into the system
-  iter     = non_dirichlet_dofs_set.begin();
-  iter_end = non_dirichlet_dofs_set.end();
-
-  this->non_dirichlet_dofs_vector.clear();
-
-  for ( ; iter != iter_end; ++iter)
-    {
-      unsigned int non_dirichlet_dof_index = *iter;
-
-      this->non_dirichlet_dofs_vector.push_back(non_dirichlet_dof_index);
-    }
 
   STOP_LOG("initialize_dirichlet_dofs()", "RBSystem");
 }
