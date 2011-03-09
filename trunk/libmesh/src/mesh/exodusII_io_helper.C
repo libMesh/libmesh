@@ -853,6 +853,9 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 
 //  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
   check_err(ex_err, "Error writing element connectivities");
+  
+  ex_err = exII::ex_update(ex_id);
+  check_err(ex_err, "Error flushing buffers to file.");
 }
 
 void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
@@ -1148,6 +1151,9 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
 
     }
   }
+
+  ex_err = exII::ex_update(ex_id);
+  check_err(ex_err, "Error flushing buffers to file.");
 }
 
 
@@ -1155,6 +1161,9 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number
 {
   ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
   check_err(ex_err, "Error writing nodal values.");
+
+  ex_err = exII::ex_update(ex_id);
+  check_err(ex_err, "Error flushing buffers to file.");
 }
 
 
@@ -1169,6 +1178,9 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
   }
   ex_err = exII::ex_put_info(ex_id, num_records, &info[0]);
   check_err(ex_err, "Error writing global values.");
+
+  ex_err = exII::ex_update(ex_id);
+  check_err(ex_err, "Error flushing buffers to file.");
 }
 
 
@@ -1176,6 +1188,9 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values,
 {
   ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_globals, &values[0]);
   check_err(ex_err, "Error writing global values.");
+
+  ex_err = exII::ex_update(ex_id);
+  check_err(ex_err, "Error flushing buffers to file.");
 }  
 
 
