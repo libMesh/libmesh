@@ -107,6 +107,15 @@ private:
    * Nonlinear solver context
    */
   SNES _snes;
+
+  /**
+   * Store the reason for SNES convergence/divergence for use even after the _snes
+   * has been cleared.  Note that print_converged_reason() will always *try* to
+   * get the current reason with SNESGetConvergedReason(), but if the SNES object
+   * has already been cleared, it will fall back on this stored value.  Note that
+   * this value is therefore necessarily *not* cleared by the clear() function.
+   */
+  SNESConvergedReason _reason;
 };
 
 
@@ -114,7 +123,8 @@ private:
 template <typename T>
 inline
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system) :
-  NonlinearSolver<T>(system)
+    NonlinearSolver<T>(system),
+    _reason(SNES_CONVERGED_ITERATING/*==0*/) // Arbitrary initial value...
 {
 }
 
