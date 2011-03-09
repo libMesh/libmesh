@@ -2660,10 +2660,14 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
   {
 
     // Make a directory to store all the data files
-    if( mkdir(directory_name.c_str(), 0777) == -1)
+    if( mkdir(directory_name.c_str(), 0777) != -1)
     {
+      // The directory must already exist due to the call
+      // rb_eval->write_offline_data_to_files(directory_name);
+      // Hence throw an error if it doesn't
       libMesh::out << "In RBSystem::write_offline_data_to_files, directory "
-                   << directory_name << " already exists, overwriting contents." << std::endl;
+                   << directory_name << " should already exist." << std::endl;
+      libmesh_error();
     }
 
     // Also, write out the greedily selected parameters
