@@ -428,8 +428,12 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
           // If this element doesn't have an old_dof_object with dofs for the
 	  // current system, then it must be newly added, so the user
 	  // is responsible for setting the new dofs.
-	  if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
-	    continue;
+
+          // ... but we need a better way to test for that; the code
+          // below breaks on any FE type for which the elem stores no
+          // dofs.
+	  // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
+	  //  continue;
 	  const Elem* parent = elem->parent();
 
           // Per-subdomain variables don't need to be projected on
@@ -783,8 +787,12 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
       // If this element doesn't have an old_dof_object with dofs for the
       // current system, then it must be newly added, so the user
       // is responsible for setting the new dofs.
-      if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
-        continue;
+
+      // ... but we need a better way to test for that; the code
+      // below breaks on any FE type for which the elem stores no
+      // dofs.
+      // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
+      //  continue;
       const Elem* parent = elem->parent();
       
       if (elem->refinement_flag() == Elem::JUST_REFINED)
