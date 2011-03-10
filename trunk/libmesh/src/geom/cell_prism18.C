@@ -627,7 +627,7 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
     }
 
   libmesh_error();
-  return libMesh::invalid_uint;
+  return static_cast<unsigned short int>(-1);
 }
 
 
