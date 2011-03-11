@@ -189,7 +189,7 @@ public:
     }
 
     /**
-     * Use dynamic_cast to convert the base pointer
+     * Use a dynamic cast to convert the base pointer
      * passed in to the derived type.  If the cast
      * fails it means you compared two different derived
      * classes.
@@ -198,17 +198,11 @@ public:
     {
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p = 
-	dynamic_cast<const variant_filter_iterator::Iter<IterType>*>(other);
+	libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>*>(other);
 #else      
       const Iter<IterType>* p = 
-	dynamic_cast<const Iter<IterType>*>(other);      
+	libmesh_cast_ptr<const Iter<IterType>*>(other);      
 #endif
-      // Check for failed cast
-      if (p == NULL)
-	{
-	  // libMesh::err << "Dynamic cast failed in Iter::equal(...)" << std::endl;
-	  std::abort();
-	}
       
       return (iter_data == p->iter_data);
     }
@@ -290,19 +284,11 @@ public:
       // Attempt downcast
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p =
-	dynamic_cast<const variant_filter_iterator::Iter<IterType>* >(in);
+	libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>* >(in);
 #else
       const Iter<IterType>* p =
-	dynamic_cast<const Iter<IterType>* >(in);
+	libmesh_cast_ptr<const Iter<IterType>* >(in);
 #endif
-      
-      // Check for failure
-      if ( p == NULL )
-	{
-	  // libMesh::err << "Dynamic cast failed in Pred::op()" << std::endl;
-	  // libMesh::err << "typeid(IterType).name()=" << typeid(IterType).name() << std::endl;
-	  std::abort();
-	}
       
       // Return result of op() for the user's predicate.
       return pred_data(p->iter_data);
@@ -456,7 +442,7 @@ public:
    * forwards on the the equal function defined for the
    * IterBase pointer.  Possibly also compare the end pointers,
    * but this is usually not important and would require an
-   * additional dynamic_cast.
+   * additional dynamic cast.
    */
   bool equal(const variant_filter_iterator& other) const
   {

@@ -126,7 +126,7 @@ public:
 /*   {  */
 /*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
 /*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */
-/*     Elem* side = dynamic_cast<Elem*>(ap_dof_object.release()); */
+/*     Elem* side = libmesh_cast_ptr<Elem*>(ap_dof_object.release()); */
 /*     libmesh_assert(side); // libmesh_assert that the cast was successful */
     
 /*     AutoPtr<Elem> ap(side); */

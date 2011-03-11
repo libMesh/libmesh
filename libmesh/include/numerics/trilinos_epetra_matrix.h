@@ -508,7 +508,7 @@ void EpetraMatrix<T>::add (const T, SparseMatrix<T> &X_in)
   libmesh_not_implemented();
 
 //   PetscScalar     a = static_cast<PetscScalar>      (a_in);
-//   EpetraMatrix<T>* X = dynamic_cast<EpetraMatrix<T>*> (&X_in);
+//   EpetraMatrix<T>* X = libmesh_cast_ptr<EpetraMatrix<T>*> (&X_in);
 
 //   libmesh_assert (X != NULL);
   

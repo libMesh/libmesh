@@ -404,9 +404,8 @@ const T& Parameters::get (const std::string& name) const
 
   libmesh_assert (it != _values.end());
   libmesh_assert (it->second != NULL);
-  libmesh_assert (dynamic_cast<const Parameter<T>*>(it->second) != NULL);
   
-  return dynamic_cast<Parameter<T>*>(it->second)->get();
+  return libmesh_cast_ptr<Parameter<T>*>(it->second)->get();
 }
 
 
@@ -415,16 +414,10 @@ template <typename T>
 inline
 T& Parameters::set (const std::string& name)
 {
-  Parameter<T>* param = NULL;
-  
   if (!this->have_parameter<T>(name))
     _values[name] = new Parameter<T>;
 
-  param = dynamic_cast<Parameter<T>*>(_values[name]);
-
-  libmesh_assert (param != NULL);
-  
-  return param->set();
+  return libmesh_cast_ptr<Parameter<T>*>(_values[name])->set();
 }
 
 

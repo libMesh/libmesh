@@ -745,7 +745,7 @@ RBBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
 #ifdef LIBMESH_HAVE_PETSC
   // ... but we can set it the "hard" way
   PetscLinearSolver<Number>* petsc_linear_solver =
-    dynamic_cast<PetscLinearSolver<Number>*>(ls.get());
+    libmesh_cast_ptr<PetscLinearSolver<Number>*>(ls.get());
 
   // Note: #define PCType char*, and PCGetType just sets a pointer.  We'll use
   // the string below to make a real copy, and set the PC back to its original
@@ -827,7 +827,7 @@ void RBBase<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
       // this->linear_solver->set_preconditioner_type(orig_pc);
       // Set PC back to its previous type
       PetscLinearSolver<Number>* petsc_linear_solver =
-	dynamic_cast<PetscLinearSolver<Number>*>(ls.get());
+	libmesh_cast_ptr<PetscLinearSolver<Number>*>(ls.get());
 
       int ierr = 0;
       PC pc;
