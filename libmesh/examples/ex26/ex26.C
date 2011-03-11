@@ -80,7 +80,7 @@
 
 // Local includes
 #include "femparameters.h"
-#include "mysystems.h"
+#include "L-shaped.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -110,10 +110,17 @@ void write_output(EquationSystems &es,
 
 // Set the parameters for the nonlinear and linear solvers to be used during the simulation
 
-void set_system_parameters(FEMSystem &system, FEMParameters &param)
+void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 {
+  // Use analytical jacobians?
+  system.analytic_jacobians() = param.analytic_jacobians;
+
   // Verify analytic jacobians against numerical ones?
   system.verify_analytic_jacobians = param.verify_analytic_jacobians;
+
+  // Use the prescribed FE type
+  system.fe_family() = param.fe_family[0];
+  system.fe_order() = param.fe_order[0];
 
   // More desperate debugging options
   system.print_solution_norms = param.print_solution_norms;
@@ -123,9 +130,11 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
   system.print_jacobian_norms = param.print_jacobian_norms;
   system.print_jacobians      = param.print_jacobians;
 
+  // No transient time solver
   system.time_solver =
       AutoPtr<TimeSolver>(new SteadySolver(system));
 
+  // Nonlinear solver options
   {
     NewtonSolver *solver = new NewtonSolver(system);
     system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver);
@@ -269,7 +278,7 @@ int main (int argc, char** argv)
   std::cout << "Building system" << std::endl;
 
   // Build the FEMSystem
-  FEMSystem &system = build_system(equation_systems, infile, param);
+  LaplaceSystem &system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
 
   // Set its parameters
   set_system_parameters(system, param);
@@ -358,10 +367,10 @@ int main (int argc, char** argv)
 	std::cout << "Postprocessing: " << std::endl; 
 	system.postprocess_sides = true;
 	system.postprocess();
-	Number QoI_0_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 0);
-	Number QoI_0_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 0);
-	Number QoI_1_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 1);
-	Number QoI_1_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 1);
+	Number QoI_0_computed = system.get_QoI_value("computed", 0);
+	Number QoI_0_exact = system.get_QoI_value("exact", 0);
+	Number QoI_1_computed = system.get_QoI_value("computed", 1);
+	Number QoI_1_exact = system.get_QoI_value("exact", 1);
 		
 	std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
                  << std::abs(QoI_0_computed - QoI_0_exact) /
@@ -460,10 +469,10 @@ int main (int argc, char** argv)
 	system.postprocess_sides = true;
 	system.postprocess();
 	
-	Number QoI_0_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 0);
-	Number QoI_0_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 0);
-	Number QoI_1_computed = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("computed", 1);
-	Number QoI_1_exact = (dynamic_cast<LaplaceSystem&>(system)).get_QoI_value("exact", 1);
+	Number QoI_0_computed = system.get_QoI_value("computed", 0);
+	Number QoI_0_exact = system.get_QoI_value("exact", 0);
+	Number QoI_1_computed = system.get_QoI_value("computed", 1);
+	Number QoI_1_exact = system.get_QoI_value("exact", 1);
 	
 	std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
                  << std::abs(QoI_0_computed - QoI_0_exact) /
