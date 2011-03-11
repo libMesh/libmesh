@@ -519,9 +519,7 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   if (coarsening_changed_mesh || refining_changed_mesh)
     {
 #ifdef DEBUG
-      ParallelMesh *pmesh = dynamic_cast<ParallelMesh *>(&_mesh);
-      if (pmesh)
-        pmesh->libmesh_assert_valid_parallel_ids();
+      _mesh.libmesh_assert_valid_parallel_ids();
 #endif
 
       _mesh.prepare_for_use (/*skip_renumber =*/false);
@@ -1602,9 +1600,7 @@ bool MeshRefinement::_refine_elements ()
       MeshCommunication().make_nodes_parallel_consistent
         (_mesh, _new_nodes_map);
 #ifdef DEBUG
-      ParallelMesh *pmesh = dynamic_cast<ParallelMesh *>(&_mesh);
-      if (pmesh)
-        pmesh->libmesh_assert_valid_parallel_ids();
+      _mesh.libmesh_assert_valid_parallel_ids();
 #endif
     }
   

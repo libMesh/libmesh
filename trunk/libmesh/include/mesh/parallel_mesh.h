@@ -122,7 +122,7 @@ class ParallelMesh : public UnstructuredMesh
    * elements containers.
    * Calls libmesh_assert() on each possible failure.
    */
-  void libmesh_assert_valid_parallel_flags() const;
+  virtual void libmesh_assert_valid_parallel_flags() const;
 #endif
 
   /**

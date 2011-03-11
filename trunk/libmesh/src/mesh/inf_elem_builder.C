@@ -638,9 +638,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
 
 #ifdef DEBUG
-  ParallelMesh *pmesh = dynamic_cast<ParallelMesh *>(&this->_mesh);
-  if (pmesh)
-    pmesh->libmesh_assert_valid_parallel_ids();
+  _mesh.libmesh_assert_valid_parallel_ids();
 
   if (be_verbose)
     libMesh::out << "  added "
