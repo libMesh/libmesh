@@ -745,7 +745,7 @@ public:
 
   /**
    * @returns a norm of variable \p var in the vector \p v, in the specified
-   * norm (e.g. L2, H0, H1)
+   * norm (e.g. L2, L_INF, H1)
    */
   Real calculate_norm(const NumericVector<Number>& v,
 		      unsigned int var = 0,
