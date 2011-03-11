@@ -306,8 +306,7 @@ int main (int argc, char** argv)
 	write_output(equation_systems, a_step, "primal");
 	
 	// Get a pointer to the primal solution vector
-	NumericVector<Number> &primal_solution =
-          dynamic_cast<NumericVector<Number> &>(*system.solution);
+	NumericVector<Number> &primal_solution = *system.solution;
 
 	// Declare a QoISet object, we need this object to set weights for our QoI error contributions
 	QoISet qois;
@@ -331,8 +330,7 @@ int main (int argc, char** argv)
 	system.adjoint_solve();
 
 	// Get a pointer to the solution vector of the adjoint problem for QoI 0
-	NumericVector<Number> &dual_solution_0 =
-          dynamic_cast<NumericVector<Number> &>(system.get_adjoint_solution(0));
+	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 
 	// Swap the primal and dual solutions so we can write out the adjoint solution
 	primal_solution.swap(dual_solution_0);	    
@@ -342,8 +340,7 @@ int main (int argc, char** argv)
 	primal_solution.swap(dual_solution_0);
 	
 	// Get a pointer to the solution vector of the adjoint problem for QoI 0
-	NumericVector<Number> &dual_solution_1 =
-          dynamic_cast<NumericVector<Number> &>(system.get_adjoint_solution(1));
+	NumericVector<Number> &dual_solution_1 = system.get_adjoint_solution(1);
 	
 	// Swap again
 	primal_solution.swap(dual_solution_1);	    
@@ -425,8 +422,7 @@ int main (int argc, char** argv)
 	
 	write_output(equation_systems, a_step, "primal");
 
-	NumericVector<Number> &primal_solution =
-          dynamic_cast<NumericVector<Number> &>(*system.solution);
+	NumericVector<Number> &primal_solution = *system.solution;
 	
 	QoISet qois;
 	std::vector<unsigned int> qoi_indices;
@@ -441,16 +437,14 @@ int main (int argc, char** argv)
 	system.assemble_qoi_sides = true;
 	system.adjoint_solve();
 		
-	NumericVector<Number> &dual_solution_0 =
-          dynamic_cast<NumericVector<Number> &>(system.get_adjoint_solution(0));
+	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 	
 	primal_solution.swap(dual_solution_0);	    
 	write_output(equation_systems, a_step, "adjoint_0");
 
 	primal_solution.swap(dual_solution_0);
 	
-	NumericVector<Number> &dual_solution_1 =
-          dynamic_cast<NumericVector<Number> &>(system.get_adjoint_solution(1));
+	NumericVector<Number> &dual_solution_1 = system.get_adjoint_solution(1);
 	
 	primal_solution.swap(dual_solution_1);	    
 	write_output(equation_systems, a_step, "adjoint_1");
