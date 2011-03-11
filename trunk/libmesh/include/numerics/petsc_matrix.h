@@ -541,7 +541,7 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   libmesh_assert (this->n() == X_in.n());
 
   PetscScalar     a = static_cast<PetscScalar>      (a_in);
-  PetscMatrix<T>* X = dynamic_cast<PetscMatrix<T>*> (&X_in);
+  PetscMatrix<T>* X = libmesh_cast_ptr<PetscMatrix<T>*> (&X_in);
 
   libmesh_assert (X != NULL);
   

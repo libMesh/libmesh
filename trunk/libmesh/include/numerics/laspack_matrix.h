@@ -490,7 +490,7 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   libmesh_assert (this->m() == X_in.m());
   libmesh_assert (this->n() == X_in.n());
 
-  LaspackMatrix<T>* X = dynamic_cast<LaspackMatrix<T>*> (&X_in);
+  LaspackMatrix<T>* X = libmesh_cast_ptr<LaspackMatrix<T>*> (&X_in);
   _LPNumber         a = static_cast<_LPNumber>          (a_in);
   
   libmesh_assert(X != NULL);

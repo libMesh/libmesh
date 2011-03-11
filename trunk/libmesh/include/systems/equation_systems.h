@@ -565,18 +565,7 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
     }
 
   // Attempt dynamic cast
-  T_sys* ptr = dynamic_cast<T_sys*>(pos->second);
-
-  // Check for failure of dynamic cast
-  if (ptr == NULL)
-    {
-      libMesh::err << "ERROR: cannot convert system "
-		    << num << " to requested type!"
-		    << std::endl;
-      libmesh_error();
-    }
-  
-  return *ptr;
+  return *libmesh_cast_ptr<T_sys*>(pos->second);
 }
 
 
@@ -604,15 +593,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
     }
 
   // Attempt dynamic cast
-  T_sys* ptr = dynamic_cast<T_sys*>(pos->second);
-
-  // Check for failure of dynamic cast
-  if (ptr == NULL)
-    {
-      LIBMESH_THROW(libMesh::DynamicCastFailure());
-    }
-
-  return *ptr; 
+  return *libmesh_cast_ptr<T_sys*>(pos->second);
 }
 
 
@@ -635,15 +616,7 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
     }
 
   // Attempt dynamic cast
-  T_sys* ptr = dynamic_cast<T_sys*>(pos->second);
-
-  // Check for failure of dynamic cast
-  if (ptr == NULL)
-    {
-      LIBMESH_THROW(libMesh::DynamicCastFailure());
-    }
-
-  return *ptr; 
+  return *libmesh_cast_ptr<T_sys*>(pos->second);
 }
 
 
@@ -666,18 +639,7 @@ T_sys & EquationSystems::get_system (const std::string& name)
     }
 
   // Attempt dynamic cast
-  T_sys* ptr = dynamic_cast<T_sys*>(pos->second);
-
-  // Check for failure of dynamic cast
-  if (ptr == NULL)
-    {
-      std::cerr << "ERROR: cannot convert system \""
-		<< name << "\" to requested type!"
-		<< std::endl;
-      libmesh_error();
-    }
-
-  return *ptr; 
+  return *libmesh_cast_ptr<T_sys*>(pos->second);
 }
 
 

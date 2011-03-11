@@ -81,12 +81,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
     }
 
   // For this to work, the passed arg. must actually be a DenseMatrix<T>
-  const DenseMatrix<T>* const_that = dynamic_cast< const DenseMatrix<T>* >(&other);
-  if (!const_that)
-    {
-      libMesh::err << "Unable to cast input matrix to usable type." << std::endl;
-      libmesh_error();
-    }
+  const DenseMatrix<T>* const_that = libmesh_cast_ptr< const DenseMatrix<T>* >(&other);
 
   // Also, although 'that' is logically const in this BLAS routine,
   // the PETSc BLAS interface does not specify that any of the inputs are

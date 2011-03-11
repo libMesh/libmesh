@@ -319,7 +319,12 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 {
 #ifndef NDEBUG
   Tnew newvar = dynamic_cast<Tnew>(oldvar);
-  libmesh_assert (newvar);
+  if (!newvar)
+    {
+      libMesh::err << "Failed to convert " << typeid(Told).name() << 
+                      " pointer to " << typeid(Tnew).name() << std::endl;
+      libmesh_error();
+    }
   return newvar;
 #else
   return(static_cast<Tnew>(oldvar));
