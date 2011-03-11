@@ -90,7 +90,7 @@
 
 // Local includes
 #include "femparameters.h"
-#include "mysystems.h"
+#include "L-shaped.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -123,10 +123,17 @@ void write_output(EquationSystems &es,
 
 // Set the parameters for the nonlinear and linear solvers to be used during the simulation
 
-void set_system_parameters(FEMSystem &system, FEMParameters &param)
+void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 {
+  // Use analytical jacobians?
+  system.analytic_jacobians() = param.analytic_jacobians;
+
   // Verify analytic jacobians against numerical ones?
   system.verify_analytic_jacobians = param.verify_analytic_jacobians;
+
+  // Use the prescribed FE type
+  system.fe_family() = param.fe_family[0];
+  system.fe_order() = param.fe_order[0];
 
   // More desperate debugging options
   system.print_solution_norms = param.print_solution_norms;
@@ -136,9 +143,11 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
   system.print_jacobian_norms = param.print_jacobian_norms;
   system.print_jacobians      = param.print_jacobians;
 
+  // No transient time solver
   system.time_solver =
       AutoPtr<TimeSolver>(new SteadySolver(system));
 
+  // Nonlinear solver options
   {
     NewtonSolver *solver = new NewtonSolver(system);
     system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver);
@@ -283,7 +292,7 @@ int main (int argc, char** argv)
   std::cout << "Building system" << std::endl;
 
   // Build the FEMSystem
-  FEMSystem &system = build_system(equation_systems, infile, param);
+  LaplaceSystem &system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
 
   // Set its parameters
   set_system_parameters(system, param);
@@ -337,13 +346,13 @@ int main (int argc, char** argv)
 	qois.set_weight(1, 0.5);
 
 	// A SensitivityData object to hold the qois and parameters
-	SensitivityData sensitivities(qois, system, (dynamic_cast<LaplaceSystem&>(system)).get_parameter_vector());
+	SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 
 	// Make sure we get the contributions to the adjoint RHS from the sides
 	system.assemble_qoi_sides = true;
 
 	// Compute the sensitivities
-	system.adjoint_qoi_parameter_sensitivity(qois, (dynamic_cast<LaplaceSystem&>(system)).get_parameter_vector(), sensitivities);
+	system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 
 	GetPot infile("l-shaped.in");
 
@@ -454,11 +463,11 @@ int main (int argc, char** argv)
 	qois.set_weight(0, 0.5);
 	qois.set_weight(1, 0.5);
 	
-	SensitivityData sensitivities(qois, system, (dynamic_cast<LaplaceSystem&>(system)).get_parameter_vector());
+	SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 	
 	system.assemble_qoi_sides = true;
 	
-	system.adjoint_qoi_parameter_sensitivity(qois, (dynamic_cast<LaplaceSystem&>(system)).get_parameter_vector(), sensitivities);
+	system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 	
 	GetPot infile("l-shaped.in");
 
@@ -482,8 +491,7 @@ int main (int argc, char** argv)
                  << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact << std::endl << std::endl;
 		
-	NumericVector<Number> &dual_solution_0 =
-          dynamic_cast<NumericVector<Number> &>(system.get_adjoint_solution(0));
+	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 	
 	primal_solution.swap(dual_solution_0);	    
 	write_output(equation_systems, a_step, "adjoint_0", param);
