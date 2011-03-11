@@ -19,6 +19,8 @@
 
 
 // C++ includes
+#include <unistd.h> // mkstemp
+
 #include "libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_PETSC
@@ -325,6 +327,108 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
   ierr = PetscViewerDestroy (petsc_viewer);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
+
+
+
+
+
+template <typename T>
+void PetscMatrix<T>::print_personal(std::ostream& os) const
+{
+  libmesh_assert (this->initialized());
+
+  // Routine must be called in parallel on parallel matrices
+  // and serial on serial matrices.
+  semiparallel_only();
+  
+// #ifndef NDEBUG
+//   if (os != std::cout)
+//     libMesh::err << "Warning! PETSc can only print to std::cout!" << std::endl;
+// #endif
+
+  // Matrix must be in an assembled state to be printed
+  this->close();
+  
+  int ierr=0;
+
+  // Print to screen if ostream is stdout
+  if (os == std::cout)
+    {
+      ierr = MatView(_mat, PETSC_VIEWER_STDOUT_SELF);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+  
+  // Otherwise, print to the requested file, in a roundabout way...
+  else 
+    {
+      // We will create a temporary filename, and file, for PETSc to
+      // write to.
+      std::string temp_filename;
+      
+      {
+	// Template for temporary filename
+	char c[] = "temp_petsc_matrix.XXXXXX";
+
+	// Generate temporary, unique filename only on processor 0.  We will
+	// use this filename for PetscViewerASCIIOpen, before copying it into
+	// the user's stream
+	if (libMesh::processor_id() == 0)
+	  {
+	    int fd = mkstemp(c);
+     
+	    // Check to see that mkstemp did not fail.
+	    if (fd == -1)
+	      libmesh_error();
+
+	    // mkstemp returns a file descriptor for an open file,
+	    // so let's close it before we hand it to PETSc!
+	    ::close (fd);
+	  }
+
+	// Store temporary filename as string, makes it easier to broadcast
+	temp_filename = c;
+      }
+      
+      // Now broadcast the filename from processor 0 to all processors.
+      Parallel::broadcast(temp_filename);
+      
+      // PetscViewer object for passing to MatView
+      PetscViewer petsc_viewer;
+
+      // This PETSc function only takes a string and handles the opening/closing
+      // of the file internally.  Since print_personal() takes a reference to
+      // an ostream, we have to do an extra step...  print_personal() should probably
+      // have a version that takes a string to get rid of this problem.
+      ierr = PetscViewerASCIIOpen( libMesh::COMM_WORLD,
+				   temp_filename.c_str(), 
+				   &petsc_viewer);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      // Probably don't need to set the format if it's default... 
+      //      ierr = PetscViewerSetFormat (petsc_viewer,
+      //				   PETSC_VIEWER_DEFAULT);
+      //      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      // Finally print the matrix using the viewer
+      ierr = MatView (_mat, petsc_viewer);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      if (libMesh::processor_id() == 0)
+	{
+	  // Now the inefficient bit: open temp_filename as an ostream and copy the contents
+	  // into the user's desired ostream.  We can't just do a direct file copy, we don't even have the filename!
+	  std::ifstream input_stream(temp_filename.c_str());
+	  os << input_stream.rdbuf();  // The "most elegant" way to copy one stream into another.
+	  // os.close(); // close not defined in ostream
+
+	  // Now remove the temporary file
+	  input_stream.close();
+	  std::remove(temp_filename.c_str());
+	}
+    }
+}
+
+  
 
 
 

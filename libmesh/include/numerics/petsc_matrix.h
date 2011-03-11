@@ -666,26 +666,6 @@ void PetscMatrix<T>::swap(PetscMatrix<T> &m)
 }
 
 
-
-
-
-template <typename T>
-inline
-void PetscMatrix<T>::print_personal(std::ostream& os) const
-{
-  libmesh_assert (this->initialized());
-
-#ifndef NDEBUG
-  if (os != std::cout)
-    libMesh::err << "Warning! PETSc can only print to std::cout!" << std::endl;
-#endif
-  
-  int ierr=0;
-
-  ierr = MatView(_mat, PETSC_VIEWER_STDOUT_SELF);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-}
-
 } // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
