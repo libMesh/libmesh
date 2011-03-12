@@ -1,4 +1,4 @@
-// $Id: enum_norm_type.h 3430 2009-07-17 15:34:59Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
