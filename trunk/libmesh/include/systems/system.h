@@ -1033,7 +1033,7 @@ public:
    */
   Number point_value(unsigned int var, Point &p);
 
-/**
+  /**
    * Returns the gradient of the solution variable \p var at the physical
    * point \p p in the mesh.
    *
@@ -1048,7 +1048,7 @@ public:
    */
   Gradient point_gradient(unsigned int var, Point &p);
 
-/**
+  /**
    * Returns the second derivative tensor of the solution variable \p var at the physical
    * point \p p in the mesh.
    *
@@ -1116,7 +1116,7 @@ private:
    * We won't even bother implementing this; we'll just make sure that
    * the compiler doesn't implement a default.
    */
-  System(const System&);
+  System (const System&);
 
   /**
    * This isn't a copyable object, so let's make sure nobody tries.
@@ -1130,9 +1130,9 @@ private:
    * Finds the discrete norm for the entries in the vector
    * corresponding to Dofs associated with var.
    */
-  Real discrete_var_norm(const NumericVector<Number>& v,
-                         unsigned int var,
-                         FEMNormType norm_type) const;
+  Real discrete_var_norm (const NumericVector<Number>& v,
+			  unsigned int var,
+			  FEMNormType norm_type) const;
 
   /**
    * Reads an input vector from the stream \p io and assigns
@@ -1191,34 +1191,34 @@ private:
   /**
    * Function that initializes the system.
    */
-  void (* _init_system) (EquationSystems& es,
-			 const std::string& name);
+  void (* _init_system_function) (EquationSystems& es,
+				  const std::string& name);
   
   /**
    * Function that assembles the system.
    */
-  void (* _assemble_system) (EquationSystems& es,
-			     const std::string& name);
+  void (* _assemble_system_function) (EquationSystems& es,
+				      const std::string& name);
 
   /**
    * Function to impose constraints.
    */
-  void (* _constrain_system) (EquationSystems& es, 
-			      const std::string& name);
+  void (* _constrain_system_function) (EquationSystems& es, 
+				       const std::string& name);
 
   /**
    * Function to evaluate quantity of interest
    */
-  void (* _qoi_evaluate) (EquationSystems& es, 
-			  const std::string& name,
-                          const QoISet& qoi_indices);
+  void (* _qoi_evaluate_function) (EquationSystems& es, 
+				   const std::string& name,
+				   const QoISet& qoi_indices);
 
   /**
    * Function to evaluate quantity of interest derivative
    */
-  void (* _qoi_evaluate_derivative) (EquationSystems& es, 
-			             const std::string& name,
-                                     const QoISet& qoi_indices);
+  void (* _qoi_evaluate_derivative_function) (EquationSystems& es, 
+					      const std::string& name,
+					      const QoISet& qoi_indices);
 
   /**
    * Data structure describing the relationship between
