@@ -28,11 +28,11 @@ fi
 ########################################################
 # Terminal commands to goto specific columns
 rescol=65;
-gotocolumn="\e["$rescol"G";
-white="\e[01;37m";
-green="\e[01;32m";
-red="\e[01;31m";
-colorreset="\e[m";
+gotocolumn="\033["$rescol"G";
+white="\033[01;37m";
+green="\033[01;32m";
+red="\033[01;31m";
+colorreset="\033[m";
 ########################################################
 
 
