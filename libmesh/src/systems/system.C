@@ -56,31 +56,31 @@ System::System (EquationSystems& es,
 		const std::string& name,
 		const unsigned int number) :
 
-  assemble_before_solve    (true),
-  use_fixed_solution       (false),
-  extra_quadrature_order   (0),
-  solution                 (NumericVector<Number>::build()),
-  current_local_solution   (NumericVector<Number>::build()),
-  time                     (0.),
-  qoi                      (0),
-  _mesh_sys                (NULL),
-  _mesh_x_var              (libMesh::invalid_uint),
-  _mesh_y_var              (libMesh::invalid_uint),
-  _mesh_z_var              (libMesh::invalid_uint),
-  _init_system             (NULL),
-  _assemble_system         (NULL),
-  _constrain_system        (NULL),
-  _qoi_evaluate            (NULL),
-  _qoi_evaluate_derivative (NULL),
-  _dof_map                 (new DofMap(number)),
-  _equation_systems        (es),
-  _mesh                    (es.get_mesh()),
-  _sys_name                (name),
-  _sys_number              (number),
-  _active                  (true),
-  _solution_projection     (true),
-  _can_add_vectors         (true),
-  _additional_data_written (false)
+  assemble_before_solve             (true),
+  use_fixed_solution                (false),
+  extra_quadrature_order            (0),
+  solution                          (NumericVector<Number>::build()),
+  current_local_solution            (NumericVector<Number>::build()),
+  time                              (0.),
+  qoi                               (0),
+  _mesh_sys                         (NULL),
+  _mesh_x_var                       (libMesh::invalid_uint),
+  _mesh_y_var                       (libMesh::invalid_uint),
+  _mesh_z_var                       (libMesh::invalid_uint),
+  _init_system_function             (NULL),
+  _assemble_system_function         (NULL),
+  _constrain_system_function        (NULL),
+  _qoi_evaluate_function            (NULL),
+  _qoi_evaluate_derivative_function (NULL),
+  _dof_map                          (new DofMap(number)),
+  _equation_systems                 (es),
+  _mesh                             (es.get_mesh()),
+  _sys_name                         (name),
+  _sys_number                       (number),
+  _active                           (true),
+  _solution_projection              (true),
+  _can_add_vectors                  (true),
+  _additional_data_written          (false)
 {
 }
 
@@ -109,7 +109,11 @@ System::~System ()
   // Null-out the function pointers.  Since this
   // class is getting destructed it is pointless,
   // but a good habit.
-  _init_system = _assemble_system = NULL;
+  _init_system_function = 
+    _assemble_system_function = 
+    _constrain_system_function =  NULL;
+  _qoi_evaluate_function =
+    _qoi_evaluate_derivative_function =  NULL;
 
   // Clear data
   this->clear ();
@@ -1450,7 +1454,7 @@ void System::attach_init_function (void fptr(EquationSystems& es,
 {
   libmesh_assert (fptr != NULL);
   
-  _init_system = fptr;
+  _init_system_function = fptr;
 }
 
 
@@ -1460,7 +1464,7 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 {
   libmesh_assert (fptr != NULL);
   
-  _assemble_system = fptr;  
+  _assemble_system_function = fptr;  
 }
 
 
@@ -1470,7 +1474,7 @@ void System::attach_constraint_function(void fptr(EquationSystems& es,
 {
   libmesh_assert (fptr != NULL);
   
-  _constrain_system = fptr;  
+  _constrain_system_function = fptr;  
 }
 
 
@@ -1481,7 +1485,7 @@ void System::attach_QOI_function(void fptr(EquationSystems&,
 {
   libmesh_assert (fptr != NULL);
   
-  _qoi_evaluate = fptr;  
+  _qoi_evaluate_function = fptr;  
 }
 
 
@@ -1492,7 +1496,7 @@ void System::attach_QOI_derivative(void fptr(EquationSystems&,
 {
   libmesh_assert (fptr != NULL);
   
-  _qoi_evaluate_derivative = fptr;  
+  _qoi_evaluate_derivative_function = fptr;  
 }
 
 
@@ -1501,8 +1505,8 @@ void System::user_initialization ()
 {
   // Call the user-provided intialization function,
   // if it was provided
-  if (_init_system != NULL)
-    this->_init_system (_equation_systems, this->name());
+  if (_init_system_function != NULL)
+    this->_init_system_function (_equation_systems, this->name());
 }
 
 
@@ -1510,8 +1514,8 @@ void System::user_assembly ()
 {
   // Call the user-provided assembly function,
   // if it was provided
-  if (_assemble_system != NULL)
-    this->_assemble_system (_equation_systems, this->name());
+  if (_assemble_system_function != NULL)
+    this->_assemble_system_function (_equation_systems, this->name());
 }
 
 
@@ -1520,8 +1524,8 @@ void System::user_constrain ()
 {
   // Call the user-provided constraint function, 
   // if it was provided
-  if(_constrain_system!= NULL)
-    this->_constrain_system(_equation_systems, this->name());
+  if(_constrain_system_function!= NULL)
+    this->_constrain_system_function(_equation_systems, this->name());
 }
 
 
@@ -1530,8 +1534,8 @@ void System::user_QOI (const QoISet& qoi_indices)
 {
   // Call the user-provided quantity of interest function, 
   // if it was provided
-  if(_qoi_evaluate != NULL)
-    this->_qoi_evaluate(_equation_systems, this->name(), qoi_indices);
+  if(_qoi_evaluate_function != NULL)
+    this->_qoi_evaluate_function(_equation_systems, this->name(), qoi_indices);
 }
 
 
@@ -1540,8 +1544,8 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
 {
   // Call the user-provided quantity of interest derivative, 
   // if it was provided
-  if(_qoi_evaluate_derivative != NULL)
-    this->_qoi_evaluate_derivative(_equation_systems, this->name(), qoi_indices);
+  if(_qoi_evaluate_derivative_function != NULL)
+    this->_qoi_evaluate_derivative_function(_equation_systems, this->name(), qoi_indices);
 }
 
 
