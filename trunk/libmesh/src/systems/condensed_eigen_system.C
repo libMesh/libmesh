@@ -1,4 +1,4 @@
-// $Id: eigen_system.C 4015 2010-10-01 21:03:53Z roystgnr $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
