@@ -584,7 +584,8 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
 
   int ierr = 0;
 
-  if((this->type()==PARALLEL) && (v.type()==GHOSTED) || (this->type()==GHOSTED) && (v.type()==PARALLEL))
+  if (((this->type()==PARALLEL) && (v.type()==GHOSTED)) || 
+      ((this->type()==GHOSTED) && (v.type()==PARALLEL)))
   {
     /* Allow assignment of a ghosted to a parallel vector since this
        causes no difficulty.  See discussion in libmesh-devel of
