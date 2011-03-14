@@ -518,7 +518,6 @@ void ParallelMesh::clear ()
 
 
 
-#ifdef DEBUG
 template <typename T>
 void ParallelMesh::libmesh_assert_valid_parallel_object_ids 
   (const mapvector<T*> &objects) const
@@ -592,7 +591,6 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
     }
 #endif // LIBMESH_ENABLE_AMR
 }
-#endif // DEBUG
 
 
 

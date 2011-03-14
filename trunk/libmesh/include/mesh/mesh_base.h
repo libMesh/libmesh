@@ -542,7 +542,6 @@ public:
    */
   void clear_point_locator ();
 
-#ifdef DEBUG
   /**
    * Verify id and processor_id consistency of our elements and
    * nodes containers.
@@ -551,7 +550,6 @@ public:
    * structure is much harder to get out of sync.
    */
   virtual void libmesh_assert_valid_parallel_ids() const {}
-#endif
 
 public:
 
