@@ -30,6 +30,8 @@
 #include <typeinfo>
 #endif
 
+#include "libmesh_common.h" // for libmesh_cast_ptr()
+
 /**
  * Original Authors: Corwin Joy          * Michael Gradman
  *                   cjoy@houston.rr.com * Michael.Gradman@caminus.com
