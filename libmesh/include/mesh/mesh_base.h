@@ -33,7 +33,6 @@
 #include "enum_elem_type.h"
 #include "libmesh_common.h"
 #include "multi_predicates.h"
-#include "partitioner.h"
 #include "variant_filter_iterator.h"
 
 namespace libMesh
@@ -46,7 +45,7 @@ class Point;
 class BoundaryInfo;
 class PointLocatorBase;
 class MeshData;
-
+class Partitioner;
 
 
 

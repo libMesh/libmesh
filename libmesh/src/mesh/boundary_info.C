@@ -29,6 +29,7 @@
 #include "elem.h"
 #include "mesh_data.h"
 #include "parallel.h"
+#include "partitioner.h"
 
 namespace libMesh
 {
