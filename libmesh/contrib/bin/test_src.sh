@@ -53,7 +53,12 @@ inc_line_nums=`cat $1 | grep -n "^#include \"" | grep -v libmesh_config | grep -
 #echo -e "$inc_line_nums"
 
 for i in $inc_line_nums; do
-  echo -n "Testing with line $i removed ... ";
+  # Grab the i'th line from the file
+  line_i=`head -$i $1 | tail -1`;
+
+  # Print informative message
+  # echo -n "Testing with line $i removed ... ";
+  echo -n "Testing with ($line_i) removed ... ";
   
   # Name for temporary file to test line deletion
   temp_file=`echo -e "line_${i}_$bn"`;
@@ -62,7 +67,7 @@ for i in $inc_line_nums; do
   cat $1 | sed "${i}d" > $temp_file.C;
 
   # Attempt to compile $temp_file
-  g++ `./libmesh-config --cxxflags --include` -c $temp_file.C &> /dev/null #$temp_file.log;
+  `./libmesh-config --cxx` `./libmesh-config --cppflags --cxxflags --include` -c $temp_file.C &> /dev/null #$temp_file.log;
 
   # If an object file is successfully created, the compilation succeeds!
   if [ -f $temp_file.o ]; then
