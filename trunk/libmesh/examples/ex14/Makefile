@@ -42,7 +42,7 @@ all:: $(target)
 # Production rules:  how to make the target - depends on library configuration
 $(target): $(objects)
 	@echo "Linking "$(target)"..."
-	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(objects) -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS)
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(objects) -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS)
 
 
 # Useful rules.
