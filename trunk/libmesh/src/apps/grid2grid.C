@@ -16,6 +16,8 @@
 #include "legacy_xdr_io.h"
 
 
+using namespace libMesh;
+
 
 int main (int argc, char** argv)
 {

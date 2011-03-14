@@ -35,6 +35,8 @@
 #include "statistics.h"
 
 
+using namespace libMesh;
+
 
 /*
  * convenient enum for the mode in which the boundary mesh

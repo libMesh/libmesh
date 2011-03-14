@@ -15,6 +15,8 @@
 #include "sparse_matrix.h"
 
 
+using namespace libMesh;
+
 
 void assemble(EquationSystems& es,
 	      const std::string& system_name);
