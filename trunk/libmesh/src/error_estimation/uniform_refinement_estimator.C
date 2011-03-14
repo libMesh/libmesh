@@ -36,6 +36,7 @@
 #include "quadrature.h"
 #include "system.h"
 #include "uniform_refinement_estimator.h"
+#include "partitioner.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
