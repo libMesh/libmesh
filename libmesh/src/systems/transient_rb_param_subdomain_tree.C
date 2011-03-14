@@ -21,6 +21,9 @@
 #include "transient_rb_param_subdomain_node.h"
 #include "getpot.h"
 
+namespace libMesh
+{
+
 TransientRBParamSubdomainTree::TransientRBParamSubdomainTree
   (TransientRBSystem& rb_system_in, const std::string& parameters_filename)
   : Parent(rb_system_in, parameters_filename),
@@ -49,3 +52,5 @@ void TransientRBParamSubdomainTree::build_root_node()
   libmesh_assert(root_node == NULL);
   root_node = new TransientRBParamSubdomainNode(*this, _rb_system.get_current_parameters());
 }
+
+} // namespace libMesh
