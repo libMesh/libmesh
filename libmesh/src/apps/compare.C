@@ -21,6 +21,7 @@
 #include "enum_xdr_mode.h"
 
 
+using namespace libMesh;
 
 
 /** 
