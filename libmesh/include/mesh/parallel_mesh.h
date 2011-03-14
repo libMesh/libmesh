@@ -101,7 +101,6 @@ class ParallelMesh : public UnstructuredMesh
   virtual bool is_serial () const
     { return _is_serial; }
 
-#ifdef DEBUG
   /**
    * Verify id and processor_id consistency of a parallel
    * objects container.
@@ -115,15 +114,14 @@ class ParallelMesh : public UnstructuredMesh
    * nodes containers.
    * Calls libmesh_assert() on each possible failure.
    */
-  void libmesh_assert_valid_parallel_ids() const;
+  virtual void libmesh_assert_valid_parallel_ids() const;
 
   /**
    * Verify refinement_flag and p_refinement_flag consistency of our
    * elements containers.
    * Calls libmesh_assert() on each possible failure.
    */
-  virtual void libmesh_assert_valid_parallel_flags() const;
-#endif
+  void libmesh_assert_valid_parallel_flags() const;
 
   /**
    * Renumber a parallel objects container
