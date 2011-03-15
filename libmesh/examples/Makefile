@@ -1,17 +1,37 @@
+# $Id$
+
+# The location of the mesh library
+LIBMESH_DIR ?= ..
+
+# Include the library options determined by configure.  This gives
+# us access to the $(METHOD) variable for building the examples.
+include $(LIBMESH_DIR)/Make.common
+
 all:: examples
 
 dirlist := $(wildcard ex?/ ex??/)
+exec_names := $(patsubst %/, %-$(METHOD), $(dirlist))
 
-#
-# Build the example programs
-examples:
-	@echo "----------------------------------------------"
-	@echo "--------- Building Example Programs ----------"
-	@echo "----------------------------------------------"
-	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
-	@echo "----------------------------------------------"
-	@echo "------- Done Building Example Programs -------"
-	@echo "----------------------------------------------"
+
+# Build the example programs.  This target has been deprecated
+# in favor of one that make can parallelize.
+# examples:
+# 	@echo "----------------------------------------------"
+# 	@echo "--------- Building Example Programs ----------"
+# 	@echo "----------------------------------------------"
+# 	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
+# 	@echo "----------------------------------------------"
+# 	@echo "------- Done Building Example Programs -------"
+# 	@echo "----------------------------------------------"
+
+
+# This target allows the examples to be compiled in parallel
+examples: $(exec_names)
+
+# We could pass $(MAKECMDGOALS) here instead of "all" but then calling "make examples"
+# in this directory doesn't work...
+ex%-$(METHOD):
+	$(MAKE) -C $(patsubst ex%-$(METHOD), ex%, $@) all||exit 1
 
 
 .PHONY: clean clobber distclean link run .depend
@@ -31,12 +51,14 @@ clobber:
 distclean:
 	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
 
-# Link the example programs
-link: $(wildcard examples/ex*/*.C)
-	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" all||exit 1; done
+# Link the example programs (deprecated, use "make examples" instead)
+# link: $(wildcard examples/ex*/*.C)
+# 	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" all||exit 1; done
 
 #
-# Run the example programs to see if shared lib's get properly loaded
+# Run the example programs to see if shared lib's get properly loaded.
+# This target should actually be "serialized" in the sense of 'make', we don't
+# want all the examples to try and run simultaneously!
 run: $(wildcard examples/ex*/*.C)
 	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
 
@@ -44,3 +66,7 @@ run: $(wildcard examples/ex*/*.C)
 # Rebuild the dependencies for the examples
 .depend: $(wildcard examples/ex*/*.C)
 	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
+
+echo:
+	@echo "dirlist = $(dirlist)"
+	@echo "exec_names = $(exec_names)" 
