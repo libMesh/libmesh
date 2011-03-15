@@ -317,6 +317,24 @@ public:
                      affine_assembly_fptr output_bndry_assembly);
 
   /**
+   * Get a pointer to inner_product_matrix. Accessing via this
+   * function, rather than directly through the class member allows
+   * us to do error checking (e.g. inner_product_matrix is not
+   * defined in low-memory mode).
+   */
+  SparseMatrix<Number>* get_inner_product_matrix();
+
+  /**
+   * Get a pointer to non_dirichlet_inner_product_matrix.
+   * Accessing via this function, rather than directly through
+   * the class member allows us to do error checking (e.g.
+   * non_dirichlet_inner_product_matrix is not
+   * defined in low-memory mode, and we need
+   * store_non_dirichlet_operators==true).
+   */
+  SparseMatrix<Number>* get_non_dirichlet_inner_product_matrix();
+
+  /**
    * Get a pointer to A_q.
    */
   SparseMatrix<Number>* get_A_q(unsigned int q);
@@ -385,7 +403,7 @@ public:
   /**
    * Assemble the inner product matrix and store it in input_matrix.
    */
-  void assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix);
+  void assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
 
   /**
    * Assemble the constraint matrix and store it in input_matrix.
@@ -495,6 +513,12 @@ public:
    * The inner product matrix.
    */
   AutoPtr< SparseMatrix<Number> > inner_product_matrix;
+
+  /**
+   * The inner product matrix without Dirichlet conditions enforced.
+   * (This is only computed if store_non_dirichlet_operators == true.)
+   */
+  AutoPtr< SparseMatrix<Number> > non_dirichlet_inner_product_matrix;
 
   /**
    * The constraint matrix, e.g. the pressure matrix entries

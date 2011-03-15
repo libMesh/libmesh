@@ -56,6 +56,7 @@ RBSystem::RBSystem (EquationSystems& es,
   : Parent(es, name, number),
     rb_eval(NULL),
     inner_product_matrix(SparseMatrix<Number>::build()),
+    non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build()),
     constraint_matrix(SparseMatrix<Number>::build()),
     constrained_problem(false),
     store_basis_functions(false),
@@ -542,6 +543,10 @@ void RBSystem::allocate_data_structures()
       // We also need to initialize a second set of non-Dirichlet operators
       if(store_non_dirichlet_operators)
       {
+        dof_map.attach_matrix(*non_dirichlet_inner_product_matrix);
+        non_dirichlet_inner_product_matrix->init();
+        non_dirichlet_inner_product_matrix->zero();
+        
         non_dirichlet_A_q_vector.resize(get_Q_a());
         for(unsigned int q=0; q<get_Q_a(); q++)
         {
@@ -1072,10 +1077,16 @@ void RBSystem::truth_assembly()
   STOP_LOG("truth_assembly()", "RBSystem");
 }
 
-void RBSystem::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix)
+void RBSystem::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
 {
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., inner_prod_assembly, inner_prod_bndry_assembly, input_matrix, NULL);
+  add_scaled_matrix_and_vector(1.,
+                               inner_prod_assembly,
+                               inner_prod_bndry_assembly,
+                               input_matrix,
+                               NULL,
+                               false, /* symmetrize */
+                               apply_dirichlet_bc);
 }
 
 void RBSystem::assemble_constraint_matrix(SparseMatrix<Number>* input_matrix)
@@ -1190,6 +1201,11 @@ void RBSystem::assemble_misc_matrices()
   }
 
   assemble_inner_product_matrix(inner_product_matrix.get());
+
+  if(store_non_dirichlet_operators)
+  {
+    assemble_inner_product_matrix(non_dirichlet_inner_product_matrix.get(), /* apply_dirichlet_bc = */ false);
+  }
 
   if( constrained_problem )
     assemble_constraint_matrix(constraint_matrix.get());
@@ -2500,6 +2516,34 @@ void RBSystem::load_RB_solution()
 //
 //  return std::sqrt( libmesh_real(slow_residual_norm_sq) );
 //}
+
+SparseMatrix<Number>* RBSystem::get_inner_product_matrix()
+{
+  if(low_memory_mode)
+  {
+    libMesh::err << "Error: The inner-product matrix is not stored in low-memory mode." << std::endl;
+    libmesh_error();
+  }
+
+  return inner_product_matrix.get();
+}
+
+SparseMatrix<Number>* RBSystem::get_non_dirichlet_inner_product_matrix()
+{
+  if(!store_non_dirichlet_operators)
+  {
+    libMesh::err << "Error: Must have store_non_dirichlet_operators==true "
+                 << "to access non_dirichlet_inner_product_matrix." << std::endl;
+    libmesh_error();
+  }
+  if(low_memory_mode)
+  {
+    libMesh::err << "Error: The non-Dirichlet inner-product matrix is not stored in low-memory mode." << std::endl;
+    libmesh_error();
+  }
+
+  return non_dirichlet_inner_product_matrix.get();
+}
 
 SparseMatrix<Number>* RBSystem::get_A_q(unsigned int q)
 {
