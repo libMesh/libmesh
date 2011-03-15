@@ -34,7 +34,7 @@ all:: $(target) $(appbinfiles)
 # 
 #
 .PHONY: all clean clobber default distclean library target \
-	doc upload doc_upload log cvsweb TODO svnexpand
+	doc upload doc_upload log cvsweb TODO svnexpand examples
 
 #
 # static library
@@ -67,18 +67,15 @@ $(mesh_library_dir)/libmesh$(shared_libext): $(objects)
 obj: $(objects)
 
 #
-# Build the examples
+# Build the examples.  Can be run in parallel with "make -jN examples"
 #
-examples: $(mesh_library) $(examplesrcfiles)
+examples: 
 	@$(MAKE) -C examples
 
+# Only link the examples.  Deprecated, use "make examples" instead.
 #
-# Only link the examples.  Useful on machines where you
-# do not have permission to run programs outside of a queue.
-#
-link_examples: $(mesh_library)
-	@$(MAKE) -C examples link
-
+# link_examples: $(mesh_library)
+# 	@$(MAKE) -C examples link
 
 #
 # Run the examples
