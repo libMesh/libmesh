@@ -220,8 +220,9 @@ void PetscNonlinearSolver<T>::init ()
       ierr = SNESCreate(libMesh::COMM_WORLD,&_snes);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-#endif	     
+#endif
 
+             
 #if PETSC_VERSION_LESS_THAN(2,3,3)
       ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
@@ -230,11 +231,15 @@ void PetscNonlinearSolver<T>::init ()
       ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
 #endif
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	     
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+      // Cannot call SNESSetOptions before SNESSetFunction when using
+      // any matrix free options with PETSc 3.1.0+
       ierr = SNESSetFromOptions(_snes);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
+#endif 
+             
       if(this->_preconditioner)
       {
         KSP ksp;	 
