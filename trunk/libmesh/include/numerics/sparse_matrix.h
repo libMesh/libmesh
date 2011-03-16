@@ -292,7 +292,7 @@ public:
    * in a uniform style, regardless of matrix/solver
    * package being used.
    */
-  void print(std::ostream& os=libMesh::out) const;
+  void print(std::ostream& os=libMesh::out, const bool sparse=false) const;
 
   /**
    * Same as the print method above, but allows you
@@ -429,9 +429,14 @@ SparseMatrix<T>::~SparseMatrix ()
 // Full specialization for Complex datatypes
 template <>
 inline
-void SparseMatrix<Complex>::print(std::ostream& os) const
+  void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
 {
   // std::complex<>::operator<<() is defined, but use this form
+
+  if(sparse)
+    {
+      libmesh_not_implemented();
+    }
 
   os << "Real part:" << std::endl;
   for (unsigned int i=0; i<this->m(); i++)

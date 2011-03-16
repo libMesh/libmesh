@@ -118,7 +118,7 @@ void SparseMatrix<T>::zero_rows (std::vector<int> &, T)
 
 template <typename T>
 inline
-void SparseMatrix<T>::print(std::ostream& os) const
+void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 {
   parallel_only();
 
@@ -138,9 +138,23 @@ void SparseMatrix<T>::print(std::ostream& os) const
       for (unsigned int i=this->_dof_map->first_dof();
            i!=this->_dof_map->end_dof(); ++i)
         {
-          for (unsigned int j=0; j<this->n(); j++)
-	    os << (*this)(i,j) << " ";
-          os << std::endl;
+	  if(sparse)
+	    {
+	      for (unsigned int j=0; j<this->n(); j++)
+		{
+		  T c = (*this)(i,j);
+		  if (c != static_cast<T>(0.0))
+		    {
+		      os << i << " " << j << " " << c << std::endl;
+		    }
+		}
+	    }
+	  else
+	    {
+	      for (unsigned int j=0; j<this->n(); j++)
+		os << (*this)(i,j) << " ";
+	      os << std::endl;
+	    }
         }
 
       std::vector<unsigned int> ibuf, jbuf;
@@ -162,27 +176,46 @@ void SparseMatrix<T>::print(std::ostream& os) const
           unsigned int currentb = 0;
           for (;currenti <= ibuf.back(); ++currenti)
             {
-              for (unsigned int j=0; j<this->n(); j++)
-                {
-                  if (currentb < ibuf.size() &&
-                      ibuf[currentb] == currenti &&
-                      jbuf[currentb] == j)
-                    {
-	              os << cbuf[currentb] << " ";
-	              currentb++;
-                    }
-                  else
-	            os << static_cast<T>(0.0) << " ";
-                }
-              os << std::endl;
+	      if(sparse)
+		{
+		  for (unsigned int j=0; j<this->n(); j++)
+		    {
+		      if (currentb < ibuf.size() &&
+			  ibuf[currentb] == currenti &&
+			  jbuf[currentb] == j)
+			{
+			  os << currenti << " " << j << " " << cbuf[currentb] << std::endl;
+			  currentb++;
+			}
+		    }
+		}
+	      else
+		{
+		  for (unsigned int j=0; j<this->n(); j++)
+		    {
+		      if (currentb < ibuf.size() &&
+			  ibuf[currentb] == currenti &&
+			  jbuf[currentb] == j)
+			{
+			  os << cbuf[currentb] << " ";
+			  currentb++;
+			}
+		      else
+			os << static_cast<T>(0.0) << " ";
+		    }
+		  os << std::endl;
+		}
             }
         }
-      for (; currenti != this->m(); ++currenti)
-        {
-          for (unsigned int j=0; j<this->n(); j++)
-	    os << static_cast<T>(0.0) << " ";
-          os << std::endl;
-        }
+      if(!sparse)
+	{
+	  for (; currenti != this->m(); ++currenti)
+	    {
+	      for (unsigned int j=0; j<this->n(); j++)
+		os << static_cast<T>(0.0) << " ";
+	      os << std::endl;
+	    }
+	}
     }
   else
     {
