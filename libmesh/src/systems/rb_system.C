@@ -332,6 +332,12 @@ void RBSystem::process_parameters_file ()
   store_non_dirichlet_operators = infile("store_non_dirichlet_operators",
                                           store_non_dirichlet_operators);
 
+  // Set boolean flag to indicate whether or not we initialize
+  // mesh dependent matrices and vectors when init_data
+  // is called. Default value is true.
+  initialize_mesh_dependent_data = infile("initialize_mesh_dependent_data",
+                                          initialize_mesh_dependent_data);
+
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.

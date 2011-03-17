@@ -90,6 +90,12 @@ void RBSCMSystem::initialize_SCM_system ()
   const unsigned int n_SCM_training_samples = infile("n_SCM_training_samples",1);
   const bool deterministic_training = infile("deterministic_training",false);
 
+  // Set boolean flag to indicate whether or not we initialize
+  // mesh dependent matrices and vectors when init_data
+  // is called. Default value is true.
+  initialize_mesh_dependent_data = infile("initialize_mesh_dependent_data",
+                                          initialize_mesh_dependent_data);
+
   // SCM Greedy termination tolerance
   const Real SCM_eps_in = infile("SCM_eps", SCM_eps);
   set_SCM_eps(SCM_eps_in);
