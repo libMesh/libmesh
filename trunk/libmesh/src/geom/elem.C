@@ -699,10 +699,17 @@ void Elem::libmesh_assert_valid_neighbors() const
                 libmesh_assert(elem);
             }
         }
+      // If we don't have a neighbor, our ancestors shouldn't have any
+      // neighbors in this same direction.
       else
         {
           const Elem *parent = this->parent();
-          if (parent)
+          if (parent &&
+          // A parent with a different dimension isn't really one of
+          // our ancestors, it means we're on a boundary mesh and this
+          // is an interior mesh element for which we're on a side.
+          // Nothing to test for in that case.
+              (parent->dim() == this->dim()))
             libmesh_assert (!parent->neighbor(s));
         }
     }
