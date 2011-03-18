@@ -34,10 +34,11 @@ namespace libMesh
 //const unsigned int Node::invalid_id = libMesh::invalid_uint;
 
 
-bool Node::operator==(const DofObject& rhs) const
+bool Node::operator==(const Node& rhs) const
 {
   // Cast rhs to a Node*
-  const Node* rhs_node = dynamic_cast<const Node*>(&rhs);
+//  const Node* rhs_node = dynamic_cast<const Node*>(&rhs);
+  const Node* rhs_node = &rhs;
 
   // If we can't cast to a Node* then rhs must be an Elem
   if(rhs_node == NULL)
