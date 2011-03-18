@@ -35,7 +35,7 @@
 namespace {
 
   // Nasty hacks for reading/writing zipped files
-  void zip_file (const std::string &unzipped_name)
+  void bzip_file (const std::string &unzipped_name)
   {
     // There's no parallel bzip2 for us to call
     libmesh_assert(libMesh::processor_id() == 0);
@@ -57,7 +57,7 @@ namespace {
 #endif
   }
 
-  std::string unzip_file (const std::string &name)
+  std::string unbzip_file (const std::string &name)
   {
     // There's no parallel bunzip2 for us to call
     libmesh_assert(libMesh::processor_id() == 0);
@@ -83,14 +83,67 @@ namespace {
 #endif
   }
 
+  void xzip_file (const std::string &unzipped_name)
+  {
+    // There's no parallel xz for us to call
+    libmesh_assert(libMesh::processor_id() == 0);
+
+#ifdef LIBMESH_HAVE_XZ
+    START_LOG("system(xz)", "XdrIO");
+
+    std::string system_string = "xz -f ";
+    system_string += unzipped_name;
+    if (std::system(system_string.c_str()))
+      libmesh_file_error(system_string);
+     
+    STOP_LOG("system(xz)", "XdrIO");
+#else
+    libMesh::err << "ERROR: need xz to create "
+		 << unzipped_name << ".xz"
+	         << std::endl;
+    libmesh_error();
+#endif
+  }
+
+  std::string unxzip_file (const std::string &name)
+  {
+    // There's no parallel xz for us to call
+    libmesh_assert(libMesh::processor_id() == 0);
+
+#ifdef LIBMESH_HAVE_BZIP
+    std::string new_name = name;
+    if (name.size() - name.rfind(".xz") == 3)
+      {
+	new_name.erase(new_name.end() - 3, new_name.end());
+	START_LOG("system(xz -d)", "XdrIO");
+	std::string system_string = "xz -f -d -k ";
+	system_string += name;
+	if (std::system(system_string.c_str()))
+          libmesh_file_error(system_string);
+	STOP_LOG("system(xz -d)", "XdrIO");
+      }
+    return new_name;
+#else
+    libMesh::err << "ERROR: need xz to open .xz file "
+		 << name << std::endl;
+    libmesh_error();
+    return name;
+#endif
+  }
+
   // remove an unzipped file
   void remove_unzipped_file (const std::string &name)
   {
-    // If we temporarily decompressed a .bz2 file, remove the
+    // If we temporarily decompressed a file, remove the
     // uncompressed version
     if (name.size() - name.rfind(".bz2") == 4)
       {
 	const std::string new_name(name.begin(), name.end()-4);
+	std::remove(new_name.c_str());
+      }
+    if (name.size() - name.rfind(".xz") == 3)
+      {
+	const std::string new_name(name.begin(), name.end()-3);
 	std::remove(new_name.c_str());
       }
   }
@@ -112,7 +165,8 @@ Xdr::Xdr (const std::string& name, const XdrMODE m) :
   out(NULL),
   comm_len(xdr_MAX_STRING_LENGTH),
   gzipped_file(false),
-  bzipped_file(false)
+  bzipped_file(false),
+  xzipped_file(false)
 {
   this->open(name);
 }
@@ -163,6 +217,7 @@ void Xdr::open (const std::string& name)
       {
 	gzipped_file = (name.size() - name.rfind(".gz")  == 3);
 	bzipped_file = (name.size() - name.rfind(".bz2") == 4);
+	xzipped_file = (name.size() - name.rfind(".xz") == 3);
 
 	if (gzipped_file)
 	  {
@@ -183,7 +238,13 @@ void Xdr::open (const std::string& name)
 	    libmesh_assert (inf != NULL);
 	    in.reset(inf);
 	    
-	    std::string new_name(bzipped_file ? unzip_file(name) : name);
+	    std::string new_name;
+            if (bzipped_file)
+              new_name = unbzip_file(name);
+            else if (xzipped_file)
+              new_name = unxzip_file(name);
+            else
+              new_name = name;
 
 	    inf->open(new_name.c_str(), std::ios::in);
 	  }
@@ -196,6 +257,7 @@ void Xdr::open (const std::string& name)
       {
 	gzipped_file = (name.size() - name.rfind(".gz")  == 3);
 	bzipped_file = (name.size() - name.rfind(".bz2") == 4);
+	xzipped_file = (name.size() - name.rfind(".xz")  == 3);
 
 	if (gzipped_file)
 	  {
@@ -220,6 +282,9 @@ void Xdr::open (const std::string& name)
 
 	    if (bzipped_file)
 	      new_name.erase(new_name.end() - 4, new_name.end());
+
+	    if (xzipped_file)
+	      new_name.erase(new_name.end() - 3, new_name.end());
 
 	    outf->open(new_name.c_str(), std::ios::out);
 	  }
@@ -278,7 +343,7 @@ void Xdr::close ()
 	  {
 	    in.reset();    
 	    
-	    if (bzipped_file)
+	    if (bzipped_file || xzipped_file)
 	      remove_unzipped_file(file_name);
 	  }
 	file_name = "";
@@ -292,7 +357,10 @@ void Xdr::close ()
 	    out.reset();      
 
 	    if (bzipped_file)
-	      zip_file(std::string(file_name.begin(), file_name.end()-4));
+	      bzip_file(std::string(file_name.begin(), file_name.end()-4));
+
+	    else if (xzipped_file)
+	      xzip_file(std::string(file_name.begin(), file_name.end()-3));
 	  }
 	file_name = "";
 	return;
