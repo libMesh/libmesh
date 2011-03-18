@@ -297,7 +297,7 @@ extern OStreamProxy err;
 template <typename Tnew, typename Told>
 inline Tnew libmesh_cast_ref(Told& oldvar)
 {
-#ifndef NDEBUG
+#if !defined(NDEBUG) && defined(LIBMESH_HAVE_RTTI)
   try
     {
       Tnew newvar = dynamic_cast<Tnew>(oldvar);
@@ -317,7 +317,7 @@ inline Tnew libmesh_cast_ref(Told& oldvar)
 template <typename Tnew, typename Told>
 inline Tnew libmesh_cast_ptr (Told* oldvar)
 {
-#ifndef NDEBUG
+#if !defined(NDEBUG) && defined(LIBMESH_HAVE_RTTI)
   Tnew newvar = dynamic_cast<Tnew>(oldvar);
   if (!newvar)
     {
