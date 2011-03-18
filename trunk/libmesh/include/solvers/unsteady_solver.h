@@ -118,6 +118,11 @@ public:
    */
   virtual Real du(const SystemNorm& norm) const;
 
+  /**
+   * This is not a steady-state solver.
+   */
+  virtual bool is_steady() const { return false; }
+
 protected:
 
   /**
