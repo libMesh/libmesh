@@ -137,7 +137,7 @@ public:
    * @returns a primitive (2-noded) edge or infedge for 
    * edge \p i.
    */
-  AutoPtr<DofObject> side (const unsigned int i) const;
+  AutoPtr<Elem> side (const unsigned int i) const;
   
   /**
    * build_edge and build_side are identical in 2D

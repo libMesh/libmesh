@@ -83,7 +83,7 @@ unsigned int InfPrism::key (const unsigned int s) const
 
 
 
-AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
+AutoPtr<Elem> InfPrism::side (const unsigned int i) const
 {
   libmesh_assert (i < this->n_sides());
   
@@ -92,7 +92,7 @@ AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
     case 0:  // the triangular face at z=-1, base face
       {
         Elem* face = new Tri3;
-        AutoPtr<DofObject> ap_face(face);
+        AutoPtr<Elem> ap_face(face);
 	//AutoPtr<Elem> face(new Tri3);
 
 	// Note that for this face element, the normal points inward
@@ -106,7 +106,7 @@ AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
     case 1:  // the quad face at y=0
       {
         Elem* face = new InfQuad4;
-        AutoPtr<DofObject> ap_face(face);
+        AutoPtr<Elem> ap_face(face);
 	//AutoPtr<Elem> face(new InfQuad4);
 	
 	face->set_node(0) = this->get_node(0);
@@ -120,7 +120,7 @@ AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
     case 2:  // the other quad face
       {
         Elem* face = new InfQuad4;
-        AutoPtr<DofObject> ap_face(face);
+        AutoPtr<Elem> ap_face(face);
 	//AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = this->get_node(1);
@@ -134,7 +134,7 @@ AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
     case 3: // the quad face at x=0
       {
         Elem* face = new InfQuad4;
-        AutoPtr<DofObject> ap_face(face);
+        AutoPtr<Elem> ap_face(face);
 	//AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = this->get_node(2);
@@ -148,13 +148,13 @@ AutoPtr<DofObject> InfPrism::side (const unsigned int i) const
     default:
       {
 	libmesh_error(); 
-	AutoPtr<DofObject> ap(NULL);  return ap;
+	AutoPtr<Elem> ap(NULL);  return ap;
       }
     }
 
   // We'll never get here.
   libmesh_error();
-  AutoPtr<DofObject> ap(NULL);  return ap;
+  AutoPtr<Elem> ap(NULL);  return ap;
 }
 
 

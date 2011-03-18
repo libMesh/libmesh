@@ -340,15 +340,16 @@ Real Elem::length(const unsigned int n1,
 
 
 
-bool Elem::operator == (const DofObject& rhs) const
+bool Elem::operator == (const Elem& rhs) const
 {
 
     // Cast rhs to an Elem*
-    const Elem* rhs_elem = dynamic_cast<const Elem*>(&rhs);
+//    const Elem* rhs_elem = dynamic_cast<const Elem*>(&rhs);
+    const Elem* rhs_elem = &rhs;
 
     // If we cannot cast to an Elem*, rhs must be a Node
-    if(rhs_elem == static_cast<const Elem*>(NULL))
-        return false;
+//    if(rhs_elem == static_cast<const Elem*>(NULL))
+//        return false;
 
 //   libmesh_assert (n_nodes());
 //   libmesh_assert (rhs.n_nodes());
