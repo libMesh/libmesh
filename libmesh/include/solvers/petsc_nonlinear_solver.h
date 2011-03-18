@@ -100,6 +100,13 @@ public:
    * con(di)verged.
    */
   virtual void print_converged_reason();
+
+  /**
+   * Returns the currently-available (or most recently obtained, if the SNES object has
+   * been destroyed) convergence reason.  Refer to PETSc docs for the meaning of different
+   * SNESConvergedReasons.
+   */
+  SNESConvergedReason get_converged_reason();
   
 private:
 

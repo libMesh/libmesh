@@ -361,13 +361,27 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 template <typename T>
 void PetscNonlinearSolver<T>::print_converged_reason()
 {
-  if (_snes)
-    SNESGetConvergedReason(_snes, &_reason);
   
   libMesh::out << "Nonlinear solver convergence/divergence reason: "
-               << SNESConvergedReasons[_reason] << std::endl;
+               << SNESConvergedReasons[this->get_converged_reason()] << std::endl;
 }
 
+
+
+template <typename T>
+SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
+{
+  int ierr=0;
+  
+  if (_snes)
+    {
+      ierr = SNESGetConvergedReason(_snes, &_reason);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+
+  return _reason;
+}
+  
 
 
 
