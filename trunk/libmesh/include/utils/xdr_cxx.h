@@ -222,10 +222,9 @@ private:
   char comm[xdr_MAX_STRING_LENGTH];  
 
   /**
-   * Are we reading/writing bzipped or gzipped files?
+   * Are we reading/writing zipped files?
    */
-  bool gzipped_file;
-  bool bzipped_file;
+  bool gzipped_file, bzipped_file, xzipped_file;
 };
 
 
