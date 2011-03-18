@@ -89,7 +89,8 @@
    support */
 #undef ENABLE_VSMOOTHER
 
-/* Flag indicating bzip2/bunzip2 are available for handlingcompressed files */
+/* Flag indicating bzip2/bunzip2 are available for handling compressed .bz2
+   files */
 #undef HAVE_BZIP
 
 /* Define to 1 if you have the <csignal> header file. */
@@ -269,6 +270,9 @@
 
 /* Flag indicating headers and libraries for XDR IO are available */
 #undef HAVE_XDR
+
+/* Flag indicating xz is available for handling compressed .xz files */
+#undef HAVE_XZ
 
 /* Define to 1 if you have the <zlib.h> header file. */
 #undef HAVE_ZLIB_H
