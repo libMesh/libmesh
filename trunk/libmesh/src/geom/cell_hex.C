@@ -97,7 +97,7 @@ unsigned int Hex::key (const unsigned int s) const
 
 
 
-AutoPtr<DofObject> Hex::side (const unsigned int i) const
+AutoPtr<Elem> Hex::side (const unsigned int i) const
 {
   libmesh_assert (i < this->n_sides());
 
@@ -115,7 +115,7 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(2);
 	face->set_node(3) = this->get_node(1);
 
-	AutoPtr<DofObject> ap(face);
+	AutoPtr<Elem> ap(face);
         return ap;
       }
     case 1:  // the face at y = -1
@@ -125,7 +125,7 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(5);
 	face->set_node(3) = this->get_node(4);
 	
-	AutoPtr<DofObject> ap(face);
+	AutoPtr<Elem> ap(face);
         return ap;
       }
     case 2:  // the face at x = 1
@@ -135,7 +135,7 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(6);
 	face->set_node(3) = this->get_node(5);
 
-	AutoPtr<DofObject> ap(face);
+	AutoPtr<Elem> ap(face);
         return ap;
       }
     case 3: // the face at y = 1
@@ -145,7 +145,7 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(7);
 	face->set_node(3) = this->get_node(6);
 	
-	AutoPtr<DofObject> ap(face);
+	AutoPtr<Elem> ap(face);
         return ap;
       }
     case 4: // the face at x = -1
@@ -155,7 +155,7 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(4);
 	face->set_node(3) = this->get_node(7);
 
-	AutoPtr<DofObject> ap(face);
+	AutoPtr<Elem> ap(face);
         return ap;
       }
     case 5: // the face at z = 1
@@ -165,20 +165,20 @@ AutoPtr<DofObject> Hex::side (const unsigned int i) const
 	face->set_node(2) = this->get_node(6);
 	face->set_node(3) = this->get_node(7);
 	
-	AutoPtr<DofObject> ap(face);
+	AutoPtr<Elem> ap(face);
         return ap;
       }
     default:
       {
 	libmesh_error();
-	AutoPtr<DofObject> ap(face);
+	AutoPtr<Elem> ap(face);
         return ap;
       }
     }
 
   // We'll never get here.
   libmesh_error();
-  AutoPtr<DofObject> ap(face);
+  AutoPtr<Elem> ap(face);
   return ap;
 }
 

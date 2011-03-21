@@ -492,6 +492,21 @@ void SerialMesh::renumber_nodes_and_elements ()
 
 
 
+void SerialMesh::fix_broken_node_and_element_numbering ()
+{
+   // Nodes first
+  for (unsigned int n=0; n<this->_nodes.size(); n++)
+    if (this->_nodes[n] != NULL)
+      this->_nodes[n]->set_id() = n;
+
+  // Elements next
+  for (unsigned int e=0; e<this->_elements.size(); e++)
+    if (this->_elements[e] != NULL)
+      this->_elements[e]->set_id() = e; 
+}
+
+
+
 unsigned int SerialMesh::n_active_elem () const
 {
   return static_cast<unsigned int>(std::distance (this->active_elements_begin(),

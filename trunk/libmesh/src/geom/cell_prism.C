@@ -83,7 +83,7 @@ unsigned int Prism::key (const unsigned int s) const
 
 
 
-AutoPtr<DofObject> Prism::side (const unsigned int i) const
+AutoPtr<Elem> Prism::side (const unsigned int i) const
 {
   libmesh_assert (i < this->n_sides());
 
@@ -92,7 +92,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
     case 0:  // the triangular face at z=0
       {
         Elem* facet = new Tri3;
-        AutoPtr<DofObject> ap_facet(facet);
+        AutoPtr<Elem> ap_facet(facet);
   
 	facet->set_node(0) = this->get_node(0);
 	facet->set_node(1) = this->get_node(2);
@@ -103,7 +103,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
     case 1:  // the quad face at y=0
       {
         Elem* faceq = new Quad4;
-        AutoPtr<DofObject> ap_faceq(faceq);
+        AutoPtr<Elem> ap_faceq(faceq);
         
 	faceq->set_node(0) = this->get_node(0);
 	faceq->set_node(1) = this->get_node(1);
@@ -115,7 +115,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
     case 2:  // the other quad face
       {
         Elem* faceq = new Quad4;
-        AutoPtr<DofObject> ap_faceq(faceq);
+        AutoPtr<Elem> ap_faceq(faceq);
       
 	faceq->set_node(0) = this->get_node(1);
 	faceq->set_node(1) = this->get_node(2);
@@ -127,7 +127,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
     case 3: // the quad face at x=0
       {
         Elem* faceq = new Quad4;
-        AutoPtr<DofObject> ap_faceq(faceq);
+        AutoPtr<Elem> ap_faceq(faceq);
 
 	faceq->set_node(0) = this->get_node(2);
 	faceq->set_node(1) = this->get_node(0);
@@ -139,7 +139,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
     case 4: // the triangular face at z=1
       {
         Elem* facet = new Tri3;
-        AutoPtr<DofObject> ap_facet(facet);
+        AutoPtr<Elem> ap_facet(facet);
       
 	facet->set_node(0) = this->get_node(3);
 	facet->set_node(1) = this->get_node(4);
@@ -151,7 +151,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
       {
 	libmesh_error();
         Elem* facet = new Tri3;
-        AutoPtr<DofObject> ap_facet(facet);
+        AutoPtr<Elem> ap_facet(facet);
         return ap_facet;
       }
     }
@@ -159,7 +159,7 @@ AutoPtr<DofObject> Prism::side (const unsigned int i) const
   // We'll never get here.
   libmesh_error();
   Elem* facet = new Tri3;
-  AutoPtr<DofObject> ap_facet(facet);
+  AutoPtr<Elem> ap_facet(facet);
   return ap_facet;
 }
 

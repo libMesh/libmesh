@@ -68,7 +68,7 @@ unsigned int InfQuad::key (const unsigned int s) const
 
 
 
-AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
+AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 {
   libmesh_assert (i < this->n_sides());
 
@@ -83,7 +83,7 @@ AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(0);
 	edge->set_node(1) = this->get_node(1);
 	
-	AutoPtr<DofObject> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
 
     case 1:
@@ -94,7 +94,7 @@ AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(1);
 	edge->set_node(1) = this->get_node(3);	
 
-	AutoPtr<DofObject> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
 
     case 2:
@@ -105,19 +105,19 @@ AutoPtr<DofObject> InfQuad::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
 	edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
 
-	AutoPtr<DofObject> ap(edge);  return ap;
+	AutoPtr<Elem> ap(edge);  return ap;
       }
 
     default:
       {
 	libmesh_error();
-	AutoPtr<DofObject> ap(NULL);  return ap;
+	AutoPtr<Elem> ap(NULL);  return ap;
       }
     }
 
   // We will never get here...  Look at the code above.
   libmesh_error();
-  AutoPtr<DofObject> ap(NULL);  return ap;
+  AutoPtr<Elem> ap(NULL);  return ap;
 }
 
 
