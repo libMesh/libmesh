@@ -160,7 +160,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * nodes, regardless of how those nodes might be numbered local
    * to the elements.
    */
-  virtual bool operator == (const DofObject& rhs) const;
+  bool operator == (const Elem& rhs) const;
 
   /**
    * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element.
@@ -410,7 +410,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
-  virtual AutoPtr<DofObject> side (const unsigned int i) const = 0;
+  virtual AutoPtr<Elem> side (const unsigned int i) const = 0;
   
   /**
    * Creates an element coincident with side \p i. The element returned is

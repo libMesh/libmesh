@@ -70,7 +70,7 @@ unsigned int Tet::key (const unsigned int s) const
 
 
 
-AutoPtr<DofObject> Tet::side (const unsigned int i) const
+AutoPtr<Elem> Tet::side (const unsigned int i) const
 {
   libmesh_assert (i < this->n_sides());
 
@@ -86,7 +86,7 @@ AutoPtr<DofObject> Tet::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(2);
 	face->set_node(2) = this->get_node(1);
 
-        AutoPtr<DofObject> ap_face(face);
+        AutoPtr<Elem> ap_face(face);
 	return ap_face;
       }
     case 1:
@@ -95,7 +95,7 @@ AutoPtr<DofObject> Tet::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(3);
 
-        AutoPtr<DofObject> ap_face(face);
+        AutoPtr<Elem> ap_face(face);
 	return ap_face;
       }
     case 2:
@@ -104,7 +104,7 @@ AutoPtr<DofObject> Tet::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(2);
 	face->set_node(2) = this->get_node(3);
 
-        AutoPtr<DofObject> ap_face(face);
+        AutoPtr<Elem> ap_face(face);
 	return ap_face;
       }
     case 3:
@@ -113,7 +113,7 @@ AutoPtr<DofObject> Tet::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(0);
 	face->set_node(2) = this->get_node(3);
 	
-        AutoPtr<DofObject> ap_face(face);
+        AutoPtr<Elem> ap_face(face);
 	return ap_face;
       }
     default:
@@ -124,7 +124,7 @@ AutoPtr<DofObject> Tet::side (const unsigned int i) const
 
   // We'll never get here.
   libmesh_error();
-  AutoPtr<DofObject> ap_face(face);
+  AutoPtr<Elem> ap_face(face);
   return ap_face;
 }
 

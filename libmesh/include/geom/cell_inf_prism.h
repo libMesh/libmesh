@@ -110,7 +110,7 @@ public:
    * @returns a primitive (3-noded) tri or (4-noded) infquad for 
    * face i.
    */
-  AutoPtr<DofObject> side (const unsigned int i) const;
+  AutoPtr<Elem> side (const unsigned int i) const;
 
 };
 

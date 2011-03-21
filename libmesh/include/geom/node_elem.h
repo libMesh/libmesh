@@ -113,8 +113,8 @@ class NodeElem : public Elem
   /**
    * The \p Elem::side() member makes no sense for nodes.
    */
-  AutoPtr<DofObject> side (const unsigned int) const
-  { libmesh_error(); AutoPtr<DofObject> ap(NULL); return ap; }
+  AutoPtr<Elem> side (const unsigned int) const
+  { libmesh_error(); AutoPtr<Elem> ap(NULL); return ap; }
 
   /**
    * The \p Elem::build_side() member makes no sense for nodes.

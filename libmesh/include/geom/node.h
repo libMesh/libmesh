@@ -121,10 +121,8 @@ public:
 
   /**
    * @returns \p true if this node equals rhs, false otherwise.
-   * Note that rhs is a DofObject, so it is possible that rhs is
-   * not a Node. If rhs is not a Node, then we return false of course.
    */
-  virtual bool operator==(const DofObject& rhs) const;
+  bool operator ==(const Node& rhs) const;
 
 
 #ifdef LIBMESH_HAVE_MPI
