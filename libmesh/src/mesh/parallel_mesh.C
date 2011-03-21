@@ -881,38 +881,6 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
 
 
-void ParallelMesh::fix_broken_node_and_element_numbering ()
-{
-  // We need access to iterators for the underlying containers,
-  // not the mapvector<> reimplementations.
-  mapvector<Node*>::maptype &nodes = this->_nodes;
-  mapvector<Elem*>::maptype &elem  = this->_elements;
-  
-  // Nodes first
-  {
-    mapvector<Node*>::maptype::iterator
-      it  = nodes.begin(),
-      end = nodes.end();
-
-    for (; it != end; ++it)
-      if (it->second != NULL)
-	it->second->set_id() = it->first;
-  }
-
-  // Elements next
-  {
-    mapvector<Elem*>::maptype::iterator
-      it  = elem.begin(),
-      end = elem.end();
-
-    for (; it != end; ++it)
-      if (it->second != NULL)
-	it->second->set_id() = it->first;
-  }
-}
-
-
-
 unsigned int ParallelMesh::n_active_elem () const
 {
   parallel_only();

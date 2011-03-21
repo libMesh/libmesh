@@ -170,11 +170,6 @@ public:
   virtual Real du(const SystemNorm& norm) const = 0;
 
   /**
-   * Is this effectively a steady-state solver?
-   */
-  virtual bool is_steady() const = 0;
-
-  /**
    * This value (which defaults to zero) is the number of times the
    * TimeSolver is allowed to halve deltat and let the DiffSolver
    * repeat the latest failed solve with a reduced timestep.  Note

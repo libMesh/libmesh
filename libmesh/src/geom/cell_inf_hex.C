@@ -94,7 +94,7 @@ unsigned int InfHex::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> InfHex::side (const unsigned int i) const
+AutoPtr<DofObject> InfHex::side (const unsigned int i) const
 {
   libmesh_assert (i < this->n_sides());
 
@@ -109,7 +109,7 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       // elements
       {  
         Elem* face = new Quad4;
-        AutoPtr<Elem> ap_face(face);
+        AutoPtr<DofObject> ap_face(face);
 
 	/*
 	 * Oops, here we are, claiming the normal of the face
@@ -132,7 +132,7 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       // this face connects to another infinite element
       {
         Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
+        AutoPtr<DofObject> ap_face(face);
 
 	face->set_node(0) = this->get_node(0);
 	face->set_node(1) = this->get_node(1);
@@ -146,7 +146,7 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       // this face connects to another infinite element
       {
         Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
+        AutoPtr<DofObject> ap_face(face);
 	//AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = this->get_node(1);
@@ -161,7 +161,7 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       // this face connects to another infinite element
       {
         Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
+        AutoPtr<DofObject> ap_face(face);
 	//AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = this->get_node(2);
@@ -176,7 +176,7 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       // this face connects to another infinite element
       {  
         Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
+        AutoPtr<DofObject> ap_face(face);
 	//AutoPtr<Elem> face(new InfQuad4);
 
 	face->set_node(0) = this->get_node(3);
@@ -190,13 +190,13 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
     default:
       {
 	libmesh_error();
-	AutoPtr<Elem> ap(NULL);  return ap;
+	AutoPtr<DofObject> ap(NULL);  return ap;
       }
     }
 
   // We'll never get here.
   libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  AutoPtr<DofObject> ap(NULL);  return ap;
 }
 
 

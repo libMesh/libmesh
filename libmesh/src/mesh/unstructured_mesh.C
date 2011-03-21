@@ -245,7 +245,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 		if (bounds.first != bounds.second)
 		  {
 		    // Get the side for this element
-		    const AutoPtr<Elem> my_side(element->side(ms));
+		    const AutoPtr<DofObject> my_side(element->side(ms));
 
 		    // Look at all the entries with an equivalent key
 		    while (bounds.first != bounds.second)
@@ -255,7 +255,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 			
 			// Get the side for the neighboring element
 			const unsigned int ns = bounds.first->second.second;
-			const AutoPtr<Elem> their_side(neighbor->side(ns));
+			const AutoPtr<DofObject> their_side(neighbor->side(ns));
                         //libmesh_assert (my_side.get() != NULL);
                         //libmesh_assert (their_side.get() != NULL);			
 

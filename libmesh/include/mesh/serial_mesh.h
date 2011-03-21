@@ -35,6 +35,15 @@ namespace libMesh
 
 
 
+// Prototype this function so we can delcare it a friend.
+class SerialMesh;
+namespace MeshTools {
+  namespace Private {
+    void fix_broken_node_and_element_numbering (SerialMesh &);
+  }
+}
+
+
 /**
  * The \p SerialMesh class is derived from the \p MeshBase class,
  * and currently represents the default Mesh implementation.
@@ -125,13 +134,7 @@ class SerialMesh : public UnstructuredMesh
   virtual void delete_elem (Elem* e) ;
   virtual void renumber_elem (unsigned int old_id, unsigned int new_id);
 
-    /**
-     * There is no reason for a user to ever call this function.
-     *
-     * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n. 
-     */
-  virtual void fix_broken_node_and_element_numbering ();
+  friend void MeshTools::Private::fix_broken_node_and_element_numbering (SerialMesh &);
   
 public:
   /**

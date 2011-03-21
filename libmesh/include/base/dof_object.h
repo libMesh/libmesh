@@ -255,8 +255,8 @@ public:
   /**
    * Implemented in Elem and Node.
    */
-//  virtual bool operator==(const DofObject& ) const
-//  { libmesh_error(); return false; }
+  virtual bool operator==(const DofObject& ) const
+  { libmesh_error(); return false; }
 
   
   /**

@@ -61,7 +61,7 @@ unsigned int Tri::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Tri::side (const unsigned int i) const
+AutoPtr<DofObject> Tri::side (const unsigned int i) const
 {
   libmesh_assert (i < this->n_sides());
 
@@ -74,7 +74,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(0);
 	edge->set_node(1) = this->get_node(1);
 	
-        AutoPtr<Elem> ap_edge(edge);
+        AutoPtr<DofObject> ap_edge(edge);
 	return ap_edge;
       }
     case 1:
@@ -82,7 +82,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(1);
 	edge->set_node(1) = this->get_node(2);
 	
-        AutoPtr<Elem> ap_edge(edge);
+        AutoPtr<DofObject> ap_edge(edge);
 	return ap_edge;
       }
     case 2:
@@ -90,7 +90,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
 	edge->set_node(0) = this->get_node(2);
 	edge->set_node(1) = this->get_node(0);
 	
-        AutoPtr<Elem> ap_edge(edge);
+        AutoPtr<DofObject> ap_edge(edge);
 	return ap_edge;
       }
     default:
@@ -102,7 +102,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
   
   // We will never get here...  Look at the code above.
   libmesh_error();
-  AutoPtr<Elem> ap_edge(edge);
+  AutoPtr<DofObject> ap_edge(edge);
   return ap_edge;
 }
 

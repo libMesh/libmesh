@@ -326,7 +326,24 @@ void EquationSystems::_read_impl (const std::string& name,
       
       // Undo the temporary numbering.
       if (!read_legacy_format)
-        _mesh.fix_broken_node_and_element_numbering();
+	{
+	  if (dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh)))
+	    {
+	      ParallelMesh *mesh = dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh));    
+	      MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+	    }
+	  else if (dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh)))
+	    {
+	      SerialMesh *mesh = dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh));    
+	      MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+	    }
+	  else
+	    {
+	      libMesh::err << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+			    << std::endl;
+	      libmesh_error();
+	    }	  
+	}
     }  
 
   STOP_LOG("read()","EquationSystems");
@@ -521,7 +538,22 @@ void EquationSystems::write(const std::string& name,
   // the EquationSystems::write() method should look constant,
   // but we need to undo the temporary numbering of the nodes
   // and elements in the mesh, which requires that we abuse const_cast
-  const_cast<MeshBase&>(_mesh).fix_broken_node_and_element_numbering();
+  if (dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh)))
+    {
+      ParallelMesh *mesh = dynamic_cast<ParallelMesh*>(const_cast<MeshBase*>(&_mesh));    
+      MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+    }
+  else if (dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh)))
+    {
+      SerialMesh *mesh = dynamic_cast<SerialMesh*>(const_cast<MeshBase*>(&_mesh));    
+      MeshTools::Private::fix_broken_node_and_element_numbering(*mesh);
+    }
+  else
+    {
+      libMesh::err << "ERROR:  dynamic_cast<> to ParallelMesh and SerialMesh failed!"
+		    << std::endl;
+      libmesh_error();
+    }
 }
 
 } // namespace libMesh

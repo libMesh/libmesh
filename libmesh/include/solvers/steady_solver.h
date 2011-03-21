@@ -100,12 +100,7 @@ public:
    * successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
    * but for this class just returns 0.
    */
-  virtual Real du(const SystemNorm&) const { return 0; }
-
-  /**
-   * This is a steady-state solver.
-   */
-  virtual bool is_steady() const { return true; }
+  virtual Real du(const SystemNorm&) const { return 0; };
 };
 
 

@@ -123,7 +123,7 @@ class Edge : public Elem
    * The \p Elem::side() member returns 
    * an auto pointer to a NodeElem for the specified node.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  AutoPtr<DofObject> side (const unsigned int i) const;
 
   /**
    * The \p Elem::side() member returns 
