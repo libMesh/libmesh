@@ -373,7 +373,7 @@ SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
 {
   int ierr=0;
   
-  if (_snes)
+  if (this->initialized())
     {
       ierr = SNESGetConvergedReason(_snes, &_reason);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
