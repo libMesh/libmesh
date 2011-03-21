@@ -377,6 +377,24 @@ namespace MeshTools
      *
      */
     void globally_renumber_nodes_and_elements (MeshBase &);
+
+  
+    /**
+     * There is no reason for a user to ever call this function.
+     *
+     * This function restores a previously broken element/node numbering such that
+     * \p mesh.node(n)->id() == n. 
+     */
+    void fix_broken_node_and_element_numbering (SerialMesh &);
+    
+
+    /**
+     * There is no reason for a user to ever call this function.
+     *
+     * This function restores a previously broken element/node numbering such that
+     * \p mesh.node(n)->id() == n. 
+     */
+    void fix_broken_node_and_element_numbering (ParallelMesh &);
   } // end namespace Private
   
 } // end namespace MeshTools

@@ -891,11 +891,10 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
 
       // This residual should only be called by unsteady solvers:
       // if the mesh is steady, there's no mesh convection term!
-      UnsteadySolver *unsteady;
-      if (this->time_solver->is_steady())
+      UnsteadySolver *unsteady =
+        dynamic_cast<UnsteadySolver *>(this->time_solver.get());
+      if (!unsteady)
         return request_jacobian;
-      else
-	unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
 
       const std::vector<Real> &JxW = 
         context.element_fe_var[var]->get_JxW();

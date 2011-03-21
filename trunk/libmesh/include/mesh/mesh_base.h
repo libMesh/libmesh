@@ -388,15 +388,6 @@ public:
    */
   virtual void renumber_nodes_and_elements () = 0;    
 
-    /**
-     * There is no reason for a user to ever call this function.
-     *
-     * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n. 
-     */
-  virtual void fix_broken_node_and_element_numbering () = 0;
-  
-
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Delete subactive (i.e. children of coarsened) elements.

@@ -128,6 +128,15 @@ public:
    */
   AutoPtr<Elem> build_side (const unsigned int i,
 			    bool proxy) const;
+/*    {  */
+/*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
+/*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */
+/*     Elem* side = libmesh_cast_ptr<Elem*>(ap_dof_object.release()); */
+/*     libmesh_assert(side); // libmesh_assert that the cast was successful */
+    
+/*     AutoPtr<Elem> ap(side); */
+/*     return ap; */
+/*   } */
 
   virtual void connectivity(const unsigned int sf,
 			    const IOPackage iop,

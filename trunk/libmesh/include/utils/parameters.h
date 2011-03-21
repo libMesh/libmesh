@@ -84,9 +84,6 @@ public:
   /**
    * @returns \p true if a parameter of type \p T
    * with a specified name exists, \p false otherwise.
-   *
-   * If RTTI has been disabled then we return \p true
-   * if a parameter of specified name exists regardless of its type.
    */
   template <typename T>
   bool have_parameter (const std::string&) const;
@@ -117,13 +114,11 @@ public:
    */
   unsigned int n_parameters () const { return _values.size(); }
 
-#ifdef LIBMESH_HAVE_RTTI
   /**
    * @returns the number of parameters of the requested type.
    */
   template <typename T>
   unsigned int n_parameters () const;
-#endif // LIBMESH_HAVE_RTTI
   
   /**
    * Clears internal data structures & frees any allocated memory.
@@ -149,13 +144,11 @@ private:
      */
     virtual ~Value() {};
 
-#ifdef LIBMESH_HAVE_RTTI
     /**
      * String identifying the type of parameter stored.
      * Must be reimplemented in derived classes.
      */
     virtual std::string type () const = 0;
-#endif // LIBMESH_HAVE_RTTI
 
     /**
      * Prints the parameter value to the specified stream.
@@ -191,12 +184,10 @@ public:
      */
     T& set () { return _value; }
 
-#ifdef LIBMESH_HAVE_RTTI
     /**
      * String identifying the type of parameter stored.
      */
     virtual std::string type () const;
-#endif // LIBMESH_HAVE_RTTI
 
     /**
      * Prints the parameter value to the specified stream.
@@ -259,17 +250,12 @@ private:
 
 // ------------------------------------------------------------
 // Parameters::Parameter<> class inline methods
-
-// This only works with Run-Time Type Information, even though
-// typeid(T) *should* be determinable at compile time regardless...
-#ifdef LIBMESH_HAVE_RTTI
 template <typename T>
 inline
 std::string Parameters::Parameter<T>::type () const
 {
   return typeid(T).name();
 }
-#endif
 
 
 
@@ -362,9 +348,7 @@ void Parameters::print (std::ostream& os) const
   while (it != _values.end())
     {
       os << " "   << it->first
-#ifdef LIBMESH_HAVE_RTTI
 	 << "\t " << it->second->type()
-#endif // LIBMESH_HAVE_RTTI
 	 << "\t ";   it->second->print(os);      
       os << '\n';
 
@@ -393,7 +377,7 @@ bool Parameters::have_parameter (const std::string& name) const
   Parameters::const_iterator it = _values.find(name);
 
   if (it != _values.end())
-    if (libmesh_cast_ptr<const Parameter<T>*>(it->second) != NULL)
+    if (dynamic_cast<const Parameter<T>*>(it->second) != NULL)
       return true;
 
   return false;
@@ -407,10 +391,8 @@ const T& Parameters::get (const std::string& name) const
 {
   if (!this->have_parameter<T>(name))
     {
-      libMesh::err << "ERROR: no"
-#ifdef LIBMESH_HAVE_RTTI
-		    << ' ' << typeid(T).name()
-#endif // LIBMESH_HAVE_RTTI
+      libMesh::err << "ERROR: no "
+		    << typeid(T).name()
 		    << " parameter named \""
 		    << name << "\":" << std::endl
 		    << *this;
@@ -456,7 +438,6 @@ void Parameters::remove (const std::string& name)
 
 
 
-#ifdef LIBMESH_HAVE_RTTI
 template <typename T>
 inline
 unsigned int Parameters::n_parameters () const
@@ -472,7 +453,6 @@ unsigned int Parameters::n_parameters () const
 
   return cnt;	 
 }
-#endif
 
 inline
 Parameters::iterator Parameters::begin()

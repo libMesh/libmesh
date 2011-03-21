@@ -140,11 +140,6 @@ public:
   virtual Real du (const SystemNorm&) const { return 0.; }
 
   /**
-   * This is effectively a steady-state solver.
-   */
-  virtual bool is_steady() const { return true; }
-
-  /**
    * The EigenSolver object.  This is what actually 
    * makes the calls to SLEPc.
    */

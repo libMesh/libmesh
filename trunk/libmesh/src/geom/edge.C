@@ -27,13 +27,13 @@ namespace libMesh
 {
 
 
-AutoPtr<Elem> Edge::side (const unsigned int i) const
+AutoPtr<DofObject> Edge::side (const unsigned int i) const
 {
   libmesh_assert(i < 2);
   const Elem* parent = this;
   Elem *nodeelem = new NodeElem(const_cast<Elem*>(parent));
   nodeelem->set_node(0) = this->get_node(i);
-  return AutoPtr<Elem>(nodeelem);
+  return AutoPtr<DofObject>(nodeelem);
 }
 
 

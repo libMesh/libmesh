@@ -132,8 +132,8 @@ class RemoteElem : public Elem
   virtual unsigned int n_sub_elem () const
   { libmesh_error(); return 0; }
 
-  virtual AutoPtr<Elem> side (const unsigned int) const
-  { libmesh_error(); return AutoPtr<Elem>(NULL); }
+  virtual AutoPtr<DofObject> side (const unsigned int) const
+  { libmesh_error(); return AutoPtr<DofObject>(NULL); }
   
   virtual AutoPtr<Elem> build_side (const unsigned int,
 				    bool) const

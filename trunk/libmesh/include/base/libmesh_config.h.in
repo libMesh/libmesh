@@ -189,9 +189,6 @@
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
 #undef HAVE_RPC_RPC_H
 
-/* define if the compiler supports Run-Time Type Identification */
-#undef HAVE_RTTI
-
 /* Flag indicating whether or not Space filling curves are available */
 #undef HAVE_SFCURVES
 
