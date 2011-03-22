@@ -107,11 +107,12 @@ void DerivedRBSystem<Base>::load_basis_function(unsigned int i)
 }
 
 template <class Base>
-void DerivedRBSystem<Base>::write_offline_data_to_files(const std::string& directory_name)
+void DerivedRBSystem<Base>::write_offline_data_to_files(const std::string& directory_name,
+                                                        const RBSystem::RBDataIO io_flag)
 {
   generate_residual_terms_wrt_truth();
   
-  Base::write_offline_data_to_files(directory_name);
+  Base::write_offline_data_to_files(directory_name, io_flag);
 }
 
 template <class Base>

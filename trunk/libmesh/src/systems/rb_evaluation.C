@@ -61,6 +61,11 @@ void RBEvaluation::clear()
   }
   basis_functions.resize(0);
 
+  // Clear the Greedy param list
+  for(unsigned int i=0; i<greedy_param_list.size(); i++)
+    greedy_param_list[i].clear();
+  greedy_param_list.clear();
+
 }
 
 void RBEvaluation::initialize()
@@ -493,6 +498,30 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       }
     }
     RB_Aq_Aq_norms_out.close();
+
+    // Also, write out the greedily selected parameters
+    {
+      std::ofstream greedy_params_out;
+      {
+        OStringStream file_name;
+        file_name << directory_name << "/greedy_params.dat";
+        greedy_params_out.open(file_name.str().c_str());
+      }
+      if ( !greedy_params_out.good() )
+      {
+        libMesh::err << "Error opening greedy_params.dat" << std::endl;
+        libmesh_error();
+      }
+      for(unsigned int i=0; i<greedy_param_list.size(); i++)
+      {
+        for(unsigned int j=0; j<rb_sys.get_n_params(); j++)
+        {
+          greedy_params_out << greedy_param_list[i][j] << " ";
+        }
+        greedy_params_out << std::endl;
+      }
+      greedy_params_out.close();
+    }
 
   }
 

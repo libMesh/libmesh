@@ -432,18 +432,34 @@ public:
   void add_scaled_Aq(Number scalar, unsigned int q_a,
                      SparseMatrix<Number>* input_matrix,
                      bool symmetrize);
+  
+  /**
+   * A convenient enum that allows us to specify whether we want
+   * to write out all the data, or just a basis (in)dependent subset.
+   */
+  enum RBDataIO { ALL_DATA          = 1,
+                  BASIS_DEPENDENT   = 2,
+                  BASIS_INDEPENDENT = 3 };
 
   /**
    * Write out all the data to text files in order to segregate the
    * Offline stage from the Online stage.
+   * \p directory_name specifies which directory to write to.
+   * \p io_flag specifies whether we write out all data, or only
+   * a basis (in)dependent subset.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data");
+  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
+                                           const RBDataIO io_flag = ALL_DATA);
 
   /**
    * Read in the saved Offline reduced basis data
    * to initialize the system for Online solves.
+   * \p directory_name specifies which directory to read from.
+   * \p io_flag specifies whether we read in all data, or only
+   * a basis (in)dependent subset.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
+  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
+                                            const RBDataIO io_flag = ALL_DATA);
   
   /**
    * This function computes all of the residual terms, can be useful
@@ -537,11 +553,6 @@ public:
    * for each output.
    */
   std::vector< std::vector< Number > > output_dual_norms;
-
-  /**
-   * The list of parameters selected by the Greedy algorithm.
-   */
-  std::vector< std::vector<Real> > greedy_param_list;
 
   /**
    * Vectors storing the residual representors.

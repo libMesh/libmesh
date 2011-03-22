@@ -123,7 +123,8 @@ public:
    * Offline stage from the Online stage. Overload to call generate_residual_terms_wrt_truth
    * before writing begins.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data");
+  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
+                                           const RBSystem::RBDataIO io_flag = RBSystem::ALL_DATA);
 
 
   //----------- PUBLIC DATA MEMBERS -----------//

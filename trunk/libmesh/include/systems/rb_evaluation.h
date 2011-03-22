@@ -127,6 +127,12 @@ public:
   std::vector< NumericVector<Number>* > basis_functions;
 
   /**
+   * The list of parameters selected by the Greedy algorithm in generating
+   * the Reduced Basis associated with this RBEvaluation object.
+   */
+  std::vector< std::vector<Real> > greedy_param_list;
+
+  /**
    * The inner product matrix. This should be close to the identity,
    * we need to calculate this rather than assume diagonality in order
    * to accurately perform projections since orthogonality degrades
