@@ -207,11 +207,6 @@ void RBSystem::clear_basis_function_dependent_data()
 {
   update_residual_terms_called = false;
 
-  // Clear the Greedy param list
-  for(unsigned int i=0; i<greedy_param_list.size(); i++)
-    greedy_param_list[i].clear();
-  greedy_param_list.clear();
-
   clear_basis_helper();
 }
 
@@ -1320,9 +1315,9 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
   int count = 1;
 
   // Clear the Greedy param list
-  for(unsigned int i=0; i<greedy_param_list.size(); i++)
-    greedy_param_list[i].clear();
-  greedy_param_list.clear();
+  for(unsigned int i=0; i<rb_eval->greedy_param_list.size(); i++)
+    rb_eval->greedy_param_list[i].clear();
+  rb_eval->greedy_param_list.clear();
 
   Real training_greedy_error;
 
@@ -1426,19 +1421,19 @@ bool RBSystem::greedy_termination_test(Real training_greedy_error, int)
 
 void RBSystem::update_greedy_param_list()
 {
-  greedy_param_list.push_back( get_current_parameters() );
+  rb_eval->greedy_param_list.push_back( get_current_parameters() );
 }
 
 std::vector<Real> RBSystem::get_greedy_parameter(unsigned int i)
 {
-  if( i >= greedy_param_list.size() )
+  if( i >= rb_eval->greedy_param_list.size() )
   {
     libMesh::out << "Error: Argument in RBSystem::get_greedy_parameter is too large."
                  << std::endl;
     libmesh_error();
   }
 
-  return greedy_param_list[i];
+  return rb_eval->greedy_param_list[i];
 }
 
 Real RBSystem::truth_solve(int plot_solution)
@@ -2698,11 +2693,19 @@ void RBSystem::zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp)
 
 
 
-void RBSystem::write_offline_data_to_files(const std::string& directory_name)
+void RBSystem::write_offline_data_to_files(const std::string& directory_name,
+                                           const RBDataIO io_flag)
 {
   START_LOG("write_offline_data_to_files()", "RBSystem");
 
-  rb_eval->write_offline_data_to_files(directory_name);
+  if( (io_flag == ALL_DATA) || (io_flag == BASIS_DEPENDENT) )
+  {
+    rb_eval->write_offline_data_to_files(directory_name);
+  }
+  
+  // return here if we only want basis dependent data
+  if( io_flag == BASIS_DEPENDENT )
+    return;
 
   const unsigned int precision_level = 14;
 
@@ -2712,36 +2715,11 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
     // Make a directory to store all the data files
     if( mkdir(directory_name.c_str(), 0777) != -1)
     {
-      // The directory must already exist due to the call
+      // The directory must already exist if we called
       // rb_eval->write_offline_data_to_files(directory_name);
-      // Hence throw an error if it doesn't
-      libMesh::out << "In RBSystem::write_offline_data_to_files, directory "
-                   << directory_name << " should already exist." << std::endl;
-      libmesh_error();
-    }
-
-    // Also, write out the greedily selected parameters
-    {
-      std::ofstream greedy_params_out;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/greedy_params.dat";
-        greedy_params_out.open(file_name.str().c_str());
-      }
-      if ( !greedy_params_out.good() )
-      {
-        libMesh::err << "Error opening greedy_params.dat" << std::endl;
-        libmesh_error();
-      }
-      for(unsigned int i=0; i<greedy_param_list.size(); i++)
-      {
-        for(unsigned int j=0; j<get_n_params(); j++)
-        {
-          greedy_params_out << greedy_param_list[i][j] << " ";
-        }
-        greedy_params_out << std::endl;
-      }
-      greedy_params_out.close();
+      // Hence assert that io_flag is ALL_DATA (we would
+      // have returned above if it were BASIS_DEPENDENT only)
+      libmesh_assert(io_flag == ALL_DATA);
     }
 
     // Write out output data
@@ -2883,11 +2861,19 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name)
 
 
 
-void RBSystem::read_offline_data_from_files(const std::string& directory_name)
+void RBSystem::read_offline_data_from_files(const std::string& directory_name,
+                                            const RBDataIO io_flag)
 {
   START_LOG("read_offline_data_from_files()", "RBSystem");
 
-  rb_eval->read_offline_data_from_files(directory_name);
+  if( (io_flag == ALL_DATA) || (io_flag == BASIS_DEPENDENT) )
+  {
+    rb_eval->read_offline_data_from_files(directory_name);
+  }
+
+  // Return here if we only want basis dependent data
+  if( io_flag == BASIS_DEPENDENT )
+    return;
 
   // Read in output data
   for(unsigned int n=0; n<get_n_outputs(); n++)

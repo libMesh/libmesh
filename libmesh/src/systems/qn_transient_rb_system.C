@@ -1056,11 +1056,16 @@ Real QNTransientRBSystem::get_SCM_upper_bound()
 
 
 
-void QNTransientRBSystem::write_offline_data_to_files(const std::string& directory_name)
+void QNTransientRBSystem::write_offline_data_to_files(const std::string& directory_name,
+                                                      RBDataIO io_flag)
 {
   START_LOG("write_offline_data_to_files()", "QNTransientRBSystem");
 
-  Parent::write_offline_data_to_files(directory_name);
+  Parent::write_offline_data_to_files(directory_name, io_flag);
+  
+  // return here if we only want basis dependent data
+  if(io_flag == BASIS_DEPENDENT)
+    return;
 
   if (store_representors)
     {
@@ -1122,11 +1127,16 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
 
 
 
-void QNTransientRBSystem::read_offline_data_from_files(const std::string& directory_name)
+void QNTransientRBSystem::read_offline_data_from_files(const std::string& directory_name,
+                                                       const RBDataIO io_flag)
 {
   START_LOG("read_offline_data_from_files()", "QNTransientRBSystem");
 
-  Parent::read_offline_data_from_files(directory_name);
+  Parent::read_offline_data_from_files(directory_name, io_flag);
+  
+  // return if we only want basis dependent data
+  if(io_flag == BASIS_DEPENDENT)
+    return;
 
   // Read in the residual representors from file if requested
   if (store_representors)

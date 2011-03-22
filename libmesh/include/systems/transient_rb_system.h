@@ -279,14 +279,16 @@ public:
    * write out the mass matrix and initial condition
    * data as well.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name="offline_data");
+  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
+                                           const RBDataIO io_flag = ALL_DATA);
 
   /**
    * Overload read_offline_data_from_files in order to
    * read in the mass matrix and initial condition
    * data as well.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name="offline_data");
+  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
+                                            const RBDataIO io_flag = ALL_DATA);
 
 
   //----------- PUBLIC DATA MEMBERS -----------//

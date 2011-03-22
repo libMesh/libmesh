@@ -232,7 +232,7 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
     {
         if (anchors_are_equal)
         {
-            for (unsigned int i=2; i< _rb_system.greedy_param_list.size() ; i++)
+            for (unsigned int i=2; i< _rb_system.rb_eval->greedy_param_list.size() ; i++)
             {
                 bool parameters_are_equal = true;
                 for (unsigned int  j = 0; j < left_child->anchor.size(); j++)

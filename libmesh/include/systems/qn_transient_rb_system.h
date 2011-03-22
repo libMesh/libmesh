@@ -208,14 +208,16 @@ public:
    * Offline data specific to quadratically nonlinear
    * problems.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data");
+  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
+                                           RBDataIO io_flag = ALL_DATA);
 
   /**
    * Overload this function to read in the extra
    * Offline data specific to quadratically nonlienar
    * problems.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
+  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
+                                            RBDataIO io_flag = ALL_DATA);
 
 
   //----------- PUBLIC DATA MEMBERS -----------//

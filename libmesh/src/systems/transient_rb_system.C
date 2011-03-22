@@ -1712,11 +1712,16 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
 //}
 
 
-void TransientRBSystem::write_offline_data_to_files(const std::string& directory_name)
+void TransientRBSystem::write_offline_data_to_files(const std::string& directory_name,
+                                                    const RBDataIO io_flag)
 {
   START_LOG("write_offline_data_to_files()", "TransientRBSystem");
 
-  Parent::write_offline_data_to_files(directory_name);
+  Parent::write_offline_data_to_files(directory_name, io_flag);
+
+  // return here if we only want basis dependent data
+  if(io_flag == BASIS_DEPENDENT)
+    return;
 
   // Write out the residual representors to file if requested
   if (store_representors)
@@ -1772,11 +1777,16 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
 
 
 
-void TransientRBSystem::read_offline_data_from_files(const std::string& directory_name)
+void TransientRBSystem::read_offline_data_from_files(const std::string& directory_name,
+                                                     const RBDataIO io_flag)
 {
   START_LOG("read_offline_data_from_files()", "TransientRBSystem");
 
-  Parent::read_offline_data_from_files(directory_name);
+  Parent::read_offline_data_from_files(directory_name, io_flag);
+  
+  // return here if we only want basis dependent data
+  if(io_flag == BASIS_DEPENDENT)
+    return;
 
   // Read in the representors if requested
   if (store_representors)

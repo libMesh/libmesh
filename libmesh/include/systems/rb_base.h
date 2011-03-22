@@ -240,20 +240,6 @@ public:
   virtual Number eval_theta_q_a(unsigned int q);
 
   /**
-   * Write out all the data to text files in order to segregate the
-   * Offline stage from the Online stage.
-   * Needs to be defineed in subclass.
-   */
-  virtual void write_offline_data_to_files(const std::string& directory_name) = 0;
-
-  /**
-   * Read in the saved Offline reduced basis data
-   * to initialize the system for Online solves.
-   * Needs to be defineed in subclass.
-   */
-  virtual void read_offline_data_from_files(const std::string& directory_name) = 0;
-
-  /**
    * Changes the current PC (and iterative solver, if desired) in the
    * passed-in LinearSolver object to an alternative solver specified
    * by the alternative_solver string stored in this class.  You might
