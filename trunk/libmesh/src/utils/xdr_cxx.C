@@ -579,7 +579,7 @@ void Xdr::do_write(std::vector<T>& a) {
     {
       libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
       this->do_write(a[i]);
-      *out << "\t "
+      *out << "\t ";
     }
 }
 
@@ -592,7 +592,7 @@ void Xdr::do_write(std::vector<std::complex<T> >& a) {
     {
       libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
       this->do_write(a[i]);
-      *out << "\t "
+      *out << "\t ";
     }
 }
 
