@@ -1721,7 +1721,10 @@ void TransientRBSystem::write_offline_data_to_files(const std::string& directory
 
   // return here if we only want basis dependent data
   if(io_flag == BASIS_DEPENDENT)
+  {
+    STOP_LOG("write_offline_data_to_files()", "TransientRBSystem");
     return;
+  }
 
   // Write out the residual representors to file if requested
   if (store_representors)
@@ -1786,7 +1789,10 @@ void TransientRBSystem::read_offline_data_from_files(const std::string& director
   
   // return here if we only want basis dependent data
   if(io_flag == BASIS_DEPENDENT)
+  {
+    STOP_LOG("read_offline_data_from_files()", "TransientRBSystem");
     return;
+  }
 
   // Read in the representors if requested
   if (store_representors)
