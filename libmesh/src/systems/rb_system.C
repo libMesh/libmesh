@@ -127,6 +127,8 @@ RBSystem::~RBSystem ()
 
 void RBSystem::clear()
 {
+  START_LOG("clear()", "RBSystem");
+
   Parent::clear();
 
   for(unsigned int q=0; q<A_q_vector.size(); q++)
@@ -201,6 +203,8 @@ void RBSystem::clear()
   {
     rb_eval = NULL;
   }
+
+  STOP_LOG("clear()", "RBSystem");
 }
 
 void RBSystem::clear_basis_function_dependent_data()
@@ -2705,7 +2709,10 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name,
   
   // return here if we only want basis dependent data
   if( io_flag == BASIS_DEPENDENT )
+  {
+    STOP_LOG("write_offline_data_to_files()", "RBSystem");
     return;
+  }
 
   const unsigned int precision_level = 14;
 
@@ -2873,7 +2880,10 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name,
 
   // Return here if we only want basis dependent data
   if( io_flag == BASIS_DEPENDENT )
+  {
+    STOP_LOG("read_offline_data_from_files()", "RBSystem");
     return;
+  }
 
   // Read in output data
   for(unsigned int n=0; n<get_n_outputs(); n++)

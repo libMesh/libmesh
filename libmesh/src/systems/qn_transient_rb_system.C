@@ -1065,7 +1065,10 @@ void QNTransientRBSystem::write_offline_data_to_files(const std::string& directo
   
   // return here if we only want basis dependent data
   if(io_flag == BASIS_DEPENDENT)
+  {
+    STOP_LOG("write_offline_data_to_files()", "QNTransientRBSystem");
     return;
+  }
 
   if (store_representors)
     {
@@ -1136,7 +1139,10 @@ void QNTransientRBSystem::read_offline_data_from_files(const std::string& direct
   
   // return if we only want basis dependent data
   if(io_flag == BASIS_DEPENDENT)
+  {
+    STOP_LOG("read_offline_data_from_files()", "QNTransientRBSystem");
     return;
+  }
 
   // Read in the residual representors from file if requested
   if (store_representors)

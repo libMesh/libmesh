@@ -49,6 +49,8 @@ RBEvaluation::~RBEvaluation()
 
 void RBEvaluation::clear()
 {
+  START_LOG("clear()", "RBEvaluation");
+
   // Clear the basis functions
   for(unsigned int i=0; i<basis_functions.size(); i++)
   {
@@ -66,6 +68,7 @@ void RBEvaluation::clear()
     greedy_param_list[i].clear();
   greedy_param_list.clear();
 
+  STOP_LOG("clear()", "RBEvaluation");
 }
 
 void RBEvaluation::initialize()
