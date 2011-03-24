@@ -119,7 +119,7 @@ vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 			for (;nd!=nd_end;++nd)
 			{
 				Node* node = (*nd);
-				float* pnt = new float[LIBMESH_DIM];
+				float pnt[LIBMESH_DIM];
 				for(unsigned int i=0;i<LIBMESH_DIM;++i){
 					pnt[i] = (*node)(i);
 				} 
@@ -128,7 +128,6 @@ vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 				//     libMesh::out<<"pnt "<<pnt[0]<<" "<<pnt[1]<<" "<<pcoords-><<std::endl;  
 				//     points->InsertPoint(node->id(),pnt);
 				//     libMesh::out<<"point "<<node->id()<<" "<<(*node)(0)<<" "<<(*node)(1)<<std::endl;  
-				delete [] pnt;
 			}
 			points->SetData(pcoords);
 			pcoords->Delete();
@@ -137,10 +136,7 @@ vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 	return NULL;
 }
 
-vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, int*& types){
-	//, vtkUnstructuredGrid*& grid){
-	//  MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-	//  const MeshBase::const_element_iterator end = mesh.active_local_elements_end(); 
+vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, std::vector<int>& types){
 	if (libMesh::processor_id() == 0)
 	{
 
@@ -148,17 +144,15 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, int*& types){
 		//     cells->Allocate(100000);
 		vtkIdList *pts = vtkIdList::New();
 
-		// for some reason the iterator variant of this code throws an error
-		//     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-		//     MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+		MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+		const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
-		//     for ( ; it != end; ++it)
-		//     {
-		for(unsigned int el_nr =0; el_nr< mesh.n_active_elem(); ++el_nr){
-			Elem *elem  = mesh.elem(el_nr);
-			//         if(elem->active()){ 
-			//       libMesh::out<<"sub elem "<<elem->has_children()<<std::endl;  
-			//       (*it);
+                int active_element_counter = 0;
+
+		for ( ; it != end; ++it) {
+			Elem *elem  = *it;
+			++active_element_counter;
+
 			vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
 
 			switch(elem->type())
@@ -231,7 +225,7 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, int*& types){
 			}
 			//        libMesh::out<<"elem "<<elem->n_nodes()<<" "<<elem->n_sub_elem()<<std::endl;  
 			//        libMesh::out<<"type "<<celltype<<" "<<VTK_BIQUADRATIC_QUAD<<std::endl;  
-			types[elem->id()] = celltype;
+			types[active_element_counter] = celltype;
 			pts->SetNumberOfIds(elem->n_nodes());
 			// get the connectivity for this element
 			std::vector<unsigned int> conn;
@@ -599,7 +593,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
   vtkXMLPUnstructuredGridWriter* writer = 0;
   vtkPoints* pnts = 0;
   vtkCellArray* cells = 0;
-  int * types = 0;
+  std::vector<int> types;
 
   if (libMesh::processor_id() == 0){
 
@@ -617,11 +611,11 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  pnts = nodes_to_vtk(mesh);
 	  _vtk_grid->SetPoints(pnts);
 	 
-	  types = new int[mesh.n_active_elem()];
+	  types.resize(mesh.n_active_elem());
 //	  libMesh::out<<"get cells"<<std::endl;  
 	  cells = cells_to_vtk(mesh, types);
 //	  libMesh::out<<"set cells"<<std::endl;  
-	  _vtk_grid->SetCells(types,cells);
+	  _vtk_grid->SetCells(&types[0],cells);
   }
 	  
 	  // I'd like to write out meshdata, but this requires some coding, in
@@ -646,7 +640,6 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  writer->SetDataModeToAscii();
 	  writer->Write();
 
-	  delete [] types;
 	  pnts->Delete();
 	  cells->Delete();
 	  _vtk_grid->Delete();
@@ -679,9 +672,9 @@ void VTKIO::write (const std::string& name)
 	  _vtk_grid->SetPoints(pnts);
 
 //	  libMesh::out<<"write elements "<<std::endl;  
-	  int * types = new int[mesh.n_active_elem()];
+	  std::vector<int> types(mesh.n_active_elem());
 	  vtkCellArray* cells = cells_to_vtk(mesh,types);
-	  _vtk_grid->SetCells(types,cells);
+	  _vtk_grid->SetCells(&types[0],cells);
 	  //  , _vtk_grid);
 	  writer->SetInput(_vtk_grid);
 	  writer->SetDataModeToAscii();

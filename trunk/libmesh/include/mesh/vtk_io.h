@@ -114,7 +114,7 @@ private:
   /** 
    * write the cells from the mesh into a vtkUnstructuredGrid
    */
-  vtkCellArray* cells_to_vtk(const MeshBase& mesh, int*& types);
+  vtkCellArray* cells_to_vtk(const MeshBase& mesh, std::vector<int>& types);
 //  , vtkUnstructuredGrid*& grid);
 
   /**
