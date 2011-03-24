@@ -85,14 +85,25 @@ EXTERN_C_FOR_PETSC_END
 
 #if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
 typedef PetscTruth PetscBool;
-// libMesh currently holds zero long-lived IS, it always creates an IS with a std::vector<int>,
-// uses it through the Vec or Mat API, and destroys the IS.  This can always be done without a
-// copy, so we assume mode = PETSC_USE_POINTER (the IS just uses the array, without ownership).
-#  if PETSC_VERSION_LESS_THAN(2,2,1)         // Cannot avoid a copy
-#    define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(is))
-#  else
-#    define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneralWithArray((comm),(n),(idx),(is))
-#  endif
+#endif
+
+#if PETSC_VERSION_LESS_THAN(2,2,1)
+// This version of PETSc always makes a copy. Current occurrences of PETSC_USE_POINTER are safe with the definition below.
+typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCopyMode;
+#  define ISCreateLibMesh(comm,n,idx,mode,is)                           \
+  ((mode) == PETSC_OWN_POINTER                                          \
+   ? (ISCreateGeneral((comm),(n),(idx),(is)) || PetscFree(idx) || (*(idx) = PETSC_NULL)) \
+   : (ISCreateGeneral((comm),(n),(idx),(is))))
+#elif PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCopyMode;
+#  define ISCreateLibMesh(comm,n,idx,mode,is)           \
+  ((mode) == PETSC_USE_POINTER                          \
+   ? ISCreateGeneralWithArray((comm),(n),(idx),(is))    \
+   : ((mode) == PETSC_OWN_POINTER                       \
+      ? ISCreateGeneralNC((comm),(n),(idx),(is))        \
+      : ISCreateGeneral((comm),(n),(idx),(is))))
+#else
+#  define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
 #endif
 
 #endif // LIBMESH_HAVE_PETSC
