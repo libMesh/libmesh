@@ -766,7 +766,7 @@ protected:
   /**
    * Assemble and store the output vectors.
    */
-  void assemble_all_output_vectors();
+  virtual void assemble_all_output_vectors();
 
   /**
    * Compute and store the dual norm of each output functional.

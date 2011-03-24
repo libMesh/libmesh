@@ -245,6 +245,14 @@ void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
 }
 
 
+template <typename T> 
+void LaspackVector<T>::add_vector_transpose (const NumericVector<T> &,
+				             const SparseMatrix<T> &)
+{
+  libmesh_not_implemented();
+}
+
+
 
 template <typename T>
 void LaspackVector<T>::scale (const T factor)

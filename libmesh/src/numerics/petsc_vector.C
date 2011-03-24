@@ -240,6 +240,25 @@ void PetscVector<T>::add_vector (const DenseVector<T>& V,
 }
 
 
+template <typename T>
+void PetscVector<T>::add_vector_transpose (const NumericVector<T>& V_in,
+				           const SparseMatrix<T>& A_in)
+{
+  this->_restore_array();
+  // Make sure the data passed in are really of Petsc types
+  const PetscVector<T>* V = libmesh_cast_ptr<const PetscVector<T>*>(&V_in);
+  const PetscMatrix<T>* A = libmesh_cast_ptr<const PetscMatrix<T>*>(&A_in);
+
+  int ierr=0;
+
+  A->close();
+
+  // The const_cast<> is not elegant, but it is required since PETSc
+  // is not const-correct.  
+  ierr = MatMultTransposeAdd(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec, _vec);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+}
+
 
 template <typename T>
 void PetscVector<T>::add (const T v_in)

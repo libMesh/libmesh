@@ -214,6 +214,15 @@ void EpetraVector<T>::add_vector (const DenseVector<T>& V_in,
 }
 
 
+// TODO: fill this in after creating an EpetraMatrix
+template <typename T>
+void EpetraVector<T>::add_vector_transpose (const NumericVector<T>& /* V_in */,
+				            const SparseMatrix<T>& /* A_in */)
+{
+  libmesh_not_implemented();
+}
+
+
 
 template <typename T>
 void EpetraVector<T>::add (const T v_in)
