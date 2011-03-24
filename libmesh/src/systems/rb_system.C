@@ -2289,6 +2289,15 @@ void RBSystem::compute_output_dual_norms()
 {
   START_LOG("compute_output_dual_norms()", "RBSystem");
   
+  // Short circuit if we don't have any outputs
+  if( get_n_outputs() == 0 )
+  {
+    output_dual_norms_computed = true;
+
+    STOP_LOG("compute_output_dual_norms()", "RBSystem");
+    return;
+  }
+  
   libMesh::out << "Compute output dual norms" << std::endl;
   
   // Note: the solves in this function employ a single system matrix and multiple
