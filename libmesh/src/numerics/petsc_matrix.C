@@ -198,10 +198,21 @@ void PetscMatrix<T>::zero_rows (std::vector<int> & rows, T diag_value)
 
   int ierr=0;
 
+#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
   if(!rows.empty())
     ierr = MatZeroRows(_mat, rows.size(), &rows[0], diag_value);
   else
     ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value);
+#else
+  // As of petsc-dev at the time of 3.1.0, MatZeroRows now takes two additional
+  // optional arguments.  The optional arguments (x,b) can be used to specify the
+  // solutions for the zeroed rows (x) and right hand side (b) to update.
+  // Could be useful for setting boundary conditions...
+  if(!rows.empty())
+    ierr = MatZeroRows(_mat, rows.size(), &rows[0], diag_value, PETSC_NULL, PETSC_NULL);
+  else
+    ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value, PETSC_NULL, PETSC_NULL);
+#endif
 
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
