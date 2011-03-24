@@ -402,7 +402,7 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int>* const 
 	  petsc_dofs[i] = (*dofs)[i];
 	}
 
-      ierr = ISCreateGeneralNC(libMesh::COMM_WORLD,dofs->size(),petsc_dofs,&_restrict_solve_to_is);
+      ierr = ISCreateLibMesh(libMesh::COMM_WORLD,dofs->size(),petsc_dofs,PETSC_OWN_POINTER,&_restrict_solve_to_is);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 }
