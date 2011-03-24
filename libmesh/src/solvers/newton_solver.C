@@ -304,9 +304,10 @@ unsigned int NewtonSolver::solve()
 
       if (libmesh_isnan(current_residual))
         {
-          libMesh::out << "  Nonlinear solver DIVERGED at step " << last_residual
-                        << " with norm Not-a-Number"
-                        << std::endl;
+          libMesh::out << "  Nonlinear solver DIVERGED at step " 
+                       << _outer_iterations
+                       << " with norm Not-a-Number"
+                       << std::endl;
           libmesh_convergence_failure();
           continue;
         }
