@@ -302,9 +302,9 @@ public:
    * (Interior assembly and boundary assembly).
    * In this case we pass in vector arguments to allow for Q_l > 1.
    */
-  void attach_output(std::vector<theta_q_fptr> theta_q_l,
-                     std::vector<affine_assembly_fptr> output_intrr_assembly,
-                     std::vector<affine_assembly_fptr> output_bndry_assembly);
+  virtual void attach_output(std::vector<theta_q_fptr> theta_q_l,
+                             std::vector<affine_assembly_fptr> output_intrr_assembly,
+                             std::vector<affine_assembly_fptr> output_bndry_assembly);
 
   /**
    * Attach user-defined assembly routine for output. 
@@ -312,9 +312,9 @@ public:
    * This function provides simpler syntax in the case that Q_l = 1; we
    * do not need to use a vector in this case.
    */
-  void attach_output(theta_q_fptr theta_q_l,
-                     affine_assembly_fptr output_intrr_assembly,
-                     affine_assembly_fptr output_bndry_assembly);
+  virtual void attach_output(theta_q_fptr theta_q_l,
+                             affine_assembly_fptr output_intrr_assembly,
+                             affine_assembly_fptr output_bndry_assembly);
 
   /**
    * Get a pointer to inner_product_matrix. Accessing via this
