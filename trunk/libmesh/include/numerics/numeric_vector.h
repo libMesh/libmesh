@@ -428,6 +428,13 @@ public:
 			   const std::vector<unsigned int>& dof_indices) = 0;
 
   /**
+   * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
+   * and a \p NumericVector \p V to \p this, where \p this=U.
+   */
+  virtual void add_vector_transpose (const NumericVector<T>&,
+			             const SparseMatrix<T>&) = 0;
+
+  /**
    * \f$ U=v \f$ where v is a std::vector<T> 
    * and you want to specify WHERE to insert it
    */

@@ -2720,14 +2720,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name,
   {
 
     // Make a directory to store all the data files
-    if( mkdir(directory_name.c_str(), 0777) != -1)
-    {
-      // The directory must already exist if we called
-      // rb_eval->write_offline_data_to_files(directory_name);
-      // Hence assert that io_flag is ALL_DATA (we would
-      // have returned above if it were BASIS_DEPENDENT only)
-      libmesh_assert(io_flag == ALL_DATA);
-    }
+    mkdir(directory_name.c_str(), 0777);
 
     // Write out output data
     for(unsigned int n=0; n<get_n_outputs(); n++)

@@ -333,6 +333,16 @@ public:
    */
   void add_vector (const DenseVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
+
+  /**
+   * \f$U+=A^T*V\f$.
+   * Add the product of the transpose of a Sparse matrix \p A_trans
+   * and a Numeric vector \p V to this Numeric vector.
+   * @e Not @e implemented.
+   */
+  void add_vector_transpose (const NumericVector<T>&,
+		             const SparseMatrix<T>&)
+  { libmesh_error(); }
   
   /**
    * \f$ U=v \f$ where v is a DenseVector<T> 

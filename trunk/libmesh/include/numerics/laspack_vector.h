@@ -338,6 +338,13 @@ class LaspackVector : public NumericVector<T>
    */
   void add_vector (const DenseVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
+
+  /**
+   * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
+   * and a \p NumericVector \p V to \p this, where \p this=U.
+   */
+  void add_vector_transpose (const NumericVector<T> &,
+		             const SparseMatrix<T> &);
   
   /**
    * \f$ U=v \f$ where v is a DenseVector<T> 
