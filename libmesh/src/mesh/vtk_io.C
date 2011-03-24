@@ -149,9 +149,8 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, std::vector<int>& types)
 
                 int active_element_counter = 0;
 
-		for ( ; it != end; ++it) {
+		for ( ; it != end; ++it, ++active_element_counter) {
 			Elem *elem  = *it;
-			++active_element_counter;
 
 			vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
 
@@ -595,12 +594,14 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
   vtkCellArray* cells = 0;
   std::vector<int> types;
 
+  const MeshBase& mesh = es.get_mesh();
+
+  unsigned int n_active_elem = mesh.n_active_elem();
+
   if (libMesh::processor_id() == 0){
 
 	  // check if the filename extension is pvtu
 	  libmesh_assert(fname.substr(fname.rfind("."),fname.size())==".pvtu");
-
-	  const MeshBase& mesh = es.get_mesh();
 
 	  /*
 		* we only use Unstructured grids
@@ -611,7 +612,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  pnts = nodes_to_vtk(mesh);
 	  _vtk_grid->SetPoints(pnts);
 	 
-	  types.resize(mesh.n_active_elem());
+	  types.resize(n_active_elem);
 //	  libMesh::out<<"get cells"<<std::endl;  
 	  cells = cells_to_vtk(mesh, types);
 //	  libMesh::out<<"set cells"<<std::endl;  
@@ -661,10 +662,12 @@ void VTKIO::write (const std::string& name)
   libmesh_error();
 
 #else
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  unsigned int n_active_elem = mesh.n_active_elem();
+
   if (libMesh::processor_id() == 0)
   {
 
-	  MeshBase& mesh = MeshInput<MeshBase>::mesh();
 	  _vtk_grid = vtkUnstructuredGrid::New();
 	  vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
 //	  libMesh::out<<"write nodes "<<std::endl;  
@@ -672,7 +675,7 @@ void VTKIO::write (const std::string& name)
 	  _vtk_grid->SetPoints(pnts);
 
 //	  libMesh::out<<"write elements "<<std::endl;  
-	  std::vector<int> types(mesh.n_active_elem());
+	  std::vector<int> types(n_active_elem);
 	  vtkCellArray* cells = cells_to_vtk(mesh,types);
 	  _vtk_grid->SetCells(&types[0],cells);
 	  //  , _vtk_grid);

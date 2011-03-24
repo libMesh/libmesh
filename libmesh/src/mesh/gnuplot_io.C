@@ -43,19 +43,14 @@ GnuPlotIO::GnuPlotIO(const MeshBase& mesh,
 
 void GnuPlotIO::write(const std::string& fname)
 {
-
-  if(libMesh::processor_id() == 0)
-    this->write_solution(fname);
-
+  this->write_solution(fname);
 }
 
 void GnuPlotIO::write_nodal_data (const std::string& fname,
 				  const std::vector<Number>& soln,
 				  const std::vector<std::string>& names)
 {
-  if(libMesh::processor_id() == 0)
-    this->write_solution(fname, &soln, &names);
-
+  this->write_solution(fname, &soln, &names);
 }
 
 
@@ -65,10 +60,16 @@ void GnuPlotIO::write_solution(const std::string& fname,
    			       const std::vector<Number>* soln,
 			       const std::vector<std::string>* names)
 {
-  libmesh_assert(libMesh::processor_id() == 0);
+  // Even when writing on a serialized ParallelMesh, we expect
+  // non-proc-0 help with calls like n_active_elem
+  // libmesh_assert(libMesh::processor_id() == 0);
 
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
+  unsigned int n_active_elem = mesh.n_active_elem();
+
+  if (libMesh::processor_id() == 0)
+  {
   std::stringstream data_stream_name;
   data_stream_name << fname << "_data";
   const std::string data_file_name = data_stream_name.str();
@@ -112,7 +113,6 @@ void GnuPlotIO::write_solution(const std::string& fname,
     mesh.active_elements_end();
 
   unsigned int count = 0;
-  unsigned int n_active_elem = mesh.n_active_elem();
 
   for( ; it != end_it; ++it)
   {
@@ -223,6 +223,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
   }
 
   data.close();
+  }
 }
 
 } // namespace libMesh
