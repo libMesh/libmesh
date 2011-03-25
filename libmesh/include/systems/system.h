@@ -89,7 +89,78 @@ protected:
   
 public:
 
+  /**
+   * Abstract base class to be used for sysem initialization.
+   * A user class derived from this class may be used to 
+   * intialize the system values by attaching an object 
+   * with the method \p attach_init_object.
+   */
+  class Initialization
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~Initialization () {};
+
+    /**
+     * Initialization function.  This function will be called 
+     * to initialize the system values upon creation and must 
+     * be provided by the user in a derived class.
+     */
+    virtual void initialize () = 0;
+  };
+
   
+
+  /**
+   * Abstract base class to be used for sysem assembly.
+   * A user class derived from this class may be used to 
+   * assemble the system by attaching an object 
+   * with the method \p attach_assemble_object.
+   */
+  class Assembly
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~Assembly () {};
+
+    /**
+     * Assembly function.  This function will be called 
+     * to assemble the system prior to a solve and must 
+     * be provided by the user in a derived class.
+     */
+    virtual void assemble () = 0;
+  };
+
+  
+
+  /**
+   * Abstract base class to be used for sysem assembly.
+   * A user class derived from this class may be used to 
+   * assemble the system by attaching an object
+   * with the method \p attach_constraint_object.
+   */
+  class Constraint
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~Constraint () {};
+
+    /**
+     * Constraint function.  This function will be called 
+     * to constrain the system prior to a solve and must 
+     * be provided by the user in a derived class.
+     */
+    virtual void constrain () = 0;
+  };
+
+  
+
   /**
    * Destructor.
    */
@@ -822,6 +893,12 @@ public:
    */
   void attach_init_function (void fptr(EquationSystems& es,
 				       const std::string& name));
+
+  /** 
+   * Register a user class to use to initialize the system.  
+   * Note this is exclusive with the \p attach_init_function.
+   */
+  void attach_init_object (Initialization& init);
   
   /**
    * Register a user function to use in assembling the system
@@ -831,10 +908,21 @@ public:
 					   const std::string& name));
   
   /**
+   * Register a user object to use in assembling the system
+   * matrix and RHS.
+   */
+  void attach_assemble_object (Assembly& assemble);
+  
+  /**
    * Register a user function for imposing constraints.
    */
   void attach_constraint_function (void fptr(EquationSystems& es,
 					     const std::string& name));
+  
+  /**
+   * Register a user object for imposing constraints.
+   */
+  void attach_constraint_object (Constraint& constrain);
   
   /**
    * Register a user function for evaluating the quantities of interest,
@@ -1049,8 +1137,8 @@ public:
   Gradient point_gradient(unsigned int var, Point &p);
 
   /**
-   * Returns the second derivative tensor of the solution variable \p var at the physical
-   * point \p p in the mesh.
+   * Returns the second derivative tensor of the solution variable \p var 
+   * at the physical point \p p in the mesh.
    *
    * Note that this function uses \p MeshBase::point_locator(); users
    * may or may not want to call \p MeshBase::clear_point_locator()
@@ -1193,7 +1281,12 @@ private:
    */
   void (* _init_system_function) (EquationSystems& es,
 				  const std::string& name);
-  
+
+  /**
+   * Object that initializes the system.
+   */
+  Initialization * _init_system_object;
+
   /**
    * Function that assembles the system.
    */
@@ -1201,10 +1294,20 @@ private:
 				      const std::string& name);
 
   /**
+   * Object that assembles the system.
+   */
+  Assembly * _assemble_system_object;
+
+  /**
    * Function to impose constraints.
    */
   void (* _constrain_system_function) (EquationSystems& es, 
 				       const std::string& name);
+
+  /**
+   * Object that constrains the system.
+   */
+  Constraint * _constrain_system_object;
 
   /**
    * Function to evaluate quantity of interest
