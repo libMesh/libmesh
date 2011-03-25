@@ -68,8 +68,11 @@ System::System (EquationSystems& es,
   _mesh_y_var                       (libMesh::invalid_uint),
   _mesh_z_var                       (libMesh::invalid_uint),
   _init_system_function             (NULL),
+  _init_system_object               (NULL),
   _assemble_system_function         (NULL),
+  _assemble_system_object           (NULL),
   _constrain_system_function        (NULL),
+  _constrain_system_object          (NULL),
   _qoi_evaluate_function            (NULL),
   _qoi_evaluate_derivative_function (NULL),
   _dof_map                          (new DofMap(number)),
@@ -112,8 +115,14 @@ System::~System ()
   _init_system_function = 
     _assemble_system_function = 
     _constrain_system_function =  NULL;
+
   _qoi_evaluate_function =
     _qoi_evaluate_derivative_function =  NULL;
+  
+  // NULL-out user-provided objects.
+  _init_system_object      = NULL;
+  _assemble_system_object  = NULL;
+  _constrain_system_object = NULL;
 
   // Clear data
   this->clear ();
@@ -1454,7 +1463,32 @@ void System::attach_init_function (void fptr(EquationSystems& es,
 {
   libmesh_assert (fptr != NULL);
   
+  if (_init_system_object != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both initialization function and object!"
+		   << std::endl;
+
+      _init_system_object = NULL;
+    }
+
   _init_system_function = fptr;
+}
+
+
+
+void System::attach_init_object (System::Initialization& init)
+{
+  if (_init_system_function != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both initialization object and function!"
+		   << std::endl;
+
+      _init_system_function = NULL;
+    }
+
+  _init_system_object = &init;
 }
 
 
@@ -1464,7 +1498,32 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 {
   libmesh_assert (fptr != NULL);
   
+  if (_assemble_system_object != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both assembly function and object!"
+		   << std::endl;
+
+      _assemble_system_object = NULL;
+    }
+  
   _assemble_system_function = fptr;  
+}
+
+
+
+void System::attach_assemble_object (System::Assembly& assemble)
+{
+  if (_assemble_system_function != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both assembly object and function!"
+		   << std::endl;
+
+      _assemble_system_function = NULL;
+    }
+
+  _assemble_system_object = &assemble;
 }
 
 
@@ -1474,7 +1533,32 @@ void System::attach_constraint_function(void fptr(EquationSystems& es,
 {
   libmesh_assert (fptr != NULL);
   
+  if (_constrain_system_object != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both constraint function and object!"
+		   << std::endl;
+
+      _constrain_system_object = NULL;
+    }
+  
   _constrain_system_function = fptr;  
+}
+
+
+
+void System::attach_constraint_object (System::Constraint& constrain)
+{
+  if (_constrain_system_function != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both constraint object and function!"
+		   << std::endl;
+
+      _constrain_system_function = NULL;
+    }
+
+  _constrain_system_object = &constrain;
 }
 
 
@@ -1507,6 +1591,10 @@ void System::user_initialization ()
   // if it was provided
   if (_init_system_function != NULL)
     this->_init_system_function (_equation_systems, this->name());
+
+  // ...or the user-provided initialization object.
+  else if (_init_system_object != NULL)
+    this->_init_system_object->initialize();
 }
 
 
@@ -1516,6 +1604,10 @@ void System::user_assembly ()
   // if it was provided
   if (_assemble_system_function != NULL)
     this->_assemble_system_function (_equation_systems, this->name());
+
+  // ...or the user-provided assembly object.
+  else if (_assemble_system_object != NULL)
+    this->_assemble_system_object->assemble();
 }
 
 
