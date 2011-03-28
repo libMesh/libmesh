@@ -36,6 +36,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stdarg.h>
+
+
 
 // We need a mutex to keep const operations thread-safe in the
 // presence of mutable containers.  Right now GetPot supports a
