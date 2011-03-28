@@ -28,27 +28,6 @@
 #ifndef __GETPOT_H__
 #define __GETPOT_H__
 
-#if defined(WIN32) || defined(SOLARIS_RAW) || (__GNUC__ == 2) || defined(__HP_aCC)
-#define strtok_r(a, b, c) strtok(a, b)
-#endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC
-
-#if defined(WIN32) 
-#define snprintf _snprintf
-#endif 
-
-extern "C" {
-//   leave the 'extern C' to make it 100% sure to work -
-//   expecially with older distributions of header files.
-#ifndef WIN32
-// this is necessary (depending on OS)
-#include <ctype.h>
-#endif
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <math.h>
-}
-
 #include <algorithm>
 #include <fstream>
 #include <iostream> // not every compiler distribution includes <iostream> 
@@ -388,22 +367,11 @@ private:
     const GetPot::variable*   _DBE_get_variable(const std::string str);
     STRING_VECTOR             _DBE_get_expr_list(const std::string str, const unsigned ExpectedNumber);
 
-    static std::string  _double2string(const double& Value) {
-	// -- converts a double integer into a string
-	char* tmp = new char[128];
-	snprintf(tmp, (int)sizeof(char)*128, "%e", Value);
-	std::string result(tmp);
-	delete [] tmp;
-	return result;
-    }
-
-    static std::string  _int2string(const int& Value) {
-	// -- converts an integer into a string
-	char* tmp = new char[128];
-	snprintf(tmp, (int)sizeof(char)*128, "%i", Value);
-	std::string result(tmp);
-	delete [] tmp;
-	return result;
+    template <typename T>
+    static std::string _convert_from_type(const T& Value) {
+      std::ostringstream out_string;
+      out_string << Value;
+      return out_string.str();
     }
 
     static STRING_VECTOR _get_section_tree(const std::string& FullPath) {
@@ -1923,12 +1891,8 @@ GetPot::_DBE_get_variable(std::string VarName)
     prefix = secure_Prefix;
 
     // error occured => variable name == ""
-    char* tmp = new char[VarName.length() + 25];
-    snprintf(tmp, (int)sizeof(char)*(VarName.length() + 25), 
-	     "<<${ } variable '%s' undefined>>", VarName.c_str());
-    ev.name = "";
-    ev.original = std::string(tmp);
-    delete [] tmp;
+    ev.original = "<<${ } variable '";
+    ev.original += VarName + "' undefined>>";
     return &ev;
 }
 
@@ -1968,7 +1932,7 @@ GetPot::_DBE_expand(const std::string expr)
 	for(; it != A.end(); it++)
 	    result += _convert_to_type(*it, 0.0);
 
-	return _double2string(result);
+	return _convert_from_type(result);
     }
     else if( expr[0] == '-' ) {
 	STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 2);
@@ -1977,7 +1941,7 @@ GetPot::_DBE_expand(const std::string expr)
 	for(; it != A.end(); it++)
 	    result -= _convert_to_type(*it, 0.0);
 
-	return _double2string(result);
+	return _convert_from_type(result);
     }
     else if( expr[0] == '*' ) {
 	STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 2);
@@ -1986,7 +1950,7 @@ GetPot::_DBE_expand(const std::string expr)
 	for(; it != A.end(); it++)
 	    result *= _convert_to_type(*it, 0.0);
 
-	return _double2string(result);
+	return _convert_from_type(result);
     }
     else if( expr[0] == '/' ) {
 	STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 2);
@@ -1999,7 +1963,7 @@ GetPot::_DBE_expand(const std::string expr)
 	    const double Q = _convert_to_type(*it, 0.0);
 	    result /= Q;
 	}
-	return _double2string(result);
+	return _convert_from_type(result);
     }
 
     // ${^ ... } power expressions
@@ -2009,7 +1973,7 @@ GetPot::_DBE_expand(const std::string expr)
 	double result = _convert_to_type(*it++, 0.0);
 	for(; it != A.end(); it++)
 	    result = pow(result, _convert_to_type(*it, 0.0));
-	return _double2string(result);
+	return _convert_from_type(result);
     }
 
     // ${==  } ${<=  } ${>= } comparisons (return the number of the first 'match'
@@ -2043,14 +2007,14 @@ GetPot::_DBE_expand(const std::string expr)
 		if( (op == EQ  && x_orig == *y_orig) || (op == GEQ && x_orig >= *y_orig) ||
 		    (op == LEQ && x_orig <= *y_orig) || (op == GT  && x_orig >  *y_orig) ||
 		    (op == LT  && x_orig <  *y_orig) )
-		    return _int2string(i);
+		    return _convert_from_type(i);
 	    }
 	    else {
 		// it's a number comparison
 		if( (op == EQ  && x == y) || (op == GEQ && x >= y) ||
 		    (op == LEQ && x <= y) || (op == GT  && x >  y) ||
 		    (op == LT  && x <  y) )
-		    return _int2string(i);
+		    return _convert_from_type(i);
 	    }
 	    i++;
 	}
@@ -2553,21 +2517,12 @@ inline void
 GetPot::variable::take(const char* Value, const char* FieldSeparator)
 {
     original = std::string(Value);
+    value.clear();
 
-    // separate string by white space delimiters using 'strtok'
-    // thread safe usage of strtok (no static members)
-    char* spt = 0;
-    // make a copy of the 'Value'
-    char* copy = new char[strlen(Value)+1];
-    strcpy(copy, Value);
-    char* follow_token = strtok_r(copy, FieldSeparator, &spt);
-    if( value.size() != 0 ) value.erase(value.begin(), value.end());
-    while(follow_token != 0) {
-	value.push_back(std::string(follow_token));
-	follow_token = strtok_r(NULL, FieldSeparator, &spt);
-    }
-
-    delete [] copy;
+    std::istringstream full_value(original);
+    std::string word;
+    while (std::getline(full_value, word, *FieldSeparator))
+      value.push_back(word);
 }
 
 inline
