@@ -38,7 +38,8 @@ namespace libMesh
 
 RBEvaluation::RBEvaluation (RBSystem& rb_sys_in)
   :
-  rb_sys(rb_sys_in)
+  rb_sys(rb_sys_in),
+  multiple_files_for_outputs(false)
 {
 }
 
@@ -325,34 +326,68 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       n_bfs_out.close();
     }
 
-    // Write out output data
-    for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+    if(multiple_files_for_outputs)
     {
-      for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+      // Write out output data to multiple files
+      for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
       {
-        std::ofstream output_n_out;
+        for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
         {
-          OStringStream file_name;
-          file_name << directory_name << "/output_";
-          OSSRealzeroright(file_name,3,0,n);
-          file_name << "_";
-          OSSRealzeroright(file_name,3,0,q_l);
-          file_name << ".dat";
-          output_n_out.open(file_name.str().c_str());
-        }
-        if( !output_n_out.good() )
-        {
-          libMesh::err << "Error opening output file for output " << n << std::endl;
-          libmesh_error();
-        }
-        output_n_out.precision(precision_level);
+          std::ofstream output_n_out;
+          {
+            OStringStream file_name;
+            file_name << directory_name << "/output_";
+            OSSRealzeroright(file_name,3,0,n);
+            file_name << "_";
+            OSSRealzeroright(file_name,3,0,q_l);
+            file_name << ".dat";
+            output_n_out.open(file_name.str().c_str());
+          }
+          if( !output_n_out.good() )
+          {
+            libMesh::err << "Error opening output file for output " << n << std::endl;
+            libmesh_error();
+          }
+          output_n_out.precision(precision_level);
 
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          output_n_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
+          for(unsigned int j=0; j<n_bfs; j++)
+          {
+            output_n_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
+          }
+          output_n_out.close();
         }
-        output_n_out.close();
       }
+    }
+    else
+    {
+      // Write out output data to a single file
+      // If we have a large number of outputs, then the IO is much faster
+      // if we store the data in a single file.
+      std::ofstream output_out;
+      {
+        OStringStream file_name;
+        file_name << directory_name << "/outputs.dat";
+        output_out.open(file_name.str().c_str());
+      }
+      if( !output_out.good() )
+      {
+        libMesh::err << "Error opening outputs.dat" << std::endl;
+        libmesh_error();
+      }
+
+      for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+      {
+        for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+        {
+          output_out.precision(precision_level);
+
+          for(unsigned int j=0; j<n_bfs; j++)
+          {
+            output_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
+          }
+        }
+      }
+      output_out.close();
     }
     
     if(rb_sys.compute_RB_inner_product)
@@ -556,35 +591,68 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   }
   libmesh_assert( n_bfs <= rb_sys.get_Nmax() );
 
-  // Read in output data
-  for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+  if(multiple_files_for_outputs)
   {
-    for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+    // Read in output data in multiple files
+    for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
     {
-      std::ifstream output_n_in;
+      for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
       {
-        OStringStream file_name;
-        file_name << directory_name << "/output_";
-        OSSRealzeroright(file_name,3,0,n);
-        file_name << "_";
-        OSSRealzeroright(file_name,3,0,q_l);
-        file_name << ".dat";
-        output_n_in.open(file_name.str().c_str());
-      }
-      if( !output_n_in.good() )
-      {
-        libMesh::err << "Error opening input file for output " << n << std::endl;
-        libmesh_error();
-      }
+        std::ifstream output_n_in;
+        {
+          OStringStream file_name;
+          file_name << directory_name << "/output_";
+          OSSRealzeroright(file_name,3,0,n);
+          file_name << "_";
+          OSSRealzeroright(file_name,3,0,q_l);
+          file_name << ".dat";
+          output_n_in.open(file_name.str().c_str());
+        }
+        if( !output_n_in.good() )
+        {
+          libMesh::err << "Error opening input file for output " << n << std::endl;
+          libmesh_error();
+        }
 
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        Number  value;
-        output_n_in >> value;
-        RB_output_vectors[n][q_l](j) = value;
+        for(unsigned int j=0; j<n_bfs; j++)
+        {
+          Number  value;
+          output_n_in >> value;
+          RB_output_vectors[n][q_l](j) = value;
+        }
+        output_n_in.close();
       }
-      output_n_in.close();
     }
+  }
+  else
+  {
+    // If we have a large number of outputs, then the IO is much faster
+    // if we store the data in a single file.
+
+    std::ifstream output_in;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/outputs.dat";
+      output_in.open(file_name.str().c_str());
+    }
+    if( !output_in.good() )
+    {
+      libMesh::err << "Error opening outputs.dat" << std::endl;
+      libmesh_error();
+    }
+    for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+    {
+      for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+      {
+        for(unsigned int j=0; j<n_bfs; j++)
+        {
+          Number value;
+          output_in >> value;
+          RB_output_vectors[n][q_l](j) = value;
+        }
+      }
+    }
+    output_in.close();
   }
   
   if(rb_sys.compute_RB_inner_product)

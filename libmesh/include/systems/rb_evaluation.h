@@ -174,6 +174,14 @@ public:
   std::vector<Number> Fq_representor_norms;
   std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
   std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
+  
+  /**
+   * Boolean to indicate whether we store the data for evaluating RB outputs
+   * in the Online stage in multiple files or in a single file.
+   * If we have a large number of outputs, then the IO can be much faster
+   * if we use a single file.
+   */
+  bool multiple_files_for_outputs;
 
 };
 
