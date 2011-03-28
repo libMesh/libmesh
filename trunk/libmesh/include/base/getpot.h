@@ -28,6 +28,10 @@
 #ifndef __GETPOT_H__
 #define __GETPOT_H__
 
+#if defined(WIN32) || defined(SOLARIS_RAW) || (__GNUC__ == 2) || defined(__HP_aCC)
+#define strtok_r(a, b, c) strtok(a, b)
+#endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC
+
 #include <algorithm>
 #include <fstream>
 #include <iostream> // not every compiler distribution includes <iostream> 
@@ -37,8 +41,10 @@
 #include <string>
 #include <vector>
 
+extern "C" {
 #include <stdarg.h> // --> va_list and friends
 #include <string.h> // --> strcmp, strncmp, strlen, strncpy
+}
 
 
 
@@ -2524,10 +2530,26 @@ GetPot::variable::take(const char* Value, const char* FieldSeparator)
     original = std::string(Value);
     value.clear();
 
+    // separate string by white space delimiters using 'strtok'
+    // thread safe usage of strtok (no static members)
+    char* spt = 0;
+    // make a copy of the 'Value'
+    char* copy = new char[strlen(Value)+1];
+    strcpy(copy, Value);
+    char* follow_token = strtok_r(copy, FieldSeparator, &spt);
+    while(follow_token != 0) {
+	value.push_back(std::string(follow_token));
+	follow_token = strtok_r(NULL, FieldSeparator, &spt);
+    }
+
+    delete [] copy;
+
+/*  // getline doesn't handle multi-character separator lists...
     std::istringstream full_value(original);
     std::string word;
     while (std::getline(full_value, word, *FieldSeparator))
       value.push_back(word);
+*/
 }
 
 inline
