@@ -138,9 +138,9 @@ public:
   
 
   /**
-   * Abstract base class to be used for sysem assembly.
+   * Abstract base class to be used for sysem constraints.
    * A user class derived from this class may be used to 
-   * assemble the system by attaching an object
+   * constrain the system by attaching an object
    * with the method \p attach_constraint_object.
    */
   class Constraint
@@ -157,6 +157,54 @@ public:
      * be provided by the user in a derived class.
      */
     virtual void constrain () = 0;
+  };
+
+  
+
+  /**
+   * Abstract base class to be used for quantities of interest.
+   * A user class derived from this class may be used to 
+   * compute quantities of interest by attaching an object
+   * with the method \p attach_QOI_object.
+   */
+  class QOI
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~QOI () {};
+
+    /**
+     * Quantitiy of interest function.  This function will be called 
+     * to compute quantities of interest and must be provided by the 
+     * user in a derived class.
+     */
+    virtual void qoi (const QoISet& qoi_indices) = 0;
+  };
+
+  
+
+  /**
+   * Abstract base class to be used for derivatives of quantities 
+   * of interest. A user class derived from this class may be used 
+   * to compute quantities of interest by attaching an object
+   * with the method \p attach_QOI_derivative_object.
+   */
+  class QOIDerivative
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~QOIDerivative () {};
+
+    /**
+     * Quantitiy of interest derivative function. This function will 
+     * be called to compute derivatived of quantities of interest and 
+     * must be provided by the user in a derived class.
+     */
+    virtual void qoi_derivative (const QoISet& qoi_indices) = 0;
   };
 
   
@@ -933,6 +981,12 @@ public:
                                       const QoISet& qoi_indices));
   
   /**
+   * Register a user object for evaluating the quantities of interest,
+   * whose values should be placed in \p System::qoi
+   */
+  void attach_QOI_object (QOI& qoi); 
+
+  /**
    * Register a user function for evaluating derivatives of a quantity
    * of interest with respect to test functions, whose values should
    * be placed in \p System::rhs
@@ -941,6 +995,13 @@ public:
 				        const std::string& name,
                                         const QoISet& qoi_indices));
   
+  /**
+   * Register a user object for evaluating derivatives of a quantity
+   * of interest with respect to test functions, whose values should
+   * be placed in \p System::rhs
+   */
+  void attach_QOI_derivative_object (QOIDerivative& qoi_derivative); 
+
   /**
    * Calls user's attached initialization function, or is overloaded by
    * the user in derived classes.
@@ -1317,11 +1378,21 @@ private:
 				   const QoISet& qoi_indices);
 
   /**
+   * Object to compute quantities of interest.
+   */
+  QOI *_qoi_evaluate_object;
+
+  /**
    * Function to evaluate quantity of interest derivative
    */
   void (* _qoi_evaluate_derivative_function) (EquationSystems& es, 
 					      const std::string& name,
 					      const QoISet& qoi_indices);
+
+  /**
+   * Object to compute derivatives of quantities of interest.
+   */
+  QOIDerivative *_qoi_evaluate_derivative_object;
 
   /**
    * Data structure describing the relationship between

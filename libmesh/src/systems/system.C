@@ -74,7 +74,9 @@ System::System (EquationSystems& es,
   _constrain_system_function        (NULL),
   _constrain_system_object          (NULL),
   _qoi_evaluate_function            (NULL),
+  _qoi_evaluate_object              (NULL),
   _qoi_evaluate_derivative_function (NULL),
+  _qoi_evaluate_derivative_object   (NULL),
   _dof_map                          (new DofMap(number)),
   _equation_systems                 (es),
   _mesh                             (es.get_mesh()),
@@ -120,9 +122,11 @@ System::~System ()
     _qoi_evaluate_derivative_function =  NULL;
   
   // NULL-out user-provided objects.
-  _init_system_object      = NULL;
-  _assemble_system_object  = NULL;
-  _constrain_system_object = NULL;
+  _init_system_object             = NULL;
+  _assemble_system_object         = NULL;
+  _constrain_system_object        = NULL;
+  _qoi_evaluate_object            = NULL;
+  _qoi_evaluate_derivative_object = NULL;
 
   // Clear data
   this->clear ();
@@ -826,6 +830,7 @@ NumericVector<Number> & System::add_sensitivity_solution (unsigned int i)
 }
 
 
+
 NumericVector<Number> & System::get_sensitivity_solution (unsigned int i)
 {
   OStringStream sensitivity_name;
@@ -1065,6 +1070,7 @@ unsigned short int System::variable_number (const std::string& var) const
 }
 
 
+
 void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & var_indices) const
 {
   // Make sure the set is clear
@@ -1097,6 +1103,8 @@ void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & 
         }
     }
 }
+
+
 
 void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) const
 {
@@ -1142,6 +1150,8 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
   }
 }
 
+
+
 Real System::discrete_var_norm(const NumericVector<Number>& v,
                                unsigned int var,
                                FEMNormType norm_type) const
@@ -1158,6 +1168,8 @@ Real System::discrete_var_norm(const NumericVector<Number>& v,
   else
     libmesh_error();
 }
+
+
 
 Real System::calculate_norm(const NumericVector<Number>& v,
                             unsigned int var,
@@ -1568,8 +1580,33 @@ void System::attach_QOI_function(void fptr(EquationSystems&,
                                            const QoISet&))
 {
   libmesh_assert (fptr != NULL);
+
+  if (_qoi_evaluate_object != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both QOI function and object!"
+		   << std::endl;
+
+      _qoi_evaluate_object = NULL;
+    }
   
   _qoi_evaluate_function = fptr;  
+}
+
+
+
+void System::attach_QOI_object (QOI& qoi)
+{
+  if (_qoi_evaluate_function != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both QOI object and function!"
+		   << std::endl;
+
+      _qoi_evaluate_function = NULL;
+    }
+
+  _qoi_evaluate_object = &qoi;
 }
 
 
@@ -1580,7 +1617,32 @@ void System::attach_QOI_derivative(void fptr(EquationSystems&,
 {
   libmesh_assert (fptr != NULL);
   
+  if (_qoi_evaluate_derivative_object != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both QOI derivative function and object!"
+		   << std::endl;
+
+      _qoi_evaluate_derivative_object = NULL;
+    }
+  
   _qoi_evaluate_derivative_function = fptr;  
+}
+
+
+
+void System::attach_QOI_derivative_object (QOIDerivative& qoi_derivative)
+{
+  if (_qoi_evaluate_derivative_function != NULL)
+    {
+      libmesh_here();
+      libMesh::out << "WARNING:  Cannot specify both QOI derivative object and function!"
+		   << std::endl;
+
+      _qoi_evaluate_derivative_function = NULL;
+    }
+
+  _qoi_evaluate_derivative_object = &qoi_derivative;
 }
 
 
@@ -1596,6 +1658,7 @@ void System::user_initialization ()
   else if (_init_system_object != NULL)
     this->_init_system_object->initialize();
 }
+
 
 
 void System::user_assembly ()
@@ -1616,8 +1679,12 @@ void System::user_constrain ()
 {
   // Call the user-provided constraint function, 
   // if it was provided
-  if(_constrain_system_function!= NULL)
+  if (_constrain_system_function!= NULL)
     this->_constrain_system_function(_equation_systems, this->name());
+
+  // ...or the user-provided constraint object.
+  else if (_constrain_system_object != NULL)
+    this->_constrain_system_object->constrain();
 }
 
 
@@ -1626,8 +1693,12 @@ void System::user_QOI (const QoISet& qoi_indices)
 {
   // Call the user-provided quantity of interest function, 
   // if it was provided
-  if(_qoi_evaluate_function != NULL)
+  if (_qoi_evaluate_function != NULL)
     this->_qoi_evaluate_function(_equation_systems, this->name(), qoi_indices);
+
+  // ...or the user-provided QOI function object.
+  else if (_qoi_evaluate_object != NULL)
+    this->_qoi_evaluate_object->qoi(qoi_indices);
 }
 
 
@@ -1636,8 +1707,12 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
 {
   // Call the user-provided quantity of interest derivative, 
   // if it was provided
-  if(_qoi_evaluate_derivative_function != NULL)
+  if (_qoi_evaluate_derivative_function != NULL)
     this->_qoi_evaluate_derivative_function(_equation_systems, this->name(), qoi_indices);
+
+  // ...or the user-provided QOI derivative function object.
+  else if (_qoi_evaluate_derivative_object != NULL)
+    this->_qoi_evaluate_derivative_object->qoi_derivative(qoi_indices);
 }
 
 
@@ -1721,6 +1796,8 @@ Number System::point_value(unsigned int var, Point &p)
   
   return u;
 }
+
+
 
 Gradient System::point_gradient(unsigned int var, Point &p)
 {
