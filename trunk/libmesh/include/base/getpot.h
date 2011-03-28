@@ -36,7 +36,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <stdarg.h>
+
+#include <stdarg.h> // --> va_list and friends
+#include <string.h> // --> strcmp, strncmp, strlen, strncpy
 
 
 
