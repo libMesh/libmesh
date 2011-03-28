@@ -251,6 +251,9 @@ void _init (int &argc, char** & argv,
   libmesh_assert (libMeshPrivateData::_n_processors >  0);
   libmesh_assert (libMeshPrivateData::_processor_id >= 0);
 
+  // Let's be sure we properly initialize on every processor at once:
+  parallel_only();
+
 #endif
       
 #if defined(LIBMESH_HAVE_PETSC)
@@ -382,6 +385,9 @@ int _close ()
 
   // Clear the thread task manager we started
   task_scheduler.reset();
+
+  // Let's be sure we properly close on every processor at once:
+  parallel_only();
 
 #if defined(LIBMESH_HAVE_MPI)
   // We may be here in only one process,
