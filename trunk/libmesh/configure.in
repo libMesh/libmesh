@@ -62,10 +62,9 @@ CXX_TRY_LIST="g++ icc pgCC c++"
                  enablempi=$enableval,
                  enablempi=yes)
    
-   if  (test "$enablempi" != no) ; then
-     CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
-     CC_TRY_LIST="mpicc $CC_TRY_LIST"
-   fi
+if  (test "$enablempi" != no) ; then
+  CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
+fi
 
 AC_ARG_WITH([cxx],
 	    AC_HELP_STRING([--with-cxx=CXX],
@@ -94,6 +93,9 @@ DETERMINE_CXX_BRAND
 dnl --------------------------------------------------------------
 dnl look for a decent C compiler or honor --with-cc=...
 CC_TRY_LIST="gcc icc pgcc cc"
+if  (test "$enablempi" != no) ; then
+  CC_TRY_LIST="mpicc $CC_TRY_LIST"
+fi
 AC_ARG_WITH([cc],
 	    AC_HELP_STRING([--with-cc=CC],
                            [C compiler to use]),
@@ -111,6 +113,9 @@ dnl --------------------------------------------------------------
 
 dnl look for a decent F90+ compiler or honor --with-fc=...
 FC_TRY_LIST="gfortran ifort pgf90 xlf95"
+if  (test "$enablempi" != no) ; then
+  FC_TRY_LIST="mpif90 $FC_TRY_LIST"
+fi
 AC_ARG_WITH([fc],
 	    AC_HELP_STRING([--with-fc=FC],
                            [Fortran compiler to use]),
@@ -128,6 +133,9 @@ dnl --------------------------------------------------------------
 dnl --------------------------------------------------------------
 dnl look for a decent F77 compiler or honor --with-77=...
 FC_TRY_LIST="g77 gfortran ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
+if  (test "$enablempi" != no) ; then
+  F77_TRY_LIST="mpif77 $F77_TRY_LIST"
+fi
 AC_ARG_WITH([f77],
 	    AC_HELP_STRING([--with-f77=F77],
                            [Fortran compiler to use]),
