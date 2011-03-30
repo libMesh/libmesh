@@ -68,6 +68,11 @@ public:
   virtual void initialize();
 
   /**
+   * Get a reference to the i^th basis function.
+   */
+  NumericVector<Number>& get_basis_function(unsigned int i);
+
+  /**
    * Perform online solve with the N RB basis functions, for the
    * set of parameters in current_params, where 1 <= N <= RB_size.
    */

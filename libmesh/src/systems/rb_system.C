@@ -599,9 +599,7 @@ void RBSystem::allocate_data_structures()
 
 NumericVector<Number>& RBSystem::get_basis_function(unsigned int i)
 {
-  libmesh_assert(i<=rb_eval->basis_functions.size());
-
-  return *(rb_eval->basis_functions[i]);
+  return rb_eval->get_basis_function(i);
 }
 
 void RBSystem::add_new_rb_evaluation_object()
@@ -1908,7 +1906,7 @@ Real RBSystem::residual_scaling_denom(Real alpha_LB)
 {
   // Here we implement the residual scaling for a coercive
   // problem.
-  return std::sqrt(alpha_LB);
+  return alpha_LB;
 }
 
 void RBSystem::update_RB_system_matrices()
