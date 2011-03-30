@@ -204,7 +204,7 @@ public:
   virtual unsigned int get_n_basis_functions() const { return rb_eval->get_n_basis_functions(); }
 
   /**
-   * Get a const reference to the i^th basis function stored in rb_eval.
+   * Get a reference to the i^th basis function stored in rb_eval.
    */
   NumericVector<Number>& get_basis_function(unsigned int i);
 

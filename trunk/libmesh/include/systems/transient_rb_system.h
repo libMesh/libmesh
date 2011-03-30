@@ -268,13 +268,6 @@ public:
   virtual Real residual_scaling_numer(Real alpha_LB);
 
   /**
-   * Specifies the residual scaling on the denominator to
-   * be used in the a posteriori error bound. Overload
-   * in subclass in order to obtain the desired error bound.
-   */
-  virtual Real residual_scaling_denom(Real alpha_LB);
-
-  /**
    * Overload write_offline_data_to_files in order to
    * write out the mass matrix and initial condition
    * data as well.

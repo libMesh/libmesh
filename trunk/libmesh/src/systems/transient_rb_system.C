@@ -1205,11 +1205,6 @@ Real TransientRBSystem::residual_scaling_numer(Real)
   return get_dt();
 }
 
-Real TransientRBSystem::residual_scaling_denom(Real alpha_LB)
-{
-  return alpha_LB;
-}
-
 void TransientRBSystem::assemble_matrix_for_output_dual_solves()
 {
   // By default we use the L2 matrix for transient problems

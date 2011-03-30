@@ -138,6 +138,13 @@ void RBEvaluation::initialize()
   RB_output_error_bounds.resize(rb_sys.get_n_outputs());
 }
 
+NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)
+{
+  libmesh_assert(i<basis_functions.size());
+
+  return *(basis_functions[i]);
+}
+
 Real RBEvaluation::RB_solve(unsigned int N)
 {
   START_LOG("RB_solve()", "RBEvaluation");
