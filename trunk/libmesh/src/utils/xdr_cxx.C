@@ -561,6 +561,7 @@ void Xdr::do_read(std::vector<std::complex<T> >& a) {
       libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
       *in >> a[i].real() >> a[i].imag();
     }
+  in->getline(comm, comm_len);
 }
 
 template <typename T>
