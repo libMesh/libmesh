@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <time.h> // for clock_t, clock()
 
 // Local includes
 #include "mesh_smoother_vsmoother.h"
