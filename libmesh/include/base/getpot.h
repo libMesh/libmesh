@@ -2527,29 +2527,55 @@ GetPot::variable::get_element(unsigned Idx) const
 inline void
 GetPot::variable::take(const char* Value, const char* FieldSeparator)
 {
-    original = std::string(Value);
-    value.clear();
+  original = std::string(Value); // string member var
+  value.clear();                 // vector<string> member var
 
-    // separate string by white space delimiters using 'strtok'
-    // thread safe usage of strtok (no static members)
-    char* spt = 0;
-    // make a copy of the 'Value'
-    char* copy = new char[strlen(Value)+1];
-    strcpy(copy, Value);
-    char* follow_token = strtok_r(copy, FieldSeparator, &spt);
-    while(follow_token != 0) {
-	value.push_back(std::string(follow_token));
-	follow_token = strtok_r(NULL, FieldSeparator, &spt);
+  /*
+  // separate string by white space delimiters using 'strtok'
+  // thread safe usage of strtok (no static members)
+  char* spt = 0;
+  // make a copy of the 'Value'
+  char* copy = new char[strlen(Value)+1];
+  strcpy(copy, Value);
+  char* follow_token = strtok_r(copy, FieldSeparator, &spt);
+  while(follow_token != 0) {
+    value.push_back(std::string(follow_token));
+    follow_token = strtok_r(NULL, FieldSeparator, &spt);
+  }
+
+  delete [] copy;
+  */
+
+  // Don't use strtok, instead tokenize the input char "Value" using std::string operations so
+  // that the results end up in the local "value" member
+
+  // Construct std::string objects from the input char*s.  I think the only
+  // FieldSeparator recognized by GetPot is whitespace?
+  std::string Value_str = std::string(Value);
+  std::string delimiters = std::string(FieldSeparator);
+
+  // Skip delimiters at beginning.
+  std::string::size_type lastPos = Value_str.find_first_not_of(delimiters, 0);
+  
+  // Find first "non-delimiter".
+  std::string::size_type pos     = Value_str.find_first_of(delimiters, lastPos);
+
+  // Loop over the input string until all the tokens have been pushed back
+  // into the local "value" member.
+  while (std::string::npos != pos || std::string::npos != lastPos)
+    {
+      // Found a token, add it to the vector.
+      value.push_back(Value_str.substr(lastPos, pos - lastPos));
+
+      // Skip delimiters.  Note the "not_of"
+      lastPos = Value_str.find_first_not_of(delimiters, pos);
+
+      // Find next "non-delimiter"
+      pos = Value_str.find_first_of(delimiters, lastPos);
     }
+  
+  // We're done, all the tokens should now be in the vector<string>
 
-    delete [] copy;
-
-/*  // getline doesn't handle multi-character separator lists...
-    std::istringstream full_value(original);
-    std::string word;
-    while (std::getline(full_value, word, *FieldSeparator))
-      value.push_back(word);
-*/
 }
 
 inline
