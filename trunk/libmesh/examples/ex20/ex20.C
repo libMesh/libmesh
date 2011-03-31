@@ -221,7 +221,7 @@ int main (int argc, char** argv)
   // Print a nice message.
   std::cout << "Solved linear system in " << system.n_linear_iterations() << " iterations, residual norm is " << system.final_linear_residual() << "." << std::endl;
   
-#ifdef LIBMESH_HAVE_VTK
+#if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
   // Write result to file.
   VTKIO(mesh).write_equation_systems ("out.pvtu", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_VTK
