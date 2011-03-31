@@ -150,10 +150,12 @@ int main (int argc, char** argv)
   // built PETSc.
   equation_systems.get_system("Poisson").solve();
 
-#ifdef LIBMESH_HAVE_VTK
+#if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
+
   // After solving the system write the solution
   // to a VTK-formatted plot file.
   VTKIO (mesh).write_equation_systems ("out.pvtu", equation_systems);
+
 #endif // #ifdef LIBMESH_HAVE_VTK
 
   // All done.  
