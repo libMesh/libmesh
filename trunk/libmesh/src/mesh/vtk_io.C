@@ -589,6 +589,11 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
   
 #else
 
+  // We may need to gather a ParallelMesh to output it, making that
+  // const qualifier in our constructor a dirty lie
+  MeshOutputSerializer serialize(const_cast<MeshBase&>(MeshOutput<MeshBase>::mesh()),
+                       !MeshOutput<MeshBase>::_is_parallel_format);
+
   vtkXMLPUnstructuredGridWriter* writer = 0;
   vtkPoints* pnts = 0;
   vtkCellArray* cells = 0;
@@ -662,8 +667,13 @@ void VTKIO::write (const std::string& name)
   libmesh_error();
 
 #else
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
   unsigned int n_active_elem = mesh.n_active_elem();
+
+  // We may need to gather a ParallelMesh to output it, making that
+  // const qualifier in our constructor a dirty lie
+  MeshOutputSerializer serialize(const_cast<MeshBase&>(MeshOutput<MeshBase>::mesh()),
+                       !MeshOutput<MeshBase>::_is_parallel_format);
 
   if (libMesh::processor_id() == 0)
   {

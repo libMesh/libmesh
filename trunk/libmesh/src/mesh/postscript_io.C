@@ -71,6 +71,10 @@ PostscriptIO::~PostscriptIO ()
 
 void PostscriptIO::write (const std::string& fname)
 {
+  // We may need to gather a ParallelMesh to output it, making that
+  // const qualifier in our constructor a dirty lie
+  MeshOutputSerializer serialize(const_cast<MeshBase&>(this->mesh()), !_is_parallel_format);
+
   if (libMesh::processor_id() == 0)
     {
       // Get a constant reference to the mesh.
