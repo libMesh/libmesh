@@ -265,6 +265,9 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
 #else
 
+  // Get a reference to the mesh
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
   // This is a parallel_only function
   const unsigned int n_active_elem = mesh.n_active_elem();
   
@@ -279,9 +282,6 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   // Make sure it opened correctly
   if (!out.good())
     libmesh_file_error(fname.c_str());
-
-  // Get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   unsigned int mesh_max_p_level = 0;
 
