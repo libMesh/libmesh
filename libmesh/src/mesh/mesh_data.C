@@ -45,6 +45,10 @@ MeshData::MeshData(const MeshBase& m) :
   _compatibility_mode (false),
   _unv_header         (NULL)
 {
+  // This class isn't actively maintained, doesn't work in parallel,
+  // and usually isn't as good a solution as adding an additional
+  // ExplicitSystem with appropriate data field(s).
+  libmesh_deprecated();
 }
 
 
