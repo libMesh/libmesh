@@ -469,10 +469,9 @@ void RBSystem::initialize_RB_system(bool do_not_assemble)
 
   // Build a new RBEvaluation object
   libmesh_assert( rb_evaluation_objects.empty() );
-  add_new_rb_evaluation_object();
+  rb_eval = add_new_rb_evaluation_object();
   
   // And initialize rb_eval
-  rb_eval = rb_evaluation_objects[0];
   rb_eval->initialize();
 
   RB_system_initialized = true;
@@ -602,10 +601,12 @@ NumericVector<Number>& RBSystem::get_basis_function(unsigned int i)
   return rb_eval->get_basis_function(i);
 }
 
-void RBSystem::add_new_rb_evaluation_object()
+RBEvaluation* RBSystem::add_new_rb_evaluation_object()
 {
   RBEvaluation* e = new RBEvaluation(*this);
   rb_evaluation_objects.push_back(e);
+
+  return e;
 }
 
 void RBSystem::attach_dirichlet_dof_initialization (dirichlet_list_fptr dirichlet_init)

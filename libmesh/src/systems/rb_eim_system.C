@@ -533,10 +533,12 @@ void RBEIMSystem::init_context(FEMContext &c)
   }
 }
 
-void RBEIMSystem::add_new_rb_evaluation_object()
+RBEvaluation* RBEIMSystem::add_new_rb_evaluation_object()
 {
   RBEIMEvaluation* e = new RBEIMEvaluation(*this);
   rb_evaluation_objects.push_back(e);
+  
+  return e;
 }
 
 void RBEIMSystem::update_RB_system_matrices()

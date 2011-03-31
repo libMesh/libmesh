@@ -189,7 +189,7 @@ public:
    * Build a new QNTransientRBEvaluation object and add
    * it to the rb_evaluation_objects vector.
    */
-  virtual void add_new_rb_evaluation_object();
+  virtual RBEvaluation* add_new_rb_evaluation_object();
 
   /**
    * Get the SCM lower bound for the current parameters
