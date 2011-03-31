@@ -120,6 +120,9 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-amr");
 #elif !defined(LIBMESH_ENABLE_PERIODIC)
   libmesh_example_assert(false, "--enable-periodic");
+#elif defined(LIBMESH_ENABLE_PARMESH)
+  // ParallelMesh still has a bug with adaptive coarsening
+  libmesh_example_assert(false, "--disable-parmesh");
 #else
 
   // Our Trilinos interface does not yet support adaptive transient
