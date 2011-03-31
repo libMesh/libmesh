@@ -139,7 +139,7 @@ public:
    * Build a new TransientRBEvaluation object and add
    * it to the rb_evaluation_objects vector.
    */
-  virtual void add_new_rb_evaluation_object();
+  virtual RBEvaluation* add_new_rb_evaluation_object();
   
   /**
    * Get Q_m, the number of terms in the affine

@@ -470,8 +470,9 @@ public:
   /**
    * Build a new RBEvaluation object and add
    * it to the rb_evaluation_objects vector.
+   * @return a pointer to the new RBEvaluation object.
    */
-  virtual void add_new_rb_evaluation_object();
+  virtual RBEvaluation* add_new_rb_evaluation_object();
   
   /**
    * Evaluate the dual norm of output \p n

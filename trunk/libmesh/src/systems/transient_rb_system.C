@@ -306,10 +306,12 @@ void TransientRBSystem::initialize_RB_system(bool do_not_assemble)
     }
 }
 
-void TransientRBSystem::add_new_rb_evaluation_object()
+RBEvaluation* TransientRBSystem::add_new_rb_evaluation_object()
 {
   TransientRBEvaluation* e = new TransientRBEvaluation(*this);
   rb_evaluation_objects.push_back(e);
+  
+  return e;
 }
 
 Real TransientRBSystem::train_reduced_basis(const std::string& directory_name)

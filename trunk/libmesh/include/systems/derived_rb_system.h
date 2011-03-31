@@ -90,7 +90,7 @@ public:
    * Build a new DerivedRBEvaluation object and add
    * it to the rb_evaluation_objects vector.
    */
-  virtual void add_new_rb_evaluation_object();
+  virtual RBEvaluation* add_new_rb_evaluation_object();
   
   /**
    * Load the RB solution from the most recent solve

@@ -164,10 +164,12 @@ void QNTransientRBSystem::process_parameters_file ()
   libMesh::out << std::endl;
 }
 
-void QNTransientRBSystem::add_new_rb_evaluation_object()
+RBEvaluation* QNTransientRBSystem::add_new_rb_evaluation_object()
 {
   QNTransientRBEvaluation* e = new QNTransientRBEvaluation(*this);
   rb_evaluation_objects.push_back(e);
+  
+  return e;
 }
 
 void QNTransientRBSystem::allocate_data_structures()

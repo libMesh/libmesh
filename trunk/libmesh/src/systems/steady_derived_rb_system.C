@@ -12,10 +12,12 @@ namespace libMesh
 {
 
 template <>
-void DerivedRBSystem<RBSystem>::add_new_rb_evaluation_object()
+RBEvaluation* DerivedRBSystem<RBSystem>::add_new_rb_evaluation_object()
 {
   DerivedRBEvaluation<RBEvaluation>* e = new DerivedRBEvaluation<RBEvaluation>(*this);
   rb_evaluation_objects.push_back(e);
+  
+  return e;
 }
 
 template <>
