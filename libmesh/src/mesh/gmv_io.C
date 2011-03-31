@@ -226,13 +226,10 @@ namespace libMesh
 // GMVIO  members
 void GMVIO::write (const std::string& fname)
 {
-  if (libMesh::processor_id() == 0)
-    {
-      if (this->binary())
-	this->write_binary (fname);
-      else
-	this->write_ascii_old_impl  (fname);
-    }
+  if (this->binary())
+    this->write_binary (fname);
+  else
+    this->write_ascii_old_impl  (fname);
 }
 
 
@@ -243,13 +240,10 @@ void GMVIO::write_nodal_data (const std::string& fname,
 {
   START_LOG("write_nodal_data()", "GMVIO");
 
-  if (libMesh::processor_id() == 0)
-    {
-      if (this->binary())
-	this->write_binary (fname, &soln, &names);
-      else
-	this->write_ascii_old_impl  (fname, &soln, &names);
-    }
+  if (this->binary())
+    this->write_binary (fname, &soln, &names);
+  else
+    this->write_ascii_old_impl  (fname, &soln, &names);
   
   STOP_LOG("write_nodal_data()", "GMVIO");
 }
@@ -270,7 +264,13 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   this->write_ascii_old_impl (fname, v, solution_names);
 
 #else
+
+  // This is a parallel_only function
+  const unsigned int n_active_elem = mesh.n_active_elem();
   
+  if (libMesh::processor_id() != 0)
+    return;
+
   // Open the output file stream
   std::ofstream out (fname.c_str());
 
@@ -306,7 +306,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 
   {
     // write the connectivity
-    out << "cells " << mesh.n_active_elem() << "\n";
+    out << "cells " << n_active_elem << "\n";
     
     // initialize the eletypes map
     init_eletypes();
@@ -544,6 +544,16 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 				  const std::vector<Number>* v,
 				  const std::vector<std::string>* solution_names)
 {
+  // Get a reference to the mesh
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  // These are parallel_only functions
+  const unsigned int n_active_elem = mesh.n_active_elem(),
+                     n_active_sub_elem = mesh.n_active_sub_elem();
+
+  if (libMesh::processor_id() != 0)
+    return;
+
   // Open the output file stream
   std::ofstream out (fname.c_str());
   
@@ -553,9 +563,6 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   // Make sure it opened correctly
   if (!out.good())
     libmesh_file_error(fname.c_str());
-
-  // Get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   // Make sure our nodes are contiguous and serialized
   libmesh_assert (mesh.n_nodes() == mesh.max_node_id());
@@ -603,9 +610,9 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
     
     out << "cells ";
     if (this->subdivide_second_order())
-      out << mesh.n_active_sub_elem();
+      out << n_active_sub_elem;
     else
-      out << mesh.n_active_elem();
+      out << n_active_elem;
     out << '\n';
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
@@ -1183,12 +1190,18 @@ void GMVIO::write_binary (const std::string& fname,
                           const std::vector<Number>* vec,
                           const std::vector<std::string>* solution_names)
 {
+  // Get a reference to the mesh
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  // This is a parallel_only function
+  const unsigned int n_active_elem = mesh.n_active_elem();
+
+  if (libMesh::processor_id() != 0)
+    return;
+
   std::ofstream out (fname.c_str());
   
   libmesh_assert (out.good());
-
-  // get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   unsigned int mesh_max_p_level = 0;
   
@@ -1242,7 +1255,7 @@ void GMVIO::write_binary (const std::string& fname,
     std::strcpy(buf, "cells   ");
     out.write(buf, std::strlen(buf));
 
-    unsigned int tempint = mesh.n_active_elem();
+    unsigned int tempint = n_active_elem;
     
     std::memcpy(buf, &tempint, sizeof(unsigned int));
     
@@ -1351,7 +1364,7 @@ void GMVIO::write_binary (const std::string& fname,
 	      out.write(buf, 8);
 	    }
 
-	  std::vector<unsigned int> proc_id (mesh.n_active_elem());
+	  std::vector<unsigned int> proc_id (n_active_elem);
       
 	  unsigned int n=0;
       
@@ -1395,7 +1408,7 @@ void GMVIO::write_binary (const std::string& fname,
   // optionally write the partition information
   if (this->p_levels() && mesh_max_p_level)
     {
-      unsigned int n_floats = mesh.n_active_elem();
+      unsigned int n_floats = n_active_elem;
       for (unsigned int i=0; i != mesh.mesh_dimension(); ++i)
         n_floats *= 2;
 
@@ -1448,7 +1461,7 @@ void GMVIO::write_binary (const std::string& fname,
 
 // 	  // Since the_array might contain zeros (for inactive elements) we need to
 // 	  // make a copy of it containing just values for active elements.
-// 	  const unsigned int n_floats = mesh.n_active_elem() * (1<<mesh.mesh_dimension());
+// 	  const unsigned int n_floats = n_active_elem * (1<<mesh.mesh_dimension());
 // 	  float *temp = new float[n_floats];
 
 // 	  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
@@ -1593,7 +1606,12 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   es.build_variable_names  (solution_names);
   es.build_discontinuous_solution_vector (v);
   
-  if (mesh.processor_id() != 0) return;
+  // These are parallel_only functions
+  const unsigned int n_active_elem = mesh.n_active_elem(),
+                     n_active_sub_elem = mesh.n_active_sub_elem();
+
+  if (mesh.processor_id() != 0)
+    return;
   
   std::ofstream out(name.c_str());
   
@@ -1664,7 +1682,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   {
     // write the connectivity
     
-    out << "cells " << mesh.n_active_elem() << std::endl;
+    out << "cells " << n_active_elem << std::endl;
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
@@ -1930,8 +1948,8 @@ void GMVIO::add_cell_centered_data (const std::string&       cell_centered_data_
 
   // Make sure there are *at least* enough entries for all the active elements.
   // There can also be entries for inactive elements, they will be ignored.
-  libmesh_assert (cell_centered_data_vals->size() >=
-	  MeshOutput<MeshBase>::mesh().n_active_elem());
+  // libmesh_assert (cell_centered_data_vals->size() >=
+  //	  MeshOutput<MeshBase>::mesh().n_active_elem());
   this->_cell_centered_data[cell_centered_data_name] = cell_centered_data_vals;
 }
 

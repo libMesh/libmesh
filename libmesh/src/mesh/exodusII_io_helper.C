@@ -440,9 +440,12 @@ void ExodusII_IO_Helper::print_sideset_info()
 
 void ExodusII_IO_Helper::close()
 {
-  ex_err = exII::ex_close(ex_id);
-  check_err(ex_err, "Error closing Exodus file.");
-  message("Exodus file closed successfully."); 
+  if (libMesh::processor_id() == 0)
+    {
+      ex_err = exII::ex_close(ex_id);
+      check_err(ex_err, "Error closing Exodus file.");
+      message("Exodus file closed successfully."); 
+    }
 }
 
 int ExodusII_IO_Helper::inquire(int req_info, std::string error_msg)
@@ -543,22 +546,30 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
 
 void ExodusII_IO_Helper::create(std::string filename)
 {
-  //Fall back on double precision when necessary since ExodusII
-  //doesn't seem to support long double
-  comp_ws = std::min(sizeof(Real),sizeof(double));
-  io_ws = std::min(sizeof(Real),sizeof(double));
+  if (libMesh::processor_id() == 0)
+    {
+
+      //Fall back on double precision when necessary since ExodusII
+      //doesn't seem to support long double
+      comp_ws = std::min(sizeof(Real),sizeof(double));
+      io_ws = std::min(sizeof(Real),sizeof(double));
     
-  ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
+      ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
 
-  check_err(ex_id, "Error creating ExodusII mesh file.");
+      check_err(ex_id, "Error creating ExodusII mesh file.");
 
-  if (_verbose) libMesh::out << "File created successfully." << std::endl;
+      if (_verbose)
+        libMesh::out << "File created successfully." << std::endl;
+    }
 
   _created = true;
 }
 
 void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const MeshBase & mesh)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   num_dim = mesh.spatial_dimension();
 
   MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
@@ -606,6 +617,12 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
 
 void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh)
 {
+  // n_active_elem() is a parallel_only function
+  unsigned int n_active_elem = mesh.n_active_elem();
+
+  if (libMesh::processor_id() != 0)
+    return;
+
   num_dim = mesh.spatial_dimension();
   num_nodes = mesh.n_nodes();
   num_elem = mesh.n_elem();
@@ -640,7 +657,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 			     str_title.c_str(),
 			     num_dim,
 			     num_nodes,
-			     mesh.n_active_elem(),
+			     n_active_elem,
 			     num_elem_blk,
 			     num_node_sets,
 			     num_side_sets);
@@ -650,6 +667,9 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
 void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   x.resize(num_nodes);
   y.resize(num_nodes);
   z.resize(num_nodes);
@@ -671,6 +691,9 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & mesh)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   x.resize(num_nodes);
   y.resize(num_nodes);
   z.resize(num_nodes);
@@ -698,6 +721,12 @@ void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & 
 
 void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 {
+  // n_active_elem() is a parallel_only function
+  unsigned int n_active_elem = mesh.n_active_elem();
+
+  if (libMesh::processor_id() != 0)
+    return;
+
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
 
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin(); 
@@ -721,7 +750,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
   // element map vector
   block_ids.clear();
-  std::vector<unsigned int> elem_map(mesh.n_active_elem());
+  std::vector<unsigned int> elem_map(n_active_elem);
   std::vector<unsigned int>::iterator curr_elem_map_end = elem_map.begin();
   for(it = subdomain_map.begin() ; it != subdomain_map.end(); it++)
     {
@@ -779,6 +808,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
 
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin(); 
@@ -860,6 +892,9 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   ExodusII_IO_Helper::ElementMaps em;
 
   std::vector< unsigned int > el;
@@ -920,6 +955,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   ExodusII_IO_Helper::ElementMaps em;
 
   std::vector< unsigned int > nl;
@@ -957,18 +995,17 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names)
 {
-  if (_elem_vars_initialized)
-  {
+  if (libMesh::processor_id() != 0)
     return;
-  }
-  _elem_vars_initialized = true;
 
   num_elem_vars = names.size();
 
   if ( num_elem_vars == 0 )
-  {
     return;
-  }
+
+  if (_elem_vars_initialized)
+    return;
+  _elem_vars_initialized = true;
 
   ex_err = exII::ex_put_var_param(ex_id, "e", num_elem_vars);
   check_err(ex_err, "Error setting number of element vars.");
@@ -1008,6 +1045,9 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
 
 void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> names)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   num_nodal_vars = names.size();
 
   ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
@@ -1048,6 +1088,9 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
 
 void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::string> & names)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   if (_global_vars_initialized) 
   {
     return;
@@ -1095,6 +1138,9 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
 
 void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   ex_err = exII::ex_put_time(ex_id, timestep, &time);
   check_err(ex_err, "Error writing timestep.");
 
@@ -1106,6 +1152,8 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
 void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::vector<Number> & values, int timestep)
 {
+  if (libMesh::processor_id() != 0)
+    return;
 
   // Loop over the element blocks and write the data one block at a time
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
@@ -1159,6 +1207,9 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
 
 void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number> & values, int timestep)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
   check_err(ex_err, "Error writing nodal values.");
 
@@ -1170,6 +1221,9 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number
 
 void ExodusII_IO_Helper::write_information_records(const std::vector<std::string> & records)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   int num_records = records.size();
   std::vector<char *> info(num_records);
   for ( int i(0); i < num_records;  ++i )
@@ -1186,6 +1240,9 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
 
 void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values, int timestep)
 {
+  if (libMesh::processor_id() != 0)
+    return;
+
   ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_globals, &values[0]);
   check_err(ex_err, "Error writing global values.");
 

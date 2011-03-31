@@ -65,8 +65,7 @@ ExodusII_IO::~ExodusII_IO ()
     
 #else
   
-  if(libMesh::processor_id() == 0)
-    exio_helper->close();
+  exio_helper->close();
 
   delete exio_helper;
   
@@ -329,23 +328,18 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   // The data must ultimately be written block by block.  This means that this data
   // must be sorted appropriately.
 
-
-  if (libMesh::processor_id() == 0)
+  if (!exio_helper->created())
     {
-      if (!exio_helper->created())
-	{
-          libMesh::err << "ERROR, ExodusII file must be initialized "
-                       << "before outputting element variables.\n"
-                       << std::endl;
-          libmesh_error();
-	}
-
-      const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
-      exio_helper->initialize_element_variables( names );
-      exio_helper->write_element_values(mesh,soln,_timestep);
-
+      libMesh::err << "ERROR, ExodusII file must be initialized "
+                   << "before outputting element variables.\n"
+                   << std::endl;
+      libmesh_error();
     }
+
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  exio_helper->initialize_element_variables( names );
+  exio_helper->write_element_values(mesh,soln,_timestep);
 }
 
 #endif
@@ -377,8 +371,6 @@ void ExodusII_IO::write_discontinuous_exodusII (const std::string& name,
   es.build_variable_names  (solution_names);
   es.build_discontinuous_solution_vector (v);
 
-  if (mesh.processor_id() != 0) return;
-
   this->write_nodal_data_discontinuous(name, v, solution_names); 
 }
   
@@ -387,78 +379,72 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
 				    const std::vector<Number>& soln,
 				    const std::vector<std::string>& names) 
 {
-  if (libMesh::processor_id() == 0)
-    {
-      const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-      int num_vars = names.size();
-      int num_nodes = 0;
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-      for ( ; it != end; ++it)
-    	num_nodes += (*it)->n_nodes();
+  int num_vars = names.size();
+  int num_nodes = 0;
+  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+  for ( ; it != end; ++it)
+    num_nodes += (*it)->n_nodes();
   
-      // FIXME: Will we ever _not_ need to do this?
-      // DRG: Yes... when writing multiple timesteps to the same file.
-      if (!exio_helper->created())
-	{
-	  exio_helper->create(fname);
-	  exio_helper->initialize_discontinuous(fname,mesh);
-	  exio_helper->write_nodal_coordinates_discontinuous(mesh);
-	  exio_helper->write_elements_discontinuous(mesh);
-          exio_helper->write_sidesets(mesh);
-          exio_helper->write_nodesets(mesh);
-	  exio_helper->initialize_nodal_variables(names);
-	}
-    
-      for (int c=0; c<num_vars; c++)
-	{
-	  std::vector<Number> cur_soln(num_nodes);
-
-	  //Copy out this variable's solution
-	  for(int i=0; i<num_nodes; i++)
-	    cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
-    
-	  exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
-	}  
+  // FIXME: Will we ever _not_ need to do this?
+  // DRG: Yes... when writing multiple timesteps to the same file.
+  if (!exio_helper->created())
+    {
+      exio_helper->create(fname);
+      exio_helper->initialize_discontinuous(fname,mesh);
+      exio_helper->write_nodal_coordinates_discontinuous(mesh);
+      exio_helper->write_elements_discontinuous(mesh);
+      exio_helper->write_sidesets(mesh);
+      exio_helper->write_nodesets(mesh);
+      exio_helper->initialize_nodal_variables(names);
     }
+    
+  for (int c=0; c<num_vars; c++)
+    {
+      std::vector<Number> cur_soln(num_nodes);
+
+      //Copy out this variable's solution
+      for(int i=0; i<num_nodes; i++)
+        cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+    
+      exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+    }  
 }
 
 void ExodusII_IO::write_nodal_data (const std::string& fname,
 				    const std::vector<Number>& soln,
 				    const std::vector<std::string>& names)
 {
-  if (libMesh::processor_id() == 0)
-    {
-      const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-      int num_vars = names.size();
-      int num_nodes = mesh.n_nodes();
+  int num_vars = names.size();
+  int num_nodes = mesh.n_nodes();
   
-      // FIXME: Will we ever _not_ need to do this?
-      // DRG: Yes... when writing multiple timesteps to the same file.
-      if (!exio_helper->created())
-	{
-	  exio_helper->create(fname);
-	  exio_helper->initialize(fname,mesh);
-	  exio_helper->write_nodal_coordinates(mesh);
-	  exio_helper->write_elements(mesh);
-          exio_helper->write_sidesets(mesh);
-          exio_helper->write_nodesets(mesh);
-	  exio_helper->initialize_nodal_variables(names);
-	}
-    
-      for (int c=0; c<num_vars; c++)
-	{
-	  std::vector<Number> cur_soln(num_nodes);
-
-	  //Copy out this variable's solution
-	  for(int i=0; i<num_nodes; i++)
-	    cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
-    
-	  exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
-	}  
+  // FIXME: Will we ever _not_ need to do this?
+  // DRG: Yes... when writing multiple timesteps to the same file.
+  if (!exio_helper->created())
+    {
+      exio_helper->create(fname);
+      exio_helper->initialize(fname,mesh);
+      exio_helper->write_nodal_coordinates(mesh);
+      exio_helper->write_elements(mesh);
+      exio_helper->write_sidesets(mesh);
+      exio_helper->write_nodesets(mesh);
+      exio_helper->initialize_nodal_variables(names);
     }
+    
+  for (int c=0; c<num_vars; c++)
+    {
+      std::vector<Number> cur_soln(num_nodes);
+
+      //Copy out this variable's solution
+      for(int i=0; i<num_nodes; i++)
+        cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+    
+      exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+    }  
 }
 
 #endif
@@ -477,19 +463,15 @@ void ExodusII_IO::write_information_records ( const std::vector<std::string>& )
 
 void ExodusII_IO::write_information_records (const std::vector<std::string>& records)
 {
-  if (libMesh::processor_id() == 0)
+  if (!exio_helper->created())
     {
-
-      if (!exio_helper->created())
-	{
-          libMesh::err << "ERROR, ExodusII file must be initialized "
-                       << "before outputting information records.\n"
-                       << std::endl;
-          libmesh_error();
-	}
-
-      exio_helper->write_information_records( records );
+      libMesh::err << "ERROR, ExodusII file must be initialized "
+                   << "before outputting information records.\n"
+                   << std::endl;
+      libmesh_error();
     }
+
+  exio_helper->write_information_records( records );
 }
 
 #endif
@@ -510,20 +492,16 @@ void ExodusII_IO::write_global_data (const std::vector<Number>& ,
 void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
                                      const std::vector<std::string>& names)
 {
-  if (libMesh::processor_id() == 0)
+  if (!exio_helper->created())
     {
-  
-      if (!exio_helper->created())
-	{
-          libMesh::err << "ERROR, ExodusII file must be initialized "
-                       << "before outputting global variables.\n"
-                       << std::endl;
-          libmesh_error();
-	}
-
-      exio_helper->initialize_global_variables( names );
-      exio_helper->write_global_values( soln, _timestep );
+      libMesh::err << "ERROR, ExodusII file must be initialized "
+                   << "before outputting global variables.\n"
+                   << std::endl;
+      libmesh_error();
     }
+
+  exio_helper->initialize_global_variables( names );
+  exio_helper->write_global_values( soln, _timestep );
 }
 
 #endif
@@ -552,8 +530,7 @@ void ExodusII_IO::write_timestep (const std::string& fname,
   _timestep=timestep; 
   write_equation_systems(fname,es);
 
-  if (libMesh::processor_id() == 0)
-    exio_helper->write_timestep(timestep, time);
+  exio_helper->write_timestep(timestep, time);
 }
 
 #endif
@@ -574,21 +551,21 @@ void ExodusII_IO::write (const std::string& )
 
 void ExodusII_IO::write (const std::string& fname)
 {
-  if (libMesh::processor_id() == 0)
-    {
-      const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   
-      libmesh_assert( !exio_helper->created() );
+  // We may need to gather a ParallelMesh to output it, making that
+  // const qualifier in our constructor a dirty lie
+  MeshOutputSerializer serialize(const_cast<MeshBase&>(mesh), !MeshOutput<MeshBase>::_is_parallel_format);
 
-      exio_helper->create(fname);
-      exio_helper->initialize(fname,mesh);
-      exio_helper->write_nodal_coordinates(mesh);
-      exio_helper->write_elements(mesh);
-      exio_helper->write_sidesets(mesh);
-      exio_helper->write_nodesets(mesh);
-      // Note: the file is closed automatically by the ExodusII_IO destructor.
-    }
+  libmesh_assert( !exio_helper->created() );
+
+  exio_helper->create(fname);
+  exio_helper->initialize(fname,mesh);
+  exio_helper->write_nodal_coordinates(mesh);
+  exio_helper->write_elements(mesh);
+  exio_helper->write_sidesets(mesh);
+  exio_helper->write_nodesets(mesh);
+  // Note: the file is closed automatically by the ExodusII_IO destructor.
 }
 
 #endif

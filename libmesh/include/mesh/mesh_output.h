@@ -114,6 +114,41 @@ class MeshOutput
    */
   const MT& mesh() const;
 
+
+  /**
+   * Flag specifying whether this format is parallel-capable.
+   * If this is false (default) I/O is only permitted when the mesh
+   * has been serialized.
+   */
+  const bool _is_parallel_format;
+
+
+  /**
+   * Temporarily serialize a ParallelMesh for output
+   */
+  class MeshOutputSerializer
+  {
+  public:
+    MeshOutputSerializer(MT& mesh, bool need_serial) :
+       _mesh(mesh),
+       reparallelize(false)
+    {
+      if (need_serial && !_mesh.is_serial()) {
+        reparallelize = true;
+        _mesh.allgather();
+      }
+    }
+
+    ~MeshOutputSerializer() {
+      if (reparallelize)
+        _mesh.delete_remote_elements();
+    }
+
+  private:
+    MT& _mesh;
+    bool reparallelize;
+  };
+
   
  private:
   
@@ -128,13 +163,6 @@ class MeshOutput
    * Precision to use when writing ASCII files.
    */
   unsigned int _ascii_precision;
-
-  /**
-   * Flag specifying whether this format is parallel-capable.
-   * If this is false (default) I/O is only permitted when the mesh
-   * has been serialized.
-   */
-  const bool _is_parallel_format;
 
   /**
    * A helper function which allows us to fill temporary
@@ -193,6 +221,10 @@ inline
 void MeshOutput<MT>::write_equation_systems (const std::string& fname,
 					     const EquationSystems& es)
 {
+  // We may need to gather a ParallelMesh to output it, making that
+  // const qualifier in our constructor a dirty lie
+  MeshOutputSerializer(const_cast<MT&>(*_obj), !_is_parallel_format);
+
   // Build the nodal solution values & get the variable
   // names from the EquationSystems object
   std::vector<Number>      soln;
