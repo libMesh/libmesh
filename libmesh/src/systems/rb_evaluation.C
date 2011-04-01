@@ -569,6 +569,9 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     }
 
   }
+  
+  // Synchronize before moving on
+  Parallel::barrier();
 
   // Now write out the basis functions if requested
   write_out_basis_functions(directory_name, precision_level);
