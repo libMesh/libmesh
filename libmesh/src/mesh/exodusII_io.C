@@ -365,9 +365,6 @@ void ExodusII_IO::write_discontinuous_exodusII (const std::string& name,
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
 
-  // Get a reference to the mesh
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
-  
   es.build_variable_names  (solution_names);
   es.build_discontinuous_solution_vector (v);
 

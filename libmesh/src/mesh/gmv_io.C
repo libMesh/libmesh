@@ -1607,8 +1607,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   es.build_discontinuous_solution_vector (v);
   
   // These are parallel_only functions
-  const unsigned int n_active_elem = mesh.n_active_elem(),
-                     n_active_sub_elem = mesh.n_active_sub_elem();
+  const unsigned int n_active_elem = mesh.n_active_elem();
 
   if (mesh.processor_id() != 0)
     return;
