@@ -509,19 +509,27 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
   libmesh_assert (elem != NULL);
 
   // Only level-0 elements store BCs.  If this is not a level-0
-  // element get its level-0 parent and infer the BCs.
+  // element, one of its parent elements may have either internal
+  // or external boundary IDs.  We find that parent now.
   const Elem*  searched_elem = elem;
   if (elem->level() != 0)
   {
-    if (elem->side(side).get() == NULL)
+    // Child element on external side: the top_parent will have the BCs
+    if (elem->neighbor(side) == NULL)
       searched_elem = elem->top_parent ();
+    
+    // Child element is not on external side, but it may have internal
+    // "boundary" IDs.  We will walk up the tree, at each level checking that 
+    // the current child is actually on the same side of the parent that is
+    // currently being searched for (i.e. that was passed in as "side").
     else
-      while (searched_elem->parent() != NULL) {
-        const Elem * parent = searched_elem->parent();
-        if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-          return invalid_id;
-        searched_elem = parent;
-      }
+      while (searched_elem->parent() != NULL) 
+	{
+	  const Elem * parent = searched_elem->parent();
+	  if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+	    return invalid_id;
+	  searched_elem = parent;
+	}
   }
   
   std::pair<std::multimap<const Elem*,
@@ -564,15 +572,16 @@ std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
   const Elem*  searched_elem = elem;
   if (elem->level() != 0)
   {
-    if (elem->side(side).get() == NULL)
+    if (elem->neighbor(side) == NULL)
       searched_elem = elem->top_parent ();
     else
-      while (searched_elem->parent() != NULL) {
-        const Elem * parent = searched_elem->parent();
-        if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-          return ids;
-        searched_elem = parent;
-      }
+      while (searched_elem->parent() != NULL) 
+	{
+	  const Elem * parent = searched_elem->parent();
+	  if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+	    return ids;
+	  searched_elem = parent;
+	}
   }
 
   std::pair<std::multimap<const Elem*,
@@ -595,8 +604,8 @@ std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
       ++e.first;
     }
 
-  // if we get here, we found elem in the data structure but not
-  // the requested side, so return the default value
+  // Whether or not we found anything, return "ids".  If it's empty, it
+  // means no valid bounary IDs were found for "side"
   return ids;
 
 }
