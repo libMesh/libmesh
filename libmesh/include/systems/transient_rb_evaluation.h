@@ -54,6 +54,12 @@ public:
   typedef RBEvaluation Parent;
 
   /**
+   * Clear this TransientRBEvaluation object.
+   * Overload to also clear the M_q representors
+   */
+  virtual void clear();
+
+  /**
    * Initialize this object by allocating the necessary data fields.
    */
   virtual void initialize();
@@ -170,6 +176,12 @@ public:
   DenseVector<Number> cached_Fq_Mq_vector;
   DenseMatrix<Number> cached_Aq_Mq_matrix;
   DenseMatrix<Number> cached_Mq_Mq_matrix;
+
+  /**
+   * Vector storing the mass matrix representors.
+   * These are basis dependent and hence stored here.
+   */
+  std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
 
 };
 

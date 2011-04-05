@@ -179,7 +179,15 @@ public:
   std::vector<Number> Fq_representor_norms;
   std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
   std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
-  
+
+  /**
+   * Vector storing the residual representors associated with the
+   * left-hand side.
+   * These are basis dependent and hence stored here, whereas
+   * the F_q_representors are stored in RBSystem.
+   */
+  std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
+
   /**
    * Boolean to indicate whether we store the data for evaluating RB outputs
    * in the Online stage in multiple files or in a single file.

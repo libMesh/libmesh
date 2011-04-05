@@ -64,6 +64,19 @@ void RBEvaluation::clear()
   }
   basis_functions.resize(0);
 
+  // Clear the A_q_representors
+  for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
+  {
+    for(unsigned int i=0; i<A_q_representor[q_a].size(); i++)
+    {
+      if(A_q_representor[q_a][i])
+      {
+        delete A_q_representor[q_a][i];
+        A_q_representor[q_a][i] = NULL;
+      }
+    }
+  }
+
   // Clear the Greedy param list
   for(unsigned int i=0; i<greedy_param_list.size(); i++)
     greedy_param_list[i].clear();
@@ -136,6 +149,13 @@ void RBEvaluation::initialize()
   // Initialize vectors storing output data
   RB_outputs.resize(rb_sys.get_n_outputs());
   RB_output_error_bounds.resize(rb_sys.get_n_outputs());
+
+  // Resize the vector of A_q_representors
+  A_q_representor.resize(rb_sys.get_Q_a());
+  for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
+  {
+    A_q_representor[q_a].resize(rb_sys.get_Nmax());
+  }
 }
 
 NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)
@@ -576,6 +596,54 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
   // Now write out the basis functions if requested
   write_out_basis_functions(directory_name, precision_level);
 
+  // Write out residual representors if requested
+  if (rb_sys.store_representors)
+  {
+    // Write out A_q_representors.  These are useful to have when restarting,
+    // so you don't have to recompute them all over again.  There should be
+    // Q_a * this->get_n_basis_functions() of these.
+    if (!rb_sys.is_quiet())
+      libMesh::out << "Writing out the A_q_representors..." << std::endl;
+
+    const std::string residual_representors_dir = "residual_representors";
+    const std::string residual_representor_suffix =
+      (rb_sys.read_binary_residual_representors ? ".xdr" : ".dat");
+    std::ostringstream file_name;
+
+    const unsigned int jstop  = this->get_n_basis_functions();
+    const unsigned int jstart = jstop-rb_sys.get_delta_N();
+    for (unsigned int i=0; i<A_q_representor.size(); ++i)
+      for (unsigned int j=jstart; j<jstop; ++j)
+      {
+        libMesh::out << "Writing out A_q_representor[" << i << "][" << j << "]..." << std::endl;
+        libmesh_assert(A_q_representor[i][j] != NULL);
+
+        file_name.str(""); // reset filename
+        file_name << residual_representors_dir
+                  << "/A_q_representor" << i << "_" << j << residual_representor_suffix;
+
+        {
+          // No need to copy! Use swap instead.
+          // *solution = *(A_q_representor[i][j]);
+          A_q_representor[i][j]->swap(*rb_sys.solution);
+
+          Xdr aqr_data(file_name.str(),
+                       rb_sys.write_binary_residual_representors ? ENCODE : WRITE);
+
+          rb_sys.write_serialized_data(aqr_data, false);
+
+          // Synchronize before moving on
+          Parallel::barrier();
+
+          // Swap back.
+          A_q_representor[i][j]->swap(*rb_sys.solution);
+
+          // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
+          // for the system call, be sure to do it only on one processor, etc.
+        }
+      }
+  }
+
   STOP_LOG("write_offline_data_to_files()", "RBEvaluation");
 }
 
@@ -827,6 +895,66 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
 
   // Read in the basis functions if requested.
   read_in_basis_functions(directory_name);
+
+  // Read in the representor vectors if requested
+  if (rb_sys.store_representors)
+  {
+    libMesh::out << "Reading in the A_q_representors..." << std::endl;
+
+    const std::string residual_representors_dir = "residual_representors";
+    const std::string residual_representor_suffix =
+      (rb_sys.read_binary_residual_representors ? ".xdr" : ".dat");
+    std::ostringstream file_name;
+    struct stat stat_info;
+
+    // Read in the A_q representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
+    // read in [Q_a][this->get_n_basis_functions()].  FIXME:
+    // should we be worried about leaks in the locations where we're about to fill entries?
+    for (unsigned int i=0; i<A_q_representor.size(); ++i)
+      for (unsigned int j=0; j<A_q_representor[i].size(); ++j)
+      {
+        if (A_q_representor[i][j] != NULL)
+        {
+          libMesh::out << "Error, must delete existing A_q_representor before reading in from file."
+                       << std::endl;
+          libmesh_error();
+        }
+      }
+
+    // Now ready to read them in from file!
+    for (unsigned int i=0; i<A_q_representor.size(); ++i)
+      for (unsigned int j=0; j<this->get_n_basis_functions(); ++j)
+      {
+        file_name.str(""); // reset filename
+        file_name << residual_representors_dir
+                  << "/A_q_representor" << i << "_" << j << residual_representor_suffix;
+
+        // On processor zero check to be sure the file exists
+        if (libMesh::processor_id() == 0)
+        {
+          int stat_result = stat(file_name.str().c_str(), &stat_info);
+
+          if (stat_result != 0)
+          {
+            libMesh::out << "File does not exist: " << file_name.str() << std::endl;
+            libmesh_error();
+          }
+        }
+
+        Xdr aqr_data(file_name.str(),
+        rb_sys.read_binary_residual_representors ? DECODE : READ);
+
+        rb_sys.read_serialized_data(aqr_data, false);
+
+        A_q_representor[i][j] = NumericVector<Number>::build().release();
+        A_q_representor[i][j]->init (rb_sys.n_dofs(), rb_sys.n_local_dofs(),
+                                     false, libMeshEnums::PARALLEL);
+
+        // No need to copy, just swap
+        //*A_q_representor[i][j] = *solution;
+        A_q_representor[i][j]->swap(*rb_sys.solution);
+      }
+  } // end if (store_representors)
 
   STOP_LOG("read_offline_data_from_files()", "RBEvaluation");
 }

@@ -73,10 +73,10 @@ RBSystem::RBSystem (EquationSystems& es,
     enforce_constraints_exactly(false),
     write_binary_basis_functions(true),
     read_binary_basis_functions(true),
-    Nmax(0),
-    delta_N(1),
     write_binary_residual_representors(true),
     read_binary_residual_representors(true),
+    Nmax(0),
+    delta_N(1),
     quiet(true),
     eigen_system_name(""),
     inner_prod_assembly(NULL),
@@ -223,18 +223,6 @@ void RBSystem::clear_basis_helper()
     {
       delete F_q_representor[q_f];
       F_q_representor[q_f] = NULL;
-    }
-  }
-
-  for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
-  {
-    for(unsigned int i=0; i<A_q_representor[q_a].size(); i++)
-    {
-      if(A_q_representor[q_a][i])
-      {
-        delete A_q_representor[q_a][i];
-        A_q_representor[q_a][i] = NULL;
-      }
     }
   }
   
@@ -500,12 +488,12 @@ void RBSystem::allocate_data_structures()
   // initialize if initialize_mesh_dependent_data == true
   A_q_vector.resize(get_Q_a());
   F_q_vector.resize(get_Q_f());
+  
+  // Resize the F_q_representors and initialize each to NULL
+  // These are basis independent and hence stored here, whereas
+  // the A_q_representors are stored in RBEvaluation
   F_q_representor.resize(get_Q_f());
-  A_q_representor.resize(get_Q_a());
-  for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
-  {
-    A_q_representor[q_a].resize(Nmax);
-  }
+
   outputs_vector.resize(get_n_outputs());
   for(unsigned int n=0; n<get_n_outputs(); n++)
     outputs_vector[n].resize( get_Q_l(n) );
@@ -2140,14 +2128,14 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
     for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
     {
       // Initialize the vector in which we'll store the representor
-      if(!A_q_representor[q_a][i])
+      if(!rb_eval->A_q_representor[q_a][i])
       {
-        A_q_representor[q_a][i] = (NumericVector<Number>::build().release());
-        A_q_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        rb_eval->A_q_representor[q_a][i] = (NumericVector<Number>::build().release());
+        rb_eval->A_q_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
-      libmesh_assert(A_q_representor[q_a][i]->size()       == this->n_dofs()       && 
-                     A_q_representor[q_a][i]->local_size() == this->n_local_dofs() );
+      libmesh_assert(rb_eval->A_q_representor[q_a][i]->size()       == this->n_dofs()       && 
+                     rb_eval->A_q_representor[q_a][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
       if(!low_memory_mode)
@@ -2195,7 +2183,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       }
 
       // Store the representor
-      *A_q_representor[q_a][i] = *solution;
+      *rb_eval->A_q_representor[q_a][i] = *solution;
 
 
       if(reuse_preconditioner)
@@ -2233,7 +2221,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
 		{
 		  rb_eval->Fq_Aq_representor_norms[q_f][q_a][i] =
-		    inner_product_storage_vector->dot(*A_q_representor[q_a][i]);
+		    inner_product_storage_vector->dot(*rb_eval->A_q_representor[q_a][i]);
 		}
 	    }
 	}
@@ -2249,25 +2237,25 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 		    {
 		      if(!low_memory_mode)
 			{
-			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][j]);
+			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *rb_eval->A_q_representor[q_a2][j]);
 			}
 		      else
 			{
-			  matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][j]);
+			  matrix->vector_mult(*inner_product_storage_vector, *rb_eval->A_q_representor[q_a2][j]);
 			}
-		      rb_eval->Aq_Aq_representor_norms[q][i][j] = inner_product_storage_vector->dot(*A_q_representor[q_a1][i]);
+		      rb_eval->Aq_Aq_representor_norms[q][i][j] = inner_product_storage_vector->dot(*rb_eval->A_q_representor[q_a1][i]);
 
 		      if(i != j)
 			{
 			  if(!low_memory_mode)
 			    {
-			      inner_product_matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][i]);
+			      inner_product_matrix->vector_mult(*inner_product_storage_vector, *rb_eval->A_q_representor[q_a2][i]);
 			    }
 			  else
 			    {
-			      matrix->vector_mult(*inner_product_storage_vector, *A_q_representor[q_a2][i]);
+			      matrix->vector_mult(*inner_product_storage_vector, *rb_eval->A_q_representor[q_a2][i]);
 			    }
-			  rb_eval->Aq_Aq_representor_norms[q][j][i] = inner_product_storage_vector->dot(*A_q_representor[q_a1][j]);
+			  rb_eval->Aq_Aq_representor_norms[q][j][i] = inner_product_storage_vector->dot(*rb_eval->A_q_representor[q_a1][j]);
 			}
 		    }
 		}
@@ -2831,45 +2819,6 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name,
 		}
 	    }
 	}
-
-      // Write out A_q_representors.  These are useful to have when restarting,
-      // so you don't have to recompute them all over again.  There should be
-      // Q_a * this->get_n_basis_functions() of these.
-      if (!quiet)
-	libMesh::out << "Writing out the A_q_representors..." << std::endl;
-
-      const unsigned int jstop  = this->get_n_basis_functions();
-      const unsigned int jstart = jstop-delta_N;
-      for (unsigned int i=0; i<A_q_representor.size(); ++i)
-	for (unsigned int j=jstart; j<jstop; ++j)
-	  {
-	    libMesh::out << "Writing out A_q_representor[" << i << "][" << j << "]..." << std::endl;
-	    libmesh_assert(A_q_representor[i][j] != NULL);
-
-	    file_name.str(""); // reset filename
-	    file_name << residual_representors_dir
-		      << "/A_q_representor" << i << "_" << j << residual_representor_suffix;
-
-	    {
-	      // No need to copy!
-	      // *solution = *(A_q_representor[i][j]);
-	      A_q_representor[i][j]->swap(*solution);
-
-	      Xdr aqr_data(file_name.str(),
-			   write_binary_residual_representors ? ENCODE : WRITE);
-
-	      write_serialized_data(aqr_data, false);
-
-	      // Synchronize before moving on
-	      Parallel::barrier();
-
-	      // Swap back.
-	      A_q_representor[i][j]->swap(*solution);
-
-	      // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
-	      // for the system call, be sure to do it only on one processor, etc.
-	    }
-	  }
     } // end if (store_representors)
 
   STOP_LOG("write_offline_data_to_files()", "RBSystem");
@@ -2922,112 +2871,63 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name,
 
   // Read in the representor vectors if requested
   if (store_representors)
+  {
+    libMesh::out << "Reading in the F_q_representors..." << std::endl;
+
+    const std::string residual_representors_dir = "residual_representors";
+    const std::string residual_representor_suffix = (read_binary_residual_representors ? ".xdr" : ".dat");
+    std::ostringstream file_name;
+    struct stat stat_info;
+
+    // Read in the F_q_representors.  There should be Q_f of these.  FIXME:
+    // should we be worried about leaks here?
+    for (unsigned int i=0; i<F_q_representor.size(); ++i)
     {
-      libMesh::out << "Reading in the F_q_representors..." << std::endl;
+      if (F_q_representor[i] != NULL)
+      {
+        libMesh::out << "Error, must delete existing F_q_representor before reading in from file."
+                     << std::endl;
+        libmesh_error();
+      }
+    }
 
-      const std::string residual_representors_dir = "residual_representors";
-      const std::string residual_representor_suffix = (read_binary_residual_representors ? ".xdr" : ".dat");
-      std::ostringstream file_name;
-      struct stat stat_info;
+    for (unsigned int i=0; i<F_q_representor.size(); i++)
+    {
+      file_name.str(""); // reset filename
+      file_name << residual_representors_dir
+		<< "/F_q_representor" << i << residual_representor_suffix;
 
-      // Read in the F_q_representors.  There should be Q_f of these.  FIXME:
-      // should we be worried about leaks here?
-      for (unsigned int i=0; i<F_q_representor.size(); ++i)
-	{
-	  if (F_q_representor[i] != NULL)
-	    {
-	      libMesh::out << "Error, must delete existing F_q_representor before reading in from file."
-			   << std::endl;
-	      libmesh_error();
-	    }
-	}
+      // On processor zero check to be sure the file exists
+      if (libMesh::processor_id() == 0)
+      {
+        int stat_result = stat(file_name.str().c_str(), &stat_info);
 
+        if (stat_result != 0)
+        {
+          libMesh::out << "File does not exist: " << file_name.str() << std::endl;
+          libmesh_error();
+        }
+      }
 
-      for (unsigned int i=0; i<F_q_representor.size(); i++)
-	{
-	  file_name.str(""); // reset filename
-	  file_name << residual_representors_dir
-		    << "/F_q_representor" << i << residual_representor_suffix;
+      Xdr fqr_data(file_name.str(),
+                   read_binary_residual_representors ? DECODE : READ);
 
-	  // On processor zero check to be sure the file exists
-	  if (libMesh::processor_id() == 0)
-	    {
-	      int stat_result = stat(file_name.str().c_str(), &stat_info);
+      read_serialized_data(fqr_data, false);
 
-	      if (stat_result != 0)
-		{
-		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-		  libmesh_error();
-		}
-	    }
+      F_q_representor[i] = NumericVector<Number>::build().release();
+      F_q_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
-	  Xdr fqr_data(file_name.str(),
-		       read_binary_residual_representors ? DECODE : READ);
+      // No need to copy, just swap
+      // *F_q_representor[i] = *solution;
+      F_q_representor[i]->swap(*solution);
+    }
 
-	  read_serialized_data(fqr_data, false);
+    // Alert the update_residual_terms() function that we don't need to recompute
+    // the F_q_representors as we have already read them in from file!
+    update_residual_terms_called=true;
 
-	  F_q_representor[i] = NumericVector<Number>::build().release();
-	  F_q_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  } // end if (store_representors)
 
-	  // No need to copy, just swap
-	  // *F_q_representor[i] = *solution;
-	  F_q_representor[i]->swap(*solution);
-	}
-
-      // Alert the update_residual_terms() function that we don't need to recompute
-      // the F_q_representors as we have already read them in from file!
-      update_residual_terms_called=true;
-
-      libMesh::out << "Reading in the A_q_representors..." << std::endl;
-
-      // Read in the A_q representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
-      // read in [Q_a][this->get_n_basis_functions()].  FIXME:
-      // should we be worried about leaks in the locations where we're about to fill entries?
-      for (unsigned int i=0; i<A_q_representor.size(); ++i)
-	for (unsigned int j=0; j<A_q_representor[i].size(); ++j)
-	  {
-	    if (A_q_representor[i][j] != NULL)
-	      {
-		libMesh::out << "Error, must delete existing A_q_representor before reading in from file."
-			     << std::endl;
-		libmesh_error();
-	      }
-	  }
-
-      // Now ready to read them in from file!
-      for (unsigned int i=0; i<A_q_representor.size(); ++i)
-	for (unsigned int j=0; j<this->get_n_basis_functions(); ++j)
-	  {
-	    file_name.str(""); // reset filename
-	    file_name << residual_representors_dir
-		      << "/A_q_representor" << i << "_" << j << residual_representor_suffix;
-
-	    // On processor zero check to be sure the file exists
-	    if (libMesh::processor_id() == 0)
-	    {
-	      int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-	      if (stat_result != 0)
-		{
-		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-		  libmesh_error();
-		}
-	    }
-
-	    Xdr aqr_data(file_name.str(),
-			 read_binary_residual_representors ? DECODE : READ);
-
-	    read_serialized_data(aqr_data, false);
-
-	    A_q_representor[i][j] = NumericVector<Number>::build().release();
-	    A_q_representor[i][j]->init (this->n_dofs(), this->n_local_dofs(),
-					 false, libMeshEnums::PARALLEL);
-
-	    // No need to copy, just swap
-	    //*A_q_representor[i][j] = *solution;
-	    A_q_representor[i][j]->swap(*solution);
-	  }
-    } // end if (store_representors)
   STOP_LOG("read_offline_data_from_files()", "RBSystem");
 }
 
