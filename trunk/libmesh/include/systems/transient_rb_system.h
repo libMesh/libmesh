@@ -93,12 +93,6 @@ public:
   virtual bool greedy_termination_test(Real training_greedy_error, int count);
 
   /**
-   * Clear the basis functions and all basis-function-dependent data.
-   * Overloaded to also clear the M-representors.
-   */
-  virtual void clear_basis_function_dependent_data();
-
-  /**
    * Assemble and store all the affine operators.
    * Overload to assemble the mass matrix operators.
    */
@@ -233,10 +227,9 @@ public:
   void set_K(const unsigned int K) { this->_K = K; }
 
   /**
-   * Get/set M, the number of basis functions we add to the
+   * Set delta_N, the number of basis functions we add to the
    * RB space from each POD
    */
-  unsigned int get_delta_N() const       { return delta_N; }
   void set_delta_N(const unsigned int delta_N) { this->delta_N = delta_N; }
 
   /**
@@ -267,22 +260,6 @@ public:
    */
   virtual Real residual_scaling_numer(Real alpha_LB);
 
-  /**
-   * Overload write_offline_data_to_files in order to
-   * write out the mass matrix and initial condition
-   * data as well.
-   */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
-                                           const RBDataIO io_flag = ALL_DATA);
-
-  /**
-   * Overload read_offline_data_from_files in order to
-   * read in the mass matrix and initial condition
-   * data as well.
-   */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
-                                            const RBDataIO io_flag = ALL_DATA);
-
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -307,11 +284,6 @@ public:
    * most recent truth_solve.
    */
   std::vector< std::vector<Number> > truth_outputs_all_k;
-
-  /**
-   * Vectors storing the mass matrix representors.
-   */
-  std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
 
   /**
    * Boolean flag to indicate whether we are using a non-zero initialization.
@@ -464,12 +436,6 @@ protected:
   DenseVector<Number> RB_ic_proj_rhs_all_N;
 
 private:
-
-  /**
-   * Private non-virtual helper function to encapsulate
-   * the code to clear the basis-function-related data.
-   */
-  void clear_basis_helper();
 
   //----------- PRIVATE DATA MEMBERS -----------//
 

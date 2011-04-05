@@ -193,6 +193,12 @@ public:
     { this->quiet = quiet; }
 
   /**
+   * Is the system in quiet mode?
+   */
+  bool is_quiet() const
+    { return this->quiet; }
+
+  /**
    * Load the i^th RB function into the RBSystem
    * solution vector.
    */
@@ -488,6 +494,15 @@ public:
   virtual Real residual_scaling_denom(Real alpha_LB);
 
   /**
+   * Get delta_N, the number of basis functions we
+   * add to the RB space per iteration of the greedy
+   * algorithm. For steady-state systems, this should
+   * be 1, but can be more than 1 for time-dependent
+   * systems.
+   */
+  unsigned int get_delta_N() const { return delta_N; }
+
+  /**
    * Get the SCM lower bound at the current parameter value.
    */
   virtual Real get_SCM_lower_bound();
@@ -556,10 +571,12 @@ public:
   std::vector< std::vector< Number > > output_dual_norms;
 
   /**
-   * Vectors storing the residual representors.
+   * Vector storing the residual representors associated with the
+   * right-hand side.
+   * These are basis independent and hence stored here, whereas
+   * the A_q_representors are stored in RBEvaluation
    */
   std::vector< NumericVector<Number>* > F_q_representor;
-  std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
 
   /**
    * Set storing the global Dirichlet dof indices.
@@ -666,6 +683,22 @@ public:
    * write_binary_basis_functions = true.
    */
   bool read_binary_basis_functions;
+
+  /**
+   * Controls whether or not XDR (binary) files are written out for
+   * the residual respresentors.  The binary file size can be as small
+   * as 1/3 the size of an ASCII file.
+   */
+  bool write_binary_residual_representors;
+
+  /**
+   * Controls wether XDR (binary) files are read for
+   * the residual representors.  Note: if you wrote ASCII representors
+   * during a previous run but want to start writing XDR, set
+   * read_binary_residual_representors = false and
+   * write_binary_residual_representors = true.
+   */
+  bool read_binary_residual_representors;
 
 protected:
 
@@ -848,22 +881,6 @@ protected:
    * This defaults to 1 in the steady case.
    */
   unsigned int delta_N;
-
-  /**
-   * Controls whether or not XDR (binary) files are written out for
-   * the residual respresentors.  The binary file size can be as small
-   * as 1/3 the size of an ASCII file.
-   */
-  bool write_binary_residual_representors;
-
-  /**
-   * Controls wether XDR (binary) files are read for
-   * the residual representors.  Note: if you wrote ASCII representors
-   * during a previous run but want to start writing XDR, set
-   * read_binary_residual_representors = false and
-   * write_binary_residual_representors = true.
-   */
-  bool read_binary_residual_representors;
 
   /**
    * Flag to indicate whether we print out extra information during

@@ -39,9 +39,6 @@
 #include <fstream>
 #include <sstream>
 
-// For checking for the existence of files
-#include <sys/stat.h>
-
 // Need SLEPc to get the POD eigenvalues
 #if defined(LIBMESH_HAVE_SLEPC)
 // LAPACK include (via SLEPc)
@@ -109,34 +106,6 @@ void TransientRBSystem::clear()
     }
   }
   temporal_data.resize(0);
-
-  // Clear the basis-function-dependent data using a call to
-  // the non-virtual helper function
-  clear_basis_helper();
-}
-
-void TransientRBSystem::clear_basis_function_dependent_data()
-{
-  // Call non-virtual helper function that performs the clear
-  clear_basis_helper();
-
-  Parent::clear_basis_function_dependent_data();
-}
-
-void TransientRBSystem::clear_basis_helper()
-{
-  // Finally delete the representors
-  for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-  {
-    for(unsigned int i=0; i<M_q_representor[q_m].size(); i++)
-    {
-      if(M_q_representor[q_m][i])
-      {
-        delete M_q_representor[q_m][i];
-        M_q_representor[q_m][i] = NULL;
-      }
-    }
-  }
 }
 
 void TransientRBSystem::init_data()
@@ -247,14 +216,6 @@ void TransientRBSystem::allocate_data_structures()
       temporal_data[i] = (NumericVector<Number>::build().release());
       temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     }
-  }
-  
-  // Resize M_q_representor, has to be after Parent::init_data call
-  // since Nmax is read in in RBSystem
-  M_q_representor.resize(get_Q_m());
-  for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
-  {
-    M_q_representor[q_m].resize(Nmax);
   }
 
   // and the truth output vectors
@@ -1359,14 +1320,14 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
     for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
     {
       // Initialize the vectors when we need them
-      if(!M_q_representor[q_m][i])
+      if(!trans_rb_eval->M_q_representor[q_m][i])
       {
-        M_q_representor[q_m][i] = (NumericVector<Number>::build().release());
-        M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        trans_rb_eval->M_q_representor[q_m][i] = (NumericVector<Number>::build().release());
+        trans_rb_eval->M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
-      libmesh_assert(M_q_representor[q_m][i]->size()       == this->n_dofs()       && 
-                     M_q_representor[q_m][i]->local_size() == this->n_local_dofs() );
+      libmesh_assert(trans_rb_eval->M_q_representor[q_m][i]->size()       == this->n_dofs()       && 
+                     trans_rb_eval->M_q_representor[q_m][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
       if(!low_memory_mode)
@@ -1414,7 +1375,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
   //       libmesh_error();
       }
 
-      *M_q_representor[q_m][i] = *solution;
+      *trans_rb_eval->M_q_representor[q_m][i] = *solution;
 
       if(reuse_preconditioner)
       {
@@ -1451,7 +1412,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 	      for(unsigned int q_m=0; q_m<get_Q_m(); q_m++)
 		{
 		  trans_rb_eval->Fq_Mq_representor_norms[q_f][q_m][i] =
-		    M_q_representor[q_m][i]->dot(*inner_product_storage_vector);
+		    trans_rb_eval->M_q_representor[q_m][i]->dot(*inner_product_storage_vector);
 		} // end for q_m
 	    } // end for i
 	} // end for q_f
@@ -1467,25 +1428,29 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 		    {
 		      if(!low_memory_mode)
 			{
-			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m2][j]);
+			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *trans_rb_eval->M_q_representor[q_m2][j]);
 			}
 		      else
 			{
-			  matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m2][j]);
+			  matrix->vector_mult(*inner_product_storage_vector, *trans_rb_eval->M_q_representor[q_m2][j]);
 			}
-		      trans_rb_eval->Mq_Mq_representor_norms[q][i][j] = M_q_representor[q_m1][i]->dot(*inner_product_storage_vector);
+		      trans_rb_eval->Mq_Mq_representor_norms[q][i][j] =
+		        trans_rb_eval->M_q_representor[q_m1][i]->dot(*inner_product_storage_vector);
 
 		      if(i != j)
 			{
 			  if(!low_memory_mode)
 			    {
-			      inner_product_matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m2][i]);
+			      inner_product_matrix->vector_mult(*inner_product_storage_vector,
+			                                        *trans_rb_eval->M_q_representor[q_m2][i]);
 			    }
 			  else
 			    {
-			      matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m2][i]);
+			      matrix->vector_mult(*inner_product_storage_vector,
+			                          *trans_rb_eval->M_q_representor[q_m2][i]);
 			    }
-			  trans_rb_eval->Mq_Mq_representor_norms[q][j][i] = M_q_representor[q_m1][j]->dot(*inner_product_storage_vector);
+			  trans_rb_eval->Mq_Mq_representor_norms[q][j][i] =
+			    trans_rb_eval->M_q_representor[q_m1][j]->dot(*inner_product_storage_vector);
 			}
 		    } // end for j
 		} // end for i
@@ -1504,27 +1469,31 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 		    {
 		      if(!low_memory_mode)
 			{
-			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m][j]);
+			  inner_product_matrix->vector_mult(*inner_product_storage_vector,
+			                                    *trans_rb_eval->M_q_representor[q_m][j]);
 			}
 		      else
 			{
-			  matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m][j]);
+			  matrix->vector_mult(*inner_product_storage_vector,
+			                      *trans_rb_eval->M_q_representor[q_m][j]);
 			}
 		      trans_rb_eval->Aq_Mq_representor_norms[q_a][q_m][i][j] =
-			A_q_representor[q_a][i]->dot(*inner_product_storage_vector);
+			trans_rb_eval->A_q_representor[q_a][i]->dot(*inner_product_storage_vector);
 
 		      if(i != j)
 			{
 			  if(!low_memory_mode)
 			    {
-			      inner_product_matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m][i]);
+			      inner_product_matrix->vector_mult(*inner_product_storage_vector,
+			                                        *trans_rb_eval->M_q_representor[q_m][i]);
 			    }
 			  else
 			    {
-			      matrix->vector_mult(*inner_product_storage_vector, *M_q_representor[q_m][i]);
+			      matrix->vector_mult(*inner_product_storage_vector,
+			                          *trans_rb_eval->M_q_representor[q_m][i]);
 			    }
 			  trans_rb_eval->Aq_Mq_representor_norms[q_a][q_m][j][i] =
-			    A_q_representor[q_a][j]->dot(*inner_product_storage_vector);
+			    trans_rb_eval->A_q_representor[q_a][j]->dot(*inner_product_storage_vector);
 			}
 		    } // end for q_m
 		} // end for q_a
@@ -1713,153 +1682,5 @@ void TransientRBSystem::update_RB_initial_condition_all_N()
 //
 //  return libmesh_real(std::sqrt( slow_residual_norm_sq ));
 //}
-
-
-void TransientRBSystem::write_offline_data_to_files(const std::string& directory_name,
-                                                    const RBDataIO io_flag)
-{
-  START_LOG("write_offline_data_to_files()", "TransientRBSystem");
-
-  Parent::write_offline_data_to_files(directory_name, io_flag);
-
-  // return here if we only want basis dependent data
-  if(io_flag == BASIS_DEPENDENT)
-  {
-    STOP_LOG("write_offline_data_to_files()", "TransientRBSystem");
-    return;
-  }
-
-  // Write out the residual representors to file if requested
-  if (store_representors)
-    {
-      // Write out the M_q_representors.  These are useful to have when restarting,
-      // so you don't have to recompute them all over again.  There should be
-      // this->get_n_basis_functions() of these.
-      libMesh::out << "Writing out the M_q_representors..." << std::endl;
-
-      std::ostringstream file_name;
-      const std::string residual_representor_suffix = (write_binary_residual_representors ? ".xdr" : ".dat");
-
-      // Residual representors written out to their own separate directory
-      std::string residual_representors_dir = "residual_representors";
-
-      const unsigned int istop  = this->get_n_basis_functions();
-      const unsigned int istart = istop-delta_N;
-
-      for (unsigned int q=0; q<M_q_representor.size(); ++q)
-        for (unsigned int i=istart; i<istop; ++i)
-	{
-	  libMesh::out << "Writing out M_q_representor[" << q << "][" << i << "]..." << std::endl;
-	  libmesh_assert(M_q_representor[q][i] != NULL);
-
-	  file_name.str(""); // reset filename
-	  file_name << residual_representors_dir << "/M_q_representor" << i << residual_representor_suffix;
-
-	  {
-	    // No need to copy!
-	    //*solution = *(M_q_representor[q][i]);
-	    M_q_representor[q][i]->swap(*solution);
-
-	    Xdr mr_data(file_name.str(),
-			write_binary_residual_representors ? ENCODE : WRITE);
-
-	    write_serialized_data(mr_data, false);
-
-	    // Synchronize before moving on
-	    Parallel::barrier();
-
-	    // Swap back.
-	    M_q_representor[q][i]->swap(*solution);
-
-	    // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
-	    // for the system call, be sure to do it only on one processor, etc.
-	  }
-	}
-    } // end if store_representors
-
-  STOP_LOG("write_offline_data_to_files()", "TransientRBSystem");
-}
-
-
-
-
-void TransientRBSystem::read_offline_data_from_files(const std::string& directory_name,
-                                                     const RBDataIO io_flag)
-{
-  START_LOG("read_offline_data_from_files()", "TransientRBSystem");
-
-  Parent::read_offline_data_from_files(directory_name, io_flag);
-  
-  // return here if we only want basis dependent data
-  if(io_flag == BASIS_DEPENDENT)
-  {
-    STOP_LOG("read_offline_data_from_files()", "TransientRBSystem");
-    return;
-  }
-
-  // Read in the representors if requested
-  if (store_representors)
-    {
-      const std::string residual_representors_dir = "residual_representors";
-      const std::string residual_representor_suffix =
-	(read_binary_residual_representors ? ".xdr" : ".dat");
-
-      std::ostringstream file_name;
-      struct stat stat_info;
-      
-
-      libMesh::out << "Reading in the M_q_representors..." << std::endl;
-
-      // Read in the A_q representors.  The class makes room for [Q_m][Nmax] of these.  We are going to
-      // read in [Q_m][this->get_n_basis_functions()].  FIXME:
-      // should we be worried about leaks in the locations where we're about to fill entries?
-      for (unsigned int i=0; i<M_q_representor.size(); ++i)
-	for (unsigned int j=0; j<M_q_representor[i].size(); ++j)
-	  {
-	    if (M_q_representor[i][j] != NULL)
-	      {
-		libMesh::out << "Error, must delete existing M_q_representor before reading in from file."
-			     << std::endl;
-		libmesh_error();
-	      }
-	  }
-
-      // Now ready to read them in from file!
-      for (unsigned int i=0; i<M_q_representor.size(); ++i)
-	for (unsigned int j=0; j<this->get_n_basis_functions(); ++j)
-	  {
-	    file_name.str(""); // reset filename
-	    file_name << residual_representors_dir
-		      << "/M_q_representor" << i << "_" << j << residual_representor_suffix;
-
-	    // On processor zero check to be sure the file exists
-	    if (libMesh::processor_id() == 0)
-	    {
-	      int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-	      if (stat_result != 0)
-		{
-		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-		  libmesh_error();
-		}
-	    }
-
-	    Xdr aqr_data(file_name.str(),
-			 read_binary_residual_representors ? DECODE : READ);
-
-	    read_serialized_data(aqr_data, false);
-
-	    M_q_representor[i][j] = NumericVector<Number>::build().release();
-	    M_q_representor[i][j]->init (this->n_dofs(), this->n_local_dofs(),
-					 false, libMeshEnums::PARALLEL);
-
-	    // No need to copy, just swap
-	    //*M_q_representor[i][j] = *solution;
-	    M_q_representor[i][j]->swap(*solution);
-	  }
-    } // end if (store_representors)
-
-  STOP_LOG("read_offline_data_from_files()", "TransientRBSystem");
-}
 
 } // namespace libMesh
