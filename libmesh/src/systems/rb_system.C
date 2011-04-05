@@ -2043,8 +2043,14 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 
     for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
-	F_q_representor[q_f] = (NumericVector<Number>::build().release());
-	F_q_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        if(!F_q_representor[q_f])
+        {
+	  F_q_representor[q_f] = (NumericVector<Number>::build().release());
+	  F_q_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        }
+
+        libmesh_assert(F_q_representor[q_f]->size()       == this->n_dofs()       && 
+                       F_q_representor[q_f]->local_size() == this->n_local_dofs() );
 
 	rhs->zero();
 	rhs->add(1., *get_F_q(q_f));
@@ -2134,8 +2140,14 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
     for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
     {
       // Initialize the vector in which we'll store the representor
-      A_q_representor[q_a][i] = (NumericVector<Number>::build().release());
-      A_q_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      if(!A_q_representor[q_a][i])
+      {
+        A_q_representor[q_a][i] = (NumericVector<Number>::build().release());
+        A_q_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      }
+
+      libmesh_assert(A_q_representor[q_a][i]->size()       == this->n_dofs()       && 
+                     A_q_representor[q_a][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
       if(!low_memory_mode)
@@ -2674,11 +2686,7 @@ NumericVector<Number>* RBSystem::get_output_vector(unsigned int n, unsigned int 
 
 void RBSystem::zero_dirichlet_dofs_on_rhs()
 {
-  START_LOG("zero_dirichlet_dofs_on_rhs()", "RBSystem");
-
   this->zero_dirichlet_dofs_on_vector(*rhs);
-
-  STOP_LOG("zero_dirichlet_dofs_on_rhs()", "RBSystem");
 }
 
 void RBSystem::zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp)
