@@ -118,10 +118,8 @@ void DerivedRBSystem<Base>::write_offline_data_to_files(const std::string& direc
 template <class Base>
 void DerivedRBSystem<Base>::clear_basis_function_dependent_data()
 {
-  // Clear the basis functions
-  Base::rb_eval->set_n_basis_functions(0);
-  
-  Base::clear_basis_function_dependent_data();
+  // Clear the RBEvaluation object
+  Base::rb_eval->clear();
   
   // On clearing we restore to a residual wrt the uber system
   residual_type_flag = RESIDUAL_WRT_UBER;

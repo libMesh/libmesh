@@ -127,12 +127,6 @@ public:
   virtual Real compute_max_error_bound();
 
   /**
-   * Clear the basis functions and all basis-function-dependent data.
-   * Overload in subclasses to clear any extra data.
-   */
-  virtual void clear_basis_function_dependent_data();
-
-  /**
    * Return the parameters chosen during the i^th step of
    * the Greedy algorithm.
    */
@@ -954,12 +948,6 @@ protected:
   bool output_dual_norms_computed;
 
 private:
-
-  /**
-   * Private non-virtual helper function to encapsulate
-   * the code to clear the basis-function-related data.
-   */
-  void clear_basis_helper();
 
   //----------- PRIVATE DATA MEMBERS -----------//
 
