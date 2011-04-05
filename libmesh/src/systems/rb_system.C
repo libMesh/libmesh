@@ -178,12 +178,20 @@ void RBSystem::clear()
         outputs_vector[i][q_l] = NULL;
       }
 
-  // Clear the basis functions and the
-  // basis-function-dependent data using
-  // the non-virtual helper function
-  clear_basis_helper();
+  // Also delete the Fq representors
+  for(unsigned int q_f=0; q_f<F_q_representor.size(); q_f++)
+  {
+    if(F_q_representor[q_f])
+    {
+      delete F_q_representor[q_f];
+      F_q_representor[q_f] = NULL;
+    }
+  }
+  // Set update_residual_terms_called flag to false now
+  // that we've cleared the F_q representors
+  update_residual_terms_called = false;
 
-  // Call the destructor on all the RBEvaluation objects
+  // Clear and delete all the RBEvaluation objects
   std::vector<RBEvaluation*>::iterator iter = rb_evaluation_objects.begin();
   for( ; iter != rb_evaluation_objects.end(); iter++)
   {
@@ -205,32 +213,6 @@ void RBSystem::clear()
   }
 
   STOP_LOG("clear()", "RBSystem");
-}
-
-void RBSystem::clear_basis_function_dependent_data()
-{
-  update_residual_terms_called = false;
-
-  clear_basis_helper();
-}
-
-void RBSystem::clear_basis_helper()
-{
-  // Also delete the representors
-  for(unsigned int q_f=0; q_f<F_q_representor.size(); q_f++)
-  {
-    if(F_q_representor[q_f])
-    {
-      delete F_q_representor[q_f];
-      F_q_representor[q_f] = NULL;
-    }
-  }
-  
-  // Clear the current RBEvaluation object
-  if(rb_eval)
-  {
-    rb_eval->clear();
-  }
 }
 
 std::string RBSystem::system_type () const

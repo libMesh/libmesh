@@ -73,7 +73,7 @@ void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_ancho
 
 void TransientRBParamSubdomainNode::hp_greedy()
 {
-    _rb_system.clear_basis_function_dependent_data();
+    _rb_system.rb_eval->clear();
 
     // Load the (full or subsampled) training set
     if(_tree.n_subsampled_training_points >= n_global_training_parameters())
@@ -179,7 +179,7 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound)
     trans_rb.set_max_truth_solves(-1);
 
     // Clear the reduced basis and reinitialize the greedy to the anchor point
-    trans_rb.clear_basis_function_dependent_data();
+    trans_rb.clear();
     trans_rb.set_current_parameters( this->anchor );
 
     // Checking if p-tol is already satisfied or Nmax has been reached

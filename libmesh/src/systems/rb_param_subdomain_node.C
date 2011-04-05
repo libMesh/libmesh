@@ -98,7 +98,7 @@ unsigned int RBParamSubdomainNode::n_global_training_parameters() const
 
 void RBParamSubdomainNode::hp_greedy()
 {
-    _rb_system.clear_basis_function_dependent_data();
+    _rb_system.rb_eval->clear();
 
     // Load the (full or subsampled) training set
     if(_tree.n_subsampled_training_points >= n_global_training_parameters())

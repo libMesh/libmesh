@@ -62,7 +62,7 @@ void RBEvaluation::clear()
       basis_functions[i] = NULL;
     }
   }
-  basis_functions.resize(0);
+  set_n_basis_functions(0);
 
   // Clear the A_q_representors
   for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
