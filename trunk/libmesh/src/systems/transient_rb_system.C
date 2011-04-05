@@ -1359,8 +1359,14 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
     for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
     {
       // Initialize the vectors when we need them
-      M_q_representor[q_m][i] = (NumericVector<Number>::build().release());
-      M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      if(!M_q_representor[q_m][i])
+      {
+        M_q_representor[q_m][i] = (NumericVector<Number>::build().release());
+        M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      }
+
+      libmesh_assert(M_q_representor[q_m][i]->size()       == this->n_dofs()       && 
+                     M_q_representor[q_m][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
       if(!low_memory_mode)
