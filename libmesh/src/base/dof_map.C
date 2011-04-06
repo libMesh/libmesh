@@ -2405,4 +2405,79 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
     }
 }
 
+
+
+void DofMap::print_info(std::ostream& os) const
+{
+  os << this->get_info();
+}
+
+
+
+std::string DofMap::get_info() const
+{
+  OStringStream os;
+
+  unsigned int max_n_nz = 0, max_n_oz = 0;
+  long double avg_n_nz = 0., avg_n_oz = 0.;
+
+  for (unsigned int i = 0; i != _n_nz.size(); ++i)
+    {
+      max_n_nz = std::max(max_n_nz, _n_nz[i]);
+      avg_n_nz += _n_nz[i];
+    }
+  avg_n_nz /= _n_nz.size();
+
+  for (unsigned int i = 0; i != _n_oz.size(); ++i)
+    {
+      max_n_oz = std::max(max_n_oz, _n_oz[i]);
+      avg_n_oz += _n_oz[i];
+    }
+  avg_n_oz /= _n_oz.size();
+
+  os << "    DofMap Sparsity\n      Average  On-Processor Bandwidth = "
+     << avg_n_nz << '\n';
+  
+  os << "      Average Off-Processor Bandwidth = "
+     << avg_n_oz << '\n';
+  
+  os << "      Maximum  On-Processor Bandwidth = "
+     << max_n_nz << '\n';
+  
+  os << "      Maximum Off-Processor Bandwidth = "
+     << max_n_oz << std::endl;
+
+  unsigned int n_constraints = 0, max_constraint_length = 0;
+  long double avg_constraint_length = 0.;
+
+  for (DofConstraints::const_iterator it=_dof_constraints.begin();
+       it != _dof_constraints.end(); ++it)
+    {
+      const DofConstraintRow& row = it->second;
+      unsigned int rowsize = row.size();
+
+      max_constraint_length = std::max(max_constraint_length,
+                                       rowsize);
+      avg_constraint_length += rowsize;
+      n_constraints++;
+    }
+
+  if (n_constraints)
+    {
+      os << "    DofMap Constraints\n      Number of Constraints = " << n_constraints
+         << '\n'
+         << "      Maximum Constraint Length= " << max_constraint_length
+         << '\n'
+         << "      Average Constraint Length= " << avg_constraint_length
+         << std::endl;
+    }
+  else
+    {
+      os << "    DofMap Constraints\n      Number of Constraints = " << n_constraints
+         << std::endl;
+    }
+
+  return os.str();
+}
+
 } // namespace libMesh
