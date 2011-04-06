@@ -50,6 +50,11 @@ public:
    * Constructor.
    */
   DerivedRBEvaluation (RBSystem& rb_sys_in);
+  
+  /**
+   * Clear this object. Overload to also reset residual_type_flag.
+   */
+  virtual void clear();
 
   /**
    * Get the current number of basis functions.
@@ -81,6 +86,20 @@ public:
    * functions based on the uber system.
    */
    std::vector< DenseVector<Number> > derived_basis_functions;
+
+  /**
+   * Define an enumeration for the two types of residuals we can
+   * compute: with respect to the uber, and the truth.
+   */
+  enum DERIVED_RESIDUAL_TYPE { RESIDUAL_WRT_UBER, RESIDUAL_WRT_TRUTH };
+
+  /**
+   * This flag indicates which type of error bound we employ.
+   * The options are:
+   * RESIDUAL_WRT_UBER: The residual is wrt the uber space X_N.
+   * RESIDUAL_WRT_TRUTH: The residual is wrt the truth space X^\calN.
+   */
+  DERIVED_RESIDUAL_TYPE residual_type_flag;
 
 };
 

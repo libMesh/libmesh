@@ -28,8 +28,18 @@ namespace libMesh
 template <class Base>
 DerivedRBEvaluation<Base>::DerivedRBEvaluation(RBSystem& rb_sys)
   :
-  Base(rb_sys)
+  Base(rb_sys),
+  residual_type_flag(RESIDUAL_WRT_UBER)
 {}
+
+template <class Base>
+void DerivedRBEvaluation<Base>::clear()
+{
+  Base::clear();
+  
+  // Reset the residual type
+  residual_type_flag = RESIDUAL_WRT_UBER;
+}
 
 template <class Base>
 unsigned int DerivedRBEvaluation<Base>::get_n_basis_functions() const

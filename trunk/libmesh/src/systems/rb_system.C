@@ -1788,21 +1788,26 @@ void RBSystem::update_system()
   this->reset_alternative_solver(this->linear_solver, orig_solver);
 }
 
-void RBSystem::recompute_all_residual_terms()
+void RBSystem::recompute_all_residual_terms(bool compute_inner_products)
 {
-  unsigned int saved_delta_N = delta_N;
-  delta_N = get_n_basis_functions();
-
   // Use alternative solver for residual terms solves
   std::pair<std::string,std::string> orig_solver =
     this->set_alternative_solver(this->linear_solver);
+
+  // Compute the basis independent terms
+  Fq_representor_norms_computed = false;
+  compute_Fq_representor_norms(compute_inner_products);
+
+  // and all the basis dependent terms
+  unsigned int saved_delta_N = delta_N;
+  delta_N = get_n_basis_functions();
   
-  update_residual_terms(/*compute_inner_products=*/false);
+  update_residual_terms(compute_inner_products);
+
+  delta_N = saved_delta_N;
 
   // Return to original solver
   this->reset_alternative_solver(this->linear_solver, orig_solver);
-  
-  delta_N = saved_delta_N;
 }
 
 Real RBSystem::compute_max_error_bound()
