@@ -64,18 +64,7 @@ void RBEvaluation::clear()
   }
   set_n_basis_functions(0);
 
-  // Clear the A_q_representors
-  for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
-  {
-    for(unsigned int i=0; i<A_q_representor[q_a].size(); i++)
-    {
-      if(A_q_representor[q_a][i])
-      {
-        delete A_q_representor[q_a][i];
-        A_q_representor[q_a][i] = NULL;
-      }
-    }
-  }
+  clear_riesz_representors();
 
   // Clear the Greedy param list
   for(unsigned int i=0; i<greedy_param_list.size(); i++)
@@ -315,6 +304,26 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
   STOP_LOG("compute_residual_dual_norm()", "RBEvaluation");
 
   return std::sqrt( libmesh_real(residual_norm_sq) );
+}
+
+void RBEvaluation::clear_riesz_representors()
+{
+  START_LOG("clear_riesz_representors()", "RBEvaluation");
+  
+  // Clear the A_q_representors
+  for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
+  {
+    for(unsigned int i=0; i<A_q_representor[q_a].size(); i++)
+    {
+      if(A_q_representor[q_a][i])
+      {
+        delete A_q_representor[q_a][i];
+        A_q_representor[q_a][i] = NULL;
+      }
+    }
+  }
+  
+  STOP_LOG("clear_riesz_representors()", "RBEvaluation");
 }
 
 void RBEvaluation::write_offline_data_to_files(const std::string& directory_name)
