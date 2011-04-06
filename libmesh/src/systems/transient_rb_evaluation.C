@@ -43,7 +43,12 @@ TransientRBEvaluation::TransientRBEvaluation (TransientRBSystem& rb_sys_in)
 void TransientRBEvaluation::clear()
 {
   Parent::clear();
+  
+  clear_riesz_representors();
+}
 
+void TransientRBEvaluation::clear_riesz_representors()
+{
   TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
 
   // Delete the M_q representors

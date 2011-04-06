@@ -94,6 +94,13 @@ public:
    * stored data.
    */
   virtual void set_n_basis_functions(unsigned int n_bfs) { basis_functions.resize(n_bfs); }
+  
+  /**
+   * Clear all the Riesz representors that are used to compute the RB residual
+   * (and hence error bound). This is useful since once we complete the Greedy
+   * we may not need the representors any more.
+   */
+  virtual void clear_riesz_representors();
 
   /**
    * Write out all the data to text files in order to segregate the
