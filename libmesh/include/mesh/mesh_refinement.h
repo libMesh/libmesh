@@ -243,6 +243,12 @@ public:
   void uniformly_p_coarsen (unsigned int n=1);
 
   /**
+   * Sets the refinement flag to \p Elem::DO_NOTHING
+   * for each element in the mesh.
+   */
+  void clean_refinement_flags ();
+
+  /**
    * Returns true if and only if the mesh is level one smooth
    * Returns false otherwise
    * Aborts the program if libmesh_assert_yes is true and 
@@ -564,12 +570,6 @@ private:
    * Updates the \p _new_nodes_map
    */
   void update_nodes_map ();
-
-  /**
-   * Sets the refinement flag to \p Elem::DO_NOTHING
-   * for each element in the mesh.
-   */
-  void clean_refinement_flags ();
   
   /**
    * Take user-specified coarsening flags and augment them

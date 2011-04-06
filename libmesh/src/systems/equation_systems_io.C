@@ -33,6 +33,7 @@
 #include "parallel.h"
 #include "serial_mesh.h"
 #include "xdr_cxx.h"
+#include "mesh_refinement.h"
 
 namespace libMesh
 {
@@ -75,6 +76,9 @@ void EquationSystems::read (const std::string& name,
   if (name.find(".xdr") != std::string::npos)
     mode = DECODE;
   this->read(name, mode, read_flags);
+
+  MeshRefinement mesh_refine(_mesh);
+  mesh_refine.clean_refinement_flags();
 }
 
 
@@ -130,6 +134,9 @@ void EquationSystems::read (const std::string& name,
   this->_read_impl (name, mode, read_flags);
   
 #endif // #ifdef LIBMESH_ENABLE_EXCEPTIONS
+
+  MeshRefinement mesh_refine(_mesh);
+  mesh_refine.clean_refinement_flags();
 }
 
 
