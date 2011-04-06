@@ -182,8 +182,10 @@ public:
   /**
    * Vectors storing the residual representor inner products
    * to be used in computing the residuals online.
+   * We store the Aq-dependent representor norms because they depend
+   * on a reduced basis space. The basis independent representors
+   * are stored in RBSystem.
    */
-  std::vector<Number> Fq_representor_norms;
   std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
   std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
 

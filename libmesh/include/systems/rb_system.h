@@ -573,6 +573,15 @@ public:
   std::vector< NumericVector<Number>* > F_q_representor;
 
   /**
+   * Vectors storing the residual representor inner products
+   * to be used in computing the residuals online. We store
+   * the Fq representor norms here because they are independent
+   * of a reduced basis space. The basis dependent representors
+   * are stored in RBEvaluation.
+   */
+  std::vector<Number> Fq_representor_norms;
+
+  /**
    * Set storing the global Dirichlet dof indices.
    * We update this set in initialize_dirichlet_dofs().
    */
@@ -802,6 +811,20 @@ protected:
   virtual void compute_output_dual_norms();
 
   /**
+   * Compute the terms that are combined `online'
+   * to determine the dual norm of the residual. Here we
+   * compute the terms associated with the right-hand side.
+   * These terms are basis independent, hence we separate
+   * them from the rest of the calculations that are done in
+   * update_residual_terms.
+   * By default,
+   * inner product terms are also computed, but you can turn
+   * this feature off e.g. if you are already reading in that
+   * data from files.
+   */
+  virtual void compute_Fq_representor_norms(bool compute_inner_products=true);
+
+  /**
    * Add a new basis function to the RB space. This is called
    * during train_reduced_basis.
    */
@@ -932,13 +955,6 @@ protected:
    * routines for the outputs. Boundary part.
    */
   std::vector< std::vector<affine_assembly_fptr> > output_bndry_assembly_vector;
-
-  /**
-   * A boolean flag to indicate whether or not update_residual_terms has
-   * been called before --- used to make sure that the representors for
-   * the Fq are only computed on the first call to update_residual_terms.
-   */
-  bool update_residual_terms_called;
   
   /**
    * A boolean flag to indicate whether or not the output dual norms
@@ -946,6 +962,13 @@ protected:
    * recompute them unnecessarily.
    */
   bool output_dual_norms_computed;
+
+  /**
+   * A boolean flag to indicate whether or not the Fq representor norms
+   * have already been computed --- used to make sure that we don't
+   * recompute them unnecessarily.
+   */
+  bool Fq_representor_norms_computed;
 
 private:
 

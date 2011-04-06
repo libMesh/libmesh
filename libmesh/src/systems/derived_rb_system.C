@@ -31,12 +31,12 @@ DerivedRBSystem<Base>::DerivedRBSystem (EquationSystems& es,
 		    const unsigned int number)
   : Base(es, name, number),
     residual_type_flag(RESIDUAL_WRT_UBER)
-  {
-    // We do not want to compute the output dual norms in
-    // a derived system, we just copy them over from the
-    // primary system
-    Base::output_dual_norms_computed = true;
-  }
+{
+  // We do not want to compute the output dual norms in
+  // a derived system, we just copy them over from the
+  // primary system
+  Base::output_dual_norms_computed = true;
+}
 
 template <class Base>
 std::string DerivedRBSystem<Base>::system_type () const
@@ -65,7 +65,7 @@ void DerivedRBSystem<Base>::generate_residual_terms_wrt_truth()
     residual_type_flag = RESIDUAL_WRT_TRUTH;
 
     // Need to recompute _all_ residual terms
-    Base::update_residual_terms_called = false;
+    Base::Fq_representor_norms_computed = false;
 
     unsigned int saved_delta_N = Base::delta_N;
     Base::delta_N = Base::get_n_basis_functions();
@@ -113,16 +113,6 @@ void DerivedRBSystem<Base>::write_offline_data_to_files(const std::string& direc
   generate_residual_terms_wrt_truth();
   
   Base::write_offline_data_to_files(directory_name, io_flag);
-}
-
-template <class Base>
-void DerivedRBSystem<Base>::clear_basis_function_dependent_data()
-{
-  // Clear the RBEvaluation object
-  Base::rb_eval->clear();
-  
-  // On clearing we restore to a residual wrt the uber system
-  residual_type_flag = RESIDUAL_WRT_UBER;
 }
 
 // explicit instantiations

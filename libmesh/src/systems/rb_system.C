@@ -82,8 +82,8 @@ RBSystem::RBSystem (EquationSystems& es,
     inner_prod_assembly(NULL),
     inner_prod_bndry_assembly(NULL),
     constraint_assembly(NULL),
-    update_residual_terms_called(false),
     output_dual_norms_computed(false),
+    Fq_representor_norms_computed(false),
     training_tolerance(-1.),
     _dirichlet_list_init(NULL),
     initial_Nmax(0),
@@ -187,9 +187,9 @@ void RBSystem::clear()
       F_q_representor[q_f] = NULL;
     }
   }
-  // Set update_residual_terms_called flag to false now
+  // Set Fq_representor_norms_computed flag to false now
   // that we've cleared the F_q representors
-  update_residual_terms_called = false;
+  Fq_representor_norms_computed = false;
 
   // Clear and delete all the RBEvaluation objects
   std::vector<RBEvaluation*>::iterator iter = rb_evaluation_objects.begin();
@@ -476,10 +476,17 @@ void RBSystem::allocate_data_structures()
   // the A_q_representors are stored in RBEvaluation
   F_q_representor.resize(get_Q_f());
 
+  // Initialize vectors for the norms of the Fq representors
+  // These are basis independent and therefore stored here.
+  unsigned int Q_f_hat = get_Q_f()*(get_Q_f()+1)/2;
+  Fq_representor_norms.resize(Q_f_hat);
+
+  // Resize the output vectors
   outputs_vector.resize(get_n_outputs());
   for(unsigned int n=0; n<get_n_outputs(); n++)
     outputs_vector[n].resize( get_Q_l(n) );
 
+  // Resize the output dual norm vectors
   output_dual_norms.resize(get_n_outputs());
   for(unsigned int n=0; n<get_n_outputs(); n++)
   {
@@ -1305,6 +1312,9 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
   if(!output_dual_norms_computed)
     this->compute_output_dual_norms();
 
+  if(!Fq_representor_norms_computed)
+    this->compute_Fq_representor_norms();
+
   while(true)
   {
     libMesh::out << std::endl << "---- Training solve " << count << " ----" << std::endl;
@@ -1978,9 +1988,6 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 {
   START_LOG("update_residual_terms()", "RBSystem");
 
-  // First we need to compute the representors of
-  // each basis function using inner_product_matrix
-
   unsigned int RB_size = get_n_basis_functions();
 
   if(!low_memory_mode)
@@ -1991,118 +1998,17 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       matrix->add(1., *constraint_matrix);
   }
 
-  if(reuse_preconditioner)
-  {
-    // For the first solve, make sure we generate a new preconditioner
-    linear_solver->same_preconditioner = false;
-  }
-
-  // We only need to compute the representors for
-  // the right-hand side once.  Note: this will be called at least
-  // once even after a restart, in which case F_q_representor[0]
-  // will already be set.
-  if(!update_residual_terms_called)
-  {
-
-    if(low_memory_mode)
-    {
-      assemble_inner_product_matrix(matrix);
-      if(constrained_problem)
-        add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
-    }
-
-    for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
-      {
-        if(!F_q_representor[q_f])
-        {
-	  F_q_representor[q_f] = (NumericVector<Number>::build().release());
-	  F_q_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-        }
-
-        libmesh_assert(F_q_representor[q_f]->size()       == this->n_dofs()       && 
-                       F_q_representor[q_f]->local_size() == this->n_local_dofs() );
-
-	rhs->zero();
-	rhs->add(1., *get_F_q(q_f));
-	zero_dirichlet_dofs_on_rhs();
-
-	solution->zero();
-
-	if (!quiet)
-	  libMesh::out << "Starting solve q_f=" << q_f
-		       << " in RBSystem::update_residual_terms() at "
-		       << Utility::get_timestamp() << std::endl;
-
-	solve();
-
-	if (!quiet)
-	  {
-	    libMesh::out << "Finished solve q_f=" << q_f
-		         << " in RBSystem::update_residual_terms() at "
-		         << Utility::get_timestamp() << std::endl;
-
-	    libMesh::out << this->n_linear_iterations()
-		         << " iterations, final residual "
-		         << this->final_linear_residual() << std::endl;
-	  }
-
-	// Make sure we didn't max out the number of iterations
-	if( (this->n_linear_iterations() >=
-	     this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-	    (this->final_linear_residual() >
-	     this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-	  {
-	    libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-		         << this->final_linear_residual() << ", number of iterations = "
-		         << this->n_linear_iterations() << std::endl << std::endl;
-	    //         libmesh_error();
-
-	  }
-	*F_q_representor[q_f] = *solution;
-
-	if(reuse_preconditioner)
-	  {
-	    // After we do a solve, tell PETSc we want to reuse the preconditioner
-	    // since the system matrix is not changing.
-	    linear_solver->same_preconditioner = true;
-	  }
-      }
-
-    if (compute_inner_products)
-      {
-	unsigned int q=0;
-	if(low_memory_mode && constrained_problem)
-	  assemble_inner_product_matrix(matrix);
-
-	for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
-	  {
-	    if(!low_memory_mode)
-	      {
-		inner_product_matrix->vector_mult(*inner_product_storage_vector, *F_q_representor[q_f1]);
-	      }
-	    else
-	      {
-		matrix->vector_mult(*inner_product_storage_vector, *F_q_representor[q_f1]);
-	      }
-
-	    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
-	      {
-		rb_eval->Fq_representor_norms[q] = inner_product_storage_vector->dot(*F_q_representor[q_f2]);
-
-		q++;
-	      }
-	  }
-      } // end if (compute_inner_products)
-
-    
-  } // end if(!update_residual_terms_called)
-
-
   if(low_memory_mode)
   {
     assemble_inner_product_matrix(matrix);
     if(constrained_problem)
       add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
+  }
+
+  if(reuse_preconditioner)
+  {
+    // For the first solve, make sure we generate a new preconditioner
+    linear_solver->same_preconditioner = false;
   }
 
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
@@ -2245,8 +2151,6 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 	    }
 	}
     } // end if (compute_inner_products)
-  
-  update_residual_terms_called = true;
 
   STOP_LOG("update_residual_terms()", "RBSystem");
 }
@@ -2416,6 +2320,120 @@ void RBSystem::compute_output_dual_norms()
   this->reset_alternative_solver(this->linear_solver, orig_solver);
 
   STOP_LOG("compute_output_dual_norms()", "RBSystem");
+}
+
+void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
+{
+  START_LOG("compute_Fq_representor_norms()", "RBSystem");
+
+  if(!low_memory_mode)
+  {
+    matrix->zero();
+    matrix->add(1., *inner_product_matrix);
+    if(constrained_problem)
+      matrix->add(1., *constraint_matrix);
+  }
+
+  if(low_memory_mode)
+  {
+    assemble_inner_product_matrix(matrix);
+    if(constrained_problem)
+      add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
+  }
+
+  if(reuse_preconditioner)
+  {
+    // For the first solve, make sure we generate a new preconditioner
+    linear_solver->same_preconditioner = false;
+  }
+
+  for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
+  {
+    if(!F_q_representor[q_f])
+    {
+      F_q_representor[q_f] = (NumericVector<Number>::build().release());
+      F_q_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    }
+
+    libmesh_assert(F_q_representor[q_f]->size()       == this->n_dofs()       && 
+                   F_q_representor[q_f]->local_size() == this->n_local_dofs() );
+
+    rhs->zero();
+    rhs->add(1., *get_F_q(q_f));
+    zero_dirichlet_dofs_on_rhs();
+
+    solution->zero();
+
+    if (!quiet)
+      libMesh::out << "Starting solve q_f=" << q_f
+		   << " in RBSystem::update_residual_terms() at "
+		   << Utility::get_timestamp() << std::endl;
+
+    solve();
+
+    if (!quiet)
+    {
+      libMesh::out << "Finished solve q_f=" << q_f
+		   << " in RBSystem::update_residual_terms() at "
+		   << Utility::get_timestamp() << std::endl;
+
+      libMesh::out << this->n_linear_iterations()
+  	           << " iterations, final residual "
+		   << this->final_linear_residual() << std::endl;
+    }
+
+    // Make sure we didn't max out the number of iterations
+    if( (this->n_linear_iterations() >=
+	 this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
+        (this->final_linear_residual() >
+         this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
+    {
+      libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+		   << this->final_linear_residual() << ", number of iterations = "
+		   << this->n_linear_iterations() << std::endl << std::endl;
+//      libmesh_error();
+
+    }
+    *F_q_representor[q_f] = *solution;
+
+    if(reuse_preconditioner)
+    {
+      // After we do a solve, tell PETSc we want to reuse the preconditioner
+      // since the system matrix is not changing.
+      linear_solver->same_preconditioner = true;
+    }
+  }
+
+  if (compute_inner_products)
+  {
+    unsigned int q=0;
+    if(low_memory_mode && constrained_problem)
+      assemble_inner_product_matrix(matrix);
+
+    for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
+    {
+      if(!low_memory_mode)
+      {
+        inner_product_matrix->vector_mult(*inner_product_storage_vector, *F_q_representor[q_f1]);
+      }
+      else
+      {
+        matrix->vector_mult(*inner_product_storage_vector, *F_q_representor[q_f1]);
+      }
+
+      for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
+      {
+        Fq_representor_norms[q] = inner_product_storage_vector->dot(*F_q_representor[q_f2]);
+        libMesh::out << "Fq_representor_norm = " << Fq_representor_norms[q] << std::endl;
+
+        q++;
+      }
+    }
+  } // end if (compute_inner_products)
+  
+  Fq_representor_norms_computed = true;
+
+  STOP_LOG("compute_Fq_representor_norms()", "RBSystem");
 }
 
 void RBSystem::load_RB_solution()
@@ -2704,9 +2722,28 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name,
 
   if(libMesh::processor_id() == 0)
   {
-
     // Make a directory to store all the data files
     mkdir(directory_name.c_str(), 0777);
+
+    // Write out F_q representor norm data
+    std::ofstream RB_Fq_norms_out;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/Fq_norms.dat";
+      RB_Fq_norms_out.open(file_name.str().c_str());
+    }
+    if ( !RB_Fq_norms_out.good() )
+    {
+      libMesh::err << "Error opening Fq_norms.dat" << std::endl;
+      libmesh_error();
+    }
+    RB_Fq_norms_out.precision(precision_level);
+    unsigned int Q_f_hat = get_Q_f()*(get_Q_f()+1)/2;
+    for(unsigned int i=0; i<Q_f_hat; i++)
+    {
+      RB_Fq_norms_out << std::scientific << Fq_representor_norms[i] << " ";
+    }
+    RB_Fq_norms_out.close();
 
     // Write out output data
     for(unsigned int n=0; n<get_n_outputs(); n++)
@@ -2825,6 +2862,26 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name,
     return;
   }
 
+  // Next read in F_q representor norm data
+  std::ifstream RB_Fq_norms_in;
+  {
+    OStringStream file_name;
+    file_name << directory_name << "/Fq_norms.dat";
+    RB_Fq_norms_in.open(file_name.str().c_str());
+  }
+  if ( !RB_Fq_norms_in.good() )
+  {
+    libMesh::err << "Error opening Fq_norms.dat" << std::endl;
+    libmesh_error();
+  }
+  unsigned int Q_f_hat = get_Q_f()*(get_Q_f()+1)/2;
+  for(unsigned int i=0; i<Q_f_hat; i++)
+  {
+    RB_Fq_norms_in >> Fq_representor_norms[i];
+  }
+  RB_Fq_norms_in.close();
+
+
   // Read in output data
   for(unsigned int n=0; n<get_n_outputs(); n++)
   {
@@ -2906,7 +2963,7 @@ void RBSystem::read_offline_data_from_files(const std::string& directory_name,
 
     // Alert the update_residual_terms() function that we don't need to recompute
     // the F_q_representors as we have already read them in from file!
-    update_residual_terms_called=true;
+    Fq_representor_norms_computed = true;
 
   } // end if (store_representors)
 
