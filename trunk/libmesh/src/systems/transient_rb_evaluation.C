@@ -316,7 +316,7 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
     for(unsigned int q_f2=q_f1; q_f2<trans_rb_sys.get_Q_f(); q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
-      cached_Fq_term += delta*cached_theta_q_f1*trans_rb_sys.eval_theta_q_f(q_f2) * Fq_representor_norms[q];
+      cached_Fq_term += delta*cached_theta_q_f1*trans_rb_sys.eval_theta_q_f(q_f2) * trans_rb_sys.Fq_representor_norms[q];
 
       q++;
     }
@@ -499,7 +499,7 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
     for(unsigned int q_f2=q_f1; q_f2<trans_rb_sys.get_Q_f(); q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
-      residual_norm_sq += delta*cached_theta_q_f1*trans_rb_sys.eval_theta_q_f(q_f2) * Fq_representor_norms[q];
+      residual_norm_sq += delta*cached_theta_q_f1*trans_rb_sys.eval_theta_q_f(q_f2) * trans_rb_sys.Fq_representor_norms[q];
 
       q++;
     }

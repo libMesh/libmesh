@@ -100,9 +100,6 @@ void RBEvaluation::initialize()
   }
 
   // Initialize vectors for the norms of the representors
-  unsigned int Q_f_hat = rb_sys.get_Q_f()*(rb_sys.get_Q_f()+1)/2;
-  Fq_representor_norms.resize(Q_f_hat);
-
   Fq_Aq_representor_norms.resize(rb_sys.get_Q_f());
   for(unsigned int i=0; i<rb_sys.get_Q_f(); i++)
   {
@@ -248,7 +245,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
       residual_norm_sq += delta * libmesh_real(
-        rb_sys.eval_theta_q_f(q_f1) * libmesh_conj(rb_sys.eval_theta_q_f(q_f2)) * Fq_representor_norms[q] );
+        rb_sys.eval_theta_q_f(q_f1) * libmesh_conj(rb_sys.eval_theta_q_f(q_f2)) * rb_sys.Fq_representor_norms[q] );
 
       q++;
     }
@@ -500,27 +497,6 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       }
       RB_A_q_a_out.close();
     }
-
-
-    // Next write out F_q representor norm data
-    std::ofstream RB_Fq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Fq_norms.dat";
-      RB_Fq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Fq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Fq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Fq_norms_out.precision(precision_level);
-    unsigned int Q_f_hat = rb_sys.get_Q_f()*(rb_sys.get_Q_f()+1)/2;
-    for(unsigned int i=0; i<Q_f_hat; i++)
-    {
-      RB_Fq_norms_out << std::scientific << Fq_representor_norms[i] << " ";
-    }
-    RB_Fq_norms_out.close();
 
     // Next write out Fq_Aq representor norm data
     std::ofstream RB_Fq_Aq_norms_out;
@@ -819,25 +795,6 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     RB_A_q_a_in.close();
   }
 
-
-  // Next read in F_q representor norm data
-  std::ifstream RB_Fq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Fq_norms.dat";
-    RB_Fq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Fq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Fq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  unsigned int Q_f_hat = rb_sys.get_Q_f()*(rb_sys.get_Q_f()+1)/2;
-  for(unsigned int i=0; i<Q_f_hat; i++)
-  {
-    RB_Fq_norms_in >> Fq_representor_norms[i];
-  }
-  RB_Fq_norms_in.close();
 
   // Next read in Fq_Aq representor norm data
   std::ifstream RB_Fq_Aq_norms_in;

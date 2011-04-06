@@ -147,6 +147,66 @@ void DerivedRBSystem<RBSystem>::update_RB_system_matrices()
   STOP_LOG("update_RB_system_matrices()", "DerivedRBSystem");
 }
 
+template <>
+void DerivedRBSystem<RBSystem>::compute_Fq_representor_norms(bool compute_inner_products)
+{
+  START_LOG("compute_Fq_representor_norms()", "DerivedRBSystem");
+  
+  EquationSystems& es = this->get_equation_systems();
+  RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
+  
+  switch(residual_type_flag)
+  {
+    case(RESIDUAL_WRT_UBER):
+    {
+      unsigned int uber_RB_size = uber_system.get_n_basis_functions();
+      DenseVector<Number> temp_vector1, temp_vector2;
+
+      // Assume inner product matrix is the identity, hence don't need to
+      // do any solves
+      if (compute_inner_products)
+      {
+        unsigned int q=0;
+        for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
+        {
+          for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
+          {
+            uber_system.rb_eval->RB_F_q_vector[q_f2].get_principal_subvector(uber_RB_size, temp_vector1);
+            uber_system.rb_eval->RB_F_q_vector[q_f1].get_principal_subvector(uber_RB_size, temp_vector2);
+            Fq_representor_norms[q] = temp_vector1.dot( temp_vector2 );
+            q++;
+          }
+        }
+      } // end if (compute_inner_products)
+
+      break;
+    }
+
+    case(RESIDUAL_WRT_TRUTH):
+    {
+      // Copy the output terms over from uber_system
+      for(unsigned int n=0; n<get_n_outputs(); n++)
+      {
+        output_dual_norms[n] = uber_system.output_dual_norms[n];
+      }
+
+      // Copy the Fq terms over from uber_system
+      Fq_representor_norms = uber_system.Fq_representor_norms;
+      
+      break;
+    }
+
+    default:
+    {
+      libMesh::out << "Invalid RESIDUAL_TYPE in update_residual_terms" << std::endl;
+      break;
+    }
+  }
+
+  Fq_representor_norms_computed = true;
+
+  STOP_LOG("compute_Fq_representor_norms()", "DerivedRBSystem");
+}
 
 template <>
 void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_products)
@@ -163,38 +223,9 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
   {
     case(RESIDUAL_WRT_UBER):
     {
-      // First we need to compute the representors of
-      // each basis function using inner_product_matrix
-
       unsigned int derived_RB_size = get_n_basis_functions();
       unsigned int uber_RB_size = uber_system.get_n_basis_functions();
       DenseVector<Number> temp_vector1, temp_vector2;
-
-      // We only need to compute the representors for
-      // the right-hand side once.  Note: this will be called at least
-      // once even after a restart, in which case F_q_representor[0]
-      // will already be set.
-      if(!update_residual_terms_called)
-      {
-
-        // Assume inner product matrix is the identity, hence don't need to
-        // do any solves
-        if (compute_inner_products)
-        {
-	  unsigned int q=0;
-	  for(unsigned int q_f1=0; q_f1<get_Q_f(); q_f1++)
-	  {
-	    for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
-	      {
-                uber_system.rb_eval->RB_F_q_vector[q_f2].get_principal_subvector(uber_RB_size, temp_vector1);
-                uber_system.rb_eval->RB_F_q_vector[q_f1].get_principal_subvector(uber_RB_size, temp_vector2);
-		rb_eval->Fq_representor_norms[q] = temp_vector1.dot( temp_vector2 );
-		q++;
-	      }
-	  }
-        } // end if (compute_inner_products)
-
-      } // end if(!update_residual_terms_called)
 
       // Now compute and store the inner products (if requested)
       if (compute_inner_products)
@@ -244,26 +275,13 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
 	      }
 	  }
       } // end if (compute_inner_products)
-  
-      update_residual_terms_called = true;
+
       break;
     }
           
     case(RESIDUAL_WRT_TRUTH):
     {
       unsigned int RB_size = get_n_basis_functions();
-
-      if(!update_residual_terms_called)
-      {
-        // Copy the output terms over from uber_system
-        for(unsigned int n=0; n<get_n_outputs(); n++)
-        {
-          output_dual_norms[n] = uber_system.output_dual_norms[n];
-        }
-
-        // Copy the Fq terms over from uber_system
-        rb_eval->Fq_representor_norms = uber_system.rb_eval->Fq_representor_norms;
-      }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
@@ -312,8 +330,6 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
           q++;
         }
       }
-
-      update_residual_terms_called = true;
 
       break;
     }

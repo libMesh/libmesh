@@ -113,12 +113,6 @@ public:
   void generate_residual_terms_wrt_truth();
   
   /**
-   * Clear the basis functions and all basis-function-dependent data.
-   * Overload to clear derived_basis_functions.
-   */
-  virtual void clear_basis_function_dependent_data();
-  
-  /**
    * Write out all the data to text files in order to segregate the
    * Offline stage from the Online stage. Overload to call generate_residual_terms_wrt_truth
    * before writing begins.
@@ -165,7 +159,14 @@ protected:
    * in the truth finite element discretization.
    */
   virtual void update_RB_system_matrices();
-  
+
+  /**
+   * Compute the RHS terms that are combined `online'
+   * to determine the dual norm of the residual. Overloaded
+   * here for the two-stage RB method.
+   */
+  virtual void compute_Fq_representor_norms(bool compute_inner_products=true);
+
   /**
    * Compute the terms that are combined `online'
    * to determine the dual norm of the residual. Overload
