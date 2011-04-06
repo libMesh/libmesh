@@ -59,6 +59,8 @@ DofMap::DofMap(const unsigned int number) :
   _end_df(),
   _var_first_local_df(),
   _send_list(),
+  _extra_send_list_function(NULL),
+  _extra_send_list_context(NULL),
   _n_nz(),
   _n_oz(),
   _n_dfs(0),
@@ -1235,6 +1237,10 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 void DofMap::prepare_send_list ()
 {
   START_LOG("prepare_send_list()", "DofMap");
+
+  // Check to see if we have any extra stuff to add to the send_list
+  if(_extra_send_list_function != NULL)
+    _extra_send_list_function(_send_list, _extra_send_list_context);
   
   // First sort the send list.  After this
   // duplicated elements will be adjacent in the

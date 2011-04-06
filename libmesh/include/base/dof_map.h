@@ -138,6 +138,13 @@ public:
   void compute_sparsity (const MeshBase&);
 
   /**
+   * Attach a function pointer to use as a callback to populate the
+   * send_list with extra entries.
+   */
+  void attach_extra_send_list_function(void (*func)(std::vector<unsigned int> &, void *), void * context = NULL)
+    { _extra_send_list_function = func; _extra_send_list_context = context; }
+
+  /**
    * Takes the \p _send_list vector (which may have duplicate entries)
    * and sorts it.  The duplicate entries are then removed, resulting in
    * a sorted \p _send_list with unique entries.
@@ -724,6 +731,16 @@ private:
    * solution on my subdomain.
    */
   std::vector<unsigned int> _send_list;
+
+  /**
+   * A function pointer to a function to call to add extra entries to the send list
+   */
+  void (*_extra_send_list_function)(std::vector<unsigned int> &, void *);
+
+  /**
+   * A pointer associcated with the extra send list that can optionally be passed in
+   */
+  void * _extra_send_list_context;
 
   /**
    * The number of on-processor nonzeros in my portion of the
