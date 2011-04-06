@@ -46,8 +46,6 @@ class DerivedRBSystem : public Base
 {
 public:
 
-  enum DERIVED_RESIDUAL_TYPE { RESIDUAL_WRT_UBER, RESIDUAL_WRT_TRUTH };
-
   /**
    * Constructor.  Optionally initializes required
    * data structures.
@@ -128,14 +126,6 @@ public:
    * we use to develop the derived RB system.
    */
   std::string uber_system_name;
-  
-  /**
-   * This flag indicates which type of error bound we employ.
-   * The options are:
-   * RESIDUAL_WRT_UBER: The residual is wrt the uber space X_N.
-   * RESIDUAL_WRT_TRUTH: The residual is wrt the truth space X^\calN.
-   */
-  DERIVED_RESIDUAL_TYPE residual_type_flag;
    
 protected:
 

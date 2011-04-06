@@ -29,8 +29,7 @@ template <class Base>
 DerivedRBSystem<Base>::DerivedRBSystem (EquationSystems& es,
 		    const std::string& name,
 		    const unsigned int number)
-  : Base(es, name, number),
-    residual_type_flag(RESIDUAL_WRT_UBER)
+  : Base(es, name, number)
 {
   // We do not want to compute the output dual norms in
   // a derived system, we just copy them over from the
@@ -52,30 +51,6 @@ void DerivedRBSystem<Base>::set_uber_current_parameters()
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
 
   uber_system.set_current_parameters( Base::get_current_parameters() );
-}
-
-template <class Base>
-void DerivedRBSystem<Base>::generate_residual_terms_wrt_truth()
-{
-  START_LOG("generate_residual_terms_wrt_truth()", "DerivedRBSystem");
-
-  if(residual_type_flag != RESIDUAL_WRT_TRUTH)
-  {
-    // Set flag to compute residual wrt truth space
-    residual_type_flag = RESIDUAL_WRT_TRUTH;
-
-    // Need to recompute _all_ residual terms
-    Base::Fq_representor_norms_computed = false;
-
-    unsigned int saved_delta_N = Base::delta_N;
-    Base::delta_N = Base::get_n_basis_functions();
-  
-    // Recompute all the residual terms
-    update_residual_terms();
-  
-    Base::delta_N = saved_delta_N;
-  }
-  STOP_LOG("generate_residual_terms_wrt_truth()", "DerivedRBSystem");
 }
 
 template <class Base>

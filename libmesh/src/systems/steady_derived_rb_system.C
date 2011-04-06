@@ -147,6 +147,24 @@ void DerivedRBSystem<RBSystem>::update_RB_system_matrices()
   STOP_LOG("update_RB_system_matrices()", "DerivedRBSystem");
 }
 
+
+template <>
+void DerivedRBSystem<RBSystem>::generate_residual_terms_wrt_truth()
+{
+  START_LOG("generate_residual_terms_wrt_truth()", "DerivedRBSystem");
+
+  SteadyDerivedRBEvaluation* drb_eval = libmesh_cast_ptr< SteadyDerivedRBEvaluation* >(rb_eval);
+
+  if(drb_eval->residual_type_flag != SteadyDerivedRBEvaluation::RESIDUAL_WRT_TRUTH)
+  {
+    // Set flag to compute residual wrt truth space
+    drb_eval->residual_type_flag = SteadyDerivedRBEvaluation::RESIDUAL_WRT_TRUTH;
+    
+    recompute_all_residual_terms(/*compute_inner_products = */ true);
+  }
+  STOP_LOG("generate_residual_terms_wrt_truth()", "DerivedRBSystem");
+}
+
 template <>
 void DerivedRBSystem<RBSystem>::compute_Fq_representor_norms(bool compute_inner_products)
 {
@@ -154,10 +172,12 @@ void DerivedRBSystem<RBSystem>::compute_Fq_representor_norms(bool compute_inner_
   
   EquationSystems& es = this->get_equation_systems();
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
+
+  SteadyDerivedRBEvaluation* drb_eval = libmesh_cast_ptr< SteadyDerivedRBEvaluation* >(rb_eval);
   
-  switch(residual_type_flag)
+  switch(drb_eval->residual_type_flag)
   {
-    case(RESIDUAL_WRT_UBER):
+    case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_UBER):
     {
       unsigned int uber_RB_size = uber_system.get_n_basis_functions();
       DenseVector<Number> temp_vector1, temp_vector2;
@@ -182,7 +202,7 @@ void DerivedRBSystem<RBSystem>::compute_Fq_representor_norms(bool compute_inner_
       break;
     }
 
-    case(RESIDUAL_WRT_TRUTH):
+    case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_TRUTH):
     {
       // Copy the output terms over from uber_system
       for(unsigned int n=0; n<get_n_outputs(); n++)
@@ -198,7 +218,7 @@ void DerivedRBSystem<RBSystem>::compute_Fq_representor_norms(bool compute_inner_
 
     default:
     {
-      libMesh::out << "Invalid RESIDUAL_TYPE in update_residual_terms" << std::endl;
+      libMesh::out << "Invalid RESIDUAL_TYPE in compute_Fq_representor_norms" << std::endl;
       break;
     }
   }
@@ -219,9 +239,9 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
   EquationSystems& es = this->get_equation_systems();
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
   
-  switch(residual_type_flag)
+  switch(der_rb_eval->residual_type_flag)
   {
-    case(RESIDUAL_WRT_UBER):
+    case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_UBER):
     {
       unsigned int derived_RB_size = get_n_basis_functions();
       unsigned int uber_RB_size = uber_system.get_n_basis_functions();
@@ -279,7 +299,7 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
       break;
     }
           
-    case(RESIDUAL_WRT_TRUTH):
+    case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_TRUTH):
     {
       unsigned int RB_size = get_n_basis_functions();
 

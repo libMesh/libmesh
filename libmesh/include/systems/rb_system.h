@@ -462,10 +462,13 @@ public:
                                             const RBDataIO io_flag = ALL_DATA);
   
   /**
-   * This function computes all of the residual terms, can be useful
+   * This function computes all of the residual representors, can be useful
    * when restarting a basis training computation.
+   * If \p compute_inner_products is false, we just compute the residual Riesz
+   * representors, whereas if true, we also compute all the corresponding inner
+   * product terms.
    */
-  virtual void recompute_all_residual_terms();
+  virtual void recompute_all_residual_terms(const bool compute_inner_products=true);
 
   /**
    * Build a new RBEvaluation object and add
