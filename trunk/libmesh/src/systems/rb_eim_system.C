@@ -54,7 +54,7 @@ RBEIMSystem::RBEIMSystem (EquationSystems& es,
     performing_extra_greedy_step(false),
     current_variable_number(0)
 {
-  allow_empty_RB_solve = false;
+  use_empty_RB_solve_in_greedy = false;
 }
 
 RBEIMSystem::~RBEIMSystem ()

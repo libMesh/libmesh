@@ -49,10 +49,8 @@ void TransientRBEvaluation::clear()
 
 void TransientRBEvaluation::clear_riesz_representors()
 {
-  TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
-
   // Delete the M_q representors
-  for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+  for(unsigned int q_m=0; q_m<M_q_representor.size(); q_m++)
   {
     for(unsigned int i=0; i<M_q_representor[q_m].size(); i++)
     {
@@ -65,13 +63,14 @@ void TransientRBEvaluation::clear_riesz_representors()
   }
 }
 
-void TransientRBEvaluation::initialize()
+
+void TransientRBEvaluation::resize_RB_data(const unsigned int Nmax)
 {
-  // Now allocate the N (i.e. RB) dependent data structures
-  Parent::initialize();
+  START_LOG("resize_RB_data()", "TransientRBEvaluation");
   
+  Parent::resize_RB_data(Nmax);
+
   TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
-  const unsigned int Nmax = trans_rb_sys.get_Nmax();
 
   RB_L2_matrix.resize(Nmax,Nmax);
 
@@ -90,7 +89,7 @@ void TransientRBEvaluation::initialize()
     Fq_Mq_representor_norms[i].resize(trans_rb_sys.get_Q_m());
     for(unsigned int j=0; j<trans_rb_sys.get_Q_m(); j++)
     {
-      Fq_Mq_representor_norms[i][j].resize(Nmax);
+      Fq_Mq_representor_norms[i][j].resize(Nmax, 0.);
     }
   }
 
@@ -101,7 +100,7 @@ void TransientRBEvaluation::initialize()
     Mq_Mq_representor_norms[i].resize(Nmax);
     for(unsigned int j=0; j<Nmax; j++)
     {
-      Mq_Mq_representor_norms[i][j].resize(Nmax);
+      Mq_Mq_representor_norms[i][j].resize(Nmax, 0.);
     }
   }
 
@@ -114,7 +113,7 @@ void TransientRBEvaluation::initialize()
       Aq_Mq_representor_norms[i][j].resize(Nmax);
       for(unsigned int k=0; k<Nmax; k++)
       {
-        Aq_Mq_representor_norms[i][j][k].resize(Nmax);
+        Aq_Mq_representor_norms[i][j][k].resize(Nmax, 0.);
       }
     }
   }
@@ -127,23 +126,27 @@ void TransientRBEvaluation::initialize()
     RB_initial_condition_all_N[i].resize(i+1);
   }
 
-  initial_L2_error_all_N.resize(Nmax);
+  initial_L2_error_all_N.resize(Nmax, 0.);
 
   // Resize the RB output vectors
   RB_outputs_all_k.resize(trans_rb_sys.get_n_outputs());
   RB_output_error_bounds_all_k.resize(trans_rb_sys.get_n_outputs());
   for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
   {
-    RB_outputs_all_k[n].resize(trans_rb_sys.get_K()+1);
-    RB_output_error_bounds_all_k[n].resize(trans_rb_sys.get_K()+1);
+    RB_outputs_all_k[n].resize(trans_rb_sys.get_K()+1, 0.);
+    RB_output_error_bounds_all_k[n].resize(trans_rb_sys.get_K()+1, 0.);
   }
 
   // Resize M_q_representor
+  // This is cleared in the call to clear_riesz_representors
+  // in Parent::resize_RB_data, so just resize here
   M_q_representor.resize(trans_rb_sys.get_Q_m());
   for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
   {
     M_q_representor[q_m].resize(trans_rb_sys.get_Nmax());
   }
+
+  STOP_LOG("resize_RB_data()", "TransientRBEvaluation");
 }
 
 Real TransientRBEvaluation::RB_solve(unsigned int N)
