@@ -53,7 +53,9 @@ RBEIMSystem::RBEIMSystem (EquationSystems& es,
     mesh_function(NULL),
     performing_extra_greedy_step(false),
     current_variable_number(0)
-{}
+{
+  allow_empty_RB_solve = false;
+}
 
 RBEIMSystem::~RBEIMSystem ()
 {

@@ -156,11 +156,6 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
                  << "of basis functions in RB_solve" << std::endl;
     libmesh_error();
   }
-  if(N==0)
-  {
-    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
-    libmesh_error();
-  }
 
   TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
   const Real dt = trans_rb_sys.get_dt();
@@ -201,7 +196,10 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
   RB_solution.resize(N);
 
   // Load the initial condition into RB_solution
-  RB_solution = RB_initial_condition_all_N[N-1];
+  if(N > 0)
+  {
+    RB_solution = RB_initial_condition_all_N[N-1];
+  }
 
   // Resize/clear the old solution vector
   old_RB_solution.resize(N);
@@ -219,7 +217,11 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
   // and load the initial data
   RB_temporal_solution_data[0] = RB_solution;
 
-  Real error_bound_sum = pow( initial_L2_error_all_N[N-1], 2.);
+  Real error_bound_sum = 0.;
+  if(N > 0)
+  {
+    error_bound_sum += pow( initial_L2_error_all_N[N-1], 2.);
+  }
 
   // Set error bound at the initial time
   error_bound_all_k[trans_rb_sys.get_time_level()] = std::sqrt(error_bound_sum);
@@ -259,7 +261,10 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
       RB_rhs.add(trans_rb_sys.eval_theta_q_f(q_f), RB_F_q_f);
     }
 
-    RB_LHS_matrix.lu_solve(RB_rhs, RB_solution);
+    if(N > 0)
+    {
+      RB_LHS_matrix.lu_solve(RB_rhs, RB_solution);
+    }
 
     // Save RB_solution for current time level
     RB_temporal_solution_data[time_level] = RB_solution;
@@ -298,8 +303,8 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
 
   STOP_LOG("RB_solve()", "TransientRBEvaluation");
 
-  return ( trans_rb_sys.return_rel_error_bound ? error_bound_all_k[trans_rb_sys.get_K()]/final_RB_L2_norm :
-                                    error_bound_all_k[trans_rb_sys.get_K()] );
+   return ( trans_rb_sys.return_rel_error_bound ? error_bound_all_k[trans_rb_sys.get_K()]/final_RB_L2_norm :
+                                                  error_bound_all_k[trans_rb_sys.get_K()] );
 }
 
 void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)

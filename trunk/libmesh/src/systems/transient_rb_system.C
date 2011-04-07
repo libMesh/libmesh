@@ -1346,13 +1346,13 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
 
       solution->zero();
 
-      if (!quiet)
+      if (!is_quiet())
         libMesh::out << "Starting solve i="
                      << i << " in TransientRBSystem::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
       solve();
 
-      if (!quiet)
+      if (!is_quiet())
         {
           libMesh::out << "Finished solve i="
                        << i << " in TransientRBSystem::update_residual_terms() at "

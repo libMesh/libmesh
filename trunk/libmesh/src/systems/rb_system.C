@@ -63,7 +63,7 @@ RBSystem::RBSystem (EquationSystems& es,
     store_representors(false),
     low_memory_mode(false),
     reuse_preconditioner(true),
-    return_rel_error_bound(true),
+    return_rel_error_bound(false),
     write_data_during_training(false),
     impose_internal_dirichlet_BCs(false),
     impose_internal_fluxes(false),
@@ -77,13 +77,14 @@ RBSystem::RBSystem (EquationSystems& es,
     read_binary_residual_representors(true),
     Nmax(0),
     delta_N(1),
-    quiet(true),
+    quiet_mode(true),
     eigen_system_name(""),
     inner_prod_assembly(NULL),
     inner_prod_bndry_assembly(NULL),
     constraint_assembly(NULL),
     output_dual_norms_computed(false),
     Fq_representor_norms_computed(false),
+    allow_empty_RB_solve(true),
     training_tolerance(-1.),
     _dirichlet_list_init(NULL),
     initial_Nmax(0),
@@ -314,8 +315,8 @@ void RBSystem::process_parameters_file ()
 					   training_parameters_random_seed);
   
   // Set quiet mode
-  const bool quiet_in = infile("quiet", quiet);
-  set_quiet(quiet_in);
+  const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
+  set_quiet_mode(quiet_mode_in);
 
   // Throw an error if we try to not initialize mesh-dependent data
   // when we also want to read in the basis functions.
@@ -341,7 +342,6 @@ void RBSystem::process_parameters_file ()
   std::vector<Real> mu_min_vector(n_parameters);
   std::vector<Real> mu_max_vector(n_parameters);
   std::vector<bool> log_scaling(n_parameters);
-  std::vector<Real> init_mu_vector(n_parameters);
   for(unsigned int i=0; i<n_parameters; i++)
   {
     // Read vector-based mu_min values.
@@ -353,9 +353,6 @@ void RBSystem::process_parameters_file ()
     // Read vector-based log scaling values.  Note the intermediate conversion to
     // int... this implies log_scaling = '1 1 1...' in the input file.
     log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
-
-    // Read vector-based init_mu values.
-    init_mu_vector[i] = infile("init_mu", init_mu_vector[i], i);
   }
 
   initialize_training_parameters(mu_min_vector,
@@ -366,8 +363,8 @@ void RBSystem::process_parameters_file ()
 
 
 
-  // Set the initial parameter value
-  set_current_parameters(init_mu_vector);
+  // Set the initial parameter value to the minimum parameters
+  set_current_parameters(mu_min_vector);
 
   libMesh::out << std::endl << "RBSystem parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
@@ -416,8 +413,8 @@ void RBSystem::process_parameters_file ()
   libMesh::out << "store non-Dirichlet affine operators? " << store_non_dirichlet_operators << std::endl;
   libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
   libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
-  libMesh::out << "quiet mode? " << quiet << std::endl;
-  libMesh::out << "initial parameter: ";
+  libMesh::out << "quiet mode? " << is_quiet() << std::endl;
+  libMesh::out << "parameter initialized to mu_min: ";
   for(unsigned int i=0; i<n_parameters; i++)
   {
     libMesh::out << "mu[" << i << "] = " << get_current_parameters()[i];
@@ -1292,7 +1289,7 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
     libmesh_error();
   }
 
-  int count = 1;
+  int count = 0;
 
   // Clear the Greedy param list
   for(unsigned int i=0; i<rb_eval->greedy_param_list.size(); i++)
@@ -1315,9 +1312,37 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
   if(!Fq_representor_norms_computed)
     this->compute_Fq_representor_norms();
 
+  libMesh::out << std::endl << "---- Performing Greedy basis enrichment ----" << std::endl;
   while(true)
   {
-    libMesh::out << std::endl << "---- Training solve " << count << " ----" << std::endl;
+    libMesh::out << std::endl << "---- Basis dimension: "
+                 << get_n_basis_functions() << " ----" << std::endl;
+
+    if( count > 0 || (count==0 && allow_empty_RB_solve) )
+    {
+      libMesh::out << "Performing RB solves on training set" << std::endl;
+      training_greedy_error = compute_max_error_bound();
+
+      libMesh::out << "Maximum " << (return_rel_error_bound ? "(relative)" : "(absolute)")
+                   << " error bound is " << training_greedy_error << std::endl << std::endl;
+
+      if(write_data_during_training)
+      {
+        OStringStream new_dir_name;
+        new_dir_name << directory_name << "_" << get_n_basis_functions();
+        libMesh::out << "Writing out RB data to " << new_dir_name.str() << std::endl;
+        write_offline_data_to_files(new_dir_name.str());
+      }
+
+      // Break out of training phase if we have reached Nmax
+      // or if the training_tolerance is satisfied.
+      if( greedy_termination_test(training_greedy_error, count) )
+      {
+        break;
+      }
+    }
+
+    libMesh::out << "Performing truth solve at parameter:" << std::endl;
     print_current_parameters();
 
     // Update the list of Greedily selected parameters
@@ -1327,35 +1352,10 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
     truth_solve(-1);
 
     // Add orthogonal part of the snapshot to the RB space
-    libMesh::out << std::endl << "Enriching the RB space" << std::endl;
+    libMesh::out << "Enriching the RB space" << std::endl;
     enrich_RB_space();
 
-    unsigned int RB_size = get_n_basis_functions();
-    libMesh::out << "Reduced basis dimension = " << RB_size << std::endl;
-
     update_system();
-
-    libMesh::out << "Performing RB solves on training set" << std::endl;
-    training_greedy_error = compute_max_error_bound();
-
-
-    libMesh::out << "Maximum a posteriori error is "
-              << training_greedy_error << std::endl << std::endl;
-
-    if(write_data_during_training)
-    {
-      OStringStream new_dir_name;
-      new_dir_name << directory_name << "_" << get_n_basis_functions();
-      libMesh::out << "Writing out RB data to " << new_dir_name.str() << std::endl;
-      write_offline_data_to_files(new_dir_name.str());
-    }
-
-    // Break out of training phase if we have reached Nmax
-    // or if the training_tolerance is satisfied.
-    if( greedy_termination_test(training_greedy_error, count) )
-    {
-      break;
-    }
 
     // Increment counter
     count++;
@@ -2047,7 +2047,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       zero_dirichlet_dofs_on_rhs();
 
       solution->zero();
-      if (!quiet)
+      if (!is_quiet())
 	    {
         libMesh::out << "Starting solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBSystem::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
@@ -2055,7 +2055,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 
       solve();
 
-      if (!quiet)
+      if (!is_quiet())
 	    {
         libMesh::out << "Finished solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBSystem::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
@@ -2242,14 +2242,14 @@ void RBSystem::compute_output_dual_norms()
 
       solution->zero();
 
-      if (!quiet)
+      if (!is_quiet())
         libMesh::out << "Starting solve n=" << n << ", q_l=" << q_l
                << " in RBSystem::compute_output_dual_norms() at "
                << Utility::get_timestamp() << std::endl;
 
       solve();
 
-      if (!quiet)
+      if (!is_quiet())
         {
           libMesh::out << "Finished solve n=" << n << ", q_l=" << q_l
                        << " in RBSystem::compute_output_dual_norms() at "
@@ -2369,14 +2369,14 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
 
     solution->zero();
 
-    if (!quiet)
+    if (!is_quiet())
       libMesh::out << "Starting solve q_f=" << q_f
 		   << " in RBSystem::update_residual_terms() at "
 		   << Utility::get_timestamp() << std::endl;
 
     solve();
 
-    if (!quiet)
+    if (!is_quiet())
     {
       libMesh::out << "Finished solve q_f=" << q_f
 		   << " in RBSystem::update_residual_terms() at "
@@ -2409,6 +2409,12 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
     }
   }
 
+  // Reset the same_preconditioner flag
+  if(reuse_preconditioner)
+  {
+    linear_solver->same_preconditioner = false;
+  }
+
   if (compute_inner_products)
   {
     unsigned int q=0;
@@ -2429,7 +2435,6 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
       for(unsigned int q_f2=q_f1; q_f2<get_Q_f(); q_f2++)
       {
         Fq_representor_norms[q] = inner_product_storage_vector->dot(*F_q_representor[q_f2]);
-        libMesh::out << "Fq_representor_norm = " << Fq_representor_norms[q] << std::endl;
 
         q++;
       }
@@ -2783,7 +2788,7 @@ void RBSystem::write_offline_data_to_files(const std::string& directory_name,
       // Write out F_q_representors.  These are useful to have when restarting,
       // so you don't have to recompute them all over again.  There should be
       // Q_f of these.
-      if (!quiet)
+      if (!is_quiet())
 	libMesh::out << "Writing out the F_q_representors..." << std::endl;
 
       std::ostringstream file_name;

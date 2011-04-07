@@ -74,7 +74,12 @@ public:
 
   /**
    * Perform online solve with the N RB basis functions, for the
-   * set of parameters in current_params, where 1 <= N <= RB_size.
+   * set of parameters in current_params, where 0 <= N <= RB_size.
+   * @return the absolute or relative error bound associated with
+   * the RB approximation.
+   * With an empty RB space (N=0), our RB solution is zero, but we
+   * still obtain a meaningful error bound associated with the
+   * forcing terms.
    */
   virtual Real RB_solve(unsigned int N);
 
