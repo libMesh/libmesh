@@ -75,6 +75,7 @@ RBSystem::RBSystem (EquationSystems& es,
     read_binary_basis_functions(true),
     write_binary_residual_representors(true),
     read_binary_residual_representors(true),
+    use_empty_RB_solve_in_greedy(true),
     Nmax(0),
     delta_N(1),
     quiet_mode(true),
@@ -84,10 +85,8 @@ RBSystem::RBSystem (EquationSystems& es,
     constraint_assembly(NULL),
     output_dual_norms_computed(false),
     Fq_representor_norms_computed(false),
-    allow_empty_RB_solve(true),
     training_tolerance(-1.),
     _dirichlet_list_init(NULL),
-    initial_Nmax(0),
     RB_system_initialized(false),
     current_EIM_system(NULL)
 {
@@ -332,7 +331,6 @@ void RBSystem::process_parameters_file ()
   // Initialize RB parameters
   const unsigned int Nmax_in = infile("Nmax", Nmax);
   set_Nmax(Nmax_in);
-  initial_Nmax = get_Nmax();
   
   const Real training_tolerance_in = infile("training_tolerance",
                                             training_tolerance);
@@ -1318,7 +1316,7 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
     libMesh::out << std::endl << "---- Basis dimension: "
                  << get_n_basis_functions() << " ----" << std::endl;
 
-    if( count > 0 || (count==0 && allow_empty_RB_solve) )
+    if( count > 0 || (count==0 && use_empty_RB_solve_in_greedy) )
     {
       libMesh::out << "Performing RB solves on training set" << std::endl;
       training_greedy_error = compute_max_error_bound();
@@ -1489,23 +1487,6 @@ void RBSystem::set_eigen_system_name(const std::string& name)
 
 void RBSystem::set_Nmax(unsigned int Nmax_in)
 {
-  // We assume that Nmax is initialized in
-  // init_data to initial_Nmax, and that it
-  // cannot be increased above initial_Nmax
-  if(RB_system_initialized && (Nmax_in > initial_Nmax))
-  {
-    libMesh::err << "Error: System was initialized with Nmax = " << initial_Nmax
-                 << ", cannot set Nmax higher than this value."  << std::endl;
-    libmesh_error();
-  }
-
-  if(RB_system_initialized && (Nmax_in < this->get_n_basis_functions()))
-  {
-    libMesh::err << "Error: Cannot set Nmax to be less than the "
-                 << "current number of basis functions."  << std::endl;
-    libmesh_error();
-  }
-
   this->Nmax = Nmax_in;
 }
 

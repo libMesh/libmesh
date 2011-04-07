@@ -33,8 +33,8 @@ template <typename T> class NumericVector;
 /**
  * This class is part of the rbOOmit framework.
  *
- * RBEvaluation encapsulates the code and data required
- * to perform "online" RB evaluations.
+ * RBEvaluation encapsulates the code and data that
+ * depends on a particular reduced basis space.
  *
  * @author David J. Knezevic, 2011
  */
@@ -66,6 +66,14 @@ public:
    * Initialize this object by allocating the necessary data fields.
    */
   virtual void initialize();
+  
+  /**
+   * Resize and clear the data vectors corresponding to the
+   * value of \p Nmax.
+   * Overload to also clear and resize any extra
+   * data in subclasses.
+   */
+  virtual void resize_RB_data(const unsigned int Nmax);
 
   /**
    * Get a reference to the i^th basis function.

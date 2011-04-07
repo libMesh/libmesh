@@ -78,6 +78,20 @@ void RBEvaluation::initialize()
 {
   const unsigned int Nmax = rb_sys.get_Nmax();
 
+  resize_RB_data(Nmax);
+}
+
+void RBEvaluation::resize_RB_data(const unsigned int Nmax)
+{
+  START_LOG("resize_RB_data()", "RBEvaluation");
+
+  if(Nmax < this->get_n_basis_functions())
+  {
+    libMesh::err << "Error: Cannot set Nmax to be less than the "
+                 << "current number of basis functions."  << std::endl;
+    libmesh_error();
+  }
+
   // Resize/clear inner product matrix
   if(rb_sys.compute_RB_inner_product)
     RB_inner_product_matrix.resize(Nmax,Nmax);
@@ -106,7 +120,7 @@ void RBEvaluation::initialize()
     Fq_Aq_representor_norms[i].resize(rb_sys.get_Q_a());
     for(unsigned int j=0; j<rb_sys.get_Q_a(); j++)
     {
-      Fq_Aq_representor_norms[i][j].resize(Nmax);
+      Fq_Aq_representor_norms[i][j].resize(Nmax, 0.);
     }
   }
 
@@ -117,7 +131,7 @@ void RBEvaluation::initialize()
     Aq_Aq_representor_norms[i].resize(Nmax);
     for(unsigned int j=0; j<Nmax; j++)
     {
-      Aq_Aq_representor_norms[i][j].resize(Nmax);
+      Aq_Aq_representor_norms[i][j].resize(Nmax, 0.);
     }
   }
 
@@ -133,15 +147,19 @@ void RBEvaluation::initialize()
   }
 
   // Initialize vectors storing output data
-  RB_outputs.resize(rb_sys.get_n_outputs());
-  RB_output_error_bounds.resize(rb_sys.get_n_outputs());
+  RB_outputs.resize(rb_sys.get_n_outputs(), 0.);
+  RB_output_error_bounds.resize(rb_sys.get_n_outputs(), 0.);
 
-  // Resize the vector of A_q_representors
+  // Clear and resize the vector of A_q_representors
+  clear_riesz_representors();
+
   A_q_representor.resize(rb_sys.get_Q_a());
   for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
   {
     A_q_representor[q_a].resize(rb_sys.get_Nmax());
   }
+
+  STOP_LOG("resize_RB_data()", "RBEvaluation");
 }
 
 NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)

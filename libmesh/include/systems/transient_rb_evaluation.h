@@ -60,9 +60,12 @@ public:
   virtual void clear();
 
   /**
-   * Initialize this object by allocating the necessary data fields.
+   * Resize and clear the data vectors corresponding to the
+   * value of \p Nmax.
+   * Overloaded to clear data relevant in the time-dependent
+   * case.
    */
-  virtual void initialize();
+  virtual void resize_RB_data(const unsigned int Nmax);
 
   /**
    * Perform online solve for current_params

@@ -706,6 +706,13 @@ public:
    */
   bool read_binary_residual_representors;
 
+  /**
+   * A boolean flag to indicate whether or not we initialize the
+   * Greedy algorithm by performing RB_solves on the training set
+   * with an "empty" (i.e. N=0) reduced basis space.
+   */
+  bool use_empty_RB_solve_in_greedy;
+
 protected:
 
   /**
@@ -972,12 +979,6 @@ protected:
    * recompute them unnecessarily.
    */
   bool Fq_representor_norms_computed;
-  
-  /**
-   * A boolean flag to indicate whether or not it makes sense to
-   * perform an RB_solve with 0 basis functions.
-   */
-  bool allow_empty_RB_solve;
 
 private:
 
@@ -1048,12 +1049,6 @@ private:
    * non-Dirichlet dofs.
    */
   dirichlet_list_fptr _dirichlet_list_init;
-
-  /**
-   * Member variable to store the value of Nmax that was read in from
-   * file and was used in init_data to initialize the RBSystem.
-   */
-  unsigned int initial_Nmax;
 
   /**
    * Boolean flag to indicate whether the RBSystem has been initialized.
