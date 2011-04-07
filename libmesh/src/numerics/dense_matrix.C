@@ -229,6 +229,10 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
   // Resize and clear dest.
   // Note: DenseVector::resize() also zeros the vector.
   dest.resize(this->m());
+  
+  // Short-circuit if the matrix is empty
+  if(this->m() == 0)
+    return;
 
   if (this->use_blas_lapack)
     this->_matvec_blas(1., 0., dest, arg);
@@ -256,6 +260,10 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
   // Resize and clear dest.
   // Note: DenseVector::resize() also zeros the vector.
   dest.resize(this->n());
+
+  // Short-circuit if the matrix is empty
+  if(this->m() == 0)
+    return;
 
   if (this->use_blas_lapack)
     {
@@ -285,6 +293,13 @@ void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
                                       const T factor,
                                       const DenseVector<T>& arg) const
 {
+  // Short-circuit if the matrix is empty
+  if(this->m() == 0)
+  {
+    dest.resize(0);
+    return;
+  }
+
   if (this->use_blas_lapack)
     this->_matvec_blas(factor, 1., dest, arg);
   else

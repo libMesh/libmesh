@@ -179,18 +179,18 @@ public:
   unsigned int get_Q_l(unsigned int output_index) const;
 
   /**
-   * Set the quiet flag. If quiet == false then
+   * Set the quiet_mode flag. If quiet == false then
    * we print out a lot of extra information
    * during the Offline stage.
    */
-  void set_quiet(bool quiet)
-    { this->quiet = quiet; }
+  void set_quiet_mode(bool quiet_mode_in)
+    { this->quiet_mode = quiet_mode_in; }
 
   /**
    * Is the system in quiet mode?
    */
   bool is_quiet() const
-    { return this->quiet; }
+    { return this->quiet_mode; }
 
   /**
    * Load the i^th RB function into the RBSystem
@@ -906,7 +906,7 @@ protected:
    * Flag to indicate whether we print out extra information during
    * the Offline stage.
    */
-  bool quiet;
+  bool quiet_mode;
 
   /**
    * The name of the RBSCMSystem system that performs
@@ -972,6 +972,12 @@ protected:
    * recompute them unnecessarily.
    */
   bool Fq_representor_norms_computed;
+  
+  /**
+   * A boolean flag to indicate whether or not it makes sense to
+   * perform an RB_solve with 0 basis functions.
+   */
+  bool allow_empty_RB_solve;
 
 private:
 

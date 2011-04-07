@@ -161,11 +161,6 @@ Real RBEvaluation::RB_solve(unsigned int N)
                  << "of basis functions in RB_solve" << std::endl;
     libmesh_error();
   }
-  if(N==0)
-  {
-    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
-    libmesh_error();
-  }
 
   // Resize (and clear) the solution vector
   RB_solution.resize(N);
@@ -195,7 +190,10 @@ Real RBEvaluation::RB_solve(unsigned int N)
   }
   
   // Solve the linear system
-  RB_system_matrix.lu_solve(RB_rhs, RB_solution);
+  if(N > 0)
+  {
+    RB_system_matrix.lu_solve(RB_rhs, RB_solution);
+  }
 
   // Evaluate the dual norm of the residual for RB_solution_vector
   Real epsilon_N = compute_residual_dual_norm(N);
@@ -226,7 +224,7 @@ Real RBEvaluation::RB_solve(unsigned int N)
   }
 
   STOP_LOG("RB_solve()", "RBEvaluation");
-
+  
   return ( rb_sys.return_rel_error_bound ? abs_error_bound/RB_solution_norm : abs_error_bound );
 }
 

@@ -12,12 +12,12 @@ Nmax = 20        # The maximum number of basis functions we can generate in the 
 
 n_parameters = 2 # The number of parameters in the problem
 
-mu_min = '-2 -2'              # The "lower corner" of the parameter domain
-mu_max = '2 2'                # The "upper corner" of the parameter domain
-log_scaling = '0 0'           # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
+mu_min = '-2 -2'               # The "lower corner" of the parameter domain
+mu_max = '2 2'                 # The "upper corner" of the parameter domain
+log_scaling = '0 0'            # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
 
-deterministic_training = true # Are the training points generated randomly or deterministically
-store_basis_functions = true  # Do we store the basis functions in the offline_data directory once Offline finishes?
+deterministic_training = true  # Are the training points generated randomly or deterministically
+store_basis_functions = true   # Do we store the basis functions in the offline_data directory once Offline finishes?
+return_rel_error_bound = false # Do we use a relative or absolute error bound in training the RB space?
 
-n_training_samples_mu = 100   # The number of parameters in training set (must be square for the 2-parameter deterministic case)
-init_mu = '2 2'               # The first parameter that we do a truth_solve at in the Offline basis training
+n_training_samples_mu = 100    # The number of parameters in training set (must be square for the 2-parameter deterministic case)
