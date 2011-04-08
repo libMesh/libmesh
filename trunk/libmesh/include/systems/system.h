@@ -1476,6 +1476,17 @@ private:
    */
   bool _additional_data_written;
 
+  /**
+   * This vector is used only when *reading* in a system from file.
+   * Based on the system header, it keeps track of any index remapping
+   * between variable names in the data file and variable names in the
+   * already-constructed system.  I.e. if we have a system with
+   * variables "A1", "A2", "B1", and "B2", but we read in a data file with
+   * only "A1" and "B1" defined, then we don't want to try and read in
+   * A2 or B2, and we don't want to assign A1 and B1 values to
+   * different dof indices.
+   */
+  std::vector<unsigned int> _written_var_indices;
 
   /**
    * This class implements projecting a vector from 
