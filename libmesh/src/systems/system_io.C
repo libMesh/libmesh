@@ -135,6 +135,9 @@ void System::read_header (Xdr& io,
     unsigned int n_vars=0;
     if (libMesh::processor_id() == 0) io.data (n_vars);
     Parallel::broadcast(n_vars);
+
+    _written_var_indices.clear();
+    _written_var_indices.resize(n_vars, 0);
       
     for (unsigned int var=0; var<n_vars; var++)
       {	            
@@ -206,7 +209,9 @@ void System::read_header (Xdr& io,
 #endif
 
 	if (read_header) 
-	  this->add_variable (var_name, type);
+	  _written_var_indices[var] = this->add_variable (var_name, type);
+        else
+	  _written_var_indices[var] = this->variable_number(var_name);
       }
   }
 
@@ -285,10 +290,13 @@ void System::read_legacy_data (Xdr& io,
     unsigned int cnt=0;
 
     const unsigned int sys     = this->number();
-    const unsigned int n_vars  = this->n_vars();
+    const unsigned int n_vars  = this->_written_var_indices.size();
+    libmesh_assert(n_vars <= this->n_vars());
 
-    for (unsigned int var=0; var<n_vars; var++)
+    for (unsigned int data_var=0; data_var<n_vars; data_var++)
       {	
+        const unsigned int var = _written_var_indices[data_var];
+
 	// First reorder the nodal DOF values
 	{
 	  MeshBase::node_iterator
@@ -370,10 +378,12 @@ void System::read_legacy_data (Xdr& io,
 	      unsigned int cnt=0;
 
 	      const unsigned int sys     = this->number();
-	      const unsigned int n_vars  = this->n_vars();
+              const unsigned int n_vars  = this->_written_var_indices.size();
+              libmesh_assert(n_vars <= this->n_vars());
 	
-	      for (unsigned int var=0; var<n_vars; var++)
-		{
+              for (unsigned int data_var=0; data_var<n_vars; data_var++)
+                {	
+                  const unsigned int var = _written_var_indices[data_var];
 		  // First reorder the nodal DOF values
 		  {
 		    MeshBase::node_iterator
@@ -484,53 +494,60 @@ void System::read_parallel_data (Xdr &io,
   io.data(io_buffer);
   
   const unsigned int sys_num = this->number();
-  const unsigned int n_vars  = this->n_vars();
-
+  const unsigned int n_vars  = this->_written_var_indices.size();
+  libmesh_assert(n_vars <= this->n_vars());
+	
   unsigned int cnt=0;
   
   // Loop over each non-SCALAR variable and each node, and read out the value.
-  for (unsigned int var=0; var<n_vars; var++)
-    if(this->variable(var).type().family != SCALAR)
+  for (unsigned int data_var=0; data_var<n_vars; data_var++)
     {
-      // First read the node DOF values
-      for (std::vector<const DofObject*>::const_iterator
-	     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
-	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-	  {
-	    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
-		    DofObject::invalid_id);
-	    libmesh_assert (cnt < io_buffer.size());
-	    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-	  }
+      const unsigned int var = _written_var_indices[data_var];
+      if(this->variable(var).type().family != SCALAR)
+        {
+          // First read the node DOF values
+          for (std::vector<const DofObject*>::const_iterator
+	       it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
+	    for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	      {
+	        libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
+		                DofObject::invalid_id);
+	        libmesh_assert (cnt < io_buffer.size());
+	        this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+	      }
 
-      // Then read the element DOF values
-      for (std::vector<const DofObject*>::const_iterator
+          // Then read the element DOF values
+          for (std::vector<const DofObject*>::const_iterator
 	     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
-	for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-	  {
-	    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
-		    DofObject::invalid_id);
-	    libmesh_assert (cnt < io_buffer.size());
-	    this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-	  }      
+	    for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+	    {
+	      libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
+		              DofObject::invalid_id);
+	      libmesh_assert (cnt < io_buffer.size());
+	      this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+	    }      
+        }
     }
 
   // Finally, read the SCALAR variables on the last processor
-  for (unsigned int var=0; var<this->n_vars(); var++)
-    if(this->variable(var).type().family == SCALAR)
-      {
-        if (libMesh::processor_id() == (libMesh::n_processors()-1))
-          {
-            const DofMap& dof_map = this->get_dof_map();
-            std::vector<unsigned int> SCALAR_dofs;
-            dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+  for (unsigned int data_var=0; data_var<n_vars; data_var++)
+    {
+      const unsigned int var = _written_var_indices[data_var];
+      if(this->variable(var).type().family == SCALAR)
+        {
+          if (libMesh::processor_id() == (libMesh::n_processors()-1))
+            {
+              const DofMap& dof_map = this->get_dof_map();
+              std::vector<unsigned int> SCALAR_dofs;
+              dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
-            for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
-              {
-                this->solution->set( SCALAR_dofs[i], io_buffer[cnt++] );
-              }
-          }
-      }
+              for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+                {
+                  this->solution->set( SCALAR_dofs[i], io_buffer[cnt++] );
+                }
+            }
+        }
+    }
 
   // Only read additional vectors if wanted  
   if (read_additional_data)
@@ -550,48 +567,54 @@ void System::read_parallel_data (Xdr &io,
 	  io.data(io_buffer);
 	  
 	  // Loop over each non-SCALAR variable and each node, and read out the value.
-	  for (unsigned int var=0; var<n_vars; var++)
-	    if(this->variable(var).type().family != SCALAR)
-	    {
-	      // First read the node DOF values
-	      for (std::vector<const DofObject*>::const_iterator
-		     it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
-		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-		  {
-		    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
-			    DofObject::invalid_id);
-		    libmesh_assert (cnt < io_buffer.size());
-		    pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-		  }	     
+          for (unsigned int data_var=0; data_var<n_vars; data_var++)
+            {
+              const unsigned int var = _written_var_indices[data_var];
+	      if(this->variable(var).type().family != SCALAR)
+	        {
+	          // First read the node DOF values
+	          for (std::vector<const DofObject*>::const_iterator
+		       it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
+		    for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		      {
+		        libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
+			                DofObject::invalid_id);
+		        libmesh_assert (cnt < io_buffer.size());
+		        pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+		      }	     
 	      
-	      // Then read the element DOF values
-	      for (std::vector<const DofObject*>::const_iterator
-		     it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
-		for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-		  {
-		    libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
-			    DofObject::invalid_id);
-		    libmesh_assert (cnt < io_buffer.size());
-		    pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-		  }	      
+	          // Then read the element DOF values
+	          for (std::vector<const DofObject*>::const_iterator
+		       it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
+		    for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+		      {
+		        libmesh_assert ((*it)->dof_number(sys_num, var, comp) !=
+			                DofObject::invalid_id);
+		        libmesh_assert (cnt < io_buffer.size());
+		        pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+		      }	      
+	        }
 	    }
 
           // Finally, read the SCALAR variables on the last processor
-          for (unsigned int var=0; var<this->n_vars(); var++)
-            if(this->variable(var).type().family == SCALAR)
-              {
-                if (libMesh::processor_id() == (libMesh::n_processors()-1))
-                  {
-                    const DofMap& dof_map = this->get_dof_map();
-                    std::vector<unsigned int> SCALAR_dofs;
-                    dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
-
-                    for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+          for (unsigned int data_var=0; data_var<n_vars; data_var++)
+            {
+              const unsigned int var = _written_var_indices[data_var];
+              if(this->variable(var).type().family == SCALAR)
+                {
+                  if (libMesh::processor_id() == (libMesh::n_processors()-1))
                     {
-                      pos->second->set( SCALAR_dofs[i], io_buffer[cnt++] );
+                      const DofMap& dof_map = this->get_dof_map();
+                      std::vector<unsigned int> SCALAR_dofs;
+                      dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+
+                      for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+                        {
+                          pos->second->set( SCALAR_dofs[i], io_buffer[cnt++] );
+                        }
                     }
-                 }
-              }
+                }
+            }
 	}
     }
 }
@@ -868,39 +891,48 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
   if (libMesh::processor_id() == 0) io.data(vector_length, "# vector length");
   Parallel::broadcast(vector_length);
   
+  const unsigned int n_vars  = this->_written_var_indices.size();
+  libmesh_assert(n_vars <= this->n_vars());
+	
   // Loop over each variable in the system, and then each node/element in the mesh.
-  for (unsigned int var=0; var<this->n_vars(); var++)
-    if(this->variable(var).type().family != SCALAR)
-      {
-        //---------------------------------
-        // Collect the values for all nodes
-        n_assigned_vals +=
-	  this->read_serialized_blocked_dof_objects (var,
-                                                     this->get_mesh().n_nodes(),
-						     this->get_mesh().local_nodes_begin(),
-						     this->get_mesh().local_nodes_end(),
-						     io,
-						     vec);
+  for (unsigned int data_var=0; data_var<n_vars; data_var++)
+    {
+      const unsigned int var = _written_var_indices[data_var];
+      if(this->variable(var).type().family != SCALAR)
+        {
+          //---------------------------------
+          // Collect the values for all nodes
+          n_assigned_vals +=
+	    this->read_serialized_blocked_dof_objects (var,
+                                                       this->get_mesh().n_nodes(),
+						       this->get_mesh().local_nodes_begin(),
+						       this->get_mesh().local_nodes_end(),
+						       io,
+						       vec);
       
       
-        //------------------------------------
-        // Collect the values for all elements
-        n_assigned_vals +=
-	  this->read_serialized_blocked_dof_objects (var,
-						     this->get_mesh().n_elem(),
-						     this->get_mesh().local_elements_begin(),
-						     this->get_mesh().local_elements_end(),
-						     io,
-						     vec);
-      } // end variable loop
+          //------------------------------------
+          // Collect the values for all elements
+          n_assigned_vals +=
+	    this->read_serialized_blocked_dof_objects (var,
+						       this->get_mesh().n_elem(),
+						       this->get_mesh().local_elements_begin(),
+						       this->get_mesh().local_elements_end(),
+						       io,
+						       vec);
+        } // end variable loop
+    }
 
   // Finally loop over all the SCALAR variables
-  for (unsigned int var=0; var<this->n_vars(); var++)
-    if(this->variable(var).type().family == SCALAR)
-      {
-        n_assigned_vals +=
-          this->read_SCALAR_dofs (var, io, vec);
-      }
+  for (unsigned int data_var=0; data_var<n_vars; data_var++)
+    {
+      const unsigned int var = _written_var_indices[data_var];
+      if(this->variable(var).type().family == SCALAR)
+        {
+          n_assigned_vals +=
+            this->read_SCALAR_dofs (var, io, vec);
+        }
+    }
 
   vec.close();
 
