@@ -170,6 +170,10 @@ void DerivedRBSystem<RBSystem>::compute_Fq_representor_norms(bool compute_inner_
 {
   START_LOG("compute_Fq_representor_norms()", "DerivedRBSystem");
   
+  // We don't short-circuit here even if Fq_representor_norms_computed = true because
+  // the residual mode may have changed (this function is very cheap so not much
+  // incentive to make sure we do not call it extra times)
+  
   EquationSystems& es = this->get_equation_systems();
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
 

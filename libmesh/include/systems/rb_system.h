@@ -26,6 +26,7 @@
 #include "rb_base.h"
 #include "fem_context.h"
 #include "rb_evaluation.h"
+#include "elem_assembly.h"
 
 namespace libMesh
 {
@@ -39,18 +40,18 @@ namespace libMesh
  * @author David J. Knezevic, 2009
  */
 
-/**
- * The function pointer typedef for
- * assembly of affine operators.
- */
-typedef void (*affine_assembly_fptr)(FEMContext&, System&);
 
 /**
- * The function pointer typedef for
- * assembly of Dirichlet and non-Dirichlet
- * dof lists.
+ * First, define a class that allows us to assemble a list of Dirichlet
+ * dofs. This list is used by RBSystem to impose homoegenous Dirichlet
+ * boundary conditions (in the RB method, non-homogeneous Dirichlet
+ * boundary conditions should be imposed via lifting functions).
  */
-typedef void (*dirichlet_list_fptr)(FEMContext&, System&, std::set<unsigned int>&);
+class DirichletDofAssembly : public ElemAssembly
+{
+public:
+  std::set<unsigned int> dirichlet_dofs_set;
+};
 
 // ------------------------------------------------------------
 // RBSystem class definition
@@ -215,10 +216,10 @@ public:
   virtual void load_RB_solution();
 
   /**
-   * Register a user function to use in initializing the
-   * lists of Dirichlet and non-Dirichlet dofs.
+   * Register a user-defined object to be used in initializing the
+   * lists of Dirichlet dofs.
    */
-  void attach_dirichlet_dof_initialization (dirichlet_list_fptr dirichlet_init);
+  void attach_dirichlet_dof_initialization (DirichletDofAssembly* dirichlet_init);
 
   /**
    * Call the user-defined Dirichlet dof initialization function.
@@ -229,7 +230,7 @@ public:
    * Override attach_theta_q_a to just throw an error. Should
    * use attach_A_q in RBSystem and its subclasses.
    */
-  virtual void attach_theta_q_a(theta_q_fptr )
+  virtual void attach_theta_q_a(RBTheta* )
   {
     libMesh::out << "Error: Cannot use attach_theta_q_a in RBSystem. Use attach_A_q instead." << std::endl;
     libmesh_error();
@@ -249,17 +250,15 @@ public:
    * Attach parameter-dependent function and user-defined assembly routine
    * for affine operator (both interior and boundary assembly).
    */
-  virtual void attach_A_q(theta_q_fptr theta_q_a,
-                          affine_assembly_fptr A_q_intrr_assembly,
-                          affine_assembly_fptr A_q_bndry_assembly);
+  virtual void attach_A_q(RBTheta* theta_q_a,
+                          ElemAssembly* A_q_assembly);
 
   /**
    * Attach parameter-dependent function and user-defined assembly routine
    * for affine vector. (Interior assembly and boundary assembly).
    */
-  virtual void attach_F_q(theta_q_fptr theta_q_f,
-                          affine_assembly_fptr F_q_intrr_assembly,
-                          affine_assembly_fptr F_q_bdnry_assembly);
+  virtual void attach_F_q(RBTheta* theta_q_f,
+                          ElemAssembly* F_q_assembly);
 
   /**
    * Attach an EIM system and a corresponding function pointers to
@@ -267,8 +266,7 @@ public:
    * a set of LHS affine operators.
    */
   void attach_A_EIM_operators(RBEIMSystem* eim_system,
-                                affine_assembly_fptr EIM_intrr_assembly,
-                                affine_assembly_fptr EIM_bndry_assembly);
+                              ElemAssembly* EIM_assembly);
   
   /**
    * Attach an EIM system and a corresponding function pointers to
@@ -276,8 +274,7 @@ public:
    * a set of RHS affine functions.
    */
   void attach_F_EIM_vectors(RBEIMSystem* eim_system,
-                              affine_assembly_fptr EIM_intrr_assembly,
-                              affine_assembly_fptr EIM_bndry_assembly);
+                            ElemAssembly* EIM_assembly);
 
   /**
    * @return a boolean to indicate whether the index q refers
@@ -289,22 +286,21 @@ public:
    * Attach user-defined assembly routine
    * for the inner-product matrix.
    */
-  void attach_inner_prod_assembly(affine_assembly_fptr IP_assembly, affine_assembly_fptr IP_bndry_assembly=NULL);
+  void attach_inner_prod_assembly(ElemAssembly* IP_assembly);
 
   /**
    * Attach user-defined assembly routine
    * for the constraint matrix.
    */
-  void attach_constraint_assembly(affine_assembly_fptr constraint_assembly_in);
+  void attach_constraint_assembly(ElemAssembly* constraint_assembly_in);
 
   /**
    * Attach user-defined assembly routine for output. 
    * (Interior assembly and boundary assembly).
    * In this case we pass in vector arguments to allow for Q_l > 1.
    */
-  virtual void attach_output(std::vector<theta_q_fptr> theta_q_l,
-                             std::vector<affine_assembly_fptr> output_intrr_assembly,
-                             std::vector<affine_assembly_fptr> output_bndry_assembly);
+  virtual void attach_output(std::vector<RBTheta*> theta_q_l,
+                             std::vector<ElemAssembly*> output_assembly);
 
   /**
    * Attach user-defined assembly routine for output. 
@@ -312,9 +308,8 @@ public:
    * This function provides simpler syntax in the case that Q_l = 1; we
    * do not need to use a vector in this case.
    */
-  virtual void attach_output(theta_q_fptr theta_q_l,
-                             affine_assembly_fptr output_intrr_assembly,
-                             affine_assembly_fptr output_bndry_assembly);
+  virtual void attach_output(RBTheta* theta_q_l,
+                             ElemAssembly* output_assembly);
 
   /**
    * Get a pointer to inner_product_matrix. Accessing via this
@@ -766,8 +761,7 @@ protected:
    * of the matrix, 0.5*(A + A^T)
    */
   void add_scaled_matrix_and_vector(Number scalar,
-                                    affine_assembly_fptr intrr_assembly,
-                                    affine_assembly_fptr bndry_assembly,
+                                    ElemAssembly* elem_assembly,
                                     SparseMatrix<Number>* input_matrix,
                                     NumericVector<Number>* input_vector,
                                     bool symmetrize=false,
@@ -786,8 +780,7 @@ protected:
    * in dest.
    */
   void assemble_scaled_matvec(Number scalar,
-                              affine_assembly_fptr intrr_assembly,
-                              affine_assembly_fptr bndry_assembly,
+                              ElemAssembly* elem_assembly,
                               NumericVector<Number>& dest,
                               NumericVector<Number>& arg);
 
@@ -922,50 +915,35 @@ protected:
   std::string eigen_system_name;
 
   /**
-   * Function pointers for assembling the inner product
-   * matrix.
+   * Pointer to inner product assembly.
    */
-  affine_assembly_fptr inner_prod_assembly;
-  affine_assembly_fptr inner_prod_bndry_assembly;
+  ElemAssembly* inner_prod_assembly;
 
   /**
    * Function pointer for assembling the constraint
    * matrix.
    */
-  affine_assembly_fptr constraint_assembly;
+  ElemAssembly* constraint_assembly;
 
   /**
    * Vectors storing the function pointers to the assembly
    * routines for the affine operators, both interior and boundary
    * assembly.
    */
-  std::vector<affine_assembly_fptr> A_q_intrr_assembly_vector;
-  std::vector<affine_assembly_fptr> A_q_bndry_assembly_vector;
+  std::vector<ElemAssembly*> A_q_assembly_vector;
 
   /**
    * Vector storing the function pointers to the assembly
-   * routines for the affine vectors. Element interior part.
+   * routines for the rhs affine vectors.
    */
-  std::vector<affine_assembly_fptr> F_q_intrr_assembly_vector;
-
-  /**
-   * Vector storing the function pointers to the assembly
-   * routines for the affine vectors. Boundary part.
-   */
-  std::vector<affine_assembly_fptr> F_q_bndry_assembly_vector;
+  std::vector<ElemAssembly*> F_q_assembly_vector;
 
   /**
    * Vector storing the function pointers to the assembly
    * routines for the outputs. Element interior part.
    */
-  std::vector< std::vector<affine_assembly_fptr> > output_intrr_assembly_vector;
+  std::vector< std::vector<ElemAssembly*> > output_assembly_vector;
 
-  /**
-   * Vector storing the function pointers to the assembly
-   * routines for the outputs. Boundary part.
-   */
-  std::vector< std::vector<affine_assembly_fptr> > output_bndry_assembly_vector;
-  
   /**
    * A boolean flag to indicate whether or not the output dual norms
    * have already been computed --- used to make sure that we don't
@@ -985,14 +963,14 @@ private:
   //----------- PRIVATE DATA MEMBERS -----------//
 
   /**
-   * Vector storing the function pointers to the theta_q_f (affine rhs vectors).
+   * Vector storing the RBTheta functors for the theta_q_f (affine expansion of the rhs).
    */
-  std::vector<theta_q_fptr> theta_q_f_vector;
+  std::vector<RBTheta*> theta_q_f_vector;
 
   /**
-   * Vector storing the function pointers to the theta_q_l (for the outputs).
+   * Vector storing the RBTheta functors for the theta_q_l (affine expansion of the outputs).
    */
-  std::vector< std::vector<theta_q_fptr> > theta_q_l_vector;
+  std::vector< std::vector<RBTheta*> > theta_q_l_vector;
   
   /**
    * Vector storing the EIM systems that provide additional affine functions
@@ -1004,15 +982,13 @@ private:
    * Vector storing the function pointers to the assembly
    * routines for the LHS EIM affine operators.
    */
-  std::vector<affine_assembly_fptr> A_EIM_intrr_assembly_vector;
-  std::vector<affine_assembly_fptr> A_EIM_bndry_assembly_vector;
+  std::vector<ElemAssembly*> A_EIM_assembly_vector;
 
   /**
    * Vector storing the function pointers to the assembly
    * routines for the RHS EIM affine operators.
    */
-  std::vector<affine_assembly_fptr> F_EIM_intrr_assembly_vector;
-  std::vector<affine_assembly_fptr> F_EIM_bndry_assembly_vector;
+  std::vector<ElemAssembly*> F_EIM_assembly_vector;
 
   /**
    * Vector storing the Q_a matrices from the affine expansion
@@ -1045,10 +1021,9 @@ private:
   Real training_tolerance;
 
   /**
-   * Function that initializes the lists of Dirichlet and
-   * non-Dirichlet dofs.
+   * Assembly object that is used to initialize the list of Dirichlet dofs.
    */
-  dirichlet_list_fptr _dirichlet_list_init;
+  DirichletDofAssembly* _dirichlet_list_init;
 
   /**
    * Boolean flag to indicate whether the RBSystem has been initialized.

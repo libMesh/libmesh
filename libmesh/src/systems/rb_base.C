@@ -40,10 +40,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // RBBase implementation
 
-//// Static member initialization
-//template <class Base>
-//PerfLog RBBase<Base>::pl("RBBase");
-
 
 template <class Base>
 RBBase<Base>::RBBase (EquationSystems& es,
@@ -53,7 +49,6 @@ RBBase<Base>::RBBase (EquationSystems& es,
     training_parameters_initialized(false),
     initialize_mesh_dependent_data(true),
     training_parameters_random_seed(-1), // by default, use std::time to seed RNG
-    theta_data(NULL),
     serial_training_set(false),
     alternative_solver("unchanged")
 {
@@ -80,13 +75,6 @@ void RBBase<Base>::clear ()
 {
   // clear the parent data
   Base::clear();
-  
-  // clear the RBThetaData object
-  if(theta_data)
-  {
-    delete theta_data;
-    theta_data = NULL;
-  }
 
   for(unsigned int i=0; i<training_parameters.size(); i++)
   {
@@ -102,9 +90,6 @@ void RBBase<Base>::clear ()
 template <class Base>
 void RBBase<Base>::init_data ()
 {
-  // Initialize the RBThetaData object
-  theta_data = build_theta_data().release();
-  init_theta_data(*theta_data);
 
   if(initialize_mesh_dependent_data)
   {
@@ -234,12 +219,13 @@ unsigned int  RBBase<Base>::get_n_A_EIM_operators() const
 }
 
 template <class Base>
-void RBBase<Base>::attach_theta_q_a(theta_q_fptr theta_q_a)
+void RBBase<Base>::attach_theta_q_a(RBTheta* theta_q_a)
 {
   libmesh_assert(theta_q_a != NULL);
 
   theta_q_a_vector.push_back(theta_q_a);
 }
+
 
 template <class Base>
 void RBBase<Base>::attach_A_EIM_system(RBEIMSystem* eim_system)
@@ -293,7 +279,7 @@ Number RBBase<Base>::eval_theta_q_a(unsigned int q)
   
   if(!is_A_EIM_operator(q))
   {
-    return theta_q_a_vector[q](*theta_data);
+    return theta_q_a_vector[q]->evaluate( get_current_parameters() );
   }
   else
   {
@@ -425,22 +411,6 @@ void RBBase<Base>::load_training_set(std::vector< std::vector<Number> >& new_tra
       training_parameters[j]->set(index, new_training_set[j][i]);
     }
   }
-}
-
-
-template <class Base>
-AutoPtr<RBThetaData> RBBase<Base>::build_theta_data ()
-{
-  AutoPtr<RBThetaData> ap(new RBThetaData());
-  
-  return ap;
-}
-
-
-template <class Base>
-void RBBase<Base>::init_theta_data(RBThetaData& data)
-{
-  data.point_to_parameters(current_parameters);
 }
 
 

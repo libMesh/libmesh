@@ -21,6 +21,7 @@
 #define __simple_rb_h__
 
 #include "rb_system.h"
+#include "fe_base.h"
 
 // A simple subclass of RBSystem since we need to specialize
 // get_SCM_lower_bound and get_SCM_upper_bound to return

@@ -145,16 +145,15 @@ public:
    * Attach user-defined assembly routine
    * for the L2 matrix.
    */
-  void attach_L2_assembly(affine_assembly_fptr L2_assembly);
+  void attach_L2_assembly(ElemAssembly* L2_assembly);
 
   /**
    * Attach parameter-dependent function and user-defined assembly routine
    * for affine operator. Boundary assembly defaults to NULL here since
    * we typically only need interior assembly for the mass operator.
    */
-  void attach_M_q(theta_q_fptr theta_q_m,
-                  affine_assembly_fptr M_q_intrr_assembly,
-                  affine_assembly_fptr M_q_bndry_assembly=NULL);
+  void attach_M_q(RBTheta* theta_q_m,
+                  ElemAssembly* M_q_assembly);
 
   /**
    * Assemble the q^th affine term of the mass matrix and store it in input_matrix.
@@ -415,19 +414,18 @@ protected:
   /**
    * Function pointer for assembling the L2 matrix.
    */
-  affine_assembly_fptr L2_assembly;
+  ElemAssembly* L2_assembly;
 
   /**
    * Vector of parameter-dependent functions for assembling
    * the mass operator.
    */
-  std::vector<theta_q_fptr> theta_q_m_vector;
+  std::vector<RBTheta*> theta_q_m_vector;
   
   /**
    * Vectors of function pointers for assembling the mass operator.
    */
-  std::vector<affine_assembly_fptr> M_q_intrr_assembly_vector;
-  std::vector<affine_assembly_fptr> M_q_bndry_assembly_vector;
+  std::vector<ElemAssembly*> M_q_assembly_vector;
   
   /**
    * The vector that stores the right-hand side for the initial
