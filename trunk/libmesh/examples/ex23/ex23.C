@@ -29,18 +29,13 @@
 #include "mesh_generation.h"
 #include "gmv_io.h"
 #include "equation_systems.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
 #include "dof_map.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "fe_interface.h"
 #include "getpot.h"
 #include "o_string_stream.h"
 #include "elem.h"
+
 #include "simple_rb.h"
+#include "assembly.h"
 
 // In this example problem we use the Certified Reduced Basis method
 // to solve a steady convection-diffusion problem on the unit square.
@@ -60,32 +55,6 @@
 // subregions of the domain. In Online mode, we print out the values of these
 // outputs as well as rigorous error bounds with respect to the output
 // associated with the "truth" finite element discretization.
-
-
-// Populate the sets non-Dirichlet and Dirichlet dofs,
-// used to impose boundary conditions
-void initialize_dirichlet_dofs(FEMContext &c,
-                               System& system,
-                               std::set<unsigned int>& dirichlet_dofs_set);
-
-// Expansion of the PDE operator
-Number theta_a_0(RBThetaData& ) { return 0.05; }
-void A0(FEMContext&, System&);
-Number theta_a_1(RBThetaData& data) { return data.get_mu()[0]; }
-void A1(FEMContext&, System&);
-Number theta_a_2(RBThetaData& data) { return data.get_mu()[1]; }
-void A2(FEMContext&, System&);
-
-// Expansion of the RHS
-Number theta_f_0(RBThetaData& ) { return 1.; }
-void F0(FEMContext&, System&);
-
-// Expansion of the outputs
-Number theta_l(RBThetaData& ) { return 1.; }
-void L0_assembly(FEMContext&, System&);
-void L1_assembly(FEMContext&, System&);
-void L2_assembly(FEMContext&, System&);
-void L3_assembly(FEMContext&, System&);
 
 // The main program.
 int main (int argc, char** argv)
@@ -148,26 +117,45 @@ int main (int argc, char** argv)
   // Point the systems to the input file defining the problem
   system.parameters_filename = parameters_filename;
 
-  system.attach_dirichlet_dof_initialization(initialize_dirichlet_dofs);
+  // Construct a default RBTheta object, evaluate() returns 1.
+  RBTheta rb_theta;
+
+  // Construct the assembly functors
+  Ex23DirichletDofAssembly dirichlet_assembly;
+  ThetaA0 theta_a_0; A0 A0_assembly;
+  ThetaA1 theta_a_1; A1 A1_assembly;
+  ThetaA2 theta_a_2; A2 A2_assembly;
+  F0 F0_assembly;
+
+  // Define a set of output assembly functions. Each output
+  // evaluates the solution average over a region defined by
+  // the arguments to the OutputAssembly constructor
+  OutputAssembly L0(0.7,0.8,0.7,0.8);
+  OutputAssembly L1(0.2,0.3,0.7,0.8);
+  OutputAssembly L2(0.2,0.3,0.2,0.3);
+  OutputAssembly L3(0.7,0.8,0.2,0.3);
+
+  system.attach_dirichlet_dof_initialization(&dirichlet_assembly);
   
   // Attach the expansion of the PDE operator. The third argument
   // here refers to assembly over the boundary of the mesh, but this
   // problem only requires internal assembly and hence it is set to NULL
-  system.attach_A_q(theta_a_0, A0, NULL);
-  system.attach_A_q(theta_a_1, A1, NULL);
-  system.attach_A_q(theta_a_2, A2, NULL);
+  system.attach_A_q(&theta_a_0, &A0_assembly);
+  system.attach_A_q(&theta_a_1, &A1_assembly);
+  system.attach_A_q(&theta_a_2, &A2_assembly);
+
   
   // Attach the expansion of the RHS
-  system.attach_F_q(theta_f_0, F0, NULL);
+  system.attach_F_q(&rb_theta, &F0_assembly);
   
   // Attach output assembly
-  system.attach_output(theta_l, L0_assembly, NULL);
-  system.attach_output(theta_l, L1_assembly, NULL);
-  system.attach_output(theta_l, L2_assembly, NULL);
-  system.attach_output(theta_l, L3_assembly, NULL);
+  system.attach_output(&rb_theta, &L0);
+  system.attach_output(&rb_theta, &L1);
+  system.attach_output(&rb_theta, &L2);
+  system.attach_output(&rb_theta, &L3);
   
   // We reuse the operator A0 as the inner product matrix
-  system.attach_inner_prod_assembly(A0);
+  system.attach_inner_prod_assembly(&A0_assembly);
   
   // Initialize the RB data structures.
   // If we're in Offline Mode (online_mode == false) then
@@ -230,227 +218,4 @@ int main (int argc, char** argv)
   }
 
   return 0;
-}
-
-// The Laplacian
-void A0(FEMContext &c, System& system)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
-
-  // The velocity shape function gradients at interior
-  // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
-
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-  // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
-
-  for (unsigned int qp=0; qp != n_qpoints; qp++)
-    for (unsigned int i=0; i != n_u_dofs; i++)
-      for (unsigned int j=0; j != n_u_dofs; j++)
-        c.elem_jacobian(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
-}
-
-// Convection in the x-direction
-void A1(FEMContext &c, System& system)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
-
-  const std::vector<std::vector<Real> >& phi =
-    c.element_fe_var[u_var]->get_phi();
-
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
-
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-  // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
-
-  for (unsigned int qp=0; qp != n_qpoints; qp++)
-    for (unsigned int i=0; i != n_u_dofs; i++)
-      for (unsigned int j=0; j != n_u_dofs; j++)
-        c.elem_jacobian(i,j) += JxW[qp] *dphi[j][qp](0)*phi[i][qp];
-}
-
-// Convection in the y-direction
-void A2(FEMContext &c, System& system)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
-
-  const std::vector<std::vector<Real> >& phi =
-    c.element_fe_var[u_var]->get_phi();
-
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
-
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-  // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
-
-  for (unsigned int qp=0; qp != n_qpoints; qp++)
-    for (unsigned int i=0; i != n_u_dofs; i++)
-      for (unsigned int j=0; j != n_u_dofs; j++)
-        c.elem_jacobian(i,j) += JxW[qp] *dphi[j][qp](1)*phi[i][qp];
-}
-
-// Source term, 1 throughout the domain
-void F0(FEMContext &c, System& system)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
-
-  const std::vector<std::vector<Real> >& phi =
-    c.element_fe_var[u_var]->get_phi();
-
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-  // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
-
-  for (unsigned int qp=0; qp != n_qpoints; qp++)
-    for (unsigned int i=0; i != n_u_dofs; i++)
-      c.elem_residual(i) += JxW[qp] * ( 1.*phi[i][qp] );
-}
-
-// Output: Average value over the region [0.7,0.8]x[0.7,0.8]
-void L0_assembly(FEMContext &c, System& system)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
-
-  const std::vector<std::vector<Real> >& phi =
-    c.element_fe_var[u_var]->get_phi();
-
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-  // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
-
-  Point centroid = c.elem->centroid();
-  if( (0.7 <= centroid(0)) && (centroid(0) <= 0.8) &&
-      (0.7 <= centroid(1)) && (centroid(1) <= 0.8) )
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        c.elem_residual(i) += JxW[qp] * ( 1.*phi[i][qp] ) / 0.01;
-}
-
-// Output: Average value over the region [0.2,0.3]x[0.7,0.8]
-void L1_assembly(FEMContext &c, System& system)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
-
-  const std::vector<std::vector<Real> >& phi =
-    c.element_fe_var[u_var]->get_phi();
-
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-  // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
-
-  Point centroid = c.elem->centroid();
-  if( (0.2 <= centroid(0)) && (centroid(0) <= 0.3) &&
-      (0.7 <= centroid(1)) && (centroid(1) <= 0.8) )
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        c.elem_residual(i) += JxW[qp] * ( 1.*phi[i][qp] ) / 0.01;
-}
-
-// Output: Average value over the region [0.2,0.3]x[0.2,0.3]
-void L2_assembly(FEMContext &c, System& system)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
-
-  const std::vector<std::vector<Real> >& phi =
-    c.element_fe_var[u_var]->get_phi();
-
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-  // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
-
-  Point centroid = c.elem->centroid();
-  if( (0.2 <= centroid(0)) && (centroid(0) <= 0.3) &&
-      (0.2 <= centroid(1)) && (centroid(1) <= 0.3) )
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        c.elem_residual(i) += JxW[qp] * ( 1.*phi[i][qp] ) / 0.01;
-}
-
-// Output: Average value over the region [0.7,0.8]x[0.2,0.3]
-void L3_assembly(FEMContext &c, System& system)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
-
-  const std::vector<std::vector<Real> >& phi =
-    c.element_fe_var[u_var]->get_phi();
-
-  // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-  // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
-
-  Point centroid = c.elem->centroid();
-  if( (0.7 <= centroid(0)) && (centroid(0) <= 0.8) &&
-      (0.2 <= centroid(1)) && (centroid(1) <= 0.3) )
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        c.elem_residual(i) += JxW[qp] * ( 1.*phi[i][qp] ) / 0.01;
-}
-
-// Build a list (element-by-element) of the Dirichlet dofs. In this case
-// all boundary dofs are Dirichlet.
-void initialize_dirichlet_dofs(FEMContext &c, System& system,
-                               std::set<unsigned int>& dirichlet_dofs_set)
-{
-  SimpleRB& rb_system = libmesh_cast_ref<SimpleRB&>(system);
-  const unsigned int u_var = rb_system.u_var;
-
-  std::vector<unsigned int> side_dofs;
-  FEInterface::dofs_on_side(c.elem, c.dim, c.element_fe_var[u_var]->get_fe_type(),
-                            c.side, side_dofs);
-
-  for(unsigned int ii=0; ii<side_dofs.size(); ii++)
-    dirichlet_dofs_set.insert(c.dof_indices[side_dofs[ii]]);
 }

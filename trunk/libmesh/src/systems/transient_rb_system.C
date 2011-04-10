@@ -69,8 +69,7 @@ TransientRBSystem::TransientRBSystem (EquationSystems& es,
   
   // Clear the theta and assembly vectors so that we can push_back
   theta_q_m_vector.clear();
-  M_q_intrr_assembly_vector.clear();
-  M_q_bndry_assembly_vector.clear();
+  M_q_assembly_vector.clear();
 }
 
 
@@ -313,13 +312,13 @@ Number TransientRBSystem::eval_theta_q_m(unsigned int q)
 
   libmesh_assert(theta_q_m_vector[q] != NULL);
 
-  return theta_q_m_vector[q](*theta_data);
+  return theta_q_m_vector[q]->evaluate( get_current_parameters() );
 }
 
 void TransientRBSystem::assemble_L2_matrix(SparseMatrix<Number>* input_matrix)
 {
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., L2_assembly, NULL, input_matrix, NULL);
+  add_scaled_matrix_and_vector(1., L2_assembly, input_matrix, NULL);
 }
 
 void TransientRBSystem::assemble_mass_matrix(SparseMatrix<Number>* input_matrix)
@@ -339,8 +338,7 @@ void TransientRBSystem::add_scaled_mass_matrix(Number scalar, SparseMatrix<Numbe
   {
     for(unsigned int q=0; q<get_Q_m(); q++)
       add_scaled_matrix_and_vector(scalar * eval_theta_q_m(q),
-                                   M_q_intrr_assembly_vector[q],
-                                   M_q_bndry_assembly_vector[q],
+                                   M_q_assembly_vector[q],
                                    input_matrix,
                                    NULL);
   }
@@ -366,8 +364,7 @@ void TransientRBSystem::mass_matrix_scaled_matvec(Number scalar,
     else
     {
       assemble_scaled_matvec(1.,
-                             M_q_intrr_assembly_vector[q],
-                             M_q_bndry_assembly_vector[q],
+                             M_q_assembly_vector[q],
                              *temp_vec,
                              arg);
     }
@@ -458,32 +455,25 @@ void TransientRBSystem::truth_assembly()
       {
         Mq_context[q_m]->pre_fe_reinit(*this, *el);
         Mq_context[q_m]->elem_fe_reinit();
-        if( M_q_intrr_assembly_vector[q_m] != NULL )
-        {
-          this->M_q_intrr_assembly_vector[q_m](*Mq_context[q_m], *this);
-          // Now overwrite the local matrix with a matrix multiplication
-          Mq_context[q_m]->elem_jacobian.vector_mult(Mq_context[q_m]->elem_residual, Mq_context[q_m]->elem_solution);
-        }
+        M_q_assembly_vector[q_m]->interior_assembly(*Mq_context[q_m]);
+        // Now overwrite the local matrix with a matrix multiplication
+        Mq_context[q_m]->elem_jacobian.vector_mult(Mq_context[q_m]->elem_residual, Mq_context[q_m]->elem_solution);
       }
 
       for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
       {
         Aq_context[q_a]->pre_fe_reinit(*this, *el);
         Aq_context[q_a]->elem_fe_reinit();
-        if( A_q_intrr_assembly_vector[q_a] != NULL )
-        {
-          this->A_q_intrr_assembly_vector[q_a](*Aq_context[q_a], *this);
-          // Now overwrite the local matrix with a matrix multiplication
-          Aq_context[q_a]->elem_jacobian.vector_mult(Aq_context[q_a]->elem_residual, Aq_context[q_a]->elem_solution);
-        }
+        A_q_assembly_vector[q_a]->interior_assembly(*Aq_context[q_a]);
+        // Now overwrite the local matrix with a matrix multiplication
+        Aq_context[q_a]->elem_jacobian.vector_mult(Aq_context[q_a]->elem_residual, Aq_context[q_a]->elem_solution);
       }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
         Fq_context[q_f]->pre_fe_reinit(*this, *el);
         Fq_context[q_f]->elem_fe_reinit();
-        if(F_q_intrr_assembly_vector[q_f] != NULL)
-          this->F_q_intrr_assembly_vector[q_f](*Fq_context[q_f], *this);
+        F_q_assembly_vector[q_f]->interior_assembly(*Fq_context[q_f]);
       }
 
       for (Aq_context[0]->side = 0;
@@ -498,22 +488,16 @@ void TransientRBSystem::truth_assembly()
         {
           Mq_context[q_m]->side = Mq_context[0]->side;
 
-          if( M_q_bndry_assembly_vector[q_m] != NULL )
-          {
-            Mq_context[q_m]->side_fe_reinit();
-            this->M_q_bndry_assembly_vector[q_m](*Mq_context[q_m], *this);
-          }
+          Mq_context[q_m]->side_fe_reinit();
+          M_q_assembly_vector[q_m]->boundary_assembly(*Mq_context[q_m]);
         }
 
         for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
         {
           Aq_context[q_a]->side = Aq_context[0]->side;
 
-          if( A_q_bndry_assembly_vector[q_a] != NULL )
-          {
-            Aq_context[q_a]->side_fe_reinit();
-            this->A_q_bndry_assembly_vector[q_a](*Aq_context[q_a], *this);
-          }
+          Aq_context[q_a]->side_fe_reinit();
+          A_q_assembly_vector[q_a]->boundary_assembly(*Aq_context[q_a]);
         }
 
         // Impose boundary terms, e.g. Neuman BCs
@@ -522,11 +506,8 @@ void TransientRBSystem::truth_assembly()
           // Update the side information for all contexts
           Fq_context[q_f]->side = Aq_context[0]->side;
 
-          if( F_q_bndry_assembly_vector[q_f] != NULL )
-          {
-            Fq_context[q_f]->side_fe_reinit();
-            this->F_q_bndry_assembly_vector[q_f](*Fq_context[q_f], *this);
-          }
+          Fq_context[q_f]->side_fe_reinit();
+          F_q_assembly_vector[q_f]->boundary_assembly(*Fq_context[q_f]);
         }
       }
 
@@ -608,7 +589,7 @@ void TransientRBSystem::truth_assembly()
     }
 
     if(constrained_problem)
-      add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
+      add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
 
     // Delete all the ptrs to FEMContexts!
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
@@ -639,18 +620,16 @@ void TransientRBSystem::truth_assembly()
   STOP_LOG("truth_assembly()", "TransientRBSystem");
 }
 
-void TransientRBSystem::attach_L2_assembly(affine_assembly_fptr L2_assembly_in)
+void TransientRBSystem::attach_L2_assembly(ElemAssembly* L2_assembly_in)
 {
   L2_assembly = L2_assembly_in;
 }
 
-void TransientRBSystem::attach_M_q(theta_q_fptr theta_q_m,
-                                   affine_assembly_fptr M_q_intrr_assembly,
-                                   affine_assembly_fptr M_q_bndry_assembly)
+void TransientRBSystem::attach_M_q(RBTheta* theta_q_m,
+                                   ElemAssembly* M_q_assembly)
 {
   theta_q_m_vector.push_back(theta_q_m);
-  M_q_intrr_assembly_vector.push_back(M_q_intrr_assembly);
-  M_q_bndry_assembly_vector.push_back(M_q_bndry_assembly);
+  M_q_assembly_vector.push_back(M_q_assembly);
 }
 
 void TransientRBSystem::assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix)
@@ -663,7 +642,7 @@ void TransientRBSystem::assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>*
   }
 
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., M_q_intrr_assembly_vector[q], M_q_bndry_assembly_vector[q], input_matrix, NULL);
+  add_scaled_matrix_and_vector(1., M_q_assembly_vector[q], input_matrix, NULL);
 }
 
 void TransientRBSystem::assemble_all_affine_operators()
@@ -1304,7 +1283,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
   {
     assemble_inner_product_matrix(matrix);
     if(constrained_problem)
-      add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
+      add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
   }
 
   if(reuse_preconditioner)
@@ -1337,8 +1316,7 @@ void TransientRBSystem::update_residual_terms(bool compute_inner_products)
       else
       {
         assemble_scaled_matvec(1.,
-                               M_q_intrr_assembly_vector[q_m],
-                               M_q_bndry_assembly_vector[q_m],
+                               M_q_assembly_vector[q_m],
                                *rhs,
                                get_basis_function(i));
       }

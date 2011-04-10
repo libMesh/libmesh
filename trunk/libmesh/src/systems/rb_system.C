@@ -81,7 +81,6 @@ RBSystem::RBSystem (EquationSystems& es,
     quiet_mode(true),
     eigen_system_name(""),
     inner_prod_assembly(NULL),
-    inner_prod_bndry_assembly(NULL),
     constraint_assembly(NULL),
     output_dual_norms_computed(false),
     Fq_representor_norms_computed(false),
@@ -93,25 +92,19 @@ RBSystem::RBSystem (EquationSystems& es,
   rb_evaluation_objects.clear();
 
   // Clear the theta and assembly vectors so that we can push_back
-  theta_q_a_vector.clear();
-  A_q_intrr_assembly_vector.clear();
-  A_q_bndry_assembly_vector.clear();
+  A_q_assembly_vector.clear();
 
   theta_q_f_vector.clear();
-  F_q_intrr_assembly_vector.clear();
-  F_q_bndry_assembly_vector.clear();
+  F_q_assembly_vector.clear();
 
   // Make sure we clear EIM vectors so we can then push_back
-  A_EIM_intrr_assembly_vector.clear();
-  A_EIM_bndry_assembly_vector.clear();
+  A_EIM_assembly_vector.clear();
 
   F_EIM_systems_vector.clear();
-  F_EIM_intrr_assembly_vector.clear();
-  F_EIM_bndry_assembly_vector.clear();
+  F_EIM_assembly_vector.clear();
 
   theta_q_l_vector.clear();
-  output_intrr_assembly_vector.clear();
-  output_bndry_assembly_vector.clear();
+  output_assembly_vector.clear();
 
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -581,7 +574,7 @@ RBEvaluation* RBSystem::add_new_rb_evaluation_object()
   return e;
 }
 
-void RBSystem::attach_dirichlet_dof_initialization (dirichlet_list_fptr dirichlet_init)
+void RBSystem::attach_dirichlet_dof_initialization (DirichletDofAssembly* dirichlet_init)
 {
   libmesh_assert (dirichlet_init != NULL);
 
@@ -590,6 +583,12 @@ void RBSystem::attach_dirichlet_dof_initialization (dirichlet_list_fptr dirichle
 
 void RBSystem::initialize_dirichlet_dofs()
 {
+  // Short-circuit if _dirichlet_list_init is NULL
+  if(!_dirichlet_list_init)
+  {
+    return;
+  }
+
   START_LOG("initialize_dirichlet_dofs()", "RBSystem");
 
   if(!initialize_mesh_dependent_data)
@@ -600,48 +599,44 @@ void RBSystem::initialize_dirichlet_dofs()
     libmesh_error();
   }
 
-  // Create a set to store the Dirichlet dofs on this processor
-  std::set<unsigned int> dirichlet_dofs_set;
-  dirichlet_dofs_set.clear();
-
   // Initialize the lists of Dirichlet and non-Dirichlet degrees-of-freedom
-  if (_dirichlet_list_init != NULL)
+  // Clear the set to store the Dirichlet dofs on this processor
+  _dirichlet_list_init->dirichlet_dofs_set.clear();
+
+  const MeshBase& mesh = this->get_equation_systems().get_mesh();
+
+  AutoPtr<FEMContext> c = this->build_context();
+  FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
+
+  this->init_context(context);
+
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+  {
+    context.pre_fe_reinit(*this, *el);
+    context.elem_fe_reinit();
+
+    for (context.side = 0;
+         context.side != context.elem->n_sides();
+       ++context.side)
     {
-      const MeshBase& mesh = this->get_equation_systems().get_mesh();
+      // Skip over non-boundary sides if we don't have internal Dirichlet BCs
+      if ( (context.elem->neighbor(context.side) != NULL) && !impose_internal_dirichlet_BCs )
+	continue;
 
-      AutoPtr<FEMContext> c = this->build_context();
-      FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
-
-      this->init_context(context);
-
-      MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-      for ( ; el != end_el; ++el)
-	{
-	  context.pre_fe_reinit(*this, *el);
-          context.elem_fe_reinit();
-
-	  for (context.side = 0;
-	       context.side != context.elem->n_sides();
-	       ++context.side)
-	    {
-	      // Skip over non-boundary sides if we don't have internal Dirichlet BCs
-	      if ( (context.elem->neighbor(context.side) != NULL) && !impose_internal_dirichlet_BCs )
-		continue;
-
-	      context.side_fe_reinit();
-	      _dirichlet_list_init(context, *this, dirichlet_dofs_set);
-	    }
-	}
+      context.side_fe_reinit();
+      _dirichlet_list_init->boundary_assembly(context);
     }
+  }
 
   // Initialize the dirichlet dofs vector on each processor
   std::vector<unsigned int> dirichlet_dofs_vector;
   dirichlet_dofs_vector.clear();
 
-  std::set<unsigned int>::iterator iter     = dirichlet_dofs_set.begin();
-  std::set<unsigned int>::iterator iter_end = dirichlet_dofs_set.end();
+  std::set<unsigned int>::iterator iter     = _dirichlet_list_init->dirichlet_dofs_set.begin();
+  std::set<unsigned int>::iterator iter_end = _dirichlet_list_init->dirichlet_dofs_set.end();
 
   for ( ; iter != iter_end; ++iter)
   {
@@ -669,12 +664,11 @@ AutoPtr<FEMContext> RBSystem::build_context ()
 }
 
 void RBSystem::add_scaled_matrix_and_vector(Number scalar,
-                                 affine_assembly_fptr intrr_assembly,
-                                 affine_assembly_fptr bndry_assembly,
-                                 SparseMatrix<Number>* input_matrix,
-                                 NumericVector<Number>* input_vector,
-                                 bool symmetrize,
-                                 bool apply_dirichlet_bc)
+                                            ElemAssembly* elem_assembly,
+                                            SparseMatrix<Number>* input_matrix,
+                                            NumericVector<Number>* input_vector,
+                                            bool symmetrize,
+                                            bool apply_dirichlet_bc)
 {
   START_LOG("add_scaled_matrix_and_vector()", "RBSystem");
 
@@ -706,8 +700,7 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
   {
     context.pre_fe_reinit(*this, *el);
     context.elem_fe_reinit();
-    if(intrr_assembly != NULL)
-      intrr_assembly(context, *this);
+    elem_assembly->interior_assembly(context);
 
     for (context.side = 0;
           context.side != context.elem->n_sides();
@@ -718,11 +711,8 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
         continue;
 
       // Impose boundary (e.g. Neumann) term
-      if( bndry_assembly != NULL )
-      {
-        context.side_fe_reinit();
-        bndry_assembly(context, *this);
-      }
+      context.side_fe_reinit();
+      elem_assembly->boundary_assembly(context);
     }
 
     // Need to symmetrize before imposing
@@ -785,8 +775,7 @@ void RBSystem::set_context_solution_vec(NumericVector<Number>& vec)
 }
 
 void RBSystem::assemble_scaled_matvec(Number scalar,
-                                      affine_assembly_fptr intrr_assembly,
-                                      affine_assembly_fptr bndry_assembly,
+                                      ElemAssembly* elem_assembly,
                                       NumericVector<Number>& dest,
                                       NumericVector<Number>& arg)
 {
@@ -814,8 +803,7 @@ void RBSystem::assemble_scaled_matvec(Number scalar,
   {
     context.pre_fe_reinit(*this, *el);
     context.elem_fe_reinit();
-    if(intrr_assembly != NULL)
-      intrr_assembly(context, *this);
+    elem_assembly->interior_assembly(context);
 
     for (context.side = 0;
          context.side != context.elem->n_sides();
@@ -825,11 +813,8 @@ void RBSystem::assemble_scaled_matvec(Number scalar,
       if( (context.elem->neighbor(context.side) != NULL) && !impose_internal_fluxes )
         continue;
 
-      if( bndry_assembly != NULL )
-        {
-          context.side_fe_reinit();
-          bndry_assembly(context, *this);
-        }
+      context.side_fe_reinit();
+      elem_assembly->boundary_assembly(context);
     }
 
 
@@ -927,16 +912,14 @@ void RBSystem::truth_assembly()
       {
         Aq_context[q_a]->pre_fe_reinit(*this, *el);
         Aq_context[q_a]->elem_fe_reinit();
-        if(A_q_intrr_assembly_vector[q_a] != NULL)
-          this->A_q_intrr_assembly_vector[q_a](*Aq_context[q_a], *this);
+        A_q_assembly_vector[q_a]->interior_assembly(*Aq_context[q_a]);
       }
 
       for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
       {
         Fq_context[q_f]->pre_fe_reinit(*this, *el);
         Fq_context[q_f]->elem_fe_reinit();
-        if(F_q_intrr_assembly_vector[q_f] != NULL)
-          this->F_q_intrr_assembly_vector[q_f](*Fq_context[q_f], *this);
+        F_q_assembly_vector[q_f]->interior_assembly(*Fq_context[q_f]);
       }
 
       for (Aq_context[0]->side = 0;
@@ -953,11 +936,8 @@ void RBSystem::truth_assembly()
           // Update the side information for all contexts
           Aq_context[q_a]->side = Aq_context[0]->side;
 
-          if( A_q_bndry_assembly_vector[q_a] != NULL )
-          {
-            Aq_context[q_a]->side_fe_reinit();
-            this->A_q_bndry_assembly_vector[q_a](*Aq_context[q_a], *this);
-          }
+          Aq_context[q_a]->side_fe_reinit();
+          A_q_assembly_vector[q_a]->boundary_assembly(*Aq_context[q_a]);
         }
 
         // Impose boundary terms, e.g. Neuman BCs
@@ -966,11 +946,8 @@ void RBSystem::truth_assembly()
           // Update the side information for all contexts
           Fq_context[q_f]->side = Aq_context[0]->side;
 
-          if( F_q_bndry_assembly_vector[q_f] != NULL )
-          {
-            Fq_context[q_f]->side_fe_reinit();
-            this->F_q_bndry_assembly_vector[q_f](*Fq_context[q_f], *this);
-          }
+          Fq_context[q_f]->side_fe_reinit();
+          F_q_assembly_vector[q_f]->boundary_assembly(*Fq_context[q_f]);
         }
       }
 
@@ -1029,7 +1006,7 @@ void RBSystem::truth_assembly()
     }
 
     if(constrained_problem)
-      add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
+      add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
 
     // Delete all the ptrs to FEMContexts!
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
@@ -1058,7 +1035,6 @@ void RBSystem::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix,
   input_matrix->zero();
   add_scaled_matrix_and_vector(1.,
                                inner_prod_assembly,
-                               inner_prod_bndry_assembly,
                                input_matrix,
                                NULL,
                                false, /* symmetrize */
@@ -1068,12 +1044,12 @@ void RBSystem::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix,
 void RBSystem::assemble_constraint_matrix(SparseMatrix<Number>* input_matrix)
 {
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., constraint_assembly, NULL, input_matrix, NULL);
+  add_scaled_matrix_and_vector(1., constraint_assembly, input_matrix, NULL);
 }
 
 void RBSystem::assemble_and_add_constraint_matrix(SparseMatrix<Number>* input_matrix)
 {
-  add_scaled_matrix_and_vector(1., constraint_assembly, NULL, input_matrix, NULL);
+  add_scaled_matrix_and_vector(1., constraint_assembly, input_matrix, NULL);
 }
 
 void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
@@ -1090,8 +1066,7 @@ void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_ma
   if(!is_A_EIM_operator(q))
   {
     add_scaled_matrix_and_vector(1.,
-                                 A_q_intrr_assembly_vector[q],
-                                 A_q_bndry_assembly_vector[q],
+                                 A_q_assembly_vector[q],
                                  input_matrix,
                                  NULL,
                                  false, /* symmetrize */
@@ -1109,8 +1084,7 @@ void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_ma
     current_EIM_system->cache_ghosted_basis_function(A_EIM_indices.second);
     
     add_scaled_matrix_and_vector(1.,
-                                 A_EIM_intrr_assembly_vector[system_id],
-                                 A_EIM_bndry_assembly_vector[system_id],
+                                 A_EIM_assembly_vector[system_id],
                                  input_matrix,
                                  NULL,
                                  false, /* symmetrize */
@@ -1139,8 +1113,7 @@ void RBSystem::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Numbe
     if(!is_A_EIM_operator(q_a))
     {
       add_scaled_matrix_and_vector(scalar,
-                                   A_q_intrr_assembly_vector[q_a],
-                                   A_q_bndry_assembly_vector[q_a],
+                                   A_q_assembly_vector[q_a],
                                    input_matrix,
                                    NULL,
                                    symmetrize);
@@ -1157,8 +1130,7 @@ void RBSystem::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Numbe
       current_EIM_system->cache_ghosted_basis_function(A_EIM_indices.second);
 
       add_scaled_matrix_and_vector(scalar,
-                                   A_EIM_intrr_assembly_vector[system_id],
-                                   A_EIM_bndry_assembly_vector[system_id],
+                                   A_EIM_assembly_vector[system_id],
                                    input_matrix,
                                    NULL,
                                    symmetrize);
@@ -1234,8 +1206,7 @@ void RBSystem::assemble_Fq_vector(unsigned int q,
   if(!is_F_EIM_function(q))
   {
     add_scaled_matrix_and_vector(1.,
-                                 F_q_intrr_assembly_vector[q],
-                                 F_q_bndry_assembly_vector[q],
+                                 F_q_assembly_vector[q],
                                  NULL,
                                  input_vector,
                                  false,             /* symmetrize */
@@ -1253,8 +1224,7 @@ void RBSystem::assemble_Fq_vector(unsigned int q,
     current_EIM_system->cache_ghosted_basis_function(F_EIM_indices.second);
     
     add_scaled_matrix_and_vector(1.,
-                                 F_EIM_intrr_assembly_vector[system_id],
-                                 F_EIM_bndry_assembly_vector[system_id],
+                                 F_EIM_assembly_vector[system_id],
                                  NULL,
                                  input_vector,
                                  false,             /* symmetrize */
@@ -1268,8 +1238,7 @@ void RBSystem::assemble_all_output_vectors()
     for(unsigned int q_l=0; q_l<get_Q_l(n); q_l++)
     {
       get_output_vector(n, q_l)->zero();
-      add_scaled_matrix_and_vector(1., output_intrr_assembly_vector[n][q_l],
-                                       output_bndry_assembly_vector[n][q_l],
+      add_scaled_matrix_and_vector(1., output_assembly_vector[n][q_l],
                                        NULL,
                                        get_output_vector(n,q_l));
     }
@@ -1304,11 +1273,10 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
   
 
   // Compute the dual norms of the outputs if we haven't already done so
-  if(!output_dual_norms_computed)
-    this->compute_output_dual_norms();
+  compute_output_dual_norms();
 
-  if(!Fq_representor_norms_computed)
-    this->compute_Fq_representor_norms();
+  // Compute the Fq Riesz representor dual norms if we haven't already done so
+  compute_Fq_representor_norms();
 
   libMesh::out << std::endl << "---- Performing Greedy basis enrichment ----" << std::endl;
   while(true)
@@ -1505,71 +1473,58 @@ unsigned int RBSystem::get_n_F_EIM_functions() const
   return count;
 }
 
-void RBSystem::attach_A_q(theta_q_fptr theta_q_a,
-                                   affine_assembly_fptr A_q_intrr_assembly,
-                                   affine_assembly_fptr A_q_bndry_assembly)
+void RBSystem::attach_A_q(RBTheta* theta_q_a,
+                          ElemAssembly* A_q_assembly)
 {
   theta_q_a_vector.push_back(theta_q_a);
-  A_q_intrr_assembly_vector.push_back(A_q_intrr_assembly);
-  A_q_bndry_assembly_vector.push_back(A_q_bndry_assembly);
+  A_q_assembly_vector.push_back(A_q_assembly);
 }
 
-void RBSystem::attach_F_q(theta_q_fptr theta_q_f,
-                          affine_assembly_fptr F_q_intrr_assembly,
-                          affine_assembly_fptr F_q_bndry_assembly)
+void RBSystem::attach_F_q(RBTheta* theta_q_f,
+                          ElemAssembly* F_q_assembly)
 {
   theta_q_f_vector.push_back(theta_q_f);
-  F_q_intrr_assembly_vector.push_back(F_q_intrr_assembly);
-  F_q_bndry_assembly_vector.push_back(F_q_bndry_assembly);
+  F_q_assembly_vector.push_back(F_q_assembly);
 }
 
 void RBSystem::attach_A_EIM_operators(RBEIMSystem* eim_system,
-                                        affine_assembly_fptr EIM_intrr_assembly,
-                                        affine_assembly_fptr EIM_bndry_assembly)
+                                      ElemAssembly* EIM_assembly)
 {
   A_EIM_systems_vector.push_back( eim_system );
-  A_EIM_intrr_assembly_vector.push_back(EIM_intrr_assembly);
-  A_EIM_bndry_assembly_vector.push_back(EIM_bndry_assembly);
+  A_EIM_assembly_vector.push_back(EIM_assembly);
 }
 
 void RBSystem::attach_F_EIM_vectors(RBEIMSystem* eim_system,
-                                      affine_assembly_fptr EIM_intrr_assembly,
-                                      affine_assembly_fptr EIM_bndry_assembly)
+                                    ElemAssembly* EIM_assembly)
 {
   F_EIM_systems_vector.push_back( eim_system );
-  F_EIM_intrr_assembly_vector.push_back(EIM_intrr_assembly);
-  F_EIM_bndry_assembly_vector.push_back(EIM_bndry_assembly);
+  F_EIM_assembly_vector.push_back(EIM_assembly);
 }
 
-void RBSystem::attach_output(std::vector<theta_q_fptr> theta_q_l,
-                             std::vector<affine_assembly_fptr> output_intrr_assembly,
-                             std::vector<affine_assembly_fptr> output_bndry_assembly)
+void RBSystem::attach_output(std::vector<RBTheta*> theta_q_l,
+                             std::vector<ElemAssembly*> output_assembly)
 {
   // Make sure the input vectors are all the same size!
-  if( (theta_q_l.size() == output_intrr_assembly.size()) &&
-      (output_intrr_assembly.size() == output_bndry_assembly.size()) )
+  if( theta_q_l.size() == output_assembly.size() )
   {
     theta_q_l_vector.push_back(theta_q_l);
-    output_intrr_assembly_vector.push_back(output_intrr_assembly);
-    output_bndry_assembly_vector.push_back(output_bndry_assembly);
+    output_assembly_vector.push_back(output_assembly);
   }
   else
   {
-    libMesh::out << "Error: The input vectors in attach_output must all be the same size in attach_output"
+    libMesh::out << "Error: The input vectors in attach_output must be the same size in attach_output"
                  << std::endl;
     libmesh_error();
   }
 }
 
-void RBSystem::attach_output(theta_q_fptr theta_q_l,
-                             affine_assembly_fptr output_intrr_assembly,
-                             affine_assembly_fptr output_bndry_assembly)
+void RBSystem::attach_output(RBTheta* theta_q_l,
+                             ElemAssembly* output_assembly)
 {
-  std::vector<theta_q_fptr> theta_l_vector(1); theta_l_vector[0] = theta_q_l;
-  std::vector<affine_assembly_fptr> L_intrr_vector(1); L_intrr_vector[0] = output_intrr_assembly;
-  std::vector<affine_assembly_fptr> L_bndry_vector(1); L_bndry_vector[0] = output_bndry_assembly;
+  std::vector<RBTheta*> theta_l_vector(1); theta_l_vector[0] = theta_q_l;
+  std::vector<ElemAssembly*> L_vector(1); L_vector[0] = output_assembly;
 
-  attach_output(theta_l_vector, L_intrr_vector, L_bndry_vector);
+  attach_output(theta_l_vector, L_vector);
 }
 
 bool RBSystem::is_F_EIM_function(unsigned int q)
@@ -1579,13 +1534,12 @@ bool RBSystem::is_F_EIM_function(unsigned int q)
   return (q >= theta_q_f_vector.size());
 }
 
-void RBSystem::attach_inner_prod_assembly(affine_assembly_fptr IP_assembly, affine_assembly_fptr IP_bndry_assembly)
+void RBSystem::attach_inner_prod_assembly(ElemAssembly* IP_assembly_in)
 {
-  inner_prod_assembly = IP_assembly;
-  inner_prod_bndry_assembly = IP_bndry_assembly;
+  inner_prod_assembly = IP_assembly_in;
 }
 
-void RBSystem::attach_constraint_assembly(affine_assembly_fptr constraint_assembly_in)
+void RBSystem::attach_constraint_assembly(ElemAssembly* constraint_assembly_in)
 {
   constraint_assembly = constraint_assembly_in;
 }
@@ -1613,7 +1567,7 @@ Number RBSystem::eval_theta_q_f(unsigned int q)
   if( q < theta_q_f_vector.size() )
   {
     libmesh_assert(theta_q_f_vector[q] != NULL);
-    return theta_q_f_vector[q](*theta_data);
+    return theta_q_f_vector[q]->evaluate( get_current_parameters() );
   }
   else
   {
@@ -1663,8 +1617,8 @@ Number RBSystem::eval_theta_q_l(unsigned int output_index, unsigned int q_l)
   }
 
   libmesh_assert(theta_q_l_vector[output_index][q_l] != NULL);
-   
-  return theta_q_l_vector[output_index][q_l](*theta_data);
+
+  return theta_q_l_vector[output_index][q_l]->evaluate( get_current_parameters() );
 }
 
 void RBSystem::load_basis_function(unsigned int i)
@@ -1988,7 +1942,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
   {
     assemble_inner_product_matrix(matrix);
     if(constrained_problem)
-      add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
+      add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
   }
 
   if(reuse_preconditioner)
@@ -2019,8 +1973,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       else
       {
         assemble_scaled_matvec(1.,
-                               A_q_intrr_assembly_vector[q_a],
-                               A_q_bndry_assembly_vector[q_a],
+                               A_q_assembly_vector[q_a],
                                *rhs,
                                get_basis_function(i));
       }
@@ -2158,16 +2111,20 @@ void RBSystem::assemble_matrix_for_output_dual_solves()
 
 void RBSystem::compute_output_dual_norms()
 {
-  START_LOG("compute_output_dual_norms()", "RBSystem");
-  
+  // short-circuit if we've already computed the output dual norms
+  if(output_dual_norms_computed)
+  {
+    return;
+  }
+
   // Short circuit if we don't have any outputs
   if( get_n_outputs() == 0 )
   {
     output_dual_norms_computed = true;
-
-    STOP_LOG("compute_output_dual_norms()", "RBSystem");
     return;
   }
+
+  START_LOG("compute_output_dual_norms()", "RBSystem");
   
   libMesh::out << "Compute output dual norms" << std::endl;
   
@@ -2210,7 +2167,7 @@ void RBSystem::compute_output_dual_norms()
         }
         else
         {
-          add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
+          add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
         }
       }
     }
@@ -2310,6 +2267,12 @@ void RBSystem::compute_output_dual_norms()
 
 void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
 {
+  // Short-circuit if we've already computed the Fq_representors
+  if(Fq_representor_norms_computed)
+  {
+    return;
+  }
+
   START_LOG("compute_Fq_representor_norms()", "RBSystem");
 
   if(!low_memory_mode)
@@ -2324,7 +2287,7 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
   {
     assemble_inner_product_matrix(matrix);
     if(constrained_problem)
-      add_scaled_matrix_and_vector(1., constraint_assembly, NULL, matrix, NULL);
+      add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
   }
 
   if(reuse_preconditioner)

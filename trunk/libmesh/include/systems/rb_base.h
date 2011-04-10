@@ -22,7 +22,7 @@
 
 #include "system.h"
 #include "numeric_vector.h"
-#include "rb_theta_data.h"
+#include "rb_theta.h"
 
 // For the solver switching stuff.
 #include "linear_solver.h"
@@ -51,11 +51,6 @@ namespace libMesh
 
 // Forward declarations
 class RBEIMSystem;
-
-/**
- * Typedef for theta_q function pointers.
- */
-typedef Number (*theta_q_fptr)(RBThetaData&);
 
 // ------------------------------------------------------------
 // RBBase class definition
@@ -155,18 +150,6 @@ public:
   virtual void load_training_set(std::vector< std::vector<Number> >& new_training_set);
 
   /**
-   * Initialize the theta_data structure. In this base class
-   * this just involves setting the pointer to current_parameters.
-   */
-  virtual AutoPtr<RBThetaData> build_theta_data();
-
-  /**
-   * Initialize the theta_data structure. In this base class
-   * this just involves setting the pointer to current_parameters.
-   */
-  virtual void init_theta_data(RBThetaData& theta_data);
-
-  /**
    * Get the number of parameters. Value is determined
    * by specifying the parameter ranges.
    */
@@ -213,12 +196,12 @@ public:
   void broadcast_current_parameters(unsigned int proc_id);
 
   /**
-   * Attach the function defining theta_q_a.
-   * The first argument specifies the index, q,
-   * and the second argument is a pointer
-   * to the function.
+   * Attach a pointer to a functor object define one
+   * of the theta_q_a terms.
+   * This class takes responsibility for deleting the
+   * RBTheta object in the destructor.
    */
-  virtual void attach_theta_q_a(theta_q_fptr theta_q_a);
+  virtual void attach_theta_q_a(RBTheta* theta_q_a);
 
   /**
    * Attach an EIM system which provides a set of affine
@@ -287,12 +270,6 @@ public:
    * number generator seed.
    */
   int training_parameters_random_seed;
-  
-  /**
-   * This data structure stores the data relevant to the evaluation
-   * of the theta_q functions.
-   */
-  RBThetaData* theta_data;
   
 protected:
 
@@ -385,10 +362,14 @@ protected:
    */
   std::string alternative_solver;
 
+//  /**
+//   * Vector storing the function pointers to the theta_q.
+//   */
+//  std::vector<theta_q_fptr> theta_q_a_vector;
   /**
-   * Vector storing the function pointers to the theta_q.
+   * Vector storing the pointers to the RBTheta functors.
    */
-  std::vector<theta_q_fptr> theta_q_a_vector;
+  std::vector<RBTheta*> theta_q_a_vector;
   
   /**
    * Vector storing the EIM systems that provide additional affine operators

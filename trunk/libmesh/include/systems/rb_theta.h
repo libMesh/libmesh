@@ -17,11 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_theta_data_h__
-#define __rb_theta_data_h__
-
-// C++ includes
-#include <vector>
+#ifndef __rb_theta_h__
+#define __rb_theta_h__
 
 // Local includes
 #include "reference_counted_object.h"
@@ -32,14 +29,14 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * RBThetaData provides a wrapper for any data required
- * in the evaluation of parameter dependent functions
- * (the theta_q functions). In the simplest case this
- * just provides access to a system's current_parameters.
+ * RBTheta provides a default functor class with which
+ * to define the parameter-dependent functions required
+ * for the PDE decomposition employed by the Reduced
+ * Basis method.
  *
- * @author David J. Knezevic, 2009
+ * @author David J. Knezevic, 2011
  */
-class RBThetaData : public ReferenceCountedObject<RBThetaData>
+class RBTheta : public ReferenceCountedObject<RBTheta>
 {
 public:
 
@@ -47,40 +44,21 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  RBThetaData () {};
+  RBTheta () {};
   
   /**
    * Destructor.
    */
-  virtual ~RBThetaData () {};
+  virtual ~RBTheta () {};
   
   /**
-   * Store a const pointer to an associated system's
-   * parameter vector.
+   * Evaluate the functor object for the given parameter.
+   * Default implementation is to return 1, overload
+   * to provide problem dependent behavior.
    */
-  void point_to_parameters(const std::vector<Real>& mu_in);
-  
-  /**
-   * Return a const reference to mu. Overload in order to
-   * provide different behavior.
-   */
-  virtual const std::vector<Real>& get_mu();
+  virtual Number evaluate(const std::vector<Real>& ) { return 1.; }
 
-  /**
-   * A pointer to the parameters in an associated system.
-   */
-  const std::vector<Real>* mu;
 };
-
-inline void RBThetaData::point_to_parameters(const std::vector<Real>& mu_in)
-{
-  mu = &mu_in;
-}
-
-inline const std::vector<Real>& RBThetaData::get_mu()
-{
-  return *mu;
-}
  
 }
 
