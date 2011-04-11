@@ -951,6 +951,11 @@ void RBEvaluation::write_out_basis_functions(const std::string& directory_name,
     std::ostringstream file_name;
     const std::string basis_function_suffix = (rb_sys.write_binary_basis_functions ? ".xdr" : ".dat");
 
+    file_name << directory_name << "/bf_header" << basis_function_suffix;
+    Xdr header_data(file_name.str(),
+                    rb_sys.write_binary_basis_functions ? ENCODE : WRITE);
+    rb_sys.write_header(header_data, "", false);
+
     // Use System::write_serialized_data to write out the basis functions
     // by copying them into this->solution one at a time.
     for(unsigned int i=0; i<basis_functions.size(); i++)
@@ -985,6 +990,11 @@ void RBEvaluation::read_in_basis_functions(const std::string& directory_name)
     std::ostringstream file_name;
     const std::string basis_function_suffix = (rb_sys.read_binary_basis_functions ? ".xdr" : ".dat");
     struct stat stat_info;
+
+    file_name << directory_name << "/bf_header" << basis_function_suffix;
+    Xdr header_data(file_name.str(),
+                    rb_sys.read_binary_basis_functions ? DECODE : READ);
+    rb_sys.read_header(header_data, "", false);
 
     // Use System::read_serialized_data to read in the basis functions
     // into this->solution and then swap with the appropriate
