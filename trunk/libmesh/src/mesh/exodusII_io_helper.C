@@ -383,8 +383,8 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
   libmesh_assert (static_cast<unsigned int>(id) < ss_ids.size());
   libmesh_assert (static_cast<unsigned int>(id) < num_sides_per_set.size());
   libmesh_assert (static_cast<unsigned int>(id) < num_df_per_set.size());
-  libmesh_assert (static_cast<unsigned int>(offset) < elem_list.size());
-  libmesh_assert (static_cast<unsigned int>(offset) < side_list.size());
+  libmesh_assert (static_cast<unsigned int>(offset) <= elem_list.size());
+  libmesh_assert (static_cast<unsigned int>(offset) <= side_list.size());
   
   ex_err = exII::ex_get_side_set_param(ex_id,
 				       ss_ids[id],
@@ -392,6 +392,16 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 				       &num_df_per_set[id]);
   check_err(ex_err, "Error retrieving sideset parameters.");
   message("Parameters retrieved successfully for sideset: ", id);
+
+
+  // It's OK for offset==elem_list.size() as long as num_sides_per_set[id]==0
+  // because in that case we don't actually read anything...
+#ifdef DEBUG
+  if (static_cast<unsigned int>(offset) == elem_list.size() ||
+      static_cast<unsigned int>(offset) == side_list.size() )
+    libmesh_assert(num_sides_per_set[id] == 0);
+#endif
+
 
   // Don't call ex_get_side_set unless there are actually sides there to get.
   // Exodus prints an annoying warning in DEBUG mode otherwise...
