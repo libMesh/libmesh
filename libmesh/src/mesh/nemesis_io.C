@@ -30,7 +30,8 @@
 #include "parallel_mesh.h"
 #include "parallel.h"
 #include "utility.h" // is_sorted, deallocate
-
+#include "boundary_info.h"
+ 
 namespace libMesh
 {
 
@@ -115,7 +116,9 @@ void Nemesis_IO::read (const std::string& base_filename)
   // On one processor, Nemesis and ExodusII should be equivalent, so
   // let's cowardly defer to that implementation...
   if (libMesh::n_processors() == 1)
-    {						
+    {			
+      // We can do this in one line but if the verbose flag was set in this
+      // object, it will no longer be set... thus no extra print-outs for serial runs.
       ExodusII_IO(this->mesh()).read (base_filename);
       return;
     }
@@ -789,6 +792,19 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  // pointer that the Mesh throws back.
 	  elem = mesh.add_elem (elem); 
 
+	  // We are expecting the element "thrown back" by libmesh to have the ID we specified for it...
+	  // Check to see that really is the case.  Note that my_next_elem was post-incremented, so
+	  // subtract 1 when performing the check.
+	  if (elem->id() != my_next_elem-1)
+	    {
+	      libMesh::err << "Unexpected ID " 
+			<< elem->id() 
+			<< " set by parallel mesh. (expecting " 
+			<< my_next_elem-1 
+			<< ")." << std::endl;
+	      libmesh_error();
+	    }
+
 	  // Set all the nodes for this element
 	  if (_verbose)	    
 	    libMesh::out << "[" << libMesh::processor_id() << "] "
@@ -809,6 +825,162 @@ void Nemesis_IO::read (const std::string& base_filename)
     } // end for (unsigned int i=0; i<nemhelper->num_elem_blk; i++)
 
   libmesh_assert ((my_next_elem - my_elem_offset) == to_uint(nemhelper->num_elem));
+
+
+  // Global sideset information, they are distributed as well, not sure if they will require communication...?
+  nemhelper->get_ss_param_global();
+
+  if (_verbose)
+    {
+      libMesh::out << "[" << libMesh::processor_id() << "] "
+		   << "Read global sideset parameter information." << std::endl;
+      
+      // These global values should be the same on all processors...
+      libMesh::out << "[" << libMesh::processor_id() << "] "
+		   << "Number of global sideset IDs: " << nemhelper->global_sideset_ids.size() << std::endl;
+    }
+
+  // Read *local* sideset info the same way it is done in
+  // exodusII_io_helper.  May be called any time after
+  // nem_helper->read_header(); This sets num_side_sets and resizes
+  // elem_list, side_list, and id_list to num_elem_all_sidesets.  Note
+  // that there appears to be the same number of sidesets in each file
+  // but they all have different numbers of entries (some are empty).
+  // Note that the sum of "nemhelper->num_elem_all_sidesets" over all
+  // processors should equal the sum of the entries in the "num_global_side_counts" array
+  // filled up by nemhelper->get_ss_param_global()
+  nemhelper->read_sideset_info();
+  
+  if (_verbose)
+    {
+      libMesh::out << "[" << libMesh::processor_id() << "] "
+		   << "nemhelper->num_side_sets = " << nemhelper->num_side_sets << std::endl;
+      
+      libMesh::out << "[" << libMesh::processor_id() << "] "
+		   << "nemhelper->num_elem_all_sidesets = " << nemhelper->num_elem_all_sidesets << std::endl;
+    }
+
+#ifdef DEBUG
+  // In DEBUG mode, check that the global number of sidesets reported
+  // in each nemesis file matches the sum of all local sideset counts
+  // from each processor.  This requires a small communication, so only
+  // do it in DEBUG mode.
+  int sum_num_global_side_counts = std::accumulate(nemhelper->num_global_side_counts.begin(),
+						   nemhelper->num_global_side_counts.end(),
+						   0);
+      
+  // MPI sum up the local files contributions
+  int sum_num_elem_all_sidesets = nemhelper->num_elem_all_sidesets;
+  Parallel::sum(sum_num_elem_all_sidesets);
+
+  if (sum_num_global_side_counts != sum_num_elem_all_sidesets)
+    {
+      libMesh::err << "Error! global side count reported by Nemesis does not "
+		   << "match the side count reported by the individual files!" << std::endl;
+      libmesh_error();
+    }
+#endif
+
+  // Note that exodus stores sidesets in separate vectors but we want to pack
+  // them all into a single vector.  So when we call read_sideset(), we pass an offset
+  // into the single vector of all IDs
+  for (int offset=0, i=0; i<nemhelper->get_num_side_sets(); i++)
+    {
+      offset += (i > 0 ? nemhelper->get_num_sides_per_set(i-1) : 0); // Compute new offset
+      nemhelper->read_sideset (i, offset);
+    }
+
+  // Now that we have the lists of elements, sides, and IDs, we are ready to set them
+  // in the BoundaryInfo object of our Mesh object.  This is slightly different in parallel... 
+  // For example, I think the IDs in each of the split Exodus files are numbered locally, 
+  // and we have to know the appropriate ID for this processor to be able to set the
+  // entry in BoundaryInfo.  This offset should be given by my_elem_offset determined in 
+  // this function...
+
+  // Get references to the elem, side, and ID lists for this processor.  We should be
+  // able to get pointers to these elements on the local processor, and add them to the
+  // BoundaryInfo object
+  const std::vector<int>& elem_list = nemhelper->get_elem_list();
+  const std::vector<int>& side_list = nemhelper->get_side_list();
+  const std::vector<int>& id_list   = nemhelper->get_id_list();
+
+
+  // Debugging:
+  // Print entries of elem_list
+  // libMesh::out << "[" << libMesh::processor_id() << "] "
+  // 	       << "elem_list = ";
+  // for (unsigned int e=0; e<elem_list.size(); e++)
+  //   {
+  //     libMesh::out << elem_list[e] << ", ";
+  //   }
+  // libMesh::out << std::endl;
+
+  // Print entries of side_list
+  // libMesh::out << "[" << libMesh::processor_id() << "] "
+  // 	       << "side_list = ";
+  // for (unsigned int e=0; e<side_list.size(); e++)
+  //   {
+  //     libMesh::out << side_list[e] << ", ";
+  //   }
+  // libMesh::out << std::endl;
+
+
+  // Loop over the entries of the elem_list, get their pointers from the
+  // Mesh data structure, and assign the appropriate side to the BoundaryInfo object.
+  for (unsigned int e=0; e<elem_list.size(); e++)
+    {
+      // Calling mesh.elem() feels wrong, for example, in
+      // ParallelMesh, Mesh::elem() can return NULL so we have to check for this...
+      //
+      // Perhaps we should iterate over elements and look them up in
+      // the elem list instead?  Note that the IDs in elem_list are
+      // not necessarily in order, so if we did instead loop over the
+      // mesh, we would have to search the (unsorted) elem_list vector
+      // for each entry!  We'll settle for doing some error checking instead.
+      Elem* elem = mesh.elem(my_elem_offset + (elem_list[e]-1)/*Exodus numbering is 1-based!*/);
+
+      if (elem == NULL)
+	{
+	  libMesh::err << "ParallelMesh returned a NULL pointer when asked for element " 
+		       << my_elem_offset << " + " << elem_list[e] << " = " << my_elem_offset+elem_list[e] << std::endl;
+	  libmesh_error();
+	}
+      
+      // The side numberings in libmesh and exodus are not 1:1, so we need to map
+      // whatever side number is stored in Exodus into a libmesh side number using 
+      // a conv object...
+      const ExodusII_IO_Helper::Conversion conv =
+	em.assign_conversion(elem->type());
+
+      // Finally, we are ready to add the element and its side to the BoundaryInfo object.
+      // Call the version of add_side which takes a pointer, since we have already gone to
+      // the trouble of getting said pointer...
+      mesh.boundary_info->add_side (elem,
+				    conv.get_side_map(side_list[e]-1/*Exodus numbering is 1-based*/),
+				    id_list[e]);
+    }
+
+  // Debugging: make sure there are as many boundary conditions in the
+  // boundary ID object as expected.  Note that, at this point, the
+  // mesh still thinks it's serial, so n_boundary_conds() returns the
+  // local number of boundary conditions (and is therefore cheap)
+  // which should match elem_list.size().
+  {
+    unsigned nbcs = mesh.boundary_info->n_boundary_conds();
+    if (nbcs != elem_list.size())
+      {
+	libMesh::err << "[" << libMesh::processor_id() << "] ";
+	libMesh::err << "BoundaryInfo contains " 
+		     << nbcs
+		     << " boundary conditions, while the Exodus file had " 
+		     << elem_list.size()
+		     << std::endl;
+	libmesh_error();
+      }
+  }
+
+  
+
 
   // See what the elem count is up to now.
   if (_verbose)

@@ -97,6 +97,9 @@ void Nemesis_IO_Helper::get_ss_param_global()
     {
       global_sideset_ids.resize(num_side_sets_global);
       num_global_side_counts.resize(num_side_sets_global);
+
+      // df = "distribution factor", not really sure what that is.  I don't yet have a file
+      // which has distribution factors so I guess we'll worry about it later...
       num_global_side_df_counts.resize(num_side_sets_global);
       
       nemesis_err_flag =

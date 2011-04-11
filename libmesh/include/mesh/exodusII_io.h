@@ -83,7 +83,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
 
 
   /**
-   * Set the flag indicationg if we should be verbose.
+   * Set the flag indicating if we should be verbose.
    */
   void verbose (bool set_verbosity);
 
