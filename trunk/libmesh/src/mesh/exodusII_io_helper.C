@@ -434,12 +434,17 @@ void ExodusII_IO_Helper::read_nodeset(int id)
 
   node_list.resize(num_nodes_per_set[id]);
 
-  ex_err = exII::ex_get_node_set(ex_id,
-				 nodeset_ids[id],
-				 &node_list[0]);
+  // Don't call ex_get_node_set unless there are actually nodes there to get.
+  // Exodus prints an annoying warning message in DEBUG mode otherwise...
+  if (num_nodes_per_set[id] > 0)
+    {
+      ex_err = exII::ex_get_node_set(ex_id,
+				     nodeset_ids[id],
+				     &node_list[0]);
   
-  check_err(ex_err, "Error retrieving nodeset data.");
-  message("Data retrieved successfully for nodeset: ", id);
+      check_err(ex_err, "Error retrieving nodeset data.");
+      message("Data retrieved successfully for nodeset: ", id);
+    }
 }
 
 
