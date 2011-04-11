@@ -42,11 +42,11 @@ namespace Nemesis {
 /**
  * This is the \p Nemesis_IO_Helper class.  Think of it as
  * a big struct with storage for all the stuff one might
- * want to pull from a Nemesis file.  Also contains an
+ * want to pull from a Nemesis file.  Derived from
  * ExodusII_IO_Helper object, since Nemesis is based on
  * the same file format.
  *
- * @author Johw W. Peterson, 2008.
+ * @author John W. Peterson, 2008.
  */
 class Nemesis_IO_Helper : public ExodusII_IO_Helper
 {
@@ -71,6 +71,12 @@ public:
   // return value.  Be careful calling these at random, some depend on others
   // being called first...
   void get_init_global();
+
+  /**
+   * Fills: global_sideset_ids, num_global_side_counts, num_global_side_df_counts
+   * Call after: get_init_global()
+   * Call before:
+   */
   void get_ss_param_global();
   void get_ns_param_global();
   void get_eb_info_global();
