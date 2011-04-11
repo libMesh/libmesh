@@ -145,7 +145,8 @@ void Nemesis_IO::read (const std::string& base_filename)
 	   << '.' << libMesh::n_processors() 
 	   << '.' << libMesh::processor_id();
 
-  libMesh::out << "Opening file: " << file_oss.str() << std::endl;
+  if (_verbose)
+    libMesh::out << "Opening file: " << file_oss.str() << std::endl;
 
   // Open the Exodus file
   nemhelper->open(file_oss.str().c_str());
@@ -434,11 +435,21 @@ void Nemesis_IO::read (const std::string& base_filename)
       libmesh_assert (owning_pid_idx == libMesh::processor_id());
       libmesh_assert (global_node_idx < to_uint(nemhelper->num_nodes_global));
 
-      mesh.add_point (Point(nemhelper->x[local_node_idx],
-			    nemhelper->y[local_node_idx],
-			    nemhelper->z[local_node_idx]), 
-		      my_next_node, 
-		      libMesh::processor_id());
+      // "Catch" the node pointer after addition, make sure the
+      // ID matches the requested value.
+      Node* added_node = 
+	mesh.add_point (Point(nemhelper->x[local_node_idx],
+			      nemhelper->y[local_node_idx],
+			      nemhelper->z[local_node_idx]), 
+			my_next_node, 
+			libMesh::processor_id());
+
+      // Make sure the node we added has the ID we thought it would
+      if (added_node->id() != my_next_node)
+	{
+	  libMesh::err << "Error, node added with ID " << added_node->id() 
+		       << ", but we wanted ID " << my_next_node << std::endl;
+	}
 
       // update the local->global index map, when we are done
       // it will be 0-based.
@@ -473,11 +484,22 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  // the new global index, for lookup purposes when neighbors come calling
 	  old_global_to_new_global_map.push_back(std::make_pair(global_node_idx, 
 								my_next_node));
-	  mesh.add_point (Point(nemhelper->x[local_node_idx],
-				nemhelper->y[local_node_idx],
-				nemhelper->z[local_node_idx]), 
-			  my_next_node, 
-			  libMesh::processor_id());
+
+	  // "Catch" the node pointer after addition, make sure the
+	  // ID matches the requested value.
+	  Node* added_node = 
+	    mesh.add_point (Point(nemhelper->x[local_node_idx],
+				  nemhelper->y[local_node_idx],
+				  nemhelper->z[local_node_idx]), 
+			    my_next_node, 
+			    libMesh::processor_id());
+
+	  // Make sure the node we added has the ID we thought it would
+	  if (added_node->id() != my_next_node)
+	    {
+	      libMesh::err << "Error, node added with ID " << added_node->id() 
+			   << ", but we wanted ID " << my_next_node << std::endl;
+	    }
 
 	  // update the local->global index map, when we are done
 	  // it will be 0-based.
@@ -611,12 +633,22 @@ void Nemesis_IO::read (const std::string& base_filename)
 		  const unsigned int // now 0-based!
 		    global_node_idx = needed_node_idxs[cmap][j++];
 		  
-		  mesh.add_point (Point(nemhelper->x[local_node_idx],
-					nemhelper->y[local_node_idx],
-					nemhelper->z[local_node_idx]),
-				  global_node_idx,
-				  source_pid_idx);
+		  // "Catch" the node pointer after addition, make sure the
+		  // ID matches the requested value.
+		  Node* added_node = 
+		    mesh.add_point (Point(nemhelper->x[local_node_idx],
+					  nemhelper->y[local_node_idx],
+					  nemhelper->z[local_node_idx]),
+				    global_node_idx,
+				    source_pid_idx);
 		  
+		  // Make sure the node we added has the ID we thought it would
+		  if (added_node->id() != global_node_idx)
+		    {
+		      libMesh::err << "Error, node added with ID " << added_node->id() 
+				   << ", but we wanted ID " << global_node_idx << std::endl;
+		    }
+
 		  // update the local->global index map, when we are done
 		  // it will be 0-based.
 		  nemhelper->node_num_map[local_node_idx] = global_node_idx;
@@ -861,24 +893,26 @@ void Nemesis_IO::read (const std::string& base_filename)
     }
 
 #ifdef DEBUG
-  // In DEBUG mode, check that the global number of sidesets reported
-  // in each nemesis file matches the sum of all local sideset counts
-  // from each processor.  This requires a small communication, so only
-  // do it in DEBUG mode.
-  int sum_num_global_side_counts = std::accumulate(nemhelper->num_global_side_counts.begin(),
-						   nemhelper->num_global_side_counts.end(),
-						   0);
+  {
+    // In DEBUG mode, check that the global number of sidesets reported
+    // in each nemesis file matches the sum of all local sideset counts
+    // from each processor.  This requires a small communication, so only
+    // do it in DEBUG mode.
+    int sum_num_global_side_counts = std::accumulate(nemhelper->num_global_side_counts.begin(),
+						     nemhelper->num_global_side_counts.end(),
+						     0);
       
-  // MPI sum up the local files contributions
-  int sum_num_elem_all_sidesets = nemhelper->num_elem_all_sidesets;
-  Parallel::sum(sum_num_elem_all_sidesets);
+    // MPI sum up the local files contributions
+    int sum_num_elem_all_sidesets = nemhelper->num_elem_all_sidesets;
+    Parallel::sum(sum_num_elem_all_sidesets);
 
-  if (sum_num_global_side_counts != sum_num_elem_all_sidesets)
-    {
-      libMesh::err << "Error! global side count reported by Nemesis does not "
-		   << "match the side count reported by the individual files!" << std::endl;
-      libmesh_error();
-    }
+    if (sum_num_global_side_counts != sum_num_elem_all_sidesets)
+      {
+	libMesh::err << "Error! global side count reported by Nemesis does not "
+		     << "match the side count reported by the individual files!" << std::endl;
+	libmesh_error();
+      }
+  }
 #endif
 
   // Note that exodus stores sidesets in separate vectors but we want to pack
@@ -979,9 +1013,73 @@ void Nemesis_IO::read (const std::string& base_filename)
       }
   }
 
+  // Read global nodeset parameters?  We might be able to use this to verify
+  // something about the local files, but I haven't figured out what yet...
+  nemhelper->get_ns_param_global();
+
+  // Read local nodeset info
+  nemhelper->read_nodeset_info();
   
+  if (_verbose)
+    {
+      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "nemhelper->num_node_sets=" << nemhelper->num_node_sets << std::endl;
+    }  
 
+//  // Debugging, what is currently in nemhelper->node_num_map anyway?
+//  libMesh::out << "[" << libMesh::processor_id() << "] "
+//	       << "nemhelper->node_num_map = ";
+//
+//  for (unsigned int i=0; i<nemhelper->node_num_map.size(); ++i)
+//    libMesh::out << nemhelper->node_num_map[i] << ", ";
+//  libMesh::out << std::endl;
 
+  // For each nodeset, 
+  for (int nodeset=0; nodeset<nemhelper->get_num_node_sets(); nodeset++)
+    {
+      // Get the user-defined ID associcated with the nodeset
+      int nodeset_id = nemhelper->get_nodeset_id(nodeset);
+
+      if (_verbose)
+	{
+	  libMesh::out << "[" << libMesh::processor_id() << "] ";
+	  libMesh::out << "nemhelper->get_nodeset_id(" << nodeset << ")=" << nodeset_id << std::endl;
+	}
+        
+      // Read the nodeset from file, store them in a vector
+      nemhelper->read_nodeset(nodeset);
+
+      // Get access to that vector
+      const std::vector<int>& node_list = nemhelper->get_node_list();
+      
+      // Add nodes from the node_list to the BoundaryInfo object
+      for(unsigned int node=0; node<node_list.size(); node++)
+	{
+	  // Don't run past the end of our node map!
+	  if (to_uint(node_list[node]-1) >= nemhelper->node_num_map.size())
+	    {
+	      libMesh::err << "Error, index is past the end of node_num_map array!" << std::endl;
+	      libmesh_error();
+	    }
+	  
+	  // We should be able to use the node_num_map data structure set up previously to determine
+	  // the proper global node index.
+	  unsigned global_node_id = nemhelper->node_num_map[ node_list[node]-1 /*Exodus is 1-based!*/ ];
+
+	  if (_verbose)
+	    {
+	      libMesh::out << "[" << libMesh::processor_id() << "] "
+			   << "nodeset " << nodeset
+			   << ", local node number: " << node_list[node]-1
+			   << ", global node id: " << global_node_id
+			   << std::endl;
+	    }
+
+	  // Add the node to the BoundaryInfo object with the proper nodeset_id
+	  mesh.boundary_info->add_node(global_node_id, nodeset_id);
+	}
+    }
+  
   // See what the elem count is up to now.
   if (_verbose)
     {
