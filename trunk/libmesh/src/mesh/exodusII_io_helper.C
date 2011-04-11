@@ -393,15 +393,20 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
   check_err(ex_err, "Error retrieving sideset parameters.");
   message("Parameters retrieved successfully for sideset: ", id);
 
-  ex_err = exII::ex_get_side_set(ex_id,
-				 ss_ids[id],
-				 &elem_list[offset],
-				 &side_list[offset]);
-  check_err(ex_err, "Error retrieving sideset data.");
-  message("Data retrieved successfully for sideset: ", id);
+  // Don't call ex_get_side_set unless there are actually sides there to get.
+  // Exodus prints an annoying warning in DEBUG mode otherwise...
+  if (num_sides_per_set[id] > 0)
+    {
+      ex_err = exII::ex_get_side_set(ex_id,
+				     ss_ids[id],
+				     &elem_list[offset],
+				     &side_list[offset]);
+      check_err(ex_err, "Error retrieving sideset data.");
+      message("Data retrieved successfully for sideset: ", id);
 
-  for (int i=0; i<num_sides_per_set[id]; i++)
-    id_list[i+offset] = ss_ids[id];
+      for (int i=0; i<num_sides_per_set[id]; i++)
+	id_list[i+offset] = ss_ids[id];
+    }
 }
 
 void ExodusII_IO_Helper::read_nodeset(int id)
