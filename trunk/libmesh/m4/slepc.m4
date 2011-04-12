@@ -7,6 +7,15 @@ dnl SLEPc
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_SLEPC],
 [
+  dnl Although PETSc 3.x does not require PETSC_ARCH, it appears that
+  dnl SLEPc 3.x may (based on patches sent in by Jed Brown)?  
+  dnl If that's the case, we should probably uncomment 
+  dnl this check and disable SLEPc when PETSC_ARCH is not set...
+  dnl if test "x$PETSC_ARCH" = x ; then
+  dnl   enableslepc=no
+  dnl   AC_MSG_RESULT([<<< SLEPc disabled.  Please set your "\$PETSC_ARCH" environment variable correctly. >>>])
+  dnl fi
+
   dnl Test to see if SLEPC_DIR set by user.  If not set, then
   dnl try to autodetect in a default directory
   if test "x$SLEPC_DIR" = x ; then
