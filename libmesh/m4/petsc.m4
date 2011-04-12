@@ -25,16 +25,48 @@ AC_DEFUN([CONFIGURE_PETSC],
   AC_CHECK_FILE($PETSC_DIR/include/petsc.h,
                 PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
 
-  dnl Test to see if PETSC_ARCH set by user.  If not set, then
-  dnl disable petsc.
-  if test "x$PETSC_ARCH" = x ; then
-    enablepetsc=no
-    AC_MSG_RESULT(<<< PETSc disabled.  Please set your "\$PETSC_ARCH" environment variable correctly. >>>)
-    dnl PETSc config failed.  Try MPI.
-    ACX_MPI
+  dnl Grab PETSc version and substitute into Makefile.
+  dnl If version 2.x, also check that PETSC_ARCH is set
+  if (test -r $PETSC_DIR/include/petsc.h) ; then
+    dnl Some tricks to discover the version of petsc.
+    dnl You have to have grep and sed for this to work.
+    petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
+    petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
+    petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
+    petscversion=$petscmajor.$petscminor.$petscsubminor
+    petscmajorminor=$petscmajor.$petscminor.x
 
-  else
-    if (test -r $PETSC_DIR/include/petsc.h) ; then
+    AC_SUBST(petscversion)
+    AC_SUBST(petscmajor)
+    AC_SUBST(petscmajorminor)
+
+    AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MAJOR, [$petscmajor],
+      [PETSc's major version number, as detected by LibMesh])
+	      
+    AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MINOR, [$petscminor],
+      [PETSc's minor version number, as detected by LibMesh])
+	      
+    AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_SUBMINOR, [$petscsubminor],
+      [PETSc's subminor version number, as detected by LibMesh])
+
+    if test $petscmajor = 2; then
+      if test "x$PETSC_ARCH" = x ; then
+        enablepetsc=no
+        AC_MSG_RESULT([<<< PETSc 2.x detected and "\$PETSC_ARCH" not set.  PETSc disabled. >>>])
+        dnl PETSc config failed.  We will try MPI at the end of this function.
+        dnl ACX_MPI
+      fi
+    fi
+
+  else dnl petsc.h was not readable
+      enablepetsc=no
+  fi
+
+
+
+
+  dnl If we haven't been disabled yet, carry on!
+  if (test $enablepetsc != no) ; then
 dnl      dnl look for a decent F77 compiler or honor --with-77=...
 dnl      FC_TRY_LIST="g77 gfortran ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
 dnl      AC_ARG_WITH([f77],
@@ -49,7 +81,7 @@ dnl      dnl --------------------------------------------------------------
 dnl      AC_PROG_F77([$F77_TRY_LIST])
 dnl      AC_F77_LIBRARY_LDFLAGS
 
-      AC_SUBST(PETSC_ARCH)
+      AC_SUBST(PETSC_ARCH) dnl Note: may be empty...
       AC_SUBST(PETSC_DIR)
       AC_DEFINE(HAVE_PETSC, 1,
   	      [Flag indicating whether or not PETSc is available])
@@ -71,14 +103,8 @@ dnl      AC_F77_LIBRARY_LDFLAGS
 	AC_MSG_RESULT(<<< Warning: configuring in serial - no MPI in PETSC config >>>)
       fi
 
-      dnl Some tricks to discover the version of petsc.
-      dnl You have to have grep and sed for this to work.
-      petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
-      petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
-      petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
-      petscversion=$petscmajor.$petscminor.$petscsubminor
-      petscmajorminor=$petscmajor.$petscminor.x
-      AC_MSG_RESULT(<<< Configuring library with PETSc version $petscversion support >>>)
+      dnl Print informative message about the version of PETSc we detected
+      AC_MSG_RESULT([<<< Configuring library with PETSc version $petscversion support >>>])
 
 dnl      PETSCLINKLIBS=`cd $PETSC_DIR ; make getlinklibs`
 dnl      PETSCINCLUDEDIRS=`cd $PETSC_DIR ; make getincludedirs`
@@ -86,41 +112,28 @@ dnl
 dnl      AC_SUBST(PETSCLINKLIBS)
 dnl      AC_SUBST(PETSCINCLUDEDIRS)
 
-      AC_SUBST(petscversion)
-      AC_SUBST(petscmajor)
-      AC_SUBST(petscmajorminor)
       AC_SUBST(MPI_IMPL)
-
-      AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MAJOR, [$petscmajor],
-  	      [PETSc's major version number, as detected by LibMesh])
-	      
-      AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MINOR, [$petscminor],
-  	      [PETSc's minor version number, as detected by LibMesh])
-	      
-      AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_SUBMINOR, [$petscsubminor],
-  	      [PETSc's subminor version number, as detected by LibMesh])
 
       dnl Check for Hypre
       if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
       	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf` 
       elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
       	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
-      fi		 
+      fi
+		 
       if test "x$HYPRE_LIB" != x ; then
         AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])
 	AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
       fi
   
-    else
-
-      AC_MSG_RESULT(<<< PETSc disabled.  No \$PETSC_DIR/include/petsc.h header found. >>>)
-  
+  else 
       dnl PETSc config failed.  Try MPI.
-      enablepetsc=no
+      AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
       ACX_MPI
   
-    fi
-  fi
+  fi 
+
+  
   AC_SUBST(enablepetsc)
 ])
 
