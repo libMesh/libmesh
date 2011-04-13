@@ -89,7 +89,8 @@ protected:
   /**
    * Also, increment the counter if the copy-constructor is called.
    */
-  ReferenceCountedObject (const ReferenceCountedObject&)
+  ReferenceCountedObject (const ReferenceCountedObject& other)
+    : ReferenceCounter(other)
   {
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
     
