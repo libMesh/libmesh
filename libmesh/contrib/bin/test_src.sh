@@ -52,11 +52,21 @@ bn=`echo $fn | cut -d"." -f1`;
 inc_line_nums=`cat $1 | grep -n "^#include \"" | grep -v libmesh_config | grep -v libmesh_common | cut -d":" -f1`;
 #echo -e "$inc_line_nums"
 
+# Save the compiler name determined by libmesh-config
+compiler_name=`./libmesh-config --cxx`
+#echo "Using compiler: $compiler_name"
+
+# Save the compile flags determined by libmesh-config
+compile_flags=`./libmesh-config --cppflags --cxxflags --include`
+#echo "Using compiler flags: $compile_flags"
+
 for i in $inc_line_nums; do
   # Grab the i'th line from the file
   line_i=`head -$i $1 | tail -1`;
 
-  # Print informative message
+  # Print informative message(s)
+  # echo "Using compile command: $compiler_name $compile_flags -c $temp_file.C"
+
   # echo -n "Testing with line $i removed ... ";
   echo -n "Testing with ($line_i) removed ... ";
   
@@ -67,7 +77,7 @@ for i in $inc_line_nums; do
   cat $1 | sed "${i}d" > $temp_file.C;
 
   # Attempt to compile $temp_file
-  `./libmesh-config --cxx` `./libmesh-config --cppflags --cxxflags --include` -c $temp_file.C &> /dev/null #$temp_file.log;
+  $compiler_name $compile_flags -c $temp_file.C &> /dev/null #$temp_file.log 
 
   # If an object file is successfully created, the compilation succeeds!
   if [ -f $temp_file.o ]; then
