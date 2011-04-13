@@ -1299,7 +1299,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   // TRISHELL    =  11     
   // PYRAMID     =  12      
   
-  if ((type_str == "QUAD4") || (type_str == "QUAD") || (type_str == "quad"))
+  if ((type_str == "QUAD4") || (type_str == "QUAD") || (type_str == "quad") || (type_str == "quad4"))
     return assign_conversion(QUAD4);
 
   else if (type_str == "QUAD8")
