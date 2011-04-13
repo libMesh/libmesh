@@ -165,21 +165,6 @@ void Nemesis_IO::read (const std::string& base_filename)
   nemhelper->read_header();
   nemhelper->print_header();
   
-  // Be sure number of dimensions is equal to the number of dimensions in the mesh supplied.
-  mesh.set_mesh_dimension(static_cast<unsigned int>(nemhelper->num_dim));
-
-#if LIBMESH_DIM < 3
-  if (mesh.mesh_dimension() > LIBMESH_DIM)
-    {
-      libMesh::err << "Cannot open dimension " <<
-		      mesh.mesh_dimension() <<
-		      " mesh file when configured without " <<
-                      mesh.mesh_dimension() << "D support." <<
-                      std::endl;
-      libmesh_error();
-    }
-#endif
-  
   // Get global information: number of nodes, elems, blocks, nodesets and sidesets
   nemhelper->get_init_global();
   
@@ -732,6 +717,16 @@ void Nemesis_IO::read (const std::string& base_filename)
   }
 #endif
 
+  // We need to set the mesh dimension, but the following...
+  // mesh.set_mesh_dimension(static_cast<unsigned int>(nemhelper->num_dim));
+
+  // ... is not sufficient since some codes report num_dim==3 for two dimensional
+  // meshes living in 3D, even though all the elements are of 2D type.  Therefore,
+  // we instead use the dimension of the highest element found for the Mesh dimension, 
+  // similar to what is done by the Exodus reader, except here it requires a
+  // parallel communication.  
+  elems_of_dimension.resize(4, false); // will use 1-based
+
   // Compute my_elem_offset, the amount by which to offset the local elem numbering
   // on my processor.
   unsigned int my_next_elem = 0;
@@ -819,7 +814,11 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  elem->subdomain_id() = subdomain_id;
 	  elem->processor_id() = libMesh::processor_id();
 	  elem->set_id()       = my_next_elem++;
-		
+	  
+	  // Mark that we have seen an element of the current element's
+	  // dimension.
+          elems_of_dimension[elem->dim()] = true;
+
 	  // Add the created Elem to the Mesh, catch the Elem
 	  // pointer that the Mesh throws back.
 	  elem = mesh.add_elem (elem); 
@@ -858,6 +857,47 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   libmesh_assert ((my_next_elem - my_elem_offset) == to_uint(nemhelper->num_elem));
 
+  if (_verbose)
+    {
+      // Print local elems_of_dimension information
+      for (unsigned int i=1; i<elems_of_dimension.size(); ++i)
+	libMesh::out << "[" << libMesh::processor_id() << "] "
+		     << "elems_of_dimension[" << i << "]=" << elems_of_dimension[i] << std::endl;
+    }
+
+  // Get the max dimension seen on the current processor
+  unsigned int max_dim_seen = 0;
+  for (unsigned int i=1; i<elems_of_dimension.size(); ++i)
+    if (elems_of_dimension[i])
+      max_dim_seen = i;
+
+  // Do a global max to determine the max dimension seen by all processors.
+  // It should match -- I don't think we even support calculations on meshes
+  // with elements of different dimension...
+  Parallel::max(max_dim_seen);
+
+  if (_verbose)
+    {
+      // Print the max element dimension from all processors
+      libMesh::out << "[" << libMesh::processor_id() << "] "
+		   << "max_dim_seen=" << max_dim_seen << std::endl;
+    }
+
+  // Set the mesh dimension to the largest encountered for an element
+  mesh.set_mesh_dimension(max_dim_seen);
+
+#if LIBMESH_DIM < 3
+  if (mesh.mesh_dimension() > LIBMESH_DIM)
+    {
+      libMesh::err << "Cannot open dimension " <<
+		      mesh.mesh_dimension() <<
+		      " mesh file when configured without " <<
+                      mesh.mesh_dimension() << "D support." <<
+                      std::endl;
+      libmesh_error();
+    }
+#endif
+  
 
   // Global sideset information, they are distributed as well, not sure if they will require communication...?
   nemhelper->get_ss_param_global();
