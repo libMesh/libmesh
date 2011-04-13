@@ -86,6 +86,18 @@ protected:
 #endif
   }
 
+  /**
+   * Also, increment the counter if the copy-constructor is called.
+   */
+  ReferenceCountedObject (const ReferenceCountedObject&)
+  {
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+    
+    increment_constructor_count(typeid(T).name());
+
+#endif
+  }
+
 public:
   
   /**
