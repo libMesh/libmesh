@@ -136,10 +136,39 @@ bool Tet::is_child_on_side(const unsigned int c,
   libmesh_assert (c < this->n_children());
   libmesh_assert (s < this->n_sides());
 
+  // For the 4 vertices, child c touches vertex c, so we can return
+  // true if that vertex is on side s
   for (unsigned int i = 0; i != 3; ++i)
     if (Tet4::side_nodes_map[s][i] == c)
       return true;
-  return false;
+
+  // For the 4 non-vertex children, the child ordering depends on the
+  // diagonal selection.  We'll let the embedding matrix figure that
+  // out: if this child has three nodes that don't depend on the
+  // position of the node_facing_side[s], then we're on side s.
+
+  const unsigned int node_facing_side[4] = {3, 2, 0, 1};
+  const unsigned int n = node_facing_side[s];
+
+  unsigned int independent_nodes = 0;
+
+  for (unsigned int nc = 0; nc != 3; ++nc)
+    {
+      independent_nodes++;  // Hey, we're independent so far!
+      if (this->embedding_matrix(c,nc,n) != 0.)
+        {
+          independent_nodes--;  // No, wait, we're not
+          continue;
+        }
+    }
+
+  // No subtet of an octahedron touches a side at all nodes
+  libmesh_assert(independent_nodes != 4);
+  // Every subtet of an octahedron touches each side at at least one
+  // node
+  libmesh_assert(independent_nodes != 0);
+
+  return (independent_nodes == 3);
 }
 
 
