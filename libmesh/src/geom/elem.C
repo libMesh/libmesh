@@ -1090,7 +1090,7 @@ void Elem::family_tree_by_side (std::vector<const Elem*>& family,
   // Do not clear the vector any more.
   if (!this->active())
     for (unsigned int c=0; c<this->n_children(); c++)
-      if (this->child(c)->is_child_on_side(c, s))
+      if (this->is_child_on_side(c, s))
         this->child(c)->family_tree_by_side (family, s, false);
 
 }
@@ -1118,7 +1118,7 @@ void Elem::active_family_tree_by_side (std::vector<const Elem*>& family,
   // Do not clear the vector any more.
   else
     for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child(c)->is_remote() && this->child(c)->is_child_on_side(c, s))
+      if (!this->child(c)->is_remote() && this->is_child_on_side(c, s))
         this->child(c)->active_family_tree_by_side (family, s, false);
 }
 
