@@ -104,10 +104,10 @@ void UnstructuredMesh::copy_nodes_and_elements
         Node *oldn = *it;
 
         // Add new nodes in old node Point locations
-        Node *newn = this->add_point(*oldn);
+        /*Node *newn =*/ this->add_point(*oldn, oldn->id(), oldn->processor_id());
 
         // And start them off in the same subdomain
-        newn->processor_id() = oldn->processor_id();
+//        newn->processor_id() = oldn->processor_id();
       }
   }
   
@@ -153,12 +153,15 @@ void UnstructuredMesh::copy_nodes_and_elements
       //Assign all the nodes
       for(unsigned int i=0;i<elem->n_nodes();i++)
         elem->set_node(i) = &this->node(old->node(i));
-      
-      //Hold onto it
-      this->add_elem(elem);
 
       // And start it off in the same subdomain
       elem->processor_id() = old->processor_id();
+
+      // Give it the same id
+      elem->set_id(old->id());
+
+      //Hold onto it
+      this->add_elem(elem);
     }
   }
   

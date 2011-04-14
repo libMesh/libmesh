@@ -848,6 +848,10 @@ BoundaryInfo::build_node_list_from_side_list()
   //Loop over the side list
   for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end(); ++pos)
   {
+    // Don't add remote sides
+    if(pos->first->is_remote())
+      continue;
+    
     //Need to loop over the sides of any possible children
     std::vector< const Elem * > family;
 #ifdef LIBMESH_ENABLE_AMR
