@@ -473,7 +473,7 @@ void UnstructuredMesh::read (const std::string& name,
   // Look for parallel formats first
   if (is_parallel_file_format(name))
     {      
-      // no need to handling bz2 files here -- the Xdr class does that.
+      // no need to handle bz2 files here -- the Xdr class does that.
       if ((name.rfind(".xda") < name.size()) ||
 	  (name.rfind(".xdr") < name.size()))
 	{
@@ -529,18 +529,44 @@ void UnstructuredMesh::read (const std::string& name,
       // the other processors will pick it up
       if (libMesh::processor_id() == 0)
 	{
+          OStringStream pid_suffix; 
+          pid_suffix << '_' << getpid();
 	  // Nasty hack for reading/writing zipped files
 	  std::string new_name = name;
 	  if (name.size() - name.rfind(".bz2") == 4)
 	    {
+#ifdef LIBMESH_HAVE_BZIP
 	      new_name.erase(new_name.end() - 4, new_name.end());
-	      std::string system_string = "bunzip2 -f -k ";
-	      system_string += name;
+              new_name += pid_suffix.str();
+	      std::string system_string = "bunzip2 -f -k -c ";
+	      system_string += name + " > " + new_name;
 	      START_LOG("system(bunzip2)", "Mesh");
 	      if (std::system(system_string.c_str()))
 	        libmesh_file_error(system_string);
 	      STOP_LOG("system(bunzip2)", "Mesh");
+#else
+              libMesh::err << "ERROR: need bzip2/bunzip2 to open .bz2 file "
+		           << name << std::endl;
+              libmesh_error();
+#endif
 	    }
+          else if (name.size() - name.rfind(".xz") == 3)
+            {
+#ifdef LIBMESH_HAVE_XZ
+	      new_name.erase(new_name.end() - 3, new_name.end());
+              new_name += pid_suffix.str();
+	      std::string system_string = "xz -f -d -k -c ";
+	      system_string += name + " > " + new_name;
+	      START_LOG("system(xz -d)", "XdrIO");
+	      if (std::system(system_string.c_str()))
+                libmesh_file_error(system_string);
+	      STOP_LOG("system(xz -d)", "XdrIO");
+#else
+              libMesh::err << "ERROR: need xz to open .xz file "
+		           << name << std::endl;
+              libmesh_error();
+#endif
+            }
 
 	  if (new_name.rfind(".mat") < new_name.size())
 	    MatlabIO(*this).read(new_name);
@@ -601,14 +627,17 @@ void UnstructuredMesh::read (const std::string& name,
 			<< "     *.xdr  -- libMesh binary format\n"
 			<< "     *.gz   -- any above format gzipped\n"
 			<< "     *.bz2  -- any above format bzip2'ed\n"
+			<< "     *.xz   -- any above format xzipped\n"
 
 			<< std::endl;
 	      libmesh_error();	  
 	    }    
 	  
-	  // If we temporarily decompressed a .bz2 file, remove the
+	  // If we temporarily decompressed a file, remove the
 	  // uncompressed version
 	  if (name.size() - name.rfind(".bz2") == 4)
+	    std::remove(new_name.c_str());
+	  if (name.size() - name.rfind(".xz") == 3)
 	    std::remove(new_name.c_str());
 	}
       
@@ -635,7 +664,7 @@ void UnstructuredMesh::write (const std::string& name,
   // separate files, let's not try to handle the zipping here.
   if (is_parallel_file_format(name))
     {	
-      // no need to handling bz2 files here -- the Xdr class does that.
+      // no need to handle bz2 files here -- the Xdr class does that.
       if (name.rfind(".xda") < name.size())
 	XdrIO(*this).write(name);
 	
@@ -650,8 +679,23 @@ void UnstructuredMesh::write (const std::string& name,
 
       // Nasty hack for reading/writing zipped files
       std::string new_name = name;
+      unsigned int pid_0 = 0;
+      if (libMesh::processor_id() == 0)
+        pid_0 = getpid();
+      Parallel::broadcast(pid_0);
+      OStringStream pid_suffix; 
+      pid_suffix << '_' << pid_0;
+
       if (name.size() - name.rfind(".bz2") == 4)
-	new_name.erase(new_name.end() - 4, new_name.end());
+        {
+	  new_name.erase(new_name.end() - 4, new_name.end());
+          new_name += pid_suffix.str();
+        }
+      else if (name.size() - name.rfind(".xz") == 3)
+        {
+	  new_name.erase(new_name.end() - 3, new_name.end());
+          new_name += pid_suffix.str();
+        }
   
       // New scope so that io will close before we try to zip the file
       {
@@ -741,13 +785,28 @@ void UnstructuredMesh::write (const std::string& name,
 	  START_LOG("system(bzip2)", "Mesh");
 	  if (libMesh::processor_id() == 0)
 	    {
-	      std::string system_string = "bzip2 -f ";
-	      system_string += new_name;
+	      std::string system_string = "bzip2 -f -c ";
+	      system_string += new_name + " > " + name;
 	      if (std::system(system_string.c_str()))
 		libmesh_file_error(system_string);
+	      std::remove(new_name.c_str());
 	    }
 	  Parallel::barrier();
 	  STOP_LOG("system(bzip2)", "Mesh");
+	}
+      if (name.size() - name.rfind(".xz") == 3)
+	{
+	  START_LOG("system(xz)", "Mesh");
+	  if (libMesh::processor_id() == 0)
+	    {
+	      std::string system_string = "xz -f -c ";
+	      system_string += new_name + " > " + name;
+	      if (std::system(system_string.c_str()))
+		libmesh_file_error(system_string);
+	      std::remove(new_name.c_str());
+	    }
+	  Parallel::barrier();
+	  STOP_LOG("system(xz)", "Mesh");
 	}
       
       STOP_LOG("write()", "Mesh");
