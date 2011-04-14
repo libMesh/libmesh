@@ -163,7 +163,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
         if(!_weights)
           vwgt[elem_global_index] = elem->n_nodes();
         else
-          vwgt[elem_global_index] = (*_weights)[elem->id()];
+          vwgt[elem_global_index] = static_cast<int>((*_weights)[elem->id()]);
 
 	// Loop over the element's neighbors.  An element
 	// adjacency corresponds to a face neighbor
