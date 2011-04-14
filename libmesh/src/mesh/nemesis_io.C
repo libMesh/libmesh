@@ -83,7 +83,7 @@ Nemesis_IO::Nemesis_IO (ParallelMesh& mesh) :
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper),
 #endif
-  _verbose (false)
+  _verbose (true)
 {
 }
 
@@ -136,14 +136,33 @@ void Nemesis_IO::read (const std::string& base_filename)
   
   // Construct a filename string for this processor.
   //
-  // FIXME: This assumes you are reading in a mesh on exactly the
+  // TODO: This assumes you are reading in a mesh on exactly the
   // same number of processors it was written out on!!
   // This should be generalized at some point...
   std::ostringstream file_oss;
+  
+  // We have to be a little careful here: Nemesis left pads its file
+  // numbers based on the largest processor ID, so for example on 128
+  // processors, we'd have:
+  // mesh.e.128.001
+  // mesh.e.128.002
+  // ...
+  // mesh.e.128.099
+  // mesh.e.128.100
+  // ...
+  // mesh.e.128.127
 
+  // Find the length of the highest processor ID 
+  file_oss << (libMesh::n_processors()-1);
+  unsigned field_width = file_oss.str().size();
+  
+  if (_verbose)
+    libMesh::out << "field_width=" << field_width << std::endl;
+
+  file_oss.str(""); // reset the string stream
   file_oss << base_filename  
 	   << '.' << libMesh::n_processors() 
-	   << '.' << libMesh::processor_id();
+	   << '.' << std::setfill('0') << std::setw(field_width) << libMesh::processor_id();
 
   if (_verbose)
     libMesh::out << "Opening file: " << file_oss.str() << std::endl;
