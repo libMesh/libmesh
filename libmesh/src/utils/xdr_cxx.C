@@ -57,30 +57,50 @@ namespace {
 #endif
   }
 
-  std::string unbzip_file (const std::string &name)
+  std::string unzip_file (const std::string &name)
   {
-    // There's no parallel bunzip2 for us to call
+    // There's no parallel bunzip2 or xz for us to call
     libmesh_assert(libMesh::processor_id() == 0);
 
-#ifdef LIBMESH_HAVE_BZIP
+    OStringStream pid_suffix; 
+    pid_suffix << '_' << getpid();
+
     std::string new_name = name;
     if (name.size() - name.rfind(".bz2") == 4)
       {
+#ifdef LIBMESH_HAVE_BZIP
 	new_name.erase(new_name.end() - 4, new_name.end());
+        new_name += pid_suffix.str();
 	START_LOG("system(bunzip2)", "XdrIO");
-	std::string system_string = "bunzip2 -f -k ";
-	system_string += name;
+	std::string system_string = "bunzip2 -f -k -c ";
+	system_string += name + " > " + new_name;
 	if (std::system(system_string.c_str()))
           libmesh_file_error(system_string);
 	STOP_LOG("system(bunzip2)", "XdrIO");
+#else
+        libMesh::err << "ERROR: need bzip2/bunzip2 to open .bz2 file "
+		     << name << std::endl;
+        libmesh_error();
+#endif
+      }
+    else if (name.size() - name.rfind(".xz") == 3)
+      {
+#ifdef LIBMESH_HAVE_XZ
+	new_name.erase(new_name.end() - 3, new_name.end());
+        new_name += pid_suffix.str();
+	START_LOG("system(xz -d)", "XdrIO");
+	std::string system_string = "xz -f -d -k -c ";
+	system_string += name + " > " + new_name;
+	if (std::system(system_string.c_str()))
+          libmesh_file_error(system_string);
+	STOP_LOG("system(xz -d)", "XdrIO");
+#else
+        libMesh::err << "ERROR: need xz to open .xz file "
+		     << name << std::endl;
+        libmesh_error();
+#endif
       }
     return new_name;
-#else
-    libMesh::err << "ERROR: need bzip2/bunzip2 to open .bz2 file "
-		 << name << std::endl;
-    libmesh_error();
-    return name;
-#endif
   }
 
   void xzip_file (const std::string &unzipped_name)
@@ -105,45 +125,25 @@ namespace {
 #endif
   }
 
-  std::string unxzip_file (const std::string &name)
-  {
-    // There's no parallel xz for us to call
-    libmesh_assert(libMesh::processor_id() == 0);
-
-#ifdef LIBMESH_HAVE_XZ
-    std::string new_name = name;
-    if (name.size() - name.rfind(".xz") == 3)
-      {
-	new_name.erase(new_name.end() - 3, new_name.end());
-	START_LOG("system(xz -d)", "XdrIO");
-	std::string system_string = "xz -f -d -k ";
-	system_string += name;
-	if (std::system(system_string.c_str()))
-          libmesh_file_error(system_string);
-	STOP_LOG("system(xz -d)", "XdrIO");
-      }
-    return new_name;
-#else
-    libMesh::err << "ERROR: need xz to open .xz file "
-		 << name << std::endl;
-    libmesh_error();
-    return name;
-#endif
-  }
 
   // remove an unzipped file
   void remove_unzipped_file (const std::string &name)
   {
+    OStringStream pid_suffix; 
+    pid_suffix << '_' << getpid();
+
     // If we temporarily decompressed a file, remove the
     // uncompressed version
     if (name.size() - name.rfind(".bz2") == 4)
       {
-	const std::string new_name(name.begin(), name.end()-4);
+	std::string new_name(name.begin(), name.end()-4);
+        new_name += pid_suffix.str();
 	std::remove(new_name.c_str());
       }
     if (name.size() - name.rfind(".xz") == 3)
       {
-	const std::string new_name(name.begin(), name.end()-3);
+	std::string new_name(name.begin(), name.end()-3);
+        new_name += pid_suffix.str();
 	std::remove(new_name.c_str());
       }
   }
@@ -239,13 +239,7 @@ void Xdr::open (const std::string& name)
 	    libmesh_assert (inf != NULL);
 	    in.reset(inf);
 	    
-	    std::string new_name;
-            if (bzipped_file)
-              new_name = unbzip_file(name);
-            else if (xzipped_file)
-              new_name = unxzip_file(name);
-            else
-              new_name = name;
+	    std::string new_name = unzip_file(name);
 
 	    inf->open(new_name.c_str(), std::ios::in);
 	  }
