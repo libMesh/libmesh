@@ -110,7 +110,7 @@ namespace {
     // There's no parallel xz for us to call
     libmesh_assert(libMesh::processor_id() == 0);
 
-#ifdef LIBMESH_HAVE_BZIP
+#ifdef LIBMESH_HAVE_XZ
     std::string new_name = name;
     if (name.size() - name.rfind(".xz") == 3)
       {
