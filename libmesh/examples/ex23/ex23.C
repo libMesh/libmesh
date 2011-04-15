@@ -27,7 +27,7 @@
 #include "libmesh.h"
 #include "mesh.h"
 #include "mesh_generation.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "equation_systems.h"
 #include "dof_map.h"
 #include "getpot.h"
@@ -210,10 +210,10 @@ int main (int argc, char** argv)
     if(system.store_basis_functions)
     {
       system.load_RB_solution();
-      GMVIO(mesh).write_equation_systems ("RB_sol.gmv",equation_systems);
+      ExodusII_IO(mesh).write_equation_systems ("RB_sol.exd",equation_systems);
       
       system.load_basis_function(0);
-      GMVIO(mesh).write_equation_systems ("bf0.gmv",equation_systems);
+      ExodusII_IO(mesh).write_equation_systems ("bf0.exd",equation_systems);
     }
   }
 
