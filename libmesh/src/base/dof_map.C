@@ -2419,21 +2419,22 @@ std::string DofMap::get_info() const
   OStringStream os;
 
   unsigned int max_n_nz = 0, max_n_oz = 0;
-  long double avg_n_nz = 0., avg_n_oz = 0.;
+  long double avg_n_nz = 0., avg_n_oz = 0;
+  const std::size_t one=1;
 
   for (unsigned int i = 0; i != _n_nz.size(); ++i)
     {
       max_n_nz = std::max(max_n_nz, _n_nz[i]);
       avg_n_nz += _n_nz[i];
     }
-  avg_n_nz /= _n_nz.size();
+  avg_n_nz /= std::max(_n_nz.size(),one);
 
   for (unsigned int i = 0; i != _n_oz.size(); ++i)
     {
       max_n_oz = std::max(max_n_oz, _n_oz[i]);
       avg_n_oz += _n_oz[i];
     }
-  avg_n_oz /= _n_oz.size();
+  avg_n_oz /= std::max(_n_oz.size(),one);
 
   os << "    DofMap Sparsity\n      Average  On-Processor Bandwidth = "
      << avg_n_nz << '\n';
