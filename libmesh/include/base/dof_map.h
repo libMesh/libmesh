@@ -232,12 +232,14 @@ public:
    */
   unsigned int first_dof(const unsigned int proc = libMesh::processor_id()) const
   { libmesh_assert(proc < _first_df.size()); return _first_df[proc]; }
-  
+
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Returns the first old dof index that is local to subdomain \p proc.
    */
   unsigned int first_old_dof(const unsigned int proc = libMesh::processor_id()) const
   { libmesh_assert(proc < _first_old_df.size()); return _first_old_df[proc]; }
+#endif //LIBMESH_ENABLE_AMR
   
   /**
    * Returns the last dof index that is local to subdomain \p proc.
@@ -253,13 +255,15 @@ public:
    */
   unsigned int end_dof(const unsigned int proc = libMesh::processor_id()) const
   { libmesh_assert(proc < _end_df.size()); return _end_df[proc]; }
-  
+
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Returns the first old dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
   unsigned int end_old_dof(const unsigned int proc = libMesh::processor_id()) const
   { libmesh_assert(proc < _end_old_df.size()); return _end_old_df[proc]; }
+#endif //LIBMESH_ENABLE_AMR
   
   /**
    * Returns the first local degree of freedom index for variable \p var.

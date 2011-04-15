@@ -77,8 +77,10 @@ void EquationSystems::read (const std::string& name,
     mode = DECODE;
   this->read(name, mode, read_flags);
 
+#ifdef LIBMESH_ENABLE_AMR
   MeshRefinement mesh_refine(_mesh);
   mesh_refine.clean_refinement_flags();
+#endif
 }
 
 
@@ -135,8 +137,10 @@ void EquationSystems::read (const std::string& name,
   
 #endif // #ifdef LIBMESH_ENABLE_EXCEPTIONS
 
+#ifdef LIBMESH_ENABLE_AMR
   MeshRefinement mesh_refine(_mesh);
   mesh_refine.clean_refinement_flags();
+#endif
 }
 
 

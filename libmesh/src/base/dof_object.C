@@ -116,7 +116,6 @@ DofObject::DofObject (const DofObject& dof_obj) :
 }
 
 
-
 // Deep-copying assignment operator
 DofObject& DofObject::operator= (const DofObject& dof_obj)
 {

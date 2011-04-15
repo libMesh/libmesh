@@ -118,8 +118,10 @@ void EquationSystems::init ()
   for (unsigned int i=0; i != this->n_systems(); ++i)
     this->get_system(i).init();
 
+#ifdef LIBMESH_ENABLE_AMR
   MeshRefinement mesh_refine(_mesh);
   mesh_refine.clean_refinement_flags();
+#endif
 }
 
 

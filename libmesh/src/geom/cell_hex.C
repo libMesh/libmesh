@@ -189,10 +189,13 @@ bool Hex::is_child_on_side(const unsigned int c,
 {
   libmesh_assert (c < this->n_children());
   libmesh_assert (s < this->n_sides());
-
+  
+#ifdef LIBMESH_ENABLE_AMR  
   for (unsigned int i = 0; i != 4; ++i)
     if (Hex8::node_child_map[Hex8::side_nodes_map[s][i]] == c)
       return true;
+#endif
+  
   return false;
 }
 
