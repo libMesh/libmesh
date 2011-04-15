@@ -83,7 +83,7 @@ Nemesis_IO::Nemesis_IO (ParallelMesh& mesh) :
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper),
 #endif
-  _verbose (true)
+  _verbose (false)
 {
 }
 
