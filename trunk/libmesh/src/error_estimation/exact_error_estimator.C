@@ -190,8 +190,11 @@ void ExactErrorEstimator::estimate_error (const System& system,
       // If we compute on parent elements, we'll want to do so only
       // once on each, so we need to keep track of which we've done.
       std::vector<bool> computed_var_on_parent;
+      
+#ifdef LIBMESH_ENABLE_AMR
       if (estimate_parent_error)
 	computed_var_on_parent.resize(error_per_cell.size(), false);
+#endif
 
       // Iterate over all the active elements in the mesh
       // that live on this processor.

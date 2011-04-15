@@ -74,13 +74,13 @@ public:
    * Destructor.
    */ 
   virtual ~DofObject ();
-
-#ifdef LIBMESH_ENABLE_AMR
   
   /**
    * Deep-copying assignment operator
    */ 
   DofObject& operator= (const DofObject& dof_obj);
+
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * This object on the last mesh.  Useful for projecting

@@ -155,11 +155,14 @@ bool Tet::is_child_on_side(const unsigned int c,
   for (unsigned int nc = 0; nc != 3; ++nc)
     {
       independent_nodes++;  // Hey, we're independent so far!
+      
+#ifdef LIBMESH_ENABLE_AMR
       if (this->embedding_matrix(c,nc,n) != 0.)
         {
           independent_nodes--;  // No, wait, we're not
           continue;
         }
+#endif //LIBMESH_ENABLE_AMR
     }
 
   // No subtet of an octahedron touches a side at all nodes

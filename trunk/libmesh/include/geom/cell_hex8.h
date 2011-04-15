@@ -148,8 +148,10 @@ public:
    */
   static const unsigned int edge_nodes_map[12][2];
 
+#ifdef LIBMESH_ENABLE_AMR
   static const unsigned int node_child_map[8];
-
+#endif
+  
   /**
    * A specialization for computing the area of a hexahedron
    * with flat sides.

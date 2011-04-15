@@ -938,7 +938,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
      */
     mesh.elem(el[i])->active_family_tree_by_side(family, sl[i], false);
 #else
-    family.push_back(el[i]);
+    family.push_back(mesh.elem(el[i]));
 #endif
 
     for(unsigned int j = 0; j < family.size(); ++j)

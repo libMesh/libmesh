@@ -518,6 +518,7 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
     if (elem->neighbor(side) == NULL)
       searched_elem = elem->top_parent ();
     
+#ifdef LIBMESH_ENABLE_AMR
     // Child element is not on external side, but it may have internal
     // "boundary" IDs.  We will walk up the tree, at each level checking that 
     // the current child is actually on the same side of the parent that is
@@ -530,6 +531,7 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
 	    return invalid_id;
 	  searched_elem = parent;
 	}
+#endif
   }
   
   std::pair<std::multimap<const Elem*,
@@ -574,6 +576,7 @@ std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
   {
     if (elem->neighbor(side) == NULL)
       searched_elem = elem->top_parent ();
+#ifdef LIBMESH_ENABLE_AMR
     else
       while (searched_elem->parent() != NULL) 
 	{
@@ -582,6 +585,7 @@ std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
 	    return ids;
 	  searched_elem = parent;
 	}
+#endif
   }
 
   std::pair<std::multimap<const Elem*,
@@ -743,6 +747,9 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
          // If we're on an internal boundary then we need to be sure
          // it's the same internal boundary as our top_parent
          const Elem *p = elem;
+
+#ifdef LIBMESH_ENABLE_AMR
+
          while (p != NULL)
            {
              const Elem *parent = p->parent();
@@ -750,6 +757,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
                break;
              p = parent;
            }
+#endif
          // We're on that side of our top_parent; return it
          if (!p)
            return side;
