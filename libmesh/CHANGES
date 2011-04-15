@@ -1,3 +1,23 @@
+0.7.0 -> 0.7.1
+  * Periodic boundary support enhancements
+  * New example with subdomain-restricted variables
+  * New examples with adjoint-based adaptivity, sensitivities
+  * More flexible multiphysics AdjointResidualErrorEstimator norms
+  * PatchRecoveryErrorEstimator of directional derivative seminorms
+  * Improved VTK output
+  * Separate RBEvaluation class for online Reduced Basis solves
+  * Object-based assembly API options
+  * Partitioning can now use element weights
+  * Better support for boundaries with multiple BC IDs
+  * More matrix printing options
+  * XZ compression support
+  * Subset solves with PETSc
+  * Better SLEPc compatibility
+  * Properly read restart files with a subset of our variables
+  * New utility for comparing restart files
+  * Easier enabling of float, long double configurations
+  * Most features now work with RTTI disabled
+  * Many assorted bug fixes
 
 0.6.4 -> 0.7.0
   * Certified Reduced Basis model creation/evaluation
