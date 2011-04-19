@@ -179,11 +179,6 @@ UnstructuredMesh::~UnstructuredMesh ()
 }
 
 
-void UnstructuredMesh::partition (const unsigned int n_parts)
-{
-  // Call base class's implementation
-  MeshBase::partition(n_parts);
-}
 
 
 
