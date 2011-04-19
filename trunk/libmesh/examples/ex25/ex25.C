@@ -102,6 +102,11 @@ int main (int argc, char** argv)
   // subdomains
   libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
+  // Skip adaptive examples on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#else
+
   // Declare a performance log for the main program
   // PerfLog perf_main("Main Program");
   
@@ -339,6 +344,8 @@ int main (int argc, char** argv)
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }
 
+#endif // #ifndef LIBMESH_ENABLE_AMR
+  
   // All done.  
   return 0;
 }
