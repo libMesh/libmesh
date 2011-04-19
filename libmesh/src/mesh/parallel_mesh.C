@@ -63,6 +63,12 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
   _max_node_id = other_mesh.max_node_id();
   _max_elem_id = other_mesh.max_elem_id();
   *this->boundary_info = *other_mesh.boundary_info;
+
+  // Need to copy extra_ghost_elems
+  for(std::set<Elem *>::iterator it = other_mesh._extra_ghost_elems.begin();
+      it != other_mesh._extra_ghost_elems.end();
+      ++it)
+    _extra_ghost_elems.insert(elem((*it)->id()));
 }
 
 
@@ -520,19 +526,22 @@ void ParallelMesh::clear ()
 
 void ParallelMesh::partition (const unsigned int n_parts)
 {
-  // Call base class' partition() function.
-  MeshBase::partition(n_parts);
+  if(!skip_partitioning())
+  { 
+    // Call base class' partition() function.
+    MeshBase::partition(n_parts);
 
-  // Construct a MeshCommunication object to actually redistribute the nodes
-  // and elements according to the partitioner, and then to re-gather the neighbors.
-  MeshCommunication mc;
-  mc.redistribute(*this);
-  mc.gather_neighboring_elements(*this);
+    // Construct a MeshCommunication object to actually redistribute the nodes
+    // and elements according to the partitioner, and then to re-gather the neighbors.
+    MeshCommunication mc;
+    mc.redistribute(*this);
+    mc.gather_neighboring_elements(*this);
 
-  // Is this necessary?  If we are called from prepare_for_use(), this will be called
-  // anyway... but users can always call partition directly, in which case we do need
-  // to call delete_remote_elements()...
-  this->delete_remote_elements();
+    // Is this necessary?  If we are called from prepare_for_use(), this will be called
+    // anyway... but users can always call partition directly, in which case we do need
+    // to call delete_remote_elements()...
+    this->delete_remote_elements();
+  }
 }
 
 

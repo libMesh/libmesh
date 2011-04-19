@@ -50,7 +50,8 @@ MeshBase::MeshBase (unsigned int d) :
   _dim           (d),
   _is_prepared   (false),
   _point_locator (NULL),
-  _partitioner   (NULL)
+  _partitioner   (NULL),
+  _skip_partitioning(false)
 {
   libmesh_assert (LIBMESH_DIM <= 3);
   libmesh_assert (LIBMESH_DIM >= _dim);
@@ -65,7 +66,8 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (NULL),
-  _partitioner   (other_mesh._partitioner->clone())
+  _partitioner   (other_mesh._partitioner->clone()),
+  _skip_partitioning(other_mesh._skip_partitioning)
 {
 }
 
@@ -257,15 +259,14 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 }
 
 
-
-
 void MeshBase::partition (const unsigned int n_parts)
 {
-  if (partitioner().get()) // "NULL" means don't partition
-    partitioner()->partition (*this, n_parts);
+  if(!skip_partitioning())
+  {
+    if (partitioner().get()) // "NULL" means don't partition
+      partitioner()->partition (*this, n_parts);
+  }
 }
-
-
 
 unsigned int MeshBase::recalculate_n_partitions()
 {

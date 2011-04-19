@@ -426,6 +426,21 @@ public:
    * Call the default partitioner (currently \p metis_partition()).
    */
   virtual void partition (const unsigned int n_parts=libMesh::n_processors());
+
+  /**
+   * If true is passed in then this mesh will no longer be (re)partitioned.
+   * It would probably be a bad idea to call this on a Serial Mesh _before_
+   * the first partitioning has happened... because no elements would get assigned
+   * to your processor pool.
+   *
+   * Note that turning on skip_partitioning() can have adverse effects on your
+   * performance when using AMR... ie you could get large load imbalances.
+   *
+   * However you might still want to use this if the communication and computation
+   * of the rebalance and repartition is too high for your application.
+   */
+  void skip_partitioning(bool skip) { _skip_partitioning = skip; }
+  bool skip_partitioning() { return _skip_partitioning; }
   
   /**
    * Returns the number of subdomains in the global mesh. Subdomains correspond
@@ -738,6 +753,11 @@ protected:
    * can be replaced by the user through the partitioner() accessor.
    */
   AutoPtr<Partitioner> _partitioner;
+
+  /**
+   * If this is true then no partitioning should be done.
+   */
+  bool _skip_partitioning;
   
   /**
    * The partitioner class is a friend so that it can set
