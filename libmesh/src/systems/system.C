@@ -241,10 +241,10 @@ void System::init_data ()
   // Expand any recursive constraints
   _dof_map->process_constraints();
 
+#endif
+
   // And clean up the send_list before we first use it
   _dof_map->prepare_send_list();
-
-#endif
   
   // Resize the solution conformal to the current mesh
   solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
