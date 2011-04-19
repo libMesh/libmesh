@@ -50,10 +50,14 @@ extern "C"
 // which monitors convergence at X
 PetscErrorCode
 __libmesh_petsc_diff_solver_monitor (SNES, PetscInt its,
-                                     PetscReal fnorm, void *)
+                                     PetscReal fnorm, void *ctx)
 {
-  libMesh::out << "  PetscDiffSolver step " << its
-                << ", |residual|_2 = " << fnorm << std::endl;
+  PetscDiffSolver& solver =
+    *(static_cast<PetscDiffSolver*> (ctx));
+
+  if (solver.verbose)
+    libMesh::out << "  PetscDiffSolver step " << its
+                 << ", |residual|_2 = " << fnorm << std::endl;
 
   return 0;
 }
@@ -70,6 +74,9 @@ __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
   PetscDiffSolver& solver =
     *(static_cast<PetscDiffSolver*> (ctx));
   ImplicitSystem &sys = solver.system();
+
+  if (solver.verbose)
+    libMesh::out << "Assembling the residual" << std::endl;
 
   PetscVector<Number>& X_system =
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
@@ -115,6 +122,9 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *j, Mat *pc,
   PetscDiffSolver& solver =
     *(static_cast<PetscDiffSolver*> (ctx));
   ImplicitSystem &sys = solver.system();
+
+  if (solver.verbose)
+    libMesh::out << "Assembling the Jacobian" << std::endl;
 
   PetscVector<Number>& X_system =
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());

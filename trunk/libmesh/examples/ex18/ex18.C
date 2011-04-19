@@ -158,6 +158,7 @@ int main (int argc, char** argv)
   // And the nonlinear solver options
   DiffSolver &solver = *(system.time_solver->diff_solver().get());
   solver.quiet = infile("solver_quiet", true);
+  solver.verbose = !solver.quiet;
   solver.max_nonlinear_iterations =
     infile("max_nonlinear_iterations", 15);
   solver.relative_step_tolerance =

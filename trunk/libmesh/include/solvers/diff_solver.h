@@ -145,6 +145,12 @@ public:
   bool quiet;
 
   /**
+   * The DiffSolver may print a lot more to libMesh::out
+   * if verbose is set to true; default is false.
+   */
+  bool verbose;
+
+  /**
    * Defaults to true, telling the DiffSolver to continue rather than exit when
    * a solve has reached its maximum number of nonlinear iterations.
    */
