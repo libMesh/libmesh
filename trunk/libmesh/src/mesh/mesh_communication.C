@@ -805,7 +805,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 				    my_interface_node_set.end());
   }
   
-  if (true)
+  if (false)
     libMesh::out << "[" << libMesh::processor_id() << "] "
 	          << "mesh.n_nodes()=" << mesh.n_nodes() << ", "
 	          << "my_interface_node_list.size()=" << my_interface_node_list.size()
@@ -2443,7 +2443,7 @@ void MeshCommunication::make_nodes_parallel_consistent
 
 
 // ------------------------------------------------------------
-void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
+void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::set<Elem *> & extra_ghost_elem_ids) const
 {
   // The mesh should know it's about to be parallelized
   libmesh_assert (!mesh.is_serial());
@@ -2506,6 +2506,12 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh) const
             break;
           }
     }
+
+  // Don't delete elements that we were explicitly told not to
+  for(std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
+      it != extra_ghost_elem_ids.end();
+      ++it)
+    semilocal_elems[(*it)->id()] = true;
 
   // Delete all the elements we have no reason to save,
   // starting with the most refined so that the mesh

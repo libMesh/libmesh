@@ -126,8 +126,12 @@ public:
    * The end result is that a previously serial \p ParallelMesh
    * will be distributed between processors.  Since this method is
    * collective it must be called by all processors.
+   *
+   * The std::set is a list of extra elements that you _don't_ want
+   * to delete.  These will be left on the current processor along with
+   * local elements and ghosted neighbors.
    */
-  void delete_remote_elements (ParallelMesh &) const;
+  void delete_remote_elements (ParallelMesh &, const std::set<Elem *> &) const;
 
   /**
    * This method assigns globally unique, partition-agnostic

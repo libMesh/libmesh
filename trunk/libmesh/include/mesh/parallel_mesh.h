@@ -28,6 +28,8 @@
 #include "mapvector.h"
 #include "unstructured_mesh.h"
 
+#include <set>
+
 namespace libMesh
 {
 
@@ -146,6 +148,13 @@ class ParallelMesh : public UnstructuredMesh
    * all nodes which are not part of a local or ghost element
    */
   virtual void delete_remote_elements();
+
+  /**
+   * Inserts the element _and_ adds it to a list of elements not to
+   * get deleted by delete_remote_elements.  This is handy for inserting
+   * off-processor elements that you want to keep track of on this processor.
+   */
+  virtual void insert_extra_ghost_elem(Elem* e);
 
   // Cached methods that can be called in serial
   virtual unsigned int n_nodes () const { return _n_nodes; }
@@ -399,6 +408,12 @@ protected:
   unsigned int _next_free_unpartitioned_node_id,
 	       _next_free_unpartitioned_elem_id;
 
+  /**
+   * These are extra ghost elements that we want to make sure
+   * not to delete when we call delete_remote_elemenst()
+   */
+  std::set<Elem *> _extra_ghost_elems;
+  
 private:
   
   /**
