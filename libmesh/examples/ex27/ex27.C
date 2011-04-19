@@ -174,6 +174,8 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
 // Build the mesh refinement object and set parameters for refining/coarsening etc
 
+#ifdef LIBMESH_ENABLE_AMR
+
 AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
                                               FEMParameters &param)
 {
@@ -187,6 +189,8 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 
   return mesh_refinement;
 }
+
+#endif // LIBMESH_ENABLE_AMR
 
 // This is where we declare the error estimators to be built and used for
 // mesh refinement. The adjoint residual estimator needs two estimators.
@@ -242,6 +246,11 @@ int main (int argc, char** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
+
+  // Skip adaptive examples on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#else
 
   std::cout << "Started " << argv[0] << std::endl;
 
@@ -507,6 +516,8 @@ int main (int argc, char** argv)
 
   std::cerr << '[' << libMesh::processor_id() 
             << "] Completing output." << std::endl; 
+    
+#endif // #ifndef LIBMESH_ENABLE_AMR
     
   // All done.  
   return 0;

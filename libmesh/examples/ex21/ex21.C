@@ -469,6 +469,11 @@ int main (int argc, char** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
     
+  // Skip adaptive examples on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#else
+
   // Create or read the mesh
   Mesh mesh;
 
@@ -576,4 +581,9 @@ int main (int argc, char** argv)
   // After solving the system write the solution
   // to a GMV-formatted plot file.
   GMVIO (mesh).write_discontinuous_gmv("lshaped_dg.gmv",equation_system,true);
+
+#endif // #ifndef LIBMESH_ENABLE_AMR
+  
+  // All done.  
+  return 0;
 }
