@@ -961,7 +961,7 @@ void ParallelMesh::delete_remote_elements()
 #endif
 
   _is_serial = false;
-  MeshCommunication().delete_remote_elements(*this);
+  MeshCommunication().delete_remote_elements(*this, _extra_ghost_elems);
 
 #ifdef DEBUG
 // Make sure our caches are up to date and our
@@ -985,6 +985,16 @@ void ParallelMesh::delete_remote_elements()
 #endif
 }
 
+
+void ParallelMesh::insert_extra_ghost_elem(Elem* e)
+{
+  // First insert the elem like normal
+  insert_elem(e);
+
+  // Now add it to the set that won't be deleted when we call
+  // delete_remote_elements()
+  _extra_ghost_elems.insert(e);
+}
 
 
 void ParallelMesh::allgather()
