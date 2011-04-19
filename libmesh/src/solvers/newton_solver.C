@@ -77,7 +77,7 @@ Real NewtonSolver::line_search(Real tol,
                           linear_solution);
       newton_iterate.close();
       bx *= substepdivision;
-      if (!quiet)
+      if (verbose)
         libMesh::out << "  Shrinking Newton step to "
                   << bx << std::endl;
 
@@ -86,7 +86,7 @@ Real NewtonSolver::line_search(Real tol,
 
       rhs.close();
       current_residual = rhs.l2_norm();
-      if (!quiet)
+      if (verbose)
         libMesh::out << "  Current Residual: "
                   << current_residual << std::endl;
 
@@ -184,7 +184,7 @@ Real NewtonSolver::line_search(Real tol,
       newton_iterate.add (bx - u, linear_solution);
       newton_iterate.close();
       bx = u;
-      if (!quiet)
+      if (verbose)
         libMesh::out << "  Shrinking Newton step to "
                       << bx << std::endl;
 
@@ -192,7 +192,7 @@ Real NewtonSolver::line_search(Real tol,
 
       rhs.close();
       Real fu = current_residual = rhs.l2_norm();
-      if (!quiet)
+      if (verbose)
         libMesh::out << "  Current Residual: "
                       << fu << std::endl;
 
@@ -224,8 +224,9 @@ Real NewtonSolver::line_search(Real tol,
         }
     }
 
-  libMesh::out << "Warning!  Too many iterations used in Brent line search!"
-                << std::endl;
+  if (!quiet)
+    libMesh::out << "Warning!  Too many iterations used in Brent line search!"
+                 << std::endl;
   return bx;
 }
 
@@ -294,7 +295,7 @@ unsigned int NewtonSolver::solve()
   for (_outer_iterations=0; _outer_iterations<max_nonlinear_iterations;
        ++_outer_iterations)
     {
-      if (!quiet)
+      if (verbose)
         libMesh::out << "Assembling the System" << std::endl;
 
       _system.assembly(true, true);
@@ -306,7 +307,7 @@ unsigned int NewtonSolver::solve()
         {
           libMesh::out << "  Nonlinear solver DIVERGED at step " 
                        << _outer_iterations
-                       << " with norm Not-a-Number"
+                       << " with residual Not-a-Number"
                        << std::endl;
           libmesh_convergence_failure();
           continue;
@@ -320,7 +321,7 @@ unsigned int NewtonSolver::solve()
 
       max_solution_norm = std::max(max_solution_norm, norm_total);
 
-      if (!quiet)
+      if (verbose)
         libMesh::out << "Nonlinear Residual: "
                       << current_residual << std::endl;
 
@@ -341,7 +342,7 @@ unsigned int NewtonSolver::solve()
       // Our best initial guess for the linear_solution is zero!
       linear_solution.zero();
 
-      if (!quiet)
+      if (verbose)
         libMesh::out << "Linear solve starting, tolerance " 
                       << current_linear_tolerance << std::endl;
 
@@ -365,7 +366,7 @@ unsigned int NewtonSolver::solve()
       const bool linear_solve_finished = 
         !(linear_steps == max_linear_iterations);
 
-      if (!quiet)
+      if (verbose)
         libMesh::out << "Linear solve finished, step " << linear_steps
                       << ", residual " << rval.second
                       << std::endl;
@@ -373,7 +374,7 @@ unsigned int NewtonSolver::solve()
       // Compute the l2 norm of the nonlinear update
       Real norm_delta = linear_solution.l2_norm();
 
-      if (!quiet)
+      if (verbose)
         libMesh::out << "Trying full Newton step" << std::endl;
       // Take a full Newton step
       newton_iterate.add (-1., linear_solution);
@@ -391,7 +392,7 @@ unsigned int NewtonSolver::solve()
 
           rhs.close();
           current_residual = rhs.l2_norm();
-          if (!quiet)
+          if (verbose)
             libMesh::out << "  Current Residual: "
                           << current_residual << std::endl;
 
@@ -424,9 +425,9 @@ unsigned int NewtonSolver::solve()
 
       if (_outer_iterations + 1 >= max_nonlinear_iterations)
         {
-          libMesh::out << "  Nonlinear solver reached maximum step "
-                        << max_nonlinear_iterations << " with norm "
-                        << norm_total << std::endl;
+          libMesh::out << "  Nonlinear solver reached maximum step, "
+                        << max_nonlinear_iterations << " latest evaluated residual "
+                        << current_residual << std::endl;
           if (continue_after_max_iterations)
 	    {
 	      _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
@@ -446,7 +447,7 @@ unsigned int NewtonSolver::solve()
 
       // Print out information for the 
       // nonlinear iterations.
-      if (!quiet)
+      if (verbose)
         libMesh::out << "  Nonlinear step: |du|/|u| = "
                       << norm_delta / norm_total
                       << ", |du| = " << norm_delta
@@ -546,9 +547,10 @@ void NewtonSolver::print_convergence(unsigned int step_num,
     }
   else if (absolute_residual_tolerance)
     {
-      libMesh::out << "  Nonlinear solver current_residual "
-                    << current_residual << " > "
-                    << (absolute_residual_tolerance) << std::endl;
+      if (verbose)
+        libMesh::out << "  Nonlinear solver current_residual "
+                     << current_residual << " > "
+                     << (absolute_residual_tolerance) << std::endl;
     }
 
   // Is our relative residual low enough?
@@ -563,11 +565,11 @@ void NewtonSolver::print_convergence(unsigned int step_num,
     }
   else if (relative_residual_tolerance)
     {
-      if (!quiet)
+      if (verbose)
         libMesh::out << "  Nonlinear solver relative residual "
-                      << (current_residual / max_residual_norm)
-                      << " > " << relative_residual_tolerance
-                      << std::endl;
+                     << (current_residual / max_residual_norm)
+                     << " > " << relative_residual_tolerance
+                     << std::endl;
     }
 
   // For incomplete linear solves, it's not safe to test step sizes
@@ -585,10 +587,11 @@ void NewtonSolver::print_convergence(unsigned int step_num,
     }
   else if (absolute_step_tolerance)
     {
-      libMesh::out << "  Nonlinear solver absolute step size "
-                    << step_norm
-                    << " > " << absolute_step_tolerance
-                    << std::endl;
+      if (verbose)
+        libMesh::out << "  Nonlinear solver absolute step size "
+                     << step_norm
+                     << " > " << absolute_step_tolerance
+                     << std::endl;
     }
 
   // Is our relative Newton step size small enough?
@@ -603,10 +606,11 @@ void NewtonSolver::print_convergence(unsigned int step_num,
     }
   else if (relative_step_tolerance)
     {
-      libMesh::out << "  Nonlinear solver relative step size "
-                    << (step_norm / max_solution_norm)
-                    << " > " << relative_step_tolerance
-                    << std::endl;
+      if (verbose)
+        libMesh::out << "  Nonlinear solver relative step size "
+                     << (step_norm / max_solution_norm)
+                     << " > " << relative_step_tolerance
+                     << std::endl;
     }
 }
 
