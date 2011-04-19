@@ -60,7 +60,7 @@ run: $(target)
 	@echo " "
 	@$(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo " "
-	@$(LIBMESH_RUN) $(target) eqn_sys.dat
+	@$(LIBMESH_RUN) $(target) eqn_sys.dat $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
