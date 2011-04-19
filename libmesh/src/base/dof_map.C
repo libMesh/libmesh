@@ -2448,6 +2448,8 @@ std::string DofMap::get_info() const
   os << "      Maximum Off-Processor Bandwidth = "
      << max_n_oz << std::endl;
 
+#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+
   unsigned int n_constraints = 0, max_constraint_length = 0;
   long double avg_constraint_length = 0.;
 
@@ -2477,6 +2479,8 @@ std::string DofMap::get_info() const
       os << "    DofMap Constraints\n      Number of Constraints = " << n_constraints
          << std::endl;
     }
+
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
   return os.str();
 }

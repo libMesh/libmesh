@@ -392,16 +392,6 @@ public:
   bool is_constrained_dof (const unsigned int dof) const;
   
   /**
-   * Prints summary info about the sparsity bandwidth and constraints.
-   */
-  void print_info(std::ostream& os=libMesh::out) const;
-
-  /**
-   * Gets summary info about the sparsity bandwidth and constraints.
-   */
-  std::string get_info() const;
-
-  /**
    * Prints the whole \p _dof_constraints data structure.
    */
   void print_dof_constraints(std::ostream& os=libMesh::out) const;
@@ -591,6 +581,16 @@ public:
    */
   void clear ();
   
+  /**
+   * Prints summary info about the sparsity bandwidth and constraints.
+   */
+  void print_info(std::ostream& os=libMesh::out) const;
+
+  /**
+   * Gets summary info about the sparsity bandwidth and constraints.
+   */
+  std::string get_info() const;
+
   /**
    * Degree of freedom coupling.  If left empty each DOF
    * couples to all others.  Can be used to reduce memory
