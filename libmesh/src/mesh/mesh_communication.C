@@ -917,7 +917,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 				    common_interface_node_list.begin()),
 	     common_interface_node_list.end());
 	  
-	  if (true)
+	  if (false)
 	    libMesh::out << "[" << libMesh::processor_id() << "] "
 		          << "my_interface_node_list.size()="       << my_interface_node_list.size()
 		          << ", [" << source_pid_idx << "] "
