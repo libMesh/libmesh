@@ -237,8 +237,8 @@ void System::read_header (Xdr& io,
       
       if (read_additional_data)
 	{
-	  // sanity checks
-	  libmesh_assert(this->_can_add_vectors);
+	  // Systems now can handle adding post-initialization vectors
+//	  libmesh_assert(this->_can_add_vectors);
 	  // Some systems may have added their own vectors already
 //	  libmesh_assert(this->_vectors.count(vec_name) == 0);
 
