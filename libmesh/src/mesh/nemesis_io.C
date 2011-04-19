@@ -31,6 +31,7 @@
 #include "parallel.h"
 #include "utility.h" // is_sorted, deallocate
 #include "boundary_info.h"
+#include "mesh_communication.h"
  
 namespace libMesh
 {
@@ -1156,6 +1157,9 @@ void Nemesis_IO::read (const std::string& base_filename)
   // For ParallelMesh, it seems that _is_serial is true by default.  A hack to
   // make the Mesh think it's parallel might be to call:
   mesh.delete_remote_elements();
+
+  // Gather neighboring elements so that the mesh has the proper "ghost" neighbor information.
+  MeshCommunication().gather_neighboring_elements(mesh);
 }
 
 #else

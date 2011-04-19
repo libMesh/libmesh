@@ -86,6 +86,13 @@ class ParallelMesh : public UnstructuredMesh
   virtual void clear();
 
   /**
+   * Calls the partitioner followed by MeshCommunication::redistribute() to actually
+   * move the partitioned nodes and elements around between processors, and 
+   * MeshCommunication::gather_neighboring_elements() to restore neighbor information.  
+   */
+  virtual void partition (const unsigned int n_parts=libMesh::n_processors());
+
+  /**
    * @returns \p true if all elements and nodes of the mesh
    * exist on the current processor, \p false otherwise
    */

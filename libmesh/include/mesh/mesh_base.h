@@ -425,7 +425,7 @@ public:
   /**
    * Call the default partitioner (currently \p metis_partition()).
    */
-  void partition (const unsigned int n_parts=libMesh::n_processors());
+  virtual void partition (const unsigned int n_parts=libMesh::n_processors());
   
   /**
    * Returns the number of subdomains in the global mesh. Subdomains correspond
