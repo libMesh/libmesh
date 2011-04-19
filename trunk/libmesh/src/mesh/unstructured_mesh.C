@@ -179,6 +179,13 @@ UnstructuredMesh::~UnstructuredMesh ()
 }
 
 
+void UnstructuredMesh::partition (const unsigned int n_parts)
+{
+  // Call base class's implementation
+  MeshBase::partition(n_parts);
+}
+
+
 
 void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 				       const bool reset_current_list)

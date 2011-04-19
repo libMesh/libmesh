@@ -66,6 +66,11 @@ class UnstructuredMesh : public MeshBase
   virtual ~UnstructuredMesh();
 
   /**
+   * Call the default partitioner (currently \p metis_partition()).
+   */
+  virtual void partition (const unsigned int n_parts=libMesh::n_processors());
+
+  /**
    * Reads the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.  This is now the only
    * way to read a mesh.  The \p UnstructuredMesh then initializes its data
