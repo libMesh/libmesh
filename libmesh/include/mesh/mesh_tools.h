@@ -93,8 +93,7 @@ namespace MeshTools
     BoundingBox & expand()
     { return *this; }
 
-    bool intersect (const BoundingBox &) const
-    { return false; }
+    bool intersect (const BoundingBox &) const;
 
   private:
   };
