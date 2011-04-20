@@ -526,6 +526,11 @@ void ParallelMesh::clear ()
 
 void ParallelMesh::partition (const unsigned int n_parts)
 {
+  // FIXME: We still need to MeshCommunication::redistribute to handle
+  // dof indices before repartitioning won't break AMR
+  if (!this->is_serial())
+    return;
+
   if(!skip_partitioning())
   { 
     // Call base class' partition() function.
