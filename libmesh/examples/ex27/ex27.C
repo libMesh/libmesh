@@ -314,9 +314,6 @@ int main (int argc, char** argv)
   mesh.print_info();
   equation_systems.print_info();
 
-  // We catch any solver errors, so that we can write the proper
-  // footers before closing
-  try
   {	
     // Adaptively solve the timestep
     unsigned int a_step = 0;
@@ -507,11 +504,6 @@ int main (int argc, char** argv)
 
 	primal_solution.swap(dual_solution_0);									
       }
-  }
-  catch (...)
-  {
-    std::cerr << '[' << libMesh::processor_id()
-              << "] Caught exception; exiting early." << std::endl; 
   }
 
   std::cerr << '[' << libMesh::processor_id() 
