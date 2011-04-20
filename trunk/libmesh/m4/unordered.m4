@@ -276,7 +276,7 @@ ac_cv_cxx_hash,
  AC_LANG_CPLUSPLUS
  AC_TRY_COMPILE([#include <functional>],
 [
-  std::tr1::hash<int> m;
+  std::hash<int> m;
   std::size_t hashed = m(12345);
 ],
  ac_cv_cxx_hash=yes, ac_cv_cxx_hash=no)
