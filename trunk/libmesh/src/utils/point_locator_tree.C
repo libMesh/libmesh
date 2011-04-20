@@ -128,7 +128,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 		  is_planar_xy = true;
 	      }
 	      		    
-	      if (is_planar_xy)
+	      if (!is_planar_xy)
 		_tree = new Trees::OctTree (this->_mesh, 200, build_type);
 	      else
 #endif
