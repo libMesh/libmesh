@@ -171,14 +171,19 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
     // partition array on *any* of the processors.
     if (!all_have_active_elements)
       {
-	if (!mesh.is_serial())
-	  libmesh_error();
-
 	// Cowardly revert to METIS, although this requires a serial mesh
+        bool mesh_was_serial = mesh.is_serial();
+	if (!mesh_was_serial)
+	  mesh.allgather();
+
 	STOP_LOG ("repartition()", "ParmetisPartitioner");
   
 	MetisPartitioner mp;
 	mp.partition (mesh, n_sbdmns);
+
+        if (mesh_was_serial)
+          mesh.delete_remote_elements();
+
 	return;	
       }
   }
