@@ -2163,8 +2163,7 @@ namespace Parallel
   {
     std::vector<T> vecdata(data.begin(), data.end());
     Parallel::allgather(vecdata, false, comm);
-    if (comm.rank() == root_id)
-      data.insert(vecdata.begin(), vecdata.end());
+    data.insert(vecdata.begin(), vecdata.end());
   }
 
 
