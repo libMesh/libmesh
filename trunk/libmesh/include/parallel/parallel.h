@@ -2161,8 +2161,10 @@ namespace Parallel
   inline void set_union(std::set<T> &data,
                         const Communicator &comm)
   {
-    Parallel::set_union(data, 0, comm);
-    Parallel::broadcast(data, comm);
+    std::vector<T> vecdata(data.begin(), data.end());
+    Parallel::allgather(vecdata, false, comm);
+    if (comm.rank() == root_id)
+      data.insert(vecdata.begin(), vecdata.end());
   }
 
 
