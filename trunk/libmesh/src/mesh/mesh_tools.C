@@ -177,6 +177,42 @@ namespace {
 
 namespace libMesh
 {
+// Small helper function to make intersect more readable.
+bool is_between(Real min, Real check, Real max)
+{
+  return min <= check && check <= max;
+}
+
+bool MeshTools::BoundingBox::intersect (const BoundingBox & other_box) const
+{
+  // Make local variables first to make thiings more clear in a moment
+  bool my_min_x = this->first(0);
+  bool my_min_y = this->first(1);
+  bool my_min_z = this->first(2);
+
+  bool my_max_x = this->second(0);
+  bool my_max_y = this->second(1);
+  bool my_max_z = this->second(2);
+
+  bool other_min_x = other_box.first(0);
+  bool other_min_y = other_box.first(1);
+  bool other_min_z = other_box.first(2);
+
+  bool other_max_x = other_box.second(0);
+  bool other_max_y = other_box.second(1);
+  bool other_max_z = other_box.second(2);
+
+  bool x_int = is_between(my_min_x, other_min_x, my_max_x) || is_between(my_min_x, other_max_x, my_max_x) ||
+               is_between(other_min_x, my_min_x, other_max_x) || is_between(other_min_x, my_max_x, other_max_x);
+
+  bool y_int = is_between(my_min_y, other_min_y, my_max_y) || is_between(my_min_y, other_max_y, my_max_y) ||
+               is_between(other_min_y, my_min_y, other_max_y) || is_between(other_min_y, my_max_y, other_max_y);
+
+  bool z_int = is_between(my_min_z, other_min_z, my_max_z) || is_between(my_min_z, other_max_z, my_max_z) ||
+               is_between(other_min_z, my_min_z, other_max_z) || is_between(other_min_z, my_max_z, other_max_z);
+
+  return x_int && y_int && z_int;
+}
 
 
 // ------------------------------------------------------------
