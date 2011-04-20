@@ -28,7 +28,7 @@
 #include <map>
 
 // Local includes
-#include "libmesh_common.h" // for Real
+#include "libmesh_common.h" // for libmesh_assert
 #include "libmesh_logging.h"
 
 namespace libMesh
@@ -40,7 +40,10 @@ namespace libMesh
 
 #undef parallel_only
 #ifndef NDEBUG
-  #define parallel_only() do { libmesh_assert(Parallel::verify(std::string(__FILE__))); libmesh_assert(Parallel::verify(__LINE__)); } while (0)
+  #define parallel_only() do { \
+    libmesh_assert(Parallel::verify(std::string(__FILE__).size())); \
+    libmesh_assert(Parallel::verify(std::string(__FILE__))); \
+    libmesh_assert(Parallel::verify(__LINE__)); } while (0)
 #else
   #define parallel_only()
 #endif
@@ -50,7 +53,10 @@ namespace libMesh
 
 #undef parallel_only_on
 #ifndef NDEBUG
-  #define parallel_only_on(comm_arg) do { libmesh_assert(Parallel::verify(std::string(__FILE__), comm_arg)); libmesh_assert(Parallel::verify(__LINE__), comm_arg); } while (0)
+  #define parallel_only_on(comm_arg) do { \
+    libmesh_assert(Parallel::verify(std::string(__FILE__).size(), comm_arg)); \
+    libmesh_assert(Parallel::verify(std::string(__FILE__), comm_arg)); \
+    libmesh_assert(Parallel::verify(__LINE__), comm_arg); } while (0)
 #else
   #define parallel_only_on(comm_arg)
 #endif
