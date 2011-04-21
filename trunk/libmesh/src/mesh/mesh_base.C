@@ -84,6 +84,8 @@ MeshBase::~MeshBase()
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 {  
+  parallel_only();
+
   // Renumber the nodes and elements so that they in contiguous
   // blocks.  By default, skip_renumber_nodes_and_elements is false,
   // however we may skip this step by passing
