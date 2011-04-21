@@ -715,6 +715,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   void add_child (Elem* elem, unsigned int c);
 
   /**
+   * Replaces the child pointer at the specified index in the array of
+   * children of this element.
+   */
+  void replace_child (Elem* elem, unsigned int c);
+
+  /**
    * Fills the vector \p family with the children of this element,
    * recursively.  So, calling this method on a twice-refined element
    * will give you the element itself, its direct children, and their

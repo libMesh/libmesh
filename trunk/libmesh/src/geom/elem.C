@@ -1000,7 +1000,18 @@ void Elem::add_child (Elem* elem, unsigned int c)
     }
   
   libmesh_assert (_children[c] == NULL || _children[c] == remote_elem);
-  libmesh_assert (this == elem->parent());
+  libmesh_assert (elem == remote_elem || this == elem->parent());
+
+  _children[c] = elem;
+}
+
+
+
+void Elem::replace_child (Elem* elem, unsigned int c)
+{
+  libmesh_assert(_children != NULL);
+  
+  libmesh_assert (_children[c] != NULL);
 
   _children[c] = elem;
 }
