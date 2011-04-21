@@ -238,6 +238,8 @@ int main (int argc, char** argv)
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_assert(false, "--enable-amr");
 #else
+  // Only our PETSc interface currently supports adjoint solves
+  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   std::cout << "Started " << argv[0] << std::endl;
 

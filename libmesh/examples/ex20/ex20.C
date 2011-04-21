@@ -95,9 +95,8 @@ int main (int argc, char** argv)
 
 #if !defined(LIBMESH_ENABLE_AMR)
   libmesh_example_assert(false, "--enable-amr");
-#elif !defined(LIBMESH_HAVE_PETSC)
-  libmesh_example_assert(false, "--enable-petsc");
 #else
+  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Brief message to the user regarding the program name
   // and command line arguments.
