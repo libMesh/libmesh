@@ -307,7 +307,11 @@ TypeVector<T>::TypeVector (const T x,
 
       if (LIBMESH_DIM == 3)
 	_coords[2] = z;
+      else
+        libmesh_assert(z == 0.);
     }
+  else
+    libmesh_assert(y == 0.);
 }
 
 
@@ -347,15 +351,8 @@ template <typename T>
 inline
 T TypeVector<T>::operator () (const unsigned int i) const
 {
-  libmesh_assert (i<3);
+  libmesh_assert (i<LIBMESH_DIM);
 
-#if LIBMESH_DIM < 3
-  
-  if (i > (LIBMESH_DIM-1))
-    return 0.;
-  
-#endif
-  
   return _coords[i];
 }
 
