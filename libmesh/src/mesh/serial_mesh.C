@@ -434,16 +434,16 @@ void SerialMesh::renumber_nodes_and_elements ()
 		const unsigned int src_idx = elem->node(n);
 		const unsigned int dst_idx = next_free_node++;
 
-		// ensure we want to swap valid nodes
+		// ensure we want to swap a valid nodes
 		libmesh_assert (_nodes[src_idx] != NULL);
-		libmesh_assert (_nodes[dst_idx] != NULL);
 		
 		// Swap the source and destination nodes
                 std::swap(_nodes[src_idx],
                           _nodes[dst_idx] );
 
-		// Set proper indices
-		_nodes[src_idx]->set_id (src_idx);
+		// Set proper indices where that makes sense
+		if (_nodes[src_idx] != NULL)
+		  _nodes[src_idx]->set_id (src_idx);
 		_nodes[dst_idx]->set_id (dst_idx);
 	      }
 	}
@@ -469,7 +469,10 @@ void SerialMesh::renumber_nodes_and_elements ()
     for (std::vector<Node*>::iterator it=nd;
 	 it != end; ++it)
       {
-	libmesh_assert (*it != NULL);
+        // Mesh modification code might have already deleted some
+        // nodes
+	if (*it == NULL)
+          continue;
 
 	// remove any boundary information associated with
 	// this node
