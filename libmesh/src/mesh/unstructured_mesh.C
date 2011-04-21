@@ -133,16 +133,21 @@ void UnstructuredMesh::copy_nodes_and_elements
 
       elem->subdomain_id() = old->subdomain_id();
 
+      for (unsigned int s=0; s != old->n_sides(); ++s)
+        if (old->neighbor(s) == remote_elem)
+          elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+
 #ifdef LIBMESH_ENABLE_AMR
+      if (old->has_children())
+        for (unsigned int c=0; c != old->n_children(); ++c)
+          if (old->child(c) == remote_elem)
+            elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
+
       //Create the parent's child pointers if necessary
       if (newparent)
         {
-          // Make sure we have space for those child pointers
-          newparent->add_child(elem);
-
-          // We'd better be adding these in the correct order
-          libmesh_assert (newparent->which_child_am_i(elem) ==
-                  old->parent()->which_child_am_i(old));
+          unsigned int oldc = old->parent()->which_child_am_i(old);
+          newparent->add_child(elem, oldc);
         }
       
       // Copy the refinement flags
