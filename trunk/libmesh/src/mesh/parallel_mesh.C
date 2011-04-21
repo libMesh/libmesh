@@ -55,7 +55,7 @@ ParallelMesh::~ParallelMesh ()
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
 ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
-  UnstructuredMesh (other_mesh)
+  UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial)
 {
   this->copy_nodes_and_elements(other_mesh);
   _n_nodes = other_mesh.n_nodes();
@@ -905,7 +905,10 @@ void ParallelMesh::renumber_nodes_and_elements ()
   libmesh_assert(this->n_nodes() == this->max_node_id());
   libmesh_assert(this->n_elem() == this->max_elem_id());
 
-// Make sure our ids and flags are consistent
+  // Make sure we didn't miss any nodes
+  MeshTools::libmesh_assert_valid_node_procids(*this);
+    
+  // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
 
