@@ -190,13 +190,17 @@ bool TreeNode<N>::bounds_point (const Point& p) const
   const Point& max = bounding_box.second;
 
 
-  if ((p(0) >= min(0)) &&
-      (p(1) >= min(1)) &&
-      (p(2) >= min(2)) &&
-      
-      (p(0) <= max(0)) &&
-      (p(1) <= max(1)) &&
-      (p(2) <= max(2)))
+  if ((p(0) >= min(0))
+      && (p(0) <= max(0))
+#if LIBMESH_DIM > 1
+      && (p(1) >= min(1))
+      && (p(1) <= max(1))
+#endif
+#if LIBMESH_DIM > 2
+      && (p(2) >= min(2))
+      && (p(2) <= max(2))
+#endif
+     )
     return true;   
 
   return false;

@@ -480,8 +480,16 @@ void assemble_poisson(EquationSystems& es,
           // on the location of the quadrature point (q_point[qp])
           // we will compute it here, outside of the i-loop          
           const Real x = q_point[qp](0);
+#if LIBMESH_DIM > 1
           const Real y = q_point[qp](1);
+#else
+          const Real y = 0;
+#endif
+#if LIBMESH_DIM > 2
           const Real z = q_point[qp](2);
+#else
+          const Real z = 0;
+#endif
           const Real eps = 1.e-3;
 
           const Real uxx = (exact_solution(x-eps,y,z) +
@@ -563,8 +571,16 @@ void assemble_poisson(EquationSystems& es,
                 // The location on the boundary of the current
                 // face quadrature point.
                 const Real xf = qface_point[qp](0);
+#if LIBMESH_DIM > 1
                 const Real yf = qface_point[qp](1);
+#else
+                const Real yf = 0.;
+#endif
+#if LIBMESH_DIM > 2
                 const Real zf = qface_point[qp](2);
+#else
+                const Real zf = 0.;
+#endif
 
 
                 // The boundary value.

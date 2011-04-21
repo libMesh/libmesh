@@ -327,8 +327,12 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
               Fx.resize(matsize); Pu_x_h.resize(matsize); // stores xx in W2 cases
+#if LIBMESH_DIM > 1
               Fy.resize(matsize); Pu_y_h.resize(matsize); // stores yy in W2 cases
+#endif
+#if LIBMESH_DIM > 2
               Fz.resize(matsize); Pu_z_h.resize(matsize); // stores zz in W2 cases
+#endif
             }
 	  else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
 	    {
@@ -336,20 +340,26 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	    }
 	  else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
 	    {
+              libmesh_assert(LIBMESH_DIM > 1);
 	      Fy.resize(matsize); Pu_y_h.resize(matsize); // Only need to compute the y gradient for the y component seminorm
 	    }
           else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
 	    {
+              libmesh_assert(LIBMESH_DIM > 2);
 	      Fz.resize(matsize); Pu_z_h.resize(matsize); // Only need to compute the z gradient for the z component seminorm
 	    }          
 
+#if LIBMESH_DIM > 1
           if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
               Fxy.resize(matsize); Pu_xy_h.resize(matsize);
+#if LIBMESH_DIM > 2
               Fxz.resize(matsize); Pu_xz_h.resize(matsize);
               Fyz.resize(matsize); Pu_yz_h.resize(matsize);
+#endif
             }
+#endif
 
 	  //------------------------------------------------------
 	  // Loop over each element in the patch and compute their
@@ -415,8 +425,12 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		      for (unsigned int i=0; i<psi.size(); i++)
 		        {
 		          Fx(i) += JxW[qp]*grad_u_h(0)*psi[i];
+#if LIBMESH_DIM > 1
 		          Fy(i) += JxW[qp]*grad_u_h(1)*psi[i];
+#endif
+#if LIBMESH_DIM > 2
 		          Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
+#endif
 		        }
                     }
 		  else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
@@ -483,11 +497,15 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		      for (unsigned int i=0; i<psi.size(); i++)
 		        {
 		          Fx(i)  += JxW[qp]*hess_u_h(0,0)*psi[i];
+#if LIBMESH_DIM > 1
 		          Fy(i)  += JxW[qp]*hess_u_h(1,1)*psi[i];
-		          Fz(i)  += JxW[qp]*hess_u_h(2,2)*psi[i];
 		          Fxy(i) += JxW[qp]*hess_u_h(0,1)*psi[i];
+#endif
+#if LIBMESH_DIM > 2
+		          Fz(i)  += JxW[qp]*hess_u_h(2,2)*psi[i];
 		          Fxz(i) += JxW[qp]*hess_u_h(0,2)*psi[i];
 		          Fyz(i) += JxW[qp]*hess_u_h(1,2)*psi[i];
+#endif
 		        }
 #else
 		      libMesh::err << "ERROR:  --enable-second-derivatives is required\n"
@@ -517,8 +535,12 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                    error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
 	      Kp.lu_solve (Fx, Pu_x_h);
+#if LIBMESH_DIM > 1
 	      Kp.lu_solve (Fy, Pu_y_h);
+#endif
+#if LIBMESH_DIM > 2
 	      Kp.lu_solve (Fz, Pu_z_h);
+#endif
             }
 	  else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
 	    {
@@ -533,13 +555,17 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	      Kp.lu_solve (Fz, Pu_z_h); 
 	    }	          
 
+#if LIBMESH_DIM > 1
           if (error_estimator.error_norm.type(var) == H2_SEMINORM ||
               error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
               Kp.lu_solve(Fxy, Pu_xy_h);
+#if LIBMESH_DIM > 2
               Kp.lu_solve(Fxz, Pu_xz_h);
               Kp.lu_solve(Fyz, Pu_yz_h);
+#endif
             }
+#endif
 	  
 	  //--------------------------------------------------
 	  // Finally, estimate the error in the current variable
@@ -609,12 +635,20 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	          for (unsigned int i=0; i<matsize; i++)
 	            {
 	              temperr[0] += psi[i]*Pu_x_h(i);
+#if LIBMESH_DIM > 1
 	              temperr[1] += psi[i]*Pu_y_h(i);
+#endif
+#if LIBMESH_DIM > 2
 	              temperr[2] += psi[i]*Pu_z_h(i);
+#endif
 	            }
 	          temperr[0] -= grad_u_h(0);
+#if LIBMESH_DIM > 1
 	          temperr[1] -= grad_u_h(1);
+#endif
+#if LIBMESH_DIM > 2
 	          temperr[2] -= grad_u_h(2);
+#endif
                 }
 	      else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
                 {
@@ -679,28 +713,41 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	          for (unsigned int i=0; i<matsize; i++)
 	            {
 	              temperr[0] += psi[i]*Pu_x_h(i);
+#if LIBMESH_DIM > 1
 	              temperr[1] += psi[i]*Pu_y_h(i);
-	              temperr[2] += psi[i]*Pu_z_h(i);
 	              temperr[3] += psi[i]*Pu_xy_h(i);
+#endif
+#if LIBMESH_DIM > 2
+	              temperr[2] += psi[i]*Pu_z_h(i);
 	              temperr[4] += psi[i]*Pu_xz_h(i);
 	              temperr[5] += psi[i]*Pu_yz_h(i);
+#endif
 	            }
 	          temperr[0] -= hess_u_h(0,0);
+#if LIBMESH_DIM > 1
 	          temperr[1] -= hess_u_h(1,1);
-	          temperr[2] -= hess_u_h(2,2);
 	          temperr[3] -= hess_u_h(0,1);
+#endif
+#if LIBMESH_DIM > 2
+	          temperr[2] -= hess_u_h(2,2);
 	          temperr[4] -= hess_u_h(0,2);
 	          temperr[5] -= hess_u_h(1,2);
+#endif
 #else
 		      libMesh::err << "ERROR:  --enable-second-derivatives is required\n"
 				    << "        for _sobolev_order == 2!\n";
 		      libmesh_error();
 #endif
                 }
+
+              // Add up relevant terms.  We can easily optimize the
+              // LIBMESH_DIM < 3 cases a little bit with the exception
+              // of the W2 cases
+
               if (error_estimator.error_norm.type(var) == L_INF)
                 element_error = std::max(element_error, std::abs(temperr[0]));
               else if (error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
-                for (unsigned int i=0; i != 3; ++i)
+                for (unsigned int i=0; i != LIBMESH_DIM; ++i)
                   element_error = std::max(element_error, std::abs(temperr[i]));
               else if (error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
                 for (unsigned int i=0; i != 6; ++i)
@@ -708,7 +755,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
               else if (error_estimator.error_norm.type(var) == L2)
                 element_error += JxW[sp]*libmesh_norm(temperr[0]);
               else if (error_estimator.error_norm.type(var) == H1_SEMINORM)
-                for (unsigned int i=0; i != 3; ++i)
+                for (unsigned int i=0; i != LIBMESH_DIM; ++i)
                   element_error += JxW[sp]*libmesh_norm(temperr[i]);
 	      else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
 		element_error += JxW[sp]*libmesh_norm(temperr[0]);
@@ -718,7 +765,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		element_error += JxW[sp]*libmesh_norm(temperr[2]);
               else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
                 {
-                  for (unsigned int i=0; i != 3; ++i)
+                  for (unsigned int i=0; i != LIBMESH_DIM; ++i)
                     element_error += JxW[sp]*libmesh_norm(temperr[i]);
                 // Off diagonal terms enter into the Hessian norm twice
                   for (unsigned int i=3; i != 6; ++i)

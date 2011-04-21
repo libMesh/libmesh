@@ -697,8 +697,16 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
   for (/* unsigned */ int i=0; i<num_nodes; ++i)
     {
       x[i]=(*mesh.node_ptr(i))(0);
+#if LIBMESH_DIM > 1
       y[i]=(*mesh.node_ptr(i))(1);
+#else
+      y[i]=0.;
+#endif
+#if LIBMESH_DIM > 2
       z[i]=(*mesh.node_ptr(i))(2);
+#else
+      z[i]=0.;
+#endif
     }
 
   ex_err = exII::ex_put_coord(ex_id,
@@ -726,8 +734,16 @@ void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & 
 	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
     {
       x[i]=(*it)->point(n)(0);
+#if LIBMESH_DIM > 1
       y[i]=(*it)->point(n)(1);
+#else
+      y[i]=0.;
+#endif
+#if LIBMESH_DIM > 2
       z[i]=(*it)->point(n)(2);
+#else
+      z[i]=0.;
+#endif
       i++;
     }
 
