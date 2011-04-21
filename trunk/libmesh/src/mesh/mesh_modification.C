@@ -34,6 +34,7 @@
 #include "mesh_modification.h"
 #include "mesh_tools.h"
 #include "parallel.h"
+#include "remote_elem.h"
 #include "string_to_enum.h"
 #include "unstructured_mesh.h"
 
@@ -247,6 +248,11 @@ void UnstructuredMesh::all_first_order ()
   START_LOG("all_first_order()", "Mesh");
 
   /**
+   * Prepare to identify (and then delete) a bunch of no-longer-used nodes.
+   */
+  std::vector<bool> node_touched_by_me(this->max_node_id(), false);
+
+  /**
    * Loop over the high-ordered elements.
    * First make sure they _are_ indeed high-order, and then replace
    * them with an equivalent first-order element.
@@ -263,25 +269,33 @@ void UnstructuredMesh::all_first_order ()
        * build the first-order equivalent, add to
        * the new_elements list.
        */
-      Elem *newparent = so_elem->parent();
       Elem* lo_elem = Elem::build
         (Elem::first_order_equivalent_type
-          (so_elem->type()), newparent).release();
+          (so_elem->type()), so_elem->parent()).release();
+
+      for (unsigned int s=0; s != so_elem->n_sides(); ++s)
+        if (so_elem->neighbor(s) == remote_elem)
+          lo_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
 
 #ifdef LIBMESH_ENABLE_AMR
-      /*
-       * Add this element to it's parent if it has one
-       */
-      if (newparent)
-        newparent->add_child(lo_elem);
-
       /*
        * Reset the parent links of any child elements
        */
       if (so_elem->has_children())
-        {
-          for (unsigned int c=0; c != so_elem->n_children(); ++c)
+        for (unsigned int c=0; c != so_elem->n_children(); ++c)
+          {
             so_elem->child(c)->set_parent(lo_elem);
+            lo_elem->add_child(so_elem->child(c), c);
+          }
+
+      /*
+       * Reset the child link of any parent element
+       */
+      if (so_elem->parent())
+        {
+          unsigned int c =
+            so_elem->parent()->which_child_am_i(so_elem);
+          lo_elem->parent()->replace_child(lo_elem, c);
         }
 
       /*
@@ -300,7 +314,10 @@ void UnstructuredMesh::all_first_order ()
        * transfer these.
        */
       for (unsigned int v=0; v < so_elem->n_vertices(); v++)
-	lo_elem->set_node(v) = so_elem->get_node(v);
+        {
+	  lo_elem->set_node(v) = so_elem->get_node(v);
+          node_touched_by_me[lo_elem->node(v)] = true;
+        }
 
       /**
        * If the second order element had any boundary conditions they
@@ -329,7 +346,22 @@ void UnstructuredMesh::all_first_order ()
       this->insert_elem(lo_elem);
     }
 
+  const MeshBase::node_iterator nd_end = this->nodes_end();
+  MeshBase::node_iterator nd = this->nodes_begin();
+    while (nd != nd_end)
+    {
+      Node *node = *nd;
+      ++nd;
+      if (!node_touched_by_me[node->id()])
+        this->delete_node(node);
+    }
+
   STOP_LOG("all_first_order()", "Mesh");
+
+// On hanging nodes that used to also be second order nodes, we might
+// now have an invalid nodal processor_id()
+  if (this->unpartitioned_elements_begin() != this->unpartitioned_elements_end())
+    Partitioner::set_node_processor_ids(*this);
 
   // delete or renumber nodes, etc
   this->prepare_for_use(/*skip_renumber =*/ false);
