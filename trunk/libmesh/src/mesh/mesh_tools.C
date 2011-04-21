@@ -200,32 +200,41 @@ bool is_between(Real min, Real check, Real max)
 bool MeshTools::BoundingBox::intersect (const BoundingBox & other_box) const
 {
   // Make local variables first to make thiings more clear in a moment
-  Real my_min_x = this->first(0);
-  Real my_min_y = this->first(1);
-  Real my_min_z = this->first(2);
+  const Real& my_min_x = this->first(0);
+  const Real& my_max_x = this->second(0);
+  const Real& other_min_x = other_box.first(0);
+  const Real& other_max_x = other_box.second(0);
 
-  Real my_max_x = this->second(0);
-  Real my_max_y = this->second(1);
-  Real my_max_z = this->second(2);
+  const bool x_int = is_between(my_min_x, other_min_x, my_max_x) || is_between(my_min_x, other_max_x, my_max_x) ||
+                     is_between(other_min_x, my_min_x, other_max_x) || is_between(other_min_x, my_max_x, other_max_x);
 
-  Real other_min_x = other_box.first(0);
-  Real other_min_y = other_box.first(1);
-  Real other_min_z = other_box.first(2);
+  bool intersection_true = x_int;
 
-  Real other_max_x = other_box.second(0);
-  Real other_max_y = other_box.second(1);
-  Real other_max_z = other_box.second(2);
+#if LIBMESH_DIM > 1
+  const Real& my_min_y = this->first(1);
+  const Real& my_max_y = this->second(1);
+  const Real& other_min_y = other_box.first(1);
+  const Real& other_max_y = other_box.second(1);
 
-  bool x_int = is_between(my_min_x, other_min_x, my_max_x) || is_between(my_min_x, other_max_x, my_max_x) ||
-               is_between(other_min_x, my_min_x, other_max_x) || is_between(other_min_x, my_max_x, other_max_x);
+  const bool y_int = is_between(my_min_y, other_min_y, my_max_y) || is_between(my_min_y, other_max_y, my_max_y) ||
+                     is_between(other_min_y, my_min_y, other_max_y) || is_between(other_min_y, my_max_y, other_max_y);
 
-  bool y_int = is_between(my_min_y, other_min_y, my_max_y) || is_between(my_min_y, other_max_y, my_max_y) ||
-               is_between(other_min_y, my_min_y, other_max_y) || is_between(other_min_y, my_max_y, other_max_y);
+  intersection_true = intersection_true && y_int;
+#endif
 
-  bool z_int = is_between(my_min_z, other_min_z, my_max_z) || is_between(my_min_z, other_max_z, my_max_z) ||
-               is_between(other_min_z, my_min_z, other_max_z) || is_between(other_min_z, my_max_z, other_max_z);
+#if LIBMESH_DIM > 2
+  const Real& my_min_z = this->first(2);
+  const Real& my_max_z = this->second(2);
+  const Real& other_min_z = other_box.first(2);
+  const Real& other_max_z = other_box.second(2);
 
-  return x_int && y_int && z_int;
+  const bool z_int = is_between(my_min_z, other_min_z, my_max_z) || is_between(my_min_z, other_max_z, my_max_z) ||
+                     is_between(other_min_z, my_min_z, other_max_z) || is_between(other_min_z, my_max_z, other_max_z);
+
+  intersection_true = intersection_true && z_int;
+#endif
+
+  return intersection_true;
 }
 
 
