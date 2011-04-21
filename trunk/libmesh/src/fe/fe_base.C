@@ -916,8 +916,16 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
   libmesh_assert (eps >= 0.);
   
   const Real xi   = p(0);
+#if LIBMESH_DIM > 1
   const Real eta  = p(1);
+#else
+  const Real eta  = 0.;
+#endif
+#if LIBMESH_DIM > 2
   const Real zeta = p(2);
+#else
+  const Real zeta  = 0.;
+#endif
   
   switch (t)
     {

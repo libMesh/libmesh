@@ -560,8 +560,12 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 	    xfer_ids.push_back((*it)->id());
 	    const Point &p = **it;
 	    xfer_coords.push_back(p(0));
+#if LIBMESH_DIM > 1
 	    xfer_coords.push_back(p(1));
+#endif
+#if LIBMESH_DIM > 2
 	    xfer_coords.push_back(p(2));
+#endif
 	  }
 
       //-------------------------------------
@@ -578,7 +582,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 	{
 	  coords_size.reserve(libMesh::n_processors());
 	  for (unsigned int p=0; p<ids_size.size(); p++)
-	    coords_size.push_back(3*ids_size[p]);
+	    coords_size.push_back(LIBMESH_DIM*ids_size[p]);
 	}			  
 
       // We will have lots of simultaneous receives if we are
@@ -641,19 +645,27 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 	    }
 
 	  libmesh_assert (tot_id_size <= std::min(io_blksize, n_nodes));
-	  libmesh_assert (tot_coord_size == 3*tot_id_size);
+	  libmesh_assert (tot_coord_size == LIBMESH_DIM*tot_id_size);
 
-	  coords.resize (tot_coord_size);
+	  coords.resize (3*tot_id_size);
 	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	    for (unsigned int idx=0; idx<recv_ids[pid].size(); idx++)
 	      {
 		const unsigned int local_idx = recv_ids[pid][idx] - first_node;
 		libmesh_assert ((3*local_idx+2) < coords.size());
-		libmesh_assert ((3*idx+2)      < recv_coords[pid].size());
+		libmesh_assert ((LIBMESH_DIM*idx+LIBMESH_DIM-1)      < recv_coords[pid].size());
 		
-		coords[3*local_idx+0] = recv_coords[pid][3*idx+0];
-		coords[3*local_idx+1] = recv_coords[pid][3*idx+1];
-		coords[3*local_idx+2] = recv_coords[pid][3*idx+2];
+		coords[3*local_idx+0] = recv_coords[pid][LIBMESH_DIM*idx+0];
+#if LIBMESH_DIM > 1
+		coords[3*local_idx+1] = recv_coords[pid][LIBMESH_DIM*idx+1];
+#else
+		coords[3*local_idx+1] = 0.;
+#endif
+#if LIBMESH_DIM > 2
+		coords[3*local_idx+2] = recv_coords[pid][LIBMESH_DIM*idx+2];
+#else
+		coords[3*local_idx+2] = 0.;
+#endif
 
 		n_written++;
 	      }

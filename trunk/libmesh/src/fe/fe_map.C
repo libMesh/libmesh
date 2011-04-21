@@ -111,8 +111,12 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	// living in 3D code).
 	const Real jacm2 = 1./jac/jac;
 	dxidx_map[p] = jacm2*dxdxi_map(p);
+#if LIBMESH_DIM > 1
 	dxidy_map[p] = jacm2*dydxi_map(p);
+#endif
+#if LIBMESH_DIM > 2
 	dxidz_map[p] = jacm2*dzdxi_map(p);
+#endif
 
 	JxW[p] = jac*qw[p];
 
@@ -159,9 +163,10 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	  }
 	
 	// compute the jacobian once
-	const Real dx_dxi = dxdxi_map(p), dx_deta = dxdeta_map(p),
-	           dy_dxi = dydxi_map(p), dy_deta = dydeta_map(p),
-	           dz_dxi = dzdxi_map(p), dz_deta = dzdeta_map(p);
+	const Real dx_dxi = dxdxi_map(p),
+                   dx_deta = dxdeta_map(p),
+	           dy_dxi = dydxi_map(p),
+                   dy_deta = dydeta_map(p);
 
 #if LIBMESH_DIM == 2
 	// Compute the Jacobian.  This assumes the 2D face
@@ -198,6 +203,10 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 
 	dxidz_map[p] = detadz_map[p] = 0.;
 #else
+
+	const Real dz_dxi = dzdxi_map(p),
+                   dz_deta = dzdeta_map(p);
+
 	// Compute the Jacobian.  This assumes a 2D face in
 	// 3D space.
 	//

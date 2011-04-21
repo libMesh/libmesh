@@ -296,11 +296,19 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
     out << "\n";
     
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
+#if LIBMESH_DIM > 1
       out << mesh.point(v)(1) << " ";
+#else
+      out << 0. << " ";
+#endif
     out << "\n";
     
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
+#if LIBMESH_DIM > 2
       out << mesh.point(v)(2) << " ";
+#else
+      out << 0. << " ";
+#endif
     out << "\n\n";
   }
 
@@ -593,12 +601,20 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
     out << '\n';
     
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
+#if LIBMESH_DIM > 1
       out << mesh.point(v)(1) << " ";
+#else
+      out << 0. << " ";
+#endif
     
     out << '\n';
     
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
+#if LIBMESH_DIM > 2
       out << mesh.point(v)(2) << " ";
+#else
+      out << 0. << " ";
+#endif
      
     out << '\n' << '\n';
   }
@@ -1238,12 +1254,20 @@ void GMVIO::write_binary (const std::string& fname,
 
     // write the y coordinate
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
+#if LIBMESH_DIM > 1
       temp[v] = static_cast<float>(mesh.point(v)(1));
+#else
+      temp[v] = 0.;
+#endif
     out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
 
     // write the z coordinate
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
+#if LIBMESH_DIM > 2
       temp[v] = static_cast<float>(mesh.point(v)(2));
+#else
+      temp[v] = 0.;
+#endif
     out.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
 
     delete [] temp;
@@ -1657,7 +1681,11 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 
       for ( ; it != end; ++it)   
 	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+#if LIBMESH_DIM > 1
 	  out << (*it)->point(n)(1) << " ";
+#else
+	  out << 0. << " ";
+#endif
 
       out << std::endl;
     }
@@ -1670,7 +1698,11 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
       
       for ( ; it != end; ++it)   
 	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+#if LIBMESH_DIM > 2
 	  out << (*it)->point(n)(2) << " ";
+#else
+	  out << 0. << " ";
+#endif
 
       out << std::endl << std::endl;
     }

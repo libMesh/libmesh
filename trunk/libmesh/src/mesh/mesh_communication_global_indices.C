@@ -54,11 +54,19 @@ namespace { // anonymous namespace for helper functions
       x = ((bbox.first(0) == bbox.second(0)) ? 0. :
 	   (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
 	  
+#if LIBMESH_DIM > 1
       y = ((bbox.first(1) == bbox.second(1)) ? 0. :
 	   (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
+#else
+      y = 0.,
+#endif
 	  
+#if LIBMESH_DIM > 2
       z = ((bbox.first(2) == bbox.second(2)) ? 0. :
 	   (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
+#else
+      z = 0.;
+#endif
 	
     // (iccords) in [0,max_inttype]^3
     icoords[0] = static_cast<Hilbert::inttype>(x*max_inttype);

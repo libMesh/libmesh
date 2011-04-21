@@ -98,8 +98,8 @@ namespace {
   {
   public:
     FindBBox () :
-      _vmin(3,  std::numeric_limits<Real>::max()),
-      _vmax(3, -std::numeric_limits<Real>::max())
+      _vmin(LIBMESH_DIM,  std::numeric_limits<Real>::max()),
+      _vmax(LIBMESH_DIM, -std::numeric_limits<Real>::max())
     {}
 
     FindBBox (FindBBox &other, Threads::split) :
@@ -117,7 +117,7 @@ namespace {
           const Node *node = *it;
 	  libmesh_assert (node != NULL);
 	  
-	  for (unsigned int i=0; i<3; i++)
+	  for (unsigned int i=0; i<LIBMESH_DIM; i++)
 	    {
 	      _vmin[i] = std::min(_vmin[i], (*node)(i));
 	      _vmax[i] = std::max(_vmax[i], (*node)(i));
@@ -136,7 +136,7 @@ namespace {
 	    {
 	      const Point &point = elem->point(n);
 
-	      for (unsigned int i=0; i<3; i++)
+	      for (unsigned int i=0; i<LIBMESH_DIM; i++)
 		{
 		  _vmin[i] = std::min(_vmin[i], point(i));
 		  _vmax[i] = std::max(_vmax[i], point(i));
@@ -150,7 +150,7 @@ namespace {
 #ifdef LIBMESH_HAVE_TBB_API
     void join (const FindBBox &other)
     {
-      for (unsigned int i=0; i<3; i++)
+      for (unsigned int i=0; i<LIBMESH_DIM; i++)
 	{
 	  _vmin[i] = std::min(_vmin[i], other._vmin[i]);
 	  _vmax[i] = std::max(_vmax[i], other._vmax[i]);
@@ -160,8 +160,22 @@ namespace {
 
     MeshTools::BoundingBox bbox () const
     {
-      Point pmin(_vmin[0], _vmin[1], _vmin[2]);
-      Point pmax(_vmax[0], _vmax[1], _vmax[2]);
+      Point pmin(_vmin[0]
+#if LIBMESH_DIM > 1
+                 , _vmin[1]
+#endif
+#if LIBMESH_DIM > 2
+                 , _vmin[2]
+#endif
+                );
+      Point pmax(_vmax[0]
+#if LIBMESH_DIM > 1
+                 , _vmax[1]
+#endif
+#if LIBMESH_DIM > 2
+                 , _vmax[2]
+#endif
+                );
 
       const MeshTools::BoundingBox ret_val(pmin, pmax);
 

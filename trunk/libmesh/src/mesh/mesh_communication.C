@@ -1436,7 +1436,7 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
       {
-	pts.reserve (3*n_nodes);
+	pts.reserve (LIBMESH_DIM*n_nodes);
 
 	MeshBase::node_iterator       it     = mesh.nodes_begin();
 	const MeshBase::node_iterator it_end = mesh.nodes_end();
@@ -1445,20 +1445,24 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
 	  {
 	    libmesh_assert (*it != NULL);
             libmesh_assert (!(*it)->valid_processor_id());
-            libmesh_assert ((*it)->id()*3 == pts.size());
+            libmesh_assert ((*it)->id()*LIBMESH_DIM == pts.size());
 	    
 	    const Point& p = **it;
 	    
 	    pts.push_back ( p(0) ); // x
+#if LIBMESH_DIM > 1
 	    pts.push_back ( p(1) ); // y
+#endif
+#if LIBMESH_DIM > 2
 	    pts.push_back ( p(2) ); // z	  
+#endif
 	  }
       }
     else
-      pts.resize (3*n_nodes);
+      pts.resize (LIBMESH_DIM*n_nodes);
 
     // Sanity check for all processors
-    libmesh_assert (pts.size() == (3*n_nodes));
+    libmesh_assert (pts.size() == (LIBMESH_DIM*n_nodes));
     
     // Broadcast the pts vector
     Parallel::broadcast (pts);
@@ -1469,11 +1473,16 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
       {
 	libmesh_assert (mesh.n_nodes() == 0);
 	
-	for (unsigned int i=0; i<pts.size(); i += 3)
-	  mesh.add_point (Point(pts[i+0],
-				pts[i+1],
-				pts[i+2]),
-			  i/3);
+	for (unsigned int i=0; i<pts.size(); i += LIBMESH_DIM)
+	  mesh.add_point (Point(pts[i+0]
+#if LIBMESH_DIM > 1
+				, pts[i+1]
+#endif
+#if LIBMESH_DIM > 2
+				, pts[i+2]
+#endif
+                               ),
+			  i/LIBMESH_DIM);
       }
     
     libmesh_assert (mesh.n_nodes() == n_nodes);
