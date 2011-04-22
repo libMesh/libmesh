@@ -1370,7 +1370,7 @@ const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
   libmesh_assert (b);
   p = b->get_corresponding_pos(p);
 
-  return mesh.point_locator().operator()(p);
+  return mesh.point_locator()->operator()(p);
 }
 
 #endif
