@@ -1173,7 +1173,8 @@ public:
    *
    * Note that this function uses \p MeshBase::point_locator(); users
    * may or may not want to call \p MeshBase::clear_point_locator()
-   * afterward.  Also, point_locator() is expensive.  Avoid using this
+   * afterward.  Also, point_locator() is expensive (N log N for
+   * initial construction, log N for evaluations).  Avoid using this
    * function in any context where you are already looping over
    * elements.
    *
@@ -1184,31 +1185,13 @@ public:
 
   /**
    * Returns the gradient of the solution variable \p var at the physical
-   * point \p p in the mesh.
-   *
-   * Note that this function uses \p MeshBase::point_locator(); users
-   * may or may not want to call \p MeshBase::clear_point_locator()
-   * afterward.  Also, point_locator() is expensive.  Avoid using this
-   * function in any context where you are already looping over
-   * elements.
-   *
-   * Because the element containing \p p may lie on any processor,
-   * this function is parallel-only.
+   * point \p p in the mesh, similarly to point_value.
    */
   Gradient point_gradient(unsigned int var, Point &p);
 
   /**
    * Returns the second derivative tensor of the solution variable \p var 
-   * at the physical point \p p in the mesh.
-   *
-   * Note that this function uses \p MeshBase::point_locator(); users
-   * may or may not want to call \p MeshBase::clear_point_locator()
-   * afterward.  Also, point_locator() is expensive.  Avoid using this
-   * function in any context where you are already looping over
-   * elements.
-   *
-   * Because the element containing \p p may lie on any processor,
-   * this function is parallel-only.
+   * at the physical point \p p in the mesh, similarly to point_value.
    */
   Tensor point_hessian(unsigned int var, Point &p);
  
