@@ -593,13 +593,17 @@ private:
    * Local dispatch function for getting the correct topological
    * neighbor from the Elem class
    */
-  Elem* topological_neighbor (Elem *elem, const unsigned int side);
+  Elem* topological_neighbor (Elem* elem,
+                              const PointLocatorBase* point_locator,
+                              const unsigned int side);
 
   /**
    * Local dispatch function for checking the correct has_neighbor
    * function from the Elem class
    */
-  bool has_topological_neighbor (Elem *elem, Elem *neighbor);
+  bool has_topological_neighbor (Elem* elem,
+                                 const PointLocatorBase* point_locator,
+                                 Elem* neighbor);
   
   /**
    * Data structure that holds the new nodes information.
@@ -704,24 +708,6 @@ inline unsigned char& MeshRefinement::edge_level_mismatch_limit()
 inline unsigned char& MeshRefinement::node_level_mismatch_limit()
 {
   return _node_level_mismatch_limit;
-}
-
-inline Elem* MeshRefinement::topological_neighbor(Elem *elem, const unsigned int side)
-{
-#ifdef LIBMESH_ENABLE_PERIODIC                    
-  return elem->topological_neighbor(side, _mesh, _periodic_boundaries);
-#else
-  return elem->neighbor(side);
-#endif
-}
-
-inline bool MeshRefinement::has_topological_neighbor(Elem *elem, Elem *neighbor)
-{
-#ifdef LIBMESH_ENABLE_PERIODIC
-  return elem->has_topological_neighbor(neighbor, _mesh, _periodic_boundaries);
-#else
-  return elem->has_neighbor(neighbor);
-#endif  
 }
 
 

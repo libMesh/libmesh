@@ -49,15 +49,17 @@ class DofConstraints;
 class DofMap;
 class Elem;
 class MeshBase;
-class PeriodicBoundaries;
 template <typename T> class NumericVector;
 class QBase;
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ifdef LIBMESH_ENABLE_PERIODIC
+class PeriodicBoundaries;
+class PointLocatorBase;
+#endif
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE;
-
 #endif
 
 
@@ -209,8 +211,9 @@ public:
    */
   static void compute_periodic_constraints (DofConstraints &constraints,
                                             DofMap &dof_map,
-                                            PeriodicBoundaries &boundaries,
+                                            const PeriodicBoundaries &boundaries,
                                             const MeshBase& mesh,
+                                            const PointLocatorBase* point_locator,
                                             const unsigned int variable_number,
                                             const Elem* elem);
 

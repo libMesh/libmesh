@@ -68,6 +68,13 @@ using namespace libMesh;
     {
       const Variable &var_description = _dof_map.variable(_variable_number);
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+      AutoPtr<PointLocatorBase> point_locator;
+      bool have_periodic_boundaries = !_periodic_boundaries.empty();
+      if (have_periodic_boundaries)
+        point_locator = _mesh.point_locator();
+#endif
+
       for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
 	if (var_description.active_on_subdomain((*it)->subdomain_id()))
 	  {
@@ -81,12 +88,14 @@ using namespace libMesh;
 	    // FIXME: periodic constraints won't work on a non-serial
 	    // mesh unless it's kept ghost elements from opposing
 	    // boundaries!
-	    FEInterface::compute_periodic_constraints (_constraints,
-						       _dof_map,
-						       _periodic_boundaries,
-						       _mesh,
-						       _variable_number,
-						       *it);
+            if (have_periodic_boundaries)
+	      FEInterface::compute_periodic_constraints (_constraints,
+						         _dof_map,
+						         _periodic_boundaries,
+						         _mesh,
+						         point_locator.get(),
+						         _variable_number,
+						         *it);
 #endif
 	  }
     }
@@ -1358,19 +1367,19 @@ PeriodicBoundaries::~PeriodicBoundaries()
 }
 
 const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
-					 const MeshBase &mesh,
+					 const PointLocatorBase &point_locator,
                                          const Elem *e,
-                                         unsigned int side)
+                                         unsigned int side) const
 {
   // Find a point on that side (and only that side)
 
   Point p = e->build_side(side)->centroid();
 
-  PeriodicBoundary *b = this->boundary(boundary_id);
+  const PeriodicBoundary *b = this->boundary(boundary_id);
   libmesh_assert (b);
   p = b->get_corresponding_pos(p);
 
-  return mesh.point_locator()->operator()(p);
+  return point_locator.operator()(p);
 }
 
 #endif

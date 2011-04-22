@@ -83,7 +83,7 @@ public:
   {
   }
 
-  virtual Point get_corresponding_pos(const Point & pt)
+  virtual Point get_corresponding_pos(const Point & pt) const
   {
     return pt + translation_vector;
   }
@@ -98,7 +98,7 @@ public:
     variables.insert(pb.variables.begin(), pb.variables.end());
   }
 
-  bool is_my_variable(unsigned int var_num)
+  bool is_my_variable(unsigned int var_num) const
   {
     bool a = variables.empty() || (!variables.empty() && variables.find(var_num) != variables.end());
     return a;
@@ -129,13 +129,18 @@ class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary *>
 public:
   PeriodicBoundary *boundary(unsigned int id);
 
+  const PeriodicBoundary *boundary(unsigned int id) const;
+
   PeriodicBoundaries() {}
 
   ~PeriodicBoundaries();
 
   // The periodic neighbor of \p e in direction \p side, if it
   // exists.  NULL otherwise
-  const Elem *neighbor(unsigned int boundary_id, const MeshBase &mesh, const Elem *e, unsigned int side);
+  const Elem *neighbor(unsigned int boundary_id,
+                       const PointLocatorBase &point_locator,
+                       const Elem *e,
+                       unsigned int side) const;
 
 private:
 };
@@ -146,9 +151,20 @@ private:
 // PeriodicBoundary inline member functions
 
 inline
-PeriodicBoundary *PeriodicBoundaries::boundary(unsigned int id)
+PeriodicBoundary *
+PeriodicBoundaries::boundary(unsigned int id)
 {
   iterator i = this->find(id);
+  if (i == this->end())
+    return NULL;
+  return i->second;
+}
+
+inline
+const PeriodicBoundary *
+PeriodicBoundaries::boundary(unsigned int id) const
+{
+  const_iterator i = this->find(id);
   if (i == this->end())
     return NULL;
   return i->second;

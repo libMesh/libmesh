@@ -587,7 +587,10 @@ void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-Elem* Elem::topological_neighbor (const unsigned int i, const MeshBase & mesh, PeriodicBoundaries * pb) const
+Elem* Elem::topological_neighbor (const unsigned int i,
+                                  const MeshBase & mesh,
+                                  const PointLocatorBase& point_locator,
+                                  PeriodicBoundaries * pb) const
 {
   libmesh_assert (i < this->n_neighbors());
 
@@ -610,7 +613,7 @@ Elem* Elem::topological_neighbor (const unsigned int i, const MeshBase & mesh, P
         // pointer directly from the mesh object.  Also since coarse
         // elements do not have more refined neighbors we need to make
         // sure that we don't return one of these types of neighbors.
-        neighbor = mesh.elem(pb->neighbor(*j, mesh, this, i)->id());
+        neighbor = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
         if (level() < neighbor->level())
           neighbor = neighbor->parent();
         return neighbor; 
@@ -621,14 +624,17 @@ Elem* Elem::topological_neighbor (const unsigned int i, const MeshBase & mesh, P
 }
 
 
-bool Elem::has_topological_neighbor (const Elem* elem, const MeshBase & mesh, PeriodicBoundaries * pb) const
+bool Elem::has_topological_neighbor (const Elem* elem,
+                                     const MeshBase & mesh,
+                                     const PointLocatorBase& point_locator,
+                                     PeriodicBoundaries * pb) const
 {
   // First see if this is a normal "interior" neighbor
   if (has_neighbor(elem))
     return true;
 
   for (unsigned int n=0; n<this->n_neighbors(); n++)
-    if (this->topological_neighbor(n, mesh, pb))
+    if (this->topological_neighbor(n, mesh, point_locator, pb))
       return true;
 
   return false;
