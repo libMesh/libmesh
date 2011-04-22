@@ -69,7 +69,7 @@ obj: $(objects)
 #
 # Build the examples.  Can be run in parallel with "make -jN examples"
 #
-examples: 
+examples: $(mesh_library)
 	@$(MAKE) -C examples
 
 # Only link the examples.  Deprecated, use "make examples" instead.
