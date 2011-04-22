@@ -223,7 +223,7 @@ int main(int argc, char** argv)
 
   // Linear solver tolerance.
   equation_systems.parameters.set<Real>("linear solver tolerance") =
-    TOLERANCE * TOLERANCE * TOLERANCE;
+    std::pow(TOLERANCE, 2.5);
   
   // Prints information about the system to the screen.
   equation_systems.print_info();
