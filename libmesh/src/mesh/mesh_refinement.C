@@ -300,11 +300,14 @@ bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
   // This function must be run on all processors at once
   parallel_only();
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-  // And it'll need a PointLocator for topological_neighbor() tests
+  // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  _mesh.point_locator();
+  AutoPtr<PointLocatorBase> point_locator;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  if (_periodic_boundaries && !_periodic_boundaries->empty())
+    point_locator = _mesh.point_locator();
 #endif
 
   MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
@@ -322,7 +325,8 @@ bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
-          Elem *neighbor = topological_neighbor(elem, n);      
+          Elem *neighbor =
+	    topological_neighbor(elem, point_locator.get(), n);      
 
           if (!neighbor || !neighbor->active() ||
               neighbor == remote_elem)
@@ -887,11 +891,14 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // This function must be run on all processors at once
   parallel_only();
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-  // And it'll need a PointLocator for topological_neighbor() tests
+  // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  _mesh.point_locator();
+  AutoPtr<PointLocatorBase> point_locator;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  if (_periodic_boundaries && !_periodic_boundaries->empty())
+    point_locator = _mesh.point_locator();
 #endif
 
   START_LOG ("make_coarsening_compatible()", "MeshRefinement");
@@ -991,7 +998,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 		  
 		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
                   {
-                    const Elem* neighbor = topological_neighbor(elem, n);
+                    const Elem* neighbor =
+                      topological_neighbor(elem, point_locator.get(), n);
 
                     if (neighbor != NULL &&      // I have a
 		        neighbor != remote_elem) // neighbor here
@@ -1026,7 +1034,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
 		  for (unsigned int n=0; n<elem->n_neighbors(); n++)
                   {
-                    const Elem* neighbor = topological_neighbor(elem, n);
+                    const Elem* neighbor =
+                      topological_neighbor(elem, point_locator.get(), n);
 
                     if (neighbor != NULL &&      // I have a
 		        neighbor != remote_elem) // neighbor here
@@ -1057,7 +1066,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                                  Elem *subneighbor = neighbor->child(c);
                                  if (subneighbor != remote_elem &&
                                      subneighbor->active() &&
-                                     has_topological_neighbor(subneighbor, elem))
+                                     has_topological_neighbor(subneighbor, point_locator.get(), elem))
                                    if ((subneighbor->p_level() > my_p_level &&
                                        subneighbor->p_refinement_flag() != Elem::COARSEN)
                                        || (subneighbor->p_level() == my_p_level &&
@@ -1088,7 +1097,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	      if (my_flag_changed && !_mesh.is_serial())
               for (unsigned int n=0; n != elem->n_neighbors(); ++n)
                 {
-                  Elem* neigh = topological_neighbor(elem, n);
+                  Elem* neigh =
+                    topological_neighbor(elem, point_locator.get(), n);
 
                   if (!neigh)
                     continue;
@@ -1225,11 +1235,14 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
   // This function must be run on all processors at once
   parallel_only();
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-  // And it'll need a PointLocator for topological_neighbor() tests
+  // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  _mesh.point_locator();
+  AutoPtr<PointLocatorBase> point_locator;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  if (_periodic_boundaries && !_periodic_boundaries->empty())
+    point_locator = _mesh.point_locator();
 #endif
 
   START_LOG ("make_refinement_compatible()", "MeshRefinement");
@@ -1274,7 +1287,8 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 	    
 		for (unsigned int side=0; side != elem->n_sides(); side++)
                   {
-                    Elem* neighbor = topological_neighbor(elem, side);
+                    Elem* neighbor =
+                      topological_neighbor(elem, point_locator.get(), side);
 
                     if (neighbor != NULL        && // I have a
 		        neighbor != remote_elem && // neighbor here
@@ -1343,7 +1357,8 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
 		for (unsigned int side=0; side != elem->n_sides(); side++)
                   {
-                    Elem* neighbor = topological_neighbor(elem, side);
+                    Elem* neighbor =
+                      topological_neighbor(elem, point_locator.get(), side);
 
                     if (neighbor != NULL &&      // I have a
 		        neighbor != remote_elem) // neighbor here
@@ -1374,7 +1389,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                                 if (subneighbor == remote_elem)
                                   continue;
                                 if (subneighbor->active() &&
-                                    has_topological_neighbor(subneighbor, elem))
+                                    has_topological_neighbor(subneighbor, point_locator.get(), elem))
                                   {
                                     if (subneighbor->p_level() < my_p_level &&
                                         subneighbor->p_refinement_flag() != Elem::REFINE)
@@ -1709,6 +1724,40 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
   // Finally, the new mesh needs to be prepared for use
   _mesh.prepare_for_use (/*skip_renumber =*/false);
 }
+
+
+
+Elem* MeshRefinement::topological_neighbor(Elem* elem,
+                                           const PointLocatorBase* point_locator,
+                                           const unsigned int side)
+{
+#ifdef LIBMESH_ENABLE_PERIODIC                    
+  if (_periodic_boundaries && !_periodic_boundaries->empty())
+    {
+      libmesh_assert(point_locator);
+      return elem->topological_neighbor(side, _mesh, *point_locator, _periodic_boundaries);
+    }
+#endif
+  return elem->neighbor(side);
+}
+
+
+
+bool MeshRefinement::has_topological_neighbor(Elem* elem,
+                                              const PointLocatorBase* point_locator,
+                                              Elem* neighbor)
+{
+#ifdef LIBMESH_ENABLE_PERIODIC
+  if (_periodic_boundaries && !_periodic_boundaries->empty())
+    {
+      libmesh_assert(point_locator);
+      return elem->has_topological_neighbor(neighbor, _mesh, *point_locator, _periodic_boundaries);
+    }
+#endif  
+  return elem->has_neighbor(neighbor);
+}
+
+
 
 } // namespace libMesh
 

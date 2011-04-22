@@ -50,6 +50,7 @@ class MeshRefinement;
 class Elem;
 #ifdef LIBMESH_ENABLE_PERIODIC
 class PeriodicBoundaries;
+class PointLocatorBase;
 #endif
 
 /**
@@ -178,13 +179,19 @@ class Elem : public ReferenceCountedObject<Elem>,
    * boundary, it will return a corresponding element on the opposite
    * side. 
    */
-  Elem* topological_neighbor (const unsigned int i, const MeshBase & mesh, PeriodicBoundaries * pb) const;
+  Elem* topological_neighbor (const unsigned int i,
+                              const MeshBase& mesh,
+                              const PointLocatorBase& point_locator,
+                              PeriodicBoundaries* pb) const;
 
   /**
    * @return \p true if the element \p elem in question is a neighbor or
    * topological neighbor of this element, \p false otherwise.
    */
-  bool has_topological_neighbor (const Elem* elem, const MeshBase & mesh, PeriodicBoundaries * pb) const;
+  bool has_topological_neighbor (const Elem* elem,
+                                 const MeshBase& mesh,
+                                 const PointLocatorBase& point_locator,
+                                 PeriodicBoundaries* pb) const;
 #endif   
 
   /**

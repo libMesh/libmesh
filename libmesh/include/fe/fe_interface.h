@@ -41,9 +41,13 @@ class DofMap;
 class Elem;
 class FEType;
 class FEComputeData;
-class PeriodicBoundaries;
 class Point;
 class MeshBase;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+class PeriodicBoundaries;
+class PointLocatorBase;
+#endif
 
 /**
  * This class provides an encapsulated access to all @e static
@@ -269,8 +273,9 @@ public:
    */
   static void compute_periodic_constraints (DofConstraints &constraints,
 				            DofMap &dof_map,
-				            PeriodicBoundaries &boundaries,
+				            const PeriodicBoundaries &boundaries,
 					    const MeshBase &mesh,
+                                            const PointLocatorBase* point_locator,
 				            const unsigned int variable_number,
 				            const Elem* elem);
 #endif // #ifdef LIBMESH_ENABLE_PERIODIC

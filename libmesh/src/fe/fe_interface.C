@@ -2488,8 +2488,9 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 
 void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
 				                DofMap &dof_map,
-                                                PeriodicBoundaries &boundaries,
+                                                const PeriodicBoundaries &boundaries,
 						const MeshBase &mesh,
+                                                const PointLocatorBase* point_locator,
 				                const unsigned int variable_number,
 				                const Elem* elem)
 {
@@ -2498,6 +2499,7 @@ void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
                                         dof_map,
                                         boundaries,
                                         mesh,
+                                        point_locator,
 				        variable_number,
 				        elem);
 }

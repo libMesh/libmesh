@@ -1954,8 +1954,9 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 
 void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 				           DofMap &dof_map,
-                                           PeriodicBoundaries &boundaries,
+                                           const PeriodicBoundaries &boundaries,
                                            const MeshBase &mesh,
+                                           const PointLocatorBase *point_locator,
 				           const unsigned int variable_number,
 				           const Elem* elem)
 {
@@ -2027,11 +2028,13 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
       for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const unsigned int boundary_id = *id_it;
-          PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
+          const PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
           if (periodic && periodic->is_my_variable(variable_number))
             {
+              libmesh_assert(point_locator);
+
               // Get pointers to the element's neighbor.
-              const Elem* neigh = boundaries.neighbor(boundary_id, mesh, elem, s);
+              const Elem* neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
 
               // h refinement constraints:
               // constrain dofs shared between
