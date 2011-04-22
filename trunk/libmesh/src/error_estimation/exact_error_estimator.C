@@ -196,6 +196,10 @@ void ExactErrorEstimator::estimate_error (const System& system,
 	computed_var_on_parent.resize(error_per_cell.size(), false);
 #endif
 
+      // TODO: this ought to be threaded (and using subordinate
+      // MeshFunction objects in each thread rather than a single
+      // master)
+
       // Iterate over all the active elements in the mesh
       // that live on this processor.
       MeshBase::const_element_iterator
