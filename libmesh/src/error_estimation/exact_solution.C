@@ -444,6 +444,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   //
   // Begin the loop over the elements
   //
+  // TODO: this ought to be threaded (and using subordinate
+  // MeshFunction objects in each thread rather than a single
+  // master)
   MeshBase::const_element_iterator       el     = _mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = _mesh.active_local_elements_end(); 
 
