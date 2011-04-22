@@ -1732,7 +1732,7 @@ Number System::point_value(unsigned int var, Point &p)
   const unsigned int dim = mesh.mesh_dimension();
 
   // Use an existing PointLocator or create a new one
-  AutoPtr<PointLocatorBase> locator_ptr = mesh.point_locator();
+  AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
   
   // Get a pointer to the element that contains P
@@ -1815,7 +1815,7 @@ Gradient System::point_gradient(unsigned int var, Point &p)
   const unsigned int dim = mesh.mesh_dimension();
   
   // Use an existing PointLocator or create a new one
-  AutoPtr<PointLocatorBase> locator_ptr = mesh.point_locator();
+  AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
   
   // Get a pointer to the element that contains P
@@ -1916,7 +1916,7 @@ Tensor System::point_hessian(unsigned int var, Point &p)
   const unsigned int dim = mesh.mesh_dimension();
   
   // Use an existing PointLocator or create a new one
-  AutoPtr<PointLocatorBase> locator_ptr = mesh.point_locator();
+  AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
   
   // Get a pointer to the element that contains P

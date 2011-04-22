@@ -72,7 +72,7 @@ using namespace libMesh;
       AutoPtr<PointLocatorBase> point_locator;
       bool have_periodic_boundaries = !_periodic_boundaries.empty();
       if (have_periodic_boundaries)
-        point_locator = _mesh.point_locator();
+        point_locator = _mesh.sub_point_locator();
 #endif
 
       for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)

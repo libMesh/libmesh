@@ -307,7 +307,7 @@ bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (_periodic_boundaries && !_periodic_boundaries->empty())
-    point_locator = _mesh.point_locator();
+    point_locator = _mesh.sub_point_locator();
 #endif
 
   MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
@@ -898,7 +898,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (_periodic_boundaries && !_periodic_boundaries->empty())
-    point_locator = _mesh.point_locator();
+    point_locator = _mesh.sub_point_locator();
 #endif
 
   START_LOG ("make_coarsening_compatible()", "MeshRefinement");
@@ -1242,7 +1242,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (_periodic_boundaries && !_periodic_boundaries->empty())
-    point_locator = _mesh.point_locator();
+    point_locator = _mesh.sub_point_locator();
 #endif
 
   START_LOG ("make_refinement_compatible()", "MeshRefinement");

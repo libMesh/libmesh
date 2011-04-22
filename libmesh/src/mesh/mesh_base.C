@@ -288,7 +288,23 @@ unsigned int MeshBase::recalculate_n_partitions()
 
 
 
-AutoPtr<PointLocatorBase> MeshBase::point_locator () const
+const PointLocatorBase& MeshBase::point_locator () const
+{
+  libmesh_deprecated();
+
+  if (_point_locator.get() == NULL)
+    {
+      // PointLocator construction may not be safe within threads
+      libmesh_assert(!Threads::in_threads);
+
+      _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
+    }
+
+  return *_point_locator;
+}
+
+
+AutoPtr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
   if (_point_locator.get() == NULL)
     {

@@ -556,11 +556,21 @@ public:
   unsigned int recalculate_n_partitions();
 
   /**
+   * \p returns a pointer to a \p PointLocatorBase object for this
+   * mesh, constructing a master PointLocator first if necessary.
+   * This should never be used in threaded or non-parallel_only code,
+   * and so is deprecated.
+   */
+  const PointLocatorBase& point_locator () const;
+
+  /**
    * \p returns a pointer to a subordinate \p PointLocatorBase object
    * for this mesh, constructing a master PointLocator first if
-   * necessary.
+   * necessary.  This should not be used in threaded or
+   * non-parallel_only code unless the master has already been
+   * constructed.
    */
-  AutoPtr<PointLocatorBase> point_locator () const;
+  AutoPtr<PointLocatorBase> sub_point_locator () const;
 
   /**
    * Releases the current \p PointLocator object.
