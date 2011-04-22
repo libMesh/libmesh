@@ -237,6 +237,34 @@ bool MeshTools::BoundingBox::intersect (const BoundingBox & other_box) const
   return intersection_true;
 }
 
+bool MeshTools::BoundingBox::contains_point (const Point & p) const
+{
+  // Make local variables first to make thiings more clear in a moment
+  Real my_min_x = this->first(0);
+  Real my_max_x = this->second(0);
+  bool x_int = is_between(my_min_x, p(0), my_max_x);
+
+  bool intersection_true = x_int;
+
+#if LIBMESH_DIM > 1
+  Real my_min_y = this->first(1);
+  Real my_max_y = this->second(1);
+  bool y_int = is_between(my_min_y, p(1), my_max_y);
+
+  intersection_true = intersection_true && y_int;
+#endif
+
+
+#if LIBMESH_DIM > 2
+  Real my_min_z = this->first(2);
+  Real my_max_z = this->second(2);
+  bool z_int = is_between(my_min_z, p(2), my_max_z);
+
+  intersection_true = intersection_true && z_int;
+#endif
+
+  return intersection_true;
+}
 
 // ------------------------------------------------------------
 // MeshTools functions
