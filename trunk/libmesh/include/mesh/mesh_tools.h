@@ -95,6 +95,8 @@ namespace MeshTools
 
     bool intersect (const BoundingBox &) const;
 
+    bool contains_point (const Point &) const;
+
   private:
   };
   
