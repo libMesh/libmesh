@@ -288,7 +288,7 @@ unsigned int MeshBase::recalculate_n_partitions()
 
 
 
-const PointLocatorBase & MeshBase::point_locator () const
+AutoPtr<PointLocatorBase> MeshBase::point_locator () const
 {
   if (_point_locator.get() == NULL)
     {
@@ -298,7 +298,7 @@ const PointLocatorBase & MeshBase::point_locator () const
       _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
     }
 
-  return *_point_locator;
+  return PointLocatorBase::build(TREE, *this, _point_locator.get());
 }
 
 

@@ -34,6 +34,7 @@
 #include "libmesh_common.h"
 #include "multi_predicates.h"
 #include "partitioner.h" // AutoPtr needs a real declaration
+#include "point_locator_base.h"
 #include "variant_filter_iterator.h"
 
 namespace libMesh
@@ -44,7 +45,6 @@ class Elem;
 class Node;
 class Point;
 class BoundaryInfo;
-class PointLocatorBase;
 class MeshData;
 
 
@@ -556,10 +556,11 @@ public:
   unsigned int recalculate_n_partitions();
 
   /**
-   * \p returns a reference to a \p PointLocatorBase object for this mesh.
-   * 
+   * \p returns a pointer to a subordinate \p PointLocatorBase object
+   * for this mesh, constructing a master PointLocator first if
+   * necessary.
    */
-  const PointLocatorBase & point_locator () const;
+  AutoPtr<PointLocatorBase> point_locator () const;
 
   /**
    * Releases the current \p PointLocator object.
