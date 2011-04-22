@@ -1171,7 +1171,7 @@ public:
    * Returns the value of the solution variable \p var at the physical
    * point \p p in the mesh.
    *
-   * Note that this function uses \p MeshBase::point_locator(); users
+   * Note that this function uses \p MeshBase::sub_point_locator(); users
    * may or may not want to call \p MeshBase::clear_point_locator()
    * afterward.  Also, point_locator() is expensive (N log N for
    * initial construction, log N for evaluations).  Avoid using this
