@@ -147,10 +147,10 @@ void PatchRecoveryErrorEstimator::estimate_error (const System& system,
 				       error_per_cell)
 			 );
 
-  // Each processor has now computed the error contribuions
+  // Each processor has now computed the error contributions
   // for its local elements, and error_per_cell contains 0 for all the
-  // non-local elements.  Summing the vector will provide the L_oo value
-  // for each element, local or remote
+  // non-local elements.  Summing the vector will provide the true
+  // value for each element, local or remote
   this->reduce_error(error_per_cell);
   
   // If we used a non-standard solution before, now is the time to fix
