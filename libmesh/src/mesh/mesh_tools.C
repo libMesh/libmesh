@@ -1000,8 +1000,12 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
   if (libMesh::n_processors() == 1)
     return;
 
-  libmesh_assert(Parallel::verify(mesh.max_node_id()));
-  std::vector<bool> node_touched_by_me(mesh.max_node_id(), false);
+  // We want this test to be valid even when called even after nodes
+  // have been added asynchonously but before they're renumbered
+  unsigned int parallel_max_node_id = mesh.max_node_id();
+  Parallel::max(parallel_max_node_id);
+
+  std::vector<bool> node_touched_by_me(parallel_max_node_id, false);
 
   const MeshBase::const_element_iterator el_end =
     mesh.active_local_elements_end();
