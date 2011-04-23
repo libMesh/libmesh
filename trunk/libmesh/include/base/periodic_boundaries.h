@@ -37,6 +37,7 @@
 #include "point.h"
 #include "vector_value.h" // RealVectorValue
 #include "libmesh.h" // libMesh::invalid_uint
+#include "point_locator_base.h"
 
 namespace libMesh {
 
