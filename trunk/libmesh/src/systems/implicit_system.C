@@ -484,10 +484,11 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
       }
 
   // Finally, assemble the jacobian at the non-perturbed parameter
-  // values
+  // values.  Ignore assemble_before_solve; if we had a good
+  // non-perturbed matrix before we've already overwritten it.
   oldparameters.value_copy(parameters);
 
-  if (this->assemble_before_solve)
+  // if (this->assemble_before_solve)
     {
       // Build the Jacobian
       this->assembly(false, true);
