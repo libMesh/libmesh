@@ -8,6 +8,8 @@
 #include "equation_systems.h"
 #include "exact_solution.h"
 
+using namespace libMesh;
+
 unsigned int dim = 2; // This gets overridden by most mesh formats
 
 int main(int argc, char** argv)
