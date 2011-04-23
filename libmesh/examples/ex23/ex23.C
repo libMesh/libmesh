@@ -37,6 +37,9 @@
 #include "simple_rb.h"
 #include "assembly.h"
 
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
 // In this example problem we use the Certified Reduced Basis method
 // to solve a steady convection-diffusion problem on the unit square.
 // The reduced basis method relies on an expansion of the PDE in the

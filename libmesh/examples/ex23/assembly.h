@@ -11,6 +11,18 @@
 // rbOOmit includes
 #include "rb_theta.h"
 
+// Bring in bits from the libMesh namespace.
+// Just the bits we're using, since this is a header.
+using libMesh::DirichletDofAssembly;
+using libMesh::ElemAssembly;
+using libMesh::FEInterface;
+using libMesh::FEMContext;
+using libMesh::Number;
+using libMesh::Point;
+using libMesh::RBTheta;
+using libMesh::Real;
+using libMesh::RealGradient;
+
 // Functors for the parameter-dependent part of the affine decomposition of the PDE
 // The RHS and outputs just require a constant value of 1, so use a default RBTheta object there
 struct ThetaA0 : RBTheta { virtual Number evaluate(const std::vector<Real>& )   { return 0.05;  } };

@@ -23,6 +23,13 @@
 #include "rb_system.h"
 #include "fe_base.h"
 
+// Bring in bits from the libMesh namespace.
+// Just the bits we're using, since this is a header.
+using libMesh::EquationSystems;
+using libMesh::FEMContext;
+using libMesh::RBSystem;
+using libMesh::Real;
+
 // A simple subclass of RBSystem since we need to specialize
 // get_SCM_lower_bound and get_SCM_upper_bound to return
 // (a lower bound for) the coercivity constant for this problem,
