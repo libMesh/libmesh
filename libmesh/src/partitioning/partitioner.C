@@ -554,6 +554,10 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
           node->processor_id(filled_request[i]);           //  the number of partitions may
         }                                                  //  not equal the number of processors
     }
+
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_node_procids(mesh);
+#endif
   
   STOP_LOG("set_node_processor_ids()","Partitioner");
 }
