@@ -545,7 +545,7 @@ inline
 DenseMatrix<T>::DenseMatrix(const unsigned int m,
 			    const unsigned int n)
   : DenseMatrixBase<T>(m,n),
-#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_USE_REAL_NUMBERS)
+#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_USE_REAL_NUMBERS) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
     use_blas_lapack(true),
 #else
     use_blas_lapack(false),
