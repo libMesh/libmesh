@@ -46,7 +46,7 @@ FEMSystem::FEMSystem (EquationSystems& es,
                       const unsigned int number)
   : Parent(es, name, number),
     fe_reinit_during_postprocess(true),
-    numerical_jacobian_h(1.e-6),
+    numerical_jacobian_h(TOLERANCE),
     verify_analytic_jacobians(0.0)
 {
 }
