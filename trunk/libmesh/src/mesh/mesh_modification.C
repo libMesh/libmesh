@@ -358,10 +358,9 @@ void UnstructuredMesh::all_first_order ()
 
   STOP_LOG("all_first_order()", "Mesh");
 
-// On hanging nodes that used to also be second order nodes, we might
-// now have an invalid nodal processor_id()
-  if (this->unpartitioned_elements_begin() != this->unpartitioned_elements_end())
-    Partitioner::set_node_processor_ids(*this);
+  // On hanging nodes that used to also be second order nodes, we
+  // might now have an invalid nodal processor_id()
+  Partitioner::set_node_processor_ids(*this);
 
   // delete or renumber nodes, etc
   this->prepare_for_use(/*skip_renumber =*/ false);
