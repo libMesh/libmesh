@@ -66,8 +66,8 @@ fe_order = 2
 # Use analytic jacobians instead of numerical ones?
 analytic_jacobians = true
 
-# Verify analytic jacobians against numerical ones?
-verify_analytic_jacobians = 1.e-3
+# Don't verify analytic jacobians against numerical ones.
+verify_analytic_jacobians = 0.
 
 # Detailed debugging options
 print_solution_norms = false
