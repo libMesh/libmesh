@@ -67,7 +67,7 @@ fe_order = 2
 analytic_jacobians = true
 
 # Verify analytic jacobians against numerical ones?
-verify_analytic_jacobians = 1.e-6
+verify_analytic_jacobians = 1.e-4
 
 # Detailed debugging options
 print_solution_norms = false

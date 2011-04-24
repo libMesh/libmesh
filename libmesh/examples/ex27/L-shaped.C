@@ -130,7 +130,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
       
   unsigned int n_qpoints = c.side_qrule->n_points();
 
-  Real penalty = 1.e10;
+  const Real penalty = 1./(TOLERANCE*TOLERANCE);
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
