@@ -288,7 +288,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                                 << " detected in analytic jacobian on element "
                                 << _femcontext.elem->id()
 			        << ", side "
-                                << _femcontext.side << '!' << std::endl;
+                                << static_cast<unsigned int>(_femcontext.side) << '!' << std::endl;
 
                   unsigned int old_precision = libMesh::out.precision();
                   libMesh::out.precision(16);
