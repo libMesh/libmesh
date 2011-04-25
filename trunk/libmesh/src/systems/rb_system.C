@@ -289,11 +289,6 @@ void RBSystem::process_parameters_file ()
   impose_internal_fluxes = infile("impose_internal_fluxes",
                                    impose_internal_fluxes);
 
-  // Set boolean which turns on/off storing a second set of affine
-  // operators and vectors which do not have Dirichlet BCs enforced
-  store_non_dirichlet_operators = infile("store_non_dirichlet_operators",
-                                          store_non_dirichlet_operators);
-
   // Set boolean flag to indicate whether or not we initialize
   // mesh dependent matrices and vectors when init_data
   // is called. Default value is true.
@@ -401,7 +396,6 @@ void RBSystem::process_parameters_file ()
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "initializing mesh-dependent data structures? "
                << initialize_mesh_dependent_data << std::endl;
-  libMesh::out << "store non-Dirichlet affine operators? " << store_non_dirichlet_operators << std::endl;
   libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
   libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
