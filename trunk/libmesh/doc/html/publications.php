@@ -10,7 +10,7 @@
 <div class="content">
 <h2>Please use the following citation to reference libMesh</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter libmesh.bib  -->
@@ -48,7 +48,7 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 </table><a name="Dissertations"></a>
 <h2>Dissertations & Theses</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter theses.bib  -->
@@ -220,7 +220,7 @@ J.&nbsp;W. Peterson.
 </table><a name="Preprints"></a>
 <h2>Preprints</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter preprints.bib  -->
@@ -230,7 +230,88 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2010b">1</a>]
+[<a name="Carey_2011">1</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;Carey and G.&nbsp;F. Carey.
+ Flexible patch post-processing recovery strategies for solution
+  enhancement and adaptive mesh refinement.
+ <em>International Journal for Numerical Methods in Engineering</em>,
+  pages n/a-n/a, 2011.
+ <a href="http://dx.doi.org/10.1002/nme.3146">http://dx.doi.org/10.1002/nme.3146</a>.
+<a name="Carey_2011"></a><pre>
+@article{Carey_2011,
+  author = {V.~Carey and G.~F.~Carey},
+  title = {Flexible patch post-processing recovery strategies for solution enhancement and adaptive mesh refinement},
+  journal = {International Journal for Numerical Methods in Engineering},
+  note = {\url{http://dx.doi.org/10.1002/nme.3146}},
+  pages = {n/a--n/a},
+  year = {2011}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Arbree_2011">2</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
+ Heterogeneous Subsurface Scattering Using the Finite Element
+  Method.
+ <em>PREPRINT, IEEE Transactions on Visualization and Computer
+  Graphics</em>, 17, 2011.
+ <a href="http://dx.doi.org/10.1109/TVCG.2010.117">http://dx.doi.org/10.1109/TVCG.2010.117</a>.
+<a name="Arbree_2011"></a><pre>
+@article{Arbree_2011,
+  author = {A.~Arbree and B.~Walter and K.~Bala},
+  title = {{Heterogeneous Subsurface Scattering Using the Finite Element Method}},
+  journal = {PREPRINT, IEEE Transactions on Visualization and Computer Graphics},
+  year = 2011,
+  volume = 17,
+  note = {\url{http://dx.doi.org/10.1109/TVCG.2010.117}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Curtis_2011">3</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
+ On the implementation of an interior-point algorithm for nonlinear
+  optimization with inexact step computations.
+ <em>PREPRINT</em>, 2011.
+ 
+  <a href="http://fgb.informatik.unibas.ch/people/oschenk/publications/references/imips.pdf">http://fgb.informatik.unibas.ch/people/oschenk/publications/references/imips.pdf</a>.
+<a name="Curtis_2011"></a><pre>
+@article{Curtis_2011,
+  author = {F.~E.~Curtis and J.~Huber and O.~Schenk and A.~W\"{a}chter},
+  title = {{On the implementation of an interior-point algorithm for nonlinear
+              optimization with inexact step computations}},
+  journal = {PREPRINT},
+  year = 2011,
+  note = {\url{http://fgb.informatik.unibas.ch/people/oschenk/publications/references/imips.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Eftang_2010b">4</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -256,7 +337,7 @@ J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2010">2</a>]
+[<a name="Griffith_2010">5</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -281,7 +362,7 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010b">3</a>]
+[<a name="Knezevic_2010b">6</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
@@ -289,7 +370,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
   the parametrized unsteady Boussinesq equations.
  <em>PREPRINT, Accepted in Mathematical Models and Methods in Applied
   Sciences</em>, August 2010.
- <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Nov09.pdf</a>.
+ <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Sep2010.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Sep2010.pdf</a>.
 <a name="Knezevic_2010b"></a><pre>
 @article{Knezevic_2010b,
   author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
@@ -300,7 +381,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
   month = aug,
   year = 2010,
   note = {\url{http://augustine.mit.edu/methodology/
-     papers/atp_M3AS_preprint_Nov09.pdf}}
+     papers/atp_M3AS_preprint_Sep2010.pdf}}
 }
 </pre>
 
@@ -311,37 +392,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">4</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
- High-Fidelity Real-Time Simulation on Deployed Platforms.
- <em>PREPRINT, Computers &amp; Fluids</em>, July 2010.
- Special Issue: Proceedings of the Symposium on High Accuracy Flow
-  Simulations (HAFS), &Eacute;cole Polytechnique F&eacute;d&eacute;rale de Lausanne,
-  February 15-16, 2010,
-  DOI:&nbsp;<a href="http://dx.doi.org/10.1016/j.compfluid.2010.07.007">http://dx.doi.org/10.1016/j.compfluid.2010.07.007</a>.
-<a name="Huynh_2010"></a><pre>
-@article{Huynh_2010,
-  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and J.~W.~Peterson and A.~T.~Patera},
-  title = {{High-Fidelity Real-Time Simulation on Deployed Platforms}},
-  journal = {PREPRINT, Computers \& Fluids},
-  year = {2010},
-  month = jul,
-  note = {Special Issue: Proceedings of the Symposium on High Accuracy Flow Simulations (HAFS),
-    \'{E}cole Polytechnique F\'{e}d\'{e}rale de Lausanne, February 15--16, 2010,
-    DOI:~\url{http://dx.doi.org/10.1016/j.compfluid.2010.07.007}    }
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Berrone_2010">5</a>]
+[<a name="Berrone_2010">7</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone and M.&nbsp;Verani.
@@ -368,7 +419,7 @@ S.&nbsp;Berrone and M.&nbsp;Verani.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2010a">6</a>]
+[<a name="Eftang_2010a">8</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -376,7 +427,7 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
   Partial Differential Equations.
  <em>PREPRINT, Mathematical and Computer Modelling of Dynamical
   Systems</em>, revised July 2010.
- <a href="http://augustine.mit.edu/methodology/papers/atp_MCMDS_preprint_Apr2010.pdf">http://augustine.mit.edu/methodology/papers/atp_MCMDS_preprint_Apr2010.pdf</a>.
+ <a href="http://augustine.mit.edu/methodology/papers/atp_MCMDS_revised_Jul2010.pdf">http://augustine.mit.edu/methodology/papers/atp_MCMDS_revised_Jul2010.pdf</a>.
 <a name="Eftang_2010a"></a><pre>
 @article{Eftang_2010a,
   author = {J.~L.~Eftang and D.~J.~Knezevic and A.~T.~Patera},
@@ -384,7 +435,7 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
   journal = {PREPRINT, Mathematical and Computer Modelling of Dynamical Systems},
   year = {revised July 2010},
   note = {\url{http://augustine.mit.edu/methodology/
-     papers/atp_MCMDS_preprint_Apr2010.pdf}}
+     papers/atp_MCMDS_revised_Jul2010.pdf}}
 }
 </pre>
 
@@ -395,33 +446,7 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010">7</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
- A High-Performance Parallel Implementation of the Certified Reduced
-  Basis Method.
- <em>PREPRINT, Comput. Meth. Appl. Mech. Eng.</em>, submitted May 2010.
- <a href="http://www.tacc.utexas.edu/~peterson/articles/2010_rboomit_cmame_preprint.pdf">http://www.tacc.utexas.edu/~peterson/articles/2010_rboomit_cmame_preprint.pdf</a>.
-<a name="Knezevic_2010"></a><pre>
-@article{Knezevic_2010,
-  author = {D.~J.~Knezevic and J.~W.~Peterson},
-  title = {{A High-Performance Parallel Implementation of the Certified Reduced Basis Method}},
-  journal = {PREPRINT, Comput. Meth. Appl. Mech. Eng.},
-  year = {submitted May 2010},
-  note = {\url{http://www.tacc.utexas.edu/~peterson/
-     articles/2010_rboomit_cmame_preprint.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Peterson_2010b">8</a>]
+[<a name="Peterson_2010b">9</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
@@ -447,7 +472,7 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 </table><a name="Articles"></a>
 <h2>2011</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter eleven.bib  -->
@@ -457,7 +482,101 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2011">1</a>]
+[<a name="AufDerMaur_2011">1</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&nbsp;Pecchia, and
+  A.&nbsp;Di&nbsp;Carlo.
+ The multiscale paradigm in electronic device simulation.
+ <em>IEEE Transactions on Electron Devices</em>, 58(5):1425-1432, May
+  2011.
+ <a href="http://dx.doi.org/10.1109/TED.2011.2114666">http://dx.doi.org/10.1109/TED.2011.2114666</a>.
+<a name="AufDerMaur_2011"></a><pre>
+@article{AufDerMaur_2011,
+  author = {Auf der Maur, M. and Penazzi, G. and Romano, G. and Sacconi, F. and Pecchia, A. and Di Carlo, A.},
+  journal = {IEEE Transactions on Electron Devices},
+  title = {The Multiscale Paradigm in Electronic Device Simulation},
+  year = {2011},
+  month = may,
+  volume = {58},
+  number = {5},
+  pages = {1425--1432},
+  note = {\url{http://dx.doi.org/10.1109/TED.2011.2114666}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Huynh_2010">2</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
+ High-Fidelity Real-Time Simulation on Deployed Platforms.
+ <em>Computers &amp; Fluids</em>, 43(1):74-81, April 2011.
+ Special issue dedicated to Prof. Michel Deville, Symposium on High
+  Accuracy Flow Simulations (HAFS), &Eacute;cole Polytechnique F&eacute;d&eacute;rale de
+  Lausanne, February 15-16, 2010,
+  DOI:&nbsp;<a href="http://dx.doi.org/10.1016/j.compfluid.2010.07.007">http://dx.doi.org/10.1016/j.compfluid.2010.07.007</a>.
+<a name="Huynh_2010"></a><pre>
+@article{Huynh_2010,
+  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and J.~W.~Peterson and A.~T.~Patera},
+  title = {{High-Fidelity Real-Time Simulation on Deployed Platforms}},
+  journal = {Computers \& Fluids},
+  year = {2011},
+  month = apr,
+  volume = 43,
+  number = 1,
+  pages = {74--81},
+  note = {Special issue dedicated to Prof. Michel Deville, 
+          Symposium on High Accuracy Flow Simulations (HAFS),
+    \'{E}cole Polytechnique F\'{e}d\'{e}rale de Lausanne, February 15--16, 2010,
+DOI:~\url{http://dx.doi.org/10.1016/j.compfluid.2010.07.007}    }
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Knezevic_2011">3</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
+ A High-Performance Parallel Implementation of the Certified Reduced
+  Basis Method.
+ <em>Comput. Meth. Appl. Mech. Eng.</em>, 200(13-16):1455-1466, March
+  2011.
+ <a href="http://dx.doi.org/10.1016/j.cma.2010.12.026">http://dx.doi.org/10.1016/j.cma.2010.12.026</a>.
+<a name="Knezevic_2011"></a><pre>
+@article{Knezevic_2011,
+  author = {D.~J.~Knezevic and J.~W.~Peterson},
+  title = {{A High-Performance Parallel Implementation of the Certified Reduced Basis Method}},
+  journal = {Comput. Meth. Appl. Mech. Eng.},
+  year = {2011},
+  pages = {1455--1466},
+  volume = 200,
+  number = {13--16},
+  month = mar,
+  note = {\url{http://dx.doi.org/10.1016/j.cma.2010.12.026}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Botti_2011">4</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
@@ -484,9 +603,72 @@ L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
 
 </td>
 </tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hilscher_2011">5</a>]
+</td>
+<td class="bibtexitem">
+P.&nbsp;P. Hilscher, K.&nbsp;Imadera, J.&nbsp;Li, and Y.&nbsp;Kishimoto.
+ Towards gyrokinetic simulations of multi-scale micro-turbulence in
+  tokamaks.
+ In Takeshi Yao, editor, <em>Zero-Carbon Energy Kyoto 2010</em>, Green
+  Energy and Technology, pages 239-244. Springer Japan, 2011.
+ <a href="http://dx.doi.org/10.1007/978-4-431-53910-0_31">http://dx.doi.org/10.1007/978-4-431-53910-0_31</a>.
+<a name="Hilscher_2011"></a><pre>
+@incollection{Hilscher_2011,
+  author = {P.~P. Hilscher and K.~Imadera and J.~Li and Y.~Kishimoto},
+  affiliation = {Department of Fundamental Energy Science, 
+                  Graduate School of Energy Science, Kyoto University, 
+                  Gokasho, Uji, Kyoto, 611-0011 Japan},
+  title = {Towards Gyrokinetic Simulations of Multi-Scale Micro-Turbulence in Tokamaks},
+  booktitle = {Zero-Carbon Energy Kyoto 2010},
+  series = {Green Energy and Technology},
+  editor = {Yao, Takeshi},
+  publisher = {Springer Japan},
+  pages = {239--244},
+  note = {\url{http://dx.doi.org/10.1007/978-4-431-53910-0_31}},
+  year = {2011}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Corsini_2011">6</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Corsini, F.&nbsp;Rispoli, and T.&nbsp;E. Tezduyar.
+ Stabilized finite element computation of NOx emission in aero-engine
+  combustors.
+ <em>International Journal for Numerical Methods in Fluids</em>,
+  65(1-3):254-270, January 2011.
+ <a href="http://dx.doi.org/10.1002/fld.2451">http://dx.doi.org/10.1002/fld.2451</a>.
+<a name="Corsini_2011"></a><pre>
+@article{Corsini_2011,
+  author = {A.~Corsini and F.~Rispoli and T.~E.~Tezduyar},
+  title = {{Stabilized finite element computation of NOx emission in aero-engine combustors}},
+  journal = {International Journal for Numerical Methods in Fluids},
+  year = 2011,
+  volume = 65,
+  number = {1--3},
+  pages = {254--270},
+  month = jan,
+  note = {\url{http://dx.doi.org/10.1002/fld.2451}}
+}
+</pre>
+
+
+</td>
+</tr>
 </table><h2>2010</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter ten.bib  -->
@@ -1069,7 +1251,7 @@ L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.
 </tr>
 </table><h2>2009</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter nine.bib  -->
@@ -1859,7 +2041,7 @@ B.&nbsp;S. Kirk.
 </tr>
 </table><h2>2008</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter eight.bib  -->
@@ -2486,7 +2668,7 @@ Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
 </tr>
 </table><h2>2007</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter seven.bib  -->
@@ -2697,7 +2879,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, D.&nbsp;J. Knezevic, and B.&nbsp;T. Murra
 </tr>
 </table><h2>2006</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter six.bib  -->
@@ -2944,7 +3126,7 @@ D.&nbsp;Dreyer, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
 </tr>
 </table><h2>2005</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter five.bib  -->
@@ -2984,7 +3166,7 @@ G.&nbsp;F. Carey, W.&nbsp;Barth, B.&nbsp;S. Kirk, and J.&nbsp;W. Peterson.
 </tr>
 </table><h2>2004</h2>
 
-<!-- This document was automatically generated with bibtex2html 1.95
+<!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
      with the following command:
      bibtex2html -d -r --nodoc --single -nofooter four.bib  -->
