@@ -231,7 +231,7 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
   dest.resize(this->m());
   
   // Short-circuit if the matrix is empty
-  if(this->m() == 0)
+  if(this->m() == 0 || this->n() == 0)
     return;
 
   if (this->use_blas_lapack)
