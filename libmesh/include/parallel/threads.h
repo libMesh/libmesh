@@ -318,6 +318,8 @@ namespace Threads
   {
   public:
     spin_mutex() {}
+    void lock () {}
+    void unlock () {}
 
     class scoped_lock 
     {
