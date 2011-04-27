@@ -54,10 +54,24 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
   std::vector<Real> psi;
   psi.reserve(matsize);
   Real x = p(0), y=0., z=0.;
+  unsigned int npows = order+1;
+  std::vector<Real> xpow(npows,1.), ypow, zpow;
+  for (unsigned int i=1; i != npows; ++i)
+    xpow[i] = xpow[i-1] * x;
   if (dim > 1)
-    y = p(1);
+    {
+      y = p(1);
+      ypow.resize(npows,1.);
+      for (unsigned int i=1; i != npows; ++i)
+        ypow[i] = ypow[i-1] * y;
+    }
   if (dim > 2)
-    z = p(2);
+    {
+      z = p(2);
+      zpow.resize(npows,1.);
+      for (unsigned int i=1; i != npows; ++i)
+        zpow[i] = zpow[i-1] * z;
+    }
     
   // builds psi vector of form 1 x y z x^2 xy xz y^2 yz z^2 etc..
   // I haven't added 1D support here
@@ -73,9 +87,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	      for (int yexp=poly_deg-xexp; yexp >= 0; yexp--)
                 {
                   int zexp = poly_deg - xexp - yexp;
-		  psi.push_back(std::pow(x,static_cast<Real>(xexp))*
-				std::pow(y,static_cast<Real>(yexp))*
-				std::pow(z,static_cast<Real>(zexp)));
+		  psi.push_back(xpow[xexp]*ypow[yexp]*zpow[zexp]);
                 }
 	    break;
 	  }
@@ -86,8 +98,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	    for (int xexp=poly_deg; xexp >= 0; xexp--) // use an int for xexp since we -- it
               {
                 int yexp = poly_deg - xexp;
-		psi.push_back(std::pow(x,static_cast<Real>(xexp))*
-			      std::pow(y,static_cast<Real>(yexp)));
+		psi.push_back(xpow[xexp]*ypow[yexp]);
               }
 	    break;
 	  }
@@ -96,7 +107,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 	case 1:
 	  {
             int xexp = poly_deg;
-	    psi.push_back(std::pow(x,static_cast<Real>(xexp)));
+	    psi.push_back(xpow[xexp]);
 	    break;
 	  }
 	  
