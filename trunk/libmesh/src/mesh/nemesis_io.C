@@ -1161,9 +1161,6 @@ void Nemesis_IO::read (const std::string& )
 
 void Nemesis_IO::write (const std::string& base_filename)
 {
-  libMesh::out << "In Nemesis_IO::write()" << std::endl;
-  libMesh::out << "Writing base_filename=" << base_filename << std::endl;
-
   // Get a constant reference to the mesh for writing 
   const MeshBase & mesh = MeshOutput<ParallelMesh>::mesh();
   
@@ -1171,8 +1168,29 @@ void Nemesis_IO::write (const std::string& base_filename)
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
   
   nemhelper->create(nemesis_filename);
+
+  // Initialize data structures and write some global Nemesis-specifc data, such as
+  // communication maps, to file.
   nemhelper->initialize(nemesis_filename,mesh);
-  // nemhelper->write_nodal_coordinates(mesh);
+
+  // Call the Nemesis-specialized version of write_nodal_coordinates() to write
+  // the nodal coordinates.
+  nemhelper->write_nodal_coordinates(mesh);
+
+  // Call the Nemesis-specialized version of write_elements() to write
+  // the elements.  Note: Must write a zero if a given global block ID has no
+  // elements...
+  nemhelper->write_elements(mesh);
+
+  // Call our specialized function to write the nodesets
+  nemhelper->write_nodesets(mesh);
+
+  // Call our specialized write_sidesets() function to write the sidesets to file
+  nemhelper->write_sidesets(mesh);
+
+  // Not sure if this is really necessary, but go ahead and flush the file
+  // once we have written all this stuff.
+  nemhelper->ex_err = exII::ex_update(nemhelper->ex_id);
 }
 
 #else
