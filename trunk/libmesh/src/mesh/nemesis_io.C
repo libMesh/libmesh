@@ -1237,34 +1237,18 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
   
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 
-  // These are no longer needed / this is handled in nemhelper->write_nodal_solution()
-//  int num_vars = names.size();
-//  int num_nodes = mesh.n_nodes();
-  
   if (!nemhelper->created())
   {
     nemhelper->create(nemesis_filename);
     nemhelper->initialize(nemesis_filename,mesh);
-//      exio_helper->write_nodal_coordinates(mesh);
-//      exio_helper->write_elements(mesh);
-//      exio_helper->write_sidesets(mesh);
-//      exio_helper->write_nodesets(mesh);
+    nemhelper->write_nodal_coordinates(mesh);
+    nemhelper->write_elements(mesh);
+    nemhelper->write_nodesets(mesh);
+    nemhelper->write_sidesets(mesh);
     nemhelper->initialize_nodal_variables(names);
   }
 
   nemhelper->write_nodal_solution(soln, names, _timestep);
-  /*
-  for (int c=0; c<num_vars; c++)
-  {
-    std::vector<Number> cur_soln(num_nodes);
-
-    //Copy out this variable's solution
-    for(int i=0; i<num_nodes; i++)
-      cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
-    
-    nemhelper->write_nodal_values(c+1,cur_soln,_timestep);
-  }
-  */
 }
 
 #else
