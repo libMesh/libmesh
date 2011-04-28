@@ -477,12 +477,12 @@ public:
   /**
    * Writes the sidesets contained in "mesh"
    */
-  void write_sidesets(const MeshBase & mesh);
+  virtual void write_sidesets(const MeshBase & mesh);
 
   /**
    * Writes the nodesets contained in "mesh"
    */
-  void write_nodesets(const MeshBase & mesh);
+  virtual void write_nodesets(const MeshBase & mesh);
 
   /**
    * Sets up the nodal variables

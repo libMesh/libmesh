@@ -24,8 +24,12 @@
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
+// C++ headers
 #include <vector>
+
+// Local headers
 #include "exodusII_io_helper.h"
+#include "parallel_mesh.h"
 
 namespace libMesh
 {
@@ -265,6 +269,16 @@ public:
    * This function is specialized to write the connectivity.
    */
   virtual void write_elements(const MeshBase & mesh);
+  
+  /**
+   * Writes the sidesets for this processor.  
+   */
+  virtual void write_sidesets(const MeshBase & mesh);
+
+  /**
+   * Writes the nodesets for this processor.
+   */
+  virtual void write_nodesets(const MeshBase & mesh);
 
   /**
    * This function is specialized from ExodusII_IO_Helper to create the
@@ -504,7 +518,133 @@ public:
 
 private:
   //  bool _verbose;
+
+  /**
+   * This map keeps track of the number of elements in each subdomain
+   * (block) for *this* processor.  
+   */
+  std::map<subdomain_id_type, unsigned> local_subdomain_counts;
   
+  /**
+   * The set which will eventually contain the IDs of "border nodes".  These are nodes
+   * that lie on the boundary between one or more processors.
+   */
+  std::set<unsigned> border_node_ids;
+
+  /**
+   * Another map to store sets of intersections with each other processor
+   * (other than ourself, of course).  A node which appears in one of these
+   * vectors belongs to element owned by at least this processor and one other.
+   */ 
+  std::map<unsigned, std::set<unsigned> > proc_nodes_touched_intersections;
+
+  /**
+   * Typedef for an iterator into the data structure above.
+   */
+  typedef std::map<unsigned, std::set<unsigned> >::iterator proc_nodes_touched_iterator;
+
+  /**
+   * Map between processor ID and (element,side) pairs bordering that processor ID.
+   */
+  std::map<unsigned, std::set<std::pair<unsigned,unsigned> > > proc_border_elem_sets;
+  
+  /**
+   * Typedef for an iterator into the data structure above.
+   */
+  typedef std::map<unsigned, std::set<std::pair<unsigned,unsigned> > >::iterator proc_border_elem_sets_iterator;
+  
+  /**
+   * A set of internal node IDs for this processor.
+   */
+  std::set<unsigned> internal_node_ids;
+
+  /**
+   * A set of internal elem IDs for this processor.
+   */
+  std::set<unsigned> internal_elem_ids;
+  
+  /**
+   * A set of border elem IDs for this processor.
+   */
+  std::set<unsigned> border_elem_ids;
+
+  /**
+   * This function uses global communication routines to determine the
+   * number of element blocks across the entire mesh.
+   */
+  void compute_num_global_elem_blocks(const ParallelMesh& pmesh);
+  
+  /**
+   * This function uses global communication routines to determine the
+   * number of nodesets across the entire mesh.
+   */
+  void compute_num_global_nodesets(const ParallelMesh& pmesh);
+  
+  /**
+   * This function uses global communication routines to determine the
+   * number of sidesets across the entire mesh.
+   */
+  void compute_num_global_sidesets(const ParallelMesh& pmesh);
+
+  /**
+   * This function builds the libmesh -> exodus and exodus -> libmesh
+   * node and element maps.  These maps allow us to have a consistent
+   * numbering scheme within an Exodus file, given an existing globally
+   * consistent numbering scheme from LibMesh.
+   */
+  void build_element_and_node_maps(const ParallelMesh& pmesh);
+
+  /**
+   * This function constructs the set of border node IDs present
+   * on the current mesh.  These are nodes which live on the "border"
+   * between elements which live on different processors.
+   */
+  void compute_border_node_ids(const ParallelMesh& pmesh);
+
+  /**
+   * This function constructs the set of border and internal element IDs
+   * and internal node IDs present on the current mesh.
+   */
+  void compute_internal_and_border_elems_and_internal_nodes(const ParallelMesh& pmesh);
+
+  /**
+   * This function determines the communication map parameters 
+   * which will eventually be written to file
+   */
+  void compute_communication_map_parameters();
+
+  /**
+   * Compute the node communcation maps (really just pack vectors)
+   * in preparation for writing them to file.
+   */
+  void compute_node_communication_maps();
+  
+  /**
+   * Compute the node maps (really just pack vectors) which 
+   * map the nodes to internal, border, and external nodes in 
+   * the file.
+   */
+  void compute_node_maps();
+
+  /**
+   * This function computes element communication maps (really
+   * just packs vectors) in preparation for writing them to file.
+   */
+  void compute_elem_communication_maps();
+
+  /**
+   * This function computes element maps (really just packs vectors)
+   * which map the elements to internal and border elements.
+   */
+  void compute_element_maps();
+
+  /**
+   * This function writes exodus-specific initialization information.
+   * This information is slightly different when you are working with
+   * Nemesis, as it depends on some global information being known.
+   */
+  void write_exodus_initialization_info(const ParallelMesh& pmesh,
+					const std::string& title);
 };
 
 } // namespace libMesh
