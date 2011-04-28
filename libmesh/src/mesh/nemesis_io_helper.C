@@ -1888,7 +1888,9 @@ void Nemesis_IO_Helper::initialize(std::string title, const MeshBase & mesh)
 
       subdomain_map[cur_subdomain].push_back(elem->id());
     }
-    num_elem_blk = subdomain_map.size();
+    
+    // For some reason it seems as if this is correct:
+    num_elem_blk = num_elem_blks_global;//subdomain_map.size();
 
     ex_err = exII::ex_put_init(ex_id,
                                title.c_str(),
