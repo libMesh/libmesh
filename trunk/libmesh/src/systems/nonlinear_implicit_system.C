@@ -211,25 +211,69 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
   // Get current_local_solution in sync
   this->update();
 
+  //-----------------------------------------------------------------------------
+  // if the user has provided both function pointers and objects only the pointer
+  // will be used, so catch that as an error
+  if (nonlinear_solver->jacobian && nonlinear_solver->jacobian_object)
+    {
+      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Jacobian!" << std::endl;
+      libmesh_error();
+    }
+  
+  if (nonlinear_solver->residual && nonlinear_solver->residual_object)
+    {
+      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
+      libmesh_error();
+    }
+  
+  if (nonlinear_solver->matvec && nonlinear_solver->residual_and_jacobian_object)
+    {
+      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+      libmesh_error();
+    }
+  //-----------------------------------------------------------------------------
+
+
   if (get_jacobian)
     {
       if (nonlinear_solver->jacobian != NULL)
         nonlinear_solver->jacobian (*current_local_solution.get(), *matrix, *this);
+
+      else if (nonlinear_solver->jacobian_object != NULL)
+	nonlinear_solver->jacobian_object->jacobian (*current_local_solution.get(), *matrix, *this);
+
       else if (nonlinear_solver->matvec != NULL)
         nonlinear_solver->matvec (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
-      else libmesh_error();
+
+      else if (nonlinear_solver->residual_and_jacobian_object != NULL)
+	nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
+
+      else 
+	libmesh_error();
     }
 
   if (get_residual)
     {
       if (nonlinear_solver->residual != NULL)
         nonlinear_solver->residual (*current_local_solution.get(), *rhs, *this);
+
+      else if (nonlinear_solver->residual_object != NULL)
+	nonlinear_solver->residual_object->residual (*current_local_solution.get(), *rhs, *this);
+
       else if (nonlinear_solver->matvec != NULL)
         {
           // we might have already grabbed the residual and jacobian together
           if (!get_jacobian)
             nonlinear_solver->matvec (*current_local_solution.get(), rhs, NULL, *this);
         }
+
+      else if (nonlinear_solver->residual_and_jacobian_object != NULL)
+	{
+          // we might have already grabbed the residual and jacobian together
+          if (!get_jacobian)
+	    nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), rhs, NULL, *this);
+	}
+
       else
         libmesh_error();
     }

@@ -80,6 +80,7 @@ extern "C"
   __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx)
   {
     START_LOG("residual()", "PetscNonlinearSolver");
+
     int ierr=0;
 
     libmesh_assert (x   != NULL);
@@ -109,8 +110,26 @@ extern "C"
 
     R.zero();
 
-    if      (solver->residual != NULL) solver->residual (*sys.current_local_solution.get(), R, sys);
-    else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), &R, NULL, sys);
+    //-----------------------------------------------------------------------------
+    // if the user has provided both function pointers and objects only the pointer
+    // will be used, so catch that as an error
+    if (solver->residual && solver->residual_object)
+      {
+	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
+	libmesh_error();
+      }
+    
+    if (solver->matvec && solver->residual_and_jacobian_object)
+      {
+	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+	libmesh_error();
+      }
+    //-----------------------------------------------------------------------------
+
+    if      (solver->residual != NULL)                     solver->residual                                            (*sys.current_local_solution.get(), R, sys);
+    else if (solver->residual_object != NULL)              solver->residual_object->residual                           (*sys.current_local_solution.get(), R, sys);
+    else if (solver->matvec   != NULL)                     solver->matvec                                              (*sys.current_local_solution.get(), &R, NULL, sys);
+    else if (solver->residual_and_jacobian_object != NULL) solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), &R, NULL, sys);
     else libmesh_error();
     
     R.close();
@@ -129,6 +148,7 @@ extern "C"
   __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx)
   {
     START_LOG("jacobian()", "PetscNonlinearSolver");
+    
     int ierr=0;
     
     libmesh_assert (ctx != NULL);
@@ -159,9 +179,27 @@ extern "C"
     Jac.swap(Jac_sys);
 
     PC.zero();
+    
+    //-----------------------------------------------------------------------------
+    // if the user has provided both function pointers and objects only the pointer
+    // will be used, so catch that as an error
+    if (solver->jacobian && solver->jacobian_object)
+      {
+	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Jacobian!" << std::endl;
+	libmesh_error();
+      }
+    
+    if (solver->matvec && solver->residual_and_jacobian_object)
+      {
+	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+	libmesh_error();
+      }
+    //-----------------------------------------------------------------------------
 
-    if      (solver->jacobian != NULL) solver->jacobian (*sys.current_local_solution.get(), PC, sys);
-    else if (solver->matvec   != NULL) solver->matvec   (*sys.current_local_solution.get(), NULL, &PC, sys);
+    if      (solver->jacobian != NULL)                     solver->jacobian                                            (*sys.current_local_solution.get(), PC, sys);
+    else if (solver->jacobian_object != NULL)              solver->jacobian_object->jacobian                           (*sys.current_local_solution.get(), PC, sys);
+    else if (solver->matvec   != NULL)                     solver->matvec                                              (*sys.current_local_solution.get(), NULL, &PC, sys);
+    else if (solver->residual_and_jacobian_object != NULL) solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), NULL, &PC, sys);
     else libmesh_error();
     
     PC.close();

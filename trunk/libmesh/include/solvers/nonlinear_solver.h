@@ -29,6 +29,7 @@
 #include "libmesh_common.h"
 #include "enum_solver_package.h"
 #include "reference_counted_object.h"
+#include "nonlinear_implicit_system.h"
 #include "libmesh.h"
 
 namespace libMesh
@@ -39,8 +40,6 @@ template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class Preconditioner;
-class NonlinearImplicitSystem;
-
 
 
 
@@ -119,12 +118,24 @@ public:
                      sys_type& S);
 
   /**
+   * Object that computes the residual \p R(X) of the nonlinear system
+   * at the input iterate \p X.
+   */
+  NonlinearImplicitSystem::ComputeResidual *residual_object;
+
+  /**
    * Function that computes the Jacobian \p J(X) of the nonlinear system
    * at the input iterate \p X.
    */
   void (* jacobian) (const NumericVector<Number>& X,
 		     SparseMatrix<Number>& J,
                      sys_type& S);
+
+  /**
+   * Object that computes the Jacobian \p J(X) of the nonlinear system
+   * at the input iterate \p X.
+   */
+  NonlinearImplicitSystem::ComputeJacobian *jacobian_object;
 
   /**
    * Function that computes either the residual \f$ R(X) \f$ or the
@@ -136,6 +147,14 @@ public:
 		   NumericVector<Number>* R,
 		   SparseMatrix<Number>*  J,
                    sys_type& S);
+
+  /**
+   * Object that computes either the residual \f$ R(X) \f$ or the
+   * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
+   * iterate \f$ X \f$.  Note that either \p R or \p J could be
+   * \p XSNULL.
+   */
+  NonlinearImplicitSystem::ComputeResidualandJacobian *residual_and_jacobian_object;
 
   /**
    * @returns a constant reference to the system we are solving.
@@ -236,9 +255,12 @@ protected:
 template <typename T>
 inline
 NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
-  residual        (NULL),
-  jacobian        (NULL),
-  matvec          (NULL),
+  residual                     (NULL),
+  residual_object              (NULL),
+  jacobian                     (NULL),
+  jacobian_object              (NULL),
+  matvec                       (NULL),
+  residual_and_jacobian_object (NULL),
   max_nonlinear_iterations(0),
   max_function_evaluations(0),
   absolute_residual_tolerance(0),
