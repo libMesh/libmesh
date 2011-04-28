@@ -123,7 +123,7 @@ void ExodusII_IO_Helper::check_err(const int err, const std::string msg)
 {
   if (err < 0)
     {
-      libMesh::out << msg << std::endl;
+      libMesh::err << msg << std::endl;
       libmesh_error();
     }
 }
@@ -152,7 +152,8 @@ void ExodusII_IO_Helper::open(const char* filename)
 			&io_ws,
 			&ex_version);
   
-  check_err(ex_id, "Error opening ExodusII mesh file.");
+  std::string err_msg = std::string("Error opening ExodusII mesh file: ") + std::string(filename);
+  check_err(ex_id, err_msg);
   if (_verbose) libMesh::out << "File opened successfully." << std::endl;
 }
 
