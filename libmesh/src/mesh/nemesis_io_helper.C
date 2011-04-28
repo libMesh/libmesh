@@ -1873,66 +1873,54 @@ void Nemesis_IO_Helper::initialize(std::string title, const MeshBase & mesh)
 
 
   
-  ///////  //ExodusII_IO_Helper::initialize(title, mesh); //////////////////
-  {    
-    this->num_dim = mesh.spatial_dimension();
+  this->num_dim = mesh.spatial_dimension();
 
-    // Find the number of nodes... which are all the ones attached to local active elements
+  // Find the number of nodes... which are all the ones attached to local active elements
     
-    this->num_elem = static_cast<unsigned int>(std::distance (pmesh.active_local_elements_begin(),
-							      pmesh.active_local_elements_end()));
+  this->num_elem = static_cast<unsigned int>(std::distance (pmesh.active_local_elements_begin(),
+							    pmesh.active_local_elements_end()));
 
-    /*
-      std::vector<short int> unique_side_boundaries;
-      std::vector<short int> unique_node_boundaries;
-
-      mesh.boundary_info->build_side_boundary_ids(unique_side_boundaries);
-      mesh.boundary_info->build_node_boundary_ids(unique_node_boundaries);
-    */
+  // Exodus will also use *global* number of side and node sets,
+  // though it will not write out entries for all of them...
+  this->num_side_sets = this->global_sideset_ids.size(); 
+  this->num_node_sets = this->global_nodeset_ids.size(); 
   
-    //  num_side_sets = unique_side_boundaries.size();
-    //  num_node_sets = unique_node_boundaries.size();
-    
-    
-    // Local boundary side and node ID counts (?)
-    //this->num_side_sets = local_side_boundary_ids.size(); // The number of side set IDs on *this* processor
-    //this->num_node_sets = local_node_boundary_ids.size(); // The number of node set IDs on *this* processor
-    
-    // Or should Exodus use *global* boundary side and node ID counts (?)
-    this->num_side_sets = this->global_sideset_ids.size(); 
-    this->num_node_sets = this->global_nodeset_ids.size(); 
-  
-    if (_verbose)
-      {
-	libMesh::out << "[" << libMesh::processor_id() 
-		     << "] local_side_boundary_ids.size()= " 
-		     << local_side_boundary_ids.size() 
-		     << std::endl;
+  if (_verbose)
+    {
+      libMesh::out << "[" << libMesh::processor_id() 
+		   << "] local_side_boundary_ids.size()= " 
+		   << local_side_boundary_ids.size() 
+		   << std::endl;
 	
-	libMesh::out << "[" << libMesh::processor_id() 
-		     << "] local_node_boundary_ids.size()= " 
-		     << local_node_boundary_ids.size() 
-		     << std::endl;
-      }
+      libMesh::out << "[" << libMesh::processor_id() 
+		   << "] local_node_boundary_ids.size()= " 
+		   << local_node_boundary_ids.size() 
+		   << std::endl;
+    }
 
-    // For some reason it seems as if we need the global number of blocks, even though
-    // it seems like Exodus should only know about the blocks which are represented on this
-    // processor...
-    this->num_elem_blk = this->num_elem_blks_global;//subdomain_map.size();
+  // For some reason it seems as if we need the global number of blocks, even though
+  // it seems like Exodus should only know about the blocks which are represented on this
+  // processor...
+  this->num_elem_blk = this->num_elem_blks_global;//subdomain_map.size();
 
-    ex_err = exII::ex_put_init(ex_id,
-                               title.c_str(),
-                               this->num_dim,
-                               this->num_nodes,
-                               this->num_elem,
-                               this->num_elem_blk,
-                               this->num_node_sets,
-                               this->num_side_sets);
+  ex_err = exII::ex_put_init(ex_id,
+			     title.c_str(),
+			     this->num_dim,
+			     this->num_nodes,
+			     this->num_elem,
+			     this->num_elem_blk,
+			     this->num_node_sets,
+			     this->num_side_sets);
     
-    check_err(ex_err, "Error initializing new Nemesis file.");
-  }
-
+  check_err(ex_err, "Error initializing new Nemesis file.");
+  
+  // Call the Nemesis-specialized version of write_nodal_coordinates() to write
+  // the nodal coordinates.
   write_nodal_coordinates(mesh);
+
+  // Call the Nemesis-specialized version of write_elements() to write
+  // the elements.  Note: Must write a zero if a given global block ID has no
+  // elements...
   write_elements(mesh);
 
   // Can't call the Exodus interfaces *directly* to write the sidesets and nodesets,
@@ -2089,79 +2077,6 @@ void Nemesis_IO_Helper::initialize(std::string title, const MeshBase & mesh)
 
     mesh.boundary_info->build_side_list(elem_list, side_list, id_list);
 
-//    // Only add sides for elements which are local to this processor?
-//    // We are going to move all non-local element,side,id entries to the
-//    // back of the vector, without actually removing them
-//    std::vector<unsigned>::iterator it_elem=elem_list.begin();
-//    std::vector<unsigned short>::iterator it_side=side_list.begin();
-//    std::vector<short>::iterator it_id=id_list.begin();
-//    
-//    std::vector<unsigned>::reverse_iterator new_last_elem=elem_list.rbegin();
-//    std::vector<unsigned short>::reverse_iterator new_last_side=side_list.rbegin();
-//    std::vector<short>::reverse_iterator new_last_id=id_list.rbegin();
-//
-//    for ( ; it_elem != new_last_elem.base(); )
-//      {
-//	if (mesh.elem( *it_elem )->processor_id() != libMesh::processor_id())
-//	  {
-//	    // Swap this element to the back of the list, but don't pop it off...
-//	    std::swap (*it_elem, *new_last_elem );
-//	    std::swap (*it_side, *new_last_side );
-//	    std::swap (*it_id, *new_last_id );
-//
-//	    // Move up the new last iterator
-//	    ++new_last_elem;
-//	    ++new_last_side;
-//	    ++new_last_id;
-//	  }
-//	else // elem is local, go to next
-//	  {
-//	    ++it_elem;
-//	    ++it_side;
-//	    ++it_id;
-//	  }
-//      }
-
-    
-    // Fill up appropriate map<int,vector> data structures for
-    // sidesets.  Note that element IDs and side IDs need to be in
-    // separate vectors for Exodus, so we store them that way...
-    // FIXME: The internals of this loop are basically identical to
-    // Exodus, so we should factor out the common code!
-    // for (unsigned int i=0; i<elem_list.size(); ++i) 
-    
-    // Use this if element removal has been implemented above...
-//    // Don't loop over whole list, just up to new_last_elem
-//    for (it_elem = elem_list.begin(), it_side=side_list.begin(), it_id=id_list.begin(); 
-//	 it_elem != new_last_elem.base(); 
-//	 ++it_elem, ++it_side, ++it_id)
-//      {
-// 	std::vector<const Elem*> family;
-// #ifdef LIBMESH_ENABLE_AMR
-// 	// We need to build up active elements if AMR is enabled and add
-// 	// them to the exodus sidesets instead of the potentially inactive "parent" elements
-// 	// Technically we don't need to "reset" the tree since the vector was just created.
-// 	mesh.elem( *it_elem )->active_family_tree_by_side(family, *it_side, /*reset tree=*/false);
-// #else
-// 	// If AMR is not even enabled, just push back the element itself
-// 	family.push_back(mesh.elem( *it_elem ));
-// #endif
-// 
-// 	// Loop over all the elements in the familty tree, store their converted IDs 
-// 	// and side IDs to the map's vectors.  TODO: Somehow reserve enough space for these
-// 	// push_back's...
-// 	for(unsigned int j=0; j<family.size(); ++j)
-// 	  {
-// 	    const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(family[j]->id())->type());
-// 
-// 	    // Use the libmesh to exodus datastructure map to get the proper sideset IDs
-// 	    // The datastructure contains the "collapsed" contiguous ids.  
-// 	    local_elem_boundary_id_lists[ *it_id ].push_back(this->libmesh_elem_num_to_exodus[family[j]->id()]);
-// 	    local_elem_boundary_id_side_lists[ *it_id ].push_back(conv.get_inverse_side_map( *it_side ));
-// 	  }
-//      }
-
-
     // Integer looping, skipping non-local elements
     for (unsigned i=0; i<elem_list.size(); ++i)
       {
@@ -2310,30 +2225,87 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
 void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
 {
-  // Iterate over the map we made earlier to write out the elements and their connectivity
-  for(std::map<int, std::vector<int> >::iterator it = block_id_to_elem_connectivity.begin();
-      it != block_id_to_elem_connectivity.end();
-      ++it)
-  {
-    int block = (*it).first;
-    std::vector<int> & this_block_connectivity = (*it).second;
-    std::vector<unsigned int> & elements_in_this_block = subdomain_map[block];
 
-    ExodusII_IO_Helper::ElementMaps em;
+  // Loop over all blocks, even if we don't have elements in each block.
+  // If we don't have elements we need to write out a 0 for that block...
+  for (unsigned int i=0; i<static_cast<unsigned>(this->num_elem_blks_global); ++i)
+    {
+      // Search for the current global block ID in the map
+      std::map<int, std::vector<int> >::iterator it = 
+	this->block_id_to_elem_connectivity.find( this->global_elem_blk_ids[i] );
 
-    //Use the first element in this block to get representative information.
-    //Note that Exodus assumes all elements in a block are of the same type!
-    //We are using that same assumption here!
-    const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(elements_in_this_block[0])->type());
-    num_nodes_per_elem = mesh.elem(elements_in_this_block[0])->n_nodes();
+      // If not found, write a zero to file....
+      if (it == this->block_id_to_elem_connectivity.end())
+	{
+	  this->ex_err = exII::ex_put_elem_block(this->ex_id, 
+						 this->global_elem_blk_ids[i], 
+						 "Empty",
+						 0, /* n. elements in this block */
+						 0, /* n. nodes per element */
+						 0);  /* number of attributes per element */
 
-    ex_err = exII::ex_put_elem_block(ex_id, block, conv.exodus_elem_type().c_str(), elements_in_this_block.size(),num_nodes_per_elem,0);
-    check_err(ex_err, "Error writing element block.");
+	  this->check_err(this->ex_err, "Error writing element block from Nemesis.");
+	}
+      
+      // Otherwise, write the actual block information and connectivity to file
+      else
+	{
+	  int block = (*it).first;
+	  std::vector<int> & this_block_connectivity = (*it).second;
+	  std::vector<unsigned int> & elements_in_this_block = subdomain_map[block];
+
+	  ExodusII_IO_Helper::ElementMaps em;
+
+	  //Use the first element in this block to get representative information.
+	  //Note that Exodus assumes all elements in a block are of the same type!
+	  //We are using that same assumption here!
+	  const ExodusII_IO_Helper::Conversion conv = 
+	    em.assign_conversion(mesh.elem(elements_in_this_block[0])->type());
+	  
+	  this->num_nodes_per_elem = mesh.elem(elements_in_this_block[0])->n_nodes();
+
+	  ex_err = exII::ex_put_elem_block(ex_id, 
+					   block, 
+					   conv.exodus_elem_type().c_str(), 
+					   elements_in_this_block.size(),
+					   num_nodes_per_elem,
+					   0);
+	  check_err(ex_err, "Error writing element block from Nemesis.");
   
-    ex_err = exII::ex_put_elem_conn(ex_id, block, &this_block_connectivity[0]);
-    check_err(ex_err, "Error writing element connectivities");
-  }
-  
+	  ex_err = exII::ex_put_elem_conn(ex_id, 
+					  block, 
+					  &this_block_connectivity[0]);
+	  check_err(ex_err, "Error writing element connectivities from Nemesis.");
+	}
+    } // end loop over global block IDs
+
+// Orig.   // Iterate over the map we made earlier to write out the elements and their connectivity
+// Orig.   for(std::map<int, std::vector<int> >::iterator it = block_id_to_elem_connectivity.begin();
+// Orig.       it != block_id_to_elem_connectivity.end();
+// Orig.       ++it)
+// Orig.   {
+// Orig.     int block = (*it).first;
+// Orig.     std::vector<int> & this_block_connectivity = (*it).second;
+// Orig.     std::vector<unsigned int> & elements_in_this_block = subdomain_map[block];
+// Orig. 
+// Orig.     ExodusII_IO_Helper::ElementMaps em;
+// Orig. 
+// Orig.     //Use the first element in this block to get representative information.
+// Orig.     //Note that Exodus assumes all elements in a block are of the same type!
+// Orig.     //We are using that same assumption here!
+// Orig.     const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(elements_in_this_block[0])->type());
+// Orig.     num_nodes_per_elem = mesh.elem(elements_in_this_block[0])->n_nodes();
+// Orig. 
+// Orig.     ex_err = exII::ex_put_elem_block(ex_id, block, conv.exodus_elem_type().c_str(), 
+// Orig.       elements_in_this_block.size(),num_nodes_per_elem,0);
+// Orig.     check_err(ex_err, "Error writing element block.");
+// Orig.   
+// Orig.     ex_err = exII::ex_put_elem_conn(ex_id, block, &this_block_connectivity[0]);
+// Orig.     check_err(ex_err, "Error writing element connectivities");
+// Orig.   }
+// Orig.   
+
+// Only call this once, not in the loop above!
   ex_err = exII::ex_put_elem_num_map(ex_id, &exodus_elem_num_to_libmesh[0]);
   check_err(ex_err, "Error writing element map");
 }

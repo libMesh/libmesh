@@ -264,7 +264,7 @@ public:
   /**
    * This function is specialized to write the connectivity.
    */
-  void write_elements(const MeshBase & mesh);
+  virtual void write_elements(const MeshBase & mesh);
 
   /**
    * This function is specialized from ExodusII_IO_Helper to create the
