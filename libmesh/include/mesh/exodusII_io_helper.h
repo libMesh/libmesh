@@ -53,10 +53,12 @@ public:
 
   /**
    * Constructor. Automatically initializes all the private members of
-   * the class.  Also allows you to set the verbosity level to v=1
-   * (on) or v=0 (off).
+   * the class.  Also allows you to set the verbosity level to v=true
+   * (on) or v=false (off).  The second argument, if true, tells the class to only
+   * perform its actions if running on processor zero.  If you initialize this
+   * to false, the writing methods will run on all processors instead.
    */
-  ExodusII_IO_Helper(bool v=false) :
+  ExodusII_IO_Helper(bool v=false, bool run_only_on_proc0=true) :
     comp_ws(sizeof(Real)),
     io_ws(0),
     ex_id(0),
@@ -80,6 +82,7 @@ public:
     num_time_steps(0),
     _created(false),
     _verbose(v),
+    _run_only_on_proc0(run_only_on_proc0),
     _elem_vars_initialized(false),
     _global_vars_initialized(false)
 
@@ -644,6 +647,7 @@ public:
  protected:
   bool _created; // This flag gets set after the the create() function has been successfully called.
   bool _verbose; // On/Off message flag
+  bool _run_only_on_proc0; // If true, whenever there is an I/O operation, only perform if if we are on processor 0.
   bool _elem_vars_initialized; // True once the elem vars are initialized
   bool _global_vars_initialized; // True once the global vars are initialized
 };

@@ -95,6 +95,16 @@ class Nemesis_IO_Helper;
    */
   void verbose (bool set_verbosity);
 
+  /**
+   * Write out global variables.
+   */
+  void write_global_data (const std::vector<Number>&,
+                          const std::vector<std::string>&);
+
+  /**
+   * Write out information records.
+   */
+  void write_information_records (const std::vector<std::string>&);
 
 private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)

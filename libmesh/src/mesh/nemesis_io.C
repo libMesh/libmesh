@@ -84,6 +84,7 @@ Nemesis_IO::Nemesis_IO (ParallelMesh& mesh) :
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper),
 #endif
+  _timestep(1),
   _verbose (false)
 {
 }
@@ -1218,8 +1219,9 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
   
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 
-  int num_vars = names.size();
-  int num_nodes = mesh.n_nodes();
+  // These are no longer needed / this is handled in nemhelper->write_nodal_solution()
+//  int num_vars = names.size();
+//  int num_nodes = mesh.n_nodes();
   
   if (!nemhelper->created())
   {
@@ -1254,11 +1256,76 @@ void Nemesis_IO::write_nodal_data (const std::string& ,
                                    const std::vector<std::string>& )
 {
 
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+  libMesh::err <<  "ERROR, Nemesis API is not defined.\n"
 	        << std::endl;
   libmesh_error();
 }
 
+
+#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+
+
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write_global_data (const std::vector<Number>& soln,
+				    const std::vector<std::string>& names)
+{
+  if (!nemhelper->created())
+    {
+      libMesh::err << "ERROR, Nemesis file must be initialized "
+		   << "before outputting global variables.\n"
+		   << std::endl;
+      libmesh_error();
+    }
+
+  // Call the Exodus writer implementation
+  nemhelper->initialize_global_variables( names );
+  nemhelper->write_global_values( soln, _timestep);
+}
+
+#else
+
+void Nemesis_IO::write_global_data (const std::vector<Number>&,
+				    const std::vector<std::string>&)
+{
+  libMesh::err <<  "ERROR, Nemesis API is not defined.\n"
+	       << std::endl;
+  libmesh_error();
+}
+
+#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write_information_records (const std::vector<std::string>& records)
+{
+  if (!nemhelper->created())
+    {
+      libMesh::err << "ERROR, Nemesis file must be initialized "
+                   << "before outputting information records.\n"
+                   << std::endl;
+      libmesh_error();
+    }
+
+  // Call the Exodus writer implementation
+  nemhelper->write_information_records( records );
+}
+
+
+#else
+
+void Nemesis_IO::write_information_records ( const std::vector<std::string>& )
+{
+
+  libMesh::err <<  "ERROR, Nemesis API is not defined.\n"
+	        << std::endl;
+  libmesh_error();
+}
 
 #endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 

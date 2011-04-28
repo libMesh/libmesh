@@ -369,10 +369,11 @@ public:
   /**
    * Map of subdomains to element numbers.
    */
-  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
+  std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
 
   /**
-   * This is the block connectivity
+   * This is the block connectivity, i.e. for each subdomain (block) there
+   * is an element connectivity list. This map associates the block ID to that vector.
    */
   std::map<int, std::vector<int> > block_id_to_elem_connectivity;
 
