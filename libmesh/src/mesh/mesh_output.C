@@ -22,6 +22,7 @@
 #include "mesh_output.h"
 #include "equation_systems.h"
 #include "unstructured_mesh.h"
+#include "parallel_mesh.h"
 
 namespace libMesh
 {
@@ -45,5 +46,6 @@ _build_variable_names_and_solution_vector (const EquationSystems& es,
 // move any functions in this file to the header file instead.
 template class MeshOutput<MeshBase>;
 template class MeshOutput<UnstructuredMesh>;
+template class MeshOutput<ParallelMesh>;
 
 } // namespace libMesh

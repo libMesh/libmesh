@@ -80,6 +80,15 @@ class Nemesis_IO_Helper;
    */
   virtual void write (const std::string& base_filename);
 
+  /**
+   * Write one timestep's worth of the solution.
+   */
+  void write_timestep (const std::string& fname, const EquationSystems& es, const int timestep, const Real time);
+
+  /**
+   * Output a nodal solution.
+   */
+  void write_nodal_data (const std::string& fname, const std::vector<Number>& soln, const std::vector<std::string>& names);
 
   /**
    * Set the flag indicationg if we should be verbose.
@@ -91,6 +100,7 @@ private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   Nemesis_IO_Helper *nemhelper;
 #endif
+  int _timestep;
 
   bool _verbose;
 };

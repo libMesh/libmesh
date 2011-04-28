@@ -1081,9 +1081,6 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
 
 void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> names)
 {
-  if (libMesh::processor_id() != 0)
-    return;
-
   num_nodal_vars = names.size();
 
   ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
@@ -1174,9 +1171,6 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
 
 void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 {
-  if (libMesh::processor_id() != 0)
-    return;
-
   ex_err = exII::ex_put_time(ex_id, timestep, &time);
   check_err(ex_err, "Error writing timestep.");
 
@@ -1243,9 +1237,6 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
 
 void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number> & values, int timestep)
 {
-  if (libMesh::processor_id() != 0)
-    return;
-
   ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
   check_err(ex_err, "Error writing nodal values.");
 
