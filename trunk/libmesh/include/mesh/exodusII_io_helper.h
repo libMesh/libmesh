@@ -437,12 +437,12 @@ public:
    * file named \p filename
    * for writing.
    */
-  void create(std::string filename);
+  virtual void create(std::string filename);
 
   /**
    * Initializes the Exodus file
    */
-  void initialize(std::string title, const MeshBase & mesh);
+  virtual void initialize(std::string title, const MeshBase & mesh);
 
   /**
    * Initializes the Exodus file
@@ -452,7 +452,7 @@ public:
   /**
    * Writes the nodal coordinates contained in "mesh"
    */
-  void write_nodal_coordinates(const MeshBase & mesh);
+  virtual void write_nodal_coordinates(const MeshBase & mesh);
 
   /**
    * Writes the nodal coordinates contained in "mesh"
@@ -463,7 +463,7 @@ public:
    * Writes the elements contained in "mesh"
    * FIXME: This only works for Mesh's having a single type of element!
    */
-  void write_elements(const MeshBase & mesh);
+  virtual void write_elements(const MeshBase & mesh);
 
   /**
    * Writes the elements contained in "mesh"
@@ -613,9 +613,18 @@ public:
   std::vector<char> title;             //  Problem title
   std::vector<char> elem_type;         // Type of element in a given block
 
-  // Maps libMesh element numbers to Exodus element numbers
+  // Maps libMesh element numbers to Exodus element numbers                                                                                                                         
   // gets filled in when write_elements gets called
   std::map<int, int> libmesh_elem_num_to_exodus;
+  std::vector<int> exodus_elem_num_to_libmesh;
+
+  /**
+   * Map of all node numbers connected to local node numbers to their exodus numbering.
+   *
+   * The exodus numbers are stored in here starting with 1
+   */
+  std::map<int, int> libmesh_node_num_to_exodus;
+  std::vector<int> exodus_node_num_to_libmesh;
 
   //Solution Data
   int num_time_steps;

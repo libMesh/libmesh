@@ -279,6 +279,11 @@ public:
   virtual void initialize(std::string title, const MeshBase & mesh);
 
   /**
+   * Takes a solution vector containing the solution for all variables and outputs it to the files
+   */
+  void write_nodal_solution(const std::vector<Number> & values, const std::vector<std::string> names, int timestep);
+
+  /**
    * Given base_filename, foo.e, constructs the Nemesis filename
    * foo.e.X.Y, where X=n. CPUs and Y=processor ID
    */

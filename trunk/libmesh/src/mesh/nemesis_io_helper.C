@@ -1969,6 +1969,22 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
   check_err(ex_err, "Error writing element map");
 }
 
+void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values, const std::vector<std::string> names, int timestep)
+{
+  int num_vars = names.size();
+  int num_values = values.size();
+
+  for (int c=0; c<num_vars; c++)
+  {
+    std::vector<Number> cur_soln(num_nodes);
+
+    //Copy out this variable's solution
+    for(int i=0; i<num_nodes; i++)
+      cur_soln[i] = values[exodus_node_num_to_libmesh[i]*num_vars + c];
+    
+    write_nodal_values(c+1,cur_soln,timestep);
+  }
+}
 
 std::string Nemesis_IO_Helper::construct_nemesis_filename(const std::string& base_filename)
 {

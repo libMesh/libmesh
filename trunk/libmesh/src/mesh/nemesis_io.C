@@ -1185,4 +1185,81 @@ void Nemesis_IO::write (const std::string& )
 #endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
 
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write_timestep (const std::string& fname,
+                                 const EquationSystems& es,
+                                 const int timestep,
+                                 const Real time)
+{
+  _timestep=timestep; 
+  write_equation_systems(fname,es);
+
+  nemhelper->write_timestep(timestep, time);
+}
+
+#else
+
+void Nemesis_IO::write_timestep (const std::string& )
+{
+  libMesh::err <<  "ERROR, Nemesis API is not defined!" << std::endl;
+  libmesh_error();
+}
+
+#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write_nodal_data (const std::string& base_filename,
+                                   const std::vector<Number>& soln,
+                                   const std::vector<std::string>& names)
+{
+  const MeshBase & mesh = MeshOutput<ParallelMesh>::mesh();
+  
+  std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
+
+  int num_vars = names.size();
+  int num_nodes = mesh.n_nodes();
+  
+  if (!nemhelper->created())
+  {
+    nemhelper->create(nemesis_filename);
+    nemhelper->initialize(nemesis_filename,mesh);
+//      exio_helper->write_nodal_coordinates(mesh);
+//      exio_helper->write_elements(mesh);
+//      exio_helper->write_sidesets(mesh);
+//      exio_helper->write_nodesets(mesh);
+    nemhelper->initialize_nodal_variables(names);
+  }
+
+  nemhelper->write_nodal_solution(soln, names, _timestep);
+  /*
+  for (int c=0; c<num_vars; c++)
+  {
+    std::vector<Number> cur_soln(num_nodes);
+
+    //Copy out this variable's solution
+    for(int i=0; i<num_nodes; i++)
+      cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+    
+    nemhelper->write_nodal_values(c+1,cur_soln,_timestep);
+  }
+  */
+}
+
+#else
+
+void Nemesis_IO::write_nodal_data (const std::string& ,
+                                   const std::vector<Number>& ,
+                                   const std::vector<std::string>& )
+{
+
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+	        << std::endl;
+  libmesh_error();
+}
+
+
+#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
 } // namespace libMesh
