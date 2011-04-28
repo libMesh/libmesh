@@ -27,7 +27,7 @@
 
 // Local includes
 #include "mesh_input.h"
-//#include "mesh_output.h" // eventually...
+#include "mesh_output.h" 
 
 namespace libMesh
 {
@@ -51,8 +51,8 @@ class Nemesis_IO_Helper;
 
 // ------------------------------------------------------------
 // Nemesis_IO class definition
-class Nemesis_IO : public MeshInput<ParallelMesh>
-//,public MeshOutput<MeshBase>
+  class Nemesis_IO : public MeshInput<ParallelMesh>,
+		     public MeshOutput<ParallelMesh>
 {
 
  public:
@@ -76,10 +76,17 @@ class Nemesis_IO : public MeshInput<ParallelMesh>
   virtual void read (const std::string& base_filename);
 
   /**
+   * This method implements writing a mesh to a specified file.
+   */
+  virtual void write (const std::string& base_filename);
+
+
+  /**
    * Set the flag indicationg if we should be verbose.
    */
   void verbose (bool set_verbosity);
-  
+
+
 private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   Nemesis_IO_Helper *nemhelper;

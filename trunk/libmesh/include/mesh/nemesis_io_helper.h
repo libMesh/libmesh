@@ -59,23 +59,31 @@ public:
   /**
    * Destructor.
    */
-  ~Nemesis_IO_Helper();
+  virtual ~Nemesis_IO_Helper();
 
 //   /**
 //    * Set the flag indicationg if we should be verbose.
 //    */
 //   void verbose (bool set_verbosity);
   
-  // Member functions.  These just allocate memory for you and call the Nemesis
-  // routines of the same name.  They also handle error checking for the Nemesis
-  // return value.  Be careful calling these at random, some depend on others
-  // being called first...
+  /**
+   * Reading functions.  These just allocate memory for you and call the Nemesis
+   * routines of the same name.  They also handle error checking for the Nemesis
+   * return value.  Be careful calling these at random, some depend on others
+   * being called first...
+   */
+
+  /**
+   * Fills: num_nodes_global, num_elems_global, num_elem_blks_global,
+   * num_node_sets_global, num_side_sets_global
+   * Call after: read_header()
+   * Call before: Any other get_* function from this class
+   */
   void get_init_global();
 
   /**
    * Fills: global_sideset_ids, num_global_side_counts, num_global_side_df_counts
    * Call after: get_init_global()
-   * Call before:
    */
   void get_ss_param_global();
   void get_ns_param_global();
@@ -87,16 +95,198 @@ public:
   void get_cmap_params();
   void get_node_cmap();
   void get_elem_cmap();
-  
-  // Member data
 
-//   /**
-//    * Instance of the Exodus IO Helper.  We call the Exodus API through
-//    * this object.  Instead of creating forwarding functions for
-//    * everything in the ExodusII_IO_Helper class, just call them
-//    * directly through this object!
-//    */
-//   ExodusII_IO_Helper ex2helper;
+  /**
+   * Writing functions.
+   */
+
+  /**
+   * Writes basic info about the partitioning to file
+   * .) num_proc - number of processors
+   * .) num_proc_in_file - number of processors in the current file - generally equal to 1
+   * .) ftype = "s" for scalar load-balance file, "p" for parallel file
+   */
+  void put_init_info(unsigned num_proc,
+		     unsigned num_proc_in_file,
+		     const char* ftype);
+
+  /**
+   * Writes global information including:
+   * .) global number of nodes
+   * .) global number of elems
+   * .) global number of element blocks
+   * .) global number of node sets
+   * .) global number of side sets 
+   */
+  void put_init_global(unsigned num_nodes_global,
+		       unsigned num_elems_global,
+		       unsigned num_elem_blks_global,
+		       unsigned num_node_sets_global,
+		       unsigned num_side_sets_global);
+
+  /**
+   * Writes global block information to the file
+   * .) global_elem_blk_ids - list of block IDs for all blocks present in the mesh
+   * .) global_elem_blk_cnts - number of elements in each block for the global mesh 
+   *
+   * Must be called after put_init_global().
+   */
+  void put_eb_info_global(std::vector<int>& global_elem_blk_ids,
+			  std::vector<int>& global_elem_blk_cnts);
+
+  /**
+   * This function writes information about global node sets.
+   * .) global_nodeset_ids - vector of global node set IDs
+   * .) num_global_node_counts - vector of global node counts contained in each global node set
+   * .) num_global_df_count - vector of global distribution factors in each global node set
+   *
+   * Must be called after put_init_global()
+   */
+  void put_ns_param_global(std::vector<int>& global_nodeset_ids,
+			   std::vector<int>& num_global_node_counts,
+			   std::vector<int>& num_global_node_df_counts);
+
+  /**
+   * This function writes information about global side sets.
+   * .) global_sideset_ids - vector of global side set IDs
+   * .) num_global_side_counts - vector of global side counts contained in each global side set
+   * .) num_global_df_count - vector of global distribution factors in each global side set
+   *
+   * Must be called after put_init_global()
+   */
+  void put_ss_param_global(std::vector<int>& global_sideset_ids,
+			   std::vector<int>& num_global_side_counts,
+			   std::vector<int>& num_global_side_df_counts);
+
+
+
+  /**
+   * Writes load balance parameters, some of which are described below:
+   * .) num_internal_nodes - nodes "wholly" owned by the current processor
+   * .) num_border_nodes - nodes local to a processor but residing in an element
+   *                       which also has nodes on other processors
+   * .) num_external_nodes - nodes that reside on other processors but whose element
+   *                         "partially" resides on the current processor -- 
+   *                          we assert this should be zero on reading!
+   * .) num_border_elems - elements local to this processor but whose nodes reside
+   *                       on other processors as well.
+   * .) processor - ID of the processor for which information is to be written
+   */
+  void put_loadbal_param(unsigned num_internal_nodes,
+			 unsigned num_border_nodes,
+			 unsigned num_external_nodes,
+			 unsigned num_internal_elems,
+			 unsigned num_border_elems,
+			 unsigned num_node_cmaps,
+			 unsigned num_elem_cmaps);
+
+  /**
+   * Outputs initial information for communication maps.
+   * Note: the order of the arguments specified in the Nemsis
+   * User's Manual is *wrong*.  The correct order is 
+   * (ids, counts, ids, counts).
+   * Must be called after put_loadbal_param().
+   */
+  void put_cmap_params(std::vector<int>& node_cmap_ids,
+		       std::vector<int>& node_cmap_node_cnts,
+		       std::vector<int>& elem_cmap_ids,
+		       std::vector<int>& elem_cmap_elem_cnts);
+
+  /**
+   * Outputs *all* of the nodal communication maps for this processor.  Internally,
+   * this function loops over all communication maps and calls 
+   * Nemesis::ne_put_node_cmap() for each one.
+   *
+   * .) node_cmap_node_ids = Nodal IDs of the FEM nodes in this communication map
+   * .) node_cmap_proc_ids = processor IDs associated with each of the nodes in node_ids
+   *
+   * In the Nemesis file, these all appeart to be written to the same chunks of data:
+   * n_comm_nids and n_comm_proc, but don't rely on these names...
+   *
+   * Note: this class contains vector<vectors>:
+   * node_cmap_node_ids
+   * node_cmap_proc_ids
+   * which can be used when calling this function.
+   *
+   * Must be called after put_cmap_params().
+   */
+  void put_node_cmap(std::vector<std::vector<int> >& node_cmap_node_ids,
+		     std::vector<std::vector<int> >& node_cmap_proc_ids);
+
+  /**
+   * Outputs IDs of internal, border, and external nodes.
+   * LibMesh asserts that the number of external nodes is zero in the
+   * Nemesis files it reads
+   */
+  void put_node_map(std::vector<int>& node_mapi,
+		    std::vector<int>& node_mapb,
+		    std::vector<int>& node_mape);
+
+  /**
+   * Writes information about elemental communication map.
+   *
+   * Note: this class contains vector<vectors>:
+   * elem_cmap_elem_ids
+   * elem_cmap_side_ids
+   * elem_cmap_proc_ids
+   * 
+   * Must be called after put_cmap_params().
+   */
+  void put_elem_cmap(std::vector<std::vector<int> >& elem_cmap_elem_ids,
+		     std::vector<std::vector<int> >& elem_cmap_side_ids,
+		     std::vector<std::vector<int> >& elem_cmap_proc_ids);
+
+  /**
+   * Outputs IDs of internal and border elements.
+   *
+   * Must be called after ne_put_loadbal_param().
+   */
+  void put_elem_map(std::vector<int>& elem_mapi,
+		    std::vector<int>& elem_mapb);
+
+  /**
+   * Writes the specified number of coordinate values starting at the specified
+   * index.  
+   */
+  void put_n_coord(unsigned start_node_num,
+		   unsigned num_nodes,
+		   std::vector<Real>& x_coor,
+		   std::vector<Real>& y_coor,
+		   std::vector<Real>& z_coor);
+  
+
+  /**
+   * This function is specialized from ExodusII_IO_Helper to write only the
+   * nodal coordinates stored on the local piece of the Mesh.
+   */
+  virtual void write_nodal_coordinates(const MeshBase & mesh);
+
+  /**
+   * This function is specialized to write the connectivity.
+   */
+  void write_elements(const MeshBase & mesh);
+
+  /**
+   * This function is specialized from ExodusII_IO_Helper to create the
+   * nodal coordinates stored on the local piece of the Mesh.
+   */
+  virtual void create(std::string filename);
+  
+  /** 
+   * Specialization of the initialize function from ExodusII_IO_Helper that
+   * also writes global initial data to file.
+   */
+  virtual void initialize(std::string title, const MeshBase & mesh);
+
+  /**
+   * Given base_filename, foo.e, constructs the Nemesis filename
+   * foo.e.X.Y, where X=n. CPUs and Y=processor ID
+   */
+  std::string construct_nemesis_filename(const std::string& base_filename);
+
+  /**
+   * Member data
+   */
 
   /**
    * All (?) Nemesis functions return an int.  If it's negative that signals an error!
@@ -165,7 +355,21 @@ public:
    */
   std::vector<int> global_elem_blk_ids;
   std::vector<int> global_elem_blk_cnts;
-  
+
+  /**
+   * libMesh numbered node ids attached to local elems.
+   */
+  std::set<int> nodes_attached_to_local_elems;
+
+  /**
+   * Map of subdomains to element numbers.
+   */
+  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
+
+  /**
+   * This is the block connectivity
+   */
+  std::map<int, std::vector<int> > block_id_to_elem_connectivity;
 
   /**
    * To be used with the Nemesis::ne_get_loadbal_param() routine.

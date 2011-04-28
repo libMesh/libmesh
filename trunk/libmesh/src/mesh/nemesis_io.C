@@ -80,7 +80,7 @@ namespace {
 // Nemesis_IO class members
 Nemesis_IO::Nemesis_IO (ParallelMesh& mesh) :
   MeshInput<ParallelMesh> (mesh, /*is_parallel_format=*/true),
-  //MeshOutput<ParallelMesh> (mesh, /*is_parallel_format=*/true)
+  MeshOutput<ParallelMesh> (mesh, /*is_parallel_format=*/true),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper),
 #endif
@@ -92,6 +92,7 @@ Nemesis_IO::Nemesis_IO (ParallelMesh& mesh) :
 Nemesis_IO::~Nemesis_IO ()
 {
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+  
   delete nemhelper;
 #endif
 }
@@ -120,7 +121,10 @@ void Nemesis_IO::read (const std::string& base_filename)
     {			
       // We can do this in one line but if the verbose flag was set in this
       // object, it will no longer be set... thus no extra print-outs for serial runs.
-      ExodusII_IO(this->mesh()).read (base_filename);
+      // ExodusII_IO(this->mesh()).read (base_filename); // ambiguous when Nemesis_IO is multiply-inherited
+      
+      ParallelMesh& mesh = MeshInput<ParallelMesh>::mesh();
+      ExodusII_IO(mesh).read (base_filename);
       return;
     }
 
@@ -135,44 +139,20 @@ void Nemesis_IO::read (const std::string& base_filename)
       libMesh::out << "Reading Nemesis file on processor: " << libMesh::processor_id() << std::endl;
     }
   
-  // Construct a filename string for this processor.
-  //
-  // TODO: This assumes you are reading in a mesh on exactly the
-  // same number of processors it was written out on!!
-  // This should be generalized at some point...
-  std::ostringstream file_oss;
-  
-  // We have to be a little careful here: Nemesis left pads its file
-  // numbers based on the largest processor ID, so for example on 128
-  // processors, we'd have:
-  // mesh.e.128.001
-  // mesh.e.128.002
-  // ...
-  // mesh.e.128.099
-  // mesh.e.128.100
-  // ...
-  // mesh.e.128.127
-
-  // Find the length of the highest processor ID 
-  file_oss << (libMesh::n_processors()-1);
-  unsigned field_width = file_oss.str().size();
-  
-  if (_verbose)
-    libMesh::out << "field_width=" << field_width << std::endl;
-
-  file_oss.str(""); // reset the string stream
-  file_oss << base_filename  
-	   << '.' << libMesh::n_processors() 
-	   << '.' << std::setfill('0') << std::setw(field_width) << libMesh::processor_id();
+  // Construct the Nemesis filename based on the number of processors and the
+  // current processor ID.
+  std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 
   if (_verbose)
-    libMesh::out << "Opening file: " << file_oss.str() << std::endl;
+    libMesh::out << "Opening file: " << nemesis_filename << std::endl;
 
   // Open the Exodus file
-  nemhelper->open(file_oss.str().c_str());
+  nemhelper->open(nemesis_filename.c_str());
 
-  // Get a reference to the ParallelMesh.  
-  ParallelMesh& mesh = this->mesh();
+  // Get a reference to the ParallelMesh.  We need to be specific
+  // since Nemesis_IO is multiply-inherited
+  // ParallelMesh& mesh = this->mesh();
+  ParallelMesh& mesh = MeshInput<ParallelMesh>::mesh();
 
   // Local information: Read the following information from the standard Exodus header
   //  title[0]
@@ -248,26 +228,26 @@ void Nemesis_IO::read (const std::string& base_filename)
   // communicate with i.  We can assert that here easily enough with an alltoall,
   // but let's only do it when not in optimized mode to limit unnecessary communication.
   {
-    std::vector<unsigned char> pid_send_partener (libMesh::n_processors(), 0);
+    std::vector<unsigned char> pid_send_partner (libMesh::n_processors(), 0);
 
     // strictly speaking, we should expect to communicate with ourself...
-    pid_send_partener[libMesh::processor_id()] = 1;
+    pid_send_partner[libMesh::processor_id()] = 1;
     
     // mark each processor id we reference with a node cmap 
     for (unsigned int cmap=0; cmap<to_uint(nemhelper->num_node_cmaps); cmap++)
       {
 	libmesh_assert (to_uint(nemhelper->node_cmap_ids[cmap]) < libMesh::n_processors());
 
-	pid_send_partener[nemhelper->node_cmap_ids[cmap]] = 1;
+	pid_send_partner[nemhelper->node_cmap_ids[cmap]] = 1;
       }
 
     // Copy the send pairing so we can catch the receive paring and
     // test for equality
-    const std::vector<unsigned char> pid_recv_partener (pid_send_partener);
+    const std::vector<unsigned char> pid_recv_partner (pid_send_partner);
     
-    Parallel::alltoall (pid_send_partener);
+    Parallel::alltoall (pid_send_partner);
 
-    libmesh_assert (pid_send_partener == pid_recv_partener);
+    libmesh_assert (pid_send_partner == pid_recv_partner);
   }
 #endif
   
@@ -1170,6 +1150,39 @@ void Nemesis_IO::read (const std::string& )
   libmesh_error();
 }
 
-#endif
+#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+
+
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write (const std::string& base_filename)
+{
+  libMesh::out << "In Nemesis_IO::write()" << std::endl;
+  libMesh::out << "Writing base_filename=" << base_filename << std::endl;
+
+  // Get a constant reference to the mesh for writing 
+  const MeshBase & mesh = MeshOutput<ParallelMesh>::mesh();
+  
+  // Create the filename for this processor given the base_filename passed in.
+  std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
+  
+  nemhelper->create(nemesis_filename);
+  nemhelper->initialize(nemesis_filename,mesh);
+  // nemhelper->write_nodal_coordinates(mesh);
+}
+
+#else
+
+void Nemesis_IO::write (const std::string& )
+{
+  libMesh::err <<  "ERROR, Nemesis API is not defined!" << std::endl;
+  libmesh_error();
+}
+
+#endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
 
 } // namespace libMesh

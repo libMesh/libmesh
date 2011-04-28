@@ -81,6 +81,8 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
   }
 
   _boundary_ids = other_boundary_info._boundary_ids;
+  _side_boundary_ids = other_boundary_info._side_boundary_ids;
+  _node_boundary_ids = other_boundary_info._node_boundary_ids;
 
   return *this;
 }
@@ -98,6 +100,8 @@ void BoundaryInfo::clear()
   _boundary_node_id.clear();
   _boundary_side_id.clear();
   _boundary_ids.clear();
+  _side_boundary_ids.clear();
+  _node_boundary_ids.clear();
 }
 
 
@@ -384,6 +388,7 @@ void BoundaryInfo::add_node(const Node* node,
   
   _boundary_node_id.insert(kv);
   _boundary_ids.insert(id);
+  _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
 }
 
 
@@ -433,6 +438,7 @@ void BoundaryInfo::add_side(const Elem* elem,
   
   _boundary_side_id.insert(kv);
   _boundary_ids.insert(id);
+  _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
 }
 
 
@@ -480,6 +486,7 @@ void BoundaryInfo::add_side(const Elem* elem,
   
       _boundary_side_id.insert(kv);
       _boundary_ids.insert(id);
+      _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
     }
 }
 
