@@ -847,6 +847,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   check_err(ex_err, "Error writing element connectivities");
 }
 
+
+
+
 void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 {
   if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
