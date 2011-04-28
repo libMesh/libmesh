@@ -274,6 +274,21 @@ public:
   { return _boundary_ids; }
 
   /**
+   * Returns a reference to the set of all boundary IDs 
+   * specified on sides. 
+   */
+  const std::set<short int>& get_side_boundary_ids () const
+  { return _side_boundary_ids; }
+
+  /**
+   * Returns a reference to the set of all boundary IDs 
+   * specified on nodes. 
+   */
+  const std::set<short int>& get_node_boundary_ids () const
+  { return _node_boundary_ids; }
+
+
+  /**
    * Print the boundary information data structure.
    */
   void print_info (std::ostream& out=libMesh::out) const;
@@ -314,9 +329,23 @@ public:
                                              _boundary_side_id;
 
   /**
-   * A collection of user-specified boundary ids.
+   * A collection of user-specified boundary ids for *both* sides and nodes.
+   * See _side_boundary_ids and _node_boundary_ids for sets containing IDs
+   * for only sides and only nodes, respectively.
    */
   std::set<short int> _boundary_ids;
+  
+  /**
+   * Set of user-specified boundary IDs for sides *only*.  Note: _boundary_ids
+   * is the union of this set and _node_boundary_ids.
+   */
+  std::set<short int> _side_boundary_ids;
+
+  /**
+   * Set of user-specified boundary IDs for nodes *only*.  Note: _boundary_ids
+   * is the union of this set and _side_boundary_ids.
+   */
+  std::set<short int> _node_boundary_ids;
 
 
 
