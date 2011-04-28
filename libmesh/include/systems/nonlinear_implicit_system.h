@@ -75,6 +75,62 @@ public:
   typedef ImplicitSystem Parent;
   
   /**
+   * Abstract base class to be used to calculate the residual
+   * of a nonlinear system. 
+   */
+  class ComputeResidual
+  {
+  public:
+    virtual ~ComputeResidual () {};
+    /**
+     * Residual function.  This function will be called to compute the 
+     * residual and must be implemented by the user in a derived class.
+     */
+    virtual void residual (const NumericVector<Number>& X,
+			   NumericVector<Number>& R,
+			   sys_type& S) = 0;
+  };
+
+
+  /**
+   * Abstract base class to be used to calculate the Jacobian
+   * of a nonlinear system. 
+   */
+  class ComputeJacobian
+  {
+  public:
+    virtual ~ComputeJacobian () {};
+
+    /**
+     * Jacobian function.  This function will be called to compute the 
+     * jacobian and must be implemented by the user in a derived class.
+     */
+    virtual void jacobian (const NumericVector<Number>& X,
+			   SparseMatrix<Number>& J,
+			   sys_type& S) = 0;
+  };
+
+  /**
+   * Abstract base class to be used to calculate the residual and Jacobian
+   * simultaneously of a nonlinear system. 
+   */
+  class ComputeResidualandJacobian
+  {
+  public:
+    virtual ~ComputeResidualandJacobian () {};
+
+    /**
+     * Residual & Jacobian function, calculated simultaneously.
+     * This function will be called to compute the residual and jacobian
+     * simultaneously and must be implemented by the user in a derived class.
+     */
+    virtual void residual_and_jacobian (const NumericVector<Number>& X,
+					NumericVector<Number>* R,
+					SparseMatrix<Number>*  J,
+					sys_type& S) = 0;
+  };
+  
+  /**
    * @returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
@@ -140,7 +196,8 @@ public:
    * Returns the final residual for the nonlinear system solve.
    */
   Real final_nonlinear_residual() const { return _final_nonlinear_residual; }
-  
+
+
 protected:
 
   /**
