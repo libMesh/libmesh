@@ -1131,8 +1131,6 @@ void Nemesis_IO_Helper::initialize(std::string title, const MeshBase & mesh)
       const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(tmp_vec[0])->type());
       num_nodes_per_elem = mesh.elem(tmp_vec[0])->n_nodes();    
 
-      std::cerr<<"getting this_block_connectivity"<<std::endl;
-      
       std::vector<int> & this_block_connectivity = block_id_to_elem_connectivity[(*it).first];
       
       this_block_connectivity.resize(tmp_vec.size()*num_nodes_per_elem);
@@ -1939,8 +1937,6 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
 void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
 {
-  std::cerr<<libMesh::processor_id()<<": In write_elements()"<<std::endl;
-  
   // Iterate over the map we made earlier to write out the elements and their connectivity
   for(std::map<int, std::vector<int> >::iterator it = block_id_to_elem_connectivity.begin();
       it != block_id_to_elem_connectivity.end();
@@ -1957,8 +1953,6 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
     //We are using that same assumption here!
     const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(elements_in_this_block[0])->type());
     num_nodes_per_elem = mesh.elem(elements_in_this_block[0])->n_nodes();
-
-    std::cerr<<libMesh::processor_id()<<": Writing Block: "<<block<<std::endl;
 
     ex_err = exII::ex_put_elem_block(ex_id, block, conv.exodus_elem_type().c_str(), elements_in_this_block.size(),num_nodes_per_elem,0);
     check_err(ex_err, "Error writing element block.");
