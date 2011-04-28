@@ -1999,8 +1999,11 @@ std::string Nemesis_IO_Helper::construct_nemesis_filename(const std::string& bas
   // ...
   // mesh.e.128.127
 
+  // DRG: Unfortunately... if you use 1000 processors it pads the files with enough zeros
+  // for 1000... even though the highest is only 999.... sigh.
+
   // Find the length of the highest processor ID 
-  file_oss << (libMesh::n_processors()-1);
+  file_oss << (libMesh::n_processors()/*-1*/);
   unsigned field_width = file_oss.str().size();
   
   if (_verbose)
