@@ -1219,7 +1219,10 @@ void Nemesis_IO::write_timestep (const std::string& fname,
 
 #else
 
-void Nemesis_IO::write_timestep (const std::string& )
+void Nemesis_IO::write_timestep (const std::string&,
+                                 const EquationSystems&,
+                                 const int,
+                                 const Real)
 {
   libMesh::err <<  "ERROR, Nemesis API is not defined!" << std::endl;
   libmesh_error();
