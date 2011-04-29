@@ -119,6 +119,9 @@ namespace {
 	elem_type_to_enum["INFPRISM"  ]=INFPRISM6;
 	elem_type_to_enum["INFPRISM6" ]=INFPRISM6;
 	elem_type_to_enum["INFPRISM12"]=INFPRISM12;
+
+	elem_type_to_enum["NODE"      ]=NODEELEM;
+	elem_type_to_enum["NODEELEM"  ]=NODEELEM;
       }
   }
 
