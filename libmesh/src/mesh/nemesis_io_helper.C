@@ -1992,16 +1992,20 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
   // nodesets.  
   for (unsigned i=0; i<boundary_node_list.size(); ++i)
     {
-      // Get reference to the vector where this node ID will be inserted.  If it 
-      // doesn't yet exist, this will create it.
-      std::vector<int>& current_id_set = local_node_boundary_id_lists[ boundary_node_boundary_id_list[i] ];
-	
-      // Push the current node ID back on that vector.
-      // TODO: reserve space in these vectors somehow.
-      // current_id_set.push_back( boundary_node_list[i] );
-	
-      // Push back Exodus-mapped node ID for this set
-      current_id_set.push_back( this->libmesh_node_num_to_exodus[boundary_node_list[i]] );
+      // Don't try to grab a reference to the vector unless the current node is attached
+      // to a local element.  Otherwise, another processor will be responsible for writing it in its nodeset.
+      std::map<int, int>::iterator it = this->libmesh_node_num_to_exodus.find( boundary_node_list[i] );
+
+      if ( it != this->libmesh_node_num_to_exodus.end() )
+	{
+	  // Get reference to the vector where this node ID will be inserted.  If it 
+	  // doesn't yet exist, this will create it.
+	  std::vector<int>& current_id_set = local_node_boundary_id_lists[ boundary_node_boundary_id_list[i] ];
+
+	  // Push back Exodus-mapped node ID for this set
+	  // TODO: reserve space in these vectors somehow.
+	  current_id_set.push_back( (*it).second );
+	}
     }
 
   // See what we got
@@ -2141,8 +2145,24 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
  
 	      // Use the libmesh to exodus datastructure map to get the proper sideset IDs
 	      // The datastructure contains the "collapsed" contiguous ids.  
-	      local_elem_boundary_id_lists[ id_list[i] ].push_back(this->libmesh_elem_num_to_exodus[family[j]->id()]);
-	      local_elem_boundary_id_side_lists[ id_list[i] ].push_back(conv.get_inverse_side_map( side_list[i] ));
+	      //
+	      // We know the parent element is local, but let's be absolutely sure that all the children have been 
+	      // actually mapped to Exodus IDs before we blindly try to add them...
+	      std::map<int,int>::iterator it = this->libmesh_elem_num_to_exodus.find( family[j]->id() );
+	      if (it != this->libmesh_elem_num_to_exodus.end())
+		{
+		  local_elem_boundary_id_lists[ id_list[i] ].push_back( (*it).second );
+		  local_elem_boundary_id_side_lists[ id_list[i] ].push_back(conv.get_inverse_side_map( side_list[i] ));
+		}
+	      else
+		{
+		  libMesh::err << "Error, no Exodus mapping for Elem " 
+			       << family[j]->id() 
+			       << " on processor "
+			       << libMesh::processor_id() 
+			       << std::endl;
+		  libmesh_error();
+		}
 	    }
 	}
     }

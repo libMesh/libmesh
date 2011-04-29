@@ -14,5 +14,7 @@ config.log
 config.status
 contrib/bin/create_libmesh_release
 include/base/libmesh_config.h
-
+*.exd
+out_1
+out_1_data
 
