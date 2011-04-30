@@ -9,6 +9,9 @@ coarserefinements = 3
 # Should the nonlinear solver produce verbose messages?
 solver_quiet = false
 
+# Should PETSc reuse the forward preconditioner for the adjoint ?
+reuse_preconditioner = true
+
 # Should the quasiNewton scheme do substepping?
 require_residual_reduction = true
 

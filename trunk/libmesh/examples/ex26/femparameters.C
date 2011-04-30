@@ -20,6 +20,7 @@ void FEMParameters::read(GetPot &input)
     GETPOT_INPUT(domainfile);
 
     GETPOT_INPUT(solver_quiet);
+    GETPOT_INPUT(reuse_preconditioner);
     GETPOT_INPUT(require_residual_reduction);
     GETPOT_INPUT(min_step_length);
     GETPOT_INT_INPUT(max_linear_iterations);

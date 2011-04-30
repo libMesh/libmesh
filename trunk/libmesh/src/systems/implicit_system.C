@@ -347,25 +347,12 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
   // Log how long the linear solve takes.
   START_LOG("adjoint_solve()", "ImplicitSystem");
 
-  // The forward system should now already be solved.
-  // Now assemble it's adjoint.
-
-  if (this->assemble_before_solve)
-    {
-      // Build the Jacobian
-      this->assembly(false, true);
-      this->matrix->close();
-
-      // Take the discrete adjoint
-      matrix->get_transpose(*matrix);
-
-      // Reset and build the RHS from the QOI derivative
-      this->assemble_qoi_derivative(qoi_indices);
-    }
-
   // The adjoint problem is linear
   LinearSolver<Number> *linear_solver = this->get_linear_solver();
 
+  // Reset and build the RHS from the QOI derivative
+  this->assemble_qoi_derivative(qoi_indices);
+    
   // Our iteration counts and residuals will be sums of the individual
   // results
   std::pair<unsigned int, Real> solver_params =
@@ -374,17 +361,17 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
 
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
-      {
-        const std::pair<unsigned int, Real> rval =
-          linear_solver->solve (*matrix, this->add_adjoint_solution(i),
-                                 this->get_adjoint_rhs(i),
-                                 solver_params.second,
-                                 solver_params.first);
+      {	
+	const std::pair<unsigned int, Real> rval =
+	  linear_solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
+					this->get_adjoint_rhs(i),
+					solver_params.second,
+					solver_params.first);
 
-        totalrval.first  += rval.first;
-        totalrval.second += rval.second;
+	    totalrval.first  += rval.first;
+	    totalrval.second += rval.second;	  
       }
-
+      
   this->release_linear_solver(linear_solver);
 
   // The linear solver may not have fit our constraints exactly
