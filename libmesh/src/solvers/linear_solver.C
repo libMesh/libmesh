@@ -22,12 +22,14 @@
 // C++ includes
 
 // Local Includes
+#include "libmesh_logging.h"
 #include "auto_ptr.h"
 #include "linear_solver.h"
 #include "laspack_linear_solver.h"
 #include "petsc_linear_solver.h"
 #include "trilinos_aztec_linear_solver.h"
 #include "preconditioner.h"
+#include "sparse_matrix.h"
 
 namespace libMesh
 {
@@ -114,6 +116,13 @@ LinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
   _preconditioner = preconditioner;
 }
 
+  template <typename T>
+void
+  LinearSolver<T>::reuse_preconditioner(bool reuse_flag)
+  {
+    same_preconditioner = reuse_flag;
+  }
+
 template <typename T>
 void
 LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
@@ -126,10 +135,42 @@ LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
 }
 
 
-
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LinearSolver<Number>;
+
+ /*------------------- functions ------------------------------*/
+
+  template <typename T>
+  std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & mat,
+					       NumericVector<T>& sol,
+					       NumericVector<T>& rhs,
+					       const double tol,
+					       const unsigned int n_iter)
+  {
+    // Log how long the linear solve takes.
+    START_LOG("adjoint_solve()", "LinearSolver");
+            
+    // Take the discrete adjoint
+    mat.close();
+    mat.get_transpose(mat);      
+                
+    // Call the solve function for the relevant linear algebra library and
+    // solve the transpose matrix
+    const std::pair<unsigned int, Real> totalrval =  this->solve (mat, sol, rhs, tol, n_iter);      
+      
+    // Now transpose back and restore the original matrix
+    // by taking the discrete adjoint
+    mat.get_transpose(mat); 
+    
+    // Stop logging the nonlinear solve
+    STOP_LOG("adjoint_solve()", "LinearSolver");
+    
+    return totalrval;   
+    
+  }
+
+
 
 } // namespace libMesh
 

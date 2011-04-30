@@ -17,6 +17,7 @@ public:
       domainfile("lshaped.xda"),
       coarserefinements(0),            
       solver_quiet(true),
+	reuse_preconditioner(false),
       require_residual_reduction(true),
       min_step_length(1e-5),
       max_linear_iterations(200000), max_nonlinear_iterations(20),
@@ -39,7 +40,7 @@ public:
     std::string domainfile;
     unsigned int coarserefinements;
             
-    bool solver_quiet, require_residual_reduction;
+    bool solver_quiet, reuse_preconditioner, require_residual_reduction;
     Real min_step_length;
     unsigned int max_linear_iterations, max_nonlinear_iterations;
     Real relative_step_tolerance, relative_residual_tolerance,

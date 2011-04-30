@@ -1942,7 +1942,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
   if(reuse_preconditioner)
   {
     // For the first solve, make sure we generate a new preconditioner
-    linear_solver->same_preconditioner = false;
+    linear_solver->reuse_preconditioner(false);
   }
 
   for(unsigned int q_a=0; q_a<get_Q_a(); q_a++)
@@ -2010,14 +2010,14 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       if(reuse_preconditioner)
       {
         // set this flag again in case we didn't do any F solves
-        linear_solver->same_preconditioner = true;
+        linear_solver->reuse_preconditioner(true);
       }
     }
   }
 
   if(reuse_preconditioner)
   {
-    linear_solver->same_preconditioner = false;
+    linear_solver->reuse_preconditioner(false);
   }
 
   // Now compute and store the inner products (if requested)
@@ -2143,7 +2143,7 @@ void RBSystem::compute_output_dual_norms()
   if(reuse_preconditioner)
   {
     // For the first solve, make sure we generate a new preconditioner
-    linear_solver->same_preconditioner = false;
+    linear_solver->reuse_preconditioner(false);
   }
   
   for(unsigned int n=0; n<get_n_outputs(); n++)
@@ -2210,7 +2210,7 @@ void RBSystem::compute_output_dual_norms()
         {
           // After we do a solve, tell PETSc we want to reuse the preconditioner
           // since the system matrix is not changing.
-          linear_solver->same_preconditioner = true;
+          linear_solver->reuse_preconditioner(true);
         }
     }
 
@@ -2236,7 +2236,7 @@ void RBSystem::compute_output_dual_norms()
   // reset same_preconditioner to false once all solves are finished
   if(reuse_preconditioner)
   {
-    linear_solver->same_preconditioner = false;
+    linear_solver->reuse_preconditioner(false);
   }
 
   // Finally clear the L_q_representor vectors
@@ -2287,7 +2287,7 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
   if(reuse_preconditioner)
   {
     // For the first solve, make sure we generate a new preconditioner
-    linear_solver->same_preconditioner = false;
+    linear_solver->reuse_preconditioner(false);
   }
 
   for(unsigned int q_f=0; q_f<get_Q_f(); q_f++)
@@ -2343,14 +2343,14 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
     {
       // After we do a solve, tell PETSc we want to reuse the preconditioner
       // since the system matrix is not changing.
-      linear_solver->same_preconditioner = true;
+      linear_solver->reuse_preconditioner(true);
     }
   }
 
   // Reset the same_preconditioner flag
   if(reuse_preconditioner)
   {
-    linear_solver->same_preconditioner = false;
+    linear_solver->reuse_preconditioner(false);
   }
 
   if (compute_inner_products)

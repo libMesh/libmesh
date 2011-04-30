@@ -147,6 +147,19 @@ public:
     return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
   }
 
+
+  /**
+   * Call the Petsc solver.  It calls the method below, using the
+   * same matrix for the system and preconditioner matrices.
+   */
+  std::pair<unsigned int, Real> 
+  adjoint_solve (SparseMatrix<T>  &matrix_in,
+	 NumericVector<T> &solution_in,
+	 NumericVector<T> &rhs_in,
+	 const double tol,
+		 const unsigned int m_its);
+    
+
   /**
    * This method allows you to call a linear solver while specifying
    * the matrix to use as the (left) preconditioning matrix.  Note

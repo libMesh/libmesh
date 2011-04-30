@@ -496,7 +496,7 @@ Real RBEIMSystem::truth_solve(int plot_solution)
   {
     // After we've done a solve we can now reuse the preconditioner
     // because the matrix is not changing
-    linear_solver->same_preconditioner = true;
+    linear_solver->reuse_preconditioner(true);
   }
   
   // Make sure we didn't max out the number of iterations

@@ -118,6 +118,10 @@ public:
    */
   void attach_preconditioner(Preconditioner<T> * preconditioner);
 
+  virtual void reuse_preconditioner(bool );
+
+  bool get_same_preconditioner();
+ 
   /**
    * After calling this method, all successive solves will be
    * restricted to the given set of dofs, which must contain local
@@ -140,7 +144,16 @@ public:
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
   
-
+    /**
+   * Function to solve the adjoint system. Note that this method
+   * will compute the preconditioner from the system matrix. This is not a pure virtual
+   * function and is defined linear_solver.C
+   */
+  virtual std::pair<unsigned int, Real> adjoint_solve (SparseMatrix<T>&,  // System Matrix
+  						       NumericVector<T>&, // Solution vector
+  						       NumericVector<T>&, // RHS vector
+  						       const double,      // Stopping tolerance
+  						       const unsigned int); // N. Iterations
 
   /**
    * This function calls the solver
@@ -211,13 +224,6 @@ public:
    */
   virtual void print_converged_reason() = 0;
   
-  /**
-   * Boolean flag to indicate whether we want to use an identical
-   * preconditioner to the previous solve. This can save
-   * substantial work in the cases where the system matrix is 
-   * the same for successive solves.
-   */
-  bool same_preconditioner;
   
 protected:
 
@@ -241,6 +247,15 @@ protected:
    * Holds the Preconditioner object to be used for the linear solves.
    */
   Preconditioner<T> * _preconditioner;
+
+    /**
+   * Boolean flag to indicate whether we want to use an identical
+   * preconditioner to the previous solve. This can save
+   * substantial work in the cases where the system matrix is 
+   * the same for successive solves.
+   */
+  bool same_preconditioner;
+
 };
 
 
@@ -268,7 +283,12 @@ LinearSolver<T>::~LinearSolver ()
   this->clear ();
 }
 
-
+template <typename T>
+inline
+  bool LinearSolver<T>::get_same_preconditioner()
+  {
+    return same_preconditioner;
+  }
 
 template <typename T>
 inline

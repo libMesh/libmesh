@@ -54,6 +54,7 @@
 
 // General libMesh includes
 #include "equation_systems.h"
+#include "linear_solver.h"
 #include "error_vector.h"
 #include "mesh.h"
 #include "mesh_refinement.h"
@@ -301,6 +302,7 @@ int main (int argc, char** argv)
   // Print information about the mesh and system to the screen.
   mesh.print_info();
   equation_systems.print_info();
+  LinearSolver<Number> *linear_solver = system.get_linear_solver();
 
   {	
     // Adaptively solve the timestep
@@ -315,7 +317,9 @@ int main (int argc, char** argv)
 	// target mesh size
             else
               libmesh_assert (param.nelem_target > 0);
-    
+    	
+	linear_solver->reuse_preconditioner(false);
+
 	// Solve the forward problem
 	system.solve();
 
@@ -337,11 +341,15 @@ int main (int argc, char** argv)
 	// Set weights for each index, these will weight the contribution of each QoI in the final error
 	// estimate to be used for flagging elements for refinement
 	qois.set_weight(0, 0.5);
-	qois.set_weight(1, 0.5);
+	qois.set_weight(0, 0.5);
 
 	// Make sure we get the contributions to the adjoint RHS from the sides
 	system.assemble_qoi_sides = true;
 
+	// We are about to solve the adjoint system, but before we do this we see the same preconditioner
+	// flag to reuse the preconditioner from the forward solver		
+	linear_solver->reuse_preconditioner(param.reuse_preconditioner);
+	
 	// Solve the adjoint system. This takes the transpose of the stiffness matrix and then
 	// solves the resulting system
 	system.adjoint_solve();
@@ -434,7 +442,8 @@ int main (int argc, char** argv)
 
     // Do one last solve if necessary
     if (a_step == param.max_adaptivesteps)
-      {	    
+      {	 
+	linear_solver->reuse_preconditioner(false);	
 	system.solve();
 	
 	write_output(equation_systems, a_step, "primal");
@@ -451,7 +460,8 @@ int main (int argc, char** argv)
 	qois.set_weight(0, 0.5);
 	qois.set_weight(1, 0.5);
 
-	system.assemble_qoi_sides = true;
+	system.assemble_qoi_sides = true;	
+	linear_solver->reuse_preconditioner(param.reuse_preconditioner);
 	system.adjoint_solve();
 		
 	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
