@@ -123,7 +123,7 @@ int main (int argc, char** argv)
   equation_systems.get_system("Stokes").solve();
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO(mesh).write_equation_systems ("out.exd",
+  ExodusII_IO(mesh).write_equation_systems ("out.e",
                                       equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 

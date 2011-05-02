@@ -265,7 +265,7 @@ int main (int argc, char** argv)
           // We write the file in the ExodusII format.
           file_name << "out_";
           OSSRealzeroright(file_name,3,0, t_step + 1);
-          file_name << ".exd";
+          file_name << ".e";
           
           ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);

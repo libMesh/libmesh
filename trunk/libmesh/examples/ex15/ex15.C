@@ -177,7 +177,7 @@ int main(int argc, char** argv)
     output_file += "uniform";
 
   std::string exd_file = output_file;
-  exd_file += ".exd";
+  exd_file += ".e";
   output_file += ".m";
 
   std::ofstream out (output_file.c_str());
