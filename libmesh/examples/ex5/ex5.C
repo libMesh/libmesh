@@ -179,7 +179,7 @@ int main (int argc, char** argv)
   // "Personalize" the output, with the
   // number of the quadrature rule appended.
   std::ostringstream f_name;
-  f_name << "out_" << quad_type << ".exd";
+  f_name << "out_" << quad_type << ".e";
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO(mesh).write_equation_systems (f_name.str(),

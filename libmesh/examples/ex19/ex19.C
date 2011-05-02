@@ -538,7 +538,7 @@ int main (int argc, char** argv)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // After solving the system write the solution
-  ExodusII_IO (mesh).write_equation_systems ("out.exd", 
+  ExodusII_IO (mesh).write_equation_systems ("out.e", 
                                        equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 #endif // #ifndef LIBMESH_ENABLE_AMR

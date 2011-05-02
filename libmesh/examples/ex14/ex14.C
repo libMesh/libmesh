@@ -260,7 +260,7 @@ int main(int argc, char** argv)
       if (output_intermediate)
         {
           OStringStream outfile;
-          outfile << "lshaped_" << r_step << ".exd";
+          outfile << "lshaped_" << r_step << ".e";
           ExodusII_IO (mesh).write_equation_systems (outfile.str(),
                                                equation_systems);
         }
@@ -416,7 +416,7 @@ int main(int argc, char** argv)
   // Write out the solution
   // After solving the system write the solution
   // to a ExodusII-formatted plot file.
-  ExodusII_IO (mesh).write_equation_systems ("lshaped.exd",
+  ExodusII_IO (mesh).write_equation_systems ("lshaped.e",
                                        equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 

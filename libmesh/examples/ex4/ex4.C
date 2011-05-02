@@ -256,7 +256,7 @@ int main (int argc, char** argv)
   else
   {
     ExodusII_IO (mesh).write_equation_systems ((dim == 3) ? 
-      "out_3.exd" : "out_2.exd",equation_systems);
+      "out_3.e" : "out_2.e",equation_systems);
   }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   
