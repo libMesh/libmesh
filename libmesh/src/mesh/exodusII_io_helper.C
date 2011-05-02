@@ -77,6 +77,16 @@ const int ExodusII_IO_Helper::ElementMaps::hex27_node_map[27] = {
   21, 25, 24, 26, 23, 22, 20};
 //20  21  22  23  24  25  26 // LibMesh indices
 
+// The hex27 appears to be the only element without a 1:1 map between its
+// node numbering and libmesh's.  Therefore when writing out hex27's we need
+// to invert this map...
+const int ExodusII_IO_Helper::ElementMaps::hex27_inverse_node_map[27] = {
+  // Vertex and mid-edge nodes
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+  // Mid-face nodes and centroid
+  26, 20, 25, 24, 22, 21, 23};
+//20  21  22  23  24  25  26
+
 
 const int ExodusII_IO_Helper::ElementMaps::tet4_node_map[4]   = {0, 1, 2, 3};
 const int ExodusII_IO_Helper::ElementMaps::tet10_node_map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -825,7 +835,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
           for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
-              const unsigned int elem_node_index = conv.get_node_map(j);
+              const unsigned int elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
               if (_verbose)
                 {
                   libMesh::out << "Exodus node index: " << j
@@ -908,7 +918,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
           for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
-              const unsigned int elem_node_index = conv.get_node_map(j);
+              const unsigned int elem_node_index = conv.get_inverse_node_map(j); // Inverse node map is for writing
               if (_verbose)
                 {
                   libMesh::out << "Exodus node index: " << j
@@ -1374,9 +1384,15 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     }
 
   libmesh_error();
-
-  const Conversion conv(tri3_node_map, tri_edge_map, tri_inverse_edge_map, TRI3,"TRI3"); // dummy
-  return conv;
+  
+  // dummy return value, we won't get here
+  const Conversion conv(tri3_node_map,
+			tri3_node_map, // inverse node map same as forward node map
+			tri_edge_map,
+			tri_inverse_edge_map,
+			TRI3,
+			"TRI3");
+  return conv;  
 }
 
 
@@ -1388,85 +1404,155 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
     case QUAD4:
       {
-	const Conversion conv(quad4_node_map, quad_edge_map, quad_inverse_edge_map, QUAD4, "QUAD4");
+	const Conversion conv(quad4_node_map,
+			      quad4_node_map, // inverse node map same as forward node map
+			      quad_edge_map,
+			      quad_inverse_edge_map,
+			      QUAD4,
+			      "QUAD4");
 	return conv;
       }
 
     case QUAD8:
       {
-	const Conversion conv(quad8_node_map, quad_edge_map, quad_inverse_edge_map, QUAD8, "QUAD8");
+	const Conversion conv(quad8_node_map,
+			      quad8_node_map, // inverse node map same as forward node map
+			      quad_edge_map,
+			      quad_inverse_edge_map,
+			      QUAD8,
+			      "QUAD8");
 	return conv;
       }
 
     case QUAD9:
       {
-	const Conversion conv(quad9_node_map, quad_edge_map, quad_inverse_edge_map, QUAD9, "QUAD9");
+	const Conversion conv(quad9_node_map,
+			      quad9_node_map, // inverse node map same as forward node map
+			      quad_edge_map,
+			      quad_inverse_edge_map,
+			      QUAD9,
+			      "QUAD9");
 	return conv;
       }
 
     case TRI3:
       {
-	const Conversion conv(tri3_node_map, tri_edge_map, tri_inverse_edge_map, TRI3, "TRI3");
+	const Conversion conv(tri3_node_map,
+			      tri3_node_map, // inverse node map same as forward node map
+			      tri_edge_map,
+			      tri_inverse_edge_map,
+			      TRI3,
+			      "TRI3");
 	return conv;
       }
 
     case TRI6:
       {
-	const Conversion conv(tri6_node_map, tri_edge_map, tri_inverse_edge_map, TRI6, "TRI6");
+	const Conversion conv(tri6_node_map,
+			      tri6_node_map, // inverse node map same as forward node map
+			      tri_edge_map,
+			      tri_inverse_edge_map,
+			      TRI6,
+			      "TRI6");
 	return conv;
       }
 
     case HEX8:
       {
-	const Conversion conv(hex8_node_map, hex_face_map, hex_inverse_face_map, HEX8, "HEX8");
+	const Conversion conv(hex8_node_map,
+			      hex8_node_map, // inverse node map same as forward node map
+			      hex_face_map,
+			      hex_inverse_face_map,
+			      HEX8,
+			      "HEX8");
 	return conv;
       }
 
     case HEX20:
       {
-	const Conversion conv(hex20_node_map, hex_face_map, hex_inverse_face_map, HEX20, "HEX20");
+	const Conversion conv(hex20_node_map,
+			      hex20_node_map, // inverse node map same as forward node map
+			      hex_face_map,
+			      hex_inverse_face_map,
+			      HEX20,
+			      "HEX20");
 	return conv;
       }
 
     case HEX27:
       {
-	const Conversion conv(hex27_node_map, hex27_face_map, hex27_inverse_face_map, HEX27, "HEX27");
+	const Conversion conv(hex27_node_map,
+			      hex27_inverse_node_map, // different inverse node map for Hex27!
+			      hex27_face_map,
+			      hex27_inverse_face_map,
+			      HEX27,
+			      "HEX27");
 	return conv;
       }
 
     case TET4:
       {
-	const Conversion conv(tet4_node_map, tet_face_map, tet_inverse_face_map, TET4, "TETRA4");
+	const Conversion conv(tet4_node_map,
+			      tet4_node_map, // inverse node map same as forward node map
+			      tet_face_map,
+			      tet_inverse_face_map,
+			      TET4,
+			      "TETRA4");
 	return conv;
       }
 
     case TET10:
       {
-	const Conversion conv(tet10_node_map, tet_face_map, tet_inverse_face_map, TET10, "TETRA10");
+	const Conversion conv(tet10_node_map,
+			      tet10_node_map, // inverse node map same as forward node map
+			      tet_face_map,
+			      tet_inverse_face_map,
+			      TET10,
+			      "TETRA10");
 	return conv;
       }
 
     case PRISM6:
       {
-	const Conversion conv(prism6_node_map, prism_face_map, prism_inverse_face_map, PRISM6, "WEDGE");
+	const Conversion conv(prism6_node_map,
+			      prism6_node_map, // inverse node map same as forward node map
+			      prism_face_map,
+			      prism_inverse_face_map,
+			      PRISM6,
+			      "WEDGE");
 	return conv;
       }
 
     case PRISM15:
       {
-	const Conversion conv(prism15_node_map, prism_face_map, prism_inverse_face_map, PRISM15, "WEDGE15");
+	const Conversion conv(prism15_node_map,
+			      prism15_node_map, // inverse node map same as forward node map
+			      prism_face_map,
+			      prism_inverse_face_map,
+			      PRISM15,
+			      "WEDGE15");
 	return conv;
       }
 
     case PRISM18:
       {
-	const Conversion conv(prism18_node_map, prism_face_map, prism_inverse_face_map, PRISM18, "WEDGE18");
+	const Conversion conv(prism18_node_map,
+			      prism18_node_map, // inverse node map same as forward node map
+			      prism_face_map,
+			      prism_inverse_face_map,
+			      PRISM18,
+			      "WEDGE18");
 	return conv;
       }
 
     case PYRAMID5:
       {
-	const Conversion conv(pyramid5_node_map, pyramid_face_map, pyramid_inverse_face_map, PYRAMID5, "PYRAMID5");
+	const Conversion conv(pyramid5_node_map,
+			      pyramid5_node_map, // inverse node map same as forward node map
+			      pyramid_face_map,
+			      pyramid_inverse_face_map,
+			      PYRAMID5,
+			      "PYRAMID5");
 	return conv;
       }
 
@@ -1475,9 +1561,15 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     }
 
   libmesh_error();
-
-  const Conversion conv(tri3_node_map, tri_edge_map, tri_inverse_edge_map, TRI3, "TRI3"); // dummy
-  return conv;
+    
+  // dummy return value, we will never get here
+  const Conversion conv(tri3_node_map,
+			tri3_node_map, // inverse node map same as forward node map
+			tri_edge_map,
+			tri_inverse_edge_map,
+			TRI3,
+			"TRI3");
+  return conv;  
 }
 
 } // namespace libMesh

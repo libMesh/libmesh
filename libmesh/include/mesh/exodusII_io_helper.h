@@ -667,12 +667,18 @@ public:
    * Constructor.  Initializes the const private member
    * variables.
    */
-  Conversion(const int* nm, const int* sm, const int* ism, const ElemType ct, std::string ex_type)
-    : node_map(nm),       // Node map for this element
+  Conversion(const int* nm,       // node_map 
+	     const int* inm,      // inverse_node_map 
+	     const int* sm,       // side_map 
+	     const int* ism,      // inverse_side_map 
+	     const ElemType ct,   // "canonical" aka libmesh element type 
+	     std::string ex_type) // string representing the Exodus element type 
+    : node_map(nm),       
+      inverse_node_map(inm),
       side_map(sm),
       inverse_side_map(ism),
-      canonical_type(ct),    // Element type name in this code
-      exodus_type(ex_type)   // Element type in Exodus
+      canonical_type(ct),    
+      exodus_type(ex_type)   
   {}
 
   /**
@@ -681,6 +687,14 @@ public:
    * format to this library's format.
    */
   int get_node_map(int i)          const { return node_map[i]; }
+
+  /**
+   * Returns the ith component of the inverse node map for this
+   * element.  The inverse node map maps the libmesh node numbering
+   * to Exodus' node numbering.  Note that all elements except Hex27
+   * currently have the same node numbering as libmesh elements.
+   */
+  int get_inverse_node_map(int i)          const { return inverse_node_map[i]; }
 
   /**
    * Returns the ith component of the side map for this
@@ -714,6 +728,13 @@ private:
    * Pointer to the node map for this element.
    */
   const int* node_map;
+
+  /**
+   * Pointer to the inverse node map for this element.
+   * For all elements except for the Hex27, this is the same
+   * as the node map.
+   */
+  const int* inverse_node_map;
 
   /**
    * Pointer to the side map for this element.
@@ -842,10 +863,17 @@ public:
 
   /**
    * The Hex27 node map.
-   * Use this map for bi-quadratic
+   * Use this map for reading tri-quadratic
    * hexahedral elements in 3D.
    */
   static const int hex27_node_map[27];
+
+  /**
+   * The Hex27 inverse node map.
+   * Use this map for writing tri-quadratic
+   * hexahedral elements in 3D.
+   */
+  static const int hex27_inverse_node_map[27];
 
   /**
    * The Tet4 node map.
