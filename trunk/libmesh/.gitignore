@@ -1,3 +1,6 @@
+*.unv
+*.gmv
+*.gmv.*
 *.o
 *-dbg
 *-opt
@@ -17,4 +20,10 @@ include/base/libmesh_config.h
 *.exd
 out_1
 out_1_data
-
+examples/ex0/gnuplot_script
+examples/ex0/gnuplot_script_data
+examples/ex1/output.xda
+examples/ex14/biquadratic_h_adaptive.m
+examples/ex15/2D_hermite_uniform.m
+examples/ex2/eqn_sys.dat
+examples/ex23/offline_data/
