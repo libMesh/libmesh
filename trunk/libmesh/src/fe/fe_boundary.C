@@ -109,10 +109,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // points
   if (pts != NULL)
     {
-      // Set the element type so we don't accidentally think we can
-      // get away without recomputing shape functions next time
-      elem_type = INVALID_ELEM;
-      
+      // The shape functions do not correspond to the qrule
+      shapes_on_quadrature = false;
+
       // Initialize the face shape functions
       this->init_face_shape_functions (*pts, side.get());
 
@@ -173,9 +172,6 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // compute the shape function and derivative values
   // at the points qp
   this->reinit  (elem, &qp);
-
-  // The shape functions correspond to the qrule
-  shapes_on_quadrature = (qrule != NULL);
 
   // copy back old data
   JxW = JxW_int;
