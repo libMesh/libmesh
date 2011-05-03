@@ -109,15 +109,10 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // points
   if (pts != NULL)
     {
-      // Set the element type
-      elem_type = elem->type();
-
-      // Set the last_side
-      last_side = std::numeric_limits<unsigned int>::max();
+      // Set the element type so we don't accidentally think we can
+      // get away without recomputing shape functions next time
+      elem_type = INVALID_ELEM;
       
-      // Set the last p level
-      _p_level = side_p_level;
-
       // Initialize the face shape functions
       this->init_face_shape_functions (*pts, side.get());
 
@@ -137,7 +132,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   else
     {
       // initialize quadrature rule
-      if (pts != NULL) qrule->init(side->type(), side_p_level);
+      qrule->init(side->type(), side_p_level);
 
       // FIXME - could this break if the same FE object was used
       // for both volume and face integrals? - RHS
