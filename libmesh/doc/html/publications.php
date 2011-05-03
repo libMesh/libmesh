@@ -58,7 +58,34 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petrolati_Dissertation">1</a>]
+[<a name="Nenning_Dissertation">1</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Nenning.
+ <em>Infinite Elements for Elasto- and Poroelastodynamics</em>.
+ PhD thesis, Graz University of Technology, Institute of Applied
+  Mechanics, August 2010.
+ 
+  <a href="http://fmysql.tu-graz.ac.at/~karl/verlagspdf/buch_nenning_10112010.pdf">http://fmysql.tu-graz.ac.at/~karl/verlagspdf/buch_nenning_10112010.pdf</a>.
+<a name="Nenning_Dissertation"></a><pre>
+@phdthesis{Nenning_Dissertation,
+  author = {M.~Nenning},
+  school = {Graz University of Technology, Institute of Applied Mechanics},
+  title = {{Infinite Elements for Elasto- and Poroelastodynamics}},
+  note = {\url{http://fmysql.tu-graz.ac.at/~karl/verlagspdf/buch_nenning_10112010.pdf}},
+  month = aug,
+  year = {2010}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Petrolati_Dissertation">2</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;Petrolati.
@@ -84,7 +111,7 @@ E.&nbsp;Petrolati.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_Dissertation">2</a>]
+[<a name="Stogner_Dissertation">3</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner.
@@ -112,7 +139,7 @@ R.&nbsp;H. Stogner.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Dissertation">3</a>]
+[<a name="Peterson_Dissertation">4</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -139,7 +166,7 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_Dissertation">4</a>]
+[<a name="Knezevic_Dissertation">5</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic.
@@ -166,7 +193,7 @@ D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_Dissertation">5</a>]
+[<a name="Kirk_Dissertation">6</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -193,7 +220,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Thesis">6</a>]
+[<a name="Peterson_Thesis">7</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -230,20 +257,48 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2011">1</a>]
+[<a name="Camata_2011">1</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
+  A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
+ Reordering and incomplete preconditioning in serial and parallel
+  AMR/C flow solutions.
+ <em>PREPRINT, International Journal for Numerical Methods in
+  Fluids</em>, pages xx-xx, 2011.
+ <a href="http://dx.doi.org">http://dx.doi.org</a>.
+<a name="Camata_2011"></a><pre>
+@article{Camata_2011,
+  author = {J.~J.~Camata and A.~L.~Rossa and A.~M.~P.~Valli and L.~Catabriga and G.~F.~Carey and A.~L.~G.~A.~Coutinho},
+  title = {{Reordering and incomplete preconditioning in serial and parallel AMR/C flow solutions}},
+  journal = {PREPRINT, International Journal for Numerical Methods in Fluids},
+  year = 2011,
+  pages = {xx--xx},
+  note = {\url{http://dx.doi.org}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Carey_2011">2</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Carey and G.&nbsp;F. Carey.
  Flexible patch post-processing recovery strategies for solution
   enhancement and adaptive mesh refinement.
- <em>International Journal for Numerical Methods in Engineering</em>,
-  pages n/a-n/a, 2011.
+ <em>PREPRINT, International Journal for Numerical Methods in
+  Engineering</em>, pages n/a-n/a, 2011.
  <a href="http://dx.doi.org/10.1002/nme.3146">http://dx.doi.org/10.1002/nme.3146</a>.
 <a name="Carey_2011"></a><pre>
 @article{Carey_2011,
   author = {V.~Carey and G.~F.~Carey},
   title = {Flexible patch post-processing recovery strategies for solution enhancement and adaptive mesh refinement},
-  journal = {International Journal for Numerical Methods in Engineering},
+  journal = {PREPRINT, International Journal for Numerical Methods in Engineering},
   note = {\url{http://dx.doi.org/10.1002/nme.3146}},
   pages = {n/a--n/a},
   year = {2011}
@@ -257,7 +312,7 @@ V.&nbsp;Carey and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Arbree_2011">2</a>]
+[<a name="Arbree_2011">3</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
@@ -274,33 +329,6 @@ A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
   year = 2011,
   volume = 17,
   note = {\url{http://dx.doi.org/10.1109/TVCG.2010.117}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Curtis_2011">3</a>]
-</td>
-<td class="bibtexitem">
-F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
- On the implementation of an interior-point algorithm for nonlinear
-  optimization with inexact step computations.
- <em>PREPRINT</em>, 2011.
- 
-  <a href="http://fgb.informatik.unibas.ch/people/oschenk/publications/references/imips.pdf">http://fgb.informatik.unibas.ch/people/oschenk/publications/references/imips.pdf</a>.
-<a name="Curtis_2011"></a><pre>
-@article{Curtis_2011,
-  author = {F.~E.~Curtis and J.~Huber and O.~Schenk and A.~W\"{a}chter},
-  title = {{On the implementation of an interior-point algorithm for nonlinear
-              optimization with inexact step computations}},
-  journal = {PREPRINT},
-  year = 2011,
-  note = {\url{http://fgb.informatik.unibas.ch/people/oschenk/publications/references/imips.pdf}}
 }
 </pre>
 
@@ -442,33 +470,6 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 </td>
 </tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Peterson_2010b">9</a>]
-</td>
-<td class="bibtexitem">
-J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
- Parallel adaptive solution of coupled
-  Rayleigh-B&eacute;nard-Marangoni problems with Navier-slip.
- <em>EARLY VIEW, International Journal for Numerical Methods in
-  Fluids</em>, accepted, 2009.
- <a href="http://dx.doi.org/10.1002/fld.2264">http://dx.doi.org/10.1002/fld.2264</a>.
-<a name="Peterson_2010b"></a><pre>
-@article{Peterson_2010b,
-  author = {J.~W.~Peterson and G.~F.~Carey},
-  title = {{Parallel adaptive solution of coupled Rayleigh--B\'{e}nard--Marangoni
-  problems with Navier-slip}},
-  journal = {EARLY VIEW, International Journal for Numerical Methods in Fluids},
-  year = {accepted, 2009},
-  note = {\url{http://dx.doi.org/10.1002/fld.2264}}
-}
-</pre>
-
-
-</td>
-</tr>
 </table><a name="Articles"></a>
 <h2>2011</h2>
 
@@ -482,7 +483,38 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="AufDerMaur_2011">1</a>]
+[<a name="Peterson_2010b">1</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
+ Parallel adaptive solution of coupled
+  Rayleigh-B&eacute;nard-Marangoni problems with Navier-slip.
+ <em>International Journal for Numerical Methods in Fluids</em>,
+  66(4):428-451, June 2011.
+ <a href="http://dx.doi.org/10.1002/fld.2264">http://dx.doi.org/10.1002/fld.2264</a>.
+<a name="Peterson_2010b"></a><pre>
+@article{Peterson_2010b,
+  author = {J.~W.~Peterson and G.~F.~Carey},
+  title = {{Parallel adaptive solution of coupled Rayleigh--B\'{e}nard--Marangoni
+  problems with Navier-slip}},
+  journal = {International Journal for Numerical Methods in Fluids},
+  volume = 66,
+  number = 4,
+  pages = {428--451},
+  month = jun,
+  year = {2011},
+  note = {\url{http://dx.doi.org/10.1002/fld.2264}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="AufDerMaur_2011">2</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&nbsp;Pecchia, and
@@ -512,7 +544,38 @@ M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">2</a>]
+[<a name="Curtis_2011a">3</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
+ On the implementation of an interior-point algorithm for nonlinear
+  optimization with inexact step computations.
+ Technical Report RC25143 (W1104-052), IBM Research Division, April
+  2011.
+ <a href="https://domino.research.ibm.com/library/cyberdig.nsf/papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf">https://domino.research.ibm.com/library/cyberdig.nsf/papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf</a>.
+<a name="Curtis_2011a"></a><pre>
+@techreport{Curtis_2011a,
+  author = {F.~E.~Curtis and J.~Huber and O.~Schenk and A.~W\"{a}chter},
+  title = {{On the implementation of an interior-point algorithm for nonlinear
+              optimization with inexact step computations}},
+  institution = {IBM Research Division},
+  day = {13},
+  month = apr,
+  year = 2011,
+  number = {RC25143 (W1104-052)},
+  note = {\url{https://domino.research.ibm.com/library/cyberdig.nsf/
+papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Huynh_2010">4</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
@@ -546,7 +609,7 @@ DOI:~\url{http://dx.doi.org/10.1016/j.compfluid.2010.07.007}    }
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2011">3</a>]
+[<a name="Knezevic_2011">5</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
@@ -576,7 +639,7 @@ D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2011">4</a>]
+[<a name="Botti_2011">6</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
@@ -607,7 +670,36 @@ L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hilscher_2011">5</a>]
+[<a name="widmer_2011">7</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
+ A mixed boundary representation to simulate the displacement of a
+  biofluid by a biomaterial in porous media.
+ <em>Journal of Biomechanical Engineering</em>, 133(5):051007, 2011.
+ <a href="http://dx.doi.org/10.1115/1.4003735">http://dx.doi.org/10.1115/1.4003735</a>.
+<a name="widmer_2011"></a><pre>
+@article{widmer_2011,
+  author = {R.~P.~Widmer and S.~J.~Ferguson},
+  title = {A Mixed Boundary Representation to Simulate the Displacement of a Biofluid by a Biomaterial in Porous Media},
+  year = {2011},
+  journal = {Journal of Biomechanical Engineering},
+  volume = {133},
+  number = {5},
+  numpages = {12},
+  pages = {051007},
+  note = {\url{http://dx.doi.org/10.1115/1.4003735}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hilscher_2011">8</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;P. Hilscher, K.&nbsp;Imadera, J.&nbsp;Li, and Y.&nbsp;Kishimoto.
@@ -640,7 +732,7 @@ P.&nbsp;P. Hilscher, K.&nbsp;Imadera, J.&nbsp;Li, and Y.&nbsp;Kishimoto.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2011">6</a>]
+[<a name="Corsini_2011">9</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, F.&nbsp;Rispoli, and T.&nbsp;E. Tezduyar.
@@ -1105,7 +1197,38 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010a">15</a>]
+[<a name="Rossa_2010">15</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;L. Rossa, J.&nbsp;J. Camata, and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
+ Hourglass control for the stabilized finite element solution of
+  coupled incompressible viscous flows and heat transfer.
+ <em>Mec&aacute;nica Computacional - High Performance Computing in
+  Computational Mechanics (B)</em>, XXIX(31):3169-3184, 2010.
+ 
+  <a href="http://www.amcaonline.org.ar/ojs/index.php/mc/article/view/3225">http://www.amcaonline.org.ar/ojs/index.php/mc/article/view/3225</a>.
+<a name="Rossa_2010"></a><pre>
+@article{Rossa_2010,
+  author = {A.~L.~Rossa and J.~J.~Camata and A.~L.~G.~A.~Coutinho},
+  title = {{Hourglass control for the stabilized finite element solution
+of coupled incompressible viscous flows and heat transfer}},
+  journal = {Mec\'{a}nica Computacional -- High Performance Computing in Computational Mechanics (B)},
+  year = 2010,
+  volume = {XXIX},
+  number = 31,
+  pages = {3169--3184},
+  note = {\url{http://www.amcaonline.org.ar/ojs/index.php/mc/article/view/3225}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Knezevic_2010a">16</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -1135,7 +1258,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhengyong_2010">16</a>]
+[<a name="Zhengyong_2010">17</a>]
 </td>
 <td class="bibtexitem">
 Z.&nbsp;Ren and J.&nbsp;Tang.
@@ -1164,7 +1287,7 @@ Z.&nbsp;Ren and J.&nbsp;Tang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2010">17</a>]
+[<a name="Carey_2010">18</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -1194,7 +1317,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010">18</a>]
+[<a name="Peterson_2010">19</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -1224,7 +1347,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010">19</a>]
+[<a name="Botti_2010">20</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
