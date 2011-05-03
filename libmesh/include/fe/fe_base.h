@@ -133,7 +133,7 @@ public:
    * This is at the core of this class. Use this for each
    * new element in the mesh.  Reinitializes the requested physical 
    * element-dependent data based on the current element 
-   * \p elem. By default the element data computed at the quadrature
+   * \p elem. By default the element data are computed at the quadrature
    * points specified by the quadrature rule \p qrule, but any set
    * of points on the reference element may be specified in the optional
    * argument \p pts.
@@ -144,25 +144,36 @@ public:
    * \p reinit().
    */
   virtual void reinit (const Elem* elem,
-		       const std::vector<Point>* const pts = NULL) = 0;
+		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL) = 0;
     
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of the element \p elem.  The \p tolerance paremeter
-   * is passed to the involved call to \p inverse_map().
+   * is passed to the involved call to \p inverse_map().  By default the
+   * element data are computed at the quadrature points specified by the
+   * quadrature rule \p qrule, but any set of points on the reference
+   * \em side element may be specified in the optional argument \p pts.
    */
   virtual void reinit (const Elem* elem,
 		       const unsigned int side,
-		       const Real tolerance = TOLERANCE) = 0;
+		       const Real tolerance = TOLERANCE,
+                       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL) = 0;
   
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p edge of the element \p elem.  The \p tolerance paremeter
-   * is passed to the involved call to \p inverse_map().
+   * is passed to the involved call to \p inverse_map().  By default the
+   * element data are computed at the quadrature points specified by the 
+   * quadrature rule \p qrule, but any set of points on the reference 
+   * \em edge element may be specified in the optional argument \p pts.
    */
   virtual void edge_reinit (const Elem* elem,
 		            const unsigned int edge,
-			    const Real tolerance = TOLERANCE) = 0;
+			    const Real tolerance = TOLERANCE,
+                            const std::vector<Point>* pts = NULL,
+                            const std::vector<Real>* weights = NULL) = 0;
   
   /**
    * @returns true if the point p is located on the reference element

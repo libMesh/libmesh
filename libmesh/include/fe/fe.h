@@ -300,25 +300,38 @@ public:
    * argument \p pts.
    */
   virtual void reinit (const Elem* elem,
-		       const std::vector<Point>* const pts = NULL);
+		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL);
     
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of \p face.  The \p tolerance paremeter is passed to
-   * the involved call to \p inverse_map().
+   * the involved call to \p inverse_map().  By default the shape
+   * functions and associated data are computed at the quadrature
+   * points specified by the quadrature rule \p qrule, but may be any
+   * points specified on the reference \em side element specified in
+   * the optional argument \p pts.
    */
   virtual void reinit (const Elem* elem,
 		       const unsigned int side,
-		       const Real tolerance = TOLERANCE);
+		       const Real tolerance = TOLERANCE,
+                       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL);
 
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p edge.  The \p tolerance paremeter is passed to the
-   * involved call to \p inverse_map().
+   * involved call to \p inverse_map().  By default the shape 
+   * functions and associated data are computed at the quadrature 
+   * points specified by the quadrature rule \p qrule, but may be any 
+   * points specified on the reference \em side element specified in 
+   * the optional argument \p pts.
    */
   virtual void edge_reinit (const Elem* elem,
 		            const unsigned int edge,
-			    const Real tolerance = TOLERANCE);
+			    const Real tolerance = TOLERANCE,
+                            const std::vector<Point>* const pts = NULL,
+                            const std::vector<Real>* const weights = NULL);
 
   /**
    * Provides the class with the quadrature rule, which provides the

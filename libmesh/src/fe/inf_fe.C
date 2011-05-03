@@ -158,7 +158,8 @@ void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
-				       const std::vector<Point>* const pts)
+				       const std::vector<Point>* const pts,
+                                       const std::vector<Real>* const weights)
 {
   libmesh_assert (base_fe        != NULL);
   libmesh_assert (base_fe->qrule != NULL);
@@ -268,10 +269,16 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
       // combine the base and radial shapes
       this->combine_base_radial (inf_elem);
 
-      // dummy weights
-      std::vector<Real> dummy_weights (pts->size(), 1.);
-
-      this->compute_map (dummy_weights, inf_elem);
+      // weights
+      if (weights != NULL)
+        {
+          this->compute_map (*weights, inf_elem);
+        }
+      else
+        {
+          std::vector<Real> dummy_weights (pts->size(), 1.);
+          this->compute_map (dummy_weights, inf_elem);
+        }
 
       // finally compute the ifem shapes     
       this->compute_shape_functions (inf_elem);
