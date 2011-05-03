@@ -114,7 +114,8 @@ void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
-		       const std::vector<Point>* const pts)
+		       const std::vector<Point>* const pts,
+                       const std::vector<Real>* const weights)
 {
   libmesh_assert (elem != NULL);
 
@@ -206,9 +207,15 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // different types of maps
   if (pts != NULL)
     {
-      std::vector<Real> dummy_weights (pts->size(), 1.);
-      
-      this->compute_map (dummy_weights, elem);
+      if (weights != NULL)
+        {
+          this->compute_map (*weights, elem);
+        }
+      else
+        {
+          std::vector<Real> dummy_weights (pts->size(), 1.);
+          this->compute_map (dummy_weights, elem);
+        }
     }
   else
     {

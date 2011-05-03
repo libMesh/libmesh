@@ -41,8 +41,17 @@ namespace libMesh
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 					const unsigned int s,
-					const Real tolerance)
+					const Real tolerance,
+                                        const std::vector<Point>* const pts,
+                                        const std::vector<Real>* const weights)
 {
+  if (pts != NULL)
+    {
+      libMesh::err << "ERROR: User-specified points for infinite elements "
+	           << "not implemented!" << std::endl;
+      libmesh_error();
+    }
+
   // We don't do this for 1D elements!
   libmesh_assert (Dim != 1);
 
@@ -101,7 +110,9 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
 					     const unsigned int,
-					     const Real)
+					     const Real,
+                                             const std::vector<Point>* const pts,
+                                             const std::vector<Real>* const weights)
 {
   // We don't do this for 1D elements!
   //libmesh_assert (Dim != 1);
@@ -109,6 +120,13 @@ void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
   libMesh::err << "ERROR: Edge conditions for infinite elements "
 	        << "not implemented!" << std::endl;
   libmesh_error();
+
+  if (pts != NULL)
+    {
+      libMesh::err << "ERROR: User-specified points for infinite elements "
+	           << "not implemented!" << std::endl;
+      libmesh_error();
+    }
 }
 
 
@@ -275,12 +293,12 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 //#include "inf_fe_instantiate_1D.h"
 //#include "inf_fe_instantiate_2D.h"
 //#include "inf_fe_instantiate_3D.h"
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real));
-INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real));
-INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real));
-INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));
+INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));
+INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));
+INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,edge_reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,init_face_shape_functions(const std::vector<Point>&,const Elem*));

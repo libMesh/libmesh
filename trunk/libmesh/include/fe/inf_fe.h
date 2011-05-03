@@ -405,7 +405,8 @@ public:
    * \p elem.
    */
   virtual void reinit (const Elem* elem,
-		       const std::vector<Point>* const pts);
+		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL);
     
   /**
    * Not implemented yet.  Reinitializes all the physical 
@@ -414,7 +415,9 @@ public:
    */
   virtual void reinit (const Elem* elem,
 		       const unsigned int side,
-		       const Real tolerance = TOLERANCE);
+		       const Real tolerance = TOLERANCE,
+                       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL);
 
   /**
    * Not implemented yet.  Reinitializes all the physical 
@@ -423,7 +426,9 @@ public:
    */
   virtual void edge_reinit (const Elem* elem,
 		            const unsigned int edge,
-			    const Real tolerance = TOLERANCE);
+			    const Real tolerance = TOLERANCE,
+                            const std::vector<Point>* const pts = NULL,
+                            const std::vector<Real>* const weights = NULL);
 
   /**
    * The use of quadrature rules with the \p InfFE class is somewhat

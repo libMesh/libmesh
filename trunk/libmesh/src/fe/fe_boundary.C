@@ -39,7 +39,9 @@ namespace libMesh
 template <>                                    \
 void FE<_dim,_type>::_func(const Elem*,        \
 			   const unsigned int, \
-                           const Real)         \
+                           const Real,         \
+                           const std::vector<Point>* const,     \
+                           const std::vector<Real>* const)      \
 {                                              \
   libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
 	        << std::endl;                      \
@@ -85,49 +87,86 @@ REINIT_ERROR(1, SZABAB, edge_reinit)
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
 		       const unsigned int s,
-		       const Real tolerance)
+		       const Real tolerance,
+                       const std::vector<Point>* const pts,
+                       const std::vector<Real>* const weights)
 {
   libmesh_assert (elem  != NULL);
-  libmesh_assert (qrule != NULL);
+  libmesh_assert (qrule != NULL || pts != NULL);
   // We now do this for 1D elements!
   // libmesh_assert (Dim != 1);
 
   // Build the side of interest 
   const AutoPtr<Elem> side(elem->build_side(s));
 
-
   // Find the max p_level to select 
   // the right quadrature rule for side integration
   unsigned int side_p_level = elem->p_level();
   if (elem->neighbor(s) != NULL)
-     side_p_level = std::max(side_p_level, elem->neighbor(s)->p_level());
-     
-  // initialize quadrature rule
-  qrule->init(side->type(), side_p_level);
+    side_p_level = std::max(side_p_level, elem->neighbor(s)->p_level());
 
-  // FIXME - could this break if the same FE object was used
-  // for both volume and face integrals? - RHS
-  // We might not need to reinitialize the shape functions
-  if ((this->get_type() != elem->type())    ||
-      (s != last_side)                      || 
-      (this->get_p_level() != side_p_level) ||
-      this->shapes_need_reinit())
+  // Initialize the shape functions at the user-specified
+  // points
+  if (pts != NULL)
     {
       // Set the element type
       elem_type = elem->type();
 
       // Set the last_side
-      last_side = s;
+      last_side = std::numeric_limits<unsigned int>::max();
       
       // Set the last p level
       _p_level = side_p_level;
-      
+
       // Initialize the face shape functions
-      this->init_face_shape_functions (qrule->get_points(),  side.get());
+      this->init_face_shape_functions (*pts, side.get());
+
+      // Compute the Jacobian*Weight on the face for integration
+      if (weights != NULL)
+        {
+          this->compute_face_map (*weights, side.get());
+        }
+      else
+        {
+          std::vector<Real> dummy_weights (pts->size(), 1.);
+          this->compute_face_map (dummy_weights, side.get());
+        }
     }
-  
-  // Compute the Jacobian*Weight on the face for integration
-  this->compute_face_map (qrule->get_weights(), side.get());
+  // If there are no user specified points, we use the
+  // quadrature rule
+  else
+    {
+      // initialize quadrature rule
+      if (pts != NULL) qrule->init(side->type(), side_p_level);
+
+      // FIXME - could this break if the same FE object was used
+      // for both volume and face integrals? - RHS
+      // We might not need to reinitialize the shape functions
+      if ((this->get_type() != elem->type())    ||
+          (s != last_side)                      ||
+          (this->get_p_level() != side_p_level) ||
+          this->shapes_need_reinit()            ||
+          !shapes_on_quadrature)
+        {
+          // Set the element type
+          elem_type = elem->type();
+
+          // Set the last_side
+          last_side = s;
+
+          // Set the last p level
+          _p_level = side_p_level;
+
+          // Initialize the face shape functions
+          this->init_face_shape_functions (qrule->get_points(),  side.get());
+        }
+
+      // Compute the Jacobian*Weight on the face for integration
+      this->compute_face_map (qrule->get_weights(), side.get());
+
+      // The shape functions correspond to the qrule
+      shapes_on_quadrature = true;
+    }
 
   // make a copy of the Jacobian for integration
   const std::vector<Real> JxW_int(JxW);
@@ -139,7 +178,10 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // compute the shape function and derivative values
   // at the points qp
   this->reinit  (elem, &qp);
-      
+
+  // The shape functions correspond to the qrule
+  shapes_on_quadrature = (qrule != NULL);
+
   // copy back old data
   JxW = JxW_int;
 }
@@ -149,36 +191,68 @@ void FE<Dim,T>::reinit(const Elem* elem,
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::edge_reinit(const Elem* elem,
 		            const unsigned int e,
-			    const Real tolerance)
+			    const Real tolerance,
+                            const std::vector<Point>* const pts,
+                            const std::vector<Real>* const weights)
 {
   libmesh_assert (elem  != NULL);
-  libmesh_assert (qrule != NULL);
+  libmesh_assert (qrule != NULL || pts != NULL);
   // We don't do this for 1D elements!
   libmesh_assert (Dim != 1);
 
   // Build the side of interest 
   const AutoPtr<Elem> edge(elem->build_edge(e));
 
-  // initialize quadrature rule
-  qrule->init(edge->type(), elem->p_level());
-
-  // We might not need to reinitialize the shape functions
-  if ((this->get_type() != elem->type()) ||
-      (e != last_edge) ||
-      this->shapes_need_reinit())
+  // Initialize the shape functions at the user-specified
+  // points
+  if (pts != NULL)
     {
       // Set the element type
       elem_type = elem->type();
 
       // Set the last_edge
-      last_edge = e;
+      last_edge = std::numeric_limits<unsigned int>::max();
       
       // Initialize the edge shape functions
-      this->init_edge_shape_functions (qrule->get_points(), edge.get());
-    }
+      this->init_edge_shape_functions (*pts, edge.get());
   
-  // Compute the Jacobian*Weight on the face for integration
-  this->compute_edge_map (qrule->get_weights(), edge.get());
+      // Compute the Jacobian*Weight on the face for integration
+      if (weights != NULL)
+        {
+          this->compute_edge_map (*weights, edge.get());
+        }
+      else
+        {
+          std::vector<Real> dummy_weights (pts->size(), 1.);
+          this->compute_edge_map (dummy_weights, edge.get());
+        }
+    }
+  // If there are no user specified points, we use the
+  // quadrature rule
+  else
+    {  
+      // initialize quadrature rule
+      qrule->init(edge->type(), elem->p_level());
+
+      // We might not need to reinitialize the shape functions
+      if ((this->get_type() != elem->type()) ||
+          (e != last_edge)                   ||
+          this->shapes_need_reinit()         ||
+          !shapes_on_quadrature)
+        {
+          // Set the element type
+          elem_type = elem->type();
+
+          // Set the last_edge
+          last_edge = e;
+      
+          // Initialize the edge shape functions
+          this->init_edge_shape_functions (qrule->get_points(), edge.get());
+        }
+  
+      // Compute the Jacobian*Weight on the face for integration
+      this->compute_edge_map (qrule->get_weights(), edge.get());
+    }
 
   // make a copy of the Jacobian for integration
   const std::vector<Real> JxW_int(JxW);
@@ -190,7 +264,10 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
   // compute the shape function and derivative values
   // at the points qp
   this->reinit  (elem, &qp);
-      
+
+  // The shape functions correspond to the qrule
+  shapes_on_quadrature = (qrule != NULL);
+
   // copy back old data
   JxW = JxW_int;
 }
@@ -706,62 +783,62 @@ void FEBase::compute_edge_map(const std::vector<Real>& qw,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template void FE<1,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
-template void FE<1,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
-template void FE<1,CLOUGH>::reinit(Elem const*, unsigned int, Real);
-template void FE<1,HERMITE>::reinit(Elem const*, unsigned int, Real);
-template void FE<1,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
-template void FE<1,SCALAR>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<1,HIERARCHIC>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<1,CLOUGH>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<1,HERMITE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<1,MONOMIAL>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<1,SCALAR>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-template void FE<1,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
-template void FE<1,SZABAB>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,BERNSTEIN>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<1,SZABAB>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 #endif
-template void FE<1,XYZ>::reinit(Elem const*, unsigned int, Real);
+template void FE<1,XYZ>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 
-template void FE<2,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,HIERARCHIC>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<2,CLOUGH>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,CLOUGH>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<2,HERMITE>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,HERMITE>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<2,SCALAR>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,SCALAR>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,HIERARCHIC>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,CLOUGH>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,CLOUGH>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,HERMITE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,HERMITE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,MONOMIAL>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,SCALAR>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,SCALAR>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-template void FE<2,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<2,SZABAB>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,SZABAB>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,BERNSTEIN>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,SZABAB>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,SZABAB>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 #endif
-template void FE<2,XYZ>::reinit(Elem const*, unsigned int, Real);
-template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<2,XYZ>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 
 // Intel 9.1 complained it needed this in devel mode.
 template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
 
-template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,HIERARCHIC>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<3,CLOUGH>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,CLOUGH>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<3,HERMITE>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,HERMITE>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<3,SCALAR>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,SCALAR>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,HIERARCHIC>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,CLOUGH>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,CLOUGH>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,HERMITE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,HERMITE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,MONOMIAL>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,MONOMIAL>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,SCALAR>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,SCALAR>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-template void FE<3,BERNSTEIN>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real);
-template void FE<3,SZABAB>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,SZABAB>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,BERNSTEIN>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,BERNSTEIN>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,SZABAB>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,SZABAB>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 #endif
-template void FE<3,XYZ>::reinit(Elem const*, unsigned int, Real);
-template void FE<3,XYZ>::edge_reinit(Elem const*, unsigned int, Real);
+template void FE<3,XYZ>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,XYZ>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 
 // Intel 9.1 complained it needed this in devel mode.
 template void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
