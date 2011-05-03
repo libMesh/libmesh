@@ -634,8 +634,9 @@ public:
    * compilers being confused by partially overriding this virtual function.
    */
   virtual void reinit (const Elem* elem,
-		       const std::vector<Point>* const pts = NULL)
-  { FE<Dim,XYZ>::reinit (elem, pts); }
+		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL)
+  { FE<Dim,XYZ>::reinit (elem, pts, weights); }
 
   /**
    * Reinitializes all the physical element-dependent data based on
@@ -643,7 +644,9 @@ public:
    */
   virtual void reinit (const Elem* elem,
 		       const unsigned int side,
-		       const Real tolerance = TOLERANCE);
+		       const Real tolerance = TOLERANCE,
+                       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL);
 
 
 protected:
@@ -674,7 +677,8 @@ protected:
    * Compute the map & shape functions for this face.
    */
   void compute_face_values (const Elem* elem,
-			    const Elem* side);
+			    const Elem* side,
+                            const std::vector<Real>& weights);
 };
 
 

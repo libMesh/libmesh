@@ -41,7 +41,9 @@ namespace libMesh
 template <>
 void FEXYZ<0>::reinit(const Elem*,
 		      const unsigned int,
-		      const Real)
+		      const Real,
+                      const std::vector<Point>* const,
+                      const std::vector<Real>* const)
 {
   libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
 	        << std::endl;
@@ -54,7 +56,9 @@ void FEXYZ<0>::reinit(const Elem*,
 template <>
 void FEXYZ<1>::reinit(const Elem*,
 		      const unsigned int,
-		      const Real)
+		      const Real,
+                      const std::vector<Point>* const,
+                      const std::vector<Real>* const)
 {
   libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
 	        << std::endl;
@@ -67,49 +71,61 @@ void FEXYZ<1>::reinit(const Elem*,
 template <unsigned int Dim>
 void FEXYZ<Dim>::reinit(const Elem* elem,
 			const unsigned int s,
-			const Real)
+			const Real,
+                        const std::vector<Point>* const pts,
+                        const std::vector<Real>* const weights)
 {
   libmesh_assert (elem  != NULL);
-  libmesh_assert (this->qrule != NULL);
+  libmesh_assert (this->qrule != NULL || pts != NULL);
   // We don't do this for 1D elements!
   libmesh_assert (Dim != 1);
 
   // Build the side of interest 
   const AutoPtr<Elem> side(elem->build_side(s));
 
-  // initialize quadrature rule
-  this->qrule->init(side->type(), elem->p_level());
-
-  // We might not need to reinitialize the shape functions.
-  // Note that the face shape functions are LAGRANGE and only
-  // depend on the type of face
-  if (this->get_type() != elem->type())
+  // Initialize the shape functions at the user-specified
+  // points
+  if (pts != NULL)
     {
-      // Set the element type
-      this->elem_type = elem->type();
+      // We can't get away without recomputing shape functions next
+      // time
+      this->shapes_on_quadrature = false;
       
       // Initialize the face shape functions
-      this->init_face_shape_functions (this->qrule->get_points(),  side.get());
+      this->init_face_shape_functions (*pts,  side.get());
+      
+    }
+  else
+    {
+      // initialize quadrature rule
+      this->qrule->init(side->type(), elem->p_level());
+
+        {
+          // Set the element type
+          this->elem_type = elem->type();
+      
+          // Initialize the face shape functions
+          this->init_face_shape_functions (this->qrule->get_points(),  side.get());
+        }
     }
   
   // Compute data on the face for integration
-  this->compute_face_values (elem, side.get());
+  this->compute_face_values (elem, side.get(), 
+    weights ? *weights : this->qrule->get_weights());
 }
 
 
 
 template <unsigned int Dim>
 void FEXYZ<Dim>::compute_face_values(const Elem* elem,
-				     const Elem* side)
+				     const Elem* side,
+                                     const std::vector<Real>& qw)
 {
   libmesh_assert (elem != NULL);
   libmesh_assert (side != NULL);
 
   START_LOG("compute_face_values()", "FEXYZ");
 
-  // The quadrature weights.
-  const std::vector<Real>& qw = this->qrule->get_weights();
-  
   // The number of quadrature points.
   const unsigned int n_qp = qw.size();
   
