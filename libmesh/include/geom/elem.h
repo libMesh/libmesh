@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <set>
 #include <vector>
+#include <limits.h> // CHAR_BIT
 
 // Local includes
 #include "libmesh_common.h"
@@ -40,6 +41,7 @@
 #include "auto_ptr.h"
 #include "multi_predicates.h"
 #include "variant_filter_iterator.h"
+#include "hashword.h" // Used in compute_key() functions
 
 namespace libMesh
 {
@@ -1710,6 +1712,17 @@ inline
 unsigned int Elem::compute_key (unsigned int n0,
 				unsigned int n1)
 {
+  // Only use the hashword function if we have 32 bit unsigned ints
+#if (LIBMESH_SIZEOF_UNSIGNED_INT*CHAR_BIT == 32)
+  if (n0 > n1) std::swap (n0, n1);
+  
+  // Use general function
+  //unsigned array[2] = {n0, n1};
+  //return Utility::hashword(array, 2);
+
+  // Use hard-coded hashword2 function
+  return Utility::hashword2(n0, n1);
+#else
   // big prime number
   const unsigned int bp = 65449;
   
@@ -1717,6 +1730,7 @@ unsigned int Elem::compute_key (unsigned int n0,
   if (n0 > n1) std::swap (n0, n1);
 
   return (n0%bp + (n1<<5)%bp);  
+#endif
 }
 
 
@@ -1726,9 +1740,15 @@ unsigned int Elem::compute_key (unsigned int n0,
 				unsigned int n1,
 				unsigned int n2)
 {
+  // Only use the hashword function if we have 32 bit unsigned ints
+#if (LIBMESH_SIZEOF_UNSIGNED_INT*CHAR_BIT == 32)
+  unsigned array[3] = {n0, n1, n2};
+  std::sort(array, array+3);
+  return Utility::hashword(array, 3);
+#else
   // big prime number
   const unsigned int bp = 65449;
-
+ 
   // Order the numbers such that n0 < n1 < n2.
   // We'll do it in 3 steps like this:
   //
@@ -1740,22 +1760,23 @@ unsigned int Elem::compute_key (unsigned int n0,
   //           |  /  |                  |
   //           | /  \|                  |
   //  gb min= min   max              gb max
-
-
-
+ 
+ 
+ 
   // Step 1
   if (n0 > n1) std::swap (n0, n1);
-
+ 
   // Step 2
   if (n1 > n2) std::swap (n1, n2);
-
+ 
   // Step 3
   if (n0 > n1) std::swap (n0, n1);
-
+ 
   libmesh_assert ((n0 < n1) && (n1 < n2));
-
-  
+ 
+   
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp);
+#endif
 }
 
 
@@ -1766,27 +1787,34 @@ unsigned int Elem::compute_key (unsigned int n0,
 				unsigned int n2,
 				unsigned int n3)
 {
+  // Only use the hashword function if we have 32 bit unsigned ints
+#if (LIBMESH_SIZEOF_UNSIGNED_INT*CHAR_BIT == 32)
+  unsigned array[4] = {n0, n1, n2, n3};
+  std::sort(array, array+4);
+  return Utility::hashword(array, 4);
+#else
   // big prime number
   const unsigned int bp = 65449;
-
+ 
   // Step 1
   if (n0 > n1) std::swap (n0, n1);
-
+ 
   // Step 2
   if (n2 > n3) std::swap (n2, n3);
-
+ 
   // Step 3
   if (n0 > n2) std::swap (n0, n2);
-
+ 
   // Step 4
   if (n1 > n3) std::swap (n1, n3);
-
+ 
   // Finally step 5
   if (n1 > n2) std::swap (n1, n2);
-
+ 
   libmesh_assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
-  
+   
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp + (n3<<15)%bp);
+#endif  
 }
 
 

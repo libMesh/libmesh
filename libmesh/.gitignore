@@ -39,3 +39,5 @@ examples/ex19/out.e
 examples/ex22/out_*.e
 examples/ex25/out_*.e
 examples/ex28/out_*.e
+autom4te.cache/
+aclocal.m4
