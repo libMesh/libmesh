@@ -112,7 +112,7 @@ void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
 					     const unsigned int,
 					     const Real,
                                              const std::vector<Point>* const pts,
-                                             const std::vector<Real>* const weights)
+                                             const std::vector<Real>* const /*weights*/)
 {
   // We don't do this for 1D elements!
   //libmesh_assert (Dim != 1);
