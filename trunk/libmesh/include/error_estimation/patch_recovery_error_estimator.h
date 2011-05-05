@@ -56,8 +56,9 @@ public:
    */
   PatchRecoveryErrorEstimator() :
     target_patch_size(20),
-    patch_growth_strategy(&Patch::add_local_face_neighbors) 
-  { error_norm = H1_SEMINORM; }
+    patch_growth_strategy(&Patch::add_local_face_neighbors),
+    patch_reuse(true)
+      { error_norm = H1_SEMINORM; }
   
   /**
    * Destructor.  
@@ -90,8 +91,10 @@ public:
    */
   Patch::PMF patch_growth_strategy;
 
+  void set_patch_reuse (bool );
+      
 private:
-
+    
   /**
    * Returns the spectral polynomial basis function values at a point x,y,z
    */
@@ -101,6 +104,8 @@ private:
 				    const Point p,
 				    const unsigned int matsize);
 
+  bool patch_reuse ;
+  
   /**
    * Class to compute the error contribution for a range
    * of elements. May be executed in parallel on separate threads.
@@ -113,13 +118,18 @@ private:
 		   ErrorVector& epc) :
       system(sys),
       error_estimator(ee),
-      error_per_cell(epc)
+      error_per_cell(epc)	
     {}
 
     void operator()(const ConstElemRange &range) const;
-    
-  private:
 
+    /**
+     * Function to set the boolean patch_reuse in case the user
+     * wants to change the default behaviour of patch_recovery_error_estimator
+     */    
+        
+  private:
+        
     const System &system;
     const PatchRecoveryErrorEstimator &error_estimator;
     ErrorVector &error_per_cell;    
