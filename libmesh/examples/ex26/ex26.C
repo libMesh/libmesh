@@ -218,10 +218,10 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
       adjoint_residual_estimator->dual_error_estimator().reset(p2);   
 
       adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
-      p1->set_patch_reuse(true);   
+      p1->set_patch_reuse(param.patch_reuse);   
 
       adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(0, H1_SEMINORM);	 
-      p2->set_patch_reuse(true);
+      p2->set_patch_reuse(param.patch_reuse);
     }
   else
     {

@@ -28,7 +28,7 @@ public:
       refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
       refine_uniformly(false),
       max_adaptivesteps(1),      
-      indicator_type("kelly"),
+	indicator_type("kelly"), patch_reuse(true),
       fe_family(1, "LAGRANGE"), fe_order(1, 1),	
       analytic_jacobians(true), verify_analytic_jacobians(0.0),
       print_solution_norms(false), print_solutions(false),
@@ -54,6 +54,7 @@ public:
     unsigned int max_adaptivesteps;
     
     std::string indicator_type;    
+    bool patch_reuse;
 
     std::vector<std::string> fe_family;
     std::vector<unsigned int> fe_order;

@@ -50,6 +50,10 @@ refine_uniformly = false
 # Type of indicator, refine_uniformly must be set to false for this to work
 indicator_type = 'adjoint_residual'
 
+# If we are using patch_recovery error estimator, should we reuse patches ? 
+# (Default is true, but user may want to reuse patches for better error estimation)
+patch_reuse = true;
+
 # Max number of refinements at each step
 refine_fraction = 0.05
 
