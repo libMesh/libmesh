@@ -198,12 +198,9 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
   // points
   if (pts != NULL)
     {
-      // Set the element type
-      elem_type = elem->type();
+      // The shape functions do not correspond to the qrule
+      shapes_on_quadrature = false;
 
-      // Set the last_edge
-      last_edge = std::numeric_limits<unsigned int>::max();
-      
       // Initialize the edge shape functions
       this->init_edge_shape_functions (*pts, edge.get());
   
@@ -243,6 +240,9 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
   
       // Compute the Jacobian*Weight on the face for integration
       this->compute_edge_map (qrule->get_weights(), edge.get());
+
+      // The shape functions correspond to the qrule
+      shapes_on_quadrature = true;
     }
 
   // make a copy of the Jacobian for integration
@@ -255,9 +255,6 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
   // compute the shape function and derivative values
   // at the points qp
   this->reinit  (elem, &qp);
-
-  // The shape functions correspond to the qrule
-  shapes_on_quadrature = (qrule != NULL);
 
   // copy back old data
   JxW = JxW_int;
