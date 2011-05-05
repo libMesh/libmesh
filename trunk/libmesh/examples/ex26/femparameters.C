@@ -38,6 +38,7 @@ void FEMParameters::read(GetPot &input)
     GETPOT_INT_INPUT(max_adaptivesteps);   
     GETPOT_INPUT(refine_uniformly);
     GETPOT_INPUT(indicator_type);
+    GETPOT_INPUT(patch_reuse);
 
     GETPOT_REGISTER(fe_family);
     const unsigned int n_fe_family =
