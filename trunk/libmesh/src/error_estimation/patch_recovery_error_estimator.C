@@ -46,7 +46,6 @@ namespace libMesh
   // Setter function for the patch_reuse flag
   void PatchRecoveryErrorEstimator::set_patch_reuse(bool patch_reuse_flag)
   {
-	std::cout<<"Setting patch reuse flag"<<std::endl;
     patch_reuse = patch_reuse_flag;
   }
 
@@ -879,8 +878,6 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		new_error_per_cell[i] += error_estimator.error_norm.weight_sq(var) * element_error;	  
 	      else
 		libmesh_error();
-		  
-		 //std::cout << " End Value: " << *patch_re_it << std::endl;    		    		  
 	    }  // End (re) loop over patch elements 	    
 	      		  
 	} // end variables loop
