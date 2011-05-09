@@ -53,9 +53,10 @@
 #include "cell_inf_prism12.h"
 #include "cell_pyramid5.h"
 #include "fe_base.h"
+#include "mesh_base.h"
 #include "quadrature_gauss.h"
 #include "remote_elem.h"
-#include "mesh_base.h"
+#include "string_to_enum.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 #include "mesh.h"
@@ -1339,6 +1340,70 @@ bool Elem::contains_point (const Point& p, Real tol) const
 						      false);
 
   return FEInterface::on_reference_element(mapped_point, this->type(), tol);
+}
+
+
+
+void Elem::print_info (std::ostream& os) const
+{
+  os << this->get_info()
+     << std::endl;
+}
+
+
+
+std::string Elem::get_info () const
+{
+  std::ostringstream out;
+
+  out << "  Elem Information"                                   << '\n'
+      << "   type()="    << Utility::enum_to_string(this->type())  << '\n'
+      << "   dim()="     << this->dim()                            << '\n'
+      << "   n_nodes()=" << this->n_nodes()                        << '\n';
+
+  for (unsigned int n=0; n != this->n_nodes(); ++n)
+    {
+      out << "    node(" << n << ")=" << this->node(n)             << '\n'
+          << "    point(" << n << ")=" << this->point(n)           << '\n';
+    }
+
+  out << "   n_sides()=" << this->n_sides()                        << '\n';
+
+  for (unsigned int s=0; s != this->n_sides(); ++s)
+    {
+      out << "    neighbor(" << s << ")=";
+      if (this->neighbor(s))
+        out << this->neighbor(s)->id() << '\n';
+      else
+        out << "NULL\n";
+    }
+
+  out << "   hmin()=" << this->hmin()                              << '\n'
+      << "   hmax()=" << this->hmax()                              << '\n'
+      << "   volume()=" << this->volume()                          << '\n'
+      << "   active()=" << this->active()                          << '\n'
+      << "   ancestor()=" << this->ancestor()                      << '\n'
+      << "   subactive()=" << this->subactive()                    << '\n'
+      << "   has_children()=" << this->has_children()              << '\n'
+      << "   parent()=";
+  if (this->parent())
+    out << this->parent()->id() << '\n';
+  else
+    out << "NULL\n";
+  out << "   has_children()=" << this->has_children()              << '\n'
+      << "   level()=" << this->level()                            << '\n'
+      << "   p_level()=" << this->p_level()                        << '\n'
+#ifdef LIBMESH_ENABLE_AMR
+      << "   refinement_flag()=" << this->refinement_flag()        << '\n'
+      << "   p_refinement_flag()=" << this->p_refinement_flag()    << '\n'
+#endif
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      << "   infinite()=" << this->infinite()    << '\n'
+      << "   origin()=" << this->origin()    << '\n'
+#endif
+      ;
+
+  return out.str();
 }
 
 
