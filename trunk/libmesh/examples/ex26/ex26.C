@@ -205,7 +205,7 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param, QoISet &qois
       
       error_estimator.reset (adjoint_residual_estimator);
       
-      adjoint_residual_estimator->set_qoi_set(qois);
+      adjoint_residual_estimator->qoi_set() = qois;
       
       adjoint_residual_estimator->adjoint_already_solved = true;
 
