@@ -513,6 +513,16 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual bool has_affine_map () const { return false; }
 
   /**
+   * Prints relevant information about the element.
+   */
+  void print_info (std::ostream& os=libMesh::out) const;
+
+  /**
+   * Prints relevant information about the element to a string.
+   */
+  std::string get_info () const;
+
+  /**
    * @returns \p true if the element is active (i.e. has no active
    * descendants), \p false  otherwise. Note that it suffices to check the
    * first child only. Always returns \p true if AMR is disabled. 
