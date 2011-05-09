@@ -72,6 +72,12 @@ public:
   QoISet &qoi_set() { return _qoi_set; }
 
   /**
+   * Access to the QoISet (default: weight all QoIs equally) to use
+   * when computing errors
+   */
+  const QoISet &qoi_set() const { return _qoi_set; }
+
+  /**
    * This function does uniform refinements and an adjoint
    * solve to get an adjoint solution on each cell,
    * then estimates the error by finding the weighted residual
