@@ -187,7 +187,7 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 // forward and adjoint weights. The H1 seminorm component of the error is used
 // as dictated by the weak form the Laplace equation.
 
-AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
+AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param, QoISet &qois)
 {
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -204,6 +204,8 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
       AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
       
       error_estimator.reset (adjoint_residual_estimator);
+      
+      adjoint_residual_estimator->set_qoi_set(qois);
       
       adjoint_residual_estimator->adjoint_already_solved = true;
 
@@ -342,8 +344,8 @@ int main (int argc, char** argv)
 
 	// Set weights for each index, these will weight the contribution of each QoI in the final error
 	// estimate to be used for flagging elements for refinement
-	qois.set_weight(0, 0.5);
-	qois.set_weight(0, 0.5);
+	qois.set_weight(0, 0.5);	
+	qois.set_weight(1, 0.5);	
 
 	// Make sure we get the contributions to the adjoint RHS from the sides
 	system.assemble_qoi_sides = true;
@@ -403,7 +405,7 @@ int main (int argc, char** argv)
 	
 	// Build an error estimator object
 	AutoPtr<ErrorEstimator> error_estimator =
-	  build_error_estimator(param);
+	  build_error_estimator(param, qois);
 	
 	// Estimate the error in each element using the Adjoint Residual or Kelly error estimator
 	error_estimator->estimate_error(system, error);
@@ -459,8 +461,8 @@ int main (int argc, char** argv)
 	qoi_indices.push_back(1);
 	qois.add_indices(qoi_indices);
 	
-	qois.set_weight(0, 0.5);
-	qois.set_weight(1, 0.5);
+	qois.set_weight(0, 0.5);	
+	qois.set_weight(1, 0.5);	
 
 	system.assemble_qoi_sides = true;	
 	linear_solver->reuse_preconditioner(param.reuse_preconditioner);
@@ -505,7 +507,7 @@ int main (int argc, char** argv)
 	ErrorVector error;
 	
 	AutoPtr<ErrorEstimator> error_estimator =
-	  build_error_estimator(param);
+	  build_error_estimator(param, qois);
 	
 	error_estimator->estimate_error(system, error);
       }
