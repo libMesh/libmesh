@@ -671,6 +671,13 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   //  The number of iterations in the map inversion process.
   unsigned int cnt = 0;
 
+  //  The number of iterations after which we give up and declare
+  //  divergence
+  const unsigned int max_cnt = 10;
+
+  //  The size of a Newton step (in master element space) above which
+  //  we give up and declare divergence
+  Real max_step_length = 4.;
 
 
 
@@ -731,7 +738,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
             // Assume that no master elements have radius > 4
 	    if (secure)
-	      libmesh_assert (dp.size() < 4);
+	      libmesh_assert (dp.size() < max_step_length);
 
 	    break;
 	  }
@@ -793,7 +800,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
             // Assume that no master elements have radius > 4
 	    if (secure)
-	      libmesh_assert (dp.size() < 4);
+	      libmesh_assert (dp.size() < max_step_length);
 
 	    break;
 	  }
@@ -867,7 +874,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
             // Assume that no master elements have radius > 4
 	    if (secure)
-	      libmesh_assert (dp.size() < 4);
+	      libmesh_assert (dp.size() < max_step_length);
 
 	    break;
 	  }
@@ -891,7 +898,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       
       //  Watch for divergence of Newton's
       //  method.  Here's how it goes:
-      //  (1) For good elements, we expect convergence in 10 iterations.
+      //  (1) For good elements, we expect convergence in 10
+      //      iterations, with no too-large steps.
       //      - If called with (secure == true) and we have not yet converged
       //        print out a warning message.
       //      - If called with (secure == true) and we have not converged in
@@ -900,7 +908,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       //      inside the element and we have no business expecting convergence.
       //      For these cases if we have not converged in 10 iterations forget
       //      about it.
-      if (cnt > 10)
+      if (cnt > max_cnt || dp.size() > max_step_length)
 	{
 	  //  Warn about divergence when secure is true - this
 	  //  shouldn't happen
@@ -921,13 +929,17 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
                             << "   in element " << elem->id()
 			    << std::endl;
 
-	      if (cnt > 20)
+              elem->print_info(libMesh::err);
+
+	      if (cnt > 2*max_cnt)
 		{
 		  libMesh::err << "ERROR: Newton scheme FAILED to converge in "
 			        << cnt
 			        << " iterations!"
                                 << " in element " << elem->id()
 			        << std::endl;
+
+                  elem->print_info(libMesh::err);
 
 		  libmesh_error();
 		}
