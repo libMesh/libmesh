@@ -83,7 +83,7 @@ public:
    * Access to the QoISet (default: weight all QoIs equally) to use
    * when computing errors
    */
-  QoISet &qoi_set() { return _qoi_set; }
+  const QoISet &qoi_set() const { return _qoi_set; }
 
   void set_qoi_set(QoISet &qois) { _qoi_set = qois; }
   
