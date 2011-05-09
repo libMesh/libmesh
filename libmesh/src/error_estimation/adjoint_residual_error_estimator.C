@@ -97,10 +97,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
   ErrorVector primal_error_per_cell;
   ErrorVector dual_error_per_cell;
   ErrorVector total_dual_error_per_cell;
-  
-  // Get the error estimator object's SystemNorm object to compute the weighted error estimate u^T M z
-  error_norm = this->error_norm;
-  
+    
   // Have we been asked to weight the variable error contributions in any specific manner
   if(!error_norm_is_identity) // If we do
     {      	
