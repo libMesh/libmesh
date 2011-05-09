@@ -675,8 +675,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   //  divergence
   const unsigned int max_cnt = 10;
 
-  //  The size of a Newton step (in master element space) above which
-  //  we give up and declare divergence
+  //  The distance (in master element space) beyond which we give up
+  //  and declare divergence
   Real max_step_length = 4.;
 
 
@@ -736,9 +736,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    
 	    dp(0) = Ginv*dxidelta;
 
-            // Assume that no master elements have radius > 4
-	    if (secure)
-	      libmesh_assert (dp.size() < max_step_length);
+            // No master elements have radius > 4, but sometimes we
+            // can take a step that big while still converging
+	    // if (secure)
+	      // libmesh_assert (dp.size() < max_step_length);
 
 	    break;
 	  }
@@ -798,9 +799,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
 	    dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
 
-            // Assume that no master elements have radius > 4
-	    if (secure)
-	      libmesh_assert (dp.size() < max_step_length);
+            // No master elements have radius > 4, but sometimes we
+            // can take a step that big while still converging
+	    // if (secure)
+	      // libmesh_assert (dp.size() < max_step_length);
 
 	    break;
 	  }
@@ -872,9 +874,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 		     Jinv32*delta(1) +
 		     Jinv33*delta(2));
 
-            // Assume that no master elements have radius > 4
-	    if (secure)
-	      libmesh_assert (dp.size() < max_step_length);
+            // No master elements have radius > 4, but sometimes we
+            // can take a step that big while still converging
+	    // if (secure)
+	      // libmesh_assert (dp.size() < max_step_length);
 
 	    break;
 	  }
@@ -908,7 +911,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       //      inside the element and we have no business expecting convergence.
       //      For these cases if we have not converged in 10 iterations forget
       //      about it.
-      if (cnt > max_cnt || dp.size() > max_step_length)
+      if (cnt > max_cnt)
 	{
 	  //  Warn about divergence when secure is true - this
 	  //  shouldn't happen
@@ -961,13 +964,14 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 
 
-  //  If we are in debug mode do a sanity check.  Make sure
-  //  the point \p p on the reference element actually does
-  //  map to the point \p physical_point within a tolerance.
+  //  If we are in debug mode do two sanity checks.
 #ifdef DEBUG
   
   if (secure)
     {  
+      // Make sure the point \p p on the reference element actually
+      // does map to the point \p physical_point within a tolerance.
+
       const Point check = FE<Dim,T>::map (elem, p);
       const Point diff  = physical_point - check;
       
@@ -981,6 +985,20 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 		        << physical_point;
 	  libMesh::err << " local=" << check;
 	  libMesh::err << " lref= " << p;
+
+          elem->print_info(libMesh::err);
+	}
+
+      // Make sure the point \p p on the reference element actually
+      // is
+
+      if (!FEBase::on_reference_element(p, elem->type(), 2*tolerance))
+        {
+	  libmesh_here();
+	  libMesh::err << "WARNING:  inverse_map of physical point "
+		       << physical_point
+		       << "is not on element." << '\n';
+          elem->print_info(libMesh::err);
 	}
     }
   
