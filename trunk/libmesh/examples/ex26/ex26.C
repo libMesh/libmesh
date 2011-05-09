@@ -503,13 +503,6 @@ int main (int argc, char** argv)
 	std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
                  << std::abs(QoI_1_computed - QoI_1_exact) /
                     std::abs(QoI_1_exact) << std::endl << std::endl;
-	
-	ErrorVector error;
-	
-	AutoPtr<ErrorEstimator> error_estimator =
-	  build_error_estimator(param, qois);
-	
-	error_estimator->estimate_error(system, error);
       }
   }
 
