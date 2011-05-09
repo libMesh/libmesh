@@ -1399,8 +1399,9 @@ std::string Elem::get_info () const
       << "   p_refinement_flag()=" << this->p_refinement_flag()    << '\n'
 #endif
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      << "   infinite()=" << this->infinite()    << '\n'
-      << "   origin()=" << this->origin()    << '\n'
+      << "   infinite()=" << this->infinite()    << '\n';
+      if (this->infinite())
+        out << "   origin()=" << this->origin()    << '\n'
 #endif
       ;
 
