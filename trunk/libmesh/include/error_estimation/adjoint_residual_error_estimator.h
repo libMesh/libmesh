@@ -45,7 +45,8 @@ namespace libMesh
  * residual-based estimates from the primal problem against estimates
  * from the adjoint problem.
  *
- * This is based on a trick suggested by Brian Carnes, but if it
+ * This is based on a trick suggested by Brian Carnes, (first proposed by
+ * Babuska and Miller in 1984) but if it
  * doesn't actually work then the misunderstanding or
  * misimplementation will be the fault of Roy Stogner.  It's also
  * Roy's fault there's no literature reference here yet.
@@ -83,6 +84,8 @@ public:
    * when computing errors
    */
   QoISet &qoi_set() { return _qoi_set; }
+
+  void set_qoi_set(QoISet &qois) { _qoi_set = qois; }
   
   /**
    * Has the adjoint problem already been solved?  If the user sets
