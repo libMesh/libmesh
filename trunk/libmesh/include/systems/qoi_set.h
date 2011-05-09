@@ -170,7 +170,7 @@ private:
   /**
    * Interpret _weights.size() <= i to mean "weight i = 1.0"
    */
-  std::vector<bool> _weights;
+  std::vector<Real> _weights;
 };
 
 
