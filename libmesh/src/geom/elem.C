@@ -1356,7 +1356,8 @@ std::string Elem::get_info () const
 {
   std::ostringstream out;
 
-  out << "  Elem Information"                                   << '\n'
+  out << "  Elem Information"                                      << '\n'
+      << "   id()="      << this->id()                             << '\n'
       << "   type()="    << Utility::enum_to_string(this->type())  << '\n'
       << "   dim()="     << this->dim()                            << '\n'
       << "   n_nodes()=" << this->n_nodes()                        << '\n';
