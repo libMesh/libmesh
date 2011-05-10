@@ -271,9 +271,13 @@ extern OStreamProxy err;
 //
 // The libmesh_convergence_failure() macro prints a message
 // and throws a ConvergenceFailure exception
-#define libmesh_error()    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::LogicError()); } while(0)
-#define libmesh_not_implemented()    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
-#define libmesh_file_error(filename)    do { libmesh_write_traceout(); libmesh_here(); LIBMESH_THROW(libMesh::FileError(filename)); } while(0)
+//
+// These macros no longer write traceout files themselves, but if the
+// exceptions they throw are uncaught then the
+// libmesh_terminate_handler will write such files.
+#define libmesh_error()    do { libmesh_here(); LIBMESH_THROW(libMesh::LogicError()); } while(0)
+#define libmesh_not_implemented()    do { libmesh_here(); LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
+#define libmesh_file_error(filename)    do { libmesh_here(); LIBMESH_THROW(libMesh::FileError(filename)); } while(0)
 #define libmesh_convergence_failure()    do { libmesh_here(); LIBMESH_THROW(libMesh::ConvergenceFailure()); } while(0)
 
 // The libmesh_example_assert() macro prints a message and calls

@@ -23,6 +23,10 @@
 #include <iostream>
 #include <fstream>
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+#include <exception>
+#endif
+
 // Local includes
 #include "libmesh.h"
 #include "auto_ptr.h"
@@ -177,6 +181,23 @@ bool closed()
 {
   return !libMeshPrivateData::_is_initialized;
 }
+
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+std::terminate_handler old_terminate_handler;
+
+void libmesh_terminate_handler()
+{
+  // If this got called then we're probably crashing; let's print a
+  // stack trace.
+  libmesh_write_traceout();
+
+  // The system terminate_handler may do useful things like printing
+  // uncaught exception information, or the user may have created
+  // their own terminate handler that we want to call.
+  old_terminate_handler();
+}
+#endif
 
 
 
@@ -360,6 +381,12 @@ void _init (int &argc, char** & argv,
   // of reference count information.
   if(libMesh::on_command_line("--disable-refcount-printing") )
     ReferenceCounter::disable_print_counter_info();
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  // Set our terminate handler to write stack traces in the event of a
+  // crash
+  old_terminate_handler = std::set_terminate(libmesh_terminate_handler);
+#endif
   
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
@@ -497,6 +524,12 @@ int _close ()
       libMesh::out.reset(std::cout);
       libMesh::err.reset(std::cerr);
     }
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  // Reset the old terminate handler; maybe the user code wants to
+  // keep doing C++ stuff after closing libMesh stuff.
+  std::set_terminate(old_terminate_handler);
+#endif
 
   // Return the number of outstanding objects.
   // This is equivalent to return 0 if all of
