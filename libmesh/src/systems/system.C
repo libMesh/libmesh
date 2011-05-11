@@ -380,6 +380,12 @@ void System::reinit ()
 
 void System::update ()
 {
+#ifdef LIBMESH_ENABLE_GHOSTED
+  solution->close();
+  
+  // If we have ghosting just copy the solution
+  *current_local_solution = *solution;
+#else
   const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
   // Check sizes
@@ -392,7 +398,8 @@ void System::update ()
   // put a local copy of solution into current_local_solution.
   // Only the necessary values (specified by the send_list)
   // are copied to minimize communication
-  solution->localize (*current_local_solution, send_list); 
+  solution->localize (*current_local_solution, send_list);
+#endif
 }
 
 
