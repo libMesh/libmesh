@@ -525,7 +525,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
     }
 
   if (n_elem_refine)
-    top_error = sorted_error[sorted_error.size() - n_elem_refine + 1];
+    top_error = sorted_error[sorted_error.size() - n_elem_refine];
 
   // Finally, let's do the element flagging
   elem_it  = _mesh.active_elements_begin();
