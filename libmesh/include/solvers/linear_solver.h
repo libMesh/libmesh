@@ -248,7 +248,7 @@ protected:
    */
   Preconditioner<T> * _preconditioner;
 
-    /**
+  /**
    * Boolean flag to indicate whether we want to use an identical
    * preconditioner to the previous solve. This can save
    * substantial work in the cases where the system matrix is 
@@ -265,12 +265,11 @@ protected:
 template <typename T>
 inline
 LinearSolver<T>::LinearSolver () :
-
-  same_preconditioner  (false),
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false),
-  _preconditioner      (NULL)
+  _preconditioner      (NULL),
+  same_preconditioner  (false)
 {
 }
 
@@ -285,10 +284,10 @@ LinearSolver<T>::~LinearSolver ()
 
 template <typename T>
 inline
-  bool LinearSolver<T>::get_same_preconditioner()
-  {
-    return same_preconditioner;
-  }
+bool LinearSolver<T>::get_same_preconditioner()
+{
+  return same_preconditioner;
+}
 
 template <typename T>
 inline

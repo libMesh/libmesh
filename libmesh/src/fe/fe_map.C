@@ -676,8 +676,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   const unsigned int max_cnt = 10;
 
   //  The distance (in master element space) beyond which we give up
-  //  and declare divergence
-  Real max_step_length = 4.;
+  //  and declare divergence.  This is no longer used...
+  // Real max_step_length = 4.;
 
 
 
