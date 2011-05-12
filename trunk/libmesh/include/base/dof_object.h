@@ -310,7 +310,8 @@ private:
    *
    * start_s = _idx_buf[s];
    */
-  std::vector<unsigned int> _idx_buf;
+  typedef std::vector<unsigned int> index_buffer_t;
+  index_buffer_t _idx_buf;
 
   /**
    * The starting index for system \p s.
@@ -404,7 +405,7 @@ inline
 void DofObject::clear_dofs ()
 {
   // vector swap trick to force deallocation
-  std::vector<unsigned int>().swap(_idx_buf);
+  index_buffer_t().swap(_idx_buf);
 
   libmesh_assert (this->n_systems() == 0);
   libmesh_assert (_idx_buf.empty());
