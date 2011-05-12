@@ -23,6 +23,7 @@
 #define __dof_object_h__
 
 // C++ includes
+#include <vector>
 
 // Local includes
 #include "libmesh_config.h"
@@ -44,12 +45,8 @@ class DofObject;
  * objects are the \p Node and \p Elem classes.  This class can
  * not be instantiated, only derived from.
  *
- * This class is intended to be extremely lightweight.  To help acheive
- * this goal no \p std::vector<> or anything else that might be heavy
- * is used to store the degree of freedom indices.
- * 
  * \author Benjamin S. Kirk
- * \date 2003
+ * \date 2003, 2011
  * \version $Revision$
  */
 
@@ -204,7 +201,8 @@ public:
   
   /**
    * Sets number of variables associated with system \p s for this
-   * \p DofObject
+   * \p DofObject.  Has the effect of setting the number of components
+   * to 0 even when called even with (nvars == this->n_vars(s)).
    */
   void set_n_vars(const unsigned int s,
 		  const unsigned int nvars);
@@ -291,25 +289,38 @@ private:
   unsigned short int _processor_id;
 
   /**
-   * The number of systems.
-   */
-  unsigned char _n_systems;
-
-  /**
-   * The number of variables and components for each variable of each system
-   * associated with this \p DofObject.  This is stored as an
-   * unsigned char for storage efficiency.
+   * DOF index information.  This is packed into a contiguous buffer of the following format:
    *
-   * _n_v_comp[s][0]   = # of variables in system s
-   * _n_v_comp[s][v+1] = # of components for variable v in system s.
+   * [ns end_0 end_1 ... end_{ns-1} (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_0 (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_1 ... (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_ns ]
+   *
+   * where 'end_s' is the index past the end of the variable storage for system \p s.
+   * Note that we specifically do not store the end for the last system - this always _idx_buf.size().
+   *
+   * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 DOFs respectively.  The _idx_buf then looks like
+   *
+   * [4 10 10 12 () (nc_0 idx_0 nc_1 idx_1 nc_2 idx_2) () (nc_0 idx_0) (nc_0 idx_0 nc_1 idx_1)]
+   * [0  1  2  3        4     5    6     7    8     9        10    11     12    13   14    15]
+   *
+   * The ending index is then given by
+   *
+   * end_s = _idx_buf.size(), s == (ns-1),
+   *       = _idx_buf[s+1]    otherwise.
+   *
+   * The starting indices are not specifically stored, but rather inferred as follows:
+   *
+   * start_s = _idx_buf[s];
    */
-  unsigned char **_n_v_comp;
+  std::vector<unsigned int> _idx_buf;
 
   /**
-   * The first global degree of freedom number
-   * for each variable of each system.
+   * The starting index for system \p s.
    */
-  unsigned int **_dof_ids;
+  unsigned int start_idx(const unsigned int s) const;
+
+  /**
+   * The ending index for system \p s.
+   */
+  unsigned int end_idx(const unsigned int s) const;
 };
 
 
@@ -322,10 +333,7 @@ DofObject::DofObject () :
   old_dof_object(NULL),
 #endif
   _id (invalid_id),
-  _processor_id (invalid_processor_id),
-  _n_systems  (0),
-  _n_v_comp (NULL),
-  _dof_ids (NULL)
+  _processor_id (invalid_processor_id)
 {
   this->invalidate();
 }
@@ -359,7 +367,7 @@ void DofObject::invalidate_dofs (const unsigned int sys_num)
     }
   // ...otherwise invalidate the dofs for all systems
   else
-    for (unsigned int v=0; v<n_vars(sys_num); v++)
+    for (unsigned int v=0; v<this->n_vars(sys_num); v++)
       if (this->n_comp(sys_num,v))
         this->set_dof_number(sys_num,v,0,invalid_id);
 }
@@ -395,36 +403,11 @@ void DofObject::invalidate ()
 inline
 void DofObject::clear_dofs ()
 {
-  // Only clear if there is data
-  if (this->n_systems() != 0)
-    {
-      libmesh_assert (_n_v_comp != NULL);
-      libmesh_assert (_dof_ids  != NULL);
-      
-      for (unsigned int s=0; s<this->n_systems(); s++)
-	{
-	  if (_dof_ids[s] != NULL) // This has only been allocated if 
-	    {                      // variables were declared
-	      delete [] _dof_ids[s]; _dof_ids[s] = NULL;
-	    }
-	  
-	  if (_n_v_comp[s] != NULL) // it is possible the number of variables is 0,
-	    {                       // but this was allocated (_n_v_comp[s][0] == 0)
-	      delete [] _n_v_comp[s]; _n_v_comp[s] = NULL;
-	    }
-	}
-      
-      delete [] _n_v_comp; _n_v_comp = NULL;
-      delete [] _dof_ids;  _dof_ids  = NULL;
-    }
-  
-  // Make sure we cleaned up
-  // (or there was nothing there)
-  libmesh_assert (_n_v_comp == NULL);
-  libmesh_assert (_dof_ids  == NULL);
-  
-  // No systems now.
-  _n_systems = 0;
+  // vector swap trick to force deallocation
+  std::vector<unsigned int>().swap(_idx_buf);
+
+  libmesh_assert (this->n_systems() == 0);
+  libmesh_assert (_idx_buf.empty());
 }
   
 
@@ -444,9 +427,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
   
   // Only count specified variable
   else
-    {
-      num = this->n_comp(s,var);
-    }
+    num = this->n_comp(s,var);
 
   return num;
 }
@@ -524,7 +505,7 @@ bool DofObject::valid_processor_id () const
 inline
 unsigned int DofObject::n_systems () const
 {
-  return static_cast<unsigned int>(_n_systems);
+  return _idx_buf.empty() ? 0 : _idx_buf[0];
 }
 
 
@@ -533,10 +514,8 @@ inline
 unsigned int DofObject::n_vars(const unsigned int s) const
 {
   libmesh_assert (s < this->n_systems());
-  libmesh_assert (_n_v_comp != NULL);
-  if (_n_v_comp[s] == NULL)
-    return 0;
-  return static_cast<unsigned int>(_n_v_comp[s][0]);
+
+  return (this->end_idx(s) - this->start_idx(s)) / 2;
 }
 
 
@@ -546,11 +525,8 @@ inline
 unsigned int DofObject::n_comp(const unsigned int s,
 			       const unsigned int var) const
 {
-  libmesh_assert (s < this->n_systems());
-  libmesh_assert (_dof_ids != NULL);
-  libmesh_assert (_dof_ids[s] != NULL);
-  libmesh_assert (_n_v_comp != NULL);
-  libmesh_assert (_n_v_comp[s] != NULL);
+  libmesh_assert (s   < this->n_systems());
+  libmesh_assert (var < this->n_vars(s));
 
 # ifdef DEBUG
   // Does this ever happen?  I doubt it... 3/7/2003 (BSK)
@@ -562,8 +538,13 @@ unsigned int DofObject::n_comp(const unsigned int s,
       libmesh_error();
     }
 # endif
+
+  const unsigned int
+    start_idx_sys = this->start_idx(s);
+
+  libmesh_assert ((start_idx_sys + 2*var) < _idx_buf.size());
   
-  return static_cast<unsigned int>(_n_v_comp[s][var+1]);
+  return _idx_buf[start_idx_sys + 2*var];
 }
 
 
@@ -573,16 +554,27 @@ unsigned int DofObject::dof_number(const unsigned int s,
 				   const unsigned int var,
 				   const unsigned int comp) const
 {
-  libmesh_assert (s < this->n_systems());
+  libmesh_assert (s    < this->n_systems());
   libmesh_assert (var  < this->n_vars(s));
-  libmesh_assert (_dof_ids != NULL);
-  libmesh_assert (_dof_ids[s] != NULL);  
   libmesh_assert (comp < this->n_comp(s,var));
-  
-  if (_dof_ids[s][var] == invalid_id)
+
+  const unsigned int
+    start_idx_sys = this->start_idx(s);
+
+  libmesh_assert ((start_idx_sys + 2*var + 1) < _idx_buf.size());
+
+  const unsigned int
+    base_idx = _idx_buf[start_idx_sys + 2*var + 1];
+
+  // if the first component is invalid, they
+  // are all invalid
+  if (base_idx == invalid_id)
     return invalid_id;
+
+  // otherwise the index is the first component
+  // index augemented by the component number
   else
-    return (_dof_ids[s][var] + comp);
+    return (base_idx + comp);
 }
 
 
@@ -607,7 +599,28 @@ bool DofObject::has_dofs (const unsigned int sys) const
   
   return false;
 }
+
+
   
+inline
+unsigned int DofObject::start_idx (const unsigned int s) const
+{
+  libmesh_assert (s < this->n_systems());
+  libmesh_assert (s < _idx_buf.size());
+
+  return _idx_buf[s];
+}
+
+  
+
+inline
+unsigned int DofObject::end_idx (const unsigned int s) const
+{
+  libmesh_assert (s < this->n_systems());
+  libmesh_assert (s < _idx_buf.size());
+
+  return ((s+1) == this->n_systems()) ? _idx_buf.size() : _idx_buf[s+1];
+}
 
 
 } // namespace libMesh

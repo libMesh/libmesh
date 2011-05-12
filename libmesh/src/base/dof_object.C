@@ -47,52 +47,8 @@ DofObject::DofObject (const DofObject& dof_obj) :
 #endif
   _id            (dof_obj._id),
   _processor_id  (dof_obj._processor_id),
-  _n_systems     (dof_obj._n_systems),
-  _n_v_comp      (NULL),
-  _dof_ids       (NULL)
+  _idx_buf       (dof_obj._idx_buf)
 {
-
-  // Allocate storage for the dof numbers and copy
-  // the values. 
-  // IT IS UNDEFINED BEHAVIOR TO ALLOCATE AN ARRAY WITH ZERO ENTRIES,
-  // IF n_systems==0, leave _n_v_comp, and _dof_ids NULL.
-  if (this->n_systems() > 0)
-    {
-      _n_v_comp = new unsigned char* [this->n_systems()];
-      _dof_ids  = new unsigned int*  [this->n_systems()];
-
-      // gotta specifically NULL these - we rely later that
-      // _n_v_comp[s] == NULL is synonymous with no variables in the system.
-      for (unsigned int s=0; s<this->n_systems(); s++)
-	{
-	  _n_v_comp[s] = NULL;
-	  _dof_ids[s]  = NULL;
-	}      
-    }
-
-  // If n_systems==0, we don't enter this for loop.
-  for (unsigned int s=0; s<this->n_systems(); s++)
-    {
-      // In case you have a system with no variables, it is undefined
-      // behavior (UB) to allocate a zero-length array here.
-      if (dof_obj.n_vars(s) > 0)
-	{
-	  _n_v_comp[s] = new unsigned char [dof_obj.n_vars(s)+1]; 
-	  _dof_ids[s]  = new unsigned int  [dof_obj.n_vars(s)];
-	  
-	  _n_v_comp[s][0] = dof_obj.n_vars(s);
-
-	}
-      for (unsigned int v=0; v<this->n_vars(s); v++)
-	{
-	  _n_v_comp[s][v+1]  = dof_obj.n_comp(s,v);
-
-	  if (this->n_comp(s,v) > 0)
-	    _dof_ids[s][v] = dof_obj.dof_number(s,v,0);
-          else
-	    _dof_ids[s][v] = invalid_id;
-	}
-    }
 
   // Check that everything worked
 #ifdef DEBUG
@@ -125,33 +81,10 @@ DofObject& DofObject::operator= (const DofObject& dof_obj)
   this->old_dof_object = new DofObject(*(dof_obj.old_dof_object));
 #endif
 
-  _id = dof_obj._id;
+  _id           = dof_obj._id;
   _processor_id = dof_obj._processor_id;
-  this->set_n_systems(dof_obj._n_systems);
+  _idx_buf      = dof_obj._idx_buf;
   
-  // If n_systems==0, we don't enter this for loop.
-  for (unsigned int s=0; s<this->n_systems(); s++)
-    {
-      // In case you have a system with no variables, it is undefined
-      // behavior (UB) to allocate a zero-length array here.
-      if (dof_obj.n_vars(s) > 0)
-	{
-	  _n_v_comp[s] = new unsigned char [dof_obj.n_vars(s)+1]; 
-	  _dof_ids[s]  = new unsigned int  [dof_obj.n_vars(s)];
-	  
-	  _n_v_comp[s][0] = dof_obj.n_vars(s);
-
-	}
-      for (unsigned int v=0; v<this->n_vars(s); v++)
-	{
-	  _n_v_comp[s][v+1]  = dof_obj.n_comp(s,v);
-
-	  if (this->n_comp(s,v) > 0)
-	    _dof_ids[s][v] = dof_obj.dof_number(s,v,0);
-          else
-	    _dof_ids[s][v] = invalid_id;
-	}
-    }
 
   // Check that everything worked
 #ifdef DEBUG
@@ -213,92 +146,57 @@ void DofObject::set_old_dof_object ()
 void DofObject::set_n_systems (const unsigned int ns)
 {
   // Check for trivial return
-  if (ns == this->n_systems()) return;
- 
-#ifdef DEBUG
-
-  if (ns != static_cast<unsigned int>(static_cast<unsigned char>(ns)))
-    {
-      libMesh::err << "Unsigned char not big enough to hold ns!" << std::endl
-		    << "Recompile with _n_systems set to a bigger type!"
-		    << std::endl;
-      
-      libmesh_error();
-    }
-					
-#endif
-
-
+  if (ns == this->n_systems())
+    return;
+  
   // Clear any existing data.  This is safe to call
   // even if we don't have any data.
   this->clear_dofs();
 
   // Set the new number of systems
-  _n_systems = static_cast<unsigned char>(ns);
-  
-  // Allocate storage for the systems
-  _n_v_comp = new unsigned char* [this->n_systems()];
-  _dof_ids  = new unsigned int*  [this->n_systems()];
+  _idx_buf.resize(ns, ns);
+  _idx_buf[0] = ns;
 
-  // No variables have been declared yet.
+  
+#ifdef DEBUG
+  
+  // check that all systems now exist and that they have 0 size
+  libmesh_assert (ns == this->n_systems());
   for (unsigned int s=0; s<this->n_systems(); s++)
-    {
-      _n_v_comp[s] = NULL;
-      _dof_ids[s]  = NULL;
-    }
+    libmesh_assert (this->n_vars(s) == 0);
+  
+#endif
 }
 
 
 
 void DofObject::add_system()
 {
-  if (this->n_systems() > 0)
+  // quick return?
+  if (this->n_systems() == 0)
     {
-      // Copy the old systems to temporary storage
-      unsigned char **old_n_v_comp = new unsigned char* [this->n_systems()];
-      unsigned int  **old_dof_ids  = new unsigned int*  [this->n_systems()]; 
-      
-      for (unsigned int s=0; s<this->n_systems(); s++)
-	{
-	  old_n_v_comp[s] = _n_v_comp[s];
-	  old_dof_ids[s]  = _dof_ids[s];
-	}
-      
-      // Delete old storage
-      libmesh_assert (_n_v_comp != NULL); delete [] _n_v_comp; _n_v_comp = NULL;
-      libmesh_assert (_dof_ids  != NULL); delete [] _dof_ids;  _dof_ids  = NULL;
-  
-      // Allocate space for new system
-      _n_v_comp= new unsigned char* [this->n_systems()+1];
-      _dof_ids = new unsigned int*  [this->n_systems()+1];
-      
-      // Copy the other systems
-      for (unsigned int s=0; s<this->n_systems(); s++)
-	{
-	  _n_v_comp[s] = old_n_v_comp[s];
-	  _dof_ids[s]  = old_dof_ids[s];
-	}
-	       
-      // Delete temporary storage
-      libmesh_assert (old_n_v_comp != NULL); delete [] old_n_v_comp; old_n_v_comp = NULL;
-      libmesh_assert (old_dof_ids  != NULL); delete [] old_dof_ids;  old_dof_ids  = NULL;
-    }
-  else
-    {
-      libmesh_assert (_n_v_comp == NULL);
-      libmesh_assert (_dof_ids  == NULL);
-      
-      // Allocate space for new system
-      _n_v_comp = new unsigned char* [this->n_systems()+1];
-      _dof_ids  = new unsigned int*  [this->n_systems()+1];      
+      this->set_n_systems(1);
+      return;
     }
   
-  // Initialize the new system
-  _n_v_comp[this->n_systems()] = NULL;
-  _dof_ids[this->n_systems()]  = NULL;
-  
-  // Done. Don't forget to increment the number of systems!
-  _n_systems++;
+  std::vector<unsigned int>::iterator it = _idx_buf.begin();
+
+  std::advance(it, this->n_systems());
+
+  // this inserts the current vector size at the position for the new system - creating the 
+  // entry we need for the new system indicating there are 0 variables.
+  _idx_buf.insert(it, _idx_buf.size());
+
+  // cache this value before we screw it up!
+  const unsigned int ns_orig = this->n_systems();
+
+  // incriment the number of systems and the offsets for each of
+  // the systems including the new one we just added.
+  for (unsigned int i=0; i<ns_orig+1; i++)
+    _idx_buf[i]++;
+
+  libmesh_assert (this->n_systems() == (ns_orig+1));
+  libmesh_assert (this->n_vars(ns_orig) == 0);
 }
 
 
@@ -307,55 +205,100 @@ void DofObject::set_n_vars(const unsigned int s,
 			   const unsigned int nvars)
 {
   libmesh_assert (s < this->n_systems());
-  libmesh_assert (_n_v_comp != NULL);
-  libmesh_assert (_dof_ids  != NULL);
-
-#ifdef DEBUG
-
-  if (nvars != static_cast<unsigned int>(static_cast<unsigned char>(nvars)))
+  
+  // BSK - note that for compatibility with the previous implementation
+  // calling this method when (nvars == this->n_vars()) requires that
+  // we invalidate the DOF indices and set the number of components to 0.
+  // Note this was a bit of a suprise to me - there was no quick return in
+  // the old method, which caused removal and readdition of the DOF indices
+  // even in the case of (nvars == this->n_vars()), resulting in n_comp(s,v)
+  // implicitly becoming 0 regardless of any previous value.
+  // quick return?
+  if (nvars == this->n_vars(s))
     {
-      libMesh::err << "Unsigned char not big enough to hold nvar!" << std::endl
-		    << "Recompile with _n_vars set to a bigger type!"
-		    << std::endl;
-      
-      libmesh_error();
+      for (unsigned int v=0; v<nvars; v++)
+	this->set_n_comp(s,v,0);
+      return;
     }
-					
-#endif
 
+  // since there is ample opportunity to screw up other systems, let us
+  // cache their current sizes and later assert that they are unchanged.
+#ifdef DEBUG
+  std::vector<unsigned int> old_system_sizes;
+  old_system_sizes.reserve(this->n_systems());
+
+  for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
+    old_system_sizes.push_back(this->n_vars(s_ctr));
+#endif
   
-  
-  // If we already have memory allocated clear it.
+  // remove current indices if we have some
   if (this->n_vars(s) != 0)
     {
-      libmesh_assert (_n_v_comp[s] != NULL); delete [] _n_v_comp[s]; _n_v_comp[s] = NULL;
-      libmesh_assert (_dof_ids[s]  != NULL); delete [] _dof_ids[s];  _dof_ids[s]  = NULL;
+      const unsigned int old_nvars_s = this->n_vars(s);
+      
+      std::vector<unsigned int>::iterator
+	it  = _idx_buf.begin(),
+	end = _idx_buf.begin();
+
+      std::advance(it,  this->start_idx(s));
+      std::advance(end, this->end_idx(s));
+      _idx_buf.erase(it,end);
+
+      for (unsigned int ctr=(s+1); ctr<this->n_systems(); ctr++)
+	_idx_buf[ctr] -= 2*old_nvars_s;      
     }
 
-  // Reset the number of variables in the system  
-  if (nvars > 0)
-    {
-      libmesh_assert (_n_v_comp[s] == NULL);
-      libmesh_assert (_dof_ids[s]  == NULL);
-      
-      _n_v_comp[s] = new unsigned char [nvars+1];
-      _dof_ids[s]  = new unsigned int  [nvars];
-      
-      _n_v_comp[s][0] = static_cast<unsigned char>(nvars);
+  // better not have any now!
+  libmesh_assert (this->n_vars(s) == 0);
 
-      libmesh_assert (nvars == this->n_vars(s));
-      
-      for (unsigned int v=0; v<this->n_vars(s); v++)
-	{
-	  _n_v_comp[s][v+1] = 0;
-	  _dof_ids[s][v]    = invalid_id - 1;
-	}
-    }
-  else // (nvars == 0)
-    {
-      libmesh_assert (_n_v_comp[s] == NULL);
-      libmesh_assert (_dof_ids[s]  == NULL);
-    }
+  // had better not screwed up any of our sizes!
+#ifdef DEBUG
+  for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
+    if (s_ctr != s)
+      libmesh_assert(this->n_vars(s_ctr) == old_system_sizes[s_ctr]);
+#endif
+
+  // OK, if the user requested 0 that is what we have
+  if (nvars == 0)
+    return;
+
+  {
+    // array to hold new indices
+    std::vector<unsigned int> var_idxs(2*nvars);
+    for (unsigned int v=0; v<nvars; v++)
+      {
+	var_idxs[2*v    ] = 0;
+	var_idxs[2*v + 1] = invalid_id - 1;
+      }
+
+    std::vector<unsigned int>::iterator it = _idx_buf.begin();
+    std::advance(it, this->end_idx(s));
+    _idx_buf.insert(it, var_idxs.begin(), var_idxs.end());
+
+    for (unsigned int ctr=(s+1); ctr<this->n_systems(); ctr++)
+      _idx_buf[ctr] += 2*nvars;
+
+    // resize _idx_buf to fit so no memory is wasted.
+    std::vector<unsigned int>(_idx_buf).swap(_idx_buf);
+  }
+
+  // that better had worked.  Assert stuff.
+  libmesh_assert (nvars == this->n_vars(s));
+
+#ifdef DEBUG
+  for (unsigned int v=0; v<this->n_vars(s); v++)
+    libmesh_assert (this->n_comp(s,v) == 0);
+  // again, all other system sizes shoudl be unchanged!
+  for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
+    if (s_ctr != s)
+      libmesh_assert(this->n_vars(s_ctr) == old_system_sizes[s_ctr]);
+		  
+//   std::cout << " [ ";
+//   for (unsigned int i=0; i<_idx_buf.size(); i++)
+//     std::cout << _idx_buf[i] << " ";
+//   std::cout << "]\n";
+    
+#endif
 }
 
 
@@ -364,38 +307,26 @@ void DofObject::set_n_comp(const unsigned int s,
 			   const unsigned int var,
 			   const unsigned int ncomp)
 {
-  libmesh_assert (s < this->n_systems());
+  libmesh_assert (s   < this->n_systems());
   libmesh_assert (var < this->n_vars(s));
-  libmesh_assert (_dof_ids != NULL);
-  libmesh_assert (_dof_ids[s] != NULL);
   
   // Check for trivial return
   if (ncomp == this->n_comp(s,var)) return;
 
-#ifdef DEBUG
+  const unsigned int
+    start_idx_sys = this->start_idx(s),
+    base_offset  = start_idx_sys + 2*var;
 
-  if (ncomp != static_cast<unsigned int>(static_cast<unsigned char>(ncomp)))
-    {
-      libMesh::err << "Unsigned char not big enough to hold ncomp!" << std::endl
-		    << "Recompile with _n_v_comp set to a bigger type!"
-		    << std::endl;
-      
-      libmesh_error();
-    }
-  
-#endif
+  libmesh_assert ((base_offset + 1) < _idx_buf.size());
+
+  // set the number of components
+  _idx_buf[base_offset] = ncomp;
 
   // We use (invalid_id - 1) to signify no
-  // components for this object
-  if (ncomp == 0)
-    {
-      _dof_ids[s][var] = (invalid_id - 1);
-    }
-  
-  libmesh_assert (_n_v_comp    != NULL);
-  libmesh_assert (_n_v_comp[s] != NULL);
-    
-  _n_v_comp[s][var+1]  = static_cast<unsigned char>(ncomp);
+  // components for this object  
+  _idx_buf[base_offset + 1] = (ncomp == 0) ? invalid_id - 1 : invalid_id;
+
+  libmesh_assert (ncomp == this->n_comp(s,var));
 }
 
 
@@ -407,17 +338,30 @@ void DofObject::set_dof_number(const unsigned int s,
 {
   libmesh_assert (s < this->n_systems());
   libmesh_assert (var  < this->n_vars(s));
-  libmesh_assert (_dof_ids != NULL);
-  libmesh_assert (_dof_ids[s] != NULL);
   libmesh_assert (comp < this->n_comp(s,var));
+
+  const unsigned int
+    start_idx_sys = this->start_idx(s);
+
+  libmesh_assert ((start_idx_sys + 2*var + 1) < _idx_buf.size());
+
+  unsigned int
+    &base_idx(_idx_buf[start_idx_sys + 2*var + 1]);
   
   //We intend to change all dof numbers together or not at all
   if (comp)
-    libmesh_assert ((dn == invalid_id && _dof_ids[s][var] == invalid_id) || 
-		    (dn == _dof_ids[s][var] + comp));
+    libmesh_assert ((dn == invalid_id && base_idx == invalid_id) || 
+		    (dn == base_idx + comp));
   else
-    _dof_ids[s][var] = dn;
-
+    base_idx = dn;
+  
+// #ifdef DEBUG
+//   std::cout << " [ ";
+//   for (unsigned int i=0; i<_idx_buf.size(); i++)
+//     std::cout << _idx_buf[i] << " ";
+//   std::cout << "]\n";
+    
+// #endif
 
   libmesh_assert(this->dof_number(s, var, comp) == dn);
 }
