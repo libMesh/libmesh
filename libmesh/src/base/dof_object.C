@@ -179,7 +179,7 @@ void DofObject::add_system()
       return;
     }
   
-  std::vector<unsigned int>::iterator it = _idx_buf.begin();
+  DofObject::index_buffer_t::iterator it = _idx_buf.begin();
 
   std::advance(it, this->n_systems());
 
@@ -224,7 +224,7 @@ void DofObject::set_n_vars(const unsigned int s,
   // since there is ample opportunity to screw up other systems, let us
   // cache their current sizes and later assert that they are unchanged.
 #ifdef DEBUG
-  std::vector<unsigned int> old_system_sizes;
+  DofObject::index_buffer_t old_system_sizes;
   old_system_sizes.reserve(this->n_systems());
 
   for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
@@ -236,7 +236,7 @@ void DofObject::set_n_vars(const unsigned int s,
     {
       const unsigned int old_nvars_s = this->n_vars(s);
       
-      std::vector<unsigned int>::iterator
+      DofObject::index_buffer_t::iterator
 	it  = _idx_buf.begin(),
 	end = _idx_buf.begin();
 
@@ -264,14 +264,14 @@ void DofObject::set_n_vars(const unsigned int s,
 
   {
     // array to hold new indices
-    std::vector<unsigned int> var_idxs(2*nvars);
+    DofObject::index_buffer_t var_idxs(2*nvars);
     for (unsigned int v=0; v<nvars; v++)
       {
 	var_idxs[2*v    ] = 0;
 	var_idxs[2*v + 1] = invalid_id - 1;
       }
 
-    std::vector<unsigned int>::iterator it = _idx_buf.begin();
+    DofObject::index_buffer_t::iterator it = _idx_buf.begin();
     std::advance(it, this->end_idx(s));
     _idx_buf.insert(it, var_idxs.begin(), var_idxs.end());
 
@@ -279,7 +279,7 @@ void DofObject::set_n_vars(const unsigned int s,
       _idx_buf[ctr] += 2*nvars;
 
     // resize _idx_buf to fit so no memory is wasted.
-    std::vector<unsigned int>(_idx_buf).swap(_idx_buf);
+    DofObject::index_buffer_t(_idx_buf).swap(_idx_buf);
   }
 
   // that better had worked.  Assert stuff.
