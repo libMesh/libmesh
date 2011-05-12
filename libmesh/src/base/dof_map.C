@@ -365,13 +365,13 @@ void DofMap::reinit(MeshBase& mesh)
 	    Node* node = elem->get_node(n);
 
 	    if (node->old_dof_object == NULL)
-	      if (node->has_dofs())
+	      if (node->has_dofs(this->sys_number()))
 		node->set_old_dof_object();
 	  }
 
 	libmesh_assert (elem->old_dof_object == NULL);
-
-	if (elem->has_dofs())
+	
+	if (elem->has_dofs(this->sys_number()))
 	  elem->set_old_dof_object();
       }
   }
