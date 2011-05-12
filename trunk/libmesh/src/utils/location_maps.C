@@ -183,19 +183,27 @@ T* LocationMap<T>::find(const Point& p,
 template <typename T>
 unsigned int LocationMap<T>::key(const Point& p)
 {
-  Real xscaled = (p(0) - _lower_bound[0])/
-                 (_upper_bound[0] - _lower_bound[0]),
+  Real xscaled = 0., yscaled = 0., zscaled = 0.;
+
+  Real deltax = _upper_bound[0] - _lower_bound[0];
+
+  if (std::abs(deltax) > TOLERANCE)
+    xscaled = (p(0) - _lower_bound[0])/deltax;
+
+  // Only check y-coords if libmesh is compiled with LIBMESH_DIM>1
 #if LIBMESH_DIM > 1
-       yscaled = (p(1) - _lower_bound[1])/
-                 (_upper_bound[1] - _lower_bound[1]),
-#else
-       yscaled = 0,
+  Real deltay = _upper_bound[1] - _lower_bound[1];
+
+  if (std::abs(deltay) > TOLERANCE)
+    yscaled = (p(1) - _lower_bound[1])/deltay;
 #endif
+
+  // Only check z-coords if libmesh is compiled with LIBMESH_DIM>2
 #if LIBMESH_DIM > 2
-       zscaled = (p(2) - _lower_bound[2])/
-                 (_upper_bound[2] - _lower_bound[2]);
-#else
-       zscaled = 0;
+  Real deltaz = _upper_bound[2] - _lower_bound[2];
+
+  if (std::abs(deltaz) > TOLERANCE)
+    zscaled = (p(2) - _lower_bound[2])/deltaz;
 #endif
 
   unsigned int n0 = static_cast<unsigned int> (chunkfloat * xscaled),
