@@ -77,8 +77,8 @@ enable-nox          = @enablenox@
 NOX_MAKEFILE_EXPORT = @NOX_MAKEFILE_EXPORT@
 
 # Boost Configuration - currently using header-only libraries
-BOOST_CPPFLAGS       = @BOOST_CPPFLAGS@
-#BOOST_LDFLAGS        = @BOOST_LDFLAGS@
+libmesh_INCLUDE += @BOOST_CPPFLAGS@
+#libmesh_LIBS     += @BOOST_LDFLAGS@
 
 # Doxygen for generating documentation
 doxygen		     = @DOXYGEN@
@@ -304,10 +304,10 @@ ifeq ($(enable-shared),yes)
 endif
 
 
-# Include path for local boost header files.  Note, this
-# will probably not be an "optional" package if we really
-# do end up using it.
-libmesh_INCLUDE += -I$(libmesh_dir)/contrib/boost
+# # Include path for local boost header files.  Note, this
+# # will probably not be an "optional" package if we really
+# # do end up using it.
+# libmesh_INCLUDE += -I$(libmesh_dir)/contrib/boost
 
 #
 # Optional packages
@@ -421,8 +421,6 @@ ifeq ($(enable-optional),yes)
           libmesh_CPPFLAGS     += -DHAVE_CONFIG_H
       endif	
   endif	
-
-
 
   #############################################################################
   # SLEPc
