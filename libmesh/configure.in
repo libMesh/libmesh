@@ -358,15 +358,25 @@ fi
 dnl --------------------------------------------------------------
 
 
-
-
-
 dnl --------------------------------------------------------------
 dnl Get the source tree directory
 dnl --------------------------------------------------------------
 PWD=`pwd`
 AC_SUBST(PWD)
 
+
+
+dnl --------------------------------------------------------------
+dnl Look for a user or system-provided boost.  If there is not
+dnl one available then use the minimal ./contrib/boost provided.
+dnl --------------------------------------------------------------
+AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using external boost installation >>>))
+  dnl If that did not work, try using our builtin boost
+  if test "x$BOOST_CPPFLAGS" = "x" ; then
+    BOOST_ROOT="$PWD/contrib"
+    AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using libmesh-provided boost in ./contrib >>>))
+  fi
+dnl --------------------------------------------------------------
 
 dnl -------------------------------------------------------------
 dnl Allow user to specify --enable-everything

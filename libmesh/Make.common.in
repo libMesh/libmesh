@@ -73,8 +73,12 @@ enable-trilinos         = @enabletrilinos@
 AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
 
 # Nox configuration
-enable-nox         = @enablenox@
+enable-nox          = @enablenox@
 NOX_MAKEFILE_EXPORT = @NOX_MAKEFILE_EXPORT@
+
+# Boost Configuration - currently using header-only libraries
+BOOST_CPPFLAGS       = @BOOST_CPPFLAGS@
+#BOOST_LDFLAGS        = @BOOST_LDFLAGS@
 
 # Doxygen for generating documentation
 doxygen		     = @DOXYGEN@
