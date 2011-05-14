@@ -45,11 +45,18 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
                                         const std::vector<Point>* const pts,
                                         const std::vector<Real>* const weights)
 {
+  if (weights != NULL)
+    {
+      libMesh::err << "ERROR: User-specified weights for infinite elements "
+	           << "are not implemented!" << std::endl;
+      libmesh_not_implemented();
+    }
+
   if (pts != NULL)
     {
       libMesh::err << "ERROR: User-specified points for infinite elements "
-	           << "not implemented!" << std::endl;
-      libmesh_error();
+	           << "are not implemented!" << std::endl;
+      libmesh_not_implemented();
     }
 
   // We don't do this for 1D elements!
