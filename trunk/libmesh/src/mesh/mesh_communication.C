@@ -2535,15 +2535,19 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
         {
           Elem *elem = *lev_elem_it;
           libmesh_assert (elem);
+          // Make sure we don't leave any invalid pointers
           if (!semilocal_elems[elem->id()])
-            {
-              // Make sure we don't leave any invalid pointers
-              elem->make_links_to_me_remote();
+            elem->make_links_to_me_remote();
 
-              // delete_elem doesn't currently invalidate element
-              // iterators... that had better not change
-              mesh.delete_elem(elem);
-            }
+          // Subactive neighbor pointers aren't preservable here
+          if (elem->subactive())
+            for (unsigned int s=0; s != elem->n_sides(); ++s)
+              elem->set_neighbor(s, NULL);
+
+          // delete_elem doesn't currently invalidate element
+          // iterators... that had better not change
+          if (!semilocal_elems[elem->id()])
+            mesh.delete_elem(elem);
         }
     }
 

@@ -746,9 +746,19 @@ class Elem : public ReferenceCountedObject<Elem>,
    * children, etc...  When the optional parameter \p reset is
    * true then the vector will be cleared before the element and its
    * descendants are added.
+   *
+   * The family tree only includes ancestor and active elements; for
+   * subactive elements as well, use total_family_tree.
    */
   void family_tree (std::vector<const Elem*>& family,
 		    const bool reset=true) const;
+
+  /**
+   * Same as the \p family_tree() member, but also adds any subactive
+   * descendants.
+   */
+  void total_family_tree (std::vector<const Elem*>& active_family,
+			  const bool reset=true) const;
 
   /**
    * Same as the \p family_tree() member, but only adds the active
