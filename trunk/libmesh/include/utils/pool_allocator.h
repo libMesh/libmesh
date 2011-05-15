@@ -64,6 +64,39 @@ namespace libMesh
     }
   };
 
+
+
+  /**
+   * An allocator which can be used in standard containers.  Uses
+   * pool-based memory allocation to efficiently allocate many small
+   * objects.  Note that object destruction returns memory to the pool
+   * rather than deallocate it.  It must be explicitly deallocated  
+   * prior to program termination.
+   */
+  template <typename T>
+  class FastPoolAllocator : public boost::fast_pool_allocator<T>
+  {
+  public:
+
+    /**
+     * Frees every memory block that doesn't have any allocated chunks. 
+     * Returns true if at least one memory block was freed.
+     */
+    static bool release_memory ()
+    {
+      return boost::singleton_pool<boost::fast_pool_allocator_tag, sizeof(T)>::release_memory();
+    }
+    
+    /**
+     * Frees every memory block. This function invalidates any pointers previously returned 
+     * by allocation functions. Returns true if at least one memory block was freed.
+     */
+    static bool purge_memory ()
+    {
+      return boost::singleton_pool<boost::fast_pool_allocator_tag, sizeof(T)>::purge_memory();
+    }
+  };
+
   // Otherwise fall back to std::allocator<>.
 #else
 
@@ -73,6 +106,29 @@ namespace libMesh
    */
   template <typename T>
   template PoolAllocator : public std::allocator<T>
+  {
+  public:
+    /**
+     * Frees every memory block that doesn't have any allocated chunks. 
+     * Returns true if at least one memory block was freed.
+     */
+    static bool release_memory () { /* no-op for std::allocator<> - already freed. */ return false; }
+
+    /**
+     * Frees every memory block. This function invalidates any pointers previously returned 
+     * by allocation functions. Returns true if at least one memory block was freed.
+     */
+    static bool purge_memory ()   { /* no-op for std::allocator<> - already freed. */ return false; }
+  };
+
+
+
+  /**
+   * An allocator which can be used in standard containers.
+   * A wrapper for \p std::allocator<> when Boost is not available.
+   */
+  template <typename T>
+  template FastPoolAllocator : public std::allocator<T>
   {
   public:
     /**
