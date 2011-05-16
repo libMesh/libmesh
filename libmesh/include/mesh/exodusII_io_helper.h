@@ -701,7 +701,11 @@ public:
    * element.  The side map maps the exodusII side numbering
    * format to this library's format.
    */
-  int get_side_map(int i)          const { return side_map[i]; }
+  int get_side_map(int i) const 
+  { 
+    libmesh_assert (static_cast<unsigned>(i) < sizeof(side_map)/sizeof(side_map[0]));  
+    return side_map[i]; 
+  }
 
   /**
    * Returns the ith component of the side map for this
