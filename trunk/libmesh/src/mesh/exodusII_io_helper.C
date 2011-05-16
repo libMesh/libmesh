@@ -41,7 +41,7 @@
 // This macro returns the length of the array a.  Don't
 // try using it on empty arrays, since it accesses the
 // zero'th element.
-#define ARRAY_LENGTH(a) sizeof((a))/sizeof((a)[0])
+#define ARRAY_LENGTH(a) (sizeof((a))/sizeof((a)[0]))
  
 namespace libMesh
 {
