@@ -61,7 +61,7 @@ dev_table_entry("images/roystgnr.jpg",
 		 "http://web.mit.edu/dknez/www/",
 		 "",
 		 "Post Doctoral Researcher",
-		 "<a href=\"www.mit.edu\">MIT</a>");
+		 "<a href=\"http://www.mit.edu\">MIT</a>");
 ?>
 
 
