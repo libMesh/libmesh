@@ -31,7 +31,8 @@ namespace libMesh
  *
  * TransientRBEvaluation extends RBEvaluation to
  * encapsulates the code and data required
- * to perform "online" RB evaluations for transient problems.
+ * to perform "online" RB evaluations for 
+ * Linear Time Invariant (LTI) transient problems.
  *
  * @author David J. Knezevic, 2011
  */

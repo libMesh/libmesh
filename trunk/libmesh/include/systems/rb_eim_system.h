@@ -168,13 +168,6 @@ public:
    * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;
-
-  /**
-   * This flag indicates whether or not we evaluate the error
-   * estimate in RB_solve. We need this to turn off error
-   * estimation during the Greedy algorithm.
-   */
-  bool eval_error_estimate;
   
 protected:
 

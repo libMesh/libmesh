@@ -217,6 +217,12 @@ public:
    * if we use a single file.
    */
   bool multiple_files_for_outputs;
+  
+  /**
+   * Boolean to indicate whether we evaluate a posteriori error bounds
+   * when RB_solve is called.
+   */
+  bool evaluate_RB_error_bound;
 
 };
 

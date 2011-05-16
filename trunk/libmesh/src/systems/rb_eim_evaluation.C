@@ -86,8 +86,8 @@ Real RBEIMEvaluation::RB_solve(unsigned int N)
   
   interpolation_matrix_N.lu_solve(EIM_rhs, RB_solution);
 
-  Real error_estimate = -1.;
-  if(eim_sys.eval_error_estimate)
+  // Evaluate an a posteriori error bound
+  if(evaluate_RB_error_bound)
   {
     // Compute the a posteriori error bound
     // First, sample the parametrized function at x_{N+1}
@@ -100,17 +100,29 @@ Real RBEIMEvaluation::RB_solve(unsigned int N)
     // Next, evaluate the EIM approximation at x_{N+1}
     Number EIM_approx_at_next_x = 0.;
     for(unsigned int j=0; j<N; j++)
+    {
       if(N == get_n_basis_functions())
+      {
         EIM_approx_at_next_x += RB_solution(j) * extra_interpolation_matrix_row(j);
+      }
       else
+      {
         EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
+      }
+    }
       
-    error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
+    Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
+
+    STOP_LOG("RB_solve()", "RBEIMEvaluation");
+  
+    return error_estimate;
   }
-  
-  STOP_LOG("RB_solve()", "RBEIMEvaluation");
-  
-  return error_estimate;
+  else // Don't evaluate an error bound
+  {
+    STOP_LOG("RB_solve()", "RBEIMEvaluation");
+    return -1.;
+  }
+
 }
 
 void RBEIMEvaluation::RB_solve(DenseVector<Number>& EIM_rhs)
