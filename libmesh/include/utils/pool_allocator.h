@@ -46,6 +46,23 @@ namespace libMesh
   public:
 
     /**
+     * Methods required for copy construction of containers using this allocator.
+     */
+    template<typename U>
+    struct rebind {
+      typedef PoolAllocator<U> other;
+    };
+
+  
+    PoolAllocator() :
+      boost::pool_allocator<T>() 
+    {}
+    
+    explicit PoolAllocator(const PoolAllocator &o) : 
+      boost::pool_allocator<T>(o) 
+    {}
+
+    /**
      * Frees every memory block that doesn't have any allocated chunks. 
      * Returns true if at least one memory block was freed.
      */
@@ -79,6 +96,24 @@ namespace libMesh
   public:
 
     /**
+     * Methods required for copy construction of containers using this allocator.
+     */
+    template<typename U>
+    struct rebind {
+      typedef FastPoolAllocator<U> other;
+    };
+
+  
+    FastPoolAllocator() :
+      boost::fast_pool_allocator<T>() 
+    {}
+    
+    explicit FastPoolAllocator(const FastPoolAllocator &o) : 
+      boost::fast_pool_allocator<T>(o) 
+    {}
+
+
+    /**
      * Frees every memory block that doesn't have any allocated chunks. 
      * Returns true if at least one memory block was freed.
      */
@@ -108,6 +143,23 @@ namespace libMesh
   template PoolAllocator : public std::allocator<T>
   {
   public:
+
+    /**
+     * Methods required for copy construction of containers using this allocator.
+     */
+    template<typename U>
+    struct rebind {
+      typedef PoolAllocator<U> other;
+    };
+  
+    PoolAllocator() :
+      std::allocator<T>() 
+    {}
+    
+    explicit PoolAllocator(const PoolAllocator &o) : 
+      std::allocator<T>(o) 
+    {}
+
     /**
      * Frees every memory block that doesn't have any allocated chunks. 
      * Returns true if at least one memory block was freed.
@@ -131,6 +183,23 @@ namespace libMesh
   template FastPoolAllocator : public std::allocator<T>
   {
   public:
+
+    /**
+     * Methods required for copy construction of containers using this allocator.
+     */
+    template<typename U>
+    struct rebind {
+      typedef FastPoolAllocator<U> other;
+    };
+  
+    FastPoolAllocator() :
+      std::allocator<T>() 
+    {}
+    
+    explicit FastPoolAllocator(const FastPoolAllocator &o) : 
+      std::allocator<T>(o) 
+    {}
+      
     /**
      * Frees every memory block that doesn't have any allocated chunks. 
      * Returns true if at least one memory block was freed.
