@@ -49,7 +49,6 @@ RBEIMSystem::RBEIMSystem (EquationSystems& es,
 		          const unsigned int number)
   : Parent(es, name, number),
     best_fit_type_flag(PROJECTION_BEST_FIT),
-    eval_error_estimate(false),
     mesh_function(NULL),
     performing_extra_greedy_step(false),
     current_variable_number(0)
@@ -392,9 +391,9 @@ Real RBEIMSystem::compute_best_fit_error()
     case(EIM_BEST_FIT):
     {
       // Turn off error estimation here, we use the linfty norm instead
-      eval_error_estimate = false;
+      rb_eval->evaluate_RB_error_bound = false;
       rb_eval->RB_solve(RB_size);
-      eval_error_estimate = true;
+      rb_eval->evaluate_RB_error_bound = true;
       break;
     }
     default:

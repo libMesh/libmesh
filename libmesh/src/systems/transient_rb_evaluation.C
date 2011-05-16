@@ -220,16 +220,7 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
   // and load the initial data
   RB_temporal_solution_data[0] = RB_solution;
 
-  Real error_bound_sum = 0.;
-  if(N > 0)
-  {
-    error_bound_sum += pow( initial_L2_error_all_N[N-1], 2.);
-  }
-
-  // Set error bound at the initial time
-  error_bound_all_k[trans_rb_sys.get_time_level()] = std::sqrt(error_bound_sum);
-
-  // Compute the outputs and associated error bounds at the initial time
+  // Set outputs at initial time
   DenseVector<Number> RB_output_vector_N;
   for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
   {
@@ -239,14 +230,40 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
       RB_outputs_all_k[n][0] += trans_rb_sys.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
     }
-
-    RB_output_error_bounds_all_k[n][0] = error_bound_all_k[0] * trans_rb_sys.eval_output_dual_norm(n);
   }
 
-  Real alpha_LB = trans_rb_sys.get_SCM_lower_bound();
-  
-  // Precompute time-invariant parts of the dual norm of the residual.
-  cache_online_residual_terms(N);
+  // Initialize error bounds, if necessary
+  Real error_bound_sum = 0.;
+  Real alpha_LB = 0.;
+  if(evaluate_RB_error_bound)
+  {
+    if(N > 0)
+    {
+      error_bound_sum += pow( initial_L2_error_all_N[N-1], 2.);
+    }
+
+    // Set error bound at the initial time
+    error_bound_all_k[trans_rb_sys.get_time_level()] = std::sqrt(error_bound_sum);
+
+    // Compute the outputs and associated error bounds at the initial time
+    DenseVector<Number> RB_output_vector_N;
+    for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
+    {
+      RB_outputs_all_k[n][0] = 0.;
+      for(unsigned int q_l=0; q_l<trans_rb_sys.get_Q_l(n); q_l++)
+      {
+        RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
+        RB_outputs_all_k[n][0] += trans_rb_sys.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
+      }
+
+      RB_output_error_bounds_all_k[n][0] = error_bound_all_k[0] * trans_rb_sys.eval_output_dual_norm(n);
+    }
+
+    alpha_LB = trans_rb_sys.get_SCM_lower_bound();
+    
+    // Precompute time-invariant parts of the dual norm of the residual.
+    cache_online_residual_terms(N);
+  }
 
   for(unsigned int time_level=1; time_level<=trans_rb_sys.get_K(); time_level++)
   {
@@ -272,16 +289,7 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
     // Save RB_solution for current time level
     RB_temporal_solution_data[time_level] = RB_solution;
 
-    // Evaluate the dual norm of the residual for RB_solution_vector
-//    Real epsilon_N = uncached_compute_residual_dual_norm(N);
-    Real epsilon_N = compute_residual_dual_norm(N);
-
-    error_bound_sum += trans_rb_sys.residual_scaling_numer(alpha_LB) * pow(epsilon_N, 2.);
-
-    // store error bound at time-level _k
-    error_bound_all_k[time_level] = std::sqrt(error_bound_sum/trans_rb_sys.residual_scaling_denom(alpha_LB));
-
-    // Now compute the outputs and associated errors
+    // Evaluate outputs
     DenseVector<Number> RB_output_vector_N;
     for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
     {
@@ -291,23 +299,49 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
         RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
         RB_outputs_all_k[n][time_level] += trans_rb_sys.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
       }
+    }
 
-      RB_output_error_bounds_all_k[n][time_level] = error_bound_all_k[time_level] * trans_rb_sys.eval_output_dual_norm(n);
+    // Calculate RB error bounds
+    if(evaluate_RB_error_bound)
+    {
+      // Evaluate the dual norm of the residual for RB_solution_vector
+      // Real epsilon_N = uncached_compute_residual_dual_norm(N);
+      Real epsilon_N = compute_residual_dual_norm(N);
+
+      error_bound_sum += trans_rb_sys.residual_scaling_numer(alpha_LB) * pow(epsilon_N, 2.);
+
+      // store error bound at time-level _k
+      error_bound_all_k[time_level] = std::sqrt(error_bound_sum/trans_rb_sys.residual_scaling_denom(alpha_LB));
+
+      // Now evaluated output error bounds
+      for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
+      {
+        RB_output_error_bounds_all_k[n][time_level] = error_bound_all_k[time_level] * trans_rb_sys.eval_output_dual_norm(n);
+      }
     }
   }
 
-  // Now compute the L2 norm of the RB solution at time-level _K
-  // to normalize the error bound
-  // We reuse RB_rhs here
-  DenseMatrix<Number> RB_L2_matrix_N;
-  RB_L2_matrix.get_principal_submatrix(N,RB_L2_matrix_N);
-  RB_L2_matrix_N.vector_mult(RB_rhs, RB_solution);
-  Real final_RB_L2_norm = libmesh_real(std::sqrt(RB_solution.dot(RB_rhs)));
+  if(evaluate_RB_error_bound) // Calculate the error bounds  
+  {
+    // Compute the L2 norm of the RB solution at time-level _K to normalize
+    // to normalize the error bound
+    // We reuse RB_rhs here
+    DenseMatrix<Number> RB_L2_matrix_N;
+    RB_L2_matrix.get_principal_submatrix(N,RB_L2_matrix_N);
+    RB_L2_matrix_N.vector_mult(RB_rhs, RB_solution);
+    Real final_RB_L2_norm = libmesh_real(std::sqrt(RB_solution.dot(RB_rhs)));
 
-  STOP_LOG("RB_solve()", "TransientRBEvaluation");
+    STOP_LOG("RB_solve()", "TransientRBEvaluation");
 
-   return ( trans_rb_sys.return_rel_error_bound ? error_bound_all_k[trans_rb_sys.get_K()]/final_RB_L2_norm :
-                                                  error_bound_all_k[trans_rb_sys.get_K()] );
+    return ( trans_rb_sys.return_rel_error_bound ? error_bound_all_k[trans_rb_sys.get_K()]/final_RB_L2_norm :
+                                                   error_bound_all_k[trans_rb_sys.get_K()] );
+  }
+  else // Don't calculate the error bounds
+  {
+    STOP_LOG("RB_solve()", "TransientRBEvaluation");
+    // Just return -1. if we did not compute the error bound
+    return -1.;
+  }
 }
 
 void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)

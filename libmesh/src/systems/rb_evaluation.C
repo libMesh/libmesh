@@ -39,7 +39,8 @@ namespace libMesh
 RBEvaluation::RBEvaluation (RBSystem& rb_sys_in)
   :
   rb_sys(rb_sys_in),
-  multiple_files_for_outputs(false)
+  multiple_files_for_outputs(false),
+  evaluate_RB_error_bound(true)
 {
 }
 
@@ -213,21 +214,7 @@ Real RBEvaluation::RB_solve(unsigned int N)
     RB_system_matrix.lu_solve(RB_rhs, RB_solution);
   }
 
-  // Evaluate the dual norm of the residual for RB_solution_vector
-  Real epsilon_N = compute_residual_dual_norm(N);
-
-  // Get lower bound for coercivity constant
-  const Real alpha_LB = rb_sys.get_SCM_lower_bound();
-  // alpha_LB needs to be positive to get a valid error bound
-  libmesh_assert( alpha_LB > 0. );
-
-  // Store (absolute) error bound
-  Real abs_error_bound = epsilon_N / rb_sys.residual_scaling_denom(alpha_LB);
-
-  // Compute the norm of RB_solution
-  Real RB_solution_norm = RB_solution.l2_norm();
-
-  // Now compute the outputs and associated errors
+  // Evaluate RB outputs
   DenseVector<Number> RB_output_vector_N;
   for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
   {
@@ -237,13 +224,40 @@ Real RBEvaluation::RB_solve(unsigned int N)
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
       RB_outputs[n] += libmesh_conj(rb_sys.eval_theta_q_l(n,q_l))*RB_output_vector_N.dot(RB_solution);
     }
-
-    RB_output_error_bounds[n] = abs_error_bound * rb_sys.eval_output_dual_norm(n);
   }
 
-  STOP_LOG("RB_solve()", "RBEvaluation");
-  
-  return ( rb_sys.return_rel_error_bound ? abs_error_bound/RB_solution_norm : abs_error_bound );
+  if(evaluate_RB_error_bound) // Calculate the error bounds  
+  {
+    // Evaluate the dual norm of the residual for RB_solution_vector
+    Real epsilon_N = compute_residual_dual_norm(N);
+
+    // Get lower bound for coercivity constant
+    const Real alpha_LB = rb_sys.get_SCM_lower_bound();
+    // alpha_LB needs to be positive to get a valid error bound
+    libmesh_assert( alpha_LB > 0. );
+
+    // Evaluate the (absolute) error bound
+    Real abs_error_bound = epsilon_N / rb_sys.residual_scaling_denom(alpha_LB);
+
+    // Now compute the output error bounds
+    DenseVector<Number> RB_output_vector_N;
+    for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+    {
+      RB_output_error_bounds[n] = abs_error_bound * rb_sys.eval_output_dual_norm(n);
+    }
+
+    // Compute the norm of RB_solution
+    Real RB_solution_norm = RB_solution.l2_norm();
+
+    STOP_LOG("RB_solve()", "RBEvaluation");
+    return ( rb_sys.return_rel_error_bound ? abs_error_bound/RB_solution_norm : abs_error_bound );
+  }
+  else // Don't calculate the error bounds
+  {
+    STOP_LOG("RB_solve()", "RBEvaluation");
+    // Just return -1. if we did not compute the error bound
+    return -1.;
+  }
 }
 
 Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
