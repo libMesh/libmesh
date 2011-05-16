@@ -668,15 +668,23 @@ public:
    * variables.
    */
   Conversion(const int* nm,       // node_map 
-	     const int* inm,      // inverse_node_map 
+	     size_t nm_size,
+	     const int* inm,      // inverse_node_map
+	     size_t inm_size, 
 	     const int* sm,       // side_map 
+	     size_t sm_size,
 	     const int* ism,      // inverse_side_map 
+	     size_t ism_size,
 	     const ElemType ct,   // "canonical" aka libmesh element type 
 	     std::string ex_type) // string representing the Exodus element type 
-    : node_map(nm),       
+    : node_map(nm),
+      node_map_size(nm_size),
       inverse_node_map(inm),
+      inverse_node_map_size(inm_size),
       side_map(sm),
+      side_map_size(sm_size),
       inverse_side_map(ism),
+      inverse_side_map_size(ism_size),
       canonical_type(ct),    
       exodus_type(ex_type)   
   {}
@@ -688,7 +696,7 @@ public:
    */
   int get_node_map(int i) const
   { 
-    //libmesh_assert (static_cast<unsigned>(i) < sizeof(node_map)/sizeof(node_map[0]));  
+    libmesh_assert (static_cast<size_t>(i) < node_map_size);  
     return node_map[i]; 
   }
 
@@ -700,7 +708,7 @@ public:
    */
   int get_inverse_node_map(int i) const
   { 
-    // libmesh_assert (static_cast<unsigned>(i) < sizeof(inverse_node_map)/sizeof(inverse_node_map[0]));  
+    libmesh_assert (static_cast<size_t>(i) < inverse_node_map_size);  
     return inverse_node_map[i]; 
   }
 
@@ -711,7 +719,7 @@ public:
    */
   int get_side_map(int i) const 
   { 
-    //libmesh_assert (static_cast<unsigned>(i) < sizeof(side_map)/sizeof(side_map[0]));  
+    libmesh_assert (static_cast<size_t>(i) < side_map_size);  
     return side_map[i]; 
   }
 
@@ -720,7 +728,11 @@ public:
    * element.  The side map maps the libMesh side numbering
    * format to this exodus's format.
    */
-  int get_inverse_side_map(int i)          const { return inverse_side_map[i]; }
+  int get_inverse_side_map(int i) const
+  { 
+    libmesh_assert (static_cast<size_t>(i) < inverse_side_map_size);
+    return inverse_side_map[i]; 
+  }
 
   /**
    * Returns the canonical element type for this
@@ -742,6 +754,11 @@ private:
   const int* node_map;
 
   /**
+   * The size of the node map array, this helps with bounds checking...
+   */
+  size_t node_map_size;
+
+  /**
    * Pointer to the inverse node map for this element.
    * For all elements except for the Hex27, this is the same
    * as the node map.
@@ -749,14 +766,29 @@ private:
   const int* inverse_node_map;
 
   /**
+   * The size of the inverse node map array, this helps with bounds checking...
+   */
+  size_t inverse_node_map_size;
+
+  /**
    * Pointer to the side map for this element.
    */
   const int* side_map;
 
   /**
+   * The size of the side map array, this helps with bounds checking...
+   */
+  size_t side_map_size;
+
+  /**
    * Pointer to the inverse side map for this element.
    */
   const int* inverse_side_map;
+
+  /**
+   * The size of the inverse side map array, this helps with bounds checking...
+   */
+  size_t inverse_side_map_size;
 
   /**
    * The canonical (i.e. standard for this library)
