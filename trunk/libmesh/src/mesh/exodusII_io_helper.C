@@ -38,6 +38,11 @@
 #include "mesh_tools.h"  // for elem_types warning
 #endif
 
+// This macro returns the length of the array a.  Don't
+// try using it on empty arrays, since it accesses the
+// zero'th element.
+#define ARRAY_LENGTH(a) sizeof((a))/sizeof((a)[0])
+ 
 namespace libMesh
 {
 
@@ -1387,13 +1392,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   
   // dummy return value, we won't get here
   const Conversion conv(tri3_node_map,
-			sizeof(tri3_node_map),
+			ARRAY_LENGTH(tri3_node_map),
 			tri3_node_map, // inverse node map same as forward node map
-			sizeof(tri3_node_map),
+			ARRAY_LENGTH(tri3_node_map),
 			tri_edge_map,
-			sizeof(tri_edge_map),
+			ARRAY_LENGTH(tri_edge_map),
 			tri_inverse_edge_map,
-			sizeof(tri_inverse_edge_map),
+			ARRAY_LENGTH(tri_inverse_edge_map),
 			TRI3,
 			"TRI3");
   return conv;  
@@ -1409,13 +1414,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case QUAD4:
       {
 	const Conversion conv(quad4_node_map,
-			      sizeof(quad4_node_map),
+			      ARRAY_LENGTH(quad4_node_map),
 			      quad4_node_map, // inverse node map same as forward node map
-			      sizeof(quad4_node_map),
+			      ARRAY_LENGTH(quad4_node_map),
 			      quad_edge_map,
-			      sizeof(quad_edge_map),
+			      ARRAY_LENGTH(quad_edge_map),
 			      quad_inverse_edge_map,
-			      sizeof(quad_inverse_edge_map),
+			      ARRAY_LENGTH(quad_inverse_edge_map),
 			      QUAD4,
 			      "QUAD4");
 	return conv;
@@ -1424,13 +1429,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case QUAD8:
       {
 	const Conversion conv(quad8_node_map,
-			      sizeof(quad8_node_map),
+			      ARRAY_LENGTH(quad8_node_map),
 			      quad8_node_map, // inverse node map same as forward node map
-			      sizeof(quad8_node_map),
+			      ARRAY_LENGTH(quad8_node_map),
 			      quad_edge_map,
-			      sizeof(quad_edge_map),
+			      ARRAY_LENGTH(quad_edge_map),
 			      quad_inverse_edge_map,
-			      sizeof(quad_inverse_edge_map),
+			      ARRAY_LENGTH(quad_inverse_edge_map),
 			      QUAD8,
 			      "QUAD8");
 	return conv;
@@ -1439,13 +1444,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case QUAD9:
       {
 	const Conversion conv(quad9_node_map,
-			      sizeof(quad9_node_map),
+			      ARRAY_LENGTH(quad9_node_map),
 			      quad9_node_map, // inverse node map same as forward node map
-			      sizeof(quad9_node_map),
+			      ARRAY_LENGTH(quad9_node_map),
 			      quad_edge_map,
-			      sizeof(quad_edge_map),
+			      ARRAY_LENGTH(quad_edge_map),
 			      quad_inverse_edge_map,
-			      sizeof(quad_inverse_edge_map),
+			      ARRAY_LENGTH(quad_inverse_edge_map),
 			      QUAD9,
 			      "QUAD9");
 	return conv;
@@ -1454,13 +1459,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case TRI3:
       {
 	const Conversion conv(tri3_node_map,
-			      sizeof(tri3_node_map),
+			      ARRAY_LENGTH(tri3_node_map),
 			      tri3_node_map, // inverse node map same as forward node map
-			      sizeof(tri3_node_map),
+			      ARRAY_LENGTH(tri3_node_map),
 			      tri_edge_map,
-			      sizeof(tri_edge_map),
+			      ARRAY_LENGTH(tri_edge_map),
 			      tri_inverse_edge_map,
-			      sizeof(tri_inverse_edge_map),
+			      ARRAY_LENGTH(tri_inverse_edge_map),
 			      TRI3,
 			      "TRI3");
 	return conv;
@@ -1469,13 +1474,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case TRI6:
       {
 	const Conversion conv(tri6_node_map,
-			      sizeof(tri6_node_map),
+			      ARRAY_LENGTH(tri6_node_map),
 			      tri6_node_map, // inverse node map same as forward node map
-			      sizeof(tri6_node_map),
+			      ARRAY_LENGTH(tri6_node_map),
 			      tri_edge_map,
-			      sizeof(tri_edge_map),
+			      ARRAY_LENGTH(tri_edge_map),
 			      tri_inverse_edge_map,
-			      sizeof(tri_inverse_edge_map),
+			      ARRAY_LENGTH(tri_inverse_edge_map),
 			      TRI6,
 			      "TRI6");
 	return conv;
@@ -1484,13 +1489,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case HEX8:
       {
 	const Conversion conv(hex8_node_map,
-			      sizeof(hex8_node_map),
+			      ARRAY_LENGTH(hex8_node_map),
 			      hex8_node_map, // inverse node map same as forward node map
-			      sizeof(hex8_node_map),
+			      ARRAY_LENGTH(hex8_node_map),
 			      hex_face_map,
-			      sizeof(hex_face_map),
+			      ARRAY_LENGTH(hex_face_map),
 			      hex_inverse_face_map,
-			      sizeof(hex_inverse_face_map),
+			      ARRAY_LENGTH(hex_inverse_face_map),
 			      HEX8,
 			      "HEX8");
 	return conv;
@@ -1499,13 +1504,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case HEX20:
       {
 	const Conversion conv(hex20_node_map,
-			      sizeof(hex20_node_map),
+			      ARRAY_LENGTH(hex20_node_map),
 			      hex20_node_map, // inverse node map same as forward node map
-			      sizeof(hex20_node_map),
+			      ARRAY_LENGTH(hex20_node_map),
 			      hex_face_map,
-			      sizeof(hex_face_map),
+			      ARRAY_LENGTH(hex_face_map),
 			      hex_inverse_face_map,
-			      sizeof(hex_inverse_face_map),
+			      ARRAY_LENGTH(hex_inverse_face_map),
 			      HEX20,
 			      "HEX20");
 	return conv;
@@ -1514,13 +1519,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case HEX27:
       {
 	const Conversion conv(hex27_node_map,
-			      sizeof(hex27_node_map),
+			      ARRAY_LENGTH(hex27_node_map),
 			      hex27_inverse_node_map, // different inverse node map for Hex27!
-			      sizeof(hex27_inverse_node_map),
+			      ARRAY_LENGTH(hex27_inverse_node_map),
 			      hex27_face_map,
-			      sizeof(hex27_face_map),
+			      ARRAY_LENGTH(hex27_face_map),
 			      hex27_inverse_face_map,
-			      sizeof(hex27_inverse_face_map),
+			      ARRAY_LENGTH(hex27_inverse_face_map),
 			      HEX27,
 			      "HEX27");
 	return conv;
@@ -1529,13 +1534,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case TET4:
       {
 	const Conversion conv(tet4_node_map,
-			      sizeof(tet4_node_map),
+			      ARRAY_LENGTH(tet4_node_map),
 			      tet4_node_map, // inverse node map same as forward node map
-			      sizeof(tet4_node_map),
+			      ARRAY_LENGTH(tet4_node_map),
 			      tet_face_map,
-			      sizeof(tet_face_map),
+			      ARRAY_LENGTH(tet_face_map),
 			      tet_inverse_face_map,
-			      sizeof(tet_inverse_face_map),
+			      ARRAY_LENGTH(tet_inverse_face_map),
 			      TET4,
 			      "TETRA4");
 	return conv;
@@ -1544,13 +1549,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case TET10:
       {
 	const Conversion conv(tet10_node_map,
-			      sizeof(tet10_node_map),
+			      ARRAY_LENGTH(tet10_node_map),
 			      tet10_node_map, // inverse node map same as forward node map
-			      sizeof(tet10_node_map),
+			      ARRAY_LENGTH(tet10_node_map),
 			      tet_face_map,
-			      sizeof(tet_face_map),
+			      ARRAY_LENGTH(tet_face_map),
 			      tet_inverse_face_map,
-			      sizeof(tet_inverse_face_map),
+			      ARRAY_LENGTH(tet_inverse_face_map),
 			      TET10,
 			      "TETRA10");
 	return conv;
@@ -1559,13 +1564,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case PRISM6:
       {
 	const Conversion conv(prism6_node_map,
-			      sizeof(prism6_node_map),
+			      ARRAY_LENGTH(prism6_node_map),
 			      prism6_node_map, // inverse node map same as forward node map
-			      sizeof(prism6_node_map),
+			      ARRAY_LENGTH(prism6_node_map),
 			      prism_face_map,
-			      sizeof(prism_face_map),
+			      ARRAY_LENGTH(prism_face_map),
 			      prism_inverse_face_map,
-			      sizeof(prism_inverse_face_map),
+			      ARRAY_LENGTH(prism_inverse_face_map),
 			      PRISM6,
 			      "WEDGE");
 	return conv;
@@ -1574,13 +1579,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case PRISM15:
       {
 	const Conversion conv(prism15_node_map,
-			      sizeof(prism15_node_map),
+			      ARRAY_LENGTH(prism15_node_map),
 			      prism15_node_map, // inverse node map same as forward node map
-			      sizeof(prism15_node_map),
+			      ARRAY_LENGTH(prism15_node_map),
 			      prism_face_map,
-			      sizeof(prism_face_map),
+			      ARRAY_LENGTH(prism_face_map),
 			      prism_inverse_face_map,
-			      sizeof(prism_inverse_face_map),
+			      ARRAY_LENGTH(prism_inverse_face_map),
 			      PRISM15,
 			      "WEDGE15");
 	return conv;
@@ -1589,13 +1594,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case PRISM18:
       {
 	const Conversion conv(prism18_node_map,
-			      sizeof(prism18_node_map),
+			      ARRAY_LENGTH(prism18_node_map),
 			      prism18_node_map, // inverse node map same as forward node map
-			      sizeof(prism18_node_map),
+			      ARRAY_LENGTH(prism18_node_map),
 			      prism_face_map,
-			      sizeof(prism_face_map),
+			      ARRAY_LENGTH(prism_face_map),
 			      prism_inverse_face_map,
-			      sizeof(prism_inverse_face_map),
+			      ARRAY_LENGTH(prism_inverse_face_map),
 			      PRISM18,
 			      "WEDGE18");
 	return conv;
@@ -1604,13 +1609,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     case PYRAMID5:
       {
 	const Conversion conv(pyramid5_node_map,
-			      sizeof(pyramid5_node_map),
+			      ARRAY_LENGTH(pyramid5_node_map),
 			      pyramid5_node_map, // inverse node map same as forward node map
-			      sizeof(pyramid5_node_map),
+			      ARRAY_LENGTH(pyramid5_node_map),
 			      pyramid_face_map,
-			      sizeof(pyramid_face_map),
+			      ARRAY_LENGTH(pyramid_face_map),
 			      pyramid_inverse_face_map,
-			      sizeof(pyramid_inverse_face_map),
+			      ARRAY_LENGTH(pyramid_inverse_face_map),
 			      PYRAMID5,
 			      "PYRAMID5");
 	return conv;
@@ -1624,13 +1629,13 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     
   // dummy return value, we will never get here
   const Conversion conv(tri3_node_map,
-			sizeof(tri3_node_map),
+			ARRAY_LENGTH(tri3_node_map),
 			tri3_node_map, // inverse node map same as forward node map
-			sizeof(tri3_node_map),
+			ARRAY_LENGTH(tri3_node_map),
 			tri_edge_map,
-			sizeof(tri_edge_map),
+			ARRAY_LENGTH(tri_edge_map),
 			tri_inverse_edge_map,
-			sizeof(tri_inverse_edge_map),
+			ARRAY_LENGTH(tri_inverse_edge_map),
 			TRI3,
 			"TRI3");
   return conv;  
