@@ -38,15 +38,6 @@ dev_table_entry("images/benkirk.jpg",
 ?>
 
 <?php
-dev_table_entry("images/spetersen.jpg",
-		"Steffen Petersen",
-		"http://www.mub.tu-harburg.de/deutsch/mitarbeiter/petersen.html",
-		"",
-		"PhD Student, Developer",
-		"<a href=\"http://www.tu-harburg.de\">Hamburg University of Technology</a>");
-?>
-
-<?php
 dev_table_entry("images/jwpeterson.jpg",
                 "Dr. John W. Peterson",
                 "http://www.cfdlab.ae.utexas.edu/~peterson",
@@ -63,6 +54,16 @@ dev_table_entry("images/roystgnr.jpg",
 		"PhD Student, Chief Software Architect",
 		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
 ?>
+
+<?php
+ dev_table_entry("images/knezed01.jpg",
+		 "Dr. David Knezevic",
+		 "http://web.mit.edu/dknez/www/",
+		 "",
+		 "Post Doctoral Researcher",
+		 "<a href=\"www.mit.edu\">MIT</a>");
+?>
+
 
 <?php
  dev_table_entry("images/drgasto_s.jpg",
@@ -88,6 +89,15 @@ dev_table_entry("images/roystgnr.jpg",
  		 <br><a href=\"http://www.uwa.edu.au\">University of Western Australia</a>");
 ?>
 
+<?php
+dev_table_entry("images/spetersen.jpg",
+		"Steffen Petersen",
+		"http://www.mub.tu-harburg.de/deutsch/mitarbeiter/petersen.html",
+		"",
+		"PhD Student, Developer",
+		"<a href=\"http://www.tu-harburg.de\">Hamburg University of Technology</a>");
+?>
+
 
 <?php
  dev_table_entry("images/bbarth2.jpg",
@@ -107,34 +117,6 @@ dev_table_entry("images/roystgnr.jpg",
 		 "Developer",
 		 "<a href=\"http://www.audi.com\">Audi AG</a>");
 ?>
-
-<?php
- dev_table_entry("images/knezed01.jpg",
-		 "David Knezevic",
-		 "http://web.comlab.ox.ac.uk/oucl/work/david.knezevic/",
-		 "",
-		 "PhD Student, Developer",
-		 "<a href=\"http://web.comlab.ox.ac.uk/oucl/work/david.knezevic/\">Oxford University Computing Laboratory</a>");
-?>
-
-<?php
- dev_table_entry("images/blank.png",
-		 "Hendrik van der Heijden",
-		 "http://www.tu-harburg.de",
-		 "",
-		 "Student, Developer",
-		 "<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
-?>
-
-<?php
- dev_table_entry("images/blank.png",
-		 "Florian Prill",
-		 "http://www.tu-harburg.de",
-		 "",
-		 "Student, Developer",
-		 "<a href=\"http://www.tu-harburg.de\">Technical University Hamburg-Harburg</a>");
-?>
-
 
 </div>
 
