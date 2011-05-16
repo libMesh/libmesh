@@ -686,7 +686,11 @@ public:
    * element.  The node map maps the exodusII node numbering
    * format to this library's format.
    */
-  int get_node_map(int i)          const { return node_map[i]; }
+  int get_node_map(int i) const
+  { 
+    //libmesh_assert (static_cast<unsigned>(i) < sizeof(node_map)/sizeof(node_map[0]));  
+    return node_map[i]; 
+  }
 
   /**
    * Returns the ith component of the inverse node map for this
@@ -694,7 +698,11 @@ public:
    * to Exodus' node numbering.  Note that all elements except Hex27
    * currently have the same node numbering as libmesh elements.
    */
-  int get_inverse_node_map(int i)          const { return inverse_node_map[i]; }
+  int get_inverse_node_map(int i) const
+  { 
+    // libmesh_assert (static_cast<unsigned>(i) < sizeof(inverse_node_map)/sizeof(inverse_node_map[0]));  
+    return inverse_node_map[i]; 
+  }
 
   /**
    * Returns the ith component of the side map for this
@@ -703,7 +711,7 @@ public:
    */
   int get_side_map(int i) const 
   { 
-    libmesh_assert (static_cast<unsigned>(i) < sizeof(side_map)/sizeof(side_map[0]));  
+    //libmesh_assert (static_cast<unsigned>(i) < sizeof(side_map)/sizeof(side_map[0]));  
     return side_map[i]; 
   }
 
