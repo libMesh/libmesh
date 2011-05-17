@@ -78,6 +78,14 @@ void Partitioner::partition (MeshBase& mesh,
 
   // Set the node's processor ids
   Partitioner::set_node_processor_ids(mesh);
+
+#ifdef DEBUG
+  // Messed up elem processor_id()s can leave us without the child
+  // elements we need to restrict vectors on a distributed mesh
+  MeshTools::libmesh_assert_valid_elem_procids(mesh);
+
+  MeshTools::libmesh_assert_valid_node_procids(mesh);
+#endif
 }
 
 
@@ -217,21 +225,35 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 {
   START_LOG("set_parent_processor_ids()","Partitioner");
   
+#ifdef LIBMESH_ENABLE_AMR
+
   // If the mesh is serial we have access to all the elements,
   // in particular all the active ones.  We can therefore set
-  // the parent processor ids indirecly through their children.
+  // the parent processor ids indirecly through their children, and
+  // set the subactive processor ids while examining their active
+  // ancestors.
   // By convention a parent is assigned to the minimum processor
-  // of all its children.
+  // of all its children, and a subactive is assigned to the processor
+  // of its active ancestor.
   if (mesh.is_serial())
     {
-      // Loop over all the active elements in the mesh  
+      // Loop over all the active elements in the mesh
       MeshBase::element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::element_iterator end = mesh.active_elements_end();
       
       for ( ; it!=end; ++it)
 	{
-#ifdef LIBMESH_ENABLE_AMR
 	  Elem *child  = *it;
+
+          // First set descendents
+
+          std::vector<const Elem*> subactive_family;
+          child->total_family_tree(subactive_family);
+          for (unsigned int i = 0; i != subactive_family.size(); ++i)
+            const_cast<Elem*>(subactive_family[i])->processor_id() = child->processor_id();
+
+          // Then set ancestors
+
 	  Elem *parent = child->parent();
 
 	  while (parent)
@@ -252,10 +274,6 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		}	      
 	      parent = parent->parent();
 	    }
-#else
-	  libmesh_assert ((*it)->level() == 0);
-#endif
-	  
 	}
     }
 
@@ -263,6 +281,26 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
   // all their children.
   else
     {
+      // Setting subactive processor ids is easy: we can guarantee
+      // that children have access to all their parents.
+
+      // Loop over all the active elements in the mesh
+      MeshBase::element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::element_iterator end = mesh.active_elements_end();
+      
+      for ( ; it!=end; ++it)
+        {
+	  Elem *child  = *it;
+
+          std::vector<const Elem*> subactive_family;
+          child->total_family_tree(subactive_family);
+          for (unsigned int i = 0; i != subactive_family.size(); ++i)
+            const_cast<Elem*>(subactive_family[i])->processor_id() = child->processor_id();
+        }
+
+      // When the mesh is parallel we cannot guarantee that parents have access to
+      // all their children.
+
       // We will use a brute-force approach here.  Each processor finds its parent
       // elements and sets the parent pid to the minimum of its local children.
       // A global reduction is then performed to make sure the true minimum is found.
@@ -295,7 +333,6 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 	  
 	  for ( ; not_it != not_end; ++not_it)
 	    {
-#ifdef LIBMESH_ENABLE_AMR
 	      Elem *parent = *not_it;
 
 	      const unsigned int parent_idx = parent->id();
@@ -315,10 +352,6 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 
 		  parent_processor_ids[packed_idx] = parent_pid;
 		}
-#else
-	      // without AMR there should be no inactive elements
-	      libmesh_error();
-#endif
 	    }
 
 	  // then find the global minimum
@@ -350,6 +383,8 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 	}
     }
   
+#endif // LIBMESH_ENABLE_AMR
+
   STOP_LOG("set_parent_processor_ids()","Partitioner");
 }
 
