@@ -81,7 +81,10 @@ void MeshTools::Modification::distort (MeshBase& mesh,
   {
     const unsigned int seed = 123456;
     
-    // seed the random number generator
+    // seed the random number generator.
+    // We'll loop from 1 to n_nodes on every processor, even those
+    // that don't have a particular node, so that the pseudorandom
+    // numbers will be the same everywhere.
     std::srand(seed);
     
     // If the node is on the boundary or
@@ -111,11 +114,15 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 	  
 	  dir = dir.unit();
 
-          mesh.node(n)(0) += dir(0)*factor*hmin[n];
+          Node *node = mesh.node_ptr(n);
+          if (!node)
+            continue;
+
+          (*node)(0) += dir(0)*factor*hmin[n];
 	  if (mesh.mesh_dimension() > 1)
-            mesh.node(n)(1) += dir(1)*factor*hmin[n];
+            (*node)(1) += dir(1)*factor*hmin[n];
           if (mesh.mesh_dimension() == 3)
-            mesh.node(n)(2) += dir(2)*factor*hmin[n];
+            (*node)(2) += dir(2)*factor*hmin[n];
 	}
   }
 
@@ -133,8 +140,11 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 {
   const Point p(xt, yt, zt);
 
-  for (unsigned int n=0; n<mesh.n_nodes(); n++)
-    mesh.node(n) += p;
+  const MeshBase::node_iterator nd_end = mesh.nodes_end();
+
+  for (MeshBase::node_iterator nd = mesh.nodes_begin();
+       nd != nd_end; ++nd)
+    **nd += p;
 }
 
 
@@ -179,15 +189,18 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
   // (equations 6-14 give the entries of the composite transformation matrix).
   // The rotations are performed sequentially about the z, x, and z axes, in that order.
   // A positive angle yields a counter-clockwise rotation about the axis in question.
-  for (unsigned int n=0; n<mesh.n_nodes(); n++)
+  const MeshBase::node_iterator nd_end = mesh.nodes_end();
+
+  for (MeshBase::node_iterator nd = mesh.nodes_begin();
+       nd != nd_end; ++nd)
     {
-      const Point p = mesh.node(n);
+      const Point p = **nd;
       const Real  x = p(0);
       const Real  y = p(1);
       const Real  z = p(2);
-      mesh.node(n) = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
-                           (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
-                           ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
+      **nd = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
+                   (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
+                   ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
     }
 }
 
@@ -209,24 +222,28 @@ void MeshTools::Modification::scale (MeshBase& mesh,
     }
 
   // Scale the x coordinate in all dimensions
-  for (unsigned int n=0; n<mesh.n_nodes(); n++)
-    mesh.node(n)(0) *= x_scale;
+  const MeshBase::node_iterator nd_end = mesh.nodes_end();
+
+  for (MeshBase::node_iterator nd = mesh.nodes_begin();
+       nd != nd_end; ++nd)
+    (**nd)(0) *= x_scale;
 
 
   // Only scale the y coordinate in 2 and 3D
-  if (mesh.spatial_dimension() > 1)
-    {
+  if (mesh.spatial_dimension() < 2)
+    return;
 
-      for (unsigned int n=0; n<mesh.n_nodes(); n++)
-	mesh.node(n)(1) *= y_scale;
+  for (MeshBase::node_iterator nd = mesh.nodes_begin();
+       nd != nd_end; ++nd)
+    (**nd)(1) *= y_scale;
 
-      // Only scale the z coordinate in 3D
-      if (mesh.spatial_dimension() == 3)
-	{
-	  for (unsigned int n=0; n<mesh.n_nodes(); n++)
-	    mesh.node(n)(2) *= z_scale;
-	}
-    }
+  // Only scale the z coordinate in 3D
+  if (mesh.spatial_dimension() < 3)
+    return;
+
+  for (MeshBase::node_iterator nd = mesh.nodes_begin();
+       nd != nd_end; ++nd)
+    (**nd)(2) *= z_scale;
 }
 
 
