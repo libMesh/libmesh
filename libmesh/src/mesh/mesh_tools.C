@@ -994,6 +994,52 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 
 
 
+void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase &mesh)
+{
+  if (libMesh::n_processors() == 1)
+    return;
+
+  // Ancestor elements we won't worry about, but subactive and active
+  // elements ought to have parents with consistent processor ids
+
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  for (MeshBase::const_element_iterator el = 
+       mesh.elements_begin(); el != el_end; ++el)
+    {
+      const Elem *elem = *el;
+      libmesh_assert(elem);
+
+      if (!elem->active() && !elem->subactive())
+        continue;
+
+      const Elem *parent = elem->parent();
+
+      if (parent)
+        {
+          libmesh_assert(parent->has_children());
+          unsigned int parent_procid = parent->processor_id();
+          bool matching_child_id = false;
+          for (unsigned int c = 0; c != parent->n_children(); ++c)
+            {
+              const Elem* child = parent->child(c);
+              libmesh_assert(child);
+
+              // If we've got a remote_elem then we don't know whether
+              // it's responsible for the parent's processor id; all
+	      // we can do is assume it is and let its processor fail
+	      // an assert if there's something wrong.
+              if (child == remote_elem ||
+                  child->processor_id() == parent_procid)
+                matching_child_id = true;
+            }
+          libmesh_assert(matching_child_id);
+        }
+    }
+}
+
+
+
 void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
 {
   parallel_only();
