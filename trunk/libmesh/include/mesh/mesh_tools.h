@@ -352,6 +352,13 @@ namespace MeshTools
   void libmesh_assert_valid_node_procids (const MeshBase &mesh);
 
   /**
+   * A function for verifying that processor assignment of elements
+   * is correct (each parent has the processor id of one of its
+   * children)
+   */
+  void libmesh_assert_valid_elem_procids (const MeshBase &mesh);
+
+  /**
    * A function for verifying that refinement flags on elements
    * are consistent between processors
    */
