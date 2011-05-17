@@ -140,7 +140,7 @@ namespace libMesh
    * A wrapper for \p std::allocator<> when Boost is not available.
    */
   template <typename T>
-  template PoolAllocator : public std::allocator<T>
+  class PoolAllocator : public std::allocator<T>
   {
   public:
 
@@ -180,7 +180,7 @@ namespace libMesh
    * A wrapper for \p std::allocator<> when Boost is not available.
    */
   template <typename T>
-  template FastPoolAllocator : public std::allocator<T>
+  class FastPoolAllocator : public std::allocator<T>
   {
   public:
 
