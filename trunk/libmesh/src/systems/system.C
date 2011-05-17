@@ -406,6 +406,8 @@ void System::update ()
 
 void System::re_update ()
 {
+  parallel_only();
+
   // If this system is empty... don't do anything!
   if(!this->n_vars())
     return;

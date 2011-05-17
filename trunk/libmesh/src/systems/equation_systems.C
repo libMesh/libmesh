@@ -128,6 +128,8 @@ void EquationSystems::init ()
 
 void EquationSystems::reinit ()
 {
+  parallel_only();
+
   libmesh_assert (this->n_systems() != 0);
   
 #ifdef DEBUG
