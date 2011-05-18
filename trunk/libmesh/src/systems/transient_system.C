@@ -147,9 +147,10 @@ void TransientSystem<Base>::re_update ()
   libmesh_assert (older_local_solution->size() >= send_list.size());
   libmesh_assert (old_local_solution->size()   >= send_list.size());
 
-  // Make sure we have something to do
-  if (first_local_dof == end_local_dof)
-    return;
+  // Even if we don't have to do anything ourselves, localize() may
+  // use parallel_only tools
+  // if (first_local_dof == end_local_dof)
+  //   return;
   
   // Update the old & older solutions with the send_list,
   // which may have changed since their last update.

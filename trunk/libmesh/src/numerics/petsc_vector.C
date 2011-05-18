@@ -857,9 +857,6 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 {
   this->_restore_array();
 
-  // Only good for serial vectors.
-  // libmesh_assert (this->size() == this->local_size());
-  libmesh_assert (last_local_idx >= first_local_idx);
   libmesh_assert (send_list.size() <= this->size());
   libmesh_assert (last_local_idx < this->size());
   
@@ -868,8 +865,10 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
   int ierr=0;  
   
   // Don't bother for serial cases
-  if ((first_local_idx == 0) &&
-      (local_size == size))
+//  if ((first_local_idx == 0) &&
+//      (local_size == size))
+  // But we do need to stay in sync for degenerate cases
+  if (libMesh::n_processors() == 1)
     return;
   
   
@@ -890,7 +889,8 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
     Utility::iota (idx.begin(), idx.end(), first_local_idx);
 
     // Create the index set & scatter object
-    ierr = ISCreateLibMesh(libMesh::COMM_WORLD, local_size, &idx[0], PETSC_USE_POINTER, &is);
+    ierr = ISCreateLibMesh(libMesh::COMM_WORLD, local_size, 
+                           local_size ? &idx[0] : NULL, PETSC_USE_POINTER, &is);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
     ierr = VecScatterCreate(_vec,              is,
