@@ -905,9 +905,6 @@ void ParallelMesh::renumber_nodes_and_elements ()
   libmesh_assert(this->n_nodes() == this->max_node_id());
   libmesh_assert(this->n_elem() == this->max_elem_id());
 
-  // Make sure we didn't miss any nodes
-  MeshTools::libmesh_assert_valid_node_procids(*this);
-    
   // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
