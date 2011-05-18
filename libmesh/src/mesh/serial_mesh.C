@@ -148,14 +148,28 @@ Elem* SerialMesh::add_elem (Elem* e)
 {
   libmesh_assert(e);
 
-  // We only append elements with SerialMesh
-  libmesh_assert (!e->valid_id() ||
-          e->id() == _elements.size());
+  // We no longer merely append elements with SerialMesh
 
-  e->set_id (_elements.size());
+  // If the user requests a valid id that doesn't correspond to an
+  // existing element, let's give them that id, resizing the elements
+  // container if necessary.
+  if (!e->valid_id())
+    e->set_id (_elements.size());
+
+  const unsigned int id = e->id();
+
+  if (id < _elements.size()) 
+    {
+      // Overwriting existing elements is still probably a mistake.
+      libmesh_assert(!_elements[id]);
+    }
+  else
+    {
+      _elements.resize(id+1, NULL);
+    }
+
+  _elements[id] = e;
   
-  _elements.push_back(e);
-
   return e;
 }
 
