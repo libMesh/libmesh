@@ -38,7 +38,7 @@ namespace libMesh
 class Elem;
 class Node;
 class MeshBase;
-class BoundaryMesh;
+class UnstructuredMesh;
 class MeshData;
 
 
@@ -101,7 +101,7 @@ public:
    * pass a pointer to both the boundary_mesh's MeshData object,
    * and the MeshData object used for this mesh.
    */
-  void sync (BoundaryMesh& boundary_mesh,
+  void sync (UnstructuredMesh& boundary_mesh,
 	     MeshData* boundary_mesh_data=NULL,
 	     MeshData* this_mesh_data=NULL);
   
@@ -119,7 +119,7 @@ public:
    * and the MeshData object used for this mesh.
    */
   void sync (const std::set<short int> &requested_boundary_ids,
-	     BoundaryMesh& boundary_mesh);
+	     UnstructuredMesh& boundary_mesh);
   
   /**
    * Add \p Node \p node with boundary id \p id to the boundary

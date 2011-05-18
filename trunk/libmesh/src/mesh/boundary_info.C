@@ -25,11 +25,11 @@
 // Local includes
 #include "libmesh_config.h"
 #include "boundary_info.h"
-#include "boundary_mesh.h"
 #include "elem.h"
 #include "mesh_data.h"
 #include "parallel.h"
 #include "partitioner.h"
+#include "unstructured_mesh.h"
 
 namespace libMesh
 {
@@ -106,7 +106,7 @@ void BoundaryInfo::clear()
 
 
 
-void BoundaryInfo::sync (BoundaryMesh& boundary_mesh,
+void BoundaryInfo::sync (UnstructuredMesh& boundary_mesh,
 			 MeshData*     boundary_mesh_data,
 			 MeshData*     this_mesh_data)
 {
@@ -169,7 +169,7 @@ void BoundaryInfo::sync (BoundaryMesh& boundary_mesh,
 	  {
 
 	    // Build the side - do not use a "proxy" element here:
-	    // This will be going into the BoundaryMesh and needs to
+	    // This will be going into the boundary_mesh and needs to
 	    // stand on its own.
 	    AutoPtr<Elem> side (elem->build_side(s, false));
 	    
@@ -244,7 +244,7 @@ void BoundaryInfo::sync (BoundaryMesh& boundary_mesh,
 			 
 
 void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
-			 BoundaryMesh& boundary_mesh)
+			 UnstructuredMesh& boundary_mesh)
 {
   // Re-create the boundary mesh.
   boundary_mesh.clear();
@@ -301,7 +301,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
 		    (requested_boundary_ids.count(pos.first->second.second)))
 		  {
 		    // Build the side - do not use a "proxy" element here:
-		    // This will be going into the BoundaryMesh and needs to
+		    // This will be going into the boundary_mesh and needs to
 		    // stand on its own.
 		    AutoPtr<Elem> side (elem->build_side(s, false));
 		    
