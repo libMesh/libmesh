@@ -292,7 +292,19 @@ void EquationSystems::allgather ()
 
   // And distribute each system's dofs
   for (unsigned int i=0; i != this->n_systems(); ++i)
-    this->get_system(i).get_dof_map().distribute_dofs(_mesh);
+    {
+      System &sys = this->get_system(i);
+      DofMap &dof_map = sys.get_dof_map();
+      dof_map.distribute_dofs(_mesh);
+
+      // The user probably won't need constraint equations or the
+      // send_list after an allgather, but let's keep it in consistent
+      // shape just in case.
+      dof_map.create_dof_constraints(_mesh);
+      sys.user_constrain();
+      dof_map.process_constraints();
+      dof_map.prepare_send_list();
+    }
 }
 
 
