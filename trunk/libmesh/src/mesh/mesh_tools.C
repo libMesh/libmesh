@@ -999,6 +999,9 @@ void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase &mesh)
   if (libMesh::n_processors() == 1)
     return;
 
+  // If we're adaptively refining, check processor ids for consistency
+#ifdef LIBMESH_ENABLE_AMR
+
   // Ancestor elements we won't worry about, but subactive and active
   // elements ought to have parents with consistent processor ids
 
@@ -1036,6 +1039,7 @@ void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase &mesh)
           libmesh_assert(matching_child_id);
         }
     }
+#endif
 }
 
 
