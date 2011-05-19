@@ -51,7 +51,7 @@ namespace Parallel {
    * Respond to fulfillment with
    * sync.act_on_data(const std::vector<unsigned int>& ids,
    *                  std::vector<sync::datum>& data)
-   * The user must define Parallel::datatype<sync::datum> if
+   * The user must define Parallel::StandardType<sync::datum> if
    * sync::datum isn't a built-in type.
    * The user-provided location_map will be used and left unchanged
    * if it is provided, or filled and cleared if it is empty.
@@ -74,7 +74,7 @@ namespace Parallel {
    * Respond to fulfillment with
    * sync.act_on_data(const std::vector<unsigned int>& ids,
    *                  std::vector<sync::datum>& data)
-   * The user must define Parallel::datatype<sync::datum> if
+   * The user must define Parallel::StandardType<sync::datum> if
    * sync::datum isn't a built-in type.
    */
   template <typename Iterator,
@@ -94,7 +94,7 @@ namespace Parallel {
    * Respond to fulfillment with
    * sync.act_on_data(const std::vector<unsigned int>& ids,
    *                  std::vector<sync::datum>& data)
-   * The user must define Parallel::datatype<sync::datum> if
+   * The user must define Parallel::StandardType<sync::datum> if
    * sync::datum isn't a built-in type.
    */
   template <typename Iterator,

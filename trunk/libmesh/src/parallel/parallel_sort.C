@@ -25,6 +25,7 @@
 // Local Includes
 #include "libmesh_common.h"
 #include "parallel.h"
+#include "parallel_hilbert.h"
 #include "parallel_sort.h"
 #include "parallel_bin_sorter.h"
 #ifdef LIBMESH_HAVE_LIBHILBERT
@@ -145,10 +146,7 @@ void Sort<Hilbert::HilbertIndices>::binsort()
     }
   
   MPI_Op hilbert_max, hilbert_min;
-  MPI_Datatype hilbert_type;
 
-  MPI_Type_contiguous (3, MPI_UNSIGNED, &hilbert_type);
-  MPI_Type_commit     (&hilbert_type);
   MPI_Op_create       ((MPI_User_function*)__hilbert_max_op, true, &hilbert_max);
   MPI_Op_create       ((MPI_User_function*)__hilbert_min_op, true, &hilbert_min);
 
@@ -157,18 +155,17 @@ void Sort<Hilbert::HilbertIndices>::binsort()
   MPI_Allreduce(&local_min,
 		&global_min,
 		1,
-		hilbert_type,
+		Parallel::StandardType<Hilbert::HilbertIndices>(),
 		hilbert_min,
 		libMesh::COMM_WORLD);
 
   MPI_Allreduce(&local_max,
 		&global_max,
 		1,
-		hilbert_type,
+		Parallel::StandardType<Hilbert::HilbertIndices>(),
 		hilbert_max,
 		libMesh::COMM_WORLD);
 
-  MPI_Type_free (&hilbert_type);
   MPI_Op_free   (&hilbert_max);
   MPI_Op_free   (&hilbert_min);
 
@@ -228,16 +225,16 @@ void Sort<KeyType>::communicate_bins()
 	  
       MPI_Gatherv((_data.size() > local_offset) ?
 		    &_data[local_offset] :
-		    NULL,                        // Points to the beginning of the bin to be sent
-		  _local_bin_sizes[i],           // How much data is in the bin being sent.
-		  Parallel::datatype<KeyType>(), // The data type we are sorting
+		    NULL,                            // Points to the beginning of the bin to be sent
+		  _local_bin_sizes[i],               // How much data is in the bin being sent.
+		  Parallel::StandardType<KeyType>(), // The data type we are sorting
 		  (dest.empty()) ?
 		    NULL :
-		    &dest[0],                    // Enough storage to hold all bin contributions
-		  (int*) &proc_bin_size[0],      // How much is to be received from each processor
-	          (int*) &displacements[0],      // Offsets into the receive buffer
-		  Parallel::datatype<KeyType>(), // The data type we are sorting
-		  i,                             // The root process (we do this once for each proc)
+		    &dest[0],                        // Enough storage to hold all bin contributions
+		  (int*) &proc_bin_size[0],          // How much is to be received from each processor
+	          (int*) &displacements[0],          // Offsets into the receive buffer
+		  Parallel::StandardType<KeyType>(), // The data type we are sorting
+		  i,                                 // The root process (we do this once for each proc)
 		  libMesh::COMM_WORLD);
 
       // Copy the destination buffer if it
@@ -276,11 +273,6 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
 		MPI_UNSIGNED,
 		MPI_SUM,
 		libMesh::COMM_WORLD);
-
-  MPI_Datatype hilbert_type;
-
-  MPI_Type_contiguous (3, MPI_UNSIGNED, &hilbert_type);
-  MPI_Type_commit     (&hilbert_type);
 
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
@@ -323,13 +315,13 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
 		    &_data[local_offset] :
 		    NULL,                   // Points to the beginning of the bin to be sent
 		  _local_bin_sizes[i],      // How much data is in the bin being sent.
-		  hilbert_type,             // The data type we are sorting
+		  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
 		  (dest.empty()) ?
 		    NULL :
 		    &dest[0],               // Enough storage to hold all bin contributions
 		  (int*) &proc_bin_size[0], // How much is to be received from each processor
 		  (int*) &displacements[0], // Offsets into the receive buffer
-		  hilbert_type,             // The data type we are sorting
+		  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
 		  i,                        // The root process (we do this once for each proc)
 		  libMesh::COMM_WORLD);
 
@@ -341,8 +333,6 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
       // Increment the local offset counter
       local_offset += _local_bin_sizes[i];
     }
-
-  MPI_Type_free (&hilbert_type);  
 }
 
 #endif // #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
