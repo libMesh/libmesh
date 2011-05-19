@@ -29,6 +29,7 @@
 #include "mesh_tools.h"
 #include "mesh_communication.h"
 #include "parallel.h"
+#include "parallel_hilbert.h"
 #include "parallel_sort.h"
 #include "elem.h"
 #include "elem_range.h"
@@ -170,7 +171,6 @@ namespace { // anonymous namespace for helper functions
     const MeshTools::BoundingBox &_bbox;
     std::vector<Hilbert::HilbertIndices> &_keys;
   };
-
 }
 #endif
 
@@ -199,12 +199,6 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
   // Global bounding box
   MeshTools::BoundingBox bbox =
     MeshTools::bounding_box (mesh);
-
-  // Set up a derived MPI datatype to handle communication of HilbertIndices
-  MPI_Datatype hilbert_type;
-  MPI_Type_contiguous (3, MPI_UNSIGNED, &hilbert_type);
-  MPI_Type_commit     (&hilbert_type);
-
 
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
@@ -258,7 +252,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
     std::vector<unsigned short int> /* do not use a vector of bools here since it is not always so! */
       empty_nodes (libMesh::n_processors()),
       empty_elem  (libMesh::n_processors());
-    Hilbert::HilbertIndices my_max[2];
+    std::vector<Hilbert::HilbertIndices> my_max(2);
     
     Parallel::allgather (static_cast<unsigned short int>(my_node_bin.empty()), empty_nodes);
     Parallel::allgather (static_cast<unsigned short int>(my_elem_bin.empty()),  empty_elem);
@@ -266,17 +260,15 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
     if (!my_node_bin.empty()) my_max[0] = my_node_bin.back();
     if (!my_elem_bin.empty()) my_max[1] = my_elem_bin.back();
 
-    MPI_Allgather (my_max,      2, hilbert_type,
-		   &recvbuf[0], 2, hilbert_type,
-		   libMesh::COMM_WORLD);
+    Parallel::allgather (my_max, /* identical_buffer_sizes = */ true);
 
     // Be cereful here.  The *_upper_bounds will be used to find the processor
     // a given object belongs to.  So, if a processor contains no objects (possible!)
     // then copy the bound from the lower processor id.
     for (unsigned int p=0; p<libMesh::n_processors(); p++)
       {
-	node_upper_bounds[p] = recvbuf[2*p+0];
-	elem_upper_bounds[p] = recvbuf[2*p+1];
+	node_upper_bounds[p] = my_max[2*p+0];
+	elem_upper_bounds[p] = my_max[2*p+1];
 
 	if (p > 0) // default hilbert index value is the OK upper bound for processor 0.
 	  {
@@ -344,8 +336,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
           Parallel::send_receive(procup, requested_ids[procup],
-                                 procdown, request_to_fill,
-				 hilbert_type);	  
+                                 procdown, request_to_fill);
 
 	  // Fill the requests
 	  std::vector<unsigned int> global_ids; /**/ global_ids.reserve(request_to_fill.size());
@@ -456,8 +447,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
           Parallel::send_receive(procup, requested_ids[procup],
-                                 procdown, request_to_fill,
-				 hilbert_type);	  
+                                 procdown, request_to_fill);
 
 	  // Fill the requests
 	  std::vector<unsigned int> global_ids; /**/ global_ids.reserve(request_to_fill.size());
@@ -518,10 +508,6 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
     }        
   }
 
-
-  // Clean up
-  MPI_Type_free (&hilbert_type);
-
   STOP_LOG ("assign_global_indices()", "MeshCommunication");
 }
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
@@ -552,12 +538,6 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
   //     each local object
   index_map.clear();
   index_map.reserve(std::distance (begin, end));
-
-  // Set up a derived MPI datatype to handle communication of HilbertIndices
-  MPI_Datatype hilbert_type;
-  MPI_Type_contiguous (3, MPI_UNSIGNED, &hilbert_type);
-  MPI_Type_commit     (&hilbert_type);
-
 
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
@@ -607,24 +587,18 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
   //-------------------------------------------------------------
   // (3) get the max value on each processor
   std::vector<Hilbert::HilbertIndices>    
-    upper_bounds(libMesh::n_processors());
+    upper_bounds(1);
     
-  // limit scope of temporaries
-  {
-    Hilbert::HilbertIndices my_max;
+  if (!my_bin.empty())
+    upper_bounds[0] = my_bin.back();
     
-    if (!my_bin.empty()) my_max = my_bin.back();
-    
-    MPI_Allgather (&my_max,          1, hilbert_type,
-		   &upper_bounds[0], 1, hilbert_type,
-		   libMesh::COMM_WORLD);
+  Parallel::allgather (upper_bounds, /* identical_buffer_sizes = */ true);
 
-    // Be cereful here.  The *_upper_bounds will be used to find the processor
-    // a given object belongs to.  So, if a processor contains no objects (possible!)
-    // then copy the bound from the lower processor id.
-    for (unsigned int p=1; p<libMesh::n_processors(); p++)
-      if (!bin_sizes[p]) upper_bounds[p] = upper_bounds[p-1];
-  }
+  // Be cereful here.  The *_upper_bounds will be used to find the processor
+  // a given object belongs to.  So, if a processor contains no objects (possible!)
+  // then copy the bound from the lower processor id.
+  for (unsigned int p=1; p<libMesh::n_processors(); p++)
+    if (!bin_sizes[p]) upper_bounds[p] = upper_bounds[p-1];
 
 
   //-------------------------------------------------------------
@@ -677,8 +651,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
                                        libMesh::n_processors();
 
 	Parallel::send_receive(procup, requested_ids[procup],
-			       procdown, request_to_fill,
-			       hilbert_type);	  
+			       procdown, request_to_fill);
 
 	// Fill the requests
 	global_ids.clear(); /**/ global_ids.reserve(request_to_fill.size());
@@ -726,10 +699,6 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	}
     }
   }
-
-
-  // Clean up
-  MPI_Type_free (&hilbert_type);
 
   STOP_LOG ("find_global_indices()", "MeshCommunication");
 }

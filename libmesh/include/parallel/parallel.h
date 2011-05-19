@@ -103,13 +103,6 @@ namespace Parallel
  
   /**
    * Templated function to return the appropriate MPI datatype
-   * for use with built-in C types
-   */
-  template <typename T>
-  inline data_type datatype();
-
-  /**
-   * Templated function to return the appropriate MPI datatype
    * for use with built-in C types when combined with an int
    */
   template <typename T>
@@ -141,9 +134,6 @@ namespace Parallel
   struct request      { /* unsigned int r; */ };
   struct status       { /* unsigned int s; */ };
   struct communicator { /* unsigned int s; */ };
-
-  template <typename T>
-  inline data_type datatype() { return data_type(); }
 
   const int any_source=0;
 #endif // LIBMESH_HAVE_MPI
@@ -223,6 +213,14 @@ namespace Parallel
       _datatype(type)
     {}
 
+    DataType (const DataType &other, unsigned int count)
+    {
+#ifdef LIBMESH_HAVE_MPI
+      MPI_Type_contiguous(count, other._datatype, &_datatype);
+      this->commit();
+#endif
+    }
+
     DataType & operator = (const DataType &other) 
     { _datatype = other._datatype; return *this; }
 
@@ -255,11 +253,26 @@ namespace Parallel
 #endif
     }
     
-  private:
+  protected:
 
     data_type _datatype;    
   };
 
+
+  //-------------------------------------------------------------------
+  /**
+   * Templated class to provide the appropriate MPI datatype
+   * for use with built-in C types or simple C++ constructions.
+   *
+   * More complicated data types may need to provide a pointer-to-T so
+   * that we can use MPI_Address without constructing a new T.
+   */
+  template <typename T>
+  class StandardType : public DataType
+  {
+  public:
+    StandardType(const T* example = NULL);
+  };
 
 
   //-------------------------------------------------------------------
@@ -799,6 +812,25 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Take set of local variables on each processor, and collect their
+   * union over all processors, replacing the set on processor 0.
+   */
+  template <typename T1, typename T2>
+  inline void set_union(std::map<T1,T2> &data, const unsigned int root_id,
+                        const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Take set of local variables on each processor, and replace it
+   * with their union over all processors.
+   */
+  template <typename T1, typename T2>
+  inline void set_union(std::map<T1, T2> &data,
+                        const Communicator &comm = Communicator_World);
+
+
+  //-------------------------------------------------------------------
+  /**
    * Blocking message probe.  Allows information about a message to be 
    * examined before the message is actually received.
    */
@@ -842,25 +874,10 @@ namespace Parallel
   {
     send (dest_processor_id,
 	  buf,
-	  datatype<T>(),
+	  StandardType<T>(buf.empty() ? NULL : &buf[0]),
 	  tag,
           comm);
   }
-
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline void send (const unsigned int dest_processor_id,
-		    std::vector<std::complex<T> > &buf,
-		    const MessageTag &tag=no_tag,
-                    const Communicator &comm = Communicator_World)
-  {
-    send (dest_processor_id,
-	  buf,
-	  datatype<T>(),
-	  tag,
-          comm);
-  }
-
 
   //-------------------------------------------------------------------
   /**
@@ -876,23 +893,7 @@ namespace Parallel
   {
     send (dest_processor_id,
 	  buf,
-	  datatype<T>(),
-	  req,
-	  tag,
-          comm);
-  }
-
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline void send (const unsigned int dest_processor_id,
-		    std::vector<std::complex<T> > &buf,
-		    Request &req,
-		    const MessageTag &tag=no_tag,
-                    const Communicator &comm = Communicator_World)
-  {
-    send (dest_processor_id,
-	  buf,
-	  datatype<T>(),
+	  StandardType<T>(buf.empty() ? NULL : &buf[0]),
 	  req,
 	  tag,
           comm);
@@ -935,21 +936,7 @@ namespace Parallel
   {
     send (dest_processor_id,
 	  buf,
-	  datatype<T>(),
-	  tag,
-          comm);
-  }
-
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline void send (const unsigned int dest_processor_id,
-		    std::set<std::complex<T> > &buf,
-		    const MessageTag &tag=no_tag,
-                    const Communicator &comm = Communicator_World)
-  {
-    send (dest_processor_id,
-	  buf,
-	  datatype<T>(),
+	  StandardType<T>(buf.empty() ? NULL : &(*buf.begin())),
 	  tag,
           comm);
   }
@@ -969,27 +956,12 @@ namespace Parallel
   {
     send (dest_processor_id,
 	  buf,
-	  datatype<T>(),
+	  StandardType<T>(buf.empty() ? NULL : &(*buf.begin())),
 	  req,
 	  tag,
           comm);
   }
 
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline void send (const unsigned int dest_processor_id,
-		    std::set<std::complex<T> > &buf,
-		    Request &req,
-		    const MessageTag &tag=no_tag,
-                    const Communicator &comm = Communicator_World)
-  {
-    send (dest_processor_id,
-	  buf,
-	  datatype<T>(),
-	  req,
-	  tag,
-          comm);
-  }
 
   //-------------------------------------------------------------------
   /**
@@ -1024,27 +996,12 @@ namespace Parallel
   {
     send (dest_processor_id,
 	  buf,
-	  datatype<T>(),
+	  StandardType<T>(buf.empty() ? NULL : &buf[0]),
 	  r,
 	  tag,
           comm);
   }
 
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline void nonblocking_send (const unsigned int dest_processor_id,
-		                std::vector<std::complex<T> > &buf,
-		                Request &r,
-		                const MessageTag &tag=no_tag,
-                                const Communicator &comm = Communicator_World)
-  {
-    send (dest_processor_id,
-	  buf,
-	  datatype<T>(),
-	  r,
-	  tag,
-          comm);
-  }
 
   //-------------------------------------------------------------------
   /**
@@ -1082,24 +1039,11 @@ namespace Parallel
   {
     return receive (src_processor_id,
 		    buf,
-		    datatype<T>(),
+	            StandardType<T>(buf.empty() ? NULL : &buf[0]),
 		    tag,
                     comm);
   }
 
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline Status receive (const int src_processor_id,
-		         std::vector<std::complex<T> > &buf,
-		         const MessageTag &tag=any_tag,
-                         const Communicator &comm = Communicator_World)
-  {
-    return receive (src_processor_id,
-		    buf,
-		    datatype<T>(),
-		    tag,
-                    comm);
-  }
 
   //-------------------------------------------------------------------
   /**
@@ -1115,27 +1059,12 @@ namespace Parallel
   {
     receive (src_processor_id,
 	     buf,
-	     datatype<T>(),
+	     StandardType<T>(buf.empty() ? NULL : &buf[0]),
 	     req,
 	     tag,
              comm);
   }
 
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline void receive (const int src_processor_id,
-		       std::vector<std::complex<T> > &buf,
-		       Request &req,
-		       const MessageTag &tag=any_tag,
-                       const Communicator &comm = Communicator_World)
-  {
-    receive (src_processor_id,
-	     buf,
-	     datatype<T>(),
-	     req,
-	     tag,
-             comm);
-  }
 
   //-------------------------------------------------------------------
   /**
@@ -1173,24 +1102,11 @@ namespace Parallel
   {
     return receive (src_processor_id,
 		    buf,
-		    datatype<T>(),
+	            StandardType<T>(buf.empty() ? NULL : &(*buf.begin())),
 		    tag,
                     comm);
   }
 
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline Status receive (const int src_processor_id,
-		         std::set<std::complex<T> > &buf,
-		         const MessageTag &tag=any_tag,
-                         const Communicator &comm = Communicator_World)
-  {
-    return receive (src_processor_id,
-		    buf,
-		    datatype<T>(),
-		    tag,
-                    comm);
-  }
 
   //-------------------------------------------------------------------
   /**
@@ -1206,27 +1122,12 @@ namespace Parallel
   {
     receive (src_processor_id,
 	     buf,
-	     datatype<T>(),
+	     StandardType<T>(buf.empty() ? NULL : &(*buf.begin())),
 	     req,
 	     tag,
              comm);
   }
 
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline void receive (const int src_processor_id,
-		       std::set<std::complex<T> > &buf,
-		       Request &req,
-		       const MessageTag &tag=any_tag,
-                       const Communicator &comm = Communicator_World)
-  {
-    receive (src_processor_id,
-	     buf,
-	     datatype<T>(),
-	     req,
-	     tag,
-             comm);
-  }
 
   //-------------------------------------------------------------------
   /**
@@ -1261,23 +1162,7 @@ namespace Parallel
   {
     receive (src_processor_id,
 	     buf,
-	     datatype<T>(),
-	     r,
-	     tag,
-             comm);
-  }
-
-  // Function overloading for std::complex<>
-  template <typename T>
-  inline void nonblocking_receive (const int src_processor_id,
-		                   std::vector<std::complex<T> > &buf,
-		                   Request &r,
-		                   const MessageTag &tag=any_tag,
-                                   const Communicator &comm = Communicator_World)
-  {
-    receive (src_processor_id,
-	     buf,
-	     datatype<T>(),
+	     StandardType<T>(buf.empty() ? NULL : &buf[0]),
 	     r,
 	     tag,
              comm);
@@ -1308,11 +1193,11 @@ namespace Parallel
    * Send vector \p send to one processor while simultaneously receiving
    * another vector \p recv from a (potentially different) processor.
    */
-  template <typename T>
+  template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
-                           T &send,
+                           T1 &send,
 			   const unsigned int source_processor_id,
-                           T &recv,
+                           T2 &recv,
                            const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -1321,12 +1206,13 @@ namespace Parallel
    * another vector \p recv from a (potentially different) processor using
    * a user-specified MPI Dataype.
    */
-  template <typename T>
+  template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
-                           T &send,
+                           T1 &send,
+			   const DataType &type1,
 			   const unsigned int source_processor_id,
-                           T &recv,
-			   const DataType &type,
+                           T2 &recv,
+			   const DataType &type2,
                            const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -1531,38 +1417,81 @@ namespace Parallel
   }
 
 #ifdef LIBMESH_HAVE_MPI
-  template<>
-  inline data_type datatype<char>() { return MPI_CHAR; }
 
-  template<>
-  inline data_type datatype<unsigned char>() { return MPI_UNSIGNED_CHAR; }
+#define STANDARD_TYPE(cxxtype,mpitype) \
+  template<> \
+  class StandardType<cxxtype> : public DataType \
+  { \
+  public: \
+    StandardType(const cxxtype* example = NULL) : DataType(mpitype) { } \
+  }
 
-  template<>
-  inline data_type datatype<short int>() { return MPI_SHORT; }
+  STANDARD_TYPE(char,MPI_CHAR);
+  STANDARD_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
+  STANDARD_TYPE(short int,MPI_SHORT);
+  STANDARD_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
+  STANDARD_TYPE(int,MPI_INT);
+  STANDARD_TYPE(unsigned int,MPI_UNSIGNED);
+  STANDARD_TYPE(long,MPI_LONG);
+  STANDARD_TYPE(unsigned long,MPI_UNSIGNED_LONG);
+  STANDARD_TYPE(float,MPI_FLOAT);
+  STANDARD_TYPE(double,MPI_DOUBLE);
+  STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
 
-  template<>
-  inline data_type datatype<unsigned short int>() { return MPI_UNSIGNED_SHORT; }
+  // We'd love to do a singleton pattern on derived data types, rather
+  // than commit, free, commit, free, ad infinitum... but it's a
+  // little tricky when we T1 and T2 are undefined.
+  template<typename T1, typename T2>
+  class StandardType<std::pair<T1, T2> > : public DataType
+  {
+  public:
+    StandardType(const std::pair<T1, T2> *example = NULL) {
+#ifdef LIBMESH_HAVE_MPI
+      // We need an example for MPI_Address to use
+      libmesh_assert(example);
 
-  template<>
-  inline data_type datatype<int>() { return MPI_INT; }
+      // Get the sub-data-types, and make sure they live long enough
+      // to construct the derived type
+      StandardType<T1> d1(&example->first);
+      StandardType<T2> d2(&example->second);
+      MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
+      int blocklengths[] = {1,1};
 
-  template<>
-  inline data_type datatype<unsigned int>() { return MPI_UNSIGNED; }
+      MPI_Aint displs[2];
+      MPI_Address (const_cast<T1*>(&example->first), &displs[0]);
+      MPI_Address (const_cast<T2*>(&example->second), &displs[1]);
+      displs[1] -= displs[0];
+      displs[0] = 0;
 
-  template<>
-  inline data_type datatype<long>() { return MPI_LONG; }
+#if MPI_VERSION > 1
+      MPI_Type_create_struct (2, blocklengths, displs, types, &_datatype);
+#else
+      MPI_Type_struct (2, blocklengths, displs, types, &_datatype);
+#endif // #if MPI_VERSION > 1
+      MPI_Type_commit (&_datatype);
+#endif // LIBMESH_HAVE_MPI
+    }
 
-  template<>
-  inline data_type datatype<unsigned long>() { return MPI_UNSIGNED_LONG; }
+    ~StandardType() {
+#ifdef LIBMESH_HAVE_MPI
+      MPI_Type_free(&_datatype);
+#endif // LIBMESH_HAVE_MPI
+    }
+  };
 
-  template<>
-  inline data_type datatype<float>() { return MPI_FLOAT; }
+  template<typename T>
+  class StandardType<std::complex<T> > : public DataType
+  {
+  public:
+    StandardType(const std::complex<T> *example = NULL) :
+      DataType(StandardType<T>(example ? &(example->real()) : NULL), 2) {}
 
-  template<>
-  inline data_type datatype<double>() { return MPI_DOUBLE; }
-
-  template<>
-  inline data_type datatype<long double>() { return MPI_LONG_DOUBLE; }
+    ~StandardType() {
+#ifdef LIBMESH_HAVE_MPI
+      MPI_Type_free(&_datatype);
+#endif // LIBMESH_HAVE_MPI
+    }
+  };
 
   template<>
   inline data_type dataplusint_type<short int>() { return MPI_SHORT_INT; }
@@ -1629,7 +1558,7 @@ namespace Parallel
 	MPI_Allreduce (&temp,
 		       &r,
 		       1,
-		       datatype<T>(),
+		       StandardType<T>(&temp),
 		       MPI_MIN,
 		       comm.get());
 
@@ -1651,7 +1580,7 @@ namespace Parallel
 	MPI_Allreduce (&tempsend,
 		       &temp,
 		       1,
-		       datatype<unsigned int>(),
+		       StandardType<unsigned int>(),
 		       MPI_MIN,
 		       comm.get());
 	r = temp;
@@ -1673,7 +1602,7 @@ namespace Parallel
 	MPI_Allreduce (&temp[0],
 		       &r[0],
 		       r.size(),
-		       datatype<T>(),
+		       StandardType<T>(&temp[0]),
 		       MPI_MIN,
 		       comm.get());
 
@@ -1696,7 +1625,7 @@ namespace Parallel
 	MPI_Allreduce (&ruint[0],
 		       &temp[0],
 		       ruint.size(),
-		       datatype<unsigned int>(),
+		       StandardType<unsigned int>(),
 		       MPI_BAND,
 		       comm.get());
         unpack_vector_bool(temp, r);
@@ -1821,7 +1750,7 @@ namespace Parallel
 	MPI_Allreduce (&in[0],
 		       &out[0],
 		       r.size(),
-		       datatype<int>(),
+		       StandardType<int>(),
 		       MPI_MINLOC,
 		       comm.get());
         for (unsigned int i=0; i != r.size(); ++i)
@@ -1852,7 +1781,7 @@ namespace Parallel
 	MPI_Allreduce (&r,
 		       &temp,
 		       1,
-		       datatype<T>(),
+		       StandardType<T>(&r),
 		       MPI_MAX,
 		       comm.get());
 	r = temp;
@@ -1875,7 +1804,7 @@ namespace Parallel
 	MPI_Allreduce (&tempsend,
 		       &temp,
 		       1,
-		       datatype<unsigned int>(),
+		       StandardType<unsigned int>(),
 		       MPI_MAX,
 		       comm.get());
 	r = temp;
@@ -1897,7 +1826,7 @@ namespace Parallel
 	MPI_Allreduce (&temp[0],
 		       &r[0],
 		       r.size(),
-		       datatype<T>(),
+		       StandardType<T>(&temp[0]),
 		       MPI_MAX,
 		       comm.get());
 
@@ -1920,7 +1849,7 @@ namespace Parallel
 	MPI_Allreduce (&ruint[0],
 		       &temp[0],
 		       ruint.size(),
-		       datatype<unsigned int>(),
+		       StandardType<unsigned int>(),
 		       MPI_BOR,
 		       comm.get());
         unpack_vector_bool(temp, r);
@@ -2045,7 +1974,7 @@ namespace Parallel
 	MPI_Allreduce (&in[0],
 		       &out[0],
 		       r.size(),
-		       datatype<int>(),
+		       StandardType<int>(),
 		       MPI_MAXLOC,
 		       comm.get());
         for (unsigned int i=0; i != r.size(); ++i)
@@ -2076,7 +2005,7 @@ namespace Parallel
 	MPI_Allreduce (&temp,
 		       &r,
 		       1,
-		       datatype<T>(),
+		       StandardType<T>(&temp),
 		       MPI_SUM,
 		       comm.get());
 
@@ -2097,7 +2026,7 @@ namespace Parallel
 	MPI_Allreduce (&temp[0],
 		       &r[0],
 		       r.size(),
-		       datatype<T>(),
+		       StandardType<T>(&temp[0]),
 		       MPI_SUM,
 		       comm.get());
 
@@ -2106,8 +2035,8 @@ namespace Parallel
   }
 
 
-
-  // Function overloading for std::complex<>
+  // We still do function overloading for complex sums - in a perfect
+  // world we'd have a StandardSumOp to go along with StandardType...
   template <typename T>
   inline void sum(std::complex<T> &r,
                   const Communicator &comm = Communicator_World)
@@ -2120,7 +2049,7 @@ namespace Parallel
 	MPI_Allreduce (&temp,
 		       &r,
 		       2,
-		       datatype<T>(),
+		       StandardType<T>(&(r.real())),
 		       MPI_SUM,
 		       comm.get());
 
@@ -2141,14 +2070,13 @@ namespace Parallel
 	MPI_Allreduce (&temp[0],
 		       &r[0],
 		       r.size() * 2,
-		       datatype<T>(),
+		       StandardType<T>(&(r[0].real())),
 		       MPI_SUM,
 		       comm.get());
 
 	STOP_LOG("sum()", "Parallel");
       }
   }
-
 
 
   template <typename T>
@@ -2168,6 +2096,29 @@ namespace Parallel
                         const Communicator &comm)
   {
     std::vector<T> vecdata(data.begin(), data.end());
+    Parallel::allgather(vecdata, false, comm);
+    data.insert(vecdata.begin(), vecdata.end());
+  }
+
+
+
+  template <typename T1, typename T2>
+  inline void set_union(std::map<T1,T2> &data, const unsigned int root_id,
+                        const Communicator &comm)
+  {
+    std::vector<std::pair<T1,T2> > vecdata(data.begin(), data.end());
+    Parallel::gather(root_id, vecdata, comm);
+    if (comm.rank() == root_id)
+      data.insert(vecdata.begin(), vecdata.end());
+  }
+
+
+
+  template <typename T1, typename T2>
+  inline void set_union(std::map<T1,T2> &data,
+                        const Communicator &comm)
+  {
+    std::vector<std::pair<T1,T2> > vecdata(data.begin(), data.end());
     Parallel::allgather(vecdata, false, comm);
     data.insert(vecdata.begin(), vecdata.end());
   }
@@ -2220,36 +2171,6 @@ namespace Parallel
   }
 
 
-
-  // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default arguments
-  template <typename T>
-  inline void send (const unsigned int dest_processor_id,
-		    std::vector<std::complex<T> > &buf,
-		    const DataType &type,
-		    const MessageTag &tag=no_tag,
-                    const Communicator &comm=Communicator_World)
-  {    
-    START_LOG("send()", "Parallel");
-
-#ifndef NDEBUG
-    // Only catch the return value when asserts are active.
-    const int ierr =
-#endif
-      MPI_Send (buf.empty() ? NULL : &buf[0],
-		buf.size() * 2,
-		type,
-		dest_processor_id,
-		tag.value(),
-		comm.get());
-
-    libmesh_assert (ierr == MPI_SUCCESS);    
-    
-    STOP_LOG("send()", "Parallel");
-  }
-
-
-
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
@@ -2275,36 +2196,6 @@ namespace Parallel
 
     STOP_LOG("send()", "Parallel");
   }
-
-
-  // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default arguments
-  template <typename T>
-  inline void send (const unsigned int dest_processor_id,
-		    std::vector<std::complex<T> > &buf,
-		    const DataType &type,
-		    Request &req,
-		    const MessageTag &tag=no_tag,
-                    const Communicator &comm=Communicator_World)
-  {
-    START_LOG("send()", "Parallel");
-
-#ifndef NDEBUG
-    // Only catch the return value when asserts are active.
-    const int ierr =	  
-#endif
-      MPI_ISend (buf.empty() ? NULL : &buf[0],
-		 buf.size() * 2,
-		 type,
-		 dest_processor_id,
-		 tag.value(),
-		 comm.get(),
-                 req.get());    
-    libmesh_assert (ierr == MPI_SUCCESS);
-
-    STOP_LOG("send()", "Parallel");
-  }
-
 
 
   template <typename T>
@@ -2342,44 +2233,6 @@ namespace Parallel
 
 
 
-  // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default arguments
-  template <typename T>
-  inline Status receive (const int src_processor_id,
-		         std::vector<std::complex<T> > &buf,
-		         const DataType &type,
-		         const MessageTag &tag=any_tag,
-                         const Communicator &comm=Communicator_World)
-  {
-    START_LOG("receive()", "Parallel");
-
-    // Get the status of the message, explicitly provide the
-    // datatype so we can later query the size
-    Status status(Parallel::probe(src_processor_id, tag, comm), datatype<T>());
-
-    libmesh_assert(!(status.size()%2));
-    buf.resize(status.size()/2);
-    
-#ifndef NDEBUG
-    // Only catch the return value when asserts are active.
-    const int ierr =	  
-#endif
-      MPI_Recv (buf.empty() ? NULL : &buf[0],
-		buf.size() * 2,
-		type,
-		src_processor_id,
-		tag.value(),
-		comm.get(),
-		status);
-    libmesh_assert (ierr == MPI_SUCCESS);
-    
-    STOP_LOG("receive()", "Parallel");
-
-    return status;
-  }
-
-
-
   template <typename T>
   inline void receive (const int src_processor_id,
 		       std::vector<T> &buf,
@@ -2407,36 +2260,6 @@ namespace Parallel
   }
 
 
-
-  // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default arguments
-  template <typename T>
-  inline void receive (const int src_processor_id,
-		       std::vector<std::complex<T> > &buf,
-		       const DataType &type,
-		       Request &req,
-		       const MessageTag &tag=any_tag,
-                       const Communicator &comm=Communicator_World)
-  {
-    START_LOG("receive()", "Parallel");
-
-    const int ierr =	  
-      MPI_Irecv (buf.empty() ? NULL : &buf[0],
-		buf.size() * 2,
-		type,
-		src_processor_id,
-		tag.value(),
-		comm.get(),
-		req.get());
-
-    libmesh_assert (ierr == MPI_SUCCESS);
-    
-    STOP_LOG("receive()", "Parallel");
-
-    return;
-  }
-
-  
 
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
@@ -2544,12 +2367,13 @@ namespace Parallel
 
   // This is both a declaration and definition for a new overloaded
   // function template, so we have to re-specify the default argument
-  template <typename T>
+  template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
-			   std::vector<T> &send,
+			   std::vector<T1> &send,
+			   const DataType &type1,
 			   const unsigned int source_processor_id,
-			   std::vector<T> &recv,
-			   const DataType &type,
+			   std::vector<T2> &recv,
+			   const DataType &type2,
                            const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2566,14 +2390,14 @@ namespace Parallel
     
     Parallel::nonblocking_send (dest_processor_id,
 				send,
-				type,
+				type1,
 				request,
 				MessageTag(321),
                                 comm);
     
     Parallel::receive (source_processor_id,
 		       recv,
-		       type,
+		       type2,
 		       MessageTag(321),
                        comm);
     
@@ -2584,11 +2408,11 @@ namespace Parallel
   
 
   
-  template <typename T>
+  template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
-			   T &send,
+			   T1 &send,
 			   const unsigned int source_processor_id,
-			   T &recv,
+			   T2 &recv,
                            const Communicator &comm)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2601,38 +2425,9 @@ namespace Parallel
 	return;
       }
 
-    MPI_Sendrecv(&send, 1, datatype<T>(),
+    MPI_Sendrecv(&send, 1, StandardType<T1>(&send),
 		 dest_processor_id, 0,
-		 &recv, 1, datatype<T>(),
-		 source_processor_id, 0,
-		 comm.get(),
-		 MPI_STATUS_IGNORE);
-
-    STOP_LOG("send_receive()", "Parallel");
-  }
-
-
-
-  template <typename T>
-  inline void send_receive(const unsigned int dest_processor_id,
-			   std::complex<T> &send,
-			   const unsigned int source_processor_id,
-			   std::complex<T> &recv,
-                           const Communicator &comm = Communicator_World)
-  {
-    START_LOG("send_receive()", "Parallel");
-
-    if (dest_processor_id   == comm.rank() &&
-	source_processor_id == comm.rank())
-      {
-	recv = send;
-	STOP_LOG("send_receive()", "Parallel");
-	return;
-      }
-
-    MPI_Sendrecv(&send, 2, datatype<T>(),
-		 dest_processor_id, 0,
-		 &recv, 2, datatype<T>(),
+		 &recv, 1, StandardType<T2>(&recv),
 		 source_processor_id, 0,
 		 comm.get(),
 		 MPI_STATUS_IGNORE);
@@ -2644,20 +2439,21 @@ namespace Parallel
 
   // This is both a declaration and definition for a new overloaded
   // function template, so we have to re-specify the default argument
-  template <typename T>
+  template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
-			   std::vector<T> &send,
+			   std::vector<T1> &send,
 			   const unsigned int source_processor_id,
-			   std::vector<T> &recv,
+			   std::vector<T2> &recv,
                            const Communicator &comm = Communicator_World)
   {
     // Call the user-defined type version with automatic 
     // type conversion based on template argument:    
     send_receive (dest_processor_id,
 		  send,
+		  StandardType<T1>(send.empty() ? NULL : &send[0]),
 		  source_processor_id,
 		  recv,
-		  datatype<T>(),
+		  StandardType<T2>(recv.empty() ? NULL : &recv[0]),
                   comm);
   }
 
@@ -2665,11 +2461,11 @@ namespace Parallel
 
   // This is both a declaration and definition for a new overloaded
   // function template, so we have to re-specify the default argument
-  template <typename T>
+  template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
-			   std::vector<std::vector<T> > &send,
+			   std::vector<std::vector<T1> > &send,
 			   const unsigned int source_processor_id,
-			   std::vector<std::vector<T> > &recv,
+			   std::vector<std::vector<T2> > &recv,
                            const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2691,7 +2487,7 @@ namespace Parallel
 
     // The outer buffer size
     MPI_Pack_size (1,           
-		   datatype<unsigned int>(),
+		   StandardType<unsigned int>(),
 		   comm.get(),
 		   &packedsize);
     sendsize += packedsize;
@@ -2700,14 +2496,14 @@ namespace Parallel
       {
 	// The size of the ith inner buffer
 	MPI_Pack_size (1,           
-		       datatype<unsigned int>(),
+		       StandardType<unsigned int>(),
 		       comm.get(),
 		       &packedsize);
 	sendsize += packedsize;
 
 	// The data for each inner buffer
 	MPI_Pack_size (send[i].size(),
-		       datatype<T>(),
+		       StandardType<T1>(send[i].empty() ? NULL : &send[i][0]),
 		       comm.get(),
 		       &packedsize);
 	sendsize += packedsize;
@@ -2721,7 +2517,7 @@ namespace Parallel
 
     // ... the size of the outer buffer
     sendsize = send.size();
-    MPI_Pack (&sendsize, 1, datatype<unsigned int>(),
+    MPI_Pack (&sendsize, 1, StandardType<unsigned int>(),
 	      &sendbuf[0], sendbuf.size(), &pos,
 	      comm.get());
     
@@ -2729,13 +2525,14 @@ namespace Parallel
       {
 	// ... the size of the ith inner buffer
 	sendsize = send[i].size();
-	MPI_Pack (&sendsize, 1, datatype<unsigned int>(),
+	MPI_Pack (&sendsize, 1, StandardType<unsigned int>(),
 		  &sendbuf[0], sendbuf.size(), &pos,
 		  comm.get());
 	
 	// ... the contents of the ith inner buffer
 	if (!send[i].empty())
-	  MPI_Pack (&send[i][0], send[i].size(), datatype<T>(),
+	  MPI_Pack (&send[i][0], send[i].size(),
+		    StandardType<T1>(&send[i][0]),
 		    &sendbuf[0], sendbuf.size(), &pos,
 		    comm.get());
       }
@@ -2763,7 +2560,7 @@ namespace Parallel
     libmesh_assert (!recvbuf.empty());
     pos=0;
     MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
-		&sendsize, 1, datatype<unsigned int>(),
+		&sendsize, 1, StandardType<unsigned int>(),
 		comm.get());
     
     // ... size the outer buffer
@@ -2772,7 +2569,7 @@ namespace Parallel
     for (unsigned int i=0; i<recv.size(); i++)
       {
 	MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
-		    &sendsize, 1, datatype<unsigned int>(),
+		    &sendsize, 1, StandardType<unsigned int>(),
 		    comm.get());
     
 	// ... size the inner buffer
@@ -2781,7 +2578,8 @@ namespace Parallel
 	// ... unpack the inner buffer if it is not empty
 	if (!recv[i].empty())
 	  MPI_Unpack (&recvbuf[0], recvbuf.size(), &pos,
-		      &recv[i][0], recv[i].size(), datatype<T>(),
+		      &recv[i][0], recv[i].size(),
+                      StandardType<T2>(&recv[i][0]),
 		      comm.get());
       }
 
@@ -2806,44 +2604,14 @@ namespace Parallel
       {
         START_LOG("gather()", "Parallel");
 
-	MPI_Gather(&send,
-		   1,
-		   datatype<T>(),
-		   recv.empty() ? NULL : &recv[0],
-		   1,
-		   datatype<T>(),
-		   root_id,
-		   comm.get());
-
-        STOP_LOG("gather()", "Parallel");
-      }
-    else
-      recv[0] = send;
-  }
-
-
-
-  template <typename T>
-  inline void gather(const unsigned int root_id,
-		     std::complex<T> send,
-		     std::vector<std::complex<T> > &recv,
-                     const Communicator &comm = Communicator_World)
-  {
-    libmesh_assert(root_id < comm.size());
-
-    if (comm.rank() == root_id)
-      recv.resize(comm.size());
-    
-    if (comm.size() > 1)
-      {
-        START_LOG("gather()", "Parallel");
+        StandardType<T> send_type(&send);
 
 	MPI_Gather(&send,
-		   2,
-		   datatype<T>(),
-		   recv.empty() ? NULL : &recv[0],
-		   2,
-		   datatype<T>(),
+		   1,
+		   send_type,
+		   &recv[0],
+		   1,
+		   send_type,
 		   root_id,
 		   comm.get());
 
@@ -2929,71 +2697,12 @@ namespace Parallel
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
-      MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
-		   r.empty() ? NULL :  &r[0], &sendlengths[0],
-		   &displacements[0], datatype<T>(),
+      MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, StandardType<T>(&r[0]),
+		   &r[0], &sendlengths[0],
+		   &displacements[0], StandardType<T>(),
 		   root_id,
 		   comm.get());
 
-    libmesh_assert (ierr == MPI_SUCCESS);
-
-    STOP_LOG("gather()", "Parallel");
-  }
-
-
-  template <typename T>
-  inline void gather(const unsigned int root_id,
-		     std::vector<std::complex<T> > &r,
-                     const Communicator &comm = Communicator_World)
-  {
-    if (comm.size() == 1)
-      {
-	libmesh_assert (!comm.rank());
-	libmesh_assert (!root_id);
-	return;
-      }
-    
-    libmesh_assert(root_id < comm.size());
-    
-    std::vector<int>
-      sendlengths  (comm.size(), 0),
-      displacements(comm.size(), 0);
-
-    const int mysize = r.size() * 2;
-    Parallel::allgather(mysize, sendlengths, comm);
-    
-    START_LOG("gather()", "Parallel");
-
-    // Find the total size of the final array and
-    // set up the displacement offsets for each processor.
-    unsigned int globalsize = 0; 
-    for (unsigned int i=0; i != comm.size(); ++i)
-      {
-	displacements[i] = globalsize;
-	globalsize += sendlengths[i];
-      }
-
-    // Check for quick return
-    if (globalsize == 0)
-      {
-	STOP_LOG("gather()", "Parallel");
-	return;
-      }
-
-    // Make temporary buffers for the input/output data
-    std::vector<std::complex<T> > r_src(r);
-
-    // now resize r to hold the global data
-    // on the receiving processor
-    if (root_id == comm.rank())
-      r.resize(globalsize/2);
-
-    // and get the data from the remote processors
-    const int ierr =
-      MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
-		   r.empty() ? NULL : &r[0], &sendlengths[0],
-		   &displacements[0], datatype<T>(),
-		   root_id, comm.get());
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("gather()", "Parallel");
@@ -3012,12 +2721,14 @@ namespace Parallel
     
     if (comm.size() > 1)
       {
+        StandardType<T> send_type(&send);
+
 	MPI_Allgather (&send,
 		       1,
-		       datatype<T>(),
+		       send_type,
 		       &recv[0],
 		       1, 
-		       datatype<T>(),
+		       send_type,
 		       comm.get());
       }
     else
@@ -3026,34 +2737,6 @@ namespace Parallel
     STOP_LOG ("allgather()","Parallel");
   }
 
-
-
-  template <typename T>
-  inline void allgather(std::complex<T> send,
-			std::vector<std::complex<T> > &recv,
-                        const Communicator &comm = Communicator_World)
-  {
-    START_LOG ("allgather()","Parallel");
-
-    libmesh_assert(comm.size());
-    recv.resize(comm.size());
-
-    if (comm.size() > 1)
-      {
-	MPI_Allgather (&send,
-		       2,
-		       datatype<T>(),
-		       &recv[0],
-		       2, 
-		       datatype<T>(),
-		       comm.get());
-      }
-    else
-      recv[0] = send;
-
-    STOP_LOG ("allgather()","Parallel");
-  }
-  
 
 
   /**
@@ -3090,14 +2773,19 @@ namespace Parallel
 
     if (identical_buffer_sizes)
       {
+        if (r.empty())
+          return;
+
 	std::vector<T> r_src(r.size()*comm.size());
 	r_src.swap(r);
-	MPI_Allgather (r_src.empty() ? NULL : &r_src[0],
+        StandardType<T> send_type(&r_src[0]);
+
+	MPI_Allgather (&r_src[0],
 		       r_src.size(),
-		       datatype<T>(),
-		       r.empty() ? NULL : &r[0],
+		       send_type,
+		       &r[0],
 		       r_src.size(), 
-		       datatype<T>(),
+		       send_type,
 		       comm.get());
 	STOP_LOG("allgather()", "Parallel");
 	return;
@@ -3130,88 +2818,22 @@ namespace Parallel
     std::vector<T> r_src(globalsize);
     r_src.swap(r);
 
+    StandardType<T> send_type(&r[0]);
+
     // and get the data from the remote processors.
     // Pass NULL if our vector is empty.
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
-      MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
-		      r.empty()     ? NULL : &r[0],     &sendlengths[0],
-		      &displacements[0], datatype<T>(), comm.get());
+      MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, send_type,
+		      &r[0], &sendlengths[0],
+		      &displacements[0], send_type, comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("allgather()", "Parallel");
   }
-
-
-  // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default arguments
-  template <typename T>
-  inline void allgather(std::vector<std::complex<T> > &r,
-			const bool identical_buffer_sizes = false,
-                        const Communicator &comm = Communicator_World)
-  {
-    if (comm.size() < 2)
-      return;
-
-    START_LOG("allgather()", "Parallel");
-
-    if (identical_buffer_sizes)
-      {
-	std::vector<std::complex<T> > r_src(r.size()*comm.size());
-	r_src.swap(r);
-	MPI_Allgather (r_src.empty() ? NULL : &r_src[0],
-		       2*r_src.size(),
-		       datatype<T>(),
-		       r.empty() ? NULL : &r[0],
-		       2*r_src.size(), 
-		       datatype<T>(),
-		       comm.get());
-	STOP_LOG("allgather()", "Parallel");
-	return;
-      }
-
-    std::vector<int>
-      sendlengths  (comm.size(), 0),
-      displacements(comm.size(), 0);
-
-    const int mysize = r.size() * 2;
-    Parallel::allgather(mysize, sendlengths, comm);
-
-    // Find the total size of the final array and
-    // set up the displacement offsets for each processor.
-    unsigned int globalsize = 0; 
-    for (unsigned int i=0; i != comm.size(); ++i)
-      {
-	displacements[i] = globalsize;
-	globalsize += sendlengths[i];
-      }
-
-    // Check for quick return
-    if (globalsize == 0)
-      {
-	STOP_LOG("allgather()", "Parallel");
-	return;
-      }
-
-    // copy the input buffer
-    std::vector<std::complex<T> > r_src(globalsize);
-    r_src.swap(r);
-
-    // and get the data from the remote processors.
-    // Pass NULL if our vector is empty.
-    const int ierr =
-      MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, datatype<T>(),
-		      r.empty()     ? NULL : &r[0],     &sendlengths[0],
-		      &displacements[0], datatype<T>(),
-		      comm.get());
-    libmesh_assert (ierr == MPI_SUCCESS);
-
-    STOP_LOG("allgather()", "Parallel");
-  }
-  
 
 
   /**
@@ -3224,7 +2846,7 @@ namespace Parallel
   inline void alltoall(std::vector<T> &buf,
                        const Communicator &comm)
   {
-    if (comm.size() < 2)
+    if (comm.size() < 2 || buf.empty())
       return;
 
     START_LOG("alltoall()", "Parallel");
@@ -3238,17 +2860,19 @@ namespace Parallel
     libmesh_assert (buf.size()%comm.size() == 0);
 
     std::vector<T> tmp(buf);
+
+    StandardType<T> send_type(&tmp[0]);
     
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
-      MPI_Alltoall (tmp.empty() ? NULL : &tmp[0],
+      MPI_Alltoall (&tmp[0],
 		    size_per_proc,
-		    datatype<T>(),
-		    buf.empty() ? NULL : &buf[0],
+		    send_type,
+		    &buf[0],
 		    size_per_proc,
-		    datatype<T>(),
+		    send_type,
 		    comm.get());
     libmesh_assert (ierr == MPI_SUCCESS);
     
@@ -3277,39 +2901,12 @@ namespace Parallel
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
-      MPI_Bcast (&data, 1, datatype<T>(), root_id, comm.get());
+      MPI_Bcast (&data, 1, StandardType<T>(&data), root_id, comm.get());
 
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
-
-
-  // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
-  template <typename T>
-  inline void broadcast (std::complex<T> &data, const unsigned int root_id=0,
-                         const Communicator &comm = Communicator_World)
-  {
-    if (comm.size() == 1)
-      {
-	libmesh_assert (!comm.rank());
-	libmesh_assert (!root_id);
-	return;
-      }
-    
-    libmesh_assert(root_id < comm.size());
-    
-    START_LOG("broadcast()", "Parallel");
-
-    // Spread data to remote processors.
-    const int ierr =
-      MPI_Bcast (&data, 2, datatype<T>(), root_id, comm.get());
-    libmesh_assert (ierr == MPI_SUCCESS);
-
-    STOP_LOG("broadcast()", "Parallel");
-  }
-
 
 
   template <>
@@ -3368,42 +2965,15 @@ namespace Parallel
 
     // and get the data from the remote processors.
     // Pass NULL if our vector is empty.
+    T *data_ptr = data.empty() ? NULL : &data[0];
+
 #ifndef NDEBUG
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
-      MPI_Bcast (data.empty() ? NULL : &data[0], data.size(), datatype<T>(),
+      MPI_Bcast (data_ptr, data.size(), StandardType<T>(data_ptr),
 		 root_id, comm.get());
 
-    libmesh_assert (ierr == MPI_SUCCESS);
-
-    STOP_LOG("broadcast()", "Parallel");
-  }
-
-
-  // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
-  template <typename T>
-  inline void broadcast (std::vector<std::complex<T> > &data,
-			 const unsigned int root_id=0,
-                         const Communicator &comm = Communicator_World)
-  {
-    if (comm.size() == 1)
-      {
-	libmesh_assert (!comm.rank());
-	libmesh_assert (!root_id);
-	return;
-      }
-
-    libmesh_assert(root_id < comm.size());
-    
-    START_LOG("broadcast()", "Parallel");
-
-    // and get the data from the remote processors.
-    // Pass NULL if our vector is empty.
-    const int ierr =
-      MPI_Bcast (data.empty() ? NULL : &data[0], data.size() * 2, datatype<T>(),
-		 root_id, comm.get());
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
@@ -3483,6 +3053,12 @@ namespace Parallel
 
   template <typename T>
   inline void set_union(std::set<T> &, const Communicator&) {}
+
+  template <typename T1, typename T2>
+  inline void set_union(std::map<T1,T2> &, const unsigned int, const Communicator &) {}
+
+  template <typename T1, typename T2>
+  inline void set_union(std::map<T1,T2> &, const Communicator &) {}
 
  //-------------------------------------------------------------------
   /**
@@ -3590,11 +3166,11 @@ namespace Parallel
   
   inline void wait (std::vector<request> &) {}
   
-  template <typename T>
+  template <typename T1, typename T2>
   inline void send_receive (const unsigned int send_tgt,
-			    T &send,
+			    T1 &send,
 			    const unsigned int recv_source,
-			    T &recv,
+			    T2 &recv,
                             const Communicator&)
   {
     libmesh_assert (send_tgt == recv_source);
