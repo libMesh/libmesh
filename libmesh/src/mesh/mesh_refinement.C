@@ -1691,8 +1691,9 @@ void MeshRefinement::uniformly_refine (unsigned int n)
       this->_refine_elements();
     }
   
-  // Finally, the new mesh needs to be prepared for use
-  _mesh.prepare_for_use (/*skip_renumber =*/false);
+  // Finally, the new mesh probably needs to be prepared for use
+  if (n > 0)
+    _mesh.prepare_for_use (/*skip_renumber =*/false);
 }
 
 
@@ -1721,8 +1722,9 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
     }
     
   
-  // Finally, the new mesh needs to be prepared for use
-  _mesh.prepare_for_use (/*skip_renumber =*/false);
+  // Finally, the new mesh probably needs to be prepared for use
+  if (n > 0)
+    _mesh.prepare_for_use (/*skip_renumber =*/false);
 }
 
 
