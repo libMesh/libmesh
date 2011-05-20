@@ -19,13 +19,35 @@
 
 
 // Local includes
-#include "mesh_output.h"
 #include "equation_systems.h"
-#include "unstructured_mesh.h"
+#include "mesh_output.h"
+#include "parallel.h"
 #include "parallel_mesh.h"
+#include "unstructured_mesh.h"
 
 namespace libMesh
 {
+
+MeshSerializer::MeshSerializer(MeshBase& mesh, bool need_serial) :
+       _mesh(mesh),
+       reparallelize(false)
+{
+  parallel_only();
+  if (need_serial && !_mesh.is_serial()) {
+    reparallelize = true;
+    _mesh.allgather();
+  }
+}
+
+
+
+MeshSerializer::~MeshSerializer()
+{
+  if (reparallelize)
+    _mesh.delete_remote_elements();
+}
+
+
 
 template <class MT>
 void MeshOutput<MT>::

@@ -116,7 +116,7 @@ void EnsightIO::write (const std::string &name)
 {
   // We may need to gather a ParallelMesh to output it, making that
   // const qualifier in our constructor a dirty lie
-  MeshOutputSerializer serialize(const_cast<MeshBase&>(this->mesh()), !_is_parallel_format);
+  MeshSerializer serialize(const_cast<MeshBase&>(this->mesh()), !_is_parallel_format);
 
   _ensight_file_name = name;
   this->write();
