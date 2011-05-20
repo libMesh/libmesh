@@ -552,7 +552,7 @@ void ExodusII_IO::write (const std::string& fname)
   
   // We may need to gather a ParallelMesh to output it, making that
   // const qualifier in our constructor a dirty lie
-  MeshOutputSerializer serialize(const_cast<MeshBase&>(mesh), !MeshOutput<MeshBase>::_is_parallel_format);
+  MeshSerializer serialize(const_cast<MeshBase&>(mesh), !MeshOutput<MeshBase>::_is_parallel_format);
 
   libmesh_assert( !exio_helper->created() );
 

@@ -37,6 +37,7 @@ namespace libMesh
 
 // Forward declares
 class EquationSystems;
+class MeshSerializer;
 
 
 /**
@@ -122,33 +123,6 @@ class MeshOutput
    */
   const bool _is_parallel_format;
 
-
-  /**
-   * Temporarily serialize a ParallelMesh for output
-   */
-  class MeshOutputSerializer
-  {
-  public:
-    MeshOutputSerializer(MT& mesh, bool need_serial) :
-       _mesh(mesh),
-       reparallelize(false)
-    {
-      if (need_serial && !_mesh.is_serial()) {
-        reparallelize = true;
-        _mesh.allgather();
-      }
-    }
-
-    ~MeshOutputSerializer() {
-      if (reparallelize)
-        _mesh.delete_remote_elements();
-    }
-
-  private:
-    MT& _mesh;
-    bool reparallelize;
-  };
-
   
  private:
   
@@ -172,6 +146,30 @@ class MeshOutput
 						 std::vector<Number>& soln,
 						 std::vector<std::string>& names);
 };
+
+
+
+/**
+ * Temporarily serialize a ParallelMesh for output; a distributed
+ * mesh is allgathered by the MeshSerializer constructor if
+ * need_serial is true, then remote elements are deleted again by the
+ * destructor.
+ */
+
+// ------------------------------------------------------------
+// MeshSerializer class definition
+class MeshSerializer
+{
+public:
+  MeshSerializer(MeshBase& mesh, bool need_serial);
+
+  ~MeshSerializer();
+
+private:
+  MeshBase& _mesh;
+  bool reparallelize;
+};
+
 
 
 
@@ -223,7 +221,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
 {
   // We may need to gather a ParallelMesh to output it, making that
   // const qualifier in our constructor a dirty lie
-  MeshOutputSerializer(const_cast<MT&>(*_obj), !_is_parallel_format);
+  MeshSerializer(const_cast<MT&>(*_obj), !_is_parallel_format);
 
   // Build the nodal solution values & get the variable
   // names from the EquationSystems object
