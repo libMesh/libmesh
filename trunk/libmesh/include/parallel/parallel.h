@@ -1597,6 +1597,8 @@ namespace Parallel
     if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("min(vector)", "Parallel");
+
+        libmesh_assert(verify(r.size(), comm));
     
 	std::vector<T> temp(r);
 	MPI_Allreduce (&temp[0],
@@ -1618,6 +1620,8 @@ namespace Parallel
     if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("min(vector<bool>)", "Parallel");
+    
+        libmesh_assert(verify(r.size(), comm));
     
         std::vector<unsigned int> ruint;
         pack_vector_bool(r, ruint);
@@ -1702,6 +1706,8 @@ namespace Parallel
       {
 	START_LOG("minloc(vector)", "Parallel");
     
+        libmesh_assert(verify(r.size(), comm));
+    
 	std::vector<DataPlusInt<T> > in(r.size());
         for (unsigned int i=0; i != r.size(); ++i)
           {
@@ -1739,6 +1745,8 @@ namespace Parallel
     if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("minloc(vector<bool>)", "Parallel");
+    
+        libmesh_assert(verify(r.size(), comm));
     
 	std::vector<DataPlusInt<int> > in(r.size());
         for (unsigned int i=0; i != r.size(); ++i)
@@ -1822,6 +1830,8 @@ namespace Parallel
       {
 	START_LOG("max(vector)", "Parallel");
     
+        libmesh_assert(verify(r.size(), comm));
+    
 	std::vector<T> temp(r);
 	MPI_Allreduce (&temp[0],
 		       &r[0],
@@ -1842,6 +1852,8 @@ namespace Parallel
     if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("max(vector<bool>)", "Parallel");
+    
+        libmesh_assert(verify(r.size(), comm));
     
         std::vector<unsigned int> ruint;
         pack_vector_bool(r, ruint);
@@ -1926,6 +1938,8 @@ namespace Parallel
       {
 	START_LOG("maxloc(vector)", "Parallel");
     
+        libmesh_assert(verify(r.size(), comm));
+    
 	std::vector<DataPlusInt<T> > in(r.size());
         for (unsigned int i=0; i != r.size(); ++i)
           {
@@ -1963,6 +1977,8 @@ namespace Parallel
     if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("maxloc(vector<bool>)", "Parallel");
+    
+        libmesh_assert(verify(r.size(), comm));
     
 	std::vector<DataPlusInt<int> > in(r.size());
         for (unsigned int i=0; i != r.size(); ++i)
@@ -2022,6 +2038,8 @@ namespace Parallel
       {
 	START_LOG("sum()", "Parallel");
     
+        libmesh_assert(verify(r.size(), comm));
+    
 	std::vector<T> temp(r);
 	MPI_Allreduce (&temp[0],
 		       &r[0],
@@ -2065,6 +2083,8 @@ namespace Parallel
     if (comm.size() > 1 && !r.empty())
       {
 	START_LOG("sum()", "Parallel");
+    
+        libmesh_assert(verify(r.size(), comm));
     
 	std::vector<std::complex<T> > temp(r);
 	MPI_Allreduce (&temp[0],
@@ -2776,6 +2796,8 @@ namespace Parallel
         if (r.empty())
           return;
 
+        libmesh_assert(verify(r.size(), comm));
+    
 	std::vector<T> r_src(r.size()*comm.size());
 	r_src.swap(r);
         StandardType<T> send_type(&r_src[0]);
@@ -2859,6 +2881,8 @@ namespace Parallel
 
     libmesh_assert (buf.size()%comm.size() == 0);
 
+    libmesh_assert(verify(size_per_proc, comm));
+    
     std::vector<T> tmp(buf);
 
     StandardType<T> send_type(&tmp[0]);
