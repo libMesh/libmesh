@@ -271,7 +271,11 @@ namespace Parallel
   class StandardType : public DataType
   {
   public:
+#ifdef LIBMESH_HAVE_MPI
     StandardType(const T* example = NULL);
+#else
+    StandardType(const T* example = NULL) {}
+#endif
   };
 
 

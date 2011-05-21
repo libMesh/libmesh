@@ -27,11 +27,11 @@
 
 
 #include "libmesh_config.h"
-#include "parallel.h"
 
-#ifdef LIBMESH_HAVE_LIBHILBERT
+#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 
 #include "hilbert.h"
+#include "parallel.h"
 
 namespace libMesh {
 namespace Parallel {
@@ -59,7 +59,7 @@ namespace Parallel {
 } // namespace Parallel
 } // namespace libMesh
 
-#endif // LIBMESH_HAVE_LIBHILBERT
+#endif // LIBMESH_HAVE_LIBHILBERT && LIBMESH_HAVE_MPI
 
 #endif // __parallel_hilbert_h__
 
