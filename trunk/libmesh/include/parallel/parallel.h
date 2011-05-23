@@ -2634,7 +2634,7 @@ namespace Parallel
 	MPI_Gather(&send,
 		   1,
 		   send_type,
-		   &recv[0],
+		   recv.empty() ? NULL : &recv[0],
 		   1,
 		   send_type,
 		   root_id,
@@ -2744,7 +2744,8 @@ namespace Parallel
     libmesh_assert(comm.size());
     recv.resize(comm.size());
     
-    if (comm.size() > 1)
+    unsigned int comm_size = comm.size();
+    if (comm_size > 1)
       {
         StandardType<T> send_type(&send);
 
@@ -2756,7 +2757,7 @@ namespace Parallel
 		       send_type,
 		       comm.get());
       }
-    else
+    else if (comm_size > 0)
       recv[0] = send;
 
     STOP_LOG ("allgather()","Parallel");
