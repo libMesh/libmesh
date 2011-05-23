@@ -1137,6 +1137,43 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
 
 
 
+#ifdef LIBMESH_ENABLE_AMR
+void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &mesh)
+{
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  for (MeshBase::const_element_iterator el = 
+       mesh.elements_begin(); el != el_end; ++el)
+    {
+      const Elem *elem = *el;
+      libmesh_assert(elem);
+      if (elem->has_children())
+        for (unsigned int n=0; n != elem->n_children(); ++n)
+          {
+            libmesh_assert(elem->child(n));
+            libmesh_assert(elem->child(n)->parent() == elem);
+          }
+      if (elem->active())
+        {
+          libmesh_assert(!elem->ancestor());
+          libmesh_assert(!elem->subactive());
+        }
+      else if (elem->ancestor())
+        {
+          libmesh_assert(!elem->subactive());
+        }
+      else
+        libmesh_assert(elem->subactive());
+    }
+}
+#else
+void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
+{
+}
+#endif // LIBMESH_ENABLE_AMR
+
+
+
 void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
 {
   const MeshBase::const_element_iterator el_end = mesh.elements_end();
