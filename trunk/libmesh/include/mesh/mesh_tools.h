@@ -365,6 +365,12 @@ namespace MeshTools
   void libmesh_assert_valid_refinement_flags (const MeshBase &mesh);
 
   /**
+   * A function for verifying that elements on this processor have
+   * valid descendants and consistent active flags.
+   */
+  void libmesh_assert_valid_refinement_tree (const MeshBase &mesh);
+
+  /**
    * A function for verifying that neighbor connectivity is correct (each
    * element is a neighbor of or descendant of a neighbor of its neighbors)
    */
