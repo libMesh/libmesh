@@ -1427,7 +1427,8 @@ namespace Parallel
   class StandardType<cxxtype> : public DataType \
   { \
   public: \
-    StandardType(const cxxtype* example = NULL) : DataType(mpitype) { } \
+    StandardType(const cxxtype* example = NULL) : DataType(mpitype) \
+      { /* make compiler think 'example' is used */ libmesh_ignore(example); } \
   }
 
   STANDARD_TYPE(char,MPI_CHAR);

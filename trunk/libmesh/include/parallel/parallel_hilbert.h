@@ -44,6 +44,9 @@ namespace Parallel {
   {
   public:
     inline StandardType(const Hilbert::HilbertIndices *example=NULL) {
+      // Make stupid compiler think "example" is used
+      libmesh_ignore(example);
+
       // _static_type never gets freed, but it only gets committed once
       // so it's not a *huge* memory leak...
       static DataType _static_type;

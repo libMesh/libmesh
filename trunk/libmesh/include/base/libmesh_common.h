@@ -361,6 +361,11 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 #endif
 
 
+// A function template for ignoring unused variables.  This is a way
+// to shut up unused variable compiler warnings on a case by case
+// basis.
+template<class T> inline void libmesh_ignore( const T& ) { }
+
 
 } // namespace libMesh
 
