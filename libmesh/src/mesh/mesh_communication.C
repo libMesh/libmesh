@@ -2031,6 +2031,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
                     libmesh_assert (elem);
 #ifdef LIBMESH_ENABLE_AMR
 		    libmesh_assert (!elem->parent() ||
+				    elem->parent()->dim() != elem->dim() ||
 				    elem->parent()->id() ==
 				    static_cast<unsigned int>(packed_elem.parent_id()));
 		    libmesh_assert (elem->p_level()           == packed_elem.p_level());
@@ -2464,6 +2465,15 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
 
   START_LOG("delete_remote_elements()", "MeshCommunication");
 
+#ifdef DEBUG
+  // We expect maximum ids to be in sync so we can use them to size
+  // vectors
+  Parallel::verify(mesh.max_node_id());
+  Parallel::verify(mesh.max_elem_id());
+  libmesh_assert(mesh.parallel_max_node_id() == mesh.max_node_id());
+  libmesh_assert(mesh.parallel_max_elem_id() == mesh.max_elem_id());
+#endif
+
   // FIXME - should these be "unsorted_set"s?  O(N) is O(N)...
   std::vector<bool> local_nodes(mesh.max_node_id(), false);
   std::vector<bool> semilocal_elems(mesh.max_elem_id(), false);
@@ -2476,11 +2486,23 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
     {
       const Elem *elem = *l_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        local_nodes[elem->node(n)] = true;
+        {
+          unsigned int nodeid = elem->node(n);
+          libmesh_assert(nodeid < local_nodes.size());
+          local_nodes[nodeid] = true;
+        }
       while (elem)
         {
-          semilocal_elems[elem->id()] = true;
-          elem = elem->parent();
+          unsigned int elemid = elem->id();
+          libmesh_assert(elemid < local_nodes.size());
+          semilocal_elems[elemid] = true;
+
+          const Elem *parent = elem->parent();
+	  // Don't proceed from a boundary mesh to an interior mesh
+          if (parent && parent->dim() != elem->dim())
+            break;
+
+          elem = parent;
         }
     }
 
@@ -2498,7 +2520,13 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
       while (elem)
         {
           semilocal_elems[elem->id()] = true;
-          elem = elem->parent();
+
+          const Elem *parent = elem->parent();
+	  // Don't proceed from a boundary mesh to an interior mesh
+          if (parent && parent->dim() != elem->dim())
+            break;
+
+          elem = parent;
         }
     }
 
@@ -2515,7 +2543,13 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
             while (elem)
               {
                 semilocal_elems[elem->id()] = true;
-                elem = elem->parent();
+
+                const Elem *parent = elem->parent();
+	        // Don't proceed from a boundary mesh to an interior mesh
+                if (parent && parent->dim() != elem->dim())
+                  break;
+
+                elem = parent;
               }
             break;
           }
@@ -2555,6 +2589,10 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
             mesh.delete_elem(elem);
         }
     }
+
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_refinement_tree(mesh);
+#endif
 
   STOP_LOG("delete_remote_elements()", "MeshCommunication");
 
