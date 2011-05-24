@@ -137,6 +137,14 @@ namespace MeshTools
     void change_boundary_id (MeshBase &mesh,
 			     const short int old_id,
 			     const short int new_id);
+    
+    /**
+     * Finds any subdomain ids that are currently old_id,
+     * changes them to new_id
+     */
+    void change_subdomain_id (MeshBase &mesh,
+			      const short int old_id,
+			      const short int new_id);
 
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools
