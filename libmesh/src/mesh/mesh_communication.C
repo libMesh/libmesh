@@ -680,6 +680,11 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   
   // unregister MPI datatypes
   packed_node_datatype.free();
+
+  // Check on the redistribution consistency
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_refinement_tree(mesh);
+#endif
   
   STOP_LOG("redistribute()","MeshCommunication");  
 }
