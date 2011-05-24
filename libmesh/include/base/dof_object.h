@@ -38,6 +38,11 @@ namespace libMesh
 class DofObject;
 
 
+// Define processor id storage type.  We default to short to save
+// space, but expanding to support more than 2^16-2 procs should work
+// too.
+typedef unsigned short int processor_id_type;
+//typedef unsigned int processor_id_type;
 
 /**
  * The \p DofObject defines an abstract base class for objects that
@@ -156,20 +161,19 @@ public:
   
   /**
    * @returns the processor that this element belongs to.
-   * To conserve space this is stored as a short integer.
    */
-  unsigned short int processor_id () const;
+  processor_id_type processor_id () const;
   
   /**
    * @returns the processor that this element belongs to as a
    * writeable reference.
    */
-  unsigned short int & processor_id ();
+  processor_id_type& processor_id ();
 
   /**
    * Sets the \p processor_id for this \p DofObject.
    */  
-  void processor_id (const unsigned int id);
+  void processor_id (const processor_id_type id);
 
   /**
    * @returns \p true if this \p DofObject has a valid \p id set,
@@ -266,7 +270,7 @@ public:
    * An invalid \p processor_id to distinguish DOFs that have
    * not been assigned to a processor.
    */
-  static const unsigned short int invalid_processor_id = static_cast<unsigned short int>(-1);
+  static const processor_id_type invalid_processor_id = static_cast<processor_id_type>(-1);
 
   
 private:
@@ -286,7 +290,7 @@ private:
    * expect to be solving on 65000+ processors any time soon,
    * can we??
    */
-  unsigned short int _processor_id;
+  processor_id_type _processor_id;
 
   /**
    * DOF index information.  This is packed into a contiguous buffer of the following format:
@@ -460,7 +464,7 @@ bool DofObject::valid_id () const
 
 
 inline
-unsigned short int DofObject::processor_id () const
+processor_id_type DofObject::processor_id () const
 {
   return _processor_id;
 }
@@ -468,7 +472,7 @@ unsigned short int DofObject::processor_id () const
 
 
 inline
-unsigned short int & DofObject::processor_id ()
+processor_id_type& DofObject::processor_id ()
 {
   return _processor_id;
 }
@@ -476,20 +480,8 @@ unsigned short int & DofObject::processor_id ()
 
 
 inline
-void DofObject::processor_id (const unsigned int id)
+void DofObject::processor_id (const processor_id_type id)
 {
-#ifdef DEBUG
-  
-  if (id != static_cast<unsigned int>(static_cast<unsigned short int>(id)))
-    {
-      libMesh::err << "ERROR: id too large for unsigned short int!" << std::endl
-		    << "Recompile with DofObject::_processor_id larger!" << std::endl;
-      
-      libmesh_error();
-    }
-
-#endif
-  
   this->processor_id() = id;
 }
 

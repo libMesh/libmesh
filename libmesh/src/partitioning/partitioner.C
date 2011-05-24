@@ -312,7 +312,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 
       const unsigned int max_elem_id = mesh.max_elem_id();
 
-      std::vector<unsigned short int>
+      std::vector<processor_id_type>
 	parent_processor_ids (std::min(communication_blocksize,
 				       max_elem_id));
       
@@ -342,7 +342,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		  (parent_idx <  last_elem_id))
 		{
 		  have_parent_in_block = true;
-		  unsigned short int parent_pid = DofObject::invalid_processor_id;
+		  processor_id_type parent_pid = DofObject::invalid_processor_id;
 
 		  for (unsigned int c=0; c<parent->n_children(); c++)
 		    parent_pid = std::min (parent_pid, parent->child(c)->processor_id());
@@ -372,7 +372,7 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		    const unsigned int packed_idx = parent_idx - first_elem_id;
 		    libmesh_assert (packed_idx < parent_processor_ids.size());
 		    
-		    const unsigned short int parent_pid =
+		    const processor_id_type parent_pid =
 		      parent_processor_ids[packed_idx];
 		    
 		    libmesh_assert (parent_pid != DofObject::invalid_processor_id);
@@ -450,7 +450,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
     {
       Node *node = *node_it;
       libmesh_assert(node);
-      const unsigned int current_pid = node->processor_id();      
+      const processor_id_type current_pid = node->processor_id();      
       if (current_pid != libMesh::processor_id() &&
 	  current_pid != DofObject::invalid_processor_id)
 	{
@@ -568,7 +568,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
         {
           Node *node = mesh.node_ptr(request_to_fill[i]);
           libmesh_assert(node);
-	  const unsigned int new_pid = node->processor_id();
+	  const processor_id_type new_pid = node->processor_id();
 	  libmesh_assert (new_pid != DofObject::invalid_processor_id);
 	  libmesh_assert (new_pid < mesh.n_partitions()); // this is the correct test --
           request_to_fill[i] = new_pid;           //  the number of partitions may
