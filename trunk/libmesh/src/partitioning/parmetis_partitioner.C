@@ -25,6 +25,7 @@
 #include "libmesh_config.h"
 #include "mesh_base.h"
 #include "parallel.h"
+#include "mesh_output.h" // for MeshSerializer
 #include "mesh_tools.h"
 #include "mesh_communication.h"
 #include "parmetis_partitioner.h"
@@ -171,18 +172,13 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
     // partition array on *any* of the processors.
     if (!all_have_active_elements)
       {
-	// Cowardly revert to METIS, although this requires a serial mesh
-        bool mesh_was_serial = mesh.is_serial();
-	if (!mesh_was_serial)
-	  mesh.allgather();
+	// FIXME: revert to METIS, although this requires a serial mesh
+        MeshSerializer serialize(mesh);
 
 	STOP_LOG ("repartition()", "ParmetisPartitioner");
   
 	MetisPartitioner mp;
 	mp.partition (mesh, n_sbdmns);
-
-        if (mesh_was_serial)
-          mesh.delete_remote_elements();
 
 	return;	
       }
