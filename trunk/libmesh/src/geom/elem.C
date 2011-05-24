@@ -834,7 +834,11 @@ void Elem::make_links_to_me_remote()
 #ifdef LIBMESH_ENABLE_AMR
   // Remotify parent's child link
   Elem *parent = this->parent();
-  if (parent && parent != remote_elem)
+  if (parent && 
+      // As long as it's not already remote
+      parent != remote_elem && 
+      // And it's a real parent, not an interior parent
+      this->dim() == parent->dim())
     {
       unsigned int me = parent->which_child_am_i(this);
       libmesh_assert (parent->_children[me] == this);
