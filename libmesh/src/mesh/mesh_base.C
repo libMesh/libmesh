@@ -283,6 +283,8 @@ unsigned int MeshBase::recalculate_n_partitions()
   // The number of partitions is one more than the max processor ID.
   _n_parts = max_proc_id+1;
 
+  Parallel::max(_n_parts);
+
   return _n_parts;
 }
 
