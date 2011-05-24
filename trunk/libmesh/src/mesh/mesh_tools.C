@@ -1151,7 +1151,8 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &mesh)
         for (unsigned int n=0; n != elem->n_children(); ++n)
           {
             libmesh_assert(elem->child(n));
-            libmesh_assert(elem->child(n)->parent() == elem);
+            if (elem->child(n) != remote_elem)
+              libmesh_assert(elem->child(n)->parent() == elem);
           }
       if (elem->active())
         {
