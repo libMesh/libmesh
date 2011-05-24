@@ -213,13 +213,17 @@ namespace Parallel
       _datatype(type)
     {}
 
+#ifdef LIBMESH_HAVE_MPI
     DataType (const DataType &other, unsigned int count)
     {
-#ifdef LIBMESH_HAVE_MPI
       MPI_Type_contiguous(count, other._datatype, &_datatype);
       this->commit();
-#endif
     }
+#else
+    DataType (const DataType &, unsigned int)
+    {
+    }
+#endif
 
     DataType & operator = (const DataType &other) 
     { _datatype = other._datatype; return *this; }
