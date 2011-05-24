@@ -536,6 +536,9 @@ void ParallelMesh::partition (const unsigned int n_parts)
     // Call base class' partition() function.
     MeshBase::partition(n_parts);
 
+    // Partitioning changes our numbers of unpartitioned objects
+    this->update_parallel_id_counts();
+
     // If this is a truly parallel mesh, go through the redistribution/gather/delete remote steps
     if (!this->is_serial())
       {
