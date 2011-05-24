@@ -161,7 +161,7 @@ class MeshOutput
 class MeshSerializer
 {
 public:
-  MeshSerializer(MeshBase& mesh, bool need_serial);
+  MeshSerializer(MeshBase& mesh, bool need_serial = true);
 
   ~MeshSerializer();
 
