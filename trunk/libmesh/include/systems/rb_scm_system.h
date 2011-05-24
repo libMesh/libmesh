@@ -28,7 +28,7 @@
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
 #include "condensed_eigen_system.h"
-#include "rb_base.h"
+#include "rb_base_system.h"
 
 namespace libMesh
 {
@@ -45,7 +45,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // RBSCMSystem class definition
 
-class RBSCMSystem : public RBBase<CondensedEigenSystem>
+class RBSCMSystem : public RBBaseSystem<CondensedEigenSystem>
 {
 public:
 
@@ -70,7 +70,7 @@ public:
   /**
    * The type of the parent.
    */
-  typedef RBBase<CondensedEigenSystem> Parent;
+  typedef RBBaseSystem<CondensedEigenSystem> Parent;
 
   /**
    * Clear all the data structures associated with

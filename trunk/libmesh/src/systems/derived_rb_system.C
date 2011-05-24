@@ -43,6 +43,15 @@ std::string DerivedRBSystem<Base>::system_type () const
   return "DerivedRBSystem";
 }
 
+template <class Base>
+Real DerivedRBSystem<Base>::train_reduced_basis (const std::string& directory_name)
+{
+  Real training_greedy_error = Base::train_reduced_basis(directory_name);
+  
+  generate_residual_terms_wrt_truth();
+  
+  return training_greedy_error;
+}
 
 template<class Base>
 void DerivedRBSystem<Base>::set_uber_current_parameters()
@@ -79,15 +88,6 @@ void DerivedRBSystem<Base>::load_basis_function(unsigned int i)
   }
 
   STOP_LOG("load_basis_function()", "DerivedRBSystem");
-}
-
-template <class Base>
-void DerivedRBSystem<Base>::write_offline_data_to_files(const std::string& directory_name,
-                                                        const RBSystem::RBDataIO io_flag)
-{
-  generate_residual_terms_wrt_truth();
-  
-  Base::write_offline_data_to_files(directory_name, io_flag);
 }
 
 // explicit instantiations

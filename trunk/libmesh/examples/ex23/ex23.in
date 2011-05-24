@@ -1,7 +1,8 @@
 # ========= Main function parameters =========
 
-n_elem = 50           # The number of elements in each dimension in the truth mesh
-online_mode = false   # Do we run Offline mode (to train a basis) or Online mode (to use the precomputed reduced basis)?
+n_elem = 50                    # The number of elements in each dimension in the truth mesh
+online_mode = false            # Do we run Offline mode (to train a basis) or Online mode (to use the precomputed reduced basis)?
+store_basis_functions = true   # Do we store the basis functions in the offline_data directory once Offline finishes?
 
 online_N = 20         # If we're in Online mode, the number of basis functions we use for the reduced basis solve
 online_mu = '-2 0.79' # Parameter vector for an Online solve
@@ -17,7 +18,6 @@ mu_max = '2 2'                 # The "upper corner" of the parameter domain
 log_scaling = '0 0'            # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
 
 deterministic_training = true  # Are the training points generated randomly or deterministically
-store_basis_functions = true   # Do we store the basis functions in the offline_data directory once Offline finishes?
-return_rel_error_bound = false # Do we use a relative or absolute error bound in training the RB space?
+return_rel_error_bound = false # Do we use a relative or absolute error bound when training the RB space?
 
 n_training_samples_mu = 100    # The number of parameters in training set (must be square for the 2-parameter deterministic case)

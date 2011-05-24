@@ -21,7 +21,10 @@
 #define __rb_theta_h__
 
 // Local includes
+#include "libmesh_common.h"
 #include "reference_counted_object.h"
+
+#include <vector>
 
 namespace libMesh
 {
@@ -59,7 +62,7 @@ public:
   virtual Number evaluate(const std::vector<Real>& ) { return 1.; }
 
 };
- 
+
 }
 
 #endif

@@ -77,8 +77,11 @@ public:
    * i.e. this function recursively constructs the hierarchical
    * subdivision of parameter space and builds the reduced basis
    * spaces on each subdomain.
+   * If \p store_basis_functions==true, write out the
+   * basis functions associated with each subdomain
+   * during the hp-greedy algorithm.
    */
-  virtual void hp_greedy();
+  virtual void hp_greedy(bool store_basis_functions);
 
   /**
    * Split the current subdomain into two new subdomains.
@@ -97,8 +100,10 @@ public:
    * Write out the offline data for the current subdomain. Overload
    * in subdomain in order to perform extra funcitonality, e.g.
    * a per-subdomain SCM which is not needed during the hp refinement.
+   * If \p store_basis_functions==true, write out the basis functions
+   * associated with the current subdomain.
    */
-  virtual void write_subdomain_data_to_files();
+  virtual void write_subdomain_data_to_files(bool store_basis_functions);
 
   /**
    * Returns the number of parameters.

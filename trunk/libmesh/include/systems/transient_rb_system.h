@@ -22,6 +22,7 @@
 
 #include "transient_system.h"
 #include "rb_system.h"
+#include "transient_rb_evaluation.h"
 
 namespace libMesh
 {
@@ -128,18 +129,6 @@ public:
   void mass_matrix_scaled_matvec(Number scalar,
                                  NumericVector<Number>& dest,
                                  NumericVector<Number>& arg);
-
-  /**
-   * Build a new TransientRBEvaluation object and add
-   * it to the rb_evaluation_objects vector.
-   */
-  virtual RBEvaluation* add_new_rb_evaluation_object();
-  
-  /**
-   * Get Q_m, the number of terms in the affine
-   * expansion for the mass operator.
-   */
-  virtual unsigned int get_Q_m() { return theta_q_m_vector.size(); }
   
   /**
    * Attach user-defined assembly routine
@@ -164,11 +153,6 @@ public:
    * Get a pointer to M_q.
    */
   SparseMatrix<Number>* get_M_q(unsigned int q);
-  
-  /**
-   * Evaluate theta_q_m at the current parameter.
-   */
-  Number eval_theta_q_m(unsigned int q);
 
   /**
    * Override initialize_RB_system to also initialize
@@ -191,39 +175,10 @@ public:
   void set_max_truth_solves(int max_truth_solves_in) { this->max_truth_solves = max_truth_solves_in; }
 
   /**
-   * Get/set dt, the time-step size.
-   */
-  Real get_dt() const        { return dt; }
-  void set_dt(const Real dt) { this->dt = dt; }
-
-  /**
    * Get/set POD_tol
    */
   Real get_POD_tol() const                { return POD_tol; }
   void set_POD_tol(const Real POD_tol_in) { this->POD_tol = POD_tol_in; }
-
-  /**
-   * Get/set euler_theta, parameter that determines
-   * the temporal discretization.
-   * euler_theta = 0   ---> Forward Euler
-   * euler_theta = 0.5 ---> Crank-Nicolson
-   * euler_theta = 1   ---> Backward Euler
-   */
-  Real get_euler_theta() const                 { return euler_theta; }
-  void set_euler_theta(const Real euler_theta) { libmesh_assert((0. <= euler_theta ) && (euler_theta <= 1.));
-                                                 this->euler_theta = euler_theta; }
-
-  /**
-   * Get/set the current time-level.
-   */
-  unsigned int get_time_level() const       { return _k; }
-  void set_time_level(const unsigned int k) { libmesh_assert(_k <= _K); this->_k = k; }
-
-  /**
-   * Get/set K, the total number of time-steps.
-   */
-  unsigned int get_K() const       { return _K; }
-  void set_K(const unsigned int K) { this->_K = K; }
 
   /**
    * Set delta_N, the number of basis functions we add to the
@@ -238,7 +193,7 @@ public:
   virtual void load_RB_solution();
 
   /**
-   * Get column k (i.e. the current time level) of temporal_data.
+   * Get the column of temporal_data corresponding to the current time level.
    * This gives access to the truth projection error data. If
    * the RB basis is empty, then this corresponds to the truth
    * solution data itself.
@@ -253,14 +208,27 @@ public:
   void update_RB_initial_condition_all_N();
 
   /**
-   * Specifies the residual scaling on the numerator to
-   * be used in the a posteriori error bound. Overload
-   * in subclass in order to obtain the desired error bound.
+   * Write out all the Riesz representor data to files. Override
+   * to write out transient data too.
    */
-  virtual Real residual_scaling_numer(Real alpha_LB);
+  virtual void write_riesz_representors_to_files(const std::string& riesz_representors_dir,
+                                                 const bool write_binary_residual_representors);
+
+  /**
+   * Write out all the Riesz representor data to files. Override
+   * to read in transient data too.
+   */
+  virtual void read_riesz_representors_from_files(const std::string& riesz_representors_dir,
+                                                  const bool write_binary_residual_representors);
 
 
   //----------- PUBLIC DATA MEMBERS -----------//
+
+  /**
+   * The object that defines the properties of the
+   * temporal discretization that we employ.
+   */
+  AutoPtr< TemporalDiscretization > temporal_discretization;
 
   /**
    * The L2 matrix.
@@ -271,12 +239,6 @@ public:
    * Vector storing the Q_m matrices from the mass operator
    */
   std::vector< SparseMatrix<Number>* > M_q_vector;
-
-  /**
-   * The true error data for all time-levels from the
-   * most recent RB_solve.
-   */
-//   std::vector< Number > true_error_all_k;
 
   /**
    * The truth outputs for all time-levels from the
@@ -309,6 +271,36 @@ protected:
    * Initializes the mesh-dependent data.
    */
   virtual void init_data ();
+
+  /**
+   * Initialize any extra objects that we may need to attach to an
+   * RB object. Overload to also initialize a TemporalDiscretization
+   * object.
+   */
+  virtual void init_extra_data_objects();
+
+  /**
+   * Build a new TransientRBThetaStruct object and return an AutoPtr to it.
+   */
+  virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion(std::vector<Real>& parameters_ref);
+
+  /**
+   * Build a new TransientRBEvaluation object.
+   */
+  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
+  
+  /**
+   * Build a new TemporalDiscretization object. This
+   * object encapsulates data that defines the
+   * temporal discretization.
+   */
+  virtual AutoPtr<TemporalDiscretization> build_temporal_discretization();
+
+  /**
+   * Override copy_system_data_to_rb_eval to also copy the data
+   * relevant to a time-dependent problem.
+   */
+  virtual void copy_system_data_to_rb_eval();
 
   /**
    * Read in the parameters from file and set up the system
@@ -374,29 +366,6 @@ protected:
   //----------- PROTECTED DATA MEMBERS -----------//
 
   /**
-   * Time step size.
-   */
-  Real dt;
-
-  /**
-   * Parameter that defines the temporal discretization:
-   * euler_theta = 0   ---> Forward Euler
-   * euler_theta = 0.5 ---> Crank-Nicolson
-   * euler_theta = 1   ---> Backward Euler
-   */
-  Real euler_theta;
-
-  /**
-   * The current time-level, 0 <= _k <= _K.
-   */
-  unsigned int _k;
-
-  /**
-   * Total number of time-steps.
-   */
-  unsigned int _K;
-
-  /**
    * If positive, this tolerance determines the number of POD modes we
    * add to the space on a call to enrich_RB_space(). If negative, we add
    * delta_N POD modes.
@@ -415,12 +384,6 @@ protected:
    * Function pointer for assembling the L2 matrix.
    */
   ElemAssembly* L2_assembly;
-
-  /**
-   * Vector of parameter-dependent functions for assembling
-   * the mass operator.
-   */
-  std::vector<RBTheta*> theta_q_m_vector;
   
   /**
    * Vectors of function pointers for assembling the mass operator.

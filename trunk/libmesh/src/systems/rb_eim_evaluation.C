@@ -20,13 +20,14 @@
 #include "rb_eim_evaluation.h"
 #include "rb_eim_system.h"
 #include "libmesh_logging.h"
+#include "rb_eim_theta.h"
 
 namespace libMesh
 {
 
-RBEIMEvaluation::RBEIMEvaluation(RBSystem& rb_sys)
+RBEIMEvaluation::RBEIMEvaluation(RBEIMSystem& rb_eim_sys_in)
   :
-  Parent(rb_sys)
+  rb_eim_sys(rb_eim_sys_in)
 {}
 
 
@@ -38,11 +39,9 @@ void RBEIMEvaluation::clear()
   interpolation_points_var.clear();
 }
 
-void RBEIMEvaluation::initialize()
+void RBEIMEvaluation::initialize(const unsigned int Nmax)
 {
-  Parent::initialize();
-
-  const unsigned int Nmax = rb_sys.get_Nmax();
+  Parent::initialize(Nmax);
 
   // Resize the data structures relevant to the EIM system
   interpolation_points.clear();
@@ -68,15 +67,16 @@ Real RBEIMEvaluation::RB_solve(unsigned int N)
     libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
     libmesh_error();
   }
-
-  RBEIMSystem& eim_sys = libmesh_cast_ref<RBEIMSystem&>(rb_sys);
+  
+  // This function uses rb_eim_sys, so set rb_eim_sys's parameter
+  rb_eim_sys.set_current_parameters( get_current_parameters() );
 
   // Get the rhs by sampling parametrized_function
   // at the first N interpolation_points
   DenseVector<Number> EIM_rhs(N);
   for(unsigned int i=0; i<N; i++)
   {
-    EIM_rhs(i) = eim_sys.evaluate_parametrized_function(interpolation_points_var[i], interpolation_points[i]);
+    EIM_rhs(i) = rb_eim_sys.evaluate_parametrized_function(interpolation_points_var[i], interpolation_points[i]);
   }
   
   
@@ -93,9 +93,9 @@ Real RBEIMEvaluation::RB_solve(unsigned int N)
     // First, sample the parametrized function at x_{N+1}
     Number g_at_next_x;
     if(N == get_n_basis_functions())
-      g_at_next_x = eim_sys.evaluate_parametrized_function(extra_interpolation_point_var, extra_interpolation_point);
+      g_at_next_x = rb_eim_sys.evaluate_parametrized_function(extra_interpolation_point_var, extra_interpolation_point);
     else
-      g_at_next_x = eim_sys.evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
+      g_at_next_x = rb_eim_sys.evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
 
     // Next, evaluate the EIM approximation at x_{N+1}
     Number EIM_approx_at_next_x = 0.;
@@ -150,6 +150,11 @@ void RBEIMEvaluation::RB_solve(DenseVector<Number>& EIM_rhs)
   STOP_LOG("RB_solve()", "RBEIMEvaluation");
 }
 
+AutoPtr<RBTheta> RBEIMEvaluation::build_rb_eim_theta(unsigned int index)
+{
+  return AutoPtr<RBTheta>(new RBEIMTheta(*this, index));
+}
+
 void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name)
 {
   START_LOG("write_offline_data_to_files()", "RBEIMEvaluation");
@@ -157,7 +162,6 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
   Parent::write_offline_data_to_files(directory_name);
 
   const unsigned int n_bfs = get_n_basis_functions();
-  libmesh_assert( n_bfs <= rb_sys.get_Nmax() );
 
   const unsigned int precision_level = 14;
 

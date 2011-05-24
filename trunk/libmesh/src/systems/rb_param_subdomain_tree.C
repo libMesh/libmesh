@@ -93,7 +93,7 @@ void RBParamSubdomainTree::build_root_node()
   root_node = new RBParamSubdomainNode(*this, _rb_system.get_current_parameters());
 }
 
-void RBParamSubdomainTree::hp_greedy()
+void RBParamSubdomainTree::hp_greedy(bool store_basis_functions)
 {
   START_LOG("hp_greedy()", "RBParamSubdomainTree");
 
@@ -104,7 +104,7 @@ void RBParamSubdomainTree::hp_greedy()
 
   root_node->copy_training_set_from_system();
 
-  root_node->hp_greedy();
+  root_node->hp_greedy(store_basis_functions);
 
   STOP_LOG("hp_greedy()", "RBParamSubdomainTree");
 }

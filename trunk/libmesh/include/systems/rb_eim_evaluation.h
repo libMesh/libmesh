@@ -25,7 +25,9 @@
 
 namespace libMesh
 {
-        
+
+class RBEIMSystem;
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -46,7 +48,7 @@ public:
   /**
    * Constructor.
    */
-  RBEIMEvaluation (RBSystem& rb_sys_in);
+  RBEIMEvaluation (RBEIMSystem& rb_eim_sys_in);
 
   /**
    * The type of the parent.
@@ -61,7 +63,7 @@ public:
   /**
    * Initialize this object by allocating the necessary data fields.
    */
-  virtual void initialize();
+  virtual void initialize(const unsigned int Nmax);
 
   /**
    * Calculate the EIM approximation to parametrized_function
@@ -79,6 +81,12 @@ public:
   void RB_solve(DenseVector<Number>& EIM_rhs);
 
   /**
+   * Build a new RBTheta object that accesses the i^th component
+   * of the RB_solution member variable of this RBEvaluation.
+   */
+  AutoPtr<RBTheta> build_rb_eim_theta(const unsigned int index);
+
+  /**
    * Write out all the data to text files in order to segregate the
    * Offline stage from the Online stage.
    */
@@ -91,6 +99,11 @@ public:
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
   
   //----------- PUBLIC DATA MEMBERS -----------//
+
+  /**
+   * A reference to an RBEIMSystem.
+   */
+  RBEIMSystem& rb_eim_sys;
 
   /**
    * Dense matrix that stores the lower triangular

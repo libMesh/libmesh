@@ -85,7 +85,8 @@ int main (int argc, char** argv)
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
   const unsigned int dim = 2;                      // The number of spatial dimensions
   
-  bool online_mode = infile("online_mode", false); // Are we in Online mode?
+  bool online_mode = infile("online_mode", false);                    // Are we in Online mode?
+  bool store_basis_functions = infile("store_basis_functions", true); // Do we write the RB basis functions to disk?
 
   // Create a one-dimensional mesh.
   Mesh mesh (dim);
@@ -98,9 +99,9 @@ int main (int argc, char** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // We override RBSystem with SimpleRB in order to specialize a few functions.
-  SimpleRB & system =
-    equation_systems.add_system<SimpleRB> ("RBConvectionDiffusion");
+  // We override RBSystem with SimpleRBSytem in order to specialize a few functions.
+  SimpleRBSystem & system =
+    equation_systems.add_system<SimpleRBSystem> ("RBConvectionDiffusion");
 
 
   // Initialize the data structures for the equation system.
@@ -171,13 +172,17 @@ int main (int argc, char** argv)
     // these snapshots as basis functions.
     system.train_reduced_basis();
     
-    // Write out the reduced basis data
-    system.write_offline_data_to_files();
+    system.rb_eval->write_offline_data_to_files();
+    
+    if(store_basis_functions)
+    {
+      system.rb_eval->write_out_basis_functions(system);
+    }
   }
   else
   {
     // Read in the reduced basis data
-    system.read_offline_data_from_files();
+    system.rb_eval->read_offline_data_from_files();
     
     // Get the parameters at which we do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
@@ -188,8 +193,8 @@ int main (int argc, char** argv)
     }
 
     // Set the parameters to online_mu_vector
-    system.set_current_parameters(online_mu_vector);
-    system.print_current_parameters();
+    system.rb_eval->set_current_parameters(online_mu_vector);
+    system.rb_eval->print_current_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
     system.rb_eval->RB_solve(online_N);
@@ -206,16 +211,17 @@ int main (int argc, char** argv)
               << std::endl;
     std::cout << "output 4, value = " << system.rb_eval->RB_outputs[3]
               << ", bound = " << system.rb_eval->RB_output_error_bounds[3]
-              << std::endl;
+              << std::endl << std::endl;
 
-    // If we stored the basis functions in the offline_data directory, plot the RB solution
-    if(system.store_basis_functions)
+    if(store_basis_functions)
     {
+      system.rb_eval->read_in_basis_functions(system);
+    
       system.load_RB_solution();
-      ExodusII_IO(mesh).write_equation_systems ("RB_sol.exd",equation_systems);
+      ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
       
       system.load_basis_function(0);
-      ExodusII_IO(mesh).write_equation_systems ("bf0.exd",equation_systems);
+      ExodusII_IO(mesh).write_equation_systems ("bf0.e",equation_systems);
     }
   }
 

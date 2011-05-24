@@ -96,7 +96,7 @@ unsigned int RBParamSubdomainNode::n_global_training_parameters() const
     return global_training_set_size;
 }
 
-void RBParamSubdomainNode::hp_greedy()
+void RBParamSubdomainNode::hp_greedy(bool store_basis_functions)
 {
     _rb_system.rb_eval->clear();
 
@@ -129,8 +129,8 @@ void RBParamSubdomainNode::hp_greedy()
         libMesh::out << "h tolerance not satisfied, splitting subdomain..." << std::endl;
         split_this_subdomain(true);
 
-        left_child->hp_greedy();
-        right_child->hp_greedy();
+        left_child->hp_greedy(store_basis_functions);
+        right_child->hp_greedy(store_basis_functions);
     }
     else // terminate branch, populate the model with standard p-type, write out subelement data
     {
@@ -141,8 +141,8 @@ void RBParamSubdomainNode::hp_greedy()
             libMesh::out << "p tolerance not satisfied, splitting subdomain..." << std::endl;
             split_this_subdomain(false);
 
-            left_child->hp_greedy();
-            right_child->hp_greedy();
+            left_child->hp_greedy(store_basis_functions);
+            right_child->hp_greedy(store_basis_functions);
         }
         else
         {
@@ -150,7 +150,7 @@ void RBParamSubdomainNode::hp_greedy()
 
             // Finally, write out the data for this subdomain
             this->model_number = _tree.leaf_node_index;
-            write_subdomain_data_to_files();
+            write_subdomain_data_to_files(store_basis_functions);
             _tree.leaf_node_index++;
         }
     }
@@ -201,7 +201,7 @@ Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound)
     return greedy_bound;
 }
 
-void RBParamSubdomainNode::write_subdomain_data_to_files()
+void RBParamSubdomainNode::write_subdomain_data_to_files(bool store_basis_functions)
 {
     START_LOG("write_subdomain_data_to_files()", "RBParamSubdomainNode");
 
@@ -211,7 +211,12 @@ void RBParamSubdomainNode::write_subdomain_data_to_files()
     std::stringstream dir_name_stream;
     dir_name_stream << "offline_data_hp" << _tree.leaf_node_index;
     const std::string& directory_name = dir_name_stream.str();
-    _rb_system.write_offline_data_to_files(directory_name);
+    _rb_system.rb_eval->write_offline_data_to_files(directory_name);
+    
+    if(store_basis_functions)
+    {
+      _rb_system.rb_eval->write_out_basis_functions(_rb_system, /*write_binary*/ true, directory_name);
+    }
 
     STOP_LOG("write_subdomain_data_to_files()", "RBParamSubdomainNode");
 }

@@ -28,18 +28,32 @@
 using libMesh::EquationSystems;
 using libMesh::FEMContext;
 using libMesh::RBSystem;
+using libMesh::RBEvaluation;
 using libMesh::Real;
 
-// A simple subclass of RBSystem since we need to specialize
-// get_SCM_lower_bound and get_SCM_upper_bound to return
-// (a lower bound for) the coercivity constant for this problem,
-// which is 0.05.
 
-class SimpleRB : public RBSystem
+// A simple subclass of RBEvaluation, which just needs to specify
+// (a lower bound for) the coercivity constant for this problem.
+// For this simple convection-diffusion problem, we can set the
+// coercivity constant lower bound to 0.05.
+class SimpleRBEvaluation : public RBEvaluation
 {
 public:
 
-  SimpleRB (EquationSystems& es,
+  /**
+   * The coercivity constant is bounded below by 0.05.
+   */
+  virtual Real get_stability_lower_bound() { return 0.05; }
+
+};
+
+// A simple subclass of RBSystem, which just needs to override build_rb_evaluation
+// in order to build a SimpleRBEvaluation object, rather than an RBEvaluation object.
+class SimpleRBSystem : public RBSystem
+{
+public:
+
+  SimpleRBSystem (EquationSystems& es,
             const std::string& name,
             const unsigned int number)
   : Parent(es, name, number)
@@ -48,27 +62,25 @@ public:
   /**
    * Destructor.
    */
-  virtual ~SimpleRB () {}
+  virtual ~SimpleRBSystem () {}
 
   /**
    * The type of system.
    */
-  typedef SimpleRB sys_type;
+  typedef SimpleRBSystem sys_type;
 
   /**
    * The type of the parent.
    */
   typedef RBSystem Parent;
-
+  
   /**
-   * The coercivity constant is bounded below by 0.05.
+   * Override build_rb_evaluation to build a SimpleRBEvaluation.
    */
-  virtual Real get_SCM_lower_bound() { return 0.05; }
-
-  /**
-   * Use 0.05 here as well.
-   */
-  virtual Real get_SCM_upper_bound() { return 0.05; }
+  virtual AutoPtr<RBEvaluation> build_rb_evaluation()
+  {
+    return AutoPtr<RBEvaluation>(new SimpleRBEvaluation);
+  }
 
   /**
    * Initialize data structures.
