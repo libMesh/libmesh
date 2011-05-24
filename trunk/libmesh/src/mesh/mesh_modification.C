@@ -1358,6 +1358,25 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
     }
 }
 
+
+
+void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
+						   const short int old_id,
+						   const short int new_id)
+{
+  MeshBase::element_iterator           el = mesh.elements_begin();
+  const MeshBase::element_iterator end_el = mesh.elements_end();
+  
+  for (; el != end_el; ++el)
+    {
+      Elem *elem = *el;
+
+      if (elem->subdomain_id() == old_id)
+	elem->subdomain_id() = new_id;
+    }
+}
+  
+
 } // namespace libMesh
 
 
