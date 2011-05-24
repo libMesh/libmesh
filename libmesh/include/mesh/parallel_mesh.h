@@ -410,7 +410,7 @@ protected:
 
   /**
    * These are extra ghost elements that we want to make sure
-   * not to delete when we call delete_remote_elemenst()
+   * not to delete when we call delete_remote_elements()
    */
   std::set<Elem *> _extra_ghost_elems;
   
