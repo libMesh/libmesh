@@ -2494,7 +2494,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
       while (elem)
         {
           unsigned int elemid = elem->id();
-          libmesh_assert(elemid < local_nodes.size());
+          libmesh_assert(elemid < semilocal_elems.size());
           semilocal_elems[elemid] = true;
 
           const Elem *parent = elem->parent();
