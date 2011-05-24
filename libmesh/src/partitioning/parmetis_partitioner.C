@@ -564,6 +564,9 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 
 void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 {
+  // This function must be run on all processors at once
+  parallel_only();
+
   const unsigned int 
     first_local_elem = _vtxdist[libMesh::processor_id()];
     
