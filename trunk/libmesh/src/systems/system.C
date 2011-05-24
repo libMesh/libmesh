@@ -1413,7 +1413,7 @@ std::string System::get_info() const
   
   const std::string& sys_name = this->name();
       
-  out << "   System \"" << sys_name << "\"\n"
+  out << "   System #"  << this->number() << ", \"" << sys_name << "\"\n"
       << "    Type \""  << this->system_type() << "\"\n"
       << "    Variables=";
   
