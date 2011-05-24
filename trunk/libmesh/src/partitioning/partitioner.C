@@ -302,7 +302,8 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
       // all their children.
 
       // We will use a brute-force approach here.  Each processor finds its parent
-      // elements and sets the parent pid to the minimum of its local children.
+      // elements and sets the parent pid to the minimum of its
+      // semilocal descendants.
       // A global reduction is then performed to make sure the true minimum is found.
       // As noted, this is required because we cannot guarantee that a parent has
       // access to all its children on any single processor.
@@ -344,8 +345,10 @@ void Partitioner::set_parent_processor_ids(MeshBase& mesh)
 		  have_parent_in_block = true;
 		  processor_id_type parent_pid = DofObject::invalid_processor_id;
 
-		  for (unsigned int c=0; c<parent->n_children(); c++)
-		    parent_pid = std::min (parent_pid, parent->child(c)->processor_id());
+                  std::vector<const Elem*> active_family;
+                  parent->active_family_tree(active_family);
+                  for (unsigned int i = 0; i != active_family.size(); ++i)
+                    parent_pid = std::min (parent_pid, active_family[i]->processor_id());
 		  
 		  const unsigned int packed_idx = parent_idx - first_elem_id;
 		  libmesh_assert (packed_idx < parent_processor_ids.size());
