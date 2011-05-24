@@ -21,10 +21,11 @@
 #define __transient_rb_evaluation_h__
 
 #include "rb_evaluation.h"
-#include "transient_rb_system.h"
 
 namespace libMesh
 {
+
+class TransientRBThetaExpansion;
         
 /**
  * This class is part of the rbOOmit framework.
@@ -37,6 +38,79 @@ namespace libMesh
  * @author David J. Knezevic, 2011
  */
 
+/**
+ * Define a class that encapsulates the details of a
+ * "generalized Euler" temporal discretization.
+ */
+class TemporalDiscretization
+{
+public:
+
+  /**
+   * Constructor.
+   */
+  TemporalDiscretization()
+  : _delta_t(0.),
+    _euler_theta(0.),
+    _current_time_step(0),
+    _n_time_steps(0)
+  {}
+
+  /**
+   * Get/set delta_t, the time-step size.
+   */
+  Real get_delta_t() const                { return _delta_t; }
+  void set_delta_t(const Real delta_t_in) { _delta_t = delta_t_in; }
+  
+  /**
+   * Get/set euler_theta, parameter that determines
+   * the temporal discretization.
+   */
+  Real get_euler_theta() const                    { return _euler_theta; }
+  void set_euler_theta(const Real euler_theta_in) { libmesh_assert((0. <= euler_theta_in ) && (euler_theta_in <= 1.));
+                                                    _euler_theta = euler_theta_in; }
+
+  /**
+   * Get/set the current time-step.
+   */
+  unsigned int get_time_step() const       { return _current_time_step; }
+  void set_time_step(const unsigned int k) { libmesh_assert(k <= get_n_time_steps()); this->_current_time_step = k; }
+
+  /**
+   * Get/set the total number of time-steps.
+   */
+  unsigned int get_n_time_steps() const       { return _n_time_steps; }
+  void set_n_time_steps(const unsigned int K) { _n_time_steps = K; }
+  
+private:
+
+  /**
+   * The time-step size.
+   */
+  Real _delta_t;
+  
+  /**
+   * The parameter that determines the generalized Euler scheme
+   * discretization that we employ.
+   * euler_theta = 0   ---> Forward Euler
+   * euler_theta = 0.5 ---> Crank-Nicolson
+   * euler_theta = 1   ---> Backward Euler
+   */
+  Real _euler_theta;
+
+  /**
+   * The current time-step.
+   */
+  unsigned int _current_time_step;
+
+  /**
+   * The number of time-steps.
+   */
+  unsigned int _n_time_steps;
+
+};
+
+
 // ------------------------------------------------------------
 // QNTransientRBEvaluation class definition
 
@@ -47,7 +121,7 @@ public:
   /**
    * Constructor.
    */
-  TransientRBEvaluation (TransientRBSystem& rb_sys_in);
+  TransientRBEvaluation ();
 
   /**
    * The type of the parent.
@@ -61,12 +135,13 @@ public:
   virtual void clear();
 
   /**
+   * Initialize this TransientRBEvaluation object.
    * Resize and clear the data vectors corresponding to the
    * value of \p Nmax.
-   * Overloaded to clear data relevant in the time-dependent
+   * Overloaded to resize data relevant in the time-dependent
    * case.
    */
-  virtual void resize_RB_data(const unsigned int Nmax);
+  virtual void initialize(const unsigned int Nmax);
 
   /**
    * Perform online solve for current_params
@@ -74,6 +149,20 @@ public:
    * to perform a time-dependent solve.
    */
   virtual Real RB_solve(unsigned int N);
+
+  /**
+   * Initialize any extra objects that we may need to attach to an
+   * RB object. Overload to also initialize a TemporalDiscretization
+   * object.
+   */
+  virtual void init_extra_data_objects();
+
+  /**
+   * Specifies the residual scaling on the numerator to
+   * be used in the a posteriori error bound. Overload
+   * in subclass in order to obtain the desired error bound.
+   */
+  virtual Real residual_scaling_numer(Real alpha_LB);
 
   /**
    * Compute the dual norm of the residual for the solution
@@ -118,6 +207,12 @@ public:
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
   
   //----------- PUBLIC DATA MEMBERS -----------//
+
+  /**
+   * The object that defines the properties of the
+   * temporal discretization that we employ.
+   */
+  AutoPtr< TemporalDiscretization > temporal_discretization;
 
   /**
    * Dense RB L2 matrix.
@@ -194,6 +289,18 @@ public:
    * These are basis dependent and hence stored here.
    */
   std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
+
+protected:
+
+  /**
+   * Build a new TransientRBThetaExpansion object and return an AutoPtr to it.
+   */
+  virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion(std::vector<Real>& parameters_ref);
+
+  /**
+   * Build a new TemporalDiscretization object and return an AutoPtr to it.
+   */
+  virtual AutoPtr<TemporalDiscretization> build_temporal_discretization();
 
 };
 

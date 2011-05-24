@@ -23,7 +23,7 @@
 #include "linear_implicit_system.h"
 #include "dense_vector.h"
 #include "dense_matrix.h"
-#include "rb_base.h"
+#include "rb_base_system.h"
 #include "fem_context.h"
 #include "rb_evaluation.h"
 #include "elem_assembly.h"
@@ -56,7 +56,7 @@ public:
 // ------------------------------------------------------------
 // RBSystem class definition
 
-class RBSystem : public RBBase<LinearImplicitSystem>
+class RBSystem : public RBBaseSystem<LinearImplicitSystem>
 {
 public:
 
@@ -86,7 +86,7 @@ public:
   /**
    * The type of the parent.
    */
-  typedef RBBase<LinearImplicitSystem> Parent;
+  typedef RBBaseSystem<LinearImplicitSystem> Parent;
 
   /**
    * Clear all the data structures associated with
@@ -106,6 +106,12 @@ public:
    * are employed as basis functions.
    */
   virtual Real truth_solve(int plot_solution);
+  
+  /**
+   * Set parameters in rb_eval to this->get_current_parameters() and
+   * then perform an RB_solve using rb_eval.
+   */
+  Real RB_solve(unsigned int N);
 
   /**
    * Train the reduced basis. This is the crucial function in the Offline
@@ -134,11 +140,6 @@ public:
   std::vector<Real> get_greedy_parameter(unsigned int i);
 
   /**
-   * Set the name of the eigen_system that performs the SCM.
-   */
-  void set_eigen_system_name(const std::string& name);
-
-  /**
    * Get/set the tolerance for the basis training.
    */
   void set_training_tolerance(Real training_tolerance)
@@ -151,33 +152,6 @@ public:
    */
   unsigned int get_Nmax() const    { return Nmax; }
   virtual void set_Nmax(unsigned int Nmax);
-
-  /**
-   * Get Q_f, the number of terms in the affine
-   * expansion for the right-hand side.
-   */
-  unsigned int get_Q_f() const { return theta_q_f_vector.size() + get_n_F_EIM_functions(); }
-
-  /**
-   * Get the number of EIM systems that will provide vectors on
-   * the "right-hand side" of the PDE.
-   */
-  unsigned int get_n_F_EIM_systems() const;
-
-  /**
-   * Get the number of EIM RHS functions that are currently attached.
-   */
-  unsigned int get_n_F_EIM_functions() const;
-
-  /**
-   * Get n_outputs, the number output functionals.
-   */
-  unsigned int get_n_outputs() const { return theta_q_l_vector.size(); }
-  
-  /**
-   * Get the number of affine terms associated with the specified output.
-   */
-  unsigned int get_Q_l(unsigned int output_index) const;
 
   /**
    * Set the quiet_mode flag. If quiet == false then
@@ -227,26 +201,6 @@ public:
   void initialize_dirichlet_dofs();
 
   /**
-   * Override attach_theta_q_a to just throw an error. Should
-   * use attach_A_q in RBSystem and its subclasses.
-   */
-  virtual void attach_theta_q_a(RBTheta* )
-  {
-    libMesh::out << "Error: Cannot use attach_theta_q_a in RBSystem. Use attach_A_q instead." << std::endl;
-    libmesh_error();
-  }
-
-  /**
-   * Override attach_A_EIM_system to just throw an error. Should
-   * use attach_A_EIM_system in RBSystem and its subclasses.
-   */
-  virtual void attach_A_EIM_system(RBEIMSystem*)
-  {
-    libMesh::out << "Error: Cannot use attach_theta_q_a in RBSystem. Use attach_A_q instead." << std::endl;
-    libmesh_error();
-  }
-
-  /**
    * Attach parameter-dependent function and user-defined assembly routine
    * for affine operator (both interior and boundary assembly).
    */
@@ -259,28 +213,6 @@ public:
    */
   virtual void attach_F_q(RBTheta* theta_q_f,
                           ElemAssembly* F_q_assembly);
-
-  /**
-   * Attach an EIM system and a corresponding function pointers to
-   * specify the assembly operation. Together these will provide
-   * a set of LHS affine operators.
-   */
-  void attach_A_EIM_operators(RBEIMSystem* eim_system,
-                              ElemAssembly* EIM_assembly);
-  
-  /**
-   * Attach an EIM system and a corresponding function pointers to
-   * specify the assembly operation. Together these will provide
-   * a set of RHS affine functions.
-   */
-  void attach_F_EIM_vectors(RBEIMSystem* eim_system,
-                            ElemAssembly* EIM_assembly);
-
-  /**
-   * @return a boolean to indicate whether the index q refers
-   * to an RHS EIM operator.
-   */
-  bool is_F_EIM_function(unsigned int q);
 
   /**
    * Attach user-defined assembly routine
@@ -338,35 +270,6 @@ public:
    * Get a pointer to non_dirichlet_A_q.
    */
   SparseMatrix<Number>* get_non_dirichlet_A_q(unsigned int q);
-  
-  /**
-   * Get a reference to the specified LHS EIM system.
-   */
-  RBEIMSystem& get_A_EIM_system(unsigned int index);
-  
-  /**
-   * Get a reference to the specified RHS EIM system.
-   */
-  RBEIMSystem& get_F_EIM_system(unsigned int index);
-  
-  /**
-   * Evaluate the EIM function that is currently being employed
-   * for affine assembly.
-   * @return the function values at the \p qpoints, where qpoints
-   * are on \p element.
-   */
-  std::vector<Number> evaluate_current_EIM_function(Elem& element,
-                                                    const std::vector<Point>& qpoints);
-
-  /**
-   * Evaluate theta_q_f at the current parameter.
-   */
-  virtual Number eval_theta_q_f(unsigned int q);
-
-  /**
-   * Evaluate theta_q_l at the current parameter.
-   */
-  Number eval_theta_q_l(unsigned int output_index, unsigned int q_l);
 
   /**
    * Resize all the RB matrices.
@@ -427,34 +330,24 @@ public:
   void add_scaled_Aq(Number scalar, unsigned int q_a,
                      SparseMatrix<Number>* input_matrix,
                      bool symmetrize);
-  
-  /**
-   * A convenient enum that allows us to specify whether we want
-   * to write out all the data, or just a basis (in)dependent subset.
-   */
-  enum RBDataIO { ALL_DATA          = 1,
-                  BASIS_DEPENDENT   = 2,
-                  BASIS_INDEPENDENT = 3 };
 
   /**
-   * Write out all the data to text files in order to segregate the
-   * Offline stage from the Online stage.
-   * \p directory_name specifies which directory to write to.
-   * \p io_flag specifies whether we write out all data, or only
-   * a basis (in)dependent subset.
+   * Write out all the Riesz representor data to files.
+   * \p residual_representors_dir specifies which directory to write to.
+   * \p write_binary_residual_representors specifies whether we write binary or ASCII data.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
-                                           const RBDataIO io_flag = ALL_DATA);
+  virtual void write_riesz_representors_to_files(const std::string& riesz_representors_dir,
+                                                 const bool write_binary_residual_representors);
 
   /**
-   * Read in the saved Offline reduced basis data
-   * to initialize the system for Online solves.
+   * Read in all the Riesz representor data from files.
    * \p directory_name specifies which directory to read from.
    * \p io_flag specifies whether we read in all data, or only
    * a basis (in)dependent subset.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
-                                            const RBDataIO io_flag = ALL_DATA);
+  virtual void read_riesz_representors_from_files(const std::string& riesz_representors_dir,
+                                                  const bool write_binary_residual_representors);
+
   
   /**
    * This function computes all of the residual representors, can be useful
@@ -466,24 +359,17 @@ public:
   virtual void recompute_all_residual_terms(const bool compute_inner_products=true);
 
   /**
-   * Build a new RBEvaluation object and add
-   * it to the rb_evaluation_objects vector.
-   * @return a pointer to the new RBEvaluation object.
+   * Build a new RBEvaluation object.
+   * @return an AutoPtr to the new RBEvaluation object.
    */
-  virtual RBEvaluation* add_new_rb_evaluation_object();
-  
-  /**
-   * Evaluate the dual norm of output \p n
-   * for the current parameters.
-   */
-  Real eval_output_dual_norm(unsigned int n);
+  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
-   * Specifies the residual scaling on the denominator to
-   * be used in the a posteriori error bound. Overload
-   * in subclass in order to obtain the desired error bound.
+   * Build a new RBEvaluation object, add it to this system
+   * and initialize the RBEvaluation based on the system's setup,
+   * i.e. copy over parameter domain and theta_q expansion.
    */
-  virtual Real residual_scaling_denom(Real alpha_LB);
+  void add_and_initialize_rb_eval();
 
   /**
    * Get delta_N, the number of basis functions we
@@ -493,16 +379,6 @@ public:
    * systems.
    */
   unsigned int get_delta_N() const { return delta_N; }
-
-  /**
-   * Get the SCM lower bound at the current parameter value.
-   */
-  virtual Real get_SCM_lower_bound();
-
-  /**
-   * Get the SCM upper bound at the current parameter value.
-   */
-  virtual Real get_SCM_upper_bound();
 
 
   //----------- PUBLIC DATA MEMBERS -----------//
@@ -592,20 +468,6 @@ public:
   bool constrained_problem;
 
   /**
-   * Boolean flag to indicate whether the basis functions are written
-   * out from the Offline stage or read in during the Online stage.
-   */
-  bool store_basis_functions;
-
-  /**
-   * Boolean flag to indicate whether the residual representors are
-   * written out from the offline stage.  For large problems, reading
-   * them back in during a restart can be much faster than recomputing
-   * them.
-   */
-  bool store_representors;
-
-  /**
    * Boolean flag to indicate whether or not we are in "low-memory" mode.
    * In low-memory mode, we do not store any extra sparse matrices.
    */
@@ -620,6 +482,7 @@ public:
   /**
    * Boolean flag to indicate whether RB_solve returns an absolute
    * or relative error bound. True => relative, false => absolute.
+   * This flag is passed on to specific RBEvaluation objects.
    */
   bool return_rel_error_bound;
 
@@ -644,7 +507,7 @@ public:
   bool impose_internal_fluxes;
   
   /**
-   * Boolean flag to indicate whether we compute the RB_inner_product_matrix
+   * Boolean flag to indicate whether we compute the RB_inner_product_matrix.
    */
   bool compute_RB_inner_product;
 
@@ -668,38 +531,6 @@ public:
    * "undersolve" Newton iterates for the sake of efficiency.
    */
   bool enforce_constraints_exactly;
-
-  /**
-   * Controls whether or not XDR (binary) files are written out for
-   * the basis functions.  The binary file size can be as small
-   * as 1/3 the size of an ASCII file.
-   */
-  bool write_binary_basis_functions;
-
-  /**
-   * Controls wether XDR (binary) files are read for
-   * the basis functions.  Note: if you wrote ASCII basis functions
-   * during a previous run but want to start writing XDR, set
-   * read_binary_basis_functions = false and
-   * write_binary_basis_functions = true.
-   */
-  bool read_binary_basis_functions;
-
-  /**
-   * Controls whether or not XDR (binary) files are written out for
-   * the residual respresentors.  The binary file size can be as small
-   * as 1/3 the size of an ASCII file.
-   */
-  bool write_binary_residual_representors;
-
-  /**
-   * Controls wether XDR (binary) files are read for
-   * the residual representors.  Note: if you wrote ASCII representors
-   * during a previous run but want to start writing XDR, set
-   * read_binary_residual_representors = false and
-   * write_binary_residual_representors = true.
-   */
-  bool read_binary_residual_representors;
 
   /**
    * A boolean flag to indicate whether or not we initialize the
@@ -843,7 +674,7 @@ protected:
    * This function returns the RB error bound for the current parameters and
    * is used in the Greedy algorithm to select the next parameter.
    */
-  virtual Real get_RB_error_bound() { return rb_eval->RB_solve(get_n_basis_functions()); }
+  virtual Real get_RB_error_bound() { return RB_solve(get_n_basis_functions()); }
 
   /**
    * Compute the reduced basis matrices for the current basis.
@@ -868,6 +699,12 @@ protected:
   virtual void init_context(FEMContext& ) {}
 
   /**
+   * Copy this system's parameter domain and theta_q functors
+   * over to rb_eval.
+   */
+  virtual void copy_system_data_to_rb_eval();
+
+  /**
    * Set the dofs on the Dirichlet boundary (stored in
    * the set global_dirichlet_dofs) to zero
    * in the right-hand side vector.
@@ -880,13 +717,6 @@ protected:
    * in the vector temp.
    */
   void zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp);
-  
-  /**
-   * @return the EIM system and affine function indices associated with
-   * the RHS index q.
-   */
-  std::pair<unsigned int, unsigned int> get_F_EIM_indices(unsigned int q);
-
 
   //----------- PROTECTED DATA MEMBERS -----------//
 
@@ -907,12 +737,6 @@ protected:
    * the Offline stage.
    */
   bool quiet_mode;
-
-  /**
-   * The name of the RBSCMSystem system that performs
-   * the SCM.
-   */
-  std::string eigen_system_name;
 
   /**
    * Pointer to inner product assembly.
@@ -963,34 +787,6 @@ private:
   //----------- PRIVATE DATA MEMBERS -----------//
 
   /**
-   * Vector storing the RBTheta functors for the theta_q_f (affine expansion of the rhs).
-   */
-  std::vector<RBTheta*> theta_q_f_vector;
-
-  /**
-   * Vector storing the RBTheta functors for the theta_q_l (affine expansion of the outputs).
-   */
-  std::vector< std::vector<RBTheta*> > theta_q_l_vector;
-  
-  /**
-   * Vector storing the EIM systems that provide additional affine functions
-   * on the "right-hand side" of the PDE.
-   */
-  std::vector< RBEIMSystem* > F_EIM_systems_vector;
-
-  /**
-   * Vector storing the function pointers to the assembly
-   * routines for the LHS EIM affine operators.
-   */
-  std::vector<ElemAssembly*> A_EIM_assembly_vector;
-
-  /**
-   * Vector storing the function pointers to the assembly
-   * routines for the RHS EIM affine operators.
-   */
-  std::vector<ElemAssembly*> F_EIM_assembly_vector;
-
-  /**
    * Vector storing the Q_a matrices from the affine expansion
    */
   std::vector< SparseMatrix<Number>* > A_q_vector;
@@ -1029,14 +825,7 @@ private:
    * Boolean flag to indicate whether the RBSystem has been initialized.
    */
   bool RB_system_initialized;
-  
-  /**
-   * Pointer to the current LHS or RHS EIM systems. This pointer
-   * is used during assembly routines in order to loop over the
-   * set of LHS and RHS EIM functions. The user can access the results
-   * of EIM function evaluation via evaluate_current_EIM_function.
-   */
-  RBEIMSystem* current_EIM_system;
+
 };
 
 } // namespace libMesh

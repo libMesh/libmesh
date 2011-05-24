@@ -39,7 +39,7 @@ namespace libMesh
 /**
  * The typedef for the function to be approximated.
  */
-typedef Number (*parametrized_function_fptr)(const Point&, const RBSystem&);
+typedef Number (*parametrized_function_fptr)(const Point&, RBSystem&);
 
 // ------------------------------------------------------------
 // RBEIMSystem class definition
@@ -111,10 +111,9 @@ public:
   virtual void init_context(FEMContext &c);
   
   /**
-   * Build a new RBEIMEvaluation object and add
-   * it to the rb_evaluation_objects vector.
+   * Build a new RBEIMEvaluation object.
    */
-  virtual RBEvaluation* add_new_rb_evaluation_object();
+  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
    * Override attach_theta_q_a to just throw an error. Should
@@ -144,17 +143,13 @@ public:
   virtual unsigned int get_n_affine_functions() const;
   
   /**
-   * Evaluate the affine function at the specified points on element.
+   * Evaluate the basis function \p index at the points \p qpoints
+   * on element \p element.
+   * @return a vector of values corresponding to qpoints.
    */
-  std::vector<Number> evaluate_current_affine_function(Elem& element,
-                                                       const std::vector<Point>& qpoints);
-
-  /**
-   * Load a GHOSTED version of the basis function specified by function_index
-   * into the vector current_ghosted_bf so that we can efficiently interpolate
-   * this basis function.
-   */
-  void cache_ghosted_basis_function(unsigned int function_index);
+  std::vector<Number> evaluate_basis_function(unsigned int index,
+                                              Elem& element,
+                                              const std::vector<Point>& qpoints);
 
   //----------- PUBLIC DATA MEMBERS -----------//
   
@@ -207,6 +202,14 @@ protected:
    * basis training. Overload in subclasses to specialize.
    */
   virtual bool greedy_termination_test(Real training_greedy_error, int count);
+
+  /**
+   * Helper function to load a GHOSTED version of the basis function specified
+   * by \p basis_function_index_in into the vector current_ghosted_bf so that
+   * we can efficiently interpolate this basis function.
+   * If basis_function_index_in == current_bf_index, then this function does nothing.
+   */
+  void set_current_basis_function(unsigned int basis_function_index_in);
   
 private:
 
@@ -237,11 +240,11 @@ private:
   AutoPtr< NumericVector<Number> > current_ghosted_bf;
   
   /**
-   * We also need to store a variable number associated wtih current_ghosted_bf
-   * because we assume that each variable can correspond to a different
-   * EIM approximation.
+   * We also need to store a basis function index to identify which basis function
+   * is currently stored in current_ghosted_bf. This allows us to cache the basis
+   * function and avoid unnecessarily reloading it all the time.
    */
-  unsigned int current_variable_number;
+  unsigned int current_bf_index;
   
   /**
    * We also need an extra vector in which we can store a serialized

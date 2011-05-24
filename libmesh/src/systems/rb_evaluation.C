@@ -36,11 +36,12 @@
 namespace libMesh
 {
 
-RBEvaluation::RBEvaluation (RBSystem& rb_sys_in)
+RBEvaluation::RBEvaluation ()
   :
-  rb_sys(rb_sys_in),
   multiple_files_for_outputs(false),
-  evaluate_RB_error_bound(true)
+  evaluate_RB_error_bound(true),
+  return_rel_error_bound(false),
+  compute_RB_inner_product(false)
 {
 }
 
@@ -75,16 +76,9 @@ void RBEvaluation::clear()
   STOP_LOG("clear()", "RBEvaluation");
 }
 
-void RBEvaluation::initialize()
+void RBEvaluation::initialize(const unsigned int Nmax)
 {
-  const unsigned int Nmax = rb_sys.get_Nmax();
-
-  resize_RB_data(Nmax);
-}
-
-void RBEvaluation::resize_RB_data(const unsigned int Nmax)
-{
-  START_LOG("resize_RB_data()", "RBEvaluation");
+  START_LOG("initialize()", "RBEvaluation");
 
   if(Nmax < this->get_n_basis_functions())
   {
@@ -94,38 +88,42 @@ void RBEvaluation::resize_RB_data(const unsigned int Nmax)
   }
 
   // Resize/clear inner product matrix
-  if(rb_sys.compute_RB_inner_product)
+  if(compute_RB_inner_product)
     RB_inner_product_matrix.resize(Nmax,Nmax);
 
   // Allocate dense matrices for RB solves
-  RB_A_q_vector.resize(rb_sys.get_Q_a());
+  RB_A_q_vector.resize(rb_theta_expansion->get_Q_a());
 
-  for(unsigned int q=0; q<rb_sys.get_Q_a(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
   {
     // Initialize the memory for the RB matrices
     RB_A_q_vector[q].resize(Nmax,Nmax);
   }
 
-  RB_F_q_vector.resize(rb_sys.get_Q_f());
+  RB_F_q_vector.resize(rb_theta_expansion->get_Q_f());
 
-  for(unsigned int q=0; q<rb_sys.get_Q_f(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_f(); q++)
   {
     // Initialize the memory for the RB vectors
     RB_F_q_vector[q].resize(Nmax);
   }
 
+  // Initialize vectors for the norms of the Fq representors
+  unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
+  Fq_representor_norms.resize(Q_f_hat);
+
   // Initialize vectors for the norms of the representors
-  Fq_Aq_representor_norms.resize(rb_sys.get_Q_f());
-  for(unsigned int i=0; i<rb_sys.get_Q_f(); i++)
+  Fq_Aq_representor_norms.resize(rb_theta_expansion->get_Q_f());
+  for(unsigned int i=0; i<rb_theta_expansion->get_Q_f(); i++)
   {
-    Fq_Aq_representor_norms[i].resize(rb_sys.get_Q_a());
-    for(unsigned int j=0; j<rb_sys.get_Q_a(); j++)
+    Fq_Aq_representor_norms[i].resize(rb_theta_expansion->get_Q_a());
+    for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
     {
       Fq_Aq_representor_norms[i][j].resize(Nmax, 0.);
     }
   }
 
-  unsigned int Q_a_hat = rb_sys.get_Q_a()*(rb_sys.get_Q_a()+1)/2;
+  unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
   Aq_Aq_representor_norms.resize(Q_a_hat);
   for(unsigned int i=0; i<Q_a_hat; i++)
   {
@@ -137,30 +135,38 @@ void RBEvaluation::resize_RB_data(const unsigned int Nmax)
   }
 
   // Initialize the RB output vectors
-  RB_output_vectors.resize(rb_sys.get_n_outputs());
-  for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+  RB_output_vectors.resize(rb_theta_expansion->get_n_outputs());
+  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
   {
-    RB_output_vectors[n].resize(rb_sys.get_Q_l(n));
-    for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+    RB_output_vectors[n].resize(rb_theta_expansion->get_Q_l(n));
+    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
     {
       RB_output_vectors[n][q_l].resize(Nmax);
     }
   }
 
   // Initialize vectors storing output data
-  RB_outputs.resize(rb_sys.get_n_outputs(), 0.);
-  RB_output_error_bounds.resize(rb_sys.get_n_outputs(), 0.);
+  RB_outputs.resize(rb_theta_expansion->get_n_outputs(), 0.);
+  RB_output_error_bounds.resize(rb_theta_expansion->get_n_outputs(), 0.);
+
+  // Resize the output dual norm vectors
+  output_dual_norms.resize(rb_theta_expansion->get_n_outputs());
+  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+  {
+    unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
+    output_dual_norms[n].resize(Q_l_hat);
+  }
 
   // Clear and resize the vector of A_q_representors
   clear_riesz_representors();
 
-  A_q_representor.resize(rb_sys.get_Q_a());
-  for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
+  A_q_representor.resize(rb_theta_expansion->get_Q_a());
+  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
   {
-    A_q_representor[q_a].resize(rb_sys.get_Nmax());
+    A_q_representor[q_a].resize(Nmax);
   }
 
-  STOP_LOG("resize_RB_data()", "RBEvaluation");
+  STOP_LOG("initialize()", "RBEvaluation");
 }
 
 NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)
@@ -189,11 +195,11 @@ Real RBEvaluation::RB_solve(unsigned int N)
   RB_system_matrix.zero();
 
   DenseMatrix<Number> RB_A_q_a;
-  for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
+  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
   {
     RB_A_q_vector[q_a].get_principal_submatrix(N, RB_A_q_a);
 
-    RB_system_matrix.add(rb_sys.eval_theta_q_a(q_a), RB_A_q_a);
+    RB_system_matrix.add(rb_theta_expansion->eval_theta_q_a(q_a), RB_A_q_a);
   }
 
   // Assemble the RB rhs
@@ -201,11 +207,11 @@ Real RBEvaluation::RB_solve(unsigned int N)
   RB_rhs.zero();
 
   DenseVector<Number> RB_F_q_f;
-  for(unsigned int q_f=0; q_f<rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
   {
     RB_F_q_vector[q_f].get_principal_subvector(N, RB_F_q_f);
 
-    RB_rhs.add(rb_sys.eval_theta_q_f(q_f), RB_F_q_f);
+    RB_rhs.add(rb_theta_expansion->eval_theta_q_f(q_f), RB_F_q_f);
   }
   
   // Solve the linear system
@@ -216,13 +222,13 @@ Real RBEvaluation::RB_solve(unsigned int N)
 
   // Evaluate RB outputs
   DenseVector<Number> RB_output_vector_N;
-  for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
   {
     RB_outputs[n] = 0.;
-    for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
     {
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs[n] += libmesh_conj(rb_sys.eval_theta_q_l(n,q_l))*RB_output_vector_N.dot(RB_solution);
+      RB_outputs[n] += libmesh_conj(rb_theta_expansion->eval_theta_q_l(n,q_l))*RB_output_vector_N.dot(RB_solution);
     }
   }
 
@@ -232,25 +238,25 @@ Real RBEvaluation::RB_solve(unsigned int N)
     Real epsilon_N = compute_residual_dual_norm(N);
 
     // Get lower bound for coercivity constant
-    const Real alpha_LB = rb_sys.get_SCM_lower_bound();
+    const Real alpha_LB = get_stability_lower_bound();
     // alpha_LB needs to be positive to get a valid error bound
     libmesh_assert( alpha_LB > 0. );
 
     // Evaluate the (absolute) error bound
-    Real abs_error_bound = epsilon_N / rb_sys.residual_scaling_denom(alpha_LB);
+    Real abs_error_bound = epsilon_N / residual_scaling_denom(alpha_LB);
 
     // Now compute the output error bounds
     DenseVector<Number> RB_output_vector_N;
-    for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      RB_output_error_bounds[n] = abs_error_bound * rb_sys.eval_output_dual_norm(n);
+      RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n);
     }
 
     // Compute the norm of RB_solution
     Real RB_solution_norm = RB_solution.l2_norm();
 
     STOP_LOG("RB_solve()", "RBEvaluation");
-    return ( rb_sys.return_rel_error_bound ? abs_error_bound/RB_solution_norm : abs_error_bound );
+    return ( return_rel_error_bound ? abs_error_bound/RB_solution_norm : abs_error_bound );
   }
   else // Don't calculate the error bounds
   {
@@ -269,36 +275,36 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
   Number residual_norm_sq = 0.;
 
   unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<rb_sys.get_Q_f(); q_f1++)
+  for(unsigned int q_f1=0; q_f1<rb_theta_expansion->get_Q_f(); q_f1++)
   {
-    for(unsigned int q_f2=q_f1; q_f2<rb_sys.get_Q_f(); q_f2++)
+    for(unsigned int q_f2=q_f1; q_f2<rb_theta_expansion->get_Q_f(); q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
       residual_norm_sq += delta * libmesh_real(
-        rb_sys.eval_theta_q_f(q_f1) * libmesh_conj(rb_sys.eval_theta_q_f(q_f2)) * rb_sys.Fq_representor_norms[q] );
+        rb_theta_expansion->eval_theta_q_f(q_f1) * libmesh_conj(rb_theta_expansion->eval_theta_q_f(q_f2)) * Fq_representor_norms[q] );
 
       q++;
     }
   }
 
-  for(unsigned int q_f=0; q_f<rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
   {
-    for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
+    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
     {
       for(unsigned int i=0; i<N; i++)
       {
         Real delta = 2.;
         residual_norm_sq +=
-          delta * libmesh_real( rb_sys.eval_theta_q_f(q_f) * libmesh_conj(rb_sys.eval_theta_q_a(q_a)) *
+          delta * libmesh_real( rb_theta_expansion->eval_theta_q_f(q_f) * libmesh_conj(rb_theta_expansion->eval_theta_q_a(q_a)) *
           libmesh_conj(RB_solution(i)) * Fq_Aq_representor_norms[q_f][q_a][i] );
       }
     }
   }
 
   q=0;
-  for(unsigned int q_a1=0; q_a1<rb_sys.get_Q_a(); q_a1++)
+  for(unsigned int q_a1=0; q_a1<rb_theta_expansion->get_Q_a(); q_a1++)
   {
-    for(unsigned int q_a2=q_a1; q_a2<rb_sys.get_Q_a(); q_a2++)
+    for(unsigned int q_a2=q_a1; q_a2<rb_theta_expansion->get_Q_a(); q_a2++)
     {
       Real delta = (q_a1==q_a2) ? 1. : 2.;
 
@@ -307,7 +313,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
         for(unsigned int j=0; j<N; j++)
         {
           residual_norm_sq +=
-            delta * libmesh_real( libmesh_conj(rb_sys.eval_theta_q_a(q_a1)) * rb_sys.eval_theta_q_a(q_a2) *
+            delta * libmesh_real( libmesh_conj(rb_theta_expansion->eval_theta_q_a(q_a1)) * rb_theta_expansion->eval_theta_q_a(q_a2) *
             libmesh_conj(RB_solution(i)) * RB_solution(j) * Aq_Aq_representor_norms[q][i][j] );
         }
       }
@@ -331,6 +337,39 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
   STOP_LOG("compute_residual_dual_norm()", "RBEvaluation");
 
   return std::sqrt( libmesh_real(residual_norm_sq) );
+}
+
+Real RBEvaluation::get_stability_lower_bound()
+{
+  // Return a default value of 1, this function should
+  // be overloaded to specify a problem-dependent stability
+  // factor lower bound
+  return 1.;
+}
+
+Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
+{
+  // Here we implement the residual scaling for a coercive
+  // problem.
+  return alpha_LB;
+}
+
+Real RBEvaluation::eval_output_dual_norm(unsigned int n)
+{
+  Number output_bound_sq = 0.;    
+  unsigned int q=0;
+  for(unsigned int q_l1=0; q_l1<rb_theta_expansion->get_Q_l(n); q_l1++)
+  {
+    for(unsigned int q_l2=q_l1; q_l2<rb_theta_expansion->get_Q_l(n); q_l2++)
+    {
+      Real delta = (q_l1==q_l2) ? 1. : 2.;
+      output_bound_sq += delta * libmesh_real(
+        libmesh_conj(rb_theta_expansion->eval_theta_q_l(n,q_l1))*rb_theta_expansion->eval_theta_q_l(n,q_l2) * output_dual_norms[n][q] );
+      q++;
+    }
+  }
+    
+  return libmesh_real(std::sqrt( output_bound_sq ));
 }
 
 void RBEvaluation::clear_riesz_representors()
@@ -360,7 +399,6 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
   const unsigned int precision_level = 14;
 
   const unsigned int n_bfs = get_n_basis_functions();
-  libmesh_assert( n_bfs <= rb_sys.get_Nmax() );
 
   if(libMesh::processor_id() == 0)
   {
@@ -389,12 +427,58 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       n_bfs_out.close();
     }
 
+    // Write out F_q representor norm data
+    std::ofstream RB_Fq_norms_out;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/Fq_norms.dat";
+      RB_Fq_norms_out.open(file_name.str().c_str());
+    }
+    if ( !RB_Fq_norms_out.good() )
+    {
+      libMesh::err << "Error opening Fq_norms.dat" << std::endl;
+      libmesh_error();
+    }
+    RB_Fq_norms_out.precision(precision_level);
+    unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
+    for(unsigned int i=0; i<Q_f_hat; i++)
+    {
+      RB_Fq_norms_out << std::scientific << Fq_representor_norms[i] << " ";
+    }
+    RB_Fq_norms_out.close();
+
+    // Write out output data
+    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+    {
+      std::ofstream output_dual_norms_out;
+      {
+        OStringStream file_name;
+        file_name << directory_name << "/output_";
+        OSSRealzeroright(file_name,3,0,n);
+        file_name << "_dual_norms.dat";
+        output_dual_norms_out.open(file_name.str().c_str());
+      }
+      if ( !output_dual_norms_out.good() )
+      {
+        libMesh::err << "Error opening output " << n << " dual norms file" << std::endl;
+        libmesh_error();
+      }
+      output_dual_norms_out.precision(precision_level);
+      
+      unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
+      for(unsigned int q=0; q<Q_l_hat; q++)
+      {
+        output_dual_norms_out << std::scientific << output_dual_norms[n][q] << " ";
+      }
+      output_dual_norms_out.close();
+    }
+
     if(multiple_files_for_outputs)
     {
       // Write out output data to multiple files
-      for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
       {
-        for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+        for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
         {
           std::ofstream output_n_out;
           {
@@ -438,9 +522,9 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
         libmesh_error();
       }
 
-      for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
       {
-        for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+        for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
         {
           output_out.precision(precision_level);
 
@@ -453,7 +537,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       output_out.close();
     }
     
-    if(rb_sys.compute_RB_inner_product)
+    if(compute_RB_inner_product)
     {
       // Next write out the inner product matrix
       std::ofstream RB_inner_product_matrix_out;
@@ -480,7 +564,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     }
 
     // Next write out the F_q vectors
-    for(unsigned int q_f=0; q_f<rb_sys.get_Q_f(); q_f++)
+    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
     {
       OStringStream file_name;
       file_name << directory_name << "/RB_F_";
@@ -503,7 +587,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     }
 
     // Next write out the A_q matrices
-    for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
+    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
     {
       OStringStream file_name;
       file_name << directory_name << "/RB_A_";
@@ -541,9 +625,9 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       libmesh_error();
     }
     RB_Fq_Aq_norms_out.precision(precision_level);
-    for(unsigned int q_f=0; q_f<rb_sys.get_Q_f(); q_f++)
+    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
     {
-      for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
+      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
       {
         for(unsigned int i=0; i<n_bfs; i++)
         {
@@ -566,7 +650,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       libmesh_error();
     }
     RB_Aq_Aq_norms_out.precision(precision_level);
-    unsigned int Q_a_hat = rb_sys.get_Q_a()*(rb_sys.get_Q_a()+1)/2;
+    unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
     for(unsigned int i=0; i<Q_a_hat; i++)
     {
       for(unsigned int j=0; j<n_bfs; j++)
@@ -594,7 +678,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       }
       for(unsigned int i=0; i<greedy_param_list.size(); i++)
       {
-        for(unsigned int j=0; j<rb_sys.get_n_params(); j++)
+        for(unsigned int j=0; j<get_n_params(); j++)
         {
           greedy_params_out << greedy_param_list[i][j] << " ";
         }
@@ -603,60 +687,6 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       greedy_params_out.close();
     }
 
-  }
-  
-  // Synchronize before moving on
-  Parallel::barrier();
-
-  // Now write out the basis functions if requested
-  write_out_basis_functions(directory_name, precision_level);
-
-  // Write out residual representors if requested
-  if (rb_sys.store_representors)
-  {
-    // Write out A_q_representors.  These are useful to have when restarting,
-    // so you don't have to recompute them all over again.  There should be
-    // Q_a * this->get_n_basis_functions() of these.
-    if (!rb_sys.is_quiet())
-      libMesh::out << "Writing out the A_q_representors..." << std::endl;
-
-    const std::string residual_representors_dir = "residual_representors";
-    const std::string residual_representor_suffix =
-      (rb_sys.read_binary_residual_representors ? ".xdr" : ".dat");
-    std::ostringstream file_name;
-
-    const unsigned int jstop  = this->get_n_basis_functions();
-    const unsigned int jstart = jstop-rb_sys.get_delta_N();
-    for (unsigned int i=0; i<A_q_representor.size(); ++i)
-      for (unsigned int j=jstart; j<jstop; ++j)
-      {
-        libMesh::out << "Writing out A_q_representor[" << i << "][" << j << "]..." << std::endl;
-        libmesh_assert(A_q_representor[i][j] != NULL);
-
-        file_name.str(""); // reset filename
-        file_name << residual_representors_dir
-                  << "/A_q_representor" << i << "_" << j << residual_representor_suffix;
-
-        {
-          // No need to copy! Use swap instead.
-          // *solution = *(A_q_representor[i][j]);
-          A_q_representor[i][j]->swap(*rb_sys.solution);
-
-          Xdr aqr_data(file_name.str(),
-                       rb_sys.write_binary_residual_representors ? ENCODE : WRITE);
-
-          rb_sys.write_serialized_data(aqr_data, false);
-
-          // Synchronize before moving on
-          Parallel::barrier();
-
-          // Swap back.
-          A_q_representor[i][j]->swap(*rb_sys.solution);
-
-          // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
-          // for the system call, be sure to do it only on one processor, etc.
-        }
-      }
   }
 
   STOP_LOG("write_offline_data_to_files()", "RBEvaluation");
@@ -682,14 +712,58 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     n_bfs_in >> n_bfs;
     n_bfs_in.close();
   }
-  libmesh_assert( n_bfs <= rb_sys.get_Nmax() );
+
+  // Next read in F_q representor norm data
+  std::ifstream RB_Fq_norms_in;
+  {
+    OStringStream file_name;
+    file_name << directory_name << "/Fq_norms.dat";
+    RB_Fq_norms_in.open(file_name.str().c_str());
+  }
+  if ( !RB_Fq_norms_in.good() )
+  {
+    libMesh::err << "Error opening Fq_norms.dat" << std::endl;
+    libmesh_error();
+  }
+  unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
+  for(unsigned int i=0; i<Q_f_hat; i++)
+  {
+    RB_Fq_norms_in >> Fq_representor_norms[i];
+  }
+  RB_Fq_norms_in.close();
+
+
+  // Read in output data
+  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+  {
+    std::ifstream output_dual_norms_in;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/output_";
+      OSSRealzeroright(file_name,3,0,n);
+      file_name << "_dual_norms.dat";
+      output_dual_norms_in.open(file_name.str().c_str());
+    }
+    if ( !output_dual_norms_in.good() )
+    {
+      libMesh::err << "Error opening input " << n << " dual norms file" << std::endl;
+      libmesh_error();
+    }
+    
+    unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
+    for(unsigned int q=0; q<Q_l_hat; q++)
+    {
+      output_dual_norms_in >> output_dual_norms[n][q];
+    }
+    output_dual_norms_in.close();
+  }
 
   if(multiple_files_for_outputs)
   {
     // Read in output data in multiple files
-    for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
       {
         std::ifstream output_n_in;
         {
@@ -733,9 +807,9 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       libMesh::err << "Error opening outputs.dat" << std::endl;
       libmesh_error();
     }
-    for(unsigned int n=0; n<rb_sys.get_n_outputs(); n++)
+    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      for(unsigned int q_l=0; q_l<rb_sys.get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
       {
         for(unsigned int j=0; j<n_bfs; j++)
         {
@@ -748,7 +822,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     output_in.close();
   }
   
-  if(rb_sys.compute_RB_inner_product)
+  if(compute_RB_inner_product)
   {
     // Next read in the inner product matrix
     std::ifstream RB_inner_product_matrix_in;
@@ -775,7 +849,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   }
 
   // Next read in the F_q vectors
-  for(unsigned int q_f=0; q_f<rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
   {
     OStringStream file_name;
     file_name << directory_name << "/RB_F_";
@@ -799,7 +873,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   }
 
   // Next read in the A_q matrices
-  for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
+  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
   {
     OStringStream file_name;
     file_name << directory_name << "/RB_A_";
@@ -838,9 +912,9 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
     libmesh_error();
   }
-  for(unsigned int q_f=0; q_f<rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
   {
-    for(unsigned int q_a=0; q_a<rb_sys.get_Q_a(); q_a++)
+    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
     {
       for(unsigned int i=0; i<n_bfs; i++)
       {
@@ -862,7 +936,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
     libmesh_error();
   }
-  unsigned int Q_a_hat = rb_sys.get_Q_a()*(rb_sys.get_Q_a()+1)/2;
+  unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
   for(unsigned int i=0; i<Q_a_hat; i++)
   {
     for(unsigned int j=0; j<n_bfs; j++)
@@ -889,162 +963,96 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       basis_functions[i] = NULL;
     }
 
-  // Read in the basis functions if requested.
-  read_in_basis_functions(directory_name);
-
-  // Read in the representor vectors if requested
-  if (rb_sys.store_representors)
-  {
-    libMesh::out << "Reading in the A_q_representors..." << std::endl;
-
-    const std::string residual_representors_dir = "residual_representors";
-    const std::string residual_representor_suffix =
-      (rb_sys.read_binary_residual_representors ? ".xdr" : ".dat");
-    std::ostringstream file_name;
-    struct stat stat_info;
-
-    // Read in the A_q representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
-    // read in [Q_a][this->get_n_basis_functions()].  FIXME:
-    // should we be worried about leaks in the locations where we're about to fill entries?
-    for (unsigned int i=0; i<A_q_representor.size(); ++i)
-      for (unsigned int j=0; j<A_q_representor[i].size(); ++j)
-      {
-        if (A_q_representor[i][j] != NULL)
-        {
-          libMesh::out << "Error, must delete existing A_q_representor before reading in from file."
-                       << std::endl;
-          libmesh_error();
-        }
-      }
-
-    // Now ready to read them in from file!
-    for (unsigned int i=0; i<A_q_representor.size(); ++i)
-      for (unsigned int j=0; j<this->get_n_basis_functions(); ++j)
-      {
-        file_name.str(""); // reset filename
-        file_name << residual_representors_dir
-                  << "/A_q_representor" << i << "_" << j << residual_representor_suffix;
-
-        // On processor zero check to be sure the file exists
-        if (libMesh::processor_id() == 0)
-        {
-          int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-          if (stat_result != 0)
-          {
-            libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-            libmesh_error();
-          }
-        }
-
-        Xdr aqr_data(file_name.str(),
-        rb_sys.read_binary_residual_representors ? DECODE : READ);
-
-        rb_sys.read_serialized_data(aqr_data, false);
-
-        A_q_representor[i][j] = NumericVector<Number>::build().release();
-        A_q_representor[i][j]->init (rb_sys.n_dofs(), rb_sys.n_local_dofs(),
-                                     false, libMeshEnums::PARALLEL);
-
-        // No need to copy, just swap
-        //*A_q_representor[i][j] = *solution;
-        A_q_representor[i][j]->swap(*rb_sys.solution);
-      }
-  } // end if (store_representors)
-
   STOP_LOG("read_offline_data_from_files()", "RBEvaluation");
 }
 
-void RBEvaluation::write_out_basis_functions(const std::string& directory_name,
-                                         const unsigned int)
+void RBEvaluation::write_out_basis_functions(RBSystem& rb_sys,
+                                             const bool write_binary_basis_functions,
+                                             const std::string& directory_name)
 {
-  if(rb_sys.store_basis_functions)
+  libMesh::out << "Writing out the basis functions..." << std::endl;
+
+  std::ostringstream file_name;
+  const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
+
+  file_name << directory_name << "/bf_header" << basis_function_suffix;
+  Xdr header_data(file_name.str(),
+                  write_binary_basis_functions ? ENCODE : WRITE);
+  rb_sys.write_header(header_data, "", false);
+
+  // Use System::write_serialized_data to write out the basis functions
+  // by copying them into this->solution one at a time.
+  for(unsigned int i=0; i<basis_functions.size(); i++)
   {
-    libMesh::out << "Writing out the basis functions..." << std::endl;
+    // No need to copy, just swap
+    // *solution = *basis_functions[i];
+    basis_functions[i]->swap(*rb_sys.solution);
 
-    std::ostringstream file_name;
-    const std::string basis_function_suffix = (rb_sys.write_binary_basis_functions ? ".xdr" : ".dat");
+    file_name.str(""); // reset the string
+    file_name << directory_name << "/bf" << i << basis_function_suffix;
 
-    file_name << directory_name << "/bf_header" << basis_function_suffix;
-    Xdr header_data(file_name.str(),
-                    rb_sys.write_binary_basis_functions ? ENCODE : WRITE);
-    rb_sys.write_header(header_data, "", false);
+    Xdr bf_data(file_name.str(),
+                write_binary_basis_functions ? ENCODE : WRITE);
 
-    // Use System::write_serialized_data to write out the basis functions
-    // by copying them into this->solution one at a time.
-    for(unsigned int i=0; i<basis_functions.size(); i++)
-    {
-      // No need to copy, just swap
-      // *solution = *basis_functions[i];
-      basis_functions[i]->swap(*rb_sys.solution);
+    rb_sys.write_serialized_data(bf_data, false);
 
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/bf" << i << basis_function_suffix;
+    // Synchronize before moving on
+    Parallel::barrier();
 
-      Xdr bf_data(file_name.str(),
-		  rb_sys.write_binary_basis_functions ? ENCODE : WRITE);
-
-      rb_sys.write_serialized_data(bf_data, false);
-
-      // Synchronize before moving on
-      Parallel::barrier();
-
-      // Swap back
-      basis_functions[i]->swap(*rb_sys.solution);
-    }
+    // Swap back
+    basis_functions[i]->swap(*rb_sys.solution);
   }
 }
 
-void RBEvaluation::read_in_basis_functions(const std::string& directory_name)
+void RBEvaluation::read_in_basis_functions(RBSystem& rb_sys,
+                                           const bool read_binary_basis_functions,
+                                           const std::string& directory_name)
 {
-  if(rb_sys.store_basis_functions)
+  libMesh::out << "Reading in the basis functions..." << std::endl;
+
+  std::ostringstream file_name;
+  const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
+  struct stat stat_info;
+
+  file_name << directory_name << "/bf_header" << basis_function_suffix;
+  Xdr header_data(file_name.str(),
+                  read_binary_basis_functions ? DECODE : READ);
+  rb_sys.read_header(header_data, "", false);
+
+  // Use System::read_serialized_data to read in the basis functions
+  // into this->solution and then swap with the appropriate
+  // of basis function.
+  for(unsigned int i=0; i<basis_functions.size(); i++)
   {
-    libMesh::out << "Reading in the basis functions..." << std::endl;
+    file_name.str(""); // reset the string
+    file_name << directory_name << "/bf" << i << basis_function_suffix;
 
-    std::ostringstream file_name;
-    const std::string basis_function_suffix = (rb_sys.read_binary_basis_functions ? ".xdr" : ".dat");
-    struct stat stat_info;
-
-    file_name << directory_name << "/bf_header" << basis_function_suffix;
-    Xdr header_data(file_name.str(),
-                    rb_sys.read_binary_basis_functions ? DECODE : READ);
-    rb_sys.read_header(header_data, "", false);
-
-    // Use System::read_serialized_data to read in the basis functions
-    // into this->solution and then swap with the appropriate
-    // of basis function.
-    for(unsigned int i=0; i<basis_functions.size(); i++)
+    // On processor zero check to be sure the file exists
+    if (libMesh::processor_id() == 0)
     {
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/bf" << i << basis_function_suffix;
+      int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-      // On processor zero check to be sure the file exists
-      if (libMesh::processor_id() == 0)
-	{
-	  int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-	  if (stat_result != 0)
-	    {
-	      libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-	      libmesh_error();
-	    }
-	}
-
-      Xdr bf_data(file_name.str(),
-		  rb_sys.read_binary_basis_functions ? DECODE : READ);
-
-      rb_sys.read_serialized_data(bf_data, false);
-
-      basis_functions[i] = NumericVector<Number>::build().release();
-      basis_functions[i]->init (rb_sys.n_dofs(), rb_sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
-
-      // No need to copy, just swap
-      // *basis_functions[i] = *solution;
-      basis_functions[i]->swap(*rb_sys.solution);
+      if (stat_result != 0)
+      {
+        libMesh::out << "File does not exist: " << file_name.str() << std::endl;
+        libmesh_error();
+      }
     }
 
-    libMesh::out << "Finished reading in the basis functions..." << std::endl;
+    Xdr bf_data(file_name.str(),
+                read_binary_basis_functions ? DECODE : READ);
+
+    rb_sys.read_serialized_data(bf_data, false);
+
+    basis_functions[i] = NumericVector<Number>::build().release();
+    basis_functions[i]->init (rb_sys.n_dofs(), rb_sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+
+    // No need to copy, just swap
+    // *basis_functions[i] = *solution;
+    basis_functions[i]->swap(*rb_sys.solution);
   }
+
+  libMesh::out << "Finished reading in the basis functions..." << std::endl;
 }
 
 } // namespace libMesh

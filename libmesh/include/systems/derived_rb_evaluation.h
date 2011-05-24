@@ -49,7 +49,7 @@ public:
   /**
    * Constructor.
    */
-  DerivedRBEvaluation (RBSystem& rb_sys_in);
+  DerivedRBEvaluation ();
   
   /**
    * Clear this object. Overload to also reset residual_type_flag.
@@ -68,16 +68,22 @@ public:
   virtual void set_n_basis_functions(unsigned int n_bfs);
 
   /**
-   * If store_basis_functions=true, write out all the basis functions to file.
-   * Precision level specifies the number of significant digits to write out.
+   * Write out all the basis functions to file.
+   * \p rb_sys and \p write_binary_basis_functions are ignored here,
+   * basis functions are written to the directory \p directory_name.
    */
-  virtual void write_out_basis_functions(const std::string& directory_name,
-                                        const unsigned int precision_level);
+  virtual void write_out_basis_functions(RBSystem& rb_sys,
+                                         const bool write_binary_basis_functions = true,
+                                         const std::string& directory_name = "offline_data");
   
   /**
-   * If store_basis_functions=true, read in all the basis functions from file.
+   * Read in all the basis functions from file.
+   * \p rb_sys and \p write_binary_basis_functions are ignored here,
+   * basis functions are read from the directory \p directory_name.
    */
-  virtual void read_in_basis_functions(const std::string& directory_name);
+  virtual void read_in_basis_functions(RBSystem& rb_sys,
+                                       const bool read_binary_basis_functions = true,
+                                       const std::string& directory_name = "offline_data");
   
   //----------- PUBLIC DATA MEMBERS -----------//
 

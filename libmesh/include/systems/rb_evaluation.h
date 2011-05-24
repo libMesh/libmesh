@@ -20,6 +20,7 @@
 #ifndef __rb_evaluation_h__
 #define __rb_evaluation_h__
 
+#include "rb_base.h"
 #include "reference_counted_object.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
@@ -42,14 +43,14 @@ template <typename T> class NumericVector;
 // ------------------------------------------------------------
 // RBEvaluation class definition
 
-class RBEvaluation : public ReferenceCountedObject<RBEvaluation>
+class RBEvaluation : public RBBase, public ReferenceCountedObject<RBEvaluation>
 {
 public:
 
   /**
    * Constructor.
    */
-  RBEvaluation (RBSystem& rb_sys_in);
+  RBEvaluation ();
 
   /**
    * Destructor.
@@ -63,17 +64,13 @@ public:
   virtual void clear();
 
   /**
-   * Initialize this object by allocating the necessary data fields.
-   */
-  virtual void initialize();
-  
-  /**
+   * Initialize this RBEvaluation object.
    * Resize and clear the data vectors corresponding to the
    * value of \p Nmax.
    * Overload to also clear and resize any extra
    * data in subclasses.
    */
-  virtual void resize_RB_data(const unsigned int Nmax);
+  virtual void initialize(const unsigned int Nmax);
 
   /**
    * Get a reference to the i^th basis function.
@@ -96,6 +93,25 @@ public:
    * saved in RB_solution_vector.
    */
   virtual Real compute_residual_dual_norm(const unsigned int N);
+
+  /**
+   * Specifies the residual scaling on the denominator to
+   * be used in the a posteriori error bound. Overload
+   * in subclass in order to obtain the desired error bound.
+   */
+  virtual Real residual_scaling_denom(Real alpha_LB);
+
+  /**
+   * Evaluate the dual norm of output \p n
+   * for the current parameters.
+   */
+  Real eval_output_dual_norm(unsigned int n);
+
+  /**
+   * Get a lower bound for the stability constant (e.g. coercivity constant or
+   * inf-sup constant) at the current parameter value.
+   */
+  virtual Real get_stability_lower_bound();
 
   /**
    * Get the current number of basis functions.
@@ -128,22 +144,20 @@ public:
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
 
   /**
-   * If store_basis_functions=true, write out all the basis functions to file.
-   * Precision level specifies the number of significant digits to write out.
+   * Write out all the basis functions to file.
    */
-  virtual void write_out_basis_functions(const std::string& directory_name, const unsigned int precision_level);
+  virtual void write_out_basis_functions(RBSystem& rb_sys,
+                                         const bool write_binary_basis_functions = true,
+                                         const std::string& directory_name = "offline_data");
   
   /**
-   * If store_basis_functions=true, read in all the basis functions from file.
+   * Read in all the basis functions from file.
    */
-  virtual void read_in_basis_functions(const std::string& directory_name);
+  virtual void read_in_basis_functions(RBSystem& rb_sys,
+                                       const bool read_binary_basis_functions = true,
+                                       const std::string& directory_name = "offline_data");
   
   //----------- PUBLIC DATA MEMBERS -----------//
-
-  /**
-   * A reference to the associated RBSystem.
-   */
-  RBSystem& rb_sys;
 
   /**
    * The libMesh vectors storing the finite element coefficients
@@ -195,12 +209,28 @@ public:
   /**
    * Vectors storing the residual representor inner products
    * to be used in computing the residuals online.
+   * These values are independent of a basis, hence they can
+   * be copied over directly from an RBSystem.
+   */
+  std::vector<Number> Fq_representor_norms;
+
+  /**
+   * Vectors storing the residual representor inner products
+   * to be used in computing the residuals online.
    * We store the Aq-dependent representor norms because they depend
    * on a reduced basis space. The basis independent representors
    * are stored in RBSystem.
    */
   std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
   std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
+
+  /**
+   * The vector storing the dual norm inner product terms
+   * for each output.
+   * These values are independent of a basis, hence they can
+   * be copied over directly from an RBSystem.
+   */
+  std::vector< std::vector< Number > > output_dual_norms;
 
   /**
    * Vector storing the residual representors associated with the
@@ -223,6 +253,17 @@ public:
    * when RB_solve is called.
    */
   bool evaluate_RB_error_bound;
+
+  /**
+   * Boolean flag to indicate whether RB_solve returns an absolute
+   * or relative error bound. True => relative, false => absolute.
+   */
+  bool return_rel_error_bound;
+
+  /**
+   * Boolean flag to indicate whether we compute the RB_inner_product_matrix.
+   */
+  bool compute_RB_inner_product;
 
 };
 

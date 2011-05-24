@@ -71,7 +71,7 @@ void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_ancho
   STOP_LOG("add_child()", "TransientRBParamSubdomainNode");
 }
 
-void TransientRBParamSubdomainNode::hp_greedy()
+void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
 {
     _rb_system.rb_eval->clear();
 
@@ -135,8 +135,8 @@ void TransientRBParamSubdomainNode::hp_greedy()
         libMesh::out << "h tolerance not satisfied, splitting subdomain..." << std::endl;
         split_this_subdomain(true);
 
-        left_child->hp_greedy();
-        right_child->hp_greedy();
+        left_child->hp_greedy(store_basis_functions);
+        right_child->hp_greedy(store_basis_functions);
     }
     else // terminate branch, populate the model with standard p-type,write out subelement data
     {
@@ -147,8 +147,8 @@ void TransientRBParamSubdomainNode::hp_greedy()
             libMesh::out << "p tolerance not satisfied, splitting subdomain..." << std::endl;
             split_this_subdomain(false);
 
-            left_child->hp_greedy();
-            right_child->hp_greedy();
+            left_child->hp_greedy(store_basis_functions);
+            right_child->hp_greedy(store_basis_functions);
         }
         else
         {
@@ -157,7 +157,7 @@ void TransientRBParamSubdomainNode::hp_greedy()
                          << std::endl;
 
             // Finally, write out the data for this subdomain
-            write_subdomain_data_to_files();
+            write_subdomain_data_to_files(store_basis_functions);
             _tree.leaf_node_index++;
         }
     }

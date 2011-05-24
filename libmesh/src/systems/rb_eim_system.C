@@ -51,7 +51,7 @@ RBEIMSystem::RBEIMSystem (EquationSystems& es,
     best_fit_type_flag(PROJECTION_BEST_FIT),
     mesh_function(NULL),
     performing_extra_greedy_step(false),
-    current_variable_number(0)
+    current_bf_index(0)
 {
   use_empty_RB_solve_in_greedy = false;
 }
@@ -130,7 +130,7 @@ void RBEIMSystem::initialize_RB_system(bool do_not_assemble)
     mesh_function->init();
     
     // initialize the vector that stores the _current_ basis function,
-    // i.e. the basis funciton that is interpolated by evaluate_current_affine_function
+    // i.e. the vector that is used in evaluate_basis_function
     current_ghosted_bf = NumericVector<Number>::build();
 #ifdef LIBMESH_ENABLE_GHOSTED
     current_ghosted_bf->init (this->n_dofs(), this->n_local_dofs(),
@@ -175,10 +175,14 @@ unsigned int RBEIMSystem::get_n_affine_functions() const
   return n_vars() * get_n_basis_functions();
 }
 
-std::vector<Number> RBEIMSystem::evaluate_current_affine_function(Elem& element,
-                                                                  const std::vector<Point>& qpoints)
+std::vector<Number> RBEIMSystem::evaluate_basis_function(unsigned int bf_index,
+                                                         Elem& element,
+                                                         const std::vector<Point>& qpoints)
 {
-  START_LOG("evaluate_current_affine_function()", "RBEIMSystem");
+  START_LOG("evaluate_current_basis_function()", "RBEIMSystem");
+  
+  // Load up basis function bf_index (does nothing if bf_index is already loaded)
+  set_current_basis_function(bf_index);
 
   // Get local coordinates to feed these into compute_data().  
   // Note that the fe_type can safely be used from the 0-variable,
@@ -190,6 +194,7 @@ std::vector<Number> RBEIMSystem::evaluate_current_affine_function(Elem& element,
                             qpoints,
                             mapped_qpoints);
 
+  const unsigned int current_variable_number = current_bf_index % n_vars();
   const FEType& fe_type = get_dof_map().variable_type(current_variable_number);
   
   std::vector<unsigned int> dof_indices_var;
@@ -207,33 +212,36 @@ std::vector<Number> RBEIMSystem::evaluate_current_affine_function(Elem& element,
       values[qp] += (*current_ghosted_bf)(dof_indices_var[i]) * data.shape[i];
   }
 
-  STOP_LOG("evaluate_current_affine_function()", "RBEIMSystem");
+  STOP_LOG("evaluate_current_basis_function()", "RBEIMSystem");
 
   return values;
 }
 
-void RBEIMSystem::cache_ghosted_basis_function(unsigned int function_index)
+void RBEIMSystem::set_current_basis_function(unsigned int basis_function_index_in)
 {
-  START_LOG("cache_ghosted_basis_function()", "RBEIMSystem");
+  START_LOG("set_current_basis_function()", "RBEIMSystem");
 
-  if(function_index > get_n_affine_functions())
+  if(basis_function_index_in > get_n_affine_functions())
   {
     libMesh::out << "Error: index cannot be larger than the number of affine functions in evaluate_affine_function"
                  << std::endl;
     libmesh_error();
   }
-        
-  // First determine the basis function index implied by function_index
-  unsigned int bf_index  = function_index/n_vars();
   
-  // and create a ghosted version of the appropriate basis function
-  get_basis_function(bf_index).localize
-    (*current_ghosted_bf, this->get_dof_map().get_send_list());
+  if(basis_function_index_in != current_bf_index)
+  {
+    // Set member variable current_bf_index
+    current_bf_index = basis_function_index_in;
     
-  // Finally, store the index of the variable number that we will be considering
-  current_variable_number = function_index % n_vars();
+    // First determine the basis function index implied by function_index
+    unsigned int basis_function_id = current_bf_index/n_vars();
   
-  STOP_LOG("cache_ghosted_basis_function()", "RBEIMSystem");
+    // and create a ghosted version of the appropriate basis function
+    get_basis_function(basis_function_id).localize
+      (*current_ghosted_bf, this->get_dof_map().get_send_list());
+  }
+  
+  STOP_LOG("set_current_basis_function()", "RBEIMSystem");
 }
 
 void RBEIMSystem::enrich_RB_space()
@@ -255,7 +263,8 @@ void RBEIMSystem::enrich_RB_space()
     {
       EIM_rhs(i) = (*mesh_function)(eim_eval->interpolation_points[i]);
     }
-  
+
+    eim_eval->set_current_parameters( get_current_parameters() );
     eim_eval->RB_solve(EIM_rhs);
 
     // Load the "EIM residual" into solution by subtracting
@@ -392,6 +401,7 @@ Real RBEIMSystem::compute_best_fit_error()
     {
       // Turn off error estimation here, we use the linfty norm instead
       rb_eval->evaluate_RB_error_bound = false;
+      rb_eval->set_current_parameters( get_current_parameters() );
       rb_eval->RB_solve(RB_size);
       rb_eval->evaluate_RB_error_bound = true;
       break;
@@ -534,12 +544,9 @@ void RBEIMSystem::init_context(FEMContext &c)
   }
 }
 
-RBEvaluation* RBEIMSystem::add_new_rb_evaluation_object()
+AutoPtr<RBEvaluation> RBEIMSystem::build_rb_evaluation()
 {
-  RBEIMEvaluation* e = new RBEIMEvaluation(*this);
-  rb_evaluation_objects.push_back(e);
-  
-  return e;
+  return AutoPtr<RBEvaluation>(new RBEIMEvaluation(*this));
 }
 
 void RBEIMSystem::update_RB_system_matrices()

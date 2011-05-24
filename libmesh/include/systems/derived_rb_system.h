@@ -76,6 +76,12 @@ public:
   virtual Real truth_solve(int plot_solution);
   
   /**
+   * Overload train_reduced_basis to generate residual terms wrt truth
+   * once the Greedy finishes.
+   */
+  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data");
+  
+  /**
    * Set the uber_system's current_parameters to
    * match unter_system's current_parameters. We
    * require a virtual function here in case the
@@ -85,10 +91,9 @@ public:
   virtual void set_uber_current_parameters();
 
   /**
-   * Build a new DerivedRBEvaluation object and add
-   * it to the rb_evaluation_objects vector.
+   * Build a new DerivedRBEvaluation object.
    */
-  virtual RBEvaluation* add_new_rb_evaluation_object();
+  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
   
   /**
    * Load the RB solution from the most recent solve
@@ -109,14 +114,6 @@ public:
    * residual terms.
    */
   void generate_residual_terms_wrt_truth();
-  
-  /**
-   * Write out all the data to text files in order to segregate the
-   * Offline stage from the Online stage. Overload to call generate_residual_terms_wrt_truth
-   * before writing begins.
-   */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
-                                           const RBSystem::RBDataIO io_flag = RBSystem::ALL_DATA);
 
 
   //----------- PUBLIC DATA MEMBERS -----------//

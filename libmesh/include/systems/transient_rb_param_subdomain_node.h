@@ -67,8 +67,10 @@ public:
 
   /**
    * Recursive function that performs the "hp" greedy algorithm.
+   * If \p store_basis_functions==true, write out the RB basis
+   * functions during the greedy.
    */
-  virtual void hp_greedy();
+  virtual void hp_greedy(bool store_basis_functions);
 
   /**
    * Split the current subdomain into two new subdomains.

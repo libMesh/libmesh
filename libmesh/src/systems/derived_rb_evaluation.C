@@ -26,9 +26,8 @@ namespace libMesh
 {
 
 template <class Base>
-DerivedRBEvaluation<Base>::DerivedRBEvaluation(RBSystem& rb_sys)
+DerivedRBEvaluation<Base>::DerivedRBEvaluation()
   :
-  Base(rb_sys),
   residual_type_flag(RESIDUAL_WRT_UBER)
 {}
 
@@ -54,12 +53,15 @@ void DerivedRBEvaluation<Base>::set_n_basis_functions(unsigned int n_bfs)
 }
 
 template <class Base>
-void DerivedRBEvaluation<Base>::write_out_basis_functions(const std::string& directory_name,
-                                                          const unsigned int precision_level)
+void DerivedRBEvaluation<Base>::write_out_basis_functions(RBSystem& ,
+                                                          const bool ,
+                                                          const std::string& directory_name)
 {
-  if( Base::rb_sys.store_basis_functions && (libMesh::processor_id() == 0) ) // Only write out on proc 0
+  if( libMesh::processor_id() == 0 ) // Only write out on proc 0
   {
     libMesh::out << "Writing out the basis functions..." << std::endl;
+    
+    const unsigned int precision_level = 14;
 
     std::ostringstream file_name;
 
@@ -103,62 +105,61 @@ void DerivedRBEvaluation<Base>::write_out_basis_functions(const std::string& dir
 }
 
 template <class Base>
-void DerivedRBEvaluation<Base>::read_in_basis_functions(const std::string& directory_name)
+void DerivedRBEvaluation<Base>::read_in_basis_functions(RBSystem& ,
+                                                        const bool ,
+                                                        const std::string& directory_name)
 {
-  if(Base::rb_sys.store_basis_functions)
-  {
-    libMesh::out << "Reading in the basis functions..." << std::endl;
+  libMesh::out << "Reading in the basis functions..." << std::endl;
     
-    // First, get the number of size of the derived basis functions
-    unsigned int derived_bf_size;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/derived_bf_size.dat";
-      std::ifstream derived_bf_size_in(file_name.str().c_str());
+  // First, get the number of size of the derived basis functions
+  unsigned int derived_bf_size;
+  {
+    OStringStream file_name;
+    file_name << directory_name << "/derived_bf_size.dat";
+    std::ifstream derived_bf_size_in(file_name.str().c_str());
 
-      if ( !derived_bf_size_in.good() )
+    if ( !derived_bf_size_in.good() )
+    {
+      libMesh::err << "Error opening derived_bf_size.dat" << std::endl;
+      libmesh_error();
+    }
+
+    derived_bf_size_in >> derived_bf_size;
+    derived_bf_size_in.close();
+  }
+
+  std::ostringstream file_name;
+  struct stat stat_info;
+
+  for(unsigned int i=0; i<derived_basis_functions.size(); i++)
+  {
+    file_name.str(""); // reset the string
+    file_name << directory_name << "/derived_bf" << i << ".dat";
+
+    // On processor zero check to be sure the file exists
+    if (libMesh::processor_id() == 0)
+    {
+      int stat_result = stat(file_name.str().c_str(), &stat_info);
+
+      if (stat_result != 0)
       {
-        libMesh::err << "Error opening derived_bf_size.dat" << std::endl;
+        libMesh::out << "File does not exist: " << file_name.str() << std::endl;
         libmesh_error();
       }
-
-      derived_bf_size_in >> derived_bf_size;
-      derived_bf_size_in.close();
     }
 
-    std::ostringstream file_name;
-    struct stat stat_info;
+    derived_basis_functions[i].resize(derived_bf_size);
 
-    for(unsigned int i=0; i<derived_basis_functions.size(); i++)
-    {
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/derived_bf" << i << ".dat";
-
-      // On processor zero check to be sure the file exists
-      if (libMesh::processor_id() == 0)
-	{
-	  int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-	  if (stat_result != 0)
-	    {
-	      libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-	      libmesh_error();
-	    }
-	}
-
-      derived_basis_functions[i].resize(derived_bf_size);
-
-      std::ifstream derived_bf_size_in(file_name.str().c_str());
+    std::ifstream derived_bf_size_in(file_name.str().c_str());
       
-      for(unsigned int j=0; j<derived_bf_size; j++)
-      {
-        Number  value;
-        derived_bf_size_in >> value;
-        derived_basis_functions[i](j) = value;
-      }
-      derived_bf_size_in.close();
-
+    for(unsigned int j=0; j<derived_bf_size; j++)
+    {
+      Number  value;
+      derived_bf_size_in >> value;
+      derived_basis_functions[i](j) = value;
     }
+    derived_bf_size_in.close();
+
   }
 }
 

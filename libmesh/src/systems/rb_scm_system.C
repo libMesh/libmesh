@@ -105,8 +105,8 @@ void RBSCMSystem::initialize_SCM_system ()
   set_SCM_M(SCM_M_in);
 
   // Resize the bounding box vectors
-  B_min.resize(get_Q_a());
-  B_max.resize(get_Q_a());
+  B_min.resize(rb_theta_expansion->get_Q_a());
+  B_max.resize(rb_theta_expansion->get_Q_a());
 
   std::vector<Real> mu_min_vector(n_SCM_parameters);
   std::vector<Real> mu_max_vector(n_SCM_parameters);
@@ -133,7 +133,7 @@ void RBSCMSystem::initialize_SCM_system ()
 
   libMesh::out << std::endl << "RBSCMSystem parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
-  libMesh::out << "Q_a: " << get_Q_a() << std::endl;
+  libMesh::out << "Q_a: " << rb_theta_expansion->get_Q_a() << std::endl;
   libMesh::out << "SCM_eps: " << get_SCM_eps() << std::endl;
   libMesh::out << "SCM_M: " << get_SCM_M() << std::endl;
   for(unsigned int i=0; i<n_SCM_parameters; i++)
@@ -162,8 +162,8 @@ void RBSCMSystem::resize_SCM_vectors()
   SCM_UB_vectors.clear();
 
   // Resize the bounding box vectors
-  B_min.resize(get_Q_a());
-  B_max.resize(get_Q_a());
+  B_min.resize(rb_theta_expansion->get_Q_a());
+  B_max.resize(rb_theta_expansion->get_Q_a());
 }
 
 void RBSCMSystem::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
@@ -231,7 +231,7 @@ void RBSCMSystem::compute_SCM_bounding_box()
 {
   START_LOG("compute_SCM_bounding_box()", "RBSCMSystem");
 
-  for(unsigned int q=0; q<get_Q_a(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
   {
     matrix_A->zero();
     add_scaled_symm_Aq(q, 1.);
@@ -299,9 +299,9 @@ void RBSCMSystem::evaluate_stability_constant()
 
   // Set matrix A corresponding to mu_star
   matrix_A->zero();
-  for(unsigned int q=0; q<get_Q_a(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
   {
-    add_scaled_symm_Aq(q, eval_theta_q_a(q));
+    add_scaled_symm_Aq(q, rb_theta_expansion->eval_theta_q_a(q));
   }
 
   set_eigensolver_properties(-1);
@@ -324,7 +324,7 @@ void RBSCMSystem::evaluate_stability_constant()
     // We use this later to compute the SCM upper bounds.
     Real norm_B2 = libmesh_real( B_inner_product(*solution, *solution) );
 
-    for(unsigned int q=0; q<get_Q_a(); q++)
+    for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
     {
       Real norm_Aq2 = libmesh_real( Aq_inner_product(q, *solution, *solution) );
 
@@ -352,7 +352,7 @@ Number RBSCMSystem::Aq_inner_product(unsigned int q,
                                     const NumericVector<Number>& v,
                                     const NumericVector<Number>& w)
 {
-  if(q >= get_Q_a())
+  if(q >= rb_theta_expansion->get_Q_a())
   {
     libMesh::err << "Error: We must have q < Q_a in Aq_inner_product."
                  << std::endl;
@@ -449,7 +449,7 @@ void RBSCMSystem::enrich_C_J(unsigned int new_C_J_index)
   // Finally, resize C_J_stability_vector and SCM_UB_vectors
   C_J_stability_vector.push_back(0.);
 
-  std::vector<Real> zero_vector(get_Q_a());
+  std::vector<Real> zero_vector(rb_theta_expansion->get_Q_a());
   SCM_UB_vectors.push_back(zero_vector);
 
   STOP_LOG("enrich_C_J()", "RBSCMSystem");
@@ -562,9 +562,9 @@ Real RBSCMSystem::get_SCM_LB()
   // the variables y_1,...y_Q_a.
   // These are the same for each \mu in the SCM
   // training set, hence can do this up front.
-  glp_add_cols(lp,get_Q_a());
+  glp_add_cols(lp,rb_theta_expansion->get_Q_a());
 
-  for(unsigned int q=0; q<get_Q_a(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
     {
       if(B_max[q] < B_min[q]) // Invalid bound, set as free variable
       {
@@ -608,7 +608,7 @@ Real RBSCMSystem::get_SCM_LB()
   std::sort( dist_from_mu.begin(), dist_from_mu.end() );
 
 
-  unsigned int matrix_size = n_rows*get_Q_a();
+  unsigned int matrix_size = n_rows*rb_theta_expansion->get_Q_a();
   std::vector<int> ia(matrix_size+1);
   std::vector<int> ja(matrix_size+1);
   std::vector<Real> ar(matrix_size+1);
@@ -625,13 +625,13 @@ Real RBSCMSystem::get_SCM_LB()
     // Now define the matrix that relates the y's
     // to the auxiliary variables at the current
     // value of mu.
-    for(unsigned int q=0; q<get_Q_a(); q++)
+    for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
       {
         count++;
 
         ia[count] = m+1;
         ja[count] = q+1;
-        ar[count] = libmesh_real( eval_theta_q_a(q) ); // This can only handle Reals right now
+        ar[count] = libmesh_real( rb_theta_expansion->eval_theta_q_a(q) ); // This can only handle Reals right now
       }
   }
   glp_load_matrix(lp, matrix_size, &ia[0], &ja[0], &ar[0]);
@@ -639,9 +639,9 @@ Real RBSCMSystem::get_SCM_LB()
   // Now load the original parameters back into current_parameters
   // in order to set the coefficients of the objective function
   reload_current_parameters();
-  for(unsigned int q=0; q<get_Q_a(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
     {
-      glp_set_obj_coef(lp,q+1, libmesh_real( eval_theta_q_a(q) ) );
+      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_theta_q_a(q) ) );
     }
 
   // Use this command to initialize the basis for the LP
@@ -712,9 +712,9 @@ Real RBSCMSystem::get_SCM_UB()
     const std::vector<Real> UB_vector = SCM_UB_vectors[mu_index];
 
     Real J_obj = 0.;
-    for(unsigned int q=0; q<get_Q_a(); q++)
+    for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
       {
-        J_obj += libmesh_real( eval_theta_q_a(q) )*UB_vector[q];
+        J_obj += libmesh_real( rb_theta_expansion->eval_theta_q_a(q) )*UB_vector[q];
       }
 
     if( (m==0) || (J_obj < min_J_obj) )
@@ -870,7 +870,7 @@ void RBSCMSystem::write_offline_data_to_files(const std::string& directory_name)
     SCM_UB_vectors_out.precision(precision_level);
     for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
     {
-      for(unsigned int j=0; j<get_Q_a(); j++)
+      for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
       {
         SCM_UB_vectors_out << std::scientific << get_SCM_UB_vector(i,j) << " ";
       }
@@ -985,8 +985,8 @@ void RBSCMSystem::read_offline_data_from_files(const std::string& directory_name
   SCM_UB_vectors.resize( C_J_stability_vector.size() );
   for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
   {
-    SCM_UB_vectors[i].resize( get_Q_a() );
-    for(unsigned int j=0; j<get_Q_a(); j++)
+    SCM_UB_vectors[i].resize( rb_theta_expansion->get_Q_a() );
+    for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
     {
       SCM_UB_vectors_in >> SCM_UB_vectors[i][j];
     }

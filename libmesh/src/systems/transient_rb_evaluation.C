@@ -19,13 +19,11 @@
 
 #include "transient_rb_evaluation.h"
 #include "transient_rb_system.h"
+#include "transient_rb_theta_expansion.h"
 #include "numeric_vector.h"
 #include "libmesh_logging.h"
 #include "xdr_cxx.h"
 #include "parallel.h"
-
-// For checking for the existence of files
-#include <sys/stat.h>
 
 #include "o_string_stream.h"
 #include <fstream>
@@ -34,9 +32,7 @@
 namespace libMesh
 {
 
-TransientRBEvaluation::TransientRBEvaluation (TransientRBSystem& rb_sys_in)
-  :
-  Parent(rb_sys_in)
+TransientRBEvaluation::TransientRBEvaluation ()
 {
 }
 
@@ -63,37 +59,58 @@ void TransientRBEvaluation::clear_riesz_representors()
   }
 }
 
-
-void TransientRBEvaluation::resize_RB_data(const unsigned int Nmax)
+AutoPtr<RBThetaExpansion> TransientRBEvaluation::build_rb_theta_expansion(std::vector<Real>& parameters_ref)
 {
-  START_LOG("resize_RB_data()", "TransientRBEvaluation");
-  
-  Parent::resize_RB_data(Nmax);
+  return AutoPtr<RBThetaExpansion>(new TransientRBThetaExpansion( parameters_ref ));
+}
 
-  TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
+AutoPtr<TemporalDiscretization> TransientRBEvaluation::build_temporal_discretization()
+{
+  return AutoPtr<TemporalDiscretization>(new TemporalDiscretization);
+}
+
+void TransientRBEvaluation::init_extra_data_objects()
+{
+  Parent::init_extra_data_objects();
+
+  // Build a temporal discretization object
+  temporal_discretization = build_temporal_discretization();
+}
+
+void TransientRBEvaluation::initialize(const unsigned int Nmax)
+{
+  START_LOG("initialize()", "TransientRBEvaluation");
+  
+  Parent::initialize(Nmax);
 
   RB_L2_matrix.resize(Nmax,Nmax);
+  
+  TransientRBThetaExpansion& trans_theta_expansion =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
+  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
+  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
 
   // Allocate dense matrices for RB solves
-  RB_M_q_vector.resize(trans_rb_sys.get_Q_m());
-  for(unsigned int q=0; q<trans_rb_sys.get_Q_m(); q++)
+  RB_M_q_vector.resize(Q_m);
+  for(unsigned int q=0; q<Q_m; q++)
   {
     // Initialize the memory for the RB matrices
     RB_M_q_vector[q].resize(Nmax,Nmax);
   }
 
   // Initialize vectors for the norms of the representors
-  Fq_Mq_representor_norms.resize(trans_rb_sys.get_Q_f());
-  for(unsigned int i=0; i<trans_rb_sys.get_Q_f(); i++)
+  Fq_Mq_representor_norms.resize(Q_f);
+  for(unsigned int i=0; i<Q_f; i++)
   {
-    Fq_Mq_representor_norms[i].resize(trans_rb_sys.get_Q_m());
-    for(unsigned int j=0; j<trans_rb_sys.get_Q_m(); j++)
+    Fq_Mq_representor_norms[i].resize(Q_m);
+    for(unsigned int j=0; j<Q_m; j++)
     {
       Fq_Mq_representor_norms[i][j].resize(Nmax, 0.);
     }
   }
 
-  unsigned int Q_m_hat = trans_rb_sys.get_Q_m()*(trans_rb_sys.get_Q_m()+1)/2;
+  unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
   Mq_Mq_representor_norms.resize(Q_m_hat);
   for(unsigned int i=0; i<Q_m_hat; i++)
   {
@@ -104,11 +121,11 @@ void TransientRBEvaluation::resize_RB_data(const unsigned int Nmax)
     }
   }
 
-  Aq_Mq_representor_norms.resize(trans_rb_sys.get_Q_a());
-  for(unsigned int i=0; i<trans_rb_sys.get_Q_a(); i++)
+  Aq_Mq_representor_norms.resize(Q_a);
+  for(unsigned int i=0; i<Q_a; i++)
   {
-    Aq_Mq_representor_norms[i].resize(trans_rb_sys.get_Q_m());
-    for(unsigned int j=0; j<trans_rb_sys.get_Q_m(); j++)
+    Aq_Mq_representor_norms[i].resize(Q_m);
+    for(unsigned int j=0; j<Q_m; j++)
     {
       Aq_Mq_representor_norms[i][j].resize(Nmax);
       for(unsigned int k=0; k<Nmax; k++)
@@ -129,24 +146,25 @@ void TransientRBEvaluation::resize_RB_data(const unsigned int Nmax)
   initial_L2_error_all_N.resize(Nmax, 0.);
 
   // Resize the RB output vectors
-  RB_outputs_all_k.resize(trans_rb_sys.get_n_outputs());
-  RB_output_error_bounds_all_k.resize(trans_rb_sys.get_n_outputs());
-  for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
+  const unsigned int n_time_steps = temporal_discretization->get_n_time_steps();
+  RB_outputs_all_k.resize(trans_theta_expansion.get_n_outputs());
+  RB_output_error_bounds_all_k.resize(trans_theta_expansion.get_n_outputs());
+  for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
   {
-    RB_outputs_all_k[n].resize(trans_rb_sys.get_K()+1, 0.);
-    RB_output_error_bounds_all_k[n].resize(trans_rb_sys.get_K()+1, 0.);
+    RB_outputs_all_k[n].resize(n_time_steps+1, 0.);
+    RB_output_error_bounds_all_k[n].resize(n_time_steps+1, 0.);
   }
 
   // Resize M_q_representor
   // This is cleared in the call to clear_riesz_representors
   // in Parent::resize_RB_data, so just resize here
-  M_q_representor.resize(trans_rb_sys.get_Q_m());
-  for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+  M_q_representor.resize(Q_m);
+  for(unsigned int q_m=0; q_m<Q_m; q_m++)
   {
-    M_q_representor[q_m].resize(trans_rb_sys.get_Nmax());
+    M_q_representor[q_m].resize(Nmax);
   }
 
-  STOP_LOG("resize_RB_data()", "TransientRBEvaluation");
+  STOP_LOG("initialize()", "TransientRBEvaluation");
 }
 
 Real TransientRBEvaluation::RB_solve(unsigned int N)
@@ -160,17 +178,24 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
     libmesh_error();
   }
 
-  TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
-  const Real dt = trans_rb_sys.get_dt();
+  TransientRBThetaExpansion& trans_theta_expansion =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
+  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
+  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
+
+  const unsigned int n_time_steps = temporal_discretization->get_n_time_steps();
+  const Real dt                   = temporal_discretization->get_delta_t();
+  const Real euler_theta          = temporal_discretization->get_euler_theta();
 
   // First assemble the mass matrix
   DenseMatrix<Number> RB_mass_matrix_N(N,N);
   RB_mass_matrix_N.zero();
   DenseMatrix<Number> RB_M_q_m;
-  for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+  for(unsigned int q_m=0; q_m<Q_m; q_m++)
   {
     RB_M_q_vector[q_m].get_principal_submatrix(N, RB_M_q_m);
-    RB_mass_matrix_N.add(trans_rb_sys.eval_theta_q_m(q_m), RB_M_q_m);
+    RB_mass_matrix_N.add(trans_theta_expansion.eval_theta_q_m(q_m), RB_M_q_m);
   }
 
   DenseMatrix<Number> RB_LHS_matrix(N,N);
@@ -183,17 +208,17 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
   RB_RHS_matrix.add(1./dt, RB_mass_matrix_N);
 
   DenseMatrix<Number> RB_A_q_a;
-  for(unsigned int q_a=0; q_a<trans_rb_sys.get_Q_a(); q_a++)
+  for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
     RB_A_q_vector[q_a].get_principal_submatrix(N, RB_A_q_a);
 
-    RB_LHS_matrix.add(       trans_rb_sys.get_euler_theta()*trans_rb_sys.eval_theta_q_a(q_a), RB_A_q_a);
-    RB_RHS_matrix.add( -(1.-trans_rb_sys.get_euler_theta())*trans_rb_sys.eval_theta_q_a(q_a), RB_A_q_a);
+    RB_LHS_matrix.add(       euler_theta*trans_theta_expansion.eval_theta_q_a(q_a), RB_A_q_a);
+    RB_RHS_matrix.add( -(1.-euler_theta)*trans_theta_expansion.eval_theta_q_a(q_a), RB_A_q_a);
   }
 
   // Set system time level to 0
-  error_bound_all_k.resize(trans_rb_sys.get_K()+1);
-  trans_rb_sys.set_time_level(0); // Sets the member variable _k to zero
+  error_bound_all_k.resize(n_time_steps+1);
+  temporal_discretization->set_time_step(0);
 
   // Resize/clear the solution vector
   RB_solution.resize(N);
@@ -212,8 +237,8 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
   RB_rhs.zero();
 
   // Initialize the vectors storing solution data
-  RB_temporal_solution_data.resize(trans_rb_sys.get_K()+1);
-  for(unsigned int time_level=0; time_level<=trans_rb_sys.get_K(); time_level++)
+  RB_temporal_solution_data.resize(n_time_steps+1);
+  for(unsigned int time_level=0; time_level<=n_time_steps; time_level++)
   {
     RB_temporal_solution_data[time_level].resize(N);
   }
@@ -222,13 +247,13 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
 
   // Set outputs at initial time
   DenseVector<Number> RB_output_vector_N;
-  for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
+  for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
   {
     RB_outputs_all_k[n][0] = 0.;
-    for(unsigned int q_l=0; q_l<trans_rb_sys.get_Q_l(n); q_l++)
+    for(unsigned int q_l=0; q_l<trans_theta_expansion.get_Q_l(n); q_l++)
     {
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs_all_k[n][0] += trans_rb_sys.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
+      RB_outputs_all_k[n][0] += trans_theta_expansion.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
     }
   }
 
@@ -243,31 +268,31 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
     }
 
     // Set error bound at the initial time
-    error_bound_all_k[trans_rb_sys.get_time_level()] = std::sqrt(error_bound_sum);
+    error_bound_all_k[temporal_discretization->get_time_step()] = std::sqrt(error_bound_sum);
 
     // Compute the outputs and associated error bounds at the initial time
     DenseVector<Number> RB_output_vector_N;
-    for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
+    for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
     {
       RB_outputs_all_k[n][0] = 0.;
-      for(unsigned int q_l=0; q_l<trans_rb_sys.get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<trans_theta_expansion.get_Q_l(n); q_l++)
       {
         RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-        RB_outputs_all_k[n][0] += trans_rb_sys.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
+        RB_outputs_all_k[n][0] += trans_theta_expansion.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
       }
 
-      RB_output_error_bounds_all_k[n][0] = error_bound_all_k[0] * trans_rb_sys.eval_output_dual_norm(n);
+      RB_output_error_bounds_all_k[n][0] = error_bound_all_k[0] * eval_output_dual_norm(n);
     }
 
-    alpha_LB = trans_rb_sys.get_SCM_lower_bound();
+    alpha_LB = get_stability_lower_bound();
     
     // Precompute time-invariant parts of the dual norm of the residual.
     cache_online_residual_terms(N);
   }
 
-  for(unsigned int time_level=1; time_level<=trans_rb_sys.get_K(); time_level++)
+  for(unsigned int time_level=1; time_level<=n_time_steps; time_level++)
   {
-    trans_rb_sys.set_time_level(time_level); // This updates the member variable _k
+    temporal_discretization->set_time_step(time_level);
     old_RB_solution = RB_solution;
 
     // Compute RB_rhs, as RB_LHS_matrix x old_RB_solution
@@ -275,10 +300,10 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
 
     // Add forcing terms
     DenseVector<Number> RB_F_q_f;
-    for(unsigned int q_f=0; q_f<trans_rb_sys.get_Q_f(); q_f++)
+    for(unsigned int q_f=0; q_f<Q_f; q_f++)
     {
       RB_F_q_vector[q_f].get_principal_subvector(N, RB_F_q_f);
-      RB_rhs.add(trans_rb_sys.eval_theta_q_f(q_f), RB_F_q_f);
+      RB_rhs.add(trans_theta_expansion.eval_theta_q_f(q_f), RB_F_q_f);
     }
 
     if(N > 0)
@@ -291,13 +316,13 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
 
     // Evaluate outputs
     DenseVector<Number> RB_output_vector_N;
-    for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
+    for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
     {
       RB_outputs_all_k[n][time_level] = 0.;
-      for(unsigned int q_l=0; q_l<trans_rb_sys.get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<trans_theta_expansion.get_Q_l(n); q_l++)
       {
         RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-        RB_outputs_all_k[n][time_level] += trans_rb_sys.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
+        RB_outputs_all_k[n][time_level] += trans_theta_expansion.eval_theta_q_l(n,q_l)*RB_output_vector_N.dot(RB_solution);
       }
     }
 
@@ -308,15 +333,15 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
       // Real epsilon_N = uncached_compute_residual_dual_norm(N);
       Real epsilon_N = compute_residual_dual_norm(N);
 
-      error_bound_sum += trans_rb_sys.residual_scaling_numer(alpha_LB) * pow(epsilon_N, 2.);
+      error_bound_sum += residual_scaling_numer(alpha_LB) * pow(epsilon_N, 2.);
 
       // store error bound at time-level _k
-      error_bound_all_k[time_level] = std::sqrt(error_bound_sum/trans_rb_sys.residual_scaling_denom(alpha_LB));
+      error_bound_all_k[time_level] = std::sqrt(error_bound_sum/residual_scaling_denom(alpha_LB));
 
       // Now evaluated output error bounds
-      for(unsigned int n=0; n<trans_rb_sys.get_n_outputs(); n++)
+      for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
       {
-        RB_output_error_bounds_all_k[n][time_level] = error_bound_all_k[time_level] * trans_rb_sys.eval_output_dual_norm(n);
+        RB_output_error_bounds_all_k[n][time_level] = error_bound_all_k[time_level] * eval_output_dual_norm(n);
       }
     }
   }
@@ -333,8 +358,8 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
 
     STOP_LOG("RB_solve()", "TransientRBEvaluation");
 
-    return ( trans_rb_sys.return_rel_error_bound ? error_bound_all_k[trans_rb_sys.get_K()]/final_RB_L2_norm :
-                                                   error_bound_all_k[trans_rb_sys.get_K()] );
+    return ( return_rel_error_bound ? error_bound_all_k[n_time_steps]/final_RB_L2_norm :
+                                      error_bound_all_k[n_time_steps] );
   }
   else // Don't calculate the error bounds
   {
@@ -344,33 +369,42 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
   }
 }
 
+Real TransientRBEvaluation::residual_scaling_numer(Real)
+{
+  return temporal_discretization->get_delta_t();
+}
+
 void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
 {
   START_LOG("cache_online_residual_terms()", "TransientRBEvaluation");
 
-  TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
+  TransientRBThetaExpansion& trans_theta_expansion =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
+  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
+  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
 
   cached_Fq_term = 0.;
   unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<trans_rb_sys.get_Q_f(); q_f1++)
+  for(unsigned int q_f1=0; q_f1<Q_f; q_f1++)
   {
-    Number cached_theta_q_f1 = trans_rb_sys.eval_theta_q_f(q_f1);
-    for(unsigned int q_f2=q_f1; q_f2<trans_rb_sys.get_Q_f(); q_f2++)
+    Number cached_theta_q_f1 = trans_theta_expansion.eval_theta_q_f(q_f1);
+    for(unsigned int q_f2=q_f1; q_f2<Q_f; q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
-      cached_Fq_term += delta*cached_theta_q_f1*trans_rb_sys.eval_theta_q_f(q_f2) * trans_rb_sys.Fq_representor_norms[q];
+      cached_Fq_term += delta*cached_theta_q_f1*trans_theta_expansion.eval_theta_q_f(q_f2) * Fq_representor_norms[q];
 
       q++;
     }
   }
 
   cached_Fq_Aq_vector.resize(N);
-  for(unsigned int q_f=0; q_f<trans_rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    Number cached_theta_q_f = trans_rb_sys.eval_theta_q_f(q_f);
-    for(unsigned int q_a=0; q_a<trans_rb_sys.get_Q_a(); q_a++)
+    Number cached_theta_q_f = trans_theta_expansion.eval_theta_q_f(q_f);
+    for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
-      Number cached_theta_q_a = trans_rb_sys.eval_theta_q_a(q_a);
+      Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a);
       for(unsigned int i=0; i<N; i++)
       {
         cached_Fq_Aq_vector(i) += 2.*cached_theta_q_f*cached_theta_q_a*
@@ -381,12 +415,12 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
 
   cached_Aq_Aq_matrix.resize(N,N);
   q=0;
-  for(unsigned int q_a1=0; q_a1<trans_rb_sys.get_Q_a(); q_a1++)
+  for(unsigned int q_a1=0; q_a1<Q_a; q_a1++)
   {
-    Number cached_theta_q_a1 = trans_rb_sys.eval_theta_q_a(q_a1);
-    for(unsigned int q_a2=q_a1; q_a2<trans_rb_sys.get_Q_a(); q_a2++)
+    Number cached_theta_q_a1 = trans_theta_expansion.eval_theta_q_a(q_a1);
+    for(unsigned int q_a2=q_a1; q_a2<Q_a; q_a2++)
     {
-      Number cached_theta_q_a2 = trans_rb_sys.eval_theta_q_a(q_a2);
+      Number cached_theta_q_a2 = trans_theta_expansion.eval_theta_q_a(q_a2);
       Real delta = (q_a1==q_a2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -403,12 +437,12 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   }
 
   cached_Fq_Mq_vector.resize(N);
-  for(unsigned int q_f=0; q_f<trans_rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    Number cached_theta_q_f = trans_rb_sys.eval_theta_q_f(q_f);
-    for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+    Number cached_theta_q_f = trans_theta_expansion.eval_theta_q_f(q_f);
+    for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
-      Number cached_theta_q_m = trans_rb_sys.eval_theta_q_m(q_m);
+      Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m);
       for(unsigned int i=0; i<N; i++)
       {
         cached_Fq_Mq_vector(i) += 2.*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_norms[q_f][q_m][i];
@@ -417,13 +451,13 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   }
 
   cached_Aq_Mq_matrix.resize(N,N);
-  for(unsigned int q_a=0; q_a<trans_rb_sys.get_Q_a(); q_a++)
+  for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
-    Number cached_theta_q_a = trans_rb_sys.eval_theta_q_a(q_a);
+    Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a);
     
-    for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+    for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
-      Number cached_theta_q_m = trans_rb_sys.eval_theta_q_m(q_m);
+      Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m);
       
       for(unsigned int i=0; i<N; i++)
       {
@@ -437,12 +471,12 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   
   cached_Mq_Mq_matrix.resize(N,N);
   q=0;
-  for(unsigned int q_m1=0; q_m1<trans_rb_sys.get_Q_m(); q_m1++)
+  for(unsigned int q_m1=0; q_m1<Q_m; q_m1++)
   {
-    Number cached_theta_q_m1 = trans_rb_sys.eval_theta_q_m(q_m1);
-    for(unsigned int q_m2=q_m1; q_m2<trans_rb_sys.get_Q_m(); q_m2++)
+    Number cached_theta_q_m1 = trans_theta_expansion.eval_theta_q_m(q_m1);
+    for(unsigned int q_m2=q_m1; q_m2<Q_m; q_m2++)
     {
-      Number cached_theta_q_m2 = trans_rb_sys.eval_theta_q_m(q_m2);
+      Number cached_theta_q_m2 = trans_theta_expansion.eval_theta_q_m(q_m2);
       Real delta = (q_m1==q_m2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -467,17 +501,16 @@ Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
 
   // This assembly assumes we have already called cache_online_residual_terms
   // and that the RB_solve parameter is constant in time
-  
-  TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
 
-  const Real dt = trans_rb_sys.get_dt();
+  const Real dt          = temporal_discretization->get_delta_t();
+  const Real euler_theta = temporal_discretization->get_euler_theta();
 
   DenseVector<Number> RB_u_euler_theta(N);
   DenseVector<Number> mass_coeffs(N);
   for(unsigned int i=0; i<N; i++)
   {
-    RB_u_euler_theta(i)  = trans_rb_sys.get_euler_theta()*RB_solution(i) +
-                          (1.-trans_rb_sys.get_euler_theta())*old_RB_solution(i);
+    RB_u_euler_theta(i)  = euler_theta*RB_solution(i) +
+                          (1.-euler_theta)*old_RB_solution(i);
     mass_coeffs(i) = -(RB_solution(i) - old_RB_solution(i))/dt;
   }
 
@@ -518,41 +551,46 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
 
   // Use the stored representor inner product values
   // to evaluate the residual norm
-  
-  TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
 
-  const Real dt = trans_rb_sys.get_dt();
+  TransientRBThetaExpansion& trans_theta_expansion =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
+  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
+  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
+
+  const Real dt          = temporal_discretization->get_delta_t();
+  const Real euler_theta = temporal_discretization->get_euler_theta();
 
   std::vector<Number> RB_u_euler_theta(N);
   std::vector<Number> mass_coeffs(N);
   for(unsigned int i=0; i<N; i++)
   {
-    RB_u_euler_theta[i]  = trans_rb_sys.get_euler_theta()*RB_solution(i) +
-                          (1.-trans_rb_sys.get_euler_theta())*old_RB_solution(i);
+    RB_u_euler_theta[i]  = euler_theta*RB_solution(i) +
+                          (1.-euler_theta)*old_RB_solution(i);
     mass_coeffs[i] = -(RB_solution(i) - old_RB_solution(i))/dt;
   }
 
   Number residual_norm_sq = 0.;
 
   unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<trans_rb_sys.get_Q_f(); q_f1++)
+  for(unsigned int q_f1=0; q_f1<Q_f; q_f1++)
   {
-    Number cached_theta_q_f1 = trans_rb_sys.eval_theta_q_f(q_f1);
-    for(unsigned int q_f2=q_f1; q_f2<trans_rb_sys.get_Q_f(); q_f2++)
+    Number cached_theta_q_f1 = trans_theta_expansion.eval_theta_q_f(q_f1);
+    for(unsigned int q_f2=q_f1; q_f2<Q_f; q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
-      residual_norm_sq += delta*cached_theta_q_f1*trans_rb_sys.eval_theta_q_f(q_f2) * trans_rb_sys.Fq_representor_norms[q];
+      residual_norm_sq += delta*cached_theta_q_f1*trans_theta_expansion.eval_theta_q_f(q_f2) * Fq_representor_norms[q];
 
       q++;
     }
   }
 
-  for(unsigned int q_f=0; q_f<trans_rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    Number cached_theta_q_f = trans_rb_sys.eval_theta_q_f(q_f);
-    for(unsigned int q_a=0; q_a<trans_rb_sys.get_Q_a(); q_a++)
+    Number cached_theta_q_f = trans_theta_expansion.eval_theta_q_f(q_f);
+    for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
-      Number cached_theta_q_a = trans_rb_sys.eval_theta_q_a(q_a);
+      Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a);
       for(unsigned int i=0; i<N; i++)
       {
         residual_norm_sq += 2.*RB_u_euler_theta[i]*cached_theta_q_f*cached_theta_q_a*
@@ -562,12 +600,12 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   }
 
   q=0;
-  for(unsigned int q_a1=0; q_a1<trans_rb_sys.get_Q_a(); q_a1++)
+  for(unsigned int q_a1=0; q_a1<Q_a; q_a1++)
   {
-    Number cached_theta_q_a1 = trans_rb_sys.eval_theta_q_a(q_a1);
-    for(unsigned int q_a2=q_a1; q_a2<trans_rb_sys.get_Q_a(); q_a2++)
+    Number cached_theta_q_a1 = trans_theta_expansion.eval_theta_q_a(q_a1);
+    for(unsigned int q_a2=q_a1; q_a2<Q_a; q_a2++)
     {
-      Number cached_theta_q_a2 = trans_rb_sys.eval_theta_q_a(q_a2);
+      Number cached_theta_q_a2 = trans_theta_expansion.eval_theta_q_a(q_a2);
       Real delta = (q_a1==q_a2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -585,12 +623,12 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
 
   // Now add the terms due to the time-derivative
   q=0;
-  for(unsigned int q_m1=0; q_m1<trans_rb_sys.get_Q_m(); q_m1++)
+  for(unsigned int q_m1=0; q_m1<Q_m; q_m1++)
   {
-    Number cached_theta_q_m1 = trans_rb_sys.eval_theta_q_m(q_m1);
-    for(unsigned int q_m2=q_m1; q_m2<trans_rb_sys.get_Q_m(); q_m2++)
+    Number cached_theta_q_m1 = trans_theta_expansion.eval_theta_q_m(q_m1);
+    for(unsigned int q_m2=q_m1; q_m2<Q_m; q_m2++)
     {
-      Number cached_theta_q_m2 = trans_rb_sys.eval_theta_q_m(q_m2);
+      Number cached_theta_q_m2 = trans_theta_expansion.eval_theta_q_m(q_m2);
       Real delta = (q_m1==q_m2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -606,12 +644,12 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
     }
   }
 
-  for(unsigned int q_f=0; q_f<trans_rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    Number cached_theta_q_f = trans_rb_sys.eval_theta_q_f(q_f);
-    for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+    Number cached_theta_q_f = trans_theta_expansion.eval_theta_q_f(q_f);
+    for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
-      Number cached_theta_q_m = trans_rb_sys.eval_theta_q_m(q_m);
+      Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m);
       for(unsigned int i=0; i<N; i++)
       {
         residual_norm_sq += 2.*mass_coeffs[i]*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_norms[q_f][q_m][i];
@@ -619,13 +657,13 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
     }
   }
 
-  for(unsigned int q_a=0; q_a<trans_rb_sys.get_Q_a(); q_a++)
+  for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
-    Number cached_theta_q_a = trans_rb_sys.eval_theta_q_a(q_a);
+    Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a);
     
-    for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+    for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
-      Number cached_theta_q_m = trans_rb_sys.eval_theta_q_m(q_m);
+      Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m);
       
       for(unsigned int i=0; i<N; i++)
       {
@@ -664,11 +702,14 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
   START_LOG("write_offline_data_to_files()", "TransientRBEvaluation");
 
   Parent::write_offline_data_to_files(directory_name);
-  
-  TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
+
+  TransientRBThetaExpansion& trans_theta_expansion =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
+  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
+  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
 
   const unsigned int n_bfs = get_n_basis_functions();
-  libmesh_assert( n_bfs <= trans_rb_sys.get_Nmax() );
 
   const unsigned int precision_level = 14;
 
@@ -692,7 +733,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
     RB_L2_matrix_out.close();
           
     // Write out the M_q matrices
-    for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+    for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
       OStringStream file_name;
       file_name << directory_name << "/RB_M_";
@@ -764,9 +805,9 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
       libmesh_error();
     }
     RB_Fq_Mq_norms_out.precision(precision_level);
-    for(unsigned int q_f=0; q_f<trans_rb_sys.get_Q_f(); q_f++)
+    for(unsigned int q_f=0; q_f<Q_f; q_f++)
     {
-      for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+      for(unsigned int q_m=0; q_m<Q_m; q_m++)
       {
         for(unsigned int i=0; i<n_bfs; i++)
         {
@@ -789,7 +830,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
       libmesh_error();
     }
     RB_Mq_Mq_norms_out.precision(precision_level);
-    unsigned int Q_m_hat = trans_rb_sys.get_Q_m()*(trans_rb_sys.get_Q_m()+1)/2;
+    unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
     for(unsigned int q=0; q<Q_m_hat; q++)
     {
       for(unsigned int i=0; i<n_bfs; i++)
@@ -815,9 +856,9 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
       libmesh_error();
     }
     RB_Aq_Mq_norms_out.precision(precision_level);
-    for(unsigned int q_a=0; q_a<trans_rb_sys.get_Q_a(); q_a++)
+    for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
-      for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+      for(unsigned int q_m=0; q_m<Q_m; q_m++)
       {
         for(unsigned int i=0; i<n_bfs; i++)
         {
@@ -831,54 +872,6 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
     RB_Aq_Mq_norms_out.close();
   }
 
-  // Write out the residual representors to file if requested
-  if (rb_sys.store_representors)
-  {
-    // Write out the M_q_representors.  These are useful to have when restarting,
-    // so you don't have to recompute them all over again.  There should be
-    // this->get_n_basis_functions() of these.
-    libMesh::out << "Writing out the M_q_representors..." << std::endl;
-
-    std::ostringstream file_name;
-    const std::string residual_representor_suffix = (rb_sys.write_binary_residual_representors ? ".xdr" : ".dat");
-
-    // Residual representors written out to their own separate directory
-    std::string residual_representors_dir = "residual_representors";
-
-    const unsigned int istop  = this->get_n_basis_functions();
-    const unsigned int istart = istop-rb_sys.get_delta_N();
-
-    for (unsigned int q=0; q<M_q_representor.size(); ++q)
-      for (unsigned int i=istart; i<istop; ++i)
-      {
-	libMesh::out << "Writing out M_q_representor[" << q << "][" << i << "]..." << std::endl;
-	libmesh_assert(M_q_representor[q][i] != NULL);
-
-	file_name.str(""); // reset filename
-	file_name << residual_representors_dir << "/M_q_representor" << i << residual_representor_suffix;
-
-	{
-	  // No need to copy!
-	  //*solution = *(M_q_representor[q][i]);
-	  M_q_representor[q][i]->swap(*rb_sys.solution);
-
-	  Xdr mr_data(file_name.str(),
-	              rb_sys.write_binary_residual_representors ? ENCODE : WRITE);
-
-          rb_sys.write_serialized_data(mr_data, false);
-
-	  // Synchronize before moving on
-	  Parallel::barrier();
-
-	  // Swap back.
-	  M_q_representor[q][i]->swap(*rb_sys.solution);
-
-	  // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
-	  // for the system call, be sure to do it only on one processor, etc.
-	}
-      }
-  } // end if store_representors
-
   STOP_LOG("write_offline_data_to_files()", "TransientRBEvaluation");
 }
 
@@ -887,8 +880,12 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   START_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
 
   Parent::read_offline_data_from_files(directory_name);
-  
-  TransientRBSystem& trans_rb_sys = libmesh_cast_ref<TransientRBSystem&>(rb_sys);
+
+  TransientRBThetaExpansion& trans_theta_expansion =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
+  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
+  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
 
   // First, find out how many basis functions we had when Greedy terminated
   // This was set in RBSystem::read_offline_data_from_files
@@ -912,7 +909,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   RB_L2_matrix_in.close();
 
   // Read in the M_q matrices
-  for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+  for(unsigned int q_m=0; q_m<Q_m; q_m++)
   {
     OStringStream file_name;
     file_name << directory_name << "/RB_M_";
@@ -982,9 +979,9 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
     libMesh::err << "Error opening Fq_Mq_norms.dat" << std::endl;
     libmesh_error();
   }
-  for(unsigned int q_f=0; q_f<trans_rb_sys.get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+    for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
       for(unsigned int i=0; i<n_bfs; i++)
       {
@@ -1006,7 +1003,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
     libMesh::err << "Error opening RB_Mq_Mq_norms_in.dat" << std::endl;
     libmesh_error();
   }
-  unsigned int Q_m_hat = trans_rb_sys.get_Q_m()*(trans_rb_sys.get_Q_m()+1)/2;
+  unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
   for(unsigned int q=0; q<Q_m_hat; q++)
   {
     for(unsigned int i=0; i<n_bfs; i++)
@@ -1031,9 +1028,9 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
     libMesh::err << "Error opening Aq_Mq_norms.dat" << std::endl;
     libmesh_error();
   }
-  for(unsigned int q_a=0; q_a<trans_rb_sys.get_Q_a(); q_a++)
+  for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
-    for(unsigned int q_m=0; q_m<trans_rb_sys.get_Q_m(); q_m++)
+    for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
       for(unsigned int i=0; i<n_bfs; i++)
       {
@@ -1045,68 +1042,6 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
     }
   }
   RB_Aq_Mq_norms_in.close();
-  
-  // Read in the representors if requested
-  if (rb_sys.store_representors)
-  {
-    const std::string residual_representors_dir = "residual_representors";
-    const std::string residual_representor_suffix =
-      (rb_sys.read_binary_residual_representors ? ".xdr" : ".dat");
-
-    std::ostringstream file_name;
-    struct stat stat_info;
-      
-
-    libMesh::out << "Reading in the M_q_representors..." << std::endl;
-
-    // Read in the A_q representors.  The class makes room for [Q_m][Nmax] of these.  We are going to
-    // read in [Q_m][this->get_n_basis_functions()].  FIXME:
-    // should we be worried about leaks in the locations where we're about to fill entries?
-    for (unsigned int i=0; i<M_q_representor.size(); ++i)
-      for (unsigned int j=0; j<M_q_representor[i].size(); ++j)
-      {
-        if (M_q_representor[i][j] != NULL)
-        {
-          libMesh::out << "Error, must delete existing M_q_representor before reading in from file."
-	  	       << std::endl;
-          libmesh_error();
-        }
-      }
-
-    // Now ready to read them in from file!
-    for (unsigned int i=0; i<M_q_representor.size(); ++i)
-      for (unsigned int j=0; j<this->get_n_basis_functions(); ++j)
-      {
-        file_name.str(""); // reset filename
-        file_name << residual_representors_dir
-		  << "/M_q_representor" << i << "_" << j << residual_representor_suffix;
-
-        // On processor zero check to be sure the file exists
-        if (libMesh::processor_id() == 0)
-        {
-          int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-          if (stat_result != 0)
-	  {
-            libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-            libmesh_error();
-          }
-        }
-
-	Xdr aqr_data(file_name.str(),
-	             rb_sys.read_binary_residual_representors ? DECODE : READ);
-
-	rb_sys.read_serialized_data(aqr_data, false);
-
-	M_q_representor[i][j] = NumericVector<Number>::build().release();
-	M_q_representor[i][j]->init (rb_sys.n_dofs(), rb_sys.n_local_dofs(),
-	                 	     false, libMeshEnums::PARALLEL);
-
-	// No need to copy, just swap
-	//*M_q_representor[i][j] = *solution;
-	M_q_representor[i][j]->swap(*rb_sys.solution);
-      }
-  } // end if (store_representors)
 
   STOP_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
 

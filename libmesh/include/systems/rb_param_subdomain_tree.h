@@ -70,8 +70,11 @@ public:
 
   /**
    * Function that calls hp_greedy on the root node.
+   * If \p store_basis_functions==true, write out the
+   * basis functions associated with each subdomain
+   * during the hp-greedy algorithm.
    */
-  void hp_greedy();
+  void hp_greedy(bool store_basis_functions);
 
   /**
    * Determine the subdomain containing the parameter new_param
