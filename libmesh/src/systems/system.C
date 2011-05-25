@@ -1728,7 +1728,7 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
 
 
 
-  Number System::point_value(unsigned int var, Point &p, const bool insist_on_success)
+Number System::point_value(unsigned int var, Point &p, const bool insist_on_success)
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -1802,21 +1802,20 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
   unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
-  // If nobody admits owning the point, we have a problem.
-  if (insist_on_success)
-    libmesh_assert(lowest_owner != libMesh::n_processors());
-
   // Everybody should get their value from a processor that was able
   // to compute it.
+  // If nobody admits owning the point, we may have a problem.
   if (lowest_owner != libMesh::n_processors())
     Parallel::broadcast(u, lowest_owner);
+  else
+    libmesh_assert(!insist_on_success);
   
   return u;
 }
 
 
 
-Gradient System::point_gradient(unsigned int var, Point &p)
+Gradient System::point_gradient(unsigned int var, Point &p, const bool insist_on_success)
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -1831,6 +1830,9 @@ Gradient System::point_gradient(unsigned int var, Point &p)
   // Use an existing PointLocator or create a new one
   AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
+
+  if (!insist_on_success)
+    locator.enable_out_of_mesh_mode();
   
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
@@ -1887,28 +1889,27 @@ Gradient System::point_gradient(unsigned int var, Point &p)
   unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
-  // If nobody admits owning the point, we have a problem.
-  libmesh_assert(lowest_owner != libMesh::n_processors());
-
-  // Broadcast cannot handle Gradients so we create a vector 
-  // that can be used to broadcast the computed gradient to the other procs
-  std::vector<Number> gradient_vector(dim);
-  
-  // Now loop over every dimension and fill this vector
-  for (unsigned int i=0; i<dim; i++)
-    {
-      gradient_vector[i] = grad_u(i);
-    }
-
   // Everybody should get their value from a processor that was able
   // to compute it.
-  Parallel::broadcast(gradient_vector, lowest_owner);
-  
-  // Now unpack
-  for (unsigned int i =0; i<dim; i++)
+  // If nobody admits owning the point, we may have a problem.
+  if (lowest_owner != libMesh::n_processors())
     {
-      grad_u(i) = gradient_vector[i];
+      // Broadcast cannot handle Gradients so we create a vector 
+      // that can be used to broadcast the computed gradient to the other procs
+      std::vector<Number> gradient_vector(dim);
+  
+      // Now loop over every dimension and fill this vector
+      for (unsigned int i=0; i<dim; i++)
+        gradient_vector[i] = grad_u(i);
+
+      Parallel::broadcast(gradient_vector, lowest_owner);
+  
+      // Now unpack
+      for (unsigned int i =0; i<dim; i++)
+        grad_u(i) = gradient_vector[i];
     }
+  else
+    libmesh_assert(!insist_on_success);
 
   return grad_u;
 }
@@ -1917,7 +1918,7 @@ Gradient System::point_gradient(unsigned int var, Point &p)
 
 // We can only accumulate a hessian with --enable-second
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor System::point_hessian(unsigned int var, Point &p)
+Tensor System::point_hessian(unsigned int var, Point &p, const bool insist_on_success)
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -1932,6 +1933,9 @@ Tensor System::point_hessian(unsigned int var, Point &p)
   // Use an existing PointLocator or create a new one
   AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
+
+  if (!insist_on_success)
+    locator.enable_out_of_mesh_mode();
   
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
@@ -1988,26 +1992,29 @@ Tensor System::point_hessian(unsigned int var, Point &p)
   unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
-  // If nobody admits owning the point, we have a problem.
-  libmesh_assert(lowest_owner != libMesh::n_processors());
-
-  // Broadcast cannot handle Gradients so we create a vector 
-  // that can be used to broadcast the computed gradient to the other procs
-  std::vector<Number> hessian_vector(dim*dim);
-  
-  // Now loop over every dimension and fill this vector
-  for (unsigned int i=0; i<dim; i++)    
-      for (unsigned int j=0; j<dim; j++)
-	hessian_vector[i*dim + j] = hess_u(i,j);
-    
   // Everybody should get their value from a processor that was able
   // to compute it.
-  Parallel::broadcast(hessian_vector, lowest_owner);
+  // If nobody admits owning the point, we may have a problem.
+  if (lowest_owner != libMesh::n_processors())
+    {
+      // Broadcast cannot handle Gradients so we create a vector 
+      // that can be used to broadcast the computed gradient to the other procs
+      std::vector<Number> hessian_vector(dim*dim);
   
-  // Now unpack
-  for (unsigned int i =0; i<dim; i++)
-    for (unsigned int j=0; j<dim; j++)
-      hess_u(i,j) = hessian_vector[i*dim + j];
+      // Now loop over every dimension and fill this vector
+      for (unsigned int i=0; i<dim; i++)    
+        for (unsigned int j=0; j<dim; j++)
+          hessian_vector[i*dim + j] = hess_u(i,j);
+    
+      Parallel::broadcast(hessian_vector, lowest_owner);
+  
+      // Now unpack
+      for (unsigned int i =0; i<dim; i++)
+        for (unsigned int j=0; j<dim; j++)
+          hess_u(i,j) = hessian_vector[i*dim + j];
+    }
+  else
+    libmesh_assert(!insist_on_success);
     
   return hess_u;
 }
