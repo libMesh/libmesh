@@ -140,9 +140,6 @@ void TransientRBSystem::process_parameters_file ()
 
   // Read in data from parameters_filename
   GetPot infile(parameters_filename);
-
-  // Build a temporal discretization object
-  temporal_discretization = build_temporal_discretization();
   
   // Read in parameters related to temporal discretization
   unsigned int K_in         = infile("K", temporal_discretization->get_n_time_steps());
