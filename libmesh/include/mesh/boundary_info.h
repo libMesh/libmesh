@@ -119,7 +119,9 @@ public:
    * and the MeshData object used for this mesh.
    */
   void sync (const std::set<short int> &requested_boundary_ids,
-	     UnstructuredMesh& boundary_mesh);
+	     UnstructuredMesh& boundary_mesh,
+	     MeshData* boundary_mesh_data=NULL,
+	     MeshData* this_mesh_data=NULL);
   
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
