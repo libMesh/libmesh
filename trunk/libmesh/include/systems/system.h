@@ -1180,8 +1180,13 @@ public:
    *
    * Because the element containing \p p may lie on any processor,
    * this function is parallel-only.
+   *
+   * By default this method expects the point to reside inside the domain
+   * and will abort if no element can be found which contains \p.  The
+   * optional parameter \p insist_on_success can be set to false to allow
+   * the method to return 0 when the point is not located.
    */
-  Number point_value(unsigned int var, Point &p);
+  Number point_value(unsigned int var, Point &p, const bool insist_on_success = true);
 
   /**
    * Returns the gradient of the solution variable \p var at the physical

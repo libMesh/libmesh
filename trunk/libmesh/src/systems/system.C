@@ -1728,7 +1728,7 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
 
 
 
-Number System::point_value(unsigned int var, Point &p)
+  Number System::point_value(unsigned int var, Point &p, const bool insist_on_success)
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -1743,6 +1743,9 @@ Number System::point_value(unsigned int var, Point &p)
   // Use an existing PointLocator or create a new one
   AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
+
+  if (!insist_on_success)
+    locator.enable_out_of_mesh_mode();
   
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
@@ -1800,11 +1803,13 @@ Number System::point_value(unsigned int var, Point &p)
   Parallel::min(lowest_owner);
 
   // If nobody admits owning the point, we have a problem.
-  libmesh_assert(lowest_owner != libMesh::n_processors());
+  if (insist_on_success)
+    libmesh_assert(lowest_owner != libMesh::n_processors());
 
   // Everybody should get their value from a processor that was able
   // to compute it.
-  Parallel::broadcast(u, lowest_owner);
+  if (lowest_owner != libMesh::n_processors())
+    Parallel::broadcast(u, lowest_owner);
   
   return u;
 }
