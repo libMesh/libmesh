@@ -88,7 +88,7 @@ int main (int argc, char** argv)
   bool online_mode = infile("online_mode", false);                    // Are we in Online mode?
   bool store_basis_functions = infile("store_basis_functions", true); // Do we write the RB basis functions to disk?
 
-  // Create a one-dimensional mesh.
+  // Build a mesh.
   Mesh mesh (dim);
   MeshTools::Generation::build_square (mesh,
                                        n_elem, n_elem,
