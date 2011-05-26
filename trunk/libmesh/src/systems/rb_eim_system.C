@@ -158,16 +158,16 @@ void RBEIMSystem::initialize_RB_system(bool do_not_assemble)
   }
 }
 
-Number RBEIMSystem::evaluate_parametrized_function(unsigned int var, const Point& p)
+Number RBEIMSystem::evaluate_parametrized_function(unsigned int index, const Point& p)
 {
-  if(var >= get_n_parametrized_functions())
+  if(index >= get_n_parametrized_functions())
   {
-    libMesh::err << "Error: We must have var < get_n_parametrized_functions() in evaluate_parametrized_function."
+    libMesh::err << "Error: We must have index < get_n_parametrized_functions() in evaluate_parametrized_function."
                  << std::endl;
     libmesh_error();
   }
 
-  return parametrized_functions[var](p, *this);
+  return parametrized_functions[index]->evaluate(get_current_parameters(), p);
 }
 
 unsigned int RBEIMSystem::get_n_affine_functions() const

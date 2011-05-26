@@ -37,9 +37,19 @@ namespace libMesh
  */
 
 /**
- * The typedef for the function to be approximated.
+ * Functor class in which we can define function to be approximated.
  */
-typedef Number (*parametrized_function_fptr)(const Point&, RBSystem&);
+class ParametrizedFunction
+{
+public:
+
+  /**
+   * Evaluate this parametrized function for the parameter value
+   * \p mu at the point \p p.
+   */
+  virtual Number evaluate(std::vector<Real>& , const Point& ) { return 0.; }
+
+};
 
 // ------------------------------------------------------------
 // RBEIMSystem class definition
@@ -119,8 +129,8 @@ public:
    * Override attach_theta_q_a to just throw an error. Should
    * use attach_A_q in RBSystem and its subclasses.
    */
-  void attach_paramerized_function(parametrized_function_fptr fptr)
-    { parametrized_functions.push_back(fptr); }
+  void attach_paramerized_function(ParametrizedFunction* pf)
+    { parametrized_functions.push_back(pf); }
   
   /**
    * Get the number of parametrized_functions that have
@@ -133,7 +143,7 @@ public:
    * @return the value of the parametrized function that is
    * being approximated.
    */
-  Number evaluate_parametrized_function(unsigned int var, const Point& p);
+  Number evaluate_parametrized_function(unsigned int index, const Point& p);
   
   /**
    * @return the number of affine terms defined by the current EIM
@@ -230,7 +240,7 @@ private:
    * This vector stores the parametrized functions
    * that will be approximated in this EIM system.
    */
-  std::vector<parametrized_function_fptr> parametrized_functions;
+  std::vector<ParametrizedFunction*> parametrized_functions;
   
   /**
    * The current basis function that we sample to evaluate the
