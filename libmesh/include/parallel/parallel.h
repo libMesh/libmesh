@@ -274,14 +274,15 @@ namespace Parallel
   template <typename T>
   class StandardType : public DataType
   {
-  public:
-#ifdef LIBMESH_HAVE_MPI
+  /*
+   * The unspecialized class is useless, so we make its constructor
+   * private to catch mistakes at compile-time rather than link-time.
+   * Specializations should have a public constructor of the same
+   * form.
+   */
+  private:
     StandardType(const T* example = NULL);
-#else
-    StandardType(const T* example = NULL) {}
-#endif
   };
-
 
   //-------------------------------------------------------------------
   /**
@@ -1481,25 +1482,17 @@ namespace Parallel
 #endif // LIBMESH_HAVE_MPI
     }
 
-    ~StandardType() {
-#ifdef LIBMESH_HAVE_MPI
-      MPI_Type_free(&_datatype);
-#endif // LIBMESH_HAVE_MPI
-    }
+    inline ~StandardType() { this->free(); }
   };
 
   template<typename T>
   class StandardType<std::complex<T> > : public DataType
   {
   public:
-    StandardType(const std::complex<T> *example = NULL) :
+    inline StandardType(const std::complex<T> *example = NULL) :
       DataType(StandardType<T>(example ? &(example->real()) : NULL), 2) {}
 
-    ~StandardType() {
-#ifdef LIBMESH_HAVE_MPI
-      MPI_Type_free(&_datatype);
-#endif // LIBMESH_HAVE_MPI
-    }
+    inline ~StandardType() { this->free(); }
   };
 
   template<>
