@@ -42,6 +42,7 @@
 #include "fe_base.h"
 #include "fe_interface.h"
 #include "parallel.h"
+#include "parallel_algebra.h"
 #include "quadrature.h"
 #include "tensor_value.h"
 #include "vector_value.h"
@@ -1893,21 +1894,7 @@ Gradient System::point_gradient(unsigned int var, Point &p, const bool insist_on
   // to compute it.
   // If nobody admits owning the point, we may have a problem.
   if (lowest_owner != libMesh::n_processors())
-    {
-      // Broadcast cannot handle Gradients so we create a vector 
-      // that can be used to broadcast the computed gradient to the other procs
-      std::vector<Number> gradient_vector(dim);
-  
-      // Now loop over every dimension and fill this vector
-      for (unsigned int i=0; i<dim; i++)
-        gradient_vector[i] = grad_u(i);
-
-      Parallel::broadcast(gradient_vector, lowest_owner);
-  
-      // Now unpack
-      for (unsigned int i =0; i<dim; i++)
-        grad_u(i) = gradient_vector[i];
-    }
+    Parallel::broadcast(grad_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 
@@ -1996,23 +1983,7 @@ Tensor System::point_hessian(unsigned int var, Point &p, const bool insist_on_su
   // to compute it.
   // If nobody admits owning the point, we may have a problem.
   if (lowest_owner != libMesh::n_processors())
-    {
-      // Broadcast cannot handle Gradients so we create a vector 
-      // that can be used to broadcast the computed gradient to the other procs
-      std::vector<Number> hessian_vector(dim*dim);
-  
-      // Now loop over every dimension and fill this vector
-      for (unsigned int i=0; i<dim; i++)    
-        for (unsigned int j=0; j<dim; j++)
-          hessian_vector[i*dim + j] = hess_u(i,j);
-    
-      Parallel::broadcast(hessian_vector, lowest_owner);
-  
-      // Now unpack
-      for (unsigned int i =0; i<dim; i++)
-        for (unsigned int j=0; j<dim; j++)
-          hess_u(i,j) = hessian_vector[i*dim + j];
-    }
+    Parallel::broadcast(hess_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
     
