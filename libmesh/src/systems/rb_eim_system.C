@@ -26,6 +26,7 @@
 #include "libmesh_logging.h"
 #include "equation_systems.h"
 #include "parallel.h"
+#include "parallel_algebra.h"
 #include "fe.h"
 #include "quadrature.h"
 #include "utility.h"
@@ -325,15 +326,8 @@ void RBEIMSystem::enrich_RB_space()
   Parallel::maxloc(global_abs_value, proc_ID_index);
   
   // Broadcast the optimal point from proc_ID_index
-  // First need to store optimal_point as a vector
-  std::vector<Real> global_optimal_point(3);
-  global_optimal_point[0] = optimal_point(0);
-  global_optimal_point[1] = optimal_point(1);
-  global_optimal_point[2] = optimal_point(2);
-  Parallel::broadcast(global_optimal_point, proc_ID_index);
-  optimal_point(0) = global_optimal_point[0];
-  optimal_point(1) = global_optimal_point[1];
-  optimal_point(2) = global_optimal_point[2];
+  Parallel::broadcast(optimal_point, proc_ID_index);
+
   // Also broadcast the corresponding optimal_var and optimal_value
   Parallel::broadcast(optimal_var, proc_ID_index);
   Parallel::broadcast(optimal_value, proc_ID_index);

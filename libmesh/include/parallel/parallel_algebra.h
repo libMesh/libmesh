@@ -29,6 +29,7 @@
 #include "libmesh_config.h"
 
 #include "parallel.h"
+#include "point.h"
 #include "type_tensor.h"
 #include "type_vector.h"
 
@@ -54,6 +55,16 @@ namespace Parallel {
   public:
     inline StandardType(const VectorValue<T> *example=NULL) :
       DataType(StandardType<T>(example ? &((*example)(0)) : NULL), LIBMESH_DIM) {}
+
+    inline ~StandardType() { this->free(); }
+  };
+
+  template <>
+  class StandardType<Point> : public DataType
+  {
+  public:
+    inline StandardType(const Point *example=NULL) :
+      DataType(StandardType<Real>(example ? &((*example)(0)) : NULL), LIBMESH_DIM) {}
 
     inline ~StandardType() { this->free(); }
   };
