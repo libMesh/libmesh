@@ -88,7 +88,7 @@ public:
   /**
    * Return the \f$ i^{th} \f$ element of the vector.
    */
-  T operator () (const unsigned int i) const;
+  const T & operator () (const unsigned int i) const;
 
   /**
    * Return a writeable reference to the \f$ i^{th} \f$ element of the vector.
@@ -349,7 +349,7 @@ void TypeVector<T>::assign (const TypeVector<T2> &p)
 
 template <typename T>
 inline
-T TypeVector<T>::operator () (const unsigned int i) const
+const T & TypeVector<T>::operator () (const unsigned int i) const
 {
   libmesh_assert (i<LIBMESH_DIM);
 

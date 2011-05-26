@@ -104,7 +104,7 @@ public:
   /**
    * Return the \f$ i,j^{th} \f$ element of the tensor.
    */
-  T operator () (const unsigned int i, const unsigned int j) const;
+  const T & operator () (const unsigned int i, const unsigned int j) const;
 
   /**
    * Return a writeable reference to the \f$ i^{th} \f$ element of the
@@ -416,7 +416,7 @@ void TypeTensor<T>::assign (const TypeTensor<T2> &p)
 
 template <typename T>
 inline
-T TypeTensor<T>::operator () (const unsigned int i,
+const T & TypeTensor<T>::operator () (const unsigned int i,
 			      const unsigned int j) const
 {
   libmesh_assert (i<3);
