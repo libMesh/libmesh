@@ -1349,21 +1349,13 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const ParallelMesh& pmesh)
   // Save this set of local boundary side IDs for later
   local_side_boundary_ids = global_side_boundary_ids;
 
-  // 2.) Copy local IDs into a vector for communication until Roy fixes Parallel::set_union()
-  std::vector<short> global_side_boundary_ids_vector(global_side_boundary_ids.begin(),
-						     global_side_boundary_ids.end());
-    
-  // 3.) Gather them into an enlarged vector
-  Parallel::allgather(global_side_boundary_ids_vector);
+  // 2.) Gather boundary side IDs from other processors
+  Parallel::set_union(global_side_boundary_ids);
 
-  // 4.) Insert any new IDs into the set (any duplicates will be dropped)
-  global_side_boundary_ids.insert(global_side_boundary_ids_vector.begin(),
-				  global_side_boundary_ids_vector.end());    
-
-  // 5.) Now global_side_boundary_ids actually contains a global list of all side boundary IDs
+  // 3.) Now global_side_boundary_ids actually contains a global list of all side boundary IDs
   this->num_side_sets_global = global_side_boundary_ids.size();
 
-  // 6.) Pack these sidesets into a vector so they can be written by Nemesis
+  // 4.) Pack these sidesets into a vector so they can be written by Nemesis
   this->global_sideset_ids.clear(); // Make sure there is no leftover information
   this->global_sideset_ids.insert(this->global_sideset_ids.end(),
 				  global_side_boundary_ids.begin(),
@@ -1457,21 +1449,13 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const ParallelMesh& pmesh)
   // Save a copy of the local_node_boundary_ids...
   local_node_boundary_ids = global_node_boundary_ids;
 
-  // 2.) Copy local IDs into a vector for communication until Roy fixes Parallel::set_union()
-  std::vector<short> global_node_boundary_ids_vector(global_node_boundary_ids.begin(),
-						     global_node_boundary_ids.end());
-    
-  // 3.) Gather them into an enlarged vector
-  Parallel::allgather(global_node_boundary_ids_vector);
+  // 2.) Gather boundary node IDs from other processors
+  Parallel::set_union(global_node_boundary_ids);
 
-  // 4.) Insert any new IDs into the set (any duplicates will be dropped)
-  global_node_boundary_ids.insert(global_node_boundary_ids_vector.begin(),
-				  global_node_boundary_ids_vector.end());    
-
-  // 5.) Now global_node_boundary_ids actually contains a global list of all node boundary IDs
+  // 3.) Now global_node_boundary_ids actually contains a global list of all node boundary IDs
   this->num_node_sets_global = global_node_boundary_ids.size();
 
-  // 6.) Create a vector<int> from the global_node_boundary_ids set
+  // 4.) Create a vector<int> from the global_node_boundary_ids set
   this->global_nodeset_ids.clear();
   this->global_nodeset_ids.insert(this->global_nodeset_ids.end(),
 				  global_node_boundary_ids.begin(),
