@@ -363,7 +363,7 @@ Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
 
 Real RBEvaluation::eval_output_dual_norm(unsigned int n, const std::vector<Real>& mu)
 {
-  Number output_bound_sq = 0.;    
+  Number output_bound_sq = 0.;
   unsigned int q=0;
   for(unsigned int q_l1=0; q_l1<rb_theta_expansion->get_Q_l(n); q_l1++)
   {
