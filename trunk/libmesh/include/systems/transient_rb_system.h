@@ -88,6 +88,13 @@ public:
   virtual Real train_reduced_basis(const std::string& directory_name = "offline_data");
 
   /**
+   * Build a new RBEvaluation object, add it to this system
+   * and initialize the RBEvaluation based on the system's setup.
+   * Here we override to also copy over TemporalDiscretization data.
+   */
+  virtual void add_and_initialize_rb_eval();
+
+  /**
    * Function that indicates when to terminate the Greedy
    * basis training.
    */
@@ -273,16 +280,9 @@ protected:
   virtual void init_data ();
 
   /**
-   * Initialize any extra objects that we may need to attach to an
-   * RB object. Overload to also initialize a TemporalDiscretization
-   * object.
-   */
-  virtual void init_extra_data_objects();
-
-  /**
    * Build a new TransientRBThetaStruct object and return an AutoPtr to it.
    */
-  virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion(std::vector<Real>& parameters_ref);
+  virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion();
 
   /**
    * Build a new TransientRBEvaluation object.
@@ -295,12 +295,6 @@ protected:
    * temporal discretization.
    */
   virtual AutoPtr<TemporalDiscretization> build_temporal_discretization();
-
-  /**
-   * Override copy_system_data_to_rb_eval to also copy the data
-   * relevant to a time-dependent problem.
-   */
-  virtual void copy_system_data_to_rb_eval();
 
   /**
    * Read in the parameters from file and set up the system

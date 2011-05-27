@@ -151,13 +151,6 @@ public:
   virtual Real RB_solve(unsigned int N);
 
   /**
-   * Initialize any extra objects that we may need to attach to an
-   * RB object. Overload to also initialize a TemporalDiscretization
-   * object.
-   */
-  virtual void init_extra_data_objects();
-
-  /**
    * Specifies the residual scaling on the numerator to
    * be used in the a posteriori error bound. Overload
    * in subclass in order to obtain the desired error bound.
@@ -291,11 +284,6 @@ public:
   std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
 
 protected:
-
-  /**
-   * Build a new TransientRBThetaExpansion object and return an AutoPtr to it.
-   */
-  virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion(std::vector<Real>& parameters_ref);
 
   /**
    * Build a new TemporalDiscretization object and return an AutoPtr to it.

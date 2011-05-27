@@ -106,12 +106,6 @@ public:
    * are employed as basis functions.
    */
   virtual Real truth_solve(int plot_solution);
-  
-  /**
-   * Set parameters in rb_eval to this->get_current_parameters() and
-   * then perform an RB_solve using rb_eval.
-   */
-  Real RB_solve(unsigned int N);
 
   /**
    * Train the reduced basis. This is the crucial function in the Offline
@@ -174,18 +168,8 @@ public:
   virtual void load_basis_function(unsigned int i);
 
   /**
-   * Get the current number of basis functions.
-   */
-  virtual unsigned int get_n_basis_functions() const { return rb_eval->get_n_basis_functions(); }
-
-  /**
-   * Get a reference to the i^th basis function stored in rb_eval.
-   */
-  NumericVector<Number>& get_basis_function(unsigned int i);
-
-  /**
-   * Load the RB solution from the most recent solve
-   * into the libMesh solution vector.
+   * Load the RB solution from the most recent solve with rb_eval
+   * into this system's solution vector.
    */
   virtual void load_RB_solution();
 
@@ -369,7 +353,7 @@ public:
    * and initialize the RBEvaluation based on the system's setup,
    * i.e. copy over parameter domain and theta_q expansion.
    */
-  void add_and_initialize_rb_eval();
+  virtual void add_and_initialize_rb_eval();
 
   /**
    * Get delta_N, the number of basis functions we
@@ -674,7 +658,7 @@ protected:
    * This function returns the RB error bound for the current parameters and
    * is used in the Greedy algorithm to select the next parameter.
    */
-  virtual Real get_RB_error_bound() { return RB_solve(get_n_basis_functions()); }
+  virtual Real get_RB_error_bound();
 
   /**
    * Compute the reduced basis matrices for the current basis.
@@ -697,12 +681,6 @@ protected:
    * call FE::get_*() as the particular physics requires.
    */
   virtual void init_context(FEMContext& ) {}
-
-  /**
-   * Copy this system's parameter domain and theta_q functors
-   * over to rb_eval.
-   */
-  virtual void copy_system_data_to_rb_eval();
 
   /**
    * Set the dofs on the Dirichlet boundary (stored in

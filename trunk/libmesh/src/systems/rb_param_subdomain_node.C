@@ -191,7 +191,8 @@ Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound)
 
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy
-    if ( (greedy_bound > _tree.p_tol) || (_rb_system.get_n_basis_functions() < _rb_system.get_Nmax()) )
+    if ( (greedy_bound > _tree.p_tol) ||
+         (_rb_system.rb_eval->get_n_basis_functions() < _rb_system.get_Nmax()) )
     {
         greedy_bound = _rb_system.train_reduced_basis();
     }

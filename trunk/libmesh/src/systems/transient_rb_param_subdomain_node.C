@@ -118,7 +118,7 @@ void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
     trans_rb.set_delta_N(saved_delta_N);
 
     trans_rb.set_current_parameters(this->anchor);
-    Real RB_error = trans_rb.rb_eval->RB_solve(trans_rb.get_n_basis_functions());
+    Real RB_error = trans_rb.rb_eval->RB_solve(trans_rb.rb_eval->get_n_basis_functions());
     if (RB_error > _tree.h_tol/trans_tree.conserv_factor)
     {
         libMesh::out << "Error: The h-tolerance was not satisfied at the "
@@ -184,7 +184,8 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound)
 
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy
-    if ( (greedy_bound > _tree.p_tol) || (_rb_system.get_n_basis_functions() < _rb_system.get_Nmax()) )
+    if ( (greedy_bound > _tree.p_tol) ||
+         (_rb_system.rb_eval->get_n_basis_functions() < _rb_system.get_Nmax()) )
     {
         greedy_bound = _rb_system.train_reduced_basis();
     }

@@ -301,7 +301,7 @@ void RBSCMSystem::evaluate_stability_constant()
   matrix_A->zero();
   for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
   {
-    add_scaled_symm_Aq(q, rb_theta_expansion->eval_theta_q_a(q));
+    add_scaled_symm_Aq(q, rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()));
   }
 
   set_eigensolver_properties(-1);
@@ -631,7 +631,9 @@ Real RBSCMSystem::get_SCM_LB()
 
         ia[count] = m+1;
         ja[count] = q+1;
-        ar[count] = libmesh_real( rb_theta_expansion->eval_theta_q_a(q) ); // This can only handle Reals right now
+
+        // This can only handle Reals right now
+        ar[count] = libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()) );
       }
   }
   glp_load_matrix(lp, matrix_size, &ia[0], &ja[0], &ar[0]);
@@ -641,7 +643,7 @@ Real RBSCMSystem::get_SCM_LB()
   reload_current_parameters();
   for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
     {
-      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_theta_q_a(q) ) );
+      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()) ) );
     }
 
   // Use this command to initialize the basis for the LP
@@ -714,7 +716,7 @@ Real RBSCMSystem::get_SCM_UB()
     Real J_obj = 0.;
     for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
       {
-        J_obj += libmesh_real( rb_theta_expansion->eval_theta_q_a(q) )*UB_vector[q];
+        J_obj += libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()) )*UB_vector[q];
       }
 
     if( (m==0) || (J_obj < min_J_obj) )

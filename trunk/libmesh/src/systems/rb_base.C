@@ -113,14 +113,4 @@ void RBBase::broadcast_current_parameters(unsigned int proc_id)
   Parallel::broadcast(current_parameters, proc_id);
 }
 
-AutoPtr<RBThetaExpansion> RBBase::build_rb_theta_expansion(std::vector<Real>& parameters_ref)
-{
-  return AutoPtr<RBThetaExpansion>(new RBThetaExpansion( parameters_ref ));
-}
-
-void RBBase::init_extra_data_objects ()
-{
-  rb_theta_expansion = build_rb_theta_expansion(current_parameters);
-}
-
 } // namespace libMesh

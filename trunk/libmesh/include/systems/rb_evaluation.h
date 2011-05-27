@@ -105,7 +105,7 @@ public:
    * Evaluate the dual norm of output \p n
    * for the current parameters.
    */
-  Real eval_output_dual_norm(unsigned int n);
+  Real eval_output_dual_norm(unsigned int n, const std::vector<Real>& mu);
 
   /**
    * Get a lower bound for the stability constant (e.g. coercivity constant or

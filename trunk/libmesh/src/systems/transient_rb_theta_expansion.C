@@ -26,14 +26,12 @@ namespace libMesh
 // ------------------------------------------------------------
 // RBThetaExpansion implementation
 
-TransientRBThetaExpansion::TransientRBThetaExpansion(std::vector<Real>& current_parameters_in)
-  :
-  Parent(current_parameters_in)
+TransientRBThetaExpansion::TransientRBThetaExpansion()
 {
   theta_q_m_vector.clear();
 }
 
-Number TransientRBThetaExpansion::eval_theta_q_m(unsigned int q)
+Number TransientRBThetaExpansion::eval_theta_q_m(unsigned int q, const std::vector<Real>& mu)
 {
   if(q >= get_Q_m())
   {
@@ -44,7 +42,7 @@ Number TransientRBThetaExpansion::eval_theta_q_m(unsigned int q)
 
   libmesh_assert(theta_q_m_vector[q] != NULL);
 
-  return theta_q_m_vector[q]->evaluate( current_parameters_ref );
+  return theta_q_m_vector[q]->evaluate( mu );
 }
 
 void TransientRBThetaExpansion::attach_theta_q_m(RBTheta* theta_q_m)

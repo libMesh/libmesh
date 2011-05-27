@@ -26,9 +26,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // RBThetaExpansion implementation
 
-RBThetaExpansion::RBThetaExpansion(std::vector<Real>& current_parameters_in)
-  :
-  current_parameters_ref(current_parameters_in)
+RBThetaExpansion::RBThetaExpansion()
 {
   theta_q_a_vector.clear();
   theta_q_f_vector.clear();
@@ -90,7 +88,7 @@ void RBThetaExpansion::attach_output_theta(RBTheta* theta_q_l)
   attach_output_theta(theta_l_vector);
 }
 
-Number RBThetaExpansion::eval_theta_q_a(unsigned int q)
+Number RBThetaExpansion::eval_theta_q_a(unsigned int q, const std::vector<Real>& mu)
 {
   if(q >= get_Q_a())
   {
@@ -99,11 +97,11 @@ Number RBThetaExpansion::eval_theta_q_a(unsigned int q)
     libmesh_error();
   }
 
-  return theta_q_a_vector[q]->evaluate( current_parameters_ref );
+  return theta_q_a_vector[q]->evaluate( mu );
 
 }
 
-Number RBThetaExpansion::eval_theta_q_f(unsigned int q)
+Number RBThetaExpansion::eval_theta_q_f(unsigned int q, const std::vector<Real>& mu)
 {
   if(q >= get_Q_f())
   {
@@ -114,10 +112,10 @@ Number RBThetaExpansion::eval_theta_q_f(unsigned int q)
 
   libmesh_assert(theta_q_f_vector[q] != NULL);
 
-  return theta_q_f_vector[q]->evaluate( current_parameters_ref );
+  return theta_q_f_vector[q]->evaluate( mu );
 }
 
-Number RBThetaExpansion::eval_theta_q_l(unsigned int output_index, unsigned int q_l)
+Number RBThetaExpansion::eval_theta_q_l(unsigned int output_index, unsigned int q_l, const std::vector<Real>& mu)
 {
   if( (output_index >= get_n_outputs()) || (q_l >= get_Q_l(output_index)) )
   {
@@ -129,7 +127,7 @@ Number RBThetaExpansion::eval_theta_q_l(unsigned int output_index, unsigned int 
 
   libmesh_assert(theta_q_l_vector[output_index][q_l] != NULL);
 
-  return theta_q_l_vector[output_index][q_l]->evaluate( current_parameters_ref );
+  return theta_q_l_vector[output_index][q_l]->evaluate( mu );
 }
 
 
