@@ -88,7 +88,8 @@ void RBThetaExpansion::attach_output_theta(RBTheta* theta_q_l)
   attach_output_theta(theta_l_vector);
 }
 
-Number RBThetaExpansion::eval_theta_q_a(unsigned int q, const std::vector<Real>& mu)
+Number RBThetaExpansion::eval_theta_q_a(unsigned int q,
+                                        const std::vector<Real>& mu)
 {
   if(q >= get_Q_a())
   {
@@ -101,7 +102,8 @@ Number RBThetaExpansion::eval_theta_q_a(unsigned int q, const std::vector<Real>&
 
 }
 
-Number RBThetaExpansion::eval_theta_q_f(unsigned int q, const std::vector<Real>& mu)
+Number RBThetaExpansion::eval_theta_q_f(unsigned int q,
+                                        const std::vector<Real>& mu)
 {
   if(q >= get_Q_f())
   {
@@ -115,7 +117,9 @@ Number RBThetaExpansion::eval_theta_q_f(unsigned int q, const std::vector<Real>&
   return theta_q_f_vector[q]->evaluate( mu );
 }
 
-Number RBThetaExpansion::eval_theta_q_l(unsigned int output_index, unsigned int q_l, const std::vector<Real>& mu)
+Number RBThetaExpansion::eval_theta_q_l(unsigned int output_index,
+                                        unsigned int q_l,
+                                        const std::vector<Real>& mu)
 {
   if( (output_index >= get_n_outputs()) || (q_l >= get_Q_l(output_index)) )
   {
