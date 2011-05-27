@@ -90,9 +90,15 @@ public:
   
   /**
    * Initialize this system so that we can perform
-   * RB calculations.
+   * the Construction stage of the RB method.
    */
-  virtual void initialize_RB_system(bool online_mode);
+  virtual void initialize_RB_system();
+
+  /**
+   * Read parameters in from file and set up this system
+   * accordingly.
+   */
+  virtual void process_parameters_file (const std::string& parameters_filename);
  
   /**
    * Load the truth representation of the parametrized function
@@ -175,12 +181,6 @@ public:
   BEST_FIT_TYPE best_fit_type_flag;
   
 protected:
-
-  /**
-   * Read parameters in from file and set up this system
-   * accordingly.
-   */
-  virtual void process_parameters_file ();
 
   /**
    * Add a new basis function to the RB space. Overload

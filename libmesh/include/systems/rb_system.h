@@ -256,16 +256,12 @@ public:
   SparseMatrix<Number>* get_non_dirichlet_A_q(unsigned int q);
 
   /**
-   * Resize all the RB matrices.
-   * Optionally assemble and store the Dirichlet dof lists, the
-   * affine and output vectors.
-   * Optionally assemble and store all the affine matrices if we
-   * are not in low-memory mode.
-   * The boolean argument \p do_not_assemble is true, then
-   * we do not perform the initial assembly of affine operators
-   * and vectors.
+   * Parse the input file "parameters_filename" and allocate
+   * all the data structures necessary for the construction
+   * stage of the RB method. This function also performs
+   * matrix and vector assembly of the "truth" affine expansion.
    */
-  virtual void initialize_RB_system(bool do_not_assemble);
+  virtual void initialize_RB_system();
 
   /**
    * Get a pointer to F_q.
@@ -349,11 +345,18 @@ public:
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
+   * Read in the parameters from file specified by the member variable
+   * "parameters_filename" and set the this system's member variables
+   * accordingly.
+   */
+  virtual void process_parameters_file(const std::string& parameters_filename);
+
+  /**
    * Build a new RBEvaluation object, add it to this system
    * and initialize the RBEvaluation based on the system's setup,
    * i.e. copy over parameter domain and theta_q expansion.
    */
-  virtual void add_and_initialize_rb_eval();
+  virtual void build_and_init_rb_eval();
 
   /**
    * Get delta_N, the number of basis functions we
@@ -501,12 +504,6 @@ public:
    * enforced.
    */
   bool store_non_dirichlet_operators;
-
-  /**
-   * The filename of the text file from which we read in the
-   * problem parameters. We use getpot.h to perform the reading.
-   */
-  std::string parameters_filename;
   
   /**
    * Public member variable which we use to determine whether or
@@ -524,18 +521,20 @@ public:
   bool use_empty_RB_solve_in_greedy;
 
 protected:
-
-  /**
-   * Read in the parameters from file and set up the system
-   * accordingly.
-   */
-  virtual void process_parameters_file();
   
   /**
    * Helper function that actually allocates all the data
    * structures required by this class.
    */
   virtual void allocate_data_structures();
+
+  /**
+   * Assemble and store the Dirichlet dof lists, the
+   * affine and output vectors.
+   * Optionally assemble and store all the affine matrices if we
+   * are not in low-memory mode.
+   */
+  virtual void assemble_affine_expansion();
 
   /**
    * Assemble the truth matrix and right-hand side

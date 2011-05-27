@@ -68,7 +68,7 @@ std::string RBEIMSystem::system_type () const
   return "RBEIMSystem";
 }
 
-void RBEIMSystem::process_parameters_file ()
+void RBEIMSystem::process_parameters_file (const std::string& parameters_filename)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -79,7 +79,7 @@ void RBEIMSystem::process_parameters_file ()
   // processors
   serial_training_set = true;
   
-  Parent::process_parameters_file();
+  Parent::process_parameters_file(parameters_filename);
   
   if(n_vars() != get_n_parametrized_functions() )
   {
@@ -113,9 +113,9 @@ void RBEIMSystem::process_parameters_file ()
   libMesh::out << std::endl;
 }
 
-void RBEIMSystem::initialize_RB_system(bool do_not_assemble)
+void RBEIMSystem::initialize_RB_system()
 {
-  Parent::initialize_RB_system(do_not_assemble);
+  Parent::initialize_RB_system();
   
   if(initialize_mesh_dependent_data)
   {
@@ -140,20 +140,17 @@ void RBEIMSystem::initialize_RB_system(bool do_not_assemble)
     current_ghosted_bf->init (this->n_dofs(), false, SERIAL);
 #endif
 
-    if(!do_not_assemble)
+    // Load up the inner product matrix
+    // We only need one matrix in this class, so we
+    // can set matrix to inner_product_matrix here
+    if(!low_memory_mode)
     {
-      // Load up the inner product matrix
-      // We only need one matrix in this class, so we
-      // can set matrix to inner_product_matrix here
-      if(!low_memory_mode)
-      {
-        matrix->zero();
-        matrix->add(1., *inner_product_matrix);
-      }
-      else
-      {
-        assemble_inner_product_matrix(matrix);
-      }
+      matrix->zero();
+      matrix->add(1., *inner_product_matrix);
+    }
+    else
+    {
+      assemble_inner_product_matrix(matrix);
     }
 
   }
