@@ -36,7 +36,8 @@ Real DerivedRBSystem<RBSystem>::truth_solve(int plot_solution)
 
   set_uber_current_parameters();
   
-  uber_system.RB_solve(uber_system.get_n_basis_functions());
+  uber_system.rb_eval->set_current_parameters(uber_system.get_current_parameters());
+  uber_system.rb_eval->RB_solve(uber_system.rb_eval->get_n_basis_functions());
   
   if(plot_solution > 0)
   {
@@ -60,7 +61,7 @@ void DerivedRBSystem<RBSystem>::enrich_RB_space()
   
   EquationSystems& es = this->get_equation_systems();
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
-  const unsigned int uber_size = uber_system.get_n_basis_functions();
+  const unsigned int uber_size = uber_system.rb_eval->get_n_basis_functions();
 
   DenseVector<Number> new_bf = uber_system.rb_eval->RB_solution;
 
@@ -70,7 +71,7 @@ void DerivedRBSystem<RBSystem>::enrich_RB_space()
 
   // compute Gram-Schmidt orthogonalization
   DenseVector<Number> proj_sum(uber_size);
-  for(unsigned int index=0; index<get_n_basis_functions(); index++)
+  for(unsigned int index=0; index<rb_eval->get_n_basis_functions(); index++)
   {
     // orthogonalize using the Identity matrix as the inner product,
     // since the uber basis functions should be orthogonal already
@@ -99,8 +100,8 @@ void DerivedRBSystem<RBSystem>::update_RB_system_matrices()
   EquationSystems& es = this->get_equation_systems();
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
 
-  unsigned int derived_RB_size = get_n_basis_functions();
-  unsigned int uber_RB_size    = uber_system.get_n_basis_functions();
+  unsigned int derived_RB_size = rb_eval->get_n_basis_functions();
+  unsigned int uber_RB_size    = uber_system.rb_eval->get_n_basis_functions();
 
   const unsigned int Q_a = rb_theta_expansion->get_Q_a();
   const unsigned int Q_f = rb_theta_expansion->get_Q_f();
@@ -185,7 +186,7 @@ void DerivedRBSystem<RBSystem>::compute_Fq_representor_norms(bool compute_inner_
   {
     case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_UBER):
     {
-      unsigned int uber_RB_size = uber_system.get_n_basis_functions();
+      unsigned int uber_RB_size = uber_system.rb_eval->get_n_basis_functions();
       DenseVector<Number> temp_vector1, temp_vector2;
 
       // Assume inner product matrix is the identity, hence don't need to
@@ -259,8 +260,8 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
   {
     case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_UBER):
     {
-      unsigned int derived_RB_size = get_n_basis_functions();
-      unsigned int uber_RB_size = uber_system.get_n_basis_functions();
+      unsigned int derived_RB_size = rb_eval->get_n_basis_functions();
+      unsigned int uber_RB_size = uber_system.rb_eval->get_n_basis_functions();
       DenseVector<Number> temp_vector1, temp_vector2;
 
       // Now compute and store the inner products (if requested)
@@ -317,7 +318,7 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
           
     case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_TRUTH):
     {
-      unsigned int RB_size = get_n_basis_functions();
+      unsigned int RB_size = rb_eval->get_n_basis_functions();
 
       for(unsigned int q_f=0; q_f<Q_f; q_f++)
       {
@@ -326,7 +327,7 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
           for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
           {
             rb_eval->Fq_Aq_representor_norms[q_f][q_a][i] = 0.;
-            for(unsigned int j=0; j<uber_system.get_n_basis_functions(); j++) // Evaluate the dot product
+            for(unsigned int j=0; j<uber_system.rb_eval->get_n_basis_functions(); j++) // Evaluate the dot product
             {
               rb_eval->Fq_Aq_representor_norms[q_f][q_a][i] +=
 	        uber_system.rb_eval->Fq_Aq_representor_norms[q_f][q_a][j] * der_rb_eval->derived_basis_functions[i](j);
@@ -349,8 +350,8 @@ void DerivedRBSystem<RBSystem>::update_residual_terms(bool compute_inner_product
               if(i != j)
                 rb_eval->Aq_Aq_representor_norms[q][j][i] = 0.;
 
-              for(unsigned int k=0; k<uber_system.get_n_basis_functions(); k++)
-                for(unsigned int k_prime=0; k_prime<uber_system.get_n_basis_functions(); k_prime++)
+              for(unsigned int k=0; k<uber_system.rb_eval->get_n_basis_functions(); k++)
+                for(unsigned int k_prime=0; k_prime<uber_system.rb_eval->get_n_basis_functions(); k_prime++)
                 {
                   rb_eval->Aq_Aq_representor_norms[q][i][j] += der_rb_eval->derived_basis_functions[i](k)*der_rb_eval->derived_basis_functions[j](k_prime)*
                                                       uber_system.rb_eval->Aq_Aq_representor_norms[q][k][k_prime];
@@ -395,9 +396,9 @@ void DerivedRBSystem<RBSystem>::load_RB_solution()
 
   solution->zero();
 
-  if(rb_eval->RB_solution.size() > get_n_basis_functions())
+  if(rb_eval->RB_solution.size() > rb_eval->get_n_basis_functions())
   {
-    libMesh::err << "ERROR: System contains " << get_n_basis_functions() << " basis functions."
+    libMesh::err << "ERROR: System contains " << rb_eval->get_n_basis_functions() << " basis functions."
                  << " RB_solution vector constains " << rb_eval->RB_solution.size() << " entries."
                  << " RB_solution in RBSystem::load_RB_solution is too long!" << std::endl;
     libmesh_error();
@@ -410,9 +411,10 @@ void DerivedRBSystem<RBSystem>::load_RB_solution()
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
 
   for(unsigned int i=0; i<rb_eval->RB_solution.size(); i++)
-    for(unsigned int j=0; j<uber_system.get_n_basis_functions(); j++)
+    for(unsigned int j=0; j<uber_system.rb_eval->get_n_basis_functions(); j++)
     {
-      solution->add(rb_eval->RB_solution(i)*der_rb_eval->derived_basis_functions[i](j), uber_system.get_basis_function(j));
+      solution->add(rb_eval->RB_solution(i)*der_rb_eval->derived_basis_functions[i](j),
+                    uber_system.rb_eval->get_basis_function(j));
     }
 
   update();

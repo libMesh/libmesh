@@ -59,6 +59,12 @@ template <class Base>
 RBBaseSystem<Base>::~RBBaseSystem ()
 {
   this->clear();
+  
+  // Delete the rb_theta_expansion object if necessary
+  if(rb_theta_expansion)
+  {
+    delete rb_theta_expansion;
+  }
 }
 
 template <class Base>
@@ -82,7 +88,7 @@ template <class Base>
 void RBBaseSystem<Base>::init_data ()
 {
   // Initialize the theta expansion object
-  init_extra_data_objects();
+  rb_theta_expansion = build_rb_theta_expansion().release();
 
   if(initialize_mesh_dependent_data)
   {
@@ -93,6 +99,12 @@ void RBBaseSystem<Base>::init_data ()
     inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   }
 
+}
+
+template <class Base>
+AutoPtr<RBThetaExpansion> RBBaseSystem<Base>::build_rb_theta_expansion()
+{
+  return AutoPtr<RBThetaExpansion>(new RBThetaExpansion);
 }
 
 template <class Base>

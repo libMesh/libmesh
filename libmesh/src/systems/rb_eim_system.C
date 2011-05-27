@@ -173,7 +173,7 @@ Number RBEIMSystem::evaluate_parametrized_function(unsigned int index, const Poi
 
 unsigned int RBEIMSystem::get_n_affine_functions() const
 {
-  return n_vars() * get_n_basis_functions();
+  return n_vars() * rb_eval->get_n_basis_functions();
 }
 
 std::vector<Number> RBEIMSystem::evaluate_basis_function(unsigned int bf_index,
@@ -238,7 +238,7 @@ void RBEIMSystem::set_current_basis_function(unsigned int basis_function_index_i
     unsigned int basis_function_id = current_bf_index/n_vars();
   
     // and create a ghosted version of the appropriate basis function
-    get_basis_function(basis_function_id).localize
+    rb_eval->get_basis_function(basis_function_id).localize
       (*current_ghosted_bf, this->get_dof_map().get_send_list());
   }
   
@@ -253,12 +253,12 @@ void RBEIMSystem::enrich_RB_space()
 
   // If we have at least one basis function we need to use
   // RB_solve, otherwise just use new_bf as is
-  if(get_n_basis_functions() > 0)
+  if(rb_eval->get_n_basis_functions() > 0)
   {
     // get the right-hand side vector for the EIM approximation
     // by sampling the parametrized function (stored in solution)
     // at the interpolation points
-    unsigned int RB_size = get_n_basis_functions();
+    unsigned int RB_size = rb_eval->get_n_basis_functions();
     DenseVector<Number> EIM_rhs(RB_size);
     for(unsigned int i=0; i<RB_size; i++)
     {
@@ -270,9 +270,9 @@ void RBEIMSystem::enrich_RB_space()
 
     // Load the "EIM residual" into solution by subtracting
     // the EIM approximation
-    for(unsigned int i=0; i<get_n_basis_functions(); i++)
+    for(unsigned int i=0; i<rb_eval->get_n_basis_functions(); i++)
     {
-      solution->add(-eim_eval->RB_solution(i), get_basis_function(i));
+      solution->add(-eim_eval->RB_solution(i), rb_eval->get_basis_function(i));
     }
   }
 
@@ -359,7 +359,7 @@ Real RBEIMSystem::compute_best_fit_error()
 {
   START_LOG("compute_best_fit_error()", "RBEIMSystem");
   
-  const unsigned int RB_size = get_n_basis_functions();
+  const unsigned int RB_size = rb_eval->get_n_basis_functions();
   
   // load the parametrized function into the solution vector
   truth_solve(-1);
@@ -380,7 +380,7 @@ Real RBEIMSystem::compute_best_fit_error()
         {
           matrix->vector_mult(*inner_product_storage_vector, *solution);
         }
-        best_fit_rhs(i) = inner_product_storage_vector->dot(get_basis_function(i));
+        best_fit_rhs(i) = inner_product_storage_vector->dot(rb_eval->get_basis_function(i));
       }
 
       // Now compute the best fit by an LU solve
@@ -408,9 +408,9 @@ Real RBEIMSystem::compute_best_fit_error()
   }
   
   // load the error into solution
-  for(unsigned int i=0; i<get_n_basis_functions(); i++)
+  for(unsigned int i=0; i<rb_eval->get_n_basis_functions(); i++)
   {
-    solution->add(-rb_eval->RB_solution(i), get_basis_function(i));
+    solution->add(-rb_eval->RB_solution(i), rb_eval->get_basis_function(i));
   }
 
   Real best_fit_error = solution->linfty_norm();
@@ -549,7 +549,7 @@ void RBEIMSystem::update_RB_system_matrices()
   
   Parent::update_RB_system_matrices();
 
-  unsigned int RB_size = get_n_basis_functions();
+  unsigned int RB_size = rb_eval->get_n_basis_functions();
   
   RBEIMEvaluation* eim_eval = libmesh_cast_ptr<RBEIMEvaluation*>(rb_eval);
   
@@ -558,7 +558,7 @@ void RBEIMSystem::update_RB_system_matrices()
   {
     // Sample the basis functions at the
     // new interpolation point
-    get_basis_function(j).localize(*serialized_vector);
+    rb_eval->get_basis_function(j).localize(*serialized_vector);
 
     if(!performing_extra_greedy_step)
     {
@@ -600,7 +600,7 @@ bool RBEIMSystem::greedy_termination_test(Real training_greedy_error, int)
     return false;
   }
 
-  if(get_n_basis_functions() >= this->get_Nmax())
+  if(rb_eval->get_n_basis_functions() >= this->get_Nmax())
   {
     libMesh::out << "Maximum number of basis functions reached: Nmax = "
               << get_Nmax() << "." << std::endl

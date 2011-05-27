@@ -88,19 +88,15 @@ public:
    * to all processors.
    */
   void broadcast_current_parameters(unsigned int proc_id);
-
-  /**
-   * Initialize any extra objects that we may need to attach to an
-   * RB object. In RBBase, we just initialize an RBThetaExpansion.
-   */
-  virtual void init_extra_data_objects();
   
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
-   * An auto-pointer to the object that stores the theta expansion.
+   * A pointer to to the object that stores the theta expansion.
+   * This is not an AutoPtr since we may want to share it between
+   * multiple RBBases. (Note: a shared_ptr would be a good option here.)
    */
-  AutoPtr<RBThetaExpansion> rb_theta_expansion;
+  RBThetaExpansion* rb_theta_expansion;
   
 protected:
 
@@ -108,11 +104,6 @@ protected:
    * Helper function to indicate if the input parameters are valid.
    */
   bool valid_params(const std::vector<Real>& params);
-
-  /**
-   * Build a new RBThetaExpansion object and return an AutoPtr to it.
-   */
-  virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion(std::vector<Real>& parameters_ref);
 
   //----------- PROTECTED DATA MEMBERS -----------//
 

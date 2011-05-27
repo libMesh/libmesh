@@ -345,18 +345,6 @@ void RBSystem::add_and_initialize_rb_eval()
   rb_evaluation_objects.push_back(build_rb_evaluation().release());
   rb_eval = rb_evaluation_objects.back();
 
-  // Build its RBThetaExpansion and any other objects that may
-  // be required in subclasses (separate function call since can't
-  // make virtual function calls in constructor)
-  rb_eval->init_extra_data_objects();
-  
-  copy_system_data_to_rb_eval();
-  
-  rb_eval->initialize(get_Nmax());
-}
-
-void RBSystem::copy_system_data_to_rb_eval()
-{
   // Copy parameter information over
   rb_eval->set_parameter_range(mu_min_vector, mu_max_vector);
   rb_eval->set_current_parameters( get_current_parameters() );
@@ -365,11 +353,11 @@ void RBSystem::copy_system_data_to_rb_eval()
   rb_eval->return_rel_error_bound   = return_rel_error_bound;
   rb_eval->compute_RB_inner_product = compute_RB_inner_product;
 
-  // Copy theta_expansion over (can't use default assignment operator because RBThetaExpansion
-  // has a non-static reference member, current_parameters_ref)
-  rb_eval->rb_theta_expansion->theta_q_a_vector = rb_theta_expansion->theta_q_a_vector;
-  rb_eval->rb_theta_expansion->theta_q_f_vector = rb_theta_expansion->theta_q_f_vector;
-  rb_eval->rb_theta_expansion->theta_q_l_vector = rb_theta_expansion->theta_q_l_vector;
+  // Copy rb_theta_expansion pointer over to rb_eval
+  rb_eval->rb_theta_expansion = this->rb_theta_expansion;
+
+  // Initialize the rb_eval object (resize data structures according to Nmax)
+  rb_eval->initialize(get_Nmax());
 }
 
 void RBSystem::initialize_RB_system(bool do_not_assemble)
@@ -509,11 +497,6 @@ void RBSystem::allocate_data_structures()
 
   // Resize truth_outputs vector
   truth_outputs.resize(this->rb_theta_expansion->get_n_outputs());
-}
-
-NumericVector<Number>& RBSystem::get_basis_function(unsigned int i)
-{
-  return rb_eval->get_basis_function(i);
 }
 
 AutoPtr<RBEvaluation> RBSystem::build_rb_evaluation()
@@ -798,6 +781,8 @@ void RBSystem::assemble_scaled_matvec(Number scalar,
 void RBSystem::truth_assembly()
 {
   START_LOG("truth_assembly()", "RBSystem");
+  
+  const std::vector<Real> mu = get_current_parameters();
 
   this->matrix->zero();
   this->rhs->zero();
@@ -810,7 +795,7 @@ void RBSystem::truth_assembly()
 
     for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
     {
-      matrix->add(rb_theta_expansion->eval_theta_q_a(q_a), *get_A_q(q_a));
+      matrix->add(rb_theta_expansion->eval_theta_q_a(q_a, mu), *get_A_q(q_a));
     }
 
     AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build();
@@ -818,7 +803,7 @@ void RBSystem::truth_assembly()
     for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
     {
       *temp_vec = *get_F_q(q_f);
-      temp_vec->scale( rb_theta_expansion->eval_theta_q_f(q_f) );
+      temp_vec->scale( rb_theta_expansion->eval_theta_q_f(q_f, mu) );
       rhs->add(*temp_vec);
     }
 
@@ -938,7 +923,7 @@ void RBSystem::truth_assembly()
       for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
       {
         // Scale by theta_q_a
-        Aq_context[q_a]->elem_jacobian *= rb_theta_expansion->eval_theta_q_a(q_a);
+        Aq_context[q_a]->elem_jacobian *= rb_theta_expansion->eval_theta_q_a(q_a, mu);
         this->matrix->add_matrix (Aq_context[q_a]->elem_jacobian,
                                   Aq_context[q_a]->dof_indices);
       }
@@ -946,7 +931,7 @@ void RBSystem::truth_assembly()
       for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
       {
         // Scale by theta_q_f
-        Fq_context[q_f]->elem_residual *= rb_theta_expansion->eval_theta_q_f(q_f);
+        Fq_context[q_f]->elem_residual *= rb_theta_expansion->eval_theta_q_f(q_f, mu);
         this->rhs->add_vector (Fq_context[q_f]->elem_residual,
                               Fq_context[q_f]->dof_indices);
       }
@@ -1154,7 +1139,7 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
   // If we are continuing from a previous training run,
   // we might already be at the max number of basis functions.
   // If so, we can just return.
-  if (this->get_n_basis_functions() >= Nmax) return 0.;
+  if (rb_eval->get_n_basis_functions() >= Nmax) return 0.;
   
 
   // Compute the dual norms of the outputs if we haven't already done so
@@ -1167,7 +1152,7 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
   while(true)
   {
     libMesh::out << std::endl << "---- Basis dimension: "
-                 << get_n_basis_functions() << " ----" << std::endl;
+                 << rb_eval->get_n_basis_functions() << " ----" << std::endl;
 
     if( count > 0 || (count==0 && use_empty_RB_solve_in_greedy) )
     {
@@ -1180,7 +1165,7 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
       if(write_data_during_training)
       {
         OStringStream new_dir_name;
-        new_dir_name << directory_name << "_" << get_n_basis_functions();
+        new_dir_name << directory_name << "_" << rb_eval->get_n_basis_functions();
         libMesh::out << "Writing out RB data to " << new_dir_name.str() << std::endl;
         rb_eval->write_offline_data_to_files(new_dir_name.str());
       }
@@ -1225,7 +1210,7 @@ bool RBSystem::greedy_termination_test(Real training_greedy_error, int)
     return true;
   }
 
-  if(get_n_basis_functions() >= this->get_Nmax())
+  if(rb_eval->get_n_basis_functions() >= this->get_Nmax())
   {
     libMesh::out << "Maximum number of basis functions reached: Nmax = "
                  << get_Nmax() << std::endl;
@@ -1269,6 +1254,8 @@ Real RBSystem::truth_solve(int plot_solution)
   // Safer to zero the solution first, especially when using iterative solvers
   solution->zero();
   solve();
+  
+  const std::vector<Real> mu = get_current_parameters();
 
   // Make sure we didn't max out the number of iterations
   if( (this->n_linear_iterations() >=
@@ -1286,7 +1273,8 @@ Real RBSystem::truth_solve(int plot_solution)
   {
     truth_outputs[n] = 0.;
     for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
-      truth_outputs[n] += libmesh_conj(rb_theta_expansion->eval_theta_q_l(n, q_l))*get_output_vector(n,q_l)->dot(*solution);
+      truth_outputs[n] += libmesh_conj(rb_theta_expansion->eval_theta_q_l(n, q_l, mu))*
+                          get_output_vector(n,q_l)->dot(*solution);
   }
 
   if(plot_solution > 0)
@@ -1313,13 +1301,6 @@ Real RBSystem::truth_solve(int plot_solution)
   STOP_LOG("truth_solve()", "RBSystem");
 
   return libmesh_real(truth_X_norm);
-}
-
-Real RBSystem::RB_solve(unsigned int N)
-{
-  rb_eval->set_current_parameters( get_current_parameters() );
-  
-  return rb_eval->RB_solve(N);
 }
 
 void RBSystem::set_Nmax(unsigned int Nmax_in)
@@ -1389,9 +1370,9 @@ void RBSystem::load_basis_function(unsigned int i)
     libmesh_error();
   }
 
-  libmesh_assert(i < get_n_basis_functions());
+  libmesh_assert(i < rb_eval->get_n_basis_functions());
 
-  *solution = get_basis_function(i);
+  *solution = rb_eval->get_basis_function(i);
 
   this->update();
 
@@ -1415,10 +1396,10 @@ void RBSystem::enrich_RB_space()
   if(low_memory_mode)
     assemble_inner_product_matrix(matrix);
 
-  for(unsigned int index=0; index<get_n_basis_functions(); index++)
+  for(unsigned int index=0; index<rb_eval->get_n_basis_functions(); index++)
   {
     // invoke copy constructor for NumericVector
-    *proj_index = get_basis_function(index);
+    *proj_index = rb_eval->get_basis_function(index);
     if(!low_memory_mode)
     {
       inner_product_matrix->vector_mult(*inner_product_storage_vector,*proj_index);
@@ -1479,6 +1460,13 @@ void RBSystem::update_system()
   this->reset_alternative_solver(this->linear_solver, orig_solver);
 }
 
+Real RBSystem::get_RB_error_bound()
+{
+  rb_eval->set_current_parameters( get_current_parameters() );
+
+  return rb_eval->RB_solve(rb_eval->get_n_basis_functions());
+}
+
 void RBSystem::recompute_all_residual_terms(bool compute_inner_products)
 {
   // Use alternative solver for residual terms solves
@@ -1491,7 +1479,7 @@ void RBSystem::recompute_all_residual_terms(bool compute_inner_products)
 
   // and all the basis dependent terms
   unsigned int saved_delta_N = delta_N;
-  delta_N = get_n_basis_functions();
+  delta_N = rb_eval->get_n_basis_functions();
   
   update_residual_terms(compute_inner_products);
 
@@ -1551,7 +1539,7 @@ void RBSystem::update_RB_system_matrices()
 {
   START_LOG("update_RB_system_matrices()", "RBSystem");
 
-  unsigned int RB_size = get_n_basis_functions();
+  unsigned int RB_size = rb_eval->get_n_basis_functions();
 
   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
@@ -1560,7 +1548,7 @@ void RBSystem::update_RB_system_matrices()
   {
     for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
     {
-      rb_eval->RB_F_q_vector[q_f](i) = get_F_q(q_f)->dot(get_basis_function(i));
+      rb_eval->RB_F_q_vector[q_f](i) = get_F_q(q_f)->dot(rb_eval->get_basis_function(i));
     }
   }
 
@@ -1569,7 +1557,7 @@ void RBSystem::update_RB_system_matrices()
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
       for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
       {
-        rb_eval->RB_output_vectors[n][q_l](i) = get_output_vector(n,q_l)->dot(get_basis_function(i));
+        rb_eval->RB_output_vectors[n][q_l](i) = get_output_vector(n,q_l)->dot(rb_eval->get_basis_function(i));
       }
 
     for(unsigned int j=0; j<RB_size; j++)
@@ -1582,15 +1570,15 @@ void RBSystem::update_RB_system_matrices()
         temp->zero();
         if(!low_memory_mode)
         {
-          inner_product_matrix->vector_mult(*temp, get_basis_function(j));
+          inner_product_matrix->vector_mult(*temp, rb_eval->get_basis_function(j));
         }
         else
         {
           assemble_inner_product_matrix(matrix);
-          matrix->vector_mult(*temp, get_basis_function(j));
+          matrix->vector_mult(*temp, rb_eval->get_basis_function(j));
         }
 
-        value = get_basis_function(i).dot(*temp);
+        value = rb_eval->get_basis_function(i).dot(*temp);
         rb_eval->RB_inner_product_matrix(i,j) = value;
         if(i!=j)
         {
@@ -1606,15 +1594,15 @@ void RBSystem::update_RB_system_matrices()
         temp->zero();
         if(!low_memory_mode)
         {
-          get_A_q(q_a)->vector_mult(*temp, get_basis_function(j));
+          get_A_q(q_a)->vector_mult(*temp, rb_eval->get_basis_function(j));
         }
         else
         {
           assemble_Aq_matrix(q_a,matrix);
-          matrix->vector_mult(*temp, get_basis_function(j));
+          matrix->vector_mult(*temp, rb_eval->get_basis_function(j));
         }
 
-        value = (*temp).dot(get_basis_function(i));
+        value = (*temp).dot(rb_eval->get_basis_function(i));
         rb_eval->RB_A_q_vector[q_a](i,j) = value;
 
         if(i!=j)
@@ -1622,15 +1610,15 @@ void RBSystem::update_RB_system_matrices()
           temp->zero();
           if(!low_memory_mode)
           {
-            get_A_q(q_a)->vector_mult(*temp, get_basis_function(i));
+            get_A_q(q_a)->vector_mult(*temp, rb_eval->get_basis_function(i));
           }
           else
           {
             // matrix should still hold affine matrix q_a
-            matrix->vector_mult(*temp, get_basis_function(i));
+            matrix->vector_mult(*temp, rb_eval->get_basis_function(i));
           }
 
-          value = (*temp).dot(get_basis_function(j));
+          value = (*temp).dot(rb_eval->get_basis_function(j));
           rb_eval->RB_A_q_vector[q_a](j,i) = value;
         }
       }
@@ -1645,7 +1633,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 {
   START_LOG("update_residual_terms()", "RBSystem");
 
-  unsigned int RB_size = get_n_basis_functions();
+  unsigned int RB_size = rb_eval->get_n_basis_functions();
 
   if(!low_memory_mode)
   {
@@ -1685,14 +1673,14 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       rhs->zero();
       if(!low_memory_mode)
       {
-        get_A_q(q_a)->vector_mult(*rhs, get_basis_function(i));
+        get_A_q(q_a)->vector_mult(*rhs, rb_eval->get_basis_function(i));
       }
       else
       {
         assemble_scaled_matvec(1.,
                                A_q_assembly_vector[q_a],
                                *rhs,
-                               get_basis_function(i));
+                               rb_eval->get_basis_function(i));
       }
       rhs->scale(-1.);
       zero_dirichlet_dofs_on_rhs();
@@ -2124,9 +2112,9 @@ void RBSystem::load_RB_solution()
 
   solution->zero();
 
-  if(rb_eval->RB_solution.size() > get_n_basis_functions())
+  if(rb_eval->RB_solution.size() > rb_eval->get_n_basis_functions())
   {
-    libMesh::err << "ERROR: System contains " << get_n_basis_functions() << " basis functions."
+    libMesh::err << "ERROR: System contains " << rb_eval->get_n_basis_functions() << " basis functions."
                  << " RB_solution vector constains " << rb_eval->RB_solution.size() << " entries."
                  << " RB_solution in RBSystem::load_RB_solution is too long!" << std::endl;
     libmesh_error();
@@ -2134,7 +2122,7 @@ void RBSystem::load_RB_solution()
 
   for(unsigned int i=0; i<rb_eval->RB_solution.size(); i++)
   {
-    solution->add(rb_eval->RB_solution(i), get_basis_function(i));
+    solution->add(rb_eval->RB_solution(i), rb_eval->get_basis_function(i));
   }
 
   update();
@@ -2160,7 +2148,7 @@ void RBSystem::load_RB_solution()
 //
 //   for(unsigned int i=0; i<N; i++)
 //   {
-//     RB_sol->add(RB_solution(i), get_basis_function(i));
+//     RB_sol->add(RB_solution(i), rb_eval->get_basis_function(i));
 //   }
 //
 //   this->truth_assembly();
@@ -2416,7 +2404,7 @@ void RBSystem::write_riesz_representors_to_files(const std::string& riesz_repres
   // Next, write out the A_q representors associated with rb_eval.
   libMesh::out << "Writing out the A_q_representors..." << std::endl;
 
-  const unsigned int jstop  = this->get_n_basis_functions();
+  const unsigned int jstop  = rb_eval->get_n_basis_functions();
   const unsigned int jstart = jstop-get_delta_N();
   for (unsigned int i=0; i<rb_eval->A_q_representor.size(); ++i)
     for (unsigned int j=jstart; j<jstop; ++j)
@@ -2516,7 +2504,7 @@ void RBSystem::read_riesz_representors_from_files(const std::string& riesz_repre
   libMesh::out << "Reading in the A_q_representors..." << std::endl;
 
   // Read in the A_q representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
-  // read in [Q_a][this->get_n_basis_functions()].  FIXME:
+  // read in [Q_a][rb_eval->get_n_basis_functions()].  FIXME:
   // should we be worried about leaks in the locations where we're about to fill entries?
   for (unsigned int i=0; i<rb_eval->A_q_representor.size(); ++i)
     for (unsigned int j=0; j<rb_eval->A_q_representor[i].size(); ++j)
@@ -2531,7 +2519,7 @@ void RBSystem::read_riesz_representors_from_files(const std::string& riesz_repre
 
   // Now ready to read them in from file!
   for (unsigned int i=0; i<rb_eval->A_q_representor.size(); ++i)
-    for (unsigned int j=0; j<this->get_n_basis_functions(); ++j)
+    for (unsigned int j=0; j<rb_eval->get_n_basis_functions(); ++j)
     {
       file_name.str(""); // reset filename
       file_name << riesz_representors_dir

@@ -46,7 +46,7 @@ public:
   /**
    * Constructor.
    */
-  RBThetaExpansion(std::vector<Real>& current_parameters_in);
+  RBThetaExpansion();
   
   /**
    * Destructor.
@@ -58,17 +58,21 @@ public:
    * if the theta functions need to be treated differently
    * in subclasses.
    */
-  virtual Number eval_theta_q_a(unsigned int q);
+  virtual Number eval_theta_q_a(unsigned int q,
+                                const std::vector<Real>& mu);
 
   /**
    * Evaluate theta_q_f at the current parameter.
    */
-  virtual Number eval_theta_q_f(unsigned int q);
+  virtual Number eval_theta_q_f(unsigned int q,
+                                const std::vector<Real>& mu);
 
   /**
    * Evaluate theta_q_l at the current parameter.
    */
-  Number eval_theta_q_l(unsigned int output_index, unsigned int q_l);
+  Number eval_theta_q_l(unsigned int output_index,
+                        unsigned int q_l,
+                        const std::vector<Real>& mu);
 
   /**
    * Get Q_a, the number of terms in the affine
@@ -134,13 +138,6 @@ public:
    * Vector storing the RBTheta functors for the theta_q_l (affine expansion of the outputs).
    */
   std::vector< std::vector<RBTheta*> > theta_q_l_vector;
-
-  /**
-   * Store a reference to a parameter vector. This parameter vector will typically
-   * come from an RBBaseSystem or RBEvaluation, and since it is a reference it will
-   * automatically stay in sync.
-   */
-  std::vector<Real>& current_parameters_ref;
 
 };
 

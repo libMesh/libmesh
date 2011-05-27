@@ -74,17 +74,15 @@ void DerivedRBSystem<Base>::load_basis_function(unsigned int i)
                  << std::endl;
     libmesh_error();
   }
-
-  libmesh_assert(i < Base::get_n_basis_functions());
   
   EquationSystems& es = Base::get_equation_systems();
   RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
 
   DenseVector<Number> bf = get_derived_basis_function(i);
 
-  for(unsigned int j=0; j<uber_system.get_n_basis_functions(); j++)
+  for(unsigned int j=0; j<uber_system.rb_eval->get_n_basis_functions(); j++)
   {
-    Base::solution->add(bf(j), uber_system.get_basis_function(j));
+    Base::solution->add(bf(j), uber_system.rb_eval->get_basis_function(j));
   }
 
   STOP_LOG("load_basis_function()", "DerivedRBSystem");

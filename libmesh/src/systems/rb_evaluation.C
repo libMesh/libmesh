@@ -186,6 +186,8 @@ Real RBEvaluation::RB_solve(unsigned int N)
                  << "of basis functions in RB_solve" << std::endl;
     libmesh_error();
   }
+  
+  const std::vector<Real> mu = get_current_parameters();
 
   // Resize (and clear) the solution vector
   RB_solution.resize(N);
@@ -199,7 +201,7 @@ Real RBEvaluation::RB_solve(unsigned int N)
   {
     RB_A_q_vector[q_a].get_principal_submatrix(N, RB_A_q_a);
 
-    RB_system_matrix.add(rb_theta_expansion->eval_theta_q_a(q_a), RB_A_q_a);
+    RB_system_matrix.add(rb_theta_expansion->eval_theta_q_a(q_a, mu), RB_A_q_a);
   }
 
   // Assemble the RB rhs
@@ -211,7 +213,7 @@ Real RBEvaluation::RB_solve(unsigned int N)
   {
     RB_F_q_vector[q_f].get_principal_subvector(N, RB_F_q_f);
 
-    RB_rhs.add(rb_theta_expansion->eval_theta_q_f(q_f), RB_F_q_f);
+    RB_rhs.add(rb_theta_expansion->eval_theta_q_f(q_f, mu), RB_F_q_f);
   }
   
   // Solve the linear system
@@ -228,7 +230,7 @@ Real RBEvaluation::RB_solve(unsigned int N)
     for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
     {
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs[n] += libmesh_conj(rb_theta_expansion->eval_theta_q_l(n,q_l))*RB_output_vector_N.dot(RB_solution);
+      RB_outputs[n] += libmesh_conj(rb_theta_expansion->eval_theta_q_l(n,q_l,mu))*RB_output_vector_N.dot(RB_solution);
     }
   }
 
@@ -249,7 +251,7 @@ Real RBEvaluation::RB_solve(unsigned int N)
     DenseVector<Number> RB_output_vector_N;
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n);
+      RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n, mu);
     }
 
     // Compute the norm of RB_solution
@@ -270,6 +272,8 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
   START_LOG("compute_residual_dual_norm()", "RBEvaluation");
 
+  const std::vector<Real> mu = get_current_parameters();
+
   // Use the stored representor inner product values
   // to evaluate the residual norm
   Number residual_norm_sq = 0.;
@@ -281,7 +285,8 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
       residual_norm_sq += delta * libmesh_real(
-        rb_theta_expansion->eval_theta_q_f(q_f1) * libmesh_conj(rb_theta_expansion->eval_theta_q_f(q_f2)) * Fq_representor_norms[q] );
+         rb_theta_expansion->eval_theta_q_f(q_f1, mu)
+       * libmesh_conj(rb_theta_expansion->eval_theta_q_f(q_f2, mu)) * Fq_representor_norms[q] );
 
       q++;
     }
@@ -295,7 +300,8 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
       {
         Real delta = 2.;
         residual_norm_sq +=
-          delta * libmesh_real( rb_theta_expansion->eval_theta_q_f(q_f) * libmesh_conj(rb_theta_expansion->eval_theta_q_a(q_a)) *
+          delta * libmesh_real( rb_theta_expansion->eval_theta_q_f(q_f, mu) *
+          libmesh_conj(rb_theta_expansion->eval_theta_q_a(q_a, mu)) *
           libmesh_conj(RB_solution(i)) * Fq_Aq_representor_norms[q_f][q_a][i] );
       }
     }
@@ -313,7 +319,8 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
         for(unsigned int j=0; j<N; j++)
         {
           residual_norm_sq +=
-            delta * libmesh_real( libmesh_conj(rb_theta_expansion->eval_theta_q_a(q_a1)) * rb_theta_expansion->eval_theta_q_a(q_a2) *
+            delta * libmesh_real( libmesh_conj(rb_theta_expansion->eval_theta_q_a(q_a1, mu)) *
+            rb_theta_expansion->eval_theta_q_a(q_a2, mu) *
             libmesh_conj(RB_solution(i)) * RB_solution(j) * Aq_Aq_representor_norms[q][i][j] );
         }
       }
@@ -354,7 +361,7 @@ Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
   return alpha_LB;
 }
 
-Real RBEvaluation::eval_output_dual_norm(unsigned int n)
+Real RBEvaluation::eval_output_dual_norm(unsigned int n, const std::vector<Real>& mu)
 {
   Number output_bound_sq = 0.;    
   unsigned int q=0;
@@ -364,7 +371,8 @@ Real RBEvaluation::eval_output_dual_norm(unsigned int n)
     {
       Real delta = (q_l1==q_l2) ? 1. : 2.;
       output_bound_sq += delta * libmesh_real(
-        libmesh_conj(rb_theta_expansion->eval_theta_q_l(n,q_l1))*rb_theta_expansion->eval_theta_q_l(n,q_l2) * output_dual_norms[n][q] );
+        libmesh_conj(rb_theta_expansion->eval_theta_q_l(n,q_l1,mu))*
+        rb_theta_expansion->eval_theta_q_l(n,q_l2,mu) * output_dual_norms[n][q] );
       q++;
     }
   }

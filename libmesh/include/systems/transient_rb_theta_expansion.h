@@ -42,7 +42,7 @@ public:
   /**
    * Constructor.
    */
-  TransientRBThetaExpansion(std::vector<Real>& current_parameters_in);
+  TransientRBThetaExpansion();
 
   /**
    * The type of the parent.
@@ -54,7 +54,8 @@ public:
    * if the theta functions need to be treated differently
    * in subclasses.
    */
-  virtual Number eval_theta_q_m(unsigned int q);
+  virtual Number eval_theta_q_m(unsigned int q,
+                                const std::vector<Real>& mu);
 
   /**
    * Get Q_m, the number of terms in the affine
