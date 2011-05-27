@@ -88,11 +88,17 @@ public:
   virtual Real train_reduced_basis(const std::string& directory_name = "offline_data");
 
   /**
+   * Read in the parameters from file and set up the system
+   * accordingly.
+   */
+  virtual void process_parameters_file (const std::string& parameters_filename);
+
+  /**
    * Build a new RBEvaluation object, add it to this system
    * and initialize the RBEvaluation based on the system's setup.
    * Here we override to also copy over TemporalDiscretization data.
    */
-  virtual void add_and_initialize_rb_eval();
+  virtual void build_and_init_rb_eval();
 
   /**
    * Function that indicates when to terminate the Greedy
@@ -160,12 +166,6 @@ public:
    * Get a pointer to M_q.
    */
   SparseMatrix<Number>* get_M_q(unsigned int q);
-
-  /**
-   * Override initialize_RB_system to also initialize
-   * RB_ic_proj_rhs_all_N, if necessary.
-   */
-  virtual void initialize_RB_system(bool do_not_assemble);
 
   /**
    * Assemble the truth system in the transient linear case.
@@ -297,16 +297,16 @@ protected:
   virtual AutoPtr<TemporalDiscretization> build_temporal_discretization();
 
   /**
-   * Read in the parameters from file and set up the system
-   * accordingly.
-   */
-  virtual void process_parameters_file ();
-
-  /**
    * Helper function that actually allocates all the data
    * structures required by this class.
    */
   virtual void allocate_data_structures();
+
+  /**
+   * Override assemble_affine_expansion to also initialize
+   * RB_ic_proj_rhs_all_N, if necessary.
+   */
+  virtual void assemble_affine_expansion();
 
   /**
    * This function imposes a truth initial condition,

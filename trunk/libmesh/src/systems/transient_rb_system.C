@@ -83,12 +83,8 @@ void TransientRBSystem::clear()
 {
   Parent::clear();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
-  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
-
   // clear the mass matrices
-  for(unsigned int q=0; q<Q_m; q++)
+  for(unsigned int q=0; q<M_q_vector.size(); q++)
   {
     if(M_q_vector[q])
     {
@@ -133,9 +129,9 @@ void TransientRBSystem::init_data()
   temporal_discretization = build_temporal_discretization();
 }
 
-void TransientRBSystem::process_parameters_file ()
+void TransientRBSystem::process_parameters_file (const std::string& parameters_filename)
 {
-  Parent::process_parameters_file();
+  Parent::process_parameters_file(parameters_filename);
 
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -249,16 +245,18 @@ void TransientRBSystem::allocate_data_structures()
   RB_ic_proj_rhs_all_N.resize(Nmax);
 }
 
-void TransientRBSystem::initialize_RB_system(bool do_not_assemble)
+void TransientRBSystem::assemble_affine_expansion()
 {
-  Parent::initialize_RB_system(do_not_assemble);
+  // Call parent's assembly functions
+  Parent::assemble_affine_expansion();
   
   // Now update RB_ic_proj_rhs_all_N if necessary.
   // This allows us to compute the L2 projection
   // of the initial condition into the RB space
   // so that we can continue to enrich a given RB
   // space.
-  if(!do_not_assemble)
+  if(rb_eval)
+  {
     if(rb_eval->get_n_basis_functions() > 0)
     {
       // Load the initial condition into the solution vector
@@ -283,6 +281,7 @@ void TransientRBSystem::initialize_RB_system(bool do_not_assemble)
         RB_ic_proj_rhs_all_N(i) = temp1->dot(rb_eval->get_basis_function(i));
       }
     }
+  }
 }
 
 AutoPtr<RBThetaExpansion> TransientRBSystem::build_rb_theta_expansion()
@@ -300,9 +299,9 @@ AutoPtr<TemporalDiscretization> TransientRBSystem::build_temporal_discretization
   return AutoPtr<TemporalDiscretization>(new TemporalDiscretization);
 }
 
-void TransientRBSystem::add_and_initialize_rb_eval()
+void TransientRBSystem::build_and_init_rb_eval()
 {
-  Parent::add_and_initialize_rb_eval();
+  Parent::build_and_init_rb_eval();
 
   // Cast rb_eval to a TransientRBEvaluation
   TransientRBEvaluation& trans_rb_eval =

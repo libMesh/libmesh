@@ -65,7 +65,6 @@ RBSystem::RBSystem (EquationSystems& es,
     impose_internal_fluxes(false),
     compute_RB_inner_product(false),
     store_non_dirichlet_operators(false),
-    parameters_filename(""),
     enforce_constraints_exactly(false),
     use_empty_RB_solve_in_greedy(true),
     Nmax(0),
@@ -194,7 +193,7 @@ std::string RBSystem::system_type () const
   return "RBSystem";
 }
 
-void RBSystem::process_parameters_file ()
+void RBSystem::process_parameters_file (const std::string& parameters_filename)
 {
   // First read in data from parameters_filename
   GetPot infile(parameters_filename);
@@ -339,7 +338,7 @@ void RBSystem::process_parameters_file ()
   libmesh_assert(Nmax > 0);
 }
 
-void RBSystem::add_and_initialize_rb_eval()
+void RBSystem::build_and_init_rb_eval()
 {
   // Build a new RBEvaluation object and add it to the vector of RBEvaluations
   rb_evaluation_objects.push_back(build_rb_evaluation().release());
@@ -360,34 +359,33 @@ void RBSystem::add_and_initialize_rb_eval()
   rb_eval->initialize(get_Nmax());
 }
 
-void RBSystem::initialize_RB_system(bool do_not_assemble)
+void RBSystem::initialize_RB_system()
 {
-  process_parameters_file();
   allocate_data_structures();
+  assemble_affine_expansion();
 
-  libmesh_assert( rb_evaluation_objects.empty() );
-  
   // Build a new RBEvaluation object and initialize it
-  add_and_initialize_rb_eval();
+  libmesh_assert( rb_evaluation_objects.empty() );
+  build_and_init_rb_eval();
 
   RB_system_initialized = true;
+}
 
-  if(!do_not_assemble)
+void RBSystem::assemble_affine_expansion()
+{
+  // Initialize the non-Dirichlet and Dirichlet dofs lists
+  this->initialize_dirichlet_dofs();
+
+  // Assemble and store all of the matrices if we're
+  // not in low-memory mode
+  if(!low_memory_mode)
   {
-    // Initialize the non-Dirichlet and Dirichlet dofs lists
-    this->initialize_dirichlet_dofs();
-
-    // Assemble and store all of the matrices if we're
-    // not in low-memory mode
-    if(!low_memory_mode)
-    {
-      this->assemble_misc_matrices();
-      this->assemble_all_affine_operators();
-    }
-
-    this->assemble_all_affine_vectors();
-    this->assemble_all_output_vectors();
+    this->assemble_misc_matrices();
+    this->assemble_all_affine_operators();
   }
+
+  this->assemble_all_affine_vectors();
+  this->assemble_all_output_vectors();
 }
 
 void RBSystem::allocate_data_structures()

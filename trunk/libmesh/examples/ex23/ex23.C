@@ -116,9 +116,6 @@ int main (int argc, char** argv)
 
   // Now that the libMesh data structures have been initialized
   // in equation_systems.init(), we can set up the Reduced Basis system.
-  
-  // Point the systems to the input file defining the problem
-  system.parameters_filename = parameters_filename;
 
   // Construct a default RBTheta object, evaluate() returns 1.
   RBTheta rb_theta;
@@ -159,28 +156,37 @@ int main (int argc, char** argv)
   
   // We reuse the operator A0 as the inner product matrix
   system.attach_inner_prod_assembly(&A0_assembly);
-  
-  // Initialize the RB data structures.
-  // If we're in Offline Mode (online_mode == false) then
-  // also pre-assemble the Dirichlet dofs list, RB operators etc
-  system.initialize_RB_system(online_mode);
 
-  if(!online_mode)
+
+  // Read in the data that defines this problem from the specified text file
+  system.process_parameters_file(parameters_filename);
+
+  if(!online_mode) // Perform the Offline stage of the RB method
   {
+    // Prepare system for the Construction stage of the RB method.
+    // This sets up the necessary data structures and performs
+    // initial assembly of the "truth" affine expansion of the PDE.
+    system.initialize_RB_system();
+
     // Compute the reduced basis space by computing "snapshots", i.e.
     // "truth" solves, at well-chosen parameter values and employing
     // these snapshots as basis functions.
     system.train_reduced_basis();
     
+    // Write out the data that will subsequently be required for the Evaluation stage
     system.rb_eval->write_offline_data_to_files();
     
+    // If request, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
       system.rb_eval->write_out_basis_functions(system);
     }
   }
-  else
+  else // Perform the Online stage of the RB method
   {
+    // Build a new RBEvaluation object and point system.rb_eval to it
+    system.build_and_init_rb_eval();
+
     // Read in the reduced basis data
     system.rb_eval->read_offline_data_from_files();
     
