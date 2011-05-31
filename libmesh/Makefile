@@ -49,6 +49,7 @@ $(mesh_library_dir)/libmesh$(static_libext): $(objects)
 else
 $(mesh_library_dir)/libmesh$(static_libext): $(objects)
 	@$(shell mkdir -p $(mesh_library_dir))
+	@rm -f $(mesh_library)
 	@echo "Linking "$@
 	@$(AR) rv $(mesh_library) $(objects)
 	@$(MAKE) -C contrib
@@ -248,7 +249,7 @@ TODO:
 #
 # Dependencies
 #
-.depend:
+.depend: $(srcfiles) $(headerfiles)
 	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) $(appsrcfiles) > .depend
 
 
