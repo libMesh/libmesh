@@ -1093,7 +1093,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 void FEBase::print_JxW(std::ostream& os) const
 {
   for (unsigned int i=0; i<JxW.size(); ++i)
-    os << JxW[i] << std::endl;
+    os << " [" << i << "]: " <<  JxW[i] << std::endl;
 }
 
 
@@ -1136,7 +1136,7 @@ void FEBase::print_d2phi(std::ostream& os) const
 void FEBase::print_xyz(std::ostream& os) const
 {
   for (unsigned int i=0; i<xyz.size(); ++i)
-    os << xyz[i];
+    os << " [" << i << "]: " << xyz[i];
 }
 
 
@@ -1144,16 +1144,16 @@ void FEBase::print_xyz(std::ostream& os) const
 
 void FEBase::print_info(std::ostream& os) const
 {
-  os << "Shape functions at the Gauss pts." << std::endl;
+  os << "phi[i][j]: Shape function i at quadrature pt. j" << std::endl;
   this->print_phi(os);
   
-  os << "Shape function gradients at the Gauss pts." << std::endl;
+  os << "dphi[i][j]: Shape function i's gradient at quadrature pt. j" << std::endl;
   this->print_dphi(os);
   
-  os << "XYZ locations of the Gauss pts." << std::endl;
+  os << "XYZ locations of the quadrature pts." << std::endl;
   this->print_xyz(os);
   
-  os << "Values of JxW at the Gauss pts." << std::endl;
+  os << "Values of JxW at the quadrature pts." << std::endl;
   this->print_JxW(os);
 }
 
