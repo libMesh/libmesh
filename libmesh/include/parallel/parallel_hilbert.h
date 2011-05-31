@@ -53,7 +53,7 @@ namespace Parallel {
       static bool _is_initialized = false;
       if (!_is_initialized)
         {
-          _static_type = DataType(Parallel::StandardType<unsigned int>(), 3);
+          _static_type = DataType(Parallel::StandardType<Hilbert::inttype>(), 3);
           _is_initialized = true;
         }
       _datatype = _static_type;
