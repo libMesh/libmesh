@@ -94,6 +94,11 @@ public:
   virtual void process_parameters_file (const std::string& parameters_filename);
 
   /**
+   * Build a new TransientRBEvaluation object.
+   */
+  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
+
+  /**
    * Build a new RBEvaluation object, add it to this system
    * and initialize the RBEvaluation based on the system's setup.
    * Here we override to also copy over TemporalDiscretization data.
@@ -283,11 +288,6 @@ protected:
    * Build a new TransientRBThetaStruct object and return an AutoPtr to it.
    */
   virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion();
-
-  /**
-   * Build a new TransientRBEvaluation object.
-   */
-  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
   
   /**
    * Build a new TemporalDiscretization object. This
