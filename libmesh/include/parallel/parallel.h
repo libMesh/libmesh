@@ -1436,6 +1436,19 @@ namespace Parallel
       { /* make compiler think 'example' is used */ libmesh_ignore(example); } \
   }
 
+#else
+
+#define STANDARD_TYPE(cxxtype,mpitype) \
+  template<> \
+  class StandardType<cxxtype> : public DataType \
+  { \
+  public: \
+    StandardType(const cxxtype* example = NULL) : DataType() \
+      { /* make compiler think 'example' is used */ libmesh_ignore(example); } \
+  }
+
+#endif
+
   STANDARD_TYPE(char,MPI_CHAR);
   STANDARD_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
   STANDARD_TYPE(short int,MPI_SHORT);
@@ -1456,10 +1469,10 @@ namespace Parallel
   {
   public:
     StandardType(const std::pair<T1, T2> *example = NULL) {
-#ifdef LIBMESH_HAVE_MPI
       // We need an example for MPI_Address to use
       libmesh_assert(example);
 
+#ifdef LIBMESH_HAVE_MPI
       // Get the sub-data-types, and make sure they live long enough
       // to construct the derived type
       StandardType<T1> d1(&example->first);
@@ -1495,6 +1508,7 @@ namespace Parallel
     inline ~StandardType() { this->free(); }
   };
 
+#ifdef LIBMESH_HAVE_MPI
   template<>
   inline data_type dataplusint_type<short int>() { return MPI_SHORT_INT; }
 
