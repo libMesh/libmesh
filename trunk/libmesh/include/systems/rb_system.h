@@ -339,17 +339,17 @@ public:
   virtual void recompute_all_residual_terms(const bool compute_inner_products=true);
 
   /**
-   * Build a new RBEvaluation object.
-   * @return an AutoPtr to the new RBEvaluation object.
-   */
-  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
-
-  /**
    * Read in the parameters from file specified by the member variable
    * "parameters_filename" and set the this system's member variables
    * accordingly.
    */
   virtual void process_parameters_file(const std::string& parameters_filename);
+
+  /**
+   * Build a new RBEvaluation object.
+   * @return an AutoPtr to the new RBEvaluation object.
+   */
+  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
    * Build a new RBEvaluation object, add it to this system
