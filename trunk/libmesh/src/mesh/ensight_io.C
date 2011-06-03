@@ -199,7 +199,7 @@ void EnsightIO::write_geometry_ascii()
   for(int i = 1; no_it != no_end_it; ++no_it, i++)
     {
       const mesh_node_value pn = *no_it;
-      fprintf(fout,"%12.5e\n",pn.second(0));
+      fprintf(fout,"%12.5e\n",static_cast<double>(pn.second(0)));
       ensight_node_index[pn.first] = i;
     }
 
@@ -208,7 +208,7 @@ void EnsightIO::write_geometry_ascii()
   for(; no_it != no_end_it; ++no_it)
     {
       const mesh_node_value pn = *no_it;
-      fprintf(fout,"%12.5e\n",pn.second(1));
+      fprintf(fout,"%12.5e\n",static_cast<double>(pn.second(1)));
     }
   
   // write z
@@ -216,7 +216,7 @@ void EnsightIO::write_geometry_ascii()
   for(; no_it != no_end_it; ++no_it)
     {
       const mesh_node_value pn = *no_it;
-      fprintf(fout,"%12.5e\n",pn.second(2));
+      fprintf(fout,"%12.5e\n",static_cast<double>(pn.second(2)));
     }
 
   ensight_parts_iterator            parts_it  =  ensight_parts_map.begin();
@@ -422,7 +422,7 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
   local_soln_iterator sol = local_soln.begin();
   const local_soln_iterator sol_end = local_soln.end();
   for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",(*sol).second);
+    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second));
 	
   fclose(fout);
 		
@@ -529,13 +529,13 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
   const local_soln_iterator sol_end = local_soln.end();
         
   for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",(*sol).second[0]);
+    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[0]));
   sol = local_soln.begin();
   for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",(*sol).second[1]);
+    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[1]));
   sol = local_soln.begin();
   for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",(*sol).second[2]);
+    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[2]));
         	
   fclose(fout);
 	
