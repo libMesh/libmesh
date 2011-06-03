@@ -249,7 +249,15 @@ class Elem : public ReferenceCountedObject<Elem>,
   bool contains_edge_of(const Elem *e) const;
 
   /**
-   * This function finds all elements which
+   * This function finds all elements (including this one) which
+   * touch the current element at the specified point, which should be
+   * a point in the current element.
+   */
+  void find_point_neighbors(const Point &p,
+                            std::set<const Elem *> &neighbor_set) const;
+
+  /**
+   * This function finds all elements (including this one) which
    * touch the current element at any point
    */
   void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
