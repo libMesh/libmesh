@@ -107,12 +107,9 @@ int main (int argc, char** argv)
   // Initialize the data structures for the equation system.
   equation_systems.init ();
 
-  if(system.initialize_mesh_dependent_data)
-  {
-    // Print out some information about the "truth" discretization
-    equation_systems.print_info();
-    mesh.print_info();
-  }
+  // Print out some information about the "truth" discretization
+  equation_systems.print_info();
+  mesh.print_info();
 
   // Now that the libMesh data structures have been initialized
   // in equation_systems.init(), we can set up the Reduced Basis system.

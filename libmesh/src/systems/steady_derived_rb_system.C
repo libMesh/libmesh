@@ -386,14 +386,6 @@ void DerivedRBSystem<RBSystem>::load_RB_solution()
 {
   START_LOG("load_RB_solution()", "DerivedRBSystem");
 
-  if(!initialize_mesh_dependent_data)
-  {
-    libMesh::err << "Error: We must initialize the mesh dependent "
-                 << "data structures in order to load RB solution."
-                 << std::endl;
-    libmesh_error();
-  }
-
   solution->zero();
 
   if(rb_eval->RB_solution.size() > rb_eval->get_n_basis_functions())

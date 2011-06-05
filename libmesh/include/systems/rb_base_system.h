@@ -181,13 +181,6 @@ public:
   bool training_parameters_initialized;
 
   /**
-   * Boolean flag to indicate whether or not we initialize
-   * mesh dependent matrices and vectors when init_data
-   * is called. Default value is true.
-   */
-  bool initialize_mesh_dependent_data;
-
-  /**
    * The training samples.
    */
   std::vector< NumericVector<Number>* > training_parameters;

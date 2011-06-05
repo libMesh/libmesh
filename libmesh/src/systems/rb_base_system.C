@@ -47,7 +47,6 @@ RBBaseSystem<Base>::RBBaseSystem (EquationSystems& es,
                                   const unsigned int number)
   : Base(es, name, number),
     training_parameters_initialized(false),
-    initialize_mesh_dependent_data(true),
     training_parameters_random_seed(-1), // by default, use std::time to seed RNG
     serial_training_set(false),
     alternative_solver("unchanged")
@@ -90,14 +89,12 @@ void RBBaseSystem<Base>::init_data ()
   // Initialize the theta expansion object
   rb_theta_expansion = build_rb_theta_expansion().release();
 
-  if(initialize_mesh_dependent_data)
-  {
-    Base::init_data();
+  Base::init_data();
 
-    // Initialize the inner product storage vector
-    inner_product_storage_vector = NumericVector<Number>::build();
-    inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-  }
+  // Initialize the inner product storage vector, which is useful for
+  // storing intermediate results when evaluating inner products
+  inner_product_storage_vector = NumericVector<Number>::build();
+  inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
 }
 
