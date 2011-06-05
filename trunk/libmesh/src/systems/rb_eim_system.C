@@ -116,44 +116,41 @@ void RBEIMSystem::process_parameters_file (const std::string& parameters_filenam
 void RBEIMSystem::initialize_RB_system()
 {
   Parent::initialize_RB_system();
-  
-  if(initialize_mesh_dependent_data)
-  {
-    // initialize a serial vector that we will use for MeshFunction evaluations
-    serialized_vector = NumericVector<Number>::build();
-    serialized_vector->init (this->n_dofs(), false, SERIAL);
 
-    // Initialize the MeshFunction for interpolating the
-    // solution vector at quadrature points
-    std::vector<unsigned int> vars(n_vars());
-    Utility::iota(vars.begin(), vars.end(), 0); // By default use all variables
-    mesh_function = new MeshFunction(get_equation_systems(), *serialized_vector, get_dof_map(), vars);
-    mesh_function->init();
+  // initialize a serial vector that we will use for MeshFunction evaluations
+  serialized_vector = NumericVector<Number>::build();
+  serialized_vector->init (this->n_dofs(), false, SERIAL);
+
+  // Initialize the MeshFunction for interpolating the
+  // solution vector at quadrature points
+  std::vector<unsigned int> vars(n_vars());
+  Utility::iota(vars.begin(), vars.end(), 0); // By default use all variables
+  mesh_function = new MeshFunction(get_equation_systems(), *serialized_vector, get_dof_map(), vars);
+  mesh_function->init();
     
-    // initialize the vector that stores the _current_ basis function,
-    // i.e. the vector that is used in evaluate_basis_function
-    current_ghosted_bf = NumericVector<Number>::build();
+  // initialize the vector that stores the _current_ basis function,
+  // i.e. the vector that is used in evaluate_basis_function
+  current_ghosted_bf = NumericVector<Number>::build();
 #ifdef LIBMESH_ENABLE_GHOSTED
-    current_ghosted_bf->init (this->n_dofs(), this->n_local_dofs(),
-                              get_dof_map().get_send_list(), false, GHOSTED);
+  current_ghosted_bf->init (this->n_dofs(), this->n_local_dofs(),
+                            get_dof_map().get_send_list(), false, GHOSTED);
 #else
-    current_ghosted_bf->init (this->n_dofs(), false, SERIAL);
+  current_ghosted_bf->init (this->n_dofs(), false, SERIAL);
 #endif
 
-    // Load up the inner product matrix
-    // We only need one matrix in this class, so we
-    // can set matrix to inner_product_matrix here
-    if(!low_memory_mode)
-    {
-      matrix->zero();
-      matrix->add(1., *inner_product_matrix);
-    }
-    else
-    {
-      assemble_inner_product_matrix(matrix);
-    }
-
+  // Load up the inner product matrix
+  // We only need one matrix in this class, so we
+  // can set matrix to inner_product_matrix here
+  if(!low_memory_mode)
+  {
+    matrix->zero();
+    matrix->add(1., *inner_product_matrix);
   }
+  else
+  {
+    assemble_inner_product_matrix(matrix);
+  }
+
 }
 
 Number RBEIMSystem::evaluate_parametrized_function(unsigned int index, const Point& p)
@@ -421,14 +418,6 @@ Real RBEIMSystem::truth_solve(int plot_solution)
 {
   START_LOG("truth_solve()", "RBEIMSystem");
         
-  if(!initialize_mesh_dependent_data)
-  {
-    libMesh::err << "Error: We must initialize the mesh dependent "
-                 << "data structures in order to load the truth solution."
-                 << std::endl;
-    libmesh_error();
-  }
-  
 //  matrix should have been set to inner_product_matrix during initialization
 //  if(!low_memory_mode)
 //  {

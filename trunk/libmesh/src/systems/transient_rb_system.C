@@ -108,22 +108,8 @@ void TransientRBSystem::clear()
 
 void TransientRBSystem::init_data()
 {
-  // Use the boolean initialize_mesh_dependent_data
-  // to determine whether or not we initialize the libMesh
-  // mesh-dependent data.
-
-  if(initialize_mesh_dependent_data)
-  {
-    // Call the Parent's initialization routine.
-    Parent::init_data();
-  }
-  else
-  {
-    // If we do not initialize mesh-dependent data, then we
-    // must skip initialization of Parent (=TransientSystem<RBSystem>)
-    // and just initialize RBSystem.
-    RBSystem::init_data();
-  }
+  // Call the Parent's initialization routine.
+  Parent::init_data();
 
   // Build a temporal discretization object
   temporal_discretization = build_temporal_discretization();
@@ -195,41 +181,38 @@ void TransientRBSystem::allocate_data_structures()
   const unsigned int Q_m       = trans_theta_expansion.get_Q_m();
   const unsigned int n_outputs = trans_theta_expansion.get_n_outputs();
 
-  // Resize vectors for storing mesh-dependent data but only
-  // initialize if initialize_mesh_dependent_data == true
+  // Resize and allocate vectors for storing mesh-dependent data
   const unsigned int n_time_levels = temporal_discretization->get_n_time_steps()+1;
   temporal_data.resize(n_time_levels);
   
   // Resize vectors for storing mesh-dependent data but only
   // initialize if initialize_mesh_dependent_data == true
   M_q_vector.resize(Q_m);
-  if(initialize_mesh_dependent_data)
+
+  // Only initialize the mass matrices if we
+  // are not in low-memory mode
+  if(!low_memory_mode)
   {
-    // Only initialize the mass matrices if we
-    // are not in low-memory mode
-    if(!low_memory_mode)
-    {
-      DofMap& dof_map = this->get_dof_map();
+    DofMap& dof_map = this->get_dof_map();
 
-      dof_map.attach_matrix(*L2_matrix);
-      L2_matrix->init();
-      L2_matrix->zero();
+    dof_map.attach_matrix(*L2_matrix);
+    L2_matrix->init();
+    L2_matrix->zero();
       
-      for(unsigned int q=0; q<Q_m; q++)
-      {
-        // Initialize the memory for the matrices
-        M_q_vector[q] = SparseMatrix<Number>::build().release();
-        dof_map.attach_matrix(*M_q_vector[q]);
-        M_q_vector[q]->init();
-        M_q_vector[q]->zero();
-      }
-    }
-
-    for(unsigned int i=0; i<n_time_levels; i++)
+    for(unsigned int q=0; q<Q_m; q++)
     {
-      temporal_data[i] = (NumericVector<Number>::build().release());
-      temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      // Initialize the memory for the matrices
+      M_q_vector[q] = SparseMatrix<Number>::build().release();
+      dof_map.attach_matrix(*M_q_vector[q]);
+      M_q_vector[q]->init();
+      M_q_vector[q]->zero();
     }
+  }
+
+  for(unsigned int i=0; i<n_time_levels; i++)
+  {
+    temporal_data[i] = (NumericVector<Number>::build().release());
+    temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   }
 
   // and the truth output vectors

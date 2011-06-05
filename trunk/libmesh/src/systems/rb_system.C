@@ -242,12 +242,6 @@ void RBSystem::process_parameters_file (const std::string& parameters_filename)
   impose_internal_fluxes = infile("impose_internal_fluxes",
                                    impose_internal_fluxes);
 
-  // Set boolean flag to indicate whether or not we initialize
-  // mesh dependent matrices and vectors when init_data
-  // is called. Default value is true.
-  initialize_mesh_dependent_data = infile("initialize_mesh_dependent_data",
-                                          initialize_mesh_dependent_data);
-
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.
@@ -318,8 +312,6 @@ void RBSystem::process_parameters_file (const std::string& parameters_filename)
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "return a relative error bound from RB_solve? " << return_rel_error_bound << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
-  libMesh::out << "initializing mesh-dependent data structures? "
-               << initialize_mesh_dependent_data << std::endl;
   libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
   libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
@@ -390,8 +382,7 @@ void RBSystem::assemble_affine_expansion()
 
 void RBSystem::allocate_data_structures()
 {
-  // Resize vectors for storing mesh-dependent data but only
-  // initialize if initialize_mesh_dependent_data == true
+  // Resize vectors for storing mesh-dependent data
   A_q_vector.resize(rb_theta_expansion->get_Q_a());
   F_q_vector.resize(rb_theta_expansion->get_Q_f());
   
@@ -418,80 +409,77 @@ void RBSystem::allocate_data_structures()
     output_dual_norms[n].resize(Q_l_hat);
   }
 
-  if(initialize_mesh_dependent_data)
+  // Only initialize matrices if we're not in low-memory mode
+  if(!low_memory_mode)
   {
-    // Only initialize matrices if we're not in low-memory mode
-    if(!low_memory_mode)
+    DofMap& dof_map = this->get_dof_map();
+
+    dof_map.attach_matrix(*inner_product_matrix);
+    inner_product_matrix->init();
+    inner_product_matrix->zero();
+
+    if(this->constrained_problem)
     {
-      DofMap& dof_map = this->get_dof_map();
-
-      dof_map.attach_matrix(*inner_product_matrix);
-      inner_product_matrix->init();
-      inner_product_matrix->zero();
-
-      if(this->constrained_problem)
-      {
-        dof_map.attach_matrix(*constraint_matrix);
-        constraint_matrix->init();
-        constraint_matrix->zero();
-      }
-
-      for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
-      {
-        // Initialize the memory for the matrices
-        A_q_vector[q] = SparseMatrix<Number>::build().release();
-        dof_map.attach_matrix(*A_q_vector[q]);
-        A_q_vector[q]->init();
-        A_q_vector[q]->zero();
-      }
-      
-      // We also need to initialize a second set of non-Dirichlet operators
-      if(store_non_dirichlet_operators)
-      {
-        dof_map.attach_matrix(*non_dirichlet_inner_product_matrix);
-        non_dirichlet_inner_product_matrix->init();
-        non_dirichlet_inner_product_matrix->zero();
-        
-        non_dirichlet_A_q_vector.resize(rb_theta_expansion->get_Q_a());
-        for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
-        {
-          // Initialize the memory for the matrices
-          non_dirichlet_A_q_vector[q] = SparseMatrix<Number>::build().release();
-          dof_map.attach_matrix(*non_dirichlet_A_q_vector[q]);
-          non_dirichlet_A_q_vector[q]->init();
-          non_dirichlet_A_q_vector[q]->zero();
-        }
-      }
+      dof_map.attach_matrix(*constraint_matrix);
+      constraint_matrix->init();
+      constraint_matrix->zero();
     }
 
-    // Initialize the vectors even if we are in low-memory mode
-    for(unsigned int q=0; q<rb_theta_expansion->get_Q_f(); q++)
+    for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
     {
-      // Initialize the memory for the vectors
-      F_q_vector[q] = NumericVector<Number>::build().release();
-      F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      // Initialize the memory for the matrices
+      A_q_vector[q] = SparseMatrix<Number>::build().release();
+      dof_map.attach_matrix(*A_q_vector[q]);
+      A_q_vector[q]->init();
+      A_q_vector[q]->zero();
     }
 
     // We also need to initialize a second set of non-Dirichlet operators
     if(store_non_dirichlet_operators)
     {
-      non_dirichlet_F_q_vector.resize(rb_theta_expansion->get_Q_f());
-      for(unsigned int q=0; q<rb_theta_expansion->get_Q_f(); q++)
+      dof_map.attach_matrix(*non_dirichlet_inner_product_matrix);
+      non_dirichlet_inner_product_matrix->init();
+      non_dirichlet_inner_product_matrix->zero();
+        
+      non_dirichlet_A_q_vector.resize(rb_theta_expansion->get_Q_a());
+      for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
       {
-        // Initialize the memory for the vectors
-        non_dirichlet_F_q_vector[q] = NumericVector<Number>::build().release();
-        non_dirichlet_F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        // Initialize the memory for the matrices
+        non_dirichlet_A_q_vector[q] = SparseMatrix<Number>::build().release();
+        dof_map.attach_matrix(*non_dirichlet_A_q_vector[q]);
+        non_dirichlet_A_q_vector[q]->init();
+        non_dirichlet_A_q_vector[q]->zero();
       }
     }
-
-    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
-      {
-        // Initialize the memory for the truth output vectors
-        outputs_vector[n][q_l] = (NumericVector<Number>::build().release());
-        outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-      }
   }
+
+  // Initialize the vectors even if we are in low-memory mode
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_f(); q++)
+  {
+    // Initialize the memory for the vectors
+    F_q_vector[q] = NumericVector<Number>::build().release();
+    F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  }
+
+  // We also need to initialize a second set of non-Dirichlet operators
+  if(store_non_dirichlet_operators)
+  {
+    non_dirichlet_F_q_vector.resize(rb_theta_expansion->get_Q_f());
+    for(unsigned int q=0; q<rb_theta_expansion->get_Q_f(); q++)
+    {
+      // Initialize the memory for the vectors
+      non_dirichlet_F_q_vector[q] = NumericVector<Number>::build().release();
+      non_dirichlet_F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    }
+  }
+
+  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+    {
+      // Initialize the memory for the truth output vectors
+      outputs_vector[n][q_l] = (NumericVector<Number>::build().release());
+      outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    }
 
   // Resize truth_outputs vector
   truth_outputs.resize(this->rb_theta_expansion->get_n_outputs());
@@ -518,14 +506,6 @@ void RBSystem::initialize_dirichlet_dofs()
   }
 
   START_LOG("initialize_dirichlet_dofs()", "RBSystem");
-
-  if(!initialize_mesh_dependent_data)
-  {
-    libMesh::err << "Error: We must initialize the mesh dependent "
-                 << "data structures in order to initialize Dirichlet dofs."
-                 << std::endl;
-    libmesh_error();
-  }
 
   // Initialize the lists of Dirichlet and non-Dirichlet degrees-of-freedom
   // Clear the set to store the Dirichlet dofs on this processor
@@ -599,14 +579,6 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
                                             bool apply_dirichlet_bc)
 {
   START_LOG("add_scaled_matrix_and_vector()", "RBSystem");
-
-  if(!initialize_mesh_dependent_data)
-  {
-    libMesh::err << "Error: We must initialize the mesh dependent "
-                 << "data structures in order to perform add_scaled_matrix_and_vector."
-                 << std::endl;
-    libmesh_error();
-  }
 
   bool assemble_matrix = (input_matrix != NULL);
   bool assemble_vector = (input_vector != NULL);
@@ -1116,14 +1088,6 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
 {
   START_LOG("train_reduced_basis()", "RBSystem");
 
-  if(!initialize_mesh_dependent_data)
-  {
-    libMesh::err << "Error: We must initialize the mesh dependent "
-                 << "data structures in order to train reduced basis."
-                 << std::endl;
-    libmesh_error();
-  }
-
   int count = 0;
 
   // Clear the Greedy param list
@@ -1239,14 +1203,6 @@ Real RBSystem::truth_solve(int plot_solution)
 {
   START_LOG("truth_solve()", "RBSystem");
 
-  if(!initialize_mesh_dependent_data)
-  {
-    libMesh::err << "Error: We must initialize the mesh dependent "
-                 << "data structures in order to do a truth solve."
-                 << std::endl;
-    libmesh_error();
-  }
-
   truth_assembly();
   
   // Safer to zero the solution first, especially when using iterative solvers
@@ -1359,14 +1315,6 @@ void RBSystem::attach_constraint_assembly(ElemAssembly* constraint_assembly_in)
 void RBSystem::load_basis_function(unsigned int i)
 {
   START_LOG("load_basis_function()", "RBSystem");
-
-  if(!initialize_mesh_dependent_data)
-  {
-    libMesh::err << "Error: We must initialize the mesh dependent "
-                 << "data structures in order to load basis function."
-                 << std::endl;
-    libmesh_error();
-  }
 
   libmesh_assert(i < rb_eval->get_n_basis_functions());
 
@@ -2099,14 +2047,6 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
 void RBSystem::load_RB_solution()
 {
   START_LOG("load_RB_solution()", "RBSystem");
-
-  if(!initialize_mesh_dependent_data)
-  {
-    libMesh::err << "Error: We must initialize the mesh dependent "
-                 << "data structures in order to load RB solution."
-                 << std::endl;
-    libmesh_error();
-  }
 
   solution->zero();
 
