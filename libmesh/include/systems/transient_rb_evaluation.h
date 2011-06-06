@@ -31,7 +31,7 @@ class TransientRBThetaExpansion;
  * This class is part of the rbOOmit framework.
  *
  * TransientRBEvaluation extends RBEvaluation to
- * encapsulates the code and data required
+ * encapsulate the code and data required
  * to perform "online" RB evaluations for 
  * Linear Time Invariant (LTI) transient problems.
  *
@@ -112,7 +112,7 @@ private:
 
 
 // ------------------------------------------------------------
-// QNTransientRBEvaluation class definition
+// TransientRBEvaluation class definition
 
 class TransientRBEvaluation : public RBEvaluation
 {
@@ -130,7 +130,7 @@ public:
 
   /**
    * Clear this TransientRBEvaluation object.
-   * Overload to also clear the M_q representors
+   * Override to also clear the M_q representors
    */
   virtual void clear();
 
@@ -138,21 +138,21 @@ public:
    * Initialize this TransientRBEvaluation object.
    * Resize and clear the data vectors corresponding to the
    * value of \p Nmax.
-   * Overloaded to resize data relevant in the time-dependent
+   * Overridden to resize data relevant in the time-dependent
    * case.
    */
   virtual void initialize(const unsigned int Nmax);
 
   /**
    * Perform online solve for current_params
-   * with the N basis functions. Overloaded
+   * with the N basis functions. Overridden
    * to perform a time-dependent solve.
    */
   virtual Real RB_solve(unsigned int N);
 
   /**
    * Specifies the residual scaling on the numerator to
-   * be used in the a posteriori error bound. Overload
+   * be used in the a posteriori error bound. Override
    * in subclass in order to obtain the desired error bound.
    */
   virtual Real residual_scaling_numer(Real alpha_LB);
@@ -183,7 +183,7 @@ public:
    * Clear all the Riesz representors that are used to compute the RB residual
    * (and hence error bound). This is useful since once we complete the Greedy
    * we may not need the representors any more.
-   * Overload to clear the M_q representors.
+   * Override to clear the M_q representors.
    */
   virtual void clear_riesz_representors();
 

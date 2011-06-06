@@ -38,7 +38,7 @@ namespace libMesh
 
 RBEvaluation::RBEvaluation ()
   :
-  multiple_files_for_outputs(false),
+  multiple_files_for_outputs(true),
   evaluate_RB_error_bound(true),
   return_rel_error_bound(false),
   compute_RB_inner_product(false)
@@ -530,12 +530,11 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
         libmesh_error();
       }
 
+      output_out.precision(precision_level);
       for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
       {
         for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
         {
-          output_out.precision(precision_level);
-
           for(unsigned int j=0; j<n_bfs; j++)
           {
             output_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
