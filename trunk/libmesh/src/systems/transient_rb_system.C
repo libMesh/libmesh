@@ -286,7 +286,7 @@ void TransientRBSystem::initialize_rb_eval_from_system(RBEvaluation& rb_evaluati
 {
   Parent::initialize_rb_eval_from_system(rb_evaluation_in);
 
-  // Cast rb_eval to a TransientRBEvaluation
+  // Cast rb_evaluation_in to a TransientRBEvaluation
   TransientRBEvaluation& trans_rb_eval =
     libmesh_cast_ref<TransientRBEvaluation&>(rb_evaluation_in);
 

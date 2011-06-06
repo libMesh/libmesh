@@ -158,12 +158,17 @@ int main (int argc, char** argv)
   // Read in the data that defines this problem from the specified text file
   system.process_parameters_file(parameters_filename);
 
+  // Build a new RBEvaluation object which will be used to perform
+  // Reduced Basis calculations. This is required in both the
+  // "Offline" and "Online" stages.
+  AutoPtr<RBEvaluation> rb_eval = system.build_rb_evaluation();
+
   if(!online_mode) // Perform the Offline stage of the RB method
   {
     // Prepare system for the Construction stage of the RB method.
     // This sets up the necessary data structures and performs
     // initial assembly of the "truth" affine expansion of the PDE.
-    system.initialize_RB_system();
+    system.initialize_RB_system(*rb_eval);
 
     // Compute the reduced basis space by computing "snapshots", i.e.
     // "truth" solves, at well-chosen parameter values and employing
@@ -181,8 +186,7 @@ int main (int argc, char** argv)
   }
   else // Perform the Online stage of the RB method
   {
-    // Build a new RBEvaluation object and use system to initialize it
-    AutoPtr<RBEvaluation> rb_eval = system.build_rb_evaluation();
+    // Use system to initialize rb_eval
     system.initialize_rb_eval_from_system(*rb_eval);
 
     // Read in the reduced basis data
@@ -224,10 +228,7 @@ int main (int argc, char** argv)
 
       // Point system to rb_eval so that we can visualize the RB solution
       // and RB basis functions on the finite element mesh.
-      // Note: We have to use AutoPtr::release here because system
-      // takes ownership of the object pointed to by rb_eval and hence
-      // will delete it on cleanup.
-      system.rb_eval = rb_eval.release();
+      system.rb_eval = rb_eval.get();
       
       // Plot the solution
       system.load_RB_solution();

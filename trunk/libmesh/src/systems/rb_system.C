@@ -162,14 +162,6 @@ void RBSystem::clear()
   // that we've cleared the F_q representors
   Fq_representor_norms_computed = false;
 
-  // Finally, clear the rb_eval object.
-  if(rb_eval)
-  {
-    rb_eval->clear(); 
-    delete rb_eval;
-    rb_eval = NULL;
-  }
-
   STOP_LOG("clear()", "RBSystem");
 }
 
@@ -330,16 +322,19 @@ void RBSystem::initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in)
 
   // Initialize the rb_eval object (resize data structures according to Nmax)
   rb_evaluation_in.initialize(get_Nmax());
+  
+  // Finally, set the rb_eval pointer to rb_evaluation_in
+  this->rb_eval = &rb_evaluation_in;
 }
 
-void RBSystem::initialize_RB_system()
+void RBSystem::initialize_RB_system(RBEvaluation& rb_eval_in)
 {
   allocate_data_structures();
   assemble_affine_expansion();
 
-  // Build a new RBEvaluation object and initialize it
-  rb_eval = build_rb_evaluation().release();
-  initialize_rb_eval_from_system( *rb_eval );
+  // Set this->rb_eval to rb_eval_in and initialize
+  // it based on the settings of this system
+  initialize_rb_eval_from_system( rb_eval_in );
 
   RB_system_initialized = true;
 }

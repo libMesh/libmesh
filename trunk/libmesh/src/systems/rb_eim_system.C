@@ -113,9 +113,9 @@ void RBEIMSystem::process_parameters_file (const std::string& parameters_filenam
   libMesh::out << std::endl;
 }
 
-void RBEIMSystem::initialize_RB_system()
+void RBEIMSystem::initialize_RB_system(RBEvaluation& rb_evaluation_in)
 {
-  Parent::initialize_RB_system();
+  Parent::initialize_RB_system(rb_evaluation_in);
 
   // initialize a serial vector that we will use for MeshFunction evaluations
   serialized_vector = NumericVector<Number>::build();
