@@ -261,10 +261,10 @@ public:
    * stage of the RB method. This function also performs
    * matrix and vector assembly of the "truth" affine expansion.
    *
-   * Also, set this->rb_eval = &rb_eval_in, and initialize it
+   * Also, set this->rb_eval = rb_eval_in, and initialize it
    * based on the settings of this system.
    */
-  virtual void initialize_RB_system(RBEvaluation& rb_eval_in);
+  virtual void initialize_RB_system(RBEvaluation* rb_eval_in);
 
   /**
    * Get a pointer to F_q.

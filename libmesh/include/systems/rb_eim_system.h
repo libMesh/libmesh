@@ -92,7 +92,7 @@ public:
    * Initialize this system so that we can perform
    * the Construction stage of the RB method.
    */
-  virtual void initialize_RB_system(RBEvaluation& rb_evaluation_in);
+  virtual void initialize_RB_system(RBEvaluation* rb_evaluation_in);
 
   /**
    * Read parameters in from file and set up this system
