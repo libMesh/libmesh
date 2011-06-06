@@ -260,8 +260,11 @@ public:
    * all the data structures necessary for the construction
    * stage of the RB method. This function also performs
    * matrix and vector assembly of the "truth" affine expansion.
+   *
+   * Also, set this->rb_eval = &rb_eval_in, and initialize it
+   * based on the settings of this system.
    */
-  virtual void initialize_RB_system();
+  virtual void initialize_RB_system(RBEvaluation& rb_eval_in);
 
   /**
    * Get a pointer to F_q.
@@ -354,6 +357,7 @@ public:
   /**
    * Initialize the \p rb_evaluation_in based on the system's setup,
    * i.e. copy over parameter domain and theta_q expansion.
+   * Also, set the system's rb_eval pointer to \p rb_evaluation.
    */
   virtual void initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in);
 
