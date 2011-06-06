@@ -88,6 +88,12 @@ public:
    * to all processors.
    */
   void broadcast_current_parameters(unsigned int proc_id);
+
+  /**
+   * @return true is params is within the parameter range defined by
+   * mu_min_vector, mu_max_vector, false otherwise.
+   */
+  bool valid_params(const std::vector<Real>& params);
   
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -99,11 +105,6 @@ public:
   RBThetaExpansion* rb_theta_expansion;
   
 protected:
-
-  /**
-   * Helper function to indicate if the input parameters are valid.
-   */
-  bool valid_params(const std::vector<Real>& params);
 
   //----------- PROTECTED DATA MEMBERS -----------//
 

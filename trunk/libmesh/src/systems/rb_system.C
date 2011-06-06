@@ -78,8 +78,6 @@ RBSystem::RBSystem (EquationSystems& es,
     _dirichlet_list_init(NULL),
     RB_system_initialized(false)
 {
-  rb_evaluation_objects.clear();
-
   // Clear the theta and assembly vectors so that we can push_back
   A_q_assembly_vector.clear();
   F_q_assembly_vector.clear();
@@ -164,24 +162,11 @@ void RBSystem::clear()
   // that we've cleared the F_q representors
   Fq_representor_norms_computed = false;
 
-  // Clear and delete all the RBEvaluation objects
-  std::vector<RBEvaluation*>::iterator iter = rb_evaluation_objects.begin();
-  for( ; iter != rb_evaluation_objects.end(); iter++)
-  {
-    RBEvaluation* eval = *iter;
-    if(eval)
-    {
-      eval->clear(); 
-      delete eval;
-      eval = NULL;
-    }
-  }
-  rb_evaluation_objects.clear();
-
-  // Also, clear the rb_eval pointer. (The object should have been
-  // deleted above, just need to set the pointer to NULL)
+  // Finally, clear the rb_eval object.
   if(rb_eval)
   {
+    rb_eval->clear(); 
+    delete rb_eval;
     rb_eval = NULL;
   }
 
@@ -330,25 +315,21 @@ void RBSystem::process_parameters_file (const std::string& parameters_filename)
   libmesh_assert(Nmax > 0);
 }
 
-void RBSystem::build_and_init_rb_eval()
+void RBSystem::initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in)
 {
-  // Build a new RBEvaluation object and add it to the vector of RBEvaluations
-  rb_evaluation_objects.push_back(build_rb_evaluation().release());
-  rb_eval = rb_evaluation_objects.back();
-
   // Copy parameter information over
-  rb_eval->set_parameter_range(mu_min_vector, mu_max_vector);
-  rb_eval->set_current_parameters( get_current_parameters() );
+  rb_evaluation_in.set_parameter_range(mu_min_vector, mu_max_vector);
+  rb_evaluation_in.set_current_parameters( get_current_parameters() );
 
   // Copy boolean flags over
-  rb_eval->return_rel_error_bound   = return_rel_error_bound;
-  rb_eval->compute_RB_inner_product = compute_RB_inner_product;
+  rb_evaluation_in.return_rel_error_bound   = return_rel_error_bound;
+  rb_evaluation_in.compute_RB_inner_product = compute_RB_inner_product;
 
   // Copy rb_theta_expansion pointer over to rb_eval
-  rb_eval->rb_theta_expansion = this->rb_theta_expansion;
+  rb_evaluation_in.rb_theta_expansion = this->rb_theta_expansion;
 
   // Initialize the rb_eval object (resize data structures according to Nmax)
-  rb_eval->initialize(get_Nmax());
+  rb_evaluation_in.initialize(get_Nmax());
 }
 
 void RBSystem::initialize_RB_system()
@@ -357,8 +338,8 @@ void RBSystem::initialize_RB_system()
   assemble_affine_expansion();
 
   // Build a new RBEvaluation object and initialize it
-  libmesh_assert( rb_evaluation_objects.empty() );
-  build_and_init_rb_eval();
+  rb_eval = build_rb_evaluation().release();
+  initialize_rb_eval_from_system( *rb_eval );
 
   RB_system_initialized = true;
 }

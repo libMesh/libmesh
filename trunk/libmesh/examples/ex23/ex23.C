@@ -181,11 +181,12 @@ int main (int argc, char** argv)
   }
   else // Perform the Online stage of the RB method
   {
-    // Build a new RBEvaluation object and point system.rb_eval to it
-    system.build_and_init_rb_eval();
+    // Build a new RBEvaluation object and use system to initialize it
+    AutoPtr<RBEvaluation> rb_eval = system.build_rb_evaluation();
+    system.initialize_rb_eval_from_system(*rb_eval);
 
     // Read in the reduced basis data
-    system.rb_eval->read_offline_data_from_files();
+    rb_eval->read_offline_data_from_files();
     
     // Get the parameters at which we do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
@@ -196,33 +197,44 @@ int main (int argc, char** argv)
     }
 
     // Set the parameters to online_mu_vector
-    system.rb_eval->set_current_parameters(online_mu_vector);
-    system.rb_eval->print_current_parameters();
+    rb_eval->set_current_parameters(online_mu_vector);
+    rb_eval->print_current_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
-    system.rb_eval->RB_solve(online_N);
+    rb_eval->RB_solve(online_N);
 
     // Print out outputs as well as the corresponding output error bounds.
-    std::cout << "output 1, value = " << system.rb_eval->RB_outputs[0]
-              << ", bound = " << system.rb_eval->RB_output_error_bounds[0]
+    std::cout << "output 1, value = " << rb_eval->RB_outputs[0]
+              << ", bound = " << rb_eval->RB_output_error_bounds[0]
               << std::endl;
-    std::cout << "output 2, value = " << system.rb_eval->RB_outputs[1]
-              << ", bound = " << system.rb_eval->RB_output_error_bounds[1]
+    std::cout << "output 2, value = " << rb_eval->RB_outputs[1]
+              << ", bound = " << rb_eval->RB_output_error_bounds[1]
               << std::endl;
-    std::cout << "output 3, value = " << system.rb_eval->RB_outputs[2]
-              << ", bound = " << system.rb_eval->RB_output_error_bounds[2]
+    std::cout << "output 3, value = " << rb_eval->RB_outputs[2]
+              << ", bound = " << rb_eval->RB_output_error_bounds[2]
               << std::endl;
-    std::cout << "output 4, value = " << system.rb_eval->RB_outputs[3]
-              << ", bound = " << system.rb_eval->RB_output_error_bounds[3]
+    std::cout << "output 4, value = " << rb_eval->RB_outputs[3]
+              << ", bound = " << rb_eval->RB_output_error_bounds[3]
               << std::endl << std::endl;
 
     if(store_basis_functions)
     {
-      system.rb_eval->read_in_basis_functions(system);
-    
+      // Read in the basis functions
+      rb_eval->read_in_basis_functions(system);
+
+      // Point system to rb_eval so that we can visualize the RB solution
+      // and RB basis functions on the finite element mesh.
+      // Note: We have to use AutoPtr::release here because system
+      // takes ownership of the object pointed to by rb_eval and hence
+      // will delete it on cleanup.
+      system.rb_eval = rb_eval.release();
+      
+      // Plot the solution
       system.load_RB_solution();
       ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
       
+      // Plot the first basis function that was generated from the train_reduced_basis
+      // call in the Offline stage
       system.load_basis_function(0);
       ExodusII_IO(mesh).write_equation_systems ("bf0.e",equation_systems);
     }

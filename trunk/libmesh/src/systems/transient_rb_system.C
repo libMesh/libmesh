@@ -282,13 +282,13 @@ AutoPtr<TemporalDiscretization> TransientRBSystem::build_temporal_discretization
   return AutoPtr<TemporalDiscretization>(new TemporalDiscretization);
 }
 
-void TransientRBSystem::build_and_init_rb_eval()
+void TransientRBSystem::initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in)
 {
-  Parent::build_and_init_rb_eval();
+  Parent::initialize_rb_eval_from_system(rb_evaluation_in);
 
   // Cast rb_eval to a TransientRBEvaluation
   TransientRBEvaluation& trans_rb_eval =
-    libmesh_cast_ref<TransientRBEvaluation&>(*rb_eval);
+    libmesh_cast_ref<TransientRBEvaluation&>(rb_evaluation_in);
 
   // Use assignment operator to copy the temporal_discretization object
   *(trans_rb_eval.temporal_discretization) = *temporal_discretization;

@@ -99,11 +99,10 @@ public:
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
-   * Build a new RBEvaluation object, add it to this system
-   * and initialize the RBEvaluation based on the system's setup.
+   * Initialize \p rb_evaluation_in based on this system's setup.
    * Here we override to also copy over TemporalDiscretization data.
    */
-  virtual void build_and_init_rb_eval();
+  virtual void initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in);
 
   /**
    * Function that indicates when to terminate the Greedy
