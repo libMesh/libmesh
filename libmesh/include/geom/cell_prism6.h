@@ -136,6 +136,11 @@ public:
   static const unsigned int side_nodes_map[5][4];
 
   /**
+   * This maps the child elements with the associated side of the parent element
+   */
+  static const unsigned int side_elems_map[5][4];
+
+  /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
    * element node numbers.
    */
