@@ -352,11 +352,10 @@ public:
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
-   * Build a new RBEvaluation object, add it to this system
-   * and initialize the RBEvaluation based on the system's setup,
+   * Initialize the \p rb_evaluation_in based on the system's setup,
    * i.e. copy over parameter domain and theta_q expansion.
    */
-  virtual void build_and_init_rb_eval();
+  virtual void initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in);
 
   /**
    * Get delta_N, the number of basis functions we
@@ -374,18 +373,6 @@ public:
    * The current RBEvaluation object we are using.
    */
   RBEvaluation* rb_eval;
-
-  /**
-   * The set of RBEvaluation objects. These perform all
-   * the "online" RB evaluation calculations, and store
-   * the associated data required for those calculations.
-   *
-   * Often we will just have one RBEvaluation object
-   * associated with an RBSystem, but it can be useful
-   * to be able to "switch contexts" between different
-   * RBEvaluations, e.g. in the context of the hp-RB method.
-   */
-  std::vector<RBEvaluation*> rb_evaluation_objects;
 
   /**
    * Vector storing the values of the error bound
