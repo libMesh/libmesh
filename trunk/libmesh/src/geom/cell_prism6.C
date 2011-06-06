@@ -43,6 +43,15 @@ const unsigned int Prism6::side_nodes_map[5][4] =
   {3, 4, 5, 99}  // Side 4
 };
 
+const unsigned int Prism6::side_elems_map[5][4] =
+{
+  {0, 1, 2, 3}, // Side 0
+  {0, 1, 4, 5}, // Side 1
+  {1, 2, 5, 6}, // Side 2
+  {0, 2, 4, 6}, // Side 3
+  {4, 5, 6, 7}  // Side 4
+};
+
 const unsigned int Prism6::edge_nodes_map[9][2] =
 {
   {0, 1}, // Side 0

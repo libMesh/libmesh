@@ -172,7 +172,7 @@ bool Prism::is_child_on_side(const unsigned int c,
   libmesh_assert (s < this->n_sides());
 
   for (unsigned int i = 0; i != 4; ++i)
-    if (Prism6::side_nodes_map[s][i] == c)
+    if (Prism6::side_elems_map[s][i] == c)
       return true;
   return false;
 }
