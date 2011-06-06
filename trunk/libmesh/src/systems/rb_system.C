@@ -327,14 +327,17 @@ void RBSystem::initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in)
   this->rb_eval = &rb_evaluation_in;
 }
 
-void RBSystem::initialize_RB_system(RBEvaluation& rb_eval_in)
+void RBSystem::initialize_RB_system(RBEvaluation* rb_eval_in)
 {
   allocate_data_structures();
   assemble_affine_expansion();
 
-  // Set this->rb_eval to rb_eval_in and initialize
-  // it based on the settings of this system
-  initialize_rb_eval_from_system( rb_eval_in );
+  // If rb_eval_in != NULL, set this->rb_eval to rb_eval_in
+  // and initialize it based on the settings of this system
+  if(rb_eval_in)
+  {
+    initialize_rb_eval_from_system( *rb_eval_in );
+  }
 
   RB_system_initialized = true;
 }

@@ -168,7 +168,7 @@ int main (int argc, char** argv)
     // Prepare system for the Construction stage of the RB method.
     // This sets up the necessary data structures and performs
     // initial assembly of the "truth" affine expansion of the PDE.
-    system.initialize_RB_system(*rb_eval);
+    system.initialize_RB_system(rb_eval.get());
 
     // Compute the reduced basis space by computing "snapshots", i.e.
     // "truth" solves, at well-chosen parameter values and employing
