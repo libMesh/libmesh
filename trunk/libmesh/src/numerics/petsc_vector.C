@@ -775,6 +775,18 @@ template <typename T>
 void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 			       const std::vector<unsigned int>& send_list) const
 {
+  // FIXME: Workaround for a strange bug at large-scale.
+  // If we have ghosting, PETSc lets us just copy the solution, and
+  // doing so avoids a segfault?
+  if (v_local_in.type() == GHOSTED &&
+      this->type() == PARALLEL)
+    {
+      v_local_in = *this;
+      return;
+    }
+  
+  // Normal code path begins here
+
   this->_restore_array();
 
   // Make sure the NumericVector passed in is really a PetscVector

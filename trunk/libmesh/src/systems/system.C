@@ -381,12 +381,8 @@ void System::reinit ()
 
 void System::update ()
 {
-#ifdef LIBMESH_ENABLE_GHOSTED
-  solution->close();
-  
-  // If we have ghosting just copy the solution
-  *current_local_solution = *solution;
-#else
+  libmesh_assert(solution->closed());
+
   const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
   // Check sizes
@@ -400,7 +396,6 @@ void System::update ()
   // Only the necessary values (specified by the send_list)
   // are copied to minimize communication
   solution->localize (*current_local_solution, send_list);
-#endif
 }
 
 
