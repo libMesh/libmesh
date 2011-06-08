@@ -1359,7 +1359,6 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
       // Initialize the vectors when we need them
       if(!trans_rb_eval->M_q_representor[q_m][i])
       {
-        libMesh::out << "Building M_q_representor, q_m="<<q_m<<", i="<<i<<std::endl;
         trans_rb_eval->M_q_representor[q_m][i] = (NumericVector<Number>::build().release());
         trans_rb_eval->M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
