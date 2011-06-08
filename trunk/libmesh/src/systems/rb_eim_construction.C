@@ -37,17 +37,17 @@
 #include <sstream>
 #include "o_string_stream.h"
 #include "gmv_io.h"
-
 #include "fem_context.h"
-#include "rb_eim_system.h"
+
+#include "rb_eim_construction.h"
 #include "rb_eim_evaluation.h"
 
 namespace libMesh
 {
 
-RBEIMSystem::RBEIMSystem (EquationSystems& es,
-		          const std::string& name,
-		          const unsigned int number)
+RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
+		                      const std::string& name,
+		                      const unsigned int number)
   : Parent(es, name, number),
     best_fit_type_flag(PROJECTION_BEST_FIT),
     mesh_function(NULL),
@@ -57,18 +57,18 @@ RBEIMSystem::RBEIMSystem (EquationSystems& es,
   use_empty_RB_solve_in_greedy = false;
 }
 
-RBEIMSystem::~RBEIMSystem ()
+RBEIMConstruction::~RBEIMConstruction ()
 {
   delete mesh_function;
   mesh_function = NULL;
 }
 
-std::string RBEIMSystem::system_type () const
+std::string RBEIMConstruction::system_type () const
 {
-  return "RBEIMSystem";
+  return "RBEIMConstruction";
 }
 
-void RBEIMSystem::process_parameters_file (const std::string& parameters_filename)
+void RBEIMConstruction::process_parameters_file (const std::string& parameters_filename)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -83,7 +83,7 @@ void RBEIMSystem::process_parameters_file (const std::string& parameters_filenam
   
   if(n_vars() != get_n_parametrized_functions() )
   {
-    libMesh::out << "Error: The number of parametrized_functions must match n_vars in RBEIMSystem."
+    libMesh::out << "Error: The number of parametrized_functions must match n_vars in RBEIMConstruction."
                  << std::endl;
     libmesh_error();
   }
@@ -107,15 +107,15 @@ void RBEIMSystem::process_parameters_file (const std::string& parameters_filenam
     libmesh_error();
   }
   
-  libMesh::out << std::endl << "RBEIMSystem parameters:" << std::endl;
+  libMesh::out << std::endl << "RBEIMConstruction parameters:" << std::endl;
   libMesh::out << "best fit type: " << best_fit_type_string << std::endl;
   libMesh::out << "number of parametrized functions: " << get_n_parametrized_functions() << std::endl;
   libMesh::out << std::endl;
 }
 
-void RBEIMSystem::initialize_RB_system(RBEvaluation* rb_evaluation_in)
+void RBEIMConstruction::initialize_RB_construction(RBEvaluation* rb_evaluation_in)
 {
-  Parent::initialize_RB_system(rb_evaluation_in);
+  Parent::initialize_RB_construction(rb_evaluation_in);
 
   // initialize a serial vector that we will use for MeshFunction evaluations
   serialized_vector = NumericVector<Number>::build();
@@ -153,7 +153,7 @@ void RBEIMSystem::initialize_RB_system(RBEvaluation* rb_evaluation_in)
 
 }
 
-Number RBEIMSystem::evaluate_parametrized_function(unsigned int index, const Point& p)
+Number RBEIMConstruction::evaluate_parametrized_function(unsigned int index, const Point& p)
 {
   if(index >= get_n_parametrized_functions())
   {
@@ -165,16 +165,16 @@ Number RBEIMSystem::evaluate_parametrized_function(unsigned int index, const Poi
   return parametrized_functions[index]->evaluate(get_current_parameters(), p);
 }
 
-unsigned int RBEIMSystem::get_n_affine_functions() const
+unsigned int RBEIMConstruction::get_n_affine_functions() const
 {
   return n_vars() * rb_eval->get_n_basis_functions();
 }
 
-std::vector<Number> RBEIMSystem::evaluate_basis_function(unsigned int bf_index,
-                                                         Elem& element,
-                                                         const std::vector<Point>& qpoints)
+std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int bf_index,
+                                                               Elem& element,
+                                                               const std::vector<Point>& qpoints)
 {
-  START_LOG("evaluate_current_basis_function()", "RBEIMSystem");
+  START_LOG("evaluate_current_basis_function()", "RBEIMConstruction");
   
   // Load up basis function bf_index (does nothing if bf_index is already loaded)
   set_current_basis_function(bf_index);
@@ -207,14 +207,14 @@ std::vector<Number> RBEIMSystem::evaluate_basis_function(unsigned int bf_index,
       values[qp] += (*current_ghosted_bf)(dof_indices_var[i]) * data.shape[i];
   }
 
-  STOP_LOG("evaluate_current_basis_function()", "RBEIMSystem");
+  STOP_LOG("evaluate_current_basis_function()", "RBEIMConstruction");
 
   return values;
 }
 
-void RBEIMSystem::set_current_basis_function(unsigned int basis_function_index_in)
+void RBEIMConstruction::set_current_basis_function(unsigned int basis_function_index_in)
 {
-  START_LOG("set_current_basis_function()", "RBEIMSystem");
+  START_LOG("set_current_basis_function()", "RBEIMConstruction");
 
   if(basis_function_index_in > get_n_affine_functions())
   {
@@ -236,12 +236,12 @@ void RBEIMSystem::set_current_basis_function(unsigned int basis_function_index_i
       (*current_ghosted_bf, this->get_dof_map().get_send_list());
   }
   
-  STOP_LOG("set_current_basis_function()", "RBEIMSystem");
+  STOP_LOG("set_current_basis_function()", "RBEIMConstruction");
 }
 
-void RBEIMSystem::enrich_RB_space()
+void RBEIMConstruction::enrich_RB_space()
 {
-  START_LOG("enrich_RB_space()", "RBEIMSystem");
+  START_LOG("enrich_RB_space()", "RBEIMConstruction");
 
   RBEIMEvaluation* eim_eval = libmesh_cast_ptr<RBEIMEvaluation*>(rb_eval);
 
@@ -346,12 +346,12 @@ void RBEIMSystem::enrich_RB_space()
     eim_eval->extra_interpolation_point_var = optimal_var;
   }
   
-  STOP_LOG("enrich_RB_space()", "RBEIMSystem");
+  STOP_LOG("enrich_RB_space()", "RBEIMConstruction");
 }
 
-Real RBEIMSystem::compute_best_fit_error()
+Real RBEIMConstruction::compute_best_fit_error()
 {
-  START_LOG("compute_best_fit_error()", "RBEIMSystem");
+  START_LOG("compute_best_fit_error()", "RBEIMConstruction");
   
   const unsigned int RB_size = rb_eval->get_n_basis_functions();
   
@@ -409,14 +409,14 @@ Real RBEIMSystem::compute_best_fit_error()
 
   Real best_fit_error = solution->linfty_norm();
   
-  STOP_LOG("compute_best_fit_error()", "RBEIMSystem");
+  STOP_LOG("compute_best_fit_error()", "RBEIMConstruction");
   
   return best_fit_error;
 }
 
-Real RBEIMSystem::truth_solve(int plot_solution)
+Real RBEIMConstruction::truth_solve(int plot_solution)
 {
-  START_LOG("truth_solve()", "RBEIMSystem");
+  START_LOG("truth_solve()", "RBEIMConstruction");
         
 //  matrix should have been set to inner_product_matrix during initialization
 //  if(!low_memory_mode)
@@ -507,12 +507,12 @@ Real RBEIMSystem::truth_solve(int plot_solution)
                                         this->get_equation_systems());
   }
   
-  STOP_LOG("truth_solve()", "RBEIMSystem");
+  STOP_LOG("truth_solve()", "RBEIMConstruction");
   
   return 0.;
 }
 
-void RBEIMSystem::init_context(FEMContext &c)
+void RBEIMConstruction::init_context(FEMContext &c)
 {
   // default implementation of init_context
   // for compute_best_fit
@@ -524,14 +524,14 @@ void RBEIMSystem::init_context(FEMContext &c)
   }
 }
 
-AutoPtr<RBEvaluation> RBEIMSystem::build_rb_evaluation()
+AutoPtr<RBEvaluation> RBEIMConstruction::build_rb_evaluation()
 {
   return AutoPtr<RBEvaluation>(new RBEIMEvaluation(*this));
 }
 
-void RBEIMSystem::update_RB_system_matrices()
+void RBEIMConstruction::update_RB_system_matrices()
 {
-  START_LOG("update_RB_system_matrices()", "RBEIMSystem");
+  START_LOG("update_RB_system_matrices()", "RBEIMConstruction");
   
   Parent::update_RB_system_matrices();
 
@@ -558,16 +558,16 @@ void RBEIMSystem::update_RB_system_matrices()
     }
   }
 
-  STOP_LOG("update_RB_system_matrices()", "RBEIMSystem");
+  STOP_LOG("update_RB_system_matrices()", "RBEIMConstruction");
 }
 
-void RBEIMSystem::update_system()
+void RBEIMConstruction::update_system()
 {
   libMesh::out << "Updating RB matrices" << std::endl;
   update_RB_system_matrices();
 }
 
-bool RBEIMSystem::greedy_termination_test(Real training_greedy_error, int)
+bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
 {
   if(performing_extra_greedy_step)
   {

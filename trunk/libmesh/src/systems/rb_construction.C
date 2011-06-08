@@ -33,8 +33,7 @@
 #include "petsc_linear_solver.h"
 
 #include "fem_context.h"
-#include "rb_system.h"
-#include "rb_scm_system.h"
+#include "rb_construction.h"
 
 // For creating a directory
 #include <sys/types.h>
@@ -48,9 +47,9 @@
 namespace libMesh
 {
 
-RBSystem::RBSystem (EquationSystems& es,
-		    const std::string& name,
-		    const unsigned int number)
+RBConstruction::RBConstruction (EquationSystems& es,
+		                const std::string& name,
+		                const unsigned int number)
   : Parent(es, name, number),
     rb_eval(NULL),
     inner_product_matrix(SparseMatrix<Number>::build()),
@@ -76,7 +75,7 @@ RBSystem::RBSystem (EquationSystems& es,
     Fq_representor_norms_computed(false),
     training_tolerance(-1.),
     _dirichlet_list_init(NULL),
-    RB_system_initialized(false)
+    RB_construction_initialized(false)
 {
   // Clear the theta and assembly vectors so that we can push_back
   A_q_assembly_vector.clear();
@@ -90,15 +89,15 @@ RBSystem::RBSystem (EquationSystems& es,
 }
 
 
-RBSystem::~RBSystem ()
+RBConstruction::~RBConstruction ()
 {
   this->clear();
 }
 
 
-void RBSystem::clear()
+void RBConstruction::clear()
 {
-  START_LOG("clear()", "RBSystem");
+  START_LOG("clear()", "RBConstruction");
 
   Parent::clear();
 
@@ -162,15 +161,15 @@ void RBSystem::clear()
   // that we've cleared the F_q representors
   Fq_representor_norms_computed = false;
 
-  STOP_LOG("clear()", "RBSystem");
+  STOP_LOG("clear()", "RBConstruction");
 }
 
-std::string RBSystem::system_type () const
+std::string RBConstruction::system_type () const
 {
-  return "RBSystem";
+  return "RBConstruction";
 }
 
-void RBSystem::process_parameters_file (const std::string& parameters_filename)
+void RBConstruction::process_parameters_file (const std::string& parameters_filename)
 {
   // First read in data from parameters_filename
   GetPot infile(parameters_filename);
@@ -265,7 +264,7 @@ void RBSystem::process_parameters_file (const std::string& parameters_filename)
   // Set the initial parameter value to the minimum parameters
   set_current_parameters(mu_min_vector);
 
-  libMesh::out << std::endl << "RBSystem parameters:" << std::endl;
+  libMesh::out << std::endl << "RBConstruction parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
   libMesh::out << "constrained_problem: " << constrained_problem << std::endl;
   libMesh::out << "Nmax: " << Nmax << std::endl;
@@ -307,7 +306,7 @@ void RBSystem::process_parameters_file (const std::string& parameters_filename)
   libmesh_assert(Nmax > 0);
 }
 
-void RBSystem::initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in)
+void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
 {
   // Copy parameter information over
   rb_evaluation_in.set_parameter_range(mu_min_vector, mu_max_vector);
@@ -327,7 +326,7 @@ void RBSystem::initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in)
   this->rb_eval = &rb_evaluation_in;
 }
 
-void RBSystem::initialize_RB_system(RBEvaluation* rb_eval_in)
+void RBConstruction::initialize_RB_construction(RBEvaluation* rb_eval_in)
 {
   allocate_data_structures();
   assemble_affine_expansion();
@@ -336,13 +335,13 @@ void RBSystem::initialize_RB_system(RBEvaluation* rb_eval_in)
   // and initialize it based on the settings of this system
   if(rb_eval_in)
   {
-    initialize_rb_eval_from_system( *rb_eval_in );
+    initialize_rb_eval( *rb_eval_in );
   }
 
-  RB_system_initialized = true;
+  RB_construction_initialized = true;
 }
 
-void RBSystem::assemble_affine_expansion()
+void RBConstruction::assemble_affine_expansion()
 {
   // Initialize the non-Dirichlet and Dirichlet dofs lists
   this->initialize_dirichlet_dofs();
@@ -359,7 +358,7 @@ void RBSystem::assemble_affine_expansion()
   this->assemble_all_output_vectors();
 }
 
-void RBSystem::allocate_data_structures()
+void RBConstruction::allocate_data_structures()
 {
   // Resize vectors for storing mesh-dependent data
   A_q_vector.resize(rb_theta_expansion->get_Q_a());
@@ -464,19 +463,19 @@ void RBSystem::allocate_data_structures()
   truth_outputs.resize(this->rb_theta_expansion->get_n_outputs());
 }
 
-AutoPtr<RBEvaluation> RBSystem::build_rb_evaluation()
+AutoPtr<RBEvaluation> RBConstruction::build_rb_evaluation()
 {
   return AutoPtr<RBEvaluation>(new RBEvaluation);
 }
 
-void RBSystem::attach_dirichlet_dof_initialization (DirichletDofAssembly* dirichlet_init)
+void RBConstruction::attach_dirichlet_dof_initialization (DirichletDofAssembly* dirichlet_init)
 {
   libmesh_assert (dirichlet_init != NULL);
 
   _dirichlet_list_init = dirichlet_init;
 }
 
-void RBSystem::initialize_dirichlet_dofs()
+void RBConstruction::initialize_dirichlet_dofs()
 {
   // Short-circuit if _dirichlet_list_init is NULL
   if(!_dirichlet_list_init)
@@ -484,7 +483,7 @@ void RBSystem::initialize_dirichlet_dofs()
     return;
   }
 
-  START_LOG("initialize_dirichlet_dofs()", "RBSystem");
+  START_LOG("initialize_dirichlet_dofs()", "RBConstruction");
 
   // Initialize the lists of Dirichlet and non-Dirichlet degrees-of-freedom
   // Clear the set to store the Dirichlet dofs on this processor
@@ -542,22 +541,22 @@ void RBSystem::initialize_dirichlet_dofs()
     global_dirichlet_dofs_set.insert(dirichlet_dofs_vector[ii]);
   }
 
-  STOP_LOG("initialize_dirichlet_dofs()", "RBSystem");
+  STOP_LOG("initialize_dirichlet_dofs()", "RBConstruction");
 }
 
-AutoPtr<FEMContext> RBSystem::build_context ()
+AutoPtr<FEMContext> RBConstruction::build_context ()
 {
   return AutoPtr<FEMContext>(new FEMContext(*this));
 }
 
-void RBSystem::add_scaled_matrix_and_vector(Number scalar,
-                                            ElemAssembly* elem_assembly,
-                                            SparseMatrix<Number>* input_matrix,
-                                            NumericVector<Number>* input_vector,
-                                            bool symmetrize,
-                                            bool apply_dirichlet_bc)
+void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
+                                                  ElemAssembly* elem_assembly,
+                                                  SparseMatrix<Number>* input_matrix,
+                                                  NumericVector<Number>* input_vector,
+                                                  bool symmetrize,
+                                                  bool apply_dirichlet_bc)
 {
-  START_LOG("add_scaled_matrix_and_vector()", "RBSystem");
+  START_LOG("add_scaled_matrix_and_vector()", "RBConstruction");
 
   bool assemble_matrix = (input_matrix != NULL);
   bool assemble_vector = (input_vector != NULL);
@@ -642,10 +641,10 @@ void RBSystem::add_scaled_matrix_and_vector(Number scalar,
   if(assemble_vector)
     input_vector->close();
 
-  STOP_LOG("add_scaled_matrix_and_vector()", "RBSystem");
+  STOP_LOG("add_scaled_matrix_and_vector()", "RBConstruction");
 }
 
-void RBSystem::set_context_solution_vec(NumericVector<Number>& vec)
+void RBConstruction::set_context_solution_vec(NumericVector<Number>& vec)
 {
   // Set current_local_solution = vec so that we can access
   // vec from FEMContext during assembly
@@ -653,19 +652,19 @@ void RBSystem::set_context_solution_vec(NumericVector<Number>& vec)
     (*current_local_solution, this->get_dof_map().get_send_list());
 }
 
-void RBSystem::assemble_scaled_matvec(Number scalar,
-                                      ElemAssembly* elem_assembly,
-                                      NumericVector<Number>& dest,
-                                      NumericVector<Number>& arg)
+void RBConstruction::assemble_scaled_matvec(Number scalar,
+                                            ElemAssembly* elem_assembly,
+                                            NumericVector<Number>& dest,
+                                            NumericVector<Number>& arg)
 {
-  START_LOG("assemble_scaled_matvec()", "RBSystem");
+  START_LOG("assemble_scaled_matvec()", "RBConstruction");
 
   dest.zero();
 
   // Set current_local_solution to be arg so that we
   // can access it from the FEMContext. Do this in a
   // function call so that it can be overloaded as
-  // necessary (e.g. for QNTransientRBSystem)
+  // necessary in subclasses
   this->set_context_solution_vec(arg);
 
   const MeshBase& mesh = this->get_mesh();
@@ -724,12 +723,12 @@ void RBSystem::assemble_scaled_matvec(Number scalar,
 
   dest.close();
 
-  STOP_LOG("assemble_scaled_matvec()", "RBSystem");
+  STOP_LOG("assemble_scaled_matvec()", "RBConstruction");
 }
 
-void RBSystem::truth_assembly()
+void RBConstruction::truth_assembly()
 {
-  START_LOG("truth_assembly()", "RBSystem");
+  START_LOG("truth_assembly()", "RBConstruction");
   
   const std::vector<Real> mu = get_current_parameters();
 
@@ -908,10 +907,10 @@ void RBSystem::truth_assembly()
   this->matrix->close();
   this->rhs->close();
 
-  STOP_LOG("truth_assembly()", "RBSystem");
+  STOP_LOG("truth_assembly()", "RBConstruction");
 }
 
-void RBSystem::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
+void RBConstruction::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
 {
   input_matrix->zero();
   add_scaled_matrix_and_vector(1.,
@@ -922,18 +921,18 @@ void RBSystem::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix,
                                apply_dirichlet_bc);
 }
 
-void RBSystem::assemble_constraint_matrix(SparseMatrix<Number>* input_matrix)
+void RBConstruction::assemble_constraint_matrix(SparseMatrix<Number>* input_matrix)
 {
   input_matrix->zero();
   add_scaled_matrix_and_vector(1., constraint_assembly, input_matrix, NULL);
 }
 
-void RBSystem::assemble_and_add_constraint_matrix(SparseMatrix<Number>* input_matrix)
+void RBConstruction::assemble_and_add_constraint_matrix(SparseMatrix<Number>* input_matrix)
 {
   add_scaled_matrix_and_vector(1., constraint_assembly, input_matrix, NULL);
 }
 
-void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
+void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
 {
   if(q >= rb_theta_expansion->get_Q_a())
   {
@@ -952,9 +951,9 @@ void RBSystem::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_ma
                                apply_dirichlet_bc);
 }
 
-void RBSystem::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Number>* input_matrix, bool symmetrize)
+void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Number>* input_matrix, bool symmetrize)
 {
-  START_LOG("add_scaled_Aq()", "RBSystem");
+  START_LOG("add_scaled_Aq()", "RBConstruction");
 
   if(q_a >= rb_theta_expansion->get_Q_a())
   {
@@ -977,10 +976,10 @@ void RBSystem::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Numbe
                                  symmetrize);
   }
 
-  STOP_LOG("add_scaled_Aq()", "RBSystem");
+  STOP_LOG("add_scaled_Aq()", "RBConstruction");
 }
 
-void RBSystem::assemble_misc_matrices()
+void RBConstruction::assemble_misc_matrices()
 {
   if(low_memory_mode)
   {
@@ -999,7 +998,7 @@ void RBSystem::assemble_misc_matrices()
     assemble_constraint_matrix(constraint_matrix.get());
 }
 
-void RBSystem::assemble_all_affine_operators()
+void RBConstruction::assemble_all_affine_operators()
 {
   if(low_memory_mode)
   {
@@ -1017,7 +1016,7 @@ void RBSystem::assemble_all_affine_operators()
   }
 }
 
-void RBSystem::assemble_all_affine_vectors()
+void RBConstruction::assemble_all_affine_vectors()
 {
   for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
     assemble_Fq_vector(q_f, get_F_q(q_f));
@@ -1030,9 +1029,9 @@ void RBSystem::assemble_all_affine_vectors()
 
 }
 
-void RBSystem::assemble_Fq_vector(unsigned int q,
-                                  NumericVector<Number>* input_vector,
-                                  bool apply_dirichlet_bc)
+void RBConstruction::assemble_Fq_vector(unsigned int q,
+                                        NumericVector<Number>* input_vector,
+                                        bool apply_dirichlet_bc)
 {
   if(q >= rb_theta_expansion->get_Q_f())
   {
@@ -1051,7 +1050,7 @@ void RBSystem::assemble_Fq_vector(unsigned int q,
                                apply_dirichlet_bc /* apply_dirichlet_bc */);
 }
 
-void RBSystem::assemble_all_output_vectors()
+void RBConstruction::assemble_all_output_vectors()
 {
   for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
@@ -1063,9 +1062,9 @@ void RBSystem::assemble_all_output_vectors()
     }
 }
 
-Real RBSystem::train_reduced_basis(const std::string& directory_name)
+Real RBConstruction::train_reduced_basis(const std::string& directory_name)
 {
-  START_LOG("train_reduced_basis()", "RBSystem");
+  START_LOG("train_reduced_basis()", "RBConstruction");
 
   int count = 0;
 
@@ -1138,12 +1137,12 @@ Real RBSystem::train_reduced_basis(const std::string& directory_name)
     count++;
   }
   this->update_greedy_param_list();
-  STOP_LOG("train_reduced_basis()", "RBSystem");
+  STOP_LOG("train_reduced_basis()", "RBConstruction");
 
   return training_greedy_error;
 }
 
-bool RBSystem::greedy_termination_test(Real training_greedy_error, int)
+bool RBConstruction::greedy_termination_test(Real training_greedy_error, int)
 {
   if(training_greedy_error < this->training_tolerance)
   {
@@ -1161,16 +1160,16 @@ bool RBSystem::greedy_termination_test(Real training_greedy_error, int)
   return false;
 }
 
-void RBSystem::update_greedy_param_list()
+void RBConstruction::update_greedy_param_list()
 {
   rb_eval->greedy_param_list.push_back( get_current_parameters() );
 }
 
-std::vector<Real> RBSystem::get_greedy_parameter(unsigned int i)
+std::vector<Real> RBConstruction::get_greedy_parameter(unsigned int i)
 {
   if( i >= rb_eval->greedy_param_list.size() )
   {
-    libMesh::out << "Error: Argument in RBSystem::get_greedy_parameter is too large."
+    libMesh::out << "Error: Argument in RBConstruction::get_greedy_parameter is too large."
                  << std::endl;
     libmesh_error();
   }
@@ -1178,9 +1177,9 @@ std::vector<Real> RBSystem::get_greedy_parameter(unsigned int i)
   return rb_eval->greedy_param_list[i];
 }
 
-Real RBSystem::truth_solve(int plot_solution)
+Real RBConstruction::truth_solve(int plot_solution)
 {
-  START_LOG("truth_solve()", "RBSystem");
+  START_LOG("truth_solve()", "RBConstruction");
 
   truth_assembly();
   
@@ -1231,32 +1230,32 @@ Real RBSystem::truth_solve(int plot_solution)
 
   Number truth_X_norm = std::sqrt(inner_product_storage_vector->dot(*solution));
 
-  STOP_LOG("truth_solve()", "RBSystem");
+  STOP_LOG("truth_solve()", "RBConstruction");
 
   return libmesh_real(truth_X_norm);
 }
 
-void RBSystem::set_Nmax(unsigned int Nmax_in)
+void RBConstruction::set_Nmax(unsigned int Nmax_in)
 {
   this->Nmax = Nmax_in;
 }
 
-void RBSystem::attach_A_q(RBTheta* theta_q_a,
-                          ElemAssembly* A_q_assembly)
+void RBConstruction::attach_A_q(RBTheta* theta_q_a,
+                                ElemAssembly* A_q_assembly)
 {
   rb_theta_expansion->attach_theta_q_a(theta_q_a);
   A_q_assembly_vector.push_back(A_q_assembly);
 }
 
-void RBSystem::attach_F_q(RBTheta* theta_q_f,
-                          ElemAssembly* F_q_assembly)
+void RBConstruction::attach_F_q(RBTheta* theta_q_f,
+                                ElemAssembly* F_q_assembly)
 {
   rb_theta_expansion->attach_theta_q_f(theta_q_f);
   F_q_assembly_vector.push_back(F_q_assembly);
 }
 
-void RBSystem::attach_output(std::vector<RBTheta*> theta_q_l,
-                             std::vector<ElemAssembly*> output_assembly)
+void RBConstruction::attach_output(std::vector<RBTheta*> theta_q_l,
+                                   std::vector<ElemAssembly*> output_assembly)
 {
   // Make sure the input vectors are all the same size!
   if( theta_q_l.size() == output_assembly.size() )
@@ -1272,8 +1271,8 @@ void RBSystem::attach_output(std::vector<RBTheta*> theta_q_l,
   }
 }
 
-void RBSystem::attach_output(RBTheta* theta_q_l,
-                             ElemAssembly* output_assembly)
+void RBConstruction::attach_output(RBTheta* theta_q_l,
+                                   ElemAssembly* output_assembly)
 {
   std::vector<RBTheta*> theta_l_vector(1); theta_l_vector[0] = theta_q_l;
   std::vector<ElemAssembly*> L_vector(1); L_vector[0] = output_assembly;
@@ -1281,19 +1280,19 @@ void RBSystem::attach_output(RBTheta* theta_q_l,
   attach_output(theta_l_vector, L_vector);
 }
 
-void RBSystem::attach_inner_prod_assembly(ElemAssembly* IP_assembly_in)
+void RBConstruction::attach_inner_prod_assembly(ElemAssembly* IP_assembly_in)
 {
   inner_prod_assembly = IP_assembly_in;
 }
 
-void RBSystem::attach_constraint_assembly(ElemAssembly* constraint_assembly_in)
+void RBConstruction::attach_constraint_assembly(ElemAssembly* constraint_assembly_in)
 {
   constraint_assembly = constraint_assembly_in;
 }
 
-void RBSystem::load_basis_function(unsigned int i)
+void RBConstruction::load_basis_function(unsigned int i)
 {
-  START_LOG("load_basis_function()", "RBSystem");
+  START_LOG("load_basis_function()", "RBConstruction");
 
   libmesh_assert(i < rb_eval->get_n_basis_functions());
 
@@ -1301,12 +1300,12 @@ void RBSystem::load_basis_function(unsigned int i)
 
   this->update();
 
-  STOP_LOG("load_basis_function()", "RBSystem");
+  STOP_LOG("load_basis_function()", "RBConstruction");
 }
 
-void RBSystem::enrich_RB_space()
+void RBConstruction::enrich_RB_space()
 {
-  START_LOG("enrich_RB_space()", "RBSystem");
+  START_LOG("enrich_RB_space()", "RBConstruction");
 
   NumericVector<Number>* new_bf = NumericVector<Number>::build().release();
   new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
@@ -1361,10 +1360,10 @@ void RBSystem::enrich_RB_space()
   // load the new basis function into the basis_functions vector.
   rb_eval->basis_functions.push_back( new_bf );
 
-  STOP_LOG("enrich_RB_space()", "RBSystem");
+  STOP_LOG("enrich_RB_space()", "RBConstruction");
 }
 
-void RBSystem::update_system()
+void RBConstruction::update_system()
 {
   libMesh::out << "Updating RB matrices" << std::endl;
   update_RB_system_matrices();
@@ -1385,14 +1384,14 @@ void RBSystem::update_system()
   this->reset_alternative_solver(this->linear_solver, orig_solver);
 }
 
-Real RBSystem::get_RB_error_bound()
+Real RBConstruction::get_RB_error_bound()
 {
   rb_eval->set_current_parameters( get_current_parameters() );
 
   return rb_eval->RB_solve(rb_eval->get_n_basis_functions());
 }
 
-void RBSystem::recompute_all_residual_terms(bool compute_inner_products)
+void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
 {
   // Use alternative solver for residual terms solves
   std::pair<std::string,std::string> orig_solver =
@@ -1414,9 +1413,9 @@ void RBSystem::recompute_all_residual_terms(bool compute_inner_products)
   this->reset_alternative_solver(this->linear_solver, orig_solver);
 }
 
-Real RBSystem::compute_max_error_bound()
+Real RBConstruction::compute_max_error_bound()
 {
-  START_LOG("compute_max_error_bound()", "RBSystem");
+  START_LOG("compute_max_error_bound()", "RBConstruction");
 
   training_error_bounds.resize(this->get_local_n_training_samples());
 
@@ -1455,14 +1454,14 @@ Real RBSystem::compute_max_error_bound()
   Parallel::sum(root_id); // root_id is only non-zero on one processor
   broadcast_current_parameters(root_id);
 
-  STOP_LOG("compute_max_error_bound()", "RBSystem");
+  STOP_LOG("compute_max_error_bound()", "RBConstruction");
 
   return error_pair.second;
 }
 
-void RBSystem::update_RB_system_matrices()
+void RBConstruction::update_RB_system_matrices()
 {
-  START_LOG("update_RB_system_matrices()", "RBSystem");
+  START_LOG("update_RB_system_matrices()", "RBConstruction");
 
   unsigned int RB_size = rb_eval->get_n_basis_functions();
 
@@ -1550,13 +1549,13 @@ void RBSystem::update_RB_system_matrices()
     }
   }
 
-  STOP_LOG("update_RB_system_matrices()", "RBSystem");
+  STOP_LOG("update_RB_system_matrices()", "RBConstruction");
 }
 
 
-void RBSystem::update_residual_terms(bool compute_inner_products)
+void RBConstruction::update_residual_terms(bool compute_inner_products)
 {
-  START_LOG("update_residual_terms()", "RBSystem");
+  START_LOG("update_residual_terms()", "RBConstruction");
 
   unsigned int RB_size = rb_eval->get_n_basis_functions();
 
@@ -1613,7 +1612,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
       solution->zero();
       if (!is_quiet())
 	    {
-        libMesh::out << "Starting solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBSystem::update_residual_terms() at "
+        libMesh::out << "Starting solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBConstruction::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
 	    }
 
@@ -1621,7 +1620,7 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 
       if (!is_quiet())
 	    {
-        libMesh::out << "Finished solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBSystem::update_residual_terms() at "
+        libMesh::out << "Finished solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBConstruction::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
         libMesh::out << this->n_linear_iterations() << " iterations, final residual "
                      << this->final_linear_residual() << std::endl;
@@ -1721,10 +1720,10 @@ void RBSystem::update_residual_terms(bool compute_inner_products)
 	}
     } // end if (compute_inner_products)
 
-  STOP_LOG("update_residual_terms()", "RBSystem");
+  STOP_LOG("update_residual_terms()", "RBConstruction");
 }
 
-void RBSystem::assemble_matrix_for_output_dual_solves()
+void RBConstruction::assemble_matrix_for_output_dual_solves()
 {
   // By default we use the inner product matrix for steady problems
   
@@ -1739,7 +1738,7 @@ void RBSystem::assemble_matrix_for_output_dual_solves()
   }
 }
 
-void RBSystem::compute_output_dual_norms()
+void RBConstruction::compute_output_dual_norms()
 {
   // Skip calculations if we've already computed the output dual norms
   if(!output_dual_norms_computed)
@@ -1752,7 +1751,7 @@ void RBSystem::compute_output_dual_norms()
     }
 
     // Only log if we get to here
-    START_LOG("compute_output_dual_norms()", "RBSystem");
+    START_LOG("compute_output_dual_norms()", "RBConstruction");
   
     libMesh::out << "Compute output dual norms" << std::endl;
   
@@ -1810,7 +1809,7 @@ void RBSystem::compute_output_dual_norms()
 
         if (!is_quiet())
           libMesh::out << "Starting solve n=" << n << ", q_l=" << q_l
-                 << " in RBSystem::compute_output_dual_norms() at "
+                 << " in RBConstruction::compute_output_dual_norms() at "
                  << Utility::get_timestamp() << std::endl;
 
         solve();
@@ -1818,7 +1817,7 @@ void RBSystem::compute_output_dual_norms()
         if (!is_quiet())
           {
             libMesh::out << "Finished solve n=" << n << ", q_l=" << q_l
-                         << " in RBSystem::compute_output_dual_norms() at "
+                         << " in RBConstruction::compute_output_dual_norms() at "
                          << Utility::get_timestamp() << std::endl;
 
             libMesh::out << this->n_linear_iterations()
@@ -1890,20 +1889,20 @@ void RBSystem::compute_output_dual_norms()
     // "unchanged".
     this->reset_alternative_solver(this->linear_solver, orig_solver);
 
-    STOP_LOG("compute_output_dual_norms()", "RBSystem");
+    STOP_LOG("compute_output_dual_norms()", "RBConstruction");
 
   }
   
   rb_eval->output_dual_norms = output_dual_norms;
 }
 
-void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
+void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
 {
   // Skip calculations if we've already computed the Fq_representors
   if(!Fq_representor_norms_computed)
   {
     // Only log if we get to here
-    START_LOG("compute_Fq_representor_norms()", "RBSystem");
+    START_LOG("compute_Fq_representor_norms()", "RBConstruction");
 
     if(!low_memory_mode)
     {
@@ -1945,7 +1944,7 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
 
       if (!is_quiet())
         libMesh::out << "Starting solve q_f=" << q_f
-		     << " in RBSystem::update_residual_terms() at "
+		     << " in RBConstruction::update_residual_terms() at "
  		     << Utility::get_timestamp() << std::endl;
 
       solve();
@@ -1953,7 +1952,7 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
       if (!is_quiet())
       {
         libMesh::out << "Finished solve q_f=" << q_f
-		     << " in RBSystem::update_residual_terms() at "
+		     << " in RBConstruction::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
 
         libMesh::out << this->n_linear_iterations()
@@ -2017,15 +2016,15 @@ void RBSystem::compute_Fq_representor_norms(bool compute_inner_products)
   
     Fq_representor_norms_computed = true;
 
-    STOP_LOG("compute_Fq_representor_norms()", "RBSystem");
+    STOP_LOG("compute_Fq_representor_norms()", "RBConstruction");
   }
   
   rb_eval->Fq_representor_norms = Fq_representor_norms;
 }
 
-void RBSystem::load_RB_solution()
+void RBConstruction::load_RB_solution()
 {
-  START_LOG("load_RB_solution()", "RBSystem");
+  START_LOG("load_RB_solution()", "RBConstruction");
 
   solution->zero();
 
@@ -2033,7 +2032,7 @@ void RBSystem::load_RB_solution()
   {
     libMesh::err << "ERROR: System contains " << rb_eval->get_n_basis_functions() << " basis functions."
                  << " RB_solution vector constains " << rb_eval->RB_solution.size() << " entries."
-                 << " RB_solution in RBSystem::load_RB_solution is too long!" << std::endl;
+                 << " RB_solution in RBConstruction::load_RB_solution is too long!" << std::endl;
     libmesh_error();
   }
 
@@ -2044,14 +2043,14 @@ void RBSystem::load_RB_solution()
 
   update();
 
-  STOP_LOG("load_RB_solution()", "RBSystem");
+  STOP_LOG("load_RB_solution()", "RBConstruction");
 }
 
 // The slow (but simple, non-error prone) way to compute the residual dual norm
 // Useful for error checking
-//Real RBSystem::compute_residual_dual_norm(const unsigned int N)
+//Real RBConstruction::compute_residual_dual_norm(const unsigned int N)
 //{
-//  START_LOG("compute_residual_dual_norm()", "RBSystem");
+//  START_LOG("compute_residual_dual_norm()", "RBConstruction");
 //
 //   // Put the residual in rhs in order to compute the norm of the Riesz representor
 //   // Note that this only works in serial since otherwise each processor will
@@ -2104,12 +2103,12 @@ void RBSystem::load_RB_solution()
 //
 //   Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
 //
-//  STOP_LOG("compute_residual_dual_norm()", "RBSystem");
+//  STOP_LOG("compute_residual_dual_norm()", "RBConstruction");
 //
 //  return std::sqrt( libmesh_real(slow_residual_norm_sq) );
 //}
 
-SparseMatrix<Number>* RBSystem::get_inner_product_matrix()
+SparseMatrix<Number>* RBConstruction::get_inner_product_matrix()
 {
   if(low_memory_mode)
   {
@@ -2120,7 +2119,7 @@ SparseMatrix<Number>* RBSystem::get_inner_product_matrix()
   return inner_product_matrix.get();
 }
 
-SparseMatrix<Number>* RBSystem::get_non_dirichlet_inner_product_matrix()
+SparseMatrix<Number>* RBConstruction::get_non_dirichlet_inner_product_matrix()
 {
   if(!store_non_dirichlet_operators)
   {
@@ -2137,7 +2136,7 @@ SparseMatrix<Number>* RBSystem::get_non_dirichlet_inner_product_matrix()
   return non_dirichlet_inner_product_matrix.get();
 }
 
-SparseMatrix<Number>* RBSystem::get_A_q(unsigned int q)
+SparseMatrix<Number>* RBConstruction::get_A_q(unsigned int q)
 {
   if(low_memory_mode)
   {
@@ -2155,7 +2154,7 @@ SparseMatrix<Number>* RBSystem::get_A_q(unsigned int q)
   return A_q_vector[q];
 }
 
-SparseMatrix<Number>* RBSystem::get_non_dirichlet_A_q(unsigned int q)
+SparseMatrix<Number>* RBConstruction::get_non_dirichlet_A_q(unsigned int q)
 {
   if(!store_non_dirichlet_operators)
   {
@@ -2179,7 +2178,7 @@ SparseMatrix<Number>* RBSystem::get_non_dirichlet_A_q(unsigned int q)
   return non_dirichlet_A_q_vector[q];
 }
 
-NumericVector<Number>* RBSystem::get_F_q(unsigned int q)
+NumericVector<Number>* RBConstruction::get_F_q(unsigned int q)
 {
   if(q >= rb_theta_expansion->get_Q_f())
   {
@@ -2191,7 +2190,7 @@ NumericVector<Number>* RBSystem::get_F_q(unsigned int q)
   return F_q_vector[q];
 }
 
-NumericVector<Number>* RBSystem::get_non_dirichlet_F_q(unsigned int q)
+NumericVector<Number>* RBConstruction::get_non_dirichlet_F_q(unsigned int q)
 {
   if(!store_non_dirichlet_operators)
   {
@@ -2209,7 +2208,7 @@ NumericVector<Number>* RBSystem::get_non_dirichlet_F_q(unsigned int q)
   return non_dirichlet_F_q_vector[q];
 }
 
-NumericVector<Number>* RBSystem::get_output_vector(unsigned int n, unsigned int q_l)
+NumericVector<Number>* RBConstruction::get_output_vector(unsigned int n, unsigned int q_l)
 {
   if( (n >= rb_theta_expansion->get_n_outputs()) || (q_l >= rb_theta_expansion->get_Q_l(n)) )
   {
@@ -2222,14 +2221,14 @@ NumericVector<Number>* RBSystem::get_output_vector(unsigned int n, unsigned int 
   return outputs_vector[n][q_l];
 }
 
-void RBSystem::zero_dirichlet_dofs_on_rhs()
+void RBConstruction::zero_dirichlet_dofs_on_rhs()
 {
   this->zero_dirichlet_dofs_on_vector(*rhs);
 }
 
-void RBSystem::zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp)
+void RBConstruction::zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp)
 {
-  START_LOG("zero_dirichlet_dofs_on_vector()", "RBSystem");
+  START_LOG("zero_dirichlet_dofs_on_vector()", "RBConstruction");
 
   std::set<unsigned int>::iterator iter     = global_dirichlet_dofs_set.begin();
   std::set<unsigned int>::iterator iter_end = global_dirichlet_dofs_set.end();
@@ -2245,15 +2244,15 @@ void RBSystem::zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp)
   }
   temp.close();
 
-  STOP_LOG("zero_dirichlet_dofs_on_vector()", "RBSystem");
+  STOP_LOG("zero_dirichlet_dofs_on_vector()", "RBConstruction");
 }
 
 
 
-void RBSystem::write_riesz_representors_to_files(const std::string& riesz_representors_dir,
-                                                 const bool write_binary_residual_representors)
+void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_representors_dir,
+                                                       const bool write_binary_residual_representors)
 {
-  START_LOG("write_riesz_representors_to_files()", "RBSystem");
+  START_LOG("write_riesz_representors_to_files()", "RBConstruction");
 
   // Write out Riesz representors. These are useful to have when restarting,
   // so you don't have to recompute them all over again.
@@ -2354,15 +2353,15 @@ void RBSystem::write_riesz_representors_to_files(const std::string& riesz_repres
       }
     }
 
-  STOP_LOG("write_riesz_representors_to_files()", "RBSystem");
+  STOP_LOG("write_riesz_representors_to_files()", "RBConstruction");
 }
 
 
 
-void RBSystem::read_riesz_representors_from_files(const std::string& riesz_representors_dir,
-                                                  const bool read_binary_residual_representors)
+void RBConstruction::read_riesz_representors_from_files(const std::string& riesz_representors_dir,
+                                                        const bool read_binary_residual_representors)
 {
-  START_LOG("read_riesz_representors_from_files()", "RBSystem");
+  START_LOG("read_riesz_representors_from_files()", "RBConstruction");
 
   libMesh::out << "Reading in the F_q_representors..." << std::endl;
 
@@ -2467,7 +2466,7 @@ void RBSystem::read_riesz_representors_from_files(const std::string& riesz_repre
       rb_eval->A_q_representor[i][j]->swap(*solution);
     }
 
-  STOP_LOG("read_riesz_representors_from_files()", "RBSystem");
+  STOP_LOG("read_riesz_representors_from_files()", "RBConstruction");
 }
 
 

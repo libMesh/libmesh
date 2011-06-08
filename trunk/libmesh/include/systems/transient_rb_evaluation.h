@@ -124,6 +124,11 @@ public:
   TransientRBEvaluation ();
 
   /**
+   * Destructor.
+   */
+  ~TransientRBEvaluation ();
+
+  /**
    * The type of the parent.
    */
   typedef RBEvaluation Parent;

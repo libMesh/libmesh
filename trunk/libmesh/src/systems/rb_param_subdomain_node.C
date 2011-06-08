@@ -19,7 +19,7 @@
 
 #include "rb_param_subdomain_node.h"
 #include "rb_param_subdomain_tree.h"
-#include "rb_system.h"
+#include "rb_construction.h"
 #include "parallel.h"
 #include "libmesh_logging.h"
 #include "utility.h"
@@ -32,12 +32,12 @@ namespace libMesh
 RBParamSubdomainNode::RBParamSubdomainNode(RBParamSubdomainTree& tree_in,
                                            const std::vector<Real>& anchor_in)
         : left_child(NULL),
-        right_child(NULL),
-        _tree(tree_in),
-        _rb_system(tree_in._rb_system),
-        anchor(anchor_in),
-        model_number(-1),
-        training_set_initialized(false)
+          right_child(NULL),
+          _tree(tree_in),
+          _rb_construction(tree_in._rb_construction),
+          anchor(anchor_in),
+          model_number(-1),
+          training_set_initialized(false)
 {
     libmesh_assert( get_n_params() != 0);
 
@@ -98,30 +98,30 @@ unsigned int RBParamSubdomainNode::n_global_training_parameters() const
 
 void RBParamSubdomainNode::hp_greedy(bool store_basis_functions)
 {
-    _rb_system.rb_eval->clear();
+    _rb_construction.rb_eval->clear();
 
     // Load the (full or subsampled) training set
     if(_tree.n_subsampled_training_points >= n_global_training_parameters())
     {
-      _rb_system.load_training_set( training_set );
+      _rb_construction.load_training_set( training_set );
     }
     else
     {
       std::vector< std::vector<Number> > subsampled_training_set = get_subsampled_training_set();
-      _rb_system.load_training_set( subsampled_training_set );
+      _rb_construction.load_training_set( subsampled_training_set );
     }
 
-    _rb_system.set_current_parameters( this->anchor );
-    _rb_system.set_training_tolerance(_tree.h_tol);
+    _rb_construction.set_current_parameters( this->anchor );
+    _rb_construction.set_training_tolerance(_tree.h_tol);
 
-    // Save _rb_system's Nmax and set Nmax to N_bar
-    const unsigned int initial_Nmax = _rb_system.get_Nmax();
-    _rb_system.set_Nmax(_tree.N_bar);
+    // Save _rb_construction's Nmax and set Nmax to N_bar
+    const unsigned int initial_Nmax = _rb_construction.get_Nmax();
+    _rb_construction.set_Nmax(_tree.N_bar);
 
-    Real greedy_bound = _rb_system.train_reduced_basis();
+    Real greedy_bound = _rb_construction.train_reduced_basis();
 
-    // Restore _rb_system's Nmax to initial_Nmax after h-stage greedy
-    _rb_system.set_Nmax(initial_Nmax);
+    // Restore _rb_construction's Nmax to initial_Nmax after h-stage greedy
+    _rb_construction.set_Nmax(initial_Nmax);
 
 
     if ( greedy_bound > _tree.h_tol) // recursive call to hp_greedy
@@ -160,8 +160,8 @@ void RBParamSubdomainNode::split_this_subdomain(bool )
 {
     START_LOG("split_this_subdomain()", "RBParamSubdomainNode");
 
-    this->add_child( _rb_system.get_greedy_parameter(0), RBParamSubdomainNode::LEFT);
-    this->add_child( _rb_system.get_greedy_parameter(1), RBParamSubdomainNode::RIGHT);
+    this->add_child( _rb_construction.get_greedy_parameter(0), RBParamSubdomainNode::LEFT);
+    this->add_child( _rb_construction.get_greedy_parameter(1), RBParamSubdomainNode::RIGHT);
 
     // Set the distance_between_anchors member of the children
     left_child->distance_between_anchors = right_child->distance_between_anchors = 
@@ -187,14 +187,14 @@ Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound)
     // Continue the greedy process on this subdomain, i.e.
     // we do not discard the basis functions generated for
     // this subdomain in the h-refinement phase
-    _rb_system.set_training_tolerance(_tree.p_tol);
+    _rb_construction.set_training_tolerance(_tree.p_tol);
 
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy
     if ( (greedy_bound > _tree.p_tol) ||
-         (_rb_system.rb_eval->get_n_basis_functions() < _rb_system.get_Nmax()) )
+         (_rb_construction.rb_eval->get_n_basis_functions() < _rb_construction.get_Nmax()) )
     {
-        greedy_bound = _rb_system.train_reduced_basis();
+        greedy_bound = _rb_construction.train_reduced_basis();
     }
 
     STOP_LOG("perform_p_stage()", "RBParamSubdomainNode");
@@ -212,11 +212,13 @@ void RBParamSubdomainNode::write_subdomain_data_to_files(bool store_basis_functi
     std::stringstream dir_name_stream;
     dir_name_stream << "offline_data_hp" << _tree.leaf_node_index;
     const std::string& directory_name = dir_name_stream.str();
-    _rb_system.rb_eval->write_offline_data_to_files(directory_name);
+    _rb_construction.rb_eval->write_offline_data_to_files(directory_name);
     
     if(store_basis_functions)
     {
-      _rb_system.rb_eval->write_out_basis_functions(_rb_system, /*write_binary*/ true, directory_name);
+      _rb_construction.rb_eval->write_out_basis_functions(_rb_construction,
+                                                          directory_name,
+                                                          /*write_binary*/ true);
     }
 
     STOP_LOG("write_subdomain_data_to_files()", "RBParamSubdomainNode");
@@ -264,7 +266,7 @@ void RBParamSubdomainNode::refine_training_set(const unsigned int new_local_trai
 {
     START_LOG("refine_training_set()", "RBParamSubdomainNode");
 
-    // seed the random number generator with the system time
+    // seed the random number generator with the construction time
     // and the processor ID so that the seed is different
     // on different processors
     std::srand((unsigned)( std::time(0)*(1+libMesh::processor_id()) ));
@@ -392,24 +394,24 @@ void RBParamSubdomainNode::initialize_child_training_sets()
 
 
 
-void RBParamSubdomainNode::copy_training_set_from_system()
+void RBParamSubdomainNode::copy_training_set_from_construction()
 {
-    START_LOG("copy_training_set_from_system()", "RBParamSubdomainNode");
+    START_LOG("copy_training_set_from_construction()", "RBParamSubdomainNode");
     
-    training_set.resize(_rb_system.get_n_params());
+    training_set.resize(_rb_construction.get_n_params());
 
     for (unsigned int i=0; i<training_set.size(); i++)
     {
       training_set[i].clear();
-      for (unsigned int j=_rb_system.training_parameters[i]->first_local_index();
-                        j<_rb_system.training_parameters[i]->last_local_index();
+      for (unsigned int j=_rb_construction.training_parameters[i]->first_local_index();
+                        j<_rb_construction.training_parameters[i]->last_local_index();
                         j++)
-        training_set[i].push_back( (*_rb_system.training_parameters[i])(j) );
+        training_set[i].push_back( (*_rb_construction.training_parameters[i])(j) );
     }
 
     training_set_initialized = true;
 
-    STOP_LOG("copy_training_set_from_system()", "RBParamSubdomainNode");
+    STOP_LOG("copy_training_set_from_construction()", "RBParamSubdomainNode");
 }
 
 Real RBParamSubdomainNode::distance(const std::vector<Real>& p1, const std::vector<Real>& p2) const
@@ -427,9 +429,9 @@ Real RBParamSubdomainNode::distance(const std::vector<Real>& p1, const std::vect
     for (unsigned int i=0; i<p1.size(); i++)
     {
         // Map anchor[i] and new_param[i] to (0,1) before computing distance
-        Real jacobian = _rb_system.get_parameter_max(i) - _rb_system.get_parameter_min(i);
-        Real p1_mapped = (p1[i] - _rb_system.get_parameter_min(i))/jacobian;
-        Real p2_mapped = (p2[i] - _rb_system.get_parameter_min(i))/jacobian;
+        Real jacobian = _rb_construction.get_parameter_max(i) - _rb_construction.get_parameter_min(i);
+        Real p1_mapped = (p1[i] - _rb_construction.get_parameter_min(i))/jacobian;
+        Real p2_mapped = (p2[i] - _rb_construction.get_parameter_min(i))/jacobian;
         sum += libmesh_norm(p1_mapped - p2_mapped);
     }
     
@@ -476,10 +478,10 @@ std::vector< std::vector<Real> > RBParamSubdomainNode::get_training_bbox()
         corner_values[1][i] = anchor[i] + _tree.bbox_margin*this->distance_between_anchors;
 
         // Might have to set corner_values to the parameter domain boundaries
-        if (corner_values[0][i] < _rb_system.get_parameter_min(i))
-            corner_values[0][i] = _rb_system.get_parameter_min(i);
-        if (corner_values[1][i] > _rb_system.get_parameter_max(i))
-            corner_values[1][i] = _rb_system.get_parameter_max(i);
+        if (corner_values[0][i] < _rb_construction.get_parameter_min(i))
+            corner_values[0][i] = _rb_construction.get_parameter_min(i);
+        if (corner_values[1][i] > _rb_construction.get_parameter_max(i))
+            corner_values[1][i] = _rb_construction.get_parameter_max(i);
     }
 
 

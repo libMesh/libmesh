@@ -17,18 +17,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "derived_rb_system.h"
+#include "derived_rb_construction.h"
+#include "derived_rb_evaluation.h"
+
 #include "libmesh_logging.h"
 #include "equation_systems.h"
-#include "derived_rb_evaluation.h"
 
 namespace libMesh
 {
 
 template <class Base>
-DerivedRBSystem<Base>::DerivedRBSystem (EquationSystems& es,
-		    const std::string& name,
-		    const unsigned int number)
+DerivedRBConstruction<Base>::DerivedRBConstruction (EquationSystems& es,
+		                                    const std::string& name,
+		                                    const unsigned int number)
   : Base(es, name, number)
 {
   // We do not want to compute the output dual norms in
@@ -38,13 +39,13 @@ DerivedRBSystem<Base>::DerivedRBSystem (EquationSystems& es,
 }
 
 template <class Base>
-std::string DerivedRBSystem<Base>::system_type () const
+std::string DerivedRBConstruction<Base>::system_type () const
 {
-  return "DerivedRBSystem";
+  return "DerivedRBConstruction";
 }
 
 template <class Base>
-Real DerivedRBSystem<Base>::train_reduced_basis (const std::string& directory_name)
+Real DerivedRBConstruction<Base>::train_reduced_basis (const std::string& directory_name)
 {
   Real training_greedy_error = Base::train_reduced_basis(directory_name);
   
@@ -54,21 +55,21 @@ Real DerivedRBSystem<Base>::train_reduced_basis (const std::string& directory_na
 }
 
 template<class Base>
-void DerivedRBSystem<Base>::set_uber_current_parameters()
+void DerivedRBConstruction<Base>::set_uber_current_parameters()
 {
   EquationSystems& es = this->get_equation_systems();
-  RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
+  RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
 
   uber_system.set_current_parameters( Base::get_current_parameters() );
 }
 
 template <class Base>
-void DerivedRBSystem<Base>::load_basis_function(unsigned int i)
+void DerivedRBConstruction<Base>::load_basis_function(unsigned int i)
 {
-  START_LOG("load_basis_function()", "DerivedRBSystem");
+  START_LOG("load_basis_function()", "DerivedRBConstruction");
   
   EquationSystems& es = Base::get_equation_systems();
-  RBSystem& uber_system = es.get_system<RBSystem>(uber_system_name);
+  RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
 
   DenseVector<Number> bf = get_derived_basis_function(i);
 
@@ -77,10 +78,10 @@ void DerivedRBSystem<Base>::load_basis_function(unsigned int i)
     Base::solution->add(bf(j), uber_system.rb_eval->get_basis_function(j));
   }
 
-  STOP_LOG("load_basis_function()", "DerivedRBSystem");
+  STOP_LOG("load_basis_function()", "DerivedRBConstruction");
 }
 
 // explicit instantiations
-template class DerivedRBSystem<RBSystem>;
+template class DerivedRBConstruction<RBConstruction>;
 
 }

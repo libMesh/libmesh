@@ -18,7 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "derived_rb_evaluation.h"
-#include "rb_system.h"
+#include "system.h"
+#include "o_string_stream.h"
 
 #include <sys/stat.h>
 
@@ -53,9 +54,9 @@ void DerivedRBEvaluation<Base>::set_n_basis_functions(unsigned int n_bfs)
 }
 
 template <class Base>
-void DerivedRBEvaluation<Base>::write_out_basis_functions(RBSystem& ,
-                                                          const bool ,
-                                                          const std::string& directory_name)
+void DerivedRBEvaluation<Base>::write_out_basis_functions(System& ,
+                                                          const std::string& directory_name,
+                                                          const bool )
 {
   if( libMesh::processor_id() == 0 ) // Only write out on proc 0
   {
@@ -105,9 +106,9 @@ void DerivedRBEvaluation<Base>::write_out_basis_functions(RBSystem& ,
 }
 
 template <class Base>
-void DerivedRBEvaluation<Base>::read_in_basis_functions(RBSystem& ,
-                                                        const bool ,
-                                                        const std::string& directory_name)
+void DerivedRBEvaluation<Base>::read_in_basis_functions(System& ,
+                                                        const std::string& directory_name,
+                                                        const bool )
 {
   libMesh::out << "Reading in the basis functions..." << std::endl;
     

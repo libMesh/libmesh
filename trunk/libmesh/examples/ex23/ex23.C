@@ -99,9 +99,10 @@ int main (int argc, char** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // We override RBSystem with SimpleRBSytem in order to specialize a few functions.
-  SimpleRBSystem & system =
-    equation_systems.add_system<SimpleRBSystem> ("RBConvectionDiffusion");
+  // We override RBConstruction with SimpleRBConstruction in order to
+  // specialize a few functions for this particular problem.
+  SimpleRBConstruction & system =
+    equation_systems.add_system<SimpleRBConstruction> ("RBConvectionDiffusion");
 
 
   // Initialize the data structures for the equation system.
@@ -168,7 +169,7 @@ int main (int argc, char** argv)
     // Prepare system for the Construction stage of the RB method.
     // This sets up the necessary data structures and performs
     // initial assembly of the "truth" affine expansion of the PDE.
-    system.initialize_RB_system(rb_eval.get());
+    system.initialize_RB_construction(rb_eval.get());
 
     // Compute the reduced basis space by computing "snapshots", i.e.
     // "truth" solves, at well-chosen parameter values and employing
@@ -187,7 +188,7 @@ int main (int argc, char** argv)
   else // Perform the Online stage of the RB method
   {
     // Use system to initialize rb_eval
-    system.initialize_rb_eval_from_system(*rb_eval);
+    system.initialize_rb_eval(*rb_eval);
 
     // Read in the reduced basis data
     rb_eval->read_offline_data_from_files();

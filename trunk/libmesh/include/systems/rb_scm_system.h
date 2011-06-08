@@ -28,7 +28,7 @@
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
 #include "condensed_eigen_system.h"
-#include "rb_base_system.h"
+#include "rb_base_construction.h"
 
 namespace libMesh
 {
@@ -39,13 +39,17 @@ namespace libMesh
  * RBSCMSystem implements the the Successive Constraint Method (SCM)
  * for computing rigorous lower bounds for stability constants.
  *
+ * TODO: Segregate this class into RBSCMConstruction and
+ * RBSCMEvaluation in the same way as the other rbOOmit classes.
+ * 
+ *
  * @author David J. Knezevic 2009
  */
 
 // ------------------------------------------------------------
 // RBSCMSystem class definition
 
-class RBSCMSystem : public RBBaseSystem<CondensedEigenSystem>
+class RBSCMSystem : public RBBaseConstruction<CondensedEigenSystem>
 {
 public:
 
@@ -70,7 +74,7 @@ public:
   /**
    * The type of the parent.
    */
-  typedef RBBaseSystem<CondensedEigenSystem> Parent;
+  typedef RBBaseConstruction<CondensedEigenSystem> Parent;
 
   /**
    * Clear all the data structures associated with

@@ -19,7 +19,7 @@
 
 #include "rb_param_subdomain_node.h"
 #include "rb_param_subdomain_tree.h"
-#include "rb_system.h"
+#include "rb_construction.h"
 #include "getpot.h"
 #include "libmesh_logging.h"
 
@@ -34,9 +34,10 @@ namespace libMesh
 {
 
 
-RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::string& parameters_filename)
+RBParamSubdomainTree::RBParamSubdomainTree(RBConstruction& rb_construction_in,
+                                           const std::string& parameters_filename)
   : root_node(NULL),
-    _rb_system(rb_system_in),
+    _rb_construction(rb_construction_in),
     h_tol(0.),
     p_tol(0.),
     N_bar(1),
@@ -53,7 +54,7 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
   p_tol = infile("p_tol",p_tol);
 
   N_bar = infile("N_bar",N_bar);
-  if(N_bar > _rb_system.get_Nmax())
+  if(N_bar > _rb_construction.get_Nmax())
   {
     libMesh::out << "Error: Cannot set N_bar larger than Nmax for an RBParamSubdomainTree."
                  << std::endl;
@@ -61,7 +62,7 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBSystem& rb_system_in, const std::st
   }
   
   // by default use all training points
-  n_subsampled_training_points = infile( "n_subsampled_training_points", _rb_system.get_n_training_samples() );
+  n_subsampled_training_points = infile( "n_subsampled_training_points", _rb_construction.get_n_training_samples() );
 
   // Set the subdomain bounding-box margin fraction
   bbox_margin = infile("bbox_margin",bbox_margin);
@@ -90,7 +91,7 @@ RBParamSubdomainTree::~RBParamSubdomainTree()
 void RBParamSubdomainTree::build_root_node()
 {
   libmesh_assert(root_node == NULL);
-  root_node = new RBParamSubdomainNode(*this, _rb_system.get_current_parameters());
+  root_node = new RBParamSubdomainNode(*this, _rb_construction.get_current_parameters());
 }
 
 void RBParamSubdomainTree::hp_greedy(bool store_basis_functions)
@@ -102,7 +103,7 @@ void RBParamSubdomainTree::hp_greedy(bool store_basis_functions)
   if(!root_node)
     build_root_node();
 
-  root_node->copy_training_set_from_system();
+  root_node->copy_training_set_from_construction();
 
   root_node->hp_greedy(store_basis_functions);
 
@@ -249,13 +250,13 @@ void RBParamSubdomainTree::reconstruct_tree(RBParamSubdomainNode * current_node,
 
  stream >> bool_vec_string;
 
- for (unsigned i = 0 ; i < _rb_system.get_n_params(); i++)
+ for (unsigned i = 0 ; i < _rb_construction.get_n_params(); i++)
    stream >> current_node->anchor[i];
 
  stream >> current_node->model_number;
 
 //  libMesh::out << bool_vec_string << " ";
-//  for (unsigned i = 0 ; i < _rb_system.get_n_params(); i++)
+//  for (unsigned i = 0 ; i < _rb_construction.get_n_params(); i++)
 //    libMesh::out<< current_node->anchor[i] << " ";
 //  libMesh::out << current_node->model_number << std::endl;
 

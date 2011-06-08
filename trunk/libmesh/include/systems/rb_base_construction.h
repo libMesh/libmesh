@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_base_system_h__
-#define __rb_base_system_h__
+#ifndef __rb_base_construction_h__
+#define __rb_base_construction_h__
 
 #include "system.h"
 #include "numeric_vector.h"
@@ -36,10 +36,10 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * This is the base class for certified reduced basis (RB)
- * systems.
+ * This is the base class for the Construction stage
+ * of the certified reduced basis (RB) method.
  * We template the Base class so that we can derive from
- * the appropriate System type (e.g. LinearImplicitSystem
+ * the appropriate libMesh System type (e.g. LinearImplicitSystem
  * for standard reduced basis, EigenSystem for SCM)
  * at compile time.
  * We also inherit from RBBase to define a parameter domain
@@ -50,9 +50,9 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
-// RBBaseSystem class definition
+// RBBaseConstruction class definition
 template<class Base>
-class RBBaseSystem : public Base, public RBBase
+class RBBaseConstruction : public Base, public RBBase
 {
 public:
 
@@ -60,19 +60,19 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  RBBaseSystem (EquationSystems& es,
-                const std::string& name,
-                const unsigned int number);
+  RBBaseConstruction (EquationSystems& es,
+                      const std::string& name,
+                      const unsigned int number);
 
   /**
    * Destructor.
    */
-  virtual ~RBBaseSystem ();
+  virtual ~RBBaseConstruction ();
 
   /**
    * The type of system.
    */
-  typedef RBBaseSystem<Base> sys_type;
+  typedef RBBaseConstruction<Base> sys_type;
 
   /**
    * @returns a clever pointer to the system.
@@ -236,8 +236,8 @@ protected:
   /**
    * This boolean flag indicates whether or not the training set should
    * be the same on all processors. By default it is false, but in the
-   * case of the Empirical Interpolation Method (RBEIMSystem), for example,
-   * we need the training set to be identical on all processors.
+   * case of the Empirical Interpolation Method (RBEIMConstruction),
+   * for example, we need the training set to be identical on all processors.
    */
   bool serial_training_set;
 
@@ -255,9 +255,9 @@ protected:
    * .) amg, to use the BoomerAMG from Hypre (NOT for indefinite problems!)
    * .) mumps, to use a sparse direct solver
    * Note1: mumps and amg will only be available if PETSc has been compiled with them.
-   * Note2: RBSystem::init_data() is responsible for reading in this value ("rb_alternative_solver")
-   *        from file for RBSystem-derived subclasses
-   * Note3: RBSCMSystem::init_data() reads this value ("scm_alternative_solver")
+   * Note2: RBConstruction::process_parameters_file() is responsible for reading in this value ("rb_alternative_solver")
+   *        from file for RBConstruction-derived subclasses
+   * Note3: RBSCMSystem::process_parameters_file() reads this value ("scm_alternative_solver")
    *        for RBSCMSystem-derived subclasses
    */
   std::string alternative_solver;

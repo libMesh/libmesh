@@ -25,8 +25,8 @@ namespace libMesh
 {
 
 TransientRBParamSubdomainTree::TransientRBParamSubdomainTree
-  (TransientRBSystem& rb_system_in, const std::string& parameters_filename)
-  : Parent(rb_system_in, parameters_filename),
+  (TransientRBConstruction& rb_construction_in, const std::string& parameters_filename)
+  : Parent(rb_construction_in, parameters_filename),
     conserv_factor(-1.),
     use_delta_N_in_h_stage(false)
 {
@@ -50,7 +50,7 @@ TransientRBParamSubdomainTree::TransientRBParamSubdomainTree
 void TransientRBParamSubdomainTree::build_root_node()
 {
   libmesh_assert(root_node == NULL);
-  root_node = new TransientRBParamSubdomainNode(*this, _rb_system.get_current_parameters());
+  root_node = new TransientRBParamSubdomainNode(*this, _rb_construction.get_current_parameters());
 }
 
 } // namespace libMesh

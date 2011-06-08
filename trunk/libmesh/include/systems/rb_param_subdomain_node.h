@@ -27,7 +27,7 @@ namespace libMesh
 {
 
 // Forward declaration
-class RBSystem;
+class RBConstruction;
 class RBParamSubdomainTree;
 
 /**
@@ -131,10 +131,10 @@ public:
   virtual void add_child(const std::vector<Real>& child_anchor, Child c);
 
   /**
-   * Copy the training set from the associated RBSystem to this
+   * Copy the training set from the associated RBConstruction to this
    * RBParamSubdomainNode.
    */
-  void copy_training_set_from_system();
+  void copy_training_set_from_construction();
 
   /**
    * Refine the training set of the current RBParamSubdomainNode
@@ -198,10 +198,10 @@ public:
   RBParamSubdomainTree& _tree;
 
   /**
-   * Reference to the RBSystem that is used
+   * Reference to the RBConstruction that is used
    * to actually perform the truth and RB solves.
    */
-  RBSystem& _rb_system;
+  RBConstruction& _rb_construction;
 
   /**
    * The anchor parameter value. The anchor point is used
@@ -224,7 +224,7 @@ public:
   /**
    * The set of training points for the parameter
    * subdomain corresponding to this node. We copy
-   * this training set to _rb_system in order to
+   * this training set to _rb_construction in order to
    * generate a reduced basis for this subdomain.
    */
   std::vector< std::vector<Number> > training_set;
