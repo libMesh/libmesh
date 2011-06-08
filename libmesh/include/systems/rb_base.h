@@ -30,8 +30,9 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * This is the base class for certified reduced basis (RB)
- * functionality. Here we store generic RB quantities such
+ * This is the base class for both Construction and Evaluation
+ * stages of the certified reduced basis (RB) method.
+ * Here we store generic RB quantities such
  * as parameter ranges and functions in the `affine'
  * expansion of the bilinear form operators of the PDE.
  *

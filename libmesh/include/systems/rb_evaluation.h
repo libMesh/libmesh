@@ -28,7 +28,7 @@
 namespace libMesh
 {
 
-class RBSystem;
+class System;
 template <typename T> class NumericVector;
         
 /**
@@ -145,17 +145,25 @@ public:
 
   /**
    * Write out all the basis functions to file.
+   * \p sys is used for file IO
+   * \p directory_name specifies which directory to write files to
+   * \p read_binary_basis_functions indicates whether to expect
+   * binary or ASCII data
    */
-  virtual void write_out_basis_functions(RBSystem& rb_sys,
-                                         const bool write_binary_basis_functions = true,
-                                         const std::string& directory_name = "offline_data");
+  virtual void write_out_basis_functions(System& sys,
+                                         const std::string& directory_name = "offline_data",
+                                         const bool write_binary_basis_functions = true);
   
   /**
    * Read in all the basis functions from file.
+   * \p sys is used for file IO
+   * \p directory_name specifies which directory to write files to
+   * \p read_binary_basis_functions indicates whether to expect
+   * binary or ASCII data
    */
-  virtual void read_in_basis_functions(RBSystem& rb_sys,
-                                       const bool read_binary_basis_functions = true,
-                                       const std::string& directory_name = "offline_data");
+  virtual void read_in_basis_functions(System& sys,
+                                       const std::string& directory_name = "offline_data",
+                                       const bool read_binary_basis_functions = true);
   
   //----------- PUBLIC DATA MEMBERS -----------//
 

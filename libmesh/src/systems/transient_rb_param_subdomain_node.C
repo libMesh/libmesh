@@ -19,7 +19,7 @@
 
 #include "transient_rb_param_subdomain_node.h"
 #include "transient_rb_param_subdomain_tree.h"
-#include "transient_rb_system.h"
+#include "transient_rb_construction.h"
 #include "libmesh_logging.h"
 
 namespace libMesh
@@ -73,21 +73,21 @@ void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_ancho
 
 void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
 {
-    _rb_system.rb_eval->clear();
+    _rb_construction.rb_eval->clear();
 
     // Load the (full or subsampled) training set
     if(_tree.n_subsampled_training_points >= n_global_training_parameters())
     {
-      _rb_system.load_training_set( training_set );
+      _rb_construction.load_training_set( training_set );
     }
     else
     {
       std::vector< std::vector<Number> > subsampled_training_set = get_subsampled_training_set();
-      _rb_system.load_training_set( subsampled_training_set );
+      _rb_construction.load_training_set( subsampled_training_set );
     }
 
-    _rb_system.set_current_parameters( this->anchor );
-    _rb_system.set_training_tolerance(_tree.h_tol);
+    _rb_construction.set_current_parameters( this->anchor );
+    _rb_construction.set_training_tolerance(_tree.h_tol);
 
     Real greedy_bound;
 
@@ -95,7 +95,7 @@ void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
     TransientRBParamSubdomainTree& trans_tree =
       libmesh_cast_ref<TransientRBParamSubdomainTree&>(_tree);
 
-    TransientRBSystem& trans_rb = libmesh_cast_ref<TransientRBSystem&>(_rb_system);
+    TransientRBConstruction& trans_rb = libmesh_cast_ref<TransientRBConstruction&>(_rb_construction);
 
     // Set the maximum number of truth solves to N_bar in the time-dependent case
     trans_rb.set_max_truth_solves(_tree.N_bar);
@@ -170,9 +170,9 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound)
     // Continue the greedy process on this subdomain, i.e.
     // we do not discard the basis functions generated for
     // this subdomain in the h-refinement phase
-    _rb_system.set_training_tolerance(_tree.p_tol);
+    _rb_construction.set_training_tolerance(_tree.p_tol);
 
-    TransientRBSystem& trans_rb = libmesh_cast_ref<TransientRBSystem&>(_rb_system);
+    TransientRBConstruction& trans_rb = libmesh_cast_ref<TransientRBConstruction&>(_rb_construction);
 
     // Ignore max_truth_solves and POD-tol in the p-stage
     trans_rb.set_POD_tol(-1.);
@@ -185,9 +185,9 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound)
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy
     if ( (greedy_bound > _tree.p_tol) ||
-         (_rb_system.rb_eval->get_n_basis_functions() < _rb_system.get_Nmax()) )
+         (_rb_construction.rb_eval->get_n_basis_functions() < _rb_construction.get_Nmax()) )
     {
-        greedy_bound = _rb_system.train_reduced_basis();
+        greedy_bound = _rb_construction.train_reduced_basis();
     }
 
     STOP_LOG("perform_p_stage()", "TransientRBParamSubdomainNode");
@@ -200,8 +200,8 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
     START_LOG("split_this_subdomain()", "TransientRBParamSubdomainNode");
 
     // These first few lines are the same as RBParamSubdomainNode::split_this_subdomain
-    this->add_child( _rb_system.get_greedy_parameter(0), RBParamSubdomainNode::LEFT);
-    this->add_child( _rb_system.get_greedy_parameter(1), RBParamSubdomainNode::RIGHT);
+    this->add_child( _rb_construction.get_greedy_parameter(0), RBParamSubdomainNode::LEFT);
+    this->add_child( _rb_construction.get_greedy_parameter(1), RBParamSubdomainNode::RIGHT);
 
     // Compute distance between the children anchor points, and pass to children (JLE 2010-09-16)
     Real distance_between_children_anchors = 0.;
@@ -233,16 +233,17 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
     {
         if (anchors_are_equal)
         {
-            for (unsigned int i=2; i< _rb_system.rb_eval->greedy_param_list.size() ; i++)
+            for (unsigned int i=2; i< _rb_construction.rb_eval->greedy_param_list.size() ; i++)
             {
                 bool parameters_are_equal = true;
                 for (unsigned int  j = 0; j < left_child->anchor.size(); j++)
                 {
-                    parameters_are_equal = ( parameters_are_equal && (left_child->anchor[j] == _rb_system.get_greedy_parameter(i)[j]));
+                    parameters_are_equal = ( parameters_are_equal && (left_child->anchor[j] ==
+                                             _rb_construction.get_greedy_parameter(i)[j]));
                 }
                 if (!parameters_are_equal)
                 {
-                    right_child->anchor = _rb_system.get_greedy_parameter(i);
+                    right_child->anchor = _rb_construction.get_greedy_parameter(i);
                     anchors_are_equal = false;
                     break;
                 }

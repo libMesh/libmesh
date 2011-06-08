@@ -17,10 +17,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_eim_system_h__
-#define __rb_eim_system_h__
+#ifndef __rb_eim_construction_h__
+#define __rb_eim_construction_h__
 
-#include "rb_system.h"
+#include "rb_construction.h"
 #include "mesh_function.h"
 
 namespace libMesh
@@ -29,8 +29,9 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * RBEIMSystem implements the Empirical Interpolation Method (EIM)
- * that can be used to generate an affine approximation to non-affine
+ * RBEIMConstruction implements the Construction stage of the
+ * Empirical Interpolation Method (EIM). This can be used to
+ * generate an affine approximation to non-affine
  * operators.
  *
  * @author David J. Knezevic, 2010
@@ -52,9 +53,9 @@ public:
 };
 
 // ------------------------------------------------------------
-// RBEIMSystem class definition
+// RBEIMConstruction class definition
 
-class RBEIMSystem : public RBSystem
+class RBEIMConstruction : public RBConstruction
 {
 public:
 
@@ -64,24 +65,24 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  RBEIMSystem (EquationSystems& es,
-               const std::string& name,
-               const unsigned int number);
+  RBEIMConstruction (EquationSystems& es,
+                     const std::string& name,
+                     const unsigned int number);
 
   /**
    * Destructor.
    */
-  virtual ~RBEIMSystem ();
+  virtual ~RBEIMConstruction ();
 
   /**
    * The type of system.
    */
-  typedef RBEIMSystem sys_type;
+  typedef RBEIMConstruction sys_type;
   
   /**
    * The type of the parent.
    */
-  typedef RBSystem Parent;
+  typedef RBConstruction Parent;
   
   /**
    * @returns a string indicating the type of the system.
@@ -92,7 +93,7 @@ public:
    * Initialize this system so that we can perform
    * the Construction stage of the RB method.
    */
-  virtual void initialize_RB_system(RBEvaluation* rb_evaluation_in);
+  virtual void initialize_RB_construction(RBEvaluation* rb_evaluation_in);
 
   /**
    * Read parameters in from file and set up this system
@@ -132,14 +133,14 @@ public:
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
-   * Override attach_theta_q_a to just throw an error. Should
-   * use attach_A_q in RBSystem and its subclasses.
+   * Attach the parametrized function that we will approximate
+   * using the Empirical Interpolation Method.
    */
   void attach_paramerized_function(ParametrizedFunction* pf)
     { parametrized_functions.push_back(pf); }
   
   /**
-   * Get the number of parametrized_functions that have
+   * Get the number of parametrized functions that have
    * been attached to this system.
    */
   unsigned int get_n_parametrized_functions() const

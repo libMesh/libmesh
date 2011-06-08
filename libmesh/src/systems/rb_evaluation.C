@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "rb_evaluation.h"
-#include "rb_system.h"
+#include "system.h"
 #include "numeric_vector.h"
 #include "parallel.h"
 #include "libmesh_logging.h"
@@ -973,9 +973,9 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   STOP_LOG("read_offline_data_from_files()", "RBEvaluation");
 }
 
-void RBEvaluation::write_out_basis_functions(RBSystem& rb_sys,
-                                             const bool write_binary_basis_functions,
-                                             const std::string& directory_name)
+void RBEvaluation::write_out_basis_functions(System& sys,
+                                             const std::string& directory_name,
+                                             const bool write_binary_basis_functions)
 {
   libMesh::out << "Writing out the basis functions..." << std::endl;
 
@@ -985,7 +985,7 @@ void RBEvaluation::write_out_basis_functions(RBSystem& rb_sys,
   file_name << directory_name << "/bf_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
                   write_binary_basis_functions ? ENCODE : WRITE);
-  rb_sys.write_header(header_data, "", false);
+  sys.write_header(header_data, "", false);
 
   // Use System::write_serialized_data to write out the basis functions
   // by copying them into this->solution one at a time.
@@ -993,7 +993,7 @@ void RBEvaluation::write_out_basis_functions(RBSystem& rb_sys,
   {
     // No need to copy, just swap
     // *solution = *basis_functions[i];
-    basis_functions[i]->swap(*rb_sys.solution);
+    basis_functions[i]->swap(*sys.solution);
 
     file_name.str(""); // reset the string
     file_name << directory_name << "/bf" << i << basis_function_suffix;
@@ -1001,19 +1001,19 @@ void RBEvaluation::write_out_basis_functions(RBSystem& rb_sys,
     Xdr bf_data(file_name.str(),
                 write_binary_basis_functions ? ENCODE : WRITE);
 
-    rb_sys.write_serialized_data(bf_data, false);
+    sys.write_serialized_data(bf_data, false);
 
     // Synchronize before moving on
     Parallel::barrier();
 
     // Swap back
-    basis_functions[i]->swap(*rb_sys.solution);
+    basis_functions[i]->swap(*sys.solution);
   }
 }
 
-void RBEvaluation::read_in_basis_functions(RBSystem& rb_sys,
-                                           const bool read_binary_basis_functions,
-                                           const std::string& directory_name)
+void RBEvaluation::read_in_basis_functions(System& sys,
+                                           const std::string& directory_name,
+                                           const bool read_binary_basis_functions)
 {
   libMesh::out << "Reading in the basis functions..." << std::endl;
 
@@ -1024,7 +1024,7 @@ void RBEvaluation::read_in_basis_functions(RBSystem& rb_sys,
   file_name << directory_name << "/bf_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
                   read_binary_basis_functions ? DECODE : READ);
-  rb_sys.read_header(header_data, "", false);
+  sys.read_header(header_data, "", false);
 
   // Use System::read_serialized_data to read in the basis functions
   // into this->solution and then swap with the appropriate
@@ -1049,14 +1049,14 @@ void RBEvaluation::read_in_basis_functions(RBSystem& rb_sys,
     Xdr bf_data(file_name.str(),
                 read_binary_basis_functions ? DECODE : READ);
 
-    rb_sys.read_serialized_data(bf_data, false);
+    sys.read_serialized_data(bf_data, false);
 
     basis_functions[i] = NumericVector<Number>::build().release();
-    basis_functions[i]->init (rb_sys.n_dofs(), rb_sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+    basis_functions[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 
     // No need to copy, just swap
     // *basis_functions[i] = *solution;
-    basis_functions[i]->swap(*rb_sys.solution);
+    basis_functions[i]->swap(*sys.solution);
   }
 
   libMesh::out << "Finished reading in the basis functions..." << std::endl;

@@ -26,14 +26,15 @@
 namespace libMesh
 {
 
-class RBSystem;
+class System;
 class string;
 
 /**
  * This class is part of the rbOOmit framework.
  *
  * DerivedRBEvaluation encapsulates the code and data required
- * to perform "online" evaluations with a DerivedRBSystem.
+ * to perform "online" evaluations for the "two-stage"
+ * reduced basis method.
  *
  * @author David J. Knezevic, 2011
  */
@@ -69,21 +70,21 @@ public:
 
   /**
    * Write out all the basis functions to file.
-   * \p rb_sys and \p write_binary_basis_functions are ignored here,
+   * \p sys and \p write_binary_basis_functions are ignored here,
    * basis functions are written to the directory \p directory_name.
    */
-  virtual void write_out_basis_functions(RBSystem& rb_sys,
-                                         const bool write_binary_basis_functions = true,
-                                         const std::string& directory_name = "offline_data");
+  virtual void write_out_basis_functions(System& sys,
+                                         const std::string& directory_name = "offline_data",
+                                         const bool write_binary_basis_functions = true);
   
   /**
    * Read in all the basis functions from file.
-   * \p rb_sys and \p write_binary_basis_functions are ignored here,
+   * \p sys and \p write_binary_basis_functions are ignored here,
    * basis functions are read from the directory \p directory_name.
    */
-  virtual void read_in_basis_functions(RBSystem& rb_sys,
-                                       const bool read_binary_basis_functions = true,
-                                       const std::string& directory_name = "offline_data");
+  virtual void read_in_basis_functions(System& sys,
+                                       const std::string& directory_name = "offline_data",
+                                       const bool read_binary_basis_functions = true);
   
   //----------- PUBLIC DATA MEMBERS -----------//
 

@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "transient_rb_evaluation.h"
-#include "transient_rb_system.h"
 #include "transient_rb_theta_expansion.h"
 #include "numeric_vector.h"
 #include "libmesh_logging.h"
@@ -36,6 +35,11 @@ TransientRBEvaluation::TransientRBEvaluation ()
 {
 }
 
+TransientRBEvaluation::~TransientRBEvaluation ()
+{
+  clear();
+}
+
 void TransientRBEvaluation::clear()
 {
   Parent::clear();
@@ -45,6 +49,8 @@ void TransientRBEvaluation::clear()
 
 void TransientRBEvaluation::clear_riesz_representors()
 {
+  Parent::clear_riesz_representors();
+
   // Delete the M_q representors
   for(unsigned int q_m=0; q_m<M_q_representor.size(); q_m++)
   {
@@ -52,6 +58,7 @@ void TransientRBEvaluation::clear_riesz_representors()
     {
       if(M_q_representor[q_m][i])
       {
+        M_q_representor[q_m][i]->clear();
         delete M_q_representor[q_m][i];
         M_q_representor[q_m][i] = NULL;
       }

@@ -25,13 +25,13 @@
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
 #include "rb_scm_system.h"
+#include "rb_construction.h"
 
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 #include "sparse_matrix.h"
 #include "equation_systems.h"
 #include "getpot.h"
-#include "rb_system.h"
 #include "parallel.h"
 
 // For creating a directory
@@ -162,9 +162,9 @@ void RBSCMSystem::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
 {
   START_LOG("add_scaled_symm_Aq()", "RBSCMSystem");
 
-  // Load the operators from the RBSystem
+  // Load the operators from the RBConstruction
   EquationSystems& es = this->get_equation_systems();
-  RBSystem& rb_system = es.get_system<RBSystem>(RB_system_name);
+  RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
 
   rb_system.add_scaled_Aq(scalar, q_a, matrix_A, true);
 
@@ -177,9 +177,9 @@ void RBSCMSystem::perform_SCM_greedy()
 
   // Copy the local parts of the Dirichlet and
   // non-Dirichlet dofs lists over from
-  // the associated RBSystem
+  // the associated RBConstruction
   EquationSystems& es = this->get_equation_systems();
-  RBSystem& rb_system = es.get_system<RBSystem>(RB_system_name);
+  RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
   this->initialize_condensed_dofs(rb_system.global_dirichlet_dofs_set);
 
   load_matrix_B();

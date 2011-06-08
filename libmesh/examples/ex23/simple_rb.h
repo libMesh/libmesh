@@ -20,14 +20,14 @@
 #ifndef __simple_rb_h__
 #define __simple_rb_h__
 
-#include "rb_system.h"
+#include "rb_construction.h"
 #include "fe_base.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
 using libMesh::EquationSystems;
 using libMesh::FEMContext;
-using libMesh::RBSystem;
+using libMesh::RBConstruction;
 using libMesh::RBEvaluation;
 using libMesh::Real;
 
@@ -47,32 +47,32 @@ public:
 
 };
 
-// A simple subclass of RBSystem, which just needs to override build_rb_evaluation
+// A simple subclass of Construction, which just needs to override build_rb_evaluation
 // in order to build a SimpleRBEvaluation object, rather than an RBEvaluation object.
-class SimpleRBSystem : public RBSystem
+class SimpleRBConstruction : public RBConstruction
 {
 public:
 
-  SimpleRBSystem (EquationSystems& es,
-            const std::string& name,
-            const unsigned int number)
+  SimpleRBConstruction (EquationSystems& es,
+                        const std::string& name,
+                        const unsigned int number)
   : Parent(es, name, number)
   {}
 
   /**
    * Destructor.
    */
-  virtual ~SimpleRBSystem () {}
+  virtual ~SimpleRBConstruction () {}
 
   /**
    * The type of system.
    */
-  typedef SimpleRBSystem sys_type;
+  typedef SimpleRBConstruction sys_type;
 
   /**
    * The type of the parent.
    */
-  typedef RBSystem Parent;
+  typedef RBConstruction Parent;
   
   /**
    * Override build_rb_evaluation to build a SimpleRBEvaluation.

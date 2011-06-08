@@ -17,13 +17,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_system_h__
-#define __rb_system_h__
+#ifndef __rb_construction_h__
+#define __rb_construction_h__
 
 #include "linear_implicit_system.h"
 #include "dense_vector.h"
 #include "dense_matrix.h"
-#include "rb_base_system.h"
+#include "rb_base_construction.h"
 #include "fem_context.h"
 #include "rb_evaluation.h"
 #include "elem_assembly.h"
@@ -34,8 +34,9 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * RBSystem implements the certified reduced
- * basis framework in the steady-state case.
+ * RBConstruction implements the Construction stage
+ * of the certified reduced basis method for
+ * steady-state elliptic parametrized PDEs.
  *
  * @author David J. Knezevic, 2009
  */
@@ -43,7 +44,7 @@ namespace libMesh
 
 /**
  * First, define a class that allows us to assemble a list of Dirichlet
- * dofs. This list is used by RBSystem to impose homoegenous Dirichlet
+ * dofs. This list is used by RBConstruction to impose homoegenous Dirichlet
  * boundary conditions (in the RB method, non-homogeneous Dirichlet
  * boundary conditions should be imposed via lifting functions).
  */
@@ -54,9 +55,9 @@ public:
 };
 
 // ------------------------------------------------------------
-// RBSystem class definition
+// RBConstruction class definition
 
-class RBSystem : public RBBaseSystem<LinearImplicitSystem>
+class RBConstruction : public RBBaseConstruction<LinearImplicitSystem>
 {
 public:
 
@@ -64,19 +65,19 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  RBSystem (EquationSystems& es,
-            const std::string& name,
-            const unsigned int number);
+  RBConstruction (EquationSystems& es,
+                  const std::string& name,
+                  const unsigned int number);
 
   /**
    * Destructor.
    */
-  virtual ~RBSystem ();
+  virtual ~RBConstruction ();
 
   /**
    * The type of system.
    */
-  typedef RBSystem sys_type;
+  typedef RBConstruction sys_type;
 
   /**
    * @returns a clever pointer to the system.
@@ -86,7 +87,7 @@ public:
   /**
    * The type of the parent.
    */
-  typedef RBBaseSystem<LinearImplicitSystem> Parent;
+  typedef RBBaseConstruction<LinearImplicitSystem> Parent;
 
   /**
    * Clear all the data structures associated with
@@ -162,7 +163,7 @@ public:
     { return this->quiet_mode; }
 
   /**
-   * Load the i^th RB function into the RBSystem
+   * Load the i^th RB function into the RBConstruction
    * solution vector.
    */
   virtual void load_basis_function(unsigned int i);
@@ -264,7 +265,7 @@ public:
    * Also, set this->rb_eval = rb_eval_in, and initialize it
    * based on the settings of this system.
    */
-  virtual void initialize_RB_system(RBEvaluation* rb_eval_in);
+  virtual void initialize_RB_construction(RBEvaluation* rb_eval_in);
 
   /**
    * Get a pointer to F_q.
@@ -355,11 +356,11 @@ public:
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
-   * Initialize the \p rb_evaluation_in based on the system's setup,
-   * i.e. copy over parameter domain and theta_q expansion.
+   * Initialize the \p rb_evaluation_in based on the setup of this
+   * RBConstruction, i.e. copy over parameter domain and theta_q expansion.
    * Also, set the system's rb_eval pointer to \p rb_evaluation.
    */
-  virtual void initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in);
+  virtual void initialize_rb_eval(RBEvaluation& rb_evaluation_in);
 
   /**
    * Get delta_N, the number of basis functions we
@@ -374,7 +375,9 @@ public:
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
-   * The current RBEvaluation object we are using.
+   * The current RBEvaluation object we are using to
+   * perform the Evaluation stage of the reduced basis
+   * method.
    */
   RBEvaluation* rb_eval;
 
@@ -574,8 +577,8 @@ protected:
 
   /**
    * Set current_local_solution = vec so that we can access vec
-   * from FEMContext during assembly. Overload in subclasses if
-   * different behavior is required (e.g. in QNTransientRBSystem)
+   * from FEMContext during assembly. Override in subclasses if
+   * different behavior is required.
    */
   virtual void set_context_solution_vec(NumericVector<Number>& vec);
 
@@ -790,9 +793,9 @@ private:
   DirichletDofAssembly* _dirichlet_list_init;
 
   /**
-   * Boolean flag to indicate whether the RBSystem has been initialized.
+   * Boolean flag to indicate whether the RBConstruction has been initialized.
    */
-  bool RB_system_initialized;
+  bool RB_construction_initialized;
 
 };
 

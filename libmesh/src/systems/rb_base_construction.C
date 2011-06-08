@@ -17,13 +17,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "rb_base_system.h"
+#include "rb_base_construction.h"
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 #include "equation_systems.h"
 #include "parallel.h"
-#include "rb_eim_system.h"
-#include "rb_eim_evaluation.h"
 
 // For the solver switching stuff.
 #include "petsc_linear_solver.h"
@@ -38,13 +36,13 @@ namespace libMesh
 {
 
 // ------------------------------------------------------------
-// RBBaseSystem implementation
+// RBBaseConstruction implementation
 
 
 template <class Base>
-RBBaseSystem<Base>::RBBaseSystem (EquationSystems& es,
-                                  const std::string& name,
-                                  const unsigned int number)
+RBBaseConstruction<Base>::RBBaseConstruction (EquationSystems& es,
+                                              const std::string& name,
+                                              const unsigned int number)
   : Base(es, name, number),
     training_parameters_initialized(false),
     training_parameters_random_seed(-1), // by default, use std::time to seed RNG
@@ -55,7 +53,7 @@ RBBaseSystem<Base>::RBBaseSystem (EquationSystems& es,
 }
 
 template <class Base>
-RBBaseSystem<Base>::~RBBaseSystem ()
+RBBaseConstruction<Base>::~RBBaseConstruction ()
 {
   this->clear();
   
@@ -67,7 +65,7 @@ RBBaseSystem<Base>::~RBBaseSystem ()
 }
 
 template <class Base>
-void RBBaseSystem<Base>::clear ()
+void RBBaseConstruction<Base>::clear ()
 {
   // clear the parent data
   Base::clear();
@@ -84,7 +82,7 @@ void RBBaseSystem<Base>::clear ()
 }
 
 template <class Base>
-void RBBaseSystem<Base>::init_data ()
+void RBBaseConstruction<Base>::init_data ()
 {
   // Initialize the theta expansion object
   rb_theta_expansion = build_rb_theta_expansion().release();
@@ -99,13 +97,13 @@ void RBBaseSystem<Base>::init_data ()
 }
 
 template <class Base>
-AutoPtr<RBThetaExpansion> RBBaseSystem<Base>::build_rb_theta_expansion()
+AutoPtr<RBThetaExpansion> RBBaseConstruction<Base>::build_rb_theta_expansion()
 {
   return AutoPtr<RBThetaExpansion>(new RBThetaExpansion);
 }
 
 template <class Base>
-void RBBaseSystem<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>& error_pair)
+void RBBaseConstruction<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>& error_pair)
 {
   // Set error_pair.second to the maximum global value and also
   // find which processor contains the maximum value
@@ -117,7 +115,7 @@ void RBBaseSystem<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>
 }
 
 template <class Base>
-std::vector<Real> RBBaseSystem<Base>::get_training_parameter(unsigned int index) const
+std::vector<Real> RBBaseConstruction<Base>::get_training_parameter(unsigned int index) const
 {
   libmesh_assert(training_parameters_initialized);
 
@@ -132,13 +130,13 @@ std::vector<Real> RBBaseSystem<Base>::get_training_parameter(unsigned int index)
 }
 
 template <class Base>
-void RBBaseSystem<Base>::load_training_parameter_locally(unsigned int index)
+void RBBaseConstruction<Base>::load_training_parameter_locally(unsigned int index)
 {
   set_current_parameters( get_training_parameter(index) );
 }
 
 template <class Base>
-void RBBaseSystem<Base>::load_training_parameter_globally(unsigned int index)
+void RBBaseConstruction<Base>::load_training_parameter_globally(unsigned int index)
 {
   libmesh_assert(training_parameters_initialized);
 
@@ -157,11 +155,11 @@ void RBBaseSystem<Base>::load_training_parameter_globally(unsigned int index)
 }
 
 template <class Base>
-void RBBaseSystem<Base>::initialize_training_parameters(const std::vector<Real>& mu_min_vector,
-                                                  const std::vector<Real>& mu_max_vector,
-                                                  const unsigned int n_training_samples,
-                                                  const std::vector<bool> log_param_scale,
-                                                  const bool deterministic)
+void RBBaseConstruction<Base>::initialize_training_parameters(const std::vector<Real>& mu_min_vector,
+                                                              const std::vector<Real>& mu_max_vector,
+                                                              const unsigned int n_training_samples,
+                                                              const std::vector<bool> log_param_scale,
+                                                              const bool deterministic)
 {
   set_parameter_range(mu_min_vector, mu_max_vector);
 
@@ -189,7 +187,7 @@ void RBBaseSystem<Base>::initialize_training_parameters(const std::vector<Real>&
 }
 
 template <class Base>
-void RBBaseSystem<Base>::load_training_set(std::vector< std::vector<Number> >& new_training_set)
+void RBBaseConstruction<Base>::load_training_set(std::vector< std::vector<Number> >& new_training_set)
 {
   // First, make sure that an initial training set has already been
   // generated
@@ -242,13 +240,13 @@ void RBBaseSystem<Base>::load_training_set(std::vector< std::vector<Number> >& n
 
 
 template <class Base>
-void RBBaseSystem<Base>::generate_training_parameters_random(const std::vector<bool> log_param_scale,
-                                                       std::vector< NumericVector<Number>* >& training_parameters_in,
-                                                       const unsigned int n_training_samples_in,
-                                                       const std::vector<Real>& min_parameters,
-                                                       const std::vector<Real>& max_parameters,
-						       int training_parameters_random_seed,
-						       bool serial_training_set)
+void RBBaseConstruction<Base>::generate_training_parameters_random(const std::vector<bool> log_param_scale,
+                                                                   std::vector< NumericVector<Number>* >& training_parameters_in,
+                                                                   const unsigned int n_training_samples_in,
+                                                                   const std::vector<Real>& min_parameters,
+                                                                   const std::vector<Real>& max_parameters,
+						                   int training_parameters_random_seed,
+						                   bool serial_training_set)
 {
   libmesh_assert( min_parameters.size() == max_parameters.size() );
   const unsigned int num_params = min_parameters.size();
@@ -353,12 +351,12 @@ void RBBaseSystem<Base>::generate_training_parameters_random(const std::vector<b
 }
 
 template <class Base>
-void RBBaseSystem<Base>::generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
-                                                              std::vector< NumericVector<Number>* >& training_parameters_in,
-                                                              const unsigned int n_training_samples_in,
-                                                              const std::vector<Real>& min_parameters,
-                                                              const std::vector<Real>& max_parameters,
-                                                              bool serial_training_set)
+void RBBaseConstruction<Base>::generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
+                                                                          std::vector< NumericVector<Number>* >& training_parameters_in,
+                                                                          const unsigned int n_training_samples_in,
+                                                                          const std::vector<Real>& min_parameters,
+                                                                          const std::vector<Real>& max_parameters,
+                                                                          bool serial_training_set)
 {
   libmesh_assert( min_parameters.size() == max_parameters.size() );
   const unsigned int num_params = min_parameters.size();
@@ -531,7 +529,7 @@ void RBBaseSystem<Base>::generate_training_parameters_deterministic(const std::v
 
 template <class Base>
 std::pair<std::string,std::string>
-RBBaseSystem<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
+RBBaseConstruction<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
 {
   // It seems that setting it this generic way has no effect...
   // PreconditionerType orig_pc = this->linear_solver->preconditioner_type();
@@ -613,8 +611,8 @@ RBBaseSystem<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
 
 
 template <class Base>
-void RBBaseSystem<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
-					    const std::pair<std::string,std::string>& orig)
+void RBBaseConstruction<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
+					                const std::pair<std::string,std::string>& orig)
 {
 #ifdef LIBMESH_HAVE_PETSC
 
@@ -649,9 +647,9 @@ void RBBaseSystem<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Number> >
 
 // EigenSystem is only defined if we have SLEPc
 #if defined(LIBMESH_HAVE_SLEPC)
-template class RBBaseSystem<CondensedEigenSystem>;
+template class RBBaseConstruction<CondensedEigenSystem>;
 #endif
 
-template class RBBaseSystem<LinearImplicitSystem>;
+template class RBBaseConstruction<LinearImplicitSystem>;
 
 } // namespace libMesh

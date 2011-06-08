@@ -17,15 +17,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __derived_rb_system_h__
-#define __derived_rb_system_h__
+#ifndef __derived_rb_construction_h__
+#define __derived_rb_construction_h__
 
 #include "linear_implicit_system.h"
 #include "dense_vector.h"
 #include "dense_matrix.h"
-#include "rb_base.h"
 #include "fem_context.h"
-#include "rb_system.h"
+
+#include "rb_construction.h"
 
 namespace libMesh
 {
@@ -33,16 +33,16 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * DerivedRBSystem implements the so-called "Uber-Unter"
- * reduced basis framework in the steady-state case.
- * In this context we obtain our (unter) basis functions
- * from a reference (ubder) RBSystem object.
+ * DerivedRBConstruction implements the Construction
+ * stage for the "two-level" Reduced Basis method.
+ * In this context we obtain our "derived" basis functions
+ * from a reference reduced basis approximation.
  *
  * @author David J. Knezevic, 2009
  */
 
 template<class Base>
-class DerivedRBSystem : public Base
+class DerivedRBConstruction : public Base
 {
 public:
 
@@ -50,14 +50,14 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  DerivedRBSystem (EquationSystems& es,
-            const std::string& name,
-            const unsigned int number);
+  DerivedRBConstruction (EquationSystems& es,
+                         const std::string& name,
+                         const unsigned int number);
 
   /**
    * The type of system.
    */
-  typedef DerivedRBSystem<Base> sys_type;
+  typedef DerivedRBConstruction<Base> sys_type;
   
   /**
    * @returns a clever pointer to the system.
@@ -167,7 +167,7 @@ private:
 };
 
 // And introduce convenient typedefs
-typedef DerivedRBSystem<RBSystem> SteadyDerivedRBSystem;
+typedef DerivedRBConstruction<RBConstruction> SteadyDerivedRBConstruction;
  
 } // namespace libMesh
 

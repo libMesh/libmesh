@@ -27,7 +27,7 @@ namespace libMesh
 {
 
 // Forward declaration
-class RBSystem;
+class RBConstruction;
 class RBParamSubdomainNode;
 
 /**
@@ -55,7 +55,7 @@ public:
    * Constructor. Initializes required
    * data structures.
    */
-  RBParamSubdomainTree (RBSystem& system, const std::string& parameters_filename);
+  RBParamSubdomainTree (RBConstruction& construction, const std::string& parameters_filename);
 
   /**
    * Destructor.
@@ -90,7 +90,9 @@ public:
    * Writes data for the current node to specified file and procedes through
    * the tree according to depth first
    */
-  void write_tree_data_to_file_recursively(RBParamSubdomainNode * current_node,   std::ofstream& stream,   std::vector<int>& bool_vec);
+  void write_tree_data_to_file_recursively(RBParamSubdomainNode * current_node,
+                                           std::ofstream& stream,
+                                           std::vector<int>& bool_vec);
 
   /**
    * Reads a tree from file
@@ -109,10 +111,10 @@ public:
   RBParamSubdomainNode * root_node;
 
   /**
-   * Reference to the RBSystem that is used
+   * Reference to the RBConstruction that is used
    * to actually perform the truth and RB solves.
    */
-  RBSystem & _rb_system;
+  RBConstruction & _rb_construction;
 
   /**
    * Variable that indicates the "h-type" tolerance.

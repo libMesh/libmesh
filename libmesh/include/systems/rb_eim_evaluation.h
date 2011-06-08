@@ -26,14 +26,15 @@
 namespace libMesh
 {
 
-class RBEIMSystem;
+class RBEIMConstruction;
 
 /**
  * This class is part of the rbOOmit framework.
  *
  * RBEIMEvaluation extends RBEvaluation to
  * encapsulate the code and data required
- * to perform "online" RB evaluations for transient problems.
+ * to perform "online" evaluations for
+ * EIM approximations.
  *
  * @author David J. Knezevic, 2011
  */
@@ -48,7 +49,7 @@ public:
   /**
    * Constructor.
    */
-  RBEIMEvaluation (RBEIMSystem& rb_eim_sys_in);
+  RBEIMEvaluation (RBEIMConstruction& rb_eim_con_in);
 
   /**
    * The type of the parent.
@@ -101,9 +102,9 @@ public:
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
-   * A reference to an RBEIMSystem.
+   * A reference to an RBEIMConstruction object.
    */
-  RBEIMSystem& rb_eim_sys;
+  RBEIMConstruction& rb_eim_con;
 
   /**
    * Dense matrix that stores the lower triangular

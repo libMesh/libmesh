@@ -21,7 +21,7 @@
 #define __transient_rb_param_subdomain_tree_h__
 
 #include "rb_param_subdomain_tree.h"
-#include "transient_rb_system.h"
+#include "transient_rb_construction.h"
 
 namespace libMesh
 {
@@ -49,7 +49,8 @@ public:
    * Constructor. Initializes required
    * data structures.
    */
-  TransientRBParamSubdomainTree (TransientRBSystem& rb_system_in, const std::string& parameters_filename);
+  TransientRBParamSubdomainTree (TransientRBConstruction& rb_construction_in,
+                                 const std::string& parameters_filename);
   
   /**
    * Build the root_node which, in this case, is a TransientRBParamNode.

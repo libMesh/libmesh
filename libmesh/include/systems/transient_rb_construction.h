@@ -17,11 +17,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __transient_rb_system_h__
-#define __transient_rb_system_h__
+#ifndef __transient_rb_construction_h__
+#define __transient_rb_construction_h__
 
 #include "transient_system.h"
-#include "rb_system.h"
+#include "rb_construction.h"
 #include "transient_rb_evaluation.h"
 
 namespace libMesh
@@ -30,17 +30,16 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * TransientRBSystem extends RBSystem to add
- * functionality relevant in the time-dependent
- * case.
+ * TransientRBConstruction extends RBConstruction to add
+ * functionality relevant in the time-dependent case.
  *
  * @author David J. Knezevic 2009
  */
 
 // ------------------------------------------------------------
-// TransientRBSystem class definition
+// TransientRBConstruction class definition
 
-class TransientRBSystem : public TransientSystem<RBSystem>
+class TransientRBConstruction : public TransientSystem<RBConstruction>
 {
 public:
 
@@ -48,24 +47,24 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  TransientRBSystem (EquationSystems& es,
-            const std::string& name,
-            const unsigned int number);
+  TransientRBConstruction (EquationSystems& es,
+                           const std::string& name,
+                           const unsigned int number);
 
   /**
    * Destructor.
    */
-  virtual ~TransientRBSystem ();
+  virtual ~TransientRBConstruction ();
 
   /**
    * The type of system.
    */
-  typedef TransientRBSystem sys_type;
+  typedef TransientRBConstruction sys_type;
 
   /**
    * The type of the parent.
    */
-  typedef TransientSystem<RBSystem> Parent;
+  typedef TransientSystem<RBConstruction> Parent;
 
   /**
    * Clear all the data structures associated with
@@ -102,7 +101,7 @@ public:
    * Initialize \p rb_evaluation_in based on this system's setup.
    * Here we override to also copy over TemporalDiscretization data.
    */
-  virtual void initialize_rb_eval_from_system(RBEvaluation& rb_evaluation_in);
+  virtual void initialize_rb_eval(RBEvaluation& rb_evaluation_in);
 
   /**
    * Function that indicates when to terminate the Greedy
@@ -284,7 +283,7 @@ protected:
   virtual void init_data ();
 
   /**
-   * Build a new TransientRBThetaStruct object and return an AutoPtr to it.
+   * Build a new TransientRBThetaExpansion object and return an AutoPtr to it.
    */
   virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion();
   
