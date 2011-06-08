@@ -870,7 +870,7 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
   this->_restore_array();
 
   libmesh_assert (send_list.size() <= this->size());
-  libmesh_assert (last_local_idx < this->size());
+  libmesh_assert (last_local_idx+1 <= this->size());
   
   const unsigned int size       = this->size();
   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
