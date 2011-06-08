@@ -625,7 +625,7 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
       {
         ierr = VecCopy (v._vec, this->_vec);
         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	    }
+      }
       else
       {
         Vec loc_vec;
