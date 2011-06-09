@@ -18,9 +18,6 @@
 #
 ###############################################################################
 
-# Re-check dependencies every time
-.PHONY: .depend
-
 ###############################################################################
 # the following lines will be replaced by the output 
 # of ./configure
