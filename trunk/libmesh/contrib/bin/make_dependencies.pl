@@ -59,11 +59,11 @@ foreach $file (keys %include_files) {
 
 # print dependency list
 foreach $file (sort @input_files) {
-    $file =~ /(.*)\.(C)/;
+    $file =~ /(.*)\.([Cc])/;
 
-    # replace the .C with .$object_suffix
+    # replace the .C or .c with .$object_suffix
     $rulename = $file;
-    $rulename =~ s/\Q.C\E/.$object_suffix/g;
+    $rulename =~ s/\.[Cc]/.$object_suffix/g;
 
 
     
