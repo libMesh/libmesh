@@ -39,7 +39,9 @@
 
 
 #if defined(LIBMESH_HAVE_MPI)
+# include "ignore_warnings.h"
 # include <mpi.h>
+# include "restore_warnings.h"
 #endif // #if defined(LIBMESH_HAVE_MPI)
 
 #if defined(LIBMESH_HAVE_PETSC)
