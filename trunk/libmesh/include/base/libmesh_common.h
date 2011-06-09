@@ -28,7 +28,9 @@
 
 // Include the MPI definition
 #ifdef LIBMESH_HAVE_MPI
+# include "ignore_warnings.h"
 # include <mpi.h>
+# include "restore_warnings.h"
 #endif
 
 // C/C++ includes everyone should know about

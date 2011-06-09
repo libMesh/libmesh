@@ -24,7 +24,7 @@
 // Local Includes -----------------------------------
 #include "libmesh_config.h"
 #include "mesh_base.h"
-#include "parallel.h"
+#include "parallel.h"    // also includes mpi.h
 #include "mesh_output.h" // for MeshSerializer
 #include "mesh_tools.h"
 #include "mesh_communication.h"
@@ -35,14 +35,12 @@
 
 #ifdef LIBMESH_HAVE_PARMETIS
 
-// Include the MPI header files, which must be accessible for
-// ParMETIS to work properly.
-#include "mpi.h"
-
 // Include the ParMETIS header files
 namespace Parmetis {
   extern "C" {
+#     include "ignore_warnings.h"
 #     include "parmetis.h"
+#     include "restore_warnings.h"
   }
 }
 

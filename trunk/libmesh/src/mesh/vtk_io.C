@@ -64,6 +64,7 @@
 
 #ifdef LIBMESH_HAVE_VTK
 
+#include "ignore_warnings.h"
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
@@ -89,6 +90,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
+#include "restore_warnings.h"
 #endif //LIBMESH_HAVE_VTK
 
 namespace libMesh
