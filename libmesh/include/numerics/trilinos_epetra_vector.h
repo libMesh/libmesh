@@ -692,6 +692,7 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v)
   int dummy;
   _vec->ExtractView(&myCoefs_, &dummy);
 
+  this->_is_closed = true;
   this->_is_initialized = true;
 }
 
@@ -969,6 +970,8 @@ template <typename T>
 inline
 void EpetraVector<T>::swap (NumericVector<T> &other)
 {
+  NumericVector<T>::swap(other);
+
   EpetraVector<T>& v = libmesh_cast_ref<EpetraVector<T>&>(other);
 
   std::swap(_vec, v._vec);

@@ -27,6 +27,7 @@
 // C++ includes
 
 // Local Includes
+#include "dof_map.h"
 #include "nonlinear_implicit_system.h"
 #include "trilinos_nox_nonlinear_solver.h"
 #include "system.h"
@@ -93,14 +94,37 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
 
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
+
+  sys.get_dof_map().enforce_constraints_exactly(sys);
   sys.update();
+
   X_global.swap(X_sys);
   
   R.zero();
   
-  if( _solver->residual == NULL )
-    return false;
-  _solver->residual (*sys.current_local_solution.get(), R, sys);
+  //-----------------------------------------------------------------------------
+   // if the user has provided both function pointers and objects only the pointer
+   // will be used, so catch that as an error
+
+    if (_solver->residual && _solver->residual_object)
+      {
+	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
+	libmesh_error();
+      }
+    
+    if (_solver->matvec && _solver->residual_and_jacobian_object)
+      {
+	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+	libmesh_error();
+      }
+    //-----------------------------------------------------------------------------
+
+    if      (_solver->residual != NULL)                     _solver->residual                                            (*sys.current_local_solution.get(), R, sys);
+    else if (_solver->residual_object != NULL)              _solver->residual_object->residual                           (*sys.current_local_solution.get(), R, sys);
+    else if (_solver->matvec   != NULL)                     _solver->matvec                                              (*sys.current_local_solution.get(), &R, NULL, sys);
+    else if (_solver->residual_and_jacobian_object != NULL) _solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), &R, NULL, sys);
+    else return false;
+
   R.close();
   X_global.close();
   return true;
@@ -256,6 +280,8 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
 //    (dynamic_cast<const NOX::Epetra::Vector&>(finalGroup.getX())).getEpetraVector();
 
   x = finalSolution;
+
+  x_in.close();
 
   return std::make_pair(1, 0.);
 }
