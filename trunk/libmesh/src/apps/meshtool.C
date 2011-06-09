@@ -12,6 +12,7 @@
 #include <iostream>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <string>
 #include <unistd.h>
@@ -162,7 +163,7 @@ void usage(char *progName)
   fprintf(stderr, helpList.c_str(), baseName.c_str());
   fflush(stderr);
 
-  abort();
+  exit(0);
 }
 
 
