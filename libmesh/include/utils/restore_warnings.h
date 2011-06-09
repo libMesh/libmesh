@@ -22,12 +22,12 @@
 #include "libmesh_config.h"
 
 #ifndef NDEBUG
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
 #if __GNUC__ > 3
 // TODO: use the gcc 4.6 push/pop when available
 #pragma GCC diagnostic warning "-Wunused-parameter"
 #pragma GCC diagnostic warning "-Wdeprecated"
 #pragma GCC diagnostic warning "-pedantic"
 #endif //__GNUC__ > 3
-#endif // __GNUC__
+#endif // __GNUC__ && !__INTEL_COMPILER
 #endif // NDEBUG
