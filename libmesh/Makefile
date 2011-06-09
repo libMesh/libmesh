@@ -249,8 +249,8 @@ TODO:
 #
 # Dependencies
 #
-.depend: $(srcfiles) $(headerfiles)
-	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) $(appsrcfiles) > .depend
+.depend: $(srcfiles) $(appsrcfiles) $(csrcfiles) $(headerfiles)
+	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) $(appsrcfiles) $(csrcfiles) > .depend
 
 
 
