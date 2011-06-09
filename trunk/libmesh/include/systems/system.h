@@ -76,19 +76,16 @@ class SystemSubset;
 // System class definition
 class System : public ReferenceCountedObject<System>
 {
-protected:
+public:
 
   /**
    * Constructor.  Optionally initializes required
-   * data structures.  Protected so that this base class
-   * cannot be explicitly instantiated.
+   * data structures.
    */
   System (EquationSystems& es,
 	  const std::string& name,
 	  const unsigned int number);
   
-public:
-
   /**
    * Abstract base class to be used for sysem initialization.
    * A user class derived from this class may be used to 
@@ -294,9 +291,9 @@ public:
 				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
  
   /**
-   * Solves the system.  Must be overloaded in derived systems.
+   * Solves the system.  Should be overloaded in derived systems.
    */
-  virtual void solve () = 0;
+  virtual void solve () {}
   
   /**
    * Solves the sensitivity system, for the provided parameters.
