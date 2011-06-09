@@ -23,7 +23,7 @@
 
 #ifndef NDEBUG
 // TODO: icpc options
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
 #if __GNUC__ > 3
 // These two don't work?
 #pragma GCC diagnostic ignored "-pedantic"
@@ -31,5 +31,5 @@
 // But this is helpful with some MPI stacks
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif //__GNUC__ > 3
-#endif // __GNUC__
+#endif // __GNUC__ && !__INTEL_COMPILER
 #endif // NDEBUG
