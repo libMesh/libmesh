@@ -151,6 +151,7 @@ typedef TransientSystem<LinearImplicitSystem> TransientImplicitSystem;
 typedef TransientSystem<LinearImplicitSystem> TransientLinearImplicitSystem;
 typedef TransientSystem<NonlinearImplicitSystem> TransientNonlinearImplicitSystem;
 typedef TransientSystem<ExplicitSystem> TransientExplicitSystem;
+typedef TransientSystem<System> TransientBaseSystem;
 
 
 
