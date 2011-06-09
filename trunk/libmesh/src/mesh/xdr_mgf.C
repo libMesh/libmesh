@@ -265,8 +265,9 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 
       else
 	{
-	  libMesh::err << "No originating software can be determined. Error." 
-		        << std::endl;
+	  libMesh::err <<
+            "No originating software can be determined for header string '" << 
+            name << "'. Error." << std::endl;
 	  libmesh_error();
 	}
     }
