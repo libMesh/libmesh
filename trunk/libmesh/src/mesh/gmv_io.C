@@ -2480,7 +2480,7 @@ void GMVIO::copy_nodal_solution(EquationSystems& es)
 	} // end for loop over _nodal_data
 
       // Communicate parallel values before going to the next system.
-      system.close();
+      system.solution->close();
       system.update();
 
     } // end loop over all systems
