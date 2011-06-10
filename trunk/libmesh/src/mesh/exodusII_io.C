@@ -296,6 +296,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string nodal_var_name
 	system.solution->set (dof_index, nodal_values[i]);
     }
 
+  system.close();
   system.update();
 }
   
