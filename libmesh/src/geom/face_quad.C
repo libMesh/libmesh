@@ -133,6 +133,48 @@ bool Quad::is_child_on_side(const unsigned int c,
 
 
 
+unsigned int Quad::opposite_side(const unsigned int side) const
+{
+  libmesh_assert(side < 4);
+
+  return (side + 2) % 4;
+}
+
+
+
+unsigned int Quad::opposite_node(const unsigned int node,
+                           const unsigned int side) const
+{
+  libmesh_assert(node < 8);
+  libmesh_assert(node < this->n_nodes());
+  libmesh_assert(side < this->n_sides());
+  libmesh_assert(this->is_node_on_side(node, side));
+
+  unsigned int opposite;
+
+  if (node > 4)
+    opposite = ((node+2)%4)+4;
+  else
+    {
+      switch (side)
+      {
+      case 0:
+      case 2:
+        opposite = 3 - node;
+        break;
+      case 1:
+      case 3:
+        opposite = 3*node - 3;
+        break;
+      default:
+        libmesh_error();
+      }
+    }
+
+  return opposite;
+}
+
+
 Real Quad::quality (const ElemQuality q) const
 {
   switch (q)

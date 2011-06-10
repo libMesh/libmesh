@@ -201,6 +201,51 @@ bool Hex::is_child_on_side(const unsigned int c,
 
 
 
+unsigned int Hex::opposite_side(const unsigned int side) const
+{
+  libmesh_assert(side < 6);
+  static const unsigned char hex_opposites[6] = {5, 3, 4, 1, 2, 0};
+  return hex_opposites[side];
+}
+
+
+
+unsigned int Hex::opposite_node(const unsigned int node,
+                                const unsigned int side) const
+{
+  libmesh_assert(node < 26);
+  libmesh_assert(node < this->n_nodes());
+  libmesh_assert(side < this->n_sides());
+  libmesh_assert(this->is_node_on_side(node, side));
+
+  switch (side)
+  {
+  case 0:
+  case 5:
+    static const unsigned char side05_nodes_map[] =
+      {4, 5, 6, 7, 0, 1, 2, 3, 16, 17, 18, 19, 255, 255, 255, 255, 8, 9, 10, 11, 25, 255, 255, 255, 255, 20};
+    return side05_nodes_map[node];
+    break;
+  case 1:
+  case 3:
+    static const unsigned char side13_nodes_map[] =
+      {3, 2, 1, 0, 7, 6, 5, 4, 10, 255, 8, 255, 15, 14, 13, 12, 18, 255, 16, 255, 255, 23, 255, 21, 255, 255};
+    return side13_nodes_map[node];
+    break;
+  case 2:
+  case 4:
+    static const unsigned char side24_nodes_map[] =
+      {1, 0, 3, 2, 5, 4, 7, 6, 255, 11, 255, 9, 13, 12, 15, 14, 255, 19, 255, 17, 255, 255, 24, 255, 22, 255};
+    return side24_nodes_map[node];
+    break;
+  }
+
+  libmesh_error();
+  return 255;
+}
+
+
+
 Real Hex::quality (const ElemQuality q) const
 {
   switch (q)

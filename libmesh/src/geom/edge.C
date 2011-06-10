@@ -58,5 +58,24 @@ bool Edge::is_child_on_side(const unsigned int c,
 
 
 
+unsigned int Edge::opposite_side(const unsigned int side) const
+{
+  libmesh_assert(side < 2);
+  return 1 - side;
+}
+
+
+
+unsigned int Edge::opposite_node(const unsigned int node,
+                                 const unsigned int side) const
+{
+  libmesh_assert(node < 2);
+  libmesh_assert(side < this->n_sides());
+  libmesh_assert(this->is_node_on_side(node, side));
+
+  return 1 - node;
+}
+
+
 
 } // namespace libMesh
