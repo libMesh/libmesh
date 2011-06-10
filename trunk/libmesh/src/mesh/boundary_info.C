@@ -486,7 +486,10 @@ void BoundaryInfo::add_node(const Node* node,
   _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
 }
 
-
+void BoundaryInfo::clear_boundary_node_ids()
+{
+  _boundary_node_id.clear();
+}
 
 void BoundaryInfo::add_side(const unsigned int e,
 			    const unsigned short int side,

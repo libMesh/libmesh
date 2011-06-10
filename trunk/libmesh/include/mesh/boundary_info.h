@@ -138,6 +138,11 @@ public:
 		 const short int id);
 
   /**
+   * Clears all the boundary information from all of the nodes in the mesh
+   */
+  void clear_boundary_node_ids();
+
+  /**
    * Add side \p side of element number \p elem with boundary id \p id
    * to the boundary information data structure.
    */
