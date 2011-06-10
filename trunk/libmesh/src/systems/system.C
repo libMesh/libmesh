@@ -381,11 +381,7 @@ void System::reinit ()
 
 void System::update ()
 {
-#ifdef LIBMESH_ENABLE_GHOSTED
-  solution->close();
-#else
   libmesh_assert(solution->closed());
-#endif
 
   const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
