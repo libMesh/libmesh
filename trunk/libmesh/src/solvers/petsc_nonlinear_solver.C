@@ -323,8 +323,13 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+   // Only set the jacobian function if we've been provided with something to call.
+   // This allows a user to set their own jacobian function if they want to
+   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
+   {
+     ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
+     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+   }
 
    // Have the Krylov subspace method use our good initial guess rather than 0
    KSP ksp;	 
