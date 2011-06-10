@@ -1902,4 +1902,21 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
   return elem;
 }
 
+
+
+unsigned int Elem::opposite_side(const unsigned int /*s*/) const
+{
+  // If the subclass didn't rederive this, using it is an error
+  libmesh_not_implemented();
+}
+
+
+
+unsigned int Elem::opposite_node(const unsigned int /*n*/,
+                                 const unsigned int /*s*/) const
+{
+  // If the subclass didn't rederive this, using it is an error
+  libmesh_not_implemented();
+}
+
 } // namespace libMesh

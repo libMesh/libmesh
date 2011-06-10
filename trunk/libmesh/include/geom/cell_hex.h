@@ -80,7 +80,21 @@ public:
    */
   virtual bool is_child_on_side(const unsigned int c,
 			        const unsigned int s) const;
-  
+
+  /**
+   * @returns the side number opposite to \p s (for a tensor product
+   * element), or throws an error otherwise.
+   */
+  virtual unsigned int opposite_side(const unsigned int s) const;
+
+  /**
+   * @returns the local node number for the node opposite to node n
+   * on side \p opposite_side(s) (for a tensor product element), or
+   * throws an error otherwise.
+   */
+  virtual unsigned int opposite_node(const unsigned int n,
+                                     const unsigned int s) const;
+
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is

@@ -129,6 +129,11 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual unsigned int node (const unsigned int i) const;
 
   /**
+   * @returns the local id number of global \p Node id \p i.
+   */
+  virtual unsigned int local_node (const unsigned int i) const;
+
+  /**
    * @returns the pointer to local \p Node \p i.
    */
   virtual Node* get_node (const unsigned int i) const;
@@ -405,6 +410,20 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   virtual bool is_node_on_edge(const unsigned int n,
 			       const unsigned int e) const = 0;
+
+  /*
+   * @returns the side number opposite to \p s (for a tensor product
+   * element), or throws an error otherwise.
+   */
+  virtual unsigned int opposite_side(const unsigned int s) const;
+
+  /*
+   * @returns the local node number for the node opposite to node n
+   * on side \p opposite_side(s) (for a tensor product element), or
+   * throws an error otherwise.
+   */
+  virtual unsigned int opposite_node(const unsigned int n,
+                                     const unsigned int s) const;
 
 //   /**
 //    * @returns the number of children this element has that
@@ -1242,6 +1261,20 @@ unsigned int Elem::node (const unsigned int i) const
 
   return _nodes[i]->id();
 }
+
+
+
+inline
+unsigned int Elem::local_node (const unsigned int i) const
+{
+  for (unsigned int n=0; n != this->n_nodes(); ++n)
+    if (this->node(n) == i)
+      return n;
+
+  return Node::invalid_id;
+}
+
+
 
 
 
