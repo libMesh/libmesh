@@ -30,6 +30,7 @@ examples/ex23/offline_data/
 examples/ex4/out_2.e
 examples/ex4/out_3.e
 examples/ex5/out_0.e
+examples/ex10/*.xda
 examples/ex11/out.e
 examples/ex13/out_*.e
 examples/ex14/lshaped.e
