@@ -516,9 +516,10 @@ int ex_put_init_ext (int   exoid,
     zero_id_status(exoid, VAR_FS_STAT,  VAR_FS_IDS,  model->num_face_sets, zeros);
     zero_id_status(exoid, VAR_SS_STAT,  VAR_SS_IDS,  model->num_side_sets, zeros);
     zero_id_status(exoid, VAR_ELS_STAT, VAR_ELS_IDS, model->num_elem_sets, zeros);
-    
-    /* clean up after ourselves */
-    free(zeros);
+     if (zeros != NULL) {
+      free(zeros);
+      zeros = NULL;
+    }
   }  
   return (EX_NOERR);
   
