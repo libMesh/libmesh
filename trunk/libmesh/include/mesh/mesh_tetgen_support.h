@@ -84,105 +84,105 @@ class TetGenWrapper
   /**
    * Method sets number of nodes in TetGen input.
    */
-  void set_numberofpoints(const int i);
+  void set_numberofpoints(int i);
 
   /**
    * Method returns number of nodes in TetGen output.
    */
-  int  get_numberofpoints();
+  int get_numberofpoints();
 
   /**
    * Method sets number of facets in TetGen input.
    */
-  void set_numberoffacets(const int i);
+  void set_numberoffacets(int i);
 
   /**
    * Method sets number of holes in TetGen input.
    */
-  void set_numberofholes(const int i);
+  void set_numberofholes(int i);
 
   /**
    * Method sets number of regions in TetGen input.
    */
-  void set_numberofregions(const int i);
+  void set_numberofregions(int i);
 
   /**
    * Method allocates memory, sets number of nodes in TetGen input.
    */
-  void set_pointlist(const int numofpoints);
+  void allocate_pointlist(int numofpoints);
 
   /**
    * Method allocates memory, sets number of facets, holes in TetGen input.
    */
-  void set_facetlist(const int numoffacets, const int numofholes);
+  void allocate_facetlist(int numoffacets, int numofholes);
 
   /**
    * Method allocates memory, sets number of regions in TetGen input.
    */
-  void set_regionlist(const int numofregions);
+  void allocate_regionlist(int numofregions);
 
   /**
    * Method sets coordinates of point i in TetGen input.
    */
-  void set_node(const int i, const REAL x, const REAL y, const REAL z);
+  void set_node(unsigned i, REAL x, REAL y, REAL z);
 
   /**
    * Method returns coordinates of point i in TetGen output.
    */
-  void get_output_node(const int i, REAL& x, REAL& y, REAL& z);
+  void get_output_node(unsigned i, REAL& x, REAL& y, REAL& z);
 
   /**
    * Method returns index of jth node from element i in TetGen output.
    */
-  int  get_element_node(const int i, const int j);
+  int  get_element_node(unsigned i, unsigned j);
 
   /**
    * Method returns index of jth node from surface triangle i in TetGen output.
    */
-  int  get_triface_node(const int i, const int j);
+  int  get_triface_node(unsigned i, unsigned j);
 
   /**
    * Method returns attribute of element i in TetGen output.
    */
-  REAL get_element_attribute(const int i);
+  REAL get_element_attribute(unsigned i);
        
   /**
    * Method sets coordinates of hole i in TetGen input.
    */
-  void set_hole(const int i, const REAL x, const REAL y, const REAL z);
+  void set_hole(unsigned i, REAL x, REAL y, REAL z);
 
   /**
    * Method sets number of polygons for facet i in TetGen input.
    */
-  void set_facet_numberofpolygons(const int i, const int num);
+  void set_facet_numberofpolygons(unsigned i, int num);
 
   /**
    * Method sets number of holes for facet i in TetGen input.
    */
-  void set_facet_numberofholes(const int i, const int num);
+  void set_facet_numberofholes(unsigned i, int num);
 
   /**
    * Method allocates memory, sets number of polygons for facet i
    * in TetGen input.
    */
-  void set_facet_polygonlist(const int i, const int numofpolygons);
+  void allocate_facet_polygonlist(unsigned i, int numofpolygons);
 
   /**
    * Method sets number of vertices for polygon j, facet i in TetGen input.
    */
-  void set_polygon_numberofvertices(const int i, const int j, const int num);
+  void set_polygon_numberofvertices(unsigned i, unsigned j, int num);
 
   /**
    * Method allocates memory, sets number of vertices for polygon j,
    * facet i in TetGen input.
    */
-  void set_polygon_vertexlist(const int i, const int j, const int numofvertices);
+  void allocate_polygon_vertexlist(unsigned i, unsigned j, int numofvertices);
 
   /**
    * Method sets index of ith facet, jth polygon, kth vertex in
    * TetGen input.
    */
-  void set_vertex(const int i, const int j, const int k, const int nodeindex);
+  void set_vertex(unsigned i, unsigned j, unsigned k, int nodeindex);
 
   /**
    * Method sets coordinates, attribute and volume constraint for
@@ -190,8 +190,8 @@ class TetGenWrapper
    * will only be considered if the corresponding switches are
    * enabled.  See TetGen documentation for more details.
    */
-  void set_region(const int i, const REAL x, const REAL y, const REAL z,
-		  const REAL attribute, const REAL vol_constraint);
+  void set_region(unsigned i, REAL x, REAL y, REAL z,
+		  REAL attribute, REAL vol_constraint);
 
   /**
    * TetGen input structure.
@@ -254,8 +254,8 @@ public:
    * from the nodes point set. Boundary constraints are taken from 
    * elements array.
    */
-  void triangulate_conformingDelaunayMesh (const double quality_constraint,
-					   const double volume_constraint);
+  void triangulate_conformingDelaunayMesh (double quality_constraint,
+					   double volume_constraint);
 
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedrization
@@ -263,22 +263,67 @@ public:
    * elements array. Include carve-out functionality.
    */
   void triangulate_conformingDelaunayMesh_carvehole (const std::vector< Node *>& holes,
-						     const double quality_constraint,
-						     const double volume_constraint);
+						     double quality_constraint,
+						     double volume_constraint);
 
-  /**
-   * Help function. Returns _nodes index for *Node. 
-   */
-  int get_node_index (const Node* inode);
 
 
 protected:
+  /**
+   * This function copies nodes from the _mesh into TetGen's
+   * pointlist.  Takes some pains to ensure that non-sequential
+   * node numberings (which can happen with e.g. ParallelMesh)
+   * are handled.
+   */
+  void fill_pointlist(TetGenWrapper& wrapper);
+
+  /**
+   * Assigns the node IDs contained in the 'node_labels'
+   * array to 'elem'. 
+   */
+  void assign_nodes_to_elem(unsigned* node_labels, Elem* elem);
+
+  /**
+   * This function checks the integrity of the current set of
+   * elements in the Mesh to see if they comprise a convex hull,
+   * that is:
+   * .) If they are all TRI3 elements
+   * .) They all have non-NULL neighbors
+   *
+   * Returns:
+   * .) 0 if the mesh forms a valid convex hull
+   * .) 1 if a non-TRI3 element is found
+   * .) 2 if an element with a NULL-neighbor is found
+   */
+  unsigned check_hull_integrity();
+
+  /**
+   * This function prints an informative message and
+   * crashes based on the output of the check_hull_integrity()
+   * function.  It is a separate function so that you
+   * can check hull integrity without crashing if you desire.
+   */
+  void process_hull_integrity_result(unsigned result);
+
+  /**
+   * Delete original convex hull elements from the Mesh 
+   * after performing a Delaunay tetrahedralization.
+   */
+  void delete_2D_hull_elements();
 
   /**
    * Local reference to the mesh we are working with.
    */
   UnstructuredMesh& _mesh;
 
+  /**
+   * We should not assume libmesh nodes are numbered sequentially...
+   * This is not the default behavior of ParallelMesh, for example,
+   * unless you specify node IDs explicitly.  So this array allows us
+   * to keep a mapping between the sequential numbering in 
+   * tetgen_data.pointlist.
+   */
+  std::vector<unsigned> _sequential_to_libmesh_node_map;
 };
 
 } // namespace libMesh
