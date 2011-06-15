@@ -98,6 +98,8 @@ void PointLocatorList::init ()
 
       if (this->_master == NULL)
         {
+          START_LOG("init(no master)", "PointLocatorList");
+
 	  // We are the master, so we have to build the list.
 	  // First create it, then get a handy reference, and
 	  // then try to speed up by reserving space...
@@ -118,6 +120,8 @@ void PointLocatorList::init ()
 
 	  for (; el!=end; ++el)
 	    my_list.push_back(std::make_pair((*el)->centroid(), *el));
+
+          STOP_LOG("init(no master)", "PointLocatorList");
 	}
 
       else
@@ -155,6 +159,8 @@ void PointLocatorList::init ()
 const Elem* PointLocatorList::operator() (const Point& p) const
 {
   libmesh_assert (this->_initialized);
+
+  START_LOG("operator()", "PointLocatorList");
 
   // Ask the list.  This is quite expensive, since
   // we loop through the whole list to try to find
@@ -195,6 +201,8 @@ const Elem* PointLocatorList::operator() (const Point& p) const
 
     // the element should be active
     libmesh_assert (last_elem->active());
+
+    STOP_LOG("operator()", "PointLocatorList");
 
     // return the element
     return (last_elem);
