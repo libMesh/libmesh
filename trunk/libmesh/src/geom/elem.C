@@ -1471,6 +1471,9 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
 
 bool Elem::contains_point (const Point& p, Real tol) const
 {
+  // This is a great optimization on straight-sided elements, but it
+  // could return false negatives on curved elements
+#if 0
   // Check to make sure the element *could* contain this point, so we
   // can avoid an expensive inverse_map call if it doesn't.
   bool point_above_min_x = false,
@@ -1498,7 +1501,7 @@ bool Elem::contains_point (const Point& p, Real tol) const
       !point_below_max_y ||
       !point_below_max_z)
     return false;
-
+#endif // 0
 
   // Declare a basic FEType.  Will ue a Lagrange
   // element by default.
