@@ -104,6 +104,8 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 
       if (this->_master == NULL)
         {
+          START_LOG("init(no master)", "PointLocatorTree");
+
 	  if (this->_mesh.mesh_dimension() == 3)
 	    _tree = new Trees::OctTree (this->_mesh, 200, build_type);		
 	  else
@@ -134,6 +136,8 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 #endif
 		_tree = new Trees::QuadTree (this->_mesh, 200, build_type);
 	    }
+
+          STOP_LOG("init(no master)", "PointLocatorTree");
 	}
 
       else
@@ -179,6 +183,8 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 {
   libmesh_assert (this->_initialized);
   
+  START_LOG("operator()", "PointLocatorTree");
+
   // First check the element from last time before asking the tree
   if (this->_element==NULL || !(this->_element->contains_point(p)))
     {
@@ -200,7 +206,10 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 		
 		for ( ; pos != end_pos; ++pos)
 		  if ((*pos)->contains_point(p))
-		    return this->_element = (*pos);
+                    {
+                      STOP_LOG("operator()", "PointLocatorTree");
+		      return this->_element = (*pos);
+                    }
 
 		if (this->_element == NULL)
 		  {
@@ -218,6 +227,8 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
   
   // If we found an element, it should be active
   libmesh_assert (!this->_element || this->_element->active());
+
+  STOP_LOG("operator()", "PointLocatorTree");
 
   // return the element
   return this->_element;
