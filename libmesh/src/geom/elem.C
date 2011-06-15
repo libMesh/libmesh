@@ -1476,30 +1476,44 @@ bool Elem::contains_point (const Point& p, Real tol) const
 #if 0
   // Check to make sure the element *could* contain this point, so we
   // can avoid an expensive inverse_map call if it doesn't.
-  bool point_above_min_x = false,
-       point_above_min_y = false,
+  bool
+#if LIBMESH_DIM > 2
        point_above_min_z = false,
-       point_below_max_x = false,
+       point_below_max_z = false,
+#endif
+#if LIBMESH_DIM > 1
+       point_above_min_y = false,
        point_below_max_y = false,
-       point_below_max_z = false;
+#endif
+       point_above_min_x = false,
+       point_below_max_x = false;
 
   for (unsigned int n=0; n != this->n_nodes(); ++n)
     {
       Point pe = this->point(n);
       point_above_min_x = point_above_min_x || (pe(0) - TOLERANCE < p(0));
-      point_above_min_y = point_above_min_y || (pe(1) - TOLERANCE < p(1));
-      point_above_min_z = point_above_min_z || (pe(2) - TOLERANCE < p(2));
       point_below_max_x = point_below_max_x || (pe(0) + TOLERANCE > p(0));
+#if LIBMESH_DIM > 1
+      point_above_min_y = point_above_min_y || (pe(1) - TOLERANCE < p(1));
       point_below_max_y = point_below_max_y || (pe(1) + TOLERANCE > p(1));
+#endif
+#if LIBMESH_DIM > 2
+      point_above_min_z = point_above_min_z || (pe(2) - TOLERANCE < p(2));
       point_below_max_z = point_below_max_z || (pe(2) + TOLERANCE > p(2));
+#endif
     }
 
-  if (!point_above_min_x ||
-      !point_above_min_y ||
+  if (
+#if LIBMESH_DIM > 2
       !point_above_min_z ||
-      !point_below_max_x ||
+      !point_below_max_z ||
+#endif
+#if LIBMESH_DIM > 1
+      !point_above_min_y ||
       !point_below_max_y ||
-      !point_below_max_z)
+#endif
+      !point_above_min_x ||
+      !point_below_max_x)
     return false;
 #endif // 0
 
