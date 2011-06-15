@@ -1471,6 +1471,35 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
 
 bool Elem::contains_point (const Point& p, Real tol) const
 {
+  // Check to make sure the element *could* contain this point, so we
+  // can avoid an expensive inverse_map call if it doesn't.
+  bool point_above_min_x = false,
+       point_above_min_y = false,
+       point_above_min_z = false,
+       point_below_max_x = false,
+       point_below_max_y = false,
+       point_below_max_z = false;
+
+  for (unsigned int n=0; n != this->n_nodes(); ++n)
+    {
+      Point pe = this->point(n);
+      point_above_min_x = point_above_min_x || (pe(0) - TOLERANCE < p(0));
+      point_above_min_y = point_above_min_y || (pe(1) - TOLERANCE < p(1));
+      point_above_min_z = point_above_min_z || (pe(2) - TOLERANCE < p(2));
+      point_below_max_x = point_below_max_x || (pe(0) + TOLERANCE > p(0));
+      point_below_max_y = point_below_max_y || (pe(1) + TOLERANCE > p(1));
+      point_below_max_z = point_below_max_z || (pe(2) + TOLERANCE > p(2));
+    }
+
+  if (!point_above_min_x ||
+      !point_above_min_y ||
+      !point_above_min_z ||
+      !point_below_max_x ||
+      !point_below_max_y ||
+      !point_below_max_z)
+    return false;
+
+
   // Declare a basic FEType.  Will ue a Lagrange
   // element by default.
   FEType fe_type(this->default_order());
