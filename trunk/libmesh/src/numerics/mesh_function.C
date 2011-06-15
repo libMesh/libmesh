@@ -94,7 +94,7 @@ MeshFunction::~MeshFunction ()
 
 
 
-void MeshFunction::init (const Trees::BuildType point_locator_build_type)
+void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
 {
   // are indices of the desired variable(s) provided?
   libmesh_assert (this->_system_vars.size() > 0);
