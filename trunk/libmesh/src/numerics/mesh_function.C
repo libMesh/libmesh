@@ -141,8 +141,8 @@ void MeshFunction::init (const Trees::BuildType point_locator_build_type)
       // build the point locator.  Only \p TREE version available
       //AutoPtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
       //this->_point_locator = ap.release();
-      this->_point_locator = new PointLocatorTree (mesh, point_locator_build_type);
-      
+      // this->_point_locator = new PointLocatorTree (mesh, point_locator_build_type);
+       this->_point_locator = mesh.sub_point_locator().release();
 
       // Point locator no longer needs to be initialized.
       //      this->_point_locator->init();
