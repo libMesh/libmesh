@@ -150,7 +150,7 @@ unsigned int Quad::opposite_node(const unsigned int node,
   libmesh_assert(side < this->n_sides());
   libmesh_assert(this->is_node_on_side(node, side));
 
-  unsigned int opposite;
+  //unsigned int opposite;
 
   switch (side)
   {
