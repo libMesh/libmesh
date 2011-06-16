@@ -608,7 +608,13 @@ void DenseMatrix<T>::zero()
 {
   _decomposition_type = NONE;
 
+  // Just doing this ifdef to be completely safe
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+  if(_val.size())
+    memset(&_val[0], 0, sizeof(T) * _val.size());
+#else
   std::fill (_val.begin(), _val.end(), 0.);
+#endif
 }
 
 
