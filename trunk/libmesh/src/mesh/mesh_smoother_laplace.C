@@ -191,11 +191,14 @@ void LaplaceMeshSmoother::init()
 	      if ((elem->neighbor(f) == NULL) ||
 		  (elem->id() > elem->neighbor(f)->id()))
 		{
-		  AutoPtr<Elem> face(elem->build_side(f));
+		  // We need a full (i.e. non-proxy) element for the face, since we will
+		  // be looking at its sides as well! 
+		  AutoPtr<Elem> face = elem->build_side(f, /*proxy=*/false);
 		
 		  for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
 		    {
-		      AutoPtr<Elem> side(face->build_side(s));
+		      // Here we can use a proxy
+		      AutoPtr<Elem> side = face->build_side(s);
 		    
 		      // At this point, we just insert the node numbers
 		      // again.  At the end we'll call sort and unique
