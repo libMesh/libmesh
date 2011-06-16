@@ -22,8 +22,9 @@
 // C++ includes
 
 // Local Includes
-#include "mesh_base.h"
 #include "elem.h"
+#include "libmesh_logging.h"
+#include "mesh_base.h"
 #include "point_locator_list.h"
 
 namespace libMesh
