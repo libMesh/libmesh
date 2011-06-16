@@ -709,10 +709,12 @@ void FEBase::compute_shape_functions (const Elem*)
 		  dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
 	      
 #if LIBMESH_DIM>1
-	        dphi[i][p](1) = dphidy[i][p] = 0.;
+	        dphi[i][p](1) = 
+                  dphidy[i][p] = dphidxi[i][p]*dxidy_map[p];
 #endif
 #if LIBMESH_DIM>2
-	        dphi[i][p](2) = dphidz[i][p] = 0.;
+	        dphi[i][p](2) =
+                  dphidz[i][p] = dphidxi[i][p]*dxidz_map[p];
 #endif
 	      }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -724,15 +726,20 @@ void FEBase::compute_shape_functions (const Elem*)
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
 #if LIBMESH_DIM>1
 	        d2phi[i][p](0,1) = d2phidxdy[i][p] = 
-		  d2phi[i][p](1,0) = 0.;
-	        d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
+		  d2phi[i][p](1,0) =
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p];
+	        d2phi[i][p](1,1) = d2phidy2[i][p] =
+		  d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p];
 #endif
 #if LIBMESH_DIM>2
 	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
-		  d2phi[i][p](2,0) = 0.;
+		  d2phi[i][p](2,0) =
+		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p];
 	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
-		  d2phi[i][p](2,1) = 0.;
-	        d2phi[i][p](2,2) = d2phidz2[i][p] = 0.;
+		  d2phi[i][p](2,1) =
+		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p];
+	        d2phi[i][p](2,2) = d2phidz2[i][p] =
+		  d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p];
 #endif
 	      }
 #endif
@@ -760,9 +767,9 @@ void FEBase::compute_shape_functions (const Elem*)
 	        // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz)
 #if LIBMESH_DIM == 3  
 	        dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
-#endif
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p]);
+#endif
 	      }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
