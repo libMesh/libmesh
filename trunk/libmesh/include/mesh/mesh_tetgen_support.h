@@ -62,7 +62,36 @@ class TetGenWrapper
   ~TetGenWrapper ();
   
   /**
-   * Method set TetGen commandline switches
+   * Method to set TetGen commandline switches
+   * -p	 Tetrahedralizes a piecewise linear complex (.poly or .smesh file). 
+   * -q	 Quality mesh generation. A minimum radius-edge ratio may be specified (default 2.0). 
+   * -a	 Applies a maximum tetrahedron volume constraint. 
+   * -A	 Assigns attributes to identify tetrahedra in certain regions. 
+   * -r	 Reconstructs and Refines a previously generated mesh. 
+   * -Y	 Suppresses boundary facets/segments splitting. 
+   * -i	 Inserts a list of additional points into mesh. 
+   * -M	 Does not merge coplanar facets. 
+   * -T	 Set a tolerance for coplanar test (default 1e-8). 
+   * -d	 Detect intersections of PLC facets. 
+   * -z	 Numbers all output items starting from zero. 
+   * -o2 Generates second-order subparametric elements. 
+   * -f	 Outputs faces (including non-boundary faces) to .face file. 
+   * -e	 Outputs subsegments to .edge file. 
+   * -n	 Outputs tetrahedra neighbors to .neigh file. 
+   * -g	 Outputs mesh to .mesh file for viewing by Medit. 
+   * -G	 Outputs mesh to .msh file for viewing by Gid. 
+   * -O	 Outputs mesh to .off file for viewing by Geomview. 
+   * -J	 No jettison of unused vertices from output .node file. 
+   * -B	 Suppresses output of boundary information. 
+   * -N	 Suppresses output of .node file. 
+   * -E	 Suppresses output of .ele file. 
+   * -F	 Suppresses output of .face file. 
+   * -I	 Suppresses mesh iteration numbers. 
+   * -C	 Checks the consistency of the final mesh. 
+   * -Q	 Quiet: No terminal output except errors. 
+   * -V	 Verbose: Detailed information, more terminal output. 
+   * -v	 Prints the version information. 
+   * -h	 Help: A brief instruction for using TetGen.
    */
   void set_switches(const std::string& s);
 
@@ -254,8 +283,8 @@ public:
    * from the nodes point set. Boundary constraints are taken from 
    * elements array.
    */
-  void triangulate_conformingDelaunayMesh (double quality_constraint,
-					   double volume_constraint);
+  void triangulate_conformingDelaunayMesh (double quality_constraint=0.,
+					   double volume_constraint=0.);
 
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedrization
@@ -263,8 +292,8 @@ public:
    * elements array. Include carve-out functionality.
    */
   void triangulate_conformingDelaunayMesh_carvehole (const std::vector< Node *>& holes,
-						     double quality_constraint,
-						     double volume_constraint);
+						     double quality_constraint=0.,
+						     double volume_constraint=0.);
 
 
 

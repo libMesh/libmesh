@@ -153,24 +153,40 @@ void TetGenWrapper::allocate_pointlist(int numofpoints)
   // This is stored as an int in tetgen, so we store it that way as well.
   this->set_numberofpoints(numofpoints);
 
-  // Is there previously-allocated memory here?
-  if (this->tetgen_data.pointlist != NULL)
+  // Don't try to allocate an array of size zero, this is not portable...
+  if (this->tetgen_data.numberofpoints > 0)
     {
-      libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
-      libmesh_error();
-    }
+      // Is there previously-allocated memory here?
+      if (this->tetgen_data.pointlist != NULL)
+	{
+	  libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
+	  libmesh_error();
+	}
 
-  // We allocate memory here, the tetgenio destructor will delete it.
-  this->tetgen_data.pointlist = new REAL[tetgen_data.numberofpoints * 3];
+      // We allocate memory here, the tetgenio destructor will delete it.
+      this->tetgen_data.pointlist = new REAL[this->tetgen_data.numberofpoints * 3];
+    }
 }
 
 
 
 void TetGenWrapper::set_switches(const std::string& s)
 {
-  // Copy the string to a temporary buffer for passing to the C API
+  // A temporary buffer for passing to the C API, it requires 
+  // a char*, not a const char*...
   char buffer[256];
-  libmesh_assert (s.size() < sizeof(buffer)-1);
+  
+  // Make sure char buffer has enough room
+  if (s.size() >= sizeof(buffer)-1)
+    {
+      libMesh::err << "Fixed size buffer of length " 
+		   << sizeof(buffer) 
+		   << " not large enough to hold TetGen switches." 
+		   << std::endl;
+      libmesh_error();
+    }
+  
+  // Copy the string, don't forget to NULL-terminate!
   buffer[ s.copy( buffer , sizeof( buffer ) - 1 ) ] = '\0' ;
   
   if (!tetgen_be.parse_commandline(buffer)) 
@@ -217,28 +233,36 @@ void TetGenWrapper::allocate_facetlist(int numoffacets, int numofholes)
   this->set_numberoffacets(numoffacets);
   this->set_numberofholes(numofholes);
   
-  // Is there previously-allocated memory here?
-  if (this->tetgen_data.facetlist != NULL)
+  // Don't try to allocate an array of size zero, this is not portable...
+  if (this->tetgen_data.numberoffacets > 0)
     {
-      libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
-      libmesh_error();
+      // Is there previously-allocated memory here?
+      if (this->tetgen_data.facetlist != NULL)
+	{
+	  libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
+	  libmesh_error();
+	}
+
+      // We allocate memory here, the tetgenio destructor cleans it up.
+      this->tetgen_data.facetlist = new tetgenio::facet[this->tetgen_data.numberoffacets];
+
+      for (int i=0; i<numoffacets; i++)
+	this->tetgen_data.init(&(this->tetgen_data.facetlist[i]));
     }
 
-  // We allocate memory here, the tetgenio destructor cleans it up.
-  this->tetgen_data.facetlist = new tetgenio::facet[this->tetgen_data.numberoffacets];
 
-  for (int i=0; i<numoffacets; i++)
-    this->tetgen_data.init(&(this->tetgen_data.facetlist[i]));
-
-
-  // Is there previously-allocated memory here?
-  if (this->tetgen_data.holelist != NULL)
+  // Don't try to allocate an array of size zero, this is not portable...
+  if (this->tetgen_data.numberofholes > 0)
     {
-      libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
-      libmesh_error();
-    }
+      // Is there previously-allocated memory here?
+      if (this->tetgen_data.holelist != NULL)
+	{
+	  libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
+	  libmesh_error();
+	}
   
-  this->tetgen_data.holelist = new REAL[this->tetgen_data.numberofholes * 3];
+      this->tetgen_data.holelist = new REAL[this->tetgen_data.numberofholes * 3];
+    }
 }
 
 
@@ -247,15 +271,19 @@ void TetGenWrapper::allocate_regionlist(int numofregions)
 {
   this->set_numberofregions(numofregions);
 
-  // Is there previously-allocated memory here?
-  if (this->tetgen_data.regionlist != NULL)
+  // Don't try to allocate an array of size zero, this is not portable...
+  if (this->tetgen_data.numberofregions > 0)
     {
-      libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
-      libmesh_error();
-    }
+      // Is there previously-allocated memory here?
+      if (this->tetgen_data.regionlist != NULL)
+	{
+	  libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
+	  libmesh_error();
+	}
   
-  // We allocate memory here, the tetgenio destructor cleans it up.
-  this->tetgen_data.regionlist = new REAL[this->tetgen_data.numberofregions * 5];
+      // We allocate memory here, the tetgenio destructor cleans it up.
+      this->tetgen_data.regionlist = new REAL[this->tetgen_data.numberofregions * 5];
+    }
 }
 
 
@@ -282,18 +310,22 @@ void TetGenWrapper::allocate_facet_polygonlist(unsigned i, int numofpolygons)
   this->set_facet_numberofpolygons(i, numofpolygons);
   this->set_facet_numberofholes(i, 0);
 
-  // Is there previously-allocated memory here?
-  if (this->tetgen_data.facetlist[i].polygonlist != NULL)
+  // Don't try to create an array of size zero, this isn't portable
+  if (numofpolygons > 0)
     {
-      libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
-      libmesh_error();
+      // Is there previously-allocated memory here?
+      if (this->tetgen_data.facetlist[i].polygonlist != NULL)
+	{
+	  libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
+	  libmesh_error();
+	}
+
+      // We allocate memory here, the tetgenio destructor cleans it up.
+      this->tetgen_data.facetlist[i].polygonlist = new tetgenio::polygon[numofpolygons];
+
+      for (int j=0; j<this->tetgen_data.facetlist[i].numberofpolygons; j++)
+	this->tetgen_data.init(&(this->tetgen_data.facetlist[i].polygonlist[j]));
     }
-
-  // We allocate memory here, the tetgenio destructor cleans it up.
-  this->tetgen_data.facetlist[i].polygonlist = new tetgenio::polygon[numofpolygons];
-
-  for (int j=0; j<this->tetgen_data.facetlist[i].numberofpolygons; j++)
-    this->tetgen_data.init(&(this->tetgen_data.facetlist[i].polygonlist[j]));
 }
 
 
@@ -310,16 +342,19 @@ void TetGenWrapper::allocate_polygon_vertexlist(unsigned i, unsigned j, int numo
 {
   this->set_polygon_numberofvertices(i, j, numofvertices);
 
-  // Is there previously-allocated memory here?
-  if (this->tetgen_data.facetlist[i].polygonlist[j].vertexlist != NULL)
+  // Don't try to create an array of size zero, this isn't portable
+  if (numofvertices > 0)
     {
-      libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
-      libmesh_error();
+      // Is there previously-allocated memory here?
+      if (this->tetgen_data.facetlist[i].polygonlist[j].vertexlist != NULL)
+	{
+	  libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
+	  libmesh_error();
+	}
+
+      // We allocate memory here, the tetgenio destructor cleans it up.
+      this->tetgen_data.facetlist[i].polygonlist[j].vertexlist = new int[numofvertices];
     }
-
-
-  // We allocate memory here, the tetgenio destructor cleans it up.
-  this->tetgen_data.facetlist[i].polygonlist[j].vertexlist = new int[numofvertices];
 }
 
 
@@ -368,8 +403,26 @@ void TetGenMeshInterface::triangulate_pointset ()
   // fill input structure with point set data:
   this->fill_pointlist(tetgen_wrapper);
 
-  // run TetGen triangulation method:
-  tetgen_wrapper.set_switches("Q"); // TetGen switches: triangulation, Quiet mode
+  // Run TetGen triangulation method:
+  // Q = quiet, no terminal output
+  // V = verbose, more terminal output
+  // Note: if no switch is used, the input must be a list of 3D points
+  // (.node file) and the Delaunay tetrahedralization of this point set
+  // will be generated.
+
+  // Can we apply quality and volume constraints in
+  // triangulate_pointset()?.  On at least one test problem,
+  // specifying any quality or volume constraints here causes tetgen
+  // to segfault down in the insphere method: a NULL pointer is passed
+  // to the routine.
+  std::ostringstream oss;
+  oss << "Q"; // quiet operation
+  // oss << "V"; // verbose operation
+  //oss  << "q" << std::fixed << 2.0;  // quality constraint
+  //oss  << "a" << std::fixed << 100.; // volume constraint
+  tetgen_wrapper.set_switches(oss.str()); 
+  
+  // Run tetgen
   tetgen_wrapper.run_tetgen();
 
   // save elements to mesh structure, nodes will not be changed:
@@ -404,8 +457,14 @@ void TetGenMeshInterface::pointset_convexhull ()
   // Copy Mesh's node points into TetGen data structure
   this->fill_pointlist(tetgen_wrapper);
 
-  // run TetGen triangulation method:
-  tetgen_wrapper.set_switches("Q"); // TetGen switches: triangulation, Convex hull, Quiet mode
+  // Run TetGen triangulation method:
+  // Q = quiet, no terminal output
+  // Note: if no switch is used, the input must be a list of 3D points
+  // (.node file) and the Delaunay tetrahedralization of this point set
+  // will be generated.  In this particular function, we are throwing
+  // away the tetrahedra generated by TetGen, and keeping only the
+  // convex hull...
+  tetgen_wrapper.set_switches("Q"); 
   tetgen_wrapper.run_tetgen();
   unsigned int num_elements   = tetgen_wrapper.get_numberoftrifaces();
 
@@ -447,13 +506,13 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh (double quality_con
 							      double volume_constraint)   
 {
   // start triangulation method with empty holes list:
-  std::vector< Node *> noholes;
+  std::vector<Node*> noholes;
   triangulate_conformingDelaunayMesh_carvehole(noholes, quality_constraint, volume_constraint);
 }
 
 
 
-void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const std::vector< Node *>& holes,
+void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const std::vector<Node*>& holes,
 									 double quality_constraint,
 									 double volume_constraint)
 {
@@ -542,7 +601,12 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
     }
 
   
-  // >>> run TetGen triangulation method:
+  // Run TetGen triangulation method:
+  // p = tetrahedralizes a piecewise linear complex (see definition in user manual)
+  // Q = quiet, no terminal output
+  // q = specify a minimum radius/edge ratio
+  // a = tetrahedron volume constraint
+
   // assemble switches:
   std::ostringstream oss; // string holding switches
   oss << "pQ";
@@ -679,6 +743,13 @@ void TetGenMeshInterface::assign_nodes_to_elem(unsigned* node_labels, Elem* elem
 
 unsigned TetGenMeshInterface::check_hull_integrity()
 {
+  // Check for easy return: if the Mesh is empty (i.e. if
+  // somebody called triangulate_conformingDelaunayMesh on
+  // a Mesh with no elements, then hull integrity check must
+  // fail...
+  if (_mesh.n_elem() == 0)
+    return 3;
+
   MeshBase::element_iterator it        = this->_mesh.elements_begin();
   const MeshBase::element_iterator end = this->_mesh.elements_end();
 
@@ -718,8 +789,16 @@ void TetGenMeshInterface::process_hull_integrity_result(unsigned result)
   if (result != 0)
     {
       libMesh::err << "Error! Conforming Delaunay mesh tetrahedralization requires a convex hull." << std::endl;
+
+      if (result==1)
+	{
+	  libMesh::err << "Non-TRI3 elements were found in the input Mesh.  ";
+	  libMesh::err << "A constrained Delaunay triangulation requires a convex hull of TRI3 elements." << std::endl;
+	}
+
       libMesh::err << "Consider calling TetGenMeshInterface::pointset_convexhull() followed " << std::endl;
       libMesh::err << "by Mesh::find_neighbors() first." << std::endl;
+
       libmesh_error();
     }
 }
