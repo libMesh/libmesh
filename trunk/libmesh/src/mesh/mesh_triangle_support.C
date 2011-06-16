@@ -235,8 +235,11 @@ void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
   // Node information
   for (int i=0, c=0; c<triangle_data_input.numberofpoints; i+=2, ++c)
     {
+      // Specify ID when adding point, otherwise, if this is ParallelMesh,
+      // it might add points with a non-sequential numbering...
       mesh_output.add_point( Point(triangle_data_input.pointlist[i],
-				   triangle_data_input.pointlist[i+1]) );
+				   triangle_data_input.pointlist[i+1]),
+			     /*id=*/c);
     }
 
   // Element information
@@ -412,25 +415,34 @@ void TriangleInterface::triangulate()
 
   
   // Copy all the non-hole points and segments into the triangle struct.
-  for (unsigned int ctr=0, n=0; n<_mesh.n_nodes(); ctr+=2, ++n)
-    {
-      const unsigned int index0 = 2*hole_offset+ctr;
-      const unsigned int index1 = 2*hole_offset+ctr+1;
-      
-      initial.pointlist[index0] = _mesh.point(n)(0);
-      initial.pointlist[index1] = _mesh.point(n)(1);
+  {
+    MeshBase::node_iterator it = _mesh.nodes_begin();
+    const MeshBase::node_iterator end = _mesh.nodes_end();
 
-      // If the user requested a PSLG, the non-hole points are also segments
-      if (_triangulation_type==PSLG)
-	{
-	  // Use implicit ordering to define segments
-	  if (this->segments.empty())
-	    {
-	      initial.segmentlist[index0] = hole_offset+n;
-	      initial.segmentlist[index1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
-	    }
-	}
-    }
+    for (unsigned int ctr=0; it != end; ctr+=2, ++it)
+      {
+	unsigned index = 2*hole_offset + ctr;
+      
+	// Get pointer to the current node
+	Node* node = *it;
+	
+	// Set x,y values in pointlist
+	initial.pointlist[index] = (*node)(0);
+	initial.pointlist[index+1] = (*node)(1);
+
+	// If the user requested a PSLG, the non-hole points are also segments
+	if (_triangulation_type==PSLG)
+	  {
+	    // Use implicit ordering to define segments
+	    if (this->segments.empty())
+	      {
+		unsigned n = ctr/2; // ctr is always even
+		initial.segmentlist[index] = hole_offset+n;
+		initial.segmentlist[index+1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
+	      }
+	  }
+      }
+  }
 
   
   // If the user provided it, use his ordering to define the segments
@@ -476,10 +488,10 @@ void TriangleInterface::triangulate()
   // -P  Suppresses the output .poly file. Saves disk space, but you lose the ability to maintain
   //     constraining segments on later refinements of the mesh.
   // Create the flag strings, depends on element type
-std::ostringstream flags;
+  std::ostringstream flags;
 
-// Default flags always used
-flags << "zBPQq";
+  // Default flags always used
+  flags << "zBPQq";
 
   // Flags which are specific to the type of triangulation
   switch (_triangulation_type)
