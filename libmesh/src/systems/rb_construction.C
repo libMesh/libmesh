@@ -177,6 +177,8 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   const unsigned int n_parameters = infile("n_parameters",1);
   const unsigned int n_training_samples_mu = infile("n_training_samples_mu",0);
   const bool deterministic_training = infile("deterministic_training",false);
+  
+  set_n_params( n_parameters );
 
   // String which selects an alternate pc/solver combo for the update_residual_terms solves.
   // Possible values are:
@@ -309,7 +311,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
 {
   // Copy parameter information over
-  rb_evaluation_in.set_parameter_range(mu_min_vector, mu_max_vector);
+  rb_evaluation_in.set_n_params( get_n_params() );
   rb_evaluation_in.set_current_parameters( get_current_parameters() );
 
   // Copy boolean flags over
@@ -319,8 +321,8 @@ void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
   // Copy rb_theta_expansion pointer over to rb_eval
   rb_evaluation_in.rb_theta_expansion = this->rb_theta_expansion;
 
-  // Initialize the rb_eval object (resize data structures according to Nmax)
-  rb_evaluation_in.initialize(get_Nmax());
+  // resize data structures according to Nmax
+  rb_evaluation_in.resize_data_structures(get_Nmax());
   
   // Finally, set the rb_eval pointer to rb_evaluation_in
   this->rb_eval = &rb_evaluation_in;

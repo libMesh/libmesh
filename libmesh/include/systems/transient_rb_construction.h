@@ -238,7 +238,7 @@ public:
    * The object that defines the properties of the
    * temporal discretization that we employ.
    */
-  AutoPtr< TemporalDiscretization > temporal_discretization;
+  TemporalDiscretization temporal_discretization;
 
   /**
    * The L2 matrix.
@@ -278,21 +278,9 @@ public:
 protected:
 
   /**
-   * Initializes the mesh-dependent data.
-   */
-  virtual void init_data ();
-
-  /**
    * Build a new TransientRBThetaExpansion object and return an AutoPtr to it.
    */
   virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion();
-  
-  /**
-   * Build a new TemporalDiscretization object. This
-   * object encapsulates data that defines the
-   * temporal discretization.
-   */
-  virtual AutoPtr<TemporalDiscretization> build_temporal_discretization();
 
   /**
    * Helper function that actually allocates all the data

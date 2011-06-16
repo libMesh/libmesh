@@ -76,9 +76,9 @@ void RBEvaluation::clear()
   STOP_LOG("clear()", "RBEvaluation");
 }
 
-void RBEvaluation::initialize(const unsigned int Nmax)
+void RBEvaluation::resize_data_structures(const unsigned int Nmax)
 {
-  START_LOG("initialize()", "RBEvaluation");
+  START_LOG("resize_data_structures()", "RBEvaluation");
 
   if(Nmax < this->get_n_basis_functions())
   {
@@ -166,7 +166,7 @@ void RBEvaluation::initialize(const unsigned int Nmax)
     A_q_representor[q_a].resize(Nmax);
   }
 
-  STOP_LOG("initialize()", "RBEvaluation");
+  STOP_LOG("resize_data_structures()", "RBEvaluation");
 }
 
 NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)
@@ -719,6 +719,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     n_bfs_in >> n_bfs;
     n_bfs_in.close();
   }
+  
+  resize_data_structures(n_bfs);
 
   // Next read in F_q representor norm data
   std::ifstream RB_Fq_norms_in;

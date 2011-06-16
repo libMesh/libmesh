@@ -140,13 +140,12 @@ public:
   virtual void clear();
 
   /**
-   * Initialize this TransientRBEvaluation object.
    * Resize and clear the data vectors corresponding to the
    * value of \p Nmax.
    * Overridden to resize data relevant in the time-dependent
    * case.
    */
-  virtual void initialize(const unsigned int Nmax);
+  virtual void resize_data_structures(const unsigned int Nmax);
 
   /**
    * Perform online solve for current_params
@@ -210,7 +209,7 @@ public:
    * The object that defines the properties of the
    * temporal discretization that we employ.
    */
-  AutoPtr< TemporalDiscretization > temporal_discretization;
+  TemporalDiscretization temporal_discretization;
 
   /**
    * Dense RB L2 matrix.
@@ -287,13 +286,6 @@ public:
    * These are basis dependent and hence stored here.
    */
   std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
-
-protected:
-
-  /**
-   * Build a new TemporalDiscretization object and return an AutoPtr to it.
-   */
-  virtual AutoPtr<TemporalDiscretization> build_temporal_discretization();
 
 };
 

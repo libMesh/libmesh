@@ -89,6 +89,8 @@ void RBSCMSystem::initialize_SCM_system ()
   const unsigned int n_SCM_parameters = infile("n_SCM_parameters",1);
   const unsigned int n_SCM_training_samples = infile("n_SCM_training_samples",1);
   const bool deterministic_training = infile("deterministic_training",false);
+  
+  set_n_params( n_SCM_parameters );
 
   // SCM Greedy termination tolerance
   const Real SCM_eps_in = infile("SCM_eps", SCM_eps);
