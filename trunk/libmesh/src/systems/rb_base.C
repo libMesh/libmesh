@@ -39,42 +39,25 @@ RBBase::~RBBase ()
 
 unsigned int RBBase::get_n_params() const
 {
-  libmesh_assert( mu_min_vector.size() == mu_max_vector.size() );
-
-  return mu_min_vector.size();
+  return current_parameters.size();
 }
 
-void RBBase::set_parameter_range(std::vector<Real> mu_min_in, std::vector<Real> mu_max_in)
+void RBBase::set_n_params(unsigned int n_params_in)
 {
-  libmesh_assert( mu_min_in.size() == mu_max_in.size() );
-  
-  mu_min_vector = mu_min_in;
-  mu_max_vector = mu_max_in;
-}
-
-Real RBBase::get_parameter_min(unsigned int i) const
-{
-  libmesh_assert(i < mu_min_vector.size());
-
-  return mu_min_vector[i];
-}
-
-Real RBBase::get_parameter_max(unsigned int i) const
-{
-  libmesh_assert(i < mu_max_vector.size());
-
-  return mu_max_vector[i];
+  current_parameters.clear();
+  current_parameters.resize(n_params_in);
 }
 
 void RBBase::set_current_parameters(const std::vector<Real>& params)
 {
   libmesh_assert(params.size() == get_n_params());
 
-  for(unsigned int i=0; i<params.size(); i++)
-    libmesh_assert( (mu_min_vector[i] <= libmesh_real(params[i])) &&
-                    (libmesh_real(params[i]) <= mu_max_vector[i]) );
-
   current_parameters = params;
+}
+
+std::vector<Real>& RBBase::get_current_parameters()
+{
+  return current_parameters;
 }
 
 void RBBase::print_current_parameters()
@@ -84,26 +67,6 @@ void RBBase::print_current_parameters()
     libMesh::out << "mu[" << j << "] = " << current_parameters[j] << std::endl;
   }
   libMesh::out << std::endl;
-}
-
-bool RBBase::valid_params(const std::vector<Real>& params)
-{
-  bool valid = ( params.size() == get_n_params() );
-
-  if(!valid)
-  {
-   return false;
-  }
-  else
-  {
-    for(unsigned int i=0; i<params.size(); i++)
-    {
-      valid = valid && ( (mu_min_vector[i] <= params[i]) &&
-                         (params[i] <= mu_max_vector[i]) );
-    }
-  }
-
-  return valid;
 }
 
 void RBBase::broadcast_current_parameters(unsigned int proc_id)

@@ -66,19 +66,11 @@ void TransientRBEvaluation::clear_riesz_representors()
   }
 }
 
-AutoPtr<TemporalDiscretization> TransientRBEvaluation::build_temporal_discretization()
+void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax)
 {
-  return AutoPtr<TemporalDiscretization>(new TemporalDiscretization);
-}
-
-void TransientRBEvaluation::initialize(const unsigned int Nmax)
-{
-  START_LOG("initialize()", "TransientRBEvaluation");
+  START_LOG("resize_data_structures()", "TransientRBEvaluation");
   
-  Parent::initialize(Nmax);
-  
-  // Build the TemporalDiscretization object
-  temporal_discretization = build_temporal_discretization();
+  Parent::resize_data_structures(Nmax);
 
   RB_L2_matrix.resize(Nmax,Nmax);
   
@@ -151,7 +143,7 @@ void TransientRBEvaluation::initialize(const unsigned int Nmax)
     M_q_representor[q_m].resize(Nmax);
   }
 
-  STOP_LOG("initialize()", "TransientRBEvaluation");
+  STOP_LOG("resize_data_structures()", "TransientRBEvaluation");
 }
 
 Real TransientRBEvaluation::RB_solve(unsigned int N)
@@ -173,9 +165,9 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
 
-  const unsigned int n_time_steps = temporal_discretization->get_n_time_steps();
-  const Real dt                   = temporal_discretization->get_delta_t();
-  const Real euler_theta          = temporal_discretization->get_euler_theta();
+  const unsigned int n_time_steps = temporal_discretization.get_n_time_steps();
+  const Real dt                   = temporal_discretization.get_delta_t();
+  const Real euler_theta          = temporal_discretization.get_euler_theta();
 
   // Resize the RB and error bound vectors
   error_bound_all_k.resize(n_time_steps+1);
@@ -216,7 +208,7 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
   }
 
   // Set system time level to 0
-  temporal_discretization->set_time_step(0);
+  temporal_discretization.set_time_step(0);
 
   // Resize/clear the solution vector
   RB_solution.resize(N);
@@ -266,7 +258,7 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
     }
 
     // Set error bound at the initial time
-    error_bound_all_k[temporal_discretization->get_time_step()] = std::sqrt(error_bound_sum);
+    error_bound_all_k[temporal_discretization.get_time_step()] = std::sqrt(error_bound_sum);
 
     // Compute the outputs and associated error bounds at the initial time
     DenseVector<Number> RB_output_vector_N;
@@ -290,7 +282,7 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
 
   for(unsigned int time_level=1; time_level<=n_time_steps; time_level++)
   {
-    temporal_discretization->set_time_step(time_level);
+    temporal_discretization.set_time_step(time_level);
     old_RB_solution = RB_solution;
 
     // Compute RB_rhs, as RB_LHS_matrix x old_RB_solution
@@ -371,7 +363,7 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
 
 Real TransientRBEvaluation::residual_scaling_numer(Real)
 {
-  return temporal_discretization->get_delta_t();
+  return temporal_discretization.get_delta_t();
 }
 
 void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
@@ -505,8 +497,8 @@ Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
   // This assembly assumes we have already called cache_online_residual_terms
   // and that the RB_solve parameter is constant in time
 
-  const Real dt          = temporal_discretization->get_delta_t();
-  const Real euler_theta = temporal_discretization->get_euler_theta();
+  const Real dt          = temporal_discretization.get_delta_t();
+  const Real euler_theta = temporal_discretization.get_euler_theta();
 
   DenseVector<Number> RB_u_euler_theta(N);
   DenseVector<Number> mass_coeffs(N);
@@ -563,8 +555,8 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
 
-  const Real dt          = temporal_discretization->get_delta_t();
-  const Real euler_theta = temporal_discretization->get_euler_theta();
+  const Real dt          = temporal_discretization.get_delta_t();
+  const Real euler_theta = temporal_discretization.get_euler_theta();
 
   std::vector<Number> RB_u_euler_theta(N);
   std::vector<Number> mass_coeffs(N);

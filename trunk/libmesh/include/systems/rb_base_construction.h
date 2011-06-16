@@ -86,6 +86,34 @@ public:
   virtual void clear ();
 
   /**
+   * Set the current parameters to \p params. Override
+   * to also check that \p params is within the
+   * allowable parameter range.
+   */
+  virtual void set_current_parameters(const std::vector<Real>& params);
+
+  /**
+   * Set the parameter range for this RB object.
+   */
+  void set_parameter_range(std::vector<Real> mu_min, std::vector<Real> mu_max);
+
+  /**
+   * Get minimum allowable value of parameter \p i.
+   */
+  Real get_parameter_min(unsigned int i) const;
+
+  /**
+   * Get maximum allowable value of parameter \p i.
+   */
+  Real get_parameter_max(unsigned int i) const;
+
+  /**
+   * @return true is params is within the parameter range defined by
+   * mu_min_vector, mu_max_vector, false otherwise.
+   */
+  bool valid_params(const std::vector<Real>& params);
+
+  /**
    * Build a new RBThetaExpansion object and return an AutoPtr to it.
    */
   virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion();
@@ -232,7 +260,13 @@ protected:
 
 
   //----------- PROTECTED DATA MEMBERS -----------//
-  
+
+  /**
+   * Vector of parameter ranges.
+   */
+  std::vector<Real> mu_min_vector;
+  std::vector<Real> mu_max_vector;
+
   /**
    * This boolean flag indicates whether or not the training set should
    * be the same on all processors. By default it is false, but in the

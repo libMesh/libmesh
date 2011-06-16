@@ -40,9 +40,9 @@ void RBEIMEvaluation::clear()
   interpolation_points_var.clear();
 }
 
-void RBEIMEvaluation::initialize(const unsigned int Nmax)
+void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
 {
-  Parent::initialize(Nmax);
+  Parent::resize_data_structures(Nmax);
 
   // Resize the data structures relevant to the EIM system
   interpolation_points.clear();

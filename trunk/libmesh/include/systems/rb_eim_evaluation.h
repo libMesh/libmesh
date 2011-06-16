@@ -22,6 +22,7 @@
 
 #include "rb_evaluation.h"
 #include "point.h"
+#include "auto_ptr.h"
 
 namespace libMesh
 {
@@ -62,9 +63,10 @@ public:
   virtual void clear();
 
   /**
-   * Initialize this object by allocating the necessary data fields.
+   * Resize the data structures for storing data associated
+   * with this object.
    */
-  virtual void initialize(const unsigned int Nmax);
+  virtual void resize_data_structures(const unsigned int Nmax);
 
   /**
    * Calculate the EIM approximation to parametrized_function

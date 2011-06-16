@@ -64,13 +64,12 @@ public:
   virtual void clear();
 
   /**
-   * Initialize this RBEvaluation object.
    * Resize and clear the data vectors corresponding to the
    * value of \p Nmax.
    * Overload to also clear and resize any extra
    * data in subclasses.
    */
-  virtual void initialize(const unsigned int Nmax);
+  virtual void resize_data_structures(const unsigned int Nmax);
 
   /**
    * Get a reference to the i^th basis function.

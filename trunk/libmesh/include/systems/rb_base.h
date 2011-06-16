@@ -20,7 +20,6 @@
 #ifndef __rb_base_h__
 #define __rb_base_h__
 
-#include "auto_ptr.h"
 #include "rb_theta.h"
 #include "rb_theta_expansion.h"
 
@@ -57,27 +56,24 @@ public:
   virtual ~RBBase ();
 
   /**
-   * Get the number of parameters. Value is determined
-   * by specifying the parameter ranges.
+   * Get the number of parameters.
    */
   unsigned int get_n_params() const;
+  
+  /**
+   * Set the number of parameters.
+   */
+  void set_n_params(unsigned int n_params_in);
 
   /**
-   * Set the parameter range for this RB object.
+   * Get the current parameters.
    */
-  void set_parameter_range(std::vector<Real> mu_min, std::vector<Real> mu_max);
-
+  std::vector<Real>& get_current_parameters();
+  
   /**
-   * Get range of i^th parameter.
+   * Set the current parameters to \p params
    */
-  Real get_parameter_min(unsigned int i) const;
-  Real get_parameter_max(unsigned int i) const;
-
-  /**
-   * Get/set current parameters.
-   */
-  std::vector<Real>& get_current_parameters() { return current_parameters; };
-  void set_current_parameters(const std::vector<Real>& params);
+  virtual void set_current_parameters(const std::vector<Real>& params);
 
   /**
    * Print the current parameters.
@@ -89,12 +85,6 @@ public:
    * to all processors.
    */
   void broadcast_current_parameters(unsigned int proc_id);
-
-  /**
-   * @return true is params is within the parameter range defined by
-   * mu_min_vector, mu_max_vector, false otherwise.
-   */
-  bool valid_params(const std::vector<Real>& params);
   
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -108,12 +98,6 @@ public:
 protected:
 
   //----------- PROTECTED DATA MEMBERS -----------//
-
-  /**
-   * Vector of parameter ranges.
-   */
-  std::vector<Real> mu_min_vector;
-  std::vector<Real> mu_max_vector;
 
   /**
    * Vector storing the current parameters.
