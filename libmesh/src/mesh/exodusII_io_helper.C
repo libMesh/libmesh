@@ -715,20 +715,45 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
   y.resize(num_nodes);
   z.resize(num_nodes);
 
-  for (/* unsigned */ int i=0; i<num_nodes; ++i)
-    {
-      x[i]=(*mesh.node_ptr(i))(0);
+//  for (/* unsigned */ int i=0; i<num_nodes; ++i)
+//    {
+//      x[i]=(*mesh.node_ptr(i))(0);
+//#if LIBMESH_DIM > 1
+//      y[i]=(*mesh.node_ptr(i))(1);
+//#else
+//      y[i]=0.;
+//#endif
+//#if LIBMESH_DIM > 2
+//      z[i]=(*mesh.node_ptr(i))(2);
+//#else
+//      z[i]=0.;
+//#endif
+//    }
+
+
+  // Use a node iterator instead of looping over i!
+  {
+    unsigned i = 0;
+    MeshBase::const_node_iterator it = mesh.nodes_begin();
+    const MeshBase::const_node_iterator end = mesh.nodes_end();
+    for ( ; it != end; ++it, ++i)
+      {
+	Node* node = *it;
+
+	x[i] = (*node)(0);
+
 #if LIBMESH_DIM > 1
-      y[i]=(*mesh.node_ptr(i))(1);
+	y[i]=(*node)(1);
 #else
-      y[i]=0.;
+	y[i]=0.;
 #endif
 #if LIBMESH_DIM > 2
-      z[i]=(*mesh.node_ptr(i))(2);
+	z[i]=(*node)(2);
 #else
-      z[i]=0.;
+	z[i]=0.;
 #endif
-    }
+      }
+  }
 
   ex_err = exII::ex_put_coord(ex_id,
 			      x.empty() ? NULL : &x[0],
