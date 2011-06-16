@@ -143,7 +143,7 @@ unsigned int Quad::opposite_side(const unsigned int side) const
 
 
 unsigned int Quad::opposite_node(const unsigned int node,
-                           const unsigned int side) const
+                                 const unsigned int side) const
 {
   libmesh_assert(node < 8);
   libmesh_assert(node < this->n_nodes());
@@ -152,26 +152,24 @@ unsigned int Quad::opposite_node(const unsigned int node,
 
   unsigned int opposite;
 
-  if (node > 4)
-    opposite = ((node+2)%4)+4;
-  else
-    {
-      switch (side)
-      {
-      case 0:
-      case 2:
-        opposite = 3 - node;
-        break;
-      case 1:
-      case 3:
-        opposite = 3*node - 3;
-        break;
-      default:
-        libmesh_error();
-      }
-    }
+  switch (side)
+  {
+  case 0:
+  case 2:
+    static const unsigned char side02_nodes_map[] =
+      {3, 2, 1, 0, 6, 255, 4, 255};
+    return side02_nodes_map[node];
+    break;
+  case 1:
+  case 3:
+    static const unsigned char side13_nodes_map[] =
+      {1, 0, 3, 2, 255, 7, 255, 5};
+    return side13_nodes_map[node];
+    break;
+  }
 
-  return opposite;
+  libmesh_error();
+  return 255;
 }
 
 
