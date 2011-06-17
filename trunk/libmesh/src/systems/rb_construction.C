@@ -1064,10 +1064,15 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name)
   START_LOG("train_reduced_basis()", "RBConstruction");
 
   int count = 0;
+  
+  // We need to have a valid RBEvaluation object
+  libmesh_assert( rb_eval );
 
   // Clear the Greedy param list
   for(unsigned int i=0; i<rb_eval->greedy_param_list.size(); i++)
+  {
     rb_eval->greedy_param_list[i].clear();
+  }
   rb_eval->greedy_param_list.clear();
 
   Real training_greedy_error;
@@ -1076,7 +1081,12 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name)
   // If we are continuing from a previous training run,
   // we might already be at the max number of basis functions.
   // If so, we can just return.
-  if (rb_eval->get_n_basis_functions() >= Nmax) return 0.;
+  if(rb_eval->get_n_basis_functions() >= get_Nmax())
+  {
+    libMesh::out << "Maximum number of basis functions reached: Nmax = "
+                 << get_Nmax() << std::endl;
+    return 0.;
+  }
   
 
   // Compute the dual norms of the outputs if we haven't already done so
