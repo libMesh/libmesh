@@ -17,11 +17,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_base_h__
-#define __rb_base_h__
+#ifndef __rb_parametrized_object_h__
+#define __rb_parametrized_object_h__
 
-#include "rb_theta.h"
-#include "rb_theta_expansion.h"
+// libMesh includes
+#include "reference_counted_object.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {
@@ -29,31 +32,28 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * This is the base class for both Construction and Evaluation
- * stages of the certified reduced basis (RB) method.
- * Here we store generic RB quantities such
- * as parameter ranges and functions in the `affine'
- * expansion of the bilinear form operators of the PDE.
+ * This class defines a parametrized object, which
+ * is fundamental in the Reduced Basis method.
  *
  * @author David J. Knezevic, 2011
  */
 
 
 // ------------------------------------------------------------
-// RBBase class definition
-class RBBase
+// RBParametrizedObject class definition
+class RBParametrizedObject : public ReferenceCountedObject<RBParametrizedObject>
 {
 public:
 
   /**
    * Constructor.
    */
-  RBBase ();
+  RBParametrizedObject ();
 
   /**
    * Destructor.
    */
-  virtual ~RBBase ();
+  virtual ~RBParametrizedObject ();
 
   /**
    * Get the number of parameters.
@@ -85,15 +85,6 @@ public:
    * to all processors.
    */
   void broadcast_current_parameters(unsigned int proc_id);
-  
-  //----------- PUBLIC DATA MEMBERS -----------//
-
-  /**
-   * A pointer to to the object that stores the theta expansion.
-   * This is not an AutoPtr since we may want to share it between
-   * multiple RBBases. (Note: a shared_ptr would be a good option here.)
-   */
-  RBThetaExpansion* rb_theta_expansion;
   
 protected:
 

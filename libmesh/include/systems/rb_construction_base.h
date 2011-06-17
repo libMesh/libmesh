@@ -17,17 +17,21 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_base_construction_h__
-#define __rb_base_construction_h__
+#ifndef __rb_construction_base_h__
+#define __rb_construction_base_h__
 
+// rbOOmit includes
+#include "rb_parametrized_object.h"
+#include "rb_theta_expansion.h"
+#include "rb_theta.h"
+
+// libMesh includes
 #include "system.h"
 #include "numeric_vector.h"
 #include "linear_solver.h"
 #include "perf_log.h"
 
-#include "rb_base.h"
-#include "rb_theta.h"
-
+// C++ includes
 #include <set>
 
 namespace libMesh
@@ -42,17 +46,15 @@ namespace libMesh
  * the appropriate libMesh System type (e.g. LinearImplicitSystem
  * for standard reduced basis, EigenSystem for SCM)
  * at compile time.
- * We also inherit from RBBase to define a parameter domain
- * and an affine expansion of a PDE.
  *
  * @author David J. Knezevic, 2009
  */
 
 
 // ------------------------------------------------------------
-// RBBaseConstruction class definition
+// RBConstructionBase class definition
 template<class Base>
-class RBBaseConstruction : public Base, public RBBase
+class RBConstructionBase : public Base, public RBParametrizedObject
 {
 public:
 
@@ -60,19 +62,19 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  RBBaseConstruction (EquationSystems& es,
+  RBConstructionBase (EquationSystems& es,
                       const std::string& name,
                       const unsigned int number);
 
   /**
    * Destructor.
    */
-  virtual ~RBBaseConstruction ();
+  virtual ~RBConstructionBase ();
 
   /**
    * The type of system.
    */
-  typedef RBBaseConstruction<Base> sys_type;
+  typedef RBConstructionBase<Base> sys_type;
 
   /**
    * @returns a clever pointer to the system.
@@ -201,6 +203,13 @@ public:
 				const std::pair<std::string,std::string>& orig);
   
   //----------- PUBLIC DATA MEMBERS -----------//
+
+  /**
+   * A pointer to to the object that stores the theta expansion.
+   * This is not an AutoPtr since we may want to share it.
+   * (Note: a shared_ptr would be a good option here.)
+   */
+  RBThetaExpansion* rb_theta_expansion;
 
   /**
    * Boolean flag to indicate whether or not the

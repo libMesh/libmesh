@@ -17,30 +17,31 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "rb_base_construction.h"
+// rbOOmit includes
+#include "rb_construction_base.h"
+
+// libMesh includes
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 #include "equation_systems.h"
 #include "parallel.h"
-
-// For the solver switching stuff.
 #include "petsc_linear_solver.h"
-
 // Includes for template instantiation
 #include "condensed_eigen_system.h"
 #include "linear_implicit_system.h"
 
+// C++ includes
 #include <ctime>
 
 namespace libMesh
 {
 
 // ------------------------------------------------------------
-// RBBaseConstruction implementation
+// RBConstructionBase implementation
 
 
 template <class Base>
-RBBaseConstruction<Base>::RBBaseConstruction (EquationSystems& es,
+RBConstructionBase<Base>::RBConstructionBase (EquationSystems& es,
                                               const std::string& name,
                                               const unsigned int number)
   : Base(es, name, number),
@@ -53,7 +54,7 @@ RBBaseConstruction<Base>::RBBaseConstruction (EquationSystems& es,
 }
 
 template <class Base>
-RBBaseConstruction<Base>::~RBBaseConstruction ()
+RBConstructionBase<Base>::~RBConstructionBase ()
 {
   this->clear();
   
@@ -65,7 +66,7 @@ RBBaseConstruction<Base>::~RBBaseConstruction ()
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::clear ()
+void RBConstructionBase<Base>::clear ()
 {
   // clear the parent data
   Base::clear();
@@ -82,7 +83,7 @@ void RBBaseConstruction<Base>::clear ()
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::set_parameter_range(std::vector<Real> mu_min_in,
+void RBConstructionBase<Base>::set_parameter_range(std::vector<Real> mu_min_in,
                                                    std::vector<Real> mu_max_in)
 {
   libmesh_assert( mu_min_in.size() == get_n_params() &&
@@ -93,7 +94,7 @@ void RBBaseConstruction<Base>::set_parameter_range(std::vector<Real> mu_min_in,
 }
 
 template <class Base>
-Real RBBaseConstruction<Base>::get_parameter_min(unsigned int i) const
+Real RBConstructionBase<Base>::get_parameter_min(unsigned int i) const
 {
   libmesh_assert(i < get_n_params());
 
@@ -101,7 +102,7 @@ Real RBBaseConstruction<Base>::get_parameter_min(unsigned int i) const
 }
 
 template <class Base>
-Real RBBaseConstruction<Base>::get_parameter_max(unsigned int i) const
+Real RBConstructionBase<Base>::get_parameter_max(unsigned int i) const
 {
   libmesh_assert(i < get_n_params());
 
@@ -109,15 +110,15 @@ Real RBBaseConstruction<Base>::get_parameter_max(unsigned int i) const
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::set_current_parameters(const std::vector<Real>& params)
+void RBConstructionBase<Base>::set_current_parameters(const std::vector<Real>& params)
 {
   libmesh_assert( valid_params(params) );
 
-  RBBase::set_current_parameters(params);
+  RBParametrizedObject::set_current_parameters(params);
 }
 
 template <class Base>
-bool RBBaseConstruction<Base>::valid_params(const std::vector<Real>& params)
+bool RBConstructionBase<Base>::valid_params(const std::vector<Real>& params)
 {
   bool valid = ( params.size() == get_n_params() );
 
@@ -138,7 +139,7 @@ bool RBBaseConstruction<Base>::valid_params(const std::vector<Real>& params)
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::init_data ()
+void RBConstructionBase<Base>::init_data ()
 {
   // Initialize the theta expansion object
   rb_theta_expansion = build_rb_theta_expansion().release();
@@ -153,13 +154,13 @@ void RBBaseConstruction<Base>::init_data ()
 }
 
 template <class Base>
-AutoPtr<RBThetaExpansion> RBBaseConstruction<Base>::build_rb_theta_expansion()
+AutoPtr<RBThetaExpansion> RBConstructionBase<Base>::build_rb_theta_expansion()
 {
   return AutoPtr<RBThetaExpansion>(new RBThetaExpansion);
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>& error_pair)
+void RBConstructionBase<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>& error_pair)
 {
   // Set error_pair.second to the maximum global value and also
   // find which processor contains the maximum value
@@ -171,7 +172,7 @@ void RBBaseConstruction<Base>::get_global_max_error_pair(std::pair<unsigned int,
 }
 
 template <class Base>
-std::vector<Real> RBBaseConstruction<Base>::get_training_parameter(unsigned int index) const
+std::vector<Real> RBConstructionBase<Base>::get_training_parameter(unsigned int index) const
 {
   libmesh_assert(training_parameters_initialized);
 
@@ -186,13 +187,13 @@ std::vector<Real> RBBaseConstruction<Base>::get_training_parameter(unsigned int 
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::load_training_parameter_locally(unsigned int index)
+void RBConstructionBase<Base>::load_training_parameter_locally(unsigned int index)
 {
   set_current_parameters( get_training_parameter(index) );
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::load_training_parameter_globally(unsigned int index)
+void RBConstructionBase<Base>::load_training_parameter_globally(unsigned int index)
 {
   libmesh_assert(training_parameters_initialized);
 
@@ -211,7 +212,7 @@ void RBBaseConstruction<Base>::load_training_parameter_globally(unsigned int ind
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::initialize_training_parameters(const std::vector<Real>& mu_min_vector,
+void RBConstructionBase<Base>::initialize_training_parameters(const std::vector<Real>& mu_min_vector,
                                                               const std::vector<Real>& mu_max_vector,
                                                               const unsigned int n_training_samples,
                                                               const std::vector<bool> log_param_scale,
@@ -243,7 +244,7 @@ void RBBaseConstruction<Base>::initialize_training_parameters(const std::vector<
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::load_training_set(std::vector< std::vector<Number> >& new_training_set)
+void RBConstructionBase<Base>::load_training_set(std::vector< std::vector<Number> >& new_training_set)
 {
   // First, make sure that an initial training set has already been
   // generated
@@ -296,7 +297,7 @@ void RBBaseConstruction<Base>::load_training_set(std::vector< std::vector<Number
 
 
 template <class Base>
-void RBBaseConstruction<Base>::generate_training_parameters_random(const std::vector<bool> log_param_scale,
+void RBConstructionBase<Base>::generate_training_parameters_random(const std::vector<bool> log_param_scale,
                                                                    std::vector< NumericVector<Number>* >& training_parameters_in,
                                                                    const unsigned int n_training_samples_in,
                                                                    const std::vector<Real>& min_parameters,
@@ -407,7 +408,7 @@ void RBBaseConstruction<Base>::generate_training_parameters_random(const std::ve
 }
 
 template <class Base>
-void RBBaseConstruction<Base>::generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
+void RBConstructionBase<Base>::generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
                                                                           std::vector< NumericVector<Number>* >& training_parameters_in,
                                                                           const unsigned int n_training_samples_in,
                                                                           const std::vector<Real>& min_parameters,
@@ -585,7 +586,7 @@ void RBBaseConstruction<Base>::generate_training_parameters_deterministic(const 
 
 template <class Base>
 std::pair<std::string,std::string>
-RBBaseConstruction<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
+RBConstructionBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
 {
   // It seems that setting it this generic way has no effect...
   // PreconditionerType orig_pc = this->linear_solver->preconditioner_type();
@@ -667,7 +668,7 @@ RBBaseConstruction<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >&
 
 
 template <class Base>
-void RBBaseConstruction<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
+void RBConstructionBase<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
 					                const std::pair<std::string,std::string>& orig)
 {
 #ifdef LIBMESH_HAVE_PETSC
@@ -703,9 +704,9 @@ void RBBaseConstruction<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Num
 
 // EigenSystem is only defined if we have SLEPc
 #if defined(LIBMESH_HAVE_SLEPC)
-template class RBBaseConstruction<CondensedEigenSystem>;
+template class RBConstructionBase<CondensedEigenSystem>;
 #endif
 
-template class RBBaseConstruction<LinearImplicitSystem>;
+template class RBConstructionBase<LinearImplicitSystem>;
 
 } // namespace libMesh
