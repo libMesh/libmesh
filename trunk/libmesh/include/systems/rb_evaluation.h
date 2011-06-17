@@ -20,8 +20,11 @@
 #ifndef __rb_evaluation_h__
 #define __rb_evaluation_h__
 
-#include "rb_base.h"
-#include "reference_counted_object.h"
+// rbOOmit includes
+#include "rb_parametrized_object.h"
+#include "rb_theta_expansion.h"
+
+// libMesh includes
 #include "dense_matrix.h"
 #include "dense_vector.h"
 
@@ -34,8 +37,8 @@ template <typename T> class NumericVector;
 /**
  * This class is part of the rbOOmit framework.
  *
- * RBEvaluation encapsulates the code and data that
- * depends on a particular reduced basis space.
+ * RBEvaluation encapsulates the functionality required
+ * to _evaluate_ a given reduced basis model.
  *
  * @author David J. Knezevic, 2011
  */
@@ -43,7 +46,7 @@ template <typename T> class NumericVector;
 // ------------------------------------------------------------
 // RBEvaluation class definition
 
-class RBEvaluation : public RBBase, public ReferenceCountedObject<RBEvaluation>
+class RBEvaluation : public RBParametrizedObject
 {
 public:
 
@@ -165,6 +168,13 @@ public:
                                        const bool read_binary_basis_functions = true);
   
   //----------- PUBLIC DATA MEMBERS -----------//
+
+  /**
+   * A pointer to to the object that stores the theta expansion.
+   * This is not an AutoPtr since we may want to share it.
+   * (Note: a shared_ptr would be a good option here.)
+   */
+  RBThetaExpansion* rb_theta_expansion;
 
   /**
    * The libMesh vectors storing the finite element coefficients

@@ -74,8 +74,7 @@ RBConstruction::RBConstruction (EquationSystems& es,
     output_dual_norms_computed(false),
     Fq_representor_norms_computed(false),
     training_tolerance(-1.),
-    _dirichlet_list_init(NULL),
-    RB_construction_initialized(false)
+    _dirichlet_list_init(NULL)
 {
   // Clear the theta and assembly vectors so that we can push_back
   A_q_assembly_vector.clear();
@@ -304,8 +303,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   }
   libMesh::out << std::endl;
 
-  // We need Nmax to be initialized
-  libmesh_assert(Nmax > 0);
 }
 
 void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
@@ -339,8 +336,6 @@ void RBConstruction::initialize_RB_construction(RBEvaluation* rb_eval_in)
   {
     initialize_rb_eval( *rb_eval_in );
   }
-
-  RB_construction_initialized = true;
 }
 
 void RBConstruction::assemble_affine_expansion()

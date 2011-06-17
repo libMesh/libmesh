@@ -20,12 +20,15 @@
 #ifndef __rb_construction_h__
 #define __rb_construction_h__
 
+// rbOOmit includes
+#include "rb_construction_base.h"
+#include "rb_evaluation.h"
+
+// libMesh includes
 #include "linear_implicit_system.h"
 #include "dense_vector.h"
 #include "dense_matrix.h"
-#include "rb_base_construction.h"
 #include "fem_context.h"
-#include "rb_evaluation.h"
 #include "elem_assembly.h"
 
 namespace libMesh
@@ -57,7 +60,7 @@ public:
 // ------------------------------------------------------------
 // RBConstruction class definition
 
-class RBConstruction : public RBBaseConstruction<LinearImplicitSystem>
+class RBConstruction : public RBConstructionBase<LinearImplicitSystem>
 {
 public:
 
@@ -87,7 +90,7 @@ public:
   /**
    * The type of the parent.
    */
-  typedef RBBaseConstruction<LinearImplicitSystem> Parent;
+  typedef RBConstructionBase<LinearImplicitSystem> Parent;
 
   /**
    * Clear all the data structures associated with
@@ -791,11 +794,6 @@ private:
    * Assembly object that is used to initialize the list of Dirichlet dofs.
    */
   DirichletDofAssembly* _dirichlet_list_init;
-
-  /**
-   * Boolean flag to indicate whether the RBConstruction has been initialized.
-   */
-  bool RB_construction_initialized;
 
 };
 
