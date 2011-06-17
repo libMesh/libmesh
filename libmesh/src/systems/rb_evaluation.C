@@ -38,7 +38,6 @@ namespace libMesh
 
 RBEvaluation::RBEvaluation ()
   :
-  multiple_files_for_outputs(true),
   evaluate_RB_error_bound(true),
   return_rel_error_bound(false),
   compute_RB_inner_product(false)
@@ -481,68 +480,64 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       output_dual_norms_out.close();
     }
 
-    if(multiple_files_for_outputs)
-    {
-      // Write out output data to multiple files
-      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-      {
-        for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
-        {
-          std::ofstream output_n_out;
-          {
-            OStringStream file_name;
-            file_name << directory_name << "/output_";
-            OSSRealzeroright(file_name,3,0,n);
-            file_name << "_";
-            OSSRealzeroright(file_name,3,0,q_l);
-            file_name << ".dat";
-            output_n_out.open(file_name.str().c_str());
-          }
-          if( !output_n_out.good() )
-          {
-            libMesh::err << "Error opening output file for output " << n << std::endl;
-            libmesh_error();
-          }
-          output_n_out.precision(precision_level);
 
-          for(unsigned int j=0; j<n_bfs; j++)
-          {
-            output_n_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
-          }
-          output_n_out.close();
+    // Write out output data to multiple files
+    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+    {
+      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+      {
+        std::ofstream output_n_out;
+        {
+          OStringStream file_name;
+          file_name << directory_name << "/output_";
+          OSSRealzeroright(file_name,3,0,n);
+          file_name << "_";
+          OSSRealzeroright(file_name,3,0,q_l);
+          file_name << ".dat";
+          output_n_out.open(file_name.str().c_str());
         }
+        if( !output_n_out.good() )
+        {
+          libMesh::err << "Error opening output file for output " << n << std::endl;
+          libmesh_error();
+        }
+        output_n_out.precision(precision_level);
+
+        for(unsigned int j=0; j<n_bfs; j++)
+        {
+          output_n_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
+        }
+        output_n_out.close();
       }
     }
-    else
-    {
-      // Write out output data to a single file
-      // If we have a large number of outputs, then the IO is much faster
-      // if we store the data in a single file.
-      std::ofstream output_out;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/outputs.dat";
-        output_out.open(file_name.str().c_str());
-      }
-      if( !output_out.good() )
-      {
-        libMesh::err << "Error opening outputs.dat" << std::endl;
-        libmesh_error();
-      }
 
-      output_out.precision(precision_level);
-      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-      {
-        for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
-        {
-          for(unsigned int j=0; j<n_bfs; j++)
-          {
-            output_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
-          }
-        }
-      }
-      output_out.close();
-    }
+//      // Write out output data to a single file
+//      // If we have a large number of outputs, then the IO is much faster
+//      // if we store the data in a single file.
+//      std::ofstream output_out;
+//      {
+//        OStringStream file_name;
+//        file_name << directory_name << "/outputs.dat";
+//        output_out.open(file_name.str().c_str());
+//      }
+//      if( !output_out.good() )
+//      {
+//        libMesh::err << "Error opening outputs.dat" << std::endl;
+//        libmesh_error();
+//      }
+//
+//      output_out.precision(precision_level);
+//      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+//      {
+//        for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+//        {
+//          for(unsigned int j=0; j<n_bfs; j++)
+//          {
+//            output_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
+//          }
+//        }
+//      }
+//      output_out.close();
     
     if(compute_RB_inner_product)
     {
@@ -767,69 +762,65 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     output_dual_norms_in.close();
   }
 
-  if(multiple_files_for_outputs)
-  {
-    // Read in output data in multiple files
-    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-    {
-      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
-      {
-        std::ifstream output_n_in;
-        {
-          OStringStream file_name;
-          file_name << directory_name << "/output_";
-          OSSRealzeroright(file_name,3,0,n);
-          file_name << "_";
-          OSSRealzeroright(file_name,3,0,q_l);
-          file_name << ".dat";
-          output_n_in.open(file_name.str().c_str());
-        }
-        if( !output_n_in.good() )
-        {
-          libMesh::err << "Error opening input file for output " << n << std::endl;
-          libmesh_error();
-        }
 
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          Number  value;
-          output_n_in >> value;
-          RB_output_vectors[n][q_l](j) = value;
-        }
-        output_n_in.close();
+  // Read in output data in multiple files
+  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+  {
+    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+    {
+      std::ifstream output_n_in;
+      {
+        OStringStream file_name;
+        file_name << directory_name << "/output_";
+        OSSRealzeroright(file_name,3,0,n);
+        file_name << "_";
+        OSSRealzeroright(file_name,3,0,q_l);
+        file_name << ".dat";
+        output_n_in.open(file_name.str().c_str());
       }
+      if( !output_n_in.good() )
+      {
+        libMesh::err << "Error opening input file for output " << n << std::endl;
+        libmesh_error();
+      }
+
+      for(unsigned int j=0; j<n_bfs; j++)
+      {
+        Number  value;
+        output_n_in >> value;
+        RB_output_vectors[n][q_l](j) = value;
+      }
+      output_n_in.close();
     }
   }
-  else
-  {
-    // If we have a large number of outputs, then the IO is much faster
-    // if we store the data in a single file.
 
-    std::ifstream output_in;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/outputs.dat";
-      output_in.open(file_name.str().c_str());
-    }
-    if( !output_in.good() )
-    {
-      libMesh::err << "Error opening outputs.dat" << std::endl;
-      libmesh_error();
-    }
-    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-    {
-      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
-      {
-        for(unsigned int j=0; j<n_bfs; j++)
-        {
-          Number value;
-          output_in >> value;
-          RB_output_vectors[n][q_l](j) = value;
-        }
-      }
-    }
-    output_in.close();
-  }
+//    // If we have a large number of outputs, then the IO is much faster
+//    // if we store the data in a single file.
+//
+//    std::ifstream output_in;
+//    {
+//      OStringStream file_name;
+//      file_name << directory_name << "/outputs.dat";
+//      output_in.open(file_name.str().c_str());
+//    }
+//    if( !output_in.good() )
+//    {
+//      libMesh::err << "Error opening outputs.dat" << std::endl;
+//      libmesh_error();
+//    }
+//    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+//    {
+//      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+//      {
+//        for(unsigned int j=0; j<n_bfs; j++)
+//        {
+//          Number value;
+//          output_in >> value;
+//          RB_output_vectors[n][q_l](j) = value;
+//        }
+//      }
+//    }
+//    output_in.close();
   
   if(compute_RB_inner_product)
   {
