@@ -256,14 +256,6 @@ public:
    * the F_q_representors are stored in RBSystem.
    */
   std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
-
-  /**
-   * Boolean to indicate whether we store the data for evaluating RB outputs
-   * in the Online stage in multiple files or in a single file.
-   * If we have a large number of outputs, then the IO can be much faster
-   * if we use a single file.
-   */
-  bool multiple_files_for_outputs;
   
   /**
    * Boolean to indicate whether we evaluate a posteriori error bounds
