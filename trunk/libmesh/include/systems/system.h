@@ -442,7 +442,7 @@ public:
    * which system type to use when reading equation system
    * data from file.  Should be overloaded in derived classes.
    */
-  virtual std::string system_type () const { return "BasicSystem"; }
+  virtual std::string system_type () const { return "Basic"; }
 
   /**
    * Projects the continuous functions onto the current solution. 
