@@ -148,6 +148,12 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
   MeshSerializer(const_cast<MeshBase&>(_mesh), boundary_mesh.is_serial());
 
   /**
+   * The boundary mesh elements will be one lower dimension than the
+   * interior mesh elements
+   */
+  boundary_mesh.set_mesh_dimension(_mesh.mesh_dimension() - 1);
+
+  /**
    * Re-create the boundary mesh.
    */
 
