@@ -276,7 +276,8 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   libMesh::out << "n_outputs: " << rb_theta_expansion->get_n_outputs() << std::endl;
   for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     libMesh::out << "output " << n << ", Q_l = " << rb_theta_expansion->get_Q_l(n) << std::endl;
-  for(unsigned int i=0; i<n_parameters; i++)
+  libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
+  for(unsigned int i=0; i<get_n_params(); i++)
   {
     libMesh::out <<   "Parameter " << i
                  << ": Min = " << get_parameter_min(i)
