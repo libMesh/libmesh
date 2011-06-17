@@ -337,7 +337,7 @@ System & EquationSystems::add_system (const std::string& sys_type,
       return this->get_system(name);
     }
   // Build a basic System
-  else if (sys_type == "BasicSystem")
+  else if (sys_type == "Basic")
     this->add_system<System> (name);
 
   // Build a Newmark system
