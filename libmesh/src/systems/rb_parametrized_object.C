@@ -48,8 +48,6 @@ void RBParametrizedObject::set_n_params(unsigned int n_params_in)
 
 void RBParametrizedObject::set_current_parameters(const std::vector<Real>& params)
 {
-  libmesh_assert(params.size() == get_n_params());
-
   current_parameters = params;
 }
 
