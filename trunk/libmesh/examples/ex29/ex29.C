@@ -70,11 +70,17 @@ int main (int argc, char** argv)
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
 
+  std::cout << "Triangulating an L-shaped domain with holes" << std::endl;
+
   // 1.) 2D triangulation of L-shaped domain with three holes of different shape
   triangulate_domain();
   
+  std::cout << "Tetrahedralizing a prism domain with a spherical hole" << std::endl;
+
   // 2.) 3D tetrahedralization of rectangular domain with spherical hole
-  tetrahedralize_domain();
+  // Disabling this for now - I get an infinite loop in tetgen.C  (in
+  // two different places with two different tetgen versions...) - RHS
+  // tetrahedralize_domain();
   
   return 0;
 }
@@ -285,9 +291,6 @@ void add_sphere_surface_points_to_mesh(MeshBase& mesh,
 	if ( boundary_node_ids.find(node->id()) != boundary_node_ids.end() )
 	  {
 	    mesh.add_point (*node + sphere_center);
-
-	    // Debugging
-	    // std::cout << "Adding point: " << (*node + translation_vector);
 	  }
       }
   }
