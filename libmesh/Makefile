@@ -250,7 +250,7 @@ TODO:
 # Dependencies
 #
 .depend: $(srcfiles) $(appsrcfiles) $(csrcfiles) $(headerfiles)
-	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) $(appsrcfiles) $(csrcfiles) > .depend
+	@$(perl) ./contrib/bin/make_dependencies.pl $(foreach i, $(wildcard include/*/ contrib/*/ contrib/*/*/), -I./$(i)) "-S\$$(obj-suffix)" $(srcfiles) $(appsrcfiles) $(csrcfiles) > .depend
 
 
 
