@@ -70,12 +70,16 @@ int main (int argc, char** argv)
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
 
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+
   std::cout << "Triangulating an L-shaped domain with holes" << std::endl;
 
   // 1.) 2D triangulation of L-shaped domain with three holes of different shape
   triangulate_domain();
   
-  std::cout << "Tetrahedralizing a prism domain with a spherical hole" << std::endl;
+  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
+
+  //std::cout << "Tetrahedralizing a prism domain with a spherical hole" << std::endl;
 
   // 2.) 3D tetrahedralization of rectangular domain with spherical hole
   // Disabling this for now - I get an infinite loop in tetgen.C  (in
