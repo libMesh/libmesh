@@ -308,8 +308,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 
 void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
 {
-  // Copy parameter information over
-  rb_evaluation_in.set_n_params( get_n_params() );
+  // Copy parameter over
   rb_evaluation_in.set_current_parameters( get_current_parameters() );
 
   // Copy boolean flags over
