@@ -260,15 +260,11 @@ public:
   SparseMatrix<Number>* get_non_dirichlet_A_q(unsigned int q);
 
   /**
-   * Parse the input file "parameters_filename" and allocate
-   * all the data structures necessary for the construction
+   * Allocate all the data structures necessary for the construction
    * stage of the RB method. This function also performs
    * matrix and vector assembly of the "truth" affine expansion.
-   *
-   * Also, set this->rb_eval = rb_eval_in, and initialize it
-   * based on the settings of this system.
    */
-  virtual void initialize_RB_construction(RBEvaluation* rb_eval_in);
+  virtual void initialize_rb_construction();
 
   /**
    * Get a pointer to F_q.
@@ -464,7 +460,7 @@ public:
   bool reuse_preconditioner;
 
   /**
-   * Boolean flag to indicate whether RB_solve returns an absolute
+   * Boolean flag to indicate whether rb_solve returns an absolute
    * or relative error bound. True => relative, false => absolute.
    * This flag is passed on to specific RBEvaluation objects.
    */
@@ -512,10 +508,10 @@ public:
 
   /**
    * A boolean flag to indicate whether or not we initialize the
-   * Greedy algorithm by performing RB_solves on the training set
+   * Greedy algorithm by performing rb_solves on the training set
    * with an "empty" (i.e. N=0) reduced basis space.
    */
-  bool use_empty_RB_solve_in_greedy;
+  bool use_empty_rb_solve_in_greedy;
 
 protected:
   

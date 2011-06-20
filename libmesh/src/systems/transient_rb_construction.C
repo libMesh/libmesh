@@ -1137,7 +1137,7 @@ void TransientRBConstruction::enrich_RB_space()
 
 	  // We need to define the updated RB system matrices before the RB solve
 	  update_system();
-	  Real error_bound = rb_eval->RB_solve(rb_eval->get_n_basis_functions());
+	  Real error_bound = rb_eval->rb_solve(rb_eval->get_n_basis_functions());
 
 	  if ( (error_bound <= POD_tol) || (rb_eval->get_n_basis_functions()==get_Nmax()) )
 	    {

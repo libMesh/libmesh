@@ -152,7 +152,7 @@ public:
    * with the N basis functions. Overridden
    * to perform a time-dependent solve.
    */
-  virtual Real RB_solve(unsigned int N);
+  virtual Real rb_solve(unsigned int N);
 
   /**
    * Specifies the residual scaling on the numerator to
@@ -223,13 +223,13 @@ public:
 
   /**
    * The RB outputs for all time-levels from the
-   * most recent RB_solve.
+   * most recent rb_solve.
    */
   std::vector< std::vector<Number> > RB_outputs_all_k;
 
   /**
    * The error bounds for each RB output for all
-   * time-levels from the most recent RB_solve.
+   * time-levels from the most recent rb_solve.
    */
   std::vector< std::vector<Real> > RB_output_error_bounds_all_k;
 
@@ -245,7 +245,7 @@ public:
 
   /**
    * The error bound data for all time-levels from the
-   * most recent RB_solve.
+   * most recent rb_solve.
    */
   std::vector< Real > error_bound_all_k;
 

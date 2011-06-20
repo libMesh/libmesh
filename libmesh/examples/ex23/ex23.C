@@ -164,12 +164,17 @@ int main (int argc, char** argv)
   // "Offline" and "Online" stages.
   AutoPtr<RBEvaluation> rb_eval = system.build_rb_evaluation();
 
+  // We also need to initialize the RBEvaluation object. We will do
+  // this by copying details of the problem definiton over from system
+  // (this also sets system.rb_eval = rb_eval)
+  system.initialize_rb_eval(*rb_eval);
+
   if(!online_mode) // Perform the Offline stage of the RB method
   {
     // Prepare system for the Construction stage of the RB method.
     // This sets up the necessary data structures and performs
     // initial assembly of the "truth" affine expansion of the PDE.
-    system.initialize_RB_construction(rb_eval.get());
+    system.initialize_rb_construction();
 
     // Compute the reduced basis space by computing "snapshots", i.e.
     // "truth" solves, at well-chosen parameter values and employing
@@ -187,9 +192,6 @@ int main (int argc, char** argv)
   }
   else // Perform the Online stage of the RB method
   {
-    // Use system to initialize rb_eval
-    system.initialize_rb_eval(*rb_eval);
-
     // Read in the reduced basis data
     rb_eval->read_offline_data_from_files();
     
@@ -206,7 +208,7 @@ int main (int argc, char** argv)
     rb_eval->print_current_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
-    rb_eval->RB_solve(online_N);
+    rb_eval->rb_solve(online_N);
 
     // Print out outputs as well as the corresponding output error bounds.
     std::cout << "output 1, value = " << rb_eval->RB_outputs[0]
