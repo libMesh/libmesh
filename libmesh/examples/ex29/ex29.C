@@ -72,10 +72,6 @@ int main (int argc, char** argv)
 
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
-  // Triangle is supposed to support non-double precision, but it hits
-  // segfaults or infinite loops when we try it on this example
-  libmesh_example_assert(LIBMESH_DEFAULT_DOUBLE_PRECISION, "default (double) precision");
-
   std::cout << "Triangulating an L-shaped domain with holes" << std::endl;
 
   // 1.) 2D triangulation of L-shaped domain with three holes of different shape
