@@ -1,3 +1,9 @@
+
+ * Modifed Triangle - this version has been altered for compatibility
+ * with libMesh non-double precision options.
+
+
+
 Triangle
 A Two-Dimensional Quality Mesh Generator and Delaunay Triangulator.
 Version 1.6

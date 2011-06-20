@@ -1,3 +1,9 @@
+/*
+ * Modifed Triangle - this version has been altered for compatibility
+ * with libMesh non-double precision options.
+ */
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*      888888888        ,o,                          / 888                  */
