@@ -65,7 +65,7 @@ RBConstruction::RBConstruction (EquationSystems& es,
     compute_RB_inner_product(false),
     store_non_dirichlet_operators(false),
     enforce_constraints_exactly(false),
-    use_empty_RB_solve_in_greedy(true),
+    use_empty_rb_solve_in_greedy(true),
     Nmax(0),
     delta_N(1),
     quiet_mode(true),
@@ -201,7 +201,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
                                 reuse_preconditioner);
 
   // Tell the system whether or not to return a relative error bound
-  // from each call to RB_solve
+  // from each call to rb_solve
   return_rel_error_bound = infile("return_rel_error_bound",
                                   return_rel_error_bound);
 
@@ -288,7 +288,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   libMesh::out << "using deterministic training samples? " << deterministic_training << std::endl;
   libMesh::out << "low-memory mode? " << low_memory_mode << std::endl;
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
-  libMesh::out << "return a relative error bound from RB_solve? " << return_rel_error_bound << std::endl;
+  libMesh::out << "return a relative error bound from rb_solve? " << return_rel_error_bound << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
   libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
@@ -325,17 +325,10 @@ void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
   this->rb_eval = &rb_evaluation_in;
 }
 
-void RBConstruction::initialize_RB_construction(RBEvaluation* rb_eval_in)
+void RBConstruction::initialize_rb_construction()
 {
   allocate_data_structures();
   assemble_affine_expansion();
-
-  // If rb_eval_in != NULL, set this->rb_eval to rb_eval_in
-  // and initialize it based on the settings of this system
-  if(rb_eval_in)
-  {
-    initialize_rb_eval( *rb_eval_in );
-  }
 }
 
 void RBConstruction::assemble_affine_expansion()
@@ -1101,7 +1094,7 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name)
     libMesh::out << std::endl << "---- Basis dimension: "
                  << rb_eval->get_n_basis_functions() << " ----" << std::endl;
 
-    if( count > 0 || (count==0 && use_empty_RB_solve_in_greedy) )
+    if( count > 0 || (count==0 && use_empty_rb_solve_in_greedy) )
     {
       libMesh::out << "Performing RB solves on training set" << std::endl;
       training_greedy_error = compute_max_error_bound();
@@ -1395,7 +1388,7 @@ Real RBConstruction::get_RB_error_bound()
 {
   rb_eval->set_current_parameters( get_current_parameters() );
 
-  return rb_eval->RB_solve(rb_eval->get_n_basis_functions());
+  return rb_eval->rb_solve(rb_eval->get_n_basis_functions());
 }
 
 void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)

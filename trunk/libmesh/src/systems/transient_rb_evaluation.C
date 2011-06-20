@@ -146,14 +146,14 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax)
   STOP_LOG("resize_data_structures()", "TransientRBEvaluation");
 }
 
-Real TransientRBEvaluation::RB_solve(unsigned int N)
+Real TransientRBEvaluation::rb_solve(unsigned int N)
 {
-  START_LOG("RB_solve()", "TransientRBEvaluation");
+  START_LOG("rb_solve()", "TransientRBEvaluation");
 
   if(N > get_n_basis_functions())
   {
     libMesh::err << "ERROR: N cannot be larger than the number "
-                 << "of basis functions in RB_solve" << std::endl;
+                 << "of basis functions in rb_solve" << std::endl;
     libmesh_error();
   }
 
@@ -348,14 +348,14 @@ Real TransientRBEvaluation::RB_solve(unsigned int N)
     RB_L2_matrix_N.vector_mult(RB_rhs, RB_solution);
     Real final_RB_L2_norm = libmesh_real(std::sqrt(RB_solution.dot(RB_rhs)));
 
-    STOP_LOG("RB_solve()", "TransientRBEvaluation");
+    STOP_LOG("rb_solve()", "TransientRBEvaluation");
 
     return ( return_rel_error_bound ? error_bound_all_k[n_time_steps]/final_RB_L2_norm :
                                       error_bound_all_k[n_time_steps] );
   }
   else // Don't calculate the error bounds
   {
-    STOP_LOG("RB_solve()", "TransientRBEvaluation");
+    STOP_LOG("rb_solve()", "TransientRBEvaluation");
     // Just return -1. if we did not compute the error bound
     return -1.;
   }
@@ -495,7 +495,7 @@ Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
   START_LOG("compute_residual_dual_norm()", "TransientRBEvaluation");
 
   // This assembly assumes we have already called cache_online_residual_terms
-  // and that the RB_solve parameter is constant in time
+  // and that the rb_solve parameter is constant in time
 
   const Real dt          = temporal_discretization.get_delta_t();
   const Real euler_theta = temporal_discretization.get_euler_theta();

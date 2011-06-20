@@ -53,19 +53,19 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   extra_interpolation_matrix_row.resize(Nmax);
 }
 
-Real RBEIMEvaluation::RB_solve(unsigned int N)
+Real RBEIMEvaluation::rb_solve(unsigned int N)
 {
-  START_LOG("RB_solve()", "RBEIMEvaluation");
+  START_LOG("rb_solve()", "RBEIMEvaluation");
 
   if(N > get_n_basis_functions())
   {
     libMesh::err << "ERROR: N cannot be larger than the number "
-                 << "of basis functions in RB_solve" << std::endl;
+                 << "of basis functions in rb_solve" << std::endl;
     libmesh_error();
   }
   if(N==0)
   {
-    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
     libmesh_error();
   }
   
@@ -114,31 +114,31 @@ Real RBEIMEvaluation::RB_solve(unsigned int N)
       
     Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
 
-    STOP_LOG("RB_solve()", "RBEIMEvaluation");
+    STOP_LOG("rb_solve()", "RBEIMEvaluation");
   
     return error_estimate;
   }
   else // Don't evaluate an error bound
   {
-    STOP_LOG("RB_solve()", "RBEIMEvaluation");
+    STOP_LOG("rb_solve()", "RBEIMEvaluation");
     return -1.;
   }
 
 }
 
-void RBEIMEvaluation::RB_solve(DenseVector<Number>& EIM_rhs)
+void RBEIMEvaluation::rb_solve(DenseVector<Number>& EIM_rhs)
 {
-  START_LOG("RB_solve()", "RBEIMEvaluation");
+  START_LOG("rb_solve()", "RBEIMEvaluation");
   
   if(EIM_rhs.size() > get_n_basis_functions())
   {
     libMesh::err << "ERROR: N cannot be larger than the number "
-                 << "of basis functions in RB_solve" << std::endl;
+                 << "of basis functions in rb_solve" << std::endl;
     libmesh_error();
   }
   if(EIM_rhs.size()==0)
   {
-    libMesh::err << "ERROR: N must be greater than 0 in RB_solve" << std::endl;
+    libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
     libmesh_error();
   }
   
@@ -148,7 +148,7 @@ void RBEIMEvaluation::RB_solve(DenseVector<Number>& EIM_rhs)
   
   interpolation_matrix_N.lu_solve(EIM_rhs, RB_solution);
   
-  STOP_LOG("RB_solve()", "RBEIMEvaluation");
+  STOP_LOG("rb_solve()", "RBEIMEvaluation");
 }
 
 AutoPtr<RBTheta> RBEIMEvaluation::build_rb_eim_theta(unsigned int index)

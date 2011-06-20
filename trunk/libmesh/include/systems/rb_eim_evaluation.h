@@ -74,14 +74,14 @@ public:
    * solution coefficients in the member RB_solution.
    * @return the EIM a posteriori error bound.
    */
-  virtual Real RB_solve(unsigned int N);
+  virtual Real rb_solve(unsigned int N);
   
   /**
    * Calculate the EIM approximation for the given
    * right-hand side vector \p EIM_rhs. Store the
    * solution coefficients in the member RB_solution.
    */
-  void RB_solve(DenseVector<Number>& EIM_rhs);
+  void rb_solve(DenseVector<Number>& EIM_rhs);
 
   /**
    * Build a new RBTheta object that accesses the i^th component

@@ -54,7 +54,7 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
     performing_extra_greedy_step(false),
     current_bf_index(0)
 {
-  use_empty_RB_solve_in_greedy = false;
+  use_empty_rb_solve_in_greedy = false;
 }
 
 RBEIMConstruction::~RBEIMConstruction ()
@@ -113,9 +113,9 @@ void RBEIMConstruction::process_parameters_file (const std::string& parameters_f
   libMesh::out << std::endl;
 }
 
-void RBEIMConstruction::initialize_RB_construction(RBEvaluation* rb_evaluation_in)
+void RBEIMConstruction::initialize_rb_construction()
 {
-  Parent::initialize_RB_construction(rb_evaluation_in);
+  Parent::initialize_rb_construction();
 
   // initialize a serial vector that we will use for MeshFunction evaluations
   serialized_vector = NumericVector<Number>::build();
@@ -246,7 +246,7 @@ void RBEIMConstruction::enrich_RB_space()
   RBEIMEvaluation* eim_eval = libmesh_cast_ptr<RBEIMEvaluation*>(rb_eval);
 
   // If we have at least one basis function we need to use
-  // RB_solve, otherwise just use new_bf as is
+  // rb_solve, otherwise just use new_bf as is
   if(rb_eval->get_n_basis_functions() > 0)
   {
     // get the right-hand side vector for the EIM approximation
@@ -260,7 +260,7 @@ void RBEIMConstruction::enrich_RB_space()
     }
 
     eim_eval->set_current_parameters( get_current_parameters() );
-    eim_eval->RB_solve(EIM_rhs);
+    eim_eval->rb_solve(EIM_rhs);
 
     // Load the "EIM residual" into solution by subtracting
     // the EIM approximation
@@ -390,7 +390,7 @@ Real RBEIMConstruction::compute_best_fit_error()
       // Turn off error estimation here, we use the linfty norm instead
       rb_eval->evaluate_RB_error_bound = false;
       rb_eval->set_current_parameters( get_current_parameters() );
-      rb_eval->RB_solve(RB_size);
+      rb_eval->rb_solve(RB_size);
       rb_eval->evaluate_RB_error_bound = true;
       break;
     }

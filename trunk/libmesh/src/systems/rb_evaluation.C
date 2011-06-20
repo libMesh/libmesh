@@ -175,14 +175,14 @@ NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)
   return *(basis_functions[i]);
 }
 
-Real RBEvaluation::RB_solve(unsigned int N)
+Real RBEvaluation::rb_solve(unsigned int N)
 {
-  START_LOG("RB_solve()", "RBEvaluation");
+  START_LOG("rb_solve()", "RBEvaluation");
 
   if(N > get_n_basis_functions())
   {
     libMesh::err << "ERROR: N cannot be larger than the number "
-                 << "of basis functions in RB_solve" << std::endl;
+                 << "of basis functions in rb_solve" << std::endl;
     libmesh_error();
   }
   
@@ -256,12 +256,12 @@ Real RBEvaluation::RB_solve(unsigned int N)
     // Compute the norm of RB_solution
     Real RB_solution_norm = RB_solution.l2_norm();
 
-    STOP_LOG("RB_solve()", "RBEvaluation");
+    STOP_LOG("rb_solve()", "RBEvaluation");
     return ( return_rel_error_bound ? abs_error_bound/RB_solution_norm : abs_error_bound );
   }
   else // Don't calculate the error bounds
   {
-    STOP_LOG("RB_solve()", "RBEvaluation");
+    STOP_LOG("rb_solve()", "RBEvaluation");
     // Just return -1. if we did not compute the error bound
     return -1.;
   }

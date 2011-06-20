@@ -88,7 +88,7 @@ public:
    * still obtain a meaningful error bound associated with the
    * forcing terms.
    */
-  virtual Real RB_solve(unsigned int N);
+  virtual Real rb_solve(unsigned int N);
 
   /**
    * Compute the dual norm of the residual for the solution
@@ -259,12 +259,12 @@ public:
   
   /**
    * Boolean to indicate whether we evaluate a posteriori error bounds
-   * when RB_solve is called.
+   * when rb_solve is called.
    */
   bool evaluate_RB_error_bound;
 
   /**
-   * Boolean flag to indicate whether RB_solve returns an absolute
+   * Boolean flag to indicate whether rb_solve returns an absolute
    * or relative error bound. True => relative, false => absolute.
    */
   bool return_rel_error_bound;
