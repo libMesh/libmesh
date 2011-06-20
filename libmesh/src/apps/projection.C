@@ -151,6 +151,8 @@ int main(int argc, char** argv)
       System &old_sys = old_es.get_system(i);
       current_sys_name = old_sys.name();
 
+      std::cout << "Projecting system " << current_sys_name << std::endl;
+
       libmesh_assert (new_es.has_system(current_sys_name));
 
       System &new_sys = new_es.get_system(current_sys_name);
@@ -168,6 +170,8 @@ int main(int argc, char** argv)
       // variable's value
       for (unsigned int j = 0; j != n_vars; ++j)
         {
+          std::cout << " with variable " << old_sys.variable_name(j) << std::endl;
+
           MeshFunction *mesh_func =
             new MeshFunction(old_es, *comparison_soln,
                              old_sys.get_dof_map(), j);
