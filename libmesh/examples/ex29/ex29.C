@@ -94,6 +94,7 @@ int main (int argc, char** argv)
 
 void triangulate_domain()
 {
+#ifdef LIBMESH_HAVE_TRIANGLE
   // Use typedefs for slightly less typing.
   typedef TriangleInterface::Hole Hole;
   typedef TriangleInterface::PolygonHole PolygonHole;
@@ -168,12 +169,15 @@ void triangulate_domain()
 
   // Write the result to file
   mesh.write("delaunay_l_shaped_hole.e");
+
+#endif // LIBMESH_HAVE_TRIANGLE
 }
 
 
 
 void tetrahedralize_domain()
 {
+#ifdef LIBMESH_HAVE_TETGEN
   // The algorithm is broken up into N steps: we must generate a convex hull
   // of TRI3 surfaces defining the boundary before we can tetrahedralize its
   // interior.
@@ -241,6 +245,8 @@ void tetrahedralize_domain()
   
   // Finally, write out the result
   mesh.write("sphere_hole.e");
+
+#endif // LIBMESH_HAVE_TETGEN
 }
 
 
