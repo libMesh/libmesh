@@ -184,7 +184,7 @@ int main (int argc, char** argv)
     // Write out the data that will subsequently be required for the Evaluation stage
     system.rb_eval->write_offline_data_to_files();
     
-    // If request, write out the RB basis functions for visualization purposes
+    // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
       system.rb_eval->write_out_basis_functions(system);
@@ -246,3 +246,4 @@ int main (int argc, char** argv)
 
   return 0;
 }
+
