@@ -144,6 +144,11 @@ public:
   const sys_type & system () const { return _system; }
 
   /**
+   * @returns a writeable reference to the system we are solving.
+   */
+  sys_type & system () { return _system; }
+  
+  /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
   virtual AutoPtr<DiffSolver> &diff_solver() { return _diff_solver; }
@@ -198,11 +203,6 @@ protected:
    */
   AutoPtr<LinearSolver<Number> > _linear_solver;
 
-  /**
-   * @returns a writeable reference to the system we are solving.
-   */
-  sys_type & system () { return _system; }
-  
   /**
    * A reference to the system we are solving.
    */
