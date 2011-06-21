@@ -45,6 +45,12 @@ class ParametrizedFunction
 public:
 
   /**
+   * Virtual evaluate() gives us a vtable, so there's no cost in adding a
+   * virtual destructor for safety's sake.
+   */
+  virtual ~ParametrizedFunction() {}
+
+  /**
    * Evaluate this parametrized function for the parameter value
    * \p mu at the point \p p.
    */
