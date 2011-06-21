@@ -24,12 +24,12 @@
 #ifndef NDEBUG
 // TODO: icpc options
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
-#if __GNUC__ > 3
+#if __GNUC__ > 3 && __GNUC_MINOR__ > 1
 // These two don't work?
 #pragma GCC diagnostic ignored "-pedantic"
 #pragma GCC diagnostic ignored "-Wdeprecated" 
 // But this is helpful with some MPI stacks
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif //__GNUC__ > 3
+#endif //__GNUC__ > 3 && __GNUC_MINOR__ > 1
 #endif // __GNUC__ && !__INTEL_COMPILER
 #endif // NDEBUG
