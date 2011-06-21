@@ -47,7 +47,11 @@ TimeSolver::~TimeSolver ()
 
 void TimeSolver::reinit ()
 {
+  libmesh_assert(_diff_solver.get() != NULL);
+  libmesh_assert(&(_diff_solver->system()) == &(this->system()));
   _diff_solver->reinit();
+
+  libmesh_assert(_linear_solver.get() != NULL);
   _linear_solver->clear();
   _linear_solver->init();
 }
@@ -72,6 +76,8 @@ void TimeSolver::init ()
 
 void TimeSolver::solve ()
 {
+  libmesh_assert(_diff_solver.get() != NULL);
+  libmesh_assert(&(_diff_solver->system()) == &(this->system()));
   _diff_solver->solve();
 }
 
