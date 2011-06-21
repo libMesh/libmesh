@@ -135,12 +135,6 @@ LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
 }
 
 
-//------------------------------------------------------------------
-// Explicit instantiations
-template class LinearSolver<Number>;
-
- /*------------------- functions ------------------------------*/
-
   template <typename T>
   std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & mat,
 					       NumericVector<T>& sol,
@@ -169,6 +163,11 @@ template class LinearSolver<Number>;
     return totalrval;   
     
   }
+
+
+//------------------------------------------------------------------
+// Explicit instantiations
+template class LinearSolver<Number>;
 
 
 
