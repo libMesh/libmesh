@@ -742,7 +742,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
 template <typename T>
 std::pair<unsigned int, Real> 
-PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,				     				 NumericVector<T>& solution_in,
+PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
+				     NumericVector<T>& solution_in,
 				     NumericVector<T>& rhs_in,
 				     const double tol,
 				     const unsigned int m_its)
