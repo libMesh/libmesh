@@ -69,6 +69,9 @@ void DifferentiableSystem::reinit ()
 {
   Parent::reinit();
 
+  libmesh_assert(time_solver.get() != NULL);
+  libmesh_assert(&(time_solver->system()) == this);
+
   time_solver->reinit();
 }
 
@@ -80,7 +83,8 @@ void DifferentiableSystem::init_data ()
   _time_evolving.resize(this->n_vars(), false);
 
   // Do any initialization our solvers need
-  libmesh_assert (time_solver.get() != NULL);
+  libmesh_assert(time_solver.get() != NULL);
+  libmesh_assert(&(time_solver->system()) == this);
   time_solver->init();
 
   // Next initialize ImplicitSystem data
@@ -109,6 +113,8 @@ void DifferentiableSystem::assemble ()
 
 void DifferentiableSystem::solve ()
 {
+  libmesh_assert(time_solver.get() != NULL);
+  libmesh_assert(&(time_solver->system()) == this);
   time_solver->solve();
 }
 
@@ -116,6 +122,8 @@ void DifferentiableSystem::solve ()
 
 LinearSolver<Number>* DifferentiableSystem::get_linear_solver() const
 {
+  libmesh_assert(time_solver.get() != NULL);
+  libmesh_assert(&(time_solver->system()) == this);
   return this->time_solver->linear_solver().get();
 }
 
@@ -123,6 +131,8 @@ LinearSolver<Number>* DifferentiableSystem::get_linear_solver() const
 
 std::pair<unsigned int, Real> DifferentiableSystem::get_linear_solve_parameters() const
 {
+  libmesh_assert(time_solver.get() != NULL);
+  libmesh_assert(&(time_solver->system()) == this);
   return std::make_pair(this->time_solver->diff_solver()->max_linear_iterations,
                         this->time_solver->diff_solver()->relative_residual_tolerance);
 }
