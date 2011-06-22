@@ -285,6 +285,18 @@ void Tri6::connectivity(const unsigned int sf,
 
     case VTK:
       {
+	// VTK_QUADRATIC_TRIANGLE has same numbering as libmesh TRI6 
+        conn.resize(6);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        conn[3] = this->node(3);
+        conn[4] = this->node(4);
+        conn[5] = this->node(5);
+	return;
+
+	// Used to write out linear sub-triangles for VTK...
+	/*
 	conn.resize(3);
 	switch(sf)
 	  {
@@ -323,6 +335,7 @@ void Tri6::connectivity(const unsigned int sf,
 	  default:
 	    libmesh_error();
 	  }
+	*/
       }
 
     default:
