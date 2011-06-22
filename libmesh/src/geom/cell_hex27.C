@@ -455,6 +455,40 @@ void Hex27::connectivity(const unsigned int sc,
       
     case VTK:
       {
+	// VTK now supports VTK_TRIQUADRATIC_HEXAHEDRON directly
+	conn.resize(27);
+
+	conn[0] = this->node(0);
+	conn[1] = this->node(1);
+	conn[2] = this->node(2);
+	conn[3] = this->node(3);
+	conn[4] = this->node(4);
+	conn[5] = this->node(5);
+	conn[6] = this->node(6);
+	conn[7] = this->node(7);
+	conn[8] = this->node(8);
+	conn[9] = this->node(9);
+	conn[10] = this->node(10);
+	conn[11] = this->node(11); //
+	conn[12] = this->node(16);
+	conn[13] = this->node(17);
+	conn[14] = this->node(18);
+	conn[15] = this->node(19);
+	conn[16] = this->node(12);
+	conn[17] = this->node(13); //
+	conn[18] = this->node(14);
+	conn[19] = this->node(15);
+	conn[20] = this->node(24);
+	conn[21] = this->node(22);
+	conn[22] = this->node(21);
+	conn[23] = this->node(23);
+	conn[24] = this->node(20);
+	conn[25] = this->node(25);
+	conn[26] = this->node(26);
+	
+	return;
+
+	/*
 	switch (sc)
 	  {
 	  case 0:
@@ -564,6 +598,7 @@ void Hex27::connectivity(const unsigned int sc,
 	  default:
 	    libmesh_error();      
 	  }
+	*/
       }
 
     default:

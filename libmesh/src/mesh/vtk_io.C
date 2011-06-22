@@ -192,10 +192,14 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, std::vector<int>& types)
 					celltype = VTK_WEDGE;
 					break;// 13
 				case PRISM15:   
-					celltype = VTK_HIGHER_ORDER_WEDGE;
+					celltype = VTK_QUADRATIC_WEDGE;
 					break;// 14
-				case PRISM18:    
-					break;// 15
+				case PRISM18:   
+				  celltype = VTK_BIQUADRATIC_QUADRATIC_WEDGE;
+				  break;
+				case HEX27:      
+				  celltype = VTK_TRIQUADRATIC_HEXAHEDRON;
+				  break;
 				case PYRAMID5:
 					celltype = VTK_PYRAMID;
 					break;// 16
@@ -207,7 +211,6 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, std::vector<int>& types)
 				case QUAD9:
 #endif 
 				case EDGE4:      
-				case HEX27:      
 				case INFEDGE2:   
 				case INFQUAD4:   
 				case INFQUAD6:   

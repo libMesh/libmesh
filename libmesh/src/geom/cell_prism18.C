@@ -443,6 +443,28 @@ void Prism18::connectivity(const unsigned int sc,
 
     case VTK:
       {
+	// VTK now supports VTK_BIQUADRATIC_QUADRATIC_WEDGE directly
+	conn.resize(18);
+
+	// VTK's VTK_BIQUADRATIC_QUADRATIC_WEDGE first 9 (vertex) and
+	// last 3 (mid-face) nodes match.  The middle and top layers
+	// of mid-edge nodes are reversed from LibMesh's.
+	for (unsigned i=0; i<conn.size(); ++i)
+	  conn[i] = this->node(i);
+	
+	// top "ring" of mid-edge nodes
+	conn[9]  = this->node(12);
+	conn[10] = this->node(13);
+	conn[11] = this->node(14);
+
+	// middle "ring" of mid-edge nodes
+	conn[12] = this->node(9);
+	conn[13] = this->node(10);
+	conn[14] = this->node(11);
+	
+	return;
+
+	/* 
 	conn.resize(6);
 	switch (sc)
 	  {
@@ -546,7 +568,7 @@ void Prism18::connectivity(const unsigned int sc,
 	  default:
 	    libmesh_error();
 	  }
-
+	*/
       }
 
     default:
