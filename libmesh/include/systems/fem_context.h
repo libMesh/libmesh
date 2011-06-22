@@ -186,6 +186,13 @@ public:
   virtual void elem_side_reinit(Real theta);
 
   /**
+   * Reinitialize Elem and edge FE objects if necessary for
+   * integration at a new point in time: specifically, handle moving
+   * elements in moving mesh schemes.
+   */
+  virtual void elem_edge_reinit(Real theta);
+
+  /**
    * Reinitializes local data vectors/matrices on the current geometric element
    */
   virtual void pre_fe_reinit(const System&, Elem *e);
@@ -200,12 +207,19 @@ public:
    */
   void side_fe_reinit();
 
+  /**
+   * Reinitializes edge FE objects on the current geometric element
+   */
+  void edge_fe_reinit();
+
 // should be protected?:
   /**
-   * Finite element objects for each variable's interior and sides.
+   * Finite element objects for each variable's interior, sides and
+   * edges.
    */
   std::map<FEType, FEBase *> element_fe;
   std::map<FEType, FEBase *> side_fe;
+  std::map<FEType, FEBase *> edge_fe;
 
   /**
    * Pointers to the same finite element objects, but indexed
@@ -213,14 +227,28 @@ public:
    */
   std::vector<FEBase *> element_fe_var;
   std::vector<FEBase *> side_fe_var;
+  std::vector<FEBase *> edge_fe_var;
 
   /**
-   * Quadrature rules for element interior and sides.
-   * The FEM system will try to find a quadrature rule that
+   * Quadrature rule for element interior.
+   * The FEM context will try to find a quadrature rule that
    * correctly integrates all variables
    */
   QBase *element_qrule;
+
+  /**
+   * Quadrature rules for element sides
+   * The FEM context will try to find a quadrature rule that
+   * correctly integrates all variables
+   */
   QBase *side_qrule;
+
+  /**
+   * Quadrature rules for element edges.  If the FEM context is told
+   * to prepare for edge integration on 3D elements, it will try to
+   * find a quadrature rule that correctly integrates all variables
+   */
+  QBase *edge_qrule;
 
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
@@ -254,6 +282,11 @@ public:
    * Current side for side_* to examine
    */
   unsigned char side;
+
+  /**
+   * Current edge for edge_* to examine
+   */
+  unsigned char edge;
 
   /**
    * Cached dimension of elements in this mesh
