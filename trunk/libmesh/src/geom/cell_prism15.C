@@ -284,6 +284,7 @@ void Prism15::connectivity(const unsigned int sc,
 
     case VTK:
       {
+	/*
 	conn.resize(6);
 	conn[0] = this->node(0);
 	conn[1] = this->node(2);
@@ -291,6 +292,26 @@ void Prism15::connectivity(const unsigned int sc,
 	conn[3] = this->node(3);
 	conn[4] = this->node(5);
 	conn[5] = this->node(4);
+	*/
+	
+	// VTK's VTK_QUADRATIC_WEDGE first 9 nodes match, then their
+	// middle and top layers of mid-edge nodes are reversed from
+	// LibMesh's.
+	conn.resize(15);
+	for (unsigned i=0; i<9; ++i)
+	  conn[i] = this->node(i);
+	
+	// top "ring" of mid-edge nodes
+	conn[9]  = this->node(12);
+	conn[10] = this->node(13);
+	conn[11] = this->node(14);
+
+	// middle "ring" of mid-edge nodes
+	conn[12] = this->node(9);
+	conn[13] = this->node(10);
+	conn[14] = this->node(11);
+	
+	
 	return;
       }
 
