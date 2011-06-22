@@ -81,10 +81,16 @@ public:
   virtual void elem_reinit(Real) {}
 
   /**
-   * Gives derived classes the opportunity to reinitialize data needed for a
-   * side integration at a new point within a timestep
+   * Gives derived classes the opportunity to reinitialize data needed
+   * for a side integration at a new point within a timestep
    */
   virtual void elem_side_reinit(Real) {}
+
+  /**
+   * Gives derived classes the opportunity to reinitialize data needed
+   * for an edge integration at a new point within a timestep
+   */
+  virtual void elem_edge_reinit(Real) {}
 
   /**
    * For time-dependent problems, this is the time t for which the current
