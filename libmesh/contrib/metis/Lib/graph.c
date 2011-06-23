@@ -13,7 +13,7 @@
  *
  */
 
-#include <metis.h>
+#include "metis.h"
 
 /*************************************************************************
 * This function sets up the graph from the user input

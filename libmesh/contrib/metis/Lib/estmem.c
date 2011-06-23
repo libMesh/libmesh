@@ -13,7 +13,7 @@
  *
  */
 
-#include <metis.h>
+#include "metis.h"
 
 /*************************************************************************
 * This function computes how much memory will be required by the various

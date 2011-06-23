@@ -14,7 +14,7 @@
 
 #define DEBUG_ORDER_
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 /*************************************************************************
 * This is the top level ordering routine

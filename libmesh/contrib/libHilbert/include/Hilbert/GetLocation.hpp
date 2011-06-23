@@ -20,8 +20,8 @@
 #define _GETLOCATION_HPP_
 
 
-#include <Hilbert/Common.hpp>
-#include <Hilbert/BigBitVec.hpp>
+#include "Hilbert/Common.hpp"
+#include "Hilbert/BigBitVec.hpp"
 
 
 namespace Hilbert

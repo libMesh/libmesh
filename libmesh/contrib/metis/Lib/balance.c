@@ -13,7 +13,7 @@
  *
  */
 
-#include <metis.h>
+#include "metis.h"
 
 /*************************************************************************
 * This function is the entry point of the bisection balancing algorithms.

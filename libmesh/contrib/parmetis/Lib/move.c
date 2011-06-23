@@ -12,7 +12,7 @@
  *
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 /*************************************************************************
 * This function moves the graph, and returns a new graph.

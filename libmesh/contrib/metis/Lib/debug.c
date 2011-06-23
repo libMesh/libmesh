@@ -12,7 +12,7 @@
  *
  */
 
-#include <metis.h>
+#include "metis.h"
 
 /*************************************************************************
 * This function computes the cut given the graph and a where vector

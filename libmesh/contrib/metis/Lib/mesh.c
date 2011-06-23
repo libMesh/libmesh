@@ -13,7 +13,7 @@
  *
  */
 
-#include <metis.h>
+#include "metis.h"
 
 /*****************************************************************************
 * This function creates a graph corresponding to the dual of a finite element

@@ -12,7 +12,7 @@
  *
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 /*****************************************************************************
 *  This function computes a partitioning.

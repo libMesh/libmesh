@@ -58,9 +58,9 @@
 #include <string.h>
 #include <math.h>
 
-#include <netcdf.h>
-#include <exodusII.h>
-#include <exodusII_int.h>
+#include "netcdf.h"
+#include "exodusII.h"
+#include "exodusII_int.h"
 
 #include "ne_nemesisI_int.h"
 #include "ne_nemesisI.h"

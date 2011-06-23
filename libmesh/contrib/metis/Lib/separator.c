@@ -12,7 +12,7 @@
  *
  */
 
-#include <metis.h>
+#include "metis.h"
 
 /*************************************************************************
 * This function takes a bisection and constructs a minimum weight vertex 

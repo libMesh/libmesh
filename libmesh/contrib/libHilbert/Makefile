@@ -8,7 +8,7 @@ pkgname  := Hilbert
 # (Relative) Path to location of shared libs
 libpath := ../lib
 
-# Only one source file for triangle
+# List of source files
 SRC     := $(shell find ./src -name "*.C")
 OBJS   	:= $(patsubst %.C, %.$(obj-suffix), $(SRC))
 
@@ -64,3 +64,33 @@ clobber:
 distclean:
 	@$(MAKE) clobber
 	@rm -f $(libpath)/*/lib$(pkgname).*
+
+# Dependencies for libHilbert files
+src/BigBitVec.$(obj-suffix):\
+    src/BigBitVec.C\
+    include/Hilbert/BigBitVec.hpp\
+    include/Hilbert/Common.hpp\
+    include/Hilbert/FixBitVec.hpp
+src/FixBitVec.$(obj-suffix):\
+    src/FixBitVec.C\
+    include/Hilbert/Common.hpp\
+    include/Hilbert/FixBitVec.hpp
+src/Hilbert.$(obj-suffix):\
+    src/Hilbert.C\
+    include/Hilbert.hpp\
+    include/Hilbert/Algorithm.hpp\
+    include/Hilbert/BigBitVec.hpp\
+    include/Hilbert/Common.hpp\
+    include/Hilbert/FixBitVec.hpp\
+    include/Hilbert/GetBits.hpp\
+    include/Hilbert/GetLocation.hpp\
+    include/Hilbert/GrayCodeRank.hpp\
+    include/Hilbert/SetBits.hpp\
+    include/Hilbert/SetLocation.hpp
+src/hilbert_mpi_ops.$(obj-suffix):\
+    src/hilbert_mpi_ops.C\
+    include/Hilbert.hpp\
+    include/Hilbert/BigBitVec.hpp\
+    include/Hilbert/Common.hpp\
+    include/Hilbert/FixBitVec.hpp\
+    include/hilbert.h

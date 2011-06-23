@@ -11,7 +11,7 @@
  * $Id$
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 #define PackWeightWhereInfo(a, b) (((a)<<10) + (b))
 #define SelectWhere(a) ((a)%1024)

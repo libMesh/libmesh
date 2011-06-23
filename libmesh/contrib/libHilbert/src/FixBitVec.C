@@ -17,7 +17,7 @@
  */
 
 
-#include <Hilbert/FixBitVec.hpp>
+#include "Hilbert/FixBitVec.hpp"
 
 
 #define COMPILE_TIME_ASSERT(pred) switch(0){case 0:case pred:;}
