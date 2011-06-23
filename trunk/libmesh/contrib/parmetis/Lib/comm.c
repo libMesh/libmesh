@@ -8,7 +8,7 @@
  * $Id$
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 
 

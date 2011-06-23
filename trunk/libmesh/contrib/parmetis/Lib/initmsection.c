@@ -11,7 +11,7 @@
  * $Id$
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 
 #define DEBUG_IPART_

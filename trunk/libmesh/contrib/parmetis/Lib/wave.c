@@ -11,7 +11,7 @@
  *
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 /*************************************************************************
 * This function performs a k-way directed diffusion

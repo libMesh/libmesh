@@ -11,7 +11,7 @@
  *
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 /*************************************************************************
 * This function remaps that graph so that it will minimize the 

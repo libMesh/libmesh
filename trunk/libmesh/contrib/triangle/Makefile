@@ -62,3 +62,8 @@ clobber:
 distclean:
 	@$(MAKE) clobber
 	@rm -f $(libpath)/*/lib$(pkgname).*
+
+# Dependencies for triangle source file
+triangle.$(obj-suffix):\
+    triangle.c\
+    triangle.h

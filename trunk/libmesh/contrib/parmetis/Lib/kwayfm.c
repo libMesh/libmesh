@@ -11,7 +11,7 @@
  * $Id$
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 #define ProperSide(c, from, other) \
               (((c) == 0 && (from)-(other) < 0) || ((c) == 1 && (from)-(other) > 0))

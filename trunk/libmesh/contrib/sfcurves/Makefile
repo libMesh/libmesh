@@ -54,3 +54,17 @@ clobber:
 distclean:
 	@$(MAKE) clobber
 	@rm -f ../lib/*/libsfcurves.*
+
+# Dependencies for space-filling curves code
+cmp.$(obj-suffix):\
+    cmp.c\
+    sfcurves.h\
+    sfcurves_internal.h
+hilbert.$(obj-suffix):\
+    hilbert.c\
+    sfcurves.h\
+    sfcurves_internal.h
+morton.$(obj-suffix):\
+    morton.c\
+    sfcurves.h\
+    sfcurves_internal.h

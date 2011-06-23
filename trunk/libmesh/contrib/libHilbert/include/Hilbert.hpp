@@ -20,8 +20,8 @@
 #define _HILBERT_HPP_
 
 
-#include <Hilbert/FixBitVec.hpp>
-#include <Hilbert/BigBitVec.hpp>
+#include "Hilbert/FixBitVec.hpp"
+#include "Hilbert/BigBitVec.hpp"
 
 
 // Description of parameters:

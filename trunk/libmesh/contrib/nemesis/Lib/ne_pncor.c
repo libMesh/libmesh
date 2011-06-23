@@ -54,10 +54,10 @@
 
 #include <stdio.h>
 
-#include <netcdf.h>
+#include "netcdf.h"
 
-#include <exodusII.h>
-#include <exodusII_int.h>
+#include "exodusII.h"
+#include "exodusII_int.h"
 
 #include "ne_nemesisI_int.h"
 #include "ne_nemesisI.h"

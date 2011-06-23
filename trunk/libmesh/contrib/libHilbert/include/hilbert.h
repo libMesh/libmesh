@@ -19,7 +19,7 @@
 #ifndef __hilbert_h__
 #define __hilbert_h__
 
-#include <Hilbert.hpp>
+#include "Hilbert.hpp"
 #include <ostream>
 
 // Specific extensions to libHilbert-0.2.

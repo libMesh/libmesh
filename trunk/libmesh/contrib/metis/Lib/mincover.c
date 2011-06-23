@@ -11,7 +11,7 @@
  * $Id$
  */
 
-#include <metis.h>
+#include "metis.h"
 
 /*************************************************************************
 * Constants used by mincover algorithm
