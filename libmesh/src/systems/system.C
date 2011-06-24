@@ -437,7 +437,7 @@ void System::restrict_solve_to (const SystemSubset* subset,
 
 void System::assemble ()
 {
-  // Log how long the user's matrix assembly code takes
+  // Log how long the user's assembly code takes
   START_LOG("assemble()", "System");
   
   // Call the user-specified assembly function
@@ -451,7 +451,7 @@ void System::assemble ()
 
 void System::assemble_qoi (const QoISet& qoi_indices)
 {
-  // Log how long the user's matrix assembly code takes
+  // Log how long the user's assembly code takes
   START_LOG("assemble_qoi()", "System");
   
   // Call the user-specified quantity of interest function
@@ -465,7 +465,7 @@ void System::assemble_qoi (const QoISet& qoi_indices)
 
 void System::assemble_qoi_derivative (const QoISet& qoi_indices)
 {
-  // Log how long the user's matrix assembly code takes
+  // Log how long the user's assembly code takes
   START_LOG("assemble_qoi_derivative()", "System");
   
   // Call the user-specified quantity of interest function
