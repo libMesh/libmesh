@@ -360,7 +360,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		// if this is a level-0 element look for boundary conditions
 	        if ((*elem_it)->level() == 0)
 		  for (unsigned int s=0; s<(*elem_it)->n_sides(); s++)
-		    if ((*elem_it)->neighbor(s) == NULL)
+// We're supporting boundary ids on internal sides now
+//		    if ((*elem_it)->neighbor(s) == NULL)
                       {
                         const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*elem_it, s);
                         for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
@@ -1087,7 +1088,8 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 		// if this is a level-0 element look for boundary conditions
 		if ((*elem_it)->level() == 0)
 		  for (unsigned int s=0; s<(*elem_it)->n_sides(); s++)
-		    if ((*elem_it)->neighbor(s) == NULL)
+// We're supporting boundary ids on internal sides now
+//		    if ((*elem_it)->neighbor(s) == NULL)
                       {
                         const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*elem_it, s);
                         for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
