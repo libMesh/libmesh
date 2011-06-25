@@ -1271,7 +1271,8 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	// This element could have boundary info as well.  We need
 	// to save the (elem, side, bc_id) triples
 	for (unsigned int s=0; s<elem->n_sides(); s++)
-	    if (elem->neighbor(s) == NULL)
+// We're supporting boundary ids on internal sides now
+//	    if (elem->neighbor(s) == NULL)
 	      {
                 const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
                 for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
