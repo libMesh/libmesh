@@ -6,8 +6,14 @@ dnl ----------------------------------------------------------------
 dnl Locate header files for the C++ linear algebra library Eigen.
 dnl Eigen is a header-only template library. By default we check for the
 dnl Eigen files in the --with-eigen-include=xxx argument provided to
-dnl configure, or if those don't exist in the $EIGEN_INC directory,
-dnl or in /usr/include.
+dnl configure, or if those don't exist in the $EIGEN_INC/Eigen directory,
+dnl or in /usr/include.  
+dnl
+dnl Note: Eigen is installed (by defalut) at the location
+dnl /path/to/eigen/Eigen, i.e. with path ending in capital 'Eigen'.
+dnl You should specify --with-eigen-include=/path/to/eigen
+dnl during configure, or set your $EIGEN_INC environment variable
+dnl to /path/to/eigen.
 dnl ----------------------------------------------------------------
 
 AC_DEFUN([CONFIGURE_EIGEN], 
@@ -21,7 +27,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
   dnl Fall back on default paths to Eigen's include files
   if (test $witheigeninc != no); then
     EIGEN_INC="$witheigeninc"
-  elif test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen; then
+  elif test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen/Eigen; then
     echo "Environment EIGEN_INC=$EIGEN_INC"
   else
     EIGEN_INC="/usr/include"
@@ -33,10 +39,11 @@ AC_DEFUN([CONFIGURE_EIGEN],
   dnl Properly let the substitution variables
   if (test $enableeigen = yes); then
   
-     dnl Check for existence of a header file in the specified location
+     dnl Check for existence of a header file in the specified location.  Note: here
+     dnl we are checking for the header file "Eigen" in the Eigen directory.
      dnl AC_CHECK_FILE([$EIGEN_INC/Eigen], [eigenincFound="OK"], [eigenincFound="FAIL"])
      eigenincFound=no;
-     AC_CHECK_HEADERS($EIGEN_INC/Eigen, eigenincFound=yes)
+     AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, eigenincFound=yes)
 
      if (test $eigenincFound = no); then
        AC_MSG_RESULT(Eigen header files not found!)
