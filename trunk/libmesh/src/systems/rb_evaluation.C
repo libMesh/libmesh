@@ -971,6 +971,9 @@ void RBEvaluation::write_out_basis_functions(System& sys,
                                              const bool write_binary_basis_functions)
 {
   libMesh::out << "Writing out the basis functions..." << std::endl;
+  
+  // Make sure processors are synced up before we begin
+  Parallel::barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
@@ -1009,6 +1012,9 @@ void RBEvaluation::read_in_basis_functions(System& sys,
                                            const bool read_binary_basis_functions)
 {
   libMesh::out << "Reading in the basis functions..." << std::endl;
+
+  // Make sure processors are synced up before we begin
+  Parallel::barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
