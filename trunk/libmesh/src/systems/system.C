@@ -85,6 +85,7 @@ System::System (EquationSystems& es,
   _sys_number                       (number),
   _active                           (true),
   _solution_projection              (true),
+  _basic_system_only                (false),
   _can_add_vectors                  (true),
   _additional_data_written          (false)
 {
@@ -210,8 +211,13 @@ void System::clear ()
 
 void System::init ()
 { 
-  // First initialize any required data
-  this->init_data();
+  // First initialize any required data:
+  // either only the basic System data
+  if (_basic_system_only)
+    System::init_data();
+  // or all the derived class' data too
+  else
+    this->init_data();
   
   //If no variables have been added to this system
   //don't do anything

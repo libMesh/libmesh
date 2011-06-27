@@ -538,6 +538,16 @@ public:
   void deactivate ();
 
   /**
+   * Sets the system to be "basic only": i.e. advanced system
+   * components such as ImplicitSystem matrices may not be
+   * initialized.  This is useful for efficiency in certain utility
+   * programs that never use System::solve().  This method must be
+   * called after the System or derived class is created but before it
+   * is initialized; e.g. from within EquationSystems::read()
+   */
+  void set_basic_system_only ();
+
+  /**
    * Vector iterator typedefs.
    */
   typedef std::map<std::string, NumericVector<Number>* >::iterator       vectors_iterator;
@@ -1453,6 +1463,12 @@ private:
   bool _solution_projection;
 
   /**
+   * Holds true if the components of more advanced system types (e.g.
+   * system matrices) should not be initialized.
+   */
+  bool _basic_system_only;
+
+  /**
    * \p true when additional vectors may still be added, \p false otherwise.
    */
   bool _can_add_vectors;
@@ -1652,6 +1668,14 @@ inline
 void System::deactivate ()
 {
   _active = false;
+}
+
+
+
+inline
+void System::set_basic_system_only ()
+{
+  _basic_system_only = true;
 }
 
 

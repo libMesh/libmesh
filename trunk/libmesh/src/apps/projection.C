@@ -134,10 +134,12 @@ int main(int argc, char** argv)
   old_es.read(solnname, read_mode,
               EquationSystems::READ_HEADER |
               EquationSystems::READ_DATA |
-              EquationSystems::READ_ADDITIONAL_DATA);
+              EquationSystems::READ_ADDITIONAL_DATA |
+              EquationSystems::READ_BASIC_ONLY);
 
   new_es.read(solnname, read_mode,
-              EquationSystems::READ_HEADER);
+              EquationSystems::READ_HEADER |
+              EquationSystems::READ_BASIC_ONLY);
 
   old_es.print_info();
 

@@ -218,6 +218,7 @@ void EquationSystems::_read_impl (const std::string& name,
    const bool read_additional_data = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
    const bool read_legacy_format   = read_flags & EquationSystems::READ_LEGACY_FORMAT;
    const bool try_read_ifems       = read_flags & EquationSystems::TRY_READ_IFEMS;
+   const bool read_basic_only      = read_flags & EquationSystems::READ_BASIC_ONLY;
          bool read_parallel_files  = false;
 	 
   // This will unzip a file with .bz2 as the extension, otherwise it
@@ -293,6 +294,11 @@ void EquationSystems::_read_impl (const std::string& name,
 				read_header,
 				read_additional_data,
 				read_legacy_format);
+
+        // If we're only creating "basic" systems, we need to tell
+        // each system that before we call init() later.
+        if (read_basic_only)
+          new_system.set_basic_system_only();
       }
   }
       
