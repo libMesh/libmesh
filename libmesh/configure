@@ -16206,7 +16206,7 @@ fi
 
     if (test $witheigeninc != no); then
     EIGEN_INC="$witheigeninc"
-  elif test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen; then
+  elif test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen/Eigen; then
     echo "Environment EIGEN_INC=$EIGEN_INC"
   else
     EIGEN_INC="/usr/include"
@@ -16216,9 +16216,9 @@ fi
 
     if (test $enableeigen = yes); then
 
-               eigenincFound=no;
+                    eigenincFound=no;
 
-for ac_header in $EIGEN_INC/Eigen
+for ac_header in $EIGEN_INC/Eigen/Eigen
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
