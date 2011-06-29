@@ -1993,7 +1993,9 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 	  const AutoPtr<Elem> my_side     (elem->build_side(s));
 	  const AutoPtr<Elem> parent_side (parent->build_side(s));
 
+          my_nodes.clear();
 	  my_nodes.reserve (my_side->n_nodes());
+          parent_nodes.clear();
 	  parent_nodes.reserve (parent_side->n_nodes());
 
           for (unsigned int n=0; n != my_side->n_nodes(); ++n)
