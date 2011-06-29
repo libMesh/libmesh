@@ -25,6 +25,7 @@
 #include "dof_map.h"
 #include "elem.h"
 #include "mesh_base.h"
+#include "fe_base.h"
 #include "fe_interface.h"
 #include "fe_type.h"
 #include "dense_matrix.h"
@@ -138,11 +139,10 @@ using namespace libMesh;
 
       for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
 	{
-/*
 #ifdef LIBMESH_ENABLE_AMR
-	  FEInterface::compute_node_constraints (_node_constraints,
-					         *it);
+	  FEBase::compute_node_constraints (_node_constraints, *it);
 #endif
+/*
 #ifdef LIBMESH_ENABLE_PERIODIC
 	  // FIXME: periodic constraints won't work on a non-serial
 	  // mesh unless it's kept ghost elements from opposing
