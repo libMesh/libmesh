@@ -142,19 +142,17 @@ using namespace libMesh;
 #ifdef LIBMESH_ENABLE_AMR
 	  FEBase::compute_node_constraints (_node_constraints, *it);
 #endif
-/*
 #ifdef LIBMESH_ENABLE_PERIODIC
 	  // FIXME: periodic constraints won't work on a non-serial
 	  // mesh unless it's kept ghost elements from opposing
 	  // boundaries!
           if (have_periodic_boundaries)
-	    FEInterface::compute_periodic_node_constraints (_node_constraints,
-						            _periodic_boundaries,
-						            _mesh,
-						            point_locator.get(),
-						            *it);
+	    FEBase::compute_periodic_node_constraints (_node_constraints,
+						       _periodic_boundaries,
+						       _mesh,
+						       point_locator.get(),
+						       *it);
 #endif
-*/
 	  }
     }
     

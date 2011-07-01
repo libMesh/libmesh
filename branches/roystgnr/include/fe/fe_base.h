@@ -236,6 +236,16 @@ public:
                                             const unsigned int variable_number,
                                             const Elem* elem);
 
+  /**
+   * Computes the node position constraint equation contributions (for
+   * meshes with periodic boundary conditions)
+   */
+  static void compute_periodic_node_constraints (NodeConstraints &constraints,
+                                                 const PeriodicBoundaries &boundaries,
+                                                 const MeshBase& mesh,
+                                                 const PointLocatorBase* point_locator,
+                                                 const Elem* elem);
+
 #endif // LIBMESH_ENABLE_PERIODIC
 
   /**
