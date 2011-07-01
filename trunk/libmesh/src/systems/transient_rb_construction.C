@@ -181,8 +181,8 @@ void TransientRBConstruction::allocate_data_structures()
   M_q_vector.resize(Q_m);
 
   // Only initialize the mass matrices if we
-  // are not in low-memory mode
-  if(!low_memory_mode)
+  // are not in single-matrix mode
+  if(!single_matrix_mode)
   {
     DofMap& dof_map = this->get_dof_map();
 
@@ -240,7 +240,7 @@ void TransientRBConstruction::assemble_affine_expansion()
       temp1->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
       // First compute the right-hand side vector for the L2 projection
-      if(!low_memory_mode)
+      if(!single_matrix_mode)
       {
         L2_matrix->vector_mult(*temp1, *solution);
       }
@@ -291,9 +291,9 @@ Real TransientRBConstruction::train_reduced_basis(const std::string& directory_n
 
 SparseMatrix<Number>* TransientRBConstruction::get_M_q(unsigned int q)
 {
-  if(low_memory_mode)
+  if(single_matrix_mode)
   {
-    libMesh::err << "Error: The affine matrices are not store in low-memory mode." << std::endl;
+    libMesh::err << "Error: The affine matrices are not stored in single-matrix mode." << std::endl;
     libmesh_error();
   }
 
@@ -330,7 +330,7 @@ void TransientRBConstruction::add_scaled_mass_matrix(Number scalar, SparseMatrix
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
 
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     for(unsigned int q=0; q<Q_m; q++)
       input_matrix->add(scalar * trans_theta_expansion.eval_theta_q_m(q,mu), *get_M_q(q));
@@ -364,7 +364,7 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
         
   for(unsigned int q=0; q<Q_m; q++)
   {
-    if(!low_memory_mode)
+    if(!single_matrix_mode)
     {
       get_M_q(q)->vector_mult(*temp_vec, arg);
     }
@@ -399,7 +399,7 @@ void TransientRBConstruction::truth_assembly()
   const Real dt          = temporal_discretization.get_delta_t();
   const Real euler_theta = temporal_discretization.get_euler_theta();
 
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     // We should have already assembled the matrices
     // and vectors in the affine expansion, so
@@ -789,7 +789,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 
   // Get the L2 norm of the truth solution at time-level _K
   // Useful for normalizing our true error data
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     L2_matrix->vector_mult(*inner_product_storage_vector, *solution);
   }
@@ -842,7 +842,7 @@ Number TransientRBConstruction::set_error_temporal_data()
     temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
     // First compute the right-hand side vector for the projection
-    if(!low_memory_mode)
+    if(!single_matrix_mode)
     {
       inner_product_matrix->vector_mult(*temp, *solution);
     }
@@ -893,7 +893,7 @@ Number TransientRBConstruction::set_error_temporal_data()
   STOP_LOG("set_error_temporal_data()", "TransientRBConstruction");
 
   // return the square of the X norm of the truth solution
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     inner_product_matrix->vector_mult(*inner_product_storage_vector,*solution);
   }
@@ -961,7 +961,7 @@ void TransientRBConstruction::add_IC_to_RB_space()
   current_bf = *solution;
 
   // We can just set the norm to 1.
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     inner_product_matrix->vector_mult(*inner_product_storage_vector,*solution);
   }
@@ -995,12 +995,12 @@ void TransientRBConstruction::enrich_RB_space()
   std::vector<Number> correlation_matrix(LDA*eigen_size);
 
   // set values of the correlation matrix
-  if(low_memory_mode)
+  if(single_matrix_mode)
     assemble_inner_product_matrix(matrix);
 
   for(int i=0; i<eigen_size; i++)
   {
-    if(!low_memory_mode)
+    if(!single_matrix_mode)
     {
       inner_product_matrix->vector_mult(*inner_product_storage_vector, *temporal_data[i]);
     }
@@ -1112,7 +1112,7 @@ void TransientRBConstruction::enrich_RB_space()
 	}
 
       // We just set the norm to 1.
-      if(!low_memory_mode)
+      if(!single_matrix_mode)
 	{
 	  inner_product_matrix->vector_mult(*inner_product_storage_vector,current_bf);
 	}
@@ -1183,7 +1183,7 @@ void TransientRBConstruction::assemble_matrix_for_output_dual_solves()
 {
   // By default we use the L2 matrix for transient problems
   
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     matrix->zero();
     matrix->add(1., *L2_matrix);
@@ -1248,7 +1248,7 @@ void TransientRBConstruction::update_RB_system_matrices()
       
       // Compute reduced L2 matrix
       temp->zero();
-      if(!low_memory_mode)
+      if(!single_matrix_mode)
       {
         L2_matrix->vector_mult(*temp, rb_eval->get_basis_function(j));
       }
@@ -1270,7 +1270,7 @@ void TransientRBConstruction::update_RB_system_matrices()
       {
         // Compute reduced M_q matrix
         temp->zero();
-        if(!low_memory_mode)
+        if(!single_matrix_mode)
         {
           get_M_q(q_m)->vector_mult(*temp, rb_eval->get_basis_function(j));
         }
@@ -1316,7 +1316,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 
   unsigned int RB_size = rb_eval->get_n_basis_functions();
 
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     matrix->zero();
     matrix->add(1., *inner_product_matrix);
@@ -1353,7 +1353,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                      trans_rb_eval->M_q_representor[q_m][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
-      if(!low_memory_mode)
+      if(!single_matrix_mode)
       {
         M_q_vector[q_m]->vector_mult(*rhs, rb_eval->get_basis_function(i));
       }
@@ -1415,12 +1415,12 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
   // Now compute and store the inner products if requested
   if (compute_inner_products)
     {
-      if(low_memory_mode && constrained_problem)
+      if(single_matrix_mode && constrained_problem)
 	assemble_inner_product_matrix(matrix);
 
       for(unsigned int q_f=0; q_f<Q_f; q_f++)
 	{
-	  if(!low_memory_mode)
+	  if(!single_matrix_mode)
 	    {
 	      inner_product_matrix->vector_mult(*inner_product_storage_vector, *F_q_representor[q_f]);
 	    }
@@ -1448,7 +1448,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 		{
 		  for(unsigned int j=0; j<RB_size; j++)
 		    {
-		      if(!low_memory_mode)
+		      if(!single_matrix_mode)
 			{
 			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *trans_rb_eval->M_q_representor[q_m2][j]);
 			}
@@ -1461,7 +1461,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 
 		      if(i != j)
 			{
-			  if(!low_memory_mode)
+			  if(!single_matrix_mode)
 			    {
 			      inner_product_matrix->vector_mult(*inner_product_storage_vector,
 			                                        *trans_rb_eval->M_q_representor[q_m2][i]);
@@ -1489,7 +1489,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 		{
 		  for(unsigned int q_m=0; q_m<Q_m; q_m++)
 		    {
-		      if(!low_memory_mode)
+		      if(!single_matrix_mode)
 			{
 			  inner_product_matrix->vector_mult(*inner_product_storage_vector,
 			                                    *trans_rb_eval->M_q_representor[q_m][j]);
@@ -1504,7 +1504,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 
 		      if(i != j)
 			{
-			  if(!low_memory_mode)
+			  if(!single_matrix_mode)
 			    {
 			      inner_product_matrix->vector_mult(*inner_product_storage_vector,
 			                                        *trans_rb_eval->M_q_representor[q_m][i]);
@@ -1546,7 +1546,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
   unsigned int RB_size = rb_eval->get_n_basis_functions();
 
   // First compute the right-hand side vector for the L2 projection
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     L2_matrix->vector_mult(*temp1, *solution);
   }
@@ -1595,7 +1595,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 
     // Compute L2 norm error, i.e. sqrt(M(solution,solution))
     temp2->zero();
-    if(!low_memory_mode)
+    if(!single_matrix_mode)
     {
       L2_matrix->vector_mult(*temp2, *temp1);
     }
@@ -1659,7 +1659,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //
 //   // Then solve the system to get the Reisz representor
 //   matrix->zero();
-//   if(!low_memory_mode)
+//   if(!single_matrix_mode)
 //   {
 //     matrix->add(1., *inner_product_matrix);
 //     if(constrained_problem)
@@ -1687,7 +1687,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 // //     libmesh_error();
 //   }
 //
-//  if(!low_memory_mode)
+//  if(!single_matrix_mode)
 //  {
 //    inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
 //  }
