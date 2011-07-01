@@ -56,7 +56,7 @@ RBConstruction::RBConstruction (EquationSystems& es,
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build()),
     constraint_matrix(SparseMatrix<Number>::build()),
     constrained_problem(false),
-    low_memory_mode(false),
+    single_matrix_mode(false),
     reuse_preconditioner(true),
     return_rel_error_bound(false),
     write_data_during_training(false),
@@ -191,9 +191,9 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // the Stokes inner product matrix to compute Riesz representors)
   constrained_problem = (constraint_assembly != NULL);
 
-  // Tell the system if we're in low-memory mode
-  low_memory_mode = infile("low_memory_mode",
-                           low_memory_mode);
+  // Tell the system if we're in single-matrix mode
+  single_matrix_mode = infile("single_matrix_mode",
+                              single_matrix_mode);
 
   // Tell the system to reuse the preconditioner on consecutive
   // Offline solves to update residual data
@@ -286,7 +286,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "using deterministic training samples? " << deterministic_training << std::endl;
-  libMesh::out << "low-memory mode? " << low_memory_mode << std::endl;
+  libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "return a relative error bound from rb_solve? " << return_rel_error_bound << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
@@ -337,8 +337,8 @@ void RBConstruction::assemble_affine_expansion()
   this->initialize_dirichlet_dofs();
 
   // Assemble and store all of the matrices if we're
-  // not in low-memory mode
-  if(!low_memory_mode)
+  // not in single-matrix mode
+  if(!single_matrix_mode)
   {
     this->assemble_misc_matrices();
     this->assemble_all_affine_operators();
@@ -377,8 +377,8 @@ void RBConstruction::allocate_data_structures()
     output_dual_norms[n].resize(Q_l_hat);
   }
 
-  // Only initialize matrices if we're not in low-memory mode
-  if(!low_memory_mode)
+  // Only initialize matrices if we're not in single-matrix mode
+  if(!single_matrix_mode)
   {
     DofMap& dof_map = this->get_dof_map();
 
@@ -421,7 +421,7 @@ void RBConstruction::allocate_data_structures()
     }
   }
 
-  // Initialize the vectors even if we are in low-memory mode
+  // Initialize the vectors
   for(unsigned int q=0; q<rb_theta_expansion->get_Q_f(); q++)
   {
     // Initialize the memory for the vectors
@@ -725,7 +725,7 @@ void RBConstruction::truth_assembly()
   this->matrix->zero();
   this->rhs->zero();
 
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     // We should have already assembled the matrices
     // and vectors in the affine expansion, so
@@ -952,7 +952,7 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
     libmesh_error();
   }
 
-  if(!low_memory_mode && !symmetrize)
+  if(!single_matrix_mode && !symmetrize)
   {
     input_matrix->add(scalar, *get_A_q(q_a));
     input_matrix->close();
@@ -971,9 +971,9 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
 
 void RBConstruction::assemble_misc_matrices()
 {
-  if(low_memory_mode)
+  if(single_matrix_mode)
   {
-    libMesh::out << "Error: Cannot store misc matrices in low-memory mode." << std::endl;
+    libMesh::out << "Error: Cannot store misc matrices in single-matrix mode." << std::endl;
     libmesh_error();
   }
 
@@ -985,14 +985,16 @@ void RBConstruction::assemble_misc_matrices()
   }
 
   if( constrained_problem )
-    assemble_constraint_matrix(constraint_matrix.get());
+  {
+    assemble_constraint_matrix(constraint_matrix.get()); 
+  }
 }
 
 void RBConstruction::assemble_all_affine_operators()
 {
-  if(low_memory_mode)
+  if(single_matrix_mode)
   {
-    libMesh::out << "Error: Cannot store affine matrices in low-memory mode." << std::endl;
+    libMesh::out << "Error: Cannot store affine matrices in single-matrix mode." << std::endl;
     libmesh_error();
   }
 
@@ -1218,7 +1220,7 @@ Real RBConstruction::truth_solve(int plot_solution)
 
   // Get the X norm of the truth solution
   // Useful for normalizing our true error data
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
   }
@@ -1317,14 +1319,14 @@ void RBConstruction::enrich_RB_space()
   proj_index->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   proj_sum->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
-  if(low_memory_mode)
+  if(single_matrix_mode)
     assemble_inner_product_matrix(matrix);
 
   for(unsigned int index=0; index<rb_eval->get_n_basis_functions(); index++)
   {
     // invoke copy constructor for NumericVector
     *proj_index = rb_eval->get_basis_function(index);
-    if(!low_memory_mode)
+    if(!single_matrix_mode)
     {
       inner_product_matrix->vector_mult(*inner_product_storage_vector,*proj_index);
     }
@@ -1338,7 +1340,7 @@ void RBConstruction::enrich_RB_space()
   new_bf->add(-1.,*proj_sum);
 
   // Normalize new_bf
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     inner_product_matrix->vector_mult(*inner_product_storage_vector,*new_bf);
   }
@@ -1492,7 +1494,7 @@ void RBConstruction::update_RB_system_matrices()
       {
         // Compute reduced inner_product_matrix
         temp->zero();
-        if(!low_memory_mode)
+        if(!single_matrix_mode)
         {
           inner_product_matrix->vector_mult(*temp, rb_eval->get_basis_function(j));
         }
@@ -1516,7 +1518,7 @@ void RBConstruction::update_RB_system_matrices()
       {
         // Compute reduced A_q matrix
         temp->zero();
-        if(!low_memory_mode)
+        if(!single_matrix_mode)
         {
           get_A_q(q_a)->vector_mult(*temp, rb_eval->get_basis_function(j));
         }
@@ -1532,7 +1534,7 @@ void RBConstruction::update_RB_system_matrices()
         if(i!=j)
         {
           temp->zero();
-          if(!low_memory_mode)
+          if(!single_matrix_mode)
           {
             get_A_q(q_a)->vector_mult(*temp, rb_eval->get_basis_function(i));
           }
@@ -1559,7 +1561,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
   unsigned int RB_size = rb_eval->get_n_basis_functions();
 
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     matrix->zero();
     matrix->add(1., *inner_product_matrix);
@@ -1567,7 +1569,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
       matrix->add(1., *constraint_matrix);
   }
 
-  if(low_memory_mode)
+  if(single_matrix_mode)
   {
     assemble_inner_product_matrix(matrix);
     if(constrained_problem)
@@ -1595,7 +1597,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
                      rb_eval->A_q_representor[q_a][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
-      if(!low_memory_mode)
+      if(!single_matrix_mode)
       {
         get_A_q(q_a)->vector_mult(*rhs, rb_eval->get_basis_function(i));
       }
@@ -1658,12 +1660,12 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
   // Now compute and store the inner products (if requested)
   if (compute_inner_products)
     {
-      if(low_memory_mode && constrained_problem)
+      if(single_matrix_mode && constrained_problem)
 	assemble_inner_product_matrix(matrix);
 
       for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
 	{
-	  if(!low_memory_mode)
+	  if(!single_matrix_mode)
 	    {
 	      inner_product_matrix->vector_mult(*inner_product_storage_vector,*F_q_representor[q_f]);
 	    }
@@ -1691,7 +1693,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 		{
 		  for(unsigned int j=0; j<RB_size; j++)
 		    {
-		      if(!low_memory_mode)
+		      if(!single_matrix_mode)
 			{
 			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *rb_eval->A_q_representor[q_a2][j]);
 			}
@@ -1703,7 +1705,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
 		      if(i != j)
 			{
-			  if(!low_memory_mode)
+			  if(!single_matrix_mode)
 			    {
 			      inner_product_matrix->vector_mult(*inner_product_storage_vector, *rb_eval->A_q_representor[q_a2][i]);
 			    }
@@ -1727,7 +1729,7 @@ void RBConstruction::assemble_matrix_for_output_dual_solves()
 {
   // By default we use the inner product matrix for steady problems
   
-  if(!low_memory_mode)
+  if(!single_matrix_mode)
   {
     matrix->zero();
     matrix->add(1., *inner_product_matrix);
@@ -1788,7 +1790,7 @@ void RBConstruction::compute_output_dual_norms()
       
         if(constrained_problem)
         {
-          if(!low_memory_mode)
+          if(!single_matrix_mode)
           {
             matrix->add(1., *constraint_matrix);
           }
@@ -1904,7 +1906,7 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
     // Only log if we get to here
     START_LOG("compute_Fq_representor_norms()", "RBConstruction");
 
-    if(!low_memory_mode)
+    if(!single_matrix_mode)
     {
       matrix->zero();
       matrix->add(1., *inner_product_matrix);
@@ -1912,7 +1914,7 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
         matrix->add(1., *constraint_matrix);
     }
 
-    if(low_memory_mode)
+    if(single_matrix_mode)
     {
       assemble_inner_product_matrix(matrix);
       if(constrained_problem)
@@ -1991,12 +1993,12 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
     if (compute_inner_products)
     {
       unsigned int q=0;
-      if(low_memory_mode && constrained_problem)
+      if(single_matrix_mode && constrained_problem)
         assemble_inner_product_matrix(matrix);
 
       for(unsigned int q_f1=0; q_f1<rb_theta_expansion->get_Q_f(); q_f1++)
       {
-        if(!low_memory_mode)
+        if(!single_matrix_mode)
         {
           inner_product_matrix->vector_mult(*inner_product_storage_vector, *F_q_representor[q_f1]);
         }
@@ -2091,7 +2093,7 @@ void RBConstruction::load_RB_solution()
 // //     libmesh_error();
 //   }
 //
-//   if(!low_memory_mode)
+//   if(!single_matrix_mode)
 //   {
 //     inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
 //   }
@@ -2110,9 +2112,9 @@ void RBConstruction::load_RB_solution()
 
 SparseMatrix<Number>* RBConstruction::get_inner_product_matrix()
 {
-  if(low_memory_mode)
+  if(single_matrix_mode)
   {
-    libMesh::err << "Error: The inner-product matrix is not stored in low-memory mode." << std::endl;
+    libMesh::err << "Error: The inner-product matrix is not stored in single-matrix mode." << std::endl;
     libmesh_error();
   }
 
@@ -2127,9 +2129,9 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_inner_product_matrix()
                  << "to access non_dirichlet_inner_product_matrix." << std::endl;
     libmesh_error();
   }
-  if(low_memory_mode)
+  if(single_matrix_mode)
   {
-    libMesh::err << "Error: The non-Dirichlet inner-product matrix is not stored in low-memory mode." << std::endl;
+    libMesh::err << "Error: The non-Dirichlet inner-product matrix is not stored in single-matrix mode." << std::endl;
     libmesh_error();
   }
 
@@ -2138,9 +2140,9 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_inner_product_matrix()
 
 SparseMatrix<Number>* RBConstruction::get_A_q(unsigned int q)
 {
-  if(low_memory_mode)
+  if(single_matrix_mode)
   {
-    libMesh::err << "Error: The affine matrices are not stored in low-memory mode." << std::endl;
+    libMesh::err << "Error: The affine matrices are not stored in single-matrix mode." << std::endl;
     libmesh_error();
   }
 
@@ -2162,9 +2164,9 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_A_q(unsigned int q)
     libmesh_error();
   }
 
-  if(low_memory_mode)
+  if(single_matrix_mode)
   {
-    libMesh::err << "Error: The affine matrices are not stored in low-memory mode." << std::endl;
+    libMesh::err << "Error: The affine matrices are not stored in single-matrix mode." << std::endl;
     libmesh_error();
   }
 
