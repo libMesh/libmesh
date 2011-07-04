@@ -2545,13 +2545,13 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
 
 	              const Node* my_node = my_nodes[my_side_n];
 
-	      	      // The support point of the DOF
-	              const Point& support_point = *my_node;
-	      
+	              // Figure out where my node lies on their reference element.
+                      const Point neigh_point = periodic->get_corresponding_pos(*my_node);
+
 	              // Figure out where my node lies on their reference element.
 	              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
 								          neigh_side.get(),
-								          support_point);
+								          neigh_point);
 	
 	              for (unsigned int their_side_n=0;
 		           their_side_n < n_side_nodes;
