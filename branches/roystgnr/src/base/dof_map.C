@@ -2468,6 +2468,17 @@ std::string DofMap::get_info() const
       n_constraints++;
     }
 
+  os << "    DofMap Constraints\n      Number of DoF Constraints = "
+     << n_constraints;
+  if (n_constraints)
+    {
+      avg_constraint_length /= n_constraints;
+      os << "\n      Maximum DoF Constraint Length= " << max_constraint_length
+         << '\n'
+         << "      Average DoF Constraint Length= " << avg_constraint_length;
+    }
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   for (NodeConstraints::const_iterator it=_node_constraints.begin();
        it != _node_constraints.end(); ++it)
     {
@@ -2480,25 +2491,15 @@ std::string DofMap::get_info() const
       n_hanging_nodes++;
     }
 
-
-  os << "    DofMap Constraints\n      Number of DoF Constraints = "
-     << n_constraints;
-  if (n_constraints)
-    {
-      avg_constraint_length /= n_constraints;
-      os << "\n      Maximum DoF Constraint Length= " << max_constraint_length
-         << '\n'
-         << "      Average DoF Constraint Length= " << avg_constraint_length;
-    }
-
-  os << "\n      Number of Node Constraints = " << n_hanging_nodes;
   if (n_hanging_nodes)
     {
+      os << "\n      Number of Node Constraints = " << n_hanging_nodes;
       avg_node_constraint_length /= n_hanging_nodes;
       os << "\n      Maximum Node Constraint Length= " << max_node_constraint_length
          << '\n'
          << "      Average Node Constraint Length= " << avg_node_constraint_length;
     }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   os << std::endl;
 

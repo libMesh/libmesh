@@ -1955,6 +1955,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 
 
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 void FEBase::compute_node_constraints (NodeConstraints &constraints,
 				       const Elem* elem)
 {
@@ -2086,6 +2087,8 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 	    }
 	}
 }
+
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
@@ -2384,6 +2387,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 
 
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
                                                 const PeriodicBoundaries &boundaries,
                                                 const MeshBase &mesh,
@@ -2586,6 +2590,8 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
         }
     }
 }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
 #endif // LIBMESH_ENABLE_PERIODIC
 
 

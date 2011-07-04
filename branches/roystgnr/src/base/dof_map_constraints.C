@@ -111,6 +111,7 @@ using namespace libMesh;
     const unsigned int _variable_number;    
   };
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   class ComputeNodeConstraints
   {
   public:
@@ -164,6 +165,7 @@ using namespace libMesh;
 #endif
     const MeshBase &_mesh;
   };
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 }
 
 
@@ -197,10 +199,6 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   // u_a = u_b is collocated at the nodes of side a, which gives
   // one row of the constraint matrix.
   
-  // clear any existing constraints.
-  _dof_constraints.clear();
-  _node_constraints.clear();
-
   // define the range of elements of interest
   ConstElemRange range;
   {
@@ -230,7 +228,10 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
     mesh.point_locator();
 #endif
 
-  // Compute node constraints first
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  // recalculate node constraints from scratch
+  _node_constraints.clear();
+
   Threads::parallel_for (range,
 			 ComputeNodeConstraints (_node_constraints,
 					         *this,
@@ -238,8 +239,12 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
 					         *_periodic_boundaries,
 #endif
 					         mesh));
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
  
+  // recalculate dof constraints from scratch
+  _dof_constraints.clear();
+
   // Look at all the variables in the system.  Reset the element
   // range at each iteration -- there is no need to reconstruct it.
   for (unsigned int variable_number=0; variable_number<this->n_variables();
@@ -286,6 +291,7 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
 
 void DofMap::print_dof_constraints(std::ostream& os) const
 {
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   os << "Node Constraints:"
      << std::endl;
   
@@ -305,6 +311,7 @@ void DofMap::print_dof_constraints(std::ostream& os) const
 
       os << std::endl;
     }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   os << "DoF Constraints:"
      << std::endl;
@@ -995,8 +1002,11 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
 
   // We might get to return immediately if none of the processors
   // found any constraints
-  unsigned int has_constraints = !_dof_constraints.empty() ||
-                                 !_node_constraints.empty();
+  unsigned int has_constraints = !_dof_constraints.empty() 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+                                 || !_node_constraints.empty()
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+                                 ;
   Parallel::max(has_constraints);
   if (!has_constraints)
     return;
@@ -1006,9 +1016,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
   // Push these out first.
   {
   std::vector<std::vector<unsigned int> > pushed_ids(libMesh::n_processors());
-  std::vector<std::vector<unsigned int> > pushed_node_ids(libMesh::n_processors());
   std::vector<unsigned int> pushed_on_proc(libMesh::n_processors(), 0);
-  std::vector<unsigned int> nodes_pushed_on_proc(libMesh::n_processors(), 0);
 
   // Count the dof constraints to push to each processor
   unsigned int push_proc_id = 0;
@@ -1020,6 +1028,10 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
         push_proc_id++;
       pushed_on_proc[push_proc_id]++;
     }
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  std::vector<std::vector<unsigned int> > pushed_node_ids(libMesh::n_processors());
+  std::vector<unsigned int> nodes_pushed_on_proc(libMesh::n_processors(), 0);
 
   // Count the node constraints to push to each processor
   for (NodeConstraints::iterator i = _node_constraints.begin();
@@ -1033,6 +1045,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
       pushed_ids[p].reserve(pushed_on_proc[p]);
       pushed_node_ids[p].reserve(pushed_on_proc[p]);
     }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   // Collect the dof constraints to push to each processor
   push_proc_id = 0;
@@ -1045,6 +1058,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
       pushed_ids[push_proc_id].push_back(constrained);
     }
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   // Collect the node constraints to push to each processor
   for (NodeConstraints::iterator i = _node_constraints.begin();
 	 i != _node_constraints.end(); ++i)
@@ -1052,6 +1066,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
       const Node *constrained = i->first;
       pushed_node_ids[constrained->processor_id()].push_back(constrained->id());
     }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   // Now trade constraint rows
   for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
@@ -1079,6 +1094,8 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
               pushed_vals[i].push_back(j->second);
             }
         }
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Pack the node constraint rows to push to procup
       std::vector<std::vector<unsigned int> > pushed_node_keys(pushed_node_ids[procup].size());
       std::vector<std::vector<Real> > pushed_node_vals(pushed_node_ids[procup].size());
@@ -1096,6 +1113,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
               pushed_node_vals[i].push_back(j->second);
             }
         }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Trade pushed dof constraint rows
       std::vector<unsigned int> pushed_ids_to_me;
@@ -1110,6 +1128,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
       libmesh_assert (pushed_ids_to_me.size() == pushed_keys_to_me.size());
       libmesh_assert (pushed_ids_to_me.size() == pushed_vals_to_me.size());
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Trade pushed node constraint rows
       std::vector<unsigned int> pushed_node_ids_to_me;
       std::vector<std::vector<unsigned int> > pushed_node_keys_to_me;
@@ -1122,6 +1141,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
                              procdown, pushed_node_vals_to_me);
       libmesh_assert (pushed_node_ids_to_me.size() == pushed_node_keys_to_me.size());
       libmesh_assert (pushed_node_ids_to_me.size() == pushed_node_vals_to_me.size());
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Add the dof constraints that I've been sent
       for (unsigned int i = 0; i != pushed_ids_to_me.size(); ++i)
@@ -1142,6 +1162,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
             }
         }
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Add the node constraints that I've been sent
       for (unsigned int i = 0; i != pushed_node_ids_to_me.size(); ++i)
         {
@@ -1162,6 +1183,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
                 }
             }
         }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
     }
   }
 
@@ -1170,9 +1192,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
 
   // Create sets containing the DOFs and nodes we already depend on
   typedef std::set<unsigned int> DoF_RCSet;
-  typedef std::set<const Node *> Node_RCSet;
   DoF_RCSet unexpanded_dofs;
-  Node_RCSet unexpanded_nodes;
 
   for (DofConstraints::iterator i = _dof_constraints.begin();
 	 i != _dof_constraints.end(); ++i)
@@ -1180,11 +1200,16 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
       unexpanded_dofs.insert(i->first);
     }
 
+  typedef std::set<const Node *> Node_RCSet;
+  Node_RCSet unexpanded_nodes;
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   for (NodeConstraints::iterator i = _node_constraints.begin();
 	 i != _node_constraints.end(); ++i)
     {
       unexpanded_nodes.insert(i->first);
     }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   // We have to keep recursing while the unexpanded set is
   // nonempty on *any* processor
@@ -1218,6 +1243,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
             dof_request_set.insert(j->first);
         }
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       for (Node_RCSet::iterator i = unexpanded_nodes.begin();
            i != unexpanded_nodes.end(); ++i)
         {
@@ -1226,6 +1252,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
                j != row.end(); ++j)
             node_request_set.insert(j->first);
         }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Clear the unexpanded constraint sets; we're about to expand
       // them
@@ -1309,6 +1336,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
                 }
             }
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
           for (unsigned int i=0; i != node_request_to_fill.size(); ++i)
             {
               unsigned int constrained_id = node_request_to_fill[i];
@@ -1327,6 +1355,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
                     }
                 }
             }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
           // Trade back the results
           std::vector<std::vector<unsigned int> > dof_filled_keys,
@@ -1337,10 +1366,12 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
                                  procup, dof_filled_keys);
           Parallel::send_receive(procdown, dof_row_vals,
                                  procup, dof_filled_vals);
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
           Parallel::send_receive(procdown, node_row_keys,
                                  procup, node_filled_keys);
           Parallel::send_receive(procdown, node_row_vals,
                                  procup, node_filled_vals);
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
           libmesh_assert (dof_filled_keys.size() == requested_dof_ids[procup].size());
           libmesh_assert (dof_filled_vals.size() == requested_dof_ids[procup].size());
           libmesh_assert (node_filled_keys.size() == requested_node_ids[procup].size());
@@ -1362,6 +1393,8 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
                   unexpanded_dofs.insert(constrained);
                 }
             }
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
           for (unsigned int i=0; i != requested_node_ids[procup].size(); ++i)
             {
               libmesh_assert (node_filled_keys[i].size() == node_filled_vals[i].size());
@@ -1381,6 +1414,7 @@ void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
                   unexpanded_nodes.insert(constrained_node);
                 }
             }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
         }
 
       // We have to keep recursing while the unexpanded set is

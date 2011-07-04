@@ -86,6 +86,7 @@ class DofConstraints : public std::map<unsigned int,
 {
 };
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 /**
  * A row of the Node constraint mapping.  Currently this just
  * stores the topology of the constrained Nodes, but for forward
@@ -108,6 +109,7 @@ class NodeConstraints : public std::map<const Node *,
                                        Threads::scalable_allocator<std::pair<const unsigned int, NodeConstraintRow> > >
 {
 };
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
 #endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
@@ -370,11 +372,13 @@ public:
    */
   unsigned int n_constrained_dofs() const { return _dof_constraints.size(); }
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
    * @returns the total number of constrained Nodes
    * in the mesh.
    */
   unsigned int n_constrained_nodes() const { return _node_constraints.size(); }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   /**
    * Rebuilds the raw degree of freedom and DofObject constraints.
@@ -415,6 +419,7 @@ public:
   DofConstraints::const_iterator constraint_rows_end() const
     { return _dof_constraints.end(); }
   
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
    * Returns an iterator pointing to the first Node constraint row
    */
@@ -426,6 +431,7 @@ public:
    */
   NodeConstraints::const_iterator node_constraint_rows_end() const
     { return _node_constraints.end(); }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
   
   /**
    * @returns true if the degree of freedom dof is constrained,
@@ -861,10 +867,12 @@ private:
    */
   DofConstraints _dof_constraints;
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
    * Data structure containing DofObject constraints.
    */
   NodeConstraints _node_constraints;
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
 #endif
 
@@ -898,8 +906,10 @@ bool DofMap::is_constrained_dof (const unsigned int dof) const
 inline
 bool DofMap::is_constrained_node (const Node *node) const
 {
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   if (_node_constraints.count(node))
     return true;
+#endif
 
   return false;
 }
