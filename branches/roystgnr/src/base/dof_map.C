@@ -2473,7 +2473,8 @@ std::string DofMap::get_info() const
   if (n_constraints)
     {
       avg_constraint_length /= n_constraints;
-      os << "\n      Maximum DoF Constraint Length= " << max_constraint_length
+
+      os << "    DofMap Constraints\n      Number of Constraints = " << n_constraints
          << '\n'
          << "      Average DoF Constraint Length= " << avg_constraint_length;
     }
