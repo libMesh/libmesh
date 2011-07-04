@@ -85,6 +85,32 @@ class DofConstraints : public std::map<unsigned int,
                                        Threads::scalable_allocator<std::pair<const unsigned int, DofConstraintRow> > >
 {
 };
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+/**
+ * A row of the Node constraint mapping.  Currently this just
+ * stores the topology of the constrained Nodes, but for forward
+ * compatibility we also include coefficients, so we could add
+ * Lagrange-positioned-node constraints later.
+ */
+typedef std::map<const Node *, Real, 
+                 std::less<const Node *>, 
+                 Threads::scalable_allocator<std::pair<const Node *, Real> > > NodeConstraintRow;
+
+/** 
+ * The Node constraint storage format. 
+ * We're using a class instead of a typedef to allow forward
+ * declarations and future flexibility.  Don't delete this from
+ * a pointer-to-std::map; the destructor isn't virtual!
+ */
+class NodeConstraints : public std::map<const Node *, 
+                                       NodeConstraintRow, 
+                                       std::less<const Node *>, 
+                                       Threads::scalable_allocator<std::pair<const unsigned int, NodeConstraintRow> > >
+{
+};
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
 #endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
   
@@ -346,18 +372,26 @@ public:
    */
   unsigned int n_constrained_dofs() const { return _dof_constraints.size(); }
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
-   * Rebuilds the raw degree of freedom constraints.
+   * @returns the total number of constrained Nodes
+   * in the mesh.
+   */
+  unsigned int n_constrained_nodes() const { return _node_constraints.size(); }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
+  /**
+   * Rebuilds the raw degree of freedom and DofObject constraints.
    */ 
-  void create_dof_constraints (const MeshBase& mesh);
+  void create_dof_constraints (const MeshBase&);
 
   /**
    * Gathers any relevant constraint equations from other processors
    */
-  void allgather_recursive_constraints ();
+  void allgather_recursive_constraints (const MeshBase&);
 
   /**
-   * Postprocesses any constrained degrees of freedom in elem_dofs
+   * Postprocesses any constrained degrees of freedom
    * to be constrained only in terms of unconstrained dofs, then adds
    * unconstrained dofs to the send_list and prepares that for use.
    * This should be run after both system (create_dof_constraints) and
@@ -374,16 +408,30 @@ public:
 			   const bool forbid_constraint_overwrite = true);
 
   /**
-   * Returns an iterator pointing to the first constraint row
+   * Returns an iterator pointing to the first DoF constraint row
    */
   DofConstraints::const_iterator constraint_rows_begin() const
     { return _dof_constraints.begin(); }
   
   /**
-   * Returns an iterator pointing just past the last constraint row
+   * Returns an iterator pointing just past the last DoF constraint row
    */
   DofConstraints::const_iterator constraint_rows_end() const
     { return _dof_constraints.end(); }
+  
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  /**
+   * Returns an iterator pointing to the first Node constraint row
+   */
+  NodeConstraints::const_iterator node_constraint_rows_begin() const
+    { return _node_constraints.begin(); }
+  
+  /**
+   * Returns an iterator pointing just past the last Node constraint row
+   */
+  NodeConstraints::const_iterator node_constraint_rows_end() const
+    { return _node_constraints.end(); }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
   
   /**
    * @returns true if the degree of freedom dof is constrained,
@@ -392,7 +440,14 @@ public:
   bool is_constrained_dof (const unsigned int dof) const;
   
   /**
-   * Prints the whole \p _dof_constraints data structure.
+   * @returns true if the Node is constrained,
+   * false otherwise.
+   */
+  bool is_constrained_node (const Node* node) const;
+  
+  /**
+   * Prints the whole \p _dof_constraints and \p
+   * _node_constraints data structures.
    */
   void print_dof_constraints(std::ostream& os=libMesh::out) const;
 
@@ -699,6 +754,12 @@ private:
   void find_connected_dofs (std::vector<unsigned int> &elem_dofs) const;
   
   /**
+   * Finds all the DofObjects associated with the set in \p objs.
+   * This will account for off-element couplings via hanging nodes.
+   */
+  void find_connected_dof_objects (std::vector<const DofObject *> &objs) const;
+  
+  /**
    * Adds entries to the \p _send_list vector corresponding to DoFs
    * which are dependencies for constraint equations on the current
    * processor.
@@ -806,6 +867,13 @@ private:
    */
   DofConstraints _dof_constraints;
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  /**
+   * Data structure containing DofObject constraints.
+   */
+  NodeConstraints _node_constraints;
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
 #endif
 
 
@@ -829,8 +897,19 @@ private:
 inline
 bool DofMap::is_constrained_dof (const unsigned int dof) const
 {
-  if (_dof_constraints.count(dof) != 0)
+  if (_dof_constraints.count(dof))
     return true;
+
+  return false;
+}
+
+inline
+bool DofMap::is_constrained_node (const Node *node) const
+{
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  if (_node_constraints.count(node))
+    return true;
+#endif
 
   return false;
 }

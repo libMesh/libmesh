@@ -2453,6 +2453,9 @@ std::string DofMap::get_info() const
   unsigned int n_constraints = 0, max_constraint_length = 0;
   long double avg_constraint_length = 0.;
 
+  unsigned int n_hanging_nodes = 0, max_node_constraint_length = 0;
+  long double avg_node_constraint_length = 0.;
+
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
     {
@@ -2465,22 +2468,41 @@ std::string DofMap::get_info() const
       n_constraints++;
     }
 
+  os << "    DofMap Constraints\n      Number of DoF Constraints = "
+     << n_constraints;
   if (n_constraints)
     {
       avg_constraint_length /= n_constraints;
 
       os << "    DofMap Constraints\n      Number of Constraints = " << n_constraints
          << '\n'
-         << "      Maximum Constraint Length= " << max_constraint_length
-         << '\n'
-         << "      Average Constraint Length= " << avg_constraint_length
-         << std::endl;
+         << "      Average DoF Constraint Length= " << avg_constraint_length;
     }
-  else
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  for (NodeConstraints::const_iterator it=_node_constraints.begin();
+       it != _node_constraints.end(); ++it)
     {
-      os << "    DofMap Constraints\n      Number of Constraints = " << n_constraints
-         << std::endl;
+      const NodeConstraintRow& row = it->second;
+      unsigned int rowsize = row.size();
+
+      max_node_constraint_length = std::max(max_node_constraint_length,
+                                            rowsize);
+      avg_node_constraint_length += rowsize;
+      n_hanging_nodes++;
     }
+
+  if (n_hanging_nodes)
+    {
+      os << "\n      Number of Node Constraints = " << n_hanging_nodes;
+      avg_node_constraint_length /= n_hanging_nodes;
+      os << "\n      Maximum Node Constraint Length= " << max_node_constraint_length
+         << '\n'
+         << "      Average Node Constraint Length= " << avg_node_constraint_length;
+    }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
+  os << std::endl;
 
 #endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
