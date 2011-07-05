@@ -904,7 +904,11 @@ bool DofMap::is_constrained_dof (const unsigned int dof) const
 }
 
 inline
-bool DofMap::is_constrained_node (const Node *node) const
+bool DofMap::is_constrained_node (const Node* 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+node
+#endif
+) const
 {
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   if (_node_constraints.count(node))

@@ -2453,8 +2453,10 @@ std::string DofMap::get_info() const
   unsigned int n_constraints = 0, max_constraint_length = 0;
   long double avg_constraint_length = 0.;
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   unsigned int n_hanging_nodes = 0, max_node_constraint_length = 0;
   long double avg_node_constraint_length = 0.;
+#endif
 
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
