@@ -2733,8 +2733,8 @@ namespace Parallel
     // Only catch the return value when asserts are active.
     const int ierr =
 #endif
-      MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, StandardType<T>(&r[0]),
-		   &r[0], &sendlengths[0],
+      MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, StandardType<T>(),
+		   r.empty() ? NULL : &r[0], &sendlengths[0],
 		   &displacements[0], StandardType<T>(),
 		   root_id,
 		   comm.get());
