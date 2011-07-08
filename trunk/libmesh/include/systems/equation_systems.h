@@ -84,7 +84,8 @@ public:
    */
   enum WriteFlags { WRITE_DATA             = 1,
                     WRITE_ADDITIONAL_DATA  = 2,
-                    WRITE_PARALLEL_FILES   = 4 };
+                    WRITE_PARALLEL_FILES   = 4,
+                    WRITE_SERIAL_FILES     = 8 };
   
   /**
    * Constructor.
