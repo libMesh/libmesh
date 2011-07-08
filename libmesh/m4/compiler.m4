@@ -347,8 +347,10 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
   dnl Flag for profiling mode; can me modified at a later stage
   PROFILING_FLAGS="-pg"
 
-  dnl The -g flag is all OProfile needs to produce annotations
-  OPROFILE_FLAGS="-g"
+  dnl The -g flag is necessary for OProfile to produce annotations
+  dnl -fno-omit-frame-pointer flag turns off an optimization that
+  dnl interferes with OProfile callgraphs
+  OPROFILE_FLAGS="-g -fno-omit-frame-pointer"
 
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
