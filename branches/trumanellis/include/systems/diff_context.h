@@ -60,7 +60,7 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  DiffContext (const System &);
+  DiffContext (const System &, bool _compute_neighbor_values = false);
 
   /**
    * Destructor.

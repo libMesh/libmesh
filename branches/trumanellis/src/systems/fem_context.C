@@ -586,6 +586,32 @@ void FEMContext::side_fe_reinit ()
     {
       i->second->reinit(elem, side);
     }
+
+  // Set pointer to neighbor Elem
+  neigh = elem->neighbor(side);
+
+  // Initialize all the interior FE objects on neighbor/side.
+  // Logging of FE::reinit is done in the FE functions
+  if (compute_neighbor_values && neigh)
+    {
+      // We will simulatneously iterate through side and neighbor FETypes.
+      std::map<FEType, FEBase *>::iterator neigh_fe_end = neighbor_fe.end();
+      std::map<FEType, FEBase *>::iterator i_side = side_fe.begin();
+      // For loop takes care of iterating through neighbor
+      for (std::map<FEType, FEBase *>::iterator i_neigh = neighbor_fe.begin();
+           i_neigh != neigh_fe_end; ++i_neigh)
+        {
+          // The quadrature points on the side
+          std::vector<Point > qface_point = i_side->second->get_xyz();
+          // The points on the neighbor that we will reinit
+          std::vector<Point> qface_neighbor_point;
+          FEInterface::inverse_map (elem->dim(), i_side->first, neigh,
+            qface_point, qface_neighbor_point);
+          i_neigh->second->reinit(neigh, &qface_neighbor_point);
+          // Iterate to next side FEType
+          ++i_side;
+        }
+    }
 }
 
 
