@@ -87,6 +87,12 @@ public:
   Number side_value(unsigned int var, unsigned int qp);
 
   /**
+   * Returns the value of the solution variable \p var at the quadrature
+   * point \p qp on the element neighbor's side
+   */
+  Number neighbor_value(unsigned int var, unsigned int qp);
+
+  /**
    * Returns the value of the solution variable \p var at the physical
    * point \p p on the current element
    */
@@ -104,6 +110,12 @@ public:
    */
   Gradient side_gradient(unsigned int var, unsigned int qp);
 
+  /**
+   * Returns the gradient of the solution variable \p var at the quadrature
+   * point \p qp on the element neighbor's side
+   */
+  Gradient neighbor_gradient(unsigned int var, unsigned int qp);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
@@ -116,6 +128,12 @@ public:
    * point \p qp on the current element side
    */
   Tensor side_hessian(unsigned int var, unsigned int qp);
+
+  /**
+   * Returns the hessian of the solution variable \p var at the quadrature
+   * point \p qp on the element neighbor's side
+   */
+  Tensor neighbor_hessian(unsigned int var, unsigned int qp);
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -214,12 +232,13 @@ public:
 
 // should be protected?:
   /**
-   * Finite element objects for each variable's interior, sides and
-   * edges.
+   * Finite element objects for each variable's interior, sides 
+   * edges, and neighbor.
    */
   std::map<FEType, FEBase *> element_fe;
   std::map<FEType, FEBase *> side_fe;
   std::map<FEType, FEBase *> edge_fe;
+  std::map<FEType, FEBase *> neighbor_fe;
 
   /**
    * Pointers to the same finite element objects, but indexed
@@ -228,6 +247,7 @@ public:
   std::vector<FEBase *> element_fe_var;
   std::vector<FEBase *> side_fe_var;
   std::vector<FEBase *> edge_fe_var;
+  std::vector<FEBase *> neighbor_fe_var;
 
   /**
    * Quadrature rule for element interior.
@@ -249,6 +269,13 @@ public:
    * find a quadrature rule that correctly integrates all variables
    */
   QBase *edge_qrule;
+
+  /**
+   * Quadrature rules for neighbor sides
+   * The FEM context will try to find a quadrature rule that
+   * correctly integrates all variables
+   */
+  QBase *neighbor_qrule;
 
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
@@ -277,6 +304,11 @@ public:
    * Current element for element_* to examine
    */
   Elem *elem;
+
+  /**
+   * Neighbor element for element_* to examine
+   */
+  Elem *neigh;
 
   /**
    * Current side for side_* to examine

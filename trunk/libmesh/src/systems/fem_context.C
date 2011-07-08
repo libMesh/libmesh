@@ -41,12 +41,13 @@ namespace libMesh
 FEMContext::FEMContext (const System &sys)
   : DiffContext(sys),
     element_qrule(NULL), side_qrule(NULL),
-    edge_qrule(NULL),
+    edge_qrule(NULL), neighbor_qrule(NULL),
     _mesh_sys(sys.get_mesh_system()),
     _mesh_x_var(sys.get_mesh_x_var()),
     _mesh_y_var(sys.get_mesh_y_var()),
     _mesh_z_var(sys.get_mesh_z_var()),
-    elem(NULL), side(0), edge(0), dim(sys.get_mesh().mesh_dimension())
+    elem(NULL), neigh(NULL),  
+    side(0), edge(0), dim(sys.get_mesh().mesh_dimension())
 {
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
@@ -73,6 +74,8 @@ FEMContext::FEMContext (const System &sys)
     (dim, sys.extra_quadrature_order).release();
   side_qrule = hardest_fe_type.default_quadrature_rule
     (dim-1, sys.extra_quadrature_order).release();
+  neighbor_qrule = hardest_fe_type.default_quadrature_rule
+    (dim-1, sys.extra_quadrature_order).release();
   if (dim == 3)
     edge_qrule = hardest_fe_type.default_quadrature_rule
       (1, sys.extra_quadrature_order).release();
@@ -80,6 +83,7 @@ FEMContext::FEMContext (const System &sys)
   // Next, create finite element objects
   element_fe_var.resize(n_vars);
   side_fe_var.resize(n_vars);
+  neighbor_fe_var.resize(n_vars);
   if (dim == 3)
     edge_fe_var.resize(n_vars);
 
@@ -92,6 +96,8 @@ FEMContext::FEMContext (const System &sys)
           element_fe[fe_type]->attach_quadrature_rule(element_qrule);
           side_fe[fe_type] = FEBase::build(dim, fe_type).release();
           side_fe[fe_type]->attach_quadrature_rule(side_qrule);
+          neighbor_fe[fe_type] = FEBase::build(dim, fe_type).release();
+          neighbor_fe[fe_type]->attach_quadrature_rule(neighbor_qrule);
 
           if (dim == 3)
             {
@@ -101,6 +107,7 @@ FEMContext::FEMContext (const System &sys)
         }
       element_fe_var[i] = element_fe[fe_type];
       side_fe_var[i] = side_fe[fe_type];
+      neighbor_fe_var[i] = neighbor_fe[fe_type];
       if (dim == 3)
         edge_fe_var[i] = edge_fe[fe_type];
     }
@@ -121,6 +128,11 @@ FEMContext::~FEMContext()
     delete i->second;
   side_fe.clear();
 
+  for (std::map<FEType, FEBase *>::iterator i = neighbor_fe.begin();
+       i != neighbor_fe.end(); ++i)
+    delete i->second;
+  neighbor_fe.clear();
+
   for (std::map<FEType, FEBase *>::iterator i = edge_fe.begin();
        i != edge_fe.end(); ++i)
     delete i->second;
@@ -131,6 +143,9 @@ FEMContext::~FEMContext()
 
   delete side_qrule;
   side_qrule = NULL;
+
+  delete neighbor_qrule;
+  neighbor_qrule = NULL;
 
   if (edge_qrule)
     delete edge_qrule;
@@ -286,6 +301,89 @@ Tensor FEMContext::side_hessian(unsigned int var, unsigned int qp)
   // Get shape function values at quadrature point
   const std::vector<std::vector<RealTensor> > &d2phi =
     side_fe_var[var]->get_d2phi();
+
+  // Accumulate solution second derivatives
+  Tensor d2u;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    d2u.add_scaled(d2phi[l][qp], coef(l));
+
+  return d2u;
+}
+#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+
+
+Number FEMContext::neighbor_value(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (neigh_dof_indices.size() > var);
+  const unsigned int n_dofs = neigh_dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (neigh_subsolutions.size() > var);
+  libmesh_assert (neigh_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *neigh_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<Real> > &phi =
+    neighbor_fe_var[var]->get_phi();
+
+  // Accumulate solution value
+  Number u = 0.;
+
+  FEType fe_type = neighbor_fe_var[var]->get_fe_type();
+  // Point p_master = FEInterface::inverse_map(dim, fe_type, elem, p);
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    u += phi[l][qp] * coef(l);
+
+  return u;
+}
+
+
+
+Gradient FEMContext::neighbor_gradient(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (neigh_dof_indices.size() > var);
+  const unsigned int n_dofs = neigh_dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (neigh_subsolutions.size() > var);
+  libmesh_assert (neigh_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *neigh_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<RealGradient> > &dphi =
+    neighbor_fe_var[var]->get_dphi();
+
+  // Accumulate solution derivatives
+  Gradient du;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    du.add_scaled(dphi[l][qp], coef(l));
+
+  return du;
+}
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+Tensor FEMContext::neighbor_hessian(unsigned int var, unsigned int qp)
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (neigh_dof_indices.size() > var);
+  const unsigned int n_dofs = neigh_dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (neigh_subsolutions.size() > var);
+  libmesh_assert (neigh_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *neigh_subsolutions[var];
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<RealTensor> > &d2phi =
+    neighbor_fe_var[var]->get_d2phi();
 
   // Accumulate solution second derivatives
   Tensor d2u;
@@ -586,6 +684,32 @@ void FEMContext::side_fe_reinit ()
     {
       i->second->reinit(elem, side);
     }
+
+  // Set pointer to neighbor Elem
+  neigh = elem->neighbor(side);
+
+  // Initialize all the interior FE objects on neighbor/side.
+  // Logging of FE::reinit is done in the FE functions
+  if (compute_neighbor_values)
+    {
+      // We will simulatneously iterate through side and neighbor FETypes.
+      std::map<FEType, FEBase *>::iterator neigh_fe_end = neighbor_fe.end();
+      std::map<FEType, FEBase *>::iterator i_side = side_fe.begin();
+      // For loop takes care of iterating through neighbor
+      for (std::map<FEType, FEBase *>::iterator i_neigh = neighbor_fe.begin();
+           i_neigh != neigh_fe_end; ++i_neigh)
+        {
+          // The quadrature points on the side
+          std::vector<Point > qface_point = i_side->second->get_xyz();
+          // The points on the neighbor that we will reinit
+          std::vector<Point> qface_neighbor_point;
+          FEInterface::inverse_map (elem->dim(), i_side->first, neigh,
+            qface_point, qface_neighbor_point);
+          i_neigh->second->reinit(neigh, &qface_neighbor_point);
+          // Iterate to next side FEType
+          ++i_side;
+        }
+    }
 }
 
 
@@ -743,19 +867,34 @@ void FEMContext::pre_fe_reinit(const System &sys, Elem *e)
 
   // Initialize the per-element data for elem.
   sys.get_dof_map().dof_indices (elem, dof_indices);
+  if (compute_neighbor_values)
+    sys.get_dof_map().dof_indices (neigh, neigh_dof_indices);
   unsigned int n_dofs = dof_indices.size();
+  unsigned int neigh_n_dofs;
+  if (compute_neighbor_values)
+    neigh_n_dofs = neigh_dof_indices.size();
   unsigned int n_qoi = sys.qoi.size();
 
   elem_solution.resize(n_dofs);
+  if (compute_neighbor_values)
+    neigh_solution.resize(n_dofs);
   if (sys.use_fixed_solution)
     elem_fixed_solution.resize(n_dofs);
 
   for (unsigned int i=0; i != n_dofs; ++i)
     elem_solution(i) = sys.current_solution(dof_indices[i]);
+  if (compute_neighbor_values)
+    for (unsigned int i=0; i != neigh_n_dofs; ++i)
+      neigh_solution(i) = sys.current_solution(neigh_dof_indices[i]);
 
   // These resize calls also zero out the residual and jacobian
   elem_residual.resize(n_dofs);
   elem_jacobian.resize(n_dofs, n_dofs);
+  if (compute_neighbor_values)
+    {
+      elem_residual.resize(n_dofs);
+      elem_jacobian.resize(n_dofs, n_dofs);
+    }
 
   elem_qoi_derivative.resize(n_qoi);
   elem_qoi_subderivatives.resize(n_qoi);
@@ -764,12 +903,18 @@ void FEMContext::pre_fe_reinit(const System &sys, Elem *e)
 
   // Initialize the per-variable data for elem.
   unsigned int sub_dofs = 0;
+  unsigned int neigh_sub_dofs = 0;
   for (unsigned int i=0; i != sys.n_vars(); ++i)
     {
       sys.get_dof_map().dof_indices (elem, dof_indices_var[i], i);
+      if (compute_neighbor_values)
+        sys.get_dof_map().dof_indices (neigh, neigh_dof_indices_var[i], i);
 
       elem_subsolutions[i]->reposition
         (sub_dofs, dof_indices_var[i].size());
+      if (compute_neighbor_values)
+        neigh_subsolutions[i]->reposition
+          (neigh_sub_dofs, neigh_dof_indices_var[i].size());
 
       if (sys.use_fixed_solution)
         elem_fixed_subsolutions[i]->reposition
@@ -777,6 +922,9 @@ void FEMContext::pre_fe_reinit(const System &sys, Elem *e)
 
       elem_subresiduals[i]->reposition
         (sub_dofs, dof_indices_var[i].size());
+      if (compute_neighbor_values)
+        neigh_subresiduals[i]->reposition
+          (neigh_sub_dofs, neigh_dof_indices_var[i].size());
 
       for (unsigned int q=0; q != n_qoi; ++q)
         elem_qoi_subderivatives[q][i]->reposition
@@ -792,12 +940,29 @@ void FEMContext::pre_fe_reinit(const System &sys, Elem *e)
             (elem_subresiduals[j]->i_off(), sub_dofs,
              dof_indices_var[j].size(),
              dof_indices_var[i].size());
+          if (compute_neighbor_values)
+            {
+              neigh_subjacobians[i][j]->reposition
+                (neigh_sub_dofs, neigh_subresiduals[j]->i_off(),
+                 neigh_dof_indices_var[i].size(),
+                 neigh_dof_indices_var[j].size());
+              neigh_subjacobians[j][i]->reposition
+                (neigh_subresiduals[j]->i_off(), neigh_sub_dofs,
+                 neigh_dof_indices_var[j].size(),
+                 neigh_dof_indices_var[i].size());
+            }
         }
       elem_subjacobians[i][i]->reposition
         (sub_dofs, sub_dofs,
          dof_indices_var[i].size(),
          dof_indices_var[i].size());
+      if (compute_neighbor_values)
+        neigh_subjacobians[i][i]->reposition
+          (neigh_sub_dofs, neigh_sub_dofs,
+           neigh_dof_indices_var[i].size(),
+           neigh_dof_indices_var[i].size());
       sub_dofs += dof_indices_var[i].size();
+      neigh_sub_dofs += dof_indices_var[i].size();
     }
   libmesh_assert(sub_dofs == n_dofs);
 }
