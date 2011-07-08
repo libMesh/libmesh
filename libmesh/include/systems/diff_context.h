@@ -1,4 +1,3 @@
-
 // $Id$
 
 // The libMesh Finite Element Library.
@@ -113,7 +112,9 @@ public:
    * as adjusted by a time_solver
    */
   DenseVector<Number> elem_solution;
+  DenseVector<Number> neigh_solution;
   std::vector<DenseSubVector<Number> *> elem_subsolutions;
+  std::vector<DenseSubVector<Number> *> neigh_subsolutions;
 
   /**
    * Element by element components of nonlinear_solution
@@ -141,12 +142,14 @@ public:
    * Element residual vector
    */
   DenseVector<Number> elem_residual;
+  DenseVector<Number> neigh_residual;
 
   /**
    * Element jacobian: derivatives of elem_residual with respect to
    * elem_solution
    */
   DenseMatrix<Number> elem_jacobian;
+  DenseMatrix<Number> neigh_jacobian;
 
   /**
    * Element quantity of interest contributions
@@ -163,13 +166,17 @@ public:
    * Element residual subvectors and Jacobian submatrices
    */
   std::vector<DenseSubVector<Number> *> elem_subresiduals;
+  std::vector<DenseSubVector<Number> *> neigh_subresiduals;
   std::vector<std::vector<DenseSubMatrix<Number> *> > elem_subjacobians;
+  std::vector<std::vector<DenseSubMatrix<Number> *> > neigh_subjacobians;
 
   /** 
    * Global Degree of freedom index lists
    */
   std::vector<unsigned int> dof_indices;
+  std::vector<unsigned int> neigh_dof_indices;
   std::vector<std::vector<unsigned int> > dof_indices_var;
+  std::vector<std::vector<unsigned int> > neigh_dof_indices_var;
 
   /**
    * Points the _deltat member of this class at a timestep value
@@ -182,6 +189,13 @@ public:
    * member
    */
   Real get_deltat_value();
+
+  /**
+   * \p compute_neighbor_values is false by default, it is useful
+   * for computations with discontinuous elements in which a interface
+   * jump or average across elements needs to be computed
+   */
+  bool compute_neighbor_values;
   
 private:
   /**
