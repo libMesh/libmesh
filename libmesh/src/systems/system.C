@@ -1730,7 +1730,7 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
 
 
 
-Number System::point_value(unsigned int var, Point &p, const bool insist_on_success)
+Number System::point_value(unsigned int var, const Point &p, const bool insist_on_success)
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -1817,7 +1817,7 @@ Number System::point_value(unsigned int var, Point &p, const bool insist_on_succ
 
 
 
-Gradient System::point_gradient(unsigned int var, Point &p, const bool insist_on_success)
+Gradient System::point_gradient(unsigned int var, const Point &p, const bool insist_on_success)
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -1906,7 +1906,7 @@ Gradient System::point_gradient(unsigned int var, Point &p, const bool insist_on
 
 // We can only accumulate a hessian with --enable-second
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor System::point_hessian(unsigned int var, Point &p, const bool insist_on_success)
+Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist_on_success)
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
@@ -1991,7 +1991,7 @@ Tensor System::point_hessian(unsigned int var, Point &p, const bool insist_on_su
   return hess_u;
 }
 #else
-Tensor System::point_hessian(unsigned int, Point &, const bool)
+Tensor System::point_hessian(unsigned int, const Point &, const bool)
 {
   // We can only accumulate a hessian with --enable-second
   libmesh_error();
