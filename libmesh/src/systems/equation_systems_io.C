@@ -442,8 +442,16 @@ void EquationSystems::write(const std::string& name,
   
    // set booleans from write_flags argument
    const bool write_data            = write_flags & EquationSystems::WRITE_DATA;
-   const bool write_parallel_files  = write_flags & EquationSystems::WRITE_PARALLEL_FILES;
    const bool write_additional_data = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
+
+   // always write parallel files if we're instructed to write in
+   // parallel
+   const bool write_parallel_files  =
+     (write_flags & EquationSystems::WRITE_PARALLEL_FILES) ||
+   // but also write parallel files if we haven't been instructed to
+   // write in serial and we're on a distributed mesh
+     (!(write_flags & EquationSystems::WRITE_SERIAL_FILES) &&
+      !this->get_mesh().is_serial());
 
   // New scope so that io will close before we try to zip the file
   {
