@@ -37,8 +37,9 @@ namespace {
   // Nasty hacks for reading/writing zipped files
   void bzip_file (const std::string &unzipped_name)
   {
-    // There's no parallel bzip2 for us to call
-    libmesh_assert(libMesh::processor_id() == 0);
+    // There's no parallel bzip2 for us to call, but we might
+    // be running multiple zip utilities on parallel files.
+    // libmesh_assert(libMesh::processor_id() == 0);
 
 #ifdef LIBMESH_HAVE_BZIP
     START_LOG("system(bzip2)", "XdrIO");
@@ -59,8 +60,9 @@ namespace {
 
   std::string unzip_file (const std::string &name)
   {
-    // There's no parallel bunzip2 or xz for us to call
-    libmesh_assert(libMesh::processor_id() == 0);
+    // There's no parallel bunzip2 or xz for us to call, but we might
+    // be running multiple zip utilities on parallel files.
+    // libmesh_assert(libMesh::processor_id() == 0);
 
     OStringStream pid_suffix; 
     pid_suffix << '_' << getpid();
@@ -105,8 +107,9 @@ namespace {
 
   void xzip_file (const std::string &unzipped_name)
   {
-    // There's no parallel xz for us to call
-    libmesh_assert(libMesh::processor_id() == 0);
+    // There's no parallel xz for us to call, but we might
+    // be running multiple zip utilities on parallel files.
+    // libmesh_assert(libMesh::processor_id() == 0);
 
 #ifdef LIBMESH_HAVE_XZ
     START_LOG("system(xz)", "XdrIO");
