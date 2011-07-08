@@ -1193,21 +1193,21 @@ public:
    * optional parameter \p insist_on_success can be set to false to allow
    * the method to return 0 when the point is not located.
    */
-  Number point_value(unsigned int var, Point &p,
+  Number point_value(unsigned int var, const Point &p,
                      const bool insist_on_success = true);
 
   /**
    * Returns the gradient of the solution variable \p var at the physical
    * point \p p in the mesh, similarly to point_value.
    */
-  Gradient point_gradient(unsigned int var, Point &p,
+  Gradient point_gradient(unsigned int var, const Point &p,
                           const bool insist_on_success = true);
 
   /**
    * Returns the second derivative tensor of the solution variable \p var 
    * at the physical point \p p in the mesh, similarly to point_value.
    */
-  Tensor point_hessian(unsigned int var, Point &p,
+  Tensor point_hessian(unsigned int var, const Point &p,
                        const bool insist_on_success = true);
  
   /**

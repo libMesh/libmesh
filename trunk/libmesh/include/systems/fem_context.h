@@ -90,7 +90,7 @@ public:
    * Returns the value of the solution variable \p var at the physical
    * point \p p on the current element
    */
-  Number point_value(unsigned int var, Point &p);
+  Number point_value(unsigned int var, const Point &p);
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
@@ -135,7 +135,7 @@ public:
    * Returns the value of the fixed_solution variable \p var at the physical
    * point \p p on the current element
    */
-  Number fixed_point_value(unsigned int var, Point &p);
+  Number fixed_point_value(unsigned int var, const Point &p);
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
