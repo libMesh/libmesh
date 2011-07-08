@@ -284,6 +284,16 @@ namespace Parallel
     StandardType(const T* example = NULL);
   };
 
+  /*
+   * The unspecialized class gives default, lowest-common-denominator
+   * attributes.  More specialized classes can override them.
+   */
+  template<typename T>
+  struct Attributes
+  {
+    const static bool has_min_max = false;
+  };
+
   //-------------------------------------------------------------------
   /**
    * Encapsulates the MPI_Comm object.  Allows the size of the group
@@ -1434,6 +1444,12 @@ namespace Parallel
   public: \
     StandardType(const cxxtype* example = NULL) : DataType(mpitype) \
       { /* make compiler think 'example' is used */ libmesh_ignore(example); } \
+  }; \
+ \
+  template<> \
+  struct Attributes<cxxtype> \
+  { \
+    const static bool has_min_max = true; \
   }
 
 #else
@@ -1445,6 +1461,12 @@ namespace Parallel
   public: \
     StandardType(const cxxtype* example = NULL) : DataType() \
       { /* make compiler think 'example' is used */ libmesh_ignore(example); } \
+  }; \
+ \
+  template<> \
+  struct Attributes<cxxtype> \
+  { \
+    const static bool has_min_max = true; \
   }
 
 #endif
@@ -1531,7 +1553,7 @@ namespace Parallel
   inline bool verify(const T &r,
                      const Communicator &comm)
   {
-    if (comm.size() > 1)
+    if (comm.size() > 1 && Attributes<T>::has_min_max == true)
       {
 	T tempmin = r, tempmax = r;
 	Parallel::min(tempmin, comm);
@@ -2826,6 +2848,7 @@ namespace Parallel
 		       r_src.size(), 
 		       send_type,
 		       comm.get());
+        libmesh_assert(verify(r));
 	STOP_LOG("allgather()", "Parallel");
 	return;
       }
