@@ -175,7 +175,7 @@ public:
    * Load the RB solution from the most recent solve with rb_eval
    * into this system's solution vector.
    */
-  virtual void load_RB_solution();
+  virtual void load_rb_solution();
 
   /**
    * Register a user-defined object to be used in initializing the

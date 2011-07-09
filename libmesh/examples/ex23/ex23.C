@@ -234,7 +234,7 @@ int main (int argc, char** argv)
       system.rb_eval = rb_eval.get();
       
       // Plot the solution
-      system.load_RB_solution();
+      system.load_rb_solution();
       ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
       
       // Plot the first basis function that was generated from the train_reduced_basis
