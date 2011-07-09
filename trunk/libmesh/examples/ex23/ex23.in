@@ -17,7 +17,7 @@ mu_min = '-2 -2'               # The "lower corner" of the parameter domain
 mu_max = '2 2'                 # The "upper corner" of the parameter domain
 log_scaling = '0 0'            # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
 
-deterministic_training = true  # Are the training points generated randomly or deterministically
-return_rel_error_bound = false # Do we use a relative or absolute error bound when training the RB space?
+deterministic_training = true        # Are the training points generated randomly or deterministically
+use_relative_bound_in_greedy = false # Do we use a relative or absolute error bound when training the RB space?
 
 n_training_samples_mu = 100    # The number of parameters in training set (must be square for the 2-parameter deterministic case)
