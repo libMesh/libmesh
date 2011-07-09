@@ -135,14 +135,11 @@ int main (int argc, char** argv)
 
   system.attach_dirichlet_dof_initialization(&dirichlet_assembly);
   
-  // Attach the expansion of the PDE operator. The third argument
-  // here refers to assembly over the boundary of the mesh, but this
-  // problem only requires internal assembly and hence it is set to NULL
+  // Attach the expansion of the PDE operator.
   system.attach_A_q(&theta_a_0, &A0_assembly);
   system.attach_A_q(&theta_a_1, &A1_assembly);
   system.attach_A_q(&theta_a_2, &A2_assembly);
 
-  
   // Attach the expansion of the RHS
   system.attach_F_q(&rb_theta, &F0_assembly);
   
@@ -158,6 +155,9 @@ int main (int argc, char** argv)
 
   // Read in the data that defines this problem from the specified text file
   system.process_parameters_file(parameters_filename);
+  
+  // Print out info that describes the current setup of system
+  system.print_info();
 
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the

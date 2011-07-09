@@ -138,7 +138,13 @@ void TransientRBConstruction::process_parameters_file (const std::string& parame
   set_POD_tol(POD_tol_in);
   set_max_truth_solves(max_truth_solves_in);
   set_delta_N(delta_N_in);
+}
 
+void TransientRBConstruction::print_info()
+{
+  Parent::print_info();
+
+  // Print out info that describes the current setup
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
 

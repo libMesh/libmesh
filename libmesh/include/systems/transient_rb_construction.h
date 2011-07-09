@@ -93,6 +93,11 @@ public:
   virtual void process_parameters_file (const std::string& parameters_filename);
 
   /**
+   * Print out info that describes the current setup of this RBConstruction.
+   */
+  virtual void print_info();
+
+  /**
    * Build a new TransientRBEvaluation object.
    */
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();

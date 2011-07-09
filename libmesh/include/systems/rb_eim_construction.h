@@ -94,18 +94,23 @@ public:
    * @returns a string indicating the type of the system.
    */
   virtual std::string system_type () const;
-  
-  /**
-   * Initialize this system so that we can perform
-   * the Construction stage of the RB method.
-   */
-  virtual void initialize_rb_construction();
 
   /**
    * Read parameters in from file and set up this system
    * accordingly.
    */
   virtual void process_parameters_file (const std::string& parameters_filename);
+
+  /**
+   * Print out info that describes the current setup of this RBConstruction.
+   */
+  virtual void print_info();
+
+  /**
+   * Initialize this system so that we can perform
+   * the Construction stage of the RB method.
+   */
+  virtual void initialize_rb_construction();
  
   /**
    * Load the truth representation of the parametrized function
