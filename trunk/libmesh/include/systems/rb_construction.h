@@ -347,6 +347,11 @@ public:
    * accordingly.
    */
   virtual void process_parameters_file(const std::string& parameters_filename);
+  
+  /**
+   * Print out info that describes the current setup of this RBConstruction.
+   */
+  virtual void print_info();
 
   /**
    * Build a new RBEvaluation object.
