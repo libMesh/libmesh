@@ -29,7 +29,11 @@ namespace libMesh
 RBEIMEvaluation::RBEIMEvaluation(RBEIMConstruction& rb_eim_con_in)
   :
   rb_eim_con(rb_eim_con_in)
-{}
+{
+  // Indicate that we need to compute the RB
+  // inner product matrix in this case
+  compute_RB_inner_product = true;
+}
 
 
 void RBEIMEvaluation::clear()

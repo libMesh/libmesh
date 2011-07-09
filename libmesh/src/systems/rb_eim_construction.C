@@ -54,7 +54,18 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
     performing_extra_greedy_step(false),
     current_bf_index(0)
 {
+  // We cannot do rb_solve with an empty
+  // "rb space" with EIM
   use_empty_rb_solve_in_greedy = false;
+
+  // Indicate that we need to compute the RB
+  // inner product matrix in this case
+  compute_RB_inner_product = true;
+  
+  // Indicate that we need the training set
+  // for the Greedy to be the same on all
+  // processors
+  serial_training_set = true;
 }
 
 RBEIMConstruction::~RBEIMConstruction ()
@@ -70,15 +81,6 @@ std::string RBEIMConstruction::system_type () const
 
 void RBEIMConstruction::process_parameters_file (const std::string& parameters_filename)
 {
-  // Indicate that we need to compute the RB
-  // inner product matrix in this case
-  compute_RB_inner_product = true;
-  
-  // Indicate that we need the training set
-  // for the Greedy to be the same on all
-  // processors
-  serial_training_set = true;
-  
   Parent::process_parameters_file(parameters_filename);
   
   if(n_vars() != get_n_parametrized_functions() )

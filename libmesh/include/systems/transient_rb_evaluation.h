@@ -155,6 +155,11 @@ public:
   virtual Real rb_solve(unsigned int N);
 
   /**
+   * Override to return the L2 norm of RB_solution.
+   */
+  virtual Real get_rb_solution_norm();
+
+  /**
    * Specifies the residual scaling on the numerator to
    * be used in the a posteriori error bound. Override
    * in subclass in order to obtain the desired error bound.
