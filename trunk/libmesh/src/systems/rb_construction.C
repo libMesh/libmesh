@@ -2018,9 +2018,9 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
   rb_eval->Fq_representor_norms = Fq_representor_norms;
 }
 
-void RBConstruction::load_RB_solution()
+void RBConstruction::load_rb_solution()
 {
-  START_LOG("load_RB_solution()", "RBConstruction");
+  START_LOG("load_rb_solution()", "RBConstruction");
 
   solution->zero();
 
@@ -2028,7 +2028,7 @@ void RBConstruction::load_RB_solution()
   {
     libMesh::err << "ERROR: System contains " << rb_eval->get_n_basis_functions() << " basis functions."
                  << " RB_solution vector constains " << rb_eval->RB_solution.size() << " entries."
-                 << " RB_solution in RBConstruction::load_RB_solution is too long!" << std::endl;
+                 << " RB_solution in RBConstruction::load_rb_solution is too long!" << std::endl;
     libmesh_error();
   }
 
@@ -2039,7 +2039,7 @@ void RBConstruction::load_RB_solution()
 
   update();
 
-  STOP_LOG("load_RB_solution()", "RBConstruction");
+  STOP_LOG("load_rb_solution()", "RBConstruction");
 }
 
 // The slow (but simple, non-error prone) way to compute the residual dual norm
