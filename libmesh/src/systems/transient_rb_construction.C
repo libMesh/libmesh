@@ -65,6 +65,10 @@ TransientRBConstruction::TransientRBConstruction (EquationSystems& es,
     max_truth_solves(-1),
     L2_assembly(NULL)
 {
+  // Indicate that we need to compute the RB
+  // inner product matrix in this case
+  compute_RB_inner_product = true;
+
   temporal_data.resize(0);
   
   // Clear assembly vector so that we can push_back
@@ -109,10 +113,6 @@ void TransientRBConstruction::clear()
 void TransientRBConstruction::process_parameters_file (const std::string& parameters_filename)
 {
   Parent::process_parameters_file(parameters_filename);
-
-  // Indicate that we need to compute the RB
-  // inner product matrix in this case
-  compute_RB_inner_product = true;
 
   // Read in data from parameters_filename
   GetPot infile(parameters_filename);

@@ -33,6 +33,9 @@ namespace libMesh
 
 TransientRBEvaluation::TransientRBEvaluation ()
 {
+  // Indicate that we need to compute the RB
+  // inner product matrix in this case
+  compute_RB_inner_product = true;
 }
 
 TransientRBEvaluation::~TransientRBEvaluation ()
