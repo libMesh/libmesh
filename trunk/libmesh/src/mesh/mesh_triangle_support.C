@@ -280,8 +280,15 @@ void Triangle::copy_tri_to_mesh(const triangulateio& triangle_data_input,
 	}
     }
 
-  // Prepare mesh for usage.
-  mesh_output.prepare_for_use(/*skip_renumber =*/false);
+  // Note: If the input mesh was a parallel one, calling
+  // prepare_for_use() now will re-parallelize it by a call to
+  // delete_remote_elements()... We do not actually want to
+  // reparallelize it here though: the triangulate() function may
+  // still do some Mesh smoothing.  The main thing needed (for
+  // smoothing) is the neighbor information, so let's just find
+  // neighbors...
+  //mesh_output.prepare_for_use(/*skip_renumber =*/false);
+  mesh_output.find_neighbors();
 }
 
 
