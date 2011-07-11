@@ -32,6 +32,7 @@
 #include "libmesh.h"
 #include "enum_elem_type.h"
 //#include "point.h"
+#include "mesh_triangle_interface.h"
 
 namespace libMesh
 {
@@ -115,7 +116,22 @@ namespace MeshTools
 		       const unsigned int nr=2,
 		       const ElemType type=INVALID_ELEM);
 
-    
+   
+#ifdef LIBMESH_HAVE_TRIANGLE
+    /**
+     * Meshes a rectangular (2D) region (with or without holes) with a
+     * Delaunay triangulation.  This function internally calls the
+     * triangle library written by J.R. Shewchuk.
+     */
+    void build_delaunay_square(UnstructuredMesh& mesh,
+			       const unsigned int nx, // num. of elements in x-dir
+			       const unsigned int ny, // num. of elements in y-dir
+			       const Real xmin, const Real xmax,
+			       const Real ymin, const Real ymax,
+			       const ElemType type,
+			       const std::vector<TriangleInterface::Hole*>* holes=NULL);
+#endif LIBMESH_HAVE_TRIANGLE
+
   } // end namespace Meshtools::Generation
 } // end namespace MeshTools
 
