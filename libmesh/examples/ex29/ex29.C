@@ -19,7 +19,7 @@
 
 
 
- // <h1>Example 28 - Meshing with LibMesh's TetGen and Triangle Interfaces</h1>
+ // <h1>Example 29 - Meshing with LibMesh's TetGen and Triangle Interfaces</h1>
  //
  // LibMesh provides interfaces to both Triangle and TetGen for generating 
  // Delaunay triangulations and tetrahedralizations in two and three dimensions
@@ -27,12 +27,13 @@
 
 // Local header files
 #include "mesh.h"
-#include "mesh_triangle_support.h"
+#include "mesh_triangle_interface.h"
 #include "mesh_generation.h"
 #include "elem.h"
 #include "mesh_tetgen_interface.h"
 #include "node.h"
 #include "face_tri3.h"
+#include "mesh_triangle_holes.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

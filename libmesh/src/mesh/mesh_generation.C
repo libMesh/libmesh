@@ -1867,4 +1867,126 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 #endif // #ifndef LIBMESH_ENABLE_AMR
 
 
+
+
+
+#ifdef LIBMESH_HAVE_TRIANGLE
+
+// Triangulates a 2D rectangular region with or without holes
+void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
+						  const unsigned int nx, // num. of elements in x-dir
+						  const unsigned int ny, // num. of elements in y-dir
+						  const Real xmin, const Real xmax,
+						  const Real ymin, const Real ymax,
+						  const ElemType type,
+						  const std::vector<TriangleInterface::Hole*>* holes)
+{
+  // Check for reasonable size
+  libmesh_assert (nx >= 1); // need at least 1 element in x-direction
+  libmesh_assert (ny >= 1); // need at least 1 element in y-direction
+  libmesh_assert (xmin < xmax);
+  libmesh_assert (ymin < ymax);
+
+  // Clear out any data which may have been in the Mesh
+  mesh.clear();
+
+  // Make sure the new Mesh will be 2D
+  mesh.set_mesh_dimension(2);
+  
+  // The x and y spacing between boundary points
+  const Real delta_x = (xmax-xmin) / static_cast<Real>(nx);
+  const Real delta_y = (ymax-ymin) / static_cast<Real>(ny);  
+
+  // Bottom
+  for (unsigned int p=0; p<=nx; ++p)
+    mesh.add_point(Point(xmin + p*delta_x, ymin));
+  
+  // Right side
+  for (unsigned int p=1; p<ny; ++p)
+    mesh.add_point(Point(xmax, ymin + p*delta_y)); 
+
+  // Top
+  for (unsigned int p=0; p<=nx; ++p)
+    mesh.add_point(Point(xmax - p*delta_x, ymax));
+
+  // Left side
+  for (unsigned int p=1; p<ny; ++p)
+    mesh.add_point(Point(xmin,  ymax - p*delta_y)); 
+		   
+  // Be sure we added as many points as we thought we did
+  libmesh_assert (mesh.n_nodes() == 2*(nx+ny));
+
+  // Construct the Triangle Interface object
+  TriangleInterface t(mesh);
+
+  // Set custom variables for the triangulation
+  t.desired_area()       = 0.5 * (xmax-xmin)*(ymax-ymin) / static_cast<Real>(nx*ny);
+  t.triangulation_type() = TriangleInterface::PSLG;
+  t.elem_type()          = type;
+
+  if (holes != NULL)
+    t.attach_hole_list(holes);
+
+  // Triangulate!
+  t.triangulate();
+
+  // The mesh is now generated, but we still need to mark the boundaries
+  // to be consistent with the other build_square routines.  Note that only
+  // the external boundaries of the square are given boundary ids, the holes
+  // are not numbered.
+  MeshBase::element_iterator       el     = mesh.elements_begin();
+  const MeshBase::element_iterator end_el = mesh.elements_end();
+  for ( ; el != end_el; ++el)
+    {
+      const Elem* elem = *el;
+      
+      for (unsigned int s=0; s<elem->n_sides(); s++)
+	if (elem->neighbor(s) == NULL)
+	  {
+	    AutoPtr<Elem> side (elem->build_side(s));
+
+	    // Check the location of the side's midpoint.  Since
+	    // the square has straight sides, the midpoint is not
+	    // on the corner and thus it is uniquely on one of the
+	    // sides.
+	    Point side_midpoint= ( (*side->get_node(0)) + (*side->get_node(1)) )/2;
+
+	    // The boundary ids are set following the same convention as Quad4 sides
+	    // bottom = 0
+	    // right  = 1
+	    // top = 2
+	    // left = 3
+	    // hole = 4
+	    short int bc_id=4;
+
+	    // bottom
+	    if      (std::fabs(side_midpoint(1) - ymin) < TOLERANCE)
+	      bc_id=0;
+
+	    // right
+	    else if (std::fabs(side_midpoint(0) - xmax) < TOLERANCE)
+	      bc_id=1;
+
+	    // top
+	    else if (std::fabs(side_midpoint(1) - ymax) < TOLERANCE)
+	      bc_id=2;
+
+	    // left
+	    else if (std::fabs(side_midpoint(0) - xmin) < TOLERANCE)
+	      bc_id=3;
+
+	    // If the point is not on any of the external boundaries, it
+	    // is on one of the holes....
+	    
+	    // Finally, add this element's information to the boundary info object.
+	    mesh.boundary_info->add_side(elem->id(), s, bc_id);
+	  }
+    }
+  
+} // end build_delaunay_square
+
+#endif // LIBMESH_HAVE_TRIANGLE
+
+
+
 } // namespace libMesh
