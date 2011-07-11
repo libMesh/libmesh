@@ -29,7 +29,7 @@
 #include "enum_elem_type.h" // For ElemType declaration below
 #include "point.h"
 #include "libmesh.h"
-#include "mesh_output.h" // for MeshSerializer... could this get its own header?
+#include "mesh_serializer.h"
 #include "unstructured_mesh.h"
 
 #ifdef LIBMESH_HAVE_TRIANGLE

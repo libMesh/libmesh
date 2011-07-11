@@ -19,37 +19,30 @@
 
 
 // Local includes
-#include "equation_systems.h"
-#include "mesh_output.h"
-#include "parallel.h"
-#include "parallel_mesh.h"
-#include "unstructured_mesh.h"
+#include "mesh_serializer.h"
+#include "mesh_base.h"
+#include "parallel.h" // parallel_only() macro
 
 namespace libMesh
 {
 
-template <class MT>
-void MeshOutput<MT>::
-_build_variable_names_and_solution_vector (const EquationSystems& es,
-					   std::vector<Number>& soln,
-					   std::vector<std::string>& names)
-{
-  if(!_is_parallel_format)
+  MeshSerializer::MeshSerializer(MeshBase& mesh, bool need_serial) :
+    _mesh(mesh),
+    reparallelize(false)
   {
-    // We need a serial mesh for MeshOutput for now
-    const_cast<EquationSystems&>(es).allgather();
+    parallel_only();
+    if (need_serial && !_mesh.is_serial()) {
+      reparallelize = true;
+      _mesh.allgather();
+    }
   }
 
-  es.build_variable_names  (names);
-  es.build_solution_vector (soln);
-}
 
 
-
-// Instantiate for our Mesh types.  If this becomes too cumbersome later,
-// move any functions in this file to the header file instead.
-template class MeshOutput<MeshBase>;
-template class MeshOutput<UnstructuredMesh>;
-template class MeshOutput<ParallelMesh>;
+  MeshSerializer::~MeshSerializer()
+  {
+    if (reparallelize)
+      _mesh.delete_remote_elements();
+  }
 
 } // namespace libMesh

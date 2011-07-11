@@ -25,7 +25,7 @@
 #include "libmesh_config.h"
 #include "mesh_base.h"
 #include "parallel.h"    // also includes mpi.h
-#include "mesh_output.h" // for MeshSerializer
+#include "mesh_serializer.h" 
 #include "mesh_tools.h"
 #include "mesh_communication.h"
 #include "parmetis_partitioner.h"

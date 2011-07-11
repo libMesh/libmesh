@@ -43,3 +43,5 @@ examples/ex28/out_*.e
 examples/ex29/*.e
 autom4te.cache/
 aclocal.m4
+examples/ex10/saved_solution.xda.0000
+examples/ex2/eqn_sys.dat.0000

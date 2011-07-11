@@ -18,38 +18,37 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#ifndef __mesh_serializer_h__
+#define __mesh_serializer_h__
+
+// C++ includes
+
 // Local includes
-#include "equation_systems.h"
-#include "mesh_output.h"
-#include "parallel.h"
-#include "parallel_mesh.h"
-#include "unstructured_mesh.h"
+
 
 namespace libMesh
 {
+  // Forward declarations
+  class MeshBase;
 
-template <class MT>
-void MeshOutput<MT>::
-_build_variable_names_and_solution_vector (const EquationSystems& es,
-					   std::vector<Number>& soln,
-					   std::vector<std::string>& names)
-{
-  if(!_is_parallel_format)
+  /**
+   * Temporarily serialize a ParallelMesh for output; a distributed
+   * mesh is allgathered by the MeshSerializer constructor if
+   * need_serial is true, then remote elements are deleted again by the
+   * destructor.
+   */
+  class MeshSerializer
   {
-    // We need a serial mesh for MeshOutput for now
-    const_cast<EquationSystems&>(es).allgather();
-  }
+  public:
+    MeshSerializer(MeshBase& mesh, bool need_serial = true);
 
-  es.build_variable_names  (names);
-  es.build_solution_vector (soln);
-}
+    ~MeshSerializer();
 
-
-
-// Instantiate for our Mesh types.  If this becomes too cumbersome later,
-// move any functions in this file to the header file instead.
-template class MeshOutput<MeshBase>;
-template class MeshOutput<UnstructuredMesh>;
-template class MeshOutput<ParallelMesh>;
-
+  private:
+    MeshBase& _mesh;
+    bool reparallelize;
+  };
+  
 } // namespace libMesh
+
+#endif // __mesh_serializer_h__

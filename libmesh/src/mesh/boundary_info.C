@@ -27,7 +27,7 @@
 #include "boundary_info.h"
 #include "elem.h"
 #include "mesh_data.h"
-#include "mesh_output.h" // for MeshSerializer
+#include "mesh_serializer.h"
 #include "parallel.h"
 #include "partitioner.h"
 #include "unstructured_mesh.h"
