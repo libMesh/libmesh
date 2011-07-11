@@ -30,7 +30,7 @@
 #include "mesh_triangle_support.h"
 #include "mesh_generation.h"
 #include "elem.h"
-#include "mesh_tetgen_support.h"
+#include "mesh_tetgen_interface.h"
 #include "node.h"
 #include "face_tri3.h"
 
@@ -187,9 +187,8 @@ void tetrahedralize_domain()
   mesh.find_neighbors();
 
   // 4.) Set up vector of hole points
-  Node hole_node( 0.5*(hole_lower_limit + hole_upper_limit) );
-  std::vector<Node*> hole(1);
-  hole[0] = &hole_node;
+  std::vector<Point> hole(1);
+  hole[0] = Point( 0.5*(hole_lower_limit + hole_upper_limit) );
 
   // 5.) Set parameters and tetrahedralize the domain
   
