@@ -31,13 +31,13 @@
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_base.h"
+#include "mesh_serializer.h"
 
 namespace libMesh
 {
 
 // Forward declares
 class EquationSystems;
-class MeshSerializer;
 
 
 /**
@@ -148,27 +148,6 @@ class MeshOutput
 };
 
 
-
-/**
- * Temporarily serialize a ParallelMesh for output; a distributed
- * mesh is allgathered by the MeshSerializer constructor if
- * need_serial is true, then remote elements are deleted again by the
- * destructor.
- */
-
-// ------------------------------------------------------------
-// MeshSerializer class definition
-class MeshSerializer
-{
-public:
-  MeshSerializer(MeshBase& mesh, bool need_serial = true);
-
-  ~MeshSerializer();
-
-private:
-  MeshBase& _mesh;
-  bool reparallelize;
-};
 
 
 

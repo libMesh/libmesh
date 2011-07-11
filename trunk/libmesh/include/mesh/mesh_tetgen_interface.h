@@ -31,7 +31,7 @@
 #include <string>
 
 // Local includes
-#include "mesh_output.h" // for MeshSerializer... could this get its own header?
+#include "mesh_serializer.h"
 #include "point.h" // used for specifying holes
 
 namespace libMesh
