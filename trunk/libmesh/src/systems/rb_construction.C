@@ -211,14 +211,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   write_data_during_training = infile("write_data_during_training",
                                       write_data_during_training);
 
-  // Set boolean which turns on/off storing the representor residuals
-  impose_internal_dirichlet_BCs = infile("impose_internal_dirichlet_BCs",
-                                          impose_internal_dirichlet_BCs);
-
-  // Set boolean which turns on/off storing the representor residuals
-  impose_internal_fluxes = infile("impose_internal_fluxes",
-                                   impose_internal_fluxes);
-
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.
@@ -307,8 +299,6 @@ void RBConstruction::print_info()
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
-  libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
-  libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
   libMesh::out << "parameter initialized to: " << std::endl;
   print_current_parameters();

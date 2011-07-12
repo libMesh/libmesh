@@ -481,19 +481,23 @@ public:
 
   /**
    * Boolean flag to indicate whether we require a Dirichlet boundary
-   * condition on internal mesh dofs, for example in a problem in which
-   * parameters are not defined on some subdomains.
+   * condition on internal mesh dofs. This is useful for example in problems
+   * with subdomain-only-variables.
    */
   bool impose_internal_dirichlet_BCs;
 
   /**
-   * Boolean flag to indicate whether we impose flux on internal element
-   * boundaries.
+   * Boolean flag to indicate whether we impose "fluxes"
+   * (i.e. element boundary contributions to the weak form)
+   * on internal element boundaries in the assembly routines.
    */
   bool impose_internal_fluxes;
   
   /**
    * Boolean flag to indicate whether we compute the RB_inner_product_matrix.
+   * This is false by default in RBConstruction since (in the default implementation)
+   * the RB inner-product matrix will just be the identity. But we may need the
+   * inner-product matrix subclasses.
    */
   bool compute_RB_inner_product;
 
