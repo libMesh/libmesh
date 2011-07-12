@@ -70,7 +70,7 @@ int ex_put_concat_elem_block (int    exoid,
                               const int*   num_attr,
                               int    define_maps)
 {
-  int i, varid, dimid, dims[2], strdim, *eb_stat;
+  int i, varid, dimid, dims[2], strdim, *eb_array;
   int temp;
   int iblk;
   int status;
@@ -100,7 +100,7 @@ int ex_put_concat_elem_block (int    exoid,
   num_elem_blk = length;
   
   /* Fill out the element block status array */
-  if (!(eb_stat = malloc(num_elem_blk*sizeof(int)))) {
+  if (!(eb_array = malloc(num_elem_blk*sizeof(int)))) {
     exerrval = EX_MEMFAIL;
     sprintf(errmsg,
 	    "Error: failed to allocate space for element block status array in file id %d",
@@ -111,9 +111,9 @@ int ex_put_concat_elem_block (int    exoid,
 
   for (i=0;i<num_elem_blk;i++) {
     if (num_elem_this_blk[i] == 0) /* Is this a NULL element block? */
-      eb_stat[i] = 0; /* change element block status to NULL */
+      eb_array[i] = 0; /* change element block status to NULL */
     else
-      eb_stat[i] = 1; /* change element block status to TRUE */
+      eb_array[i] = 1; /* change element block status to TRUE */
   }
 
   /* Next, get variable id of status array */
@@ -126,7 +126,7 @@ int ex_put_concat_elem_block (int    exoid,
     return (EX_FATAL);
   }
 
-  status = nc_put_var_int(exoid, varid, eb_stat);
+  status = nc_put_var_int(exoid, varid, eb_array);
 
   if (status != NC_NOERR) {
     exerrval = status;
@@ -136,8 +136,6 @@ int ex_put_concat_elem_block (int    exoid,
     ex_err("ex_put_concat_elem_block",errmsg,exerrval);
     return (EX_FATAL);
   }
-
-  free(eb_stat);
 
   /* Next, fill out ids array */
   /* first get id of ids array variable */
@@ -163,7 +161,7 @@ int ex_put_concat_elem_block (int    exoid,
   }
 
   /* inquire previously defined dimensions  */
-  if ((status = nc_inq_dimid(exoid, DIM_STR, &strdim)) != NC_NOERR) {
+  if ((status = nc_inq_dimid(exoid, DIM_STR_NAME, &strdim)) != NC_NOERR) {
     exerrval = status;
     sprintf(errmsg,
 	    "Error: failed to get string length in file id %d",exoid);
@@ -228,46 +226,6 @@ int ex_put_concat_elem_block (int    exoid,
       goto error_ret;         /* exit define mode and return */
     }
 
-    /* element attribute array */
-    if (num_attr[iblk] > 0) {
-      if ((status = nc_def_dim (exoid, 
-				DIM_NUM_ATT_IN_BLK(cur_num_elem_blk+1),
-				num_attr[iblk], &numattrdim)) != NC_NOERR) {
-	exerrval = status;
-	sprintf(errmsg,
-		"Error: failed to define number of attributes in block %d in file id %d",
-		elem_blk_id[iblk],exoid);
-	ex_err("ex_put_concat_elem_block",errmsg,exerrval);
-	goto error_ret;         /* exit define mode and return */
-      }
-      
-      dims[0] = numelbdim;
-      dims[1] = numattrdim;
-      
-      if ((status = nc_def_var(exoid, VAR_ATTRIB(cur_num_elem_blk+1),
-			       nc_flt_code(exoid), 2, dims, &temp)) != NC_NOERR) {
-	exerrval = status;
-	sprintf(errmsg,
-		"Error:  failed to define attributes for element block %d in file id %d",
-		elem_blk_id[iblk],exoid);
-	ex_err("ex_put_concat_elem_block",errmsg,exerrval);
-	goto error_ret;         /* exit define mode and return */
-      }
-
-      /* Attribute names... */
-      dims[0] = numattrdim;
-      dims[1] = strdim;
-      
-      if ((status = nc_def_var(exoid, VAR_NAME_ATTRIB(cur_num_elem_blk+1),
-			       NC_CHAR, 2, dims, &temp)) != NC_NOERR) {
-	exerrval = status;
-	sprintf(errmsg,
-		"Error: failed to define element attribute name array in file id %d",exoid);
-	ex_err("ex_put_concat_elem_block",errmsg,exerrval);
-	goto error_ret;         /* exit define mode and return */
-      }
-    }
-    
     /* element connectivity array */
     dims[0] = numelbdim;
     dims[1] = nelnoddim;
@@ -292,6 +250,49 @@ int ex_put_concat_elem_block (int    exoid,
       ex_err("ex_put_concat_elem_block",errmsg,exerrval);
       goto error_ret;         /* exit define mode and return */
     }
+
+    /* element attribute array */
+    if (num_attr[iblk] > 0) {
+      if ((status = nc_def_dim (exoid, 
+				DIM_NUM_ATT_IN_BLK(cur_num_elem_blk+1),
+				num_attr[iblk], &numattrdim)) != NC_NOERR) {
+	exerrval = status;
+	sprintf(errmsg,
+		"Error: failed to define number of attributes in block %d in file id %d",
+		elem_blk_id[iblk],exoid);
+	ex_err("ex_put_concat_elem_block",errmsg,exerrval);
+	goto error_ret;         /* exit define mode and return */
+      }
+      
+      /* Attribute names... */
+      dims[0] = numattrdim;
+      dims[1] = strdim;
+      
+      if ((status = nc_def_var(exoid, VAR_NAME_ATTRIB(cur_num_elem_blk+1),
+			       NC_CHAR, 2, dims, &temp)) != NC_NOERR) {
+	exerrval = status;
+	sprintf(errmsg,
+		"Error: failed to define element attribute name array in file id %d",exoid);
+	ex_err("ex_put_concat_elem_block",errmsg,exerrval);
+	goto error_ret;         /* exit define mode and return */
+      }
+      eb_array[iblk] = temp;
+
+      dims[0] = numelbdim;
+      dims[1] = numattrdim;
+      
+      if ((status = nc_def_var(exoid, VAR_ATTRIB(cur_num_elem_blk+1),
+			       nc_flt_code(exoid), 2, dims, &temp)) != NC_NOERR) {
+	exerrval = status;
+	sprintf(errmsg,
+		"Error:  failed to define attributes for element block %d in file id %d",
+		elem_blk_id[iblk],exoid);
+	ex_err("ex_put_concat_elem_block",errmsg,exerrval);
+	goto error_ret;         /* exit define mode and return */
+      }
+
+    }
+    
   }
 
   /* Define the element map here to avoid a later redefine call */
@@ -354,6 +355,27 @@ int ex_put_concat_elem_block (int    exoid,
     return (EX_FATAL);
   }
 
+  {
+  /* Write dummy attribute name. Without this we get corruption in the
+   * attribute name.
+   */
+    size_t  start[2], count[2];
+    char *text = "";
+    count[0] = 1;
+    start[1] = 0;
+    count[1] = strlen(text)+1;
+    
+    for (iblk = 0; iblk < num_elem_blk; iblk++) {
+      if (num_elem_this_blk[iblk] == 0) /* Is this a NULL element block? */
+	continue;
+      for (i = 0; i < num_attr[iblk]; i++) {
+	start[0] = i;
+	nc_put_vara_text(exoid, eb_array[iblk], start, count, text);
+      }
+    }
+  }
+  free(eb_array);
+  
   return (EX_NOERR);
   
   /* Fatal error: exit definition mode and return */

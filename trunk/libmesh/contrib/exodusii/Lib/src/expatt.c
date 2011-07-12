@@ -47,7 +47,6 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
@@ -121,6 +120,13 @@ int ex_put_attr (int   exoid,
   case EX_ELEM_BLOCK:
     status = nc_inq_varid (exoid, VAR_ATTRIB(blk_id_ndx), &attrid);
     break;
+  default:
+    exerrval = 1005;
+    sprintf(errmsg,
+	    "Internal Error: unrecognized object type in switch: %d in file id %d",
+	    blk_type,exoid);
+    ex_err("ex_put_attr",errmsg,EX_MSG);
+    return (EX_FATAL);              /* number of attributes not defined */
   }
 
   if (status != NC_NOERR) {

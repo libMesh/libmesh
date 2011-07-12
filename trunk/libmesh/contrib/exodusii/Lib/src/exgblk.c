@@ -32,9 +32,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-/*****************************************************************************
+/*! 
 *
-* exgblk - read block parameters
+* \undoc exgblk - read block parameters
 *
 * entry conditions -
 *   input parameters:
@@ -50,7 +50,6 @@
 *
 * revision history -
 *
-*  $Id$
 *
 */
 
@@ -166,14 +165,10 @@ int ex_get_block( int exoid,
 
   if ( num_nodes_per_entry ) {
     if ((status = nc_inq_dimid (exoid, dnumnod, &dimid)) != NC_NOERR) {
-      exerrval = status;
-      sprintf(errmsg,
-	      "Error: failed to locate number of nodes/entity in %s %d in file id %d",
-	      ex_name_of_object(blk_type),blk_id,exoid);
-      ex_err("ex_get_block",errmsg, exerrval);
-      return(EX_FATAL);
-    }
-    if ((status = nc_inq_dimlen (exoid, dimid, &len)) != NC_NOERR) {
+      /* undefined => no node entries per element */
+      len = 0;
+    } else {
+      if ((status = nc_inq_dimlen (exoid, dimid, &len)) != NC_NOERR) {
 	exerrval = status;
 	sprintf(errmsg,
 		"Error: failed to get number of nodes/entity in %s %d in file id %d",
@@ -181,6 +176,7 @@ int ex_get_block( int exoid,
 	ex_err("ex_get_block",errmsg, exerrval);
 	return(EX_FATAL);
       }
+    }
     *num_nodes_per_entry = len;
   }
 
@@ -194,7 +190,7 @@ int ex_get_block( int exoid,
     } else {
       if ((status = nc_inq_dimid (exoid, dnumedg, &dimid)) != NC_NOERR) {
 	/* undefined => no edge entries per element */
-	*num_edges_per_entry = 0;
+	len = 0;
       } else {
 	if ((status = nc_inq_dimlen (exoid, dimid, &len)) != NC_NOERR) {
 	  exerrval = status;
@@ -204,8 +200,8 @@ int ex_get_block( int exoid,
 	  ex_err("ex_get_block",errmsg, exerrval);
 	  return(EX_FATAL);
 	}
-	*num_edges_per_entry = len;
       }
+      *num_edges_per_entry = len;
     }
   }
 
@@ -219,7 +215,7 @@ int ex_get_block( int exoid,
     } else {
       if ((status = nc_inq_dimid (exoid, dnumfac, &dimid)) != NC_NOERR) {
 	/* undefined => no face entries per element */
-	*num_faces_per_entry = 0;
+	len = 0;
       } else {
 	if ((status = nc_inq_dimlen(exoid, dimid, &len)) != NC_NOERR) {
 	  exerrval = status;
@@ -229,8 +225,8 @@ int ex_get_block( int exoid,
 	  ex_err("ex_get_block",errmsg, exerrval);
 	  return(EX_FATAL);
 	}
-	*num_faces_per_entry = len;
       }
+      *num_faces_per_entry = len;
     }
   }
 
@@ -252,50 +248,59 @@ int ex_get_block( int exoid,
   }
 
   if ( elem_type ) {
-    /* look up connectivity array for this element block id */
-    if ((status = nc_inq_varid (exoid, vblkcon, &connid)) != NC_NOERR) {
-      exerrval = status;
-      sprintf(errmsg,
-	      "Error: failed to locate connectivity array for %s %d in file id %d",
-	      ex_name_of_object(blk_type), blk_id,exoid);
-      ex_err("ex_get_block",errmsg, exerrval);
-      return(EX_FATAL);
+    if (*num_nodes_per_entry > 0) {
+      ; /* Do nothing, vblkcon should be correctly set already */
+    } else if (*num_edges_per_entry > 0) {
+      vblkcon = VAR_EBCONN(blk_id_ndx);
+    } else if (*num_faces_per_entry > 0) {
+      vblkcon = VAR_FCONN(blk_id_ndx);
     }
 
-    if ((status = nc_inq_attlen (exoid, connid, ablknam, &len)) != NC_NOERR) {
-      exerrval = status;
-      sprintf(errmsg,
-	      "Error: failed to get %s %d type in file id %d",
-	      ex_name_of_object(blk_type), blk_id,exoid);
-      ex_err("ex_get_block",errmsg, exerrval);
-      return(EX_FATAL);
-    }
+    if (vblkcon) {
+      /* look up connectivity array for this element block id */
+      if ((status = nc_inq_varid (exoid, vblkcon, &connid)) != NC_NOERR) {
+	exerrval = status;
+	sprintf(errmsg,
+		"Error: failed to locate connectivity array for %s %d in file id %d",
+		ex_name_of_object(blk_type), blk_id,exoid);
+	ex_err("ex_get_block",errmsg, exerrval);
+	return(EX_FATAL);
+      }
 
-    if (len > (MAX_STR_LENGTH+1)) {
-      len = MAX_STR_LENGTH;
-      sprintf (errmsg,
-	       "Warning: %s %d type will be truncated to %ld chars", 
-	       ex_name_of_object(blk_type), blk_id,len);
-      ex_err("ex_get_block",errmsg,EX_MSG);
-    }
+      if ((status = nc_inq_attlen (exoid, connid, ablknam, &len)) != NC_NOERR) {
+	exerrval = status;
+	sprintf(errmsg,
+		"Error: failed to get %s %d type in file id %d",
+		ex_name_of_object(blk_type), blk_id,exoid);
+	ex_err("ex_get_block",errmsg, exerrval);
+	return(EX_FATAL);
+      }
 
-    /* get the element type name */
-    if ((status = nc_get_att_text (exoid, connid, ablknam, elem_type)) != NC_NOERR) {
-      exerrval = status;
-      sprintf(errmsg,"Error: failed to get %s %d type in file id %d",
-	      ex_name_of_object(blk_type), blk_id, exoid);
-      ex_err("ex_get_block",errmsg, exerrval);
-      return(EX_FATAL);
+      if (len > (MAX_STR_LENGTH+1)) {
+	len = MAX_STR_LENGTH;
+	sprintf (errmsg,
+		 "Warning: %s %d type will be truncated to %ld chars", 
+		 ex_name_of_object(blk_type), blk_id, (long)len);
+	ex_err("ex_get_block",errmsg,EX_MSG);
+      }
+      
+      /* get the element type name */
+      if ((status = nc_get_att_text (exoid, connid, ablknam, elem_type)) != NC_NOERR) {
+	exerrval = status;
+	sprintf(errmsg,"Error: failed to get %s %d type in file id %d",
+		ex_name_of_object(blk_type), blk_id, exoid);
+	ex_err("ex_get_block",errmsg, exerrval);
+	return(EX_FATAL);
+      }
+      
+      /* get rid of trailing blanks */
+      ptr = elem_type;
+      /* fprintf(stderr,"[exgblk] %s, len: %d\n",ptr,len); */
+      while (ptr < elem_type + len && *ptr != ' ') {
+	ptr++;
+      }
+      *(ptr) = '\0';
     }
-
-    /* get rid of trailing blanks */
-    ptr = elem_type;
-    /* fprintf(stderr,"[exgblk] %s, len: %d\n",ptr,len); */
-    while (ptr < elem_type + len && *ptr != ' ') {
-      ptr++;
-    }
-    *(ptr) = '\0';
   }
-
   return (EX_NOERR);
 }

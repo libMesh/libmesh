@@ -70,13 +70,10 @@ int ex_put_partial_elem_map (int exoid,
   size_t start[1]; 
   size_t num_elem_maps, num_elem, count[1];
   int cur_num_elem_maps;
-  char *cdum;
   char errmsg[MAX_ERR_LENGTH];
 
   exerrval = 0; /* clear error code */
   map_exists = 0;
-  cdum = 0;
-
 
   /* Make sure the file contains elements */
   if (nc_inq_dimid (exoid, DIM_NUM_ELEM, &dimid) != NC_NOERR ) {
@@ -119,11 +116,11 @@ int ex_put_partial_elem_map (int exoid,
        specific file and returns that value.
     */
     cur_num_elem_maps = ex_get_file_item(exoid, ex_get_counter_list(EX_ELEM_MAP));
-    if (cur_num_elem_maps >= num_elem_maps) {
+    if (cur_num_elem_maps >= (int)num_elem_maps) {
       exerrval = EX_FATAL;
       sprintf(errmsg,
 	      "Error: exceeded number of element maps (%ld) specified in file id %d",
-	      num_elem_maps,exoid);
+	      (long)num_elem_maps,exoid);
       ex_err("ex_put_partial_elem_map",errmsg,exerrval);
       return (EX_FATAL);
     }
@@ -155,7 +152,7 @@ int ex_put_partial_elem_map (int exoid,
   }
 
   /* Check input parameters for a valid range of numbers */
-  if (ent_start <= 0 || ent_start > num_elem) {
+  if (ent_start <= 0 || ent_start > (int)num_elem) {
     exerrval = EX_FATAL;
     sprintf(errmsg,
 	    "Error: start count is invalid in file id %d",
@@ -171,7 +168,7 @@ int ex_put_partial_elem_map (int exoid,
     ex_err("ex_put_partial_elem_map",errmsg,exerrval);
     return (EX_FATAL);
   }
-  if (ent_start+ent_count-1 > num_elem) {
+  if (ent_start+ent_count-1 > (int)num_elem) {
     exerrval = EX_FATAL;
     sprintf(errmsg,
 	    "Error: start+count-1 is larger than element count in file id %d",

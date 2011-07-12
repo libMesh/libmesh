@@ -32,29 +32,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-/*****************************************************************************
-*
-* expvp - ex_put_var_param
-*
-* entry conditions - 
-*   input parameters:
-*       int     exoid                   exodus file id
-*       int     obj_type                
-*       int*    num_vars                number of variables in database
-*
-* exit conditions - 
-*
-* revision history - 
-*
-*  $Id: expvarparam.c,v 1.1 2008/02/20 19:49:29 gdsjaar Exp $
-*
-*****************************************************************************/
 
 #include "exodusII.h"
 #include "exodusII_int.h"
 
 #include <ctype.h>
 
+/*! \cond INTERNAL */
 #define EX_PREPARE_RESULT_VAR(TNAME,DIMNAME,VARNAMEVAR) \
   if ((status = nc_def_dim(exoid, DIMNAME, num_vars, &dimid)) != NC_NOERR) { \
           if (status == NC_ENAMEINUSE) { \
@@ -74,7 +58,7 @@
         } \
       /* Now define TNAME variable name variable */ \
       dims[0] = dimid; \
-      dims[1] = strdim; \
+      dims[1] = dim_str_name; \
   if ((status = nc_def_var (exoid, VARNAMEVAR, NC_CHAR, 2, dims, &varid)) != NC_NOERR) { \
           if (status == NC_ENAMEINUSE) { \
               exerrval = status; \
@@ -91,20 +75,64 @@
             } \
           goto error_ret;          /* exit define mode and return */ \
         }
+/*! \endcond */
 
 /*!
- * writes the number and names of global, nodal, or element variables 
- * that will be written to the database
- * \param      exoid                   exodus file id
- * \param      obj_type                object type
- * \param     *num_vars                number of variables in database
+
+The function ex_put_variable_param() writes the number of global,
+nodal, nodeset, sideset, edge, face, or element variables that will be
+written to the database.
+
+\return In case of an error, ex_put_variable_param() returns a negative
+        number; a warning will return a positive number. Possible causes of
+	errors include:
+  -  data file not properly opened with call to ex_create() or ex_open()
+  -  data file opened for read only.
+  -  invalid variable type specified.
+  -  data file not initialized properly with call to ex_put_init().
+  -  this routine has already been called with the same variable
+     type; redefining the number of variables is not allowed.
+  -  a warning value is returned if the number of variables 
+     is specified as zero.
+
+\param[in] exoid     exodus file ID returned from a previous call to ex_create() or ex_open().
+\param[in] obj_type  Variable indicating the type of variable which is described. Use one
+                     of the #ex_entity_type types specified in the table below.
+\param[in] num_vars  The number of \c var_type variables that will be written to the
+                     database.
+
+<table>
+<tr><td> \c EX_GLOBAL     </td><td>  Global entity type       </td></tr>
+<tr><td> \c EX_NODAL      </td><td>  Nodal entity type        </td></tr>
+<tr><td> \c EX_NODE_SET   </td><td>  Node Set entity type     </td></tr>
+<tr><td> \c EX_EDGE_BLOCK </td><td>  Edge Block entity type   </td></tr>
+<tr><td> \c EX_EDGE_SET   </td><td>  Edge Set entity type     </td></tr>
+<tr><td> \c EX_FACE_BLOCK </td><td>  Face Block entity type   </td></tr>
+<tr><td> \c EX_FACE_SET   </td><td>  Face Set entity type     </td></tr>
+<tr><td> \c EX_ELEM_BLOCK </td><td>  Element Block entity type</td></tr>
+<tr><td> \c EX_ELEM_SET   </td><td>  Element Set entity type  </td></tr>
+<tr><td> \c EX_SIDE_SET   </td><td>  Side Set entity type     </td></tr>
+</table>
+
+For example, the following code segment initializes the data file to
+store global variables:
+
+\code
+int num_glo_vars, error, exoid;
+
+\comment{write results variables parameters}
+num_glo_vars = 3;
+
+error = ex_put_variable_param (exoid, EX_GLOBAL, num_glo_vars);
+\endcode
+
  */
 
 int ex_put_variable_param (int exoid,
 			   ex_entity_type obj_type,
 			   int num_vars)
 {
-  int time_dim, num_nod_dim, dimid, strdim, varid;
+  int time_dim, num_nod_dim, dimid, dim_str_name, varid;
   int dims[3];
   char errmsg[MAX_ERR_LENGTH];
   int status;
@@ -159,10 +187,10 @@ int ex_put_variable_param (int exoid,
     }
   }
 
-  if ((status = nc_inq_dimid (exoid, DIM_STR, &strdim)) < 0) {
+  if ((status = nc_inq_dimid (exoid, DIM_STR_NAME, &dim_str_name)) < 0) {
     exerrval = status;
     sprintf(errmsg,
-	    "Error: failed to get string length in file id %d",exoid);
+	    "Error: failed to get name string length in file id %d",exoid);
     ex_err("ex_put_variable_param",errmsg,exerrval);
     return (EX_FATAL);
   }
@@ -258,7 +286,7 @@ int ex_put_variable_param (int exoid,
 
     /* Now define nodal variable name variable */
     dims[0] = dimid;
-    dims[1] = strdim;
+    dims[1] = dim_str_name;
     if ((status = nc_def_var(exoid, VAR_NAME_NOD_VAR, NC_CHAR, 2, dims, &varid)) != NC_NOERR) {
       if (status == NC_ENAMEINUSE) {
 	exerrval = status;

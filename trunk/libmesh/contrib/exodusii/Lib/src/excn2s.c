@@ -32,28 +32,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-/*****************************************************************************
-*
-* excn2s - ex_cvt_nodes_to_sides: convert nodes to sides
-*
-* entry conditions - 
-*   input parameters:
-*       int     exoid                   exodus file id
-*       int     *num_elem_per_set       number of element per set
-*       int     *num_nodes_per_set      number of nodes per set
-*       int     *side_sets_elem_index   index array of elements into elem list
-*       int     *side_sets_node_index   index array of nodes
-*       int     *side_sets_elem_list    array of elements
-*       int     *side_sets_node_list    array of nodes
-*
-* exit conditions - 
-*       int     *side_sets_side_list    array of sides/faces
-*
-* revision history - 
-*
-*  $Id$
-*
-*****************************************************************************/
 
 #include <ctype.h>
 #include <string.h>
@@ -62,20 +40,84 @@
 #include "exodusII_int.h"
 
 /*!
- * This routine is designed to take the results from retrieving the ExodusI
- * style concatenated side sets to the Exodus II V 2.0 definition
- * uses the element id to get the  coordinate node list,  element block
- * connectivity, element type to
- * convert the side set node list to a side/face list. 
 
- *  \param    exoid                   exodus file id
- *  \param    *num_elem_per_set       number of element per set
- *  \param    *num_nodes_per_set      number of nodes per set
- *  \param    *side_sets_elem_index   index array of elements into elem list
- *  \param    *side_sets_node_index   index array of nodes
- *  \param    *side_sets_elem_list    array of elements
- *  \param    *side_sets_node_list    array of nodes
- *  \param[out]    *side_sets_side_list    array of sides/faces
+The function ex_cvt_nodes_to_sides() is used to convert a side set
+node list to a side set side list. This routine is provided for
+application programs that utilize side sets defined by nodes (as was
+done previous to release 2.0) rather than local faces or edges. The
+application program must allocate memory for the returned array of
+sides. The length of this array is the same as the length of the
+concatenated side sets element list, which can be determined with a
+call to ex_inquire() or ex_inquire_int().
+
+\return In case of an error, ex_cvt_nodes_to_sides() returns a
+negative number; a warning will return a positive number. Possible
+causes of errors include:
+  -  a warning value is returned if no side sets are stored in the file.
+  -  because the faces of a wedge require a different number of
+     nodes to describe them (quadrilateral vs. triangular faces), the
+     function will abort with a fatal return code if a wedge is
+     encountered in the side set element list.
+
+\param[in] exoid                  exodus file ID returned from a previous call to ex_create() 
+                                  or ex_open().
+
+\param[in]  num_elem_per_set      Array containing the number of sides for each set. The number 
+                                  of sides is equal to the number of elements for each set.
+
+\param[in]  num_nodes_per_set     Array containing the number of nodes for each set.
+
+\param[in]  side_sets_elem_index  Array containing indices into the \c side_sets_elem_list which are
+                                  the locations of the first element for each set. These indices are
+				  0-based.  Unused.
+
+\param[in]  side_sets_node_index  Array containing indices into the \c side_sets_node_list 
+                                  which are the locations of the first node for each set. These 
+				  indices are 0-based. Unused.
+
+\param[in]  side_sets_elem_list   Array containing the elements for all side sets. Internal element IDs
+                                  are used in this list (see Section LocalElementIds).
+
+\param[in]  side_sets_node_list   Array containing the nodes for all side sets. Internal node 
+                                  IDs are used in this list (see  Section LocalNodeIds).
+
+\param[out]  side_sets_side_list  Returned array containing the sides for all side sets.
+
+
+The following code segment will convert side sets described 
+by nodes to side sets described by local side numbers:
+
+\code
+int error, exoid, ids[2], num_side_per_set[2],
+    num_nodes_per_set[2], elem_ind[2], node_ind[2], 
+    elem_list[4], node_list[8], el_lst_len, *side_list;
+
+ids[0] = 30             ; ids[1]  = 31;
+num_side_per_set[0]  = 2; num_side_per_set[1] = 2;
+num_nodes_per_set[0] = 4; num_nodes_per_set[1] = 4;
+
+elem_ind[0] = 0; elem_ind[1] = 2;
+node_ind[0] = 0; node_ind[1] = 4;
+
+\comment{side set #1}
+elem_list[0] = 2; elem_list[1] = 2;
+node_list[0] = 8; node_list[1] = 5; 
+node_list[2] = 6; node_list[3] = 7;
+
+\comment{side set #2}
+elem_list[2] = 1; elem_list[3] = 2;
+node_list[4] = 2; node_list[5] = 3; 
+node_list[6] = 7; node_list[7] = 8;
+
+el_lst_len = ex_inquire_int(exoid, EX_INQ_SS_ELEM_LEN);
+
+\comment{side set element list is same length as side list}
+side_list = (int *) calloc (el_lst_len, sizeof(int));
+
+ex_cvt_nodes_to_sides(exoid, num_side_per_set, num_nodes_per_set,
+                      elem_ind, node_ind, elem_list, 
+                      node_list, side_list);
+\endcode
 
  <b>Algorithm:</b>
 
@@ -124,20 +166,23 @@
 int ex_cvt_nodes_to_sides(int exoid,
                           int *num_elem_per_set,
                           int *num_nodes_per_set,
-                          int *side_sets_elem_index,
-                          int *side_sets_node_index,
+                          int *side_sets_elem_index, /* unused */ 
+                          int *side_sets_node_index, /* unused */
                           int *side_sets_elem_list,
                           int *side_sets_node_list,
                           int *side_sets_side_list)
 {
-  int i, j, k, m, n;
+  size_t m;
+  int i, j, k, n;
   int  num_side_sets, num_elem_blks;
   int tot_num_elem = 0, tot_num_ss_elem = 0, elem_num = 0, ndim;
-  int *elem_blk_ids, *connect;
+  int *elem_blk_ids = NULL;
+  int *connect = NULL;
   int *ss_elem_ndx, *ss_elem_node_ndx, *ss_parm_ndx;
   int elem_ctr, node_ctr, elem_num_pos;
   int num_elem_in_blk, num_nodes_per_elem, num_node_per_side, num_attr;
-  int *same_elem_type, el_type;
+  int *same_elem_type = NULL;
+  int el_type = 0;
   float fdum;
   char *cdum, elem_type[MAX_STR_LENGTH+1];
 
@@ -333,19 +378,19 @@ int ex_cvt_nodes_to_sides(int exoid,
 
     if (strncmp(elem_blk_parms[i].elem_type,"CIRCLE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = CIRCLE;
+      elem_blk_parms[i].elem_type_val = EX_EL_CIRCLE;
       /* set side set node stride */
         elem_blk_parms[i].num_nodes_per_side[0] = 1;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"SPHERE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = SPHERE;
+      elem_blk_parms[i].elem_type_val = EX_EL_SPHERE;
       /* set side set node stride */
         elem_blk_parms[i].num_nodes_per_side[0] = 1;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"QUAD",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = QUAD;
+      elem_blk_parms[i].elem_type_val = EX_EL_QUAD;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 4)
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
@@ -356,7 +401,7 @@ int ex_cvt_nodes_to_sides(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"TRIANGLE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = TRIANGLE;
+      elem_blk_parms[i].elem_type_val = EX_EL_TRIANGLE;
       /* determine side set node stride */
       if (ndim == 2)  /* 2d TRIs */
       {
@@ -367,20 +412,20 @@ int ex_cvt_nodes_to_sides(int exoid,
       }
       else if (ndim == 3)  /* 3d TRIs */
       {
-        elem_blk_parms[i].elem_type_val = TRISHELL;
+        elem_blk_parms[i].elem_type_val = EX_EL_TRISHELL;
         elem_blk_parms[i].num_nodes_per_side[0] =
           elem_blk_parms[i].num_nodes_per_elem;
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"SHELL",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = SHELL;
+      elem_blk_parms[i].elem_type_val = EX_EL_SHELL;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2)
       {
         /* 2d SHELL; same as BEAM or TRUSS or BAR */
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
-        elem_blk_parms[i].elem_type_val = BEAM;
+        elem_blk_parms[i].elem_type_val = EX_EL_BEAM;
       }
       else if (elem_blk_parms[i].num_nodes_per_elem == 4)
         elem_blk_parms[i].num_nodes_per_side[0] = 4;
@@ -389,7 +434,7 @@ int ex_cvt_nodes_to_sides(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"HEX",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = HEX;
+      elem_blk_parms[i].elem_type_val = EX_EL_HEX;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 8)
         elem_blk_parms[i].num_nodes_per_side[0] = 4;
@@ -404,7 +449,7 @@ int ex_cvt_nodes_to_sides(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"TETRA",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = TETRA;
+      elem_blk_parms[i].elem_type_val = EX_EL_TETRA;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 4)
         elem_blk_parms[i].num_nodes_per_side[0] = 3;
@@ -415,7 +460,7 @@ int ex_cvt_nodes_to_sides(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"WEDGE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = WEDGE;
+      elem_blk_parms[i].elem_type_val = EX_EL_WEDGE;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 6)
         elem_blk_parms[i].num_nodes_per_side[0] = 4;
@@ -429,7 +474,7 @@ int ex_cvt_nodes_to_sides(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"PYRAMID",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = PYRAMID;
+      elem_blk_parms[i].elem_type_val = EX_EL_PYRAMID;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 5)
         elem_blk_parms[i].num_nodes_per_side[0] = 4;
@@ -443,7 +488,7 @@ int ex_cvt_nodes_to_sides(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"BEAM",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = BEAM;
+      elem_blk_parms[i].elem_type_val = EX_EL_BEAM;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2)
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
@@ -454,7 +499,7 @@ int ex_cvt_nodes_to_sides(int exoid,
               (strncmp(elem_blk_parms[i].elem_type,"BAR",3) == 0)  ||
               (strncmp(elem_blk_parms[i].elem_type,"EDGE",3) == 0) )
     {
-      elem_blk_parms[i].elem_type_val = TRUSS;
+      elem_blk_parms[i].elem_type_val = EX_EL_TRUSS;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2)
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
@@ -463,14 +508,14 @@ int ex_cvt_nodes_to_sides(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"NULL",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = NULL_ELEMENT;
+      elem_blk_parms[i].elem_type_val = EX_EL_NULL_ELEMENT;
       /* set side set node stride */
       elem_blk_parms[i].num_nodes_per_side[0] = 0;
     }
     else
     { /* unsupported element type; no problem if no sides specified for
          this element block */
-      elem_blk_parms[i].elem_type_val = UNK;
+      elem_blk_parms[i].elem_type_val = EX_EL_UNK;
       elem_blk_parms[i].num_nodes_per_side[0] = 0;
     }
     elem_blk_parms[i].elem_blk_id = elem_blk_ids[i];    /* save id */
@@ -664,23 +709,23 @@ int ex_cvt_nodes_to_sides(int exoid,
       {
         switch (elem_blk_parms[ss_parm_ndx[ss_elem_ndx[j]]].elem_type_val)
         {
-          case CIRCLE:
-          case SPHERE:
+          case EX_EL_CIRCLE:
+          case EX_EL_SPHERE:
           {
             /* simple case: 1st node number is same as side # */
                 side_sets_side_list[ss_elem_ndx[j]] = n+1;
             break;
           }
-          case QUAD:
-          case TRIANGLE:
-          case TRUSS:
-          case BEAM:
+          case EX_EL_QUAD:
+          case EX_EL_TRIANGLE:
+          case EX_EL_TRUSS:
+          case EX_EL_BEAM:
           {
             /* simple case: 1st node number is same as side # */
                 side_sets_side_list[ss_elem_ndx[j]] = n+1;
             break;
           }
-          case TRISHELL:
+          case EX_EL_TRISHELL:
           {
             /* use table to find which node to compare to next */
             num_node_per_side = ss_elem_node_ndx[ss_elem_ndx[j]+1] - 
@@ -728,7 +773,7 @@ int ex_cvt_nodes_to_sides(int exoid,
             break;
 
           }
-          case SHELL:
+          case EX_EL_SHELL:
           {
             /* use table to find which node to compare to next */
 
@@ -789,7 +834,7 @@ int ex_cvt_nodes_to_sides(int exoid,
             break;
 
           }
-          case HEX:
+          case EX_EL_HEX:
           {
             /* use table to find which node to compare to next */
           
@@ -825,7 +870,7 @@ int ex_cvt_nodes_to_sides(int exoid,
             }
             break;
           }
-          case TETRA:
+          case EX_EL_TETRA:
           {
             /* use table to find which node to compare to next */
           
@@ -861,7 +906,7 @@ int ex_cvt_nodes_to_sides(int exoid,
             }
             break;
           }
-          case PYRAMID:
+          case EX_EL_PYRAMID:
           {
  /* NOTE: PYRAMID elements in side set node lists are currently not supported */
             exerrval = EX_BADPARAM;
@@ -877,7 +922,7 @@ int ex_cvt_nodes_to_sides(int exoid,
             free(ss_elem_ndx);
             return (EX_FATAL);
           }
-          case WEDGE:
+          case EX_EL_WEDGE:
           {
 #if 1
  /* NOTE: WEDGE elements in side set node lists are currently not supported */

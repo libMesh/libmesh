@@ -55,7 +55,6 @@
 * revision history - 
 *   20061002 - David Thompson - Adapted from ex_get_elem_var
 *
-*  $Id$
 *
 *****************************************************************************/
 

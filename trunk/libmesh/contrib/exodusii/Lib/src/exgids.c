@@ -33,7 +33,6 @@
  * 
  */
 /*
- *  $Id$
  *
  *****************************************************************************/
 
@@ -99,6 +98,17 @@ int ex_get_ids (int  exoid,
     ex_err("ex_get_ids",errmsg,exerrval);
     return(EX_FATAL);
   }
+
+  /* Determine if there are any 'obj-type' objects */
+  if ((status = nc_inq_dimid (exoid, ex_dim_num_objects(obj_type), &varid)) != NC_NOERR) {
+    exerrval = status;
+    sprintf(errmsg,
+            "Warning: no %s defined in file id %d",
+	    ex_name_of_object(obj_type), exoid);
+    ex_err("ex_get_ids",errmsg,exerrval);
+    return (EX_WARN);
+  }
+
 
   /* inquire id's of previously defined dimensions and variables  */
   if ((status = nc_inq_varid(exoid, varidobj, &varid)) != NC_NOERR) {

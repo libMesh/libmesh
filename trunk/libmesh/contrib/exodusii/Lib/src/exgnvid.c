@@ -45,7 +45,6 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
@@ -60,8 +59,8 @@
 int ex_get_nodal_varid(int exoid, int *varid)
 {
   int status;
-  int i, dimid, nvarid;
-  size_t num_vars;
+  int dimid, nvarid;
+  size_t num_vars, i;
   char errmsg[MAX_ERR_LENGTH];
 
   exerrval = 0; /* clear error code */
@@ -112,7 +111,7 @@ int ex_get_nodal_varid(int exoid, int *varid)
         exerrval = status;
         sprintf(errmsg,
                 "Warning: could not find nodal variable %d in file id %d",
-                i+1, exoid);
+                (int)i+1, exoid);
         ex_err("ex_get_nodal_varid",errmsg,exerrval);
         return (EX_WARN);
       }

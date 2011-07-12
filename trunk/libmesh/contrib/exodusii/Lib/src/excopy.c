@@ -32,21 +32,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-/*****************************************************************************
-*
-* excopy - ex_copy
-*
-* entry conditions - 
-*   input parameters:
-*       int     in_exoid                input exodus file id
-*
-* exit conditions - 
-*       int     out_exoid               output exodus file id
-*
-* revision history - 
-*
-*
-*****************************************************************************/
 
 #include <assert.h>
 #include <stdlib.h>
@@ -54,13 +39,14 @@
 #include "exodusII.h"
 #include "exodusII_int.h"
 
+/*! \cond INTERNAL */
 struct ncdim {                  /* dimension */
-    char name[MAX_STR_LENGTH];
+    char name[MAX_VAR_NAME_LENGTH];
     size_t size;
 };
 
 struct ncvar {                  /* variable */
-    char name[MAX_STR_LENGTH];
+    char name[MAX_VAR_NAME_LENGTH];
     nc_type type;
     int ndims;
     int dims[NC_MAX_VAR_DIMS];
@@ -69,7 +55,7 @@ struct ncvar {                  /* variable */
 
 struct ncatt {                  /* attribute */
     int var;
-    char name[MAX_STR_LENGTH];
+    char name[MAX_VAR_NAME_LENGTH];
     nc_type type;
     size_t len;
     void *val;
@@ -84,8 +70,11 @@ static int cpy_coord_def(int in_id,int out_id,int rec_dim_id,
 static int cpy_coord_val(int in_id,int out_id,char *var_nm,
 			 int in_large, int out_large);
 static void update_internal_structs( int, ex_inquiry, struct list_item** );
+/*! \endcond */
 
 /*!
+  \undoc
+
  *  efficiently copies all non-transient information (attributes,
  * dimensions, and variables from an opened EXODUS file to another
  * opened EXODUS file.  Will not overwrite a dimension or variable
@@ -107,12 +96,14 @@ int ex_copy (int in_exoid, int out_exoid)
    int var_out_id;              /* variable id */
    struct ncvar var;            /* variable */
    struct ncatt att;            /* attribute */
-   int i;
+   nc_type att_type = NC_NAT;
+   size_t att_len = 0;
+   size_t i;
    size_t numrec;
    size_t dim_sz;
    char dim_nm[NC_MAX_NAME];
    int in_large, out_large;
-   
+
    exerrval = 0; /* clear error code */
 
    /*
@@ -131,12 +122,10 @@ int ex_copy (int in_exoid, int out_exoid)
    nc_inq_dimlen(in_exoid, recdimid, &numrec);
 
    /* put output file into define mode */
-
    nc_redef(out_exoid);
 
    /* copy global attributes */
-
-   for (i = 0; i < ngatts; i++) {
+   for (i = 0; i < (size_t)ngatts; i++) {
 
      nc_inq_attname(in_exoid, NC_GLOBAL, i, att.name);
         
@@ -196,6 +185,22 @@ int ex_copy (int in_exoid, int out_exoid)
        } /* end if */
      } /* end if */
    } /* end loop over dim */
+
+   /* DIM_STR_NAME is a newly added dimension required by current API.
+    * If it doesn't exist on the source database, we need to add it to
+    * the target...
+    */
+   status = nc_inq_dimid(in_exoid, DIM_STR_NAME, &dim_out_id);
+   if (status != NC_NOERR) {
+     /* Not found; set to default value of 32+1. */
+     status = nc_def_dim(out_exoid, DIM_STR_NAME, 33, &dim_out_id);
+   }
+
+   status = nc_inq_att(in_exoid, NC_GLOBAL, ATT_MAX_NAME_LENGTH, &att_type, &att_len);
+   if (status != NC_NOERR) {
+      int max_so_far = 32;
+      status=nc_put_att_int(out_exoid, NC_GLOBAL, ATT_MAX_NAME_LENGTH, NC_INT, 1, &max_so_far);
+    }
 
    /* copy variable definitions and variable attributes */
    for (varid = 0; varid < nvars; varid++) {
@@ -336,6 +341,7 @@ int ex_copy (int in_exoid, int out_exoid)
    return(EX_NOERR);
 }
 
+/*! \cond INTERNAL */
 int cpy_att(int in_id,int out_id,int var_in_id,int var_out_id)
 /*
    int in_id: input netCDF input-file ID
@@ -360,7 +366,7 @@ int cpy_att(int in_id,int out_id,int var_in_id,int var_out_id)
 
   /* Get the attributes names, types, lengths, and values */
   for (idx=0; idx<nbr_att; idx++) {
-    char att_nm[MAX_STR_LENGTH];
+    char att_nm[MAX_VAR_NAME_LENGTH];
 
     nc_inq_attname(in_id, var_in_id, idx, att_nm);
     nc_copy_att(in_id, var_in_id, att_nm, out_id, var_out_id);
@@ -369,6 +375,7 @@ int cpy_att(int in_id,int out_id,int var_in_id,int var_out_id)
   return(EX_NOERR);
 } 
 
+/*! \internal */
 int cpy_coord_def(int in_id,int out_id,int rec_dim_id,char *var_nm,
 		  int in_large, int out_large)
 /*
@@ -450,6 +457,7 @@ int cpy_coord_def(int in_id,int out_id,int rec_dim_id,char *var_nm,
   return var_out_id;
 }
 
+/*! \internal */
 int cpy_var_def(int in_id,int out_id,int rec_dim_id,char *var_nm)
 /*
    int in_id: input netCDF input-file ID
@@ -534,6 +542,7 @@ int cpy_var_def(int in_id,int out_id,int rec_dim_id,char *var_nm)
   return var_out_id;
 } /* end cpy_var_def() */
 
+/*! \internal */
 int
 cpy_var_val(int in_id,int out_id,char *var_nm)
 /*
@@ -671,6 +680,7 @@ cpy_var_val(int in_id,int out_id,char *var_nm)
 
 } /* end cpy_var_val() */
 
+/*! \internal */
 int
 cpy_coord_val(int in_id,int out_id,char *var_nm,
               int in_large, int out_large)
@@ -685,12 +695,13 @@ cpy_coord_val(int in_id,int out_id,char *var_nm,
    */
 
   const char *routine = NULL;
-  int i, temp;
+  int temp;
+  size_t i;
   size_t spatial_dim, num_nodes;
   size_t start[2], count[2];
   nc_type var_type_in, var_type_out;
 
-  void *void_ptr;
+  void *void_ptr = NULL;
 
   /* Handle easiest situation first: in_large matches out_large */
   if (in_large == out_large)
@@ -767,6 +778,7 @@ cpy_coord_val(int in_id,int out_id,char *var_nm,
 } /* end cpy_coord_val() */
 
 
+/*! \internal */
 void update_internal_structs( int out_exoid, ex_inquiry inqcode, struct list_item** ctr_list )
 {
   int i;
@@ -795,3 +807,5 @@ size_t type_size(nc_type type)
   else
     return 0;
 }
+
+/* \endcond */
