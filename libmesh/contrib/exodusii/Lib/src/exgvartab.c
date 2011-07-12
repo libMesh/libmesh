@@ -45,7 +45,6 @@
 * exit conditions - 
 *       int*    var_tab            element variable truth table array
 *
-*  $Id: exgvartab.c,v 1.1 2008/02/20 19:49:27 gdsjaar Exp $
 *
 *****************************************************************************/
 
@@ -92,7 +91,7 @@ int ex_get_truth_table (int  exoid,
     status = ex_get_dimension(exoid, DIM_NUM_FAC_VAR,  "face variables", &num_var_db, &varid, routine);
     status1 = nc_inq_varid (exoid, VAR_FBLK_TAB, &tabid);
     var_name = "vals_face_var";
-    ent_type = "eb";
+    ent_type = "fb";
     break;
   case EX_ELEM_BLOCK:
     status = ex_get_dimension(exoid, DIM_NUM_ELE_VAR,  "element variables", &num_var_db, &varid, routine);
@@ -110,13 +109,13 @@ int ex_get_truth_table (int  exoid,
     status = ex_get_dimension(exoid, DIM_NUM_ESET_VAR, "edgeset variables", &num_var_db, &varid, routine);
     status1 = nc_inq_varid (exoid, VAR_ESET_TAB, &tabid);
     var_name = "vals_eset_var";
-    ent_type = "ns";
+    ent_type = "es";
     break;
   case EX_FACE_SET:
     status = ex_get_dimension(exoid, DIM_NUM_FSET_VAR, "faceset variables", &num_var_db, &varid, routine);
     status1 = nc_inq_varid (exoid, VAR_FSET_TAB, &tabid);
     var_name = "vals_fset_var";
-    ent_type = "ns";
+    ent_type = "fs";
     break;
   case EX_SIDE_SET:
     status = ex_get_dimension(exoid, DIM_NUM_SSET_VAR, "sideset variables", &num_var_db, &varid, routine);
@@ -128,7 +127,7 @@ int ex_get_truth_table (int  exoid,
     status = ex_get_dimension(exoid, DIM_NUM_ELSET_VAR, "elemset variables", &num_var_db, &varid, routine);
     status1 = nc_inq_varid (exoid, VAR_ELSET_TAB, &tabid);
     var_name = "vals_elset_var";
-    ent_type = "els";
+    ent_type = "es";
     break;
   default:
     exerrval = EX_BADPARAM;
@@ -151,7 +150,7 @@ int ex_get_truth_table (int  exoid,
     return (EX_FATAL);
   }
 
-  if (num_entity != num_blk) {
+  if (num_entity != (size_t)num_blk) {
     exerrval = EX_FATAL;
     sprintf(errmsg,
       "Error: # of %s doesn't match those defined in file id %d",
@@ -160,7 +159,7 @@ int ex_get_truth_table (int  exoid,
     return (EX_FATAL);
   }
 
-  if (num_var_db != num_var) {
+  if (num_var_db != (size_t)num_var) {
     exerrval = EX_FATAL;
     sprintf(errmsg,
       "Error: # of %s variables doesn't match those defined in file id %d",

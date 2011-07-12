@@ -48,7 +48,6 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
@@ -74,8 +73,8 @@ int ex_put_set (int   exoid,
   int dimid, status;
   int entry_list_id, extra_list_id, set_id_ndx;
   char errmsg[MAX_ERR_LENGTH];
-  char* entryptr;
-  char* extraptr;
+  char* entryptr = NULL;
+  char* extraptr = NULL;
 
   exerrval = 0; /* clear error code */
 
@@ -124,7 +123,7 @@ int ex_put_set (int   exoid,
     entryptr = VAR_ELEM_SS(set_id_ndx);
     extraptr = VAR_SIDE_SS(set_id_ndx);
   }
-  if (set_type == EX_ELEM_SET) {
+  else if (set_type == EX_ELEM_SET) {
     entryptr = VAR_ELEM_ELS(set_id_ndx);
     extraptr = NULL;
   }

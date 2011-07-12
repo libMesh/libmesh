@@ -46,7 +46,6 @@
 *                                       side or face
 * revision history - 
 *
-*  $Id$
 *****************************************************************************/
 
 #include <ctype.h>
@@ -57,18 +56,23 @@
 #include "exodusII_int.h"
 
 /* Generic error message for element type/node count mapping...*/
-#define EL_NODE_COUNT_ERROR sprintf(errmsg, \
-      "Error: An element of type '%s' with %d nodes is not valid.",\
-                      elem_blk_parms[i].elem_type,\
-                      elem_blk_parms[i].num_nodes_per_elem);\
-              ex_err("ex_get_side_set_node_count",errmsg,EX_MSG);\
-              return(EX_FATAL);\
+static int el_node_count_error(struct elem_blk_parm elem_blk_parms)
+{
+  char errmsg[MAX_ERR_LENGTH];
+  sprintf(errmsg,							
+	  "Error: An element of type '%s' with %d nodes is not valid.",	
+	  elem_blk_parms.elem_type,					
+	  elem_blk_parms.num_nodes_per_elem);			
+  ex_err("ex_get_side_set_node_count",errmsg,EX_MSG);			
+  return(EX_FATAL);							
+}
 
 int ex_get_side_set_node_count(int exoid,
                                int side_set_id,
                                int *side_set_node_cnt_list)
 {
-  int ii, i, j, m; 
+  size_t m;
+  int ii, i, j; 
   int  num_side_sets, num_elem_blks, num_df, ndim;
   int tot_num_elem = 0, tot_num_ss_elem = 0, side, elem;
   int *elem_blk_ids;
@@ -290,19 +294,19 @@ int ex_get_side_set_node_count(int exoid,
 
     if (strncmp(elem_blk_parms[i].elem_type,"CIRCLE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = CIRCLE;
+      elem_blk_parms[i].elem_type_val = EX_EL_CIRCLE;
       elem_blk_parms[i].num_sides = 1;
       elem_blk_parms[i].num_nodes_per_side[0] = 1;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"SPHERE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = SPHERE;
+      elem_blk_parms[i].elem_type_val = EX_EL_SPHERE;
       elem_blk_parms[i].num_sides = 1;
         elem_blk_parms[i].num_nodes_per_side[0] = 1;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"QUAD",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = QUAD;
+      elem_blk_parms[i].elem_type_val = EX_EL_QUAD;
       elem_blk_parms[i].num_sides = 4;
       if (elem_blk_parms[i].num_nodes_per_elem == 4) {
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
@@ -321,12 +325,12 @@ int ex_get_side_set_node_count(int exoid,
         elem_blk_parms[i].num_nodes_per_side[2] = 3;
         elem_blk_parms[i].num_nodes_per_side[3] = 3;
       } else {
-        EL_NODE_COUNT_ERROR;
+        return el_node_count_error(elem_blk_parms[i]);
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"TRIANGLE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = TRIANGLE;
+      elem_blk_parms[i].elem_type_val = EX_EL_TRIANGLE;
       if (ndim == 2) { /* 2d TRIs */
         elem_blk_parms[i].num_sides = 3;
         if (elem_blk_parms[i].num_nodes_per_elem == 3) {
@@ -353,13 +357,13 @@ int ex_get_side_set_node_count(int exoid,
           elem_blk_parms[i].num_nodes_per_side[3] = 3;
           elem_blk_parms[i].num_nodes_per_side[4] = 3;
         } else {
-          EL_NODE_COUNT_ERROR;
+	  return el_node_count_error(elem_blk_parms[i]);
         }
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"SHELL",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = SHELL;
+      elem_blk_parms[i].elem_type_val = EX_EL_SHELL;
 
       if (elem_blk_parms[i].num_nodes_per_elem == 2) {/* KLUDGE for 2D Shells*/
         elem_blk_parms[i].num_sides = 2; 
@@ -385,12 +389,12 @@ int ex_get_side_set_node_count(int exoid,
         elem_blk_parms[i].num_nodes_per_side[4] = 3;
         elem_blk_parms[i].num_nodes_per_side[5] = 3;
       } else {
-        EL_NODE_COUNT_ERROR;
+        return el_node_count_error(elem_blk_parms[i]);
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"HEX",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = HEX;
+      elem_blk_parms[i].elem_type_val = EX_EL_HEX;
       elem_blk_parms[i].num_sides = 6;  
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 8) {  /* 8-node bricks */
@@ -429,12 +433,12 @@ int ex_get_side_set_node_count(int exoid,
         elem_blk_parms[i].num_nodes_per_side[4] = 9;
         elem_blk_parms[i].num_nodes_per_side[5] = 9;
       } else {
-        EL_NODE_COUNT_ERROR;
+        return el_node_count_error(elem_blk_parms[i]);
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"TETRA",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = TETRA;
+      elem_blk_parms[i].elem_type_val = EX_EL_TETRA;
       elem_blk_parms[i].num_sides = 4;  
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 4) {
@@ -453,12 +457,12 @@ int ex_get_side_set_node_count(int exoid,
         elem_blk_parms[i].num_nodes_per_side[2] = 6;
         elem_blk_parms[i].num_nodes_per_side[3] = 6;
       } else {
-        EL_NODE_COUNT_ERROR;
+        return el_node_count_error(elem_blk_parms[i]);
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"WEDGE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = WEDGE;
+      elem_blk_parms[i].elem_type_val = EX_EL_WEDGE;
       elem_blk_parms[i].num_sides = 5;  
       if (elem_blk_parms[i].num_nodes_per_elem == 6) {
         elem_blk_parms[i].num_nodes_per_side[0] = 4;
@@ -473,12 +477,12 @@ int ex_get_side_set_node_count(int exoid,
         elem_blk_parms[i].num_nodes_per_side[3] = 6;
         elem_blk_parms[i].num_nodes_per_side[4] = 6;
       } else {
-        EL_NODE_COUNT_ERROR;
+        return el_node_count_error(elem_blk_parms[i]);
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"PYRAMID",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = PYRAMID;
+      elem_blk_parms[i].elem_type_val = EX_EL_PYRAMID;
       elem_blk_parms[i].num_sides = 5;  
       if (elem_blk_parms[i].num_nodes_per_elem == 5) {
         elem_blk_parms[i].num_nodes_per_side[0] = 3;
@@ -493,12 +497,12 @@ int ex_get_side_set_node_count(int exoid,
         elem_blk_parms[i].num_nodes_per_side[3] = 6;
         elem_blk_parms[i].num_nodes_per_side[4] = 8;
       } else {
-        EL_NODE_COUNT_ERROR;
+        return el_node_count_error(elem_blk_parms[i]);
       }
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"BEAM",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = BEAM;
+      elem_blk_parms[i].elem_type_val = EX_EL_BEAM;
       elem_blk_parms[i].num_sides = 2;  
 
       if (elem_blk_parms[i].num_nodes_per_elem == 2) {
@@ -508,14 +512,14 @@ int ex_get_side_set_node_count(int exoid,
         elem_blk_parms[i].num_nodes_per_side[0] = 3;
         elem_blk_parms[i].num_nodes_per_side[1] = 3;
       } else {
-        EL_NODE_COUNT_ERROR;
+        return el_node_count_error(elem_blk_parms[i]);
       }
     }
     else if ( (strncmp(elem_blk_parms[i].elem_type,"TRUSS",3) == 0) ||
               (strncmp(elem_blk_parms[i].elem_type,"BAR",3) == 0) ||
               (strncmp(elem_blk_parms[i].elem_type,"EDGE",3) == 0) )
     {
-      elem_blk_parms[i].elem_type_val = TRUSS;
+      elem_blk_parms[i].elem_type_val = EX_EL_TRUSS;
       elem_blk_parms[i].num_sides = 2;  
 
       if (elem_blk_parms[i].num_nodes_per_elem == 2) {
@@ -525,19 +529,19 @@ int ex_get_side_set_node_count(int exoid,
         elem_blk_parms[i].num_nodes_per_side[0] = 3;
         elem_blk_parms[i].num_nodes_per_side[1] = 3;
       } else {
-        EL_NODE_COUNT_ERROR;
+        return el_node_count_error(elem_blk_parms[i]);
       }
     }
     /* Used for an empty block in a parallel decomposition */
     else if (strncmp(elem_blk_parms[i].elem_type,"NULL",3) == 0) {
-      elem_blk_parms[i].elem_type_val = NULL_ELEMENT;
+      elem_blk_parms[i].elem_type_val = EX_EL_NULL_ELEMENT;
       elem_blk_parms[i].num_sides = 0;  
       elem_blk_parms[i].num_nodes_per_side[0] = 0;
       elem_blk_parms[i].num_elem_in_blk = 0;
     } else {
       /* unsupported element type; no problem if no sides specified for
          this element block */
-      elem_blk_parms[i].elem_type_val = UNK;
+      elem_blk_parms[i].elem_type_val = EX_EL_UNK;
       elem_blk_parms[i].num_sides = 0;  
       elem_blk_parms[i].num_nodes_per_side[0] = 0;
     }

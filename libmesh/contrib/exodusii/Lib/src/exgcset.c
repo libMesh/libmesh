@@ -32,9 +32,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-/*****************************************************************************
+/*!
 *
-* exgcss - ex_get_concat_sets
+* \undoc exgcss - ex_get_concat_sets
+*
+* reads the set ID's, set entry count array, set entry pointers
+* array, set entry list, set extra list, and set distribution factors
+* for all sets of the specified type.
 *
 * entry conditions - 
 *   input parameters:
@@ -46,18 +50,11 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
 #include "exodusII.h"
 #include "exodusII_int.h"
-
-/*
- * reads the set ID's, set entry count array, set entry pointers
- * array, set entry list, set extra list, and set distribution factors
- * for all sets of the specified type.
- */
 
 int ex_get_concat_sets (int   exoid,
                         ex_entity_type set_type,
@@ -71,7 +68,7 @@ int ex_get_concat_sets (int   exoid,
   int  *sets_dist_index = set_specs->sets_dist_index;
   int  *sets_entry_list = set_specs->sets_entry_list;
   int  *sets_extra_list = set_specs->sets_extra_list;
-  void *sets_dist_fact = set_specs->sets_dist_fact;
+  void *sets_dist_fact = set_specs->sets_dist_fact; 
   char *cdum;
   int num_sets, i;
   float fdum;
@@ -114,19 +111,19 @@ int ex_get_concat_sets (int   exoid,
 
   if ((status = nc_inq_dimid(exoid, ex_dim_num_objects(set_type), &dimid)) != NC_NOERR) {
     exerrval = status;
-      if (status == NC_EBADDIM) {
-	sprintf(errmsg,
-		"Warning: no %ss defined for file id %d",
-		ex_name_of_object(set_type), exoid);
-	ex_err("ex_get_concat_sets",errmsg,exerrval);
-	return (EX_WARN);
-      } else {
-	sprintf(errmsg,
-		"Error: failed to locate %ss defined in file id %d", 
-		ex_name_of_object(set_type), exoid);
-	ex_err("ex_get_concat_sets",errmsg,exerrval);
-	return (EX_FATAL);
-      }
+    if (status == NC_EBADDIM) {
+      sprintf(errmsg,
+	      "Warning: no %ss defined for file id %d",
+	      ex_name_of_object(set_type), exoid);
+      ex_err("ex_get_concat_sets",errmsg,exerrval);
+      return (EX_WARN);
+    } else {
+      sprintf(errmsg,
+	      "Error: failed to locate %ss defined in file id %d", 
+	      ex_name_of_object(set_type), exoid);
+      ex_err("ex_get_concat_sets",errmsg,exerrval);
+      return (EX_FATAL);
+    }
   }
 
   /* inquire how many sets have been stored */
@@ -179,17 +176,19 @@ int ex_get_concat_sets (int   exoid,
 	return(EX_FATAL); /* error will be reported by subroutine */
 
       /* get distribution factors for this set */
-      flt_dist_fact = sets_dist_fact;
-      if (num_dist_per_set[i] > 0) {      /* only get df if they exist */
-	if (ex_get_set_dist_fact(exoid, set_type, set_ids[i],
-				 &(flt_dist_fact[sets_dist_index[i]])) != NC_NOERR) {
-	  sprintf(errmsg,
-                  "Error: failed to get %s %d dist factors in file id %d",
-		  ex_name_of_object(set_type), set_ids[i], exoid);
-	  ex_err("ex_get_concat_sets",errmsg,exerrval);
-	  return(EX_FATAL);
+      if (sets_dist_fact != 0) {
+	flt_dist_fact = sets_dist_fact;
+	if (num_dist_per_set[i] > 0) {      /* only get df if they exist */
+	  if (ex_get_set_dist_fact(exoid, set_type, set_ids[i],
+				   &(flt_dist_fact[sets_dist_index[i]])) != NC_NOERR) {
+	    sprintf(errmsg,
+		    "Error: failed to get %s %d dist factors in file id %d",
+		    ex_name_of_object(set_type), set_ids[i], exoid);
+	    ex_err("ex_get_concat_sets",errmsg,exerrval);
+	    return(EX_FATAL);
+	  }
+	} else {  /* fill distribution factor array with 1's */
 	}
-      } else {  /* fill distribution factor array with 1's */
       }
     }
     else if (ex_comp_ws(exoid) == sizeof(double))
@@ -200,17 +199,19 @@ int ex_get_concat_sets (int   exoid,
 	  return(EX_FATAL); /* error will be reported by subroutine */
 
 	/* get distribution factors for this set */
-	dbl_dist_fact = sets_dist_fact;
-	if (num_dist_per_set[i] > 0) {      /* only get df if they exist */
-	  if (ex_get_set_dist_fact(exoid, set_type, set_ids[i],
-				   &(dbl_dist_fact[sets_dist_index[i]])) != NC_NOERR) {
-	    sprintf(errmsg,
-		    "Error: failed to get %s %d dist factors in file id %d",
-		    ex_name_of_object(set_type), set_ids[i], exoid);
-	    ex_err("ex_get_concat_sets",errmsg,exerrval);
-	    return(EX_FATAL);
+	if (sets_dist_fact != 0) {
+	  dbl_dist_fact = sets_dist_fact;
+	  if (num_dist_per_set[i] > 0) {      /* only get df if they exist */
+	    if (ex_get_set_dist_fact(exoid, set_type, set_ids[i],
+				     &(dbl_dist_fact[sets_dist_index[i]])) != NC_NOERR) {
+	      sprintf(errmsg,
+		      "Error: failed to get %s %d dist factors in file id %d",
+		      ex_name_of_object(set_type), set_ids[i], exoid);
+	      ex_err("ex_get_concat_sets",errmsg,exerrval);
+	      return(EX_FATAL);
+	    }
+	  } else {  /* fill distribution factor array with 1's */
 	  }
-	} else {  /* fill distribution factor array with 1's */
 	}
       }
   }

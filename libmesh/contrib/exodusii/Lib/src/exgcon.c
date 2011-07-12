@@ -32,42 +32,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-/*****************************************************************************
-*
-* exgcon - ex_get_coord_names
-*
-* entry conditions - 
-*   input parameters:
-*       int     exoid                   exodus file id
-*
-* exit conditions - 
-*       char*   coord_names[]           ptr array of coord names
-*
-* revision history - 
-*
-*  $Id$
-*
-*****************************************************************************/
 
 #include "exodusII.h"
 #include "exodusII_int.h"
 
 /*!
- * reads the names (#MAX_STR_LENGTH characters in length) of the
- * coordinate arrays from the database. Memory must be allocated for
- * the character strings before this function is invoked.
- * \param      exoid  exodus file id
- * \param[out] coord_names Returned pointer to a vector containing
- *             'num_dim' names of the nodal coordinate arrays.
- */
+
+The function ex_get_coord_names() reads the names (\p MAX_STR_LENGTH
+-characters in length) of the coordinate arrays from the
+database. Memory must be allocated for the character strings before
+this function is invoked.
+
+\return In case of an error, ex_get_coord_names() returns a negative
+number; a warning will return a positive number.  Possible causes of
+errors include:
+  -  data file not properly opened with call to ex_create() or ex_open()
+  -  a warning value is returned if coordinate names were not stored.
+
+\param[in]   exoid        exodus file ID returned from a previous call to ex_create() or ex_open().
+\param[out]  coord_names  Returned pointer to a vector containing \c num_dim names of the nodal
+                          coordinate arrays.
+
+The following code segment will read the coordinate names from an open
+exodus file :
+
+\code
+int error, exoid;
+char *coord_names[3];
+
+for (i=0; i < num_dim; i++) {
+   coord_names[i] = (char *)calloc((MAX_STR_LENGTH+1), sizeof(char));
+}
+
+error = ex_get_coord_names (exoid, coord_names);
+\endcode
+
+*/
 
 int ex_get_coord_names (int    exoid,
                         char **coord_names)
 {
   int status;
-  int i, j, ndimdim, varid;
-  size_t num_dim, start[2];
-  char *ptr;
+  size_t i;
+  int ndimdim, varid;
+  size_t num_dim, start[2], count[2];
   char errmsg[MAX_ERR_LENGTH];
 
   exerrval = 0;
@@ -103,38 +111,9 @@ int ex_get_coord_names (int    exoid,
 
 
   /* read the coordinate names */
-  for (i=0; i<num_dim; i++) {
-    start[0] = i;
-    start[1] = 0;
-
-    j = 0;
-    ptr = coord_names[i];
-
-    if ((status = nc_get_var1_text(exoid, varid, start, ptr)) != NC_NOERR) {
-      exerrval = status;
-      sprintf(errmsg,
-	      "Error: failed to get coordinate names in file id %d", exoid);
-      ex_err("ex_get_coord_names",errmsg,exerrval);
-      return (EX_FATAL);
-    }
-
- 
-    while ((*ptr++ != '\0') && (j < MAX_STR_LENGTH)) {
-      start[1] = ++j;
-      if ((status = nc_get_var1_text(exoid, varid, start, ptr)) != NC_NOERR) {
-	exerrval = status;
-	sprintf(errmsg,
-		"Error: failed to get coordinate names in file id %d", exoid);
-	ex_err("ex_get_coord_names",errmsg,exerrval);
-	return (EX_FATAL);
-      }
-    }
-    --ptr;
-    if (ptr > coord_names[i]) {
-      /*    get rid of trailing blanks */
-      while (*(--ptr) == ' ');
-    }
-    *(++ptr) = '\0';
+  status = ex_get_names_internal(exoid, varid, num_dim, coord_names, EX_COORDINATE, "ex_get_coord_names");
+  if (status != NC_NOERR) {
+    return (EX_FATAL);
   }
   return (EX_NOERR);
 }

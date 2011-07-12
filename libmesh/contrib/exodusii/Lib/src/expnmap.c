@@ -74,7 +74,6 @@ int ex_put_num_map ( int exoid,
    int num_maps;
    size_t num_entries;
    int cur_num_maps;
-   char *cdum;
    char errmsg[MAX_ERR_LENGTH];
    const char* dnumentries;
    const char* dnummaps;
@@ -83,8 +82,6 @@ int ex_put_num_map ( int exoid,
    int status;
    
    exerrval = 0; /* clear error code */
-
-   cdum = 0;
 
    switch ( map_type ) {
    case EX_NODE_MAP:
@@ -215,6 +212,13 @@ int ex_put_num_map ( int exoid,
    case EX_ELEM_MAP:
      vmap = VAR_ELEM_MAP(cur_num_maps+1);
      break;
+  default:
+    exerrval = 1005;
+    sprintf(errmsg,
+	    "Internal Error: unrecognized map type in switch: %d in file id %d",
+	    map_type,exoid);
+    ex_err("ex_putt_n_one_attr",errmsg,EX_MSG);
+    return (EX_FATAL);
    }
 
    /* locate variable array in which to store the map */

@@ -48,7 +48,6 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
@@ -70,9 +69,8 @@ int ex_get_set (int   exoid,
   int dimid, entry_list_id, extra_list_id, status;
   int set_id_ndx;
   char errmsg[MAX_ERR_LENGTH];
-  char* numentryptr;
-  char* entryptr;
-  char* extraptr;
+  char* entryptr = NULL;
+  char* extraptr = NULL;
 
   exerrval = 0; /* clear error code */
 
@@ -107,27 +105,22 @@ int ex_get_set (int   exoid,
 
   /* setup more pointers based on set_type */
   if (set_type == EX_NODE_SET) {
-    numentryptr = DIM_NUM_NOD_NS(set_id_ndx);
     entryptr = VAR_NODE_NS(set_id_ndx);
     extraptr = NULL;
   }
   else if (set_type == EX_EDGE_SET) {
-    numentryptr = DIM_NUM_EDGE_ES(set_id_ndx);
     entryptr = VAR_EDGE_ES(set_id_ndx);
     extraptr = VAR_ORNT_ES(set_id_ndx);
   }
   else if (set_type == EX_FACE_SET) {
-    numentryptr = DIM_NUM_FACE_FS(set_id_ndx);
     entryptr = VAR_FACE_FS(set_id_ndx);
     extraptr = VAR_ORNT_FS(set_id_ndx);
   }
   else if (set_type == EX_SIDE_SET) {
-    numentryptr = DIM_NUM_SIDE_SS(set_id_ndx);
     entryptr = VAR_ELEM_SS(set_id_ndx);
     extraptr = VAR_SIDE_SS(set_id_ndx);
   }
   if (set_type == EX_ELEM_SET) {
-    numentryptr = DIM_NUM_ELE_ELS(set_id_ndx);
     entryptr = VAR_ELEM_ELS(set_id_ndx);
     extraptr = NULL;
   }

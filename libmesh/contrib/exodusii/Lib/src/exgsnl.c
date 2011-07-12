@@ -46,7 +46,6 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
@@ -68,7 +67,8 @@ int ex_get_side_set_node_list_len(int exoid,
                           int side_set_id,
                           int *side_set_node_list_len)
 {
-  int i, j, m;
+  int i, j;
+  size_t m;
   int  num_side_sets, num_elem_blks, num_df, ndim;
   int tot_num_elem = 0, tot_num_ss_elem = 0; 
   int *elem_blk_ids;
@@ -91,6 +91,33 @@ int ex_get_side_set_node_list_len(int exoid,
 /* first check if any side sets are specified */
 /* inquire how many side sets have been stored */
 
+  /* get the dimensionality of the coordinates;  this is necessary to
+     distinguish between 2d TRIs and 3d TRIs */
+
+  if ((ex_inquire(exoid, EX_INQ_DIM, &ndim, &fdum, cdum)) == -1)
+  {
+    sprintf(errmsg,
+           "Error: failed to get dimensionality in file id %d",exoid);
+    ex_err("ex_get_side_set_node_list_len",errmsg,exerrval);
+    return(EX_FATAL);
+  }
+
+  if ((ex_inquire(exoid, EX_INQ_ELEM, &tot_num_elem, &fdum, cdum)) == -1)
+  {
+    sprintf(errmsg,
+           "Error: failed to get total number of elements in file id %d",exoid);
+    ex_err("ex_get_side_set_node_list_len",errmsg,exerrval);
+    return(EX_FATAL);
+  }
+
+  if ((ex_inquire(exoid, EX_INQ_ELEM_BLK, &num_elem_blks, &fdum, cdum)) == -1)
+  {
+    sprintf(errmsg,
+           "Error: failed to get number of element blocks in file id %d",exoid);
+    ex_err("ex_get_side_set_node_list_len",errmsg,exerrval);
+    return(EX_FATAL);
+  }
+
   if ((ex_inquire(exoid, EX_INQ_SIDE_SETS, &num_side_sets, &fdum, cdum)) == -1)
   {
     sprintf(errmsg,
@@ -107,33 +134,6 @@ int ex_get_side_set_node_list_len(int exoid,
     return(EX_WARN);
   }
 
-  if ((ex_inquire(exoid, EX_INQ_ELEM_BLK, &num_elem_blks, &fdum, cdum)) == -1)
-  {
-    sprintf(errmsg,
-           "Error: failed to get number of element blocks in file id %d",exoid);
-    ex_err("ex_get_side_set_node_list_len",errmsg,exerrval);
-    return(EX_FATAL);
-  }
-
-  if ((ex_inquire(exoid, EX_INQ_ELEM, &tot_num_elem, &fdum, cdum)) == -1)
-  {
-    sprintf(errmsg,
-           "Error: failed to get total number of elements in file id %d",exoid);
-    ex_err("ex_get_side_set_node_list_len",errmsg,exerrval);
-    return(EX_FATAL);
-  }
-
-/* get the dimensionality of the coordinates;  this is necessary to
-   distinguish between 2d TRIs and 3d TRIs */
-
-  if ((ex_inquire(exoid, EX_INQ_DIM, &ndim, &fdum, cdum)) == -1)
-  {
-    sprintf(errmsg,
-           "Error: failed to get dimensionality in file id %d",exoid);
-    ex_err("ex_get_side_set_node_list_len",errmsg,exerrval);
-    return(EX_FATAL);
-  }
-
   /* First determine the  # of elements in the side set*/
   if ((ex_get_side_set_param(exoid,side_set_id,&tot_num_ss_elem,&num_df)) == -1)
   {
@@ -146,6 +146,13 @@ int ex_get_side_set_node_list_len(int exoid,
 
   if (tot_num_ss_elem == 0) /* NULL side set? */
     return (EX_NOERR); /* return zero */
+
+  /* Minor optimization/kluge -- If num_df is nonzero, or 1 per face
+     then assume that it matches the number of nodes in the sideset... */
+  if (num_df > 0 && num_df != tot_num_ss_elem) {
+    *side_set_node_list_len = num_df;
+    return(EX_NOERR);
+  }
 
   /* Allocate space for the side set element list */
   if (!(side_set_elem_list=malloc(tot_num_ss_elem*sizeof(int))))
@@ -274,23 +281,23 @@ int ex_get_side_set_node_list_len(int exoid,
 
     for (m=0; m < strlen(elem_type); m++)
       elem_blk_parms[i].elem_type[m] = toupper(elem_type[m]);
-    elem_blk_parms[i].elem_type[m] = NULL_ELEMENT;
+    elem_blk_parms[i].elem_type[m] = EX_EL_NULL_ELEMENT;
 
     if (strncmp(elem_blk_parms[i].elem_type,"CIRCLE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = CIRCLE;
+      elem_blk_parms[i].elem_type_val = EX_EL_CIRCLE;
       /* set side set node stride */
         elem_blk_parms[i].num_nodes_per_side[0] = 1;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"SPHERE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = SPHERE;
+      elem_blk_parms[i].elem_type_val = EX_EL_SPHERE;
       /* set side set node stride */
         elem_blk_parms[i].num_nodes_per_side[0] = 1;
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"QUAD",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = QUAD;
+      elem_blk_parms[i].elem_type_val = EX_EL_QUAD;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 4)
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
@@ -301,7 +308,7 @@ int ex_get_side_set_node_list_len(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"TRIANGLE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = TRIANGLE;
+      elem_blk_parms[i].elem_type_val = EX_EL_TRIANGLE;
       /* determine side set node stride */
       if (ndim == 2) /* 2d TRIs */
       {
@@ -320,7 +327,7 @@ int ex_get_side_set_node_list_len(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"SHELL",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = SHELL;
+      elem_blk_parms[i].elem_type_val = EX_EL_SHELL;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2) /* KLUDGE for 2D Shells*/
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
@@ -331,7 +338,7 @@ int ex_get_side_set_node_list_len(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"HEX",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = HEX;
+      elem_blk_parms[i].elem_type_val = EX_EL_HEX;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 8)
         elem_blk_parms[i].num_nodes_per_side[0] = 4;
@@ -346,7 +353,7 @@ int ex_get_side_set_node_list_len(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"TETRA",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = TETRA;
+      elem_blk_parms[i].elem_type_val = EX_EL_TETRA;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 4)
         elem_blk_parms[i].num_nodes_per_side[0] = 3;
@@ -357,7 +364,7 @@ int ex_get_side_set_node_list_len(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"WEDGE",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = WEDGE;
+      elem_blk_parms[i].elem_type_val = EX_EL_WEDGE;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 6)
         elem_blk_parms[i].num_nodes_per_side[0] = 4;
@@ -366,7 +373,7 @@ int ex_get_side_set_node_list_len(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"PYRAMID",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = PYRAMID;
+      elem_blk_parms[i].elem_type_val = EX_EL_PYRAMID;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 5)
         elem_blk_parms[i].num_nodes_per_side[0] = 4;
@@ -375,7 +382,7 @@ int ex_get_side_set_node_list_len(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"BEAM",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = BEAM;
+      elem_blk_parms[i].elem_type_val = EX_EL_BEAM;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2)
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
@@ -386,7 +393,7 @@ int ex_get_side_set_node_list_len(int exoid,
               (strncmp(elem_blk_parms[i].elem_type,"BAR",3) == 0)  ||
               (strncmp(elem_blk_parms[i].elem_type,"EDGE",3) == 0))
     {
-      elem_blk_parms[i].elem_type_val = TRUSS;
+      elem_blk_parms[i].elem_type_val = EX_EL_TRUSS;
       /* determine side set node stride */
       if (elem_blk_parms[i].num_nodes_per_elem == 2)
         elem_blk_parms[i].num_nodes_per_side[0] = 2;
@@ -395,14 +402,14 @@ int ex_get_side_set_node_list_len(int exoid,
     }
     else if (strncmp(elem_blk_parms[i].elem_type,"NULL",3) == 0)
     {
-      elem_blk_parms[i].elem_type_val = NULL_ELEMENT;
+      elem_blk_parms[i].elem_type_val = EX_EL_NULL_ELEMENT;
       elem_blk_parms[i].num_nodes_per_side[0] = 0;
       elem_blk_parms[i].num_elem_in_blk = 0;
     }
     else
     { /* unsupported element type; no problem if no sides specified for
          this element block */
-      elem_blk_parms[i].elem_type_val = UNK;
+      elem_blk_parms[i].elem_type_val = EX_EL_UNK;
       elem_blk_parms[i].num_nodes_per_side[0] = 0;
     }
 
@@ -417,7 +424,7 @@ int ex_get_side_set_node_list_len(int exoid,
   {
     for (j=0; j<num_elem_blks; j++)
     {
-      if (elem_blk_parms[j].elem_type_val != NULL_ELEMENT)
+      if (elem_blk_parms[j].elem_type_val != EX_EL_NULL_ELEMENT)
         if (side_set_elem_list[i] <= elem_blk_parms[j].elem_ctr)
           break; /* stop because we found the parameters for this element */
     }
@@ -439,7 +446,7 @@ int ex_get_side_set_node_list_len(int exoid,
     /* Update *side_set_node_list_len (which points to next node in chain */
 
     /* WEDGEs with 3 node sides (side 4 or 5) are special cases */
-    if (elem_blk_parms[j].elem_type_val == WEDGE &&
+    if (elem_blk_parms[j].elem_type_val == EX_EL_WEDGE &&
         (side_set_side_list[i] == 4 || side_set_side_list[i] == 5))
     {
       if (elem_blk_parms[j].num_nodes_per_elem == 6)
@@ -448,7 +455,7 @@ int ex_get_side_set_node_list_len(int exoid,
         *side_set_node_list_len += 6;  /* 6 node side */
     }
     /* PYRAMIDSs with 3 node sides (sides 1,2,3,4) are also special */
-    else if (elem_blk_parms[j].elem_type_val == PYRAMID &&
+    else if (elem_blk_parms[j].elem_type_val == EX_EL_PYRAMID &&
              (side_set_side_list[i] < 5))
     {
       if (elem_blk_parms[j].num_nodes_per_elem == 5)
@@ -457,7 +464,7 @@ int ex_get_side_set_node_list_len(int exoid,
         *side_set_node_list_len += 6;  /* 6 node side */
     }
     /* side numbers 3,4,5,6 for SHELLs are also special */
-    else if (elem_blk_parms[j].elem_type_val == SHELL &&
+    else if (elem_blk_parms[j].elem_type_val == EX_EL_SHELL &&
         (side_set_side_list[i] > 2 ))
     {
       if (elem_blk_parms[j].num_nodes_per_elem == 4)
@@ -466,7 +473,7 @@ int ex_get_side_set_node_list_len(int exoid,
         *side_set_node_list_len += 3;  /* 3 node side */
     }
     /* sides 3, 4, and 5 of 3d TRIs are special cases */
-    else if (elem_blk_parms[j].elem_type_val == TRIANGLE &&
+    else if (elem_blk_parms[j].elem_type_val == EX_EL_TRIANGLE &&
              ndim == 3 &&
              side_set_side_list[i] > 2 )
     {
@@ -475,7 +482,7 @@ int ex_get_side_set_node_list_len(int exoid,
       else  /* 6-node TRI */
         *side_set_node_list_len += 3;  /* 3 node side */
     }
-    else if (elem_blk_parms[j].elem_type_val == UNK)
+    else if (elem_blk_parms[j].elem_type_val == EX_EL_UNK)
     {
       exerrval = EX_BADPARAM;
       sprintf(errmsg,

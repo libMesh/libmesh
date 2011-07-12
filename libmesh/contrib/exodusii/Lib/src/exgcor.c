@@ -32,44 +32,64 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-/*****************************************************************************
-*
-* exgcor - ex_get_coord
-*
-* entry conditions - 
-*   input parameters:
-*       int     exoid                   exodus file id
-*
-* exit conditions - 
-*       float*  x_coord                 X coord array
-*       float*  y_coord                 y coord array
-*       float*  z_coord                 z coord array
-*
-* revision history - 
-*
-*  $Id$
-*
-*****************************************************************************/
 
 #include "exodusII.h"
 #include "exodusII_int.h"
 
 /*!
- * reads the coordinates of the nodes.
- * Memory must be allocated for the coordinate arrays (x_coor, y_coor,
- * and z_coor) before this call is made. The length of each of these
- * arrays is the number of nodes in the mesh.  Because the coordinates
- * are floating point values, the application code must declare the
- * arrays passed to be the appropriate type "float" or "double"
- * to match the compute word size passed in ex_create() or ex_open()
- * \param      exoid  exodus file id
- * \param[out] x_coor Returned X coordinates of the nodes. These are
- *                    returned only if x_coor is non-NULL.
- * \param[out] y_coor Returned Y coordinates of the nodes. These are
- *                    returned only if y_coor is non-NULL.
- * \param[out] z_coor Returned Z coordinates of the nodes. These are
- *                    returned only if z_coor is non-NULL.
- */
+The function ex_get_coord() reads the nodal coordinates of the
+nodes. Memory must be allocated for the coordinate arrays (\c x_coor,
+\c y_coor, and \c z_coor) before this call is made. The length of each
+of these arrays is the number of nodes in the mesh.
+
+Because the coordinates are floating point values, the application
+code must declare the arrays passed to be the appropriate type
+(\c float or \c double) to match the compute word size passed in
+ex_create() or ex_open().
+
+\return
+In case of an error, ex_get_coord() returns a negative number;
+a warning will return a positive number. Possible causes of errors
+include:
+  -  data file not properly opened with call to ex_create() or ex_open()
+  -  a warning value is returned if nodal coordinates were not stored.
+
+\param[in]   exoid    exodus file ID returned from a previous call to ex_create() or ex_open().
+\param[out]  x_coor   Returned X coordinates of the nodes. If this is \c NULL, the
+                      X-coordinates will not be read.
+\param[out]  y_coor   Returned Y coordinates of the nodes. These are returned only if
+                      \c num_dim > 1; otherwise, pass in \c NULL. If this
+		      is \c NULL, the Y-coordinates will not be read.
+\param[out]  z_coor   Returned Z coordinates of the nodes. These are returned only if
+                      \c num_dim > 2; otherwise, pass in \c NULL. If this
+                      is \c NULL, the Z-coordinates will not be read.
+
+The following code segment will read the nodal coordinates 
+from an open exodus file :
+
+\code
+int error, exoid;
+
+double *x, *y, *z;
+
+\comment{read nodal coordinates values from database}
+x = (double *)calloc(num_nodes, sizeof(double));
+y = (double *)calloc(num_nodes, sizeof(double));
+if (num_dim >= 3)
+   z = (double *)calloc(num_nodes, sizeof(double));
+else
+   z = 0;
+
+error = ex_get_coord(exoid, x, y, z);
+
+\comment{Do the same as the previous call in three separate calls}
+error = ex_get_coord(exoid, x,    NULL, NULL);
+error = ex_get_coord(exoid, NULL, y,    NULL);
+if (num_dim >= 3)
+   error = ex_get_coord(exoid, NULL, NULL, z);
+\endcode
+
+*/
 
 int ex_get_coord (int exoid,
                   void *x_coor,
@@ -80,14 +100,19 @@ int ex_get_coord (int exoid,
   int coordid;
   int coordidx, coordidy, coordidz;
 
-  int numnoddim, ndimdim, i;
-  size_t num_nod, num_dim, start[2], count[2];
+  int numnoddim, ndimdim;
+  size_t num_nod, num_dim, start[2], count[2], i;
   char errmsg[MAX_ERR_LENGTH];
 
   exerrval = 0;
 
   /* inquire id's of previously defined dimensions  */
 
+  if (ex_get_dimension(exoid, DIM_NUM_DIM, "dimensions",
+		       &num_dim, &ndimdim, "ex_get_coord") != NC_NOERR) {
+    return(EX_FATAL);
+  }
+      
   if (nc_inq_dimid (exoid, DIM_NUM_NODES, &numnoddim) != NC_NOERR)
     {
       /* If not found, then this file is storing 0 nodes.
@@ -105,11 +130,6 @@ int ex_get_coord (int exoid,
       return (EX_FATAL);
     }
 
-  if (ex_get_dimension(exoid, DIM_NUM_DIM, "dimensions",
-		       &num_dim, &ndimdim, "ex_get_coord") != NC_NOERR) {
-    return(EX_FATAL);
-  }
-      
   /* read in the coordinates  */
   if (ex_large_model(exoid) == 0) {
     if ((status = nc_inq_varid (exoid, VAR_COORD, &coordid)) != NC_NOERR) {
@@ -198,9 +218,8 @@ int ex_get_coord (int exoid,
     /* write out the coordinates  */
     for (i=0; i<num_dim; i++)
       {
-        void *coor;
-        char *which;
-        int status;
+        void *coor = NULL;
+        char *which = NULL;
        
         if (i == 0) {
           coor = x_coor;

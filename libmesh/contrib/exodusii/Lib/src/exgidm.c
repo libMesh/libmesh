@@ -58,8 +58,8 @@ int ex_get_id_map ( int   exoid,
 		    ex_entity_type map_type,
 		    int*  map )
 {
-  int i;
   int dimid, mapid, status;
+  size_t i;
   size_t num_entries;
   char errmsg[MAX_ERR_LENGTH];
   const char* dnumentries;
@@ -113,7 +113,7 @@ int ex_get_id_map ( int   exoid,
     
     /* generate default map of 1..n, where n is num_entries */
     for (i=0; i<num_entries; i++) {
-      map[i] = i+1;
+      map[i] = (int)i+1;
     }
 
     return (EX_NOERR);

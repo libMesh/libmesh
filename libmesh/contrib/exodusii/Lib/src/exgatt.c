@@ -47,15 +47,14 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
 #include "exodusII.h"
 #include "exodusII_int.h"
 
-/*
- * reads the attributes for an edge, face, or element block
+/*!
+ * \undoc reads the attributes for an edge, face, or element block
  */
 
 int ex_get_attr( int   exoid,
@@ -122,6 +121,13 @@ int ex_get_attr( int   exoid,
   case EX_ELEM_BLOCK:
     vattrbname = VAR_ATTRIB(obj_id_ndx);
     break;
+  default:
+    exerrval = 1005;
+    sprintf(errmsg,
+	    "Internal Error: unrecognized object type in switch: %d in file id %d",
+	    obj_type,exoid);
+    ex_err("ex_get_attr",errmsg,EX_MSG);
+    return (EX_FATAL);              /* number of attributes not defined */
   }
 
   /* inquire id's of previously defined dimensions  */

@@ -49,7 +49,6 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
@@ -78,20 +77,17 @@ int ex_put_set_param (int exoid,
   int num_sets;
   int ldum;
   int cur_num_sets, set_stat;
-  char *cdum;
   char errmsg[MAX_ERR_LENGTH];
-  char* dimptr;
-  char* idsptr;
-  char* statptr;
-  char* numentryptr;
-  char* numdfptr;
-  char* factptr;
-  char* entryptr;
-  char* extraptr;
+  char* dimptr = NULL;
+  char* idsptr = NULL;
+  char* statptr = NULL;
+  char* numentryptr = NULL;
+  char* numdfptr = NULL;
+  char* factptr = NULL;
+  char* entryptr = NULL;
+  char* extraptr = NULL;
 
   exerrval = 0; /* clear error code */
-
-  cdum = 0;
 
   /* setup pointers based on set_type 
      NOTE: there is another block that sets more stuff later ... */

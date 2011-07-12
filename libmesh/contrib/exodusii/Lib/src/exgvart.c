@@ -53,7 +53,6 @@
 * revision history - 
 *   20061002 - David Thompson - Adapted from ex_get_var_time
 *
-* $Id$
 *
 *****************************************************************************/
 
@@ -75,10 +74,10 @@ int ex_get_var_time( int   exoid,
                      int   end_time_step,
                      void* var_vals )
 {
-  int i, dimid, varid, numel = 0, offset;
+  int dimid, varid, numel = 0, offset;
   int status;
   int *obj_ids, *stat_vals;
-  size_t num_obj;
+  size_t num_obj, i;
   size_t num_entries_this_obj = 0;
   size_t start[2], count[2];
   float fdum;

@@ -45,7 +45,6 @@
 *
 * revision history - 
 *
-*  $Id$
 *
 *****************************************************************************/
 
@@ -61,8 +60,9 @@ int ex_get_varid (int  exoid,
 		  ex_entity_type obj_type,
 		  int *varid_arr)
 {
-  int  status1, status2, i, j;
+  int  status1, status2;
   int varid;
+  size_t i, j;
   size_t num_entity = 0;
   size_t num_var = 0;
   char errmsg[MAX_ERR_LENGTH];
@@ -100,7 +100,7 @@ int ex_get_varid (int  exoid,
   else if (obj_type == EX_EDGE_BLOCK) {
     status1 = ex_get_dimension(exoid, DIM_NUM_EDG_VAR,  "edge variables", &num_var,    &varid, routine);
     var_name = "vals_edge_var";
-    ent_type = "ed";
+    ent_type = "eb";
   }
   else if (obj_type == EX_EDGE_SET) {
     status1 = ex_get_dimension(exoid, DIM_NUM_ESET_VAR, "edgeset variables", &num_var, &varid, routine);
@@ -110,7 +110,7 @@ int ex_get_varid (int  exoid,
   else if (obj_type == EX_FACE_BLOCK) {
     status1 = ex_get_dimension(exoid, DIM_NUM_FAC_VAR,  "face variables", &num_var,    &varid, routine);
     var_name = "vals_face_var";
-    ent_type = "fa";
+    ent_type = "fb";
   }
   else if (obj_type == EX_FACE_SET) {
     status1 = ex_get_dimension(exoid, DIM_NUM_FSET_VAR, "faceset variables", &num_var, &varid, routine);
