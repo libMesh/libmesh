@@ -130,7 +130,7 @@ namespace MeshTools
 			       const Real ymin, const Real ymax,
 			       const ElemType type,
 			       const std::vector<TriangleInterface::Hole*>* holes=NULL);
-#endif LIBMESH_HAVE_TRIANGLE
+#endif // #define LIBMESH_HAVE_TRIANGLE
 
   } // end namespace Meshtools::Generation
 } // end namespace MeshTools
