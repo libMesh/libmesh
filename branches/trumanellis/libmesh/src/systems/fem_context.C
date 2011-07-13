@@ -299,7 +299,7 @@ Tensor FEMContext::side_hessian(unsigned int var, unsigned int qp)
 
 
 
-Number FEMContext::point_value(unsigned int var, Point &p)
+Number FEMContext::point_value(unsigned int var, const Point &p)
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -485,7 +485,7 @@ Tensor FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp)
 
 
 
-Number FEMContext::fixed_point_value(unsigned int var, Point &p)
+Number FEMContext::fixed_point_value(unsigned int var, const Point &p)
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
