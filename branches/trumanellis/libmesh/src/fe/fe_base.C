@@ -1953,18 +1953,154 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
       }
 }
 
+
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+void FEBase::compute_node_constraints (NodeConstraints &constraints,
+				       const Elem* elem)
+{
+  libmesh_assert (elem != NULL);
+
+  const unsigned int Dim = elem->dim();
+
+  // Only constrain elements in 2,3D.
+  if (Dim == 1)
+    return;
+
+  // Only constrain active and ancestor elements
+  if (elem->subactive())
+    return;
+
+  // We currently always use LAGRANGE mappings for geometry
+  const FEType fe_type(elem->default_order(), LAGRANGE);
+
+  std::vector<const Node*> my_nodes, parent_nodes;
+
+  // Look at the element faces.  Check to see if we need to 
+  // build constraints.
+  for (unsigned int s=0; s<elem->n_sides(); s++)
+    if (elem->neighbor(s) != NULL)
+      if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
+	{                                                     // this element and ones coarser
+	                                                      // than this element.
+	  // Get pointers to the elements of interest and its parent.
+	  const Elem* parent = elem->parent();
+	  
+	  // This can't happen...  Only level-0 elements have NULL
+	  // parents, and no level-0 elements can be at a higher
+	  // level than their neighbors!
+	  libmesh_assert (parent != NULL);
+	  
+	  const AutoPtr<Elem> my_side     (elem->build_side(s));
+	  const AutoPtr<Elem> parent_side (parent->build_side(s));
+
+	  const unsigned int n_side_nodes = my_side->n_nodes();
+
+          my_nodes.clear();
+	  my_nodes.reserve (n_side_nodes);
+          parent_nodes.clear();
+	  parent_nodes.reserve (n_side_nodes);
+
+          for (unsigned int n=0; n != n_side_nodes; ++n)
+            my_nodes.push_back(my_side->get_node(n));
+
+          for (unsigned int n=0; n != n_side_nodes; ++n)
+            parent_nodes.push_back(parent_side->get_node(n));
+
+	  for (unsigned int my_side_n=0;
+	       my_side_n < n_side_nodes;
+	       my_side_n++)
+	    {
+	      libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+
+	      const Node* my_node = my_nodes[my_side_n];
+	      
+	      // The support point of the DOF
+	      const Point& support_point = *my_node;
+	      
+	      // Figure out where my node lies on their reference element.
+	      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+								  parent_side.get(),
+								  support_point);
+	      
+	      // Compute the parent's side shape function values.
+	      for (unsigned int their_side_n=0;
+		   their_side_n < n_side_nodes;
+		   their_side_n++)
+		{
+	          libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
+
+	          const Node* their_node = parent_nodes[their_side_n];
+		  
+		  const Real their_value = FEInterface::shape(Dim-1,
+							      fe_type,
+							      parent_side->type(),
+							      their_side_n,
+							      mapped_point);
+		  
+                  const Real their_mag = std::abs(their_value);
+#ifdef DEBUG
+		  // Protect for the case u_i ~= u_j,
+		  // in which case i better equal j.
+		  if (their_mag > 0.999)
+                    {
+		      libmesh_assert (my_node == their_node);
+		      libmesh_assert (std::abs(their_value - 1.) < 0.001);
+                    }
+                  else
+#endif
+		  // To make nodal constraints useful for constructing
+		  // sparsity patterns faster, we need to get EVERY
+		  // POSSIBLE constraint coupling identified, even if
+		  // there is no coupling in the isoparametric
+		  // Lagrange case.
+                  if (their_mag < 1.e-5)
+                    {
+		      // since we may be running this method concurretly 
+		      // on multiple threads we need to acquire a lock 
+		      // before modifying the shared constraint_row object.		      
+		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+		      // A reference to the constraint row.
+		      NodeConstraintRow& constraint_row = constraints[my_node];
+		      
+		      constraint_row.insert(std::make_pair (their_node,
+							    0.));
+                    }
+		  // To get nodal coordinate constraints right, only
+		  // add non-zero and non-identity values for Lagrange
+		  // basis functions.
+		  else // (1.e-5 <= their_mag <= .999) 
+		    {
+		      // since we may be running this method concurretly 
+		      // on multiple threads we need to acquire a lock 
+		      // before modifying the shared constraint_row object.		      
+		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+		      // A reference to the constraint row.
+		      NodeConstraintRow& constraint_row = constraints[my_node];
+		      
+		      constraint_row.insert(std::make_pair (their_node,
+							    their_value));
+		    }
+		}		      
+	    }
+	}
+}
+
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-
 void FEBase::compute_periodic_constraints (DofConstraints &constraints,
-				           DofMap &dof_map,
+                                           DofMap &dof_map,
                                            const PeriodicBoundaries &boundaries,
                                            const MeshBase &mesh,
                                            const PointLocatorBase *point_locator,
-				           const unsigned int variable_number,
+                                           const unsigned int variable_number,
 				           const Elem* elem)
 {
   // Only bother if we truly have periodic boundaries
@@ -2248,6 +2384,214 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
         }
     }
 }
+
+
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
+                                                const PeriodicBoundaries &boundaries,
+                                                const MeshBase &mesh,
+                                                const PointLocatorBase *point_locator,
+				                const Elem* elem)
+{
+  // Only bother if we truly have periodic boundaries
+  if (boundaries.empty())
+    return;
+
+  libmesh_assert (elem != NULL);
+  
+  // Only constrain active elements with this method
+  if (!elem->active())
+    return;
+
+  const unsigned int Dim = elem->dim();
+  
+  // We currently always use LAGRANGE mappings for geometry
+  const FEType fe_type(elem->default_order(), LAGRANGE);
+
+  std::vector<const Node*> my_nodes, neigh_nodes;
+
+  // Look at the element faces.  Check to see if we need to
+  // build constraints.
+  for (unsigned int s=0; s<elem->n_sides(); s++)
+    {
+      if (elem->neighbor(s))
+        continue;
+
+      const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+      for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+        {
+          const unsigned int boundary_id = *id_it;
+          const PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
+          if (periodic)
+            {
+              libmesh_assert(point_locator);
+
+              // Get pointers to the element's neighbor.
+              const Elem* neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
+
+              // h refinement constraints:
+              // constrain dofs shared between
+              // this element and ones as coarse
+              // as or coarser than this element.
+              if (neigh->level() <= elem->level()) 
+                {
+	          unsigned int s_neigh = 
+                    mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
+                  libmesh_assert(s_neigh != libMesh::invalid_uint);
+
+#ifdef LIBMESH_ENABLE_AMR
+                  libmesh_assert(neigh->active());
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
+	          const AutoPtr<Elem> my_side    (elem->build_side(s));
+	          const AutoPtr<Elem> neigh_side (neigh->build_side(s_neigh));
+
+	          const unsigned int n_side_nodes = my_side->n_nodes();
+
+                  my_nodes.clear();
+	          my_nodes.reserve (n_side_nodes);
+                  neigh_nodes.clear();
+	          neigh_nodes.reserve (n_side_nodes);
+
+                  for (unsigned int n=0; n != n_side_nodes; ++n)
+                    my_nodes.push_back(my_side->get_node(n));
+
+                  for (unsigned int n=0; n != n_side_nodes; ++n)
+                    neigh_nodes.push_back(neigh_side->get_node(n));
+
+                  // Make sure we're not adding recursive constraints
+                  // due to the redundancy in the way we add periodic
+                  // boundary constraints, or adding constraints to
+                  // nodes that already have AMR constraints
+                  std::vector<bool> skip_constraint(n_side_nodes, false);
+
+	          for (unsigned int my_side_n=0;
+	               my_side_n < n_side_nodes;
+	               my_side_n++)
+	            {
+	              libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+
+	              const Node* my_node = my_nodes[my_side_n];
+	      
+	              // Figure out where my node lies on their reference element.
+                      const Point neigh_point = periodic->get_corresponding_pos(*my_node);
+
+	              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+								          neigh_side.get(),
+								          neigh_point);
+
+                      // If we've already got a constraint on this
+                      // node, then the periodic constraint is
+                      // redundant
+                      {
+			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                        if (constraints.count(my_node))
+                          {
+                            skip_constraint[my_side_n] = true;
+                            continue;
+                          }
+                      }
+		  
+	      	      // Compute the neighbors's side shape function values.
+	              for (unsigned int their_side_n=0;
+		           their_side_n < n_side_nodes;
+		           their_side_n++)
+		        {
+	                  libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+
+	                  const Node* their_node = neigh_nodes[their_side_n];
+
+		          const Real their_value = FEInterface::shape(Dim-1,
+							              fe_type,
+							              neigh_side->type(),
+							              their_side_n,
+							              mapped_point);
+		  
+                          const Real their_mag = std::abs(their_value);
+
+                          // If there's a constraint on an opposing node,
+			  // we need to see if it's constrained by
+			  // *our side* making any periodic constraint
+			  // on us recursive
+                          {
+			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                            if (!constraints.count(their_node))
+                              continue;
+
+                            NodeConstraintRow& their_constraint_row =
+                              constraints[their_node];
+
+	                    for (unsigned int orig_side_n=0;
+	                         orig_side_n < n_side_nodes;
+	                         orig_side_n++)
+	                      {
+	                        libmesh_assert (orig_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+
+	                        const Node* orig_node = my_nodes[orig_side_n];
+	      
+                                if (their_constraint_row.count(orig_node))
+                                  skip_constraint[orig_side_n] = true;
+	                      }
+                          }
+                        }
+                    }
+	          for (unsigned int my_side_n=0;
+	               my_side_n < n_side_nodes;
+	               my_side_n++)
+	            {
+	              libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+
+                      if (skip_constraint[my_side_n])
+                        continue;
+
+	              const Node* my_node = my_nodes[my_side_n];
+
+	              // Figure out where my node lies on their reference element.
+                      const Point neigh_point = periodic->get_corresponding_pos(*my_node);
+
+	              // Figure out where my node lies on their reference element.
+	              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+								          neigh_side.get(),
+								          neigh_point);
+	
+	              for (unsigned int their_side_n=0;
+		           their_side_n < n_side_nodes;
+		           their_side_n++)
+	                {
+	                  libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+
+	                  const Node* their_node = neigh_nodes[their_side_n];
+
+		          const Real their_value = FEInterface::shape(Dim-1,
+							              fe_type,
+							              neigh_side->type(),
+							              their_side_n,
+							              mapped_point);
+
+		          // since we may be running this method concurretly 
+		          // on multiple threads we need to acquire a lock 
+		          // before modifying the shared constraint_row object.
+		          {
+			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+			    NodeConstraintRow& constraint_row =
+			      constraints[my_node];
+
+			    constraint_row.insert(std::make_pair(their_node,
+							         their_value));
+		          }
+		        }
+	            }
+	        }
+            }
+        }
+    }
+}
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
 #endif // LIBMESH_ENABLE_PERIODIC
 
 

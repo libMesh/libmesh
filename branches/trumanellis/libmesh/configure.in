@@ -470,6 +470,24 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
+dnl NodeConstraints -- disabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(nodeconstraint,
+              AC_HELP_STRING([--enable-nodeconstraint],
+                             [build with node constraints suppport]),
+              enablenodeconstraint=$enableval,
+              enablenodeconstraint=$enableeverything)
+
+if test "$enablenodeconstraint" != no ; then
+  AC_DEFINE(ENABLE_NODE_CONSTRAINTS, 1,
+           [Flag indicating if the library should be built with node constraints support])
+  AC_MSG_RESULT(<<< Configuring library with nodeconstraints support >>>)
+fi
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
 dnl Mesh == ParallelMesh -- disabled until it's debugged/finished
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(parmesh,
