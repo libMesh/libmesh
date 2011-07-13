@@ -13652,7 +13652,7 @@ void tetgenmesh::bowatinsertsite(point bp,face* splitseg,int n,list** sublists,
           esym(newtet, rotface);
           pa = org(rotface);
           pb = dest(rotface);
-          while (fnextself(rotface));
+          while (fnextself(rotface)) {};
           // Do we meet a boundary face?
           tspivot(rotface, checksh);
           if (checksh.sh != dummysh) {
@@ -13668,7 +13668,7 @@ void tetgenmesh::bowatinsertsite(point bp,face* splitseg,int n,list** sublists,
                 break;
               }
               findedge(&rotface, pa, pb);
-              while (fnextself(rotface));
+              while (fnextself(rotface)) {};
               tspivot(rotface, checksh);
             } while (checksh.sh != dummysh);
           }
