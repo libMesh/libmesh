@@ -76,7 +76,8 @@ public:
                    READ_DATA             = 2,
                    READ_ADDITIONAL_DATA  = 4,
                    READ_LEGACY_FORMAT    = 8,
-                   TRY_READ_IFEMS        = 16 };
+                   TRY_READ_IFEMS        = 16,
+                   READ_BASIC_ONLY       = 32 };
 
   /**
    * Define enumeration to set properties in EquationSystems::write()
