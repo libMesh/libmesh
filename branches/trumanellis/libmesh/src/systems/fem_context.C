@@ -41,11 +41,12 @@ namespace libMesh
 FEMContext::FEMContext (const System &sys)
   : DiffContext(sys),
     element_qrule(NULL), side_qrule(NULL),
+    edge_qrule(NULL),
     _mesh_sys(sys.get_mesh_system()),
     _mesh_x_var(sys.get_mesh_x_var()),
     _mesh_y_var(sys.get_mesh_y_var()),
     _mesh_z_var(sys.get_mesh_z_var()),
-    elem(NULL), side(0), dim(sys.get_mesh().mesh_dimension())
+    elem(NULL), side(0), edge(0), dim(sys.get_mesh().mesh_dimension())
 {
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
@@ -72,10 +73,16 @@ FEMContext::FEMContext (const System &sys)
     (dim, sys.extra_quadrature_order).release();
   side_qrule = hardest_fe_type.default_quadrature_rule
     (dim-1, sys.extra_quadrature_order).release();
+  if (dim == 3)
+    edge_qrule = hardest_fe_type.default_quadrature_rule
+      (1, sys.extra_quadrature_order).release();
 
   // Next, create finite element objects
   element_fe_var.resize(n_vars);
   side_fe_var.resize(n_vars);
+  if (dim == 3)
+    edge_fe_var.resize(n_vars);
+
   for (unsigned int i=0; i != n_vars; ++i)
     {
       FEType fe_type = sys.variable_type(i);
@@ -85,9 +92,17 @@ FEMContext::FEMContext (const System &sys)
           element_fe[fe_type]->attach_quadrature_rule(element_qrule);
           side_fe[fe_type] = FEBase::build(dim, fe_type).release();
           side_fe[fe_type]->attach_quadrature_rule(side_qrule);
+
+          if (dim == 3)
+            {
+              edge_fe[fe_type] = FEBase::build(dim, fe_type).release();
+              edge_fe[fe_type]->attach_quadrature_rule(edge_qrule);
+            }
         }
       element_fe_var[i] = element_fe[fe_type];
       side_fe_var[i] = side_fe[fe_type];
+      if (dim == 3)
+        edge_fe_var[i] = edge_fe[fe_type];
     }
 }
 
@@ -106,10 +121,19 @@ FEMContext::~FEMContext()
     delete i->second;
   side_fe.clear();
 
+  for (std::map<FEType, FEBase *>::iterator i = edge_fe.begin();
+       i != edge_fe.end(); ++i)
+    delete i->second;
+  edge_fe.clear();
+
   delete element_qrule;
   element_qrule = NULL;
 
   delete side_qrule;
+  side_qrule = NULL;
+
+  if (edge_qrule)
+    delete edge_qrule;
   side_qrule = NULL;
 }
 
@@ -524,6 +548,21 @@ void FEMContext::elem_side_reinit(Real theta)
 }
 
 
+void FEMContext::elem_edge_reinit(Real theta)
+{
+  // Update the "time" variable of this context object
+  this->_update_time_from_system(theta);
+  
+  // Handle a moving element if necessary
+  if (_mesh_sys)
+    {
+      // FIXME - not threadsafe yet!
+      elem_position_set(theta);
+      edge_fe_reinit();
+    }
+}
+
+
 void FEMContext::elem_fe_reinit ()
 {
   // Initialize all the interior FE objects on elem.
@@ -546,6 +585,22 @@ void FEMContext::side_fe_reinit ()
        i != fe_end; ++i)
     {
       i->second->reinit(elem, side);
+    }
+}
+
+
+
+void FEMContext::edge_fe_reinit ()
+{
+  libmesh_assert(dim == 3);
+
+  // Initialize all the interior FE objects on elem/edge.
+  // Logging of FE::reinit is done in the FE functions
+  std::map<FEType, FEBase *>::iterator fe_end = edge_fe.end();
+  for (std::map<FEType, FEBase *>::iterator i = edge_fe.begin();
+       i != fe_end; ++i)
+    {
+      i->second->edge_reinit(elem, edge);
     }
 }
 
