@@ -6,8 +6,12 @@ INCLUDE = -I.
 
 # Package name and additional flags required for library compilation
 pkgname  := tetgen
-#libmesh_CXXFLAGS += -DTETLIBRARY
-libmesh_CXXFLAGS := -DNDEBUG -DTETLIBRARY -fPIC
+
+# Set compilation flags
+#libmesh_CXXFLAGS := -DNDEBUG -DTETLIBRARY -fPIC
+
+# [JWP] Should we not inherit whatever libmesh_CXXFLAGS were set by Make.common and add our own?
+libmesh_CXXFLAGS += -DTETLIBRARY -fPIC
 
 # (Relative) Path to location of shared libs
 libpath := ../lib
@@ -64,3 +68,12 @@ distclean:
 	@$(MAKE) clobber
 	@rm -f $(libpath)/*/lib$(pkgname).*
 
+
+# Dependencies for tetgen object file
+tetgen.$(obj-suffix):\
+    tetgen.C\
+    tetgen.h
+
+predicates.$(obj-suffix):\
+    predicates.C\
+    tetgen.h
