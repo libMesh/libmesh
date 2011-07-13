@@ -991,7 +991,11 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 
 
 
-void DofMap::allgather_recursive_constraints(const MeshBase &mesh)
+void DofMap::allgather_recursive_constraints(const MeshBase&
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+mesh
+#endif
+)
 {
   // This function must be run on all processors at once
   parallel_only();
