@@ -446,7 +446,9 @@ bool NavierSystem::side_constraint (bool request_jacobian,
     }
 
   // Pin p = 0 at the origin
-  if (c.elem->contains_point(Point(0.,0.)))
+  const Point zero(0.,0.);
+
+  if (c.elem->contains_point(zero))
     {
       // The pressure penalty value.  \f$ \frac{1}{\epsilon} \f$
       const Real penalty = 1.e9;
@@ -455,7 +457,6 @@ bool NavierSystem::side_constraint (bool request_jacobian,
       DenseSubVector<Number> &Fp = *c.elem_subresiduals[p_var];
       const unsigned int n_p_dofs = c.dof_indices_var[p_var].size(); 
 
-      Point zero(0.);
       Number p = c.point_value(p_var, zero);
       Number p_value = 0.;
 
