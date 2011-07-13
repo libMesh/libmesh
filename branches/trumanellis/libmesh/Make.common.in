@@ -95,6 +95,7 @@ enable-triangle      = @enabletriangle@
 enable-gmv           = @enablegmv@
 enable-vtk           = @enablevtk@
 enable-glpk          = @enableglpk@
+enable-eigen         = @enableeigen@
 enable-exodus	     = @enableexodus@
 enable-netcdf	     = @enablenetcdf@
 enable-nemesis	     = @enablenemesis@
@@ -359,6 +360,11 @@ ifeq ($(enable-optional),yes)
   ifeq ($(enable-glpk),yes)
     libmesh_LIBS    += @GLPK_LIBRARY@
     libmesh_INCLUDE += @GLPK_INCLUDE@
+  endif
+
+  # Add Eigen header files to include paths
+  ifeq ($(enable-eigen),yes)
+    libmesh_INCLUDE += @EIGEN_INCLUDE@
   endif
 
   # if TetGen is used:

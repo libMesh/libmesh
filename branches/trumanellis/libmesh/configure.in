@@ -1019,6 +1019,20 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
+dnl Eigen -- Optimized linear algebra routines, disabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(eigen,
+              AC_HELP_STRING([--enable-eigen],
+                             [build with Eigen linear algebra support]),
+              enableeigen=$enableval,
+              enableeigen=yes)
+
+CONFIGURE_EIGEN
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
 dnl GLPK -- Needed by the SCM routine of rbOOmit.
 dnl Enabled by default.
 dnl -------------------------------------------------------------
