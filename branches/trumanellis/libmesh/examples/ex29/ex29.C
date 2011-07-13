@@ -70,6 +70,10 @@ int main (int argc, char** argv)
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
 
+  // Both our Triangle and TetGen interfaces need updating to be
+  // ParallelMesh-compatible
+  libmesh_example_assert(false, "--disable-parmesh");
+
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
   std::cout << "Triangulating an L-shaped domain with holes" << std::endl;
@@ -314,6 +318,7 @@ void add_sphere_surface_points_to_mesh(MeshBase& mesh,
 
 void add_boundary_tris(MeshBase& mesh, MeshParams& mesh_params)
 {
+#ifdef LIBMESH_HAVE_TETGEN
   // This function uses build_cube and tetgen to generate a convex hull of
   // the *outer* boundary, then adds those new points and elements to the
   // input mesh, thereby creating an outer boundary for the domain.
@@ -393,4 +398,5 @@ void add_boundary_tris(MeshBase& mesh, MeshParams& mesh_params)
 	  }
       }
   }
+#endif // LIBMESH_HAVE_TETGEN
 }
