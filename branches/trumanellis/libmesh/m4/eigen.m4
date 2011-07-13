@@ -50,11 +50,6 @@ AC_DEFUN([CONFIGURE_EIGEN],
        enableeigen=no;
      fi
 
-     dnl Print out a helpful message if we successfully located the headers
-     if (test $enableeigen = yes); then
-       AC_MSG_RESULT(<<< Configuring library with Eigen support >>>)
-     fi
-     
      dnl If the Eigen headers were found, continue.
      if (test $enableeigen = yes); then
        EIGEN_INCLUDE="-I$EIGEN_INC"

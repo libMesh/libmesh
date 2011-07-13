@@ -16365,11 +16365,6 @@ echo "${ECHO_T}Eigen header files not found!" >&6; }
      fi
 
           if (test $enableeigen = yes); then
-       { echo "$as_me:$LINENO: result: <<< Configuring library with Eigen support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with Eigen support >>>" >&6; }
-     fi
-
-          if (test $enableeigen = yes); then
        EIGEN_INCLUDE="-I$EIGEN_INC"
 
 cat >>confdefs.h <<\_ACEOF
