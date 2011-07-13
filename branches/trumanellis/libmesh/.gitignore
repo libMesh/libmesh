@@ -4,6 +4,7 @@
 *.o
 *-dbg
 *-opt
+*.swp
 Make.common
 .depend
 *~
