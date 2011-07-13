@@ -549,6 +549,9 @@ void System::read_parallel_data (Xdr &io,
         }
     }
 
+  // And we're done setting solution entries
+  this->solution->close();
+
   // Only read additional vectors if wanted  
   if (read_additional_data)
     {	  
@@ -615,6 +618,9 @@ void System::read_parallel_data (Xdr &io,
                     }
                 }
             }
+
+          // And we're done setting entries for this variable
+          pos->second->close();
 	}
     }
 }
