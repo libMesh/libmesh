@@ -64,3 +64,8 @@ clobber:
 distclean:
 	@$(MAKE) clobber
 	@rm -f $(libpath)/*/lib$(pkgname).*
+
+# Dependencies for GMV files
+gmvread.$(obj-suffix):\
+    gmvread.c\
+    gmvread.h

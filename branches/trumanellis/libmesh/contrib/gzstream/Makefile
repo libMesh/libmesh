@@ -101,3 +101,7 @@ distclean:
 	@$(MAKE) clobber
 	@rm -f ../lib/*/$(library_name).*
 
+# Dependencies for gzstreams code
+gzstream.$(obj-suffix):\
+    gzstream.C\
+    gzstream.h

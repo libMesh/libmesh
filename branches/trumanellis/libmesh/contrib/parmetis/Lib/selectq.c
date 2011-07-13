@@ -11,7 +11,7 @@
  * $Id$
  */
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 /*************************************************************************
 *  This stuff is hardcoded for up to four constraints

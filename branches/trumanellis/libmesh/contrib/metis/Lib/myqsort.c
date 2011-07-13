@@ -12,7 +12,7 @@
  * $Id$
  */
 
-#include <metis.h>			/* only for type declarations */
+#include "metis.h"			/* only for type declarations */
 
 #define		THRESH		1	/* threshold for insertion */
 #define		MTHRESH		6	/* threshold for median */

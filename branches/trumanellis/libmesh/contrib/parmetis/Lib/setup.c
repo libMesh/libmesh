@@ -14,7 +14,7 @@
  */
 
 
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 #define DEBUG_SETUPINFO_
 

@@ -20,8 +20,8 @@
 #define _BIGBITVEC_HPP_
 
 
-#include <Hilbert/Common.hpp>
-#include <Hilbert/FixBitVec.hpp>
+#include "Hilbert/Common.hpp"
+#include "Hilbert/FixBitVec.hpp"
 
 #define BBV_MIN(a,b)		((a)<(b)?(a):(b))
 #define BBV_MAX(a,b)		((a)>(b)?(a):(b))

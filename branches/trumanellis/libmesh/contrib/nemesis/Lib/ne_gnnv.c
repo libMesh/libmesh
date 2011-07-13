@@ -55,8 +55,8 @@
 *
 *****************************************************************************/
 
-#include <exodusII.h>
-#include <exodusII_int.h>
+#include "exodusII.h"
+#include "exodusII_int.h"
 
 #include "ne_nemesisI.h"
 #include "ne_nemesisI_int.h"

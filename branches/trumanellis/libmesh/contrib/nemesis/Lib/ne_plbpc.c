@@ -64,9 +64,9 @@
 
 #include <stdio.h>
 
-#include <exodusII.h>
-#include <exodusII_int.h>
-#include <netcdf.h>
+#include "exodusII.h"
+#include "exodusII_int.h"
+#include "netcdf.h"
 
 #include "ne_nemesisI.h"
 #include "ne_nemesisI_int.h"

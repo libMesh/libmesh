@@ -1,4 +1,4 @@
-#include <hilbert.h>
+#include "hilbert.h"
 
 // user-provided functions for performing MPI reductions on 
 // HilbertIndices datatypes.  Note that these can actually 

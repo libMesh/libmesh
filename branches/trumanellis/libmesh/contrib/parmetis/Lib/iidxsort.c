@@ -1,4 +1,4 @@
-#include <parmetislib.h>
+#include "parmetislib.h"
 
 
 /* Byte-wise swap two items of size SIZE. */

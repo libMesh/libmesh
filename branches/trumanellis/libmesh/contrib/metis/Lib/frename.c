@@ -12,7 +12,7 @@
  *
  */
 
-#include <metis.h>
+#include "metis.h"
 
 
 void METIS_PARTGRAPHRECURSIVE(int *nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *vwgt, idxtype *adjwgt, int *wgtflag, int *numflag, int *nparts, int *options, int *edgecut, idxtype *part)

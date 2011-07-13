@@ -21,7 +21,7 @@
 
 
 #include <inttypes.h>
-#include <Hilbert/Common.hpp>
+#include "Hilbert/Common.hpp"
 
 
 // This must be an unsigned integer that is either
