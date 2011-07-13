@@ -9,7 +9,7 @@ dnl Eigen files in the --with-eigen-include=xxx argument provided to
 dnl configure, or if those don't exist in the $EIGEN_INC/Eigen directory,
 dnl or in /usr/include.  
 dnl
-dnl Note: Eigen is installed (by defalut) at the location
+dnl Note: Eigen is installed (by default) at the location
 dnl /path/to/eigen/Eigen, i.e. with path ending in capital 'Eigen'.
 dnl You should specify --with-eigen-include=/path/to/eigen
 dnl during configure, or set your $EIGEN_INC environment variable
