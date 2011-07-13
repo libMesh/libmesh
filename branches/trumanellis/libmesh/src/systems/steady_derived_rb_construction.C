@@ -64,7 +64,7 @@ Real DerivedRBConstruction<RBConstruction>::truth_solve(int plot_solution)
   
   if(plot_solution > 0)
   {
-    uber_system.load_RB_solution();
+    uber_system.load_rb_solution();
     *solution = *(uber_system.solution);
     const MeshBase& mesh = get_mesh();
     GMVIO(mesh).write_equation_systems ("unter_uber_truth.gmv",
@@ -408,9 +408,9 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
 }
 
 template<>
-void DerivedRBConstruction<RBConstruction>::load_RB_solution()
+void DerivedRBConstruction<RBConstruction>::load_rb_solution()
 {
-  START_LOG("load_RB_solution()", "DerivedRBConstruction");
+  START_LOG("load_rb_solution()", "DerivedRBConstruction");
 
   solution->zero();
 
@@ -418,7 +418,7 @@ void DerivedRBConstruction<RBConstruction>::load_RB_solution()
   {
     libMesh::err << "ERROR: rb_eval contains " << rb_eval->get_n_basis_functions() << " basis functions."
                  << " RB_solution vector constains " << rb_eval->RB_solution.size() << " entries."
-                 << " RB_solution in RBConstruction::load_RB_solution is too long!" << std::endl;
+                 << " RB_solution in RBConstruction::load_rb_solution is too long!" << std::endl;
     libmesh_error();
   }
 
@@ -437,7 +437,7 @@ void DerivedRBConstruction<RBConstruction>::load_RB_solution()
 
   update();
 
-  STOP_LOG("load_RB_solution()", "DerivedRBConstruction");
+  STOP_LOG("load_rb_solution()", "DerivedRBConstruction");
 }
 
 }

@@ -205,7 +205,7 @@ public:
    * Load the RB solution from the current time-level
    * into the libMesh solution vector.
    */
-  virtual void load_RB_solution();
+  virtual void load_rb_solution();
 
   /**
    * Get the column of temporal_data corresponding to the current time level.

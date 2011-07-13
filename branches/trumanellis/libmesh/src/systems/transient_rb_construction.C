@@ -1200,9 +1200,9 @@ void TransientRBConstruction::assemble_matrix_for_output_dual_solves()
   }
 }
 
-void TransientRBConstruction::load_RB_solution()
+void TransientRBConstruction::load_rb_solution()
 {
-  START_LOG("load_RB_solution()", "TransientRBConstruction");
+  START_LOG("load_rb_solution()", "TransientRBConstruction");
 
   solution->zero();
   
@@ -1215,7 +1215,7 @@ void TransientRBConstruction::load_RB_solution()
   {
     libMesh::err << "ERROR: rb_eval object contains " << rb_eval->get_n_basis_functions() << " basis functions."
                  << " RB_solution vector constains " << RB_solution_vector_k.size() << " entries."
-                 << " RB_solution in TransientRBConstruction::load_RB_solution is too long!" << std::endl;
+                 << " RB_solution in TransientRBConstruction::load_rb_solution is too long!" << std::endl;
     libmesh_error();
   }
 
@@ -1226,7 +1226,7 @@ void TransientRBConstruction::load_RB_solution()
 
   update();
 
-  STOP_LOG("load_RB_solution()", "TransientRBConstruction");
+  STOP_LOG("load_rb_solution()", "TransientRBConstruction");
 }
 
 void TransientRBConstruction::update_RB_system_matrices()

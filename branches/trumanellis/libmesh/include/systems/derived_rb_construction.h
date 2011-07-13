@@ -99,7 +99,7 @@ public:
    * Load the RB solution from the most recent solve
    * into the libMesh solution vector.
    */
-  virtual void load_RB_solution();
+  virtual void load_rb_solution();
 
   /**
    * Load the i^th derived basis function into vec.
