@@ -2503,14 +2503,6 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
 
 	                  const Node* their_node = neigh_nodes[their_side_n];
 
-		          const Real their_value = FEInterface::shape(Dim-1,
-							              fe_type,
-							              neigh_side->type(),
-							              their_side_n,
-							              mapped_point);
-		  
-                          const Real their_mag = std::abs(their_value);
-
                           // If there's a constraint on an opposing node,
 			  // we need to see if it's constrained by
 			  // *our side* making any periodic constraint
