@@ -979,7 +979,8 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
       
       // Maybe add boundary conditions for this element
       for (unsigned int s=0; s<old_elem->n_sides(); s++)
-	if (old_elem->neighbor(s) == NULL)
+// We're supporting boundary ids on internal sides now
+//	if (old_elem->neighbor(s) == NULL)
           {
             const std::vector<short int>& bc_ids = this->boundary_info->boundary_ids(old_elem, s);
             for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)

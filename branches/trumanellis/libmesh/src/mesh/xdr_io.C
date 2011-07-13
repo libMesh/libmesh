@@ -710,7 +710,8 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
       const Elem *elem = *it;
 
       for (unsigned int s=0; s<elem->n_sides(); s++)
-	if (elem->neighbor(s) == NULL)
+// We're supporting boundary ids on internal sides now
+//	if (elem->neighbor(s) == NULL)
 	  {
 	    const std::vector<short int>& bc_ids =
 	      boundary_info.boundary_ids (elem, s);
