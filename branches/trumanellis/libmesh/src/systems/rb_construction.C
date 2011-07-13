@@ -264,46 +264,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 
   // Set the initial parameter value to the minimum parameters
   set_current_parameters(mu_min_vector);
-
-  libMesh::out << std::endl << "RBConstruction parameters:" << std::endl;
-  libMesh::out << "system name: " << this->name() << std::endl;
-  libMesh::out << "constrained_problem: " << constrained_problem << std::endl;
-  libMesh::out << "Nmax: " << Nmax << std::endl;
-  if(training_tolerance > 0.)
-    libMesh::out << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
-  libMesh::out << "A_q operators attached: " << rb_theta_expansion->get_Q_a() << std::endl;
-  libMesh::out << "F_q functions attached: " << rb_theta_expansion->get_Q_f() << std::endl;
-  libMesh::out << "n_outputs: " << rb_theta_expansion->get_n_outputs() << std::endl;
-  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-    libMesh::out << "output " << n << ", Q_l = " << rb_theta_expansion->get_Q_l(n) << std::endl;
-  libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
-  for(unsigned int i=0; i<get_n_params(); i++)
-  {
-    libMesh::out <<   "Parameter " << i
-                 << ": Min = " << get_parameter_min(i)
-                 << ", Max = " << get_parameter_max(i)
-                 << ", log scaling = " << log_scaling[i] << std::endl;
-  }
-  libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
-  libMesh::out << "using deterministic training samples? " << deterministic_training << std::endl;
-  libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
-  libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
-  libMesh::out << "return a relative error bound from rb_solve? " << return_rel_error_bound << std::endl;
-  libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
-  libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
-  libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
-  libMesh::out << "quiet mode? " << is_quiet() << std::endl;
-  libMesh::out << "parameter initialized to mu_min: ";
-  for(unsigned int i=0; i<n_parameters; i++)
-  {
-    libMesh::out << "mu[" << i << "] = " << get_current_parameters()[i];
-    if(i < (n_parameters-1))
-      libMesh::out << ", ";
-    else
-      libMesh::out << std::endl;
-  }
-  libMesh::out << std::endl;
-
 }
 
 void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
@@ -325,8 +285,42 @@ void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
   this->rb_eval = &rb_evaluation_in;
 }
 
+void RBConstruction::print_info()
+{
+  // Print out info that describes the current setup
+  libMesh::out << std::endl << "RBConstruction parameters:" << std::endl;
+  libMesh::out << "system name: " << this->name() << std::endl;
+  libMesh::out << "constrained_problem: " << constrained_problem << std::endl;
+  libMesh::out << "Nmax: " << Nmax << std::endl;
+  if(training_tolerance > 0.)
+    libMesh::out << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
+  libMesh::out << "A_q operators attached: " << rb_theta_expansion->get_Q_a() << std::endl;
+  libMesh::out << "F_q functions attached: " << rb_theta_expansion->get_Q_f() << std::endl;
+  libMesh::out << "n_outputs: " << rb_theta_expansion->get_n_outputs() << std::endl;
+  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+    libMesh::out << "output " << n << ", Q_l = " << rb_theta_expansion->get_Q_l(n) << std::endl;
+  libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
+  for(unsigned int i=0; i<get_n_params(); i++)
+  {
+    libMesh::out <<   "Parameter " << i
+                 << ": Min = " << get_parameter_min(i)
+                 << ", Max = " << get_parameter_max(i) << std::endl;
+  }
+  libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
+  libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
+  libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
+  libMesh::out << "return a relative error bound from rb_solve? " << return_rel_error_bound << std::endl;
+  libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
+  libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
+  libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
+  libMesh::out << "quiet mode? " << is_quiet() << std::endl;
+  libMesh::out << "parameter initialized to: " << std::endl;
+  print_current_parameters();
+}
+
 void RBConstruction::initialize_rb_construction()
 {
+  // Perform the initialization
   allocate_data_structures();
   assemble_affine_expansion();
 }

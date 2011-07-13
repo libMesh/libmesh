@@ -220,6 +220,17 @@ void RBConstructionBase<Base>::initialize_training_parameters(const std::vector<
 {
   set_parameter_range(mu_min_vector, mu_max_vector);
 
+  // Print out some info about the training set initialization
+  libMesh::out << "Initializing training parameters with "
+               << (deterministic ? "deterministic " : "random " ) 
+               << "training set..." << std::endl;
+  for(unsigned int i=0; i<get_n_params(); i++)
+  {
+    libMesh::out << "Parameter " << i
+                 << ": log scaling = " << log_param_scale[i] << std::endl;
+  }
+  libMesh::out << std::endl;
+
   if(deterministic)
   {
     generate_training_parameters_deterministic(log_param_scale,

@@ -106,9 +106,23 @@ void RBEIMConstruction::process_parameters_file (const std::string& parameters_f
     libMesh::out << "Error: invalid best_fit_type in input file" << std::endl;
     libmesh_error();
   }
-  
+}
+
+void RBEIMConstruction::print_info()
+{
+  Parent::print_info();
+
+  // Print out setup info
   libMesh::out << std::endl << "RBEIMConstruction parameters:" << std::endl;
-  libMesh::out << "best fit type: " << best_fit_type_string << std::endl;
+  if(best_fit_type_flag == PROJECTION_BEST_FIT)
+  {
+    libMesh::out << "best fit type: projection" << std::endl;
+  }
+  else
+  if(best_fit_type_flag == EIM_BEST_FIT)
+  {
+    libMesh::out << "best fit type: eim" << std::endl;
+  }
   libMesh::out << "number of parametrized functions: " << get_n_parametrized_functions() << std::endl;
   libMesh::out << std::endl;
 }
