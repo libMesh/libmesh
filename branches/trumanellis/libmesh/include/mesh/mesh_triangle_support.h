@@ -29,14 +29,13 @@
 #include "enum_elem_type.h" // For ElemType declaration below
 #include "point.h"
 #include "libmesh.h"
+#include "mesh_output.h" // for MeshSerializer... could this get its own header?
+#include "unstructured_mesh.h"
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 namespace libMesh
 {
-
-// Forward Declarations
-class UnstructuredMesh;
 
 // Note: libmesh_common.h defines REAL, which is required by triangle.
 // Therefore, we need to include it first.
@@ -114,7 +113,7 @@ public:
   /**
    * The constructor.  A reference to the mesh containing the points
    * which are to be triangulated must be provided.  Unless otherwise
-   * specified, a convex hull will be computed for set of input points
+   * specified, a convex hull will be computed for the set of input points
    * and the convex hull will be meshed.
    */
   TriangleInterface(UnstructuredMesh& mesh)
@@ -124,7 +123,8 @@ public:
       _desired_area(0.1),
       _triangulation_type(GENERATE_CONVEX_HULL),
       _insert_extra_points(false),
-      _smooth_after_generating(true)
+      _smooth_after_generating(true),
+      _serializer(_mesh)
   {}
 
   /**
@@ -266,6 +266,11 @@ private:
    * it is generated.  True by default.
    */
   bool _smooth_after_generating;
+
+  /**
+   * Triangle only operates on serial meshes.
+   */
+  MeshSerializer _serializer;
 };
 
 

@@ -31,6 +31,7 @@
 #include <string>
 
 // Local includes
+#include "mesh_output.h" // for MeshSerializer... could this get its own header?
 
 // TetGen include file
 #include "tetgen.h"
@@ -353,6 +354,12 @@ protected:
    * tetgen_data.pointlist.
    */
   std::vector<unsigned> _sequential_to_libmesh_node_map;
+
+  /**
+   * Tetgen only operates on serial meshes.
+   */
+  MeshSerializer _serializer;
+  
 };
 
 } // namespace libMesh

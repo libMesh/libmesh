@@ -389,7 +389,8 @@ void TetGenWrapper::set_region(unsigned i, REAL x, REAL y, REAL z,
 //----------------------------------------------------------------------
 // TetGenMeshInterface class members
 TetGenMeshInterface::TetGenMeshInterface (UnstructuredMesh& mesh) :
-  _mesh(mesh)
+  _mesh(mesh),
+  _serializer(_mesh)
 {
 }
 
