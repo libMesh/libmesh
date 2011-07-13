@@ -1354,8 +1354,8 @@ mesh
                   for (NodeConstraintRow::iterator j = row.begin();
                        j != row.end(); ++j)
                     {
-                      dof_row_keys[i].push_back(j->first->id());
-                      dof_row_vals[i].push_back(j->second);
+                      node_row_keys[i].push_back(j->first->id());
+                      node_row_vals[i].push_back(j->second);
                     }
                 }
             }
