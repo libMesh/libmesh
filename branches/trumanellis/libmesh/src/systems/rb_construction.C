@@ -58,7 +58,7 @@ RBConstruction::RBConstruction (EquationSystems& es,
     constrained_problem(false),
     single_matrix_mode(false),
     reuse_preconditioner(true),
-    return_rel_error_bound(false),
+    use_relative_bound_in_greedy(false),
     write_data_during_training(false),
     impose_internal_dirichlet_BCs(false),
     impose_internal_fluxes(false),
@@ -200,10 +200,10 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   reuse_preconditioner = infile("reuse_preconditioner",
                                 reuse_preconditioner);
 
-  // Tell the system whether or not to return a relative error bound
-  // from each call to rb_solve
-  return_rel_error_bound = infile("return_rel_error_bound",
-                                  return_rel_error_bound);
+  // Tell the system whether or not to use a relative error bound
+  // in the Greedy algorithm
+  use_relative_bound_in_greedy = infile("use_relative_bound_in_greedy",
+                                        use_relative_bound_in_greedy);
 
   // Tell the system whether or not to write out offline data during
   // train_reduced_basis. This allows us to continue from where the
@@ -271,10 +271,6 @@ void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
   // Copy parameter over
   rb_evaluation_in.set_current_parameters( get_current_parameters() );
 
-  // Copy boolean flags over
-  rb_evaluation_in.return_rel_error_bound   = return_rel_error_bound;
-  rb_evaluation_in.compute_RB_inner_product = compute_RB_inner_product;
-
   // Copy rb_theta_expansion pointer over to rb_eval
   rb_evaluation_in.rb_theta_expansion = this->rb_theta_expansion;
 
@@ -309,7 +305,7 @@ void RBConstruction::print_info()
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
-  libMesh::out << "return a relative error bound from rb_solve? " << return_rel_error_bound << std::endl;
+  libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "impose internal Dirichlet BCs? " << impose_internal_dirichlet_BCs << std::endl;
   libMesh::out << "impose internal fluxes? " << impose_internal_fluxes << std::endl;
@@ -1095,7 +1091,7 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name)
       libMesh::out << "Performing RB solves on training set" << std::endl;
       training_greedy_error = compute_max_error_bound();
 
-      libMesh::out << "Maximum " << (return_rel_error_bound ? "(relative)" : "(absolute)")
+      libMesh::out << "Maximum " << (use_relative_bound_in_greedy ? "(relative)" : "(absolute)")
                    << " error bound is " << training_greedy_error << std::endl << std::endl;
 
       if(write_data_during_training)
@@ -1384,7 +1380,15 @@ Real RBConstruction::get_RB_error_bound()
 {
   rb_eval->set_current_parameters( get_current_parameters() );
 
-  return rb_eval->rb_solve(rb_eval->get_n_basis_functions());
+  Real error_bound = rb_eval->rb_solve(rb_eval->get_n_basis_functions());
+  
+  // Should we normalize the error bound to return a relative bound?
+  if(use_relative_bound_in_greedy)
+  {
+    error_bound /= rb_eval->get_rb_solution_norm();
+  }
+  
+  return error_bound;
 }
 
 void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)

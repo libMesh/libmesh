@@ -82,13 +82,18 @@ public:
   /**
    * Perform online solve with the N RB basis functions, for the
    * set of parameters in current_params, where 0 <= N <= RB_size.
-   * @return the absolute or relative error bound associated with
+   * @return the (absolute) error bound associated with
    * the RB approximation.
    * With an empty RB space (N=0), our RB solution is zero, but we
    * still obtain a meaningful error bound associated with the
    * forcing terms.
    */
   virtual Real rb_solve(unsigned int N);
+
+  /**
+   * Return the norm of RB_solution.
+   */
+  virtual Real get_rb_solution_norm();
 
   /**
    * Compute the dual norm of the residual for the solution
@@ -262,12 +267,6 @@ public:
    * when rb_solve is called.
    */
   bool evaluate_RB_error_bound;
-
-  /**
-   * Boolean flag to indicate whether rb_solve returns an absolute
-   * or relative error bound. True => relative, false => absolute.
-   */
-  bool return_rel_error_bound;
 
   /**
    * Boolean flag to indicate whether we compute the RB_inner_product_matrix.

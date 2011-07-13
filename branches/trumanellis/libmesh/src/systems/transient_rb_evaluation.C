@@ -338,27 +338,32 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
     }
   }
 
+  STOP_LOG("rb_solve()", "TransientRBEvaluation");
+
   if(evaluate_RB_error_bound) // Calculate the error bounds  
   {
-    // Compute the L2 norm of the RB solution at time-level _K to normalize
-    // to normalize the error bound
-    // We reuse RB_rhs here
-    DenseMatrix<Number> RB_L2_matrix_N;
-    RB_L2_matrix.get_principal_submatrix(N,RB_L2_matrix_N);
-    RB_L2_matrix_N.vector_mult(RB_rhs, RB_solution);
-    Real final_RB_L2_norm = libmesh_real(std::sqrt(RB_solution.dot(RB_rhs)));
-
-    STOP_LOG("rb_solve()", "TransientRBEvaluation");
-
-    return ( return_rel_error_bound ? error_bound_all_k[n_time_steps]/final_RB_L2_norm :
-                                      error_bound_all_k[n_time_steps] );
+    return error_bound_all_k[n_time_steps];
   }
   else // Don't calculate the error bounds
   {
-    STOP_LOG("rb_solve()", "TransientRBEvaluation");
     // Just return -1. if we did not compute the error bound
     return -1.;
   }
+}
+
+Real TransientRBEvaluation::get_rb_solution_norm()
+{
+  // Return the L2 norm of RB_solution
+  // After an rb_solve, RB_solution will hold the
+  // solution vector for the final time level.
+  
+  const unsigned int N = RB_solution.size();
+  DenseVector<Number> temp(N);
+  DenseMatrix<Number> RB_L2_matrix_N;
+  RB_L2_matrix.get_principal_submatrix(N, RB_L2_matrix_N);
+  RB_L2_matrix_N.vector_mult(temp, RB_solution);
+
+  return libmesh_real(std::sqrt(RB_solution.dot(temp)));
 }
 
 Real TransientRBEvaluation::residual_scaling_numer(Real)

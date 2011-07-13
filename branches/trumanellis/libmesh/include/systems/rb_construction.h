@@ -466,11 +466,11 @@ public:
   bool reuse_preconditioner;
 
   /**
-   * Boolean flag to indicate whether rb_solve returns an absolute
-   * or relative error bound. True => relative, false => absolute.
-   * This flag is passed on to specific RBEvaluation objects.
+   * Boolean flag to indicate whether we use an absolute or
+   * relative error bound in the Greedy algorithm for training
+   * a Reduced Basis.
    */
-  bool return_rel_error_bound;
+  bool use_relative_bound_in_greedy;
 
   /**
    * Boolean flag to indicate whether train_reduced_basis writes

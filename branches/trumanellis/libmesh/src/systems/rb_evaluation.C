@@ -39,7 +39,6 @@ namespace libMesh
 RBEvaluation::RBEvaluation ()
   :
   evaluate_RB_error_bound(true),
-  return_rel_error_bound(false),
   compute_RB_inner_product(false)
 {
 }
@@ -253,11 +252,9 @@ Real RBEvaluation::rb_solve(unsigned int N)
       RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n, mu);
     }
 
-    // Compute the norm of RB_solution
-    Real RB_solution_norm = RB_solution.l2_norm();
-
     STOP_LOG("rb_solve()", "RBEvaluation");
-    return ( return_rel_error_bound ? abs_error_bound/RB_solution_norm : abs_error_bound );
+
+    return abs_error_bound;
   }
   else // Don't calculate the error bounds
   {
@@ -265,6 +262,11 @@ Real RBEvaluation::rb_solve(unsigned int N)
     // Just return -1. if we did not compute the error bound
     return -1.;
   }
+}
+
+Real RBEvaluation::get_rb_solution_norm()
+{
+  return RB_solution.l2_norm();
 }
 
 Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
