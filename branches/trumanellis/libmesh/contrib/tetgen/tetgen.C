@@ -4239,6 +4239,12 @@ int tetgenmesh::locver2nextf[4][6][2] = {
 
 #define EdgeRing(V) ((V) Mod2)
 
+// [JWP] The code will die if the number of flips exceeds this amount.
+// You can set this value arbitrarily high, in most cases the number
+// of flips performed is relatively low, but the algorithm does have
+// the potential for going into an infinite loop.
+#define TETGEN_MAX_FLIPCOUNT 50000
+
 //
 // Begin of primitives for tetrahedra
 // 
@@ -10649,6 +10655,16 @@ long tetgenmesh::flip(queue* flipqueue, badface **plastflip)
         }
       }
     }
+
+    // [JWP] Intermediate flipcount, check to see if we are infinite looping...
+    long intermediate_flipcount = flip23s + flip32s + flip22s + flip44s - flipcount;
+    
+    // [JWP] Kill the code if a probable infinite loop is detected
+    if (intermediate_flipcount > TETGEN_MAX_FLIPCOUNT)
+      {
+	printf("[JWP] Max-allowed flipcount of %d exceeded, probable infinite loop detected. Exiting...", TETGEN_MAX_FLIPCOUNT);
+	terminatetetgen(1);
+      }
   }
 
   flipcount = flip23s + flip32s + flip22s + flip44s - flipcount;
@@ -30908,7 +30924,13 @@ void tetgenmesh::qualitystatistics()
         tendegree--;  // In the right column.
       }
     }
-    dihedangletable[tendegree]++;
+    
+    // [JWP] Some simple bounds checking can be done here.  In one 
+    // pathological case I ran, smalldiangle was NaN, and the code 
+    // above sets tendegree==MAX_INT in that case.
+    if (tendegree < sizeof(dihedangletable)/sizeof(int))
+      dihedangletable[tendegree]++;
+
     if (bigdiangle >= 80.0 && bigdiangle < 110.0) {
       tendegree = 9; // Angles between 80 to 110 degree are in one entry.
     } else if (bigdiangle >= 170.0 && bigdiangle < 175.0) {
@@ -30923,7 +30945,10 @@ void tetgenmesh::qualitystatistics()
         tendegree--;  // In the right column.
       }
     }
-    dihedangletable[tendegree]++;
+
+    // [JWP] Bounds checking, same as above
+    if (tendegree < sizeof(dihedangletable)/sizeof(int))
+      dihedangletable[tendegree]++;
 
     // Calculate aspect ratio and radius-edge ratio for this element.
     tetradius = cirradius / sqrt(shortlen);
