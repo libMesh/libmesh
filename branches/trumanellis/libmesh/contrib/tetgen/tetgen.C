@@ -30928,7 +30928,7 @@ void tetgenmesh::qualitystatistics()
     // [JWP] Some simple bounds checking can be done here.  In one 
     // pathological case I ran, smalldiangle was NaN, and the code 
     // above sets tendegree==MAX_INT in that case.
-    if (tendegree < sizeof(dihedangletable)/sizeof(int))
+    if (tendegree < (int)(sizeof(dihedangletable)/sizeof(int)))
       dihedangletable[tendegree]++;
 
     if (bigdiangle >= 80.0 && bigdiangle < 110.0) {
@@ -30947,7 +30947,7 @@ void tetgenmesh::qualitystatistics()
     }
 
     // [JWP] Bounds checking, same as above
-    if (tendegree < sizeof(dihedangletable)/sizeof(int))
+    if (tendegree < (int)(sizeof(dihedangletable)/sizeof(int)))
       dihedangletable[tendegree]++;
 
     // Calculate aspect ratio and radius-edge ratio for this element.
