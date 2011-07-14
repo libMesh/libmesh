@@ -155,6 +155,8 @@ public:
    */
   DenseMatrix<Number> elem_jacobian;
   DenseMatrix<Number> neigh_jacobian;
+  DenseMatrix<Number> neigh_elem_jacobian;
+  DenseMatrix<Number> elem_neigh_jacobian;
 
   /**
    * Element quantity of interest contributions
@@ -174,6 +176,8 @@ public:
   std::vector<DenseSubVector<Number> *> neigh_subresiduals;
   std::vector<std::vector<DenseSubMatrix<Number> *> > elem_subjacobians;
   std::vector<std::vector<DenseSubMatrix<Number> *> > neigh_subjacobians;
+  std::vector<std::vector<DenseSubMatrix<Number> *> > neigh_elem_subjacobians;
+  std::vector<std::vector<DenseSubMatrix<Number> *> > elem_neigh_subjacobians;
 
   /** 
    * Global Degree of freedom index lists

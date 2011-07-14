@@ -694,6 +694,7 @@ void FEMContext::side_fe_reinit ()
     {
       // Initialize the neighbor data
       system.get_dof_map().dof_indices (neigh, neigh_dof_indices);
+      unsigned int n_dofs = dof_indices.size();
       unsigned int n_neigh_dofs = neigh_dof_indices.size();
       neigh_solution.resize(n_neigh_dofs);
       for (unsigned int i=0; i != n_neigh_dofs; ++i)
@@ -701,9 +702,12 @@ void FEMContext::side_fe_reinit ()
 
       neigh_residual.resize(n_neigh_dofs);
       neigh_jacobian.resize(n_neigh_dofs, n_neigh_dofs);
+      neigh_elem_jacobian.resize(n_neigh_dofs, n_dofs);
+      elem_neigh_jacobian.resize(n_dofs, n_neigh_dofs);
 
       // Initialize the per-variable data for elem.
       unsigned int neigh_sub_dofs = 0;
+      unsigned int sub_dofs = 0;
       for (unsigned int i=0; i != system.n_vars(); ++i)
         {
           system.get_dof_map().dof_indices (neigh, 
@@ -723,15 +727,41 @@ void FEMContext::side_fe_reinit ()
                 (neigh_subresiduals[j]->i_off(), neigh_sub_dofs,
                  neigh_dof_indices_var[j].size(),
                  neigh_dof_indices_var[i].size());
+              neigh_elem_subjacobians[i][j]->reposition
+                (neigh_sub_dofs, elem_subresiduals[j]->i_off(),
+                 neigh_dof_indices_var[i].size(),
+                 dof_indices_var[j].size());
+              neigh_elem_subjacobians[j][i]->reposition
+                (elem_subresiduals[j]->i_off(), neigh_sub_dofs,
+                 dof_indices_var[j].size(),
+                 neigh_dof_indices_var[i].size());
+              elem_neigh_subjacobians[i][j]->reposition
+                (sub_dofs, neigh_subresiduals[j]->i_off(),
+                 dof_indices_var[i].size(),
+                 neigh_dof_indices_var[j].size());
+              elem_neigh_subjacobians[j][i]->reposition
+                (neigh_subresiduals[j]->i_off(), sub_dofs,
+                 neigh_dof_indices_var[j].size(),
+                 dof_indices_var[i].size());
             }
 
           neigh_subjacobians[i][i]->reposition
             (neigh_sub_dofs, neigh_sub_dofs,
              neigh_dof_indices_var[i].size(),
              neigh_dof_indices_var[i].size());
+          neigh_elem_subjacobians[i][i]->reposition
+            (neigh_sub_dofs, sub_dofs,
+             neigh_dof_indices_var[i].size(),
+             dof_indices_var[i].size());
+          elem_neigh_subjacobians[i][i]->reposition
+            (sub_dofs, neigh_sub_dofs,
+             dof_indices_var[i].size(),
+             neigh_dof_indices_var[i].size());
           neigh_sub_dofs += neigh_dof_indices_var[i].size();
+          sub_dofs += dof_indices_var[i].size();
         }
-      libmesh_assert(neigh_sub_dofs == n_neigh_dofs);
+      libmesh_assert((neigh_sub_dofs == n_neigh_dofs) 
+          && (sub_dofs == n_dofs));
 
       // We will simulatneously iterate through side and neighbor FETypes.
       std::map<FEType, FEBase *>::iterator neigh_fe_end = neighbor_fe.end();

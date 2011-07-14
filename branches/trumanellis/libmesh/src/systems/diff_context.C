@@ -49,6 +49,8 @@ DiffContext::DiffContext (const System& sys, bool _compute_neighbor_values) :
       neigh_subsolutions.reserve(n_vars);
       neigh_subresiduals.reserve(n_vars);
       neigh_subjacobians.resize(n_vars);
+      neigh_elem_subjacobians.resize(n_vars);
+      elem_neigh_subjacobians.resize(n_vars);
     }
 
   // If the user resizes sys.qoi, it will invalidate us
@@ -74,19 +76,29 @@ DiffContext::DiffContext (const System& sys, bool _compute_neighbor_values) :
         elem_qoi_subderivatives[q].push_back(new DenseSubVector<Number>(elem_qoi_derivative[q]));
       elem_subjacobians[i].reserve(n_vars);
       if (compute_neighbor_values)
-        neigh_subjacobians[i].reserve(n_vars);
+        {
+          neigh_subjacobians[i].reserve(n_vars);
+          neigh_elem_subjacobians[i].reserve(n_vars);
+          elem_neigh_subjacobians[i].reserve(n_vars);
+        }
 
       if (sys.use_fixed_solution)
         elem_fixed_subsolutions.push_back
-	  (new DenseSubVector<Number>(elem_fixed_solution));
+          (new DenseSubVector<Number>(elem_fixed_solution));
 
       for (unsigned int j=0; j != n_vars; ++j)
         {
           elem_subjacobians[i].push_back
             (new DenseSubMatrix<Number>(elem_jacobian));
           if (compute_neighbor_values)
-            neigh_subjacobians[i].push_back
-              (new DenseSubMatrix<Number>(neigh_jacobian));
+            {
+              neigh_subjacobians[i].push_back
+                (new DenseSubMatrix<Number>(neigh_jacobian));
+              neigh_elem_subjacobians[i].push_back
+                (new DenseSubMatrix<Number>(neigh_elem_jacobian));
+              elem_neigh_subjacobians[i].push_back
+                (new DenseSubMatrix<Number>(elem_neigh_jacobian));
+            }
         }
     }
 }
@@ -120,6 +132,10 @@ DiffContext::~DiffContext ()
 
           for (unsigned int j=0; j != neigh_subjacobians[i].size(); ++j)
             delete neigh_subjacobians[i][j];
+          for (unsigned int j=0; j != neigh_elem_subjacobians[i].size(); ++j)
+            delete neigh_elem_subjacobians[i][j];
+          for (unsigned int j=0; j != elem_neigh_subjacobians[i].size(); ++j)
+            delete elem_neigh_subjacobians[i][j];
         }
     }
 }

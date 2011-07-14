@@ -88,9 +88,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   const MeshBase& mesh = this->get_mesh();
 
-//  this->get_vector("_nonlinear_solution").localize
-//    (*current_local_nonlinear_solution,
-//     dof_map.get_send_list());
+  //  this->get_vector("_nonlinear_solution").localize
+  //    (*current_local_nonlinear_solution,
+  //     dof_map.get_send_list());
   this->update();
 
   if (print_solution_norms)
@@ -150,7 +150,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
       _femcontext.elem_fe_reinit();
 
       bool jacobian_computed =
-	time_solver->element_residual(get_jacobian, _femcontext);
+        time_solver->element_residual(get_jacobian, _femcontext);
 
       // Compute a numeric jacobian if we have to
       if (get_jacobian && !jacobian_computed)
@@ -193,11 +193,11 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
               unsigned int old_precision = libMesh::out.precision();
               libMesh::out.precision(16);
-	      libMesh::out << "J_analytic " << _femcontext.elem->id() << " = "
-                        << _femcontext.elem_jacobian << std::endl;
+              libMesh::out << "J_analytic " << _femcontext.elem->id() 
+                           << " = " << _femcontext.elem_jacobian << std::endl;
               analytic_jacobian.add(1.0, _femcontext.elem_jacobian);
-	      libMesh::out << "J_numeric " << _femcontext.elem->id() << " = "
-                        << analytic_jacobian << std::endl;
+              libMesh::out << "J_numeric " << _femcontext.elem->id() 
+                           << " = " << analytic_jacobian << std::endl;
 
               libMesh::out.precision(old_precision);
 
@@ -221,6 +221,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
           DenseMatrix<Number> old_jacobian;
           DenseMatrix<Number> old_neigh_jacobian;
+          DenseMatrix<Number> old_neigh_elem_jacobian;
+          DenseMatrix<Number> old_elem_neigh_jacobian;
           // If we're in DEBUG mode, we should always verify that the
           // user's side_residual function doesn't alter our existing
           // jacobian and then lie about it
@@ -236,7 +238,11 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               if (compute_neighbor_values)
                 {
                   old_neigh_jacobian = _femcontext.neigh_jacobian;
+                  old_neigh_elem_jacobian = _femcontext.neigh_elem_jacobian;
+                  old_elem_neigh_jacobian = _femcontext.elem_neigh_jacobian;
                   _femcontext.neigh_jacobian.zero();
+                  _femcontext.neigh_elem_jacobian.zero();
+                  _femcontext.elem_neigh_jacobian.zero();
                 }
             }
           // TODO Do I need to do any neighbor equivalent here?
@@ -270,7 +276,11 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                 {
                   _femcontext.elem_jacobian += old_jacobian;
                   if (compute_neighbor_values)
-                    _femcontext.neigh_jacobian += old_neigh_jacobian;
+                    {
+                      _femcontext.neigh_jacobian += old_neigh_jacobian;
+                      _femcontext.neigh_elem_jacobian += old_neigh_elem_jacobian;
+                      _femcontext.elem_neigh_jacobian += old_elem_neigh_jacobian;
+                    }
                 }
             }
 
@@ -284,10 +294,18 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               // TODO Do I need to do any neighbor equivalent here?
               DenseMatrix<Number> analytic_neigh_jacobian
                 (_femcontext.neigh_jacobian);
+              DenseMatrix<Number> analytic_neigh_elem_jacobian
+                (_femcontext.neigh_elem_jacobian);
+              DenseMatrix<Number> analytic_elem_neigh_jacobian
+                (_femcontext.elem_neigh_jacobian);
 
               _femcontext.elem_jacobian.zero();
               if (compute_neighbor_values)
-                _femcontext.neigh_jacobian.zero();
+                {
+                  _femcontext.neigh_jacobian.zero();
+                  _femcontext.neigh_elem_jacobian.zero();
+                  _femcontext.elem_neigh_jacobian.zero();
+                }
               // Logging of numerical jacobians is done separately
               // TODO Do I need to do any neighbor equivalent here?
               this->numerical_side_jacobian(_femcontext);
@@ -299,7 +317,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               // the analytic jacobian
               analytic_jacobian.swap(_femcontext.elem_jacobian);
               if (compute_neighbor_values)
-                analytic_neigh_jacobian.swap(_femcontext.neigh_jacobian);
+                {
+                  analytic_neigh_jacobian.swap
+                    (_femcontext.neigh_jacobian);
+                  analytic_neigh_elem_jacobian.swap
+                    (_femcontext.neigh_elem_jacobian);
+                  analytic_elem_neigh_jacobian.swap
+                    (_femcontext.elem_neigh_jacobian);
+                }
 
               // The matrix "analytic_jacobian" will now hold the error matrix
               // TODO Do I need to do any neighbor equivalent here?
@@ -334,7 +359,11 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               // rest of the accumulated jacobian
               _femcontext.elem_jacobian += old_jacobian;
               if (compute_neighbor_values)
-                _femcontext.neigh_jacobian += old_neigh_jacobian;
+                {
+                  _femcontext.neigh_jacobian += old_neigh_jacobian;
+                  _femcontext.neigh_elem_jacobian += old_neigh_elem_jacobian;
+                  _femcontext.elem_neigh_jacobian += old_elem_neigh_jacobian;
+                }
             }
           // In DEBUG mode, we've set elem_jacobian == 0, and we
           // may still need to add the old jacobian back
@@ -346,12 +375,18 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               if (compute_neighbor_values)
                 {
                   _femcontext.neigh_jacobian += old_neigh_jacobian;
+                  _femcontext.neigh_elem_jacobian += old_neigh_elem_jacobian;
+                  _femcontext.elem_neigh_jacobian += old_elem_neigh_jacobian;
                   if (get_jacobian)
-                    this->matrix->add_matrix (_femcontext.neigh_jacobian,
-                                              _femcontext.neigh_dof_indices);
+                    {
+                      this->matrix->add_matrix (_femcontext.neigh_jacobian,
+                                                _femcontext.neigh_dof_indices);
+                    }
                   if (get_residual)
-                    this->rhs->add_vector (_femcontext.neigh_residual,
-                                           _femcontext.neigh_dof_indices);
+                    {
+                      this->rhs->add_vector (_femcontext.neigh_residual,
+                                             _femcontext.neigh_dof_indices);
+                    }
                 }
             }
 #endif // ifdef DEBUG
