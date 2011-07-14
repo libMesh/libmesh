@@ -220,62 +220,89 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
           _femcontext.side_fe_reinit();
 
           DenseMatrix<Number> old_jacobian;
+          DenseMatrix<Number> old_neigh_jacobian;
           // If we're in DEBUG mode, we should always verify that the
-	  // user's side_residual function doesn't alter our existing
+          // user's side_residual function doesn't alter our existing
           // jacobian and then lie about it
 #ifndef DEBUG
-	  // Even if we're not in DEBUG mode, when we're verifying
-	  // analytic jacobians we'll want to verify each side's
+          // Even if we're not in DEBUG mode, when we're verifying
+          // analytic jacobians we'll want to verify each side's
           // jacobian contribution separately
           if (verify_analytic_jacobians != 0.0 && get_jacobian)
 #endif // ifndef DEBUG
             {
               old_jacobian = _femcontext.elem_jacobian;
               _femcontext.elem_jacobian.zero();
+              if (compute_neighbor_values)
+                {
+                  old_neigh_jacobian = _femcontext.neigh_jacobian;
+                  _femcontext.neigh_jacobian.zero();
+                }
             }
-	  jacobian_computed =
+          // TODO Do I need to do any neighbor equivalent here?
+          jacobian_computed =
             time_solver->side_residual(get_jacobian, _femcontext);
 
           // Compute a numeric jacobian if we have to
           if (get_jacobian && !jacobian_computed)
             {
-	      // In DEBUG mode, we've already set elem_jacobian == 0,
-	      // so we can make sure side_residual didn't compute a
+              // In DEBUG mode, we've already set elem_jacobian == 0,
+              // so we can make sure side_residual didn't compute a
               // jacobian and lie about it
 #ifdef DEBUG
               libmesh_assert(_femcontext.elem_jacobian.l1_norm() == 0.0);
+              if (compute_neighbor_values)
+                {
+                  libmesh_assert(_femcontext.neigh_jacobian.l1_norm() == 0.0);
+                }
 #endif
               // Logging of numerical jacobians is done separately
+              // TODO Do I need to do any neighbor equivalent here?
               this->numerical_side_jacobian(_femcontext);
 
               // If we're in DEBUG mode or if
-	      // verify_analytic_jacobians is on, we've moved
+              // verify_analytic_jacobians is on, we've moved
               // elem_jacobian's accumulated values into old_jacobian.
               // Now let's add them back.
 #ifndef DEBUG
               if (verify_analytic_jacobians != 0.0)
 #endif // ifndef DEBUG
-                _femcontext.elem_jacobian += old_jacobian;
+                {
+                  _femcontext.elem_jacobian += old_jacobian;
+                  if (compute_neighbor_values)
+                    _femcontext.neigh_jacobian += old_neigh_jacobian;
+                }
             }
 
           // Compute a numeric jacobian if we're asked to verify the
           // analytic jacobian we got
-	  if (get_jacobian && jacobian_computed &&
+          if (get_jacobian && jacobian_computed &&
               verify_analytic_jacobians != 0.0)
             {
-	      DenseMatrix<Number> analytic_jacobian(_femcontext.elem_jacobian);
+              DenseMatrix<Number> analytic_jacobian
+                (_femcontext.elem_jacobian);
+              // TODO Do I need to do any neighbor equivalent here?
+              DenseMatrix<Number> analytic_neigh_jacobian
+                (_femcontext.neigh_jacobian);
 
               _femcontext.elem_jacobian.zero();
+              if (compute_neighbor_values)
+                _femcontext.neigh_jacobian.zero();
               // Logging of numerical jacobians is done separately
+              // TODO Do I need to do any neighbor equivalent here?
               this->numerical_side_jacobian(_femcontext);
 
               Real analytic_norm = analytic_jacobian.l1_norm();
               Real numerical_norm = _femcontext.elem_jacobian.l1_norm();
 
-              // If we can continue, we'll probably prefer the analytic jacobian
+              // If we can continue, we'll probably prefer 
+              // the analytic jacobian
               analytic_jacobian.swap(_femcontext.elem_jacobian);
+              if (compute_neighbor_values)
+                analytic_neigh_jacobian.swap(_femcontext.neigh_jacobian);
 
               // The matrix "analytic_jacobian" will now hold the error matrix
+              // TODO Do I need to do any neighbor equivalent here?
               analytic_jacobian.add(-1.0, _femcontext.elem_jacobian);
               Real error_norm = analytic_jacobian.l1_norm();
 
@@ -285,18 +312,20 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               if (relative_error > verify_analytic_jacobians)
                 {
                   libMesh::err << "Relative error " << relative_error
-                                << " detected in analytic jacobian on element "
-                                << _femcontext.elem->id()
-			        << ", side "
-                                << static_cast<unsigned int>(_femcontext.side) << '!' << std::endl;
+                               << " detected in analytic jacobian on element "
+                               << _femcontext.elem->id()
+                               << ", side "
+                               << static_cast<unsigned int>(_femcontext.side) 
+                               << '!' << std::endl;
 
                   unsigned int old_precision = libMesh::out.precision();
                   libMesh::out.precision(16);
-	          libMesh::out << "J_analytic " << _femcontext.elem->id() << " = "
-                                << _femcontext.elem_jacobian << std::endl;
+                  libMesh::out << "J_analytic " << _femcontext.elem->id() 
+                               << " = " << _femcontext.elem_jacobian 
+                               << std::endl;
                   analytic_jacobian.add(1.0, _femcontext.elem_jacobian);
-	          libMesh::out << "J_numeric " << _femcontext.elem->id() << " = "
-                                << analytic_jacobian << std::endl;
+                  libMesh::out << "J_numeric " << _femcontext.elem->id() 
+                               << " = " << analytic_jacobian << std::endl;
                   libMesh::out.precision(old_precision);
 
                   libmesh_error();
@@ -304,14 +333,26 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               // Once we've verified a side, we'll want to add back the
               // rest of the accumulated jacobian
               _femcontext.elem_jacobian += old_jacobian;
+              if (compute_neighbor_values)
+                _femcontext.neigh_jacobian += old_neigh_jacobian;
             }
-	  // In DEBUG mode, we've set elem_jacobian == 0, and we
+          // In DEBUG mode, we've set elem_jacobian == 0, and we
           // may still need to add the old jacobian back
 #ifdef DEBUG
-	  if (get_jacobian && jacobian_computed &&
+          if (get_jacobian && jacobian_computed &&
               verify_analytic_jacobians == 0.0)
             {
               _femcontext.elem_jacobian += old_jacobian;
+              if (compute_neighbor_values)
+                {
+                  _femcontext.neigh_jacobian += old_neigh_jacobian;
+                  if (get_jacobian)
+                    this->matrix->add_matrix (_femcontext.neigh_jacobian,
+                                              _femcontext.neigh_dof_indices);
+                  if (get_residual)
+                    this->rhs->add_vector (_femcontext.neigh_residual,
+                                           _femcontext.neigh_dof_indices);
+                }
             }
 #endif // ifdef DEBUG
         }
@@ -335,8 +376,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         {
           unsigned int old_precision = libMesh::out.precision();
           libMesh::out.precision(16);
-	  libMesh::out << "J_elem " << _femcontext.elem->id() << " = "
-                    << _femcontext.elem_jacobian << std::endl;
+          libMesh::out << "J_elem " << _femcontext.elem->id() << " = "
+                       << _femcontext.elem_jacobian << std::endl;
           libMesh::out.precision(old_precision);
         }
 
@@ -738,7 +779,7 @@ void FEMSystem::numerical_side_jacobian (FEMContext &context)
 
 AutoPtr<DiffContext> FEMSystem::build_context ()
 {
-  AutoPtr<DiffContext> ap(new FEMContext(*this));
+  AutoPtr<DiffContext> ap(new FEMContext(*this, compute_neighbor_values));
 
   ap->set_deltat_pointer( &deltat );
   

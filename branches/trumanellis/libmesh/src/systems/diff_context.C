@@ -26,14 +26,15 @@ namespace libMesh
 
 
 
-DiffContext::DiffContext (const System& sys) :
+DiffContext::DiffContext (const System& sys, bool _compute_neighbor_values) :
+  system(sys),
   time(sys.time),
   system_time(sys.time),
   elem_solution_derivative(1.),
   fixed_solution_derivative(0.),
   dof_indices_var(sys.n_vars()),
   neigh_dof_indices_var(sys.n_vars()),
-  compute_neighbor_values(false), _deltat(NULL)
+  compute_neighbor_values(_compute_neighbor_values), _deltat(NULL)
 {
   // Finally initialize solution/residual/jacobian data structures
   unsigned int n_vars = sys.n_vars();

@@ -59,7 +59,7 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  DiffContext (const System &);
+  DiffContext (const System &, bool _compute_neighbor_values = false);
 
   /**
    * Destructor.
@@ -90,6 +90,11 @@ public:
    * for an edge integration at a new point within a timestep
    */
   virtual void elem_edge_reinit(Real) {}
+
+  /**
+   * Reference to System
+   */
+  const System &system;
 
   /**
    * For time-dependent problems, this is the time t for which the current

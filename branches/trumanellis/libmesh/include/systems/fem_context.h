@@ -67,7 +67,7 @@ public:
   /**
    * Constructor.  Allocates some but fills no data structures.
    */
-  FEMContext (const System &sys);
+  FEMContext (const System &sys, bool _compute_neighbor_values = false);
 
   /**
    * Destructor.

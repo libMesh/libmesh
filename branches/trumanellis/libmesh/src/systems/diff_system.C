@@ -96,7 +96,7 @@ void DifferentiableSystem::init_data ()
 
 AutoPtr<DiffContext> DifferentiableSystem::build_context ()
 {
-  AutoPtr<DiffContext> ap(new DiffContext(*this));
+  AutoPtr<DiffContext> ap(new DiffContext(*this, compute_neighbor_values));
 
   ap->set_deltat_pointer( &deltat );
   
