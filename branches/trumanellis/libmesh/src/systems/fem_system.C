@@ -381,6 +381,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                     {
                       this->matrix->add_matrix (_femcontext.neigh_jacobian,
                                                 _femcontext.neigh_dof_indices);
+                      this->matrix->add_matrix 
+                        (_femcontext.neigh_elem_jacobian,
+                         _femcontext.neigh_dof_indices,
+                         _femcontext.dof_indices);
+                      this->matrix->add_matrix 
+                        (_femcontext.elem_neigh_jacobian,
+                         _femcontext.dof_indices,
+                         _femcontext.neigh_dof_indices);
                     }
                   if (get_residual)
                     {
