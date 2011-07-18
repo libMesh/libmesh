@@ -41,7 +41,7 @@ namespace libMesh
 FEMContext::FEMContext (const System &sys, bool _compute_neighbor_values)
   : DiffContext(sys, _compute_neighbor_values),
     element_qrule(NULL), side_qrule(NULL),
-    edge_qrule(NULL), neighbor_qrule(NULL),
+    edge_qrule(NULL), neigh_qrule(NULL),
     _mesh_sys(sys.get_mesh_system()),
     _mesh_x_var(sys.get_mesh_x_var()),
     _mesh_y_var(sys.get_mesh_y_var()),
@@ -74,7 +74,7 @@ FEMContext::FEMContext (const System &sys, bool _compute_neighbor_values)
     (dim, sys.extra_quadrature_order).release();
   side_qrule = hardest_fe_type.default_quadrature_rule
     (dim-1, sys.extra_quadrature_order).release();
-  neighbor_qrule = hardest_fe_type.default_quadrature_rule
+  neigh_qrule = hardest_fe_type.default_quadrature_rule
     (dim-1, sys.extra_quadrature_order).release();
   if (dim == 3)
     edge_qrule = hardest_fe_type.default_quadrature_rule
@@ -83,7 +83,7 @@ FEMContext::FEMContext (const System &sys, bool _compute_neighbor_values)
   // Next, create finite element objects
   element_fe_var.resize(n_vars);
   side_fe_var.resize(n_vars);
-  neighbor_fe_var.resize(n_vars);
+  neigh_fe_var.resize(n_vars);
   if (dim == 3)
     edge_fe_var.resize(n_vars);
 
@@ -96,8 +96,8 @@ FEMContext::FEMContext (const System &sys, bool _compute_neighbor_values)
           element_fe[fe_type]->attach_quadrature_rule(element_qrule);
           side_fe[fe_type] = FEBase::build(dim, fe_type).release();
           side_fe[fe_type]->attach_quadrature_rule(side_qrule);
-          neighbor_fe[fe_type] = FEBase::build(dim, fe_type).release();
-          neighbor_fe[fe_type]->attach_quadrature_rule(neighbor_qrule);
+          neigh_fe[fe_type] = FEBase::build(dim, fe_type).release();
+          neigh_fe[fe_type]->attach_quadrature_rule(neigh_qrule);
 
           if (dim == 3)
             {
@@ -107,7 +107,7 @@ FEMContext::FEMContext (const System &sys, bool _compute_neighbor_values)
         }
       element_fe_var[i] = element_fe[fe_type];
       side_fe_var[i] = side_fe[fe_type];
-      neighbor_fe_var[i] = neighbor_fe[fe_type];
+      neigh_fe_var[i] = neigh_fe[fe_type];
       if (dim == 3)
         edge_fe_var[i] = edge_fe[fe_type];
     }
@@ -128,10 +128,10 @@ FEMContext::~FEMContext()
     delete i->second;
   side_fe.clear();
 
-  for (std::map<FEType, FEBase *>::iterator i = neighbor_fe.begin();
-       i != neighbor_fe.end(); ++i)
+  for (std::map<FEType, FEBase *>::iterator i = neigh_fe.begin();
+       i != neigh_fe.end(); ++i)
     delete i->second;
-  neighbor_fe.clear();
+  neigh_fe.clear();
 
   for (std::map<FEType, FEBase *>::iterator i = edge_fe.begin();
        i != edge_fe.end(); ++i)
@@ -144,8 +144,8 @@ FEMContext::~FEMContext()
   delete side_qrule;
   side_qrule = NULL;
 
-  delete neighbor_qrule;
-  neighbor_qrule = NULL;
+  delete neigh_qrule;
+  neigh_qrule = NULL;
 
   if (edge_qrule)
     delete edge_qrule;
@@ -327,12 +327,12 @@ Number FEMContext::neighbor_value(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<Real> > &phi =
-    neighbor_fe_var[var]->get_phi();
+    neigh_fe_var[var]->get_phi();
 
   // Accumulate solution value
   Number u = 0.;
 
-  FEType fe_type = neighbor_fe_var[var]->get_fe_type();
+  FEType fe_type = neigh_fe_var[var]->get_fe_type();
   // Point p_master = FEInterface::inverse_map(dim, fe_type, elem, p);
 
   for (unsigned int l=0; l != n_dofs; l++)
@@ -356,7 +356,7 @@ Gradient FEMContext::neighbor_gradient(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<RealGradient> > &dphi =
-    neighbor_fe_var[var]->get_dphi();
+    neigh_fe_var[var]->get_dphi();
 
   // Accumulate solution derivatives
   Gradient du;
@@ -383,7 +383,7 @@ Tensor FEMContext::neighbor_hessian(unsigned int var, unsigned int qp)
 
   // Get shape function values at quadrature point
   const std::vector<std::vector<RealTensor> > &d2phi =
-    neighbor_fe_var[var]->get_d2phi();
+    neigh_fe_var[var]->get_d2phi();
 
   // Accumulate solution second derivatives
   Tensor d2u;
@@ -764,19 +764,19 @@ void FEMContext::side_fe_reinit ()
           && (sub_dofs == n_dofs));
 
       // We will simulatneously iterate through side and neighbor FETypes.
-      std::map<FEType, FEBase *>::iterator neigh_fe_end = neighbor_fe.end();
+      std::map<FEType, FEBase *>::iterator neigh_fe_end = neigh_fe.end();
       std::map<FEType, FEBase *>::iterator i_side = side_fe.begin();
       // For loop takes care of iterating through neighbor
-      for (std::map<FEType, FEBase *>::iterator i_neigh = neighbor_fe.begin();
+      for (std::map<FEType, FEBase *>::iterator i_neigh = neigh_fe.begin();
            i_neigh != neigh_fe_end; ++i_neigh)
         {
           // The quadrature points on the side
           std::vector<Point > qface_point = i_side->second->get_xyz();
           // The points on the neighbor that we will reinit
-          std::vector<Point> qface_neighbor_point;
+          std::vector<Point> qface_neigh_point;
           FEInterface::inverse_map (elem->dim(), i_side->first, neigh,
-            qface_point, qface_neighbor_point);
-          i_neigh->second->reinit(neigh, &qface_neighbor_point);
+            qface_point, qface_neigh_point);
+          i_neigh->second->reinit(neigh, &qface_neigh_point);
           // Iterate to next side FEType
           ++i_side;
         }

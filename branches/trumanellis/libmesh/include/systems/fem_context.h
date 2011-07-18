@@ -238,7 +238,7 @@ public:
   std::map<FEType, FEBase *> element_fe;
   std::map<FEType, FEBase *> side_fe;
   std::map<FEType, FEBase *> edge_fe;
-  std::map<FEType, FEBase *> neighbor_fe;
+  std::map<FEType, FEBase *> neigh_fe;
 
   /**
    * Pointers to the same finite element objects, but indexed
@@ -247,7 +247,7 @@ public:
   std::vector<FEBase *> element_fe_var;
   std::vector<FEBase *> side_fe_var;
   std::vector<FEBase *> edge_fe_var;
-  std::vector<FEBase *> neighbor_fe_var;
+  std::vector<FEBase *> neigh_fe_var;
 
   /**
    * Quadrature rule for element interior.
@@ -275,7 +275,7 @@ public:
    * The FEM context will try to find a quadrature rule that
    * correctly integrates all variables
    */
-  QBase *neighbor_qrule;
+  QBase *neigh_qrule;
 
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
