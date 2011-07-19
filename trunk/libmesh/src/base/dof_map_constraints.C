@@ -990,6 +990,10 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 }
 
 
+// NodeConstraints can fail in parallel when we try to look up a node
+// that our processor doesn't have.  Until we have a fix for that,
+// let's just disable the allgather attempt.
+#undef LIBMESH_ENABLE_NODE_CONSTRAINTS
 
 void DofMap::allgather_recursive_constraints(const MeshBase&
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -1183,6 +1187,7 @@ mesh
               for (unsigned int j = 0; j != pushed_node_keys_to_me[i].size(); ++j)
                 {
                   const Node *key_node = mesh.node_ptr(pushed_node_keys_to_me[i][j]);
+                  libmesh_assert(key_node);
                   row[key_node] = pushed_node_vals_to_me[i][j];
                 }
             }
@@ -1254,7 +1259,10 @@ mesh
           NodeConstraintRow &row = _node_constraints[*i];
           for (NodeConstraintRow::iterator j = row.begin();
                j != row.end(); ++j)
-            node_request_set.insert(j->first);
+            {
+              libmesh_assert(j->first);
+              node_request_set.insert(j->first);
+            }
         }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
@@ -1276,6 +1284,8 @@ mesh
       for (Node_RCSet::iterator i = node_request_set.begin();
            i != node_request_set.end(); ++i)
         {
+          libmesh_assert(*i);
+          libmesh_assert((*i)->processor_id() < libMesh::n_processors());
           node_ids_on_proc[(*i)->processor_id()]++;
         }
 
@@ -1347,11 +1357,11 @@ mesh
               const Node *constrained_node = mesh.node_ptr(constrained_id);
               if (_node_constraints.count(constrained_node))
                 {
-                  NodeConstraintRow &row = _node_constraints[constrained_node];
+                  const NodeConstraintRow &row = _node_constraints[constrained_node];
                   unsigned int row_size = row.size();
                   node_row_keys[i].reserve(row_size);
                   node_row_vals[i].reserve(row_size);
-                  for (NodeConstraintRow::iterator j = row.begin();
+                  for (NodeConstraintRow::const_iterator j = row.begin();
                        j != row.end(); ++j)
                     {
                       node_row_keys[i].push_back(j->first->id());
@@ -1411,6 +1421,7 @@ mesh
                     {
                       const Node* key_node =
                         mesh.node_ptr(node_filled_keys[i][j]);
+                      libmesh_assert(key_node);
                       row[key_node] = node_filled_vals[i][j];
                     }
 
