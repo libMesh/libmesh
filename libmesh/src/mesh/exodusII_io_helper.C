@@ -862,6 +862,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
           Elem * elem = mesh.elem(elem_id);
 
+          // Exodus/Nemesis want every block to have the same element type
+          libmesh_assert(elem->type() == conv.get_canonical_type());
+          
           for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;

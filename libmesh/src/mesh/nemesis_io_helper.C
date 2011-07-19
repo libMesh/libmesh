@@ -1803,6 +1803,9 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 	  this->libmesh_elem_num_to_exodus[elem_id] = this->exodus_elem_num_to_libmesh.size();
 
 	  Elem * elem = pmesh.elem(elem_id);
+
+          // Exodus/Nemesis want every block to have the same element type
+          libmesh_assert(elem->type() == conv.get_canonical_type());
           
 	  for (unsigned int j=0; j < static_cast<unsigned int>(this->num_nodes_per_elem); j++)
 	    {  
