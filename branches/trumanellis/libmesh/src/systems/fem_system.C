@@ -211,7 +211,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         {
           // Don't compute on non-boundary sides unless requested
           if (!compute_internal_sides && 
-	      _femcontext.elem->neighbor(_femcontext.side) != NULL)
+              _femcontext.elem->neighbor(_femcontext.side) != NULL)
             continue;
 
           // Any mesh movement has already been done (and restored,
@@ -778,7 +778,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
       if (coord)
         {
           *coord = libmesh_real(context.elem_solution(j));
-	  for (unsigned int i = 0; i != context.dof_indices.size(); ++i)
+          for (unsigned int i = 0; i != context.dof_indices.size(); ++i)
             {
               numerical_jacobian(i,j) =
                 (context.elem_residual(i) - backwards_residual(i)) /
@@ -794,6 +794,99 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
                 2. / numerical_jacobian_h;
             }
         }
+    }
+  if (compute_neighbor_values && context.neigh)
+    {
+      DenseVector<Number> original_neigh_residual(context.neigh_residual);
+      DenseVector<Number> backwards_neigh_residual(context.neigh_residual);
+      DenseMatrix<Number> numerical_neigh_jacobian(context.neigh_jacobian);
+#ifdef DEBUG
+      DenseMatrix<Number> old_neigh_jacobian(context.neigh_jacobian);
+#endif
+      for (unsigned int j = 0; j != context.neigh_dof_indices.size(); ++j)
+        {
+          // Take the "minus" side of a central differenced first derivative
+          Number original_neigh_solution = context.neigh_solution(j);
+          context.neigh_solution(j) -= numerical_jacobian_h;
+
+          // Make sure to catch any moving mesh terms
+          // FIXME - this could be less ugly
+          Real *coord = NULL;
+          if (_mesh_sys == this)
+            {
+              if (_mesh_x_var != libMesh::invalid_uint)
+                for (unsigned int k = 0;
+                     k != context.neigh_dof_indices_var[_mesh_x_var].size(); ++k)
+                  if (context.neigh_dof_indices_var[_mesh_x_var][k] ==
+                      context.neigh_dof_indices[j])
+                    coord = &(context.neigh->point(k)(0));
+              if (_mesh_y_var != libMesh::invalid_uint)
+                for (unsigned int k = 0;
+                     k != context.neigh_dof_indices_var[_mesh_y_var].size(); ++k)
+                  if (context.neigh_dof_indices_var[_mesh_y_var][k] == 
+                      context.neigh_dof_indices[j])
+                    coord = &(context.neigh->point(k)(1));
+              if (_mesh_z_var != libMesh::invalid_uint)
+                for (unsigned int k = 0;
+                     k != context.neigh_dof_indices_var[_mesh_z_var].size(); ++k)
+            if (context.neigh_dof_indices_var[_mesh_z_var][k] ==
+                      context.neigh_dof_indices[j])
+                    coord = &(context.neigh->point(k)(2));
+            }
+          if (coord)
+            {
+              // We have enough information to scale the perturbations
+              // here appropriately
+              context.neigh_solution(j) = 
+                original_neigh_solution - numerical_point_h;
+              *coord = libmesh_real(context.neigh_solution(j));
+            }
+
+          context.neigh_residual.zero();
+          ((*time_solver).*(res))(false, context);
+#ifdef DEBUG
+          libmesh_assert(old_neigh_jacobian == context.neigh_jacobian);
+#endif
+          backwards_neigh_residual = context.neigh_residual;
+
+          // Take the "plus" side of a central differenced first derivative
+          context.neigh_solution(j) = 
+            original_neigh_solution + numerical_jacobian_h;
+          if (coord)
+            {
+              context.neigh_solution(j) = 
+                original_neigh_solution + numerical_point_h;
+              *coord = libmesh_real(context.neigh_solution(j));
+            }
+          context.neigh_residual.zero();
+          ((*time_solver).*(res))(false, context);
+#ifdef DEBUG
+          libmesh_assert(old_neigh_jacobian == context.neigh_jacobian);
+#endif
+
+          context.neigh_solution(j) = original_neigh_solution;
+          if (coord)
+            {
+              *coord = libmesh_real(context.neigh_solution(j));
+              for (unsigned int i = 0; i != context.neigh_dof_indices.size(); ++i)
+                {
+                  numerical_neigh_jacobian(i,j) =
+                    (context.neigh_residual(i) - backwards_neigh_residual(i)) /
+                    2. / numerical_point_h;
+                }
+            }
+          else
+            {
+              for (unsigned int i = 0; i != context.neigh_dof_indices.size(); ++i)
+                {
+                  numerical_neigh_jacobian(i,j) =
+                    (context.neigh_residual(i) - backwards_neigh_residual(i)) /
+                    2. / numerical_jacobian_h;
+                }
+            }
+        }
+      context.neigh_residual = original_neigh_residual;
+      context.neigh_jacobian = numerical_neigh_jacobian;
     }
 
   context.elem_residual = original_residual;
@@ -979,7 +1072,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
       if (this->time_solver->is_steady())
         return request_jacobian;
       else
-	unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
+        unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
 
       const std::vector<Real> &JxW = 
         context.element_fe_var[var]->get_JxW();
@@ -1033,11 +1126,11 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
           RealGradient convection(0.);
 
           for (unsigned int i = 0; i != n_x_dofs; ++i)
-	    convection(0) += delta_x[i] * psi[i][qp];
+            convection(0) += delta_x[i] * psi[i][qp];
           for (unsigned int i = 0; i != n_y_dofs; ++i)
-	    convection(1) += delta_y[i] * psi[i][qp];
+            convection(1) += delta_y[i] * psi[i][qp];
           for (unsigned int i = 0; i != n_z_dofs; ++i)
-	    convection(2) += delta_z[i] * psi[i][qp];
+            convection(2) += delta_z[i] * psi[i][qp];
 
           for (unsigned int i = 0; i != n_u_dofs; ++i)
             {

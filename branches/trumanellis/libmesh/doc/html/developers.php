@@ -56,12 +56,12 @@ dev_table_entry("images/roystgnr.jpg",
 ?>
 
 <?php
- dev_table_entry("images/knezed01.jpg",
+ dev_table_entry("images/djk.jpg",
 		 "Dr. David Knezevic",
-		 "http://web.mit.edu/dknez/www/",
+		 "http://people.seas.harvard.edu/~dknezevic/",
 		 "",
-		 "Post Doctoral Researcher",
-		 "<a href=\"http://www.mit.edu\">MIT</a>");
+		 "Lecturer, Developer",
+		 "<a href=\"http://iacs.seas.harvard.edu\">Harvard IACS</a>");
 ?>
 
 
