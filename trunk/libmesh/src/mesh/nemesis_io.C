@@ -78,9 +78,9 @@ namespace {
 
 // ------------------------------------------------------------
 // Nemesis_IO class members
-Nemesis_IO::Nemesis_IO (ParallelMesh& mesh) :
-  MeshInput<ParallelMesh> (mesh, /*is_parallel_format=*/true),
-  MeshOutput<ParallelMesh> (mesh, /*is_parallel_format=*/true),
+Nemesis_IO::Nemesis_IO (MeshBase& mesh) :
+  MeshInput<MeshBase> (mesh, /*is_parallel_format=*/true),
+  MeshOutput<MeshBase> (mesh, /*is_parallel_format=*/true),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper),
 #endif
@@ -124,7 +124,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       // object, it will no longer be set... thus no extra print-outs for serial runs.
       // ExodusII_IO(this->mesh()).read (base_filename); // ambiguous when Nemesis_IO is multiply-inherited
       
-      ParallelMesh& mesh = MeshInput<ParallelMesh>::mesh();
+      MeshBase& mesh = MeshInput<MeshBase>::mesh();
       ExodusII_IO(mesh).read (base_filename);
       return;
     }
@@ -150,10 +150,10 @@ void Nemesis_IO::read (const std::string& base_filename)
   // Open the Exodus file
   nemhelper->open(nemesis_filename.c_str());
 
-  // Get a reference to the ParallelMesh.  We need to be specific
+  // Get a reference to the mesh.  We need to be specific
   // since Nemesis_IO is multiply-inherited
-  // ParallelMesh& mesh = this->mesh();
-  ParallelMesh& mesh = MeshInput<ParallelMesh>::mesh();
+  // MeshBase& mesh = this->mesh();
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
   // Local information: Read the following information from the standard Exodus header
   //  title[0]
@@ -1016,7 +1016,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
       if (elem == NULL)
 	{
-	  libMesh::err << "ParallelMesh returned a NULL pointer when asked for element " 
+	  libMesh::err << "Mesh returned a NULL pointer when asked for element " 
 		       << my_elem_offset << " + " << elem_list[e] << " = " << my_elem_offset+elem_list[e] << std::endl;
 	  libmesh_error();
 	}
@@ -1139,8 +1139,13 @@ void Nemesis_IO::read (const std::string& base_filename)
   // make the Mesh think it's parallel might be to call:
   mesh.delete_remote_elements();
 
+  // And if that didn't work, then we're actually reading into a
+  // SerialMesh, so forget about gathering neighboring elements
+  if (mesh.is_serial())
+    return;
+
   // Gather neighboring elements so that the mesh has the proper "ghost" neighbor information.
-  MeshCommunication().gather_neighboring_elements(mesh);
+  MeshCommunication().gather_neighboring_elements(libmesh_cast_ref<ParallelMesh&>(mesh));
 }
 
 #else
@@ -1162,7 +1167,7 @@ void Nemesis_IO::read (const std::string& )
 void Nemesis_IO::write (const std::string& base_filename)
 {
   // Get a constant reference to the mesh for writing 
-  const MeshBase & mesh = MeshOutput<ParallelMesh>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   
   // Create the filename for this processor given the base_filename passed in.
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
@@ -1236,7 +1241,7 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
                                    const std::vector<Number>& soln,
                                    const std::vector<std::string>& names)
 {
-  const MeshBase & mesh = MeshOutput<ParallelMesh>::mesh();
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 

@@ -733,7 +733,8 @@ void Nemesis_IO_Helper::create(std::string filename)
 void Nemesis_IO_Helper::initialize(std::string title, const MeshBase & mesh)
 {
   // Make sure that the reference passed in is really a ParallelMesh
-  const ParallelMesh& pmesh = libmesh_cast_ref<const ParallelMesh&>(mesh);
+  // const ParallelMesh& pmesh = libmesh_cast_ref<const ParallelMesh&>(mesh);
+  const MeshBase& pmesh = mesh;
 
   // According to Nemesis documentation, first call when writing should be to
   // ne_put_init_info().  Our reader doesn't actually call this, but we should
@@ -898,7 +899,7 @@ void Nemesis_IO_Helper::initialize(std::string title, const MeshBase & mesh)
 
 
 
-void Nemesis_IO_Helper::write_exodus_initialization_info(const ParallelMesh& pmesh,
+void Nemesis_IO_Helper::write_exodus_initialization_info(const MeshBase& pmesh,
 							 const std::string& title)
 {
   // This follows the convention of Exodus: we always write out the mesh as LIBMESH_DIM-dimensional,
@@ -1188,7 +1189,8 @@ void Nemesis_IO_Helper::compute_communication_map_parameters()
 
 
 
-void Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const ParallelMesh& pmesh)
+void
+Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const MeshBase& pmesh)
 {
   // Set of all local, active element IDs.  After we have identified border element
   // IDs, the set_difference between this set and the border_elem_ids set will give us
@@ -1204,8 +1206,8 @@ void Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(con
   // element numberings into Nemesis numberings.
   ExodusII_IO_Helper::ElementMaps element_mapper;
 
-  ParallelMesh::const_element_iterator elem_it = pmesh.active_local_elements_begin();
-  ParallelMesh::const_element_iterator elem_end = pmesh.active_local_elements_end();
+  MeshBase::const_element_iterator elem_it = pmesh.active_local_elements_begin();
+  MeshBase::const_element_iterator elem_end = pmesh.active_local_elements_end();
 
   for (; elem_it != elem_end; ++elem_it)
     {
@@ -1338,7 +1340,7 @@ void Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(con
 
 
 
-void Nemesis_IO_Helper::compute_num_global_sidesets(const ParallelMesh& pmesh)
+void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
 {
   std::set<short> local_side_boundary_ids;
 
@@ -1438,7 +1440,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const ParallelMesh& pmesh)
 
 
 
-void Nemesis_IO_Helper::compute_num_global_nodesets(const ParallelMesh& pmesh)
+void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
 {
   std::set<short> local_node_boundary_ids;
 
@@ -1549,7 +1551,7 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const ParallelMesh& pmesh)
 
 
 
-void Nemesis_IO_Helper::compute_num_global_elem_blocks(const ParallelMesh& pmesh)
+void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
 {
   // 1.) Loop over active local elements, build up set of subdomain IDs.  
   std::set<subdomain_id_type> global_subdomain_ids;
@@ -1557,8 +1559,8 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const ParallelMesh& pmesh
   // This map keeps track of the number of elements in each subdomain over all processors
   std::map<subdomain_id_type, unsigned> global_subdomain_counts;
 
-  ParallelMesh::const_element_iterator elem_it = pmesh.active_local_elements_begin();
-  ParallelMesh::const_element_iterator elem_end = pmesh.active_local_elements_end();
+  MeshBase::const_element_iterator elem_it = pmesh.active_local_elements_begin();
+  MeshBase::const_element_iterator elem_end = pmesh.active_local_elements_end();
     
   for (; elem_it != elem_end; ++elem_it)
     {
@@ -1656,7 +1658,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const ParallelMesh& pmesh
 
 
 
-void Nemesis_IO_Helper::build_element_and_node_maps(const ParallelMesh& pmesh)
+void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 {
   if (local_subdomain_counts.empty())
     {
@@ -1698,8 +1700,8 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const ParallelMesh& pmesh)
 
     
   // First loop over the elements to figure out which elements are in which subdomain
-  ParallelMesh::const_element_iterator elem_it = pmesh.active_local_elements_begin();
-  ParallelMesh::const_element_iterator elem_end = pmesh.active_local_elements_end();
+  MeshBase::const_element_iterator elem_it = pmesh.active_local_elements_begin();
+  MeshBase::const_element_iterator elem_end = pmesh.active_local_elements_end();
 
   for (; elem_it != elem_end; ++elem_it)
     {
@@ -1812,7 +1814,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const ParallelMesh& pmesh)
 
 
 
-void Nemesis_IO_Helper::compute_border_node_ids(const ParallelMesh& pmesh)
+void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase& pmesh)
 {
   // The set which will eventually contain the IDs of "border nodes".  These are nodes
   // that lie on the boundary between one or more processors.
@@ -1830,8 +1832,8 @@ void Nemesis_IO_Helper::compute_border_node_ids(const ParallelMesh& pmesh)
     // Loop over active (not just active local) elements, make sets of node IDs for each
     // processor which has an element that "touches" a node.
     {
-      ParallelMesh::const_element_iterator elem_it = pmesh.active_elements_begin();
-      ParallelMesh::const_element_iterator elem_end = pmesh.active_elements_end();
+      MeshBase::const_element_iterator elem_it = pmesh.active_elements_begin();
+      MeshBase::const_element_iterator elem_end = pmesh.active_elements_end();
 
       for (; elem_it != elem_end; ++elem_it)
 	{
