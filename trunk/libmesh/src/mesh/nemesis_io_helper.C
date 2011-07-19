@@ -525,11 +525,15 @@ void Nemesis_IO_Helper::put_ss_param_global(std::vector<int>& global_sideset_ids
 					    std::vector<int>& num_global_side_counts,
 					    std::vector<int>& num_global_side_df_counts)
 {
-  nemesis_err_flag = 
-    Nemesis::ne_put_ss_param_global(ex_id,
-				    &global_sideset_ids[0],
-				    &num_global_side_counts[0],
-				    &num_global_side_df_counts[0]);
+  // Only add sidesets if there are some
+  if(global_sideset_ids.size())
+  {
+    nemesis_err_flag = 
+      Nemesis::ne_put_ss_param_global(ex_id,
+				      &global_sideset_ids[0],
+				      &num_global_side_counts[0],
+				      &num_global_side_df_counts[0]);
+  }
 
   this->check_err(nemesis_err_flag, "Error writing global sideset parameters!");
 }
