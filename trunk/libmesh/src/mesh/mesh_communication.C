@@ -1871,8 +1871,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
   {
     std::vector<Real> xyz; xyz.reserve(3*n_nodes[libMesh::processor_id()]);
     
-    ParallelMesh::node_iterator       it  = mesh.local_nodes_begin();
-    const ParallelMesh::node_iterator end = mesh.local_nodes_end();
+    MeshBase::node_iterator       it  = mesh.local_nodes_begin();
+    const MeshBase::node_iterator end = mesh.local_nodes_end();
 
     for (; it != end; ++it)
       {
@@ -1942,8 +1942,8 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 						
     for (unsigned int level=0; level<=local_n_levels; level++)
       {
-	ParallelMesh::element_iterator        it  = mesh.local_level_elements_begin(level);
-	const ParallelMesh::element_iterator  end = mesh.local_level_elements_end(level);
+	MeshBase::element_iterator        it  = mesh.local_level_elements_begin(level);
+	const MeshBase::element_iterator  end = mesh.local_level_elements_end(level);
 
 	for (; it != end; ++it)
 	  {
