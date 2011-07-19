@@ -2031,6 +2031,7 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 	          libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
 
 	          const Node* their_node = parent_nodes[their_side_n];
+                  libmesh_assert(their_node);
 		  
 		  const Real their_value = FEInterface::shape(Dim-1,
 							      fe_type,
@@ -2513,7 +2514,7 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
                             if (!constraints.count(their_node))
                               continue;
 
-                            NodeConstraintRow& their_constraint_row =
+                            const NodeConstraintRow& their_constraint_row =
                               constraints[their_node];
 
 	                    for (unsigned int orig_side_n=0;
@@ -2556,6 +2557,7 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
 	                  libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
 
 	                  const Node* their_node = neigh_nodes[their_side_n];
+                          libmesh_assert(their_node);
 
 		          const Real their_value = FEInterface::shape(Dim-1,
 							              fe_type,
