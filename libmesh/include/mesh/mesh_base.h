@@ -163,9 +163,20 @@ public:
   /**
    * Returns the number of nodes in the mesh. This function and others must
    * be defined in derived classes since the MeshBase class has no specific
-   * storage for nodes or elements.
+   * storage for nodes or elements.  The standard n_nodes() function
+   * may return a cached value on distributed meshes, and so can be
+   * called by any processor at any time.
    */
   virtual unsigned int n_nodes () const = 0; 
+
+  /**
+   * Returns the number of nodes in the mesh. This function and others must
+   * be defined in derived classes since the MeshBase class has no specific
+   * storage for nodes or elements.  The parallel_n_nodes() function
+   * returns a newly calculated parallel-synchronized value on
+   * distributed meshes, and so must be called in parallel only.
+   */
+  virtual unsigned int parallel_n_nodes () const = 0; 
 
   /**
    * Returns the number of nodes on processor \p proc.
@@ -200,9 +211,19 @@ public:
   virtual void reserve_nodes (const unsigned int nn) = 0; 
   
   /**
-   * Returns the number of elements in the mesh.
+   * Returns the number of elements in the mesh.  The standard
+   * n_elem() function may return a cached value on distributed
+   * meshes, and so can be called by any processor at any time.
    */
   virtual unsigned int n_elem () const = 0; 
+
+  /**
+   * Returns the number of elements in the mesh.  The
+   * parallel_n_elem() function returns a newly calculated
+   * parallel-synchronized value on distributed meshes, and so must be
+   * called in parallel only.
+   */
+  virtual unsigned int parallel_n_elem () const = 0; 
 
   /**
    * Returns a number greater than or equal to the maximum element id in the

@@ -89,9 +89,11 @@ class SerialMesh : public UnstructuredMesh
   virtual void renumber_nodes_and_elements ();
 
   virtual unsigned int n_nodes () const { return _nodes.size(); }
+  virtual unsigned int parallel_n_nodes () const { return _nodes.size(); }
   virtual unsigned int max_node_id () const { return _nodes.size(); }
   virtual void reserve_nodes (const unsigned int nn) { _nodes.reserve (nn); }
   virtual unsigned int n_elem ()  const { return _elements.size(); }
+  virtual unsigned int parallel_n_elem ()  const { return _elements.size(); }
   virtual unsigned int n_active_elem () const;
   virtual unsigned int max_elem_id ()  const { return _elements.size(); }
   virtual void reserve_elem (const unsigned int ne) { _elements.reserve (ne); }
