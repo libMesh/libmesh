@@ -23,8 +23,6 @@
 #define __exodusII_io_h__
 
 
-// C++ inludes
-
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_input.h"
