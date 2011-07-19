@@ -1253,6 +1253,10 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
     nemhelper->write_elements(mesh);
     nemhelper->write_nodesets(mesh);
     nemhelper->write_sidesets(mesh);
+
+    // If we don't have any nodes written out on this processor,
+    // Exodus seems to like us better if we don't try to write out any
+    // variable names too...
     nemhelper->initialize_nodal_variables(names);
   }
 
