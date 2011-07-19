@@ -1168,7 +1168,7 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   ex_err = exII::ex_put_var_names(ex_id,
 				  "n",
 				  num_nodal_vars,
-				  &strings[0]//var_names
+				  strings.empty() ? NULL : &strings[0]//var_names
 				  );
 
   check_err(ex_err, "Error setting nodal variable names.");

@@ -1669,11 +1669,16 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
 
 void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 {
+  // If we don't have any local subdomains, it had better be because
+  // we don't have any local elements
+#ifdef DEBUG
   if (local_subdomain_counts.empty())
     {
-      libMesh::err << "The local_subdomain_counts map must not be empty when you run this function! " << std::endl;
-      libmesh_error();
+      libmesh_assert(pmesh.active_local_elements_begin() ==
+                     pmesh.active_local_elements_end());
+      libmesh_assert(this->nodes_attached_to_local_elems.empty());
     }
+#endif
 
   // Elements have to be numbered contiguously based on what block
   // number they are in.  Therefore we have to do a bit of work to get
@@ -1865,6 +1870,18 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase& pmesh)
     // with which we share nodes. (I think.) This is just the size of the map we just
     // created, minus 1.
     this->num_node_cmaps = proc_nodes_touched.size() - 1;
+
+    // If we've got no elements on this processor and haven't touched
+    // any nodes, however, then that's 0 other processors with which
+    // we share nodes, not -1.
+    if (this->num_node_cmaps == -1)
+      {
+        libmesh_assert(pmesh.active_elements_begin() == pmesh.active_elements_end());
+        this->num_node_cmaps = 0;
+      }
+
+    // We can't be connecting to more processors than exist outside
+    // ourselves
     libmesh_assert(static_cast<unsigned>(this->num_node_cmaps) < libMesh::n_processors());
 
     if (_verbose)
@@ -2259,13 +2276,24 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
     z[i]=node(2);
   }
 
-  // Call Exodus API to write nodal coordinates...
-  ex_err = exII::ex_put_coord(ex_id, &x[0], &y[0], &z[0]);
-  check_err(ex_err, "Error writing node coordinates");
+  if (local_num_nodes)
+    {
+      // Call Exodus API to write nodal coordinates...
+      ex_err = exII::ex_put_coord(ex_id, &x[0], &y[0], &z[0]);
+      check_err(ex_err, "Error writing node coordinates");
 
-  // And write the nodal map we created for them
-  ex_err = exII::ex_put_node_num_map(ex_id, &(this->exodus_node_num_to_libmesh[0]));
-  check_err(ex_err, "Error writing node num map");
+      // And write the nodal map we created for them
+      ex_err = exII::ex_put_node_num_map(ex_id, &(this->exodus_node_num_to_libmesh[0]));
+      check_err(ex_err, "Error writing node num map");
+    }
+  else // Does the Exodus API want us to write empty nodal coordinates?
+    {
+      ex_err = exII::ex_put_coord(ex_id, NULL, NULL, NULL);
+      check_err(ex_err, "Error writing empty node coordinates");
+
+      ex_err = exII::ex_put_node_num_map(ex_id, NULL);
+      check_err(ex_err, "Error writing empty node num map");
+    }
 }
 
 
@@ -2327,9 +2355,10 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
 	  check_err(ex_err, "Error writing element connectivities from Nemesis.");
 	}
     } // end loop over global block IDs
-
+ 
   // Only call this once, not in the loop above!
-  ex_err = exII::ex_put_elem_num_map(ex_id, &exodus_elem_num_to_libmesh[0]);
+  ex_err = exII::ex_put_elem_num_map(ex_id,
+    exodus_elem_num_to_libmesh.empty() ? NULL : &exodus_elem_num_to_libmesh[0]);
   check_err(ex_err, "Error writing element map");
 }
 
