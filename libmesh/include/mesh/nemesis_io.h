@@ -23,9 +23,8 @@
 #define __nemesis_io_h__
 
 
-// C++ inludes
-
 // Local includes
+#include "libmesh_common.h"
 #include "mesh_input.h"
 #include "mesh_output.h" 
 
@@ -33,7 +32,6 @@ namespace libMesh
 {
 
 // Forward declarations
-class ParallelMesh;
 class Nemesis_IO_Helper;
 
 
@@ -51,8 +49,8 @@ class Nemesis_IO_Helper;
 
 // ------------------------------------------------------------
 // Nemesis_IO class definition
-  class Nemesis_IO : public MeshInput<ParallelMesh>,
-		     public MeshOutput<ParallelMesh>
+  class Nemesis_IO : public MeshInput<MeshBase>,
+		     public MeshOutput<MeshBase>
 {
 
  public:
@@ -61,7 +59,7 @@ class Nemesis_IO_Helper;
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  Nemesis_IO (ParallelMesh& mesh);
+  Nemesis_IO (MeshBase& mesh);
   
   /**
    * Destructor.

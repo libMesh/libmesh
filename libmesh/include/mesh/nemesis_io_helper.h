@@ -29,7 +29,6 @@
 
 // Local headers
 #include "exodusII_io_helper.h"
-#include "parallel_mesh.h"
 
 namespace libMesh
 {
@@ -572,19 +571,19 @@ private:
    * This function uses global communication routines to determine the
    * number of element blocks across the entire mesh.
    */
-  void compute_num_global_elem_blocks(const ParallelMesh& pmesh);
+  void compute_num_global_elem_blocks(const MeshBase& pmesh);
   
   /**
    * This function uses global communication routines to determine the
    * number of nodesets across the entire mesh.
    */
-  void compute_num_global_nodesets(const ParallelMesh& pmesh);
+  void compute_num_global_nodesets(const MeshBase& pmesh);
   
   /**
    * This function uses global communication routines to determine the
    * number of sidesets across the entire mesh.
    */
-  void compute_num_global_sidesets(const ParallelMesh& pmesh);
+  void compute_num_global_sidesets(const MeshBase& pmesh);
 
   /**
    * This function builds the libmesh -> exodus and exodus -> libmesh
@@ -592,20 +591,20 @@ private:
    * numbering scheme within an Exodus file, given an existing globally
    * consistent numbering scheme from LibMesh.
    */
-  void build_element_and_node_maps(const ParallelMesh& pmesh);
+  void build_element_and_node_maps(const MeshBase& pmesh);
 
   /**
    * This function constructs the set of border node IDs present
    * on the current mesh.  These are nodes which live on the "border"
    * between elements which live on different processors.
    */
-  void compute_border_node_ids(const ParallelMesh& pmesh);
+  void compute_border_node_ids(const MeshBase& pmesh);
 
   /**
    * This function constructs the set of border and internal element IDs
    * and internal node IDs present on the current mesh.
    */
-  void compute_internal_and_border_elems_and_internal_nodes(const ParallelMesh& pmesh);
+  void compute_internal_and_border_elems_and_internal_nodes(const MeshBase& pmesh);
 
   /**
    * This function determines the communication map parameters 
@@ -643,7 +642,7 @@ private:
    * This information is slightly different when you are working with
    * Nemesis, as it depends on some global information being known.
    */
-  void write_exodus_initialization_info(const ParallelMesh& pmesh,
+  void write_exodus_initialization_info(const MeshBase& pmesh,
 					const std::string& title);
 };
 
