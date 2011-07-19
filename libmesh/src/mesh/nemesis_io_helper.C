@@ -572,13 +572,18 @@ void Nemesis_IO_Helper::put_cmap_params(std::vector<int>& node_cmap_ids,
 					std::vector<int>& elem_cmap_ids,
 					std::vector<int>& elem_cmap_elem_cnts)
 {
-  nemesis_err_flag = 
-    Nemesis::ne_put_cmap_params(ex_id,
-				&node_cmap_ids[0],
-				&node_cmap_node_cnts[0],
-				&elem_cmap_ids[0],
-				&elem_cmap_elem_cnts[0],
-				libMesh::processor_id());
+  // We might not have cmaps on every processor in some corner
+  // cases
+  if(node_cmap_ids.size())
+    {
+      nemesis_err_flag = 
+        Nemesis::ne_put_cmap_params(ex_id,
+				    &node_cmap_ids[0],
+				    &node_cmap_node_cnts[0],
+				    &elem_cmap_ids[0],
+				    &elem_cmap_elem_cnts[0],
+				    libMesh::processor_id());
+    }
 
   this->check_err(nemesis_err_flag, "Error writing cmap parameters!");
 }
@@ -634,8 +639,8 @@ void Nemesis_IO_Helper::put_node_map(std::vector<int>& node_mapi,
 {
   nemesis_err_flag = 
     Nemesis::ne_put_node_map(ex_id,
-			     &node_mapi[0],
-			     &node_mapb[0],
+			     node_mapi.empty() ? NULL : &node_mapi[0],
+			     node_mapb.empty() ? NULL : &node_mapb[0],
 			     node_mape.empty() ? NULL : &node_mape[0], // Don't take address of empty vector...
 			     libMesh::processor_id());
 
@@ -671,8 +676,8 @@ void Nemesis_IO_Helper::put_elem_map(std::vector<int>& elem_mapi,
 {
   nemesis_err_flag =
     Nemesis::ne_put_elem_map(ex_id,
-			     &elem_mapi[0],
-			     &elem_mapb[0],
+			     elem_mapi.empty() ? NULL : &elem_mapi[0],
+			     elem_mapb.empty() ? NULL : &elem_mapb[0],
 			     libMesh::processor_id());
   
   this->check_err(nemesis_err_flag, "Error writing Nemesis internal and border element maps to file!");
