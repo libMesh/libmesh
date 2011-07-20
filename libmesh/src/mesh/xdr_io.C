@@ -123,6 +123,8 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   _binary             (binary),
   _legacy             (false),
+  _write_serial       (false),
+  _write_parallel     (false),
   _version            ("libMesh-0.7.0+"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
@@ -152,6 +154,10 @@ void XdrIO::write (const std::string& name)
   if (this->legacy())
     {
       libmesh_deprecated();
+
+      // We don't support writing parallel files in the legacy format
+      libmesh_assert(!this->_write_parallel);
+
       LegacyXdrIO(MeshOutput<MeshBase>::mesh(), this->binary()).write(name);
       return;
     }
@@ -169,6 +175,7 @@ void XdrIO::write (const std::string& name)
     n_bcs      = mesh.boundary_info->n_boundary_conds(),
     n_p_levels = MeshTools::n_p_levels (mesh); 
 
+  bool write_parallel_files = this->write_parallel();
 
   //-------------------------------------------------------------
   // For all the optional files -- the default file name is "n/a".
@@ -197,7 +204,8 @@ void XdrIO::write (const std::string& name)
   // write the header
   if (libMesh::processor_id() == 0)
     {
-      io.data (this->version());
+      std::string full_ver = this->version() + (write_parallel_files ?  " parallel" : "");
+      io.data (full_ver);
       
       io.data (n_elem,  "# number of elements");
       io.data (n_nodes, "# number of nodes");
@@ -208,18 +216,36 @@ void XdrIO::write (const std::string& name)
       io.data (this->polynomial_level_file_name(),   "# p-level specification file");      
     }
 
-  // write connectivity
-  this->write_serialized_connectivity (io, n_elem);
+  if (write_parallel_files)
+    {
+      // Parallel xdr mesh files aren't implemented yet; until they
+      // are we'll just warn the user and write a serial file.
+      std::cerr << "Warning!\n";
 
-  // write the nodal locations
-  this->write_serialized_nodes (io, n_nodes);
+      // write connectivity
+      this->write_serialized_connectivity (io, n_elem);
 
-  // write the boundary condition information
-  this->write_serialized_bcs (io, n_bcs);
+      // write the nodal locations
+      this->write_serialized_nodes (io, n_nodes);
+
+      // write the boundary condition information
+      this->write_serialized_bcs (io, n_bcs);
+    }
+  else
+    {
+      // write connectivity
+      this->write_serialized_connectivity (io, n_elem);
+
+      // write the nodal locations
+      this->write_serialized_nodes (io, n_nodes);
+
+      // write the boundary condition information
+      this->write_serialized_bcs (io, n_bcs);
+    }
 
   STOP_LOG("write()","XdrIO");
   
-  // pause all processes until the write ends -- this will 
+  // pause all processes until the writing ends -- this will 
   // protect for the pathological case where a write is 
   // followed immediately by a read.  The write must be
   // guaranteed to complete first.

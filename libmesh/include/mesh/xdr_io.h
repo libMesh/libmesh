@@ -101,6 +101,22 @@ class XdrIO : public MeshInput<MeshBase>,
   bool & legacy()       { return _legacy; };
   
   /**
+   * Report whether we should write parallel files.
+   */
+  bool write_parallel() const;
+
+  /**
+   * Insist that we should/shouldn't write parallel files.
+   */
+  void set_write_parallel      (bool do_parallel = true);
+
+  /**
+   * Insist that we should write parallel files if and only if the
+   * mesh is an already distributed ParallelMesh.
+   */
+  void set_auto_parallel ();
+  
+  /**
    * Get/Set the version string.  Vailid version strings:
      \verbatim
 
@@ -190,6 +206,8 @@ class XdrIO : public MeshInput<MeshBase>,
 
   bool _binary;
   bool _legacy;
+  bool _write_serial;
+  bool _write_parallel;
   std::string _version;
   std::string _bc_file_name;
   std::string _partition_map_file;
@@ -203,6 +221,46 @@ class XdrIO : public MeshInput<MeshBase>,
 };
 
 
+// ------------------------------------------------------------
+// XdrIO inline members
+
+inline
+bool XdrIO::write_parallel() const
+{
+  // We can't insist on both serial and parallel
+  libmesh_assert (!this->_write_serial || !this->_write_parallel);
+
+  // If we insisted on serial, do that
+  if (this->_write_serial)
+    return false;
+
+  // If we insisted on parallel, do that
+  if (this->_write_parallel)
+    return true;
+
+  // If we're doing things automatically, check the mesh
+  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+  return !mesh.is_serial();
+}
+
+
+
+inline
+void XdrIO::set_write_parallel (bool do_parallel)
+{ 
+  this->_write_parallel = do_parallel;
+
+  this->_write_serial = !do_parallel;
+}
+
+
+
+inline
+void XdrIO::set_auto_parallel ()
+{
+  this->_write_serial   = false;
+  this->_write_parallel = false;
+}
 
 
 } // namespace libMesh
