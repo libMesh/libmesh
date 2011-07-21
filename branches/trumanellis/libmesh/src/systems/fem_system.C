@@ -235,7 +235,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
             {
               old_jacobian = _femcontext.elem_jacobian;
               _femcontext.elem_jacobian.zero();
-              if (compute_neighbor_values)
+              if (compute_neighbor_values && _femcontext.neigh)
                 {
                   old_neigh_jacobian = _femcontext.neigh_jacobian;
                   old_neigh_elem_jacobian = _femcontext.neigh_elem_jacobian;
@@ -257,7 +257,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               // jacobian and lie about it
 #ifdef DEBUG
               libmesh_assert(_femcontext.elem_jacobian.l1_norm() == 0.0);
-              if (compute_neighbor_values)
+              if (compute_neighbor_values && _femcontext.neigh)
                 {
                   libmesh_assert(_femcontext.neigh_jacobian.l1_norm() == 0.0);
                 }
@@ -275,7 +275,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 #endif // ifndef DEBUG
                 {
                   _femcontext.elem_jacobian += old_jacobian;
-                  if (compute_neighbor_values)
+                  if (compute_neighbor_values && _femcontext.neigh)
                     {
                       _femcontext.neigh_jacobian += old_neigh_jacobian;
                       _femcontext.neigh_elem_jacobian += old_neigh_elem_jacobian;
@@ -300,7 +300,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                 (_femcontext.elem_neigh_jacobian);
 
               _femcontext.elem_jacobian.zero();
-              if (compute_neighbor_values)
+              if (compute_neighbor_values && _femcontext.neigh)
                 {
                   _femcontext.neigh_jacobian.zero();
                   _femcontext.neigh_elem_jacobian.zero();
@@ -312,11 +312,20 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
               Real analytic_norm = analytic_jacobian.l1_norm();
               Real numerical_norm = _femcontext.elem_jacobian.l1_norm();
+              if (compute_neighbor_values && _femcontext.neigh)
+                {
+                  analytic_norm += analytic_neigh_jacobian.l1_norm()
+                    + analytic_neigh_elem_jacobian.l1_norm()
+                    + analytic_elem_neigh_jacobian.l1_norm();
+                  numerical_norm += _femcontext.neigh_jacobian.l1_norm()
+                    + _femcontext.neigh_elem_jacobian.l1_norm()
+                    + _femcontext.elem_neigh_jacobian.l1_norm();
+                }
 
               // If we can continue, we'll probably prefer 
               // the analytic jacobian
               analytic_jacobian.swap(_femcontext.elem_jacobian);
-              if (compute_neighbor_values)
+              if (compute_neighbor_values && _femcontext.neigh)
                 {
                   analytic_neigh_jacobian.swap
                     (_femcontext.neigh_jacobian);
@@ -329,7 +338,20 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               // The matrix "analytic_jacobian" will now hold the error matrix
               // TODO Do I need to do any neighbor equivalent here?
               analytic_jacobian.add(-1.0, _femcontext.elem_jacobian);
+              if (compute_neighbor_values && _femcontext.neigh)
+                {
+                  analytic_neigh_jacobian.add(-1.0, 
+                      _femcontext.neigh_jacobian);
+                  analytic_neigh_elem_jacobian.add(-1.0, 
+                      _femcontext.neigh_elem_jacobian);
+                  analytic_elem_neigh_jacobian.add(-1.0, 
+                      _femcontext.elem_neigh_jacobian);
+                }
               Real error_norm = analytic_jacobian.l1_norm();
+              if (compute_neighbor_values && _femcontext.neigh)
+                error_norm += analytic_neigh_jacobian.l1_norm()
+                  + analytic_neigh_elem_jacobian.l1_norm()
+                  + analytic_elem_neigh_jacobian.l1_norm();
 
               Real relative_error = error_norm /
                                     std::max(analytic_norm, numerical_norm);
@@ -351,6 +373,38 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                   analytic_jacobian.add(1.0, _femcontext.elem_jacobian);
                   libMesh::out << "J_numeric " << _femcontext.elem->id() 
                                << " = " << analytic_jacobian << std::endl;
+                  if (compute_neighbor_values && _femcontext.neigh)
+                    {
+                      libMesh::out << "J_neigh_analytic " 
+                        << _femcontext.elem->id() 
+                        << " = " << _femcontext.neigh_jacobian 
+                        << std::endl;
+                      analytic_neigh_jacobian.add(1.0, 
+                          _femcontext.neigh_jacobian);
+                      libMesh::out << "J_neigh_numeric " 
+                        << _femcontext.elem->id() 
+                        << " = " << analytic_neigh_jacobian << std::endl;
+
+                      libMesh::out << "J_neigh_elem_analytic " 
+                        << _femcontext.elem->id() 
+                        << " = " << _femcontext.neigh_elem_jacobian 
+                        << std::endl;
+                      analytic_neigh_elem_jacobian.add(1.0, 
+                          _femcontext.neigh_elem_jacobian);
+                      libMesh::out << "J_neigh_elem_numeric " 
+                        << _femcontext.elem->id() 
+                        << " = " << analytic_neigh_elem_jacobian << std::endl;
+
+                      libMesh::out << "J_elem_neigh_analytic " 
+                        << _femcontext.elem->id() 
+                        << " = " << _femcontext.elem_neigh_jacobian 
+                        << std::endl;
+                      analytic_elem_neigh_jacobian.add(1.0, 
+                          _femcontext.elem_neigh_jacobian);
+                      libMesh::out << "J_elem_neigh_numeric " 
+                        << _femcontext.elem->id() 
+                        << " = " << analytic_elem_neigh_jacobian << std::endl;
+                    }
                   libMesh::out.precision(old_precision);
 
                   libmesh_error();
@@ -358,7 +412,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               // Once we've verified a side, we'll want to add back the
               // rest of the accumulated jacobian
               _femcontext.elem_jacobian += old_jacobian;
-              if (compute_neighbor_values)
+              if (compute_neighbor_values && _femcontext.neigh)
                 {
                   _femcontext.neigh_jacobian += old_neigh_jacobian;
                   _femcontext.neigh_elem_jacobian += old_neigh_elem_jacobian;
@@ -372,7 +426,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               verify_analytic_jacobians == 0.0)
             {
               _femcontext.elem_jacobian += old_jacobian;
-              if (compute_neighbor_values)
+              if (compute_neighbor_values && _femcontext.neigh)
                 {
                   _femcontext.neigh_jacobian += old_neigh_jacobian;
                   _femcontext.neigh_elem_jacobian += old_neigh_elem_jacobian;
@@ -396,6 +450,58 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                                              _femcontext.neigh_dof_indices);
                     }
                 }
+            }
+
+          if (get_residual && get_jacobian && compute_neighbor_values && 
+              _femcontext.neigh)
+            {
+              this->get_dof_map().constrain_element_matrix_and_vector
+                (_femcontext.neigh_jacobian, _femcontext.neigh_residual,
+                 _femcontext.neigh_dof_indices, false);
+              // TODO: this is probably wrong, 
+              // constrain_element_matrix_and_vector only works for square
+              // jacobians, but I'm not sure if it is equivalent to 
+              // separately constrain the residual and jacobians
+              this->get_dof_map().constrain_element_vector
+                (_femcontext.neigh_residual, _femcontext.neigh_dof_indices, 
+                 false);
+              this->get_dof_map().constrain_element_matrix
+                (_femcontext.neigh_jacobian, _femcontext.neigh_dof_indices, 
+                 false);
+              this->get_dof_map().constrain_element_matrix
+                (_femcontext.neigh_elem_jacobian, 
+                 _femcontext.neigh_dof_indices,
+                 _femcontext.dof_indices, false);
+              this->get_dof_map().constrain_element_matrix
+                (_femcontext.elem_neigh_jacobian, 
+                 _femcontext.dof_indices,
+                 _femcontext.neigh_dof_indices, false);
+              // this->get_dof_map().constrain_element_matrix_and_vector
+              //   (_femcontext.neigh_elem_jacobian, _femcontext.neigh_residual,
+              //    _femcontext.dof_indices, false);
+              // this->get_dof_map().constrain_element_matrix_and_vector
+              //   (_femcontext.elem_neigh_jacobian, _femcontext.elem_residual,
+              //    _femcontext.neigh_dof_indices, false);
+            }
+          else if (get_residual && compute_neighbor_values && 
+              _femcontext.neigh)
+            this->get_dof_map().constrain_element_vector
+              (_femcontext.neigh_residual, _femcontext.neigh_dof_indices, 
+               false);
+          else if (get_jacobian && compute_neighbor_values && 
+              _femcontext.neigh)
+            {
+              this->get_dof_map().constrain_element_matrix
+                (_femcontext.neigh_jacobian, _femcontext.neigh_dof_indices, 
+                 false);
+              this->get_dof_map().constrain_element_matrix
+                (_femcontext.neigh_elem_jacobian, 
+                 _femcontext.neigh_dof_indices,
+                 _femcontext.dof_indices, false);
+              this->get_dof_map().constrain_element_matrix
+                (_femcontext.elem_neigh_jacobian, 
+                 _femcontext.dof_indices,
+                 _femcontext.neigh_dof_indices, false);
             }
 #endif // ifdef DEBUG
         }
