@@ -906,8 +906,14 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
       DenseVector<Number> original_neigh_residual(context.neigh_residual);
       DenseVector<Number> backwards_neigh_residual(context.neigh_residual);
       DenseMatrix<Number> numerical_neigh_jacobian(context.neigh_jacobian);
+      DenseMatrix<Number> numerical_neigh_elem_jacobian
+        (context.neigh_elem_jacobian);
+      DenseMatrix<Number> numerical_elem_neigh_jacobian
+        (context.elem_neigh_jacobian);
 #ifdef DEBUG
       DenseMatrix<Number> old_neigh_jacobian(context.neigh_jacobian);
+      DenseMatrix<Number> old_neigh_elem_jacobian(context.neigh_elem_jacobian);
+      DenseMatrix<Number> old_elem_neigh_jacobian(context.elem_neigh_jacobian);
 #endif
       for (unsigned int j = 0; j != context.neigh_dof_indices.size(); ++j)
         {
@@ -952,6 +958,10 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           ((*time_solver).*(res))(false, context);
 #ifdef DEBUG
           libmesh_assert(old_neigh_jacobian == context.neigh_jacobian);
+          libmesh_assert(old_neigh_elem_jacobian == 
+              context.neigh_elem_jacobian);
+          libmesh_assert(old_elem_neigh_jacobian == 
+              context.elem_neigh_jacobian);
 #endif
           backwards_neigh_residual = context.neigh_residual;
 
@@ -968,6 +978,10 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           ((*time_solver).*(res))(false, context);
 #ifdef DEBUG
           libmesh_assert(old_neigh_jacobian == context.neigh_jacobian);
+          libmesh_assert(old_neigh_elem_jacobian == 
+              context.neigh_elem_jacobian);
+          libmesh_assert(old_elem_neigh_jacobian == 
+              context.elem_neigh_jacobian);
 #endif
 
           context.neigh_solution(j) = original_neigh_solution;
@@ -977,6 +991,13 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
               for (unsigned int i = 0; i != context.neigh_dof_indices.size(); ++i)
                 {
                   numerical_neigh_jacobian(i,j) =
+                    (context.neigh_residual(i) - backwards_neigh_residual(i)) /
+                    2. / numerical_point_h;
+                }
+              for (unsigned int i = 0; i != context.dof_indices.size(); ++i)
+                {
+                  // TODO:: This is wrong, need to fix.
+                  numerical_elem_neigh_jacobian(i,j) =
                     (context.neigh_residual(i) - backwards_neigh_residual(i)) /
                     2. / numerical_point_h;
                 }
@@ -993,6 +1014,8 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
         }
       context.neigh_residual = original_neigh_residual;
       context.neigh_jacobian = numerical_neigh_jacobian;
+      context.neigh_elem_jacobian = numerical_neigh_elem_jacobian;
+      context.elem_neigh_jacobian = numerical_elem_neigh_jacobian;
     }
 
   context.elem_residual = original_residual;
