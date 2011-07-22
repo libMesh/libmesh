@@ -245,7 +245,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                   _femcontext.elem_neigh_jacobian.zero();
                 }
             }
-          // TODO Do I need to do any neighbor equivalent here?
           jacobian_computed =
             time_solver->side_residual(get_jacobian, _femcontext);
 
@@ -263,7 +262,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                 }
 #endif
               // Logging of numerical jacobians is done separately
-              // TODO Do I need to do any neighbor equivalent here?
               this->numerical_side_jacobian(_femcontext);
 
               // If we're in DEBUG mode or if
@@ -291,7 +289,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
             {
               DenseMatrix<Number> analytic_jacobian
                 (_femcontext.elem_jacobian);
-              // TODO Do I need to do any neighbor equivalent here?
               DenseMatrix<Number> analytic_neigh_jacobian
                 (_femcontext.neigh_jacobian);
               DenseMatrix<Number> analytic_neigh_elem_jacobian
@@ -307,7 +304,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                   _femcontext.elem_neigh_jacobian.zero();
                 }
               // Logging of numerical jacobians is done separately
-              // TODO Do I need to do any neighbor equivalent here?
               this->numerical_side_jacobian(_femcontext);
 
               Real analytic_norm = analytic_jacobian.l1_norm();
@@ -336,7 +332,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                 }
 
               // The matrix "analytic_jacobian" will now hold the error matrix
-              // TODO Do I need to do any neighbor equivalent here?
               analytic_jacobian.add(-1.0, _femcontext.elem_jacobian);
               if (compute_neighbor_values && _femcontext.neigh)
                 {
@@ -458,7 +453,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
               this->get_dof_map().constrain_element_matrix_and_vector
                 (_femcontext.neigh_jacobian, _femcontext.neigh_residual,
                  _femcontext.neigh_dof_indices, false);
-              // TODO: this is probably wrong, 
+              // FIXME: this is probably wrong, 
               // constrain_element_matrix_and_vector only works for square
               // jacobians, but I'm not sure if it is equivalent to 
               // separately constrain the residual and jacobians
