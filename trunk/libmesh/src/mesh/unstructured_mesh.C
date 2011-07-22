@@ -458,17 +458,37 @@ void UnstructuredMesh::read (const std::string& name,
   // See if the file exists.  Perform this check on all processors
   // so that the code is terminated properly in the case that the
   // file does not exist.
-  {
-    std::ifstream in (name.c_str());
+
+  // For Nemesis files, the name we try to read will have suffixes
+  // identifying processor rank
+  if (name.rfind(".nem") + 4 == name.size() ||
+      name.rfind(".n") + 2 == name.size())
+    {
+      OStringStream full_name;
+      full_name << name << '.' << libMesh::n_processors() << '.' << libMesh::processor_id();
+
+      std::ifstream in (full_name.str().c_str());
+
+      if (!in.good())
+        {
+	  libMesh::err << "ERROR: cannot locate specified file:\n\t"
+		        << full_name.str()
+		        << std::endl;
+	  libmesh_error();
+        }
+    }
+  else
+    {
+      std::ifstream in (name.c_str());
     
-    if (!in.good())
-      {
-	libMesh::err << "ERROR: cannot locate specified file:\n\t"
-		      << name
-		      << std::endl;
-	libmesh_error();
-      }
-  }
+      if (!in.good())
+        {
+	  libMesh::err << "ERROR: cannot locate specified file:\n\t"
+		        << name
+		        << std::endl;
+	  libmesh_error();
+        }
+    }
 
   // Set the skip_renumber_nodes_and_elements flag on all processors.
   // This ensures that renumber_nodes_and_elements is *not* called
