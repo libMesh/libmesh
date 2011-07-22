@@ -246,7 +246,7 @@ void QGauss::init_2D(const ElemType _type,
 	      const Real b[n_wts] = {0., 0., 0.}; // not used
 	      const unsigned int permutation_ids[n_wts] = {1, 3, 3};
 
-	      dunavant_rule2(wts, a, b, permutation_ids, n_wts); // 6 total points
+	      dunavant_rule2(wts, a, b, permutation_ids, n_wts); // 7 total points
 
 	      return;
 	    }
