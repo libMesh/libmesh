@@ -45,6 +45,7 @@
 #include "matlab_io.h"
 #include "off_io.h"
 #include "medit_io.h"
+#include "nemesis_io.h"
 #include "gmsh_io.h"
 #include "fro_io.h"
 #include "xdr_io.h"
@@ -60,10 +61,12 @@
 namespace {
   bool is_parallel_file_format (const std::string &name)
   {
-    // Certain mesh formats support parallel I/O, including the
-    // "new" Xdr format.
+    // Certain mesh formats can support parallel I/O, including the
+    // "new" Xdr format and the Nemesis format.
     return ((name.rfind(".xda") < name.size()) ||
-	    (name.rfind(".xdr") < name.size())
+	    (name.rfind(".xdr") < name.size()) ||
+	    (name.rfind(".nem") < name.size()) ||
+	    (name.rfind(".n") < name.size())
 	    );
   }
 }
@@ -524,6 +527,10 @@ void UnstructuredMesh::read (const std::string& name,
 	  skip_renumber_nodes_and_elements = true;
 #endif
 	}      
+      else if (name.rfind(".nem") < name.size() ||
+	       name.rfind(".n")   < name.size())
+        Nemesis_IO(*this).read (name);
+	  
     }
 
   // Serial mesh formats
@@ -626,6 +633,8 @@ void UnstructuredMesh::read (const std::string& name,
 			<< "     *.exd  -- Sandia's ExodusII format\n"
 			<< "     *.gmv  -- LANL's General Mesh Viewer format\n"
 			<< "     *.mat  -- Matlab triangular ASCII file\n"
+			<< "     *.n    -- Sandia's Nemesis format\n"
+			<< "     *.nem  -- Sandia's Nemesis format\n"
 			<< "     *.off  -- OOGL OFF surface format\n"
 			<< "     *.ucd  -- AVS's ASCII UCD format\n"
 			<< "     *.unv  -- I-deas Universal format\n"
@@ -677,6 +686,10 @@ void UnstructuredMesh::write (const std::string& name,
 	
       else if (name.rfind(".xdr") < name.size())
 	XdrIO(*this,true).write(name);
+
+      else if (name.rfind(".nem") < name.size() ||
+               name.rfind(".n")   < name.size())
+        Nemesis_IO(*this).write(name);
     }
 
   // serial file formats
@@ -774,6 +787,8 @@ void UnstructuredMesh::write (const std::string& name,
               << "     *.mesh  -- MEdit mesh format\n"
               << "     *.mgf   -- MGF binary mesh format\n"
               << "     *.msh   -- GMSH ASCII file\n"
+              << "     *.n     -- Sandia's Nemesis format\n"
+              << "     *.nem   -- Sandia's Nemesis format\n"
               << "     *.plt   -- Tecplot binary file\n"
               << "     *.poly  -- TetGen ASCII file\n"
               << "     *.ucd   -- AVS's ASCII UCD format\n"
