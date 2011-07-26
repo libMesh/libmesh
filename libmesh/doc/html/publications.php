@@ -58,7 +58,35 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nenning_Dissertation">1</a>]
+[<a name="Nagler_dissertation">1</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Nagler.
+ <em>Simulation of sound transmission through poroelastic plate-like
+  structures</em>.
+ PhD thesis, Graz University of Technology, Institute of Applied
+  Mechanics, February 2011.
+ 
+  <a href="http://fmysql.tu-graz.ac.at/~karl/verlagspdf/nagler_buch_13052011.pdf">http://fmysql.tu-graz.ac.at/~karl/verlagspdf/nagler_buch_13052011.pdf</a>.
+<a name="Nagler_dissertation"></a><pre>
+@phdthesis{Nagler_dissertation,
+  author = {L.~Nagler},
+  school = {Graz University of Technology, Institute of Applied Mechanics},
+  title = {{Simulation of sound transmission through poroelastic plate-like structures}},
+  note = {\url{http://fmysql.tu-graz.ac.at/~karl/verlagspdf/nagler_buch_13052011.pdf}},
+  month = feb,
+  year = {2011}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Nenning_Dissertation">2</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Nenning.
@@ -85,7 +113,7 @@ M.&nbsp;Nenning.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petrolati_Dissertation">2</a>]
+[<a name="Petrolati_Dissertation">3</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;Petrolati.
@@ -111,7 +139,7 @@ E.&nbsp;Petrolati.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_Dissertation">3</a>]
+[<a name="Stogner_Dissertation">4</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner.
@@ -139,7 +167,7 @@ R.&nbsp;H. Stogner.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Dissertation">4</a>]
+[<a name="Peterson_Dissertation">5</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -166,7 +194,7 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_Dissertation">5</a>]
+[<a name="Knezevic_Dissertation">6</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic.
@@ -193,7 +221,7 @@ D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_Dissertation">6</a>]
+[<a name="Kirk_Dissertation">7</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -220,7 +248,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Thesis">7</a>]
+[<a name="Peterson_Thesis">8</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -257,23 +285,44 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2011">1</a>]
+[<a name="Vavourakis_2011">1</a>]
 </td>
 <td class="bibtexitem">
-J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
-  A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
- Reordering and incomplete preconditioning in serial and parallel
-  AMR/C flow solutions.
- <em>PREPRINT, International Journal for Numerical Methods in
-  Fluids</em>, pages xx-xx, 2011.
- <a href="http://dx.doi.org">http://dx.doi.org</a>.
-<a name="Camata_2011"></a><pre>
-@article{Camata_2011,
-  author = {J.~J.~Camata and A.~L.~Rossa and A.~M.~P.~Valli and L.~Catabriga and G.~F.~Carey and A.~L.~G.~A.~Coutinho},
-  title = {{Reordering and incomplete preconditioning in serial and parallel AMR/C flow solutions}},
-  journal = {PREPRINT, International Journal for Numerical Methods in Fluids},
+V.&nbsp;Vavourakis, Y.&nbsp;Papaharilaou, and J.&nbsp;A. Ekaterinaris.
+ Coupled fluid-structure interaction hemodynamics in a zero-pressure
+  state corrected arterial geometry.
+ <em>PREPRINT, Journal of Biomechanics</em>, 2011.
+ <a href="http://dx.doi.org/10.1016/j.jbiomech.2011.06.024">http://dx.doi.org/10.1016/j.jbiomech.2011.06.024</a>.
+<a name="Vavourakis_2011"></a><pre>
+@article{Vavourakis_2011,
+  author = {V.~Vavourakis and Y.~Papaharilaou and J.~A.~Ekaterinaris},
+  title = {{Coupled fluid-structure interaction hemodynamics in a zero-pressure state corrected arterial geometry}},
+  journal = {PREPRINT, Journal of Biomechanics},
   year = 2011,
-  pages = {xx--xx},
+  note = {\url{http://dx.doi.org/10.1016/j.jbiomech.2011.06.024}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bova_2011">2</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;W. Bova and B.&nbsp;S. Kirk.
+ On the preservation of total enthalpy in SUPG methods.
+ <em>PREPRINT, AIAA Journal</em>, 2011.
+ <a href="http://dx.doi.org">http://dx.doi.org</a>.
+<a name="Bova_2011"></a><pre>
+@article{Bova_2011,
+  author = {S.~W.~Bova and B.~S.~Kirk},
+  title = {{On the preservation of total enthalpy in SUPG methods}},
+  journal = {PREPRINT, AIAA Journal},
+  year = 2011,
   note = {\url{http://dx.doi.org}}
 }
 </pre>
@@ -285,50 +334,23 @@ J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2011">2</a>]
+[<a name="Huynh_2011">3</a>]
 </td>
 <td class="bibtexitem">
-V.&nbsp;Carey and G.&nbsp;F. Carey.
- Flexible patch post-processing recovery strategies for solution
-  enhancement and adaptive mesh refinement.
- <em>PREPRINT, International Journal for Numerical Methods in
-  Engineering</em>, pages n/a-n/a, 2011.
- <a href="http://dx.doi.org/10.1002/nme.3146">http://dx.doi.org/10.1002/nme.3146</a>.
-<a name="Carey_2011"></a><pre>
-@article{Carey_2011,
-  author = {V.~Carey and G.~F.~Carey},
-  title = {Flexible patch post-processing recovery strategies for solution enhancement and adaptive mesh refinement},
-  journal = {PREPRINT, International Journal for Numerical Methods in Engineering},
-  note = {\url{http://dx.doi.org/10.1002/nme.3146}},
-  pages = {n/a--n/a},
-  year = {2011}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Arbree_2011">3</a>]
-</td>
-<td class="bibtexitem">
-A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
- Heterogeneous Subsurface Scattering Using the Finite Element
-  Method.
- <em>PREPRINT, IEEE Transactions on Visualization and Computer
-  Graphics</em>, 17, 2011.
- <a href="http://dx.doi.org/10.1109/TVCG.2010.117">http://dx.doi.org/10.1109/TVCG.2010.117</a>.
-<a name="Arbree_2011"></a><pre>
-@article{Arbree_2011,
-  author = {A.~Arbree and B.~Walter and K.~Bala},
-  title = {{Heterogeneous Subsurface Scattering Using the Finite Element Method}},
-  journal = {PREPRINT, IEEE Transactions on Visualization and Computer Graphics},
+D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
+ A static condensation reduced basis element method: approximation
+  and a posteriori error estimation.
+ <em>PREPRINT, Mathematical Modelling and Numerical Analysis</em>, 2011.
+ 
+  <a href="http://augustine.mit.edu/methodology/papers/HKP_RBcomponents_M2AN.pdf">http://augustine.mit.edu/methodology/papers/HKP_RBcomponents_M2AN.pdf</a>.
+<a name="Huynh_2011"></a><pre>
+@article{Huynh_2011,
+  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and A.~T.~Patera},
+  title = {{A static condensation reduced basis element method:  
+approximation and a posteriori error estimation}},
+  journal = {PREPRINT, Mathematical Modelling and Numerical Analysis},
   year = 2011,
-  volume = 17,
-  note = {\url{http://dx.doi.org/10.1109/TVCG.2010.117}}
+  note = {\url{http://augustine.mit.edu/methodology/papers/HKP_RBcomponents_M2AN.pdf}}
 }
 </pre>
 
@@ -339,7 +361,117 @@ A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2010b">4</a>]
+[<a name="Bordas_2011">4</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;Bordas, K.&nbsp;Gillow, Q.&nbsp;Lou, I.&nbsp;R. Efimov, D.&nbsp;Gavaghan, P.&nbsp;Kohl, V.&nbsp;Grau, and
+  B.&nbsp;Rodriguez.
+ Rabbit-specific ventricular model of cardiac electrophysiological
+  function including specialized conduction system.
+ <em>Progress in Biophysics and Molecular Biology</em>, pages zz-zz,
+  2011.
+ <a href="http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002">http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002</a>.
+<a name="Bordas_2011"></a><pre>
+@article{Bordas_2011,
+  author = {R.~Bordas and K.~Gillow and Q.~Lou and I.~R.~Efimov and D.~Gavaghan and P.~Kohl and V.~Grau and B.~Rodriguez},
+  title = {{Rabbit-specific ventricular model of cardiac electrophysiological function including specialized conduction system}},
+  journal = {Progress in Biophysics and Molecular Biology},
+  year = 2011,
+  volume = <a href="#x">x</a>,
+  number = <a href="#y">y</a>,
+  pages = {zz--zz},
+  note = {\url{http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Sopeju_2011">5</a>]
+</td>
+<td class="bibtexitem">
+O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
+ AutoSCOPE: Automatic suggestions for code optimizations using
+  PerfExpert.
+ <em>PREPRINT</em>, 2011.
+ <a href="http://www.cs.txstate.edu/~mb92/papers/pdpta11a.pdf">http://www.cs.txstate.edu/~mb92/papers/pdpta11a.pdf</a>.
+<a name="Sopeju_2011"></a><pre>
+@article{Sopeju_2011,
+  author = {O.~A.~Sopeju and M.~Burtscher and A.~Rane and J.~Browne},
+  title = {{AutoSCOPE: Automatic suggestions for code optimizations using PerfExpert}},
+  journal = {PREPRINT},
+  year = 2011,
+  note = {\url{http://www.cs.txstate.edu/~mb92/papers/pdpta11a.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Oliveira_2011">6</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
+ Damage identification in a concrete dam by fitting measured modal
+  parameters.
+ <em>PREPRINT</em>, 2011.
+ 
+  <a href="http://cmaf.ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2011/artigo_parametros_110514.pdf">http://cmaf.ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2011/artigo_parametros_110514.pdf</a>.
+<a name="Oliveira_2011"></a><pre>
+@article{Oliveira_2011,
+  author = {S.~Oliveira and A.-M.~Toader and P.~Vieira},
+  title = {{Damage identification in a concrete dam by fitting measured modal parameters}},
+  journal = {PREPRINT},
+  year = 2011,
+  note = {\url{http://cmaf.ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2011/artigo_parametros_110514.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Camata_2011">7</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
+  A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
+ Reordering and incomplete preconditioning in serial and parallel
+  AMR/C flow solutions.
+ <em>PREPRINT, International Journal for Numerical Methods in
+  Fluids</em>, pages xx-xx, 2011.
+ <a href="http://dx.doi.org/10.1002/fld.2614">http://dx.doi.org/10.1002/fld.2614</a>,
+  <a href="http://onlinelibrary.wiley.com/doi/10.1002/fld.2614/abstract">http://onlinelibrary.wiley.com/doi/10.1002/fld.2614/abstract</a>.
+<a name="Camata_2011"></a><pre>
+@article{Camata_2011,
+  author = {J.~J.~Camata and A.~L.~Rossa and A.~M.~P.~Valli and L.~Catabriga and G.~F.~Carey and A.~L.~G.~A.~Coutinho},
+  title = {{Reordering and incomplete preconditioning in serial and parallel AMR/C flow solutions}},
+  journal = {PREPRINT, International Journal for Numerical Methods in Fluids},
+  year = 2011,
+  pages = {xx--xx},
+  note = {\url{http://dx.doi.org/10.1002/fld.2614}, \url{http://onlinelibrary.wiley.com/doi/10.1002/fld.2614/abstract}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Eftang_2010b">8</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -365,7 +497,7 @@ J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2010">5</a>]
+[<a name="Griffith_2010">9</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -390,7 +522,7 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010b">6</a>]
+[<a name="Knezevic_2010b">10</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
@@ -420,7 +552,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010">7</a>]
+[<a name="Berrone_2010">11</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone and M.&nbsp;Verani.
@@ -447,7 +579,7 @@ S.&nbsp;Berrone and M.&nbsp;Verani.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2010a">8</a>]
+[<a name="Eftang_2010a">12</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -483,7 +615,151 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010b">1</a>]
+[<a name="Brummelen_2011b">1</a>]
+</td>
+<td class="bibtexitem">
+E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
+ Flux evaluation in primal and dual boundary-coupled problems.
+ Technical Report 11-22, Institute for Computational Engineering and
+  Sciences (ICES), The University of Texas at Austin, July 2011.
+ <a href="http://www.ices.utexas.edu/media/reports/2011/1122.pdf">http://www.ices.utexas.edu/media/reports/2011/1122.pdf</a>.
+<a name="Brummelen_2011b"></a><pre>
+@techreport{Brummelen_2011b,
+  author = {E.~H.~van~Brummelen and K.~G.~van~der~Zee and V.~V.~Garg and S.~Prudhomme},
+  title = {{Flux evaluation in primal and dual boundary-coupled problems}},
+  institution = {Institute for Computational Engineering and Sciences (ICES), The University of Texas at Austin},
+  month = jul,
+  year = 2011,
+  number = {11-22},
+  note = {\url{http://www.ices.utexas.edu/media/reports/2011/1122.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Brummelen_2011">2</a>]
+</td>
+<td class="bibtexitem">
+E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
+ Flux evaluation in primal and dual boundary-coupled problems.
+ Technical Report 11-41, Centre for Analysis, Scientific computing and
+  Applications (CASA), Dept. of Mathematics and Computer Science, Eindhoven
+  University of Technology, July 2011.
+ <a href="http://www.win.tue.nl/analysis/reports/rana11-41.pdf">http://www.win.tue.nl/analysis/reports/rana11-41.pdf</a>.
+<a name="Brummelen_2011"></a><pre>
+@techreport{Brummelen_2011,
+  author = {E.~H.~van~Brummelen and K.~G.~van~der~Zee and V.~V.~Garg and S.~Prudhomme},
+  title = {{Flux evaluation in primal and dual boundary-coupled problems}},
+  institution = {Centre for Analysis, Scientific computing and Applications (CASA), Dept.\ of Mathematics and Computer Science, Eindhoven University of Technology},
+  month = jul,
+  year = 2011,
+  number = {11-41},
+  note = {\url{http://www.win.tue.nl/analysis/reports/rana11-41.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Carey_2011">3</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;Carey and G.&nbsp;F. Carey.
+ Flexible patch post-processing recovery strategies for solution
+  enhancement and adaptive mesh refinement.
+ <em>International Journal for Numerical Methods in Engineering</em>,
+  87(1-5):424-436, July 2011.
+ <a href="http://dx.doi.org/10.1002/nme.3146">http://dx.doi.org/10.1002/nme.3146</a>.
+<a name="Carey_2011"></a><pre>
+@article{Carey_2011,
+  author = {V.~Carey and G.~F.~Carey},
+  title = {Flexible patch post-processing recovery strategies for solution enhancement and adaptive mesh refinement},
+  journal = {International Journal for Numerical Methods in Engineering},
+  volume = 87,
+  number = {1--5},
+  pages = {424--436},
+  month = jul,
+  note = {\url{http://dx.doi.org/10.1002/nme.3146}},
+  year = {2011}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Arbree_2011">4</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
+ Heterogeneous Subsurface Scattering Using the Finite Element
+  Method.
+ <em>IEEE Transactions on Visualization and Computer Graphics</em>,
+  17(7):956-969, July 2011.
+ <a href="http://dx.doi.org/10.1109/TVCG.2010.117">http://dx.doi.org/10.1109/TVCG.2010.117</a>.
+<a name="Arbree_2011"></a><pre>
+@article{Arbree_2011,
+  author = {A.~Arbree and B.~Walter and K.~Bala},
+  title = {{Heterogeneous Subsurface Scattering Using the Finite Element Method}},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  year = 2011,
+  month = jul,
+  volume = 17,
+  number = 7,
+  pages = {956--969},
+  note = {\url{http://dx.doi.org/10.1109/TVCG.2010.117}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gunther_2011">5</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
+ Direct LDDMM of discrete currents with adaptive finite elements.
+ Technical Report 11-22 (2011), Konrad-Zuse-Zentrum f&uuml;r
+  Informationstechnik Berlin (ZIB), June 2011.
+ 
+  <a href="http://vs24.kobv.de/opus4-zib/files/1309/ZIB-Report11-22_GLW-LDDMMwithAFEM.pdf">http://vs24.kobv.de/opus4-zib/files/1309/ZIB-Report11-22_GLW-LDDMMwithAFEM.pdf</a>.
+<a name="Gunther_2011"></a><pre>
+@techreport{Gunther_2011,
+  author = {A.~G\"{u}nther and H.~Lamecker and M.~Weiser},
+  title = {{Direct LDDMM of discrete currents with adaptive finite elements}},
+  institution = {Konrad-Zuse-Zentrum f\"{u}r Informationstechnik Berlin (ZIB)},
+  day = 14,
+  month = jun,
+  year = 2011,
+  number = {11-22 (2011)},
+  note = {\url{http://vs24.kobv.de/opus4-zib/files/1309/ZIB-Report11-22_GLW-LDDMMwithAFEM.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Peterson_2010b">6</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
@@ -514,7 +790,36 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="AufDerMaur_2011">2</a>]
+[<a name="Feng_2011">7</a>]
+</td>
+<td class="bibtexitem">
+Y.&nbsp;Feng and D.&nbsp;Fuentes.
+ Real-time predictive surgical control for cancer treatment using
+  laser ablation.
+ <em>IEEE Signal Processing Magazine</em>, 28(3):134-138, May 2011.
+ <a href="http://dx.doi.org/10.1109/MSP.2011.940419">http://dx.doi.org/10.1109/MSP.2011.940419</a>.
+<a name="Feng_2011"></a><pre>
+@article{Feng_2011,
+  author = {Y.~Feng and D.~Fuentes},
+  title = {{Real-time predictive surgical control for cancer treatment using laser ablation}},
+  journal = {IEEE Signal Processing Magazine},
+  year = 2011,
+  volume = 28,
+  number = 3,
+  month = may,
+  pages = {134--138},
+  note = {\url{http://dx.doi.org/10.1109/MSP.2011.940419}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="AufDerMaur_2011">8</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&nbsp;Pecchia, and
@@ -544,7 +849,7 @@ M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Curtis_2011a">3</a>]
+[<a name="Curtis_2011a">9</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
@@ -575,7 +880,7 @@ papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf}}
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">4</a>]
+[<a name="Huynh_2010">10</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
@@ -609,7 +914,7 @@ DOI:~\url{http://dx.doi.org/10.1016/j.compfluid.2010.07.007}    }
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2011">5</a>]
+[<a name="Knezevic_2011">11</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
@@ -639,7 +944,7 @@ D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2011">6</a>]
+[<a name="Botti_2011">12</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
@@ -670,7 +975,37 @@ L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="widmer_2011">7</a>]
+[<a name="Fuentes_2011">13</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Fuentes, C.&nbsp;Walker, A.&nbsp;Elliott, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J. Stafford.
+ Magnetic resonance temperature imaging validation of a bioheat
+  transfer model for laser-induced thermal therapy.
+ <em>Int.&nbsp;J.&nbsp;of Hyperthermia</em>, 27(5):453-464, 2011.
+ <a href="http://dx.doi.org/10.3109/02656736.2011.557028">http://dx.doi.org/10.3109/02656736.2011.557028</a>.
+<a name="Fuentes_2011"></a><pre>
+@article{Fuentes_2011,
+  author = {D.~Fuentes and C.~Walker and A.~Elliott and A.~Shetty
+             and J.~D.~Hazle and R.~J.~Stafford},
+  title = {{Magnetic resonance temperature imaging validation of a 
+              bioheat transfer model for laser-induced thermal therapy}},
+  journal = {Int.~J.~of Hyperthermia},
+  year = 2011,
+  volume = 27,
+  number = 5,
+  pages = {453--464},
+  note = {\url{http://dx.doi.org/10.3109/02656736.2011.557028}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="widmer_2011">14</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
@@ -699,7 +1034,7 @@ R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hilscher_2011">8</a>]
+[<a name="Hilscher_2011">15</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;P. Hilscher, K.&nbsp;Imadera, J.&nbsp;Li, and Y.&nbsp;Kishimoto.
@@ -732,7 +1067,7 @@ P.&nbsp;P. Hilscher, K.&nbsp;Imadera, J.&nbsp;Li, and Y.&nbsp;Kishimoto.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2011">9</a>]
+[<a name="Corsini_2011">16</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, F.&nbsp;Rispoli, and T.&nbsp;E. Tezduyar.
@@ -1017,9 +1352,10 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
 A.&nbsp;Pecchia.
  Transport at the nanoscale: integration of micro-macro scales for
   electrothermal device simulations.
- Technical Report A029035, University of Rome, &ldquo;Tor Vergata&rdquo;, May
-  2010.
- <a href="http://www.dtic.mil/cgi-bin/GetTRDoc?Location=U2&doc=GetTRDoc.pdf&AD=ADA530920">http://www.dtic.mil/cgi-bin/GetTRDoc?Location=U2&doc=GetTRDoc.pdf&AD=ADA530920</a>.
+ Technical Report A029035, Grant No: FA8655-08-1-3017, University of
+  Rome, &ldquo;Tor Vergata&rdquo;, May 2010.
+ <a href="http://www.dtic.mil/cgi-bin/GetTRDoc?Location=U2&doc=GetTRDoc.pdf&AD=ADA530920">http://www.dtic.mil/cgi-bin/GetTRDoc?Location=U2&doc=GetTRDoc.pdf&AD=ADA530920</a>,
+  <a href="http://dodreports.com/pdf/ada530920.pdf">http://dodreports.com/pdf/ada530920.pdf</a>.
 <a name="Pecchia_2010"></a><pre>
 @techreport{Pecchia_2010,
   author = {A.~Pecchia},
@@ -1029,9 +1365,9 @@ A.&nbsp;Pecchia.
   day = 27,
   month = may,
   year = {2010},
-  number = {A029035},
+  number = {A029035, Grant No: FA8655-08-1-3017},
   note = {\url{http://www.dtic.mil/cgi-bin/GetTRDoc?
-                      Location=U2&doc=GetTRDoc.pdf&AD=ADA530920}}
+                      Location=U2&doc=GetTRDoc.pdf&AD=ADA530920}, \url{http://dodreports.com/pdf/ada530920.pdf}}
 }
 </pre>
 
@@ -1165,7 +1501,35 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2010">14</a>]
+[<a name="Burtscher_2010">14</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Burtscher, B.&nbsp;Kim, J.&nbsp;Diamond, J.&nbsp;McCalpin, L.&nbsp;Koesterke, and J.&nbsp;Browne.
+ PerfExpert: An automated HPC performance measurement and analysis
+  tool with optimization recommendations.
+ Technical Report 10-04, Institute for Computational Engineering and
+  Sciences (ICES), February 2010.
+ <a href="http://www.ices.utexas.edu/media/reports/2010/1004.pdf">http://www.ices.utexas.edu/media/reports/2010/1004.pdf</a>.
+<a name="Burtscher_2010"></a><pre>
+@techreport{Burtscher_2010,
+  author = {M.~Burtscher and B.~Kim and J.~Diamond and J.~McCalpin and L.~Koesterke and J.~Browne},
+  title = {{PerfExpert:  An automated HPC performance measurement and analysis tool with optimization recommendations}},
+  institution = {Institute for Computational Engineering and Sciences (ICES)},
+  month = feb,
+  year = 2010,
+  number = {10-04},
+  note = {\url{http://www.ices.utexas.edu/media/reports/2010/1004.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Podgorney_2010">15</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
@@ -1197,7 +1561,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rossa_2010">15</a>]
+[<a name="Rossa_2010">16</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;L. Rossa, J.&nbsp;J. Camata, and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
@@ -1228,7 +1592,7 @@ of coupled incompressible viscous flows and heat transfer}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010a">16</a>]
+[<a name="Knezevic_2010a">17</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -1258,7 +1622,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhengyong_2010">17</a>]
+[<a name="Zhengyong_2010">18</a>]
 </td>
 <td class="bibtexitem">
 Z.&nbsp;Ren and J.&nbsp;Tang.
@@ -1287,7 +1651,7 @@ Z.&nbsp;Ren and J.&nbsp;Tang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2010">18</a>]
+[<a name="Carey_2010">19</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -1317,7 +1681,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010">19</a>]
+[<a name="Peterson_2010">20</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -1347,7 +1711,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010">20</a>]
+[<a name="Botti_2010">21</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
@@ -2830,7 +3194,36 @@ M.&nbsp;Anderson and J.-H. Kimn.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Steensland_2007">2</a>]
+[<a name="Kidner_2007">2</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;R.&nbsp;F. Kidner, K.&nbsp;Idrisi, J.&nbsp;P. Carneal, and M.&nbsp;E. Johnson.
+ Comparison of experiment, finite element, and wave based models for
+  mass inclusions in poro-elastic layers.
+ In <em>Proceedings of the 14th International Congress on Sound &amp;
+  Vibration (ICSV14)</em>, Cairns, Australia, July&nbsp;9-12, 2007.
+ <a href="http://data.mecheng.adelaide.edu.au/avc/publications/public_papers/2007/kidner_icsv14_2007_p577.pdf">http://data.mecheng.adelaide.edu.au/avc/publications/public_papers/2007/kidner_icsv14_2007_p577.pdf</a>.
+<a name="Kidner_2007"></a><pre>
+@inproceedings{Kidner_2007,
+  author = {M.~R.~F.~Kidner and K.~Idrisi and J.~P.~Carneal and M.~E.~Johnson},
+  title = {{Comparison of experiment, finite element, and wave based models for mass inclusions in poro-elastic layers}},
+  booktitle = {{Proceedings of the 14th International Congress on Sound \& Vibration (ICSV14)}},
+  address = {Cairns, Australia},
+  year = 2007,
+  month = jul # {~9--12,},
+  note = {\url{http://data.mecheng.adelaide.edu.au/avc/
+publications/public_papers/2007/kidner_icsv14_2007_p577.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Steensland_2007">3</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Steensland and J.&nbsp;W. Peterson.
@@ -2862,7 +3255,7 @@ J.&nbsp;Steensland and J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="AufderMaur_2007">3</a>]
+[<a name="AufderMaur_2007">4</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, and A.&nbsp;di Carlo.
@@ -2891,7 +3284,7 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, and A.&nbsp;di Carlo
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_2007">4</a>]
+[<a name="Stogner_2007">5</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
@@ -2920,7 +3313,7 @@ R.&nbsp;H. Stogner and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nam_2007">5</a>]
+[<a name="Nam_2007">6</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Nam and M.&nbsp;M. Aral.
@@ -2947,7 +3340,7 @@ K.&nbsp;Nam and M.&nbsp;M. Aral.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Biermann_2007">6</a>]
+[<a name="Biermann_2007">7</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Biermann, O.&nbsp;von Estorff, S.&nbsp;Petersen, and H.&nbsp;Schmidt.
@@ -2976,7 +3369,7 @@ J.&nbsp;Biermann, O.&nbsp;von Estorff, S.&nbsp;Petersen, and H.&nbsp;Schmidt.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2007">7</a>]
+[<a name="Peterson_2007">8</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, D.&nbsp;J. Knezevic, and B.&nbsp;T. Murray.
@@ -3134,7 +3527,38 @@ M.&nbsp;Schindler, P.&nbsp;Talkner, and P.&nbsp;H&auml;nggi.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Estorff_2006">5</a>]
+[<a name="Catabriga_2006">5</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Catabriga, J.&nbsp;J. Camata, A.&nbsp;M.&nbsp;P. Valli, A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho, and G.&nbsp;F.
+  Carey.
+ Reordering effects on preconditioned Krylov methods in AMR solutions
+  of flow and transport, Paper CIL04-557.
+ In <em>Proceedings of the XXVII Iberian Latin-American Congress on
+  Computational Methods in Engineering (CILAMCE)</em>. Brazilian Assoc. for Comp.
+  Mechanics &amp; Latin American Assoc. of Comp. Methods in Engineering,
+  September&nbsp;3-6, 2006.
+ <a href="http://www.inf.ufes.br/~luciac/papers/CIL04_557.pdf">http://www.inf.ufes.br/~luciac/papers/CIL04_557.pdf</a>.
+<a name="Catabriga_2006"></a><pre>
+@inproceedings{Catabriga_2006,
+  author = {L.~Catabriga and J.~J.~Camata and A.~M.~P.~Valli and A.~L.~G.~A.~Coutinho and G.~F.~Carey},
+  title = {{Reordering effects on preconditioned Krylov methods in AMR solutions of flow and transport, Paper CIL04-557}},
+  booktitle = {{Proceedings of the XXVII Iberian Latin-American Congress on Computational Methods in Engineering (CILAMCE)}},
+  publisher = {Brazilian Assoc. for Comp. Mechanics \& Latin American Assoc. of Comp. Methods in Engineering},
+  year = {2006},
+  month = sep # {~3--6,},
+  note = {\url{http://www.inf.ufes.br/~luciac/papers/CIL04_557.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Estorff_2006">6</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;von Estorff and S.&nbsp;Petersen.
@@ -3163,7 +3587,7 @@ O.&nbsp;von Estorff and S.&nbsp;Petersen.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Marichalar_2006">6</a>]
+[<a name="Marichalar_2006">7</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Marichalar, W.&nbsp;C. Rochelle, B.&nbsp;S. Kirk, and C.&nbsp;H. Campbell.
@@ -3191,7 +3615,7 @@ J.&nbsp;J. Marichalar, W.&nbsp;C. Rochelle, B.&nbsp;S. Kirk, and C.&nbsp;H. Camp
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petersen_2006">7</a>]
+[<a name="Petersen_2006">8</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Petersen, D.&nbsp;Dreyer, and O.&nbsp;von Estorff.
@@ -3221,7 +3645,7 @@ S.&nbsp;Petersen, D.&nbsp;Dreyer, and O.&nbsp;von Estorff.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Dreyer_2006">8</a>]
+[<a name="Dreyer_2006">9</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Dreyer, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
@@ -3259,7 +3683,38 @@ D.&nbsp;Dreyer, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2005">1</a>]
+[<a name="Camata_2005">1</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;J. Camata, L.&nbsp;Catabriga, A.&nbsp;M.&nbsp;P. Valli, A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho, and G.&nbsp;F.
+  Carey.
+ Numerical Evaluation of the LCD method implemented in the LibMesh
+  library, Paper CIL16-692.
+ In <em>Proceedings of the XXVI Iberian Latin-American Congress on
+  Computational Methods in Engineering (CILAMCE)</em>. Brazilian Assoc. for Comp.
+  Mechanics &amp; Latin American Assoc. of Comp. Methods in Engineering,
+  October&nbsp;19-21, 2005.
+ <a href="http://www.inf.ufes.br/~luciac/papers/CIL-0692.pdf">http://www.inf.ufes.br/~luciac/papers/CIL-0692.pdf</a>.
+<a name="Camata_2005"></a><pre>
+@inproceedings{Camata_2005,
+  author = {J.~J.~Camata and L.~Catabriga and A.~M.~P.~Valli and A.~L.~G.~A.~Coutinho and G.~F.~Carey},
+  title = {{Numerical Evaluation of the LCD method implemented in the LibMesh library, Paper CIL16-692}},
+  booktitle = {{Proceedings of the XXVI Iberian Latin-American Congress on Computational Methods in Engineering (CILAMCE)}},
+  publisher = {Brazilian Assoc. for Comp. Mechanics \& Latin American Assoc. of Comp. Methods in Engineering},
+  year = {2005},
+  month = oct # {~19--21,},
+  note = {\url{http://www.inf.ufes.br/~luciac/papers/CIL-0692.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Carey_2005">2</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;F. Carey, W.&nbsp;Barth, B.&nbsp;S. Kirk, and J.&nbsp;W. Peterson.
