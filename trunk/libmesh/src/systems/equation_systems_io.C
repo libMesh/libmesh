@@ -220,7 +220,9 @@ void EquationSystems::_read_impl (const std::string& name,
    const bool try_read_ifems       = read_flags & EquationSystems::TRY_READ_IFEMS;
    const bool read_basic_only      = read_flags & EquationSystems::READ_BASIC_ONLY;
          bool read_parallel_files  = false;
-	 
+
+  std::map<std::string, System*> xda_systems;
+
   // This will unzip a file with .bz2 as the extension, otherwise it
   // simply returns the name if the file need not be unzipped.
   Xdr io ((libMesh::processor_id() == 0) ? name : "", mode);
@@ -282,7 +284,7 @@ void EquationSystems::_read_impl (const std::string& name,
 	std::string sys_type;	
 	if (libMesh::processor_id() == 0) io.data (sys_type);
 	Parallel::broadcast(sys_type);
-	
+
 	if (read_header)
 	  this->add_system (sys_type, sys_name);
 
@@ -294,6 +296,8 @@ void EquationSystems::_read_impl (const std::string& name,
 				read_header,
 				read_additional_data,
 				read_legacy_format);
+
+        xda_systems.insert(std::make_pair(sys_name, &new_system));
 
         // If we're only creating "basic" systems, we need to tell
         // each system that before we call init() later.
@@ -326,9 +330,9 @@ void EquationSystems::_read_impl (const std::string& name,
       Xdr local_io (read_parallel_files ? local_file_name(name) : "", mode);
    
       std::map<std::string, System*>::iterator
-	pos = _systems.begin();
+	pos = xda_systems.begin();
       
-      for (; pos != _systems.end(); ++pos)
+      for (; pos != xda_systems.end(); ++pos)
 	if (read_legacy_format)
 	  {
 	    libmesh_deprecated();
