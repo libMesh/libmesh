@@ -45,9 +45,11 @@ std::string DerivedRBConstruction<Base>::system_type () const
 }
 
 template <class Base>
-Real DerivedRBConstruction<Base>::train_reduced_basis (const std::string& directory_name)
+Real DerivedRBConstruction<Base>::train_reduced_basis (const std::string& directory_name,
+                                                       const bool resize_rb_eval_data)
 {
-  Real training_greedy_error = Base::train_reduced_basis(directory_name);
+  Real training_greedy_error = Base::train_reduced_basis(directory_name,
+                                                         resize_rb_eval_data);
   
   generate_residual_terms_wrt_truth();
   

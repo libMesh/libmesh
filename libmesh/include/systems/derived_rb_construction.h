@@ -79,7 +79,8 @@ public:
    * Overload train_reduced_basis to generate residual terms wrt truth
    * once the Greedy finishes.
    */
-  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data");
+  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
+                                   const bool resize_rb_eval_data=true);
   
   /**
    * Set the uber_system's current_parameters to
