@@ -234,12 +234,13 @@ public:
   /**
    * Attach the full affine expansion associated with this system.
    * We assert that the assembly vectors have sizes consistent
-   * with \p rb_theta_expansion_in.
+   * with \p rb_theta_expansion_in. Also, this is not used for attaching
+   * outputs (use attach_output for that), hence we assert that
+   * rb_theta_expansion_in->n_outputs() == 0.
    */
   void attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
                                std::vector<ElemAssembly*> A_q_assembly_vector_in,
-                               std::vector<ElemAssembly*> F_q_assembly_vector_in,
-                               std::vector< std::vector<ElemAssembly*> > output_assembly_vector_in);
+                               std::vector<ElemAssembly*> F_q_assembly_vector_in);
 
   /**
    * Get a pointer to inner_product_matrix. Accessing via this
