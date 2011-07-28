@@ -136,6 +136,13 @@ class ExodusII_IO : public MeshInput<MeshBase>,
 		       const EquationSystems& es,
 		       const int timestep,
 		       const Real time);
+
+  /**
+   * Sets the list of variable names to be included in the output.
+   * This is _optional_.  If this is never called then all variables
+   * will be present.
+   */
+  void set_output_variables(const std::vector<std::string> & output_variables) { _output_variables = output_variables; }
   
  private:
   /**
@@ -156,6 +163,12 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * should we be verbose?
    */
   bool _verbose;
+
+  /**
+   * The names of the variables to be output.
+   * If this is empty then all variables are output.
+   */
+  std::vector<std::string> _output_variables;
 };
 
 

@@ -419,7 +419,15 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
   int num_vars = names.size();
   int num_nodes = mesh.n_nodes();
+
+  // The names of the variables to be output
+  std::vector<std::string> output_names;
   
+  if(_output_variables.size())
+    output_names = _output_variables;
+  else
+    output_names = names;
+
   // FIXME: Will we ever _not_ need to do this?
   // DRG: Yes... when writing multiple timesteps to the same file.
   if (!exio_helper->created())
@@ -430,18 +438,28 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
       exio_helper->write_elements(mesh);
       exio_helper->write_sidesets(mesh);
       exio_helper->write_nodesets(mesh);
-      exio_helper->initialize_nodal_variables(names);
+      exio_helper->initialize_nodal_variables(output_names);
     }
-    
+
+  // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
     {
+      int variable_name_position = 0;
+      for(; variable_name_position < output_names.size(); variable_name_position++)
+        if(output_names[variable_name_position] == names[c])
+          break;
+
+      // This means we didn't find it
+      if(variable_name_position >= output_names.size())
+        continue;
+      
       std::vector<Number> cur_soln(num_nodes);
 
       //Copy out this variable's solution
       for(int i=0; i<num_nodes; i++)
         cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
     
-      exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+      exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
     }  
 }
 
