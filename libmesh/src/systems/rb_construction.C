@@ -1264,8 +1264,7 @@ void RBConstruction::attach_output(RBTheta* theta_q_l,
 
 void RBConstruction::attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
                                              std::vector<ElemAssembly*> A_q_assembly_vector_in,
-                                             std::vector<ElemAssembly*> F_q_assembly_vector_in,
-                                             std::vector< std::vector<ElemAssembly*> > output_assembly_vector_in)
+                                             std::vector<ElemAssembly*> F_q_assembly_vector_in)
 {
   // Delete the exisitng rb_theta_expansion object
   delete rb_theta_expansion;
@@ -1277,16 +1276,12 @@ void RBConstruction::attach_affine_expansion(RBThetaExpansion& rb_theta_expansio
   // have consistent sizes
   libmesh_assert(rb_theta_expansion->get_Q_a() == A_q_assembly_vector_in.size());
   libmesh_assert(rb_theta_expansion->get_Q_f() == F_q_assembly_vector_in.size());
-  libmesh_assert(rb_theta_expansion->get_n_outputs() == output_assembly_vector_in.size());
-  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-  {
-    libmesh_assert(rb_theta_expansion->get_Q_l(n) == output_assembly_vector_in[n].size());
-  }
+  libmesh_assert(rb_theta_expansion->get_n_outputs() == 0);
   
   // Finally, set the assembly vectors
   A_q_assembly_vector = A_q_assembly_vector_in;
   F_q_assembly_vector = F_q_assembly_vector_in;
-  output_assembly_vector = output_assembly_vector_in;
+  output_assembly_vector.clear();
 }
 
 void RBConstruction::attach_inner_prod_assembly(ElemAssembly* IP_assembly_in)
