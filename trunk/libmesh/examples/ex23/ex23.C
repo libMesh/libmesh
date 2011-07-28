@@ -101,7 +101,7 @@ int main (int argc, char** argv)
 
   // We override RBConstruction with SimpleRBConstruction in order to
   // specialize a few functions for this particular problem.
-  SimpleRBConstruction & system =
+  SimpleRBConstruction & rb_con =
     equation_systems.add_system<SimpleRBConstruction> ("RBConvectionDiffusion");
 
 
@@ -133,61 +133,64 @@ int main (int argc, char** argv)
   OutputAssembly L2(0.2,0.3,0.2,0.3);
   OutputAssembly L3(0.7,0.8,0.2,0.3);
 
-  system.attach_dirichlet_dof_initialization(&dirichlet_assembly);
+  rb_con.attach_dirichlet_dof_initialization(&dirichlet_assembly);
   
   // Attach the expansion of the PDE operator.
-  system.attach_A_q(&theta_a_0, &A0_assembly);
-  system.attach_A_q(&theta_a_1, &A1_assembly);
-  system.attach_A_q(&theta_a_2, &A2_assembly);
+  rb_con.attach_A_q(&theta_a_0, &A0_assembly);
+  rb_con.attach_A_q(&theta_a_1, &A1_assembly);
+  rb_con.attach_A_q(&theta_a_2, &A2_assembly);
 
   // Attach the expansion of the RHS
-  system.attach_F_q(&rb_theta, &F0_assembly);
+  rb_con.attach_F_q(&rb_theta, &F0_assembly);
   
   // Attach output assembly
-  system.attach_output(&rb_theta, &L0);
-  system.attach_output(&rb_theta, &L1);
-  system.attach_output(&rb_theta, &L2);
-  system.attach_output(&rb_theta, &L3);
+  rb_con.attach_output(&rb_theta, &L0);
+  rb_con.attach_output(&rb_theta, &L1);
+  rb_con.attach_output(&rb_theta, &L2);
+  rb_con.attach_output(&rb_theta, &L3);
   
   // We reuse the operator A0 as the inner product matrix
-  system.attach_inner_prod_assembly(&A0_assembly);
+  rb_con.attach_inner_prod_assembly(&A0_assembly);
 
 
   // Read in the data that defines this problem from the specified text file
-  system.process_parameters_file(parameters_filename);
+  rb_con.process_parameters_file(parameters_filename);
   
-  // Print out info that describes the current setup of system
-  system.print_info();
+  // Print out info that describes the current setup of rb_con
+  rb_con.print_info();
 
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
-  AutoPtr<RBEvaluation> rb_eval = system.build_rb_evaluation();
+  AutoPtr<RBEvaluation> rb_eval = rb_con.build_rb_evaluation();
 
-  // We also need to initialize the RBEvaluation object. We will do
-  // this by copying details of the problem definiton over from system
-  // (this also sets system.rb_eval = rb_eval)
-  system.initialize_rb_eval(*rb_eval);
+  // Set rb_eval's RBThetaExpansion to be the same as the one we constructed
+  // for the RBConstruction object
+  rb_eval->rb_theta_expansion = rb_con.rb_theta_expansion;
+
+  // Finally, we need to give the RBConstruction object a pointer to
+  // our RBEvaluation object
+  rb_con.rb_eval = rb_eval.get();
 
   if(!online_mode) // Perform the Offline stage of the RB method
   {
-    // Prepare system for the Construction stage of the RB method.
+    // Prepare rb_con for the Construction stage of the RB method.
     // This sets up the necessary data structures and performs
     // initial assembly of the "truth" affine expansion of the PDE.
-    system.initialize_rb_construction();
+    rb_con.initialize_rb_construction();
 
     // Compute the reduced basis space by computing "snapshots", i.e.
     // "truth" solves, at well-chosen parameter values and employing
     // these snapshots as basis functions.
-    system.train_reduced_basis();
+    rb_con.train_reduced_basis();
     
     // Write out the data that will subsequently be required for the Evaluation stage
-    system.rb_eval->write_offline_data_to_files();
+    rb_con.rb_eval->write_offline_data_to_files();
     
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
-      system.rb_eval->write_out_basis_functions(system);
+      rb_con.rb_eval->write_out_basis_functions(rb_con);
     }
   }
   else // Perform the Online stage of the RB method
@@ -197,8 +200,8 @@ int main (int argc, char** argv)
     
     // Get the parameters at which we do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
-    std::vector<Real> online_mu_vector(system.get_n_params());
-    for(unsigned int i=0; i<system.get_n_params(); i++)
+    std::vector<Real> online_mu_vector(rb_con.get_n_params());
+    for(unsigned int i=0; i<rb_con.get_n_params(); i++)
     {
       online_mu_vector[i] = infile("online_mu", online_mu_vector[i], i);
     }
@@ -227,19 +230,15 @@ int main (int argc, char** argv)
     if(store_basis_functions)
     {
       // Read in the basis functions
-      rb_eval->read_in_basis_functions(system);
-
-      // Point system to rb_eval so that we can visualize the RB solution
-      // and RB basis functions on the finite element mesh.
-      system.rb_eval = rb_eval.get();
+      rb_eval->read_in_basis_functions(rb_con);
       
       // Plot the solution
-      system.load_rb_solution();
+      rb_con.load_rb_solution();
       ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
       
       // Plot the first basis function that was generated from the train_reduced_basis
       // call in the Offline stage
-      system.load_basis_function(0);
+      rb_con.load_basis_function(0);
       ExodusII_IO(mesh).write_equation_systems ("bf0.e",equation_systems);
     }
   }

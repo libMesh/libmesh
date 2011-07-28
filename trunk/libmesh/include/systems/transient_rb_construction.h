@@ -84,7 +84,8 @@ public:
    * projection error. Other calls to truth_solve generally do not
    * need to perform these projection calculations.
    */
-  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data");
+  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
+                                   const bool resize_rb_eval_data=true);
 
   /**
    * Read in the parameters from file and set up the system
@@ -101,12 +102,6 @@ public:
    * Build a new TransientRBEvaluation object.
    */
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();
-
-  /**
-   * Initialize \p rb_evaluation_in based on this system's setup.
-   * Here we override to also copy over TemporalDiscretization data.
-   */
-  virtual void initialize_rb_eval(RBEvaluation& rb_evaluation_in);
 
   /**
    * Function that indicates when to terminate the Greedy

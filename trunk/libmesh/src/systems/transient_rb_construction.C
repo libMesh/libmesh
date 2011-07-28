@@ -274,22 +274,12 @@ AutoPtr<RBEvaluation> TransientRBConstruction::build_rb_evaluation()
   return AutoPtr<RBEvaluation>(new TransientRBEvaluation);
 }
 
-void TransientRBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
-{
-  Parent::initialize_rb_eval(rb_evaluation_in);
-
-  // Cast rb_evaluation_in to a TransientRBEvaluation
-  TransientRBEvaluation& trans_rb_eval =
-    libmesh_cast_ref<TransientRBEvaluation&>(rb_evaluation_in);
-
-  // Use assignment operator to copy the temporal_discretization object
-  trans_rb_eval.temporal_discretization = temporal_discretization;
-}
-
-Real TransientRBConstruction::train_reduced_basis(const std::string& directory_name)
+Real TransientRBConstruction::train_reduced_basis(const std::string& directory_name,
+                                                  const bool resize_rb_eval_data)
 {
   compute_truth_projection_error = true;
-  Real value = Parent::train_reduced_basis(directory_name);
+  Real value = Parent::train_reduced_basis(directory_name,
+                                           resize_rb_eval_data);
   compute_truth_projection_error = false;
   
   return value;

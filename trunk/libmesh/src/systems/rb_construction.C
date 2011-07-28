@@ -258,21 +258,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   set_current_parameters(mu_min_vector);
 }
 
-void RBConstruction::initialize_rb_eval(RBEvaluation& rb_evaluation_in)
-{
-  // Copy parameter over
-  rb_evaluation_in.set_current_parameters( get_current_parameters() );
-
-  // Copy rb_theta_expansion pointer over to rb_eval
-  rb_evaluation_in.rb_theta_expansion = this->rb_theta_expansion;
-
-  // resize data structures according to Nmax
-  rb_evaluation_in.resize_data_structures(get_Nmax());
-  
-  // Finally, set the rb_eval pointer to rb_evaluation_in
-  this->rb_eval = &rb_evaluation_in;
-}
-
 void RBConstruction::print_info()
 {
   // Print out info that describes the current setup
@@ -1034,7 +1019,8 @@ void RBConstruction::assemble_all_output_vectors()
     }
 }
 
-Real RBConstruction::train_reduced_basis(const std::string& directory_name)
+Real RBConstruction::train_reduced_basis(const std::string& directory_name,
+                                         const bool resize_rb_eval_data)
 {
   START_LOG("train_reduced_basis()", "RBConstruction");
 
@@ -1042,6 +1028,12 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name)
   
   // We need to have a valid RBEvaluation object
   libmesh_assert( rb_eval );
+
+  // possibly resize data structures according to Nmax
+  if(resize_rb_eval_data)
+  {
+    rb_eval->resize_data_structures(get_Nmax());
+  }
 
   // Clear the Greedy param list
   for(unsigned int i=0; i<rb_eval->greedy_param_list.size(); i++)

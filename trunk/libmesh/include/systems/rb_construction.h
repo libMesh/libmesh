@@ -120,9 +120,15 @@ public:
    * at that parameter and enriching the reduced basis with the corresponding
    * snapshot.
    *
+   * \p resize_rb_eval_data is a boolean flag to indicate whether or not we
+   * call rb_eval->resize_data_structures(Nmax). True by default, by we may
+   * set it to false if, for example, we are continuing from a previous
+   * training run and don't want to clobber the existing rb_eval data.
+   *
    * @returns the final maximum a posteriori error bound on the training set.
    */
-  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data");
+  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
+                                   const bool resize_rb_eval_data=true);
 
   /**
    * (i) Compute the a posteriori error bound for each set of parameters
@@ -369,13 +375,6 @@ public:
    * @return an AutoPtr to the new RBEvaluation object.
    */
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();
-
-  /**
-   * Initialize the \p rb_evaluation_in based on the setup of this
-   * RBConstruction, i.e. copy over parameter domain and theta_q expansion.
-   * Also, set the system's rb_eval pointer to \p rb_evaluation.
-   */
-  virtual void initialize_rb_eval(RBEvaluation& rb_evaluation_in);
 
   /**
    * Get delta_N, the number of basis functions we
