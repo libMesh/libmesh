@@ -87,6 +87,24 @@ EXTERN_C_FOR_PETSC_END
 typedef PetscTruth PetscBool;
 #endif
 
+#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#  define LibMeshVecDestroy(x)         VecDestroy(*(x))
+#  define LibMeshVecScatterDestroy(x)  VecScatterDestroy(*(x))
+#  define LibMeshMatDestroy(x)         MatDestroy(*(x))
+#  define LibMeshISDestroy(x)          ISDestroy(*(x))
+#  define LibMeshKSPDestroy(x)         KSPDestroy(*(x))
+#  define LibMeshSNESDestroy(x)        SNESDestroy(*(x))
+#  define LibMeshPetscViewerDestroy(x) PetscViewerDestroy(*(x))
+#else
+#  define LibMeshVecDestroy(x)         VecDestroy(x)
+#  define LibMeshVecScatterDestroy(x)  VecScatterDestroy(x)
+#  define LibMeshMatDestroy(x)         MatDestroy(x)
+#  define LibMeshISDestroy(x)          ISDestroy(x)
+#  define LibMeshKSPDestroy(x)         KSPDestroy(x)
+#  define LibMeshSNESDestroy(x)        SNESDestroy(x)
+#  define LibMeshPetscViewerDestroy(x) PetscViewerDestroy(x)
+#endif
+
 #if PETSC_VERSION_LESS_THAN(2,2,1)
 // This version of PETSc always makes a copy. Current occurrences of PETSC_USE_POINTER are safe with the definition below.
 typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCopyMode;

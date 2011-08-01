@@ -229,7 +229,7 @@ void PetscNonlinearSolver<T>::clear ()
 
       int ierr=0;
 
-      ierr = SNESDestroy(_snes);
+      ierr = LibMeshSNESDestroy(&_snes);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 }

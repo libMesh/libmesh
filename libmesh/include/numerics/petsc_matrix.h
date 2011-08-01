@@ -325,7 +325,7 @@ public:
   /**
    * Returns the raw PETSc matrix context pointer.  Note this is generally
    * not required in user-level code. Just don't do anything crazy like
-   * calling MatDestroy()!
+   * calling LibMeshMatDestroy()!
    */
   Mat mat () { libmesh_assert (_mat != NULL); return _mat; }
 

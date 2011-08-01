@@ -102,14 +102,14 @@ void PetscLinearSolver<T>::clear ()
 	 be removed and the subset index set destroyed.  */
       if(_restrict_solve_to_is!=NULL)
 	{
-	  int ierr = ISDestroy(_restrict_solve_to_is);
+	  int ierr = LibMeshISDestroy(&_restrict_solve_to_is);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	  _restrict_solve_to_is = NULL;
 	}
       
       if(_restrict_solve_to_is_complement!=NULL)
 	{
-	  int ierr = ISDestroy(_restrict_solve_to_is_complement);
+	  int ierr = LibMeshISDestroy(&_restrict_solve_to_is_complement);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	  _restrict_solve_to_is_complement = NULL;
 	}
@@ -127,7 +127,7 @@ void PetscLinearSolver<T>::clear ()
 #else
 
   // 2.2.0 & newer style
-  ierr = KSPDestroy(_ksp);
+  ierr = LibMeshKSPDestroy(&_ksp);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #endif
@@ -633,11 +633,11 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 	  ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-	  ierr = VecScatterDestroy(scatter1);
+	  ierr = LibMeshVecScatterDestroy(&scatter1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = VecDestroy(subvec1);
+	  ierr = LibMeshVecDestroy(&subvec1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = MatDestroy(submat1);
+	  ierr = LibMeshMatDestroy(&submat1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
 
@@ -711,7 +711,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
       ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      ierr = VecScatterDestroy(scatter);
+      ierr = LibMeshVecScatterDestroy(&scatter);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       if(this->_preconditioner)
@@ -723,13 +723,13 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 	  subprecond_matrix = NULL;
 	}
 
-      ierr = VecDestroy(subsolution);
+      ierr = LibMeshVecDestroy(&subsolution);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecDestroy(subrhs);
+      ierr = LibMeshVecDestroy(&subrhs);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = MatDestroy(submat);
+      ierr = LibMeshMatDestroy(&submat);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = MatDestroy(subprecond);
+      ierr = LibMeshMatDestroy(&subprecond);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
@@ -965,11 +965,11 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 	  ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-	  ierr = VecScatterDestroy(scatter1);
+	  ierr = LibMeshVecScatterDestroy(&scatter1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = VecDestroy(subvec1);
+	  ierr = LibMeshVecDestroy(&subvec1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = MatDestroy(submat1);
+	  ierr = LibMeshMatDestroy(&submat1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
 
@@ -1043,7 +1043,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
       ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      ierr = VecScatterDestroy(scatter);
+      ierr = LibMeshVecScatterDestroy(&scatter);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       if(this->_preconditioner)
@@ -1055,13 +1055,13 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 	  subprecond_matrix = NULL;
 	}
 
-      ierr = VecDestroy(subsolution);
+      ierr = LibMeshVecDestroy(&subsolution);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecDestroy(subrhs);
+      ierr = LibMeshVecDestroy(&subrhs);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = MatDestroy(submat);
+      ierr = LibMeshMatDestroy(&submat);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = MatDestroy(subprecond);
+      ierr = LibMeshMatDestroy(&subprecond);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
@@ -1254,11 +1254,11 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	  ierr = VecAXPY(subrhs,1.0,subvec2);
 
-	  ierr = VecScatterDestroy(scatter1);
+	  ierr = LibMeshVecScatterDestroy(&scatter1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = VecDestroy(subvec1);
+	  ierr = LibMeshVecDestroy(&subvec1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = MatDestroy(submat1);
+	  ierr = LibMeshMatDestroy(&submat1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
 
@@ -1323,19 +1323,19 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
       ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      ierr = VecScatterDestroy(scatter);
+      ierr = LibMeshVecScatterDestroy(&scatter);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      ierr = VecDestroy(subsolution);
+      ierr = LibMeshVecDestroy(&subsolution);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecDestroy(subrhs);
+      ierr = LibMeshVecDestroy(&subrhs);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = MatDestroy(submat);
+      ierr = LibMeshMatDestroy(&submat);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
   // Destroy the matrix.
-  ierr = MatDestroy(mat);
+  ierr = LibMeshMatDestroy(&mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
   STOP_LOG("solve()", "PetscLinearSolver");
@@ -1537,11 +1537,11 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	  ierr = VecAXPY(subrhs,1.0,subvec2);
 	  
-	  ierr = VecScatterDestroy(scatter1);
+	  ierr = LibMeshVecScatterDestroy(&scatter1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = VecDestroy(subvec1);
+	  ierr = LibMeshVecDestroy(&subvec1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = MatDestroy(submat1);
+	  ierr = LibMeshMatDestroy(&submat1);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
 
@@ -1615,7 +1615,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
       ierr = VecScatterEnd(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      ierr = VecScatterDestroy(scatter);
+      ierr = LibMeshVecScatterDestroy(&scatter);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       if(this->_preconditioner)
@@ -1627,18 +1627,18 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	  subprecond_matrix = NULL;
 	}
 
-      ierr = VecDestroy(subsolution);
+      ierr = LibMeshVecDestroy(&subsolution);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecDestroy(subrhs);
+      ierr = LibMeshVecDestroy(&subrhs);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = MatDestroy(submat);
+      ierr = LibMeshMatDestroy(&submat);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = MatDestroy(subprecond);
+      ierr = LibMeshMatDestroy(&subprecond);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
   // Destroy the matrix.
-  ierr = MatDestroy(mat);
+  ierr = LibMeshMatDestroy(&mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	 
   STOP_LOG("solve()", "PetscLinearSolver");

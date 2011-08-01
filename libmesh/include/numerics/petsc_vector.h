@@ -500,7 +500,7 @@ public:
   /**
    * Returns the raw PETSc vector context pointer.  Note this is generally
    * not required in user-level code. Just don't do anything crazy like
-   * calling VecDestroy()!
+   * calling LibMeshVecDestroy()!
    */
   Vec vec () { libmesh_assert (_vec != NULL); return _vec; }
 
@@ -931,7 +931,7 @@ void PetscVector<T>::clear ()
     {
       int ierr=0;
 
-      ierr = VecDestroy(_vec);
+      ierr = LibMeshVecDestroy(&_vec);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 
