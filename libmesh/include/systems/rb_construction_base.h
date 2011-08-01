@@ -116,11 +116,6 @@ public:
   bool valid_params(const std::vector<Real>& params);
 
   /**
-   * Build a new RBThetaExpansion object and return an AutoPtr to it.
-   */
-  virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion();
-
-  /**
    * Get the total number of training samples.
    */
   unsigned int get_n_training_samples() const

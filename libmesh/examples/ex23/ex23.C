@@ -34,8 +34,12 @@
 #include "o_string_stream.h"
 #include "elem.h"
 
+// local includes
 #include "simple_rb.h"
 #include "assembly.h"
+
+// rbOOmit includes
+#include "rb_assembly_expansion.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -115,62 +119,72 @@ int main (int argc, char** argv)
   // Now that the libMesh data structures have been initialized
   // in equation_systems.init(), we can set up the Reduced Basis system.
 
-  // Construct a default RBTheta object, evaluate() returns 1.
-  RBTheta rb_theta;
+  // Construct the RBTheta objects
+  ThetaA0 theta_a_0;
+  ThetaA1 theta_a_1;
+  ThetaA2 theta_a_2;
+  RBTheta rb_theta; // Default RBTheta object, just returns 1.
+  // And build the RBThetaExpansion object
+  RBThetaExpansion rb_theta_expansion;
+  rb_theta_expansion.attach_theta_q_a(&theta_a_0);   // Attach the lhs theta
+  rb_theta_expansion.attach_theta_q_a(&theta_a_1);
+  rb_theta_expansion.attach_theta_q_a(&theta_a_2);
+  rb_theta_expansion.attach_theta_q_f(&rb_theta);    // Attach the rhs theta
+  rb_theta_expansion.attach_output_theta(&rb_theta); // Attach output 0 theta
+  rb_theta_expansion.attach_output_theta(&rb_theta); // Attach output 1 theta
+  rb_theta_expansion.attach_output_theta(&rb_theta); // Attach output 2 theta
+  rb_theta_expansion.attach_output_theta(&rb_theta); // Attach output 3 theta
 
-  // Construct the assembly functors
-  Ex23DirichletDofAssembly dirichlet_assembly;
-  ThetaA0 theta_a_0; A0 A0_assembly;
-  ThetaA1 theta_a_1; A1 A1_assembly;
-  ThetaA2 theta_a_2; A2 A2_assembly;
+  // Construct the ElemAssembly objects
+  A0 A0_assembly;
+  A1 A1_assembly;
+  A2 A2_assembly;
   F0 F0_assembly;
-
-  // Define a set of output assembly functions. Each output
-  // evaluates the solution average over a region defined by
-  // the arguments to the OutputAssembly constructor
   OutputAssembly L0(0.7,0.8,0.7,0.8);
   OutputAssembly L1(0.2,0.3,0.7,0.8);
   OutputAssembly L2(0.2,0.3,0.2,0.3);
   OutputAssembly L3(0.7,0.8,0.2,0.3);
+  // And build the RBAssemblyExpansion object
+  RBAssemblyExpansion rb_assembly_expansion;
+  rb_assembly_expansion.attach_A_q_assembly(&A0_assembly); // Attach the lhs assembly
+  rb_assembly_expansion.attach_A_q_assembly(&A1_assembly);
+  rb_assembly_expansion.attach_A_q_assembly(&A2_assembly);
+  rb_assembly_expansion.attach_F_q_assembly(&F0_assembly); // Attach the rhs assembly
+  rb_assembly_expansion.attach_output_assembly(&L0);       // Attach output 0 assembly
+  rb_assembly_expansion.attach_output_assembly(&L1);       // Attach output 1 assembly
+  rb_assembly_expansion.attach_output_assembly(&L2);       // Attach output 2 assembly
+  rb_assembly_expansion.attach_output_assembly(&L3);       // Attach output 3 assembly
 
+  // Attach rb_theta_expansion and rb_assembly_expansion to rb_con
+  // This also checks that the expansion objects are sized consistently
+  rb_con.attach_affine_expansion(rb_theta_expansion, rb_assembly_expansion);
+
+  // Attach the object that determines the Dirichlet boundary conditions for the PDE
+  Ex23DirichletDofAssembly dirichlet_assembly;
   rb_con.attach_dirichlet_dof_initialization(&dirichlet_assembly);
-  
-  // Attach the expansion of the PDE operator.
-  rb_con.attach_A_q(&theta_a_0, &A0_assembly);
-  rb_con.attach_A_q(&theta_a_1, &A1_assembly);
-  rb_con.attach_A_q(&theta_a_2, &A2_assembly);
 
-  // Attach the expansion of the RHS
-  rb_con.attach_F_q(&rb_theta, &F0_assembly);
-  
-  // Attach output assembly
-  rb_con.attach_output(&rb_theta, &L0);
-  rb_con.attach_output(&rb_theta, &L1);
-  rb_con.attach_output(&rb_theta, &L2);
-  rb_con.attach_output(&rb_theta, &L3);
-  
   // We reuse the operator A0 as the inner product matrix
   rb_con.attach_inner_prod_assembly(&A0_assembly);
-
-
-  // Read in the data that defines this problem from the specified text file
-  rb_con.process_parameters_file(parameters_filename);
-  
-  // Print out info that describes the current setup of rb_con
-  rb_con.print_info();
 
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
-  AutoPtr<RBEvaluation> rb_eval = rb_con.build_rb_evaluation();
+  SimpleRBEvaluation rb_eval;
 
-  // Set rb_eval's RBThetaExpansion to be the same as the one we constructed
-  // for the RBConstruction object
-  rb_eval->rb_theta_expansion = rb_con.rb_theta_expansion;
+  // Set rb_eval's rb_theta_expansion
+  rb_eval.rb_theta_expansion = &rb_theta_expansion;
 
   // Finally, we need to give the RBConstruction object a pointer to
   // our RBEvaluation object
-  rb_con.rb_eval = rb_eval.get();
+  rb_con.rb_eval = &rb_eval;
+
+  // Read in the data that defines this problem from the specified text file
+  rb_con.process_parameters_file(parameters_filename);
+
+  // Print out info that describes the current setup of rb_con
+  rb_con.print_info();
+
+
 
   if(!online_mode) // Perform the Offline stage of the RB method
   {
@@ -196,7 +210,7 @@ int main (int argc, char** argv)
   else // Perform the Online stage of the RB method
   {
     // Read in the reduced basis data
-    rb_eval->read_offline_data_from_files();
+    rb_eval.read_offline_data_from_files();
     
     // Get the parameters at which we do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
@@ -207,30 +221,30 @@ int main (int argc, char** argv)
     }
 
     // Set the parameters to online_mu_vector
-    rb_eval->set_current_parameters(online_mu_vector);
-    rb_eval->print_current_parameters();
+    rb_eval.set_current_parameters(online_mu_vector);
+    rb_eval.print_current_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
-    rb_eval->rb_solve(online_N);
+    rb_eval.rb_solve(online_N);
 
     // Print out outputs as well as the corresponding output error bounds.
-    std::cout << "output 1, value = " << rb_eval->RB_outputs[0]
-              << ", bound = " << rb_eval->RB_output_error_bounds[0]
+    std::cout << "output 1, value = " << rb_eval.RB_outputs[0]
+              << ", bound = " << rb_eval.RB_output_error_bounds[0]
               << std::endl;
-    std::cout << "output 2, value = " << rb_eval->RB_outputs[1]
-              << ", bound = " << rb_eval->RB_output_error_bounds[1]
+    std::cout << "output 2, value = " << rb_eval.RB_outputs[1]
+              << ", bound = " << rb_eval.RB_output_error_bounds[1]
               << std::endl;
-    std::cout << "output 3, value = " << rb_eval->RB_outputs[2]
-              << ", bound = " << rb_eval->RB_output_error_bounds[2]
+    std::cout << "output 3, value = " << rb_eval.RB_outputs[2]
+              << ", bound = " << rb_eval.RB_output_error_bounds[2]
               << std::endl;
-    std::cout << "output 4, value = " << rb_eval->RB_outputs[3]
-              << ", bound = " << rb_eval->RB_output_error_bounds[3]
+    std::cout << "output 4, value = " << rb_eval.RB_outputs[3]
+              << ", bound = " << rb_eval.RB_output_error_bounds[3]
               << std::endl << std::endl;
 
     if(store_basis_functions)
     {
       // Read in the basis functions
-      rb_eval->read_in_basis_functions(rb_con);
+      rb_eval.read_in_basis_functions(rb_con);
       
       // Plot the solution
       rb_con.load_rb_solution();

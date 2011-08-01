@@ -17,6 +17,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// rbOOmit includes
+#include "rb_construction.h"
+#include "rb_assembly_expansion.h"
+
 // LibMesh includes
 #include "numeric_vector.h"
 #include "sparse_matrix.h"
@@ -31,9 +35,7 @@
 #include "xdr_cxx.h"
 #include "timestamp.h"
 #include "petsc_linear_solver.h"
-
 #include "fem_context.h"
-#include "rb_construction.h"
 
 // For creating a directory
 #include <sys/types.h>
@@ -76,12 +78,6 @@ RBConstruction::RBConstruction (EquationSystems& es,
     training_tolerance(-1.),
     _dirichlet_list_init(NULL)
 {
-  // Clear the theta and assembly vectors so that we can push_back
-  A_q_assembly_vector.clear();
-  F_q_assembly_vector.clear();
-
-  output_assembly_vector.clear();
-
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
   assemble_before_solve = false;
@@ -267,12 +263,19 @@ void RBConstruction::print_info()
   libMesh::out << "Nmax: " << Nmax << std::endl;
   if(training_tolerance > 0.)
     libMesh::out << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
-  libMesh::out << "A_q operators attached: " << rb_theta_expansion->get_Q_a() << std::endl;
-  libMesh::out << "F_q functions attached: " << rb_theta_expansion->get_Q_f() << std::endl;
-  libMesh::out << "n_outputs: " << rb_theta_expansion->get_n_outputs() << std::endl;
-  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-    libMesh::out << "output " << n << ", Q_l = " << rb_theta_expansion->get_Q_l(n) << std::endl;
-  libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
+  if(rb_theta_expansion)
+  {
+    libMesh::out << "A_q operators attached: " << rb_theta_expansion->get_Q_a() << std::endl;
+    libMesh::out << "F_q functions attached: " << rb_theta_expansion->get_Q_f() << std::endl;
+    libMesh::out << "n_outputs: " << rb_theta_expansion->get_n_outputs() << std::endl;
+    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+      libMesh::out << "output " << n << ", Q_l = " << rb_theta_expansion->get_Q_l(n) << std::endl;
+    libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
+  }
+  else
+  {
+    libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
+  }
   for(unsigned int i=0; i<get_n_params(); i++)
   {
     libMesh::out <<   "Parameter " << i
@@ -416,11 +419,6 @@ void RBConstruction::allocate_data_structures()
 
   // Resize truth_outputs vector
   truth_outputs.resize(this->rb_theta_expansion->get_n_outputs());
-}
-
-AutoPtr<RBEvaluation> RBConstruction::build_rb_evaluation()
-{
-  return AutoPtr<RBEvaluation>(new RBEvaluation);
 }
 
 void RBConstruction::attach_dirichlet_dof_initialization (DirichletDofAssembly* dirichlet_init)
@@ -747,14 +745,14 @@ void RBConstruction::truth_assembly()
       {
         Aq_context[q_a]->pre_fe_reinit(*this, *el);
         Aq_context[q_a]->elem_fe_reinit();
-        A_q_assembly_vector[q_a]->interior_assembly(*Aq_context[q_a]);
+        rb_assembly_expansion->A_q_assembly_vector[q_a]->interior_assembly(*Aq_context[q_a]);
       }
 
       for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
       {
         Fq_context[q_f]->pre_fe_reinit(*this, *el);
         Fq_context[q_f]->elem_fe_reinit();
-        F_q_assembly_vector[q_f]->interior_assembly(*Fq_context[q_f]);
+        rb_assembly_expansion->F_q_assembly_vector[q_f]->interior_assembly(*Fq_context[q_f]);
       }
 
       for (Aq_context[0]->side = 0;
@@ -772,7 +770,7 @@ void RBConstruction::truth_assembly()
           Aq_context[q_a]->side = Aq_context[0]->side;
 
           Aq_context[q_a]->side_fe_reinit();
-          A_q_assembly_vector[q_a]->boundary_assembly(*Aq_context[q_a]);
+          rb_assembly_expansion->A_q_assembly_vector[q_a]->boundary_assembly(*Aq_context[q_a]);
         }
 
         // Impose boundary terms, e.g. Neuman BCs
@@ -782,7 +780,7 @@ void RBConstruction::truth_assembly()
           Fq_context[q_f]->side = Aq_context[0]->side;
 
           Fq_context[q_f]->side_fe_reinit();
-          F_q_assembly_vector[q_f]->boundary_assembly(*Fq_context[q_f]);
+          rb_assembly_expansion->F_q_assembly_vector[q_f]->boundary_assembly(*Fq_context[q_f]);
         }
       }
 
@@ -899,7 +897,7 @@ void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* in
   input_matrix->zero();
 
   add_scaled_matrix_and_vector(1.,
-                               A_q_assembly_vector[q],
+                               rb_assembly_expansion->A_q_assembly_vector[q],
                                input_matrix,
                                NULL,
                                false, /* symmetrize */
@@ -925,7 +923,7 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
   else
   {
     add_scaled_matrix_and_vector(scalar,
-                                 A_q_assembly_vector[q_a],
+                                 rb_assembly_expansion->A_q_assembly_vector[q_a],
                                  input_matrix,
                                  NULL,
                                  symmetrize);
@@ -1000,7 +998,7 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
   input_vector->zero();
     
   add_scaled_matrix_and_vector(1.,
-                               F_q_assembly_vector[q],
+                               rb_assembly_expansion->F_q_assembly_vector[q],
                                NULL,
                                input_vector,
                                false,             /* symmetrize */
@@ -1013,7 +1011,7 @@ void RBConstruction::assemble_all_output_vectors()
     for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
     {
       get_output_vector(n, q_l)->zero();
-      add_scaled_matrix_and_vector(1., output_assembly_vector[n][q_l],
+      add_scaled_matrix_and_vector(1., rb_assembly_expansion->output_assembly_vector[n][q_l],
                                        NULL,
                                        get_output_vector(n,q_l));
     }
@@ -1214,66 +1212,22 @@ void RBConstruction::set_Nmax(unsigned int Nmax_in)
   this->Nmax = Nmax_in;
 }
 
-void RBConstruction::attach_A_q(RBTheta* theta_q_a,
-                                ElemAssembly* A_q_assembly)
-{
-  rb_theta_expansion->attach_theta_q_a(theta_q_a);
-  A_q_assembly_vector.push_back(A_q_assembly);
-}
-
-void RBConstruction::attach_F_q(RBTheta* theta_q_f,
-                                ElemAssembly* F_q_assembly)
-{
-  rb_theta_expansion->attach_theta_q_f(theta_q_f);
-  F_q_assembly_vector.push_back(F_q_assembly);
-}
-
-void RBConstruction::attach_output(std::vector<RBTheta*> theta_q_l,
-                                   std::vector<ElemAssembly*> output_assembly)
-{
-  // Make sure the input vectors are all the same size!
-  if( theta_q_l.size() == output_assembly.size() )
-  {
-    rb_theta_expansion->attach_output_theta(theta_q_l);
-    output_assembly_vector.push_back(output_assembly);
-  }
-  else
-  {
-    libMesh::out << "Error: The input vectors in attach_output must be the same size in attach_output"
-                 << std::endl;
-    libmesh_error();
-  }
-}
-
-void RBConstruction::attach_output(RBTheta* theta_q_l,
-                                   ElemAssembly* output_assembly)
-{
-  std::vector<RBTheta*> theta_l_vector(1); theta_l_vector[0] = theta_q_l;
-  std::vector<ElemAssembly*> L_vector(1); L_vector[0] = output_assembly;
-
-  attach_output(theta_l_vector, L_vector);
-}
-
 void RBConstruction::attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
-                                             std::vector<ElemAssembly*> A_q_assembly_vector_in,
-                                             std::vector<ElemAssembly*> F_q_assembly_vector_in)
+                                             RBAssemblyExpansion& rb_assembly_expansion_in)
 {
-  // Delete the exisitng rb_theta_expansion object
-  delete rb_theta_expansion;
-  
-  // and set it to rb_theta_expansion_in
-  rb_theta_expansion = &rb_theta_expansion_in;
-  
-  // Check that the assembly vectors and the rb_theta_expansion
-  // have consistent sizes
-  libmesh_assert(rb_theta_expansion->get_Q_a() == A_q_assembly_vector_in.size());
-  libmesh_assert(rb_theta_expansion->get_Q_f() == F_q_assembly_vector_in.size());
-  libmesh_assert(rb_theta_expansion->get_n_outputs() == 0);
-  
-  // Finally, set the assembly vectors
-  A_q_assembly_vector = A_q_assembly_vector_in;
-  F_q_assembly_vector = F_q_assembly_vector_in;
-  output_assembly_vector.clear();
+  // Check that the theta and assembly objects are consistently sized
+  libmesh_assert(rb_theta_expansion_in.get_Q_a() == rb_assembly_expansion_in.A_q_assembly_vector.size());
+  libmesh_assert(rb_theta_expansion_in.get_Q_f() == rb_assembly_expansion_in.F_q_assembly_vector.size());
+  libmesh_assert(rb_theta_expansion_in.get_n_outputs() == rb_assembly_expansion_in.output_assembly_vector.size());
+  for(unsigned int i=0; i<rb_theta_expansion_in.get_n_outputs(); i++)
+  {
+    libmesh_assert(rb_theta_expansion_in.get_Q_l(i) ==
+                   rb_assembly_expansion_in.output_assembly_vector[i].size());
+  }
+
+  // set the affine expansion objects
+  rb_theta_expansion    = &rb_theta_expansion_in;
+  rb_assembly_expansion = &rb_assembly_expansion_in;
 }
 
 void RBConstruction::attach_inner_prod_assembly(ElemAssembly* IP_assembly_in)
@@ -1606,7 +1560,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
       else
       {
         assemble_scaled_matvec(1.,
-                               A_q_assembly_vector[q_a],
+                               rb_assembly_expansion->A_q_assembly_vector[q_a],
                                *rhs,
                                rb_eval->get_basis_function(i));
       }

@@ -17,8 +17,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// LibMesh includes
+// rbOOmit includes
+#include "transient_rb_construction.h"
+#include "transient_rb_evaluation.h"
+#include "transient_rb_theta_expansion.h"
+#include "transient_rb_assembly_expansion.h"
 
+// LibMesh includes
 #include "numeric_vector.h"
 #include "sparse_matrix.h"
 #include "dof_map.h"
@@ -33,9 +38,6 @@
 #include "xdr_cxx.h"
 #include "timestamp.h"
 #include "parallel.h"
-#include "transient_rb_construction.h"
-#include "transient_rb_evaluation.h"
-#include "transient_rb_theta_expansion.h"
 
 // For checking for the existence of files
 #include <sys/stat.h>
@@ -70,9 +72,6 @@ TransientRBConstruction::TransientRBConstruction (EquationSystems& es,
   compute_RB_inner_product = true;
 
   temporal_data.resize(0);
-  
-  // Clear assembly vector so that we can push_back
-  M_q_assembly_vector.clear();
 }
 
 
@@ -144,12 +143,19 @@ void TransientRBConstruction::print_info()
 {
   Parent::print_info();
 
-  // Print out info that describes the current setup
-  TransientRBThetaExpansion& trans_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
-
   libMesh::out << std::endl << "TransientRBConstruction parameters:" << std::endl;
-  libMesh::out << "Q_m: " << trans_theta_expansion.get_Q_m() << std::endl;
+
+  if(rb_theta_expansion)
+  {
+    // Print out info that describes the current setup
+    TransientRBThetaExpansion& trans_theta_expansion =
+      libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+    libMesh::out << "Q_m: " << trans_theta_expansion.get_Q_m() << std::endl;
+  }
+  else
+  {
+    libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
+  }
   libMesh::out << "Number of time-steps: " << temporal_discretization.get_n_time_steps() << std::endl;
   libMesh::out << "dt: " << temporal_discretization.get_delta_t() << std::endl;
   libMesh::out << "euler_theta (time discretization parameter): " << temporal_discretization.get_euler_theta() << std::endl;
@@ -264,16 +270,6 @@ void TransientRBConstruction::assemble_affine_expansion()
   }
 }
 
-AutoPtr<RBThetaExpansion> TransientRBConstruction::build_rb_theta_expansion()
-{
-  return AutoPtr<RBThetaExpansion>(new TransientRBThetaExpansion);
-}
-
-AutoPtr<RBEvaluation> TransientRBConstruction::build_rb_evaluation()
-{
-  return AutoPtr<RBEvaluation>(new TransientRBEvaluation);
-}
-
 Real TransientRBConstruction::train_reduced_basis(const std::string& directory_name,
                                                   const bool resize_rb_eval_data)
 {
@@ -324,6 +320,10 @@ void TransientRBConstruction::add_scaled_mass_matrix(Number scalar, SparseMatrix
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+
+  TransientRBAssemblyExpansion& trans_assembly_expansion =
+    libmesh_cast_ref<TransientRBAssemblyExpansion&>(*rb_assembly_expansion);
+
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
 
   if(!single_matrix_mode)
@@ -335,7 +335,7 @@ void TransientRBConstruction::add_scaled_mass_matrix(Number scalar, SparseMatrix
   {
     for(unsigned int q=0; q<Q_m; q++)
       add_scaled_matrix_and_vector(scalar * trans_theta_expansion.eval_theta_q_m(q,mu),
-                                   M_q_assembly_vector[q],
+                                   trans_assembly_expansion.M_q_assembly_vector[q],
                                    input_matrix,
                                    NULL);
   }
@@ -353,6 +353,10 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+
+  TransientRBAssemblyExpansion& trans_assembly_expansion =
+    libmesh_cast_ref<TransientRBAssemblyExpansion&>(*rb_assembly_expansion);
+
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
 
   AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build();
@@ -367,7 +371,7 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
     else
     {
       assemble_scaled_matvec(1.,
-                             M_q_assembly_vector[q],
+                             trans_assembly_expansion.M_q_assembly_vector[q],
                              *temp_vec,
                              arg);
     }
@@ -388,6 +392,10 @@ void TransientRBConstruction::truth_assembly()
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+
+  TransientRBAssemblyExpansion& trans_assembly_expansion =
+    libmesh_cast_ref<TransientRBAssemblyExpansion&>(*rb_assembly_expansion);
+
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
@@ -469,7 +477,7 @@ void TransientRBConstruction::truth_assembly()
       {
         Mq_context[q_m]->pre_fe_reinit(*this, *el);
         Mq_context[q_m]->elem_fe_reinit();
-        M_q_assembly_vector[q_m]->interior_assembly(*Mq_context[q_m]);
+        trans_assembly_expansion.M_q_assembly_vector[q_m]->interior_assembly(*Mq_context[q_m]);
         // Now overwrite the local matrix with a matrix multiplication
         Mq_context[q_m]->elem_jacobian.vector_mult(Mq_context[q_m]->elem_residual, Mq_context[q_m]->elem_solution);
       }
@@ -478,7 +486,7 @@ void TransientRBConstruction::truth_assembly()
       {
         Aq_context[q_a]->pre_fe_reinit(*this, *el);
         Aq_context[q_a]->elem_fe_reinit();
-        A_q_assembly_vector[q_a]->interior_assembly(*Aq_context[q_a]);
+        rb_assembly_expansion->A_q_assembly_vector[q_a]->interior_assembly(*Aq_context[q_a]);
         // Now overwrite the local matrix with a matrix multiplication
         Aq_context[q_a]->elem_jacobian.vector_mult(Aq_context[q_a]->elem_residual, Aq_context[q_a]->elem_solution);
       }
@@ -487,7 +495,7 @@ void TransientRBConstruction::truth_assembly()
       {
         Fq_context[q_f]->pre_fe_reinit(*this, *el);
         Fq_context[q_f]->elem_fe_reinit();
-        F_q_assembly_vector[q_f]->interior_assembly(*Fq_context[q_f]);
+        rb_assembly_expansion->F_q_assembly_vector[q_f]->interior_assembly(*Fq_context[q_f]);
       }
 
       for (Aq_context[0]->side = 0;
@@ -503,7 +511,7 @@ void TransientRBConstruction::truth_assembly()
           Mq_context[q_m]->side = Mq_context[0]->side;
 
           Mq_context[q_m]->side_fe_reinit();
-          M_q_assembly_vector[q_m]->boundary_assembly(*Mq_context[q_m]);
+          trans_assembly_expansion.M_q_assembly_vector[q_m]->boundary_assembly(*Mq_context[q_m]);
         }
 
         for(unsigned int q_a=0; q_a<Q_a; q_a++)
@@ -511,7 +519,7 @@ void TransientRBConstruction::truth_assembly()
           Aq_context[q_a]->side = Aq_context[0]->side;
 
           Aq_context[q_a]->side_fe_reinit();
-          A_q_assembly_vector[q_a]->boundary_assembly(*Aq_context[q_a]);
+          rb_assembly_expansion->A_q_assembly_vector[q_a]->boundary_assembly(*Aq_context[q_a]);
         }
 
         // Impose boundary terms, e.g. Neuman BCs
@@ -521,7 +529,7 @@ void TransientRBConstruction::truth_assembly()
           Fq_context[q_f]->side = Aq_context[0]->side;
 
           Fq_context[q_f]->side_fe_reinit();
-          F_q_assembly_vector[q_f]->boundary_assembly(*Fq_context[q_f]);
+          rb_assembly_expansion->F_q_assembly_vector[q_f]->boundary_assembly(*Fq_context[q_f]);
         }
       }
 
@@ -639,20 +647,29 @@ void TransientRBConstruction::attach_L2_assembly(ElemAssembly* L2_assembly_in)
   L2_assembly = L2_assembly_in;
 }
 
-void TransientRBConstruction::attach_M_q(RBTheta* theta_q_m,
-                                         ElemAssembly* M_q_assembly)
+void TransientRBConstruction::attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
+                                                      RBAssemblyExpansion& rb_assembly_expansion_in)
 {
-  TransientRBThetaExpansion& transient_rb_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+  // Check that the theta and assembly objects are consistently sized
+  TransientRBThetaExpansion& trans_theta_expansion_in =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(rb_theta_expansion_in);
 
-  transient_rb_theta_expansion.attach_theta_q_m(theta_q_m);
-  M_q_assembly_vector.push_back(M_q_assembly);
+  TransientRBAssemblyExpansion& trans_assembly_expansion_in =
+    libmesh_cast_ref<TransientRBAssemblyExpansion&>(rb_assembly_expansion_in);
+
+  libmesh_assert(trans_theta_expansion_in.get_Q_m() == trans_assembly_expansion_in.M_q_assembly_vector.size());
+
+  // set the affine expansion objects
+  Parent::attach_affine_expansion(rb_theta_expansion_in, rb_assembly_expansion_in);
 }
 
 void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix)
 {
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+
+  TransientRBAssemblyExpansion& trans_assembly_expansion =
+    libmesh_cast_ref<TransientRBAssemblyExpansion&>(*rb_assembly_expansion);
 
   if(q >= trans_theta_expansion.get_Q_m())
   {
@@ -662,7 +679,7 @@ void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Nu
   }
 
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., M_q_assembly_vector[q], input_matrix, NULL);
+  add_scaled_matrix_and_vector(1., trans_assembly_expansion.M_q_assembly_vector[q], input_matrix, NULL);
 }
 
 void TransientRBConstruction::assemble_all_affine_operators()
@@ -1306,6 +1323,10 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+
+  TransientRBAssemblyExpansion& trans_assembly_expansion =
+    libmesh_cast_ref<TransientRBAssemblyExpansion&>(*rb_assembly_expansion);
+
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
@@ -1356,7 +1377,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
       else
       {
         assemble_scaled_matvec(1.,
-                               M_q_assembly_vector[q_m],
+                               trans_assembly_expansion.M_q_assembly_vector[q_m],
                                *rhs,
                                rb_eval->get_basis_function(i));
       }

@@ -34,6 +34,8 @@
 namespace libMesh
 {
 
+class RBAssemblyExpansion;
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -195,20 +197,6 @@ public:
   void initialize_dirichlet_dofs();
 
   /**
-   * Attach parameter-dependent function and user-defined assembly routine
-   * for affine operator (both interior and boundary assembly).
-   */
-  virtual void attach_A_q(RBTheta* theta_q_a,
-                          ElemAssembly* A_q_assembly);
-
-  /**
-   * Attach parameter-dependent function and user-defined assembly routine
-   * for affine vector. (Interior assembly and boundary assembly).
-   */
-  virtual void attach_F_q(RBTheta* theta_q_f,
-                          ElemAssembly* F_q_assembly);
-
-  /**
    * Attach user-defined assembly routine
    * for the inner-product matrix.
    */
@@ -221,32 +209,13 @@ public:
   void attach_constraint_assembly(ElemAssembly* constraint_assembly_in);
 
   /**
-   * Attach user-defined assembly routine for output. 
-   * (Interior assembly and boundary assembly).
-   * In this case we pass in vector arguments to allow for Q_l > 1.
+   * Attach the affine expansion associated with this system.
+   * The affine expansion is defined by the set of parameter-dependent
+   * functions (defined in \p rb_theta_expansion_in) and parameter-independent
+   * operators (defined in \p rb_assembly_expansion_in).
    */
-  virtual void attach_output(std::vector<RBTheta*> theta_q_l,
-                             std::vector<ElemAssembly*> output_assembly);
-
-  /**
-   * Attach user-defined assembly routine for output. 
-   * (Interior assembly and boundary assembly).
-   * This function provides simpler syntax in the case that Q_l = 1; we
-   * do not need to use a vector in this case.
-   */
-  virtual void attach_output(RBTheta* theta_q_l,
-                             ElemAssembly* output_assembly);
-
-  /**
-   * Attach the full affine expansion associated with this system.
-   * We assert that the assembly vectors have sizes consistent
-   * with \p rb_theta_expansion_in. Also, this is not used for attaching
-   * outputs (use attach_output for that), hence we assert that
-   * rb_theta_expansion_in->n_outputs() == 0.
-   */
-  void attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
-                               std::vector<ElemAssembly*> A_q_assembly_vector_in,
-                               std::vector<ElemAssembly*> F_q_assembly_vector_in);
+  virtual void attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
+                                       RBAssemblyExpansion& rb_assembly_expansion_in);
 
   /**
    * Get a pointer to inner_product_matrix. Accessing via this
@@ -369,12 +338,6 @@ public:
    * Print out info that describes the current setup of this RBConstruction.
    */
   virtual void print_info();
-
-  /**
-   * Build a new RBEvaluation object.
-   * @return an AutoPtr to the new RBEvaluation object.
-   */
-  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
 
   /**
    * Get delta_N, the number of basis functions we
@@ -729,6 +692,12 @@ protected:
   bool quiet_mode;
 
   /**
+   * This member holds the (parameter independent) assembly functors
+   * that define the "affine expansion" of the PDE that we are solving.
+   */
+  RBAssemblyExpansion* rb_assembly_expansion;
+
+  /**
    * Pointer to inner product assembly.
    */
   ElemAssembly* inner_prod_assembly;
@@ -738,25 +707,6 @@ protected:
    * matrix.
    */
   ElemAssembly* constraint_assembly;
-
-  /**
-   * Vectors storing the function pointers to the assembly
-   * routines for the affine operators, both interior and boundary
-   * assembly.
-   */
-  std::vector<ElemAssembly*> A_q_assembly_vector;
-
-  /**
-   * Vector storing the function pointers to the assembly
-   * routines for the rhs affine vectors.
-   */
-  std::vector<ElemAssembly*> F_q_assembly_vector;
-
-  /**
-   * Vector storing the function pointers to the assembly
-   * routines for the outputs. Element interior part.
-   */
-  std::vector< std::vector<ElemAssembly*> > output_assembly_vector;
 
   /**
    * A boolean flag to indicate whether or not the output dual norms

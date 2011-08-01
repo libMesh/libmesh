@@ -45,6 +45,7 @@ RBConstructionBase<Base>::RBConstructionBase (EquationSystems& es,
                                               const std::string& name,
                                               const unsigned int number)
   : Base(es, name, number),
+    rb_theta_expansion(NULL),
     training_parameters_initialized(false),
     training_parameters_random_seed(-1), // by default, use std::time to seed RNG
     serial_training_set(false),
@@ -57,12 +58,6 @@ template <class Base>
 RBConstructionBase<Base>::~RBConstructionBase ()
 {
   this->clear();
-  
-  // Delete the rb_theta_expansion object if necessary
-  if(rb_theta_expansion)
-  {
-    delete rb_theta_expansion;
-  }
 }
 
 template <class Base>
@@ -141,22 +136,12 @@ bool RBConstructionBase<Base>::valid_params(const std::vector<Real>& params)
 template <class Base>
 void RBConstructionBase<Base>::init_data ()
 {
-  // Initialize the theta expansion object
-  rb_theta_expansion = build_rb_theta_expansion().release();
-
   Base::init_data();
 
   // Initialize the inner product storage vector, which is useful for
   // storing intermediate results when evaluating inner products
   inner_product_storage_vector = NumericVector<Number>::build();
   inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-
-}
-
-template <class Base>
-AutoPtr<RBThetaExpansion> RBConstructionBase<Base>::build_rb_theta_expansion()
-{
-  return AutoPtr<RBThetaExpansion>(new RBThetaExpansion);
 }
 
 template <class Base>
