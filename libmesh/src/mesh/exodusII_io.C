@@ -444,7 +444,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
     {
-      int variable_name_position = 0;
+      unsigned variable_name_position = 0;
       for(; variable_name_position < output_names.size(); variable_name_position++)
         if(output_names[variable_name_position] == names[c])
           break;
