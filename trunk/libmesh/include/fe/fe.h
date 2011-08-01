@@ -334,6 +334,16 @@ public:
                             const std::vector<Real>* const weights = NULL);
 
   /**
+   * Computes the reference space quadrature points on the side of 
+   * an element based on the side quadrature points.
+   */  
+  virtual void side_map (const Elem* elem,
+                         const Elem* side,
+                         const unsigned int s,
+                         const std::vector<Point>& reference_side_points,
+                         std::vector<Point>&       reference_points);
+
+  /**
    * Provides the class with the quadrature rule, which provides the
    * locations (on a reference element) where the shape functions are
    * to be calculated.
@@ -450,7 +460,9 @@ protected:
   /**
    * The last side and last edge we did a reinit on
    */
-  unsigned int last_side, last_edge;
+  ElemType last_side;
+
+  unsigned int last_edge;
 };
 
 
@@ -764,7 +776,7 @@ template <unsigned int Dim, FEFamily T>
 inline
 FE<Dim,T>::FE (const FEType& fet) :
   FEBase (Dim,fet),
-  last_side(libMesh::invalid_uint),
+  last_side(INVALID_ELEM),
   last_edge(libMesh::invalid_uint)
 {
   // Sanity check.  Make sure the

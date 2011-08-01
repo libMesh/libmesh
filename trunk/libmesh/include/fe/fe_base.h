@@ -178,7 +178,17 @@ public:
 			    const Real tolerance = TOLERANCE,
                             const std::vector<Point>* pts = NULL,
                             const std::vector<Real>* weights = NULL) = 0;
-  
+
+  /**
+   * Computes the reference space quadrature points on the side of 
+   * an element based on the side quadrature points.
+   */  
+  virtual void side_map (const Elem* elem,
+                         const Elem* side,
+                         const unsigned int s,
+                         const std::vector<Point>& reference_side_points,
+                         std::vector<Point>&       reference_points) = 0;
+
   /**
    * @returns true if the point p is located on the reference element
    * for element type t, false otherwise.  Since we are doing floating
@@ -189,7 +199,12 @@ public:
   static bool on_reference_element(const Point& p,
 				   const ElemType t,
 				   const Real eps = TOLERANCE);
-
+  /**
+   * returns the reference space nodes coordinates 
+   * given the element type
+   */
+  static void get_refspace_nodes(const ElemType t, 
+	                         std::vector<Point>& nodes);
 #ifdef LIBMESH_ENABLE_AMR
 
   /**

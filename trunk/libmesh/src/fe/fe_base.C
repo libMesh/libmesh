@@ -917,6 +917,246 @@ void FEBase::compute_shape_functions (const Elem*)
 }
 
 
+void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nodes)
+{
+  switch(itemType)
+  {
+    case EDGE2:
+    {
+       nodes.resize(2);
+       nodes[0] = Point (-1.,0.,0.);
+       nodes[1] = Point (1.,0.,0.); 
+       return;
+    }
+    case EDGE3:
+    {
+       nodes.resize(3);
+       nodes[0] = Point (-1.,0.,0.);
+       nodes[1] = Point (1.,0.,0.); 
+       nodes[2] = Point (0.,0.,0.);
+       return;
+    }
+    case TRI3:
+    {
+       nodes.resize(3);
+       nodes[0] = Point (0.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,1.,0.);
+       return;
+    } 
+    case TRI6:
+    {
+       nodes.resize(6);
+       nodes[0] = Point (0.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,1.,0.);
+       nodes[3] = Point (.5,0.,0.);
+       nodes[4] = Point (.5,.5,0.);
+       nodes[5] = Point (0.,.5,0.);
+       return;
+    } 
+    case QUAD4:
+    {
+       nodes.resize(4);
+       nodes[0] = Point (-1.,-1.,0.);
+       nodes[1] = Point (1.,-1.,0.);
+       nodes[2] = Point (1.,1.,0.);
+       nodes[3] = Point (-1.,1.,0.);
+       return;
+    }
+    case QUAD8:
+    {
+       nodes.resize(8);
+       nodes[0] = Point (-1.,-1.,0.);
+       nodes[1] = Point (1.,-1.,0.);
+       nodes[2] = Point (1.,1.,0.);
+       nodes[3] = Point (-1.,1.,0.);
+       nodes[4] = Point (0.,-1.,0.);
+       nodes[5] = Point (1.,0.,0.);
+       nodes[6] = Point (0.,1.,0.);
+       nodes[7] = Point (-1.,0.,0.);
+       return;
+    }
+    case QUAD9:
+    {
+       nodes.resize(9);
+       nodes[0] = Point (-1.,-1.,0.);
+       nodes[1] = Point (1.,-1.,0.);
+       nodes[2] = Point (1.,1.,0.);
+       nodes[3] = Point (-1.,1.,0.);
+       nodes[4] = Point (0.,-1.,0.);
+       nodes[5] = Point (1.,0.,0.);
+       nodes[6] = Point (0.,1.,0.);
+       nodes[7] = Point (-1.,0.,0.);
+       nodes[8] = Point (0.,0.,0.);
+       return;
+    }
+    case TET4:
+    {
+       nodes.resize(4);
+       nodes[0] = Point (0.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,1.,0.);
+       nodes[3] = Point (0.,0.,1.);
+       return;
+    } 
+    case TET10:
+    {
+       nodes.resize(10);
+       nodes[0] = Point (0.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,1.,0.);
+       nodes[3] = Point (0.,0.,1.);
+       nodes[4] = Point (.5,0.,0.);
+       nodes[5] = Point (.5,.5,0.);
+       nodes[6] = Point (0.,.5,0.);
+       nodes[7] = Point (0.,0.,.5);
+       nodes[8] = Point (.5,0.,.5);
+       nodes[9] = Point (0.,.5,.5);
+       return;
+    } 
+    case HEX8:
+    {
+       nodes.resize(8);
+       nodes[0] = Point (-1.,-1.,-1.);
+       nodes[1] = Point (1.,-1.,-1.);
+       nodes[2] = Point (1.,1.,-1.);
+       nodes[3] = Point (-1.,1.,-1.);
+       nodes[4] = Point (-1.,-1.,1.);
+       nodes[5] = Point (1.,-1.,1.);
+       nodes[6] = Point (1.,1.,1.);
+       nodes[7] = Point (-1.,1.,1.);
+       return;
+    }
+    case HEX20:
+    {
+       nodes.resize(20);
+       nodes[0] = Point (-1.,-1.,-1.);
+       nodes[1] = Point (1.,-1.,-1.);
+       nodes[2] = Point (1.,1.,-1.);
+       nodes[3] = Point (-1.,1.,-1.);
+       nodes[4] = Point (-1.,-1.,1.);
+       nodes[5] = Point (1.,-1.,1.);
+       nodes[6] = Point (1.,1.,1.);
+       nodes[7] = Point (-1.,1.,1.);
+       nodes[8] = Point (0.,-1.,-1.);
+       nodes[9] = Point (1.,0.,-1.);
+       nodes[10] = Point (0.,1.,-1.);
+       nodes[11] = Point (-1.,0.,-1.);
+       nodes[12] = Point (-1.,-1.,0.);
+       nodes[13] = Point (1.,-1.,0.);
+       nodes[14] = Point (1.,1.,0.);
+       nodes[15] = Point (-1.,1.,0.);
+       nodes[16] = Point (0.,-1.,1.);
+       nodes[17] = Point (1.,0.,1.);
+       nodes[18] = Point (0.,1.,1.);
+       nodes[19] = Point (-1.,0.,1.);
+       return;
+    }
+    case HEX27:
+    {
+       nodes.resize(27);
+       nodes[0] = Point (-1.,-1.,-1.);
+       nodes[1] = Point (1.,-1.,-1.);
+       nodes[2] = Point (1.,1.,-1.);
+       nodes[3] = Point (-1.,1.,-1.);
+       nodes[4] = Point (-1.,-1.,1.);
+       nodes[5] = Point (1.,-1.,1.);
+       nodes[6] = Point (1.,1.,1.);
+       nodes[7] = Point (-1.,1.,1.);
+       nodes[8] = Point (0.,-1.,-1.);
+       nodes[9] = Point (1.,0.,-1.);
+       nodes[10] = Point (0.,1.,-1.);
+       nodes[11] = Point (-1.,0.,-1.);
+       nodes[12] = Point (-1.,-1.,0.);
+       nodes[13] = Point (1.,-1.,0.);
+       nodes[14] = Point (1.,1.,0.);
+       nodes[15] = Point (-1.,1.,0.);
+       nodes[16] = Point (0.,-1.,1.);
+       nodes[17] = Point (1.,0.,1.);
+       nodes[18] = Point (0.,1.,1.);
+       nodes[19] = Point (-1.,0.,1.);
+       nodes[20] = Point (0.,0.,-1.);
+       nodes[21] = Point (0.,-1.,0.);
+       nodes[22] = Point (1.,0.,0.);
+       nodes[23] = Point (0.,1.,0.);
+       nodes[24] = Point (-1.,0.,0.);
+       nodes[25] = Point (0.,0.,1.);
+       nodes[26] = Point (0.,0.,0.);
+       return;
+    }
+    case PRISM6:
+    {
+       nodes.resize(6);
+       nodes[0] = Point (0.,0.,-1.);
+       nodes[1] = Point (1.,0.,-1.);
+       nodes[2] = Point (0.,1.,-1.);
+       nodes[3] = Point (0.,0.,1.);
+       nodes[4] = Point (1.,0.,1.);
+       nodes[5] = Point (0.,1.,1.);
+       return;
+    } 
+    case PRISM15:
+    {
+       nodes.resize(15);
+       nodes[0] = Point (0.,0.,-1.);
+       nodes[1] = Point (1.,0.,-1.);
+       nodes[2] = Point (0.,1.,-1.);
+       nodes[3] = Point (0.,0.,1.);
+       nodes[4] = Point (1.,0.,1.);
+       nodes[5] = Point (0.,1.,1.);
+       nodes[6] = Point (.5,0.,-1.);
+       nodes[7] = Point (.5,.5,-1.);
+       nodes[8] = Point (0.,.5,-1.);
+       nodes[9] = Point (0.,0.,0.);
+       nodes[10] = Point (1.,0.,0.);
+       nodes[11] = Point (0.,1.,0.);
+       nodes[12] = Point (.5,0.,1.);
+       nodes[13] = Point (.5,.5,1.);
+       nodes[14] = Point (0.,.5,1.);
+       return;
+    } 
+    case PRISM18:
+    {
+       nodes.resize(18);
+       nodes[0] = Point (0.,0.,-1.);
+       nodes[1] = Point (1.,0.,-1.);
+       nodes[2] = Point (0.,1.,-1.);
+       nodes[3] = Point (0.,0.,1.);
+       nodes[4] = Point (1.,0.,1.);
+       nodes[5] = Point (0.,1.,1.);
+       nodes[6] = Point (.5,0.,-1.);
+       nodes[7] = Point (.5,.5,-1.);
+       nodes[8] = Point (0.,.5,-1.);
+       nodes[9] = Point (0.,0.,0.);
+       nodes[10] = Point (1.,0.,0.);
+       nodes[11] = Point (0.,1.,0.);
+       nodes[12] = Point (.5,0.,1.);
+       nodes[13] = Point (.5,.5,1.);
+       nodes[14] = Point (0.,.5,1.);
+       nodes[15] = Point (.5,0.,0.);
+       nodes[16] = Point (.5,.5,0.);
+       nodes[17] = Point (0.,.5,0.);
+       return;
+    } 
+    case PYRAMID5:
+    {
+       nodes.resize(5);
+       nodes[0] = Point (-1.,-1.,0.);
+       nodes[1] = Point (1.,-1.,0.);
+       nodes[2] = Point (1.,1.,0.);
+       nodes[3] = Point (-1.,1.,0.);
+       nodes[4] = Point (-1.,-1.,1.);
+       return;
+    } 
+    default:
+    {
+      libMesh::err << "ERROR: Unknown element type " << itemType << std::endl;
+      libmesh_error();
+    }
+  }
+  return;
+}
 
 bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real eps)
 {
