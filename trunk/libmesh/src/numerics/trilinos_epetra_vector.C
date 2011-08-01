@@ -528,10 +528,10 @@ void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
 // #endif
 
 //     // Clean up
-//     ierr = ISDestroy (is);
+//     ierr = LibMeshISDestroy (is);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
-//     ierr = VecScatterDestroy(scatter);
+//     ierr = LibMeshVecScatterDestroy(scatter);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 //   }
 
@@ -740,9 +740,9 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 // #endif
   
 //   // Clean up 
-//   ierr = ISDestroy(parent_is);       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//   ierr = ISDestroy(subvector_is);    CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//   ierr = VecScatterDestroy(scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+//   ierr = LibMeshISDestroy(parent_is);       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+//   ierr = LibMeshISDestroy(subvector_is);    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+//   ierr = LibMeshVecScatterDestroy(scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr); 
 }
 
 

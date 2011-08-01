@@ -226,7 +226,7 @@ void PetscMatrix<T>::clear ()
     {
       semiparallel_only();
   
-      ierr = MatDestroy (_mat);
+      ierr = LibMeshMatDestroy (&_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
       
       this->_is_initialized = false;
@@ -335,7 +335,7 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
   /**
    * Destroy the viewer.
    */
-  ierr = PetscViewerDestroy (petsc_viewer);
+  ierr = LibMeshPetscViewerDestroy (&petsc_viewer);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
@@ -526,8 +526,8 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   petsc_submatrix->close();
 
   // Clean up PETSc data structures
-  ierr = ISDestroy(isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = ISDestroy(iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = LibMeshISDestroy(&isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = LibMeshISDestroy(&iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 

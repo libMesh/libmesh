@@ -760,10 +760,10 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 #endif
 
   // Clean up
-  ierr = ISDestroy (is);
+  ierr = LibMeshISDestroy (&is);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
-  ierr = VecScatterDestroy(scatter);
+  ierr = LibMeshVecScatterDestroy(&scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Make sure ghost dofs are up to date
@@ -852,10 +852,10 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 	 
 
   // Clean up
-  ierr = ISDestroy (is);
+  ierr = LibMeshISDestroy (&is);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
-  ierr = VecScatterDestroy(scatter);
+  ierr = LibMeshVecScatterDestroy(&scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // Make sure ghost dofs are up to date
@@ -937,10 +937,10 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 #endif
 
     // Clean up
-    ierr = ISDestroy (is);
+    ierr = LibMeshISDestroy (&is);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
-    ierr = VecScatterDestroy(scatter);
+    ierr = LibMeshVecScatterDestroy(&scatter);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
   }
 
@@ -1238,7 +1238,7 @@ void PetscVector<T>::print_matlab (const std::string name) const
   /**
    * Destroy the viewer.
    */
-  ierr = PetscViewerDestroy (petsc_viewer);
+  ierr = LibMeshPetscViewerDestroy (&petsc_viewer);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
@@ -1339,9 +1339,9 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
 #endif
   
   // Clean up 
-  ierr = ISDestroy(parent_is);       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = ISDestroy(subvector_is);    CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = VecScatterDestroy(scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+  ierr = LibMeshISDestroy(&parent_is);       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = LibMeshISDestroy(&subvector_is);    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = LibMeshVecScatterDestroy(&scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 }
 

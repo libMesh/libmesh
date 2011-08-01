@@ -294,7 +294,7 @@ void EpetraMatrix<T>::print_matlab (const std::string) const
 //   /**
 //    * Destroy the viewer.
 //    */
-//   ierr = PetscViewerDestroy (petsc_viewer);
+//   ierr = LibMeshPetscViewerDestroy (petsc_viewer);
 //          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
@@ -362,8 +362,8 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 // //   petsc_submatrix->close();
 
 // //   // Clean up PETSc data structures
-// //   ierr = ISDestroy(isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-// //   ierr = ISDestroy(iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+// //   ierr = LibMeshISDestroy(isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+// //   ierr = LibMeshISDestroy(iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 // }
 
 template <typename T>
