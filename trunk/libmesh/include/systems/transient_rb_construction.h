@@ -99,11 +99,6 @@ public:
   virtual void print_info();
 
   /**
-   * Build a new TransientRBEvaluation object.
-   */
-  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
-
-  /**
    * Function that indicates when to terminate the Greedy
    * basis training.
    */
@@ -153,12 +148,15 @@ public:
   void attach_L2_assembly(ElemAssembly* L2_assembly);
 
   /**
-   * Attach parameter-dependent function and user-defined assembly routine
-   * for affine operator. Boundary assembly defaults to NULL here since
-   * we typically only need interior assembly for the mass operator.
+   * Attach the affine expansion associated with this system.
+   * The affine expansion is defined by the set of parameter-dependent
+   * functions (defined in \p rb_theta_expansion_in) and parameter-independent
+   * operators (defined in \p rb_assembly_expansion_in).
+   * Override to also check that the time-derivative expansions are sized
+   * consistently.
    */
-  void attach_M_q(RBTheta* theta_q_m,
-                  ElemAssembly* M_q_assembly);
+  virtual void attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
+                                       RBAssemblyExpansion& rb_assembly_expansion_in);
 
   /**
    * Assemble the q^th affine term of the mass matrix and store it in input_matrix.
@@ -278,11 +276,6 @@ public:
 protected:
 
   /**
-   * Build a new TransientRBThetaExpansion object and return an AutoPtr to it.
-   */
-  virtual AutoPtr<RBThetaExpansion> build_rb_theta_expansion();
-
-  /**
    * Helper function that actually allocates all the data
    * structures required by this class.
    */
@@ -364,11 +357,6 @@ protected:
    * Function pointer for assembling the L2 matrix.
    */
   ElemAssembly* L2_assembly;
-  
-  /**
-   * Vectors of function pointers for assembling the mass operator.
-   */
-  std::vector<ElemAssembly*> M_q_assembly_vector;
   
   /**
    * The vector that stores the right-hand side for the initial

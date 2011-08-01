@@ -73,14 +73,6 @@ public:
    * The type of the parent.
    */
   typedef RBConstruction Parent;
-  
-  /**
-   * Override build_rb_evaluation to build a SimpleRBEvaluation.
-   */
-  virtual AutoPtr<RBEvaluation> build_rb_evaluation()
-  {
-    return AutoPtr<RBEvaluation>(new SimpleRBEvaluation);
-  }
 
   /**
    * Initialize data structures.

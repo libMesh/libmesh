@@ -20,8 +20,11 @@
 #ifndef __rb_theta_expansion_h__
 #define __rb_theta_expansion_h__
 
+// libMesh includes
 #include "libmesh_common.h"
+#include "reference_counted_object.h"
 
+// misc includes
 #include <vector>
 
 
@@ -39,7 +42,7 @@ class RBTheta;
 
 // ------------------------------------------------------------
 // RBThetaExpansion class definition
-class RBThetaExpansion
+class RBThetaExpansion : public ReferenceCountedObject<RBThetaExpansion>
 {
 public:
 
