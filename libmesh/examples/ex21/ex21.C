@@ -154,6 +154,7 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
   LinearImplicitSystem & ellipticdg_system = es.get_system<LinearImplicitSystem> ("EllipticDG");
   // Get some parameters that we need during assembly
   const Real penalty = es.parameters.get<Real> ("penalty");
+  std::string refinement_type = es.parameters.get<std::string> ("refinement");
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
@@ -350,7 +351,11 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
           qface_point = fe_elem_face->get_xyz();
 
           // Find their locations on the neighbor 
-          FEInterface::inverse_map (elem->dim(), fe->get_fe_type(), neighbor, qface_point, qface_neighbor_point);
+	  unsigned int side_neighbor = neighbor->which_neighbor_am_i(elem);
+          if (refinement_type == "p")
+            fe_neighbor_face->side_map (neighbor, elem_side.get(), side_neighbor, qface.get_points(), qface_neighbor_point);
+	  else
+            FEInterface::inverse_map (elem->dim(), fe->get_fe_type(), neighbor, qface_point, qface_neighbor_point);
           // Calculate the neighbor element shape functions at those locations
           fe_neighbor_face->reinit(neighbor, &qface_neighbor_point);
           
@@ -507,6 +512,7 @@ int main (int argc, char** argv)
   equation_system.parameters.set<unsigned int>("linear solver maximum iterations") = 1000;
   equation_system.parameters.set<Real>("penalty") = penalty;
   equation_system.parameters.set<bool>("singularity") = singularity;
+  equation_system.parameters.set<std::string>("refinement") = refinement_type;
 
   // Create a system named ellipticdg
   LinearImplicitSystem& ellipticdg_system = equation_system.add_system<LinearImplicitSystem> ("EllipticDG");

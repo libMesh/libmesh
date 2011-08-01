@@ -431,6 +431,19 @@ public:
                             const std::vector<Real>* const weights = NULL);
 
   /**
+   * Computes the reference space quadrature points on the side of 
+   * an element based on the side quadrature points.
+   */  
+  virtual void side_map (const Elem* /* elem */,
+                         const Elem* /* side */,
+                         const unsigned int /* s */,
+                         const std::vector<Point>& /* reference_side_points */,
+                         std::vector<Point>&       /* reference_points */)
+  {
+    libmesh_not_implemented();
+  }
+
+  /**
    * The use of quadrature rules with the \p InfFE class is somewhat
    * different from the approach of the \p FE class.  While the
    * \p FE class requires an appropriately initialized quadrature
