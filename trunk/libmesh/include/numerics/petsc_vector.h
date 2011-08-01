@@ -675,7 +675,13 @@ PetscVector<T>::PetscVector (Vec v)
 
   if((strcmp(type,VECSHARED) == 0) || (strcmp(type,VECMPI) == 0))
   {
+#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
     ISLocalToGlobalMapping mapping = _vec->mapping;
+#else
+    ISLocalToGlobalMapping mapping;
+    ierr = VecGetLocalToGlobalMapping(_vec, &mapping);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
 
     // If is a sparsely stored vector, set up our new mapping
     if (mapping)
@@ -683,8 +689,15 @@ PetscVector<T>::PetscVector (Vec v)
       const unsigned int local_size = static_cast<unsigned int>(petsc_local_size);
       const unsigned int ghost_begin = static_cast<unsigned int>(petsc_local_size);
       const unsigned int ghost_end = static_cast<unsigned int>(mapping->n);
+#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+      const int *indices = mapping->indices;
+#else
+      const int *indices = mapping->indices;
+      ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
       for(unsigned int i=ghost_begin; i<ghost_end; i++)
-        _global_to_local_map[mapping->indices[i]] = i-local_size;
+        _global_to_local_map[indices[i]] = i-local_size;
       this->_type = GHOSTED;
     }
     else
