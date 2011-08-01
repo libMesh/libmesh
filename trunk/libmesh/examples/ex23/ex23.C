@@ -38,9 +38,6 @@
 #include "simple_rb.h"
 #include "assembly.h"
 
-// rbOOmit includes
-#include "rb_assembly_expansion.h"
-
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
@@ -119,41 +116,11 @@ int main (int argc, char** argv)
   // Now that the libMesh data structures have been initialized
   // in equation_systems.init(), we can set up the Reduced Basis system.
 
-  // Construct the RBTheta objects
-  ThetaA0 theta_a_0;
-  ThetaA1 theta_a_1;
-  ThetaA2 theta_a_2;
-  RBTheta rb_theta; // Default RBTheta object, just returns 1.
-  // And build the RBThetaExpansion object
-  RBThetaExpansion rb_theta_expansion;
-  rb_theta_expansion.attach_theta_q_a(&theta_a_0);   // Attach the lhs theta
-  rb_theta_expansion.attach_theta_q_a(&theta_a_1);
-  rb_theta_expansion.attach_theta_q_a(&theta_a_2);
-  rb_theta_expansion.attach_theta_q_f(&rb_theta);    // Attach the rhs theta
-  rb_theta_expansion.attach_output_theta(&rb_theta); // Attach output 0 theta
-  rb_theta_expansion.attach_output_theta(&rb_theta); // Attach output 1 theta
-  rb_theta_expansion.attach_output_theta(&rb_theta); // Attach output 2 theta
-  rb_theta_expansion.attach_output_theta(&rb_theta); // Attach output 3 theta
-
-  // Construct the ElemAssembly objects
-  A0 A0_assembly;
-  A1 A1_assembly;
-  A2 A2_assembly;
-  F0 F0_assembly;
-  OutputAssembly L0(0.7,0.8,0.7,0.8);
-  OutputAssembly L1(0.2,0.3,0.7,0.8);
-  OutputAssembly L2(0.2,0.3,0.2,0.3);
-  OutputAssembly L3(0.7,0.8,0.2,0.3);
-  // And build the RBAssemblyExpansion object
-  RBAssemblyExpansion rb_assembly_expansion;
-  rb_assembly_expansion.attach_A_q_assembly(&A0_assembly); // Attach the lhs assembly
-  rb_assembly_expansion.attach_A_q_assembly(&A1_assembly);
-  rb_assembly_expansion.attach_A_q_assembly(&A2_assembly);
-  rb_assembly_expansion.attach_F_q_assembly(&F0_assembly); // Attach the rhs assembly
-  rb_assembly_expansion.attach_output_assembly(&L0);       // Attach output 0 assembly
-  rb_assembly_expansion.attach_output_assembly(&L1);       // Attach output 1 assembly
-  rb_assembly_expansion.attach_output_assembly(&L2);       // Attach output 2 assembly
-  rb_assembly_expansion.attach_output_assembly(&L3);       // Attach output 3 assembly
+  // Construct an Ex23RBThetaExpansion object (see assembly.h)
+  Ex23RBThetaExpansion rb_theta_expansion;
+  
+  // Construct an Ex23RBAssemblyExpansion object (see assembly.h)
+  Ex23RBAssemblyExpansion rb_assembly_expansion;
 
   // Attach rb_theta_expansion and rb_assembly_expansion to rb_con
   // This also checks that the expansion objects are sized consistently
@@ -164,7 +131,7 @@ int main (int argc, char** argv)
   rb_con.attach_dirichlet_dof_initialization(&dirichlet_assembly);
 
   // We reuse the operator A0 as the inner product matrix
-  rb_con.attach_inner_prod_assembly(&A0_assembly);
+  rb_con.attach_inner_prod_assembly(&rb_assembly_expansion.A0_assembly);
 
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the

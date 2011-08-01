@@ -10,6 +10,7 @@
 
 // rbOOmit includes
 #include "rb_theta.h"
+#include "rb_assembly_expansion.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
@@ -199,3 +200,71 @@ struct Ex23DirichletDofAssembly : DirichletDofAssembly
       dirichlet_dofs_set.insert(c.dof_indices[side_dofs[ii]]);
   }
 };
+
+// Define an RBThetaExpansion class for this PDE
+struct Ex23RBThetaExpansion : RBThetaExpansion
+{
+
+  /**
+   * Constructor.
+   */
+  Ex23RBThetaExpansion()
+  {
+    // set up the RBThetaExpansion object
+    attach_theta_q_a(&theta_a_0);   // Attach the lhs theta
+    attach_theta_q_a(&theta_a_1);
+    attach_theta_q_a(&theta_a_2);
+
+    attach_theta_q_f(&rb_theta);    // Attach the rhs theta
+
+    attach_output_theta(&rb_theta); // Attach output 0 theta
+    attach_output_theta(&rb_theta); // Attach output 1 theta
+    attach_output_theta(&rb_theta); // Attach output 2 theta
+    attach_output_theta(&rb_theta); // Attach output 3 theta
+  }
+
+  // The RBTheta member variables
+  ThetaA0 theta_a_0;
+  ThetaA1 theta_a_1;
+  ThetaA2 theta_a_2;
+  RBTheta rb_theta; // Default RBTheta object, just returns 1.
+};
+
+// Define an RBAssemblyExpansion class for this PDE
+struct Ex23RBAssemblyExpansion : RBAssemblyExpansion
+{
+
+  /**
+   * Constructor.
+   */
+  Ex23RBAssemblyExpansion()
+    :
+    L0(0.7,0.8,0.7,0.8),
+    L1(0.2,0.3,0.7,0.8),
+    L2(0.2,0.3,0.2,0.3),
+    L3(0.7,0.8,0.2,0.3)
+  {
+    // And set up the RBAssemblyExpansion object
+    attach_A_q_assembly(&A0_assembly); // Attach the lhs assembly
+    attach_A_q_assembly(&A1_assembly);
+    attach_A_q_assembly(&A2_assembly);
+    
+    attach_F_q_assembly(&F0_assembly); // Attach the rhs assembly
+    
+    attach_output_assembly(&L0);       // Attach output 0 assembly
+    attach_output_assembly(&L1);       // Attach output 1 assembly
+    attach_output_assembly(&L2);       // Attach output 2 assembly
+    attach_output_assembly(&L3);       // Attach output 3 assembly
+  }
+
+  // The ElemAssembly objects
+  A0 A0_assembly;
+  A1 A1_assembly;
+  A2 A2_assembly;
+  F0 F0_assembly;
+  OutputAssembly L0;
+  OutputAssembly L1;
+  OutputAssembly L2;
+  OutputAssembly L3;
+};
+
