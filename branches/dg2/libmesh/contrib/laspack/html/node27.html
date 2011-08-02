@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> VECTOR(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" VECTOR(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html463 HREF="node28.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html461 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html457 HREF="node26.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html465 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html464 HREF="node28.html"> Index</A>
+<B>Up:</B> <A NAME=tex2html462 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html458 HREF="node26.html"> RTC(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION000812000000000000000>&#160;</A><A NAME=VECTOR> VECTOR(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION000812100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> V_Constr</tt>, <tt> V_Destr</tt>,
+<tt> V_SetName</tt>, <tt> V_GetName</tt>,
+<tt> V_GetDim</tt>, 
+<tt> V_SetCmp</tt>, <tt> V_SetAllCmp</tt>, <tt> V_SetRndCmp</tt>, <tt> V_GetCmp</tt>,
+<tt> V_AddCmp</tt>,
+<tt> V__SetCmp</tt>, <tt> V__GetCmp</tt>, <tt> V__AddCmp</tt>,
+<tt> V_Lock</tt>, <tt> V_Unlock</tt>
+-- type <tt> Vector</tt>
+<P>
+<H3><A NAME=SECTION000812200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/vector.h&gt;
+
+typedef double Real; 
+
+typedef enum { 
+    Normal, 
+    Tempor 
+} InstanceType; 
+
+void V_Constr(Vector *V, char *Name, size_t Dim, InstanceType Instance,
+              Boolean OwnData); 
+void V_Destr(Vector *V); 
+void V_SetName(Vector *V, char *Name); 
+char *V_GetName(Vector *V); 
+size_t V_GetDim(Vector *V); 
+void V_SetCmp(Vector *V, size_t Ind, Real Val); 
+void V_SetAllCmp(Vector *V, Real Val); 
+void V_SetRndCmp(Vector *V, Real Val); 
+Real V_GetCmp(Vector *V, size_t Ind); 
+void V_AddCmp(Vector *V, size_t Ind, Real Val); 
+void V__SetCmp(Vector *V, size_t Ind, Real Val); 
+Real V__GetCmp(Vector *V, size_t Ind); 
+void V__AddCmp(Vector *V, size_t Ind, Real Val); 
+void V_Lock(Vector *V); 
+void V_Unlock(Vector *V);
+</PRE>
+<H3><A NAME=SECTION000812300000000000000> DESCRIPTION</A></H3>
+<P>
+<H6><A NAME=V_Constr>&#160;</A></H6>
+The procedure <tt> V_Constr</tt> is the constructor of the type <tt> Vector</tt>. 
+It creates and initializes a new variable of this type directed
+by the parameter <tt> V</tt>.
+As symbolic name, the string <tt> Name</tt> is used.
+The dimensions of the vector are defined by <tt> Dim</tt>.
+For vectors used in application codes,
+one should always use the parameters
+<tt> Instance = Normal</tt> and <tt> OwnData = True</tt>.
+In this case, <tt> V_Constr</tt> allocates memory for vector components.
+Other parameter combinations for <tt> Instance</tt> and <tt> OwnData</tt>
+are intended for internal usage by <tt> LASPack</tt>
+ .
+<P>
+<H6><A NAME=V_Destr>&#160;</A></H6>
+The procedure <tt> V_Destr</tt> is the destructor of the type <tt> Vector</tt>.
+It releases memory of vector components.
+<P>
+<H6><A NAME=V_SetName>&#160;</A><A NAME=V_GetName>&#160;</A></H6>
+The procedure <tt> V_SetName</tt> resets the symbolic name of the vector.
+This can be queried by the procedure <tt> V_GetName</tt>.
+<P>
+<H6><A NAME=V_GetDim>&#160;</A></H6>
+The procedure <tt> V_GetDim</tt> returns the dimension of the vector.
+<P>
+<H6><A NAME=V_SetCmp>&#160;</A><A NAME=V_SetAllCmp>&#160;</A><A NAME=V_SetRndCmp>&#160;</A></H6>
+The procedure <tt> V_SetCmp</tt> assigns
+the value <tt> Val</tt> to the vector component with the index <tt> Ind</tt>.
+The procedure <tt> V_SetAllCmp</tt> sets all components to the value <tt> Val</tt>.
+The procedure <tt> V_SetRndCmp</tt> initializes vector components
+to normalized random values <tt> (0 &lt;= V[i] &lt; 1)</tt>.
+
+As random-number generator, the ANSI C function <tt> rand</tt> is used.
+The starting point can be specified by a call of function <tt> srand</tt>.
+<P>
+<H6><A NAME=V_GetCmp>&#160;</A></H6>
+The procedure <tt> V_GetCmp</tt> returns the value of the vector component
+with the index <tt> Ind</tt>.
+<P>
+<H6><A NAME=V_AddCmp>&#160;</A></H6>
+The procedure <tt> V_AddCmp</tt> adds the value <tt> Val</tt>
+to the vector component with the index <tt> Ind</tt>.
+<P>
+<H6><A NAME=V__SetCmp>&#160;</A><A NAME=V__GetCmp>&#160;</A><A NAME=V__AddCmp>&#160;</A></H6>
+The procedures <tt> V__SetCmp</tt>, <tt> V__GetCmp</tt> and <tt> V__AddCmp</tt> 
+have the same functionality as
+the routines <tt> V_SetCmp</tt>, <tt> V_GetCmp</tt> and <tt> V_AddCmp</tt>.
+They are designed as preprocessing macros and are thus essentially faster.
+Because no range check is made they should not be used in the test
+phase of application code.
+<P>
+<H6><A NAME=V_Lock>&#160;</A><A NAME=V_Unlock>&#160;</A></H6>
+In subroutines, the procedure <tt> V_Lock</tt> should be applied 
+to all passed parameters of the type <tt> Vector</tt>.
+This ensures that,
+if they are of a temporary kind,
+they are not released within any <tt> LASPack</tt>
+  routine
+before the procedure is left.
+This should be carried out by a call of <tt> V_Unlock</tt>
+which has to be called at the end of the procedure.
+<P>
+<H3><A NAME=SECTION000812400000000000000> FILES</A></H3>
+<P>
+  <tt> vector.h ... </tt> header file <BR> 
+
+  <tt> vector.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION000812500000000000000> EXAMPLES</A></H3>
+<P>
+The vector
+<tt> ( 1 2 3 4 5 )^T</tt>
+ could be generated as follows:
+
+<PRE>Vector a;
+size_t Ind;
+
+...
+
+V_Constr(&amp;a, &quot;a&quot;, 5, Normal, True);
+
+for (Ind = 1; Ind &lt;= 5; Ind++)
+    V_SetCmp(&amp;a, Ind, (double)Ind);      
+
+...
+
+V_Destr(&amp;a);
+</PRE>
+<P>
+<H3><A NAME=SECTION000812600000000000000> SEE ALSO</A></H3>
+<P>
+rand(3C), srand(3C),
+<A HREF="node23.html#OPERATS">operats(3LAS)</A>, <A HREF="node18.html#ERRHANDL">errhandl(3LAS)</A>
+<P>
+<BR> <HR><A NAME=tex2html463 HREF="node28.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html461 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html457 HREF="node26.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html465 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html464 HREF="node28.html"> Index</A>
+<B>Up:</B> <A NAME=tex2html462 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html458 HREF="node26.html"> RTC(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>
