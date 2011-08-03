@@ -1263,15 +1263,13 @@ void RBConstruction::enrich_RB_space()
 
   // compute orthogonalization
   AutoPtr< NumericVector<Number> > proj_index = NumericVector<Number>::build();
-  AutoPtr< NumericVector<Number> > proj_sum   = NumericVector<Number>::build();
   proj_index->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-  proj_sum->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
   if(single_matrix_mode)
     assemble_inner_product_matrix(matrix);
 
   for(unsigned int index=0; index<rb_eval->get_n_basis_functions(); index++)
-  {
+  {    
     // invoke copy constructor for NumericVector
     *proj_index = rb_eval->get_basis_function(index);
     if(!single_matrix_mode)
@@ -1282,10 +1280,10 @@ void RBConstruction::enrich_RB_space()
     {
       matrix->vector_mult(*inner_product_storage_vector,*proj_index);
     }
+
     Number scalar = inner_product_storage_vector->dot(*new_bf);
-    proj_sum->add( scalar, *proj_index);
+    new_bf->add(-scalar,*proj_index);
   }
-  new_bf->add(-1.,*proj_sum);
 
   // Normalize new_bf
   if(!single_matrix_mode)
