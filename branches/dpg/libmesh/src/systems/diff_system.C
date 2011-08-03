@@ -33,7 +33,6 @@ DifferentiableSystem::DifferentiableSystem
                        const unsigned int number) :
   Parent      (es, name, number),
   compute_internal_sides(false),
-  compute_neighbor_values(false),
   postprocess_sides(false),
   assemble_qoi_sides(false),
   time_solver (NULL),
