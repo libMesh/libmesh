@@ -77,6 +77,18 @@ class TetGenIO : public MeshInput<MeshBase>,
    */
   virtual void write (const std::string& );  
 
+  /**
+   * Data structure to hold node attributes read in from file.
+   * What you do with these is up to you!
+   */
+  std::vector<std::vector<Real> > node_attributes;
+
+  /**
+   * Data structure to hold element attributes read in from file.
+   * What you do with these is up to you!
+   */
+  std::vector<std::vector<Real> > element_attributes;
+
  private:
  
 

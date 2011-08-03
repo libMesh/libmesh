@@ -145,6 +145,12 @@ void TetGenIO::node_in (std::istream& node_stream)
   Point xyz;
   Real dummy;
 
+  // If present, make room for node attributes to be stored.
+  this->node_attributes.resize(nAttributes);
+  for (unsigned i=0; i<nAttributes; ++i)
+    this->node_attributes[i].resize(_num_nodes);
+
+
   for (unsigned int i=0; i<_num_nodes; i++)
     {
       // Check input buffer
@@ -155,11 +161,12 @@ void TetGenIO::node_in (std::istream& node_stream)
 		  >> xyz(1)    // y-coordinate value
 		  >> xyz(2);   // z-coordinate value
 
-      // For the number of attributes read all into dummy.
+      // Read and store attributes from the stream.
       for (unsigned int j=0; j<nAttributes; j++)
-	node_stream >> dummy;
+	node_stream >> node_attributes[j][i];
       
-      // Read boundary marker if BoundaryMarker=1.
+      // Read (and discard) boundary marker if BoundaryMarker=1.
+      // TODO: should we store this somehow?
       if (BoundaryMarkers == 1)
 	node_stream >> dummy;
 
@@ -191,7 +198,6 @@ void TetGenIO::element_in (std::istream& ele_stream)
 
   // Read the elements from the ele_stream (*.ele file). 
   unsigned int element_lab=0, n_nodes=0, nAttri=0;
-  Real dummy=0.0;
 
   ele_stream >> _num_elements // Read the number of tetrahedrons from the stream.
 	     >> n_nodes       // Read the number of nodes per tetrahedron from the stream (defaults to 4).
@@ -202,6 +208,11 @@ void TetGenIO::element_in (std::istream& ele_stream)
   // (right now this is strictly not necessary since it is the identity map,
   //  but in the future TetGen could change their numbering scheme.)
   static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+  // If present, make room for element attributes to be stored.
+  this->element_attributes.resize(nAttri);
+  for (unsigned i=0; i<nAttri; ++i)
+    this->element_attributes[i].resize(_num_elements);
 
   for (unsigned int i=0; i<_num_elements; i++)
     {
@@ -223,7 +234,9 @@ void TetGenIO::element_in (std::istream& ele_stream)
 	  libmesh_error();
 	}
       elem->set_id(i);
-      mesh.add_elem (elem);
+      
+      // Since we know the ID, it's more correct to call insert_elem() here than add_elem()
+      mesh.insert_elem (elem);
 
       libmesh_assert (elem != NULL);
       libmesh_assert (elem->n_nodes() == n_nodes);
@@ -247,9 +260,9 @@ void TetGenIO::element_in (std::istream& ele_stream)
 	    mesh.node_ptr(_assign_nodes[node_label]);
 	}
 
-      // Read attributes from the stream.
+      // Read and store attributes from the stream.
       for (unsigned int j=0; j<nAttri; j++)
-	ele_stream >> dummy;
+	ele_stream >> this->element_attributes[j][i];
     }
 }
 
