@@ -351,10 +351,11 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
           qface_point = fe_elem_face->get_xyz();
 
           // Find their locations on the neighbor 
-	  unsigned int side_neighbor = neighbor->which_neighbor_am_i(elem);
+          unsigned int side_neighbor = neighbor->which_neighbor_am_i(elem);
           if (refinement_type == "p")
-            fe_neighbor_face->side_map (neighbor, elem_side.get(), side_neighbor, qface.get_points(), qface_neighbor_point);
-	  else
+            fe_neighbor_face->side_map (neighbor, elem_side.get(), 
+                side_neighbor, qface.get_points(), qface_neighbor_point);
+          else
             FEInterface::inverse_map (elem->dim(), fe->get_fe_type(), neighbor, qface_point, qface_neighbor_point);
           // Calculate the neighbor element shape functions at those locations
           fe_neighbor_face->reinit(neighbor, &qface_neighbor_point);

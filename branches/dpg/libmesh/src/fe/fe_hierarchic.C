@@ -142,9 +142,9 @@ unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
     case EDGE3:
       switch (n)
         {
-	case 0:
-	case 1:
-	  return 1;
+          case 0:
+          case 1:
+            return 1;
         // Internal DoFs are associated with the elem, not its nodes
 	case 2:
 	  return 0;
