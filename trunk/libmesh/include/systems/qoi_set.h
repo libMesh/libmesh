@@ -193,7 +193,7 @@ inline
 void QoISet::add_index(unsigned int i)
 {
   if (i >= _indices.size())
-    _indices.resize(i+1);
+    _indices.resize(i+1, true);
   _indices[i] = true;
 }
 
@@ -202,7 +202,8 @@ void QoISet::add_index(unsigned int i)
 inline
 void QoISet::remove_index(unsigned int i)
 {
-  libmesh_assert(i < _indices.size());
+  if (i >= _indices.size())
+    _indices.resize(i+1, true);
   _indices[i] = false;
 }
 
