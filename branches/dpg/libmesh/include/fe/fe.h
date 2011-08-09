@@ -138,7 +138,7 @@ public:
    *
    * Note:  Computing second derivatives is not currently supported
    * for all element types: C1 (Clough and Hermite), Lagrange,
-   * Hierarchic, and Monomial are supported.
+   * Hierarchic, L2_Hierarchic, and Monomial are supported.
    * All other element types return an error when asked for second derivatives.
    *
    * On a p-refined element, \p o should be the total order of the element.
@@ -162,7 +162,7 @@ public:
    *
    * Note:  Computing second derivatives is not currently supported
    * for all element types: C1 (Clough and Hermite), Lagrange,
-   * Hierarchic, and Monomial are supported.
+   * Hierarchic, L2_Hierarchic, and Monomial are supported.
    * All other element types return an error when asked for second derivatives.
    *
    * On a p-refined element, \p o should be the base order of the element.
@@ -553,6 +553,31 @@ public:
 
 
 /**
+ * Discontinuous Hierarchic finite elements.  Still templated on the dimension,
+ * \p Dim.  
+ *
+ * \author Truman E. Ellis
+ * \date 2011
+ * \version $Revision$
+ */
+
+//-------------------------------------------------------------
+// FEL2Hierarchic class definition
+template <unsigned int Dim>
+class FEL2Hierarchic : public FE<Dim,L2_HIERARCHIC>
+{
+public:
+
+  /**
+   * Constructor. Creates a hierarchic finite element
+   * to be used in dimension \p Dim.
+   */
+  FEL2Hierarchic(const FEType& fet);
+};
+
+
+
+/**
  * Lagrange finite elements.  Still templated on the dimension,
  * \p Dim.
  *
@@ -725,6 +750,24 @@ namespace FiniteElements
    */
   typedef FE<3,HIERARCHIC> FEHierarchic3D;
   
+  
+  /**
+   * Convenient definition for a 1D
+   * Discontinuous Hierarchic finite element.
+   */
+  typedef FE<1,L2_HIERARCHIC> FEL2Hierarchic1D;
+  
+  /**
+   * Convenient definition for a 2D
+   * Discontinuous Hierarchic finite element.
+   */
+  typedef FE<2,L2_HIERARCHIC> FEL2Hierarchic2D;
+  
+  /**
+   * Convenient definition for a 3D
+   * Discontinuous Hierarchic finite element.
+   */
+  typedef FE<3,L2_HIERARCHIC> FEL2Hierarchic3D;
 
 
   /**
@@ -815,6 +858,17 @@ template <unsigned int Dim>
 inline
 FEHierarchic<Dim>::FEHierarchic (const FEType& fet) :
   FE<Dim,HIERARCHIC> (fet)
+{
+}
+
+
+
+// ------------------------------------------------------------
+// FEL2Hierarchic class inline members
+template <unsigned int Dim>
+inline
+FEL2Hierarchic<Dim>::FEL2Hierarchic (const FEType& fet) :
+  FE<Dim,L2_HIERARCHIC> (fet)
 {
 }
 

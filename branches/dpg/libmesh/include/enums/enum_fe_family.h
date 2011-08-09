@@ -31,34 +31,35 @@ namespace libMeshEnums {
    * element families. 
    */
                  // vanilla C0 
-  enum FEFamily {LAGRANGE     = 0,
-		 HIERARCHIC   = 1,
+  enum FEFamily {LAGRANGE      = 0,
+		 HIERARCHIC    = 1,
 
 		 // discontinuous, in local coordinates
-		 MONOMIAL     = 2,
+		 MONOMIAL      = 2,
+                 L2_HIERARCHIC = 3,
 
 		 // higher-order 
-		 BERNSTEIN    = 3,
-		 SZABAB       = 4,
+		 BERNSTEIN     = 4,
+		 SZABAB        = 5,
 
 		 // discontinuous, in global coordinates
-		 XYZ          = 5,
+		 XYZ           = 6,
 
 		 // infinite element stuff
-		 INFINITE_MAP = 11,     //   for 1/r-map
-		 JACOBI_20_00 = 12,     //   i_max = 19
-                 JACOBI_30_00 = 13,     //   i_max = 19
-		 LEGENDRE     = 14,     //   i_max = 19
+		 INFINITE_MAP  = 11,     //   for 1/r-map
+		 JACOBI_20_00  = 12,     //   i_max = 19
+                 JACOBI_30_00  = 13,     //   i_max = 19
+		 LEGENDRE      = 14,     //   i_max = 19
 
 		 // C1 elements
-		 CLOUGH       = 21,
-		 HERMITE      = 22,
+		 CLOUGH        = 21,
+		 HERMITE       = 22,
 
                  // A scalar variable that couples to 
                  // all other DOFs in the system
-		 SCALAR       = 31,
+		 SCALAR        = 31,
 		 
-		 INVALID_FE   = 42};
+		 INVALID_FE    = 42};
 
   /**
    * \enum libMeshEnums::FEContinuity defines an \p enum for finite element
