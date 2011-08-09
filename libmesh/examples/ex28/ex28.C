@@ -229,7 +229,7 @@ int main (int argc, char** argv)
     equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
   
-  std::set<unsigned char> active_subdomains;
+  std::set<subdomain_id_type> active_subdomains;
 
   
   // Add the variable "u" to "Poisson".  "u"

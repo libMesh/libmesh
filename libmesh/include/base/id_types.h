@@ -23,6 +23,8 @@
 #define __id_types_h__
 
 #include <limits>
+#include "libmesh_config.h"
+#include <stdint.h>
 
 namespace libMesh
 {
@@ -42,7 +44,18 @@ operator int() const { return _c; }
 typedef TestClass subdomain_id_type;
 #endif
 
-typedef unsigned char subdomain_id_type;
+#if LIBMESH_SUBDOMAIN_ID_BYTES == 1
+typedef uint8_t subdomain_id_type;
+#elif LIBMESH_SUBDOMAIN_ID_BYTES == 4
+/**
+ * Note: subdomain_id_types are positive integers - however limitation in the exodusII
+ * API force us to use a signed integer here to represent subdomains.  This gives us 2^31
+ * possible unique blocks
+ */
+typedef int32_t subdomain_id_type;
+#else // LIBMESH_SUBDOMAIN_ID_BYTES = 2 (default)
+typedef uint16_t subdomain_id_type;
+#endif
 
 } // namespace libMesh
 

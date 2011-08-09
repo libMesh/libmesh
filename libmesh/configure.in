@@ -293,6 +293,32 @@ dnl argument to do it.
 AC_CHECK_SIZEOF([function_pointer], [], [typedef void (*function_pointer)();])
 dnl AC_CHECK_SIZEOF([void(*)(void)]) <-- Does not work! 
 
+dnl -------------------------------------------------------------
+dnl size of subdomain_id -- default 2
+dnl -------------------------------------------------------------
+AC_ARG_WITH([subdomain_id_bytes],
+	    AC_HELP_STRING([--with-subdomain-id-bytes=<1|2|4>],
+                           [bytes of storage per element used to store the subdomain_id]),
+	    [subdomain_bytes="$withval"],
+	    [subdomain_bytes=2])
+
+if test "$subdomain_bytes" == 1 ; then
+  AC_DEFINE(SUBDOMAIN_ID_BYTES, 1,
+           [size of subdomain_id])
+  AC_MSG_RESULT(configuring size of subdomain_id... 1)
+elif test "$subdomain_bytes" == 2 ; then
+  AC_DEFINE(SUBDOMAIN_ID_BYTES, 2,
+           [size of subdomain_id])
+  AC_MSG_RESULT(configuring size of subdomain_id... 2)
+elif test "$subdomain_bytes" == 4 ; then
+  AC_DEFINE(SUBDOMAIN_ID_BYTES, 4,
+           [size of subdomain_id])
+  AC_MSG_RESULT(configuring size of subdomain_id... 4)
+else
+  AC_MSG_RESULT(unrecognized subdomain_id size - configuring size...2)
+fi
+
+dnl -------------------------------------------------------------
 
 
 dnl --------------------------------------------------------------
@@ -549,7 +575,6 @@ elif test "$enable1D" != no ; then
   AC_MSG_RESULT(<<< Configuring library for 1D meshes only >>>)
 fi
 dnl -------------------------------------------------------------
-
 
 
 dnl dnl -------------------------------------------------------------
