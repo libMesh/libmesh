@@ -1577,10 +1577,12 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
 	
       subdomain_id_type cur_subdomain = elem->subdomain_id();
 
+/*      
       // We can't have a zero subdomain ID in Exodus (for some reason?)
       // so map zero subdomains to a max value...
       if (cur_subdomain == 0)
 	cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
+*/
 
       global_subdomain_ids.insert(cur_subdomain);
 
@@ -1694,11 +1696,12 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
     {
       subdomain_id_type cur_subdomain = (*it).first;
 
+/*
       // We can't have a zero subdomain ID in Exodus (for some reason?)
       // so map zero subdomains to a max value...
       if (cur_subdomain == 0)
 	cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
-	
+*/	
 
       if (_verbose)
 	{
@@ -1727,10 +1730,12 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 
       unsigned int cur_subdomain = elem->subdomain_id();
 
+/*      
       // We can't have a zero subdomain ID in Exodus (for some reason?)
       // so map zero subdomains to a max value...
       if(cur_subdomain == 0)
 	cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
+*/	
      
       this->subdomain_map[cur_subdomain].push_back(elem->id());
     }
@@ -2060,10 +2065,12 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
       // Convert current global_nodeset_id into an exodus ID, which can't be zero...
       int exodus_id = global_nodeset_ids[i];
 
+/*      
       // Exodus can't handle zero nodeset IDs (?)  Use max short here since
       // when libmesh reads it back in, it will want to store it as a short...
       if (exodus_id==0)
 	exodus_id = std::numeric_limits<short>::max();
+*/
 	   
       // Try to find this boundary ID in the local list we created
       local_node_boundary_id_lists_iterator it =
@@ -2200,10 +2207,12 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
       // Convert current global_sideset_id into an exodus ID, which can't be zero...
       int exodus_id = global_sideset_ids[i];
 
+/*      
       // Exodus can't handle zero sideset IDs (?)  Use max short here since
       // when libmesh reads it back in, it will want to store it as a short...
       if (exodus_id==0)
 	exodus_id = std::numeric_limits<short>::max();
+*/
 	   
       // Try to find this boundary ID in the local list we created
       local_elem_boundary_id_lists_iterator it =
