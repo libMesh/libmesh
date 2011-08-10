@@ -121,7 +121,8 @@ int main (int argc, char** argv)
 #elif !defined(LIBMESH_ENABLE_PERIODIC)
   libmesh_example_assert(false, "--enable-periodic");
 #elif defined(LIBMESH_ENABLE_PARMESH)
-  // ParallelMesh doesn't yet understand periodic BCs
+  // ParallelMesh doesn't yet understand periodic BCs, plus
+  // we still need some work on automatic parallel restarts
   libmesh_example_assert(false, "--disable-parmesh");
 #else
 
