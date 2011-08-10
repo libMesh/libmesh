@@ -119,6 +119,11 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+#ifdef LIBMESH_ENABLE_PARMESH
+  // We still need some work on automatic parallel restarts
+  libmesh_example_assert(false, "--disable-parmesh");
+#endif
+
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_assert(false, "--enable-amr");
 #else
