@@ -56,20 +56,45 @@ namespace
 {
   /**
    * Defines mapping from libMesh element types to GMV element types.
+   * Note: Not all of the GMV element types have an identity mapping
+   * to libmesh node numbering, but the node mappings do all happen to
+   * be their own inverse, that is, pairs of nodes are simply swapped
+   * between the two definitions.  Therefore we need only one node map
+   * for both reading and writing.
    */
-  struct elementDefinition {
+  struct ElementDefinition {
+    // GMV element name
     std::string label;
-    std::vector<unsigned int> nodes;
+
+    // Used to map libmesh nodes to GMV for writing
+    std::vector<unsigned> node_map;
   };
 
 
-  // maps from a libMesh element type to the proper
-  // GMV elementDefinition.  Placing the data structure
-  // here in this anonymous namespace gives us the
-  // benefits of a global variable without the nasty
-  // side-effects
-  std::map<ElemType, elementDefinition> eletypes;
+  // maps from a libMesh element type to the proper GMV
+  // ElementDefinition.  Placing the data structure here in this
+  // anonymous namespace gives us the benefits of a global variable
+  // without the nasty side-effects.
+  std::map<ElemType, ElementDefinition> eletypes;
 
+  // Helper function to fill up eletypes map
+  void add_eletype_entry(ElemType libmesh_elem_type,
+			 const unsigned* node_map, 
+			 const std::string& gmv_label, 
+			 unsigned nodes_size )
+  {
+    // If map entry does not exist, this will create it
+    ElementDefinition& map_entry = eletypes[libmesh_elem_type];
+
+    // Set the label
+    map_entry.label = gmv_label;
+
+    // Use the "swap trick" from Scott Meyer's "Effective STL" to swap
+    // an unnamed temporary vector into the map_entry's vector.  Note:
+    // the vector(iter, iter) constructor is used.
+    std::vector<unsigned int>(node_map, 
+			      node_map+nodes_size).swap(map_entry.node_map);
+  }
 
 
   // ------------------------------------------------------------
@@ -83,134 +108,89 @@ namespace
 	// we will fill it.  Any subsequent calls will find an initialized
 	// eletypes map and will do nothing.
 
-	//==============================
-	// setup the element definitions
-	elementDefinition eledef;
-
-	// use "swap trick" from Scott Meyer's "Effective STL" to initialize
-	// eledef.nodes vector
-	
 	// EDGE2
 	{
-	  eledef.label = "line 2";
-	  const unsigned int nodes[] = {0,1};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-	
-	  eletypes[EDGE2] = eledef;
+	  const unsigned int node_map[] = {0,1};
+	  add_eletype_entry(EDGE2, node_map, "line 2", 2);
 	}
   
 	// LINE3
 	{
-	  eledef.label = "3line 3";
-	  const unsigned int nodes[] = {0,1,2};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-	  
-	  eletypes[EDGE3] = eledef;
+	  const unsigned int node_map[] = {0,1,2};
+	  add_eletype_entry(EDGE3, node_map, "3line 3", 3);
 	}
       
 	// TRI3
 	{
-	  eledef.label = "tri3 3";
-	  const unsigned int nodes[] = {0,1,2};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-	  
-	  eletypes[TRI3] = eledef;
+	  const unsigned int node_map[] = {0,1,2};
+	  add_eletype_entry(TRI3, node_map, "tri3 3", 3);
 	}
       
 	// TRI6
 	{
-	  eledef.label = "6tri 6";
-	  const unsigned int nodes[] = {0,1,2,3,4,5};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-
-	  eletypes[TRI6] = eledef;
+	  const unsigned int node_map[] = {0,1,2,3,4,5};
+	  add_eletype_entry(TRI6, node_map, "6tri 6", 6);
 	}
       
 	// QUAD4
 	{
-	  eledef.label = "quad 4";
-	  const unsigned int nodes[] = {0,1,2,3};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-
-	  eletypes[QUAD4] = eledef;
+	  const unsigned int node_map[] = {0,1,2,3};
+	  add_eletype_entry(QUAD4, node_map, "quad 4", 4);
 	}
       
 	// QUAD8, QUAD9
 	{
-	  eledef.label = "8quad 8";
-	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-
-	  eletypes[QUAD8] = eledef;
-	  eletypes[QUAD9] = eledef;
+	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7};
+	  add_eletype_entry(QUAD8, node_map, "8quad 8", 8);
+	  
+	  // QUAD9 was not supported by GMV but it gets the same entry, even the label (is that correct?)
+	  eletypes[QUAD9] = eletypes[QUAD8];
 	}
       
 	// HEX8
 	{
-	  eledef.label = "phex8 8";
-	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-
-	  eletypes[HEX8] = eledef;
+	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7};
+	  add_eletype_entry(HEX8, node_map, "phex8 8", 8);
 	}
       
 	// HEX20, HEX27
 	{
-	  eledef.label = "phex20 20";
-	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  // Note: This map is its own inverse
+	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15};
+	  add_eletype_entry(HEX20, node_map, "phex20 20", 20);
 
-	  eletypes[HEX20] = eledef;
-	  eletypes[HEX27] = eledef;
+	  // HEX27 was not supported by GMV but it gets the same entry, even the label (is that correct?)
+	  eletypes[HEX27] = eletypes[HEX20];
 	}
       
 	// TET4
 	{
-	  eledef.label = "tet 4";
-	  const unsigned int nodes[] = {0,1,2,3};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-
-	  eletypes[TET4] = eledef;
+	  // This is correct, see write_ascii_old_impl() to confirm.
+	  // This map is also its own inverse.
+	  const unsigned node_map[] = {0,2,1,3}; 
+	  add_eletype_entry(TET4, node_map, "tet 4", 4);
 	}
       
 	// TET10
 	{
-	  eledef.label = "ptet10 10";
-	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,9};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-	  
-	  eletypes[TET10] = eledef;
+	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9};
+	  add_eletype_entry(TET10, node_map, "ptet10 10", 10);	  
 	}
       
 	// PRISM6
 	{
-	  eledef.label = "pprism6 6";
-	  const unsigned int nodes[] = {0,1,2,3,4,5};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
-	  
-	  eletypes[PRISM6] = eledef;
+	  const unsigned int node_map[] = {0,1,2,3,4,5};
+	  add_eletype_entry(PRISM6, node_map, "pprism6 6", 6);	  
 	}
       
 	// PRISM15, PRISM18
 	{
-	  eledef.label = "pprism15 15";
-	  const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11};
-	  const unsigned int nnodes = sizeof(nodes)/sizeof(nodes[0]);
-	  std::vector<unsigned int>(nodes, nodes+nnodes).swap(eledef.nodes);
+	  // Note: This map is its own inverse
+	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14, 9,10,11};
+	  add_eletype_entry(PRISM15, node_map, "pprism15 15", 15);	  
 	  
-	  eletypes[PRISM15] = eledef;
-	  eletypes[PRISM18] = eledef;
+	  // PRISM18 was not supported by GMV but it gets the same entry, even the label (is that correct?)
+	  eletypes[PRISM18] = eletypes[PRISM15];
 	}
 	//==============================      
       }
@@ -316,7 +296,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
     // write the connectivity
     out << "cells " << n_active_elem << "\n";
     
-    // initialize the eletypes map
+    // initialize the eletypes map (eletypes is a file-global variable)
     init_eletypes();
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
@@ -333,15 +313,15 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 	// the current element type.
 	libmesh_assert (eletypes.count(elem->type()));
 
-        const elementDefinition& ele = eletypes[elem->type()];
+        const ElementDefinition& ele = eletypes[elem->type()];
 
 	// The element mapper better not require any more nodes
 	// than are present in the current element!
-	libmesh_assert (ele.nodes.size() <= elem->n_nodes());
+	libmesh_assert (ele.node_map.size() <= elem->n_nodes());
 	
         out << ele.label << "\n";
-        for (unsigned int i=0; i < ele.nodes.size(); i++)
-          out << elem->node(ele.nodes[i])+1 << " ";
+        for (unsigned int i=0; i < ele.node_map.size(); i++)
+          out << elem->node(ele.node_map[i])+1 << " ";
         out << "\n";
       }
     out << "\n";
@@ -377,7 +357,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
 	  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
 	  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
 
-	  // FIXME - don't we need to use an elementDefinition here? - RHS
+	  // FIXME - don't we need to use an ElementDefinition here? - RHS
 	  for ( ; it != end; ++it)
 	    out << (*it)->processor_id()+1 << "\n";
 	  out << "\n";
@@ -421,13 +401,13 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
         {
           const Elem* elem = *it;
 
-          const elementDefinition& ele = eletypes[elem->type()];
+          const ElementDefinition& ele = eletypes[elem->type()];
 
 	  // The element mapper better not require any more nodes
 	  // than are present in the current element!
-	  libmesh_assert (ele.nodes.size() <= elem->n_nodes());
+	  libmesh_assert (ele.node_map.size() <= elem->n_nodes());
 
-          for (unsigned int i=0; i < ele.nodes.size(); i++)
+          for (unsigned int i=0; i < ele.node_map.size(); i++)
             out << elem->p_level() << " ";
         }
       out << "\n\n";
@@ -555,6 +535,13 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
+  // Use a MeshSerializer object to gather a parallel mesh before outputting it.
+  // Note that we cast away constness here (which is bad), but the destructor of
+  // the MeshSerializer object reparallelizes the Mesh, hopefully keeping it
+  // "logically const" outside the context of this function...
+  MeshSerializer serialize(const_cast<MeshBase&>(mesh), 
+			   !MeshOutput<MeshBase>::_is_parallel_format);
+
   // These are parallel_only functions
   const unsigned int n_active_elem = mesh.n_active_elem(),
                      n_active_sub_elem = mesh.n_active_sub_elem();
@@ -574,15 +561,16 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 
   // Make sure our nodes are contiguous and serialized
   libmesh_assert (mesh.n_nodes() == mesh.max_node_id());
+  
   // libmesh_assert (mesh.is_serial());
-  if (!mesh.is_serial())
-    {
-      if (libMesh::processor_id() == 0)
-        libMesh::err << "Error: GMVIO cannot yet write a ParallelMesh solution"
-                      << std::endl;
-      return;
-    }
-
+  // if (!mesh.is_serial())
+  //   {
+  //     if (libMesh::processor_id() == 0)
+  //       libMesh::err << "Error: GMVIO cannot yet write a ParallelMesh solution"
+  //                     << std::endl;
+  //     return;
+  //   }
+  
   unsigned int mesh_max_p_level = 0;
   
   // Begin interfacing with the GMV data file
@@ -850,11 +838,15 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 			     ((*it)->type() == TET10))
 		      {
 		        out << "tet 4\n";
+			// Tecplot connectivity returns 8 entries for
+			// the Tet, enough to store it as a degenerate Hex.
+			// For GMV we only pick out the four relevant node
+			// indices.
 		        (*it)->connectivity(se, TECPLOT, conn);
-		        out << conn[0] << " "
-			    << conn[2] << " "
-			    << conn[1] << " "
-			    << conn[4] << " ";
+		        out << conn[0] << " "  // libmesh tet node 0
+			    << conn[2] << " "  // libmesh tet node 2
+			    << conn[1] << " "  // libmesh tet node 1
+			    << conn[4] << " "; // libmesh tet node 3
 		      }
 #ifndef  LIBMESH_ENABLE_INFINITE_ELEMENTS
 		    else if (((*it)->type() == PRISM6)  ||
@@ -2006,6 +1998,10 @@ void GMVIO::read (const std::string& name)
   libmesh_error();
 
 #else
+  // We use the file-scope global variable eletypes for mapping nodes 
+  // from GMV to libmesh indices, so initialize that data now.
+  init_eletypes();
+
   // Clear the mesh so we are sure to start from a pristeen state.
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
   mesh.clear();
@@ -2285,17 +2281,23 @@ void GMVIO::_read_one_cell()
       Elem* elem = Elem::build(type).release();
       elem->set_id(_next_elem_id++);
 
+      // Get the ElementDefinition object for this element type
+      const ElementDefinition& eledef = eletypes[type];
+
       // Print out the connectivity information for
       // this cell.
-      for (int i = 0; i < GMV::gmv_data.num2; i++)
+      for (unsigned i=0; i<GMV::gmv_data.num2; i++)
 	{
 	  // 	  // Debugging info
 	  // 	  libMesh::out << "Vertex " << i << " is node "
 	  // 		    << GMV::gmv_data.longdata1[i]
 	  // 		    << std::endl;
 	  
-	  // Note: Node numbers are 1-based
-	  elem->set_node(i) = mesh.node_ptr(GMV::gmv_data.longdata1[i]-1);
+	  // Map index i to GMV's numbering scheme
+	  unsigned mapped_i = eledef.node_map[i];
+
+	  // Note: Node numbers (as stored in libmesh) are 1-based
+	  elem->set_node(i) = mesh.node_ptr(GMV::gmv_data.longdata1[mapped_i]-1);
 	}
 
       elems_of_dimension[elem->dim()] = true;
