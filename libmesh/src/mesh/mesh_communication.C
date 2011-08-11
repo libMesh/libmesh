@@ -1179,6 +1179,9 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	  ////////////////////////////////////////////////////////////////////////////////
 	  const unsigned int n_node_bcs_received = elements_received.back(); elements_received.pop_back();
 	  const unsigned int n_elem_bcs_received = elements_received.back(); elements_received.pop_back();
+#ifdef NDEBUG
+          libmesh_ignore(n_elem_bcs_received);
+#endif
 	  const unsigned int n_elements_received = elements_received.back(); elements_received.pop_back();
 	  
 	  // counter into the bc/element connectivty buffer

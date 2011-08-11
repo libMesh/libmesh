@@ -291,7 +291,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* inf_elem)
+void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_dbg_var(inf_elem))
 {
   libmesh_assert (radial_qrule != NULL);
   libmesh_assert (inf_elem     != NULL);

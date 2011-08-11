@@ -56,7 +56,7 @@ class Edge4 : public Edge
    * nodes and neighbors for which storage will be allocated.
    */
   Edge4(const unsigned int nn,
-        const unsigned int ns,
+        const unsigned int libmesh_dbg_var(ns),
 	Elem* p) :
     Edge(nn, p) { libmesh_assert (ns == 0); }
 

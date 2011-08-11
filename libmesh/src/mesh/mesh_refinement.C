@@ -295,7 +295,7 @@ void MeshRefinement::update_nodes_map ()
 
 
 
-bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
+bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
 {
   // This function must be run on all processors at once
   parallel_only();
@@ -359,7 +359,7 @@ bool MeshRefinement::test_level_one (bool libmesh_assert_pass)
 
 
 
-bool MeshRefinement::test_unflagged (bool libmesh_assert_pass)
+bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
 {
   // This function must be run on all processors at once
   parallel_only();

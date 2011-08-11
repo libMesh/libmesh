@@ -870,7 +870,7 @@ void FEMContext::pre_fe_reinit(const System &sys, Elem *e)
   if (compute_neighbor_values)
     sys.get_dof_map().dof_indices (neigh, neigh_dof_indices);
   unsigned int n_dofs = dof_indices.size();
-  unsigned int neigh_n_dofs;
+  unsigned int neigh_n_dofs = 0;
   if (compute_neighbor_values)
     neigh_n_dofs = neigh_dof_indices.size();
   unsigned int n_qoi = sys.qoi.size();

@@ -67,7 +67,7 @@ unsigned int Edge::opposite_side(const unsigned int side) const
 
 
 unsigned int Edge::opposite_node(const unsigned int node,
-                                 const unsigned int side) const
+                                 const unsigned int libmesh_dbg_var(side)) const
 {
   libmesh_assert(node < 2);
   libmesh_assert(side < this->n_sides());

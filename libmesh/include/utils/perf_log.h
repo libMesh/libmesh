@@ -375,8 +375,8 @@ void PerfLog::push (const std::string &label,
 
 
 inline
-void PerfLog::pop (const std::string &label,
-		   const std::string &header)
+void PerfLog::pop (const std::string &libmesh_dbg_var(label),
+		   const std::string &libmesh_dbg_var(header))
 {
   if (this->log_events)
     {

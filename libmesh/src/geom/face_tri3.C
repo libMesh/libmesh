@@ -159,7 +159,7 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
 }
 
 
-void Tri3::connectivity(const unsigned int sf,
+void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
 			const IOPackage iop,
 			std::vector<unsigned int>& conn) const
 {

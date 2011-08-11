@@ -32,7 +32,7 @@ namespace libMesh
 
 template <>
 Real FE<3,MONOMIAL>::shape(const ElemType,
-			   const Order order,
+			   const Order libmesh_dbg_var(order),
 			   const unsigned int i,
 			   const Point& p)
 {
@@ -201,7 +201,7 @@ Real FE<3,MONOMIAL>::shape(const Elem* elem,
 
 template <>
 Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
-				 const Order order,
+				 const Order libmesh_dbg_var(order),
 				 const unsigned int i,
 				 const unsigned int j,
 				 const Point& p)
@@ -652,7 +652,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const Elem* elem,
 
 template <>
 Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
-				        const Order order,
+				        const Order libmesh_dbg_var(order),
 				        const unsigned int i,
 				        const unsigned int j,
 				        const Point& p)

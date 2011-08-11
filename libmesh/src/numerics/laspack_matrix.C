@@ -126,11 +126,11 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 
 
 template <typename T> 
-void LaspackMatrix<T>::init (const unsigned int m,
-			     const unsigned int n,
-			     const unsigned int m_l,
-			     const unsigned int n_l,
-			     const unsigned int nnz,
+void LaspackMatrix<T>::init (const unsigned int libmesh_dbg_var(m),
+			     const unsigned int libmesh_dbg_var(n),
+			     const unsigned int libmesh_dbg_var(m_l),
+			     const unsigned int libmesh_dbg_var(n_l),
+			     const unsigned int libmesh_dbg_var(nnz),
 			     const unsigned int)
 {
   // noz ignored...  only used for multiple processors!

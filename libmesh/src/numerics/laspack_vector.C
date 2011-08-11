@@ -372,7 +372,7 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in) const
 
 template <typename T>
 void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
-				 const std::vector<unsigned int>& send_list) const
+				 const std::vector<unsigned int>& libmesh_dbg_var(send_list)) const
 {
   // Make sure the NumericVector passed in is really a LaspackVector
   LaspackVector<T>* v_local =
@@ -387,9 +387,9 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
 
 
 template <typename T>
-void LaspackVector<T>::localize (const unsigned int first_local_idx,
-				 const unsigned int last_local_idx,
-				 const std::vector<unsigned int>& send_list)
+void LaspackVector<T>::localize (const unsigned int libmesh_dbg_var(first_local_idx),
+				 const unsigned int libmesh_dbg_var(last_local_idx),
+				 const std::vector<unsigned int>& libmesh_dbg_var(send_list))
 {
   libmesh_assert (first_local_idx  == 0);
   libmesh_assert (last_local_idx+1 == this->size());
@@ -413,7 +413,7 @@ void LaspackVector<T>::localize (std::vector<T>& v_local) const
 
 template <typename T>
 void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
-					const unsigned int pid) const
+					const unsigned int libmesh_dbg_var(pid)) const
 {
   libmesh_assert (pid == 0);
 

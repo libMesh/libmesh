@@ -193,7 +193,7 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 
 
 
-void Quad4::connectivity(const unsigned int sf,
+void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {

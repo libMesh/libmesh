@@ -55,7 +55,7 @@ std::map<std::string, MeshFunction *> mesh_functions;
 // Return the function value on the old mesh and solution
 Number fptr(const Point& p,
             const Parameters&,
-            const std::string& sys_name,
+            const std::string& libmesh_dbg_var(sys_name),
             const std::string& unknown_name)
 {
   libmesh_assert(sys_name == current_sys_name);
@@ -70,7 +70,7 @@ Number fptr(const Point& p,
 // Return the function gradient on the old mesh and solution
 Gradient gptr(const Point& p,
               const Parameters&,
-              const std::string& sys_name,
+              const std::string& libmesh_dbg_var(sys_name),
               const std::string& unknown_name)
 {
   libmesh_assert(sys_name == current_sys_name);

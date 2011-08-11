@@ -651,12 +651,13 @@ void TransientRBConstruction::attach_affine_expansion(RBThetaExpansion& rb_theta
                                                       RBAssemblyExpansion& rb_assembly_expansion_in)
 {
   // Check that the theta and assembly objects are consistently sized
+#ifndef NDEBUG
   TransientRBThetaExpansion& trans_theta_expansion_in =
     libmesh_cast_ref<TransientRBThetaExpansion&>(rb_theta_expansion_in);
 
   TransientRBAssemblyExpansion& trans_assembly_expansion_in =
     libmesh_cast_ref<TransientRBAssemblyExpansion&>(rb_assembly_expansion_in);
-
+#endif
   libmesh_assert(trans_theta_expansion_in.get_Q_m() == trans_assembly_expansion_in.M_q_assembly_vector.size());
 
   // set the affine expansion objects

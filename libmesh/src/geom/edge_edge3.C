@@ -76,7 +76,7 @@ bool Edge3::is_node_on_side(const unsigned int n,
 }
 
 bool Edge3::is_node_on_edge(const unsigned int,
-			    const unsigned int e) const
+			    const unsigned int libmesh_dbg_var(e)) const
 {
   libmesh_assert(e == 0);
   return true;

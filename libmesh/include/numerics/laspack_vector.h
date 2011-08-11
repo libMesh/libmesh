@@ -517,7 +517,7 @@ LaspackVector<T>::~LaspackVector ()
 template <typename T> 
 inline
 void LaspackVector<T>::init (const unsigned int n,
-			     const unsigned int n_local,
+			     const unsigned int libmesh_dbg_var(n_local),
 			     const bool fast,
                              const ParallelType)
 {
@@ -564,7 +564,7 @@ template <typename T>
 inline
 void LaspackVector<T>::init (const unsigned int n,
 			     const unsigned int n_local,
-	                     const std::vector<unsigned int>& ghost,
+	                     const std::vector<unsigned int>& libmesh_dbg_var(ghost),
 			     const bool fast,
                              const ParallelType type)
 {

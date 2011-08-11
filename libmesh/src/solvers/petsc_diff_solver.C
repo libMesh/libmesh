@@ -111,7 +111,7 @@ __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
 
 
 PetscErrorCode
-__libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *j, Mat *pc,
+__libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *libmesh_dbg_var(j), Mat *pc,
                                       MatStructure *msflag, void *ctx)
 {
   libmesh_assert (x   != NULL);
