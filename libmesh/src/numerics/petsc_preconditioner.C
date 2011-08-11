@@ -28,15 +28,22 @@
 #include "petsc_macro.h"
 #include "petsc_matrix.h"
 #include "petsc_vector.h"
-
 #include "libmesh_common.h"
+
+// PCBJacobiGetSubKSP was defined in petscksp.h in PETSc 2.3.3
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+
+EXTERN_C_FOR_PETSC_BEGIN
+#include "petscksp.h"
+EXTERN_C_FOR_PETSC_END
+
+#endif
 
 namespace libMesh
 {
 
 template <typename T>
-void
-PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
+void PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
 {
   PetscVector<T> & x_pvec = libmesh_cast_ref<PetscVector<T>&>(const_cast<NumericVector<T>&>(x));
   PetscVector<T> & y_pvec = libmesh_cast_ref<PetscVector<T>&>(const_cast<NumericVector<T>&>(y));
@@ -48,9 +55,11 @@ PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
+
+
+
 template <typename T>
-void
-PetscPreconditioner<T>::init ()
+void PetscPreconditioner<T>::init ()
 {
   if(!this->_matrix)
   {
@@ -58,23 +67,12 @@ PetscPreconditioner<T>::init ()
     libmesh_error();
   }
 
-  //Clear the preconditioner in case it has been created in the past
-  if(!this->_is_initialized)
+  // Clear the preconditioner in case it has been created in the past
+  if (!this->_is_initialized)
   {
-    //Create the preconditioning object
+    // Create the preconditioning object
     int ierr = PCCreate(libMesh::COMM_WORLD,&_pc);
     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-    //Set the PCType
-    set_petsc_preconditioner_type(this->_preconditioner_type, _pc);
-
-#ifdef LIBMESH_HAVE_PETSC_HYPRE
-    if(this->_preconditioner_type == AMG_PRECOND)
-      {
-	PCHYPRESetType(this->_pc, "boomeramg");
-	CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      }
-#endif
 
     PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
     
@@ -84,12 +82,23 @@ PetscPreconditioner<T>::init ()
   int ierr = PCSetOperators(_pc,_mat,_mat,SAME_NONZERO_PATTERN);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
+  // Set the PCType.  Note: this used to be done *before* the call to
+  // PCSetOperators(), and only when !_is_initialized, but
+  // 1.) Some preconditioners (those employing sub-preconditioners,
+  // for example) have to call PCSetUp(), and can only do this after
+  // the operators have been set.
+  // 2.) It should be safe to call set_petsc_preconditioner_type()
+  // multiple times.
+  set_petsc_preconditioner_type(this->_preconditioner_type, _pc);
+
   this->_is_initialized = true;
 }
 
+
+
+
 template <typename T>
-void
-PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType & preconditioner_type, PC & pc)
+void PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType & preconditioner_type, PC & pc)
 {
   int ierr = 0;
  
@@ -105,13 +114,58 @@ PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType 
     ierr = PCSetType (pc, (char*) PCICC);       CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
 
   case ILU_PRECOND:
-    ierr = PCSetType (pc, (char*) PCILU);       CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
+    {
+      // In serial, just set the ILU preconditioner type
+      if (libMesh::n_processors() == 1)
+	{
+	  ierr = PCSetType (pc, (char*) PCILU);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+	}
+      else
+	{
+	  // But PETSc has no truly parallel ILU, instead you have to set
+	  // an actual parallel preconditioner (e.g. block Jacobi) and then
+	  // assign ILU sub-preconditioners.
+	  ierr = PCSetType (pc, (char*) PCBJACOBI);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  
+	  // Set ILU as the sub preconditioner type
+	  set_petsc_subpreconditioner_type(PCILU, pc);
+	}      
+      break;
+    }
 
   case LU_PRECOND:
-    ierr = PCSetType (pc, (char*) PCLU);        CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
+    {
+      // In serial, just set the LU preconditioner type
+      if (libMesh::n_processors() == 1)
+	{
+	  ierr = PCSetType (pc, (char*) PCLU);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	}
+      else
+	{
+	  // But PETSc has no truly parallel LU, instead you have to set
+	  // an actual parallel preconditioner (e.g. block Jacobi) and then
+	  // assign LU sub-preconditioners.
+	  ierr = PCSetType (pc, (char*) PCBJACOBI);
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  
+	  // Set ILU as the sub preconditioner type
+	  set_petsc_subpreconditioner_type(PCLU, pc);
+	}
+      break;
+    }
       
   case ASM_PRECOND:
-    ierr = PCSetType (pc, (char*) PCASM);       CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
+    {
+      // In parallel, I think ASM uses ILU by default as the sub-preconditioner...
+      // I tried setting a different sub-preconditioner here, but apparently the matrix
+      // is not in the correct state (at this point) to call PCSetUp().
+      ierr = PCSetType (pc, (char*) PCASM);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+      break;
+    }
 
   case JACOBI_PRECOND:
     ierr = PCSetType (pc, (char*) PCJACOBI);    CHKERRABORT(libMesh::COMM_WORLD,ierr); break;
@@ -143,13 +197,78 @@ PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType 
                   << "Continuing with PETSC defaults" << std::endl;
   }
 
-  //Let the commandline override stuff
-  if( preconditioner_type != AMG_PRECOND )
+  // Set additional options if we are doing AMG and
+  // HYPRE is available
+#ifdef LIBMESH_HAVE_PETSC_HYPRE
+  if (preconditioner_type == AMG_PRECOND)
     {
-      PCSetFromOptions(pc);
+      ierr = PCHYPRESetType(pc, "boomeramg");
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+#endif
+
+  // Let the commandline override stuff
+  // FIXME: Unless we are doing AMG???
+  if (preconditioner_type != AMG_PRECOND)
+    {
+      ierr = PCSetFromOptions(pc);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 }
+
+
+
+template <typename T>
+#if PETSC_VERSION_LESS_THAN(3,0,0)
+ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(PCType type, PC& pc)
+#else
+ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type, PC& pc)
+#endif
+{
+  // For catching PETSc error return codes
+  int ierr = 0;
+
+  // All docs say must call KSPSetUp or PCSetUp before calling PCBJacobiGetSubKSP.
+  // You must call PCSetUp after the preconditioner operators have been set, otherwise you get the:
+  //
+  // "Object is in wrong state!"
+  // "Matrix must be set first."
+  //
+  // error messages...
+  ierr = PCSetUp(pc);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // To store array of local KSP contexts on this processor
+  KSP* subksps;
+
+  // the number of blocks on this processor
+  int n_local;
+
+  // The global number of the first block on this processor.
+  // This is not used, so we just pass PETSC_NULL instead.
+  // int first_local;
+
+  // Fill array of local KSP contexts
+  ierr = PCBJacobiGetSubKSP(pc, &n_local, PETSC_NULL, &subksps);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Loop over sub-ksp objects, set ILU preconditioner
+  for (int i=0; i<n_local; ++i)
+    {
+      // Get pointer to sub KSP object's PC
+      PC subpc;
+      ierr = KSPGetPC(subksps[i], &subpc);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      // Set requested type on the sub PC
+      ierr = PCSetType(subpc, type);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
+  
+}
+
+
+
 
 //------------------------------------------------------------------
 // Explicit instantiations
