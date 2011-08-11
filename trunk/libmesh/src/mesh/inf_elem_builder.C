@@ -223,7 +223,9 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       // front, while to leftovers are @e not deleted.  Instead,
       // it returns a pointer to the end of the unique range.
       //TODO:[BSK] int_ibn_size_before is not the same type as unique_size!
+#ifndef NDEBUG
       const unsigned int ibn_size_before = inner_boundary_node_numbers.size();
+#endif
       std::sort (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
       std::vector<unsigned int>::iterator unique_end = 
 	  std::unique (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());

@@ -217,7 +217,7 @@ AutoPtr<Elem> Pyramid5::build_edge (const unsigned int i) const
 
 
 
-void Pyramid5::connectivity(const unsigned int sc,
+void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const
 {

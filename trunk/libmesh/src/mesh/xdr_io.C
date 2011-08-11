@@ -255,7 +255,7 @@ void XdrIO::write (const std::string& name)
 
 
 
-void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int n_elem) const
+void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_dbg_var(n_elem)) const
 {
   libmesh_assert (io.writing());
   

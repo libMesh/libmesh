@@ -112,7 +112,7 @@ int main (int, char**)
 
 
 void assemble(EquationSystems& es,
-	      const std::string& system_name)
+	      const std::string& libmesh_dbg_var(system_name))
 {
   libmesh_assert (system_name == "primary");
   

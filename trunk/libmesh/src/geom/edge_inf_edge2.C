@@ -59,13 +59,13 @@ bool InfEdge2::is_node_on_side(const unsigned int n,
 }
 
 bool InfEdge2::is_node_on_edge(const unsigned int,
-			       const unsigned int e) const
+			       const unsigned int libmesh_dbg_var(e)) const
 {
   libmesh_assert(e == 0);
   return true;
 }
 
-void InfEdge2::connectivity(const unsigned int se,
+void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const
 {

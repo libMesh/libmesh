@@ -160,7 +160,7 @@ AutoPtr<Elem> Tet4::build_edge (const unsigned int i) const
 }
 
 
-void Tet4::connectivity(const unsigned int sc,
+void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
 			const IOPackage iop,
 			std::vector<unsigned int>& conn) const
 {

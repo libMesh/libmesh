@@ -258,7 +258,7 @@ AutoPtr<Elem> Prism15::build_edge (const unsigned int i) const
 }
 
 
-void Prism15::connectivity(const unsigned int sc,
+void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
 			   const IOPackage iop,
 			   std::vector<unsigned int>& conn) const
 {

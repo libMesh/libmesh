@@ -45,7 +45,7 @@ namespace libMesh
     libmesh_assert(Parallel::verify(std::string(__FILE__))); \
     libmesh_assert(Parallel::verify(__LINE__)); } while (0)
 #else
-  #define parallel_only()
+  #define parallel_only()  ((void) 0)
 #endif
 
 // Macro to identify and debug functions which should only be called in
@@ -58,7 +58,7 @@ namespace libMesh
     libmesh_assert(Parallel::verify(std::string(__FILE__), comm_arg)); \
     libmesh_assert(Parallel::verify(__LINE__), comm_arg); } while (0)
 #else
-  #define parallel_only_on(comm_arg)
+  #define parallel_only_on(comm_arg)  ((void) 0)
 #endif
 
 /**

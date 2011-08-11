@@ -1148,7 +1148,7 @@ void Elem::replace_child (Elem* elem, unsigned int c)
 
 
 
-bool Elem::is_child_on_edge(const unsigned int c,
+bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
                             const unsigned int e) const
 {
   libmesh_assert (c < this->n_children());

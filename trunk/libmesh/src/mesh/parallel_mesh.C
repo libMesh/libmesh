@@ -617,15 +617,19 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
       unsigned int refinement_flag   = elem ?
         static_cast<unsigned int> (elem->refinement_flag()) : libMesh::invalid_uint;
+#ifndef NDEBUG
       unsigned int p_refinement_flag = elem ?
         static_cast<unsigned int> (elem->p_refinement_flag()) : libMesh::invalid_uint;
+#endif
 
       unsigned int min_rflag = refinement_flag;
       Parallel::min(min_rflag);
       // All processors with this element should agree on flag
       libmesh_assert (!elem || min_rflag == refinement_flag);
 
+#ifndef NDEBUG
       unsigned int min_pflag = p_refinement_flag;
+#endif
       // All processors with this element should agree on flag
       libmesh_assert (!elem || min_pflag == p_refinement_flag);
     }

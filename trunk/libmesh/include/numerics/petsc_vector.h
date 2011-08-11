@@ -806,7 +806,7 @@ void PetscVector<T>::init (const unsigned int n,
 			   const unsigned int n_local,
 			   const std::vector<unsigned int>& ghost,
 			   const bool fast,
-                           const ParallelType type)
+                           const ParallelType libmesh_dbg_var(type))
 {
   int ierr=0;
   int petsc_n=static_cast<int>(n);

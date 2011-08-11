@@ -412,10 +412,11 @@ void Nemesis_IO::read (const std::string& base_filename)
   // computed and the current processor's ID.
   for (unsigned int i=0; i<to_uint(nemhelper->num_internal_nodes); ++i)
     {
-      const unsigned int 
-	local_node_idx  = nemhelper->node_mapi[i]-1,
-	global_node_idx = nemhelper->node_num_map[local_node_idx]-1,
-	owning_pid_idx  = node_ownership[local_node_idx];
+      const unsigned int local_node_idx  = nemhelper->node_mapi[i]-1;
+#ifndef NDEBUG
+      const unsigned int global_node_idx = nemhelper->node_num_map[local_node_idx]-1;
+      const unsigned int owning_pid_idx  = node_ownership[local_node_idx];
+#endif
 
       // an internal node we do not own? huh??
       libmesh_assert (owning_pid_idx == libMesh::processor_id());

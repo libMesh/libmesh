@@ -142,7 +142,7 @@ template <>
 Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 				 const Order order,
 				 const unsigned int i,
-				 const unsigned int j,
+				 const unsigned int libmesh_dbg_var(j),
 				 const Point& p)
 {
   // only d()/dxi in 1D!
@@ -256,7 +256,7 @@ template <>
 Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
 					const Order order,
 					const unsigned int i,
-					const unsigned int j,
+					const unsigned int libmesh_dbg_var(j),
 					const Point& p)
 {
   // Don't need to switch on j.  1D shape functions

@@ -205,7 +205,7 @@ AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
 }
 
 
-void InfQuad4::connectivity(const unsigned int sf,
+void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const
 {

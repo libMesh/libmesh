@@ -59,7 +59,7 @@ Real FE<2,XYZ>::shape(const ElemType,
 
 template <>
 Real FE<2,XYZ>::shape(const Elem* elem,
-		      const Order order,
+		      const Order libmesh_dbg_var(order),
 		      const unsigned int i,
 		      const Point& p)
 {
@@ -188,7 +188,7 @@ Real FE<2,XYZ>::shape_deriv(const ElemType,
 
 template <>
 Real FE<2,XYZ>::shape_deriv(const Elem* elem,
-			    const Order order,
+			    const Order libmesh_dbg_var(order),
 			    const unsigned int i,
 			    const unsigned int j,
 			    const Point& p)
@@ -400,7 +400,7 @@ Real FE<2,XYZ>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
-			           const Order order,
+			           const Order libmesh_dbg_var(order),
 			           const unsigned int i,
 			           const unsigned int j,
 			           const Point& p)

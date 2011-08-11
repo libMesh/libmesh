@@ -212,7 +212,7 @@ template <>
 Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
 				  const Order order,
 				  const unsigned int i,
-				  const unsigned int j,
+				  const unsigned int libmesh_dbg_var(j),
 				  const Point& p)
 {
   // only d()/dxi in 1D!
