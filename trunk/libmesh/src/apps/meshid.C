@@ -5,6 +5,10 @@
 
 #include <iostream>
 
+#include "libmesh_config.h"
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+
 #include "exodusII.h"
 #include "exodusII_int.h"
 #include "getpot.h"
@@ -131,3 +135,11 @@ int main(int argc, char** argv)
   
   exit(0);
 }
+
+#else // LIBMESH_HAVE_EXODUS_API
+
+int main(int argc, char** argv)
+{
+  std::cerr << "Error: meshid requires libMesh configured with --enable-exodus" << std::endl;
+}
+#endif // LIBMESH_HAVE_EXODUS_API
