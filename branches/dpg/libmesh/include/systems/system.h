@@ -825,8 +825,8 @@ public:
    * for this system.  Returns the index number for the new variable.
    */
   unsigned int add_variable (const std::string& var,
-		             const FEType& type,
-			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
+      const FEType& type,
+      const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -834,9 +834,9 @@ public:
    * as default value for \p FEType.family.
    */
   unsigned int add_variable (const std::string& var,
-		             const Order order = FIRST,
-		             const FEFamily = LAGRANGE,
-			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
+      const Order order = FIRST,
+      const FEFamily = LAGRANGE,
+      const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /** 
    * Return a constant reference to \p Variable \p var.

@@ -130,7 +130,7 @@ mode := "INVALID"
 # If the user has no environment variable
 # called METHOD, he gets optimized mode.
 ifeq (x$(METHOD),x)
-  METHOD := opt
+  METHOD := dbg
 endif
 
 # If METHOD=opt, compile in optimized mode.
