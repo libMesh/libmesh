@@ -17,20 +17,12 @@
 #define SIDES   0x2
 #define NODES   0x1
 
-void handle_error(int error)
-{
-  std::cout << "An error occured while working with the netCDF API" << std::endl;
+// Report error from NetCDF and exit
+void handle_error(int error, std::string message);
 
-  exit(1);
-}
+// Report error in input flags and exit
+void usage_error(const char *progname);
 
-void usage_error(const char *progname)
-{
-  std::cout << "Usage: " << progname
-            << " --input inputmesh --oldid <n> --newid <n> [--nodesetonly | --sidesetonly | --blockonly]" 
-            << std::endl;
-  exit(1);
-}
 
 int main(int argc, char** argv)
 {
@@ -65,11 +57,16 @@ int main(int argc, char** argv)
     flags |= SIDES;
   if (cl.search("--blockonly"))
     flags |= BLOCKS;
+
+  // No command line flags were set, turn on NODES, SIDES, and BLOCKS
   if (!flags)
     flags = NODES | SIDES | BLOCKS; // ALL ON
 
   // flags are exclusive
-  if (flags != NODES && flags != SIDES && flags != BLOCKS  && flags != (NODES | SIDES | BLOCKS))
+  if (flags != NODES &&
+      flags != SIDES &&
+      flags != BLOCKS &&
+      flags != (NODES | SIDES | BLOCKS))
   {
     std::cerr << "Only one of the following options may be active [--nodesetonly | --sidesetonly | --blockonly]!" << std::endl;
     usage_error(argv[0]);
@@ -82,10 +79,12 @@ int main(int argc, char** argv)
   size_t dim_len;
 
   status = nc_open (meshname, NC_WRITE, &nc_id);
-  if (status != NC_NOERR) handle_error(status);
+  if (status != NC_NOERR) handle_error(status, "Error while opening file.");
 
-  for (unsigned char mask = 1<<2; mask; mask>>=1)
+  for (unsigned char mask = 4; mask; mask/=2)
   {
+
+    // These are char*'s #defined in exodsuII_int.h
     switch (flags & mask)
     {
     case BLOCKS:
@@ -101,39 +100,40 @@ int main(int argc, char** argv)
       var_name = VAR_NS_IDS;
       break;
     default:
+      // We don't match this flag, so go to the next mask
       continue;
     }
 
-    // Get the length of the "variable" in question - stored in a dimension field
+    // Get the ID and length of the variable in question - stored in a dimension field
     status = nc_inq_dimid (nc_id, dim_name.c_str(), &dim_id);
-    if (status != NC_NOERR) handle_error(status);
+    if (status != NC_NOERR) handle_error(status, "Error while inquiring about a dimension's ID.");
 
     status = nc_inq_dimlen (nc_id, dim_id, &dim_len);
-    if (status != NC_NOERR) handle_error(status);
+    if (status != NC_NOERR) handle_error(status, "Error while inquiring about a dimension's length.");
     
     // Now get the variable values themselves
     std::vector<long> var_vals(dim_len);
     
     status = nc_inq_varid (nc_id, var_name.c_str(), &var_id);
-    if (status != NC_NOERR) handle_error(status);
+    if (status != NC_NOERR) handle_error(status, "Error while inquiring about a variable's ID.");
 
     status = nc_get_var_long (nc_id, var_id, &var_vals[0]);
-    if (status != NC_NOERR) handle_error(status);
+    if (status != NC_NOERR) handle_error(status, "Error while retrieving a variable's values.");
 
     // Update the variable value specified on the command line
     for (unsigned int i=0; i<dim_len; ++i)
       if (var_vals[i] == oldid)
-        var_vals[i] = newid;
+	var_vals[i] = newid;
 
     // Save that value back to the NetCDF database
     status = nc_put_var_long (nc_id, var_id, &var_vals[0]);
-    if (status != NC_NOERR) handle_error(status);
-  }
+    if (status != NC_NOERR) handle_error(status, "Error while writing a variable's values.");
+  } // end for
 
   // Write out the dataset
   status = nc_close(nc_id);
   
-  exit(0);
+  return 0;
 }
 
 #else // LIBMESH_HAVE_EXODUS_API
@@ -143,3 +143,23 @@ int main(int argc, char** argv)
   std::cerr << "Error: meshid requires libMesh configured with --enable-exodus" << std::endl;
 }
 #endif // LIBMESH_HAVE_EXODUS_API
+
+
+
+void handle_error(int error, std::string message)
+{
+  std::cout << "Error " << error << " occured while working with the netCDF API" << std::endl;
+  std::cout << message << std::endl;
+
+  exit(1);
+}
+
+
+
+void usage_error(const char *progname)
+{
+  std::cout << "Usage: " << progname
+            << " --input inputmesh --oldid <n> --newid <n> [--nodesetonly | --sidesetonly | --blockonly]" 
+            << std::endl;
+  exit(1);
+}
