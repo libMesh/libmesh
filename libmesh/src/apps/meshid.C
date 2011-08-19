@@ -4,6 +4,8 @@
 // blocks, sidesets and nodesets
 
 #include <iostream>
+#include <time.h> // time
+#include <stdlib.h> // random, srandom
 
 #include "libmesh_config.h"
 
@@ -13,15 +15,20 @@
 #include "exodusII_int.h"
 #include "getpot.h"
 
-#define BLOCKS  0x4
-#define SIDES   0x2
-#define NODES   0x1
+#define EXODUS_DIM 0x8
+#define BLOCKS     0x4
+#define SIDES      0x2
+#define NODES      0x1
 
 // Report error from NetCDF and exit
 void handle_error(int error, std::string message);
 
 // Report error in input flags and exit
 void usage_error(const char *progname);
+
+// Generate a random string, seed RNG with current time.
+void gen_random_string(std::string& s, const int len);
+
 
 
 int main(int argc, char** argv)
@@ -57,18 +64,21 @@ int main(int argc, char** argv)
     flags |= SIDES;
   if (cl.search("--blockonly"))
     flags |= BLOCKS;
+  if (cl.search("--dim"))
+    flags |= EXODUS_DIM;
 
   // No command line flags were set, turn on NODES, SIDES, and BLOCKS
   if (!flags)
-    flags = NODES | SIDES | BLOCKS; // ALL ON
+    flags = NODES | SIDES | BLOCKS; // ALL except EXODUS_DIM on
 
   // flags are exclusive
-  if (flags != NODES &&
-      flags != SIDES &&
-      flags != BLOCKS &&
+  if (flags != NODES && 
+      flags != SIDES && 
+      flags != BLOCKS && 
+      flags != EXODUS_DIM && 
       flags != (NODES | SIDES | BLOCKS))
   {
-    std::cerr << "Only one of the following options may be active [--nodesetonly | --sidesetonly | --blockonly]!" << std::endl;
+    std::cerr << "Only one of the following options may be active [--nodesetonly | --sidesetonly | --blockonly | --dim]!" << std::endl;
     usage_error(argv[0]);
   }
   
@@ -81,9 +91,8 @@ int main(int argc, char** argv)
   status = nc_open (meshname, NC_WRITE, &nc_id);
   if (status != NC_NOERR) handle_error(status, "Error while opening file.");
 
-  for (unsigned char mask = 4; mask; mask/=2)
+  for (unsigned char mask = 8; mask; mask/=2)
   {
-
     // These are char*'s #defined in exodsuII_int.h
     switch (flags & mask)
     {
@@ -93,11 +102,15 @@ int main(int argc, char** argv)
       break;
     case SIDES:
       dim_name = DIM_NUM_SS;
-      var_name = VAR_SS_IDS;
+      var_name = VAR_SS_IDS; 
       break;
     case NODES:
       dim_name = DIM_NUM_NS;
       var_name = VAR_NS_IDS;
+      break;
+    case EXODUS_DIM:
+      dim_name = DIM_NUM_DIM;
+      // var_name not used for setting dimension
       break;
     default:
       // We don't match this flag, so go to the next mask
@@ -107,27 +120,70 @@ int main(int argc, char** argv)
     // Get the ID and length of the variable in question - stored in a dimension field
     status = nc_inq_dimid (nc_id, dim_name.c_str(), &dim_id);
     if (status != NC_NOERR) handle_error(status, "Error while inquiring about a dimension's ID.");
-
+    
     status = nc_inq_dimlen (nc_id, dim_id, &dim_len);
     if (status != NC_NOERR) handle_error(status, "Error while inquiring about a dimension's length.");
     
-    // Now get the variable values themselves
-    std::vector<long> var_vals(dim_len);
+    if ( (flags & mask) != EXODUS_DIM)
+      {
+	// Now get the variable values themselves
+	std::vector<long> var_vals(dim_len);
     
-    status = nc_inq_varid (nc_id, var_name.c_str(), &var_id);
-    if (status != NC_NOERR) handle_error(status, "Error while inquiring about a variable's ID.");
+	status = nc_inq_varid (nc_id, var_name.c_str(), &var_id);
+	if (status != NC_NOERR) handle_error(status, "Error while inquiring about a variable's ID.");
 
-    status = nc_get_var_long (nc_id, var_id, &var_vals[0]);
-    if (status != NC_NOERR) handle_error(status, "Error while retrieving a variable's values.");
+	status = nc_get_var_long (nc_id, var_id, &var_vals[0]);
+	if (status != NC_NOERR) handle_error(status, "Error while retrieving a variable's values.");
 
-    // Update the variable value specified on the command line
-    for (unsigned int i=0; i<dim_len; ++i)
-      if (var_vals[i] == oldid)
-	var_vals[i] = newid;
+	// Update the variable value specified on the command line
+	for (unsigned int i=0; i<dim_len; ++i)
+	  if (var_vals[i] == oldid)
+	    var_vals[i] = newid;
 
-    // Save that value back to the NetCDF database
-    status = nc_put_var_long (nc_id, var_id, &var_vals[0]);
-    if (status != NC_NOERR) handle_error(status, "Error while writing a variable's values.");
+	// Save that value back to the NetCDF database
+	status = nc_put_var_long (nc_id, var_id, &var_vals[0]);
+	if (status != NC_NOERR) handle_error(status, "Error while writing a variable's values.");
+      }
+
+    // Redefine the dimension
+    else
+      {
+	// The value stored in dim_len is actually the dimension?
+	if (dim_len == oldid)
+	  {
+	    // Trying to change def's always raises
+	    // Error -38: /* Operation not allowed in data mode */
+	    // unless you are in "define" mode.  So let's go there now.
+
+	    // Try to put the file into define mode
+	    status = nc_redef(nc_id);
+	    if (status != NC_NOERR) handle_error(status, "Error while putting file into define mode.");
+
+	    // Rename the "num_dim" dimension.  Note: this will fail if there is already a dimension
+	    // which has the name you are trying to use.  This can happen, for example if you have already
+	    // changed the dimension of this exodus file once using this very script.  There appears
+	    // to be no way to delete a dimension using basic NetCDF interfaces, so to workaround this
+	    // we just rename it to an arbitrary unique string that Exodus will ignore.
+	    
+	    // Construct a string with 6 random alpha-numeric characters at the end.
+	    std::string random_dim_name;
+	    gen_random_string(random_dim_name, 6);
+	    random_dim_name = std::string("ignored_num_dim_") + random_dim_name;
+
+	    // Rename the old dimension variable to our randomly-chosen name
+	    status = nc_rename_dim(nc_id, dim_id, random_dim_name.c_str());
+	    if (status != NC_NOERR) handle_error(status, "Error while trying to rename num_dim.");
+
+	    // Now define a new "num_dim" value of newid
+	    int dummy=0;
+	    status = nc_def_dim (nc_id, dim_name.c_str(), newid, &dummy);
+	    if (status != NC_NOERR) handle_error(status, "Error while trying to define num_dim.");
+	    
+	    // Leave define mode
+	    status = nc_enddef(nc_id);
+	    if (status != NC_NOERR) handle_error(status, "Error while leaving define mode.");
+	  }
+      }
   } // end for
 
   // Write out the dataset
@@ -162,4 +218,23 @@ void usage_error(const char *progname)
             << " --input inputmesh --oldid <n> --newid <n> [--nodesetonly | --sidesetonly | --blockonly]" 
             << std::endl;
   exit(1);
+}
+
+
+
+void gen_random_string(std::string& s, const int len) 
+{
+  static const char alphanum[] =
+    "0123456789"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz";
+
+  // Seed the random number generator with the current time
+  srandom( static_cast<unsigned>(time(NULL)) );
+
+  s.resize(len);
+  for (int i = 0; i < len; ++i) 
+    {
+      s[i] = alphanum[random() % (sizeof(alphanum) - 1)];
+    }
 }
