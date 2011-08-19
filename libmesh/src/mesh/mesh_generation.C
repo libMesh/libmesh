@@ -1931,9 +1931,8 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
   t.triangulate();
 
   // The mesh is now generated, but we still need to mark the boundaries
-  // to be consistent with the other build_square routines.  Note that only
-  // the external boundaries of the square are given boundary ids, the holes
-  // are not numbered.
+  // to be consistent with the other build_square routines.  Note that all
+  // hole boundary elements get the same ID, 4.
   MeshBase::element_iterator       el     = mesh.elements_begin();
   const MeshBase::element_iterator end_el = mesh.elements_end();
   for ( ; el != end_el; ++el)
@@ -1949,7 +1948,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 	    // the square has straight sides, the midpoint is not
 	    // on the corner and thus it is uniquely on one of the
 	    // sides.
-	    Point side_midpoint= ( (*side->get_node(0)) + (*side->get_node(1)) )/2;
+	    Point side_midpoint= 0.5*( (*side->get_node(0)) + (*side->get_node(1)) );
 
 	    // The boundary ids are set following the same convention as Quad4 sides
 	    // bottom = 0
