@@ -1948,7 +1948,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 	    // the square has straight sides, the midpoint is not
 	    // on the corner and thus it is uniquely on one of the
 	    // sides.
-	    Point side_midpoint= 0.5*( (*side->get_node(0)) + (*side->get_node(1)) );
+	    Point side_midpoint= 0.5f*( (*side->get_node(0)) + (*side->get_node(1)) );
 
 	    // The boundary ids are set following the same convention as Quad4 sides
 	    // bottom = 0
