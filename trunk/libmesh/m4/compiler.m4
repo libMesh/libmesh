@@ -355,12 +355,12 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
   dnl First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
-    CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses -Wuninitialized"
-    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wimplicit -Wformat -Wparentheses"
+    CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized"
+    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses"
 
     CFLAGS_OPT="-O2"
-    CFLAGS_DVL="$CFLAGS_OPT -g"
-    CFLAGS_DBG="-g"
+    CFLAGS_DVL="$CFLAGS_OPT -g -Wimplicit"
+    CFLAGS_DBG="-g -Wimplicit"
 
     dnl Position-independent code for shared libraries
     if test "$enableshared" = yes ; then
