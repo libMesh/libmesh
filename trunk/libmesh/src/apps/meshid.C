@@ -85,7 +85,7 @@ int main(int argc, char** argv)
   // Processing
   std::string var_name, dim_name;
   int status;
-  int nc_id, var_id, dim_id, var_len;
+  int nc_id, var_id, dim_id;
   size_t dim_len;
 
   status = nc_open (meshname, NC_WRITE, &nc_id);
@@ -149,7 +149,7 @@ int main(int argc, char** argv)
     else
       {
 	// The value stored in dim_len is actually the dimension?
-	if (dim_len == oldid)
+	if (dim_len == (size_t)oldid)
 	  {
 	    // Trying to change def's always raises
 	    // Error -38: /* Operation not allowed in data mode */
