@@ -29,6 +29,7 @@
 #include "enum_elem_type.h"
 #include "elem.h"
 #include "equation_systems.h"
+#include "libmesh_logging.h"
 #include "system.h"
 #include "numeric_vector.h"
 #include "exodusII_io_helper.h"
@@ -377,6 +378,8 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
 				    const std::vector<Number>& soln,
 				    const std::vector<std::string>& names) 
 {
+  START_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   int num_vars = names.size();
@@ -409,12 +412,16 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
     
       exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
     }  
+
+  STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 }
 
 void ExodusII_IO::write_nodal_data (const std::string& fname,
 				    const std::vector<Number>& soln,
 				    const std::vector<std::string>& names)
 {
+  START_LOG("write_nodal_data()", "ExodusII_IO");
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   int num_vars = names.size();
@@ -461,6 +468,8 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
     
       exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
     }  
+
+  STOP_LOG("write_nodal_data()", "ExodusII_IO");
 }
 
 #endif

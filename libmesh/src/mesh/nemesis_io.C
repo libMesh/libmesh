@@ -24,6 +24,7 @@
 // LibMesh includes
 #include "elem.h"
 #include "exodusII_io.h"
+#include "libmesh_logging.h"
 #include "nemesis_io.h"
 #include "nemesis_io_helper.h"
 #include "node.h"
@@ -1242,6 +1243,8 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
                                    const std::vector<Number>& soln,
                                    const std::vector<std::string>& names)
 {
+  START_LOG("write_nodal_data()", "Nemesis_IO");
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
@@ -1262,6 +1265,8 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
   }
 
   nemhelper->write_nodal_solution(soln, names, _timestep);
+
+  STOP_LOG("write_nodal_data()", "Nemesis_IO");
 }
 
 #else

@@ -25,6 +25,7 @@
 
 // Local includes
 #include "libmesh_config.h"
+#include "libmesh_logging.h"
 #include "mesh_base.h"
 #include "medit_io.h"
 #include "elem.h"
@@ -48,9 +49,13 @@ void MEDITIO::write_nodal_data (const std::string& fname,
 			      const std::vector<Number>& soln,
 			      const std::vector<std::string>& names)
 {
+  START_LOG("write_nodal_data()", "MEDITIO");
+
   if (libMesh::processor_id() == 0)
     if (!this->binary())
       this->write_ascii  (fname, &soln, &names);
+
+  STOP_LOG("write_nodal_data()", "MEDITIO");
 }
 
 
