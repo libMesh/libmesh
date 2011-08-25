@@ -45,3 +45,10 @@ autom4te.cache/
 aclocal.m4
 examples/ex10/saved_solution.xda.0000
 examples/ex2/eqn_sys.dat.0000
+doc/html/doxygen/*.php
+doc/html/doxygen/*.png
+doc/man
+doc/html/doxygen/doxygen.css
+doc/html/doxygen/jquery.js
+doc/html/doxygen/tabs.css
+
