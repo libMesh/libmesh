@@ -1,5 +1,5 @@
 </div>
-
+</div>
 
 <?php make_footer() ?>
 
