@@ -96,9 +96,11 @@ University of Texas at Austin in the
 <a href="http://www.cfdlab.ae.utexas.edu">CFDLab</a> since March 2002.  Major 
 contributions have come from developers at the Technische 
 Universit&auml;t Hamburg-Harburg
-<a href="http://www.mub.tu-harburg.de/index_e.html">Institute of Modelling and Computation</a>, 
-and recent contributions have been made by CFDLab graduates at
-<a href="http://www.sandia.gov/">Sandia National Laboratories</a> and <a href="http://www.nasa.gov/">NASA</a> <a href="http://www.nasa.gov/centers/johnson/home/index.html">Lyndon B. Johnson Space Center</a>.
+<a href="http://www.mub.tu-harburg.de">Institute of Modelling and Computation</a>, 
+and recent contributions have been made by CFDLab associates at
+<a href="http://www.inl.gov/">Idaho National Laboratory</a>,
+<a href="http://www.nasa.gov/">NASA</a> <a href="http://www.nasa.gov/centers/johnson/home/index.html">Lyndon B. Johnson Space Center</a>, 
+and <a href="http://augustine.mit.edu">MIT</a>.
 The <code>libMesh</code> <a href="http://libmesh.sf.net/developers.php">developers</a> welcome contributions
 in the form of patches and bug reports (preferably with a minimal test case that reliably reproduces the error)
 to the official <a href="http://sourceforge.net/mail/?group_id=71130">mailing lists</a>.
@@ -107,7 +109,7 @@ Many thanks to <a href="http://sourceforge.net">SourceForge</a> for
 project</a>.  You can find out what is currently happening in the
 development branch by checking out the
 <a href="http://libmesh.svn.sourceforge.net/viewvc/libmesh/trunk/libmesh">SVN
-Logs</a> online, and you can see many people are downloading the library
+Logs</a> online, and you can see how many people are downloading the library
 on the <a href="http://sourceforge.net/project/stats/?group_id=71130&ugn=libmesh&type=&mode=year">statistics</a> page.
 
 </div>
