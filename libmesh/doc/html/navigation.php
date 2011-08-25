@@ -48,13 +48,16 @@ function load_style($root)
         <?php } ?>
 	
     <?php echo "<a class=\"L1\" href = \"", $root, "examples.php\">Examples</a><BR>"; ?>
+    <!--
+    There are too many examples now to expand them all in the menu...
     <?php if (ereg("^ex[0-9]+|examples",$mode))
             {
-              for ($i=0; $i<28; $i++)
+              for ($i=0; $i<30; $i++)
                 {
                   make_example_subs($i, $root, $mode);
                 }
             } ?>
+    -->
 
     <?php echo "<a class=\"L1\" href = \"", $root, "developers.php\">Developers</a><BR>"; ?>
 
@@ -103,7 +106,11 @@ function load_style($root)
 <i>Site Created By:</i>
 <!-- <a href="mailto:libmesh-users@lists.sourceforge.net">libMesh Developers</a><br> -->
 <a href="http://libmesh.sourceforge.net/developers.php">libMesh Developers</a><br>
-<i><?php echo "Last modified: ".date( "F d Y H:i:s.", getlastmod() ); ?></i>
+<?php 
+   // Newer versions of PHP require you to set the default timezone or a warning message is printed
+   date_default_timezone_set('UTC');
+?>
+<i><?php echo "Last modified: ".date( "F d Y H:i:s", getlastmod() ); echo " UTC";?></i>
 
 <br>
 <br>
@@ -130,3 +137,8 @@ function load_style($root)
 <?php } ?>
 
 
+<?php if (0) { ?>
+# Local Variables:
+# mode: html
+# End:
+<?php } ?>

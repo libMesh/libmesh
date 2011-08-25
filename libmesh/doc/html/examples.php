@@ -21,7 +21,22 @@ that order.  Click the links below, or use the
 menu on the left to navigate the examples.
 
 
-<ul>
+<ol start=0>
+
+<li><L1><a href="ex0.php">Solving 1D PDE Using Adaptive Mesh Refinement</a></L1></li>
+<!-- This example demonstrates how to solve a simple 1D problem using -->
+<!-- adaptive mesh refinement. The PDE that is solved is: -epsilon*u''(x) + -->
+<!-- u(x) = 1, on the domain [0,1] with boundary conditions u(0) = u(1) = 0 -->
+<!-- and where epsilon << 1. -->
+
+<!-- <br> -->
+<!-- The approach used to solve 1D problems in libMesh is virtually -->
+<!-- identical to solving 2D or 3D problems, so in this sense this example -->
+<!-- represents a good starting point for new users. Note that many -->
+<!-- concepts are used in this example which are explained more fully in -->
+<!-- subsequent examples. -->
+
+
 
 <li><L1><a href="ex1.php">Creation of a Mesh Object</a></L1></li>
 <!-- This is the first example program.  It simply demonstrates -->
@@ -60,18 +75,6 @@ menu on the left to navigate the examples.
 <!-- changes allow rhe example will allow the problem to be -->
 <!-- solved in two or three dimensions and in parallel.  -->
 
-<li><L1><a href="ex0.php">Solving 1D PDE Using Adaptive Mesh Refinement</a></L1></li>
-<!-- This example demonstrates how to solve a simple 1D problem using -->
-<!-- adaptive mesh refinement. The PDE that is solved is: -epsilon*u''(x) + -->
-<!-- u(x) = 1, on the domain [0,1] with boundary conditions u(0) = u(1) = 0 -->
-<!-- and where epsilon << 1. -->
-
-<!-- <br> -->
-<!-- The approach used to solve 1D problems in libMesh is virtually -->
-<!-- identical to solving 2D or 3D problems, so in this sense this example -->
-<!-- represents a good starting point for new users. Note that many -->
-<!-- concepts are used in this example which are explained more fully in -->
-<!-- subsequent examples. -->
 
 
 <li><L1><a href="ex5.php">Run-time Selection of Quadrature Rules</a></L1></li>
@@ -81,13 +84,13 @@ menu on the left to navigate the examples.
 
 
 
-<li><L1><a href="ex6.php">Infinite Elements for the Wave Equation</a></L1></li>
+<li><L1><a href="ex6.php">Infinite Elements for the Wave Equation</a></L1>
 <!-- This example introduces "infinite elements" which may be used for -->
 <!-- certain classes of applications.  The wave equation is solved in this -->
 <!-- example.  -->
-<i>For this example to work you must have configured the
-library with the --enable-ifem option</i>
-
+<i>(For this example to work you must have configured the
+library with the --enable-ifem option)</i>
+</li>
 
 
 
@@ -210,6 +213,8 @@ library with the --enable-ifem option</i>
 <!-- "max_r_steps" controls the number of refinement steps, and -->
 <!-- "max_r_level" controls the maximum element refinement level. -->
 
+<li><L1><a href="ex15.php">Solving the Biharmonic Equation</a></L1></li>
+
 <li><L1><a href="ex16.php">Solving an Eigen Problem</a></L1></li>
 <!-- This example introduces the EigenSystem and shows how libMesh can be -->
 <!-- used for eigenvalue analysis.  For solving eigen problems, libMesh -->
@@ -264,7 +269,7 @@ library with the --enable-ifem option</i>
 <li><L1><a href="ex29.php">Meshing with Triangle and Tetgen</a></L1></li>
 
 
-</ul>
+</ol>
 
 </div>
 

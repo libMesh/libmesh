@@ -41,9 +41,9 @@ dev_table_entry("images/benkirk.jpg",
 dev_table_entry("images/jwpeterson.jpg",
                 "Dr. John W. Peterson",
                 "http://www.cfdlab.ae.utexas.edu/~peterson",
-                "<a href=\"http://www.cfdlab.ae.utexas.edu/~peterson/resume.pdf\">(curriculum vitae)</a>",
+                "<a href=\"http://users.ices.utexas.edu/~peterson/resume.pdf\">(curriculum vitae)</a>",
 		"Developer",
-		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
+		"<a href=\"http://www.inl.gov\">Idaho National Laboratory</a>");
 ?>
 
 <?php
@@ -71,7 +71,25 @@ dev_table_entry("images/roystgnr.jpg",
  		"http://www.cfdlab.ae.utexas.edu/~drgasto",
 		"",
  		"Developer",
- 		"<a href=\"http://www.sandia.gov\">UT-Austin, Sandia Nat'l Lab</a>");
+ 		"<a href=\"http://www.inl.gov\">Idaho National Laboratory</a>");
+?>
+
+<?php
+ dev_table_entry("images/permcj_s.png",
+ 		"Cody Permann",
+ 		"",
+		"",
+ 		"Developer",
+ 		"<a href=\"http://www.inl.gov\">Idaho National Laboratory</a>");
+?>
+
+<?php
+ dev_table_entry("images/andrs_s.png",
+ 		"Dr. David Andrs",
+ 		"",
+		"",
+ 		"Developer",
+ 		"<a href=\"http://www.inl.gov\">Idaho National Laboratory</a>");
 ?>
 
 <br>
@@ -91,18 +109,18 @@ dev_table_entry("images/roystgnr.jpg",
 
 <?php
 dev_table_entry("images/spetersen.jpg",
-		"Steffen Petersen",
-		"http://www.mub.tu-harburg.de/deutsch/mitarbeiter/petersen.html",
+		"Dr. Steffen Petersen",
+		"http://www.stanford.edu/group/frg/students/steffenp.html",
 		"",
 		"PhD Student, Developer",
-		"<a href=\"http://www.tu-harburg.de\">Hamburg University of Technology</a>");
+		"<a href=\"http://www.stanford.edu\">Stanford University</a>");
 ?>
 
 
 <?php
  dev_table_entry("images/bbarth2.jpg",
                  "Dr. William L. Barth",
-                 "http://www.tacc.utexas.edu/general/staff/barth",
+                 "http://www.tacc.utexas.edu/staff/bill-barth",
 		 "",
 		 "Consultant, Developer",
 		 "<a href=\"http://www.tacc.utexas.edu\">Texas Advanced Computing Center</a>");
