@@ -351,6 +351,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   KSPSetFromOptions(ksp);
   SNESSetFromOptions(_snes);
 
+  if (this->user_presolve)
+    this->user_presolve(this->system());
+
   //Set the preconditioning matrix
   if(this->_preconditioner)
     this->_preconditioner->set_matrix(jac_in);
