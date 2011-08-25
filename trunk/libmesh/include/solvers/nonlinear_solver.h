@@ -156,6 +156,8 @@ public:
    */
   NonlinearImplicitSystem::ComputeResidualandJacobian *residual_and_jacobian_object;
 
+  void (* user_presolve)(sys_type& S);
+
   /**
    * @returns a constant reference to the system we are solving.
    */
@@ -261,6 +263,7 @@ NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   jacobian_object              (NULL),
   matvec                       (NULL),
   residual_and_jacobian_object (NULL),
+  user_presolve                (NULL),
   max_nonlinear_iterations(0),
   max_function_evaluations(0),
   absolute_residual_tolerance(0),
