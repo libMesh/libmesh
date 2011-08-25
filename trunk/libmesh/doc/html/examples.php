@@ -261,6 +261,8 @@ library with the --enable-ifem option</i>
 
 <li><L1><a href="ex28.php">Subdomain-Restricted Variables</a></L1></li>
 
+<li><L1><a href="ex29.php">Meshing with Triangle and Tetgen</a></L1></li>
+
 
 </ul>
 
