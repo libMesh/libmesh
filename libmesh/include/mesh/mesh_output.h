@@ -30,6 +30,7 @@
 
 // Local includes
 #include "libmesh_common.h"
+#include "libmesh_logging.h"
 #include "mesh_base.h"
 #include "mesh_serializer.h"
 
@@ -198,6 +199,8 @@ inline
 void MeshOutput<MT>::write_equation_systems (const std::string& fname,
 					     const EquationSystems& es)
 {
+  START_LOG("write_equation_systems()", "MeshOutput");
+
   // We may need to gather a ParallelMesh to output it, making that
   // const qualifier in our constructor a dirty lie
   MeshSerializer(const_cast<MT&>(*_obj), !_is_parallel_format);
@@ -212,6 +215,8 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
   //es.build_solution_vector (soln);
 
   this->write_nodal_data (fname, soln, names);  
+
+  STOP_LOG("write_equation_systems()", "MeshOutput");
 }
 
 

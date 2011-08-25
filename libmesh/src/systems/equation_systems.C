@@ -555,6 +555,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 
 void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 {
+  START_LOG("build_solution_vector()", "EquationSystems");
+
   // This function must be run on all processors at once
   parallel_only();
 
@@ -684,6 +686,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // Now each processor has computed contriburions to the
   // soln vector.  Gather them all up.
   Parallel::sum(soln);
+
+  STOP_LOG("build_solution_vector()", "EquationSystems");
 }
 
 
@@ -770,6 +774,8 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
 void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& soln) const
 {
+  START_LOG("build_discontinuous_solution_vector()", "EquationSystems");
+
   libmesh_assert (this->n_systems());
 
   const unsigned int dim = _mesh.mesh_dimension();
@@ -861,6 +867,8 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 
       var_num += nv_sys;
     }
+
+  STOP_LOG("build_discontinuous_solution_vector()", "EquationSystems");
 }
 
 
