@@ -73,9 +73,7 @@ namespace
     FE<3,LAGRANGE>::n_shape_functions(mapping_elem_type,
 				      mapping_order);
 
-  std::vector<Point> dofpt;
-  dofpt.push_back(Point(-1,-1,-1));
-  dofpt.push_back(Point(1,1,1));
+  static const Point dofpt[2] = {Point(-1,-1,-1), Point(1,1,1)};
 
   for (int p = 0; p != 2; ++p)
     {
@@ -101,16 +99,17 @@ namespace
 
 	  // dxdeta, dxdzeta, dydxi, dydzeta, dzdxi, dzdeta should all
           // be 0!
-          dxdxi[0][p] += elem->point(i)(0) * ddxi;
-          dxdxi[1][p] += elem->point(i)(1) * ddeta;
-          dxdxi[2][p] += elem->point(i)(2) * ddzeta;
+          const Point &point_i = elem->point(i);
+          dxdxi[0][p] += point_i(0) * ddxi;
+          dxdxi[1][p] += point_i(1) * ddeta;
+          dxdxi[2][p] += point_i(2) * ddzeta;
 #ifdef DEBUG
-          dydxi[p] += elem->point(i)(1) * ddxi;
-          dzdeta[p] += elem->point(i)(2) * ddeta;
-          dxdzeta[p] += elem->point(i)(0) * ddzeta;
-          dzdxi[p] += elem->point(i)(2) * ddxi;
-          dxdeta[p] += elem->point(i)(0) * ddeta;
-          dydzeta[p] += elem->point(i)(1) * ddzeta;
+          dydxi[p] += point_i(1) * ddxi;
+          dzdeta[p] += point_i(2) * ddeta;
+          dxdzeta[p] += point_i(0) * ddzeta;
+          dzdxi[p] += point_i(2) * ddxi;
+          dxdeta[p] += point_i(0) * ddeta;
+          dydzeta[p] += point_i(1) * ddzeta;
 #endif
         }
 
