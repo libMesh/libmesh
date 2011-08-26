@@ -1194,21 +1194,21 @@ public:
    * the method to return 0 when the point is not located.
    */
   Number point_value(unsigned int var, const Point &p,
-                     const bool insist_on_success = true);
+                     const bool insist_on_success = true) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the physical
    * point \p p in the mesh, similarly to point_value.
    */
   Gradient point_gradient(unsigned int var, const Point &p,
-                          const bool insist_on_success = true);
+                          const bool insist_on_success = true) const;
 
   /**
    * Returns the second derivative tensor of the solution variable \p var 
    * at the physical point \p p in the mesh, similarly to point_value.
    */
   Tensor point_hessian(unsigned int var, const Point &p,
-                       const bool insist_on_success = true);
+                       const bool insist_on_success = true) const;
  
   /**
    * Fills the std::set with the degrees of freedom on the local

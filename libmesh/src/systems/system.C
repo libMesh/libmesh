@@ -1730,11 +1730,17 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
 
 
 
-Number System::point_value(unsigned int var, const Point &p, const bool insist_on_success)
+Number System::point_value(unsigned int var, const Point &p, const bool insist_on_success) const
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
   parallel_only();
+
+  // And every processor had better agree about which point we're
+  // looking for
+#ifndef NDEBUG
+  Parallel::verify(p);
+#endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
   const MeshBase &mesh = this->get_mesh();
@@ -1817,11 +1823,17 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
 
 
 
-Gradient System::point_gradient(unsigned int var, const Point &p, const bool insist_on_success)
+Gradient System::point_gradient(unsigned int var, const Point &p, const bool insist_on_success) const
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
   parallel_only();
+
+  // And every processor had better agree about which point we're
+  // looking for
+#ifndef NDEBUG
+  Parallel::verify(p);
+#endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
   const MeshBase &mesh = this->get_mesh();
@@ -1906,11 +1918,17 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 
 // We can only accumulate a hessian with --enable-second
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist_on_success)
+Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist_on_success) const
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
   parallel_only();
+
+  // And every processor had better agree about which point we're
+  // looking for
+#ifndef NDEBUG
+  Parallel::verify(p);
+#endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
   const MeshBase &mesh = this->get_mesh();
