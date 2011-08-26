@@ -192,6 +192,9 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
 {
   this->init ();
 
+  if (this->user_presolve)
+    this->user_presolve(this->system());
+
   EpetraVector<T> * x_epetra = libmesh_cast_ptr<EpetraVector<T>*>(&x_in);
   EpetraVector<T> * r_epetra = libmesh_cast_ptr<EpetraVector<T>*>(&r_in);
 
