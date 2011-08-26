@@ -1,4 +1,4 @@
-// $Id$
+// $Id: fe_macro.h 4791 2011-08-09 14:45:40Z trumanellis $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
@@ -36,6 +36,7 @@
 #define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
                                template class FE< (_dim), HERMITE>;    \
                                template class FE< (_dim), HIERARCHIC>;   \
+                               template class FE< (_dim), L2_HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SCALAR>;   \
@@ -45,6 +46,7 @@
   template void FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
   template void FE<_dim,HERMITE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
   template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
+  template void FE<_dim,L2_HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,SCALAR>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
@@ -55,6 +57,7 @@
 #define INSTANTIATE_FE(_dim)   template class FE< (_dim), CLOUGH>; \
                                template class FE< (_dim), HERMITE>;    \
                                template class FE< (_dim), HIERARCHIC>;   \
+                               template class FE< (_dim), L2_HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SCALAR>;   \
@@ -66,6 +69,7 @@
   template void  FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
   template void  FE<_dim,HERMITE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
   template void  FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
+  template void  FE<_dim,L2_HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,SCALAR>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
