@@ -1,4 +1,4 @@
-// $Id$
+// $Id: fe_base.C 4791 2011-08-09 14:45:40Z trumanellis $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
@@ -80,6 +80,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FE<0,HIERARCHIC>(fet));
 	      return ap;
 	    }
+		   
+	  case L2_HIERARCHIC:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,L2_HIERARCHIC>(fet));
+	      return ap;
+	    }
 	    
 	  case MONOMIAL:
 	    {
@@ -144,6 +150,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  case HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,HIERARCHIC>(fet));
+	      return ap;
+	    }
+		   
+	  case L2_HIERARCHIC:
+	    {
+	      AutoPtr<FEBase> ap(new FE<1,L2_HIERARCHIC>(fet));
 	      return ap;
 	    }
 	    
@@ -215,6 +227,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 	    
+	  case L2_HIERARCHIC:
+	    {
+	      AutoPtr<FEBase> ap(new FE<2,L2_HIERARCHIC>(fet));
+	      return ap;
+	    }
+	    
 	  case MONOMIAL:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,MONOMIAL>(fet));
@@ -281,6 +299,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  case HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,HIERARCHIC>(fet));
+	      return ap;
+	    }
+	    
+	  case L2_HIERARCHIC:
+	    {
+	      AutoPtr<FEBase> ap(new FE<3,L2_HIERARCHIC>(fet));
 	      return ap;
 	    }
 	    

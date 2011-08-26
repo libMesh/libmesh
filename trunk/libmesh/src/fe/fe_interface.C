@@ -1,4 +1,4 @@
-// $Id$
+// $Id: fe_interface.C 4791 2011-08-09 14:45:40Z trumanellis $
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
@@ -76,6 +76,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<0,HIERARCHIC>::n_shape_functions(t, o);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<0,L2_HIERARCHIC>::n_shape_functions(t, o);
+	    
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::n_shape_functions(t, o);
 	    
@@ -117,6 +120,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::n_shape_functions(t, o);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<1,L2_HIERARCHIC>::n_shape_functions(t, o);
 	    
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::n_shape_functions(t, o);
@@ -161,6 +167,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_shape_functions(t, o);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<2,L2_HIERARCHIC>::n_shape_functions(t, o);
+	    
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::n_shape_functions(t, o);
 	    
@@ -199,6 +208,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::n_shape_functions(t, o);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<3,L2_HIERARCHIC>::n_shape_functions(t, o);
 	    
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::n_shape_functions(t, o);
@@ -270,6 +282,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<0,HIERARCHIC>::n_dofs(t, o);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<0,L2_HIERARCHIC>::n_dofs(t, o);
+	    
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::n_dofs(t, o);
 	    
@@ -310,6 +325,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::n_dofs(t, o);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<1,L2_HIERARCHIC>::n_dofs(t, o);
 	    
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::n_dofs(t, o);
@@ -353,6 +371,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs(t, o);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<2,L2_HIERARCHIC>::n_dofs(t, o);
+	    
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::n_dofs(t, o);
 	    
@@ -391,6 +412,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::n_dofs(t, o);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<3,L2_HIERARCHIC>::n_dofs(t, o);
 	    
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::n_dofs(t, o);
@@ -462,6 +486,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<0,HIERARCHIC>::n_dofs_at_node(t, o, n);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<0,L2_HIERARCHIC>::n_dofs_at_node(t, o, n);
+	    
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::n_dofs_at_node(t, o, n);
 	    
@@ -502,6 +529,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::n_dofs_at_node(t, o, n);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<1,L2_HIERARCHIC>::n_dofs_at_node(t, o, n);
 	    
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::n_dofs_at_node(t, o, n);
@@ -545,6 +575,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs_at_node(t, o, n);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<2,L2_HIERARCHIC>::n_dofs_at_node(t, o, n);
+	    
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::n_dofs_at_node(t, o, n);
 	    
@@ -583,6 +616,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::n_dofs_at_node(t, o, n);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<3,L2_HIERARCHIC>::n_dofs_at_node(t, o, n);
 	    
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::n_dofs_at_node(t, o, n);
@@ -654,6 +690,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<0,HIERARCHIC>::n_dofs_per_elem(t, o);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<0,L2_HIERARCHIC>::n_dofs_per_elem(t, o);
+	    
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::n_dofs_per_elem(t, o);
 	    
@@ -695,6 +734,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::n_dofs_per_elem(t, o);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<1,L2_HIERARCHIC>::n_dofs_per_elem(t, o);
 	    
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::n_dofs_per_elem(t, o);
@@ -738,6 +780,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::n_dofs_per_elem(t, o);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<2,L2_HIERARCHIC>::n_dofs_per_elem(t, o);
+	    
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::n_dofs_per_elem(t, o);
 	    
@@ -776,6 +821,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::n_dofs_per_elem(t, o);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<3,L2_HIERARCHIC>::n_dofs_per_elem(t, o);
 	    
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::n_dofs_per_elem(t, o);
@@ -844,6 +892,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<0,HIERARCHIC>::dofs_on_side(elem, o, s, di);
             return;
 	    
+	  case L2_HIERARCHIC:
+	    FE<0,L2_HIERARCHIC>::dofs_on_side(elem, o, s, di);
+            return;
+	    
 	  case LAGRANGE:
 	    FE<0,LAGRANGE>::dofs_on_side(elem, o, s, di);
             return;
@@ -893,6 +945,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    
 	  case HIERARCHIC:
 	    FE<1,HIERARCHIC>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<1,L2_HIERARCHIC>::dofs_on_side(elem, o, s, di);
             return;
 	    
 	  case LAGRANGE:
@@ -946,6 +1002,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<2,HIERARCHIC>::dofs_on_side(elem, o, s, di);
             return;
 	    
+	  case L2_HIERARCHIC:
+	    FE<2,L2_HIERARCHIC>::dofs_on_side(elem, o, s, di);
+            return;
+	    
 	  case LAGRANGE:
 	    FE<2,LAGRANGE>::dofs_on_side(elem, o, s, di);
             return;
@@ -991,6 +1051,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::dofs_on_side(elem, o, s, di);
+            return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<3,L2_HIERARCHIC>::dofs_on_side(elem, o, s, di);
             return;
 	    
 	  case LAGRANGE:
@@ -1063,6 +1127,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<0,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
             return;
 	    
+	  case L2_HIERARCHIC:
+	    FE<0,L2_HIERARCHIC>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
 	  case LAGRANGE:
 	    FE<0,LAGRANGE>::dofs_on_edge(elem, o, e, di);
             return;
@@ -1112,6 +1180,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    
 	  case HIERARCHIC:
 	    FE<1,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<1,L2_HIERARCHIC>::dofs_on_edge(elem, o, e, di);
             return;
 	    
 	  case LAGRANGE:
@@ -1165,6 +1237,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<2,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
             return;
 	    
+	  case L2_HIERARCHIC:
+	    FE<2,L2_HIERARCHIC>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
 	  case LAGRANGE:
 	    FE<2,LAGRANGE>::dofs_on_edge(elem, o, e, di);
             return;
@@ -1210,6 +1286,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::dofs_on_edge(elem, o, e, di);
+            return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<3,L2_HIERARCHIC>::dofs_on_edge(elem, o, e, di);
             return;
 	    
 	  case LAGRANGE:
@@ -1295,6 +1375,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	    FE<0,HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
 	    return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<0,L2_HIERARCHIC>::nodal_soln(elem, order,
+					 elem_soln, nodal_soln);
+	    return;
 
 	  case LAGRANGE:
 	    FE<0,LAGRANGE>::nodal_soln(elem, order,
@@ -1353,6 +1438,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    FE<1,HIERARCHIC>::nodal_soln(elem, order,
+					 elem_soln, nodal_soln);
+	    return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<1,L2_HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
 	    return;
 
@@ -1416,6 +1506,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 					 elem_soln, nodal_soln);
 	    return;
 	    
+	  case L2_HIERARCHIC:
+	    FE<2,L2_HIERARCHIC>::nodal_soln(elem, order,
+					 elem_soln, nodal_soln);
+	    return;
+	    
 	  case LAGRANGE:
 	    FE<2,LAGRANGE>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
@@ -1468,6 +1563,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::nodal_soln(elem, order,
+					 elem_soln, nodal_soln);
+	    return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<3,L2_HIERARCHIC>::nodal_soln(elem, order,
 					 elem_soln, nodal_soln);
 	    return;
 	    
@@ -1549,6 +1649,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<0,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<0,L2_HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
+	    
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 	    
@@ -1590,6 +1693,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<1,L2_HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
@@ -1633,6 +1739,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<2,L2_HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
+	    
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 	    
@@ -1670,6 +1779,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<3,L2_HIERARCHIC>::inverse_map(elem, p, tolerance, secure);
 	    
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
@@ -1769,6 +1881,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<0,HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
+	  case L2_HIERARCHIC:
+	    FE<0,L2_HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
 	  case LAGRANGE:
 	    FE<0,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
@@ -1818,6 +1934,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    FE<1,HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<1,L2_HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case LAGRANGE:
@@ -1871,6 +1991,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<2,HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
+	  case L2_HIERARCHIC:
+	    FE<2,L2_HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
 	  case LAGRANGE:
 	    FE<2,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
@@ -1916,6 +2040,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+	    
+	  case L2_HIERARCHIC:
+	    FE<3,L2_HIERARCHIC>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 	    
 	  case LAGRANGE:
@@ -2000,9 +2128,12 @@ Real FEInterface::shape(const unsigned int dim,
 	    
 	  case HERMITE:
 	    return FE<0,HERMITE>::shape(t,o,i,p);
-	    
+	   
 	  case HIERARCHIC:
 	    return FE<0,HIERARCHIC>::shape(t,o,i,p);
+	   
+	  case L2_HIERARCHIC:
+	    return FE<0,L2_HIERARCHIC>::shape(t,o,i,p);
 	    
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::shape(t,o,i,p);
@@ -2044,6 +2175,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::shape(t,o,i,p);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<1,L2_HIERARCHIC>::shape(t,o,i,p);
 	    
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::shape(t,o,i,p);
@@ -2087,6 +2221,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::shape(t,o,i,p);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<2,L2_HIERARCHIC>::shape(t,o,i,p);
+	    
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::shape(t,o,i,p);
 	    
@@ -2125,6 +2262,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::shape(t,o,i,p);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<3,L2_HIERARCHIC>::shape(t,o,i,p);
 	    
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::shape(t,o,i,p);
@@ -2197,6 +2337,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<0,HIERARCHIC>::shape(elem,o,i,p);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<0,L2_HIERARCHIC>::shape(elem,o,i,p);
+	    
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::shape(elem,o,i,p);
 	    
@@ -2237,6 +2380,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<1,HIERARCHIC>::shape(elem,o,i,p);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<1,L2_HIERARCHIC>::shape(elem,o,i,p);
 	    
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::shape(elem,o,i,p);
@@ -2280,6 +2426,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case HIERARCHIC:
 	    return FE<2,HIERARCHIC>::shape(elem,o,i,p);
 	    
+	  case L2_HIERARCHIC:
+	    return FE<2,L2_HIERARCHIC>::shape(elem,o,i,p);
+	    
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::shape(elem,o,i,p);
 	    
@@ -2318,6 +2467,9 @@ Real FEInterface::shape(const unsigned int dim,
 	    
 	  case HIERARCHIC:
 	    return FE<3,HIERARCHIC>::shape(elem,o,i,p);
+	    
+	  case L2_HIERARCHIC:
+	    return FE<3,L2_HIERARCHIC>::shape(elem,o,i,p);
 	    
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::shape(elem,o,i,p);
@@ -2442,6 +2594,12 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 						   variable_number,
 						   elem); return;
 
+	  case L2_HIERARCHIC:
+	    FE<2,L2_HIERARCHIC>::compute_constraints (constraints,
+						   dof_map,
+						   variable_number,
+						   elem); return;
+
 	  default:
 	    return;
 	  }
@@ -2466,6 +2624,12 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 
 	  case HIERARCHIC:
 	    FE<3,HIERARCHIC>::compute_constraints (constraints,
+						   dof_map,
+						   variable_number,
+						   elem); return;
+
+	  case L2_HIERARCHIC:
+	    FE<3,L2_HIERARCHIC>::compute_constraints (constraints,
 						   dof_map,
 						   variable_number,
 						   elem); return;
@@ -2769,6 +2933,39 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	      return unknown;
 	  }
 	break;
+      case L2_HIERARCHIC:
+	switch (el_t)
+	  {
+	    case EDGE2:
+	    case EDGE3:
+	    case EDGE4:
+	      return unlimited;
+	    case TRI3:
+	      return 1;
+	    case TRI6:
+	      return unlimited;
+	    case QUAD4:
+	      return 1;
+	    case QUAD8:
+	    case QUAD9:
+	      return unlimited;
+	    case TET4:
+	    case TET10:
+	      return 0;
+	    case HEX8:
+	    case HEX20:
+	      return 1;
+	    case HEX27:
+	      return unlimited;
+	    case PRISM6:
+	    case PRISM15:
+	    case PRISM18:
+	    case PYRAMID5:
+	      return 0;
+	    default:
+	      return unknown;
+	  }
+	break;
       default:
 	return 0;
 	break;
@@ -2783,6 +2980,7 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
     {
       case LAGRANGE:
       case MONOMIAL:
+      case L2_HIERARCHIC:
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
       case BERNSTEIN:
       case SZABAB:
