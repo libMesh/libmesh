@@ -2009,7 +2009,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   return hess_u;
 }
 #else
-Tensor System::point_hessian(unsigned int, const Point &, const bool)
+Tensor System::point_hessian(unsigned int, const Point &, const bool) const
 {
   // We can only accumulate a hessian with --enable-second
   libmesh_error();
