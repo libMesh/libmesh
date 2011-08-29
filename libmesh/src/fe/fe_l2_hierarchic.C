@@ -1,4 +1,4 @@
-// $Id: fe_hierarchic.C 4788 2011-08-04 16:56:27Z trumanellis $
+// $Id$
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
   
