@@ -129,9 +129,9 @@ unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
 
 
 template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
-				       const Order o,
-				       const unsigned int n)
+unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType /*t*/,
+				       const Order /*o*/,
+				       const unsigned int /*n*/)
 {
   // Discontinuous L2 elements only have interior nodes
   return 0;

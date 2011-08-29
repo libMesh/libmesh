@@ -255,9 +255,9 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
       qrule->init(edge->type(), elem->p_level());
 
       // We might not need to reinitialize the shape functions
-      if ((this->get_type() != elem->type()) ||
-          (edge->type() != last_edge)        ||
-          this->shapes_need_reinit()         ||
+      if ((this->get_type() != elem->type())                   ||
+          (edge->type() != static_cast<int>(last_edge))        || // Comparison between enum and unsigned, cast the unsigned to int
+          this->shapes_need_reinit()                           ||
           !shapes_on_quadrature)
         {
           // Set the element type
