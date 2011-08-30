@@ -145,6 +145,15 @@ public:
    */   
   void comment (std::string &);
   
+  /**
+   * Sets the version of the file that is being read
+   */
+  void set_version(int ver) { version_number = ver; }
+
+  /**
+   * Gets the version of the file that is being read
+   */
+  int version() const { return version_number; }
 
 private:
 
@@ -225,6 +234,11 @@ private:
    * Are we reading/writing zipped files?
    */
   bool gzipped_file, bzipped_file, xzipped_file;
+
+  /**
+   * Version of the file being read
+   */
+  int version_number;
 };
 
 

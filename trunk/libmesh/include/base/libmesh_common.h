@@ -385,6 +385,9 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 template<class T> inline void libmesh_ignore( const T& ) { }
 
 
+// build a integer representation of version
+#define LIBMESH_VERSION(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))
+
 } // namespace libMesh
 
 #endif // #define __libmesh_common_h__

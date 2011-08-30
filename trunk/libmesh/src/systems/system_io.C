@@ -100,6 +100,8 @@ void System::read_header (Xdr& io,
   //   for each variable in the system
   //     
   //     6.) The name of the variable (string)
+  //
+  //     6.1.) Variable subdmains
   //     
   //     7.) Combined in an FEType:
   //         - The approximation order(s) of the variable 
@@ -147,6 +149,17 @@ void System::read_header (Xdr& io,
 	if (libMesh::processor_id() == 0) io.data (var_name);
 	Parallel::broadcast(var_name);
 	      	
+	// 6.1.)
+	std::set<subdomain_id_type> domains;
+	if (io.version() >= LIBMESH_VERSION(0,7,2))
+	{
+	  std::vector<subdomain_id_type> domain_array;
+	  if (libMesh::processor_id() == 0) io.data (domain_array);
+	  for (std::vector<subdomain_id_type>::iterator it = domain_array.begin(); it != domain_array.end(); ++it)
+		  domains.insert(*it);
+	}
+	Parallel::broadcast(domains);
+
 	// 7.)
 	// Read the approximation order(s) of the var-th variable 
 	int order=0;	  
@@ -208,9 +221,14 @@ void System::read_header (Xdr& io,
 
 #endif
 
-	if (read_header) 
-	  _written_var_indices[var] = this->add_variable (var_name, type);
-        else
+	if (read_header)
+	{
+	  if (domains.empty())
+	    _written_var_indices[var] = this->add_variable (var_name, type);
+	  else
+	    _written_var_indices[var] = this->add_variable (var_name, type, &domains);
+	}
+    else
 	  _written_var_indices[var] = this->variable_number(var_name);
       }
   }
@@ -969,6 +987,8 @@ void System::write_header (Xdr& io,
    *     
    *     6.) The name of the variable (string)
    *     
+   *     6.1.) subdomain where the variable lives
+   *
    *     7.) Combined in an FEType:
    *         - The approximation order(s) of the variable 
    *           (Order Enum, cast to int/s)
@@ -1027,6 +1047,22 @@ void System::write_header (Xdr& io,
 	io.data (var_name, comment.c_str());
       }
       
+      // 6.1.) Variable subdomains
+      {
+        // set up the comment
+		comment  = "#     Subdomains, Variable \"";
+		std::sprintf(buf, "%s", this->variable_name(var).c_str());
+		comment += buf;
+		comment += "\", System \"";
+		comment += this->name();
+		comment += "\"";
+
+		const std::set<subdomain_id_type> & domains = this->variable(var).active_subdomains();
+		std::vector<subdomain_id_type> domain_array;
+		domain_array.assign(domains.begin(), domains.end());
+		io.data (domain_array, comment.c_str());
+      }
+
       // 7.)
       // Write the approximation order of the var-th variable 
       // in this system

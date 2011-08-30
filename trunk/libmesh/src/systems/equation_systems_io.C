@@ -239,7 +239,8 @@ void EquationSystems::_read_impl (const std::string& name,
 	
 	// All processors have the version header, if it does not contain
 	// "libMesh" something then it is a legacy file.
-	if (!(version.find("libMesh") < version.size()))
+	int lm_pos = version.find("libMesh");
+	if (!(lm_pos < version.size()))
 	  {
 	    io.close();
 	    
@@ -248,6 +249,14 @@ void EquationSystems::_read_impl (const std::string& name,
 	    this->read (name, mode, (read_flags | EquationSystems::READ_LEGACY_FORMAT));
 	    return;
 	  }
+
+	// Figure out the libMesh version that created this file
+	std::istringstream iss(version.substr(lm_pos + 8));
+	int ver_major = 0, ver_minor = 0, ver_patch = 0;
+	char dot;
+	iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
+	io.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
+
 
 	read_parallel_files = (version.rfind(" parallel") < version.size());
 
@@ -479,7 +488,7 @@ void EquationSystems::write(const std::string& name,
       {
 	// 1.)
 	// Write the version header
-	std::string version = "libMesh-0.7.0+";
+	std::string version = "libMesh-0.7.2";
 	if (write_parallel_files) version += " parallel";
 	
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
