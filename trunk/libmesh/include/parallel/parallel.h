@@ -3070,7 +3070,10 @@ namespace Parallel
 
     Parallel::broadcast(vecdata, root_id, comm);
     if (comm.rank() != root_id)
-      data.assign(vecdata.begin(), vecdata.end());
+    {
+      data.clear();
+      data.insert(vecdata.begin(), vecdata.end());
+    }
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -3277,6 +3280,9 @@ namespace Parallel
 
   template <typename T>
     inline void broadcast (std::vector<T> &, const unsigned int, const Communicator&) {}
+
+  template <typename T>
+    inline void broadcast(std::set<T> &, const unsigned int, const Communicator &) {}
 
 #endif // LIBMESH_HAVE_MPI
 
