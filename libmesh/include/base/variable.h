@@ -104,7 +104,13 @@ public:
    */
   bool implicitly_active () const
   { return _active_subdomains.empty(); }
-  
+
+  /**
+   * Returns set of subdomain ids this variable lives on
+   */
+  const std::set<subdomain_id_type> & active_subdomains() const
+  { return _active_subdomains; }
+
 private:
   std::string             _name; 
   unsigned int            _number;
