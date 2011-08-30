@@ -371,6 +371,8 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
       CFLAGS_OPT="$CFLAGS_OPT -fPIC"
       CFLAGS_DVL="$CFLAGS_DVL -fPIC"
       CFLAGS_DBG="$CFLAGS_DBG -fPIC"
+
+      FFLAGS="$FFLAGS -fPIC"
     fi
 
     dnl set some flags that are specific to some versions of the
@@ -486,6 +488,8 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
             CFLAGS_OPT="$CFLAGS_OPT -KPIC"
             CFLAGS_DBG="$CFLAGS_DBG -KPIC"
             CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+
+            FFLAGS="$FFLAGS -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -676,6 +680,8 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
               CFLAGS_DBG="$CFLAGS_DBG -fPIC"
               CFLAGS_DVL="$CFLAGS_DVL -fPIC"
 
+              FFLAGS="$FFLAGS -fPIC"
+
               LDFLAGS="$LDFLAGS -fPIC"
 	      ;;
 	    *)
@@ -686,6 +692,8 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
               CFLAGS_OPT="$CFLAGS_OPT -KPIC"
               CFLAGS_DBG="$CFLAGS_DBG -KPIC"
               CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+
+	      FFLAGS="$FFLAGS -KPIC"
 
               LDFLAGS="$LDFLAGS -KPIC"
 	      ;;
@@ -789,6 +797,8 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
             CFLAGS_OPT="$CFLAGS_OPT -KPIC"
             CFLAGS_DBG="$CFLAGS_DBG -KPIC"
             CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+
+	    FFLAGS="$FFLAGS -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi

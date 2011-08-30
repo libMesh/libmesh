@@ -273,7 +273,7 @@ AC_SUBST(CXXSHAREDFLAG)
 AC_SUBST(RPATHFLAG)
 AC_SUBST(PROFILING_FLAGS)
 AC_SUBST(OPROFILE_FLAGS)
-
+AC_SUBST(FLIBS)
 
 dnl --------------------------------------------------------------
 dnl Check for important type sizes
