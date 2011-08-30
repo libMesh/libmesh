@@ -211,7 +211,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
         {
           // Don't compute on non-boundary sides unless requested
           if (!compute_internal_sides && 
-	      _femcontext.elem->neighbor(_femcontext.side) != NULL)
+              _femcontext.elem->neighbor(_femcontext.side) != NULL)
             continue;
 
           // Any mesh movement has already been done (and restored,
