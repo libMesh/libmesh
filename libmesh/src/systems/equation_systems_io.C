@@ -239,7 +239,7 @@ void EquationSystems::_read_impl (const std::string& name,
 	
 	// All processors have the version header, if it does not contain
 	// "libMesh" something then it is a legacy file.
-	int lm_pos = version.find("libMesh");
+	std::string::size_type lm_pos = version.find("libMesh");
 	if (!(lm_pos < version.size()))
 	  {
 	    io.close();
