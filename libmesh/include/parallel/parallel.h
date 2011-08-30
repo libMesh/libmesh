@@ -2368,7 +2368,8 @@ namespace Parallel
     std::vector<T> vecbuf;
     // Use Parallel::receive() so we get its specialization(s)
     Status status = Parallel::receive(src_processor_id, vecbuf, type, tag, comm);
-    buf.assign(vecbuf.begin(), vecbuf.end());
+    buf.clear();
+    buf.insert(vecbuf.begin(), vecbuf.end());
 
     STOP_LOG("receive()", "Parallel");
 
@@ -2390,7 +2391,8 @@ namespace Parallel
     std::vector<T> vecbuf;
     // Use Parallel::receive() so we get its specialization(s)
     Parallel::receive(src_processor_id, vecbuf, type, req, tag, comm);
-    buf.assign(vecbuf.begin(), vecbuf.end());
+    buf.clear();
+    buf.insert(vecbuf.begin(), vecbuf.end());
 
     STOP_LOG("receive()", "Parallel");
   }
