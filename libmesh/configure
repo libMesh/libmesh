@@ -691,6 +691,7 @@ CXXSHAREDFLAG
 RPATHFLAG
 PROFILING_FLAGS
 OPROFILE_FLAGS
+FLIBS
 CXXCPP
 GREP
 EGREP
@@ -4345,6 +4346,8 @@ fi
       CFLAGS_OPT="$CFLAGS_OPT -fPIC"
       CFLAGS_DVL="$CFLAGS_DVL -fPIC"
       CFLAGS_DBG="$CFLAGS_DBG -fPIC"
+
+      FFLAGS="$FFLAGS -fPIC"
     fi
 
 
@@ -4439,6 +4442,8 @@ fi
             CFLAGS_OPT="$CFLAGS_OPT -KPIC"
             CFLAGS_DBG="$CFLAGS_DBG -KPIC"
             CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+
+            FFLAGS="$FFLAGS -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -4551,6 +4556,8 @@ echo "${ECHO_T}Unknown Intel complier" >&6; }
               CFLAGS_DBG="$CFLAGS_DBG -fPIC"
               CFLAGS_DVL="$CFLAGS_DVL -fPIC"
 
+              FFLAGS="$FFLAGS -fPIC"
+
               LDFLAGS="$LDFLAGS -fPIC"
 	      ;;
 	    *)
@@ -4561,6 +4568,8 @@ echo "${ECHO_T}Unknown Intel complier" >&6; }
               CFLAGS_OPT="$CFLAGS_OPT -KPIC"
               CFLAGS_DBG="$CFLAGS_DBG -KPIC"
               CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+
+	      FFLAGS="$FFLAGS -KPIC"
 
               LDFLAGS="$LDFLAGS -KPIC"
 	      ;;
@@ -4622,6 +4631,8 @@ echo "${ECHO_T}Unknown Intel complier" >&6; }
             CFLAGS_OPT="$CFLAGS_OPT -KPIC"
             CFLAGS_DBG="$CFLAGS_DBG -KPIC"
             CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+
+	    FFLAGS="$FFLAGS -KPIC"
 
             LDFLAGS="$LDFLAGS -KPIC"
           fi
@@ -17596,6 +17607,7 @@ CXXSHAREDFLAG!$CXXSHAREDFLAG$ac_delim
 RPATHFLAG!$RPATHFLAG$ac_delim
 PROFILING_FLAGS!$PROFILING_FLAGS$ac_delim
 OPROFILE_FLAGS!$OPROFILE_FLAGS$ac_delim
+FLIBS!$FLIBS$ac_delim
 CXXCPP!$CXXCPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
@@ -17614,7 +17626,6 @@ PETSC_DIR!$PETSC_DIR$ac_delim
 MPI_IMPL!$MPI_IMPL$ac_delim
 MPI!$MPI$ac_delim
 MPI_LIBS!$MPI_LIBS$ac_delim
-MPI_LIBS_PATH!$MPI_LIBS_PATH$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -17656,6 +17667,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+MPI_LIBS_PATH!$MPI_LIBS_PATH$ac_delim
 MPI_LIBS_PATHS!$MPI_LIBS_PATHS$ac_delim
 MPI_INCLUDES_PATH!$MPI_INCLUDES_PATH$ac_delim
 MPI_INCLUDES_PATHS!$MPI_INCLUDES_PATHS$ac_delim
@@ -17727,7 +17739,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 69; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 70; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
