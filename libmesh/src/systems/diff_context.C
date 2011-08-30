@@ -32,8 +32,7 @@ DiffContext::DiffContext (const System& sys) :
   elem_solution_derivative(1.),
   fixed_solution_derivative(0.),
   dof_indices_var(sys.n_vars()),
-  neigh_dof_indices_var(sys.n_vars()),
-  compute_neighbor_values(false), _deltat(NULL)
+  _deltat(NULL)
 {
   // Finally initialize solution/residual/jacobian data structures
   unsigned int n_vars = sys.n_vars();
@@ -43,12 +42,6 @@ DiffContext::DiffContext (const System& sys) :
   elem_subjacobians.resize(n_vars);
   if (sys.use_fixed_solution)
     elem_fixed_subsolutions.reserve(n_vars);
-  if (compute_neighbor_values)
-    {
-      neigh_subsolutions.reserve(n_vars);
-      neigh_subresiduals.reserve(n_vars);
-      neigh_subjacobians.resize(n_vars);
-    }
 
   // If the user resizes sys.qoi, it will invalidate us
   unsigned int n_qoi = sys.qoi.size();
@@ -62,18 +55,9 @@ DiffContext::DiffContext (const System& sys) :
     {
       elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
       elem_subresiduals.push_back(new DenseSubVector<Number>(elem_residual));
-      if (compute_neighbor_values)
-        {
-          neigh_subsolutions.push_back
-            (new DenseSubVector<Number>(neigh_solution));
-          neigh_subresiduals.push_back
-            (new DenseSubVector<Number>(neigh_residual));
-        }
       for (unsigned int q=0; q != n_qoi; ++q)
         elem_qoi_subderivatives[q].push_back(new DenseSubVector<Number>(elem_qoi_derivative[q]));
       elem_subjacobians[i].reserve(n_vars);
-      if (compute_neighbor_values)
-        neigh_subjacobians[i].reserve(n_vars);
 
       if (sys.use_fixed_solution)
         elem_fixed_subsolutions.push_back
@@ -83,9 +67,6 @@ DiffContext::DiffContext (const System& sys) :
         {
           elem_subjacobians[i].push_back
             (new DenseSubMatrix<Number>(elem_jacobian));
-          if (compute_neighbor_values)
-            neigh_subjacobians[i].push_back
-              (new DenseSubMatrix<Number>(neigh_jacobian));
         }
     }
 }
@@ -105,21 +86,6 @@ DiffContext::~DiffContext ()
 
       for (unsigned int j=0; j != elem_subjacobians[i].size(); ++j)
         delete elem_subjacobians[i][j];
-    }
-  if (compute_neighbor_values)
-    {
-      for (unsigned int i=0; i != neigh_subsolutions.size(); ++i)
-        {
-          delete neigh_subsolutions[i];
-          delete neigh_subresiduals[i];
-          for (unsigned int q=0; q != elem_qoi_subderivatives.size(); ++q)
-            delete elem_qoi_subderivatives[q][i];
-          if (!elem_fixed_subsolutions.empty())
-            delete elem_fixed_subsolutions[i];
-
-          for (unsigned int j=0; j != neigh_subjacobians[i].size(); ++j)
-            delete neigh_subjacobians[i][j];
-        }
     }
 }
 

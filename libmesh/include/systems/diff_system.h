@@ -166,13 +166,6 @@ public:
   bool compute_internal_sides;
 
   /**
-   * \p compute_neighbor_values is false by default, it is useful
-   * for computations with discontinuous elements in which a interface
-   * jump or average across elements needs to be computed
-   */
-  bool compute_neighbor_values;
-
-  /**
    * Adds the time derivative contribution on \p side of \p elem to
    * elem_residual.
    * If this method receives request_jacobian = true, then it
