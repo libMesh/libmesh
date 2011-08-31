@@ -443,14 +443,14 @@ ifeq ($(enable-optional),yes)
 
     libmesh_INCLUDE += -I$(SLEPC_DIR)/include -I$(SLEPC_DIR)/$(PETSC_ARCH)/include
 
-    # Depending on petsc version, libs live in different locations
+    # Depending on slepc version, libs live in different locations
     ifeq ($(petsc-major-minor),2.3.x) # 2.3.x does not use BOPT, has lib/ARCH/...
-      PETSC_LIB = $(PETSC_DIR)/lib/$(PETSC_ARCH)
+      SLEPC_LIB = $(SLEPC_DIR)/lib/$(PETSC_ARCH)
     else
       ifeq ($(petsc-major),3) # 3.0.x & newer does not use BOPT, has ARCH/lib/...
-        PETSC_LIB = $(PETSC_DIR)/$(PETSC_ARCH)/lib
+        SLEPC_LIB = $(SLEPC_DIR)/$(PETSC_ARCH)/lib
       else
-        PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
+        SLEPC_LIB = $(SLEPC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
       endif
     endif
 
