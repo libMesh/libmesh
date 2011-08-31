@@ -52,5 +52,11 @@
 #  define EXTERN_C_FOR_SLEPC_END
 #endif
 
+#if SLEPC_VERSION_RELEASE && SLEPC_VERSION_LESS_THAN(3,1,0)
+#  define LibMeshEPSDestroy(x)         EPSDestroy(*(x))
+#else
+#  define LibMeshEPSDestroy(x)         EPSDestroy(x)
+#endif
+
 #endif // #if LIBMESH_HAVE_SLEPC
 #endif // #ifdef __slepc_macro_h__
