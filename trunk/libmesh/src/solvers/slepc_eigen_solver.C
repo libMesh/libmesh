@@ -47,7 +47,7 @@ void SlepcEigenSolver<T>::clear ()
 
       int ierr=0;
 
-      ierr = EPSDestroy(_eps);
+      ierr = LibMeshEPSDestroy(&_eps);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       // SLEPc default eigenproblem solver
