@@ -715,8 +715,8 @@ MPI_LIBS_PATHS
 MPI_INCLUDES_PATH
 MPI_INCLUDES_PATHS
 enablepetsc
-SLEPC_DIR
 slepcversion
+SLEPC_DIR
 enableslepc
 AZTECOO_MAKEFILE_EXPORT
 enabletrilinos
@@ -14357,14 +14357,11 @@ fi
 if test "$enableslepc" != no ; then
 
 
-      if test "x$SLEPC_DIR" = x ; then
-    SLEPC_DIR=/usr/lib/slepc
-  fi
 
       if test "x$SLEPC_DIR" = x || test "x$petscversion" = x; then
     enableslepc=no
-    { echo "$as_me:$LINENO: result: <<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly and enable PETSc. >>>" >&5
-echo "${ECHO_T}<<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly and enable PETSc. >>>" >&6; }
+    { echo "$as_me:$LINENO: result: <<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly to enable SLEPc. >>>" >&5
+echo "${ECHO_T}<<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly to enable SLEPc. >>>" >&6; }
 
   else
     as_ac_File=`echo "ac_cv_file_$SLEPC_DIR/include/slepc.h" | $as_tr_sh`
@@ -14393,7 +14390,6 @@ fi
 
     if (test -r $SLEPC_DIR/include/slepc.h) ; then
 
-
                   slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
       slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
       slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
@@ -14414,9 +14410,12 @@ _ACEOF
         { echo "$as_me:$LINENO: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
 echo "${ECHO_T}<<< Configuring library with SLEPc version $slepcversion support >>>" >&6; }
     else
+      { echo "$as_me:$LINENO: result: <<< Invalid \"\$SLEPC_DIR\" detected (slepc.h not found). SLEPc disabled. >>>" >&5
+echo "${ECHO_T}<<< Invalid \"\$SLEPC_DIR\" detected (slepc.h not found). SLEPc disabled. >>>" >&6; }
       enableslepc=no
     fi
   fi
+
 
 
 
@@ -17672,8 +17671,8 @@ MPI_LIBS_PATHS!$MPI_LIBS_PATHS$ac_delim
 MPI_INCLUDES_PATH!$MPI_INCLUDES_PATH$ac_delim
 MPI_INCLUDES_PATHS!$MPI_INCLUDES_PATHS$ac_delim
 enablepetsc!$enablepetsc$ac_delim
-SLEPC_DIR!$SLEPC_DIR$ac_delim
 slepcversion!$slepcversion$ac_delim
+SLEPC_DIR!$SLEPC_DIR$ac_delim
 enableslepc!$enableslepc$ac_delim
 AZTECOO_MAKEFILE_EXPORT!$AZTECOO_MAKEFILE_EXPORT$ac_delim
 enabletrilinos!$enabletrilinos$ac_delim

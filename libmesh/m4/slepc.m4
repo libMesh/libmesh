@@ -18,22 +18,21 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
   dnl Test to see if SLEPC_DIR set by user.  If not set, then
   dnl try to autodetect in a default directory
-  if test "x$SLEPC_DIR" = x ; then
-    SLEPC_DIR=/usr/lib/slepc
-  fi
+dnl  if test "x$SLEPC_DIR" = x ; then
+dnl    SLEPC_DIR=/usr/lib/slepc
+dnl  fi
 
   dnl Test to see if SLEPC_DIR and petscversion were set by user or
   dnl autodetection.  If not set, then disable slepc, print a message.
   if test "x$SLEPC_DIR" = x || test "x$petscversion" = x; then
     enableslepc=no
-    AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly and enable PETSc. >>>)
+    AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly to enable SLEPc. >>>)
 
   else
     AC_CHECK_FILE($SLEPC_DIR/include/slepc.h,
                   SLEPC_H_PATH=$SLEPC_DIR/include/slepc.h)
                                                                                          
     if (test -r $SLEPC_DIR/include/slepc.h) ; then
-      AC_SUBST(SLEPC_DIR)
   
       dnl Similar to petsc, we need the slepc version number.
       dnl Note slepc will most likely only work with the corresponding version of petsc
@@ -55,9 +54,11 @@ dnl      else
         AC_MSG_RESULT(<<< Configuring library with SLEPc version $slepcversion support >>>)
 dnl      fi
     else
+      AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepc.h not found). SLEPc disabled. >>>)
       enableslepc=no
     fi
   fi
 
+  AC_SUBST(SLEPC_DIR)
   AC_SUBST(enableslepc)
 ])
