@@ -52,7 +52,7 @@
 #  define EXTERN_C_FOR_SLEPC_END
 #endif
 
-#if SLEPC_VERSION_RELEASE && SLEPC_VERSION_LESS_THAN(3,1,0)
+#if SLEPC_VERSION_RELEASE && SLEPC_VERSION_LESS_THAN(3,1,1)
 #  define LibMeshEPSDestroy(x)         EPSDestroy(*(x))
 #else
 #  define LibMeshEPSDestroy(x)         EPSDestroy(x)
