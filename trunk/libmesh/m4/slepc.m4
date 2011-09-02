@@ -18,9 +18,9 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
   dnl Test to see if SLEPC_DIR set by user.  If not set, then
   dnl try to autodetect in a default directory
-dnl  if test "x$SLEPC_DIR" = x ; then
-dnl    SLEPC_DIR=/usr/lib/slepc
-dnl  fi
+  if test "x$SLEPC_DIR" = x ; then
+    SLEPC_DIR=/usr/lib/slepc
+  fi
 
   dnl Test to see if SLEPC_DIR and petscversion were set by user or
   dnl autodetection.  If not set, then disable slepc, print a message.
@@ -41,6 +41,7 @@ dnl  fi
       slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
       slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
       AC_SUBST(slepcversion)
+      AC_SUBST(SLEPC_DIR)
   
       if (test $slepcversion != $petscversion) ; then
         AC_MSG_RESULT(WARNING:)
@@ -59,6 +60,5 @@ dnl      fi
     fi
   fi
 
-  AC_SUBST(SLEPC_DIR)
   AC_SUBST(enableslepc)
 ])
