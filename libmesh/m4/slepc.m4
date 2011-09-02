@@ -42,7 +42,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
       slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
       AC_SUBST(slepcversion)
       AC_SUBST(SLEPC_DIR)
-  
+
       if (test $slepcversion != $petscversion) ; then
         AC_MSG_RESULT(WARNING:)
         AC_MSG_RESULT(>>> Different version numbers for SLEPc and PETSc <<<)
@@ -56,6 +56,7 @@ dnl      else
 dnl      fi
     else
       AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepc.h not found). SLEPc disabled. >>>)
+      unset SLEPC_DIR
       enableslepc=no
     fi
   fi
