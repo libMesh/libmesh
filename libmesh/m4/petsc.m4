@@ -119,6 +119,8 @@ dnl      AC_SUBST(PETSCINCLUDEDIRS)
       	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf` 
       elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
       	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
+      elif (test -r $PETSC_DIR/conf/petscvariables) ; then dnl 3.0.x 
+         HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
       fi
 		 
       if test "x$HYPRE_LIB" != x ; then
