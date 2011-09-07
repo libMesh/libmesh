@@ -12911,6 +12911,7 @@ echo "${ECHO_T}<<< Configuring library with PETSc version $petscversion support 
 
             if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then                 	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`
       elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then       	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
+      elif (test -r $PETSC_DIR/conf/petscvariables) ; then          HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
       fi
 
       if test "x$HYPRE_LIB" != x ; then
