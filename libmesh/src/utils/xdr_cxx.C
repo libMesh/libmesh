@@ -464,9 +464,14 @@ template <typename T>
 bool xdr_translate(XDR* x, std::vector<T>& a) {
   unsigned int length = a.size();
   xdr_u_int(x, &length);
-  a.resize(length);
-  return xdr_vector(x, (char*) &a[0], length, sizeof(T),
-                    xdr_translator<T>());
+  if (length > 0)
+  {
+    a.resize(length);
+    return xdr_vector(x, (char*) &a[0], length, sizeof(T),
+                      xdr_translator<T>());
+  }
+  else
+    return true;
 }
 
 template <typename T>
