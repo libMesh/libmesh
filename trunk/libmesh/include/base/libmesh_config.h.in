@@ -97,6 +97,10 @@
    support */
 #undef ENABLE_VSMOOTHER
 
+/* Flag indicating whether the library shall be compiled to use the Trilinos
+   solver collection */
+#undef HAVE_AZTECOO
+
 /* define if the Boost library is available */
 #undef HAVE_BOOST
 
