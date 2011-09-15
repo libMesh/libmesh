@@ -718,8 +718,10 @@ enablepetsc
 slepcversion
 SLEPC_DIR
 enableslepc
+TRILINOS_MAKEFILE_EXPORT
+enabletrilinos10
 AZTECOO_MAKEFILE_EXPORT
-enabletrilinos
+enableaztecoo
 NOX_MAKEFILE_EXPORT
 enablenox
 TBB_LIBRARY
@@ -1403,8 +1405,7 @@ Optional Features:
   --enable-optional       en/disable optional external libraries
   --enable-petsc          build with PETSc iterative solver suppport
   --enable-slepc          build with SLEPc eigen solver support
-  --enable-trilinos       build with Trilinos suppport
-  --enable-nox            build with Nox suppport
+  --enable-trilinos       build with Trilinos support
   --enable-tbb            build with threading support via Threading Building
                           Blocks
   --enable-laspack        build with LASPACK iterative solver suppport
@@ -14452,6 +14453,208 @@ fi
 
 
   if test "$withtrilinosdir" != no ; then
+    as_ac_File=`echo "ac_cv_file_$withtrilinosdir/include/Makefile.export.Trilinos" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $withtrilinosdir/include/Makefile.export.Trilinos" >&5
+echo $ECHO_N "checking for $withtrilinosdir/include/Makefile.export.Trilinos... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withtrilinosdir/include/Makefile.export.Trilinos"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.Trilinos
+else
+  as_ac_File=`echo "ac_cv_file_$withtrilinosdir/Makefile.export.Trilinos" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $withtrilinosdir/Makefile.export.Trilinos" >&5
+echo $ECHO_N "checking for $withtrilinosdir/Makefile.export.Trilinos... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withtrilinosdir/Makefile.export.Trilinos"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/Makefile.export.Trilinos
+else
+  enabletrilinos10=no
+fi
+
+fi
+
+
+    if test "$enabletrilinos10" != no ; then
+       enabletrilinos10=yes
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_TRILINOS 1
+_ACEOF
+
+       { echo "$as_me:$LINENO: result: <<< Configuring library with Trilinos 10 support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with Trilinos 10 support >>>" >&6; }
+
+                            as_ac_File=`echo "ac_cv_file_$withtrilinosdir/include/AztecOO_config.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $withtrilinosdir/include/AztecOO_config.h" >&5
+echo $ECHO_N "checking for $withtrilinosdir/include/AztecOO_config.h... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withtrilinosdir/include/AztecOO_config.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  enableaztecoo=yes
+else
+  as_ac_File=`echo "ac_cv_file_$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $withtrilinosdir/packages/aztecoo/src/AztecOO_config.h" >&5
+echo $ECHO_N "checking for $withtrilinosdir/packages/aztecoo/src/AztecOO_config.h... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  enableaztecoo=yes
+else
+  enableaztecoo=no
+fi
+
+fi
+
+
+       if test "$enableaztecoo" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_AZTECOO 1
+_ACEOF
+
+          { echo "$as_me:$LINENO: result: <<< Configuring library with AztecOO support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with AztecOO support >>>" >&6; }
+       fi
+
+                            as_ac_File=`echo "ac_cv_file_$withtrilinosdir/include/NOX_Config.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $withtrilinosdir/include/NOX_Config.h" >&5
+echo $ECHO_N "checking for $withtrilinosdir/include/NOX_Config.h... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withtrilinosdir/include/NOX_Config.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  enablenox=yes
+else
+  as_ac_File=`echo "ac_cv_file_$withtrilinosdir/packages/nox/src/NOX_Config.h" | $as_tr_sh`
+{ echo "$as_me:$LINENO: checking for $withtrilinosdir/packages/nox/src/NOX_Config.h" >&5
+echo $ECHO_N "checking for $withtrilinosdir/packages/nox/src/NOX_Config.h... $ECHO_C" >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$withtrilinosdir/packages/nox/src/NOX_Config.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval echo '${'$as_ac_File'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  enablenox=yes
+else
+  enablenox=no
+fi
+
+fi
+
+
+       if test "$enablenox" != no ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NOX 1
+_ACEOF
+
+          { echo "$as_me:$LINENO: result: <<< Configuring library with NOX support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with NOX support >>>" >&6; }
+       fi
+    fi
+  else
+    enabletrilinos10=no
+  fi
+
+
+
+
+
+  if test "x$TRILINOS_DIR" = "x"; then
+    TRILINOS_DIR=no
+  fi
+
+
+# Check whether --with-trilinos was given.
+if test "${with_trilinos+set}" = set; then
+  withval=$with_trilinos; withtrilinosdir=$withval
+else
+  withtrilinosdir=$TRILINOS_DIR
+fi
+
+
+    if test "$withtrilinosdir" != no ; then
     as_ac_File=`echo "ac_cv_file_$withtrilinosdir/include/Makefile.export.aztecoo" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for $withtrilinosdir/include/Makefile.export.aztecoo" >&5
 echo $ECHO_N "checking for $withtrilinosdir/include/Makefile.export.aztecoo... $ECHO_C" >&6; }
@@ -14496,40 +14699,28 @@ echo "${ECHO_T}$ac_res" >&6; }
 if test `eval echo '${'$as_ac_File'}'` = yes; then
   AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo
 else
-  enabletrilinos=no
+  enableaztecoo=no
 fi
 
 fi
 
 
-    if test "$enabletrilinos" != no ; then
+    if test "$enableaztecoo" != no ; then
+       enableaztecoo=yes
 
 cat >>confdefs.h <<\_ACEOF
+#define HAVE_AZTECOO 1
+_ACEOF
+
+       cat >>confdefs.h <<\_ACEOF
 #define HAVE_TRILINOS 1
 _ACEOF
 
-       { echo "$as_me:$LINENO: result: <<< Configuring library with Trilinos support >>>" >&5
-echo "${ECHO_T}<<< Configuring library with Trilinos support >>>" >&6; }
+       { echo "$as_me:$LINENO: result: <<< Configuring library with Trilinos 9 support >>>" >&5
+echo "${ECHO_T}<<< Configuring library with Trilinos 9 support >>>" >&6; }
     fi
   else
-    enabletrilinos=no
-  fi
-
-
-
-
-
-                        # Check whether --enable-nox was given.
-if test "${enable_nox+set}" = set; then
-  enableval=$enable_nox; enablenox=$enableval
-else
-  enablenox=yes
-fi
-
-      if test "$enablenox" != no ; then
-
-  if test "x$TRILINOS_DIR" = "x"; then
-    TRILINOS_DIR=no
+    enableaztecoo=no
   fi
 
 
@@ -14539,7 +14730,6 @@ if test "${with_nox+set}" = set; then
 else
   withnoxdir=$TRILINOS_DIR
 fi
-
 
   if test "$withnoxdir" != no ; then
     as_ac_File=`echo "ac_cv_file_$withnoxdir/include/Makefile.export.nox" | $as_tr_sh`
@@ -14593,6 +14783,7 @@ fi
 
 
     if test "$enablenox" != no ; then
+       enablenox=yes
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_NOX 1
@@ -14609,8 +14800,10 @@ echo "${ECHO_T}<<< Configuring library with Nox support >>>" >&6; }
 
 
 
-      fi
-         fi
+
+
+
+   fi
 fi
 
 
@@ -17679,8 +17872,10 @@ enablepetsc!$enablepetsc$ac_delim
 slepcversion!$slepcversion$ac_delim
 SLEPC_DIR!$SLEPC_DIR$ac_delim
 enableslepc!$enableslepc$ac_delim
+TRILINOS_MAKEFILE_EXPORT!$TRILINOS_MAKEFILE_EXPORT$ac_delim
+enabletrilinos10!$enabletrilinos10$ac_delim
 AZTECOO_MAKEFILE_EXPORT!$AZTECOO_MAKEFILE_EXPORT$ac_delim
-enabletrilinos!$enabletrilinos$ac_delim
+enableaztecoo!$enableaztecoo$ac_delim
 NOX_MAKEFILE_EXPORT!$NOX_MAKEFILE_EXPORT$ac_delim
 enablenox!$enablenox$ac_delim
 TBB_LIBRARY!$TBB_LIBRARY$ac_delim
@@ -17743,7 +17938,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 70; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 72; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

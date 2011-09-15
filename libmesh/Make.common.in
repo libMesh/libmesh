@@ -66,7 +66,11 @@ MPI_INCLUDE          = @MPI_INCLUDES_PATHS@
 MPI_LIB              = @MPI_LIBS_PATHS@ @MPI_LIBS@
 
 # Trilinos configuration
-enable-trilinos         = @enabletrilinos@
+enable-trilinos-10       = @enabletrilinos10@
+TRILINOS_MAKEFILE_EXPORT = @TRILINOS_MAKEFILE_EXPORT@
+
+# AztecOO configuration
+enable-aztecoo          = @enableaztecoo@
 AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
 
 # Nox configuration
@@ -411,7 +415,7 @@ ifeq ($(enable-optional),yes)
   # Trilinos - at a minimum, we support the 
   # AztecOO linear solvers and requisite Epetra
   # data structures
-  ifeq ($(enable-trilinos),yes)
+  ifeq ($(enable-aztecoo),yes)
       include @AZTECOO_MAKEFILE_EXPORT@
       libmesh_LIBS    += $(AZTECOO_LIBS)
       libmesh_INCLUDE += $(AZTECOO_INCLUDES)
@@ -422,7 +426,13 @@ ifeq ($(enable-optional),yes)
           libmesh_LIBS    += $(NOX_LIBS)
           libmesh_INCLUDE += $(NOX_INCLUDES)
           libmesh_CPPFLAGS     += -DHAVE_CONFIG_H
-      endif	
+      endif
+  endif	
+
+  ifeq ($(enable-trilinos-10),yes)
+      include @TRILINOS_MAKEFILE_EXPORT@
+      libmesh_LIBS    += $(Trilinos_LIBRARIES) $(Trilinos_LIBRARY_DIRS) $(Trilinos_TPL_LIBRARIES) $(Trilinos_TPL_LIBRARY_DIRS)
+      libmesh_INCLUDE += $(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS)      	
   endif	
 
   #############################################################################

@@ -196,13 +196,9 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
     this->user_presolve(this->system());
 
   EpetraVector<T> * x_epetra = libmesh_cast_ptr<EpetraVector<T>*>(&x_in);
-  EpetraVector<T> * r_epetra = libmesh_cast_ptr<EpetraVector<T>*>(&r_in);
-
-  Teuchos::RCP<Epetra_Vector> x_t(x_epetra->vec());
-  Teuchos::RCP<Epetra_Vector> r_t(r_epetra->vec());
-
-  NOX::Epetra::Vector x(x_t, NOX::Epetra::Vector::CreateView);
-  NOX::Epetra::Vector r(r_t, NOX::Epetra::Vector::CreateView);
+  // Creating a Teuchos::RCP as they do in NOX examples does not work here - we get some invalid memory references
+  // thus we make a local copy
+  NOX::Epetra::Vector x(*x_epetra->vec());
   
   Teuchos::RCP<Teuchos::ParameterList> nlParamsPtr =
     Teuchos::rcp(new Teuchos::ParameterList);
@@ -273,20 +269,17 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
   
   Teuchos::RCP<NOX::Solver::Generic> solver =
     NOX::Solver::buildSolver(grpPtr, combo, nlParamsPtr);
-  NOX::StatusTest::StatusType status = NOX::StatusTest::Unconverged;
-  status = solver->solve();
+  NOX::StatusTest::StatusType status = solver->solve();
+  this->converged = (status == NOX::StatusTest::Converged);
   
   const NOX::Epetra::Group& finalGroup =
     dynamic_cast<const NOX::Epetra::Group&>(solver->getSolutionGroup());
-  const NOX::Abstract::Vector& finalSolution = finalGroup.getX();
-//  const Epetra_Vector& finalSolution =
-//    (dynamic_cast<const NOX::Epetra::Vector&>(finalGroup.getX())).getEpetraVector();
+  const NOX::Epetra::Vector& noxFinalSln = dynamic_cast<const NOX::Epetra::Vector&>(finalGroup.getX());
 
-  x = finalSolution;
-
+  *x_epetra->vec() = noxFinalSln.getEpetraVector();
   x_in.close();
 
-  return std::make_pair(1, 0.);
+  return std::make_pair(1, finalGroup.getNormF());
 }
 
 

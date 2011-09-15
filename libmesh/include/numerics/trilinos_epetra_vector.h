@@ -787,6 +787,7 @@ void EpetraVector<T>::init (const unsigned int n,
   _vec->ExtractView(&myCoefs_, &dummy);
   
   this->_is_initialized = true;
+  this->_is_closed = true;
   
   if (fast == false)
     this->zero ();
@@ -836,7 +837,10 @@ inline
 void EpetraVector<T>::clear ()
 {
   if ((this->initialized()) && (this->_destroy_vec_on_exit))
+  {
     delete _vec;
+    _vec = NULL;
+  }
 
   this->_is_closed = this->_is_initialized = false;
 }
