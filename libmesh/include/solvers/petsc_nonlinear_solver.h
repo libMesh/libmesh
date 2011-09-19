@@ -113,6 +113,11 @@ public:
    * SNESConvergedReasons.
    */
   SNESConvergedReason get_converged_reason();
+
+  /**
+   * Get the total number of linear iterations done in the last solve
+   */
+  int get_total_linear_iterations();
   
 private:
 
@@ -129,6 +134,11 @@ private:
    * this value is therefore necessarily *not* cleared by the clear() function.
    */
   SNESConvergedReason _reason;
+
+  /**
+   * Stores the total number of linear iterations from the last solve.
+   */
+  int _n_linear_iterations;
 };
 
 
@@ -137,7 +147,8 @@ template <typename T>
 inline
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system) :
     NonlinearSolver<T>(system),
-    _reason(SNES_CONVERGED_ITERATING/*==0*/) // Arbitrary initial value...
+    _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
+    _n_linear_iterations(0)
 {
 }
 
