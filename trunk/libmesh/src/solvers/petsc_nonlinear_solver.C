@@ -382,6 +382,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   ierr = SNESGetIterationNumber(_snes,&n_iterations);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);         
 	 
   ierr = SNESGetFunctionNorm(_snes,&final_residual_norm);
 	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -428,7 +431,11 @@ SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
   return _reason;
 }
   
-
+template <typename T>
+int PetscNonlinearSolver<T>::get_total_linear_iterations()
+{
+  return _n_linear_iterations;
+}
 
 
 //------------------------------------------------------------------
