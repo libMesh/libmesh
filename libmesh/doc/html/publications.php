@@ -1232,7 +1232,7 @@ J.&nbsp;Ragusa, A.&nbsp;Siegel, and J.-M. Ruggieri.
  Neutronic/Thermalhydraulic Coupling Technigues for Sodium Cooled
   Fast Reactor Simulations.
  Technical Report 14837, Department of Energy, September 2010.
- <a href="http://dx.doi/org/10.2172/992636">http://dx.doi/org/10.2172/992636</a>.
+ <a href="http://dx.doi.org/10.2172/992636">http://dx.doi.org/10.2172/992636</a>.
 <a name="Ragusa_2010"></a><pre>
 @techreport{Ragusa_2010,
   author = {J.~Ragusa and A.~Siegel and J.-M.~Ruggieri},
@@ -1242,7 +1242,7 @@ J.&nbsp;Ragusa, A.&nbsp;Siegel, and J.-M. Ruggieri.
   month = sep,
   year = {2010},
   number = {14837},
-  note = {\url{http://dx.doi/org/10.2172/992636}}
+  note = {\url{http://dx.doi.org/10.2172/992636}}
 }
 </pre>
 
