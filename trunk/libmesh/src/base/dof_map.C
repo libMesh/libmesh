@@ -59,6 +59,8 @@ DofMap::DofMap(const unsigned int number) :
   _end_df(),
   _var_first_local_df(),
   _send_list(),
+  _extra_sparsity_function(NULL),
+  _extra_sparsity_context(NULL),
   _extra_send_list_function(NULL),
   _extra_send_list_context(NULL),
   _n_nz(),
@@ -1345,6 +1347,9 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   _n_oz.swap(sp.n_oz);
   
   STOP_LOG("compute_sparsity()", "DofMap");
+
+  if(_extra_sparsity_function)
+    (*_extra_sparsity_function)(sp.sparsity_pattern, _n_nz, _n_oz, _extra_sparsity_context);
   
   // We are done with the sparsity_pattern.  However, quite a
   // lot has gone into computing it.  It is possible that some

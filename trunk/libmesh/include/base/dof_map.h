@@ -38,6 +38,7 @@
 #include "threads.h"
 #include "threads_allocators.h"
 #include "elem_range.h"
+#include "sparsity_pattern.h"
 
 namespace libMesh
 {
@@ -162,6 +163,23 @@ public:
    * preallocation of sparse matrices.
    */
   void compute_sparsity (const MeshBase&);
+
+  /**
+   * Attach a function pointer to use as a callback to populate the
+   * sparsity pattern with extra entries.
+   *
+   * Care must be taken that when adding entries they are sorted into the Rows
+   *
+   * Further, you _must_ modify n_nz and n_oz properly!
+   *
+   * This is an advanced function... use at your own peril!
+   */
+  void attach_extra_sparsity_function(void (*func)(SparsityPattern::Graph & sparsity,
+                                                   std::vector<unsigned int> & n_nz,
+                                                   std::vector<unsigned int> & n_oz,
+                                                   void *),
+                                      void * context = NULL)
+    { _extra_sparsity_function = func; _extra_sparsity_context = context; }
 
   /**
    * Attach a function pointer to use as a callback to populate the
@@ -806,6 +824,18 @@ private:
    * solution on my subdomain.
    */
   std::vector<unsigned int> _send_list;
+
+  /**
+   * A function pointer to a function to call to add extra entries to the sparsity pattern
+   */
+  void (*_extra_sparsity_function)(SparsityPattern::Graph &,
+                                   std::vector<unsigned int> & n_nz,
+                                   std::vector<unsigned int> & n_oz,
+                                   void *);
+  /**
+   * A pointer associcated with the extra sparsity that can optionally be passed in
+   */
+  void * _extra_sparsity_context;
 
   /**
    * A function pointer to a function to call to add extra entries to the send list
