@@ -15,6 +15,15 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   dnl pretending to be gcc
   REAL_GXX=`($CXX -v 2>&1) | grep "gcc version"`
 
+  dnl Intel's v12.1 does this:
+  dnl $ icpc -v
+  dnl   icpc version 12.1.0 (gcc version 4.4.4 compatibility)
+  dnl cath that and do not interpret it as 'REAL_GXX' compiler
+  is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
+  if test "x$is_intel_icc" != "x" ; then
+    REAL_GXX=""
+  fi	
+  
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
@@ -183,6 +192,10 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *12.1*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 12.1 >>>)
+  	        GXX_VERSION=intel_icc_v12.x
+                ;;
               *12.*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 12 >>>)
   	        GXX_VERSION=intel_icc_v12.x
