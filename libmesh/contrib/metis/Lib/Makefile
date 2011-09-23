@@ -14,7 +14,7 @@ OBJS   	:= $(patsubst %.c, %.$(obj-suffix), $(SRC))
 # doesn't exist (see proto.h) which is the way it stands now.
 # We don't want to see the warnings so we will filter out the
 # '-Wimplicit' flag when compiling this package.
-libmesh_CFLAGS := $(filter '-Wimplicit',$(libmesh_CFLAGS))
+libmesh_CFLAGS := $(filter-out '-Wimplicit',$(libmesh_CFLAGS))
 
 target := $(EXTERNAL_LIBDIR)/libmetis$(static_libext)
 
