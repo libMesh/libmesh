@@ -66,16 +66,32 @@ void AztecLinearSolver<T>::init ()
  
     _linear_solver = new AztecOO();
 
+    set_solver_type();
+
     switch(this->_preconditioner_type)
     {
     case ILU_PRECOND:
       _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+      _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
       break;
+
     case BLOCK_JACOBI_PRECOND:
       _linear_solver->SetAztecOption(AZ_precond,AZ_Jacobi);
       break;
+
+    case ICC_PRECOND:
+      _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+      _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_icc);
+      break;
+
+    case LU_PRECOND:
+      _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+      _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_lu);
+      break;
+
     default:
       _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+      _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
     }
   }
 }
@@ -269,6 +285,32 @@ void AztecLinearSolver<T>::print_converged_reason()
 // #endif
 }
 
+template <typename T>
+void AztecLinearSolver<T>::set_solver_type()
+{
+  switch (this->_solver_type)
+  {
+    case CG:
+      _linear_solver->SetAztecOption(AZ_solver, AZ_cg); return;
+
+    case CGS:
+      _linear_solver->SetAztecOption(AZ_solver, AZ_cgs); return;
+
+    case TFQMR:
+      _linear_solver->SetAztecOption(AZ_solver, AZ_tfqmr); return;
+
+    case BICGSTAB:
+      _linear_solver->SetAztecOption(AZ_solver, AZ_bicgstab); return;
+
+    case GMRES:
+      _linear_solver->SetAztecOption(AZ_solver, AZ_gmres); return;
+
+    default:
+      libMesh::err << "ERROR:  Unsupported AztecOO Solver: "
+                    << this->_solver_type                 << std::endl
+                    << "Continuing with AztecOO defaults" << std::endl;
+  }
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations
