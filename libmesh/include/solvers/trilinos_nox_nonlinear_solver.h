@@ -70,7 +70,7 @@ public:
   /**
    * Destructor.
    */
-  ~NoxNonlinearSolver ();
+  virtual ~NoxNonlinearSolver ();
   
   /**
    * Release all memory and clear data structures.
@@ -86,11 +86,11 @@ public:
    * Call the Nox solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,    // System Jacobian Matrix
-					       NumericVector<T>&,   // Solution vector
-					       NumericVector<T>&,   // Residual vector
-					       const double,        // Stopping tolerance
-					       const unsigned int); // N. Iterations
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T> &,    // System Jacobian Matrix
+                                               NumericVector<T> &,   // Solution vector
+                                               NumericVector<T> &,   // Residual vector
+                                               const double,         // Stopping tolerance
+                                               const unsigned int);  // N. Iterations
 private:
 
   /**

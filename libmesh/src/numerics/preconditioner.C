@@ -25,6 +25,7 @@
 #include "auto_ptr.h"
 #include "preconditioner.h"
 #include "petsc_preconditioner.h"
+#include "trilinos_preconditioner.h"
 
 namespace libMesh
 {
@@ -56,15 +57,11 @@ Preconditioner<T>::build(const SolverPackage solver_package)
       }
 #endif
 
-/*
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
-      {
-	AutoPtr<Preconditioner<T> > ap(new AztecPreconditioner<T>);
-	return ap;
-      }
+      return new TrilinosPreconditioner<T>();
 #endif
-*/
+
     default:
       libMesh::err << "ERROR:  Unrecognized solver package: "
 		    << solver_package
