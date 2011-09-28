@@ -811,7 +811,9 @@ if test "$enablecomplex" = no ; then
       dnl -- try Trilinos 10 first
       CONFIGURE_TRILINOS_10
       dnl -- then Trlinos 9
-      CONFIGURE_TRILINOS_9
+      if test "$enabletrilinos10" = no ; then
+        CONFIGURE_TRILINOS_9
+      fi
    fi
 fi
 dnl -------------------------------------------------------------
