@@ -78,6 +78,10 @@ AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
 enable-nox          = @enablenox@
 NOX_MAKEFILE_EXPORT = @NOX_MAKEFILE_EXPORT@
 
+# ML configuration
+enable-ml          = @enableml@
+ML_MAKEFILE_EXPORT = @ML_MAKEFILE_EXPORT@
+
 # Boost Configuration - currently using header-only libraries
 libmesh_INCLUDE += @BOOST_CPPFLAGS@
 #libmesh_LIBS     += @BOOST_LDFLAGS@
@@ -427,6 +431,13 @@ ifeq ($(enable-optional),yes)
           libmesh_LIBS    += $(NOX_LIBS)
           libmesh_INCLUDE += $(NOX_INCLUDES)
           libmesh_CPPFLAGS     += -DHAVE_CONFIG_H
+      endif
+      
+      # ML, an additional option if AztecOO is present
+      ifeq ($(enable-ml),yes)
+          include @ML_MAKEFILE_EXPORT@
+          libmesh_LIBS    += $(ML_LIBS)
+          libmesh_INCLUDE += $(ML_INCLUDES)
       endif
   endif	
 

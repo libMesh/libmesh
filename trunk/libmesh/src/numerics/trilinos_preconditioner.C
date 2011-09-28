@@ -37,6 +37,10 @@
 #include "Ifpack_IC.h"
 #include "Ifpack_ICT.h"
 
+#ifdef LIBMESH_HAVE_ML
+#include "ml_MultiLevelPreconditioner.h"
+#endif
+
 namespace libMesh
 {
 
@@ -82,8 +86,30 @@ template <typename T>
 void
 TrilinosPreconditioner<T>::compute()
 {
-  Ifpack_Preconditioner * pc = dynamic_cast<Ifpack_Preconditioner *>(_prec);
-  pc->Compute();
+  Ifpack_Preconditioner * ifpack = NULL;
+  ML_Epetra::MultiLevelPreconditioner * ml = NULL;
+
+  switch (this->_preconditioner_type)
+  {
+  // IFPACK preconditioners
+  case ILU_PRECOND:
+  case SOR_PRECOND:
+    ifpack = dynamic_cast<Ifpack_Preconditioner *>(_prec);
+    ifpack->Compute();
+    break;
+
+#ifdef LIBMESH_HAVE_ML
+  // ML preconditioners
+  case AMG_PRECOND:
+    ml = dynamic_cast<ML_Epetra::MultiLevelPreconditioner *>(_prec);
+    ml->ComputePreconditioner();
+    break;
+#endif
+
+  default:
+    // no nothing here
+    break;
+  }
 }
 
 
@@ -91,8 +117,8 @@ template <typename T>
 void
 TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & preconditioner_type)
 {
-  Ifpack factory;
   Ifpack_Preconditioner * pc = NULL;
+  ML_Epetra::MultiLevelPreconditioner * ml = NULL;
   switch (preconditioner_type)
   {
   case IDENTITY_PRECOND:
@@ -109,6 +135,7 @@ TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & p
     pc = new Ifpack_ILU(_mat);
     pc->SetParameters(_param_list);
     pc->Initialize();
+    _prec = pc;
     break;
 
   case LU_PRECOND:
@@ -129,14 +156,19 @@ TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & p
   case EISENSTAT_PRECOND:
     break;
 
-//  case AMG_PRECOND:
+#ifdef LIBMESH_HAVE_ML
+  case AMG_PRECOND:
+    ml = new ML_Epetra::MultiLevelPreconditioner(*_mat, _param_list, false);;
+    _prec = ml;
+    break;
+#endif
+
   default:
     libMesh::err << "ERROR:  Unsupported Trilinos Preconditioner: "
                   << preconditioner_type       << std::endl
                   << "Continuing with Trilinos defaults" << std::endl;
   }
 
-  _prec = pc;
 }
 
 
