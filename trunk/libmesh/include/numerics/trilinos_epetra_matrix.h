@@ -74,14 +74,14 @@ public:
    */
   EpetraMatrix ();
 
-//   /**
-//    * Constructor.  Creates a EpetraMatrix assuming you already
-//    * have a valid Mat object.  In this case, m is NOT destroyed
-//    * by the EpetraMatrix destructor when this object goes out of scope.
-//    * This allows ownership of m to remain with the original creator,
-//    * and to simply provide additional functionality with the EpetraMatrix.
-//    */
-//   EpetraMatrix (Mat m);
+   /**
+    * Constructor.  Creates a EpetraMatrix assuming you already
+    * have a valid Epetra_FECrsMatrix object.  In this case, m is NOT destroyed
+    * by the EpetraMatrix destructor when this object goes out of scope.
+    * This allows ownership of m to remain with the original creator,
+    * and to simply provide additional functionality with the EpetraMatrix.
+    */
+   EpetraMatrix (Epetra_FECrsMatrix * m);
   
   /**
    * Destructor. Free all memory, but do not
@@ -365,14 +365,14 @@ EpetraMatrix<T>::EpetraMatrix()
 
 
 
-// template <typename T>
-// inline
-// EpetraMatrix<T>::EpetraMatrix(Mat m)
-//   : _destroy_mat_on_exit(false)
-// {
-//   this->_mat = m;
-//   this->_is_initialized = true;
-// }
+template <typename T>
+inline
+EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m)
+ : _destroy_mat_on_exit(false)
+{
+  this->_mat = m;
+  this->_is_initialized = true;
+}
 
 
 
@@ -583,13 +583,10 @@ bool EpetraMatrix<T>::closed() const
 
 template <typename T>
 inline
-//void EpetraMatrix<T>::swap(EpetraMatrix<T> &m) 
-void EpetraMatrix<T>::swap(EpetraMatrix<T> &) 
+void EpetraMatrix<T>::swap(EpetraMatrix<T> & m)
 {
-  libmesh_not_implemented();
-
-//   std::swap(_mat, m._mat);
-//   std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);
+   std::swap(_mat, m._mat);
+   std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);
 }
 
 

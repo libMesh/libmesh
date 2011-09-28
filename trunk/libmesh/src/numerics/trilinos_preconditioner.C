@@ -1,0 +1,219 @@
+// $Id$
+
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+  
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#include "libmesh_common.h"
+
+#ifdef LIBMESH_HAVE_TRILINOS
+
+// C++ includes
+
+// Local Includes
+#include "trilinos_preconditioner.h"
+#include "trilinos_epetra_matrix.h"
+#include "trilinos_epetra_vector.h"
+#include "libmesh_common.h"
+
+#include "Ifpack.h"
+#include "Ifpack_DiagPreconditioner.h"
+#include "Ifpack_AdditiveSchwarz.h"
+#include "Ifpack_ILU.h"
+#include "Ifpack_ILUT.h"
+#include "Ifpack_IC.h"
+#include "Ifpack_ICT.h"
+
+namespace libMesh
+{
+
+template <typename T>
+void TrilinosPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
+{
+}
+
+
+
+
+template <typename T>
+void TrilinosPreconditioner<T>::init ()
+{
+  if(!this->_matrix)
+  {
+    libMesh::err << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;
+    libmesh_error();
+  }
+
+  // Clear the preconditioner in case it has been created in the past
+  if (!this->_is_initialized)
+  {
+    EpetraMatrix<T> * matrix = libmesh_cast_ptr<EpetraMatrix<T>*, SparseMatrix<T> >(this->_matrix);
+    _mat = matrix->mat();
+  }
+  
+  set_preconditioner_type(this->_preconditioner_type);
+
+  this->_is_initialized = true;
+}
+
+
+template <typename T>
+void
+TrilinosPreconditioner<T>::set_params(Teuchos::ParameterList & list)
+{
+  _param_list = list;
+}
+
+
+template <typename T>
+void
+TrilinosPreconditioner<T>::compute()
+{
+  Ifpack_Preconditioner * pc = dynamic_cast<Ifpack_Preconditioner *>(_prec);
+  pc->Compute();
+}
+
+
+template <typename T>
+void
+TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & preconditioner_type)
+{
+  Ifpack factory;
+  Ifpack_Preconditioner * pc = NULL;
+  switch (preconditioner_type)
+  {
+  case IDENTITY_PRECOND:
+//    pc = new Ifpack_DiagPreconditioner();
+    break;
+
+  case CHOLESKY_PRECOND:
+    break;
+
+  case ICC_PRECOND:
+    break;
+
+  case ILU_PRECOND:
+    pc = new Ifpack_ILU(_mat);
+    pc->SetParameters(_param_list);
+    pc->Initialize();
+    break;
+
+  case LU_PRECOND:
+    break;
+
+  case ASM_PRECOND:
+    break;
+
+  case JACOBI_PRECOND:
+    break;
+
+  case BLOCK_JACOBI_PRECOND:
+    break;
+
+  case SOR_PRECOND:
+    break;
+
+  case EISENSTAT_PRECOND:
+    break;
+
+//  case AMG_PRECOND:
+  default:
+    libMesh::err << "ERROR:  Unsupported Trilinos Preconditioner: "
+                  << preconditioner_type       << std::endl
+                  << "Continuing with Trilinos defaults" << std::endl;
+  }
+
+  _prec = pc;
+}
+
+
+template <typename T>
+int
+TrilinosPreconditioner<T>::SetUseTranspose(bool UseTranspose)
+{
+  return _prec->SetUseTranspose(UseTranspose);
+}
+
+template <typename T>
+int
+TrilinosPreconditioner<T>::Apply(const Epetra_MultiVector &X, Epetra_MultiVector &Y) const
+{
+  return _prec->Apply(X, Y);
+}
+
+template <typename T>
+int
+TrilinosPreconditioner<T>::ApplyInverse(const Epetra_MultiVector &r, Epetra_MultiVector &z) const
+{
+  return _prec->ApplyInverse(r, z);
+}
+
+template <typename T>
+double
+TrilinosPreconditioner<T>::NormInf() const
+{
+  return _prec->NormInf();
+}
+
+template <typename T>
+const char *
+TrilinosPreconditioner<T>::Label() const
+{
+  return _prec->Label();
+}
+
+template <typename T>
+bool
+TrilinosPreconditioner<T>::UseTranspose() const
+{
+  return _prec->UseTranspose();
+}
+
+template <typename T>
+bool
+TrilinosPreconditioner<T>::HasNormInf() const
+{
+  return _prec->HasNormInf();
+}
+
+template <typename T>
+const Epetra_Comm &
+TrilinosPreconditioner<T>::Comm() const
+{
+  return _prec->Comm();
+}
+
+template <typename T>
+const Epetra_Map &
+TrilinosPreconditioner<T>::OperatorDomainMap() const
+{
+  return _prec->OperatorDomainMap();
+}
+
+template <typename T>
+const Epetra_Map &
+TrilinosPreconditioner<T>::OperatorRangeMap() const
+{
+  return _prec->OperatorRangeMap();
+}
+
+//------------------------------------------------------------------
+// Explicit instantiations
+template class TrilinosPreconditioner<Number>;
+
+} // namespace libMesh
+
+#endif // #ifdef LIBMESH_HAVE_TRILINOS
