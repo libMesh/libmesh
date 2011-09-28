@@ -178,6 +178,10 @@
 /* Flag indicating whether or not Metis is available */
 #undef HAVE_METIS
 
+/* Flag indicating whether the library shall be compiled to use the ML package
+   */
+#undef HAVE_ML
+
 /* Flag indicating whether or not MPI is available */
 #undef HAVE_MPI
 

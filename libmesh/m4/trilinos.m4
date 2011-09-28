@@ -58,6 +58,21 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                     [Flag indicating whether the library shall be compiled to use the Trilinos NOX nonlinear solver])
           AC_MSG_RESULT(<<< Configuring library with NOX support >>>)
        fi
+       
+       dnl ------------------------------------------------------
+       dnl ML
+       dnl ------------------------------------------------------
+       AC_CHECK_FILE($withtrilinosdir/include/ml_include.h,
+                     enableml=yes,
+       AC_CHECK_FILE($withtrilinosdir/packages/ml/src/Include/ml_include.h,
+                     enableml=yes,
+                     enableml=no))
+                     
+       if test "$enableml" != no ; then
+          AC_DEFINE(HAVE_ML, 1,
+                    [Flag indicating whether the library shall be compiled to use the Trilinos ML package])
+          AC_MSG_RESULT(<<< Configuring library with ML support >>>)
+       fi
     fi
   else
     enabletrilinos10=no
@@ -123,11 +138,36 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   else
     enablenox=no
   fi
+  
+  dnl ML
+  AC_ARG_WITH(ml,
+              AC_HELP_STRING([--with-ml=PATH],[Specify the path to ML installation]),
+              withmldir=$withval,
+              withmldir=$TRILINOS_DIR)
+  if test "$withmldir" != no ; then
+    AC_CHECK_FILE($withmldir/include/Makefile.export.ml,
+                  ML_MAKEFILE_EXPORT=$withmldir/include/Makefile.export.ml,
+    AC_CHECK_FILE($withmldir/packages/nox/Makefile.export.ml,
+                  ML_MAKEFILE_EXPORT=$withmldir/packages/nox/Makefile.export.ml,
+	 	              enableml=no))
+
+    if test "$enableml" != no ; then
+       enableml=yes
+       AC_DEFINE(HAVE_ML, 1,
+                 [Flag indicating whether the library shall be compiled to use the ML package])
+       AC_MSG_RESULT(<<< Configuring library with ML support >>>)
+    fi
+  else
+    enableml=no
+  fi
 
   AC_SUBST(AZTECOO_MAKEFILE_EXPORT)
   AC_SUBST(enableaztecoo)
 
   AC_SUBST(NOX_MAKEFILE_EXPORT)
   AC_SUBST(enablenox)
+
+  AC_SUBST(ML_MAKEFILE_EXPORT)
+  AC_SUBST(enableml)
 
 ])
