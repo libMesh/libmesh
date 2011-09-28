@@ -403,6 +403,7 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
 
   Real residual_norm = finalGroup.getNormF();
   unsigned int total_iters = solver->getNumIterations();
+  _n_linear_iterations = finalPars->sublist("Direction").sublist("Newton").sublist("Linear Solver").sublist("Output").get("Total Number of Linear Iterations", -1);
 
   // do not let Trilinos to deallocate what we allocated
   pc.release();
@@ -411,6 +412,12 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
   return std::make_pair(total_iters, residual_norm);
 }
 
+template <typename T>
+int
+NoxNonlinearSolver<T>::get_total_linear_iterations()
+{
+  return _n_linear_iterations;
+}
 
 
 

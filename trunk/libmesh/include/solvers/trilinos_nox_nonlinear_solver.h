@@ -91,6 +91,11 @@ public:
                                                NumericVector<T> &,   // Residual vector
                                                const double,         // Stopping tolerance
                                                const unsigned int);  // N. Iterations
+  /**
+   * Get the total number of linear iterations done in the last solve
+   */
+  virtual int get_total_linear_iterations();
+
 private:
 
   /**
@@ -103,6 +108,10 @@ private:
    */
   Problem_Interface * _interface;
   
+  /**
+   * Stores the total number of linear iterations from the last solve.
+   */
+  int _n_linear_iterations;
 };
 
 
@@ -110,7 +119,10 @@ private:
 template <typename T>
 inline
 NoxNonlinearSolver<T>::NoxNonlinearSolver (sys_type& system) :
-  NonlinearSolver<T>(system)
+  NonlinearSolver<T>(system),
+  _solver(NULL),
+  _interface(NULL),
+  _n_linear_iterations(0)
 {
 }
 

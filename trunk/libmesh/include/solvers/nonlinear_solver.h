@@ -110,6 +110,11 @@ public:
   virtual void print_converged_reason() { libmesh_not_implemented(); }
 
   /**
+   * Get the total number of linear iterations done in the last solve
+   */
+  virtual int get_total_linear_iterations() = 0;
+
+  /**
    * Function that computes the residual \p R(X) of the nonlinear system
    * at the input iterate \p X.
    */

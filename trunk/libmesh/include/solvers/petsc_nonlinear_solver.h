@@ -117,7 +117,7 @@ public:
   /**
    * Get the total number of linear iterations done in the last solve
    */
-  int get_total_linear_iterations();
+  virtual int get_total_linear_iterations();
   
 private:
 
