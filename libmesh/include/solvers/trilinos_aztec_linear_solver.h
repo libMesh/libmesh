@@ -147,6 +147,12 @@ public:
 private:
 
   /**
+   * Tells AztecOO to use the user-specified solver stored in
+   * \p _solver_type
+   */
+  void set_solver_type ();
+
+  /**
    * The Epetra linear problem object.
    */
   Epetra_LinearProblem * _linear_problem;
