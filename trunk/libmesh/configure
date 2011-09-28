@@ -14713,6 +14713,7 @@ echo "${ECHO_T}<<< Configuring library with ML support >>>" >&6; }
 
 
 
+            if test "$enabletrilinos10" = no ; then
 
   if test "x$TRILINOS_DIR" = "x"; then
     TRILINOS_DIR=no
@@ -14952,6 +14953,7 @@ echo "${ECHO_T}<<< Configuring library with ML support >>>" >&6; }
 
 
 
+      fi
    fi
 fi
 
