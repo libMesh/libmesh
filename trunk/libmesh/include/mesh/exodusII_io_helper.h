@@ -817,6 +817,41 @@ public:
   ElementMaps() {}
 
   /**
+   * 1D node maps.  These define
+   * mappings from ExodusII-formatted
+   * element numberings.
+   */
+
+  /**
+   * The Edge2 node map.
+   * Use this map for linear elements in 1D.
+   */
+  static const int edge2_node_map[2];
+
+  /**
+   * The Edge3 node map.
+   * Use this map for quadratic elements in 1D.
+   */
+  static const int edge3_node_map[3];
+
+  /**
+   * 1D edge maps
+   */
+  // FIXME: This notion may or may not be defined in ExodusII
+
+  /**
+   * Maps the Exodus edge numbering for line elements.
+   * Useful for reading sideset information.
+   */
+  static const int edge_edge_map[2];
+
+  /**
+   * Maps the Exodus edge numbering for line elements.
+   * Useful for writing sideset information.
+   */
+  static const int edge_inverse_edge_map[2];
+
+  /**
    * 2D node maps.  These define
    * mappings from ExodusII-formatted
    * element numberings.
