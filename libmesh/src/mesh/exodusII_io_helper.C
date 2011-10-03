@@ -49,6 +49,15 @@ namespace libMesh
 // ------------------------------------------------------------
 // ExodusII_IO_Helper::ElementMaps static data
 
+// 1D node map definitions
+const int ExodusII_IO_Helper::ElementMaps::edge2_node_map[2] = {0, 1};
+const int ExodusII_IO_Helper::ElementMaps::edge3_node_map[3] = {0, 1, 2};
+
+// 1D edge maps
+// FIXME: This notion may or may not be defined in ExodusII
+const int ExodusII_IO_Helper::ElementMaps::edge_edge_map[2] = {0, 1};
+const int ExodusII_IO_Helper::ElementMaps::edge_inverse_edge_map[2] = {1, 2};
+
 // 2D node map definitions
 const int ExodusII_IO_Helper::ElementMaps::quad4_node_map[4] = {0, 1, 2, 3};
 const int ExodusII_IO_Helper::ElementMaps::quad8_node_map[8] = {0, 1, 2, 3, 4, 5, 6, 7};
@@ -1393,6 +1402,12 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   // TRISHELL    =  11
   // PYRAMID     =  12
 
+  if (type_str == "EDGE2" || type_str == "TRUSS" || type_str == "BEAM" )
+    return assign_conversion(EDGE2);
+
+  else if (type_str == "EDGE3" || type_str == "TRUSS" || type_str == "BEAM" )
+    return assign_conversion(EDGE3);
+
   if ((type_str == "QUAD4") || (type_str == "QUAD") || (type_str == "quad") || (type_str == "quad4"))
     return assign_conversion(QUAD4);
 
@@ -1463,7 +1478,32 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 {
   switch (type)
     {
-
+    case EDGE2:
+      {
+	const Conversion conv(edge2_node_map, 
+			      ARRAY_LENGTH(edge2_node_map),
+			      edge2_node_map, // inverse node map same as forward node map
+			      ARRAY_LENGTH(edge2_node_map),
+			      edge_edge_map, 
+			      ARRAY_LENGTH(edge_edge_map),
+			      edge_inverse_edge_map, 
+			      ARRAY_LENGTH(edge_inverse_edge_map),
+			      EDGE2, "EDGE2");
+	return conv;
+      }
+    case EDGE3:
+      {
+	const Conversion conv(edge3_node_map, 
+			      ARRAY_LENGTH(edge3_node_map),
+			      edge3_node_map, // inverse node map same as forward node map
+			      ARRAY_LENGTH(edge3_node_map),
+			      edge_edge_map, 
+			      ARRAY_LENGTH(edge_edge_map),
+			      edge_inverse_edge_map, 
+			      ARRAY_LENGTH(edge_inverse_edge_map),
+			      EDGE3, "EDGE3");
+	return conv;
+      }
     case QUAD4:
       {
 	const Conversion conv(quad4_node_map,

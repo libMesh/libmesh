@@ -107,6 +107,15 @@ void ExodusII_IO::read (const std::string& fname)
   // Get a reference to the mesh we are reading
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
   
+  // Currently cannot read meshes in 1-D.
+  if( mesh.mesh_dimension() == 1 )
+    {
+      libMesh::err << "Error: ExodusII API cannot handle side sets in 1-D and \n"
+		   << "libMesh cannot currently read ExodusII format in 1-D."
+		   << std::endl;
+      libmesh_error();
+    }
+  
   // Clear any existing mesh data
   mesh.clear();
   
