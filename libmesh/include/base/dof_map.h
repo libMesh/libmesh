@@ -96,7 +96,7 @@ class DofConstraints : public std::map<unsigned int,
  */
 typedef std::map<const Node *, Real, 
                  std::less<const Node *>, 
-                 Threads::scalable_allocator<std::pair<const Node *, Real> > > NodeConstraintRow;
+                 Threads::scalable_allocator<std::pair<const Node * const, Real> > > NodeConstraintRow;
 
 /** 
  * The Node constraint storage format. 
@@ -107,7 +107,7 @@ typedef std::map<const Node *, Real,
 class NodeConstraints : public std::map<const Node *, 
                                        NodeConstraintRow, 
                                        std::less<const Node *>, 
-                                       Threads::scalable_allocator<std::pair<const unsigned int, NodeConstraintRow> > >
+                                       Threads::scalable_allocator<std::pair<const Node * const, NodeConstraintRow> > >
 {
 };
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
