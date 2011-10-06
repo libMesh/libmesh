@@ -1100,7 +1100,32 @@ unsigned int PetscVector<T>::map_global_to_local_index (const unsigned int i) co
     }
 
   GlobalToLocalMap::const_iterator it = _global_to_local_map.find(i);
+#ifndef NDEBUG
+  const GlobalToLocalMap::const_iterator end = _global_to_local_map.end();
+  if (it == end)
+    {
+      OStringStream error_message;
+      error_message << "No index " << i << " in ghosted vector.\n"
+                    << "Vector contains [" << first << ',' << last << ")\n";
+      GlobalToLocalMap::const_iterator b = _global_to_local_map.begin();
+      if (b == end)
+        {
+          error_message << "And empty ghost array.\n";
+        }
+      else
+        {
+          error_message << "And ghost array {" << b->first;
+          for (b++; b != end; b++)
+            error_message << ',' << b->first;
+          error_message << "}\n";
+        }
+
+      std::cerr << error_message.str();
+
+      libmesh_error();
+    }
   libmesh_assert (it!=_global_to_local_map.end());
+#endif
   return it->second+last-first;
 }
 
