@@ -90,6 +90,11 @@ void ImplicitSystem::init_data ()
   // initialize parent data
   Parent::init_data();
 
+  // Clear any existing matrices
+  for (matrices_iterator pos = _matrices.begin();
+       pos != _matrices.end(); ++pos)
+    pos->second->clear();
+
   // Add the system matrix.
   this->add_system_matrix ();
   
