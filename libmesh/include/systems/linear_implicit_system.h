@@ -86,6 +86,11 @@ public:
   virtual void clear ();
 
   /**
+   * Initializes new data members of the system
+   */
+  virtual void init_data ();
+
+  /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */

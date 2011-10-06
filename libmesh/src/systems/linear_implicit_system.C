@@ -73,6 +73,17 @@ void LinearImplicitSystem::clear ()
 
 
 
+void LinearImplicitSystem::init_data ()
+{
+  // initialize parent data
+  Parent::init_data();  
+
+  // re-initialize the linear solver interface
+  linear_solver->clear();
+}
+
+
+
 void LinearImplicitSystem::reinit ()
 {
   // re-initialize the linear solver interface
