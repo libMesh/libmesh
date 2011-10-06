@@ -1409,8 +1409,11 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 	  {
 	    const unsigned int jg = constrained_dof_indices[j];
 
-	    libmesh_assert ((jg >= Ug.first_local_index()) &&
-		    (jg <  Ug.last_local_index()));
+//          If Ug is a serial or ghosted vector, then this assert is
+//          overzealous.  If Ug is a parallel vector, then this assert
+//          is redundant.
+//	    libmesh_assert ((jg >= Ug.first_local_index()) &&
+//		    (jg <  Ug.last_local_index()));
 	    
 	    Ue.el(i) += C(i,j)*Ug(jg); 	    
 	  }
