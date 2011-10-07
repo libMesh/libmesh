@@ -175,6 +175,12 @@ public:
   
   
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[8];
+  
   
   
 #ifdef LIBMESH_ENABLE_AMR
@@ -203,7 +209,7 @@ protected:
 // InfHex8 class member functions
 inline
 InfHex8::InfHex8(Elem* p) :
-  InfHex(InfHex8::n_nodes(), p) 
+  InfHex(InfHex8::n_nodes(), p, _nodelinks_data) 
 {
 }
 

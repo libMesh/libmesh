@@ -60,16 +60,7 @@ class InfEdge2 : public Edge
    * Constructor.  By default this element has no parent.
    */
   InfEdge2 (Elem* p=NULL) :
-    Edge(InfEdge2::n_nodes(), p) {}
-
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  InfEdge2(const unsigned int nn,
-	   const unsigned int ns,
-	   Elem* p) :
-    Edge(nn, ns, p) {}
+    Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
 
   /**
    * @returns 1
@@ -144,6 +135,12 @@ class InfEdge2 : public Edge
 
   
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[2];
+  
 
   
 #ifdef LIBMESH_ENABLE_AMR

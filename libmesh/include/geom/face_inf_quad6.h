@@ -64,17 +64,8 @@ public:
    * Constructor.  By default this element has no parent.
    */
   InfQuad6 (Elem* p=NULL):
-    InfQuad(InfQuad6::n_nodes(), p) {}
+    InfQuad(InfQuad6::n_nodes(), p, _nodelinks_data) {}
 
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  InfQuad6 (const unsigned int nn,
-	    const unsigned int ns,
-	    Elem* p) :
-    InfQuad(nn, ns, p) {}
-  
   /**
    * @returns 6
    */
@@ -172,6 +163,12 @@ public:
   
   
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[6];
+  
   
   
 #ifdef LIBMESH_ENABLE_AMR

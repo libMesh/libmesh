@@ -68,18 +68,10 @@ public:
    * Constructor.  Derived classes implement 'true' elements.
    */
   InfQuad (const unsigned int nn,
-	   Elem* p) :
-    Elem(nn, InfQuad::n_sides(), p) {}
+	   Elem* p,
+           Node** nodelinkdata) :
+    Elem(nn, InfQuad::n_sides(), p, _elemlinks_data, nodelinkdata) {}
 
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  InfQuad (const unsigned int nn,
-	   const unsigned int ns,
-	   Elem* p) :
-    Elem(nn, ns, p) {}
- 
   /**
    * @returns 2, the dimensionality of the object.
    */
@@ -169,6 +161,13 @@ public:
    */
   Point origin () const;
 
+
+protected:
+
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[4];
 };
 
 

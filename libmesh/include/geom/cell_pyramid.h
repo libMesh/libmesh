@@ -48,7 +48,7 @@ public:
    * takes number of nodes and parent. 
    * Derived classes implement 'true' elements.
    */
-  Pyramid(const unsigned int nn, Elem* p);
+  Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata);
   
   /**
    * @returns 5.  All pyramid-derivatives are guaranteed to have at
@@ -104,6 +104,11 @@ public:
   
  protected:
 
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[6];
+
 
 #ifdef LIBMESH_ENABLE_AMR
   
@@ -123,8 +128,8 @@ public:
 // ------------------------------------------------------------
 // Pyramid class member functions
 inline
-Pyramid::Pyramid(const unsigned int nn, Elem* p) :
-  Cell(nn, Pyramid::n_sides(), p) 
+Pyramid::Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  Cell(nn, Pyramid::n_sides(), p, _elemlinks_data, nodelinkdata) 
 {
 }
 

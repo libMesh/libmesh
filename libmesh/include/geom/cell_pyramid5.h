@@ -150,6 +150,12 @@ public:
   
 protected:
 
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[5];
+  
+
   
 #ifdef LIBMESH_ENABLE_AMR
   
@@ -170,7 +176,7 @@ protected:
 // Pyramid5 class member functions
 inline
 Pyramid5::Pyramid5(Elem* p) :
-  Pyramid(Pyramid5::n_nodes(), p) 
+  Pyramid(Pyramid5::n_nodes(), p, _nodelinks_data) 
 {
 }
 

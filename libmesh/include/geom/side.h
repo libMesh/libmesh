@@ -62,7 +62,7 @@ class Side : public SideType
    */ 
   Side (const Elem* parent,
 	const unsigned int side) :
-    SideType(0,0,const_cast<Elem*>(parent)), // Allocate no storage for nodes or neighbors!
+    SideType(const_cast<Elem*>(parent)),
     _side_number(side)
   {
     libmesh_assert (parent != NULL);
@@ -164,7 +164,7 @@ class SideEdge : public EdgeType
    */ 
   SideEdge (const Elem* parent,
 	    const unsigned int edge) :
-    EdgeType(0,0,const_cast<Elem*>(parent)), // Allocate no storage for nodes or neighbors!
+    EdgeType(const_cast<Elem*>(parent)),
     _edge_number(edge)
   {
     libmesh_assert (parent != NULL);

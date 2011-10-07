@@ -49,16 +49,7 @@ class Edge4 : public Edge
    * Constructor. By default this element has no parent.
    */
   Edge4 (Elem* p=NULL) :
-    Edge(Edge4::n_nodes(), p) {}
-
- /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Edge4(const unsigned int nn,
-        const unsigned int libmesh_dbg_var(ns),
-	Elem* p) :
-    Edge(nn, p) { libmesh_assert (ns == 0); }
+    Edge(Edge4::n_nodes(), p, _nodelinks_data) {}
 
   /**
    * @returns 4
@@ -142,6 +133,12 @@ class Edge4 : public Edge
 
 
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[4];
+  
 
   
 #ifdef LIBMESH_ENABLE_AMR

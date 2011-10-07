@@ -954,8 +954,8 @@ void Elem::make_links_to_me_remote()
       this->dim() == parent->dim())
     {
       unsigned int me = parent->which_child_am_i(this);
-      libmesh_assert (parent->_children[me] == this);
-      parent->_children[me] = const_cast<RemoteElem*>(remote_elem);
+      libmesh_assert (parent->child(me) == this);
+      parent->set_child(me, const_cast<RemoteElem*>(remote_elem));
     }
 #endif
 }
@@ -1099,15 +1099,15 @@ void Elem::add_child (Elem* elem)
       _children = new Elem*[this->n_children()];
       
       for (unsigned int c=0; c<this->n_children(); c++)
-	_children[c] = NULL;
+	this->set_child(c, NULL);
     }
   
   for (unsigned int c=0; c<this->n_children(); c++)
     {
-      if(_children[c] == NULL || _children[c] == remote_elem)
+      if(this->_children[c] == NULL || this->_children[c] == remote_elem)
 	{
 	  libmesh_assert (this == elem->parent());
-	  _children[c] = elem;
+	  this->set_child(c, elem);
 	  return;
 	}
     }
@@ -1121,29 +1121,29 @@ void Elem::add_child (Elem* elem)
 
 void Elem::add_child (Elem* elem, unsigned int c)
 {
-  if(_children == NULL)
+  if(!this->has_children())
     {
       _children = new Elem*[this->n_children()];
       
       for (unsigned int i=0; i<this->n_children(); i++)
-	_children[i] = NULL;
+	this->set_child(i, NULL);
     }
   
-  libmesh_assert (_children[c] == NULL || _children[c] == remote_elem);
+  libmesh_assert (this->_children[c] == NULL || this->child(c) == remote_elem);
   libmesh_assert (elem == remote_elem || this == elem->parent());
 
-  _children[c] = elem;
+  this->set_child(c, elem);
 }
 
 
 
 void Elem::replace_child (Elem* elem, unsigned int c)
 {
-  libmesh_assert(_children != NULL);
+  libmesh_assert(this->has_children());
   
-  libmesh_assert (_children[c] != NULL);
+  libmesh_assert (this->child(c) != NULL);
 
-  _children[c] = elem;
+  this->set_child(c, elem);
 }
 
 

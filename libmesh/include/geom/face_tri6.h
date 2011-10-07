@@ -45,11 +45,11 @@ namespace libMesh
  * \verbatim
  *  TRI6:  2      
  *         o      
- *        / \     
- *       /   \    
+ *        / \
+ *       /   \
  *    5 o     o 4 
- *     /       \  
- *    /         \ 
+ *     /       \
+ *    /         \
  *   o-----o-----o
  *   0     3     1
  * \endverbatim
@@ -65,16 +65,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   Tri6  (Elem* p=NULL) :
-    Tri(Tri6::n_nodes(), p) {}
-
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Tri6 (const unsigned int nn,
-	const unsigned int ns,
-	Elem* p) :
-    Tri(nn, ns, p) {}
+    Tri(Tri6::n_nodes(), p, _nodelinks_data) {}
 
   /**
    * @returns \p TRI6
@@ -183,7 +174,13 @@ public:
   static const unsigned int side_nodes_map[3][3];
  
   
-private:
+protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[6];
+  
   
   
 #ifdef LIBMESH_ENABLE_AMR

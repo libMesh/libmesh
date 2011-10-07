@@ -202,6 +202,12 @@ public:
   
 protected:
   
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[27];
+  
   
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -245,7 +251,7 @@ private:
 // Hex27 class member functions
 inline
 Hex27::Hex27(Elem* p) :
-  Hex(Hex27::n_nodes(), p) 
+  Hex(Hex27::n_nodes(), p, _nodelinks_data) 
 {
 }
 

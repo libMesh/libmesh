@@ -47,7 +47,7 @@ public:
    * Default brick element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Hex(const unsigned int nn, Elem* p);
+  Hex(const unsigned int nn, Elem* p, Node** nodelinkdata);
 
   /**
    * @returns 6
@@ -125,7 +125,10 @@ public:
   
 protected:
 
-
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[7];
   
   /**
    * Matrix that tells which vertices define the location
@@ -152,8 +155,8 @@ protected:
 // ------------------------------------------------------------
 // Hex class member functions
 inline
-Hex::Hex(const unsigned int nn, Elem* p) :
-  Cell(nn, Hex::n_sides(), p) 
+Hex::Hex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  Cell(nn, Hex::n_sides(), p, _elemlinks_data, nodelinkdata) 
 {
 }
 

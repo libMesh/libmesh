@@ -51,7 +51,7 @@ class RemoteElem : public Elem
   /**
    * Constructor.
    */ 
-  RemoteElem () : Elem() {}
+  RemoteElem () : Elem(0,0,NULL,_elemlinks_data,NULL) {}
 
   /**
    * Destructor.
@@ -165,6 +165,13 @@ class RemoteElem : public Elem
 
 #endif
 
+protected:
+
+  /**
+   * Data for link to (NULL!) parent
+   */
+  Elem* _elemlinks_data[1];
+  
 };
 
 // Singleton RemoteElem

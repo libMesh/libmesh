@@ -190,6 +190,12 @@ public:
   
 
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[20];
+  
   
   
 #ifdef LIBMESH_ENABLE_AMR
@@ -218,7 +224,7 @@ protected:
 // Hex20 class member functions
 inline
 Hex20::Hex20(Elem* p) :
-  Hex(Hex20::n_nodes(), p) 
+  Hex(Hex20::n_nodes(), p, _nodelinks_data) 
 {
 }
 

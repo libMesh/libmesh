@@ -192,6 +192,12 @@ public:
 
 protected:  
 
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[12];
+  
+
 #ifdef LIBMESH_ENABLE_AMR
   
   /**
@@ -236,7 +242,7 @@ private:
 // InfPrism12 class member functions
 inline
 InfPrism12::InfPrism12(Elem* p) :
-  InfPrism(InfPrism12::n_nodes(), p) 
+  InfPrism(InfPrism12::n_nodes(), p, _nodelinks_data) 
 {
 }
 

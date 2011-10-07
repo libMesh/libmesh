@@ -205,6 +205,12 @@ public:
   
 protected:
 
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[18];
+  
+
   
 #ifdef LIBMESH_ENABLE_AMR
   
@@ -242,7 +248,7 @@ protected:
 // Prism18 class member functions
 inline
 Prism18::Prism18(Elem* p) :
-  Prism(Prism18::n_nodes(), p) 
+  Prism(Prism18::n_nodes(), p, _nodelinks_data) 
 {
 }
 

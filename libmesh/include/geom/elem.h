@@ -101,9 +101,11 @@ class Elem : public ReferenceCountedObject<Elem>,
    * parent \p p.  The constructor allocates the memory necessary
    * to support this data.
    */ 
-  Elem (const unsigned int n_nodes=0,
-	const unsigned int n_sides=0,
-	Elem* parent=NULL);
+  Elem (const unsigned int n_nodes,
+	const unsigned int n_sides,
+	Elem* parent,
+	Elem** elemlinkdata,
+	Node** nodelinkdata);
 
  public:
 
@@ -723,6 +725,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   Elem* child (const unsigned int i) const;
 
+private:
+  /**
+   * @sets the pointer to the \f$ i^{th} \f$ child for this element.
+   * Do not call if this element has no children, i.e. is active.
+   */
+  void set_child (unsigned int c, Elem *elem);
+
+public:
   /**
    * This function tells you which child you \p (e) are.
    * I.e. if c = a->which_child_am_i(e); then
@@ -1072,20 +1082,15 @@ public:
   void nullify_neighbors ();
   
   /**
-   * Pointers to the nodes we are conneted to.
+   * Pointers to the nodes we are connected to.
    */
   Node** _nodes;
 
   /**
-   * Pointers to this element's neighbors.
+   * Pointers to this element's parent and neighbors.
    */
-  Elem** _neighbors;
+  Elem** _elemlinks;
  
-  /**
-   * A pointer to this element's parent.
-   */
-  Elem* _parent;
-
 #ifdef LIBMESH_ENABLE_AMR
   
   /**
@@ -1158,10 +1163,11 @@ public:
 inline
 Elem::Elem(const unsigned int nn,
 	   const unsigned int ns,
-	   Elem* p) :
-  _nodes(NULL),
-  _neighbors(NULL),
-  _parent(p),
+	   Elem* p,
+           Elem** elemlinkdata,
+           Node** nodelinkdata) :
+  _nodes(nodelinkdata),
+  _elemlinks(elemlinkdata),
 #ifdef LIBMESH_ENABLE_AMR
   _children(NULL),
   _rflag(Elem::DO_NOTHING),
@@ -1173,21 +1179,21 @@ Elem::Elem(const unsigned int nn,
   this->processor_id() = DofObject::invalid_processor_id;
   
   // Initialize the nodes data structure
-  if (nn != 0)
+  if (_nodes)
     {
-      _nodes = new Node*[nn]; 
-      
       for (unsigned int n=0; n<nn; n++)
 	_nodes[n] = NULL;
     }
   
-  // Initialize the neighbors data structure
-  if (ns != 0)
-    {
-      _neighbors = new Elem*[ns]; 
+  // Initialize the neighbors/parent data structure
+  // _elemlinks = new Elem*[ns+1]; 
       
-      for (unsigned int n=0; n<ns; n++)
-	_neighbors[n] = NULL;
+  if (_elemlinks)
+    {
+      _elemlinks[0] = p;
+
+      for (unsigned int n=1; n<ns+1; n++)
+        _elemlinks[n] = NULL;
     }
 
   // Optionally initialize data from the parent
@@ -1199,7 +1205,7 @@ Elem::Elem(const unsigned int nn,
 
 #ifdef LIBMESH_ENABLE_AMR
   if (this->parent())
-    this->set_p_level(parent()->p_level());
+    this->set_p_level(this->parent()->p_level());
 #endif
 }
 
@@ -1208,15 +1214,14 @@ Elem::Elem(const unsigned int nn,
 inline
 Elem::~Elem() 
 {
-  // Delete my node storage
-  if (_nodes != NULL)
-    delete [] _nodes;
-  _nodes = NULL;
+  // Deleting my parent/neighbor/nodes storage isn't necessary since it's
+  // handled by the subclass
 
-  // Delete my neighbor storage
-  if (_neighbors != NULL)
-    delete [] _neighbors;
-  _neighbors = NULL;
+  // if (_nodes != NULL)
+  //   delete [] _nodes;
+  // _nodes = NULL;
+
+  // delete [] _elemlinks;
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -1320,7 +1325,7 @@ Elem* Elem::neighbor (const unsigned int i) const
 {
   libmesh_assert (i < this->n_neighbors());
 
-  return _neighbors[i];
+  return _elemlinks[i+1];
 }
 
 
@@ -1330,7 +1335,7 @@ void Elem::set_neighbor (const unsigned int i, Elem* n)
 {
   libmesh_assert (i < this->n_neighbors());
   
-  _neighbors[i] = n;
+  _elemlinks[i+1] = n;
 }
 
 
@@ -1493,7 +1498,7 @@ bool Elem::is_ancestor_of(const Elem *
 inline
 const Elem* Elem::parent () const
 {
-  return _parent;
+  return _elemlinks[0];
 }
 
 
@@ -1501,7 +1506,7 @@ const Elem* Elem::parent () const
 inline
 Elem* Elem::parent ()
 {
-  return _parent;
+  return _elemlinks[0];
 }
 
 
@@ -1509,7 +1514,7 @@ Elem* Elem::parent ()
 inline
 void Elem::set_parent (Elem *p)
 {
-  _parent = p;
+  _elemlinks[0] = p;
 }
 
 
@@ -1545,10 +1550,10 @@ const Elem* Elem::interior_parent () const
   // if we are at level-0 and our parent is not NULL
   // then it better be the higher-dimensional 
   // interior element we are looking for.
-  if (_parent)
-    libmesh_assert (_parent->dim() == (this->dim()+1));
+  libmesh_assert (!this->parent() ||
+                  this->parent()->dim() == (this->dim()+1));
 
-  return _parent;
+  return this->parent();
 }
 
 
@@ -1608,6 +1613,16 @@ Elem* Elem::child (const unsigned int i) const
   libmesh_assert (_children[i] != NULL);
   
   return _children[i];
+}
+
+
+
+inline
+void Elem::set_child (unsigned int c, Elem *elem)
+{
+  libmesh_assert (this->has_children());
+  
+  _children[c] = elem;
 }
 
 
