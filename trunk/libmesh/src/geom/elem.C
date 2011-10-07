@@ -708,7 +708,7 @@ Elem* Elem::topological_neighbor (const unsigned int i,
 {
   libmesh_assert (i < this->n_neighbors());
 
-  Elem * neighbor = _neighbors[i];
+  Elem * neighbor = this->neighbor(i);
   if (neighbor != NULL)
     return neighbor;
   
