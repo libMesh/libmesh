@@ -2286,7 +2286,7 @@ void GMVIO::_read_one_cell()
 
       // Print out the connectivity information for
       // this cell.
-      for (unsigned i=0; i<GMV::gmv_data.num2; i++)
+      for (int i=0; i<GMV::gmv_data.num2; i++)
 	{
 	  // 	  // Debugging info
 	  // 	  libMesh::out << "Vertex " << i << " is node "
