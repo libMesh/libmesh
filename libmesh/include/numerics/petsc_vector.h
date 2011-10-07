@@ -35,6 +35,7 @@
 
 // Local includes
 #include "numeric_vector.h"
+#include "o_string_stream.h"
 #include "petsc_macro.h"
 
 /**
