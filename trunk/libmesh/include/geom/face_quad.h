@@ -63,18 +63,9 @@ public:
    * Default quadrilateral element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Quad (const unsigned int nn, Elem* p) :
-    Face(nn, Quad::n_sides(), p) {}
+  Quad (const unsigned int nn, Elem* p, Node** nodelinkdata) :
+    Face(nn, Quad::n_sides(), p, _elemlinks_data, nodelinkdata) {}
  
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Quad (const unsigned int nn,
-	const unsigned int ns,
-	Elem* p) :
-    Face(nn, ns, p) {}
-
   /**
    * @returns 4.  All quad-derivatives are guaranteed to have at
    * least 4 nodes.
@@ -148,6 +139,13 @@ public:
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
   
+protected:
+
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[5];
+
   /**
    * Matrix that tells which vertices define the location
    * of mid-side (or second-order) nodes.  Since most 

@@ -56,7 +56,7 @@ public:
    * Default infinite prism element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  InfPrism(const unsigned int nn, Elem* p);
+  InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata);
 
 //   /**
 //    * @returns 4 for the base \p s=0 and 2 for side faces. 
@@ -112,6 +112,13 @@ public:
    */
   AutoPtr<Elem> side (const unsigned int i) const;
 
+
+protected:
+
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[5];
 };
 
 
@@ -119,8 +126,8 @@ public:
 // ------------------------------------------------------------
 // InfPrism class member functions
 inline
-InfPrism::InfPrism(const unsigned int nn, Elem* p) :
-  InfCell(nn, InfPrism::n_sides(), p) 
+InfPrism::InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  InfCell(nn, InfPrism::n_sides(), p, _elemlinks_data, nodelinkdata) 
 {
 }
 

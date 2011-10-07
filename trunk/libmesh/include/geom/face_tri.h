@@ -45,11 +45,11 @@ namespace libMesh
  * It looks like this:
  * \verbatim
  *          ^      
- *         / \     
- *        /   \    
- *       /     \   
- *      /       \  
- *     /         \ 
+ *         / \
+ *        /   \
+ *       /     \
+ *      /       \
+ *     /         \
  *     -----------
  *               
  * \endverbatim
@@ -66,18 +66,10 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Tri (const unsigned int nn,
-       Elem* p) :
-    Face(nn, Tri::n_sides(), p) {}
+       Elem* p,
+       Node** nodelinkdata) :
+    Face(nn, Tri::n_sides(), p, _elemlinks_data, nodelinkdata) {}
  
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Tri (const unsigned int nn,
-       const unsigned int ns,
-       Elem* p) :
-    Face(nn, ns, p) {}
-    
   /**
    * @returns 3.  All tri-derivatives are guaranteed to have at
    * least 3 nodes.
@@ -137,6 +129,13 @@ public:
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
 
+
+protected:
+
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[4];
 };
 
 // ------------------------------------------------------------

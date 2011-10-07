@@ -47,7 +47,7 @@ public:
    * Default tetrahedral element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Tet  (const unsigned int nn, Elem* p);
+  Tet  (const unsigned int nn, Elem* p, Node** nodelinkdata);
 
   /**
    * @returns 4
@@ -107,6 +107,13 @@ public:
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
   
+
+protected:
+
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[5];
 };
 
 
@@ -114,8 +121,8 @@ public:
 // ------------------------------------------------------------
 // Tet class member functions
 inline
-Tet::Tet(const unsigned int nn, Elem* p) :
-  Cell(nn, Tet::n_sides(), p) 
+Tet::Tet(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata) 
 {
 }
 

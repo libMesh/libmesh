@@ -52,18 +52,10 @@ class Edge : public Elem
    * parent. Derived classes implement 'true' elements.
    */
   Edge (const unsigned int nn,
-	Elem* p) :
-    Elem(nn, Edge::n_sides(), p) {}
+	Elem* p,
+        Node** nodelinkdata) :
+    Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata) {}
    
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Edge (const unsigned int nn,
-	const unsigned int ns,
-	Elem* p) :
-    Elem(nn, ns, p) {}
-
   /**
    * @returns 1, the dimensionality of the object.
    */
@@ -156,6 +148,10 @@ class Edge : public Elem
   
  protected:
 
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[3];
 
 #ifdef LIBMESH_ENABLE_AMR
   

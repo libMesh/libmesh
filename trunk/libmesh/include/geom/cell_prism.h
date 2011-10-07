@@ -47,7 +47,7 @@ public:
    * Default prismatic element, takes number of nodes and 
    * parent. Derived classes implement 'true' elements.
    */
-  Prism(const unsigned int nn, Elem* p);
+  Prism(const unsigned int nn, Elem* p, Node** nodelinkdata);
   
   /**
    * @returns 6.  All prism-derivatives are guaranteed to have at
@@ -104,6 +104,11 @@ public:
 
 protected:
 
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[6];
+
 
   
   /**
@@ -130,8 +135,8 @@ protected:
 // ------------------------------------------------------------
 // Prism class member functions
 inline
-Prism::Prism(const unsigned int nn, Elem* p) :
-  Cell(nn, Prism::n_sides(), p) 
+Prism::Prism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
+  Cell(nn, Prism::n_sides(), p, _elemlinks_data, nodelinkdata) 
 {
 }
 

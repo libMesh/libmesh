@@ -65,17 +65,8 @@ public:
    * Constructor.  By default this element has no parent.
    */
   Quad4 (Elem* p=NULL) :
-    Quad(Quad::n_nodes(), p) {}
+    Quad(Quad::n_nodes(), p, _nodelinks_data) {}
 
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Quad4 (const unsigned int nn,
-	 const unsigned int ns,
-	 Elem* p) :
-    Quad(nn, ns, p) {}
-  
   /**
    * @returns \p QUAD4
    */
@@ -148,6 +139,12 @@ public:
   virtual Real volume () const;
   
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[4];
+  
 
   
 #ifdef LIBMESH_ENABLE_AMR

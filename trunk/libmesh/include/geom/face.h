@@ -54,8 +54,10 @@ public:
    */
   Face (const unsigned int nn,
 	const unsigned int ns,
-	Elem* p) :
-    Elem(nn, ns, p) {}
+	Elem* p,
+        Elem** elemlinkdata,
+        Node** nodelinkdata) :
+    Elem(nn, ns, p, elemlinkdata, nodelinkdata) {}
 
   /**
    * @returns 2, the dimensionality of the object.

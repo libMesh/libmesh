@@ -42,11 +42,11 @@ namespace libMesh
  * \verbatim
  *   TRI3:  2      
  *          o      
- *         / \     
- *        /   \    
- *       /     \   
- *      /       \  
- *     /         \ 
+ *         / \
+ *        /   \
+ *       /     \
+ *      /       \
+ *     /         \
  *    o-----------o
  *    0           1
  * \endverbatim
@@ -62,16 +62,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   Tri3 (Elem* p=NULL) :
-    Tri(Tri3::n_nodes(), p) {}
-
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Tri3 (const unsigned int nn,
-	const unsigned int ns,
-	Elem* p) :
-    Tri(nn, ns, p) {}
+    Tri(Tri3::n_nodes(), p, _nodelinks_data) {}
 
   /**
    * @returns \p TRI3
@@ -151,6 +142,12 @@ public:
   std::pair<Real, Real> min_and_max_angle() const;
   
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[3];
+  
 
   
 #ifdef LIBMESH_ENABLE_AMR

@@ -160,6 +160,12 @@ public:
   
   
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[8];
+  
   
   
 #ifdef LIBMESH_ENABLE_AMR
@@ -188,7 +194,7 @@ protected:
 // Hex8 class member functions
 inline
 Hex8::Hex8(Elem* p) :
-  Hex(Hex8::n_nodes(), p) 
+  Hex(Hex8::n_nodes(), p, _nodelinks_data) 
 {
 }
 

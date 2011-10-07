@@ -52,8 +52,10 @@ public:
    */
   Cell (const unsigned int nn,
 	const unsigned int ns,
-	Elem* p) :
-    Elem (nn, ns, p)
+	Elem* p,
+	Elem** elemlinkdata,
+	Node** nodelinkdata) :
+    Elem (nn, ns, p, elemlinkdata, nodelinkdata)
   {}
 
   /**

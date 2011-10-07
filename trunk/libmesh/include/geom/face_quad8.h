@@ -66,17 +66,8 @@ public:
    * Constructor. By default this element has no parent.
    */
   Quad8 (Elem* p=NULL) :
-    Quad(Quad8::n_nodes(), p) {}
+    Quad(Quad8::n_nodes(), p, _nodelinks_data) {}
  
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  Quad8 (const unsigned int nn,
-	 const unsigned int ns,
-	 Elem* p) :
-    Quad(nn, ns, p) {}
-  
   /**
    * @returns \p QUAD8
    */
@@ -86,16 +77,6 @@ public:
    * @returns 8
    */
   unsigned int n_nodes() const { return 8; }
-  
-  /**
-   * @returns 4
-   */
-  unsigned int n_sides() const { return 4; }
-  
-  /**
-   * @returns 4
-   */
-  unsigned int n_children() const { return 4; }
   
   /**
    * @returns 5
@@ -195,6 +176,12 @@ public:
   
   
 protected:
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[8];
+  
   
   
 #ifdef LIBMESH_ENABLE_AMR

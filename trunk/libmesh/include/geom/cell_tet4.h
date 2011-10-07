@@ -165,6 +165,12 @@ public:
 
 protected:
 
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[4];
+  
+
   
 #ifdef LIBMESH_ENABLE_AMR
   
@@ -241,7 +247,7 @@ protected:
 // Tet4 class member functions
 inline
 Tet4::Tet4(Elem* p) :
-  Tet(Tet4::n_nodes(), p)
+  Tet(Tet4::n_nodes(), p, _nodelinks_data)
 #ifdef LIBMESH_ENABLE_AMR
   , _diagonal_selection(INVALID_DIAG)
 #endif

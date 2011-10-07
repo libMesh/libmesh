@@ -49,25 +49,8 @@ class NodeElem : public Elem
    * Constructor.  By default this element has no parent.
    */
   NodeElem (Elem* p=NULL) :
-    Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p) {}
+    Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data, _nodelinks_data) {}
 
-  /**
-   * Constructor.  Explicitly specifies the number of
-   * nodes and neighbors for which storage will be allocated.
-   */
-  NodeElem (const unsigned int nn,
-         const unsigned int ns,
-         Elem* p) :
-    Elem(nn, ns, p) { libmesh_assert(nn == 1); libmesh_assert (ns == 0); }
-
-  /**
-   * Default node element, takes number of nodes and 
-   * parent. Derived classes implement 'true' elements.
-   */
-  NodeElem (const unsigned int nn,
-	Elem* p) :
-    Elem(nn, NodeElem::n_sides(), p) {}
-   
   /**
    * @returns 0, the dimensionality of the object.
    */
@@ -190,6 +173,16 @@ class NodeElem : public Elem
   
 protected:
 
+  /**
+   * Data for links to parent/neighbor elements.
+   */
+  Elem* _elemlinks_data[1];
+
+  /**
+   * Data for links to nodes
+   */
+  Node* _nodelinks_data[1];
+  
   
 #ifdef LIBMESH_ENABLE_AMR
 
