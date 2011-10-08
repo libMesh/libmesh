@@ -169,8 +169,8 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
 
   // We'll pass through our own part of the mesh once first to build
   // the maps and count boundary nodes and elements
-  const MeshBase::const_element_iterator end_el = _mesh.active_local_elements_end(); 
-  for (MeshBase::const_element_iterator el = _mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = _mesh.local_elements_end(); 
+  for (MeshBase::const_element_iterator el = _mesh.local_elements_begin();
        el != end_el; ++el)
     {
       const Elem *elem = *el;
@@ -256,9 +256,9 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
   next_elem_id = libMesh::n_processors();
 
   const MeshBase::const_element_iterator end_unpartitioned_el =
-    _mesh.active_pid_elements_end(DofObject::invalid_processor_id); 
+    _mesh.pid_elements_end(DofObject::invalid_processor_id); 
   for (MeshBase::const_element_iterator el =
-         _mesh.active_pid_elements_begin(DofObject::invalid_processor_id);
+         _mesh.pid_elements_begin(DofObject::invalid_processor_id);
        el != end_unpartitioned_el; ++el)
     {
       const Elem *elem = *el;
@@ -348,7 +348,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
   // Finally let's add the elements
 
 
-  for (MeshBase::const_element_iterator el = _mesh.active_elements_begin();
+  for (MeshBase::const_element_iterator el = _mesh.elements_begin();
        el != end_el; ++el)
     {
       const Elem* elem = *el;
@@ -404,17 +404,30 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
 
                 side->processor_id() = elem->processor_id();
 
-                std::pair<unsigned int, unsigned char> side_pair(elem->id(), s);
+                const std::pair<unsigned int, unsigned char> side_pair(elem->id(), s);
+
+                libmesh_assert(side_id_map.count(side_pair));
 
                 side->set_id(side_id_map[side_pair]);
 
                 // Add the side
                 Elem* new_elem = boundary_mesh.add_elem(side.release());
 
-                // and set the parent
-                new_elem->set_parent (const_cast<Elem*>(elem));
+                // and set the parent and interior_parent links
+                if (elem->parent())
+                  {
+                    const std::pair<unsigned int, unsigned char> parent_side_pair(elem->parent()->id(), s);
 
-                // This side's Node pointers still point to the nodes of the  original mesh.
+                    libmesh_assert(side_id_map.count(parent_side_pair));
+
+                    Elem* side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
+
+                    new_elem->set_parent(side_parent);
+                  }
+
+                new_elem->set_interior_parent (const_cast<Elem*>(elem));
+
+                // This side's Node pointers still point to the nodes of the original mesh.
                 // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
                 // the original mesh's nodes over, we should be guaranteed to have the same ordering.
                 for (unsigned int nn=0; nn<new_elem->n_nodes(); ++nn)
