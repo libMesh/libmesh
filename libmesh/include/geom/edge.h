@@ -149,9 +149,9 @@ class Edge : public Elem
  protected:
 
   /**
-   * Data for links to parent/neighbor elements.
+   * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[3];
+  Elem* _elemlinks_data[3+(LIBMESH_DIM>1)];
 
 #ifdef LIBMESH_ENABLE_AMR
   

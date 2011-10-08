@@ -126,9 +126,9 @@ public:
 protected:
 
   /**
-   * Data for links to parent/neighbor elements.
+   * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[7];
+  Elem* _elemlinks_data[7+(LIBMESH_DIM>3)];
   
   /**
    * Matrix that tells which vertices define the location
