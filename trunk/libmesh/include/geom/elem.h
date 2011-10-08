@@ -629,6 +629,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   const Elem* interior_parent () const;
 
   /**
+   * Sets the pointer to the element's interior_parent.
+   * Dangerous to use in high-level code.
+   */
+  void set_interior_parent (Elem *p);
+
+  /**
    * @returns the magnitude of the distance between nodes n1 and n2.
    * Useful for computing the lengths of the sides of elements.
    */
@@ -1087,7 +1093,8 @@ public:
   Node** _nodes;
 
   /**
-   * Pointers to this element's parent and neighbors.
+   * Pointers to this element's parent and neighbors, and for
+   * lower-dimensional elements interior_parent.
    */
   Elem** _elemlinks;
  
@@ -1540,20 +1547,38 @@ const Elem* Elem::top_parent () const
 inline
 const Elem* Elem::interior_parent () const
 {
-  // interior parents make no sense for 3D elements.
-  libmesh_assert (this->dim() != 3);
+  // interior parents make no sense for full-dimensional elements.
+  libmesh_assert (this->dim() < LIBMESH_DIM);
 
-  // and they are only good for level-0 elements
-  if (this->level() != 0)
-    return this->parent()->interior_parent();
+  // // and they [USED TO BE] only good for level-0 elements
+  // if (this->level() != 0)
+    // return this->parent()->interior_parent();
+
+  // We store the interior_parent pointer after both the parent
+  // neighbor and neighbor pointers
+  Elem *interior_p = _elemlinks[1+this->n_sides()];
   
-  // if we are at level-0 and our parent is not NULL
-  // then it better be the higher-dimensional 
-  // interior element we are looking for.
-  libmesh_assert (!this->parent() ||
-                  this->parent()->dim() == (this->dim()+1));
+  // If we have an interior_parent, it had better be the
+  // one-higher-dimensional interior element we are looking for.
+  libmesh_assert (!interior_p ||
+                  interior_p->dim() == (this->dim()+1));
 
-  return this->parent();
+  return interior_p;
+}
+
+
+
+inline
+void Elem::set_interior_parent (Elem *p)
+{
+  // interior parents make no sense for full-dimensional elements.
+  libmesh_assert (this->dim() < LIBMESH_DIM);
+
+  // this had better be a one-higher-dimensional interior element
+  libmesh_assert (!p ||
+                  p->dim() == (this->dim()+1));
+
+  _elemlinks[1+this->n_sides()] = p;
 }
 
 

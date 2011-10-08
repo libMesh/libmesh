@@ -174,9 +174,9 @@ class NodeElem : public Elem
 protected:
 
   /**
-   * Data for links to parent/neighbor elements.
+   * Data for links to parent/neighbor/interior_parent elements.
    */
-  Elem* _elemlinks_data[1];
+  Elem* _elemlinks_data[1+(LIBMESH_DIM>0)];
 
   /**
    * Data for links to nodes
