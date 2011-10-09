@@ -243,6 +243,13 @@ class Elem : public ReferenceCountedObject<Elem>,
   unsigned int which_neighbor_am_i(const Elem *e) const; 
 
   /**
+   * This function tells you which side the boundary element \p e is.
+   * I.e. if e = a->build_side(s) or e = a->side(s); then
+   * a->which_side_am_i(e) will be s.
+   */
+  unsigned int which_side_am_i(const Elem *e) const; 
+
+  /**
    * This function returns true iff a vertex of e is contained
    * in this element
    */
@@ -1412,6 +1419,57 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
     if (this->neighbor(s) == eparent)
       return s;
     
+  return libMesh::invalid_uint;
+}
+
+
+
+inline
+unsigned int Elem::which_side_am_i (const Elem* e) const
+{
+  libmesh_assert (e != NULL);
+
+  const unsigned int ns = this->n_sides();
+  const unsigned int nn = this->n_nodes();
+
+  const unsigned int en = e->n_nodes();
+
+  // e might be on any side until proven otherwise
+  std::vector<bool> might_be_side(ns, true);
+
+  for (unsigned int i=0; i != en; ++i)
+    {
+      Point side_point = e->point(i);
+      unsigned int local_node_id = Node::invalid_id;
+
+      // Look for a node of this that's contiguous with node i of e
+      for (unsigned int j=0; j != nn; ++j)
+        if (this->point(j) == side_point)
+          local_node_id = j;
+
+      // If a node of e isn't contiguous with some node of this, then
+      // e isn't a side of this.
+      if (local_node_id == Node::invalid_id)
+        return Node::invalid_id;
+
+      // If a node of e isn't contiguous with some node on side s of
+      // this, then e isn't on side s.
+      for (unsigned int s=0; s != ns; ++s)
+        if (!this->is_node_on_side(local_node_id, s))
+          might_be_side[s] = false;
+    }
+
+  for (unsigned int s=0; s != ns; ++s)
+    if (might_be_side[s])
+      {
+#ifdef DEBUG
+        for (unsigned int s2=s+1; s2 < ns; ++s2)
+          libmesh_assert (!might_be_side[s2]);
+#endif
+        return s;
+      }
+
+  // Didn't find any matching side
   return libMesh::invalid_uint;
 }
 
