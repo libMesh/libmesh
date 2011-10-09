@@ -413,20 +413,6 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
                 // Add the side
                 Elem* new_elem = boundary_mesh.add_elem(side.release());
 
-                // and set the parent and interior_parent links
-                if (elem->parent())
-                  {
-                    const std::pair<unsigned int, unsigned char> parent_side_pair(elem->parent()->id(), s);
-
-                    libmesh_assert(side_id_map.count(parent_side_pair));
-
-                    Elem* side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
-
-                    new_elem->set_parent(side_parent);
-                  }
-
-                new_elem->set_interior_parent (const_cast<Elem*>(elem));
-
                 // This side's Node pointers still point to the nodes of the original mesh.
                 // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
                 // the original mesh's nodes over, we should be guaranteed to have the same ordering.
@@ -443,6 +429,48 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
                     // Assign the new node pointer
                     new_elem->set_node(nn) = new_node;
                   }
+
+#ifdef LIBMESH_ENABLE_AMR
+                // Finally, set the parent and interior_parent links
+                if (elem->parent())
+                  {
+                    const std::pair<unsigned int, unsigned char> parent_side_pair(elem->parent()->id(), s);
+
+                    libmesh_assert(side_id_map.count(parent_side_pair));
+
+                    Elem* side_parent = boundary_mesh.elem(side_id_map[parent_side_pair]);
+
+                    libmesh_assert(side_parent);
+
+                    new_elem->set_parent(side_parent);
+
+                    side_parent->set_refinement_flag(Elem::INACTIVE);
+
+                    // Figuring out which child we are of our parent
+                    // is a trick.  Due to libMesh child numbering
+		    // conventions, if we are an element on a vertex,
+		    // then we share that vertex with our parent, with
+		    // the same local index.
+                    bool found_child = false;
+                    for (unsigned int v=0; v != new_elem->n_vertices(); ++v)
+                      if (new_elem->get_node(v) == side_parent->get_node(v))
+                        {
+                          side_parent->add_child(new_elem, v);
+                          found_child = true;
+                        }
+
+		    // If we don't share any vertex with our parent,
+		    // then we're the fourth child (index 3) of a
+		    // triangle.
+                    if (!found_child)
+                      {
+                        libmesh_assert(new_elem->n_vertices() == 3);
+                        side_parent->add_child(new_elem, 3);
+                      }
+                  }
+#endif
+
+                new_elem->set_interior_parent (const_cast<Elem*>(elem));
               }
           }
     }
