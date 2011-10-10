@@ -106,6 +106,25 @@ void Patch::add_local_face_neighbors()
     
 
 
+void Patch::add_semilocal_face_neighbors()
+{
+  std::set<const Elem *> new_neighbors;
+
+  this->find_face_neighbors(new_neighbors);
+    
+  std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
+  const std::set<const Elem*>::const_iterator end = new_neighbors.end();
+
+  for (; it != end; ++it)
+    {
+      const Elem* neighbor = *it;
+      if (neighbor->is_semilocal())
+	this->insert (neighbor);
+    }
+}
+    
+
+
 void Patch::find_point_neighbors(std::set<const Elem *> &new_neighbors)
 {
   // Loop over all the elements in the patch
@@ -152,6 +171,25 @@ void Patch::add_local_point_neighbors()
       if (neighbor->processor_id() ==
 	  libMesh::processor_id()) // ... if the neighbor belongs to this processor
 	this->insert (neighbor);   // ... then add it to the patch
+    }
+}
+
+
+    
+void Patch::add_semilocal_point_neighbors()
+{
+  std::set<const Elem *> new_neighbors;
+
+  this->find_point_neighbors(new_neighbors);
+
+  std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
+  const std::set<const Elem*>::const_iterator end = new_neighbors.end();
+
+  for (; it != end; ++it)
+    {
+      const Elem* neighbor = *it;
+      if (neighbor->is_semilocal())
+	this->insert (neighbor);
     }
 }
   

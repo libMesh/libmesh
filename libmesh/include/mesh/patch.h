@@ -71,6 +71,13 @@ public:
 
   /**
    * This function finds all elements which touch the current patch at
+   * a face and which touch one of our processor's elements at any
+   * point, and it adds them to the patch.
+   */
+  void add_semilocal_face_neighbors();
+
+  /**
+   * This function finds all elements which touch the current patch at
    * any point, and adds them to the patch.
    */
   void add_point_neighbors();
@@ -80,6 +87,13 @@ public:
    * touch the current patch at any point, and adds them to the patch.
    */
   void add_local_point_neighbors();
+
+  /**
+   * This function finds all elements which touch the current patch at
+   * any point and which touch one of our processor's elements at any
+   * point, and it adds them to the patch.
+   */
+  void add_semilocal_point_neighbors();
 
   /**
    * Pointer to Member Function typedef
