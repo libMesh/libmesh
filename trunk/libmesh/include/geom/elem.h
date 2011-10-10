@@ -236,6 +236,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   bool on_boundary () const;
   
   /**
+   * @returns \p true if this element shares a vertex and/or a side
+   * with a local element.
+   */
+  bool is_semilocal () const;
+  
+  /**
    * This function tells you which neighbor you \p (e) are.
    * I.e. if s = a->which_neighbor_am_i(e); then
    * a->neighbor(s) will be an ancestor of e;
