@@ -440,6 +440,27 @@ bool Elem::operator == (const Elem& rhs) const
 
 
 
+bool Elem::is_semilocal() const
+{
+  std::set<const Elem *> point_neighbors;
+
+  this->find_point_neighbors(point_neighbors);
+
+  std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
+  const std::set<const Elem*>::const_iterator end = point_neighbors.end();
+
+  for (; it != end; ++it)
+    {
+      const Elem* elem = *it;
+      if (elem->processor_id() == libMesh::processor_id())
+        return true;
+    }
+
+  return false;
+}
+
+
+
 bool Elem::contains_vertex_of(const Elem *e) const
 {
   // Our vertices are the first numbered nodes
