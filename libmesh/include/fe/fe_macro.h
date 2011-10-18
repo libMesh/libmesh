@@ -97,4 +97,5 @@
 #define INSTANTIATE_MAP(_dim) \
   template Point FE<_dim,LAGRANGE>::map(const Elem*,const Point&);\
   template Point FE<_dim,LAGRANGE>::map_xi(const Elem*,const Point&);\
-  template Point FE<_dim,LAGRANGE>::map_eta(const Elem*,const Point&)
+  template Point FE<_dim,LAGRANGE>::map_eta(const Elem*,const Point&);\
+  template Point FE<_dim,LAGRANGE>::map_zeta(const Elem*,const Point&);
