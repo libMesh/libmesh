@@ -1045,11 +1045,12 @@ INSTANTIATE_IMAP(1);
 INSTANTIATE_IMAP(2);
 INSTANTIATE_IMAP(3);
 
-#if defined(__INTEL_COMPILER)
+// Note: This appears to be necessary even for GNU compilers (parallel build is unstable without it)
+//#if defined(__INTEL_COMPILER)
 INSTANTIATE_MAP(0);
 INSTANTIATE_MAP(1);
 INSTANTIATE_MAP(2);
 INSTANTIATE_MAP(3);
-#endif
+//#endif
 
 } // namespace libMesh
