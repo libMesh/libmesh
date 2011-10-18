@@ -268,6 +268,12 @@ public:
   void build_node_list_from_side_list();
 
   /**
+   * Adds sides to a sideset if every node on that side are in the same
+   * sideset
+   */
+  void build_side_list_from_node_list();
+
+  /**
    * Creates a list of element numbers, sides, and  and ids for those sides.
    */
   void build_side_list (std::vector<unsigned int>&       el,
