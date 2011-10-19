@@ -1192,7 +1192,7 @@ AC_OUTPUT
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(--------- Done Configuring libMesh ----------)
 AC_MSG_RESULT(---------------------------------------------)
-rm -f conftest* config.cache include/base/libmesh_config.h.tmp
+rm -f -r conftest* config.cache include/base/libmesh_config.h.tmp
 
 
 dnl Local Variables:
