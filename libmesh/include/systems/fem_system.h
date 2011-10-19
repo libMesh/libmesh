@@ -242,8 +242,9 @@ public:
    * Runs a qoi assembly loop over all elements, and if
    * \p assemble_qoi_sides is true over all sides.
    *
-   * Users may have to override this function for quantities of
-   * interest that are not expressible as a sum of element qois.
+   * Users may have to override this function if they have any
+   * quantities of interest that are not expressible as a sum of
+   * element qois.
    */
   virtual void assemble_qoi
     (const QoISet& indices = QoISet());
@@ -288,13 +289,6 @@ public:
    */
   Real verify_analytic_jacobians;
 
-protected:
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void init_data ();
-
   /**
    * Syntax sugar to make numerical_jacobian() declaration easier.
    */
@@ -320,6 +314,13 @@ protected:
    * on an element's side.
    */
   void numerical_side_jacobian (FEMContext &context);
+
+protected:
+  /**
+   * Initializes the member data fields associated with
+   * the system, so that, e.g., \p assemble() may be used.
+   */
+  virtual void init_data ();
 };
 
 
