@@ -67,6 +67,11 @@ class GmshIO : public MeshInput<MeshBase>,
   /**
    * Reads in a mesh in the Gmsh *.msh format
    * from the ASCII file given by name.
+   *
+   * Note that for this method to work (in 2d and 3d) you have to
+   * explicitly set the mesh dimension prior to calling GmshIO::read()
+   * and that Mesh::prepare_for_use() must be called after reading the
+   * mesh and before using it.
    */
   virtual void read (const std::string& name);
 
