@@ -165,7 +165,7 @@ else
   else
     AC_MSG_ERROR([input file $_INP does not exist - skip generating $_OUT])
   fi
-  rm -f conftest.*
+  rm -f -r conftest.*
 fi
 m4_popdef([_symbol])dnl
 m4_popdef([_script])dnl

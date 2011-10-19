@@ -18447,7 +18447,7 @@ do
     cat >>$CONFIG_STATUS <<_ACEOF
     # First, check the format of the line:
     cat >"\$tmp/defines.sed" <<\\CEOF
-/^[	 ]*#[	 ]*undef[	 ][	 ]*$ac_word_re[	 ]*\$/b def
+/^[	 ]*#[	 ]*undef[	 ][	 ]*$ac_word_re[	 ]*/b def
 /^[	 ]*#[	 ]*define[	 ][	 ]*$ac_word_re[(	 ]/b def
 b
 :def
@@ -18624,7 +18624,7 @@ echo "$as_me: error: cannot create directory $as_dir" >&2;}
 echo "$as_me: error: input file $ac_prefix_conf_INP does not exist - skip generating $ac_prefix_conf_OUT" >&2;}
    { (exit 1); exit 1; }; }
   fi
-  rm -f conftest.*
+  rm -f -r conftest.*
 fi
  ;;
 
@@ -18667,6 +18667,6 @@ echo "${ECHO_T}---------------------------------------------" >&6; }
 echo "${ECHO_T}--------- Done Configuring libMesh ----------" >&6; }
 { echo "$as_me:$LINENO: result: ---------------------------------------------" >&5
 echo "${ECHO_T}---------------------------------------------" >&6; }
-rm -f conftest* config.cache include/base/libmesh_config.h.tmp
+rm -f -r conftest* config.cache include/base/libmesh_config.h.tmp
 
 
