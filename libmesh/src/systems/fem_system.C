@@ -547,10 +547,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
     {
 //      this->get_vector("_nonlinear_solution").close();
       this->solution->close();
+
+      unsigned int old_precision = libMesh::out.precision();
+      libMesh::out.precision(16);
       libMesh::out << "|U| = "
 //                    << this->get_vector("_nonlinear_solution").l1_norm()
                     << this->solution->l1_norm()
                     << std::endl;
+      libMesh::out.precision(old_precision);
     }
   if (print_solutions)
     {
@@ -590,27 +594,34 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                         AssemblyContributions(*this, get_residual, get_jacobian));
 
 
+  if (get_residual && (print_residual_norms || print_residuals))
+    this->rhs->close();
   if (get_residual && print_residual_norms)
     {
-      this->rhs->close();
+      unsigned int old_precision = libMesh::out.precision();
+      libMesh::out.precision(16);
       libMesh::out << "|F| = " << this->rhs->l1_norm() << std::endl;
+      libMesh::out.precision(old_precision);
     }
   if (get_residual && print_residuals)
     {
-      this->rhs->close();
       unsigned int old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "F = [" << *(this->rhs) << "];" << std::endl;
       libMesh::out.precision(old_precision);
     }
+
+  if (get_jacobian && (print_jacobian_norms || print_jacobians))
+    this->matrix->close();
   if (get_jacobian && print_jacobian_norms)
     {
-      this->matrix->close();
+      unsigned int old_precision = libMesh::out.precision();
+      libMesh::out.precision(16);
       libMesh::out << "|J| = " << this->matrix->l1_norm() << std::endl;
+      libMesh::out.precision(old_precision);
     }
   if (get_jacobian && print_jacobians)
     {
-      this->matrix->close();
       unsigned int old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "J = [" << *(this->matrix) << "];" << std::endl;
