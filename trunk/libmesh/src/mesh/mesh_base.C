@@ -240,7 +240,9 @@ std::string MeshBase::get_info() const
       << "    n_active_elem()="   << this->n_active_elem()     << '\n'
 #endif
       << "  n_subdomains()="      << this->n_subdomains()      << '\n'
-      << "  n_processors()="      << this->n_processors()      << '\n'
+      << "  n_partitions()="      << this->n_partitions()      << '\n'
+      << "  n_processors()="      << libMesh::n_processors()   << '\n'
+      << "  n_threads()="         << libMesh::n_threads()      << '\n'
       << "  processor_id()="      << this->processor_id()      << '\n';
 
   return out.str();
