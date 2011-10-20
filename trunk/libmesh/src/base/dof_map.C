@@ -1305,7 +1305,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // if we don't need the exact pattern.  For some sparse matrix formats
   // a good upper bound will suffice.
   bool need_full_sparsity_pattern=false;
-  std::vector<SparseMatrix<Number>* >::iterator
+  std::vector<SparseMatrix<Number>* >::const_iterator
     pos = _matrices.begin(),
     end = _matrices.end();
       
@@ -2374,9 +2374,6 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
     {
       // incriment the number of on and off-processor nonzeros in this row
       // (note this will be an upper bound unless we need the full sparsity pattern)
-      n_nz[r] += other.n_nz[r];  n_nz[r] = std::min(n_nz[r], n_dofs_on_proc);
-      n_oz[r] += other.n_oz[r];  n_oz[r] = std::min(n_oz[r], n_global_dofs-n_nz[r]);
-
       if (need_full_sparsity_pattern)
 	{
 	  SparsityPattern::Row       &my_row    = sparsity_pattern[r];
@@ -2410,6 +2407,11 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 	    else
 	      n_nz[r]++;
 	}
+      else
+        {
+          n_nz[r] += other.n_nz[r];  n_nz[r] = std::min(n_nz[r], n_dofs_on_proc);
+          n_oz[r] += other.n_oz[r];  n_oz[r] = std::min(n_oz[r], n_global_dofs-n_nz[r]);
+	}
     }
 }
 
@@ -2425,6 +2427,21 @@ void DofMap::print_info(std::ostream& os) const
 std::string DofMap::get_info() const
 {
   OStringStream os;
+
+  // If we didn't calculate the exact sparsity pattern, the threaded
+  // sparsity pattern assembly may have just given us an upper bound
+  // on sparsity.
+  const char* may_equal = " <= ";
+
+  // If we calculated the exact sparsity pattern, then we can report
+  // exact bandwidth figures:
+  std::vector<SparseMatrix<Number>* >::const_iterator
+    pos = _matrices.begin(),
+    end = _matrices.end();
+      
+  for (; pos != end; ++pos)
+    if ((*pos)->need_full_sparsity_pattern())
+      may_equal = " = ";
 
   unsigned int max_n_nz = 0, max_n_oz = 0;
   long double avg_n_nz = 0., avg_n_oz = 0;
@@ -2444,17 +2461,17 @@ std::string DofMap::get_info() const
     }
   avg_n_oz /= std::max(_n_oz.size(),one);
 
-  os << "    DofMap Sparsity\n      Average  On-Processor Bandwidth = "
-     << avg_n_nz << '\n';
+  os << "    DofMap Sparsity\n      Average  On-Processor Bandwidth"
+     << may_equal << avg_n_nz << '\n';
   
-  os << "      Average Off-Processor Bandwidth = "
-     << avg_n_oz << '\n';
+  os << "      Average Off-Processor Bandwidth"
+     << may_equal << avg_n_oz << '\n';
   
-  os << "      Maximum  On-Processor Bandwidth = "
-     << max_n_nz << '\n';
+  os << "      Maximum  On-Processor Bandwidth"
+     << may_equal << max_n_nz << '\n';
   
-  os << "      Maximum Off-Processor Bandwidth = "
-     << max_n_oz << std::endl;
+  os << "      Maximum Off-Processor Bandwidth"
+     << may_equal << max_n_oz << std::endl;
 
 #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
