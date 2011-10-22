@@ -31,7 +31,24 @@
 
 // Local includes
 #include "perf_log.h"
+#include "threads.h"
 #include "timestamp.h"
+
+namespace {
+  Threads::spin_mutex perflog_mutex;
+}
+
+void libmesh_start_log(const std::string &label, const std::string &header)
+{
+  Threads::spin_mutex::scoped_lock perflog_start_lock(perflog_mutex);
+  libMesh::perflog.push(label,header);
+}
+
+void libmesh_stop_log(const std::string &label, const std::string &header)
+{
+  Threads::spin_mutex::scoped_lock perflog_stop_lock(perflog_mutex);
+  libMesh::perflog.pop(label,header);
+}
 
 namespace libMesh
 {
