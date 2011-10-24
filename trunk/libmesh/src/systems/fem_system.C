@@ -346,14 +346,14 @@ namespace {
      * constructor to set context
      */
     QoIContributions(FEMSystem &sys) :
-      _sys(sys), qoi(sys.qoi.size(), 0.) {}
+      qoi(sys.qoi.size(), 0.), _sys(sys) {}
 
     /**
      * splitting constructor
      */
     QoIContributions(const QoIContributions &other,
                      Threads::split) :
-      _sys(other._sys), qoi(other._sys.qoi.size(), 0.) {}
+      qoi(other._sys.qoi.size(), 0.), _sys(other._sys) {}
 
     /**
      * operator() for use with Threads::parallel_reduce().
