@@ -30,6 +30,7 @@
 #include <vector>
 
 // Local includes
+#include "libmesh_logging.h"
 #include "perf_log.h"
 #include "threads.h"
 #include "timestamp.h"
