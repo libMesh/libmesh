@@ -57,13 +57,10 @@ class PerfLog;
 // is disabled.
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
 
-void libmesh_start_log(const std::string &label, const std::string &header);
-void libmesh_stop_log(const std::string &label, const std::string &header);
-
 // Note the log is in libMesh, so we need to include it.
 #  include "libmesh.h"
-#  define START_LOG(a,b)   { libmesh_start_log(a,b); }
-#  define STOP_LOG(a,b)    { libmesh_stop_log(a,b); }
+#  define START_LOG(a,b)   { libMesh::perflog.push(a,b); }
+#  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
 #  define PALIBMESH_USE_LOG(a,b)   { libmesh_deprecated(); }
 #  define RESTART_LOG(a,b) { libmesh_deprecated(); }
 

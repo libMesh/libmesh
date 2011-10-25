@@ -101,6 +101,8 @@ namespace Threads
     BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
@@ -112,7 +114,7 @@ namespace Threads
       body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-    if (libMesh::n_threads() > 1)
+    if (libMesh::n_threads() > 1 && logging_was_enabled)
       libMesh::perflog.enable_logging();
 #endif
   }
@@ -131,6 +133,8 @@ namespace Threads
     BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
@@ -142,7 +146,7 @@ namespace Threads
       body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-    if (libMesh::n_threads() > 1)
+    if (libMesh::n_threads() > 1 && logging_was_enabled)
       libMesh::perflog.enable_logging();
 #endif
   }
@@ -161,6 +165,8 @@ namespace Threads
     BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
@@ -172,7 +178,7 @@ namespace Threads
       body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-    if (libMesh::n_threads() > 1)
+    if (libMesh::n_threads() > 1 && logging_was_enabled)
       libMesh::perflog.enable_logging();
 #endif
   }
@@ -191,6 +197,8 @@ namespace Threads
     BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
 #endif   
@@ -202,7 +210,7 @@ namespace Threads
 	 body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-    if (libMesh::n_threads() > 1)
+    if (libMesh::n_threads() > 1 && logging_was_enabled)
       libMesh::perflog.enable_logging();
 #endif
   }
