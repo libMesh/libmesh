@@ -164,6 +164,10 @@ class PerfLog
    */
   void enable_logging() { log_events = true; }
 
+  /**
+   * Returns true iff performance logging is enabled
+   */
+  bool logging_enabled() const { return log_events; }
 
   /**
    * Push the event \p label onto the stack, pausing any active event.
