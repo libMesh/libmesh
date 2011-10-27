@@ -43,6 +43,7 @@ libmesh_RPATHFLAG     = @RPATHFLAG@
 libmesh_CFLAGS       ?= $(CFLAGS)
 libmesh_CXXFLAGS     ?= $(CXXFLAGS)
 libmesh_CPPFLAGS     ?= $(CPPFLAGS)
+NODEPRECATEDFLAG     = @NODEPRECATEDFLAG@
 
 # Complex variable support
 enable-complex       = @enablecomplex@
