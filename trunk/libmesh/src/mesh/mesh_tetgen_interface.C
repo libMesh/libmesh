@@ -220,7 +220,7 @@ namespace libMesh
 		  libmesh_error();
 		}
 	    
-	      std::vector<unsigned>::iterator::difference_type 
+	      std::vector<unsigned>::difference_type 
 		sequential_index = std::distance(_sequential_to_libmesh_node_map.begin(), it);
 	    
 	      // Debugging:
