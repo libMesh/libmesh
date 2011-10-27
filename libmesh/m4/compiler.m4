@@ -370,6 +370,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
     CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized"
     CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses"
+    NODEPRECATEDFLAG="-Wno-deprecated"
 
     CFLAGS_OPT="-O2"
     CFLAGS_DVL="$CFLAGS_OPT -g -Wimplicit"
@@ -472,6 +473,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
           CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          NODEPRECATEDFLAG=""
           CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
           CFLAGS_DBG="-qansialias -g"
           CFLAGS_DVL="$CFLAGS_DBG"
@@ -484,6 +486,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -O2 -w"
           CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -g -woff 1460"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          NODEPRECATEDFLAG=""
           CFLAGS_OPT="-O2 -w"
           CFLAGS_DBG="-g"
           CFLAGS_DVL="$CFLAGS_DBG"
@@ -516,6 +519,9 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
 
       dnl All Intel ICC/ECC flavors
       intel_*)
+
+        dnl Intel understands the gcc-like no-deprecated flag
+        NODEPRECATEDFLAG="-Wno-deprecated"
 
         dnl Intel compilers use -qp for profiling
         PROFILING_FLAGS="-qp"
@@ -756,6 +762,8 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           CFLAGS_DBG="-w1 -msg_display_number -timplicit_local"
           CFLAGS_OPT="-w2 -msg_display_number -timplicit_local -O2 -fast"
   	  CFLAGS_DVL="$CFLAGS_DBG"
+        
+          NODEPRECATEDFLAG=""
 
           for i in 175 236 237 487 1136 1156 111 1182 265 ; do
             CXXFLAGS_DBG="$CXXFLAGS_DBG -msg_disable $i"
@@ -790,6 +798,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           CXXFLAGS_DBG="-library=stlport4 -g"
           CXXFLAGS_OPT="-library=stlport4 -fast -xO4"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          NODEPRECATEDFLAG=""
           CFLAGS_DBG="-g"
           CFLAGS_OPT="-xO4"
           CFLAGS_DVL="$CFLAGS_DBG"
@@ -821,6 +830,10 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
 	  CXXFLAGS_DBG="-g --no_using_std"
           CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+
+          dnl PG C++ definitely doesn't understand -Wno-deprecated...
+          NODEPRECATEDFLAG=""
+
 	  CFLAGS_DBG="-g"
           CFLAGS_OPT="-O2"
           CFLAGS_DVL="$CFLAGS_DBG"
@@ -871,6 +884,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           CXXFLAGS_DBG="+DA2.0W -AA +z -ext -g"
           CXXFLAGS_OPT="+DA2.0W -AA +z -ext -O +Onolimit"
 	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+          NODEPRECATEDFLAG=""
 	  CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
           CFLAGS_OPT="+DA2.0W -Aa +z -Ae -O +Onolimit"
           CFLAGS_DVL="$CFLAGS_DBG"
@@ -883,6 +897,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
 	  CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
  	  CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
  	  CXXFLAGS_DVL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+          NODEPRECATEDFLAG=""
 	  CFLAGS_DBG="-G n"
 	  CFLAGS_OPT="-G n"
 	  CFLAGS_DVL="-G n"
@@ -897,6 +912,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
 	  CXXFLAGS_DBG="$CXXFLAGS"
 	  CXXFLAGS_OPT="$CXXFLAGS"
 	  CXXFLAGS_DVL="$CXXFLAGS"
+          NODEPRECATEDFLAG=""
 
 	  CFLAGS_DBG="$CFLAGS"
 	  CFLAGS_OPT="$CFLAGS"

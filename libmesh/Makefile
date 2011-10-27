@@ -262,7 +262,7 @@ TODO:
 # VTK headers.
 src/mesh/vtk_io.$(obj-suffix) : src/mesh/vtk_io.C
 	@echo "Compiling using special rule for vtk_io.C (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CXX) -Wno-deprecated $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_CXX) $(NODEPRECATEDFLAG) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 
 
