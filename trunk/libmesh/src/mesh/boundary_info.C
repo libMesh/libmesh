@@ -1037,49 +1037,67 @@ BoundaryInfo::build_node_list_from_side_list()
   }
 }
 
-void
-BoundaryInfo::build_side_list_from_node_list()
+
+
+
+void BoundaryInfo::build_side_list_from_node_list()
 {
-  std::multimap<const Node*, short int>::const_iterator pos;
-  std::pair<std::multimap<const Node*, short int>::const_iterator,
-    std::multimap<const Node*, short int>::const_iterator> range;
-
-  const MeshBase::const_element_iterator end_el = _mesh.active_local_elements_end();
-  for (MeshBase::const_element_iterator el = _mesh.active_local_elements_begin(); el != end_el; ++el)
-  {
-    const Elem* elem = *el;
-
-    for (unsigned int side=0; side<elem->n_sides(); ++side)
+  // Check for early return
+  if (_boundary_node_id.empty())
     {
-      AutoPtr<Elem> side_elem = elem->build_side(side);
-
-      // First: NodesetID
-      // Second: Node Count
-      std::map<unsigned int, unsigned int> nodesets_node_count;
-      for (unsigned int node_num=0; node_num < side_elem->n_nodes(); ++node_num)
-      {
-        Node * node = side_elem->get_node(node_num);
-        range = _boundary_node_id.equal_range(node);
-
-        // For each nodeset that this node is a member of, increment the associated
-        // nodeset ID count
-        for (pos = range.first; pos != range.second; ++pos)
-          nodesets_node_count[pos->second]++;
-      }
-
-      // Now check to see what nodeset_counts have the correct number of nodes in them
-      for (std::map<unsigned int, unsigned int>::const_iterator nodesets = nodesets_node_count.begin();
-           nodesets != nodesets_node_count.end(); ++nodesets)
-      {
-        if (nodesets->second == side_elem->n_nodes())
-        {
-          // Add this side to the sideset
-          add_side(elem, side, nodesets->first);
-        }
-      }
+      libMesh::out << "No boundary node IDs have been added: cannot build side list!" << std::endl;
+      return;
     }
-  }
+
+  // typedef for less typing!
+  typedef std::multimap<const Node*, short int>::const_iterator iterator_t;
+
+  // Return value and iterator for equal_range()
+  iterator_t pos;
+  std::pair<iterator_t, iterator_t> range;
+
+  MeshBase::const_element_iterator el = _mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_el = _mesh.active_elements_end();
+
+  for (; el != end_el; ++el)
+    {
+      const Elem* elem = *el;
+
+      for (unsigned side=0; side<elem->n_sides(); ++side)
+	{
+	  AutoPtr<Elem> side_elem = elem->build_side(side);
+
+	  // map from nodeset_id to count for that ID
+	  std::map<unsigned, unsigned> nodesets_node_count;
+	  for (unsigned node_num=0; node_num < side_elem->n_nodes(); ++node_num)
+	    {
+	      Node* node = side_elem->get_node(node_num);
+	      range = _boundary_node_id.equal_range(node);
+
+	      // For each nodeset that this node is a member of, increment the associated
+	      // nodeset ID count
+	      for (pos = range.first; pos != range.second; ++pos)
+		{
+		  nodesets_node_count[pos->second]++;
+		}
+	    }
+
+	  // Now check to see what nodeset_counts have the correct number of nodes in them
+	  for (std::map<unsigned, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
+	       nodesets != nodesets_node_count.end(); ++nodesets)
+	    {
+	      if (nodesets->second == side_elem->n_nodes())
+		{
+		  // Add this side to the sideset
+		  add_side(elem, side, nodesets->first);
+		}
+	    }
+	} // end for side
+    } // end for el
 }
+
+
+
 
 void BoundaryInfo::build_side_list (std::vector<unsigned int>&       el,
 				    std::vector<unsigned short int>& sl,
