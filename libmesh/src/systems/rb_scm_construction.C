@@ -1,0 +1,419 @@
+// rbOOmit: An implementation of the Certified Reduced Basis method.
+// Copyright (C) 2009, 2010 David J. Knezevic
+
+// This file is part of rbOOmit.
+
+// rbOOmit is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+  
+// rbOOmit is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+  
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// Configuration data
+#include "libmesh_config.h"
+
+// Currently, the RBSCMConstruction should only be available
+// if SLEPc support is enabled.
+#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+
+#include "rb_scm_construction.h"
+#include "rb_construction.h"
+
+#include "libmesh_logging.h"
+#include "numeric_vector.h"
+#include "sparse_matrix.h"
+#include "equation_systems.h"
+#include "getpot.h"
+#include "parallel.h"
+#include "dof_map.h"
+// For creating a directory
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+
+namespace libMesh
+{
+
+RBSCMConstruction::RBSCMConstruction (EquationSystems& es,
+                          const std::string& name,
+                          const unsigned int number)
+  : Parent(es, name, number),
+    parameters_filename(""),
+    rb_scm_eval(NULL),
+    SCM_eps(0.5),
+    RB_system_name("")
+{
+
+  // set assemble_before_solve flag to false
+  // so that we control matrix assembly.
+  assemble_before_solve = false;
+
+  // We symmetrize all operators hence use symmetric solvers
+  set_eigenproblem_type(GHEP);
+
+}
+
+RBSCMConstruction::~RBSCMConstruction ()
+{
+  this->clear();
+}
+
+
+void RBSCMConstruction::clear()
+{
+  Parent::clear();
+}
+
+void RBSCMConstruction::initialize_SCM_system ()
+{
+  // First read in data from parameters_filename
+  GetPot infile(parameters_filename);
+  const unsigned int n_SCM_parameters = infile("n_SCM_parameters",1);
+  const unsigned int n_SCM_training_samples = infile("n_SCM_training_samples",1);
+  const bool deterministic_training = infile("deterministic_training",false);
+  
+  set_n_params( n_SCM_parameters );
+
+  // SCM Greedy termination tolerance
+  const Real SCM_eps_in = infile("SCM_eps", SCM_eps);
+  set_SCM_eps(SCM_eps_in);
+
+  // Resize the bounding box vectors
+  rb_scm_eval->B_min.resize(rb_theta_expansion->get_Q_a());
+  rb_scm_eval->B_max.resize(rb_theta_expansion->get_Q_a());
+
+  std::vector<Real> mu_min_vector(n_SCM_parameters);
+  std::vector<Real> mu_max_vector(n_SCM_parameters);
+  std::vector<bool> log_scaling(n_SCM_parameters);
+  for(unsigned int i=0; i<n_SCM_parameters; i++)
+  {
+    // Read vector-based mu_min values.
+    mu_min_vector[i] = infile("SCM_mu_min", mu_min_vector[i], i);
+
+    // Read vector-based mu_max values.
+    mu_max_vector[i] = infile("SCM_mu_max", mu_max_vector[i], i);
+
+    // Read vector-based log scaling values.  Note the intermediate conversion to
+    // int... this implies log_scaling = '1 1 1...' in the input file.
+    log_scaling[i] = static_cast<bool>(infile("SCM_log_scaling", static_cast<int>(log_scaling[i]), i));
+  }
+
+  // Make sure this generates training parameters properly!
+  initialize_training_parameters(mu_min_vector,
+                                 mu_max_vector,
+                                 n_SCM_training_samples,
+                                 log_scaling,
+                                 deterministic_training);
+
+  libMesh::out << std::endl << "RBSCMConstruction parameters:" << std::endl;
+  libMesh::out << "system name: " << this->name() << std::endl;
+  libMesh::out << "Q_a: " << rb_theta_expansion->get_Q_a() << std::endl;
+  libMesh::out << "SCM_eps: " << get_SCM_eps() << std::endl;
+  for(unsigned int i=0; i<n_SCM_parameters; i++)
+  {
+    libMesh::out <<   "SCM Parameter " << i
+                 << ": Min = " << get_parameter_min(i)
+                 << ", Max = " << get_parameter_max(i)
+                 << ", log scaling = " << log_scaling[i] << std::endl;
+  }
+  libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
+  libMesh::out << "using deterministic training samples? " << deterministic_training << std::endl;
+  libMesh::out << std::endl;
+}
+
+void RBSCMConstruction::resize_SCM_vectors()
+{
+  // Clear SCM data vectors
+  rb_scm_eval->B_min.clear();
+  rb_scm_eval->B_max.clear();
+  rb_scm_eval->C_J.clear();
+  rb_scm_eval->C_J_stability_vector.clear();
+  for(unsigned int i=0; i<rb_scm_eval->SCM_UB_vectors.size(); i++)
+    rb_scm_eval->SCM_UB_vectors[i].clear();
+  rb_scm_eval->SCM_UB_vectors.clear();
+
+  // Resize the bounding box vectors
+  rb_scm_eval->B_min.resize(rb_theta_expansion->get_Q_a());
+  rb_scm_eval->B_max.resize(rb_theta_expansion->get_Q_a());
+}
+
+void RBSCMConstruction::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
+{
+  START_LOG("add_scaled_symm_Aq()", "RBSCMConstruction");
+  // Load the operators from the RBConstruction
+  EquationSystems& es = this->get_equation_systems();
+  RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
+  rb_system.add_scaled_Aq(scalar, q_a, matrix_A, true);
+  STOP_LOG("add_scaled_symm_Aq()", "RBSCMConstruction");
+}
+
+void RBSCMConstruction::load_matrix_B()
+{
+  // Load the operators from the RBConstruction
+  EquationSystems& es = this->get_equation_systems();
+  RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
+  
+  matrix_B->zero();
+  matrix_B->add(1.,*rb_system.get_inner_product_matrix());
+}
+
+void RBSCMConstruction::perform_SCM_greedy()
+{
+  START_LOG("perform_SCM_greedy()", "RBSCMConstruction");
+
+  // Copy the local parts of the Dirichlet and
+  // non-Dirichlet dofs lists over from
+  // the associated RBConstruction
+  EquationSystems& es = this->get_equation_systems();
+  RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
+  this->initialize_condensed_dofs(rb_system.global_dirichlet_dofs_set);
+
+  // Copy the inner product matrix over from rb_system to be used as matrix_B
+  load_matrix_B();
+
+  attach_deflation_space();
+
+  compute_SCM_bounding_box();
+  // This loads the new parameter into current_parameters
+  enrich_C_J(0);
+
+  unsigned int SCM_iter=0;
+  while(true)
+  {
+    // matrix_A is reinitialized for the current parameters
+    // on each call to evaluate_stability_constant
+    evaluate_stability_constant();
+
+    std::pair<unsigned int,Real> SCM_error_pair = compute_SCM_bounds_on_training_set();
+
+    libMesh::out << "SCM iteration " << SCM_iter
+                 << ", max_SCM_error = " << SCM_error_pair.second << std::endl;
+
+    if( SCM_error_pair.second < SCM_eps )
+    {
+      libMesh::out << std::endl << "SCM tolerance of " << SCM_eps << " reached."
+                   << std::endl << std::endl;
+      break;
+    }
+
+    // If we need another SCM iteration, then enrich C_J
+    enrich_C_J(SCM_error_pair.first);
+
+    libMesh::out << std::endl << "-----------------------------------" << std::endl << std::endl;
+
+    SCM_iter++;
+  }
+
+  STOP_LOG("perform_SCM_greedy()", "RBSCMConstruction");
+}
+
+void RBSCMConstruction::compute_SCM_bounding_box()
+{
+  START_LOG("compute_SCM_bounding_box()", "RBSCMConstruction");
+
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
+  {
+    matrix_A->zero();
+    add_scaled_symm_Aq(q, 1.);
+
+    // Compute B_min(q)
+    eigen_solver->set_position_of_spectrum(SMALLEST_REAL);
+    set_eigensolver_properties(q);
+
+    solve();
+    unsigned int nconv = get_n_converged();
+    if (nconv != 0)
+    {
+      std::pair<Real, Real> eval = get_eigenpair(0);
+
+      // ensure that the eigenvalue is real
+      libmesh_assert(eval.second < TOLERANCE);
+
+      rb_scm_eval->set_B_min(q, eval.first);
+      libMesh::out << std::endl << "B_min("<<q<<") = " << rb_scm_eval->get_B_min(q) << std::endl;
+    }
+    else
+    {
+      libMesh::err << "Eigen solver for computing B_min did not converge" << std::endl;
+      libmesh_error();
+    }
+
+    // Compute B_max(q)
+    eigen_solver->set_position_of_spectrum(LARGEST_REAL);
+    set_eigensolver_properties(q);
+
+    solve();
+    nconv = get_n_converged();
+    if (nconv != 0)
+    {
+      std::pair<Real, Real> eval = get_eigenpair(0);
+
+      // ensure that the eigenvalue is real
+      libmesh_assert(eval.second < TOLERANCE);
+
+      rb_scm_eval->set_B_max(q,eval.first);
+      libMesh::out << "B_max("<<q<<") = " << rb_scm_eval->get_B_max(q) << std::endl;
+    }
+    else
+    {
+      libMesh::err << "Eigen solver for computing B_max did not converge" << std::endl;
+      libmesh_error();
+    }
+  }
+
+  STOP_LOG("compute_SCM_bounding_box()", "RBSCMConstruction");
+}
+
+void RBSCMConstruction::evaluate_stability_constant()
+{
+  START_LOG("evaluate_stability_constant()", "RBSCMConstruction");
+
+  // Get current index of C_J
+  const unsigned int j = rb_scm_eval->C_J.size()-1;
+
+  eigen_solver->set_position_of_spectrum(SMALLEST_REAL);
+
+  // We assume B is set in system assembly
+  // For coercive problems, B is set to the inner product matrix
+  // For non-coercive time-dependent problems, B is set to the mass matrix
+
+  // Set matrix A corresponding to mu_star
+  matrix_A->zero();
+  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
+  {
+    add_scaled_symm_Aq(q, rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()));
+  }
+
+  set_eigensolver_properties(-1);
+  solve();
+  unsigned int nconv = get_n_converged();
+  if (nconv != 0)
+  {
+    std::pair<Real, Real> eval = get_eigenpair(0);
+
+    // ensure that the eigenvalue is real
+    libmesh_assert(eval.second < TOLERANCE);
+
+    // Store the coercivity constant corresponding to mu_star
+    rb_scm_eval->set_C_J_stability_constraint(j,eval.first);
+    libMesh::out << std::endl << "Stability constant for C_J("<<j<<") = "
+                 << rb_scm_eval->get_C_J_stability_constraint(j) << std::endl << std::endl;
+
+    // Compute and store the vector y = (y_1, \ldots, y_Q) for the
+    // eigenvector currently stored in eigen_system.solution.
+    // We use this later to compute the SCM upper bounds.
+    Real norm_B2 = libmesh_real( B_inner_product(*solution, *solution) );
+
+    for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
+    {
+      Real norm_Aq2 = libmesh_real( Aq_inner_product(q, *solution, *solution) );
+
+      rb_scm_eval->set_SCM_UB_vector(j,q,norm_Aq2/norm_B2);
+    }
+  }
+  else
+  {
+    libMesh::err << "Error: Eigensolver did not converge in evaluate_stability_constant"
+                 << std::endl;
+    libmesh_error();
+  }
+
+  STOP_LOG("evaluate_stability_constant()", "RBSCMConstruction");
+}
+
+Number RBSCMConstruction::B_inner_product(const NumericVector<Number>& v, const NumericVector<Number>& w) const
+{
+  matrix_B->vector_mult(*inner_product_storage_vector, w);
+
+  return v.dot(*inner_product_storage_vector);
+}
+
+Number RBSCMConstruction::Aq_inner_product(unsigned int q,
+                                    const NumericVector<Number>& v,
+                                    const NumericVector<Number>& w)
+{
+  if(q >= rb_theta_expansion->get_Q_a())
+  {
+    libMesh::err << "Error: We must have q < Q_a in Aq_inner_product."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  matrix_A->zero();
+  add_scaled_symm_Aq(q, 1.);
+  matrix_A->vector_mult(*inner_product_storage_vector, w);
+
+  return v.dot(*inner_product_storage_vector);
+}
+
+std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_set()
+{
+  START_LOG("compute_SCM_bounds_on_training_set()", "RBSCMConstruction");
+
+  // Now compute the maximum bound error over training_parameters
+  unsigned int new_C_J_index = 0;
+  Real max_SCM_error = 0.;
+
+  unsigned int first_index = get_first_local_training_index();
+  for(unsigned int i=0; i<get_local_n_training_samples(); i++)
+  {
+    load_training_parameter_locally(first_index+i);
+    rb_scm_eval->set_current_parameters( get_current_parameters() );
+    Real LB = rb_scm_eval->get_SCM_LB();
+    Real UB = rb_scm_eval->get_SCM_UB();
+
+    Real error_i = SCM_greedy_error_indicator(LB, UB);
+
+    if( error_i > max_SCM_error )
+    {
+      max_SCM_error = error_i;
+      new_C_J_index = i;
+    }
+  }
+
+  unsigned int global_index = first_index + new_C_J_index;
+  std::pair<unsigned int,Real> error_pair(global_index, max_SCM_error);
+  get_global_max_error_pair(error_pair);
+
+  STOP_LOG("compute_SCM_bounds_on_training_set()", "RBSCMConstruction");
+
+  return error_pair;
+}
+
+void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
+{
+  START_LOG("enrich_C_J()", "RBSCMConstruction");
+
+  load_training_parameter_globally(new_C_J_index);
+
+  rb_scm_eval->C_J.push_back(get_current_parameters());
+
+  libMesh::out << std::endl << "SCM: Added mu = (";
+  for(unsigned int i=0; i<get_n_params(); i++)
+  {
+    libMesh::out << rb_scm_eval->C_J[rb_scm_eval->C_J.size()-1][i];
+    if(i < (get_n_params()-1)) libMesh::out << ",";
+  }
+  libMesh::out << ")" << std::endl;
+
+  // Finally, resize C_J_stability_vector and SCM_UB_vectors
+  rb_scm_eval->C_J_stability_vector.push_back(0.);
+
+  std::vector<Real> zero_vector(rb_theta_expansion->get_Q_a());
+  rb_scm_eval->SCM_UB_vectors.push_back(zero_vector);
+
+  STOP_LOG("enrich_C_J()", "RBSCMConstruction");
+}
+
+
+} // namespace libMesh
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK

@@ -23,6 +23,7 @@
 
 // System includes
 #include <memory> // for std::allocator
+#include <cstddef>
 
 // Local includes
 #include "libmesh_config.h"
