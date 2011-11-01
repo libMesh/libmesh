@@ -23,12 +23,13 @@
 // Configuration data
 #include "libmesh_config.h"
 
-// Currently, the RBSCMSystem is only usable
+// Currently, the RBSCMConstruction is only usable
 // if SLEPc is enabled.
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
 // rbOOmit includes
 #include "rb_construction_base.h"
+#include "rb_scm_evaluation.h"
 
 // libMesh includes
 #include "condensed_eigen_system.h"
@@ -39,20 +40,16 @@ namespace libMesh
 /**
  * This class is part of the rbOOmit framework.
  *
- * RBSCMSystem implements the the Successive Constraint Method (SCM)
+ * RBSCMConstruction implements the the Successive Constraint Method (SCM)
  * for computing rigorous lower bounds for stability constants.
- *
- * TODO: Segregate this class into RBSCMConstruction and
- * RBSCMEvaluation in the same way as the other rbOOmit classes.
- * 
  *
  * @author David J. Knezevic 2009
  */
 
 // ------------------------------------------------------------
-// RBSCMSystem class definition
+// RBSCMConstruction class definition
 
-class RBSCMSystem : public RBConstructionBase<CondensedEigenSystem>
+class RBSCMConstruction : public RBConstructionBase<CondensedEigenSystem>
 {
 public:
 
@@ -60,19 +57,19 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  RBSCMSystem (EquationSystems& es,
+  RBSCMConstruction (EquationSystems& es,
                const std::string& name,
                const unsigned int number);
 
   /**
    * Destructor.
    */
-  virtual ~RBSCMSystem ();
+  virtual ~RBSCMConstruction ();
 
   /**
    * The type of system.
    */
-  typedef RBSCMSystem sys_type;
+  typedef RBSCMConstruction sys_type;
 
   /**
    * The type of the parent.
@@ -121,63 +118,10 @@ public:
   void set_SCM_eps(Real SCM_eps_in) { this->SCM_eps = SCM_eps_in; }
 
   /**
-   * Get/set SCM_M: the number of nearby points to a given parameter
-   * that we use to construct the SCM LP.
-   */
-  unsigned int get_SCM_M() const     { return SCM_M; }
-  void set_SCM_M(unsigned int SCM_M_in) { this->SCM_M = SCM_M_in; }
-
-  /**
    * Perform the SCM greedy algorithm to develop a lower bound
    * over the training set.
    */
   virtual void perform_SCM_greedy();
-
-  /**
-   * Evaluate single SCM lower bound.
-   */
-  virtual Real get_SCM_LB();
-
-  /**
-   * Evaluate single SCM upper bound.
-   */
-  virtual Real get_SCM_UB();
-
-  /**
-   * Get stability constraints (i.e. the values of coercivity/
-   * inf-sup/stability constants at the parameter values chosen
-   * during the greedy); we store one constraint for each element
-   * of C_J.
-   */
-  Real get_C_J_stability_constraint(unsigned int j) const;
-
-  /**
-   * Get entries of SCM_UB_vector, which stores the
-   * vector y, corresponding to the minimizing eigenvectors
-   * for the elements of C_J.
-   */
-  Real get_SCM_UB_vector(unsigned int j, unsigned int q);
-
-  /**
-   * Get size of the set C_J.
-   */
-  unsigned int get_C_J_size() { return C_J.size(); }
-
-  /**
-   * Get entry of C_J.
-   */
-  std::vector<Real> get_C_J_entry(unsigned int j);
-
-  /**
-   * Get entry of C_J_stability_vector.
-   */
-  Real get_C_J_stability_value(unsigned int j) { return C_J_stability_vector[j]; }
-
-  /**
-   * Get B_min and B_max.
-   */
-  Real get_B_min(unsigned int i) const;
-  Real get_B_max(unsigned int i) const;
 
   /**
    * Attach the deflation space defined by the specified vector, can
@@ -189,18 +133,6 @@ public:
    */
   virtual void attach_deflation_space() {}
 
-  /**
-   * Write out all the data to text files in order to segregate the
-   * Offline stage from the Online stage.
-   */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data");
-
-  /**
-   * Read in the saved Offline reduced basis data
-   * to initialize the system for Online solves.
-   */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
-
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -208,6 +140,12 @@ public:
    * problem parameters. We use getpot.h to perform the reading.
    */
   std::string parameters_filename;
+
+  /**
+   * The current RBSCMEvaluation object we are using to
+   * perform the Evaluation stage of the SCM.
+   */
+  RBSCMEvaluation* rb_scm_eval;
 
 protected:
 
@@ -222,7 +160,7 @@ protected:
    * usually this is the mass or inner-product
    * matrix, but needs to be implemented in subclass.
    */
-  virtual void load_matrix_B() { libmesh_not_implemented(); }
+  virtual void load_matrix_B() ;
 
   /**
    * Compute the SCM bounding box.
@@ -237,10 +175,10 @@ protected:
   virtual void evaluate_stability_constant();
 
   /**
-   * Helper function to set current_parameters to the
-   * specified parameters saved in C_J.
+   * Enrich C_J by adding the element of SCM_training_samples
+   * that has the largest gap between alpha_LB and alpha_LB.
    */
-  virtual void set_current_parameters_from_C_J(unsigned int C_J_index);
+  virtual void enrich_C_J(unsigned int new_C_J_index);
 
   /**
    * Compute upper and lower bounds for each SCM training point.
@@ -249,33 +187,6 @@ protected:
    * error is achieved.
    */
   virtual std::pair<unsigned int,Real> compute_SCM_bounds_on_training_set();
-
-  /**
-   * Enrich C_J by adding the element of SCM_training_samples
-   * that has the largest gap between alpha_LB and alpha_LB.
-   */
-  virtual void enrich_C_J(unsigned int new_C_J_index);
-
-  /**
-   * Set B_min and B_max.
-   */
-  void set_B_min(unsigned int i, Real B_min_val);
-  void set_B_max(unsigned int i, Real B_max_val);
-
-  /**
-   * Set stability constraints (i.e. the values of coercivity/
-   * inf-sup/stability constants at the parameter values chosen
-   * during the greedy); we store one constraint for each element
-   * of C_J.
-   */
-  void set_C_J_stability_constraint(unsigned int j, Real stability_constraint_in);
-
-  /**
-   * Set entries of SCM_UB_vector, which stores the
-   * vector y, corresponding to the minimizing eigenvectors
-   * for the elements of C_J.
-   */
-  void set_SCM_UB_vector(unsigned int j, unsigned int q, Real y_q);
 
   /**
    * Compute the inner product between two vectors using the system's
@@ -292,33 +203,11 @@ protected:
                         const NumericVector<Number>& w);
 
   /**
-   * Helper function to compute the distance between
-   * two parameters, using the Euclidean norm.
-   *
-   * We make this virtual because in some cases (e.g. Burgers)
-   * we use a weighted distance.
-   */
-  virtual Real param_dist(const std::vector<Real>& mu_1, const std::vector<Real>& mu_2);
-
-  /**
    * Helper function which provides an error
    * indicator to be used in the SCM greedy.
    * Overload in subclasses to specialize behavior.
    */
   virtual Real SCM_greedy_error_indicator(Real LB, Real UB) { return fabs(UB-LB)/fabs(UB); }
-
-  /**
-   * Helper function to save current_parameters in
-   * saved_parameters.
-   */
-  virtual void save_current_parameters();
-
-  /**
-   * Helper functiont to (re)load current_parameters
-   * from saved_parameters.
-   */
-  virtual void reload_current_parameters();
-
 
   //----------- PROTECTED DATA MEMBERS -----------//
 
@@ -326,43 +215,6 @@ protected:
    * SCM tolerance, where SCM_eps \in (0,1).
    */
   Real SCM_eps;
-
-  /**
-   * Parameter used in SCM algorithm.
-   */
-  unsigned int SCM_M;
-
-  /**
-   * B_min, B_max define the bounding box.
-   */
-  std::vector<Real> B_min;
-  std::vector<Real> B_max;
-
-  /**
-   * Vector storing the greedily selected parameters
-   * during SCM training.
-   */
-  std::vector< std::vector<Real> > C_J;
-
-  /**
-   * Vector storing the (truth) stability values
-   * at the parameters in C_J.
-   */
-  std::vector<Real> C_J_stability_vector;
-
-  /**
-   * This matrix stores the infimizing vectors
-   * y_1(\mu),...,y_Q_a(\mu), for each \mu in
-   * C_J, which are used in computing the SCM
-   * upper bounds.
-   */
-  std::vector< std::vector<Real> > SCM_UB_vectors;
-
-  /**
-   * Vector in which to save a parameter set. Useful
-   * in get_SCM_LB, for example.
-   */
-  std::vector<Real> saved_parameters;
 
   /**
    * The name of the associated RB system.
