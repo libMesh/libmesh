@@ -228,8 +228,11 @@ void _init (int &argc, char** & argv,
     // multithreading competition.  If you would like to use MPI and multithreading 
     // at the same time then (n_mpi_processes_per_node)x(n_threads) should be the
     //  number of processing cores per node.
+    std::vector<std::string> n_threads(2);
+    n_threads[0] = "--n_threads";
+    n_threads[1] = "--n-threads";
     libMesh::libMeshPrivateData::_n_threads = 
-      libMesh::command_line_value ("--n_threads", 1);
+      libMesh::command_line_value (n_threads, 1);
 
     task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
   }
@@ -610,6 +613,23 @@ T command_line_value (const std::string &name, T value)
       value = (*command_line)(name.c_str(), value);      
 
     return value;
+}
+
+template <typename T>
+T command_line_value (const std::vector<std::string> &name, T value)
+{
+  // Make sure the command line parser is ready for use
+  libmesh_assert (command_line.get() != NULL);
+
+  // Check for multiple options (return the first that matches)
+  for (std::vector<std::string>::const_iterator i=name.begin(); i != name.end(); ++i)
+    if (command_line->have_variable(i->c_str()))
+    {
+      value = (*command_line)(i->c_str(), value);
+      break;
+    }
+
+  return value;
 }
 
 

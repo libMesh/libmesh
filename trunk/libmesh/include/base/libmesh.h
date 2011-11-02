@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <string>
+#include <vector>
 
 // Local includes
 #include "libmesh_common.h"
@@ -141,12 +142,15 @@ public:
 
   /**
    * \returns the value associated with name on the command line if it is specified,
-   * otherwise return the default, provided value.
+   * otherwise return the default, provided value.  A second template function is provided
+   * to support recognizing multiple variations of a given option
    */
   template <typename T>
-  T command_line_value (const std::string &, T);  
+  T command_line_value (const std::string &, T);
+  template <typename T>
+  T command_line_value (const std::vector<std::string> &, T);
 
-  /**
+ /**
    * The imaginary unit, \f$ \sqrt{-1} \f$.
    */
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
