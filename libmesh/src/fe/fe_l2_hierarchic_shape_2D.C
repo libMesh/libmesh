@@ -54,10 +54,6 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-  // Declare that we are using our own special power function
-  // from the Utility namespace.  This saves typing later.
-  using Utility::pow;
-
   const Order totalorder = static_cast<Order>(order+elem->p_level());
   libmesh_assert(totalorder > 0);
   
