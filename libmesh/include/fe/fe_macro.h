@@ -79,6 +79,9 @@
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
+// Refactoring of the finite element functions makes this instantiation
+// macro no longer necessary.
+/*
 #define INSTANTIATE_MBRF(_dim,_t) \
   template unsigned int FE<_dim,_t>::n_dofs_at_node(ElemType,Order,unsigned int); \
   template unsigned int FE<_dim,_t>::n_dofs(ElemType,Order);\
@@ -87,8 +90,7 @@
   template bool         FE<_dim,_t>::is_hierarchic() const;\
   template unsigned int FE<_dim,_t>::n_dofs_per_elem(ElemType,Order);\
   template void         FE<_dim,_t>::nodal_soln(const Elem*,const Order,const std::vector<Number>&,std::vector<Number>&)
-
-#endif
+*/
 
 // The Intel 7.1 compiler out at TACC required these, but they are used
 // inside the inverse_map function so it seems like they should be instantiated
@@ -99,3 +101,6 @@
   template Point FE<_dim,LAGRANGE>::map_xi(const Elem*,const Point&);\
   template Point FE<_dim,LAGRANGE>::map_eta(const Elem*,const Point&);\
   template Point FE<_dim,LAGRANGE>::map_zeta(const Elem*,const Point&)
+
+
+#endif // __fe_macro_h__
