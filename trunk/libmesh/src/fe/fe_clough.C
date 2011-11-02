@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -23,309 +23,353 @@
 #include "elem.h"
 #include "fe.h"
 #include "fe_macro.h"
-
+#include "fe_interface.h"
 
 
 namespace libMesh
 {
 
+  // ------------------------------------------------------------
+  // Clough-specific implementations
 
-// ------------------------------------------------------------
-// Hierarchic-specific implementations
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::nodal_soln(const Elem* elem,
+  // Anonymous namespace for local helper functions
+  namespace {
+
+    void clough_nodal_soln(const Elem* elem,
 			   const Order order,
 			   const std::vector<Number>& elem_soln,
-			   std::vector<Number>&       nodal_soln)
-{
-  const unsigned int n_nodes = elem->n_nodes();
-  
-  const ElemType type = elem->type();
-
-  nodal_soln.resize(n_nodes);
-
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
-
-  
-  switch (totalorder)
+			   std::vector<Number>&       nodal_soln,
+			   unsigned Dim)
     {
-      // Piecewise cubic shape functions with linear flux edges
-    case SECOND:
-      // Piecewise cubic shape functions
-    case THIRD:
-      {
+      const unsigned int n_nodes = elem->n_nodes();
 
-	const unsigned int n_sf =
-	  FE<Dim,T>::n_shape_functions(type, totalorder);
-	
-	for (unsigned int n=0; n<n_nodes; n++)
+      const ElemType elem_type = elem->type();
+
+      nodal_soln.resize(n_nodes);
+
+      const Order totalorder = static_cast<Order>(order + elem->p_level());
+
+      // FEType object to be passed to various FEInterface functions below.
+      FEType fe_type(totalorder, CLOUGH);
+
+      switch (totalorder)
+	{
+	  // Piecewise cubic shape functions with linear flux edges
+	case SECOND:
+	  // Piecewise cubic shape functions
+	case THIRD:
 	  {
-	    const Point mapped_point = FE<Dim,T>::inverse_map(elem,
-							      elem->point(n));
 
-	    libmesh_assert (elem_soln.size() == n_sf);
+	    const unsigned int n_sf =
+	      // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
+	      FEInterface::n_shape_functions(Dim, fe_type, elem_type);
 
-	    // Zero before summation
-	    nodal_soln[n] = 0;
+	    for (unsigned int n=0; n<n_nodes; n++)
+	      {
+		const Point mapped_point =
+		  // FE<Dim,T>::inverse_map(elem, elem->point(n));
+		  FEInterface::inverse_map(Dim, fe_type, elem, elem->point(n));
 
-	    // u_i = Sum (alpha_i phi_i)
-	    for (unsigned int i=0; i<n_sf; i++)
-	      nodal_soln[n] += elem_soln[i]*FE<Dim,T>::shape(elem,
-							     order,
-							     i,
-							     mapped_point);	    
+		libmesh_assert (elem_soln.size() == n_sf);
+
+		// Zero before summation
+		nodal_soln[n] = 0;
+
+		// u_i = Sum (alpha_i phi_i)
+		for (unsigned int i=0; i<n_sf; i++)
+		  nodal_soln[n] += elem_soln[i] *
+		    // FE<Dim,T>::shape(elem, order, i, mapped_point);
+		    FEInterface::shape(Dim, fe_type, elem, i, mapped_point);
+	      }
+
+	    return;
 	  }
 
-	return;
-      }
-      
-    default:
-      {
-	libmesh_error();
-      }
-    }
-}
+	default:
+	  {
+	    libmesh_error();
+	  }
+	}
+    } // clough_nodal_soln()
 
 
 
-template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_dofs(const ElemType t, const Order o)
-{
-  switch (o)
+
+    unsigned int clough_n_dofs(const ElemType t, const Order o)
     {
-      // Piecewise cubic shape functions with linear flux edges
-    case SECOND:
-      {
-	switch (t)
+      switch (o)
+	{
+	  // Piecewise cubic shape functions with linear flux edges
+	case SECOND:
 	  {
-	  case TRI6:
-	    return 9;
-	    
-	  default:
-	    {
+	    switch (t)
+	      {
+	      case TRI6:
+		return 9;
+
+	      default:
+		{
 #ifdef DEBUG
-	      libMesh::err << "ERROR: Bad ElemType = " << t
-			    << " for " << o << "th order approximation!" 
-			    << std::endl;
+		  libMesh::err << "ERROR: Bad ElemType = " << t
+			       << " for " << o << "th order approximation!"
+			       << std::endl;
 #endif
-	      libmesh_error();	    
-	    }
+		  libmesh_error();
+		}
+	      }
 	  }
-      }
-      // Piecewise cubic Clough-Tocher element
-    case THIRD:
-      {
-	switch (t)
+	  // Piecewise cubic Clough-Tocher element
+	case THIRD:
 	  {
-	  case TRI6:
-	    return 12;
-	    
-	  default:
-	    {
+	    switch (t)
+	      {
+	      case TRI6:
+		return 12;
+
+	      default:
+		{
 #ifdef DEBUG
-	      libMesh::err << "ERROR: Bad ElemType = " << t
-			    << " for " << o << "th order approximation!" 
-			    << std::endl;
+		  libMesh::err << "ERROR: Bad ElemType = " << t
+			       << " for " << o << "th order approximation!"
+			       << std::endl;
 #endif
-	      libmesh_error();	    
-	    }
+		  libmesh_error();
+		}
+	      }
 	  }
-      }
-      
-    default:
-      {
-	libmesh_error();
-      }
-    }
-  
-  libmesh_error();  
-  return 0;
-}
+
+	default:
+	  {
+	    libmesh_error();
+	  }
+	}
+
+      libmesh_error();
+      return 0;
+    } // clough_n_dofs()
 
 
 
-template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_dofs_at_node(const ElemType t,
+
+
+    unsigned int clough_n_dofs_at_node(const ElemType t,
 				       const Order o,
 				       const unsigned int n)
-{
-  switch (o)
     {
-      // Piecewise cubic shape functions with linear flux edges
-    case SECOND:
-      {
-	switch (t)
+      switch (o)
+	{
+	  // Piecewise cubic shape functions with linear flux edges
+	case SECOND:
 	  {
-	    // The 2D Clough-Tocher defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
+	    switch (t)
+	      {
+		// The 2D Clough-Tocher defined on a 6-noded triangle
+	      case TRI6:
 		{
-		case 0:
-		case 1:
-		case 2:
-		  return 3;
+		  switch (n)
+		    {
+		    case 0:
+		    case 1:
+		    case 2:
+		      return 3;
 
-		case 3:
-		case 4:
-		case 5:
-		  return 0;
+		    case 3:
+		    case 4:
+		    case 5:
+		      return 0;
 
-		default:
+		    default:
+		      libmesh_error();
+		    }
+		}
+
+	      default:
+		{
+#ifdef DEBUG
+		  libMesh::err << "ERROR: Bad ElemType = " << t
+			       << " for " << o << "th order approximation!"
+			       << std::endl;
+#endif
 		  libmesh_error();
 		}
-	    }
 
-	  default:
-	    {
-#ifdef DEBUG
-	      libMesh::err << "ERROR: Bad ElemType = " << t
-			    << " for " << o << "th order approximation!" 
-			    << std::endl;
-#endif
-	      libmesh_error();	    
-	    }
-	    
+	      }
 	  }
-      }
-      // The third-order hierarchic shape functions
-    case THIRD:
-      {
-	switch (t)
+	  // The third-order clough shape functions
+	case THIRD:
 	  {
-	    // The 2D Clough-Tocher defined on a 6-noded triangle
-	  case TRI6:
-	    {
-	      switch (n)
+	    switch (t)
+	      {
+		// The 2D Clough-Tocher defined on a 6-noded triangle
+	      case TRI6:
 		{
-		case 0:
-		case 1:
-		case 2:
-		  return 3;
+		  switch (n)
+		    {
+		    case 0:
+		    case 1:
+		    case 2:
+		      return 3;
 
-		case 3:
-		case 4:
-		case 5:
-		  return 1;
+		    case 3:
+		    case 4:
+		    case 5:
+		      return 1;
 
-		default:
+		    default:
+		      libmesh_error();
+		    }
+		}
+
+	      default:
+		{
+#ifdef DEBUG
+		  libMesh::err << "ERROR: Bad ElemType = " << t
+			       << " for " << o << "th order approximation!"
+			       << std::endl;
+#endif
 		  libmesh_error();
 		}
-	    }
 
-	  default:
-	    {
-#ifdef DEBUG
-	      libMesh::err << "ERROR: Bad ElemType = " << t
-			    << " for " << o << "th order approximation!" 
-			    << std::endl;
-#endif
-	      libmesh_error();	    
-	    }
-	    
+	      }
 	  }
-      }
-    default:
-      {
-	libmesh_error();
-      }
-    }
-  
-  libmesh_error();
-  
-  return 0;
-}
-
-
-
-template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_dofs_per_elem(const ElemType t,
-					const Order o)
-{
-  switch (o)
-    {
-      // Piecewise cubic shape functions with linear flux edges
-    case SECOND:
-      // The third-order Clough-Tocher shape functions
-    case THIRD:
-      {
-	switch (t)
+	default:
 	  {
-	    // The 2D hierarchic defined on a 6-noded triangle
-	  case TRI6:
-	    return 0;
-
-	  default:
-	    {
-#ifdef DEBUG
-	      libMesh::err << "ERROR: Bad ElemType = " << t
-			    << " for " << o << "th order approximation!" 
-			    << std::endl;
-#endif
-	      libmesh_error();	    
-	    }
-	    
+	    libmesh_error();
 	  }
-      }
-      // Otherwise no DOFS per element
-    default:
-      libmesh_error();	    
+	}
+
+      libmesh_error();
+
       return 0;
-    }
-}
+    } // clough_n_dofs_at_node()
 
 
 
-template <unsigned int Dim, FEFamily T>
-FEContinuity FE<Dim,T>::get_continuity() const
-{
-  return C_ONE;
-}
+
+    unsigned int clough_n_dofs_per_elem(const ElemType t, const Order o)
+    {
+      switch (o)
+	{
+	  // Piecewise cubic shape functions with linear flux edges
+	case SECOND:
+	  // The third-order Clough-Tocher shape functions
+	case THIRD:
+	  {
+	    switch (t)
+	      {
+		// The 2D clough defined on a 6-noded triangle
+	      case TRI6:
+		return 0;
+
+	      default:
+		{
+#ifdef DEBUG
+		  libMesh::err << "ERROR: Bad ElemType = " << t
+			       << " for " << o << "th order approximation!"
+			       << std::endl;
+#endif
+		  libmesh_error();
+		}
+
+	      }
+	  }
+	  // Otherwise no DOFS per element
+	default:
+	  libmesh_error();
+	  return 0;
+	}
+    } // clough_n_dofs_per_elem()
+
+  } // anonymous
 
 
 
-template <unsigned int Dim, FEFamily T>
-bool FE<Dim,T>::is_hierarchic() const
-{
-  return false;  // FIXME - this will be changed
-}
+
+  // Do full-specialization of nodal_soln() function for every
+  // dimension, instead of explicit instantiation at the end of this
+  // file.
+  // This could be macro-ified so that it fits on one line...
+  template <>
+  void FE<0,CLOUGH>::nodal_soln(const Elem* elem,
+				  const Order order,
+				  const std::vector<Number>& elem_soln,
+				  std::vector<Number>& nodal_soln)
+  { clough_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
+
+  template <>
+  void FE<1,CLOUGH>::nodal_soln(const Elem* elem,
+				  const Order order,
+				  const std::vector<Number>& elem_soln,
+				  std::vector<Number>& nodal_soln)
+  { clough_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
+
+  template <>
+  void FE<2,CLOUGH>::nodal_soln(const Elem* elem,
+				  const Order order,
+				  const std::vector<Number>& elem_soln,
+				  std::vector<Number>& nodal_soln)
+  { clough_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
+
+  template <>
+  void FE<3,CLOUGH>::nodal_soln(const Elem* elem,
+				  const Order order,
+				  const std::vector<Number>& elem_soln,
+				  std::vector<Number>& nodal_soln)
+  { clough_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
 
 
+  // Full specialization of n_dofs() function for every dimension
+  template <> unsigned int FE<0,CLOUGH>::n_dofs(const ElemType t, const Order o) { return clough_n_dofs(t, o); }
+  template <> unsigned int FE<1,CLOUGH>::n_dofs(const ElemType t, const Order o) { return clough_n_dofs(t, o); }
+  template <> unsigned int FE<2,CLOUGH>::n_dofs(const ElemType t, const Order o) { return clough_n_dofs(t, o); }
+  template <> unsigned int FE<3,CLOUGH>::n_dofs(const ElemType t, const Order o) { return clough_n_dofs(t, o); }
+
+
+  // Full specialization of n_dofs_at_node() function for every dimension.
+  template <> unsigned int FE<0,CLOUGH>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return clough_n_dofs_at_node(t, o, n); }
+  template <> unsigned int FE<1,CLOUGH>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return clough_n_dofs_at_node(t, o, n); }
+  template <> unsigned int FE<2,CLOUGH>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return clough_n_dofs_at_node(t, o, n); }
+  template <> unsigned int FE<3,CLOUGH>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return clough_n_dofs_at_node(t, o, n); }
+
+  // Full specialization of n_dofs_per_elem() function for every dimension.
+  template <> unsigned int FE<0,CLOUGH>::n_dofs_per_elem(const ElemType t, const Order o) { return clough_n_dofs_per_elem(t, o); }
+  template <> unsigned int FE<1,CLOUGH>::n_dofs_per_elem(const ElemType t, const Order o) { return clough_n_dofs_per_elem(t, o); }
+  template <> unsigned int FE<2,CLOUGH>::n_dofs_per_elem(const ElemType t, const Order o) { return clough_n_dofs_per_elem(t, o); }
+  template <> unsigned int FE<3,CLOUGH>::n_dofs_per_elem(const ElemType t, const Order o) { return clough_n_dofs_per_elem(t, o); }
+
+  // Clough FEMs are C^1 continuous
+  template <> FEContinuity FE<0,CLOUGH>::get_continuity() const { return C_ONE; }
+  template <> FEContinuity FE<1,CLOUGH>::get_continuity() const { return C_ONE; }
+  template <> FEContinuity FE<2,CLOUGH>::get_continuity() const { return C_ONE; }
+  template <> FEContinuity FE<3,CLOUGH>::get_continuity() const { return C_ONE; }
+
+  // Clough FEMs are not (currently) hierarchic
+  template <> bool FE<0,CLOUGH>::is_hierarchic() const { return false; } // FIXME - this will be changed
+  template <> bool FE<1,CLOUGH>::is_hierarchic() const { return false; } // FIXME - this will be changed
+  template <> bool FE<2,CLOUGH>::is_hierarchic() const { return false; } // FIXME - this will be changed
+  template <> bool FE<3,CLOUGH>::is_hierarchic() const { return false; } // FIXME - this will be changed
 
 #ifdef LIBMESH_ENABLE_AMR
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::compute_constraints (DofConstraints &constraints,
-				     DofMap &dof_map,
-				     const unsigned int variable_number,
-				     const Elem* elem)
-{
-  compute_proj_constraints(constraints, dof_map, variable_number, elem);
-}
+  // compute_constraints() specializations are only needed for 2 and 3D
+  template <>
+  void FE<2,CLOUGH>::compute_constraints (DofConstraints &constraints,
+					  DofMap &dof_map,
+					  const unsigned int variable_number,
+					  const Elem* elem)
+  { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
+
+  template <>
+  void FE<3,CLOUGH>::compute_constraints (DofConstraints &constraints,
+					  DofMap &dof_map,
+					  const unsigned int variable_number,
+					  const Elem* elem)
+  { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-
-
-template <unsigned int Dim, FEFamily T>
-bool FE<Dim,T>::shapes_need_reinit() const
-{
-  return true;
-}
-
-
-//--------------------------------------------------------------
-// Explicit instantiation of member functions
-INSTANTIATE_MBRF(0,CLOUGH);
-INSTANTIATE_MBRF(1,CLOUGH);
-INSTANTIATE_MBRF(2,CLOUGH);
-INSTANTIATE_MBRF(3,CLOUGH);
-
-#ifdef LIBMESH_ENABLE_AMR
-template void FE<2,CLOUGH>::compute_constraints(DofConstraints&, DofMap&,
-                                                const unsigned int,
-                                                const Elem*);
-template void FE<3,CLOUGH>::compute_constraints(DofConstraints&, DofMap&,
-                                                const unsigned int,
-                                                const Elem*);
-#endif // #ifdef LIBMESH_ENABLE_AMR
+  // Clough FEM shapes need reinit
+  template <> bool FE<0,CLOUGH>::shapes_need_reinit() const { return true; }
+  template <> bool FE<1,CLOUGH>::shapes_need_reinit() const { return true; }
+  template <> bool FE<2,CLOUGH>::shapes_need_reinit() const { return true; }
+  template <> bool FE<3,CLOUGH>::shapes_need_reinit() const { return true; }
 
 } // namespace libMesh
