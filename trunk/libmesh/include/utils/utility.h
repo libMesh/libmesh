@@ -141,70 +141,52 @@ namespace Utility
    * An efficient template instantiation for raising
    * to an arbitrary integer power.
    */
-  template <int N>
+  template <int N, typename T>
+  struct do_pow {
+    static inline T apply (const T& x)
+      { 
+        libmesh_assert(N>1); 
+    
+        if (N%2) // odd exponent
+          return x * do_pow<N-1,T>::apply(x); 
+    
+        const T xNover2 = do_pow<N/2,T>::apply(x);
+
+        return xNover2*xNover2;
+      }
+  };
+
+  // An efficient compiler would distill N=6 down to 3
+  // multiplications, but an inefficient one (or a complicated
+  // T::operator*) might do worse, so we'll specialize here.
+  template <typename T>
+  struct do_pow<6,T> {
+    static inline T apply (const T& x)
+      {
+        const T x2 = x*x,
+                x4 = x2*x2;
+
+        return x4*x2; 
+      }
+  };
+
+  template <typename T>
+  struct do_pow<1,T> {
+    static inline T apply (const T& x) { return x; }
+  };
+
+  template <typename T>
+  struct do_pow<0,T> {
+    static inline T apply (const T&) { return 1; }
+  };
+
+
+  template <int N, typename T>
   inline
-  Real pow(const Real x) 
+  T pow(const T& x) 
   { 
-    libmesh_assert(N>1); 
-    
-    if (N%2) // odd exponent
-      return x * pow<N-1>(x); 
-    
-    const Real xNover2 = pow<N/2>(x);
-
-    return xNover2*xNover2;
+    return do_pow<N,T>::apply(x);
   }
-
-  template <>
-  inline
-  Real pow<8>(const Real x) 
-  {
-    const Real 
-      x2 = x*x,
-      x4 = x2*x2,
-      x8 = x4*x4;
-
-    return x8; 
-  }
-
-  template <>
-  inline
-  Real pow<6>(const Real x) 
-  {
-    const Real 
-      x2 = x*x,
-      x4 = x2*x2,
-      x6 = x4*x2;
-
-    return x6; 
-  }
-
-  template <>
-  inline
-  Real pow<4>(const Real x) 
-  {
-    const Real 
-      x2 = x*x,
-      x4 = x2*x2;
-    return x4; 
-  }
-
-  template <>
-  inline
-  Real pow<3>(const Real x) { return x*x*x; }
-
-  template <>
-  inline
-  Real pow<2>(const Real x) { return x*x; }
-
-  template <>
-  inline
-  Real pow<1>(const Real x) { return x; }
-
-  template <>
-  inline
-  Real pow<0>(const Real) { return 1.; }
-
 
   //-------------------------------------------------------------------
   /**
