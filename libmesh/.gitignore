@@ -35,6 +35,8 @@ examples/ex11/out.e
 examples/ex13/out_*.e
 examples/ex14/lshaped.e
 examples/ex15/2D_hermite_uniform.e
+examples/ex15/2D_clough_uniform.e
+examples/ex15/*.m
 examples/ex18/out_*.e
 examples/ex19/out.e
 examples/ex22/out_*.e
