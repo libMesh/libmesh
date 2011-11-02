@@ -22,7 +22,6 @@
 // Local includes
 #include "dof_map.h"
 #include "fe.h"
-#include "fe_macro.h"
 #include "elem.h"
 
 namespace libMesh

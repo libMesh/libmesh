@@ -22,7 +22,6 @@
 // Local includes
 #include "elem.h"
 #include "fe.h"
-#include "fe_macro.h"
 #include "fe_interface.h"
 
 namespace libMesh

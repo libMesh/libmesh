@@ -24,7 +24,6 @@
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
 #include "fe.h"
-#include "fe_macro.h"
 #include "elem.h"
 #include "fe_interface.h"
 

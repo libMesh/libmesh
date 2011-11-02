@@ -21,7 +21,6 @@
 
 // Local includes
 #include "fe.h"
-#include "fe_macro.h"
 #include "elem.h"
 #include "fe_interface.h"
 
