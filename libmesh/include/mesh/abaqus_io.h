@@ -31,23 +31,23 @@
 namespace libMesh
 {
   /**
-   * The Abaqus_IO class is a preliminary implementation for reading
+   * The AbaqusIO class is a preliminary implementation for reading
    * Abaqus mesh files in ASCII format.
    *
    * @author John W. Peterson, 2011.
    */
-  class Abaqus_IO : public MeshInput<MeshBase>
+  class AbaqusIO : public MeshInput<MeshBase>
   {
   public:
     /**
      * Constructor.  Takes a writeable reference to a mesh object.
      */
-    Abaqus_IO (MeshBase& mesh);
+    AbaqusIO (MeshBase& mesh);
 
     /**
      * Destructor.
      */
-    virtual ~Abaqus_IO ();
+    virtual ~AbaqusIO ();
 
     /**
      * This method implements reading a mesh from a specified file.
