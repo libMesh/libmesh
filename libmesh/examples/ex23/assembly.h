@@ -1,3 +1,6 @@
+#ifndef __assembly_h__
+#define __assembly_h__
+
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
 #include "dense_matrix.h"
@@ -267,4 +270,7 @@ struct Ex23RBAssemblyExpansion : RBAssemblyExpansion
   OutputAssembly L2;
   OutputAssembly L3;
 };
+
+#endif
+
 
