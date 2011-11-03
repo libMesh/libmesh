@@ -51,6 +51,7 @@
 #include "xdr_io.h"
 #include "legacy_xdr_io.h"
 #include "vtk_io.h"
+#include "abaqus_io.h"
 
 #include LIBMESH_INCLUDE_UNORDERED_MAP
 
@@ -644,6 +645,9 @@ void UnstructuredMesh::read (const std::string& name,
 
 	  else if (new_name.rfind(".vtu") < new_name.size())
 	    VTKIO(*this).read(new_name);
+
+	  else if (new_name.rfind(".inp") < new_name.size())
+	    AbaqusIO(*this).read(new_name);
       
 	  else
 	    {
@@ -659,6 +663,7 @@ void UnstructuredMesh::read (const std::string& name,
 			<< "     *.ucd  -- AVS's ASCII UCD format\n"
 			<< "     *.unv  -- I-deas Universal format\n"
 			<< "     *.vtu  -- Paraview VTK format\n"
+			<< "     *.inp  -- Abaqus .inp format\n"
 			<< "     *.xda  -- libMesh ASCII format\n"
 			<< "     *.xdr  -- libMesh binary format\n"
 			<< "     *.gz   -- any above format gzipped\n"

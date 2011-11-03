@@ -167,7 +167,7 @@ namespace
 namespace libMesh
 {
 
-  Abaqus_IO::Abaqus_IO (MeshBase& mesh) :
+  AbaqusIO::AbaqusIO (MeshBase& mesh) :
     MeshInput<MeshBase> (mesh),
     build_sidesets_from_nodesets(false),
     _already_seen_part(false),
@@ -178,14 +178,14 @@ namespace libMesh
 
 
 
-  Abaqus_IO::~Abaqus_IO ()
+  AbaqusIO::~AbaqusIO ()
   {
   }
 
 
 
 
-  void Abaqus_IO::read (const std::string& fname)
+  void AbaqusIO::read (const std::string& fname)
   {
     // Get a reference to the mesh we are reading
     MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -392,7 +392,7 @@ namespace libMesh
 
 
 
-  void Abaqus_IO::read_nodes()
+  void AbaqusIO::read_nodes()
   {
     // Get a reference to the mesh we are reading
     MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -451,7 +451,7 @@ namespace libMesh
 
 
 
-  void Abaqus_IO::read_elements(std::string upper)
+  void AbaqusIO::read_elements(std::string upper)
   {
     // Some *Element sections also specify an Elset name on the same line.
     // Look for one here.
@@ -646,7 +646,7 @@ namespace libMesh
 
 
 
-  std::string Abaqus_IO::parse_label(std::string line, std::string label_name)
+  std::string AbaqusIO::parse_label(std::string line, std::string label_name)
   {
     // Do all string comparisons in upper-case
     std::string upper_line(line), upper_label_name(label_name);
@@ -677,7 +677,7 @@ namespace libMesh
 
 
 
-  void Abaqus_IO::read_ids(std::string set_name, container_t& container)
+  void AbaqusIO::read_ids(std::string set_name, container_t& container)
   {
     // Grab a reference to a vector that will hold all the IDs
     std::vector<unsigned>& id_storage = container[set_name];
@@ -731,7 +731,7 @@ namespace libMesh
 
 
 
-  void Abaqus_IO::read_sideset(std::string sideset_name, sideset_container_t& container)
+  void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t& container)
   {
     // Grab a reference to a vector that will hold all the IDs
     std::vector<std::pair<unsigned, unsigned> >& id_storage = container[sideset_name];
@@ -766,7 +766,7 @@ namespace libMesh
 
 
 
-  void Abaqus_IO::assign_subdomain_ids()
+  void AbaqusIO::assign_subdomain_ids()
   {
     // Get a reference to the mesh we are reading
     MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -821,7 +821,7 @@ namespace libMesh
 
 
 
-  void Abaqus_IO::assign_boundary_node_ids()
+  void AbaqusIO::assign_boundary_node_ids()
   {
     // Get a reference to the mesh we are reading
     MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -859,7 +859,7 @@ namespace libMesh
 
 
 
-  void Abaqus_IO::assign_sideset_ids()
+  void AbaqusIO::assign_sideset_ids()
   {
     // Get a reference to the mesh we are reading
     MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -922,7 +922,7 @@ namespace libMesh
 
 
 
-  void Abaqus_IO::process_and_discard_comments()
+  void AbaqusIO::process_and_discard_comments()
   {
     std::string dummy;
     while (true)
