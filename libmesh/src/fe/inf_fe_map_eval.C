@@ -29,9 +29,9 @@ namespace libMesh
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
-				     const Order, /* not used */
-				     const unsigned int i)
+Real InfFE<Dim,T_radial,T_map>::eval(Real v,
+				     Order, /* not used */
+				     unsigned int i)
 {
   libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
@@ -56,9 +56,9 @@ Real InfFE<Dim,T_radial,T_map>::eval(const Real v,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
-					   const Order, /* not used */
-					   const unsigned int i)
+Real InfFE<Dim,T_radial,T_map>::eval_deriv(Real v,
+					   Order, /* not used */
+					   unsigned int i)
 {
   libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
@@ -96,12 +96,13 @@ Real InfFE<Dim,T_radial,T_map>::eval_deriv(const Real v,
 // template class InfFE<2,INFINITE_MAP,ELLIPSOIDAL>;
 // template class InfFE<3,INFINITE_MAP,ELLIPSOIDAL>;
 
-template Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval(const Real,const Order,const unsigned int);
-template Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
-template Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval(const Real,const Order,const unsigned int);
-template Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
-template Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval(const Real,const Order,const unsigned int);
-template Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval_deriv(const Real,const Order,const unsigned int);
+template Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval(Real, Order, unsigned);
+template Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval(Real, Order, unsigned);
+template Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval(Real, Order, unsigned);
+
+template Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval_deriv(Real, Order, unsigned);
+template Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval_deriv(Real, Order, unsigned);
+template Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval_deriv(Real, Order, unsigned);
 
 } // namespace libMesh
 

@@ -2648,15 +2648,15 @@ namespace libMesh
 
   // Specialize the eval() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
   // to call the local helper function from the anonymous namespace.
-  template <> Real InfFE<1,LAGRANGE,CARTESIAN>::eval(const Real v, const Order o, const unsigned i) { return lagrange_eval(v, o, i); }
-  template <> Real InfFE<2,LAGRANGE,CARTESIAN>::eval(const Real v, const Order o, const unsigned i) { return lagrange_eval(v, o, i); }
-  template <> Real InfFE<3,LAGRANGE,CARTESIAN>::eval(const Real v, const Order o, const unsigned i) { return lagrange_eval(v, o, i); }
+  template <> Real InfFE<1,LAGRANGE,CARTESIAN>::eval(Real v, Order o, unsigned i) { return lagrange_eval(v, o, i); }
+  template <> Real InfFE<2,LAGRANGE,CARTESIAN>::eval(Real v, Order o, unsigned i) { return lagrange_eval(v, o, i); }
+  template <> Real InfFE<3,LAGRANGE,CARTESIAN>::eval(Real v, Order o, unsigned i) { return lagrange_eval(v, o, i); }
 
   // Specialize the eval_deriv() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
   // to call the local helper function from the anonymous namespace.
-  template <> Real InfFE<1,LAGRANGE,CARTESIAN>::eval_deriv(const Real v, const Order o, const unsigned i) { return lagrange_eval_deriv(v, o, i); }
-  template <> Real InfFE<2,LAGRANGE,CARTESIAN>::eval_deriv(const Real v, const Order o, const unsigned i) { return lagrange_eval_deriv(v, o, i); }
-  template <> Real InfFE<3,LAGRANGE,CARTESIAN>::eval_deriv(const Real v, const Order o, const unsigned i) { return lagrange_eval_deriv(v, o, i); }
+  template <> Real InfFE<1,LAGRANGE,CARTESIAN>::eval_deriv(Real v, Order o, unsigned i) { return lagrange_eval_deriv(v, o, i); }
+  template <> Real InfFE<2,LAGRANGE,CARTESIAN>::eval_deriv(Real v, Order o, unsigned i) { return lagrange_eval_deriv(v, o, i); }
+  template <> Real InfFE<3,LAGRANGE,CARTESIAN>::eval_deriv(Real v, Order o, unsigned i) { return lagrange_eval_deriv(v, o, i); }
 
 
 } // namespace libMesh
