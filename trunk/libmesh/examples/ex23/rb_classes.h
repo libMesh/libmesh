@@ -17,11 +17,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __simple_rb_h__
-#define __simple_rb_h__
+#ifndef __rb_classes_h__
+#define __rb_classes_h__
 
 #include "rb_construction.h"
 #include "fe_base.h"
+
+// local include
+#include "assembly.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
@@ -41,9 +44,23 @@ class SimpleRBEvaluation : public RBEvaluation
 public:
 
   /**
+   * Constructor. Just set the theta expansion.
+   */
+  SimpleRBEvaluation()
+  {
+    rb_theta_expansion = &ex23_rb_theta_expansion;
+  }
+
+  /**
    * The coercivity constant is bounded below by 0.05.
    */
   virtual Real get_stability_lower_bound() { return 0.05; }
+
+  /**
+   * The object that stores the "theta" expansion of the parameter dependent PDE,
+   * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
+   */
+  Ex23RBThetaExpansion ex23_rb_theta_expansion;
 
 };
 
@@ -82,6 +99,19 @@ public:
     u_var = this->add_variable ("u", FIRST);
 
     Parent::init_data();
+
+    // Attach rb_theta_expansion and rb_assembly_expansion
+    // to this Construction object.
+    // This also checks that the expansion objects are sized consistently
+    attach_affine_expansion(ex23_rb_theta_expansion,
+                            ex23_rb_assembly_expansion);
+
+
+    // Attach the object that determines the Dirichlet boundary conditions for the PDE
+    attach_dirichlet_dof_initialization(&dirichlet_assembly);
+
+    // We need to define an inner product matrix for this problem
+    attach_inner_prod_assembly(&ex23_rb_assembly_expansion.A0_assembly);
   }
 
   /**
@@ -101,6 +131,24 @@ public:
    * Variable number for u.
    */
   unsigned int u_var;
+
+  /**
+   * The object that stores the "theta" expansion of the parameter dependent PDE,
+   * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
+   */
+  Ex23RBThetaExpansion ex23_rb_theta_expansion;
+  
+  /**
+   * The object that stores the "assembly" expansion of the parameter dependent PDE,
+   * i.e. the objects that define how to assemble the set of parameter-independent
+   * operators in the affine expansion of the PDE.
+   */
+  Ex23RBAssemblyExpansion ex23_rb_assembly_expansion;
+
+  /**
+   * The object that defines which degrees of freedom are on a Dirichlet boundary.
+   */
+  Ex23DirichletDofAssembly dirichlet_assembly;
 
 };
 

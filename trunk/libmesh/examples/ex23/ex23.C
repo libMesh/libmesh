@@ -35,7 +35,7 @@
 #include "elem.h"
 
 // local includes
-#include "simple_rb.h"
+#include "rb_classes.h"
 #include "assembly.h"
 
 // Bring in everything from the libMesh namespace
@@ -113,35 +113,12 @@ int main (int argc, char** argv)
   equation_systems.print_info();
   mesh.print_info();
 
-  // Now that the libMesh data structures have been initialized
-  // in equation_systems.init(), we can set up the Reduced Basis system.
-
-  // Construct an Ex23RBThetaExpansion object (see assembly.h)
-  Ex23RBThetaExpansion rb_theta_expansion;
-  
-  // Construct an Ex23RBAssemblyExpansion object (see assembly.h)
-  Ex23RBAssemblyExpansion rb_assembly_expansion;
-
-  // Attach rb_theta_expansion and rb_assembly_expansion to rb_con
-  // This also checks that the expansion objects are sized consistently
-  rb_con.attach_affine_expansion(rb_theta_expansion, rb_assembly_expansion);
-
-  // Attach the object that determines the Dirichlet boundary conditions for the PDE
-  Ex23DirichletDofAssembly dirichlet_assembly;
-  rb_con.attach_dirichlet_dof_initialization(&dirichlet_assembly);
-
-  // We reuse the operator A0 as the inner product matrix
-  rb_con.attach_inner_prod_assembly(&rb_assembly_expansion.A0_assembly);
-
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
   SimpleRBEvaluation rb_eval;
-
-  // Set rb_eval's rb_theta_expansion
-  rb_eval.rb_theta_expansion = &rb_theta_expansion;
-
-  // Finally, we need to give the RBConstruction object a pointer to
+  
+  // We need to give the RBConstruction object a pointer to
   // our RBEvaluation object
   rb_con.rb_eval = &rb_eval;
 
