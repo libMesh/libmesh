@@ -493,18 +493,18 @@ protected:
    * Infinite elements in quasi-static materially nonlinear problems,
    * @e Computers @e and @e Structures, 1984.
    */
-  static Real eval(const Real v,
-		   const Order o_radial,
-		   const unsigned int i);
+  static Real eval(Real v,
+		   Order o_radial,
+		   unsigned int i);
   
   /**
    * @returns the value of the first derivative of the
    * \f$ i^{th} \f$ polynomial at coordinate \p v.
    * See \p eval for details.
    */
-  static Real eval_deriv(const Real v,
-			 const Order o_radial,
-			 const unsigned int i);
+  static Real eval_deriv(Real v,
+			 Order o_radial,
+			 unsigned int i);
 
 
 

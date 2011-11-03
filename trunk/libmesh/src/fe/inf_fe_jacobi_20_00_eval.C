@@ -472,15 +472,15 @@ namespace libMesh
 
   // Specialize the eval() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
   // to call the local helper function from the anonymous namespace.
-  template <> Real InfFE<1,JACOBI_20_00,CARTESIAN>::eval(const Real v, const Order, const unsigned i) { return jacobi_20_00_eval(v, i); }
-  template <> Real InfFE<2,JACOBI_20_00,CARTESIAN>::eval(const Real v, const Order, const unsigned i) { return jacobi_20_00_eval(v, i); }
-  template <> Real InfFE<3,JACOBI_20_00,CARTESIAN>::eval(const Real v, const Order, const unsigned i) { return jacobi_20_00_eval(v, i); }
+  template <> Real InfFE<1,JACOBI_20_00,CARTESIAN>::eval(Real v, Order, unsigned i) { return jacobi_20_00_eval(v, i); }
+  template <> Real InfFE<2,JACOBI_20_00,CARTESIAN>::eval(Real v, Order, unsigned i) { return jacobi_20_00_eval(v, i); }
+  template <> Real InfFE<3,JACOBI_20_00,CARTESIAN>::eval(Real v, Order, unsigned i) { return jacobi_20_00_eval(v, i); }
 
   // Specialize the eval_deriv() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
   // to call the local helper function from the anonymous namespace.
-  template <> Real InfFE<1,JACOBI_20_00,CARTESIAN>::eval_deriv(const Real v, const Order, const unsigned i) { return jacobi_20_00_eval_deriv(v, i); }
-  template <> Real InfFE<2,JACOBI_20_00,CARTESIAN>::eval_deriv(const Real v, const Order, const unsigned i) { return jacobi_20_00_eval_deriv(v, i); }
-  template <> Real InfFE<3,JACOBI_20_00,CARTESIAN>::eval_deriv(const Real v, const Order, const unsigned i) { return jacobi_20_00_eval_deriv(v, i); }
+  template <> Real InfFE<1,JACOBI_20_00,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return jacobi_20_00_eval_deriv(v, i); }
+  template <> Real InfFE<2,JACOBI_20_00,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return jacobi_20_00_eval_deriv(v, i); }
+  template <> Real InfFE<3,JACOBI_20_00,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return jacobi_20_00_eval_deriv(v, i); }
 
 } // namespace libMesh
 
