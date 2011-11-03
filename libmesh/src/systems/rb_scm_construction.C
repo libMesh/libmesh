@@ -46,7 +46,6 @@ RBSCMConstruction::RBSCMConstruction (EquationSystems& es,
                           const std::string& name,
                           const unsigned int number)
   : Parent(es, name, number),
-    parameters_filename(""),
     rb_scm_eval(NULL),
     SCM_eps(0.5),
     RB_system_name("")
@@ -72,7 +71,7 @@ void RBSCMConstruction::clear()
   Parent::clear();
 }
 
-void RBSCMConstruction::initialize_SCM_system ()
+void RBSCMConstruction::process_parameters_file(const std::string& parameters_filename)
 {
   // First read in data from parameters_filename
   GetPot infile(parameters_filename);
@@ -91,10 +90,6 @@ void RBSCMConstruction::initialize_SCM_system ()
   // SCM Greedy termination tolerance
   const Real SCM_eps_in = infile("SCM_eps", SCM_eps);
   set_SCM_eps(SCM_eps_in);
-
-  // Resize the bounding box vectors
-  rb_scm_eval->B_min.resize(rb_theta_expansion->get_Q_a());
-  rb_scm_eval->B_max.resize(rb_theta_expansion->get_Q_a());
 
   std::vector<Real> mu_min_vector(n_SCM_parameters);
   std::vector<Real> mu_max_vector(n_SCM_parameters);
@@ -118,20 +113,30 @@ void RBSCMConstruction::initialize_SCM_system ()
                                  n_SCM_training_samples,
                                  log_scaling,
                                  deterministic_training);
+}
 
+void RBSCMConstruction::print_info()
+{
+  // Print out info that describes the current setup
   libMesh::out << std::endl << "RBSCMConstruction parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
-  libMesh::out << "Q_a: " << rb_theta_expansion->get_Q_a() << std::endl;
-  libMesh::out << "SCM_eps: " << get_SCM_eps() << std::endl;
-  for(unsigned int i=0; i<n_SCM_parameters; i++)
+  libMesh::out << "SCM Greedy tolerance: " << get_SCM_eps() << std::endl;
+  if(rb_theta_expansion)
   {
-    libMesh::out <<   "SCM Parameter " << i
+    libMesh::out << "A_q operators attached: " << rb_theta_expansion->get_Q_a() << std::endl;
+    libMesh::out << "Number of parameters: "   << get_n_params() << std::endl;
+  }
+  else
+  {
+    libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
+  }
+  for(unsigned int i=0; i<get_n_params(); i++)
+  {
+    libMesh::out <<   "Parameter " << i
                  << ": Min = " << get_parameter_min(i)
-                 << ", Max = " << get_parameter_max(i)
-                 << ", log scaling = " << log_scaling[i] << std::endl;
+                 << ", Max = " << get_parameter_max(i) << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
-  libMesh::out << "using deterministic training samples? " << deterministic_training << std::endl;
   libMesh::out << std::endl;
 }
 
@@ -224,6 +229,10 @@ void RBSCMConstruction::perform_SCM_greedy()
 void RBSCMConstruction::compute_SCM_bounding_box()
 {
   START_LOG("compute_SCM_bounding_box()", "RBSCMConstruction");
+
+  // Resize the bounding box vectors
+  rb_scm_eval->B_min.resize(rb_theta_expansion->get_Q_a());
+  rb_scm_eval->B_max.resize(rb_theta_expansion->get_Q_a());
 
   for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
   {

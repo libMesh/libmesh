@@ -89,10 +89,15 @@ public:
   virtual void resize_SCM_vectors ();
 
   /**
-   * Read in the parameters from file and set up the system
-   * accordingly.
+   * Read in the parameters from file specified by \p parameters_filename
+   * and set the this system's member variables accordingly.
    */
-  virtual void initialize_SCM_system ();
+  virtual void process_parameters_file(const std::string& parameters_filename);
+
+  /**
+   * Print out info that describes the current setup of this RBSCMConstruction.
+   */
+  virtual void print_info();
 
   /**
    * This function is called before truth eigensolves in
@@ -134,12 +139,6 @@ public:
   virtual void attach_deflation_space() {}
 
   //----------- PUBLIC DATA MEMBERS -----------//
-
-  /**
-   * The filename of the text file from which we read in the
-   * problem parameters. We use getpot.h to perform the reading.
-   */
-  std::string parameters_filename;
 
   /**
    * The current RBSCMEvaluation object we are using to
