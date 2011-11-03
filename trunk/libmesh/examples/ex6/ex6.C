@@ -113,7 +113,7 @@ int main (int argc, char** argv)
   mesh.print_info();
 
   // Write the mesh before the infinite elements are added
-  ExodusII_IO(mesh).write ("orig_mesh.exd");
+  ExodusII_IO(mesh).write ("orig_mesh.e");
 
   // Normally, when a mesh is imported or created in
   // libMesh, only conventional elements exist.  The infinite
@@ -138,7 +138,7 @@ int main (int argc, char** argv)
 
   // Write the mesh with the infinite elements added.
   // Compare this to the original mesh.
-  ExodusII_IO(mesh).write ("ifems_added.exd");
+  ExodusII_IO(mesh).write ("ifems_added.e");
 
   // After building infinite elements, we have to let 
   // the elements find their neighbors again.
