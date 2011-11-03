@@ -79,6 +79,12 @@ void RBSCMConstruction::initialize_SCM_system ()
   const unsigned int n_SCM_parameters = infile("n_SCM_parameters",1);
   const unsigned int n_SCM_training_samples = infile("n_SCM_training_samples",1);
   const bool deterministic_training = infile("deterministic_training",false);
+
+  // Read in training_parameters_random_seed value.  This is used to
+  // seed the RNG when picking the training parameters.  By default the
+  // value is -1, which means use std::time to seed the RNG.
+  training_parameters_random_seed = infile("training_parameters_random_seed",
+					   training_parameters_random_seed);
   
   set_n_params( n_SCM_parameters );
 
