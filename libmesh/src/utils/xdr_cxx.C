@@ -1,4 +1,4 @@
-// "$Id$\n"
+// "$Id$"
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
