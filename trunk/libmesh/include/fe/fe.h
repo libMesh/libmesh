@@ -59,7 +59,7 @@ class InfFE;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 4791 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -473,7 +473,7 @@ protected:
  *
  * \author Roy Stogner
  * \date 2004
- * \version $Revision: 4791 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -498,7 +498,7 @@ public:
  *
  * \author Roy Stogner
  * \date 2005
- * \version $Revision: 4791 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -533,7 +533,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 4791 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -558,7 +558,7 @@ public:
  *
  * \author Truman E. Ellis
  * \date 2011
- * \version $Revision: 4791 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -583,7 +583,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 4791 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -608,7 +608,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 4791 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
@@ -650,7 +650,7 @@ public:
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
- * \version $Revision: 4791 $
+ * \version $Revision$
  */
 
 //-------------------------------------------------------------
