@@ -1060,7 +1060,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
       actual_id = std::numeric_limits<int>::max();
 */      
 
-    ex_err = exII::ex_put_side_set_param(ex_id, actual_id, elem[ss_id].size(), 4);
+    ex_err = exII::ex_put_side_set_param(ex_id, actual_id, elem[ss_id].size(), 0);
     check_err(ex_err, "Error writing sideset parameters");
 
     ex_err = exII::ex_put_side_set(ex_id, actual_id, &elem[ss_id][0], &side[ss_id][0]);
