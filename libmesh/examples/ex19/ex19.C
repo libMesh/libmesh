@@ -1,4 +1,4 @@
-/* $Id: ex4.C 2501 2007-11-20 02:33:29Z benkirk $ */
+/* $Id$ */
 
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
