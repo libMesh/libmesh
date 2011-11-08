@@ -48,50 +48,24 @@ struct ScalarTraits {
       static const bool value = false;
 };
 
-template<>
-struct ScalarTraits<signed char> { static const bool value = true; };
+#define ScalarTraits_true(type) \
+template<> \
+struct ScalarTraits<type> { static const bool value = true; }
 
-template<>
-struct ScalarTraits<char> { static const bool value = true; };
+ScalarTraits_true(char);
+ScalarTraits_true(short);
+ScalarTraits_true(int);
+ScalarTraits_true(long);
+ScalarTraits_true(unsigned char);
+ScalarTraits_true(unsigned short);
+ScalarTraits_true(unsigned int);
+ScalarTraits_true(unsigned long);
+ScalarTraits_true(float);
+ScalarTraits_true(double);
+ScalarTraits_true(long double);
 
-template<>
-struct ScalarTraits<short> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<int> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<long> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<unsigned char> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<unsigned short> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<unsigned int> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<unsigned long> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<float> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<double> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<long double> { static const bool value = true; };
-
-template<>
-struct ScalarTraits<std::complex<float> > { static const bool value = true; };
-
-template<>
-struct ScalarTraits<std::complex<double> > { static const bool value = true; };
-
-template<>
-struct ScalarTraits<std::complex<long double> > { static const bool value = true; };
+template<typename T>
+struct ScalarTraits<std::complex<T> > { static const bool value = ScalarTraits<T>::value; };
 
 
 
@@ -107,44 +81,6 @@ struct CompareTypes {
   typedef void supertype;
 };
 
-// There's got to be some magic template way to do these better - but the best
-// thing on the net requires a bunch of Alexandrescu's code and doesn't work
-// with older compilers
-
-#define SUPERTYPE(mysub,mysuper) \
-	template<> \
-	struct CompareTypes<mysub, mysuper> { \
-	  typedef mysuper supertype; \
-	}; \
-	template<> \
-	struct CompareTypes<mysuper, mysub> { \
-	  typedef mysuper supertype; \
-	}; \
-	template<> \
-	struct CompareTypes<std::complex<mysub>, mysuper> { \
-	  typedef std::complex<mysuper> supertype; \
-	}; \
-	template<> \
-	struct CompareTypes<mysuper, std::complex<mysub> > { \
-	  typedef std::complex<mysuper> supertype; \
-	}; \
-	template<> \
-	struct CompareTypes<mysub, std::complex<mysuper> > { \
-	  typedef std::complex<mysuper> supertype; \
-	}; \
-	template<> \
-	struct CompareTypes<std::complex<mysuper>, mysub> { \
-	  typedef std::complex<mysuper> supertype; \
-	}; \
-	template<> \
-	struct CompareTypes<std::complex<mysub>, std::complex<mysuper> > { \
-	  typedef std::complex<mysuper> supertype; \
-	}; \
-	template<> \
-	struct CompareTypes<std::complex<mysuper>, std::complex<mysub> > { \
-	  typedef std::complex<mysuper> supertype; \
-	}
-
 template<typename T>
 struct CompareTypes<T, T> {
   typedef T supertype;
@@ -159,6 +95,26 @@ template<typename T>
 struct CompareTypes<std::complex<T>, T> {
   typedef std::complex<T> supertype;
 };
+
+// There's got to be some magic template way to do these better - but the best
+// thing on the net requires a bunch of Alexandrescu's code and doesn't work
+// with older compilers
+
+#define CompareTypes_super(a,b,super) \
+	template<> \
+	struct CompareTypes<a, b> { \
+	  typedef super supertype; \
+	}
+
+#define SUPERTYPE(mysub,mysuper) \
+        CompareTypes_super(mysub, mysuper, mysuper); \
+        CompareTypes_super(mysuper, mysub, mysuper); \
+        CompareTypes_super(std::complex<mysub>, mysuper, std::complex<mysuper>); \
+        CompareTypes_super(mysuper, std::complex<mysub>, std::complex<mysuper>); \
+        CompareTypes_super(mysub, std::complex<mysuper>, std::complex<mysuper>); \
+        CompareTypes_super(std::complex<mysuper>, mysub, std::complex<mysuper>); \
+        CompareTypes_super(std::complex<mysub>, std::complex<mysuper>, std::complex<mysuper>); \
+        CompareTypes_super(std::complex<mysuper>, std::complex<mysub>, std::complex<mysuper>)
 
 SUPERTYPE(unsigned char, short);
 SUPERTYPE(unsigned char, int);
