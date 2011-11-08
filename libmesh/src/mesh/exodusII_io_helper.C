@@ -620,7 +620,10 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
   if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
     return;
 
-  num_dim = mesh.spatial_dimension();
+  if (_use_mesh_dimension_instead_of_spatial_dimension)
+    num_dim = mesh.mesh_dimension();
+  else
+    num_dim = mesh.spatial_dimension();
 
   MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
@@ -676,7 +679,11 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
     return;
 
-  num_dim = mesh.spatial_dimension();
+  if (_use_mesh_dimension_instead_of_spatial_dimension)
+    num_dim = mesh.mesh_dimension();
+  else
+    num_dim = mesh.spatial_dimension();
+
   num_nodes = mesh.n_nodes();
   num_elem = mesh.n_elem();
 
@@ -1372,6 +1379,14 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values,
   ex_err = exII::ex_update(ex_id);
   check_err(ex_err, "Error flushing buffers to file.");
 }
+
+
+
+void ExodusII_IO_Helper::use_mesh_dimension_instead_of_spatial_dimension(bool val)
+{
+  _use_mesh_dimension_instead_of_spatial_dimension = val;
+}
+
 
 
 

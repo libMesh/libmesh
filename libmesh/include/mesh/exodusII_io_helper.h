@@ -84,8 +84,8 @@ public:
     _verbose(v),
     _run_only_on_proc0(run_only_on_proc0),
     _elem_vars_initialized(false),
-    _global_vars_initialized(false)
-
+    _global_vars_initialized(false),
+    _use_mesh_dimension_instead_of_spatial_dimension(false)
   {
     title.resize(MAX_LINE_LENGTH+1);
     elem_type.resize(MAX_STR_LENGTH);
@@ -524,7 +524,15 @@ public:
    */
   void write_global_values(const std::vector<Number> & values, int timestep);
 
-
+  /**
+   * Sets the underlying value of the boolean flag
+   * _use_mesh_dimension_instead_of_spatial_dimension.  By default,
+   * the value of this flag is false.
+   *
+   * See the ExodusII_IO class documentation for a detailed
+   * description of this flag.
+   */
+  void use_mesh_dimension_instead_of_spatial_dimension(bool val);
 
   /**
    * This is the \p ExodusII_IO_Helper Conversion class.
@@ -650,6 +658,13 @@ public:
   bool _run_only_on_proc0; // If true, whenever there is an I/O operation, only perform if if we are on processor 0.
   bool _elem_vars_initialized; // True once the elem vars are initialized
   bool _global_vars_initialized; // True once the global vars are initialized
+
+  /**
+   * If true, use the Mesh's dimension (as determined by the dimension
+   * of the elements comprising the mesh) instead of the mesh's
+   * spatial dimension, when writing.  By default this is false.
+   */
+  bool _use_mesh_dimension_instead_of_spatial_dimension;
 };
 
 

@@ -88,6 +88,15 @@ void ExodusII_IO::verbose (bool set_verbosity)
 
 
 
+  void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
+  { 
+#ifdef LIBMESH_HAVE_EXODUS_API
+    exio_helper->use_mesh_dimension_instead_of_spatial_dimension(val);
+#endif
+  }
+
+
+
 void ExodusII_IO::read (const std::string& fname)
 {
   // This is a serial-only process for now;

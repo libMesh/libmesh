@@ -144,6 +144,19 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    */
   void set_output_variables(const std::vector<std::string> & output_variables) { _output_variables = output_variables; }
   
+  /**
+   * In the general case, meshes containing 2D elements can be
+   * manifolds living in 3D space, thus by default we write all
+   * meshes with the Exodus dimension set to LIBMESH_DIM = 
+   * mesh.spatial_dimension().
+   * 
+   * In certain cases, however, the user may know his 2D mesh actually
+   * lives in the z=0 plane, and therefore wants to write a truly 2D
+   * Exodus mesh.  In such a case, he should call this function with
+   * val=true.
+   */
+  void use_mesh_dimension_instead_of_spatial_dimension(bool val);
+
  private:
   /**
    * Only attempt to instantiate an ExodusII helper class
