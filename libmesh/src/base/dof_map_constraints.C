@@ -225,7 +225,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   // nest threads within threads we'll make sure it's preconstructed.
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (!_periodic_boundaries->empty())
-    mesh.point_locator();
+    mesh.sub_point_locator();
 #endif
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
