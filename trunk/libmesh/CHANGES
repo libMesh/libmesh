@@ -1,3 +1,24 @@
+0.7.1 -> 0.7.2
+  * Discontinuous hierarchic FE basis
+  * PatchRecoveryErrorEstimator patch reuse option
+  * New partitioning-aware Patch construction option
+  * More efficient adjoint solves with PETSc
+  * New projection example utility
+  * Bare System objects are now useful for efficient utilities
+  * Many Exodus/Nemesis output improvements
+  * BoundaryInfo::sync() is now AMR- and ParallelMesh-compatible
+  * More code is now ParallelMesh-compatible
+  * More flexible Parallel:: APIs
+  * Elem:: utilities for semi-structured grids
+  * NodeConstraints calculations for moving mesh users
+  * Stack trace output on any uncaught exception
+  * Corrected non-standard C++ in FE class specializations
+  * Multithreaded FEMSystem assembly functions
+  * Assorted efficiency improvements
+  * Various Trilinos, Tetgen, Triangle interface improvements
+  * Compatibility with newer third-party packages, compilers
+  * Many assorted bug fixes
+
 0.7.0 -> 0.7.1
   * Periodic boundary support enhancements
   * New example with subdomain-restricted variables
