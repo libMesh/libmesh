@@ -129,13 +129,6 @@ namespace libMesh
     } // l2_hierarchic_n_dofs()
 
 
-
-    unsigned int l2_hierarchic_n_dofs_per_elem(const ElemType t,
-					       const Order o)
-    {
-      return l2_hierarchic_n_dofs(t, o);
-    } // l2_hierarchic_n_dofs_per_elem()
-
   } // anonymous namespace
 
 
