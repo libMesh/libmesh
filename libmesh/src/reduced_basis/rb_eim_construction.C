@@ -540,11 +540,6 @@ void RBEIMConstruction::init_context(FEMContext &c)
   }
 }
 
-AutoPtr<RBEvaluation> RBEIMConstruction::build_rb_evaluation()
-{
-  return AutoPtr<RBEvaluation>(new RBEIMEvaluation(*this));
-}
-
 void RBEIMConstruction::update_RB_system_matrices()
 {
   START_LOG("update_RB_system_matrices()", "RBEIMConstruction");

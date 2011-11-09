@@ -139,11 +139,6 @@ public:
   virtual void init_context(FEMContext &c);
   
   /**
-   * Build a new RBEIMEvaluation object.
-   */
-  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
-
-  /**
    * Attach the parametrized function that we will approximate
    * using the Empirical Interpolation Method.
    */
