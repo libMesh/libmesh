@@ -295,6 +295,7 @@ libmesh_INCLUDE += -I$(libmesh_dir)/include/base \
                    -I$(libmesh_dir)/include/parallel \
                    -I$(libmesh_dir)/include/partitioning \
                    -I$(libmesh_dir)/include/quadrature \
+                   -I$(libmesh_dir)/include/reduced_basis \
                    -I$(libmesh_dir)/include/solvers \
                    -I$(libmesh_dir)/include/systems \
                    -I$(libmesh_dir)/include/utils
