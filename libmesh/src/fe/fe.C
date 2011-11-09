@@ -448,8 +448,8 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
  }
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  // Optimize for the affine elements case:
-  bool has_affine_map = elem->has_affine_map();
+  // Optimize for the *linear* geometric elements case:
+  bool is_linear = elem->is_linear();
   
   switch (Dim)
     {
@@ -494,7 +494,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
-        if (has_affine_map)
+        if (is_linear)
           {
 	    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
@@ -558,7 +558,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
-        if (has_affine_map)
+        if (is_linear)
           {
 	    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
@@ -635,7 +635,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
-        if (has_affine_map)
+        if (is_linear)
           {
 	    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
