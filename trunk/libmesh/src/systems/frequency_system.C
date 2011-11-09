@@ -107,7 +107,8 @@ void FrequencySystem::clear_all ()
   // EquationSystems object
   if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
     {
-      for (unsigned int n=0; n < es.parameters.get<unsigned int>("n_frequencies"); n++)
+      unsigned int n_frequencies = es.parameters.get<unsigned int>("n_frequencies");
+      for (unsigned int n=0; n < n_frequencies; n++)
 	es.parameters.remove(this->form_freq_param_name(n));
       es.parameters.remove("current frequency");
     }
