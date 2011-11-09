@@ -555,6 +555,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual bool has_affine_map () const { return false; }
 
   /**
+   * @returns true iff the Lagrange shape functions on this element
+   * are linear
+   */
+  virtual bool is_linear () const { return false; }
+
+  /**
    * Prints relevant information about the element.
    */
   void print_info (std::ostream& os=libMesh::out) const;

@@ -111,6 +111,12 @@ public:
   virtual bool has_affine_map () const { return true; }
 
   /**
+   * @returns true iff the Lagrange shape functions on this element
+   * are linear
+   */
+  virtual bool is_linear () const { return true; }
+
+  /**
    * @returns FIRST
    */
   Order default_order() const { return FIRST; }

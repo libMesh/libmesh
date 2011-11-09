@@ -96,6 +96,12 @@ class Edge2 : public Edge
   virtual bool has_affine_map () const { return true; }
 
   /**
+   * @returns true iff the Lagrange shape functions on this element
+   * are linear
+   */
+  virtual bool is_linear () const { return true; }
+
+  /**
    * @returns \p EDGE2
    */
   ElemType type()  const { return EDGE2; }
