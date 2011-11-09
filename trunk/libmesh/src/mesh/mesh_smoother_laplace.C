@@ -32,6 +32,23 @@
 namespace libMesh
 {
 
+
+  LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh& mesh)
+    : MeshSmoother(mesh),
+      _initialized(false)
+  {
+    // LaplaceMeshSmoother does not currently work with ParallelMesh...
+    if (!mesh.is_serial())
+      {
+	libMesh::err << "The LaplaceMeshSmoother does not currently support ParallelMesh!" << std::endl;
+	libmesh_error();
+      }
+
+  }
+
+
+
+
 // Member functions for the Laplace smoother
 void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 {
@@ -137,12 +154,10 @@ void LaplaceMeshSmoother::init()
       
     case 2: // Stolen directly from build_L_graph in mesh_base.C
       {
-	// Initialize space in the graph.  It is n_nodes
-	// long and each node is assumed to be connected to
-	// approximately 4 neighbors.
+	// Initialize space in the graph.  It is n_nodes long.  Each
+	// node may be connected to an arbitrary number of other nodes
+	// via edges.
 	_graph.resize(_mesh.n_nodes());
-// 	for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
-// 	  _graph[i].reserve(4);
 	
 	MeshBase::element_iterator       el  = _mesh.active_elements_begin();
 	const MeshBase::element_iterator end = _mesh.active_elements_end(); 
@@ -164,7 +179,7 @@ void LaplaceMeshSmoother::init()
 		    AutoPtr<Elem> side(elem->build_side(s));
 		    _graph[side->node(0)].push_back(side->node(1));
 		    _graph[side->node(1)].push_back(side->node(0));
-		}
+		  }
 	      }
 	  }
 	_initialized = true;
@@ -173,11 +188,8 @@ void LaplaceMeshSmoother::init()
 
     case 3: // Stolen blatantly from build_L_graph in mesh_base.C
       {
-	// Initialize space in the graph.  In 3D, I've assumed
-	// that each node was connected to approximately 3 neighbors.
+	// Initialize space in the graph.
 	_graph.resize(_mesh.n_nodes());
-// 	for (unsigned int i=0; i<_mesh.n_nodes(); ++i)
-// 	  _graph[i].reserve(8);
 	
 	MeshBase::element_iterator       el  = _mesh.active_elements_begin();
 	const MeshBase::element_iterator end = _mesh.active_elements_end(); 
