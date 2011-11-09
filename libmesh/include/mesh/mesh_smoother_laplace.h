@@ -60,9 +60,7 @@ public:
    * Constructor.  Sets the constant mesh reference
    * in the protected data section of the class.
    */
-  LaplaceMeshSmoother(UnstructuredMesh& mesh)
-    : MeshSmoother(mesh),
-      _initialized(false) {}
+  LaplaceMeshSmoother(UnstructuredMesh& mesh);
 
   /**
    * Destructor.

@@ -1559,69 +1559,85 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
         const Real rad_2      = .25*rad;
         const Real rad_sqrt_2 = rad/sqrt_2;
 
+	// For ParallelMesh, if we don't specify node IDs the Mesh
+	// will try to pick an appropriate (unique) one for us.  But
+	// since we are adding these nodes on all processors, we want
+	// to be sure they have consistent IDs across all processors.
+	unsigned node_id = 0;
+
 	// (Temporary) convenient storage for node pointers
 	std::vector<Node*> nodes(8);
 	    
 	// Point 0
-	nodes[0] = mesh.add_point (Point(-rad_2,-rad_2, 0.));
+	nodes[0] = mesh.add_point (Point(-rad_2,-rad_2, 0.), node_id++);
 	    
 	// Point 1
-	nodes[1] = mesh.add_point (Point( rad_2,-rad_2, 0.));
+	nodes[1] = mesh.add_point (Point( rad_2,-rad_2, 0.), node_id++);
 	    
 	// Point 2
-	nodes[2] = mesh.add_point (Point( rad_2, rad_2, 0.));
+	nodes[2] = mesh.add_point (Point( rad_2, rad_2, 0.), node_id++);
 
 	// Point 3
-	nodes[3] = mesh.add_point (Point(-rad_2, rad_2, 0.));
+	nodes[3] = mesh.add_point (Point(-rad_2, rad_2, 0.), node_id++);
 	    
 	// Point 4
-	nodes[4] = mesh.add_point (Point(-rad_sqrt_2,-rad_sqrt_2, 0.));
+	nodes[4] = mesh.add_point (Point(-rad_sqrt_2,-rad_sqrt_2, 0.), node_id++);
 	    
 	// Point 5
-	nodes[5] = mesh.add_point (Point( rad_sqrt_2,-rad_sqrt_2, 0.));
+	nodes[5] = mesh.add_point (Point( rad_sqrt_2,-rad_sqrt_2, 0.), node_id++);
 	    
 	// Point 6
-	nodes[6] = mesh.add_point (Point( rad_sqrt_2, rad_sqrt_2, 0.));
+	nodes[6] = mesh.add_point (Point( rad_sqrt_2, rad_sqrt_2, 0.), node_id++);
 	    
 	// Point 7
-	nodes[7] = mesh.add_point (Point(-rad_sqrt_2, rad_sqrt_2, 0.));
+	nodes[7] = mesh.add_point (Point(-rad_sqrt_2, rad_sqrt_2, 0.), node_id++);
 
 	// Build the elements & set node pointers
 	    
 	// Element 0
-	Elem* elem0 = mesh.add_elem (new Quad4);
-	elem0->set_node(0) = nodes[0];
-	elem0->set_node(1) = nodes[1];
-	elem0->set_node(2) = nodes[2];
-	elem0->set_node(3) = nodes[3];
-	    
+	{
+	  Elem* elem0 = mesh.add_elem (new Quad4);
+	  elem0->set_node(0) = nodes[0];
+	  elem0->set_node(1) = nodes[1];
+	  elem0->set_node(2) = nodes[2];
+	  elem0->set_node(3) = nodes[3];
+	}
+
 	// Element 1
-	Elem* elem1 = mesh.add_elem (new Quad4);
-	elem1->set_node(0) = nodes[4];
-	elem1->set_node(1) = nodes[0];
-	elem1->set_node(2) = nodes[3];
-	elem1->set_node(3) = nodes[7];
-	    
+	{
+	  Elem* elem1 = mesh.add_elem (new Quad4);
+	  elem1->set_node(0) = nodes[4];
+	  elem1->set_node(1) = nodes[0];
+	  elem1->set_node(2) = nodes[3];
+	  elem1->set_node(3) = nodes[7];
+	}
+
 	// Element 2
-	Elem* elem2 = mesh.add_elem (new Quad4);
-	elem2->set_node(0) = nodes[4];
-	elem2->set_node(1) = nodes[5];
-	elem2->set_node(2) = nodes[1];
-	elem2->set_node(3) = nodes[0];
-	    
+	{
+	  Elem* elem2 = mesh.add_elem (new Quad4);
+	  elem2->set_node(0) = nodes[4];
+	  elem2->set_node(1) = nodes[5];
+	  elem2->set_node(2) = nodes[1];
+	  elem2->set_node(3) = nodes[0];
+	}
+
 	// Element 3
-	Elem* elem3 = mesh.add_elem (new Quad4);
-	elem3->set_node(0) = nodes[1];
-	elem3->set_node(1) = nodes[5];
-	elem3->set_node(2) = nodes[6];
-	elem3->set_node(3) = nodes[2];
-	    
+	{
+	  Elem* elem3 = mesh.add_elem (new Quad4);
+	  elem3->set_node(0) = nodes[1];
+	  elem3->set_node(1) = nodes[5];
+	  elem3->set_node(2) = nodes[6];
+	  elem3->set_node(3) = nodes[2];
+	}
+
 	// Element 4
-	Elem* elem4 = mesh.add_elem (new Quad4);
-	elem4->set_node(0) = nodes[3];
-	elem4->set_node(1) = nodes[2];
-	elem4->set_node(2) = nodes[6];
-	elem4->set_node(3) = nodes[7];
+	{
+	  Elem* elem4 = mesh.add_elem (new Quad4);
+	  elem4->set_node(0) = nodes[3];
+	  elem4->set_node(1) = nodes[2];
+	  elem4->set_node(2) = nodes[6];
+	  elem4->set_node(3) = nodes[7];
+	}
 
 	break;
       } // end case 2
@@ -1653,25 +1669,31 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	// (Temporary) convenient storage for node pointers
 	std::vector<Node*> nodes(16);
 	
+	// For ParallelMesh, if we don't specify node IDs the Mesh
+	// will try to pick an appropriate (unique) one for us.  But
+	// since we are adding these nodes on all processors, we want
+	// to be sure they have consistent IDs across all processors.
+	unsigned node_id = 0;
+
 	// Points 0-7 are the initial HEX8
-	nodes[0] = mesh.add_point (Point(-r_small,-r_small, -r_small));
-	nodes[1] = mesh.add_point (Point( r_small,-r_small, -r_small));
-	nodes[2] = mesh.add_point (Point( r_small, r_small, -r_small));
-	nodes[3] = mesh.add_point (Point(-r_small, r_small, -r_small));
-	nodes[4] = mesh.add_point (Point(-r_small,-r_small,  r_small));
-	nodes[5] = mesh.add_point (Point( r_small,-r_small,  r_small));
-	nodes[6] = mesh.add_point (Point( r_small, r_small,  r_small));
-	nodes[7] = mesh.add_point (Point(-r_small, r_small,  r_small));
+	nodes[0] = mesh.add_point (Point(-r_small,-r_small, -r_small), node_id++);
+	nodes[1] = mesh.add_point (Point( r_small,-r_small, -r_small), node_id++);
+	nodes[2] = mesh.add_point (Point( r_small, r_small, -r_small), node_id++);
+	nodes[3] = mesh.add_point (Point(-r_small, r_small, -r_small), node_id++);
+	nodes[4] = mesh.add_point (Point(-r_small,-r_small,  r_small), node_id++);
+	nodes[5] = mesh.add_point (Point( r_small,-r_small,  r_small), node_id++);
+	nodes[6] = mesh.add_point (Point( r_small, r_small,  r_small), node_id++);
+	nodes[7] = mesh.add_point (Point(-r_small, r_small,  r_small), node_id++);
 
 	//  Points 8-15 are for the outer hexes, we number them in the same way
-	nodes[8]  = mesh.add_point (Point(-r_med,-r_med, -r_med));
-	nodes[9]  = mesh.add_point (Point( r_med,-r_med, -r_med));
-	nodes[10] = mesh.add_point (Point( r_med, r_med, -r_med));
-	nodes[11] = mesh.add_point (Point(-r_med, r_med, -r_med));
-	nodes[12] = mesh.add_point (Point(-r_med,-r_med,  r_med));
-	nodes[13] = mesh.add_point (Point( r_med,-r_med,  r_med));
-	nodes[14] = mesh.add_point (Point( r_med, r_med,  r_med));
-	nodes[15] = mesh.add_point (Point(-r_med, r_med,  r_med));
+	nodes[8]  = mesh.add_point (Point(-r_med,-r_med, -r_med), node_id++);
+	nodes[9]  = mesh.add_point (Point( r_med,-r_med, -r_med), node_id++);
+	nodes[10] = mesh.add_point (Point( r_med, r_med, -r_med), node_id++);
+	nodes[11] = mesh.add_point (Point(-r_med, r_med, -r_med), node_id++);
+	nodes[12] = mesh.add_point (Point(-r_med,-r_med,  r_med), node_id++);
+	nodes[13] = mesh.add_point (Point( r_med,-r_med,  r_med), node_id++);
+	nodes[14] = mesh.add_point (Point( r_med, r_med,  r_med), node_id++);
+	nodes[15] = mesh.add_point (Point(-r_med, r_med,  r_med), node_id++);
 
 	// Now create the elements and add them to the mesh
 	// Element 0 - center element
@@ -1853,10 +1875,18 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
     }
   
 
-  // The meshes could probably use some smoothing...
-  LaplaceMeshSmoother smoother(mesh);
-  smoother.smooth(2);
-  
+  // The meshes could probably use some smoothing, but the
+  // LaplaceMeshSmoother currently only works on Meshes which are
+  // serial (i.e. without RemoteElems).  The MeshSerializer
+  // destructor will re-parallelize the mesh automatically.
+  // If the mesh is already serial, then the serializer won't do
+  // anything.
+  {
+    MeshSerializer mesh_serializer(mesh);
+    LaplaceMeshSmoother smoother(mesh);
+    smoother.smooth(2);
+  }
+
   STOP_LOG("build_sphere()", "MeshTools::Generation");
 
   

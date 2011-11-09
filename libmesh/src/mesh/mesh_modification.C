@@ -1259,8 +1259,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	// Make a new element of the same type
 	Elem* copy = Elem::build(elem->type()).release();
 
-	// Set node pointers (they point to nodes in the original mesh)
-	// The copy's element ID will be set upon adding it to the mesh
+	// Set node pointers (they still point to nodes in the original mesh)
 	for(unsigned int n=0; n<elem->n_nodes(); n++)
 	  copy->set_node(n) = elem->get_node(n);
 
@@ -1268,25 +1267,27 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
         copy->processor_id() = elem->processor_id();
         copy->subdomain_id() = elem->subdomain_id();
 
+	// Retain the original element's ID as well, otherwise ParallelMesh will
+	// try to create one for you...
+	copy->set_id( elem->id() );
+
 	// This element could have boundary info as well.  We need
 	// to save the (elem, side, bc_id) triples
 	for (unsigned int s=0; s<elem->n_sides(); s++)
-// We're supporting boundary ids on internal sides now
-//	    if (elem->neighbor(s) == NULL)
+	  {
+	    const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
+	    for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
 	      {
-                const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
-                for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
-                  {
-		    const short int bc_id = *id_it;
+		const short int bc_id = *id_it;
 
-		    if (bc_id != BoundaryInfo::invalid_id)
-		      {
-		        saved_boundary_elements.push_back(copy);
-		        saved_bc_ids.push_back(bc_id);
-		        saved_bc_sides.push_back(s);
-                      }
+		if (bc_id != BoundaryInfo::invalid_id)
+		  {
+		    saved_boundary_elements.push_back(copy);
+		    saved_bc_ids.push_back(bc_id);
+		    saved_bc_sides.push_back(s);
 		  }
 	      }
+	  }
 
 	
 	// We're done with this element
@@ -1318,7 +1319,18 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
     for (std::vector<Elem*>::iterator it = new_elements.begin();
 	 it != new_elements.end();
 	 ++it)
-      mesh.add_elem(*it);
+      {
+	unsigned orig_id = (*it)->id();
+
+	Elem* added_elem = mesh.add_elem(*it);
+
+	unsigned added_id = added_elem->id();
+
+	// If the Elem, as it was re-added to the mesh, now has a
+	// different ID (this is unlikely, so it's just an assert)
+	// the boundary information will no longer be correct.
+	libmesh_assert(orig_id == added_id);
+      }
   }
 
   // Finally, also add back the saved boundary information
