@@ -46,7 +46,7 @@
 #include "numeric_vector.h"
 #include "linear_implicit_system.h"
 #include "boundary_info.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "fe_interface.h"
 #include "getpot.h"
 #include "mesh_refinement.h"
@@ -585,8 +585,8 @@ int main (int argc, char** argv)
 
   // Write out the solution
   // After solving the system write the solution
-  // to a GMV-formatted plot file.
-  GMVIO (mesh).write_discontinuous_gmv("lshaped_dg.gmv",equation_system,true);
+  // to a ExodusII-formatted plot file.
+  ExodusII_IO (mesh).write_discontinuous_exodusII("lshaped_dg.ex2",equation_system);
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
   
