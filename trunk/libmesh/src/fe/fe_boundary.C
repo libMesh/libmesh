@@ -159,6 +159,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
       // initialize quadrature rule
       qrule->init(side->type(), side_p_level);
 
+      if(qrule->shapes_need_reinit())
+        shapes_on_quadrature = false;
+
       // FIXME - could this break if the same FE object was used
       // for both volume and face integrals? - RHS
       // We might not need to reinitialize the shape functions
@@ -196,9 +199,15 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp; //this->inverse_map (elem, xyz, qp, tolerance);
-  this->side_map(elem, side.get(), s, qrule->get_points(), qp);
-  
+  const std::vector<Point>* ref_qp;
+  if (pts != NULL)
+    ref_qp = pts;
+  else
+    ref_qp = &qrule->get_points();
+
+  std::vector<Point> qp;
+  this->side_map(elem, side.get(), s, *ref_qp, qp);
+
   // compute the shape function and derivative values
   // at the points qp
   this->reinit  (elem, &qp);
@@ -254,6 +263,9 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
       // initialize quadrature rule
       qrule->init(edge->type(), elem->p_level());
 
+      if(qrule->shapes_need_reinit())
+        shapes_on_quadrature = false;
+
       // We might not need to reinitialize the shape functions
       if ((this->get_type() != elem->type())                   ||
           (edge->type() != static_cast<int>(last_edge))        || // Comparison between enum and unsigned, cast the unsigned to int
@@ -304,7 +316,8 @@ void FE<Dim,T>::side_map (const Elem* elem,
     side_p_level = std::max(side_p_level, elem->neighbor(s)->p_level());
 
   if (side->type() != last_side ||
-      side_p_level != _p_level)
+      side_p_level != _p_level ||
+      !shapes_on_quadrature)
     {
       // Set the element type
       elem_type = elem->type();
