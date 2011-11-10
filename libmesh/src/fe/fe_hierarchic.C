@@ -73,14 +73,13 @@ namespace libMesh
 	    const unsigned int n_sf =
 	      // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
 	      FEInterface::n_shape_functions(Dim, fe_type, elem_type);
-
+	    
+	    std::vector<Point> refspace_nodes;
+	    FEBase::get_refspace_nodes(elem_type,refspace_nodes);
+	    libmesh_assert (refspace_nodes.size() == n_nodes);
 
 	    for (unsigned int n=0; n<n_nodes; n++)
 	      {
-		const Point mapped_point =
-		  // FE<Dim,T>::inverse_map(elem, elem->point(n));
-		  FEInterface::inverse_map(Dim, fe_type, elem, elem->point(n));
-
 		libmesh_assert (elem_soln.size() == n_sf);
 
 		// Zero before summation
@@ -90,7 +89,7 @@ namespace libMesh
 		for (unsigned int i=0; i<n_sf; i++)
 		  nodal_soln[n] += elem_soln[i] *
 		    // FE<Dim,T>::shape(elem, order, i, mapped_point);
-		    FEInterface::shape(Dim, fe_type, elem, i, mapped_point);
+		    FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
 	      }
 
 	    return;
