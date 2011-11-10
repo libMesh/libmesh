@@ -41,6 +41,8 @@ colorreset="\033[m";
 # Errors during the tests will be printed here
 errlog=test_headers.log
 
+returnval=0
+
 for i in $headers_to_test; do
     header_name=`basename $i`
     source_name=TestHeader_$header_name.C # Use .C here, take advantage of our make rule
@@ -60,8 +62,11 @@ for i in $headers_to_test; do
 	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
     else
 	echo -e $gotocolumn $white"["$red" FAILED "$white"]";
+        returnval=1
     fi
     
     echo -e -n $colorreset;    
     rm -f $source_file $app_file
 done
+
+exit $returnval
