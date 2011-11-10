@@ -31,6 +31,7 @@
 #include <string>
 
 // Local includes
+#include "elem.h"
 #include "mesh_serializer.h"
 #include "point.h" // used for specifying holes
 

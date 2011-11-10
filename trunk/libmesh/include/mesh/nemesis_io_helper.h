@@ -25,6 +25,7 @@
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
 // C++ headers
+#include <set>
 #include <vector>
 
 // Local headers
