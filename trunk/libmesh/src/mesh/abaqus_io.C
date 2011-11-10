@@ -470,42 +470,50 @@ namespace libMesh
     if (upper.find("CPE4") != std::string::npos ||
 	upper.find("CPS4") != std::string::npos)
       {
-	// libMesh::out << "Element type is QUAD4!" << std::endl;
 	elem_type = QUAD4;
 	n_nodes_per_elem = 4;
-	_elem_types.insert(QUAD4);
 	mesh.set_mesh_dimension(2);
       }
     else if (upper.find("CPS3") != std::string::npos)
       {
-	// libMesh::out << "Element type is TRI3!" << std::endl;
 	elem_type = TRI3;
 	n_nodes_per_elem = 3;
-	_elem_types.insert(TRI3);
 	mesh.set_mesh_dimension(2);
       }
     else if (upper.find("C3D8") != std::string::npos)
       {
-	// libMesh::out << "Element type is HEX8!" << std::endl;
 	elem_type = HEX8;
 	n_nodes_per_elem = 8;
-	_elem_types.insert(HEX8);
 	mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D4") != std::string::npos)
       {
-	// libMesh::out << "Element type is TET4!" << std::endl;
 	elem_type = TET4;
 	n_nodes_per_elem = 4;
-	_elem_types.insert(TET4);
 	mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D20") != std::string::npos)
       {
-	// libMesh::out << "Element type is HEX20!" << std::endl;
 	elem_type = HEX20;
 	n_nodes_per_elem = 20;
-	_elem_types.insert(HEX20);
+	mesh.set_mesh_dimension(3);
+      }
+    else if (upper.find("C3D6") != std::string::npos)
+      {
+	elem_type = PRISM6;
+	n_nodes_per_elem = 6;
+	mesh.set_mesh_dimension(3);
+      }
+    else if (upper.find("C3D15") != std::string::npos)
+      {
+	elem_type = PRISM15;
+	n_nodes_per_elem = 15;
+	mesh.set_mesh_dimension(3);
+      }
+    else if (upper.find("C3D10") != std::string::npos)
+      {
+	elem_type = TET10;
+	n_nodes_per_elem = 10;
 	mesh.set_mesh_dimension(3);
       }
     else
@@ -513,6 +521,9 @@ namespace libMesh
 	libMesh::err << "Unrecognized element type: " << upper << std::endl;
 	libmesh_error();
       }
+
+    // Insert the elem type we detected into the set of all elem types for this mesh
+    _elem_types.insert(elem_type);
 
     // For reading in line endings
     std::string dummy;

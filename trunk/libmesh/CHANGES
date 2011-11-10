@@ -17,6 +17,7 @@
   * Assorted efficiency improvements
   * Various Trilinos, Tetgen, Triangle interface improvements
   * Compatibility with newer third-party packages, compilers
+  * Read support for ABAQUS meshes
   * Many assorted bug fixes
 
 0.7.0 -> 0.7.1
