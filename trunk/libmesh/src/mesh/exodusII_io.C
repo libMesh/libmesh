@@ -420,16 +420,17 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
       exio_helper->initialize_nodal_variables(names);
     }
     
-  for (int c=0; c<num_vars; c++)
-    {
-      std::vector<Number> cur_soln(num_nodes);
+  if (libMesh::processor_id() == 0)
+    for (int c=0; c<num_vars; c++)
+      {
+        //Copy out this variable's solution
+        std::vector<Number> cur_soln(num_nodes);
 
-      //Copy out this variable's solution
-      for(int i=0; i<num_nodes; i++)
-        cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+        for(int i=0; i<num_nodes; i++)
+          cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
     
-      exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
-    }  
+        exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+      }  
 
   STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 }
