@@ -55,13 +55,13 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@$(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Done Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 
