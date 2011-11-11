@@ -32,9 +32,6 @@
 #include "parallel_ghost_sync.h" // sync_dofobject_data_by_id()
 #include "parallel_algebra.h" // StandardType<Point>
 
-// Debugging
-#include "exodusII_io.h"
-
 namespace libMesh
 {
 
