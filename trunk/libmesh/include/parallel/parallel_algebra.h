@@ -36,43 +36,201 @@
 namespace libMesh {
 namespace Parallel {
   // StandardType<> specializations to return a derived MPI datatype
-  // to handle communication of LIBMESH_DIM-vectors.  We use a
-  // singleton pattern here because a global variable would have tried
-  // to call MPI functions before MPI got initialized.
+  // to handle communication of LIBMESH_DIM-vectors.
+  //
+  // We use static variables to minimize the number of MPI datatype
+  // construction calls executed over the course of the program.
+  //
+  // We use a singleton pattern because a global variable would
+  // have tried to call MPI functions before MPI got initialized.
+  //
+  // We use MPI_Create_struct here because our vector classes might
+  // have vptrs, and I'd rather not have the datatype break in those
+  // cases.
   template <typename T>
   class StandardType<TypeVector<T> > : public DataType
   {
   public:
-    inline StandardType(const TypeVector<T> *example=NULL) :
-      DataType(StandardType<T>(example ?  &((*example)(0)) : NULL), LIBMESH_DIM) {}
+    inline StandardType(const TypeVector<T> *example=NULL) {
+      // We need an example for MPI_Address to use
+      TypeVector<T> *ex;
+      AutoPtr<TypeVector<T> > temp;
+      if (example)
+        ex = const_cast<TypeVector<T> *>(example);
+      else
+        {
+          temp.reset(new TypeVector<T>());
+          ex = temp.get();
+        }
 
-    inline ~StandardType() { this->free(); }
+      // _static_type never gets freed, but it only gets committed once
+      // per T, so it's not a *huge* memory leak...
+      static data_type _static_type;
+      static bool _is_initialized = false;
+      if (!_is_initialized)
+        {
+#ifdef LIBMESH_HAVE_MPI
+          StandardType<T> T_type(&((*example)(0)));
+          int blocklengths[LIBMESH_DIM+2];
+          MPI_Aint displs[LIBMESH_DIM+2];
+          MPI_Datatype types[LIBMESH_DIM+2];
+          MPI_Aint start, later;
+
+          MPI_Address(ex, &start);
+          blocklengths[0] = 1;
+          displs[0] = 0;
+          types[0] = MPI_LB;
+          for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+            {
+              MPI_Address(&((*ex)(i)), &later);
+              blocklengths[i+1] = 1;
+              displs[i+1] = later - start;
+              types[i+1] = T_type;
+            }
+          MPI_Address((ex+1), &later);
+          blocklengths[LIBMESH_DIM+1] = 1;
+          displs[LIBMESH_DIM+1] = later - start;
+          types[LIBMESH_DIM+1] = MPI_UB;
+
+#if MPI_VERSION > 1
+          MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
+#else
+          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_type);
+#endif // #if MPI_VERSION > 1
+
+          MPI_Type_commit (&_static_type);
+#endif
+          _is_initialized = true;
+        }
+      _datatype = _static_type;
+    }
   };
 
   template <typename T>
   class StandardType<VectorValue<T> > : public DataType
   {
   public:
-    inline StandardType(const VectorValue<T> *example=NULL) :
-      DataType(StandardType<T>(example ? &((*example)(0)) : NULL), LIBMESH_DIM) {}
+    inline StandardType(const VectorValue<T> *example=NULL) {
+      // We need an example for MPI_Address to use
+      VectorValue<T> *ex;
+      AutoPtr<VectorValue<T> > temp;
+      if (example)
+        ex = const_cast<VectorValue<T> *>(example);
+      else
+        {
+          temp.reset(new VectorValue<T>());
+          ex = temp.get();
+        }
 
-    inline ~StandardType() { this->free(); }
+      // _static_type never gets freed, but it only gets committed once
+      // per T, so it's not a *huge* memory leak...
+      static data_type _static_type;
+      static bool _is_initialized = false;
+      if (!_is_initialized)
+        {
+#ifdef LIBMESH_HAVE_MPI
+          StandardType<T> T_type(&((*example)(0)));
+          int blocklengths[LIBMESH_DIM+2];
+          MPI_Aint displs[LIBMESH_DIM+2];
+          MPI_Datatype types[LIBMESH_DIM+2];
+          MPI_Aint start, later;
+
+          MPI_Address(ex, &start);
+          blocklengths[0] = 1;
+          displs[0] = 0;
+          types[0] = MPI_LB;
+          for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+            {
+              MPI_Address(&((*ex)(i)), &later);
+              blocklengths[i+1] = 1;
+              displs[i+1] = later - start;
+              types[i+1] = T_type;
+            }
+          MPI_Address((ex+1), &later);
+          blocklengths[LIBMESH_DIM+1] = 1;
+          displs[LIBMESH_DIM+1] = later - start;
+          types[LIBMESH_DIM+1] = MPI_UB;
+
+#if MPI_VERSION > 1
+          MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
+#else
+          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_type);
+#endif // #if MPI_VERSION > 1
+
+          MPI_Type_commit (&_static_type);
+#endif
+          _is_initialized = true;
+        }
+      _datatype = _static_type;
+    }
   };
 
   template <>
   class StandardType<Point> : public DataType
   {
   public:
-    inline StandardType(const Point *example=NULL) :
-      DataType(StandardType<Real>(example ? &((*example)(0)) : NULL), LIBMESH_DIM) {}
+    inline StandardType(const Point *example=NULL) {
+      // We need an example for MPI_Address to use
+      Point *ex;
+      AutoPtr<Point> temp;
+      if (example)
+        ex = const_cast<Point *>(example);
+      else
+        {
+          temp.reset(new Point());
+          ex = temp.get();
+        }
 
-    inline ~StandardType() { this->free(); }
+      // _static_type never gets freed, but it only gets committed once
+      // per T, so it's not a *huge* memory leak...
+      static data_type _static_type;
+      static bool _is_initialized = false;
+      if (!_is_initialized)
+        {
+#ifdef LIBMESH_HAVE_MPI
+          StandardType<Real> T_type(&((*example)(0)));
+          int blocklengths[LIBMESH_DIM+2];
+          MPI_Aint displs[LIBMESH_DIM+2];
+          MPI_Datatype types[LIBMESH_DIM+2];
+          MPI_Aint start, later;
+
+          MPI_Address(ex, &start);
+          blocklengths[0] = 1;
+          displs[0] = 0;
+          types[0] = MPI_LB;
+          for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+            {
+              MPI_Address(&((*ex)(i)), &later);
+              blocklengths[i+1] = 1;
+              displs[i+1] = later - start;
+              types[i+1] = T_type;
+            }
+          MPI_Address((ex+1), &later);
+          blocklengths[LIBMESH_DIM+1] = 1;
+          displs[LIBMESH_DIM+1] = later - start;
+          types[LIBMESH_DIM+1] = MPI_UB;
+
+#if MPI_VERSION > 1
+          MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
+#else
+          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_type);
+#endif // #if MPI_VERSION > 1
+
+          MPI_Type_commit (&_static_type);
+#endif
+          _is_initialized = true;
+        }
+      _datatype = _static_type;
+    }
   };
 
   // StandardType<> specializations to return a derived MPI datatype
-  // to handle communication of LIBMESH_DIM*LIBMESH_DIM-tensors.  We use a
-  // singleton pattern here because a global variable would have tried
-  // to call MPI functions before MPI got initialized.
+  // to handle communication of LIBMESH_DIM*LIBMESH_DIM-tensors.
+  //
+  // We use a singleton pattern here because a global variable would
+  // have tried to call MPI functions before MPI got initialized.
+  //
+  // We assume contiguous storage here
   template <typename T>
   class StandardType<TypeTensor<T> > : public DataType
   {
