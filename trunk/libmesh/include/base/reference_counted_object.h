@@ -104,7 +104,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ReferenceCountedObject ()
+  ~ReferenceCountedObject ()
   {
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
     

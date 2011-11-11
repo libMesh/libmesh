@@ -62,7 +62,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ReferenceCounter ();
+  ~ReferenceCounter ();
 
   /**
    * Gets a string containing the reference information.

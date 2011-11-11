@@ -64,7 +64,7 @@ class Point : public TypeVector<Real>
   /**
    * Empty.
    */
-  virtual ~Point() {}
+  ~Point() {}
   
 //   /**
 //    * @returns a key associated with this point.  Useful for sorting.

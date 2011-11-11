@@ -77,7 +77,7 @@ public:
   /**
    * Destructor.
    */ 
-  virtual ~TypeVector ();
+  ~TypeVector ();
 
   /**
    * Assign to a vector without creating a temporary.
