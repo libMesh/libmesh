@@ -1686,6 +1686,7 @@ void RBConstruction::assemble_matrix_for_output_dual_solves()
   if(!single_matrix_mode)
   {
     matrix->zero();
+    matrix->close();
     matrix->add(1., *inner_product_matrix);
   }
   else
