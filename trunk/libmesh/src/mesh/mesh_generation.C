@@ -1875,17 +1875,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
     }
   
 
-  // The meshes could probably use some smoothing, but the
-  // LaplaceMeshSmoother currently only works on Meshes which are
-  // serial (i.e. without RemoteElems).  The MeshSerializer
-  // destructor will re-parallelize the mesh automatically.
-  // If the mesh is already serial, then the serializer won't do
-  // anything.
-  {
-    MeshSerializer mesh_serializer(mesh);
-    LaplaceMeshSmoother smoother(mesh);
-    smoother.smooth(2);
-  }
+  // The meshes could probably use some smoothing.
+  LaplaceMeshSmoother smoother(mesh);
+  smoother.smooth(2);
 
   STOP_LOG("build_sphere()", "MeshTools::Generation");
 

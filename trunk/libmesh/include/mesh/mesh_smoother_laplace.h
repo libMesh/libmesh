@@ -31,6 +31,7 @@
 
 
 // Local Includes -----------------------------------
+#include "libmesh.h" // libMesh::out/err
 #include "mesh_smoother.h"
 
 namespace libMesh
@@ -95,9 +96,14 @@ public:
    * Mainly for debugging, this function will print
    * out the connectivity graph which has been created.
    */
-  void print_graph() const;
+  void print_graph(std::ostream& out = libMesh::out) const;
   
 private:
+  /**
+   * This function allgather's the (local) graph after
+   * it is computed on each processor by the init() function.
+   */
+  void allgather_graph();
 
   /**
    * True if the L-graph has been created, false otherwise.
