@@ -47,7 +47,7 @@ RBSCMConstruction::RBSCMConstruction (EquationSystems& es,
                           const unsigned int number)
   : Parent(es, name, number),
     rb_scm_eval(NULL),
-    SCM_eps(0.5),
+    SCM_training_tolerance(0.5),
     RB_system_name("")
 {
 
@@ -75,9 +75,9 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
 {
   // First read in data from parameters_filename
   GetPot infile(parameters_filename);
-  const unsigned int n_SCM_parameters = infile("n_SCM_parameters",1);
-  const unsigned int n_SCM_training_samples = infile("n_SCM_training_samples",1);
-  const bool deterministic_training = infile("deterministic_training",false);
+  const unsigned int n_parameters       = infile("n_parameters",1);
+  const unsigned int n_training_samples = infile("n_training_samples",1);
+  const bool deterministic_training     = infile("deterministic_training",false);
 
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
@@ -85,22 +85,22 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   training_parameters_random_seed = infile("training_parameters_random_seed",
 					   training_parameters_random_seed);
   
-  set_n_params( n_SCM_parameters );
+  set_n_params( n_parameters );
 
   // SCM Greedy termination tolerance
-  const Real SCM_eps_in = infile("SCM_eps", SCM_eps);
-  set_SCM_eps(SCM_eps_in);
+  const Real SCM_training_tolerance_in = infile("SCM_training_tolerance", SCM_training_tolerance);
+  set_SCM_training_tolerance(SCM_training_tolerance_in);
 
-  std::vector<Real> mu_min_vector(n_SCM_parameters);
-  std::vector<Real> mu_max_vector(n_SCM_parameters);
-  std::vector<bool> log_scaling(n_SCM_parameters);
-  for(unsigned int i=0; i<n_SCM_parameters; i++)
+  std::vector<Real> mu_min_vector(n_parameters);
+  std::vector<Real> mu_max_vector(n_parameters);
+  std::vector<bool> log_scaling(n_parameters);
+  for(unsigned int i=0; i<n_parameters; i++)
   {
     // Read vector-based mu_min values.
-    mu_min_vector[i] = infile("SCM_mu_min", mu_min_vector[i], i);
+    mu_min_vector[i] = infile("mu_min", mu_min_vector[i], i);
 
     // Read vector-based mu_max values.
-    mu_max_vector[i] = infile("SCM_mu_max", mu_max_vector[i], i);
+    mu_max_vector[i] = infile("mu_max", mu_max_vector[i], i);
 
     // Read vector-based log scaling values.  Note the intermediate conversion to
     // int... this implies log_scaling = '1 1 1...' in the input file.
@@ -110,7 +110,7 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   // Make sure this generates training parameters properly!
   initialize_training_parameters(mu_min_vector,
                                  mu_max_vector,
-                                 n_SCM_training_samples,
+                                 n_training_samples,
                                  log_scaling,
                                  deterministic_training);
 }
@@ -120,7 +120,7 @@ void RBSCMConstruction::print_info()
   // Print out info that describes the current setup
   libMesh::out << std::endl << "RBSCMConstruction parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
-  libMesh::out << "SCM Greedy tolerance: " << get_SCM_eps() << std::endl;
+  libMesh::out << "SCM Greedy tolerance: " << get_SCM_training_tolerance() << std::endl;
   if(rb_theta_expansion)
   {
     libMesh::out << "A_q operators attached: " << rb_theta_expansion->get_Q_a() << std::endl;
@@ -208,9 +208,9 @@ void RBSCMConstruction::perform_SCM_greedy()
     libMesh::out << "SCM iteration " << SCM_iter
                  << ", max_SCM_error = " << SCM_error_pair.second << std::endl;
 
-    if( SCM_error_pair.second < SCM_eps )
+    if( SCM_error_pair.second < SCM_training_tolerance )
     {
-      libMesh::out << std::endl << "SCM tolerance of " << SCM_eps << " reached."
+      libMesh::out << std::endl << "SCM tolerance of " << SCM_training_tolerance << " reached."
                    << std::endl << std::endl;
       break;
     }

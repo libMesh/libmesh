@@ -170,7 +170,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   GetPot infile(parameters_filename);
 
   const unsigned int n_parameters = infile("n_parameters",1);
-  const unsigned int n_training_samples_mu = infile("n_training_samples_mu",0);
+  const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
   
   set_n_params( n_parameters );
@@ -244,7 +244,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 
   initialize_training_parameters(mu_min_in,
                                  mu_max_in,
-                                 n_training_samples_mu,
+                                 n_training_samples,
                                  log_scaling,
                                  deterministic_training);   // use deterministic parameters
 
