@@ -20,4 +20,4 @@ log_scaling = '0 0'            # Generate a training set with uniform (0) or log
 deterministic_training = true        # Are the training points generated randomly or deterministically
 use_relative_bound_in_greedy = false # Do we use a relative or absolute error bound when training the RB space?
 
-n_training_samples_mu = 100    # The number of parameters in training set (must be square for the 2-parameter deterministic case)
+n_training_samples = 100    # The number of parameters in training set (must be square for the 2-parameter deterministic case)

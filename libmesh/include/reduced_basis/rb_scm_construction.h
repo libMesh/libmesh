@@ -117,10 +117,10 @@ public:
   void set_RB_system_name(const std::string& name) { RB_system_name = name; }
 
   /**
-   * Get/set SCM_eps: tolerance for SCM greedy.
+   * Get/set SCM_training_tolerance: tolerance for SCM greedy.
    */
-  Real get_SCM_eps() const          { return SCM_eps; }
-  void set_SCM_eps(Real SCM_eps_in) { this->SCM_eps = SCM_eps_in; }
+  Real get_SCM_training_tolerance() const                         { return SCM_training_tolerance; }
+  void set_SCM_training_tolerance(Real SCM_training_tolerance_in) { this->SCM_training_tolerance = SCM_training_tolerance_in; }
 
   /**
    * Perform the SCM greedy algorithm to develop a lower bound
@@ -198,8 +198,8 @@ protected:
    * matrix Aq.
    */
   Number Aq_inner_product(unsigned int q,
-                        const NumericVector<Number>& v,
-                        const NumericVector<Number>& w);
+                          const NumericVector<Number>& v,
+                          const NumericVector<Number>& w);
 
   /**
    * Helper function which provides an error
@@ -211,9 +211,9 @@ protected:
   //----------- PROTECTED DATA MEMBERS -----------//
 
   /**
-   * SCM tolerance, where SCM_eps \in (0,1).
+   * Tolerance which controls when to terminate the SCM Greedy.
    */
-  Real SCM_eps;
+  Real SCM_training_tolerance;
 
   /**
    * The name of the associated RB system.
