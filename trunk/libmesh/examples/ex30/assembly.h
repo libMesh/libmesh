@@ -1,6 +1,8 @@
 #ifndef __assembly_h__
 #define __assembly_h__
 
+#if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_GLPK)
+
 #include "sparse_matrix.h"
 #include "numeric_vector.h"
 #include "dense_matrix.h"
@@ -319,6 +321,8 @@ struct Ex30RBAssemblyExpansion : RBAssemblyExpansion
   OutputAssembly L2;
   OutputAssembly L3;
 };
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 #endif
 
