@@ -161,7 +161,8 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
     {
       DofObjType *obj = *it;
       unsigned int obj_procid = obj->processor_id();
-      if (obj_procid == libMesh::processor_id())
+      if (obj_procid == libMesh::processor_id() ||
+          obj_procid == DofObject::invalid_processor_id)
         continue;
 
       Point p = location_map.point_of(*obj);
@@ -264,7 +265,8 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
     {
       DofObject *obj = *it;
       unsigned int obj_procid = obj->processor_id();
-      if (obj_procid == libMesh::processor_id())
+      if (obj_procid == libMesh::processor_id() ||
+          obj_procid == DofObject::invalid_processor_id)
         continue;
 
       requested_objs_id[obj_procid].push_back(obj->id());
@@ -346,7 +348,8 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
     {
       Elem *elem = *it;
       unsigned int obj_procid = elem->processor_id();
-      if (obj_procid == libMesh::processor_id())
+      if (obj_procid == libMesh::processor_id() ||
+          obj_procid == DofObject::invalid_processor_id)
         continue;
       const Elem *parent = elem->parent();
       if (!parent || !elem->active())
