@@ -20,6 +20,8 @@
 #ifndef __rb_classes_h__
 #define __rb_classes_h__
 
+#if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_GLPK)
+
 #include "rb_construction.h"
 #include "rb_scm_construction.h"
 #include "fe_base.h"
@@ -36,7 +38,6 @@ using libMesh::RBSCMConstruction;
 using libMesh::RBEvaluation;
 using libMesh::RBSCMEvaluation;
 using libMesh::Real;
-
 
 // A simple subclass of RBEvaluation. We also store the theta expansion object
 // for the affine expansion of the PDE as a member variable.
@@ -164,5 +165,7 @@ public:
   Ex30DirichletDofAssembly dirichlet_assembly;
 
 };
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 #endif

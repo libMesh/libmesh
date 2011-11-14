@@ -68,7 +68,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 // This example requires SLEPc and GLPK
-#if !defined (LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+#if !defined(LIBMESH_HAVE_SLEPC) && !defined(LIBMESH_HAVE_GLPK)
   libmesh_example_assert(false, "--enable-slepc --enable-glpk");
 #else
 
