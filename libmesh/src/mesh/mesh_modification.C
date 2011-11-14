@@ -674,12 +674,16 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
 void MeshTools::Modification::all_tri (MeshBase& mesh)
 {
+  // The number of elements in the original mesh before any additions
+  // or deletions.
+  const unsigned n_orig_elem = mesh.n_elem();
+
   // We store pointers to the newly created elements in a vector
   // until they are ready to be added to the mesh.  This is because
   // adding new elements on the fly can cause reallocation and invalidation
   // of existing iterators.
   std::vector<Elem*> new_elements;
-  new_elements.reserve (2*mesh.n_active_elem());
+  new_elements.reserve (2*n_orig_elem);
 
   // If the original mesh has boundary data, we carry that over
   // to the new mesh with triangular elements.
@@ -692,16 +696,19 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   
   // Iterate over the elements, splitting QUADS into
   // pairs of conforming triangles.
+  // FIXME: This algorithm does not work on refined grids!
   {
     MeshBase::element_iterator       el  = mesh.elements_begin();
-    const MeshBase::element_iterator end = mesh.elements_end(); 
+    const MeshBase::element_iterator end = mesh.elements_end();
 
     for (; el!=end; ++el)
       {
-	const ElemType etype = (*el)->type();
+	Elem* elem = *el;
+
+	const ElemType etype = elem->type();
 
 	// all_tri currently only works on coarse meshes
-	libmesh_assert ((*el)->parent() == NULL);
+	libmesh_assert (elem->parent() == NULL);
 
 	// We split the quads using the shorter of the two diagonals
 	// to maintain the best angle properties.
@@ -725,29 +732,29 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      tri1 = new Tri3;
 	      
 	      // Check for possible edge swap
-	      if (((*el)->point(0) - (*el)->point(2)).size() <
-		  ((*el)->point(1) - (*el)->point(3)).size())
+	      if ((elem->point(0) - elem->point(2)).size() <
+		  (elem->point(1) - elem->point(3)).size())
 		{	      
-		  tri0->set_node(0) = (*el)->get_node(0);
-		  tri0->set_node(1) = (*el)->get_node(1);
-		  tri0->set_node(2) = (*el)->get_node(2);
+		  tri0->set_node(0) = elem->get_node(0);
+		  tri0->set_node(1) = elem->get_node(1);
+		  tri0->set_node(2) = elem->get_node(2);
 		
-		  tri1->set_node(0) = (*el)->get_node(0);
-		  tri1->set_node(1) = (*el)->get_node(2);
-		  tri1->set_node(2) = (*el)->get_node(3);
+		  tri1->set_node(0) = elem->get_node(0);
+		  tri1->set_node(1) = elem->get_node(2);
+		  tri1->set_node(2) = elem->get_node(3);
 		}
 	    
 	      else
 		{
 		  edge_swap=true;
 		  
-		  tri0->set_node(0) = (*el)->get_node(0);
-		  tri0->set_node(1) = (*el)->get_node(1);
-		  tri0->set_node(2) = (*el)->get_node(3);
+		  tri0->set_node(0) = elem->get_node(0);
+		  tri0->set_node(1) = elem->get_node(1);
+		  tri0->set_node(2) = elem->get_node(3);
 		
-		  tri1->set_node(0) = (*el)->get_node(1);
-		  tri1->set_node(1) = (*el)->get_node(2);
-		  tri1->set_node(2) = (*el)->get_node(3);
+		  tri1->set_node(0) = elem->get_node(1);
+		  tri1->set_node(1) = elem->get_node(2);
+		  tri1->set_node(2) = elem->get_node(3);
 		}
 
 	      
@@ -761,29 +768,29 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      tri0 = new Tri6;
 	      tri1 = new Tri6;
 	  
-	      Node* new_node = mesh.add_point((mesh.node((*el)->node(0)) +
-					       mesh.node((*el)->node(1)) +
-					       mesh.node((*el)->node(2)) +
-					       mesh.node((*el)->node(3)))/4
+	      Node* new_node = mesh.add_point( 0.25*(mesh.node(elem->node(0)) +
+						     mesh.node(elem->node(1)) +
+						     mesh.node(elem->node(2)) +
+						     mesh.node(elem->node(3)))
 					       );
 	  
 	      // Check for possible edge swap
-	      if (((*el)->point(0) - (*el)->point(2)).size() <
-		  ((*el)->point(1) - (*el)->point(3)).size())
+	      if ((elem->point(0) - elem->point(2)).size() <
+		  (elem->point(1) - elem->point(3)).size())
 		{	      
-		  tri0->set_node(0) = (*el)->get_node(0);
-		  tri0->set_node(1) = (*el)->get_node(1);
-		  tri0->set_node(2) = (*el)->get_node(2);
-		  tri0->set_node(3) = (*el)->get_node(4);
-		  tri0->set_node(4) = (*el)->get_node(5);
+		  tri0->set_node(0) = elem->get_node(0);
+		  tri0->set_node(1) = elem->get_node(1);
+		  tri0->set_node(2) = elem->get_node(2);
+		  tri0->set_node(3) = elem->get_node(4);
+		  tri0->set_node(4) = elem->get_node(5);
 		  tri0->set_node(5) = new_node;
 	      
-		  tri1->set_node(0) = (*el)->get_node(0);
-		  tri1->set_node(1) = (*el)->get_node(2);
-		  tri1->set_node(2) = (*el)->get_node(3);
+		  tri1->set_node(0) = elem->get_node(0);
+		  tri1->set_node(1) = elem->get_node(2);
+		  tri1->set_node(2) = elem->get_node(3);
 		  tri1->set_node(3) = new_node;
-		  tri1->set_node(4) = (*el)->get_node(6);
-		  tri1->set_node(5) = (*el)->get_node(7);
+		  tri1->set_node(4) = elem->get_node(6);
+		  tri1->set_node(5) = elem->get_node(7);
 
 		}
 	  
@@ -791,18 +798,18 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 		{
 		  edge_swap=true;
 		  
-		  tri0->set_node(0) = (*el)->get_node(3);
-		  tri0->set_node(1) = (*el)->get_node(0);
-		  tri0->set_node(2) = (*el)->get_node(1);
-		  tri0->set_node(3) = (*el)->get_node(7);
-		  tri0->set_node(4) = (*el)->get_node(4);
+		  tri0->set_node(0) = elem->get_node(3);
+		  tri0->set_node(1) = elem->get_node(0);
+		  tri0->set_node(2) = elem->get_node(1);
+		  tri0->set_node(3) = elem->get_node(7);
+		  tri0->set_node(4) = elem->get_node(4);
 		  tri0->set_node(5) = new_node;
 	      
-		  tri1->set_node(0) = (*el)->get_node(1);
-		  tri1->set_node(1) = (*el)->get_node(2);
-		  tri1->set_node(2) = (*el)->get_node(3);
-		  tri1->set_node(3) = (*el)->get_node(5);
-		  tri1->set_node(4) = (*el)->get_node(6);
+		  tri1->set_node(0) = elem->get_node(1);
+		  tri1->set_node(1) = elem->get_node(2);
+		  tri1->set_node(2) = elem->get_node(3);
+		  tri1->set_node(3) = elem->get_node(5);
+		  tri1->set_node(4) = elem->get_node(6);
 		  tri1->set_node(5) = new_node;
 		}
 	  
@@ -817,41 +824,41 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      tri1 = new Tri6;
 
 	      // Check for possible edge swap
-	      if (((*el)->point(0) - (*el)->point(2)).size() <
-		  ((*el)->point(1) - (*el)->point(3)).size())
+	      if ((elem->point(0) - elem->point(2)).size() <
+		  (elem->point(1) - elem->point(3)).size())
 		{	      
-		  tri0->set_node(0) = (*el)->get_node(0);
-		  tri0->set_node(1) = (*el)->get_node(1);
-		  tri0->set_node(2) = (*el)->get_node(2);
-		  tri0->set_node(3) = (*el)->get_node(4);
-		  tri0->set_node(4) = (*el)->get_node(5);
-		  tri0->set_node(5) = (*el)->get_node(8);
+		  tri0->set_node(0) = elem->get_node(0);
+		  tri0->set_node(1) = elem->get_node(1);
+		  tri0->set_node(2) = elem->get_node(2);
+		  tri0->set_node(3) = elem->get_node(4);
+		  tri0->set_node(4) = elem->get_node(5);
+		  tri0->set_node(5) = elem->get_node(8);
 	      
-		  tri1->set_node(0) = (*el)->get_node(0);
-		  tri1->set_node(1) = (*el)->get_node(2);
-		  tri1->set_node(2) = (*el)->get_node(3);
-		  tri1->set_node(3) = (*el)->get_node(8);
-		  tri1->set_node(4) = (*el)->get_node(6);
-		  tri1->set_node(5) = (*el)->get_node(7);
+		  tri1->set_node(0) = elem->get_node(0);
+		  tri1->set_node(1) = elem->get_node(2);
+		  tri1->set_node(2) = elem->get_node(3);
+		  tri1->set_node(3) = elem->get_node(8);
+		  tri1->set_node(4) = elem->get_node(6);
+		  tri1->set_node(5) = elem->get_node(7);
 		}
 
 	      else
 		{
 		  edge_swap=true;
 		  
-		  tri0->set_node(0) = (*el)->get_node(0);
-		  tri0->set_node(1) = (*el)->get_node(1);
-		  tri0->set_node(2) = (*el)->get_node(3);
-		  tri0->set_node(3) = (*el)->get_node(4);
-		  tri0->set_node(4) = (*el)->get_node(8);
-		  tri0->set_node(5) = (*el)->get_node(7);
+		  tri0->set_node(0) = elem->get_node(0);
+		  tri0->set_node(1) = elem->get_node(1);
+		  tri0->set_node(2) = elem->get_node(3);
+		  tri0->set_node(3) = elem->get_node(4);
+		  tri0->set_node(4) = elem->get_node(8);
+		  tri0->set_node(5) = elem->get_node(7);
 	      
-		  tri1->set_node(0) = (*el)->get_node(1);
-		  tri1->set_node(1) = (*el)->get_node(2);
-		  tri1->set_node(2) = (*el)->get_node(3);
-		  tri1->set_node(3) = (*el)->get_node(5);
-		  tri1->set_node(4) = (*el)->get_node(6);
-		  tri1->set_node(5) = (*el)->get_node(8);
+		  tri1->set_node(0) = elem->get_node(1);
+		  tri1->set_node(1) = elem->get_node(2);
+		  tri1->set_node(2) = elem->get_node(3);
+		  tri1->set_node(3) = elem->get_node(5);
+		  tri1->set_node(4) = elem->get_node(6);
+		  tri1->set_node(5) = elem->get_node(8);
 		}
 	    
 	      break;
@@ -876,14 +883,14 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	  {
 	    // Be sure the correct ID's are also set for tri0 and
 	    // tri1.
-            tri0->processor_id() = (*el)->processor_id();
-            tri0->subdomain_id() = (*el)->subdomain_id();
-            tri1->processor_id() = (*el)->processor_id();
-            tri1->subdomain_id() = (*el)->subdomain_id();
+            tri0->processor_id() = elem->processor_id();
+            tri0->subdomain_id() = elem->subdomain_id();
+            tri1->processor_id() = elem->processor_id();
+            tri1->subdomain_id() = elem->subdomain_id();
 	   
 	    if (mesh_has_boundary_data)
 	      {
-		for (unsigned int sn=0; sn<(*el)->n_sides(); ++sn)
+		for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
 		  {
                     const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*el, sn);
                     for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
@@ -983,33 +990,38 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 		  } // end for loop over sides
 
 		// Remove the original element from the BoundaryInfo structure.
-		mesh.boundary_info->remove(*el);
+		mesh.boundary_info->remove(elem);
 
 	      } // end if (mesh_has_boundary_data)
 	    
+	    // Determine new IDs for the split elements which will be
+	    // the same on all processors, therefore keeping the Mesh
+	    // in sync.  Note: we offset the new IDs by n_orig_elem to
+	    // avoid overwriting any of the original IDs, this assumes
+	    // they were contiguously-numbered to begin with...
+	    tri0->set_id( n_orig_elem + 2*elem->id() + 0 );
+	    tri1->set_id( n_orig_elem + 2*elem->id() + 1 );
+
 	    // Add the newly-created triangles to the temporary vector of new elements.
 	    new_elements.push_back(tri0);
 	    new_elements.push_back(tri1);
 
 	    // Delete the original element
-	    mesh.delete_elem(*el);
+	    mesh.delete_elem(elem);
 	  } // end if (split_elem)
       } // End for loop over elements
-  } 
+  } // end scope
 
   
-    // Now, iterate over the new elements vector, and add them each to
-    // the Mesh.
+  // Now, iterate over the new elements vector, and add them each to
+  // the Mesh.
   {
     std::vector<Elem*>::iterator el        = new_elements.begin();
     const std::vector<Elem*>::iterator end = new_elements.end();
     for (; el != end; ++el)
-      {
-	mesh.add_elem(*el);
-      }
+      mesh.add_elem(*el);
   }
 
-  
   if (mesh_has_boundary_data)
     {
       // By this time, we should have removed all of the original boundary sides
