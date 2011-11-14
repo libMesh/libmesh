@@ -586,10 +586,24 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
 
       unsigned int min_procid = procid;
       Parallel::min(min_procid);
+
       // All processors with an object should agree on processor id
       libmesh_assert (!obj || procid == min_procid);
-      // I should own any object another processor thinks I do
-      libmesh_assert (min_procid != libMesh::processor_id() || obj);
+
+      // Either:
+      // 1.) I own this elem (min_procid == libMesh::processor_id()) *and* I have a valid pointer to it (obj != NULL)
+      // or
+      // 2.) I don't own this elem (min_procid != libMesh::processor_id()).  (In this case I may or may not have a valid pointer to it.)
+
+      // Original assert logic
+      // libmesh_assert (min_procid != libMesh::processor_id() || obj);
+
+      // More human-understandable logic...
+      libmesh_assert (
+		      ((min_procid == libMesh::processor_id()) && obj)
+		      ||
+		      (min_procid != libMesh::processor_id())
+		       );
     }
 }
 
