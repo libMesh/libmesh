@@ -134,9 +134,8 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
       DofObjType *obj = *it;
       libmesh_assert (obj);
       unsigned int obj_procid = obj->processor_id();
-      libmesh_assert (obj_procid != DofObject::invalid_processor_id);
-
-      ghost_objects_from_proc[obj_procid]++;
+      if (obj_procid != DofObject::invalid_processor_id)
+        ghost_objects_from_proc[obj_procid]++;
     }
 
   // Request sets to send to each processor
@@ -246,9 +245,8 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
       DofObject *obj = *it;
       libmesh_assert (obj);
       unsigned int obj_procid = obj->processor_id();
-      libmesh_assert (obj_procid != DofObject::invalid_processor_id);
-
-      ghost_objects_from_proc[obj_procid]++;
+      if (obj_procid != DofObject::invalid_processor_id)
+        ghost_objects_from_proc[obj_procid]++;
     }
 
   // Request sets to send to each processor
@@ -324,9 +322,8 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       DofObject *obj = *it;
       libmesh_assert (obj);
       unsigned int obj_procid = obj->processor_id();
-      libmesh_assert (obj_procid != DofObject::invalid_processor_id);
-
-      ghost_objects_from_proc[obj_procid]++;
+      if (obj_procid != DofObject::invalid_processor_id)
+        ghost_objects_from_proc[obj_procid]++;
     }
 
   // Request sets to send to each processor
