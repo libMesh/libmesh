@@ -173,6 +173,7 @@ void RBSCMConstruction::load_matrix_B()
   RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
   
   matrix_B->zero(); 
+  matrix_B->close();
   matrix_B->add(1.,*rb_system.get_inner_product_matrix());
 }
 

@@ -54,13 +54,13 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running " $(LIBMESHRUN) $(target) -eps_tol 5.e-5 $(LIBMESHOPTIONS)
+	@echo "* Running " $(LIBMESHRUN) $(target) -eps_type lapack $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESHRUN) $(target) -eps_tol 5.e-5 $(LIBMESHOPTIONS)
+	@$(LIBMESHRUN) $(target) -eps_type lapack $(LIBMESHOPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running " $(LIBMESHRUN) $(target) -eps_tol 5.e-5 $(LIBMESHOPTIONS)
+	@echo "* Done Running " $(LIBMESHRUN) $(target) -eps_type lapack $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 
 
