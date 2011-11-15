@@ -66,6 +66,8 @@ distclean:
 	@rm -f $(libpath)/*/lib$(pkgname).*
 
 # Dependencies for libHilbert files
+src/%.$(obj-suffix): ../../include/base/libmesh_config.h
+
 src/BigBitVec.$(obj-suffix):\
     src/BigBitVec.C\
     include/Hilbert/BigBitVec.hpp\

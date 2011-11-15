@@ -56,6 +56,8 @@ distclean:
 	@rm -f ../lib/*/libsfcurves.*
 
 # Dependencies for space-filling curves code
+%.$(obj-suffix): ../../include/base/libmesh_config.h
+
 cmp.$(obj-suffix):\
     cmp.c\
     sfcurves.h\

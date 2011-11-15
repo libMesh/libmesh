@@ -70,6 +70,8 @@ distclean:
 
 
 # Dependencies for tetgen object file
+%.$(obj-suffix): ../../include/base/libmesh_config.h
+
 tetgen.$(obj-suffix):\
     tetgen.C\
     tetgen.h

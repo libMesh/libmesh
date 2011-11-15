@@ -78,6 +78,8 @@ distclean:
 	@rm -f ../lib/*/liblaspack.*
 
 # Dependencies for Laspack source files
+%.$(obj-suffix): ../../include/base/libmesh_config.h
+
 eigenval.$(obj-suffix):\
     eigenval.c\
     copyrght.h\
