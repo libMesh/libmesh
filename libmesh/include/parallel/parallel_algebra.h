@@ -96,7 +96,7 @@ namespace Parallel {
 #if MPI_VERSION > 1
           MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
 #else
-          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_type);
+          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
 #endif // #if MPI_VERSION > 1
 
           MPI_Type_commit (&_static_type);
@@ -155,7 +155,7 @@ namespace Parallel {
 #if MPI_VERSION > 1
           MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
 #else
-          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_type);
+          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
 #endif // #if MPI_VERSION > 1
 
           MPI_Type_commit (&_static_type);
@@ -214,7 +214,7 @@ namespace Parallel {
 #if MPI_VERSION > 1
           MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
 #else
-          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_type);
+          MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
 #endif // #if MPI_VERSION > 1
 
           MPI_Type_commit (&_static_type);
