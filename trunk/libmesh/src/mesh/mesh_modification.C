@@ -768,10 +768,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      tri0 = new Tri6;
 	      tri1 = new Tri6;
 	  
-	      Node* new_node = mesh.add_point( 0.25*(mesh.node(elem->node(0)) +
-						     mesh.node(elem->node(1)) +
-						     mesh.node(elem->node(2)) +
-						     mesh.node(elem->node(3)))
+	      Node* new_node = mesh.add_point( (mesh.node(elem->node(0)) +
+						mesh.node(elem->node(1)) +
+						mesh.node(elem->node(2)) +
+						mesh.node(elem->node(3)) / 4)
 					       );
 	  
 	      // Check for possible edge swap
