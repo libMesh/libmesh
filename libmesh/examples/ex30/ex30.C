@@ -91,9 +91,14 @@ int main (int argc, char** argv)
 
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
   const unsigned int dim = 2;                      // The number of spatial dimensions
-  
-  bool online_mode = infile("online_mode", false);                    // Are we in Online mode?
+
   bool store_basis_functions = infile("store_basis_functions", true); // Do we write the RB basis functions to disk?
+
+  // Read the "online_mode" flag from the command line
+  GetPot command_line (argc, argv);
+  int online_mode = 0;
+  if ( command_line.search(1, "-online_mode") )
+    online_mode = command_line.next(online_mode);
 
   // Build a mesh.
   Mesh mesh (dim);

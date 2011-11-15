@@ -1,7 +1,6 @@
 # ========= Main function parameters =========
 
 n_elem = 25                    # The number of elements in each dimension in the truth mesh
-online_mode = false            # Do we run Offline mode (to train a basis) or Online mode (to use the precomputed reduced basis)?
 store_basis_functions = true   # Do we store the basis functions in the offline_data directory once Offline finishes?
 
 online_N = 6            # If we're in Online mode, the number of basis functions we use for the reduced basis solve
