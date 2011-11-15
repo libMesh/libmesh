@@ -64,6 +64,8 @@ distclean:
 	@rm -f $(libpath)/*/lib$(pkgname).*
 
 # Dependencies for triangle source file
+%.$(obj-suffix): ../../include/base/libmesh_config.h
+
 triangle.$(obj-suffix):\
     triangle.c\
     triangle.h
