@@ -1046,7 +1046,7 @@ void TransientRBConstruction::enrich_RB_space()
   int IL = 0; // Not used when RANGE = A
   int IU = 0; // Not used when RANGE = A
   
-  double ABSTOL = 1.e-14; // Absolute tolerance for eigensolver
+  Real ABSTOL = 1.e-14; // Absolute tolerance for eigensolver
   
   int M = 0; // (output) The total number of evals found
   
