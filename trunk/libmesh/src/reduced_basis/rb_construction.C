@@ -1864,6 +1864,7 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
     if(!single_matrix_mode)
     {
       matrix->zero();
+      matrix->close();
       matrix->add(1., *inner_product_matrix);
       if(constrained_problem)
         matrix->add(1., *constraint_matrix);
