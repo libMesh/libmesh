@@ -688,6 +688,9 @@ void RBConstruction::truth_assembly()
   this->matrix->zero();
   this->rhs->zero();
 
+  this->matrix->close();
+  this->rhs->close();
+
   if(!single_matrix_mode)
   {
     // We should have already assembled the matrices
