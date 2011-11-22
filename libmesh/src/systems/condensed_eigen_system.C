@@ -123,19 +123,14 @@ void CondensedEigenSystem::solve()
   // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
 
-  // Need to get a global copy of local_non_condensed_dofs_vector on all processors
-  std::vector<unsigned int> global_non_condensed_dofs_vector = local_non_condensed_dofs_vector;
-  Parallel::allgather(global_non_condensed_dofs_vector);
-
   // Now condense the matrices
   matrix_A->create_submatrix(*condensed_matrix_A,
                              local_non_condensed_dofs_vector,
-                             global_non_condensed_dofs_vector);
+                             local_non_condensed_dofs_vector);
 
   matrix_B->create_submatrix(*condensed_matrix_B,
                              local_non_condensed_dofs_vector,
-                             global_non_condensed_dofs_vector);
-
+                             local_non_condensed_dofs_vector);
 
   // Get the tolerance for the solver and the maximum
   // number of iterations. Here, we simply adopt the linear solver
