@@ -1200,6 +1200,7 @@ void TransientRBConstruction::assemble_matrix_for_output_dual_solves()
   if(!single_matrix_mode)
   {
     matrix->zero();
+    matrix->close();
     matrix->add(1., *L2_matrix);
   }
   else
