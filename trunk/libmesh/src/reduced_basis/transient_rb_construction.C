@@ -117,22 +117,22 @@ void TransientRBConstruction::process_parameters_file (const std::string& parame
   GetPot infile(parameters_filename);
   
   // Read in parameters related to temporal discretization
-  unsigned int K_in         = infile("K", temporal_discretization.get_n_time_steps());
-  const Real dt_in          = infile("dt", temporal_discretization.get_delta_t());
-  const Real euler_theta_in = infile("euler_theta", temporal_discretization.get_euler_theta());
+  unsigned int n_time_steps_in = infile("n_time_steps", temporal_discretization.get_n_time_steps());
+  const Real delta_t_in        = infile("delta_t", temporal_discretization.get_delta_t());
+  const Real euler_theta_in    = infile("euler_theta", temporal_discretization.get_euler_theta());
 
   // and set it's member variables
-  temporal_discretization.set_n_time_steps(K_in);
-  temporal_discretization.set_delta_t(dt_in);
+  temporal_discretization.set_n_time_steps(n_time_steps_in);
+  temporal_discretization.set_delta_t(delta_t_in);
   temporal_discretization.set_euler_theta(euler_theta_in);
   temporal_discretization.set_time_step(0);
 
   nonzero_initialization = infile("nonzero_initialization",nonzero_initialization);
   init_filename = infile("init_filename",init_filename);
 
-  const Real POD_tol_in                = infile("POD_tol", POD_tol);
-  const int max_truth_solves_in        = infile("max_truth_solves", max_truth_solves);
-  const unsigned int delta_N_in        = infile("delta_N", delta_N);
+  const Real POD_tol_in         = infile("POD_tol", POD_tol);
+  const int max_truth_solves_in = infile("max_truth_solves", max_truth_solves);
+  const unsigned int delta_N_in = infile("delta_N", delta_N);
 
   set_POD_tol(POD_tol_in);
   set_max_truth_solves(max_truth_solves_in);
