@@ -54,14 +54,14 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Running " $(LIBMESH_RUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
 	@$(LIBMESH_RUN) $(target) -online_mode 0 -eps_type lapack $(LIBMESH_OPTIONS)
 	@$(LIBMESH_RUN) $(target) -online_mode 1 $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running " $(LIBMESHRUN) $(target) $(LIBMESHOPTIONS)
+	@echo "* Done Running " $(LIBMESH_RUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 
 
