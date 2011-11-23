@@ -1263,7 +1263,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
               static bool warning_given_HEX20 = false;
 
               if (!warning_given_HEX20)
-              libMesh::err << "Second derivatives for 2D Lagrangian HEX20"
+              libMesh::err << "Second derivatives for 3D Lagrangian HEX20"
                             << " elements are not yet implemented!"
                             << std::endl;
               warning_given_HEX20 = true;
