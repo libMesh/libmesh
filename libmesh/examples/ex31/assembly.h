@@ -270,10 +270,10 @@ struct Ex23RBAssemblyExpansion : TransientRBAssemblyExpansion
    */
   Ex23RBAssemblyExpansion()
     :
-    L0(0.7,0.8,0.7,0.8),
-    L1(0.2,0.3,0.7,0.8),
-    L2(0.2,0.3,0.2,0.3),
-    L3(0.7,0.8,0.2,0.3)
+    L0(0.72,0.88,0.72,0.88), // We make sure these output regions conform to the mesh
+    L1(0.12,0.28,0.72,0.88),
+    L2(0.12,0.28,0.12,0.28),
+    L3(0.72,0.88,0.12,0.28)
   {
     // And set up the RBAssemblyExpansion object
     attach_M_q_assembly(&M0_assembly); // Attach the time-derivative assembly
