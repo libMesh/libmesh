@@ -70,6 +70,10 @@ int main (int argc, char** argv)
 
 #else
 
+#ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
+  // SLEPc currently gives us a nasty crash with Real==float
+  libmesh_example_assert(false, "--disable-singleprecision");
+#endif
 
   // Check for proper usage.
   if (argc < 3)
