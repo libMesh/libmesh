@@ -39,17 +39,17 @@ ex%-$(METHOD):
 #
 # Clean up the example programs
 clean:
-	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
+	@for dir in $(dirlist); do if [ -f "$${dir}"/Makefile ]; then $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; fi; done
 
 #
 # Really clean up the example programs
 clobber:
-	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
+	@for dir in $(dirlist); do if [ -f "$${dir}"/Makefile ]; then $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; fi; done
 
 # Make the example program directories look
 # like a clean distribution
 distclean:
-	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
+	@for dir in $(dirlist); do if [ -f "$${dir}"/Makefile ]; then $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; fi; done
 
 # Link the example programs (deprecated, use "make examples" instead)
 # link: $(wildcard examples/ex*/*.C)
@@ -60,12 +60,12 @@ distclean:
 # This target should actually be "serialized" in the sense of 'make', we don't
 # want all the examples to try and run simultaneously!
 run: $(wildcard examples/ex*/*.C)
-	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
+	@for dir in $(dirlist); do if [ -f "$${dir}"/Makefile ]; then $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; fi; done
 
 #
 # Rebuild the dependencies for the examples
 .depend: $(wildcard examples/ex*/*.C)
-	@for dir in $(dirlist); do $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; done
+	@for dir in $(dirlist); do if [ -f "$${dir}"/Makefile ]; then $(MAKE) -C "$${dir}" $(MAKECMDGOALS)||exit 1; fi; done
 
 echo:
 	@echo "dirlist = $(dirlist)"
