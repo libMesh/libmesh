@@ -9,7 +9,7 @@ include $(LIBMESH_DIR)/Make.common
 
 all:: examples
 
-dirlist := $(wildcard ex?/ ex??/ reduced_basis/ex??)
+dirlist := $(wildcard ex*/ */ex*/)
 exec_names := $(patsubst %/, %-$(METHOD), $(dirlist))
 
 
