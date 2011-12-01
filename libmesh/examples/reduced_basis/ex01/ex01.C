@@ -53,7 +53,7 @@ using namespace libMesh;
 // reduced basis space is generated and written out to the directory
 // "offline_data". In Online mode, the reduced basis data in "offline_data"
 // is read in and used to solve the reduced problem for the parameters
-// specified in ex23.in.
+// specified in ex01.in.
 
 // We also attach four outputs to the system which are averages over certain
 // subregions of the domain. In Online mode, we print out the values of these
@@ -79,8 +79,8 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   
-  // Parse the input file (ex23.in) using GetPot
-  std::string parameters_filename = "ex23.in";
+  // Parse the input file (ex01.in) using GetPot
+  std::string parameters_filename = "ex01.in";
   GetPot infile(parameters_filename);
 
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh

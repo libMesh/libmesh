@@ -12,8 +12,8 @@
 #include "quadrature_gauss.h"
 
 // rbOOmit includes
-#include "transient_rb_theta_expansion.h"
-#include "transient_rb_assembly_expansion.h"
+#include "rb_theta.h"
+#include "rb_assembly_expansion.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
@@ -32,32 +32,6 @@ using libMesh::RealGradient;
 struct ThetaA0 : RBTheta { virtual Number evaluate(const std::vector<Real>& )   { return 0.05;  } };
 struct ThetaA1 : RBTheta { virtual Number evaluate(const std::vector<Real>& mu) { return mu[0]; } };
 struct ThetaA2 : RBTheta { virtual Number evaluate(const std::vector<Real>& mu) { return mu[1]; } };
-
-struct M0 : ElemAssembly
-{
-  // L2 matrix
-  virtual void interior_assembly(FEMContext &c)
-  {
-    const unsigned int u_var = 0;
-
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
-
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[u_var]->get_phi();
-
-    // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-    // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
-
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        for (unsigned int j=0; j != n_u_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] *phi[j][qp]*phi[i][qp];
-  }
-};
 
 struct A0 : ElemAssembly
 {
@@ -215,7 +189,7 @@ struct OutputAssembly : ElemAssembly
 
 // Build up the dirichlet_dofs_set, which stores all the Dirichlet degrees of freedom
 // in this problem. In this case all boundary dofs are Dirichlet.
-struct Ex23DirichletDofAssembly : DirichletDofAssembly
+struct CDDirichletDofAssembly : DirichletDofAssembly
 {
   virtual void boundary_assembly(FEMContext &c)
   {
@@ -231,17 +205,15 @@ struct Ex23DirichletDofAssembly : DirichletDofAssembly
 };
 
 // Define an RBThetaExpansion class for this PDE
-struct Ex23RBThetaExpansion : TransientRBThetaExpansion
+struct CDRBThetaExpansion : RBThetaExpansion
 {
 
   /**
    * Constructor.
    */
-  Ex23RBThetaExpansion()
+  CDRBThetaExpansion()
   {
     // set up the RBThetaExpansion object
-    attach_theta_q_m(&rb_theta);    // Attach the time-derivative theta
-
     attach_theta_q_a(&theta_a_0);   // Attach the lhs theta
     attach_theta_q_a(&theta_a_1);
     attach_theta_q_a(&theta_a_2);
@@ -262,21 +234,20 @@ struct Ex23RBThetaExpansion : TransientRBThetaExpansion
 };
 
 // Define an RBAssemblyExpansion class for this PDE
-struct Ex23RBAssemblyExpansion : TransientRBAssemblyExpansion
+struct CDRBAssemblyExpansion : RBAssemblyExpansion
 {
 
   /**
    * Constructor.
    */
-  Ex23RBAssemblyExpansion()
+  CDRBAssemblyExpansion()
     :
-    L0(0.72,0.88,0.72,0.88), // We make sure these output regions conform to the mesh
-    L1(0.12,0.28,0.72,0.88),
-    L2(0.12,0.28,0.12,0.28),
-    L3(0.72,0.88,0.12,0.28)
+    L0(0.7,0.8,0.7,0.8),
+    L1(0.2,0.3,0.7,0.8),
+    L2(0.2,0.3,0.2,0.3),
+    L3(0.7,0.8,0.2,0.3)
   {
     // And set up the RBAssemblyExpansion object
-    attach_M_q_assembly(&M0_assembly); // Attach the time-derivative assembly
     attach_A_q_assembly(&A0_assembly); // Attach the lhs assembly
     attach_A_q_assembly(&A1_assembly);
     attach_A_q_assembly(&A2_assembly);
@@ -290,7 +261,6 @@ struct Ex23RBAssemblyExpansion : TransientRBAssemblyExpansion
   }
 
   // The ElemAssembly objects
-  M0 M0_assembly;
   A0 A0_assembly;
   A1 A1_assembly;
   A2 A2_assembly;
@@ -302,3 +272,5 @@ struct Ex23RBAssemblyExpansion : TransientRBAssemblyExpansion
 };
 
 #endif
+
+

@@ -1,7 +1,7 @@
-# $Id$
+# $Id: Makefile 4976 2011-11-15 23:18:27Z knezed01 $
  
 # The location of the mesh library
-LIBMESH_DIR ?= ../..
+LIBMESH_DIR ?= ../../..
 
 # include the library options determined by configure.  This will
 # set the variables INCLUDE and LIBS that we will need to build and
@@ -28,7 +28,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   :=  ./ex30-$(METHOD)
+target 	   :=  ./ex03-$(METHOD)
 
 
 all:: $(target)
@@ -57,7 +57,7 @@ run: $(target)
 	@echo "* Running " $(LIBMESH_RUN) $(target) $(LIBMESHOPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) -online_mode 0 -eps_type lapack $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) -online_mode 0 $(LIBMESH_OPTIONS)
 	@$(LIBMESH_RUN) $(target) -online_mode 1 $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"

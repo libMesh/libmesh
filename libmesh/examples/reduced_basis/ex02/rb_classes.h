@@ -20,7 +20,10 @@
 #ifndef __rb_classes_h__
 #define __rb_classes_h__
 
-#include "transient_rb_construction.h"
+#if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_GLPK)
+
+#include "rb_construction.h"
+#include "rb_scm_construction.h"
 #include "fe_base.h"
 
 // local include
@@ -31,15 +34,14 @@
 using libMesh::EquationSystems;
 using libMesh::FEMContext;
 using libMesh::RBConstruction;
+using libMesh::RBSCMConstruction;
 using libMesh::RBEvaluation;
+using libMesh::RBSCMEvaluation;
 using libMesh::Real;
 
-
-// A simple subclass of RBEvaluation, which just needs to specify
-// (a lower bound for) the coercivity constant for this problem.
-// For this simple convection-diffusion problem, we can set the
-// coercivity constant lower bound to 0.05.
-class SimpleRBEvaluation : public TransientRBEvaluation
+// A simple subclass of RBEvaluation. We also store the theta expansion object
+// for the affine expansion of the PDE as a member variable.
+class SimpleRBEvaluation : public RBEvaluation
 {
 public:
 
@@ -48,25 +50,36 @@ public:
    */
   SimpleRBEvaluation()
   {
-    rb_theta_expansion = &ex23_rb_theta_expansion;
+    rb_theta_expansion = &ex02_rb_theta_expansion;
   }
 
   /**
-   * The coercivity constant is bounded below by 0.05.
+   * We override get_stability_lower_bound so that it calls rb_scm_eval to return
+   * a parameter-dependent lower bound for the coercivity constant.
    */
-  virtual Real get_stability_lower_bound() { return 0.05; }
+  virtual Real get_stability_lower_bound()
+  { 
+    rb_scm_eval->set_current_parameters( get_current_parameters() );
+    return rb_scm_eval->get_SCM_LB() ;
+  }
 
+  /**
+   * Pointer to the SCM object that will provide our coercivity constant lower bound.
+   */
+  RBSCMEvaluation* rb_scm_eval;
+  
   /**
    * The object that stores the "theta" expansion of the parameter dependent PDE,
    * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
    */
-  Ex23RBThetaExpansion ex23_rb_theta_expansion;
+  Ex02RBThetaExpansion ex02_rb_theta_expansion;
 
 };
 
-// A simple subclass of Construction, which just needs to override build_rb_evaluation
-// in order to build a SimpleRBEvaluation object, rather than an RBEvaluation object.
-class SimpleRBConstruction : public TransientRBConstruction
+// A simple subclass of RBConstruction, which initializes libMesh-related data such
+// as the number of variables and their finite element type. We also store the objects
+// that define the affine expansion of the PDE as member variables.
+class SimpleRBConstruction : public RBConstruction
 {
 public:
 
@@ -89,7 +102,7 @@ public:
   /**
    * The type of the parent.
    */
-  typedef TransientRBConstruction Parent;
+  typedef RBConstruction Parent;
 
   /**
    * Initialize data structures.
@@ -99,26 +112,24 @@ public:
     u_var = this->add_variable ("u", FIRST);
 
     Parent::init_data();
-
+    
     // Attach rb_theta_expansion and rb_assembly_expansion
     // to this Construction object.
     // This also checks that the expansion objects are sized consistently
-    attach_affine_expansion(ex23_rb_theta_expansion,
-                            ex23_rb_assembly_expansion);
+    attach_affine_expansion(ex02_rb_theta_expansion,
+                            ex02_rb_assembly_expansion);
 
 
     // Attach the object that determines the Dirichlet boundary conditions for the PDE
     attach_dirichlet_dof_initialization(&dirichlet_assembly);
 
     // We need to define an inner product matrix for this problem
-    attach_inner_prod_assembly(&ex23_rb_assembly_expansion.A0_assembly);
-
-    // We also need an "L2 matrix" in order to compute the time-dependent error bound
-    attach_L2_assembly(&ex23_rb_assembly_expansion.M0_assembly);
+    attach_inner_prod_assembly(&ex02_rb_assembly_expansion.B_assembly);
   }
 
   /**
-   * Pre-request all relevant element data.
+   * Pre-request all relevant element data. (This is not essential, but it
+   * allows libMesh to cache data and hence run faster.)
    */
   virtual void init_context(FEMContext &c)
   {
@@ -134,25 +145,27 @@ public:
    * Variable number for u.
    */
   unsigned int u_var;
-
+  
   /**
    * The object that stores the "theta" expansion of the parameter dependent PDE,
    * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
    */
-  Ex23RBThetaExpansion ex23_rb_theta_expansion;
+  Ex02RBThetaExpansion ex02_rb_theta_expansion;
   
   /**
    * The object that stores the "assembly" expansion of the parameter dependent PDE,
    * i.e. the objects that define how to assemble the set of parameter-independent
    * operators in the affine expansion of the PDE.
    */
-  Ex23RBAssemblyExpansion ex23_rb_assembly_expansion;
+  Ex02RBAssemblyExpansion ex02_rb_assembly_expansion;
 
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
-  Ex23DirichletDofAssembly dirichlet_assembly;
+  Ex02DirichletDofAssembly dirichlet_assembly;
 
 };
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 
 #endif
