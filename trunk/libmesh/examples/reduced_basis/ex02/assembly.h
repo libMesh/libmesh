@@ -231,7 +231,7 @@ struct OutputAssembly : ElemAssembly
 
 // Build up the dirichlet_dofs_set, which stores all the Dirichlet degrees of freedom
 // in this problem. In this case all boundary dofs are Dirichlet.
-struct Ex30DirichletDofAssembly : DirichletDofAssembly
+struct Ex02DirichletDofAssembly : DirichletDofAssembly
 {
   virtual void boundary_assembly(FEMContext &c)
   {
@@ -255,13 +255,13 @@ struct Ex30DirichletDofAssembly : DirichletDofAssembly
 };
 
 // Define an RBThetaExpansion class for this PDE
-struct Ex30RBThetaExpansion : RBThetaExpansion
+struct Ex02RBThetaExpansion : RBThetaExpansion
 {
 
   /**
    * Constructor.
    */
-  Ex30RBThetaExpansion()
+  Ex02RBThetaExpansion()
   {
     // set up the RBThetaExpansion object
     attach_theta_q_a(&theta_a_0);   // Attach the lhs theta
@@ -284,18 +284,18 @@ struct Ex30RBThetaExpansion : RBThetaExpansion
 };
 
 // Define an RBAssemblyExpansion class for this PDE
-struct Ex30RBAssemblyExpansion : RBAssemblyExpansion
+struct Ex02RBAssemblyExpansion : RBAssemblyExpansion
 {
 
   /**
    * Constructor.
    */
-  Ex30RBAssemblyExpansion()
+  Ex02RBAssemblyExpansion()
     :
-    L0(0.7,0.8,0.7,0.8),
-    L1(0.2,0.3,0.7,0.8),
-    L2(0.2,0.3,0.2,0.3),
-    L3(0.7,0.8,0.2,0.3)
+    L0(0.72,0.88,0.72,0.88), // We make sure these output regions conform to the mesh
+    L1(0.12,0.28,0.72,0.88),
+    L2(0.12,0.28,0.12,0.28),
+    L3(0.72,0.88,0.12,0.28)
   {
     // And set up the RBAssemblyExpansion object
     attach_A_q_assembly(&A0_assembly); // Attach the lhs assembly

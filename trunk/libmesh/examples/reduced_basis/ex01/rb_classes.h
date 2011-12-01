@@ -48,7 +48,7 @@ public:
    */
   SimpleRBEvaluation()
   {
-    rb_theta_expansion = &ex23_rb_theta_expansion;
+    rb_theta_expansion = &cd_rb_theta_expansion;
   }
 
   /**
@@ -60,7 +60,7 @@ public:
    * The object that stores the "theta" expansion of the parameter dependent PDE,
    * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
    */
-  Ex23RBThetaExpansion ex23_rb_theta_expansion;
+  CDRBThetaExpansion cd_rb_theta_expansion;
 
 };
 
@@ -103,15 +103,15 @@ public:
     // Attach rb_theta_expansion and rb_assembly_expansion
     // to this Construction object.
     // This also checks that the expansion objects are sized consistently
-    attach_affine_expansion(ex23_rb_theta_expansion,
-                            ex23_rb_assembly_expansion);
+    attach_affine_expansion(cd_rb_theta_expansion,
+                            cd_rb_assembly_expansion);
 
 
     // Attach the object that determines the Dirichlet boundary conditions for the PDE
     attach_dirichlet_dof_initialization(&dirichlet_assembly);
 
     // We need to define an inner product matrix for this problem
-    attach_inner_prod_assembly(&ex23_rb_assembly_expansion.A0_assembly);
+    attach_inner_prod_assembly(&cd_rb_assembly_expansion.A0_assembly);
   }
 
   /**
@@ -136,19 +136,19 @@ public:
    * The object that stores the "theta" expansion of the parameter dependent PDE,
    * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
    */
-  Ex23RBThetaExpansion ex23_rb_theta_expansion;
+  CDRBThetaExpansion cd_rb_theta_expansion;
   
   /**
    * The object that stores the "assembly" expansion of the parameter dependent PDE,
    * i.e. the objects that define how to assemble the set of parameter-independent
    * operators in the affine expansion of the PDE.
    */
-  Ex23RBAssemblyExpansion ex23_rb_assembly_expansion;
+  CDRBAssemblyExpansion cd_rb_assembly_expansion;
 
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
-  Ex23DirichletDofAssembly dirichlet_assembly;
+  CDDirichletDofAssembly dirichlet_assembly;
 
 };
 
