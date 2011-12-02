@@ -34,7 +34,7 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream> // not every compiler distribution includes <iostream> 
+#include <iostream> // not every compiler distribution includes <iostream>
 //                  // with <fstream>
 #include <set>
 #include <sstream>
@@ -46,6 +46,7 @@ extern "C" {
 #include <string.h> // --> strcmp, strncmp, strlen, strncpy
 }
 
+#include "libmesh_common.h"
 
 
 // We need a mutex to keep const operations thread-safe in the
@@ -80,12 +81,12 @@ public:
     // (*) constructors, destructor, assignment operator -----------------------
     inline GetPot();
     inline GetPot(const GetPot&);
-    inline GetPot(const int argc_, char** argv_, 
+    inline GetPot(const int argc_, char** argv_,
 		  const char* FieldSeparator=0x0);
-    inline GetPot(const char* FileName, 
+    inline GetPot(const char* FileName,
 		  const char* CommentStart=0x0, const char* CommentEnd=0x0,
 		  const char* FieldSeparator=0x0);
-    inline GetPot(const std::string& FileName, 
+    inline GetPot(const std::string& FileName,
 		  const std::string& CommentStart   = std::string("#"),
                   const std::string& CommentEnd     = std::string("\n"),
 		  const std::string& FieldSeparator = std::string(" \t\n"));
@@ -93,9 +94,9 @@ public:
     inline GetPot& operator=(const GetPot&);
 
     // Re-initialization methods
-    inline void parse_command_line(const int argc_, char ** argv_, 
+    inline void parse_command_line(const int argc_, char ** argv_,
                                    const char* FieldSeparator =0x0);
-    inline void parse_input_file(const std::string& FileName, 
+    inline void parse_input_file(const std::string& FileName,
                                  const std::string& CommentStart=std::string("#"),
                                  const std::string& CommentEnd=std::string("\n"),
                                  const std::string& FieldSeparator=std::string(" \t\n"));
@@ -136,6 +137,21 @@ public:
     inline T               operator()(const std::string& VarName, const T&    Default, unsigned Idx) const;
     inline const char*     operator()(const char* VarName, const char* Default, unsigned Idx) const;
     inline const char*     operator()(const std::string& VarName, const char* Default, unsigned Idx) const;
+    // (*) access varibles, but error out if not present -----------------------
+    //     -- scalar values
+    template<typename T>
+    inline T               get_value_no_default(const char* VarName, const T& Default) const;
+    template<typename T>
+    inline T               get_value_no_default(const std::string& VarName, const T& Default) const;
+    inline const char*     get_value_no_default(const char* VarName, const char* Default) const;
+    inline const char*     get_value_no_default(const std::string& VarName, const char* Default) const;
+    //     -- vectors
+    template<typename T>
+    inline T               get_value_no_default(const char* VarName, const T&    Default, unsigned Idx) const;
+    template<typename T>
+    inline T               get_value_no_default(const std::string& VarName, const T&    Default, unsigned Idx) const;
+    inline const char*     get_value_no_default(const char* VarName, const char* Default, unsigned Idx) const;
+    inline const char*     get_value_no_default(const std::string& VarName, const char* Default, unsigned Idx) const;
 
     //     -- setting variables
     //                  i) from outside of GetPot (considering prefix etc.)
@@ -146,12 +162,12 @@ public:
     inline void            set(const std::string& VarName, const T& Value, const bool Requested = true);
     inline void            set(const char* VarName, const char* Value, const bool Requested = true);
     inline void            set(const std::string& VarName, const char* Value, const bool Requested = true);
-    
+
     inline unsigned        vector_variable_size(const char* VarName) const;
     inline unsigned        vector_variable_size(const std::string& VarName) const;
     inline STRING_VECTOR   get_variable_names() const;
     inline STRING_VECTOR   get_section_names() const;
-    
+
 
     // (*) cursor oriented functions -------------------------------------------
     inline void            set_prefix(const char* Prefix) { prefix = std::string(Prefix); }
@@ -274,7 +290,7 @@ private:
     //     -- variables
     //       (arguments of the form "variable=value")
     std::vector<variable> variables;
-    
+
     //     -- comment delimiters
     std::string           _comment_start;
     std::string           _comment_end;
@@ -317,7 +333,7 @@ private:
 
     bool            request_recording_f;   // speed: request recording can be turned off
 
-    //     -- if an argument is requested record it and the 'tag' the section branch to which 
+    //     -- if an argument is requested record it and the 'tag' the section branch to which
     //        it belongs. Caution: both functions mark the sections as 'tagged'.
     //        These are "const" functions but they do modify the
     //        mutable _requested_* members
@@ -347,8 +363,11 @@ private:
     template<typename T>
     inline T                  _convert_to_type(const std::string& String, const T& Default) const;
     inline std::string        _convert_to_type(const std::string& String, const char* Default) const;
+    template<typename T>
+    inline T                  _convert_to_type_no_default(const char* VarName, const std::string& String, const T& Default) const;
+    inline std::string        _convert_to_type_no_default(const char* VarName, const std::string& String, const char* Default) const;
     //        * prefix extraction
-    const std::string         _get_remaining_string(const std::string& String, 
+    const std::string         _get_remaining_string(const std::string& String,
 						     const std::string& Start) const;
     //        * search for a specific string
     inline bool               _search_string_vector(const STRING_VECTOR& Vec,
@@ -392,7 +411,7 @@ private:
 	const char* Start = FullPath.c_str();
 
 	for(char *p = (char*)Start; *p ; p++) {
-	    if( *p == '/' ) { 
+	    if( *p == '/' ) {
 		*p = '\0';  // set terminating zero for convinience
 		const std::string Section = Start;
 		*p = '/';   // reset slash at place
@@ -415,7 +434,7 @@ GetPot::_basic_initialization()
     cursor = 0;              nominus_cursor = -1;
     search_failed_f = true;  search_loop_f = true;
     prefix = "";             section = "";
-    
+
     // automatic request recording for later ufo detection
     request_recording_f = true;
 
@@ -448,14 +467,14 @@ GetPot::GetPot() :
   _requested_variables(),
   _requested_sections(),
   request_recording_f()
-{ 
-    _basic_initialization(); 
+{
+    _basic_initialization();
 }
 
 inline
-GetPot::GetPot(const int argc_, char ** argv_, 
+GetPot::GetPot(const int argc_, char ** argv_,
 	       const char* FieldSeparator /* =0x0 */) :
-    // leave 'char**' non-const to honor less capable compilers ... 
+    // leave 'char**' non-const to honor less capable compilers ...
   prefix(),
   section(),
   section_list(),
@@ -481,9 +500,9 @@ GetPot::GetPot(const int argc_, char ** argv_,
 
 
 inline void
-GetPot::parse_command_line(const int argc_, char ** argv_, 
-                           const char* FieldSeparator /* =0x0 */)     
-    // leave 'char**' non-const to honor less capable compilers ... 
+GetPot::parse_command_line(const int argc_, char ** argv_,
+                           const char* FieldSeparator /* =0x0 */)
+    // leave 'char**' non-const to honor less capable compilers ...
 {
     _basic_initialization();
 
@@ -580,7 +599,7 @@ GetPot::parse_input_file(const std::string& FileName,
     _comment_start = std::string(CommentStart);
     _comment_end   = std::string(CommentEnd);
     _field_separator = FieldSeparator;
-    
+
     STRING_VECTOR _apriori_argv;
     // -- file name is element of argument vector, however, it is not parsed for
     //    variable assignments or nominuses.
@@ -613,10 +632,10 @@ GetPot::GetPot(const GetPot& Other) :
   _requested_sections(Other._requested_sections),
   request_recording_f(Other.request_recording_f)
 {
-    std::set<const char*,ltstr>::const_iterator it = 
+    std::set<const char*,ltstr>::const_iterator it =
       Other._internal_string_container.begin();
 
-    const std::set<const char*,ltstr>::const_iterator end = 
+    const std::set<const char*,ltstr>::const_iterator end =
       Other._internal_string_container.end();
 
     for (; it != end; ++it) {
@@ -629,12 +648,12 @@ GetPot::GetPot(const GetPot& Other) :
 
 inline
 GetPot::~GetPot()
-{ 
+{
     // // may be some return strings had to be created, delete now !
     std::set<const char*, ltstr>::const_iterator        it = _internal_string_container.begin();
     const std::set<const char*, ltstr>::const_iterator end = _internal_string_container.end();
     for(; it != end; it++)
-        delete [] *it;	
+        delete [] *it;
 }
 
 inline GetPot&
@@ -667,13 +686,13 @@ GetPot::operator=(const GetPot& Other)
       _internal_string_container.end();
 
     for(; my_it != my_end; my_it++)
-        delete [] *my_it;	
+        delete [] *my_it;
 
     _internal_string_container.clear();
 
-    std::set<const char*,ltstr>::const_iterator it = 
+    std::set<const char*,ltstr>::const_iterator it =
       Other._internal_string_container.begin();
-    const std::set<const char*,ltstr>::const_iterator end = 
+    const std::set<const char*,ltstr>::const_iterator end =
       Other._internal_string_container.end();
 
     for (; it != end; ++it) {
@@ -694,7 +713,7 @@ GetPot::absorb(const GetPot& Other)
 
     // variables that are not influenced by absorption:
     //               _comment_start
-    //               _comment_end 
+    //               _comment_end
     //               cursor
     //               nominus_cursor
     //               search_failed
@@ -703,7 +722,7 @@ GetPot::absorb(const GetPot& Other)
     argv      = Other.argv;
     variables = Other.variables;
 
-    if( request_recording_f ) { 
+    if( request_recording_f ) {
         // Get a lock before touching anything mutable
         SCOPED_MUTEX;
 
@@ -711,10 +730,10 @@ GetPot::absorb(const GetPot& Other)
 	_requested_variables.insert(Other._requested_variables.begin(), Other._requested_variables.end());
 	_requested_sections.insert(Other._requested_sections.begin(), Other._requested_sections.end());
     }
-	
+
 }
 
-inline void    
+inline void
 GetPot::clear_requests()
 {
     // Get a lock before touching anything mutable
@@ -761,7 +780,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 
                 _requested_arguments.insert(arg);
             }
-	    
+
 	    const std::string Name = _DBE_expand_string(arg.substr(1, arg.length()-2));
 	    section = _process_section_label(Name, section_stack);
 	    // new section --> append to list of sections
@@ -782,7 +801,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 	for(; *p ; p++) {
 	    if( *p == '=' ) {
 		// (*) record for later ufo detection
-		//     arguments carriying variables are always treated as 'requested' arguments. 
+		//     arguments carriying variables are always treated as 'requested' arguments.
 		//     unrequested variables have to be detected with the ufo-variable
 		//     detection routine.
 		if( request_recording_f ) {
@@ -894,11 +913,11 @@ GetPot::_skip_whitespace(std::istream& istr)
 	const std::istream::pos_type  Pos = istr.tellg();
 	unsigned    i=0;
 	for(; i<_comment_start.length() ; i++) {
-	    if( tmp != _comment_start[i] ) { 
+	    if( tmp != _comment_start[i] ) {
 		istr.seekg(Pos);
 		// -- one step more backwards, since 'tmp' already at non-whitespace
 		istr.unget();
-		return; 
+		return;
 	    }
 
 // RHS: Why is this here?  It breaks on empty comments
@@ -913,7 +932,7 @@ GetPot::_skip_whitespace(std::istream& istr)
 	    tmp = istr.get();
 	    if( ! istr ) { istr.unget(); return; }
 
-	    if( tmp == _comment_end[match_no] ) { 
+	    if( tmp == _comment_end[match_no] ) {
 		match_no++;
 		if( match_no == _comment_end.length() ) {
 		    istr.unget();
@@ -1096,11 +1115,11 @@ GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) c
   {
     newstring[i]=toupper(newstring[i]);
   }
-  
+
   // "true"/"True"/"TRUE" should work
   if (newstring.find("TRUE")!=std::string::npos)  return true;
   if (newstring.find("FALSE")!=std::string::npos) return false;
-  
+
   // And if we don't find that, let's search for an integer and use C unsigned
   // int->bool conversion before giving up; i.e. a user could specify "0" for
   // false or "1" for true
@@ -1109,6 +1128,70 @@ GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) c
   in_string >> retval;
   if (in_string.fail())
     return Default;
+
+  return retval;
+}
+
+// Use C++ istream/ostream to handle most type conversions.
+template <typename T>
+inline T
+GetPot::_convert_to_type_no_default(const char* VarName, const std::string& String, const T&) const
+{
+  std::istringstream in_string(String);
+  T retval;
+  in_string >> retval;
+  if (in_string.fail())
+  {
+    libMesh::err<<"ERROR: Input value for variable "<<VarName<<" is of the wrong type."<<std::endl;
+    libMesh::err<<"       value = "<<String<<" expected type = "<<typeid(T).name()<<std::endl;
+    libmesh_error();
+  }
+  return retval;
+}
+
+// copy string - operator>> would have stopped upon seeing whitespace!
+template <>
+inline std::string
+GetPot::_convert_to_type_no_default(const char*, const std::string& String, const std::string&) const
+{
+    return String;
+}
+
+// copy string
+inline std::string
+GetPot::_convert_to_type_no_default(const char*, const std::string& String, const char*) const
+{
+    return String;
+}
+
+// be more liberal than std C++ in what we interpret as a boolean
+template<>
+inline bool
+GetPot::_convert_to_type_no_default<bool>(const char* VarName, const std::string& String, const bool&) const
+{
+  std::string newstring(String);
+  //std::transform(newstring.begin(), newstring.end(), newstring.begin(), std::toupper);
+  for (unsigned int i=0; i<newstring.length(); ++i)
+  {
+    newstring[i]=toupper(newstring[i]);
+  }
+
+  // "true"/"True"/"TRUE" should work
+  if (newstring.find("TRUE")!=std::string::npos)  return true;
+  if (newstring.find("FALSE")!=std::string::npos) return false;
+
+  // And if we don't find that, let's search for an integer and use C unsigned
+  // int->bool conversion before giving up; i.e. a user could specify "0" for
+  // false or "1" for true
+  std::istringstream in_string(String);
+  unsigned int retval;
+  in_string >> retval;
+  if (in_string.fail())
+  {
+    libMesh::err<<"ERROR: Input value for variable "<<VarName<<" is of the wrong type."<<std::endl;
+    libMesh::err<<"       value = "<<String<<" expected type = "<<typeid(bool).name()<<std::endl;
+    libmesh_error();
+  }
 
   return retval;
 }
@@ -1122,7 +1205,7 @@ GetPot::_internal_managed_copy(const std::string& Arg) const
     SCOPED_MUTEX;
 
     // See if there's already an identical string saved
-    std::set<const char*,ltstr>::const_iterator it = 
+    std::set<const char*,ltstr>::const_iterator it =
         _internal_string_container.find(arg);
 
     // If so, return it
@@ -1154,19 +1237,19 @@ GetPot::_get_remaining_string(const std::string& String, const std::string& Star
 //     -- search for a certain argument and set cursor to position
 inline bool
 GetPot::search(const std::string &Option)
-{ 
+{
   return search(Option.c_str());
 }
 
 //     -- search for a certain argument and set cursor to position
 inline bool
 GetPot::search(const char* Option)
-{    
+{
     unsigned           OldCursor = cursor;
     const std::string  SearchTerm = prefix + Option;
 
     // (*) record requested arguments for later ufo detection
-    _record_argument_request(SearchTerm);			       
+    _record_argument_request(SearchTerm);
 
     if( OldCursor >= argv.size() ) OldCursor = argv.size() - 1;
     search_failed_f = true;
@@ -1207,10 +1290,10 @@ GetPot::search(unsigned No, const char* P, ...)
 	// (*) search records itself for later ufo detection
 	if( search(Opt) == true ) break;
     }
-    
+
     if( i < No ) {
 	i++;
-	// loop was left before end of array --> hit but 
+	// loop was left before end of array --> hit but
 	// make sure that the rest of the search terms is marked
 	// as requested.
 	for(; i < No; i++) {
@@ -1269,7 +1352,7 @@ GetPot::next(const T& Default)
 {
     if( search_failed_f ) return Default;
     cursor++;
-    if( cursor >= argv.size() )  
+    if( cursor >= argv.size() )
     { cursor = argv.size(); return Default; }
 
     // (*) record requested argument for later ufo detection
@@ -1471,7 +1554,7 @@ GetPot::nominus_vector() const
 	nv.push_back(argv[*it]);
 
 	// (*) record for later ufo-detection
-	//     when a nominus vector is requested, the entire set of nominus arguments are 
+	//     when a nominus vector is requested, the entire set of nominus arguments are
 	//     tagged as 'requested'
 	_record_argument_request(argv[*it]);
     }
@@ -1573,10 +1656,80 @@ GetPot::operator()(const std::string& VarName, const char* Default, unsigned int
     return operator()(VarName.c_str(), Default, Idx);
 }
 
-inline void 
+template <typename T>
+inline T
+GetPot::get_value_no_default(const char* VarName, const T& Default ) const
+{
+    // (*) recording of requested variables happens in '_request_variable()'
+    const variable*  sv = _request_variable(VarName);
+    if( sv == 0 )
+    {
+      libMesh::err<< "ERROR: cannot find variable "<<VarName<<std::endl;
+      libmesh_error();
+    }
+    return _convert_to_type_no_default(VarName, sv->original, Default);
+}
+
+template <typename T>
+inline T
+GetPot::get_value_no_default(const std::string& VarName, const T& Default ) const
+{
+    return get_value_no_default(VarName.c_str(),Default);
+}
+
+inline const char*
+GetPot::get_value_no_default(const char* VarName, const char* Default) const
+{
+    return _internal_managed_copy(get_value_no_default(VarName, Default));
+}
+
+inline const char*
+GetPot::get_value_no_default(const std::string& VarName, const char* Default ) const
+{
+    return get_value_no_default(VarName.c_str(),Default);
+}
+
+template <typename T>
+inline T
+GetPot::get_value_no_default(const char* VarName, const T& Default, unsigned int Idx) const
+{
+    // (*) recording of requested variables happens in '_request_variable()'
+    const variable* sv = _request_variable(VarName);
+    if( sv == 0 ){
+      libMesh::err<< "ERROR: cannot find variable "<<VarName<<std::endl;
+      libmesh_error();
+    }
+    const std::string*  element = sv->get_element(Idx);
+    if( element == 0 ){
+      libMesh::err<< "ERROR: cannot find index "<<Idx<<" of variable "<<VarName<<std::endl;
+      libmesh_error();
+    }
+    return _convert_to_type_no_default(VarName, *element, Default);
+}
+
+template <typename T>
+inline T
+GetPot::get_value_no_default(const std::string& VarName, const T& Default, unsigned int Idx) const
+{
+    return get_value_no_default(VarName.c_str(), Default, Idx);
+}
+
+inline const char*
+GetPot::get_value_no_default(const char* VarName, const char* Default, unsigned int Idx) const
+{
+    return _internal_managed_copy(get_value_no_default(VarName, std::string(Default), Idx));
+}
+
+inline const char*
+GetPot::get_value_no_default(const std::string& VarName, const char* Default, unsigned int Idx) const
+{
+    return get_value_no_default(VarName.c_str(), Default, Idx);
+}
+
+inline void
 GetPot::_record_argument_request(const std::string& Name) const
 {
-    if( ! request_recording_f ) return; 
+    if( ! request_recording_f ) return;
 
     // Get a lock before touching anything mutable
     SCOPED_MUTEX;
@@ -1591,10 +1744,10 @@ GetPot::_record_argument_request(const std::string& Name) const
 	    if( section.length() != 0 ) _requested_sections.insert(*it);
 }
 
-inline void 
+inline void
 GetPot::_record_variable_request(const std::string& Name) const
 {
-    if( ! request_recording_f ) return; 
+    if( ! request_recording_f ) return;
 
     // Get a lock before touching anything mutable
     SCOPED_MUTEX;
@@ -1616,7 +1769,7 @@ GetPot::_set_variable(const char* VarName, const char* Value, const bool Request
 {
     const GetPot::variable* Var = Requested ? _request_variable(VarName) : _find_variable(VarName);
     if( Var == 0 ) variables.push_back(variable(VarName, Value, _field_separator.c_str()));
-    else           ((GetPot::variable*)Var)->take(Value, _field_separator.c_str());    
+    else           ((GetPot::variable*)Var)->take(Value, _field_separator.c_str());
 }
 
 template <typename T>
@@ -1715,8 +1868,8 @@ GetPot::print(std::ostream &out_stream) const
 
 // PECOS/HPCT Addition - add option to prepend output with a delimiter
 // while also disabling argc print and skipping first print (the name
-// of the input file) 
-// 
+// of the input file)
+//
 // PECOS Development Team: (ks. 4/16/09)
 
 inline int
@@ -2218,14 +2371,14 @@ GetPot::unidentified_options(unsigned Number,
 
 inline STRING_VECTOR
 GetPot::unidentified_options() const
-{ 
-    // -- every option is an argument. 
-    // -- the set of requested arguments contains the set of requested options. 
-    // -- IF the set of requested arguments contains unrequested options, 
+{
+    // -- every option is an argument.
+    // -- the set of requested arguments contains the set of requested options.
+    // -- IF the set of requested arguments contains unrequested options,
     //    THEN they were requested as 'follow' and 'next' arguments and not as real options.
     //
     // => it is not necessary to separate requested options from the list
-    return unidentified_arguments(_requested_arguments); 
+    return unidentified_arguments(_requested_arguments);
 }
 
 inline STRING_VECTOR
@@ -2442,9 +2595,9 @@ GetPot::unidentified_nominuses(unsigned Number, const char* Known, ...) const
 
 inline STRING_VECTOR
 GetPot::unidentified_nominuses() const {
-    // -- every nominus is an argument. 
-    // -- the set of requested arguments contains the set of requested nominuss. 
-    // -- IF the set of requested arguments contains unrequested nominuss, 
+    // -- every nominus is an argument.
+    // -- the set of requested arguments contains the set of requested nominuss.
+    // -- IF the set of requested arguments contains unrequested nominuss,
     //    THEN they were requested as 'follow' and 'next' arguments and not as real nominuses.
     //
     // => it is not necessary to separate requested nominus from the list
@@ -2556,7 +2709,7 @@ GetPot::variable::take(const char* Value, const char* FieldSeparator)
 
   // Skip delimiters at beginning.
   std::string::size_type lastPos = Value_str.find_first_not_of(delimiters, 0);
-  
+
   // Find first "non-delimiter".
   std::string::size_type pos     = Value_str.find_first_of(delimiters, lastPos);
 
@@ -2573,7 +2726,7 @@ GetPot::variable::take(const char* Value, const char* FieldSeparator)
       // Find next "non-delimiter"
       pos = Value_str.find_first_of(delimiters, lastPos);
     }
-  
+
   // We're done, all the tokens should now be in the vector<string>
 
 }
