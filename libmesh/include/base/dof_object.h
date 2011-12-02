@@ -232,7 +232,7 @@ public:
 		  const unsigned int ncomp);
   
   /**
-   * @returns the global degree of freedom number variable \p var,
+   * @returns the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
    */
   unsigned int dof_number(const unsigned int s,
@@ -240,7 +240,7 @@ public:
 			  const unsigned int comp) const;
   
   /**
-   * Sets the global degree of freedom number variable \p var,
+   * Sets the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
    */
   void set_dof_number(const unsigned int s,
