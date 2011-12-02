@@ -163,8 +163,8 @@ output file name.
 
 <div class ="fragment">
 <pre>
-          if (argc &gt;= 6 && std::string("-o") == argv[4])
-            mesh.write (argv[5]);
+          if (argc == 5)
+            mesh.write (argv[4]);
         
 </pre>
 </div>
@@ -184,11 +184,52 @@ checks for leaked memory.
 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The program without comments: </h1> 
+<pre> 
+  
+  #include &lt;iostream&gt;
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">int</FONT></B> main (<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
+  {
+    LibMeshInit init (argc, argv);
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc &lt; 4)
+      {
+        <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::processor_id() == 0)
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Usage: &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; -d 2 in.mesh [out.mesh]&quot;</FONT></B>
+                    &lt;&lt; std::endl;
+        
+        libmesh_error();
+      }
+    
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = std::atoi(argv[2]);
+  
+    libmesh_example_assert(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
+    
+    Mesh mesh;
+    
+    mesh.read (argv[3]);
+    
+    mesh.find_neighbors();
+  
+    mesh.print_info();
+    
+    <B><FONT COLOR="#A020F0">if</FONT></B> (argc == 5)
+      mesh.write (argv[4]);
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
+  }
+</pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+Compiling C++ (in optimized mode) ex1.C...
+Linking ex1-opt...
 ***************************************************************
-* Running Example  ./ex1-dbg -d 3 /home/dknez/software/libmesh/reference_elements/3D/one_hex27.xda [-o output.xda]
+* Running Example  mpirun -np 2 ./ex1-opt -d 3 /h2/roystgnr/libmesh/svn/reference_elements/3D/one_hex27.xda -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
  
  Mesh Information:
@@ -200,130 +241,102 @@ checks for leaked memory.
     n_local_elem()=1
     n_active_elem()=1
   n_subdomains()=1
-  n_partitions()=1
-  n_processors()=1
-  n_threads()=1
+  n_processors()=2
   processor_id()=0
 
-WARNING! There are options you set that were not used!
-WARNING! could be spelling mistake, etc!
-Option left: name:-d value: 3
+************************************************************************************************************************
+***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
+************************************************************************************************************************
 
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| N7libMesh4ElemE reference count information:
-|  Creations:    2
-|  Destructions: 2
-| N7libMesh4NodeE reference count information:
-|  Creations:    27
-|  Destructions: 27
-| N7libMesh9DofObjectE reference count information:
-|  Creations:    29
-|  Destructions: 29
- ---------------------------------------------------------------------------- 
+---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
 
--------------------------------------------------------------------
-| Time:           Thu Dec  1 21:20:45 2011                         |
-| OS:             Linux                                            |
-| HostName:       dknez-laptop                                     |
-| OS Release:     3.0.0-13-generic                                 |
-| OS Version:     #22-Ubuntu SMP Wed Nov 2 13:27:26 UTC 2011       |
-| Machine:        x86_64                                           |
-| Username:       dknez                                            |
-| Configuration:  ./configure run on Tue Nov 22 16:02:41 EST 2011  |
--------------------------------------------------------------------
- -----------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.003803, Active time=0.000979                                            |
- -----------------------------------------------------------------------------------------------------------
-| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|-----------------------------------------------------------------------------------------------------------|
-|                                                                                                           |
-|                                                                                                           |
-| Mesh                                                                                                      |
-|   find_neighbors()            2         0.0001      0.000053    0.0001      0.000053    10.93    10.93    |
-|   renumber_nodes_and_elem()   2         0.0000      0.000007    0.0000      0.000007    1.53     1.53     |
-|                                                                                                           |
-| Partitioner                                                                                               |
-|   set_node_processor_ids()    1         0.0002      0.000151    0.0002      0.000151    15.42    15.42    |
-|   single_partition()          1         0.0000      0.000021    0.0000      0.000021    2.15     2.15     |
-|                                                                                                           |
-| XdrIO                                                                                                     |
-|   read()                      1         0.0007      0.000685    0.0007      0.000685    69.97    69.97    |
- -----------------------------------------------------------------------------------------------------------
-| Totals:                       7         0.0010                                          100.00            |
- -----------------------------------------------------------------------------------------------------------
+./ex1-opt on a gcc-4.5-l named daedalus with 2 processors, by roystgnr Tue Feb 22 12:19:26 2011
+Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
 
- Mesh Information:
-  mesh_dimension()=3
-  spatial_dimension()=3
-  n_nodes()=27
-    n_local_nodes()=27
-  n_elem()=1
-    n_local_elem()=1
-    n_active_elem()=1
-  n_subdomains()=1
-  n_partitions()=1
-  n_processors()=1
-  n_threads()=1
-  processor_id()=0
+                         Max       Max/Min        Avg      Total 
+Time (sec):           1.694e-02      1.00000   1.694e-02
+Objects:              0.000e+00      0.00000   0.000e+00
+Flops:                0.000e+00      0.00000   0.000e+00  0.000e+00
+Flops/sec:            0.000e+00      0.00000   0.000e+00  0.000e+00
+MPI Messages:         0.000e+00      0.00000   0.000e+00  0.000e+00
+MPI Message Lengths:  0.000e+00      0.00000   0.000e+00  0.000e+00
+MPI Reductions:       0.000e+00      0.00000
 
-WARNING! There are options you set that were not used!
-WARNING! could be spelling mistake, etc!
-Option left: name:-d value: 3
-Option left: name:-o value: output.xda
+Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+                            e.g., VecAXPY() for real vectors of length N --> 2N flops
+                            and VecAXPY() for complex vectors of length N --> 8N flops
 
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| N7libMesh4ElemE reference count information:
-|  Creations:    2
-|  Destructions: 2
-| N7libMesh4NodeE reference count information:
-|  Creations:    27
-|  Destructions: 27
-| N7libMesh9DofObjectE reference count information:
-|  Creations:    29
-|  Destructions: 29
- ---------------------------------------------------------------------------- 
+Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
+                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
+ 0:      Main Stage: 1.6917e-02  99.9%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
 
--------------------------------------------------------------------
-| Time:           Thu Dec  1 21:20:45 2011                         |
-| OS:             Linux                                            |
-| HostName:       dknez-laptop                                     |
-| OS Release:     3.0.0-13-generic                                 |
-| OS Version:     #22-Ubuntu SMP Wed Nov 2 13:27:26 UTC 2011       |
-| Machine:        x86_64                                           |
-| Username:       dknez                                            |
-| Configuration:  ./configure run on Tue Nov 22 16:02:41 EST 2011  |
--------------------------------------------------------------------
- -----------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.004027, Active time=0.001408                                            |
- -----------------------------------------------------------------------------------------------------------
-| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|-----------------------------------------------------------------------------------------------------------|
-|                                                                                                           |
-|                                                                                                           |
-| Mesh                                                                                                      |
-|   find_neighbors()            2         0.0001      0.000053    0.0001      0.000053    7.53     7.53     |
-|   renumber_nodes_and_elem()   2         0.0000      0.000008    0.0000      0.000008    1.14     1.14     |
-|                                                                                                           |
-| Partitioner                                                                                               |
-|   set_node_processor_ids()    1         0.0001      0.000149    0.0001      0.000149    10.58    10.58    |
-|   single_partition()          1         0.0000      0.000021    0.0000      0.000021    1.49     1.49     |
-|                                                                                                           |
-| XdrIO                                                                                                     |
-|   read()                      1         0.0007      0.000713    0.0007      0.000713    50.64    50.64    |
-|   write()                     1         0.0004      0.000403    0.0004      0.000403    28.62    28.62    |
- -----------------------------------------------------------------------------------------------------------
-| Totals:                       8         0.0014                                          100.00            |
- -----------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+See the 'Profiling' chapter of the users' manual for details on interpreting output.
+Phase summary info:
+   Count: number of times phase was executed
+   Time and Flops: Max - maximum over all processors
+                   Ratio - ratio of maximum to minimum over all processors
+   Mess: number of messages sent
+   Avg. len: average message length
+   Reduct: number of global reductions
+   Global: entire computation
+   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+      %T - percent time in this phase         %F - percent flops in this phase
+      %M - percent messages in this phase     %L - percent message lengths in this phase
+      %R - percent reductions in this phase
+   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
+------------------------------------------------------------------------------------------------------------------------
+Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+------------------------------------------------------------------------------------------------------------------------
 
+--- Event Stage 0: Main Stage
+
+------------------------------------------------------------------------------------------------------------------------
+
+Memory usage is given in bytes:
+
+Object Type          Creations   Destructions     Memory  Descendants' Mem.
+Reports information only for process 0.
+
+--- Event Stage 0: Main Stage
+
+========================================================================================================================
+Average time to get PetscTime(): 9.53674e-08
+Average time for MPI_Barrier(): 1.23978e-06
+Average time for zero size MPI_Send(): 6.55651e-06
+#PETSc Option Table entries:
+-d 3
+-ksp_right_pc
+-log_summary
+-pc_type bjacobi
+-sub_pc_factor_levels 4
+-sub_pc_factor_zeropivot 0
+-sub_pc_type ilu
+#End of PETSc Option Table entries
+Compiled without FORTRAN kernels
+Compiled with full precision matrices (default)
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8
+Configure run at: Fri Oct 15 13:01:23 2010
+Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared=1 --with-mpi-dir=/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid --with-mumps=true --download-mumps=ifneeded --with-parmetis=true --download-parmetis=ifneeded --with-superlu=true --download-superlu=ifneeded --with-superludir=true --download-superlu_dist=ifneeded --with-blacs=true --download-blacs=ifneeded --with-scalapack=true --download-scalapack=ifneeded --with-hypre=true --download-hypre=ifneeded --with-blas-lib="[/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t/libmkl_intel_lp64.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t/libmkl_sequential.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t/libmkl_core.so]" --with-lapack-lib=/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t/libmkl_solver_lp64_sequential.a
+-----------------------------------------
+Libraries compiled on Fri Oct 15 13:01:23 CDT 2010 on atreides 
+Machine characteristics: Linux atreides 2.6.32-25-generic #44-Ubuntu SMP Fri Sep 17 20:05:27 UTC 2010 x86_64 GNU/Linux 
+Using PETSc directory: /org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5
+Using PETSc arch: gcc-4.5-lucid-mpich2-1.2.1-cxx-opt
+-----------------------------------------
+Using C compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/bin/mpicxx -Wall -Wwrite-strings -Wno-strict-aliasing -O3   -fPIC   
+Using Fortran compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/bin/mpif90 -fPIC -Wall -Wno-unused-variable -O3    
+-----------------------------------------
+Using include paths: -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/include  
+------------------------------------------
+Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/bin/mpicxx -Wall -Wwrite-strings -Wno-strict-aliasing -O3 
+Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/bin/mpif90 -fPIC -Wall -Wno-unused-variable -O3  
+Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/gcc-4.5-lucid-mpich2-1.2.1-cxx-opt/lib -lHYPRE -lsuperlu_dist_2.4 -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-gcc-4.5-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lm -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.2.1-gcc-4.5-lucid/lib -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib/gcc/x86_64-unknown-linux-gnu/4.5.1 -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib/gcc/x86_64-unknown-linux-gnu/4.5.1 -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib64 -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib64 -Wl,-rpath,/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib -L/org/centers/pecos/LIBRARIES/GCC/gcc-4.5.1-lucid/lib -ldl -lmpich -lopa -lpthread -lrt -lgcc_s -lmpichf90 -lgfortran -lm -lm -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lpthread -lrt -lgcc_s -ldl  
+------------------------------------------
  
 ***************************************************************
-* Done Running Example  ./ex1-dbg -d 3 /home/dknez/software/libmesh/reference_elements/3D/one_hex27.xda [-o output.xda]
+* Done Running Example  mpirun -np 2 ./ex1-opt -d 3 /h2/roystgnr/libmesh/svn/reference_elements/3D/one_hex27.xda -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
 </pre>
 </div>
