@@ -33,6 +33,7 @@
 #endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC
 
 #include <algorithm>
+#include <stdexcept>
 #include <fstream>
 #include <iostream> // not every compiler distribution includes <iostream>
 //                  // with <fstream>
@@ -46,8 +47,13 @@ extern "C" {
 #include <string.h> // --> strcmp, strncmp, strlen, strncpy
 }
 
-#include "libmesh_common.h"
+// Undefine USE_LIBMESH to avoid libMesh-specific code
 
+#define USE_LIBMESH 1
+
+#ifdef USE_LIBMESH
+
+#include "libmesh_common.h"
 
 // We need a mutex to keep const operations thread-safe in the
 // presence of mutable containers.  Right now GetPot supports a
@@ -60,6 +66,21 @@ extern "C" {
 #else
   #define SCOPED_MUTEX
 #endif
+
+#define getpot_cerr libMesh::err
+#define getpot_error() libmesh_error()
+
+#else // USE_LIBMESH
+
+// Currently threaded GetPot use is only supported via libMesh Threads
+#define SCOPED_MUTEX
+
+#define getpot_cerr std::cerr
+#define getpot_error() throw std::runtime_error
+
+#endif
+
+
 
 typedef  std::vector<std::string>  STRING_VECTOR;
 
@@ -74,6 +95,7 @@ typedef  std::vector<std::string>  STRING_VECTOR;
 #ifdef GETPOT_NAMESPACE
 namespace GETPOT_NAMESPACE {
 #endif
+
 class GetPot {
     //--------
     inline void _basic_initialization();
@@ -1142,9 +1164,9 @@ GetPot::_convert_to_type_no_default(const char* VarName, const std::string& Stri
   in_string >> retval;
   if (in_string.fail())
   {
-    libMesh::err<<"ERROR: Input value for variable "<<VarName<<" is of the wrong type."<<std::endl;
-    libMesh::err<<"       value = "<<String<<" expected type = "<<typeid(T).name()<<std::endl;
-    libmesh_error();
+    getpot_cerr <<"ERROR: Input value for variable "<<VarName<<" is of the wrong type."<<std::endl;
+    getpot_cerr <<"       value = "<<String<<" expected type = "<<typeid(T).name()<<std::endl;
+    getpot_error();
   }
   return retval;
 }
@@ -1188,9 +1210,9 @@ GetPot::_convert_to_type_no_default<bool>(const char* VarName, const std::string
   in_string >> retval;
   if (in_string.fail())
   {
-    libMesh::err<<"ERROR: Input value for variable "<<VarName<<" is of the wrong type."<<std::endl;
-    libMesh::err<<"       value = "<<String<<" expected type = "<<typeid(bool).name()<<std::endl;
-    libmesh_error();
+    getpot_cerr <<"ERROR: Input value for variable "<<VarName<<" is of the wrong type."<<std::endl;
+    getpot_cerr <<"       value = "<<String<<" expected type = "<<typeid(bool).name()<<std::endl;
+    getpot_error();
   }
 
   return retval;
@@ -1664,8 +1686,8 @@ GetPot::get_value_no_default(const char* VarName, const T& Default ) const
     const variable*  sv = _request_variable(VarName);
     if( sv == 0 )
     {
-      libMesh::err<< "ERROR: cannot find variable "<<VarName<<std::endl;
-      libmesh_error();
+      getpot_cerr << "ERROR: cannot find variable "<<VarName<<std::endl;
+      getpot_error();
     }
     return _convert_to_type_no_default(VarName, sv->original, Default);
 }
@@ -1696,13 +1718,13 @@ GetPot::get_value_no_default(const char* VarName, const T& Default, unsigned int
     // (*) recording of requested variables happens in '_request_variable()'
     const variable* sv = _request_variable(VarName);
     if( sv == 0 ){
-      libMesh::err<< "ERROR: cannot find variable "<<VarName<<std::endl;
-      libmesh_error();
+      getpot_cerr << "ERROR: cannot find variable "<<VarName<<std::endl;
+      getpot_error();
     }
     const std::string*  element = sv->get_element(Idx);
     if( element == 0 ){
-      libMesh::err<< "ERROR: cannot find index "<<Idx<<" of variable "<<VarName<<std::endl;
-      libmesh_error();
+      getpot_cerr << "ERROR: cannot find index "<<Idx<<" of variable "<<VarName<<std::endl;
+      getpot_error();
     }
     return _convert_to_type_no_default(VarName, *element, Default);
 }
