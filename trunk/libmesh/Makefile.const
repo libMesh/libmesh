@@ -38,7 +38,7 @@ csrcfiles 	:= $(filter-out $(appsrcfiles), $(wildcard src/*/*.c))
 
 #
 # examples source files
-examplesrcfiles	:= $(wildcard examples/ex*/*.C) $(wildcard examples/*/ex*/*.C)
+examplesrcfiles	:= $(wildcard examples/ex*/*.C) $(wildcard examples/*/*ex*/*.C)
 
 # apps object files
 appobjects	:= $(patsubst %.C, %.$(obj-suffix), $(appsrcfiles))
