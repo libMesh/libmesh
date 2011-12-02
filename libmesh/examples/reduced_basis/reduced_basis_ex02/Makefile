@@ -28,7 +28,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   :=  ./ex02-$(METHOD)
+target 	   :=  ./reduced_basis_ex02-$(METHOD)
 
 
 all:: $(target)

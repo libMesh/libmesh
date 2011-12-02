@@ -41,30 +41,36 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// In this example problem we use the Certified Reduced Basis method
-// to solve a steady convection-diffusion problem on the unit square.
-// The reduced basis method relies on an expansion of the PDE in the
-// form \sum_q=1^Q_a theta_a^q(\mu) * a^q(u,v) = \sum_q=1^Q_f theta_f^q(\mu) f^q(v)
-// where theta_a, theta_f are parameter dependent functions and 
-// a^q, f^q are parameter independent operators (\mu denotes a parameter).
+// In this example we extend ex23 to solve a steady convection-diffusion problem
+// on the unit square via the Reduced Basis Method. In this case, we modify the
+// PDE so that it no longer has a constant coercivity constant. Therefore, in
+// order to obtain an error bound, we need to employ the Successive Constraint
+// Method (SCM) implemented in RBSCMConstruction/RBSCMEvaluation to obtain a
+// lower bound for the coercivity constant.
 
-// We first attach the parameter dependent functions and paramater
-// independent operators to the RBSystem. Then in Offline mode, a
-// reduced basis space is generated and written out to the directory
-// "offline_data". In Online mode, the reduced basis data in "offline_data"
-// is read in and used to solve the reduced problem for the parameters
-// specified in ex01.in.
-
-// We also attach four outputs to the system which are averages over certain
-// subregions of the domain. In Online mode, we print out the values of these
-// outputs as well as rigorous error bounds with respect to the output
-// associated with the "truth" finite element discretization.
+// The PDE being solved is div(k*grad(u)) + Beta*grad(u) = f
+// k is the diffusion coefficient :
+// - constant in the domain 0<=x<0.5 , its value is given by the first parameter mu[0]
+// - constant in the domain 0.5<=x<=1 , its value is given by the second parameter mu[1]
+// Beta is the convection velocity :
+// - constant in the whole domain
+// - equal to zero in the y-direction
+// - its value in the x-direction is given by the third (and last) parameter mu[2]
+// Boundary conditions :
+// - dyu=0 on top and bottom
+// - u=0 on the left side
+// - dxu + Beta*u = 0 on the right side
 
 // The main program.
 int main (int argc, char** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
+
+// This example requires SLEPc and GLPK
+#if !defined(LIBMESH_HAVE_SLEPC) || !defined(LIBMESH_HAVE_GLPK)
+  libmesh_example_assert(false, "--enable-slepc --enable-glpk");
+#else
 
 #if !defined(LIBMESH_HAVE_XDR)
   // We need XDR support to write out reduced bases
@@ -79,13 +85,13 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   
-  // Parse the input file (ex01.in) using GetPot
-  std::string parameters_filename = "ex01.in";
+  // Parse the input file (reduced_basis_ex02.in) using GetPot
+  std::string parameters_filename = "reduced_basis_ex02.in";
   GetPot infile(parameters_filename);
 
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
   const unsigned int dim = 2;                      // The number of spatial dimensions
-  
+
   bool store_basis_functions = infile("store_basis_functions", true); // Do we write the RB basis functions to disk?
 
   // Read the "online_mode" flag from the command line
@@ -110,6 +116,17 @@ int main (int argc, char** argv)
   SimpleRBConstruction & rb_con =
     equation_systems.add_system<SimpleRBConstruction> ("RBConvectionDiffusion");
 
+  // Initialize the SCM Construction object
+  RBSCMConstruction & rb_scm_con =
+    equation_systems.add_system<RBSCMConstruction> ("RBSCMConvectionDiffusion");
+  rb_scm_con.set_RB_system_name("RBConvectionDiffusion");
+  rb_scm_con.add_variable("p", FIRST);
+
+  // Set parameters for the eigenvalue problems that will be solved by rb_scm_con
+  equation_systems.parameters.set<unsigned int>("eigenpairs")    = 1;
+  equation_systems.parameters.set<unsigned int>("basis vectors") = 3;
+  equation_systems.parameters.set<unsigned int>
+    ("linear solver maximum iterations") = 1000;
 
   // Initialize the data structures for the equation system.
   equation_systems.init ();
@@ -122,17 +139,30 @@ int main (int argc, char** argv)
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
   SimpleRBEvaluation rb_eval;
-  
-  // We need to give the RBConstruction object a pointer to
+
+  // Finally, we need to give the RBConstruction object a pointer to
   // our RBEvaluation object
   rb_con.rb_eval = &rb_eval;
 
+  // We also need a SCM evaluation object to perform SCM calculations
+  RBSCMEvaluation rb_scm_eval;
+
   // Read in the data that defines this problem from the specified text file
   rb_con.process_parameters_file(parameters_filename);
+  rb_scm_con.process_parameters_file(parameters_filename);
+
+  // Need to give rb_scm_con and rb_scm_eval a pointer to the theta expansion
+  rb_scm_con.rb_theta_expansion  = rb_con.rb_theta_expansion;
+  rb_scm_eval.rb_theta_expansion = rb_con.rb_theta_expansion;
+  
+  // Finally, need to give rb_scm_con and rb_eval a pointer to the
+  // SCM evaluation object, rb_scm_eval
+  rb_scm_con.rb_scm_eval = &rb_scm_eval;
+  rb_eval.rb_scm_eval    = &rb_scm_eval;
 
   // Print out info that describes the current setup of rb_con
   rb_con.print_info();
-
+  rb_scm_con.print_info();
 
 
   if(!online_mode) // Perform the Offline stage of the RB method
@@ -141,6 +171,10 @@ int main (int argc, char** argv)
     // This sets up the necessary data structures and performs
     // initial assembly of the "truth" affine expansion of the PDE.
     rb_con.initialize_rb_construction();
+    
+    // Perform the SCM Greedy algorithm to derive the data required
+    // for rb_scm_eval to provide a coercivity lower bound.
+    rb_scm_con.perform_SCM_greedy();
 
     // Compute the reduced basis space by computing "snapshots", i.e.
     // "truth" solves, at well-chosen parameter values and employing
@@ -149,6 +183,7 @@ int main (int argc, char** argv)
     
     // Write out the data that will subsequently be required for the Evaluation stage
     rb_con.rb_eval->write_offline_data_to_files();
+    rb_scm_con.rb_scm_eval->write_offline_data_to_files();
     
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
@@ -158,9 +193,7 @@ int main (int argc, char** argv)
   }
   else // Perform the Online stage of the RB method
   {
-    // Read in the reduced basis data
-    rb_eval.read_offline_data_from_files();
-    
+
     // Get the parameters at which we do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
     std::vector<Real> online_mu_vector(rb_con.get_n_params());
@@ -171,8 +204,13 @@ int main (int argc, char** argv)
 
     // Set the parameters to online_mu_vector
     rb_eval.set_current_parameters(online_mu_vector);
+    rb_scm_eval.set_current_parameters(online_mu_vector);
     rb_eval.print_current_parameters();
-
+    
+    // Read in the reduced basis data
+    rb_eval.read_offline_data_from_files();
+    rb_scm_eval.read_offline_data_from_files();   
+ 
     // Now do the Online solve using the precomputed reduced basis
     rb_eval.rb_solve(online_N);
 
@@ -207,5 +245,7 @@ int main (int argc, char** argv)
   }
 
   return 0;
+
+#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 }
 
