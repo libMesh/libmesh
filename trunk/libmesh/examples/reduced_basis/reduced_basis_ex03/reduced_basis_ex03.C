@@ -64,8 +64,8 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
-  // Parse the input file (ex03.in) using GetPot
-  std::string parameters_filename = "ex03.in";
+  // Parse the input file (reduced_basis_ex03.in) using GetPot
+  std::string parameters_filename = "reduced_basis_ex03.in";
   GetPot infile(parameters_filename);
 
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
