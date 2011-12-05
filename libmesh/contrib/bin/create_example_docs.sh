@@ -9,7 +9,7 @@ if [ "x$LIBMESH_DIR" = x ]; then
 fi
 
 cd $LIBMESH_DIR/examples/
-exampleslist=`ls -d ex*/ */*ex*/ | sed 's#/$##g'`
+exampleslist=`ls -d */*ex*/ | sed 's#/$##g'`
 echo $exampleslist
 cd ../contrib/bin/
 
