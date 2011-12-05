@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -72,17 +72,17 @@ class XdrIO : public MeshInput<MeshBase>,
    * files.
    */
   XdrIO (const MeshBase&, const bool=false);
-  
+
   /**
    * Destructor.
    */
   virtual ~XdrIO ();
-  
+
   /**
    * This method implements reading a mesh from a specified file.
    */
   virtual void read (const std::string&);
-    
+
   /**
    * This method implements writing a mesh to a specified file.
    */
@@ -93,13 +93,13 @@ class XdrIO : public MeshInput<MeshBase>,
    */
   bool   binary() const { return _binary; };
   bool & binary()       { return _binary; };
-  
+
   /**
    * Get/Set the flag indicating if we should read/write legacy.
    */
   bool   legacy() const { return _legacy; };
   bool & legacy()       { return _legacy; };
-  
+
   /**
    * Report whether we should write parallel files.
    */
@@ -115,17 +115,17 @@ class XdrIO : public MeshInput<MeshBase>,
    * mesh is an already distributed ParallelMesh.
    */
   void set_auto_parallel ();
-  
+
   /**
    * Get/Set the version string.  Vailid version strings:
      \verbatim
 
-     "libMesh-0.7.0+" 
+     "libMesh-0.7.0+"
      "libMesh-0.7.0+ parallel"
 
      \endverbatim
      If "libMesh" is not detected in the version string the
-     \p LegacyXdrIO class will be used to read older 
+     \p LegacyXdrIO class will be used to read older
      (pre version 0.7.0) mesh files.
    */
   const std::string & version () const { return _version; };
@@ -160,7 +160,7 @@ class XdrIO : public MeshInput<MeshBase>,
 
 
   //---------------------------------------------------------------------------
-  // Write Implementation  
+  // Write Implementation
   /**
    * Write the connectivity for a parallel, distributed mesh
    */
@@ -177,7 +177,7 @@ class XdrIO : public MeshInput<MeshBase>,
   void write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const;
 
 
-  
+
   //---------------------------------------------------------------------------
   // Read Implementation
   /**
@@ -199,8 +199,8 @@ class XdrIO : public MeshInput<MeshBase>,
   /**
    * Pack an element into a transfer buffer for parallel communication.
    */
-  void pack_element (std::vector<unsigned int> &conn, 
-		     const Elem *elem, 
+  void pack_element (std::vector<unsigned int> &conn,
+		     const Elem *elem,
 		     const unsigned int parent_id  = libMesh::invalid_uint,
 		     const unsigned int parent_pid = libMesh::invalid_uint) const;
 
@@ -247,7 +247,7 @@ bool XdrIO::write_parallel() const
 
 inline
 void XdrIO::set_write_parallel (bool do_parallel)
-{ 
+{
   this->_write_parallel = do_parallel;
 
   this->_write_serial = !do_parallel;

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -311,7 +311,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
 	  }
 	}
     }
-  
+
   // We'll never get here.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -325,7 +325,7 @@ AutoPtr<Elem> Hex27::build_edge (const unsigned int i) const
 
   return AutoPtr<Elem>(new SideEdge<Edge3,Hex27>(this,i));
 }
-  
+
 
 
 void Hex27::connectivity(const unsigned int sc,
@@ -356,7 +356,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(24)+1;
 
 	    return;
-      
+
 	  case 1:
 
 	    conn[0] = this->node(8)+1;
@@ -369,20 +369,20 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(26)+1;
 
 	    return;
-      
+
 	  case 2:
 
 	    conn[0] = this->node(11)+1;
 	    conn[1] = this->node(20)+1;
 	    conn[2] = this->node(10)+1;
-	    conn[3] = this->node(3)+1; 
+	    conn[3] = this->node(3)+1;
 	    conn[4] = this->node(24)+1;
 	    conn[5] = this->node(26)+1;
 	    conn[6] = this->node(23)+1;
 	    conn[7] = this->node(15)+1;
 
 	    return;
-      
+
 	  case 3:
 
 	    conn[0] = this->node(20)+1;
@@ -395,7 +395,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(23)+1;
 
 	    return;
-      
+
 	  case 4:
 
 	    conn[0] = this->node(12)+1;
@@ -408,7 +408,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(19)+1;
 
 	    return;
-      
+
 	  case 5:
 
 	    conn[0] = this->node(21)+1;
@@ -421,7 +421,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(25)+1;
 
 	    return;
-      
+
 	  case 6:
 
 	    conn[0] = this->node(24)+1;
@@ -431,12 +431,12 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[4] = this->node(19)+1;
 	    conn[5] = this->node(25)+1;
 	    conn[6] = this->node(18)+1;
-	    conn[7] = this->node(7)+1; 
+	    conn[7] = this->node(7)+1;
 
 	    return;
-      
+
 	  case 7:
-      
+
 	    conn[0] = this->node(26)+1;
 	    conn[1] = this->node(22)+1;
 	    conn[2] = this->node(14)+1;
@@ -452,7 +452,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    libmesh_error();
 	  }
       }
-      
+
     case VTK:
       {
 	// VTK now supports VTK_TRIQUADRATIC_HEXAHEDRON directly
@@ -485,7 +485,7 @@ void Hex27::connectivity(const unsigned int sc,
 	conn[24] = this->node(20);
 	conn[25] = this->node(25);
 	conn[26] = this->node(26);
-	
+
 	return;
 
 	/*
@@ -503,7 +503,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(24);
 
 	    return;
-      
+
 	  case 1:
 
 	    conn[0] = this->node(8);
@@ -516,20 +516,20 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(26);
 
 	    return;
-      
+
 	  case 2:
 
 	    conn[0] = this->node(11);
 	    conn[1] = this->node(20);
 	    conn[2] = this->node(10);
-	    conn[3] = this->node(3); 
+	    conn[3] = this->node(3);
 	    conn[4] = this->node(24);
 	    conn[5] = this->node(26);
 	    conn[6] = this->node(23);
 	    conn[7] = this->node(15);
 
 	    return;
-      
+
 	  case 3:
 
 	    conn[0] = this->node(20);
@@ -542,7 +542,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(23);
 
 	    return;
-      
+
 	  case 4:
 
 	    conn[0] = this->node(12);
@@ -555,7 +555,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(19);
 
 	    return;
-      
+
 	  case 5:
 
 	    conn[0] = this->node(21);
@@ -568,7 +568,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[7] = this->node(25);
 
 	    return;
-      
+
 	  case 6:
 
 	    conn[0] = this->node(24);
@@ -578,12 +578,12 @@ void Hex27::connectivity(const unsigned int sc,
 	    conn[4] = this->node(19);
 	    conn[5] = this->node(25);
 	    conn[6] = this->node(18);
-	    conn[7] = this->node(7); 
+	    conn[7] = this->node(7);
 
 	    return;
-      
+
 	  case 7:
-      
+
 	    conn[0] = this->node(26);
 	    conn[1] = this->node(22);
 	    conn[2] = this->node(14);
@@ -596,7 +596,7 @@ void Hex27::connectivity(const unsigned int sc,
 	    return;
 
 	  default:
-	    libmesh_error();      
+	    libmesh_error();
 	  }
 	*/
       }
@@ -653,7 +653,7 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
 
 unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
 							const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
 
@@ -671,7 +671,7 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
       case 25:
       {
 	libmesh_assert (v < 4);
-        return _remaining_second_order_adjacent_vertices[n-20][v]; 
+        return _remaining_second_order_adjacent_vertices[n-20][v];
       }
 
       /*
@@ -690,20 +690,20 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
       /*
        * nodes 8..19:
        * these are all nodes that are identical for
-       * Hex20 and Hex27.  Therefore use the 
+       * Hex20 and Hex27.  Therefore use the
        * matrix stored in cell_hex.C
        */
       default:
       {
 	libmesh_assert (v < 2);
-        return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+        return _second_order_adjacent_vertices[n-this->n_vertices()][v];
       }
     }
 }
 
 
 
-const unsigned short int Hex27::_remaining_second_order_adjacent_vertices[6][4] = 
+const unsigned short int Hex27::_remaining_second_order_adjacent_vertices[6][4] =
 {
   { 0,  1,  2,  3}, // vertices adjacent to node 20   face nodes
   { 0,  1,  4,  5}, // vertices adjacent to node 21

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -82,18 +82,18 @@ public:
     * and to simply provide additional functionality with the EpetraMatrix.
     */
    EpetraMatrix (Epetra_FECrsMatrix * m);
-  
+
   /**
    * Destructor. Free all memory, but do not
    * release the memory of the sparsity
    * structure.
    */
   ~EpetraMatrix ();
- 
+
 //   /**
 //    * The \p EpetraMatrix needs the full sparsity pattern.
-//    */ 
-  bool need_full_sparsity_pattern () const 
+//    */
+  bool need_full_sparsity_pattern () const
   { return true; }
 
 //   /**
@@ -120,40 +120,40 @@ public:
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.
-   */   
+   */
   void init ();
-  
+
   /**
    * Release all memory and return
    * to a state just like after
    * having called the default
-   * constructor. 
+   * constructor.
    */
   void clear ();
 
   /**
-   * Set all entries to 0. This method retains 
+   * Set all entries to 0. This method retains
    * sparsity structure.
    */
   void zero ();
-  
+
   /**
    * Call the Petsc assemble routines.
    * sends necessary messages to other
    * processors
    */
   void close () const;
-  
+
   /**
    * @returns \p m, the row-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
-   */  
+   */
   unsigned int m () const;
 
   /**
    * @returns \p n, the column-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
-   */  
+   */
   unsigned int n () const;
 
   /**
@@ -177,7 +177,7 @@ public:
   void set (const unsigned int i,
 	    const unsigned int j,
 	    const T value);
-    
+
   /**
    * Add \p value to the element
    * \p (i,j).  Throws an error if
@@ -196,29 +196,29 @@ public:
    * for adding an element matrix
    * at assembly time
    */
-    
+
   void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<unsigned int> &rows,
-		   const std::vector<unsigned int> &cols);	     
+		   const std::vector<unsigned int> &cols);
 
   /**
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   void add_matrix (const DenseMatrix<T> &dm,
-		   const std::vector<unsigned int> &dof_indices);	     
-      
+		   const std::vector<unsigned int> &dof_indices);
+
   /**
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,
-   * stores the result in \p this: 
+   * stores the result in \p this:
    * \f$\texttt{this} = a*X + \texttt{this} \f$.
-   * It is advisable to not only allocate appropriate memory with 
+   * It is advisable to not only allocate appropriate memory with
    * \p init() , but also explicitly zero the terms of \p this
-   * whenever you add a non-zero value to \p X.  Note: \p X will 
+   * whenever you add a non-zero value to \p X.  Note: \p X will
    * be closed, if not already done, before performing any work.
    */
   void add (const T a, SparseMatrix<T> &X);
-    
+
   /**
    * Return the value of the entry
    * \p (i,j).  This may be an
@@ -242,7 +242,7 @@ public:
 
   /**
    * Return the l1-norm of the matrix, that is
-   * \f$|M|_1=max_{all columns j}\sum_{all 
+   * \f$|M|_1=max_{all columns j}\sum_{all
    * rows i} |M_ij|\f$,
    * (max. sum of columns).
    * This is the
@@ -256,7 +256,7 @@ public:
   /**
    * Return the linfty-norm of the
    * matrix, that is
-   * \f$|M|_infty=max_{all rows i}\sum_{all 
+   * \f$|M|_infty=max_{all rows i}\sum_{all
    * columns j} |M_ij|\f$,
    * (max. sum of rows).
    * This is the
@@ -272,7 +272,7 @@ public:
    * and fully assembled yet
    */
   bool closed() const;
-  
+
   /**
    * Print the contents of the matrix, by default to libMesh::out.
    */
@@ -309,7 +309,7 @@ public:
    */
   Epetra_FECrsMatrix * mat () { libmesh_assert (_mat != NULL); return _mat; }
 
-  
+
 protected:
 
 //   /**
@@ -327,7 +327,7 @@ protected:
 // 			      const bool reuse_submatrix) const;
 
 private:
-  
+
   /**
    * Actual Epetra datatype
    * to hold matrix entries
@@ -346,7 +346,7 @@ private:
 
   /**
    * This boolean value should only be set to false
-   * for the constructor which takes a PETSc Mat object. 
+   * for the constructor which takes a PETSc Mat object.
    */
   bool _destroy_mat_on_exit;
 };
@@ -391,7 +391,7 @@ inline
 void EpetraMatrix<T>::close () const
 {
   libmesh_assert (_mat != NULL);
-  
+
   _mat->GlobalAssemble();
 }
 
@@ -402,7 +402,7 @@ inline
 unsigned int EpetraMatrix<T>::m () const
 {
   libmesh_assert (this->initialized());
-  
+
   return static_cast<unsigned int>(_mat->NumGlobalRows());
 }
 
@@ -413,7 +413,7 @@ inline
 unsigned int EpetraMatrix<T>::n () const
 {
   libmesh_assert (this->initialized());
-  
+
   return static_cast<unsigned int>(_mat->NumGlobalCols());
 }
 
@@ -448,18 +448,18 @@ inline
 void EpetraMatrix<T>::set (const unsigned int i,
 			   const unsigned int j,
 			   const T value)
-{  
+{
   libmesh_assert (this->initialized());
 
-  int 
+  int
     epetra_i = static_cast<int>(i),
     epetra_j = static_cast<int>(j);
 
   T epetra_value = value;
 
-  if (_mat->Filled())    
+  if (_mat->Filled())
     _mat->ReplaceGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
-  else    
+  else
     _mat->InsertGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
 }
 
@@ -472,13 +472,13 @@ void EpetraMatrix<T>::add (const unsigned int i,
 			   const T value)
 {
   libmesh_assert (this->initialized());
-  
-  int 
+
+  int
     epetra_i = static_cast<int>(i),
     epetra_j = static_cast<int>(j);
 
   T epetra_value = value;
-  
+
   _mat->SumIntoGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
 }
 
@@ -500,7 +500,7 @@ void EpetraMatrix<T>::add (const T, SparseMatrix<T> &X_in)
 {
   libmesh_assert (this->initialized());
 
-  // sanity check. but this cannot avoid 
+  // sanity check. but this cannot avoid
   // crash due to incompatible sparsity structure...
   libmesh_assert (this->m() == X_in.m());
   libmesh_assert (this->n() == X_in.n());
@@ -511,24 +511,24 @@ void EpetraMatrix<T>::add (const T, SparseMatrix<T> &X_in)
 //   EpetraMatrix<T>* X = libmesh_cast_ptr<EpetraMatrix<T>*> (&X_in);
 
 //   libmesh_assert (X != NULL);
-  
+
 //   int ierr=0;
 
 //   // the matrix from which we copy the values has to be assembled/closed
 //   X->close ();
 
 // // 2.2.x & earlier style
-// #if PETSC_VERSION_LESS_THAN(2,3,0)  
-  
+// #if PETSC_VERSION_LESS_THAN(2,3,0)
+
 //   ierr = MatAXPY(&a,  X->_mat, _mat, SAME_NONZERO_PATTERN);
 //          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
+
 // // 2.3.x & newer
 // #else
-  
+
 //   ierr = MatAXPY(_mat, a, X->_mat, DIFFERENT_NONZERO_PATTERN);
 //          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
+
 // #endif
 }
 
@@ -563,7 +563,7 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
   libmesh_assert (static_cast<unsigned int>(row_indices[*index]) == j);
 
   //libMesh::out << "val=" << values[*index] << std::endl;
-  
+
   return values[*index];
 }
 
@@ -576,7 +576,7 @@ bool EpetraMatrix<T>::closed() const
 {
   libmesh_assert (this->initialized());
   libmesh_assert (this->_mat != NULL);
-  
+
   return this->_mat->Filled();
 }
 

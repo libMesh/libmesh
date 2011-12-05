@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -155,7 +155,7 @@ Real clough_raw_shape(const unsigned int basis_num,
   return xi + eta + zeta;
 }
 
-  
+
 } // end anonymous namespace
 
 
@@ -172,7 +172,7 @@ Real FE<3,CLOUGH>::shape(const ElemType,
   libMesh::err << "Clough-Tocher elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -189,15 +189,15 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 
   libMesh::err << "3D Clough elements not yet implemented."
 	        << std::endl;
-  
+
   libmesh_error();
 
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
-  
+
   switch (order+elem->p_level())
-    {      
+    {
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
@@ -213,7 +213,7 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -222,7 +222,7 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 
 template <>
 Real FE<3,CLOUGH>::shape_deriv(const ElemType,
-				   const Order,			    
+				   const Order,
 				   const unsigned int,
 				   const unsigned int,
 				   const Point&)
@@ -248,15 +248,15 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 
   libMesh::err << "3D Clough elements not yet implemented."
 	        << std::endl;
-  
+
   libmesh_error();
 
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
-  
+
   switch (order+elem->p_level())
-    {      
+    {
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
@@ -272,7 +272,7 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -290,15 +290,15 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
 
   libMesh::err << "3D Clough elements not yet implemented."
 	    << std::endl;
-  
+
   libmesh_error();
 
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
-  
+
   switch (order+elem->p_level())
-    {      
+    {
       // 3rd-order Clough-Tocher element
     case THIRD:
       {
@@ -314,7 +314,7 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }

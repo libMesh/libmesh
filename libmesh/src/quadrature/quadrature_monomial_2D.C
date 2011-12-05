@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -56,7 +56,7 @@ void QMonomial::init_2D(const ElemType _type,
 	      const Real
 		s=std::sqrt(1./3.),
 		t=std::sqrt(2./3.);
-	      
+
 	      const Real data[2][3] =
 		{
 		  {0.0,  s,  2.0},
@@ -67,26 +67,26 @@ void QMonomial::init_2D(const ElemType _type,
 	      _weights.resize(3);
 
 	      wissmann_rule(data, 2);
-	      
+
 	      return;
 	    } // end case SECOND
 
 
-	    
+
 	  // For third-order, fall through to default case, use 2x2 Gauss product rule.
 	  // case THIRD:
 	  //   {
 	  //   }  // end case THIRD
-	    
+
 	  case FOURTH:
 	    {
 	      // A pair of degree=4 rules for the QUAD "C2" due to
 	      // Wissmann and Becker. These rules both have six points.
 	      // A tensor product degree-4 Gauss would have 9 points.
 	      //
-	      // J. W. Wissmann and T. Becker, Partially symmetric cubature 
+	      // J. W. Wissmann and T. Becker, Partially symmetric cubature
 	      // formulas for even degrees of exactness, SIAM J. Numer. Anal.  23
-	      // (1986), 676--685.                                           
+	      // (1986), 676--685.
 	      const Real data[4][3] =
 		{
 		  // First of 2 degree-4 rules given by Wissmann
@@ -98,26 +98,26 @@ void QMonomial::init_2D(const ElemType _type,
 		  // Second of 2 degree-4 rules given by Wissmann.  These both
 		  // yield 4th-order accurate rules, I just chose the one that
 		  // happened to contain the origin.
-		  // {0.000000000000000, -0.356822089773090,  1.286412084888852}, 
+		  // {0.000000000000000, -0.356822089773090,  1.286412084888852},
 		  // {0.000000000000000,  0.934172358962716,  0.491365692888926},
 		  // {0.774596669241483,  0.390885162530071,  0.761883709085613},
-		  // {0.774596669241483, -0.852765377881771,  0.349227402025498} 
+		  // {0.774596669241483, -0.852765377881771,  0.349227402025498}
 		};
 
 	      _points.resize(6);
 	      _weights.resize(6);
 
 	      wissmann_rule(data, 4);
-	      
+
 	      return;
 	    } // end case FOURTH
 
 
 
-	    
+
 	  case FIFTH:
 	    {
-	      // A degree 5, 7-point rule due to Stroud.  
+	      // A degree 5, 7-point rule due to Stroud.
 	      //
 	      // A.H. Stroud, Approximate calculation of multiple integrals,
 	      // Prentice-Hall, Englewood Cliffs, N.J., 1971.
@@ -136,27 +136,27 @@ void QMonomial::init_2D(const ElemType _type,
 		7, // Central Symmetry
 		6  // Rectangular
 	      };
-	      
+
 	      _points.resize (7);
 	      _weights.resize(7);
 
 	      stroud_rule(data, symmetry, 3);
-	      
+
 	      return;
 	    } // end case FIFTH
 
 
 
-	    
+
 	  case SIXTH:
 	    {
 	      // A pair of degree=6 rules for the QUAD "C2" due to
 	      // Wissmann and Becker. These rules both have 10 points.
 	      // A tensor product degree-6 Gauss would have 16 points.
 	      //
-	      // J. W. Wissmann and T. Becker, Partially symmetric cubature 
+	      // J. W. Wissmann and T. Becker, Partially symmetric cubature
 	      // formulas for even degrees of exactness, SIAM J. Numer. Anal.  23
-	      // (1986), 676--685.                                           
+	      // (1986), 676--685.
 	      const Real data[6][3] =
 		{
 		  // First of 2 degree-6, 10 point rules given by Wissmann
@@ -165,7 +165,7 @@ void QMonomial::init_2D(const ElemType _type,
 		  // {0.888764014654765,  0.872101531193131,  0.144000884599645},
 		  // {0.604857639464685,  0.305985162155427,  0.668259104262665},
 		  // {0.955447506641064, -0.410270899466658,  0.225474004890679},
-		  // {0.565459993438754, -0.872869311156879,  0.320896396788441} 
+		  // {0.565459993438754, -0.872869311156879,  0.320896396788441}
 		  //
 		  // Second of 2 degree-6, 10 point rules given by Wissmann.
 		  // Either of these will work, I just chose the one with points
@@ -183,15 +183,15 @@ void QMonomial::init_2D(const ElemType _type,
 
 	      wissmann_rule(data, 6);
 
-	      return; 
+	      return;
 	    } // end case SIXTH
 
 
 
-	    
+
 	  case SEVENTH:
 	    {
-	      // A degree 7, 12-point rule due to Tyler, can be found in Stroud's book  
+	      // A degree 7, 12-point rule due to Tyler, can be found in Stroud's book
 	      //
 	      // A.H. Stroud, Approximate calculation of multiple integrals,
 	      // Prentice-Hall, Englewood Cliffs, N.J., 1971.
@@ -205,7 +205,7 @@ void QMonomial::init_2D(const ElemType _type,
 		B1 = 196.L / 810.L,
 		B2 = 4.L * (178981.L + 2769.L*std::sqrt(583.L)) / 1888920.L,
 		B3 = 4.L * (178981.L - 2769.L*std::sqrt(583.L)) / 1888920.L;
-	      
+
 	      const Real data[3][3] =
 		{
 		  {r, 0.0, B1}, // 4
@@ -218,7 +218,7 @@ void QMonomial::init_2D(const ElemType _type,
 		2, // Full Symmetry, (x,x)
 		2  // Full Symmetry, (x,x)
 	      };
-	      
+
 	      _points.resize (12);
 	      _weights.resize(12);
 
@@ -229,16 +229,16 @@ void QMonomial::init_2D(const ElemType _type,
 
 
 
-	    
+
 	  case EIGHTH:
 	    {
 	      // A pair of degree=8 rules for the QUAD "C2" due to
 	      // Wissmann and Becker. These rules both have 16 points.
 	      // A tensor product degree-6 Gauss would have 25 points.
 	      //
-	      // J. W. Wissmann and T. Becker, Partially symmetric cubature 
+	      // J. W. Wissmann and T. Becker, Partially symmetric cubature
 	      // formulas for even degrees of exactness, SIAM J. Numer. Anal.  23
-	      // (1986), 676--685.                                           
+	      // (1986), 676--685.
 	      const Real data[10][3] =
 		{
 		  // First of 2 degree-8, 16 point rules given by Wissmann
@@ -272,7 +272,7 @@ void QMonomial::init_2D(const ElemType _type,
 
 	      wissmann_rule(data, /*10*/ 9);
 
-	      return; 
+	      return;
 	    } // end case EIGHTH
 
 
@@ -280,7 +280,7 @@ void QMonomial::init_2D(const ElemType _type,
 
 	  case NINTH:
 	    {
-	      // A degree 9, 17-point rule due to Moller.  
+	      // A degree 9, 17-point rule due to Moller.
 	      //
 	      // H.M. Moller,  Kubaturformeln mit minimaler Knotenzahl,
 	      // Numer. Math.  25 (1976), 185--200.
@@ -303,7 +303,7 @@ void QMonomial::init_2D(const ElemType _type,
 		4, // Rotational Invariant
 		4  // Rotational Invariant
 	      };
-	      
+
 	      _points.resize (17);
 	      _weights.resize(17);
 
@@ -318,12 +318,12 @@ void QMonomial::init_2D(const ElemType _type,
 	  case TENTH:
 	  case ELEVENTH:
 	    {
-	      // A degree 11, 24-point rule due to Cools and Haegemans.  
+	      // A degree 11, 24-point rule due to Cools and Haegemans.
 	      //
 	      // R. Cools and A. Haegemans, Another step forward in searching for
 	      // cubature formulae with a minimal number of knots for the square,
 	      // Computing 40 (1988), 139--146.
-	      // 
+	      //
 	      // P. Verlinden and R. Cools, The algebraic construction of a minimal
 	      // cubature formula of degree 11 for the square, Cubature Formulas
 	      // and their Applications (Russian) (Krasnoyarsk) (M.V. Noskov, ed.),
@@ -349,7 +349,7 @@ void QMonomial::init_2D(const ElemType _type,
 		4, // Rotational Invariant
 		4  // Rotational Invariant
 	      };
-	      
+
 	      _points.resize (24);
 	      _weights.resize(24);
 
@@ -364,12 +364,12 @@ void QMonomial::init_2D(const ElemType _type,
 	  case TWELFTH:
 	  case THIRTEENTH:
 	    {
-	      // A degree 13, 33-point rule due to Cools and Haegemans.  
+	      // A degree 13, 33-point rule due to Cools and Haegemans.
 	      //
 	      // R. Cools and A. Haegemans, Another step forward in searching for
 	      // cubature formulae with a minimal number of knots for the square,
 	      // Computing 40 (1988), 139--146.
-	      // 
+	      //
 	      // A tensor-product rule accurate for "bi-12" or "bi-13" degree polynomials would have 49 points.
 	      const Real data[9][3] =
 		{
@@ -395,7 +395,7 @@ void QMonomial::init_2D(const ElemType _type,
 		4, // Rotational Invariant
 		4  // Rotational Invariant
 	      };
-	      
+
 	      _points.resize (33);
 	      _weights.resize(33);
 
@@ -441,7 +441,7 @@ void QMonomial::init_2D(const ElemType _type,
 		1, // Full Symmetry, (x,y)
 		1, // Full Symmetry, (x,y)
 	      };
-	      
+
 	      _points.resize (48);
 	      _weights.resize(48);
 
@@ -452,16 +452,16 @@ void QMonomial::init_2D(const ElemType _type,
 
 
 
-	    
+
 	  case SIXTEENTH:
 	  case SEVENTEENTH:
 	    {
-	      // A degree 17, 60-point rule due to Cools and Haegemans.  
+	      // A degree 17, 60-point rule due to Cools and Haegemans.
 	      //
 	      // R. Cools and A. Haegemans, Another step forward in searching for
 	      // cubature formulae with a minimal number of knots for the square,
 	      // Computing 40 (1988), 139--146.
-	      // 
+	      //
 	      // A tensor-product rule accurate for "bi-14" or "bi-15" degree polynomials would have 64 points.
 	      // A tensor-product rule accurate for "bi-16" or "bi-17" degree polynomials would have 81 points.
 	      const Real data[10][3] =
@@ -484,13 +484,13 @@ void QMonomial::init_2D(const ElemType _type,
 		2, // Fully symmetric (x,x)
 		2, // Fully symmetric (x,x)
 		2, // Fully symmetric (x,x)
-		1, // Fully symmetric (x,y) 
+		1, // Fully symmetric (x,y)
 		1, // Fully symmetric (x,y)
 		1, // Fully symmetric (x,y)
 		1, // Fully symmetric (x,y)
 		1  // Fully symmetric (x,y)
 	      };
-	      
+
 	      _points.resize (60);
 	      _weights.resize(60);
 
@@ -498,9 +498,9 @@ void QMonomial::init_2D(const ElemType _type,
 
 	      return;
 	    } // end case FOURTEENTH through SEVENTEENTH
-	    
-	    
-	    
+
+
+
 	    // By default: construct and use a Gauss quadrature rule
 	  default:
 	    {
@@ -508,11 +508,11 @@ void QMonomial::init_2D(const ElemType _type,
 	      // outer switch statement.
 	      break;
 	    }
-	    
+
 	  } // end switch(_order + 2*p)
       } // end case QUAD4/8/9
 
-      
+
       // By default: construct and use a Gauss quadrature rule
     default:
       {

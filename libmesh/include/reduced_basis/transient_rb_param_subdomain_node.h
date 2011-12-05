@@ -53,12 +53,12 @@ public:
    * Constructor. Initializes required data structures.
    */
   TransientRBParamSubdomainNode (TransientRBParamSubdomainTree& tree, const std::vector<Real>& anchor);
-  
+
   /**
    * Convenient typedef for the Parent class.
    */
   typedef RBParamSubdomainNode Parent;
-  
+
   /**
    * Add a new (LEFT or RIGHT) child RBParamSubdomainNode. Overloaded
    * in order to add QNTransientRBParamSubdomainNode children.

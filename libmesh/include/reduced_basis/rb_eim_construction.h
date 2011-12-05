@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -84,12 +84,12 @@ public:
    * The type of system.
    */
   typedef RBEIMConstruction sys_type;
-  
+
   /**
    * The type of the parent.
    */
   typedef RBConstruction Parent;
-  
+
   /**
    * @returns a string indicating the type of the system.
    */
@@ -111,7 +111,7 @@ public:
    * the Construction stage of the RB method.
    */
   virtual void initialize_rb_construction();
- 
+
   /**
    * Load the truth representation of the parametrized function
    * at the current parameters into the solution vector.
@@ -130,21 +130,21 @@ public:
    * @return the error in the best fit
    */
   virtual Real compute_best_fit_error();
-  
+
   /**
    * Provide an implementation of init_context that is
    * relevant to the projection calculations in
    * load_calN_parametrized_function.
    */
   virtual void init_context(FEMContext &c);
-  
+
   /**
    * Attach the parametrized function that we will approximate
    * using the Empirical Interpolation Method.
    */
   void attach_paramerized_function(ParametrizedFunction* pf)
     { parametrized_functions.push_back(pf); }
-  
+
   /**
    * Get the number of parametrized functions that have
    * been attached to this system.
@@ -157,14 +157,14 @@ public:
    * being approximated.
    */
   Number evaluate_parametrized_function(unsigned int index, const Point& p);
-  
+
   /**
    * @return the number of affine terms defined by the current EIM
    * approximation. Each function is typically used in an associated
    * reduced basis approximation.
    */
   virtual unsigned int get_n_affine_functions() const;
-  
+
   /**
    * Evaluate the basis function \p index at the points \p qpoints
    * on element \p element.
@@ -175,7 +175,7 @@ public:
                                               const std::vector<Point>& qpoints);
 
   //----------- PUBLIC DATA MEMBERS -----------//
-  
+
   /**
    * Enum that indicates which type of "best fit" algorithm
    * we should use.
@@ -186,7 +186,7 @@ public:
    * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;
-  
+
 protected:
 
   /**
@@ -194,26 +194,26 @@ protected:
    * to enrich with the EIM basis functions.
    */
   virtual void enrich_RB_space();
-  
+
   /**
    * Update the system after enriching the RB space; this calls
    * a series of functions to update the system properly.
    */
   virtual void update_system();
-  
+
   /**
    * Compute the reduced basis matrices for the current basis.
    * Overload to update the inner product matrix that
    * is used to compute the best fit to parametrized_function.
    */
   virtual void update_RB_system_matrices();
-  
+
   /**
    * Overload to return the best fit error. This function is used in
    * the Greedy algorithm to select the next parameter.
    */
   virtual Real get_RB_error_bound() { return compute_best_fit_error(); }
-  
+
   /**
    * Function that indicates when to terminate the Greedy
    * basis training. Overload in subclasses to specialize.
@@ -227,14 +227,14 @@ protected:
    * If basis_function_index_in == current_bf_index, then this function does nothing.
    */
   void set_current_basis_function(unsigned int basis_function_index_in);
-  
+
 private:
 
   /**
    * A mesh function to interpolate on the mesh.
    */
   MeshFunction* mesh_function;
-  
+
   /**
    * This flag allows us to perform one extra Greedy step
    * in order to compute the data needed for the EIM
@@ -242,27 +242,27 @@ private:
    * all of our basis functions.
    */
   bool performing_extra_greedy_step;
-  
+
   /**
    * This vector stores the parametrized functions
    * that will be approximated in this EIM system.
    */
   std::vector<ParametrizedFunction*> parametrized_functions;
-  
+
   /**
    * The current basis function that we sample to evaluate the
    * empirical interpolation approximation. This will be a GHOSTED
    * vector to facilitate interpolation in the case of multiple processors.
    */
   AutoPtr< NumericVector<Number> > current_ghosted_bf;
-  
+
   /**
    * We also need to store a basis function index to identify which basis function
    * is currently stored in current_ghosted_bf. This allows us to cache the basis
    * function and avoid unnecessarily reloading it all the time.
    */
   unsigned int current_bf_index;
-  
+
   /**
    * We also need an extra vector in which we can store a serialized
    * copy of the solution vector so that we can use MeshFunction

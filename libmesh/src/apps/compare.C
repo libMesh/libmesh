@@ -24,7 +24,7 @@
 using namespace libMesh;
 
 
-/** 
+/**
  * how to use this, and command line processor
  */
 void usage(char *progName)
@@ -63,13 +63,13 @@ void usage(char *progName)
     " Direct questions to:\n"
     " benkirk@cfdlab.ae.utexas.edu\n";
 
-    
+
   if (progName == NULL)
     baseName = "UNKNOWN";
-  else 
+  else
     baseName = progName;
 
-  
+
   fprintf(stderr, helpList.c_str(), baseName.c_str());
   fflush(stderr);
 
@@ -102,7 +102,7 @@ void process_cmd_line(int argc, char **argv,
     {
       switch (opt)
         {
-          
+
           /**
            * Get mesh file name
            */
@@ -127,7 +127,7 @@ void process_cmd_line(int argc, char **argv,
             dim = atoi(optarg);
             break;
           }
-          
+
           /**
            * Get left file name
            */
@@ -146,7 +146,7 @@ void process_cmd_line(int argc, char **argv,
               }
             break;
           }
-          
+
           /**
            * Get right file name
            */
@@ -191,7 +191,7 @@ void process_cmd_line(int argc, char **argv,
               }
             break;
           }
-          
+
           /**
            * Use binary format
            */
@@ -210,8 +210,8 @@ void process_cmd_line(int argc, char **argv,
               }
             break;
           }
-          
-                    
+
+
           /**
            * Be verbose
            */
@@ -220,7 +220,7 @@ void process_cmd_line(int argc, char **argv,
             verbose = true;
             break;
           }
-          
+
           /**
            * Be totally quiet, no matter what -v says
            */
@@ -229,11 +229,11 @@ void process_cmd_line(int argc, char **argv,
             quiet = true;
             break;
           }
-          
+
         case 'h':
         case '?':
           usage(argv[0]);
-          
+
         default:
           return;
         }
@@ -265,7 +265,7 @@ bool do_compare (EquationSystems& les,
       std::cout << "********* COMPARISON PHASE *********" << std::endl
                 << std::endl;
     }
- 
+
   /**
    * start comparing
    */
@@ -289,13 +289,13 @@ bool do_compare (EquationSystems& les,
 int main (int argc, char** argv)
 {
   LibMeshInit init(argc, argv);
-  
+
   // these should better be not contained in the following braces
   bool quiet = false;
   bool are_equal;
 
   PerfMon perfmon(argv[0]);
-  
+
   // default values
   std::vector<std::string> names;
   unsigned int dim                = static_cast<unsigned int>(-1);
@@ -304,7 +304,7 @@ int main (int argc, char** argv)
   bool verbose                    = false;
 
   // get commands
-  process_cmd_line(argc, argv, 
+  process_cmd_line(argc, argv,
                    names,
                    dim,
                    threshold,
@@ -332,9 +332,9 @@ int main (int argc, char** argv)
                   << " left system    = " << names[1] << std::endl
                   << " right system   = " << names[2] << std::endl
                   << " threshold      = " << threshold << std::endl
-                  << " read format    = " << format << std::endl 
+                  << " read format    = " << format << std::endl
                   << std::endl;
-    }          
+    }
 
 
   /**
@@ -368,8 +368,8 @@ int main (int argc, char** argv)
   if (names.size() == 3)
     {
       left_system.read  (names[1], format);
-      right_system.read (names[2], format);          
-    }    
+      right_system.read (names[2], format);
+    }
   else
     {
       std::cout << "Bad input specified." << std::endl;
@@ -388,9 +388,9 @@ int main (int argc, char** argv)
     {
       if (!quiet)
           std::cout << std::endl
-                    << " Congrat's, up to the defined threshold, the two"  
+                    << " Congrat's, up to the defined threshold, the two"
                     << std::endl
-                    << " are identical." 
+                    << " are identical."
                     << std::endl;
       our_result=0;
     }
@@ -398,7 +398,7 @@ int main (int argc, char** argv)
     {
       if (!quiet)
           std::cout << std::endl
-                    << " Oops, differences occured!"  
+                    << " Oops, differences occured!"
                     << std::endl
                     << " Use -v to obtain more information where differences occured."
                     << std::endl;

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,7 +48,7 @@ namespace {
     system_string += unzipped_name;
     if (std::system(system_string.c_str()))
       libmesh_file_error(system_string);
-     
+
     STOP_LOG("system(bzip2)", "XdrIO");
 #else
     libMesh::err << "ERROR: need bzip2/bunzip2 to create "
@@ -64,7 +64,7 @@ namespace {
     // be running multiple zip utilities on parallel files.
     // libmesh_assert(libMesh::processor_id() == 0);
 
-    OStringStream pid_suffix; 
+    OStringStream pid_suffix;
     pid_suffix << '_' << getpid();
 
     std::string new_name = name;
@@ -118,7 +118,7 @@ namespace {
     system_string += unzipped_name;
     if (std::system(system_string.c_str()))
       libmesh_file_error(system_string);
-     
+
     STOP_LOG("system(xz)", "XdrIO");
 #else
     libMesh::err << "ERROR: need xz to create "
@@ -132,7 +132,7 @@ namespace {
   // remove an unzipped file
   void remove_unzipped_file (const std::string &name)
   {
-    OStringStream pid_suffix; 
+    OStringStream pid_suffix;
     pid_suffix << '_' << getpid();
 
     // If we temporarily decompressed a file, remove the
@@ -203,15 +203,15 @@ void Xdr::open (const std::string& name)
 	xdrs = new XDR;
 	xdrstdio_create (xdrs, fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
 
 	libmesh_error();
-	
+
 #endif
 	return;
 
@@ -241,7 +241,7 @@ void Xdr::open (const std::string& name)
 	    std::ifstream *inf = new std::ifstream;
 	    libmesh_assert (inf != NULL);
 	    in.reset(inf);
-	    
+
 	    std::string new_name = unzip_file(name);
 
 	    inf->open(new_name.c_str(), std::ios::in);
@@ -286,14 +286,14 @@ void Xdr::open (const std::string& name)
 
 	    outf->open(new_name.c_str(), std::ios::out);
 	  }
-	
+
 	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	return;
       }
-      
+
     default:
       libmesh_error();
-    }  
+    }
 }
 
 
@@ -313,7 +313,7 @@ void Xdr::close ()
 	    delete xdrs;
 	    xdrs = NULL;
 	  }
-	
+
 	if (fp)
 	  {
 	    fflush(fp);
@@ -321,26 +321,26 @@ void Xdr::close ()
 	    fp = NULL;
 	  }
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
 
 	libmesh_error();
-	
+
 #endif
 	file_name = "";
 	return;
       }
-      
+
     case READ:
       {
 	if (in.get() != NULL)
 	  {
-	    in.reset();    
-	    
+	    in.reset();
+
 	    if (bzipped_file || xzipped_file)
 	      remove_unzipped_file(file_name);
 	  }
@@ -352,7 +352,7 @@ void Xdr::close ()
       {
 	if (out.get() != NULL)
 	  {
-	    out.reset();      
+	    out.reset();
 
 	    if (bzipped_file)
 	      bzip_file(std::string(file_name.begin(), file_name.end()-4));
@@ -387,21 +387,21 @@ bool Xdr::is_open() const
 	return false;
 
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
 
 	libmesh_error();
 
-	return false;	
+	return false;
 
 #endif
 
       }
-      
+
     case READ:
       {
 	if (in.get() != NULL)
@@ -514,7 +514,7 @@ xdrproc_t xdr_translator<long double>() { return (xdrproc_t)(xdr_double); }
 
 template <typename T>
 void Xdr::do_read(T& a) {
-  *in >> a; 
+  *in >> a;
   in->getline(comm, comm_len);
 }
 
@@ -532,7 +532,7 @@ void Xdr::do_read(std::string& a) {
 
   for (unsigned int c=0; c<std::strlen(comm); c++)
     {
-      if (comm[c] == '\t') 
+      if (comm[c] == '\t')
         break;
       a.push_back(comm[c]);
     }
@@ -547,7 +547,7 @@ void Xdr::do_read(std::vector<T>& a) {
   for (unsigned int i=0; i<a.size(); i++)
     {
       libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-      *in >> a[i]; 
+      *in >> a[i];
     }
   in->getline(comm, comm_len);
 }
@@ -570,12 +570,12 @@ template <typename T>
 void Xdr::do_write(T& a) { *out << a; }
 
 template <typename T>
-void Xdr::do_write(std::complex<T>& a) { 
+void Xdr::do_write(std::complex<T>& a) {
   *out << a.real() << "\t " << a.imag();
 }
 
 template <typename T>
-void Xdr::do_write(std::vector<T>& a) { 
+void Xdr::do_write(std::vector<T>& a) {
   unsigned int length=a.size();
   data(length, "# vector length");
 
@@ -588,7 +588,7 @@ void Xdr::do_write(std::vector<T>& a) {
 }
 
 template <typename T>
-void Xdr::do_write(std::vector<std::complex<T> >& a) { 
+void Xdr::do_write(std::vector<std::complex<T> >& a) {
   unsigned int length=a.size();
   data(length, "# vector length x 2 (complex)");
 
@@ -617,9 +617,9 @@ void Xdr::data (T& a, const char* comment)
 	xdr_translate(xdrs, a);
 
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
@@ -633,7 +633,7 @@ void Xdr::data (T& a, const char* comment)
     case READ:
       {
 	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	
+
 	this->do_read(a);
 
 	return;
@@ -642,7 +642,7 @@ void Xdr::data (T& a, const char* comment)
     case WRITE:
       {
 	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
-	
+
 	this->do_write(a);
         *out << "\t " << comment << '\n';
 
@@ -667,23 +667,23 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 	libmesh_assert (this->is_open());
 
 
-	xdr_vector(xdrs, 
+	xdr_vector(xdrs,
 		   (char*) val,
 		   len,
 		   sizeof(unsigned int),
 		   (xdrproc_t) xdr_u_int);
 
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
 
 	libmesh_error();
 
-#endif	
+#endif
 	return;
       }
 
@@ -694,16 +694,16 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 	libmesh_assert (this->is_open());
 
 	if (len > 0)
-	  xdr_vector(xdrs, 
+	  xdr_vector(xdrs,
 		     (char*) val,
 		     len,
 		     sizeof(unsigned int),
 		     (xdrproc_t) xdr_u_int);
-	
+
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
@@ -724,7 +724,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 	    *in >> val[i];
 	  }
 
-	return;	
+	return;
       }
 
     case WRITE:
@@ -752,7 +752,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 	      }
 	  }
 
-	return;	
+	return;
       }
 
     default:
@@ -775,16 +775,16 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 	libmesh_assert (this->is_open());
 
 	if (len > 0)
-	  xdr_vector(xdrs, 
+	  xdr_vector(xdrs,
 		     (char*) val,
 		     len,
 		     sizeof(double),
 		     (xdrproc_t) xdr_double);
-	
+
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
@@ -805,7 +805,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 	    *in >> val[i];
 	  }
 
-	return;	
+	return;
       }
 
     case WRITE:
@@ -833,7 +833,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 	      }
 	  }
 
-	return;	
+	return;
       }
 
     default:
@@ -863,11 +863,11 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 		      << "currently supported." << std::endl;
 
 	libmesh_error();
-	
+
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
@@ -891,7 +891,7 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 	    *in >> val[i];
 	  }
 
-	return;	
+	return;
       }
 
     case WRITE:
@@ -919,7 +919,7 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 	      }
 	  }
 
-	return;	
+	return;
       }
 
     default:
@@ -944,7 +944,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 	// doubles drops back to double precision, but you can still
 	// write long double ASCII files of course.
 	// if (len > 0)
-	//   xdr_vector(xdrs, 
+	//   xdr_vector(xdrs,
 	// 	     (char*) val,
 	// 	     len,
 	// 	     sizeof(double),
@@ -953,30 +953,30 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 	if (len > 0)
 	  {
 	    std::vector<double> io_buffer (len);
-	    
+
 	    // Fill io_buffer if we are writing.
 	    if (mode == ENCODE)
 	      for (unsigned int i=0, cnt=0; i<len; i++)
 		io_buffer[cnt++] = val[i];
-	      
-	    xdr_vector(xdrs, 
+
+	    xdr_vector(xdrs,
 		       (char*) &io_buffer[0],
 		       len,
 		       sizeof(double),
 		       (xdrproc_t) xdr_double);
-	    
+
 	    // Fill val array if we are reading.
 	    if (mode == DECODE)
 	      for (unsigned int i=0, cnt=0; i<len; i++)
 		{
 		  val[i] = io_buffer[cnt++];
-		} 
+		}
 	  }
-	
+
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
@@ -997,7 +997,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 	    *in >> val[i];
 	  }
 
-	return;	
+	return;
       }
 
     case WRITE:
@@ -1025,7 +1025,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 	      }
 	  }
 
-	return;	
+	return;
       }
 
     default:
@@ -1051,33 +1051,33 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 	if (len > 0)
 	  {
 	    std::vector<double> io_buffer (2*len);
-	    
+
 	    // Fill io_buffer if we are writing.
 	    if (mode == ENCODE)
 	      for (unsigned int i=0, cnt=0; i<len; i++)
 		{
 		  io_buffer[cnt++] = val[i].real();
 		  io_buffer[cnt++] = val[i].imag();
-		} 
-	      
-	    xdr_vector(xdrs, 
+		}
+
+	    xdr_vector(xdrs,
 		       (char*) &io_buffer[0],
 		       2*len,
 		       sizeof(double),
 		       (xdrproc_t) xdr_double);
-	    
+
 	    // Fill val array if we are reading.
 	    if (mode == DECODE)
 	      for (unsigned int i=0, cnt=0; i<len; i++)
 		{
 		  val[i].real() = io_buffer[cnt++];
 		  val[i].imag() = io_buffer[cnt++];
-		} 
+		}
 	  }
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
@@ -1098,7 +1098,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 	    *in >> val[i].real() >> val[i].imag();
 	  }
 
-	return;	
+	return;
       }
 
     case WRITE:
@@ -1129,7 +1129,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 	      }
 	  }
 
-	return;	
+	return;
       }
 
     default:
@@ -1158,33 +1158,33 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 	if (len > 0)
 	  {
 	    std::vector<double> io_buffer (2*len);
-	    
+
 	    // Fill io_buffer if we are writing.
 	    if (mode == ENCODE)
 	      for (unsigned int i=0, cnt=0; i<len; i++)
 		{
 		  io_buffer[cnt++] = val[i].real();
 		  io_buffer[cnt++] = val[i].imag();
-		} 
-	      
-	    xdr_vector(xdrs, 
+		}
+
+	    xdr_vector(xdrs,
 		       (char*) &io_buffer[0],
 		       2*len,
 		       sizeof(double),
 		       (xdrproc_t) xdr_double);
-	    
+
 	    // Fill val array if we are reading.
 	    if (mode == DECODE)
 	      for (unsigned int i=0, cnt=0; i<len; i++)
 		{
 		  val[i].real() = io_buffer[cnt++];
 		  val[i].imag() = io_buffer[cnt++];
-		} 
+		}
 	  }
 #else
-	
+
 	libMesh::err << "ERROR: Functionality is not available." << std::endl
-		      << "Make sure LIBMESH_HAVE_XDR is defined at build time" 
+		      << "Make sure LIBMESH_HAVE_XDR is defined at build time"
 		      << std::endl
 		      << "The XDR interface is not available in this installation"
 		      << std::endl;
@@ -1205,7 +1205,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 	    *in >> val[i].real() >> val[i].imag();
 	  }
 
-	return;	
+	return;
       }
 
     case WRITE:
@@ -1236,7 +1236,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 	      }
 	  }
 
-	return;	
+	return;
       }
 
     default:
@@ -1259,14 +1259,14 @@ void Xdr::comment (std::string &comment)
       {
 	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
 	in->getline(comm, comm_len);
-	return;	
+	return;
       }
 
     case WRITE:
       {
 	libmesh_assert (out.get() != NULL); libmesh_assert (out->good());
 	*out << "\t " << comment << '\n';
-	return;	
+	return;
       }
 
     default:

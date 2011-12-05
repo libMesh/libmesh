@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -44,7 +44,7 @@ namespace libMesh
  * useful for finite elements, particulary for systems of equations.
  *
  * @author Benjamin S. Kirk, 2003
- */ 
+ */
 
 // ------------------------------------------------------------
 // DenseVector class definition
@@ -70,10 +70,10 @@ public:
    */
   template <typename T2>
   DenseVector (const std::vector<T2>& other_vector);
-  
+
   /**
    * Destructor.  Does nothing.
-   */     
+   */
   ~DenseVector() {}
 
   /**
@@ -85,7 +85,7 @@ public:
    * Set every element in the vector to 0.
    */
   virtual void zero();
-  
+
   /**
    * @returns the \p (i) element of the vector.
    */
@@ -105,18 +105,18 @@ public:
    * @returns the \p (i) element of the vector as a writeable reference.
    */
   virtual T & el(const unsigned int i)     { return (*this)(i); }
-  
+
   /**
    * Assignment operator.
    */
   template <typename T2>
   DenseVector<T>& operator = (const DenseVector<T2>& other_vector);
-  
+
   /**
    * STL-like swap method
    */
   void swap(DenseVector<T>& other_vector);
-  
+
   /**
    * Resize the vector. Sets all elements to 0.
    */
@@ -126,12 +126,12 @@ public:
    * Multiplies every element in the vector by \p factor.
    */
   void scale (const T factor);
-  
+
   /**
    * Multiplies every element in the vector by \p factor.
    */
   DenseVector<T>& operator*= (const T factor);
-  
+
   /**
    * Adds \p factor times \p vec to this vector.
    * This should only work if T += T2 * T3 is valid C++ and
@@ -154,25 +154,25 @@ public:
    */
   template <typename T2>
   bool operator== (const DenseVector<T2> &vec) const;
-  
+
   /**
    * Tests if \p vec is not exactly equal to this vector.
    */
   template <typename T2>
   bool operator!= (const DenseVector<T2> &vec) const;
-  
+
   /**
    * Adds \p vec to this vector.
    */
   template <typename T2>
   DenseVector<T>& operator+= (const DenseVector<T2> &vec);
-  
+
   /**
    * Subtracts \p vec from this vector.
    */
   template <typename T2>
   DenseVector<T>& operator-= (const DenseVector<T2> &vec);
-  
+
   /**
    * @returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
@@ -271,7 +271,7 @@ template<typename T2>
 inline
 DenseVector<T>::DenseVector (const std::vector<T2>& other_vector) :
   _val(other_vector)
-{  
+{
 }
 
 
@@ -334,8 +334,8 @@ inline
 T DenseVector<T>::operator () (const unsigned int i) const
 {
   libmesh_assert (i < _val.size());
-  
-  return _val[i]; 
+
+  return _val[i];
 }
 
 
@@ -345,10 +345,10 @@ inline
 T & DenseVector<T>::operator () (const unsigned int i)
 {
   libmesh_assert (i < _val.size());
-  
-  return _val[i]; 
+
+  return _val[i];
 }
-      
+
 
 
 template<typename T>

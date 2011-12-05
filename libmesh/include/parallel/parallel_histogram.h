@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,7 +37,7 @@ namespace libMesh
 namespace Parallel {
 
   /**
-   * Defines a histogram to be used in parallel in conjuction with 
+   * Defines a histogram to be used in parallel in conjuction with
    * a \p BinSorter.
    */
 template <typename KeyType>
@@ -45,12 +45,12 @@ class Histogram
 {
   // The type of iterator we will be using is inferred from KeyType
   typedef typename std::vector<KeyType>::const_iterator IterType;
-  
+
 public:
 
   // Constructor
   Histogram (const std::vector<KeyType>& d);
-  
+
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
   // max which you must provide e.g. by using MPI.
@@ -64,16 +64,16 @@ public:
 
   // Return the raw histogram data to the user
   const std::vector<unsigned int>& get_histogram() const;
-  
+
   // The number of bins in the histogram
   unsigned int n_bins () const;
-  
+
   // Returns the size of local bin b as an unsigned int.
-  unsigned int local_bin_size (const unsigned int bin) const;  
-  
+  unsigned int local_bin_size (const unsigned int bin) const;
+
   // Returns the size of global bin b as an unsigned int.
   // Requires that the user first call \p build_histogram()
-  unsigned int global_bin_size (const unsigned int bin) const;  
+  unsigned int global_bin_size (const unsigned int bin) const;
 
   // Returns the lower boundary of bin \p bin
   double lower_bound (const unsigned int bin) const;
@@ -81,10 +81,10 @@ public:
   // Returns the upper boundary of bin \p bin
   double upper_bound (const unsigned int bin) const;
 
-  
+
 private:
 
-  
+
   const std::vector<KeyType>& data;
   std::vector<unsigned int>   hist;        // The actual histogram
   std::vector<double>         bin_bounds;  // The boundary values of each bin

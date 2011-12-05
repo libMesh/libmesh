@@ -19,7 +19,7 @@
 void usage_error(const char *progname)
 {
   std::cout << "Usage: " << progname
-            << " --dim d --input inputmesh --output outputmesh --newbcid idnum --tests --moretests" 
+            << " --dim d --input inputmesh --output outputmesh --newbcid idnum --tests --moretests"
             << std::endl;
 
   exit(1);
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     {
       std::cerr << "No --input argument found!" << std::endl;
       usage_error(argv[0]);
-    } 
+    }
   const char* meshname = cl.next("mesh.xda");
 
   mesh.read(meshname);
@@ -147,12 +147,12 @@ std::cout << "max normal = " << maxnormal << std::endl;
               n(1) > minnormal(1) && n(1) < maxnormal(1) &&
               n(2) > minnormal(2) && n(2) < maxnormal(2))
             {
-              if (matcholdbcid && 
+              if (matcholdbcid &&
                   mesh.boundary_info->boundary_id(elem, s) != oldbcid)
                 continue;
               mesh.boundary_info->remove_side(elem, s);
               mesh.boundary_info->add_side(elem, s, bcid);
-//std::cout << "Set element " << elem->id() << " side " << s << 
+//std::cout << "Set element " << elem->id() << " side " << s <<
 //             " to boundary " << bcid << std::endl;
             }
         }
@@ -162,12 +162,12 @@ std::cout << "max normal = " << maxnormal << std::endl;
   if(cl.search("--output"))
     {
       outputname = cl.next("mesh.xda");
-    } 
+    }
   else
-    { 
+    {
       outputname = "new.";
       outputname += meshname;
-    } 
+    }
 
 
   mesh.write(outputname.c_str());

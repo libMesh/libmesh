@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -57,16 +57,16 @@ typedef unsigned short int processor_id_type;
 
 class DofObject : public ReferenceCountedObject<DofObject>
 {
-  
+
 protected:
-  
+
   /**
    * Constructor. Protected so that you can't instantiate one of these.
    */
   DofObject ();
 
 public:
-  
+
   /**
    * Copy-constructor.
    */
@@ -74,12 +74,12 @@ public:
 
   /**
    * Destructor.
-   */ 
+   */
   virtual ~DofObject ();
-  
+
   /**
    * Deep-copying assignment operator
-   */ 
+   */
   DofObject& operator= (const DofObject& dof_obj);
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -101,7 +101,7 @@ public:
   void set_old_dof_object ();
 
 #endif
-  
+
   /**
    * Clear the \p DofMap data structures and return to
    * a pristine state.
@@ -127,16 +127,16 @@ public:
    * Invalidates all the indices for this \p DofObject
    */
   void invalidate ();
-  
+
   /**
    * @returns the number of degrees of freedom associated with
    * system \p s for this object. Optionally only counts degrees
    * of freedom for variable number \p var
    */
-  unsigned int n_dofs (const unsigned int s, 
+  unsigned int n_dofs (const unsigned int s,
 		       const unsigned int var =
 		       libMesh::invalid_uint) const;
-  
+
   /**
    * \returns the \p id for this \p DofObject
    */
@@ -158,12 +158,12 @@ public:
    * \p false otherwise.
    */
   bool valid_id () const;
-  
+
   /**
    * @returns the processor that this element belongs to.
    */
   processor_id_type processor_id () const;
-  
+
   /**
    * @returns the processor that this element belongs to as a
    * writeable reference.
@@ -172,7 +172,7 @@ public:
 
   /**
    * Sets the \p processor_id for this \p DofObject.
-   */  
+   */
   void processor_id (const processor_id_type id);
 
   /**
@@ -180,7 +180,7 @@ public:
    * \p false otherwise.
    */
   bool valid_processor_id () const;
-  
+
   /**
    * @returns the number of systems associated with this
    * \p DofObject
@@ -196,13 +196,13 @@ public:
    * Adds an additional system to the \p DofObject
    */
   void add_system ();
-  
+
   /**
    * @returns the number of variables associated with system \p s
    * for this \p DofObject
    */
   unsigned int n_vars(const unsigned int s) const;
-  
+
   /**
    * Sets number of variables associated with system \p s for this
    * \p DofObject.  Has the effect of setting the number of components
@@ -210,10 +210,10 @@ public:
    */
   void set_n_vars(const unsigned int s,
 		  const unsigned int nvars);
-  
+
   /**
    * @returns the number of components for variable \p var
-   * of system \p s associated with this \p DofObject. 
+   * of system \p s associated with this \p DofObject.
    * For example, the \p HIERARCHIC shape functions may
    * have @e multiple dof's associated with @e one node.  Another
    * example is the \p MONOMIALs, where only the elements
@@ -222,7 +222,7 @@ public:
    */
   unsigned int n_comp(const unsigned int s,
 		      const unsigned int var) const;
-  
+
   /**
    * Sets the number of components for variable \p var
    * of system \p s associated with this \p DofObject
@@ -230,7 +230,7 @@ public:
   void set_n_comp(const unsigned int s,
 		  const unsigned int var,
 		  const unsigned int ncomp);
-  
+
   /**
    * @returns the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
@@ -238,7 +238,7 @@ public:
   unsigned int dof_number(const unsigned int s,
 			  const unsigned int var,
 			  const unsigned int comp) const;
-  
+
   /**
    * Sets the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
@@ -253,14 +253,14 @@ public:
    * false otherwise
    */
   bool has_dofs(const unsigned int s=libMesh::invalid_uint) const;
-  
+
   /**
    * Implemented in Elem and Node.
    */
 //  virtual bool operator==(const DofObject& ) const
 //  { libmesh_error(); return false; }
 
-  
+
   /**
    * An invaild \p id to distinguish an uninitialized \p DofObject
    */
@@ -272,10 +272,10 @@ public:
    */
   static const processor_id_type invalid_processor_id = static_cast<processor_id_type>(-1);
 
-  
+
 private:
 
-  
+
   /**
    * The \p id of the \p DofObject
    */
@@ -363,7 +363,7 @@ inline
 void DofObject::invalidate_dofs (const unsigned int sys_num)
 {
   // If the user does not specify the system number...
-  if (sys_num >= this->n_systems()) 
+  if (sys_num >= this->n_systems())
     {
       for (unsigned int s=0; s<this->n_systems(); s++)
         for (unsigned int v=0; v<this->n_vars(s); v++)
@@ -414,7 +414,7 @@ void DofObject::clear_dofs ()
   libmesh_assert (this->n_systems() == 0);
   libmesh_assert (_idx_buf.empty());
 }
-  
+
 
 
 inline
@@ -422,14 +422,14 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 				const unsigned int var) const
 {
   libmesh_assert (s < this->n_systems());
-  
+
   unsigned int num = 0;
 
   // Count all variables
   if (var == libMesh::invalid_uint)
     for (unsigned int v=0; v<this->n_vars(s); v++)
       num += this->n_comp(s,v);
-  
+
   // Only count specified variable
   else
     num = this->n_comp(s,var);
@@ -536,7 +536,7 @@ unsigned int DofObject::n_comp(const unsigned int s,
     start_idx_sys = this->start_idx(s);
 
   libmesh_assert ((start_idx_sys + 2*var) < _idx_buf.size());
-  
+
   return _idx_buf[start_idx_sys + 2*var];
 }
 
@@ -581,7 +581,7 @@ bool DofObject::has_dofs (const unsigned int sys) const
 	if (this->n_vars(s))
 	  return true;
     }
-  
+
   else
     {
       libmesh_assert (sys < this->n_systems());
@@ -589,12 +589,12 @@ bool DofObject::has_dofs (const unsigned int sys) const
       if (this->n_vars(sys))
 	return true;
     }
-  
+
   return false;
 }
 
 
-  
+
 inline
 unsigned int DofObject::start_idx (const unsigned int s) const
 {
@@ -604,7 +604,7 @@ unsigned int DofObject::start_idx (const unsigned int s) const
   return _idx_buf[s];
 }
 
-  
+
 
 inline
 unsigned int DofObject::end_idx (const unsigned int s) const

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,7 +41,7 @@ class ParameterVector;
 /**
  * This is a generic class that defines a solver to handle
  * ImplicitSystem classes, including NonlinearImplicitSystem and
- * DifferentiableSystem   A user can define a solver by 
+ * DifferentiableSystem   A user can define a solver by
  * deriving from this class and implementing certain functions.
  *
  * This class is part of the new DifferentiableSystem framework,
@@ -60,7 +60,7 @@ public:
    * The type of system
    */
   typedef ImplicitSystem sys_type;
-  
+
   /**
    * Constructor. Requires a reference to the system
    * to be solved.
@@ -72,7 +72,7 @@ public:
    * to be solved.  Returns a NewtonSolver by default
    */
   static AutoPtr<DiffSolver> build(sys_type& s);
-  
+
   /**
    * Destructor.
    */
@@ -93,7 +93,7 @@ public:
   /**
    * This method performs a solve.  What occurs in
    * this method will depend on the type of solver.  See
-   * the subclasses for more details.  
+   * the subclasses for more details.
    */
   virtual unsigned int solve () = 0;
 
@@ -123,7 +123,7 @@ public:
    * @returns a writeable reference to the system we are solving.
    */
   sys_type & system () { return _system; }
-  
+
   /**
    * Each linear solver step should exit after \p max_linear_iterations
    * is exceeded.
@@ -196,7 +196,7 @@ public:
    * The tolerance for linear solves is kept above this minimum
    */
   Real minimum_linear_tolerance;
-  
+
   /**
    * Enumeration return type for the solve() function.  Multiple SolveResults
    * may be combined (OR'd) in the single return.  To test which ones are present,
@@ -208,7 +208,7 @@ public:
      * no solve has occurred yet.
      */
     INVALID_SOLVE_RESULT = 0,
-    
+
     /**
      * The solver converged but no
      * particular reason is specified.

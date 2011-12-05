@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -70,14 +70,14 @@ public:
    * Constructor.  Responsible for initializing the _bc_function function
    * pointer to NULL, and defaulting the norm type to H1.
    */
-  ExactErrorEstimator() : _exact_value(NULL), 
+  ExactErrorEstimator() : _exact_value(NULL),
                           _exact_deriv(NULL),
                           _exact_hessian(NULL),
 			  _extra_order(0)
   { error_norm = H1; }
-  
+
   /**
-   * Destructor.  
+   * Destructor.
    */
   ~ExactErrorEstimator() {}
 
@@ -121,7 +121,7 @@ public:
    * object with a reference fine grid solution.
    */
   void attach_reference_solution (EquationSystems* es_fine);
-  
+
 
   /**
    * Increases or decreases the order of the quadrature rule used for numerical

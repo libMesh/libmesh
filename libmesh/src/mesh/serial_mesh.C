@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -81,7 +81,7 @@ const Node& SerialMesh::node (const unsigned int i) const
   libmesh_assert (i < this->n_nodes());
   libmesh_assert (_nodes[i] != NULL);
   libmesh_assert (_nodes[i]->id() == i); // This will change soon
-  
+
   return (*_nodes[i]);
 }
 
@@ -98,7 +98,7 @@ Node& SerialMesh::node (const unsigned int i)
 		    << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_assert (i < this->n_nodes());
   libmesh_assert (_nodes[i] != NULL);
   libmesh_assert (_nodes[i]->id() == i); // This will change soon
@@ -113,7 +113,7 @@ const Node* SerialMesh::node_ptr (const unsigned int i) const
   libmesh_assert (i < this->n_nodes());
   libmesh_assert (_nodes[i] != NULL);
   libmesh_assert (_nodes[i]->id() == i); // This will change soon
-  
+
   return _nodes[i];
 }
 
@@ -137,7 +137,7 @@ Elem* SerialMesh::elem (const unsigned int i) const
   libmesh_assert (i < this->n_elem());
   libmesh_assert (_elements[i] != NULL);
   libmesh_assert (_elements[i]->id() == i); // This will change soon
-  
+
   return _elements[i];
 }
 
@@ -158,7 +158,7 @@ Elem* SerialMesh::add_elem (Elem* e)
 
   const unsigned int id = e->id();
 
-  if (id < _elements.size()) 
+  if (id < _elements.size())
     {
       // Overwriting existing elements is still probably a mistake.
       libmesh_assert(!_elements[id]);
@@ -169,7 +169,7 @@ Elem* SerialMesh::add_elem (Elem* e)
     }
 
   _elements[id] = e;
-  
+
   return e;
 }
 
@@ -200,7 +200,7 @@ void SerialMesh::delete_elem(Elem* e)
 
   // Initialize an iterator to eventually point to the element we want to delete
   std::vector<Elem*>::iterator pos = _elements.end();
-  
+
   // In many cases, e->id() gives us a clue as to where e
   // is located in the _elements vector.  Try that first
   // before trying the O(n_elem) search.
@@ -226,10 +226,10 @@ void SerialMesh::delete_elem(Elem* e)
 
   // Remove the element from the BoundaryInfo object
   this->boundary_info->remove(e);
-  
+
   // delete the element
   delete e;
-  
+
   // explicitly NULL the pointer
   *pos = NULL;
 }
@@ -254,7 +254,7 @@ void SerialMesh::renumber_elem(const unsigned int old_id,
 Node* SerialMesh::add_point (const Point& p,
 			     const unsigned int id,
 			     const unsigned int proc_id)
-{  
+{
 //   // We only append points with SerialMesh
 //   libmesh_assert(id == DofObject::invalid_id || id == _nodes.size());
 //   Node *n = Node::build(p, _nodes.size()).release();
@@ -273,11 +273,11 @@ Node* SerialMesh::add_point (const Point& p,
       _nodes.resize(id+1);
   else
     _nodes.push_back (static_cast<Node*>(NULL));
-  
+
   // if the node already exists, then assign new (x,y,z) values
   if (n)
     *n = p;
-  // otherwise build a new node, put it in the right spot, and return 
+  // otherwise build a new node, put it in the right spot, and return
   // a valid pointer.
   else
     {
@@ -299,13 +299,13 @@ Node* SerialMesh::add_point (const Point& p,
 
 
 Node* SerialMesh::add_node (Node* n)
-{  
+{
   libmesh_assert(n);
   // We only append points with SerialMesh
   libmesh_assert(!n->valid_id() || n->id() == _nodes.size());
 
   n->set_id (_nodes.size());
-  
+
   _nodes.push_back(n);
 
   return n;
@@ -336,16 +336,16 @@ void SerialMesh::delete_node(Node* n)
 		       _nodes.end(),
 		       n);
     }
-  
+
   // Huh? Node not in the vector?
   libmesh_assert (pos != _nodes.end());
 
   // Delete the node from the BoundaryInfo object
   this->boundary_info->remove(n);
-  
+
   // delete the node
   delete n;
-  
+
   // explicitly NULL the pointer
   *pos = NULL;
 }
@@ -372,7 +372,7 @@ void SerialMesh::clear ()
   // Call parent clear function
   MeshBase::clear();
 
-  
+
   // Clear our elements and nodes
   {
     std::vector<Elem*>::iterator       it  = _elements.begin();
@@ -397,7 +397,7 @@ void SerialMesh::clear ()
     // already cleared it.
     for (; it != end; ++it)
       delete *it;
-    
+
     _nodes.clear();
   }
 }
@@ -406,9 +406,9 @@ void SerialMesh::clear ()
 
 void SerialMesh::renumber_nodes_and_elements ()
 {
-  
+
   START_LOG("renumber_nodes_and_elem()", "Mesh");
-  
+
   // node and element id counters
   unsigned int next_free_elem = 0;
   unsigned int next_free_node = 0;
@@ -417,7 +417,7 @@ void SerialMesh::renumber_nodes_and_elements ()
   // be NULLs in the _elements vector from the coarsening
   // process.  Pack the elements in to a contiguous array
   // and then trim any excess.
-  {      
+  {
     std::vector<Elem*>::iterator in        = _elements.begin();
     std::vector<Elem*>::iterator out       = _elements.begin();
     const std::vector<Elem*>::iterator end = _elements.end();
@@ -426,13 +426,13 @@ void SerialMesh::renumber_nodes_and_elements ()
       if (*in != NULL)
 	{
 	  Elem* elem = *in;
-	  
+
 	  *out = *in;
 	  ++out;
-	  
+
 	  // Increment the element counter
 	  elem->set_id (next_free_elem++);
-	  
+
 	  // Loop over this element's nodes.  Number them,
 	  // if they have not been numbered already.  Also,
 	  // position them in the _nodes vector so that they
@@ -450,7 +450,7 @@ void SerialMesh::renumber_nodes_and_elements ()
 
 		// ensure we want to swap a valid nodes
 		libmesh_assert (_nodes[src_idx] != NULL);
-		
+
 		// Swap the source and destination nodes
                 std::swap(_nodes[src_idx],
                           _nodes[dst_idx] );
@@ -479,7 +479,7 @@ void SerialMesh::renumber_nodes_and_elements ()
     const std::vector<Node*>::iterator end = _nodes.end();
 
     std::advance (nd, next_free_node);
-    
+
     for (std::vector<Node*>::iterator it=nd;
 	 it != end; ++it)
       {
@@ -491,7 +491,7 @@ void SerialMesh::renumber_nodes_and_elements ()
 	// remove any boundary information associated with
 	// this node
 	this->boundary_info->remove (*it);
-	
+
 	// delete the node
 	delete *it;
 	*it = NULL;
@@ -499,11 +499,11 @@ void SerialMesh::renumber_nodes_and_elements ()
 
     _nodes.erase (nd, end);
   }
-  
+
 
   libmesh_assert (next_free_elem == _elements.size());
   libmesh_assert (next_free_node == _nodes.size());
-  
+
   STOP_LOG("renumber_nodes_and_elem()", "Mesh");
 }
 
@@ -519,7 +519,7 @@ void SerialMesh::fix_broken_node_and_element_numbering ()
   // Elements next
   for (unsigned int e=0; e<this->_elements.size(); e++)
     if (this->_elements[e] != NULL)
-      this->_elements[e]->set_id() = e; 
+      this->_elements[e]->set_id() = e;
 }
 
 

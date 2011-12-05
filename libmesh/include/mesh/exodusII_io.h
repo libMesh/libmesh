@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -53,18 +53,18 @@ class ExodusII_IO : public MeshInput<MeshBase>,
 {
 
  public:
-  
+
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
   ExodusII_IO (MeshBase& mesh);
-  
+
   /**
    * Destructor.
    */
   virtual ~ExodusII_IO ();
-  
+
   /**
    * This method implements reading a mesh from a specified file.
    * Open the file named \p name and read the mesh in Sandia National Lab's
@@ -90,13 +90,13 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * to copy that nodal solution into an EquationSystems object.
    */
   void copy_nodal_solution(System& es, std::string nodal_var_name, unsigned int timestep=1);
-  
+
   /**
    * Writes a exodusII file with discontinuous data
-   */ 
-  void write_discontinuous_exodusII (const std::string& name, 
+   */
+  void write_discontinuous_exodusII (const std::string& name,
 				const EquationSystems& es);
-  
+
 
   /**
    * Write out element solution.
@@ -143,13 +143,13 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * will be present.
    */
   void set_output_variables(const std::vector<std::string> & output_variables) { _output_variables = output_variables; }
-  
+
   /**
    * In the general case, meshes containing 2D elements can be
    * manifolds living in 3D space, thus by default we write all
-   * meshes with the Exodus dimension set to LIBMESH_DIM = 
+   * meshes with the Exodus dimension set to LIBMESH_DIM =
    * mesh.spatial_dimension().
-   * 
+   *
    * In certain cases, however, the user may know his 2D mesh actually
    * lives in the z=0 plane, and therefore wants to write a truly 2D
    * Exodus mesh.  In such a case, he should call this function with

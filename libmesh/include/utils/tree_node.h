@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -40,28 +40,28 @@ class Elem;
 /**
  * This class defines a node on a tree.  A tree node
  * contains a pointer to its parent (NULL if the node is
- * the root) and pointers to its children (NULL if the 
+ * the root) and pointers to its children (NULL if the
  * node is active.
  */
 template <unsigned int N>
 class TreeNode
-{  
+{
 public:
 
 
   /**
-   * Constructor.  Takes a pointer to this node's 
-   * parent.  The pointer should only be NULL 
+   * Constructor.  Takes a pointer to this node's
+   * parent.  The pointer should only be NULL
    * for the top-level (root) node.
    */
-  TreeNode (const MeshBase& m, 
-	    const unsigned int tbs,	    
+  TreeNode (const MeshBase& m,
+	    const unsigned int tbs,
 	    const TreeNode<N> *p = NULL);
 
   /**
    * Destructor.  Deletes all children, if any.  Thus
-   * to delete a tree it is sufficient to explicitly 
-   * delete the root node. 
+   * to delete a tree it is sufficient to explicitly
+   * delete the root node.
    */
   ~TreeNode ();
 
@@ -72,7 +72,7 @@ public:
   bool is_root() const { return (parent == NULL); }
 
   /**
-   * @returns true if this node is active (i.e. has no 
+   * @returns true if this node is active (i.e. has no
    * children), false otherwise.
    */
   bool active() const { return children.empty(); }
@@ -91,7 +91,7 @@ public:
    * Refine the tree node into N children if it contains
    * more than tol nodes.
    */
-  void refine (); 
+  void refine ();
 
   /**
    * Sets the bounding box;
@@ -114,14 +114,14 @@ public:
   /**
    * @returns the level of the node.
    */
-  unsigned int level () const; 
-    
+  unsigned int level () const;
+
   /**
    * Prints the contents of the node_numbers vector if we
    * are active.
    */
   void print_nodes(std::ostream& out=libMesh::out) const;
-    
+
   /**
    * Prints the contents of the elements set if we
    * are active.
@@ -131,7 +131,7 @@ public:
   /**
    * Transforms node numbers to element pointers.
    */
-  void transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& 
+  void transform_nodes_to_elements (std::vector<std::vector<const Elem*> >&
 				    nodes_to_elem);
 
   /**
@@ -145,10 +145,10 @@ public:
    */
   const Elem* find_element (const Point& p) const;
 
-  
+
 private:
 
-  
+
   /**
    * Look for point \p p in our children.
    */
@@ -165,7 +165,7 @@ private:
   const MeshBase& mesh;
 
   /**
-   * The maximum number of things we should store before 
+   * The maximum number of things we should store before
    * refining ourself.
    */
   const unsigned int tgt_bin_size;
@@ -182,7 +182,7 @@ private:
   std::vector<TreeNode<N>* > children;
 
   /**
-   * The Cartesian bounding box for the node. 
+   * The Cartesian bounding box for the node.
    * The minimum point is stored as bounding_box.first,
    * the maximum point is stored as bounding_box.second.
    */
@@ -213,7 +213,7 @@ private:
 // TreeNode class inline methods
 template <unsigned int N>
 inline
-TreeNode<N>::TreeNode (const MeshBase& m, 
+TreeNode<N>::TreeNode (const MeshBase& m,
 		       const unsigned int tbs,
 		       const TreeNode<N>* p) :
   mesh           (m),
@@ -224,7 +224,7 @@ TreeNode<N>::TreeNode (const MeshBase& m,
   // libmesh_assert our children are empty, thus we are active.
   libmesh_assert (children.empty());
   libmesh_assert (this->active());
-  
+
   // Reserve space for the nodes & elements
   nodes.reserve    (tgt_bin_size);
   elements.reserve (tgt_bin_size);
@@ -247,8 +247,8 @@ TreeNode<N>::~TreeNode ()
 
 template <unsigned int N>
 inline
-unsigned int TreeNode<N>::level () const 
-{ 
+unsigned int TreeNode<N>::level () const
+{
   if (parent != NULL)
     return parent->level()+1;
 

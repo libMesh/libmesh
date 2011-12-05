@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -62,14 +62,14 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	d2xyzdxi2_map[p].zero();
 #endif
-	
+
 	// compute x, dx, d2x at the quadrature point
 	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
 	  {
 	    // Reference to the point, helps eliminate
 	    // exessive temporaries in the inner loop
 	    const Point& elem_point = elem->point(i);
-	    
+
 	    xyz[p].add_scaled          (elem_point, phi_map[i][p]    );
 	    dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -83,7 +83,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	// The transformation matrix from local->global
 	// coordinates is
 	//
-	// T = | dx/dxi | 
+	// T = | dx/dxi |
 	//     | dy/dxi |
 	//     | dz/dxi |
 	//
@@ -95,12 +95,12 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	//
 	// jac = sqrt( (dx/dxi)^2 + (dy/dxi)^2 + (dz/dxi)^2 )
 	const Real jac = dxyzdxi_map[p].size();
-	    
+
 	if (jac <= 0.)
 	  {
 	    libMesh::err << "ERROR: negative Jacobian: "
 		          << jac
-                          << " in element " 
+                          << " in element "
                           << elem->id()
 		          << std::endl;
 	    libmesh_error();
@@ -124,7 +124,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	break;
       }
 
-      
+
       //--------------------------------------------------------------------
       // 2D
     case 2:
@@ -142,15 +142,15 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	d2xyzdxideta_map[p].zero();
 	d2xyzdeta2_map[p].zero();
 #endif
-	
-	
+
+
 	// compute (x,y) at the quadrature points, derivatives once
 	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
 	  {
 	    // Reference to the point, helps eliminate
 	    // exessive temporaries in the inner loop
 	    const Point& elem_point = elem->point(i);
-	    
+
 	    xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
 
 	    dxyzdxi_map[p].add_scaled      (elem_point, dphidxi_map[i][p] );
@@ -161,7 +161,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	    d2xyzdeta2_map[p].add_scaled   (elem_point, d2phideta2_map[i][p]);
 #endif
 	  }
-	
+
 	// compute the jacobian once
 	const Real dx_dxi = dxdxi_map(p),
                    dx_deta = dxdeta_map(p),
@@ -176,26 +176,26 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	//
 	//         | dx/dxi  dx/deta |
 	// jac =   | dy/dxi  dy/deta |
-	//         
-	// jac = dx/dxi*dy/deta - dx/deta*dy/dxi 
+	//
+	// jac = dx/dxi*dy/deta - dx/deta*dy/dxi
 	const Real jac = (dx_dxi*dy_deta - dx_deta*dy_dxi);
-	    
+
 	if (jac <= 0.)
 	  {
 	    libMesh::err << "ERROR: negative Jacobian: "
 		          << jac
-                          << " in element " 
+                          << " in element "
                           << elem->id()
 		          << std::endl;
 	    libmesh_error();
 	  }
-	    
+
 	JxW[p] = jac*qw[p];
-	    
+
 	// Compute the shape function derivatives wrt x,y at the
 	// quadrature points
 	const Real inv_jac = 1./jac;
-	    
+
 	dxidx_map[p]  =  dy_deta*inv_jac; //dxi/dx  =  (1/J)*dy/deta
 	dxidy_map[p]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
 	detadx_map[p] = -dy_dxi* inv_jac; //deta/dx = -(1/J)*dy/dxi
@@ -223,7 +223,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	// Notes:
 	//
 	//       dX = R dXi -> R'dX = R'R dXi
-	// (R^-1)dX =   dXi    [(R'R)^-1 R']dX = dXi 
+	// (R^-1)dX =   dXi    [(R'R)^-1 R']dX = dXi
 	//
 	// so R^-1 = (R'R)^-1 R'
 	//
@@ -232,13 +232,13 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	const Real g11 = (dx_dxi*dx_dxi +
 			  dy_dxi*dy_dxi +
 			  dz_dxi*dz_dxi);
-	    
+
 	const Real g12 = (dx_dxi*dx_deta +
 			  dy_dxi*dy_deta +
 			  dz_dxi*dz_deta);
-	    
+
 	const Real g21 = g12;
-	    
+
 	const Real g22 = (dx_deta*dx_deta +
 			  dy_deta*dy_deta +
 			  dz_deta*dz_deta);
@@ -248,15 +248,15 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	if (det <= 0.)
 	  {
 	    libMesh::err << "ERROR: negative Jacobian! "
-                          << " in element " 
+                          << " in element "
                           << elem->id()
 		          << std::endl;
 	    libmesh_error();
 	  }
-	      
+
 	const Real inv_det = 1./det;
 	const Real jac = std::sqrt(det);
-	    
+
 	JxW[p] = jac*qw[p];
 
 	const Real g11inv =  g22*inv_det;
@@ -267,18 +267,18 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	dxidx_map[p]  = g11inv*dx_dxi + g12inv*dx_deta;
 	dxidy_map[p]  = g11inv*dy_dxi + g12inv*dy_deta;
 	dxidz_map[p]  = g11inv*dz_dxi + g12inv*dz_deta;
-	    
+
 	detadx_map[p] = g21inv*dx_dxi + g22inv*dx_deta;
 	detady_map[p] = g21inv*dy_dxi + g22inv*dy_deta;
 	detadz_map[p] = g21inv*dz_dxi + g22inv*dz_deta;
-	    	    	    
+
 #endif
 	// done computing the map
 	break;
       }
 
 
-      
+
       //--------------------------------------------------------------------
       // 3D
     case 3:
@@ -300,8 +300,8 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	d2xyzdetadzeta_map[p].zero();
 	d2xyzdzeta2_map[p].zero();
 #endif
-	
-	
+
+
 	// compute (x,y,z) at the quadrature points,
         // dxdxi,   dydxi,   dzdxi,
 	// dxdeta,  dydeta,  dzdeta,
@@ -311,7 +311,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	    // Reference to the point, helps eliminate
 	    // exessive temporaries in the inner loop
 	    const Point& elem_point = elem->point(i);
-	    
+
 	    xyz[p].add_scaled           (elem_point, phi_map[i][p]      );
 	    dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
 	    dxyzdeta_map[p].add_scaled  (elem_point, dphideta_map[i][p] );
@@ -331,19 +331,19 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 					       d2phidzeta2_map[i][p]);
 #endif
 	  }
-	
+
 	// compute the jacobian
 	const Real
 	  dx_dxi   = dxdxi_map(p),   dy_dxi   = dydxi_map(p),   dz_dxi   = dzdxi_map(p),
 	  dx_deta  = dxdeta_map(p),  dy_deta  = dydeta_map(p),  dz_deta  = dzdeta_map(p),
 	  dx_dzeta = dxdzeta_map(p), dy_dzeta = dydzeta_map(p), dz_dzeta = dzdzeta_map(p);
-	    
+
 	// Symbolically, the matrix determinant is
 	//
 	//         | dx/dxi   dy/dxi   dz/dxi   |
 	// jac =   | dx/deta  dy/deta  dz/deta  |
 	//         | dx/dzeta dy/dzeta dz/dzeta |
-	// 
+	//
 	// jac = dx/dxi*(dy/deta*dz/dzeta - dz/deta*dy/dzeta) +
 	//       dy/dxi*(dz/deta*dx/dzeta - dx/deta*dz/dzeta) +
 	//       dz/dxi*(dx/deta*dy/dzeta - dy/deta*dx/dzeta)
@@ -351,35 +351,35 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 	const Real jac = (dx_dxi*(dy_deta*dz_dzeta - dz_deta*dy_dzeta)  +
 			  dy_dxi*(dz_deta*dx_dzeta - dx_deta*dz_dzeta)  +
 			  dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
-	    
+
 	if (jac <= 0.)
 	  {
 	    libMesh::err << "ERROR: negative Jacobian: "
 		          << jac
-                          << " in element " 
+                          << " in element "
                           << elem->id()
 		          << std::endl;
 	    libmesh_error();
 	  }
 
 	JxW[p] = jac*qw[p];
-	    
+
 	    // Compute the shape function derivatives wrt x,y at the
 	    // quadrature points
-	const Real inv_jac  = 1./jac;	    
-	    
+	const Real inv_jac  = 1./jac;
+
 	dxidx_map[p]   = (dy_deta*dz_dzeta - dz_deta*dy_dzeta)*inv_jac;
 	dxidy_map[p]   = (dz_deta*dx_dzeta - dx_deta*dz_dzeta)*inv_jac;
 	dxidz_map[p]   = (dx_deta*dy_dzeta - dy_deta*dx_dzeta)*inv_jac;
-	    
+
 	detadx_map[p]  = (dz_dxi*dy_dzeta  - dy_dxi*dz_dzeta )*inv_jac;
 	detady_map[p]  = (dx_dxi*dz_dzeta  - dz_dxi*dx_dzeta )*inv_jac;
 	detadz_map[p]  = (dy_dxi*dx_dzeta  - dx_dxi*dy_dzeta )*inv_jac;
-	    
+
 	dzetadx_map[p] = (dy_dxi*dz_deta   - dz_dxi*dy_deta  )*inv_jac;
 	dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
 	dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
-	
+
 	// done computing the map
 	break;
       }
@@ -424,7 +424,7 @@ void FEBase::resize_map_vectors(unsigned int n_qp)
 #endif
         }
     }
-    
+
   JxW.resize(n_qp);
 }
 
@@ -432,7 +432,7 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 			        const Elem* elem)
 {
    // Start logging the map computation.
-  START_LOG("compute_affine_map()", "FE");  
+  START_LOG("compute_affine_map()", "FE");
 
   libmesh_assert (elem  != NULL);
 
@@ -443,7 +443,7 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 
   // Compute map at quadrature point 0
   this->compute_single_point_map(qw, elem, 0);
-  
+
   // Compute xyz at all other quadrature points
   for (unsigned int p=1; p<n_qp; p++)
     {
@@ -488,8 +488,8 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
         }
       JxW[p] = JxW[0] / qw[0] * qw[p];
     }
-  
-  STOP_LOG("compute_affine_map()", "FE");  
+
+  STOP_LOG("compute_affine_map()", "FE");
 }
 
 
@@ -512,12 +512,12 @@ void FEBase::compute_map(const std::vector<Real>& qw,
                       << std::endl;);
     }
 #endif
-  
+
    // Start logging the map computation.
   START_LOG("compute_map()", "FE");
 
   libmesh_assert (elem  != NULL);
-  
+
   const unsigned int        n_qp = qw.size();
 
   // Resize the vectors to hold data at the quadrature points
@@ -526,9 +526,9 @@ void FEBase::compute_map(const std::vector<Real>& qw,
   // Compute map at all quadrature points
   for (unsigned int p=0; p!=n_qp; p++)
     this->compute_single_point_map(qw, elem, p);
-  
+
   // Stop logging the map computation.
-  STOP_LOG("compute_map()", "FE");  
+  STOP_LOG("compute_map()", "FE");
 }
 
 
@@ -539,7 +539,7 @@ Point FE<Dim,T>::map (const Elem* elem,
 		      const Point& reference_point)
 {
   libmesh_assert (elem != NULL);
-    
+
   Point p;
 
   const ElemType type     = elem->type();
@@ -565,14 +565,14 @@ Point FE<Dim,T>::map_xi (const Elem* elem,
 			 const Point& reference_point)
 {
   libmesh_assert (elem != NULL);
-    
+
   Point p;
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
   const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
 
-  // Lagrange basis functions are used for mapping    
+  // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
 		  FE<Dim,LAGRANGE>::shape_deriv(type,
@@ -581,7 +581,7 @@ Point FE<Dim,T>::map_xi (const Elem* elem,
 						0,
 						reference_point)
 		  );
-    
+
   return p;
 }
 
@@ -592,13 +592,13 @@ Point FE<Dim,T>::map_eta (const Elem* elem,
 			  const Point& reference_point)
 {
   libmesh_assert (elem != NULL);
-    
+
   Point p;
 
   const ElemType type     = elem->type();
   const Order order       = elem->default_order();
   const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
-  
+
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
@@ -608,7 +608,7 @@ Point FE<Dim,T>::map_eta (const Elem* elem,
 						1,
 						reference_point)
 		  );
-    
+
   return p;
 }
 
@@ -619,7 +619,7 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
 			   const Point& reference_point)
 {
   libmesh_assert (elem != NULL);
-    
+
   Point p;
 
   const ElemType type     = elem->type();
@@ -635,7 +635,7 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
 						2,
 						reference_point)
 		  );
-    
+
   return p;
 }
 
@@ -650,20 +650,20 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   libmesh_assert (elem != NULL);
   libmesh_assert (tolerance >= 0.);
 
-  
-  // Start logging the map inversion.  
+
+  // Start logging the map inversion.
   START_LOG("inverse_map()", "FE");
-  
+
   // How much did the point on the reference
   // element change by in this Newton step?
   Real inverse_map_error = 0.;
-  
+
   //  The point on the reference element.  This is
   //  the "initial guess" for Newton's method.  The
   //  centroid seems like a good idea, but computing
   //  it is a little more intensive than, say taking
-  //  the zero point.  
-  // 
+  //  the zero point.
+  //
   //  Convergence should be insensitive of this choice
   //  for "good" elements.
   Point p; // the zero point.  No computation required
@@ -698,10 +698,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       //  on the dimension that we are in.
       switch (Dim)
 	{
-	  
+
 	  // ------------------------------------------------------------------
 	  //  1D map inversion
-	  // 
+	  //
 	  //  Here we find the point on a 1D reference element that maps to
 	  //  the point \p physical_point in the domain.  This is a bit tricky
 	  //  since we do not want to assume that the point \p physical_point
@@ -711,29 +711,29 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	case 1:
 	  {
 	    const Point dxi = FE<Dim,T>::map_xi (elem, p);
-	    
+
 	    //  Newton's method in this case looks like
-	    // 
+	    //
 	    //  {X} - {X_n} = [J]*dp
-	    // 
+	    //
 	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x1 matrix
 	    //  d(x,y,z)/dxi, and we seek dp, a scalar.  Since the above
 	    //  system is either overdetermined or rank-deficient, we will
 	    //  solve the normal equations for this system
-	    // 
+	    //
 	    //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
-	    // 
+	    //
 	    //  which involves the trivial inversion of the scalar
 	    //  G = [J]^T [J]
 	    const Real G = dxi*dxi;
-	    
+
 	    if (secure)
 	      libmesh_assert (G > 0.);
-	    
+
 	    const Real Ginv = 1./G;
-	    
+
 	    const Real  dxidelta = dxi*delta;
-	    
+
 	    dp(0) = Ginv*dxidelta;
 
             // No master elements have radius > 4, but sometimes we
@@ -748,7 +748,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 	  // ------------------------------------------------------------------
 	  //  2D map inversion
-	  // 
+	  //
 	  //  Here we find the point on a 2D reference element that maps to
 	  //  the point \p physical_point in the domain.  This is a bit tricky
 	  //  since we do not want to assume that the point \p physical_point
@@ -759,43 +759,43 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	  {
 	    const Point dxi  = FE<Dim,T>::map_xi  (elem, p);
 	    const Point deta = FE<Dim,T>::map_eta (elem, p);
-	    
+
 	    //  Newton's method in this case looks like
-	    // 
+	    //
 	    //  {X} - {X_n} = [J]*{dp}
-	    // 
+	    //
 	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x2 matrix
 	    //  d(x,y,z)/d(xi,eta), and we seek {dp}, a 2x1 vector.  Since
 	    //  the above system is either overdermined or rank-deficient,
 	    //  we will solve the normal equations for this system
-	    // 
+	    //
 	    //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
-	    // 
+	    //
 	    //  which involves the inversion of the 2x2 matrix
 	    //  [G] = [J]^T [J]
 	    const Real
 	      G11 = dxi*dxi,  G12 = dxi*deta,
 	      G21 = dxi*deta, G22 = deta*deta;
-	    
-	    
+
+
 	    const Real det = (G11*G22 - G12*G21);
-	    
+
 	    if (secure)
 	      libmesh_assert (det != 0.);
 
 	    const Real inv_det = 1./det;
-	    
+
 	    const Real
 	      Ginv11 =  G22*inv_det,
 	      Ginv12 = -G12*inv_det,
-	      
+
 	      Ginv21 = -G21*inv_det,
 	      Ginv22 =  G11*inv_det;
-	    
-	    
+
+
 	    const Real  dxidelta  = dxi*delta;
 	    const Real  detadelta = deta*delta;
-	    
+
 	    dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
 	    dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
 
@@ -806,12 +806,12 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
 	    break;
 	  }
-	  
 
-	  
+
+
 	  // ------------------------------------------------------------------
 	  //  3D map inversion
-	  // 
+	  //
 	  //  Here we find the point in a 3D reference element that maps to
 	  //  the point \p physical_point in a 3D domain. Nothing special
 	  //  has to happen here, since (unless the map is singular because
@@ -822,54 +822,54 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
        	    const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
 	    const Point deta  = FE<Dim,T>::map_eta  (elem, p);
 	    const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
-	    
+
 	    //  Newton's method in this case looks like
-	    // 
+	    //
 	    //  {X} = {X_n} + [J]*{dp}
-	    // 
+	    //
 	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x3 matrix
 	    //  d(x,y,z)/d(xi,eta,zeta), and we seek {dp}, a 3x1 vector.
 	    //  Since the above system is nonsingular for invertable maps
-	    //  we will solve 
-	    // 
+	    //  we will solve
+	    //
 	    //  {dp} = [J]^-1 ({X} - {X_n})
-	    // 
+	    //
 	    //  which involves the inversion of the 3x3 matrix [J]
 	    const Real
 	      J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
 	      J21 = dxi(1), J22 = deta(1), J23 = dzeta(1),
 	      J31 = dxi(2), J32 = deta(2), J33 = dzeta(2);
-	    
+
 	    const Real det = (J11*(J22*J33 - J23*J32) +
 			      J12*(J23*J31 - J21*J33) +
 			      J13*(J21*J32 - J22*J31));
-	    
+
 	    if (secure)
 	      libmesh_assert (det != 0.);
 
 	    const Real inv_det = 1./det;
-	    
+
 	    const Real
 	      Jinv11 =  (J22*J33 - J23*J32)*inv_det,
 	      Jinv12 = -(J12*J33 - J13*J32)*inv_det,
 	      Jinv13 =  (J12*J23 - J13*J22)*inv_det,
-	      
+
 	      Jinv21 = -(J21*J33 - J23*J31)*inv_det,
 	      Jinv22 =  (J11*J33 - J13*J31)*inv_det,
 	      Jinv23 = -(J11*J23 - J13*J21)*inv_det,
-	      
+
 	      Jinv31 =  (J21*J32 - J22*J31)*inv_det,
 	      Jinv32 = -(J11*J32 - J12*J31)*inv_det,
 	      Jinv33 =  (J11*J22 - J12*J21)*inv_det;
-	    
+
 	    dp(0) = (Jinv11*delta(0) +
 		     Jinv12*delta(1) +
 		     Jinv13*delta(2));
-	    
+
 	    dp(1) = (Jinv21*delta(0) +
 		     Jinv22*delta(1) +
 		     Jinv23*delta(2));
-	    
+
 	    dp(2) = (Jinv31*delta(0) +
 		     Jinv32*delta(1) +
 		     Jinv33*delta(2));
@@ -895,10 +895,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
       //  P_n+1 = P_n + dp
       p.add (dp);
-      
+
       //  Increment the iteration count.
       cnt++;
-      
+
       //  Watch for divergence of Newton's
       //  method.  Here's how it goes:
       //  (1) For good elements, we expect convergence in 10
@@ -954,7 +954,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    {
 	      for (unsigned int i=0; i != Dim; ++i)
 		p(i) = 1e6;
-	      
+
 	      STOP_LOG("inverse_map()", "FE");
 	      return p;
 	    }
@@ -966,15 +966,15 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
   //  If we are in debug mode do two sanity checks.
 #ifdef DEBUG
-  
+
   if (secure)
-    {  
+    {
       // Make sure the point \p p on the reference element actually
       // does map to the point \p physical_point within a tolerance.
 
       const Point check = FE<Dim,T>::map (elem, p);
       const Point diff  = physical_point - check;
-      
+
       if (diff.size() > tolerance)
 	{
 	  libmesh_here();
@@ -1001,14 +1001,14 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
           elem->print_info(libMesh::err);
 	}
     }
-  
+
 #endif
 
 
-  
+
   //  Stop logging the map inversion.
   STOP_LOG("inverse_map()", "FE");
-  
+
   return p;
 }
 

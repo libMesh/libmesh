@@ -2,24 +2,24 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
 #include <iostream>
-#include <sstream> 
+#include <sstream>
 
 // Local includes
 #include "libmesh_common.h"
@@ -38,29 +38,29 @@ namespace libMesh
  * a name or description to the ElemQuality enums.
  * It can be removed if it is found to be useless.
  */
-std::string Quality::name (const ElemQuality q) 
+std::string Quality::name (const ElemQuality q)
 {
   std::string its_name;
-  
+
   switch (q)
     {
-      
+
     case ASPECT_RATIO:
       its_name = "Aspect Ratio";
       break;
-      
+
     case SKEW:
       its_name = "Skew";
       break;
-      
+
     case SHEAR:
       its_name = "Shear";
       break;
-      
+
     case SHAPE:
       its_name = "Shape";
       break;
-      
+
     case MAX_ANGLE:
       its_name = "Maximum Angle";
       break;
@@ -68,27 +68,27 @@ std::string Quality::name (const ElemQuality q)
     case MIN_ANGLE:
       its_name = "Minimum Angle";
       break;
-      
+
     case CONDITION:
       its_name = "Condition Number";
       break;
-      
+
     case DISTORTION:
       its_name = "Distortion";
       break;
-      
+
     case TAPER:
       its_name = "Taper";
       break;
-      
+
     case WARP:
       its_name = "Warp";
       break;
-      
+
     case STRETCH:
       its_name = "Stretch";
       break;
-      
+
     case DIAGONAL:
       its_name = "Diagonal";
       break;
@@ -96,7 +96,7 @@ std::string Quality::name (const ElemQuality q)
     case ASPECT_RATIO_BETA:
       its_name = "AR Beta";
       break;
-      
+
     case ASPECT_RATIO_GAMMA:
       its_name = "AR Gamma";
       break;
@@ -104,7 +104,7 @@ std::string Quality::name (const ElemQuality q)
     case SIZE:
       its_name = "Size";
       break;
-      
+
     case JACOBIAN:
       its_name = "Jacobian";
       break;
@@ -113,7 +113,7 @@ std::string Quality::name (const ElemQuality q)
       its_name = "Unknown";
       break;
     }
-  
+
   return its_name;
 }
 
@@ -122,18 +122,18 @@ std::string Quality::name (const ElemQuality q)
 
 
 /**
- * This function returns a string containing a short 
+ * This function returns a string containing a short
  * description of q.  Useful for asking the enum what
  * it computes.
  */
-std::string Quality::describe (const ElemQuality q) 
+std::string Quality::describe (const ElemQuality q)
 {
-  
-  std::ostringstream desc; 
-  
+
+  std::ostringstream desc;
+
   switch (q)
     {
-      
+
     case ASPECT_RATIO:
       desc << "Max edge length ratio\n"
 	   << "at element center.\n"
@@ -142,7 +142,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Hexes: (1 -> 4)\n"
 	   << "Quads: (1 -> 4)";
       break;
-      
+
     case SKEW:
       desc << "Maximum |cos A|, where A\n"
 	   << "is the angle between edges\n"
@@ -152,7 +152,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Hexes: (0 -> 0.5)\n"
 	   << "Quads: (0 -> 0.5)";
       break;
-      
+
     case SHEAR:
       desc << "LIBMESH_DIM / K(Js)\n"
 	   << '\n'
@@ -164,7 +164,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Hexes(LIBMESH_DIM=3): (0.3 -> 1)\n"
 	   << "Quads(LIBMESH_DIM=2): (0.3 -> 1)";
       break;
-      
+
     case SHAPE:
       desc << "LIBMESH_DIM / K(Jw)\n"
 	   << '\n'
@@ -178,7 +178,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Tets(LIBMESH_DIM=3): (0.2 -> 1)\n"
 	   << "Quads(LIBMESH_DIM=2): (0.3 -> 1).";
       break;
-      
+
     case MAX_ANGLE:
       desc << "Largest included angle.\n"
 	   << '\n'
@@ -194,18 +194,18 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Quads: (45 -> 90)\n"
 	   << "Triangles: (30 -> 60)";
       break;
-      
+
     case CONDITION:
       desc << "Condition number of the\n"
 	   << "Jacobian matrix.\n"
 	   << '\n'
 	   << "Suggested ranges:\n"
-	   << "Quads: (1 -> 4)\n" 
+	   << "Quads: (1 -> 4)\n"
 	   << "Hexes: (1 -> 8)\n"
 	   << "Tris: (1 -> 1.3)\n"
 	   << "Tets: (1 -> 3)";
       break;
-      
+
     case DISTORTION:
       desc << "min |J| * A / <A>\n"
 	   << '\n'
@@ -214,12 +214,12 @@ std::string Quality::describe (const ElemQuality q)
 	   << "<A> = reference area\n"
 	   << '\n'
 	   << "Suggested ranges:\n"
-	   << "Quads: (0.6 -> 1), <A>=4\n" 
+	   << "Quads: (0.6 -> 1), <A>=4\n"
 	   << "Hexes: (0.6 -> 1), <A>=8\n"
 	   << "Tris: (0.6 -> 1), <A>=1/2\n"
 	   << "Tets: (0.6 -> 1), <A>=1/6";
       break;
-      
+
     case TAPER:
       desc << "Maximum ratio of lengths\n"
 	   << "derived from opposited edges.\n"
@@ -228,7 +228,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Quads: (0.7 -> 1)\n"
 	   << "Hexes: (0.4 -> 1)";
       break;
-      
+
     case WARP:
       desc << "cos D\n"
 	   << '\n'
@@ -238,7 +238,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Suggested ranges:\n"
 	   << "Quads: (0.9 -> 1)";
       break;
-      
+
     case STRETCH:
       desc << "Sqrt(3) * L_min / L_max\n"
 	   << '\n'
@@ -249,7 +249,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Quads: (0.25 -> 1)\n"
 	   << "Hexes: (0.25 -> 1)";
       break;
-      
+
     case DIAGONAL:
       desc << "D_min / D_max\n"
 	   << '\n'
@@ -269,7 +269,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "Suggested ranges:\n"
 	   << "Tets: (1 -> 3)";
       break;
-      
+
     case ASPECT_RATIO_GAMMA:
       desc << "S^(3/2) / 8.479670 * V\n"
 	   << '\n'
@@ -287,12 +287,12 @@ std::string Quality::describe (const ElemQuality q)
 	   << "|J| = norm of Jacobian matrix.\n"
 	   << '\n'
 	   << "Suggested ranges:\n"
-	   << "Quads: (0.3 -> 1)\n" 
+	   << "Quads: (0.3 -> 1)\n"
 	   << "Hexes: (0.5 -> 1)\n"
 	   << "Tris: (0.25 -> 1)\n"
 	   << "Tets: (0.2 -> 1)";
       break;
-      
+
     case JACOBIAN:
       desc << "Minimum Jacobian divided by\n"
 	   << "the lengths of the LIBMESH_DIM\n"
@@ -301,7 +301,7 @@ std::string Quality::describe (const ElemQuality q)
 	   << "LIBMESH_DIM = element dimension.\n"
 	   << '\n'
 	   << "Suggested ranges:\n"
-	   << "Quads: (0.5 -> 1)\n" 
+	   << "Quads: (0.5 -> 1)\n"
 	   << "Hexes: (0.5 -> 1)\n"
 	   << "Tris: (0.5 -> 1.155)\n"
 	   << "Tets: (0.5 -> 1.414)";
@@ -311,7 +311,7 @@ std::string Quality::describe (const ElemQuality q)
       desc << "Unknown";
       break;
     }
-  
+
   return desc.str();
 }
 
@@ -323,7 +323,7 @@ std::string Quality::describe (const ElemQuality q)
 std::vector<ElemQuality> Quality::valid(const ElemType t)
 {
   std::vector<ElemQuality> v;
-  
+
   switch (t)
     {
     case EDGE2:
@@ -449,14 +449,14 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
 
 #endif
 
-      
+
     default:
       {
 	libMesh::out << "Undefined element type!." << std::endl;
 	libmesh_error();
       }
     }
-  
+
   return v;
 }
 

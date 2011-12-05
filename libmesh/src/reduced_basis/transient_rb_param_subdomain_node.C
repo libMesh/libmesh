@@ -166,7 +166,7 @@ void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
 Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound)
 {
     START_LOG("perform_p_stage()", "TransientRBParamSubdomainNode");
-    
+
     // Continue the greedy process on this subdomain, i.e.
     // we do not discard the basis functions generated for
     // this subdomain in the h-refinement phase
@@ -248,9 +248,9 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
                     break;
                 }
             }
-            
+
             // anchors_are_equal has been updated, check if we have found different point.
-            if(anchors_are_equal) 
+            if(anchors_are_equal)
             {
                 libMesh::out << "Error: Unable to find distinct anchors in additional splitting step." << std::endl;
                 libmesh_error();

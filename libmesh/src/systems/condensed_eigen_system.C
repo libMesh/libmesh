@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -20,7 +20,7 @@
 #include "libmesh_config.h"
 
 // Currently, the EigenSystem should only be available
-// if SLEPc support is enabled. 
+// if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC)
 
 #include "condensed_eigen_system.h"
@@ -53,7 +53,7 @@ void CondensedEigenSystem::initialize_condensed_dofs(std::set<unsigned int>& glo
   // Now erase the condensed dofs
   std::set<unsigned int>::iterator iter     = global_dirichlet_dofs_set.begin();
   std::set<unsigned int>::iterator iter_end = global_dirichlet_dofs_set.end();
-  
+
   for ( ; iter != iter_end ; iter++)
   {
     unsigned int condensed_dof_index = *iter;
@@ -99,7 +99,7 @@ unsigned int CondensedEigenSystem::n_global_non_condensed_dofs() const
 void CondensedEigenSystem::solve()
 {
   START_LOG("solve()", "CondensedEigenSystem");
-  
+
   // If we haven't initialized any condensed dofs,
   // just use the default eigen_system
   if(!condensed_dofs_initialized)

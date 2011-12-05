@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -172,7 +172,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   const unsigned int n_parameters = infile("n_parameters",1);
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
-  
+
   set_n_params( n_parameters );
 
   // String which selects an alternate pc/solver combo for the update_residual_terms solves.
@@ -212,7 +212,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // value is -1, which means use std::time to seed the RNG.
   training_parameters_random_seed = infile("training_parameters_random_seed",
 					   training_parameters_random_seed);
-  
+
   // Set quiet mode
   const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
   set_quiet_mode(quiet_mode_in);
@@ -220,7 +220,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // Initialize RB parameters
   const unsigned int Nmax_in = infile("Nmax", Nmax);
   set_Nmax(Nmax_in);
-  
+
   const Real training_tolerance_in = infile("training_tolerance",
                                             training_tolerance);
   set_training_tolerance(training_tolerance_in);
@@ -321,7 +321,7 @@ void RBConstruction::allocate_data_structures()
   // Resize vectors for storing mesh-dependent data
   A_q_vector.resize(rb_theta_expansion->get_Q_a());
   F_q_vector.resize(rb_theta_expansion->get_Q_f());
-  
+
   // Resize the F_q_representors and initialize each to NULL
   // These are basis independent and hence stored here, whereas
   // the A_q_representors are stored in RBEvaluation
@@ -376,7 +376,7 @@ void RBConstruction::allocate_data_structures()
       dof_map.attach_matrix(*non_dirichlet_inner_product_matrix);
       non_dirichlet_inner_product_matrix->init();
       non_dirichlet_inner_product_matrix->zero();
-        
+
       non_dirichlet_A_q_vector.resize(rb_theta_expansion->get_Q_a());
       for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
       {
@@ -656,7 +656,7 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
     // Apply constraints, e.g. periodic constraints
     this->get_dof_map().constrain_element_matrix_and_vector
       (context.elem_jacobian, context.elem_residual, context.dof_indices);
-      
+
     // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
     // This zeros the Dirichlet dofs in context.elem_residual
     std::set<unsigned int>::const_iterator iter;
@@ -682,7 +682,7 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
 void RBConstruction::truth_assembly()
 {
   START_LOG("truth_assembly()", "RBConstruction");
-  
+
   const std::vector<Real> mu = get_current_parameters();
 
   this->matrix->zero();
@@ -799,7 +799,7 @@ void RBConstruction::truth_assembly()
         this->get_dof_map().constrain_element_vector
           (Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
       }
-      
+
       // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
       // Note that this cannot be inside the side-loop since non-boundary
       // elements may contain boundary dofs
@@ -822,7 +822,7 @@ void RBConstruction::truth_assembly()
 	  }
 	}
       }
-      
+
       // Finally add local matrices/vectors to global system
       for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
       {
@@ -952,7 +952,7 @@ void RBConstruction::assemble_misc_matrices()
 
   if( constrained_problem )
   {
-    assemble_constraint_matrix(constraint_matrix.get()); 
+    assemble_constraint_matrix(constraint_matrix.get());
   }
 }
 
@@ -999,7 +999,7 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
   }
 
   input_vector->zero();
-    
+
   add_scaled_matrix_and_vector(1.,
                                rb_assembly_expansion->F_q_assembly_vector[q],
                                NULL,
@@ -1026,7 +1026,7 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
   START_LOG("train_reduced_basis()", "RBConstruction");
 
   int count = 0;
-  
+
   // We need to have a valid RBEvaluation object
   libmesh_assert( rb_eval );
 
@@ -1055,7 +1055,7 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
                  << get_Nmax() << std::endl;
     return 0.;
   }
-  
+
 
   // Compute the dual norms of the outputs if we haven't already done so
   compute_output_dual_norms();
@@ -1157,11 +1157,11 @@ Real RBConstruction::truth_solve(int plot_solution)
   START_LOG("truth_solve()", "RBConstruction");
 
   truth_assembly();
-  
+
   // Safer to zero the solution first, especially when using iterative solvers
   solution->zero();
   solve();
-  
+
   const std::vector<Real> mu = get_current_parameters();
 
   // Make sure we didn't max out the number of iterations
@@ -1272,7 +1272,7 @@ void RBConstruction::enrich_RB_space()
     assemble_inner_product_matrix(matrix);
 
   for(unsigned int index=0; index<rb_eval->get_n_basis_functions(); index++)
-  {    
+  {
     // invoke copy constructor for NumericVector
     *proj_index = rb_eval->get_basis_function(index);
     if(!single_matrix_mode)
@@ -1298,7 +1298,7 @@ void RBConstruction::enrich_RB_space()
     matrix->vector_mult(*inner_product_storage_vector,*new_bf);
   }
   Number new_bf_norm = std::sqrt( inner_product_storage_vector->dot(*new_bf) );
-  
+
   if(new_bf_norm == 0.)
   {
     new_bf->zero(); // avoid potential nan's
@@ -1340,13 +1340,13 @@ Real RBConstruction::get_RB_error_bound()
   rb_eval->set_current_parameters( get_current_parameters() );
 
   Real error_bound = rb_eval->rb_solve(rb_eval->get_n_basis_functions());
-  
+
   // Should we normalize the error bound to return a relative bound?
   if(use_relative_bound_in_greedy)
   {
     error_bound /= rb_eval->get_rb_solution_norm();
   }
-  
+
   return error_bound;
 }
 
@@ -1363,7 +1363,7 @@ void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
   // and all the basis dependent terms
   unsigned int saved_delta_N = delta_N;
   delta_N = rb_eval->get_n_basis_functions();
-  
+
   update_residual_terms(compute_inner_products);
 
   delta_N = saved_delta_N;
@@ -1446,7 +1446,7 @@ void RBConstruction::update_RB_system_matrices()
     for(unsigned int j=0; j<RB_size; j++)
     {
       Number value = 0.;
-      
+
       if(compute_RB_inner_product)
       {
         // Compute reduced inner_product_matrix
@@ -1550,7 +1550,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
         rb_eval->A_q_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
-      libmesh_assert(rb_eval->A_q_representor[q_a][i]->size()       == this->n_dofs()       && 
+      libmesh_assert(rb_eval->A_q_representor[q_a][i]->size()       == this->n_dofs()       &&
                      rb_eval->A_q_representor[q_a][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
@@ -1685,7 +1685,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 void RBConstruction::assemble_matrix_for_output_dual_solves()
 {
   // By default we use the inner product matrix for steady problems
-  
+
   if(!single_matrix_mode)
   {
     matrix->zero();
@@ -1712,9 +1712,9 @@ void RBConstruction::compute_output_dual_norms()
 
     // Only log if we get to here
     START_LOG("compute_output_dual_norms()", "RBConstruction");
-  
+
     libMesh::out << "Compute output dual norms" << std::endl;
-  
+
     // Note: the solves in this function employ a single system matrix and multiple
     // right-hand sides, so we may get better performance using a different
     // preconditioner, or even a direct solver.
@@ -1738,14 +1738,14 @@ void RBConstruction::compute_output_dual_norms()
       // For the first solve, make sure we generate a new preconditioner
       linear_solver->reuse_preconditioner(false);
     }
-  
+
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
       // If constrained_problem, we need to reassemble to add the constraint part back in
       if( (n==0) || constrained_problem)
       {
         assemble_matrix_for_output_dual_solves();
-      
+
         if(constrained_problem)
         {
           if(!single_matrix_mode)
@@ -1820,7 +1820,7 @@ void RBConstruction::compute_output_dual_norms()
         {
           output_dual_norms[n][q] = L_q_representor[q_l2]->dot(*inner_product_storage_vector);
           libMesh::out << "output_dual_norms[" << n << "][" << q << "] = " << output_dual_norms[n][q] << std::endl;
-        
+
           q++;
         }
       }
@@ -1841,7 +1841,7 @@ void RBConstruction::compute_output_dual_norms()
         L_q_representor[q] = NULL;
       }
     }
-  
+
     output_dual_norms_computed = true;
 
     // Change the preconditioner, Krylov solver back to their original
@@ -1852,7 +1852,7 @@ void RBConstruction::compute_output_dual_norms()
     STOP_LOG("compute_output_dual_norms()", "RBConstruction");
 
   }
-  
+
   rb_eval->output_dual_norms = output_dual_norms;
 }
 
@@ -1894,7 +1894,7 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
         F_q_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
-      libmesh_assert(F_q_representor[q_f]->size()       == this->n_dofs()       && 
+      libmesh_assert(F_q_representor[q_f]->size()       == this->n_dofs()       &&
                      F_q_representor[q_f]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
@@ -1974,12 +1974,12 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
         }
       }
     } // end if (compute_inner_products)
-  
+
     Fq_representor_norms_computed = true;
 
     STOP_LOG("compute_Fq_representor_norms()", "RBConstruction");
   }
-  
+
   rb_eval->Fq_representor_norms = Fq_representor_norms;
 }
 
@@ -2376,7 +2376,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
   // Alert the update_residual_terms() function that we don't need to recompute
   // the F_q_representors as we have already read them in from file!
   Fq_representor_norms_computed = true;
-  
+
 
   libMesh::out << "Reading in the A_q_representors..." << std::endl;
 

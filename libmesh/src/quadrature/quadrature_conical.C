@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -56,10 +56,10 @@ void QConical::conical_product_tri(unsigned int p)
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert (this->get_dim() == 2);
-  
+
   QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
   QJacobi jac1D(1,static_cast<Order>(_order+2*p),1,0);
-	      
+
   // The Gauss rule needs to be scaled to [0,1]
   std::pair<Real, Real> old_range(-1.0L, 1.0L);
   std::pair<Real, Real> new_range( 0.0L, 1.0L);
@@ -73,7 +73,7 @@ void QConical::conical_product_tri(unsigned int p)
 
   // Save the number of points as a convenient variable
   const unsigned int n_points = gauss1D.n_points();
-  
+
   // Both rules should be between x=0 and x=1
   libmesh_assert(gauss1D.qp(0)(0) >= 0.0); libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
   libmesh_assert(jac1D.qp(0)(0)   >= 0.0); libmesh_assert(jac1D.qp(n_points-1)(0) <= 1.0);
@@ -105,7 +105,7 @@ void QConical::conical_product_tet(unsigned int p)
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert (this->get_dim() == 3);
-  
+
   QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
   QJacobi jacA1D(1,static_cast<Order>(_order+2*p),1,0);
   QJacobi jacB1D(1,static_cast<Order>(_order+2*p),2,0);
@@ -121,10 +121,10 @@ void QConical::conical_product_tet(unsigned int p)
   // All rules should have the same number of points
   libmesh_assert(gauss1D.n_points() == jacA1D.n_points());
   libmesh_assert(jacA1D.n_points()  == jacB1D.n_points());
-  
+
   // Save the number of points as a convenient variable
   const unsigned int n_points = gauss1D.n_points();
-  
+
   // All rules should be between x=0 and x=1
   libmesh_assert(gauss1D.qp(0)(0) >= 0.0); libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
   libmesh_assert(jacA1D.qp(0)(0)  >= 0.0); libmesh_assert(jacA1D.qp(n_points-1)(0)  <= 1.0);
@@ -161,7 +161,7 @@ void QConical::conical_product_tet(unsigned int p)
 //
 // (Imagine a stack of infinitely thin squares which decrease in size as
 //  you approach the apex.)  Under the transformation of variables:
-// 
+//
 // z=w
 // y=(1-z)v
 // x=(1-z)u,
@@ -179,13 +179,13 @@ void QConical::conical_product_pyramid(unsigned int p)
   // Be sure the underlying rule object was built with the same dimension as the
   // rule we are about to construct.
   libmesh_assert (this->get_dim() == 3);
-  
+
   QGauss  gauss1D(1,static_cast<Order>(_order+2*p));
   QJacobi jac1D(1,static_cast<Order>(_order+2*p),2,0);
 
   // These rules should have the same number of points
   libmesh_assert(gauss1D.n_points() == jac1D.n_points());
-  
+
   // Save the number of points as a convenient variable
   const unsigned int n_points = gauss1D.n_points();
 
@@ -202,14 +202,14 @@ void QConical::conical_product_pyramid(unsigned int p)
 	const Real xi=gauss1D.qp(i)(0);
 	const Real yj=gauss1D.qp(j)(0);
 	const Real zk=jac1D.qp(k)(0);
-	
+
 	_points[qp](0) = (1.-zk) * xi;
 	_points[qp](1) = (1.-zk) * yj;
 	_points[qp](2) = zk;
 	_weights[qp]   = gauss1D.w(i) * gauss1D.w(j) * jac1D.w(k);
       }
-  
-  
+
+
 }
 
 } // namespace libMesh

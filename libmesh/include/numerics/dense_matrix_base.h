@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -43,11 +43,11 @@ template <typename T> class DenseVectorBase;
  * can be derived from this class.
  *
  * @author John W. Peterson, 2003
- */ 
+ */
 template<typename T>
 class DenseMatrixBase
 {
-  
+
 protected:
   /**
    * Constructor.  Creates a dense matrix of dimension \p m by \p n.
@@ -55,11 +55,11 @@ protected:
    */
   DenseMatrixBase(const unsigned int m=0,
 		  const unsigned int n=0) : _m(m), _n(n) {};
-  
+
 public:
   /**
    * Destructor. Empty.
-   */     
+   */
   virtual ~DenseMatrixBase() {};
 
   /**
@@ -76,7 +76,7 @@ public:
    */
   virtual T el(const unsigned int i,
 	       const unsigned int j) const = 0;
-  
+
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    * Since internal data representations may differ, you
@@ -86,7 +86,7 @@ public:
 		 const unsigned int j) = 0;
 
   /**
-   * Performs the operation: (*this) <- M2 * (*this) 
+   * Performs the operation: (*this) <- M2 * (*this)
    */
   virtual void left_multiply (const DenseMatrixBase<T>& M2) = 0;
 
@@ -94,17 +94,17 @@ public:
    * Performs the operation: (*this) <- (*this) * M3
    */
   virtual void right_multiply (const DenseMatrixBase<T>& M3) = 0;
-  
+
   /**
    * @returns the row-dimension of the matrix.
    */
   unsigned int m() const { return _m; }
-  
+
   /**
    * @returns the column-dimension of the matrix.
    */
   unsigned int n() const { return _n; }
-  
+
   /**
    * Pretty-print the matrix, by default to \p libMesh::out.
    */
@@ -120,26 +120,26 @@ public:
     m.print(os);
     return os;
   }
-  
+
   /**
    * Prints the matrix entries with more decimal places in
    * scientific notation.
    */
   void print_scientific(std::ostream& os) const;
-  
+
   /**
    * Adds \p factor to every element in the matrix.
    * This should only work if T += T2 * T3 is valid C++ and
-   * if T2 is scalar.  Return type is void 
+   * if T2 is scalar.  Return type is void
    */
   template <typename T2, typename T3>
   typename boostcopy::enable_if_c<
     ScalarTraits<T2>::value, void >::type
   add (const T2 factor,
        const DenseMatrixBase<T3>& mat);
-   
+
 protected:
-  
+
   /**
    * Performs the computation M1 = M2 * M3 where:
    * M1 = (m x n)

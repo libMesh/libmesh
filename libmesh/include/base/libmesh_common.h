@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -130,7 +130,7 @@ namespace libMesh
 #endif
 
 
-   
+
 // Define the type to use for real numbers
 
 typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
@@ -251,7 +251,7 @@ extern OStreamProxy err;
 #ifndef NDEBUG
 #define libmesh_dbg_var(var) var
 #else
-#define libmesh_dbg_var(var) 
+#define libmesh_dbg_var(var)
 #endif
 
 // The libmesh_dbg_use() macro indicates that an argument to a function
@@ -259,10 +259,10 @@ extern OStreamProxy err;
 #ifndef NDEBUG
 #define libmesh_dbg_var(var) var
 #else
-#define libmesh_dbg_var(var) 
+#define libmesh_dbg_var(var)
 #endif
 
-// The libmesh_assert() macro acts like C's assert(), but throws a 
+// The libmesh_assert() macro acts like C's assert(), but throws a
 // libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
 #define libmesh_assert(asserted)  ((void) 0)
@@ -343,7 +343,7 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
   Tnew newvar = dynamic_cast<Tnew>(oldvar);
   if (!newvar)
     {
-      libMesh::err << "Failed to convert " << typeid(Told).name() << 
+      libMesh::err << "Failed to convert " << typeid(Told).name() <<
                       " pointer to " << typeid(Tnew).name() << std::endl;
       libmesh_error();
     }

@@ -31,23 +31,23 @@ namespace libMesh
   //
   // PolygonHole member functions
   //
-  TriangleInterface::PolygonHole::PolygonHole(Point center, Real radius, unsigned int n_points) 
+  TriangleInterface::PolygonHole::PolygonHole(Point center, Real radius, unsigned int n_points)
     : _center(center),
       _radius(radius),
-      _n_points(n_points) 
+      _n_points(n_points)
   {}
 
 
-  unsigned int TriangleInterface::PolygonHole::n_points() const 
-  { 
-    return _n_points; 
+  unsigned int TriangleInterface::PolygonHole::n_points() const
+  {
+    return _n_points;
   }
 
   Point TriangleInterface::PolygonHole::point(const unsigned int n) const
   {
     // The nth point lies at the angle theta = 2 * pi * n / _n_points
     const Real theta = static_cast<Real>(n) * 2.0 * libMesh::pi / static_cast<Real>(_n_points);
-	
+
     return Point(_center(0) + _radius*std::cos(theta), // x=r*cos(theta)
 		 _center(1) + _radius*std::sin(theta), // y=r*sin(theta)
 		 0.);
@@ -55,16 +55,16 @@ namespace libMesh
 
 
 
-  Point TriangleInterface::PolygonHole::inside() const 
-  { 
+  Point TriangleInterface::PolygonHole::inside() const
+  {
     // The center of the hole is definitely inside.
-    return _center;  
+    return _center;
   }
-  
 
 
 
-  // 
+
+  //
   // ArbitraryHole member functions
   //
   TriangleInterface::ArbitraryHole::ArbitraryHole(const Point center,
@@ -73,10 +73,10 @@ namespace libMesh
 	_points(points)
   {}
 
-  
-  unsigned int TriangleInterface::ArbitraryHole::n_points() const 
-  { 
-    return _points.size(); 
+
+  unsigned int TriangleInterface::ArbitraryHole::n_points() const
+  {
+    return _points.size();
   }
 
 
@@ -87,12 +87,12 @@ namespace libMesh
     }
 
 
-  Point  TriangleInterface::ArbitraryHole::inside() const 
-  { 
-    return _center;  
+  Point  TriangleInterface::ArbitraryHole::inside() const
+  {
+    return _center;
   }
 
-  
+
 } // namespace libMesh
 
 

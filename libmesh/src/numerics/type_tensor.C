@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,12 +41,12 @@ template <typename T>
 void TypeTensor<T>::print(std::ostream& os) const
 {
 #if LIBMESH_DIM == 1
-  
+
   os << "x=" << (*this)(0,0) << std::endl;
-  
+
 #endif
 #if LIBMESH_DIM == 2
-  
+
   os << "(xx,xy)=("
      << std::setw(8) << (*this)(0,0) << ", "
      << std::setw(8) << (*this)(0,1) << ")"
@@ -58,7 +58,7 @@ void TypeTensor<T>::print(std::ostream& os) const
 
 #endif
 #if LIBMESH_DIM == 3
-  
+
   os <<  "(xx,xy,xz)=("
      << std::setw(8) << (*this)(0,0) << ", "
      << std::setw(8) << (*this)(0,1) << ", "
@@ -92,21 +92,21 @@ void TypeTensor<T>::write_unformatted (std::ostream &out,
       << (*this)(0,1) << " "
       << (*this)(0,2) << " ";
   if (newline)
-    out << '\n';      
+    out << '\n';
 
   out << std::setiosflags(std::ios::showpoint)
       << (*this)(1,0) << " "
       << (*this)(1,1) << " "
       << (*this)(1,2) << " ";
   if (newline)
-    out << '\n';      
+    out << '\n';
 
   out << std::setiosflags(std::ios::showpoint)
       << (*this)(2,0) << " "
       << (*this)(2,1) << " "
       << (*this)(2,2) << " ";
   if (newline)
-    out << '\n';      
+    out << '\n';
 }
 
 

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -60,9 +60,9 @@ public:
     : scale_by_n_flux_faces(false),
       integrate_boundary_sides(false),
       fe_fine(NULL), fe_coarse(NULL) {}
-  
+
   /**
-   * Destructor.  
+   * Destructor.
    */
   virtual ~JumpErrorEstimator() {}
 
@@ -87,7 +87,7 @@ public:
    * want to use the feature.
    */
   bool scale_by_n_flux_faces;
-  
+
 protected:
   /**
    * A utility function to reinit the finite element data on elements sharing a
@@ -122,7 +122,7 @@ protected:
   virtual bool boundary_side_integration() { return false; }
 
   /**
-   * A boolean flag, by default false, to be set to true if integrations 
+   * A boolean flag, by default false, to be set to true if integrations
    * with boundary_side_integration() should be performed
    */
   bool integrate_boundary_sides;

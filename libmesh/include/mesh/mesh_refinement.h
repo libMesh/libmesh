@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -69,8 +69,8 @@ public:
   MeshRefinement (MeshBase& mesh);
 
 private:
-  // Both the copy ctor and the assignment operator are 
-  // declared private but not implemented.  This is the 
+  // Both the copy ctor and the assignment operator are
+  // declared private but not implemented.  This is the
   // standard practice to prevent them from being used.
   MeshRefinement (const MeshRefinement&);
   MeshRefinement& operator=(const MeshRefinement&);
@@ -78,7 +78,7 @@ private:
 public:
 
   void set_periodic_boundaries_ptr(PeriodicBoundaries * pb_ptr);
-  
+
   /**
    * Destructor. Deletes all the elements that are currently stored.
    */
@@ -87,7 +87,7 @@ public:
   /**
    * Deletes all the data that are currently stored.
    */
-  void clear ();  
+  void clear ();
 
   /**
    * Flags elements for coarsening and refinement based on
@@ -211,7 +211,7 @@ public:
   bool coarsen_elements (const bool maintain_level_one=true);
 
   /**
-   * Only refines the user-requested elements. 
+   * Only refines the user-requested elements.
    * It is possible that for a given set of refinement flags there
    * is actually no change upon calling this member function.  Consequently,
    * this function returns \p true if the mesh actually changed (hence
@@ -221,22 +221,22 @@ public:
    * face_level_mismatch_limit() instead.
    */
   bool refine_elements (const bool maintain_level_one=true);
-  
+
   /**
    * Uniformly refines the mesh \p n times.
    */
   void uniformly_refine (unsigned int n=1);
-  
+
   /**
    * Attempts to uniformly coarsen the mesh \p n times.
    */
   void uniformly_coarsen (unsigned int n=1);
-  
+
   /**
    * Uniformly p refines the mesh \p n times.
    */
   void uniformly_p_refine (unsigned int n=1);
-  
+
   /**
    * Attempts to uniformly p coarsen the mesh \p n times.
    */
@@ -251,20 +251,20 @@ public:
   /**
    * Returns true if and only if the mesh is level one smooth
    * Returns false otherwise
-   * Aborts the program if libmesh_assert_yes is true and 
+   * Aborts the program if libmesh_assert_yes is true and
    * the mesh is not level one smooth
    */
   bool test_level_one (bool libmesh_assert_yes = false);
-  
+
   /**
    * Returns true if and only if the mesh has no elements
    * flagged to be coarsened or refined
    * Returns false otherwise
-   * Aborts the program if libmesh_assert_yes is true and 
+   * Aborts the program if libmesh_assert_yes is true and
    * the mesh has flagged elements
    */
   bool test_unflagged (bool libmesh_assert_yes = false);
-  
+
   /**
    * Add point \p p to the mesh. The function returns a pointer to
    * the new node.
@@ -409,7 +409,7 @@ private:
    * data needs to be projected) and \p false otherwise.
    */
   bool _coarsen_elements ();
-  
+
   /**
    * Refines user-requested elements.
    *
@@ -424,7 +424,7 @@ private:
 
   //------------------------------------------------------
   // "Smoothing" algorthms for refined meshes
-  
+
   /**
    * This algorithm restricts the maximum level mismatch
    * at any node in the mesh.  Calling this with \p max_mismatch
@@ -454,11 +454,11 @@ private:
    |       |       |               |
    |       |       |               |
    |       |       |               |
-   o-------o-------o---------------o     
+   o-------o-------o---------------o
    \endverbatim
 
    * into this:
-   
+
    \verbatim
    o---o---o---o---o-------o-------o
    |   |   |   |   |       |       |
@@ -484,10 +484,10 @@ private:
    |       |       |       :       |
    |       |       |       :       |
    |       |       |       :       |
-   o-------o-------o-------o-------o     
+   o-------o-------o-------o-------o
    \endverbatim
    by refining the indicated element
-   
+
    */
   bool limit_level_mismatch_at_node (const unsigned int max_mismatch);
 
@@ -548,7 +548,7 @@ private:
    \endverbatim
 
    by refining the indicated element
-   
+
    */
   bool eliminate_unrefined_patches ();
 
@@ -570,7 +570,7 @@ private:
    * Updates the \p _new_nodes_map
    */
   void update_nodes_map ();
-  
+
   /**
    * Take user-specified coarsening flags and augment them
    * so that level-one dependency is satisfied.
@@ -604,7 +604,7 @@ private:
   bool has_topological_neighbor (Elem* elem,
                                  const PointLocatorBase* point_locator,
                                  Elem* neighbor);
-  
+
   /**
    * Data structure that holds the new nodes information.
    */
@@ -714,4 +714,4 @@ inline unsigned char& MeshRefinement::node_level_mismatch_limit()
 } // namespace libMesh
 
 #endif // end #ifdef LIBMESH_ENABLE_AMR
-#endif // end #ifndef __mesh_refinement_h__ 
+#endif // end #ifndef __mesh_refinement_h__

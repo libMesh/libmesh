@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -112,7 +112,7 @@ void HPCoarsenTest::add_projection(const System &system,
       // The projection matrix and vector
       for (unsigned int i=0; i != Fe.size(); ++i)
         {
-          Fe(i) += (*JxW)[qp] * 
+          Fe(i) += (*JxW)[qp] *
             (*phi_coarse)[i][qp]*val;
           if (cont == C_ZERO || cont == C_ONE)
             Fe(i) += (*JxW)[qp] *
@@ -147,10 +147,10 @@ void HPCoarsenTest::select_refinement (System &system)
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // The number of variables in the system
   const unsigned int n_vars = system.n_vars();
-  
+
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
@@ -181,14 +181,14 @@ void HPCoarsenTest::select_refinement (System &system)
   // the number of elements, initialize them to 0.
   std::vector<ErrorVectorReal> h_error_per_cell(mesh.n_elem(), 0.);
   std::vector<ErrorVectorReal> p_error_per_cell(mesh.n_elem(), 0.);
-  
+
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_vars; var++)
     {
       // Possibly skip this variable
       if (!component_scale.empty())
 	if (component_scale[var] == 0.0) continue;
-      
+
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
 
@@ -205,7 +205,7 @@ void HPCoarsenTest::select_refinement (System &system)
       unsigned int cached_coarse_p_level = 0;
 
       const FEContinuity cont = fe->get_continuity();
-      libmesh_assert (cont == DISCONTINUOUS || cont == C_ZERO || 
+      libmesh_assert (cont == DISCONTINUOUS || cont == C_ZERO ||
 	      cont == C_ONE);
 
       // Build an appropriate quadrature rule
@@ -246,7 +246,7 @@ void HPCoarsenTest::select_refinement (System &system)
       MeshBase::const_element_iterator       elem_it  =
 		      mesh.active_local_elements_begin();
       const MeshBase::const_element_iterator elem_end =
-		      mesh.active_local_elements_end(); 
+		      mesh.active_local_elements_end();
 
       for (; elem_it != elem_end; ++elem_it)
 	{
@@ -272,7 +272,7 @@ void HPCoarsenTest::select_refinement (System &system)
 
               unsigned int old_parent_level = coarse->p_level();
               (const_cast<Elem *>(coarse))->hack_p_level(elem->p_level());
-              
+
               this->add_projection(system, coarse, var);
 
               (const_cast<Elem *>(coarse))->hack_p_level(old_parent_level);
@@ -282,7 +282,7 @@ void HPCoarsenTest::select_refinement (System &system)
             }
 
 	  fe->reinit(elem);
-	  
+
           // Get the DOF indices for the fine element
           dof_map.dof_indices (elem, dof_indices, var);
 
@@ -320,7 +320,7 @@ void HPCoarsenTest::select_refinement (System &system)
 	    {
               unsigned int old_elem_level = elem->p_level();
               (const_cast<Elem *>(elem))->hack_p_level(old_elem_level - 1);
-              
+
               fe_coarse->reinit(elem, &(qrule->get_points()));
 
               (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
@@ -421,7 +421,7 @@ void HPCoarsenTest::select_refinement (System &system)
                     }
                 }
 
-	      p_error_per_cell[e_id] += component_scale[var] * 
+	      p_error_per_cell[e_id] += component_scale[var] *
 		(*JxW)[qp] * libmesh_norm(value_error);
               if (cont == C_ZERO || cont == C_ONE)
 	        p_error_per_cell[e_id] += component_scale[var] *
@@ -489,13 +489,13 @@ void HPCoarsenTest::select_refinement (System &system)
 			// hessian_error -= (*d2phi_coarse)[i][qp] * Uc(i);
                     }
 
-	          h_error_per_cell[e_id] += component_scale[var] * 
+	          h_error_per_cell[e_id] += component_scale[var] *
 		    (*JxW)[qp] * libmesh_norm(value_error);
                   if (cont == C_ZERO || cont == C_ONE)
-	            h_error_per_cell[e_id] += component_scale[var] * 
+	            h_error_per_cell[e_id] += component_scale[var] *
 		      (*JxW)[qp] * grad_error.size_sq();
                   if (cont == C_ONE)
-	            h_error_per_cell[e_id] += component_scale[var] * 
+	            h_error_per_cell[e_id] += component_scale[var] *
 		      (*JxW)[qp] * hessian_error.size_sq();
                 }
 
@@ -512,7 +512,7 @@ void HPCoarsenTest::select_refinement (System &system)
   MeshBase::const_element_iterator       elem_it  =
 		  mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator elem_end =
-		  mesh.active_local_elements_end(); 
+		  mesh.active_local_elements_end();
 
   for (; elem_it != elem_end; ++elem_it)
     {
@@ -538,12 +538,12 @@ void HPCoarsenTest::select_refinement (System &system)
           FEType elem_fe_type = fe_type;
           elem_fe_type.order =
             static_cast<Order>(fe_type.order + elem->p_level());
-          dofs_per_elem += 
+          dofs_per_elem +=
             FEInterface::n_dofs(dim, elem_fe_type, elem->type());
 
           elem_fe_type.order =
             static_cast<Order>(fe_type.order + elem->p_level() + 1);
-          dofs_per_p_elem += 
+          dofs_per_p_elem +=
             FEInterface::n_dofs(dim, elem_fe_type, elem->type());
         }
 
@@ -552,17 +552,17 @@ void HPCoarsenTest::select_refinement (System &system)
 
       const unsigned int new_p_dofs = dofs_per_p_elem -
         dofs_per_elem;
-      
+
 /*
 libMesh::err << "Cell " << e_id << ": h = " << elem->hmax()
-              << ", p = " << elem->p_level() + 1 << "," << std::endl 
-              << "     h_error = " << h_error_per_cell[e_id] 
+              << ", p = " << elem->p_level() + 1 << "," << std::endl
+              << "     h_error = " << h_error_per_cell[e_id]
               << ", p_error = " << p_error_per_cell[e_id] << std::endl
               << "     new_h_dofs = " << new_h_dofs
               << ", new_p_dofs = " << new_p_dofs << std::endl;
 */
-        
-      if ((std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs) 
+
+      if ((std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs)
           > (std::sqrt(h_error_per_cell[e_id]) / new_h_dofs))
 /*
       if (std::sqrt(p_error_per_cell[e_id]) * p_weight

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -35,7 +35,7 @@ namespace libMesh
 
 
 /**
- * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes. 
+ * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes.
  * It is numbered like this:
  *
    \verbatim
@@ -47,7 +47,7 @@ namespace libMesh
         |
         |
         o         base node
-          0       
+          0
    \endverbatim
  */
 // ------------------------------------------------------------
@@ -66,7 +66,7 @@ class InfEdge2 : public Edge
    * @returns 1
    */
   unsigned int n_sub_elem() const { return 1; }
-  
+
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
@@ -81,26 +81,26 @@ class InfEdge2 : public Edge
    * @returns true iff the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
 			       const unsigned int s) const;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
 			       const unsigned int e) const;
-  
+
   /**
    * @returns \p INFEDGE2
    */
   ElemType type()  const { return INFEDGE2; }
-  
+
   /**
    * @returns FIRST
    */
@@ -111,10 +111,10 @@ class InfEdge2 : public Edge
 			    std::vector<unsigned int>& conn) const;
 
 //   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
-  
+
 //   void vtk_connectivity(const unsigned int se,
 // 			std::vector<unsigned int>*conn = NULL) const;
-  
+
 //   unsigned int vtk_element_type (const unsigned int) const
 //   { return 3; }
 
@@ -122,7 +122,7 @@ class InfEdge2 : public Edge
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns \p true.  This is an infinite element. 
+   * @returns \p true.  This is an infinite element.
    */
   bool infinite () const { return true; }
 
@@ -133,16 +133,16 @@ class InfEdge2 : public Edge
 
 #endif
 
-  
+
 protected:
 
   /**
    * Data for links to nodes
    */
   Node* _nodelinks_data[2];
-  
 
-  
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**

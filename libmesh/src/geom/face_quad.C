@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -32,33 +32,33 @@ namespace libMesh
 unsigned int Quad::key (const unsigned int s) const
 {
   libmesh_assert (s < this->n_sides());
-  
+
   switch (s)
     {
     case 0:
       return
 	this->compute_key (this->node(0),
 			   this->node(1));
-      
+
     case 1:
       return
 	this->compute_key (this->node(1),
 			   this->node(2));
-	
+
     case 2:
       return
 	this->compute_key (this->node(2),
 			   this->node(3));
-	
+
     case 3:
       return
 	this->compute_key (this->node(3),
-			   this->node(0));	
+			   this->node(0));
     }
 
 
   // We will never get here...  Look at the code above.
-  libmesh_error();  
+  libmesh_error();
   return 0;
 }
 
@@ -76,7 +76,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
       {
 	edge->set_node(0) = this->get_node(0);
 	edge->set_node(1) = this->get_node(1);
-	
+
         AutoPtr<Elem> ap_edge(edge);
 	return ap_edge;
       }
@@ -84,7 +84,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
       {
 	edge->set_node(0) = this->get_node(1);
 	edge->set_node(1) = this->get_node(2);
-	
+
         AutoPtr<Elem> ap_edge(edge);
 	return ap_edge;
       }
@@ -92,7 +92,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
       {
 	edge->set_node(0) = this->get_node(2);
 	edge->set_node(1) = this->get_node(3);
-	
+
         AutoPtr<Elem> ap_edge(edge);
 	return ap_edge;
       }
@@ -100,7 +100,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
       {
 	edge->set_node(0) = this->get_node(3);
 	edge->set_node(1) = this->get_node(0);
-	
+
         AutoPtr<Elem> ap_edge(edge);
 	return ap_edge;
       }
@@ -112,7 +112,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
 
 
   // We will never get here...  Look at the code above.
-  libmesh_error();  
+  libmesh_error();
   AutoPtr<Elem> ap_edge(edge);
   return ap_edge;
 }
@@ -177,7 +177,7 @@ Real Quad::quality (const ElemQuality q) const
 {
   switch (q)
     {
-      
+
       /**
        * Compue the min/max diagonal ratio.
        * This is modeled after the Hex element
@@ -204,9 +204,9 @@ Real Quad::quality (const ElemQuality q) const
     default:
       return Elem::quality(q);
     }
-      
+
   /**
-   * I don't know what to do for this metric. 
+   * I don't know what to do for this metric.
    * Maybe the base class knows.  We won't get
    * here because of the default case above.
    */
@@ -221,7 +221,7 @@ Real Quad::quality (const ElemQuality q) const
 std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 {
   std::pair<Real, Real> bounds;
-  
+
   switch (q)
     {
 
@@ -229,7 +229,7 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
       bounds.first  = 1.;
       bounds.second = 4.;
       break;
-      
+
     case SKEW:
       bounds.first  = 0.;
       bounds.second = 0.5;
@@ -244,7 +244,7 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
       bounds.first  = 0.9;
       bounds.second = 1.;
       break;
-     
+
     case STRETCH:
       bounds.first  = 0.25;
       bounds.second = 1.;
@@ -254,12 +254,12 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
       bounds.first  = 45.;
       bounds.second = 90.;
       break;
-      
+
     case MAX_ANGLE:
       bounds.first  = 90.;
       bounds.second = 135.;
       break;
-      
+
     case CONDITION:
       bounds.first  = 1.;
       bounds.second = 4.;
@@ -269,19 +269,19 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
       bounds.first  = 0.5;
       bounds.second = 1.;
       break;
-      
+
     case SHEAR:
     case SHAPE:
     case SIZE:
       bounds.first  = 0.3;
       bounds.second = 1.;
       break;
-      
+
     case DISTORTION:
       bounds.first  = 0.6;
       bounds.second = 1.;
       break;
-      
+
     default:
       libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
       bounds.first  = -1;
@@ -294,12 +294,12 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 
 
 
-const unsigned short int Quad::_second_order_adjacent_vertices[4][2] = 
+const unsigned short int Quad::_second_order_adjacent_vertices[4][2] =
 {
-  {0, 1}, // vertices adjacent to node 4 
-  {1, 2}, // vertices adjacent to node 5 
-  {2, 3}, // vertices adjacent to node 6 
-  {0, 3}  // vertices adjacent to node 7 
+  {0, 1}, // vertices adjacent to node 4
+  {1, 2}, // vertices adjacent to node 5
+  {2, 3}, // vertices adjacent to node 6
+  {0, 3}  // vertices adjacent to node 7
 };
 
 

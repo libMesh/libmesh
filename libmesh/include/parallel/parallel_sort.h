@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -60,7 +60,7 @@ public:
   Sort (std::vector<KeyType>& d,
 	const unsigned int n_procs = libMesh::n_processors(),
 	const unsigned int proc_id = libMesh::processor_id());
-		
+
 
   /**
    * This is the only method which needs to be
@@ -69,14 +69,14 @@ public:
    * order.
    */
   void sort();
-  
+
   /**
    * Return a constant reference to _my_bin.  This allows
    * us to do things like check if sorting was successful
    * by printing _my_bin.
    */
   const std::vector<KeyType>& bin();
-  
+
 private:
 
   /**
@@ -93,7 +93,7 @@ private:
    * Flag which lets you know if sorting is complete
    */
   bool _bin_is_sorted;
-  
+
   /**
    * The raw, unsorted data which will need to
    * be sorted (in parallel) across all
@@ -103,11 +103,11 @@ private:
 
   /**
    * Vector which holds the size of each
-   * bin on this processor.  It has 
+   * bin on this processor.  It has
    * size equal to _n_procs.
    */
   std::vector<unsigned int> _local_bin_sizes;
-  
+
   /**
    * The bin which will eventually be held
    * by this processor.  It may be shorter or
@@ -137,7 +137,7 @@ private:
    * call to std::sort
    */
   void sort_local_bin();
-  
+
 };
 }
 

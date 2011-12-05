@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -38,7 +38,7 @@ EigenTimeSolver::EigenTimeSolver (sys_type& s)
     maxits(1000),
     n_eigenpairs_to_compute(5),
     n_basis_vectors_to_use(3*n_eigenpairs_to_compute),
-    n_converged_eigenpairs(0),    
+    n_converged_eigenpairs(0),
     n_iterations_reqd(0)
 {
   libmesh_experimental();
@@ -54,7 +54,7 @@ void EigenTimeSolver::reinit ()
 {
   // empty...
 }
-  
+
 void EigenTimeSolver::init ()
 {
   // Add matrix "B" to _system if not already there.
@@ -99,7 +99,7 @@ void EigenTimeSolver::solve ()
   this->now_assembling = Matrix_A;
   _system.assembly(true, true);
   //_system.matrix->print_matlab("matrix_A.m");
-  
+
   // Point the system's matrix at B, call assembly again.
   if (!this->quiet)
     libMesh::out << "Assembling matrix B." << std::endl;
@@ -107,7 +107,7 @@ void EigenTimeSolver::solve ()
   this->now_assembling = Matrix_B;
   _system.assembly(true, true);
   //_system.matrix->print_matlab("matrix_B.m");
-  
+
   // Send matrices A, B to Steffen's SlepcEigenSolver interface
   //libmesh_here();
   if (!this->quiet)
@@ -119,7 +119,7 @@ void EigenTimeSolver::solve ()
 				     n_basis_vectors_to_use,
 				     tol,
 				     maxits);
-  
+
   this->n_converged_eigenpairs = solve_data.first;
   this->n_iterations_reqd      = solve_data.second;
 }
@@ -131,7 +131,7 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
 {
   // The EigenTimeSolver always computes jacobians!
   libmesh_assert (request_jacobian);
-  
+
   // Assemble the operator for the spatial part.
   if (now_assembling == Matrix_A)
     {
@@ -148,7 +148,7 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
       libmesh_assert (jacobian_computed || !jacobian_computed2);
 
       return jacobian_computed && jacobian_computed2;
-  
+
     }
 
   // Assemble the mass matrix operator
@@ -192,9 +192,9 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (jacobian_computed || !jacobian_computed2);
-  
+
       return jacobian_computed && jacobian_computed2;
-  
+
     }
 
   // There is now a "side" equivalent for the mass matrix

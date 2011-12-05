@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -136,7 +136,7 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
 	    face->set_node(0) = this->get_node(2);
 	    face->set_node(1) = this->get_node(0);
 	    face->set_node(2) = this->get_node(3);
-	
+
 	    return face;
 	  }
 	default:
@@ -145,9 +145,9 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
 	  }
 	}
     }
-  
+
   // We'll never get here.
-  libmesh_error();  
+  libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -210,70 +210,70 @@ const float Tet4::_embedding_matrix[8][4][4] =
   {
     // embedding matrix for child 0
     {
-      // 0    1    2    3  
+      // 0    1    2    3
       {1.0, 0.0, 0.0, 0.0}, // 0
       {0.5, 0.5, 0.0, 0.0}, // 1
       {0.5, 0.0, 0.5, 0.0}, // 2
       {0.5, 0.0, 0.0, 0.5}  // 3
     },
-  
+
     // embedding matrix for child 1
     {
-      // 0    1    2    3  
+      // 0    1    2    3
       {0.5, 0.5, 0.0, 0.0}, // 0
       {0.0, 1.0, 0.0, 0.0}, // 1
       {0.0, 0.5, 0.5, 0.0}, // 2
       {0.0, 0.5, 0.0, 0.5}  // 3
     },
-  
+
     // embedding matrix for child 2
     {
-      // 0    1    2    3  
+      // 0    1    2    3
       {0.5, 0.0, 0.5, 0.0}, // 0
       {0.0, 0.5, 0.5, 0.0}, // 1
       {0.0, 0.0, 1.0, 0.0}, // 2
       {0.0, 0.0, 0.5, 0.5}  // 3
     },
-  
+
     // embedding matrix for child 3
     {
-      // 0    1    2    3  
+      // 0    1    2    3
       {0.5, 0.0, 0.0, 0.5}, // 0
       {0.0, 0.5, 0.0, 0.5}, // 1
       {0.0, 0.0, 0.5, 0.5}, // 2
       {0.0, 0.0, 0.0, 1.0}  // 3
     },
-  
+
     // embedding matrix for child 4
     {
-      // 0    1    2    3  
+      // 0    1    2    3
       {0.5, 0.5, 0.0, 0.0}, // 0
       {0.0, 0.5, 0.0, 0.5}, // 1
       {0.5, 0.0, 0.5, 0.0}, // 2
       {0.5, 0.0, 0.0, 0.5}  // 3
     },
-  
+
     // embedding matrix for child 5
     {
-      // 0    1    2    3  
+      // 0    1    2    3
       {0.5, 0.5, 0.0, 0.0}, // 0
       {0.0, 0.5, 0.5, 0.0}, // 1
       {0.5, 0.0, 0.5, 0.0}, // 2
       {0.0, 0.5, 0.0, 0.5}  // 3
     },
-  
+
     // embedding matrix for child 6
     {
-      // 0    1    2    3  
+      // 0    1    2    3
       {0.5, 0.0, 0.5, 0.0}, // 0
       {0.0, 0.5, 0.5, 0.0}, // 1
       {0.0, 0.0, 0.5, 0.5}, // 2
       {0.0, 0.5, 0.0, 0.5}  // 3
     },
-  
+
     // embedding matrix for child 7
     {
-      // 0    1    2    3  
+      // 0    1    2    3
       {0.5, 0.0, 0.5, 0.0}, // 0
       {0.0, 0.5, 0.0, 0.5}, // 1
       {0.0, 0.0, 0.5, 0.5}, // 2
@@ -308,7 +308,7 @@ Real Tet4::volume () const
 std::pair<Real, Real> Tet4::min_and_max_angle() const
 {
   Point n[4];
-  
+
   // Compute the outward normal vectors on each face
   n[0] = (this->point(2) - this->point(0)).cross(this->point(1) - this->point(0));
   n[1] = (this->point(1) - this->point(0)).cross(this->point(3) - this->point(0));
@@ -343,7 +343,7 @@ float Tet4::embedding_matrix (const unsigned int i,
       Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
 
       this->_diagonal_selection=DIAG_02_13;
-      
+
       if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
 	{
 	  if (diag_01_23 < diag_03_12)
@@ -367,7 +367,7 @@ float Tet4::embedding_matrix (const unsigned int i,
     }
 
   // Call embedding matrx with permuted indices
-  return this->_embedding_matrix[i][jp][kp]; 
+  return this->_embedding_matrix[i][jp][kp];
 }
 
 
@@ -420,8 +420,8 @@ void Tet4::reselect_diagonal (const Diagonal diag)
 		 the properties of the embedding matrix for the first
 		 (unchanged) four children, which allow us to use a
 		 simple mechanism to find the required node.  */
-	      
-	      
+
+
 	      unsigned int first_05_in_embedding_matrix = libMesh::invalid_uint;
 	      for (unsigned int n=0; n<this->n_nodes(); n++)
 		{
@@ -459,7 +459,7 @@ void Tet4::reselect_optimal_diagonal (const Diagonal exclude_this)
   Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
   Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
   Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
-  
+
   Diagonal use_this = INVALID_DIAG;
   switch (exclude_this)
     {
@@ -503,8 +503,8 @@ void Tet4::reselect_optimal_diagonal (const Diagonal exclude_this)
       break;
     }
 
-  reselect_diagonal (use_this);  
-} 
+  reselect_diagonal (use_this);
+}
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 } // namespace libMesh

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -78,10 +78,10 @@ public:
    * The type of the parent.
    */
   typedef ExplicitSystem Parent;
-  
+
   /**
    * Clear all the data structures associated with
-   * the system. 
+   * the system.
    */
   virtual void clear ();
 
@@ -90,19 +90,19 @@ public:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void reinit ();
-   
+
   /**
    * Prepares \p matrix and \p rhs for system assembly, then calls
    * user assembly function.
    * @e Can be overloaded in derived classes.
    */
   virtual void assemble ();
- 
+
 //   /**
-//    * Assembles & solves the linear system Ax=b. 
+//    * Assembles & solves the linear system Ax=b.
 //    */
 //   virtual void solve ();
- 
+
   /**
    * @returns \p "Implicit".  Helps in identifying
    * the system type in an equation system file.
@@ -128,7 +128,7 @@ public:
     get_linear_solve_parameters() const;
 
   /**
-   * Releases a pointer to a linear solver acquired by 
+   * Releases a pointer to a linear solver acquired by
    * \p this->get_linear_solver()
    */
   virtual void release_linear_solver(LinearSolver<Number> *) const;
@@ -165,7 +165,7 @@ public:
    */
   virtual std::pair<unsigned int, Real>
     sensitivity_solve (const ParameterVector& parameters);
- 
+
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
    * those parameters p contained within \p parameters weighted by the
@@ -177,7 +177,7 @@ public:
   virtual std::pair<unsigned int, Real>
     weighted_sensitivity_solve (const ParameterVector& parameters,
                                 const ParameterVector& weights);
- 
+
   /**
    * Assembles & solves the linear system (dR/du)^T*z = dq/du, for
    * those quantities of interest q specified by \p qoi_indices.
@@ -189,9 +189,9 @@ public:
    */
   virtual std::pair<unsigned int, Real>
     adjoint_solve (const QoISet& qoi_indices = QoISet());
- 
+
   /**
-   * Assembles & solves the linear system(s) 
+   * Assembles & solves the linear system(s)
    * (dR/du)^T*z_w = sum(w_p*(d^2q/dudp - d^2R/dudp*z)), for those
    * parameters p contained within \p parameters, weighted by the
    * values w_p found within \p weights.
@@ -206,15 +206,15 @@ public:
     weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
                                         const ParameterVector& weights,
                                         const QoISet& qoi_indices = QoISet());
- 
+
   /**
    * Solves for the derivative of each of the system's quantities of
-   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
+   * interest q in \p qoi[qoi_indices] with respect to each parameter in
    * \p parameters, placing the result for qoi \p i and parameter \p j
    * into \p sensitivities[i][j].
    *
    * Uses adjoint_solve() and the adjoint sensitivity method.
-   * 
+   *
    * Currently uses finite differenced derivatives (partial q /
    * partial p) and (partial R / partial p).
    */
@@ -224,46 +224,46 @@ public:
 
   /**
    * Solves for the derivative of each of the system's quantities of
-   * interest q in \p qoi[qoi_indices] with respect to each parameter in 
+   * interest q in \p qoi[qoi_indices] with respect to each parameter in
    * \p parameters, placing the result for qoi \p i and parameter \p j
    * into \p sensitivities[i][j].
    *
    * Uses the forward sensitivity method.
-   * 
+   *
    * Currently uses finite differenced derivatives (partial q /
    * partial p) and (partial R / partial p).
    */
   virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
                                                   SensitivityData& sensitivities);
-  
+
   /**
-   * For each of the system's quantities of interest q in 
+   * For each of the system's quantities of interest q in
    * \p qoi[qoi_indices], and for a vector of parameters p, the
-   * parameter sensitivity Hessian H_ij is defined as 
+   * parameter sensitivity Hessian H_ij is defined as
    * H_ij = (d^2 q)/(d p_i d p_j)
    * This Hessian is the output of this method, where for each q_i,
-   * H_jk is stored in \p hessian.second_derivative(i,j,k).  
+   * H_jk is stored in \p hessian.second_derivative(i,j,k).
    */
   virtual void qoi_parameter_hessian(const QoISet& qoi_indices,
                                      const ParameterVector& parameters,
                                      SensitivityData& hessian);
 
   /**
-   * For each of the system's quantities of interest q in 
+   * For each of the system's quantities of interest q in
    * \p qoi[qoi_indices], and for a vector of parameters p, the
-   * parameter sensitivity Hessian H_ij is defined as 
+   * parameter sensitivity Hessian H_ij is defined as
    * H_ij = (d^2 q)/(d p_i d p_j)
    * The Hessian-vector product, for a vector v_k in parameter space, is
    * S_j = H_jk v_k
    * This product is the output of this method, where for each q_i,
-   * S_j is stored in \p sensitivities[i][j].  
+   * S_j is stored in \p sensitivities[i][j].
    */
   virtual void qoi_parameter_hessian_vector_product(const QoISet& qoi_indices,
                                                     const ParameterVector& parameters,
                                                     const ParameterVector& vector,
                                                     SensitivityData& product);
-  
+
   /**
    * Matrix iterator typedefs.
    */
@@ -302,7 +302,7 @@ public:
 
   /**
    * @returns a const reference to this system's @e additional matrix
-   * named \p mat_name.  @e None of these matrices is involved in the 
+   * named \p mat_name.  @e None of these matrices is involved in the
    * solution process.  Access is only granted when the matrix is already
    * properly initialized.
    */
@@ -310,7 +310,7 @@ public:
 
   /**
    * @returns a writeable reference to this system's @e additional matrix
-   * named \p mat_name.  @e None of these matrices is involved in the 
+   * named \p mat_name.  @e None of these matrices is involved in the
    * solution process.  Access is only granted when the matrix is already
    * properly initialized.
    */
@@ -320,7 +320,7 @@ public:
    * @returns the number of matrices handled by this system
    */
   unsigned int n_matrices () const;
-  
+
   /**
    * The system matrix.  Implicit systems are characterized by
    * the need to solve the linear system Ax=b.  This is the
@@ -329,22 +329,22 @@ public:
   SparseMatrix<Number> * matrix;
 
 
-  
+
 protected:
-  
+
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void init_data ();
-  
+
   /**
    * Initializes the matrices associated with this system.
    */
   virtual void init_matrices ();
 
 
-  
+
 private:
 
   /**
@@ -378,7 +378,7 @@ bool ImplicitSystem::have_matrix (const std::string& mat_name) const
 inline
 unsigned int ImplicitSystem::n_matrices () const
 {
- return _matrices.size(); 
+ return _matrices.size();
 }
 
 

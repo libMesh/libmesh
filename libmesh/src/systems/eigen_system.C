@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -21,7 +21,7 @@
 #include "libmesh_config.h"
 
 // Currently, the EigenSystem should only be available
-// if SLEPc support is enabled. 
+// if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC)
 
 // C++ includes
@@ -96,21 +96,21 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
     {
     case HEP: // libMesh::out<<"Hermitian"<<std::endl;
       break;
-      
+
     case NHEP: // libMesh::out<<"Non-Hermitian"<<std::endl;
       break;
-      
+
     case GHEP: // libMesh::out<<"Gerneralized Hermitian"<<std::endl;
       break;
-      
+
     case GNHEP: // libMesh::out<<"Generalized Non-Hermitian"<<std::endl;
       break;
-      
+
     default: // libMesh::out<<"not properly specified"<<std::endl;
       libmesh_error();
       break;
-      
-    } 
+
+    }
 }
 
 
@@ -118,14 +118,14 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 
 void EigenSystem::init_data ()
 {
- 
+
   // initialize parent data
   Parent::init_data();
-  
+
   // define the type of eigenproblem
-  if (_eigen_problem_type == GNHEP || _eigen_problem_type == GHEP) 
+  if (_eigen_problem_type == GNHEP || _eigen_problem_type == GHEP)
     _is_generalized_eigenproblem = true;
-  
+
   // build the system matrix
   matrix_A = SparseMatrix<Number>::build().release();
 
@@ -134,7 +134,7 @@ void EigenSystem::init_data ()
   DofMap& dof_map = this->get_dof_map();
 
   dof_map.attach_matrix(*matrix_A);
-  
+
   // build matrix_B only in case of a
   // generalized problem
   if (_is_generalized_eigenproblem)
@@ -142,20 +142,20 @@ void EigenSystem::init_data ()
       matrix_B = SparseMatrix<Number>::build().release();
       dof_map.attach_matrix(*matrix_B);
     }
-  
+
   dof_map.compute_sparsity(this->get_mesh());
-  
+
   // initialize and zero system matrix
   matrix_A->init();
   matrix_A->zero();
-  
-  // eventually initialize and zero system matrix_B  
+
+  // eventually initialize and zero system matrix_B
   if (_is_generalized_eigenproblem)
     {
       matrix_B->init();
       matrix_B->zero();
-    }	
-  
+    }
+
 }
 
 
@@ -163,8 +163,8 @@ void EigenSystem::init_data ()
 void EigenSystem::reinit ()
 {
   // initialize parent data
-  Parent::reinit();  
-  
+  Parent::reinit();
+
 }
 
 
@@ -197,29 +197,29 @@ void EigenSystem::solve ()
 
   const unsigned int ncv    =
     es.parameters.get<unsigned int>("basis vectors");
-    
+
   std::pair<unsigned int, unsigned int> solve_data;
 
   // call the solver depending on the type of eigenproblem
   if (_is_generalized_eigenproblem)
-    { 
+    {
       //in case of a generalized eigenproblem
       solve_data = eigen_solver->solve_generalized (*matrix_A,*matrix_B, nev, ncv, tol, maxits);
-      
+
     }
-  
+
   else
     {
       libmesh_assert (matrix_B == NULL);
-      
+
       //in case of a standard eigenproblem
       solve_data = eigen_solver->solve_standard (*matrix_A, nev, ncv, tol, maxits);
-      
+
     }
-  
+
   this->_n_converged_eigenpairs = solve_data.first;
   this->_n_iterations           = solve_data.second;
-  
+
 }
 
 
@@ -227,7 +227,7 @@ void EigenSystem::assemble ()
 {
 
   // Assemble the linear system
-  Parent::assemble (); 
+  Parent::assemble ();
 
 }
 

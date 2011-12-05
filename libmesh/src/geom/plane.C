@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,7 +37,7 @@ Plane::Plane ()
 
 
 
-Plane::Plane (const Point& p, 
+Plane::Plane (const Point& p,
 	      const Point& n)
 {
   this->create_from_point_normal (p, n);
@@ -45,8 +45,8 @@ Plane::Plane (const Point& p,
 
 
 
-Plane::Plane (const Point& p0, 
-	      const Point& p1, 
+Plane::Plane (const Point& p0,
+	      const Point& p1,
 	      const Point& p2)
 {
   this->create_from_three_points (p0, p1, p2);
@@ -83,12 +83,12 @@ void Plane::create_from_three_points (const Point& p0,
 {
   // Just use p0 for the point.
   _point = p0;
-  
+
   const Point e0 = p1 - p0;
   const Point e1 = p2 - p0;
   const Point n  = e0.cross(e1);
 
-  _normal = n.unit(); 
+  _normal = n.unit();
 }
 
 
@@ -126,16 +126,16 @@ void Plane::yz_plane (const Real xpos)
 
 
 
-bool Plane::above_surface (const Point& p) const 
+bool Plane::above_surface (const Point& p) const
 {
   // Create a vector from the surface to point p;
   const Point w = p - _point;
 
   // The point is above the surface if the projection
-  // of that vector onto the normal is positive 
+  // of that vector onto the normal is positive
   const Real proj = w*this->normal();
-  
-  if (proj > 0.) 
+
+  if (proj > 0.)
     return true;
 
   return false;
@@ -143,14 +143,14 @@ bool Plane::above_surface (const Point& p) const
 
 
 
-bool Plane::below_surface (const Point& p) const 
+bool Plane::below_surface (const Point& p) const
 {
   return ( !this->above_surface (p) );
 }
 
 
 
-bool Plane::on_surface (const Point& p) const 
+bool Plane::on_surface (const Point& p) const
 {
   // Create a vector from the surface to point p;
   const Point w = p - _point;
@@ -177,7 +177,7 @@ Point Plane::closest_point (const Point& p) const
   // is in the negative normal direction
   // a distance w (dot) p.
   const Point cp = p - this->normal()*(w*this->normal());
-  
+
   return cp;
 }
 
@@ -192,5 +192,5 @@ const Point & Plane::get_planar_point() const
 {
   return _point;
 }
-  
+
 } // namespace libMesh

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -71,9 +71,9 @@ class InfFE;
 /**
  * This class forms the foundation from which generic finite
  * elements may be derived.  In the current implementation the
- * templated derived class \p FE offers a wide variety of commonly 
+ * templated derived class \p FE offers a wide variety of commonly
  * used finite element concepts.  Check there for details.
- * Use the \p FEBase::build() method to create an object of any of 
+ * Use the \p FEBase::build() method to create an object of any of
  * the derived classes.
  * Note that the amount of virtual members is kept to a minimum,
  * and the sophisticated template scheme of \p FE is quite
@@ -85,9 +85,9 @@ class InfFE;
  * element classes.  Even internal library classes, like \p DofMap,
  * request the number of dof's through this interface class.
  * Note that this also enables the co-existence of various
- * element-based schemes.  
- * This class is well 'at the heart' of the library, so 
- * things in here should better remain unchanged. 
+ * element-based schemes.
+ * This class is well 'at the heart' of the library, so
+ * things in here should better remain unchanged.
  *
  * @author Benjamin S. Kirk, 2002
  */
@@ -105,9 +105,9 @@ protected:
    */
   FEBase (const unsigned int dim,
 	  const FEType& fet);
-  
+
 public:
-  
+
   /**
    * Destructor.
    */
@@ -119,8 +119,8 @@ public:
    * remember to delete the object.
    */
   static AutoPtr<FEBase> build (const unsigned int dim,
-				const FEType& type); 
-  
+				const FEType& type);
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
@@ -129,14 +129,14 @@ public:
    * remember to delete the object.
    */
   static AutoPtr<FEBase> build_InfFE (const unsigned int dim,
-				      const FEType& type); 
+				      const FEType& type);
 
 #endif
 
   /**
    * This is at the core of this class. Use this for each
-   * new element in the mesh.  Reinitializes the requested physical 
-   * element-dependent data based on the current element 
+   * new element in the mesh.  Reinitializes the requested physical
+   * element-dependent data based on the current element
    * \p elem. By default the element data are computed at the quadrature
    * points specified by the quadrature rule \p qrule, but any set
    * of points on the reference element may be specified in the optional
@@ -150,7 +150,7 @@ public:
   virtual void reinit (const Elem* elem,
 		       const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL) = 0;
-    
+
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of the element \p elem.  The \p tolerance paremeter
@@ -164,13 +164,13 @@ public:
 		       const Real tolerance = TOLERANCE,
                        const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL) = 0;
-  
+
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p edge of the element \p elem.  The \p tolerance paremeter
    * is passed to the involved call to \p inverse_map().  By default the
-   * element data are computed at the quadrature points specified by the 
-   * quadrature rule \p qrule, but any set of points on the reference 
+   * element data are computed at the quadrature points specified by the
+   * quadrature rule \p qrule, but any set of points on the reference
    * \em edge element may be specified in the optional argument \p pts.
    */
   virtual void edge_reinit (const Elem* elem,
@@ -180,9 +180,9 @@ public:
                             const std::vector<Real>* weights = NULL) = 0;
 
   /**
-   * Computes the reference space quadrature points on the side of 
+   * Computes the reference space quadrature points on the side of
    * an element based on the side quadrature points.
-   */  
+   */
   virtual void side_map (const Elem* elem,
                          const Elem* side,
                          const unsigned int s,
@@ -194,16 +194,16 @@ public:
    * for element type t, false otherwise.  Since we are doing floating
    * point comparisons here the parameter \p eps can be specified to
    * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
-   * \f$ x \le 1 + \epsilon \f$. 
+   * \f$ x \le 1 + \epsilon \f$.
    */
   static bool on_reference_element(const Point& p,
 				   const ElemType t,
 				   const Real eps = TOLERANCE);
   /**
-   * returns the reference space nodes coordinates 
+   * returns the reference space nodes coordinates
    * given the element type
    */
-  static void get_refspace_nodes(const ElemType t, 
+  static void get_refspace_nodes(const ElemType t,
 	                         std::vector<Point>& nodes);
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -273,22 +273,22 @@ public:
   /**
    * @returns the \p xyz spatial locations of the quadrature
    * points on the element.
-   */    
+   */
   const std::vector<Point>& get_xyz() const
   { return xyz; }
-  
+
   /**
    * @returns the shape function values at the quadrature points
    * on the element.
-   */    
+   */
   const std::vector<std::vector<Real> >& get_phi() const
   { libmesh_assert(!calculations_started || calculate_phi);
     calculate_phi = true; return phi; }
-  
+
   /**
    * @returns the element Jacobian times the quadrature weight for
    * each quadrature point.
-   */    
+   */
   const std::vector<Real>& get_JxW() const
   { return JxW; }
 
@@ -297,25 +297,25 @@ public:
    * points.
    */
   const std::vector<std::vector<RealGradient> >& get_dphi() const
-  { libmesh_assert(!calculations_started || calculate_dphi); 
+  { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphi; }
-  
+
   /**
    * @returns the shape function x-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidx() const
-  { libmesh_assert(!calculations_started || calculate_dphi); 
+  { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidx; }
-  
+
   /**
    * @returns the shape function y-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidy() const
-  { libmesh_assert(!calculations_started || calculate_dphi); 
+  { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidy; }
-  
+
   /**
    * @returns the shape function z-derivative at the quadrature
    * points.
@@ -329,17 +329,17 @@ public:
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphidxi() const
-  { libmesh_assert(!calculations_started || calculate_dphi); 
+  { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidxi; }
-  
+
   /**
    * @returns the shape function eta-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<Real> >& get_dphideta() const
-  { libmesh_assert(!calculations_started || calculate_dphi); 
+  { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphideta; }
-  
+
   /**
    * @returns the shape function zeta-derivative at the quadrature
    * points.
@@ -355,9 +355,9 @@ public:
    * points.
    */
   const std::vector<std::vector<RealTensor> >& get_d2phi() const
-  { libmesh_assert(!calculations_started || calculate_d2phi); 
+  { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phi; }
-  
+
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
@@ -365,7 +365,7 @@ public:
   const std::vector<std::vector<Real> >& get_d2phidx2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidx2; }
-  
+
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
@@ -373,7 +373,7 @@ public:
   const std::vector<std::vector<Real> >& get_d2phidxdy() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidxdy; }
-  
+
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
@@ -381,7 +381,7 @@ public:
   const std::vector<std::vector<Real> >& get_d2phidxdz() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidxdz; }
-  
+
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
@@ -389,7 +389,7 @@ public:
   const std::vector<std::vector<Real> >& get_d2phidy2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidy2; }
-  
+
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
@@ -397,7 +397,7 @@ public:
   const std::vector<std::vector<Real> >& get_d2phidydz() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidydz; }
-  
+
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
@@ -407,7 +407,7 @@ public:
     calculate_d2phi = true; return d2phidz2; }
 
 #endif
-  
+
   /**
    * @returns the element tangents in xi-direction at the quadrature
    * points.
@@ -428,7 +428,7 @@ public:
    */
   const std::vector<RealGradient>& get_dxyzdzeta() const
   { return dxyzdzeta_map; }
-  
+
   /**
    * @returns the second partial derivatives in xi.
    */
@@ -442,15 +442,15 @@ public:
   { return d2xyzdeta2_map; }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  
+
   /**
    * @returns the second partial derivatives in zeta.
    */
   const std::vector<RealGradient>& get_d2xyzdzeta2() const
   { return d2xyzdzeta2_map; }
-  
+
 #endif
-  
+
   /**
    * @returns the second partial derivatives in xi-eta.
    */
@@ -458,7 +458,7 @@ public:
   { return d2xyzdxideta_map; }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  
+
   /**
    * @returns the second partial derivatives in xi-zeta.
    */
@@ -472,80 +472,80 @@ public:
   { return d2xyzdetadzeta_map; }
 
 #endif
-  
+
   /**
    * @returns the dxi/dx entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dxidx() const
   { return dxidx_map; }
 
   /**
    * @returns the dxi/dy entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dxidy() const
   { return dxidy_map; }
 
   /**
    * @returns the dxi/dz entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dxidz() const
   { return dxidz_map; }
 
   /**
    * @returns the deta/dx entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_detadx() const
   { return detadx_map; }
 
   /**
    * @returns the deta/dy entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_detady() const
   { return detady_map; }
 
   /**
    * @returns the deta/dz entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_detadz() const
   { return detadz_map; }
 
   /**
    * @returns the dzeta/dx entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dzetadx() const
   { return dzetadx_map; }
 
   /**
    * @returns the dzeta/dy entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dzetady() const
   { return dzetady_map; }
 
   /**
    * @returns the dzeta/dz entry in the transformation
-   * matrix from physical to local coordinates. 
+   * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dzetadz() const
   { return dzetadz_map; }
-  
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns the global first derivative of the phase term 
-   * which is used in infinite elements, evaluated at the 
-   * quadrature points.  
+   * @returns the global first derivative of the phase term
+   * which is used in infinite elements, evaluated at the
+   * quadrature points.
    *
-   * In case of the general finite element class \p FE this 
-   * field is initialized to all zero, so that the variational 
-   * formulation for an @e infinite element returns correct element 
+   * In case of the general finite element class \p FE this
+   * field is initialized to all zero, so that the variational
+   * formulation for an @e infinite element returns correct element
    * matrices for a mesh using both finite and infinite elements.
    */
   const std::vector<RealGradient>& get_dphase() const
@@ -554,21 +554,21 @@ public:
 
   /**
    * @returns the multiplicative weight at each quadrature point.
-   * This weight is used for certain infinite element weak 
+   * This weight is used for certain infinite element weak
    * formulations, so that @e weighted Sobolev spaces are
    * used for the trial function space.  This renders the
-   * variational form easily computable. 
+   * variational form easily computable.
    *
-   * In case of the general finite element class \p FE this 
-   * field is initialized to all ones, so that the variational 
-   * formulation for an @e infinite element returns correct element 
+   * In case of the general finite element class \p FE this
+   * field is initialized to all ones, so that the variational
+   * formulation for an @e infinite element returns correct element
    * matrices for a mesh using both finite and infinite elements.
    */
   const std::vector<Real>& get_Sobolev_weight() const
       { return weight; }
 
   /**
-   * @returns the first global derivative of the multiplicative 
+   * @returns the first global derivative of the multiplicative
    * weight at each quadrature point. See \p get_Sobolev_weight()
    * for details.  In case of \p FE initialized to all zero.
    */
@@ -577,13 +577,13 @@ public:
 
 #endif
 
-  
+
   /**
    * @returns the tangent vectors for face integration.
    */
   const std::vector<std::vector<Point> >& get_tangents() const
   { return tangents; }
-  
+
   /**
    * @returns the normal vectors for face integration.
    */
@@ -595,7 +595,7 @@ public:
    */
   const std::vector<Real>& get_curvatures() const
   { return curvatures;}
-  
+
   /**
    * Provides the class with the quadrature rule.  Implement
    * this in derived classes.
@@ -604,7 +604,7 @@ public:
 
   /**
    * @returns the total number of approximation shape functions
-   * for the current element.  Useful during matrix assembly.  
+   * for the current element.  Useful during matrix assembly.
    * Implement this in derived classes.
    */
   virtual unsigned int n_shape_functions () const = 0;
@@ -614,7 +614,7 @@ public:
    * during matrix assembly.  Implement this in derived classes.
    */
   virtual unsigned int n_quadrature_points () const = 0;
-  
+
   /**
    * @returns the element type that the current shape functions
    * have been calculated for.  Useful in determining when shape
@@ -656,18 +656,18 @@ public:
 
   /**
    * Prints the Jacobian times the weight for each quadrature point.
-   */ 
-  void print_JxW(std::ostream& os) const; 
-  
+   */
+  void print_JxW(std::ostream& os) const;
+
   /**
    * Prints the value of each shape function at each quadrature point.
-   */ 
-  void print_phi(std::ostream& os) const; 
-  
+   */
+  void print_phi(std::ostream& os) const;
+
   /**
    * Prints the value of each shape function's derivative
    * at each quadrature point.
-   */ 
+   */
   void print_dphi(std::ostream& os) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -675,15 +675,15 @@ public:
   /**
    * Prints the value of each shape function's second derivatives
    * at each quadrature point.
-   */ 
+   */
   void print_d2phi(std::ostream& os) const;
 
 #endif
-  
+
   /**
    * Prints the spatial location of each quadrature point
    * (on the physical element).
-   */ 
+   */
   void print_xyz(std::ostream& os) const;
 
   /**
@@ -695,17 +695,17 @@ public:
    * Same as above, but allows you to print to a stream.
    */
   friend std::ostream& operator << (std::ostream& os, const FEBase& fe);
-  
-  
+
+
 protected:
 
 
-    
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * Initialize the data fields for the base of an
-   * an infinite element.  Implement this in the derived 
+   * an infinite element.  Implement this in the derived
    * class \p FE<Dim,T>.
    */
   virtual void init_base_shape_functions(const std::vector<Point>& qp,
@@ -720,7 +720,7 @@ protected:
    */
   virtual void compute_map(const std::vector<Real>& qw,
 		   const Elem* e);
-  
+
   /**
    * Compute the jacobian and some other additional
    * data fields. Takes the integration weights
@@ -737,28 +737,28 @@ protected:
   void compute_single_point_map(const std::vector<Real>& qw,
 		                const Elem* e,
 				unsigned int p);
-  
+
   /**
    * A utility function for use by compute_*_map
    */
   void resize_map_vectors(unsigned int n_qp);
 
-  /** 
+  /**
    * Same as compute_map, but for a side.  Useful for boundary integration.
-   */  
+   */
   void compute_face_map(const std::vector<Real>& qw,
 			const Elem* side);
 
-  /** 
+  /**
    * Same as before, but for an edge.  Useful for some projections.
-   */  
+   */
   void compute_edge_map(const std::vector<Real>& qw,
 			const Elem* side);
 
-  /** 
+  /**
    * After having updated the jacobian and the transformation
    * from local to global coordinates in \p FEBase::compute_map(),
-   * the first derivatives of the shape functions are 
+   * the first derivatives of the shape functions are
    * transformed to global coordinates, giving \p dphi,
    * \p dphidx, \p dphidy, and \p dphidz. This method
    * should rarely be re-defined in derived classes, but
@@ -766,7 +766,7 @@ protected:
    * it protected.
    */
   virtual void compute_shape_functions(const Elem*);
-  
+
 
   /**
    * Used in \p FEBase::compute_map(), which should be
@@ -801,7 +801,7 @@ protected:
    * be usable in derived classes, and therefore protected.
    * Returns the y value of the pth entry of the dxzydeta_map.
    */
-  Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); } 
+  Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }
 
   /**
    * Used in \p FEBase::compute_map(), which should be
@@ -834,7 +834,7 @@ protected:
 
 
 
-  
+
   /**
    * The dimensionality of the object
    */
@@ -846,25 +846,25 @@ protected:
   std::vector<Point> xyz;
 
 
-  
+
   /**
-   * Vector of parital derivatives: 
-   * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi) 
+   * Vector of parital derivatives:
+   * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi)
    */
   std::vector<RealGradient> dxyzdxi_map;
 
   /**
-   * Vector of parital derivatives: 
+   * Vector of parital derivatives:
    * d(x)/d(eta), d(y)/d(eta), d(z)/d(eta)
    */
   std::vector<RealGradient> dxyzdeta_map;
 
   /**
-   * Vector of parital derivatives: 
+   * Vector of parital derivatives:
    * d(x)/d(zeta), d(y)/d(zeta), d(z)/d(zeta)
    */
   std::vector<RealGradient> dxyzdzeta_map;
-  
+
   /**
    * Vector of second partial derivatives in xi:
    * d^2(x)/d(xi)^2, d^2(y)/d(xi)^2, d^2(z)/d(xi)^2
@@ -879,7 +879,7 @@ protected:
 
   /**
    * Vector of second partial derivatives in eta:
-   * d^2(x)/d(eta)^2 
+   * d^2(x)/d(eta)^2
    */
   std::vector<RealGradient> d2xyzdeta2_map;
 
@@ -899,12 +899,12 @@ protected:
 
   /**
    * Vector of second partial derivatives in zeta:
-   * d^2(x)/d(zeta)^2 
+   * d^2(x)/d(zeta)^2
    */
   std::vector<RealGradient> d2xyzdzeta2_map;
 
 #endif
-  
+
   /**
    * Map for partial derivatives:
    * d(xi)/d(x). Needed for the Jacobian.
@@ -925,7 +925,7 @@ protected:
 
 
 
-  
+
   /**
    * Map for partial derivatives:
    * d(eta)/d(x). Needed for the Jacobian.
@@ -947,7 +947,7 @@ protected:
 
 
 
-  
+
   /**
    * Map for partial derivatives:
    * d(zeta)/d(x). Needed for the Jacobian.
@@ -1006,7 +1006,7 @@ protected:
    * Shape function derivatives in the eta direction.
    */
   std::vector<std::vector<Real> >   dphideta;
-  
+
   /**
    * Shape function derivatives in the zeta direction.
    */
@@ -1029,7 +1029,7 @@ protected:
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  
+
   /**
    * Shape function second derivative values.
    */
@@ -1044,7 +1044,7 @@ protected:
    * Shape function second derivatives in the xi-eta direction.
    */
   std::vector<std::vector<Real> >   d2phidxideta;
-  
+
   /**
    * Shape function second derivatives in the xi-zeta direction.
    */
@@ -1059,7 +1059,7 @@ protected:
    * Shape function second derivatives in the eta-zeta direction.
    */
   std::vector<std::vector<Real> >   d2phidetadzeta;
-  
+
   /**
    * Shape function second derivatives in the zeta direction.
    */
@@ -1094,12 +1094,12 @@ protected:
    * Shape function second derivatives in the z direction.
    */
   std::vector<std::vector<Real> >   d2phidz2;
-  
+
 #endif
 
 
 
-  
+
   /**
    * Map for the shape function phi.
    */
@@ -1153,13 +1153,13 @@ protected:
   std::vector<std::vector<Real> >   d2phidzeta2_map;
 
 #endif
-  
 
 
 
-  
+
+
   /**
-   * Map for the side shape functions, psi. 
+   * Map for the side shape functions, psi.
    */
   std::vector<std::vector<Real> >   psi_map;
 
@@ -1196,11 +1196,11 @@ protected:
    */
   std::vector<std::vector<Real> > d2psideta2_map;
 
-  
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   //--------------------------------------------------------------
-  /* protected members for infinite elements, which are accessed 
+  /* protected members for infinite elements, which are accessed
    * from the outside through some inline functions
    */
 
@@ -1230,7 +1230,7 @@ protected:
 
 
 
-  
+
   /**
    * Tangent vectors on boundary at quadrature points.
    */
@@ -1247,7 +1247,7 @@ protected:
    * The mean curvature is a scalar value.
    */
   std::vector<Real>                 curvatures;
-  
+
   /**
    * Jacobian*Weight values at quadrature points
    */
@@ -1258,7 +1258,7 @@ protected:
    * should be constant for the object.
    */
   const FEType fe_type;
-  
+
   /**
    * The element type the current data structures are
    * set up for.

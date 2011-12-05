@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -116,13 +116,13 @@ System::~System ()
   // Null-out the function pointers.  Since this
   // class is getting destructed it is pointless,
   // but a good habit.
-  _init_system_function = 
-    _assemble_system_function = 
+  _init_system_function =
+    _assemble_system_function =
     _constrain_system_function =  NULL;
 
   _qoi_evaluate_function =
     _qoi_evaluate_derivative_function =  NULL;
-  
+
   // NULL-out user-provided objects.
   _init_system_object             = NULL;
   _assemble_system_object         = NULL;
@@ -172,7 +172,7 @@ Number System::current_solution (const unsigned int global_dof_number) const
   // Check the sizes
   libmesh_assert (global_dof_number < _dof_map->n_dofs());
   libmesh_assert (global_dof_number < current_local_solution->size());
-   
+
   return (*current_local_solution)(global_dof_number);
 }
 
@@ -181,15 +181,15 @@ Number System::current_solution (const unsigned int global_dof_number) const
 void System::clear ()
 {
   _variables.clear();
-  
+
   _variable_numbers.clear();
 
   _dof_map->clear ();
-  
+
   solution->clear ();
 
   current_local_solution->clear ();
-  
+
   // clear any user-added vectors
   {
     for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
@@ -198,7 +198,7 @@ void System::clear ()
 	delete pos->second;
 	pos->second = NULL;
       }
-    
+
     _vectors.clear();
     _vector_projections.clear();
     _vector_types.clear();
@@ -210,7 +210,7 @@ void System::clear ()
 
 
 void System::init ()
-{ 
+{
   // First initialize any required data:
   // either only the basic System data
   if (_basic_system_only)
@@ -218,12 +218,12 @@ void System::init ()
   // or all the derived class' data too
   else
     this->init_data();
-  
+
   //If no variables have been added to this system
   //don't do anything
   if(!this->n_vars())
     return;
- 
+
   // Then call the user-provided intialization function
   this->user_initialization();
 }
@@ -252,7 +252,7 @@ void System::init_data ()
 
   // And clean up the send_list before we first use it
   _dof_map->prepare_send_list();
-  
+
   // Resize the solution conformal to the current mesh
   solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
@@ -272,7 +272,7 @@ void System::init_data ()
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
   {
     ParallelType type = _vector_types[pos->first];
-    
+
     if(type == GHOSTED)
     {
 #ifdef LIBMESH_ENABLE_GHOSTED
@@ -298,13 +298,13 @@ void System::restrict_vectors ()
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
     {
       NumericVector<Number>* v = pos->second;
-      
+
       if (_vector_projections[pos->first])
 	this->project_vector (*v);
       else
       {
         ParallelType type = _vector_types[pos->first];
-        
+
         if(type == GHOSTED)
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
@@ -329,14 +329,14 @@ void System::restrict_vectors ()
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init(this->n_dofs(),
-			       this->n_local_dofs(), send_list, 
+			       this->n_local_dofs(), send_list,
                                false, GHOSTED);
 #else
   current_local_solution->init(this->n_dofs());
 #endif
 
   if (_solution_projection)
-    solution->localize (*current_local_solution, send_list); 
+    solution->localize (*current_local_solution, send_list);
 
 #endif // LIBMESH_ENABLE_AMR
 }
@@ -367,14 +367,14 @@ void System::reinit ()
   // Update the solution based on the projected
   // current_local_solution.
   solution->init (this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
-	
+
   libmesh_assert (solution->size() == current_local_solution->size());
   // Not true with ghosted vectors
   // libmesh_assert (solution->size() == current_local_solution->local_size());
 
   const unsigned int first_local_dof = solution->first_local_index();
   const unsigned int local_size      = solution->local_size();
-      
+
   for (unsigned int i=0; i<local_size; i++)
     solution->set(i+first_local_dof,
 		  (*current_local_solution)(i+first_local_dof));
@@ -445,7 +445,7 @@ void System::assemble ()
 {
   // Log how long the user's assembly code takes
   START_LOG("assemble()", "System");
-  
+
   // Call the user-specified assembly function
   this->user_assembly();
 
@@ -459,7 +459,7 @@ void System::assemble_qoi (const QoISet& qoi_indices)
 {
   // Log how long the user's assembly code takes
   START_LOG("assemble_qoi()", "System");
-  
+
   // Call the user-specified quantity of interest function
   this->user_QOI(qoi_indices);
 
@@ -473,7 +473,7 @@ void System::assemble_qoi_derivative (const QoISet& qoi_indices)
 {
   // Log how long the user's assembly code takes
   START_LOG("assemble_qoi_derivative()", "System");
-  
+
   // Call the user-specified quantity of interest function
   this->user_QOI_derivative(qoi_indices);
 
@@ -492,7 +492,7 @@ void System::qoi_parameter_sensitivity
   if (qoi_indices.size(*this) > parameters.size())
     forward_qoi_parameter_sensitivity(qoi_indices, parameters, sensitivities);
   // Adjoint sensitivities are more efficient for Np > Nq,
-  // and an adjoint may be more reusable than a forward 
+  // and an adjoint may be more reusable than a forward
   // solution sensitivity in the Np == Nq case.
   else
     adjoint_qoi_parameter_sensitivity(qoi_indices, parameters, sensitivities);
@@ -500,7 +500,7 @@ void System::qoi_parameter_sensitivity
 
 
 
-bool System::compare (const System& other_system, 
+bool System::compare (const System& other_system,
 		      const Real threshold,
 		      const bool verbose) const
 {
@@ -536,7 +536,7 @@ bool System::compare (const System& other_system,
       if (solu_result == -1)
 	libMesh::out << " identical up to threshold." << std::endl;
       else
-	libMesh::out << "  first difference occured at index = " 
+	libMesh::out << "  first difference occured at index = "
 		  << solu_result << "." << std::endl;
     }
 
@@ -549,10 +549,10 @@ bool System::compare (const System& other_system,
     {
       if (verbose)
         {
-	  libMesh::out << "   Fatal difference. This system handles " 
+	  libMesh::out << "   Fatal difference. This system handles "
 		    << this->n_vectors() << " add'l vectors," << std::endl
 		    << "   while the other system handles "
-		    << other_system.n_vectors() 
+		    << other_system.n_vectors()
 		    << " add'l vectors." << std::endl
 		    << "   Aborting comparison." << std::endl;
 	}
@@ -574,7 +574,7 @@ bool System::compare (const System& other_system,
 			<< pos->first << "\" ...";
 
 	  // assume they have the same name
-	  const NumericVector<Number>& other_system_vector = 
+	  const NumericVector<Number>& other_system_vector =
 	      other_system.get_vector(pos->first);
 
 	  ov_result.push_back(pos->second->compare (other_system_vector,
@@ -595,7 +595,7 @@ bool System::compare (const System& other_system,
 
 
   bool overall_result;
-       
+
   // sum up the results
   if ((name_result==0) && (solu_result==-1))
     {
@@ -622,10 +622,10 @@ bool System::compare (const System& other_system,
       libMesh::out << "   finished comparisons, ";
       if (overall_result)
 	libMesh::out << "found no differences." << std::endl << std::endl;
-      else 
+      else
 	libMesh::out << "found differences." << std::endl << std::endl;
     }
-	  
+
   return overall_result;
 }
 
@@ -691,10 +691,10 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 const NumericVector<Number> * System::request_vector (const std::string& vec_name) const
 {
   const_vectors_iterator pos = _vectors.find(vec_name);
-  
+
   if (pos == _vectors.end())
     return NULL;
-  
+
   return pos->second;
 }
 
@@ -703,10 +703,10 @@ const NumericVector<Number> * System::request_vector (const std::string& vec_nam
 NumericVector<Number> * System::request_vector (const std::string& vec_name)
 {
   vectors_iterator pos = _vectors.find(vec_name);
-  
+
   if (pos == _vectors.end())
     return NULL;
-  
+
   return pos->second;
 }
 
@@ -750,16 +750,16 @@ const NumericVector<Number> & System::get_vector (const std::string& vec_name) c
 {
   // Make sure the vector exists
   const_vectors_iterator pos = _vectors.find(vec_name);
-  
+
   if (pos == _vectors.end())
     {
       libMesh::err << "ERROR: vector "
 		    << vec_name
 		    << " does not exist in this system!"
-		    << std::endl;      
+		    << std::endl;
       libmesh_error();
     }
-  
+
   return *(pos->second);
 }
 
@@ -769,16 +769,16 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
 {
   // Make sure the vector exists
   vectors_iterator pos = _vectors.find(vec_name);
-  
+
   if (pos == _vectors.end())
     {
       libMesh::err << "ERROR: vector "
 		    << vec_name
 		    << " does not exist in this system!"
-		    << std::endl;      
+		    << std::endl;
       libmesh_error();
     }
-  
+
   return *(pos->second);
 }
 
@@ -1006,7 +1006,7 @@ const NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i) const
 unsigned int System::add_variable (const std::string& var,
 			           const FEType& type,
 				   const std::set<subdomain_id_type> * const active_subdomains)
-{  
+{
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (unsigned int v=0; v<this->n_vars(); v++)
@@ -1022,7 +1022,7 @@ unsigned int System::add_variable (const std::string& var,
 	libmesh_error();
       }
 
-  const unsigned int curr_n_vars = this->n_vars();						
+  const unsigned int curr_n_vars = this->n_vars();
 
   // Add the variable to the list
   _variables.push_back((active_subdomains == NULL) ?
@@ -1047,8 +1047,8 @@ unsigned int System::add_variable (const std::string& var,
 			           const FEFamily family,
 				   const std::set<subdomain_id_type> * const active_subdomains)
 {
-  return this->add_variable(var, 
-			    FEType(order, family), 
+  return this->add_variable(var,
+			    FEType(order, family),
 			    active_subdomains);
 }
 
@@ -1066,13 +1066,13 @@ unsigned short int System::variable_number (const std::string& var) const
   // Make sure the variable exists
   std::map<std::string, unsigned short int>::const_iterator
     pos = _variable_numbers.find(var);
-  
+
   if (pos == _variable_numbers.end())
     {
       libMesh::err << "ERROR: variable "
 		    << var
 		    << " does not exist in this system!"
-		    << std::endl;      
+		    << std::endl;
       libmesh_error();
     }
   libmesh_assert (_variables[pos->second].name() == var);
@@ -1088,20 +1088,20 @@ void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & 
   var_indices.clear();
 
   std::vector<unsigned int> dof_indices;
-  
+
   // Begin the loop over the elements
   MeshBase::const_element_iterator       el     =
     this->get_mesh().active_local_elements_begin();
   const MeshBase::const_element_iterator end_el =
     this->get_mesh().active_local_elements_end();
 
-  const unsigned int 
+  const unsigned int
     first_local = this->get_dof_map().first_dof(),
     end_local   = this->get_dof_map().end_dof();
 
   for ( ; el != end_el; ++el)
     {
-      const Elem* elem = *el;      
+      const Elem* elem = *el;
       this->get_dof_map().dof_indices (elem, dof_indices, var);
 
       for(unsigned int i=0; i<dof_indices.size(); i++)
@@ -1131,9 +1131,9 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
   /* Loop over nodes.  */
   {
     MeshBase::const_node_iterator it = mesh.local_nodes_begin();
-    const MeshBase::const_node_iterator end_it = mesh.local_nodes_end(); 
+    const MeshBase::const_node_iterator end_it = mesh.local_nodes_end();
     for ( ; it != end_it; ++it)
-      {    
+      {
 	const Node* node = *it;
 	unsigned int n_comp = node->n_comp(sys_num,var_num);
 	for(unsigned int i=0; i<n_comp; i++)
@@ -1147,9 +1147,9 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
   /* Loop over elements.  */
   {
     MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end_it = mesh.active_local_elements_end(); 
+    const MeshBase::const_element_iterator end_it = mesh.active_local_elements_end();
     for ( ; it != end_it; ++it)
-      {    
+      {
 	const Elem* elem = *it;
 	unsigned int n_comp = elem->n_comp(sys_num,var_num);
 	for(unsigned int i=0; i<n_comp; i++)
@@ -1252,7 +1252,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
   // Localize the potentially parallel vector
   AutoPtr<NumericVector<Number> > local_v = NumericVector<Number>::build();
   local_v->init(v.size(), true, SERIAL);
-  v.localize (*local_v, _dof_map->get_send_list()); 
+  v.localize (*local_v, _dof_map->get_send_list());
 
   unsigned int dim = this->get_mesh().mesh_dimension();
 
@@ -1412,16 +1412,16 @@ std::string System::get_info() const
 {
   std::ostringstream out;
 
-  
+
   const std::string& sys_name = this->name();
-      
+
   out << "   System #"  << this->number() << ", \"" << sys_name << "\"\n"
       << "    Type \""  << this->system_type() << "\"\n"
       << "    Variables=";
-  
+
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
       out << "\"" << this->variable_name(vn) << "\" ";
-     
+
   out << '\n';
 
   out << "    Finite Element Types=";
@@ -1429,7 +1429,7 @@ std::string System::get_info() const
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
     out << "\""
 	<< Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_type(vn).family)
-	<< "\" ";  
+	<< "\" ";
 #else
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
     {
@@ -1445,10 +1445,10 @@ std::string System::get_info() const
     out << "\""
 	<< Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_type(vn).inf_map)
 	<< "\" ";
-#endif      
+#endif
 
   out << '\n';
-      
+
   out << "    Approximation Orders=";
   for (unsigned int vn=0; vn<this->n_vars(); vn++)
     {
@@ -1466,7 +1466,7 @@ std::string System::get_info() const
     }
 
   out << '\n';
-      
+
   out << "    n_dofs()="             << this->n_dofs()             << '\n';
   out << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
 #ifdef LIBMESH_ENABLE_AMR
@@ -1477,7 +1477,7 @@ std::string System::get_info() const
 //   out << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << '\n';
 
   out << this->get_dof_map().get_info();
-  
+
   return out.str();
 }
 
@@ -1487,7 +1487,7 @@ void System::attach_init_function (void fptr(EquationSystems& es,
 					     const std::string& name))
 {
   libmesh_assert (fptr != NULL);
-  
+
   if (_init_system_object != NULL)
     {
       libmesh_here();
@@ -1522,7 +1522,7 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 						 const std::string& name))
 {
   libmesh_assert (fptr != NULL);
-  
+
   if (_assemble_system_object != NULL)
     {
       libmesh_here();
@@ -1531,8 +1531,8 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 
       _assemble_system_object = NULL;
     }
-  
-  _assemble_system_function = fptr;  
+
+  _assemble_system_function = fptr;
 }
 
 
@@ -1557,7 +1557,7 @@ void System::attach_constraint_function(void fptr(EquationSystems& es,
 						  const std::string& name))
 {
   libmesh_assert (fptr != NULL);
-  
+
   if (_constrain_system_object != NULL)
     {
       libmesh_here();
@@ -1566,8 +1566,8 @@ void System::attach_constraint_function(void fptr(EquationSystems& es,
 
       _constrain_system_object = NULL;
     }
-  
-  _constrain_system_function = fptr;  
+
+  _constrain_system_function = fptr;
 }
 
 
@@ -1602,8 +1602,8 @@ void System::attach_QOI_function(void fptr(EquationSystems&,
 
       _qoi_evaluate_object = NULL;
     }
-  
-  _qoi_evaluate_function = fptr;  
+
+  _qoi_evaluate_function = fptr;
 }
 
 
@@ -1629,7 +1629,7 @@ void System::attach_QOI_derivative(void fptr(EquationSystems&,
                                              const QoISet&))
 {
   libmesh_assert (fptr != NULL);
-  
+
   if (_qoi_evaluate_derivative_object != NULL)
     {
       libmesh_here();
@@ -1638,8 +1638,8 @@ void System::attach_QOI_derivative(void fptr(EquationSystems&,
 
       _qoi_evaluate_derivative_object = NULL;
     }
-  
-  _qoi_evaluate_derivative_function = fptr;  
+
+  _qoi_evaluate_derivative_function = fptr;
 }
 
 
@@ -1690,7 +1690,7 @@ void System::user_assembly ()
 
 void System::user_constrain ()
 {
-  // Call the user-provided constraint function, 
+  // Call the user-provided constraint function,
   // if it was provided
   if (_constrain_system_function!= NULL)
     this->_constrain_system_function(_equation_systems, this->name());
@@ -1704,7 +1704,7 @@ void System::user_constrain ()
 
 void System::user_QOI (const QoISet& qoi_indices)
 {
-  // Call the user-provided quantity of interest function, 
+  // Call the user-provided quantity of interest function,
   // if it was provided
   if (_qoi_evaluate_function != NULL)
     this->_qoi_evaluate_function(_equation_systems, this->name(), qoi_indices);
@@ -1718,7 +1718,7 @@ void System::user_QOI (const QoISet& qoi_indices)
 
 void System::user_QOI_derivative (const QoISet& qoi_indices)
 {
-  // Call the user-provided quantity of interest derivative, 
+  // Call the user-provided quantity of interest derivative,
   // if it was provided
   if (_qoi_evaluate_derivative_function != NULL)
     this->_qoi_evaluate_derivative_function(_equation_systems, this->name(), qoi_indices);
@@ -1754,7 +1754,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
 
   if (!insist_on_success)
     locator.enable_out_of_mesh_mode();
-  
+
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
 
@@ -1795,7 +1795,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
 
           // Get the shape function values
           const std::vector<std::vector<Real> >& phi = fe->get_phi();
-    
+
           // Reinitialize the element and compute the shape function values at coor
           fe->reinit (e, &coor);
 
@@ -1817,7 +1817,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
     Parallel::broadcast(u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
-  
+
   return u;
 }
 
@@ -1840,14 +1840,14 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 
   // Get the dimension of the mesh
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // Use an existing PointLocator or create a new one
   AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
 
   if (!insist_on_success)
     locator.enable_out_of_mesh_mode();
-  
+
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
 
@@ -1878,7 +1878,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
           const unsigned int n_dofs  = dof_indices.size();
 
           FEType fe_type = dof_map.variable_type(0);
-    
+
           // Build a FE again so we can calculate u(p)
           AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -1888,7 +1888,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 
           // Get the values of the shape function derivatives
 	  const std::vector<std::vector<RealGradient> >&  dphi = fe->get_dphi();
-    
+
           // Reinitialize the element and compute the shape function values at coor
           fe->reinit (e, &coor);
 
@@ -1935,14 +1935,14 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 
   // Get the dimension of the mesh
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // Use an existing PointLocator or create a new one
   AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
 
   if (!insist_on_success)
     locator.enable_out_of_mesh_mode();
-  
+
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
 
@@ -1973,7 +1973,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
           const unsigned int n_dofs  = dof_indices.size();
 
           FEType fe_type = dof_map.variable_type(0);
-    
+
           // Build a FE again so we can calculate u(p)
           AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -1983,7 +1983,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 
           // Get the values of the shape function derivatives
 	  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
-    
+
           // Reinitialize the element and compute the shape function values at coor
           fe->reinit (e, &coor);
 
@@ -2005,7 +2005,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
     Parallel::broadcast(hess_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
-    
+
   return hess_u;
 }
 #else
@@ -2013,7 +2013,7 @@ Tensor System::point_hessian(unsigned int, const Point &, const bool) const
 {
   // We can only accumulate a hessian with --enable-second
   libmesh_error();
-    
+
   // Avoid compiler warnings
   return Tensor();
 }

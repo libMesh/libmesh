@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -44,7 +44,7 @@ class Hex : public Cell
 public:
 
   /**
-   * Default brick element, takes number of nodes and 
+   * Default brick element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
   Hex(const unsigned int nn, Elem* p, Node** nodelinkdata);
@@ -68,12 +68,12 @@ public:
    * @returns 6.  All hexahedrals have 6 faces.
    */
   unsigned int n_faces() const { return 6; }
-  
+
   /**
    * @returns 8
    */
   unsigned int n_children() const { return 8; }
-  
+
   /*
    * @returns true iff the specified child is on the
    * specified side
@@ -103,7 +103,7 @@ public:
   unsigned int key (const unsigned int s) const;
 
   /**
-   * @returns a primitive (4-noded) quad for 
+   * @returns a primitive (4-noded) quad for
    * face i.
    */
   AutoPtr<Elem> side (const unsigned int i) const;
@@ -122,14 +122,14 @@ public:
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
 
 
-  
+
 protected:
 
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
   Elem* _elemlinks_data[7+(LIBMESH_DIM>3)];
-  
+
   /**
    * Matrix that tells which vertices define the location
    * of mid-side (or second-order) nodes.  This matrix
@@ -140,7 +140,7 @@ protected:
   static const unsigned short int _second_order_adjacent_vertices[12][2];
 
   /**
-   * Vector that names a child sharing each second order node. 
+   * Vector that names a child sharing each second order node.
    */
   static const unsigned short int _second_order_vertex_child_number[27];
 
@@ -156,7 +156,7 @@ protected:
 // Hex class member functions
 inline
 Hex::Hex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Hex::n_sides(), p, _elemlinks_data, nodelinkdata) 
+  Cell(nn, Hex::n_sides(), p, _elemlinks_data, nodelinkdata)
 {
 }
 

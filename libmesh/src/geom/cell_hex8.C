@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -129,7 +129,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
       AutoPtr<Elem> ap(new Side<Quad4,Hex8>(this,i));
       return ap;
     }
-  
+
   else
     {
       AutoPtr<Elem> face(new Quad4);
@@ -152,7 +152,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
 	    face->set_node(1) = this->get_node(1);
 	    face->set_node(2) = this->get_node(5);
 	    face->set_node(3) = this->get_node(4);
-	
+
 	    return face;
 	  }
 	case 2:  // the face at x = 1
@@ -170,7 +170,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
 	    face->set_node(1) = this->get_node(3);
 	    face->set_node(2) = this->get_node(7);
 	    face->set_node(3) = this->get_node(6);
-	
+
 	    return face;
 	  }
 	case 4: // the face at x = -1
@@ -188,7 +188,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
 	    face->set_node(1) = this->get_node(5);
 	    face->set_node(2) = this->get_node(6);
 	    face->set_node(3) = this->get_node(7);
-	
+
 	    return face;
 	  }
 	default:
@@ -198,7 +198,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
 	  }
 	}
     }
-  
+
   // We'll never get here.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -213,7 +213,7 @@ AutoPtr<Elem> Hex8::build_edge (const unsigned int i) const
   AutoPtr<Elem> ap(new SideEdge<Edge2,Hex8>(this,i));
   return ap;
 }
-  
+
 
 
 void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
@@ -272,7 +272,7 @@ const float Hex8::_embedding_matrix[8][8][8] =
   // numbered the same as their corresponding vertex, while some are
   // not.  The children which are numbered differently have been marked
   // with ** in the comments below.
-  
+
   // embedding matrix for child 0 (child 0 is associated with vertex 0)
   {
     //  0     1     2     3     4     5     6     7
@@ -394,7 +394,7 @@ Real Hex8::volume () const
   // into 6 sub-pyramids and applying the formula in:
   // "Calculation of the Volume of a General Hexahedron
   // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
-  
+
   static const unsigned char sub_pyr[6][4] =
     {
       {0, 3, 2, 1},
@@ -409,7 +409,7 @@ Real Hex8::volume () const
   // for the apex of all the pyramids.
   const Point R = this->centroid();
   Node* pyr_base[4];
-  
+
   Real vol=0.;
 
   // Compute the volume using 6 sub-pyramids
@@ -418,7 +418,7 @@ Real Hex8::volume () const
       // Set the nodes of the pyramid base
       for (unsigned int i=0; i<4; ++i)
 	pyr_base[i] = this->_nodes[sub_pyr[n][i]];
-      
+
       // Compute diff vectors
       Point a ( *pyr_base[0] - R );
       Point b ( *pyr_base[1] - *pyr_base[3] );
@@ -433,7 +433,7 @@ Real Hex8::volume () const
 
       vol += sub_vol;
     }
-  
+
   return vol;
 }
 

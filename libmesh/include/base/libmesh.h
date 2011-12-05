@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,7 +46,7 @@ namespace libMesh
 
 /**
  * The \p LibMeshInit class, when constructed, initializes
- * the dependent libraries (e.g. MPI or PETSC) and does the 
+ * the dependent libraries (e.g. MPI or PETSC) and does the
  * command line parsing needed by libMesh.  The LibMeshInit
  * destructor closes those libraries properly.
  *
@@ -71,13 +71,13 @@ public:
 #else
   LibMeshInit(int & argc, char** & argv);
 #endif
-	
+
   virtual ~LibMeshInit();
 };
 
 
 #ifndef LIBMESH_HAVE_MPI
-  
+
   /**
    * Initialize the library for use.  This will call
    * PetscInitialize if PETSC is available.
@@ -89,11 +89,11 @@ public:
   void init (int & argc, char** & argv);
 
 #else
-  
+
   /**
    * Initialize the library for use.  This will call
    * PetscInitialize if PETSC is available.
-   * This method takes an optional parameter 
+   * This method takes an optional parameter
    *
    * You must perform an initialization before using any of the
    * library functionality, but libMesh::init() is a deprecated
@@ -111,7 +111,7 @@ public:
    * object constructors.
    */
   bool initialized ();
-  
+
   /**
    * Stop using the mesh library.  This will call PetscFinalize()
    * if PETSC is available.  This method should be called after
@@ -133,12 +133,12 @@ public:
    * object destructors.
    */
   bool closed ();
-  
+
   /**
    * @returns true if the argument \p arg was specified on the command line,
    * \p false otherwise.
    */
-  bool on_command_line (const std::string& arg);  
+  bool on_command_line (const std::string& arg);
 
   /**
    * \returns the value associated with name on the command line if it is specified,
@@ -163,7 +163,7 @@ public:
    * The command-line is also checked, allowing the user to override the
    * compiled default.  For example, \p --use-petsc will force the use of
    * PETSc solvers, and \p --use-laspack will force the use of LASPACK
-   * solvers.   
+   * solvers.
    */
   SolverPackage default_solver_package ();
 

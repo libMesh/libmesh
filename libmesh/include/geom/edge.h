@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,19 +48,19 @@ class Edge : public Elem
  public:
 
   /**
-   * Default line element, takes number of nodes and 
+   * Default line element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
   Edge (const unsigned int nn,
 	Elem* p,
         Node** nodelinkdata) :
     Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata) {}
-   
+
   /**
    * @returns 1, the dimensionality of the object.
    */
   unsigned int dim () const { return 1; }
-  
+
   /**
    * @returns 2. Every edge is guaranteed to have at least 2 nodes.
    */
@@ -75,17 +75,17 @@ class Edge : public Elem
    * @returns 2.  Every edge has exactly two vertices.
    */
   unsigned int n_vertices() const { return 2; }
-  
+
   /**
    * @returns 0.  All 1D elements have no edges.
-   */  
+   */
   unsigned int n_edges() const { return 0; }
-  
+
   /**
    * @returns 0.  All 1D elements have no faces.
-   */  
+   */
   unsigned int n_faces() const { return 0; }
-  
+
   /**
    * @returns 2
    */
@@ -97,7 +97,7 @@ class Edge : public Elem
    */
   virtual bool is_child_on_side(const unsigned int c,
 			        const unsigned int s) const;
-  
+
   /*
    * @returns the side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.
@@ -116,7 +116,7 @@ class Edge : public Elem
 //    * @returns 1
 //    */
 //   unsigned int n_children_per_side(const unsigned int) const { return 1; }
-  
+
   /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
@@ -124,15 +124,15 @@ class Edge : public Elem
    */
   unsigned int key (const unsigned int s) const
   { return this->compute_key(this->node(s)); }
-  
+
   /**
-   * The \p Elem::side() member returns 
+   * The \p Elem::side() member returns
    * an auto pointer to a NodeElem for the specified node.
    */
   AutoPtr<Elem> side (const unsigned int i) const;
 
   /**
-   * The \p Elem::side() member returns 
+   * The \p Elem::side() member returns
    * an auto pointer to a NodeElem for the specified node.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
@@ -145,7 +145,7 @@ class Edge : public Elem
   //{ libmesh_assert(i < n_nodes()); AutoPtr<DofObject> ap(new Node(*get_node(i))); return ap; }
   { libmesh_error(); AutoPtr<Elem> ap(NULL); return ap; }
 
-  
+
  protected:
 
   /**
@@ -154,16 +154,16 @@ class Edge : public Elem
   Elem* _elemlinks_data[3+(LIBMESH_DIM>1)];
 
 #ifdef LIBMESH_ENABLE_AMR
-  
+
   /**
    * Matrix that allows children to inherit boundary conditions.
    */
-  unsigned int side_children_matrix (const unsigned int, 
+  unsigned int side_children_matrix (const unsigned int,
 				     const unsigned int) const
   { libmesh_error(); return 0; }
 
 #endif
-  
+
 };
 
 

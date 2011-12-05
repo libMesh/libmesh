@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -58,7 +58,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType& fet,
 						const ElemType inf_elem_type)
 {
   const ElemType base_et (Base::get_elem_type(inf_elem_type));
-    
+
   if (Dim > 1)
     return FEInterface::n_dofs(Dim-1, fet, base_et) * Radial::n_dofs(fet.radial_order);
   else
@@ -79,16 +79,16 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
 
   unsigned int n_base, n_radial;
   compute_node_indices(inf_elem_type, n, n_base, n_radial);
-  
-//   libMesh::out << "elem_type=" << inf_elem_type 
+
+//   libMesh::out << "elem_type=" << inf_elem_type
 // 	    << ",  fet.radial_order=" << fet.radial_order
-// 	    << ",  n=" << n 
-// 	    << ",  n_radial=" << n_radial 
+// 	    << ",  n=" << n
+// 	    << ",  n_radial=" << n_radial
 // 	    << ",  n_base=" << n_base
 // 	    << std::endl;
 
   if (Dim > 1)
-    return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base) 
+    return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base)
         * Radial::n_dofs_at_node(fet.radial_order, n_radial);
   else
     return Radial::n_dofs_at_node(fet.radial_order, n_radial);
@@ -106,7 +106,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType& fet,
   const ElemType base_et (Base::get_elem_type(inf_elem_type));
 
   if (Dim > 1)
-    return FEInterface::n_dofs_per_elem(Dim-1, fet, base_et) 
+    return FEInterface::n_dofs_per_elem(Dim-1, fet, base_et)
         * Radial::n_dofs_per_elem(fet.radial_order);
   else
     return Radial::n_dofs_per_elem(fet.radial_order);
@@ -166,7 +166,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
     {
       libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
 		    << " return the correct trial function!  Use " << std::endl
-		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" 
+		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!"
 		    << std::endl;
       _warned_for_shape = true;
     }
@@ -209,7 +209,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
     {
       libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
 		    << " return the correct trial function!  Use " << std::endl
-		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" 
+		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!"
 		    << std::endl;
       _warned_for_shape = true;
     }
@@ -246,22 +246,22 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
   libmesh_assert (Dim != 0);
 
   const Order        o_radial             (fet.radial_order);
-  const Order        radial_mapping_order (Radial::mapping_order());    
+  const Order        radial_mapping_order (Radial::mapping_order());
   const Point&       p                    (data.p);
   const Real         v                    (p(Dim-1));
   AutoPtr<Elem>      base_el              (inf_elem->build_side(0));
 
   /*
-   * compute \p interpolated_dist containing the mapping-interpolated 
+   * compute \p interpolated_dist containing the mapping-interpolated
    * distance of the base point to the origin.  This is the same
    * for all shape functions.  Set \p interpolated_dist to 0, it
    * is added to.
    */
   Real interpolated_dist = 0.;
   switch (Dim)
-    {  
+    {
     case 1:
-      {	
+      {
         libmesh_assert (inf_elem->type() == INFEDGE2);
 	interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).size();
 	break;
@@ -333,7 +333,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 	  // compute base and radial shape indices
 	  unsigned int i_base, i_radial;
 	  compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
- 
+
 	  data.shape[i] = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
 			   *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
 			   * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
@@ -341,7 +341,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 	}
     }
   else
-    {	
+    {
       libMesh::err << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
       libmesh_error();
     }
@@ -351,11 +351,11 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
   const Real speed = data.speed;
 
   /*
-   * This is quite weird: the phase is actually 
+   * This is quite weird: the phase is actually
    * a measure how @e advanced the pressure is that
-   * we compute.  In other words: the further away 
+   * we compute.  In other words: the further away
    * the node \p data.p is, the further we look into
-   * the future... 
+   * the future...
    */
   data.phase = interpolated_dist                                                       /* phase(s,t,v)/c  */
       * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1) / speed;
@@ -370,14 +370,14 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 	  // compute base and radial shape indices
 	  unsigned int i_base, i_radial;
 	  compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
- 
+
 	  data.shape[i] = InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D */
 	                  *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)        */
 	                  * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial);    /* L_n(v)          */
 	}
     }
   else
-    {	
+    {
       libMesh::err << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
       libmesh_error();
     }
@@ -597,8 +597,8 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
 
 
     default:
-      { 
-        libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type 
+      {
+        libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type
 		      << ", node=" << outer_node_index << std::endl;
 	libmesh_error();
 	return;
@@ -622,7 +622,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
   static std::vector<unsigned int> _static_base_node_index;
   static std::vector<unsigned int> _static_radial_node_index;
 
-  /* 
+  /*
    * fast counterpart to compute_node_indices(), uses local static buffers
    * to store the index maps.  The class member
    * \p _compute_node_indices_fast_current_elem_type remembers
@@ -635,7 +635,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
    * members (which use \p compute_node_indices_fast()).
    * So separate these.
    *
-   * check whether the work for this elemtype has already 
+   * check whether the work for this elemtype has already
    * been done.  If so, use this index.  Otherwise, refresh
    * the buffer to this element type.
    */
@@ -646,7 +646,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
       return;
     }
   else
-    {      
+    {
       // store the map for _all_ nodes for this element type
       _compute_node_indices_fast_current_elem_type = inf_elem_type;
 
@@ -695,8 +695,8 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
 	    break;
 	  }
 	default:
-	  { 
-	    libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type 
+	  {
+	    libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type
 		          << ", node=" << outer_node_index << std::endl;
 	    libmesh_error();
 	    break;
@@ -708,9 +708,9 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
       _static_radial_node_index.resize(n_nodes);
 
       for (unsigned int n=0; n<n_nodes; n++)
-	  compute_node_indices (inf_elem_type, 
-				n, 
-				_static_base_node_index  [outer_node_index], 
+	  compute_node_indices (inf_elem_type,
+				n,
+				_static_base_node_index  [outer_node_index],
 				_static_radial_node_index[outer_node_index]);
 
       // and return for the specified node
@@ -807,7 +807,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
 	n_base_face_dof   = 0;
 	break;
       }
-	
+
     case INFHEX8:
       {
 	n_base_vertices   = 4;
@@ -838,7 +838,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
 	break;
       }
 
-		 
+
     case INFPRISM6:
       {
 	n_base_vertices   = 3;
@@ -892,7 +892,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
 	 * so that i_offset contains only the offset for the base
 	 */
 	const unsigned int i_offset = i - n_dof_at_base_vertices;                // 0..31
-	
+
 	// first the radial dof are counted, then the base dof
 	radial_shape = (i_offset % radial_order) + 1;
 	base_shape   = i_offset / radial_order;
@@ -925,8 +925,8 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
     else if (i < n_dof_at_all_vertices+n_dof_at_all_sides+n_dof_at_all_faces)    // range of i: 105..124
       {
 	// belongs to the node in the outer face
-	const unsigned int i_offset = i - (n_dof_at_all_vertices 
-					   + n_dof_at_all_sides 
+	const unsigned int i_offset = i - (n_dof_at_all_vertices
+					   + n_dof_at_all_sides
 					   + n_dof_at_base_face);                // 0..19
 	radial_shape = (i_offset % radial_order) + 1;
 	base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices + n_dof_at_base_sides;
@@ -936,18 +936,18 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
       {
 	// belongs to the base and is an element associated shape
 	radial_shape = 0;
-	base_shape = i - (n_dof_at_all_vertices 
-			  + n_dof_at_all_sides 
-			  + n_dof_at_all_faces);                                 // 0..8 
+	base_shape = i - (n_dof_at_all_vertices
+			  + n_dof_at_all_sides
+			  + n_dof_at_all_faces);                                 // 0..8
       }
 
     else                                                                         // range of i: 134..169
       {
 	libmesh_assert (i < n_dofs(fet, inf_elem_type));
 	// belongs to the outer shell and is an element associated shape
-	const unsigned int i_offset = i - (n_dof_at_all_vertices 
-					   + n_dof_at_all_sides 
-					   + n_dof_at_all_faces 
+	const unsigned int i_offset = i - (n_dof_at_all_vertices
+					   + n_dof_at_all_sides
+					   + n_dof_at_all_faces
 					   + n_base_elem_dof);                   // 0..19
 	radial_shape = (i_offset % radial_order) + 1;
 	base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices + n_dof_at_base_sides + n_dof_at_base_face;
@@ -994,6 +994,6 @@ INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,co
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,const std::vector<Number>&,std::vector<Number>&));
 
 } // namespace libMesh
-					   
+
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

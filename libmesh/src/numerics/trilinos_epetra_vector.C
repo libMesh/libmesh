@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,18 +48,18 @@ template <typename T>
 T EpetraVector<T>::sum () const
 {
   libmesh_assert(this->closed());
-  
+
   const unsigned int nl = _vec->MyLength();
 
   T sum=0.0;
 
   T * values = _vec->Values();
-  
+
   for (unsigned int i=0; i<nl; i++)
     sum += values[i];
 
   Parallel::sum<T>(sum);
-  
+
   return sum;
 }
 
@@ -71,7 +71,7 @@ Real EpetraVector<T>::l1_norm () const
   Real value;
 
   _vec->Norm1(&value);
-  
+
   return value;
 }
 
@@ -79,11 +79,11 @@ template <typename T>
 Real EpetraVector<T>::l2_norm () const
 {
   libmesh_assert(this->closed());
-  
+
   Real value;
 
   _vec->Norm2(&value);
-  
+
   return value;
 }
 
@@ -91,11 +91,11 @@ template <typename T>
 Real EpetraVector<T>::linfty_norm () const
 {
   libmesh_assert(this->closed());
-  
+
   Real value;
 
   _vec->NormInf(&value);
-  
+
   return value;
 }
 
@@ -104,9 +104,9 @@ NumericVector<T>&
 EpetraVector<T>::operator += (const NumericVector<T>& v)
 {
   libmesh_assert(this->closed());
-  
+
   this->add(1., v);
-  
+
   return *this;
 }
 
@@ -117,9 +117,9 @@ NumericVector<T>&
 EpetraVector<T>::operator -= (const NumericVector<T>& v)
 {
   libmesh_assert(this->closed());
-  
+
   this->add(-1., v);
-  
+
   return *this;
 }
 
@@ -147,7 +147,7 @@ void EpetraVector<T>::add (const unsigned int i_in, const T value_in)
   T value = value_in;
 
   libmesh_assert(i_in<this->size());
-  
+
   SumIntoGlobalValues(1, &i, &value);
 
   this->_is_closed = false;
@@ -195,9 +195,9 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& /* V_in */,
 //   A->close();
 
 //   // The const_cast<> is not elegant, but it is required since Epetra
-//   // is not const-correct.  
+//   // is not const-correct.
 //   ierr = MatMultAdd(const_cast<EpetraMatrix<T>*>(A)->mat(), V->_vec, _vec, _vec);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -230,7 +230,7 @@ void EpetraVector<T>::add (const T v_in)
   const unsigned int nl = _vec->MyLength();
 
   T * values = _vec->Values();
-  
+
   for (unsigned int i=0; i<nl; i++)
     values[i]+=v_in;
 
@@ -288,9 +288,9 @@ void EpetraVector<T>::insert (const DenseVector<T>& v,
 			      const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (v.size() == dof_indices.size());
-  
+
   std::vector<T> &vals = const_cast<DenseVector<T>&>(v).get_values();
-  
+
   ReplaceGlobalValues (v.size(),
                        (int*) &dof_indices[0],
                        &vals[0]);
@@ -303,7 +303,7 @@ void EpetraVector<T>::insert (const DenseSubVector<T>& v,
 			      const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (v.size() == dof_indices.size());
-  
+
   for (unsigned int i=0; i < v.size(); ++i)
     this->set (dof_indices[i], v(i));
 }
@@ -348,11 +348,11 @@ void EpetraVector<T>::pointwise_mult (const NumericVector<T>& vec1,
 
 
 template <typename T>
-NumericVector<T>& 
+NumericVector<T>&
 EpetraVector<T>::operator = (const T s_in)
 {
   _vec->PutScalar(s_in);
-  
+
   return *this;
 }
 
@@ -365,7 +365,7 @@ EpetraVector<T>::operator = (const NumericVector<T>& v_in)
   const EpetraVector<T>* v = libmesh_cast_ptr<const EpetraVector<T>*>(&v_in);
 
   *this = *v;
-  
+
   return *this;
 }
 
@@ -376,7 +376,7 @@ EpetraVector<T>&
 EpetraVector<T>::operator = (const EpetraVector<T>& v)
 {
   (*_vec) = *v._vec;
-  
+
   return *this;
 }
 
@@ -387,7 +387,7 @@ NumericVector<T>&
 EpetraVector<T>::operator = (const std::vector<T>& v)
 {
   T * values = _vec->Values();
-  
+
   /**
    * Case 1:  The vector is the same size of
    * The global vector.  Only add the local components.
@@ -396,7 +396,7 @@ EpetraVector<T>::operator = (const std::vector<T>& v)
   {
     const unsigned int nl=this->local_size();
     const unsigned int fli=this->first_local_index();
-    
+
     for(unsigned int i=0;i<nl;i++)
       values[i]=v[fli+i];
   }
@@ -408,9 +408,9 @@ EpetraVector<T>::operator = (const std::vector<T>& v)
   else
   {
     libmesh_assert(v.size()==this->local_size());
-    
+
     const unsigned int nl=this->local_size();
-    
+
     for(unsigned int i=0;i<nl;i++)
       values[i]=v[i];
   }
@@ -440,7 +440,7 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
 {
   // TODO: optimize to sync only the send list values
   this->localize(v_local_in);
-  
+
 //   EpetraVector<T>* v_local =
 //   libmesh_cast_ptr<EpetraVector<T>*>(&v_local_in);
 
@@ -450,7 +450,7 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
 //   libmesh_assert (send_list.size() <= v_local->size());
 
 //   Epetra_Import importer (*v_local->_map, *this->_map);
-  
+
 //   v_local->_vec->Import (*this->_vec, importer, Insert);
 }
 
@@ -467,17 +467,17 @@ void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
 //   libmesh_assert (last_local_idx > first_local_idx);
 //   libmesh_assert (send_list.size() <= this->size());
 //   libmesh_assert (last_local_idx < this->size());
-  
+
 //   const unsigned int size       = this->size();
 //   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
-//   int ierr=0;  
-  
+//   int ierr=0;
+
 //   // Don't bother for serial cases
 //   if ((first_local_idx == 0) &&
 //       (local_size == size))
 //     return;
-  
-  
+
+
 //   // Build a parallel vector, initialize it with the local
 //   // parts of (*this)
 //   EpetraVector<T> parallel_vec;
@@ -495,7 +495,7 @@ void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
 //     Utility::iota (idx.begin(), idx.end(), first_local_idx);
 
 //     // Create the index set & scatter object
-//     ierr = ISCreateGeneral(libMesh::COMM_WORLD, local_size, &idx[0], &is); 
+//     ierr = ISCreateGeneral(libMesh::COMM_WORLD, local_size, &idx[0], &is);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 //     ierr = VecScatterCreate(_vec,              is,
@@ -509,28 +509,28 @@ void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
 //     ierr = VecScatterBegin(_vec, parallel_vec._vec, INSERT_VALUES,
 // 			   SCATTER_FORWARD, scatter);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
 //     ierr = VecScatterEnd  (_vec, parallel_vec._vec, INSERT_VALUES,
 // 			   SCATTER_FORWARD, scatter);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 // #else
-	   
+
 //       // API argument order change in Epetra 2.3.3
 //     ierr = VecScatterBegin(scatter, _vec, parallel_vec._vec,
 // 			   INSERT_VALUES, SCATTER_FORWARD);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
 //     ierr = VecScatterEnd  (scatter, _vec, parallel_vec._vec,
 // 			   INSERT_VALUES, SCATTER_FORWARD);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	   
+
 // #endif
 
 //     // Clean up
 //     ierr = LibMeshISDestroy (is);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
 //     ierr = LibMeshVecScatterDestroy(scatter);
 //            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 //   }
@@ -578,11 +578,11 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
 
   libmesh_assert (pid < libMesh::n_processors());
   libmesh_assert (this->_vec != NULL);
-  
+
   v_local.clear();
   v_local.reserve(n);
-  
-  
+
+
   // build up my local part
   for (unsigned int i=0; i<nl; i++)
     v_local.push_back((*this->_vec)[i]);
@@ -599,8 +599,8 @@ void EpetraVector<T>::print_matlab (const std::string /* name */) const
 
 //   libmesh_assert (this->initialized());
 //   libmesh_assert (this->closed());
-  
-//   int ierr=0; 
+
+//   int ierr=0;
 //   EpetraViewer epetra_viewer;
 
 
@@ -610,7 +610,7 @@ void EpetraVector<T>::print_matlab (const std::string /* name */) const
 
 //   /**
 //    * Create an ASCII file containing the matrix
-//    * if a filename was provided.  
+//    * if a filename was provided.
 //    */
 //   if (name != "NULL")
 //     {
@@ -618,11 +618,11 @@ void EpetraVector<T>::print_matlab (const std::string /* name */) const
 // 				   name.c_str(),
 // 				   &epetra_viewer);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
 //       ierr = EpetraViewerSetFormat (epetra_viewer,
 // 				   EPETRA_VIEWER_ASCII_MATLAB);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
 //       ierr = VecView (_vec, epetra_viewer);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 //     }
@@ -635,7 +635,7 @@ void EpetraVector<T>::print_matlab (const std::string /* name */) const
 //       ierr = EpetraViewerSetFormat (EPETRA_VIEWER_STDOUT_WORLD,
 // 				   EPETRA_VIEWER_ASCII_MATLAB);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
 //       ierr = VecView (_vec, EPETRA_VIEWER_STDOUT_WORLD);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 //     }
@@ -662,11 +662,11 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 //   IS parent_is, subvector_is;
 //   VecScatter scatter;
 //   int ierr = 0;
-  
+
 //   // Make sure the passed int subvector is really a EpetraVector
 //   EpetraVector<T>* epetra_subvector = libmesh_cast_ptr<EpetraVector<T>*>(&subvector);
 //   libmesh_assert(epetra_subvector != NULL);
-  
+
 //   // If the epetra_subvector is already initialized, we assume that the
 //   // user has already allocated the *correct* amount of space for it.
 //   // If not, we use the appropriate Epetra routines to initialize it.
@@ -688,7 +688,7 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 //       // Mark the subvector as initialized
 //       epetra_subvector->_is_initialized = true;
 //     }
-  
+
 //   // Use iota to fill an array with entries [0,1,2,3,4,...rows.size()]
 //   std::vector<int> idx(rows.size());
 //   Utility::iota (idx.begin(), idx.end(), 0);
@@ -738,11 +738,11 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 // 		       INSERT_VALUES,
 // 		       SCATTER_FORWARD); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 // #endif
-  
-//   // Clean up 
+
+//   // Clean up
 //   ierr = LibMeshISDestroy(parent_is);       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 //   ierr = LibMeshISDestroy(subvector_is);    CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//   ierr = LibMeshVecScatterDestroy(scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+//   ierr = LibMeshVecScatterDestroy(scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -990,7 +990,7 @@ int EpetraVector<T>::GlobalAssemble(Epetra_CombineMode mode)
   }
 
 
-  
+
   //First build a map that describes the data in nonlocalIDs_/nonlocalCoefs_.
   //We'll use the arbitrary distribution constructor of Map.
 

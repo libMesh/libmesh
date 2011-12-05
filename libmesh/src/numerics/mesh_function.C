@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -109,7 +109,7 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
   /*
    * set up the PointLocator: either someone else
    * is the master (go and get the address of his
-   * point locator) or this object is the master 
+   * point locator) or this object is the master
    * (build the point locator  on our own).
    */
   if (this->_master != NULL)
@@ -117,7 +117,7 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
       // we aren't the master
       const MeshFunction* master =
 	libmesh_cast_ptr<const MeshFunction*>(this->_master);
-      
+
       if (master->_point_locator == NULL)
         {
 	  libMesh::err << "ERROR: When the master-servant concept is used,"
@@ -170,13 +170,13 @@ MeshFunction::clear ()
 
 
 
-Number MeshFunction::operator() (const Point& p, 
+Number MeshFunction::operator() (const Point& p,
 				 const Real time)
 {
   libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
   libmesh_assert (time == 0.);
-  
+
   DenseVector<Number> buf (1);
   this->operator() (p, time, buf);
   return buf(0);
@@ -184,13 +184,13 @@ Number MeshFunction::operator() (const Point& p,
 
 
 
-Gradient MeshFunction::gradient (const Point& p, 
+Gradient MeshFunction::gradient (const Point& p,
 				 const Real time)
 {
   libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
   libmesh_assert (time == 0.);
-  
+
   std::vector<Gradient> buf (1);
   this->gradient(p, time, buf);
   return buf[0];
@@ -199,13 +199,13 @@ Gradient MeshFunction::gradient (const Point& p,
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor MeshFunction::hessian (const Point& p, 
+Tensor MeshFunction::hessian (const Point& p,
 			      const Real time)
 {
   libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
   libmesh_assert (time == 0.);
-  
+
   std::vector<Tensor> buf (1);
   this->hessian(p, time, buf);
   return buf[0];
@@ -237,36 +237,36 @@ void MeshFunction::operator() (const Point& p,
 	}
     }
 #endif
-  
+
   // locate the point in the other mesh
   const Elem* element = this->_point_locator->operator()(p);
 
   if(element==NULL)
     {
-      output = _out_of_mesh_value;      
+      output = _out_of_mesh_value;
     }
   else
     {
       // resize the output vector to the number of output values
       // that the user told us
       output.resize (this->_system_vars.size());
-      
-      
+
+
       {
 	const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-	
-	
+
+
 	/*
-	 * Get local coordinates to feed these into compute_data().  
+	 * Get local coordinates to feed these into compute_data().
 	 * Note that the fe_type can safely be used from the 0-variable,
 	 * since the inverse mapping is the same for all FEFamilies
 	 */
-	const Point mapped_point (FEInterface::inverse_map (dim, 
+	const Point mapped_point (FEInterface::inverse_map (dim,
 							    this->_dof_map.variable_type(0),
-							    element, 
+							    element,
 							    p));
-	
-	
+
+
 	// loop over all vars
 	for (unsigned int index=0; index < this->_system_vars.size(); index++)
 	  {
@@ -275,37 +275,37 @@ void MeshFunction::operator() (const Point& p,
 	     */
 	    const unsigned int var = _system_vars[index];
 	    const FEType& fe_type = this->_dof_map.variable_type(var);
-	    
+
 	    /**
 	     * Build an FEComputeData that contains both input and output data
 	     * for the specific compute_data method.
 	     */
 	    {
 	      FEComputeData data (this->_eqn_systems, mapped_point);
-	      
+
 	      FEInterface::compute_data (dim, fe_type, element, data);
-	      
+
 	      // where the solution values for the var-th variable are stored
 	      std::vector<unsigned int> dof_indices;
 	      this->_dof_map.dof_indices (element, dof_indices, var);
-	      
+
 	      // interpolate the solution
 	      {
 		Number value = 0.;
-		
+
 		for (unsigned int i=0; i<dof_indices.size(); i++)
 		  value += this->_vector(dof_indices[i]) * data.shape[i];
-		
+
 		output(index) = value;
 	      }
-	      
+
 	    }
-	    
+
 	    // next variable
 	  }
       }
     }
-      
+
   // all done
   return;
 }
@@ -335,7 +335,7 @@ void MeshFunction::gradient (const Point& p,
 	}
     }
 #endif
-  
+
   // locate the point in the other mesh
   const Elem* element = this->_point_locator->operator()(p);
 
@@ -348,24 +348,24 @@ void MeshFunction::gradient (const Point& p,
       // resize the output vector to the number of output values
       // that the user told us
       output.resize (this->_system_vars.size());
-      
-      
+
+
       {
 	const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-	
-	
+
+
 	/*
-	 * Get local coordinates to feed these into compute_data().  
+	 * Get local coordinates to feed these into compute_data().
 	 * Note that the fe_type can safely be used from the 0-variable,
 	 * since the inverse mapping is the same for all FEFamilies
 	 */
-	const Point mapped_point (FEInterface::inverse_map (dim, 
+	const Point mapped_point (FEInterface::inverse_map (dim,
 							    this->_dof_map.variable_type(0),
-							    element, 
+							    element,
 							    p));
-	
+
         std::vector<Point> point_list (1, mapped_point);
-	
+
 	// loop over all vars
 	for (unsigned int index=0; index < this->_system_vars.size(); index++)
 	  {
@@ -378,22 +378,22 @@ void MeshFunction::gradient (const Point& p,
             AutoPtr<FEBase> point_fe (FEBase::build(dim, fe_type));
             const std::vector<std::vector<RealGradient> >& dphi = point_fe->get_dphi();
             point_fe->reinit(element, &point_list);
-	    
+
 	    // where the solution values for the var-th variable are stored
 	    std::vector<unsigned int> dof_indices;
 	    this->_dof_map.dof_indices (element, dof_indices, var);
-	      
+
 	    // interpolate the solution
 	    Gradient grad(0.);
-		
+
 	    for (unsigned int i=0; i<dof_indices.size(); i++)
 	      grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
-		
+
 	    output[index] = grad;
 	  }
       }
     }
-      
+
   // all done
   return;
 }
@@ -424,7 +424,7 @@ void MeshFunction::hessian (const Point& p,
 	}
     }
 #endif
-  
+
   // locate the point in the other mesh
   const Elem* element = this->_point_locator->operator()(p);
 
@@ -437,24 +437,24 @@ void MeshFunction::hessian (const Point& p,
       // resize the output vector to the number of output values
       // that the user told us
       output.resize (this->_system_vars.size());
-      
-      
+
+
       {
 	const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-	
-	
+
+
 	/*
-	 * Get local coordinates to feed these into compute_data().  
+	 * Get local coordinates to feed these into compute_data().
 	 * Note that the fe_type can safely be used from the 0-variable,
 	 * since the inverse mapping is the same for all FEFamilies
 	 */
-	const Point mapped_point (FEInterface::inverse_map (dim, 
+	const Point mapped_point (FEInterface::inverse_map (dim,
 							    this->_dof_map.variable_type(0),
-							    element, 
+							    element,
 							    p));
-	
+
         std::vector<Point> point_list (1, mapped_point);
-	
+
 	// loop over all vars
 	for (unsigned int index=0; index < this->_system_vars.size(); index++)
 	  {
@@ -468,22 +468,22 @@ void MeshFunction::hessian (const Point& p,
             const std::vector<std::vector<RealTensor> >& d2phi =
 			    point_fe->get_d2phi();
             point_fe->reinit(element, &point_list);
-	    
+
 	    // where the solution values for the var-th variable are stored
 	    std::vector<unsigned int> dof_indices;
 	    this->_dof_map.dof_indices (element, dof_indices, var);
-	      
+
 	    // interpolate the solution
 	    Tensor hess;
-		
+
 	    for (unsigned int i=0; i<dof_indices.size(); i++)
 	      hess.add_scaled(d2phi[i][0], this->_vector(dof_indices[i]));
-		
+
 	    output[index] = hess;
 	  }
       }
     }
-      
+
   // all done
   return;
 }

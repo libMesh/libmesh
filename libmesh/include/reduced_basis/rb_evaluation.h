@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -33,7 +33,7 @@ namespace libMesh
 
 class System;
 template <typename T> class NumericVector;
-        
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -130,7 +130,7 @@ public:
    * stored data.
    */
   virtual void set_n_basis_functions(unsigned int n_bfs) { basis_functions.resize(n_bfs); }
-  
+
   /**
    * Clear all the Riesz representors that are used to compute the RB residual
    * (and hence error bound). This is useful since once we complete the Greedy
@@ -160,7 +160,7 @@ public:
   virtual void write_out_basis_functions(System& sys,
                                          const std::string& directory_name = "offline_data",
                                          const bool write_binary_basis_functions = true);
-  
+
   /**
    * Read in all the basis functions from file.
    * \p sys is used for file IO
@@ -171,7 +171,7 @@ public:
   virtual void read_in_basis_functions(System& sys,
                                        const std::string& directory_name = "offline_data",
                                        const bool read_binary_basis_functions = true);
-  
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -261,7 +261,7 @@ public:
    * the F_q_representors are stored in RBSystem.
    */
   std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
-  
+
   /**
    * Boolean to indicate whether we evaluate a posteriori error bounds
    * when rb_solve is called.

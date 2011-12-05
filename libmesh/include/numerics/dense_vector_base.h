@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -38,7 +38,7 @@ namespace libMesh
  * for example DenseSubVectors, can be derived from this class.
  *
  * @author John W. Peterson, 2003
- */ 
+ */
 
 // ------------------------------------------------------------
 // DenseVectorBase class definition
@@ -51,10 +51,10 @@ public:
    * Constructor.  Empty.
    */
   DenseVectorBase() {}
-  
+
   /**
    * Destructor.  Does nothing.
-   */     
+   */
   virtual ~DenseVectorBase() {}
 
   /**
@@ -77,7 +77,7 @@ public:
   /**
    * @returns the size of the vector.
    */
-  virtual unsigned int size() const = 0; 
+  virtual unsigned int size() const = 0;
 
   /**
    * Pretty-print the vector to \p stdout.
@@ -93,7 +93,7 @@ public:
     v.print(os);
     return os;
   }
-  
+
   /**
    * Prints the entries of the vector with additional
    * decimal places in scientific notation.

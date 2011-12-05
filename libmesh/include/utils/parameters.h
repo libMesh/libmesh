@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -49,7 +49,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Parameters class definition
-class Parameters 
+class Parameters
 {
 public:
 
@@ -124,7 +124,7 @@ public:
   template <typename T>
   unsigned int n_parameters () const;
 #endif // LIBMESH_HAVE_RTTI
-  
+
   /**
    * Clears internal data structures & frees any allocated memory.
    */
@@ -134,7 +134,7 @@ public:
    * Prints the contents, by default to libMesh::out.
    */
   void print (std::ostream& os=libMesh::out) const;
-  
+
 private:
 
   /**
@@ -185,7 +185,7 @@ public:
      * @returns a read-only reference to the parameter value.
      */
     const T& get () const { return _value; }
-    
+
     /**
      * @returns a writeable reference to the parameter value.
      */
@@ -206,8 +206,8 @@ public:
     /**
      * Clone this value.  Useful in copy-construction.
      */
-    virtual Value* clone () const; 
-    
+    virtual Value* clone () const;
+
   private:
 
     /**
@@ -293,7 +293,7 @@ Parameters::Value* Parameters::Parameter<T>::clone () const
     *copy = new Parameter<T>;
 
   libmesh_assert (copy != NULL);
-  
+
   copy->_value = _value;
 
   return copy;
@@ -308,10 +308,10 @@ void Parameters::clear () // since this is inline we must define it
   while (!_values.empty())
     {
       Parameters::iterator it = _values.begin();
-      
-      delete it->second;      
+
+      delete it->second;
       it->second = NULL;
-      
+
       _values.erase(it);
     }
 }
@@ -336,7 +336,7 @@ Parameters& Parameters::operator+= (const Parameters& source)
       delete _values[it->first];
     _values[it->first] = it->second->clone();
   }
-  
+
   return *this;
 }
 
@@ -369,7 +369,7 @@ void Parameters::print (std::ostream& os) const
 #ifdef LIBMESH_HAVE_RTTI
 	 << "\t " << it->second->type()
 #endif // LIBMESH_HAVE_RTTI
-	 << "\t ";   it->second->print(os);      
+	 << "\t ";   it->second->print(os);
       os << '\n';
 
       ++it;
@@ -422,7 +422,7 @@ const T& Parameters::get (const std::string& name) const
 		    << " parameter named \""
 		    << name << "\":" << std::endl
 		    << *this;
-      
+
       libmesh_error();
     }
 
@@ -430,7 +430,7 @@ const T& Parameters::get (const std::string& name) const
 
   libmesh_assert (it != _values.end());
   libmesh_assert (it->second != NULL);
-  
+
   return libmesh_cast_ptr<Parameter<T>*>(it->second)->get();
 }
 
@@ -469,16 +469,16 @@ template <typename T>
 inline
 unsigned int Parameters::n_parameters () const
 {
-  unsigned int cnt = 0;  
-  
+  unsigned int cnt = 0;
+
   Parameters::const_iterator       it  = _values.begin();
   const Parameters::const_iterator end = _values.end();
-  
+
   for (; it != end; ++it)
     if (dynamic_cast<Parameter<T>*>(it->second) != NULL)
       cnt++;
 
-  return cnt;	 
+  return cnt;
 }
 #endif
 

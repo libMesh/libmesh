@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -33,7 +33,7 @@
 #include "enum_elem_type.h"
 #include "id_types.h"
 #include "mesh_base.h"
-#include "point.h" // some compilers want the full definition - I think so they can do 
+#include "point.h" // some compilers want the full definition - I think so they can do
                    // return-value-optimization for BoundingBox'es - BSK
 
 namespace libMesh
@@ -69,7 +69,7 @@ namespace MeshTools
   class BoundingBox : public std::pair<Point, Point>
   {
   public:
-    
+
     BoundingBox (const Point &min, const Point &max) :
       std::pair<Point, Point>(min, max)
     {}
@@ -99,7 +99,7 @@ namespace MeshTools
 
   private:
   };
-  
+
   /**
    * This function returns the sum over all the elemenents of the number
    * of nodes per element.  This can be useful for partitioning hybrid meshes.
@@ -107,7 +107,7 @@ namespace MeshTools
    * uniform as possible.
    */
   unsigned int total_weight (const MeshBase &mesh);
-  
+
   /**
    * This function returns the sum over all the elemenents on processor \p pid
    * of nodes per element.  This can be useful for partitioning hybrid meshes.
@@ -115,7 +115,7 @@ namespace MeshTools
    * uniform as possible.
    */
   unsigned int weight (const MeshBase &mesh, const unsigned int pid=libMesh::processor_id());
-  
+
   /**
    * After calling this function the input vector \p nodes_to_elem_map
    * will contain the node to element connectivity.  That is to say
@@ -124,7 +124,7 @@ namespace MeshTools
    */
   void build_nodes_to_elem_map (const MeshBase &mesh,
 				std::vector<std::vector<unsigned int> > &nodes_to_elem_map);
-  
+
   /**
    * The same, except element pointers are returned instead of indices.
    */
@@ -135,7 +135,7 @@ namespace MeshTools
 //   /**
 //    * Calling this function on a 2D mesh will convert all the elements
 //    * to triangles.  \p QUAD4s will be converted to \p TRI3s, \p QUAD8s
-//    * and \p QUAD9s will be converted to \p TRI6s. 
+//    * and \p QUAD9s will be converted to \p TRI6s.
 //    */
 //   void all_tri (MeshBase &mesh);
 
@@ -148,7 +148,7 @@ namespace MeshTools
 
   /**
    * @returns two points defining a cartesian box that bounds the
-   * mesh.  The first entry in the pair is the mininum, the second 
+   * mesh.  The first entry in the pair is the mininum, the second
    * is the maximim.
    */
   BoundingBox
@@ -159,10 +159,10 @@ namespace MeshTools
    */
   Sphere
   bounding_sphere (const MeshBase &mesh);
-  
+
   /**
    * @returns two points defining a cartesian box that bounds the
-   * elements belonging to processor pid. 
+   * elements belonging to processor pid.
    */
   BoundingBox
   processor_bounding_box (const MeshBase &mesh,
@@ -171,7 +171,7 @@ namespace MeshTools
   /**
    * Same, but returns a sphere instead of a box.
    */
-  Sphere 
+  Sphere
   processor_bounding_sphere (const MeshBase &mesh,
 			     const unsigned int pid);
 
@@ -186,7 +186,7 @@ namespace MeshTools
   /**
    * Same, but returns a sphere instead of a box.
    */
-  Sphere 
+  Sphere
   subdomain_bounding_sphere (const MeshBase &mesh,
 			     const subdomain_id_type sid);
 
@@ -197,7 +197,7 @@ namespace MeshTools
    */
   void elem_types (const MeshBase &mesh,
 		   std::vector<ElemType> &et);
-  
+
   /**
    * Return the number of elements of type \p type.  Implemented
    * in terms of type_element_iterators.
@@ -237,7 +237,7 @@ namespace MeshTools
    * maximum level.
    */
   unsigned int n_local_levels(const MeshBase &mesh);
- 
+
   /**
    * Return the number of levels of refinement in the active mesh.
    * Implemented by looping over all the active local elements and finding
@@ -258,14 +258,14 @@ namespace MeshTools
    * maximum p-level, then summing in parallel.
    */
   unsigned int n_p_levels (const MeshBase &mesh);
- 
+
   /**
    * Builds a set of node IDs for nodes which belong to non-subactive
    * elements.  Non-subactive elements are those which are either active
    * or inactive.  This is useful for determining which nodes should be
    * written to a data file, and is used by the XDA mesh writing methods.
    */
-  void get_not_subactive_node_ids(const MeshBase &mesh, 
+  void get_not_subactive_node_ids(const MeshBase &mesh,
                                   std::set<unsigned int> &not_subactive_node_ids);
 
   /**
@@ -285,22 +285,22 @@ namespace MeshTools
 
 
   /**
-   * Find the maxium h-refinement level in a mesh.   
+   * Find the maxium h-refinement level in a mesh.
    */
   unsigned int max_level (const MeshBase &mesh);
-    
-  
+
+
   /**
     * Given a mesh and a node in the mesh, the vector will be filled with
     * every node directly attached to the given one.
     */
-   void find_nodal_neighbors(const MeshBase &mesh, const Node &n, 
-                             std::vector<std::vector<const Elem*> > &nodes_to_elem_map, 
+   void find_nodal_neighbors(const MeshBase &mesh, const Node &n,
+                             std::vector<std::vector<const Elem*> > &nodes_to_elem_map,
                              std::vector<const Node*> &neighbors);
-   
+
    /**
     * Given a mesh hanging_nodes will be filled with an associative array keyed off the
-    * global id of all the hanging nodes in the mesh.  It will hold an array of the 
+    * global id of all the hanging nodes in the mesh.  It will hold an array of the
     * parents of the node (meaning the two nodes to either side of it that make up
     * the side the hanging node is on.
     */
@@ -382,7 +382,7 @@ namespace MeshTools
     /**
      * There is no reason for a user to ever call this function.
      *
-     * This function determines partition-agnostic global indices for all nodes and elements 
+     * This function determines partition-agnostic global indices for all nodes and elements
      * in the mesh.  Note that after this function is called the mesh will likely be in an
      * inconsistent state, i.e. \p mesh.nodes(i)->id() != i in the nodes container.
      * Direct node/element access via the \p mesh.node(n) or \p mesh.elem(e) functions will
@@ -392,7 +392,7 @@ namespace MeshTools
      */
     void globally_renumber_nodes_and_elements (MeshBase &);
   } // end namespace Private
-  
+
 } // end namespace MeshTools
 
 } // namespace libMesh

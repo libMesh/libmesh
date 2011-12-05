@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -45,12 +45,12 @@ namespace libMesh
  * implementation using raw element iterators incurred simply too much overhead
  * by using the predicated iterators, specifically operations such as advancing
  * such iterators has a cost proportional to the amount the iterator is advanced.
- * Hence in this implementation the user-provided range is packed into a vector. 
+ * Hence in this implementation the user-provided range is packed into a vector.
  *
  * \author Benjamin S. Kirk, 2008.
  */
 template <typename iterator_type, typename object_type>
-class StoredRange 
+class StoredRange
 {
 public:
   /**
@@ -73,7 +73,7 @@ public:
   {}
 
   /**
-   * Constructor.  Takes the beginning and end of the range.  
+   * Constructor.  Takes the beginning and end of the range.
    * Optionally takes the \p grainsize parameter, which is the
    * smallest chunk the range may be broken into for parallel
    * execution.
@@ -93,7 +93,7 @@ public:
 
   /**
    * Copy constructor.  The \p StoredRange can be copied into
-   * subranges for parallel execution.  In this way the 
+   * subranges for parallel execution.  In this way the
    * initial \p StoredRange can be thought of as the root of
    * a binary tree.  The root element is the only element
    * which interacts with the user.  It takes a specified
@@ -105,7 +105,7 @@ public:
    * vector.
    */
   StoredRange (const StoredRange<iterator_type,object_type> &er):
-    _end(er._end), 
+    _end(er._end),
     _begin(er._begin),
     _last(er._last),
     _first(er._first),
@@ -114,13 +114,13 @@ public:
   {
     // specifically, do *not* copy the vector
   }
-    
+
   /**
    * Splits the range \p r.  The first half
    * of the range is left in place, the second
    * half of the range is placed in *this.
    */
-  StoredRange (StoredRange<iterator_type,object_type> &r, Threads::split ) : 
+  StoredRange (StoredRange<iterator_type,object_type> &r, Threads::split ) :
     _end(r._end),
     _begin(r._begin),
     _last(r._last),
@@ -132,7 +132,7 @@ public:
       beginning = r._begin,
       ending    = r._end,
       middle    = beginning + std::distance(beginning, ending)/2u;
-    
+
     r._end = _begin = middle;
 
     unsigned int
@@ -142,13 +142,13 @@ public:
 
     r._last = _first = half;
   }
-    
+
   /**
    * Resets the \p StoredRange to contain [first,last).  Returns
    * a reference to itself for convenience, so functions
    * expecting a StoredRange<> can be passed e.g. foo.reset(begin,end).
    */
-  StoredRange<iterator_type, object_type> & 
+  StoredRange<iterator_type, object_type> &
   reset (const iterator_type &first,
 	 const iterator_type &last)
   {
@@ -156,13 +156,13 @@ public:
 
     for (iterator_type it=first; it!=last; ++it)
       _objs.push_back(*it);
-    
+
     _begin = _objs.begin();
     _end   = _objs.end();
 
     _first = 0;
     _last  = _objs.size();
-    
+
     return *this;
   }
 
@@ -183,12 +183,12 @@ public:
 
     return *this;
   }
-  
+
   /**
    * Beginning of the range.
    */
-  const_iterator begin () const { return _begin; }  
-  
+  const_iterator begin () const { return _begin; }
+
   /**
    * End of the range.
    */
@@ -205,7 +205,7 @@ public:
   unsigned int last_idx () const { return _last; }
 
   /**
-   * The grain size for the range.  The range will be subdivided into 
+   * The grain size for the range.  The range will be subdivided into
    * subranges not to exceed the grain size.
    */
   unsigned int grainsize () const {return _grainsize;}
@@ -226,7 +226,7 @@ public:
 
   /**
    * Returns true if the range is empty.
-   */  
+   */
   bool empty() const { return (_begin == _end); }
 
   /**

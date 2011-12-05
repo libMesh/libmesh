@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -61,19 +61,19 @@ void JumpErrorEstimator::estimate_error (const System& system,
   /*
 
   Conventions for assigning the direction of the normal:
-  
+
   - e & f are global element ids
-  
+
   Case (1.) Elements are at the same level, e<f
             Compute the flux jump on the face and
 	    add it as a contribution to error_per_cell[e]
 	    and error_per_cell[f]
-  
+
                    ----------------------
 		  |           |          |
 		  |           |    f     |
 		  |           |          |
-		  |    e      |---> n    | 
+		  |    e      |---> n    |
 		  |           |          |
 		  |           |          |
                    ----------------------
@@ -88,22 +88,22 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		  |     |     |          |
 		  |     |  e  |---> n    |
 		  |     |     |          |
-		  |-----------|    f     | 
+		  |-----------|    f     |
 		  |     |     |          |
 		  |     |     |          |
 		  |     |     |          |
                    ----------------------
   */
-   
+
   // The current mesh
   const MeshBase& mesh = system.get_mesh();
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // The number of variables in the system
   const unsigned int n_vars = system.n_vars();
-  
+
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
@@ -125,7 +125,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
   // f gets 1/2 of a flux face contribution from each of his
   // neighbors
   std::vector<float> n_flux_faces (error_per_cell.size());
-  
+
   // Prepare current_local_solution to localize a non-standard
   // solution vector if necessary
   if (solution_vector && solution_vector != system.solution.get())
@@ -136,7 +136,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
       newsol->swap(*sys.solution);
       sys.update();
     }
-  
+
   // Loop over all the variables in the system
   for (var=0; var<n_vars; var++)
     {
@@ -145,7 +145,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
-      
+
       // Finite element objects for the same face from
       // different sides
       fe_fine = FEBase::build (dim, fe_type);
@@ -157,7 +157,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
       // Tell the finite element for the fine element about the quadrature
       // rule.  The finite element for the coarse element need not know about it
       fe_fine->attach_quadrature_rule (&qrule);
-      
+
       // By convention we will always do the integration
       // on the face of element e.  We'll need its Jacobian values and
       // physical point locations, at least
@@ -166,17 +166,17 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
       // Our derived classes may want to do some initialization here
       this->initialize(system, error_per_cell, estimate_parent_error);
-      
+
       // The global DOF indices for elements e & f
       std::vector<unsigned int> dof_indices_fine;
       std::vector<unsigned int> dof_indices_coarse;
 
 
-      
+
       // Iterate over all the active elements in the mesh
       // that live on this processor.
       MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
+      const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
       for (; elem_it != elem_end; ++elem_it)
 	{
@@ -198,7 +198,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
             for (unsigned int c=0; c != parent->n_children(); ++c)
               if (!parent->child(c)->active())
                 compute_on_parent = false;
-             
+
           if (compute_on_parent &&
               !error_per_cell[parent->id()])
 	    {
@@ -219,7 +219,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		        active_family_tree_by_neighbor(active_neighbors,
                                                        parent);
                       // Compute the flux to each active neighbor
-                      for (unsigned int a=0; 
+                      for (unsigned int a=0;
                            a != active_neighbors.size(); ++a)
                         {
                           const Elem *f = active_neighbors[a];
@@ -234,7 +234,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		              dof_map.dof_indices (fine_elem, dof_indices_fine, var);
 		              const unsigned int n_dofs_fine = dof_indices_fine.size();
                               Ufine.resize(n_dofs_fine);
-			
+
 			      for (unsigned int i=0; i<n_dofs_fine; i++)
 			        Ufine(i) = system.current_solution(dof_indices_fine[i]);
                               this->reinit_sides();
@@ -263,7 +263,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
                           error_per_cell[fine_elem->id()] += fine_error;
                           n_flux_faces[fine_elem->id()]++;
                         }
-                    } 
+                    }
 		}
 	    }
 #endif // #ifdef LIBMESH_ENABLE_AMR
@@ -284,7 +284,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		  // Compute flux jumps if we are in case 1 or case 2.
 		  if ((f->active() && (f->level() == e->level()) && (e_id < f_id))
 		      || (f->level() < e->level()))
-		    {		    
+		    {
                       // f is now the coarse element
                       coarse_elem = f;
 
@@ -303,7 +303,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 			Ufine(i) = system.current_solution(dof_indices_fine[i]);
 		      for (unsigned int i=0; i<n_dofs_coarse; i++)
 			Ucoarse(i) = system.current_solution(dof_indices_coarse[i]);
-			
+
                       this->reinit_sides();
                       this->internal_side_integration();
 
@@ -332,7 +332,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
                       // Reinitialize shape functions on the fine element side
                       fe_fine->reinit (fine_elem, fine_side);
 
-		      // Get the DOF indices 
+		      // Get the DOF indices
 		      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
 
 		      // The number of DOFS on each element
@@ -354,7 +354,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
     } // End loop over variables
 
 
-  
+
   // Each processor has now computed the error contribuions
   // for its local elements.  We need to sum the vector
   // and then take the square-root of each component.  Note
@@ -383,18 +383,18 @@ void JumpErrorEstimator::estimate_error (const System& system,
       for (unsigned int i=0; i<n_flux_faces.size(); ++i)
 	libmesh_assert (n_flux_faces[i] == static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
 #endif
-  
+
       // Scale the error by the number of flux faces for each element
       for (unsigned int i=0; i<n_flux_faces.size(); ++i)
 	{
 	  if (n_flux_faces[i] == 0.0) // inactive or non-local element
 	    continue;
-      
+
 	  //libMesh::out << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
-	  error_per_cell[i] /= static_cast<Real>(n_flux_faces[i]); 
+	  error_per_cell[i] /= static_cast<Real>(n_flux_faces[i]);
 	}
     }
-  
+
   // If we used a non-standard solution before, now is the time to fix
   // the current_local_solution
   if (solution_vector && solution_vector != system.solution.get())

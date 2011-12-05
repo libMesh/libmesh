@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -65,7 +65,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // Resize the error_per_cell vector to be
   // the number of elements, initialized to 0.
   error_per_cell.clear();
@@ -117,7 +117,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // avoid declaring it unless asserts are active.
   const unsigned int n_coarse_elem = mesh.n_elem();
 #endif
-  
+
   // Uniformly refine the mesh
   MeshRefinement mesh_refinement(mesh);
 
@@ -131,7 +131,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       mesh_refinement.uniformly_refine(1);
       es.reinit();
     }
-      
+
   for (unsigned int i = 0; i != number_p_refinements; ++i)
     {
       mesh_refinement.uniformly_p_refine(1);
@@ -141,7 +141,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   for (unsigned int i=0; i != system_list.size(); ++i)
     {
       System &system = *system_list[i];
-      
+
       // Copy the projected coarse grid solutions, which will be
       // overwritten by solve()
 //      projected_solutions[i] = system.solution->clone().release();
@@ -163,7 +163,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
           libmesh_assert(solution_vectors->size() == es.n_systems());
 	  libmesh_assert(solution_vectors->find(system_list[0]) !=
 			 solution_vectors->end());
-	  const bool solve_adjoint = 
+	  const bool solve_adjoint =
             (system_list[0]->have_vector("adjoint_solution0") &&
              (solution_vectors->find(system_list[0])->second ==
 	      &system_list[0]->get_adjoint_solution()));
@@ -171,7 +171,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	    (solution_vectors->find(system_list[0])->second ==
 	     system_list[0]->solution.get()) ||
 	     !solution_vectors->find(system_list[0])->second);
-			 
+
 #ifdef DEBUG
 	  for (unsigned int i=0; i != system_list.size(); ++i)
 	    {
@@ -215,7 +215,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  libmesh_assert(solution_vectors->find(system_list[0]) !=
 			 solution_vectors->end());
 
-	  const bool solve_adjoint = 
+	  const bool solve_adjoint =
             (system_list[0]->have_vector("adjoint_solution0") &&
              (solution_vectors->find(system_list[0])->second ==
 	      &system_list[0]->get_adjoint_solution()));
@@ -239,7 +239,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
             system_list[0]->solve();
         }
     }
-  
+
   // Get the error in the uniformly refined solution(s).
 
   for (unsigned int i=0; i != system_list.size(); ++i)
@@ -269,14 +269,14 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
           // The type of finite element to use for this variable
           const FEType& fe_type = dof_map.variable_type (var);
-      
+
           // Finite element object for each fine element
           AutoPtr<FEBase> fe (FEBase::build (dim, fe_type));
 
           // Build and attach an appropriate quadrature rule
           AutoPtr<QBase> qrule = fe_type.default_quadrature_rule(dim);
           fe->attach_quadrature_rule (qrule.get());
-      
+
           const std::vector<Real>&  JxW = fe->get_JxW();
           const std::vector<std::vector<Real> >& phi = fe->get_phi();
           const std::vector<std::vector<RealGradient> >& dphi =
@@ -288,11 +288,11 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
           // The global DOF indices for the fine element
           std::vector<unsigned int> dof_indices;
-      
+
           // Iterate over all the active elements in the fine mesh
           // that live on this processor.
           MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
+          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
           for (; elem_it != elem_end; ++elem_it)
 	    {
@@ -308,7 +308,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
                   coarse = coarse->parent();
                   e_id = coarse->id();
                 }
-          
+
               double L2normsq = 0., H1seminormsq = 0., H2seminormsq = 0.;
 
               // reinitialize the element-specific data
@@ -402,7 +402,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
                   system_i_norm.type(var) == H2 ||
                   system_i_norm.type(var) == H1_SEMINORM)
                 (*err_vec)[e_id] += H1seminormsq;
-              
+
               if (system_i_norm.type(var) == H2 ||
                   system_i_norm.type(var) == H2_SEMINORM)
                 (*err_vec)[e_id] += H2seminormsq;
@@ -424,7 +424,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       // FIXME - should the reinits here be necessary? - RHS
       es.reinit();
     }
-      
+
   for (unsigned int i = 0; i != number_p_refinements; ++i)
     {
       mesh_refinement.uniformly_p_coarsen(1);
@@ -478,7 +478,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       System &system = *system_list[i];
 
       system.project_solution_on_reinit() = old_projection_settings[i];
-  
+
       // Restore the coarse solution vectors and delete their copies
       *system.solution = *coarse_solutions[i];
       delete coarse_solutions[i];

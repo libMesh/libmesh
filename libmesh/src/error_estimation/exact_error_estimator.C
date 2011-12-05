@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -111,10 +111,10 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // The number of variables in the system
   const unsigned int n_vars = system.n_vars();
-  
+
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
@@ -133,7 +133,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
       newsol->swap(*sys.solution);
       sys.update();
     }
-  
+
   // Loop over all the variables in the system
   for (unsigned int var=0; var<n_vars; var++)
     {
@@ -142,10 +142,10 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
       // The (string) name of this variable
       const std::string& var_name = system.variable_name(var);
-      
+
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
-      
+
       AutoPtr<FEBase> fe (FEBase::build (dim, fe_type));
 
       // Build an appropriate Gaussian quadrature rule
@@ -190,7 +190,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
       // If we compute on parent elements, we'll want to do so only
       // once on each, so we need to keep track of which we've done.
       std::vector<bool> computed_var_on_parent;
-      
+
 #ifdef LIBMESH_ENABLE_AMR
       if (estimate_parent_error)
 	computed_var_on_parent.resize(error_per_cell.size(), false);
@@ -205,7 +205,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
       MeshBase::const_element_iterator
         elem_it  = mesh.active_local_elements_begin();
       const MeshBase::const_element_iterator
-        elem_end = mesh.active_local_elements_end(); 
+        elem_end = mesh.active_local_elements_end();
 
       for (;elem_it != elem_end; ++elem_it)
 	{
@@ -260,7 +260,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
     } // End loop over variables
 
 
-  
+
   // Each processor has now computed the error contribuions
   // for its local elements.  We need to sum the vector
   // and then take the square-root of each component.  Note
@@ -276,14 +276,14 @@ void ExactErrorEstimator::estimate_error (const System& system,
   START_LOG("std::sqrt()", "ExactErrorEstimator");
   for (unsigned int i=0; i<error_per_cell.size(); i++)
     {
-      
+
       if (error_per_cell[i] != 0.)
 	{
 	  libmesh_assert (error_per_cell[i] > 0.);
 	  error_per_cell[i] = std::sqrt(error_per_cell[i]);
 	}
-      
-      
+
+
     }
   STOP_LOG("std::sqrt()", "ExactErrorEstimator");
 
@@ -312,7 +312,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
   const std::string& sys_name = system.name();
 
   unsigned int var = system.variable_number(var_name);
-  
+
   const Parameters& parameters = system.get_equation_systems().parameters;
 
   // reinitialize the element-specific data
@@ -381,7 +381,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 
       // Compute the value of the error in the gradient at this
       // quadrature point
-      if ((_exact_deriv || _equation_systems_fine) && 
+      if ((_exact_deriv || _equation_systems_fine) &&
           (error_norm.type(var) == H1 ||
            error_norm.type(var) == H1_SEMINORM ||
            error_norm.type(var) == H2))
@@ -399,7 +399,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // Compute the value of the error in the hessian at this
       // quadrature point
-      if ((_exact_hessian || _equation_systems_fine) && 
+      if ((_exact_hessian || _equation_systems_fine) &&
           (error_norm.type(var) == H2_SEMINORM ||
            error_norm.type(var) == H2))
         {
@@ -416,7 +416,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
     } // end qp loop
 
   libmesh_assert (error_val >= 0.);
-	  
+
   return error_val;
 }
 

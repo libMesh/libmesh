@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -57,13 +57,13 @@ public:
    * The parent class
    */
   typedef UnsteadySolver Parent;
-  
+
   /**
    * Constructor. Requires a reference to the system
    * to be solved.
    */
   AdaptiveTimeSolver (sys_type& s);
-  
+
   /**
    * Destructor.
    */
@@ -130,10 +130,10 @@ public:
 
   /**
    * This tolerance is the maximum relative error between double-deltat and
-   * single-deltat timesteps, scaled by deltat.  If this error tolerance is 
+   * single-deltat timesteps, scaled by deltat.  If this error tolerance is
    * exceeded, the current timestep will be repeated with a smaller deltat.
    *
-   * If you use the default upper_tolerance=0.0, 
+   * If you use the default upper_tolerance=0.0,
    */
   Real upper_tolerance;
 
@@ -148,7 +148,7 @@ public:
    * The default value is 0.0.
    */
   Real min_deltat;
-  
+
   /**
    * Do not allow the adaptive time solver to select
    * a new deltat greater than max_growth times the old deltat.
@@ -172,7 +172,7 @@ public:
    * as well.
    */
   bool global_tolerance;
-  
+
 protected:
 
   /**

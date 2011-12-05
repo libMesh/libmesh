@@ -71,8 +71,8 @@ struct AutoPtrRef
   AutoPtrRef(Tp1* p)
     : _ptr(p) {}
 };
-  
-  
+
+
 /**
  *  @brief  A simple smart pointer providing strict ownership semantics.
  *
@@ -109,13 +109,13 @@ private:
    * The actual dumb pointer this class wraps.
    */
   Tp* _ptr;
-    
+
 public:
   /**
    * The pointed-to type.
    */
   typedef Tp element_type;
-    
+
   /**
    *  @brief  An %AutoPtr is usually constructed from a raw pointer.
    *  @param  p  A pointer (defaults to NULL).
@@ -123,7 +123,7 @@ public:
    *  This object now @e owns the object pointed to by @a p.
    */
   explicit
-  AutoPtr(element_type* p = 0) 
+  AutoPtr(element_type* p = 0)
     : _ptr(p) {}
 
   /**
@@ -133,7 +133,7 @@ public:
    *  This object now @e owns the object previously owned by @a a, which has
    *  given up ownsership.
    */
-  AutoPtr(AutoPtr& a) 
+  AutoPtr(AutoPtr& a)
     : _ptr(a.release()) {}
 
   /**
@@ -146,7 +146,7 @@ public:
    *  given up ownsership.
    */
   template<typename Tp1>
-  AutoPtr(AutoPtr<Tp1>& a) 
+  AutoPtr(AutoPtr<Tp1>& a)
     : _ptr(a.release()) {}
 
   /**
@@ -158,12 +158,12 @@ public:
    *  track has been deleted.
    */
   AutoPtr&
-  operator=(AutoPtr& a) 
+  operator=(AutoPtr& a)
   {
     reset(a.release());
     return *this;
   }
-    
+
   /**
    *  @brief  %AutoPtr assignment operator.
    *  @param  a  Another %AutoPtr of a different but related type.
@@ -176,7 +176,7 @@ public:
    */
   template <typename Tp1>
   AutoPtr&
-  operator=(AutoPtr<Tp1>& a) 
+  operator=(AutoPtr<Tp1>& a)
   {
     reset(a.release());
     return *this;
@@ -195,7 +195,7 @@ public:
    *  @endif maint
    */
   ~AutoPtr() { delete _ptr; }
-    
+
   /**
    *  @brief  Smart pointer dereferencing.
    *
@@ -206,7 +206,7 @@ public:
    */
   element_type&
   operator*() const  { return *_ptr; }
-    
+
   /**
    *  @brief  Smart pointer dereferencing.
    *
@@ -215,7 +215,7 @@ public:
    */
   element_type*
   operator->() const  { return _ptr; }
-    
+
   /**
    *  @brief  Bypassing the smart pointer.
    *  @return  The raw pointer being managed.
@@ -228,7 +228,7 @@ public:
    */
   element_type*
   get() const  { return _ptr; }
-    
+
   /**
    *  @brief  Bypassing the smart pointer.
    *  @return  The raw pointer being managed.
@@ -241,13 +241,13 @@ public:
    *  goes out of scope, nothing will happen.
    */
   element_type*
-  release() 
+  release()
   {
     element_type* tmp = _ptr;
     _ptr = 0;
     return tmp;
   }
-    
+
   /**
    *  @brief  Forcibly deletes the managed object.
    *  @param  p  A pointer (defaults to NULL).
@@ -256,7 +256,7 @@ public:
    *  object has been deleted.
    */
   void
-  reset(element_type* p = 0) 
+  reset(element_type* p = 0)
   {
     if (p != _ptr)
       {
@@ -264,7 +264,7 @@ public:
 	_ptr = p;
       }
   }
-    
+
   /** @{
    *  @brief  Automatic conversions
    *
@@ -276,7 +276,7 @@ public:
    *    AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
    *  @endcode
    */
-  AutoPtr(AutoPtrRef<element_type> ref) 
+  AutoPtr(AutoPtrRef<element_type> ref)
     : _ptr(ref._ptr) {}
 
   /**
@@ -286,7 +286,7 @@ public:
    * @endcode
    */
   AutoPtr&
-  operator=(AutoPtrRef<element_type> ref) 
+  operator=(AutoPtrRef<element_type> ref)
   {
     if (ref._ptr != this->get())
       {
@@ -300,14 +300,14 @@ public:
    * op() for AutoPtrRef<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
-  operator AutoPtrRef<Tp1>() 
+  operator AutoPtrRef<Tp1>()
   { return AutoPtrRef<Tp1>(this->release()); }
-    
+
   /**
    * op() for AutoPtr<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
-  operator AutoPtr<Tp1>() 
+  operator AutoPtr<Tp1>()
   { return AutoPtr<Tp1>(this->release()); }
 };
 

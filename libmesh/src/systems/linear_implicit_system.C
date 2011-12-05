@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -39,7 +39,7 @@ namespace libMesh
 LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
 					    const std::string& name,
 					    const unsigned int number) :
-  
+
   Parent                 (es, name, number),
   linear_solver          (LinearSolver<Number>::build()),
   _n_linear_iterations   (0),
@@ -66,7 +66,7 @@ void LinearImplicitSystem::clear ()
   linear_solver->clear();
 
   this->restrict_solve_to(NULL);
-  
+
   // clear the parent data
   Parent::clear();
 }
@@ -76,7 +76,7 @@ void LinearImplicitSystem::clear ()
 void LinearImplicitSystem::init_data ()
 {
   // initialize parent data
-  Parent::init_data();  
+  Parent::init_data();
 
   // re-initialize the linear solver interface
   linear_solver->clear();
@@ -88,9 +88,9 @@ void LinearImplicitSystem::reinit ()
 {
   // re-initialize the linear solver interface
   linear_solver->clear();
-  
+
   // initialize parent data
-  Parent::reinit();  
+  Parent::reinit();
 }
 
 
@@ -112,7 +112,7 @@ void LinearImplicitSystem::solve ()
 {
   if (this->assemble_before_solve)
     // Assemble the linear system
-    this->assemble (); 
+    this->assemble ();
 
   // Log how long the linear solve takes.
   // This gets done by the LinearSolver classes now [RHS]
@@ -121,7 +121,7 @@ void LinearImplicitSystem::solve ()
   // Get a reference to the EquationSystems
   const EquationSystems& es =
     this->get_equation_systems();
-  
+
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
     es.parameters.get<Real>("linear solver tolerance");
@@ -153,13 +153,13 @@ void LinearImplicitSystem::solve ()
   // solve and the final residual.
   _n_linear_iterations   = rval.first;
   _final_linear_residual = rval.second;
-    
+
   // Stop logging the linear solve
   // This gets done by the LinearSolver classes now [RHS]
   // STOP_LOG("solve()", "System");
 
   // Update the system after the solve
-  this->update();  
+  this->update();
 }
 
 
@@ -176,7 +176,7 @@ void LinearImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
   if (this->assemble_before_solve)
     {
       // Assemble the linear system
-      this->assemble (); 
+      this->assemble ();
 
       // But now assemble right hand sides with the residual's
       // parameter derivatives
@@ -186,7 +186,7 @@ void LinearImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
   // Get a reference to the EquationSystems
   const EquationSystems& es =
     this->get_equation_systems();
-  
+
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
     es.parameters.get<Real>("sensitivity solver tolerance");
@@ -235,7 +235,7 @@ void LinearImplicitSystem::adjoint_solve (const QoISet &qoi_indices)
   if (this->assemble_before_solve)
     {
       // Assemble the linear system
-      this->assemble (); 
+      this->assemble ();
 
       // And take the adjoint
       matrix->get_transpose(*matrix);
@@ -253,7 +253,7 @@ void LinearImplicitSystem::adjoint_solve (const QoISet &qoi_indices)
   // Get a reference to the EquationSystems
   const EquationSystems& es =
     this->get_equation_systems();
-  
+
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
     es.parameters.get<Real>("adjoint solver tolerance");
@@ -299,7 +299,7 @@ void LinearImplicitSystem::forward_qoi_parameter_sensitivity
   //
   // This implies that:
   // d/dp(R) = 0
-  // (partial b / partial p) - 
+  // (partial b / partial p) -
   // (partial A / partial p) * u -
   // A * (partial u / partial p) = 0
   // A * (partial u / partial p) = (partial R / partial p)
@@ -316,10 +316,10 @@ void LinearImplicitSystem::forward_qoi_parameter_sensitivity
   // We use the identity:
   // dq/dp = (partial q / partial p) + (partial q / partial u) *
   //         (partial u / partial p)
- 
+
   // We get (partial q / partial u) from the user
   this->assemble_qoi_derivative(qoi_indices);
- 
+
   for (unsigned int j=0; j != Np; ++j)
     {
       // We currently get partial derivatives via central differencing
@@ -372,7 +372,7 @@ void LinearImplicitSystem::release_linear_solver(LinearSolver<Number>*) const
 
 
 
-void LinearImplicitSystem::assembly(bool, 
+void LinearImplicitSystem::assembly(bool,
 				    bool)
 {
   // Residual R(u(p),p) := A(p)*u(p) - b(p)

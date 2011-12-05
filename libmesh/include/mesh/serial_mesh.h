@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -131,10 +131,10 @@ class SerialMesh : public UnstructuredMesh
      * There is no reason for a user to ever call this function.
      *
      * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n. 
+     * \p mesh.node(n)->id() == n.
      */
   virtual void fix_broken_node_and_element_numbering ();
-  
+
 public:
   /**
    * Elem iterator accessor functions.
@@ -198,25 +198,25 @@ public:
 
   element_iterator unpartitioned_elements_begin ();
   element_iterator unpartitioned_elements_end ();
-  
+
   element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id);
   element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id);
-  
+
   /**
    * const Elem iterator accessor functions.
    */
   const_element_iterator elements_begin() const;
   const_element_iterator elements_end()   const;
-  
+
   const_element_iterator active_elements_begin() const;
   const_element_iterator active_elements_end()   const;
-  
+
   const_element_iterator ancestor_elements_begin() const;
   const_element_iterator ancestor_elements_end()   const;
-  
+
   const_element_iterator subactive_elements_begin() const;
   const_element_iterator subactive_elements_end()   const;
-  
+
   const_element_iterator not_active_elements_begin() const;
   const_element_iterator not_active_elements_end()   const;
 
@@ -264,27 +264,27 @@ public:
 
   const_element_iterator unpartitioned_elements_begin () const;
   const_element_iterator unpartitioned_elements_end () const;
-  
+
   const_element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id) const;
   const_element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id) const;
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
   /**
    * non-const Node iterator accessor functions.
    */
   node_iterator nodes_begin();
   node_iterator nodes_end();
-  
+
   node_iterator active_nodes_begin();
   node_iterator active_nodes_end();
 
   node_iterator local_nodes_begin  ();
   node_iterator local_nodes_end    ();
-  
+
   node_iterator pid_nodes_begin (const unsigned int proc_id);
   node_iterator pid_nodes_end   (const unsigned int proc_id);
 
@@ -302,20 +302,20 @@ public:
 
   const_node_iterator pid_nodes_begin (const unsigned int proc_id) const;
   const_node_iterator pid_nodes_end   (const unsigned int proc_id) const;
-  
+
 protected:
   /**
    * The verices (spatial coordinates) of the mesh.
    */
   std::vector<Node*> _nodes;
-  
+
   /**
    * The elements in the mesh.
    */
   std::vector<Elem*> _elements;
 
 private:
-  
+
   /**
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Elem*>.

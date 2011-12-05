@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public  License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -145,7 +145,7 @@ const FEType& DofMap::variable_type (const unsigned int c) const
 void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 {
   _matrices.push_back(&matrix);
-  
+
   matrix.attach_dof_map (*this);
 }
 
@@ -280,7 +280,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
               requested->set_n_comp(this->sys_number(), v, n_comp);
               if (n_comp)
                 {
-                  unsigned int first_dof = 
+                  unsigned int first_dof =
                     filled_request[i*2*n_variables+n_variables+v];
                   libmesh_assert(first_dof != DofObject::invalid_id);
                   requested->set_dof_number
@@ -314,31 +314,31 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 void DofMap::reinit(MeshBase& mesh)
 {
   libmesh_assert (mesh.is_prepared());
-  
+
   START_LOG("reinit()", "DofMap");
-  
+
   //this->clear();
 
   const unsigned int n_var = this->n_variables();
 
 #ifdef LIBMESH_ENABLE_AMR
-  
+
   //------------------------------------------------------------
   // Clear the old_dof_objects for all the nodes
   // and elements so that we can overwrite them
   {
     MeshBase::node_iterator       node_it  = mesh.nodes_begin();
     const MeshBase::node_iterator node_end = mesh.nodes_end();
-    
+
     for ( ; node_it != node_end; ++node_it)
       {
 	(*node_it)->clear_old_dof_object();
 	libmesh_assert ((*node_it)->old_dof_object == NULL);
       }
-    
+
     MeshBase::element_iterator       elem_it  = mesh.elements_begin();
     const MeshBase::element_iterator elem_end = mesh.elements_end();
-    
+
     for ( ; elem_it != elem_end; ++elem_it)
       {
 	(*elem_it)->clear_old_dof_object();
@@ -346,7 +346,7 @@ void DofMap::reinit(MeshBase& mesh)
       }
   }
 
-  
+
   //------------------------------------------------------------
   // Set the old_dof_objects for the elements that
   // weren't just created, if these old dof objects
@@ -354,7 +354,7 @@ void DofMap::reinit(MeshBase& mesh)
   {
     MeshBase::element_iterator       elem_it  = mesh.elements_begin();
     const MeshBase::element_iterator elem_end = mesh.elements_end();
-    
+
     for ( ; elem_it != elem_end; ++elem_it)
       {
 	Elem* elem = *elem_it;
@@ -372,7 +372,7 @@ void DofMap::reinit(MeshBase& mesh)
 	  }
 
 	libmesh_assert (elem->old_dof_object == NULL);
-	
+
 	if (elem->has_dofs(this->sys_number()))
 	  elem->set_old_dof_object();
       }
@@ -380,7 +380,7 @@ void DofMap::reinit(MeshBase& mesh)
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-  
+
   //------------------------------------------------------------
   // Then set the number of variables for each \p DofObject
   // equal to n_variables() for this system.  This will
@@ -426,15 +426,15 @@ void DofMap::reinit(MeshBase& mesh)
 
       // For all the active elements
       MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
- 
+      const MeshBase::element_iterator elem_end = mesh.active_elements_end();
+
       // Count vertex degrees of freedom first
       for ( ; elem_it != elem_end; ++elem_it)
 	{
 	  Elem* elem  = *elem_it;
 	  libmesh_assert (elem != NULL);
-	  
-	  // Skip the numbering if this variable is 
+
+	  // Skip the numbering if this variable is
 	  // not active on this element's subdoman
 	  if (!var_description.active_on_subdomain(elem->subdomain_id()))
 	    continue;
@@ -454,12 +454,12 @@ void DofMap::reinit(MeshBase& mesh)
               if (FEInterface::max_order(base_fe_type,type) <
                   static_cast<unsigned int>(base_fe_type.order))
                 {
-                  libMesh::err 
+                  libMesh::err
                     << "ERROR: Finite element "
                     << Utility::enum_to_string(base_fe_type.family)
                     << " on geometric element "
                     << Utility::enum_to_string(type) << std::endl
-                    << "only supports FEInterface::max_order = " 
+                    << "only supports FEInterface::max_order = "
                     << FEInterface::max_order(base_fe_type,type)
                     << ", not fe_type.order = " << base_fe_type.order
                     << std::endl;
@@ -472,7 +472,7 @@ void DofMap::reinit(MeshBase& mesh)
                 << Utility::enum_to_string(base_fe_type.family)
                 << " on geometric element "
                 << Utility::enum_to_string(type) << std::endl
-                << "could not be p refined past FEInterface::max_order = " 
+                << "could not be p refined past FEInterface::max_order = "
                 << FEInterface::max_order(base_fe_type,type)
                 << std::endl;
 #  endif
@@ -483,7 +483,7 @@ void DofMap::reinit(MeshBase& mesh)
 
 	  fe_type.order = static_cast<Order>(fe_type.order +
                                              elem->p_level());
-	     
+
 	  // Allocate the vertex DOFs
 	  for (unsigned int n=0; n<elem->n_nodes(); n++)
 	    {
@@ -498,7 +498,7 @@ void DofMap::reinit(MeshBase& mesh)
 		    std::max(FEInterface::n_dofs_at_node(dim, fe_type,
                                                          type, n),
                              old_node_dofs);
-		  
+
 		  // Some discontinuous FEs have no vertex dofs
 		  if (vertex_dofs > old_node_dofs)
 		    {
@@ -520,15 +520,15 @@ void DofMap::reinit(MeshBase& mesh)
 	{
 	  Elem* elem = *elem_it;
 	  libmesh_assert (elem != NULL);
-	  
-	  // Skip the numbering if this variable is 
+
+	  // Skip the numbering if this variable is
 	  // not active on this element's subdoman
 	  if (!var_description.active_on_subdomain(elem->subdomain_id()))
 	    continue;
 
 	  const ElemType type = elem->type();
           const unsigned int dim = elem->dim();
-	     
+
           FEType fe_type = base_fe_type;
           fe_type.order = static_cast<Order>(fe_type.order +
                                              elem->p_level());
@@ -645,7 +645,7 @@ void DofMap::reinit(MeshBase& mesh)
   // Finally, clear all the current DOF indices
   // (distribute_dofs expects them cleared!)
   this->invalidate_dofs(mesh);
-  
+
   STOP_LOG("reinit()", "DofMap");
 }
 
@@ -661,10 +661,10 @@ void DofMap::invalidate_dofs(MeshBase& mesh) const
 
   for ( ; node_it != node_end; ++node_it)
     (*node_it)->invalidate_dofs(sys_num);
-  
+
   // All the elements
   MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.active_elements_end(); 
+  const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
   for ( ; elem_it != elem_end; ++elem_it)
     (*elem_it)->invalidate_dofs(sys_num);
@@ -679,7 +679,7 @@ void DofMap::clear()
   // It should not change...
   //_dof_coupling->clear();
 
-  _variables.clear();  
+  _variables.clear();
   _first_df.clear();
   _end_df.clear();
   _var_first_local_df.clear();
@@ -716,13 +716,13 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   const unsigned int proc_id = libMesh::processor_id();
   const unsigned int n_proc  = libMesh::n_processors();
-  
+
 //  libmesh_assert (this->n_variables() > 0);
   libmesh_assert (proc_id < n_proc);
-  
+
   // re-init in case the mesh has changed
   this->reinit(mesh);
-  
+
   // By default distribute variables in a
   // var-major fashion, but allow run-time
   // specification
@@ -790,7 +790,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
                                      mesh.elements_end(),
                                      mesh, &DofMap::elem_ptr);
     }
-  
+
   // Set the total number of degrees of freedom
 #ifdef LIBMESH_ENABLE_AMR
   _n_old_dfs = _n_dfs;
@@ -803,7 +803,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   // boundaries that are shared by multiple elements are added for
   // each element.
   this->add_neighbors_to_send_list(mesh);
-  
+
   // Here we used to clean up that data structure; now System and
   // EquationSystems call that for us, after we've added constraint
   // dependencies to the send_list too.
@@ -829,15 +829,15 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
   //-------------------------------------------------------------------------
   // First count and assign temporary numbers to local dofs
   MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();  
-  
+  const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();
+
   for ( ; elem_it != elem_end; ++elem_it)
     {
       // Only number dofs connected to active
       // elements on this processor.
       Elem* elem                 = *elem_it;
       const unsigned int n_nodes = elem->n_nodes();
-      
+
       // First number the nodal DOFS
       for (unsigned int n=0; n<n_nodes; n++)
         {
@@ -882,7 +882,7 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
 	      next_free_dof += elem->n_comp(sys_num,var);
 	    }
     } // done looping over elements
-    
+
 
   // we may have missed assigning DOFs to nodes that we own
   // but to which we have no connected elements matching our
@@ -895,26 +895,26 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
   {
     MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
     const MeshBase::node_iterator node_end = mesh.local_nodes_end();
-    
+
     for (; node_it != node_end; ++node_it)
       {
 	Node *node = *node_it;
 	libmesh_assert(node);
 
-	for (unsigned var=0; var<n_vars; var++)	  
+	for (unsigned var=0; var<n_vars; var++)
 	  if (node->n_comp(sys_num,var))
 	    if (node->dof_number(sys_num,var,0) == DofObject::invalid_id)
-	      {		
+	      {
 		node->set_dof_number (sys_num,
 				      var,
 				      0,
 				      next_free_dof);
-		
+
 		next_free_dof += node->n_comp(sys_num,var);
 	      }
       }
   }
-  
+
   // Finally, count up the SCALAR dofs
   this->_n_SCALAR_dofs = 0;
   for (unsigned var=0; var<n_vars; var++)
@@ -935,7 +935,7 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
   {
     // Make sure we didn't miss any nodes
     MeshTools::libmesh_assert_valid_node_procids(mesh);
-    
+
     MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
     const MeshBase::node_iterator node_end = mesh.local_nodes_end();
     for (; node_it != node_end; ++node_it)
@@ -997,12 +997,12 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
 	    continue;
 
           const unsigned int n_nodes = elem->n_nodes();
-          
+
           // First number the nodal DOFS
           for (unsigned int n=0; n<n_nodes; n++)
             {
               Node* node = elem->get_node(n);
-              
+
               // assign dof numbers (all at once) if this is
               // our node and if they aren't already there
               if ((node->n_comp(sys_num,var) > 0) &&
@@ -1017,7 +1017,7 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
                   next_free_dof += node->n_comp(sys_num,var);
                 }
             }
-                  
+
           // Now number the element DOFS
           if (elem->n_comp(sys_num,var) > 0)
             {
@@ -1032,7 +1032,7 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
               next_free_dof += elem->n_comp(sys_num,var);
             }
         } // end loop on elements
-      
+
       // we may have missed assigning DOFs to nodes that we own
       // but to which we have no connected elements matching our
       // variable restriction criterion.  this will happen, for example,
@@ -1044,20 +1044,20 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
       {
 	MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
 	const MeshBase::node_iterator node_end = mesh.local_nodes_end();
-	
+
 	for (; node_it != node_end; ++node_it)
 	  {
 	    Node *node = *node_it;
 	    libmesh_assert(node);
-	    
+
 	    if (node->n_comp(sys_num,var))
 	      if (node->dof_number(sys_num,var,0) == DofObject::invalid_id)
-		{		
+		{
 		  node->set_dof_number (sys_num,
 					var,
 					0,
 					next_free_dof);
-		  
+
 		  next_free_dof += node->n_comp(sys_num,var);
 		}
 	  }
@@ -1082,12 +1082,12 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
 
   // Cache the last local dof number too
   _var_first_local_df.push_back(next_free_dof);
-  
+
 #ifdef DEBUG
   {
     // Make sure we didn't miss any nodes
     MeshTools::libmesh_assert_valid_node_procids(mesh);
-    
+
     MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
     const MeshBase::node_iterator node_end = mesh.local_nodes_end();
     for (; node_it != node_end; ++node_it)
@@ -1115,7 +1115,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
   START_LOG("add_neighbors_to_send_list()", "DofMap");
 
   const unsigned int sys_num = this->sys_number();
-  
+
   //-------------------------------------------------------------------------
   // We need to add the DOFs from elements that live on neighboring processors
   // that are neighbors of the elements on the local processor
@@ -1124,7 +1124,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
   MeshBase::const_element_iterator       local_elem_it
     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator local_elem_end
-    = mesh.active_local_elements_end(); 
+    = mesh.active_local_elements_end();
 
   std::vector<bool> node_on_processor(mesh.max_node_id(), false);
   std::vector<unsigned int> di;
@@ -1165,7 +1165,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 	if (elem->neighbor(s) != NULL)
 	  {
 	    family.clear();
-	    
+
             // Find all the active elements that neighbor elem
 #ifdef LIBMESH_ENABLE_AMR
             if (!elem->neighbor(s)->active())
@@ -1198,7 +1198,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
     = mesh.active_elements_begin();
   const MeshBase::const_element_iterator elem_end
     = mesh.active_elements_end();
-  
+
   for ( ; elem_it != elem_end; ++elem_it)
     {
       const Elem* elem = *elem_it;
@@ -1209,7 +1209,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 
       // Do we need to add the element DOFs?
       bool add_elem_dofs = false;
-      
+
       // Check all the nodes of the element to see if it
       // shares a node with us
       for (unsigned int n=0; n!=elem->n_nodes(); n++)
@@ -1230,7 +1230,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 	        _send_list.push_back(di[j]);
 	}
     }
-  
+
   STOP_LOG("add_neighbors_to_send_list()", "DofMap");
 }
 
@@ -1243,20 +1243,20 @@ void DofMap::prepare_send_list ()
   // Check to see if we have any extra stuff to add to the send_list
   if(_extra_send_list_function != NULL)
     _extra_send_list_function(_send_list, _extra_send_list_context);
-  
+
   // First sort the send list.  After this
   // duplicated elements will be adjacent in the
   // vector
   std::sort(_send_list.begin(), _send_list.end());
 
-  // Now use std::unique to remove duplicate entries  
+  // Now use std::unique to remove duplicate entries
   std::vector<unsigned int>::iterator new_end =
     std::unique (_send_list.begin(), _send_list.end());
 
   // Remove the end of the send_list.  Use the "swap trick"
   // from Effective STL
   std::vector<unsigned int> (_send_list.begin(), new_end).swap (_send_list);
-  
+
   STOP_LOG("prepare_send_list()", "DofMap");
 }
 
@@ -1266,7 +1266,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
 {
   // If we were asked on the command line, then we need to
   // include sensitivities between neighbor degrees of freedom
-  bool implicit_neighbor_dofs = 
+  bool implicit_neighbor_dofs =
     libMesh::on_command_line ("--implicit_neighbor_dofs");
 
   // look at all the variables in this system.  If every one is
@@ -1274,7 +1274,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
   // and  force implicit_neighbor_dofs=true
   {
     bool all_discontinuous_dofs = true;
-    
+
     for (unsigned int var=0; var<this->n_variables(); var++)
       if (FEBase::build (mesh.mesh_dimension(),
 			 this->variable_type(var))->get_continuity() !=  DISCONTINUOUS)
@@ -1283,7 +1283,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
     if (all_discontinuous_dofs)
       implicit_neighbor_dofs = true;
   }
-  
+
   return implicit_neighbor_dofs;
 }
 
@@ -1308,7 +1308,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   std::vector<SparseMatrix<Number>* >::const_iterator
     pos = _matrices.begin(),
     end = _matrices.end();
-      
+
   for (; pos != end; ++pos)
     if ((*pos)->need_full_sparsity_pattern())
       need_full_sparsity_pattern = true;
@@ -1316,7 +1316,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // See if we need to include sparsity pattern entries for coupling
   // between neighbor dofs
   bool implicit_neighbor_dofs = this->use_coupled_neighbor_dofs(mesh);
-  
+
   // We can compute the sparsity pattern in parallel on multiple
   // threads.  The goal is for each thread to compute the full sparsity
   // pattern for a subset of elements.  These sparsity patterns can
@@ -1330,7 +1330,7 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 			     _dof_coupling,
 			     implicit_neighbor_dofs,
 			     need_full_sparsity_pattern);
-  
+
   Threads::parallel_reduce (ConstElemRange (mesh.active_elements_begin(),
 					    mesh.active_elements_end()), sp);
 
@@ -1345,21 +1345,21 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
   // and this is more efficient than copying them.
   _n_nz.swap(sp.n_nz);
   _n_oz.swap(sp.n_oz);
-  
+
   STOP_LOG("compute_sparsity()", "DofMap");
 
   if(_extra_sparsity_function)
     (*_extra_sparsity_function)(sp.sparsity_pattern, _n_nz, _n_oz, _extra_sparsity_context);
-  
+
   // We are done with the sparsity_pattern.  However, quite a
   // lot has gone into computing it.  It is possible that some
   // \p SparseMatrix implementations want to see it.  Let them
   // see it before we throw it away.
   pos = _matrices.begin();
   end = _matrices.end();
-      
+
   for (; pos != end; ++pos)
-    (*pos)->update_sparsity_pattern (sp.sparsity_pattern);     
+    (*pos)->update_sparsity_pattern (sp.sparsity_pattern);
 }
 
 
@@ -1414,25 +1414,25 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 //          is redundant.
 //	    libmesh_assert ((jg >= Ug.first_local_index()) &&
 //		    (jg <  Ug.last_local_index()));
-	    
-	    Ue.el(i) += C(i,j)*Ug(jg); 	    
+
+	    Ue.el(i) += C(i,j)*Ug(jg);
 	  }
-    }  
-   
+    }
+
 #else
-  
+
   // Trivial mapping
   libmesh_assert (dof_indices.size() == Ue.size());
-  
+
   for (unsigned int il=0; il<dof_indices.size(); il++)
     {
       const unsigned int ig = dof_indices[il];
-      
+
       libmesh_assert ((ig >= Ug.first_local_index()) && (ig <  Ug.last_local_index()));
 
       Ue.el(il) = Ug(ig);
     }
-  
+
 #endif
 }
 
@@ -1441,18 +1441,18 @@ void DofMap::dof_indices (const Elem* const elem,
 			  const unsigned int vn) const
 {
   START_LOG("dof_indices()", "DofMap");
-  
+
   libmesh_assert (elem != NULL);
-  
+
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
   const unsigned int dim     = elem->dim();
-  
+
   // Clear the DOF indices vector
   di.clear();
-  
+
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
   unsigned int tot_size = 0;
@@ -1497,12 +1497,12 @@ void DofMap::dof_indices (const Elem* const elem,
 					  fe_type,
 					  type);
 #endif
-	
+
 	  // Get the node-based DOF numbers
 	  for (unsigned int n=0; n<n_nodes; n++)
-	    {	    
+	    {
 	      const Node* node      = elem->get_node(n);
-	    
+
 	      // There is a potential problem with h refinement.  Imagine a
 	      // quad9 that has a linear FE on it.  Then, on the hanging side,
 	      // it can falsely identify a DOF at the mid-edge node. This is why
@@ -1547,7 +1547,7 @@ void DofMap::dof_indices (const Elem* const elem,
 		    di.push_back(node->dof_number(sys_num,v,i));
 		  }
 	    }
-	
+
 	  // If there are any element-based DOF numbers, get them
 	  const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
 							       fe_type,
@@ -1564,7 +1564,7 @@ void DofMap::dof_indices (const Elem* const elem,
 		    {
 		      libmesh_assert (elem->dof_number(sys_num,v,i) !=
 				      DofObject::invalid_id);
-		    
+
 		      di.push_back(elem->dof_number(sys_num,v,i));
 		    }
 		}
@@ -1590,8 +1590,8 @@ void DofMap::dof_indices (const Elem* const elem,
 #ifdef DEBUG
     libmesh_assert (tot_size == di.size());
 #endif
-  
-  STOP_LOG("dof_indices()", "DofMap");  
+
+  STOP_LOG("dof_indices()", "DofMap");
 }
 
 void DofMap::SCALAR_dof_indices (std::vector<unsigned int>& di,
@@ -1686,17 +1686,17 @@ void DofMap::old_dof_indices (const Elem* const elem,
 			      const unsigned int vn) const
 {
   START_LOG("old_dof_indices()", "DofMap");
-  
+
   libmesh_assert (elem != NULL);
   libmesh_assert (elem->old_dof_object != NULL);
-	    
+
 
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
   const unsigned int dim     = elem->dim();
-  
+
   // Clear the DOF indices vector.
   di.clear();
 
@@ -1730,7 +1730,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
       if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
 	{ // Do this for all the variables if one was not specified
 	  // or just for the specified variable
-	
+
 	  // Increase the polynomial order on p refined elements,
 	  // but make sure you get the right polynomial order for
 	  // the OLD degrees of freedom
@@ -1757,12 +1757,12 @@ void DofMap::old_dof_indices (const Elem* const elem,
 					  fe_type,
 					  type);
 #endif
-	
+
 	  // Get the node-based DOF numbers
 	  for (unsigned int n=0; n<n_nodes; n++)
 	    {
 	      const Node* node      = elem->get_node(n);
-	    
+
 	      // There is a potential problem with h refinement.  Imagine a
 	      // quad9 that has a linear FE on it.  Then, on the hanging side,
 	      // it can falsely identify a DOF at the mid-edge node. This is why
@@ -1772,16 +1772,16 @@ void DofMap::old_dof_indices (const Elem* const elem,
 								   type,
 								   n);
 	      libmesh_assert (node->old_dof_object != NULL);
-	    
+
 	      // If this is a non-vertex on a hanging node with extra
 	      // degrees of freedom, we use the non-vertex dofs (which
 	      // come in reverse order starting from the end, to
 	      // simplify p refinement)
 	      if (extra_hanging_dofs && !elem->is_vertex(n))
 		{
-		  const int dof_offset = 
+		  const int dof_offset =
 		    node->old_dof_object->n_comp(sys_num,v) - nc;
-	    
+
 		  // We should never have fewer dofs than necessary on a
 		  // node unless we're getting indices on a parent element
 		  // or a just-coarsened element
@@ -1811,7 +1811,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 		    di.push_back(node->old_dof_object->dof_number(sys_num,v,i));
 		  }
 	    }
-	
+
 	  // If there are any element-based DOF numbers, get them
 	  const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
 							       fe_type,
@@ -1826,12 +1826,12 @@ void DofMap::old_dof_indices (const Elem* const elem,
 		  nc <= elem->old_dof_object->n_comp(sys_num,v))
 		{
 		  libmesh_assert (elem->old_dof_object != NULL);
-		
+
 		  for (unsigned int i=0; i<nc; i++)
 		    {
 		      libmesh_assert (elem->old_dof_object->dof_number(sys_num,v,i) !=
 				      DofObject::invalid_id);
-		    
+
 		      di.push_back(elem->old_dof_object->dof_number(sys_num,v,i));
 		    }
 		}
@@ -1854,12 +1854,12 @@ void DofMap::old_dof_indices (const Elem* const elem,
     this->SCALAR_dof_indices(di_new,*it,true);
     di.insert( di.end(), di_new.begin(), di_new.end());
   }
-  
+
 #ifdef DEBUG
   libmesh_assert (tot_size == di.size());
 #endif
-  
-  STOP_LOG("old_dof_indices()", "DofMap");  
+
+  STOP_LOG("old_dof_indices()", "DofMap");
 }
 
 
@@ -1881,10 +1881,10 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
   // Note we won't need to re-sort unless a child with a
   // parent belonging to a different processor is found
   bool needs_sorting = false;
-  
-  
+
+
   MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end(); 
+  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
@@ -1893,7 +1893,7 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
       // We only need to consider the children that
       // were just refined
       if (elem->refinement_flag() != Elem::JUST_REFINED) continue;
-      
+
       const Elem* const parent = elem->parent();
 
       // If the parent lives on another processor
@@ -1909,7 +1909,7 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
 			       di.begin(), di.end());
 
 	    // We will need to re-sort the send list
-	    needs_sorting = true;	    
+	    needs_sorting = true;
 	  }
     }
 
@@ -1927,11 +1927,11 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 {
   typedef std::set<unsigned int> RCSet;
 
-  // First insert the DOFS we already depend on into the set.  
+  // First insert the DOFS we already depend on into the set.
   RCSet dof_set (elem_dofs.begin(), elem_dofs.end());
 
   bool done = true;
-    
+
   // Next insert any dofs those might be constrained in terms
   // of.  Note that in this case we may not be done:  Those may
   // in turn depend on others.  So, we need to repeat this process
@@ -1943,19 +1943,19 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 	// If the DOF is constrained
 	DofConstraints::const_iterator
 	  pos = _dof_constraints.find(elem_dofs[i]);
-	
+
 	libmesh_assert (pos != _dof_constraints.end());
-	
+
 	const DofConstraintRow& constraint_row = pos->second;
-	
+
 // adaptive p refinement currently gives us lots of empty constraint
 // rows - we should optimize those DoFs away in the future.  [RHS]
 //	libmesh_assert (!constraint_row.empty());
-	
+
 	DofConstraintRow::const_iterator it     = constraint_row.begin();
 	DofConstraintRow::const_iterator it_end = constraint_row.end();
-	
-	
+
+
 	// Add the DOFs this dof is constrained in terms of.
 	// note that these dofs might also be constrained, so
 	// we will need to call this function recursively.
@@ -1966,23 +1966,23 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 	      done = false;
 	    }
 	}
-  
-  
+
+
   // If not done then we need to do more work
   // (obviously :-) )!
   if (!done)
     {
       // Fill the vector with the contents of the set
-      elem_dofs.clear();      
+      elem_dofs.clear();
       elem_dofs.insert (elem_dofs.end(),
 			dof_set.begin(), dof_set.end());
-      
+
 
       // May need to do this recursively.  It is possible
       // that we just replaced a constrained DOF with another
       // constrained DOF.
       this->find_connected_dofs (elem_dofs);
-      
+
     } // end if (!done)
 }
 
@@ -2012,7 +2012,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
   const unsigned int end_dof_on_proc   = dof_map.end_dof(proc_id);
 
   sparsity_pattern.resize(n_dofs_on_proc);
-  
+
   // If the user did not explicitly specify the DOF coupling
   // then all the DOFS are coupled to each other.  Furthermore,
   // we can take a shortcut and do this more quickly here.  So
@@ -2039,13 +2039,13 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 	  // We can be more efficient if we sort the element DOFs
 	  // into increasing order
 	  std::sort(element_dofs.begin(), element_dofs.end());
-	  
+
 	  const unsigned int n_dofs_on_element = element_dofs.size();
-	    
+
 	  for (unsigned int i=0; i<n_dofs_on_element; i++)
 	    {
 	      const unsigned int ig = element_dofs[i];
-	      
+
 	      // Only bother if this matrix row will be stored
 	      // on this processor.
 	      if ((ig >= first_dof_on_proc) &&
@@ -2057,7 +2057,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		  // first_dof_on_proc are unsigned ints
 		  libmesh_assert (ig >= first_dof_on_proc);
 		  libmesh_assert ((ig - first_dof_on_proc) < sparsity_pattern.size());
-		  
+
 		  SparsityPattern::Row &row = sparsity_pattern[ig - first_dof_on_proc];
 
 		  // If the row is empty we will add *all* the element DOFs,
@@ -2069,7 +2069,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 				 element_dofs.end());
 		    }
 		  else
-		    {		  
+		    {
 		      // Build a list of the DOF indices not found in the
 		      // sparsity pattern
 		      dofs_to_add.clear();
@@ -2079,20 +2079,20 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		      SparsityPattern::Row::iterator
 			low  = std::lower_bound (row.begin(), row.end(), element_dofs.front()),
 			high = std::upper_bound (low,         row.end(), element_dofs.back());
-		  
+
 		      for (unsigned int j=0; j<n_dofs_on_element; j++)
 			{
 			  const unsigned int jg = element_dofs[j];
-			  
+
 			  // See if jg is in the sorted range
 			  std::pair<SparsityPattern::Row::iterator,
 			            SparsityPattern::Row::iterator>
 			    pos = std::equal_range (low, high, jg);
-			
+
 			  // Must add jg if it wasn't found
 			  if (pos.first == pos.second)
 			    dofs_to_add.push_back(jg);
-			
+
 			  // pos.first is now a valid lower bound for any
 			  // remaining element DOFs. (That's why we sorted them.)
 			  // Use it for the next search
@@ -2103,15 +2103,15 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		      if (!dofs_to_add.empty())
 			{
 			  const unsigned int old_size = row.size();
-			  
+
 			  row.insert (row.end(),
 				      dofs_to_add.begin(),
 				      dofs_to_add.end());
-		      
+
 			  SparsityPattern::sort_row (row.begin(), row.begin()+old_size, row.end());
 			}
 		    }
-		  
+
 		  // Now (possibly) add dofs from neighboring elements
 		  // TODO:[BSK] optimize this like above!
 		  if (implicit_neighbor_dofs)
@@ -2125,39 +2125,39 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 			  active_neighbors.clear();
 			  active_neighbors.push_back(neighbor_0);
 #endif
-			  
+
 			  for (unsigned int a=0; a != active_neighbors.size(); ++a)
 			    {
 			      const Elem *neighbor = active_neighbors[a];
-			      
+
 			      dof_map.dof_indices (neighbor, neighbor_dofs);
 #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 			      dof_map.find_connected_dofs (neighbor_dofs);
-#endif			      
+#endif
 			      const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
-			      
+
 			      for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
 				{
 				  const unsigned int jg = neighbor_dofs[j];
-				  
+
 				  // See if jg is in the sorted range
 				  std::pair<SparsityPattern::Row::iterator,
 				            SparsityPattern::Row::iterator>
 				    pos = std::equal_range (row.begin(), row.end(), jg);
-			        
+
 				  // Insert jg if it wasn't found
 				  if (pos.first == pos.second)
 				    row.insert (pos.first, jg);
-				}    
+				}
 			    }
 			}
 		}
 	    }
-	}	      
-    } 
+	}
+    }
 
 
-  
+
   // This is what we do in the case that the user has specified
   // explicit DOF coupling.
   else
@@ -2165,9 +2165,9 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
       libmesh_assert (dof_coupling != NULL);
       libmesh_assert (dof_coupling->size() ==
 		      dof_map.n_variables());
-      
+
       const unsigned int n_var = dof_map.n_variables();
-      
+
       std::vector<unsigned int>
 	element_dofs_i,
 	element_dofs_j,
@@ -2180,7 +2180,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 	for (unsigned int vi=0; vi<n_var; vi++)
 	  {
 	    const Elem* const elem = *elem_it;
-	    
+
 	    // Find element dofs for variable vi
 	    dof_map.dof_indices (elem, element_dofs_i, vi);
 #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
@@ -2191,7 +2191,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 	    // into increasing order
 	    std::sort(element_dofs_i.begin(), element_dofs_i.end());
 	    const unsigned int n_dofs_on_element_i = element_dofs_i.size();
-	    
+
 	    for (unsigned int vj=0; vj<n_var; vj++)
 	      if ((*dof_coupling)(vi,vj)) // If vi couples to vj
 		{
@@ -2210,23 +2210,23 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		    }
 		  else
 		    element_dofs_j = element_dofs_i;
-		  
+
 		  const unsigned int n_dofs_on_element_j =
 		    element_dofs_j.size();
-		  
+
 		  for (unsigned int i=0; i<n_dofs_on_element_i; i++)
 		    {
 		      const unsigned int ig = element_dofs_i[i];
-		      
+
 		      // We are only interested in computing the sparsity pattern
 		      // for the rows in [range.begin(),range.end()).  So, if this
 		      // element's DOFs are not in that range just go ahead to the
 		      // next one.
-		      //	      
+		      //
 		      // Also, only bother if this matrix row will be stored
 		      // on this processor.
 		      if ((ig >= first_dof_on_proc) &&
-			  (ig <  end_dof_on_proc))			
+			  (ig <  end_dof_on_proc))
 			{
 			  // This is what I mean
 			  // libmesh_assert ((ig - first_dof_on_proc) >= 0);
@@ -2235,7 +2235,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 			  libmesh_assert (ig >= first_dof_on_proc);
 			  libmesh_assert (ig < (sparsity_pattern.size() +
 					first_dof_on_proc));
-			  
+
 			  SparsityPattern::Row &row = sparsity_pattern[ig - first_dof_on_proc];
 
 			  // If the row is empty we will add *all* the element j DOFs,
@@ -2247,7 +2247,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 					 element_dofs_j.end());
 			    }
 			  else
-			    {		  
+			    {
 			      // Build a list of the DOF indices not found in the
 			      // sparsity pattern
 			      dofs_to_add.clear();
@@ -2261,31 +2261,31 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 			      for (unsigned int j=0; j<n_dofs_on_element_j; j++)
 				{
 				  const unsigned int jg = element_dofs_j[j];
-				  
+
 				  // See if jg is in the sorted range
 				  std::pair<SparsityPattern::Row::iterator,
 				            SparsityPattern::Row::iterator>
 				    pos = std::equal_range (low, high, jg);
-			      
+
 				  // Must add jg if it wasn't found
 				  if (pos.first == pos.second)
 				    dofs_to_add.push_back(jg);
-				
+
 				  // pos.first is now a valid lower bound for any
 				  // remaining element j DOFs. (That's why we sorted them.)
 				  // Use it for the next search
 				  low = pos.first;
 				}
-			      
+
 			      // Add to the sparsity pattern
 			      if (!dofs_to_add.empty())
 				{
 				  const unsigned int old_size = row.size();
-				  
+
 				  row.insert (row.end(),
 					      dofs_to_add.begin(),
 					      dofs_to_add.end());
-		      
+
 				  SparsityPattern::sort_row (row.begin(), row.begin()+old_size, row.end());
 				}
 			    }
@@ -2302,30 +2302,30 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
          			  active_neighbors.clear();
          			  active_neighbors.push_back(neighbor_0);
          #endif
-         			  
+
          			  for (unsigned int a=0; a != active_neighbors.size(); ++a)
          			    {
          			      const Elem *neighbor = active_neighbors[a];
-         			      
+
          			      dof_map.dof_indices (neighbor, neighbor_dofs);
      #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
      			            dof_map.find_connected_dofs (neighbor_dofs);
-     #endif		      	      
+     #endif
      			            const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
-     			            
+
      			            for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
      			              {
      			                const unsigned int jg = neighbor_dofs[j];
-     			                
+
      			                // See if jg is in the sorted range
      			                std::pair<SparsityPattern::Row::iterator,
      			                          SparsityPattern::Row::iterator>
      			                  pos = std::equal_range (row.begin(), row.end(), jg);
-     			               
+
      			                // Insert jg if it wasn't found
      			                if (pos.first == pos.second)
      			                  row.insert (pos.first, jg);
-     			              }    
+     			              }
      			          }
      			      }
 			}
@@ -2333,7 +2333,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		}
 	  }
     }
-  
+
   // Now the full sparsity structure is built for all of the
   // DOFs connected to our rows of the matrix.
   n_nz.resize (n_dofs_on_proc);
@@ -2342,7 +2342,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
   // First zero the counters.
   std::fill(n_nz.begin(), n_nz.end(), 0);
   std::fill(n_oz.begin(), n_oz.end(), 0);
-  
+
   for (unsigned int i=0; i<n_dofs_on_proc; i++)
     {
       // Get the row of the sparsity pattern
@@ -2369,7 +2369,7 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
   libmesh_assert (sparsity_pattern.size() ==  other.sparsity_pattern.size());
   libmesh_assert (n_nz.size() == sparsity_pattern.size());
   libmesh_assert (n_oz.size() == sparsity_pattern.size());
-  
+
   for (unsigned int r=0; r<n_dofs_on_proc; r++)
     {
       // incriment the number of on and off-processor nonzeros in this row
@@ -2378,13 +2378,13 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 	{
 	  SparsityPattern::Row       &my_row    = sparsity_pattern[r];
 	  const SparsityPattern::Row &their_row = other.sparsity_pattern[r];
-      
+
 	  // simple copy if I have no dofs
 	  if (my_row.empty())
 	    my_row = their_row;
-	  
+
 	  // otherwise add their DOFs to mine, resort, and re-unique the row
-	  else if (!their_row.empty()) // do nothing for the trivial case where 
+	  else if (!their_row.empty()) // do nothing for the trivial case where
 	    {                          // their row is empty
 	      my_row.insert (my_row.end(),
 			     their_row.begin(),
@@ -2394,13 +2394,13 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 	      // the [begin,middle) [middle,end) to be non-overlapping.  This is not
 	      // necessarily the case here, so use std::sort()
 	      std::sort (my_row.begin(), my_row.end());
-	 
+
 	      my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
 	    }
 
 	  // fix the number of on and off-processor nonzeros in this row
 	  n_nz[r] = n_oz[r] = 0;
-	  
+
 	  for (unsigned int j=0; j<my_row.size(); j++)
 	    if ((my_row[j] < first_dof_on_proc) || (my_row[j] >= end_dof_on_proc))
 	      n_oz[r]++;
@@ -2438,7 +2438,7 @@ std::string DofMap::get_info() const
   std::vector<SparseMatrix<Number>* >::const_iterator
     pos = _matrices.begin(),
     end = _matrices.end();
-      
+
   for (; pos != end; ++pos)
     if ((*pos)->need_full_sparsity_pattern())
       may_equal = " = ";
@@ -2463,13 +2463,13 @@ std::string DofMap::get_info() const
 
   os << "    DofMap Sparsity\n      Average  On-Processor Bandwidth"
      << may_equal << avg_n_nz << '\n';
-  
+
   os << "      Average Off-Processor Bandwidth"
      << may_equal << avg_n_oz << '\n';
-  
+
   os << "      Maximum  On-Processor Bandwidth"
      << may_equal << max_n_nz << '\n';
-  
+
   os << "      Maximum Off-Processor Bandwidth"
      << may_equal << max_n_oz << std::endl;
 

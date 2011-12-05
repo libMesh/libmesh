@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -81,9 +81,9 @@ void PerfLog::clear()
 	    libmesh_error();
 	  }
 
-      
+
       gettimeofday (&tstart, NULL);
-  
+
       log.clear();
 
       while (!log_stack.empty())
@@ -95,15 +95,15 @@ void PerfLog::clear()
 std::string PerfLog::get_info_header() const
 {
   OStringStream out;
-  
+
   if (log_events)
     {
       std::string date = Utility::get_timestamp();
-      
+
       // Get system information
       struct utsname sysInfo;
       uname(&sysInfo);
-      
+
       // Get user information
       //
       // Some systems, for example Crays, actually have getpwuid on the head-node
@@ -130,7 +130,7 @@ std::string PerfLog::get_info_header() const
       OStringStream machine_stream;
       OStringStream user_stream;
       OStringStream config_stream;
-      
+
 
       // Put pointers to these streams in a vector
       std::vector<OStringStream*> v(10);
@@ -148,29 +148,29 @@ std::string PerfLog::get_info_header() const
       // Fill string stream objects
       if (libMesh::n_processors() > 1)
 	{
-	  pid_stream     << "| Processor id:   " << libMesh::processor_id(); 
+	  pid_stream     << "| Processor id:   " << libMesh::processor_id();
 	  nprocs_stream  << "| Num Processors: " << libMesh::n_processors();
 	}
-      
-      time_stream    << "| Time:           " << date                   ; 
-      os_stream      << "| OS:             " << sysInfo.sysname        ; 
-      host_stream    << "| HostName:       " << sysInfo.nodename       ; 
-      osrel_stream   << "| OS Release:     " << sysInfo.release        ; 
-      osver_stream   << "| OS Version:     " << sysInfo.version        ; 
-      machine_stream << "| Machine:        " << sysInfo.machine        ; 
+
+      time_stream    << "| Time:           " << date                   ;
+      os_stream      << "| OS:             " << sysInfo.sysname        ;
+      host_stream    << "| HostName:       " << sysInfo.nodename       ;
+      osrel_stream   << "| OS Release:     " << sysInfo.release        ;
+      osver_stream   << "| OS Version:     " << sysInfo.version        ;
+      machine_stream << "| Machine:        " << sysInfo.machine        ;
 #ifdef LIBMESH_HAVE_GETPWUID
       user_stream    << "| Username:       " << p->pw_name             ;
 #else
       user_stream    << "| Username:       " << "Unknown"              ;
 #endif
       config_stream  << "| Configuration:  " << LIBMESH_CONFIGURE_INFO;
-      
+
       // Find the longest string, use that to set the line length for formatting.
       unsigned int max_length = 0;
       for (unsigned int i=0; i<v.size(); ++i)
 	if (v[i]->str().size() > max_length)
 	  max_length = v[i]->str().size();
-      
+
       // Print dashed line
       this->_character_line(max_length+2, '-', out);
       out << '\n';
@@ -194,19 +194,19 @@ std::string PerfLog::get_info_header() const
 }
 
 
- 
+
 
 std::string PerfLog::get_perf_info() const
 {
   OStringStream out;
-  
+
   if (log_events && !log.empty())
     {
       // Stop timing for this event.
       struct timeval tstop;
-      
+
       gettimeofday (&tstop, NULL);
-	  
+
       const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
 				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);
 
@@ -220,10 +220,10 @@ std::string PerfLog::get_perf_info() const
       const unsigned int avg_time_incl_sub_col_width   = 12;
       const unsigned int pct_active_col_width = 9;
       const unsigned int pct_active_incl_sub_col_width = 9;
-      
+
       // Iterator to be used to loop over the map of timed events
       std::map<std::pair<std::string,std::string>, PerfData>::const_iterator pos;
-      
+
       // Reset the event column width based on the longest event name plus
       // a possible 2-character indentation, plus a space.
       for (pos = log.begin(); pos != log.end(); ++pos)
@@ -245,7 +245,7 @@ std::string PerfLog::get_perf_info() const
       out << ' ';
       this->_character_line(total_col_width, '-', out);
       out << '\n';
-            
+
       {
 	// Construct temporary message string
 	OStringStream temp;
@@ -266,26 +266,26 @@ std::string PerfLog::get_perf_info() const
 	  {
 	    OSSStringright(out, total_col_width-temp_size+2, "|");
 	  }
-	
+
 	out << '\n';
       }
-      
+
       // Print dashed line
       out << ' ';
       this->_character_line(total_col_width, '-', out);
       out << '\n';
 
-      
+
       // Write out the header for the events listing
       out << "| ";
-      OSSStringleft(out,event_col_width,"Event");      
-      OSSStringleft(out,ncalls_col_width,"nCalls");      
+      OSSStringleft(out,event_col_width,"Event");
+      OSSStringleft(out,ncalls_col_width,"nCalls");
       OSSStringleft(out,tot_time_col_width,"Total Time");
       OSSStringleft(out,avg_time_col_width,"Avg Time");
       OSSStringleft(out,tot_time_incl_sub_col_width,"Total Time");
       OSSStringleft(out,avg_time_incl_sub_col_width,"Avg Time");
-      OSSStringleft(out,pct_active_col_width+pct_active_incl_sub_col_width,"% of Active Time");      
-      out << "|\n";      
+      OSSStringleft(out,pct_active_col_width+pct_active_incl_sub_col_width,"% of Active Time");
+      out << "|\n";
       out << "| ";
       OSSStringleft(out,event_col_width,"");
       OSSStringleft(out,ncalls_col_width,"");
@@ -295,19 +295,19 @@ std::string PerfLog::get_perf_info() const
       OSSStringleft(out,avg_time_incl_sub_col_width,"With Sub");
       OSSStringleft(out,pct_active_col_width,"w/o S");
       OSSStringleft(out,pct_active_incl_sub_col_width,"With S");
-      
+
       out << "|\n|";
       this->_character_line(total_col_width, '-', out);
       out << "|\n|";
       this->_character_line(total_col_width, ' ', out);
       out << "|\n";
-      
+
       unsigned int summed_function_calls = 0;
       double       summed_total_time     = 0;
       double       summed_percentage     = 0;
-      
+
       std::string last_header("");
-	  
+
       for (pos = log.begin(); pos != log.end(); ++pos)
 	{
 	  const PerfData& perf_data = pos->second;
@@ -354,9 +354,9 @@ std::string PerfLog::get_perf_info() const
 		  out << "|   ";
 		  OSSStringleft(out, event_col_width-2, pos->first.second);
 		}
-	      
 
-	      // Print the number of calls to the event.  
+
+	      // Print the number of calls to the event.
 	      OSSInt(out,ncalls_col_width,perf_count);
 
 	      // Print the total time spent in the event
@@ -374,10 +374,10 @@ std::string PerfLog::get_perf_info() const
 
 	      // Print the percentage of the time spent in the event
 	      OSSRealleft(out,pct_active_col_width,2,perf_percent);
-	      
+
 	      // Print the percentage of the time spent in the event incl. sub-events
 	      OSSRealleft(out,pct_active_incl_sub_col_width,2,perf_percent_incl_sub);
-	      
+
 	      out << "|";
 	      out << '\n';
 	    }
@@ -396,14 +396,14 @@ std::string PerfLog::get_perf_info() const
 	{
 	  OSSInt(out,ncalls_col_width,summed_function_calls);
 	}
-      
+
       else
 	{
 	  out.setf(std::ios::scientific);
 	  OSSRealleft(out, ncalls_col_width, 3, static_cast<Real>(summed_function_calls));
 	  out.unsetf(std::ios::scientific);
 	}
-	
+
       // Print the total time spent in logged function calls
       out.setf(std::ios::fixed);
       OSSRealleft(out,tot_time_col_width,4,summed_total_time);
@@ -420,7 +420,7 @@ std::string PerfLog::get_perf_info() const
 
       // Print the total percentage
       OSSRealleft(out,pct_active_col_width,2,summed_percentage);
-      
+
       out.width(pct_active_incl_sub_col_width);
       out << "";
 
@@ -437,7 +437,7 @@ std::string PerfLog::get_perf_info() const
 std::string PerfLog::get_log() const
 {
   OStringStream out;
-  
+
   if (log_events)
     {
       // Only print the log
@@ -450,11 +450,11 @@ std::string PerfLog::get_log() const
 	    {
 	      called = true;
 	      out << get_info_header();
-	    }	  
+	    }
 	  out << get_perf_info();
 	}
     }
-  
+
   return out.str();
 }
 
@@ -492,7 +492,7 @@ void PerfLog::stop_event(const std::string &label,
 
 void PerfLog::pause_event(const std::string &,
 			  const std::string &)
-{  
+{
   // nothing to do.  pushing the next object on the stack will handle it
 }
 

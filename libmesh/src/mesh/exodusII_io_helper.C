@@ -42,7 +42,7 @@
 // try using it on empty arrays, since it accesses the
 // zero'th element.
 #define ARRAY_LENGTH(a) (sizeof((a))/sizeof((a)[0]))
- 
+
 namespace libMesh
 {
 
@@ -649,7 +649,7 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
       Elem * elem = *it;
       subdomain_id_type cur_subdomain = elem->subdomain_id();
 
-/*      
+/*
       if(cur_subdomain == 0)
         // We are mapping 0 to the maximum size that ExodusII allows
         cur_subdomain = std::numeric_limits<int>::max();
@@ -706,7 +706,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     Elem * elem = *it;
     subdomain_id_type cur_subdomain = elem->subdomain_id();
 
-/*    
+/*
     if(cur_subdomain == 0)
       // We are mapping 0 to the maximum size that ExodusII allows
       cur_subdomain = std::numeric_limits<int>::max();
@@ -893,7 +893,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 	  // But we can get away with writing e.g. HEX8 and INFHEX8 in
 	  // the same block...
           libmesh_assert(elem->n_nodes() == Elem::build(conv.get_canonical_type(), NULL)->n_nodes());
-          
+
           for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
@@ -1061,11 +1061,11 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
     int actual_id = ss_id;
 
-/*    
+/*
     if(actual_id == 0)
       // We are mapping 0 to the maximum size that ExodusII allows
       actual_id = std::numeric_limits<int>::max();
-*/      
+*/
 
     ex_err = exII::ex_put_side_set_param(ex_id, actual_id, elem[ss_id].size(), 0);
     check_err(ex_err, "Error writing sideset parameters");
@@ -1105,7 +1105,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
     int actual_id = nodeset_id;
 
-/*    
+/*
     if(nodeset_id == 0)
       // We are mapping 0 to the maximum size that ExodusII allows
       actual_id = std::numeric_limits<int>::max();
@@ -1299,11 +1299,11 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
       {
         unsigned int cur_subdomain = elem->subdomain_id();
 
-/*        
+/*
         if(cur_subdomain == 0)
           // We are mapping 0 to the maximum size that ExodusII allows
           cur_subdomain = std::numeric_limits<int>::max();
-*/          
+*/
 
         subdomain_map[cur_subdomain].push_back(elem->id());
       }
@@ -1472,7 +1472,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     }
 
   libmesh_error();
-  
+
   // dummy return value, we won't get here
   const Conversion conv(tri3_node_map,
 			ARRAY_LENGTH(tri3_node_map),
@@ -1484,7 +1484,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 			ARRAY_LENGTH(tri_inverse_edge_map),
 			TRI3,
 			"TRI3");
-  return conv;  
+  return conv;
 }
 
 
@@ -1495,26 +1495,26 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     {
     case EDGE2:
       {
-	const Conversion conv(edge2_node_map, 
+	const Conversion conv(edge2_node_map,
 			      ARRAY_LENGTH(edge2_node_map),
 			      edge2_node_map, // inverse node map same as forward node map
 			      ARRAY_LENGTH(edge2_node_map),
-			      edge_edge_map, 
+			      edge_edge_map,
 			      ARRAY_LENGTH(edge_edge_map),
-			      edge_inverse_edge_map, 
+			      edge_inverse_edge_map,
 			      ARRAY_LENGTH(edge_inverse_edge_map),
 			      EDGE2, "EDGE2");
 	return conv;
       }
     case EDGE3:
       {
-	const Conversion conv(edge3_node_map, 
+	const Conversion conv(edge3_node_map,
 			      ARRAY_LENGTH(edge3_node_map),
 			      edge3_node_map, // inverse node map same as forward node map
 			      ARRAY_LENGTH(edge3_node_map),
-			      edge_edge_map, 
+			      edge_edge_map,
 			      ARRAY_LENGTH(edge_edge_map),
-			      edge_inverse_edge_map, 
+			      edge_inverse_edge_map,
 			      ARRAY_LENGTH(edge_inverse_edge_map),
 			      EDGE3, "EDGE3");
 	return conv;
@@ -1734,7 +1734,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     }
 
   libmesh_error();
-    
+
   // dummy return value, we will never get here
   const Conversion conv(tri3_node_map,
 			ARRAY_LENGTH(tri3_node_map),
@@ -1746,7 +1746,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 			ARRAY_LENGTH(tri_inverse_edge_map),
 			TRI3,
 			"TRI3");
-  return conv;  
+  return conv;
 }
 
 } // namespace libMesh

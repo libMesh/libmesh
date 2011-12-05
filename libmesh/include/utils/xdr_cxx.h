@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -57,7 +57,7 @@ namespace libMesh
 // Xdr class definition
 
 /**
- * This class implements a C++ interface to the XDR 
+ * This class implements a C++ interface to the XDR
  * (eXternal Data Representation) format.  XDR is useful for
  * creating platform-independent binary files.  This class was
  * created to handle equation system output as a replacement for
@@ -66,7 +66,7 @@ namespace libMesh
 
 class Xdr
 {
-  
+
 public:
 
   /**
@@ -82,18 +82,18 @@ public:
 
   /**
    * Opens the file.
-   */ 
+   */
   void open (const std::string& name);
 
   /**
    * Closes the file if it is open.
-   */ 
+   */
   void close();
 
   /**
    * Returns true if the Xdr file is open, false
    * if it is closed.
-   */ 
+   */
   bool is_open() const;
 
   /**
@@ -133,7 +133,7 @@ public:
    */
   template <typename T>
   Xdr& operator >> (T& a) { libmesh_assert (reading()); data(a); return *this; }
-  
+
   /**
    * Inputs or outputs a raw data stream.
    */
@@ -142,9 +142,9 @@ public:
 
   /**
    * Writes or reads (ignores) a comment line.
-   */   
+   */
   void comment (std::string &);
-  
+
   /**
    * Sets the version of the file that is being read
    */
@@ -189,7 +189,7 @@ private:
 
   /**
    * The mode used for accessing the file.
-   */ 
+   */
   const XdrMODE mode;
 
   /**
@@ -198,7 +198,7 @@ private:
   std::string file_name;
 
 #ifdef LIBMESH_HAVE_XDR
-  
+
   /**
    * Pointer to the standard @p xdr
    * struct.  See the standard
@@ -211,7 +211,7 @@ private:
    * File pointer.
    */
   FILE* fp;
-  
+
 #endif
 
   /**
@@ -228,7 +228,7 @@ private:
    * A buffer to put comment strings into.
    */
   const int comm_len;
-  char comm[xdr_MAX_STRING_LENGTH];  
+  char comm[xdr_MAX_STRING_LENGTH];
 
   /**
    * Are we reading/writing zipped files?

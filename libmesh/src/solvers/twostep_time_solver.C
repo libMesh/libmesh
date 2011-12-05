@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -58,7 +58,7 @@ void TwostepTimeSolver::solve()
   // Calculating error values each time
   Real single_norm(0.), double_norm(0.), error_norm(0.),
        relative_error(0.);
- 
+
   while (!max_tolerance_met)
     {
       // If we've been asked to reduce deltat if necessary, make sure
@@ -68,7 +68,7 @@ void TwostepTimeSolver::solve()
 
       if (!quiet)
         {
-          libMesh::out << "\n === Computing adaptive timestep === " 
+          libMesh::out << "\n === Computing adaptive timestep === "
                         << std::endl;
         }
 
@@ -99,7 +99,7 @@ void TwostepTimeSolver::solve()
       // FIXME: even if diffsolver failure is unlikely, we ought to
       // do *something* if it happens
       core_time_solver->reduce_deltat_on_diffsolver_failure = 0;
-  
+
       Real old_time = _system.time;
       Real old_deltat = _system.deltat;
       _system.deltat *= 0.5;
@@ -116,7 +116,7 @@ void TwostepTimeSolver::solve()
       // Reset the core_time_solver's reduce_deltat... value.
       core_time_solver->reduce_deltat_on_diffsolver_failure =
         this->reduce_deltat_on_diffsolver_failure;
-  
+
       // But then back off just in case our advance_timestep() isn't
       // called.
       // FIXME: this probably doesn't work with multistep methods
@@ -142,8 +142,8 @@ void TwostepTimeSolver::solve()
                             std::max(double_norm, single_norm))
                         << std::endl;
           libMesh::out << "Global relative error = "
-		        << (error_norm / _system.deltat / 
-                            std::max(double_norm, single_norm)) 
+		        << (error_norm / _system.deltat /
+                            std::max(double_norm, single_norm))
                         << std::endl;
           libMesh::out << "old delta t = " << _system.deltat << std::endl;
         }
@@ -161,7 +161,7 @@ void TwostepTimeSolver::solve()
 
           if (!quiet)
             {
-              libMesh::out << "Failed to meet upper error tolerance" 
+              libMesh::out << "Failed to meet upper error tolerance"
                             << std::endl;
               libMesh::out << "Retrying with delta t = "
                             << _system.deltat << std::endl;
@@ -171,7 +171,7 @@ void TwostepTimeSolver::solve()
         max_tolerance_met = true;
     }
 
-  
+
   // Otherwise, compare the relative error to the tolerance
   // and adjust deltat
   last_deltat = _system.deltat;
@@ -198,7 +198,7 @@ void TwostepTimeSolver::solve()
   // s.o.g. factor is based on the method's **global** truncation
   // error.  You can shrink/grow the timestep to attempt to satisfy
   // either a global or local time-discretization error tolerance.
- 
+
   Real shrink_or_growth_factor =
     this->global_tolerance ? global_shrink_or_growth_factor :
                              local_shrink_or_growth_factor;
@@ -213,7 +213,7 @@ void TwostepTimeSolver::solve()
     }
 
   _system.deltat *= shrink_or_growth_factor;
-  
+
   // Restrict deltat to max-allowable value if necessary
   if ((this->max_deltat != 0.0) && (_system.deltat > this->max_deltat))
     {
@@ -235,7 +235,7 @@ void TwostepTimeSolver::solve()
 	}
       _system.deltat = this->min_deltat;
     }
-  
+
   if (!quiet)
     {
       libMesh::out << "new delta t = " << _system.deltat << std::endl;

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -60,7 +60,7 @@ void MeshTools::Modification::distort (MeshBase& mesh,
   // so that we don't move them
   // on_boundary holds false (not on boundary) and true (on boundary)
   std::vector<bool> on_boundary (mesh.n_nodes(), false);
-  
+
   if (!perturb_boundary) MeshTools::find_boundary_nodes (mesh, on_boundary);
 
   // Now calculate the minimum distance to
@@ -69,24 +69,24 @@ void MeshTools::Modification::distort (MeshBase& mesh,
   std::vector<float> hmin (mesh.n_nodes(), 1.e20);
 
   MeshBase::element_iterator       el  = mesh.active_elements_begin();
-  const MeshBase::element_iterator end = mesh.active_elements_end(); 
+  const MeshBase::element_iterator end = mesh.active_elements_end();
 
   for (; el!=end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       hmin[(*el)->node(n)] = std::min(hmin[(*el)->node(n)],
                                       static_cast<float>((*el)->hmin()));
-  
-  
+
+
   // Now actually move the nodes
   {
     const unsigned int seed = 123456;
-    
+
     // seed the random number generator.
     // We'll loop from 1 to n_nodes on every processor, even those
     // that don't have a particular node, so that the pseudorandom
     // numbers will be the same everywhere.
     std::srand(seed);
-    
+
     // If the node is on the boundary or
     // the node is not used by any element (hmin[n]<1.e20)
     // then we should not move it.
@@ -96,7 +96,7 @@ void MeshTools::Modification::distort (MeshBase& mesh,
       if (!on_boundary[n] && (hmin[n] < 1.e20) )
 	{
 	  // the direction, random but unit normalized
-	  
+
 	  Point dir( static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
 		     (mesh.mesh_dimension() > 1) ?
 		     static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
@@ -105,13 +105,13 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 		      static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
 		      : 0.)
 		     );
-	  
+
 	  dir(0) = (dir(0)-.5)*2.;
 	  if (mesh.mesh_dimension() > 1)
 	    dir(1) = (dir(1)-.5)*2.;
 	  if (mesh.mesh_dimension() == 3)
 	    dir(2) = (dir(2)-.5)*2.;
-	  
+
 	  dir = dir.unit();
 
           Node *node = mesh.node_ptr(n);
@@ -127,7 +127,7 @@ void MeshTools::Modification::distort (MeshBase& mesh,
   }
 
 
-  // All done  
+  // All done
   STOP_LOG("distort()", "MeshTools::Modification");
 }
 
@@ -213,7 +213,7 @@ void MeshTools::Modification::scale (MeshBase& mesh,
   const Real x_scale = xs;
   Real y_scale       = ys;
   Real z_scale       = zs;
-  
+
   if (ys == 0.)
     {
       libmesh_assert (zs == 0.);
@@ -255,7 +255,7 @@ void UnstructuredMesh::all_first_order ()
 {
   /*
    * when the mesh is not prepared,
-   * at least renumber the nodes and 
+   * at least renumber the nodes and
    * elements, so that the node ids
    * are correct
    */
@@ -343,12 +343,12 @@ void UnstructuredMesh::all_first_order ()
        * data structure by insert_elem.
        */
       libmesh_assert (lo_elem->n_sides() == so_elem->n_sides());
-	
+
       for (unsigned int s=0; s<so_elem->n_sides(); s++)
 	{
 	  const std::vector<short int> boundary_ids =
 	    this->boundary_info->raw_boundary_ids (so_elem, s);
-	    
+
 	  this->boundary_info->add_side (lo_elem, s, boundary_ids);
 	}
 
@@ -392,7 +392,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
   /*
    * when the mesh is not prepared,
-   * at least renumber the nodes and 
+   * at least renumber the nodes and
    * elements, so that the node ids
    * are correct
    */
@@ -405,7 +405,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    */
   if (!this->n_elem())
     return;
- 
+
   /*
    * If the mesh is already second order
    * then we have nothing to do.
@@ -471,7 +471,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        */
       this->reserve_nodes(static_cast<unsigned int>(2.5*this->n_nodes()));
       break;
-	
+
     default:
       // Hm?
       libmesh_error();
@@ -505,8 +505,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
       // make sure it is linear order
       if (lo_elem->default_order() != FIRST)
-        {	  
-	  libMesh::err << "ERROR: This is not a linear element: type=" 
+        {
+	  libMesh::err << "ERROR: This is not a linear element: type="
 		        << lo_elem->type() << std::endl;
 	  libmesh_error();
 	}
@@ -522,8 +522,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * for either type of seconrd-order equivalent, e.g.
        * Hex20 or Hex27, as equivalents for Hex8
        */
-      Elem* so_elem = 
-	Elem::build (Elem::second_order_equivalent_type(lo_elem->type(), 
+      Elem* so_elem =
+	Elem::build (Elem::second_order_equivalent_type(lo_elem->type(),
 							full_ordered) ).release();
 
       libmesh_assert (lo_elem->n_vertices() == so_elem->n_vertices());
@@ -541,13 +541,13 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * Now handle the additional mid-side nodes.  This
        * is simply handled through a map that remembers
        * the already-added nodes.  This map maps the global
-       * ids of the vertices (that uniquely define this 
-       * higher-order node) to the new node. 
+       * ids of the vertices (that uniquely define this
+       * higher-order node) to the new node.
        * Notation: son = second-order node
        */
       const unsigned int son_begin = so_elem->n_vertices();
       const unsigned int son_end   = so_elem->n_nodes();
-      
+
 
       for (unsigned int son=son_begin; son<son_end; son++)
         {
@@ -555,15 +555,15 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	    so_elem->n_second_order_adjacent_vertices(son);
 
 	  adjacent_vertices_ids.resize(n_adjacent_vertices);
-	  
+
 	  for (unsigned int v=0; v<n_adjacent_vertices; v++)
 	    adjacent_vertices_ids[v] =
 	      so_elem->node( so_elem->second_order_adjacent_vertex(son,v) );
 
 	  /*
 	   * \p adjacent_vertices_ids is now in order of the current
-	   * side.  sort it, so that comparisons  with the 
-	   * \p adjacent_vertices_ids created through other elements' 
+	   * side.  sort it, so that comparisons  with the
+	   * \p adjacent_vertices_ids created through other elements'
 	   * sides can match
 	   */
 	  std::sort(adjacent_vertices_ids.begin(),
@@ -572,14 +572,14 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
 	  // does this set of vertices already has a mid-node added?
 	  std::pair<std::map<std::vector<unsigned int>, Node*>::iterator,
-                    std::map<std::vector<unsigned int>, Node*>::iterator>	    
+                    std::map<std::vector<unsigned int>, Node*>::iterator>
 	    pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
 
 	  // no, not added yet
 	  if (pos.first == pos.second)
 	    {
 	      /*
-	       * for this set of vertices, there is no 
+	       * for this set of vertices, there is no
 	       * second_order node yet.  Add it.
 	       *
 	       * compute the location of the new node as
@@ -590,7 +590,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 		new_location += this->point(adjacent_vertices_ids[v]);
 
 	      new_location /= static_cast<Real>(n_adjacent_vertices);
-	      
+
 	      /* Add the new point to the mesh, giving it a globally
                * well-defined processor id.
 	       */
@@ -598,7 +598,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
                 (new_location, DofObject::invalid_id,
                 this->node(adjacent_vertices_ids[0]).processor_id());
 
-	      /* 
+	      /*
 	       * insert the new node with its defining vertex
 	       * set into the map, and relocate pos to this
 	       * new entry, so that the so_elem can use
@@ -614,7 +614,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	  else
 	    {
 	      libmesh_assert (pos.first->second != NULL);
-	      
+
 	      so_elem->set_node(son) = pos.first->second;
 	    }
 	}
@@ -627,12 +627,12 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * data structure by insert_elem.
        */
       libmesh_assert (lo_elem->n_sides() == so_elem->n_sides());
-	
+
       for (unsigned int s=0; s<lo_elem->n_sides(); s++)
 	{
 	  const std::vector<short int> boundary_ids =
 	    this->boundary_info->raw_boundary_ids (lo_elem, s);
-	    
+
 	  this->boundary_info->add_side (so_elem, s, boundary_ids);
 	}
 
@@ -693,7 +693,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   std::vector<Elem*> new_bndry_elements;
   std::vector<unsigned short int> new_bndry_sides;
   std::vector<short int> new_bndry_ids;
-  
+
   // Iterate over the elements, splitting QUADS into
   // pairs of conforming triangles.
   // FIXME: This algorithm does not work on refined grids!
@@ -721,70 +721,70 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	Elem* tri0 = NULL;
 	Elem* tri1 = NULL;
 
-	
+
 	switch (etype)
 	  {
 	  case QUAD4:
 	    {
 	      split_elem = true;
-	      
+
 	      tri0 = new Tri3;
 	      tri1 = new Tri3;
-	      
+
 	      // Check for possible edge swap
 	      if ((elem->point(0) - elem->point(2)).size() <
 		  (elem->point(1) - elem->point(3)).size())
-		{	      
+		{
 		  tri0->set_node(0) = elem->get_node(0);
 		  tri0->set_node(1) = elem->get_node(1);
 		  tri0->set_node(2) = elem->get_node(2);
-		
+
 		  tri1->set_node(0) = elem->get_node(0);
 		  tri1->set_node(1) = elem->get_node(2);
 		  tri1->set_node(2) = elem->get_node(3);
 		}
-	    
+
 	      else
 		{
 		  edge_swap=true;
-		  
+
 		  tri0->set_node(0) = elem->get_node(0);
 		  tri0->set_node(1) = elem->get_node(1);
 		  tri0->set_node(2) = elem->get_node(3);
-		
+
 		  tri1->set_node(0) = elem->get_node(1);
 		  tri1->set_node(1) = elem->get_node(2);
 		  tri1->set_node(2) = elem->get_node(3);
 		}
 
-	      
+
 	      break;
 	    }
-      
+
 	  case QUAD8:
 	    {
 	      split_elem =  true;
-	      
+
 	      tri0 = new Tri6;
 	      tri1 = new Tri6;
-	  
+
 	      Node* new_node = mesh.add_point( (mesh.node(elem->node(0)) +
 						mesh.node(elem->node(1)) +
 						mesh.node(elem->node(2)) +
 						mesh.node(elem->node(3)) / 4)
 					       );
-	  
+
 	      // Check for possible edge swap
 	      if ((elem->point(0) - elem->point(2)).size() <
 		  (elem->point(1) - elem->point(3)).size())
-		{	      
+		{
 		  tri0->set_node(0) = elem->get_node(0);
 		  tri0->set_node(1) = elem->get_node(1);
 		  tri0->set_node(2) = elem->get_node(2);
 		  tri0->set_node(3) = elem->get_node(4);
 		  tri0->set_node(4) = elem->get_node(5);
 		  tri0->set_node(5) = new_node;
-	      
+
 		  tri1->set_node(0) = elem->get_node(0);
 		  tri1->set_node(1) = elem->get_node(2);
 		  tri1->set_node(2) = elem->get_node(3);
@@ -793,18 +793,18 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 		  tri1->set_node(5) = elem->get_node(7);
 
 		}
-	  
+
 	      else
 		{
 		  edge_swap=true;
-		  
+
 		  tri0->set_node(0) = elem->get_node(3);
 		  tri0->set_node(1) = elem->get_node(0);
 		  tri0->set_node(2) = elem->get_node(1);
 		  tri0->set_node(3) = elem->get_node(7);
 		  tri0->set_node(4) = elem->get_node(4);
 		  tri0->set_node(5) = new_node;
-	      
+
 		  tri1->set_node(0) = elem->get_node(1);
 		  tri1->set_node(1) = elem->get_node(2);
 		  tri1->set_node(2) = elem->get_node(3);
@@ -812,28 +812,28 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 		  tri1->set_node(4) = elem->get_node(6);
 		  tri1->set_node(5) = new_node;
 		}
-	  
+
 	      break;
 	    }
-      
+
 	  case QUAD9:
 	    {
 	      split_elem =  true;
-	      
+
 	      tri0 = new Tri6;
 	      tri1 = new Tri6;
 
 	      // Check for possible edge swap
 	      if ((elem->point(0) - elem->point(2)).size() <
 		  (elem->point(1) - elem->point(3)).size())
-		{	      
+		{
 		  tri0->set_node(0) = elem->get_node(0);
 		  tri0->set_node(1) = elem->get_node(1);
 		  tri0->set_node(2) = elem->get_node(2);
 		  tri0->set_node(3) = elem->get_node(4);
 		  tri0->set_node(4) = elem->get_node(5);
 		  tri0->set_node(5) = elem->get_node(8);
-	      
+
 		  tri1->set_node(0) = elem->get_node(0);
 		  tri1->set_node(1) = elem->get_node(2);
 		  tri1->set_node(2) = elem->get_node(3);
@@ -845,14 +845,14 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      else
 		{
 		  edge_swap=true;
-		  
+
 		  tri0->set_node(0) = elem->get_node(0);
 		  tri0->set_node(1) = elem->get_node(1);
 		  tri0->set_node(2) = elem->get_node(3);
 		  tri0->set_node(3) = elem->get_node(4);
 		  tri0->set_node(4) = elem->get_node(8);
 		  tri0->set_node(5) = elem->get_node(7);
-	      
+
 		  tri1->set_node(0) = elem->get_node(1);
 		  tri1->set_node(1) = elem->get_node(2);
 		  tri1->set_node(2) = elem->get_node(3);
@@ -860,7 +860,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 		  tri1->set_node(4) = elem->get_node(6);
 		  tri1->set_node(5) = elem->get_node(8);
 		}
-	    
+
 	      break;
 	    }
           // No need to split elements that are already triangles
@@ -877,7 +877,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	    }
 	  } // end switch (etype)
 
-	
+
 
 	if (split_elem)
 	  {
@@ -887,7 +887,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
             tri0->subdomain_id() = elem->subdomain_id();
             tri1->processor_id() = elem->processor_id();
             tri1->subdomain_id() = elem->subdomain_id();
-	   
+
 	    if (mesh_has_boundary_data)
 	      {
 		for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
@@ -901,7 +901,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 		          {
 			    // Add the boundary ID to the list of new boundary ids
 			    new_bndry_ids.push_back(b_id);
-			  
+
 			    // Convert the boundary side information of the old element to
 			    // boundary side information for the new element.
 			    if (!edge_swap)
@@ -993,7 +993,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 		mesh.boundary_info->remove(elem);
 
 	      } // end if (mesh_has_boundary_data)
-	    
+
 	    // Determine new IDs for the split elements which will be
 	    // the same on all processors, therefore keeping the Mesh
 	    // in sync.  Note: we offset the new IDs by n_orig_elem to
@@ -1012,7 +1012,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
       } // End for loop over elements
   } // end scope
 
-  
+
   // Now, iterate over the new elements vector, and add them each to
   // the Mesh.
   {
@@ -1045,7 +1045,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 				     new_bndry_sides[s],
 				     new_bndry_ids[s]);
     }
-  
+
 
   // Prepare the newly created mesh for use.
   mesh.prepare_for_use(/*skip_renumber =*/ false);
@@ -1062,7 +1062,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
    * This implementation assumes every element "side" has only 2 nodes.
    */
   libmesh_assert (mesh.mesh_dimension() == 2);
-  
+
   /*
    * find the boundary nodes
    */
@@ -1090,17 +1090,17 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
              * Loop over the elements to calculate new node positions
              */
             MeshBase::element_iterator       el  = mesh.level_elements_begin(refinement_level);
-            const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level); 
-	
+            const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level);
+
             for (; el != end; ++el)
               {
                 /*
                  * Constant handle for the element
                  */
                 const Elem* elem = *el;
-          
+
                 /*
-                 * We relax all nodes on level 0 first 
+                 * We relax all nodes on level 0 first
                  * If the element is refined (level > 0), we interpolate the
                  * parents nodes with help of the embedding matrix
                  */
@@ -1115,7 +1115,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                          * Sides get only built once.
                          */
                         if ((elem->neighbor(s) != NULL) &&
-                            (elem->id() > elem->neighbor(s)->id()) ) 
+                            (elem->id() > elem->neighbor(s)->id()) )
                           {
                             AutoPtr<Elem> side(elem->build_side(s));
 
@@ -1137,7 +1137,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                             weight[id1] += node_weight;
                           }
                       } // element neighbor loop
-                  } 
+                  }
 #ifdef LIBMESH_ENABLE_AMR
                 else   // refinement_level > 0
                   {
@@ -1171,7 +1171,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                                      * The value from the embedding matrix
                                      */
                                     const float em_val = parent->embedding_matrix(c,nc,n);
-	      
+
                                     if (em_val != 0.)
                                       point.add_scaled (parent->point(n), em_val);
                                   }
@@ -1180,14 +1180,14 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                                 new_positions[id] = point;
                                 weight[id] = 1.;
                               }
-                    
+
                           } // if parent->child == elem
                       } // for parent->n_children
                   } // if element refinement_level
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
               } // element loop
-          
+
             /*
              * finally reposition the vertex nodes
              */
@@ -1203,7 +1203,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
              * we do a second loop over the level elements
              */
             MeshBase::element_iterator       el  = mesh.level_elements_begin(refinement_level);
-            const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level); 
+            const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level);
 
             for (; el != end; ++el)
               {
@@ -1218,7 +1218,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                     const unsigned int n_adjacent_vertices =
                       elem->n_second_order_adjacent_vertices(n);
 
-                    Point point; 
+                    Point point;
                     for (unsigned int v=0; v<n_adjacent_vertices; v++)
                       point.add(elem->point( elem->second_order_adjacent_vertex(n,v) ));
 
@@ -1227,7 +1227,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                   }
               }
           }
-      
+
         } // refinement_level loop
 
     } // end iteration
@@ -1239,14 +1239,14 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
 void MeshTools::Modification::flatten(MeshBase& mesh)
 {
   // Algorithm:
-  // .) For each active element in the mesh: construct a 
+  // .) For each active element in the mesh: construct a
   //    copy which is the same in every way *except* it is
   //    a level 0 element.  Store the pointers to these in
   //    a separate vector. Save any boundary information as well.
   //    Delete the active element from the mesh.
   // .) Loop over all (remaining) elements in the mesh, delete them.
   // .) Add the level-0 copies back to the mesh
-  
+
   // Temporary storage for new element pointers
   std::vector<Elem*> new_elements;
 
@@ -1262,7 +1262,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
   saved_bc_sides.reserve(mesh.boundary_info->n_boundary_conds());
   {
     MeshBase::element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator end = mesh.active_elements_end(); 
+    const MeshBase::element_iterator end = mesh.active_elements_end();
 
     for (; it != end; ++it)
       {
@@ -1301,31 +1301,31 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	      }
 	  }
 
-	
+
 	// We're done with this element
 	mesh.delete_elem(elem);
 
 	// But save the copy
 	new_elements.push_back(copy);
       }
-    
+
     // Make sure we saved the same number of boundary conditions
     // in each vector.
     libmesh_assert (saved_boundary_elements.size() == saved_bc_ids.size());
     libmesh_assert (saved_bc_ids.size()            == saved_bc_sides.size());
   }
 
-  
+
   // Loop again, delete any remaining elements
   {
     MeshBase::element_iterator       it  = mesh.elements_begin();
-    const MeshBase::element_iterator end = mesh.elements_end(); 
+    const MeshBase::element_iterator end = mesh.elements_end();
 
     for (; it != end; ++it)
       mesh.delete_elem( *it );
   }
 
-  
+
   // Add the copied (now level-0) elements back to the mesh
   {
     for (std::vector<Elem*>::iterator it = new_elements.begin();
@@ -1391,7 +1391,7 @@ void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
 {
   MeshBase::element_iterator           el = mesh.elements_begin();
   const MeshBase::element_iterator end_el = mesh.elements_end();
-  
+
   for (; el != end_el; ++el)
     {
       Elem *elem = *el;
@@ -1400,7 +1400,7 @@ void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
 	elem->subdomain_id() = new_id;
     }
 }
-  
+
 
 } // namespace libMesh
 

@@ -224,7 +224,7 @@ if(me>=3){
 		scanned = fscanf(stream1,"%le ",&d1);
 		libmesh_assert(scanned != EOF);
 	}
-	fprintf(stream,"%d \n",mask[i]); 
+	fprintf(stream,"%d \n",mask[i]);
 	scanned = fscanf(stream1,"%d \n",&lo);
 	libmesh_assert(scanned != EOF);
     }
@@ -489,7 +489,7 @@ FILE *stream;
    stream=fopen(name,"r");
    for(i=0;i<ncells;i++)
 	  for(j=0;j<n;j++){
-	  for(k=0;k<n;k++){scanned = fscanf(stream,"%le ",&d); 
+	  for(k=0;k<n;k++){scanned = fscanf(stream,"%le ",&d);
             libmesh_assert(scanned != EOF);
             H[i][j][k]=d;}
 		  scanned = fscanf(stream,"\n");

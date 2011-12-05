@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -317,7 +317,7 @@ public:
   virtual void read_riesz_representors_from_files(const std::string& riesz_representors_dir,
                                                   const bool write_binary_residual_representors);
 
-  
+
   /**
    * This function computes all of the residual representors, can be useful
    * when restarting a basis training computation.
@@ -332,7 +332,7 @@ public:
    * and set the this system's member variables accordingly.
    */
   virtual void process_parameters_file(const std::string& parameters_filename);
-  
+
   /**
    * Print out info that describes the current setup of this RBConstruction.
    */
@@ -464,7 +464,7 @@ public:
    * on internal element boundaries in the assembly routines.
    */
   bool impose_internal_fluxes;
-  
+
   /**
    * Boolean flag to indicate whether we compute the RB_inner_product_matrix.
    * This is false by default in RBConstruction since (in the default implementation)
@@ -479,7 +479,7 @@ public:
    * enforced.
    */
   bool store_non_dirichlet_operators;
-  
+
   /**
    * Public member variable which we use to determine whether or
    * not we enforce hanging-dof and/or periodic constraints exactly.
@@ -496,7 +496,7 @@ public:
   bool use_empty_rb_solve_in_greedy;
 
 protected:
-  
+
   /**
    * Helper function that actually allocates all the data
    * structures required by this class.
@@ -522,7 +522,7 @@ protected:
    * evaluations on each element.
    */
   virtual AutoPtr<FEMContext> build_context();
-  
+
   /**
    * Define the matrix assembly for the output residual dual
    * norm solves. By default we use the inner product matrix
@@ -627,7 +627,7 @@ protected:
    * a series of functions to update the system properly.
    */
   virtual void update_system();
-  
+
   /**
    * This function returns the RB error bound for the current parameters and
    * is used in the Greedy algorithm to select the next parameter.

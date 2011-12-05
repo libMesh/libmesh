@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -39,20 +39,20 @@ namespace libMesh
 //-----------------------------------------------------------------------
 //EpetraMatrix members
 
-template <typename T> 
+template <typename T>
 void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
-{  
+{
   // clear data, start over
-  this->clear ();    
+  this->clear ();
 
   // big trouble if this fails!
   libmesh_assert (this->_dof_map != NULL);
-  
+
   const unsigned int n_rows = sparsity_pattern.size();
 
   const unsigned int m   = this->_dof_map->n_dofs();
   const unsigned int n   = m;
-  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id()); 
+  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id());
   const unsigned int m_l = n_l;
 
   // error checking
@@ -61,7 +61,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
     libmesh_assert (n == m);
     libmesh_assert (n_l == m_l);
 
-    unsigned int 
+    unsigned int
       summed_m_l = m_l,
       summed_n_l = n_l;
 
@@ -72,29 +72,29 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
     libmesh_assert (n == summed_n_l);
   }
 #endif
-  
+
   // build a map defining the data distribution
-  _map = new Epetra_Map (m, 
+  _map = new Epetra_Map (m,
                          m_l,
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
 
   libmesh_assert (static_cast<unsigned int>(_map->NumGlobalPoints()) == m);
   libmesh_assert (static_cast<unsigned int>(_map->MaxAllGID()+1) == m);
-  
+
   const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
-  
+
    // Make sure the sparsity pattern isn't empty
   libmesh_assert (n_nz.size() == n_l);
   libmesh_assert (n_oz.size() == n_l);
 
   // Epetra wants the total number of nonzeros, both local and remote.
   std::vector<int> n_nz_tot; /**/ n_nz_tot.reserve(n_nz.size());
-  
-  for (unsigned int i=0; i<n_nz.size(); i++)    
+
+  for (unsigned int i=0; i<n_nz.size(); i++)
     n_nz_tot.push_back(std::min(n_nz[i] + n_oz[i], n));
-  
+
   if (m==0)
     return;
 
@@ -145,7 +145,7 @@ void EpetraMatrix<T>::init (const unsigned int m,
     libmesh_assert (n == m);
     libmesh_assert (n_l == m_l);
 
-    unsigned int 
+    unsigned int
       summed_m_l = m_l,
       summed_n_l = n_l;
 
@@ -158,11 +158,11 @@ void EpetraMatrix<T>::init (const unsigned int m,
 #endif
 
   // build a map defining the data distribution
-  _map = new Epetra_Map (m, 
+  _map = new Epetra_Map (m,
                          m_l,
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
-  
+
   libmesh_assert (static_cast<unsigned int>(_map->NumGlobalPoints()) == m);
   libmesh_assert (static_cast<unsigned int>(_map->MaxAllGID()+1) == m);
 
@@ -176,7 +176,7 @@ template <typename T>
 void EpetraMatrix<T>::init ()
 {
   libmesh_assert (this->_dof_map != NULL);
-  
+
   {
     // Clear initialized matrices
     if (this->initialized())
@@ -184,7 +184,7 @@ void EpetraMatrix<T>::init ()
 
     this->_is_initialized = true;
   }
-  
+
 
   _mat = new Epetra_FECrsMatrix (Copy, *_graph);
 }
@@ -195,7 +195,7 @@ template <typename T>
 void EpetraMatrix<T>::zero ()
 {
   libmesh_assert (this->initialized());
-  
+
   _mat->Scale(0.0);
 }
 
@@ -208,7 +208,7 @@ void EpetraMatrix<T>::clear ()
 //  delete _map;
 
   this->_is_initialized = false;
-  
+
   libmesh_assert (!this->initialized());
 }
 
@@ -218,7 +218,7 @@ template <typename T>
 Real EpetraMatrix<T>::l1_norm () const
 {
   libmesh_assert (this->initialized());
-  
+
   libmesh_assert (_mat != NULL);
 
   return static_cast<Real>(_mat->NormOne());
@@ -230,8 +230,8 @@ template <typename T>
 Real EpetraMatrix<T>::linfty_norm () const
 {
   libmesh_assert (this->initialized());
-  
-  
+
+
   libmesh_assert (_mat != NULL);
 
   return static_cast<Real>(_mat->NormInf());
@@ -247,10 +247,10 @@ void EpetraMatrix<T>::print_matlab (const std::string) const
 
   // libmesh_assert (this->closed());
   this->close();
-  
+
   libmesh_not_implemented();
 
-//   int ierr=0; 
+//   int ierr=0;
 //   PetscViewer petsc_viewer;
 
 
@@ -260,7 +260,7 @@ void EpetraMatrix<T>::print_matlab (const std::string) const
 
 //   /**
 //    * Create an ASCII file containing the matrix
-//    * if a filename was provided.  
+//    * if a filename was provided.
 //    */
 //   if (name != "NULL")
 //     {
@@ -268,11 +268,11 @@ void EpetraMatrix<T>::print_matlab (const std::string) const
 // 				   name.c_str(),
 // 				   &petsc_viewer);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
 //       ierr = PetscViewerSetFormat (petsc_viewer,
 // 				   PETSC_VIEWER_ASCII_MATLAB);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
 //       ierr = MatView (_mat, petsc_viewer);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 //     }
@@ -285,7 +285,7 @@ void EpetraMatrix<T>::print_matlab (const std::string) const
 //       ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
 // 				   PETSC_VIEWER_ASCII_MATLAB);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
 //       ierr = MatView (_mat, PETSC_VIEWER_STDOUT_WORLD);
 //              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 //     }
@@ -329,7 +329,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 // {
 //   // Can only extract submatrices from closed matrices
 //   this->close();
-  
+
 //   libmesh_not_implemented();
 
 // //   // Attempt to cast the input matrix to a EpetraMatrix*

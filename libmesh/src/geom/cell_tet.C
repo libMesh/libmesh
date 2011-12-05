@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -43,7 +43,7 @@ unsigned int Tet::key (const unsigned int s) const
 	this->compute_key (this->node(0),
 			   this->node(2),
 			   this->node(1));
-      
+
     case 1:
       return
 	this->compute_key (this->node(0),
@@ -60,7 +60,7 @@ unsigned int Tet::key (const unsigned int s) const
       return
 	this->compute_key (this->node(2),
 			   this->node(0),
-			   this->node(3));	
+			   this->node(3));
     }
 
   // We'll never get here.
@@ -75,9 +75,9 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
   libmesh_assert (i < this->n_sides());
 
 
-  
+
   Elem* face = new Tri3;
-  
+
   switch (i)
     {
     case 0:
@@ -112,7 +112,7 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 	face->set_node(0) = this->get_node(2);
 	face->set_node(1) = this->get_node(0);
 	face->set_node(2) = this->get_node(3);
-	
+
         AutoPtr<Elem> ap_face(face);
 	return ap_face;
       }
@@ -155,7 +155,7 @@ bool Tet::is_child_on_side(const unsigned int c,
   for (unsigned int nc = 0; nc != 3; ++nc)
     {
       independent_nodes++;  // Hey, we're independent so far!
-      
+
 #ifdef LIBMESH_ENABLE_AMR
       if (this->embedding_matrix(c,nc,n) != 0.)
         {
@@ -187,7 +187,7 @@ Real Tet::quality(const ElemQuality q) const
 std::pair<Real, Real> Tet::qual_bounds (const ElemQuality q) const
 {
   std::pair<Real, Real> bounds;
-  
+
   switch (q)
     {
 
@@ -196,7 +196,7 @@ std::pair<Real, Real> Tet::qual_bounds (const ElemQuality q) const
       bounds.first  = 1.;
       bounds.second = 3.;
       break;
-      
+
     case SIZE:
     case SHAPE:
       bounds.first  = 0.2;
@@ -207,17 +207,17 @@ std::pair<Real, Real> Tet::qual_bounds (const ElemQuality q) const
       bounds.first  = 1.;
       bounds.second = 3.;
       break;
-      
+
     case DISTORTION:
       bounds.first  = 0.6;
       bounds.second = 1.;
-      break;  
+      break;
 
     case JACOBIAN:
       bounds.first  = 0.5;
       bounds.second = 1.414;
       break;
-      
+
     default:
       libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
       bounds.first  = -1;

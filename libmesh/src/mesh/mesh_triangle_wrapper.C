@@ -38,7 +38,7 @@ namespace libMesh
     t.pointattributelist           = static_cast<REAL*>(NULL);
     t.pointmarkerlist              = static_cast<int* >(NULL);
     t.numberofpoints               = 0 ;
-    t.numberofpointattributes      = 0 ;                                   
+    t.numberofpointattributes      = 0 ;
 
     t.trianglelist                 = static_cast<int* >(NULL);
     t.triangleattributelist        = static_cast<REAL*>(NULL);
@@ -47,7 +47,7 @@ namespace libMesh
     t.numberoftriangles            = 0;
     t.numberofcorners              = 0;
     t.numberoftriangleattributes   = 0;
-  
+
     t.segmentlist                  = static_cast<int* >(NULL);
     t.segmentmarkerlist            = static_cast<int* >(NULL);
     t.numberofsegments             = 0;
@@ -57,14 +57,14 @@ namespace libMesh
 
     t.regionlist                   = static_cast<REAL*>(NULL);
     t.numberofregions              = 0;
-  
+
     t.edgelist                     = static_cast<int* >(NULL);
     t.edgemarkerlist               = static_cast<int* >(NULL);
     t.normlist                     = static_cast<REAL*>(NULL);
     t.numberofedges                = 0;
   }
-  
-  
+
+
 
 
 
@@ -87,7 +87,7 @@ namespace libMesh
 	std::free (t.holelist  );
 	std::free (t.regionlist);
       }
-  
+
     std::free (t.edgelist      );
     std::free (t.edgemarkerlist);
     std::free (t.normlist      );
@@ -95,8 +95,8 @@ namespace libMesh
     // Reset
     // TriangleWrapper::init(t);
   }
-  
-  
+
+
 
 
 
@@ -107,10 +107,10 @@ namespace libMesh
   {
     // Transfer the information into the LibMesh mesh.
     mesh_output.clear();
-  
+
     // Make sure the new Mesh will be 2D
     mesh_output.set_mesh_dimension(2);
-  
+
     // Node information
     for (int i=0, c=0; c<triangle_data_input.numberofpoints; i+=2, ++c)
       {
@@ -169,7 +169,7 @@ namespace libMesh
     //mesh_output.prepare_for_use(/*skip_renumber =*/false);
     mesh_output.find_neighbors();
   }
-  
+
 
 }
 

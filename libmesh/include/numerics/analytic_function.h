@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -34,7 +34,7 @@ namespace libMesh
 
 
 // Forward Declarations
-template <typename T> 
+template <typename T>
 class DenseVector;
 
 
@@ -60,7 +60,7 @@ public:
 				const Real time));
 
   /**
-   * Constructor.  Takes a function pointer for 
+   * Constructor.  Takes a function pointer for
    * vector valued functions.
    */
   AnalyticFunction (void fptr(DenseVector<Number>& output,
@@ -73,7 +73,7 @@ public:
 
 
   /**
-   * Pointer to user-provided function that computes 
+   * Pointer to user-provided function that computes
    * the boundary values when an analytical expression
    * is available.
    */
@@ -88,7 +88,7 @@ public:
 			 const Real time);
 
   /**
-   * The actual initialization process. 
+   * The actual initialization process.
    */
   void init ();
 
@@ -98,14 +98,14 @@ public:
   void clear ();
 
   /**
-   * @returns the value at point \p p and time 
+   * @returns the value at point \p p and time
    * \p time, which defaults to zero.
    */
-  Number operator() (const Point& p, 
+  Number operator() (const Point& p,
 		     const Real time=0.);
 
   /**
-   * Like before, but returns the values in a 
+   * Like before, but returns the values in a
    * writable reference.
    */
   void operator() (const Point& p,
@@ -119,7 +119,7 @@ public:
 // ------------------------------------------------------------
 // AnalyticFunction inline methods
 inline
-Number AnalyticFunction::operator() (const Point& p, 
+Number AnalyticFunction::operator() (const Point& p,
 				     const Real time)
 {
   libmesh_assert (this->initialized());

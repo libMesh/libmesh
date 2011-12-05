@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -38,79 +38,79 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
 {
   const Real xi = p(0);
 
-	
+
   switch (order)
     {
       // Lagrange linears
     case FIRST:
       {
 	libmesh_assert (i<2);
-	
+
 	switch (i)
 	  {
 	  case 0:
 	    return .5*(1. - xi);
-	  
+
 	  case 1:
 	    return .5*(1. + xi);
-	   
+
 	  default:
 	    libMesh::err << "Invalid shape function index!" << std::endl;
 	    libmesh_error();
 	  }
       }
 
-      
-	      
+
+
       // Lagrange quadratics
     case SECOND:
       {
 	libmesh_assert (i<3);
-	
+
 	switch (i)
 	  {
 	  case 0:
 	    return .5*xi*(xi - 1.);
-	    
+
 	  case 1:
 	    return .5*xi*(xi + 1);
-	   
+
 	  case 2:
 	    return (1. - xi*xi);
-	    
+
 	  default:
 	    libMesh::err << "Invalid shape function index!" << std::endl;
 	    libmesh_error();
 	  }
       }
 
-      
+
 
       // Lagrange cubics
     case THIRD:
       {
 	libmesh_assert (i<4);
-	
+
 	switch (i)
 	  {
 	  case 0:
 	    return 9./16.*(1./9.-xi*xi)*(xi-1.);
-	   
+
 	  case 1:
 	    return -9./16.*(1./9.-xi*xi)*(xi+1.);
-	   
+
 	  case 2:
 	    return 27./16.*(1.-xi*xi)*(1./3.-xi);
-	   
+
 	  case 3:
 	    return 27./16.*(1.-xi*xi)*(1./3.+xi);
-	   
+
 	  default:
 	    libMesh::err << "Invalid shape function index!" << std::endl;
 	    libmesh_error();
 	  }
       }
-      
+
     default:
       {
 	libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
@@ -118,7 +118,7 @@ Real FE<1,LAGRANGE>::shape(const ElemType,
       }
     }
 
-  
+
   libmesh_error();
   return 0.;
 }
@@ -132,7 +132,7 @@ Real FE<1,LAGRANGE>::shape(const Elem* elem,
 			   const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   return FE<1,LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
 
@@ -146,50 +146,50 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
 				 const Point& p)
 {
   // only d()/dxi in 1D!
-  
+
   libmesh_assert (j == 0);
-	
+
   const Real xi = p(0);
 
-	
+
   switch (order)
-    {      
+    {
       // Lagrange linear shape function derivatives
     case FIRST:
       {
 	libmesh_assert (i<2);
-	
+
 	switch (i)
 	  {
 	  case 0:
 	    return -.5;
-	   
+
 	  case 1:
 	    return .5;
-	    
+
 	  default:
 	    libMesh::err << "Invalid shape function index!" << std::endl;
 	    libmesh_error();
 	  }
       }
-	
-	      
+
+
       // Lagrange quadratic shape function derivatives
     case SECOND:
       {
 	libmesh_assert (i<3);
-	
+
 	switch (i)
 	  {
 	  case 0:
 	    return xi-.5;
-	    
+
 	  case 1:
 	    return xi+.5;
-	    
+
 	  case 2:
 	    return -2.*xi;
-	   
+
 	  default:
 	    libMesh::err << "Invalid shape function index!" << std::endl;
 	    libmesh_error();
@@ -201,28 +201,28 @@ Real FE<1,LAGRANGE>::shape_deriv(const ElemType,
     case THIRD:
       {
 	libmesh_assert (i<4);
-	
+
 	switch (i)
 	  {
 	  case 0:
 	    return -9./16.*(3.*xi*xi-2.*xi-1./9.);
-	    
+
 	  case 1:
 	    return -9./16.*(-3.*xi*xi-2.*xi+1./9.);
-	   
+
 	  case 2:
 	    return 27./16.*(3.*xi*xi-2./3.*xi-1.);
-	    
+
 	  case 3:
 	    return 27./16.*(-3.*xi*xi-2./3.*xi+1.);
-	    
+
 	  default:
 	    libMesh::err << "Invalid shape function index!" << std::endl;
 	    libmesh_error();
 	  }
       }
 
-      
+
     default:
       {
 	libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
@@ -244,7 +244,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const Elem* elem,
 				 const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   return FE<1,LAGRANGE>::shape_deriv(elem->type(),
 				     static_cast<Order>(order + elem->p_level()), i, j, p);
 }
@@ -264,7 +264,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
 
   const Real xi = p(0);
   libmesh_assert (j == 0);
-  
+
   switch (order)
     {
       // linear Lagrange shape functions
@@ -281,13 +281,13 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
 	  {
 	  case 0:
 	    return 1.;
-	    
+
 	  case 1:
 	    return 1.;
-	    
+
 	  case 2:
 	    return -2.;
-	    
+
 	  default:
 	    {
 	      libMesh::err << "Invalid shape function index requested!"
@@ -303,16 +303,16 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
         {
         case 0:
             return -9./16.*(6.*xi-2);
-            
+
         case 1:
             return -9./16.*(-6*xi-2.);
 
         case 2:
             return 27./16.*(6*xi-2./3.);
-            
+
         case 3:
             return 27./16.*(-6*xi-2./3.);
-            
+
         default:
           {
             libMesh::err << "Invalid shape function index requested!"
@@ -329,7 +329,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
 	libmesh_error();
       }
     } // end switch (order)
-  
+
   libmesh_error();
   return 0.;
 }
@@ -344,7 +344,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const Elem* elem,
 				        const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   return FE<1,LAGRANGE>::shape_second_deriv(elem->type(),
 				            static_cast<Order>(order + elem->p_level()), i, j, p);
 }

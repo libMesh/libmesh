@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -59,7 +59,7 @@ public:
    * Get the number of parameters.
    */
   unsigned int get_n_params() const;
-  
+
   /**
    * Set the number of parameters.
    */
@@ -69,7 +69,7 @@ public:
    * Get the current parameters.
    */
   std::vector<Real>& get_current_parameters();
-  
+
   /**
    * Set the current parameters to \p params
    */
@@ -85,7 +85,7 @@ public:
    * to all processors.
    */
   void broadcast_current_parameters(unsigned int proc_id);
-  
+
 protected:
 
   //----------- PROTECTED DATA MEMBERS -----------//

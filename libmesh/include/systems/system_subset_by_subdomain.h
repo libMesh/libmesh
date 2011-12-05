@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -55,12 +55,12 @@ public:
   class SubdomainSelection : public ReferenceCountedObject<SubdomainSelection>
   {
   public:
-    
+
     /**
      * Constructor.
      */
     SubdomainSelection (void);
-  
+
     /**
      * Destructor.
      */
@@ -71,7 +71,7 @@ public:
      * the subset or nor.
      */
     virtual bool operator()(const subdomain_id_type& subdomain_id)const=0;
-    
+
   private:
     /**
      * This isn't a copyable object, so let's make sure nobody tries.
@@ -127,7 +127,7 @@ public:
   SystemSubsetBySubdomain (const System& system,
 			   const SubdomainSelection& subdomain_selection,
 			   const std::set<unsigned int>* const var_nums = NULL);
-  
+
   /**
    * Constructor.  The subset will consist of those dofs which are
    * associated to at least one mesh element that has a subdomain id
@@ -139,7 +139,7 @@ public:
   SystemSubsetBySubdomain (const System& system,
 			   const std::set<subdomain_id_type>& subdomain_ids,
 			   const std::set<unsigned int>* const var_nums = NULL);
-  
+
   /**
    * Destructor.
    */

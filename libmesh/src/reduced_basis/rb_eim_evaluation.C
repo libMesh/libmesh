@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -39,7 +39,7 @@ RBEIMEvaluation::RBEIMEvaluation(RBEIMConstruction& rb_eim_con_in)
 void RBEIMEvaluation::clear()
 {
   Parent::clear();
-  
+
   interpolation_points.clear();
   interpolation_points_var.clear();
 }
@@ -52,7 +52,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   interpolation_points.clear();
   interpolation_points_var.clear();
   interpolation_matrix.resize(Nmax,Nmax);
-  
+
   // Resize the "extra" row due to the "extra Greedy step"
   extra_interpolation_matrix_row.resize(Nmax);
 }
@@ -72,7 +72,7 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
     libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
     libmesh_error();
   }
-  
+
   // This function uses rb_eim_con, so set rb_eim_con's parameter
   rb_eim_con.set_current_parameters( get_current_parameters() );
 
@@ -83,12 +83,12 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
   {
     EIM_rhs(i) = rb_eim_con.evaluate_parametrized_function(interpolation_points_var[i], interpolation_points[i]);
   }
-  
-  
+
+
 
   DenseMatrix<Number> interpolation_matrix_N;
   interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
-  
+
   interpolation_matrix_N.lu_solve(EIM_rhs, RB_solution);
 
   // Evaluate an a posteriori error bound
@@ -115,11 +115,11 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
         EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
       }
     }
-      
+
     Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
 
     STOP_LOG("rb_solve()", "RBEIMEvaluation");
-  
+
     return error_estimate;
   }
   else // Don't evaluate an error bound
@@ -133,7 +133,7 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
 void RBEIMEvaluation::rb_solve(DenseVector<Number>& EIM_rhs)
 {
   START_LOG("rb_solve()", "RBEIMEvaluation");
-  
+
   if(EIM_rhs.size() > get_n_basis_functions())
   {
     libMesh::err << "ERROR: N cannot be larger than the number "
@@ -145,13 +145,13 @@ void RBEIMEvaluation::rb_solve(DenseVector<Number>& EIM_rhs)
     libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
     libmesh_error();
   }
-  
+
   const unsigned int N = EIM_rhs.size();
   DenseMatrix<Number> interpolation_matrix_N;
   interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
-  
+
   interpolation_matrix_N.lu_solve(EIM_rhs, RB_solution);
-  
+
   STOP_LOG("rb_solve()", "RBEIMEvaluation");
 }
 
@@ -193,7 +193,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
           << interpolation_matrix(i,j) << " ";
       }
     }
-    
+
     // Also, write out the "extra" row
     std::ofstream extra_interpolation_matrix_row_out;
     {
@@ -211,7 +211,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
       extra_interpolation_matrix_row_out << std::scientific
           << extra_interpolation_matrix_row(j) << " ";
     extra_interpolation_matrix_row_out.close();
-    
+
     // Next write out interpolation_points
     std::ofstream interpolation_points_out;
     {
@@ -249,7 +249,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
           << extra_interpolation_point(1) << " "
           << extra_interpolation_point(2) << " ";
     extra_interpolation_point_out.close();
-    
+
     // Next write out interpolation_points_var
     std::ofstream interpolation_points_var_out;
     {
@@ -293,11 +293,11 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   START_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
 
   Parent::read_offline_data_from_files(directory_name);
-  
+
   // First, find out how many basis functions we had when Greedy terminated
   // This was set in RBSystem::read_offline_data_from_files
   unsigned int n_bfs = this->get_n_basis_functions();
-  
+
   // Read in the interpolation matrix
   std::ifstream interpolation_matrix_in;
   {
@@ -362,7 +362,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
     interpolation_points.push_back(p);
   }
   interpolation_points_in.close();
-  
+
   // Also, read in the extra interpolation point
   std::ifstream extra_interpolation_point_in;
   {
@@ -385,7 +385,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
     extra_interpolation_point = p;
   }
   extra_interpolation_point_in.close();
-  
+
 
   // Next read in interpolation_points_var
   std::ifstream interpolation_points_var_in;
@@ -406,7 +406,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
     interpolation_points_var.push_back(var);
   }
   interpolation_points_var_in.close();
-  
+
   // Also, read in extra_interpolation_point_var
   std::ifstream extra_interpolation_point_var_in;
   {
@@ -426,7 +426,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
     extra_interpolation_point_var = var;
   }
   extra_interpolation_point_var_in.close();
-  
+
   STOP_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
 }
 

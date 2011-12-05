@@ -34,13 +34,13 @@ void gen_random_string(std::string& s, const int len);
 int main(int argc, char** argv)
 {
   GetPot cl(argc, argv);
-  
+
   // Command line parsing
   if(!cl.search("--input"))
   {
     std::cerr << "No --input argument found!" << std::endl;
     usage_error(argv[0]);
-  } 
+  }
   const char* meshname = cl.next("");
 
   if(!cl.search("--oldid"))
@@ -72,16 +72,16 @@ int main(int argc, char** argv)
     flags = NODES | SIDES | BLOCKS; // ALL except EXODUS_DIM on
 
   // flags are exclusive
-  if (flags != NODES && 
-      flags != SIDES && 
-      flags != BLOCKS && 
-      flags != EXODUS_DIM && 
+  if (flags != NODES &&
+      flags != SIDES &&
+      flags != BLOCKS &&
+      flags != EXODUS_DIM &&
       flags != (NODES | SIDES | BLOCKS))
   {
     std::cerr << "Only one of the following options may be active [--nodesetonly | --sidesetonly | --blockonly | --dim]!" << std::endl;
     usage_error(argv[0]);
   }
-  
+
   // Processing
   std::string var_name, dim_name;
   int status;
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
       break;
     case SIDES:
       dim_name = DIM_NUM_SS;
-      var_name = VAR_SS_IDS; 
+      var_name = VAR_SS_IDS;
       break;
     case NODES:
       dim_name = DIM_NUM_NS;
@@ -120,15 +120,15 @@ int main(int argc, char** argv)
     // Get the ID and length of the variable in question - stored in a dimension field
     status = nc_inq_dimid (nc_id, dim_name.c_str(), &dim_id);
     if (status != NC_NOERR) handle_error(status, "Error while inquiring about a dimension's ID.");
-    
+
     status = nc_inq_dimlen (nc_id, dim_id, &dim_len);
     if (status != NC_NOERR) handle_error(status, "Error while inquiring about a dimension's length.");
-    
+
     if ( (flags & mask) != EXODUS_DIM)
       {
 	// Now get the variable values themselves
 	std::vector<long> var_vals(dim_len);
-    
+
 	status = nc_inq_varid (nc_id, var_name.c_str(), &var_id);
 	if (status != NC_NOERR) handle_error(status, "Error while inquiring about a variable's ID.");
 
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 	    // changed the dimension of this exodus file once using this very script.  There appears
 	    // to be no way to delete a dimension using basic NetCDF interfaces, so to workaround this
 	    // we just rename it to an arbitrary unique string that Exodus will ignore.
-	    
+
 	    // Construct a string with 6 random alpha-numeric characters at the end.
 	    std::string random_dim_name;
 	    gen_random_string(random_dim_name, 6);
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 	    int dummy=0;
 	    status = nc_def_dim (nc_id, dim_name.c_str(), newid, &dummy);
 	    if (status != NC_NOERR) handle_error(status, "Error while trying to define num_dim.");
-	    
+
 	    // Leave define mode
 	    status = nc_enddef(nc_id);
 	    if (status != NC_NOERR) handle_error(status, "Error while leaving define mode.");
@@ -188,7 +188,7 @@ int main(int argc, char** argv)
 
   // Write out the dataset
   status = nc_close(nc_id);
-  
+
   return 0;
 }
 
@@ -215,14 +215,14 @@ void handle_error(int error, std::string message)
 void usage_error(const char *progname)
 {
   std::cout << "Usage: " << progname
-            << " --input inputmesh --oldid <n> --newid <n> [--nodesetonly | --sidesetonly | --blockonly]" 
+            << " --input inputmesh --oldid <n> --newid <n> [--nodesetonly | --sidesetonly | --blockonly]"
             << std::endl;
   exit(1);
 }
 
 
 
-void gen_random_string(std::string& s, const int len) 
+void gen_random_string(std::string& s, const int len)
 {
   static const char alphanum[] =
     "0123456789"
@@ -233,7 +233,7 @@ void gen_random_string(std::string& s, const int len)
   srandom( static_cast<unsigned>(time(NULL)) );
 
   s.resize(len);
-  for (int i = 0; i < len; ++i) 
+  for (int i = 0; i < len; ++i)
     {
       s[i] = alphanum[random() % (sizeof(alphanum) - 1)];
     }

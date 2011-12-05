@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -59,7 +59,7 @@ public:
   typedef variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> Iterator;
 
 
-  
+
 public:
   /**
    * Abstract base class for the iterator type.  Ideally these mixin classes would be protected,
@@ -85,8 +85,8 @@ public:
 
 
 
-  
-  
+
+
   /**
    * Abstract base class for the predicate.
    */
@@ -106,15 +106,15 @@ public:
 
 
 
-  
-  
+
+
   /**
    * The actual iterator object is held as a template parameter here.
    */
   template<typename IterType>
   struct Iter : IterBase
   {
-    
+
     /**
      * Constructor
      */
@@ -123,7 +123,7 @@ public:
     {
       // libMesh::out << "In Iter<IterType>::Iter(const IterType& v)" << std::endl;
     }
-    
+
 
     /**
      * Copy Constructor.
@@ -137,21 +137,21 @@ public:
      * Destructor
      */
     virtual ~Iter () {}
-    
+
     /**
      * @returns a copy of this object as a pointer to
      * the base (non-templated) class.
      */
     virtual IterBase* clone() const
     {
-#ifdef __SUNPRO_CC      
-      variant_filter_iterator::Iter<IterType> *copy = 
+#ifdef __SUNPRO_CC
+      variant_filter_iterator::Iter<IterType> *copy =
 	new variant_filter_iterator::Iter<IterType>(iter_data);
 #else
-      Iter<IterType> *copy = 
-	new Iter<IterType>(iter_data);      
+      Iter<IterType> *copy =
+	new Iter<IterType>(iter_data);
 #endif
-      
+
       return copy;
     }
 
@@ -199,13 +199,13 @@ public:
     virtual bool equal(const IterBase *other) const
     {
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
-      const variant_filter_iterator::Iter<IterType>* p = 
+      const variant_filter_iterator::Iter<IterType>* p =
 	libMesh::libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>*>(other);
-#else      
-      const Iter<IterType>* p = 
-	libMesh::libmesh_cast_ptr<const Iter<IterType>*>(other);      
+#else
+      const Iter<IterType>* p =
+	libMesh::libmesh_cast_ptr<const Iter<IterType>*>(other);
 #endif
-      
+
       return (iter_data == p->iter_data);
     }
 
@@ -215,9 +215,9 @@ public:
     IterType iter_data;
   };
 
-  
 
-  
+
+
   /**
    * The actual predicate is held as a template parameter here.
    * There are two template arguments here, one for the actual type
@@ -243,13 +243,13 @@ public:
     virtual PredBase* clone() const
     {
 #ifdef __SUNPRO_CC
-      variant_filter_iterator::Pred<IterType,PredType> *copy = 
+      variant_filter_iterator::Pred<IterType,PredType> *copy =
 	new variant_filter_iterator::Pred<IterType,PredType>(pred_data);
 #else
-      Pred<IterType,PredType> *copy = 
+      Pred<IterType,PredType> *copy =
 	new Pred<IterType,PredType>(pred_data);
 #endif
-      
+
       return copy;
     }
 
@@ -274,15 +274,15 @@ public:
     }
 
 
-    
-    
+
+
     /**
      * Re-implementation of op()
      */
     virtual bool operator() (const IterBase* in) const
     {
       libmesh_assert (in != NULL);
-      
+
       // Attempt downcast
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p =
@@ -291,11 +291,11 @@ public:
       const Iter<IterType>* p =
 	libMesh::libmesh_cast_ptr<const Iter<IterType>* >(in);
 #endif
-      
+
       // Return result of op() for the user's predicate.
       return pred_data(p->iter_data);
     }
-    
+
     /**
      * This is the predicate passed in by the user.
      */
@@ -330,7 +330,7 @@ public:
   PredBase* pred;
 
 
-  
+
 public:
   /**
    * Templated Constructor.  Allows you to construct the iterator
@@ -347,7 +347,7 @@ public:
   {
     this->satisfy_predicate();
   }
-  
+
   /**
    * Default Constructor.
    */
@@ -390,8 +390,8 @@ public:
 
 
 
-  
-  
+
+
   /**
    * Destructor
    */
@@ -401,7 +401,7 @@ public:
     delete end;  end  = NULL;
     delete pred; pred = NULL;
   }
-  
+
   /**
    * unary op*() forwards on to \p Iter::op*()
    */
@@ -418,7 +418,7 @@ public:
   {
     return (&**this);
   }
-  
+
   /**
    * op++() forwards on to \p Iter::op++()
    */
@@ -477,9 +477,9 @@ public:
   }
 
 
-  
+
 private:
-  
+
   /**
    * Advances the data pointer until it reaches
    * the end or the predicate is satisfied.
@@ -488,7 +488,7 @@ private:
   {
     while ( !data->equal(end) && !(*pred)(data) )
       ++(*data);
-  }  
+  }
 };
 
 

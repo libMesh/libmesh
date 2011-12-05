@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -85,7 +85,7 @@ void PointLocatorList::clear ()
 
 void PointLocatorList::init ()
 {
-  libmesh_assert (this->_list == NULL); 
+  libmesh_assert (this->_list == NULL);
 
   if (this->_initialized)
     {
@@ -114,10 +114,10 @@ void PointLocatorList::init ()
 	  // pointers of the mesh.  For this use the handy
 	  // element iterators.
 // 	  const_active_elem_iterator       el (this->_mesh.elements_begin());
-// 	  const const_active_elem_iterator end(this->_mesh.elements_end()); 
+// 	  const const_active_elem_iterator end(this->_mesh.elements_end());
 
 	  MeshBase::const_element_iterator       el  = _mesh.active_elements_begin();
-	  const MeshBase::const_element_iterator end = _mesh.active_elements_end(); 
+	  const MeshBase::const_element_iterator end = _mesh.active_elements_end();
 
 	  for (; el!=end; ++el)
 	    my_list.push_back(std::make_pair((*el)->centroid(), *el));
@@ -126,7 +126,7 @@ void PointLocatorList::init ()
 	}
 
       else
-	  
+
         {
 	  // We are _not_ the master.  Let our _list point to
 	  // the master's list.  But for this we first transform
@@ -173,7 +173,7 @@ const Elem* PointLocatorList::operator() (const Point& p) const
   // close to it.  But when a point comes, this
   // point may belong to the bounding box (where the
   // coplanar element does @e not belong to).  Then
-  // we would search through the elements in this 
+  // we would search through the elements in this
   // bounding box, while the other bounding box'es
   // element is closer, but we simply don't consider
   // it!

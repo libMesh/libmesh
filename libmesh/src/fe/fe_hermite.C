@@ -53,7 +53,7 @@ namespace libMesh
       const unsigned int n_sf =
 	// FE<Dim,T>::n_shape_functions(elem_type, totalorder);
 	FEInterface::n_shape_functions(Dim, fe_type, elem_type);
-	    
+
       std::vector<Point> refspace_nodes;
       FEBase::get_refspace_nodes(elem_type,refspace_nodes);
       libmesh_assert (refspace_nodes.size() == n_nodes);

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -31,7 +31,7 @@ const float Edge3::_embedding_matrix[2][3][3] =
 {
   // embedding matrix for child 0
   {
-    // 0    1    2  
+    // 0    1    2
     {1.0, 0.0, 0.0}, // left
     {0.0, 0.0, 1.0}, // right
     {3./8.,-1./8.,0.75} // middle
@@ -39,7 +39,7 @@ const float Edge3::_embedding_matrix[2][3][3] =
 
   // embedding matrix for child 1
   {
-    // 0    1    2  
+    // 0    1    2
     {0.0, 0.0, 1.0}, // left
     {0.0, 1.0, 0.0},  // right
     {-1./8.,3./8.,0.75} // middle
@@ -109,12 +109,12 @@ void Edge3::connectivity(const unsigned int sc,
       {
 	switch (sc)
 	  {
-	  case 0: 
+	  case 0:
 	    conn[0] = this->node(0)+1;
 	    conn[1] = this->node(2)+1;
 	    return;
-      
-	  case 1: 
+
+	  case 1:
 	    conn[0] = this->node(2)+1;
 	    conn[1] = this->node(1)+1;
 	    return;
@@ -124,21 +124,21 @@ void Edge3::connectivity(const unsigned int sc,
 	  }
       }
 
-      
+
     case VTK:
       {
 	switch (sc)
 	  {
-	  case 0: 
+	  case 0:
 	    conn[0] = this->node(0);
 	    conn[1] = this->node(2);
-      
+
 	    return;
-      
-	  case 1: 
+
+	  case 1:
 	    conn[0] = this->node(2);
 	    conn[1] = this->node(1);
-      
+
 	    return;
 
 	  default:
@@ -170,19 +170,19 @@ Real Edge3::volume () const
   Point A = this->point(0) + this->point(1) - 2*this->point(2);
   Point B = (this->point(1) - this->point(0))/2;
 
-  const Real a = A.size_sq(); 
-  const Real b = 2.*(A*B);    
-  const Real c = B.size_sq(); 
+  const Real a = A.size_sq();
+  const Real b = 2.*(A*B);
+  const Real c = B.size_sq();
 
   // Degenerate straight line case
   if (a < TOLERANCE*TOLERANCE*TOLERANCE)
     return (this->point(1) - this->point(0)).size();
 
-  const Real ba=b/a; 
-  const Real ca=c/a; 
+  const Real ba=b/a;
+  const Real ca=c/a;
 
   libmesh_assert (1.-ba+ca>0.);
-  
+
   const Real s1 = std::sqrt(1. - ba + ca);
   const Real s2 = std::sqrt(1. + ba + ca);
 

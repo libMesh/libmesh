@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,7 +37,7 @@ namespace libMesh
 NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
 						  const std::string& name,
 						  const unsigned int number) :
-  
+
   Parent                    (es, name, number),
   nonlinear_solver          (NonlinearSolver<Number>::build(*this)),
   diff_solver               (NULL),
@@ -49,7 +49,7 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
   es.parameters.set<Real>        ("linear solver tolerance") = 1e-5;
   es.parameters.set<Real>        ("linear solver minimum tolerance") = 1e-5;
   es.parameters.set<unsigned int>("linear solver maximum iterations") = 10000;
-  
+
   es.parameters.set<unsigned int>("nonlinear solver maximum iterations") = 50;
   es.parameters.set<unsigned int>("nonlinear solver maximum function evaluations") = 10000;
 
@@ -73,7 +73,7 @@ void NonlinearImplicitSystem::clear ()
 {
   // clear the nonlinear solver
   nonlinear_solver->clear();
-  
+
   // clear the parent data
   Parent::clear();
 }
@@ -87,9 +87,9 @@ void NonlinearImplicitSystem::reinit ()
 
   if (diff_solver.get())
     diff_solver->reinit();
-  
+
   // initialize parent data
-  Parent::reinit();  
+  Parent::reinit();
 }
 
 
@@ -98,8 +98,8 @@ void NonlinearImplicitSystem::set_solver_parameters ()
 {
   // Get a reference to the EquationSystems
   const EquationSystems& es =
-    this->get_equation_systems();  
-  
+    this->get_equation_systems();
+
   // Get the user-specifiied nonlinear solver tolerances
   const unsigned int maxits =
     es.parameters.get<unsigned int>("nonlinear solver maximum iterations");
@@ -159,7 +159,7 @@ void NonlinearImplicitSystem::solve ()
 {
   // Log how long the nonlinear solve takes.
   START_LOG("solve()", "System");
-  
+
   this->set_solver_parameters();
 
   if (diff_solver.get())
@@ -175,7 +175,7 @@ void NonlinearImplicitSystem::solve ()
     {
       // Solve the nonlinear system.
       const std::pair<unsigned int, Real> rval =
-        nonlinear_solver->solve (*matrix, *solution, *rhs, 
+        nonlinear_solver->solve (*matrix, *solution, *rhs,
 			         nonlinear_solver->relative_residual_tolerance,
                                  nonlinear_solver->max_linear_iterations);
 
@@ -184,12 +184,12 @@ void NonlinearImplicitSystem::solve ()
       _n_nonlinear_iterations   = rval.first;
       _final_nonlinear_residual = rval.second;
     }
-    
+
   // Stop logging the nonlinear solve
   STOP_LOG("solve()", "System");
 
   // Update the system after the solve
-  this->update();  
+  this->update();
 }
 
 
@@ -205,7 +205,7 @@ std::pair<unsigned int, Real> NonlinearImplicitSystem::get_linear_solve_paramete
 
 
 
-void NonlinearImplicitSystem::assembly(bool get_residual, 
+void NonlinearImplicitSystem::assembly(bool get_residual,
 				       bool get_jacobian)
 {
   // Get current_local_solution in sync
@@ -219,13 +219,13 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
       libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Jacobian!" << std::endl;
       libmesh_error();
     }
-  
+
   if (nonlinear_solver->residual && nonlinear_solver->residual_object)
     {
       libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
       libmesh_error();
     }
-  
+
   if (nonlinear_solver->matvec && nonlinear_solver->residual_and_jacobian_object)
     {
       libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
@@ -248,7 +248,7 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
       else if (nonlinear_solver->residual_and_jacobian_object != NULL)
 	nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
 
-      else 
+      else
 	libmesh_error();
     }
 

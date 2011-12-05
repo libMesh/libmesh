@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -57,12 +57,12 @@ public:
    *  Constructor. Initializes Aztec data structures
    */
   AztecLinearSolver ();
-    
+
   /**
    * Destructor.
    */
   ~AztecLinearSolver ();
-  
+
   /**
    * Release all memory and clear data structures.
    */
@@ -76,8 +76,8 @@ public:
   /**
    * Call the Aztec solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
-   */    
-  std::pair<unsigned int, Real> 
+   */
+  std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix_in,
 	 NumericVector<T> &solution_in,
 	 NumericVector<T> &rhs_in,
@@ -93,7 +93,7 @@ public:
    * that the linear solver will not compute a preconditioner in this
    * case, and will instead premultiply by the matrix you provide.
    */
-  std::pair<unsigned int, Real> 
+  std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix,
 	 SparseMatrix<T>  &preconditioner,
 	 NumericVector<T> &solution,
@@ -143,7 +143,7 @@ public:
    * con(di)verged.
    */
   virtual void print_converged_reason();
-  
+
 private:
 
   /**

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -49,7 +49,7 @@ namespace libMesh
  * This class provides an interface to Laspack
  * iterative solvers that is compatible with the \p libMesh
  * \p LinearSolver<>
- * 
+ *
  * @author Benjamin Kirk, 2002-2007
  */
 template <typename T>
@@ -60,12 +60,12 @@ class LaspackLinearSolver : public LinearSolver<T>
    *  Constructor. Initializes Laspack data structures
    */
   LaspackLinearSolver ();
-    
+
   /**
    * Destructor.
    */
   ~LaspackLinearSolver ();
-  
+
   /**
    * Release all memory and clear data structures.
    */
@@ -75,12 +75,12 @@ class LaspackLinearSolver : public LinearSolver<T>
    * Initialize data structures if not done so already.
    */
   void init ();
-  
+
 
   /**
    * Call the Laspack solver
-   */    
-  std::pair<unsigned int, Real> 
+   */
+  std::pair<unsigned int, Real>
     solve (SparseMatrix<T>  &matrix,
 	   NumericVector<T> &solution,
 	   NumericVector<T> &rhs,
@@ -88,15 +88,15 @@ class LaspackLinearSolver : public LinearSolver<T>
 	   const unsigned int m_its);
   /**
    * Call the Laspack solver
-   */    
-  std::pair<unsigned int, Real> 
+   */
+  std::pair<unsigned int, Real>
     solve (SparseMatrix<T>  &matrix,
 	   SparseMatrix<T>  &pc,
 	   NumericVector<T> &solution,
 	   NumericVector<T> &rhs,
 	   const double tol,
 	   const unsigned int m_its);
-   
+
   /**
    * This function solves a system whose matrix is a shell matrix.
    */
@@ -106,7 +106,7 @@ class LaspackLinearSolver : public LinearSolver<T>
 	   NumericVector<T>& rhs_in,
 	   const double tol,
 	   const unsigned int m_its);
-  
+
   /**
    * This function solves a system whose matrix is a shell matrix, but
    * a sparse matrix is used as preconditioning matrix, this allowing
@@ -119,15 +119,15 @@ class LaspackLinearSolver : public LinearSolver<T>
 	   NumericVector<T>& rhs_in,
 	   const double tol,
 	   const unsigned int m_its);
-  
+
   /**
    * Prints a useful message about why the latest linear solve
    * con(di)verged.
    */
   virtual void print_converged_reason();
-  
+
  private:
-  
+
   /**
    * Tells LASPACK to use the user-specified preconditioner stored in
    * \p _preconditioner_type

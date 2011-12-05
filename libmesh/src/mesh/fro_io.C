@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -78,7 +78,7 @@ void FroIO::write (const std::string& fname)
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end();
       unsigned int e=0;
-      
+
       for ( ; it != end; ++it)
 	{
 	  // .fro likes TRI3's
@@ -89,7 +89,7 @@ void FroIO::write (const std::string& fname)
 			    << std::endl;
 	      libmesh_error();
 	    }
-	  
+
 	  out << ++e << " \t";
 
  	  for (unsigned int n=0; n<(*it)->n_nodes(); n++)
@@ -111,7 +111,7 @@ void FroIO::write (const std::string& fname)
  	std::vector<unsigned int>       el;
  	std::vector<unsigned short int> sl;
  	std::vector<short int>          il;
-	
+
  	mesh.boundary_info->build_side_list (el, sl, il);
 
 
@@ -122,10 +122,10 @@ void FroIO::write (const std::string& fname)
 	     id != bc_ids.end(); ++id)
 	  {
 	    std::deque<unsigned int> node_list;
-	    
+
 	    std::map<unsigned int, unsigned int>
 	      forward_edges, backward_edges;
-	    
+
 	    // Get all sides on this element with the relevant BC id.
 	    for (unsigned int e=0; e<el.size(); e++)
 	      if (il[e] == *id)
@@ -171,7 +171,7 @@ void FroIO::write (const std::string& fname)
 	    // until that is the case simply add on to the beginning and end of the node_list,
 	    // building up a chain of ordered nodes...
 	    const unsigned int n_edges = forward_edges.size();
-	    
+
 	    while (node_list.size() != (n_edges+1))
 	      {
 		const unsigned int
@@ -186,7 +186,7 @@ void FroIO::write (const std::string& fname)
 		  if (pos != backward_edges.end())
 		    {
 		      node_list.push_front(pos->second);
-		       
+
 		      backward_edges.erase(pos);
 		    }
 		}
@@ -199,23 +199,23 @@ void FroIO::write (const std::string& fname)
 		  if (pos != forward_edges.end())
 		    {
 		      node_list.push_back(pos->second);
-		       
+
 		      forward_edges.erase(pos);
 		    }
 		}
 
 // 		libMesh::out << "node_list.size()=" << node_list.size()
-// 			      << ", n_edges+1=" << n_edges+1 << std::endl;		  
+// 			      << ", n_edges+1=" << n_edges+1 << std::endl;
 	      }
-	    	    
+
 
 	    out << ++bc_id << " " << node_list.size() << '\n';
 
 	    std::deque<unsigned int>::iterator pos = node_list.begin();
 	    for ( ; pos != node_list.end(); ++pos)
 		out << *pos+1 << " \t0\n";
-	  }	
-      }      
+	  }
+      }
     }
 }
 

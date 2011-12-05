@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -73,17 +73,17 @@ public:
    * The type of the parent.
    */
   typedef ImplicitSystem Parent;
-  
+
   /**
    * Abstract base class to be used to calculate the residual
-   * of a nonlinear system. 
+   * of a nonlinear system.
    */
   class ComputeResidual
   {
   public:
     virtual ~ComputeResidual () {};
     /**
-     * Residual function.  This function will be called to compute the 
+     * Residual function.  This function will be called to compute the
      * residual and must be implemented by the user in a derived class.
      */
     virtual void residual (const NumericVector<Number>& X,
@@ -94,7 +94,7 @@ public:
 
   /**
    * Abstract base class to be used to calculate the Jacobian
-   * of a nonlinear system. 
+   * of a nonlinear system.
    */
   class ComputeJacobian
   {
@@ -102,7 +102,7 @@ public:
     virtual ~ComputeJacobian () {};
 
     /**
-     * Jacobian function.  This function will be called to compute the 
+     * Jacobian function.  This function will be called to compute the
      * jacobian and must be implemented by the user in a derived class.
      */
     virtual void jacobian (const NumericVector<Number>& X,
@@ -112,7 +112,7 @@ public:
 
   /**
    * Abstract base class to be used to calculate the residual and Jacobian
-   * simultaneously of a nonlinear system. 
+   * simultaneously of a nonlinear system.
    */
   class ComputeResidualandJacobian
   {
@@ -129,15 +129,15 @@ public:
 					SparseMatrix<Number>*  J,
 					sys_type& S) = 0;
   };
-  
+
   /**
    * @returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
-  
+
   /**
    * Clear all the data structures associated with
-   * the system. 
+   * the system.
    */
   virtual void clear ();
 
@@ -146,12 +146,12 @@ public:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void reinit ();
-   
+
   /**
    * Assembles & solves the nonlinear system R(x) = 0.
    */
   virtual void solve ();
- 
+
   /**
    * Returns an integer corresponding to the upper iteration count
    * limit and a Real corresponding to the convergence tolerance to
@@ -185,9 +185,9 @@ public:
    * solve the nonlinear_implicit system.
    */
   AutoPtr<DiffSolver> diff_solver;
-  
+
   /**
-   * Returns  the number of iterations 
+   * Returns  the number of iterations
    * taken for the most recent nonlinear solve.
    */
   unsigned int n_nonlinear_iterations() const { return _n_nonlinear_iterations; }
@@ -204,7 +204,7 @@ protected:
    * Copies system parameters into nonlinear solver parameters
    */
   void set_solver_parameters();
-  
+
   /**
    * The number of nonlinear iterations required to solve the nonlinear
    * system R(x)=0.

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -34,14 +34,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Sphere class member functions
-Sphere::Sphere () : 
+Sphere::Sphere () :
   _rad(-1.)
 {
 }
 
 
 
-Sphere::Sphere (const Point& c, 
+Sphere::Sphere (const Point& c,
 		const Real   r)
 {
   libmesh_assert (r > 0.);
@@ -128,13 +128,13 @@ bool Sphere::intersects (const Sphere& other_sphere) const
 
   if (distance < (this->radius() + other_sphere.radius()) )
     return true;
-  
+
   return false;
 }
 
 
 
-bool Sphere::above_surface (const Point& p) const 
+bool Sphere::above_surface (const Point& p) const
 {
   libmesh_assert (this->radius() > 0.);
 
@@ -149,7 +149,7 @@ bool Sphere::above_surface (const Point& p) const
 
 
 
-bool Sphere::below_surface (const Point& p) const 
+bool Sphere::below_surface (const Point& p) const
 {
   libmesh_assert (this->radius() > 0.);
 
@@ -158,7 +158,7 @@ bool Sphere::below_surface (const Point& p) const
 
 
 
-bool Sphere::on_surface (const Point& p) const 
+bool Sphere::on_surface (const Point& p) const
 {
   libmesh_assert (this->radius() > 0.);
 
@@ -186,7 +186,7 @@ Point Sphere::closest_point (const Point& p) const
   // The closest point on the sphere is in the direction
   // of the normal a distance r from the center.
   const Point cp = this->center() + normal*this->radius();
-  
+
   return cp;
 }
 
@@ -197,7 +197,7 @@ Point Sphere::unit_normal (const Point& p) const
   libmesh_assert (this->radius() > 0.);
 
   libmesh_assert ( !(p == this->center()) );
-  
+
   // Create a vector from the center to the point
   Point n = p - this->center();
 

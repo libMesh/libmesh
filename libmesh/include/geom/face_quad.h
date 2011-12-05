@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,15 +41,15 @@ namespace libMesh
  * The \p QUAD is an element in 2D composed of 4 sides.
  * It looks like this:
  * \verbatim
- *                   
- *         ----------- 
+ *
+ *         -----------
  *        |           |
  *        |           |
- *        |           | 
  *        |           |
  *        |           |
- *         ----------- 
- *                   
+ *        |           |
+ *         -----------
+ *
  * \endverbatim
  */
 
@@ -60,12 +60,12 @@ class Quad : public Face
 public:
 
   /**
-   * Default quadrilateral element, takes number of nodes and 
+   * Default quadrilateral element, takes number of nodes and
    * parent. Derived classes implement 'true' elements.
    */
   Quad (const unsigned int nn, Elem* p, Node** nodelinkdata) :
     Face(nn, Quad::n_sides(), p, _elemlinks_data, nodelinkdata) {}
- 
+
   /**
    * @returns 4.  All quad-derivatives are guaranteed to have at
    * least 4 nodes.
@@ -75,7 +75,7 @@ public:
   /**
    * @returns 4
    */
-  unsigned int n_sides() const { return 4; }  
+  unsigned int n_sides() const { return 4; }
 
   /**
    * @returns 4.  All quadrilaterals have 4 vertices.
@@ -91,14 +91,14 @@ public:
    * @returns 4
    */
   unsigned int n_children() const { return 4; }
-  
+
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
 			        const unsigned int s) const;
-  
+
   /**
    * @returns the side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.
@@ -121,11 +121,11 @@ public:
   unsigned int key (const unsigned int s) const;
 
   /**
-   * @returns a primitive (2-noded) edge for 
+   * @returns a primitive (2-noded) edge for
    * edge i.
    */
   AutoPtr<Elem> side (const unsigned int i) const;
-  
+
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
@@ -138,7 +138,7 @@ public:
    * the values suggested by the CUBIT User's Manual.
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
-  
+
 protected:
 
   /**
@@ -148,14 +148,14 @@ protected:
 
   /**
    * Matrix that tells which vertices define the location
-   * of mid-side (or second-order) nodes.  Since most 
+   * of mid-side (or second-order) nodes.  Since most
    * second-order nodes are identical for \p Quad8 and \p Quad9,
    * we keep this matrix here in \p Quad
    */
   static const unsigned short int _second_order_adjacent_vertices[4][2];
 
   /**
-   * Vector that names a child sharing each second order node. 
+   * Vector that names a child sharing each second order node.
    */
   static const unsigned short int _second_order_vertex_child_number[9];
 

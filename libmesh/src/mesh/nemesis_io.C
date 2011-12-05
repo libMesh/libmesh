@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -33,7 +33,7 @@
 #include "utility.h" // is_sorted, deallocate
 #include "boundary_info.h"
 #include "mesh_communication.h"
- 
+
 namespace libMesh
 {
 
@@ -46,26 +46,26 @@ namespace {
     // strict weak ordering for a.first -> a.second mapping.  since we can only map to one
     // value only order the first entry
     bool operator()(const std::pair<unsigned int, unsigned int> &a,
-		    const std::pair<unsigned int, unsigned int> &b) const 
+		    const std::pair<unsigned int, unsigned int> &b) const
     { return a.first < b.first; }
-    
+
     // strict weak ordering for a.first -> a.second mapping.  lookups will
     // be in terms of a single integer, which is why we need this method.
     bool operator()(const std::pair<unsigned int, unsigned int> &a,
-		    const unsigned int b) const 
+		    const unsigned int b) const
     { return a.first < b; }
   };
 
-  // Nemesis & ExodusII use int for all integer values, even the ones which 
+  // Nemesis & ExodusII use int for all integer values, even the ones which
   // should never be negative.  we like to use unsigned as a force of habit,
   // this trivial little method saves some typing & also makes sure something
   // is not horribly wrong.
   template <typename T>
-  inline unsigned int to_uint ( const T &t ) 
+  inline unsigned int to_uint ( const T &t )
   {
     libmesh_assert (t == static_cast<T>(static_cast<unsigned int>(t)));
 
-    return static_cast<unsigned int>(t); 
+    return static_cast<unsigned int>(t);
   }
 
   // test equality for a.first -> a.second mapping.  since we can only map to one
@@ -94,7 +94,7 @@ Nemesis_IO::Nemesis_IO (MeshBase& mesh) :
 Nemesis_IO::~Nemesis_IO ()
 {
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  
+
   delete nemhelper;
 #endif
 }
@@ -120,11 +120,11 @@ void Nemesis_IO::read (const std::string& base_filename)
   // On one processor, Nemesis and ExodusII should be equivalent, so
   // let's cowardly defer to that implementation...
   if (libMesh::n_processors() == 1)
-    {			
+    {
       // We can do this in one line but if the verbose flag was set in this
       // object, it will no longer be set... thus no extra print-outs for serial runs.
       // ExodusII_IO(this->mesh()).read (base_filename); // ambiguous when Nemesis_IO is multiply-inherited
-      
+
       MeshBase& mesh = MeshInput<MeshBase>::mesh();
       ExodusII_IO(mesh).read (base_filename);
       return;
@@ -134,13 +134,13 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   // This function must be run on all processors at once
   parallel_only();
-  
+
   if (_verbose)
     {
       libMesh::out << "[" << libMesh::processor_id() << "] ";
       libMesh::out << "Reading Nemesis file on processor: " << libMesh::processor_id() << std::endl;
     }
-  
+
   // Construct the Nemesis filename based on the number of processors and the
   // current processor ID.
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
@@ -166,14 +166,14 @@ void Nemesis_IO::read (const std::string& base_filename)
   //  num_side_sets
   nemhelper->read_header();
   nemhelper->print_header();
-  
+
   // Get global information: number of nodes, elems, blocks, nodesets and sidesets
   nemhelper->get_init_global();
-  
+
   // Get "load balance" information.  This includes the number of internal & border
   // nodes and elements as well as the number of communication maps.
   nemhelper->get_loadbal_param();
-  
+
   // Do some error checking
   if (nemhelper->num_external_nodes)
     {
@@ -183,37 +183,37 @@ void Nemesis_IO::read (const std::string& base_filename)
     }
 
   libmesh_assert (nemhelper->num_nodes ==
-		  (nemhelper->num_internal_nodes + 
+		  (nemhelper->num_internal_nodes +
 		   nemhelper->num_border_nodes));
-  
+
   libmesh_assert (nemhelper->num_elem ==
 		  (nemhelper->num_internal_elems +
 		   nemhelper->num_border_elems));
-  
+
   libmesh_assert (nemhelper->num_nodes <= nemhelper->num_nodes_global);
   libmesh_assert (nemhelper->num_elem  <= nemhelper->num_elems_global);
-      
+
   // Read nodes from the exodus file: this fills the nemhelper->x,y,z arrays.
   nemhelper->read_nodes();
 
   // Reads the nemhelper->node_num_map array, node_num_map[i] is the global node number for
   // local node number i.
   nemhelper->read_node_num_map();
-  
+
   // The get_cmap_params() function reads in the:
   //  node_cmap_ids[],
   //  node_cmap_node_cnts[],
   //  elem_cmap_ids[],
   //  elem_cmap_elem_cnts[],
   nemhelper->get_cmap_params();
-  
+
   // Read the IDs of the interior, boundary, and external nodes.  This function
   // fills the vectors:
   //  node_mapi[],
   //  node_mapb[],
   //  node_mape[]
   nemhelper->get_node_map();
-  
+
   // Read each node communication map for this processor.  This function
   // fills the vectors of vectors named:
   //  node_cmap_node_ids[][]
@@ -234,8 +234,8 @@ void Nemesis_IO::read (const std::string& base_filename)
 
     // strictly speaking, we should expect to communicate with ourself...
     pid_send_partner[libMesh::processor_id()] = 1;
-    
-    // mark each processor id we reference with a node cmap 
+
+    // mark each processor id we reference with a node cmap
     for (unsigned int cmap=0; cmap<to_uint(nemhelper->num_node_cmaps); cmap++)
       {
 	libmesh_assert (to_uint(nemhelper->node_cmap_ids[cmap]) < libMesh::n_processors());
@@ -246,15 +246,15 @@ void Nemesis_IO::read (const std::string& base_filename)
     // Copy the send pairing so we can catch the receive paring and
     // test for equality
     const std::vector<unsigned char> pid_recv_partner (pid_send_partner);
-    
+
     Parallel::alltoall (pid_send_partner);
 
     libmesh_assert (pid_send_partner == pid_recv_partner);
   }
 #endif
-  
+
   // We now have enough information to infer node ownership.  We start by assuming
-  // we own all the nodes on this processor.  We will then interrogate the 
+  // we own all the nodes on this processor.  We will then interrogate the
   // node cmaps and see if a lower-rank processor is associated with any of
   // our nodes.  If so, then that processor owns the node, not us...
   std::vector<unsigned short int> node_ownership (nemhelper->num_internal_nodes +
@@ -270,20 +270,20 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Good time for error checking...
       libmesh_assert (to_uint(nemhelper->node_cmap_node_cnts[cmap]) ==
 		      nemhelper->node_cmap_node_ids[cmap].size());
-      
+
       libmesh_assert (to_uint(nemhelper->node_cmap_node_cnts[cmap]) ==
 		      nemhelper->node_cmap_proc_ids[cmap].size());
-      
+
       // In all the samples I have seen, node_cmap_ids[cmap] is the processor
       // rank of the remote processor...
       const unsigned short int adjcnt_pid_idx = nemhelper->node_cmap_ids[cmap];
 
       libmesh_assert (adjcnt_pid_idx <  libMesh::n_processors());
       libmesh_assert (adjcnt_pid_idx != libMesh::processor_id());
-      
+
       // We only expect one cmap per adjacent processor
       libmesh_assert (!pid_to_cmap_map.count(adjcnt_pid_idx));
-						
+
       pid_to_cmap_map[adjcnt_pid_idx] = cmap;
 
       // ...and each node in that cmap...
@@ -291,20 +291,20 @@ void Nemesis_IO::read (const std::string& base_filename)
 	{
 	  //  Are the node_cmap_ids and node_cmap_proc_ids really redundant?
 	  libmesh_assert (adjcnt_pid_idx == nemhelper->node_cmap_proc_ids[cmap][idx]);
-	  
+
 	  // we are expecting the exodus node numbering to be 1-based...
 	  const unsigned int local_node_idx = nemhelper->node_cmap_node_ids[cmap][idx]-1;
 
 	  libmesh_assert (local_node_idx < node_ownership.size());
-	  
+
 	  // if the adjacent processor is lower rank than the current
 	  // owner for this node, then it will get the node...
-	  node_ownership[local_node_idx] = 
+	  node_ownership[local_node_idx] =
 	    std::min(node_ownership[local_node_idx], adjcnt_pid_idx);
 	}
     } // We now should have established proper node ownership.
 
-  // now that ownership is established, we can figure out how many nodes we 
+  // now that ownership is established, we can figure out how many nodes we
   // will be responsible for numbering.
   unsigned int num_nodes_i_must_number = 0;
 
@@ -321,7 +321,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	          << "num_nodes_i_must_number="
 	          << num_nodes_i_must_number
 	          << std::endl;
-  
+
   // The call to get_loadbal_param() gets 7 pieces of information.  We allgather
   // these now across all processors to determine some global numberings. We should
   // also gather the number of nodes each processor thinks it will number so that
@@ -335,7 +335,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   all_loadbal_data[5] = nemhelper->num_node_cmaps;
   all_loadbal_data[6] = nemhelper->num_elem_cmaps;
   all_loadbal_data[7] = num_nodes_i_must_number;
-  
+
   Parallel::allgather (all_loadbal_data, /* identical_buffer_sizes = */ true);
 
   // OK, we are now in a position to request new global indices for all the nodes
@@ -344,12 +344,12 @@ void Nemesis_IO::read (const std::string& base_filename)
   // Let's get a unique message tag to use for send()/receive()
   Parallel::MessageTag nodes_tag = Parallel::Communicator_World.get_unique_tag(12345);
 
-  std::vector<std::vector<int> > 
+  std::vector<std::vector<int> >
     needed_node_idxs (nemhelper->num_node_cmaps); // the indices we will ask for
-    
-  std::vector<Parallel::Request> 
+
+  std::vector<Parallel::Request>
     needed_nodes_requests (nemhelper->num_node_cmaps);
-  
+
   for (unsigned int cmap=0; cmap<to_uint(nemhelper->num_node_cmaps); cmap++)
     {
       // We know we will need no more indices than there are nodes
@@ -357,13 +357,13 @@ void Nemesis_IO::read (const std::string& base_filename)
       // since the neighboring processor associated with the cmap
       //  may not actually own it
       needed_node_idxs[cmap].reserve   (nemhelper->node_cmap_node_cnts[cmap]);
-            
+
       const unsigned int adjcnt_pid_idx = nemhelper->node_cmap_ids[cmap];
 
       // ...and each node in that cmap...
       for (unsigned int idx=0; idx<to_uint(nemhelper->node_cmap_node_cnts[cmap]); idx++)
 	{
-	  const unsigned int 
+	  const unsigned int
 	    local_node_idx  = nemhelper->node_cmap_node_ids[cmap][idx]-1,
 	    owning_pid_idx  = node_ownership[local_node_idx];
 
@@ -379,7 +379,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       Parallel::send (adjcnt_pid_idx,              // destination
 		      needed_node_idxs[cmap],      // send buffer
 		      needed_nodes_requests[cmap], // request
-		      nodes_tag);      
+		      nodes_tag);
     } // all communication requests for getting updated global indices for border
       // nodes have been initiated
 
@@ -388,19 +388,19 @@ void Nemesis_IO::read (const std::string& base_filename)
   // index offsets for each processor.
   std::vector<unsigned int>
     all_num_nodes_i_must_number (libMesh::n_processors());
-   
+
   for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
     all_num_nodes_i_must_number[pid] = all_loadbal_data[8*pid + 7];
-  
+
   // The sum of all the entries in this vector should sum to the number of global nodes
   libmesh_assert (std::accumulate(all_num_nodes_i_must_number.begin(),
 				  all_num_nodes_i_must_number.end(),
 				  0) == nemhelper->num_nodes_global);
-  
+
   unsigned int my_next_node = 0;
   for (unsigned int pid=0; pid<libMesh::processor_id(); pid++)
     my_next_node += all_num_nodes_i_must_number[pid];
-  
+
   const unsigned int my_node_offset = my_next_node;
 
   if (_verbose)
@@ -408,7 +408,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	          << "my_node_offset="
 	          << my_node_offset
 	          << std::endl;
-  
+
   // Add internal nodes to the ParallelMesh, using the node ID offset we
   // computed and the current processor's ID.
   for (unsigned int i=0; i<to_uint(nemhelper->num_internal_nodes); ++i)
@@ -425,17 +425,17 @@ void Nemesis_IO::read (const std::string& base_filename)
 
       // "Catch" the node pointer after addition, make sure the
       // ID matches the requested value.
-      Node* added_node = 
+      Node* added_node =
 	mesh.add_point (Point(nemhelper->x[local_node_idx],
 			      nemhelper->y[local_node_idx],
-			      nemhelper->z[local_node_idx]), 
-			my_next_node, 
+			      nemhelper->z[local_node_idx]),
+			my_next_node,
 			libMesh::processor_id());
 
       // Make sure the node we added has the ID we thought it would
       if (added_node->id() != my_next_node)
 	{
-	  libMesh::err << "Error, node added with ID " << added_node->id() 
+	  libMesh::err << "Error, node added with ID " << added_node->id()
 		       << ", but we wanted ID " << my_next_node << std::endl;
 	}
 
@@ -446,22 +446,22 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   // Now, for the boundary nodes...  We may very well own some of them,
   // but there may be others for which we have requested the new global
-  // id.  We expect to be asked for the ids of the ones we own, so 
+  // id.  We expect to be asked for the ids of the ones we own, so
   // we need to create a map from the old global id to the new one
   // we are about to create.
   typedef std::vector<std::pair<unsigned int, unsigned int> > global_idx_mapping_type;
   global_idx_mapping_type old_global_to_new_global_map;
-  old_global_to_new_global_map.reserve (num_nodes_i_must_number // total # i will have         
+  old_global_to_new_global_map.reserve (num_nodes_i_must_number // total # i will have
 					- (my_next_node         // amount i have thus far
-					   - my_node_offset));  // this should be exact! 
+					   - my_node_offset));  // this should be exact!
   CompareGlobalIdxMappings global_idx_mapping_comp;
 
   for (unsigned int i=0; i<to_uint(nemhelper->num_border_nodes); ++i)
     {
-      const unsigned int 
+      const unsigned int
 	local_node_idx  = nemhelper->node_mapb[i]-1,
-	owning_pid_idx  = node_ownership[local_node_idx];	
-      
+	owning_pid_idx  = node_ownership[local_node_idx];
+
       // if we own it...
       if (owning_pid_idx == libMesh::processor_id())
 	{
@@ -470,22 +470,22 @@ void Nemesis_IO::read (const std::string& base_filename)
 
 	  // we will number it, and create a mapping from its old global index to
 	  // the new global index, for lookup purposes when neighbors come calling
-	  old_global_to_new_global_map.push_back(std::make_pair(global_node_idx, 
+	  old_global_to_new_global_map.push_back(std::make_pair(global_node_idx,
 								my_next_node));
 
 	  // "Catch" the node pointer after addition, make sure the
 	  // ID matches the requested value.
-	  Node* added_node = 
+	  Node* added_node =
 	    mesh.add_point (Point(nemhelper->x[local_node_idx],
 				  nemhelper->y[local_node_idx],
-				  nemhelper->z[local_node_idx]), 
-			    my_next_node, 
+				  nemhelper->z[local_node_idx]),
+			    my_next_node,
 			    libMesh::processor_id());
 
 	  // Make sure the node we added has the ID we thought it would
 	  if (added_node->id() != my_next_node)
 	    {
-	      libMesh::err << "Error, node added with ID " << added_node->id() 
+	      libMesh::err << "Error, node added with ID " << added_node->id()
 			   << ", but we wanted ID " << my_next_node << std::endl;
 	    }
 
@@ -510,15 +510,15 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   // We can now catch incoming requests and process them. for efficiency
   // let's do whatever is available next
-  std::map<unsigned int, std::vector<int> > requested_node_idxs; // the indices asked of us   
+  std::map<unsigned int, std::vector<int> > requested_node_idxs; // the indices asked of us
 
   std::vector<Parallel::Request> requested_nodes_requests(nemhelper->num_node_cmaps);
-  
+
   // We know we will receive the request from a given processor before
   // we receive its reply to our request. However, we may receive
   // a request and a response from one processor before getting
   // a request from another processor.  So what we are doing here
-  // is processing whatever message comes next, while recognizing 
+  // is processing whatever message comes next, while recognizing
   // we will receive a request from a processor before receiving
   // its reply
   std::vector<bool> processed_cmap (nemhelper->num_node_cmaps, false);
@@ -526,39 +526,39 @@ void Nemesis_IO::read (const std::string& base_filename)
   for (unsigned int comm_step=0; comm_step<2*to_uint(nemhelper->num_node_cmaps); comm_step++)
     {
       // query the first message which is available
-      const Parallel::Status 
-	status (Parallel::probe (Parallel::any_source, 
-		                 nodes_tag));      
-      const unsigned int 
+      const Parallel::Status
+	status (Parallel::probe (Parallel::any_source,
+		                 nodes_tag));
+      const unsigned int
 	requesting_pid_idx = status.source(),
 	source_pid_idx     = status.source();
 
       // this had better be from a processor we are expecting...
       libmesh_assert (pid_to_cmap_map.count(requesting_pid_idx));
-      
+
       // the local cmap which corresponds to the source processor
       const unsigned int cmap = pid_to_cmap_map[source_pid_idx];
 
       if (!processed_cmap[cmap])
 	{
 	  processed_cmap[cmap] = true;
-	  
+
 	  // we should only get one request per paired processor
 	  libmesh_assert (!requested_node_idxs.count(requesting_pid_idx));
-      
+
 	  // get a reference to the request buffer for this processor to
 	  // avoid repeated map lookups
 	  std::vector<int> &xfer_buf (requested_node_idxs[requesting_pid_idx]);
-	    
-	  // actually receive the message.  
+
+	  // actually receive the message.
 	  Parallel::receive (requesting_pid_idx, xfer_buf, nodes_tag);
-	  
+
 	  // Fill the request
 	  for (unsigned int i=0; i<xfer_buf.size(); i++)
 	    {
 	      // the requested old global node index, *now 0-based*
 	      const unsigned int old_global_node_idx = xfer_buf[i];
-	      
+
 	      // find the new global node index for the requested node -
 	      // note that requesting_pid_idx thinks we own this node,
 	      // so we better!
@@ -567,89 +567,89 @@ void Nemesis_IO::read (const std::string& base_filename)
 				  old_global_to_new_global_map.end(),
 				  old_global_node_idx,
 				  global_idx_mapping_comp);
-		
+
 	      libmesh_assert (it != old_global_to_new_global_map.end());
 	      libmesh_assert (it->first == old_global_node_idx);
 	      libmesh_assert (it->second >= my_node_offset);
 	      libmesh_assert (it->second <  my_next_node);
-	      
+
 	      // overwrite the requested old global node index with the new global index
 	      xfer_buf[i] = it->second;
 	    }
-	    
+
 	  // and send the new global indices back to the processor which asked for them
 	  Parallel::send (requesting_pid_idx,
 			  xfer_buf,
 			  requested_nodes_requests[cmap],
 			  nodes_tag);
 	} // done processing the request
-      
-      // this is the second time we have heard from this processor, 
+
+      // this is the second time we have heard from this processor,
       // so it must be its reply to our request
       else
 	{
-	  // a long time ago, we sent off our own requests.  now it is time to catch the 
+	  // a long time ago, we sent off our own requests.  now it is time to catch the
 	  // replies and get the new global node numbering.  note that for any reply
-	  // we receive, the corresponding nonblocking send from above *must* have been 
+	  // we receive, the corresponding nonblocking send from above *must* have been
 	  // completed, since the reply is in response to that request!!
-	  
+
 	  // if we have received a reply, our send *must* have completed
 	  // (note we never actually need to wait on the request)
 	  libmesh_assert (needed_nodes_requests[cmap].test());
 	  libmesh_assert (to_uint(nemhelper->node_cmap_ids[cmap]) == source_pid_idx);
-	    
+
 	  // now post the receive for this cmap
 	  Parallel::receive (source_pid_idx,
 			     needed_node_idxs[cmap],
 			     nodes_tag);
-	  
-	  libmesh_assert (needed_node_idxs[cmap].size() <= 
+
+	  libmesh_assert (needed_node_idxs[cmap].size() <=
 			  nemhelper->node_cmap_node_ids[cmap].size());
-	  
+
 	  for (unsigned int i=0,j=0; i<nemhelper->node_cmap_node_ids[cmap].size(); i++)
 	    {
-	      const unsigned int 
+	      const unsigned int
 		local_node_idx  = nemhelper->node_cmap_node_ids[cmap][i]-1,
-		owning_pid_idx  = node_ownership[local_node_idx];	
-	      
-	      // if this node is owned by source_pid_idx, its new global id 
+		owning_pid_idx  = node_ownership[local_node_idx];
+
+	      // if this node is owned by source_pid_idx, its new global id
 	      // is in the buffer we just received
 	      if (owning_pid_idx == source_pid_idx)
 		{
 		  libmesh_assert (j < needed_node_idxs[cmap].size());
-		    
+
 		  const unsigned int // now 0-based!
 		    global_node_idx = needed_node_idxs[cmap][j++];
-		  
+
 		  // "Catch" the node pointer after addition, make sure the
 		  // ID matches the requested value.
-		  Node* added_node = 
+		  Node* added_node =
 		    mesh.add_point (Point(nemhelper->x[local_node_idx],
 					  nemhelper->y[local_node_idx],
 					  nemhelper->z[local_node_idx]),
 				    global_node_idx,
 				    source_pid_idx);
-		  
+
 		  // Make sure the node we added has the ID we thought it would
 		  if (added_node->id() != global_node_idx)
 		    {
-		      libMesh::err << "Error, node added with ID " << added_node->id() 
+		      libMesh::err << "Error, node added with ID " << added_node->id()
 				   << ", but we wanted ID " << global_node_idx << std::endl;
 		    }
 
 		  // update the local->global index map, when we are done
 		  // it will be 0-based.
 		  nemhelper->node_num_map[local_node_idx] = global_node_idx;
-		  
+
 		  // we are not really going to use my_next_node again, but we can
-		  // keep incrimenting it to track how many nodes we have added 
+		  // keep incrimenting it to track how many nodes we have added
 		  // to the mesh
 		  my_next_node++;
 		}
 	    }
 	}
     } // end of node index communication loop
-  
+
   // we had better have added all the nodes we need to!
   libmesh_assert ((my_next_node - my_node_offset) == to_uint(nemhelper->num_nodes));
 
@@ -670,7 +670,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     Utility::deallocate (needed_node_idxs);
     Utility::deallocate (node_ownership);
   }
-  
+
   Parallel::wait (requested_nodes_requests);
   requested_node_idxs.clear();
 
@@ -680,19 +680,19 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Report the number of nodes which have been added locally
       libMesh::out << "[" << libMesh::processor_id() << "] ";
       libMesh::out << "mesh.n_nodes()=" << mesh.n_nodes() << std::endl;
-      
+
       // Reports the number of nodes that have been added in total.
       libMesh::out << "[" << libMesh::processor_id() << "] ";
       libMesh::out << "mesh.parallel_n_nodes()=" << mesh.parallel_n_nodes() << std::endl;
     }
-  
+
 
 
   // --------------------------------------------------------------------------------
   // --------------------------------------------------------------------------------
   // --------------------------------------------------------------------------------
 
-      
+
   // We can now read in the elements...Exodus stores them in blocks in which all
   // elements have the same geometric type.  This code is adapted directly from exodusII_io.C
 
@@ -703,19 +703,19 @@ void Nemesis_IO::read (const std::string& base_filename)
     int sum_internal_elems=0, sum_border_elems=0;
     for (unsigned int j=3,c=0; c<libMesh::n_processors(); j+=8,++c)
       sum_internal_elems += all_loadbal_data[j];
-    
+
     for (unsigned int j=4,c=0; c<libMesh::n_processors(); j+=8,++c)
       sum_border_elems += all_loadbal_data[j];
-    
+
     if (_verbose)
       {
 	libMesh::out << "[" << libMesh::processor_id() << "] ";
 	libMesh::out << "sum_internal_elems=" << sum_internal_elems << std::endl;
-	
+
 	libMesh::out << "[" << libMesh::processor_id() << "] ";
 	libMesh::out << "sum_border_elems=" << sum_border_elems << std::endl;
       }
-    
+
     libmesh_assert(sum_internal_elems+sum_border_elems == nemhelper->num_elems_global);
   }
 #endif
@@ -725,9 +725,9 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   // ... is not sufficient since some codes report num_dim==3 for two dimensional
   // meshes living in 3D, even though all the elements are of 2D type.  Therefore,
-  // we instead use the dimension of the highest element found for the Mesh dimension, 
+  // we instead use the dimension of the highest element found for the Mesh dimension,
   // similar to what is done by the Exodus reader, except here it requires a
-  // parallel communication.  
+  // parallel communication.
   elems_of_dimension.resize(4, false); // will use 1-based
 
   // Compute my_elem_offset, the amount by which to offset the local elem numbering
@@ -743,7 +743,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	      << "my_elem_offset=" << my_elem_offset << std::endl;
 
 
-  // Fills in the: 
+  // Fills in the:
   // global_elem_blk_ids[] and
   // global_elem_blk_cnts[] arrays.
   nemhelper->get_eb_info_global();
@@ -756,14 +756,14 @@ void Nemesis_IO::read (const std::string& base_filename)
 //   // binary search for each element ID... however I don't think we need to distinguish between the
 //   // two types, since either can have nodes the boundary!
 //   nemhelper->get_elem_map();
-      
+
   // Fills in the vectors of vectors:
   // elem_cmap_elem_ids[][]
   // elem_cmap_side_ids[][]
   // elem_cmap_proc_ids[][]
   // These arrays are of size num_elem_cmaps * elem_cmap_elem_cnts[i], i = 0..num_elem_cmaps
   nemhelper->get_elem_cmap();
-      
+
   // Get information about the element blocks:
   // (read in the array nemhelper->block_ids[])
   nemhelper->read_block_info();
@@ -771,11 +771,11 @@ void Nemesis_IO::read (const std::string& base_filename)
   // Reads the nemhelper->elem_num_map array, elem_num_map[i] is the global element number for
   // local element number i.
   nemhelper->read_elem_num_map();
-      
+
   // Instantiate the ElementMaps interface.  This is what translates LibMesh's
   // element numbering scheme to Exodus's.
   ExodusII_IO_Helper::ElementMaps em;
-      
+
   // Read in the element connectivity for each block by
   // looping over all the blocks.
   for (unsigned int i=0; i<to_uint(nemhelper->num_elem_blk); i++)
@@ -791,19 +791,19 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Note that with parallel files it is possible we have no elements in
       // this block!
       if (!nemhelper->num_elem_this_blk) continue;
-      
+
       // Set subdomain ID based on the block ID.
       int subdomain_id = nemhelper->block_ids[i];
 
       // Create a type string (this uses the null-terminated string ctor).
-      const std::string type_str ( &(nemhelper->elem_type[0]) ); 
+      const std::string type_str ( &(nemhelper->elem_type[0]) );
 
       // Set any relevant node/edge maps for this element
-      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str); 
+      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str);
 
       if (_verbose)
 	libMesh::out << "Reading a block of " << type_str << " elements." << std::endl;
-      
+
       // Loop over all the elements in this block
       for (unsigned int j=0; j<to_uint(nemhelper->num_elem_this_blk); j++)
 	{
@@ -817,45 +817,45 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  elem->subdomain_id() = subdomain_id;
 	  elem->processor_id() = libMesh::processor_id();
 	  elem->set_id()       = my_next_elem++;
-	  
+
 	  // Mark that we have seen an element of the current element's
 	  // dimension.
           elems_of_dimension[elem->dim()] = true;
 
 	  // Add the created Elem to the Mesh, catch the Elem
 	  // pointer that the Mesh throws back.
-	  elem = mesh.add_elem (elem); 
+	  elem = mesh.add_elem (elem);
 
 	  // We are expecting the element "thrown back" by libmesh to have the ID we specified for it...
 	  // Check to see that really is the case.  Note that my_next_elem was post-incremented, so
 	  // subtract 1 when performing the check.
 	  if (elem->id() != my_next_elem-1)
 	    {
-	      libMesh::err << "Unexpected ID " 
-			<< elem->id() 
-			<< " set by parallel mesh. (expecting " 
-			<< my_next_elem-1 
+	      libMesh::err << "Unexpected ID "
+			<< elem->id()
+			<< " set by parallel mesh. (expecting "
+			<< my_next_elem-1
 			<< ")." << std::endl;
 	      libmesh_error();
 	    }
 
 	  // Set all the nodes for this element
-	  if (_verbose)	    
+	  if (_verbose)
 	    libMesh::out << "[" << libMesh::processor_id() << "] "
 		          << "Setting nodes for Elem " << elem->id() << std::endl;
-	      
+
 	  for (unsigned int k=0; k<to_uint(nemhelper->num_nodes_per_elem); k++)
 	    {
 	      const unsigned int
 		gi              = (j*nemhelper->num_nodes_per_elem +       // index into connectivity array
-				   conv.get_node_map(k)), 
-		local_node_idx  = nemhelper->connect[gi]-1,                // local node index 
+				   conv.get_node_map(k)),
+		local_node_idx  = nemhelper->connect[gi]-1,                // local node index
 		global_node_idx = nemhelper->node_num_map[local_node_idx]; // new global node index
-		  
+
 	      // Set node number
 	      elem->set_node(k) = mesh.node_ptr(global_node_idx);
 	    }
-	} // for (unsigned int j=0; j<nemhelper->num_elem_this_blk; j++)     
+	} // for (unsigned int j=0; j<nemhelper->num_elem_this_blk; j++)
     } // end for (unsigned int i=0; i<nemhelper->num_elem_blk; i++)
 
   libmesh_assert ((my_next_elem - my_elem_offset) == to_uint(nemhelper->num_elem));
@@ -900,7 +900,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       libmesh_error();
     }
 #endif
-  
+
 
   // Global sideset information, they are distributed as well, not sure if they will require communication...?
   nemhelper->get_ss_param_global();
@@ -909,7 +909,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     {
       libMesh::out << "[" << libMesh::processor_id() << "] "
 		   << "Read global sideset parameter information." << std::endl;
-      
+
       // These global values should be the same on all processors...
       libMesh::out << "[" << libMesh::processor_id() << "] "
 		   << "Number of global sideset IDs: " << nemhelper->global_sideset_ids.size() << std::endl;
@@ -925,12 +925,12 @@ void Nemesis_IO::read (const std::string& base_filename)
   // processors should equal the sum of the entries in the "num_global_side_counts" array
   // filled up by nemhelper->get_ss_param_global()
   nemhelper->read_sideset_info();
-  
+
   if (_verbose)
     {
       libMesh::out << "[" << libMesh::processor_id() << "] "
 		   << "nemhelper->num_side_sets = " << nemhelper->num_side_sets << std::endl;
-      
+
       libMesh::out << "[" << libMesh::processor_id() << "] "
 		   << "nemhelper->num_elem_all_sidesets = " << nemhelper->num_elem_all_sidesets << std::endl;
     }
@@ -944,7 +944,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     int sum_num_global_side_counts = std::accumulate(nemhelper->num_global_side_counts.begin(),
 						     nemhelper->num_global_side_counts.end(),
 						     0);
-      
+
     // MPI sum up the local files contributions
     int sum_num_elem_all_sidesets = nemhelper->num_elem_all_sidesets;
     Parallel::sum(sum_num_elem_all_sidesets);
@@ -968,10 +968,10 @@ void Nemesis_IO::read (const std::string& base_filename)
     }
 
   // Now that we have the lists of elements, sides, and IDs, we are ready to set them
-  // in the BoundaryInfo object of our Mesh object.  This is slightly different in parallel... 
-  // For example, I think the IDs in each of the split Exodus files are numbered locally, 
+  // in the BoundaryInfo object of our Mesh object.  This is slightly different in parallel...
+  // For example, I think the IDs in each of the split Exodus files are numbered locally,
   // and we have to know the appropriate ID for this processor to be able to set the
-  // entry in BoundaryInfo.  This offset should be given by my_elem_offset determined in 
+  // entry in BoundaryInfo.  This offset should be given by my_elem_offset determined in
   // this function...
 
   // Get references to the elem, side, and ID lists for this processor.  We should be
@@ -1018,13 +1018,13 @@ void Nemesis_IO::read (const std::string& base_filename)
 
       if (elem == NULL)
 	{
-	  libMesh::err << "Mesh returned a NULL pointer when asked for element " 
+	  libMesh::err << "Mesh returned a NULL pointer when asked for element "
 		       << my_elem_offset << " + " << elem_list[e] << " = " << my_elem_offset+elem_list[e] << std::endl;
 	  libmesh_error();
 	}
-      
+
       // The side numberings in libmesh and exodus are not 1:1, so we need to map
-      // whatever side number is stored in Exodus into a libmesh side number using 
+      // whatever side number is stored in Exodus into a libmesh side number using
       // a conv object...
       const ExodusII_IO_Helper::Conversion conv =
 	em.assign_conversion(elem->type());
@@ -1047,9 +1047,9 @@ void Nemesis_IO::read (const std::string& base_filename)
     if (nbcs != elem_list.size())
       {
 	libMesh::err << "[" << libMesh::processor_id() << "] ";
-	libMesh::err << "BoundaryInfo contains " 
+	libMesh::err << "BoundaryInfo contains "
 		     << nbcs
-		     << " boundary conditions, while the Exodus file had " 
+		     << " boundary conditions, while the Exodus file had "
 		     << elem_list.size()
 		     << std::endl;
 	libmesh_error();
@@ -1062,12 +1062,12 @@ void Nemesis_IO::read (const std::string& base_filename)
 
   // Read local nodeset info
   nemhelper->read_nodeset_info();
-  
+
   if (_verbose)
     {
       libMesh::out << "[" << libMesh::processor_id() << "] ";
       libMesh::out << "nemhelper->num_node_sets=" << nemhelper->num_node_sets << std::endl;
-    }  
+    }
 
 //  // Debugging, what is currently in nemhelper->node_num_map anyway?
 //  libMesh::out << "[" << libMesh::processor_id() << "] "
@@ -1077,7 +1077,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 //    libMesh::out << nemhelper->node_num_map[i] << ", ";
 //  libMesh::out << std::endl;
 
-  // For each nodeset, 
+  // For each nodeset,
   for (int nodeset=0; nodeset<nemhelper->get_num_node_sets(); nodeset++)
     {
       // Get the user-defined ID associcated with the nodeset
@@ -1088,13 +1088,13 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  libMesh::out << "[" << libMesh::processor_id() << "] ";
 	  libMesh::out << "nemhelper->get_nodeset_id(" << nodeset << ")=" << nodeset_id << std::endl;
 	}
-        
+
       // Read the nodeset from file, store them in a vector
       nemhelper->read_nodeset(nodeset);
 
       // Get access to that vector
       const std::vector<int>& node_list = nemhelper->get_node_list();
-      
+
       // Add nodes from the node_list to the BoundaryInfo object
       for(unsigned int node=0; node<node_list.size(); node++)
 	{
@@ -1104,7 +1104,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	      libMesh::err << "Error, index is past the end of node_num_map array!" << std::endl;
 	      libmesh_error();
 	    }
-	  
+
 	  // We should be able to use the node_num_map data structure set up previously to determine
 	  // the proper global node index.
 	  unsigned global_node_id = nemhelper->node_num_map[ node_list[node]-1 /*Exodus is 1-based!*/ ];
@@ -1122,7 +1122,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  mesh.boundary_info->add_node(global_node_id, nodeset_id);
 	}
     }
-  
+
   // See what the elem count is up to now.
   if (_verbose)
     {
@@ -1168,12 +1168,12 @@ void Nemesis_IO::read (const std::string& )
 
 void Nemesis_IO::write (const std::string& base_filename)
 {
-  // Get a constant reference to the mesh for writing 
+  // Get a constant reference to the mesh for writing
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-  
+
   // Create the filename for this processor given the base_filename passed in.
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
-  
+
   nemhelper->create(nemesis_filename);
 
   // Initialize data structures and write some global Nemesis-specifc data, such as
@@ -1218,7 +1218,7 @@ void Nemesis_IO::write_timestep (const std::string& fname,
                                  const int timestep,
                                  const Real time)
 {
-  _timestep=timestep; 
+  _timestep=timestep;
   write_equation_systems(fname,es);
 
   nemhelper->write_timestep(timestep, time);
@@ -1246,7 +1246,7 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
   START_LOG("write_nodal_data()", "Nemesis_IO");
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-  
+
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 
   if (!nemhelper->created())

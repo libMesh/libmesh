@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -137,7 +137,7 @@ AutoPtr<Elem> Tet10::build_side (const unsigned int i,
   else
     {
       AutoPtr<Elem> face(new Tri6);
-  
+
       switch (i)
 	{
 	case 0:
@@ -191,7 +191,7 @@ AutoPtr<Elem> Tet10::build_side (const unsigned int i,
 	}
     }
 
-  
+
   // We'll never get here.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -236,9 +236,9 @@ void Tet10::connectivity(const unsigned int sc,
 	    conn[5] = this->node(7)+1;
 	    conn[6] = this->node(7)+1;
 	    conn[7] = this->node(7)+1;
- 
+
 	    return;
-  
+
 	    // Linear sub-tet 1
 	  case 1:
 
@@ -361,7 +361,7 @@ void Tet10::connectivity(const unsigned int sc,
         /*
            conn.resize(4);
            switch (sc)
-           {            
+           {
         // Linear sub-tet 0
         case 0:
 
@@ -489,23 +489,23 @@ Tet10::second_order_child_vertex (const unsigned int n) const
 
 unsigned short int Tet10::second_order_adjacent_vertex (const unsigned int n,
 							const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
   libmesh_assert (v < 2);
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 
 
-const unsigned short int Tet10::_second_order_adjacent_vertices[6][2] = 
+const unsigned short int Tet10::_second_order_adjacent_vertices[6][2] =
 {
-  {0, 1}, // vertices adjacent to node 4 
-  {1, 2}, // vertices adjacent to node 5 
-  {0, 2}, // vertices adjacent to node 6 
-  {0, 3}, // vertices adjacent to node 7 
-  {1, 3}, // vertices adjacent to node 8 
-  {2, 3}  // vertices adjacent to node 9 
+  {0, 1}, // vertices adjacent to node 4
+  {1, 2}, // vertices adjacent to node 5
+  {0, 2}, // vertices adjacent to node 6
+  {0, 3}, // vertices adjacent to node 7
+  {1, 3}, // vertices adjacent to node 8
+  {2, 3}  // vertices adjacent to node 9
 };
 
 

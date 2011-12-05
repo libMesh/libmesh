@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -98,9 +98,9 @@ void clough_compute_coefs(const Elem* elem)
 //      libMesh::err << p << ' ' << dofpt[p];
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<2,LAGRANGE>::shape_deriv 
+          const Real ddxi = FE<2,LAGRANGE>::shape_deriv
             (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
-          const Real ddeta = FE<2,LAGRANGE>::shape_deriv 
+          const Real ddeta = FE<2,LAGRANGE>::shape_deriv
             (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
 
 //      libMesh::err << ddxi << ' ';
@@ -122,7 +122,7 @@ void clough_compute_coefs(const Elem* elem)
 //      libMesh::err << dxdeta[p] << ' ';
 //      libMesh::err << dydeta[p] << std::endl << std::endl;
 
-      const Real inv_jac = 1. / (dxdxi[p]*dydeta[p] - 
+      const Real inv_jac = 1. / (dxdxi[p]*dydeta[p] -
         dxdeta[p]*dydxi[p]);
       dxidx[p] = dydeta[p] * inv_jac;
       dxidy[p] = - dxdeta[p] * inv_jac;
@@ -252,7 +252,7 @@ void clough_compute_coefs(const Elem* elem)
   // FIXME: the raw_shape calls shouldn't be done on every element!
   // FIXME: I should probably be looping, too...
   // Gradient naming: d(1)d(2n)d(xi) is the xi component of the
-  // gradient of the 
+  // gradient of the
   // local basis function corresponding to value 1 at the node
   // corresponding to normal vector 2
 
@@ -406,7 +406,7 @@ void clough_compute_coefs(const Elem* elem)
   Real d3yd2ndn = d3yd2ndx * N2x + d3yd2ndy * N2y;
 
   // Calculate midpoint scaling factors
-  
+
   d1nd1n = 1. / d1nd1ndn;
   d2nd2n = 1. / d2nd2ndn;
   d3nd3n = 1. / d3nd3ndn;
@@ -457,7 +457,7 @@ void clough_compute_coefs(const Elem* elem)
 
   // Calculate midpoint derivative adjustments to nodal derivative
   // interpolant functions
-  
+
   d1xd2n = -(d1xd1x * d1xd2ndn + d1xd1y * d1yd2ndn) / d2nd2ndn;
   d1yd2n = -(d1yd1y * d1yd2ndn + d1yd1x * d1xd2ndn) / d2nd2ndn;
   d1xd3n = -(d1xd1x * d1xd3ndn + d1xd1y * d1yd3ndn) / d3nd3ndn;
@@ -1263,7 +1263,7 @@ Real clough_raw_shape(const unsigned int basis_num,
         switch (subtriangle_lookup(p))
           {
             case 0:
-              return 1 - 3*xi*xi + 2*xi*xi*xi 
+              return 1 - 3*xi*xi + 2*xi*xi*xi
                 - 3*eta*eta - 3*xi*eta*eta + 3*eta*eta*eta;
             case 1:
               return -1 + 9*xi - 15*xi*xi + 7*xi*xi*xi
@@ -1433,7 +1433,7 @@ Real clough_raw_shape(const unsigned int basis_num,
   return 0.;
 }
 
-  
+
 } // end anonymous namespace
 
 
@@ -1450,7 +1450,7 @@ Real FE<2,CLOUGH>::shape(const ElemType,
   libMesh::err << "Clough-Tocher elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -1468,11 +1468,11 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
-  
+
   const Order totalorder = static_cast<Order>(order + elem->p_level());
 
   switch (totalorder)
-    {      
+    {
       // 2nd-order restricted Clough-Tocher element
     case SECOND:
       {
@@ -1621,7 +1621,7 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
                   return d2nd2n * clough_raw_shape(10, p);
 		case 9:
                   return d3nd3n * clough_raw_shape(11, p);
-		  
+
 		default:
 		  libmesh_error();
 		}
@@ -1636,7 +1636,7 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -1645,7 +1645,7 @@ Real FE<2,CLOUGH>::shape(const Elem* elem,
 
 template <>
 Real FE<2,CLOUGH>::shape_deriv(const ElemType,
-				   const Order,			    
+				   const Order,
 				   const unsigned int,
 				   const unsigned int,
 				   const Point&)
@@ -1672,11 +1672,11 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
-  
+
   const Order totalorder = static_cast<Order>(order + elem->p_level());
 
   switch (totalorder)
-    {      
+    {
       // 2nd-order restricted Clough-Tocher element
     case SECOND:
       {
@@ -1825,7 +1825,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
                   return d2nd2n * clough_raw_shape_deriv(10, j, p);
 		case 9:
                   return d3nd3n * clough_raw_shape_deriv(11, j, p);
-		  
+
 		default:
 		  libmesh_error();
 		}
@@ -1840,7 +1840,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -1859,11 +1859,11 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
   clough_compute_coefs(elem);
 
   const ElemType type = elem->type();
-  
+
   const Order totalorder = static_cast<Order>(order + elem->p_level());
 
   switch (totalorder)
-    {      
+    {
       // 2nd-order restricted Clough-Tocher element
     case SECOND:
       {
@@ -2008,7 +2008,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
                   return d2nd2n * clough_raw_shape_second_deriv(10, j, p);
 		case 9:
                   return d3nd3n * clough_raw_shape_second_deriv(11, j, p);
-		  
+
 		default:
 		  libmesh_error();
 		}
@@ -2023,7 +2023,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }

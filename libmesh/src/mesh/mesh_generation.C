@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -87,7 +87,7 @@ namespace MeshTools {
 	      return i + j*(2*nx+1);
 	      break;
 	    }
-	  
+
 	  default:
 	    {
 	      libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
@@ -99,7 +99,7 @@ namespace MeshTools {
       }
 
 
-    
+
       // Same as the function above, but for 3D elements
       inline
       unsigned int idx(const ElemType type,
@@ -130,14 +130,14 @@ namespace MeshTools {
 	      return i + (2*nx+1)*(j + k*(2*ny+1));
 	      break;
 	    }
-	  
+
 	  default:
 	    {
 	      libMesh::err << "ERROR: Unrecognized element type." << std::endl;
 	      libmesh_error();
 	    }
 	  }
-      
+
 	return libMesh::invalid_uint;
       }
     } // namespace Private
@@ -166,7 +166,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
   // causes an internal compiler error for Intel Compiler 11.0 on Linux
   // in debug mode.
   using namespace MeshTools::Generation::Private;
-  
+
   // Clear the mesh and start from scratch
   mesh.clear();
 
@@ -178,11 +178,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
     mesh.set_mesh_dimension(1);
   else
     mesh.set_mesh_dimension(0);
-  
+
   switch (mesh.mesh_dimension())
     {
       //---------------------------------------------------------------------
-      // Build a 0D point 
+      // Build a 0D point
     case 0:
       {
 	libmesh_assert (nx == 0);
@@ -203,7 +203,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
       //---------------------------------------------------------------------
       // Build a 1D line
-    case 1:      
+    case 1:
       {
 	libmesh_assert (nx != 0);
 	libmesh_assert (ny == 0);
@@ -259,7 +259,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
           }
 
 
-        // Build the nodes, depends on whether we're using linears, 
+        // Build the nodes, depends on whether we're using linears,
         // quadratics or cubics and whether using uniform grid or Gauss-Lobatto
         unsigned int node_id = 0;
         switch(type)
@@ -271,11 +271,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
               {
                 if (gauss_lobatto_grid)
                   mesh.add_point (Point(0.5*(std::cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
-                        0, 
+                        0,
                         0), node_id++);
                 else
-                  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx), 
-                        0, 
+                  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
+                        0,
                         0), node_id++);
               }
               break;
@@ -305,7 +305,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   {
                     Real cmin = std::cos( pi*(i-1) / static_cast<Real>(2*nx) );
                     Real cmax = std::cos( pi*(i+1) / static_cast<Real>(2*nx) );
-                    
+
                     Real xmin = 0.5*(1.0 - cmin);
                     Real xmax = 0.5*(1.0 - cmax);
                     x = 0.5*(xmin + xmax);
@@ -329,7 +329,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                 {
                   // The x location of the point
                   Real x=0.;
-                  
+
                   const Real pi = libMesh::pi;
 
                   // Shortcut quantities
@@ -375,16 +375,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
               }
 
 
-            
+
               break;
             }
-            
+
           default:
             {
               libMesh::err << "ERROR: Unrecognized 1D element type." << std::endl;
               libmesh_error();
             }
-              
+
         }
 
         // Build the elements of the mesh
@@ -448,14 +448,14 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             default:
               {
                 libMesh::err << "ERROR: Unrecognized 1D element type." << std::endl;
-                libmesh_error();                
+                libmesh_error();
               }
           }
 
 	// Scale the nodal positions
 	for (unsigned int p=0; p<mesh.n_nodes(); p++)
 	  mesh.node(p)(0) = (mesh.node(p)(0))*(xmax-xmin) + xmin;
-	
+
 	break;
       }
 
@@ -465,9 +465,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-      
-      
-      
+
+
+
       //---------------------------------------------------------------------
       // Build a 2D quadrilateral
     case 2:
@@ -506,7 +506,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  }
 
 
-	
+
 	// Reserve nodes.  The quadratic element types
 	// need to reserve more nodes than the linear types.
 	switch (type)
@@ -518,7 +518,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	      mesh.reserve_nodes( (nx+1)*(ny+1) );
 	      break;
 	    }
-	    
+
 	  case QUAD8:
 	  case QUAD9:
 	  case TRI6:
@@ -527,7 +527,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	      break;
 	    }
 
-	    
+
 	  default:
 	    {
 	      libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
@@ -559,7 +559,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 					      0.5*(1.0 - std::cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
 					      0.), node_id++);
 		      }
-		  
+
 		    else
 		      mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
 					    static_cast<Real>(j)/static_cast<Real>(ny),
@@ -568,7 +568,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 	      break;
 	    }
-	    
+
 	  case QUAD8:
 	  case QUAD9:
 	  case TRI6:
@@ -583,7 +583,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 			// Shortcut variable
 			const Real pi = libMesh::pi;
-			
+
 			// Shortcut quantities (do not depend on i,j)
 			const Real a = std::cos( pi / static_cast<Real>(2*nx) );
 			const Real b = std::cos( pi / static_cast<Real>(2*ny) );
@@ -591,7 +591,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			// Shortcut quantities (depend on i,j)
 			const Real c = std::cos( pi*i / static_cast<Real>(2*nx) );
 			const Real d = std::cos( pi*j / static_cast<Real>(2*ny) );
-			
+
 			// If i is even, compute a normal Gauss-Lobatto point
 			if (i%2 == 0)
 			  x = 0.5*(1.0 - c);
@@ -599,20 +599,20 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			// Otherwise, it is the average of the previous and next points
 			else
 			  x = 0.5*(1.0 - a*c);
-		      
+
 			// If j is even, compute a normal Gauss-Lobatto point
 			if (j%2 == 0)
 			  y = 0.5*(1.0 - d);
-		      
+
 			// Otherwise, it is the average of the previous and next points
 			else
 			  y = 0.5*(1.0 - b*d);
-		      
+
 
 			mesh.add_point (Point(x,y,0.), node_id++);
-		      } 
+		      }
 
-		  
+
 		    else
 		      mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
 					    static_cast<Real>(j)/static_cast<Real>(2*ny),
@@ -622,7 +622,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	      break;
 	    }
 
-	    
+
 	  default:
 	    {
 	      libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
@@ -654,13 +654,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 		    if (j == 0)
 		      mesh.boundary_info->add_side(elem, 0, 0);
-		  
+
 		    if (j == (ny-1))
 		      mesh.boundary_info->add_side(elem, 2, 2);
-		  
+
 		    if (i == 0)
 		      mesh.boundary_info->add_side(elem, 3, 3);
-		  
+
 		    if (i == (nx-1))
 		      mesh.boundary_info->add_side(elem, 1, 1);
 		  }
@@ -715,7 +715,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		    Elem* elem = (type == QUAD8) ?
 		      mesh.add_elem(new Quad8) :
 		      mesh.add_elem(new Quad9);
-		  
+
 
 		    elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
 		    elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j)  );
@@ -727,17 +727,17 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		    elem->set_node(7) = mesh.node_ptr(idx(type,nx,i,j+1)  );
 		    if (type == QUAD9)
 		      elem->set_node(8) = mesh.node_ptr(idx(type,nx,i+1,j+1));
-		  
+
 
 		    if (j == 0)
 		      mesh.boundary_info->add_side(elem, 0, 0);
-		  
+
 		    if (j == 2*(ny-1))
 		      mesh.boundary_info->add_side(elem, 2, 2);
-		  
+
 		    if (i == 0)
 		      mesh.boundary_info->add_side(elem, 3, 3);
-		  
+
 		    if (i == 2*(nx-1))
 		      mesh.boundary_info->add_side(elem, 1, 1);
 		  }
@@ -788,7 +788,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	      break;
 	    };
 
-	    
+
 	  default:
 	    {
 	      libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
@@ -798,7 +798,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-	
+
 	// Scale the nodal positions
 	for (unsigned int p=0; p<mesh.n_nodes(); p++)
 	  {
@@ -806,7 +806,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    mesh.node(p)(1) = (mesh.node(p)(1))*(ymax-ymin) + ymin;
 	  }
 
-	
+
 	break;
       }
 
@@ -817,7 +817,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-      
+
 
 
       //---------------------------------------------------------------------
@@ -866,7 +866,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-	
+
 	// Reserve nodes.  Quadratic elements need twice as many nodes as linear elements.
 	switch (type)
 	  {
@@ -925,7 +925,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 						0.5*(1.0 - std::cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
 						0.5*(1.0 - std::cos(pi*static_cast<Real>(k)/static_cast<Real>(nz)))), node_id++);
 			}
-		      
+
 		      else
 			mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(nx),
 					     static_cast<Real>(j)/static_cast<Real>(ny),
@@ -933,7 +933,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		    }
 	      break;
 	    }
-	    
+
 	  case HEX20:
 	  case HEX27:
 	  case TET4: // TET4's are created from an initial HEX27 discretization
@@ -950,7 +950,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			{
 			  // Shortcut variable
 			  const Real pi = libMesh::pi;
-			  
+
 			  // The x,y locations of the point.
 			  Real x=0., y=0., z=0.;
 
@@ -961,11 +961,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  // Shortcut quantities (depend on i,j)
 			  const Real c = std::cos( pi*i / static_cast<Real>(2*nx) );
 			  const Real d = std::cos( pi*j / static_cast<Real>(2*ny) );
-			  
+
 			  // Additional shortcut quantities (for 3D)
 			  const Real e = std::cos( pi / static_cast<Real>(2*nz) );
 			  const Real f = std::cos( pi*k / static_cast<Real>(2*nz) );
-			  
+
 			  // If i is even, compute a normal Gauss-Lobatto point
 			  if (i%2 == 0)
 			    x = 0.5*(1.0 - c);
@@ -973,11 +973,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  // Otherwise, it is the average of the previous and next points
 			  else
 			    x = 0.5*(1.0 - a*c);
-		      
+
 			  // If j is even, compute a normal Gauss-Lobatto point
 			  if (j%2 == 0)
 			    y = 0.5*(1.0 - d);
-		      
+
 			  // Otherwise, it is the average of the previous and next points
 			  else
 			    y = 0.5*(1.0 - b*d);
@@ -985,12 +985,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  // If k is even, compute a normal Gauss-Lobatto point
 			  if (k%2 == 0)
 			    z = 0.5*(1.0 - f);
-		      
+
 			  // Otherwise, it is the average of the previous and next points
 			  else
 			    z = 0.5*(1.0 - e*f);
-		      
-			  
+
+
 			  mesh.add_point (Point(x,y,z), node_id++);
 			}
 
@@ -1010,9 +1010,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    }
 	  }
 
-	    
 
-	
+
+
 	// Build the elements.
 	switch (type)
 	  {
@@ -1024,7 +1024,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		  for (unsigned int i=0; i<nx; i++)
 		    {
 		      Elem* elem = mesh.add_elem(new Hex8);
-			
+
 		      elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i,j,k)      );
 		      elem->set_node(1) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
 		      elem->set_node(2) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
@@ -1033,22 +1033,22 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		      elem->set_node(5) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k+1)  );
 		      elem->set_node(6) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
 		      elem->set_node(7) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  );
-			
+
 		      if (k == 0)
 			mesh.boundary_info->add_side(elem, 0, 0);
-			
+
 		      if (k == (nz-1))
 			mesh.boundary_info->add_side(elem, 5, 5);
-			
+
 		      if (j == 0)
 			mesh.boundary_info->add_side(elem, 1, 1);
 
 		      if (j == (ny-1))
 			mesh.boundary_info->add_side(elem, 3, 3);
- 			
+
 		      if (i == 0)
 			mesh.boundary_info->add_side(elem, 4, 4);
- 			
+
 		      if (i == (nx-1))
 			mesh.boundary_info->add_side(elem, 2, 2);
 		    }
@@ -1117,8 +1117,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-	    
-	    
+
+
 	  case HEX20:
 	  case HEX27:
 	  case TET4: // TET4's are created from an initial HEX27 discretization
@@ -1132,7 +1132,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		      Elem* elem = (type == HEX20) ?
 			mesh.add_elem(new Hex20) :
 			mesh.add_elem(new Hex27);
-		    
+
 		      elem->set_node(0)  = mesh.node_ptr(idx(type,nx,ny,i,  j,  k)  );
 		      elem->set_node(1)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k)  );
 		      elem->set_node(2)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k)  );
@@ -1163,23 +1163,23 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  elem->set_node(25) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+2));
 			  elem->set_node(26) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
 			}
-			
-			
+
+
 		      if (k == 0)
 			mesh.boundary_info->add_side(elem, 0, 0);
-			
+
 		      if (k == 2*(nz-1))
 			mesh.boundary_info->add_side(elem, 5, 5);
-			
+
 		      if (j == 0)
 			mesh.boundary_info->add_side(elem, 1, 1);
 
 		      if (j == 2*(ny-1))
 			mesh.boundary_info->add_side(elem, 3, 3);
- 			
+
 		      if (i == 0)
 			mesh.boundary_info->add_side(elem, 4, 4);
- 			
+
 		      if (i == 2*(nx-1))
 			mesh.boundary_info->add_side(elem, 2, 2);
 		    }
@@ -1188,7 +1188,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-	    
+
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -1237,12 +1237,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		      if (k == 2*(nz-1))
 			mesh.boundary_info->add_side(elem, 4, 5);
 
-		      
+
 		      // Second Prism
 		      elem = ((type == PRISM15) ?
 			      mesh.add_elem(new Prism15) :
 			      mesh.add_elem(new Prism18));
-			
+
 		      elem->set_node(0)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,k)     );
 		      elem->set_node(1)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k)   );
 		      elem->set_node(2)  = mesh.node_ptr(idx(type,nx,ny,i,j+2,k)     );
@@ -1264,7 +1264,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  elem->set_node(16)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+1));
 			  elem->set_node(17)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
 			}
-		      
+
 		      // Add sides for second prism to boundary info object
 		      if (i == 2*(nx-1))
 			mesh.boundary_info->add_side(elem, 1, 2);
@@ -1285,7 +1285,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
 
-	    
+
 	  default:
 	    {
 	      libMesh::err << "ERROR: Unrecognized 3D element type." << std::endl;
@@ -1293,7 +1293,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    }
 	  }
 
-	    
+
 
 
 	//.......................................
@@ -1317,16 +1317,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	// the various elements.
 	if ((type == TET4) ||
 	    (type == TET10) ||
-	    (type == PYRAMID5)) 
+	    (type == PYRAMID5))
 	  {
 	    // Temporary storage for new elements. (24 tets per hex, 6 pyramids)
 	    std::vector<Elem*> new_elements;
-	    
+
 	    if ((type == TET4) || (type == TET10))
 	      new_elements.reserve(24*mesh.n_elem());
 	    else
 	      new_elements.reserve(6*mesh.n_elem());
-	      
+
 	    // Create tetrahedra or pyramids
 	    {
 	      MeshBase::element_iterator       el     = mesh.elements_begin();
@@ -1339,12 +1339,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 		  // Get a pointer to the node located at the HEX27 centroid
 		  Node* apex_node = base_hex->get_node(26);
-	 
+
 		  for (unsigned int s=0; s<base_hex->n_sides(); ++s)
 		    {
 		      // Get the boundary ID for this side
 		      short int b_id = mesh.boundary_info->boundary_id(*el, s);
-		      
+
 		      // Need to build the full-ordered side!
 		      AutoPtr<Elem> side = base_hex->build_side(s);
 
@@ -1373,7 +1373,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  // Build 1 sub-pyramid per side.
 			  new_elements.push_back(new Pyramid5);
 			  Elem* sub_elem = new_elements.back();
-			      
+
 			  // Set the base.  Note that since the apex is *inside* the base_hex,
 			  // and the pyramid uses a counter-clockwise base numbering, we need to
 			  // reverse the [1] and [3] node indices.
@@ -1381,25 +1381,25 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  sub_elem->set_node(1) = side->get_node(3);
 			  sub_elem->set_node(2) = side->get_node(2);
 			  sub_elem->set_node(3) = side->get_node(1);
-			      
+
 			  // Set the apex
 			  sub_elem->set_node(4) = apex_node;
-			      
+
 			  // If the original hex was a boundary hex, add the new sub_pyr's side
-			  // 4 (the square base) with the same b_id.  
+			  // 4 (the square base) with the same b_id.
 			  if (b_id != BoundaryInfo::invalid_id)
 			    mesh.boundary_info->add_side(sub_elem, 4, b_id);
 			} // end else type==PYRAMID5
 		    }
 		}
 	    }
-	    
+
 
 	    // Delete the original HEX27 elements from the mesh, and the boundary info structure.
 	    {
 	      MeshBase::element_iterator       el     = mesh.elements_begin();
 	      const MeshBase::element_iterator end_el = mesh.elements_end();
-       
+
 	      for ( ; el != end_el;  ++el)
 		{
 		  mesh.boundary_info->remove(*el); // Safe even if *el has no boundary info.
@@ -1410,7 +1410,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    // Add the new elements
 	    for (unsigned int i=0; i<new_elements.size(); ++i)
 	      mesh.add_elem(new_elements[i]);
-	    
+
 	  } // end if (type == TET4,TET10,PYRAMID5
 
 
@@ -1420,7 +1420,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    mesh.all_second_order();
 	  }
 
-	
+
 	break;
       } // end case dim==3
 
@@ -1428,14 +1428,14 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       {
 	libmesh_error();
       }
-    }  
+    }
 
   STOP_LOG("build_cube()", "MeshTools::Generation");
 
 
-  
+
   // Done building the mesh.  Now prepare it for use.
-  mesh.prepare_for_use (/*skip_renumber =*/ false);  
+  mesh.prepare_for_use (/*skip_renumber =*/ false);
 }
 
 
@@ -1456,7 +1456,7 @@ void MeshTools::Generation::build_point (UnstructuredMesh& mesh,
                type,
                gauss_lobatto_grid);
 }
-                                        
+
 
 void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
                                         const unsigned int nx,
@@ -1476,7 +1476,7 @@ void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
                type,
                gauss_lobatto_grid);
 }
-                                        
+
 
 
 void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
@@ -1520,7 +1520,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh&,
 }
 
 #else
-	
+
 void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 					  const Real rad,
 					  const unsigned int nr,
@@ -1528,17 +1528,17 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 {
   libmesh_assert (rad > 0.);
   //libmesh_assert (nr > 0); // must refine at least once otherwise will end up with a square/cube
-  
+
   START_LOG("build_sphere()", "MeshTools::Generation");
 
   // Clear the mesh and start from scratch
   mesh.clear();
-  
+
   // Sphere is centered at origin by default
   const Point cent;
 
   const Sphere sphere (cent, rad);
-  
+
   switch (mesh.mesh_dimension())
     {
       //-----------------------------------------------------------------
@@ -1567,33 +1567,33 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
 	// (Temporary) convenient storage for node pointers
 	std::vector<Node*> nodes(8);
-	    
+
 	// Point 0
 	nodes[0] = mesh.add_point (Point(-rad_2,-rad_2, 0.), node_id++);
-	    
+
 	// Point 1
 	nodes[1] = mesh.add_point (Point( rad_2,-rad_2, 0.), node_id++);
-	    
+
 	// Point 2
 	nodes[2] = mesh.add_point (Point( rad_2, rad_2, 0.), node_id++);
 
 	// Point 3
 	nodes[3] = mesh.add_point (Point(-rad_2, rad_2, 0.), node_id++);
-	    
+
 	// Point 4
 	nodes[4] = mesh.add_point (Point(-rad_sqrt_2,-rad_sqrt_2, 0.), node_id++);
-	    
+
 	// Point 5
 	nodes[5] = mesh.add_point (Point( rad_sqrt_2,-rad_sqrt_2, 0.), node_id++);
-	    
+
 	// Point 6
 	nodes[6] = mesh.add_point (Point( rad_sqrt_2, rad_sqrt_2, 0.), node_id++);
-	    
+
 	// Point 7
 	nodes[7] = mesh.add_point (Point(-rad_sqrt_2, rad_sqrt_2, 0.), node_id++);
 
 	// Build the elements & set node pointers
-	    
+
 	// Element 0
 	{
 	  Elem* elem0 = mesh.add_elem (new Quad4);
@@ -1643,9 +1643,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
       } // end case 2
 
 
-      
 
-      
+
+
       //-----------------------------------------------------------------
       // Build a sphere in three dimensions
     case 3:
@@ -1660,15 +1660,15 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	    libmesh_error();
 	  }
 
-	
+
 	// 3D analog of 2D initial grid:
 	const Real
 	  r_small = 0.25*rad,                      //  0.25 *radius
-	  r_med   = (0.125*std::sqrt(2.)+0.5)*rad; // .67677*radius 
-	
+	  r_med   = (0.125*std::sqrt(2.)+0.5)*rad; // .67677*radius
+
 	// (Temporary) convenient storage for node pointers
 	std::vector<Node*> nodes(16);
-	
+
 	// For ParallelMesh, if we don't specify node IDs the Mesh
 	// will try to pick an appropriate (unique) one for us.  But
 	// since we are adding these nodes on all processors, we want
@@ -1708,7 +1708,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	  elem0->set_node(6) = nodes[6];
 	  elem0->set_node(7) = nodes[7];
 	}
-	
+
 	// Element 1 - "bottom"
 	{
 	  Elem* elem1 = mesh.add_elem (new Hex8);
@@ -1721,7 +1721,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	  elem1->set_node(6) = nodes[2];
 	  elem1->set_node(7) = nodes[3];
 	}
-	
+
 	// Element 2 - "front"
 	{
 	  Elem* elem2 = mesh.add_elem (new Hex8);
@@ -1786,17 +1786,17 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	  elem6->set_node(6) = nodes[14];
 	  elem6->set_node(7) = nodes[15];
 	}
-	
+
 	break;
       } // end case 3
-      
+
     default:
       libmesh_error();
-      
+
     } // end switch (dim)
 
-  
-	
+
+
   // Now we have the beginnings of a sphere.
   // Add some more elements by doing uniform refinements and
   // popping nodes to the boundary.
@@ -1808,12 +1808,12 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
       mesh_refinement.uniformly_refine(1);
 
       MeshBase::element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::element_iterator end = mesh.active_elements_end(); 
+      const MeshBase::element_iterator end = mesh.active_elements_end();
 
       for (; it != end; ++it)
 	{
 	  Elem* elem = *it;
-		
+
 	  for (unsigned int s=0; s<elem->n_sides(); s++)
 	    if (elem->neighbor(s) == NULL)
 	      {
@@ -1842,7 +1842,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	}
     }
 
-  
+
   // Convert to second-order elements if the user requested it.
   if (Elem::second_order_equivalent_type(type) == INVALID_ELEM)
     {
@@ -1855,12 +1855,12 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
       // And pop to the boundary again...
       MeshBase::element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::element_iterator end = mesh.active_elements_end(); 
+      const MeshBase::element_iterator end = mesh.active_elements_end();
 
       for (; it != end; ++it)
 	{
 	  Elem* elem = *it;
-		
+
 	  for (unsigned int s=0; s<elem->n_sides(); s++)
 	    if (elem->neighbor(s) == NULL)
 	      {
@@ -1873,7 +1873,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	      }
 	}
     }
-  
+
 
   // The meshes could probably use some smoothing.
   LaplaceMeshSmoother smoother(mesh);
@@ -1881,7 +1881,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
   STOP_LOG("build_sphere()", "MeshTools::Generation");
 
-  
+
   // Done building the mesh.  Now prepare it for use.
   mesh.prepare_for_use(/*skip_renumber =*/ false);
 }
@@ -1914,18 +1914,18 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 
   // Make sure the new Mesh will be 2D
   mesh.set_mesh_dimension(2);
-  
+
   // The x and y spacing between boundary points
   const Real delta_x = (xmax-xmin) / static_cast<Real>(nx);
-  const Real delta_y = (ymax-ymin) / static_cast<Real>(ny);  
+  const Real delta_y = (ymax-ymin) / static_cast<Real>(ny);
 
   // Bottom
   for (unsigned int p=0; p<=nx; ++p)
     mesh.add_point(Point(xmin + p*delta_x, ymin));
-  
+
   // Right side
   for (unsigned int p=1; p<ny; ++p)
-    mesh.add_point(Point(xmax, ymin + p*delta_y)); 
+    mesh.add_point(Point(xmax, ymin + p*delta_y));
 
   // Top
   for (unsigned int p=0; p<=nx; ++p)
@@ -1933,8 +1933,8 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 
   // Left side
   for (unsigned int p=1; p<ny; ++p)
-    mesh.add_point(Point(xmin,  ymax - p*delta_y)); 
-		   
+    mesh.add_point(Point(xmin,  ymax - p*delta_y));
+
   // Be sure we added as many points as we thought we did
   libmesh_assert (mesh.n_nodes() == 2*(nx+ny));
 
@@ -1960,7 +1960,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
   for ( ; el != end_el; ++el)
     {
       const Elem* elem = *el;
-      
+
       for (unsigned int s=0; s<elem->n_sides(); s++)
 	if (elem->neighbor(s) == NULL)
 	  {
@@ -1998,12 +1998,12 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 
 	    // If the point is not on any of the external boundaries, it
 	    // is on one of the holes....
-	    
+
 	    // Finally, add this element's information to the boundary info object.
 	    mesh.boundary_info->add_side(elem->id(), s, bc_id);
 	  }
     }
-  
+
 } // end build_delaunay_square
 
 #endif // LIBMESH_HAVE_TRIANGLE

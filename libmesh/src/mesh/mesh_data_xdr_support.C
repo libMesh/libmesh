@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -53,27 +53,27 @@ void MeshData::read_xdr (const std::string& name,
    *       (unsigned int)
    *
    *   for each node
-   *     
+   *
    *     5.) The foreign node id (unsigned int)
-   *     
+   *
    *     6.) The actual values (vector of real/complex)
-   * 
+   *
    *   end node loop
    *
    *   for each element
-   *     
+   *
    *     7.) The foreign element id (unsigned int)
-   *     
+   *
    *     8.) The actual values (vector of real/complex)
-   * 
+   *
    *   end node loop
    *
-   * Note that the actual IO is handled through the Xdr class 
-   * (to be renamed later?) which provides a uniform interface to 
+   * Note that the actual IO is handled through the Xdr class
+   * (to be renamed later?) which provides a uniform interface to
    * both the XDR (eXternal Data Representation) interface and standard
    * ASCII output.  Thus this one section of code will write XDR or ASCII
    * files with no changes.
-   */ 
+   */
 
 
   // we should better be active or in compatibility mode
@@ -150,7 +150,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
   /**
-   * 3.)  
+   * 3.)
    *
    * Read the number of nodes for which data is there
    */
@@ -159,7 +159,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
   /**
-   * 4.)  
+   * 4.)
    *
    * Read the number of elements for which data is there
    */
@@ -171,7 +171,7 @@ void MeshData::read_xdr (const std::string& name,
   for (unsigned int n_cnt=0; n_cnt < n_node; n_cnt++)
     {
       /**
-       * 5.)  
+       * 5.)
        *
        * Read the foreign node id, locate the
        * Node* associated with this foreign id
@@ -183,7 +183,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
       /**
-       * 6.)  
+       * 6.)
        *
        * the actual values for this node, Xdr knows
        * the length
@@ -212,7 +212,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
 	/**
-	 * insert this node and the values in the _node_data 
+	 * insert this node and the values in the _node_data
 	 */
 	_node_data.insert (std::make_pair(node, values));
       }
@@ -225,7 +225,7 @@ void MeshData::read_xdr (const std::string& name,
   for (unsigned int n_cnt=0; n_cnt < n_elem; n_cnt++)
     {
       /**
-       * 7.)  
+       * 7.)
        *
        * Read the foreign elem id, locate the Elem*
        */
@@ -236,7 +236,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
       /**
-       * 8.)  
+       * 8.)
        *
        * the actual values for this elem, Xdr knows
        * how many
@@ -265,7 +265,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
 	/**
-	 * insert this elem and the values in our _elem_data 
+	 * insert this elem and the values in our _elem_data
 	 * @e only when we own this element!
 	 */
 	if (elem->processor_id() == proc_id)
@@ -308,27 +308,27 @@ void MeshData::write_xdr (const std::string& name,
    *       (unsigned int)
    *
    *   for each node
-   *     
+   *
    *     5.) The foreign node id (unsigned int)
-   *     
+   *
    *     6.) The actual values (vector of real/complex)
-   * 
+   *
    *   end node loop
    *
    *   for each element
-   *     
+   *
    *     7.) The foreign element id (unsigned int)
-   *     
+   *
    *     8.) The actual values (vector of real/complex)
-   * 
+   *
    *   end node loop
    *
-   * Note that the actual IO is handled through the Xdr class 
-   * (to be renamed later?) which provides a uniform interface to 
+   * Note that the actual IO is handled through the Xdr class
+   * (to be renamed later?) which provides a uniform interface to
    * both the XDR (eXternal Data Representation) interface and standard
    * ASCII output.  Thus this one section of code will write XDR or ASCII
    * files with no changes.
-   */ 
+   */
 
   /*
    * make sure the id maps are ready
@@ -339,7 +339,7 @@ void MeshData::write_xdr (const std::string& name,
 
   libmesh_assert (_node_data_closed);
   libmesh_assert (_elem_data_closed);
-  
+
 
   Xdr io(name, mode);
 
@@ -378,7 +378,7 @@ better_you_choke_this...
 
 
   /**
-   * 3.)  
+   * 3.)
    *
    * Write the number of nodes for which data is there
    */
@@ -389,7 +389,7 @@ better_you_choke_this...
 
 
   /**
-   * 4.)  
+   * 4.)
    *
    * Write the number of elements for which data is there
    */
@@ -401,7 +401,7 @@ better_you_choke_this...
 
 
 
-  std::map<const Node*, 
+  std::map<const Node*,
            std::vector<Number> >::const_iterator nit = _node_data.begin ();
 
   for (; nit != _node_data.end(); ++nit)
@@ -409,7 +409,7 @@ better_you_choke_this...
       const Node* node = (*nit).first;
 
       /**
-       * 5.)  
+       * 5.)
        *
        * Write the foreign node id
        */
@@ -420,19 +420,19 @@ better_you_choke_this...
 
 
       /**
-       * 6.)  
+       * 6.)
        *
        * the actual values for this node
        */
       {
-	/* 
-	 * since we are iterating over our @e own 
+	/*
+	 * since we are iterating over our @e own
 	 * map, this libmesh_assert should never break...
 	 */
 	libmesh_assert (this->has_data(node));
 
 	const std::vector<Number>& values = this->get_data(node);
-	
+
 	/*
 	 * copy the data to a local buf, since
 	 * the Xdr class needs write access, even
@@ -449,7 +449,7 @@ better_you_choke_this...
 
 
 
-  std::map<const Elem*, 
+  std::map<const Elem*,
            std::vector<Number> >::const_iterator eit = _elem_data.begin ();
 
   for (; eit != _elem_data.end(); ++eit)
@@ -457,7 +457,7 @@ better_you_choke_this...
       const Elem* elem = (*eit).first;
 
       /**
-       * 7.)  
+       * 7.)
        *
        * Write the foreign element id
        */
@@ -468,19 +468,19 @@ better_you_choke_this...
 
 
       /**
-       * 8.)  
+       * 8.)
        *
        * the actual values for this element
        */
       {
-	/* 
-	 * since we are iterating over our @e own 
+	/*
+	 * since we are iterating over our @e own
 	 * map, this libmesh_assert should never break...
 	 */
 	libmesh_assert (this->has_data(elem));
 
 	const std::vector<Number>& values = this->get_data(elem);
-	
+
 	/*
 	 * copy the data to a local buf, since
 	 * the Xdr class needs write access, even

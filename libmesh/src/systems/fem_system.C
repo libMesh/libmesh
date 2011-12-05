@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -135,7 +135,7 @@ namespace {
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_sys.compute_internal_sides && 
+              if (!_sys.compute_internal_sides &&
                   _femcontext.elem->neighbor(_femcontext.side) != NULL)
                 continue;
 
@@ -312,7 +312,7 @@ namespace {
           // Optionally initialize all the interior FE objects on elem.
           if (_sys.fe_reinit_during_postprocess)
             _femcontext.elem_fe_reinit();
-      
+
           _sys.element_postprocess(_femcontext);
 
           for (_femcontext.side = 0;
@@ -590,7 +590,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   // Build the residual and jacobian contributions on every active
   // mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
-                                         mesh.active_local_elements_end()), 
+                                         mesh.active_local_elements_end()),
                         AssemblyContributions(*this, get_residual, get_jacobian));
 
 
@@ -661,7 +661,7 @@ void FEMSystem::mesh_position_set()
   // data, respond to others' queries, work on my query's results"
   // pattern that we seem to be using a lot.
   libmesh_assert(libMesh::n_processors() == 1);
-  
+
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
   this->init_context(_femcontext);
@@ -701,7 +701,7 @@ void FEMSystem::postprocess ()
 
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
-                                         mesh.active_local_elements_end()), 
+                                         mesh.active_local_elements_end()),
                         PostprocessContributions(*this));
 
   STOP_LOG("postprocess()", "FEMSystem");
@@ -729,7 +729,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   // Loop over every active mesh element on this processor
   Threads::parallel_reduce(elem_range.reset(mesh.active_local_elements_begin(),
-                                            mesh.active_local_elements_end()), 
+                                            mesh.active_local_elements_end()),
                            qoi_contributions);
 
   Parallel::sum(qoi_contributions.qoi);
@@ -757,7 +757,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
 
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
-                                         mesh.active_local_elements_end()), 
+                                         mesh.active_local_elements_end()),
                         QoIDerivativeContributions(*this, qoi_indices));
 
   STOP_LOG("assemble_qoi_derivative()", "FEMSystem");
@@ -802,7 +802,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           if (_mesh_y_var != libMesh::invalid_uint)
             for (unsigned int k = 0;
                  k != context.dof_indices_var[_mesh_y_var].size(); ++k)
-              if (context.dof_indices_var[_mesh_y_var][k] == 
+              if (context.dof_indices_var[_mesh_y_var][k] ==
                   context.dof_indices[j])
                 coord = &(context.elem->point(k)(1));
           if (_mesh_z_var != libMesh::invalid_uint)
@@ -891,7 +891,7 @@ AutoPtr<DiffContext> FEMSystem::build_context ()
   AutoPtr<DiffContext> ap(new FEMContext(*this));
 
   ap->set_deltat_pointer( &deltat );
-  
+
   return ap;
 }
 
@@ -910,7 +910,7 @@ void FEMSystem::init_context(DiffContext &c)
   // deltat pointers even if they have different build_context()
   // overloads.
   c.set_deltat_pointer ( &deltat );
-  
+
   FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
 
   // Make sure we're prepared to do mass integration
@@ -1047,7 +1047,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
       else
 	unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
 
-      const std::vector<Real> &JxW = 
+      const std::vector<Real> &JxW =
         context.element_fe_var[var]->get_JxW();
 
       const std::vector<std::vector<Real> >     &phi =
@@ -1136,7 +1136,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
   return request_jacobian;
 }
 
-      
+
 
 bool FEMSystem::mass_residual (bool request_jacobian,
                                DiffContext &c)
@@ -1150,7 +1150,7 @@ bool FEMSystem::mass_residual (bool request_jacobian,
       if (!_time_evolving[var])
         continue;
 
-      const std::vector<Real> &JxW = 
+      const std::vector<Real> &JxW =
         context.element_fe_var[var]->get_JxW();
 
       const std::vector<std::vector<Real> > &phi =

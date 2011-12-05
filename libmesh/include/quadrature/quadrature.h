@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -63,9 +63,9 @@ protected:
    */
   QBase (const unsigned int _dim,
 	 const Order _order=INVALID_ORDER);
-  
+
 public:
-  
+
   /**
    * Destructor.
    */
@@ -82,7 +82,7 @@ public:
    * to prevent a memory leak. This way the user need not
    * remember to delete the object.  Enables run-time decision of
    * the quadrature rule.  The input parameter \p name
-   * must be mappable through the \p Utility::string_to_enum<>() 
+   * must be mappable through the \p Utility::string_to_enum<>()
    * function.
    */
   static AutoPtr<QBase> build (const std::string &name,
@@ -102,19 +102,19 @@ public:
 
   /**
    * @returns the current element type we're set up for
-   */    
+   */
   ElemType get_elem_type() const
     { return _type; }
 
   /**
    * @returns the current p refinement level we're initialized with
-   */    
+   */
   unsigned int get_p_level() const
     { return _p_level; }
 
   /**
    * @returns the number of points associated with the quadrature rule.
-   */    
+   */
   unsigned int n_points() const
     { libmesh_assert (!_points.empty()); return _points.size(); }
 
@@ -156,19 +156,19 @@ public:
    */
   Real w(const unsigned int i) const
     { libmesh_assert (i < _weights.size()); return _weights[i]; }
-  
+
   /**
    * Initializes the data structures to contain a quadrature rule
-   * for an object of type \p type.  
+   * for an object of type \p type.
    */
   void init (const ElemType _type=INVALID_ELEM,
 	     unsigned int p_level=0);
 
   /**
-   * @returns the order of the quadrature rule.   
+   * @returns the order of the quadrature rule.
    */
   Order get_order() const { return static_cast<Order>(_order + _p_level); }
-  
+
   /**
    * Prints information relevant to the quadrature rule, by default to
    * libMesh::out.
@@ -214,10 +214,10 @@ public:
    * rule instead, nearly tripling the computational effort required!
    */
   bool allow_rules_with_negative_weights;
-  
+
 protected:
 
-  
+
   /**
    * Initializes the 0D quadrature rule by filling the points and
    * weights vectors with the appropriate values.  Generally this
@@ -249,7 +249,7 @@ protected:
 #ifndef DEBUG
   {}
 #else
-  {  
+  {
     libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
 	          << " is not implemented for 2D." << std::endl;
     libmesh_error();
@@ -269,14 +269,14 @@ protected:
 #ifndef DEBUG
   {}
 #else
-  {  
+  {
     libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
 	          << " is not implemented for 3D." << std::endl;
     libmesh_error();
   }
 #endif
-  
-  
+
+
   /**
    * Computes the tensor product of
    * two 1D rules and returns a 2D rule.
@@ -292,7 +292,7 @@ protected:
    * hexahedral element types.
    */
   void tensor_product_hex (const QBase& q1D);
-  
+
   /**
    * Computes the tensor product of
    * a 1D quadrature rule and a 2D
@@ -303,15 +303,15 @@ protected:
   void tensor_product_prism (const QBase& q1D, const QBase& q2D);
 
 
-  
+
   /**
    * The dimension
    */
   const unsigned int _dim;
-  
+
   /**
    * The order of the quadrature rule.
-   */ 
+   */
   const Order _order;
 
   /**

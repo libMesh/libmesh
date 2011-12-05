@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -34,9 +34,9 @@
 
 
 // anonymous namespace to hold local data
-namespace 
+namespace
 {
-  
+
   /**
    * Defines a structure to hold boundary element information.
    *
@@ -88,14 +88,14 @@ namespace
 
 	// use "swap trick" from Scott Meyer's "Effective STL" to initialize
 	// eledef.nodes vector
-	
+
 	// POINT (only Gmsh)
 	{
 	  eledef.exptype = 15;
           eledef.dim     = 0;
           eledef.nnodes  = 1;
 	  eledef.nodes.clear();
-	
+
           // import only
           eletypes_imp[15] = eledef;
 	}
@@ -107,11 +107,11 @@ namespace
           eledef.nnodes  = 2;
 	  eledef.exptype = 1;
 	  eledef.nodes.clear();
-	
+
 	  eletypes_exp[EDGE2] = eledef;
           eletypes_imp[1]     = eledef;
 	}
-  
+
 	// EDGE3
 	{
 	  eledef.type    = EDGE3;
@@ -119,11 +119,11 @@ namespace
           eledef.nnodes  = 3;
 	  eledef.exptype = 8;
 	  eledef.nodes.clear();
-	  
+
 	  eletypes_exp[EDGE3] = eledef;
           eletypes_imp[8]     = eledef;
 	}
-      
+
 	// TRI3
 	{
           eledef.type    = TRI3;
@@ -131,11 +131,11 @@ namespace
           eledef.nnodes  = 3;
 	  eledef.exptype = 2;
 	  eledef.nodes.clear();
-	  
+
 	  eletypes_exp[TRI3] = eledef;
           eletypes_imp[2] = eledef;
 	}
-      
+
 	// TRI6
 	{
           eledef.type    = TRI6;
@@ -147,7 +147,7 @@ namespace
 	  eletypes_exp[TRI6] = eledef;
           eletypes_imp[9]    = eledef;
 	}
-      
+
 	// QUAD4
 	{
           eledef.type    = QUAD4;
@@ -159,7 +159,7 @@ namespace
 	  eletypes_exp[QUAD4] = eledef;
           eletypes_imp[3]     = eledef;
 	}
-      
+
 	// QUAD8
         // TODO: what should be done with this on writing?
 	{
@@ -173,7 +173,7 @@ namespace
 	  eletypes_exp[QUAD8] = eledef;
           eletypes_imp[10]    = eledef;
 	}
-      
+
 	// QUAD9
 	{
           eledef.type    = QUAD9;
@@ -185,7 +185,7 @@ namespace
 	  eletypes_exp[QUAD9] = eledef;
           eletypes_imp[10]    = eledef;
 	}
-      
+
 	// HEX8
 	{
           eledef.type    = HEX8;
@@ -197,7 +197,7 @@ namespace
 	  eletypes_exp[HEX8] = eledef;
           eletypes_imp[5]    = eledef;
 	}
-      
+
 	// HEX20
         // TODO: what should be done with this on writing?
 	{
@@ -211,7 +211,7 @@ namespace
 	  eletypes_exp[HEX20] = eledef;
           eletypes_imp[12]    = eledef;
 	}
-      
+
 	// HEX27
 	{
           eledef.type    = HEX27;
@@ -225,7 +225,7 @@ namespace
 	  eletypes_exp[HEX27] = eledef;
           eletypes_imp[12]    = eledef;
 	}
-      
+
 	// TET4
 	{
           eledef.type    = TET4;
@@ -237,7 +237,7 @@ namespace
           eletypes_exp[TET4] = eledef;
           eletypes_imp[4]    = eledef;
 	}
-      
+
 	// TET10
 	{
           eledef.type    = TET10;
@@ -249,7 +249,7 @@ namespace
 	  eletypes_exp[TET10] = eledef;
           eletypes_imp[11]    = eledef;
 	}
-      
+
 	// PRISM6
 	{
           eledef.type    = PRISM6;
@@ -257,11 +257,11 @@ namespace
           eledef.nnodes  = 6;
 	  eledef.exptype = 6;
 	  eledef.nodes.clear();
-	  
+
 	  eletypes_exp[PRISM6] = eledef;
           eletypes_imp[6]      = eledef;
 	}
-      
+
 	// PRISM15
         // TODO: what should be done with this on writing?
 	{
@@ -270,7 +270,7 @@ namespace
           eledef.nnodes  = 15;
 	  eledef.exptype = 103;
 	  eledef.nodes.clear();
-	  
+
 	  eletypes_exp[PRISM15] = eledef;
           eletypes_imp[13] = eledef;
 	}
@@ -296,15 +296,15 @@ namespace
           eledef.nnodes  = 5;
 	  eledef.exptype = 7;
 	  eledef.nodes.clear();
-	  
+
 	  eletypes_exp[PYRAMID5] = eledef;
           eletypes_imp[7]        = eledef;
 	}
 
-	//==============================      
+	//==============================
       }
   }
-  
+
 } // end anonymous namespace
 
 
@@ -343,11 +343,11 @@ void GmshIO::read_mesh(std::istream& in)
   char       buf[bufLen+1];
   int        format=0, size=0;
   Real       version = 1.0;
-  
+
   // map to hold the node numbers for translation
   // note the the nodes can be non-consecutive
   std::map<unsigned int, unsigned int> nodetrans;
-  
+
   {
     while (!in.eof()) {
       in >> buf;
@@ -374,11 +374,11 @@ void GmshIO::read_mesh(std::istream& in)
             libmesh_error();
           }
         }
-      
+
       // read the node block
       else if (!std::strncmp(buf,"$NOD",4) ||
 	       !std::strncmp(buf,"$NOE",4) ||
-	       !std::strncmp(buf,"$Nodes",6) 
+	       !std::strncmp(buf,"$Nodes",6)
 	       )
         {
           unsigned int numNodes = 0;
@@ -388,9 +388,9 @@ void GmshIO::read_mesh(std::istream& in)
           // read in the nodal coordinates and form points.
           Real x, y, z;
           unsigned int id;
-        
+
           // add the nodal coordinates to the mesh
-          for (unsigned int i=0; i<numNodes; ++i)      
+          for (unsigned int i=0; i<numNodes; ++i)
             {
               in >> id >> x >> y >> z;
               mesh.add_point (Point(x, y, z), i);
@@ -423,7 +423,7 @@ void GmshIO::read_mesh(std::istream& in)
 
           // read the elements
 	  unsigned int elem_id_counter = 0;
-          for (unsigned int iel=0; iel<numElem; ++iel)      
+          for (unsigned int iel=0; iel<numElem; ++iel)
             {
               unsigned int id, type, physical, elementary,
                 /* partition = 1,*/ nnodes, ntags;
@@ -468,13 +468,13 @@ void GmshIO::read_mesh(std::istream& in)
 		  elem_id_counter++;
 
                   // check number of nodes. We cannot do that for version 2.0
-                  if (version <= 1.0) 
+                  if (version <= 1.0)
                     {
                       if (elem->n_nodes() != nnodes)
                         {
                           libMesh::err << "Number of nodes for element " << id
                                         << " of type " << eletypes_imp[type].type
-                                        << " (Gmsh type " << type  
+                                        << " (Gmsh type " << type
                                         << ") does not match Libmesh definition. "
                                         << "I expected " << elem->n_nodes()
                                         << " nodes, but got " << nnodes << "\n";
@@ -561,10 +561,10 @@ void GmshIO::read_mesh(std::istream& in)
                   for (;iter!= binfo.nodes.end(); iter++)
                     node_index[*iter].push_back(i);
                 }
-              
+
               MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-              const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-              
+              const MeshBase::const_element_iterator end = mesh.active_elements_end();
+
               // iterate over all elements and see which boundary element has
               // the same set of nodes as on of the boundary elements previously read
               for ( ; it != end; ++it)
@@ -578,9 +578,9 @@ void GmshIO::read_mesh(std::istream& in)
                         std::set<unsigned int>::iterator iter = side_nodes.begin();
 
                         // make a set with all nodes from this side
-                        // this allows for easy comparison                        
+                        // this allows for easy comparison
                         for (unsigned int ns=0; ns<side->n_nodes(); ns++)
-                          side_nodes.insert(iter, side->node(ns)); 
+                          side_nodes.insert(iter, side->node(ns));
 
                         // See whether one of the side node occurs in the list
                         // of tagged nodes. If we would loop over all side
@@ -647,15 +647,15 @@ void GmshIO::write_mesh (std::ostream& out)
 {
   // Be sure that the stream is valid.
   libmesh_assert (out.good());
-  
+
   // initialize the map with element types
   init_eletypes();
 
   // Get a const reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
-  
+
   // Note: we are using version 2.0 of the gmsh output format.
-  
+
   {
     // Write the file header.
     out << "$MeshFormat\n";
@@ -667,7 +667,7 @@ void GmshIO::write_mesh (std::ostream& out)
     // write the nodes in (n x y z) format
     out << "$Nodes\n";
     out << mesh.n_nodes() << '\n';
-    
+
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       out << mesh.node(v).id()+1 << " "
 	  << mesh.node(v)(0) << " "
@@ -675,15 +675,15 @@ void GmshIO::write_mesh (std::ostream& out)
 	  << mesh.node(v)(2) << '\n';
     out << "$EndNodes\n";
   }
-  
+
   {
     // write the connectivity
     out << "$Elements\n";
     out << mesh.n_active_elem() << '\n';
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-    
+    const MeshBase::const_element_iterator end = mesh.active_elements_end();
+
     // loop over the elements
     for ( ; it != end; ++it)
       {
@@ -693,13 +693,13 @@ void GmshIO::write_mesh (std::ostream& out)
 	// the current element type.
 	libmesh_assert (eletypes_exp.count(elem->type()));
 
-        // consult the export element table 
+        // consult the export element table
         const elementDefinition& eletype = eletypes_exp[elem->type()];
 
 	// The element mapper better not require any more nodes
 	// than are present in the current element!
         libmesh_assert (eletype.nodes.size() <= elem->n_nodes());
-	
+
         // elements ids are 1 based in Gmsh
         out << elem->id()+1 << " ";
 
@@ -710,17 +710,17 @@ void GmshIO::write_mesh (std::ostream& out)
         // tag1 (physical entity), tag2 (geometric entity), and tag3 (partition entity)
         out << " 3 "
             << static_cast<unsigned int>(elem->subdomain_id())
-            << " 1 " 
+            << " 1 "
             << (elem->processor_id()+1) << " ";
 
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out << elem->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based 
+            out << elem->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
         // otherwise keep the same node order
         else
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out << elem->node(i)+1 << " ";                  // gmsh is 1-based 
+            out << elem->node(i)+1 << " ";                  // gmsh is 1-based
         out << "\n";
       } // element loop
     out << "$EndElements\n";
@@ -735,7 +735,7 @@ void GmshIO::write_post (const std::string& fname,
 
   // Should only do this on processor 0!
   libmesh_assert (libMesh::processor_id() == 0);
-  
+
   // Create an output stream
   std::ofstream out(fname.c_str());
 
@@ -754,16 +754,16 @@ void GmshIO::write_post (const std::string& fname,
 
   //  write the data
   if ((solution_names != NULL) && (v != NULL))
-    {      
+    {
       const unsigned int n_vars = solution_names->size();
-    
+
       if (!(v->size() == mesh.n_nodes()*n_vars))
         libMesh::err << "ERROR: v->size()=" << v->size()
                       << ", mesh.n_nodes()=" << mesh.n_nodes()
                       << ", n_vars=" << n_vars
                       << ", mesh.n_nodes()*n_vars=" << mesh.n_nodes()*n_vars
                       << "\n";
-      
+
       libmesh_assert (v->size() == mesh.n_nodes()*n_vars);
 
       // write the header
@@ -782,13 +782,13 @@ void GmshIO::write_post (const std::string& fname,
 
       {
         MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-        const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+        const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
 
         for ( ; it != end; ++it)
           {
             const ElemType elemtype = (*it)->type();
-            
+
             switch (elemtype)
               {
               case EDGE2:
@@ -855,10 +855,10 @@ void GmshIO::write_post (const std::string& fname,
           // later this should be made configurable through
           // options to the writer class
           n_scalar = 1;
-      
+
           // write the variable as a view, and the number of time steps
           out << "$View\n" << varname << " " << 1 << "\n";
-      
+
           // write how many of each geometry type are written
           out << n_points * n_scalar << " "
               << n_points * n_vector << " "
@@ -888,7 +888,7 @@ void GmshIO::write_post (const std::string& fname,
               << nb_text2d_chars << " "
               << nb_text3d << " "
               << nb_text3d_chars << "\n";
-      
+
           // if binary, write a marker to identify the endianness of the file
           if (this->binary())
             {
@@ -909,14 +909,14 @@ void GmshIO::write_post (const std::string& fname,
 
           // Loop over the elements and write out the data
           MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-    
+          const MeshBase::const_element_iterator end = mesh.active_elements_end();
+
           for ( ; it != end; ++it)
             {
               const Elem* elem = *it;
-	
+
               // this is quite crappy, but I did not invent that file format!
-              for (unsigned int d=0; d<3; d++)  // loop over the dimensions 
+              for (unsigned int d=0; d<3; d++)  // loop over the dimensions
                 {
                   for (unsigned int n=0; n < elem->n_vertices(); n++)   // loop over vertices
                     {

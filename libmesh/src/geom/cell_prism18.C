@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -226,7 +226,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
 	case 1:  // the quad face at y=0
 	  {
 	    AutoPtr<Elem> face(new Quad9);
-	
+
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(1);
 	    face->set_node(2) = this->get_node(4);
@@ -236,7 +236,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
 	    face->set_node(6) = this->get_node(12);
 	    face->set_node(7) = this->get_node(9);
 	    face->set_node(8) = this->get_node(15);
-	
+
 	    return face;
 	  }
 	case 2:  // the other quad face
@@ -268,7 +268,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
 	    face->set_node(6) = this->get_node(14);
 	    face->set_node(7) = this->get_node(11);
 	    face->set_node(8) = this->get_node(17);
-	
+
 	    return face;
 	  }
 	case 4: // the triangular face at z=1
@@ -290,7 +290,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
 	  }
 	}
     }
-  
+
   // We'll never get here.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -322,7 +322,7 @@ void Prism18::connectivity(const unsigned int sc,
 	conn.resize(8);
 	switch (sc)
 	  {
-      
+
 	  case 0:
 	    {
 	      conn[0] = this->node(0)+1;
@@ -333,7 +333,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[5] = this->node(15)+1;
 	      conn[6] = this->node(17)+1;
 	      conn[7] = this->node(17)+1;
-	
+
 	      return;
 	    }
 
@@ -347,10 +347,10 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[5] = this->node(10)+1;
 	      conn[6] = this->node(16)+1;
 	      conn[7] = this->node(16)+1;
-	
+
 	      return;
 	    }
-      
+
 	  case 2:
 	    {
 	      conn[0] = this->node(8)+1;
@@ -361,10 +361,10 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[5] = this->node(16)+1;
 	      conn[6] = this->node(11)+1;
 	      conn[7] = this->node(11)+1;
-	
+
 	      return;
 	    }
-      
+
 	  case 3:
 	    {
 	      conn[0] = this->node(6)+1;
@@ -375,7 +375,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[5] = this->node(16)+1;
 	      conn[6] = this->node(17)+1;
 	      conn[7] = this->node(17)+1;
-	
+
 	      return;
 	    }
 
@@ -389,7 +389,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[5] = this->node(12)+1;
 	      conn[6] = this->node(14)+1;
 	      conn[7] = this->node(14)+1;
-	
+
 	      return;
 	    }
 
@@ -403,7 +403,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[5] = this->node(4)+1;
 	      conn[6] = this->node(13)+1;
 	      conn[7] = this->node(13)+1;
-	
+
 	      return;
 	    }
 
@@ -417,7 +417,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[5] = this->node(13)+1;
 	      conn[6] = this->node(5)+1;
 	      conn[7] = this->node(5)+1;
-	
+
 	      return;
 	    }
 
@@ -431,7 +431,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[5] = this->node(13)+1;
 	      conn[6] = this->node(14)+1;
 	      conn[7] = this->node(14)+1;
-	
+
 	      return;
 	    }
 
@@ -451,7 +451,7 @@ void Prism18::connectivity(const unsigned int sc,
 	// of mid-edge nodes are reversed from LibMesh's.
 	for (unsigned i=0; i<conn.size(); ++i)
 	  conn[i] = this->node(i);
-	
+
 	// top "ring" of mid-edge nodes
 	conn[9]  = this->node(12);
 	conn[10] = this->node(13);
@@ -461,14 +461,14 @@ void Prism18::connectivity(const unsigned int sc,
 	conn[12] = this->node(9);
 	conn[13] = this->node(10);
 	conn[14] = this->node(11);
-	
+
 	return;
 
-	/* 
+	/*
 	conn.resize(6);
 	switch (sc)
 	  {
-      
+
 	  case 0:
 	    {
 	      conn[0] = this->node(0);
@@ -477,7 +477,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[3] = this->node(9);
 	      conn[4] = this->node(15);
 	      conn[5] = this->node(17);
-	
+
 	      return;
 	    }
 
@@ -489,10 +489,10 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[3] = this->node(15);
 	      conn[4] = this->node(10);
 	      conn[5] = this->node(16);
-	
+
 	      return;
 	    }
-      
+
 	  case 2:
 	    {
 	      conn[0] = this->node(8);
@@ -501,10 +501,10 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[3] = this->node(17);
 	      conn[4] = this->node(16);
 	      conn[5] = this->node(11);
-	
+
 	      return;
 	    }
-      
+
 	  case 3:
 	    {
 	      conn[0] = this->node(6);
@@ -513,7 +513,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[3] = this->node(15);
 	      conn[4] = this->node(16);
 	      conn[5] = this->node(17);
-	
+
 	      return;
 	    }
 
@@ -525,7 +525,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[3] = this->node(3);
 	      conn[4] = this->node(12);
 	      conn[5] = this->node(14);
-	
+
 	      return;
 	    }
 
@@ -537,7 +537,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[3] = this->node(12);
 	      conn[4] = this->node(4);
 	      conn[5] = this->node(13);
-	
+
 	      return;
 	    }
 
@@ -549,7 +549,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[3] = this->node(14);
 	      conn[4] = this->node(13);
 	      conn[5] = this->node(5);
-	
+
 	      return;
 	    }
 
@@ -561,7 +561,7 @@ void Prism18::connectivity(const unsigned int sc,
 	      conn[3] = this->node(12);
 	      conn[4] = this->node(13);
 	      conn[5] = this->node(14);
-	
+
 	      return;
 	    }
 
@@ -615,7 +615,7 @@ unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) co
 
 unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
 							  const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
 
@@ -631,7 +631,7 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
       case 17:
       {
 	libmesh_assert (v < 4);
-	return _remaining_second_order_adjacent_vertices[n-15][v]; 
+	return _remaining_second_order_adjacent_vertices[n-15][v];
       }
 
       /*
@@ -643,7 +643,7 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
       default:
       {
 	libmesh_assert (v < 2);
-	return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+	return _second_order_adjacent_vertices[n-this->n_vertices()][v];
       }
 
     }
@@ -654,7 +654,7 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
 
 
 
-const unsigned short int Prism18::_remaining_second_order_adjacent_vertices[3][4] = 
+const unsigned short int Prism18::_remaining_second_order_adjacent_vertices[3][4] =
 {
   { 0,  1,  3,  4}, // vertices adjacent to node 15
   { 1,  2,  4,  5}, // vertices adjacent to node 16
