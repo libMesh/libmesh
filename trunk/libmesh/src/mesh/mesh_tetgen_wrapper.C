@@ -1,5 +1,5 @@
 // $Id$
- 
+
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -84,9 +84,9 @@ namespace libMesh
     // Bounds checking...
     if (i >= static_cast<unsigned>(tetgen_output->numberofpoints))
       {
-	std::cerr << "Error, requested point " 
-		  << i 
-		  << ", but there are only " 
+	std::cerr << "Error, requested point "
+		  << i
+		  << ", but there are only "
 		  << tetgen_output->numberofpoints
 		  << " points available."
 		  << std::endl;
@@ -167,24 +167,24 @@ namespace libMesh
 
   void TetGenWrapper::set_switches(const std::string& s)
   {
-    // A temporary buffer for passing to the C API, it requires 
+    // A temporary buffer for passing to the C API, it requires
     // a char*, not a const char*...
     char buffer[256];
-  
+
     // Make sure char buffer has enough room
     if (s.size() >= sizeof(buffer)-1)
       {
-	libMesh::err << "Fixed size buffer of length " 
-		     << sizeof(buffer) 
-		     << " not large enough to hold TetGen switches." 
+	libMesh::err << "Fixed size buffer of length "
+		     << sizeof(buffer)
+		     << " not large enough to hold TetGen switches."
 		     << std::endl;
 	libmesh_error();
       }
-  
+
     // Copy the string, don't forget to NULL-terminate!
     buffer[ s.copy( buffer , sizeof( buffer ) - 1 ) ] = '\0' ;
-  
-    if (!tetgen_be.parse_commandline(buffer)) 
+
+    if (!tetgen_be.parse_commandline(buffer))
       libMesh::out << "TetGen replies: Wrong switches!" << std::endl;
   }
 
@@ -199,7 +199,7 @@ namespace libMesh
 
 
   void TetGenWrapper::set_numberoffacets(int i)
-  { 
+  {
     // This is stored as an int in TetGen
     this->tetgen_data.numberoffacets = i;
   }
@@ -207,7 +207,7 @@ namespace libMesh
 
 
   void TetGenWrapper::set_numberofholes(int i)
-  { 
+  {
     // This is stored as an int in TetGen
     this->tetgen_data.numberofholes = i;
   }
@@ -227,7 +227,7 @@ namespace libMesh
     // These are both stored as ints in TetGen
     this->set_numberoffacets(numoffacets);
     this->set_numberofholes(numofholes);
-  
+
     // Don't try to allocate an array of size zero, this is not portable...
     if (this->tetgen_data.numberoffacets > 0)
       {
@@ -255,7 +255,7 @@ namespace libMesh
 	    libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
 	    libmesh_error();
 	  }
-  
+
 	this->tetgen_data.holelist = new REAL[this->tetgen_data.numberofholes * 3];
       }
   }
@@ -275,7 +275,7 @@ namespace libMesh
 	    libMesh::err << "Cannot allocate on top of previously allocated memory!" << std::endl;
 	    libmesh_error();
 	  }
-  
+
 	// We allocate memory here, the tetgenio destructor cleans it up.
 	this->tetgen_data.regionlist = new REAL[this->tetgen_data.numberofregions * 5];
       }
@@ -373,7 +373,7 @@ namespace libMesh
     tetgen_data.regionlist[index++] = attribute;
     tetgen_data.regionlist[index++] = vol_constraint;
   }
-  
+
 } // namespace libMesh
 
 

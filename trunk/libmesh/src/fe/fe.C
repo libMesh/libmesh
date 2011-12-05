@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -44,7 +44,7 @@ unsigned int FE<Dim,T>::n_shape_functions () const
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::attach_quadrature_rule (QBase* q)
 {
-  libmesh_assert (q != NULL); 
+  libmesh_assert (q != NULL);
   qrule = q;
   // make sure we don't cache results from a previous quadrature rule
   elem_type = INVALID_ELEM;
@@ -54,9 +54,9 @@ void FE<Dim,T>::attach_quadrature_rule (QBase* q)
 
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_quadrature_points () const
-{ 
-  libmesh_assert (qrule != NULL);  
-  return qrule->n_points(); 
+{
+  libmesh_assert (qrule != NULL);
+  return qrule->n_points();
 }
 
 
@@ -122,7 +122,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // Try to avoid calling init_shape_functions
   // even when shapes_need_reinit
   bool cached_nodes_still_fit = false;
-  
+
   // Initialize the shape functions at the user-specified
   // points
   if (pts != NULL)
@@ -137,19 +137,19 @@ void FE<Dim,T>::reinit(const Elem* elem,
       // The shape functions do not correspond to the qrule
       shapes_on_quadrature = false;
     }
-  
+
   // If there are no user specified points, we use the
   // quadrature rule
-  
+
   // update the type in accordance to the current cell
   // and reinit if the cell type has changed or (as in
   // the case of the hierarchics) the shape functions need
   // reinit, since they depend on the particular element shape
-  else 
-    {      
+  else
+    {
       libmesh_assert (qrule   != NULL);
       qrule->init(elem->type(), elem->p_level());
-      
+
       if(qrule->shapes_need_reinit())
         shapes_on_quadrature = false;
 
@@ -198,11 +198,11 @@ void FE<Dim,T>::reinit(const Elem* elem,
                 cached_nodes[n] = elem->point(n);
             }
         }
-      
+
       // The shape functions correspond to the qrule
       shapes_on_quadrature = true;
     }
-  
+
   // Compute the map for this element.  In the future we can specify
   // different types of maps
   if (pts != NULL)
@@ -246,11 +246,11 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   if (!calculate_phi && !calculate_dphi)
     calculate_phi = calculate_dphi = true;
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
-  
+
   // Start logging the shape function initialization
   START_LOG("init_shape_functions()", "FE");
 
-  
+
   // The number of quadrature points.
   const unsigned int n_qp = qp.size();
 
@@ -258,7 +258,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   // the map
   const Order    mapping_order     (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
-    
+
   // Number of shape functions in the finite element approximation
   // space.
   const unsigned int n_approx_shape_functions =
@@ -270,7 +270,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   const unsigned int n_mapping_shape_functions =
     FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
 					 mapping_order);
-  
+
   // resize the vectors to hold current data
   // Phi are the shape functions used for the FE approximation
   // Phi_map are the shape functions used for the FE mapping
@@ -320,7 +320,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
         }
     }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    
+
   phi_map.resize         (n_mapping_shape_functions);
   if (Dim > 0)
     {
@@ -329,7 +329,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       d2phidxi2_map.resize   (n_mapping_shape_functions);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     }
-    
+
   if (Dim > 1)
     {
       dphideta_map.resize  (n_mapping_shape_functions);
@@ -338,7 +338,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       d2phideta2_map.resize     (n_mapping_shape_functions);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     }
-    
+
   if (Dim > 2)
     {
       dphidzeta_map.resize (n_mapping_shape_functions);
@@ -348,7 +348,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       d2phidzeta2_map.resize    (n_mapping_shape_functions);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     }
-    
+
   for (unsigned int i=0; i<n_approx_shape_functions; i++)
     {
       if (calculate_phi)
@@ -364,8 +364,8 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
           if (Dim > 1)
             dphideta[i].resize  (n_qp);
-   
-          if (Dim > 2)	     
+
+          if (Dim > 2)
             dphidzeta[i].resize (n_qp);
         }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -394,7 +394,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
         }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     }
-       
+
   for (unsigned int i=0; i<n_mapping_shape_functions; i++)
     {
       phi_map[i].resize         (n_qp);
@@ -415,20 +415,20 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
               d2phidzeta2_map[i].resize    (n_qp);
             }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	   
+
 	  if (Dim > 1)
 	    dphideta_map[i].resize  (n_qp);
-	   
+
 	  if (Dim > 2)
 	    dphidzeta_map[i].resize (n_qp);
         }
     }
 
 
-      
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   //------------------------------------------------------------
-  // Initialize the data fields, which should only be used for infinite 
+  // Initialize the data fields, which should only be used for infinite
   // elements, to some sensible values, so that using a FE with the
   // variational formulation of an InfFE, correct element matrices are
   // returned
@@ -437,7 +437,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
     weight.resize  (n_qp);
     dweight.resize (n_qp);
     dphase.resize  (n_qp);
-    
+
     for (unsigned int p=0; p<n_qp; p++)
       {
         weight[p] = 1.;
@@ -450,7 +450,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
   // Optimize for the *linear* geometric elements case:
   bool is_linear = elem->is_linear();
-  
+
   switch (Dim)
     {
 
@@ -491,7 +491,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	    for (unsigned int p=0; p<n_qp; p++)
               d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 0, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	
+
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
         if (is_linear)
@@ -523,12 +523,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
                 d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	      }
-		
+
 	break;
       }
 
 
-      
+
       //------------------------------------------------------------
       // 2D
     case 2:
@@ -555,7 +555,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
                 d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 2, qp[p]);
 	      }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	
+
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
         if (is_linear)
@@ -596,12 +596,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
                 d2phideta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	      }
-			
+
        	break;
       }
 
 
-      
+
       //------------------------------------------------------------
       // 3D
     case 3:
@@ -632,7 +632,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
                 d2phidzeta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, fe_type.order, i, 5, qp[p]);
 	      }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	
+
 	// Compute the value of the mapping shape function i at quadrature point p
 	// (Lagrange shape functions are used for mapping)
         if (is_linear)
@@ -685,7 +685,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
                 d2phidzeta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	      }
-			
+
 	break;
       }
 
@@ -693,30 +693,30 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
     default:
       libmesh_error();
     }
-  
+
   // Stop logging the shape function initialization
   STOP_LOG("init_shape_functions()", "FE");
 }
 
 
 
-    
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_base_shape_functions(const std::vector<Point>& qp,
 					  const Elem* e)
-{ 
+{
   // I don't understand infinite elements well enough to risk
   // calculating too little.  :-(  RHS
   calculate_phi = calculate_dphi = calculate_d2phi = true;
 
-  elem_type = e->type(); 
-  init_shape_functions(qp, e); 
+  elem_type = e->type();
+  init_shape_functions(qp, e);
 }
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
-    
+
 
 
 //--------------------------------------------------------------

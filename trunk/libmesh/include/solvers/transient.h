@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -47,7 +47,7 @@ template <class T = Linear<> >
 class Transient : public T
 {
 public:
-  
+
   /**
    * Constructor. Requires a reference to a system to be solved.
    */
@@ -84,7 +84,7 @@ public:
    * Sets the target simulation time.
    */
   Real & t_end () { return _t_end; }
-  
+
   /**
    * @returns the time step used to advance the solution.
    */
@@ -110,7 +110,7 @@ public:
    */
   unsigned int & max_time_steps () { return _max_time_steps; }
 
- 
+
 protected:
 
   /**
@@ -125,7 +125,7 @@ protected:
    */
   unsigned int & time_step () { return _time_step; }
 
-  
+
 private:
 
   /**
@@ -147,7 +147,7 @@ private:
    * The current time step.
    */
   unsigned int _time_step;
-  
+
   /**
    * The maximum number of time steps to take.
    */
@@ -205,13 +205,13 @@ void Transient<T>::solve ()
 
       // Incriment the time counter
       this->time() += this->dt();
-      
+
       libMesh::out << "Solving time step "
 		   << this->time_step()
 		   << std::endl;
 
       // Call the base class solver
-      T::solve ();	
+      T::solve ();
     }
   while ((this->time_step() < this->max_time_steps()) &&
 	 (this->time()      < this->t_end()));

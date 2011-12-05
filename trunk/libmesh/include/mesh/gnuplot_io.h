@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -49,7 +49,7 @@ class GnuPlotIO : public MeshOutput<MeshBase>
   */
   enum PlottingProperties { GRID_ON    = 1,
                             PNG_OUTPUT = 2};
-    
+
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * To set the properties, we input a bitwise OR of the
@@ -57,7 +57,7 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    * e.g. GnuPlotIO::GRID_ON | GnuPlotIO::PNG_OUTPUT
    */
   GnuPlotIO (const MeshBase&,
-	     const std::string& = std::string("FE 1D Solution"), 
+	     const std::string& = std::string("FE 1D Solution"),
              int properties=0);
 
   /**
@@ -95,10 +95,10 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    * GNUplot to maintain a fixed set of axes.
    * Example: axes_limits = "[0:1] [0:1]" would force x and y
    * to be plotted on the range 0<=x<=1 and 0<=y<=1 regardless
-   * of where the data lie. 
+   * of where the data lie.
    */
   std::string axes_limits;
-  
+
  private:
   /**
    * This method implements writing a mesh with nodal data to a
@@ -117,5 +117,5 @@ class GnuPlotIO : public MeshOutput<MeshBase>
 
 } // namespace libMesh
 
-    
+
 #endif

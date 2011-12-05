@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -39,7 +39,7 @@ namespace libMesh
  * into a global vector, particularly when you have systems of equations.
  *
  * @author Benjamin S. Kirk, 2003
- */ 
+ */
 
 // ------------------------------------------------------------
 // DenseSubVector class definition
@@ -60,7 +60,7 @@ public:
 
   /**
    * Destructor.  Does nothing.
-   */     
+   */
   virtual ~DenseSubVector() {}
 
 
@@ -68,7 +68,7 @@ public:
    * @returns a reference to the parent vector.
    */
   DenseVector<T>& parent () { return _parent_vector; }
-  
+
   /**
    * Set every element in the subvector to 0.
    */
@@ -93,7 +93,7 @@ public:
    * @returns the \p (i) element of the vector as a writeable reference.
    */
   virtual T & el(const unsigned int i)     { return (*this)(i); }
-  
+
   /**
    * @returns the size of the subvector.
    */
@@ -105,11 +105,11 @@ public:
   unsigned int i_off() const { return _i_off; }
 
   /**
-   * Changes the location of the subvector in the parent vector. 
+   * Changes the location of the subvector in the parent vector.
    */
   void reposition(const unsigned int ioff,
 		  const unsigned int n);
-  
+
 private:
 
 
@@ -117,7 +117,7 @@ private:
    * The parent vector that contains this subvector.
    */
   DenseVector<T>& _parent_vector;
-  
+
   /**
    * The length of this subvector.
    */
@@ -149,7 +149,7 @@ template<typename T>
 inline
 void DenseSubVector<T>::reposition(const unsigned int ioff,
 				   const unsigned int n)
-{				   
+{
   _i_off = ioff;
   _n = n;
 
@@ -175,7 +175,7 @@ T DenseSubVector<T>::operator () (const unsigned int i) const
 {
   libmesh_assert (i < this->size());
   libmesh_assert (i + this->i_off() < _parent_vector.size());
-  
+
   return _parent_vector (i + this->i_off());
 }
 
@@ -186,7 +186,7 @@ T & DenseSubVector<T>::operator () (const unsigned int i)
 {
   libmesh_assert (i < this->size());
   libmesh_assert (i + this->i_off() < _parent_vector.size());
-  
+
   return _parent_vector (i + this->i_off());
 }
 

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -62,37 +62,37 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FE<0,CLOUGH>(fet));
 	      return ap;
 	    }
-	    
+
 	  case HERMITE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<0,HERMITE>(fet));
 	      return ap;
 	    }
-	    
+
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<0,LAGRANGE>(fet));
 	      return ap;
 	    }
-		   
+
 	  case HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<0,HIERARCHIC>(fet));
 	      return ap;
 	    }
-		   
+
 	  case L2_HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<0,L2_HIERARCHIC>(fet));
 	      return ap;
 	    }
-	    
+
 	  case MONOMIAL:
 	    {
 	      AutoPtr<FEBase> ap(new FE<0,MONOMIAL>(fet));
 	      return ap;
 	    }
-	    
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
 	    {
@@ -134,37 +134,37 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FE<1,CLOUGH>(fet));
 	      return ap;
 	    }
-	    
+
 	  case HERMITE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,HERMITE>(fet));
 	      return ap;
 	    }
-	    
+
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
 	      return ap;
 	    }
-		   
+
 	  case HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,HIERARCHIC>(fet));
 	      return ap;
 	    }
-		   
+
 	  case L2_HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,L2_HIERARCHIC>(fet));
 	      return ap;
 	    }
-	    
+
 	  case MONOMIAL:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,MONOMIAL>(fet));
 	      return ap;
 	    }
-	    
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
 	    {
@@ -197,7 +197,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  }
       }
 
-      
+
       // 2D
     case 2:
       {
@@ -208,7 +208,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FE<2,CLOUGH>(fet));
 	      return ap;
 	    }
-	    
+
 	  case HERMITE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,HERMITE>(fet));
@@ -220,25 +220,25 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      AutoPtr<FEBase> ap(new FE<2,LAGRANGE>(fet));
 	      return ap;
 	    }
-	    
+
 	  case HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,HIERARCHIC>(fet));
 	      return ap;
 	    }
-	    
+
 	  case L2_HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,L2_HIERARCHIC>(fet));
 	      return ap;
 	    }
-	    
+
 	  case MONOMIAL:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,MONOMIAL>(fet));
 	      return ap;
 	    }
-	    
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
 	    {
@@ -271,7 +271,7 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  }
       }
 
-      
+
       // 3D
     case 3:
       {
@@ -283,37 +283,37 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
                             << std::endl;
 	      libmesh_error();
 	    }
-	    
+
 	  case HERMITE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,HERMITE>(fet));
 	      return ap;
 	    }
-	    
+
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
 	      return ap;
 	    }
-	    
+
 	  case HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,HIERARCHIC>(fet));
 	      return ap;
 	    }
-	    
+
 	  case L2_HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,L2_HIERARCHIC>(fet));
 	      return ap;
 	    }
-	    
+
 	  case MONOMIAL:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
 	      return ap;
 	    }
-	    
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 	  case SZABAB:
 	    {
@@ -450,7 +450,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 	    }
 
 
-	    
+
 	  default:
 	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
 	    libmesh_error();
@@ -458,7 +458,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
       }
 
-      
+
 
 
       // 2D
@@ -538,7 +538,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 	    }
 
 
-	    
+
 	  default:
 	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
 	    libmesh_error();
@@ -546,7 +546,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
       }
 
-      
+
 
 
       // 3D
@@ -626,7 +626,7 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 	    }
 
 
-	    
+
 	  default:
 	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
 	    libmesh_error();
@@ -689,7 +689,7 @@ void FEBase::compute_shape_functions (const Elem*)
 	    for (unsigned int p=0; p<dphi[i].size(); p++)
 	      {
 	        dphi[i][p](0) = 0.;
-	      
+
 #if LIBMESH_DIM>1
 	        dphi[i][p](1) = dphidy[i][p] = 0.;
 #endif
@@ -704,14 +704,14 @@ void FEBase::compute_shape_functions (const Elem*)
 	      {
 	        d2phi[i][p](0,0) = d2phidx2[i][p] = 0.;
 #if LIBMESH_DIM>1
-	        d2phi[i][p](0,1) = d2phidxdy[i][p] = 
+	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
 		  d2phi[i][p](1,0) = 0.;
 	        d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
 #endif
 #if LIBMESH_DIM>2
 	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
 		  d2phi[i][p](2,0) = 0.;
-	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
+	        d2phi[i][p](1,2) = d2phidydz[i][p] =
 		  d2phi[i][p](2,1) = 0.;
 	        d2phi[i][p](2,2) = d2phidz2[i][p] = 0.;
 #endif
@@ -719,7 +719,7 @@ void FEBase::compute_shape_functions (const Elem*)
 #endif
 
 	// All done
-	
+
       break;
 
     case 1:
@@ -731,9 +731,9 @@ void FEBase::compute_shape_functions (const Elem*)
 	        // dphi/dx    = (dphi/dxi)*(dxi/dx)
 	        dphi[i][p](0) =
 		  dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
-	      
+
 #if LIBMESH_DIM>1
-	        dphi[i][p](1) = 
+	        dphi[i][p](1) =
                   dphidy[i][p] = dphidxi[i][p]*dxidy_map[p];
 #endif
 #if LIBMESH_DIM>2
@@ -746,10 +746,10 @@ void FEBase::compute_shape_functions (const Elem*)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
-	        d2phi[i][p](0,0) = d2phidx2[i][p] = 
+	        d2phi[i][p](0,0) = d2phidx2[i][p] =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
 #if LIBMESH_DIM>1
-	        d2phi[i][p](0,1) = d2phidxdy[i][p] = 
+	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
 		  d2phi[i][p](1,0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p];
 	        d2phi[i][p](1,1) = d2phidy2[i][p] =
@@ -759,7 +759,7 @@ void FEBase::compute_shape_functions (const Elem*)
 	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
 		  d2phi[i][p](2,0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p];
-	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
+	        d2phi[i][p](1,2) = d2phidydz[i][p] =
 		  d2phi[i][p](2,1) =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p];
 	        d2phi[i][p](2,2) = d2phidz2[i][p] =
@@ -782,14 +782,14 @@ void FEBase::compute_shape_functions (const Elem*)
 	        dphi[i][p](0) =
 		  dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
 				  dphideta[i][p]*detadx_map[p]);
-	      
+
 	        // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy)
 	        dphi[i][p](1) =
 		  dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 				  dphideta[i][p]*detady_map[p]);
-	      
+
 	        // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz)
-#if LIBMESH_DIM == 3  
+#if LIBMESH_DIM == 3
 	        dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p]);
@@ -801,12 +801,12 @@ void FEBase::compute_shape_functions (const Elem*)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
-	        d2phi[i][p](0,0) = d2phidx2[i][p] = 
+	        d2phi[i][p](0,0) = d2phidx2[i][p] =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
 		  2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
 		  d2phideta2[i][p]*detadx_map[p]*detadx_map[p];
 	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
-		  d2phi[i][p](1,0) = 
+		  d2phi[i][p](1,0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
 		  d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
 		  d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
@@ -815,14 +815,14 @@ void FEBase::compute_shape_functions (const Elem*)
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
 		  2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
 		  d2phideta2[i][p]*detady_map[p]*detady_map[p];
-#if LIBMESH_DIM == 3  
-	        d2phi[i][p](0,2) = d2phidxdz[i][p] = 
-		  d2phi[i][p](2,0) = 
+#if LIBMESH_DIM == 3
+	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
+		  d2phi[i][p](2,0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
 		  d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
 		  d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
 		  d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p];
-	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
+	        d2phi[i][p](1,2) = d2phidydz[i][p] =
 		  d2phi[i][p](2,1) =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
 		  d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
@@ -839,7 +839,7 @@ void FEBase::compute_shape_functions (const Elem*)
 	// All done
 	break;
       }
-    
+
     case 3:
       {
 	if (calculate_dphi)
@@ -851,18 +851,18 @@ void FEBase::compute_shape_functions (const Elem*)
 		  dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
 				  dphideta[i][p]*detadx_map[p] +
 				  dphidzeta[i][p]*dzetadx_map[p]);
-		
+
 	        // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
 	        dphi[i][p](1) =
 		  dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 				  dphideta[i][p]*detady_map[p] +
 				  dphidzeta[i][p]*dzetady_map[p]);
-		
+
 	        // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
 	        dphi[i][p](2) =
 		  dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				  dphideta[i][p]*detadz_map[p] +
-				  dphidzeta[i][p]*dzetadz_map[p]);	      
+				  dphidzeta[i][p]*dzetadz_map[p]);
 	      }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -870,7 +870,7 @@ void FEBase::compute_shape_functions (const Elem*)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
-	        d2phi[i][p](0,0) = d2phidx2[i][p] = 
+	        d2phi[i][p](0,0) = d2phidx2[i][p] =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
 		  2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
 		  2*d2phidxidzeta[i][p]*dxidx_map[p]*dzetadx_map[p] +
@@ -878,7 +878,7 @@ void FEBase::compute_shape_functions (const Elem*)
 		  d2phideta2[i][p]*detadx_map[p]*detadx_map[p] +
 		  d2phidzeta2[i][p]*dzetadx_map[p]*dzetadx_map[p];
 	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
-		  d2phi[i][p](1,0) = 
+		  d2phi[i][p](1,0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
 		  d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
 		  d2phidxidzeta[i][p]*dxidx_map[p]*dzetady_map[p] +
@@ -888,8 +888,8 @@ void FEBase::compute_shape_functions (const Elem*)
 		  d2phidzeta2[i][p]*dzetadx_map[p]*dzetady_map[p] +
 		  d2phidxidzeta[i][p]*dzetadx_map[p]*dxidy_map[p] +
 		  d2phidetadzeta[i][p]*dzetadx_map[p]*detady_map[p];
-	        d2phi[i][p](0,2) = d2phidxdz[i][p] = 
-		  d2phi[i][p](2,0) = 
+	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
+		  d2phi[i][p](2,0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
 		  d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
 		  d2phidxidzeta[i][p]*dxidx_map[p]*dzetadz_map[p] +
@@ -906,7 +906,7 @@ void FEBase::compute_shape_functions (const Elem*)
 		  2*d2phidetadzeta[i][p]*detady_map[p]*dzetady_map[p] +
 		  d2phideta2[i][p]*detady_map[p]*detady_map[p] +
 		  d2phidzeta2[i][p]*dzetady_map[p]*dzetady_map[p];
-	        d2phi[i][p](1,2) = d2phidydz[i][p] = 
+	        d2phi[i][p](1,2) = d2phidydz[i][p] =
 		  d2phi[i][p](2,1) =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
 		  d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
@@ -935,7 +935,7 @@ void FEBase::compute_shape_functions (const Elem*)
 	libmesh_error();
       }
     }
-  
+
   // Stop logging the shape function computation
   STOP_LOG("compute_shape_functions()", "FE");
 }
@@ -949,14 +949,14 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
     {
        nodes.resize(2);
        nodes[0] = Point (-1.,0.,0.);
-       nodes[1] = Point (1.,0.,0.); 
+       nodes[1] = Point (1.,0.,0.);
        return;
     }
     case EDGE3:
     {
        nodes.resize(3);
        nodes[0] = Point (-1.,0.,0.);
-       nodes[1] = Point (1.,0.,0.); 
+       nodes[1] = Point (1.,0.,0.);
        nodes[2] = Point (0.,0.,0.);
        return;
     }
@@ -967,7 +967,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
        nodes[1] = Point (1.,0.,0.);
        nodes[2] = Point (0.,1.,0.);
        return;
-    } 
+    }
     case TRI6:
     {
        nodes.resize(6);
@@ -978,7 +978,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
        nodes[4] = Point (.5,.5,0.);
        nodes[5] = Point (0.,.5,0.);
        return;
-    } 
+    }
     case QUAD4:
     {
        nodes.resize(4);
@@ -1023,7 +1023,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
        nodes[2] = Point (0.,1.,0.);
        nodes[3] = Point (0.,0.,1.);
        return;
-    } 
+    }
     case TET10:
     {
        nodes.resize(10);
@@ -1038,7 +1038,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
        nodes[8] = Point (.5,0.,.5);
        nodes[9] = Point (0.,.5,.5);
        return;
-    } 
+    }
     case HEX8:
     {
        nodes.resize(8);
@@ -1119,7 +1119,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
        nodes[4] = Point (1.,0.,1.);
        nodes[5] = Point (0.,1.,1.);
        return;
-    } 
+    }
     case PRISM15:
     {
        nodes.resize(15);
@@ -1139,7 +1139,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
        nodes[13] = Point (.5,.5,1.);
        nodes[14] = Point (0.,.5,1.);
        return;
-    } 
+    }
     case PRISM18:
     {
        nodes.resize(18);
@@ -1162,7 +1162,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
        nodes[16] = Point (.5,.5,0.);
        nodes[17] = Point (0.,.5,0.);
        return;
-    } 
+    }
     case PYRAMID5:
     {
        nodes.resize(5);
@@ -1172,7 +1172,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
        nodes[3] = Point (-1.,1.,0.);
        nodes[4] = Point (-1.,-1.,1.);
        return;
-    } 
+    }
     default:
     {
       libMesh::err << "ERROR: Unknown element type " << itemType << std::endl;
@@ -1185,7 +1185,7 @@ void FEBase::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nod
 bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real eps)
 {
   libmesh_assert (eps >= 0.);
-  
+
   const Real xi   = p(0);
 #if LIBMESH_DIM > 1
   const Real eta  = p(1);
@@ -1197,7 +1197,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 #else
   const Real zeta  = 0.;
 #endif
-  
+
   switch (t)
     {
 
@@ -1213,7 +1213,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	return false;
       }
 
-      
+
     case TRI3:
     case TRI6:
       {
@@ -1227,7 +1227,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	return false;
       }
 
-      
+
     case QUAD4:
     case QUAD8:
     case QUAD9:
@@ -1238,7 +1238,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    (eta >= -1.-eps) &&
 	    (eta <=  1.+eps))
 	  return true;
-		
+
 	return false;
       }
 
@@ -1254,11 +1254,11 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	    (zeta >= 0.-eps) &&
 	    ((xi + eta + zeta) <= 1.+eps))
 	  return true;
-		
+
 	return false;
       }
 
-      
+
     case HEX8:
     case HEX20:
     case HEX27:
@@ -1272,7 +1272,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 	  (zeta <=  1.))
 	  return true;
 	*/
-	
+
 	// The reference hexahedral element is [-1,1]^3.
 	if ((xi   >= -1.-eps) &&
 	    (xi   <=  1.+eps) &&
@@ -1317,7 +1317,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     case INFHEX8:
-      {      
+      {
 	// The reference infhex8 is a [-1,1]^3.
 	if ((xi   >= -1.-eps) &&
 	    (xi   <=  1.+eps) &&
@@ -1332,7 +1332,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
       }
 
     case INFPRISM6:
-      {      
+      {
 	// inside the reference triange with zeta in [-1,1]
 	if ((xi   >=  0.-eps) &&
 	    (eta  >=  0.-eps) &&
@@ -1354,7 +1354,7 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 
   // If we get here then the point is _not_ in the
   // reference element.   Better return false.
-  
+
   return false;
 }
 
@@ -1417,13 +1417,13 @@ void FEBase::print_info(std::ostream& os) const
 {
   os << "phi[i][j]: Shape function i at quadrature pt. j" << std::endl;
   this->print_phi(os);
-  
+
   os << "dphi[i][j]: Shape function i's gradient at quadrature pt. j" << std::endl;
   this->print_dphi(os);
-  
+
   os << "XYZ locations of the quadrature pts." << std::endl;
   this->print_xyz(os);
-  
+
   os << "Values of JxW at the quadrature pts." << std::endl;
   this->print_JxW(os);
 }
@@ -1561,7 +1561,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
 /*
       if (elem->child(n)->p_level() < elem->p_level())
         {
-          temp_fe_type.order = 
+          temp_fe_type.order =
             static_cast<Order>(temp_fe_type.order +
                                elem->child(n)->p_level());
         }
@@ -1617,7 +1617,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
             const unsigned int child_n_dofs = child_dof_indices.size();
 
             temp_fe_type = base_fe_type;
-            temp_fe_type.order = 
+            temp_fe_type.order =
               static_cast<Order>(temp_fe_type.order +
                                  child->p_level());
 
@@ -1658,7 +1658,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                   }
 
                 // Form edge projection matrix
-                for (unsigned int sidei=0, freei=0; 
+                for (unsigned int sidei=0, freei=0;
                      sidei != new_side_dofs.size();
                      ++sidei)
                   {
@@ -1720,7 +1720,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
               true;
           }
       }
-   
+
   // Project any side values (edges in 2D, faces in 3D)
   if (dim > 1 && cont != DISCONTINUOUS)
     for (unsigned int s=0; s != elem->n_sides(); ++s)
@@ -1759,7 +1759,7 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
             const unsigned int child_n_dofs = child_dof_indices.size();
 
             temp_fe_type = base_fe_type;
-            temp_fe_type.order = 
+            temp_fe_type.order =
               static_cast<Order>(temp_fe_type.order +
                                  child->p_level());
 
@@ -1903,9 +1903,9 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
       // Loop over the quadrature points
       for (unsigned int qp=0; qp<n_qp; qp++)
         {
-          // solution value at the quadrature point              
+          // solution value at the quadrature point
           Number fineval = libMesh::zero;
-          // solution grad at the quadrature point              
+          // solution grad at the quadrature point
           Gradient finegrad;
 
           // Sum the solution values * the DOF
@@ -2057,7 +2057,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
         // constrain dofs shared between
         // this element and ones coarser
         // than this element.
-        if (neigh->level() < elem->level()) 
+        if (neigh->level() < elem->level())
           {
 	    unsigned int s_neigh = neigh->which_neighbor_am_i(elem);
             libmesh_assert (s_neigh < neigh->n_neighbors());
@@ -2082,9 +2082,9 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
               (const_cast<Elem *>(neigh))->hack_p_level(min_p_level);
 
 	    my_fe->reinit(elem, s);
-	    
+
 	    // This function gets called element-by-element, so there
-	    // will be a lot of memory allocation going on.  We can 
+	    // will be a lot of memory allocation going on.  We can
 	    // at least minimize this for the case of the dof indices
 	    // by efficiently preallocating the requisite storage.
 	    // n_nodes is not necessarily n_dofs, but it is better
@@ -2098,7 +2098,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 			         variable_number);
 
 	    const unsigned int n_qp = my_qface.n_points();
-	    
+
 	    FEInterface::inverse_map (Dim, base_fe_type, neigh,
                                       q_point, neigh_qface);
 
@@ -2185,15 +2185,15 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 		    if (std::abs(their_dof_value) < 1.e-5)
 		      continue;
 
-		    // since we may be running this method concurretly 
-		    // on multiple threads we need to acquire a lock 
+		    // since we may be running this method concurretly
+		    // on multiple threads we need to acquire a lock
 		    // before modifying the shared constraint_row object.
 		    {
 		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 		      DofConstraintRow& constraint_row =
 			constraints[my_dof_g];
-		      
+
 		      constraint_row.insert(std::make_pair(their_dof_g,
 							   their_dof_value));
 		    }
@@ -2240,7 +2240,7 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 
   std::vector<const Node*> my_nodes, parent_nodes;
 
-  // Look at the element faces.  Check to see if we need to 
+  // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
     if (elem->neighbor(s) != NULL)
@@ -2249,12 +2249,12 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 	                                                      // than this element.
 	  // Get pointers to the elements of interest and its parent.
 	  const Elem* parent = elem->parent();
-	  
+
 	  // This can't happen...  Only level-0 elements have NULL
 	  // parents, and no level-0 elements can be at a higher
 	  // level than their neighbors!
 	  libmesh_assert (parent != NULL);
-	  
+
 	  const AutoPtr<Elem> my_side     (elem->build_side(s));
 	  const AutoPtr<Elem> parent_side (parent->build_side(s));
 
@@ -2278,15 +2278,15 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 	      libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
 	      const Node* my_node = my_nodes[my_side_n];
-	      
+
 	      // The support point of the DOF
 	      const Point& support_point = *my_node;
-	      
+
 	      // Figure out where my node lies on their reference element.
 	      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
 								  parent_side.get(),
 								  support_point);
-	      
+
 	      // Compute the parent's side shape function values.
 	      for (unsigned int their_side_n=0;
 		   their_side_n < n_side_nodes;
@@ -2296,13 +2296,13 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 
 	          const Node* their_node = parent_nodes[their_side_n];
                   libmesh_assert(their_node);
-		  
+
 		  const Real their_value = FEInterface::shape(Dim-1,
 							      fe_type,
 							      parent_side->type(),
 							      their_side_n,
 							      mapped_point);
-		  
+
                   const Real their_mag = std::abs(their_value);
 #ifdef DEBUG
 		  // Protect for the case u_i ~= u_j,
@@ -2321,34 +2321,34 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 		  // Lagrange case.
                   if (their_mag < 1.e-5)
                     {
-		      // since we may be running this method concurretly 
-		      // on multiple threads we need to acquire a lock 
-		      // before modifying the shared constraint_row object.		      
+		      // since we may be running this method concurretly
+		      // on multiple threads we need to acquire a lock
+		      // before modifying the shared constraint_row object.
 		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 		      // A reference to the constraint row.
 		      NodeConstraintRow& constraint_row = constraints[my_node];
-		      
+
 		      constraint_row.insert(std::make_pair (their_node,
 							    0.));
                     }
 		  // To get nodal coordinate constraints right, only
 		  // add non-zero and non-identity values for Lagrange
 		  // basis functions.
-		  else // (1.e-5 <= their_mag <= .999) 
+		  else // (1.e-5 <= their_mag <= .999)
 		    {
-		      // since we may be running this method concurretly 
-		      // on multiple threads we need to acquire a lock 
-		      // before modifying the shared constraint_row object.		      
+		      // since we may be running this method concurretly
+		      // on multiple threads we need to acquire a lock
+		      // before modifying the shared constraint_row object.
 		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 		      // A reference to the constraint row.
 		      NodeConstraintRow& constraint_row = constraints[my_node];
-		      
+
 		      constraint_row.insert(std::make_pair (their_node,
 							    their_value));
 		    }
-		}		      
+		}
 	    }
 	}
 }
@@ -2373,13 +2373,13 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
     return;
 
   libmesh_assert (elem != NULL);
-  
+
   // Only constrain active elements with this method
   if (!elem->active())
     return;
 
   const unsigned int Dim = elem->dim();
-  
+
   const FEType& base_fe_type = dof_map.variable_type(variable_number);
 
   // Construct FE objects for this element and its pseudo-neighbors.
@@ -2448,9 +2448,9 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
               // constrain dofs shared between
               // this element and ones as coarse
               // as or coarser than this element.
-              if (neigh->level() <= elem->level()) 
+              if (neigh->level() <= elem->level())
                 {
-	          unsigned int s_neigh = 
+	          unsigned int s_neigh =
                     mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
                   libmesh_assert(s_neigh != libMesh::invalid_uint);
 
@@ -2614,8 +2614,8 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 		          if (std::abs(their_dof_value) < 1.e-5)
 		            continue;
 
-		          // since we may be running this method concurretly 
-		          // on multiple threads we need to acquire a lock 
+		          // since we may be running this method concurretly
+		          // on multiple threads we need to acquire a lock
 		          // before modifying the shared constraint_row object.
 		          {
 			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
@@ -2664,13 +2664,13 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
     return;
 
   libmesh_assert (elem != NULL);
-  
+
   // Only constrain active elements with this method
   if (!elem->active())
     return;
 
   const unsigned int Dim = elem->dim();
-  
+
   // We currently always use LAGRANGE mappings for geometry
   const FEType fe_type(elem->default_order(), LAGRANGE);
 
@@ -2699,9 +2699,9 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
               // constrain dofs shared between
               // this element and ones as coarse
               // as or coarser than this element.
-              if (neigh->level() <= elem->level()) 
+              if (neigh->level() <= elem->level())
                 {
-	          unsigned int s_neigh = 
+	          unsigned int s_neigh =
                     mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
                   libmesh_assert(s_neigh != libMesh::invalid_uint);
 
@@ -2738,7 +2738,7 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
 	              libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
 	              const Node* my_node = my_nodes[my_side_n];
-	      
+
 	              // Figure out where my node lies on their reference element.
                       const Point neigh_point = periodic->get_corresponding_pos(*my_node);
 
@@ -2758,7 +2758,7 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
                             continue;
                           }
                       }
-		  
+
 	      	      // Compute the neighbors's side shape function values.
 	              for (unsigned int their_side_n=0;
 		           their_side_n < n_side_nodes;
@@ -2788,7 +2788,7 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
 	                        libmesh_assert (orig_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
 	                        const Node* orig_node = my_nodes[orig_side_n];
-	      
+
                                 if (their_constraint_row.count(orig_node))
                                   skip_constraint[orig_side_n] = true;
 	                      }
@@ -2813,7 +2813,7 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
 	              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
 								          neigh_side.get(),
 								          neigh_point);
-	
+
 	              for (unsigned int their_side_n=0;
 		           their_side_n < n_side_nodes;
 		           their_side_n++)
@@ -2829,8 +2829,8 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
 							              their_side_n,
 							              mapped_point);
 
-		          // since we may be running this method concurretly 
-		          // on multiple threads we need to acquire a lock 
+		          // since we may be running this method concurretly
+		          // on multiple threads we need to acquire a lock
 		          // before modifying the shared constraint_row object.
 		          {
 			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);

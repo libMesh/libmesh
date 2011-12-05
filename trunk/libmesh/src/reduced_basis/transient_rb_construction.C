@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -115,7 +115,7 @@ void TransientRBConstruction::process_parameters_file (const std::string& parame
 
   // Read in data from parameters_filename
   GetPot infile(parameters_filename);
-  
+
   // Read in parameters related to temporal discretization
   unsigned int n_time_steps_in = infile("n_time_steps", temporal_discretization.get_n_time_steps());
   const Real delta_t_in        = infile("delta_t", temporal_discretization.get_delta_t());
@@ -187,7 +187,7 @@ void TransientRBConstruction::allocate_data_structures()
   // Resize and allocate vectors for storing mesh-dependent data
   const unsigned int n_time_levels = temporal_discretization.get_n_time_steps()+1;
   temporal_data.resize(n_time_levels);
-  
+
   // Resize vectors for storing mesh-dependent data but only
   // initialize if initialize_mesh_dependent_data == true
   M_q_vector.resize(Q_m);
@@ -201,7 +201,7 @@ void TransientRBConstruction::allocate_data_structures()
     dof_map.attach_matrix(*L2_matrix);
     L2_matrix->init();
     L2_matrix->zero();
-      
+
     for(unsigned int q=0; q<Q_m; q++)
     {
       // Initialize the memory for the matrices
@@ -224,7 +224,7 @@ void TransientRBConstruction::allocate_data_structures()
   {
     truth_outputs_all_k[n].resize(n_time_levels);
   }
-  
+
   // This vector is for storing rhs entries for
   // computing the projection of the initial condition
   // into the RB space
@@ -235,7 +235,7 @@ void TransientRBConstruction::assemble_affine_expansion()
 {
   // Call parent's assembly functions
   Parent::assemble_affine_expansion();
-  
+
   // Now update RB_ic_proj_rhs_all_N if necessary.
   // This allows us to compute the L2 projection
   // of the initial condition into the RB space
@@ -277,7 +277,7 @@ Real TransientRBConstruction::train_reduced_basis(const std::string& directory_n
   Real value = Parent::train_reduced_basis(directory_name,
                                            resize_rb_eval_data);
   compute_truth_projection_error = false;
-  
+
   return value;
 }
 
@@ -346,7 +346,7 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
                                                         NumericVector<Number>& arg)
 {
   START_LOG("mass_matrix_scaled_matvec()", "TransientRBConstruction");
-  
+
   dest.zero();
 
   const std::vector<Real> mu = get_current_parameters();
@@ -361,7 +361,7 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
 
   AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build();
   temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-        
+
   for(unsigned int q=0; q<Q_m; q++)
   {
     if(!single_matrix_mode)
@@ -411,7 +411,7 @@ void TransientRBConstruction::truth_assembly()
 
     add_scaled_mass_matrix(1./dt, matrix);
     mass_matrix_scaled_matvec(1./dt, *rhs, *current_local_solution);
-    
+
     AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build();
     temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
@@ -446,7 +446,7 @@ void TransientRBConstruction::truth_assembly()
     // here
 
     const MeshBase& mesh = this->get_mesh();
-    
+
     std::vector<FEMContext*> Mq_context(Q_m);
     for(unsigned int q_m=0; q_m<Mq_context.size(); q_m++)
     {
@@ -551,7 +551,7 @@ void TransientRBConstruction::truth_assembly()
         this->get_dof_map().constrain_element_matrix_and_vector
           (Fq_context[q_f]->elem_jacobian, Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
       }
-        
+
       // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
       // Note that this cannot be inside the side-loop since non-boundary
       // elements may contain boundary dofs
@@ -839,7 +839,7 @@ Number TransientRBConstruction::set_error_temporal_data()
 
   // first compute the projection of solution onto the current
   // RB space
-  
+
   const unsigned int time_step = temporal_discretization.get_time_step();
 
   if(rb_eval->get_n_basis_functions() == 0)
@@ -923,11 +923,11 @@ Number TransientRBConstruction::set_error_temporal_data()
 const NumericVector<Number>& TransientRBConstruction::get_error_temporal_data()
 {
   START_LOG("get_error_temporal_data()", "TransientRBConstruction");
-  
+
   const unsigned int time_step = temporal_discretization.get_time_step();
 
   return *temporal_data[time_step];
-  
+
   STOP_LOG("get_error_temporal_data()", "TransientRBConstruction");
 }
 
@@ -1039,34 +1039,34 @@ void TransientRBConstruction::enrich_RB_space()
   char JOBZ = 'V'; // Compute eigenvectors and eigenvalues
   char RANGE = 'A'; // Compute all eigenvalues
   char UPLO = 'U'; // Upper triangular symmetric matrix
-  
+
   Real VL = 0.; // Not used when RANGE = A
   Real VU = 0.; // Not used when RANGE = A
-  
+
   int IL = 0; // Not used when RANGE = A
   int IU = 0; // Not used when RANGE = A
-  
+
   Real ABSTOL = 1.e-14; // Absolute tolerance for eigensolver
-  
+
   int M = 0; // (output) The total number of evals found
-  
+
   std::vector<Real> W(eigen_size); // (output) the eigenvalues
 
   int LDZ = eigen_size; // The leading order of Z
   std::vector<Number> Z(LDZ*eigen_size); // (output) the eigenvectors
 
   std::vector<int> ISUPPZ(2*eigen_size); // Indicates which evecs in Z are nonzero
-  
+
   // Work array, sized according to lapack documentation
   int LWORK = 26*eigen_size;
   std::vector<Number> WORK(LWORK);
-  
+
   // Work array, sized according to lapack documentation
   int LIWORK = 10*eigen_size;
   std::vector<int> IWORK(LIWORK);
-  
+
   int INFO = 0;
-  
+
 #ifdef LIBMESH_USE_REAL_NUMBERS // Use real numbers
   // Call the eigensolver for symmetric eigenvalue problems.
   // NOTE: evals in W are in ascending order
@@ -1077,7 +1077,7 @@ void TransientRBConstruction::enrich_RB_space()
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS // Use complex numbers
   // Need some extra data in the complex case
-  
+
   // Work array, sized according to lapack documentation
   int LRWORK = 24*eigen_size;
   std::vector<Real> RWORK(LRWORK);
@@ -1196,7 +1196,7 @@ void TransientRBConstruction::update_system()
 void TransientRBConstruction::assemble_matrix_for_output_dual_solves()
 {
   // By default we use the L2 matrix for transient problems
-  
+
   if(!single_matrix_mode)
   {
     matrix->zero();
@@ -1214,7 +1214,7 @@ void TransientRBConstruction::load_rb_solution()
   START_LOG("load_rb_solution()", "TransientRBConstruction");
 
   solution->zero();
-  
+
   const unsigned int time_step = temporal_discretization.get_time_step();
 
   TransientRBEvaluation* trans_rb_eval = libmesh_cast_ptr<TransientRBEvaluation*>(rb_eval);
@@ -1243,7 +1243,7 @@ void TransientRBConstruction::update_RB_system_matrices()
   START_LOG("update_RB_system_matrices()", "TransientRBConstruction");
 
   Parent::update_RB_system_matrices();
-  
+
   TransientRBEvaluation* trans_rb_eval = libmesh_cast_ptr<TransientRBEvaluation*>(rb_eval);
 
   TransientRBThetaExpansion& trans_theta_expansion =
@@ -1254,13 +1254,13 @@ void TransientRBConstruction::update_RB_system_matrices()
 
   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-  
+
   for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
   {
     for(unsigned int j=0; j<RB_size; j++)
     {
       Number value = 0.;
-      
+
       // Compute reduced L2 matrix
       temp->zero();
       if(!single_matrix_mode)
@@ -1305,7 +1305,7 @@ void TransientRBConstruction::update_RB_system_matrices()
           trans_rb_eval->RB_M_q_vector[q_m](j,i) = value;
         }
       }
-      
+
     }
   }
 
@@ -1368,7 +1368,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
         trans_rb_eval->M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
-      libmesh_assert(trans_rb_eval->M_q_representor[q_m][i]->size()       == this->n_dofs()       && 
+      libmesh_assert(trans_rb_eval->M_q_representor[q_m][i]->size()       == this->n_dofs()       &&
                      trans_rb_eval->M_q_representor[q_m][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
@@ -1588,7 +1588,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
   {
     // We have to index here by N+1 since the loop index is zero-based.
     trans_rb_eval->RB_L2_matrix.get_principal_submatrix(N+1, RB_L2_matrix_N);
-    
+
     RB_ic_proj_rhs_all_N.get_principal_subvector(N+1, RB_rhs_N);
 
     DenseVector<Number> RB_ic_N(N+1);

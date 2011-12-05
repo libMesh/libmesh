@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -51,7 +51,7 @@ T DistributedVector<T>::sum () const
 
   for (unsigned int i=0; i<local_size(); i++)
     local_sum += _values[i];
-  
+
   Parallel::sum(local_sum);
 
   return local_sum;
@@ -73,7 +73,7 @@ Real DistributedVector<T>::l1_norm () const
 
   for (unsigned int i=0; i<local_size(); i++)
     local_l1 += std::abs(_values[i]);
-  
+
   Parallel::sum(local_l1);
 
   return local_l1;
@@ -92,10 +92,10 @@ Real DistributedVector<T>::l2_norm () const
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   double local_l2 = 0.;
-  
+
   for (unsigned int i=0; i<local_size(); i++)
     local_l2 += libmesh_norm(_values[i]);
-  
+
   Parallel::sum(local_l2);
 
   return std::sqrt(local_l2);
@@ -114,14 +114,14 @@ Real DistributedVector<T>::linfty_norm () const
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   Real local_linfty = 0.;
-  
+
   for (unsigned int i=0; i<local_size(); i++)
     local_linfty  = std::max(local_linfty,
 			     static_cast<Real>(std::abs(_values[i]))
 			     ); // Note we static_cast so that both
                                 // types are the same, as required
                                 // by std::max
-  
+
   Parallel::max(local_linfty);
 
   return local_linfty;
@@ -136,9 +136,9 @@ NumericVector<T>& DistributedVector<T>::operator += (const NumericVector<T>& v)
   libmesh_assert (this->initialized());
   libmesh_assert (_values.size() == _local_size);
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
-  
+
   add(1., v);
-  
+
   return *this;
 }
 
@@ -151,9 +151,9 @@ NumericVector<T>& DistributedVector<T>::operator -= (const NumericVector<T>& v)
   libmesh_assert (this->initialized());
   libmesh_assert (_values.size() == _local_size);
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
-  
+
   add(-1., v);
-  
+
   return *this;
 }
 
@@ -168,7 +168,7 @@ void DistributedVector<T>::add_vector (const std::vector<T>& v,
   libmesh_assert (this->initialized());
   libmesh_assert (_values.size() == _local_size);
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
-  
+
   for (unsigned int i=0; i<v.size(); i++)
     add (dof_indices[i], v[i]);
 }
@@ -251,7 +251,7 @@ void DistributedVector<T>::insert (const std::vector<T>& v,
   libmesh_assert (this->initialized());
   libmesh_assert (_values.size() == _local_size);
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
-  
+
   for (unsigned int i=0; i<v.size(); i++)
     this->set (dof_indices[i], v[i]);
 }
@@ -311,7 +311,7 @@ void DistributedVector<T>::scale (const T factor)
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
   for (unsigned int i=0; i<local_size(); i++)
-    _values[i] *= factor;  
+    _values[i] *= factor;
 }
 
 template <typename T>
@@ -340,7 +340,7 @@ T DistributedVector<T>::dot (const NumericVector<T>& V) const
   // Make sure that the two vectors are distributed in the same way.
   libmesh_assert ( this->first_local_index() == v->first_local_index() );
   libmesh_assert ( this->last_local_index()  == v->last_local_index()  );
-  
+
   // The result of dotting together the local parts of the vector.
   T local_dot = 0;
 
@@ -351,12 +351,12 @@ T DistributedVector<T>::dot (const NumericVector<T>& V) const
   Parallel::sum(local_dot);
 
   return local_dot;
-} 
+}
 
 
 
 template <typename T>
-NumericVector<T>& 
+NumericVector<T>&
 DistributedVector<T>::operator = (const T s)
 {
   libmesh_assert (this->initialized());
@@ -365,7 +365,7 @@ DistributedVector<T>::operator = (const T s)
 
   for (unsigned int i=0; i<local_size(); i++)
     _values[i] = s;
-  
+
   return *this;
 }
 
@@ -377,9 +377,9 @@ DistributedVector<T>::operator = (const NumericVector<T>& v_in)
 {
   // Make sure the NumericVector passed in is really a DistributedVector
   const DistributedVector<T>* v = libmesh_cast_ptr<const DistributedVector<T>*>(&v_in);
-  
+
   *this = *v;
-  
+
   return *this;
 }
 
@@ -396,7 +396,7 @@ DistributedVector<T>::operator = (const DistributedVector<T>& v)
   _local_size        = v._local_size;
   _first_local_index = v._first_local_index;
   _last_local_index  = v._last_local_index;
-  
+
   if (v.local_size() == this->local_size())
     {
       _values = v._values;
@@ -405,7 +405,7 @@ DistributedVector<T>::operator = (const DistributedVector<T>& v)
     {
       libmesh_error();
     }
-  
+
   return *this;
 }
 
@@ -431,7 +431,7 @@ DistributedVector<T>::operator = (const std::vector<T>& v)
       libmesh_error();
     }
 
-  
+
   return *this;
 }
 
@@ -448,22 +448,22 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
   DistributedVector<T>* v_local = libmesh_cast_ptr<DistributedVector<T>*>(&v_local_in);
 
   v_local->_first_local_index = 0;
-  
+
   v_local->_global_size =
     v_local->_local_size =
     v_local->_last_local_index = size();
 
   v_local->_is_initialized =
     v_local->_is_closed = true;
-  
+
   // Call localize on the vector's values.  This will help
   // prevent code duplication
-  localize (v_local->_values);    
-  
+  localize (v_local->_values);
+
 #ifndef LIBMESH_HAVE_MPI
 
   libmesh_assert (local_size() == size());
-  
+
 #endif
 }
 
@@ -493,7 +493,7 @@ void DistributedVector<T>::localize (const unsigned int first_local_idx,
   libmesh_assert (last_local_idx > first_local_idx);
   libmesh_assert (send_list.size() <= this->size());
   libmesh_assert (last_local_idx < this->size());
-  
+
   const unsigned int size       = this->size();
   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
 
@@ -501,8 +501,8 @@ void DistributedVector<T>::localize (const unsigned int first_local_idx,
   if ((first_local_idx == 0) &&
       (local_size == size))
     return;
-  
-	  
+
+
   // Build a parallel vector, initialize it with the local
   // parts of (*this)
   DistributedVector<T> parallel_vec;
@@ -514,7 +514,7 @@ void DistributedVector<T>::localize (const unsigned int first_local_idx,
     parallel_vec._values[i-first_local_idx] = _values[i];
 
   // localize like normal
-  parallel_vec.localize (*this, send_list);    
+  parallel_vec.localize (*this, send_list);
 }
 
 
@@ -535,7 +535,7 @@ void DistributedVector<T>::localize (std::vector<T>& v_local) const
 
 #ifndef LIBMESH_HAVE_MPI
   libmesh_assert (local_size() == size());
-#endif  
+#endif
 }
 
 
@@ -557,7 +557,7 @@ void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 
 #ifndef LIBMESH_HAVE_MPI
   libmesh_assert (local_size() == size());
-#endif  
+#endif
 }
 
 

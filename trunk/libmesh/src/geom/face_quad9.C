@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -166,28 +166,28 @@ bool Quad9::has_affine_map() const
 }
 
 
- 
+
 unsigned int Quad9::key (const unsigned int s) const
 {
   libmesh_assert (s < this->n_sides());
-  
+
   switch (s)
     {
     case 0:
 
       return
 	this->compute_key (this->node(4));
-	      
+
     case 1:
 
       return
 	this->compute_key (this->node(5));
-	
+
     case 2:
 
       return
 	this->compute_key (this->node(6));
-	
+
     case 3:
 
       return
@@ -224,7 +224,7 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(0);
 	    edge->set_node(1) = this->get_node(1);
 	    edge->set_node(2) = this->get_node(4);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 1:
@@ -232,7 +232,7 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(1);
 	    edge->set_node(1) = this->get_node(2);
 	    edge->set_node(2) = this->get_node(5);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 2:
@@ -240,7 +240,7 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(2);
 	    edge->set_node(1) = this->get_node(3);
 	    edge->set_node(2) = this->get_node(6);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 3:
@@ -248,7 +248,7 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(3);
 	    edge->set_node(1) = this->get_node(0);
 	    edge->set_node(2) = this->get_node(7);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	default:
@@ -415,7 +415,7 @@ unsigned int Quad9::n_second_order_adjacent_vertices (const unsigned int n) cons
 
 unsigned short int Quad9::second_order_adjacent_vertex (const unsigned int n,
 							const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
 
@@ -431,7 +431,7 @@ unsigned short int Quad9::second_order_adjacent_vertex (const unsigned int n,
       {
 	libmesh_assert (v < 2);
 	// use the matrix that we inherited from \p Quad
-	return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+	return _second_order_adjacent_vertices[n-this->n_vertices()][v];
       }
     }
 }

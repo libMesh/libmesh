@@ -3,17 +3,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -49,7 +49,7 @@ void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
         if (elem->neighbor(s) != NULL)        // we have a neighbor on this side
           {
 	    const Elem* neighbor = elem->neighbor(s);
-	
+
 #ifdef LIBMESH_ENABLE_AMR
 	    if (!neighbor->active())          // the neighbor is *not* active,
 	      {                               // so add *all* neighboring
@@ -80,7 +80,7 @@ void Patch::add_face_neighbors()
   std::set<const Elem *> new_neighbors;
 
   this->find_face_neighbors(new_neighbors);
-    
+
   this->insert(new_neighbors.begin(), new_neighbors.end());
 }
 
@@ -91,7 +91,7 @@ void Patch::add_local_face_neighbors()
   std::set<const Elem *> new_neighbors;
 
   this->find_face_neighbors(new_neighbors);
-    
+
   std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
   const std::set<const Elem*>::const_iterator end = new_neighbors.end();
 
@@ -103,7 +103,7 @@ void Patch::add_local_face_neighbors()
 	this->insert (neighbor);   // ... then add it to the patch
     }
 }
-    
+
 
 
 void Patch::add_semilocal_face_neighbors()
@@ -111,7 +111,7 @@ void Patch::add_semilocal_face_neighbors()
   std::set<const Elem *> new_neighbors;
 
   this->find_face_neighbors(new_neighbors);
-    
+
   std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
   const std::set<const Elem*>::const_iterator end = new_neighbors.end();
 
@@ -122,7 +122,7 @@ void Patch::add_semilocal_face_neighbors()
 	this->insert (neighbor);
     }
 }
-    
+
 
 
 void Patch::find_point_neighbors(std::set<const Elem *> &new_neighbors)
@@ -137,7 +137,7 @@ void Patch::find_point_neighbors(std::set<const Elem *> &new_neighbors)
 
       const Elem* elem = *it;
       elem->find_point_neighbors(elem_point_neighbors);
- 
+
       new_neighbors.insert(elem_point_neighbors.begin(),
                            elem_point_neighbors.end());
     }
@@ -150,12 +150,12 @@ void Patch::add_point_neighbors()
   std::set<const Elem *> new_neighbors;
 
   this->find_point_neighbors(new_neighbors);
-    
+
   this->insert(new_neighbors.begin(), new_neighbors.end());
 }
 
 
-  
+
 void Patch::add_local_point_neighbors()
 {
   std::set<const Elem *> new_neighbors;
@@ -175,7 +175,7 @@ void Patch::add_local_point_neighbors()
 }
 
 
-    
+
 void Patch::add_semilocal_point_neighbors()
 {
   std::set<const Elem *> new_neighbors;
@@ -192,14 +192,14 @@ void Patch::add_semilocal_point_neighbors()
 	this->insert (neighbor);
     }
 }
-  
+
 
 
 void Patch::build_around_element (const Elem* e0,
                                   const unsigned int target_patch_size,
                                   PMF patchtype)
 {
-  
+
   // Make sure we are building a patch for an active element.
   libmesh_assert (e0 != NULL);
   libmesh_assert (e0->active());
@@ -208,7 +208,7 @@ void Patch::build_around_element (const Elem* e0,
   libmesh_assert ((patchtype != &Patch::add_local_face_neighbors &&
            patchtype != &Patch::add_local_point_neighbors) ||
            e0->processor_id() == libMesh::processor_id());
-  
+
   // First clear the current set, then add the element of interest.
   this->clear();
   this->insert (e0);
@@ -223,10 +223,10 @@ void Patch::build_around_element (const Elem* e0,
       // detect this case is by detecting a "stagnant patch," i.e. a
       // patch whose size does not increase after adding face neighbors
       const unsigned int old_patch_size = this->size();
-      
+
       // We profile the patch-extending functions separately
       (this->*patchtype)();
-      
+
       // Check for a "stagnant" patch
       if (this->size() == old_patch_size)
 	{
@@ -240,14 +240,14 @@ void Patch::build_around_element (const Elem* e0,
 	}
     } // end while loop
 
-  
+
   // make sure all the elements in the patch are active and local
   // if we are in debug mode
 #ifdef DEBUG
   {
     std::set<const Elem*>::const_iterator       it  = this->begin();
     const std::set<const Elem*>::const_iterator end = this->end();
-    
+
     for (; it != end; ++it)
       {
 	// Convenience.  Keep the syntax simple.

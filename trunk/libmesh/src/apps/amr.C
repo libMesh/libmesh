@@ -32,10 +32,10 @@ int main (int argc, char** argv)
 
   if (argc < 4)
     std::cout << "Usage: ./prog -d DIM filename" << std::endl;
-  
+
   // Variables to get us started
   const unsigned int dim = atoi(argv[2]);
-  
+
   std::string meshname  (argv[3]);
 
   // declare a mesh...
@@ -45,17 +45,17 @@ int main (int argc, char** argv)
   mesh.read(meshname);
 
   GMVIO(mesh).write ("out_0.gmv");
-  
+
   mesh.elem(0)->set_refinement_flag (Elem::REFINE);
 
   MeshRefinement mesh_refinement (mesh);
-    
-  mesh_refinement.refine_and_coarsen_elements ();    
+
+  mesh_refinement.refine_and_coarsen_elements ();
   mesh_refinement.uniformly_refine (2);
-  
+
   mesh.print_info();
 
-  
+
   // Set up the equation system(s)
   EquationSystems es (mesh);
 
@@ -65,20 +65,20 @@ int main (int argc, char** argv)
   primary.add_variable ("U", FIRST);
   primary.add_variable ("V", FIRST);
 
-  primary.get_dof_map()._dof_coupling->resize(2);      
+  primary.get_dof_map()._dof_coupling->resize(2);
   (*primary.get_dof_map()._dof_coupling)(0,0) = 1;
   (*primary.get_dof_map()._dof_coupling)(1,1) = 1;
-  
+
   primary.attach_assemble_function(assemble);
-  
+
   es.init ();
-      
+
   es.print_info ();
   primary.get_dof_map().print_dof_constraints ();
 
   // call the solver.
   primary.solve ();
-  
+
   GMVIO(mesh).write_equation_systems ("out_1.gmv",
                                       es);
 
@@ -115,49 +115,49 @@ void assemble(EquationSystems& es,
 	      const std::string& libmesh_dbg_var(system_name))
 {
   libmesh_assert (system_name == "primary");
-  
+
   const MeshBase& mesh   = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // Also use a 3x3x3 quadrature rule (3D).  Then tell the FE
   // about the geometry of the problem and the quadrature rule
   FEType fe_type (FIRST);
-  
+
   AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
   QGauss qrule(dim, FIFTH);
-  
+
   fe->attach_quadrature_rule (&qrule);
-  
-  AutoPtr<FEBase> fe_face(FEBase::build(dim, fe_type));  
+
+  AutoPtr<FEBase> fe_face(FEBase::build(dim, fe_type));
   QGauss qface(dim-1, FIFTH);
-  
+
   fe_face->attach_quadrature_rule(&qface);
-  
+
   LinearImplicitSystem& system =
     es.get_system<LinearImplicitSystem>("primary");
-  
-  
+
+
   // These are references to cell-specific data
   const std::vector<Real>& JxW_face                   = fe_face->get_JxW();
   const std::vector<Real>& JxW                        = fe->get_JxW();
   const std::vector<Point>& q_point                   = fe->get_xyz();
   const std::vector<std::vector<Real> >& phi          = fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  
+
   std::vector<unsigned int> dof_indices_U;
   std::vector<unsigned int> dof_indices_V;
   const DofMap& dof_map = system.get_dof_map();
-  
+
   DenseMatrix<Number> Kuu;
   DenseMatrix<Number> Kvv;
   DenseVector<Number> Fu;
   DenseVector<Number> Fv;
-  
+
   Real vol=0., area=0.;
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-  
+
   for (; el != end_el; ++el)
     {
       const Elem* elem = *el;
@@ -165,22 +165,22 @@ void assemble(EquationSystems& es,
       // recompute the element-specific data for the current element
       fe->reinit (elem);
 
-      
+
       //fe->print_info();
 
       dof_map.dof_indices(elem, dof_indices_U, 0);
       dof_map.dof_indices(elem, dof_indices_V, 1);
-      
+
       // zero the element matrix and vector
       Kuu.resize (phi.size(),
 		  phi.size());
-	    
+
       Kvv.resize (phi.size(),
 		  phi.size());
-	    
+
       Fu.resize (phi.size());
       Fv.resize (phi.size());
-	    
+
       // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
 	{
@@ -191,22 +191,22 @@ void assemble(EquationSystems& es,
 	      // in general these numbers will not be the same (except for
 	      // the case of one unknown per node on one subdomain) so
 	      // we need to go through the dof_map
-		  
+
 	      const Real f = q_point[gp]*q_point[gp];
 	      //		    const Real f = (q_point[gp](0) +
 	      //				    q_point[gp](1) +
 	      //				    q_point[gp](2));
-		    
+
 	      // add jac*weight*f*phi to the RHS in position ig
-		    
+
 	      Fu(i) += JxW[gp]*f*phi[i][gp];
 	      Fv(i) += JxW[gp]*f*phi[i][gp];
-		    
+
 	      for (unsigned int j=0; j<phi.size(); ++j)
 		{
-			
+
 		  Kuu(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]));
-			
+
 		  Kvv(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]) +
 				       1.*((dphi[i][gp])*(dphi[j][gp])));
 		};
@@ -222,9 +222,9 @@ void assemble(EquationSystems& es,
 	    if (elem->neighbor(side) == NULL)
 	      {
 		fe_face->reinit (elem, side);
-	    
+
 		//fe_face->print_info();
-	    
+
 		for (unsigned int gp=0; gp<JxW_face.size(); gp++)
 		  area += JxW_face[gp];
 	      }
@@ -234,14 +234,14 @@ void assemble(EquationSystems& es,
       dof_map.constrain_element_matrix_and_vector(Kuu, Fu, dof_indices_U);
       dof_map.constrain_element_matrix_and_vector(Kvv, Fv, dof_indices_V);
 
-      
+
       system.rhs->add_vector(Fu, dof_indices_U);
       system.rhs->add_vector(Fv, dof_indices_V);
 
       system.matrix->add_matrix(Kuu, dof_indices_U);
       system.matrix->add_matrix(Kvv, dof_indices_V);
     }
-  
+
   std::cout << "Vol="  << vol << std::endl;
 
   if (dim == 3)

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -64,14 +64,14 @@ public:
    */
   explicit
   NumericVector (const ParallelType type = AUTOMATIC);
-    
+
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   NumericVector (const unsigned int n,
                  const ParallelType type = AUTOMATIC);
-    
+
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
@@ -89,7 +89,7 @@ public:
 		 const unsigned int n_local,
 		 const std::vector<unsigned int>& ghost,
                  const ParallelType type = AUTOMATIC);
-    
+
 public:
 
   /**
@@ -104,7 +104,7 @@ public:
    */
   static AutoPtr<NumericVector<T> >
   build(const SolverPackage solver_package = libMesh::default_solver_package());
-  
+
   /**
    * @returns true if the vector has been initialized,
    * false otherwise.
@@ -126,11 +126,11 @@ public:
    * computation, false otherwise.
    */
   virtual bool closed() const { return _is_closed; }
-  
+
   /**
    * Call the assemble functions
    */
-  virtual void close () = 0; 
+  virtual void close () = 0;
 
   /**
    * @returns the \p NumericVector<T> to a pristine state.
@@ -139,9 +139,9 @@ public:
 
   /**
    * Set all entries to zero. Equivalent to \p v = 0, but more obvious and
-   * faster. 
+   * faster.
    */
-  virtual void zero () = 0;    
+  virtual void zero () = 0;
 
   /**
    * Creates a vector which has the same type, size and partitioning
@@ -150,13 +150,13 @@ public:
    * This must be overloaded in the derived classes.
    */
   virtual AutoPtr<NumericVector<T> > zero_clone () const = 0;
-  
+
   /**
    * Creates a copy of this vector and returns it in an \p AutoPtr.
    * This must be overloaded in the derived classes.
    */
   virtual AutoPtr<NumericVector<T> > clone () const = 0;
-  
+
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
    * this vector remains unchanged if possible, to make things faster, but
@@ -169,19 +169,19 @@ public:
    * On \p fast==false, the vector is filled by
    * zeros.
    */
-    
+
   virtual void init (const unsigned int,
 		     const unsigned int,
 		     const bool = false,
                      const ParallelType = AUTOMATIC) = 0;
-  
+
   /**
    * call init with n_local = N,
    */
   virtual void init (const unsigned int,
 		     const bool = false,
                      const ParallelType = AUTOMATIC) = 0;
-    
+
   /**
    * Create a vector that holds tha local indices plus those specified
    * in the \p ghost argument.
@@ -198,12 +198,12 @@ public:
    */
   virtual void init (const NumericVector<T>& other,
                      const bool fast = false) = 0;
-    
+
   /**
    * \f$U(0-N) = s\f$: fill all components.
    */
   virtual NumericVector<T> & operator= (const T s) = 0;
-  
+
   /**
    *  \f$U = V\f$: copy all components.
    */
@@ -220,14 +220,14 @@ public:
    * Real part.
    */
   virtual Real min () const = 0;
-  
+
   /**
    * @returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
    * Real part.
    */
   virtual Real max () const = 0;
- 
+
   /**
    * returns the sum of the elements in a vector
    */
@@ -313,12 +313,12 @@ public:
    * maximum for this index is \p size().
    */
   virtual unsigned int last_local_index() const = 0;
-    
+
   /**
    * Access components, returns \p U(i).
    */
   virtual T operator() (const unsigned int i) const = 0;
-    
+
   /**
    * @returns the element \p U(i)
    */
@@ -343,7 +343,7 @@ public:
    * Fast equivalent to \p U.add(-1, V).
    */
   virtual NumericVector<T> & operator -= (const NumericVector<T> &V) = 0;
-    
+
   /**
    * Multiplication operator.
    * Equivalent to \p U.scale(a)
@@ -360,19 +360,19 @@ public:
    * v(i) = value
    */
   virtual void set (const unsigned int i, const T value) = 0;
-    
+
   /**
    * v(i) += value
    */
   virtual void add (const unsigned int i, const T value) = 0;
-    
+
   /**
    * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
   virtual void add (const T s) = 0;
-    
+
   /**
    * \f$U+=V\f$:
    * Simple vector addition, equal to the
@@ -388,7 +388,7 @@ public:
   virtual void add (const T a, const NumericVector<T>& v) = 0;
 
   /**
-   * \f$ U+=v \f$ where v is a DenseVector<T> 
+   * \f$ U+=v \f$ where v is a DenseVector<T>
    * and you
    * want to specify WHERE to add it
    */
@@ -396,10 +396,10 @@ public:
 			   const std::vector<unsigned int>& dof_indices) = 0;
 
   /**
-   * \f$U+=V\f$, where U and V are type 
+   * \f$U+=V\f$, where U and V are type
    * NumericVector<T> and you
    * want to specify WHERE to add
-   * the NumericVector<T> V 
+   * the NumericVector<T> V
    */
   virtual void add_vector (const NumericVector<T>& V,
 			   const std::vector<unsigned int>& dof_indices) = 0;
@@ -410,19 +410,19 @@ public:
    */
   virtual void add_vector (const NumericVector<T>&,
 			   const SparseMatrix<T>&) = 0;
-      
+
   /**
    * \f$U+=A*V\f$, add the product of a \p ShellMatrix \p A
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   void add_vector (const NumericVector<T>& v,
 		   const ShellMatrix<T>& a);
-      
+
   /**
-   * \f$ U+=V \f$ where U and V are type 
+   * \f$ U+=V \f$ where U and V are type
    * DenseVector<T> and you
    * want to specify WHERE to add
-   * the DenseVector<T> V 
+   * the DenseVector<T> V
    */
   virtual void add_vector (const DenseVector<T>& V,
 			   const std::vector<unsigned int>& dof_indices) = 0;
@@ -435,26 +435,26 @@ public:
 			             const SparseMatrix<T>&) = 0;
 
   /**
-   * \f$ U=v \f$ where v is a std::vector<T> 
+   * \f$ U=v \f$ where v is a std::vector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
 		       const std::vector<unsigned int>& dof_indices) = 0;
 
   /**
-   * \f$U=V\f$, where U and V are type 
+   * \f$U=V\f$, where U and V are type
    * NumericVector<T> and you
    * want to specify WHERE to insert
-   * the NumericVector<T> V 
+   * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices) = 0;
-      
+
   /**
-   * \f$ U=V \f$ where U and V are type 
+   * \f$ U=V \f$ where U and V are type
    * DenseVector<T> and you
    * want to specify WHERE to insert
-   * the DenseVector<T> V 
+   * the DenseVector<T> V
    */
   virtual void insert (const DenseVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices) = 0;
@@ -466,7 +466,7 @@ public:
    */
   virtual void insert (const DenseSubVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices) = 0;
-    
+
   /**
    * Scale each element of the
    * vector by the given factor.
@@ -483,7 +483,7 @@ public:
    * Computes the dot product, p = U.V
    */
   virtual T dot(const NumericVector<T>&) const = 0;
-  
+
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
@@ -503,7 +503,7 @@ public:
    */
   virtual void localize (NumericVector<T>& v_local,
 			 const std::vector<unsigned int>& send_list) const = 0;
-  
+
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
@@ -520,7 +520,7 @@ public:
    */
   virtual void localize_to_one (std::vector<T>& v_local,
 				const unsigned int proc_id=0) const = 0;
-    
+
   /**
    * @returns \p -1 when \p this is equivalent to \p other_vector,
    * up to the given \p threshold.  When differences occur,
@@ -537,7 +537,7 @@ public:
    * up to the given local relative \p threshold.  When differences
    * occur, the return value contains the first index where
    * the difference \p (a[i]-b[i])/max(a[i],b[i]) exceeded the
-   * threshold.  When no threshold is given, the \p libMesh 
+   * threshold.  When no threshold is given, the \p libMesh
    * \p TOLERANCE is used.
    */
   virtual int local_relative_compare (const NumericVector<T> &other_vector,
@@ -548,7 +548,7 @@ public:
    * up to the given local relative \p threshold.  When differences
    * occur, the return value contains the first index where
    * the difference \p (a[i]-b[i])/max_j(a[j],b[j]) exceeded the
-   * threshold.  When no threshold is given, the \p libMesh 
+   * threshold.  When no threshold is given, the \p libMesh
    * \p TOLERANCE is used.
    */
   virtual int global_relative_compare (const NumericVector<T> &other_vector,
@@ -581,7 +581,7 @@ public:
     v.print_global(os);
     return os;
   }
-  
+
   /**
    * Print the contents of the matrix in Matlab's
    * sparse matrix format. Optionally prints the
@@ -607,7 +607,7 @@ public:
     libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
     libmesh_error();
   }
-    
+
   /**
    * Exchanges the values/sizes of two vectors.  There should be
    * enough indirection in subclasses to make this an O(1) header-swap
@@ -616,15 +616,15 @@ public:
   virtual void swap (NumericVector<T> &v);
 
 protected:
-  
+
   /**
    * Flag to see if the Numeric
    * assemble routines have been called yet
    */
   bool _is_closed;
-  
+
   /**
-   * Flag to tell if init 
+   * Flag to tell if init
    * has been called yet
    */
   bool _is_initialized;
@@ -709,7 +709,7 @@ NumericVector<T>::~NumericVector ()
 /*
 template <typename T>
 inline
-NumericVector<T> & NumericVector<T>::operator= (const T) 
+NumericVector<T> & NumericVector<T>::operator= (const T)
 {
   //  libmesh_error();
 
@@ -720,7 +720,7 @@ NumericVector<T> & NumericVector<T>::operator= (const T)
 
 template <typename T>
 inline
-NumericVector<T> & NumericVector<T>::operator= (const NumericVector<T>&) 
+NumericVector<T> & NumericVector<T>::operator= (const NumericVector<T>&)
 {
   //  libmesh_error();
 
@@ -731,7 +731,7 @@ NumericVector<T> & NumericVector<T>::operator= (const NumericVector<T>&)
 
 template <typename T>
 inline
-NumericVector<T> & NumericVector<T>::operator= (const std::vector<T>&) 
+NumericVector<T> & NumericVector<T>::operator= (const std::vector<T>&)
 {
   //  libmesh_error();
 
@@ -748,9 +748,9 @@ void NumericVector<T>::clear ()
   _is_closed      = false;
   _is_initialized = false;
 }
-  
-  
-  
+
+
+
 template <typename T>
 inline
 void NumericVector<T>::get(const std::vector<unsigned int>& index, std::vector<T>& values) const
@@ -775,12 +775,12 @@ void NumericVector<Complex>::print(std::ostream& os) const
   libmesh_assert (this->initialized());
   os << "Size\tglobal =  " << this->size()
      << "\t\tlocal =  " << this->local_size() << std::endl;
-  
+
   // std::complex<>::operator<<() is defined, but use this form
   os << "#\tReal part\t\tImaginary part" << std::endl;
   for (unsigned int i=this->first_local_index(); i<this->last_local_index(); i++)
-    os << i << "\t" 
-       << (*this)(i).real() << "\t\t" 
+    os << i << "\t"
+       << (*this)(i).real() << "\t\t"
        << (*this)(i).imag() << std::endl;
 }
 
@@ -813,12 +813,12 @@ void NumericVector<Complex>::print_global(std::ostream& os) const
   // Right now we only want one copy of the output
   if (libMesh::processor_id())
     return;
-  
+
   os << "Size\tglobal =  " << this->size() << std::endl;
   os << "#\tReal part\t\tImaginary part" << std::endl;
   for (unsigned int i=0; i!=v.size(); i++)
-    os << i << "\t" 
-       << v[i].real() << "\t\t" 
+    os << i << "\t"
+       << v[i].real() << "\t\t"
        << v[i].imag() << std::endl;
 }
 

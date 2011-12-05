@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -70,14 +70,14 @@ public:
    */
   explicit
   PetscVector (const ParallelType type = AUTOMATIC);
-  
+
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   PetscVector (const unsigned int n,
                const ParallelType type = AUTOMATIC);
-    
+
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
@@ -95,7 +95,7 @@ public:
 	       const unsigned int n_local,
 	       const std::vector<unsigned int>& ghost,
                const ParallelType type = AUTOMATIC);
-  
+
   /**
    * Constructor.  Creates a PetscVector assuming you already have a
    * valid PETSc Vec object.  In this case, \p v is NOT destroyed by the
@@ -104,7 +104,7 @@ public:
    * and to simply provide additional functionality with the PetscVector.
    */
   PetscVector(Vec v);
-  
+
   /**
    * Destructor, deallocates memory. Made virtual to allow
    * for derived classes to behave properly.
@@ -114,18 +114,18 @@ public:
   /**
    * Call the assemble functions
    */
-  void close (); 
+  void close ();
 
   /**
    * @returns the \p PetscVector<T> to a pristine state.
    */
   void clear ();
-  
+
   /**
    * Set all entries to zero. Equivalent to \p v = 0, but more obvious and
-   * faster. 
+   * faster.
    */
-  void zero ();    
+  void zero ();
 
   /**
    * Creates a vector which has the same type, size and partitioning
@@ -133,12 +133,12 @@ public:
    * AutoPtr.
    */
   virtual AutoPtr<NumericVector<T> > zero_clone () const;
-  
+
   /**
    * Creates a copy of this vector and returns it in an \p AutoPtr.
    */
   AutoPtr<NumericVector<T> > clone () const;
-  
+
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
    * this vector remains unchanged if possible, to make things faster, but
@@ -151,19 +151,19 @@ public:
    * On \p fast==false, the vector is filled by
    * zeros.
    */
-    
+
   void init (const unsigned int N,
 	     const unsigned int n_local,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
-    
+
   /**
    * call init with n_local = N,
    */
   void init (const unsigned int N,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
-    
+
   /**
    * Create a vector that holds tha local indices plus those specified
    * in the \p ghost argument.
@@ -197,7 +197,7 @@ public:
    * \f$U(0-N) = s\f$: fill all components.
    */
   NumericVector<T> & operator= (const T s);
-    
+
   /**
    *  \f$U = V\f$: copy all components.
    */
@@ -219,7 +219,7 @@ public:
    * Real part.
    */
   Real min () const;
-  
+
   /**
    * @returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
@@ -286,12 +286,12 @@ public:
    * to be looked up in the map.
    */
   unsigned int map_global_to_local_index(const unsigned int i) const;
-    
+
   /**
    * Access components, returns \p U(i).
    */
   T operator() (const unsigned int i) const;
-    
+
   /**
    * Access multiple components at once.  Overloaded method that
    * should be faster (probably much faster) than calling \p
@@ -310,24 +310,24 @@ public:
    * Fast equivalent to \p U.add(-1, V).
    */
   NumericVector<T> & operator -= (const NumericVector<T> &V);
-    
+
   /**
    * v(i) = value
    */
   void set (const unsigned int i, const T value);
-    
+
   /**
    * v(i) += value
    */
   void add (const unsigned int i, const T value);
-    
+
   /**
    * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
   void add (const T s);
-    
+
   /**
    * \f$ U+=V \f$ .
    * Simple vector addition, equal to the
@@ -341,9 +341,9 @@ public:
    * \p operator +=.
    */
   void add (const T a, const NumericVector<T>& v);
-  
+
   /**
-   * \f$ U+=v \f$ where \p v is a std::vector<T> 
+   * \f$ U+=v \f$ where \p v is a std::vector<T>
    * and you
    * want to specify WHERE to add it
    */
@@ -351,10 +351,10 @@ public:
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
-   * \f$ U+=V \f$ where U and V are type 
+   * \f$ U+=V \f$ where U and V are type
    * \p NumericVector<T> and you
    * want to specify WHERE to add
-   * the \p NumericVector<T> V 
+   * the \p NumericVector<T> V
    */
   void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
@@ -366,12 +366,12 @@ public:
    */
   void add_vector (const NumericVector<T> &V,
 		   const SparseMatrix<T> &A);
-     
+
   /**
-   * \f$U+=V \f$ where U and V are type 
+   * \f$U+=V \f$ where U and V are type
    * DenseVector<T> and you
    * want to specify WHERE to add
-   * the DenseVector<T> V 
+   * the DenseVector<T> V
    */
   void add_vector (const DenseVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
@@ -383,40 +383,40 @@ public:
    */
   void add_vector_transpose (const NumericVector<T> &V,
 		             const SparseMatrix<T> &A_trans);
-  
+
   /**
-   * \f$ U=v \f$ where v is a std::vector<T> 
+   * \f$ U=v \f$ where v is a std::vector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
 		       const std::vector<unsigned int>& dof_indices);
 
   /**
-   * \f$U=V\f$, where U and V are type 
+   * \f$U=V\f$, where U and V are type
    * NumericVector<T> and you
    * want to specify WHERE to insert
-   * the NumericVector<T> V 
+   * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-      
+
   /**
-   * \f$ U=V \f$ where V is type 
+   * \f$ U=V \f$ where V is type
    * DenseVector<T> and you
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-    
+
   /**
-   * \f$ U=V \f$ where V is type 
+   * \f$ U=V \f$ where V is type
    * DenseSubVector<T> and you
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-    
-  
+
+
   /**
    * Scale each element of the
    * vector by the given factor.
@@ -433,7 +433,7 @@ public:
    * Computes the dot product, p = U.V
    */
   virtual T dot(const NumericVector<T>& V) const;
-  
+
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
@@ -453,7 +453,7 @@ public:
    */
   void localize (NumericVector<T>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
-  
+
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
@@ -461,7 +461,7 @@ public:
   void localize (const unsigned int first_local_idx,
 		 const unsigned int last_local_idx,
 		 const std::vector<unsigned int>& send_list);
-  
+
   /**
    * Creates a local copy of the global vector in
    * \p v_local only on processor \p proc_id.  By
@@ -470,7 +470,7 @@ public:
    */
   void localize_to_one (std::vector<T>& v_local,
 			const unsigned int proc_id=0) const;
-  
+
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
    * and \p vec2 and stores the result in \p *this.
@@ -506,7 +506,7 @@ public:
   Vec vec () { libmesh_assert (_vec != NULL); return _vec; }
 
 
-  
+
 private:
 
   /**
@@ -569,7 +569,7 @@ private:
 
   /**
    * This boolean value should only be set to false
-   * for the constructor which takes a PETSc Vec object. 
+   * for the constructor which takes a PETSc Vec object.
    */
   bool _destroy_vec_on_exit;
 };
@@ -734,7 +734,7 @@ void PetscVector<T>::init (const unsigned int n,
   int petsc_n_local=static_cast<int>(n_local);
 
 
-  // Clear initialized vectors 
+  // Clear initialized vectors
   if (this->initialized())
     this->clear();
 
@@ -750,13 +750,13 @@ void PetscVector<T>::init (const unsigned int n,
 
   libmesh_assert ((this->_type==SERIAL && n==n_local) ||
                   this->_type==PARALLEL);
-  
-  // create a sequential vector if on only 1 processor 
+
+  // create a sequential vector if on only 1 processor
   if (this->_type == SERIAL)
     {
       ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
              CHKERRABORT(PETSC_COMM_SELF,ierr);
-      
+
       ierr = VecSetFromOptions (_vec);
              CHKERRABORT(PETSC_COMM_SELF,ierr);
     }
@@ -773,17 +773,17 @@ void PetscVector<T>::init (const unsigned int n,
       ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
              CHKERRABORT(PETSC_COMM_SELF,ierr);
 #endif
-      
+
       ierr = VecSetFromOptions (_vec);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }  
+    }
   else
     libmesh_error();
-  
+
   this->_is_initialized = true;
   this->_is_closed = true;
-  
-  
+
+
   if (fast == false)
     this->zero ();
 }
@@ -828,7 +828,7 @@ void PetscVector<T>::init (const unsigned int n,
   int* petsc_ghost = ghost.empty() ? PETSC_NULL :
     const_cast<int*>(reinterpret_cast<const int*>(&ghost[0]));
 
-  // Clear initialized vectors 
+  // Clear initialized vectors
   if (this->initialized())
     this->clear();
 
@@ -846,13 +846,13 @@ void PetscVector<T>::init (const unsigned int n,
 			 petsc_n_ghost, petsc_ghost,
 			 &_vec);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   ierr = VecSetFromOptions (_vec);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   this->_is_initialized = true;
   this->_is_closed = true;
-  
+
   if (fast == false)
     this->zero ();
 }
@@ -864,7 +864,7 @@ inline
 void PetscVector<T>::init (const NumericVector<T>& other,
                            const bool fast)
 {
-  // Clear initialized vectors 
+  // Clear initialized vectors
   if (this->initialized())
     this->clear();
 
@@ -888,7 +888,7 @@ void PetscVector<T>::init (const NumericVector<T>& other,
       ierr = VecDuplicate (v._vec, &this->_vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
-  
+
   if (fast == false)
     this->zero ();
 }
@@ -900,9 +900,9 @@ inline
 void PetscVector<T>::close ()
 {
   this->_restore_array();
-  
+
   int ierr=0;
-  
+
   ierr = VecAssemblyBegin(_vec);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = VecAssemblyEnd(_vec);
@@ -948,14 +948,14 @@ inline
 void PetscVector<T>::zero ()
 {
   this->_restore_array();
-  
+
   int ierr=0;
 
   PetscScalar z=0.;
 
   if(this->type() != GHOSTED)
     {
-#if PETSC_VERSION_LESS_THAN(2,3,0)  
+#if PETSC_VERSION_LESS_THAN(2,3,0)
       // 2.2.x & earlier style
       ierr = VecSet (&z, _vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -972,7 +972,7 @@ void PetscVector<T>::zero ()
       Vec loc_vec;
       ierr = VecGhostGetLocalForm (_vec,&loc_vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-#if PETSC_VERSION_LESS_THAN(2,3,0)  
+#if PETSC_VERSION_LESS_THAN(2,3,0)
       // 2.2.x & earlier style
       ierr = VecSet (&z, loc_vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -1021,12 +1021,12 @@ inline
 unsigned int PetscVector<T>::size () const
 {
   libmesh_assert (this->initialized());
-  
+
   int ierr=0, petsc_size=0;
-  
+
   if (!this->initialized())
     return 0;
-  
+
   ierr = VecGetSize(_vec, &petsc_size);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -1040,12 +1040,12 @@ inline
 unsigned int PetscVector<T>::local_size () const
 {
   libmesh_assert (this->initialized());
-  
+
   int ierr=0, petsc_size=0;
-  
+
   ierr = VecGetLocalSize(_vec, &petsc_size);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   return static_cast<unsigned int>(petsc_size);
 }
 
@@ -1056,12 +1056,12 @@ inline
 unsigned int PetscVector<T>::first_local_index () const
 {
   libmesh_assert (this->initialized());
-  
+
   int ierr=0, petsc_first=0, petsc_last=0;
-  
+
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   return static_cast<unsigned int>(petsc_first);
 }
 
@@ -1072,12 +1072,12 @@ inline
 unsigned int PetscVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
-  
+
   int ierr=0, petsc_first=0, petsc_last=0;
-  
+
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   return static_cast<unsigned int>(petsc_last);
 }
 
@@ -1146,7 +1146,7 @@ T PetscVector<T>::operator() (const unsigned int i) const
       libmesh_assert(local_index<_local_size);
     }
 #endif
-  
+
   return static_cast<T>(_values[local_index]);
 }
 

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,7 +41,7 @@ namespace libMesh
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
 // methods as needed.
-// 
+//
 // Since they must have C linkage they have no knowledge of a namespace.
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
@@ -53,9 +53,9 @@ extern "C"
   typedef int PetscErrorCode;
   typedef int PetscInt;
 #endif
-  
+
   //-------------------------------------------------------------------
-  // this function is called by PETSc at the end of each nonlinear step  
+  // this function is called by PETSc at the end of each nonlinear step
   PetscErrorCode
   __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *)
   {
@@ -86,10 +86,10 @@ extern "C"
     libmesh_assert (x   != NULL);
     libmesh_assert (r   != NULL);
     libmesh_assert (ctx != NULL);
-    
+
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
-    
+
     NonlinearImplicitSystem &sys = solver->system();
 
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
@@ -101,7 +101,7 @@ extern "C"
     R.swap(R_sys);
 
     sys.get_dof_map().enforce_constraints_exactly(sys);
-    
+
     sys.update();
 
     //Swap back
@@ -118,7 +118,7 @@ extern "C"
 	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
 	libmesh_error();
       }
-    
+
     if (solver->matvec && solver->residual_and_jacobian_object)
       {
 	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
@@ -131,33 +131,33 @@ extern "C"
     else if (solver->matvec   != NULL)                     solver->matvec                                              (*sys.current_local_solution.get(), &R, NULL, sys);
     else if (solver->residual_and_jacobian_object != NULL) solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), &R, NULL, sys);
     else libmesh_error();
-    
+
     R.close();
     X_global.close();
 
     STOP_LOG("residual()", "PetscNonlinearSolver");
-    
+
     return ierr;
   }
 
 
-  
+
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
   PetscErrorCode
   __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx)
   {
     START_LOG("jacobian()", "PetscNonlinearSolver");
-    
+
     int ierr=0;
-    
+
     libmesh_assert (ctx != NULL);
-    
+
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
 
     NonlinearImplicitSystem &sys = solver->system();
-    
+
     PetscMatrix<Number> PC(*pc);
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
@@ -179,7 +179,7 @@ extern "C"
     Jac.swap(Jac_sys);
 
     PC.zero();
-    
+
     //-----------------------------------------------------------------------------
     // if the user has provided both function pointers and objects only the pointer
     // will be used, so catch that as an error
@@ -188,7 +188,7 @@ extern "C"
 	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Jacobian!" << std::endl;
 	libmesh_error();
       }
-    
+
     if (solver->matvec && solver->residual_and_jacobian_object)
       {
 	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
@@ -201,18 +201,18 @@ extern "C"
     else if (solver->matvec   != NULL)                     solver->matvec                                              (*sys.current_local_solution.get(), NULL, &PC, sys);
     else if (solver->residual_and_jacobian_object != NULL) solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), NULL, &PC, sys);
     else libmesh_error();
-    
+
     PC.close();
     Jac.close();
     X_global.close();
-    
+
     *msflag = SAME_NONZERO_PATTERN;
-    
+
     STOP_LOG("jacobian()", "PetscNonlinearSolver");
 
     return ierr;
   }
-    
+
 } // end extern "C"
 //---------------------------------------------------------------------
 
@@ -238,12 +238,12 @@ void PetscNonlinearSolver<T>::clear ()
 
 template <typename T>
 void PetscNonlinearSolver<T>::init ()
-{  
+{
   // Initialize the data structures if not done so already.
   if (!this->initialized())
     {
       this->_is_initialized = true;
-      
+
       int ierr=0;
 
 #if PETSC_VERSION_LESS_THAN(2,1,2)
@@ -260,7 +260,7 @@ void PetscNonlinearSolver<T>::init ()
 
 #endif
 
-             
+
 #if PETSC_VERSION_LESS_THAN(2,3,3)
       ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
@@ -276,17 +276,17 @@ void PetscNonlinearSolver<T>::init ()
       // any matrix free options with PETSc 3.1.0+
       ierr = SNESSetFromOptions(_snes);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-#endif 
-             
+#endif
+
       if(this->_preconditioner)
       {
-        KSP ksp;	 
+        KSP ksp;
         ierr = SNESGetKSP (_snes, &ksp);
                CHKERRABORT(libMesh::COMM_WORLD,ierr);
         PC pc;
         ierr = KSPGetPC(ksp,&pc);
                CHKERRABORT(libMesh::COMM_WORLD,ierr);
-               
+
         PCSetType(pc, PCSHELL);
         PCShellSetContext(pc,(void*)this->_preconditioner);
 
@@ -300,16 +300,16 @@ void PetscNonlinearSolver<T>::init ()
 
 
 template <typename T>
-std::pair<unsigned int, Real> 
+std::pair<unsigned int, Real>
 PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matrix
 				NumericVector<T>& x_in,    // Solution vector
 				NumericVector<T>& r_in,    // Residual vector
 				const double,              // Stopping tolerance
-				const unsigned int) 
+				const unsigned int)
 {
   START_LOG("solve()", "PetscNonlinearSolver");
   this->init ();
-  
+
   // Make sure the data passed in are really of Petsc types
   PetscMatrix<T>* jac = libmesh_cast_ptr<PetscMatrix<T>*>(&jac_in);
   PetscVector<T>* x   = libmesh_cast_ptr<PetscVector<T>*>(&x_in);
@@ -318,7 +318,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   int ierr=0;
   int n_iterations =0;
   // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
-  Real final_residual_norm=0.; 
+  Real final_residual_norm=0.;
 
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -332,7 +332,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
    }
 
    // Have the Krylov subspace method use our good initial guess rather than 0
-   KSP ksp;	 
+   KSP ksp;
    ierr = SNESGetKSP (_snes, &ksp);
           CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -347,7 +347,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
                            this->absolute_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  //Pull in command-line options       
+  //Pull in command-line options
   KSPSetFromOptions(ksp);
   SNESSetFromOptions(_snes);
 
@@ -360,7 +360,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
 //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
 //           CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      	 
+
 // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
 // the last one being a pointer to an int to hold the number of iterations required.
 # if PETSC_VERSION_LESS_THAN(2,2,0)
@@ -368,15 +368,15 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-// 2.2.x style	
+// 2.2.x style
 #elif PETSC_VERSION_LESS_THAN(2,3,0)
-	
+
  ierr = SNESSolve (_snes, x->vec());
         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-// 2.3.x & newer style	
+// 2.3.x & newer style
 #else
-	
+
   ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -384,11 +384,11 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);         
-	 
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
   ierr = SNESGetFunctionNorm(_snes,&final_residual_norm);
 	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	 
+
 #endif
 
   // Get and store the reason for convergence
@@ -398,9 +398,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   this->converged = (_reason >= 0);
 
   this->clear();
-  
+
   STOP_LOG("solve()", "PetscNonlinearSolver");
-		 
+
   // return the # of its. and the final residual norm.
   return std::make_pair(n_iterations, final_residual_norm);
 }
@@ -410,7 +410,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 template <typename T>
 void PetscNonlinearSolver<T>::print_converged_reason()
 {
-  
+
   libMesh::out << "Nonlinear solver convergence/divergence reason: "
                << SNESConvergedReasons[this->get_converged_reason()] << std::endl;
 }
@@ -421,7 +421,7 @@ template <typename T>
 SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
 {
   int ierr=0;
-  
+
   if (this->initialized())
     {
       ierr = SNESGetConvergedReason(_snes, &_reason);
@@ -430,7 +430,7 @@ SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
 
   return _reason;
 }
-  
+
 template <typename T>
 int PetscNonlinearSolver<T>::get_total_linear_iterations()
 {
@@ -443,7 +443,7 @@ int PetscNonlinearSolver<T>::get_total_linear_iterations()
 template class PetscNonlinearSolver<Number>;
 
 } // namespace libMesh
- 
+
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC

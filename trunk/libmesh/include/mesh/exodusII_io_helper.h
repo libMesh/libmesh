@@ -624,7 +624,7 @@ public:
   std::vector<char> title;             //  Problem title
   std::vector<char> elem_type;         // Type of element in a given block
 
-  // Maps libMesh element numbers to Exodus element numbers                                                                                                                         
+  // Maps libMesh element numbers to Exodus element numbers
   // gets filled in when write_elements gets called
   std::map<int, int> libmesh_elem_num_to_exodus;
   std::vector<int> exodus_elem_num_to_libmesh;
@@ -682,16 +682,16 @@ public:
    * Constructor.  Initializes the const private member
    * variables.
    */
-  Conversion(const int* nm,       // node_map 
+  Conversion(const int* nm,       // node_map
 	     size_t nm_size,
 	     const int* inm,      // inverse_node_map
-	     size_t inm_size, 
-	     const int* sm,       // side_map 
+	     size_t inm_size,
+	     const int* sm,       // side_map
 	     size_t sm_size,
-	     const int* ism,      // inverse_side_map 
+	     const int* ism,      // inverse_side_map
 	     size_t ism_size,
-	     const ElemType ct,   // "canonical" aka libmesh element type 
-	     std::string ex_type) // string representing the Exodus element type 
+	     const ElemType ct,   // "canonical" aka libmesh element type
+	     std::string ex_type) // string representing the Exodus element type
     : node_map(nm),
       node_map_size(nm_size),
       inverse_node_map(inm),
@@ -700,8 +700,8 @@ public:
       side_map_size(sm_size),
       inverse_side_map(ism),
       inverse_side_map_size(ism_size),
-      canonical_type(ct),    
-      exodus_type(ex_type)   
+      canonical_type(ct),
+      exodus_type(ex_type)
   {}
 
   /**
@@ -710,9 +710,9 @@ public:
    * format to this library's format.
    */
   int get_node_map(int i) const
-  { 
-    libmesh_assert (static_cast<size_t>(i) < node_map_size);  
-    return node_map[i]; 
+  {
+    libmesh_assert (static_cast<size_t>(i) < node_map_size);
+    return node_map[i];
   }
 
   /**
@@ -722,9 +722,9 @@ public:
    * currently have the same node numbering as libmesh elements.
    */
   int get_inverse_node_map(int i) const
-  { 
-    libmesh_assert (static_cast<size_t>(i) < inverse_node_map_size);  
-    return inverse_node_map[i]; 
+  {
+    libmesh_assert (static_cast<size_t>(i) < inverse_node_map_size);
+    return inverse_node_map[i];
   }
 
   /**
@@ -732,10 +732,10 @@ public:
    * element.  The side map maps the exodusII side numbering
    * format to this library's format.
    */
-  int get_side_map(int i) const 
-  { 
-    libmesh_assert (static_cast<size_t>(i) < side_map_size);  
-    return side_map[i]; 
+  int get_side_map(int i) const
+  {
+    libmesh_assert (static_cast<size_t>(i) < side_map_size);
+    return side_map[i];
   }
 
   /**
@@ -744,9 +744,9 @@ public:
    * format to this exodus's format.
    */
   int get_inverse_side_map(int i) const
-  { 
+  {
     libmesh_assert (static_cast<size_t>(i) < inverse_side_map_size);
-    return inverse_side_map[i]; 
+    return inverse_side_map[i];
   }
 
   /**

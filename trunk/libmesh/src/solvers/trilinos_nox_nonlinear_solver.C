@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -59,7 +59,7 @@ class Problem_Interface : public NOX::Epetra::Interface::Required,
 public:
   Problem_Interface(NoxNonlinearSolver<Number> * solver);
   ~Problem_Interface();
-  
+
   //! Compute and return F
   bool computeF(const Epetra_Vector& x, Epetra_Vector& FVec,
                 NOX::Epetra::Interface::Required::FillType fillType);
@@ -73,7 +73,7 @@ public:
   //! Computes a user supplied preconditioner based on input vector x.  Returns true if computation was successful.
   bool computePreconditioner(const Epetra_Vector& x, Epetra_Operator& Prec,
                              Teuchos::ParameterList* p);
-  
+
   NoxNonlinearSolver<Number> * _solver;
 };
 
@@ -106,9 +106,9 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
   // Swap back
   X_global.swap(X_sys);
   R.swap(R_sys);
-  
+
   R.zero();
-  
+
   //-----------------------------------------------------------------------------
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
@@ -279,7 +279,7 @@ void NoxNonlinearSolver<T>::init ()
 }
 
 template <typename T>
-std::pair<unsigned int, Real> 
+std::pair<unsigned int, Real>
 NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matrix
                               NumericVector<T>& x_in,    // Solution vector
                               NumericVector<T>& r_in,    // Residual vector
@@ -295,12 +295,12 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
   // Creating a Teuchos::RCP as they do in NOX examples does not work here - we get some invalid memory references
   // thus we make a local copy
   NOX::Epetra::Vector x(*x_epetra->vec());
-  
+
   Teuchos::RCP<Teuchos::ParameterList> nlParamsPtr = Teuchos::rcp(new Teuchos::ParameterList);
   Teuchos::ParameterList& nlParams = *(nlParamsPtr.get());
   nlParams.set("Nonlinear Solver", "Line Search Based");
 
-  //print params	
+  //print params
   Teuchos::ParameterList& printParams = nlParams.sublist("Printing");
   printParams.set("Output Precision", 3);
   printParams.set("Output Processor", 0);
@@ -317,7 +317,7 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matr
   dirParams.set("Method", "Newton");
   Teuchos::ParameterList& newtonParams = dirParams.sublist("Newton");
   newtonParams.set("Forcing Term Method", "Constant");
-  
+
   Teuchos::ParameterList& lsParams = newtonParams.sublist("Linear Solver");
   lsParams.set("Aztec Solver", "GMRES");
   lsParams.set("Max Iterations", static_cast<int>(this->max_linear_iterations));
@@ -426,7 +426,7 @@ NoxNonlinearSolver<T>::get_total_linear_iterations()
 template class NoxNonlinearSolver<Number>;
 
 } // namespace libMesh
- 
+
 
 
 #endif // #ifdef LIBMESH_HAVE_NOX

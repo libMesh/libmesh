@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -68,7 +68,7 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
       _boundary_node_id.insert( std::pair<const Node*, short int>(_mesh.node_ptr(other_node->id()), it->second) );
     }
   }
-  
+
 
   {
     std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator it = other_boundary_info._boundary_side_id.begin();
@@ -169,12 +169,12 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
 
   // We'll pass through our own part of the mesh once first to build
   // the maps and count boundary nodes and elements
-  const MeshBase::const_element_iterator end_el = _mesh.local_elements_end(); 
+  const MeshBase::const_element_iterator end_el = _mesh.local_elements_end();
   for (MeshBase::const_element_iterator el = _mesh.local_elements_begin();
        el != end_el; ++el)
     {
       const Elem *elem = *el;
-    
+
       for (unsigned char s=0; s<elem->n_sides(); s++)
         if (elem->neighbor(s) == NULL) // on the boundary
           {
@@ -185,7 +185,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
             typedef
               std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator
               Iter;
-	    
+
             // Find the right id number for that side
             std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
 
@@ -204,7 +204,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
                     add_this_side = true;
                     break;
                   }
-              
+
                 ++pos.first;
               }
 
@@ -256,13 +256,13 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
   next_elem_id = libMesh::n_processors();
 
   const MeshBase::const_element_iterator end_unpartitioned_el =
-    _mesh.pid_elements_end(DofObject::invalid_processor_id); 
+    _mesh.pid_elements_end(DofObject::invalid_processor_id);
   for (MeshBase::const_element_iterator el =
          _mesh.pid_elements_begin(DofObject::invalid_processor_id);
        el != end_unpartitioned_el; ++el)
     {
       const Elem *elem = *el;
-    
+
       for (unsigned char s=0; s<elem->n_sides(); s++)
         if (elem->neighbor(s) == NULL) // on the boundary
           {
@@ -273,7 +273,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
             typedef
               std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator
               Iter;
-	    
+
             // Find the right id number for that side
             std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
 
@@ -291,7 +291,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
                     add_this_side = true;
                     break;
                   }
-              
+
                 ++pos.first;
               }
 
@@ -334,7 +334,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
   // Let's add all the nodes to the boundary mesh
 
   MeshBase::const_node_iterator n_end  = _mesh.nodes_end();
-  
+
   for(MeshBase::const_node_iterator n_it = _mesh.nodes_begin();
       n_it != n_end; ++n_it)
     {
@@ -352,7 +352,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
        el != end_el; ++el)
     {
       const Elem* elem = *el;
-    
+
       for (unsigned int s=0; s<elem->n_sides(); s++)
         if (elem->neighbor(s) == NULL) // on the boundary
           {
@@ -363,7 +363,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
             typedef
               std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator
               Iter;
-            
+
             // Find the right id number for that side
             std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
 
@@ -382,7 +382,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
                     add_this_side = true;
                     break;
                   }
-              
+
                 ++pos.first;
               }
 
@@ -420,7 +420,7 @@ void BoundaryInfo::sync (const std::set<short int> &requested_boundary_ids,
                   {
                     // Get the correct node pointer, based on the id()
                     Node* new_node = boundary_mesh.node_ptr(node_id_map[new_elem->node(nn)]);
-              
+
                     // sanity check: be sure that the new Node exists
                     // and its global id really matches
                     libmesh_assert (new_node);
@@ -518,7 +518,7 @@ void BoundaryInfo::add_node(const Node* node,
 
   // A convenient typedef
   typedef std::multimap<const Node*, short int>::const_iterator Iter;
-	      
+
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
 
@@ -527,7 +527,7 @@ void BoundaryInfo::add_node(const Node* node,
       return;
 
   std::pair<const Node*, short int> kv (node, id);
-  
+
   _boundary_node_id.insert(kv);
   _boundary_ids.insert(id);
   _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
@@ -555,7 +555,7 @@ void BoundaryInfo::add_side(const Elem* elem,
 
   // Only add BCs for level-0 elements.
   libmesh_assert (elem->level() == 0);
-  
+
   if (id == invalid_id)
     {
       libMesh::err << "ERROR: You may not set a boundary ID of "
@@ -565,10 +565,10 @@ void BoundaryInfo::add_side(const Elem* elem,
 
       libmesh_error();
     }
-  
+
   // A convenient typedef
   typedef std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator Iter;
-	      
+
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(elem);
 
@@ -580,7 +580,7 @@ void BoundaryInfo::add_side(const Elem* elem,
   std::pair<unsigned short int, short int> p(side,id);
   std::pair<const Elem*, std::pair<unsigned short int, short int> >
     kv (elem, p);
-  
+
   _boundary_side_id.insert(kv);
   _boundary_ids.insert(id);
   _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
@@ -599,10 +599,10 @@ void BoundaryInfo::add_side(const Elem* elem,
 
   // Only add BCs for level-0 elements.
   libmesh_assert (elem->level() == 0);
-  
+
   // A convenient typedef
   typedef std::multimap<const Elem*, std::pair<unsigned short int, short int> >::const_iterator Iter;
-	      
+
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(elem);
 
@@ -619,7 +619,7 @@ void BoundaryInfo::add_side(const Elem* elem,
 
           libmesh_error();
         }
-  
+
       for (Iter p = pos.first;p != pos.second; ++p)
         if (p->second.first == side &&
             p->second.second == id)
@@ -628,7 +628,7 @@ void BoundaryInfo::add_side(const Elem* elem,
       std::pair<unsigned short int, short int> p(side,id);
       std::pair<const Elem*, std::pair<unsigned short int, short int> >
         kv (elem, p);
-  
+
       _boundary_side_id.insert(kv);
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
@@ -640,10 +640,10 @@ void BoundaryInfo::add_side(const Elem* elem,
 std::vector<short int> BoundaryInfo::boundary_ids(const Node* node) const
 {
   std::vector<short int> ids;
-  
+
   // A convenient typedef
   typedef std::multimap<const Node*, short int>::const_iterator Iter;
-	      
+
   // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
 
@@ -669,14 +669,14 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
     // Child element on external side: the top_parent will have the BCs
     if (elem->neighbor(side) == NULL)
       searched_elem = elem->top_parent ();
-    
+
 #ifdef LIBMESH_ENABLE_AMR
     // Child element is not on external side, but it may have internal
-    // "boundary" IDs.  We will walk up the tree, at each level checking that 
+    // "boundary" IDs.  We will walk up the tree, at each level checking that
     // the current child is actually on the same side of the parent that is
     // currently being searched for (i.e. that was passed in as "side").
     else
-      while (searched_elem->parent() != NULL) 
+      while (searched_elem->parent() != NULL)
 	{
 	  const Elem * parent = searched_elem->parent();
 	  if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
@@ -685,11 +685,11 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
 	}
 #endif
   }
-  
+
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::const_iterator,
             std::multimap<const Elem*,
-                          std::pair<unsigned short int, short int> >::const_iterator > 
+                          std::pair<unsigned short int, short int> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
   // elem not in the data structure
@@ -709,7 +709,7 @@ short int BoundaryInfo::boundary_id(const Elem* const elem,
 
   // if we get here, we found elem in the data structure but not
   // the requested side, so return the default value
-  return invalid_id;  
+  return invalid_id;
 }
 
 
@@ -730,7 +730,7 @@ std::vector<short int> BoundaryInfo::boundary_ids (const Elem* const elem,
       searched_elem = elem->top_parent ();
 #ifdef LIBMESH_ENABLE_AMR
     else
-      while (searched_elem->parent() != NULL) 
+      while (searched_elem->parent() != NULL)
 	{
 	  const Elem * parent = searched_elem->parent();
 	  if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
@@ -797,7 +797,7 @@ std::vector<short int> BoundaryInfo::raw_boundary_ids (const Elem* const elem,
 
   // if nothing got pushed back, we didn't find elem in the data
   // structure with the requested side, so return the default empty
-  // vector 
+  // vector
   return ids;
 }
 
@@ -811,11 +811,11 @@ void BoundaryInfo::remove_side (const Elem* elem,
   // The user shouldn't be trying to remove only one child's boundary
   // id
   libmesh_assert (elem->level() == 0);
-  
+
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::iterator,
             std::multimap<const Elem*,
-                          std::pair<unsigned short int, short int> >::iterator > 
+                          std::pair<unsigned short int, short int> >::iterator >
     e = _boundary_side_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurances
@@ -844,11 +844,11 @@ void BoundaryInfo::remove_side (const Elem* elem,
   // The user shouldn't be trying to remove only one child's boundary
   // id
   libmesh_assert (elem->level() == 0);
-  
+
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::iterator,
             std::multimap<const Elem*,
-                          std::pair<unsigned short int, short int> >::iterator > 
+                          std::pair<unsigned short int, short int> >::iterator >
     e = _boundary_side_id.equal_range(elem);
 
   // elem may be there, maybe multiple occurances
@@ -879,7 +879,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, short int> >::const_iterator,
             std::multimap<const Elem*,
-                          std::pair<unsigned short int, short int> >::const_iterator > 
+                          std::pair<unsigned short int, short int> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
   // elem may have zero or multiple occurances
@@ -918,7 +918,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
 
   // if we get here, we found elem in the data structure but not
   // the requested boundary id, so return the default value
-  return libMesh::invalid_uint;  
+  return libMesh::invalid_uint;
 }
 
 void BoundaryInfo::build_node_boundary_ids(std::vector<short int> &b_ids)
@@ -931,7 +931,7 @@ void BoundaryInfo::build_node_boundary_ids(std::vector<short int> &b_ids)
   for (; pos != _boundary_node_id.end(); ++pos)
     {
       short int id = pos->second;
-      
+
       if(std::find(b_ids.begin(),b_ids.end(),id) == b_ids.end())
         b_ids.push_back(id);
     }
@@ -947,7 +947,7 @@ void BoundaryInfo::build_side_boundary_ids(std::vector<short int> &b_ids)
   for (; pos != _boundary_side_id.end(); ++pos)
     {
       short int id = pos->second.second;
-      
+
       if(std::find(b_ids.begin(),b_ids.end(),id) == b_ids.end())
         b_ids.push_back(id);
     }
@@ -962,7 +962,7 @@ unsigned int BoundaryInfo::n_boundary_conds () const
 
   // in parallel we need to sum the number of local bcs
   parallel_only();
-  
+
   unsigned int nbcs=0;
 
   std::multimap<const Elem*,
@@ -972,9 +972,9 @@ unsigned int BoundaryInfo::n_boundary_conds () const
   for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end(); ++pos)
     if (pos->first->processor_id() == libMesh::processor_id())
       nbcs++;
-  
+
   Parallel::sum (nbcs);
-  
+
   return nbcs;
 }
 
@@ -986,7 +986,7 @@ void BoundaryInfo::build_node_list (std::vector<unsigned int>& nl,
   // Reserve the size, then use push_back
   nl.reserve (_boundary_node_id.size());
   il.reserve (_boundary_node_id.size());
-  
+
   std::multimap<const Node*, short int>::const_iterator pos
     = _boundary_node_id.begin();
 
@@ -1004,14 +1004,14 @@ BoundaryInfo::build_node_list_from_side_list()
   std::multimap<const Elem*,
                 std::pair<unsigned short int,
                           short int> >::const_iterator pos;
-  
+
   //Loop over the side list
   for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end(); ++pos)
   {
     // Don't add remote sides
     if(pos->first->is_remote())
       continue;
-    
+
     //Need to loop over the sides of any possible children
     std::vector< const Elem * > family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1023,14 +1023,14 @@ BoundaryInfo::build_node_list_from_side_list()
     for(unsigned int elem_it=0; elem_it < family.size(); elem_it++)
     {
       const Elem * cur_elem = family[elem_it];
-      
+
       AutoPtr<Elem> side = cur_elem->build_side(pos->second.first);
 
       //Add each node node on the side with the side's boundary id
       for(unsigned int i=0; i<side->n_nodes(); i++)
       {
         Node * node = side->get_node(i);
-        
+
         this->add_node(node, pos->second.second);
       }
     }
@@ -1144,7 +1144,7 @@ void BoundaryInfo::print_info(std::ostream& out) const
 	    << ", "  << (*it).second
 	    << ")"  << std::endl;
     }
-  
+
   // Print out the element BCs
   if (!_boundary_side_id.empty())
     {
@@ -1165,7 +1165,7 @@ void BoundaryInfo::print_info(std::ostream& out) const
       for (; it != end; ++it)
         out << "  (" << (*it).first->id()
 	    << ", "  << (*it).second.first
-	    << ", "  << (*it).second.second 
+	    << ", "  << (*it).second.second
 	    << ")"   << std::endl;
     }
 }
@@ -1197,7 +1197,7 @@ void BoundaryInfo::print_summary(std::ostream& out) const
 	    << ", "  << (*ID_it).second
 	    << ")"  << std::endl;
     }
-  
+
   // Print out the element BCs
   if (!_boundary_side_id.empty())
     {

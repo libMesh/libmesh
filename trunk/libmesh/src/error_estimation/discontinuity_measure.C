@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -76,7 +76,7 @@ DiscontinuityMeasure::internal_side_integration ()
 
       for (unsigned int i=0; i != n_fine_dofs; ++i)
         u_fine += phi_fine[i][qp] * Ufine(i);
-                                
+
       // Find the jump in the value
       // at this quadrature point
       const Number jump = u_fine - u_coarse;
@@ -111,13 +111,13 @@ DiscontinuityMeasure::boundary_side_integration ()
   if (this->_bc_function(*my_system, qface_point[0], var_name).first)
     {
       const Real h = fine_elem->hmax();
-		    
+
       // The number of quadrature points
       const unsigned int n_qp = fe_fine->n_quadrature_points();
 
       // The error contribution from this face
       Real error = 1.e-30;
-		    
+
       // loop over the integration points on the face.
       for (unsigned int qp=0; qp<n_qp; qp++)
         {
@@ -125,7 +125,7 @@ DiscontinuityMeasure::boundary_side_integration ()
           const std::pair<bool,Real> essential_bc =
             this->_bc_function(*my_system, qface_point[qp], var_name);
 
-          // Be sure the BC function still thinks we're on the 
+          // Be sure the BC function still thinks we're on the
           // essential boundary.
           libmesh_assert (essential_bc.first == true);
 
@@ -136,7 +136,7 @@ DiscontinuityMeasure::boundary_side_integration ()
           for (unsigned int i=0; i != Ufine.size(); i++)
             u_fine += phi_fine[i][qp] * Ufine(i);
 
-          // The difference between the desired BC and the approximate solution. 
+          // The difference between the desired BC and the approximate solution.
           const Number jump = essential_bc.second - u_fine;
 
           // The flux jump squared.  If using complex numbers,
@@ -147,8 +147,8 @@ DiscontinuityMeasure::boundary_side_integration ()
           // scaled by an additional power of h, where h is
           // the maximum side length for the element.  This
           // arises in the definition of the indicator.
-          error += JxW_face[qp]*jump2;			
-			
+          error += JxW_face[qp]*jump2;
+
         } // End quadrature point loop
 
       fine_error = error*h*error_norm.weight(var);

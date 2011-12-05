@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -52,7 +52,7 @@ template <typename T> class ShellMatrix;
 /**
  * This class provides an interface to the suite of preconditioners available
  * from Trilinos.
- * 
+ *
  * @author David Andrs, 2011
  */
 
@@ -62,12 +62,12 @@ class TrilinosPreconditioner :
   public Epetra_Operator
 {
 public:
-  
+
   /**
    *  Constructor. Initializes PetscPreconditioner data structures
    */
   TrilinosPreconditioner ();
-    
+
   /**
    * Destructor.
    */
@@ -78,7 +78,7 @@ public:
    * Usually by solving Py=x to get the action of P^-1 x.
    */
   virtual void apply(const NumericVector<T> & x, NumericVector<T> & y);
-  
+
   /**
    * Release all memory and clear data structures.
    */
@@ -95,18 +95,18 @@ public:
    * Returns the actual Trilinos preconditioner object.
    */
   Epetra_FECrsMatrix * mat() { return _mat; }
-  
+
   /**
    */
   void set_preconditioner_type (const PreconditionerType & preconditioner_type);
-  
+
   /**
    * Compute the preconditioner. In Trilinos, we need to call this explicitly.
    */
   void compute();
 
 protected:
-  
+
   /**
    * Trilinos preconditioner
    */

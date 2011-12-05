@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -47,7 +47,7 @@ namespace MeshTools
    * \author Benjamin S. Kirk
    * \date 2004
    * \version $Revision$
-   */  
+   */
   namespace Modification
   {
     /**
@@ -59,14 +59,14 @@ namespace MeshTools
      */
     void distort (MeshBase& mesh,
 		  const Real factor, const bool perturb_boundary=false);
-    
+
     /**
      * Translates the mesh.  The grid points are translated in the
      * \p x direction by \p xt, in the \p y direction by \p yt,
      * etc...
      */
     void translate (MeshBase& mesh,
-		    const Real xt=0., const Real yt=0., const Real zt=0.); 
+		    const Real xt=0., const Real yt=0., const Real zt=0.);
 
 //     /**
 //      * Rotates the mesh in the xy plane. The rotation is
@@ -74,16 +74,16 @@ namespace MeshTools
 //      * The angle is in degrees (360 make a full circle)
 //      */
 //     void rotate2D (MeshBase& mesh,
-//                    const Real alpha=0.); 
+//                    const Real alpha=0.);
 
     /**
-     * Rotates the mesh in 3D space. 
+     * Rotates the mesh in 3D space.
      * Here the standard Euler angles are adopted
      * (http://mathworld.wolfram.com/EulerAngles.html)
      * The angles are in degrees (360 make a full circle)
      */
     void rotate (MeshBase& mesh,
-		 const Real phi, const Real theta=0., const Real psi=0.); 
+		 const Real phi, const Real theta=0., const Real psi=0.);
 
     /**
      * Scales the mesh.  The grid points are scaled in the
@@ -114,7 +114,7 @@ namespace MeshTools
      *
      * \author Martin Lüthi (luthi@gi.alaska.edu)
      * \date 2005
-     */ 
+     */
     void smooth(MeshBase&, unsigned int, Real);
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -129,7 +129,7 @@ namespace MeshTools
      */
     void flatten(MeshBase& mesh);
 #endif // #ifdef LIBMESH_ENABLE_AMR
-    
+
     /**
      * Finds any boundary ids that are currently old_id,
      * changes them to new_id
@@ -137,7 +137,7 @@ namespace MeshTools
     void change_boundary_id (MeshBase &mesh,
 			     const short int old_id,
 			     const short int new_id);
-    
+
     /**
      * Finds any subdomain ids that are currently old_id,
      * changes them to new_id

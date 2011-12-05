@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -188,7 +188,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 	case 3:  // connecting to another infinite element
 	  {
 	    AutoPtr<Elem> face(new InfQuad6);
-	
+
 	    face->set_node(0) = this->get_node(2);
 	    face->set_node(1) = this->get_node(3);
 	    face->set_node(2) = this->get_node(6);
@@ -221,7 +221,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 	}
     }
 
-  
+
   // We'll never get here.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -263,10 +263,10 @@ void InfHex16::connectivity(const unsigned int sc,
 	    conn[6] = this->node(6)+1;
 	    conn[7] = this->node(7)+1;
 	    return;
-      
+
 	  default:
 	    libmesh_error();
-      
+
 	  }
       }
 
@@ -282,13 +282,13 @@ void InfHex16::connectivity(const unsigned int sc,
 
 unsigned short int InfHex16::second_order_adjacent_vertex (const unsigned int n,
 							   const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
   libmesh_assert (v <  2);
   // note that the _second_order_adjacent_vertices matrix is
   // stored in \p InfHex
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 

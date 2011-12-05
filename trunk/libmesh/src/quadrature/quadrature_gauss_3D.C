@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -31,7 +31,7 @@ void QGauss::init_3D(const ElemType _type,
                      unsigned int p)
 {
 #if LIBMESH_DIM == 3
-  
+
   //-----------------------------------------------------------------------
   // 3D quadrature rules
   switch (_type)
@@ -48,12 +48,12 @@ void QGauss::init_3D(const ElemType _type,
 	q1D.init(EDGE2,p);
 
 	tensor_product_hex( q1D );
-	
+
 	return;
       }
 
 
-      
+
       //---------------------------------------------
       // Tetrahedral quadrature rules
     case TET4:
@@ -69,14 +69,14 @@ void QGauss::init_3D(const ElemType _type,
 	      // Exact for linears
 	      _points.resize(1);
 	      _weights.resize(1);
-		    
-		    
+
+
 	      _points[0](0) = .25;
 	      _points[0](1) = .25;
 	      _points[0](2) = .25;
-		    
+
 	      _weights[0] = .1666666666666666666666666666666666666666666667L;
-		    
+
 	      return;
 	    }
 	  case SECOND:
@@ -84,39 +84,39 @@ void QGauss::init_3D(const ElemType _type,
 	      // Exact for quadratics
 	      _points.resize(4);
 	      _weights.resize(4);
-		    
-		    
+
+
 	      const Real a = .585410196624969;
 	      const Real b = .138196601125011;
-		    
+
 	      _points[0](0) = a;
 	      _points[0](1) = b;
 	      _points[0](2) = b;
-		    
+
 	      _points[1](0) = b;
 	      _points[1](1) = a;
 	      _points[1](2) = b;
-		    
+
 	      _points[2](0) = b;
 	      _points[2](1) = b;
 	      _points[2](2) = a;
-		    
+
 	      _points[3](0) = b;
 	      _points[3](1) = b;
 	      _points[3](2) = b;
-		    
-		    
-		    
+
+
+
 	      _weights[0] = .0416666666666666666666666666666666666666666667;
 	      _weights[1] = _weights[0];
 	      _weights[2] = _weights[0];
 	      _weights[3] = _weights[0];
-		    
+
 	      return;
 	    }
 
 
-	    
+
 	    // Can be found in the class notes
 	    // http://www.cs.rpi.edu/~flaherje/FEM/fem6.ps
 	    // by Flaherty.
@@ -134,42 +134,42 @@ void QGauss::init_3D(const ElemType _type,
 		{
 		  _points.resize(5);
 		  _weights.resize(5);
-		    
-		    
+
+
 		  _points[0](0) = .25;
 		  _points[0](1) = .25;
 		  _points[0](2) = .25;
-		    
+
 		  _points[1](0) = .5;
 		  _points[1](1) = .16666666666666666666666666666666666666666667;
 		  _points[1](2) = .16666666666666666666666666666666666666666667;
-		    
+
 		  _points[2](0) = .16666666666666666666666666666666666666666667;
 		  _points[2](1) = .5;
 		  _points[2](2) = .16666666666666666666666666666666666666666667;
-		    
+
 		  _points[3](0) = .16666666666666666666666666666666666666666667;
 		  _points[3](1) = .16666666666666666666666666666666666666666667;
 		  _points[3](2) = .5;
-		    
+
 		  _points[4](0) = .16666666666666666666666666666666666666666667;
 		  _points[4](1) = .16666666666666666666666666666666666666666667;
 		  _points[4](2) = .16666666666666666666666666666666666666666667;
-		    
-		    
+
+
 		  _weights[0] = -.133333333333333333333333333333333333333333333;
 		  _weights[1] = .075;
 		  _weights[2] = _weights[1];
 		  _weights[3] = _weights[1];
 		  _weights[4] = _weights[1];
-		    
+
 		  return;
 		} // end if (allow_rules_with_negative_weights)
 	      else
 		{
 		  // If a rule with postive weights is required, the 2x2x2 conical
 		  // product rule is third-order accurate and has less points than
-		  // the next-available positive-weight rule at FIFTH order. 
+		  // the next-available positive-weight rule at FIFTH order.
 		  QConical conical_rule(3, _order);
 		  conical_rule.init(_type, p);
 
@@ -182,7 +182,7 @@ void QGauss::init_3D(const ElemType _type,
 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
 
-	    
+
 
 	    // Originally a Keast rule,
 	    //    Patrick Keast,
@@ -202,7 +202,7 @@ void QGauss::init_3D(const ElemType _type,
 		{
 		  _points.resize(11);
 		  _weights.resize(11);
-		    
+
 		  // The raw data for the quadrature rule.
 		  const Real p[3][4] = {
 		    {0.250000000000000000e+00,                         0.,                            0.,  -0.131555555555555556e-01},  // 1
@@ -210,7 +210,7 @@ void QGauss::init_3D(const ElemType _type,
 		    {0.399403576166799219e+00,                         0.,      0.100596423833200785e+00,   0.248888888888888889e-01}   // 6
 		  };
 
-	      
+
 		  // Now call the keast routine to generate _points and _weights
 		  keast_rule(p, 3);
 
@@ -221,7 +221,7 @@ void QGauss::init_3D(const ElemType _type,
 
 
 
-	    
+
 	    // Walkington's fifth-order 14-point rule from
 	    // "Quadrature on Simplices of Arbitrary Dimension"
 	    //
@@ -261,8 +261,8 @@ void QGauss::init_3D(const ElemType _type,
 		  _points[offset + 1] = Point(a[i],    b, a[i]);
 		  _points[offset + 2] = Point(   b, a[i], a[i]);
 		  _points[offset + 3] = Point(a[i], a[i],    b);
-		      			    
-		  // These 4 points all have the same weights 
+
+		  // These 4 points all have the same weights
 		  for (unsigned int j=0; j<4; ++j)
 		    _weights[offset + j] = w[i];
 		} // end for
@@ -281,18 +281,18 @@ void QGauss::init_3D(const ElemType _type,
 		_points[offset + 3] = Point(a[2],    b, a[2]);
 		_points[offset + 4] = Point(   b, a[2],    b);
 		_points[offset + 5] = Point(a[2],    b,    b);
-		  
-		// These 6 points all have the same weights 
+
+		// These 6 points all have the same weights
 		for (unsigned int j=0; j<6; ++j)
 		  _weights[offset + j] = w[2];
 	      }
 
-	      
+
 	      // Original rule by Keast, unsuitable because it has points on the
 	      // reference element boundary!
 	      // 	      _points.resize(15);
 	      // 	      _weights.resize(15);
-		    
+
 	      // 	      _points[0](0) = 0.25;
 	      // 	      _points[0](1) = 0.25;
 	      // 	      _points[0](2) = 0.25;
@@ -300,19 +300,19 @@ void QGauss::init_3D(const ElemType _type,
 	      // 	      {
 	      // 		const Real a = 0.;
 	      // 		const Real b = 0.333333333333333333333333333333333333333;
-		
+
 	      // 		_points[1](0) = a;
 	      // 		_points[1](1) = b;
 	      // 		_points[1](2) = b;
-		
+
 	      // 		_points[2](0) = b;
 	      // 		_points[2](1) = a;
 	      // 		_points[2](2) = b;
-		
+
 	      // 		_points[3](0) = b;
 	      // 		_points[3](1) = b;
 	      // 		_points[3](2) = a;
-		
+
 	      // 		_points[4](0) = b;
 	      // 		_points[4](1) = b;
 	      // 		_points[4](2) = b;
@@ -320,19 +320,19 @@ void QGauss::init_3D(const ElemType _type,
 	      // 	      {
 	      // 		const Real a = 0.7272727272727272727272727272727272727272727272727272727;
 	      // 		const Real b = 0.0909090909090909090909090909090909090909090909090909091;
-		
+
 	      // 		_points[5](0) = a;
 	      // 		_points[5](1) = b;
 	      // 		_points[5](2) = b;
-		
+
 	      // 		_points[6](0) = b;
 	      // 		_points[6](1) = a;
 	      // 		_points[6](2) = b;
-		
+
 	      // 		_points[7](0) = b;
 	      // 		_points[7](1) = b;
 	      // 		_points[7](2) = a;
-		
+
 	      // 		_points[8](0) = b;
 	      // 		_points[8](1) = b;
 	      // 		_points[8](2) = b;
@@ -340,32 +340,32 @@ void QGauss::init_3D(const ElemType _type,
 	      // 	      {
 	      // 		const Real a = 0.066550153573664;
 	      // 		const Real b = 0.433449846426336;
-		
+
 	      // 		_points[9](0) = b;
 	      // 		_points[9](1) = a;
 	      // 		_points[9](2) = a;
-		
+
 	      // 		_points[10](0) = a;
 	      // 		_points[10](1) = a;
 	      // 		_points[10](2) = b;
-		
+
 	      // 		_points[11](0) = a;
 	      // 		_points[11](1) = b;
 	      // 		_points[11](2) = b;
-		
+
 	      // 		_points[12](0) = b;
 	      // 		_points[12](1) = a;
 	      // 		_points[12](2) = b;
-		
+
 	      // 		_points[13](0) = b;
 	      // 		_points[13](1) = b;
 	      // 		_points[13](2) = a;
-		
+
 	      // 		_points[14](0) = a;
 	      // 		_points[14](1) = b;
-	      // 		_points[14](2) = a;		
+	      // 		_points[14](2) = a;
 	      // 	      }
-	      
+
 	      // 	      _weights[0]  = 0.030283678097089;
 	      // 	      _weights[1]  = 0.006026785714286;
 	      // 	      _weights[2]  = _weights[1];
@@ -381,13 +381,13 @@ void QGauss::init_3D(const ElemType _type,
 	      // 	      _weights[12] = _weights[9];
 	      // 	      _weights[13] = _weights[9];
 	      // 	      _weights[14] = _weights[9];
-	      
+
 	      return;
 	    }
 
 
 
-	    
+
 	    // This rule is originally from Keast:
 	    //    Patrick Keast,
 	    //    Moderate Degree Tetrahedral Quadrature Formulas,
@@ -409,10 +409,10 @@ void QGauss::init_3D(const ElemType _type,
 		{0.356191386222544953e+00 , 0.214602871259151684e+00 ,                       0., 0.00665379170969464506e+00}, // 4
 		{0.877978124396165982e+00 , 0.0406739585346113397e+00,                       0., 0.00167953517588677620e+00}, // 4
 		{0.0329863295731730594e+00, 0.322337890142275646e+00 ,                       0., 0.00922619692394239843e+00}, // 4
-		{0.0636610018750175299e+00, 0.269672331458315867e+00 , 0.603005664791649076e+00, 0.00803571428571428248e+00}  // 12    
+		{0.0636610018750175299e+00, 0.269672331458315867e+00 , 0.603005664791649076e+00, 0.00803571428571428248e+00}  // 12
 	      };
 
-	      
+
 	      // Now call the keast routine to generate _points and _weights
 	      keast_rule(p, 4);
 
@@ -446,7 +446,7 @@ void QGauss::init_3D(const ElemType _type,
 		    {0.379700484718286102e-01,  0.730313427807538396e+00,  0.193746475248804382e+00,    0.223873973961420164e-02}   // 12
 		  };
 
-	      
+
 		  // Now call the keast routine to generate _points and _weights
 		  keast_rule(p, 7);
 
@@ -491,15 +491,15 @@ void QGauss::init_3D(const ElemType _type,
 		  // Swap points and weights with the about-to-be destroyed rule.
 		  _points.swap (conical_rule.get_points() );
 		  _weights.swap(conical_rule.get_weights());
-		  
+
 		  return;
 		}
 	    }
 	  }
       } // end case TET4,TET10
 
-      
-	    
+
+
       //---------------------------------------------
       // Prism quadrature rules
     case PRISM6:
@@ -509,21 +509,21 @@ void QGauss::init_3D(const ElemType _type,
 	// We compute the 3D quadrature rule as a tensor
 	// product of the 1D quadrature rule and a 2D
 	// triangle quadrature rule
-	    
+
 	QGauss q1D(1,_order);
 	QGauss q2D(2,_order);
 
-	// Initialize 
+	// Initialize
 	q1D.init(EDGE2,p);
 	q2D.init(TRI3,p);
 
 	tensor_product_prism(q1D, q2D);
-	
+
 	return;
       }
-      
 
-      
+
+
       //---------------------------------------------
       // Pyramid
     case PYRAMID5:
@@ -539,13 +539,13 @@ void QGauss::init_3D(const ElemType _type,
 	// Swap points and weights with the about-to-be destroyed rule.
 	_points.swap (conical_rule.get_points() );
 	_weights.swap(conical_rule.get_weights());
-	
+
 	return;
 
       }
 
 
-      
+
       //---------------------------------------------
       // Unsupported type
     default:
@@ -558,7 +558,7 @@ void QGauss::init_3D(const ElemType _type,
   libmesh_error();
 
   return;
-  
+
 #endif
 }
 

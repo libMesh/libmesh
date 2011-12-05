@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -79,9 +79,9 @@ NumericVector<T>::build(const SolverPackage solver_package)
       AutoPtr<NumericVector<T> > ap(new DistributedVector<T>);
       return ap;
     }
-    
+
   AutoPtr<NumericVector<T> > ap(NULL);
-  return ap;    
+  return ap;
 }
 
 
@@ -297,12 +297,12 @@ template <class T>
 Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices) const
 {
   const NumericVector<T> & v = *this;
-  
+
   std::set<unsigned int>::const_iterator it = indices.begin();
   const std::set<unsigned int>::const_iterator it_end = indices.end();
 
   Real norm = 0;
-  
+
   for(; it!=it_end; ++it)
     norm += std::abs(v(*it));
 
@@ -320,7 +320,7 @@ Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices) c
   const std::set<unsigned int>::const_iterator it_end = indices.end();
 
   Real norm = 0;
-  
+
   for(; it!=it_end; ++it)
     norm += libmesh_norm(v(*it));
 
@@ -338,7 +338,7 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<unsigned int> & indice
   const std::set<unsigned int>::const_iterator it_end = indices.end();
 
   Real norm = 0;
-  
+
   for(; it!=it_end; ++it)
     {
       Real value = std::abs(v(*it));

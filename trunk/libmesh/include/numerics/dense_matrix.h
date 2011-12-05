@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -45,7 +45,7 @@ template <typename T> class DenseVector;
  * into a global matrix.
  *
  * @author Benjamin S. Kirk, 2002
- */ 
+ */
 
 // ------------------------------------------------------------
 // Dense Matrix class definition
@@ -53,23 +53,23 @@ template<typename T>
 class DenseMatrix : public DenseMatrixBase<T>
 {
 public:
-  
+
   /**
    * Constructor.  Creates a dense matrix of dimension \p m by \p n.
    */
   DenseMatrix(const unsigned int m=0,
 	      const unsigned int n=0);
-  
+
   /**
    * Copy-constructor.
    */
   //DenseMatrix (const DenseMatrix<T>& other_matrix);
-  
+
   /**
    * Destructor.  Empty.
-   */     
+   */
   virtual ~DenseMatrix() {}
-  
+
 
   /**
    * Set every element in the matrix to 0.
@@ -98,13 +98,13 @@ public:
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T & el(const unsigned int i,
-		 const unsigned int j)     { return (*this)(i,j); } 
+		 const unsigned int j)     { return (*this)(i,j); }
 
   /**
    * Left multipliess by the matrix \p M2.
    */
   virtual void left_multiply (const DenseMatrixBase<T>& M2);
-  
+
   /**
    * Right multiplies by the matrix \p M3.
    */
@@ -121,12 +121,12 @@ public:
    * \p dest := (*this)^T * \p arg.
    */
   void vector_mult_transpose(DenseVector<T>& dest, const DenseVector<T>& arg) const;
-  
+
   /**
    * Performs the scaled matrix-vector multiplication,
-   * \p dest += \p factor * (*this) * \p arg. 
+   * \p dest += \p factor * (*this) * \p arg.
    */
-  void vector_mult_add (DenseVector<T>& dest, 
+  void vector_mult_add (DenseVector<T>& dest,
                         const T factor,
                         const DenseVector<T>& arg) const;
 
@@ -144,19 +144,19 @@ public:
    * Assignment operator.
    */
   DenseMatrix<T>& operator = (const DenseMatrix<T>& other_matrix);
-  
+
   /**
    * STL-like swap method
    */
   void swap(DenseMatrix<T>& other_matrix);
-  
+
   /**
    * Resize the matrix.  Will never free memory, but may
    * allocate more.  Sets all elements to 0.
    */
   void resize(const unsigned int m,
 	      const unsigned int n);
-  
+
   /**
    * Multiplies every element in the matrix by \p factor.
    */
@@ -236,13 +236,13 @@ public:
    * Left multiplies by the transpose of the matrix \p A.
    */
   void left_multiply_transpose (const DenseMatrix<T>& A);
-  
+
 
   /**
    * Right multiplies by the transpose of the matrix \p A
    */
   void right_multiply_transpose (const DenseMatrix<T>& A);
-  
+
   /**
    * @returns the \p (i,j) element of the transposed matrix.
    */
@@ -253,7 +253,7 @@ public:
    * Put the tranposed matrix into \p dest.
    */
   void get_transpose(DenseMatrix<T>& dest) const;
- 
+
   /**
    * Access to the values array.  This should be used with
    * caution but can  be used to speed up code compilation
@@ -326,7 +326,7 @@ public:
    */
   void svd(DenseVector<T>& sigma, DenseMatrix<T>& U, DenseMatrix<T>& VT);
 
-  
+
   /**
    * @returns the determinant of the matrix.  Note that this means
    * doing an LU decomposition and then computing the product of the
@@ -350,7 +350,7 @@ public:
    * removed...
    */
   bool use_blas_lapack;
-  
+
 private:
 
   /**
@@ -364,7 +364,7 @@ private:
    * of the lu_solve(...) function.
    */
   void _lu_decompose ();
-  
+
   /**
    * Solves the system Ax=b through back substitution.  This function
    * is private since it is only called as part of the implementation
@@ -372,7 +372,7 @@ private:
    */
   void _lu_back_substitute (const DenseVector<T>& b,
 			    DenseVector<T>& x) const;
-  
+
   /**
    * Decomposes a symmetric positive definite matrix into a
    * product of two lower triangular matrices according to
@@ -396,7 +396,7 @@ private:
    * A.  It is therefore an error to call A.lu_solve() and subsequently
    * call A.cholesky_solve() since the result will probably not match
    * any desired outcome.  This typedef keeps track of which decomposition
-   * has been called for this matrix.  
+   * has been called for this matrix.
    */
   enum DecompositionType {LU=0, CHOLESKY=1, LU_BLAS_LAPACK, NONE};
 
@@ -416,7 +416,7 @@ private:
     LEFT_MULTIPLY_TRANSPOSE,
     RIGHT_MULTIPLY_TRANSPOSE
   };
-  
+
   /**
    * The _multiply_blas function computes A <- op(A) * op(B) using
    * BLAS gemm function.  Used in the right_multiply(),
@@ -444,7 +444,7 @@ private:
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
   void _svd_lapack(DenseVector<T>& sigma);
-  
+
   /**
    * Computes a "reduced" SVD of the matrix using the
    * Lapack routine "getsvd".
@@ -527,7 +527,7 @@ namespace DenseMatrices
    * is likely to be more efficient for
    * real than for complex data.
    */
-  typedef DenseMatrix<Complex> ComplexDenseMatrix;  
+  typedef DenseMatrix<Complex> ComplexDenseMatrix;
 
 }
 
@@ -586,7 +586,7 @@ void DenseMatrix<T>::swap(DenseMatrix<T>& other_matrix)
 }
 
 
-  
+
 template<typename T>
 inline
 void DenseMatrix<T>::resize(const unsigned int m,
@@ -643,8 +643,8 @@ T DenseMatrix<T>::operator () (const unsigned int i,
   libmesh_assert (i*j<_val.size());
   libmesh_assert (i < this->_m);
   libmesh_assert (j < this->_n);
-  
-  
+
+
   //  return _val[(i) + (this->_m)*(j)]; // col-major
   return _val[(i)*(this->_n) + (j)]; // row-major
 }
@@ -659,13 +659,13 @@ T & DenseMatrix<T>::operator () (const unsigned int i,
   libmesh_assert (i*j<_val.size());
   libmesh_assert (i < this->_m);
   libmesh_assert (j < this->_n);
-  
+
   //return _val[(i) + (this->_m)*(j)]; // col-major
   return _val[(i)*(this->_n) + (j)]; // row-major
 }
 
 
-     
+
 
 
 template<typename T>
@@ -882,7 +882,7 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 
 //   (*this)(iv,jv) = 1.;
 //   rhs(iv) = val;
-  
+
 // }
 
 

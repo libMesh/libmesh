@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,7 +41,7 @@ class Elem;
 
 /**
  * This class implements the Patch Recovery error indicator.
- * 
+ *
  *
  * @author Varis Carey, Benjamin S. Kirk, 2004.
  */
@@ -59,9 +59,9 @@ public:
     patch_growth_strategy(&Patch::add_local_face_neighbors),
     patch_reuse(true)
       { error_norm = H1_SEMINORM; }
-  
+
   /**
-   * Destructor.  
+   * Destructor.
    */
   ~PatchRecoveryErrorEstimator() {}
 
@@ -92,20 +92,20 @@ public:
   Patch::PMF patch_growth_strategy;
 
   void set_patch_reuse (bool );
-      
+
 private:
-    
+
   /**
    * Returns the spectral polynomial basis function values at a point x,y,z
    */
-  
+
   static std::vector<Real> specpoly(const unsigned int dim,
 				    const Order order,
 				    const Point p,
 				    const unsigned int matsize);
 
   bool patch_reuse ;
-  
+
   /**
    * Class to compute the error contribution for a range
    * of elements. May be executed in parallel on separate threads.
@@ -118,7 +118,7 @@ private:
 		   ErrorVector& epc) :
       system(sys),
       error_estimator(ee),
-      error_per_cell(epc)	
+      error_per_cell(epc)
     {}
 
     void operator()(const ConstElemRange &range) const;
@@ -126,13 +126,13 @@ private:
     /**
      * Function to set the boolean patch_reuse in case the user
      * wants to change the default behaviour of patch_recovery_error_estimator
-     */    
-        
+     */
+
   private:
-        
+
     const System &system;
     const PatchRecoveryErrorEstimator &error_estimator;
-    ErrorVector &error_per_cell;    
+    ErrorVector &error_per_cell;
   };
 
   friend class EstimateError;

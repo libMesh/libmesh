@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -61,9 +61,9 @@ typedef NumberVectorValue Gradient;
 class SystemSubset;
 
 /**
- * This is the base class for classes which contain 
- * information related to any physical process that might be simulated.  
- * Such information may range from the actual solution values to 
+ * This is the base class for classes which contain
+ * information related to any physical process that might be simulated.
+ * Such information may range from the actual solution values to
  * algorithmic flags that may be used to control the numerical methods
  * employed.  In general, use an \p EqnSystems<T_sys> object to handle
  * one or more of the children of this class.
@@ -85,11 +85,11 @@ public:
   System (EquationSystems& es,
 	  const std::string& name,
 	  const unsigned int number);
-  
+
   /**
    * Abstract base class to be used for sysem initialization.
-   * A user class derived from this class may be used to 
-   * intialize the system values by attaching an object 
+   * A user class derived from this class may be used to
+   * intialize the system values by attaching an object
    * with the method \p attach_init_object.
    */
   class Initialization
@@ -101,19 +101,19 @@ public:
     virtual ~Initialization () {};
 
     /**
-     * Initialization function.  This function will be called 
-     * to initialize the system values upon creation and must 
+     * Initialization function.  This function will be called
+     * to initialize the system values upon creation and must
      * be provided by the user in a derived class.
      */
     virtual void initialize () = 0;
   };
 
-  
+
 
   /**
    * Abstract base class to be used for sysem assembly.
-   * A user class derived from this class may be used to 
-   * assemble the system by attaching an object 
+   * A user class derived from this class may be used to
+   * assemble the system by attaching an object
    * with the method \p attach_assemble_object.
    */
   class Assembly
@@ -125,18 +125,18 @@ public:
     virtual ~Assembly () {};
 
     /**
-     * Assembly function.  This function will be called 
-     * to assemble the system prior to a solve and must 
+     * Assembly function.  This function will be called
+     * to assemble the system prior to a solve and must
      * be provided by the user in a derived class.
      */
     virtual void assemble () = 0;
   };
 
-  
+
 
   /**
    * Abstract base class to be used for sysem constraints.
-   * A user class derived from this class may be used to 
+   * A user class derived from this class may be used to
    * constrain the system by attaching an object
    * with the method \p attach_constraint_object.
    */
@@ -149,18 +149,18 @@ public:
     virtual ~Constraint () {};
 
     /**
-     * Constraint function.  This function will be called 
-     * to constrain the system prior to a solve and must 
+     * Constraint function.  This function will be called
+     * to constrain the system prior to a solve and must
      * be provided by the user in a derived class.
      */
     virtual void constrain () = 0;
   };
 
-  
+
 
   /**
    * Abstract base class to be used for quantities of interest.
-   * A user class derived from this class may be used to 
+   * A user class derived from this class may be used to
    * compute quantities of interest by attaching an object
    * with the method \p attach_QOI_object.
    */
@@ -173,18 +173,18 @@ public:
     virtual ~QOI () {};
 
     /**
-     * Quantitiy of interest function.  This function will be called 
-     * to compute quantities of interest and must be provided by the 
+     * Quantitiy of interest function.  This function will be called
+     * to compute quantities of interest and must be provided by the
      * user in a derived class.
      */
     virtual void qoi (const QoISet& qoi_indices) = 0;
   };
 
-  
+
 
   /**
-   * Abstract base class to be used for derivatives of quantities 
-   * of interest. A user class derived from this class may be used 
+   * Abstract base class to be used for derivatives of quantities
+   * of interest. A user class derived from this class may be used
    * to compute quantities of interest by attaching an object
    * with the method \p attach_QOI_derivative_object.
    */
@@ -197,14 +197,14 @@ public:
     virtual ~QOIDerivative () {};
 
     /**
-     * Quantitiy of interest derivative function. This function will 
-     * be called to compute derivatived of quantities of interest and 
+     * Quantitiy of interest derivative function. This function will
+     * be called to compute derivatived of quantities of interest and
      * must be provided by the user in a derived class.
      */
     virtual void qoi_derivative (const QoISet& qoi_indices) = 0;
   };
 
-  
+
 
   /**
    * Destructor.
@@ -220,33 +220,33 @@ public:
    * @returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
-  
+
   /**
    * Clear all the data structures associated with
    * the system.
    */
   virtual void clear ();
-  
-  /** 
+
+  /**
    * Initializes degrees of freedom on the current mesh.
-   * Sets the 
+   * Sets the
    */
   void init ();
-  
+
   /**
-   * Reinitializes degrees of freedom and other 
+   * Reinitializes degrees of freedom and other
    * required data on the current mesh.  Note that the matrix
    * is not initialized at this time since it may not be required
    * for all applications. @e Should be overloaded in derived classes.
    */
   virtual void reinit ();
-  
+
   /**
    * Update the local values to reflect the solution
    * on neighboring processors.
    */
   virtual void update ();
-  
+
   /**
    * Prepares \p matrix and \p _dof_map for matrix assembly.
    * Does not actually assemble anything.  For matrix assembly,
@@ -261,14 +261,14 @@ public:
    */
   virtual void assemble_qoi
     (const QoISet &qoi_indices = QoISet());
- 
+
   /**
    * Calls user qoi derivative function.
    * @e Can be overloaded in derived classes.
    */
-  virtual void assemble_qoi_derivative 
+  virtual void assemble_qoi_derivative
     (const QoISet &qoi_indices = QoISet());
- 
+
   /**
    * Calls residual parameter derivative function.
    *
@@ -289,12 +289,12 @@ public:
    */
   virtual void restrict_solve_to (const SystemSubset* subset,
 				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
- 
+
   /**
    * Solves the system.  Should be overloaded in derived systems.
    */
   virtual void solve () {}
-  
+
   /**
    * Solves the sensitivity system, for the provided parameters.
    * Must be overloaded in derived systems.
@@ -306,7 +306,7 @@ public:
    */
   virtual std::pair<unsigned int, Real>
     sensitivity_solve (const ParameterVector& parameters);
-  
+
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
    * those parameters p contained within \p parameters weighted by the
@@ -320,7 +320,7 @@ public:
   virtual std::pair<unsigned int, Real>
     weighted_sensitivity_solve (const ParameterVector& parameters,
                                 const ParameterVector& weights);
- 
+
   /**
    * Solves the adjoint system, for the specified qoi indices, or for
    * every qoi if \p qoi_indices is NULL.  Must be overloaded in
@@ -333,9 +333,9 @@ public:
    */
   virtual std::pair<unsigned int, Real>
     adjoint_solve (const QoISet& qoi_indices = QoISet());
-  
+
   /**
-   * Assembles & solves the linear system(s) 
+   * Assembles & solves the linear system(s)
    * (dR/du)^T*z_w = sum(w_p*(d^2q/dudp - d^2R/dudp*z)), for those
    * parameters p contained within \p parameters, weighted by the
    * values w_p found within \p weights.
@@ -352,12 +352,12 @@ public:
     weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
                                         const ParameterVector& weights,
                                         const QoISet& qoi_indices = QoISet());
- 
+
   /**
    * Solves for the derivative of each of the system's quantities of
    * interest q in \p qoi[qoi_indices] with respect to each parameter
    * in \p parameters, placing the result for qoi \p i and parameter
-   * \p j into \p sensitivities[i][j].  
+   * \p j into \p sensitivities[i][j].
    *
    * Note that parameters is a const vector, not a vector-of-const;
    * parameter values in this vector need to be mutable for finite
@@ -373,7 +373,7 @@ public:
   virtual void qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                           const ParameterVector& parameters,
                                           SensitivityData& sensitivities);
-  
+
   /**
    * Solves for parameter sensitivities using the adjoint method.
    *
@@ -382,7 +382,7 @@ public:
   virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
                                                   SensitivityData& sensitivities);
-  
+
   /**
    * Solves for parameter sensitivities using the forward method.
    *
@@ -391,14 +391,14 @@ public:
   virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
                                                   const ParameterVector& parameters,
                                                   SensitivityData& sensitivities);
-  
+
   /**
-   * For each of the system's quantities of interest q in 
+   * For each of the system's quantities of interest q in
    * \p qoi[qoi_indices], and for a vector of parameters p, the
-   * parameter sensitivity Hessian H_ij is defined as 
+   * parameter sensitivity Hessian H_ij is defined as
    * H_ij = (d^2 q)/(d p_i d p_j)
    * This Hessian is the output of this method, where for each q_i,
-   * H_jk is stored in \p hessian.second_derivative(i,j,k).  
+   * H_jk is stored in \p hessian.second_derivative(i,j,k).
    *
    * This method is only implemented in some derived classes.
    */
@@ -407,14 +407,14 @@ public:
                                      SensitivityData& hessian);
 
   /**
-   * For each of the system's quantities of interest q in 
+   * For each of the system's quantities of interest q in
    * \p qoi[qoi_indices], and for a vector of parameters p, the
-   * parameter sensitivity Hessian H_ij is defined as 
+   * parameter sensitivity Hessian H_ij is defined as
    * H_ij = (d^2 q)/(d p_i d p_j)
    * The Hessian-vector product, for a vector v_k in parameter space, is
    * S_j = H_jk v_k
    * This product is the output of this method, where for each q_i,
-   * S_j is stored in \p sensitivities[i][j].  
+   * S_j is stored in \p sensitivities[i][j].
    *
    * This method is only implemented in some derived classes.
    */
@@ -422,13 +422,13 @@ public:
                                                     const ParameterVector& parameters,
                                                     const ParameterVector& vector,
                                                     SensitivityData& product);
-  
+
   /**
    * @returns \p true when the other system contains
    * identical data, up to the given threshold.  Outputs
    * some diagnostic info when \p verbose is set.
    */
-  virtual bool compare (const System& other_system, 
+  virtual bool compare (const System& other_system,
 			const Real threshold,
 			const bool verbose) const;
 
@@ -445,7 +445,7 @@ public:
   virtual std::string system_type () const { return "Basic"; }
 
   /**
-   * Projects the continuous functions onto the current solution. 
+   * Projects the continuous functions onto the current solution.
    */
   void project_solution (Number fptr(const Point& p,
 				     const Parameters& parameters,
@@ -470,12 +470,12 @@ public:
 				     const std::string& unknown_name),
 		       Parameters& parameters,
 		       NumericVector<Number>& new_vector) const;
-  
+
   /**
-   * @returns the system number.   
+   * @returns the system number.
    */
   unsigned int number () const;
-  
+
   /**
    * Fill the input vector \p global_soln so that it contains
    * the global solution on all processors.
@@ -495,17 +495,17 @@ public:
    * @returns a constant reference to this systems's \p _mesh.
    */
   const MeshBase & get_mesh() const;
-  
+
   /**
    * @returns a reference to this systems's \p _mesh.
    */
   MeshBase & get_mesh();
-  
+
   /**
    * @returns a constant reference to this system's \p _dof_map.
    */
   const DofMap & get_dof_map() const;
-  
+
   /**
    * @returns a writeable reference to this system's \p _dof_map.
    */
@@ -578,7 +578,7 @@ public:
    * allowed @e prior to \p init().  All the additional vectors
    * are similarly distributed, like the \p solution,
    * and inititialized to zero.
-   * 
+   *
    * By default vectors added by add_vector are projected to changed grids by
    * reinit().  To zero them instead (more efficient), pass "false" as the
    * second argument
@@ -594,25 +594,25 @@ public:
    */
   bool& project_solution_on_reinit (void)
     { return _solution_projection; }
-  
+
   /**
    * @returns \p true if this \p System has a vector associated with the
    * given name, \p false otherwise.
    */
   bool have_vector (const std::string& vec_name) const;
-  
+
   /**
    * @returns a const pointer to the vector if this \p System has a
    * vector associated with the given name, \p NULL otherwise.
    */
   const NumericVector<Number> * request_vector (const std::string& vec_name) const;
-  
+
   /**
    * @returns a pointer to the vector if this \p System has a
    * vector associated with the given name, \p NULL otherwise.
    */
   NumericVector<Number> * request_vector (const std::string& vec_name);
-  
+
   /**
    * @returns a const pointer to this system's @e additional vector
    * number \p vec_num (where the vectors are counted starting with
@@ -774,7 +774,7 @@ public:
    * By default these vectors are built by the library, using finite
    * differences, when \p assemble_residual_derivatives() is called.
    *
-   * When assembled, this vector should hold 
+   * When assembled, this vector should hold
    * -(partial R / partial p_i)
    */
   NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0);
@@ -813,7 +813,7 @@ public:
    * in the system.
    */
   unsigned int n_constrained_dofs() const;
-  
+
   /**
    * @returns the number of degrees of freedom local
    * to this processor
@@ -838,7 +838,7 @@ public:
 		             const FEFamily = LAGRANGE,
 			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
-  /** 
+  /**
    * Return a constant reference to \p Variable \p var.
    */
   const Variable & variable (unsigned int var) const;
@@ -847,12 +847,12 @@ public:
    * @returns true if a variable named \p var exists in this System
    */
   bool has_variable(const std::string& var) const;
-  
+
   /**
    * @returns the name of variable \p i.
    */
   const std::string & variable_name(const unsigned int i) const;
-  
+
   /**
    * @returns the variable number assoicated with
    * the user-specified variable named \p var.
@@ -936,7 +936,7 @@ public:
    */
   void write_parallel_data (Xdr &io,
 			    const bool write_additional_data) const;
-  
+
   /**
    * @returns a string containing information about the
    * system.
@@ -949,36 +949,36 @@ public:
   void attach_init_function (void fptr(EquationSystems& es,
 				       const std::string& name));
 
-  /** 
-   * Register a user class to use to initialize the system.  
+  /**
+   * Register a user class to use to initialize the system.
    * Note this is exclusive with the \p attach_init_function.
    */
   void attach_init_object (Initialization& init);
-  
+
   /**
    * Register a user function to use in assembling the system
    * matrix and RHS.
    */
   void attach_assemble_function (void fptr(EquationSystems& es,
 					   const std::string& name));
-  
+
   /**
    * Register a user object to use in assembling the system
    * matrix and RHS.
    */
   void attach_assemble_object (Assembly& assemble);
-  
+
   /**
    * Register a user function for imposing constraints.
    */
   void attach_constraint_function (void fptr(EquationSystems& es,
 					     const std::string& name));
-  
+
   /**
    * Register a user object for imposing constraints.
    */
   void attach_constraint_object (Constraint& constrain);
-  
+
   /**
    * Register a user function for evaluating the quantities of interest,
    * whose values should be placed in \p System::qoi
@@ -986,12 +986,12 @@ public:
   void attach_QOI_function (void fptr(EquationSystems& es,
 				      const std::string& name,
                                       const QoISet& qoi_indices));
-  
+
   /**
    * Register a user object for evaluating the quantities of interest,
    * whose values should be placed in \p System::qoi
    */
-  void attach_QOI_object (QOI& qoi); 
+  void attach_QOI_object (QOI& qoi);
 
   /**
    * Register a user function for evaluating derivatives of a quantity
@@ -1001,26 +1001,26 @@ public:
   void attach_QOI_derivative (void fptr(EquationSystems& es,
 				        const std::string& name,
                                         const QoISet& qoi_indices));
-  
+
   /**
    * Register a user object for evaluating derivatives of a quantity
    * of interest with respect to test functions, whose values should
    * be placed in \p System::rhs
    */
-  void attach_QOI_derivative_object (QOIDerivative& qoi_derivative); 
+  void attach_QOI_derivative_object (QOIDerivative& qoi_derivative);
 
   /**
    * Calls user's attached initialization function, or is overloaded by
    * the user in derived classes.
    */
   virtual void user_initialization ();
-  
+
   /**
    * Calls user's attached assembly function, or is overloaded by
    * the user in derived classes.
    */
   virtual void user_assembly ();
-  
+
   /**
    * Calls user's attached constraint function, or is overloaded by
    * the user in derived classes.
@@ -1087,8 +1087,8 @@ public:
    * By default, every call to solve() begins with a call to the
    * user assemble, so this flag is true.  (For explicit systems,
    * "solving" the system occurs during the assembly step, so this
-   * flag is always true for explicit systems.)  
-   * 
+   * flag is always true for explicit systems.)
+   *
    * You will only want to set this to false if you need direct
    * control over when the system is assembled, and are willing to
    * track the state of its assembly yourself.  An example of such a
@@ -1112,7 +1112,7 @@ public:
    * called.
    */
   bool use_fixed_solution;
-  
+
   /**
    * A member int that can be employed to indicate increased or
    * reduced quadrature order.
@@ -1131,7 +1131,7 @@ public:
 
   //--------------------------------------------------
   // The solution and solution access members
-  
+
   /**
    * @returns the current solution for the specified global
    * DOF.
@@ -1204,12 +1204,12 @@ public:
                           const bool insist_on_success = true) const;
 
   /**
-   * Returns the second derivative tensor of the solution variable \p var 
+   * Returns the second derivative tensor of the solution variable \p var
    * at the physical point \p p in the mesh, similarly to point_value.
    */
   Tensor point_hessian(unsigned int var, const Point &p,
                        const bool insist_on_success = true) const;
- 
+
   /**
    * Fills the std::set with the degrees of freedom on the local
    * processor corresponding the the variable number passed in.
@@ -1234,7 +1234,7 @@ protected:
 
   /**
    * Projects the vector defined on the old mesh onto the
-   * new mesh. 
+   * new mesh.
    */
   void project_vector (NumericVector<Number>&) const;
 
@@ -1255,7 +1255,7 @@ protected:
    * Variables from which to acquire moving mesh information
    */
   unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
-  
+
 private:
   /**
    * This isn't a copyable object, so let's make sure nobody tries.
@@ -1285,7 +1285,7 @@ private:
    * Reads an input vector from the stream \p io and assigns
    * the values to a set of \p DofObjects.  This method uses
    * blocked input and is safe to call on a distributed memory-mesh.
-   */   
+   */
   template <typename iterator_type>
   unsigned int read_serialized_blocked_dof_objects (const unsigned int var,
 						    const unsigned int n_objects,
@@ -1312,7 +1312,7 @@ private:
   /**
    * Writes an output vector to the stream \p io for a set of \p DofObjects.
    * This method uses blocked output and is safe to call on a distributed memory-mesh.
-   */   
+   */
   template <typename iterator_type>
   unsigned int write_serialized_blocked_dof_objects (const NumericVector<Number> &vec,
 						     const unsigned int var,
@@ -1323,7 +1323,7 @@ private:
 
   /**
    * Writes the SCALAR dofs associated with var to the stream \p io.
-   */   						     
+   */
   unsigned int write_SCALAR_dofs (const NumericVector<Number> &vec,
                                   const unsigned int var,
 				  Xdr &io) const;
@@ -1360,7 +1360,7 @@ private:
   /**
    * Function to impose constraints.
    */
-  void (* _constrain_system_function) (EquationSystems& es, 
+  void (* _constrain_system_function) (EquationSystems& es,
 				       const std::string& name);
 
   /**
@@ -1371,7 +1371,7 @@ private:
   /**
    * Function to evaluate quantity of interest
    */
-  void (* _qoi_evaluate_function) (EquationSystems& es, 
+  void (* _qoi_evaluate_function) (EquationSystems& es,
 				   const std::string& name,
 				   const QoISet& qoi_indices);
 
@@ -1383,7 +1383,7 @@ private:
   /**
    * Function to evaluate quantity of interest derivative
    */
-  void (* _qoi_evaluate_derivative_function) (EquationSystems& es, 
+  void (* _qoi_evaluate_derivative_function) (EquationSystems& es,
 					      const std::string& name,
 					      const QoISet& qoi_indices);
 
@@ -1403,13 +1403,13 @@ private:
    * used for the simulation.
    */
   EquationSystems& _equation_systems;
-  
+
   /**
    * Constant reference to the \p mesh data structure used
-   * for the simulation.   
+   * for the simulation.
    */
   MeshBase& _mesh;
-  
+
   /**
    * A name associated with this system.
    */
@@ -1419,7 +1419,7 @@ private:
    * The number associated with this system
    */
   const unsigned int _sys_number;
-  
+
   /**
    * The \p Variables in this \p System.
    */
@@ -1435,7 +1435,7 @@ private:
    * Flag stating if the system is active or not.
    */
   bool _active;
-  
+
   /**
    * Some systems need an arbitrary number of vectors.
    * This map allows names to be associated with arbitrary
@@ -1493,11 +1493,11 @@ private:
   std::vector<unsigned int> _written_var_indices;
 
   /**
-   * This class implements projecting a vector from 
+   * This class implements projecting a vector from
    * an old mesh to the newly refined mesh.  This
    * may be executed in parallel on multiple threads.
    */
-  class ProjectVector 
+  class ProjectVector
   {
   private:
     const System                &system;
@@ -1512,7 +1512,7 @@ private:
     old_vector(old_v_in),
     new_vector(new_v_in)
     {}
-    
+
     void operator()(const ConstElemRange &range) const;
   };
 
@@ -1521,7 +1521,7 @@ private:
    * This class builds the send_list of old dof indices
    * whose coefficients are needed to perform a projection.
    * This may be executed in parallel on multiple threads.
-   * The end result is a \p send_list vector which is 
+   * The end result is a \p send_list vector which is
    * unsorted and may contain duplicate elements.
    * The \p unique() method can be used to sort and
    * create a unique list.
@@ -1541,7 +1541,7 @@ private:
       system(other.system),
       send_list()
     {}
-    
+
     void unique();
     void operator()(const ConstElemRange &range);
     void join (const BuildProjectionList &other);
@@ -1551,7 +1551,7 @@ private:
 
 
   /**
-   * This class implements projecting a vector from 
+   * This class implements projecting a vector from
    * an old mesh to the newly refined mesh.  This
    * may be exectued in parallel on multiple threads.
    */
@@ -1591,7 +1591,7 @@ private:
     parameters(parameters_in),
     new_vector(new_v_in)
     {}
-    
+
     void operator()(const ConstElemRange &range) const;
   };
 };
@@ -1651,7 +1651,7 @@ DofMap & System::get_dof_map()
 inline
 bool System::active() const
 {
-  return _active;  
+  return _active;
 }
 
 
@@ -1712,7 +1712,7 @@ inline
 const FEType & System::variable_type (const unsigned int i) const
 {
   libmesh_assert (i < _variables.size());
-  
+
   return _variables[i].type();
 }
 
@@ -1745,7 +1745,7 @@ bool System::have_vector (const std::string& vec_name) const
 inline
 unsigned int System::n_vectors () const
 {
-  return _vectors.size(); 
+  return _vectors.size();
 }
 
 inline

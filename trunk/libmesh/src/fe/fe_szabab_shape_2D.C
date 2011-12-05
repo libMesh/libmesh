@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -59,7 +59,7 @@ Real FE<2,SZABAB>::shape(const ElemType,
   libMesh::err << "Szabo-Babuska polynomials require the element type\n"
 	        << "because edge orientation is needed."
 	        << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -73,7 +73,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 			 const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
@@ -81,9 +81,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
   using Utility::pow;
-  
+
   switch (totalorder)
-    {      
+    {
       // 1st & 2nd-order Szabo-Babuska.
     case FIRST:
     case SECOND:
@@ -96,25 +96,25 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	    {
 	      const Real l1 = 1-p(0)-p(1);
 	      const Real l2 = p(0);
-	      const Real l3 = p(1);	      
-	      
+	      const Real l3 = p(1);
+
 	      libmesh_assert (i<6);
-	      
+
 	      switch (i)
 		{
-		case 0: return l1;		
-		case 1: return l2;		  
+		case 0: return l1;
+		case 1: return l2;
 		case 2: return l3;
-		  
-		case 3: return l1*l2*(-4.*sqrt6);			  
-		case 4: return l2*l3*(-4.*sqrt6);		  
-		case 5: return l3*l1*(-4.*sqrt6);	
-		  
+
+		case 3: return l1*l2*(-4.*sqrt6);
+		case 4: return l2*l3*(-4.*sqrt6);
+		case 5: return l3*l1*(-4.*sqrt6);
+
 		default:
 		  libmesh_error();
 		}
 	    }
-    
+
 
 	    // Szabo-Babuska shape functions on the quadrilateral.
 	  case QUAD8:
@@ -123,73 +123,73 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 9);
-	      
+
 	      //                                0  1  2  3  4  5  6  7  8
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
-	      
+
 	      return (FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
 		      FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
-	      
+
 	    }
 
-	    
+
 	  default:
 	    libmesh_error();
 	  }
       }
-	   
+
 
       // 3rd-order Szabo-Babuska.
     case THIRD:
       {
 	switch (type)
 	  {
-	 
+
 	    // Szabo-Babuska shape functions on the triangle.
 	  case TRI6:
 	    {
 	      Real l1 = 1-p(0)-p(1);
 	      Real l2 = p(0);
 	      Real l3 = p(1);
-	      
+
 	      Real f=1;
-	      
+
 	      libmesh_assert (i<10);
 
 
 	      if (i==4 && (elem->point(0) > elem->point(1)))f=-1;
-	      if (i==6 && (elem->point(1) > elem->point(2)))f=-1;     
+	      if (i==6 && (elem->point(1) > elem->point(2)))f=-1;
 	      if (i==8 && (elem->point(2) > elem->point(0)))f=-1;
 
 
 	      switch (i)
 		{
 		  //nodal modes
-		case 0: return l1;		
-		case 1: return l2;		  
+		case 0: return l1;
+		case 1: return l2;
 		case 2: return l3;
-		  
+
 		  //side modes
-		case 3: return   l1*l2*(-4.*sqrt6);			  
+		case 3: return   l1*l2*(-4.*sqrt6);
 		case 4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);
 
-		case 5: return   l2*l3*(-4.*sqrt6);		  
+		case 5: return   l2*l3*(-4.*sqrt6);
 		case 6: return f*l2*l3*(-4.*sqrt10)*(l3-l2);
-	  
+
 		case 7: return   l3*l1*(-4.*sqrt6);
-		case 8: return f*l3*l1*(-4.*sqrt10)*(l1-l3);	
-		
+		case 8: return f*l3*l1*(-4.*sqrt10)*(l1-l3);
+
 		  //internal modes
 		case 9: return l1*l2*l3;
-	
+
 		default:
 		  libmesh_error();
 		}
 	    }
-	    
+
 
 	    // Szabo-Babuska shape functions on the quadrilateral.
 	  case QUAD8:
@@ -198,22 +198,22 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 16);
 
 	      //                                0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 	      static const unsigned int i0[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
 	      static const unsigned int i1[] = {0,  0,  1,  1,  0,  0,  2,  3,  1,  1,  2,  3,  2,  2,  3,  3};
-	      	
+
 	      Real f=1.;
-	      	      
+
 	      // take care of edge orientation, this is needed at
 	      // edge shapes with (y=0)-asymmetric 1D shapes, these have
 	      // one 1D shape index being 0 or 1, the other one being odd and >=3
-	      	     
+
 	      switch(i)
 		{
-		case  5: // edge 0 points    			
+		case  5: // edge 0 points
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case  7: // edge 1 points
@@ -225,8 +225,8 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	        case 11: // edge 3 points
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	      
-	      
+		}
+
 	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
 			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 	    }
@@ -235,9 +235,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	    libmesh_error();
 	  }
       }
-	   
 
-      
+
+
 
       // 4th-order Szabo-Babuska.
     case FOURTH:
@@ -250,48 +250,48 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      Real l1 = 1-p(0)-p(1);
 	      Real l2 = p(0);
 	      Real l3 = p(1);
-	      
+
 	      Real f=1;
-	      
+
 	      libmesh_assert (i<15);
-	      
-	      
+
+
 	      if (i== 4 && (elem->point(0) > elem->point(1)))f=-1;
-	      if (i== 7 && (elem->point(1) > elem->point(2)))f=-1;     
+	      if (i== 7 && (elem->point(1) > elem->point(2)))f=-1;
 	      if (i==10 && (elem->point(2) > elem->point(0)))f=-1;
-	      
+
 
 	      switch (i)
 		{
 		  //nodal modes
-		case  0: return l1;		
-		case  1: return l2;		  
+		case  0: return l1;
+		case  1: return l2;
 		case  2: return l3;
-		  
+
 		  //side modes
-		case  3: return   l1*l2*(-4.*sqrt6);			  
+		case  3: return   l1*l2*(-4.*sqrt6);
 		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);
-		case  5: return   l1*l2*(-sqrt14)*(5.*pow<2>(l2-l1)-1);		  
-		  
-		case  6: return   l2*l3*(-4.*sqrt6);	
-		case  7: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
-		case  8: return   l2*l3*(-sqrt14)*(5.*pow<2>(l3-l2)-1);	  
-		  
-		case  9: return   l3*l1*(-4.*sqrt6);		  
-		case 10: return f*l3*l1*(-4.*sqrt10)*(l1-l3);		
+		case  5: return   l1*l2*(-sqrt14)*(5.*pow<2>(l2-l1)-1);
+
+		case  6: return   l2*l3*(-4.*sqrt6);
+		case  7: return f*l2*l3*(-4.*sqrt10)*(l3-l2);
+		case  8: return   l2*l3*(-sqrt14)*(5.*pow<2>(l3-l2)-1);
+
+		case  9: return   l3*l1*(-4.*sqrt6);
+		case 10: return f*l3*l1*(-4.*sqrt10)*(l1-l3);
 		case 11: return   l3*l1*(-sqrt14)*(5.*pow<2>(l1-l3)-1);
-		  
+
 		  //internal modes
 		case 12: return l1*l2*l3;
-		  
+
 		case 13: return l1*l2*l3*(l2-l1);
 		case 14: return l1*l2*l3*(2*l3-1);
-	
+
 		default:
 		  libmesh_error();
 		}
 	    }
-	  
+
 
 	    // Szabo-Babuska shape functions on the quadrilateral.
 	  case QUAD8:
@@ -300,18 +300,18 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 25);
-	      
+
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-	      
-	      Real f=1.;	      	      
-	      
+
+	      Real f=1.;
+
 	      switch(i)
 		{
-		case  5: // edge 0 points    			
+		case  5: // edge 0 points
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case  8: // edge 1 points
@@ -323,19 +323,19 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	        case 14: // edge 3 points
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	      
-   	      
+		}
+
 	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
 			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 	    }
-	    
+
 	  default:
 	    libmesh_error();
 	  }
       }
-      
 
-      
+
+
 
       // 5th-order Szabo-Babuska.
     case FIFTH:
@@ -350,56 +350,56 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      Real l3 = p(1);
 
 	      const Real x=l2-l1;
-	      const Real y=2.*l3-1;	
-	      
-	      Real f=1;	      
-	      
-	      libmesh_assert (i<21);      	      
-	      
+	      const Real y=2.*l3-1;
+
+	      Real f=1;
+
+	      libmesh_assert (i<21);
+
 
 	      if ((i== 4||i== 6) && (elem->point(0) > elem->point(1)))f=-1;
-	      if ((i== 8||i==10) && (elem->point(1) > elem->point(2)))f=-1;     
+	      if ((i== 8||i==10) && (elem->point(1) > elem->point(2)))f=-1;
 	      if ((i==12||i==14) && (elem->point(2) > elem->point(0)))f=-1;
-	      
+
 
 	      switch (i)
 		{
 		  //nodal modes
-		case  0: return l1;		
-		case  1: return l2;		  
+		case  0: return l1;
+		case  1: return l2;
 		case  2: return l3;
-		  
+
 		  //side modes
-		case  3: return   l1*l2*(-4.*sqrt6);			  
+		case  3: return   l1*l2*(-4.*sqrt6);
 		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);
 		case  5: return   -sqrt14*l1*l2*(5.0*l1*l1-1.0+(-10.0*l1+5.0*l2)*l2);
 		case  6: return f*(-sqrt2)*l1*l2*((9.-21.*l1*l1)*l1+(-9.+63.*l1*l1+(-63.*l1+21.*l2)*l2)*l2);
-	  
+
 		case  7: return   l2*l3*(-4.*sqrt6);
 		case  8: return f*l2*l3*(-4.*sqrt10)*(l3-l2);
 		case  9: return   -sqrt14*l2*l3*(5.0*l3*l3-1.0+(-10.0*l3+5.0*l2)*l2);
 		case 10: return -f*sqrt2*l2*l3*((-9.0+21.0*l3*l3)*l3+(-63.0*l3*l3+9.0+(63.0*l3-21.0*l2)*l2)*l2);
-		  
-		case 11: return   l3*l1*(-4.*sqrt6);		  
-		case 12: return f*l3*l1*(-4.*sqrt10)*(l1-l3); 
+
+		case 11: return   l3*l1*(-4.*sqrt6);
+		case 12: return f*l3*l1*(-4.*sqrt10)*(l1-l3);
 		case 13: return -sqrt14*l3*l1*(5.0*l3*l3-1.0+(-10.0*l3+5.0*l1)*l1);
 		case 14: return f*(-sqrt2)*l3*l1*((9.0-21.0*l3*l3)*l3+(-9.0+63.0*l3*l3+(-63.0*l3+21.0*l1)*l1)*l1);
-		  
+
 		  //internal modes
 		case 15: return l1*l2*l3;
-		  
-		case 16: return l1*l2*l3*x;	
+
+		case 16: return l1*l2*l3*x;
 		case 17: return l1*l2*l3*y;
-		  
+
 		case 18: return l1*l2*l3*(1.5*l1*l1-.5+(-3.0*l1+1.5*l2)*l2);
-		case 19: return l1*l2*l3*x*y;	
+		case 19: return l1*l2*l3*x*y;
 		case 20: return l1*l2*l3*(1.0+(-6.0+6.0*l3)*l3);
-		  
+
 		default:
 		  libmesh_error();
 		}
 	    } // case TRI6
-	    
+
 	    // Szabo-Babuska shape functions on the quadrilateral.
 	  case QUAD8:
 	  case QUAD9:
@@ -407,23 +407,23 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 36);
-	      
+
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
-	      
+
 	      Real f=1.;
-	      
+
 	      switch(i)
 		{
 		case  5: // edge 0 points
-		case  7:    			
+		case  7:
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 		case  9: // edge 1 points
-	      	case 11:	      	
+	      	case 11:
 		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
 	        case 13: // edge 2 points
@@ -434,10 +434,10 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	        case 19:
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	     
-	      
+		}
+
 	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
-			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));	      
+			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 
 	    } // case QUAD8/QUAD9
 
@@ -447,7 +447,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	  } // switch type
 
       } // case FIFTH
-      
+
       // 6th-order Szabo-Babuska.
     case SIXTH:
       {
@@ -461,50 +461,50 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      Real l3 = p(1);
 
 	      const Real x=l2-l1;
-	      const Real y=2.*l3-1;	      
-	      
+	      const Real y=2.*l3-1;
+
 	      Real f=1;
 
 	      libmesh_assert (i<28);
-	      
-	      
+
+
 	      if ((i== 4||i== 6) && (elem->point(0) > elem->point(1)))f=-1;
-	      if ((i== 9||i==11) && (elem->point(1) > elem->point(2)))f=-1;     
+	      if ((i== 9||i==11) && (elem->point(1) > elem->point(2)))f=-1;
 	      if ((i==14||i==16) && (elem->point(2) > elem->point(0)))f=-1;
 
-	      
+
 	      switch (i)
 		{
 		  //nodal modes
-		case  0: return l1;		
-		case  1: return l2;		  
+		case  0: return l1;
+		case  1: return l2;
 		case  2: return l3;
-		  
+
 		  //side modes
 		case  3: return   l1*l2*(-4.*sqrt6);
-		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);		  
+		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);
 		case  5: return   -sqrt14*l1*l2*(5.0*l1*l1-1.0+(-10.0*l1+5.0*l2)*l2);
 		case  6: return f*(-sqrt2)*l1*l2*((9.0-21.0*l1*l1)*l1+(-9.0+63.0*l1*l1+(-63.0*l1+21.0*l2)*l2)*l2);
 		case  7: return   -sqrt22*l1*l2*(0.5+(-7.0+0.105E2*l1*l1)*l1*l1+((14.0-0.42E2*l1*l1)*l1+(-7.0+0.63E2*l1*l1+(-0.42E2*l1+0.105E2*l2)*l2)*l2)*l2);
 
 		case  8: return   l2*l3*(-4.*sqrt6);
-		case  9: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
+		case  9: return f*l2*l3*(-4.*sqrt10)*(l3-l2);
 		case 10: return   -sqrt14*l2*l3*(5.0*l3*l3-1.0+(-10.0*l3+5.0*l2)*l2);
 		case 11: return f*(-sqrt2)*l2*l3*((-9.0+21.0*l3*l3)*l3+(-63.0*l3*l3+9.0+(63.0*l3-21.0*l2)*l2)*l2);
 		case 12: return   -sqrt22*l2*l3*(0.5+(-7.0+0.105E2*l3*l3)*l3*l3+((14.0-0.42E2*l3*l3)*l3+(-7.0+0.63E2*l3*l3+(-0.42E2*l3+0.105E2*l2)*l2)*l2)*l2);
-		  
+
 		case 13: return   l3*l1*(-4.*sqrt6);
 		case 14: return f*l3*l1*(-4.*sqrt10)*(l1-l3);
-		case 15: return   -sqrt14*l3*l1*(5.0*l3*l3-1.0+(-10.0*l3+5.0*l1)*l1);  
+		case 15: return   -sqrt14*l3*l1*(5.0*l3*l3-1.0+(-10.0*l3+5.0*l1)*l1);
 		case 16: return f*(-sqrt2)*l3*l1*((9.0-21.0*l3*l3)*l3+(-9.0+63.0*l3*l3+(-63.0*l3+21.0*l1)*l1)*l1);
 		case 17: return   -sqrt22*l3*l1*(0.5+(-7.0+0.105E2*l3*l3)*l3*l3+((14.0-0.42E2*l3*l3)*l3+(-7.0+0.63E2*l3*l3+(-0.42E2*l3+0.105E2*l1)*l1)*l1)*l1);
 
 
-		  
+
 		  //internal modes
 		case 18: return l1*l2*l3;
-		  
-		case 19: return l1*l2*l3*x;	
+
+		case 19: return l1*l2*l3*x;
 		case 20: return l1*l2*l3*y;
 
 		case 21: return 0.5*l1*l2*l3*(3.0*l1*l1-1.0+(-6.0*l1+3.0*l2)*l2);
@@ -513,9 +513,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 24: return 0.5*l1*l2*l3*((3.0-5.0*l1*l1)*l1+(-3.0+15.0*l1*l1+(-15.0*l1+5.0*l2)*l2)*l2);
 		case 25: return 0.5*l1*l2*l3*(3.0*l1*l1-1.0+(-6.0*l1+3.0*l2)*l2)*(2.0*l3-1.0);
 		case 26: return 0.5*l1*l2*l3*(2.0+(-12.0+12.0*l3)*l3)*(l2-l1);
-		case 27: return 0.5*l1*l2*l3*(-2.0+(24.0+(-60.0+40.0*l3)*l3)*l3);  
+		case 27: return 0.5*l1*l2*l3*(-2.0+(24.0+(-60.0+40.0*l3)*l3)*l3);
 
-		  
+
 		default:
 		  libmesh_error();
 		}
@@ -528,23 +528,23 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 49);
-	      
+
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6};
-	      
+
 	      Real f=1.;
-	      
+
 	      switch(i)
 		{
 		case  5: // edge 0 points
-		case  7:    			
+		case  7:
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case 10: // edge 1 points
-	      	case 12:	      	
+	      	case 12:
 		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
 	        case 15: // edge 2 points
@@ -555,8 +555,8 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	        case 22:
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	     
-	      
+		}
+
 	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
 			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 
@@ -581,31 +581,31 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 
 	      Real l1 = 1-p(0)-p(1);
 	      Real l2 = p(0);
-	      Real l3 = p(1);	      
-	      
+	      Real l3 = p(1);
+
 	      const Real x=l2-l1;
-	      const Real y=2.*l3-1.;	      
+	      const Real y=2.*l3-1.;
 
 	      Real f=1;
 
 	      libmesh_assert (i<36);
-	      
-	      
+
+
 	      if ((i>= 4&&i<= 8) && (elem->point(0) > elem->point(1)))f=-1;
-	      if ((i>=10&&i<=14) && (elem->point(1) > elem->point(2)))f=-1;     
+	      if ((i>=10&&i<=14) && (elem->point(1) > elem->point(2)))f=-1;
 	      if ((i>=16&&i<=20) && (elem->point(2) > elem->point(0)))f=-1;
 
-	      
+
 	      switch (i)
 		{
 		  //nodal modes
-		case  0: return l1;		
-		case  1: return l2;		  
+		case  0: return l1;
+		case  1: return l2;
 		case  2: return l3;
-		  
+
 		  //side modes
 		case  3: return   l1*l2*(-4.*sqrt6);
-		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);		  
+		case  4: return f*l1*l2*(-4.*sqrt10)*(l2-l1);
 
 		case  5: return   -sqrt14*l1*l2*(5.0*l1*l1-1.0+(-10.0*l1+5.0*l2)*l2);
 		case  6: return f*-sqrt2*l1*l2*((9.0-21.0*l1*l1)*l1+(-9.0+63.0*l1*l1+(-63.0*l1+21.0*l2)*l2)*l2);
@@ -613,7 +613,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case  8: return f*-sqrt26*l1*l2*((-0.25E1+(15.0-0.165E2*l1*l1)*l1*l1)*l1+(0.25E1+(-45.0+0.825E2*l1*l1)*l1*l1+((45.0-0.165E3*l1*l1)*l1+(-15.0+0.165E3*l1*l1+(-0.825E2*l1+0.165E2*l2)*l2)*l2)*l2)*l2);
 
 		case  9: return   l2*l3*(-4.*sqrt6);
-		case 10: return f*l2*l3*(-4.*sqrt10)*(l3-l2);	  
+		case 10: return f*l2*l3*(-4.*sqrt10)*(l3-l2);
 
 		case 11: return   -sqrt14*l2*l3*(5.0*l3*l3-1.0+(-10.0*l3+5.0*l2)*l2);
 		case 12: return f*-sqrt2*l2*l3*((-9.0+21.0*l3*l3)*l3+(-63.0*l3*l3+9.0+(63.0*l3-21.0*l2)*l2)*l2);
@@ -631,12 +631,12 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 
 		  //internal modes
 		case 21: return l1*l2*l3;
-		  
-		case 22: return l1*l2*l3*x;	
+
+		case 22: return l1*l2*l3*x;
 		case 23: return l1*l2*l3*y;
-		  
+
 		case 24: return l1*l2*l3*0.5*(3.*pow<2>(x)-1.);
-		case 25: return l1*l2*l3*x*y;	
+		case 25: return l1*l2*l3*x*y;
 		case 26: return l1*l2*l3*0.5*(3.*pow<2>(y)-1.);
 
 		case 27: return 0.5*l1*l2*l3*((3.0-5.0*l1*l1)*l1+(-3.0+15.0*l1*l1+(-15.0*l1+5.0*l2)*l2)*l2);
@@ -653,7 +653,7 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		  libmesh_error();
 		}
 	    } // case TRI6
-	    
+
 	    // Szabo-Babuska shape functions on the quadrilateral.
 	  case QUAD8:
 	  case QUAD9:
@@ -661,24 +661,24 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 64);
-	      
+
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7};
-	      
+
 	      Real f=1.;
-	      
+
 	      switch(i)
 		{
 		case  5: // edge 0 points
 		case  7:
-		case  9:    			
+		case  9:
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case 11: // edge 1 points
-	      	case 13:	      	
+	      	case 13:
 		case 15:
 		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
@@ -692,13 +692,13 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
 		case 27:
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	     
-	      
+		}
+
 	      return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
-			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));	      
+			FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
 
 	    } // case QUAD8/QUAD9
-	    
+
 	  default:
 	    libmesh_error();
 
@@ -718,13 +718,13 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
   return 0.;
 }
 
-      
+
 
 
 
 template <>
 Real FE<2,SZABAB>::shape_deriv(const ElemType,
-				   const Order,			    
+				   const Order,
 				   const unsigned int,
 				   const unsigned int,
 				   const Point&)
@@ -751,7 +751,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (totalorder)
     {
 
@@ -761,16 +761,16 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
       {
 	switch (type)
 	  {
-	    
+
 	    // Szabo-Babuska shape functions on the triangle.
 	  case TRI6:
 	    {
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 6);
 	      libmesh_assert (j < 2);
-	      
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -792,14 +792,14 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		    return (FE<2,SZABAB>::shape(elem, order, i, pp) -
 			    FE<2,SZABAB>::shape(elem, order, i, pm))/2./eps;
 		  }
-		  
+
 
 		default:
 		  libmesh_error();
 		}
 	    }
 
-	    
+
 
 	    // Szabo-Babuska shape functions on the quadrilateral.
 	  case QUAD8:
@@ -808,9 +808,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 9);
-	      
+
 	      //                                0  1  2  3  4  5  6  7  8
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
@@ -818,18 +818,18 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      switch (j)
 		{
 		  // d()/dxi
-		case 0:		      
+		case 0:
 		  return (FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
 			  FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
 
 		  // d()/deta
-		case 1:		      
+		case 1:
 		  return (FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
 			  FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
 		default:
 		  libmesh_error();
-		}	      
+		}
 	    }
 
 	  default:
@@ -837,7 +837,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	  }
       }
 
-      
+
 
       // 3rd-order Szabo-Babuska.
     case THIRD:
@@ -849,10 +849,10 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	    {
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 10);
 	      libmesh_assert (j < 2);
-	      
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -874,13 +874,13 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		    return (FE<2,SZABAB>::shape(elem, order, i, pp) -
 			    FE<2,SZABAB>::shape(elem, order, i, pm))/2./eps;
 		  }
-		  
+
 
 		default:
 		  libmesh_error();
 		}
 	    }
-	  
+
 
 	    // Szabo-Babuska shape functions on the quadrilateral.
 	  case QUAD8:
@@ -889,18 +889,18 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 16);
 
 	      //                                0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 	      static const unsigned int i0[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
 	      static const unsigned int i1[] = {0,  0,  1,  1,  0,  0,  2,  3,  1,  1,  2,  3,  2,  2,  3,  3};
-	      
+
 	      Real f=1.;
 
 	      switch(i)
 		{
-	      	case  5: // edge 0 points    			
+	      	case  5: // edge 0 points
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case  7: // edge 1 points
@@ -912,18 +912,18 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	        case 11: // edge 3 points
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	      
+		}
 
-	      
+
 	      switch (j)
 		{
 		  // d()/dxi
-		case 0:		  		  
+		case 0:
 		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
 			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
-	      
+
 		  // d()/deta
-		case 1:		  		  
+		case 1:
 		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
@@ -936,25 +936,25 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	    libmesh_error();
 	  }
       }
-	   
 
-      
+
+
 
       // 4th-order Szabo-Babuska.
     case FOURTH:
       {
 	switch (type)
 	  {
-	 
+
 	    // Szabo-Babuska shape functions on the triangle.
 	  case TRI6:
 	    {
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 15);
 	      libmesh_assert (j < 2);
-	      
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -976,14 +976,14 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		    return (FE<2,SZABAB>::shape(elem, order, i, pp) -
 			    FE<2,SZABAB>::shape(elem, order, i, pm))/2./eps;
 		  }
-		  
+
 
 		default:
 		  libmesh_error();
 		}
 	    }
-	
-	    
+
+
 
 	    // Szabo-Babuska shape functions on the quadrilateral.
 	  case QUAD8:
@@ -992,18 +992,18 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 25);
 
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-	      
+
 	      Real f=1.;
 
 	      switch(i)
 		{
-	      	case  5: // edge 0 points    			
+	      	case  5: // edge 0 points
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case  8: // edge 1 points
@@ -1015,18 +1015,18 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	        case 14: // edge 3 points
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	      
+		}
 
-	      
+
 	      switch (j)
 		{
 		  // d()/dxi
-		case 0:		  		  
+		case 0:
 		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
 			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
-	      
+
 		  // d()/deta
-		case 1:		  		  
+		case 1:
 		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
@@ -1039,9 +1039,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	    libmesh_error();
 	  }
       }
-	   
 
-      
+
+
 
       // 5th-order Szabo-Babuska.
     case FIFTH:
@@ -1049,16 +1049,16 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	// Szabo-Babuska shape functions on the quadrilateral.
 	switch (type)
 	  {
-	 
+
 	    // Szabo-Babuska shape functions on the triangle.
 	  case TRI6:
 	    {
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 21);
 	      libmesh_assert (j < 2);
-	      
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -1080,14 +1080,14 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		    return (FE<2,SZABAB>::shape(elem, order, i, pp) -
 			    FE<2,SZABAB>::shape(elem, order, i, pm))/2./eps;
 		  }
-		  
+
 
 		default:
 		  libmesh_error();
 		}
 	    }
-	
-	    
+
+
 
 	  case QUAD8:
 	  case QUAD9:
@@ -1095,23 +1095,23 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 36);
 
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
-	      
+
 	      Real f=1.;
-	     
+
 	      switch(i)
 		{
 		case  5: // edge 0 points
-	      	case  7:    			
+	      	case  7:
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case  9: // edge 1 points
-	      	case 11:	      	
+	      	case 11:
 		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
 	        case 13: // edge 2 points
@@ -1122,18 +1122,18 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	        case 19:
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	     
-	      
-	      
+		}
+
+
 	      switch (j)
 		{
 		  // d()/dxi
-		case 0:		  		  
+		case 0:
 		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
 			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
-	      
+
 		  // d()/deta
-		case 1:		  		  
+		case 1:
 		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
@@ -1154,16 +1154,16 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	// Szabo-Babuska shape functions on the quadrilateral.
 	switch (type)
 	  {
-	 
+
 	    // Szabo-Babuska shape functions on the triangle.
 	  case TRI6:
 	    {
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 28);
 	      libmesh_assert (j < 2);
-	      
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -1185,14 +1185,14 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		    return (FE<2,SZABAB>::shape(elem, order, i, pp) -
 			    FE<2,SZABAB>::shape(elem, order, i, pm))/2./eps;
 		  }
-		  
+
 
 		default:
 		  libmesh_error();
 		}
 	    }
-	
-	    
+
+
 
 	  case QUAD8:
 	  case QUAD9:
@@ -1200,23 +1200,23 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 49);
 
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6};
-	      
+
 	      Real f=1.;
-	     
+
 	      switch(i)
 		{
 	      	case  5: // edge 0 points
-	      	case  7:    			
+	      	case  7:
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case 10: // edge 1 points
-	      	case 12:	      	
+	      	case 12:
 		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
 	        case 15: // edge 2 points
@@ -1227,18 +1227,18 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	        case 22:
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	       
+		}
 
-	      
+
 	      switch (j)
 		{
 		  // d()/dxi
-		case 0:		  		  
+		case 0:
 		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
 			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
-	      
+
 		  // d()/deta
-		case 1:		  		  
+		case 1:
 		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
 
@@ -1259,16 +1259,16 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	// Szabo-Babuska shape functions on the quadrilateral.
 	switch (type)
 	  {
-	 
+
 	    // Szabo-Babuska shape functions on the triangle.
 	  case TRI6:
 	    {
 	      // Here we use finite differences to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 36);
 	      libmesh_assert (j < 2);
-	      
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -1290,14 +1290,14 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		    return (FE<2,SZABAB>::shape(elem, order, i, pp) -
 			    FE<2,SZABAB>::shape(elem, order, i, pm))/2./eps;
 		  }
-		  
+
 
 		default:
 		  libmesh_error();
 		}
 	    }
-	
-	    
+
+
 
 	  case QUAD8:
 	  case QUAD9:
@@ -1305,24 +1305,24 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 	      // Compute quad shape functions as a tensor-product
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
-	      
+
 	      libmesh_assert (i < 64);
 
 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7};
-	      
+
 	      Real f=1.;
-	     
+
 	      switch(i)
 		{
 	      	case  5: // edge 0 points
 	      	case  7:
-		case  9:    			
+		case  9:
 		  if (elem->point(0) > elem->point(1))f = -1.;
 		  break;
 	      	case 11: // edge 1 points
-	      	case 13:	      	
+	      	case 13:
 		case 15:
 		  if (elem->point(1) > elem->point(2))f = -1.;
 		  break;
@@ -1336,40 +1336,40 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
 		case 27:
 		  if (elem->point(0) > elem->point(3))f = -1.;
 		  break;
-		}	     	       
-	      
-	      
+		}
+
+
 	      switch (j)
 		{
 		  // d()/dxi
-		case 0:		  		  
+		case 0:
 		  return f*(FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
 			    FE<1,SZABAB>::shape      (EDGE3, totalorder, i1[i],    eta));
-		  
+
 		  // d()/deta
-		case 1:		  		  
+		case 1:
 		  return f*(FE<1,SZABAB>::shape      (EDGE3, totalorder, i0[i],    xi)*
 			    FE<1,SZABAB>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta));
-		  
+
 		default:
 		  libmesh_error();
 		}
 	    }
-	    
+
 	  default:
 	    libmesh_error();
 	  }
       }
-      
 
-      
+
+
       // by default throw an error;call the orientation-independent shape functions
     default:
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
 
-  
+
   libmesh_error();
   return 0.;
 }

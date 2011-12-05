@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -57,7 +57,7 @@ class MeshBase;
  * be active or inactive, so that at different solution
  * stages only a sub-set may be solved for.  Also, through
  * the templated access, @e different types of systems
- * may be handled.  Also other features, like flags, 
+ * may be handled.  Also other features, like flags,
  * parameters, I/O etc are provided.
  *
  * @author Benjamin S. Kirk, 2002-2007
@@ -86,7 +86,7 @@ public:
                     WRITE_ADDITIONAL_DATA  = 2,
                     WRITE_PARALLEL_FILES   = 4,
                     WRITE_SERIAL_FILES     = 8 };
-  
+
   /**
    * Constructor.
    */
@@ -97,17 +97,17 @@ public:
    * subclasses of EquationSystems.
    */
   virtual ~EquationSystems ();
- 
+
   /**
    * Returns tha data structure to a pristine state.
    */
   virtual void clear ();
-  
+
   /**
    * Initialize all the systems
    */
   virtual void init ();
-  
+
   /**
    * Reinitialize all the systems
    */
@@ -184,20 +184,20 @@ public:
    * @returns a writeable referene to the system number \p num.
    */
   System & get_system (const unsigned int num);
-  
+
   /**
    * Add the system of type \p system_type named \p name to the
    * systems array.
    */
   virtual System & add_system (const std::string& system_type,
 		               const std::string& name);
-  
+
   /**
    * Add the system named \p name to the systems array.
    */
   template <typename T_sys>
   T_sys & add_system (const std::string& name);
-  
+
   /**
    * Remove the system named \p name from the systems array.
    * This function is now deprecated - write the
@@ -210,7 +210,7 @@ public:
    * systems.
    */
   unsigned int n_vars () const;
-  
+
   /**
    * @returns the total number of degrees of freedom
    * in all systems.
@@ -222,7 +222,7 @@ public:
    * for the EquationSystems object.
    */
   unsigned int n_active_dofs() const;
-  
+
   /**
    * Call \p solve on all the individual equation systems.
    *
@@ -232,7 +232,7 @@ public:
    * class.
    */
   virtual void solve ();
-  
+
   /**
    * Call \p adjoint_solve on all the individual equation systems.
    *
@@ -268,14 +268,14 @@ public:
   void build_solution_vector (std::vector<Number>& soln,
                               const std::string& system_name,
                               const std::string& variable_name = "all_vars") const;
-  
+
   /**
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names()).
    */
   void build_solution_vector (std::vector<Number>& soln) const;
-  
+
   /**
    * Retrieve the solution data for CONSTANT MONOMIALs.
    */
@@ -288,13 +288,13 @@ public:
    * the names from \p build_variable_names()).
    */
   void build_discontinuous_solution_vector (std::vector<Number>& soln) const;
-  
+
   /**
    * Read & initialize the systems from disk using the XDR data format.
    * This format allows for machine-independent binary output.
    *
-   * Set which sections of the file to read by bitwise OR'ing the 
-   * EquationSystems::ReadFlags enumeration together. For example, to 
+   * Set which sections of the file to read by bitwise OR'ing the
+   * EquationSystems::ReadFlags enumeration together. For example, to
    * read all sections of the file, set read_flags to:
    * (READ_HEADER | READ_DATA | READ_ADDITIONAL_DATA)
    *
@@ -340,7 +340,7 @@ public:
    * most of the comparisons to perform to the responsible
    * systems
    */
-  virtual bool compare (const EquationSystems& other_es, 
+  virtual bool compare (const EquationSystems& other_es,
                         const Real threshold,
                         const bool verbose) const;
 
@@ -349,7 +349,7 @@ public:
    * systems, flags, and parameters.
    */
   virtual std::string get_info() const;
-    
+
   /**
    * Prints information about the equation systems, by default to
    * libMesh::out.
@@ -399,10 +399,10 @@ public:
    */
   Parameters parameters;
 
-  
+
 protected:
 
-  
+
   /**
    * The mesh data structure
    */
@@ -430,7 +430,7 @@ protected:
   typedef std::map<std::string, System*>::const_iterator const_system_iterator;
 
 private:
-    
+
   /**
    * Actual read implementation.  This can be called repeatedly
    * inside a try-catch block in an attempt to read broken files.
@@ -483,7 +483,7 @@ MeshData & EquationSystems::get_mesh_data ()
 }
 
 inline
-bool EquationSystems::has_mesh_data () const 
+bool EquationSystems::has_mesh_data () const
 {
   return (_mesh_data!=NULL);
 }
@@ -503,12 +503,12 @@ inline
 T_sys & EquationSystems::add_system (const std::string& name)
 {
   T_sys* ptr = NULL;
-  
+
   if (!_systems.count(name))
     {
       ptr = new T_sys(*this, name, this->n_systems());
 
-      _systems.insert (std::make_pair(name, ptr));   
+      _systems.insert (std::make_pair(name, ptr));
 
       // Tell all the \p DofObject entities to add a system.
       this->_add_system_to_nodes_and_elems();
@@ -578,7 +578,7 @@ inline
 T_sys & EquationSystems::get_system (const unsigned int num)
 {
   libmesh_assert (num < this->n_systems());
-  
+
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
 

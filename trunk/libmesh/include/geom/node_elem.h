@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -55,7 +55,7 @@ class NodeElem : public Elem
    * @returns 0, the dimensionality of the object.
    */
   unsigned int dim () const { return 0; }
-  
+
   /**
    * @returns 1.
    */
@@ -70,17 +70,17 @@ class NodeElem : public Elem
    * @returns 1.  Every NodeElem is a vertex
    */
   unsigned int n_vertices() const { return 1; }
-  
+
   /**
    * @returns 0.
-   */  
+   */
   unsigned int n_edges() const { return 0; }
-  
+
   /**
    * @returns 0.
-   */  
+   */
   unsigned int n_faces() const { return 0; }
-  
+
   /**
    * @returns 1
    */
@@ -92,7 +92,7 @@ class NodeElem : public Elem
    */
   unsigned int key (const unsigned int) const
   { return 0; }
-  
+
   /**
    * The \p Elem::side() member makes no sense for nodes.
    */
@@ -115,7 +115,7 @@ class NodeElem : public Elem
    * @returns 1
    */
   unsigned int n_sub_elem() const { return 1; }
-  
+
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
@@ -127,19 +127,19 @@ class NodeElem : public Elem
   virtual bool is_edge(const unsigned int) const { return false; }
 
   virtual bool is_face(const unsigned int) const { return false; }
-  
+
   virtual bool is_child_on_side(const unsigned int,
 			        const unsigned int) const
   { libmesh_error(); return false; }
-  
+
   virtual bool is_node_on_side(const unsigned int,
 			       const unsigned int) const
   { libmesh_error(); return false; }
-  
+
   virtual bool is_node_on_edge(const unsigned int,
-			       const unsigned int) const 
+			       const unsigned int) const
   { libmesh_error(); return false; }
-  
+
   /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
@@ -156,7 +156,7 @@ class NodeElem : public Elem
    * @returns \p NODEELEM
    */
   ElemType type()  const { return NODEELEM; }
-  
+
   /**
    * @returns FIRST
    */
@@ -176,7 +176,7 @@ class NodeElem : public Elem
 
 #endif
 
-  
+
 protected:
 
   /**
@@ -188,8 +188,8 @@ protected:
    * Data for links to nodes
    */
   Node* _nodelinks_data[1];
-  
-  
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -199,22 +199,22 @@ protected:
 			 const unsigned int j,
 			 const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
-  
+
   /**
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
   static const float _embedding_matrix[1][1][1];
-  
+
   /**
    * Matrix that allows children to inherit boundary conditions.
    */
-  unsigned int side_children_matrix (const unsigned int, 
+  unsigned int side_children_matrix (const unsigned int,
 				     const unsigned int) const
   { libmesh_error(); return 0; }
 
 #endif
-  
+
 };
 
 

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,22 +41,22 @@ namespace libMesh
 unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
 						 const FEType& fe_t,
 						 const ElemType t)
-{ 
+{
   switch (dim)
     {
       // 1D
     case 1:
-      /* 
+      /*
        * Since InfFE<Dim,T_radial,T_map>::n_shape_functions(...)
        * is actually independent of T_radial and T_map, we can use
        * just any T_radial and T_map
        */
       return InfFE<1,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
-      
+
       // 2D
     case 2:
       return InfFE<2,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
-      
+
       // 3D
     case 3:
       return InfFE<3,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
@@ -65,7 +65,7 @@ unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
       libmesh_error();
     }
 
-  
+
   libmesh_error();
   return 0;
 }
@@ -82,17 +82,17 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
     {
       // 1D
     case 1:
-      /* 
+      /*
        * Since InfFE<Dim,T_radial,T_map>::n_dofs(...)
        * is actually independent of T_radial and T_map, we can use
        * just any T_radial and T_map
        */
       return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
-      
+
       // 2D
     case 2:
       return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
-      
+
       // 3D
     case 3:
       return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
@@ -101,12 +101,12 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
       libmesh_error();
     }
 
-  
+
   libmesh_error();
   return 0;
 }
 
-		
+
 
 
 unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
@@ -118,17 +118,17 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
     {
       // 1D
     case 1:
-      /* 
+      /*
        * Since InfFE<Dim,T_radial,T_map>::n_dofs_at_node(...)
        * is actually independent of T_radial and T_map, we can use
        * just any T_radial and T_map
        */
       return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
-      
+
       // 2D
     case 2:
       return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
-      
+
       // 3D
     case 3:
       return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
@@ -137,7 +137,7 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
       libmesh_error();
     }
 
-  
+
   libmesh_error();
   return 0;
 }
@@ -154,17 +154,17 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
     {
       // 1D
     case 1:
-      /* 
+      /*
        * Since InfFE<Dim,T_radial,T_map>::n_dofs(...)
        * is actually independent of T_radial and T_map, we can use
        * just any T_radial and T_map
        */
       return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
-      
+
       // 2D
     case 2:
       return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
-      
+
       // 3D
     case 3:
       return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
@@ -173,7 +173,7 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
       libmesh_error();
     }
 
-  
+
   libmesh_error();
   return 0;
 }
@@ -267,7 +267,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	    }
 
 
-	    
+
 	  default:
 	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
 	    libmesh_error();
@@ -277,7 +277,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	break;
       }
 
-      
+
 
 
       // 2D
@@ -302,7 +302,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		      break;
 		    }
 		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    libmesh_error();
 		}
 	      break;
@@ -318,7 +318,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		      break;
 		    }
 		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    libmesh_error();
 		}
 	      break;
@@ -334,7 +334,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		      break;
 		    }
 		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    libmesh_error();
 		}
 	      break;
@@ -350,14 +350,14 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		      break;
 		    }
 		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    libmesh_error();
 		}
 	      break;
 	    }
 
 
-	    
+
 	  default:
 	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
 	    libmesh_error();
@@ -367,7 +367,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 	break;
       }
 
-      
+
 
 
       // 3D
@@ -392,7 +392,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		      break;
 		    }
 		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    libmesh_error();
 		}
 	      break;
@@ -408,7 +408,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		      break;
 		    }
 		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    libmesh_error();
 		}
 	      break;
@@ -424,7 +424,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		      break;
 		    }
 		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;		      
+		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    libmesh_error();
 		}
 	      break;
@@ -440,14 +440,14 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 		      break;
 		    }
 		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;			      
+		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
 		    libmesh_error();
 		}
 	      break;
 	    }
 
 
-	    
+
 	  default:
 	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
 	    libmesh_error();
@@ -507,7 +507,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 	  }
       }
 
-      
+
       // 2D
     case 2:
       {
@@ -538,7 +538,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
       }
 
-      
+
       // 3D
     case 3:
       {
@@ -574,7 +574,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
       libmesh_error();
     }
 
-  
+
   libmesh_error();
   Point pt;
   return pt;
@@ -606,7 +606,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 	  }
       }
 
-      
+
       // 2D
     case 2:
       {
@@ -622,7 +622,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 
       }
 
-      
+
       // 3D
     case 3:
       {
@@ -687,7 +687,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  case JACOBI_30_00:
 	    return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
 
 	  case LAGRANGE:
@@ -698,7 +698,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  }
       }
 
-      
+
       // 2D
     case 2:
       {
@@ -713,7 +713,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  case JACOBI_30_00:
 	    return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
 
 	  case LAGRANGE:
@@ -725,7 +725,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
       }
 
-      
+
       // 3D
     case 3:
       {
@@ -740,7 +740,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  case JACOBI_30_00:
 	    return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
 
 	  case LAGRANGE:
@@ -757,7 +757,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
       libmesh_error();
     }
 
-  
+
   libmesh_error();
   return 0.;
 }
@@ -792,7 +792,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  case JACOBI_30_00:
 	    return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
 
 	  case LAGRANGE:
@@ -818,7 +818,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  case JACOBI_30_00:
 	    return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
 
 	  case LAGRANGE:
@@ -830,7 +830,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
       }
 
-            
+
       // 3D
     case 3:
       {
@@ -845,7 +845,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 	  case JACOBI_30_00:
 	    return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
 
 	  case LAGRANGE:
@@ -862,7 +862,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
       libmesh_error();
     }
 
-  
+
   libmesh_error();
   return 0.;
 }
@@ -899,7 +899,7 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 	    InfFE<1,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
 	    break;
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    InfFE<1,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
 	    break;
 
@@ -932,7 +932,7 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 	    InfFE<2,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
 	    break;
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    InfFE<2,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
 	    break;
 
@@ -947,7 +947,7 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 	break;
       }
 
-            
+
       // 3D
     case 3:
       {
@@ -965,7 +965,7 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 	    InfFE<3,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
 	    break;
 
-	  case LEGENDRE:   
+	  case LEGENDRE:
 	    InfFE<3,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
 	    break;
 

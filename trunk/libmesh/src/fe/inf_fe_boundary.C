@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -67,13 +67,13 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 
   // Don't do this for the base
   libmesh_assert (s != 0);
-  
-  // Build the side of interest 
+
+  // Build the side of interest
   const AutoPtr<Elem> side(inf_elem->build_side(s));
 
   // set the element type
   elem_type = inf_elem->type();
-  
+
   // eventually initialize radial quadrature rule
   bool radial_qrule_initialized = false;
 
@@ -83,13 +83,13 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
       radial_qrule->init(EDGE2, inf_elem->p_level());
       radial_qrule_initialized = true;
     }
-  
+
   // Initialize the face shape functions
-  if (this->get_type() != inf_elem->type() ||  
+  if (this->get_type() != inf_elem->type() ||
       base_fe->shapes_need_reinit()        ||
       radial_qrule_initialized)
     this->init_face_shape_functions (qrule->get_points(), side.get());
-  
+
 
   // compute the face map
   this->compute_face_map (_total_qrule_weights, side.get());
@@ -100,7 +100,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
   // Find where the integration points are located on the
   // full element.
   std::vector<Point> qp; this->inverse_map (inf_elem, xyz, qp, tolerance);
-  
+
   // compute the shape function and derivative values
   // at the points qp
   this->reinit  (inf_elem, &qp);
@@ -177,46 +177,46 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   const unsigned int n_radial_qp = som.size();
   const unsigned int n_base_qp   = base_qrule->n_points();
   const unsigned int n_total_qp  = n_radial_qp * n_base_qp;
-  
+
   // the quadratur weigths
   _total_qrule_weights.resize(n_total_qp);
-  
+
   // now inite the shapes for boundary work
   {
-    
-    // The element type and order to use in the base map  
+
+    // The element type and order to use in the base map
     const Order    base_mapping_order     ( base_elem->default_order() );
     const ElemType base_mapping_elem_type ( base_elem->type()          );
-    
+
     // the number of mapping shape functions
     // (Lagrange shape functions are used for mapping in the base)
     const unsigned int n_radial_mapping_sf = radial_map.size();
     const unsigned int n_base_mapping_shape_functions = Base::n_base_mapping_sf(base_mapping_elem_type,
 										base_mapping_order);
-    
-    const unsigned int n_total_mapping_shape_functions = 
+
+    const unsigned int n_total_mapping_shape_functions =
       n_radial_mapping_sf * n_base_mapping_shape_functions;
-    
+
 
     // initialize the node and shape numbering maps
     {
       _radial_node_index.resize    (n_total_mapping_shape_functions);
       _base_node_index.resize      (n_total_mapping_shape_functions);
-      
+
       const ElemType inf_face_elem_type (inf_side->type());
-    
+
       // fill the node index map
       for (unsigned int n=0; n<n_total_mapping_shape_functions; n++)
 	{
-	  compute_node_indices (inf_face_elem_type, 
+	  compute_node_indices (inf_face_elem_type,
 				n,
-				_base_node_index[n], 
+				_base_node_index[n],
 				_radial_node_index[n]);
 
 	  libmesh_assert (_base_node_index[n]   < n_base_mapping_shape_functions);
 	  libmesh_assert (_radial_node_index[n] < n_radial_mapping_sf);
 	}
-      
+
     }
 
     // rezise map data fields
@@ -231,20 +231,20 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 	d2psidxideta_map.resize (n_total_mapping_shape_functions);
 	d2psideta2_map.resize   (n_total_mapping_shape_functions);
       }
-      
+
       for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
 	{
 	  psi_map[i].resize         (n_total_qp);
 	  dpsidxi_map[i].resize     (n_total_qp);
 	  d2psidxi2_map[i].resize   (n_total_qp);
-	  
+
 	  // if (Dim == 3)
 	  {
 	    dpsideta_map[i].resize     (n_total_qp);
 	    d2psidxideta_map[i].resize (n_total_qp);
 	    d2psideta2_map[i].resize   (n_total_qp);
 	  }
-	}    
+	}
     }
 
 
@@ -269,7 +269,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 	      // d2psidxideta_map [ti][bp+rp*n_base_qp] = 0.;
 	      // d2psideta2_map   [ti][bp+rp*n_base_qp] = 0.;
 	    }
-      
+
     }
 
   }
@@ -288,15 +288,15 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 	  _total_qrule_weights[  bp+rp*n_base_qp ] = radial_qw[rp] * base_qw[bp];
 	}
   }
-  
+
 }
 
 
 
 
 //--------------------------------------------------------------
-// Explicit instantiations - doesn't make sense in 1D, but as 
-// long as we only return errors, we are fine... ;-) 
+// Explicit instantiations - doesn't make sense in 1D, but as
+// long as we only return errors, we are fine... ;-)
 //#include "inf_fe_instantiate_1D.h"
 //#include "inf_fe_instantiate_2D.h"
 //#include "inf_fe_instantiate_3D.h"

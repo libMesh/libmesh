@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,7 +46,7 @@ Real FE<1,SZABAB>::shape(const ElemType,
   // Use this libmesh_assert rather than a switch with a single entry...
   // It will go away in optimized mode, essentially has the same effect.
   libmesh_assert (order <= SEVENTH);
-  
+
 //   switch (order)
 //     {
 //     case FIRST:
@@ -56,9 +56,9 @@ Real FE<1,SZABAB>::shape(const ElemType,
 //     case FIFTH:
 //     case SIXTH:
 //     case SEVENTH:
-      
+
       switch(i)
-	{				
+	{
 	  //nodal shape functions
 	case 0: return 1./2.-1./2.*xi;
 	case 1: return 1./2.+1./2.*xi;
@@ -69,19 +69,19 @@ Real FE<1,SZABAB>::shape(const ElemType,
 	case 6: return 1./32. *4.6904157598234295546*(-1.+(15.+(-35.+21.*xi2)*xi2)*xi2);
 	case 7: return 1./32. *5.0990195135927848300*(-5.+(35.+(-63.+33.*xi2)*xi2)*xi2)*xi;
 	case 8: return 1./256.*5.4772255750516611346*(5.+(-140.+(630.+(-924.+429.*xi2)*xi2)*xi2)*xi2);
-	  
+
 	default:
 	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();	    
+	  libmesh_error();
 	}
-      
+
 //     default:
 //       {
 // 	libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
 // 	libmesh_error();
 //       }
 //     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -95,7 +95,7 @@ Real FE<1,SZABAB>::shape(const Elem* elem,
 			 const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   return FE<1,SZABAB>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
 
@@ -108,18 +108,18 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
 			       const unsigned int libmesh_dbg_var(j),
 			       const Point& p)
 {
-  // only d()/dxi in 1D!  
+  // only d()/dxi in 1D!
   libmesh_assert (j == 0);
-	
+
   const Real xi  = p(0);
   const Real xi2 = xi*xi;
-  
+
   // Use this libmesh_assert rather than a switch with a single entry...
   // It will go away in optimized mode, essentially has the same effect.
   libmesh_assert (order <= SEVENTH);
-  
+
 //   switch (order)
-//     {      
+//     {
 //     case FIRST:
 //     case SECOND:
 //     case THIRD:
@@ -127,7 +127,7 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
 //     case FIFTH:
 //     case SIXTH:
 //     case SEVENTH:
-      
+
       switch(i)
 	{
 	case 0:	return -1./2.;
@@ -139,12 +139,12 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
 	case 6:	return 1./32.*4.6904157598234295546*(30.+(-140.+126.*xi2)*xi2)*xi;
 	case 7:	return -5./32.*5.0990195135927848300+(105./32.*5.0990195135927848300+(-315./32.*5.0990195135927848300+231./32.*5.0990195135927848300*xi2)*xi2)*xi2;
 	case 8:	return 1./256.*5.4772255750516611346*(-280.+(2520.+(-5544.+3432.*xi2)*xi2)*xi2)*xi;
-	  
+
 	default:
 	  libMesh::err << "Invalid shape function index!" << std::endl;
 	  libmesh_error();
 	}
- 
+
 //     default:
 //       {
 // 	libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
@@ -166,7 +166,7 @@ Real FE<1,SZABAB>::shape_deriv(const Elem* elem,
 			       const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   return FE<1,SZABAB>::shape_deriv(elem->type(),
 				       static_cast<Order>(order + elem->p_level()), i, j, p);
 }

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -77,9 +77,9 @@ namespace
 #endif
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<2,LAGRANGE>::shape_deriv 
+          const Real ddxi = FE<2,LAGRANGE>::shape_deriv
             (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
-          const Real ddeta = FE<2,LAGRANGE>::shape_deriv 
+          const Real ddeta = FE<2,LAGRANGE>::shape_deriv
             (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
 
           dxdxi[0][p] += elem->point(i)(0) * ddxi;
@@ -216,7 +216,7 @@ Real FE<2,HERMITE>::shape(const ElemType,
   libMesh::err << "Hermite elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -230,7 +230,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 			  const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
 #ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
 #else
@@ -240,9 +240,9 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
-  
+
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (type)
     {
     case QUAD4:
@@ -263,7 +263,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
       libMesh::err << "ERROR: Unsupported element type!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -272,7 +272,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 
 template <>
 Real FE<2,HERMITE>::shape_deriv(const ElemType,
-				const Order,			    
+				const Order,
 				const unsigned int,
 				const unsigned int,
 				const Point&)
@@ -296,7 +296,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
   libmesh_assert (j == 0 || j == 1);
-  
+
 #ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
 #else
@@ -306,9 +306,9 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
-  
+
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (type)
     {
     case QUAD4:
@@ -340,7 +340,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported element type!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -366,9 +366,9 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
-  
+
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (type)
     {
     case QUAD4:
@@ -404,7 +404,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported element type!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }

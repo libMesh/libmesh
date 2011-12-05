@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -69,7 +69,7 @@ public:
 //    * Set the flag indicationg if we should be verbose.
 //    */
 //   void verbose (bool set_verbosity);
-  
+
   /**
    * Reading functions.  These just allocate memory for you and call the Nemesis
    * routines of the same name.  They also handle error checking for the Nemesis
@@ -120,7 +120,7 @@ public:
    * .) global number of elems
    * .) global number of element blocks
    * .) global number of node sets
-   * .) global number of side sets 
+   * .) global number of side sets
    */
   void put_init_global(unsigned num_nodes_global,
 		       unsigned num_elems_global,
@@ -131,7 +131,7 @@ public:
   /**
    * Writes global block information to the file
    * .) global_elem_blk_ids - list of block IDs for all blocks present in the mesh
-   * .) global_elem_blk_cnts - number of elements in each block for the global mesh 
+   * .) global_elem_blk_cnts - number of elements in each block for the global mesh
    *
    * Must be called after put_init_global().
    */
@@ -170,7 +170,7 @@ public:
    * .) num_border_nodes - nodes local to a processor but residing in an element
    *                       which also has nodes on other processors
    * .) num_external_nodes - nodes that reside on other processors but whose element
-   *                         "partially" resides on the current processor -- 
+   *                         "partially" resides on the current processor --
    *                          we assert this should be zero on reading!
    * .) num_border_elems - elements local to this processor but whose nodes reside
    *                       on other processors as well.
@@ -187,7 +187,7 @@ public:
   /**
    * Outputs initial information for communication maps.
    * Note: the order of the arguments specified in the Nemsis
-   * User's Manual is *wrong*.  The correct order is 
+   * User's Manual is *wrong*.  The correct order is
    * (ids, counts, ids, counts).
    * Must be called after put_loadbal_param().
    */
@@ -198,7 +198,7 @@ public:
 
   /**
    * Outputs *all* of the nodal communication maps for this processor.  Internally,
-   * this function loops over all communication maps and calls 
+   * this function loops over all communication maps and calls
    * Nemesis::ne_put_node_cmap() for each one.
    *
    * .) node_cmap_node_ids = Nodal IDs of the FEM nodes in this communication map
@@ -233,7 +233,7 @@ public:
    * elem_cmap_elem_ids
    * elem_cmap_side_ids
    * elem_cmap_proc_ids
-   * 
+   *
    * Must be called after put_cmap_params().
    */
   void put_elem_cmap(std::vector<std::vector<int> >& elem_cmap_elem_ids,
@@ -250,14 +250,14 @@ public:
 
   /**
    * Writes the specified number of coordinate values starting at the specified
-   * index.  
+   * index.
    */
   void put_n_coord(unsigned start_node_num,
 		   unsigned num_nodes,
 		   std::vector<Real>& x_coor,
 		   std::vector<Real>& y_coor,
 		   std::vector<Real>& z_coor);
-  
+
 
   /**
    * This function is specialized from ExodusII_IO_Helper to write only the
@@ -269,9 +269,9 @@ public:
    * This function is specialized to write the connectivity.
    */
   virtual void write_elements(const MeshBase & mesh);
-  
+
   /**
-   * Writes the sidesets for this processor.  
+   * Writes the sidesets for this processor.
    */
   virtual void write_sidesets(const MeshBase & mesh);
 
@@ -285,8 +285,8 @@ public:
    * nodal coordinates stored on the local piece of the Mesh.
    */
   virtual void create(std::string filename);
-  
-  /** 
+
+  /**
    * Specialization of the initialize function from ExodusII_IO_Helper that
    * also writes global initial data to file.
    */
@@ -312,7 +312,7 @@ public:
    * Internally, we use the ExodusII_IO_Helper::check_err() function to check for errors.
    */
   int nemesis_err_flag;
-    
+
   /**
    * Global initial information.  The names are self-explanatory
    * for the most part.  Used with Nemesis::ne_get_init_global().
@@ -332,17 +332,17 @@ public:
   /**
    * The number of processors for which the NEMESIS I file stores information.
    * This is generally equal to 1 (1 CPU/file) at least for the splitting Derek gave us.
-   * To be used with Nemesis::ne_get_init_info().   
+   * To be used with Nemesis::ne_get_init_info().
    */
   int num_proc_in_file;
 
   /**
    * The type of file to be written. Either 's', for a scalar
    * load-balance file, or 'p' for a parallel file.
-   * To be used with Nemesis::ne_get_init_info().   
+   * To be used with Nemesis::ne_get_init_info().
    */
   char ftype;
-  
+
   /**
    * Containers for reading global sideset (boundary conditions) information.  Each vector will
    * eventually have num_side_sets_global entries, and be used in calls to
@@ -407,14 +407,14 @@ public:
    * To be used with the Nemesis::ne_get_loadbal_param() routine.
    */
   int num_border_nodes;
-  
+
   /**
    * The number of FEM nodes that reside on another processor but
    * whose element partially resides on the current processor.
    * To be used with the Nemesis::ne_get_loadbal_param() routine.
    */
   int num_external_nodes;
-  
+
   /**
    * The number of internal FEM elements. Elements local to this processor.
    * To be used with the Nemesis::ne_get_loadbal_param() routine.
@@ -427,14 +427,14 @@ public:
    * To be used with the Nemesis::ne_get_loadbal_param() routine.
    */
   int num_border_elems;
-  
+
   /**
    * The number of nodal communication maps for this processor. (One
    * per neighboring proc?)
    * To be used with the Nemesis::ne_get_loadbal_param() routine.
    */
   int num_node_cmaps;
-  
+
   /**
    * The number of elemental communication maps for this
    * processor. (One per neighboring proc?)
@@ -443,14 +443,14 @@ public:
   int num_elem_cmaps;
 
 
-  
+
   /**
    * Vector which stores internal element IDs.  Will have length
    * num_internal_elems.
    * To be used with Nemesis::ne_get_elem_map().
    */
   std::vector<int> elem_mapi;
-  
+
   /**
    * Vector which stores border element IDs.  Will have length
    * num_border_elems.
@@ -459,14 +459,14 @@ public:
   std::vector<int> elem_mapb;
 
 
-  
+
   /**
    * Vector which stores internal node IDs.  Will have length
    * num_internal_nodes.
    * To be used with Nemesis::ne_get_node_map().
    */
   std::vector<int> node_mapi;
-  
+
   /**
    * Vector which stores border node IDs.  Will have length
    * num_border_nodes.
@@ -480,8 +480,8 @@ public:
    * To be used with Nemesis::ne_get_node_map().
    */
   std::vector<int> node_mape;
-  
-  
+
+
   /**
    * Vectors for storing the communication map parameters.
    * Each will eventually have length num_node_cmaps OR
@@ -521,10 +521,10 @@ private:
 
   /**
    * This map keeps track of the number of elements in each subdomain
-   * (block) for *this* processor.  
+   * (block) for *this* processor.
    */
   std::map<subdomain_id_type, unsigned> local_subdomain_counts;
-  
+
   /**
    * The set which will eventually contain the IDs of "border nodes".  These are nodes
    * that lie on the boundary between one or more processors.
@@ -535,7 +535,7 @@ private:
    * Another map to store sets of intersections with each other processor
    * (other than ourself, of course).  A node which appears in one of these
    * vectors belongs to element owned by at least this processor and one other.
-   */ 
+   */
   std::map<unsigned, std::set<unsigned> > proc_nodes_touched_intersections;
 
   /**
@@ -547,12 +547,12 @@ private:
    * Map between processor ID and (element,side) pairs bordering that processor ID.
    */
   std::map<unsigned, std::set<std::pair<unsigned,unsigned> > > proc_border_elem_sets;
-  
+
   /**
    * Typedef for an iterator into the data structure above.
    */
   typedef std::map<unsigned, std::set<std::pair<unsigned,unsigned> > >::iterator proc_border_elem_sets_iterator;
-  
+
   /**
    * A set of internal node IDs for this processor.
    */
@@ -562,7 +562,7 @@ private:
    * A set of internal elem IDs for this processor.
    */
   std::set<unsigned> internal_elem_ids;
-  
+
   /**
    * A set of border elem IDs for this processor.
    */
@@ -573,13 +573,13 @@ private:
    * number of element blocks across the entire mesh.
    */
   void compute_num_global_elem_blocks(const MeshBase& pmesh);
-  
+
   /**
    * This function uses global communication routines to determine the
    * number of nodesets across the entire mesh.
    */
   void compute_num_global_nodesets(const MeshBase& pmesh);
-  
+
   /**
    * This function uses global communication routines to determine the
    * number of sidesets across the entire mesh.
@@ -608,7 +608,7 @@ private:
   void compute_internal_and_border_elems_and_internal_nodes(const MeshBase& pmesh);
 
   /**
-   * This function determines the communication map parameters 
+   * This function determines the communication map parameters
    * which will eventually be written to file
    */
   void compute_communication_map_parameters();
@@ -618,10 +618,10 @@ private:
    * in preparation for writing them to file.
    */
   void compute_node_communication_maps();
-  
+
   /**
-   * Compute the node maps (really just pack vectors) which 
-   * map the nodes to internal, border, and external nodes in 
+   * Compute the node maps (really just pack vectors) which
+   * map the nodes to internal, border, and external nodes in
    * the file.
    */
   void compute_node_maps();

@@ -2,17 +2,17 @@
 
 // The Next Great Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -43,7 +43,7 @@ Real FE<3,BERNSTEIN>::shape(const ElemType,
   libMesh::err << "Bernstein polynomials require the element type\n"
 	        << "because edge and face orientation is needed."
 	        << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -56,58 +56,58 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			    const unsigned int i,
 			    const Point& p)
 {
-  
+
 #if LIBMESH_DIM == 3
-  
+
   libmesh_assert (elem != NULL);
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (totalorder)
     {
-      
+
       // 1st order Bernstein.
     case FIRST:
       {
 	switch (type)
 	  {
-	    
+
 	    // Bernstein shape functions on the tetrahedron.
 	  case TET4:
 	  case TET10:
 	    {
 	      libmesh_assert(i<4);
-	      
+
 	      // Area coordinates
 	      const Real zeta1 = p(0);
 	      const Real zeta2 = p(1);
 	      const Real zeta3 = p(2);
 	      const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-	      
+
 	      switch(i)
 		{
-		case  0:  return zeta0;	   
-		case  1:  return zeta1;	   
-		case  2:  return zeta2;	   
+		case  0:  return zeta0;
+		case  1:  return zeta1;
+		case  2:  return zeta2;
 		case  3:  return zeta3;
-		  
+
 		default:
 		  libmesh_error();
 		}
 	    }
-	    
+
 	    // Bernstein shape functions on the hexahedral.
 	  case HEX20:
 	  case HEX27:
 	    {
 	      libmesh_assert (i<8);
-	      
+
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
 	      const Real zeta = p(2);
-	      
+
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
 	      // and make the cut-out cube!
@@ -115,65 +115,65 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
 	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
-	      
+
 	      return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta));
 	    }
 
-	    
+
 	  default:
 	    libmesh_error();
 	  }
 	}
-      
-      
-      
-      
+
+
+
+
     case SECOND:
       {
 	switch (type)
 	  {
-	
+
 	    // Bernstein shape functions on the tetrahedron.
 	  case TET10:
 	    {
 	      libmesh_assert(i<10);
-	
+
 	      // Area coordinates
 	      const Real zeta1 = p(0);
 	      const Real zeta2 = p(1);
 	      const Real zeta3 = p(2);
 	      const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-	      
+
 	      switch(i)
 		{
-		case  0:  return zeta0*zeta0;			
-		case  1:  return zeta1*zeta1;			
-		case  2:  return zeta2*zeta2;        	
+		case  0:  return zeta0*zeta0;
+		case  1:  return zeta1*zeta1;
+		case  2:  return zeta2*zeta2;
 		case  3:  return zeta3*zeta3;
 		case  4:  return 2.*zeta0*zeta1;
 		case  5:  return 2.*zeta1*zeta2;
 		case  6:  return 2.*zeta0*zeta2;
 		case  7:  return 2.*zeta3*zeta0;
 		case  8:  return 2.*zeta1*zeta3;
-		case  9:  return 2.*zeta2*zeta3;     
-		  
+		case  9:  return 2.*zeta2*zeta3;
+
 		default:
 		  libmesh_error();
 		}
 	    }
-	    
+
 	    // Bernstein shape functions on the 20-noded hexahedral.
 	  case HEX20:
 	    {
 	      libmesh_assert (i<20);
-	      
+
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
 	      const Real zeta = p(2);
-	      
+
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
 	      // and make the cut-out cube!
@@ -193,7 +193,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	      static const Real scal24[] =     {-0.25, 0,     0,     -0.25, -0.25, 0,     0,     -0.25, 0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0,     0.5};
 	      static const Real scal25[] =     {0,     0,     0,     0,     -0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5};
 	      static const Real scal26[] =     {-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, 0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25};
-	      
+
 	      return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta)
@@ -226,17 +226,17 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[26], eta)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[26], zeta));
 	    }
-	    
+
 	    // Bernstein shape functions on the hexahedral.
 	  case HEX27:
 	    {
 	      libmesh_assert (i<27);
-	      
+
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
 	      const Real zeta = p(2);
-	
+
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
 	      // and make the cut-out cube!
@@ -244,53 +244,53 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
 	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-	      
+
 	      return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta));
 	    }
 
-	    
+
 	  default:
 	    libmesh_error();
 	  }
-	
+
       }
 
-      
-      
+
+
       // 3rd-order Bernstein.
     case THIRD:
       {
 	switch (type)
 	  {
-	  
+
 // 	    // Bernstein shape functions on the tetrahedron.
 // 	  case TET10:
 // 	    {
 // 	      libmesh_assert(i<20);
-	      
+
 // 	      // Area coordinates
 // 	      const Real zeta1 = p(0);
 // 	      const Real zeta2 = p(1);
 // 	      const Real zeta3 = p(2);
 // 	      const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-	      
-	      
+
+
 // 	      unsigned int shape=i;
-	      
+
 // 	      // handle the edge orientation
-	      
+
 // 	      if ((i== 4||i== 5) && elem->node(0) > elem->node(1))shape= 9-i;   //Edge 0
 // 	      if ((i== 6||i== 7) && elem->node(1) > elem->node(2))shape=13-i;   //Edge 1
 // 	      if ((i== 8||i== 9) && elem->node(0) > elem->node(2))shape=17-i;   //Edge 2
 // 	      if ((i==10||i==11) && elem->node(0) > elem->node(3))shape=21-i;   //Edge 3
 // 	      if ((i==12||i==13) && elem->node(1) > elem->node(3))shape=25-i;   //Edge 4
 // 	      if ((i==14||i==15) && elem->node(2) > elem->node(3))shape=29-i;   //Edge 5
-	      
+
 // 	      // No need to handle face orientation in 3rd order.
-	      
-	      
+
+
 // 	      switch(shape)
 // 		{
 // 		  //point function
@@ -298,43 +298,43 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 // 		case  1:  return zeta1*zeta1*zeta1;
 // 		case  2:  return zeta2*zeta2*zeta2;
 // 		case  3:  return zeta3*zeta3*zeta3;
-		  
+
 // 		  //edge functions
 // 		case  4:  return 3.*zeta0*zeta0*zeta1;
 // 		case  5:  return 3.*zeta1*zeta1*zeta0;
-			  
+
 // 		case  6:  return 3.*zeta1*zeta1*zeta2;
 // 		case  7:  return 3.*zeta2*zeta2*zeta1;
-		  
+
 // 		case  8:  return 3.*zeta0*zeta0*zeta2;
 // 		case  9:  return 3.*zeta2*zeta2*zeta0;
-		  
+
 // 		case 10:  return 3.*zeta0*zeta0*zeta3;
 // 		case 11:  return 3.*zeta3*zeta3*zeta0;
-		  
+
 // 		case 12:  return 3.*zeta1*zeta1*zeta3;
 // 		case 13:  return 3.*zeta3*zeta3*zeta1;
-		  
+
 // 		case 14:  return 3.*zeta2*zeta2*zeta3;
 // 		case 15:  return 3.*zeta3*zeta3*zeta2;
-			  
+
 // 		  //face functions
 // 		case 16:  return 6.*zeta0*zeta1*zeta2;
 // 		case 17:  return 6.*zeta0*zeta1*zeta3;
 // 		case 18:  return 6.*zeta1*zeta2*zeta3;
 // 		case 19:  return 6.*zeta2*zeta0*zeta3;
-		  
+
 // 		default:
 // 		  libmesh_error();
 // 		}
 // 	    }
-	    
-	    
+
+
 	    // Bernstein shape functions on the hexahedral.
 	  case HEX27:
 	    {
 	      libmesh_assert (i<64);
-	      
+
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi    = p(0);
 	      const Real eta   = p(1);
@@ -342,17 +342,17 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	      Real xi_mapped   = p(0);
 	      Real eta_mapped  = p(1);
 	      Real zeta_mapped = p(2);
-	      
+
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
 	      // and make the cut-out cube!
-	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26 
+	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26
 	      //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63
 	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 2, 2, 3, 3, 0, 0, 0, 0, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
 	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
 
-	      
+
 
 	      // handle the edge orientation
 	      {
@@ -385,13 +385,13 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		  {
 		    if (elem->point(0) != std::min(elem->point(0), elem->point(4)))
 		      zeta_mapped = -zeta;
-		  }		
+		  }
 		// Edge 5
 		else if ((i0[i] == 1) && (i1[i] == 0) && (i2[i] >=2 ))
 		  {
 		    if (elem->point(1) != std::min(elem->point(1), elem->point(5)))
 		      zeta_mapped = -zeta;
-		  }		
+		  }
 		// Edge 6
 		else if ((i0[i] == 1) && (i1[i] == 1) && (i2[i] >=2 ))
 		  {
@@ -403,7 +403,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		  {
 		    if (elem->point(3) != std::min(elem->point(3), elem->point(7)))
 		      zeta_mapped = -zeta;
-		  }		
+		  }
 		// Edge 8
 		else if ((i0[i] >=2 ) && (i1[i] == 0) && (i2[i] == 1))
 		  {
@@ -415,7 +415,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		  {
 		    if (elem->point(5) != std::min(elem->point(5), elem->point(6)))
 		      eta_mapped = -eta;
-		  }		
+		  }
 		// Edge 10
 		else if ((i0[i] >=2 ) && (i1[i] == 1) && (i2[i] == 1))
 		  {
@@ -429,8 +429,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      eta_mapped = -eta;
 		  }
 	      }
-	      
-	      
+
+
 	      // handle the face orientation
 	      {
 		// Face 0
@@ -453,7 +453,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped  = eta;
 			  eta_mapped = xi;
 			}
-		    
+
 		    else if (elem->point(3) == min_point)
 		      if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
 			{
@@ -467,7 +467,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped  = xi;
 			  eta_mapped = -eta;
 			}
-		    
+
 		    else if (elem->point(2) == min_point)
 		      if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
 			{
@@ -481,7 +481,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped  = -eta;
 			  eta_mapped = -xi;
 			}
-		    
+
 		    else if (elem->point(1) == min_point)
 		      {
 			if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
@@ -498,8 +498,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  }
 		      }
 		  }
-		
-		
+
+
 		// Face 1
 		else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
 		  {
@@ -534,7 +534,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped   = -xi;
 			  zeta_mapped = zeta;
 			}
-		    
+
 		    else if (elem->point(5) == min_point)
 		      if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
 			{
@@ -548,7 +548,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped   = -zeta;
 			  zeta_mapped = -xi;
 			}
-		    
+
 		    else if (elem->point(4) == min_point)
 		      {
 			if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
@@ -565,8 +565,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  }
 		      }
 		  }
-		
-		
+
+
 		// Face 2
 		else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
 		  {
@@ -587,7 +587,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  eta_mapped  = zeta;
 			  zeta_mapped = eta;
 			}
-		    
+
 		    else if (elem->point(2) == min_point)
 		      if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
 			{
@@ -601,7 +601,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  eta_mapped  = -eta;
 			  zeta_mapped = zeta;
 			}
-		    
+
 		    else if (elem->point(6) == min_point)
 		      if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
 			{
@@ -633,7 +633,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      }
 		  }
 
-		
+
 		// Face 3
 		else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
 		  {
@@ -654,7 +654,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped   = zeta;
 			  zeta_mapped = xi;
 			}
-		    
+
 		    else if (elem->point(7) == min_point)
 		      if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
 			{
@@ -668,7 +668,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped   = xi;
 			  zeta_mapped = -zeta;
 			}
-		    
+
 		    else if (elem->point(6) == min_point)
 		      if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
 			{
@@ -699,8 +699,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  }
 		      }
 		  }
-		
-		
+
+
 		// Face 4
 		else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
 		  {
@@ -735,7 +735,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  eta_mapped  = eta;
 			  zeta_mapped = -zeta;
 			}
-		    
+
 		    else if (elem->point(7) == min_point)
 		      if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
 			{
@@ -766,8 +766,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  }
 		      }
 		  }
-		
-		
+
+
 		// Face 5
 		else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
 		  {
@@ -788,7 +788,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped  = eta;
 			  eta_mapped = xi;
 			}
-		    
+
 		    else if (elem->point(5) == min_point)
 		      if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
 			{
@@ -802,7 +802,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped  = -xi;
 			  eta_mapped = eta;
 			}
-		    
+
 		    else if (elem->point(6) == min_point)
 		      if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
 			{
@@ -816,7 +816,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 			  xi_mapped  = -eta;
 			  eta_mapped = -xi;
 			}
-		    
+
 		    else if (elem->point(7) == min_point)
 		      {
 			if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
@@ -834,32 +834,32 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      }
 		  }
 	      }
-	      
+
 	      return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi_mapped)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta_mapped)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta_mapped));
 	    }
-	    
-	    
+
+
 	  default:
 	    libmesh_error();
-	    
+
 	  } //case HEX27
- 
+
       }	//case THIRD
-      
-      
+
+
       // 4th-order Bernstein.
     case FOURTH:
       {
 	switch (type)
-	  {  
-	    
+	  {
+
 	    // Bernstein shape functions on the hexahedral.
 	  case HEX27:
 	    {
 	      libmesh_assert (i<125);
-	      
+
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi    = p(0);
 	      const Real eta   = p(1);
@@ -867,18 +867,18 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 	      Real xi_mapped   = p(0);
 	      Real eta_mapped  = p(1);
 	      Real zeta_mapped = p(2);
-	      
+
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
 	      // and make the cut-out cube!
-	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26 
+	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26
 	      //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4};
 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
 	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4};
-	      
-	      
-	      
+
+
+
 	      // handle the edge orientation
 	      {
 		// Edge 0
@@ -910,13 +910,13 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		  {
 		    if (elem->point(0) != std::min(elem->point(0), elem->point(4)))
 		      zeta_mapped = -zeta;
-		  }		
+		  }
 		// Edge 5
 		else if ((i0[i] == 1) && (i1[i] == 0) && (i2[i] >=2 ))
 		  {
 		    if (elem->point(1) != std::min(elem->point(1), elem->point(5)))
 		      zeta_mapped = -zeta;
-		  }		
+		  }
 		// Edge 6
 		else if ((i0[i] == 1) && (i1[i] == 1) && (i2[i] >=2 ))
 		  {
@@ -928,7 +928,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		  {
 		    if (elem->point(3) != std::min(elem->point(3), elem->point(7)))
 		      zeta_mapped = -zeta;
-		  }		
+		  }
 		// Edge 8
 		else if ((i0[i] >=2 ) && (i1[i] == 0) && (i2[i] == 1))
 		  {
@@ -940,7 +940,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		  {
 		    if (elem->point(5) != std::min(elem->point(5), elem->point(6)))
 		      eta_mapped = -eta;
-		  }		
+		  }
 		// Edge 10
 		else if ((i0[i] >=2 ) && (i1[i] == 1) && (i2[i] == 1))
 		  {
@@ -954,8 +954,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      eta_mapped = -eta;
 		  }
 	      }
-	      
-	      
+
+
 	      // handle the face orientation
 	      {
 		// Face 0
@@ -1024,7 +1024,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      }
 		  }
 
-		
+
 		// Face 1
 		else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
 		  {
@@ -1091,7 +1091,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      }
 		  }
 
-		
+
 		// Face 2
 		else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
 		  {
@@ -1158,7 +1158,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      }
 		  }
 
-		
+
 		// Face 3
 		else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
 		  {
@@ -1225,7 +1225,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      }
 		  }
 
-		
+
 		// Face 4
 		else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
 		  {
@@ -1292,7 +1292,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      }
 		  }
 
-		
+
 		// Face 5
 		else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
 		  {
@@ -1359,28 +1359,28 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 		      }
 		  }
 
-		
+
 	      }
-	      
-	      
+
+
 	      return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi_mapped)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta_mapped)*
 		      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta_mapped));
 	    }
 
-	    
+
 	  default:
 	    libmesh_error();
-	  }	
+	  }
       }
-      
-      
+
+
     default:
       libmesh_error();
     }
-  
+
 #endif
-  
+
   libmesh_error();
   return 0.;
 }
@@ -1399,7 +1399,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const ElemType,
 	        << "because edge and face orientation is needed."
 	        << std::endl;
   libmesh_error();
-  
+
   return 0.;
 }
 
@@ -1418,13 +1418,13 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   libmesh_assert (j < 3);
-  
+
   switch (totalorder)
     {
-      
-      
+
+
       // 1st order Bernstein.
     case FIRST:
       {
@@ -1437,11 +1437,11 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	      // I have been lazy here and am using finite differences
 	      // to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 4);
 	      libmesh_assert (j < 3);
-	      
-	      
+
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -1449,7 +1449,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  {
 		    const Point pp(p(0)+eps, p(1), p(2));
 		    const Point pm(p(0)-eps, p(1), p(2));
-		    
+
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }
@@ -1471,11 +1471,11 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
-		  }                 
+		  }
 		default:
 		  libmesh_error();
 		}
-		              
+
 	    }
 
 
@@ -1486,12 +1486,12 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	  case HEX27:
 	    {
 	      libmesh_assert (i<8);
-	
+
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
 	      const Real zeta = p(2);
-	
+
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
 	      // and make the cut-out cube!
@@ -1544,7 +1544,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	      // I have been lazy here and am using finite differences
 	      // to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i <10);
 	      libmesh_assert (j < 3);
 
@@ -1578,23 +1578,23 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
-		  }                 
+		  }
 		default:
 		  libmesh_error();
 		}
-		              
+
 	    }
 
 		// Bernstein shape functions on the hexahedral.
 	  case HEX20:
 	    {
 	      libmesh_assert (i<20);
-	
+
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
 	      const Real zeta = p(2);
-	
+
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
 	      // and make the cut-out cube!
@@ -1723,12 +1723,12 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	  case HEX27:
 	    {
 	      libmesh_assert (i<27);
-	
+
 	      // Compute hex shape functions as a tensor-product
 	      const Real xi   = p(0);
 	      const Real eta  = p(1);
 	      const Real zeta = p(2);
-	
+
 	      // The only way to make any sense of this
 	      // is to look at the mgflo/mg2/mgf documentation
 	      // and make the cut-out cube!
@@ -1768,7 +1768,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	  }
       }
 
-      
+
 
       // 3rd-order Bernstein.
     case THIRD:
@@ -1782,10 +1782,10 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      // I have been lazy here and am using finite differences
 // 	      // to compute the derivatives!
 // 	      const Real eps = 1.e-6;
-	      
+
 // 	      libmesh_assert (i < 20);
-// 	      libmesh_assert (j < 3);    
- 
+// 	      libmesh_assert (j < 3);
+
 // 		switch (j)
 // 		{
 // 		  //  d()/dxi
@@ -1815,14 +1815,14 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 
 // 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 // 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
-// 		  }                 
+// 		  }
 // 		default:
 // 		  libmesh_error();
 // 		}
-      
-          		              
+
+
 // 	    }
-	    
+
 
 	    // Bernstein shape functions on the hexahedral.
  	  case HEX27:
@@ -1830,10 +1830,10 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	      // I have been lazy here and am using finite differences
 	      // to compute the derivatives!
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 64);
-	      libmesh_assert (j < 3);    
-	      
+	      libmesh_assert (j < 3);
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -1841,17 +1841,17 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  {
 		    const Point pp(p(0)+eps, p(1), p(2));
 		    const Point pm(p(0)-eps, p(1), p(2));
-		    
+
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }
-		  
+
 		  // d()/deta
 		case 1:
 		  {
 		    const Point pp(p(0), p(1)+eps, p(2));
 		    const Point pm(p(0), p(1)-eps, p(2));
-		    
+
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }
@@ -1860,16 +1860,16 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  {
 		    const Point pp(p(0), p(1), p(2)+eps);
 		    const Point pm(p(0), p(1), p(2)-eps);
-		    
+
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
-		  }                 
+		  }
 		default:
 		  libmesh_error();
 		}
-	      
+
 	    }
-	    
+
 // 	      // Compute hex shape functions as a tensor-product
 // 	      const Real xi    = p(0);
 // 	      const Real eta   = p(1);
@@ -1877,11 +1877,11 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      Real xi_mapped   = p(0);
 // 	      Real eta_mapped  = p(1);
 // 	      Real zeta_mapped = p(2);
-	
+
 // 	      // The only way to make any sense of this
 // 	      // is to look at the mgflo/mg2/mgf documentation
 // 	      // and make the cut-out cube!
-// 	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26 
+// 	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26
 // 	      //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63
 // 	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3};
 // 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 2, 2, 3, 3, 0, 0, 0, 0, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
@@ -1920,13 +1920,13 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		  {
 // 		    if (elem->node(0) != std::min(elem->node(0), elem->node(4)))
 // 		      zeta_mapped = -zeta;
-// 		  }		
+// 		  }
 // 		// Edge 5
 // 		else if ((i0[i] == 1) && (i1[i] == 0))
 // 		  {
 // 		    if (elem->node(1) != std::min(elem->node(1), elem->node(5)))
 // 		      zeta_mapped = -zeta;
-// 		  }		
+// 		  }
 // 		// Edge 6
 // 		else if ((i0[i] == 1) && (i1[i] == 1))
 // 		  {
@@ -1938,7 +1938,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		  {
 // 		    if (elem->node(3) != std::min(elem->node(3), elem->node(7)))
 // 		      zeta_mapped = -zeta;
-// 		  }		
+// 		  }
 // 		// Edge 8
 // 		else if ((i1[i] == 0) && (i2[i] == 1))
 // 		  {
@@ -1950,7 +1950,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		  {
 // 		    if (elem->node(5) != std::min(elem->node(5), elem->node(6)))
 // 		      eta_mapped = -eta;
-// 		  }		
+// 		  }
 // 		// Edge 10
 // 		else if ((i1[i] == 1) && (i2[i] == 1))
 // 		  {
@@ -2032,7 +2032,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 1
 // 		else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
 // 		  {
@@ -2097,7 +2097,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 2
 // 		else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
 // 		  {
@@ -2162,7 +2162,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 3
 // 		else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
 // 		  {
@@ -2227,7 +2227,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 4
 // 		else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
 // 		  {
@@ -2292,7 +2292,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 5
 // 		else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
 // 		  {
@@ -2357,10 +2357,10 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 	      }
-		  
-	      
+
+
 
 // 	      libmesh_assert (j < 3);
 
@@ -2389,7 +2389,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		}
 // 	    }
 
-	    
+
 	  default:
 	    libmesh_error();
 	  }
@@ -2405,10 +2405,10 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 	  case HEX27:
 	    {
 	      const Real eps = 1.e-6;
-	      
+
 	      libmesh_assert (i < 125);
-	      libmesh_assert (j < 3);    
-	      
+	      libmesh_assert (j < 3);
+
 	      switch (j)
 		{
 		  //  d()/dxi
@@ -2416,17 +2416,17 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  {
 		    const Point pp(p(0)+eps, p(1), p(2));
 		    const Point pm(p(0)-eps, p(1), p(2));
-		    
+
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }
-		  
+
 		  // d()/deta
 		case 1:
 		  {
 		    const Point pp(p(0), p(1)+eps, p(2));
 		    const Point pm(p(0), p(1)-eps, p(2));
-		    
+
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
 		  }
@@ -2435,14 +2435,14 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 		  {
 		    const Point pp(p(0), p(1), p(2)+eps);
 		    const Point pm(p(0), p(1), p(2)-eps);
-		    
+
 		    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
 			    FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
-		  }                 
+		  }
 		default:
 		  libmesh_error();
 		}
-	    }	      
+	    }
 
 // 	      // Compute hex shape functions as a tensor-product
 // 	      const Real xi    = p(0);
@@ -2451,11 +2451,11 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      Real xi_mapped   = p(0);
 // 	      Real eta_mapped  = p(1);
 // 	      Real zeta_mapped = p(2);
-	
+
 // 	      // The only way to make any sense of this
 // 	      // is to look at the mgflo/mg2/mgf documentation
 // 	      // and make the cut-out cube!
-// 	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26	
+// 	      //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26
 // 	      //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 // 	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4};
 // 	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
@@ -2494,13 +2494,13 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		  {
 // 		    if (elem->node(0) != std::min(elem->node(0), elem->node(4)))
 // 		      zeta_mapped = -zeta;
-// 		  }		
+// 		  }
 // 		// Edge 5
 // 		else if ((i0[i] == 1) && (i1[i] == 0))
 // 		  {
 // 		    if (elem->node(1) != std::min(elem->node(1), elem->node(5)))
 // 		      zeta_mapped = -zeta;
-// 		  }		
+// 		  }
 // 		// Edge 6
 // 		else if ((i0[i] == 1) && (i1[i] == 1))
 // 		  {
@@ -2512,7 +2512,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		  {
 // 		    if (elem->node(3) != std::min(elem->node(3), elem->node(7)))
 // 		      zeta_mapped = -zeta;
-// 		  }		
+// 		  }
 // 		// Edge 8
 // 		else if ((i1[i] == 0) && (i2[i] == 1))
 // 		  {
@@ -2524,7 +2524,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		  {
 // 		    if (elem->node(5) != std::min(elem->node(5), elem->node(6)))
 // 		      eta_mapped = -eta;
-// 		  }		
+// 		  }
 // 		// Edge 10
 // 		else if ((i1[i] == 1) && (i2[i] == 1))
 // 		  {
@@ -2606,7 +2606,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 1
 // 		else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
 // 		  {
@@ -2671,7 +2671,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 2
 // 		else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
 // 		  {
@@ -2736,7 +2736,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 3
 // 		else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
 // 		  {
@@ -2801,7 +2801,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 4
 // 		else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
 // 		  {
@@ -2866,7 +2866,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 		// Face 5
 // 		else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
 // 		  {
@@ -2931,10 +2931,10 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 			}
 // 		  }
 
-		
+
 // 	      }
-		  
-	      
+
+
 
 // 	      libmesh_assert (j < 3);
 
@@ -2963,7 +2963,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		}
 //	    }
 
-	    
+
 	  default:
 	    libmesh_error();
 	  }

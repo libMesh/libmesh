@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -76,7 +76,7 @@ Real FE<1,HIERARCHIC>::shape(const ElemType,
       returnval = (pow<5>(xi) - xi)/120.;
       break;
     case 7:
-      returnval = (pow<7>(xi) - xi)/5040.;	    
+      returnval = (pow<7>(xi) - xi)/5040.;
       break;
     default:
       Real denominator = 1.;
@@ -106,7 +106,7 @@ Real FE<1,HIERARCHIC>::shape(const Elem* elem,
 			     const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   return FE<1,HIERARCHIC>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
 
@@ -120,7 +120,7 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
 				   const Point& p)
 {
   // only d()/dxi in 1D!
-  
+
   libmesh_assert (j == 0);
   libmesh_assert(i < order+1u);
 
@@ -160,7 +160,7 @@ Real FE<1,HIERARCHIC>::shape_deriv(const ElemType,
       returnval = (5.*pow<4>(xi) - 1.)/120.;
       break;
     case 7:
-      returnval = (7.*pow<6>(xi) - 1.)/5040.;	    
+      returnval = (7.*pow<6>(xi) - 1.)/5040.;
       break;
     default:
       Real denominator = 1.;
@@ -191,7 +191,7 @@ Real FE<1,HIERARCHIC>::shape_deriv(const Elem* elem,
 				   const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   return FE<1,HIERARCHIC>::shape_deriv(elem->type(),
 				       static_cast<Order>(order + elem->p_level()), i, j, p);
 }
@@ -206,7 +206,7 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
 				          const Point& p)
 {
   // only d2()/d2xi in 1D!
-  
+
   libmesh_assert (j == 0);
   libmesh_assert (i < order+1u);
 
@@ -215,7 +215,7 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
   using Utility::pow;
 
   const Real xi = p(0);
-	
+
   Real returnval = 1.;
 
   switch (i)
@@ -242,9 +242,9 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const ElemType,
       returnval = pow<4>(xi)/24.;
       break;
     case 7:
-      returnval = pow<5>(xi)/120.;	    
+      returnval = pow<5>(xi)/120.;
       break;
-    
+
     default:
       Real denominator = 1.;
       for (unsigned int n=1; n != i; ++n)
@@ -274,7 +274,7 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const Elem* elem,
 				          const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   return FE<1,HIERARCHIC>::shape_second_deriv(elem->type(),
 				              static_cast<Order>(order + elem->p_level()), i, j, p);
 }

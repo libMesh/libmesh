@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,7 +46,7 @@ TransientRBEvaluation::~TransientRBEvaluation ()
 void TransientRBEvaluation::clear()
 {
   Parent::clear();
-  
+
   clear_riesz_representors();
 }
 
@@ -72,11 +72,11 @@ void TransientRBEvaluation::clear_riesz_representors()
 void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax)
 {
   START_LOG("resize_data_structures()", "TransientRBEvaluation");
-  
+
   Parent::resize_data_structures(Nmax);
 
   RB_L2_matrix.resize(Nmax,Nmax);
-  
+
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
@@ -278,7 +278,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
     }
 
     alpha_LB = get_stability_lower_bound();
-    
+
     // Precompute time-invariant parts of the dual norm of the residual.
     cache_online_residual_terms(N);
   }
@@ -343,7 +343,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
 
   STOP_LOG("rb_solve()", "TransientRBEvaluation");
 
-  if(evaluate_RB_error_bound) // Calculate the error bounds  
+  if(evaluate_RB_error_bound) // Calculate the error bounds
   {
     return error_bound_all_k[n_time_steps];
   }
@@ -359,7 +359,7 @@ Real TransientRBEvaluation::get_rb_solution_norm()
   // Return the L2 norm of RB_solution
   // After an rb_solve, RB_solution will hold the
   // solution vector for the final time level.
-  
+
   const unsigned int N = RB_solution.size();
   DenseVector<Number> temp(N);
   DenseMatrix<Number> RB_L2_matrix_N;
@@ -457,11 +457,11 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
     Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a,mu);
-    
+
     for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
       Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m,mu);
-      
+
       for(unsigned int i=0; i<N; i++)
       {
         for(unsigned int j=0; j<N; j++)
@@ -471,7 +471,7 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
       }
     }
   }
-  
+
   cached_Mq_Mq_matrix.resize(N,N);
   q=0;
   for(unsigned int q_m1=0; q_m1<Q_m; q_m1++)
@@ -494,7 +494,7 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
       q++;
     }
   }
-  
+
   STOP_LOG("cache_online_residual_terms()", "TransientRBEvaluation");
 }
 
@@ -518,7 +518,7 @@ Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
   }
 
   Number residual_norm_sq = cached_Fq_term;
-  
+
   residual_norm_sq += RB_u_euler_theta.dot(cached_Fq_Aq_vector);
   residual_norm_sq += mass_coeffs.dot(cached_Fq_Mq_vector);
 
@@ -665,11 +665,11 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
     Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a,mu);
-    
+
     for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
       Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m,mu);
-      
+
       for(unsigned int i=0; i<N; i++)
       {
         for(unsigned int j=0; j<N; j++)
@@ -681,7 +681,7 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
       }
     }
   }
-  
+
   if(libmesh_real(residual_norm_sq) < 0)
   {
     libMesh::out << "Warning: Square of residual norm is negative "
@@ -736,7 +736,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
       }
     }
     RB_L2_matrix_out.close();
-          
+
     // Write out the M_q matrices
     for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
@@ -895,7 +895,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   // First, find out how many basis functions we had when Greedy terminated
   // This was set in RBSystem::read_offline_data_from_files
   unsigned int n_bfs = this->get_n_basis_functions();
-  
+
   std::ifstream RB_L2_matrix_in;
   {
     OStringStream file_name;

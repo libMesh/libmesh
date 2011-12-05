@@ -3,17 +3,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -79,10 +79,10 @@ public:
    * The type of the parent.
    */
   typedef DifferentiableSystem Parent;
-  
+
   /**
    * Clear all the data structures associated with
-   * the system. 
+   * the system.
    */
   virtual void clear ();
 
@@ -226,12 +226,12 @@ public:
 
   /*
    * Prepares the result of a build_context() call for use.
-   * 
+   *
    * Most FEMSystem-based problems will need to reimplement this in order to
    * call FE::get_*() as their particular physics requires.
    */
   virtual void init_context(DiffContext &);
- 
+
   /**
    * Runs a postprocessing loop over all elements, and if
    * \p postprocess_sides is true over all sides.
@@ -271,7 +271,7 @@ public:
    * If calculating numeric jacobians is required, the FEMSystem
    * will perturb each solution vector entry by numerical_jacobian_h
    * when calculating finite differences.
-   */ 
+   */
   Real numerical_jacobian_h;
 
   /**
@@ -280,7 +280,7 @@ public:
    * an overloaded element_time_derivative(), element_constraint(),
    * side_time_derivative(), or side_constraint() function cannot
    * provide an analytic jacobian upon request.
-   * 
+   *
    * If verify_analytic_jacobian is equal to the positive value tol,
    * then any time a full analytic element jacobian can be calculated
    * it will be tested against a numerical jacobian on the same element,

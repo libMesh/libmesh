@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,19 +37,19 @@ namespace libMesh
  * The \p Hex8 is an element in 3D composed of 8 nodes.
  * It is numbered like this:
    \verbatim
-  HEX8: 7        6           
-        o--------o           
-       /:       /|           
-      / :      / |           
-   4 /  :   5 /  |           
-    o--------o   |           
-    |   o....|...o 2         
-    |  .3    |  /            
-    | .      | /             
-    |.       |/              
-    o--------o               
-    0        1               
-                             
+  HEX8: 7        6
+        o--------o
+       /:       /|
+      / :      / |
+   4 /  :   5 /  |
+    o--------o   |
+    |   o....|...o 2
+    |  .3    |  /
+    | .      | /
+    |.       |/
+    o--------o
+    0        1
+
    \endverbatim
  */
 
@@ -63,12 +63,12 @@ public:
    * Constructor.  By default this element has no parent.
    */
   Hex8  (Elem* p=NULL);
-  
+
   /**
    * @returns \p HEX8
    */
   ElemType type () const { return HEX8; }
-  
+
   /**
    * @returns 8
    */
@@ -93,21 +93,21 @@ public:
    * @returns true iff the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
 			       const unsigned int s) const;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
 			       const unsigned int e) const;
-  
+
   /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
@@ -118,16 +118,16 @@ public:
    * @returns FIRST
    */
   Order default_order() const { return FIRST; }
-  
+
   /**
-   * Builds a QUAD4 built coincident with face i.  
+   * Builds a QUAD4 built coincident with face i.
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
 			    bool proxy) const;
 
   /**
-   * Builds a EDGE2 built coincident with edge i.  
+   * Builds a EDGE2 built coincident with edge i.
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_edge (const unsigned int i) const;
@@ -151,23 +151,23 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
   static const unsigned int node_child_map[8];
 #endif
-  
+
   /**
    * A specialization for computing the area of a hexahedron
    * with flat sides.
    */
   virtual Real volume () const;
-  
-  
+
+
 protected:
 
   /**
    * Data for links to nodes
    */
   Node* _nodelinks_data[8];
-  
-  
-  
+
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -183,7 +183,7 @@ protected:
    * from current nodes/solution.
    */
   static const float _embedding_matrix[8][8][8];
-  
+
 #endif
 
 };
@@ -194,7 +194,7 @@ protected:
 // Hex8 class member functions
 inline
 Hex8::Hex8(Elem* p) :
-  Hex(Hex8::n_nodes(), p, _nodelinks_data) 
+  Hex(Hex8::n_nodes(), p, _nodelinks_data)
 {
 }
 

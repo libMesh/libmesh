@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -43,7 +43,7 @@ class MeshData;
 
 /**
  * This class implements reading and writing meshes in the VTK format.
- * Format description: 
+ * Format description:
  * cf. <a href="http://www.vtk.org/">VTK home page</a>.
  *
  * This class will not have any functionality unless VTK is detected
@@ -84,7 +84,7 @@ public:
    * write_nodal_data there would be no way to export cell centered data
    */
 
-  virtual void write_equation_systems(const std::string& fname, const EquationSystems& es); 
+  virtual void write_equation_systems(const std::string& fname, const EquationSystems& es);
 
   /**
    * This method implements reading a mesh from a specified file
@@ -96,13 +96,13 @@ public:
    * This method implements writing a mesh to a specified ".poly"   file.
    * ".poly" files defines so called Piecewise Linear Complex   (PLC).
   */
-  virtual void write (const std::string& );  
+  virtual void write (const std::string& );
 
-  /** 
+  /**
    * Get a pointer to the VTK datastructure
    */
    vtkUnstructuredGrid* get_vtk_grid(){return _vtk_grid;}
-	
+
 private:
 
   /**
@@ -111,7 +111,7 @@ private:
   vtkPoints* nodes_to_vtk(const MeshBase& mesh);
 //  , vtkUnstructuredGrid*& grid);
 
-  /** 
+  /**
    * write the cells from the mesh into a vtkUnstructuredGrid
    */
   vtkCellArray* cells_to_vtk(const MeshBase& mesh, std::vector<int>& types);
@@ -123,7 +123,7 @@ private:
   void solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid);
 
   /**
-   * write the system vectors to vtk 
+   * write the system vectors to vtk
    */
   void system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid);
 
@@ -131,7 +131,7 @@ private:
     * pointer to the VTK grid
     */
    vtkUnstructuredGrid* _vtk_grid;
-  
+
   /**
    * A pointer to the MeshData object you would like to use.
    * with this VTKIO object.  Can be NULL.
@@ -149,7 +149,7 @@ VTKIO::VTKIO (MeshBase& mesh, MeshData* mesh_data) :
 	MeshOutput<MeshBase>(mesh),
 	_mesh_data(mesh_data)
 {
-  _vtk_grid = NULL;	
+  _vtk_grid = NULL;
   libmesh_experimental();
 }
 
@@ -160,7 +160,7 @@ VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
 	MeshOutput<MeshBase>(mesh),
 	_mesh_data(mesh_data)
 {
-  _vtk_grid = NULL;	
+  _vtk_grid = NULL;
   libmesh_experimental();
 }
 

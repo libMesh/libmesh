@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -43,7 +43,7 @@ T LaspackVector<T>::sum () const
   T _sum = 0;
 
   const unsigned int n = this->size();
-  
+
   for (unsigned int i=0; i!=n; ++i)
     _sum += (*this)(i);
 
@@ -56,7 +56,7 @@ template <typename T>
 Real LaspackVector<T>::l1_norm () const
 {
   libmesh_assert (this->closed());
-  
+
   return static_cast<Real>(l1Norm_V(const_cast<QVector*>(&_vec)));
 }
 
@@ -66,7 +66,7 @@ template <typename T>
 Real LaspackVector<T>::l2_norm () const
 {
   libmesh_assert (this->closed());
-  
+
   return static_cast<Real>(l2Norm_V(const_cast<QVector*>(&_vec)));
 }
 
@@ -76,7 +76,7 @@ template <typename T>
 Real LaspackVector<T>::linfty_norm () const
 {
   libmesh_assert (this->closed());
-  
+
   return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
 }
 
@@ -86,9 +86,9 @@ template <typename T>
 NumericVector<T>& LaspackVector<T>::operator += (const NumericVector<T>& v)
 {
   libmesh_assert (this->closed());
-  
+
   this->add(1., v);
-  
+
   return *this;
 }
 
@@ -99,9 +99,9 @@ template <typename T>
 NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
 {
   libmesh_assert (this->closed());
-  
+
   this->add(-1., v);
-  
+
   return *this;
 }
 
@@ -111,7 +111,7 @@ template <typename T>
 void LaspackVector<T>::add (const T v)
 {
   const unsigned int n = this->size();
-  
+
   for (unsigned int i=0; i<n; i++)
     this->add (i, v);
 }
@@ -142,20 +142,20 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::add_vector (const std::vector<T>& v,
 				   const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (!v.empty());
   libmesh_assert (v.size() == dof_indices.size());
-  
+
   for (unsigned int i=0; i<v.size(); i++)
     this->add (dof_indices[i], v[i]);
 }
 
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::add_vector (const NumericVector<T>& V,
 				   const std::vector<unsigned int>& dof_indices)
 {
@@ -167,7 +167,7 @@ void LaspackVector<T>::add_vector (const NumericVector<T>& V,
 
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::add_vector (const DenseVector<T>& V,
 				   const std::vector<unsigned int>& dof_indices)
 {
@@ -179,20 +179,20 @@ void LaspackVector<T>::add_vector (const DenseVector<T>& V,
 
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::insert (const std::vector<T>& v,
 			       const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (!v.empty());
   libmesh_assert (v.size() == dof_indices.size());
-  
+
   for (unsigned int i=0; i<v.size(); i++)
     this->set (dof_indices[i], v[i]);
 }
 
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::insert (const NumericVector<T>& V,
 			       const std::vector<unsigned int>& dof_indices)
 {
@@ -204,7 +204,7 @@ void LaspackVector<T>::insert (const NumericVector<T>& V,
 
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::insert (const DenseVector<T>& V,
 			       const std::vector<unsigned int>& dof_indices)
 {
@@ -216,7 +216,7 @@ void LaspackVector<T>::insert (const DenseVector<T>& V,
 
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::insert (const DenseSubVector<T>& V,
 			       const std::vector<unsigned int>& dof_indices)
 {
@@ -228,7 +228,7 @@ void LaspackVector<T>::insert (const DenseSubVector<T>& V,
 
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
 				   const SparseMatrix<T> &mat_in)
 {
@@ -238,14 +238,14 @@ void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
 
   libmesh_assert (vec != NULL);
   libmesh_assert (mat != NULL);
-  
+
   // += mat*vec
   AddAsgn_VV (&_vec, Mul_QV(const_cast<QMatrix*>(&mat->_QMat),
 			    const_cast<QVector*>(&vec->_vec)));
 }
 
 
-template <typename T> 
+template <typename T>
 void LaspackVector<T>::add_vector_transpose (const NumericVector<T> &,
 				             const SparseMatrix<T> &)
 {
@@ -258,7 +258,7 @@ template <typename T>
 void LaspackVector<T>::scale (const T factor)
 {
   libmesh_assert (this->initialized());
-  
+
   Mul_SV (factor, &_vec);
 }
 
@@ -268,7 +268,7 @@ void LaspackVector<T>::abs()
   libmesh_assert (this->initialized());
 
   const unsigned int n = this->size();
-  
+
   for (unsigned int i=0; i!=n; ++i)
     this->set(i,std::abs((*this)(i)));
 }
@@ -281,7 +281,7 @@ T LaspackVector<T>::dot (const NumericVector<T>& V) const
   // Make sure the NumericVector passed in is really a LaspackVector
   const LaspackVector<T>* v = libmesh_cast_ptr<const LaspackVector<T>*>(&V);
   libmesh_assert (v != NULL);
-  
+
   return Mul_VV (const_cast<QVector*>(&(this->_vec)),
 		 const_cast<QVector*>(&(v->_vec)));
 }
@@ -289,13 +289,13 @@ T LaspackVector<T>::dot (const NumericVector<T>& V) const
 
 
 template <typename T>
-NumericVector<T>& 
+NumericVector<T>&
 LaspackVector<T>::operator = (const T s)
 {
   libmesh_assert (this->initialized());
 
   V_SetAllCmp (&_vec, s);
-  
+
   return *this;
 }
 
@@ -310,7 +310,7 @@ LaspackVector<T>::operator = (const NumericVector<T>& v_in)
     libmesh_cast_ptr<const LaspackVector<T>*>(&v_in);
 
   libmesh_assert (v != NULL);
-  
+
   *this = *v;
 
   return *this;
@@ -327,11 +327,11 @@ LaspackVector<T>::operator = (const LaspackVector<T>& v)
 
   this->_is_closed = v._is_closed;
 
-  if (v.size() != 0)    
+  if (v.size() != 0)
     Asgn_VV (const_cast<QVector*>(&_vec),
 	     const_cast<QVector*>(&v._vec)
 	     );
-  
+
   return *this;
 }
 
@@ -345,10 +345,10 @@ LaspackVector<T>::operator = (const std::vector<T>& v)
    * Case 1:  The vector is the same size of
    * The global vector.  Only add the local components.
    */
-  if (this->size() == v.size())      
+  if (this->size() == v.size())
     for (unsigned int i=0; i<v.size(); i++)
       this->set (i, v[i]);
-  
+
   else
     libmesh_error();
 
@@ -393,7 +393,7 @@ void LaspackVector<T>::localize (const unsigned int libmesh_dbg_var(first_local_
 {
   libmesh_assert (first_local_idx  == 0);
   libmesh_assert (last_local_idx+1 == this->size());
-  
+
   libmesh_assert (send_list.size() <= this->size());
 }
 
@@ -406,7 +406,7 @@ void LaspackVector<T>::localize (std::vector<T>& v_local) const
   v_local.resize(this->size());
 
   for (unsigned int i=0; i<v_local.size(); i++)
-    v_local[i] = (*this)(i);  
+    v_local[i] = (*this)(i);
 }
 
 
@@ -431,7 +431,7 @@ void LaspackVector<T>::pointwise_mult (const NumericVector<T>& /*vec1*/,
 
 
 
-template <typename T> 
+template <typename T>
 Real LaspackVector<T>::max() const
 {
   libmesh_assert (this->initialized());
@@ -441,7 +441,7 @@ Real LaspackVector<T>::max() const
   Real max = libmesh_real((*this)(0));
 
   const unsigned int n = this->size();
-  
+
   for (unsigned int i=1; i<n; i++)
     max = std::max (max, libmesh_real((*this)(i)));
 
@@ -450,7 +450,7 @@ Real LaspackVector<T>::max() const
 
 
 
-template <typename T> 
+template <typename T>
 Real LaspackVector<T>::min () const
 {
   libmesh_assert (this->initialized());
@@ -460,7 +460,7 @@ Real LaspackVector<T>::min () const
   Real min = libmesh_real((*this)(0));
 
   const unsigned int n = this->size();
-  
+
   for (unsigned int i=1; i<n; i++)
     min = std::min (min, libmesh_real((*this)(i)));
 
@@ -473,6 +473,6 @@ Real LaspackVector<T>::min () const
 template class LaspackVector<Number>;
 
 } // namespace libMesh
- 
+
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK

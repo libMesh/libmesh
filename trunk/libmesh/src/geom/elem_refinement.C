@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,14 +37,14 @@ namespace libMesh
  * The following functions only apply when
  * AMR is enabled and thus are not present
  * otherwise.
- */ 
+ */
 #ifdef LIBMESH_ENABLE_AMR
 
 void Elem::refine (MeshRefinement& mesh_refinement)
 {
   libmesh_assert (this->refinement_flag() == Elem::REFINE);
   libmesh_assert (this->active());
-  
+
   // Create my children if necessary
   if (!_children)
     {
@@ -66,11 +66,11 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       // static should save on reallocations
       std::vector<std::vector<Point> >        p    (this->n_children());
       std::vector<std::vector<Node*> >        nodes(this->n_children());
-    
+
 
       // compute new nodal locations
       for (unsigned int c=0; c<this->n_children(); c++)
-        {	
+        {
           Elem *child = this->child(c);
 	  p[c].resize    (child->n_nodes());
 	  nodes[c].resize(child->n_nodes());
@@ -80,16 +80,16 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 	      // zero entries
 	      p[c][nc].zero();
 	      nodes[c][nc] = NULL;
-	  
+
 	      for (unsigned int n=0; n<this->n_nodes(); n++)
 	        {
 		  // The value from the embedding matrix
 		  const float em_val = this->embedding_matrix(c,nc,n);
-	      
+
 		  if (em_val != 0.)
 		    {
 		      p[c][nc].add_scaled (this->point(n), em_val);
-		  
+
 		      // We may have found the node, in which case we
 		      // won't need to look it up later.
 		      if (em_val == 1.)
@@ -97,7 +97,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 		    }
 	        }
 	    }
-      
+
 	// assign nodes to children & add them to the mesh
           const Real pointtol = this->hmin() * TOLERANCE;
 	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
@@ -116,7 +116,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
                     (this->n_systems());
 	        }
 	    }
-      
+
 	  mesh_refinement.add_elem (child);
           child->set_n_systems(this->n_systems());
         }
@@ -125,7 +125,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
     {
       unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
-        {	
+        {
           Elem *child = this->child(c);
           libmesh_assert(child->subactive());
           child->set_refinement_flag(Elem::JUST_REFINED);
@@ -139,7 +139,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
   this->set_p_refinement_flag(Elem::INACTIVE);
 
   for (unsigned int c=0; c<this->n_children(); c++)
-    {	
+    {
       libmesh_assert(this->child(c)->parent() == this);
       libmesh_assert(this->child(c)->active());
     }
@@ -164,11 +164,11 @@ unsigned int Elem::_cast_node_address_to_unsigned_int(const unsigned int n)
 
 #elif LIBMESH_SIZEOF_LONG_INT == LIBMESH_SIZEOF_VOID_P
 
-  // 64-bit machines 
+  // 64-bit machines
   // Another big prime number less than max_unsigned_int
   // for key creation on 64-bit machines
   const unsigned int bp3 = 4294967291;
-  const unsigned int n_id =			
+  const unsigned int n_id =
     reinterpret_cast<long unsigned int>(this->get_node(n))%bp3;
 
 #else
@@ -197,7 +197,7 @@ void Elem::coarsen()
 
   // re-compute hanging node nodal locations
   for (unsigned int c=0; c<this->n_children(); c++)
-  {	
+  {
     Elem *mychild = this->child(c);
     if (mychild == remote_elem)
       continue;
@@ -210,9 +210,9 @@ void Elem::coarsen()
       {
         // The value from the embedding matrix
         const float em_val = this->embedding_matrix(c,nc,n);
-         
+
         // The node location is somewhere between existing vertices
-        if ((em_val != 0.) && (em_val != 1.)) 
+        if ((em_val != 0.) && (em_val != 1.))
         {
 	  new_pos.add_scaled (this->point(n), em_val);
 	  calculated_new_pos = true;
@@ -220,7 +220,7 @@ void Elem::coarsen()
       }
 
       if(calculated_new_pos)
-      {	
+      {
 	//Move the existing node back into it's original location
 	for(unsigned int i=0; i<LIBMESH_DIM; i++)
 	{
@@ -232,7 +232,7 @@ void Elem::coarsen()
   }
 
   for (unsigned int c=0; c<this->n_children(); c++)
-    {	
+    {
       Elem *mychild = this->child(c);
       if (mychild == remote_elem)
         continue;

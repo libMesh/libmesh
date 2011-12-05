@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -36,9 +36,9 @@ namespace libMesh
 // InfFE::Base class members
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 Elem* InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem* inf_elem)
-{ 
-  AutoPtr<Elem> ape(inf_elem->build_side(0)); 
-  return ape.release(); 
+{
+  AutoPtr<Elem> ape(inf_elem->build_side(0));
+  return ape.release();
 }
 
 
@@ -59,7 +59,7 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
 
       case INFHEX18:
 	  return QUAD9;
-		 
+
       case INFPRISM6:
 	  return TRI3;
 
@@ -105,7 +105,7 @@ unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType
 {
   if (Dim == 1)
     return 1;
-  
+
   else if (Dim == 2)
     return FE<1,LAGRANGE>::n_shape_functions (base_elem_type,
 					      base_mapping_order);
@@ -134,7 +134,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node (const Order o_ra
 
   if (n_onion == 0)
     /*
-     * in the base, no matter what, we have 1 node associated 
+     * in the base, no matter what, we have 1 node associated
      * with radial direction
      */
     return 1;
@@ -167,6 +167,6 @@ INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const O
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const Order,const unsigned int));
 
 } // namespace libMesh
-								
+
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -66,7 +66,7 @@ class PostscriptIO : public MeshOutput<MeshBase>
    * This method implements writing a mesh to a specified file.
    */
   virtual void write (const std::string& );
-  
+
   /**
    * Controls greyscale shading of cells.  By default this value
    * is 0.0 (which actually corresponds to black) and this indicates
@@ -84,7 +84,7 @@ class PostscriptIO : public MeshOutput<MeshBase>
    * the mesh.
    */
   Real line_width;
-  
+
   /**
    * Draws an element with Bezier curves
    */
@@ -94,7 +94,7 @@ class PostscriptIO : public MeshOutput<MeshBase>
    * Draws an element with straight lines
    */
   void plot_linear_elem(const Elem* elem);
-  
+
 private:
   /**
    * Given a quadratic edge Elem which lies in the x-y plane,
@@ -110,7 +110,7 @@ private:
    */
   //DenseMatrix<float> _M;
   static const float _bezier_transform[3][3];
-  
+
   /**
    * Vector containing 3 points corresponding to Bezier coefficients,
    * as computed by _compute_edge_bezier_coeffs.
@@ -141,7 +141,7 @@ private:
 
   /**
    * Output file stream which will be opened when the file name is known
-   */ 
+   */
   std::ofstream _out;
 };
 

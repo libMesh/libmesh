@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -65,7 +65,7 @@ void SlepcEigenSolver<T>::clear ()
 template <typename T>
 void SlepcEigenSolver<T>::init ()
 {
-  
+
   int ierr=0;
 
   // Initialize the data structures if not done so already.
@@ -79,13 +79,13 @@ void SlepcEigenSolver<T>::init ()
 
       // Set user-specified  solver
       set_slepc_solver_type();
-    } 
-}    
+    }
+}
 
 
 
 template <typename T>
-std::pair<unsigned int, unsigned int> 
+std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
 				     int nev,                  // number of requested eigenpairs
 				     int ncv,                  // number of basis vectors
@@ -95,14 +95,14 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
 //   START_LOG("solve_standard()", "SlepcEigenSolver");
 
   this->init ();
-  
+
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T>* matrix_A   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
 
-  // just for debugging, remove this 
+  // just for debugging, remove this
 //   char mat_file[] = "matA.petsc";
 //   PetscViewer petsc_viewer;
 //   ierr = PetscViewerBinaryOpen(libMesh::COMM_WORLD, mat_file, PETSC_FILE_CREATE, &petsc_viewer);
@@ -115,7 +115,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
 
 
 template <typename T>
-std::pair<unsigned int, unsigned int> 
+std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
 				     int nev,                  // number of requested eigenpairs
 				     int ncv,                  // number of basis vectors
@@ -151,7 +151,7 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
 }
 
 template <typename T>
-std::pair<unsigned int, unsigned int> 
+std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::_solve_standard_helper
 				    (Mat mat,
 				     int nev,                  // number of requested eigenpairs
@@ -182,7 +182,7 @@ SlepcEigenSolver<T>::_solve_standard_helper
   //set the problem type and the position of the spectrum
   set_slepc_problem_type();
   set_slepc_position_of_spectrum();
-      
+
   // Set eigenvalues to be computed.
 #if SLEPC_VERSION_LESS_THAN(3,0,0)
   ierr = EPSSetDimensions (_eps, nev, ncv);
@@ -253,7 +253,7 @@ SlepcEigenSolver<T>::_solve_standard_helper
 	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
     }
-  
+
   ierr = PetscPrintf(libMesh::COMM_WORLD,"\n" );
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif // DEBUG
@@ -272,7 +272,7 @@ SlepcEigenSolver<T>::_solve_standard_helper
 
 
 template <typename T>
-std::pair<unsigned int, unsigned int> 
+std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 					SparseMatrix<T> &matrix_B_in,
 					int nev,                  // number of requested eigenpairs
@@ -295,7 +295,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 }
 
 template <typename T>
-std::pair<unsigned int, unsigned int> 
+std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 					SparseMatrix<T> &matrix_B_in,
 					int nev,                  // number of requested eigenpairs
@@ -336,7 +336,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 }
 
 template <typename T>
-std::pair<unsigned int, unsigned int> 
+std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 					ShellMatrix<T> &shell_matrix_B,
 					int nev,                  // number of requested eigenpairs
@@ -378,7 +378,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 }
 
 template <typename T>
-std::pair<unsigned int, unsigned int> 
+std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 					ShellMatrix<T> &shell_matrix_B,
 					int nev,                  // number of requested eigenpairs
@@ -430,7 +430,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 
 
 template <typename T>
-std::pair<unsigned int, unsigned int> 
+std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 					        Mat mat_B,
 					        int nev,                  // number of requested eigenpairs
@@ -461,7 +461,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   //set the problem type and the position of the spectrum
   set_slepc_problem_type();
   set_slepc_position_of_spectrum();
-      
+
   // Set eigenvalues to be computed.
 #if SLEPC_VERSION_LESS_THAN(3,0,0)
   ierr = EPSSetDimensions (_eps, nev, ncv);
@@ -534,7 +534,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
     }
-  
+
   ierr = PetscPrintf(libMesh::COMM_WORLD,"\n" );
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif // DEBUG
@@ -581,7 +581,7 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
 #endif
       // case ARPACK:
       // ierr = EPSSetType (_eps, (char*) EPSARPACK);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-      
+
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Solver: "
 		    << this->_eigen_solver_type         << std::endl
@@ -590,7 +590,7 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
 }
 
 
-	
+
 
 template <typename T>
 void SlepcEigenSolver<T>:: set_slepc_problem_type()
@@ -607,7 +607,7 @@ void SlepcEigenSolver<T>:: set_slepc_problem_type()
       ierr = EPSSetProblemType (_eps, EPS_HEP);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
     case GHEP:
       ierr = EPSSetProblemType (_eps, EPS_GHEP);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
-      
+
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Problem: "
 		    << this->_eigen_problem_type        << std::endl
@@ -633,11 +633,11 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
     case SMALLEST_REAL:
       ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_REAL);      CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
     case LARGEST_IMAGINARY:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_IMAGINARY);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return; 
+      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_IMAGINARY);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
     case SMALLEST_IMAGINARY:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_IMAGINARY); CHKERRABORT(libMesh::COMM_WORLD,ierr); return; 
-     
-      
+      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_IMAGINARY); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+
+
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc position of spectrum: "
 		    << this->_position_of_spectrum        << std::endl;
@@ -758,7 +758,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
 template class SlepcEigenSolver<Number>;
 
 } // namespace libMesh
- 
+
 
 
 #endif // #ifdef LIBMESH_HAVE_SLEPC

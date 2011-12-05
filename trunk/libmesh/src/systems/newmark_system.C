@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,7 +46,7 @@ const Real NewmarkSystem::_default_timestep = 1.;
 // NewmarkSystem implementation
 NewmarkSystem::NewmarkSystem (EquationSystems& es,
 			      const std::string& name,
-			      const unsigned int number) :  
+			      const unsigned int number) :
   LinearImplicitSystem (es, name, number),
   _a_0                 (1./(_default_alpha*_default_timestep*_default_timestep)),
   _a_1                 (_default_delta/(_default_alpha*_default_timestep)),
@@ -57,7 +57,7 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
   _a_6                 (_default_timestep*(1.-_default_delta)),
   _a_7                 (_default_delta*_default_timestep),
   _finished_assemble   (false)
-  
+
 {
   // default values of the newmark parameters
   es.parameters.set<Real>("Newmark alpha") = _default_alpha;
@@ -78,10 +78,10 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
   this->add_matrix ("damping");
   this->add_matrix ("mass");
 
-  // load vector  
+  // load vector
   this->add_vector ("force");
 
-  // the displacement and the time derivatives  
+  // the displacement and the time derivatives
   this->add_vector ("displacement");
   this->add_vector ("velocity");
   this->add_vector ("acceleration");
@@ -89,7 +89,7 @@ NewmarkSystem::NewmarkSystem (EquationSystems& es,
   // contributions to the rhs
   this->add_vector ("rhs_m");
   this->add_vector ("rhs_c");
-  
+
   // results from the previous time step
   this->add_vector ("old_solution");
   this->add_vector ("old_acceleration");
@@ -113,7 +113,7 @@ void NewmarkSystem::clear ()
   // Get a reference to the EquationSystems
   EquationSystems& es =
     this->get_equation_systems();
-  
+
   // default values of the newmark parameters
   es.parameters.set<Real>("Newmark alpha") = _default_alpha;
   es.parameters.set<Real>("Newmark delta") = _default_delta;
@@ -130,7 +130,7 @@ void NewmarkSystem::clear ()
 void NewmarkSystem::reinit ()
 {
   libmesh_error();
-  
+
   // initialize parent data
   LinearImplicitSystem::reinit();
 }
@@ -141,7 +141,7 @@ void NewmarkSystem::assemble ()
 {
   if (!_finished_assemble)
     {
-      // prepare matrix with the help of the _dof_map, 
+      // prepare matrix with the help of the _dof_map,
       // fill with sparsity pattern
       LinearImplicitSystem::assemble();
 
@@ -150,7 +150,7 @@ void NewmarkSystem::assemble ()
 
       // apply initial conditions
       this->initial_conditions();
-      
+
       _finished_assemble = true;
     }
 }
@@ -162,7 +162,7 @@ void NewmarkSystem::initial_conditions ()
 
   // Log how long the user's matrix assembly code takes
   START_LOG("initial_conditions ()", "NewmarkSystem");
-  
+
   // Set all values to 0, then
   // call the user-specified function for initial conditions.
   this->get_vector("displacement").zero();
@@ -198,7 +198,7 @@ void NewmarkSystem::compute_matrix ()
 void NewmarkSystem::update_rhs ()
 {
   START_LOG("update_rhs ()", "NewmarkSystem");
-  
+
   // zero the rhs-vector
   NumericVector<Number>& rhs = *this->rhs;
   rhs.zero();
@@ -225,7 +225,7 @@ void NewmarkSystem::update_rhs ()
   rhs.add(this->get_vector("force"));
   rhs.add_vector(rhs_m, this->get_matrix("mass"));
   rhs.add_vector(rhs_c, this->get_matrix("damping"));
-  
+
   STOP_LOG("update_rhs ()", "NewmarkSystem");
 }
 
@@ -234,7 +234,7 @@ void NewmarkSystem::update_rhs ()
 void NewmarkSystem::update_u_v_a ()
 {
   START_LOG("update_u_v_a ()", "NewmarkSystem");
-  
+
   // get some references for convenience
   const NumericVector<Number>&  solu = *this->solution;
 
@@ -258,13 +258,13 @@ void NewmarkSystem::update_u_v_a ()
   // compute the new velocity vector
   vel_vec.add(_a_6,old_acc);
   vel_vec.add(_a_7,acc_vec);
-  
+
   STOP_LOG("update_u_v_a ()", "NewmarkSystem");
 }
 
 
 
-void NewmarkSystem::set_newmark_parameters (const Real delta_T, 
+void NewmarkSystem::set_newmark_parameters (const Real delta_T,
 					    const Real alpha,
 					    const Real delta)
 {

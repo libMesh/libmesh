@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,7 +48,7 @@ unsigned int Hex::key (const unsigned int s) const
 			   this->node(3),
 			   this->node(2),
 			   this->node(1));
-      
+
     case 1:  // the face at y = -1
 
       return
@@ -56,7 +56,7 @@ unsigned int Hex::key (const unsigned int s) const
 			   this->node(1),
 			   this->node(5),
 			   this->node(4));
-      
+
     case 2:  // the face at x = 1
 
       return
@@ -72,9 +72,9 @@ unsigned int Hex::key (const unsigned int s) const
 			   this->node(3),
 			   this->node(7),
 			   this->node(6));
-      
+
     case 4: // the face at x = -1
-      
+
       return
 	this->compute_key (this->node(3),
 			   this->node(0),
@@ -87,7 +87,7 @@ unsigned int Hex::key (const unsigned int s) const
 	this->compute_key (this->node(4),
 			   this->node(5),
 			   this->node(6),
-			   this->node(7));	
+			   this->node(7));
     }
 
   // We'll never get here.
@@ -102,7 +102,7 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
   libmesh_assert (i < this->n_sides());
 
 
-  
+
   Elem* face = new Quad4;
 
   // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
@@ -124,7 +124,7 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(5);
 	face->set_node(3) = this->get_node(4);
-	
+
 	AutoPtr<Elem> ap(face);
         return ap;
       }
@@ -144,7 +144,7 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(3);
 	face->set_node(2) = this->get_node(7);
 	face->set_node(3) = this->get_node(6);
-	
+
 	AutoPtr<Elem> ap(face);
         return ap;
       }
@@ -164,7 +164,7 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(5);
 	face->set_node(2) = this->get_node(6);
 	face->set_node(3) = this->get_node(7);
-	
+
 	AutoPtr<Elem> ap(face);
         return ap;
       }
@@ -189,13 +189,13 @@ bool Hex::is_child_on_side(const unsigned int c,
 {
   libmesh_assert (c < this->n_children());
   libmesh_assert (s < this->n_sides());
-  
-#ifdef LIBMESH_ENABLE_AMR  
+
+#ifdef LIBMESH_ENABLE_AMR
   for (unsigned int i = 0; i != 4; ++i)
     if (Hex8::node_child_map[Hex8::side_nodes_map[s][i]] == c)
       return true;
 #endif
-  
+
   return false;
 }
 
@@ -250,7 +250,7 @@ Real Hex::quality (const ElemQuality q) const
 {
   switch (q)
     {
-      
+
       /**
        * Compue the min/max diagonal ratio.
        * Source: CUBIT User's Manual.
@@ -266,7 +266,7 @@ Real Hex::quality (const ElemQuality q) const
 	// Diagonal between node 1 and node 7
 	const Real d17 = this->length(1,7);
 
-	// Diagonal between node 2 and node 4 
+	// Diagonal between node 2 and node 4
 	const Real d24 = this->length(2,4);
 
 	// Find the biggest and smallest diagonals
@@ -274,7 +274,7 @@ Real Hex::quality (const ElemQuality q) const
 	const Real max = std::max(d06, std::max(d35, std::max(d17, d24)));
 
 	libmesh_assert (max != 0.0);
-	
+
 	return min / max;
 
 	break;
@@ -327,7 +327,7 @@ Real Hex::quality (const ElemQuality q) const
 	// Top
 	edge_ratios[10] = std::min(d45, d67) / std::max(d45, d67);
 	edge_ratios[11] = std::min(d56, d47) / std::max(d56, d47);
-	
+
 	return *(std::min_element(edge_ratios.begin(), edge_ratios.end())) ;
 
 	break;
@@ -375,9 +375,9 @@ Real Hex::quality (const ElemQuality q) const
 	break;
       }
 
-      
+
       /**
-       * I don't know what to do for this metric. 
+       * I don't know what to do for this metric.
        * Maybe the base class knows...
        */
     default:
@@ -386,7 +386,7 @@ Real Hex::quality (const ElemQuality q) const
       }
     }
 
-    
+
     // Will never get here...
     libmesh_error();
     return 0.;
@@ -397,7 +397,7 @@ Real Hex::quality (const ElemQuality q) const
 std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
 {
   std::pair<Real, Real> bounds;
-  
+
   switch (q)
     {
 
@@ -405,7 +405,7 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
       bounds.first  = 1.;
       bounds.second = 4.;
       break;
-      
+
     case SKEW:
       bounds.first  = 0.;
       bounds.second = 0.5;
@@ -425,23 +425,23 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
     case JACOBIAN:
       bounds.first  = 0.5;
       bounds.second = 1.;
-      break;  
-      
+      break;
+
     case DISTORTION:
       bounds.first  = 0.6;
       bounds.second = 1.;
-      break;  
+      break;
 
     case TAPER:
       bounds.first  = 0.;
       bounds.second = 0.4;
       break;
-      
+
     case STRETCH:
       bounds.first  = 0.25;
       bounds.second = 1.;
       break;
-      
+
     case DIAGONAL:
       bounds.first  = 0.65;
       bounds.second = 1.;
@@ -451,7 +451,7 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
       bounds.first  = 0.5;
       bounds.second = 1.;
       break;
-      
+
     default:
       libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
       bounds.first  = -1;
@@ -482,11 +482,11 @@ const unsigned short int Hex::_second_order_vertex_child_index[27] =
 };
 
 
-const unsigned short int Hex::_second_order_adjacent_vertices[12][2] = 
+const unsigned short int Hex::_second_order_adjacent_vertices[12][2] =
 {
-  { 0,  1}, // vertices adjacent to node 8 
-  { 1,  2}, // vertices adjacent to node 9 
-  { 2,  3}, // vertices adjacent to node 10 
+  { 0,  1}, // vertices adjacent to node 8
+  { 1,  2}, // vertices adjacent to node 9
+  { 2,  3}, // vertices adjacent to node 10
   { 0,  3}, // vertices adjacent to node 11
 
   { 0,  4}, // vertices adjacent to node 12

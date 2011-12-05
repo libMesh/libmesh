@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -54,11 +54,11 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   // Loop over all the active elements & fill the vector
   {
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
-    
+    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
     for (; elem_it != elem_end; ++elem_it)
       {
-	const Elem* elem = *elem_it;	
+	const Elem* elem = *elem_it;
 	const unsigned char elem_level =
 	  elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
 	const unsigned char elem_p_level =
@@ -70,13 +70,13 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 	    const unsigned int node_number = elem->node(n);
 
 	    libmesh_assert (node_number < max_level_at_node.size());
-	    
+
 	    max_level_at_node[node_number] =
 	      std::max (max_level_at_node[node_number], elem_level);
 	    max_p_level_at_node[node_number] =
 	      std::max (max_p_level_at_node[node_number], elem_p_level);
 	  }
-      }     
+      }
   }
 
 
@@ -84,14 +84,14 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   // who violate the requested level mismatch
   {
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
-    
+    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
     for (; elem_it != elem_end; ++elem_it)
       {
-	Elem* elem = *elem_it;	
+	Elem* elem = *elem_it;
 	const unsigned int elem_level = elem->level();
 	const unsigned int elem_p_level = elem->p_level();
-	
+
 	// Skip the element if it is already fully flagged
 	if (elem->refinement_flag() == Elem::REFINE &&
             elem->p_refinement_flag() == Elem::REFINE)
@@ -117,9 +117,9 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 		flags_changed = true;
 	      }
 	  }
-      }     
+      }
   }
-  
+
   // If flags changed on any processor then they changed globally
   Parallel::max(flags_changed);
 
@@ -147,11 +147,11 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
   // Loop over all the active elements & fill the maps
   {
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
-    
+    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
     for (; elem_it != elem_end; ++elem_it)
       {
-	const Elem* elem = *elem_it;	
+	const Elem* elem = *elem_it;
 	const unsigned char elem_level =
 	  elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
 	const unsigned char elem_p_level =
@@ -174,7 +174,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
                 if (node1 < node0)
                   std::swap(node0, node1);
-		
+
 		// If elem does not share this edge with its ancestor
 		// p, refinement levels of elements sharing p's edge
 		// are not restricted by refinement levels of elem.
@@ -205,7 +205,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
                   }
               }
 	  }
-      }     
+      }
   }
 
 
@@ -213,14 +213,14 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
   // who violate the requested level mismatch
   {
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
-    
+    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+
     for (; elem_it != elem_end; ++elem_it)
       {
-	Elem* elem = *elem_it;	
+	Elem* elem = *elem_it;
 	const unsigned int elem_level = elem->level();
 	const unsigned int elem_p_level = elem->p_level();
-	
+
 	// Skip the element if it is already fully flagged
 	if (elem->refinement_flag() == Elem::REFINE &&
             elem->p_refinement_flag() == Elem::REFINE)
@@ -253,9 +253,9 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 		flags_changed = true;
 	      }
 	  }
-      }     
+      }
   }
-  
+
   // If flags changed on any processor then they changed globally
   Parallel::max(flags_changed);
 
@@ -273,7 +273,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
   bool flags_changed = false;
 
   MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end(); 
+  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
 
   for (; elem_it != elem_end; ++elem_it)
     {
@@ -409,15 +409,15 @@ bool MeshRefinement::eliminate_unrefined_patches ()
           else
 	    elem->set_refinement_flag(Elem::REFINE);
 	  flags_changed = true;
-	}      
+	}
       if (p_flag_me)
 	{
           if (elem->p_refinement_flag() == Elem::COARSEN)
 	    elem->set_p_refinement_flag(Elem::DO_NOTHING);
-          else 
+          else
 	    elem->set_p_refinement_flag(Elem::REFINE);
 	  flags_changed = true;
-	}      
+	}
     }
 
   // If flags changed on any processor then they changed globally

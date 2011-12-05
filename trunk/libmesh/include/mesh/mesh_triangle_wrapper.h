@@ -1,18 +1,18 @@
 // $Id$
- 
+
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -42,9 +42,9 @@ namespace libMesh
    * as well as some helper functions for initializing/destroying
    * the structs triangle uses to communicate.
    */
-  namespace TriangleWrapper 
+  namespace TriangleWrapper
   {
-    extern "C" 
+    extern "C"
     {
 #include "triangle.h"
     }
@@ -53,7 +53,7 @@ namespace libMesh
       INPUT  = 0,
       OUTPUT = 1,
       BOTH   = 2};
-  
+
     /**
      * Initializes the fields of t to NULL/0 as necessary.
      * This is helpful for preventing the access of uninitialized
@@ -61,7 +61,7 @@ namespace libMesh
      * destructors.
      */
     void init(triangulateio& t);
-    
+
     /**
      * Frees any memory which has been dynamically allocated by
      * Triangle.  Note the following facts:
@@ -84,7 +84,7 @@ namespace libMesh
     void copy_tri_to_mesh(const triangulateio& triangle_data_input,
 			  UnstructuredMesh& mesh_output,
 			  const ElemType type);
-  } // namespace TriangleWrapper 
+  } // namespace TriangleWrapper
 } // namespace libMesh
 
 

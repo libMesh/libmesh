@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,7 +48,7 @@ class MeshBase;
  *     fprintf(fid, '%d %d %d %d \n', t);
  *     fclose(fid);
  *
- * What's going on here? 
+ * What's going on here?
  * There is no standard for exporting PDE toolkit meshes
  * to files in Matlab.  When you choose "export mesh" in the GUI,
  * it returns three matrices that it likes to call
@@ -59,11 +59,11 @@ class MeshBase;
  * Row 1: x coordinate
  * Row 2: y coordinate
  *
- * e is the edge matrix ... 
+ * e is the edge matrix ...
  * Row 1: starting point number          (dummy)
  * Row 2: ending point number            (dummy)
  * Row 3: starting parameter value (?)   (dummy)
- * Row 4: ending parameter value (?)     (dummy) 
+ * Row 4: ending parameter value (?)     (dummy)
  * Row 5: boundary segment number (?)    (dummy)
  * Row 6: left-hand subdomain number     (dummy)
  * Row 7: right-hand subdomain number    (dummy)

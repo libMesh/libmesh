@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -75,14 +75,14 @@ namespace
       dxdxi[p] = 0;
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<1,LAGRANGE>::shape_deriv 
+          const Real ddxi = FE<1,LAGRANGE>::shape_deriv
             (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
           dxdxi[p] += elem->point(i)(0) * ddxi;
         }
     }
 
   // Calculate derivative scaling factors
-  
+
   d1xd1x = dxdxi[0];
   d2xd2x = dxdxi[1];
 }
@@ -200,7 +200,7 @@ Real FEHermite<1>::hermite_raw_shape
             denominator *= (n+1);
           }
         return (xi*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
-                
+
     }
 
   libmesh_error();
@@ -217,7 +217,7 @@ Real FE<1,HERMITE>::shape(const ElemType,
   libMesh::err << "Hermite elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -243,9 +243,9 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (totalorder)
-    {      
+    {
       // Hermite cubic shape functions
     case THIRD:
       {
@@ -281,7 +281,7 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -290,7 +290,7 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 
 template <>
 Real FE<1,HERMITE>::shape_deriv(const ElemType,
-				const Order,			    
+				const Order,
 				const unsigned int,
 				const unsigned int,
 				const Point&)
@@ -313,7 +313,7 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 				const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
 #ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
 #else
@@ -323,11 +323,11 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
-  
+
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (totalorder)
-    {      
+    {
       // Hermite cubic shape functions
     case THIRD:
       {
@@ -361,7 +361,7 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -386,11 +386,11 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
-  
+
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (totalorder)
-    {      
+    {
       // Hermite cubic shape functions
     case THIRD:
       {
@@ -424,7 +424,7 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }

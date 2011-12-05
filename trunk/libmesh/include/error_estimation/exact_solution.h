@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -64,7 +64,7 @@ typedef NumberVectorValue   Gradient;
 
 class ExactSolution
 {
-  
+
 public:
   /**
    * Constructor.  The ExactSolution object
@@ -78,7 +78,7 @@ public:
    */
   ~ExactSolution() {}
 
-  
+
   /**
    * Attach function similar to system.h which
    * allows the user to attach a second EquationSystems
@@ -90,7 +90,7 @@ public:
    * Attach function similar to system.h which
    * allows the user to attach an arbitrary function
    * which computes the exact value of the solution
-   * at any point. 
+   * at any point.
    */
   void attach_exact_value ( Number fptr(const Point& p,
 					const Parameters& Parameters,
@@ -135,7 +135,7 @@ public:
    */
   void compute_error(const std::string& sys_name,
 		     const std::string& unknown_name);
-  
+
   /**
    * This function returns the integrated L2 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
@@ -143,7 +143,7 @@ public:
    */
   Real l2_error(const std::string& sys_name,
                 const std::string& unknown_name);
-  
+
   /**
    * This function returns the integrated L1 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
@@ -151,7 +151,7 @@ public:
    */
   Real l1_error(const std::string& sys_name,
                 const std::string& unknown_name);
-  
+
   /**
    * This function returns the L_INF error for the system sys_name for
    * the unknown unknown_name.  Note that no error computations are
@@ -163,7 +163,7 @@ public:
    */
   Real l_inf_error(const std::string& sys_name,
                    const std::string& unknown_name);
-  
+
   /**
    * This function computes and returns the H1 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
@@ -171,7 +171,7 @@ public:
    */
   Real h1_error(const std::string& sys_name,
                 const std::string& unknown_name);
-  
+
   /**
    * This function computes and returns the H2 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
@@ -179,7 +179,7 @@ public:
    */
   Real h2_error(const std::string& sys_name,
                 const std::string& unknown_name);
-  
+
   /**
    * This function returns the error in the requested norm for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
@@ -191,7 +191,7 @@ public:
 	          const std::string& unknown_name,
 	          const FEMNormType& norm);
 private:
-  
+
   /**
    * This function computes the error (in the solution and its first
    * derivative) for a single unknown in a single system.  It is a
@@ -209,7 +209,7 @@ private:
    */
   std::vector<Real>& _check_inputs(const std::string& sys_name,
                                    const std::string& unknown_name);
-  
+
   /**
    * Function pointer to user-provided function which
    * computes the exact value of the solution.
@@ -254,7 +254,7 @@ private:
    * systems to have unknowns with the *same name*.
    */
   std::map<std::string, SystemErrorMap> _errors;
-  
+
   /**
    * Constant reference to the \p EquationSystems object
    * used for the simulation.

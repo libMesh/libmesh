@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -35,7 +35,7 @@
 #include "Epetra_RowMatrix.h"
 #include "NOX_Epetra_Interface_Required.H" // base class
 #include "NOX_Epetra_Interface_Jacobian.H" // base class
-#include "NOX_Epetra_Interface_Preconditioner.H" // base class	
+#include "NOX_Epetra_Interface_Preconditioner.H" // base class
 #include "NOX.H"
 
 namespace libMesh
@@ -66,12 +66,12 @@ public:
    *  Constructor. Initializes Nox data structures
    */
   NoxNonlinearSolver (sys_type& system);
-    
+
   /**
    * Destructor.
    */
   virtual ~NoxNonlinearSolver ();
-  
+
   /**
    * Release all memory and clear data structures.
    */
@@ -81,7 +81,7 @@ public:
    * Initialize data structures if not done so already.
    */
   virtual void init ();
-  
+
   /**
    * Call the Nox solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
@@ -102,12 +102,12 @@ private:
    * Nonlinear solver context
    */
   NOX::Solver::Generic * _solver;
-  
+
   /**
    * Solver interface
    */
   Problem_Interface * _interface;
-  
+
   /**
    * Stores the total number of linear iterations from the last solve.
    */

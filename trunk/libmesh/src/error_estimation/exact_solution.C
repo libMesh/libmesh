@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -51,7 +51,7 @@ ExactSolution::ExactSolution(const EquationSystems& es) :
     {
       // Reference to the system
       const System& system = _equation_systems.get_system(sys);
-      
+
       // The name of the system
       const std::string& sys_name = system.name();
 
@@ -64,7 +64,7 @@ ExactSolution::ExactSolution(const EquationSystems& es) :
 	  const std::string& var_name = system.variable_name(var);
 	  sem[var_name] = std::vector<Real>(5, 0.);
 	}
-      
+
       _errors[sys_name] = sem;
     }
 }
@@ -138,11 +138,11 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
       libmesh_error();
     }
 */
-  
+
   // Make sure the requested sys_name exists.
   std::map<std::string, SystemErrorMap>::iterator sys_iter =
     _errors.find(sys_name);
-  
+
   if (sys_iter == _errors.end())
     {
       libMesh::err << "Sorry, couldn't find the requested system '"
@@ -150,7 +150,7 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
 		    << std::endl;
       libmesh_error();
     }
-  
+
   // Make sure the requested unknown_name exists.
   SystemErrorMap::iterator var_iter = (*sys_iter).second.find(unknown_name);
 
@@ -195,7 +195,7 @@ Real ExactSolution::error_norm(const std::string& sys_name,
   // to the proper location to store the error
   std::vector<Real>& error_vals = this->_check_inputs(sys_name,
                                                       unknown_name);
-  
+
   switch (norm)
     {
     case L2:
@@ -227,12 +227,12 @@ Real ExactSolution::error_norm(const std::string& sys_name,
 Real ExactSolution::l2_error(const std::string& sys_name,
                              const std::string& unknown_name)
 {
-  
+
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
   std::vector<Real>& error_vals = this->_check_inputs(sys_name,
 						      unknown_name);
-  
+
   // Return the square root of the first component of the
   // computed error.
   return std::sqrt(error_vals[0]);
@@ -247,12 +247,12 @@ Real ExactSolution::l2_error(const std::string& sys_name,
 Real ExactSolution::l1_error(const std::string& sys_name,
                              const std::string& unknown_name)
 {
-  
+
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
   std::vector<Real>& error_vals = this->_check_inputs(sys_name,
                                                       unknown_name);
-  
+
   // Return the square root of the first component of the
   // computed error.
   return error_vals[3];
@@ -267,12 +267,12 @@ Real ExactSolution::l1_error(const std::string& sys_name,
 Real ExactSolution::l_inf_error(const std::string& sys_name,
                                 const std::string& unknown_name)
 {
-  
+
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
   std::vector<Real>& error_vals = this->_check_inputs(sys_name,
                                                       unknown_name);
-  
+
   // Return the square root of the first component of the
   // computed error.
   return error_vals[4];
@@ -299,12 +299,12 @@ Real ExactSolution::h1_error(const std::string& sys_name,
       libmesh_error();
     }
 */
-  
+
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
   std::vector<Real>& error_vals = this->_check_inputs(sys_name,
                                                       unknown_name);
-  
+
   // Return the square root of the sum of the computed errors.
   return std::sqrt(error_vals[0] + error_vals[1]);
 }
@@ -331,12 +331,12 @@ Real ExactSolution::h2_error(const std::string& sys_name,
       libmesh_error();
     }
 */
-  
+
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
   std::vector<Real>& error_vals = this->_check_inputs(sys_name,
 						      unknown_name);
-  
+
   // Return the square root of the sum of the computed errors.
   return std::sqrt(error_vals[0] + error_vals[1] + error_vals[2]);
 }
@@ -401,7 +401,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Steady systems of equations do not have a time parameter, so this
   // routine needs to take that into account.
   // FIXME!!!
-  // const Real time = 0.;//_equation_systems.parameter("time");  
+  // const Real time = 0.;//_equation_systems.parameter("time");
 
   // Construct Quadrature rule based on default quadrature order
   const unsigned int var = computed_system.variable_number(unknown_name);
@@ -412,19 +412,19 @@ void ExactSolution::_compute_error(const std::string& sys_name,
                                      _extra_order);
 
   // Construct finite element object
-  
+
   AutoPtr<FEBase> fe(FEBase::build(_mesh.mesh_dimension(), fe_type));
 
   // Attach quadrature rule to FE object
   fe->attach_quadrature_rule (qrule.get());
-  
+
   // The Jacobian*weight at the quadrature points.
   const std::vector<Real>& JxW                               = fe->get_JxW();
-  
+
   // The value of the shape functions at the quadrature points
-  // i.e. phi(i) = phi_values[i][qp] 
+  // i.e. phi(i) = phi_values[i][qp]
   const std::vector<std::vector<Real> >&  phi_values         = fe->get_phi();
-  
+
   // The value of the shape function gradients at the quadrature points
   const std::vector<std::vector<RealGradient> >& dphi_values = fe->get_dphi();
 
@@ -432,10 +432,10 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // The value of the shape function second derivatives at the quadrature points
   const std::vector<std::vector<RealTensor> >& d2phi_values = fe->get_d2phi();
 #endif
-  
+
   // The XYZ locations (in physical space) of the quadrature points
   const std::vector<Point>& q_point                          = fe->get_xyz();
-	    
+
   // The global degree of freedom indices associated
   // with the local degrees of freedom.
   std::vector<unsigned int> dof_indices;
@@ -448,7 +448,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // MeshFunction objects in each thread rather than a single
   // master)
   MeshBase::const_element_iterator       el     = _mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = _mesh.active_local_elements_end(); 
+  const MeshBase::const_element_iterator end_el = _mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
     {
@@ -462,7 +462,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
       // Get the local to global degree of freedom maps
       computed_dof_map.dof_indices    (elem, dof_indices, var);
-      
+
       // The number of quadrature points
       const unsigned int n_qp = qrule->n_points();
 
@@ -483,7 +483,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  Tensor grad2_u_h;
 #endif
-  
+
 
 	  // Compute solution values at the current
 	  // quadrature point.  This reqiures a sum
@@ -543,7 +543,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 	  error_vals[2] += JxW[qp]*grad2_error.size_sq();
 #endif
-	  
+
 	} // end qp loop
     } // end element loop
 

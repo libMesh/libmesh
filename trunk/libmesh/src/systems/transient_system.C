@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -40,7 +40,7 @@ template <class Base>
 TransientSystem<Base>::TransientSystem (EquationSystems& es,
 					const std::string& name,
 					const unsigned int number) :
-  
+
   Base                 (es, name, number)
 {
   old_local_solution =
@@ -61,8 +61,8 @@ TransientSystem<Base>::~TransientSystem ()
   // We still have AutoPtrs for API compatibility, but
   // now that we're System::add_vector()ing these, we can trust
   // the base class to handle memory management
-  old_local_solution.release();  
-  older_local_solution.release();  
+  old_local_solution.release();
+  older_local_solution.release();
 }
 
 
@@ -76,12 +76,12 @@ void TransientSystem<Base>::clear ()
   // the old & older local solutions
   // are now deleted by System!
   // old_local_solution->clear();
-  // older_local_solution->clear();  
+  // older_local_solution->clear();
 
   // FIXME: This preserves maximum backwards compatibility,
   // but is probably grossly unnecessary:
-  old_local_solution.release();  
-  older_local_solution.release();  
+  old_local_solution.release();
+  older_local_solution.release();
 
   old_local_solution =
     AutoPtr<NumericVector<Number> >
@@ -122,7 +122,7 @@ void TransientSystem<Base>::reinit ()
 {
   // initialize parent data
   Base::reinit();
-    
+
   // Project the old & older vectors to the new mesh
   // The System::reinit handles this now
   // this->project_vector (*old_local_solution);
@@ -136,9 +136,9 @@ void TransientSystem<Base>::re_update ()
 {
   // re_update the parent system
   Base::re_update ();
-  
+
   const std::vector<unsigned int>& send_list = this->get_dof_map().get_send_list ();
-  
+
   const unsigned int first_local_dof = Base::get_dof_map().first_dof();
   const unsigned int end_local_dof  = Base::get_dof_map().end_dof();
 
@@ -151,16 +151,16 @@ void TransientSystem<Base>::re_update ()
   // use parallel_only tools
   // if (first_local_dof == end_local_dof)
   //   return;
-  
+
   // Update the old & older solutions with the send_list,
   // which may have changed since their last update.
   older_local_solution->localize (first_local_dof,
 				  end_local_dof-1,
 				  send_list);
-  
+
   old_local_solution->localize (first_local_dof,
 				end_local_dof-1,
-				send_list);  
+				send_list);
 }
 
 
@@ -172,7 +172,7 @@ Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number
   // Check the sizes
   libmesh_assert (global_dof_number < this->get_dof_map().n_dofs());
   libmesh_assert (global_dof_number < old_local_solution->size());
-   
+
   return (*old_local_solution)(global_dof_number);
 }
 
@@ -184,7 +184,7 @@ Number TransientSystem<Base>::older_solution (const unsigned int global_dof_numb
   // Check the sizes
   libmesh_assert (global_dof_number < this->get_dof_map().n_dofs());
   libmesh_assert (global_dof_number < older_local_solution->size());
-   
+
   return (*older_local_solution)(global_dof_number);
 }
 

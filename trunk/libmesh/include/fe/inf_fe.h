@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,17 +46,17 @@ class FEComputeData;
  * will result in different Infinite Element families, similar
  * to the \p FE class.  \p InfFE builds a \p FE<Dim-1,T_base>,
  * and most of the requests related to the base are handed over
- * to this object.  All methods related to the radial part 
+ * to this object.  All methods related to the radial part
  * are collected in the nested class \p Radial.  Similarly,
  * most of the static methods concerning base approximation
  * are contained in \p Base.
- * 
- * Having different shape approximation families in radial direction 
+ *
+ * Having different shape approximation families in radial direction
  * introduces the requirement for an additional \p Order in this
  * class. Therefore, the \p FEType internals change when infinite
- * elements are enabled. 
+ * elements are enabled.
  * When the specific infinite element type is not known at compile
- * time, use the \p FEBase::build() member to create abstract 
+ * time, use the \p FEBase::build() member to create abstract
  * (but still optimized) infinite elements at run time.
  *
  * The @e node numbering scheme is the one from the current
@@ -64,7 +64,7 @@ class FEComputeData;
  * the same number of dofs as an adjacent conventional \p FE
  * would contain.  The nodes further out hold the additional
  * dof necessary for radial approximation.  The order of the outer nodes'
- * components is such that the radial shapes have highest 
+ * components is such that the radial shapes have highest
  * priority, followed by the base shapes.
  *
  * \author Daniel Dreyer
@@ -85,7 +85,7 @@ protected:
 
   /**
    * Infinite elements are in some sense directional, compared
-   * to conventional finite elements.  All methods related 
+   * to conventional finite elements.  All methods related
    * to the radial part, which extends perpendicular from the base,
    * are collected in this nested class.  This class offers
    * static methods, which are only available to \p InfFE members.
@@ -139,11 +139,11 @@ protected:
     /**
      * @returns the number of shape functions in radial direction
      * associated with this infinite element.
-     * Either way, if the modes are stored as nodal dofs (\p n_dofs_at_node) 
+     * Either way, if the modes are stored as nodal dofs (\p n_dofs_at_node)
      * or as element dofs (\p n_dofs_per_elem), in each case we have the
      * same number of modes in radial direction. Note that for the case of 1D
      * infinite elements, in the base the dof-per-node scheme is used.
-     * 
+     *
      * From the formulation of the infinite elements, we have
      * 1 mode, when \p o_radial=CONST.
      * Therefore, we have a total of \p o_radial+1 modes in radial direction.
@@ -152,8 +152,8 @@ protected:
 	{ return static_cast<unsigned int>(o_radial)+1; }
 
     /**
-     * @returns the number of dofs in radial direction on "onion slice" 
-     * \p n (either 0 or 1) for an infinite element of type \p inf_elem_type and 
+     * @returns the number of dofs in radial direction on "onion slice"
+     * \p n (either 0 or 1) for an infinite element of type \p inf_elem_type and
      * radial order \p o_radial.
      *
      * Currently, the first radial mode is associated with the nodes in
@@ -167,7 +167,7 @@ protected:
      * @returns the number of modes in radial direction interior to the element,
      * not associated with any interior nodes.
      * Note that these modes are a discontinuous approximation, therefore
-     * we have no special formulation for coupling in the base, like in the 
+     * we have no special formulation for coupling in the base, like in the
      * case of associating (possibly) multiple dofs per (outer) node.
      */
     static unsigned int n_dofs_per_elem (const Order o_radial)
@@ -178,7 +178,7 @@ protected:
 
 
   /**
-   * This nested class contains most of the static methods related 
+   * This nested class contains most of the static methods related
    * to the base part of an infinite element.  Only static members
    * are provided, and these should only be accessible from within \p InfFE.
    *
@@ -238,12 +238,12 @@ public:
    * Constructor.
    * Initializes some data structures.  Builds a \p FE<Dim-1,T_base>
    * object to handle  approximation in the base, so that
-   * there is no need to template \p InfFE<Dim,T_radial,T_map> also with 
+   * there is no need to template \p InfFE<Dim,T_radial,T_map> also with
    * respect to the base approximation \p T_base.
-   * 
-   * The same remarks concerning compile-time optimization for 
-   * \p FE also hold for \p InfFE.  Use the 
-   * \p FEBase::build_InfFE(const unsigned int, const FEType&) 
+   *
+   * The same remarks concerning compile-time optimization for
+   * \p FE also hold for \p InfFE.  Use the
+   * \p FEBase::build_InfFE(const unsigned int, const FEType&)
    * method to build specific instantiations of \p InfFE at
    * run time.
    */
@@ -264,7 +264,7 @@ public:
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method lets you specify the relevant
    * data directly, and is therefore allowed to be static.
-   * Note that this class member is by far not as efficient as 
+   * Note that this class member is by far not as efficient as
    * its counterpart in \p FE<Dim,T>, and is @e not employed
    * in the \p reinit() cycle.
    * Also note that this method does @e not return physically
@@ -280,8 +280,8 @@ public:
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method lets you specify the relevant
    * data directly, and is therefore allowed to be static.
-   * Note that this class member is not as efficient as its 
-   * counterpart in \p FE<Dim,T>, and is @e not employed 
+   * Note that this class member is not as efficient as its
+   * counterpart in \p FE<Dim,T>, and is @e not employed
    * in the \p reinit() cycle.
    * Also note that this method does @e not return physically
    * correct shapes, instead use \p compute_data().  The \p shape()
@@ -304,7 +304,7 @@ public:
   static void compute_data(const FEType& fe_t,
 			   const Elem* inf_elem,
 			   FEComputeData& data);
-  
+
   /**
    * @returns the number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
@@ -315,15 +315,15 @@ public:
 
   /**
    * @returns the number of shape functions associated with this
-   * infinite element.  Currently, we have \p o_radial+1 modes in 
+   * infinite element.  Currently, we have \p o_radial+1 modes in
    * radial direction, and \p FE<Dim-1,T>::n_dofs(...) in the base.
    */
   static unsigned int n_dofs(const FEType& fet,
 			     const ElemType inf_elem_type);
 
   /**
-   * @returns the number of dofs at infinite element @e node \p n 
-   * (not dof!) for an element of type \p t and order \p o.  
+   * @returns the number of dofs at infinite element @e node \p n
+   * (not dof!) for an element of type \p t and order \p o.
    */
   static unsigned int n_dofs_at_node(const FEType& fet,
 				     const ElemType inf_elem_type,
@@ -350,22 +350,22 @@ public:
     { return false; }  // FIXME - Inf FEs don't handle p elevation yet
 
   /**
-   * Usually, this method would build the nodal soln from the 
-   * element soln.  But infinite elements require additional 
-   * simulation-specific data to compute physically correct 
+   * Usually, this method would build the nodal soln from the
+   * element soln.  But infinite elements require additional
+   * simulation-specific data to compute physically correct
    * results.  Use \p compute_data() to compute results.  For
    * compatibility an empty vector is returned.
    */
   static void nodal_soln(const FEType& fet,
-			 const Elem* elem, 
+			 const Elem* elem,
 			 const std::vector<Number>& elem_soln,
 			 std::vector<Number>& nodal_soln);
 
   /**
    * @returns the location (on the reference element) of the
    * point \p p located in physical space.  First, the location
-   * in the base face is computed. This requires inverting the 
-   * (possibly nonlinear) transformation map in the base, so it is 
+   * in the base face is computed. This requires inverting the
+   * (possibly nonlinear) transformation map in the base, so it is
    * not trivial. The optional parameter \p tolerance defines
    * how close is "good enough."  The map inversion iteration
    * computes the sequence \f$ \{ p_n \} \f$, and the iteration is
@@ -400,17 +400,17 @@ public:
   // The work-horses of InfFE. These are often used during matrix assembly
   /**
    * This is at the core of this class. Use this for each
-   * new element in the mesh.  Reinitializes all the physical 
-   * element-dependent data based on the current element 
+   * new element in the mesh.  Reinitializes all the physical
+   * element-dependent data based on the current element
    * \p elem.
    */
   virtual void reinit (const Elem* elem,
 		       const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL);
-    
+
   /**
-   * Not implemented yet.  Reinitializes all the physical 
-   * element-dependent data based on the \p side of an infinite 
+   * Not implemented yet.  Reinitializes all the physical
+   * element-dependent data based on the \p side of an infinite
    * element.
    */
   virtual void reinit (const Elem* elem,
@@ -420,8 +420,8 @@ public:
                        const std::vector<Real>* const weights = NULL);
 
   /**
-   * Not implemented yet.  Reinitializes all the physical 
-   * element-dependent data based on the \p edge of an infinite 
+   * Not implemented yet.  Reinitializes all the physical
+   * element-dependent data based on the \p edge of an infinite
    * element.
    */
   virtual void edge_reinit (const Elem* elem,
@@ -431,9 +431,9 @@ public:
                             const std::vector<Real>* const weights = NULL);
 
   /**
-   * Computes the reference space quadrature points on the side of 
+   * Computes the reference space quadrature points on the side of
    * an element based on the side quadrature points.
-   */  
+   */
   virtual void side_map (const Elem* /* elem */,
                          const Elem* /* side */,
                          const unsigned int /* s */,
@@ -462,7 +462,7 @@ public:
    */
   virtual unsigned int n_shape_functions () const
   { return _n_total_approx_sf; }
-  
+
   /**
    * @returns the total number of quadrature points.  Call this
    * to get an upper bound for the \p for loop in your simulation
@@ -486,9 +486,9 @@ protected:
    * of dimension and base_family.  It is templated, though,
    * w.r.t. to radial \p FEFamily.
    *
-   * Specialized for \p T_radial=INFINITE_MAP, this function returns 
+   * Specialized for \p T_radial=INFINITE_MAP, this function returns
    * the value of the \f$ i^{th} \f$ @e mapping shape function
-   * in radial direction evaluated at \p v.  Currently, only one specific 
+   * in radial direction evaluated at \p v.  Currently, only one specific
    * mapping shape is used.  Namely the one by Marques JMMC, Owen DRJ:
    * Infinite elements in quasi-static materially nonlinear problems,
    * @e Computers @e and @e Structures, 1984.
@@ -496,7 +496,7 @@ protected:
   static Real eval(Real v,
 		   Order o_radial,
 		   unsigned int i);
-  
+
   /**
    * @returns the value of the first derivative of the
    * \f$ i^{th} \f$ polynomial at coordinate \p v.
@@ -526,26 +526,26 @@ protected:
   /**
    * Some of the member data only depend on the radial part of the
    * infinite element.  The parts that only change when the radial
-   * order changes, are initialized here.  
+   * order changes, are initialized here.
    */
   void init_radial_shape_functions(const Elem* inf_elem);
 
-  /** 
-   * Initialize all the data fields like \p weight, \p mode, 
+  /**
+   * Initialize all the data fields like \p weight, \p mode,
    * \p phi, \p dphidxi, \p dphideta, \p dphidzeta, etc.
    * for the current element.  This method prepares the data
    * related to the base part, and some of the combined fields.
    */
   void init_shape_functions(const Elem* inf_elem);
 
-  /** 
-   * Not implemented yet.  Initialize all the data fields like \p weight, 
+  /**
+   * Not implemented yet.  Initialize all the data fields like \p weight,
    * \p phi, etc for the side \p s.
-   */  
+   */
   void init_face_shape_functions (const std::vector<Point>& qp,
 				  const Elem* side);
 
-  /** 
+  /**
    * Combines the shape functions, which were formed in
    * \p init_shape_functions(Elem*), with geometric data.
    * Has to be called every time the geometric configuration
@@ -555,10 +555,10 @@ protected:
    */
   void combine_base_radial(const Elem* inf_elem);
 
-  /** 
+  /**
    * After having updated the jacobian and the transformation
    * from local to global coordinates in FEBase::compute_map(),
-   * the first derivatives of the shape functions are 
+   * the first derivatives of the shape functions are
    * transformed to global coordinates, giving \p dphi,
    * \p dphidx/y/z, \p dphasedx/y/z, \p dweight. This method
    * should barely be re-defined in derived classes, but
@@ -581,8 +581,8 @@ protected:
 		    const Point& reference_point);
 
   /**
-   * Computes the indices in the base \p base_node and in radial 
-   * direction \p radial_node (either 0 or 1) associated to the 
+   * Computes the indices in the base \p base_node and in radial
+   * direction \p radial_node (either 0 or 1) associated to the
    * node \p outer_node_index of an infinite element of type
    * \p inf_elem_type.
    */
@@ -605,9 +605,9 @@ protected:
 					 unsigned int& radial_node);
 
   /**
-   * Computes the indices of shape functions in the base \p base_shape and 
-   * in radial direction \p radial_shape (0 in the base, \f$ \ge 1 \f$ further 
-   * out) associated to the shape with global index \p i of an infinite element 
+   * Computes the indices of shape functions in the base \p base_shape and
+   * in radial direction \p radial_shape (0 in the base, \f$ \ge 1 \f$ further
+   * out) associated to the shape with global index \p i of an infinite element
    * of type \p inf_elem_type.
    */
   static void compute_shape_indices (const FEType& fet,
@@ -626,7 +626,7 @@ protected:
   /**
    * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
    * over all quadrature points. The weight does not vary in base
-   * direction.  However, for uniform access to the data fields from the 
+   * direction.  However, for uniform access to the data fields from the
    * outside, this data field is expanded to @e all quadrature points.
    */
   std::vector<Real>  dweightdv;
@@ -639,7 +639,7 @@ protected:
    */
   std::vector<Real>  som;
   /**
-   * the first local derivative of the radial decay \f$ 1/r \f$ in local 
+   * the first local derivative of the radial decay \f$ 1/r \f$ in local
    * coordinates.  Needed when setting up the overall shape functions.
    */
   std::vector<Real>  dsomdv;
@@ -655,7 +655,7 @@ protected:
    * Needed when setting up the overall shape functions.
    */
   std::vector<std::vector<Real> >   dmodedv;
-  
+
   /**
    * the radial mapping shapes in local coordinates
    */
@@ -668,14 +668,14 @@ protected:
   std::vector<std::vector<Real> >   dradialdv_map;
 
   /**
-   * the first local derivative (for 3D, the first in the base) 
+   * the first local derivative (for 3D, the first in the base)
    * of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
   std::vector<Real>  dphasedxi;
 
   /**
-   * the second local derivative (for 3D, the second in the base) 
+   * the second local derivative (for 3D, the second in the base)
    * of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
@@ -699,7 +699,7 @@ protected:
    * -- tensor product of base element times radial
    * nodes -- has to be determined from the node numbering
    * of the current infinite element.  This vector
-   * maps the @e infinte \p Elem node number to the 
+   * maps the @e infinte \p Elem node number to the
    * @e radial node (either 0 or 1).
    */
   std::vector<unsigned int> _radial_node_index;
@@ -709,7 +709,7 @@ protected:
    * -- tensor product of base element times radial
    * nodes -- has to be determined from the node numbering
    * of the current element.  This vector
-   * maps the @e infinte \p Elem node number to the 
+   * maps the @e infinte \p Elem node number to the
    * associated node in the @e base element.
    */
   std::vector<unsigned int> _base_node_index;
@@ -719,7 +719,7 @@ protected:
    * -- tensor product of base element shapes times radial
    * shapes -- has to be determined from the dof numbering
    * scheme of the current infinite element.  This vector
-   * maps the infinite \p Elem dof index to the @e radial 
+   * maps the infinite \p Elem dof index to the @e radial
    * \p InfFE shape index (\p 0..radial_order+1 ).
    */
   std::vector<unsigned int> _radial_shape_index;
@@ -741,7 +741,7 @@ protected:
   // some more protected members
 
   /**
-   * The number of total approximation shape functions for 
+   * The number of total approximation shape functions for
    * the current configuration
    */
   unsigned int _n_total_approx_sf;
@@ -759,13 +759,13 @@ protected:
   std::vector<Real>  _total_qrule_weights;
 
   /**
-   * The quadrature rule for the base element associated 
+   * The quadrature rule for the base element associated
    * with the current infinite element
    */
   QBase* base_qrule;
 
   /**
-   * The quadrature rule for the base element associated 
+   * The quadrature rule for the base element associated
    * with the current infinite element
    */
   QBase* radial_qrule;

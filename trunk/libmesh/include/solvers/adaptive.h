@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -50,7 +50,7 @@ template <class T = Linear<> >
 class Adaptive : public T
 {
 public:
-  
+
   /**
    * Constructor. Requires a reference to a system to be solved.
    */
@@ -87,7 +87,7 @@ public:
   /**
    * Sets the number of refinement steps to take.
    */
-  unsigned int & n_refinement_steps () { return _n_refinement_steps; }  
+  unsigned int & n_refinement_steps () { return _n_refinement_steps; }
 
   /**
    * @returns the maximum level for mesh refinement.
@@ -98,17 +98,17 @@ public:
    * Sets the maximum level for mesh refinement.
    */
   unsigned int & max_refinement_level () { return _max_refinement_level; }
-  
-  
+
+
 protected:
 
-  
+
   /**
    * Sets the current refinement step.
    */
   unsigned int & refinement_step () { return _refinement_step; }
 
-  
+
 private:
 
 
@@ -116,7 +116,7 @@ private:
    * The current refinement step.
    */
   unsigned int _refinement_step;
-  
+
   /**
    * The number of refinement steps to take.
    */
@@ -168,32 +168,32 @@ void Adaptive<T>::solve ()
 {
   // First solve the base system
   T::solve ();
-      
+
   for (this->refinement_step()=0;
        this->refinement_step() < this->n_refinement_steps();
        this->refinement_step()++)
-    {  
+    {
       // Then estimate the error in the base system
       // and refine the mesh
       {
 	ErrorVector error;
-	
+
 	KellyErrorEstimator error_estimator;
-	
+
 	error_estimator.estimate_error (this->system(), "incomp_ns", error);
-	
+
 	MeshRefinement mesh_refinement (this->mesh());
-	
+
 	mesh_refinement.flag_elements_by_error_fraction (error,
 							 0.40,
 							 0.40,
 							 this->max_refinement_level());
-	
+
 	mesh_refinement.refine_and_coarsen_elements ();
 
 	this->system().reinit ();
       }
-  
+
       // Then re-solve the base system
       T::solve ();
     }

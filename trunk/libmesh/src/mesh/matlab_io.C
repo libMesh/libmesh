@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -52,7 +52,7 @@ void MatlabIO::read_stream(std::istream& in)
 
   // Clear any existing mesh data
   mesh.clear();
-  
+
   // PDE toolkit only works in 2D
   mesh.set_mesh_dimension(2);
 
@@ -90,25 +90,25 @@ void MatlabIO::read_stream(std::istream& in)
   // Read the elements (elements)
   {
     unsigned int node=0, dummy=0;
-    
+
     for (unsigned int i=0; i<nElem; i++)
       {
 	Elem* elem = new Tri3; // Always build a triangle
         elem->set_id(i);
 	mesh.add_elem (elem);
-	
+
 	for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
 	  {
 	    in >> node;
 	    elem->set_node(n) = mesh.node_ptr(node-1);  // Assign the node number
 	  }
-	
+
 	// There is an additional subdomain number here,
 	// so we read it and get rid of it!
 	in >> dummy;
       }
   }
-  
+
 }
 
 } // namespace libMesh

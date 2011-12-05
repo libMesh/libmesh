@@ -180,7 +180,7 @@ public:
    * just return the full training set.
    */
   std::vector< std::vector<Number> > get_subsampled_training_set();
-  
+
   /**
    * Clear the training set associated with this subdomain.
    */
@@ -205,7 +205,7 @@ public:
 
   /**
    * The anchor parameter value. The anchor point is used
-   * in order to determine which subdomain a parameter 
+   * in order to determine which subdomain a parameter
    * belongs to based on proximity. At each step in descending
    * the tree data structure we go "left" or "right"
    * depending on whether a given parameter value is closer

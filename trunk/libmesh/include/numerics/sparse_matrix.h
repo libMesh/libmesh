@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -90,7 +90,7 @@ public:
    */
   static AutoPtr<SparseMatrix<T> >
   build(const SolverPackage solver_package = libMesh::default_solver_package());
-  
+
   /**
    * @returns true if the matrix has been initialized,
    * false otherwise.
@@ -104,14 +104,14 @@ public:
   { _dof_map = &dof_map; }
 
   /**
-   * \p returns true if this sparse matrix format needs to be fed the 
-   * graph of the sparse matrix.  This is true in the case of the \p LaspackMatrix, 
+   * \p returns true if this sparse matrix format needs to be fed the
+   * graph of the sparse matrix.  This is true in the case of the \p LaspackMatrix,
    * but not for the \p PetscMatrix.  In the case where the full graph is not
-   * required we can efficiently approximate it to provide a good estimate of the 
+   * required we can efficiently approximate it to provide a good estimate of the
    * required size of the sparse matrix.
-   */ 
-  virtual bool need_full_sparsity_pattern() const 
-  { return false; }  
+   */
+  virtual bool need_full_sparsity_pattern() const
+  { return false; }
 
   /**
    * Updates the matrix sparsity pattern. When your \p SparseMatrix<T>
@@ -119,7 +119,7 @@ public:
    * not overload this method.
    */
   virtual void update_sparsity_pattern (const SparsityPattern::Graph &) {}
-  
+
   /**
    * Initialize a Sparse matrix that is of global
    * dimension \f$ m \times  n \f$ with local dimensions
@@ -137,14 +137,14 @@ public:
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.
-   */   
+   */
   virtual void init () = 0;
-  
+
   /**
    * Release all memory and return
    * to a state just like after
    * having called the default
-   * constructor. 
+   * constructor.
    */
   virtual void clear () = 0;
 
@@ -157,24 +157,24 @@ public:
    * Set all row entries to 0 then puts diag_value in the diagonal entry
    */
   virtual void zero_rows (std::vector<int> & rows, T diag_value = 0.0);
-  
+
   /**
    * Call the Sparse assemble routines.
    * sends necessary messages to other
    * processors
    */
   virtual void close () const = 0;
-  
+
   /**
    * @returns \p m, the row-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
-   */  
+   */
   virtual unsigned int m () const = 0;
 
   /**
    * @returns \p n, the column-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
-   */  
+   */
   virtual unsigned int n () const = 0;
 
   /**
@@ -198,7 +198,7 @@ public:
   virtual void set (const unsigned int i,
 		    const unsigned int j,
 		    const T value) = 0;
-    
+
   /**
    * Add \p value to the element
    * \p (i,j).  Throws an error if
@@ -220,17 +220,17 @@ public:
   virtual void add_matrix (const DenseMatrix<T> &dm,
 			   const std::vector<unsigned int> &rows,
 			   const std::vector<unsigned int> &cols) = 0;
-  
+
   /**
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   virtual void add_matrix (const DenseMatrix<T> &dm,
 			   const std::vector<unsigned int> &dof_indices) = 0;
-      
+
   /**
    * Add a Sparse matrix \p _X, scaled with \p _a, to \p this,
-   * stores the result in \p this: 
+   * stores the result in \p this:
    * \f$\texttt{this} = \_a*\_X + \texttt{this} \f$.
    */
   virtual void add (const T, SparseMatrix<T> &) = 0;
@@ -258,7 +258,7 @@ public:
 
   /**
    * Return the l1-norm of the matrix, that is
-   * \f$|M|_1=max_{all columns j}\sum_{all 
+   * \f$|M|_1=max_{all columns j}\sum_{all
    * rows i} |M_ij|\f$,
    * (max. sum of columns).
    * This is the
@@ -271,7 +271,7 @@ public:
   /**
    * Return the linfty-norm of the
    * matrix, that is
-   * \f$|M|_\infty=max_{all rows i}\sum_{all 
+   * \f$|M|_\infty=max_{all rows i}\sum_{all
    * columns j} |M_ij|\f$,
    * (max. sum of rows).
    * This is the
@@ -300,13 +300,13 @@ public:
    */
   template <typename U>
   friend std::ostream& operator << (std::ostream& os, const SparseMatrix<U>& m);
-  
+
   /**
    * Print the contents of the matrix to the screen
    * in a package-personalized style, if available.
    */
   virtual void print_personal(std::ostream& os=libMesh::out) const = 0;
-  
+
   /**
    * Print the contents of the matrix in Matlab's
    * sparse matrix format. Optionally prints the
@@ -350,7 +350,7 @@ x   */
 			 cols,
 			 true); // true means REUSE submatrix
   }
-  
+
   /**
    * Multiplies the matrix with \p arg and stores the result in \p
    * dest.
@@ -391,12 +391,12 @@ protected:
 	          << std::endl;
     libmesh_error();
   }
-  
+
   /**
    * The \p DofMap object associated with this object.
    */
   DofMap const *_dof_map;
-  
+
   /**
    * Flag indicating whether or not the matrix
    * has been initialized.

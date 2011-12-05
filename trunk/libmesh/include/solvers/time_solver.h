@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,7 +46,7 @@ class TimeSolver;
  * This is a generic class that defines a solver to handle
  * time integration of DifferentiableSystems.
  *
- * A user can define a solver by deriving from this class and 
+ * A user can define a solver by deriving from this class and
  * implementing certain functions.
  *
  * This class is part of the new DifferentiableSystem framework,
@@ -65,13 +65,13 @@ public:
    * The type of system
    */
   typedef DifferentiableSystem sys_type;
-  
+
   /**
    * Constructor. Requires a reference to the system
    * to be solved.
    */
   TimeSolver (sys_type& s);
-  
+
   /**
    * Destructor.
    */
@@ -147,7 +147,7 @@ public:
    * @returns a writeable reference to the system we are solving.
    */
   sys_type & system () { return _system; }
-  
+
   /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
@@ -165,7 +165,7 @@ public:
 
   /**
    * Computes the size of ||u^{n+1} - u^{n}|| in some norm.
-   * 
+   *
    * Note that, while you can always call this function, its
    * result may or may not be very meaningful.  For example, if
    * you call this function right after calling advance_timestep()
@@ -190,7 +190,7 @@ public:
    * retry the solve.
    */
   unsigned int reduce_deltat_on_diffsolver_failure;
-  
+
 protected:
 
   /**

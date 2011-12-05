@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -91,7 +91,7 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Exectue the provided function object in parallel on the specified 
+   * Exectue the provided function object in parallel on the specified
    * range.
    */
   template <typename Range, typename Body>
@@ -105,12 +105,12 @@ namespace Threads
 
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
-#endif   
+#endif
 
     if (libMesh::n_threads() > 1)
       tbb::parallel_for (range, body, tbb::auto_partitioner());
 
-    else 
+    else
       body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
@@ -123,13 +123,13 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Exectue the provided function object in parallel on the specified 
+   * Exectue the provided function object in parallel on the specified
    * range with the specified partitioner.
    */
   template <typename Range, typename Body, typename Partitioner>
   inline
   void parallel_for (const Range &range, const Body &body, const Partitioner &partitioner)
-  { 
+  {
     BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
@@ -137,10 +137,10 @@ namespace Threads
 
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
-#endif   
-    
+#endif
+
     if (libMesh::n_threads() > 1)
-      tbb::parallel_for (range, body, partitioner); 
+      tbb::parallel_for (range, body, partitioner);
 
     else
       body(range);
@@ -155,13 +155,13 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Exectue the provided reduction operation in parallel on the specified 
+   * Exectue the provided reduction operation in parallel on the specified
    * range.
    */
   template <typename Range, typename Body>
   inline
   void parallel_reduce (const Range &range, Body &body)
-  { 
+  {
     BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
@@ -169,10 +169,10 @@ namespace Threads
 
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
-#endif   
+#endif
 
     if (libMesh::n_threads() > 1)
-      tbb::parallel_reduce (range, body, tbb::auto_partitioner()); 
+      tbb::parallel_reduce (range, body, tbb::auto_partitioner());
 
     else
       body(range);
@@ -187,13 +187,13 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Exectue the provided reduction operation in parallel on the specified 
+   * Exectue the provided reduction operation in parallel on the specified
    * range with the specified partitioner.
    */
   template <typename Range, typename Body, typename Partitioner>
   inline
   void parallel_reduce (const Range &range, Body &body, const Partitioner &partitioner)
-  { 
+  {
     BoolAcquire b(in_threads);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
@@ -201,10 +201,10 @@ namespace Threads
 
     if (libMesh::n_threads() > 1)
       libMesh::perflog.disable_logging();
-#endif   
+#endif
 
        if (libMesh::n_threads() > 1)
-	 tbb::parallel_reduce (range, body); 
+	 tbb::parallel_reduce (range, body);
 
        else
 	 body(range);
@@ -234,14 +234,14 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Defines atomic operations which can only be executed on a 
+   * Defines atomic operations which can only be executed on a
    * single thread at a time.  This is used in reference counting,
    * for example, to allow count++/count-- to work.
    */
   template <typename T>
   class atomic : public tbb::atomic<T> {};
 
-  
+
 
 #else //LIBMESH_HAVE_TBB_API
 
@@ -255,7 +255,7 @@ namespace Threads
     static const int automatic = -1;
     task_scheduler_init (int = automatic) {};
     void initialize (int = automatic) {};
-    void terminate () {};    
+    void terminate () {};
   };
 
   //-------------------------------------------------------------------
@@ -267,20 +267,20 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Exectue the provided function object in parallel on the specified 
+   * Exectue the provided function object in parallel on the specified
    * range.
    */
   template <typename Range, typename Body>
   inline
   void parallel_for (const Range &range, const Body &body)
-  { 
+  {
     BoolAcquire b(in_threads);
     body(range);
   }
 
   //-------------------------------------------------------------------
   /**
-   * Exectue the provided function object in parallel on the specified 
+   * Exectue the provided function object in parallel on the specified
    * range with the specified partitioner.
    */
   template <typename Range, typename Body, typename Partitioner>
@@ -293,7 +293,7 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Exectue the provided reduction operation in parallel on the specified 
+   * Exectue the provided reduction operation in parallel on the specified
    * range.
    */
   template <typename Range, typename Body>
@@ -306,7 +306,7 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Exectue the provided reduction operation in parallel on the specified 
+   * Exectue the provided reduction operation in parallel on the specified
    * range with the specified partitioner.
    */
   template <typename Range, typename Body, typename Partitioner>
@@ -322,18 +322,18 @@ namespace Threads
    * Spin mutex.  Implements mutual exclusion by busy-waiting in user
    * space for the lock to be acquired.
    */
-  class spin_mutex 
+  class spin_mutex
   {
   public:
     spin_mutex() {}
     void lock () {}
     void unlock () {}
 
-    class scoped_lock 
+    class scoped_lock
     {
     public:
       scoped_lock () {}
-      scoped_lock ( spin_mutex&  ) {} 
+      scoped_lock ( spin_mutex&  ) {}
       void acquire ( spin_mutex& ) {}
       void release () {}
     };
@@ -344,16 +344,16 @@ namespace Threads
    * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
    * space for the lock to be acquired.
    */
-  class recursive_mutex 
+  class recursive_mutex
   {
   public:
     recursive_mutex() {}
 
-    class scoped_lock 
+    class scoped_lock
     {
     public:
       scoped_lock () {}
-      scoped_lock ( recursive_mutex&  ) {} 
+      scoped_lock ( recursive_mutex&  ) {}
       void acquire ( recursive_mutex& ) {}
       void release () {}
     };
@@ -361,7 +361,7 @@ namespace Threads
 
   //-------------------------------------------------------------------
   /**
-   * Defines atomic operations which can only be executed on a 
+   * Defines atomic operations which can only be executed on a
    * single thread at a time.
    */
   template <typename T>
@@ -373,7 +373,7 @@ namespace Threads
   private:
     T _val;
   };
-  
+
 
 #endif // #ifdef LIBMESH_HAVE_TBB_API
 
@@ -383,7 +383,7 @@ namespace Threads
    * Blocked range which can be subdivided and executed in parallel.
    */
   template <typename T>
-  class BlockedRange 
+  class BlockedRange
   {
   public:
     /**
@@ -401,7 +401,7 @@ namespace Threads
     {}
 
     /**
-     * Constructor.  Takes the beginning and end of the range.  
+     * Constructor.  Takes the beginning and end of the range.
      * Optionally takes the \p grainsize parameter, which is the
      * smallest chunk the range may be broken into for parallel
      * execution.
@@ -416,7 +416,7 @@ namespace Threads
 
     /**
      * Copy constructor.  The \p StoredRange can be copied into
-     * subranges for parallel execution.  In this way the 
+     * subranges for parallel execution.  In this way the
      * initial \p StoredRange can be thought of as the root of
      * a binary tree.  The root element is the only element
      * which interacts with the user.  It takes a specified
@@ -428,17 +428,17 @@ namespace Threads
      * vector.
      */
     BlockedRange (const BlockedRange<T> &r):
-      _end(r._end), 
+      _end(r._end),
       _begin(r._begin),
       _grainsize(r._grainsize)
     {}
-    
+
     /**
      * Splits the range \p r.  The first half
      * of the range is left in place, the second
      * half of the range is placed in *this.
      */
-    BlockedRange (BlockedRange<T> &r, Threads::split ) : 
+    BlockedRange (BlockedRange<T> &r, Threads::split ) :
       _end(r._end),
       _begin(r._begin),
       _grainsize(r._grainsize)
@@ -447,41 +447,41 @@ namespace Threads
 	beginning = r._begin,
 	ending    = r._end,
 	middle    = beginning + (ending - beginning)/2u;
-    
+
       r._end = _begin = middle;
     }
-    
+
     /**
      * Resets the \p StoredRange to contain [first,last).
-     */ 
+     */
     void reset (const const_iterator first,
 		const const_iterator last)
     {
       _begin = first;
       _end   = last;
     }
-    
+
     /**
      * Beginning of the range.
      */
-    const_iterator begin () const { return _begin; }  
-    
+    const_iterator begin () const { return _begin; }
+
     /**
      * End of the range.
      */
     const_iterator end () const { return _end; }
-    
+
     /**
-     * The grain size for the range.  The range will be subdivided into 
+     * The grain size for the range.  The range will be subdivided into
      * subranges not to exceed the grain size.
      */
     unsigned int grainsize () const {return _grainsize;}
-    
+
     /**
      * Set the grain size.
      */
     void grainsize (const unsigned int &gs) {_grainsize = gs;}
-    
+
     /**
      * \return the size of the range.
      */
@@ -490,33 +490,33 @@ namespace Threads
     //------------------------------------------------------------------------
     // Methods that implement Range concept
     //------------------------------------------------------------------------
-    
+
     /**
      * Returns true if the range is empty.
-     */  
+     */
     bool empty() const { return (_begin == _end); }
-    
+
     /**
      * Returns true if the range can be subdivided.
      */
     bool is_divisible() const { return ((_begin + this->grainsize()) < _end); }
-    
+
   private:
-    
+
     const_iterator _end;
     const_iterator _begin;
     unsigned int _grainsize;
   };
-  
 
-  
+
+
   /**
-   * A spin mutex object which 
+   * A spin mutex object which
    */
   extern spin_mutex spin_mtx;
 
   /**
-   * A recursive mutex object which 
+   * A recursive mutex object which
    */
   extern recursive_mutex recursive_mtx;
 

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -63,14 +63,14 @@ public:
    */
   explicit
   DistributedVector (const ParallelType = AUTOMATIC);
-  
+
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   DistributedVector (const unsigned int n,
                      const ParallelType type = AUTOMATIC);
-    
+
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
@@ -78,7 +78,7 @@ public:
   DistributedVector (const unsigned int n,
 		     const unsigned int n_local,
                      const ParallelType type = AUTOMATIC);
-    
+
   /**
    * Constructor. Set local dimension to \p n_local, the global
    * dimension to \p n, but additionally reserve memory for the
@@ -88,7 +88,7 @@ public:
 		     const unsigned int n_local,
 		     const std::vector<unsigned int>& ghost,
                      const ParallelType type = AUTOMATIC);
-    
+
   /**
    * Destructor, deallocates memory. Made virtual to allow
    * for derived classes to behave properly.
@@ -98,18 +98,18 @@ public:
   /**
    * Call the assemble functions
    */
-  void close (); 
+  void close ();
 
   /**
    * @returns the \p DistributedVector to a pristine state.
    */
   void clear ();
-  
+
   /**
    * Set all entries to zero. Equivalent to \p v = 0, but more obvious and
-   * faster. 
+   * faster.
    */
-  void zero ();    
+  void zero ();
 
   /**
    * Creates a vector which has the same type, size and partitioning
@@ -134,19 +134,19 @@ public:
    *
    * On \p fast==false, the vector is filled by
    * zeros.
-   */    
+   */
   void init (const unsigned int N,
 	     const unsigned int n_local,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
-    
+
   /**
    * call init with n_local = N,
    */
   void init (const unsigned int N,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
-    
+
   /**
    * Create a vector that holds tha local indices plus those specified
    * in the \p ghost argument.
@@ -156,7 +156,7 @@ public:
 		     const std::vector<unsigned int>& /*ghost*/,
 		     const bool /*fast*/ = false,
 		     const ParallelType = AUTOMATIC);
-    
+
   /**
    * Creates a vector that has the same dimension and storage type as
    * \p other, including ghost dofs.
@@ -168,7 +168,7 @@ public:
    * \f$U(0-N) = s\f$: fill all components.
    */
   NumericVector<T> & operator= (const T s);
-    
+
   /**
    *  \f$U = V\f$: copy all components.
    */
@@ -183,23 +183,23 @@ public:
    *  \f$U = V\f$: copy all components.
    */
   NumericVector<T> & operator= (const std::vector<T> &v);
-  
+
   /**
    * @returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
    * Real part.
    */
   Real min () const;
-  
+
   /**
    * @returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
    * Real part.
    */
   Real max () const;
-  
+
   /**
-   * @returns the sum of all values in the vector 
+   * @returns the sum of all values in the vector
    */
   T sum() const;
 
@@ -249,12 +249,12 @@ public:
    * actually stored on this processor
    */
   unsigned int last_local_index() const;
-    
+
   /**
    * Access components, returns \p U(i).
    */
   T operator() (const unsigned int i) const;
-    
+
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
@@ -266,24 +266,24 @@ public:
    * Fast equivalent to \p U.add(-1, V).
    */
   NumericVector<T> & operator -= (const NumericVector<T> &V);
-    
+
   /**
    * v(i) = value
    */
   void set (const unsigned int i, const T value);
-    
+
   /**
    * v(i) += value
    */
   void add (const unsigned int i, const T value);
-    
+
   /**
    * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
   void add (const T s);
-    
+
   /**
    * \f$U+=V\f$.
    * Simple vector addition, equal to the
@@ -297,9 +297,9 @@ public:
    * \p operator +=.
    */
   void add (const T a, const NumericVector<T>& v);
-  
+
   /**
-   * \f$U+=v\f$ where v is a \p std::vector<T> 
+   * \f$U+=v\f$ where v is a \p std::vector<T>
    * and you
    * want to specify WHERE to add it
    */
@@ -307,14 +307,14 @@ public:
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
-   * \f$U+=V\f$ where U and V are type 
+   * \f$U+=V\f$ where U and V are type
    * \p NumericVector<T> and you
    * want to specify WHERE to add
-   * the \p NumericVector<T> V 
+   * the \p NumericVector<T> V
    */
   void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
-  
+
   /**
    * \f$U+=A*V\f$.
    * Add the product of a Sparse matrix \p A
@@ -324,12 +324,12 @@ public:
   void add_vector (const NumericVector<T>&,
 		   const SparseMatrix<T>&)
   { libmesh_error(); }
-  
+
   /**
-   * \f$U+=V\f$ where U and V are type 
+   * \f$U+=V\f$ where U and V are type
    * \p DenseVector<T> and you
    * want to specify WHERE to add
-   * the \p DenseVector<T> V 
+   * the \p DenseVector<T> V
    */
   void add_vector (const DenseVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
@@ -343,39 +343,39 @@ public:
   void add_vector_transpose (const NumericVector<T>&,
 		             const SparseMatrix<T>&)
   { libmesh_error(); }
-  
+
   /**
-   * \f$ U=v \f$ where v is a DenseVector<T> 
+   * \f$ U=v \f$ where v is a DenseVector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
 		       const std::vector<unsigned int>& dof_indices);
 
   /**
-   * \f$U=V\f$, where U and V are type 
+   * \f$U=V\f$, where U and V are type
    * NumericVector<T> and you
    * want to specify WHERE to insert
-   * the NumericVector<T> V 
+   * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-      
+
   /**
-   * \f$ U=V \f$ where V is type 
+   * \f$ U=V \f$ where V is type
    * DenseVector<T> and you
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-    
+
   /**
-   * \f$ U=V \f$ where V is type 
+   * \f$ U=V \f$ where V is type
    * DenseSubVector<T> and you
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-    
+
   /**
    * Scale each element of the
    * vector by the given factor.
@@ -387,12 +387,12 @@ public:
    * by its absolute value.
    */
   virtual void abs();
-  
+
   /**
    * Computes the dot product, p = U.V
    */
   virtual T dot(const NumericVector<T>& V) const;
-  
+
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
@@ -412,7 +412,7 @@ public:
    */
   void localize (NumericVector<T>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
-  
+
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
@@ -429,7 +429,7 @@ public:
    */
   void localize_to_one (std::vector<T>& v_local,
 			const unsigned int proc_id=0) const;
-    
+
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
    * and \p vec2 and stores the result in \p *this.
@@ -551,24 +551,24 @@ void DistributedVector<T>::init (const unsigned int n,
   else
     this->_type = type;
 
-  libmesh_assert ((this->_type==SERIAL && n==n_local) || 
+  libmesh_assert ((this->_type==SERIAL && n==n_local) ||
                   this->_type==PARALLEL);
 
   // Clear the data structures if already initialized
   if (this->initialized())
     this->clear();
-    
+
   // Initialize data structures
   _values.resize(n_local);
   _local_size  = n_local;
   _global_size = n;
 
   _first_local_index = 0;
-  
+
 #ifdef LIBMESH_HAVE_MPI
 
   std::vector<int> local_sizes (libMesh::n_processors(), 0);
-  
+
   local_sizes[libMesh::processor_id()] = n_local;
 
   Parallel::sum(local_sizes);
@@ -588,11 +588,11 @@ void DistributedVector<T>::init (const unsigned int n,
     sum += local_sizes[p];
 
   libmesh_assert (sum == static_cast<int>(n));
-  
+
 #  endif
-  
+
 #else
-  
+
   // No other options without MPI!
   if (n != n_local)
     {
@@ -600,11 +600,11 @@ void DistributedVector<T>::init (const unsigned int n,
 		    << std::endl;
       libmesh_error();
     }
-  
+
 #endif
 
   _last_local_index = _first_local_index + n_local;
-  
+
   // Set the initialized flag
   this->_is_initialized = true;
 
@@ -655,7 +655,7 @@ inline
 void DistributedVector<T>::close ()
 {
   libmesh_assert (this->initialized());
-  
+
   this->_is_closed = true;
 }
 
@@ -666,13 +666,13 @@ inline
 void DistributedVector<T>::clear ()
 {
   _values.clear();
-  
+
   _global_size =
     _local_size =
     _first_local_index =
     _last_local_index = 0;
-  
-  
+
+
   this->_is_closed = this->_is_initialized = false;
 }
 
@@ -685,7 +685,7 @@ void DistributedVector<T>::zero ()
   libmesh_assert (this->initialized());
   libmesh_assert (_values.size() == _local_size);
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
-  
+
   std::fill (_values.begin(),
 	     _values.end(),
 	     0.);
@@ -797,7 +797,7 @@ void DistributedVector<T>::set (const unsigned int i, const T value)
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
   libmesh_assert (i<size());
   libmesh_assert (i-first_local_index() < local_size());
-  
+
   _values[i - _first_local_index] = value;
 }
 
@@ -812,7 +812,7 @@ void DistributedVector<T>::add (const unsigned int i, const T value)
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
   libmesh_assert (i<size());
   libmesh_assert (i-first_local_index() < local_size());
-  
+
   _values[i - _first_local_index] += value;
 }
 
@@ -829,11 +829,11 @@ Real DistributedVector<T>::min () const
   libmesh_assert (_values.size() == _local_size);
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
-  Real local_min = _values.size() ? 
+  Real local_min = _values.size() ?
     libmesh_real(_values[0]) : std::numeric_limits<Real>::max();
   for (unsigned int i = 1; i < _values.size(); ++i)
     local_min = std::min(libmesh_real(_values[i]), local_min);
-  
+
   Parallel::min(local_min);
 
   return local_min;
@@ -852,11 +852,11 @@ Real DistributedVector<T>::max() const
   libmesh_assert (_values.size() == _local_size);
   libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
 
-  Real local_max = _values.size() ? 
+  Real local_max = _values.size() ?
     libmesh_real(_values[0]) : -std::numeric_limits<Real>::max();
   for (unsigned int i = 1; i < _values.size(); ++i)
     local_max = std::max(libmesh_real(_values[i]), local_max);
-  
+
   Parallel::max(local_max);
 
   return local_max;

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,11 +37,11 @@ void MeshData::read_tetgen (const std::string& name)
 {
   std::string name_node, name_ele, dummy;
   std::string desc = name;
-  
-  
+
+
   // Check name for *.node or *.ele extension.
   // Set std::istream for node_stream and ele_stream.
-  if (name.rfind(".node") < name.size()) 
+  if (name.rfind(".node") < name.size())
     {
       name_node = name;
       dummy     = name;
@@ -49,7 +49,7 @@ void MeshData::read_tetgen (const std::string& name)
       name_ele     = dummy.replace(position, 5, ".ele");
       desc.erase(position);
     }
-  else if (name.rfind(".ele") < name.size()) 
+  else if (name.rfind(".ele") < name.size())
     {
       name_ele = name;
       dummy    = name;
@@ -63,7 +63,7 @@ void MeshData::read_tetgen (const std::string& name)
 		    << name << std::endl;
       libmesh_error();
     }
-  
+
   // Set the streams from which to read in.
   std::ifstream node_stream (name_node.c_str());
   std::ifstream ele_stream  (name_ele.c_str());
@@ -77,12 +77,12 @@ void MeshData::read_tetgen (const std::string& name)
       libmesh_error();
     }
 
-  
+
   // Set the descriptive name.
   // TetGen won't give a name, so we use the filename.
   this->_data_descriptor = desc;
 
-  
+
   //--------------------------------------------------
   // Read in the data associated with the nodes.
   {
@@ -103,7 +103,7 @@ void MeshData::read_tetgen (const std::string& name)
       {
 	node_stream >> f_n_id;
 
-	
+
 	// Read the nodal coordinates for this node into dummy,
 	// since we don't need them.
 	for (unsigned int j=0; j<3; j++)
@@ -119,13 +119,13 @@ void MeshData::read_tetgen (const std::string& name)
 
 	// For the foreign node id locate the Node*.
      	const Node* node = foreign_id_to_node(f_n_id);
-				
+
 	// Insert this node and the values in our _node_data.
 	_node_data.insert (std::make_pair(node, AttriValue));
       }
   }
 
-  
+
   //--------------------------------------------------
   // Read in the data associated with the elements.
   {
@@ -161,12 +161,12 @@ void MeshData::read_tetgen (const std::string& name)
 
 	// For the foreign elem id locate the Elem*.
      	const Elem* elem = foreign_id_to_elem(f_e_id);
-				
+
 	// Insert this elem and the values in our _elem_data.
 	_elem_data.insert (std::make_pair(elem, AttriValue));
       }
   }
-  
+
   //--------------------------------------------------
   // Finished reading.  Now ready for use.
   this->_node_data_closed = true;

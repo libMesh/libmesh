@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -58,30 +58,30 @@ template <typename T>
 class LinearSolver : public ReferenceCountedObject<LinearSolver<T> >
 {
 public:
-  
+
   /**
    *  Constructor. Initializes Solver data structures
    */
   LinearSolver ();
-    
+
   /**
    * Destructor.
    */
   virtual ~LinearSolver ();
-  
+
   /**
    * Builds a \p LinearSolver using the linear solver package specified by
    * \p solver_package
    */
   static AutoPtr<LinearSolver<T> > build(const SolverPackage solver_package =
 						  libMesh::default_solver_package());
-  
+
   /**
    * @returns true if the data structures are
    * initialized, false otherwise.
    */
   bool initialized () const { return _is_initialized; }
-  
+
   /**
    * Release all memory and clear data structures.
    */
@@ -121,7 +121,7 @@ public:
   virtual void reuse_preconditioner(bool );
 
   bool get_same_preconditioner();
- 
+
   /**
    * After calling this method, all successive solves will be
    * restricted to the given set of dofs, which must contain local
@@ -143,7 +143,7 @@ public:
 					       NumericVector<T>&, // RHS vector
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
-  
+
     /**
    * Function to solve the adjoint system. Note that this method
    * will compute the preconditioner from the system matrix. This is not a pure virtual
@@ -166,7 +166,7 @@ public:
 					       NumericVector<T>&, // RHS vector
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
-  
+
   /**
    * This function calls the solver "_solver_type" preconditioned with
    * the "_preconditioner_type" preconditioner.  The preconditioning
@@ -179,7 +179,7 @@ public:
 				       NumericVector<T>&, // RHS vector
 				       const double,      // Stopping tolerance
 				       const unsigned int); // N. Iterations
-  
+
 
 
   /**
@@ -190,7 +190,7 @@ public:
 					       NumericVector<T>&, // RHS vector
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
-  
+
 
 
   /**
@@ -204,7 +204,7 @@ public:
 					       NumericVector<T>&, // RHS vector
 					       const double,      // Stopping tolerance
 					       const unsigned int) = 0; // N. Iterations
-  
+
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -223,11 +223,11 @@ public:
    * con(di)verged.
    */
   virtual void print_converged_reason() = 0;
-  
-  
+
+
 protected:
 
-  
+
   /**
    * Enum stating which type of iterative solver to use.
    */
@@ -237,7 +237,7 @@ protected:
    * Enum statitng with type of preconditioner to use.
    */
   PreconditionerType _preconditioner_type;
-  
+
   /**
    * Flag indicating if the data structures have been initialized.
    */
@@ -251,7 +251,7 @@ protected:
   /**
    * Boolean flag to indicate whether we want to use an identical
    * preconditioner to the previous solve. This can save
-   * substantial work in the cases where the system matrix is 
+   * substantial work in the cases where the system matrix is
    * the same for successive solves.
    */
   bool same_preconditioner;
@@ -291,7 +291,7 @@ bool LinearSolver<T>::get_same_preconditioner()
 
 template <typename T>
 inline
-std::pair<unsigned int, Real> 
+std::pair<unsigned int, Real>
 LinearSolver<T>::solve (SparseMatrix<T>&   mat,
 		        SparseMatrix<T>*   pc_mat,
 		        NumericVector<T>&  sol,
@@ -308,7 +308,7 @@ LinearSolver<T>::solve (SparseMatrix<T>&   mat,
 
 template <typename T>
 inline
-std::pair<unsigned int, Real> 
+std::pair<unsigned int, Real>
 LinearSolver<T>::solve (const ShellMatrix<T>&  mat,
 		        const SparseMatrix<T>* pc_mat,
 		        NumericVector<T>&      sol,

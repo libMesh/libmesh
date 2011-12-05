@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -49,7 +49,7 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
       ap.reset(new PetscNonlinearSolver<T>(s));
       break;
 #endif
-      
+
 #ifdef LIBMESH_HAVE_NOX
     case TRILINOS_SOLVERS:
       ap.reset(new NoxNonlinearSolver<T>(s));
@@ -62,8 +62,8 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 		    << std::endl;
       libmesh_error();
     }
-    
-  return ap;    
+
+  return ap;
 }
 #else // LIBMESH_HAVE_PETSC || LIBMESH_HAVE_NOX
 template <typename T>
@@ -86,7 +86,7 @@ NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
     libMesh::err << "Preconditioner must be attached before the solver is initialized!"<<std::endl;
     libmesh_error();
   }
-  
+
   _preconditioner = preconditioner;
 }
 

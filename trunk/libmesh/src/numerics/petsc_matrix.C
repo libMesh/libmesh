@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -56,7 +56,7 @@ void PetscMatrix<T>::init (const unsigned int m,
 
   this->_is_initialized = true;
 
-  
+
   int ierr     = 0;
   int m_global = static_cast<int>(m);
   int n_global = static_cast<int>(n);
@@ -64,7 +64,7 @@ void PetscMatrix<T>::init (const unsigned int m,
   int n_local  = static_cast<int>(n_l);
   int n_nz     = static_cast<int>(nnz);
   int n_oz     = static_cast<int>(noz);
-  
+
   // create a sequential matrix on one processor
   if (libMesh::n_processors() == 1)
     {
@@ -74,7 +74,7 @@ void PetscMatrix<T>::init (const unsigned int m,
       ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, m_global, n_global,
 			      n_nz, PETSC_NULL, &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
       ierr = MatSetFromOptions (_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -86,7 +86,7 @@ void PetscMatrix<T>::init (const unsigned int m,
       ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD, m_local, n_local, m_global, n_global,
 			      n_nz, PETSC_NULL, n_oz, PETSC_NULL, &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
       ierr = MatSetFromOptions (_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -101,17 +101,17 @@ template <typename T>
 void PetscMatrix<T>::init ()
 {
   libmesh_assert (this->_dof_map != NULL);
-  
+
   // Clear initialized matrices
   if (this->initialized())
     this->clear();
 
   this->_is_initialized = true;
 
-  
+
   const unsigned int m   = this->_dof_map->n_dofs();
   const unsigned int n   = m;
-  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id()); 
+  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id());
   const unsigned int m_l = n_l;
 
 
@@ -121,11 +121,11 @@ void PetscMatrix<T>::init ()
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
   libmesh_assert (n_nz.size() == n_l);
   libmesh_assert (n_oz.size() == n_l);
-  
+
   // We allow 0x0 matrices now
   //if (m==0)
   //  return;
-  
+
   int ierr     = 0;
   int m_global = static_cast<int>(m);
   int n_global = static_cast<int>(n);
@@ -144,7 +144,7 @@ void PetscMatrix<T>::init ()
         ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, m_global, n_global,
 			        PETSC_NULL, (int*) &n_nz[0], &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
       ierr = MatSetFromOptions (_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -166,7 +166,7 @@ void PetscMatrix<T>::init ()
 			        PETSC_NULL, (int*) &n_nz[0],
 			        PETSC_NULL, (int*) &n_oz[0], &_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
       ierr = MatSetFromOptions (_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -182,7 +182,7 @@ void PetscMatrix<T>::zero ()
   libmesh_assert (this->initialized());
 
   semiparallel_only();
-  
+
   int ierr=0;
 
   ierr = MatZeroEntries(_mat);
@@ -221,14 +221,14 @@ template <typename T>
 void PetscMatrix<T>::clear ()
 {
   int ierr=0;
-  
+
   if ((this->initialized()) && (this->_destroy_mat_on_exit))
     {
       semiparallel_only();
-  
+
       ierr = LibMeshMatDestroy (&_mat);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
       this->_is_initialized = false;
     }
 }
@@ -239,13 +239,13 @@ template <typename T>
 Real PetscMatrix<T>::l1_norm () const
 {
   libmesh_assert (this->initialized());
-  
+
   semiparallel_only();
 
   int ierr=0;
   PetscReal petsc_value;
   Real value;
-  
+
   libmesh_assert (this->closed());
 
   ierr = MatNorm(_mat, NORM_1, &petsc_value);
@@ -262,13 +262,13 @@ template <typename T>
 Real PetscMatrix<T>::linfty_norm () const
 {
   libmesh_assert (this->initialized());
-  
+
   semiparallel_only();
 
   int ierr=0;
   PetscReal petsc_value;
   Real value;
-  
+
   libmesh_assert (this->closed());
 
   ierr = MatNorm(_mat, NORM_INFINITY, &petsc_value);
@@ -290,8 +290,8 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
 
   // libmesh_assert (this->closed());
   this->close();
-  
-  int ierr=0; 
+
+  int ierr=0;
   PetscViewer petsc_viewer;
 
 
@@ -301,7 +301,7 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
 
   /**
    * Create an ASCII file containing the matrix
-   * if a filename was provided.  
+   * if a filename was provided.
    */
   if (name != "NULL")
     {
@@ -309,11 +309,11 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
 				   name.c_str(),
 				   &petsc_viewer);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
       ierr = PetscViewerSetFormat (petsc_viewer,
 				   PETSC_VIEWER_ASCII_MATLAB);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
       ierr = MatView (_mat, petsc_viewer);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -326,7 +326,7 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
       ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
 				   PETSC_VIEWER_ASCII_MATLAB);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
       ierr = MatView (_mat, PETSC_VIEWER_STDOUT_WORLD);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -351,7 +351,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
   // Routine must be called in parallel on parallel matrices
   // and serial on serial matrices.
   semiparallel_only();
-  
+
 // #ifndef NDEBUG
 //   if (os != std::cout)
 //     libMesh::err << "Warning! PETSc can only print to std::cout!" << std::endl;
@@ -359,7 +359,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
 
   // Matrix must be in an assembled state to be printed
   this->close();
-  
+
   int ierr=0;
 
   // Print to screen if ostream is stdout
@@ -368,14 +368,14 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
       ierr = MatView(_mat, PETSC_VIEWER_STDOUT_SELF);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
-  
+
   // Otherwise, print to the requested file, in a roundabout way...
-  else 
+  else
     {
       // We will create a temporary filename, and file, for PETSc to
       // write to.
       std::string temp_filename;
-      
+
       {
 	// Template for temporary filename
 	char c[] = "temp_petsc_matrix.XXXXXX";
@@ -386,7 +386,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
 	if (libMesh::processor_id() == 0)
 	  {
 	    int fd = mkstemp(c);
-     
+
 	    // Check to see that mkstemp did not fail.
 	    if (fd == -1)
 	      libmesh_error();
@@ -399,10 +399,10 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
 	// Store temporary filename as string, makes it easier to broadcast
 	temp_filename = c;
       }
-      
+
       // Now broadcast the filename from processor 0 to all processors.
       Parallel::broadcast(temp_filename);
-      
+
       // PetscViewer object for passing to MatView
       PetscViewer petsc_viewer;
 
@@ -411,11 +411,11 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
       // an ostream, we have to do an extra step...  print_personal() should probably
       // have a version that takes a string to get rid of this problem.
       ierr = PetscViewerASCIIOpen( libMesh::COMM_WORLD,
-				   temp_filename.c_str(), 
+				   temp_filename.c_str(),
 				   &petsc_viewer);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-      // Probably don't need to set the format if it's default... 
+      // Probably don't need to set the format if it's default...
       //      ierr = PetscViewerSetFormat (petsc_viewer,
       //				   PETSC_VIEWER_DEFAULT);
       //      CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -439,7 +439,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
     }
 }
 
-  
+
 
 
 
@@ -450,13 +450,13 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				const std::vector<unsigned int>& cols)
 {
   libmesh_assert (this->initialized());
-  
+
   const unsigned int m = dm.m();
   const unsigned int n = dm.n();
 
   libmesh_assert (rows.size() == m);
   libmesh_assert (cols.size() == n);
-  
+
   int ierr=0;
 
   // These casts are required for PETSc <= 2.1.5
@@ -488,7 +488,7 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   // then we need to clear it, otherwise we get a memory leak.
   if( !reuse_submatrix && submatrix.initialized() )
     submatrix.clear();
-  
+
   // Construct row and column index sets.
   int ierr=0;
   IS isrow, iscol;

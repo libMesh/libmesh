@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -78,7 +78,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   MeshBase (unsigned int dim=1);
-  
+
   /**
    * Copy-constructor.
    */
@@ -105,39 +105,39 @@ public:
    * A partitioner to use at each prepare_for_use()
    */
   virtual AutoPtr<Partitioner> &partitioner() { return _partitioner; }
-  
+
   /**
    * Deletes all the data that are currently stored.
    */
   virtual void clear ();
-  
+
   /**
    * @returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
    */
   bool is_prepared () const
   { return _is_prepared; }
-  
+
   /**
    * @returns \p true if all elements and nodes of the mesh
    * exist on the current processor, \p false otherwise
    */
-  virtual bool is_serial () const 
+  virtual bool is_serial () const
   { return true; }
-  
+
   /**
    * Gathers all elements and nodes of the mesh onto
    * every processor
    */
   virtual void allgather () {}
-  
+
   /**
    * When supported, deletes all nonlocal elements of the mesh
    * except for "ghosts" which touch a local element, and deletes
    * all nodes which are not part of a local or ghost element
    */
   virtual void delete_remote_elements () {}
-  
+
   /**
    * @returns the logical dimension of the mesh; i.e. the manifold
    * dimension of the elements in the mesh.  If we ever support
@@ -146,20 +146,20 @@ public:
    */
   unsigned int mesh_dimension () const
   { return static_cast<unsigned int>(_dim); }
-  
+
   /**
    * Resets the logical dimension of the mesh.
    */
   void set_mesh_dimension (unsigned int d)
   { _dim = d; }
-  
+
   /**
    * Returns the spatial dimension of the mesh.  Note that this is
    * defined at compile time in the header \p libmesh_common.h.
    */
   unsigned int spatial_dimension () const
   { return static_cast<unsigned int>(LIBMESH_DIM); }
-  
+
   /**
    * Returns the number of nodes in the mesh. This function and others must
    * be defined in derived classes since the MeshBase class has no specific
@@ -167,7 +167,7 @@ public:
    * may return a cached value on distributed meshes, and so can be
    * called by any processor at any time.
    */
-  virtual unsigned int n_nodes () const = 0; 
+  virtual unsigned int n_nodes () const = 0;
 
   /**
    * Returns the number of nodes in the mesh. This function and others must
@@ -176,7 +176,7 @@ public:
    * returns a newly calculated parallel-synchronized value on
    * distributed meshes, and so must be called in parallel only.
    */
-  virtual unsigned int parallel_n_nodes () const = 0; 
+  virtual unsigned int parallel_n_nodes () const = 0;
 
   /**
    * Returns the number of nodes on processor \p proc.
@@ -208,14 +208,14 @@ public:
    * of nodes you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
-  virtual void reserve_nodes (const unsigned int nn) = 0; 
-  
+  virtual void reserve_nodes (const unsigned int nn) = 0;
+
   /**
    * Returns the number of elements in the mesh.  The standard
    * n_elem() function may return a cached value on distributed
    * meshes, and so can be called by any processor at any time.
    */
-  virtual unsigned int n_elem () const = 0; 
+  virtual unsigned int n_elem () const = 0;
 
   /**
    * Returns the number of elements in the mesh.  The
@@ -223,7 +223,7 @@ public:
    * parallel-synchronized value on distributed meshes, and so must be
    * called in parallel only.
    */
-  virtual unsigned int parallel_n_elem () const = 0; 
+  virtual unsigned int parallel_n_elem () const = 0;
 
   /**
    * Returns a number greater than or equal to the maximum element id in the
@@ -238,10 +238,10 @@ public:
    * of elements you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
-  virtual void reserve_elem (const unsigned int ne) = 0; 
+  virtual void reserve_elem (const unsigned int ne) = 0;
 
   /**
-   * Updates parallel caches so that methods like n_elem() 
+   * Updates parallel caches so that methods like n_elem()
    * accurately reflect changes on other processors
    */
   virtual void update_parallel_id_counts () = 0;
@@ -279,7 +279,7 @@ public:
    */
   unsigned int n_active_local_elem () const
   { return this->n_active_elem_on_proc (libMesh::processor_id()); }
-  
+
   /**
    * This function returns the number of elements that will be written
    * out in the Tecplot format.  For example, a 9-noded quadrilateral will
@@ -293,32 +293,32 @@ public:
    * Same, but only counts active elements.
    */
   unsigned int n_active_sub_elem () const;
-  
+
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ point.
-   */  
+   */
   virtual const Point& point (const unsigned int i) const = 0;
 
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ node.
-   */  
+   */
   virtual const Node& node (const unsigned int i) const = 0;
-  
+
   /**
    * Return a reference to the \f$ i^{th} \f$ node.
-   */  
+   */
   virtual Node& node (const unsigned int i) = 0;
-  
+
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.
-   */  
+   */
   virtual const Node* node_ptr (const unsigned int i) const = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node.
-   */  
+   */
   virtual Node* & node_ptr (const unsigned int i) = 0;
 
   /**
@@ -350,14 +350,14 @@ public:
    * Removes the Node n from the mesh.
    */
   virtual void delete_node (Node* n) = 0;
-  
+
   /**
    * Changes the id of node \p old_id, both by changing node(old_id)->id() and
    * by moving node(old_id) in the mesh's internal container.  No element with
    * the id \p new_id should already exist.
    */
   virtual void renumber_node (unsigned int old_id, unsigned int new_id) = 0;
-		      
+
   /**
    * Add elem \p e to the end of the element array.
    * To add an element locally, set e->processor_id() before adding it.
@@ -389,7 +389,7 @@ public:
 
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help
-   * of a \p std::map that functions like a hash table.  
+   * of a \p std::map that functions like a hash table.
    * After this routine is called all the elements with a \p NULL neighbor
    * pointer are guaranteed to be on the boundary.  Thus this routine is
    * useful for automatically determining the boundaries of the domain.
@@ -401,22 +401,22 @@ public:
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
 			       const bool reset_current_list    = true) = 0;
-  
+
   /**
    * After partitoning a mesh it is useful to renumber the nodes and elements
    * so that they lie in contiguous blocks on the processors.  This method
    * does just that.
    */
-  virtual void renumber_nodes_and_elements () = 0;    
+  virtual void renumber_nodes_and_elements () = 0;
 
     /**
      * There is no reason for a user to ever call this function.
      *
      * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n. 
+     * \p mesh.node(n)->id() == n.
      */
   virtual void fix_broken_node_and_element_numbering () = 0;
-  
+
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
@@ -432,7 +432,7 @@ public:
    * This involves 3 steps:
    *  1.) call \p find_neighbors()
    *  2.) call \p partition()
-   *  3.) call \p renumber_nodes_and_elements() 
+   *  3.) call \p renumber_nodes_and_elements()
    *
    * The read_xda_file boolean flag is true when prepare_for_use
    * is called from Mesh::read after reading an xda file.  It prevents
@@ -442,7 +442,7 @@ public:
    * skip_renumber is currently set to TRUE to work around an I/O bug
    */
   void prepare_for_use (const bool skip_renumber_nodes_and_elements=true);
-  
+
   /**
    * Call the default partitioner (currently \p metis_partition()).
    */
@@ -462,10 +462,10 @@ public:
    */
   void skip_partitioning(bool skip) { _skip_partitioning = skip; }
   bool skip_partitioning() { return _skip_partitioning; }
-  
+
   /**
    * Returns the number of subdomains in the global mesh. Subdomains correspond
-   * to separate subsets of the mesh which could correspond e.g. to different 
+   * to separate subsets of the mesh which could correspond e.g. to different
    * materials in a solid mechanics application, or regions where different
    * physical processes are important.  The subdomain mapping is independent
    * from the parallel decomposition.
@@ -480,7 +480,7 @@ public:
    */
   unsigned int n_partitions () const
   { return _n_parts; }
-  
+
   /**
    * @returns the number of processors used in the
    * current simulation.
@@ -522,15 +522,15 @@ public:
 
   /**
    * Converts a mesh with higher-order
-   * elements into a mesh with linear elements.  For 
+   * elements into a mesh with linear elements.  For
    * example, a mesh consisting of \p Tet10 will be converted
    * to a mesh with \p Tet4 etc.
    */
   virtual void all_first_order () = 0;
 
   /**
-   * Converts a (conforming, non-refined) mesh with linear 
-   * elements into a mesh with second-order elements.  For 
+   * Converts a (conforming, non-refined) mesh with linear
+   * elements into a mesh with second-order elements.  For
    * example, a mesh consisting of \p Tet4 will be converted
    * to a mesh with \p Tet10 etc.  Note that for some elements
    * like \p Hex8 there exist @e two higher order equivalents,
@@ -572,7 +572,7 @@ public:
    * number of partitions, _n_parts, has changed, unless you call this
    * function.  This is an O(N active elements) calculation.  The return
    * value is the number of partitions, and _n_parts is also set by
-   * this function.  
+   * this function.
    */
   unsigned int recalculate_n_partitions();
 
@@ -610,7 +610,7 @@ public:
 public:
 
 
-  
+
   /**
    * Elem iterator accessor functions.  These must be defined in
    * Concrete base classes.
@@ -657,10 +657,10 @@ public:
   virtual element_iterator unpartitioned_elements_end       () = 0;
   virtual element_iterator active_local_subdomain_elements_begin         (const unsigned int subdomain_id) = 0;
   virtual element_iterator active_local_subdomain_elements_end           (const unsigned int subdomain_id) = 0;
-  
 
-  
-  
+
+
+
   /**
    * const Elem iterator accessor functions.
    */
@@ -707,7 +707,7 @@ public:
   virtual const_element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id) const = 0;
   virtual const_element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id) const = 0;
 
-  
+
   /**
    * non-const Node iterator accessor functions.
    */
@@ -734,20 +734,20 @@ public:
   virtual const_node_iterator pid_nodes_end      (const unsigned int proc_id) const = 0;
 
 
-  
+
 protected:
 
 
 
-  
-  
+
+
 
   /**
    * Returns a writeable reference to the number of partitions.
    */
   unsigned int& set_n_partitions ()
   { return _n_parts; }
-  
+
   /**
    * The number of partitions the mesh has.  This is set by
    * the partitioners, and may not be changed directly by
@@ -758,22 +758,22 @@ protected:
    * processor and view the result in GMV.
    */
   unsigned int _n_parts;
-  
+
   /**
    * The logical dimension of the mesh.
-   */     
+   */
   unsigned int _dim;
 
   /**
    * Flag indicating if the mesh has been prepared for use.
    */
   bool _is_prepared;
-  
+
   /**
-   * A \p PointLocator class for this mesh. 
-   * This will not actually be built unless needed. Further, since we want 
+   * A \p PointLocator class for this mesh.
+   * This will not actually be built unless needed. Further, since we want
    * our \p point_locator() method to be \p const (yet do the dynamic allocating)
-   * this needs to be mutable.  Since the PointLocatorBase::build() member is used, 
+   * this needs to be mutable.  Since the PointLocatorBase::build() member is used,
    * and it operates on a constant reference to the mesh, this is OK.
    */
   mutable AutoPtr<PointLocatorBase> _point_locator;
@@ -790,7 +790,7 @@ protected:
    * If this is true then no partitioning should be done.
    */
   bool _skip_partitioning;
-  
+
   /**
    * The partitioner class is a friend so that it can set
    * the number of partitions.

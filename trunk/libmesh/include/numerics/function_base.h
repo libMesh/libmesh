@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,16 +41,16 @@ class Point;
 
 
 /**
- * This is the base class for functor-like classes.  These 
- * entities are functions (in the mathematical sense) of time 
- * and space, \f$ f(\mathbf{x},t) =  \mbox{\texttt{v}} \f$, 
+ * This is the base class for functor-like classes.  These
+ * entities are functions (in the mathematical sense) of time
+ * and space, \f$ f(\mathbf{x},t) =  \mbox{\texttt{v}} \f$,
  * where \p v may be either a \p Number or a \p DenseVector<Number>.
- * Children of this base class implement different styles of 
+ * Children of this base class implement different styles of
  * data retrieval for these functions.  Use the constructors
- * of the derived classes for creating new objects. The 
+ * of the derived classes for creating new objects. The
  * required input of each derived class thwarts the effective
  * use of the commonly used \p build() member.  But afterwards
- * the virtual members allow the convenient and libMesh-common 
+ * the virtual members allow the convenient and libMesh-common
  * usage through a \p FunctionBase*.
  *
  * @author Daniel Dreyer, 2003
@@ -58,7 +58,7 @@ class Point;
 
 // ------------------------------------------------------------
 // FunctionBase class definition
-class FunctionBase 
+class FunctionBase
 {
 protected:
 
@@ -93,7 +93,7 @@ public:
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
    */
-  virtual Number operator() (const Point& p, 
+  virtual Number operator() (const Point& p,
 			     const Real time = 0.) = 0;
 
   /**

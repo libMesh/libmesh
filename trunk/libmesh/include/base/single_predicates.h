@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,7 +41,7 @@ namespace Predicates
 {
   // Forward declaration
   template <typename T> class abstract_multi_predicate;
-  
+
   // abstract single predicate.  Derived classes must implement the clone()
   // function.  Be careful using it since it allocates memory!  The clone()
   // function is necessary since the predicate class has pure virtual
@@ -70,7 +70,7 @@ namespace Predicates
   protected:
     virtual predicate<T>* clone() const { return new is_null<T>(*this); }
   };
-  
+
   // The not_null predicate simply returns true if the pointer is not NULL.
   template <typename T>
   struct not_null : is_null<T>
@@ -88,7 +88,7 @@ namespace Predicates
   {
     virtual ~active() {}
     virtual bool operator()(const T& it) const { return (*it)->active(); }
-    
+
   protected:
     virtual predicate<T>* clone() const { return new active<T>(*this); }
   };
@@ -110,7 +110,7 @@ namespace Predicates
   {
     virtual ~ancestor() {}
     virtual bool operator()(const T& it) const { return (*it)->ancestor(); }
-    
+
   protected:
     virtual predicate<T>* clone() const { return new ancestor<T>(*this); }
   };
@@ -132,7 +132,7 @@ namespace Predicates
   {
     virtual ~subactive() {}
     virtual bool operator()(const T& it) const { return (*it)->subactive(); }
-    
+
   protected:
     virtual predicate<T>* clone() const { return new subactive<T>(*this); }
   };
@@ -160,14 +160,14 @@ namespace Predicates
 
     // op()
     virtual bool operator()(const T& it) const { return (*it)->processor_id() == _pid; }
-    
+
   protected:
     virtual predicate<T>* clone() const { return new pid<T>(*this); }
     const unsigned int _pid;
   };
 
 
-  
+
   // The not_pid predicate returns ture if the pointers
   // processor id does _not_ match p.
   template <typename T>
@@ -191,7 +191,7 @@ namespace Predicates
     // Constructor
     elem_type (const ElemType t) : _elem_type(t) {}
     virtual ~elem_type() {}
-    
+
     virtual bool operator()(const T& it) const { return (*it)->type() == _elem_type; }
 
   protected:
@@ -202,7 +202,7 @@ namespace Predicates
 
 
 
-  
+
   // The level predicate returns true if the pointers level
   // matches the given level.
   template <typename T>
@@ -213,14 +213,14 @@ namespace Predicates
     virtual ~level() {}
 
     virtual bool operator()(const T& it) const { return (*it)->level() == _level; }
-    
+
   protected:
     virtual predicate<T>* clone() const { return new level<T>(*this); }
     const unsigned int _level;
   };
 
 
-  
+
   // The not_level predicate returns true if the pointers level
   // _does not_ match the given level.
   template <typename T>
@@ -228,7 +228,7 @@ namespace Predicates
   {
     // Constructor
     not_level(const unsigned int l) : level<T>(l) {}
-  
+
     virtual bool operator()(const T& it) const { return !level<T>::operator()(it); }
 
   protected:
@@ -236,7 +236,7 @@ namespace Predicates
   };
 
 
-  
+
 
   // The null_neighbor predicate returns true if the pointer has any
   // NULL neigbors.
@@ -248,7 +248,7 @@ namespace Predicates
     {
       return (*it)->on_boundary();
     }
-    
+
   protected:
     virtual predicate<T>* clone() const { return new null_neighbor<T>(*this); }
   };
@@ -282,7 +282,7 @@ namespace Predicates
 
     // op()
     virtual bool operator()(const T& it) const { return (*it)->subdomain_id() == _subdomain; }
-    
+
   protected:
     virtual predicate<T>* clone() const { return new subdomain<T>(*this); }
     const subdomain_id_type _subdomain;

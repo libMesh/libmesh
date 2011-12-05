@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,33 +37,33 @@ namespace libMesh
  * The \p Hex27 is an element in 3D composed of 27 nodes.
  * It is numbered like this:
    \verbatim
-   HEX27:      7              18             6     			      
-               o--------------o--------------o     			      
-              /:             /              /|     			      
-             / :            /              / |     			      
-            /  :           /              /  |     			      
-         19/   :        25/            17/   |     			      
-          o--------------o--------------o    |     			      
-         /     :        /              /|    |     			      
-        /    15o       /    23o       / |  14o     
-       /       :      /              /  |   /|     
-     4/        :   16/             5/   |  / |     
-     o--------------o--------------o    | /  |     			      
-     |         :    |   26         |    |/   |     
-     |  24o    :    |    o         |  22o    |     
-     |         :    |       10     |   /|    |                                
-     |        3o....|.........o....|../.|....o     
-     |        .     |              | /  |   / 2      
-     |       .    21|            13|/   |  /        
-  12 o--------------o--------------o    | /         
-     |     .        |              |    |/          
-     |  11o         | 20o          |    o           
-     |   .          |              |   / 9          
-     |  .           |              |  /             
-     | .            |              | /              
-     |.             |              |/               
-     o--------------o--------------o                
-     0              8              1                
+   HEX27:      7              18             6
+               o--------------o--------------o
+              /:             /              /|
+             / :            /              / |
+            /  :           /              /  |
+         19/   :        25/            17/   |
+          o--------------o--------------o    |
+         /     :        /              /|    |
+        /    15o       /    23o       / |  14o
+       /       :      /              /  |   /|
+     4/        :   16/             5/   |  / |
+     o--------------o--------------o    | /  |
+     |         :    |   26         |    |/   |
+     |  24o    :    |    o         |  22o    |
+     |         :    |       10     |   /|    |
+     |        3o....|.........o....|../.|....o
+     |        .     |              | /  |   / 2
+     |       .    21|            13|/   |  /
+  12 o--------------o--------------o    | /
+     |     .        |              |    |/
+     |  11o         | 20o          |    o
+     |   .          |              |   / 9
+     |  .           |              |  /
+     | .            |              | /
+     |.             |              |/
+     o--------------o--------------o
+     0              8              1
    \endverbatim
  */
 
@@ -77,7 +77,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   Hex27  (Elem* p=NULL);
-  
+
   /**
    * @returns \p HEX27
    */
@@ -87,12 +87,12 @@ public:
    * @returns 27
    */
   unsigned int n_nodes() const { return 27; }
-  
+
   /**
    * @returns 8
    */
   unsigned int n_sub_elem() const { return 8; }
-  
+
   /**
    * @returns true iff the specified (local) node number is a vertex.
    */
@@ -107,14 +107,14 @@ public:
    * @returns true iff the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
 			       const unsigned int s) const;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
@@ -143,16 +143,16 @@ public:
    * key.
    */
   unsigned int key (const unsigned int s) const;
-  
+
   /**
-   * Builds a \p QUAD9 built coincident with face i.  
+   * Builds a \p QUAD9 built coincident with face i.
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
 			    bool proxy) const;
 
   /**
-   * Builds a \p EDGE3 built coincident with edge i.  
+   * Builds a \p EDGE3 built coincident with edge i.
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_edge (const unsigned int i) const;
@@ -178,13 +178,13 @@ public:
   /**
    * @returns the child number \p c and element-local index \p v of the
    * \f$ n^{th} \f$ second-order node on the parent element.  Note that
-   * the return values are always less \p this->n_children() and 
+   * the return values are always less \p this->n_children() and
    * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
    * to \p * this->n_vertices().  For linear elements this returns 0,0.
    * On refined second order elements, the return value will satisfy
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
-  virtual std::pair<unsigned short int, unsigned short int> 
+  virtual std::pair<unsigned short int, unsigned short int>
 	  second_order_child_vertex (const unsigned int n) const;
 
   /**
@@ -199,16 +199,16 @@ public:
    */
   static const unsigned int edge_nodes_map[12][3];
 
-  
+
 protected:
-  
+
 
   /**
    * Data for links to nodes
    */
   Node* _nodelinks_data[27];
-  
-  
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -224,19 +224,19 @@ protected:
    * from current nodes/solution.
    */
   static const float _embedding_matrix[8][27][27];
-  
+
 #endif
 
 
 private:
-  
+
   /**
    * Matrix that tells which vertices define the location
    * of mid-side (or second-order) nodes.  This matrix only
    * covers the nodes that are unique to \p Hex27, while the
    * second-order-nodes that are identical with \p Hex20 are covered
    * through the \p _second_order_adjacent_vertices matrix in
-   * \p cell_hex.C.  Note that this matrix also does @e not 
+   * \p cell_hex.C.  Note that this matrix also does @e not
    * cover the bubble node.  The interpolation
    * is trivial and would only blow up the size of this
    * matrix.
@@ -251,7 +251,7 @@ private:
 // Hex27 class member functions
 inline
 Hex27::Hex27(Elem* p) :
-  Hex(Hex27::n_nodes(), p, _nodelinks_data) 
+  Hex(Hex27::n_nodes(), p, _nodelinks_data)
 {
 }
 

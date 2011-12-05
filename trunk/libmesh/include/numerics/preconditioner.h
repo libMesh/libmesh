@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -62,7 +62,7 @@ template <typename T>
 class Preconditioner : public ReferenceCountedObject<Preconditioner<T> >
 {
 public:
-  
+
   /**
    *  Constructor. Initializes Preconditioner data structures
    */
@@ -72,14 +72,14 @@ public:
    * Destructor.
    */
   virtual ~Preconditioner ();
-  
+
   /**
    * Builds a \p Preconditioner using the linear solver package specified by
    * \p solver_package
    */
   static Preconditioner<T> * build(const SolverPackage solver_package =
                                    libMesh::default_solver_package());
-  
+
   /**
    * @returns true if the data structures are
    * initialized, false otherwise.
@@ -91,7 +91,7 @@ public:
    * Usually by solving Py=x to get the action of P^-1 x.
    */
   virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) = 0;
-  
+
   /**
    * Release all memory and clear data structures.
    */
@@ -117,7 +117,7 @@ public:
    * Sets the type of preconditioner to use.
    */
   void set_type (const PreconditionerType pct);
-  
+
 protected:
 
   /**
@@ -125,12 +125,12 @@ protected:
    * This is often the actual system matrix of a linear sytem.
    */
   SparseMatrix<T> * _matrix;
-  
+
   /**
    * Enum statitng with type of preconditioner to use.
    */
   PreconditionerType _preconditioner_type;
-  
+
   /**
    * Flag indicating if the data structures have been initialized.
    */

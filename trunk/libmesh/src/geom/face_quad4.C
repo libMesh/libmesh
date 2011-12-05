@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -148,7 +148,7 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 
 	    edge->set_node(0) = this->get_node(0);
 	    edge->set_node(1) = this->get_node(1);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 1:
@@ -157,7 +157,7 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 
 	    edge->set_node(0) = this->get_node(1);
 	    edge->set_node(1) = this->get_node(2);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 2:
@@ -166,7 +166,7 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 
 	    edge->set_node(0) = this->get_node(2);
 	    edge->set_node(1) = this->get_node(3);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 3:
@@ -175,7 +175,7 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 
 	    edge->set_node(0) = this->get_node(3);
 	    edge->set_node(1) = this->get_node(0);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	default:
@@ -236,7 +236,7 @@ Real Quad4::volume () const
 {
   // The A,B,C,D naming scheme here corresponds exactly to the
   // libmesh counter-clockwise numbering scheme.
-  
+
   //        3           2        D           C
   // QUAD4: o-----------o	 o-----------o
   //        |           |	 |           |
@@ -246,10 +246,10 @@ Real Quad4::volume () const
   //        |           |	 |           |
   //        o-----------o	 o-----------o
   //        0           1	 A           B
-  
+
   // Vector pointing from A to C
   Point AC ( this->point(2) - this->point(0) );
-  
+
   // Vector pointing from A to B
   Point AB ( this->point(1) - this->point(0) );
 
@@ -258,12 +258,12 @@ Real Quad4::volume () const
 
   // The diagonal vector minus the side vectors
   Point AC_AB_AD (AC - AB - AD);
-    
+
   // Check for quick return for planar QUAD4.  This will
   // be the most common case, occuring for all purely 2D meshes.
   if (AC_AB_AD == Point(0.,0.,0.))
     return AB.cross(AD).size();
-  
+
   else
     {
       // Use 2x2 quadrature to approximate the surface area.  (The
@@ -279,7 +279,7 @@ Real Quad4::volume () const
       // Numerical Methods in Engineering (CNME), submitted as an
       // invited paper, 2006.
       // http://www.ices.utexas.edu/~jessica/paper/quadhexgf/quadhex_geomflow_CNM.pdf
-      
+
       // 4-point rule
       const Real q[2] = {0.5 - std::sqrt(3.) / 6.,
 			 0.5 + std::sqrt(3.) / 6.};
@@ -288,7 +288,7 @@ Real Quad4::volume () const
       for (unsigned int i=0; i<2; ++i)
 	for (unsigned int j=0; j<2; ++j)
 	  vol += (AB + q[i]*AC_AB_AD).cross(AD + q[j]*AC_AB_AD).size();
-      
+
       return 0.25*vol;
     }
 }

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -117,7 +117,7 @@ unsigned int InfHex18::key (const unsigned int s) const
       return
 	this->compute_key (this->node(16));
 
-          
+
     case 1:  // the face at y = -1
 
       return
@@ -125,7 +125,7 @@ unsigned int InfHex18::key (const unsigned int s) const
 			   this->node(1),
 			   this->node(5),
 			   this->node(4));
-      
+
     case 2:  // the face at x = 1
 
       return
@@ -141,9 +141,9 @@ unsigned int InfHex18::key (const unsigned int s) const
 			   this->node(3),
 			   this->node(7),
 			   this->node(6));
-      
+
     case 4: // the face at x = -1
-      
+
       return
 	this->compute_key (this->node(3),
 			   this->node(0),
@@ -214,7 +214,7 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
 	case 1:  // connecting to another infinite element
 	  {
 	    AutoPtr<Elem> face(new InfQuad6);
-	
+
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(1);
 	    face->set_node(2) = this->get_node(4);
@@ -242,7 +242,7 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
 	case 3:  // connecting to another infinite element
 	  {
 	    AutoPtr<Elem> face(new InfQuad6);
-	
+
 	    face->set_node(0) = this->get_node(2);
 	    face->set_node(1) = this->get_node(3);
 	    face->set_node(2) = this->get_node(6);
@@ -274,7 +274,7 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
 	  }
 	}
     }
-  
+
   // We'll never get here.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -320,7 +320,7 @@ void InfHex18::connectivity(const unsigned int sc,
 	    conn[7] = this->node(15)+1;
 
 	    return;
-      
+
 	  case 1:
 
 	    conn[0] = this->node(8)+1;
@@ -333,20 +333,20 @@ void InfHex18::connectivity(const unsigned int sc,
 	    conn[7] = this->node(17)+1;
 
 	    return;
-      
+
 	  case 2:
 
 	    conn[0] = this->node(11)+1;
 	    conn[1] = this->node(16)+1;
 	    conn[2] = this->node(10)+1;
-	    conn[3] = this->node(3)+1; 
+	    conn[3] = this->node(3)+1;
 	    conn[4] = this->node(15)+1;
 	    conn[5] = this->node(17)+1;
 	    conn[6] = this->node(14)+1;
 	    conn[7] = this->node(7)+1;
 
 	    return;
-      
+
 	  case 3:
 
 	    conn[0] = this->node(16)+1;
@@ -359,7 +359,7 @@ void InfHex18::connectivity(const unsigned int sc,
 	    conn[7] = this->node(14)+1;
 
 	    return;
-      
+
 	  default:
 	    libmesh_error();
 	  }
@@ -405,16 +405,16 @@ unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) c
 
 unsigned short int InfHex18::second_order_adjacent_vertex (const unsigned int n,
 							   const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
   libmesh_assert (v <  this->n_second_order_adjacent_vertices(n));
 
   if (n == 16)
       /*
-       * for the bubble node in the base the return value is 
-       * simply v.  Why? -- the user asks for the v-th 
-       * adjacent vertex, from \p n_second_order_adjacent_vertices() 
+       * for the bubble node in the base the return value is
+       * simply v.  Why? -- the user asks for the v-th
+       * adjacent vertex, from \p n_second_order_adjacent_vertices()
        * there are 4 adjacent vertices, and these happen to be
        * 0..3
        */
@@ -422,7 +422,7 @@ unsigned short int InfHex18::second_order_adjacent_vertex (const unsigned int n,
   else if (n == 17)
       /*
        * for the bubble node further out similar reasoning works,
-       * but v must be shifted to the further-out nodes: 
+       * but v must be shifted to the further-out nodes:
        * simply add 4
        */
       return static_cast<unsigned short int>(v+4);
@@ -433,7 +433,7 @@ unsigned short int InfHex18::second_order_adjacent_vertex (const unsigned int n,
        * that this matrix is kept in \p InfHex to foster
        * code-reuse
        */
-      return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+      return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 

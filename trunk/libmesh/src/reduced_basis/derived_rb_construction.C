@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -50,9 +50,9 @@ Real DerivedRBConstruction<Base>::train_reduced_basis (const std::string& direct
 {
   Real training_greedy_error = Base::train_reduced_basis(directory_name,
                                                          resize_rb_eval_data);
-  
+
   generate_residual_terms_wrt_truth();
-  
+
   return training_greedy_error;
 }
 
@@ -69,7 +69,7 @@ template <class Base>
 void DerivedRBConstruction<Base>::load_basis_function(unsigned int i)
 {
   START_LOG("load_basis_function()", "DerivedRBConstruction");
-  
+
   EquationSystems& es = Base::get_equation_systems();
   RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
 

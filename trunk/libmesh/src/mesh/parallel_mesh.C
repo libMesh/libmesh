@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -169,7 +169,7 @@ unsigned int ParallelMesh::parallel_max_node_id() const
 const Point& ParallelMesh::point (const unsigned int i) const
 {
   libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i);  
+  libmesh_assert (_nodes[i]->id() == i);
 
   return (*_nodes[i]);
 }
@@ -181,8 +181,8 @@ const Point& ParallelMesh::point (const unsigned int i) const
 const Node& ParallelMesh::node (const unsigned int i) const
 {
   libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i);  
-  
+  libmesh_assert (_nodes[i]->id() == i);
+
   return (*_nodes[i]);
 }
 
@@ -193,7 +193,7 @@ const Node& ParallelMesh::node (const unsigned int i) const
 Node& ParallelMesh::node (const unsigned int i)
 {
   libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i);  
+  libmesh_assert (_nodes[i]->id() == i);
 
   return (*_nodes[i]);
 }
@@ -203,8 +203,8 @@ Node& ParallelMesh::node (const unsigned int i)
 const Node* ParallelMesh::node_ptr (const unsigned int i) const
 {
 //  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i] == NULL || _nodes[i]->id() == i);  
-  
+  libmesh_assert (_nodes[i] == NULL || _nodes[i]->id() == i);
+
   return _nodes[i];
 }
 
@@ -226,7 +226,7 @@ Elem* ParallelMesh::elem (const unsigned int i) const
 {
 //  libmesh_assert (_elements[i] != NULL);
   libmesh_assert (_elements[i] == NULL || _elements[i]->id() == i);
-  
+
   return _elements[i];
 }
 
@@ -267,7 +267,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
   // Make the cached elem data more accurate
   _n_elem++;
   _max_elem_id = std::max(_max_elem_id, e->id()+1);
-  
+
 // Unpartitioned elems should be added on every processor
 // And shouldn't be added in the same batch as ghost elems
 // But we might be just adding on processor 0 to
@@ -315,7 +315,7 @@ void ParallelMesh::delete_elem(Elem* e)
   // Instead, we set it to NULL for now
 
   _elements[e->id()] = NULL;
-  
+
   // delete the element
   delete e;
 }
@@ -340,13 +340,13 @@ void ParallelMesh::renumber_elem(const unsigned int old_id,
 Node* ParallelMesh::add_point (const Point& p,
 			       const unsigned int id,
 			       const unsigned int proc_id)
-{  
+{
   if (_nodes.count(id))
     {
       Node *n = _nodes[id];
       libmesh_assert (n);
       libmesh_assert (n->id() == id);
-      
+
       *n = p;
       n->processor_id() = proc_id;
 
@@ -391,11 +391,11 @@ Node* ParallelMesh::add_node (Node *n)
   libmesh_assert (!_nodes[n->id()]);
 
   _nodes[n->id()] = n;
-  
+
   // Make the cached elem data more accurate
   _n_nodes++;
   _max_node_id = std::max(_max_node_id, n->id()+1);
-  
+
 // Unpartitioned nodes should be added on every processor
 // And shouldn't be added in the same batch as ghost nodes
 // But we might be just adding on processor 0 to
@@ -452,7 +452,7 @@ void ParallelMesh::delete_node(Node* n)
 
   // And from the container
   _nodes.erase(n->id());
-  
+
   // delete the node
   delete n;
 }
@@ -479,7 +479,7 @@ void ParallelMesh::clear ()
   // Call parent clear function
   MeshBase::clear();
 
-  
+
   // Clear our elements and nodes
   {
     elem_iterator_imp        it = _elements.begin();
@@ -504,7 +504,7 @@ void ParallelMesh::clear ()
     // already cleared it.
     for (; it != end; ++it)
       delete *it;
-    
+
     _nodes.clear();
   }
 
@@ -532,7 +532,7 @@ void ParallelMesh::partition (const unsigned int n_parts)
     return;
 
   if(!skip_partitioning())
-  { 
+  {
     // Call base class' partition() function.
     MeshBase::partition(n_parts);
 
@@ -559,7 +559,7 @@ void ParallelMesh::partition (const unsigned int n_parts)
 
 
 template <typename T>
-void ParallelMesh::libmesh_assert_valid_parallel_object_ids 
+void ParallelMesh::libmesh_assert_valid_parallel_object_ids
   (const mapvector<T*> &objects) const
 {
   // This function must be run on all processors at once
@@ -709,12 +709,12 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   unsigned int next_id = first_object_on_proc[libMesh::processor_id()];
   unsigned int first_free_id =
     first_object_on_proc[libMesh::n_processors()-1] +
-    objects_on_proc[libMesh::n_processors()-1] + 
+    objects_on_proc[libMesh::n_processors()-1] +
     unpartitioned_objects;
 
-  // First set new local object ids and build request sets 
+  // First set new local object ids and build request sets
   // for non-local object ids
-  
+
   // Request sets to send to each processor
   std::vector<std::vector<unsigned int> >
     requested_ids(libMesh::n_processors());
@@ -852,7 +852,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
   std::set<unsigned int> used_nodes;
 
   // flag the nodes we need
-  {      
+  {
     element_iterator  it = elements_begin();
     element_iterator end = elements_end();
 
@@ -945,7 +945,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
   // not the mapvector<> reimplementations.
   mapvector<Node*>::maptype &nodes = this->_nodes;
   mapvector<Elem*>::maptype &elem  = this->_elements;
-  
+
   // Nodes first
   {
     mapvector<Node*>::maptype::iterator

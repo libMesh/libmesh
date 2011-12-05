@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -84,7 +84,7 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   // value is -1, which means use std::time to seed the RNG.
   training_parameters_random_seed = infile("training_parameters_random_seed",
 					   training_parameters_random_seed);
-  
+
   set_n_params( n_parameters );
 
   // SCM Greedy termination tolerance
@@ -171,8 +171,8 @@ void RBSCMConstruction::load_matrix_B()
   // Load the operators from the RBConstruction
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
-  
-  matrix_B->zero(); 
+
+  matrix_B->zero();
   matrix_B->close();
   matrix_B->add(1.,*rb_system.get_inner_product_matrix());
 }

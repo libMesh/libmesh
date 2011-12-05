@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -30,7 +30,7 @@ void QGrid::init_3D(const ElemType _type,
                     unsigned int)
 {
 #if LIBMESH_DIM == 3
-  
+
   //-----------------------------------------------------------------------
   // 3D quadrature rules
 
@@ -49,12 +49,12 @@ void QGrid::init_3D(const ElemType _type,
 	q1D.init(EDGE2);
 
 	tensor_product_hex( q1D );
-	
+
 	return;
       }
 
 
-      
+
       //---------------------------------------------
       // Tetrahedral quadrature rules
     case TET4:
@@ -91,21 +91,21 @@ void QGrid::init_3D(const ElemType _type,
 	// We compute the 3D quadrature rule as a tensor
 	// product of the 1D quadrature rule and a 2D
 	// triangle quadrature rule
-	    
+
 	QGrid q1D(1,_order);
 	QGrid q2D(2,_order);
 
-	// Initialize 
+	// Initialize
 	q1D.init(EDGE2);
 	q2D.init(TRI3);
 
 	tensor_product_prism(q1D, q2D);
-	
+
 	return;
       }
-      
 
-      
+
+
       //---------------------------------------------
       // Pyramid
     case PYRAMID5:
@@ -135,7 +135,7 @@ void QGrid::init_3D(const ElemType _type,
       }
 
 
-      
+
       //---------------------------------------------
       // Unsupported type
     default:
@@ -148,7 +148,7 @@ void QGrid::init_3D(const ElemType _type,
   libmesh_error();
 
   return;
-  
+
 #endif
 }
 

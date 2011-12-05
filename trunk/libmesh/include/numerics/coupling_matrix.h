@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -44,7 +44,7 @@ namespace libMesh
 class CouplingMatrix
 {
 public:
-  
+
   /**
    * Constructor.
    */
@@ -55,18 +55,18 @@ public:
    */
   unsigned char operator() (const unsigned int i,
 			    const unsigned int j) const;
-  
+
   /**
    * @returns the (i,j) entry of the matrix as
    * a writeable reference.
    */
   unsigned char & operator() (const unsigned int i,
 			      const unsigned int j);
-  
+
   /**
    * @returns the size of the matrix, i.e. N for an
    * NxN matrix.
-   */ 
+   */
   unsigned int size() const;
 
   /**
@@ -84,16 +84,16 @@ public:
    * @returns true if the matrix is empty.
    */
   bool empty() const;
-  
+
 private:
-  
+
   /**
    * The actual matrix values.  These
    * are stored as unsigned chars because
    * a vector of bools is not what you
    * think.
    */
-  std::vector<unsigned char> _values;  
+  std::vector<unsigned char> _values;
 
   /**
    * The size of the matrix.
@@ -102,7 +102,7 @@ private:
 };
 
 
-  
+
 
 
 

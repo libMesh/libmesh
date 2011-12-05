@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -40,7 +40,7 @@ class ErrorVector;
  * The \p Partitioner class provides a uniform interface for
  * partitioning algorithms.  It takes a reference to a \p MeshBase
  * object as input, which it will partition into a number of
- * subdomains. 
+ * subdomains.
  */
 
 // ------------------------------------------------------------
@@ -53,14 +53,14 @@ class Partitioner
    * Constructor.
    */
   Partitioner ():_weights(NULL) {}
-  
+
   /**
    * Destructor. Virtual so that we can derive from this class.
    */
   virtual ~Partitioner() {}
 
   /**
-   * Creates a new partitioner of this type and returns it in 
+   * Creates a new partitioner of this type and returns it in
    * an \p AutoPtr.
    * This is used when copying meshes, and must be overloaded in the
    * derived classes.
@@ -91,9 +91,9 @@ class Partitioner
 		    const unsigned int n=libMesh::n_processors());
 
   /**
-   * This function 
+   * This function
    */
-  static void partition_unpartitioned_elements (MeshBase &mesh, 
+  static void partition_unpartitioned_elements (MeshBase &mesh,
 						const unsigned int n=libMesh::n_processors());
 
   /**
@@ -116,7 +116,7 @@ class Partitioner
    * entries.
    */
   virtual void attach_weights(ErrorVector * /*weights*/) { libmesh_not_implemented(); }
-  
+
 protected:
 
   /**

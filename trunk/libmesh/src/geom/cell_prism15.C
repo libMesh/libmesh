@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -182,7 +182,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
 	case 1:  // the quad face at y=0
 	  {
 	    AutoPtr<Elem> face(new Quad8);
-	
+
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(1);
 	    face->set_node(2) = this->get_node(4);
@@ -191,7 +191,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
 	    face->set_node(5) = this->get_node(10);
 	    face->set_node(6) = this->get_node(12);
 	    face->set_node(7) = this->get_node(9);
-	
+
 	    return face;
 	  }
 	case 2:  // the other quad face
@@ -221,7 +221,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
 	    face->set_node(5) = this->get_node(9);
 	    face->set_node(6) = this->get_node(14);
 	    face->set_node(7) = this->get_node(11);
-	
+
 	    return face;
 	  }
 	case 4: // the triangular face at z=1
@@ -243,7 +243,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
 	  }
 	}
     }
-  
+
   // We'll never get here.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -293,14 +293,14 @@ void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
 	conn[4] = this->node(5);
 	conn[5] = this->node(4);
 	*/
-	
+
 	// VTK's VTK_QUADRATIC_WEDGE first 9 nodes match, then their
 	// middle and top layers of mid-edge nodes are reversed from
 	// LibMesh's.
 	conn.resize(15);
 	for (unsigned i=0; i<9; ++i)
 	  conn[i] = this->node(i);
-	
+
 	// top "ring" of mid-edge nodes
 	conn[9]  = this->node(12);
 	conn[10] = this->node(13);
@@ -310,8 +310,8 @@ void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
 	conn[12] = this->node(9);
 	conn[13] = this->node(10);
 	conn[14] = this->node(11);
-	
-	
+
+
 	return;
       }
 
@@ -328,11 +328,11 @@ void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 unsigned short int Prism15::second_order_adjacent_vertex (const unsigned int n,
 							  const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
   libmesh_assert (v < 2);
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 

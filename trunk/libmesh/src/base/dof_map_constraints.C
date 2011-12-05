@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -100,7 +100,7 @@ using namespace libMesh;
 #endif
 	  }
     }
-    
+
   private:
     DofConstraints &_constraints;
     DofMap &_dof_map;
@@ -108,7 +108,7 @@ using namespace libMesh;
     PeriodicBoundaries &_periodic_boundaries;
 #endif
     const MeshBase &_mesh;
-    const unsigned int _variable_number;    
+    const unsigned int _variable_number;
   };
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -156,7 +156,7 @@ using namespace libMesh;
 #endif
 	  }
     }
-    
+
   private:
     NodeConstraints &_node_constraints;
     DofMap &_dof_map;
@@ -183,7 +183,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   START_LOG("create_dof_constraints()", "DofMap");
 
   libmesh_assert (mesh.is_prepared());
-  
+
   const unsigned int dim = mesh.mesh_dimension();
 
   // Constraints are not necessary in 1D
@@ -193,12 +193,12 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
     STOP_LOG("create_dof_constraints()", "DofMap");
     return;
   }
-  
+
   // Here we build the hanging node constraints.  This is done
   // by enforcing the condition u_a = u_b along hanging sides.
   // u_a = u_b is collocated at the nodes of side a, which gives
   // one row of the constraint matrix.
-  
+
   // define the range of elements of interest
   ConstElemRange range;
   {
@@ -207,13 +207,13 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
     MeshBase::const_element_iterator
       elem_begin = mesh.elements_begin(),
       elem_end   = mesh.elements_end();
-    
+
     // With a parallel ParallelMesh, processors compute only
     // their local constraints
     if (!mesh.is_serial())
       {
 	elem_begin = mesh.local_elements_begin();
-	elem_end   = mesh.local_elements_end(); 
+	elem_end   = mesh.local_elements_end();
       }
 
     // set the range to contain the specified elements
@@ -241,7 +241,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
 					         mesh));
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
- 
+
   // recalculate dof constraints from scratch
   _dof_constraints.clear();
 
@@ -263,7 +263,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   // take into account.
   if (!mesh.is_serial())
     this->allgather_recursive_constraints(mesh);
-  
+
   STOP_LOG("create_dof_constraints()", "DofMap");
 }
 
@@ -281,7 +281,7 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
 		      << std::endl;
 	libmesh_error();
       }
-  
+
   std::pair<unsigned int, DofConstraintRow> kv(dof_number, constraint_row);
 
   _dof_constraints.insert(kv);
@@ -294,7 +294,7 @@ void DofMap::print_dof_constraints(std::ostream& os) const
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   os << "Node Constraints:"
      << std::endl;
-  
+
   for (NodeConstraints::const_iterator it=_node_constraints.begin();
        it != _node_constraints.end(); ++it)
     {
@@ -315,7 +315,7 @@ void DofMap::print_dof_constraints(std::ostream& os) const
 
   os << "DoF Constraints:"
      << std::endl;
-  
+
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
     {
@@ -346,15 +346,15 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   // check for easy return
   if (this->n_constrained_dofs() == 0)
     return;
-    
-  // The constrained matrix is built up as C^T K C.    
+
+  // The constrained matrix is built up as C^T K C.
   DenseMatrix<Number> C;
 
-  
+
   this->build_constraint_matrix (C, elem_dofs);
 
   START_LOG("constrain_elem_matrix()", "DofMap");
-  
+
   // It is possible that the matrix is not constrained at all.
   if ((C.m() == matrix.m()) &&
       (C.n() == elem_dofs.size())) // It the matrix is constrained
@@ -362,44 +362,44 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
       // Compute the matrix-matrix-matrix product C^T K C
       matrix.left_multiply_transpose  (C);
       matrix.right_multiply (C);
-      
-      
+
+
       libmesh_assert (matrix.m() == matrix.n());
       libmesh_assert (matrix.m() == elem_dofs.size());
       libmesh_assert (matrix.n() == elem_dofs.size());
-      
-      
+
+
       for (unsigned int i=0; i<elem_dofs.size(); i++)
 	// If the DOF is constrained
 	if (this->is_constrained_dof(elem_dofs[i]))
 	  {
 	    for (unsigned int j=0; j<matrix.n(); j++)
 	      matrix(i,j) = 0.;
-	    
+
 	    matrix(i,i) = 1.;
-	    
+
             if (asymmetric_constraint_rows)
               {
 	        DofConstraints::const_iterator
 	          pos = _dof_constraints.find(elem_dofs[i]);
-	    
+
 	        libmesh_assert (pos != _dof_constraints.end());
-	    
+
 	        const DofConstraintRow& constraint_row = pos->second;
-	    
+
 	        libmesh_assert (!constraint_row.empty());
-	    
+
 	        for (DofConstraintRow::const_iterator
 		       it=constraint_row.begin(); it != constraint_row.end();
 		     ++it)
 	          for (unsigned int j=0; j<elem_dofs.size(); j++)
 		    if (elem_dofs[j] == it->first)
-		      matrix(i,j) = -it->second;	
+		      matrix(i,j) = -it->second;
 	      }
 	  }
     } // end if is constrained...
-  
-  STOP_LOG("constrain_elem_matrix()", "DofMap");  
+
+  STOP_LOG("constrain_elem_matrix()", "DofMap");
 }
 
 
@@ -416,15 +416,15 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
   // check for easy return
   if (this->n_constrained_dofs() == 0)
     return;
-  
+
   // The constrained matrix is built up as C^T K C.
   // The constrained RHS is built up as C^T F
   DenseMatrix<Number> C;
-  
+
   this->build_constraint_matrix (C, elem_dofs);
-  
+
   START_LOG("cnstrn_elem_mat_vec()", "DofMap");
-  
+
   // It is possible that the matrix is not constrained at all.
   if ((C.m() == matrix.m()) &&
       (C.n() == elem_dofs.size())) // It the matrix is constrained
@@ -432,22 +432,22 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
       // Compute the matrix-matrix-matrix product C^T K C
       matrix.left_multiply_transpose  (C);
       matrix.right_multiply (C);
-      
-      
+
+
       libmesh_assert (matrix.m() == matrix.n());
       libmesh_assert (matrix.m() == elem_dofs.size());
       libmesh_assert (matrix.n() == elem_dofs.size());
-      
+
 
       for (unsigned int i=0; i<elem_dofs.size(); i++)
 	if (this->is_constrained_dof(elem_dofs[i]))
 	  {
 	    for (unsigned int j=0; j<matrix.n(); j++)
 	      matrix(i,j) = 0.;
-	    
+
 	    // If the DOF is constrained
 	    matrix(i,i) = 1.;
-	    
+
             // This will put a nonsymmetric entry in the constraint
             // row to ensure that the linear system produces the
             // correct value for the constrained DOF.
@@ -455,48 +455,48 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
               {
 	        DofConstraints::const_iterator
 	          pos = _dof_constraints.find(elem_dofs[i]);
-	    
+
 	        libmesh_assert (pos != _dof_constraints.end());
-	    
+
 	        const DofConstraintRow& constraint_row = pos->second;
-	    
+
 // p refinement creates empty constraint rows
 //	    libmesh_assert (!constraint_row.empty());
-	    
+
 	        for (DofConstraintRow::const_iterator
 		       it=constraint_row.begin(); it != constraint_row.end();
 		     ++it)
 	          for (unsigned int j=0; j<elem_dofs.size(); j++)
 		    if (elem_dofs[j] == it->first)
-		      matrix(i,j) = -it->second;	
+		      matrix(i,j) = -it->second;
               }
 	  }
 
-      
+
       // Compute the matrix-vector product C^T F
       DenseVector<Number> old_rhs(rhs);
 
       // resize the RHS vector & 0 before summation
       rhs.resize(elem_dofs.size());
       rhs.zero();
-      
+
       // compute matrix/vector product
       for (unsigned int i=0; i<elem_dofs.size(); i++)
 	for (unsigned int j=0; j<old_rhs.size(); j++)
 	  rhs(i) += C.transpose(i,j)*old_rhs(j);
-	
+
 
       libmesh_assert (elem_dofs.size() == rhs.size());
 
       for (unsigned int i=0; i<elem_dofs.size(); i++)
 	if (this->is_constrained_dof(elem_dofs[i]))
-	  {	
+	  {
 	    // If the DOF is constrained
 	    rhs(i) = 0.;
 	  }
     } // end if is constrained...
-  
-  STOP_LOG("cnstrn_elem_mat_vec()", "DofMap");  
+
+  STOP_LOG("cnstrn_elem_mat_vec()", "DofMap");
 }
 
 
@@ -512,7 +512,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   // check for easy return
   if (this->n_constrained_dofs() == 0)
     return;
-  
+
   // The constrained matrix is built up as R^T K C.
   DenseMatrix<Number> R;
   DenseMatrix<Number> C;
@@ -522,16 +522,16 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   // the calls to build_matrix would fail
   std::vector<unsigned int> orig_row_dofs(row_dofs);
   std::vector<unsigned int> orig_col_dofs(col_dofs);
-  
+
   this->build_constraint_matrix (R, orig_row_dofs);
   this->build_constraint_matrix (C, orig_col_dofs);
 
   START_LOG("constrain_elem_matrix()", "DofMap");
-  
+
   row_dofs = orig_row_dofs;
   col_dofs = orig_col_dofs;
-  
-    
+
+
   // It is possible that the matrix is not constrained at all.
   if ((R.m() == matrix.m()) &&
       (R.n() == row_dofs.size()) &&
@@ -541,43 +541,43 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
       // K_constrained = R^T K C
       matrix.left_multiply_transpose  (R);
       matrix.right_multiply (C);
-      
-      
+
+
       libmesh_assert (matrix.m() == row_dofs.size());
       libmesh_assert (matrix.n() == col_dofs.size());
-      
-      
+
+
       for (unsigned int i=0; i<row_dofs.size(); i++)
 	if (this->is_constrained_dof(row_dofs[i]))
 	  {
 	    for (unsigned int j=0; j<matrix.n(); j++)
 	      matrix(i,j) = 0.;
-	  
+
 	    // If the DOF is constrained
 	    matrix(i,i) = 1.;
-	    
+
             if (asymmetric_constraint_rows)
               {
 	        DofConstraints::const_iterator
 	          pos = _dof_constraints.find(row_dofs[i]);
-	    
+
 	        libmesh_assert (pos != _dof_constraints.end());
-	    
+
 	        const DofConstraintRow& constraint_row = pos->second;
-	    
+
 	        libmesh_assert (!constraint_row.empty());
-	    
+
 	        for (DofConstraintRow::const_iterator
 		       it=constraint_row.begin(); it != constraint_row.end();
 		     ++it)
 	          for (unsigned int j=0; j<col_dofs.size(); j++)
 		    if (col_dofs[j] == it->first)
-		      matrix(i,j) = -it->second;	
+		      matrix(i,j) = -it->second;
               }
 	  }
     } // end if is constrained...
-  
-  STOP_LOG("constrain_elem_matrix()", "DofMap");  
+
+  STOP_LOG("constrain_elem_matrix()", "DofMap");
 }
 
 
@@ -591,14 +591,14 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
   // check for easy return
   if (this->n_constrained_dofs() == 0)
     return;
-  
-  // The constrained RHS is built up as R^T F.  
+
+  // The constrained RHS is built up as R^T F.
   DenseMatrix<Number> R;
 
   this->build_constraint_matrix (R, row_dofs);
 
   START_LOG("constrain_elem_vector()", "DofMap");
-    
+
   // It is possible that the vector is not constrained at all.
   if ((R.m() == rhs.size()) &&
       (R.n() == row_dofs.size())) // if the RHS is constrained
@@ -614,18 +614,18 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
       for (unsigned int i=0; i<row_dofs.size(); i++)
 	for (unsigned int j=0; j<old_rhs.size(); j++)
 	  rhs(i) += R.transpose(i,j)*old_rhs(j);
-      
+
       libmesh_assert (row_dofs.size() == rhs.size());
 
       for (unsigned int i=0; i<row_dofs.size(); i++)
 	if (this->is_constrained_dof(row_dofs[i]))
-	  {	
+	  {
 	    // If the DOF is constrained
 	    rhs(i) = 0.;
 	  }
     } // end if the RHS is constrained.
-  
-  STOP_LOG("constrain_elem_vector()", "DofMap");  
+
+  STOP_LOG("constrain_elem_vector()", "DofMap");
 }
 
 
@@ -641,14 +641,14 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
   // check for easy return
   if (this->n_constrained_dofs() == 0)
     return;
-  
-  // The constrained RHS is built up as R^T F.  
+
+  // The constrained RHS is built up as R^T F.
   DenseMatrix<Number> R;
 
   this->build_constraint_matrix (R, row_dofs);
 
   START_LOG("cnstrn_elem_dyad_mat()", "DofMap");
-    
+
   // It is possible that the vector is not constrained at all.
   if ((R.m() == v.size()) &&
       (R.n() == row_dofs.size())) // if the RHS is constrained
@@ -668,7 +668,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 	    v(i) += R.transpose(i,j)*old_v(j);
 	    w(i) += R.transpose(i,j)*old_w(j);
 	  }
-      
+
       libmesh_assert (row_dofs.size() == v.size());
       libmesh_assert (row_dofs.size() == w.size());
 
@@ -676,12 +676,12 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 
       for (unsigned int i=0; i<row_dofs.size(); i++)
 	if (this->is_constrained_dof(row_dofs[i]))
-	  {	
+	  {
 	    // If the DOF is constrained
 	    v(i) = 0.;
 	  }
     } // end if the RHS is constrained.
-  
+
   STOP_LOG("cnstrn_elem_dyad_mat()", "DofMap");
 }
 
@@ -710,7 +710,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
   Parallel::max(local_constraints);
   if (!local_constraints)
     return;
-  
+
   START_LOG("enforce_constraints_exactly()","DofMap");
 
   if (!v)
@@ -751,7 +751,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
     }
   else // unknown v->type()
     {
-      libMesh::err << "ERROR: Unknown v->type() == " << v->type() 
+      libMesh::err << "ERROR: Unknown v->type() == " << v->type()
 		    << std::endl;
       libmesh_error();
     }
@@ -820,8 +820,8 @@ DofMap::max_constraint_error (const System &system,
   MeshBase::const_element_iterator       elem_it  =
     mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator elem_end =
-    mesh.active_local_elements_end(); 
-      
+    mesh.active_local_elements_end();
+
   for ( ; elem_it != elem_end; ++elem_it)
     {
       const Elem* elem = *elem_it;
@@ -853,7 +853,7 @@ DofMap::max_constraint_error (const System &system,
             for (unsigned int j=0; j!=C.n(); ++j)
               {
                 if (local_dof_indices[j] != global_dof)
-                  exact_value += C(i,j) * 
+                  exact_value += C(i,j) *
                     vec(local_dof_indices[j]);
               }
 
@@ -896,14 +896,14 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 	// If the DOF is constrained
 	DofConstraints::const_iterator
 	  pos = _dof_constraints.find(elem_dofs[i]);
-	
+
 	libmesh_assert (pos != _dof_constraints.end());
-	
+
 	const DofConstraintRow& constraint_row = pos->second;
-	
+
 // Constraint rows in p refinement may be empty
 //	libmesh_assert (!constraint_row.empty());
-	
+
 	for (DofConstraintRow::const_iterator
 	       it=constraint_row.begin(); it != constraint_row.end();
 	     ++it)
@@ -936,11 +936,11 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       // contents of the current dof_set.
       std::vector<unsigned int> new_elem_dofs (dof_set.begin(),
 					       dof_set.end());
-      
+
       // Now we can build the constraint matrix.
       // Note that resize also zeros for a DenseMatrix<Number>.
       C.resize (elem_dofs.size(), new_elem_dofs.size());
-      
+
       // Create the C constraint matrix.
       for (unsigned int i=0; i<elem_dofs.size(); i++)
 	if (this->is_constrained_dof(elem_dofs[i]))
@@ -948,14 +948,14 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 	    // If the DOF is constrained
 	    DofConstraints::const_iterator
 	      pos = _dof_constraints.find(elem_dofs[i]);
-	    
+
 	    libmesh_assert (pos != _dof_constraints.end());
-	    
+
 	    const DofConstraintRow& constraint_row = pos->second;
-	    
+
 // p refinement creates empty constraint rows
 //	    libmesh_assert (!constraint_row.empty());
-	    
+
 	    for (DofConstraintRow::const_iterator
 		   it=constraint_row.begin(); it != constraint_row.end();
 		 ++it)
@@ -968,25 +968,25 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 	    for (unsigned int j=0; j<new_elem_dofs.size(); j++)
 	      if (new_elem_dofs[j] == elem_dofs[i])
 		C(i,j) =  1.;
-	  }	
+	  }
 
       // May need to do this recursively.  It is possible
       // that we just replaced a constrained DOF with another
       // constrained DOF.
       elem_dofs = new_elem_dofs;
-      
+
       DenseMatrix<Number> Cnew;
-      
+
       this->build_constraint_matrix (Cnew, elem_dofs, true);
 
       if ((C.n() == Cnew.m()) &&
-	  (Cnew.n() == elem_dofs.size())) // If the constraint matrix	                                 
+	  (Cnew.n() == elem_dofs.size())) // If the constraint matrix
 	C.right_multiply(Cnew);           // is constrained...
-      
+
       libmesh_assert (C.n() == elem_dofs.size());
     }
-  
-  if (!called_recursively) STOP_LOG("build_constraint_matrix()", "DofMap");  
+
+  if (!called_recursively) STOP_LOG("build_constraint_matrix()", "DofMap");
 }
 
 
@@ -1010,7 +1010,7 @@ mesh
 
   // We might get to return immediately if none of the processors
   // found any constraints
-  unsigned int has_constraints = !_dof_constraints.empty() 
+  unsigned int has_constraints = !_dof_constraints.empty()
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
                                  || !_node_constraints.empty()
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -1089,7 +1089,7 @@ mesh
       // Pack the dof constraint rows to push to procup
       std::vector<std::vector<unsigned int> > pushed_keys(pushed_ids[procup].size());
       std::vector<std::vector<Real> > pushed_vals(pushed_ids[procup].size());
-      for (unsigned int i = 0; i != pushed_ids[procup].size(); ++i) 
+      for (unsigned int i = 0; i != pushed_ids[procup].size(); ++i)
         {
           DofConstraintRow &row = _dof_constraints[pushed_ids[procup][i]];
           unsigned int row_size = row.size();
@@ -1107,7 +1107,7 @@ mesh
       // Pack the node constraint rows to push to procup
       std::vector<std::vector<unsigned int> > pushed_node_keys(pushed_node_ids[procup].size());
       std::vector<std::vector<Real> > pushed_node_vals(pushed_node_ids[procup].size());
-      for (unsigned int i = 0; i != pushed_node_ids[procup].size(); ++i) 
+      for (unsigned int i = 0; i != pushed_node_ids[procup].size(); ++i)
         {
           const Node *node = mesh.node_ptr(pushed_node_ids[procup][i]);
           NodeConstraintRow &row = _node_constraints[node];
@@ -1459,9 +1459,9 @@ void DofMap::process_constraints ()
 	// If the DOF is constrained
 	DofConstraints::iterator
 	  pos = _dof_constraints.find(*i);
-	
+
 	libmesh_assert (pos != _dof_constraints.end());
-	
+
 	DofConstraintRow& constraint_row = pos->second;
 
 	std::vector<unsigned int> constraints_to_expand;
@@ -1482,11 +1482,11 @@ void DofMap::process_constraints ()
 
 	    DofConstraints::const_iterator
 	      subpos = _dof_constraints.find(expandable);
-	
+
 	    libmesh_assert (subpos != _dof_constraints.end());
-	
+
 	    const DofConstraintRow& subconstraint_row = subpos->second;
-            
+
 	    for (DofConstraintRow::const_iterator
 	           it=subconstraint_row.begin();
 		   it != subconstraint_row.end(); ++it)
@@ -1532,7 +1532,7 @@ void DofMap::add_constraints_to_send_list()
       unsigned int constrained_dof = i->first;
 
       // We only need the dependencies of our own constrained dofs
-      if (constrained_dof < this->first_dof() || 
+      if (constrained_dof < this->first_dof() ||
           constrained_dof >= this->end_dof())
         continue;
 
@@ -1544,7 +1544,7 @@ void DofMap::add_constraints_to_send_list()
           unsigned int constraint_dependency = j->first;
 
           // No point in adding one of our own dofs to the send_list
-          if (constraint_dependency >= this->first_dof() && 
+          if (constraint_dependency >= this->first_dof() &&
               constraint_dependency < this->end_dof())
             continue;
 
@@ -1577,7 +1577,7 @@ void DofMap::constrain_p_dofs (unsigned int var,
   FEType low_p_fe_type = this->variable_type(var);
   FEType high_p_fe_type = this->variable_type(var);
   low_p_fe_type.order = static_cast<Order>(low_p_fe_type.order + p);
-  high_p_fe_type.order = static_cast<Order>(high_p_fe_type.order + 
+  high_p_fe_type.order = static_cast<Order>(high_p_fe_type.order +
                                             elem->p_level());
 
   const unsigned int n_nodes = elem->n_nodes();
@@ -1589,12 +1589,12 @@ void DofMap::constrain_p_dofs (unsigned int var,
 	  FEInterface::n_dofs_at_node (dim, low_p_fe_type, type, n);
         const unsigned int high_nc =
 	  FEInterface::n_dofs_at_node (dim, high_p_fe_type, type, n);
-	
-	// since we may be running this method concurretly 
-	// on multiple threads we need to acquire a lock 
+
+	// since we may be running this method concurretly
+	// on multiple threads we need to acquire a lock
 	// before modifying the _dof_constraints object.
 	Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-	
+
         if (elem->is_vertex(n))
           {
 	    // Add "this is zero" constraint rows for high p vertex

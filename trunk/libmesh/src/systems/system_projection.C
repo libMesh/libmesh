@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -82,7 +82,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
   AutoPtr<NumericVector<Number> > local_old_vector_built;
   const NumericVector<Number> *old_vector_ptr = NULL;
 
-  ConstElemRange active_local_elem_range 
+  ConstElemRange active_local_elem_range
     (this->get_mesh().active_local_elements_begin(),
      this->get_mesh().active_local_elements_end());
 
@@ -101,7 +101,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
     {
       // Build a send list for efficient localization
       BuildProjectionList projection_list(*this);
-      Threads::parallel_reduce (active_local_elem_range, 
+      Threads::parallel_reduce (active_local_elem_range,
 				projection_list);
 
       // Create a sorted, unique send_list
@@ -122,7 +122,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
     {
       // Build a send list for efficient localization
       BuildProjectionList projection_list(*this);
-      Threads::parallel_reduce (active_local_elem_range, 
+      Threads::parallel_reduce (active_local_elem_range,
 				projection_list);
 
       // Create a sorted, unique send_list
@@ -142,11 +142,11 @@ void System::project_vector (const NumericVector<Number>& old_v,
     }
   else // unknown old_v.type()
     {
-      libMesh::err << "ERROR: Unknown old_v.type() == " << old_v.type() 
+      libMesh::err << "ERROR: Unknown old_v.type() == " << old_v.type()
 		    << std::endl;
       libmesh_error();
     }
-  
+
   // Note that the above will have zeroed the new_vector.
   // Just to be sure, assert that new_vector_ptr and old_vector_ptr
   // were successfully set before trying to deref them.
@@ -155,7 +155,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
   NumericVector<Number> &new_vector = *new_vector_ptr;
   const NumericVector<Number> &old_vector = *old_vector_ptr;
-    
+
   Threads::parallel_for (active_local_elem_range,
 			 ProjectVector(*this,
 				       old_vector,
@@ -196,7 +196,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
-    
+
       for (unsigned int i=0; i!=dist_v->size(); i++)
         if (new_vector(i) != 0.0)
           dist_v->set(i, new_vector(i));
@@ -225,7 +225,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
   // AMR is disabled: simply copy the vector
   new_v = old_v;
-  
+
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
   STOP_LOG("project_vector()", "System");
@@ -362,14 +362,14 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
     {
       const Variable& variable = dof_map.variable(var);
 
-      const FEType& base_fe_type = variable.type();     
+      const FEType& base_fe_type = variable.type();
 
       if (base_fe_type.family == SCALAR)
         continue;
 
       // Get FE objects of the appropriate type
-      AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));      
-      AutoPtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));      
+      AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));
+      AutoPtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));
 
       // Create FE objects with potentially different p_level
       FEType fe_type, temp_fe_type;
@@ -409,7 +409,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
       // The Jacobian * quadrature weight at the quadrature points
       const std::vector<Real>& JxW =
 	fe->get_JxW();
-     
+
       // The XYZ locations of the quadrature points on the
       // child element
       const std::vector<Point>& xyz_values =
@@ -420,7 +420,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
       std::vector<unsigned int> new_dof_indices, old_dof_indices;
       // Side/edge DOF indices
       std::vector<unsigned int> new_side_dofs, old_side_dofs;
-   
+
       // Iterate over the elements in the range
       for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
 	{
@@ -498,7 +498,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
                 {
                   (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() + 1);
                 }
-	 
+
 	      dof_map.old_dof_indices (parent, old_dof_indices, var);
             }
 	  else
@@ -525,7 +525,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	        // Update the fe object based on the current child
                 fe->attach_quadrature_rule (qrule.get());
 	        fe->reinit (elem);
-	  
+
 	        // The number of quadrature points on the child
 	        const unsigned int n_qp = qrule->n_points();
 
@@ -539,12 +539,12 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	        // before they are summed.
 	        Ke.resize (new_n_dofs, new_n_dofs); Ke.zero();
 	        Fe.resize (new_n_dofs); Fe.zero();
-	  
-	  
+
+
 	        // Loop over the quadrature points
 	        for (unsigned int qp=0; qp<n_qp; qp++)
 	          {
-	            // The solution value at the quadrature point	      
+	            // The solution value at the quadrature point
 	            Number val = libMesh::zero;
 
 		    // Sum the function values * the DOF values
@@ -571,7 +571,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	            // Construct the RHS
 	            for (unsigned int i=0; i<new_n_dofs; i++)
 		      Fe(i) += JxW[qp]*phi_values[i][qp]*val;
-	      
+
 	          } // end qp loop
 
                 Ke.cholesky_solve(Fe, Ue);
@@ -661,7 +661,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 		  for (unsigned int i=0; i<new_n_dofs; i++)
 		    Ue(i) = old_vector(old_dof_indices[i]);
 	      }
-          } 
+          }
 	  else { // fe type is Lagrange
 	    // Loop over the DOFs on the element
 	    for (unsigned int new_local_dof=0;
@@ -686,14 +686,14 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 		  continue;
 
 		already_done[new_global_dof] = true;
-	      
+
 	        if (elem->refinement_flag() == Elem::JUST_REFINED)
 		  {
 		    // The location of the child's node on the parent element
 		    const Point point =
 		      FEInterface::inverse_map (dim, fe_type, parent,
 					        elem->point(new_local_dof));
-		  
+
 		    // Sum the function values * the DOF values
 		    // at the point of interest to get the function value
 		    // (Note that the # of DOFs on the parent need not be the
@@ -703,8 +703,8 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 		      {
 		        const unsigned int old_global_dof =
 			  old_dof_indices[old_local_dof];
-		      
-		        Ue(new_local_dof) += 
+
+		        Ue(new_local_dof) +=
                           (old_vector(old_global_dof)*
 			  FEInterface::shape(dim, fe_type, parent,
 					     old_local_dof, point));
@@ -729,7 +729,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 	  {
 	    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-	    for (unsigned int i = 0; i < new_n_dofs; i++) 
+	    for (unsigned int i = 0; i < new_n_dofs; i++)
 	      if (Ue(i) != 0.)
 		new_vector.set(new_dof_indices[i], Ue(i));
 	  }
@@ -747,17 +747,17 @@ void System::BuildProjectionList::unique()
 {
   // Sort the send list.  After this duplicated
   // elements will be adjacent in the vector
-  std::sort(this->send_list.begin(), 
+  std::sort(this->send_list.begin(),
 	    this->send_list.end());
-  
+
   // Now use std::unique to remove duplicate entries
   std::vector<unsigned int>::iterator new_end =
-    std::unique (this->send_list.begin(), 
+    std::unique (this->send_list.begin(),
 		 this->send_list.end());
-  
+
   // Remove the end of the send_list.  Use the "swap trick"
   // from Effective STL
-  std::vector<unsigned int> 
+  std::vector<unsigned int>
     (this->send_list.begin(), new_end).swap (this->send_list);
 }
 
@@ -779,7 +779,7 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
   // We can handle all the variables at once.
   // The old global DOF indices
   std::vector<unsigned int> di;
-   
+
   // Iterate over the elements in the range
   for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
     {
@@ -794,12 +794,12 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
       // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
       //  continue;
       const Elem* parent = elem->parent();
-      
+
       if (elem->refinement_flag() == Elem::JUST_REFINED)
 	{
 	  libmesh_assert (parent != NULL);
 	  unsigned int old_parent_level = parent->p_level();
-	  
+
 	  if (elem->p_refinement_flag() == Elem::JUST_REFINED)
 	    {
 	      // We may have done p refinement or coarsening as well;
@@ -814,7 +814,7 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
 	    }
 
 	  dof_map.old_dof_indices (parent, di);
-	  
+
 	  // Fix up the parent's p level in case we changed it
 	  (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
 	}
@@ -885,13 +885,13 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
     {
       const Variable& variable = dof_map.variable(var);
 
-      const FEType& fe_type = variable.type();     
+      const FEType& fe_type = variable.type();
 
       if (fe_type.family == SCALAR)
         continue;
 
       // Get FE objects of the appropriate type
-      AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));      
+      AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
 
       // Prepare variables for projection
       AutoPtr<QBase> qrule     (fe_type.default_quadrature_rule(dim));
@@ -921,7 +921,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
       // The Jacobian * quadrature weight at the quadrature points
       const std::vector<Real>& JxW =
 	fe->get_JxW();
-     
+
       // The XYZ locations of the quadrature points
       const std::vector<Point>& xyz_values =
 	fe->get_xyz();
@@ -930,7 +930,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
       std::vector<unsigned int> dof_indices;
       // Side/edge DOF indices
       std::vector<unsigned int> side_dofs;
-   
+
       // Iterate over all the elements in the range
       for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
 	{
@@ -1168,12 +1168,12 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	        // Loop over the quadrature points
 	        for (unsigned int qp=0; qp<n_qp; qp++)
 	          {
-	            // solution at the quadrature point	      
+	            // solution at the quadrature point
 	            Number fineval = fptr(xyz_values[qp],
                                           parameters,
                                           system.name(),
                                           system.variable_name(var));
-	            // solution grad at the quadrature point	      
+	            // solution grad at the quadrature point
 	            Gradient finegrad;
                     if (cont == C_ONE)
                       finegrad = gptr(xyz_values[qp], parameters,
@@ -1181,7 +1181,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 				      system.variable_name(var));
 
                     // Form edge projection matrix
-                    for (unsigned int sidei=0, freei=0; 
+                    for (unsigned int sidei=0, freei=0;
                          sidei != side_dofs.size(); ++sidei)
                       {
                         unsigned int i = side_dofs[sidei];
@@ -1232,7 +1232,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                     dof_is_fixed[side_dofs[free_dof[i]]] = true;
                   }
               }
-                 
+
 	  // Project any side values (edges in 2D, faces in 3D)
           if (dim > 1 && cont != DISCONTINUOUS)
             for (unsigned int s=0; s != elem->n_sides(); ++s)
@@ -1250,7 +1250,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                 // There may be nothing to project
                 if (!free_dofs)
                   continue;
-             
+
 	        Ke.resize (free_dofs, free_dofs); Ke.zero();
 	        Fe.resize (free_dofs); Fe.zero();
                 // The new side coefficients
@@ -1264,12 +1264,12 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	        // Loop over the quadrature points
 	        for (unsigned int qp=0; qp<n_qp; qp++)
 	          {
-	            // solution at the quadrature point	      
+	            // solution at the quadrature point
 	            Number fineval = fptr(xyz_values[qp],
                                           parameters,
                                           system.name(),
                                           system.variable_name(var));
-	            // solution grad at the quadrature point	      
+	            // solution grad at the quadrature point
 	            Gradient finegrad;
                     if (cont == C_ONE)
                       finegrad = gptr(xyz_values[qp], parameters,
@@ -1341,7 +1341,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
           // There may be nothing to project
           if (free_dofs)
             {
-             
+
 	  Ke.resize (free_dofs, free_dofs); Ke.zero();
 	  Fe.resize (free_dofs); Fe.zero();
           // The new interior coefficients
@@ -1355,12 +1355,12 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	  // Loop over the quadrature points
 	  for (unsigned int qp=0; qp<n_qp; qp++)
 	    {
-	      // solution at the quadrature point	      
+	      // solution at the quadrature point
 	      Number fineval = fptr(xyz_values[qp],
                                     parameters,
                                     system.name(),
                                     system.variable_name(var));
-	      // solution grad at the quadrature point	      
+	      // solution grad at the quadrature point
 	      Gradient finegrad;
               if (cont == C_ONE)
                 finegrad = gptr(xyz_values[qp], parameters,
@@ -1422,12 +1422,12 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	  const unsigned int
 	    first = new_vector.first_local_index(),
 	    last  = new_vector.last_local_index();
-	  
+
 	  // Lock the new_vector since it is shared among threads.
 	  {
 	    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-	    
-	    for (unsigned int i = 0; i < n_dofs; i++) 
+
+	    for (unsigned int i = 0; i < n_dofs; i++)
 	      // We may be projecting a new zero value onto
 	      // an old nonzero approximation - RHS
 	      // if (Ue(i) != 0.)
