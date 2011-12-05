@@ -30,7 +30,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./ex3-$(METHOD)
+target 	   := ./introduction_ex3-$(METHOD)
 
 
 all:: $(target)
