@@ -1,0 +1,308 @@
+/* $Id$ */
+
+/* The Next Great Finite Element Library. */
+/* Copyright (C) 2003  Benjamin S. Kirk */
+
+/* This library is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
+
+/* This library is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
+
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+
+ // <h1>Example 18 - Unsteady Navier-Stokes Equations with DiffSystem</h1>
+ //
+ // This example shows how the transient nonlinear problem from
+ // example 13 can be solved using the new (and experimental)
+ // DiffSystem class framework
+
+// Basic include files
+#include "equation_systems.h"
+#include "error_vector.h"
+#include "getpot.h"
+#include "exodusII_io.h"
+#include "kelly_error_estimator.h"
+#include "mesh.h"
+#include "mesh_generation.h"
+#include "mesh_refinement.h"
+#include "uniform_refinement_estimator.h"
+
+// Some (older) compilers do not offer full stream
+// functionality, OStringStream works around this.
+#include "o_string_stream.h"
+
+// The systems and solvers we may use
+#include "naviersystem.h"
+#include "diff_solver.h"
+#include "euler_solver.h"
+#include "steady_solver.h"
+
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
+// The main program.
+int main (int argc, char** argv)
+{
+  // Initialize libMesh.
+  LibMeshInit init (argc, argv);
+
+  // This example fails without at least double precision FP
+#ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
+  libmesh_example_assert(false, "--disable-singleprecision");
+#endif
+
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#else
+
+  // Trilinos solver NaNs by default on the zero pressure block.
+  // We'll skip this example for now.
+  if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
+    {
+      std::cout << "We skip example 18 when using the Trilinos solvers.\n"
+                << std::endl;
+      return 0;
+    }
+
+  // Parse the input file
+  GetPot infile("fem_system_ex1.in");
+
+  // Read in parameters from the input file
+  const Real global_tolerance          = infile("global_tolerance", 0.);
+  const unsigned int nelem_target      = infile("n_elements", 400);
+  const bool transient                 = infile("transient", true);
+  const Real deltat                    = infile("deltat", 0.005);
+  unsigned int n_timesteps             = infile("n_timesteps", 20);
+  const unsigned int write_interval    = infile("write_interval", 5);
+  const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
+  const unsigned int coarserefinements = infile("coarserefinements", 0);
+  const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
+  const unsigned int dim               = infile("dimension", 2);
+
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+  
+  // We have only defined 2 and 3 dimensional problems
+  libmesh_assert (dim == 2 || dim == 3);
+
+  // Create a mesh.
+  Mesh mesh;
+  
+  // And an object to refine it
+  MeshRefinement mesh_refinement(mesh);
+  mesh_refinement.coarsen_by_parents() = true;
+  mesh_refinement.absolute_global_tolerance() = global_tolerance;
+  mesh_refinement.nelem_target() = nelem_target;
+  mesh_refinement.refine_fraction() = 0.3;
+  mesh_refinement.coarsen_fraction() = 0.3;
+  mesh_refinement.coarsen_threshold() = 0.1;
+
+  // Use the MeshTools::Generation mesh generator to create a uniform
+  // grid on the square [-1,1]^D.  We instruct the mesh generator
+  // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
+  // elements in 3D.  Building these higher-order elements allows
+  // us to use higher-order approximation, as in example 3.
+  if (dim == 2)
+    MeshTools::Generation::build_square (mesh,
+                                         coarsegridsize,
+                                         coarsegridsize,
+                                         0., 1.,
+                                         0., 1.,
+                                         QUAD9);
+  else if (dim == 3)
+    MeshTools::Generation::build_cube (mesh,
+                                       coarsegridsize,
+                                       coarsegridsize,
+                                       coarsegridsize,
+                                       0., 1.,
+                                       0., 1.,
+                                       0., 1.,
+                                       HEX27);
+
+  mesh_refinement.uniformly_refine(coarserefinements);
+
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
+
+  // Declare the system "Navier-Stokes" and its variables.
+  NavierSystem & system = 
+    equation_systems.add_system<NavierSystem> ("Navier-Stokes");
+
+  // Solve this as a time-dependent or steady system
+  if (transient)
+    system.time_solver =
+      AutoPtr<TimeSolver>(new EulerSolver(system));
+  else
+    {
+      system.time_solver =
+        AutoPtr<TimeSolver>(new SteadySolver(system));
+      libmesh_assert(n_timesteps == 1);
+    }
+
+  // Initialize the system
+  equation_systems.init ();
+
+  // Set the time stepping options
+  system.deltat = deltat;
+
+  // And the nonlinear solver options
+  DiffSolver &solver = *(system.time_solver->diff_solver().get());
+  solver.quiet = infile("solver_quiet", true);
+  solver.verbose = !solver.quiet;
+  solver.max_nonlinear_iterations =
+    infile("max_nonlinear_iterations", 15);
+  solver.relative_step_tolerance =
+    infile("relative_step_tolerance", 1.e-3);
+  solver.relative_residual_tolerance =
+    infile("relative_residual_tolerance", 0.0);
+  solver.absolute_residual_tolerance =
+    infile("absolute_residual_tolerance", 0.0);
+    
+  // And the linear solver options
+  solver.max_linear_iterations =
+    infile("max_linear_iterations", 50000);
+  solver.initial_linear_tolerance =
+    infile("initial_linear_tolerance", 1.e-3);
+
+  // Print information about the system to the screen.
+  equation_systems.print_info();
+
+  // Now we begin the timestep loop to compute the time-accurate
+  // solution of the equations.
+  for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
+    {
+      // A pretty update message
+      std::cout << "\n\nSolving time step " << t_step << ", time = "
+                << system.time << std::endl;
+
+      // Adaptively solve the timestep
+      unsigned int a_step = 0;
+      for (; a_step != max_adaptivesteps; ++a_step)
+        {
+          system.solve();
+
+          ErrorVector error;
+
+          AutoPtr<ErrorEstimator> error_estimator;
+
+          // To solve to a tolerance in this problem we
+          // need a better estimator than Kelly
+          if (global_tolerance != 0.)
+            {
+              // We can't adapt to both a tolerance and a mesh
+              // size at once
+              libmesh_assert (nelem_target == 0);
+
+              UniformRefinementEstimator *u =
+                new UniformRefinementEstimator;
+
+              // The lid-driven cavity problem isn't in H1, so
+              // lets estimate L2 error
+              u->error_norm = L2;
+
+              error_estimator.reset(u);
+            }
+          else
+            {
+              // If we aren't adapting to a tolerance we need a
+              // target mesh size
+              libmesh_assert (nelem_target > 0);
+
+              // Kelly is a lousy estimator to use for a problem
+              // not in H1 - if we were doing more than a few
+              // timesteps we'd need to turn off or limit the
+              // maximum level of our adaptivity eventually
+              error_estimator.reset(new KellyErrorEstimator);
+            }
+
+          // Calculate error based on u and v (and w?) but not p
+	  std::vector<Real> weights(2,1.0);  // u, v
+          if (dim == 3)
+            weights.push_back(1.0);          // w
+          weights.push_back(0.0);            // p
+	  // Keep the same default norm type.
+	  std::vector<FEMNormType>
+	    norms(1, error_estimator->error_norm.type(0));
+	  error_estimator->error_norm = SystemNorm(norms, weights);
+
+          error_estimator->estimate_error(system, error);
+
+          // Print out status at each adaptive step.
+          Real global_error = error.l2_norm();
+          std::cout << "adaptive step " << a_step << ": ";
+          if (global_tolerance != 0.)
+            std::cout << "global_error = " << global_error
+                      << " with ";
+          std::cout << mesh.n_active_elem()
+                    << " active elements and "
+                    << equation_systems.n_active_dofs()
+                    << " active dofs." << std::endl;
+          if (global_tolerance != 0.)
+            std::cout << "worst element error = " << error.maximum()
+                      << ", mean = " << error.mean() << std::endl;
+
+          if (global_tolerance != 0.)
+            {
+              // If we've reached our desired tolerance, we
+              // don't need any more adaptive steps
+              if (global_error < global_tolerance)
+                break;
+              mesh_refinement.flag_elements_by_error_tolerance(error);
+            }
+          else
+            {
+              // If flag_elements_by_nelem_target returns true, this
+              // should be our last adaptive step.
+              if (mesh_refinement.flag_elements_by_nelem_target(error))
+                {
+                  mesh_refinement.refine_and_coarsen_elements();
+                  equation_systems.reinit();
+                  a_step = max_adaptivesteps;
+                  break;
+                }
+            }
+
+          // Carry out the adaptive mesh refinement/coarsening
+          mesh_refinement.refine_and_coarsen_elements();
+          equation_systems.reinit();
+        }
+      // Do one last solve if necessary
+      if (a_step == max_adaptivesteps)
+        {
+          system.solve();
+        }
+
+      // Advance to the next timestep in a transient problem
+      system.time_solver->advance_timestep();
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+      // Write out this timestep if we're requested to
+      if ((t_step+1)%write_interval == 0)
+        {
+          OStringStream file_name;
+
+          // We write the file in the ExodusII format.
+          file_name << "out_";
+          OSSRealzeroright(file_name,3,0, t_step + 1);
+          file_name << ".e";
+
+          ExodusII_IO(mesh).write_equation_systems (file_name.str(),
+                                              equation_systems);
+        }
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+    }
+#endif // #ifndef LIBMESH_ENABLE_AMR
+  
+  // All done.  
+  return 0;
+}
