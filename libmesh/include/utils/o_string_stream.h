@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -45,7 +45,7 @@
 /*
  * Some compilers, at least HP \p aCC do not even
  * accept empty classes derived from \p std::ostringstream.
- * Therefore, resort to preprocessor definitions. 
+ * Therefore, resort to preprocessor definitions.
  */
 
 #ifndef LIBMESH_BROKEN_IOSTREAM
@@ -57,13 +57,13 @@
 # include <iomanip>
 
  /*
-  * Outputs \p std::string \p d with width 
+  * Outputs \p std::string \p d with width
   * \p v left-formatted to stream \p o.
   */
 # define OSSStringleft(o,v,d)       (o).width(v);  (o) << std::left << (d)
 
  /*
-  * Outputs \p std::string \p d with width 
+  * Outputs \p std::string \p d with width
   * \p v right-formatted to stream \p o.
   */
 # define OSSStringright(o,v,d)      (o).width(v);  (o) << std::right << (d)
@@ -77,7 +77,7 @@
 
  /*
   * Outputs \p Real \p d with width \p v and
-  * precision \p p to stream \p o (padded with 
+  * precision \p p to stream \p o (padded with
   * zeros).
   */
 # define OSSRealzeroleft(o,v,p,d)   (o).width(v); (o).precision(p); (o).fill('0'); (o) << std::showpoint << std::left << (d)
@@ -94,7 +94,7 @@
   * precision \p p to stream \p o (padded with
   * zeros).
   */
-# define OSSRealzeroright(o,v,p,d)   (o).width(v);  (o).precision(p); (o).fill('0'); (o) << std::right << (d) 
+# define OSSRealzeroright(o,v,p,d)   (o).width(v);  (o).precision(p); (o).fill('0'); (o) << std::right << (d)
 
  /*
   * Outputs \p Real \p d with width \p v
@@ -103,7 +103,7 @@
 # define OSSRealscientific(o,v,d)   (o) << std::setw(v) << std::scientific << (d)
 
  /*
-  * Outputs \p int \p d with width 
+  * Outputs \p int \p d with width
   * \p v to stream \p o.
   */
 # define OSSInt(o,v,d)              (o).width(v);  (o) << (d)
@@ -126,13 +126,13 @@ typedef std::ostringstream OStringStream;
 # include <cstdio>
 
  /*
-  * Outputs \p std::string \p d with width 
+  * Outputs \p std::string \p d with width
   * \p v left-formatted to stream \p o.
   */
 # define OSSStringleft(o,v,d)       (o).left( (v), (d) )
 
  /*
-  * Outputs \p std::string \p d with width 
+  * Outputs \p std::string \p d with width
   * \p v right-formatted to stream \p o.
   */
 # define OSSStringright(o,v,d)      (o).right( (v), (d) )
@@ -156,14 +156,14 @@ typedef std::ostringstream OStringStream;
   * precision \p p to stream \p o (padded with
   * whitespaces).
   */
-# define OSSRealright(o,v,p,d)      (o).right( (v), (p), (d) ,' ') 
+# define OSSRealright(o,v,p,d)      (o).right( (v), (p), (d) ,' ')
 
  /*
   * Outputs \p Real \p d with width \p v and
   * precision \p p to stream \p o (padded with
   * zeros).
   */
-# define OSSRealzeroright(o,v,p,d)      (o).right( (v), (p), (d) ,'0') 
+# define OSSRealzeroright(o,v,p,d)      (o).right( (v), (p), (d) ,'0')
 
  /*
   * Outputs \p Real \p d with width \p v
@@ -172,7 +172,7 @@ typedef std::ostringstream OStringStream;
 # define OSSRealscientific(o,v,d)   (o).scientific( (v), (d) )
 
  /*
-  * Outputs \p int \p d with width 
+  * Outputs \p int \p d with width
   * \p v to stream \p o.
   */
 # define OSSInt(o,v,d)              (o).left( (v), (d) )
@@ -271,7 +271,7 @@ namespace libMesh
 
  protected:
   /**
-   * Appends \p n chars (defaults to whitespaces) 
+   * Appends \p n chars (defaults to whitespaces)
    * to the string \p s.
    */
   void print_ws (const sizetype n,
@@ -300,7 +300,7 @@ namespace libMesh
 			   const char c)
  {
    libmesh_assert (w < 30);
-   char buf[30];  
+   char buf[30];
    char format[8];
    // form the format for r
    // ALTERNATIVE: sprintf (format, "%%%d.%df", int((w-prec)/2), prec);
@@ -319,7 +319,7 @@ namespace libMesh
 			   const int n)
  {
    libmesh_assert (w < 30);
-   char buf[30];  
+   char buf[30];
    // form string as desired
    sprintf (buf, "%d", n);
    *this << buf;
@@ -345,7 +345,7 @@ namespace libMesh
 			    const char c)
  {
    libmesh_assert (w < 30);
-   char buf[30];  
+   char buf[30];
    char format[8];
    // form the format for r
    sprintf (format, "%%.%df", prec);
@@ -363,7 +363,7 @@ namespace libMesh
 				 const Real r)
  {
    libmesh_assert (w < 30);
-   char buf[30];  
+   char buf[30];
    char format[8];
    // form the format for r
    sprintf (format, "%%%de", w);

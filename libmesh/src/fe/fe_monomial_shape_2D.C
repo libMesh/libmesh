@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,7 +37,7 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
 			   const Point& p)
 {
 #if LIBMESH_DIM > 1
-  
+
   libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
                (static_cast<unsigned int>(order)+2)/2);
 
@@ -53,17 +53,17 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
       // linear
     case 1:
       return xi;
-    
+
     case 2:
       return eta;
 
       // quadratics
     case 3:
       return xi*xi;
-    
+
     case 4:
       return xi*eta;
-    
+
     case 5:
       return eta*eta;
 
@@ -95,7 +95,7 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
 
     case 14:
       return eta*eta*eta*eta;
-    
+
     default:
       unsigned int o = 0;
       for (; i >= (o+1)*(o+2)/2; o++) { }
@@ -124,7 +124,7 @@ Real FE<2,MONOMIAL>::shape(const Elem* elem,
 			   const Point& p)
 {
   libmesh_assert (elem != NULL);
-  
+
   // by default call the orientation-independent shape functions
   return FE<2,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
@@ -140,7 +140,7 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 {
 #if LIBMESH_DIM > 1
 
-  
+
   libmesh_assert (j<2);
 
   libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
@@ -161,53 +161,53 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 	    // constants
 	  case 0:
 	    return 0.;
-	    
+
 	    // linears
 	  case 1:
 	    return 1.;
-	    
+
 	  case 2:
 	    return 0.;
 
 	    // quadratics
 	  case 3:
 	    return 2.*xi;
-	    
+
 	  case 4:
 	    return eta;
-	    
+
 	  case 5:
 	    return 0.;
 
 	    // cubics
 	  case 6:
 	    return 3.*xi*xi;
-	    
+
 	  case 7:
 	    return 2.*xi*eta;
-	    
+
 	  case 8:
 	    return eta*eta;
-	    
+
 	  case 9:
 	    return 0.;
-	    
+
 	    // quartics
 	  case 10:
 	    return 4.*xi*xi*xi;
-	    
+
 	  case 11:
 	    return 3.*xi*xi*eta;
-	    
+
 	  case 12:
 	    return 2.*xi*eta*eta;
-	    
+
 	  case 13:
 	    return eta*eta*eta;
-	    
+
 	  case 14:
 	    return 0.;
-	    
+
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
@@ -222,7 +222,7 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 	  }
       }
 
-      
+
       // d()/deta
     case 1:
       {
@@ -231,53 +231,53 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
 	    // constants
 	  case 0:
 	    return 0.;
-    
+
 	    // linears
 	  case 1:
 	    return 0.;
-	    
+
 	  case 2:
 	    return 1.;
 
 	    // quadratics
 	  case 3:
 	    return 0.;
-	    
+
 	  case 4:
 	    return xi;
-	    
+
 	  case 5:
 	    return 2.*eta;
 
 	    // cubics
 	  case 6:
 	    return 0.;
-	    
+
 	  case 7:
 	    return xi*xi;
-	    
+
 	  case 8:
 	    return 2.*xi*eta;
-	    
+
 	  case 9:
 	    return 3.*eta*eta;
-	    
+
 	    // quartics
 	  case 10:
 	    return 0.;
-	    
+
 	  case 11:
 	    return xi*xi*xi;
-	    
+
 	  case 12:
 	    return 2.*xi*xi*eta;
-	    
+
 	  case 13:
 	    return 3.*xi*eta*eta;
-	    
+
 	  case 14:
 	    return 4.*eta*eta*eta;
-	    
+
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
@@ -311,7 +311,7 @@ Real FE<2,MONOMIAL>::shape_deriv(const Elem* elem,
   libmesh_assert (elem != NULL);
 
   // by default call the orientation-independent shape functions
-  return FE<2,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p); 
+  return FE<2,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
 
@@ -325,7 +325,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 {
 #if LIBMESH_DIM > 1
 
-  
+
   libmesh_assert (j<=2);
 
   libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
@@ -353,7 +353,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 	    // quadratics
 	  case 3:
 	    return 2.;
-	    
+
 	  case 4:
 	  case 5:
 	    return 0.;
@@ -361,28 +361,28 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 	    // cubics
 	  case 6:
 	    return 6.*xi;
-	    
+
 	  case 7:
 	    return 2.*eta;
-	    
+
 	  case 8:
 	  case 9:
 	    return 0.;
-	    
+
 	    // quartics
 	  case 10:
 	    return 12.*xi*xi;
-	    
+
 	  case 11:
 	    return 6.*xi*eta;
-	    
+
 	  case 12:
 	    return 2.*eta*eta;
-	    
+
 	  case 13:
 	  case 14:
 	    return 0.;
-	    
+
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
@@ -404,7 +404,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 	  {
 	    // constants
 	  case 0:
-	    
+
 	    // linears
 	  case 1:
 	  case 2:
@@ -413,10 +413,10 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 	    // quadratics
 	  case 3:
 	    return 0.;
-	    
+
 	  case 4:
 	    return 1.;
-	    
+
 	  case 5:
 	    return 0.;
 
@@ -425,29 +425,29 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 	    return 0.;
 	  case 7:
 	    return 2.*xi;
-	    
+
 	  case 8:
 	    return 2.*eta;
-	    
+
 	  case 9:
 	    return 0.;
-	    
+
 	    // quartics
 	  case 10:
 	    return 0.;
 
 	  case 11:
 	    return 3.*xi*xi;
-	    
+
 	  case 12:
 	    return 4.*xi*eta;
-	    
+
 	  case 13:
 	    return 3.*eta*eta;
-	    
+
 	  case 14:
 	    return 0.;
-	    
+
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
@@ -461,7 +461,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
             return val;
 	  }
       }
-	      
+
       // d^2()/deta^2
     case 2:
       {
@@ -469,7 +469,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 	  {
 	    // constants
 	  case 0:
-	    
+
 	    // linears
 	  case 1:
 	  case 2:
@@ -479,37 +479,37 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
 	  case 3:
 	  case 4:
 	    return 0.;
-	    
+
 	  case 5:
 	    return 2.;
 
 	    // cubics
 	  case 6:
 	    return 0.;
-	    
+
 	  case 7:
 	    return 0.;
-	    
+
 	  case 8:
 	    return 2.*xi;
-	    
+
 	  case 9:
 	    return 6.*eta;
-	    
+
 	    // quartics
 	  case 10:
 	  case 11:
 	    return 0.;
-	    
+
 	  case 12:
 	    return 2.*xi*xi;
-	    
+
 	  case 13:
 	    return 6.*xi*eta;
-	    
+
 	  case 14:
 	    return 12.*eta*eta;
-	    
+
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
@@ -543,7 +543,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const Elem* elem,
   libmesh_assert (elem != NULL);
 
   // by default call the orientation-independent shape functions
-  return FE<2,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p); 
+  return FE<2,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
 

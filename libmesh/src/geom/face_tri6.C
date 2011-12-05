@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -155,19 +155,19 @@ unsigned int Tri6::key (const unsigned int s) const
 
       return
 	this->compute_key (this->node(3));
-	
+
     case 1:
 
       return
 	this->compute_key (this->node(4));
-	
+
     case 2:
 
       return
 	this->compute_key (this->node(5));
     }
 
-  
+
   // We will never get here...  Look at the code above.
   libmesh_error();
   return 0;
@@ -197,7 +197,7 @@ AutoPtr<Elem> Tri6::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(0);
 	    edge->set_node(1) = this->get_node(1);
 	    edge->set_node(2) = this->get_node(3);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 1:
@@ -205,7 +205,7 @@ AutoPtr<Elem> Tri6::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(1);
 	    edge->set_node(1) = this->get_node(2);
 	    edge->set_node(2) = this->get_node(4);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 2:
@@ -213,7 +213,7 @@ AutoPtr<Elem> Tri6::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(2);
 	    edge->set_node(1) = this->get_node(0);
 	    edge->set_node(2) = this->get_node(5);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	default:
@@ -222,7 +222,7 @@ AutoPtr<Elem> Tri6::build_side (const unsigned int i,
 	  }
 	}
     }
-  
+
   // We will never get here...  Look at the code above.
   AutoPtr<Elem> ap(NULL);  return ap;
 }
@@ -285,7 +285,7 @@ void Tri6::connectivity(const unsigned int sf,
 
     case VTK:
       {
-	// VTK_QUADRATIC_TRIANGLE has same numbering as libmesh TRI6 
+	// VTK_QUADRATIC_TRIANGLE has same numbering as libmesh TRI6
         conn.resize(6);
         conn[0] = this->node(0);
         conn[1] = this->node(1);
@@ -341,7 +341,7 @@ void Tri6::connectivity(const unsigned int sf,
     default:
       libmesh_error();
     }
-  
+
   libmesh_error();
 }
 
@@ -351,20 +351,20 @@ void Tri6::connectivity(const unsigned int sf,
 
 unsigned short int Tri6::second_order_adjacent_vertex (const unsigned int n,
 						       const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
   libmesh_assert (v < 2);
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 
 
-const unsigned short int Tri6::_second_order_adjacent_vertices[3][2] = 
+const unsigned short int Tri6::_second_order_adjacent_vertices[3][2] =
 {
-  {0, 1}, // vertices adjacent to node 3 
-  {1, 2}, // vertices adjacent to node 4 
-  {0, 2}  // vertices adjacent to node 5  
+  {0, 1}, // vertices adjacent to node 3
+  {1, 2}, // vertices adjacent to node 4
+  {0, 2}  // vertices adjacent to node 5
 };
 
 

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -38,8 +38,8 @@ namespace libMesh
  * space.  The typedef RealVectorValue always defines a real-valued vector,
  * and NumberVectorValue defines a real or complex-valued vector depending
  * on how the library was configured.
- * 
- * \author Benjamin S. Kirk, 2003. 
+ *
+ * \author Benjamin S. Kirk, 2003.
  */
 template <typename T>
 class VectorValue : public TypeVector<T>
@@ -53,10 +53,10 @@ public:
   VectorValue  (const T x=0.,
 		const T y=0.,
 		const T z=0.);
-  
+
   /**
    * Copy-constructor.
-   */ 
+   */
   template <typename T2>
   VectorValue (const VectorValue<T2>& p);
 
@@ -77,10 +77,10 @@ public:
 	       const TypeVector<Real>& p_im);
 #endif
 
-  
+
 private:
 
-  
+
 };
 
 

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -64,14 +64,14 @@ public:
    */
   explicit
   EpetraVector (const ParallelType type = AUTOMATIC);
-  
+
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   EpetraVector (const unsigned int n,
                 const ParallelType type = AUTOMATIC);
-    
+
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
@@ -98,7 +98,7 @@ public:
    * and to simply provide additional functionality with the EpetraVector.
    */
   EpetraVector(Epetra_Vector & v);
-  
+
   /**
    * Destructor, deallocates memory. Made virtual to allow
    * for derived classes to behave properly.
@@ -108,18 +108,18 @@ public:
   /**
    * Call the assemble functions
    */
-  void close (); 
+  void close ();
 
   /**
    * @returns the \p EpetraVector<T> to a pristine state.
    */
   void clear ();
-  
+
   /**
    * Set all entries to zero. Equivalent to \p v = 0, but more obvious and
-   * faster. 
+   * faster.
    */
-  void zero ();    
+  void zero ();
 
   /**
    * Creates a vector which has the same type, size and partitioning
@@ -132,7 +132,7 @@ public:
    * Creates a copy of this vector and returns it in an \p AutoPtr.
    */
   AutoPtr<NumericVector<T> > clone () const;
-  
+
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
    * this vector remains unchanged if possible, to make things faster, but
@@ -145,12 +145,12 @@ public:
    * On \p fast==false, the vector is filled by
    * zeros.
    */
-    
+
   void init (const unsigned int N,
 	     const unsigned int n_local,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
-    
+
   /**
    * call init with n_local = N,
    */
@@ -191,7 +191,7 @@ public:
    * \f$U(0-N) = s\f$: fill all components.
    */
   NumericVector<T> & operator= (const T s);
-    
+
   /**
    *  \f$U = V\f$: copy all components.
    */
@@ -213,7 +213,7 @@ public:
    * Real part.
    */
   Real min () const;
-  
+
   /**
    * @returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
@@ -272,12 +272,12 @@ public:
    * actually stored on this processor
    */
   unsigned int last_local_index() const;
-    
+
   /**
    * Access components, returns \p U(i).
    */
   T operator() (const unsigned int i) const;
-    
+
   /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
@@ -289,24 +289,24 @@ public:
    * Fast equivalent to \p U.add(-1, V).
    */
   NumericVector<T> & operator -= (const NumericVector<T> &V);
-    
+
   /**
    * v(i) = value
    */
   void set (const unsigned int i, const T value);
-    
+
   /**
    * v(i) += value
    */
   void add (const unsigned int i, const T value);
-    
+
   /**
    * \f$U(0-LIBMESH_DIM)+=s\f$.
    * Addition of \p s to all components. Note
    * that \p s is a scalar and not a vector.
    */
   void add (const T s);
-    
+
   /**
    * \f$ U+=V \f$ .
    * Simple vector addition, equal to the
@@ -320,9 +320,9 @@ public:
    * \p operator +=.
    */
   void add (const T a, const NumericVector<T>& v);
-  
+
   /**
-   * \f$ U+=v \f$ where \p v is a std::vector<T> 
+   * \f$ U+=v \f$ where \p v is a std::vector<T>
    * and you
    * want to specify WHERE to add it
    */
@@ -330,10 +330,10 @@ public:
 		   const std::vector<unsigned int>& dof_indices);
 
   /**
-   * \f$ U+=V \f$ where U and V are type 
+   * \f$ U+=V \f$ where U and V are type
    * \p NumericVector<T> and you
    * want to specify WHERE to add
-   * the \p NumericVector<T> V 
+   * the \p NumericVector<T> V
    */
   void add_vector (const NumericVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
@@ -345,12 +345,12 @@ public:
    */
   void add_vector (const NumericVector<T> &V,
 		   const SparseMatrix<T> &A);
-     
+
   /**
-   * \f$U+=V \f$ where U and V are type 
+   * \f$U+=V \f$ where U and V are type
    * DenseVector<T> and you
    * want to specify WHERE to add
-   * the DenseVector<T> V 
+   * the DenseVector<T> V
    */
   void add_vector (const DenseVector<T>& V,
 		   const std::vector<unsigned int>& dof_indices);
@@ -361,39 +361,39 @@ public:
    */
   void add_vector_transpose (const NumericVector<T> &V,
 		             const SparseMatrix<T> &A_trans);
-  
+
   /**
-   * \f$ U=v \f$ where v is a DenseVector<T> 
+   * \f$ U=v \f$ where v is a DenseVector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
 		       const std::vector<unsigned int>& dof_indices);
 
   /**
-   * \f$U=V\f$, where U and V are type 
+   * \f$U=V\f$, where U and V are type
    * NumericVector<T> and you
    * want to specify WHERE to insert
-   * the NumericVector<T> V 
+   * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-      
+
   /**
-   * \f$ U=V \f$ where V is type 
+   * \f$ U=V \f$ where V is type
    * DenseVector<T> and you
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-    
+
   /**
-   * \f$ U=V \f$ where V is type 
+   * \f$ U=V \f$ where V is type
    * DenseSubVector<T> and you
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
 		       const std::vector<unsigned int>& dof_indices);
-  
+
   /**
    * Scale each element of the
    * vector by the given factor.
@@ -411,7 +411,7 @@ public:
    * Computes the dot product, p = U.V
    */
   virtual T dot(const NumericVector<T>& V) const;
-  
+
   /**
    * Creates a copy of the global vector in the
    * local vector \p v_local.
@@ -431,7 +431,7 @@ public:
    */
   void localize (NumericVector<T>& v_local,
 		 const std::vector<unsigned int>& send_list) const;
-  
+
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
@@ -439,7 +439,7 @@ public:
   void localize (const unsigned int first_local_idx,
 		 const unsigned int last_local_idx,
 		 const std::vector<unsigned int>& send_list);
-  
+
   /**
    * Creates a local copy of the global vector in
    * \p v_local only on processor \p proc_id.  By
@@ -448,7 +448,7 @@ public:
    */
   void localize_to_one (std::vector<T>& v_local,
 			const unsigned int proc_id=0) const;
-  
+
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
    * and \p vec2 and stores the result in \p *this.
@@ -498,12 +498,12 @@ private:
 
   /**
    * This boolean value should only be set to false
-   * for the constructor which takes a Epetra Vec object. 
+   * for the constructor which takes a Epetra Vec object.
    */
   bool _destroy_vec_on_exit;
 
 
-  
+
   /*********************************************************************
    * The following were copied (and slightly modified) from
    * Epetra_FEVector.h in order to allow us to use a standard
@@ -771,11 +771,11 @@ void EpetraVector<T>::init (const unsigned int n,
   libmesh_assert ((this->_type==SERIAL && n==my_n_local) ||
                   this->_type==PARALLEL);
 
-  _map = new Epetra_Map(n, 
-                        my_n_local, 
-                        0, 
+  _map = new Epetra_Map(n,
+                        my_n_local,
+                        0,
                         Epetra_MpiComm (libMesh::COMM_WORLD));
-	      
+
   _vec = new Epetra_Vector(*_map);
 
   myFirstID_ = _vec->Map().MinMyGID();
@@ -785,10 +785,10 @@ void EpetraVector<T>::init (const unsigned int n,
   //need the LDA argument when calling ExtractView. Hence the "dummy" arg.
   int dummy;
   _vec->ExtractView(&myCoefs_, &dummy);
-  
+
   this->_is_initialized = true;
   this->_is_closed = true;
-  
+
   if (fast == false)
     this->zero ();
 }
@@ -890,7 +890,7 @@ template <typename T>
 inline
 unsigned int EpetraVector<T>::size () const
 {
-  libmesh_assert (this->initialized());  
+  libmesh_assert (this->initialized());
 
   return _vec->GlobalLength();
 }
@@ -902,7 +902,7 @@ inline
 unsigned int EpetraVector<T>::local_size () const
 {
   libmesh_assert (this->initialized());
-  
+
   return _vec->MyLength();
 }
 
@@ -911,7 +911,7 @@ inline
 unsigned int EpetraVector<T>::first_local_index () const
 {
   libmesh_assert (this->initialized());
-  
+
   return _vec->Map().MinMyGID();
 }
 
@@ -922,7 +922,7 @@ inline
 unsigned int EpetraVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
-  
+
   return _vec->Map().MaxMyGID()+1;
 }
 

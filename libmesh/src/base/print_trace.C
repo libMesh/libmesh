@@ -34,7 +34,7 @@
 
 #include <iostream>
 #include <string>
-#include <execinfo.h> 
+#include <execinfo.h>
 #include <cxxabi.h>
 #include <cstdlib>
 
@@ -55,7 +55,7 @@ std::string abi_demangle(const char *name)
    *
    * lineno: stackframeno                 address functionname + offset
    */
-  
+
 #ifdef __APPLE__
   namestart = fullname.find("0x");
   if (namestart != std::string::npos)
@@ -83,7 +83,7 @@ std::string abi_demangle(const char *name)
       nameend <= namestart)
     return fullname;
 #endif
-  
+
   std::string funcname = fullname.substr(namestart, nameend - namestart);
   std::string goodname = funcname;
   try { if ( (d = abi::__cxa_demangle(funcname.c_str(), 0, 0, &status)) ) goodname = d; }

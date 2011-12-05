@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -31,7 +31,7 @@ void QSimpson::init_2D(const ElemType _type,
                        unsigned int)
 {
 #if LIBMESH_DIM > 1
-  
+
   //-----------------------------------------------------------------------
   // 2D quadrature rules
   switch (_type)
@@ -52,7 +52,7 @@ void QSimpson::init_2D(const ElemType _type,
 	return;
       }
 
-	    
+
       //---------------------------------------------
       // Triangle quadrature rules
     case TRI3:
@@ -66,39 +66,39 @@ void QSimpson::init_2D(const ElemType _type,
 	// stiffness matrix entries for quadratic elements.
 	// This rule should be able to integrate a little
 	// better than linears exactly.
-	
+
  	_points.resize(6);
  	_weights.resize(6);
-	
+
  	_points[0](0) = 0.;
  	_points[0](1) = 0.;
-	
+
  	_points[1](0) = 1.;
  	_points[1](1) = 0.;
-	
+
  	_points[2](0) = 0.;
  	_points[2](1) = 1.;
-	
+
  	_points[3](0) = 0.5;
  	_points[3](1) = 0.;
-	
+
  	_points[4](0) = 0.;
  	_points[4](1) = 0.5;
-	
+
  	_points[5](0) = 0.5;
  	_points[5](1) = 0.5;
-	
+
  	_weights[0] = 0.041666666666666666666666666667; // 1./24.
  	_weights[1] = 0.041666666666666666666666666667; // 1./24.
  	_weights[2] = 0.041666666666666666666666666667; // 1./24.
  	_weights[3] = 0.125;                            // 1./8.
  	_weights[4] = 0.125;                            // 1./8.
  	_weights[5] = 0.125;                            // 1./8.
-	
+
 	return;
       }
 
-      
+
       //---------------------------------------------
       // Unsupported type
     default:

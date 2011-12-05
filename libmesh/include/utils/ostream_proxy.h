@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,7 +46,7 @@ namespace libMesh
  // for flexibility, but to look like a reference when used to produce
  // less awkward user code.
  //
- // It is up to the user to ensure that the target ostream 
+ // It is up to the user to ensure that the target ostream
 
  template <typename charT=char, typename traits=std::char_traits<charT> >
  class BasicOStreamProxy
@@ -83,8 +83,8 @@ namespace libMesh
    * Reset the internal target to a new \p target output stream.
    */
   BasicOStreamProxy& operator= (streamT& target)
-    { 
-       _target = &target; 
+    {
+       _target = &target;
        return *this;
     }
 
@@ -102,7 +102,7 @@ namespace libMesh
    */
   ~BasicOStreamProxy () {}
 
-  // 
+  //
   // Functions that get passed to the proxied target:
   //
 
@@ -171,13 +171,13 @@ namespace libMesh
   /**
    * Set/get the associated format flags
    */
-  std::ios_base::fmtflags flags ( std::ios_base::fmtflags fmtfl ) 
+  std::ios_base::fmtflags flags ( std::ios_base::fmtflags fmtfl )
     { return _target->flags(fmtfl); }
 
   /**
    * Set the associated flags
    */
-  std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl ) 
+  std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl )
     { return _target->setf(fmtfl); }
 
   /**
@@ -190,7 +190,7 @@ namespace libMesh
   /**
    * Clear the associated flags
    */
-  void unsetf ( std::ios_base::fmtflags mask ) 
+  void unsetf ( std::ios_base::fmtflags mask )
     { _target->unsetf(mask); }
 
   /**

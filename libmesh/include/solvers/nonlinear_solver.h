@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -65,25 +65,25 @@ public:
    *  Constructor. Initializes Solver data structures
    */
   NonlinearSolver (sys_type& s);
-    
+
   /**
    * Destructor.
    */
   virtual ~NonlinearSolver ();
-  
+
   /**
    * Builds a \p NonlinearSolver using the nonlinear solver package specified by
    * \p solver_package
    */
   static AutoPtr<NonlinearSolver<T> > build(sys_type& s, const SolverPackage solver_package =
 					    libMesh::default_solver_package());
-  
+
   /**
    * @returns true if the data structures are
    * initialized, false otherwise.
    */
   bool initialized () const { return _is_initialized; }
-  
+
   /**
    * Release all memory and clear data structures.
    */
@@ -187,7 +187,7 @@ public:
    * Maximum number of function evaluations.
    */
   unsigned int max_function_evaluations;
-  
+
   /**
    * The NonlinearSolver should exit after the residual is
    * reduced to either less than absolute_residual_tolerance
@@ -237,13 +237,13 @@ public:
    * solve was successful.
    */
   bool converged;
-  
+
 protected:
   /**
    * A reference to the system we are solving.
    */
   sys_type& _system;
-  
+
   /**
    * Flag indicating if the data structures have been initialized.
    */

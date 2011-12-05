@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -43,7 +43,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
 				    _BLAS_Multiply_Flag flag)
 {
   int result_size = 0;
-  
+
   // For each case, determine the size of the final result make sure
   // that the inner dimensions match
   switch (flag)
@@ -109,7 +109,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
 
   // Integer values to pass to BLAS:
   //
-  // M  
+  // M
   // In Fortran, the number of rows of op(A),
   // In the BLAS documentation, typically known as 'M'.
   //
@@ -121,7 +121,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
   // N
   // In Fortran, the number of cols of op(B), and also the number of cols of C.
   // In the BLAS documentation, typically known as 'N'.
-  //	    
+  //
   // In C/C++, we set:
   // N = n_rows(B) if (transb='n')
   //     n_cols(B) if (transb='t')
@@ -160,12 +160,12 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
   // LDC (leading dimension of C).  LDC is the
   // number of columns in the solution matrix.
   int LDC = M;
-  
+
   // Scalar values to pass to BLAS
   //
-  // scalar multiplying the whole product AB 
+  // scalar multiplying the whole product AB
   T alpha = 1.;
-  
+
   // scalar multiplying C, which is the original matrix.
   T beta  = 0.;
 
@@ -188,7 +188,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
 	libmesh_error();
       }
     }
-  
+
   // Swap my data vector with the result
   this->_val.swap(result);
 }
@@ -222,33 +222,33 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
 
   // The calling sequence for dgetrf is:
   // dgetrf(M, N, A, lda, ipiv, info)
-  
+
   //    M       (input) int*
   //            The number of rows of the matrix A.  M >= 0.
   // In C/C++, pass the number of *cols* of A
   int M = this->n();
-    
+
   //    N       (input) int*
   //            The number of columns of the matrix A.  N >= 0.
   // In C/C++, pass the number of *rows* of A
   int N = this->m();
-  
+
   //    A (input/output) double precision array, dimension (LDA,N)
   //      On entry, the M-by-N matrix to be factored.
   //      On exit, the factors L and U from the factorization
   //      A = P*L*U; the unit diagonal elements of L are not stored.
   // Here, we pass &(_val[0]).
-  
+
   //    LDA     (input) int*
   //            The leading dimension of the array A.  LDA >= max(1,M).
   int LDA = M;
-  
+
   //    ipiv    (output) integer array, dimension (min(m,n))
   //            The pivot indices; for 1 <= i <= min(m,n), row i of the
   //            matrix was interchanged with row IPIV(i).
   // Here, we pass &(_pivots[0]), a private class member used to store pivots
   this->_pivots.resize( std::min(M,N) );
-  
+
   //    info    (output) int*
   //            = 0:  successful exit
   //            < 0:  if INFO = -i, the i-th argument had an illegal value
@@ -269,7 +269,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
 		    << ", Error during Lapack LU factorization!" << std::endl;
       libmesh_error();
     }
-  
+
   // Set the flag for LU decomposition
   this->_decomposition_type = LU_BLAS_LAPACK;
 }
@@ -293,7 +293,7 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma)
   // The calling sequence for dgetrf is:
   // DGESVD( JOBU, JOBVT, M, N, A, LDA, S, U, LDU, VT, LDVT, WORK, LWORK, INFO )
 
-  
+
   //  JOBU    (input) CHARACTER*1
   //          Specifies options for computing all or part of the matrix U:
   //          = 'A':  all M columns of U are returned in array U:
@@ -316,11 +316,11 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma)
   //          = 'N':  no rows of V**T (no right singular vectors) are
   //                  computed.
   char JOBVT = 'N';
-  
+
   std::vector<T> sigma_val;
   std::vector<T> U_val;
   std::vector<T> VT_val;
-  
+
   _svd_helper(JOBU, JOBVT, sigma_val, U_val, VT_val);
 
   // Load the singular values into sigma, ignore U_val and VT_val
@@ -336,7 +336,7 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, Dens
   // The calling sequence for dgetrf is:
   // DGESVD( JOBU, JOBVT, M, N, A, LDA, S, U, LDU, VT, LDVT, WORK, LWORK, INFO )
 
-  
+
   //  JOBU    (input) CHARACTER*1
   //          Specifies options for computing all or part of the matrix U:
   //          = 'A':  all M columns of U are returned in array U:
@@ -359,11 +359,11 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, Dens
   //          = 'N':  no rows of V**T (no right singular vectors) are
   //                  computed.
   char JOBVT = 'S';
-  
+
   std::vector<T> sigma_val;
   std::vector<T> U_val;
   std::vector<T> VT_val;
-  
+
   _svd_helper(JOBU, JOBVT, sigma_val, U_val, VT_val);
 
   // Load the singular values into sigma, ignore U_val and VT_val
@@ -406,12 +406,12 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   //            The number of rows of the matrix A.  M >= 0.
   // In C/C++, pass the number of *cols* of A
   int M = this->n();
-    
+
   //    N       (input) int*
   //            The number of columns of the matrix A.  N >= 0.
   // In C/C++, pass the number of *rows* of A
   int N = this->m();
-  
+
   int min_MN = (M < N) ? M : N;
   int max_MN = (M > N) ? M : N;
 
@@ -427,7 +427,7 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   //          if JOBU .ne. 'O' and JOBVT .ne. 'O', the contents of A
   //                          are destroyed.
   // Here, we pass &(_val[0]).
-  
+
   //    LDA     (input) int*
   //            The leading dimension of the array A.  LDA >= max(1,M).
   int LDA = M;
@@ -531,7 +531,7 @@ void DenseMatrix<T>::_svd_helper (char,
 
 template<typename T>
 void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
-						 DenseVector<T>& x) 
+						 DenseVector<T>& x)
 {
   // The calling sequence for getrs is:
   // dgetrs(TRANS, N, NRHS, A, LDA, IPIV, B, LDB, INFO)
@@ -539,31 +539,31 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
   //    trans   (input) char*
   //            'n' for no tranpose, 't' for transpose
   char TRANS[] = "t";
-  
+
   //    N       (input) int*
   //            The order of the matrix A.  N >= 0.
   int N = this->m();
-  
- 
+
+
   //    NRHS    (input) int*
   //            The number of right hand sides, i.e., the number of columns
   //            of the matrix B.  NRHS >= 0.
   int NRHS = 1;
- 
+
   //    A       (input) DOUBLE PRECISION array, dimension (LDA,N)
   //            The factors L and U from the factorization A = P*L*U
   //            as computed by dgetrf.
   // Here, we pass &(_val[0])
-  
+
   //    LDA     (input) int*
   //            The leading dimension of the array A.  LDA >= max(1,N).
   int LDA = N;
-    
+
   //    ipiv    (input) int array, dimension (N)
   //            The pivot indices from DGETRF; for 1<=i<=N, row i of the
   //            matrix was interchanged with row IPIV(i).
   // Here, we pass &(_pivots[0]) which was computed in _lu_decompose_lapack
- 
+
   //    B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)
   //            On entry, the right hand side matrix B.
   //            On exit, the solution matrix X.
@@ -576,16 +576,16 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
   // We can avoid the copy if we don't care about overwriting the RHS: just
   // pass b to the Lapack routine and then swap with x before exiting
   // std::vector<T>& x_vec = b.get_values();
- 
+
   //    LDB     (input) int*
   //            The leading dimension of the array B.  LDB >= max(1,N).
   int LDB = N;
- 
+
   //    INFO    (output) int*
   //            = 0:  successful exit
   //            < 0:  if INFO = -i, the i-th argument had an illegal value
   int INFO = 0;
-  
+
   // Finally, ready to call the Lapack getrs function
   LAPACKgetrs_(TRANS, &N, &NRHS, &(_val[0]), &LDA, &(_pivots[0]), &(x_vec[0]), &LDB, &INFO);
 
@@ -654,28 +654,28 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
 	  libmesh_error();
 	}
     }
-  
+
   // Calling sequence for dgemv:
   //
   // dgemv(TRANS,M,N,ALPHA,A,LDA,X,INCX,BETA,Y,INCY)
-  
+
   //   TRANS  - CHARACTER*1, 't' for transpose, 'n' for non-transpose multiply
   // We store everything in row-major order, so pass the transpose flag for
   // non-transposed matvecs and the 'n' flag for transposed matvecs
   char TRANS[] = "t";
   if (trans)
     TRANS[0] = 'n';
-  
+
   //   M      - INTEGER.
   //            On entry, M specifies the number of rows of the matrix A.
   // In C/C++, pass the number of *cols* of A
   int M = this->n();
-    
+
   //   N      - INTEGER.
   //            On entry, N specifies the number of columns of the matrix A.
   // In C/C++, pass the number of *rows* of A
   int N = this->m();
-  
+
   //   ALPHA  - DOUBLE PRECISION.
   // The scalar constant passed to this function
 
@@ -694,7 +694,7 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
   //            in the calling (sub) program. LDA must be at least
   //            max( 1, m ).
   int LDA = M;
-  
+
   //   X      - DOUBLE PRECISION array of DIMENSION at least
   //            ( 1 + ( n - 1 )*abs( INCX ) ) when TRANS = 'N' or 'n'
   //            and at least
@@ -705,12 +705,12 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
   // nothing about const
   DenseVector<T>& x_ref = const_cast< DenseVector<T>& > ( arg );
   std::vector<T>& x = x_ref.get_values();
-  
+
   //   INCX   - INTEGER.
   //            On entry, INCX specifies the increment for the elements of
   //            X. INCX must not be zero.
   int INCX = 1;
-  
+
   //   BETA   - DOUBLE PRECISION.
   //            On entry, BETA specifies the scalar beta. When BETA is
   //            supplied as zero then Y need not be set on input.
@@ -730,7 +730,7 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
   //            On entry, INCY specifies the increment for the elements of
   //            Y. INCY must not be zero.
   int INCY = 1;
-  
+
   // Finally, ready to call the BLAS function
   BLASgemv_(TRANS, &M, &N, &alpha, &(a[0]), &LDA, &(x[0]), &INCX, &beta, &(y[0]), &INCY);
 }

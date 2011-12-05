@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -59,7 +59,7 @@ Real NewtonSolver::line_search(Real tol,
   // Find bx, a step length that gives lower residual than ax or cx
   Real bx = 1.;
 
-  while (libmesh_isnan(current_residual) || 
+  while (libmesh_isnan(current_residual) ||
          (current_residual > last_residual &&
           require_residual_reduction))
     {
@@ -90,8 +90,8 @@ Real NewtonSolver::line_search(Real tol,
         libMesh::out << "  Current Residual: "
                   << current_residual << std::endl;
 
-      if (bx/2. < minsteplength && 
-          (libmesh_isnan(current_residual) || 
+      if (bx/2. < minsteplength &&
+          (libmesh_isnan(current_residual) ||
            (current_residual > last_residual)))
         {
           libMesh::out << "Inexact Newton step FAILED at step "
@@ -265,7 +265,7 @@ unsigned int NewtonSolver::solve()
 
   // Reset any prior solve result
   _solve_result = INVALID_SOLVE_RESULT;
-  
+
   NumericVector<Number> &newton_iterate = *(_system.solution);
 
   AutoPtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.zero_clone();
@@ -305,7 +305,7 @@ unsigned int NewtonSolver::solve()
 
       if (libmesh_isnan(current_residual))
         {
-          libMesh::out << "  Nonlinear solver DIVERGED at step " 
+          libMesh::out << "  Nonlinear solver DIVERGED at step "
                        << _outer_iterations
                        << " with residual Not-a-Number"
                        << std::endl;
@@ -315,7 +315,7 @@ unsigned int NewtonSolver::solve()
 
       max_residual_norm = std::max (current_residual,
                                     max_residual_norm);
- 
+
       // Compute the l2 norm of the whole solution
       Real norm_total = newton_iterate.l2_norm();
 
@@ -343,7 +343,7 @@ unsigned int NewtonSolver::solve()
       linear_solution.zero();
 
       if (verbose)
-        libMesh::out << "Linear solve starting, tolerance " 
+        libMesh::out << "Linear solve starting, tolerance "
                       << current_linear_tolerance << std::endl;
 
       // Solve the linear system.
@@ -363,7 +363,7 @@ unsigned int NewtonSolver::solve()
       libmesh_assert(linear_steps <= max_linear_iterations);
       _inner_iterations += linear_steps;
 
-      const bool linear_solve_finished = 
+      const bool linear_solve_finished =
         !(linear_steps == max_linear_iterations);
 
       if (verbose)
@@ -445,7 +445,7 @@ unsigned int NewtonSolver::solve()
 
       max_solution_norm = std::max(max_solution_norm, norm_total);
 
-      // Print out information for the 
+      // Print out information for the
       // nonlinear iterations.
       if (verbose)
         libMesh::out << "  Nonlinear step: |du|/|u| = "
@@ -480,7 +480,7 @@ unsigned int NewtonSolver::solve()
   // Make sure we are returning something sensible as the
   // _solve_result.
   libmesh_assert (_solve_result != DiffSolver::INVALID_SOLVE_RESULT);
-  
+
   return _solve_result;
 }
 
@@ -499,7 +499,7 @@ bool NewtonSolver::test_convergence(Real current_residual,
       _solve_result |= CONVERGED_ABSOLUTE_RESIDUAL;
       has_converged = true;
     }
-  
+
   // Is our relative residual low enough?
   if ((current_residual / max_residual_norm) <
       relative_residual_tolerance)
@@ -507,20 +507,20 @@ bool NewtonSolver::test_convergence(Real current_residual,
       _solve_result |= CONVERGED_RELATIVE_RESIDUAL;
       has_converged = true;
     }
-  
+
   // For incomplete linear solves, it's not safe to test step sizes
   if (!linear_solve_finished)
     {
       return has_converged;
     }
-  
+
   // Is our absolute Newton step size small enough?
   if (step_norm < absolute_step_tolerance)
     {
       _solve_result |= CONVERGED_ABSOLUTE_STEP;
       has_converged = true;
     }
-  
+
   // Is our relative Newton step size small enough?
   if (step_norm / max_solution_norm <
       relative_step_tolerance)
@@ -528,7 +528,7 @@ bool NewtonSolver::test_convergence(Real current_residual,
       _solve_result |= CONVERGED_RELATIVE_STEP;
       has_converged = true;
     }
-  
+
   return has_converged;
 }
 

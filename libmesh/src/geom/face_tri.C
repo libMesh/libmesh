@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -42,7 +42,7 @@ unsigned int Tri::key (const unsigned int s) const
       return
 	this->compute_key (this->node(0),
 			   this->node(1));
-	
+
     case 1:
       return
 	this->compute_key (this->node(1),
@@ -53,7 +53,7 @@ unsigned int Tri::key (const unsigned int s) const
 			   this->node(0));
     }
 
-  
+
   // We will never get here...  Look at the code above.
   libmesh_error();
   return 0;
@@ -73,7 +73,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
       {
 	edge->set_node(0) = this->get_node(0);
 	edge->set_node(1) = this->get_node(1);
-	
+
         AutoPtr<Elem> ap_edge(edge);
 	return ap_edge;
       }
@@ -81,7 +81,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
       {
 	edge->set_node(0) = this->get_node(1);
 	edge->set_node(1) = this->get_node(2);
-	
+
         AutoPtr<Elem> ap_edge(edge);
 	return ap_edge;
       }
@@ -89,7 +89,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
       {
 	edge->set_node(0) = this->get_node(2);
 	edge->set_node(1) = this->get_node(0);
-	
+
         AutoPtr<Elem> ap_edge(edge);
 	return ap_edge;
       }
@@ -99,7 +99,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
       }
     }
 
-  
+
   // We will never get here...  Look at the code above.
   libmesh_error();
   AutoPtr<Elem> ap_edge(edge);
@@ -123,7 +123,7 @@ Real Tri::quality (const ElemQuality q) const
 {
   switch (q)
     {
-      
+
       /**
        * Source: Netgen, meshtool.cpp, TriangleQualityInst
        */
@@ -149,21 +149,21 @@ Real Tri::quality (const ElemQuality q) const
         v1 *= -1;
         const Real s2 = std::sin(std::acos(v1*v3/l1/l3)/2.);
         const Real s3 = std::sin(std::acos(v2*v3/l2/l3)/2.);
-        
+
         return 8. * s1 * s2 * s3;
-        
+
       }
     default:
       return Elem::quality(q);
     }
-  
+
   /**
-   * I don't know what to do for this metric. 
+   * I don't know what to do for this metric.
    * Maybe the base class knows.  We won't get
    * here because of the defualt case above.
    */
   return Elem::quality(q);
-  
+
 }
 
 
@@ -174,7 +174,7 @@ Real Tri::quality (const ElemQuality q) const
 std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
 {
   std::pair<Real, Real> bounds;
-  
+
   switch (q)
     {
 
@@ -182,7 +182,7 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
       bounds.first  = 60.;
       bounds.second = 90.;
       break;
-      
+
     case MIN_ANGLE:
       bounds.first  = 30.;
       bounds.second = 60.;
@@ -197,18 +197,18 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
       bounds.first  = 0.5;
       bounds.second = 1.155;
       break;
-     
+
     case SIZE:
     case SHAPE:
       bounds.first  = 0.25;
       bounds.second = 1.;
-      break;   
+      break;
 
     case DISTORTION:
       bounds.first  = 0.6;
       bounds.second = 1.;
       break;
-      
+
     default:
       libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
       bounds.first  = -1;

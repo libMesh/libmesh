@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -75,21 +75,21 @@ class Edge4 : public Edge
    * @returns true iff the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
 			       const unsigned int s) const;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
 			       const unsigned int e) const;
-  
+
   /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
@@ -100,7 +100,7 @@ class Edge4 : public Edge
    * @returns \p EDGE4
    */
   ElemType type()  const { return EDGE4; }
-  
+
   /**
    * @returns THIRD
    */
@@ -125,7 +125,7 @@ class Edge4 : public Edge
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns \p false.  This is a finite element. 
+   * @returns \p false.  This is a finite element.
    */
   bool infinite () const { return false; }
 
@@ -138,9 +138,9 @@ protected:
    * Data for links to nodes
    */
   Node* _nodelinks_data[4];
-  
 
-  
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -150,7 +150,7 @@ protected:
 			 const unsigned int j,
 			 const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
-  
+
   /**
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.

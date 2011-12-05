@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -40,24 +40,24 @@ TypeVector<T> TypeVector<T>::unit() const
 {
 
   const Real length = size();
-  
+
   libmesh_assert (length != static_cast<Real>(0.));
-  
+
 #if LIBMESH_DIM == 1
   return TypeVector<T>(_coords[0]/length);
 #endif
-  
-#if LIBMESH_DIM == 2 
+
+#if LIBMESH_DIM == 2
   return TypeVector<T>(_coords[0]/length,
 		       _coords[1]/length);
 #endif
-  
+
 #if LIBMESH_DIM == 3
   return TypeVector<T>(_coords[0]/length,
-		       _coords[1]/length, 
+		       _coords[1]/length,
 		       _coords[2]/length);
 #endif
-  
+
 }
 
 
@@ -66,12 +66,12 @@ template <typename T>
 void TypeVector<T>::print(std::ostream& os) const
 {
 #if LIBMESH_DIM == 1
-  
+
   os << "x=" << (*this)(0) << '\n';
-  
+
 #endif
 #if LIBMESH_DIM == 2
-  
+
   os << "(x,y)=("
      << std::setw(8) << (*this)(0) << ", "
      << std::setw(8) << (*this)(1) << ")"
@@ -79,7 +79,7 @@ void TypeVector<T>::print(std::ostream& os) const
 
 #endif
 #if LIBMESH_DIM == 3
-  
+
   os <<  "(x,y,z)=("
      << std::setw(8) << (*this)(0) << ", "
      << std::setw(8) << (*this)(1) << ", "
@@ -104,7 +104,7 @@ void TypeVector<T>::write_unformatted (std::ostream &out,
       << (*this)(2) << " ";
 
   if (newline)
-    out << '\n';      
+    out << '\n';
 }
 
 

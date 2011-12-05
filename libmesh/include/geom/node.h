@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -52,12 +52,12 @@ class MeshRefinement;
  */
 
 class Node : public Point,
-	     public DofObject,      
+	     public DofObject,
 	     public ReferenceCountedObject<Node>
 {
-  
+
 public:
-  
+
   /**
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
    * \p LIBMESH_DIM dimensions with an \p id of \p Node::invalid_id
@@ -80,14 +80,14 @@ public:
 
   /**
    * Destructor.
-   */ 
+   */
   virtual ~Node ();
 
   /**
    * Assign to a node from a point
    */
   Node& operator= (const Point& p);
-  
+
   /**
    * Builds a \p Node and returns an \p AutoPtr<Node> to the
    * newly-created object.  The \p id is copied from \p n.id()
@@ -100,7 +100,7 @@ public:
    */
   static AutoPtr<Node> build (const Point& p,
 			      const unsigned int id);
-  
+
   /**
    * Builds a \p Node from specified points and returns an \p AutoPtr<Node>
    * to the newly-created object.  Optionally assigned the \p id.
@@ -178,12 +178,12 @@ public:
     {
       return Point(x,y,z);
     }
-    
+
     static MPI_Datatype create_mpi_datatype ();
-    
+
   };
 #endif // #ifdef LIBMESH_HAVE_MPI
-  
+
 private:
 
   /**
@@ -271,7 +271,7 @@ inline
 AutoPtr<Node> Node::build(const Point& p,
 			  const unsigned int id)
 {
-  
+
   AutoPtr<Node> ap(new Node(p,id));
   return ap;
 }

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -49,18 +49,18 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
   radial_qrule (NULL),
   base_elem    (NULL),
   base_fe      (NULL),
-  
+
   // initialize the current_fe_type to all the same
   // values as \p fet (since the FE families and coordinate
   // map type should @e not change), but use an invalid order
   // for the radial part (since this is the only order
   // that may change!).
-  // the data structures like \p phi etc are not initialized 
+  // the data structures like \p phi etc are not initialized
   // through the constructor, but throught reinit()
-  current_fe_type ( FEType(fet.order, 
-			   fet.family, 
-			   INVALID_ORDER, 
-			   fet.radial_family,      
+  current_fe_type ( FEType(fet.order,
+			   fet.family,
+			   INVALID_ORDER,
+			   fet.radial_family,
 			   fet.inf_map) )
 
 {
@@ -89,7 +89,7 @@ InfFE<Dim,T_radial,T_map>::~InfFE ()
       delete base_qrule;
       base_qrule = NULL;
     }
-  
+
   if (radial_qrule != NULL)
     {
       delete radial_qrule;
@@ -101,7 +101,7 @@ InfFE<Dim,T_radial,T_map>::~InfFE ()
       delete base_elem;
       base_elem = NULL;
     }
-  
+
   if (base_fe != NULL)
     {
       delete base_fe;
@@ -130,7 +130,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
       base_qrule = apq.release();
       base_fe->attach_quadrature_rule(base_qrule);
     }
-  
+
   // in radial direction, always use Gauss quadrature
   radial_qrule = new QGauss(1, radial_int_order);
 
@@ -170,34 +170,34 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
   if (pts == NULL)
     {
       bool init_shape_functions_required = false;
-      
+
       // -----------------------------------------------------------------
       // init the radial data fields only when the radial order changes
       if (current_fe_type.radial_order != fe_type.radial_order)
 	{
 	  current_fe_type.radial_order = fe_type.radial_order;
-	  
-	  // Watch out: this call to QBase->init() only works for 
-	  // current_fe_type = const!   To allow variable Order, 
-	  // the init() of QBase has to be modified...  
+
+	  // Watch out: this call to QBase->init() only works for
+	  // current_fe_type = const!   To allow variable Order,
+	  // the init() of QBase has to be modified...
 	  radial_qrule->init(EDGE2);
-	  
+
 	  // initialize the radial shape functions
 	  this->init_radial_shape_functions(inf_elem);
-	  
-	  init_shape_functions_required=true;      
+
+	  init_shape_functions_required=true;
 	}
-      
-      
+
+
       bool update_base_elem_required=true;
-      
+
       // -----------------------------------------------------------------
       // update the type in accordance to the current cell
       // and reinit if the cell type has changed or (as in
       // the case of the hierarchics) the shape functions
       // depend on the particular element and need a reinit
       if (  ( Dim != 1) &&
-	    (  (this->get_type() != inf_elem->type())  ||  
+	    (  (this->get_type() != inf_elem->type())  ||
 	       (base_fe->shapes_need_reinit())  )  )
 	{
 	  // store the new element type, update base_elem
@@ -206,41 +206,41 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 	  elem_type = inf_elem->type();
 	  this->update_base_elem(inf_elem);
 	  update_base_elem_required=false;
-	  
+
 	  // initialize the base quadrature rule for the new element
 	  base_qrule->init(base_elem->type());
-	  
+
 	  // initialize the shape functions in the base
 	  base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
 					     base_elem);
-	  
-	  init_shape_functions_required=true;      
+
+	  init_shape_functions_required=true;
 	}
-      
-      
-      // when either the radial or base part change, 
+
+
+      // when either the radial or base part change,
       // we have to init the whole fields
       if (init_shape_functions_required)
 	this->init_shape_functions (inf_elem);
-      
+
       // computing the distance only works when we have the current
       // base_elem stored.  This happens when fe_type is const,
       // the inf_elem->type remains the same.  Then we have to
       // update the base elem _here_.
       if (update_base_elem_required)
 	this->update_base_elem(inf_elem);
-      
+
       // compute dist (depends on geometry, therefore has to be updated for
       // each and every new element), throw radial and base part together
       this->combine_base_radial (inf_elem);
-      
+
       this->compute_map (_total_qrule_weights, inf_elem);
 
-      // Compute the shape functions and the derivatives 
+      // Compute the shape functions and the derivatives
       // at all quadrature points.
       this->compute_shape_functions (inf_elem);
     }
-  
+
   else // if pts != NULL
     {
       // update the elem_type
@@ -280,10 +280,10 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
           this->compute_map (dummy_weights, inf_elem);
         }
 
-      // finally compute the ifem shapes     
+      // finally compute the ifem shapes
       this->compute_shape_functions (inf_elem);
     }
-  
+
 }
 
 
@@ -296,7 +296,7 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_
   libmesh_assert (radial_qrule != NULL);
   libmesh_assert (inf_elem     != NULL);
 
- 
+
   /**
    * Start logging the radial shape function initialization
    */
@@ -307,14 +307,14 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_
   // initialize most of the things related to mapping
 
   // The order to use in the radial map (currently independent of the element type)
-  const Order        radial_mapping_order             (Radial::mapping_order());    
+  const Order        radial_mapping_order             (Radial::mapping_order());
   const unsigned int n_radial_mapping_shape_functions (Radial::n_dofs(radial_mapping_order));
 
 
 
   // -----------------------------------------------------------------
   // initialize most of the things related to physical approximation
-  
+
   const Order        radial_approx_order             (fe_type.radial_order);
   const unsigned int n_radial_approx_shape_functions (Radial::n_dofs(radial_approx_order));
 
@@ -325,7 +325,7 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_
 
   // -----------------------------------------------------------------
   // resize the radial data fields
-  
+
   mode.resize      (n_radial_approx_shape_functions);       // the radial polynomials (eval)
   dmodedv.resize   (n_radial_approx_shape_functions);
 
@@ -335,7 +335,7 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_
   radial_map.resize    (n_radial_mapping_shape_functions);  // the radial map
   dradialdv_map.resize (n_radial_mapping_shape_functions);
 
-  
+
   for (unsigned int i=0; i<n_radial_mapping_shape_functions; i++)
     {
       radial_map[i].resize    (n_radial_qp);
@@ -353,11 +353,11 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_
   // compute scalar values at radial quadrature points
   for (unsigned int p=0; p<n_radial_qp; p++)
     {
-      som[p]       = Radial::decay       (radial_qp[p](0)); 
-      dsomdv[p]    = Radial::decay_deriv (radial_qp[p](0)); 
+      som[p]       = Radial::decay       (radial_qp[p](0));
+      dsomdv[p]    = Radial::decay_deriv (radial_qp[p](0));
     }
 
-  
+
   // evaluate the mode shapes in radial direction at radial quadrature points
   for (unsigned int i=0; i<n_radial_approx_shape_functions; i++)
     for (unsigned int p=0; p<n_radial_qp; p++)
@@ -390,12 +390,12 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 {
   libmesh_assert (inf_elem     != NULL);
- 
-  
+
+
   // Start logging the radial shape function initialization
   START_LOG("init_shape_functions()", "InfFE");
 
-  
+
   // -----------------------------------------------------------------
   // fast access to some const int's for the radial data
   const unsigned int n_radial_mapping_sf = radial_map.size();
@@ -405,8 +405,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
   // -----------------------------------------------------------------
   // initialize most of the things related to mapping
-  
-  // The element type and order to use in the base map  
+
+  // The element type and order to use in the base map
   const Order    base_mapping_order     ( base_elem->default_order() );
   const ElemType base_mapping_elem_type ( base_elem->type()          );
 
@@ -415,14 +415,14 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   unsigned int n_base_mapping_shape_functions = Base::n_base_mapping_sf(base_mapping_elem_type,
 									base_mapping_order);
 
-  const unsigned int n_total_mapping_shape_functions = 
+  const unsigned int n_total_mapping_shape_functions =
     n_radial_mapping_sf * n_base_mapping_shape_functions;
 
 
 
   // -----------------------------------------------------------------
   // initialize most of the things related to physical approximation
-  
+
   unsigned int n_base_approx_shape_functions;
   if (Dim > 1)
     n_base_approx_shape_functions = base_fe->n_shape_functions();
@@ -430,7 +430,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     n_base_approx_shape_functions = 1;
 
 
-  const unsigned int n_total_approx_shape_functions = 
+  const unsigned int n_total_approx_shape_functions =
       n_radial_approx_sf * n_base_approx_shape_functions;
 
   // update class member field
@@ -443,7 +443,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   // The total number of quadrature points.
   const unsigned int        n_total_qp =  n_radial_qp * n_base_qp;
 
-  
+
   // update class member field
   _n_total_qp = n_total_qp;
 
@@ -467,9 +467,9 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     // fill the node index map
     for (unsigned int n=0; n<n_total_mapping_shape_functions; n++)
       {
-        compute_node_indices (inf_elem_type, 
+        compute_node_indices (inf_elem_type,
 			      n,
-			      _base_node_index[n], 
+			      _base_node_index[n],
 			      _radial_node_index[n]);
 	libmesh_assert (_base_node_index[n]   < n_base_mapping_shape_functions);
 	libmesh_assert (_radial_node_index[n] < n_radial_mapping_sf);
@@ -479,15 +479,15 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     for (unsigned int n=0; n<n_total_approx_shape_functions; n++)
       {
 	compute_shape_indices (this->fe_type,
-			       inf_elem_type, 
+			       inf_elem_type,
 			       n,
-			       _base_shape_index[n], 
+			       _base_shape_index[n],
 			       _radial_shape_index[n]);
 	libmesh_assert (_base_shape_index[n]   < n_base_approx_shape_functions);
 	libmesh_assert (_radial_shape_index[n] < n_radial_approx_sf);
       }
   }
- 
+
 
 
 
@@ -500,11 +500,11 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
   // -----------------------------------------------------------------
   // resize the total data fields
-  
+
   // the phase term varies with xi, eta and zeta(v): store it for _all_ qp
   //
   // when computing the phase, we need the base approximations
-  // therefore, initialize the phase here, but evaluate it 
+  // therefore, initialize the phase here, but evaluate it
   // in combine_base_radial().
   //
   // the weight, though, is only needed at the radial quadrature points, n_radial_qp.
@@ -560,14 +560,14 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
         d2phidzeta2.resize    (n_total_approx_shape_functions);
       }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    
+
     if (Dim > 1)
       dphideta.resize      (n_total_approx_shape_functions);
-    
+
     if (Dim == 3)
       dphidzeta.resize     (n_total_approx_shape_functions);
-      
-    
+
+
     phi_map.resize         (n_total_mapping_shape_functions);
     dphidxi_map.resize     (n_total_mapping_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -586,10 +586,10 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
         d2phidzeta2_map.resize    (n_total_mapping_shape_functions);
       }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    
+
     if (Dim > 1)
       dphideta_map.resize  (n_total_mapping_shape_functions);
-    
+
     if (Dim == 3)
       dphidzeta_map.resize (n_total_mapping_shape_functions);
   }
@@ -597,9 +597,9 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
 
   // -----------------------------------------------------------------
-  // collect all the for loops, where inner vectors are 
+  // collect all the for loops, where inner vectors are
   // resized to the appropriate number of quadrature points
-  {    
+  {
     for (unsigned int i=0; i<n_total_approx_shape_functions; i++)
       {
 	phi[i].resize         (n_total_qp);
@@ -623,22 +623,22 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	    d2phidxideta[i].resize   (n_total_qp);
 	    d2phideta2[i].resize     (n_total_qp);
 	  }
-	if (Dim > 2)	     
+	if (Dim > 2)
 	  {
 	    d2phidxidzeta[i].resize  (n_total_qp);
 	    d2phidetadzeta[i].resize (n_total_qp);
 	    d2phidzeta2[i].resize    (n_total_qp);
 	  }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	   
+
 	if (Dim > 1)
 	  dphideta[i].resize  (n_total_qp);
-	   
-	if (Dim == 3)	     
+
+	if (Dim == 3)
 	  dphidzeta[i].resize (n_total_qp);
-	     
+
       }
-       
+
     for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
       {
 	phi_map[i].resize         (n_total_qp);
@@ -658,10 +658,10 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 	    d2phidzeta2_map[i].resize    (n_total_qp);
 	  }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	   
+
 	if (Dim > 1)
 	  dphideta_map[i].resize  (n_total_qp);
-	   
+
 	if (Dim == 3)
 	  dphidzeta_map[i].resize (n_total_qp);
       }
@@ -671,7 +671,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
   {
     // -----------------------------------------------------------------
-    // (a) compute scalar values at _all_ quadrature points  -- for uniform 
+    // (a) compute scalar values at _all_ quadrature points  -- for uniform
     //     access from the outside to these fields
     // (b) form a std::vector<Real> which contains the appropriate weights
     //     of the combined quadrature rule!
@@ -686,14 +686,14 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     for (unsigned int rp=0; rp<n_radial_qp; rp++)
       for (unsigned int bp=0; bp<n_base_qp; bp++)
         {
-          weight   [ bp+rp*n_base_qp ] = Radial::D       (radial_qp[rp](0)); 
+          weight   [ bp+rp*n_base_qp ] = Radial::D       (radial_qp[rp](0));
 	  dweightdv[ bp+rp*n_base_qp ] = Radial::D_deriv (radial_qp[rp](0));
 
 	  _total_qrule_weights[  bp+rp*n_base_qp ] = radial_qw[rp] * base_qw[bp];
 	}
   }
 
- 
+
   /**
    * Stop logging the radial shape function initialization
    */
@@ -746,7 +746,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       }
 
 
-      
+
       //------------------------------------------------------------
       // 2D
     case 2:
@@ -756,7 +756,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       }
 
 
-      
+
       //------------------------------------------------------------
       // 3D
     case 3:
@@ -804,7 +804,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 	libmesh_assert (dphidxi.size()   == n_total_approx_sf);
 	libmesh_assert (dphideta.size()  == n_total_approx_sf);
 	libmesh_assert (dphidzeta.size() == n_total_approx_sf);
-	
+
 	// compute the overall approximation shape functions,
 	// pick the appropriate radial and base shapes through using
 	// _base_shape_index and _radial_shape_index
@@ -818,16 +818,16 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 		phi      [ti][bp+rp*n_base_qp] = S [bi][bp] * mode[ri][rp] * som[rp];
 		dphidxi  [ti][bp+rp*n_base_qp] = Ss[bi][bp] * mode[ri][rp] * som[rp];
 		dphideta [ti][bp+rp*n_base_qp] = St[bi][bp] * mode[ri][rp] * som[rp];
-		dphidzeta[ti][bp+rp*n_base_qp] = S [bi][bp] 
+		dphidzeta[ti][bp+rp*n_base_qp] = S [bi][bp]
 		    * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
 	      }
 
-	
+
 	libmesh_assert (phi_map.size()       == n_total_mapping_sf);
 	libmesh_assert (dphidxi_map.size()   == n_total_mapping_sf);
 	libmesh_assert (dphideta_map.size()  == n_total_mapping_sf);
 	libmesh_assert (dphidzeta_map.size() == n_total_mapping_sf);
-	
+
 	// compute the overall mapping functions,
 	// pick the appropriate radial and base entries through using
 	// _base_node_index and _radial_node_index
@@ -843,7 +843,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 		dphideta_map [ti][bp+rp*n_base_qp] = St_map[bi][bp] * radial_map   [ri][rp];
 		dphidzeta_map[ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
 	      }
-			
+
 
 	break;
       }
@@ -872,7 +872,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
   libmesh_assert (radial_qrule != NULL);
 
 
-  
+
   // Start logging the overall computation of shape functions
   START_LOG("compute_shape_functions()", "InfFE");
 
@@ -888,7 +888,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
   // Compute the value of the derivative shape function i at quadrature point p
   switch (dim)
     {
-      
+
     case 1:
       {
 	libmesh_not_implemented();
@@ -900,7 +900,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 	libmesh_not_implemented();
 	break;
       }
-    
+
     case 3:
       {
 	// These are _all_ shape functions of this infinite element
@@ -912,18 +912,18 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 		dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
 				dphideta[i][p]*detadx_map[p] +
 				dphidzeta[i][p]*dzetadx_map[p]);
-		
+
 	      // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
 	      dphi[i][p](1) =
 		dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 				dphideta[i][p]*detady_map[p] +
 				dphidzeta[i][p]*dzetady_map[p]);
-		
+
 	      // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
 	      dphi[i][p](2) =
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p] +
-				dphidzeta[i][p]*dzetadz_map[p]);	      
+				dphidzeta[i][p]*dzetadz_map[p]);
 	    }
 
 
@@ -934,11 +934,11 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 	    dphase[p](0) = (dphasedxi[p]   * dxidx_map[p] +
 			    dphasedeta[p]  * detadx_map[p] +
 			    dphasedzeta[p] * dzetadx_map[p]);
-		
+
 	    dphase[p](1) = (dphasedxi[p]   * dxidy_map[p] +
 			    dphasedeta[p]  * detady_map[p] +
 			    dphasedzeta[p] * dzetady_map[p]);
-		
+
 	    dphase[p](2) = (dphasedxi[p]   * dxidz_map[p] +
 			    dphasedeta[p]  * detadz_map[p] +
 			    dphasedzeta[p] * dzetadz_map[p]);
@@ -946,9 +946,9 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 	    // the derivative of the radial weight - varies only in radial direction,
 	    // therefore dweightdxi = dweightdeta = 0.
 	    dweight[p](0) = dweightdv[p] * dzetadx_map[p];
-		
+
 	    dweight[p](1) = dweightdv[p] * dzetady_map[p];
-		
+
 	    dweight[p](2) = dweightdv[p] * dzetadz_map[p];
 
 	  }
@@ -965,7 +965,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
     }
 
 
-  
+
   // Stop logging the overall computation of shape functions
   STOP_LOG("compute_shape_functions()", "InfFE");
 
@@ -974,9 +974,9 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-bool InfFE<Dim,T_radial,T_map>::shapes_need_reinit() const 
-{ 
-  return false; 
+bool InfFE<Dim,T_radial,T_map>::shapes_need_reinit() const
+{
+  return false;
 }
 
 } // namespace libMesh

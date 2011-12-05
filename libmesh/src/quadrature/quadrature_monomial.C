@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -80,7 +80,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 	  {
 	    _points[c]  = Point( x, y);
 	    _weights[c++] = w;
-	    
+
 	    break;
 	  }
 	case 1: // Fully-symmetric (x,y)
@@ -96,7 +96,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 
 	    _points[c]    = Point(-x,-y);
 	    _weights[c++] = w;
-	    
+
 	    _points[c]    = Point( y, x);
 	    _weights[c++] = w;
 
@@ -108,7 +108,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 
 	    _points[c]    = Point(-y,-x);
 	    _weights[c++] = w;
-	    
+
 	    break;
 	  }
 	case 2: // Fully-symmetric (x,x)
@@ -164,7 +164,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 	case 5: // Partial symmetry (Wissman's rules)
 	  {
 	    libmesh_assert (x != 0.0);
-	    
+
 	    _points[c]    = Point( x, y);
 	    _weights[c++] = w;
 
@@ -193,7 +193,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 	  {
 	    libmesh_assert (x == 0.0);
 	    libmesh_assert (y != 0.0);
-	    
+
 	    _points[c]    = Point(0., y);
 	    _weights[c++] = w;
 
@@ -231,7 +231,7 @@ void QMonomial::kim_rule(const Real rule_data[][4],
 	case 0: // (0,0,0) 1 permutation
 	  {
 	    _points[c]  = Point( x, y, z);	    _weights[c++] = w;
-	    
+
 	    break;
 	  }
 	case 1: //  (x,0,0) 6 permutations
@@ -288,7 +288,7 @@ void QMonomial::kim_rule(const Real rule_data[][4],
 	    _points[c] = Point(-x, 0., -y);	    _weights[c++] = w;
 	    _points[c] = Point(0.,  x,  y);	    _weights[c++] = w;
 	    _points[c] = Point(0.,  x, -y);	    _weights[c++] = w;
-	    
+
 	    break;
 	  }
 	case 4: // (x,x,x) 8 permutations

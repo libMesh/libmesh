@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -75,14 +75,14 @@ void MEDITIO::write_ascii (const std::string& fname,
 
   // Open the output file stream
   std::ofstream out (fname.c_str());
-  
+
   // Make sure it opened correctly
   if (!out.good())
     libmesh_file_error(fname.c_str());
 
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
-  
+
   // Begin interfacing with the MEdit data file
   {
     // header:
@@ -102,7 +102,7 @@ void MEDITIO::write_ascii (const std::string& fname,
   {
     // write the connectivity:
     out << "\n# Set of Polys\n\n";
-    
+
     // count occurrences of output elements:
     int n_tri3  = 0;
     int n_quad4 = 0;
@@ -113,8 +113,8 @@ void MEDITIO::write_ascii (const std::string& fname,
 //       const const_active_elem_iterator end(mesh.elements_end());
 
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-      
+      const MeshBase::const_element_iterator end = mesh.active_elements_end();
+
       for ( ; it != end; ++it)
 	{
 	  if ((*it)->type() == TRI3)  n_tri3++;
@@ -123,7 +123,7 @@ void MEDITIO::write_ascii (const std::string& fname,
 	  if ((*it)->type() == TET4)  n_tet4++;
 	} // for
     }
-    
+
     // First: write out TRI3 elements:
     out << "Triangles\n";
     out << n_tri3 << "\n";
@@ -133,13 +133,13 @@ void MEDITIO::write_ascii (const std::string& fname,
 //       const const_active_elem_iterator end(mesh.elements_end());
 
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-    
-      for ( ; it != end; ++it) 
+      const MeshBase::const_element_iterator end = mesh.active_elements_end();
+
+      for ( ; it != end; ++it)
 	if ((*it)->type() == TRI3)
 	  out << (*it)->node(0)+1  << " " << (*it)->node(1)+1  << " " << (*it)->node(2)+1  << " 0\n";
     }
-    
+
     // Second: write out QUAD4 elements:
     out << "Quadrilaterals\n";
     out << n_quad4 << "\n";
@@ -149,38 +149,38 @@ void MEDITIO::write_ascii (const std::string& fname,
 //       const const_active_elem_iterator end(mesh.elements_end());
 
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+      const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
-      for ( ; it != end; ++it) 
+      for ( ; it != end; ++it)
 	if ((*it)->type() == QUAD4)
 	  {
-	    out << (*it)->node(0)+1  << " " 
-		<< (*it)->node(1)+1  << " " 
-		<< (*it)->node(2)+1  << " " 
+	    out << (*it)->node(0)+1  << " "
+		<< (*it)->node(1)+1  << " "
+		<< (*it)->node(2)+1  << " "
 		<< (*it)->node(3)+1  <<" 0\n";
 	  } // if
 	else if ((*it)->type() == QUAD9)
 	  {
-	    out << (*it)->node(0)+1  << " " 
-		<< (*it)->node(4)+1  << " " 
-		<< (*it)->node(8)+1  << " " 
+	    out << (*it)->node(0)+1  << " "
+		<< (*it)->node(4)+1  << " "
+		<< (*it)->node(8)+1  << " "
 		<< (*it)->node(7)+1  <<" 0\n";
-	    out << (*it)->node(7)+1  << " " 
-		<< (*it)->node(8)+1  << " " 
-		<< (*it)->node(6)+1  << " " 
+	    out << (*it)->node(7)+1  << " "
+		<< (*it)->node(8)+1  << " "
+		<< (*it)->node(6)+1  << " "
 		<< (*it)->node(3)+1  <<" 0\n";
-	    out << (*it)->node(4)+1  << " " 
-		<< (*it)->node(1)+1  << " " 
-		<< (*it)->node(5)+1  << " " 
+	    out << (*it)->node(4)+1  << " "
+		<< (*it)->node(1)+1  << " "
+		<< (*it)->node(5)+1  << " "
 		<< (*it)->node(8)+1  <<" 0\n";
-	    out << (*it)->node(8)+1  << " " 
-		<< (*it)->node(5)+1  << " " 
-		<< (*it)->node(2)+1  << " " 
+	    out << (*it)->node(8)+1  << " "
+		<< (*it)->node(5)+1  << " "
+		<< (*it)->node(2)+1  << " "
 		<< (*it)->node(6)+1  <<" 0\n";
 	  } // if
     }
 
-    
+
     // Third: write out TET4 elements:
     out << "Tetrahedra\n";
     out << n_tet4 << "\n";
@@ -190,19 +190,19 @@ void MEDITIO::write_ascii (const std::string& fname,
 //       const const_active_elem_iterator end(mesh.elements_end());
 
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
-      
-      for ( ; it != end; ++it) 
+      const MeshBase::const_element_iterator end = mesh.active_elements_end();
+
+      for ( ; it != end; ++it)
 	if ((*it)->type() == TET4)
 	  {
-	    out << (*it)->node(0)+1  << " " 
-		<< (*it)->node(1)+1  << " " 
-		<< (*it)->node(2)+1  << " " 
+	    out << (*it)->node(0)+1  << " "
+		<< (*it)->node(1)+1  << " "
+		<< (*it)->node(2)+1  << " "
 		<< (*it)->node(3)+1  <<" 0\n";
 	  } // if
     }
-    
-  }  
+
+  }
   // end of the out file
   out << '\n' << "# end of file\n";
 
@@ -213,14 +213,14 @@ void MEDITIO::write_ascii (const std::string& fname,
       // Open the ".bb" file stream
       int idx = fname.find_last_of(".");
       std::string bbname = fname.substr(0,idx) + ".bb";
-      
+
       std::ofstream bbout (bbname.c_str());
 
       // Make sure it opened correctly
       if (!out.good())
         libmesh_file_error(bbname.c_str());
 
-      // Header: 3: 3D mesh, 1: scalar output, 2: node-indexed 
+      // Header: 3: 3D mesh, 1: scalar output, 2: node-indexed
       const unsigned int n_vars = solution_names->size();
       bbout << "3 1 " << mesh.n_nodes() << " 2\n";
       for (unsigned int n=0; n<mesh.n_nodes(); n++)

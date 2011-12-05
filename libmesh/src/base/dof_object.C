@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -67,7 +67,7 @@ DofObject::DofObject (const DofObject& dof_obj) :
 	    libmesh_assert (this->dof_number(s,v,c) == dof_obj.dof_number(s,v,c));
 	}
     }
-  
+
 #endif
 }
 
@@ -77,14 +77,14 @@ DofObject& DofObject::operator= (const DofObject& dof_obj)
 {
 #ifdef LIBMESH_ENABLE_AMR
   this->clear_old_dof_object();
-  
+
   this->old_dof_object = new DofObject(*(dof_obj.old_dof_object));
 #endif
 
   _id           = dof_obj._id;
   _processor_id = dof_obj._processor_id;
   _idx_buf      = dof_obj._idx_buf;
-  
+
 
   // Check that everything worked
 #ifdef DEBUG
@@ -103,7 +103,7 @@ DofObject& DofObject::operator= (const DofObject& dof_obj)
 	    libmesh_assert (this->dof_number(s,v,c) == dof_obj.dof_number(s,v,c));
 	}
     }
-  
+
 #endif
 
   return *this;
@@ -123,7 +123,7 @@ void  DofObject::clear_old_dof_object ()
     {
       delete this->old_dof_object;
       this->old_dof_object = NULL;
-    }  
+    }
 }
 
 
@@ -133,7 +133,7 @@ void DofObject::set_old_dof_object ()
   this->clear_old_dof_object();
 
   libmesh_assert (this->old_dof_object == NULL);
-  
+
   // Make a new DofObject, assign a copy of \p this.
   // Make sure the copy ctor for DofObject works!!
   this->old_dof_object = new DofObject(*this);
@@ -148,7 +148,7 @@ void DofObject::set_n_systems (const unsigned int ns)
   // Check for trivial return
   if (ns == this->n_systems())
     return;
-  
+
   // Clear any existing data.  This is safe to call
   // even if we don't have any data.
   this->clear_dofs();
@@ -157,14 +157,14 @@ void DofObject::set_n_systems (const unsigned int ns)
   _idx_buf.resize(ns, ns);
   _idx_buf[0] = ns;
 
-  
+
 #ifdef DEBUG
-  
+
   // check that all systems now exist and that they have 0 size
   libmesh_assert (ns == this->n_systems());
   for (unsigned int s=0; s<this->n_systems(); s++)
     libmesh_assert (this->n_vars(s) == 0);
-  
+
 #endif
 }
 
@@ -178,12 +178,12 @@ void DofObject::add_system()
       this->set_n_systems(1);
       return;
     }
-  
+
   DofObject::index_buffer_t::iterator it = _idx_buf.begin();
 
   std::advance(it, this->n_systems());
 
-  // this inserts the current vector size at the position for the new system - creating the 
+  // this inserts the current vector size at the position for the new system - creating the
   // entry we need for the new system indicating there are 0 variables.
   _idx_buf.insert(it, _idx_buf.size());
 
@@ -205,7 +205,7 @@ void DofObject::set_n_vars(const unsigned int s,
 			   const unsigned int nvars)
 {
   libmesh_assert (s < this->n_systems());
-  
+
   // BSK - note that for compatibility with the previous implementation
   // calling this method when (nvars == this->n_vars()) requires that
   // we invalidate the DOF indices and set the number of components to 0.
@@ -230,12 +230,12 @@ void DofObject::set_n_vars(const unsigned int s,
   for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
     old_system_sizes.push_back(this->n_vars(s_ctr));
 #endif
-  
+
   // remove current indices if we have some
   if (this->n_vars(s) != 0)
     {
       const unsigned int old_nvars_s = this->n_vars(s);
-      
+
       DofObject::index_buffer_t::iterator
 	it  = _idx_buf.begin(),
 	end = _idx_buf.begin();
@@ -245,7 +245,7 @@ void DofObject::set_n_vars(const unsigned int s,
       _idx_buf.erase(it,end);
 
       for (unsigned int ctr=(s+1); ctr<this->n_systems(); ctr++)
-	_idx_buf[ctr] -= 2*old_nvars_s;      
+	_idx_buf[ctr] -= 2*old_nvars_s;
     }
 
   // better not have any now!
@@ -292,12 +292,12 @@ void DofObject::set_n_vars(const unsigned int s,
   for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
     if (s_ctr != s)
       libmesh_assert(this->n_vars(s_ctr) == old_system_sizes[s_ctr]);
-		  
+
 //   std::cout << " [ ";
 //   for (unsigned int i=0; i<_idx_buf.size(); i++)
 //     std::cout << _idx_buf[i] << " ";
 //   std::cout << "]\n";
-    
+
 #endif
 }
 
@@ -309,7 +309,7 @@ void DofObject::set_n_comp(const unsigned int s,
 {
   libmesh_assert (s   < this->n_systems());
   libmesh_assert (var < this->n_vars(s));
-  
+
   // Check for trivial return
   if (ncomp == this->n_comp(s,var)) return;
 
@@ -323,7 +323,7 @@ void DofObject::set_n_comp(const unsigned int s,
   _idx_buf[base_offset] = ncomp;
 
   // We use (invalid_id - 1) to signify no
-  // components for this object  
+  // components for this object
   _idx_buf[base_offset + 1] = (ncomp == 0) ? invalid_id - 1 : invalid_id;
 
   libmesh_assert (ncomp == this->n_comp(s,var));
@@ -347,20 +347,20 @@ void DofObject::set_dof_number(const unsigned int s,
 
   unsigned int
     &base_idx(_idx_buf[start_idx_sys + 2*var + 1]);
-  
+
   //We intend to change all dof numbers together or not at all
   if (comp)
-    libmesh_assert ((dn == invalid_id && base_idx == invalid_id) || 
+    libmesh_assert ((dn == invalid_id && base_idx == invalid_id) ||
 		    (dn == base_idx + comp));
   else
     base_idx = dn;
-  
+
 // #ifdef DEBUG
 //   std::cout << " [ ";
 //   for (unsigned int i=0; i<_idx_buf.size(); i++)
 //     std::cout << _idx_buf[i] << " ";
 //   std::cout << "]\n";
-    
+
 // #endif
 
   libmesh_assert(this->dof_number(s, var, comp) == dn);

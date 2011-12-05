@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -150,7 +150,7 @@ bool InfQuad4::contains_point (const Point& p, Real tol) const
        * and something else (not important) in radial direction.
        */
       FEType fe_type(default_order());
-  
+
       const Point mapped_point = FEInterface::inverse_map(dim(),
 							  fe_type,
 							  this,
@@ -198,7 +198,7 @@ AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
       // FIXME: Find out how to return non-proxy side
       libmesh_error();
     }
-    
+
   // How did we get here
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -213,7 +213,7 @@ void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
   libmesh_assert (iop != INVALID_IO_PACKAGE);
 
   conn.resize(4);
-  
+
   switch (iop)
     {
     case TECPLOT:
@@ -234,7 +234,7 @@ void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
     default:
       libmesh_error();
     }
-  
+
   libmesh_error();
 }
 

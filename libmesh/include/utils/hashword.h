@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -32,11 +32,11 @@
 // Standard.
 //
 // http://stackoverflow.com/questions/237370/does-stdsize-t-make-sense-in-c
-#include <stddef.h> 
+#include <stddef.h>
 
 
 // Anonymous namespace for utility functions used locally
-namespace 
+namespace
 {
   // Rotate x by k bits
   // @author Bob Jenkins, May 2006, Public Domain.
@@ -70,13 +70,13 @@ namespace
   inline
   void final(uint32_t& a, uint32_t& b, uint32_t& c)
   {
-    c ^= b; c -= rot(b,14); 
-    a ^= c; a -= rot(c,11); 
-    b ^= a; b -= rot(a,25); 
-    c ^= b; c -= rot(b,16); 
-    a ^= c; a -= rot(c,4);  
-    b ^= a; b -= rot(a,14); 
-    c ^= b; c -= rot(b,24); 
+    c ^= b; c -= rot(b,14);
+    a ^= c; a -= rot(c,11);
+    b ^= a; b -= rot(a,25);
+    c ^= b; c -= rot(b,16);
+    a ^= c; a -= rot(c,4);
+    b ^= a; b -= rot(a,14);
+    c ^= b; c -= rot(b,24);
   }
 } // end anonymous namespace
 
@@ -95,10 +95,10 @@ namespace libMesh
     {
       uint32_t a,b,c;
 
-      // Set up the internal state 
+      // Set up the internal state
       a = b = c = 0xdeadbeef + ((static_cast<uint32_t>(length))<<2) + initval;
 
-      //------------------------------------------------- handle most of the key 
+      //------------------------------------------------- handle most of the key
       while (length > 3)
 	{
 	  a += k[0];
@@ -109,18 +109,18 @@ namespace libMesh
 	  k += 3;
 	}
 
-      //------------------------------------------- handle the last 3 uint32_t's 
-      switch(length)                     // all the case statements fall through 
-	{ 
+      //------------------------------------------- handle the last 3 uint32_t's
+      switch(length)                     // all the case statements fall through
+	{
 	case 3 : c+=k[2];
 	case 2 : b+=k[1];
 	case 1 : a+=k[0];
 	  final(a,b,c);
-	case 0:     // case 0: nothing left to add 
+	case 0:     // case 0: nothing left to add
 	  break;
 	}
 
-      //------------------------------------------------------ report the result 
+      //------------------------------------------------------ report the result
       return c;
     }
 
@@ -133,7 +133,7 @@ namespace libMesh
     {
       uint32_t a,b,c;
 
-      // Set up the internal state 
+      // Set up the internal state
       a = b = c = 0xdeadbeef + 8 + initval;
 
       b+=second;

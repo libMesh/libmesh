@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -52,7 +52,7 @@ namespace {
     unsigned int       elem_id;
     unsigned short int side;
     short int          bc_id;
-    
+
     // Default constructor
     ElemBCData (unsigned int       elem_id_in=0,
 		unsigned short int side_in=0,
@@ -67,9 +67,9 @@ namespace {
     {
       if (this->elem_id == other.elem_id)
 	return (this->side < other.side);
-      
+
       return this->elem_id < other.elem_id;
-    }  
+    }
   };
 
   // comparison operator
@@ -81,7 +81,7 @@ namespace {
 
   bool operator < (const ElemBCData &elem_bc,
 		   const unsigned int &other_elem_id)
-    
+
   {
     return elem_bc.elem_id < other_elem_id;
   }
@@ -100,7 +100,7 @@ namespace {
     }
 
     bool operator()(const ElemBCData &elem_bc,
-		    const unsigned int &other_elem_id)    
+		    const unsigned int &other_elem_id)
     {
       return elem_bc.elem_id < other_elem_id;
     }
@@ -161,40 +161,40 @@ void XdrIO::write (const std::string& name)
       LegacyXdrIO(MeshOutput<MeshBase>::mesh(), this->binary()).write(name);
       return;
     }
-  
+
   Xdr io ((libMesh::processor_id() == 0) ? name : "", this->binary() ? ENCODE : WRITE);
 
   START_LOG("write()","XdrIO");
-  
+
   // convenient reference to our mesh
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
-  
+
   unsigned int
     n_elem     = mesh.n_elem(),
     n_nodes    = mesh.n_nodes(),
     n_bcs      = mesh.boundary_info->n_boundary_conds(),
-    n_p_levels = MeshTools::n_p_levels (mesh); 
+    n_p_levels = MeshTools::n_p_levels (mesh);
 
   bool write_parallel_files = this->write_parallel();
 
   //-------------------------------------------------------------
   // For all the optional files -- the default file name is "n/a".
-  // However, the user may specify an optional external file. 
-  
+  // However, the user may specify an optional external file.
+
   // If there are BCs and the user has not already provided a
   // file name then write to "."
   if (n_bcs &&
       this->boundary_condition_file_name() == "n/a")
     this->boundary_condition_file_name() = ".";
-  
-  // If there are more than one subdomains and the user has not specified an 
-  // external file then write the subdomain mapping to the default file "."  
-  if ((mesh.n_subdomains() > 0) && 
+
+  // If there are more than one subdomains and the user has not specified an
+  // external file then write the subdomain mapping to the default file "."
+  if ((mesh.n_subdomains() > 0) &&
       (this->subdomain_map_file_name() == "n/a"))
     this->subdomain_map_file_name() = ".";
 
   // In general we don't write the partition information.
-  
+
   // If we have p levels and the user has not already provided
   // a file name then write to "."
   if ((n_p_levels > 1) &&
@@ -206,14 +206,14 @@ void XdrIO::write (const std::string& name)
     {
       std::string full_ver = this->version() + (write_parallel_files ?  " parallel" : "");
       io.data (full_ver);
-      
+
       io.data (n_elem,  "# number of elements");
       io.data (n_nodes, "# number of nodes");
-      
+
       io.data (this->boundary_condition_file_name(), "# boundary condition specification file");
       io.data (this->subdomain_map_file_name(),      "# subdomain id specification file");
       io.data (this->partition_map_file_name(),      "# processor id specification file");
-      io.data (this->polynomial_level_file_name(),   "# p-level specification file");      
+      io.data (this->polynomial_level_file_name(),   "# p-level specification file");
     }
 
   if (write_parallel_files)
@@ -244,9 +244,9 @@ void XdrIO::write (const std::string& name)
     }
 
   STOP_LOG("write()","XdrIO");
-  
-  // pause all processes until the writing ends -- this will 
-  // protect for the pathological case where a write is 
+
+  // pause all processes until the writing ends -- this will
+  // protect for the pathological case where a write is
   // followed immediately by a read.  The write must be
   // guaranteed to complete first.
   io.close();
@@ -258,7 +258,7 @@ void XdrIO::write (const std::string& name)
 void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_dbg_var(n_elem)) const
 {
   libmesh_assert (io.writing());
-  
+
   const bool
     write_p_level      = ("." == this->polynomial_level_file_name()),
     write_partitioning = ("." == this->partition_map_file_name()),
@@ -270,7 +270,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 
   // We will only write active elements and their parents.
   const unsigned int n_active_levels = MeshTools::n_active_levels (mesh);
-  std::vector<unsigned int> 
+  std::vector<unsigned int>
     n_global_elem_at_level(n_active_levels), n_local_elem_at_level(n_active_levels);
 
   MeshBase::const_element_iterator it  = mesh.local_elements_end(), end=it;
@@ -289,10 +289,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
       libmesh_assert (tot_n_elem <= n_elem);
     }
 
-  std::vector<unsigned int> 
-    xfer_conn, recv_conn, output_buffer, 
-    n_elem_on_proc(libMesh::n_processors()), 
-    processor_offsets(libMesh::n_processors()), 
+  std::vector<unsigned int>
+    xfer_conn, recv_conn, output_buffer,
+    n_elem_on_proc(libMesh::n_processors()),
+    processor_offsets(libMesh::n_processors()),
     xfer_buf_sizes(libMesh::n_processors());
 
   typedef std::map<unsigned int, std::pair<unsigned int, unsigned int> > id_map_type;
@@ -307,7 +307,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
   for (; it != end; ++it)
     {
       pack_element (xfer_conn, *it);
-      parent_id_map[(*it)->id()] = std::make_pair(libMesh::processor_id(), 
+      parent_id_map[(*it)->id()] = std::make_pair(libMesh::processor_id(),
 						  my_next_elem++);
     }
   xfer_conn.push_back(my_next_elem); // toss in the number of elements transferred.
@@ -321,10 +321,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
     processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];
 
   // All processors send their xfer buffers to processor 0.
-  // Processor 0 will receive the data and write out the elements. 
+  // Processor 0 will receive the data and write out the elements.
   if (libMesh::processor_id() == 0)
     {
-      // Write the number of elements at this level.      
+      // Write the number of elements at this level.
       {
 	std::string comment = "# n_elem at level 0", legend  = ", [ type ";
 	if (write_partitioning)
@@ -344,22 +344,22 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
           if (pid == 0)
 	    recv_conn = xfer_conn;
           else
-	    Parallel::receive (pid, recv_conn);	
+	    Parallel::receive (pid, recv_conn);
 
 	  // at a minimum, the buffer should contain the number of elements,
 	  // which could be 0.
 	  libmesh_assert (!recv_conn.empty());
-	  
+
 	  const unsigned int n_elem_received = recv_conn.back();
 	  std::vector<unsigned int>::const_iterator it = recv_conn.begin();
-	  
+
 	  for (unsigned int elem=0; elem<n_elem_received; elem++, next_global_elem++)
 	    {
 	      output_buffer.clear();
 	      const unsigned int n_nodes = *it; ++it;
-	      output_buffer.push_back(*it);     /* type       */ ++it;	      
+	      output_buffer.push_back(*it);     /* type       */ ++it;
 	      /*output_buffer.push_back(*it);*/ /* id         */ ++it;
-	      
+
 	      if (write_partitioning)
 		output_buffer.push_back(*it); /* processor id */ ++it;
 
@@ -372,15 +372,15 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 #endif
 	      for (unsigned int node=0; node<n_nodes; node++, ++it)
 		output_buffer.push_back(*it);
-	      
+
 	      io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
-	    }       	
+	    }
 	}
     }
   else
     Parallel::send (0, xfer_conn);
 
-#ifdef LIBMESH_ENABLE_AMR  
+#ifdef LIBMESH_ENABLE_AMR
   //--------------------------------------------------------------------
   // Next write the remaining elements indirectly through their parents.
   // This will insure that the children are written in the proper order
@@ -391,7 +391,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 
       it  = mesh.local_level_elements_begin(level-1);
       end = mesh.local_level_elements_end  (level-1);
-      
+
       for (my_n_elem_written_at_level=0; it != end; ++it)
 	if (!(*it)->active()) // we only want the parents elements at this level, and
 	  {                   // there is no direct iterator for this obscure use
@@ -410,18 +410,18 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 		// this aproach introduces the possibility that we write
 		// non-local elements.  These elements may well be parents
 		// at the next step
-		child_id_map[child->id()] = std::make_pair (child->processor_id(), 
+		child_id_map[child->id()] = std::make_pair (child->processor_id(),
 							    my_n_elem_written_at_level++);
 	      }
 	  }
       xfer_conn.push_back(my_n_elem_written_at_level);
       my_size = xfer_conn.size();
       Parallel::gather (0, my_size,   xfer_buf_sizes);
-      
+
       // Processor 0 will receive the data and write the elements.
       if (libMesh::processor_id() == 0)
 	{
-	  // Write the number of elements at this level.      
+	  // Write the number of elements at this level.
 	  {
 	    char buf[80];
 	    std::sprintf(buf, "# n_elem at level %d", level);
@@ -437,31 +437,31 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 	    comment += legend;
 	    io.data (n_global_elem_at_level[level], comment.c_str());
 	  }
-	  
+
 	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
 	    {
 	      recv_conn.resize(xfer_buf_sizes[pid]);
               if (pid == 0)
 	        recv_conn = xfer_conn;
               else
-	        Parallel::receive (pid, recv_conn);	
+	        Parallel::receive (pid, recv_conn);
 
 	      // at a minimum, the buffer should contain the number of elements,
 	      // which could be 0.
 	      libmesh_assert (!recv_conn.empty());
 	      const unsigned int n_elem_received = recv_conn.back();
 	      std::vector<unsigned int>::const_iterator it = recv_conn.begin();
-	      
+
 	      for (unsigned int elem=0; elem<n_elem_received; elem++, next_global_elem++)
 		{
 		  output_buffer.clear();
 		  const unsigned int n_nodes = *it; ++it;
 		  output_buffer.push_back(*it);                   /* type          */ ++it;
 		  /*output_buffer.push_back(*it);*/               /* id            */ ++it;
-		  
-		  const unsigned int parent_local_id = *it; ++it; 
-		  const unsigned int parent_pid      = *it; ++it; 
-	      	      
+
+		  const unsigned int parent_local_id = *it; ++it;
+		  const unsigned int parent_pid      = *it; ++it;
+
 		  output_buffer.push_back (parent_local_id+processor_offsets[parent_pid]);
 
 		  if (write_partitioning)
@@ -469,32 +469,32 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 
 		  if (write_subdomain_id)
 		    output_buffer.push_back(*it); /* subdomain id */ ++it;
-		  
+
 		  if (write_p_level)
 		    output_buffer.push_back(*it); /* p level       */ ++it;
-		  
+
 		  for (unsigned int node=0; node<n_nodes; node++, ++it)
 		    output_buffer.push_back(*it);
-		  
+
 		  io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
-		}       		    
+		}
 	    }
-	}  
+	}
       else
         Parallel::send  (0, xfer_conn);
-  
+
       // update the processor_offsets
-      processor_offsets[0] = processor_offsets.back() + n_elem_on_proc.back();	  
+      processor_offsets[0] = processor_offsets.back() + n_elem_on_proc.back();
       Parallel::gather (0, my_n_elem_written_at_level, n_elem_on_proc);
       for (unsigned int pid=1; pid<libMesh::n_processors(); pid++)
-	processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];	    
+	processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];
 
-      // Now, at the next level we will again iterate over local parents.  However, 
-      // those parents may have been written by other processors (at this step), 
+      // Now, at the next level we will again iterate over local parents.  However,
+      // those parents may have been written by other processors (at this step),
       // so we need to gather them into our *_id_maps.
       {
 	std::vector<std::vector<unsigned int> > requested_ids(libMesh::n_processors());
-	std::vector<unsigned int> request_to_fill;	
+	std::vector<unsigned int> request_to_fill;
 
 	it  = mesh.local_level_elements_begin(level);
 	end = mesh.local_level_elements_end(level);
@@ -506,7 +506,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 	      requested_ids[(*it)->parent()->processor_id()].push_back((*it)->id());
 	    }
 
-	// Next set the child_ids 
+	// Next set the child_ids
 	for (unsigned int p=1; p != libMesh::n_processors(); ++p)
 	  {
 	    // Trade my requests with processor procup and procdown
@@ -520,7 +520,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 				   procdown, request_to_fill);
 
 	    // Fill those requests by overwriting the requested ids
-	    for (unsigned int i=0; i<request_to_fill.size(); i++)	   
+	    for (unsigned int i=0; i<request_to_fill.size(); i++)
 	      {
 		libmesh_assert (child_id_map.count(request_to_fill[i]));
 		libmesh_assert (child_id_map[request_to_fill[i]].first == procdown);
@@ -534,9 +534,9 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 				   procup, filled_request);
 
 	    libmesh_assert (filled_request.size() == requested_ids[procup].size());
-	    
+
 	    for (unsigned int i=0; i<filled_request.size(); i++)
-	      child_id_map[requested_ids[procup][i]] = 
+	      child_id_map[requested_ids[procup][i]] =
 		std::make_pair (procup,
 				filled_request[i]);
 	  }
@@ -548,7 +548,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 #endif // LIBMESH_ENABLE_AMR
   if (libMesh::processor_id() == 0)
     libmesh_assert (next_global_elem == n_elem);
-  
+
 }
 
 
@@ -578,7 +578,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 	end = mesh.local_nodes_end();
 
       xfer_ids.clear(); xfer_coords.clear();
-      
+
       for (; it!=end; ++it)
 	if (((*it)->id() >= first_node) && // node in [first_node, last_node)
 	    ((*it)->id() <  last_node))
@@ -609,7 +609,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 	  coords_size.reserve(libMesh::n_processors());
 	  for (unsigned int p=0; p<ids_size.size(); p++)
 	    coords_size.push_back(LIBMESH_DIM*ids_size[p]);
-	}			  
+	}
 
       // We will have lots of simultaneous receives if we are
       // processor 0, so let's use nonblocking receives.
@@ -620,7 +620,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
       Parallel::MessageTag
         id_tag    = Parallel::Communicator_World.get_unique_tag(1234),
         coord_tag = Parallel::Communicator_World.get_unique_tag(1235);
-      
+
       // Post the receives -- do this on processor 0 only.
       if (libMesh::processor_id() == 0)
         {
@@ -628,7 +628,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
             {
               recv_ids[pid].resize(ids_size[pid]);
               recv_coords[pid].resize(coords_size[pid]);
-            
+
               if (pid == 0)
                 {
                   recv_ids[0] = xfer_ids;
@@ -661,7 +661,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
           // buffer sizes.
 	  Parallel::wait (id_request_handles);
 	  Parallel::wait (coord_request_handles);
-          
+
           // Write the coordinates in this block.
 	  unsigned int tot_id_size=0, tot_coord_size=0;
 	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
@@ -680,7 +680,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 		const unsigned int local_idx = recv_ids[pid][idx] - first_node;
 		libmesh_assert ((3*local_idx+2) < coords.size());
 		libmesh_assert ((LIBMESH_DIM*idx+LIBMESH_DIM-1)      < recv_coords[pid].size());
-		
+
 		coords[3*local_idx+0] = recv_coords[pid][LIBMESH_DIM*idx+0];
 #if LIBMESH_DIM > 1
 		coords[3*local_idx+1] = recv_coords[pid][LIBMESH_DIM*idx+1];
@@ -708,12 +708,12 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
 void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
 {
   libmesh_assert (io.writing());
-  
+
   if (!n_bcs) return;
-  
+
   // convenient reference to our mesh
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
-  
+
   // and our boundary info object
   const BoundaryInfo &boundary_info = *mesh.boundary_info;
 
@@ -724,7 +724,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
 
   std::vector<int> xfer_bcs, recv_bcs;
   std::vector<unsigned int> bc_sizes(libMesh::n_processors());;
-  
+
   // Boundary conditions are only specified for level-0 elements
   MeshBase::const_element_iterator
     it  = mesh.local_level_elements_begin(0),
@@ -757,7 +757,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
   xfer_bcs.push_back(n_local_level_0_elem);
   unsigned int my_size = xfer_bcs.size();
   Parallel::gather (0, my_size, bc_sizes);
-  
+
   // All processors send their xfer buffers to processor 0
   // Processor 0 will receive all buffers and write out the bcs
   if (libMesh::processor_id() == 0)
@@ -770,20 +770,20 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
           else
 	    Parallel::receive (pid, recv_bcs);
 
-	  const unsigned int n_local_level_0_elem 
+	  const unsigned int n_local_level_0_elem
 	    = recv_bcs.back(); recv_bcs.pop_back();
-	  
+
 	  for (unsigned int idx=0; idx<recv_bcs.size(); idx += 3, n_bcs_out++)
 	    recv_bcs[idx+0] += elem_offset;
 
 	  io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0], recv_bcs.size(), 3);
 	  elem_offset += n_local_level_0_elem;
-	}    
+	}
       libmesh_assert (n_bcs == n_bcs_out);
     }
   else
     Parallel::send (0, xfer_bcs);
-} 
+}
 
 
 
@@ -793,15 +793,15 @@ void XdrIO::read (const std::string& name)
   // there may be an underlying bzip/bunzip going on, and multiple simultaneous
   // calls will produce a race condition.
   Xdr io (libMesh::processor_id() == 0 ? name : "", this->binary() ? DECODE : READ);
-   
+
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
-  // get the version string.   
-  if (libMesh::processor_id() == 0)    
+  // get the version string.
+  if (libMesh::processor_id() == 0)
     io.data (this->version());
-  Parallel::broadcast (this->version());  
-  
+  Parallel::broadcast (this->version());
+
   // note that for "legacy" files the first entry is an
   // integer -- not a string at all.
   this->legacy() = !(this->version().find("libMesh") < this->version().size());
@@ -815,7 +815,7 @@ void XdrIO::read (const std::string& name)
     }
 
   START_LOG("read()","XdrIO");
-  
+
   unsigned int n_elem, n_nodes;
   if (libMesh::processor_id() == 0)
     {
@@ -834,7 +834,7 @@ void XdrIO::read (const std::string& name)
   Parallel::broadcast (this->subdomain_map_file_name());
   Parallel::broadcast (this->partition_map_file_name());
   Parallel::broadcast (this->polynomial_level_file_name());
-  
+
   // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
   // this may allow for efficient adding of nodes/elements.
   mesh.reserve_elem(n_elem);
@@ -844,13 +844,13 @@ void XdrIO::read (const std::string& name)
   this->read_serialized_connectivity (io, n_elem);
 
   // read the nodal locations
-  this->read_serialized_nodes (io, n_nodes);  
+  this->read_serialized_nodes (io, n_nodes);
 
   // read the boundary conditions
   this->read_serialized_bcs (io);
 
   STOP_LOG("read()","XdrIO");
-   
+
   // set the node processor ids
   Partitioner::set_node_processor_ids(mesh);
 }
@@ -862,12 +862,12 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
   libmesh_assert (io.reading());
 
   if (!n_elem) return;
-  
+
   const bool
     read_p_level      = ("." == this->polynomial_level_file_name()),
     read_partitioning = ("." == this->partition_map_file_name()),
     read_subdomain_id = ("." == this->subdomain_map_file_name());
-  
+
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
@@ -878,7 +878,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
   std::vector<unsigned int> conn, input_buffer(100 /* oversized ! */);
 
   int level=-1;
-  
+
   for (unsigned int blk=0, first_elem=0, last_elem=0, n_elem_at_level=0, n_processed_at_level=0;
        last_elem<n_elem; blk++)
     {
@@ -897,8 +897,8 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 		n_processed_at_level = 0;
 		level++;
 	      }
-	    
-	    // get the element type, 
+
+	    // get the element type,
 	    io.data_stream (&input_buffer[0], 1);
 
 	    // maybe the parent
@@ -916,7 +916,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	    // maybe the subdomain id
 	    if (read_subdomain_id)
 	      io.data_stream (&input_buffer[3], 1);
-	    else 
+	    else
 	      input_buffer[3] = 0;
 
 	    // maybe the p level
@@ -924,7 +924,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	      io.data_stream (&input_buffer[4], 1);
 	    else
 	      input_buffer[4] = 0;
-	    
+
 	    // and all the nodes
 	    libmesh_assert (5+Elem::type_to_n_nodes_map[input_buffer[0]] < input_buffer.size());
 	    io.data_stream (&input_buffer[5], Elem::type_to_n_nodes_map[input_buffer[0]]);
@@ -932,14 +932,14 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 			 input_buffer.begin(),
 			 input_buffer.begin() + 5 + Elem::type_to_n_nodes_map[input_buffer[0]]);
 	  }
-      
+
       unsigned int conn_size = conn.size();
-      Parallel::broadcast(conn_size);	    
+      Parallel::broadcast(conn_size);
       conn.resize (conn_size);
       Parallel::broadcast (conn);
 
       // All processors now have the connectivity for this block.
-      std::vector<unsigned int>::const_iterator it = conn.begin();      
+      std::vector<unsigned int>::const_iterator it = conn.begin();
       for (unsigned int e=first_elem; e<last_elem; e++)
 	{
 	  const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
@@ -973,10 +973,10 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	    {
 	      const unsigned int global_node_number = *it;
 
-	      elem->set_node(n) = 
+	      elem->set_node(n) =
 		mesh.add_point (Point(), global_node_number);
 	    }
-	  
+
           elems_of_dimension[elem->dim()] = true;
 	  mesh.add_elem(elem);
 	}
@@ -1005,10 +1005,10 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 void XdrIO::read_serialized_nodes (Xdr &io, const unsigned int n_nodes)
 {
   libmesh_assert (io.reading());
-  
+
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
-  
+
   if (!mesh.n_nodes()) return;
 
   // At this point the elements have been read from file and placeholder nodes
@@ -1043,9 +1043,9 @@ void XdrIO::read_serialized_nodes (Xdr &io, const unsigned int n_nodes)
     {
       first_node = blk*io_blksize;
       last_node  = std::min((blk+1)*io_blksize, n_nodes);
-      
+
       coords.resize(3*(last_node - first_node));
-	
+
       if (libMesh::processor_id() == 0)
 	io.data_stream (coords.empty() ? NULL : &coords[0], coords.size());
 
@@ -1053,7 +1053,7 @@ void XdrIO::read_serialized_nodes (Xdr &io, const unsigned int n_nodes)
       // block may not actually need these data.  It may be worth profiling this,
       // although it is expected that disk IO will be the bottleneck
       Parallel::broadcast (coords);
-      
+
       for (unsigned int n=first_node, idx=0; n<last_node; n++, idx+=3)
 	{
 	  // first see if we need this node.  use pos.first as a smart lower
@@ -1064,14 +1064,14 @@ void XdrIO::read_serialized_nodes (Xdr &io, const unsigned int n_nodes)
 	  if (pos.first != pos.second) // we need this node.
 	    {
 	      libmesh_assert (*pos.first == n);
-	      mesh.node(n) = 
+	      mesh.node(n) =
 		Point (coords[idx+0],
 		       coords[idx+1],
 		       coords[idx+2]);
 
 	    }
-	}	  
-    }    
+	}
+    }
 }
 
 
@@ -1081,10 +1081,10 @@ void XdrIO::read_serialized_bcs (Xdr &io)
   if (this->boundary_condition_file_name() == "n/a") return;
 
   libmesh_assert (io.reading());
-  
+
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
-  
+
   // and our boundary info object
   BoundaryInfo &boundary_info = *mesh.boundary_info;
 
@@ -1092,7 +1092,7 @@ void XdrIO::read_serialized_bcs (Xdr &io)
   std::vector<int> input_buffer;
 
   unsigned int n_bcs=0;
-  if (libMesh::processor_id() == 0) 
+  if (libMesh::processor_id() == 0)
     io.data (n_bcs);
   Parallel::broadcast (n_bcs);
 
@@ -1105,7 +1105,7 @@ void XdrIO::read_serialized_bcs (Xdr &io)
 
       if (libMesh::processor_id() == 0)
 	io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0], input_buffer.size());
-      
+
       Parallel::broadcast (input_buffer);
       elem_bc_data.clear(); /**/ elem_bc_data.reserve (input_buffer.size()/3);
 
@@ -1123,7 +1123,7 @@ void XdrIO::read_serialized_bcs (Xdr &io)
 	it  = mesh.level_elements_begin(0),
 	end = mesh.level_elements_end(0);
 
-      // Look for BCs in this block for all the level-0 elements we have 
+      // Look for BCs in this block for all the level-0 elements we have
       // (not just local ones).  Do this by finding all the entries
       // in elem_bc_data whose elem_id match the ID of the current element.
       // We cannot rely on NULL neighbors at this point since the neighbor
@@ -1141,39 +1141,39 @@ void XdrIO::read_serialized_bcs (Xdr &io)
 	    libmesh_assert (pos.first->side < (*it)->n_sides());
 
 	    boundary_info.add_side (*it, pos.first->side, pos.first->bc_id);
-	  }	
+	  }
     }
 }
 
 
 
-void XdrIO::pack_element (std::vector<unsigned int> &conn, const Elem *elem, 
+void XdrIO::pack_element (std::vector<unsigned int> &conn, const Elem *elem,
 			  const unsigned int parent_id, const unsigned int parent_pid) const
 {
   libmesh_assert (elem != NULL);
   libmesh_assert (elem->n_nodes() == Elem::type_to_n_nodes_map[elem->type()]);
-  
+
   conn.push_back(elem->n_nodes());
 
   conn.push_back (elem->type());
   conn.push_back (elem->id());
-  
+
   if (parent_id != libMesh::invalid_uint)
     {
       conn.push_back (parent_id);
       libmesh_assert (parent_pid != libMesh::invalid_uint);
       conn.push_back (parent_pid);
     }
-  
+
   conn.push_back (elem->processor_id());
   conn.push_back (elem->subdomain_id());
-  
+
 #ifdef LIBMESH_ENABLE_AMR
   conn.push_back (elem->p_level());
 #endif
-  
+
   for (unsigned int n=0; n<elem->n_nodes(); n++)
-    conn.push_back (elem->node(n));                 
+    conn.push_back (elem->node(n));
 }
 
 } // namespace libMesh

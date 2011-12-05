@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -124,12 +124,12 @@ vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 				float pnt[LIBMESH_DIM];
 				for(unsigned int i=0;i<LIBMESH_DIM;++i){
 					pnt[i] = (*node)(i);
-				} 
+				}
 				//     pcoords->InsertNextTuple(pnt);
 				pcoords->SetTuple(node->id(),pnt);
-				//     libMesh::out<<"pnt "<<pnt[0]<<" "<<pnt[1]<<" "<<pcoords-><<std::endl;  
+				//     libMesh::out<<"pnt "<<pnt[0]<<" "<<pnt[1]<<" "<<pcoords-><<std::endl;
 				//     points->InsertPoint(node->id(),pnt);
-				//     libMesh::out<<"point "<<node->id()<<" "<<(*node)(0)<<" "<<(*node)(1)<<std::endl;  
+				//     libMesh::out<<"point "<<node->id()<<" "<<(*node)(0)<<" "<<(*node)(1)<<std::endl;
 			}
 			points->SetData(pcoords);
 			pcoords->Delete();
@@ -147,7 +147,7 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, std::vector<int>& types)
 		vtkIdList *pts = vtkIdList::New();
 
 		MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-		const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+		const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
                 int active_element_counter = 0;
 
@@ -158,68 +158,68 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, std::vector<int>& types)
 
 			switch(elem->type())
 			{
-				case EDGE2:				
+				case EDGE2:
 					celltype = VTK_LINE;
 					break;
-				case EDGE3:      
+				case EDGE3:
 					celltype = VTK_QUADRATIC_EDGE;
 					break;// 1
-				case TRI3:       
+				case TRI3:
 					celltype = VTK_TRIANGLE;
 					break;// 3
-				case TRI6:       
+				case TRI6:
 					celltype = VTK_QUADRATIC_TRIANGLE;
 					break;// 4
-				case QUAD4:      
+				case QUAD4:
 					celltype = VTK_QUAD;
 					break;// 5
-				case QUAD8:      
+				case QUAD8:
 					celltype = VTK_QUADRATIC_QUAD;
 					break;// 6
-				case TET4:      
+				case TET4:
 					celltype = VTK_TETRA;
 					break;// 8
-				case TET10:      
+				case TET10:
 					celltype = VTK_QUADRATIC_TETRA;
 					break;// 9
-				case HEX8:    
+				case HEX8:
 					celltype = VTK_HEXAHEDRON;
 					break;// 10
-				case HEX20:      
+				case HEX20:
 					celltype = VTK_QUADRATIC_HEXAHEDRON;
 					break;// 12
-				case PRISM6:     
+				case PRISM6:
 					celltype = VTK_WEDGE;
 					break;// 13
-				case PRISM15:   
+				case PRISM15:
 					celltype = VTK_QUADRATIC_WEDGE;
 					break;// 14
-				case PRISM18:   
+				case PRISM18:
 				  celltype = VTK_BIQUADRATIC_QUADRATIC_WEDGE;
 				  break;
-				case HEX27:      
+				case HEX27:
 				  celltype = VTK_TRIQUADRATIC_HEXAHEDRON;
 				  break;
 				case PYRAMID5:
 					celltype = VTK_PYRAMID;
 					break;// 16
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
-				case QUAD9:      
+				case QUAD9:
 					celltype = VTK_BIQUADRATIC_QUAD;
 					break;
 #else
 				case QUAD9:
-#endif 
-				case EDGE4:      
-				case INFEDGE2:   
-				case INFQUAD4:   
-				case INFQUAD6:   
-				case INFHEX8:    
-				case INFHEX16:   
-				case INFHEX18:   
-				case INFPRISM6:  
-				case INFPRISM12: 
-				case NODEELEM:   
+#endif
+				case EDGE4:
+				case INFEDGE2:
+				case INFQUAD4:
+				case INFQUAD6:
+				case INFHEX8:
+				case INFHEX16:
+				case INFHEX18:
+				case INFPRISM6:
+				case INFPRISM12:
+				case NODEELEM:
 				case INVALID_ELEM:
 				default:
 					{
@@ -227,23 +227,23 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, std::vector<int>& types)
 						libmesh_error();
 					}
 			}
-			//        libMesh::out<<"elem "<<elem->n_nodes()<<" "<<elem->n_sub_elem()<<std::endl;  
-			//        libMesh::out<<"type "<<celltype<<" "<<VTK_BIQUADRATIC_QUAD<<std::endl;  
+			//        libMesh::out<<"elem "<<elem->n_nodes()<<" "<<elem->n_sub_elem()<<std::endl;
+			//        libMesh::out<<"type "<<celltype<<" "<<VTK_BIQUADRATIC_QUAD<<std::endl;
 			types[active_element_counter] = celltype;
 			pts->SetNumberOfIds(elem->n_nodes());
 			// get the connectivity for this element
 			std::vector<unsigned int> conn;
 			elem->connectivity(0,VTK,conn);
-			//        libMesh::out<<"conn size "<<conn.size()<<std::endl;  
+			//        libMesh::out<<"conn size "<<conn.size()<<std::endl;
 			for(unsigned int i=0;i<conn.size();++i)
 			{
-				//           libMesh::out<<" sz "<<pts->GetNumberOfIds()<<std::endl;  
+				//           libMesh::out<<" sz "<<pts->GetNumberOfIds()<<std::endl;
 				pts->InsertId(i,conn[i]);
-			} 
-			//        libMesh::out<<"set cell"<<std::endl;  
+			}
+			//        libMesh::out<<"set cell"<<std::endl;
 			cells->InsertNextCell(pts);
 			//         }
-			//         libMesh::out<<"finish set cell"<<std::endl;  
+			//         libMesh::out<<"finish set cell"<<std::endl;
 		} // end loop over active elements
 		pts->Delete();
 
@@ -261,9 +261,9 @@ void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid
 //   if (libMesh::processor_id() == 0)
 //      {
 //   std::vector<Number> soln;
-//   libMesh::out<<"build"<<std::endl;  
+//   libMesh::out<<"build"<<std::endl;
 //   es.build_solution_vector(soln);
-//   libMesh::out<<"add solution "<<soln.size()<<std::endl;  
+//   libMesh::out<<"add solution "<<soln.size()<<std::endl;
 
 	if(libMesh::processor_id()==0){
 		const MeshBase& mesh = (MeshBase&)es.get_mesh();
@@ -273,8 +273,8 @@ void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid
 			for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
 				for(unsigned int j=0;j<n_vars;++j){
 					const System& sys = es.get_system(i);
-					const std::string& varname = sys.variable_name(j); 
-					vtkFloatArray *data = vtkFloatArray::New(); 
+					const std::string& varname = sys.variable_name(j);
+					vtkFloatArray *data = vtkFloatArray::New();
 					data->SetName(varname.c_str());
 					data->SetNumberOfValues(n_nodes);
 					MeshBase::const_node_iterator it = mesh.nodes_begin();
@@ -290,10 +290,10 @@ void VTKIO::solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid
 						}else{
 							data->InsertValue((*it)->id(),0);
 						}
-					} 
+					}
 					grid->GetPointData()->AddArray(data);
-				} 
-			} 
+				}
+			}
    }
 }*/
 
@@ -318,7 +318,7 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 
 				std::string name = sys.variable_name(j);
 
-				vtkDoubleArray *data = vtkDoubleArray::New(); 
+				vtkDoubleArray *data = vtkDoubleArray::New();
 
 				data->SetName(name.c_str());
 
@@ -334,11 +334,11 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 					data->SetValue(k,soln[dof_nr]);
 #endif
 
-				} 
+				}
 				grid->GetPointData()->AddArray(data);
 				data->Delete();
-			} 
-			
+			}
+
 		}
 	}
 }
@@ -350,27 +350,27 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid){
 	if (libMesh::processor_id() == 0){
 
-		std::map<std::string,std::vector<Number> > vecs; 
+		std::map<std::string,std::vector<Number> > vecs;
 		for(unsigned int i=0;i<es.n_systems();++i){
 			const System& sys = es.get_system(i);
 			System::const_vectors_iterator v_end = sys.vectors_end();
 			System::const_vectors_iterator it = sys.vectors_begin();
 			for(;it!= v_end;++it){ // for all vectors on this system
-				std::vector<Number> values; 	
-//				libMesh::out<<"it "<<it->first<<std::endl;  
+				std::vector<Number> values;
+//				libMesh::out<<"it "<<it->first<<std::endl;
 
 				it->second->localize_to_one(values,0);
-//				libMesh::out<<"finish localize"<<std::endl;  
+//				libMesh::out<<"finish localize"<<std::endl;
 				vecs[it->first] = values;
 			}
 		}
 
 
-		std::map<std::string,std::vector<Number> >::iterator it = vecs.begin(); 
+		std::map<std::string,std::vector<Number> >::iterator it = vecs.begin();
 
 		for(;it!=vecs.end();++it){
 
-			vtkDoubleArray *data = vtkDoubleArray::New(); 
+			vtkDoubleArray *data = vtkDoubleArray::New();
 
 			data->SetName(it->first.c_str());
 
@@ -390,7 +390,7 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 
 			grid->GetPointData()->AddArray(data);
 			data->Delete();
-		} 
+		}
 
 	}
 
@@ -398,35 +398,35 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 	// write out the vectors added to the systems
 	if (libMesh::processor_id() == 0)
 		{
-			libMesh::out<<"write system vectors"<<std::endl;  
+			libMesh::out<<"write system vectors"<<std::endl;
 		const MeshBase& mesh = (MeshBase&)es.get_mesh();
 		const unsigned int n_nodes = mesh.n_nodes();
 		for(unsigned int i=0;i<es.n_systems();++i){ // for all systems, regardless of whether they are active or not
 			const System& sys = es.get_system(i);
-			libMesh::out<<"i "<<i<<std::endl;  
+			libMesh::out<<"i "<<i<<std::endl;
 			System::const_vectors_iterator v_end = sys.vectors_end();
 			System::const_vectors_iterator it = sys.vectors_begin();
 			for(;it!= v_end;++it){ // for all vectors on this system
-				libMesh::out<<"it- "<<it->second->size()<<" "<<n_nodes<<" "<<it->first<<std::endl;  
-				vtkFloatArray *data = vtkFloatArray::New(); 
+				libMesh::out<<"it- "<<it->second->size()<<" "<<n_nodes<<" "<<it->first<<std::endl;
+				vtkFloatArray *data = vtkFloatArray::New();
 				data->SetName(it->first.c_str());
-				std::vector<Number> values; 	
+				std::vector<Number> values;
 				it->second->localize(values);
 				data->SetNumberOfValues(n_nodes);
 
 
 	//         MeshBase::const_node_iterator it = mesh.active_nodes_begin();
 	//         const MeshBase::const_node_iterator n_end = mesh.nodes_end();
-	//         for(unsigned int count=0;it!=n_end;++it,++count){			
+	//         for(unsigned int count=0;it!=n_end;++it,++count){
 				for(unsigned int j=0;j<n_nodes;++j){
-					libMesh::out<<"j "<<j<<" "<<(*it->second).size()<<std::endl;  
+					libMesh::out<<"j "<<j<<" "<<(*it->second).size()<<std::endl;
 //               const unsigned int dof_nr = mesh.node(j).dof_number(i,0,0);
 					data->SetValue(j,values[j]);
 	//            it++;
-				} 
-				grid->GetPointData()->AddArray(data);		
-			} 
-		} 
+				}
+				grid->GetPointData()->AddArray(data);
+			}
+		}
 	}*/
 }
 
@@ -436,7 +436,7 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 inline void meshdata_to_vtk(const MeshData& meshdata,
 										vtkUnstructuredGrid* grid){
 	vtkPointData* pointdata = vtkPointData::New();
-	
+
 	const unsigned int n_vn = meshdata.n_val_per_node();
 	const unsigned int n_dat = meshdata.n_node_data();
 
@@ -467,14 +467,14 @@ void VTKIO::read (const std::string& name)
   libmesh_error();
 
 #else
-//  libMesh::out<<"read "<<name <<std::endl;  
+//  libMesh::out<<"read "<<name <<std::endl;
   vtkXMLUnstructuredGridReader *reader = vtkXMLUnstructuredGridReader::New();
   reader->SetFileName( name.c_str() );
-  //libMesh::out<<"force read"<<std::endl;  
+  //libMesh::out<<"force read"<<std::endl;
   // Force reading
   reader->Update();
 
-  // read in the grid   
+  // read in the grid
 //  vtkUnstructuredGrid *grid = reader->GetOutput();
   _vtk_grid = reader->GetOutput();
   _vtk_grid->Update();
@@ -485,7 +485,7 @@ void VTKIO::read (const std::string& name)
 
   // Clear out any pre-existing data from the Mesh
   mesh.clear();
-	
+
   // always numbered nicely??, so we can loop like this
   // I'm pretty sure it is numbered nicely
   for (unsigned int i=0; i < static_cast<unsigned int>(_vtk_grid->GetNumberOfPoints()); ++i)
@@ -501,7 +501,7 @@ void VTKIO::read (const std::string& name)
       if (this->_mesh_data != NULL)
 	this->_mesh_data->add_foreign_node_id (newnode, i);
     }
-	
+
   for (unsigned int i=0; i < static_cast<unsigned int>(_vtk_grid->GetNumberOfCells()); ++i)
     {
       vtkCell* cell = _vtk_grid->GetCell(i);
@@ -518,8 +518,8 @@ void VTKIO::read (const std::string& name)
 	case VTK_HEXAHEDRON:
 	  elem = new Hex8();
 	  break;
-	case VTK_PYRAMID:	
-	  elem = new Pyramid5();					
+	case VTK_PYRAMID:
+	  elem = new Pyramid5();
 	  break;
 	case VTK_QUADRATIC_HEXAHEDRON:
   	  elem = new Hex20();
@@ -535,15 +535,15 @@ void VTKIO::read (const std::string& name)
   // get the straightforward numbering from the VTK cells
   for(unsigned int j=0;j<elem->n_nodes();++j){
 	  elem->set_node(j) = mesh.node_ptr(cell->GetPointId(j));
-  } 
-  // then get the connectivity 
+  }
+  // then get the connectivity
   std::vector<unsigned int> conn;
   elem->connectivity(0,VTK,conn);
   // then reshuffle the nodes according to the connectivity, this
   // two-time-assign would evade the definition of the vtk_mapping
   for(unsigned int j=0;j<conn.size();++j){
 	  elem->set_node(j) = mesh.node_ptr(conn[j]);
-  } 
+  }
   elem->set_id(i);
 
   elems_of_dimension[elem->dim()] = true;
@@ -578,7 +578,7 @@ void VTKIO::read (const std::string& name)
  */
 /**
  * This method writes out the equationsystems to a .pvtu file (VTK parallel
- * unstructured grid). 
+ * unstructured grid).
  */
 void VTKIO::write_equation_systems(const std::string& fname, const EquationSystems& es)
 {
@@ -586,12 +586,12 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 
   // Do something with the es to avoid a compiler warning.
   es.n_systems();
-  
+
   libMesh::err << "Cannot write VTK file: " << fname
 	        << "\nYou must have VTK installed and correctly configured to read VTK meshes."
 	        << std::endl;
   libmesh_error();
-  
+
 #else
 
   // We may need to gather a ParallelMesh to output it, making that
@@ -618,24 +618,24 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 		*/
 	  _vtk_grid = vtkUnstructuredGrid::New();
 	  writer = vtkXMLPUnstructuredGridWriter::New();
-//	  libMesh::out<<"get points "<<std::endl;  
+//	  libMesh::out<<"get points "<<std::endl;
 	  pnts = nodes_to_vtk(mesh);
 	  _vtk_grid->SetPoints(pnts);
-	 
+
 	  types.resize(n_active_elem);
-//	  libMesh::out<<"get cells"<<std::endl;  
+//	  libMesh::out<<"get cells"<<std::endl;
 	  cells = cells_to_vtk(mesh, types);
-//	  libMesh::out<<"set cells"<<std::endl;  
+//	  libMesh::out<<"set cells"<<std::endl;
 	  _vtk_grid->SetCells(&types[0],cells);
   }
-	  
+
 	  // I'd like to write out meshdata, but this requires some coding, in
 	  // particular, non_const meshdata iterators
 	  //   const MeshData& md = es.get_mesh_data();
 	  //   if(es.has_mesh_data())
 	  //      meshdata_to_vtk(md,_vtk_grid);
 	  //   libmesh_assert (soln.size() ==mesh.n_nodes()*names.size());
-//	  libMesh::out<<"write solution"<<std::endl;  
+//	  libMesh::out<<"write solution"<<std::endl;
 
           // call solution_to_vtk on all processors to allow localization of the solution in it
 	  solution_to_vtk(es,_vtk_grid);
@@ -660,11 +660,11 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 }
 
 /**
- * This method implements writing to a .vtu (VTK Unstructured Grid) file. 
- * This is one of the new style XML dataformats. 
+ * This method implements writing to a .vtu (VTK Unstructured Grid) file.
+ * This is one of the new style XML dataformats.
  */
 void VTKIO::write (const std::string& name)
-{	
+{
 #ifndef LIBMESH_HAVE_VTK
   libMesh::err << "Cannot write VTK file: " << name
 	        << "\nYou must have VTK installed and correctly configured to write VTK meshes."
@@ -685,11 +685,11 @@ void VTKIO::write (const std::string& name)
 
 	  _vtk_grid = vtkUnstructuredGrid::New();
 	  vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
-//	  libMesh::out<<"write nodes "<<std::endl;  
+//	  libMesh::out<<"write nodes "<<std::endl;
 	  vtkPoints* pnts = nodes_to_vtk(mesh);
 	  _vtk_grid->SetPoints(pnts);
 
-//	  libMesh::out<<"write elements "<<std::endl;  
+//	  libMesh::out<<"write elements "<<std::endl;
 	  std::vector<int> types(n_active_elem);
 	  vtkCellArray* cells = cells_to_vtk(mesh,types);
 	  _vtk_grid->SetCells(&types[0],cells);
@@ -706,4 +706,4 @@ void VTKIO::write (const std::string& name)
 
 } // namespace libMesh
 
-//  vim: sw=3 ts=3  
+//  vim: sw=3 ts=3

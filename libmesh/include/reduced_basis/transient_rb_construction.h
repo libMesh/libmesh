@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -109,7 +109,7 @@ public:
    * Overload to assemble the mass matrix operators.
    */
   virtual void assemble_all_affine_operators();
-  
+
   /**
    * Override to assemble the L2 matrix as well.
    */
@@ -121,11 +121,11 @@ public:
   void assemble_L2_matrix(SparseMatrix<Number>* input_matrix);
 
   /**
-   * Assemble the mass matrix at the current parameter 
+   * Assemble the mass matrix at the current parameter
    * and store it in input_matrix.
    */
   void assemble_mass_matrix(SparseMatrix<Number>* input_matrix);
-  
+
   /**
    * Add the scaled mass matrix (assembled for the current parameter)
    * to input_matrix.
@@ -140,7 +140,7 @@ public:
   void mass_matrix_scaled_matvec(Number scalar,
                                  NumericVector<Number>& dest,
                                  NumericVector<Number>& arg);
-  
+
   /**
    * Attach user-defined assembly routine
    * for the L2 matrix.
@@ -162,7 +162,7 @@ public:
    * Assemble the q^th affine term of the mass matrix and store it in input_matrix.
    */
   void assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix);
-  
+
   /**
    * Get a pointer to M_q.
    */
@@ -259,7 +259,7 @@ public:
    * If we are, then an initialization function must be attached to the system.
    */
   bool nonzero_initialization;
-  
+
   /**
    * Boolean flag that indicates whether we will compute the projection error
    * for the truth solution into the RB space (at every time level).
@@ -293,7 +293,7 @@ protected:
    * nonzero_initialization is true.
    */
   virtual void initialize_truth();
-  
+
   /**
    * Override to use the L2 product matrix for output
    * dual norm solves for transient state problems.
@@ -352,12 +352,12 @@ protected:
    * If negative, it's ignored.
    */
   int max_truth_solves;
-  
+
   /**
    * Function pointer for assembling the L2 matrix.
    */
   ElemAssembly* L2_assembly;
-  
+
   /**
    * The vector that stores the right-hand side for the initial
    * condition projections.

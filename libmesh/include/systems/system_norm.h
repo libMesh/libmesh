@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -50,19 +50,19 @@ namespace libMesh
 class SystemNorm
 {
 public:
-  
+
   /**
    * Constructor, defaults to DISCRETE_L2
    */
   SystemNorm();
-  
+
   /**
    * Constructor, for discrete vector norms, systems with one variable,
    * and systems for which the same norm type should be used with a
    * weight of one on each variable.
    */
   SystemNorm(const FEMNormType &t);
-  
+
   /**
    * Constructor, for unweighted sobolev norms on systems with multiple
    * variables.
@@ -82,10 +82,10 @@ public:
   SystemNorm(const std::vector<FEMNormType> &norms, std::vector<Real> &weights);
 
   /**
-   * Constructor, for weighted sobolev norms on systems with multiple 
+   * Constructor, for weighted sobolev norms on systems with multiple
    * variables and their adjoints
    *
-   * For a system with n variables, the final norm computed will be of the form 
+   * For a system with n variables, the final norm computed will be of the form
    * norm_u^T*R*norm_z where R is a scaling matrix
    */
   SystemNorm(const std::vector<FEMNormType> &norms, std::vector<std::vector<Real> > &weights);
@@ -94,7 +94,7 @@ public:
    * Copy Constructor
    */
   SystemNorm(const SystemNorm &s);
-  
+
   /**
    * Returns true if this is purely a discrete norm
    */
@@ -112,7 +112,7 @@ public:
   Real calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2);
 
    /**
-   * Returns true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false   
+   * Returns true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false
    */
   bool is_identity();
 
@@ -156,9 +156,9 @@ private:
   std::vector<Real> _weights_sq;
 
   /**
-   * One more data structure needed to store the off diagonal 
+   * One more data structure needed to store the off diagonal
    * components for the generalize SystemNorm case
-   */  
+   */
   std::vector<std::vector<Real> > _off_diagonal_weights;
 };
 
@@ -170,14 +170,14 @@ private:
 inline
 SystemNorm::SystemNorm() :
     _norms(1, DISCRETE_L2), _weights(1, 1.0), _weights_sq(1, 1.0)
-{ 
+{
 }
 
 
 inline
 SystemNorm::SystemNorm(const FEMNormType &t) :
     _norms(1, t), _weights(1, 1.0), _weights_sq(1, 1.0)
-{ 
+{
 }
 
 
@@ -223,7 +223,7 @@ inline
     }
   else
     {
-      // Loop over the entries of the user provided matrix and store its entries in 
+      // Loop over the entries of the user provided matrix and store its entries in
       // the _off_diagonal_weights or _diagonal_weights
       for(unsigned int i=0; i!=_off_diagonal_weights.size(); ++i)
         {
@@ -277,7 +277,7 @@ inline
 void SystemNorm::set_type(unsigned int var, const FEMNormType &t)
 {
   libmesh_assert (!_norms.empty());
-  
+
   if (var >= _norms.size())
     _norms.resize(var+1, t);
 
@@ -289,7 +289,7 @@ inline
 Real SystemNorm::weight(unsigned int var) const
 {
   libmesh_assert (!_weights.empty());
-  
+
   return (var < _weights.size()) ? _weights[var] : 1.0;
 }
 
@@ -298,7 +298,7 @@ inline
 void SystemNorm::set_weight(unsigned int var, Real w)
 {
   libmesh_assert (!_weights.empty());
-  
+
   if (var >= _weights.size())
     {
       _weights.resize(var+1, 1.0);
@@ -313,10 +313,10 @@ inline
   void SystemNorm::set_off_diagonal_weight(unsigned int i, unsigned int j, Real w)
 {
   libmesh_assert (!_weights.empty());
-  
+
   if (i >= _off_diagonal_weights.size())
-    {      
-      _off_diagonal_weights.resize(i+1);      
+    {
+      _off_diagonal_weights.resize(i+1);
     }
 
   if (j >= _off_diagonal_weights[i].size())
@@ -325,7 +325,7 @@ inline
     }
 
   _off_diagonal_weights[i][j] = w;
-  
+
 }
 
 
@@ -333,13 +333,13 @@ inline
 Real SystemNorm::weight_sq(unsigned int var) const
 {
   libmesh_assert (!_weights_sq.empty());
-  
+
   return (var < _weights_sq.size()) ? _weights_sq[var] : 1.0;
 }
 
 
 inline
-Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2) 
+Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2)
 {
   // The vectors are assumed to both be vectors of the (same number
   // of) components
@@ -353,40 +353,40 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<R
 
   // Initialize the variable val
   Real val = 0.;
-  
+
   // Loop over all the components of the system with explicit
   // weights
   for(unsigned int i = 0; i != diagsize; i++)
-    {            		
-      val += this->_weights[i] * v1[i] * v2[i];		
+    {
+      val += this->_weights[i] * v1[i] * v2[i];
     }
   // Loop over all the components of the system with implicit
   // weights
   for(unsigned int i = diagsize; i < vsize; i++)
-    {            		
-      val += v1[i] * v2[i];		
+    {
+      val += v1[i] * v2[i];
     }
-    
+
   // Loop over the components of the system
   unsigned int nrows = this->_off_diagonal_weights.size();
   libmesh_assert(vsize <= nrows);
 
   for(unsigned int i = 0; i != nrows; i++)
-    {		
+    {
       unsigned int ncols = this->_off_diagonal_weights[i].size();
       for(unsigned int j=0; j != ncols; j++)
         {
           // Note that the diagonal weights here were set to zero
           // in the constructor
-          val += this->_off_diagonal_weights[i][j] * v1[i] * v2[j];	    
+          val += this->_off_diagonal_weights[i][j] * v1[i] * v2[j];
         }
     }
-    
+
     return(val);
   }
 
 inline
-Real SystemNorm::calculate_norm(const std::vector<Real>& v1) 
+Real SystemNorm::calculate_norm(const std::vector<Real>& v1)
 {
   return this->calculate_norm(v1,v1);
 }
@@ -395,7 +395,7 @@ inline
 bool SystemNorm::is_identity()
 {
   unsigned int nrows = this->_off_diagonal_weights.size();
-  
+
   // If any of the off-diagonal elements is not 0, then we are in the non-identity case
   for(unsigned int i = 0; i != nrows; i++)
     {
@@ -418,7 +418,7 @@ bool SystemNorm::is_identity()
   // If all the off-diagonals elements are 0, and diagonal elements 1, then we are in an identity case
   return(true);
 }
-	
+
 } // namespace libMesh
 
 #endif // #define __system_norm_h__

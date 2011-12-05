@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -22,7 +22,7 @@
 // C++ includes
 #include <ctime>
 #include <sstream>
-#ifdef LIBMESH_HAVE_LOCALE    
+#ifdef LIBMESH_HAVE_LOCALE
 #include <locale>
 #endif
 
@@ -38,7 +38,7 @@ namespace Utility
   // creating a timestamp, otherwise, we'll fall back on the C way.
   std::string get_timestamp()
   {
-#ifdef LIBMESH_HAVE_LOCALE    
+#ifdef LIBMESH_HAVE_LOCALE
     // Create time_put "facet"
     std::locale loc;
     const std::time_put<char>& tp = std::use_facet <std::time_put<char> > (loc);
@@ -46,7 +46,7 @@ namespace Utility
     // Call C-style time getting functions
     time_t now    = time(NULL);
     tm* tm_struct = localtime(&now);
-  
+
     // Date will eventually be stored in this ostringstream's string
     std::ostringstream date_stream;
 
@@ -66,7 +66,7 @@ namespace Utility
     //	   tm_struct,                  /*tm*/
     //	   pattern,                    /*format begin*/
     //	   pattern+sizeof(pattern)-1); /*format end  */
-  
+
     return date_stream.str();
 #else
   // C-stye code originally found here:

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -81,10 +81,10 @@ public:
    * The type of the parent.
    */
   typedef FEMSystem Parent;
-  
+
   /**
    * Clear all the data structures associated with
-   * the system. 
+   * the system.
    */
   virtual void clear ();
 
@@ -92,7 +92,7 @@ public:
    * Perform a standard "solve" of the system, without doing continuation.
    */
   virtual void solve();
-  
+
   /**
    * Perform a continuation solve of the system.  In general, you can only
    * begin the continuation solves after either reading in or solving for two
@@ -106,7 +106,7 @@ public:
    * get the next initial guess.
    */
   void advance_arcstep();
-  
+
   /**
    * The continuation parameter must be a member variable of the
    * derived class, and the "continuation_parameter" pointer defined
@@ -130,7 +130,7 @@ public:
    * is 0.1
    */
   void set_max_arclength_stepsize(Real maxds) { ds=maxds; ds_current=maxds; }
-  
+
   /**
    * How tightly should the Newton iterations attempt to converge delta_lambda.
    * Defaults to 1.e-6.
@@ -149,7 +149,7 @@ public:
    * prevent oversolving.
    */
   Real initial_newton_tolerance;
-  
+
   /**
    * Stores the current solution and continuation parameter
    * (as "previous_u" and "old_continuation_paramter") for later referral.
@@ -183,7 +183,7 @@ public:
    * the others.
    */
   Real Theta;
-  
+
   /**
    * Another normalization parameter, which is described in the LOCA manual.
    * This one is designed to maintain a relatively "fixed" value of d(lambda)/ds.
@@ -258,7 +258,7 @@ public:
    * by quitting early.
    */
   bool newton_progress_check;
-  
+
 protected:
   /**
    * Initializes the member data fields associated with
@@ -280,7 +280,7 @@ protected:
    *     Fu(i) +=  ... // normal PDE residual
    *     break;
    *   }
-   * 	      
+   *
    * case G_Lambda:
    *   {
    *     Fu(i) += ... // derivative wrt control parameter
@@ -289,7 +289,7 @@ protected:
    */
   enum RHS_Mode {Residual,
 		 G_Lambda};
-  
+
   RHS_Mode rhs_mode;
 
 
@@ -331,7 +331,7 @@ private:
    * next solution.
    */
   void apply_predictor();
-  
+
   /**
    * Extra work vectors used by the continuation algorithm.
    * These are added to the system by the init_data() routine.
@@ -348,7 +348,7 @@ private:
 
   /**
    * The solution at the previous value of the continuation variable.
-   */ 
+   */
   NumericVector<Number>* previous_u;
 
   /**
@@ -374,12 +374,12 @@ private:
   NumericVector<Number>* delta_u;
 
   /**
-   * We maintain our own linear solver interface, for solving 
+   * We maintain our own linear solver interface, for solving
    * custom systems of equations and/or things which do not require
    * a full-blown NewtonSolver.
-   */ 
+   */
   AutoPtr<LinearSolver<Number> > linear_solver;
-  
+
   /**
    * False until initialize_tangent() is called
    */
@@ -391,21 +391,21 @@ private:
    * which are available to the "normal" Newton solver.
    */
   NewtonSolver* newton_solver;
-  
+
   /**
    * The most recent value of the derivative of the continuation parameter
    * with respect to s.  We use "lambda" here for shortness of notation, lambda
    * always refers to the continuation parameter.
-   */ 
+   */
   Real dlambda_ds;
 
   /**
    * The initial arclength stepsize, selected by the user.  This is
    * the max-allowable arclength stepsize, but the algorithm may frequently
-   * reduce ds near turning points.  
+   * reduce ds near turning points.
    */
   Real ds;
-  
+
   /**
    * Value of stepsize currently in use.  Will not exceed user-provided maximum
    * arclength stepize ds.

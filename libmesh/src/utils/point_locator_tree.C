@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -91,7 +91,7 @@ void PointLocatorTree::clear ()
 
 void PointLocatorTree::init (const Trees::BuildType build_type)
 {
-  libmesh_assert (this->_tree == NULL); 
+  libmesh_assert (this->_tree == NULL);
 
   if (this->_initialized)
     {
@@ -108,7 +108,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
           START_LOG("init(no master)", "PointLocatorTree");
 
 	  if (this->_mesh.mesh_dimension() == 3)
-	    _tree = new Trees::OctTree (this->_mesh, 200, build_type);		
+	    _tree = new Trees::OctTree (this->_mesh, 200, build_type);
 	  else
 	    {
 	      // A 1D/2D mesh in 3D space needs special consideration.
@@ -117,20 +117,20 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 	      // then we need an octree
 #if LIBMESH_DIM > 2
 	      bool is_planar_xy = false;
-	      
+
 	      // Build the bounding box for the mesh.  If the delta-z bound is
 	      // negligibly small then we can use a quadtree.
 	      {
 		MeshTools::BoundingBox bbox = MeshTools::bounding_box(this->_mesh);
-		
+
 		const Real
 		  Dx = bbox.second(0) - bbox.first(0),
 		  Dz = bbox.second(2) - bbox.first(2);
-		
+
 		if (std::abs(Dz/(Dx + 1.e-20)) < 1e-10)
 		  is_planar_xy = true;
 	      }
-	      		    
+
 	      if (!is_planar_xy)
 		_tree = new Trees::OctTree (this->_mesh, 200, build_type);
 	      else
@@ -142,7 +142,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 	}
 
       else
-	  
+
         {
 	  // We are _not_ the master.  Let our Tree point to
 	  // the master's tree.  But for this we first transform
@@ -183,7 +183,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 const Elem* PointLocatorTree::operator() (const Point& p) const
 {
   libmesh_assert (this->_initialized);
-  
+
   START_LOG("operator()", "PointLocatorTree");
 
   // First check the element from last time before asking the tree
@@ -205,7 +205,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 	      {
 		MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
 		const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
-		
+
 		for ( ; pos != end_pos; ++pos)
 		  if ((*pos)->contains_point(p))
                     {
@@ -218,7 +218,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 		  {
 		    libMesh::err << std::endl
 			          << " ******** Serious Problem.  Could not find an Element "
-			          << "in the Mesh" 
+			          << "in the Mesh"
 			          << std:: endl
 			          << " ******** that contains the Point "
 			          << p;
@@ -228,7 +228,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
             STOP_LOG("linear search", "PointLocatorTree");
 	  }
     }
-  
+
   // If we found an element, it should be active
   libmesh_assert (!this->_element || this->_element->active());
 
@@ -258,7 +258,7 @@ void PointLocatorTree::enable_out_of_mesh_mode (void)
 	    libmesh_error();
 	  }
 #endif
-      
+
       _out_of_mesh_mode = true;
     }
 }

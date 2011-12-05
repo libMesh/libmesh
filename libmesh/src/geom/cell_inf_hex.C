@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -76,8 +76,8 @@ unsigned int InfHex::key (const unsigned int s) const
 			   this->node(3),
 			   this->node(7),
 			   this->node(6));
-      
-	
+
+
     case 4: // the face at x = -1
 
       return
@@ -107,14 +107,14 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
     case 0:  // the face at z = -1
       // the base, where the infinite element couples to conventional
       // elements
-      {  
+      {
         Elem* face = new Quad4;
         AutoPtr<Elem> ap_face(face);
 
 	/*
 	 * Oops, here we are, claiming the normal of the face
 	 * elements point outwards -- and this is the exception:
-	 * For the side built from the base face, 
+	 * For the side built from the base face,
 	 * the normal is pointing _into_ the element!
 	 * Why is that? - In agreement with build_side(),
 	 * which in turn _has_ to build the face in this
@@ -138,7 +138,7 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(1);
 	face->set_node(2) = this->get_node(4);
 	face->set_node(3) = this->get_node(5);
-	
+
 	return ap_face;
       }
 
@@ -168,13 +168,13 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 	face->set_node(1) = this->get_node(3);
 	face->set_node(2) = this->get_node(6);
 	face->set_node(3) = this->get_node(7);
-	
+
 	return ap_face;
       }
 
     case 4: // the face at x = -1
       // this face connects to another infinite element
-      {  
+      {
         Elem* face = new InfQuad4;
         AutoPtr<Elem> ap_face(face);
 	//AutoPtr<Elem> face(new InfQuad4);
@@ -216,7 +216,7 @@ Real InfHex::quality (const ElemQuality q) const
 {
   switch (q)
     {
-      
+
       /**
        * Compue the min/max diagonal ratio.
        * Source: CUBIT User's Manual.
@@ -239,7 +239,7 @@ Real InfHex::quality (const ElemQuality q) const
 	const Real max = std::max(d02, d13);
 
 	libmesh_assert (max != 0.0);
-	
+
 	return min / max;
 
 	break;
@@ -268,7 +268,7 @@ Real InfHex::quality (const ElemQuality q) const
 	// Bottom
 	edge_ratios[8] = std::min(d01, d23) / std::max(d01, d23);
 	edge_ratios[9] = std::min(d03, d12) / std::max(d03, d12);
-	
+
 	return *(std::min_element(edge_ratios.begin(), edge_ratios.end())) ;
 
 	break;
@@ -312,9 +312,9 @@ Real InfHex::quality (const ElemQuality q) const
 	break;
       }
 
-      
+
       /**
-       * I don't know what to do for this metric. 
+       * I don't know what to do for this metric.
        * Maybe the base class knows...
        */
     default:
@@ -323,7 +323,7 @@ Real InfHex::quality (const ElemQuality q) const
       }
     }
 
-    
+
     // Will never get here...
     libmesh_error();
     return 0.;
@@ -345,7 +345,7 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
       bounds.first  = 1.;
       bounds.second = 4.;
       break;
-      
+
     case SKEW:
       bounds.first  = 0.;
       bounds.second = 0.5;
@@ -365,23 +365,23 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
     case JACOBIAN:
       bounds.first  = 0.5;
       bounds.second = 1.;
-      break;  
-      
+      break;
+
     case DISTORTION:
       bounds.first  = 0.6;
       bounds.second = 1.;
-      break;  
+      break;
 
     case TAPER:
       bounds.first  = 0.;
       bounds.second = 0.4;
       break;
-      
+
     case STRETCH:
       bounds.first  = 0.25;
       bounds.second = 1.;
       break;
-      
+
     case DIAGONAL:
       bounds.first  = 0.65;
       bounds.second = 1.;
@@ -391,7 +391,7 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
       bounds.first  = 0.5;
       bounds.second = 1.;
       break;
-      
+
     default:
       libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
       bounds.first  = -1;
@@ -406,11 +406,11 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 
 
 
-const unsigned short int InfHex::_second_order_adjacent_vertices[8][2] = 
+const unsigned short int InfHex::_second_order_adjacent_vertices[8][2] =
 {
-  { 0,  1}, // vertices adjacent to node 8 
-  { 1,  2}, // vertices adjacent to node 9 
-  { 2,  3}, // vertices adjacent to node 10 
+  { 0,  1}, // vertices adjacent to node 8
+  { 1,  2}, // vertices adjacent to node 9
+  { 2,  3}, // vertices adjacent to node 10
   { 0,  3}, // vertices adjacent to node 11
 
   { 4,  5}, // vertices adjacent to node 12

@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -83,7 +83,7 @@ void RBConstructionBase<Base>::set_parameter_range(std::vector<Real> mu_min_in,
 {
   libmesh_assert( mu_min_in.size() == get_n_params() &&
                   mu_max_in.size() == get_n_params() );
-  
+
   mu_min_vector = mu_min_in;
   mu_max_vector = mu_max_in;
 }
@@ -151,7 +151,7 @@ void RBConstructionBase<Base>::get_global_max_error_pair(std::pair<unsigned int,
   // find which processor contains the maximum value
   unsigned int proc_ID_index;
   Parallel::maxloc(error_pair.second, proc_ID_index);
-  
+
   // Then broadcast error_pair.first from proc_ID_index
   Parallel::broadcast(error_pair.first, proc_ID_index);
 }
@@ -207,7 +207,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const std::vector<
 
   // Print out some info about the training set initialization
   libMesh::out << "Initializing training parameters with "
-               << (deterministic ? "deterministic " : "random " ) 
+               << (deterministic ? "deterministic " : "random " )
                << "training set..." << std::endl;
   for(unsigned int i=0; i<get_n_params(); i++)
   {
@@ -319,7 +319,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const std::ve
 
   if (training_parameters_random_seed < 0)
     {
-      
+
       if(!serial_training_set)
       {
         // seed the random number generator with the system time
@@ -351,7 +351,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const std::ve
       }
     }
 
-  
+
   // Initialize num_params NumericVectors
   training_parameters_in.resize(num_params);
 
@@ -614,7 +614,7 @@ RBConstructionBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >&
 
       KSP ksp = petsc_linear_solver->ksp();
       ierr = KSPGetType(ksp, &orig_petsc_ksp_type); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
       // libMesh::out << "orig_petsc_pc_type (before)=" << orig_petsc_pc_type << std::endl;
       // Make actual copies of the original PC and KSP types
       orig_petsc_pc_type_string = orig_petsc_pc_type;

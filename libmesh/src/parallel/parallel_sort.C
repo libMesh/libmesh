@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -37,7 +37,7 @@ namespace libMesh
 
 
 namespace Parallel {
-  
+
 // The Constructor sorts the local data using
 // std::sort().  Therefore, the construction of
 // a Parallel::Sort object takes O(nlogn) time,
@@ -45,7 +45,7 @@ namespace Parallel {
 template <typename KeyType>
 Sort<KeyType>::Sort(std::vector<KeyType>& d,
 		    const unsigned int n_procs,
-		    const unsigned int proc_id) :	    
+		    const unsigned int proc_id) :
   _n_procs(n_procs),
   _proc_id(proc_id),
   _bin_is_sorted(false),
@@ -84,7 +84,7 @@ void Sort<KeyType>::sort()
       this->communicate_bins();
       this->sort_local_bin();
     }
-  
+
   // Set sorted flag to true
   _bin_is_sorted = true;
 }
@@ -93,7 +93,7 @@ void Sort<KeyType>::sort()
 
 template <typename KeyType>
 void Sort<KeyType>::binsort()
-{  
+{
   // Find the global min and max from all the
   // processors.
   std::vector<KeyType> global_min_max(2);
@@ -123,14 +123,14 @@ void Sort<KeyType>::binsort()
 
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 // Full specialization for HilbertIndices, there is a fair amount of
-// code duplication here that could potentially be consolidated with the 
+// code duplication here that could potentially be consolidated with the
 // above method
 template <>
 void Sort<Hilbert::HilbertIndices>::binsort()
 {
   // Find the global min and max from all the
   // processors.  Do this using MPI_Allreduce.
-  Hilbert::HilbertIndices 
+  Hilbert::HilbertIndices
     local_min,  local_max,
     global_min, global_max;
 
@@ -144,7 +144,7 @@ void Sort<Hilbert::HilbertIndices>::binsort()
       local_min = _data.front();
       local_max = _data.back();
     }
-  
+
   MPI_Op hilbert_max, hilbert_min;
 
   MPI_Op_create       ((MPI_User_function*)__hilbert_max_op, true, &hilbert_max);
@@ -190,7 +190,7 @@ void Sort<KeyType>::communicate_bins()
   // is the number of keys which will be held in
   // each bin over all processors.
   std::vector<unsigned int> global_bin_sizes = _local_bin_sizes;
-  
+
   // Sum to find the total number of entries in each bin.
   Parallel::sum(global_bin_sizes);
 
@@ -200,7 +200,7 @@ void Sort<KeyType>::communicate_bins()
   std::vector<KeyType> dest;
 
   unsigned int local_offset = 0;
-  
+
   for (unsigned int i=0; i<_n_procs; ++i)
     {
       // Vector to receive the total bin size for each
@@ -222,7 +222,7 @@ void Sort<KeyType>::communicate_bins()
 
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
-	  
+
       MPI_Gatherv((_data.size() > local_offset) ?
 		    &_data[local_offset] :
 		    NULL,                            // Points to the beginning of the bin to be sent
@@ -241,10 +241,10 @@ void Sort<KeyType>::communicate_bins()
       // corresponds to the bin for this processor
       if (i == _proc_id)
 	_my_bin = dest;
-	  
+
       // Increment the local offset counter
       local_offset += _local_bin_sizes[i];
-    } 
+    }
 #endif // LIBMESH_HAVE_MPI
 }
 
@@ -252,7 +252,7 @@ void Sort<KeyType>::communicate_bins()
 
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 // Full specialization for HilbertIndices, there is a fair amount of
-// code duplication here that could potentially be consolidated with the 
+// code duplication here that could potentially be consolidated with the
 // above method
 template <>
 void Sort<Hilbert::HilbertIndices>::communicate_bins()
@@ -261,7 +261,7 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
   // is the number of keys which will be held in
   // each bin over all processors.
   std::vector<unsigned int> global_bin_sizes(_n_procs);
-  
+
   libmesh_assert (_local_bin_sizes.size() == global_bin_sizes.size());
 
   // Sum to find the total number of entries in each bin.
@@ -280,7 +280,7 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
   std::vector<Hilbert::HilbertIndices> sendbuf, dest;
 
   unsigned int local_offset = 0;
-  
+
   for (unsigned int i=0; i<_n_procs; ++i)
     {
       // Vector to receive the total bin size for each
@@ -294,13 +294,13 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
       // Note: Here again we know that we are communicating
       // MPI_UNSIGNED's so there is no need to check the MPI_traits.
       MPI_Allgather(&_local_bin_sizes[i], // Source: # of entries on this proc in bin i
-		    1,                    // Number of items to gather                 
-		    MPI_UNSIGNED,           
+		    1,                    // Number of items to gather
+		    MPI_UNSIGNED,
 		    &proc_bin_size[0],    // Destination: Total # of entries in bin i
 		    1,
 		    MPI_UNSIGNED,
 		    libMesh::COMM_WORLD);
-      
+
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
@@ -310,7 +310,7 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
 
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
-      
+
       MPI_Gatherv((_data.size() > local_offset) ?
 		    &_data[local_offset] :
 		    NULL,                   // Points to the beginning of the bin to be sent
@@ -352,7 +352,7 @@ const std::vector<KeyType>& Sort<KeyType>::bin()
 {
   if (!_bin_is_sorted)
     {
-      libMesh::out << "Warning! Bin is not yet sorted!" << std::endl; 
+      libMesh::out << "Warning! Bin is not yet sorted!" << std::endl;
     }
 
   return _my_bin;

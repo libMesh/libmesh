@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -46,7 +46,7 @@ namespace Utility
    */
   std::string system_info();
 
-  
+
 
   //-------------------------------------------------------------------
   /**
@@ -92,14 +92,14 @@ namespace Utility
     //             ^    ^
     //           prev first
     InputIterator prev( first );
-    for ( ++first; first != last; ++prev, ++first ) 
+    for ( ++first; first != last; ++prev, ++first )
       if ( *first < *prev  )    // Note: this is the same as *prev > *first,
 	   return false;        // but we only require op< to be defined.
 
     // If we haven't returned yet, it's sorted!
     return true;
-    
-    
+
+
     // A one-liner version using adjacent_find.  This doesn't work for
     // C-style arrays, since their pointers do not have a value_type.
     //
@@ -111,7 +111,7 @@ namespace Utility
     // return (last ==
     // std::adjacent_find(first, last,
     // std::greater< typename InputIterator::value_type >()));
-    
+
     // A second one-linear attempt.  This one checks for a **strictly
     // increasing** (no duplicate entries) range.  Also doesn't work
     // with C-style arrays.
@@ -134,8 +134,8 @@ namespace Utility
     ForwardIterator it = std::lower_bound(first, last, value);
     return (it == last || value < *it) ? last : it;
   }
-    
-      
+
+
   //-------------------------------------------------------------------
   /**
    * An efficient template instantiation for raising
@@ -144,12 +144,12 @@ namespace Utility
   template <int N, typename T>
   struct do_pow {
     static inline T apply (const T& x)
-      { 
-        libmesh_assert(N>1); 
-    
+      {
+        libmesh_assert(N>1);
+
         if (N%2) // odd exponent
-          return x * do_pow<N-1,T>::apply(x); 
-    
+          return x * do_pow<N-1,T>::apply(x);
+
         const T xNover2 = do_pow<N/2,T>::apply(x);
 
         return xNover2*xNover2;
@@ -166,7 +166,7 @@ namespace Utility
         const T x2 = x*x,
                 x4 = x2*x2;
 
-        return x4*x2; 
+        return x4*x2;
       }
   };
 
@@ -183,8 +183,8 @@ namespace Utility
 
   template <int N, typename T>
   inline
-  T pow(const T& x) 
-  { 
+  T pow(const T& x)
+  {
     return do_pow<N,T>::apply(x);
   }
 
@@ -200,14 +200,14 @@ namespace Utility
 
       if (n==0)
 	return factorial_n;
-      
+
       for (unsigned int i=1; i<n; i++)
 	factorial_n *= i+1;
 
       return factorial_n;
     }
 
-  
+
   //-------------------------------------------------------------------
   /**
    * A convenient method to truly empty a vector using the "swap trick"
@@ -221,12 +221,12 @@ namespace Utility
 
   //-------------------------------------------------------------------
   // Utility functions useful when dealing with complex numbers.
- 
+
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
   /**
    * @returns for \p r_o_c = 0 the filename for output of the real part
-   * of complex data, and for  \p r_o_c = 1 the filename for the imaginary 
+   * of complex data, and for  \p r_o_c = 1 the filename for the imaginary
    * part.
    */
   std::string complex_filename (const std::string& basename,
@@ -242,7 +242,7 @@ namespace Utility
 #endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 
-  
+
   //-------------------------------------------------------------------
   /**
    * This Functor simply takes an object and reverses its byte
@@ -250,12 +250,12 @@ namespace Utility
    * for file IO.  This class has been tested on x86 architectures
    * with 4-byte words.
    *
-   * 
+   *
    */
   class ReverseBytes
   {
   public:
-    
+
     /**
      * Constructor.  Takes a bool, determines if we will actually
      * do byte reversing.
@@ -268,9 +268,9 @@ namespace Utility
      */
     template <typename T>
     T operator () (T& data) const;
-  
+
   private:
-  
+
     /**
      * Returns the value of the reverse flag.
      */
@@ -279,7 +279,7 @@ namespace Utility
     /**
      * flag
      */
-    const bool _do_reverse;  
+    const bool _do_reverse;
   };
 
 
@@ -300,10 +300,10 @@ namespace Utility
     if (this->reverse())
       {
 	unsigned char* b = (unsigned char*) &data;
-	
+
 	register int i=0;
 	register int j=(sizeof(T) - 1);
-	
+
 	while (i < j)
 	  {
 	    std::swap (b[i], b[j]);
@@ -314,7 +314,7 @@ namespace Utility
     return data;
   }
 
-  
+
 }
 
 } // namespace libMesh

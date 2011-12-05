@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -70,19 +70,19 @@ template <typename T> class NumericVector;
 /**
  * A row of the Dof constraint matrix.
  */
-typedef std::map<unsigned int, Real, 
-                 std::less<unsigned int>, 
+typedef std::map<unsigned int, Real,
+                 std::less<unsigned int>,
                  Threads::scalable_allocator<std::pair<const unsigned int, Real> > > DofConstraintRow;
 
-/** 
- * The constraint matrix storage format. 
+/**
+ * The constraint matrix storage format.
  * We're using a class instead of a typedef to allow forward
  * declarations and future flexibility.  Don't delete this from
  * a pointer-to-std::map; the destructor isn't virtual!
  */
-class DofConstraints : public std::map<unsigned int, 
-                                       DofConstraintRow, 
-                                       std::less<unsigned int>, 
+class DofConstraints : public std::map<unsigned int,
+                                       DofConstraintRow,
+                                       std::less<unsigned int>,
                                        Threads::scalable_allocator<std::pair<const unsigned int, DofConstraintRow> > >
 {
 };
@@ -94,19 +94,19 @@ class DofConstraints : public std::map<unsigned int,
  * compatibility we also include coefficients, so we could add
  * Lagrange-positioned-node constraints later.
  */
-typedef std::map<const Node *, Real, 
-                 std::less<const Node *>, 
+typedef std::map<const Node *, Real,
+                 std::less<const Node *>,
                  Threads::scalable_allocator<std::pair<const Node * const, Real> > > NodeConstraintRow;
 
-/** 
- * The Node constraint storage format. 
+/**
+ * The Node constraint storage format.
  * We're using a class instead of a typedef to allow forward
  * declarations and future flexibility.  Don't delete this from
  * a pointer-to-std::map; the destructor isn't virtual!
  */
-class NodeConstraints : public std::map<const Node *, 
-                                       NodeConstraintRow, 
-                                       std::less<const Node *>, 
+class NodeConstraints : public std::map<const Node *,
+                                       NodeConstraintRow,
+                                       std::less<const Node *>,
                                        Threads::scalable_allocator<std::pair<const Node * const, NodeConstraintRow> > >
 {
 };
@@ -114,8 +114,8 @@ class NodeConstraints : public std::map<const Node *,
 
 #endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
 
-  
-  
+
+
 // ------------------------------------------------------------
 // DofMap class definition
 
@@ -153,7 +153,7 @@ public:
   /**
    * Distrubute dofs on the current mesh.  Also builds the send list for
    * processor \p proc_id, which defaults to 0 for ease of use in serial
-   * applications. 
+   * applications.
    */
   void distribute_dofs (MeshBase&);
 
@@ -194,7 +194,7 @@ public:
    * a sorted \p _send_list with unique entries.
    */
   void prepare_send_list ();
-  
+
   /**
    * Returns a constant reference to the \p _send_list for this processor.  The
    * \p _send_list contains the global indices of all the variables in the
@@ -203,7 +203,7 @@ public:
    * solution values needed for computation.
    */
   const std::vector<unsigned int>& get_send_list() const { return _send_list; }
-  
+
   /**
    * Returns a constant reference to the \p _n_nz list for this processor.
    * The vector contains the bandwidth of the on-processor coupling for each
@@ -211,7 +211,7 @@ public:
    * information can be used to preallocate space for a parallel sparse matrix.
    */
   const std::vector<unsigned int>& get_n_nz() const { return _n_nz; }
-  
+
   /**
    * Returns a constant reference to the \p _n_oz list for this processor.
    * The vector contains the bandwidth of the off-processor coupling for each
@@ -225,7 +225,7 @@ public:
    * \p type to the system of equations.
    */
   void add_variable (const Variable &var);
-  
+
   /**
    * @returns the variable description object for variable \p c.
    */
@@ -235,20 +235,20 @@ public:
    * @returns the approximation order for variable \p c.
    */
   Order variable_order (const unsigned int c) const;
-  
+
   /**
    * @returns the finite element type for variable \p c.
    */
   const FEType& variable_type (const unsigned int c) const;
-  
+
   /**
    * Returns the number of variables in the global solution vector. Defaults
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
-   */  
+   */
   unsigned int n_variables() const
   { return _variables.size(); }
-  
+
   /**
    * @returns the total number of degrees of freedom in the problem.
    */
@@ -284,14 +284,14 @@ public:
   unsigned int first_old_dof(const unsigned int proc = libMesh::processor_id()) const
   { libmesh_assert(proc < _first_old_df.size()); return _first_old_df[proc]; }
 #endif //LIBMESH_ENABLE_AMR
-  
+
   /**
    * Returns the last dof index that is local to subdomain \p proc.
    * This function is now deprecated, because it returns nonsense in the rare
    * case where \p proc has no local dof indices.  Use end_dof() instead.
    */
   unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_deprecated(); libmesh_assert(proc < _end_df.size()); return (_end_df[proc] - 1); }  
+  { libmesh_deprecated(); libmesh_assert(proc < _end_df.size()); return (_end_df[proc] - 1); }
 
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.
@@ -308,12 +308,12 @@ public:
   unsigned int end_old_dof(const unsigned int proc = libMesh::processor_id()) const
   { libmesh_assert(proc < _end_old_df.size()); return _end_old_df[proc]; }
 #endif //LIBMESH_ENABLE_AMR
-  
+
   /**
    * Returns the first local degree of freedom index for variable \p var.
    */
   unsigned int variable_first_local_dof (const unsigned int var) const
-  { 
+  {
     libmesh_assert ((var+1) < _var_first_local_df.size());
     libmesh_assert (_var_first_local_df[var] != DofObject::invalid_id);
     return _var_first_local_df[var];
@@ -324,7 +324,7 @@ public:
    * Analogous to the end() member function of STL containers.
    */
   unsigned int variable_last_local_dof (const unsigned int var) const
-  { 
+  {
     libmesh_assert ((var+1) < _var_first_local_df.size());
     libmesh_assert (_var_first_local_df[var+1] != DofObject::invalid_id);
     return _var_first_local_df[var+1];
@@ -373,7 +373,7 @@ public:
    *
    * Note that the user must ensure that the element vector \p Ue is
    * properly sized when calling this method.  This is because there
-   * is no \p resize() method in the \p DenseVectorBase<> class. 
+   * is no \p resize() method in the \p DenseVectorBase<> class.
    */
   void extract_local_vector (const NumericVector<Number>& Ug,
 			     const std::vector<unsigned int>& dof_indices,
@@ -400,7 +400,7 @@ public:
 
   /**
    * Rebuilds the raw degree of freedom and DofObject constraints.
-   */ 
+   */
   void create_dof_constraints (const MeshBase&);
 
   /**
@@ -430,39 +430,39 @@ public:
    */
   DofConstraints::const_iterator constraint_rows_begin() const
     { return _dof_constraints.begin(); }
-  
+
   /**
    * Returns an iterator pointing just past the last DoF constraint row
    */
   DofConstraints::const_iterator constraint_rows_end() const
     { return _dof_constraints.end(); }
-  
+
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
    * Returns an iterator pointing to the first Node constraint row
    */
   NodeConstraints::const_iterator node_constraint_rows_begin() const
     { return _node_constraints.begin(); }
-  
+
   /**
    * Returns an iterator pointing just past the last Node constraint row
    */
   NodeConstraints::const_iterator node_constraint_rows_end() const
     { return _node_constraints.end(); }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-  
+
   /**
    * @returns true if the degree of freedom dof is constrained,
    * false otherwise.
    */
   bool is_constrained_dof (const unsigned int dof) const;
-  
+
   /**
    * @returns true if the Node is constrained,
    * false otherwise.
    */
   bool is_constrained_node (const Node* node) const;
-  
+
   /**
    * Prints the whole \p _dof_constraints and \p
    * _node_constraints data structures.
@@ -505,7 +505,7 @@ public:
   void constrain_element_matrix (DenseMatrix<Number>& matrix,
 				 std::vector<unsigned int>& elem_dofs,
 				 bool asymmetric_constraint_rows = true) const;
-  
+
   /**
    * Constrains the element matrix.  This method allows the
    * element matrix to be non-square, in which case the row_dofs
@@ -516,14 +516,14 @@ public:
 				 std::vector<unsigned int>& row_dofs,
 				 std::vector<unsigned int>& col_dofs,
 				 bool asymmetric_constraint_rows = true) const;
-  
+
   /**
    * Constrains the element vector.
    */
   void constrain_element_vector (DenseVector<Number>&       rhs,
 				 std::vector<unsigned int>& dofs,
 				 bool asymmetric_constraint_rows = true) const;
-  
+
   /**
    * Constrains the element matrix and vector.  This method requires
    * the element matrix to be square, in which case the elem_dofs
@@ -557,7 +557,7 @@ public:
    * constrained.
    */
   void constrain_nothing (std::vector<unsigned int>& dofs) const;
-  
+
   /**
    * Constrains the numeric vector \p v, which represents a solution defined on
    * the mesh.  This may need to be used after a linear solve, if your linear
@@ -568,7 +568,7 @@ public:
    */
   void enforce_constraints_exactly (const System &system,
 				    NumericVector<Number> *v = NULL) const;
-  
+
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
@@ -628,32 +628,32 @@ public:
 			const unsigned int vn = libMesh::invalid_uint) const;
   /**
    * @returns the total number of degrees of freedom on old_dof_objects
-   * 
+   *
    */
   unsigned int n_old_dofs() const { return _n_old_dfs; }
 
   /**
    * Constrains degrees of freedom on side \p s of element \p elem which
-   * correspond to variable number \p var and to p refinement levels 
+   * correspond to variable number \p var and to p refinement levels
    * above \p p.
    */
   void constrain_p_dofs (unsigned int var,
 			 const Elem *elem,
 			 unsigned int s,
 			 unsigned int p);
-  
+
 #endif // LIBMESH_ENABLE_AMR
 
   /**
    * Reinitialize the underlying data strucures conformal to the current mesh.
    */
   void reinit (MeshBase& mesh);
-  
+
   /**
    * Free all memory associated with the object, but keep the mesh pointer.
    */
   void clear ();
-  
+
   /**
    * Prints summary info about the sparsity bandwidth and constraints.
    */
@@ -679,9 +679,9 @@ public:
    */
   CouplingMatrix* _dof_coupling;
 
-  
+
 private:
-  
+
   /**
    * @returns the number of the system we are responsible for.
    */
@@ -707,7 +707,7 @@ private:
    */
   typedef DofObject* (DofMap::*dofobject_accessor)
     (MeshBase& mesh, unsigned int i) const;
-  
+
   /**
    * Helper function for distributing dofs in parallel
    */
@@ -724,25 +724,25 @@ private:
    * variable in the system.
    * Starts at index next_free_dof, and increments it to
    * the post-final index.
-   */  
+   */
   void distribute_local_dofs_var_major (unsigned int& next_free_dof,
 				        MeshBase& mesh);
-  
+
   /**
    * Distributes the global degrees of freedom, for dofs on
-   * this processor.  In this format all the 
-   * degrees of freedom at a node/element are in contiguous 
+   * this processor.  In this format all the
+   * degrees of freedom at a node/element are in contiguous
    * blocks.  Note in particular that the degrees of freedom
-   * for a given variable are not in contiguous blocks, as 
+   * for a given variable are not in contiguous blocks, as
    * in the case of \p distribute_local_dofs_var_major.
    * Starts at index next_free_dof, and increments it to
    * the post-final index.
    * If build_send_list is true, builds the send list.  If
    * false, clears and reserves the send list
-   */  
+   */
   void distribute_local_dofs_node_major (unsigned int& next_free_dof,
 				         MeshBase& mesh);
-    
+
   /**
    * Adds entries to the \p _send_list vector corresponding to DoFs
    * on elements neighboring the current processor.
@@ -759,7 +759,7 @@ private:
    * an element's degrees of freedom being constrained in terms
    * of other, local degrees of freedom.  The usual case is
    * for an elements DOFs to be constrained by some other,
-   * external DOFs.   
+   * external DOFs.
    */
   void build_constraint_matrix (DenseMatrix<Number>& C,
 				std::vector<unsigned int>& elem_dofs,
@@ -770,13 +770,13 @@ private:
    * This will account for off-element couplings via hanging nodes.
    */
   void find_connected_dofs (std::vector<unsigned int> &elem_dofs) const;
-  
+
   /**
    * Finds all the DofObjects associated with the set in \p objs.
    * This will account for off-element couplings via hanging nodes.
    */
   void find_connected_dof_objects (std::vector<const DofObject *> &objs) const;
-  
+
   /**
    * Adds entries to the \p _send_list vector corresponding to DoFs
    * which are dependencies for constraint equations on the current
@@ -796,14 +796,14 @@ private:
    * The number of the system we manage DOFs for.
    */
   const unsigned int _sys_number;
-  
+
   /**
-   * Additional matrices handled by this object.  These pointers do @e 
+   * Additional matrices handled by this object.  These pointers do @e
    * not handle the memory, instead, \p System, who
    * told \p DofMap about them, owns them.
    */
   std::vector<SparseMatrix<Number>* > _matrices;
-  
+
   /**
    * First DOF index on processor \p p.
    */
@@ -818,7 +818,7 @@ private:
    * The first local DOF index for each variable in the \p System.
    */
   std::vector<unsigned int> _var_first_local_df;
-  
+
   /**
    * A list containing all the global DOF indicies that affect the
    * solution on my subdomain.
@@ -852,7 +852,7 @@ private:
    * global matrix.
    */
   std::vector<unsigned int> _n_nz;
-  
+
   /**
    * The number of off-processor nonzeros in my portion of the
    * global matrix.
@@ -934,7 +934,7 @@ bool DofMap::is_constrained_dof (const unsigned int dof) const
 }
 
 inline
-bool DofMap::is_constrained_node (const Node* 
+bool DofMap::is_constrained_node (const Node*
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 node
 #endif
@@ -961,22 +961,22 @@ unsigned int DofMap::sys_number() const
 #if !defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_PERIODIC)
   //--------------------------------------------------------------------
   // Constraint-specific methods get inlined into nothing if
-  // constraints are disabled, so there's no reason for users not to 
+  // constraints are disabled, so there's no reason for users not to
   // use them.
 
 inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
 				              std::vector<unsigned int>&,
 				              bool) const {}
-  
+
 inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
 				              std::vector<unsigned int>&,
 				              std::vector<unsigned int>&,
 				              bool) const {}
-  
+
 inline void DofMap::constrain_element_vector (DenseVector<Number>&,
 				              std::vector<unsigned int>&,
 				              bool) const {}
-  
+
 inline void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>&,
 					                 DenseVector<Number>&,
 					                 std::vector<unsigned int>&,

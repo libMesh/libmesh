@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -36,10 +36,10 @@ namespace libMesh
  */
 namespace Predicates
 {
-  
+
   // Empty place-holder base class for multi_predicates
   struct multi_predicate {};
-  
+
 
   // This class represents a generic combination of more than one predicate.
   // It is meant to be derived from to actually be used.
@@ -63,10 +63,10 @@ namespace Predicates
 
       // Now copy over the information from the rhs.
       this->deep_copy(rhs);
-      
+
       return *this;
     }
-    
+
     // operator() checks all the predicates in the vector.
     virtual bool operator()(const T& it) const
     {
@@ -75,14 +75,14 @@ namespace Predicates
 	  const predicate<T>* pred = _predicates[i];
 
 	  libmesh_assert (pred != NULL);
-	  
+
 	  if ( ! (*pred)(it) )
 	    return false;
 	}
-      
+
       return true;
     }
-    
+
   protected:
     // Do not instantiate the base class.
     abstract_multi_predicate() {}
@@ -101,12 +101,12 @@ namespace Predicates
       for (unsigned int i=0; i<rhs._predicates.size(); ++i)
 	_predicates.push_back(rhs._predicates[i]->clone());
     }
-    
+
     // Predicates to be evaluated.
     std::vector<predicate<T>*> _predicates;
   };
-  
-  
+
+
 
   // Instantiation of the IsNull abstract_multi_predicate.
   // This would be used to iterate over NULL entries in a container.
@@ -119,12 +119,12 @@ namespace Predicates
       this->_predicates.push_back(new is_null<T>);
     }
   };
-  
 
 
 
 
-  
+
+
   // Instantiation for the NotNull abstract_multi_predicate
   template <typename T>
   struct NotNull : abstract_multi_predicate<T>
@@ -167,7 +167,7 @@ namespace Predicates
   };
 
 
-  
+
 
   // Instantiation for the Ancestor abstract_multi_predicate
   template <typename T>
@@ -182,7 +182,7 @@ namespace Predicates
   };
 
 
-  
+
 
   // Instantiation for the NotAncestor abstract_multi_predicate
   template <typename T>
@@ -198,7 +198,7 @@ namespace Predicates
 
 
 
-  
+
   // Instantiation for the SubActive abstract_multi_predicate
   template <typename T>
   struct SubActive : abstract_multi_predicate<T>
@@ -212,7 +212,7 @@ namespace Predicates
   };
 
 
-  
+
 
   // Instantiation for the NotSubActive abstract_multi_predicate
   template <typename T>
@@ -226,8 +226,8 @@ namespace Predicates
     }
   };
 
-  
-  
+
+
   // Instantiation for the Local abstract_multi_predicate
   template <typename T>
   struct Local : abstract_multi_predicate<T>
@@ -269,7 +269,7 @@ namespace Predicates
     }
 
   };
-  
+
 
   // Instantiation for the Type abstract_multi_predicate
   template <typename T>
@@ -282,8 +282,8 @@ namespace Predicates
     }
   };
 
-  
-  
+
+
   // Instantiation for the ActiveType abstract_multi_predicate
   template <typename T>
   struct ActiveType : abstract_multi_predicate<T>
@@ -313,7 +313,7 @@ namespace Predicates
 
 
 
-  
+
   // Instantiation for the ActiveLocal abstract_multi_predicate
   template <typename T>
   struct ActiveLocal : abstract_multi_predicate<T>
@@ -342,7 +342,7 @@ namespace Predicates
   };
 
 
-  
+
   // Instantiation for the NotPID abstract_multi_predicate
   template <typename T>
   struct NotPID : abstract_multi_predicate<T>
@@ -427,7 +427,7 @@ namespace Predicates
   };
 
 
-  
+
   // Instantiation for the BoundarySide abstract_multi_predicate
   template <typename T>
   struct BoundarySide : abstract_multi_predicate<T>
@@ -438,7 +438,7 @@ namespace Predicates
     }
   };
 
-  
+
 
   // Instantiation for the ActiveLocalSubdomain abstract_multi_predicate
   template <typename T>
@@ -452,7 +452,7 @@ namespace Predicates
       this->_predicates.push_back(new subdomain<T>(subdomain_id));
     }
   };
-  
+
 }
 
 

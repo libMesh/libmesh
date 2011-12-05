@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -52,9 +52,9 @@ public:
   UniformRefinementEstimator() : number_h_refinements(1),
                                  number_p_refinements(0)
   { error_norm = H1; }
-  
+
   /**
-   * Destructor.  
+   * Destructor.
    */
   ~UniformRefinementEstimator() {}
 
@@ -96,7 +96,7 @@ public:
   /**
    * Currently this function ignores the component_scale member variable,
    * because it calculates each error individually, unscaled.
-   * 
+   *
    * The user selects which errors get computed by filling a map with error
    * vectors: If errors_per_cell[&system][v] exists, it will be filled with the
    * error values in variable \p v of \p system
@@ -110,7 +110,7 @@ public:
    * How many h refinements to perform to get the fine grid
    */
   unsigned char number_h_refinements;
-  
+
   /**
    * How many p refinements to perform to get the fine grid
    */

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -47,19 +47,19 @@ namespace libMesh
 std::string Utility::system_info()
 {
   OStringStream out;
-  
+
   std::string date = Utility::get_timestamp();
-  
+
   // Get system information
   struct utsname sysInfo;
   uname(&sysInfo);
-  
+
   // Get user information
 #ifdef LIBMESH_HAVE_GETPWUID
       struct passwd* p = getpwuid(getuid());
 #endif
 
-      
+
   out << '\n'
       << " ---------------------------------------------------------------------\n"
       << "| Time:           " << date             << '\n'
@@ -86,13 +86,13 @@ std::string Utility::complex_filename (const std::string& basename,
 				       const unsigned int r_o_c)
 {
   std::string name(basename);
-  
+
   if (r_o_c == 0)
     name.append(".real");
-  
+
   else
     name.append(".imag");
-  
+
   return name;
 }
 
@@ -103,7 +103,7 @@ void Utility::prepare_complex_data(const std::vector<Complex>& source,
 				   std::vector<Real>& imag_part)
 {
   const unsigned int len = source.size();
-  
+
   real_part.resize(len);
   imag_part.resize(len);
 

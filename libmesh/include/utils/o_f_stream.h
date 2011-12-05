@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -36,7 +36,7 @@
 /*
  * Some compilers, at least HP \p aCC do not even
  * accept empty classes derived from \p std::ostringstream.
- * Therefore, resort to preprocessor definitions. 
+ * Therefore, resort to preprocessor definitions.
  */
 
 #ifndef LIBMESH_BROKEN_IOSTREAM
@@ -58,7 +58,7 @@
   * may be either real or complex) with width
   * \p v in scientific format to stream \p o.
   */
-# if defined(LIBMESH_USE_COMPLEX_NUMBERS) 
+# if defined(LIBMESH_USE_COMPLEX_NUMBERS)
 #  define OFSNumberscientific(o,v,d)    (o) << std::setprecision(v) << std::scientific << (d).real() << " " \
                                             << std::setprecision(v) << std::scientific << (d).imag()
 # else
@@ -80,7 +80,7 @@
 # include <cstdio>
 
  /*
-  * Outputs \p Real \p d with width 
+  * Outputs \p Real \p d with width
   * \p v in scientific format to stream \p o.
   */
 # define OFSRealscientific(o,v,d)       (o).scientific( (v), (d) )
@@ -145,7 +145,7 @@ namespace libMesh
 
  // ------------------------------------------------------------
  // OFStream inline methods
- 
+
 
 #endif // ifndef ... else ... LIBMESH_BROKEN_IOSTREAM
 

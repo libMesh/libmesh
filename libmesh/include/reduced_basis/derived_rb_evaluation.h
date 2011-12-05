@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -51,7 +51,7 @@ public:
    * Constructor.
    */
   DerivedRBEvaluation ();
-  
+
   /**
    * Clear this object. Overload to also reset residual_type_flag.
    */
@@ -76,7 +76,7 @@ public:
   virtual void write_out_basis_functions(System& sys,
                                          const std::string& directory_name = "offline_data",
                                          const bool write_binary_basis_functions = true);
-  
+
   /**
    * Read in all the basis functions from file.
    * \p sys and \p write_binary_basis_functions are ignored here,
@@ -85,7 +85,7 @@ public:
   virtual void read_in_basis_functions(System& sys,
                                        const std::string& directory_name = "offline_data",
                                        const bool read_binary_basis_functions = true);
-  
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**

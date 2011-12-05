@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -116,7 +116,7 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
     {
       switch (i)
 	{
-	case 0:  
+	case 0:
 	case 1:
 	case 2:
 	case 3:
@@ -200,7 +200,7 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
 	}
     }
 
-  
+
   // We'll never get here.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -251,7 +251,7 @@ void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
 	conn[4] = this->node(4);
 	return;
       }
-      
+
     default:
       libmesh_error();
     }
@@ -266,7 +266,7 @@ Real Pyramid5::volume () const
   // formula in: "Calculation of the Volume of a General Hexahedron
   // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
   Node* node0 = this->get_node(0);
-  Node* node1 = this->get_node(1); 
+  Node* node1 = this->get_node(1);
   Node* node2 = this->get_node(2);
   Node* node3 = this->get_node(3);
   Node* node4 = this->get_node(4);
@@ -277,7 +277,7 @@ Real Pyramid5::volume () const
   Point v02 ( *node2 - *node0 );
   Point v03 ( *node3 - *node0 );
   Point v01 ( *node1 - *node0 );
-  
+
   // Finally, ready to return the volume!
   return (1./6.)*(v40*(v13.cross(v02))) + (1./12.)*(v02*(v01.cross(v03)));
 }

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -64,9 +64,9 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 		      const Point& p)
 {
 #if LIBMESH_DIM == 3
-  
+
   libmesh_assert (elem != NULL);
-  
+
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
   // This avoids repeated centroid calculations
@@ -75,12 +75,12 @@ Real FE<3,XYZ>::shape(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
-    }  
+    }
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
   libmesh_assert(libMesh::n_threads() == 1);
-  
+
   const Real x  = p(0);
   const Real y  = p(1);
   const Real z  = p(2);
@@ -99,7 +99,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
   libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+2)/6);
-    
+
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
     {
@@ -110,20 +110,20 @@ Real FE<3,XYZ>::shape(const Elem* elem,
       // linears
     case 1:
       return dx;
-      
+
     case 2:
       return dy;
-      
+
     case 3:
       return dz;
 
       // quadratics
     case 4:
       return dx*dx;
-      
+
     case 5:
       return dx*dy;
-      
+
     case 6:
       return dy*dy;
 
@@ -212,7 +212,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 
     case 34:
       return dz*dz*dz*dz;
-      	    
+
     default:
       unsigned int o = 0;
       for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -232,7 +232,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
     }
 
 #endif
-  
+
   libmesh_error();
   return 0.;
 }
@@ -249,7 +249,7 @@ Real FE<3,XYZ>::shape_deriv(const ElemType,
   libMesh::err << "XYZ polynomials require the element\n"
                 << "because the centroid is needed."
                 << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -267,7 +267,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   libmesh_assert (elem != NULL);
   libmesh_assert (j<3);
-  
+
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
   // This avoids repeated centroid calculations
@@ -276,12 +276,12 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
-    }  
+    }
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
   libmesh_assert(libMesh::n_threads() == 1);
-  
+
   const Real x  = p(0);
   const Real y  = p(1);
   const Real z  = p(2);
@@ -311,33 +311,33 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  // constant
   	case 0:
   	  return 0.;
-  	  
+
   	  // linear
   	case 1:
   	  return 1.;
-  	  
+
   	case 2:
   	  return 0.;
-  	  
+
   	case 3:
   	  return 0.;
 
   	  // quadratic
   	case 4:
   	  return 2.*dx;
-  	  
+
   	case 5:
   	  return dy;
-  	  
+
   	case 6:
   	  return 0.;
-  	  
+
   	case 7:
   	  return dz;
-  	  
+
   	case 8:
   	  return 0.;
-  	  
+
   	case 9:
   	  return 0.;
 
@@ -417,7 +417,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   	case 34:
   	  return 0.;
-  	  
+
         default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -437,7 +437,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	}
       }
 
-      
+
       // d()/dy
     case 1:
       {
@@ -446,33 +446,33 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  // constant
   	case 0:
   	  return 0.;
-  	  
+
   	  // linear
   	case 1:
   	  return 0.;
-  	  
+
   	case 2:
   	  return 1.;
-  	  
+
   	case 3:
   	  return 0.;
 
   	  // quadratic
   	case 4:
   	  return 0.;
-  	  
+
   	case 5:
   	  return dx;
-  	  
+
   	case 6:
   	  return 2.*dy;
-  	  
+
   	case 7:
   	  return 0.;
-  	  
+
   	case 8:
   	  return dz;
-  	  
+
   	case 9:
   	  return 0.;
 
@@ -552,7 +552,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   	case 34:
   	  return 0.;
-  	  
+
   	default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -572,7 +572,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	}
       }
 
-      
+
       // d()/dz
     case 2:
       {
@@ -581,33 +581,33 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  // constant
   	case 0:
   	  return 0.;
-  	  
+
   	  // linear
   	case 1:
   	  return 0.;
-  	  
+
   	case 2:
   	  return 0.;
-  	  
+
   	case 3:
   	  return 1.;
 
   	  // quadratic
   	case 4:
   	  return 0.;
-  	  
+
   	case 5:
   	  return 0.;
-  	  
+
   	case 6:
   	  return 0.;
-  	  
+
   	case 7:
   	  return dx;
-  	  
+
   	case 8:
   	  return dy;
-  	  
+
   	case 9:
   	  return 2.*dz;
 
@@ -687,7 +687,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   	case 34:
   	  return 4.*dz*dz*dz;
-  	  
+
   	default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -707,15 +707,15 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	}
       }
 
-      
+
     default:
       libmesh_error();
     }
 
 #endif
-  
+
   libmesh_error();
-  return 0.;  
+  return 0.;
 }
 
 
@@ -730,7 +730,7 @@ Real FE<3,XYZ>::shape_second_deriv(const ElemType,
   libMesh::err << "XYZ polynomials require the element\n"
                 << "because the centroid is needed."
                 << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -748,7 +748,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   libmesh_assert (elem != NULL);
   libmesh_assert (j<3);
-  
+
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
   // This avoids repeated centroid calculations
@@ -757,12 +757,12 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
-    }  
+    }
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
   libmesh_assert(libMesh::n_threads() == 1);
-  
+
   const Real x  = p(0);
   const Real y  = p(1);
   const Real z  = p(2);
@@ -792,7 +792,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	{
   	  // constant
   	case 0:
-  	  
+
   	  // linear
   	case 1:
   	case 2:
@@ -802,7 +802,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  // quadratic
   	case 4:
   	  return 2.;
-  	  
+
   	case 5:
   	case 6:
   	case 7:
@@ -864,7 +864,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	case 33:
   	case 34:
   	  return 0.;
-  	  
+
   	default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -892,7 +892,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	{
   	  // constant
   	case 0:
-  	  
+
   	  // linear
   	case 1:
   	case 2:
@@ -970,7 +970,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	case 33:
   	case 34:
   	  return 0.;
-  	  
+
   	default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -990,7 +990,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	}
       }
 
-      
+
       // d^2()/dy^2
     case 2:
       {
@@ -998,7 +998,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	{
   	  // constant
   	case 0:
-  	  
+
   	  // linear
   	case 1:
   	case 2:
@@ -1009,7 +1009,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	case 4:
   	case 5:
   	  return 0.;
-  	  
+
   	case 6:
   	  return 2.;
 
@@ -1075,7 +1075,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	case 33:
   	case 34:
   	  return 0.;
-  	  
+
   	default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -1095,7 +1095,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	}
       }
 
-      
+
       // d^2()/dxdz
     case 3:
       {
@@ -1103,7 +1103,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	{
   	  // constant
   	case 0:
-  	  
+
   	  // linear
   	case 1:
   	case 2:
@@ -1118,7 +1118,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   	case 7:
   	  return 1.;
-  	  
+
   	case 8:
   	case 9:
   	  return 0.;
@@ -1181,7 +1181,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	case 33:
   	case 34:
   	  return 0.;
-  	  
+
   	default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -1208,7 +1208,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	{
   	  // constant
   	case 0:
-  	  
+
   	  // linear
   	case 1:
   	case 2:
@@ -1224,7 +1224,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   	case 8:
   	  return 1.;
-  	  
+
   	case 9:
   	  return 0.;
 
@@ -1286,7 +1286,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   	case 34:
   	  return 0.;
-  	  
+
   	default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -1314,7 +1314,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	{
   	  // constant
   	case 0:
-  	  
+
   	  // linear
   	case 1:
   	case 2:
@@ -1380,7 +1380,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   	case 34:
   	  return 12.*dz*dz;
-  	  
+
   	default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
@@ -1400,15 +1400,15 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	}
       }
 
-      
+
     default:
       libmesh_error();
     }
 
 #endif
-  
+
   libmesh_error();
-  return 0.;  
+  return 0.;
 }
 
 } // namespace libMesh

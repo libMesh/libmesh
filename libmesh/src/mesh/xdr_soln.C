@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -34,20 +34,20 @@ namespace libMesh
 int XdrSOLN::header(XdrSHEAD *hd)
 {
   // Temporary variables to facilitate stream reading
-  const int comm_len= 80;  
+  const int comm_len= 80;
   char comment[comm_len];
 
 
-  
+
   switch (m_type)
     {
-      
+
 #ifdef LIBMESH_HAVE_XDR
-      
+
     case (XdrMGF::ENCODE):
     case (XdrMGF::DECODE):
       {
-  
+
 	xdr_int(mp_xdr_handle,  &(hd->m_wrtVar));
 	xdr_int(mp_xdr_handle,  &(hd->m_numvar));
 	xdr_int(mp_xdr_handle,  &(hd->m_numNodes));
@@ -55,14 +55,14 @@ int XdrSOLN::header(XdrSHEAD *hd)
 	xdr_int(mp_xdr_handle,  &(hd->m_kstep));
 	xdr_int(mp_xdr_handle,  &(hd->m_strSize));
 	xdr_REAL(mp_xdr_handle, &(hd->m_time));
-	
+
 	m_wrtVar=hd->m_wrtVar;
 
 	char* temp = const_cast<char *>(hd->getId());
 	xdr_string(mp_xdr_handle,&(temp),
 		   ((m_type == XdrMGF::ENCODE) ? std::strlen(temp)    : hd->m_strSize));
 	hd->setId(temp);
-	
+
 	temp = const_cast<char *>(hd->getTitle());
 	xdr_string(mp_xdr_handle,&(temp),
 		   ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
@@ -72,11 +72,11 @@ int XdrSOLN::header(XdrSHEAD *hd)
 	xdr_string(mp_xdr_handle,&(temp),
 		   ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
 	hd->setUserTitle(temp);
-		
-	
+
+
 	char * tempTitle = new char[hd->m_strSize*m_wrtVar];
-  
-  
+
+
 	if (m_type == XdrMGF::DECODE)
 	  {
 	    int tempSize = 0;
@@ -121,12 +121,12 @@ int XdrSOLN::header(XdrSHEAD *hd)
     case (XdrMGF::R_ASCII):
       {
 	libmesh_assert (mp_in.good());
-	
+
 	mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_wrtVar   ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_strSize  ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_time     ; mp_in.getline(comment, comm_len);
-	
+
 	mp_in.getline(comment, comm_len);
 	hd->setId(comment);
 
@@ -143,7 +143,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
 	  std::string var_name;
 	  char* titles = new char[hd->m_wrtVar*hd->m_strSize];
 	  unsigned int c=0;
-	  
+
 	  for (int var=0; var < hd->m_wrtVar; var++)
 	    {
 	      mp_in >> var_name;
@@ -161,11 +161,11 @@ int XdrSOLN::header(XdrSHEAD *hd)
 	  delete [] titles;
 	}
 
-	
+
 	return 0;
       }
 
-      
+
     case (XdrMGF::W_ASCII):
       {
 	mp_out << hd->m_numNodes   << "\t # Num. Nodes\n";
@@ -184,7 +184,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
 	    {
 	      mp_out << p << " ";
 	      p += std::strlen(p)+1;
-	    }	  
+	    }
 	  mp_out << "\t # Variable Names\n";
 	}
 
@@ -194,16 +194,16 @@ int XdrSOLN::header(XdrSHEAD *hd)
       }
 
 
-      
+
     default:
       // Unknown access type
       libmesh_error();
 
     }
-  
+
   return 1;
 }
 
 } // namespace libMesh
-  
+
 

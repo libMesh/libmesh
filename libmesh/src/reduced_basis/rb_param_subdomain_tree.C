@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -60,7 +60,7 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBConstruction& rb_construction_in,
                  << std::endl;
     libmesh_error();
   }
-  
+
   // by default use all training points
   n_subsampled_training_points = infile( "n_subsampled_training_points", _rb_construction.get_n_training_samples() );
 
@@ -74,7 +74,7 @@ RBParamSubdomainTree::RBParamSubdomainTree(RBConstruction& rb_construction_in,
   libMesh::out << "n_subsampled_training_points: " << n_subsampled_training_points << std::endl;
   libMesh::out << "Bounding-box margin fraction for subdomain training set enrichment: " << bbox_margin << std::endl;
   libMesh::out << std::endl;
-  
+
   // The rbOOmit code is still in a state of flux
   libmesh_experimental();
 }
@@ -220,7 +220,7 @@ void RBParamSubdomainTree::write_tree_data_to_file_recursively(RBParamSubdomainN
 void RBParamSubdomainTree::read_tree_data_from_file(const std::string& directory_name)
 {
   START_LOG("read_tree_data_from_file()", "RBParamSubdomainTree");
-  
+
   libMesh::out << "Reading tree data from tree_data/tree.dat" << std::endl;
 
   // First, need to build a root node

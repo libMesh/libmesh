@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -55,7 +55,7 @@ class CentroidPartitioner : public Partitioner
 {
 public:
 
-  
+
   /**
    * A typedef which is reserved only for use within
    * this class.  If \p X is chosen, then centroid locations
@@ -74,7 +74,7 @@ public:
   CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
 
   /**
-   * Creates a new partitioner of this type and returns it in 
+   * Creates a new partitioner of this type and returns it in
    * an \p AutoPtr.
    */
   virtual AutoPtr<Partitioner> clone () const {
@@ -93,7 +93,7 @@ public:
    */
   void set_sort_method (const CentroidSortMethod sm) {_sort_method = sm; }
 
-  
+
 protected:
   /**
    * Partitions the mesh into n subdomains.  This is
@@ -138,7 +138,7 @@ private:
   static bool sort_z (const std::pair<Point, Elem*>& lhs,
 		      const std::pair<Point, Elem*>& rhs);
 
-  
+
   /**
    * Partition the list of centroids based on the
    * radial position of the centroid.  This provides

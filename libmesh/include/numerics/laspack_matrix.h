@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -24,7 +24,7 @@
 
 #include "libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_LASPACK 
+#ifdef LIBMESH_HAVE_LASPACK
 
 // C++ includes
 #include <algorithm>
@@ -93,8 +93,8 @@ public:
 
   /**
    * The \p LaspackMatrix needs the full sparsity pattern.
-   */ 
-  bool need_full_sparsity_pattern() const 
+   */
+  bool need_full_sparsity_pattern() const
   { return true; }
 
   /**
@@ -103,7 +103,7 @@ public:
    * to map the \f$ (i,j) \f$ elements.
    */
   void update_sparsity_pattern (const SparsityPattern::Graph &);
-  
+
   /**
    * Initialize a Laspack matrix that is of global
    * dimension \f$ m \times  n \f$ with local dimensions
@@ -121,14 +121,14 @@ public:
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.
-   */   
+   */
   void init ();
-  
+
   /**
    * Release all memory and return
    * to a state just like after
    * having called the default
-   * constructor. 
+   * constructor.
    */
   void clear ();
 
@@ -136,24 +136,24 @@ public:
    * Set all entries to 0.
    */
   void zero ();
-  
+
   /**
    * Close the matrix.  Dummy routine.  After calling
    * this method \p closed() is true and the matrix can
    * be used in computations.
    */
   void close () const { const_cast<LaspackMatrix<T>*>(this)->_closed = true; }
-  
+
   /**
    * @returns \p m, the row-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
-   */  
+   */
   unsigned int m () const;
 
   /**
    * @returns \p n, the column-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
-   */  
+   */
   unsigned int n () const;
 
   /**
@@ -177,7 +177,7 @@ public:
   void set (const unsigned int i,
 	    const unsigned int j,
 	    const T value);
-    
+
   /**
    * Add \p value to the element
    * \p (i,j).  Throws an error if
@@ -196,18 +196,18 @@ public:
    * for adding an element matrix
    * at assembly time
    */
-    
+
   void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<unsigned int> &rows,
 		   const std::vector<unsigned int> &cols);
-  
+
   /**
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<unsigned int> &dof_indices);
-      
+
   /**
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,
    * stores the result in \p this: \f$\texttt{this} += a*X \f$.
@@ -216,7 +216,7 @@ public:
    * is provided.
    */
   void add (const T a, SparseMatrix<T> &X);
-      
+
   /**
    * Return the value of the entry
    * \p (i,j).  This may be an
@@ -240,7 +240,7 @@ public:
 
   /**
    * Return the l1-norm of the matrix, that is
-   * \f$|M|_1=max_{all columns j}\sum_{all 
+   * \f$|M|_1=max_{all columns j}\sum_{all
    * rows i} |M_ij|\f$,
    * (max. sum of columns).
    * This is the
@@ -253,7 +253,7 @@ public:
   /**
    * Return the linfty-norm of the
    * matrix, that is
-   * \f$|M|_\infty=max_{all rows i}\sum_{all 
+   * \f$|M|_\infty=max_{all rows i}\sum_{all
    * columns j} |M_ij|\f$,
    * (max. sum of rows).
    * This is the
@@ -268,7 +268,7 @@ public:
    * and fully assembled yet
    */
   bool closed() const { return _closed; }
-  
+
   /**
    * Print the contents of the matrix, by default to libMesh::out.
    * Currently identical to \p print().
@@ -294,7 +294,7 @@ private:
    */
   unsigned int pos (const unsigned int i,
 		    const unsigned int j) const;
-  
+
   /**
    *  The Laspack sparse matrix pointer.
    */
@@ -353,7 +353,7 @@ void LaspackMatrix<T>::clear ()
     {
       Q_Destr(&_QMat);
     }
-  
+
   _csr.clear();
   _row_start.clear();
   _closed = false;
@@ -362,7 +362,7 @@ void LaspackMatrix<T>::clear ()
 
 
 
-template <typename T> 
+template <typename T>
 inline
 void LaspackMatrix<T>::zero ()
 {
@@ -372,27 +372,27 @@ void LaspackMatrix<T>::zero ()
     {
       const std::vector<unsigned int>::const_iterator
 	r_start = _row_start[row];
-      
+
       const unsigned int len = (_row_start[row+1] - _row_start[row]);
-	
+
       // Make sure we agree on the row length
       libmesh_assert (len == Q_GetLen(&_QMat, row+1));
-      
+
       for (unsigned int l=0; l<len; l++)
 	{
 	  const unsigned int j = *(r_start + l);
 
 	  // Make sure the data structures are working
 	  libmesh_assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
-	  
+
 	  Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
 	}
-    }    
+    }
 }
 
 
 
-template <typename T> 
+template <typename T>
 inline
 unsigned int LaspackMatrix<T>::m () const
 {
@@ -403,18 +403,18 @@ unsigned int LaspackMatrix<T>::m () const
 
 
 
-template <typename T> 
+template <typename T>
 inline
 unsigned int LaspackMatrix<T>::n () const
 {
   libmesh_assert (this->initialized());
-  
+
   return static_cast<unsigned int>(Q_GetDim(const_cast<QMatrix*>(&_QMat)));
 }
 
 
 
-template <typename T> 
+template <typename T>
 inline
 unsigned int LaspackMatrix<T>::row_start () const
 {
@@ -423,7 +423,7 @@ unsigned int LaspackMatrix<T>::row_start () const
 
 
 
-template <typename T> 
+template <typename T>
 inline
 unsigned int LaspackMatrix<T>::row_stop () const
 {
@@ -432,7 +432,7 @@ unsigned int LaspackMatrix<T>::row_stop () const
 
 
 
-template <typename T> 
+template <typename T>
 inline
 void LaspackMatrix<T>::set (const unsigned int i,
 			    const unsigned int j,
@@ -441,7 +441,7 @@ void LaspackMatrix<T>::set (const unsigned int i,
   libmesh_assert (this->initialized());
   libmesh_assert (i < this->m());
   libmesh_assert (j < this->n());
-  
+
   const unsigned int position = this->pos(i,j);
 
   // Sanity check
@@ -453,7 +453,7 @@ void LaspackMatrix<T>::set (const unsigned int i,
 
 
 
-template <typename T> 
+template <typename T>
 inline
 void LaspackMatrix<T>::add (const unsigned int i,
 			    const unsigned int j,
@@ -462,7 +462,7 @@ void LaspackMatrix<T>::add (const unsigned int i,
   libmesh_assert (this->initialized());
   libmesh_assert (i < this->m());
   libmesh_assert (j < this->n());
-  
+
   const unsigned int position = this->pos(i,j);
 
   // Sanity check
@@ -473,7 +473,7 @@ void LaspackMatrix<T>::add (const unsigned int i,
 
 
 
-template <typename T> 
+template <typename T>
 inline
 void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 				  const std::vector<unsigned int>& dof_indices)
@@ -492,9 +492,9 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
   LaspackMatrix<T>* X = libmesh_cast_ptr<LaspackMatrix<T>*> (&X_in);
   _LPNumber         a = static_cast<_LPNumber>          (a_in);
-  
+
   libmesh_assert(X != NULL);
-  
+
   // loops taken from LaspackMatrix<T>::zero ()
 
   const unsigned int n_rows = this->m();
@@ -503,15 +503,15 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
     {
       const std::vector<unsigned int>::const_iterator
 	r_start = _row_start[row];
-      
+
       const unsigned int len = (_row_start[row+1] - _row_start[row]);
 
       // Make sure we agree on the row length
       libmesh_assert (len == Q_GetLen(&_QMat, row+1));
       // compare matrix sparsity structures
       libmesh_assert (len == Q_GetLen(&(X->_QMat), row+1));
-	
-      
+
+
       for (unsigned int l=0; l<len; l++)
 	{
 	  const unsigned int j = *(r_start + l);
@@ -522,13 +522,13 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 	  const _LPNumber value = a * Q_GetEl(const_cast<QMatrix*>(&(X->_QMat)), row+1, j+1);
 	  Q_AddVal   (&_QMat, row+1, l, value);
 	}
-    }    
+    }
 }
 
 
 
 
-template <typename T> 
+template <typename T>
 inline
 T LaspackMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j) const
@@ -536,13 +536,13 @@ T LaspackMatrix<T>::operator () (const unsigned int i,
   libmesh_assert (this->initialized());
   libmesh_assert (i < this->m());
   libmesh_assert (j < this->n());
-  
+
   return Q_GetEl (const_cast<QMatrix*>(&_QMat), i+1, j+1);
 }
 
 
 
-template <typename T> 
+template <typename T>
 inline
 unsigned int LaspackMatrix<T>::pos (const unsigned int i,
 				    const unsigned int j) const
@@ -552,7 +552,7 @@ unsigned int LaspackMatrix<T>::pos (const unsigned int i,
   libmesh_assert (i+1 < _row_start.size());
   libmesh_assert (_row_start.back() == _csr.end());
 
-  // note this requires the _csr to be 
+  // note this requires the _csr to be
   std::pair<std::vector<unsigned int>::const_iterator,
 	    std::vector<unsigned int>::const_iterator> p =
     std::equal_range (_row_start[i],

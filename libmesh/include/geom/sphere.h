@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -38,7 +38,7 @@ namespace libMesh
  * This class defines a sphere.  It also computes coordinate
  * transformations between cartesian  \f$ (x, y, z) \f$
  * and spherical  \f$ (r, \theta, \phi) \f$ coordinates.
- * The spherical coordinates are valid in the ranges:  
+ * The spherical coordinates are valid in the ranges:
  *
  * - \f$ 0 \le r      < \infty \f$
  * - \f$ 0 \le \theta < \pi \f$
@@ -52,7 +52,7 @@ namespace libMesh
    \verbatim
 
           \      | Z
-           \theta|  
+           \theta|
             \    |    .
              \   |   .
               \  |  .
@@ -60,12 +60,12 @@ namespace libMesh
                 \|.
   ---------------+---------.---------
                 /|\       .          Y
-               /phi\     .  
-              /  |  \   .  
-             /   |   \ .  
-            /.........\  
+               /phi\     .
+              /  |  \   .
+             /   |   \ .
+            /.........\
            /     |
-        X /      
+        X /
    \endverbatim
  *
  * \author Benjamin S. Kirk, Daniel Dreyer
@@ -77,7 +77,7 @@ namespace libMesh
 class Sphere : public Surface
 {
 public:
-  
+
   /**
    * Dummy Constructor.
    */
@@ -128,8 +128,8 @@ public:
 
   /**
    * @returns true if the point p is on the surface,
-   * false otherwise.  Note that the definition of on 
-   * the surface really means "very close" to account 
+   * false otherwise.  Note that the definition of on
+   * the surface really means "very close" to account
    * for roundoff error.
    */
   bool on_surface (const Point& p) const;
@@ -141,7 +141,7 @@ public:
 
   /**
    * @returns a unit vector normal to the surface at
-   * point p.  
+   * point p.
    */
   Point unit_normal (const Point& p) const;
 
@@ -157,30 +157,30 @@ public:
 
   /**
    * @returns the center of the sphere.
-   */ 
+   */
   const Point& center() const { return _cent; }
 
   /**
    * @returns the center of the sphere.
-   */ 
+   */
   Point& center() { return _cent; }
 
   /**
    * @returns the spherical coordinates for the
    * cartesian coordinates \p cart.
-   */ 
+   */
   Point surface_coords (const Point& cart) const;
 
   /**
    * @returns the cartesian coordinates for the
    * spherical coordinates \p sph.
-   */ 
+   */
   Point world_coords (const Point& sph) const;
 
-  
+
 private:
 
-  
+
   /**
    * The center of the sphere.
    */

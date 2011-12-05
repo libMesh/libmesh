@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -42,16 +42,16 @@ namespace libMesh
 
 /**
  * \p FrequencySystem provides a specific system class
- * for frequency-dependent (linear) systems. 
+ * for frequency-dependent (linear) systems.
  * Generally two solution flavors are possible:
  *
  * - @e fast solution of moderately-sized systems:
- *   For moderate numbers of dof, it is possible to keep 
+ *   For moderate numbers of dof, it is possible to keep
  *   frequency-independent matrices in memory.  For this,
  *   simply provide multiple frequencies prior to \p ini().
- *   Also provide functions \p _assemble_fptr and \p _solve_fptr 
- *   that should compute the element contributions, and simply add 
- *   these contributions to give the frequency-dependent overall 
+ *   Also provide functions \p _assemble_fptr and \p _solve_fptr
+ *   that should compute the element contributions, and simply add
+ *   these contributions to give the frequency-dependent overall
  *   matrix, respectively. For details see the examples section.
  *
  * - solution of @e large systems:
@@ -83,7 +83,7 @@ public:
    * Destructor.
    */
   ~FrequencySystem ();
-  
+
   /**
    * Clear all the data structures associated with
    * the system, but leave the frequencies untouched.
@@ -91,7 +91,7 @@ public:
    * object.
    */
   virtual void clear ();
-  
+
   /**
    * The full clear method also clears the frequencies
    * (stored as parameters of the \p EquationSystems
@@ -107,12 +107,12 @@ public:
 
   /**
    * Solves the system for all frequencies.
-   */ 
+   */
   virtual void solve ();
-  
+
   /**
    * Solves the linear system for the
-   * \f$ [ \texttt{n\_start, n\_stop} ]^{th} \f$ 
+   * \f$ [ \texttt{n\_start, n\_stop} ]^{th} \f$
    * frequencies. The solution vectors are stored in automatically
    * allocated vectors named \p solution_nnnn.  For access to these vectors,
    * see \p System. When calling this, the frequency range should better
@@ -120,7 +120,7 @@ public:
    */
   void solve (const unsigned int n_start,
 	      const unsigned int n_stop);
-  
+
   /**
    * @returns \p "Frequency".  Helps in identifying
    * the system type in an equation system file.
@@ -131,7 +131,7 @@ public:
   //--------------------------------------------------------
   // Methods specific to the FrequencySystem
   //
-  
+
   /**
    * Set the frequency range for which the
    * system should be solved.  \p n_freq frequencies
@@ -150,9 +150,9 @@ public:
 				 const bool allocate_solution_duplicates=true);
 
   /**
-   * Set the frequency range for which the system should 
-   * be solved.  \p n_freq frequencies are equally 
-   * distributed in the interval 
+   * Set the frequency range for which the system should
+   * be solved.  \p n_freq frequencies are equally
+   * distributed in the interval
    * \f$ [ \texttt{min\_freq, max\_freq} ] \f$ .
    * By default, the solution for each frequency is copied
    * to a separate \p NumericVector.  This feature
@@ -177,16 +177,16 @@ public:
    * @returns the number of frequencies to solve
    */
   unsigned int n_frequencies () const;
-  
+
   /**
    * Register a required user function to use in assembling/solving the system.
    * It is intended to compute @e frequency-dependent data.  For proper
-   * work of \p FrequencySystem, at least @e this function has to be provided 
+   * work of \p FrequencySystem, at least @e this function has to be provided
    * by the user.
    */
   void attach_solve_function(void fptr(EquationSystems& es,
 				       const std::string& name));
-  
+
   /**
    * Function that computes frequency-dependent data of the system.
    */
@@ -200,14 +200,14 @@ public:
 
   /**
    * @returns a string of the form \p "frequency_x", where \p x is
-   * the integer \p n.  Useful for identifying frequencies and 
+   * the integer \p n.  Useful for identifying frequencies and
    * solution vectors in the parameters set of \p _equation_systems.
    */
   std::string form_freq_param_name(const unsigned int n) const;
 
   /**
    * @returns a string of the form \p "solution_x", where \p x is
-   * the integer \p n.  Useful for identifying frequencies and 
+   * the integer \p n.  Useful for identifying frequencies and
    * solution vectors in the vectors map of \p System.
    */
   std::string form_solu_vec_name(const unsigned int n) const;
@@ -218,12 +218,12 @@ protected:
 
   /**
    * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.  
-   * The frequenices have to be set @e prior to calling 
+   * the system, so that, e.g., \p assemble() may be used.
+   * The frequenices have to be set @e prior to calling
    * \p init().
    */
   virtual void init_data ();
-  
+
   /**
    * Sets the current frequency to the \p n-th entry in the vector
    * \p _frequencies.
@@ -231,16 +231,16 @@ protected:
   void set_current_frequency(unsigned int n);
 
   /**
-   * true when we have frequencies to solve for. 
+   * true when we have frequencies to solve for.
    * Setting the frequencies is the first step after
    * creating/adding a \p FrequencySystem.
    */
   bool _finished_set_frequencies;
 
   /**
-   * when the solution for each frequency should be 
+   * when the solution for each frequency should be
    * stored in an additional vector, then this \p bool
-   * is \p true, otherwise \p false.  
+   * is \p true, otherwise \p false.
    * \p _keep_solution_duplicates is implicitly set
    * through the \p set_frequencies methods.
    */
@@ -256,14 +256,14 @@ protected:
   /**
    * true when we have finished the \p assemble() phase.
    * This is the third step and requires that
-   * a) frequencies have already been set, and 
+   * a) frequencies have already been set, and
    * b) the system has been initialized.
    *
    * In this linear, frequency-dependent setting,
    * the overall system matrices \p mass, \p damping
    * and \p stiffness only have to be assembled once,
    * before multiple solutions may be obtained for
-   * different frequencies. 
+   * different frequencies.
    */
   bool _finished_assemble;
 

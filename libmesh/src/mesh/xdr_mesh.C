@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -30,16 +30,16 @@ namespace libMesh
 int XdrMESH::header(XdrMHEAD *hd)
 {
   // Temporary variables to facilitate stream reading
-  const int comm_len= 256;  
+  const int comm_len= 256;
   char comment[comm_len];
-  
+
   switch (m_type)
     {
-      
+
 #ifdef LIBMESH_HAVE_XDR
-      
+
     case (XdrMGF::DECODE):
-    case (XdrMGF::ENCODE): 
+    case (XdrMGF::ENCODE):
       {
 	xdr_int(mp_xdr_handle, &(hd->m_numel));
 	xdr_int(mp_xdr_handle, &(hd->m_numNodes));
@@ -50,7 +50,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       }
 
 #endif
-      
+
     case (XdrMGF::W_ASCII):
       {
 	mp_out << hd->m_numel    << "\t # Num. Elements\n";
@@ -64,7 +64,7 @@ int XdrMESH::header(XdrMHEAD *hd)
     case (XdrMGF::R_ASCII):
       {
 	libmesh_assert (mp_in.good());
-	
+
 	mp_in >> hd->m_numel    ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);
 	mp_in >> hd->m_sumWghts ; mp_in.getline(comment, comm_len);
@@ -79,26 +79,26 @@ int XdrMESH::header(XdrMHEAD *hd)
     default:
       // Unknown access type
       libmesh_error();
-      
+
     }
-  
+
   // Let's write the augmented header information
   // before we write the title and id string
 
   // Both DEAL and LIBM style files have augmented headers.
-  if ((orig_flag == 0) || (orig_flag == 2)) 
+  if ((orig_flag == 0) || (orig_flag == 2))
     {
 
       switch (m_type)
 	{
-	  
+
 #ifdef LIBMESH_HAVE_XDR
-	  
+
 	case (XdrMGF::ENCODE):
 	case (XdrMGF::DECODE):
 	  {
 	    // this used to be 0.  How did that work?
-	    unsigned int temp_n_blocks = hd->get_n_blocks(); 
+	    unsigned int temp_n_blocks = hd->get_n_blocks();
 	    xdr_u_int(mp_xdr_handle, &temp_n_blocks);
 	    hd->set_n_blocks(temp_n_blocks);
 
@@ -110,7 +110,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 	  }
 
 #endif
-	  
+
 	case (XdrMGF::W_ASCII):
 	  {
 	    mp_out << hd->get_n_blocks() << "\t # Num. Element Blocks.\n";
@@ -132,27 +132,27 @@ int XdrMESH::header(XdrMHEAD *hd)
 	  libmesh_error();
 	}
 
-      
+
       std::vector<ElemType> et;
       hd->get_block_elt_types(et);
 
-      
+
       // Note:  If DECODING or READING, allocate space in the vector
       if ((m_type == DECODE) || (m_type == R_ASCII))
-	et.resize(hd->get_n_blocks());  
+	et.resize(hd->get_n_blocks());
 
 
       switch (m_type)
 	{
-	  
+
 #ifdef LIBMESH_HAVE_XDR
-	  
+
 	case (XdrMGF::ENCODE):
 	case (XdrMGF::DECODE):
 	  {
 	    xdr_vector(mp_xdr_handle,
 		       (char *) &et[0],
-		       et.size(), 
+		       et.size(),
 		       sizeof(unsigned int),
 		       (xdrproc_t) xdr_u_int);
 	    break;
@@ -164,7 +164,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 	  {
 	    for (unsigned int i=0; i<hd->get_n_blocks(); i++)
 	      mp_out << et[i] << " ";
-	      
+
 	    mp_out << "\t # Element types in each block.\n";
 	    break;
 	  }
@@ -172,15 +172,15 @@ int XdrMESH::header(XdrMHEAD *hd)
 	case (XdrMGF::R_ASCII):
 	  {
 	    libmesh_assert (mp_in.good());
-	
+
 	    for (unsigned int i=0; i<hd->get_n_blocks(); i++)
 	      {
 		// convoluted way of doing it to
 		// satisfy icc
 		unsigned int type;
-		
+
 		mp_in >> type ;
-		
+
 		et[i] = static_cast<ElemType>(type) ;
 	      }
 	    mp_in.getline(comment, comm_len);
@@ -193,42 +193,42 @@ int XdrMESH::header(XdrMHEAD *hd)
 	}
 
 
-      
-      // Note:  If DECODING or READING, you need to set the value 
+
+      // Note:  If DECODING or READING, you need to set the value
       // in the header data structure.
-      if ((m_type == DECODE) || (m_type == R_ASCII)) 
+      if ((m_type == DECODE) || (m_type == R_ASCII))
 	hd->set_block_elt_types(et);
 
 
       std::vector<unsigned int> neeb;
       hd->get_num_elem_each_block(neeb);
 
-      // If DECODING or READING, allocate space for the vector 
+      // If DECODING or READING, allocate space for the vector
       if ((m_type == DECODE) || (m_type == R_ASCII))
 	neeb.resize( hd->get_n_blocks()*(this->get_num_levels()+1) );
 
       switch (m_type)
 	{
-	  
+
 #ifdef LIBMESH_HAVE_XDR
-	  
+
 	case (XdrMGF::ENCODE):
 	case (XdrMGF::DECODE):
 	  {
 	    xdr_vector(mp_xdr_handle,
 		       (char *) &neeb[0],
-		       neeb.size(), 
+		       neeb.size(),
 		       sizeof(unsigned int),
 		       (xdrproc_t) xdr_u_int);
 	  }
 
 #endif
-	  
+
 	case (XdrMGF::W_ASCII):
 	  {
 	    for (unsigned int i=0; i<neeb.size(); i++)
 	      mp_out << neeb[i] << " ";
-	      
+
 	    mp_out << "\t # Num. of elements in each block at each level.\n";
 	    break;
 	  }
@@ -268,7 +268,7 @@ int XdrMESH::header(XdrMHEAD *hd)
                 // If you reach an alphabetic character, this is an error
                 if (!isdigit(token[0]))
 		  {
-		    libMesh::err << "Error: Unrecognized character detected." 
+		    libMesh::err << "Error: Unrecognized character detected."
 			          << std::endl;
 		    libmesh_error();
 		  }
@@ -276,7 +276,7 @@ int XdrMESH::header(XdrMHEAD *hd)
                 // Otherwise, add the value to the neeb vector
                 neeb.push_back( std::atoi(token) );
               }
-              
+
 	    // Be sure you have the right number of entries in neeb
 	    libmesh_assert (neeb.size() == (hd->get_n_blocks() * (this->get_num_levels()+1)));
 
@@ -288,8 +288,8 @@ int XdrMESH::header(XdrMHEAD *hd)
 	  libmesh_error();
 	}
 
-      if ((m_type == DECODE) || (m_type == R_ASCII)) 
-	hd->set_num_elem_each_block(neeb);      
+      if ((m_type == DECODE) || (m_type == R_ASCII))
+	hd->set_num_elem_each_block(neeb);
     }
 
 
@@ -300,8 +300,8 @@ int XdrMESH::header(XdrMHEAD *hd)
     {
       libmesh_error();
     }
-  
-  
+
+
 
 
   // Write the ID and TITLE strings (can be safely ignored)
@@ -309,7 +309,7 @@ int XdrMESH::header(XdrMHEAD *hd)
     {
 
 #ifdef LIBMESH_HAVE_XDR
-      
+
     case (XdrMGF::ENCODE):
     case (XdrMGF::DECODE):
       {
@@ -327,7 +327,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       }
 
 #endif
-      
+
     case (XdrMGF::W_ASCII):
       {
 	mp_out << hd->mp_id    << '\n';
@@ -338,12 +338,12 @@ int XdrMESH::header(XdrMHEAD *hd)
     case (XdrMGF::R_ASCII):
       {
 	libmesh_assert (mp_in.good());
-	
+
 	mp_in.getline(comment, comm_len);
 	hd->setId(comment);
 
 	libmesh_assert (mp_in.good());
-	
+
 	mp_in.getline(comment, comm_len);
 	hd->setTitle(comment);
 
@@ -354,7 +354,7 @@ int XdrMESH::header(XdrMHEAD *hd)
       // Unknown access type
       libmesh_error();
     }
-  
+
   return 1;
 }
 

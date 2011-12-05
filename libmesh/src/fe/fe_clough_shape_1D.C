@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -80,14 +80,14 @@ void clough_compute_coefs(const Elem* elem)
     {
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = FE<1,LAGRANGE>::shape_deriv 
+          const Real ddxi = FE<1,LAGRANGE>::shape_deriv
             (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
           dxdxi[p] += dofpt[p](0) * ddxi;
         }
     }
 
   // Calculate derivative scaling factors
-  
+
   d1xd1x = dxdxi[0];
   d2xd2x = dxdxi[1];
 }
@@ -171,7 +171,7 @@ Real clough_raw_shape(const unsigned int basis_num,
   return 0.;
 }
 
-  
+
 } // end anonymous namespace
 
 
@@ -188,7 +188,7 @@ Real FE<1,CLOUGH>::shape(const ElemType,
   libMesh::err << "Clough-Tocher elements require the real element\n"
 	        << "to construct gradient-based degrees of freedom."
 	        << std::endl;
-  
+
   libmesh_error();
   return 0.;
 }
@@ -208,9 +208,9 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (totalorder)
-    {      
+    {
       // 3rd-order C1 cubic element
     case THIRD:
       {
@@ -246,7 +246,7 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -255,7 +255,7 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
 
 template <>
 Real FE<1,CLOUGH>::shape_deriv(const ElemType,
-				   const Order,			    
+				   const Order,
 				   const unsigned int,
 				   const unsigned int,
 				   const Point&)
@@ -284,9 +284,9 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (totalorder)
-    {      
+    {
       // 3rd-order C1 cubic element
     case THIRD:
       {
@@ -320,7 +320,7 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }
@@ -341,9 +341,9 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
   const ElemType type = elem->type();
 
   const Order totalorder = static_cast<Order>(order + elem->p_level());
-  
+
   switch (totalorder)
-    {      
+    {
       // 3rd-order C1 cubic element
     case THIRD:
       {
@@ -377,7 +377,7 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
       libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
       libmesh_error();
     }
-  
+
   libmesh_error();
   return 0.;
 }

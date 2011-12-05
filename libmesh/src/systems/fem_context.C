@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -41,12 +41,12 @@ namespace libMesh
 FEMContext::FEMContext (const System &sys)
   : DiffContext(sys),
     element_qrule(NULL), side_qrule(NULL),
-    edge_qrule(NULL), 
+    edge_qrule(NULL),
     _mesh_sys(sys.get_mesh_system()),
     _mesh_x_var(sys.get_mesh_x_var()),
     _mesh_y_var(sys.get_mesh_y_var()),
     _mesh_z_var(sys.get_mesh_z_var()),
-    elem(NULL), 
+    elem(NULL),
     side(0), edge(0), dim(sys.get_mesh().mesh_dimension())
 {
   // We need to know which of our variables has the hardest
@@ -306,7 +306,7 @@ Number FEMContext::point_value(unsigned int var, const Point &p)
   libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
-  
+
   // Get current local coefficients
   libmesh_assert (elem_subsolutions.size() > var);
   libmesh_assert (elem_subsolutions[var] != NULL);
@@ -492,7 +492,7 @@ Number FEMContext::fixed_point_value(unsigned int var, const Point &p)
   libmesh_assert (dof_indices.size() > var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
-  
+
   // Get current local coefficients
   libmesh_assert (elem_fixed_subsolutions.size() > var);
   libmesh_assert (elem_fixed_subsolutions[var] != NULL);
@@ -516,7 +516,7 @@ void FEMContext::elem_reinit(Real theta)
 {
   // Update the "time" variable of this context object
   this->_update_time_from_system(theta);
-  
+
   // Handle a moving element if necessary.
   if (_mesh_sys)
     // We assume that the ``default'' state
@@ -538,7 +538,7 @@ void FEMContext::elem_side_reinit(Real theta)
 {
   // Update the "time" variable of this context object
   this->_update_time_from_system(theta);
-  
+
   // Handle a moving element if necessary
   if (_mesh_sys)
     {
@@ -553,7 +553,7 @@ void FEMContext::elem_edge_reinit(Real theta)
 {
   // Update the "time" variable of this context object
   this->_update_time_from_system(theta);
-  
+
   // Handle a moving element if necessary
   if (_mesh_sys)
     {

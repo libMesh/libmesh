@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -24,7 +24,7 @@
 
 namespace libMesh
 {
- 
+
 
 
 void QJacobi::init_1D(const ElemType,
@@ -48,11 +48,11 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (1);
 	    _weights.resize(1);
-	
+
 	    _points[0](0)  = 1./3.;
-	
+
 	    _weights[0]    = 0.5;
-	
+
 	    return;
 	  }
 	case SECOND:
@@ -60,7 +60,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (2);
 	    _weights.resize(2);
-	      
+
 	    _points[ 0](0)=1.5505102572168219018027159252941e-01L;	_weights[ 0]=3.1804138174397716939436900207516e-01L;
 	    _points[ 1](0)=6.4494897427831780981972840747059e-01L;	_weights[ 1]=1.8195861825602283060563099792484e-01L;
 
@@ -71,7 +71,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (3);
 	    _weights.resize(3);
-	      
+
 	    _points[ 0](0)=8.8587959512703947395546143769456e-02L;	_weights[ 0]=2.0093191373895963077219813326460e-01L;
 	    _points[ 1](0)=4.0946686444073471086492625206883e-01L;	_weights[ 1]=2.2924110635958624669392059455632e-01L;
 	    _points[ 2](0)=7.8765946176084705602524188987600e-01L;	_weights[ 2]=6.9826979901454122533881272179077e-02L;
@@ -83,7 +83,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (4);
 	    _weights.resize(4);
-	      
+
 	    _points[ 0](0)=5.7104196114517682193121192554116e-02L;	_weights[ 0]=1.3550691343148811620826417407794e-01L;
 	    _points[ 1](0)=2.7684301363812382768004599768563e-01L;	_weights[ 1]=2.0346456801027136079140447593585e-01L;
 	    _points[ 2](0)=5.8359043236891682005669766866292e-01L;	_weights[ 2]=1.2984754760823244082645620288963e-01L;
@@ -96,7 +96,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (5);
 	    _weights.resize(5);
-	      
+
 	    _points[ 0](0)=3.9809857051468742340806690093333e-02L;	_weights[ 0]=9.6781590226651679274360971636151e-02L;
 	    _points[ 1](0)=1.9801341787360817253579213679530e-01L;	_weights[ 1]=1.6717463809436956549167562309770e-01L;
 	    _points[ 2](0)=4.3797481024738614400501252000523e-01L;	_weights[ 2]=1.4638698708466980869803786935596e-01L;
@@ -108,10 +108,10 @@ void QJacobi::init_1D(const ElemType,
 	case TENTH:
 	case ELEVENTH:
 	  {
-	
+
 	    _points.resize (6);
 	    _weights.resize(6);
-	      
+
 	    _points[ 0](0)=2.9316427159784891972050276913165e-02L;	_weights[ 0]=7.2310330725508683655454326124832e-02L;
 	    _points[ 1](0)=1.4807859966848429184997685249598e-01L;	_weights[ 1]=1.3554249723151861684069039663805e-01L;
 	    _points[ 2](0)=3.3698469028115429909705297208078e-01L;	_weights[ 2]=1.4079255378819892811907683907093e-01L;
@@ -126,7 +126,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (7);
 	    _weights.resize(7);
-	      
+
 	    _points[ 0](0)=2.2479386438712498108825499570845e-02L;	_weights[ 0]=5.5967363423491051151562113429926e-02L;
 	    _points[ 1](0)=1.1467905316090423190964023706751e-01L;	_weights[ 1]=1.1050925819087460242112073636961e-01L;
 	    _points[ 2](0)=2.6578982278458946847678939169339e-01L;	_weights[ 2]=1.2739089729958832691873448577496e-01L;
@@ -142,7 +142,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (8);
 	    _weights.resize(8);
-	      
+
 	    _points[ 0](0)=1.7779915147363451813205101037679e-02L;	_weights[ 0]=4.4550804361555931326215619533963e-02L;
 	    _points[ 1](0)=9.1323607899793956003741458074541e-02L;	_weights[ 1]=9.1119023636373626345722461782880e-02L;
 	    _points[ 2](0)=2.1430847939563075835754126758167e-01L;	_weights[ 2]=1.1250579947088736617177209860428e-01L;
@@ -190,7 +190,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[ 9](0)=9.6997096783851350295693564236559e-01L;	_weights[ 9]=1.4991406024063940282481360041064e-03L;
 
 	    return;
-	  }      
+	  }
 	case TWENTIETH:
 	case TWENTYFIRST:
 	  {
@@ -252,7 +252,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[10](0)=8.7369482130668941936771456713174e-01L;	_weights[10]=9.4489244795927503661800865492413e-03L;
 	    _points[11](0)=9.3852445910073101239763338676530e-01L;	_weights[11]=3.3383592507737718066104206420419e-03L;
 	    _points[12](0)=9.8138963498901214856028062215971e-01L;	_weights[12]=5.7805670493619285159651119259460e-04L;
-	    
+
 	    return;
 	  }
 
@@ -285,7 +285,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (15);
 	    _weights.resize(15);
-	    
+
 	    _points[ 0](0)=5.6406889725117097575064665794442e-03L;	_weights[ 0]=1.4367069621712523019113300206269e-02L;
 	    _points[ 1](0)=2.9482298647942486631640984718004e-02L;	_weights[ 1]=3.2119044874965915878547666076448e-02L;
 	    _points[ 2](0)=7.1412953115158840054783901746735e-02L;	_weights[ 2]=4.6891639944059925679345570546797e-02L;
@@ -338,7 +338,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (17);
 	    _weights.resize(17);
-	
+
 	    _points[ 0](0)=4.4579935677873917545062291115464e-03L;	_weights[ 0]=1.1372703113196894148880104403419e-02L;
 	    _points[ 1](0)=2.3340094123774273967021528207683e-02L;	_weights[ 1]=2.5642427920205179185750205247311e-02L;
 	    _points[ 2](0)=5.6707968769078239532713331556521e-02L;	_weights[ 2]=3.8025728825742400201474917006665e-02L;
@@ -356,7 +356,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[14](0)=9.2224303459229840848710732823038e-01L;	_weights[14]=3.6472304834214064450344565237838e-03L;
 	    _points[15](0)=9.6250119782335004125046077538851e-01L;	_weights[15]=1.2526834393912207489106525201067e-03L;
 	    _points[16](0)=9.8871404063224375141712140225296e-01L;	_weights[16]=2.1311628920693358082515074128342e-04L;
-	
+
 	    return;
 	  }
 
@@ -384,7 +384,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[15](0)=9.3002088969969321648195850472769e-01L;	_weights[15]=2.9624430644328375036535062298419e-03L;
 	    _points[16](0)=9.6630075194563254241150674649068e-01L;	_weights[16]=1.0130251793010471252471709101709e-03L;
 	    _points[17](0)=9.8986684820259713441676302277596e-01L;	_weights[17]=1.7186908409819589231237151109171e-04L;
-	
+
 	    return;
 	  }
 
@@ -413,7 +413,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[16](0)=9.3669584807436508054390550208195e-01L;	_weights[16]=2.4300917120432807075681660438661e-03L;
 	    _points[17](0)=9.6955263708022088547192878623227e-01L;	_weights[17]=8.2788076092398219334600301771448e-04L;
 	    _points[18](0)=9.9085180527095568535309483522012e-01L;	_weights[18]=1.4012759417838633744062778723898e-04L;
-	
+
 	    return;
 	  }
 
@@ -443,7 +443,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[17](0)=9.4246554236318633869089187742766e-01L;	_weights[17]=2.0114576139640780069071394684122e-03L;
 	    _points[18](0)=9.7235694664743691118470187166465e-01L;	_weights[18]=6.8306227608592198451771987553801e-04L;
 	    _points[19](0)=9.9169995579293273076654365969470e-01L;	_weights[19]=1.1538190717568529014836276132844e-04L;
-	
+
 	    return;
 	  }
 
@@ -474,7 +474,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[18](0)=9.4748554440639734668609897166113e-01L;	_weights[18]=1.6787560215669155362763365937815e-03L;
 	    _points[19](0)=9.7479197566036565307915209128675e-01L;	_weights[19]=5.6849852669976417861179123569953e-04L;
 	    _points[20](0)=9.9243549072562147749379027938900e-01L;	_weights[20]=9.5861868529721828979599842865244e-05L;
-	
+
 	    return;
 	  }
 
@@ -506,15 +506,15 @@ void QJacobi::init_1D(const ElemType,
 	    _points[19](0)=9.5187959322971991452332541323047e-01L;	_weights[19]=1.4117668531394242829582650189559e-03L;
 	    _points[20](0)=9.7691966323712886717816657113704e-01L;	_weights[20]=4.7692790565900675904839748933142e-04L;
 	    _points[21](0)=9.9307748504434821490300210664154e-01L;	_weights[21]=8.0298216937450816028842814607537e-05L;
-	
+
 	    return;
 	  }
-      
+
 	default:
 	  {
 	    libMesh::err << "Quadrature rule " << _order
 		          << " not supported!" << std::endl;
-	      
+
 	    libmesh_error();
 	  }
 	} // end switch(_order + 2*p)
@@ -523,10 +523,10 @@ void QJacobi::init_1D(const ElemType,
     } // end if ((_alpha == 1) && (_beta == 0))
 
 
-  
+
   else if ((_alpha == 2) && (_beta == 0))
     {
-      
+
       switch(_order + 2*p)
 	{
 	case CONSTANT:
@@ -534,11 +534,11 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (1);
 	    _weights.resize(1);
-	
+
 	    _points[0](0)  = 0.25;
-	
+
 	    _weights[0]    = 1./3.;
-	
+
 	    return;
 	  }
 	case SECOND:
@@ -546,7 +546,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (2);
 	    _weights.resize(2);
-	    
+
 	    _points[ 0](0)=1.2251482265544137786674043037115e-01L;	_weights[ 0]=2.3254745125350790274997694884235e-01L;
 	    _points[ 1](0)=5.4415184401122528879992623629551e-01L;	_weights[ 1]=1.0078588207982543058335638449099e-01L;
 
@@ -557,7 +557,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (3);
 	    _weights.resize(3);
-	      
+
 	    _points[ 0](0)=7.2994024073149732155837979012003e-02L;	_weights[ 0]=1.5713636106488661331834482221327e-01L;
 	    _points[ 1](0)=3.4700376603835188472176354340395e-01L;	_weights[ 1]=1.4624626925986602200351202036424e-01L;
 	    _points[ 2](0)=7.0500220988849838312239847758405e-01L;	_weights[ 2]=2.9950703008580698011476490755827e-02L;
@@ -569,7 +569,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (4);
 	    _weights.resize(4);
-	      
+
 	    _points[ 0](0)=4.8500549446997329297067257098986e-02L;	_weights[ 0]=1.1088841561127798368323131746895e-01L;
 	    _points[ 1](0)=2.3860073755186230505898141272470e-01L;	_weights[ 1]=1.4345878979921420904832801427594e-01L;
 	    _points[ 2](0)=5.1704729510436750234057336938307e-01L;	_weights[ 2]=6.8633887172923075317376345041811e-02L;
@@ -582,7 +582,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (5);
 	    _weights.resize(5);
-	      
+
 	    _points[ 0](0)=3.4578939918215091524457428631527e-02L;	_weights[ 0]=8.1764784285770917904880732922352e-02L;
 	    _points[ 1](0)=1.7348032077169572310459241798618e-01L;	_weights[ 1]=1.2619896189991148802883293516467e-01L;
 	    _points[ 2](0)=3.8988638706551932824089541038499e-01L;	_weights[ 2]=8.9200161221590000186254493070384e-02L;
@@ -594,10 +594,10 @@ void QJacobi::init_1D(const ElemType,
 	case TENTH:
 	case ELEVENTH:
 	  {
-	
+
 	    _points.resize (6);
 	    _weights.resize(6);
-	      
+
 	    _points[ 0](0)=2.5904555093667192754643606997235e-02L;	_weights[ 0]=6.2538702726580937878526556468332e-02L;
 	    _points[ 1](0)=1.3156394165798513398691085074097e-01L;	_weights[ 1]=1.0737649973678063260575568234795e-01L;
 	    _points[ 2](0)=3.0243691802289123274990557791855e-01L;	_weights[ 2]=9.4577186748541203568292051720052e-02L;
@@ -612,7 +612,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (7);
 	    _weights.resize(7);
-	      
+
 	    _points[ 0](0)=2.0132773773400507230501687117472e-02L;	_weights[ 0]=4.9276501776438120823429129084905e-02L;
 	    _points[ 1](0)=1.0308902914804901475222678600595e-01L;	_weights[ 1]=9.0698824612686144536967479972374e-02L;
 	    _points[ 2](0)=2.4055412604805753665369914150100e-01L;	_weights[ 2]=9.1733803279795254111416595896867e-02L;
@@ -628,7 +628,7 @@ void QJacobi::init_1D(const ElemType,
 	  {
 	    _points.resize (8);
 	    _weights.resize(8);
-	      
+
 	    _points[ 0](0)=1.6097759551921033532013550096618e-02L;	_weights[ 0]=3.9778957806690559830106455926398e-02L;
 	    _points[ 1](0)=8.2900617485651102700366353380388e-02L;	_weights[ 1]=7.6818093267222624804506735068290e-02L;
 	    _points[ 2](0)=1.9547516848873991732426660953061e-01L;	_weights[ 2]=8.5284769171938765209441226265186e-02L;
@@ -676,7 +676,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[ 9](0)=9.5087429264052316644634948461033e-01L;	_weights[ 9]=1.5324003669716084212825702284675e-04L;
 
 	    return;
-	  }      
+	  }
 	case TWENTIETH:
 	case TWENTYFIRST:
 	  {
@@ -738,7 +738,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[10](0)=8.4769104394723239091031404895142e-01L;	_weights[10]=1.8323911392393785873485644191745e-03L;
 	    _points[11](0)=9.1799964553720667953362597028835e-01L;	_weights[11]=4.1072089179088541678428389490865e-04L;
 	    _points[12](0)=9.6892889422858896211181181730274e-01L;	_weights[12]=3.9016993264146227750471940564101e-05L;
-	
+
 	    return;
 	  }
 
@@ -762,7 +762,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[11](0)=8.6582490073159695367114083518102e-01L;	_weights[11]=1.2617838951574880413283334197260e-03L;
 	    _points[12](0)=9.2799573874675232498377812203940e-01L;	_weights[12]=2.7909934094687847008945560658272e-04L;
 	    _points[13](0)=9.7277712074118323045296336316727e-01L;	_weights[13]=2.6276161668899854751670304157309e-05L;
-	
+
 	    return;
 	  }
 
@@ -787,7 +787,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[12](0)=8.8094952871531360238808055493652e-01L;	_weights[12]=8.8657363523409667398227745346013e-04L;
 	    _points[13](0)=9.3628182173551874210251937228715e-01L;	_weights[13]=1.9398726306394554934013378631178e-04L;
 	    _points[14](0)=9.7595387433502370956200384127912e-01L;	_weights[14]=1.8128785569508725971591601924058e-05L;
-	
+
 	    return;
 	  }
 
@@ -814,7 +814,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[13](0)=8.9368597454880401881486969876816e-01L;	_weights[13]=6.3445999956883686801084896849641e-04L;
 	    _points[14](0)=9.4322428571224559352545066239296e-01L;	_weights[14]=1.3757810397555175246959527906570e-04L;
 	    _points[15](0)=9.7860643749869701257280091378128e-01L;	_weights[15]=1.2778410569693501244162062287056e-05L;
-	
+
 	    return;
 	  }
 
@@ -842,7 +842,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[14](0)=9.0450542331432870037906100932836e-01L;	_weights[14]=4.6167405877711308077043506706165e-04L;
 	    _points[15](0)=9.4909701659654457024654762835657e-01L;	_weights[15]=9.9356525335473959962406835119113e-05L;
 	    _points[16](0)=9.8084389384741256367666372092760e-01L;	_weights[16]=9.1808042001255039722337720228143e-06L;
-	
+
 	    return;
 	  }
 
@@ -870,7 +870,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[15](0)=9.1376986411079293616612318979159e-01L;	_weights[15]=3.4109120368765498289598525047321e-04L;
 	    _points[16](0)=9.5410789551731665881890309384613e-01L;	_weights[16]=7.2937008664118705328162954331465e-05L;
 	    _points[17](0)=9.8274840759428696063307389954630e-01L;	_weights[17]=6.7100861245431215907697266774769e-06L;
-	
+
 	    return;
 	  }
 
@@ -899,7 +899,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[16](0)=9.2176068172914004889937421632274e-01L;	_weights[16]=2.5553085889097125647555166013802e-04L;
 	    _points[17](0)=9.5841690242340714510347790926694e-01L;	_weights[17]=5.4342643132004416773622274012570e-05L;
 	    _points[18](0)=9.8438280655170201067612761745569e-01L;	_weights[18]=4.9807023319691181766751703037610e-06L;
-	
+
 	    return;
 	  }
 
@@ -929,7 +929,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[17](0)=9.2869901491875054534509783716727e-01L;	_weights[17]=1.9388830961751181076983851525948e-04L;
 	    _points[18](0)=9.6214871215049818970916080642292e-01L;	_weights[18]=4.1039102087320205549074040898061e-05L;
 	    _points[19](0)=9.8579578884064184668002313135922e-01L;	_weights[19]=3.7492209933371347725241368372638e-06L;
-	
+
 	    return;
 	  }
 
@@ -961,7 +961,7 @@ void QJacobi::init_1D(const ElemType,
 	    _points[18](0)=9.3476043640122994798279429359660e-01L;	_weights[18]=1.4884999898655056859287865070751e-04L;
 	    _points[19](0)=9.6540160736574245809294907904429e-01L;	_weights[19]=3.1377233396792732027953172274463e-05L;
 	    _points[20](0)=9.8702556657875783654690055164718e-01L;	_weights[20]=2.8584835468101709504260347382715e-06L;
-	
+
 	    return;
 	  }
 
@@ -993,16 +993,16 @@ void QJacobi::init_1D(const ElemType,
 	    _points[19](0)=9.4008566921081846961603077466108e-01L;	_weights[19]=1.1551470917602499323205530447797e-04L;
 	    _points[20](0)=9.6825388381656365288164210087944e-01L;	_weights[20]=2.4263177919766775694554800111547e-05L;
 	    _points[21](0)=9.8810245999087788318348935085438e-01L;	_weights[21]=2.2049570604019597784590797971169e-06L;
-	
+
 	    return;
 	  }
 
-      
+
 	default:
 	  {
 	    libMesh::err << "Quadrature rule " << _order
 		          << " not supported!" << std::endl;
-	      
+
 	    libmesh_error();
 	  }
 	} // end switch(_order + 2*p)
@@ -1020,10 +1020,10 @@ void QJacobi::init_1D(const ElemType,
 		    << std::endl;
     }
 
-  
+
   return;
 }
 
 } // namespace libMesh
- 
+
 

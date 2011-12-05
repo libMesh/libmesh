@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -63,21 +63,21 @@ class MeshOutput
    * rendering this object useless.
    */
   MeshOutput (const bool is_parallel_format = false);
-  
+
   /**
    * Constructor.  Takes a reference to a constant object.
    * This constructor will only allow us to write the object.
    */
   MeshOutput (const MT&, const bool is_parallel_format = false);
 
-  
+
  public:
 
   /**
    * Destructor.
    */
   virtual ~MeshOutput ();
-  
+
   /**
    * This method implements writing a mesh to a specified file.
    */
@@ -107,7 +107,7 @@ class MeshOutput
    * Real back when reading in.
    */
   unsigned int & ascii_precision ();
-  
+
  protected:
 
 
@@ -124,9 +124,9 @@ class MeshOutput
    */
   const bool _is_parallel_format;
 
-  
+
  private:
-  
+
 
   /**
    *  A pointer to a constant object.
@@ -176,7 +176,7 @@ MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
     {
       if (libMesh::processor_id() == 0)
 	{
-          libmesh_do_once(libMesh::err << 
+          libmesh_do_once(libMesh::err <<
             "Warning:  This MeshOutput subclass only support meshes which have been serialized!"
 	    << std::endl; libmesh_here(););
         }
@@ -214,7 +214,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
   //es.build_variable_names  (names);
   //es.build_solution_vector (soln);
 
-  this->write_nodal_data (fname, soln, names);  
+  this->write_nodal_data (fname, soln, names);
 
   STOP_LOG("write_equation_systems()", "MeshOutput");
 }

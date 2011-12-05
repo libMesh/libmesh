@@ -1,17 +1,17 @@
 // $Id$
 
 // Copyright (C) 2002-2007  Benjamin S. Kirk
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,7 +48,7 @@ namespace libMesh
 // {
 //   const std::string gname = basename + ".g";
 //   const std::string qname = basename + ".q";
-  
+
 //   // FORTAN file unit numbers
 //   const int gunit = 25;
 //   const int qunit = 26;
@@ -64,36 +64,36 @@ namespace libMesh
 //       libMesh::out << std::endl;
 //     }
 
-  
+
 //   // Open the FORTRAN unformatted file
 //   {
 //     libmesh_assert (gname.size() == qname.size());
 //     int len = gname.size();
-    
+
 //     open_ (&gunit, gname.c_str(), &len);
 
 //     if (!gridonly)
 //       open_ (&qunit, qname.c_str(), &len);
 //   }
-  
+
 //   // Write the headers
 //   {
 //     std::vector<int> ints;
 //     ints.reserve (3*this->n_zones());
-    
+
 //     for (unsigned int zn=0; zn<this->n_zones(); zn++)
 //       {
 // 	ints.push_back(this->imax(zn));
 // 	ints.push_back(this->jmax(zn));
 // 	ints.push_back(this->kmax(zn));
 //       }
-    
+
 //     int nb  = this->n_zones();
 //     int one = 1;
 //     int len = ints.size();
 
 //     libmesh_assert (static_cast<unsigned int>(len) == 3*this->n_zones());
-    
+
 //     idata_ (&gunit, &nb, &one);
 //     idata_ (&gunit, &ints[0], &len);
 
@@ -101,7 +101,7 @@ namespace libMesh
 //       {
 // 	idata_ (&qunit, &nb, &one);
 // 	idata_ (&qunit, &ints[0], &len);
-//       }	
+//       }
 //   }
 
 
@@ -111,13 +111,13 @@ namespace libMesh
 
 //   std::fill (write_vars.begin(), write_vars.end(), 0);
 
-  
+
 //   //------------------------------------------------------------------------
 //   // Ask the user which variables to write
 //   if (!gridonly)
 //     {
 //       libMesh::out << "Variables:" << std::endl;
-      
+
 //       for (unsigned int v=0; v<this->n_vars(); v++)
 // 	libMesh::out << " " << v << ") \"" << this->var_name(v) << "\""
 // 		  << std::endl;
@@ -131,7 +131,7 @@ namespace libMesh
 // 		    << " "
 // 		    << std::endl
 // 		    << "(-1 writes them all): ";
-	  
+
 // 	  std::cin >> n_write_vars;
 
 // 	  if (n_write_vars == -1)
@@ -156,40 +156,40 @@ namespace libMesh
 // 	{
 // 	  libmesh_assert (n_write_vars >= 1);
 // 	  libmesh_assert (n_write_vars < static_cast<int>(this->n_vars()));
-	  
+
 // 	  libMesh::out << "Select the " << n_write_vars << " variables to write to the Plot3D file: "
 // 		    << std::endl;
-	  
+
 // 	  for (int wv=0; wv<n_write_vars; wv++)
 // 	    {
 // 	      int num=0;
-	      
+
 // 	      std::cin >> num;
-	      
+
 // 	      libmesh_assert (num < static_cast<int>(this->n_vars()));
-	      
+
 // 	      write_vars.push_back (num);
 // 	    }
 // 	}
-      
+
 //       libMesh::out << std::endl;
 //     } // if (!gridonly)
 
 
-  
+
 //   //------------------------------------------------------------------------
 //   // Write the coordinates & data for each block
 //   for (unsigned int zn=0; zn<this->n_zones(); zn++)
-//     {     
+//     {
 //       // Write the coordinates
-//       { 
+//       {
 // 	std::vector<float> coords;   // the nodal coordinates
 // 	coords.reserve (3*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
-	
+
 // 	for (unsigned int v=0; v<3; v++)
 // 	  {
 // 	    unsigned int l=0;
-	    
+
 // 	    for (unsigned int k=0; k<this->kmax(zn); k++)
 // 	      for (unsigned int j=0; j<this->jmax(zn); j++)
 // 		for (unsigned int i=0; i<this->imax(zn); i++)
@@ -198,22 +198,22 @@ namespace libMesh
 // 		    coords.push_back (_data[zn][v][l++]);
 // 		  }
 // 	  }
-	
+
 // 	// Write to the grid file
 // 	{
 // 	  int len = coords.size();
 // 	  libmesh_assert (static_cast<unsigned int>(len) ==
 // 		  3*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
-	  
+
 // 	  fdata_ (&gunit, &coords[0], &len);
 // 	}
 //       }
 
-      
+
 //       //------------------------------------------------------------------------
 //       // Write the data
 //       if (!gridonly)
-// 	{ 
+// 	{
 // 	  std::vector<float> data;     // arbitrary data
 // 	  std::vector<float> conds(4); // plot3D conditions [FSMACH, ALPHA, RE, TIME]
 // 	  data.reserve (write_vars.size()*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
@@ -221,21 +221,21 @@ namespace libMesh
 
 // 	  if (zn == 0)
 // 	    libMesh::out << "  Writing ";
-	  
+
 // 	  for (unsigned int i=0; i<write_vars.size(); i++)
 // 	    {
 // 	      // Number of the variable to write
 // 	      const unsigned int v = write_vars[i];
-	      
+
 // 	      libmesh_assert (v < this->n_vars());
 
 // 	      // Tell the user what variable we are writing, but only
 // 	      // once per file.
 // 	      if (zn == 0)
 // 		libMesh::out << "\"" << this->var_name(v) << "\" ";
-	      
+
 // 	      unsigned int l=0;
-	      
+
 // 	      for (unsigned int k=0; k<this->kmax(zn); k++)
 // 		for (unsigned int j=0; j<this->jmax(zn); j++)
 // 		  for (unsigned int i=0; i<this->imax(zn); i++)
@@ -248,20 +248,20 @@ namespace libMesh
 
 // 	  if (zn == 0)
 // 	    libMesh::out << "to " << qname << std::endl;
-	  
+
 // 	  // Write to the solution file
 // 	  {
 // 	    int len = conds.size();
-	    
+
 // 	    fdata_ (&qunit, &conds[0], &len);
 // 	  }
-	  
+
 // 	  // Write to the solution file
 // 	  {
 // 	    int len = data.size();
 // 	    libmesh_assert (static_cast<unsigned int>(len) ==
 // 		    write_vars.size()*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
-	    
+
 // 	    fdata_ (&qunit, &data[0], &len);
 // 	  }
 // 	}
@@ -279,7 +279,7 @@ namespace libMesh
 //       if (this->verbose())
 // 	libMesh::out << "Reversing byte-ordering for output files."
 // 		  << std::endl;
-      
+
 //       Utility::reverse_endian (gname);
 
 //       if (!gridonly)
@@ -296,7 +296,7 @@ namespace libMesh
 //   // Check out
 //   // http://people.nas.nasa.gov/~aftosmis/cart3d/cart3dTriangulations.html
 //   // for the .tri, .triq format
-  
+
 //   // FORTRAN file unit numbers
 //   const int gunit = 25;
 
@@ -326,25 +326,25 @@ namespace libMesh
 
 //   {
 //     std::vector<int> ints;
-    
+
 //     for (unsigned int zone=0; zone<this->n_zones(); zone++)
 //       {
 // 	libmesh_assert (this->elem_type(zone) == TRI);
 // 	n_nodes += this->n_nodes(zone);
 // 	n_tri   += this->n_elem(zone);
 //       }
-  
+
 //     ints.push_back (n_nodes);
 //     ints.push_back (n_tri);
 
 //     if (!gridonly)
 //       if (this->n_vars() > 3)
 // 	ints.push_back(n_scalar);
-  
+
 //     int len = ints.size();
 //     idata_ (&gunit, &ints[0], &len);
 //   }
-  
+
 //   // Write the nodal values.
 //   {
 //     std::vector<float> coords;
@@ -375,7 +375,7 @@ namespace libMesh
 // 	const std::vector<int> & zconn = _conn[zone];
 
 // 	libmesh_assert (!zconn.empty());
-	
+
 // 	// Append the connectivity for this zone to the connectivity
 // 	// array
 // 	conn.insert (conn.end(), zconn.begin(), zconn.end());
@@ -383,7 +383,7 @@ namespace libMesh
 
 //     int len = conn.size();
 //     libmesh_assert (static_cast<unsigned int>(len) == 3*n_tri);
-//     idata_ (&gunit, &conn[0], &len);    
+//     idata_ (&gunit, &conn[0], &len);
 //   }
 
 
@@ -400,7 +400,7 @@ namespace libMesh
 //     idata_ (&gunit, &comp[0], &len);
 //   }
 
-  
+
 //   // Possibly write additional values for each node
 //   if (!gridonly)
 //     if (this->n_vars() > 3)
@@ -415,7 +415,7 @@ namespace libMesh
 // 	    libMesh::out << "to the output file " << name
 // 		      << std::endl;
 // 	  }
-	
+
 // 	std::vector<float> data;
 
 // 	data.reserve (n_nodes*(this->n_vars()-3));
@@ -431,18 +431,18 @@ namespace libMesh
 // 	fdata_ (&gunit, &data[0], &len);
 //       }
 
-  
+
 //   // Close the FORTRAN file
 //   close_ (&gunit);
 
-  
+
 //   // Possibly reverse the orders
 //   if (reverse)
 //     {
 //       if (this->verbose())
 // 	libMesh::out << "Reversing byte-ordering for output files."
 // 		  << std::endl;
-      
+
 //       Utility::reverse_endian (name);
 //     }
 // }
@@ -483,18 +483,18 @@ void PltLoader::write_dat (const std::string& name,
 	      out << ", ZONETYPE=Ordered\n"
 		  << "DATAPACKING=BLOCK\n";
 	    }
-      
+
 	  out << "DT=(";
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    out << "SINGLE ";
 	  out << ")\n";
 
 	  out.precision(9);
-	  
+
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    {
 	      unsigned int l=0;
-	      
+
 	      for (unsigned int k=0; k<this->kmax(z); k++)
 		for (unsigned int j=0; j<this->jmax(z); j++)
 		  for (unsigned int i=0; i<this->imax(z); i++)
@@ -531,17 +531,17 @@ void PltLoader::write_dat (const std::string& name,
 	      out << ", ZONETYPE=Ordered\n"
 		  << "DATAPACKING=POINT\n";
 	    }
-	  
+
 	  out << "DT=(";
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    out << "SINGLE ";
 	  out << ")\n";
-	  
+
 	  out.precision(9);
-	  
+
 	  {
 	    unsigned int l=0;
-	    
+
 	    for (unsigned int k=0; k<this->kmax(z); k++)
 	      for (unsigned int j=0; j<this->jmax(z); j++)
 		for (unsigned int i=0; i<this->imax(z); i++)
@@ -558,7 +558,7 @@ void PltLoader::write_dat (const std::string& name,
 			  << _data[z][v][l] << " ";
 #endif
 		    out << '\n';
-		    
+
 		    l++;
 		  }
 	  }

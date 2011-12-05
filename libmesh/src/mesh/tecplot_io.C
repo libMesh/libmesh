@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -90,7 +90,7 @@ TecplotMacros::TecplotMacros(const unsigned int nn,
 inline
 float & TecplotMacros::nd(const unsigned int i, const unsigned int j)
 {
-  return nodalData[(i)*(n_nodes) + (j)]; 
+  return nodalData[(i)*(n_nodes) + (j)];
 }
 
 
@@ -98,7 +98,7 @@ float & TecplotMacros::nd(const unsigned int i, const unsigned int j)
 inline
 int & TecplotMacros::cd(const unsigned int i, const unsigned int j)
 {
-  return connData[(i) + (j)*(n_vert)]; 
+  return connData[(i) + (j)*(n_vert)];
 }
 
 #endif
@@ -146,7 +146,7 @@ void TecplotIO::write_ascii (const std::string& fname,
 {
   // Should only do this on processor 0!
   libmesh_assert (libMesh::processor_id() == 0);
-  
+
   // Create an output stream
   std::ofstream out(fname.c_str());
 
@@ -156,7 +156,7 @@ void TecplotIO::write_ascii (const std::string& fname,
 
   // Get a constant reference to the mesh.
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
-  
+
   // Write header to stream
   {
     {
@@ -174,24 +174,24 @@ void TecplotIO::write_ascii (const std::string& fname,
       for (unsigned int n=0; n<solution_names->size(); n++)
 	{
 #ifdef LIBMESH_USE_REAL_NUMBERS
-	  
+
 	  // Write variable names for real variables
 	  out << "," << (*solution_names)[n];
 
 #else
-	  
+
 	  // Write variable names for complex variables
 	  out << "," << "r_"   << (*solution_names)[n]
 	      << "," << "i_"   << (*solution_names)[n]
 	      << "," << "a_"   << (*solution_names)[n];
-	  
+
 #endif
 	}
 
     out << '\n';
-    
+
     out << "Zone f=fepoint, n=" << mesh.n_nodes() << ", e=" << mesh.n_active_sub_elem();
-	
+
     if (mesh.mesh_dimension() == 1)
       out << ", et=lineseg";
     else if (mesh.mesh_dimension() == 2)
@@ -203,10 +203,10 @@ void TecplotIO::write_ascii (const std::string& fname,
 	// Dimension other than 1, 2, or 3?
 	libmesh_error();
       }
-    
+
     // Use default mesh color = black
     out << ", c=black\n";
-    
+
   } // finished writing header
 
   for (unsigned int i=0; i<mesh.n_nodes(); i++)
@@ -221,7 +221,7 @@ void TecplotIO::write_ascii (const std::string& fname,
 
 	  for (unsigned int c=0; c<n_vars; c++)
 	    {
-#ifdef LIBMESH_USE_REAL_NUMBERS	      
+#ifdef LIBMESH_USE_REAL_NUMBERS
 	      // Write real data
 	      out << std::setprecision(this->ascii_precision())
 		  << (*v)[i*n_vars + c] << " ";
@@ -234,18 +234,18 @@ void TecplotIO::write_ascii (const std::string& fname,
 		  << std::abs((*v)[i*n_vars + c]) << " ";
 
 #endif
-	    }	  
+	    }
 	}
 
       // Write a new line after the data for this node
-      out << '\n';	  
+      out << '\n';
     }
 
 //   const_active_elem_iterator       it (mesh.elements_begin());
 //   const const_active_elem_iterator end(mesh.elements_end());
 
   MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+  const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
   for ( ; it != end; ++it)
     (*it)->write_connectivity(out, TECPLOT);
@@ -260,7 +260,7 @@ void TecplotIO::write_binary (const std::string& fname,
   // Call the ASCII output function if configure did not detect
   // the Tecplot binary API
 #ifndef LIBMESH_HAVE_TECPLOT_API
-  
+
     libMesh::err << "WARNING: Tecplot Binary files require the Tecplot API." << std::endl
 	          << "Continuing with ASCII output."
 	          << std::endl;
@@ -268,12 +268,12 @@ void TecplotIO::write_binary (const std::string& fname,
     if (libMesh::processor_id() == 0)
       this->write_ascii (fname, vec, solution_names);
     return;
-    
+
 #else
-    
+
   // Get a constant reference to the mesh.
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
-  
+
   // Tecplot binary output only good for dim=2,3
   if (mesh.mesh_dimension() == 1)
     {
@@ -291,7 +291,7 @@ void TecplotIO::write_binary (const std::string& fname,
   // Build a string containing all the variable names to pass to Tecplot
   {
     tecplot_variable_names += "x, y, z";
-    
+
     if (solution_names != NULL)
       {
 	for (unsigned int name=0; name<solution_names->size(); name++)
@@ -302,7 +302,7 @@ void TecplotIO::write_binary (const std::string& fname,
 	    tecplot_variable_names += (*solution_names)[name];
 
 #else
-	    
+
 	    tecplot_variable_names += ", ";
 	    tecplot_variable_names += "r_";
 	    tecplot_variable_names += (*solution_names)[name];
@@ -321,9 +321,9 @@ void TecplotIO::write_binary (const std::string& fname,
   // Instantiate a TecplotMacros interface.  In 2D the most nodes per
   // face should be 4, in 3D it's 8.
 
-  
+
   TecplotMacros tm(mesh.n_nodes(),
-#ifdef LIBMESH_USE_REAL_NUMBERS		   
+#ifdef LIBMESH_USE_REAL_NUMBERS
 		   (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
 #else
 		   (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
@@ -345,12 +345,12 @@ void TecplotIO::write_binary (const std::string& fname,
       if ((vec != NULL) &&
 	  (solution_names != NULL))
 	{
-	  const unsigned int n_vars = solution_names->size(); 
+	  const unsigned int n_vars = solution_names->size();
 
 	  for (unsigned int c=0; c<n_vars; c++)
 	    {
 #ifdef LIBMESH_USE_REAL_NUMBERS
-	      
+
 	      tm.nd((3+c),v)     = static_cast<float>((*vec)[v*n_vars + c]);
 #else
 	      tm.nd((3+3*c),v)   = static_cast<float>((*vec)[v*n_vars + c].real());
@@ -363,14 +363,14 @@ void TecplotIO::write_binary (const std::string& fname,
 
 
   // Copy the connectivity
-  {   
+  {
     unsigned int te = 0;
 
 //     const_active_elem_iterator       it (mesh.elements_begin());
 //     const const_active_elem_iterator end(mesh.elements_end());
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end(); 
+    const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
     for ( ; it != end; ++it)
       {
@@ -378,65 +378,65 @@ void TecplotIO::write_binary (const std::string& fname,
 	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	  {
 	    (*it)->connectivity(se, TECPLOT, conn);
-	  
+
 	    for (unsigned int node=0; node<conn.size(); node++)
 	      tm.cd(node,te) = conn[node];
-	  
+
 	    te++;
 	  }
       }
   }
-  
-  
+
+
   // Ready to call the Tecplot API
   {
     int ierr = 0,
       num_nodes = static_cast<int>(mesh.n_nodes()),
       num_cells = static_cast<int>(mesh.n_active_sub_elem());
-    
-    
+
+
     ierr = TECINI (NULL,
 		   (char*) tecplot_variable_names.c_str(),
 		   (char*) fname.c_str(),
 		   (char*) ".",
 		   &tec_debug,
 		   &is_double);
-    
+
     libmesh_assert (ierr == 0);
-    
+
     ierr = TECZNE (NULL,
 		   &num_nodes,
 		   &num_cells,
 		   &cell_type,
 		   (char*) "FEBLOCK",
 		   NULL);
-    
+
     libmesh_assert (ierr == 0);
 
-    
+
     int total =
 #ifdef LIBMESH_USE_REAL_NUMBERS
       ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
-#else  
+#else
       ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #endif
 
-    
+
     ierr = TECDAT (&total,
 		   &tm.nodalData[0],
 		   &is_double);
-    
+
     libmesh_assert (ierr == 0);
-    
+
     ierr = TECNOD (&tm.connData[0]);
-    
+
     libmesh_assert (ierr == 0);
-    
+
     ierr = TECEND ();
-    
+
     libmesh_assert (ierr == 0);
   }
-      
+
 #endif
 }
 

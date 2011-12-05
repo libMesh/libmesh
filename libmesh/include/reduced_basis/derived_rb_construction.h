@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -58,7 +58,7 @@ public:
    * The type of system.
    */
   typedef DerivedRBConstruction<Base> sys_type;
-  
+
   /**
    * @returns a clever pointer to the system.
    */
@@ -68,20 +68,20 @@ public:
    * @returns a string indicating the type of the system.
    */
   virtual std::string system_type () const;
-  
+
   /**
    * Overload truth_solve so that it computes the
    * associated Unter RB solution.
    */
   virtual Real truth_solve(int plot_solution);
-  
+
   /**
    * Overload train_reduced_basis to generate residual terms wrt truth
    * once the Greedy finishes.
    */
   virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
                                    const bool resize_rb_eval_data=true);
-  
+
   /**
    * Set the uber_system's current_parameters to
    * match unter_system's current_parameters. We
@@ -95,7 +95,7 @@ public:
    * Build a new DerivedRBEvaluation object.
    */
   virtual AutoPtr<RBEvaluation> build_rb_evaluation();
-  
+
   /**
    * Load the RB solution from the most recent solve
    * into the libMesh solution vector.
@@ -106,7 +106,7 @@ public:
    * Load the i^th derived basis function into vec.
    */
   virtual void load_basis_function(unsigned int i);
-  
+
   /**
    * This function recomputes all the residual terms in order
    * to allow evaluation of the residual wrt the truth space.
@@ -118,13 +118,13 @@ public:
 
 
   //----------- PUBLIC DATA MEMBERS -----------//
-   
+
   /**
    * The name of the uber RB system, i.e. the RB system
    * we use to develop the derived RB system.
    */
   std::string uber_system_name;
-   
+
 protected:
 
   /**
@@ -139,7 +139,7 @@ protected:
    * in the truth finite element discretization.
    */
   virtual void enrich_RB_space();
-  
+
   /**
    * Compute the reduced basis matrices for the current basis.
    * This operation is based on the uber system and hence is
@@ -162,14 +162,14 @@ protected:
    * system.
    */
   virtual void update_residual_terms(bool compute_inner_products=true);
-  
+
 private:
 
 };
 
 // And introduce convenient typedefs
 typedef DerivedRBConstruction<RBConstruction> SteadyDerivedRBConstruction;
- 
+
 } // namespace libMesh
 
 

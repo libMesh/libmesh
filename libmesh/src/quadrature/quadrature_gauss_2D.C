@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -31,7 +31,7 @@ void QGauss::init_2D(const ElemType _type,
                      unsigned int p)
 {
 #if LIBMESH_DIM > 1
-  
+
   //-----------------------------------------------------------------------
   // 2D quadrature rules
   switch (_type)
@@ -65,7 +65,7 @@ void QGauss::init_2D(const ElemType _type,
 	return;
       }
 
-	    
+
       //---------------------------------------------
       // Triangle quadrature rules
     case TRI3:
@@ -79,7 +79,7 @@ void QGauss::init_2D(const ElemType _type,
 	      // Exact for linears
 	      _points.resize(1);
 	      _weights.resize(1);
-		  
+
 	      _points[0](0) = 1.0L/3.0L;
 	      _points[0](1) = 1.0L/3.0L;
 
@@ -102,7 +102,7 @@ void QGauss::init_2D(const ElemType _type,
 	      // _points[1](1) = .5;
 	      // _points[2](0) = .5;
 	      // _points[2](1) = .0;
-	      
+
 	      _points[0](0) = 2.0L/3.0L;
 	      _points[0](1) = 1.0L/6.0L;
 
@@ -149,7 +149,7 @@ void QGauss::init_2D(const ElemType _type,
 
 	      return;
 
-	      
+
 	      // The following third-order rule is quite commonly cited
 	      // in the literature and most likely works fine.  However,
 	      // we generally prefer a rule with all positive weights
@@ -160,32 +160,32 @@ void QGauss::init_2D(const ElemType _type,
 	      //   // Exact for cubics
 	      //   _points.resize(4);
 	      //   _weights.resize(4);
-	      //   
+	      //
 	      //   _points[0](0) = .33333333333333333333333333333333;
 	      //   _points[0](1) = .33333333333333333333333333333333;
-	      // 
+	      //
 	      //   _points[1](0) = .2;
 	      //   _points[1](1) = .6;
-	      // 
+	      //
 	      //   _points[2](0) = .2;
 	      //   _points[2](1) = .2;
-	      // 
+	      //
 	      //   _points[3](0) = .6;
 	      //   _points[3](1) = .2;
-	      // 
-	      // 
+	      //
+	      //
 	      //   _weights[0] = -27./96.;
 	      //   _weights[1] =  25./96.;
 	      //   _weights[2] =  25./96.;
 	      //   _weights[3] =  25./96.;
-	      // 
+	      //
 	      //   return;
 	      // } // end if (allow_rules_with_negative_weights)
 	      // Note: if !allow_rules_with_negative_weights, fall through to next case.
 	    }
 
 
-	    
+
 	    // A degree 4 rule with six points.  This rule can be found in many places
 	    // including:
 	    //
@@ -193,7 +193,7 @@ void QGauss::init_2D(const ElemType _type,
 	    // quadrature rules for the triangle, J. Inst. Math. Appl.  15 (1975),
 	    // 19--32.
 	    //
-	    // We used the code in: 
+	    // We used the code in:
 	    // L. Zhang, T. Cui, and H. Liu. "A set of symmetric quadrature rules
 	    // on triangles and tetrahedra"  Journal of Computational Mathematics,
 	    // v. 27, no. 1, 2009, pp. 89-96.
@@ -217,12 +217,12 @@ void QGauss::init_2D(const ElemType _type,
 	      const unsigned int permutation_ids[n_wts] = {3, 3};
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts); // 6 total points
-	      
+
 	      return;
 	    }
 
 
-	    
+
 	    // Exact for quintics
 	    // Can be found in "Quadrature on Simplices of Arbitrary
 	    // Dimension" by Walkington.
@@ -252,7 +252,7 @@ void QGauss::init_2D(const ElemType _type,
 	    }
 
 
-	    
+
 	    // A degree 6 rule with 12 points.  This rule can be found in many places
 	    // including:
 	    //
@@ -260,7 +260,7 @@ void QGauss::init_2D(const ElemType _type,
 	    // quadrature rules for the triangle, J. Inst. Math. Appl.  15 (1975),
 	    // 19--32.
 	    //
-	    // We used the code in: 
+	    // We used the code in:
 	    // L. Zhang, T. Cui, and H. Liu. "A set of symmetric quadrature rules
 	    // on triangles and tetrahedra"  Journal of Computational Mathematics,
 	    // v. 27, no. 1, 2009, pp. 89-96.
@@ -289,17 +289,17 @@ void QGauss::init_2D(const ElemType _type,
 		{
 		  0.,
 		  0.,
-		  6.3650249912139864723014259441204970e-01L		  
+		  6.3650249912139864723014259441204970e-01L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts] = {3, 3, 6}; // 12 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
 
 	      return;
 	    }
-	    
-	    
+
+
 	    // A degree 7 rule with 12 points.  This rule can be found in:
 	    //
 	    // K. Gatermann, The construction of symmetric cubature
@@ -327,9 +327,9 @@ void QGauss::init_2D(const ElemType _type,
 	    {
 	      _points.resize (12);
 	      _weights.resize(12);
-	      
+
 	      const unsigned int nrows=4;
-	      
+
 	      // In each of the rows below, the first two entries are (z1, z2) which imply
 	      // z3.  The third entry is the weight for each of the points in the cyclic permutation.
 	      const Real p[nrows][3] = {
@@ -356,7 +356,7 @@ void QGauss::init_2D(const ElemType _type,
 
 	      return;
 
-	      
+
 // 	      // The following is an inferior 7th-order Lyness-style rule with 15 points.
 // 	      // It's here only for completeness and the Ro3-invariant rule above should
 // 	      // be used instead!
@@ -367,31 +367,31 @@ void QGauss::init_2D(const ElemType _type,
 // 		  3.5426541846066783659206291623201826e-02L,
 // 		  3.4637341039708446756138297960207647e-02L
 // 		};
-// 
+//
 // 	      const Real a[n_wts] =
 // 		{
 // 		  6.4930513159164863078379776030396538e-02L,
 // 		  2.8457558424917033519741605734978046e-01L,
 // 		  3.1355918438493150795585190219862865e-01L
 // 		};
-// 
+//
 // 	      const Real b[n_wts] =
 // 		{
 // 		  0.,
 // 		  1.9838447668150671917987659863332941e-01L,
-// 		  4.3863471792372471511798695971295936e-02L		  
+// 		  4.3863471792372471511798695971295936e-02L
 // 		};
-// 	      
+//
 // 	      const unsigned int permutation_ids[n_wts] = {3, 6, 6}; // 15 total points
-// 
+//
 // 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-// 
+//
 // 	      return;
 	    }
 
 
 
-	    
+
 	    // Another Dunavant rule.  This one has all positive weights.  This rule has
 	    // 16 points while a comparable conical product rule would have 5*5=25.
 	    //
@@ -431,7 +431,7 @@ void QGauss::init_2D(const ElemType _type,
 		  0.,
 		  7.2849239295540428124100037917606196e-01L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts] = {1, 3, 3, 3, 6}; // 16 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
@@ -440,7 +440,7 @@ void QGauss::init_2D(const ElemType _type,
 	    }
 
 
-	    
+
 	    // Another Dunavant rule.  This one has all positive weights.  This rule has 19
 	    // points. The comparable conical product rule would have 25.
 	    // It was copied 23rd June 2008 from:
@@ -456,10 +456,10 @@ void QGauss::init_2D(const ElemType _type,
 	      const Real wts[n_wts] =
 		{
 		  4.8567898141399416909620991253644315e-02L,
-		  1.5667350113569535268427415643604658e-02L, 
-		  1.2788837829349015630839399279499912e-02L, 
-		  3.8913770502387139658369678149701978e-02L, 
-		  3.9823869463605126516445887132022637e-02L, 
+		  1.5667350113569535268427415643604658e-02L,
+		  1.2788837829349015630839399279499912e-02L,
+		  3.8913770502387139658369678149701978e-02L,
+		  3.9823869463605126516445887132022637e-02L,
 		  2.1641769688644688644688644688644689e-02L
 		};
 
@@ -482,7 +482,7 @@ void QGauss::init_2D(const ElemType _type,
 		  0.,
 		  7.4119859878449802069007987352342383e-01L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts] = {1, 3, 3, 3, 3, 6}; // 19 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
@@ -490,7 +490,7 @@ void QGauss::init_2D(const ElemType _type,
 	      return;
 	    }
 
-	    
+
 	    // Another Dunavant rule with all positive weights.  This rule has 25
 	    // points. The comparable conical product rule would have 36.
 	    // It was copied 23rd June 2008 from:
@@ -532,11 +532,11 @@ void QGauss::init_2D(const ElemType _type,
 		  7.2832390459741092000873505358107866e-01L,
 		  9.2365593358750027664630697761508843e-01L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts] = {1, 3, 3, 6, 6, 6}; // 25 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-	      
+
 	      return;
 	    }
 
@@ -555,7 +555,7 @@ void QGauss::init_2D(const ElemType _type,
 	    // does not appear to be unique.  It is a solution in the sense that it
 	    // minimizes the error in the least-squares minimization problem, but
 	    // it involves too many unknowns and the Jacobian is therefore singular
-	    // when attempting to improve the solution via Newton's method. 
+	    // when attempting to improve the solution via Newton's method.
 	  case ELEVENTH:
 	    {
   	      const unsigned int n_wts = 6;
@@ -586,19 +586,19 @@ void QGauss::init_2D(const ElemType _type,
 		  5.6817155788572446538150614865768991e-02L,
 		  1.2539956353662088473247489775203396e-01L,
 		  1.2409970153698532116262152247041742e-02L,
-		  5.2792057988217708934207928630851643e-02L		  
+		  5.2792057988217708934207928630851643e-02L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts] = {3, 3, 6, 6, 6, 6}; // 30 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-	      
+
 	      return;
 	    }
 
 
 
-	    
+
 	    // Another Dunavant rule with all positive weights.  This rule has 33
 	    // points. The comparable conical product rule would have 36 (ELEVENTH) or 49 (TWELFTH).
 	    //
@@ -647,15 +647,15 @@ void QGauss::init_2D(const ElemType _type,
 		  8.5801403354407263059053661662617818e-01L,
 		  6.0894323577978780685619243776371007e-01L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts] = {3, 3, 3, 3, 3, 6, 6, 6}; // 33 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-	      
+
 	      return;
 	    }
 
-	    
+
 	    // Another Dunavant rule with all positive weights.  This rule has 37
 	    // points. The comparable conical product rule would have 49 points.
 	    //
@@ -705,17 +705,17 @@ void QGauss::init_2D(const ElemType _type,
 		  6.2354599555367557081585435318623659e-01L,
 		  8.6470777029544277530254595089569318e-01L,
 		  7.4850711589995219517301859578870965e-01L,
-		  7.2235779312418796526062013230478405e-01L 
+		  7.2235779312418796526062013230478405e-01L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts] = {1, 3, 3, 3, 3, 6, 6, 6, 6}; // 37 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-	      
+
 	      return;
 	    }
 
-	    
+
 	    // Another Dunavant rule.  This rule has 42 points, while
 	    // a comparable conical product rule would have 64.
 	    //
@@ -764,22 +764,22 @@ void QGauss::init_2D(const ElemType _type,
 		  0.,
 		  0.,
 		  0.,
-		  0.,		  
+		  0.,
 		  7.7060855477499648258903327416742796e-01L,
 		  5.7022229084668317349769621336235426e-01L,
 		  6.8698016780808783735862715402031306e-01L,
-		  8.7975717137017112951457163697460183e-01L 
+		  8.7975717137017112951457163697460183e-01L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts]
 		= {3, 3, 3, 3, 3, 3, 6, 6, 6, 6}; // 42 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-	      
+
 	      return;
 	    }
 
-	    
+
 	    // This 49-point rule was found by me [JWP] using the code in:
 	    //
 	    // L. Zhang, T. Cui, and H. Liu. "A set of symmetric quadrature rules
@@ -842,20 +842,20 @@ void QGauss::init_2D(const ElemType _type,
 		  7.7663767064308164090246588765178087e-02L,
 		  2.1594628433980258573654682690950798e-02L,
 		  1.2563596287784997705599005477153617e-02L,
-		  1.5082654870922784345283124845552190e-02L		  
+		  1.5082654870922784345283124845552190e-02L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts]
 		= {1, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6}; // 49 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-	      
+
 	      return;
 	    }
 
 
 
-	    
+
 	    // Dunavant's 16th-order rule contains points outside the region of
 	    // integration, and is thus unacceptable for our FEM calculations.
 	    //
@@ -870,8 +870,8 @@ void QGauss::init_2D(const ElemType _type,
 	    // does not appear to be unique.  It is a solution in the sense that it
 	    // minimizes the error in the least-squares minimization problem, but
 	    // it involves too many unknowns and the Jacobian is therefore singular
-	    // when attempting to improve the solution via Newton's method. 
-	  case SIXTEENTH:    
+	    // when attempting to improve the solution via Newton's method.
+	  case SIXTEENTH:
 	    {
 	      const unsigned int n_wts = 12;
 	      const Real wts[n_wts] =
@@ -919,18 +919,18 @@ void QGauss::init_2D(const ElemType _type,
 		  7.1278762832147862035977841733532020e-02L,
 		  1.6623223223705792825395256602140459e-02L,
 		  1.4160772533794791868984026749196156e-02L,
-		  1.4539694958941854654807449467759690e-02L		  
+		  1.4539694958941854654807449467759690e-02L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts]
 		= {1, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6}; // 55 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-	      
+
 	      return;
 	    }
-	    
-	    
+
+
 	    // Dunavant's 17th-order rule has 61 points, while a
 	    // comparable conical product rule would have 81 (16th and 17th orders).
 	    //
@@ -1002,14 +1002,14 @@ void QGauss::init_2D(const ElemType _type,
 		  1.5916814107619812717966560404970160e-02L,
 		  1.0734733163764032541125434215228937e-02L
 		};
-	      
+
 	      const unsigned int permutation_ids[n_wts]
 		= {3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6}; // 63 total points
 
 	      dunavant_rule2(wts, a, b, permutation_ids, n_wts);
-	      
+
 	      return;
-   
+
 // 	      _points.resize (61);
 // 	      _weights.resize(61);
 
@@ -1026,13 +1026,13 @@ void QGauss::init_2D(const ElemType _type,
 // 		{0.968690546064356e+00, 0.015654726967822e+00,                    0., 0.003194676173779e+00 / 2.0}, // 3-perm
 // 		{0.010186928826919e+00, 0.334319867363658e+00, 0.655493203809423e+00, 0.008119655318993e+00 / 2.0}, // 6-perm
 // 		{0.135440871671036e+00, 0.292221537796944e+00, 0.572337590532020e+00, 0.026805742283163e+00 / 2.0}, // 6-perm
-// 		{0.054423924290583e+00, 0.319574885423190e+00, 0.626001190286228e+00, 0.018459993210822e+00 / 2.0}, // 6-perm 
+// 		{0.054423924290583e+00, 0.319574885423190e+00, 0.626001190286228e+00, 0.018459993210822e+00 / 2.0}, // 6-perm
 // 		{0.012868560833637e+00, 0.190704224192292e+00, 0.796427214974071e+00, 0.008476868534328e+00 / 2.0}, // 6-perm
-// 		{0.067165782413524e+00, 0.180483211648746e+00, 0.752351005937729e+00, 0.018292796770025e+00 / 2.0}, // 6-perm 
+// 		{0.067165782413524e+00, 0.180483211648746e+00, 0.752351005937729e+00, 0.018292796770025e+00 / 2.0}, // 6-perm
 // 		{0.014663182224828e+00, 0.080711313679564e+00, 0.904625504095608e+00, 0.006665632004165e+00 / 2.0}  // 6-perm
 // 	      };
 
-	      
+
 // 	      // Now call the dunavant routine to generate _points and _weights
 // 	      dunavant_rule(p, 15);
 
@@ -1040,14 +1040,14 @@ void QGauss::init_2D(const ElemType _type,
 	    }
 
 
-	    
+
 	    // Dunavant's 18th-order rule contains points outside the region and is therefore unsuitable
 	    // for our FEM calculations.  His 19th-order rule has 73 points, compared with 100 points for
 	    // a comparable-order conical product rule.
 	    //
 	    // It was copied 23rd June 2008 from:
 	    // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
-	  case EIGHTTEENTH:  
+	  case EIGHTTEENTH:
 	  case NINTEENTH:
 	    {
 	      _points.resize (73);
@@ -1066,23 +1066,23 @@ void QGauss::init_2D(const ElemType _type,
 		{0.974756272445543e+00, 0.012621863777229e+00,                    0., 0.002079362027485e+00 / 2.0}, // 3-perm
 		{0.003611417848412e+00, 0.395754787356943e+00, 0.600633794794645e+00, 0.003884876904981e+00 / 2.0}, // 6-perm
 		{0.134466754530780e+00, 0.307929983880436e+00, 0.557603261588784e+00, 0.025574160612022e+00 / 2.0}, // 6-perm
-		{0.014446025776115e+00, 0.264566948406520e+00, 0.720987025817365e+00, 0.008880903573338e+00 / 2.0}, // 6-perm 
+		{0.014446025776115e+00, 0.264566948406520e+00, 0.720987025817365e+00, 0.008880903573338e+00 / 2.0}, // 6-perm
 		{0.046933578838178e+00, 0.358539352205951e+00, 0.594527068955871e+00, 0.016124546761731e+00 / 2.0}, // 6-perm
-		{0.002861120350567e+00, 0.157807405968595e+00, 0.839331473680839e+00, 0.002491941817491e+00 / 2.0}, // 6-perm 
+		{0.002861120350567e+00, 0.157807405968595e+00, 0.839331473680839e+00, 0.002491941817491e+00 / 2.0}, // 6-perm
 		{0.223861424097916e+00, 0.075050596975911e+00, 0.701087978926173e+00, 0.018242840118951e+00 / 2.0}, // 6-perm
-		{0.034647074816760e+00, 0.142421601113383e+00, 0.822931324069857e+00, 0.010258563736199e+00 / 2.0}, // 6-perm 
+		{0.034647074816760e+00, 0.142421601113383e+00, 0.822931324069857e+00, 0.010258563736199e+00 / 2.0}, // 6-perm
 		{0.010161119296278e+00, 0.065494628082938e+00, 0.924344252620784e+00, 0.003799928855302e+00 / 2.0}  // 6-perm
 	      };
 
-	      
+
 	      // Now call the dunavant routine to generate _points and _weights
 	      dunavant_rule(p, 17);
 
 	      return;
 	    }
 
-	    
-	    // 20th-order rule by Wandzura.  
+
+	    // 20th-order rule by Wandzura.
 	    //
 	    // Stephen Wandzura, Hong Xiao,
 	    // Symmetric Quadrature Rules on a Triangle,
@@ -1103,7 +1103,7 @@ void QGauss::init_2D(const ElemType _type,
 	      // The raw data for the quadrature rule.
 	      const Real p[19][4] = {
 		{0.33333333333333e+00,                  0.0,                  0.0, 0.2761042699769952e-01 / 2.0}, // 1-perm
-		{0.00150064932443e+00, 0.49924967533779e+00,                  0.0, 0.1779029547326740e-02 / 2.0}, // 3-perm 
+		{0.00150064932443e+00, 0.49924967533779e+00,                  0.0, 0.1779029547326740e-02 / 2.0}, // 3-perm
 		{0.09413975193895e+00, 0.45293012403052e+00,                  0.0, 0.2011239811396117e-01 / 2.0}, // 3-perm
 		{0.20447212408953e+00, 0.39776393795524e+00,                  0.0, 0.2681784725933157e-01 / 2.0}, // 3-perm
 		{0.47099959493443e+00, 0.26450020253279e+00,                  0.0, 0.2452313380150201e-01 / 2.0}, // 3-perm
@@ -1123,7 +1123,7 @@ void QGauss::init_2D(const ElemType _type,
 		{0.14071084494394e+00, 0.32317056653626e+00, 0.53611858851980e+00, 0.2281822405839526e-01 / 2.0}  // 6-perm
 	      };
 
-	      
+
 	      // Now call the dunavant routine to generate _points and _weights
 	      dunavant_rule(p, 19);
 
@@ -1132,7 +1132,7 @@ void QGauss::init_2D(const ElemType _type,
 
 
 
-	    // 25th-order rule by Wandzura.  
+	    // 25th-order rule by Wandzura.
 	    //
 	    // Stephen Wandzura, Hong Xiao,
 	    // Symmetric Quadrature Rules on a Triangle,
@@ -1145,9 +1145,9 @@ void QGauss::init_2D(const ElemType _type,
 	    // Copied on 3rd July 2008 from:
 	    // http://people.scs.fsu.edu/~burkardt/f_src/wandzura/wandzura.f90
 	    // case TWENTYFIRST: // fall through to 121 point conical product rule below
-	  case TWENTYSECOND:  
-	  case TWENTYTHIRD:   
-	  case TWENTYFOURTH:  	    
+	  case TWENTYSECOND:
+	  case TWENTYTHIRD:
+	  case TWENTYFOURTH:
 	  case TWENTYFIFTH:
 	    {
 	      // The equivalent concial product rule would have 169 points
@@ -1184,7 +1184,7 @@ void QGauss::init_2D(const ElemType _type,
 		{0.19177186586733e+00, 0.32561812259598e+00, 0.48261001153669e+00, 0.1488137956116801e-01 / 2.0}   // 6-perm
 	      };
 
-	      
+
 	      // Now call the dunavant routine to generate _points and _weights
 	      dunavant_rule(p, 26);
 
@@ -1193,7 +1193,7 @@ void QGauss::init_2D(const ElemType _type,
 
 
 
-	    // 30th-order rule by Wandzura.  
+	    // 30th-order rule by Wandzura.
 	    //
 	    // Stephen Wandzura, Hong Xiao,
 	    // Symmetric Quadrature Rules on a Triangle,
@@ -1205,10 +1205,10 @@ void QGauss::init_2D(const ElemType _type,
 	    //
 	    // Copied on 3rd July 2008 from:
 	    // http://people.scs.fsu.edu/~burkardt/f_src/wandzura/wandzura.f90
-	  case TWENTYSIXTH:   
-	  case TWENTYSEVENTH: 
-	  case TWENTYEIGHTH:  
-	  case TWENTYNINTH:   	    
+	  case TWENTYSIXTH:
+	  case TWENTYSEVENTH:
+	  case TWENTYEIGHTH:
+	  case TWENTYNINTH:
 	  case THIRTIETH:
 	    {
 	      // The equivalent concial product rule would have 256 points
@@ -1217,52 +1217,52 @@ void QGauss::init_2D(const ElemType _type,
 
 	      // The raw data for the quadrature rule.
 	      const Real p[36][4] = {
-		{0.33333333333333e+00,                  0.0,                  0.0, 0.1557996020289920e-01 / 2.0}, // 1-perm 
-		{0.00733011643277e+00, 0.49633494178362e+00,                  0.0, 0.3177233700534134e-02 / 2.0}, // 3-perm  
-		{0.08299567580296e+00, 0.45850216209852e+00,                  0.0, 0.1048342663573077e-01 / 2.0}, // 3-perm  
-		{0.15098095612541e+00, 0.42450952193729e+00,                  0.0, 0.1320945957774363e-01 / 2.0}, // 3-perm  
-		{0.23590585989217e+00, 0.38204707005392e+00,                  0.0, 0.1497500696627150e-01 / 2.0}, // 3-perm  
-		{0.43802430840785e+00, 0.28098784579608e+00,                  0.0, 0.1498790444338419e-01 / 2.0}, // 3-perm  
-		{0.54530204829193e+00, 0.22734897585403e+00,                  0.0, 0.1333886474102166e-01 / 2.0}, // 3-perm  
-		{0.65088177698254e+00, 0.17455911150873e+00,                  0.0, 0.1088917111390201e-01 / 2.0}, // 3-perm  
-		{0.75348314559713e+00, 0.12325842720144e+00,                  0.0, 0.8189440660893461e-02 / 2.0}, // 3-perm  
-		{0.83983154221561e+00, 0.08008422889220e+00,                  0.0, 0.5575387588607785e-02 / 2.0}, // 3-perm  
-		{0.90445106518420e+00, 0.04777446740790e+00,                  0.0, 0.3191216473411976e-02 / 2.0}, // 3-perm  
-		{0.95655897063972e+00, 0.02172051468014e+00,                  0.0, 0.1296715144327045e-02 / 2.0}, // 3-perm  
-		{0.99047064476913e+00, 0.00476467761544e+00,                  0.0, 0.2982628261349172e-03 / 2.0}, // 3-perm  
-		{0.00092537119335e+00, 0.41529527091331e+00, 0.58377935789334e+00, 0.9989056850788964e-03 / 2.0}, // 6-perm  
-		{0.00138592585556e+00, 0.06118990978535e+00, 0.93742416435909e+00, 0.4628508491732533e-03 / 2.0}, // 6-perm  
-		{0.00368241545591e+00, 0.16490869013691e+00, 0.83140889440718e+00, 0.1234451336382413e-02 / 2.0}, // 6-perm  
-		{0.00390322342416e+00, 0.02503506223200e+00, 0.97106171434384e+00, 0.5707198522432062e-03 / 2.0}, // 6-perm  
-		{0.00323324815501e+00, 0.30606446515110e+00, 0.69070228669389e+00, 0.1126946125877624e-02 / 2.0}, // 6-perm  
-		{0.00646743211224e+00, 0.10707328373022e+00, 0.88645928415754e+00, 0.1747866949407337e-02 / 2.0}, // 6-perm  
-		{0.00324747549133e+00, 0.22995754934558e+00, 0.76679497516308e+00, 0.1182818815031657e-02 / 2.0}, // 6-perm  
-		{0.00867509080675e+00, 0.33703663330578e+00, 0.65428827588746e+00, 0.1990839294675034e-02 / 2.0}, // 6-perm  
-		{0.01559702646731e+00, 0.05625657618206e+00, 0.92814639735063e+00, 0.1900412795035980e-02 / 2.0}, // 6-perm  
-		{0.01797672125369e+00, 0.40245137521240e+00, 0.57957190353391e+00, 0.4498365808817451e-02 / 2.0}, // 6-perm  
-		{0.01712424535389e+00, 0.24365470201083e+00, 0.73922105263528e+00, 0.3478719460274719e-02 / 2.0}, // 6-perm  
-		{0.02288340534658e+00, 0.16538958561453e+00, 0.81172700903888e+00, 0.4102399036723953e-02 / 2.0}, // 6-perm  
-		{0.03273759728777e+00, 0.09930187449585e+00, 0.86796052821639e+00, 0.4021761549744162e-02 / 2.0}, // 6-perm  
-		{0.03382101234234e+00, 0.30847833306905e+00, 0.65770065458860e+00, 0.6033164660795066e-02 / 2.0}, // 6-perm  
-		{0.03554761446002e+00, 0.46066831859211e+00, 0.50378406694787e+00, 0.3946290302129598e-02 / 2.0}, // 6-perm  
-		{0.05053979030687e+00, 0.21881529945393e+00, 0.73064491023920e+00, 0.6644044537680268e-02 / 2.0}, // 6-perm  
-		{0.05701471491573e+00, 0.37920955156027e+00, 0.56377573352399e+00, 0.8254305856078458e-02 / 2.0}, // 6-perm  
-		{0.06415280642120e+00, 0.14296081941819e+00, 0.79288637416061e+00, 0.6496056633406411e-02 / 2.0}, // 6-perm  
-		{0.08050114828763e+00, 0.28373128210592e+00, 0.63576756960645e+00, 0.9252778144146602e-02 / 2.0}, // 6-perm  
-		{0.10436706813453e+00, 0.19673744100444e+00, 0.69889549086103e+00, 0.9164920726294280e-02 / 2.0}, // 6-perm  
-		{0.11384489442875e+00, 0.35588914121166e+00, 0.53026596435959e+00, 0.1156952462809767e-01 / 2.0}, // 6-perm  
-		{0.14536348771552e+00, 0.25981868535191e+00, 0.59481782693256e+00, 0.1176111646760917e-01 / 2.0}, // 6-perm  
-		{0.18994565282198e+00, 0.32192318123130e+00, 0.48813116594672e+00, 0.1382470218216540e-01 / 2.0}  // 6-perm   
+		{0.33333333333333e+00,                  0.0,                  0.0, 0.1557996020289920e-01 / 2.0}, // 1-perm
+		{0.00733011643277e+00, 0.49633494178362e+00,                  0.0, 0.3177233700534134e-02 / 2.0}, // 3-perm
+		{0.08299567580296e+00, 0.45850216209852e+00,                  0.0, 0.1048342663573077e-01 / 2.0}, // 3-perm
+		{0.15098095612541e+00, 0.42450952193729e+00,                  0.0, 0.1320945957774363e-01 / 2.0}, // 3-perm
+		{0.23590585989217e+00, 0.38204707005392e+00,                  0.0, 0.1497500696627150e-01 / 2.0}, // 3-perm
+		{0.43802430840785e+00, 0.28098784579608e+00,                  0.0, 0.1498790444338419e-01 / 2.0}, // 3-perm
+		{0.54530204829193e+00, 0.22734897585403e+00,                  0.0, 0.1333886474102166e-01 / 2.0}, // 3-perm
+		{0.65088177698254e+00, 0.17455911150873e+00,                  0.0, 0.1088917111390201e-01 / 2.0}, // 3-perm
+		{0.75348314559713e+00, 0.12325842720144e+00,                  0.0, 0.8189440660893461e-02 / 2.0}, // 3-perm
+		{0.83983154221561e+00, 0.08008422889220e+00,                  0.0, 0.5575387588607785e-02 / 2.0}, // 3-perm
+		{0.90445106518420e+00, 0.04777446740790e+00,                  0.0, 0.3191216473411976e-02 / 2.0}, // 3-perm
+		{0.95655897063972e+00, 0.02172051468014e+00,                  0.0, 0.1296715144327045e-02 / 2.0}, // 3-perm
+		{0.99047064476913e+00, 0.00476467761544e+00,                  0.0, 0.2982628261349172e-03 / 2.0}, // 3-perm
+		{0.00092537119335e+00, 0.41529527091331e+00, 0.58377935789334e+00, 0.9989056850788964e-03 / 2.0}, // 6-perm
+		{0.00138592585556e+00, 0.06118990978535e+00, 0.93742416435909e+00, 0.4628508491732533e-03 / 2.0}, // 6-perm
+		{0.00368241545591e+00, 0.16490869013691e+00, 0.83140889440718e+00, 0.1234451336382413e-02 / 2.0}, // 6-perm
+		{0.00390322342416e+00, 0.02503506223200e+00, 0.97106171434384e+00, 0.5707198522432062e-03 / 2.0}, // 6-perm
+		{0.00323324815501e+00, 0.30606446515110e+00, 0.69070228669389e+00, 0.1126946125877624e-02 / 2.0}, // 6-perm
+		{0.00646743211224e+00, 0.10707328373022e+00, 0.88645928415754e+00, 0.1747866949407337e-02 / 2.0}, // 6-perm
+		{0.00324747549133e+00, 0.22995754934558e+00, 0.76679497516308e+00, 0.1182818815031657e-02 / 2.0}, // 6-perm
+		{0.00867509080675e+00, 0.33703663330578e+00, 0.65428827588746e+00, 0.1990839294675034e-02 / 2.0}, // 6-perm
+		{0.01559702646731e+00, 0.05625657618206e+00, 0.92814639735063e+00, 0.1900412795035980e-02 / 2.0}, // 6-perm
+		{0.01797672125369e+00, 0.40245137521240e+00, 0.57957190353391e+00, 0.4498365808817451e-02 / 2.0}, // 6-perm
+		{0.01712424535389e+00, 0.24365470201083e+00, 0.73922105263528e+00, 0.3478719460274719e-02 / 2.0}, // 6-perm
+		{0.02288340534658e+00, 0.16538958561453e+00, 0.81172700903888e+00, 0.4102399036723953e-02 / 2.0}, // 6-perm
+		{0.03273759728777e+00, 0.09930187449585e+00, 0.86796052821639e+00, 0.4021761549744162e-02 / 2.0}, // 6-perm
+		{0.03382101234234e+00, 0.30847833306905e+00, 0.65770065458860e+00, 0.6033164660795066e-02 / 2.0}, // 6-perm
+		{0.03554761446002e+00, 0.46066831859211e+00, 0.50378406694787e+00, 0.3946290302129598e-02 / 2.0}, // 6-perm
+		{0.05053979030687e+00, 0.21881529945393e+00, 0.73064491023920e+00, 0.6644044537680268e-02 / 2.0}, // 6-perm
+		{0.05701471491573e+00, 0.37920955156027e+00, 0.56377573352399e+00, 0.8254305856078458e-02 / 2.0}, // 6-perm
+		{0.06415280642120e+00, 0.14296081941819e+00, 0.79288637416061e+00, 0.6496056633406411e-02 / 2.0}, // 6-perm
+		{0.08050114828763e+00, 0.28373128210592e+00, 0.63576756960645e+00, 0.9252778144146602e-02 / 2.0}, // 6-perm
+		{0.10436706813453e+00, 0.19673744100444e+00, 0.69889549086103e+00, 0.9164920726294280e-02 / 2.0}, // 6-perm
+		{0.11384489442875e+00, 0.35588914121166e+00, 0.53026596435959e+00, 0.1156952462809767e-01 / 2.0}, // 6-perm
+		{0.14536348771552e+00, 0.25981868535191e+00, 0.59481782693256e+00, 0.1176111646760917e-01 / 2.0}, // 6-perm
+		{0.18994565282198e+00, 0.32192318123130e+00, 0.48813116594672e+00, 0.1382470218216540e-01 / 2.0}  // 6-perm
 	      };
 
-	      
+
 	      // Now call the dunavant routine to generate _points and _weights
 	      dunavant_rule(p, 36);
 
 	      return;
 	    }
-	    
-	    
+
+
 	    // By default, we fall back on the conical product rules.  If the user
 	    // requests an order higher than what is currently available in the 1D
 	    // rules, an error will be thrown from the respective 1D code.
@@ -1280,13 +1280,13 @@ void QGauss::init_2D(const ElemType _type,
 	      // Swap points and weights with the about-to-be destroyed rule.
 	      _points.swap (conical_rule.get_points() );
 	      _weights.swap(conical_rule.get_weights());
-		  
+
 	      return;
 	    }
 	  }
       }
 
-	    
+
       //---------------------------------------------
       // Unsupported type
     default:

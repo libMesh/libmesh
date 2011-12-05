@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -44,9 +44,9 @@ class MeshData;
 
 /**
  * The \p BoundaryInfo class contains information relevant
- * to boundary conditions: it does not hold actual boundary 
+ * to boundary conditions: it does not hold actual boundary
  * condition data (check \p MeshData for that), but can mark
- * element faces and nodes with ids useful for identifying the 
+ * element faces and nodes with ids useful for identifying the
  * type of boundary condtion.  It can also build a mesh that
  * just includes boundary elements/faces.
  *
@@ -59,13 +59,13 @@ class BoundaryInfo
 {
 protected:
   friend class MeshBase;
-  
+
   /**
    * Constructor.  Takes a reference to the mesh.
    * The BoundaryInfo class is only used internally
    * by the Mesh class.  A user should never instantiate
    * this class.  Therefore the constructor is protected.
-   */ 
+   */
   BoundaryInfo (const MeshBase& m);
 
 public:
@@ -79,7 +79,7 @@ public:
 
   /**
    * Destructor.  Not much to do.
-   */ 
+   */
   ~BoundaryInfo ();
 
   /**
@@ -88,7 +88,7 @@ public:
    * with no data stored.
    */
   void clear ();
-  
+
   /**
    * Close the data structures and prepare for use.
    * Synchronizes the \p boundary_mesh
@@ -104,7 +104,7 @@ public:
   void sync (UnstructuredMesh& boundary_mesh,
 	     MeshData* boundary_mesh_data=NULL,
 	     MeshData* this_mesh_data=NULL);
-  
+
   /**
    * Close the data structures and prepare for use.
    * Synchronizes the \p boundary_mesh
@@ -122,18 +122,18 @@ public:
 	     UnstructuredMesh& boundary_mesh,
 	     MeshData* boundary_mesh_data=NULL,
 	     MeshData* this_mesh_data=NULL);
-  
+
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
    * information data structures.
-   */ 
+   */
   void add_node (const Node* node,
 		 const short int id);
 
   /**
    * Add node number \p node with boundary id \p id to the boundary
    * information data structures.
-   */ 
+   */
   void add_node (const unsigned int node,
 		 const short int id);
 
@@ -230,7 +230,7 @@ public:
        const unsigned short int side) const;
 
   /**
-   * Returns a side of element \p elem whose associated boundary id is 
+   * Returns a side of element \p elem whose associated boundary id is
    * \p boundary_id if such a side exists.
    * If multiple sides of \p elem have the same id, only the lowest numbered
    * such side is returned.
@@ -254,7 +254,7 @@ public:
    * @returns the number of element-based boundary conditions.
    */
   unsigned int n_boundary_conds () const;
-  
+
   /**
    * Creates a list of nodes and ids for those nodes.
    */
@@ -287,15 +287,15 @@ public:
   { return _boundary_ids; }
 
   /**
-   * Returns a reference to the set of all boundary IDs 
-   * specified on sides. 
+   * Returns a reference to the set of all boundary IDs
+   * specified on sides.
    */
   const std::set<short int>& get_side_boundary_ids () const
   { return _side_boundary_ids; }
 
   /**
-   * Returns a reference to the set of all boundary IDs 
-   * specified on nodes. 
+   * Returns a reference to the set of all boundary IDs
+   * specified on nodes.
    */
   const std::set<short int>& get_node_boundary_ids () const
   { return _node_boundary_ids; }
@@ -305,12 +305,12 @@ public:
    * Print the boundary information data structure.
    */
   void print_info (std::ostream& out=libMesh::out) const;
-  
+
   /**
    * Print a summary of the boundary information.
    */
   void print_summary (std::ostream& out=libMesh::out) const;
-  
+
   /**
    * Number used for internal use. This is the return value
    * if a boundary condition is not specified.
@@ -329,7 +329,7 @@ public:
   /**
    * Data structure that maps nodes in the mesh
    * to boundary ids.
-   */  
+   */
   std::multimap<const Node*,
                 short int> _boundary_node_id;
 
@@ -347,7 +347,7 @@ public:
    * for only sides and only nodes, respectively.
    */
   std::set<short int> _boundary_ids;
-  
+
   /**
    * Set of user-specified boundary IDs for sides *only*.  Note: _boundary_ids
    * is the union of this set and _node_boundary_ids.
@@ -366,7 +366,7 @@ public:
 //    * Functor class for printing a single node's info
 //    * To be used with "for_each".
 //    */
-//   class PrintNodeInfo 
+//   class PrintNodeInfo
 //   {
 //   public:
 //     inline
@@ -392,13 +392,13 @@ public:
 //     {
 //       libMesh::out << "  (" << sp.first->id()
 // 		      << ", "  << sp.second.first
-// 		      << ", "  << sp.second.second 
+// 		      << ", "  << sp.second.second
 // 		      << ")"   << std::endl;
 //     }
 //   };
 
 
-  
+
   /**
    * Functor class for initializing a map.
    * The entries being added to the map
@@ -415,18 +415,18 @@ public:
     {
       id_map[invalid_id] = cnt;
     }
-    
+
     inline
     void operator() (const short int & pos)
     {
       id_map[pos] = cnt++;
     }
-    
+
   private:
     std::map<short int, unsigned int>& id_map;
     unsigned int cnt;
   };
-  
+
 };
 
 
@@ -440,7 +440,7 @@ inline
 void BoundaryInfo::remove (const Node* node)
 {
   libmesh_assert (node != NULL);
-  
+
   // Erase everything associated with node
   _boundary_node_id.erase (node);
 }
@@ -451,7 +451,7 @@ inline
 void BoundaryInfo::remove (const Elem* elem)
 {
   libmesh_assert (elem != NULL);
-  
+
   // Erase everything associated with elem
   _boundary_side_id.erase (elem);
 }

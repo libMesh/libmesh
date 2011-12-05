@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -71,7 +71,7 @@ class PointLocatorBase;
  * concrete element type in 3D is a \p Hex8, which is a hexahedral. A
  * \p Hex8 has 6 sides, which are \p Faces.  You may access these
  * sides.
- * 
+ *
  * An \p Elem is composed of a number of \p Node objects.  Some of
  * these nodes live at the vertices of the element, and others may
  * live on edges (and faces in 3D) or interior to the element.  The
@@ -82,7 +82,7 @@ class PointLocatorBase;
  * type with three 3 nodes, all located at the vertices.  A \p Tri6 is
  * another triangular element with 6 nodes, 3 of which are located at
  * vertices and another 3 that live on the edges.
- * In all that follows, nodes that live either on edges, faces or the 
+ * In all that follows, nodes that live either on edges, faces or the
  * interior are named @e second-order nodes.
  *
  * \author Benjamin S. Kirk, 2002-2007
@@ -94,13 +94,13 @@ class Elem : public ReferenceCountedObject<Elem>,
 	     public DofObject
 {
  protected:
-  
+
   /**
    * Constructor.  Creates an element with \p n_nodes nodes,
    * \p n_sides sides, \p n_children possible children, and
    * parent \p p.  The constructor allocates the memory necessary
    * to support this data.
-   */ 
+   */
   Elem (const unsigned int n_nodes,
 	const unsigned int n_sides,
 	Elem* parent,
@@ -144,13 +144,13 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns the pointer to local \p Node \p i as a writeable reference.
    */
   virtual Node* & set_node (const unsigned int i);
-  
+
   /**
    * @returns the subdomain that this element belongs to.
    * To conserve space this is stored as an unsigned char.
    */
   subdomain_id_type subdomain_id () const;
-  
+
   /**
    * @returns the subdomain that this element belongs to as a
    * writeable reference.
@@ -163,7 +163,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
   virtual unsigned int key (const unsigned int s) const = 0;
-  
+
   /**
    * @returns true if two elements are identical, false otherwise.
    * This is true if the elements are connected to identical global
@@ -177,16 +177,16 @@ class Elem : public ReferenceCountedObject<Elem>,
    * If \p MeshBase::find_neighbors() has not been called this
    * simply returns \p NULL.  If \p MeshBase::find_neighbors()
    * has been called and this returns \p NULL then the side is on
-   * a boundary of the domain. 
+   * a boundary of the domain.
    */
   Elem* neighbor (const unsigned int i) const;
 
-#ifdef LIBMESH_ENABLE_PERIODIC  
+#ifdef LIBMESH_ENABLE_PERIODIC
   /**
    * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element
    * for interior elements.  If an element is on a periodic
    * boundary, it will return a corresponding element on the opposite
-   * side. 
+   * side.
    */
   Elem* topological_neighbor (const unsigned int i,
                               const MeshBase& mesh,
@@ -201,7 +201,7 @@ class Elem : public ReferenceCountedObject<Elem>,
                                  const MeshBase& mesh,
                                  const PointLocatorBase& point_locator,
                                  PeriodicBoundaries* pb) const;
-#endif   
+#endif
 
   /**
    * Assigns \p n as the \f$ i^{th} \f$ neighbor.
@@ -213,47 +213,47 @@ class Elem : public ReferenceCountedObject<Elem>,
    * of this element, \p false otherwise.
    */
   bool has_neighbor (const Elem* elem) const;
-  
+
   /**
    * If the element \p elem in question is a neighbor
    * of a child of this element, this returns a pointer
    * to that child.  Otherwise it returns NULL.
    */
   Elem* child_neighbor (Elem* elem) const;
-  
+
   /**
    * If the element \p elem in question is a neighbor
    * of a child of this element, this returns a pointer
    * to that child.  Otherwise it returns NULL.
    */
   const Elem* child_neighbor (const Elem* elem) const;
-  
+
   /**
    * @returns \p true if this element has a side coincident
    * with a boundary (indicated by a \p NULL neighbor), \p false
    * otherwise.
    */
   bool on_boundary () const;
-  
+
   /**
    * @returns \p true if this element shares a vertex and/or a side
    * with a local element.
    */
   bool is_semilocal () const;
-  
+
   /**
    * This function tells you which neighbor you \p (e) are.
    * I.e. if s = a->which_neighbor_am_i(e); then
    * a->neighbor(s) will be an ancestor of e;
    */
-  unsigned int which_neighbor_am_i(const Elem *e) const; 
+  unsigned int which_neighbor_am_i(const Elem *e) const;
 
   /**
    * This function tells you which side the boundary element \p e is.
    * I.e. if e = a->build_side(s) or e = a->side(s); then
    * a->which_side_am_i(e) will be s.
    */
-  unsigned int which_side_am_i(const Elem *e) const; 
+  unsigned int which_side_am_i(const Elem *e) const;
 
   /**
    * This function returns true iff a vertex of e is contained
@@ -297,7 +297,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   void make_links_to_me_remote ();
 
-  /** 
+  /**
    * Returns true if this element is remote, false otherwise.
    * A remote element (see \p RemoteElem) is a syntactic convenience --
    * it is a placeholder for an element which exists on some other
@@ -346,14 +346,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    * to the number of nodes in the element.
    */
   static const unsigned int type_to_n_nodes_map[INVALID_ELEM];
-  
+
   /**
    * @returns the dimensionality of the object.
    */
   virtual unsigned int dim () const = 0;
-  
+
   /**
-   * @returns the number of nodes this element contains. 
+   * @returns the number of nodes this element contains.
    */
   virtual unsigned int n_nodes () const = 0;
 
@@ -390,7 +390,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * from this class has.
    */
   virtual unsigned int n_faces () const = 0;
-  
+
   /**
    * @returns the number of children the element that has been derived
    * from this class may have.
@@ -411,14 +411,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns true iff the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const = 0;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
 			       const unsigned int s) const = 0;
-  
+
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
@@ -445,7 +445,7 @@ class Elem : public ReferenceCountedObject<Elem>,
 //    * share side \p s
 //    */
 //   virtual unsigned int n_children_per_side (const unsigned int) const = 0;
-  
+
   /**
    * @returns the number of sub-elements this element may be broken
    * down into for visualization purposes.  For example, this returns
@@ -455,17 +455,17 @@ class Elem : public ReferenceCountedObject<Elem>,
 
   /**
    * @returns a proxy element coincident with side \p i.  This method returns
-   * the _minimum_ element necessary to uniquely identify the side.  So, 
+   * the _minimum_ element necessary to uniquely identify the side.  So,
    * for example, the side of a hexahedral is always returned as a 4-noded
    * quadrilateral, regardless of what type of hex you are dealing with.  If
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
   virtual AutoPtr<Elem> side (const unsigned int i) const = 0;
-  
+
   /**
    * Creates an element coincident with side \p i. The element returned is
-   * full-ordered, in contrast to the side method.  For example, calling 
+   * full-ordered, in contrast to the side method.  For example, calling
    * build_side(0) on a 20-noded hex will build a 8-noded quadrilateral
    * coincident with face 0 and pass back the pointer.
    *
@@ -498,20 +498,20 @@ class Elem : public ReferenceCountedObject<Elem>,
    * reference element.
    */
   virtual Order default_order () const = 0;
-  
+
   /**
-   * @returns the centriod of the element. The centroid is 
-   * computed as the average of all the element vertices. 
-   * This method is overloadable since some derived elements 
+   * @returns the centriod of the element. The centroid is
+   * computed as the average of all the element vertices.
+   * This method is overloadable since some derived elements
    * might want to use shortcuts to compute their centroid.
    */
   virtual Point centroid () const;
-  
+
   /**
-   * @returns the minimum vertex separation for the element.  
+   * @returns the minimum vertex separation for the element.
    */
   virtual Real hmin () const;
-  
+
   /**
    * @returns the maximum vertex separation for the element.
    */
@@ -521,12 +521,12 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @return the (length/area/volume) of the geometric element.
    */
   virtual Real volume () const;
-  
+
   /**
    * Based on the quality metric q specified by the user,
    * returns a quantitative assessment of element quality.
    */
-  virtual Real quality (const ElemQuality q) const;  
+  virtual Real quality (const ElemQuality q) const;
 
   /**
    * Returns the suggested quality bounds for
@@ -537,14 +537,14 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   virtual std::pair<Real,Real> qual_bounds (const ElemQuality) const
   { libmesh_error(); return std::make_pair(0.,0.); }
-  
+
   /**
-   * @returns true if the point p is contained in this element, 
+   * @returns true if the point p is contained in this element,
    * false otherwise.
    *
    * Since we are doing floating point comparisons here the parameter
    * \p tol can be specified to indicate a tolerance.  For example,
-   * \f$ \xi \le 1 \f$  becomes \f$ \xi \le 1 + \epsilon \f$. 
+   * \f$ \xi \le 1 \f$  becomes \f$ \xi \le 1 + \epsilon \f$.
    */
   virtual bool contains_point (const Point& p, Real tol=TOLERANCE) const;
 
@@ -573,41 +573,41 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * @returns \p true if the element is active (i.e. has no active
    * descendants), \p false  otherwise. Note that it suffices to check the
-   * first child only. Always returns \p true if AMR is disabled. 
+   * first child only. Always returns \p true if AMR is disabled.
    */
   bool active () const;
-  
+
   /**
    * @returns \p true if the element is an ancestor (i.e. has an
    * active child or ancestor child), \p false otherwise. Always
-   * returns \p false if AMR is disabled. 
+   * returns \p false if AMR is disabled.
    */
   bool ancestor () const;
-  
+
   /**
    * @returns \p true if the element is subactive (i.e. has no active
    * descendants), \p false otherwise. Always returns \p false if AMR
-   * is disabled. 
+   * is disabled.
    */
   bool subactive () const;
-  
+
   /**
    * @returns \p true if the element has any children (active or not),
-   * \p false  otherwise. Always returns \p false if AMR is disabled. 
+   * \p false  otherwise. Always returns \p false if AMR is disabled.
    */
   bool has_children () const;
 
   /**
    * @returns \p true if the element has any descendants other than
    * its immediate children, \p false otherwise. Always returns \p
-   * false if AMR is disabled. 
+   * false if AMR is disabled.
    */
   bool has_ancestor_children () const;
 
   /**
    * @returns \p true if \p descendant is a child of \p this, or a
    * child of a child of \p this, etc.
-   * Always returns \p false if AMR is disabled. 
+   * Always returns \p false if AMR is disabled.
    */
   bool is_ancestor_of(const Elem *descendant) const;
 
@@ -636,8 +636,8 @@ class Elem : public ReferenceCountedObject<Elem>,
    * a level-2 element, etc...
    */
   const Elem* top_parent () const;
-  
-  /** 
+
+  /**
    * In some cases it is desireable to extract the boundary (or a subset thereof)
    * of a D-dimensional mesh as a (D-1)-dimensional manifold.  In this case
    * we may want to know the 'parent' element from which the manifold elements
@@ -657,15 +657,15 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns the magnitude of the distance between nodes n1 and n2.
    * Useful for computing the lengths of the sides of elements.
    */
-  Real length (const unsigned int n1, 
+  Real length (const unsigned int n1,
 	       const unsigned int n2) const;
 
   /**
    * @returns the number of adjacent vertices, that uniquely define
-   * the location of the \f$ n^{th} \f$ @e second-order node.  For linear 
+   * the location of the \f$ n^{th} \f$ @e second-order node.  For linear
    * elements ( \p default_order()==FIRST ), this returns 0.
-   * This method is useful when converting linear elements to quadratic 
-   * elements.  Note that \p n has to be greater or equal 
+   * This method is useful when converting linear elements to quadratic
+   * elements.  Note that \p n has to be greater or equal
    * \p this->n_vertices().
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int n) const;
@@ -683,13 +683,13 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * @returns the child number \p c and element-local index \p v of the
    * \f$ n^{th} \f$ second-order node on the parent element.  Note that
-   * the return values are always less \p this->n_children() and 
+   * the return values are always less \p this->n_children() and
    * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
    * to \p * this->n_vertices().  For linear elements this returns 0,0.
    * On refined second order elements, the return value will satisfy
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
-  virtual std::pair<unsigned short int, unsigned short int> 
+  virtual std::pair<unsigned short int, unsigned short int>
 	  second_order_child_vertex (const unsigned int n) const;
 
   /**
@@ -713,7 +713,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * or cannot be converted into lower order equivalents.
    */
   static ElemType first_order_equivalent_type (const ElemType et);
-					       
+
 
   /**
    * @returns the refinement level of the current element.  If the
@@ -722,7 +722,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * its parent.
    */
   unsigned int level () const;
-  
+
   /**
    * Returns the value of the p refinement level of an active
    * element, or the minimum value of the p refinement levels
@@ -743,7 +743,7 @@ class Elem : public ReferenceCountedObject<Elem>,
 			 JUST_COARSENED,
                          INACTIVE,
                          COARSEN_INACTIVE };
-  
+
   /**
    * @returns a pointer to the \f$ i^{th} \f$ child for this element.
    * Do not call if this element has no children, i.e. is active.
@@ -763,7 +763,7 @@ public:
    * I.e. if c = a->which_child_am_i(e); then
    * a->child(c) will be e;
    */
-  unsigned int which_child_am_i(const Elem *e) const; 
+  unsigned int which_child_am_i(const Elem *e) const;
 
   /**
    * @returns true iff the specified child is on the
@@ -771,7 +771,7 @@ public:
    */
   virtual bool is_child_on_side(const unsigned int c,
 			        const unsigned int s) const = 0;
-  
+
   /**
    * @returns true iff the specified child is on the
    * specified edge
@@ -781,7 +781,7 @@ public:
 
   /**
    * Adds a child pointer to the array of children of this element.
-   * If this is the first child to be added, this method allocates 
+   * If this is the first child to be added, this method allocates
    * memory in the parent's _children array, otherwise, it just sets
    * the pointer.
    */
@@ -846,7 +846,7 @@ public:
   void active_family_tree_by_side (std::vector<const Elem*>& family,
                                    const unsigned int side,
                                    const bool reset=true) const;
-  
+
   /**
    * Same as the \p family_tree() member, but only adds elements
    * which are next to \p neighbor.
@@ -881,7 +881,7 @@ public:
 
   /**
    * Sets the value of the refinement flag for the element.
-   */     
+   */
   void set_refinement_flag (const RefinementState rflag);
 
   /**
@@ -891,7 +891,7 @@ public:
 
   /**
    * Sets the value of the p refinement flag for the element.
-   */     
+   */
   void set_p_refinement_flag (const RefinementState pflag);
 
   /**
@@ -901,7 +901,7 @@ public:
   unsigned int max_descendant_p_level () const;
 
   /**
-   * Returns the minimum p refinement level of elements which 
+   * Returns the minimum p refinement level of elements which
    * are descended from this and which share a side with the
    * active \p neighbor
    */
@@ -920,20 +920,20 @@ public:
   /**
    * Sets the value of the p refinement level for the element
    * Note that the maximum p refinement level is currently 255
-   */     
+   */
   void set_p_level (const unsigned int p);
 
   /**
    * Sets the value of the p refinement level for the element
    * without altering the p level of its ancestors
-   */     
+   */
   void hack_p_level (const unsigned int p);
 
   /**
    * Refine the element.
    */
   virtual void refine (MeshRefinement& mesh_refinement);
- 
+
   /**
    * Coarsen the element.  This is not
    * virtual since it is the same for all
@@ -943,7 +943,7 @@ public:
 
   /**
    * Contract an active element, i.e. remove pointers to any
-   * subactive children.  This should only be called via 
+   * subactive children.  This should only be called via
    * MeshRefinement::contract, which will also remove subactive
    * children from the mesh
    */
@@ -978,7 +978,7 @@ protected:
    * The definition can be found at the end of this header file.
    */
   class SideIter;
-  
+
 public:
   /**
    * Useful iterator typedefs
@@ -991,7 +991,7 @@ public:
    * this header file.
    */
   struct side_iterator;
-  
+
   /**
    * Iterator accessor functions
    */
@@ -1003,16 +1003,16 @@ private:
    * Side iterator helper functions.  Used to replace the begin()
    * and end() functions of the STL containers.
    */
-  SideIter _first_side(); 
-  SideIter _last_side();  
-  
+  SideIter _first_side();
+  SideIter _last_side();
+
 public:
-  
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * @returns \p true if the element is an infinite element,
-   * \p false  otherwise.  
+   * \p false  otherwise.
    */
   virtual bool infinite () const = 0;
 
@@ -1030,17 +1030,17 @@ public:
 
 
 
-  
+
   /**
    * Build an element of type \p type.  Since this method
-   * allocates memory the new \p Elem is returned in a 
+   * allocates memory the new \p Elem is returned in a
    * \p AutoPtr<>
    */
   static AutoPtr<Elem> build (const ElemType type,
 			      Elem* p=NULL);
 
 #ifdef LIBMESH_ENABLE_AMR
-  
+
   /**
    * Matrix that transforms the parents nodes into the children's
    * nodes
@@ -1050,11 +1050,11 @@ public:
 				  const unsigned int k) const = 0;
 
 #endif
-  
+
 
   //--------------------------------------------------------
   /**
-   * Convenient way to communicate elements.  This struct 
+   * Convenient way to communicate elements.  This struct
    * packes up an element so that it can easily be communicated through
    * an MPI array.
    *
@@ -1098,14 +1098,14 @@ public:
   //-------------------------------------------------------
 
 
-  
+
   /**
    * Replaces this element with \p NULL for all of
    * its neighbors.  This is useful when deleting an
    * element.
    */
   void nullify_neighbors ();
-  
+
   /**
    * Pointers to the nodes we are connected to.
    */
@@ -1116,9 +1116,9 @@ public:
    * lower-dimensional elements interior_parent.
    */
   Elem** _elemlinks;
- 
+
 #ifdef LIBMESH_ENABLE_AMR
-  
+
   /**
    * Pointers to this element's children.
    */
@@ -1130,14 +1130,14 @@ public:
    */
   unsigned char _rflag;
   //RefinementState _rflag;
-  
+
   /**
    * p refinement flag. This is stored as an unsigned char
    * to save space.
    */
   unsigned char _pflag;
   //RefinementState _pflag;
-  
+
   /**
    * p refinement level - the difference between the
    * polynomial degree on this element and the minimum
@@ -1203,17 +1203,17 @@ Elem::Elem(const unsigned int nn,
   _sbd_id(0)
 {
   this->processor_id() = DofObject::invalid_processor_id;
-  
+
   // Initialize the nodes data structure
   if (_nodes)
     {
       for (unsigned int n=0; n<nn; n++)
 	_nodes[n] = NULL;
     }
-  
+
   // Initialize the neighbors/parent data structure
-  // _elemlinks = new Elem*[ns+1]; 
-      
+  // _elemlinks = new Elem*[ns+1];
+
   if (_elemlinks)
     {
       _elemlinks[0] = p;
@@ -1227,7 +1227,7 @@ Elem::Elem(const unsigned int nn,
     {
       this->subdomain_id() = this->parent()->subdomain_id();
       this->processor_id() = this->parent()->processor_id();
-    }  
+    }
 
 #ifdef LIBMESH_ENABLE_AMR
   if (this->parent())
@@ -1238,7 +1238,7 @@ Elem::Elem(const unsigned int nn,
 
 
 inline
-Elem::~Elem() 
+Elem::~Elem()
 {
   // Deleting my parent/neighbor/nodes storage isn't necessary since it's
   // handled by the subclass
@@ -1255,7 +1255,7 @@ Elem::~Elem()
   if (_children != NULL)
     delete [] _children;
   _children = NULL;
-  
+
 #endif
 }
 
@@ -1360,7 +1360,7 @@ inline
 void Elem::set_neighbor (const unsigned int i, Elem* n)
 {
   libmesh_assert (i < this->n_neighbors());
-  
+
   _elemlinks[i+1] = n;
 }
 
@@ -1426,11 +1426,11 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
       eparent = eparent->parent();
       libmesh_assert(eparent);
     }
-  
+
   for (unsigned int s=0; s<this->n_neighbors(); s++)
     if (this->neighbor(s) == eparent)
       return s;
-    
+
   return libMesh::invalid_uint;
 }
 
@@ -1605,11 +1605,11 @@ const Elem* Elem::top_parent () const
   // until that parent is at level-0
   while (tp->parent() != NULL)
     tp = tp->parent();
-  
+
   libmesh_assert (tp != NULL);
   libmesh_assert (tp->level() == 0);
 
-  return tp;  
+  return tp;
 }
 
 
@@ -1627,7 +1627,7 @@ const Elem* Elem::interior_parent () const
   // We store the interior_parent pointer after both the parent
   // neighbor and neighbor pointers
   Elem *interior_p = _elemlinks[1+this->n_sides()];
-  
+
   // If we have an interior_parent, it had better be the
   // one-higher-dimensional interior element we are looking for.
   libmesh_assert (!interior_p ||
@@ -1666,8 +1666,8 @@ unsigned int Elem::level() const
     return 0;
 
   // if the parent and this element are of different
-  // dimensionality we are at the same level as 
-  // the parent (e.g. we are the 2D side of a 
+  // dimensionality we are at the same level as
+  // the parent (e.g. we are the 2D side of a
   // 3D element)
   if (this->dim() != this->parent()->dim())
     return this->parent()->level();
@@ -1681,7 +1681,7 @@ unsigned int Elem::level() const
   // Without AMR all elements are
   // at level 0.
   return 0;
-  
+
 #endif
 }
 
@@ -1706,7 +1706,7 @@ Elem* Elem::child (const unsigned int i) const
 {
   libmesh_assert (_children    != NULL);
   libmesh_assert (_children[i] != NULL);
-  
+
   return _children[i];
 }
 
@@ -1716,7 +1716,7 @@ inline
 void Elem::set_child (unsigned int c, Elem *elem)
 {
   libmesh_assert (this->has_children());
-  
+
   _children[c] = elem;
 }
 
@@ -1732,7 +1732,7 @@ unsigned int Elem::which_child_am_i (const Elem* e) const
     if (this->child(c) == e)
       return c;
 
-  libMesh::err << "ERROR:  which_child_am_i() was called with a non-child!" 
+  libMesh::err << "ERROR:  which_child_am_i() was called with a non-child!"
 	        << std::endl;
 
   libmesh_error();
@@ -1804,7 +1804,7 @@ unsigned int Elem::max_descendant_p_level () const
   libmesh_assert (!this->subactive());
   if (this->active())
     return this->p_level();
-  
+
   unsigned int max_p_level = _p_level;
   for (unsigned int c=0; c != this->n_children(); c++)
     max_p_level = std::max(max_p_level,
@@ -1886,7 +1886,7 @@ unsigned int Elem::compute_key (unsigned int n0,
   // Only use the hashword function if we have 32 bit unsigned ints
 #if (LIBMESH_SIZEOF_UNSIGNED_INT*CHAR_BIT == 32)
   if (n0 > n1) std::swap (n0, n1);
-  
+
   // Use general function
   //unsigned array[2] = {n0, n1};
   //return Utility::hashword(array, 2);
@@ -1896,11 +1896,11 @@ unsigned int Elem::compute_key (unsigned int n0,
 #else
   // big prime number
   const unsigned int bp = 65449;
-  
+
   // Order the two so that n0 < n1
   if (n0 > n1) std::swap (n0, n1);
 
-  return (n0%bp + (n1<<5)%bp);  
+  return (n0%bp + (n1<<5)%bp);
 #endif
 }
 
@@ -1919,7 +1919,7 @@ unsigned int Elem::compute_key (unsigned int n0,
 #else
   // big prime number
   const unsigned int bp = 65449;
- 
+
   // Order the numbers such that n0 < n1 < n2.
   // We'll do it in 3 steps like this:
   //
@@ -1931,21 +1931,21 @@ unsigned int Elem::compute_key (unsigned int n0,
   //           |  /  |                  |
   //           | /  \|                  |
   //  gb min= min   max              gb max
- 
- 
- 
+
+
+
   // Step 1
   if (n0 > n1) std::swap (n0, n1);
- 
+
   // Step 2
   if (n1 > n2) std::swap (n1, n2);
- 
+
   // Step 3
   if (n0 > n1) std::swap (n0, n1);
- 
+
   libmesh_assert ((n0 < n1) && (n1 < n2));
- 
-   
+
+
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp);
 #endif
 }
@@ -1966,26 +1966,26 @@ unsigned int Elem::compute_key (unsigned int n0,
 #else
   // big prime number
   const unsigned int bp = 65449;
- 
+
   // Step 1
   if (n0 > n1) std::swap (n0, n1);
- 
+
   // Step 2
   if (n2 > n3) std::swap (n2, n3);
- 
+
   // Step 3
   if (n0 > n2) std::swap (n0, n2);
- 
+
   // Step 4
   if (n1 > n3) std::swap (n1, n3);
- 
+
   // Finally step 5
   if (n1 > n2) std::swap (n1, n2);
- 
+
   libmesh_assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
-   
+
   return (n0%bp + (n1<<5)%bp + (n2<<10)%bp + (n3<<15)%bp);
-#endif  
+#endif
 }
 
 
@@ -2002,7 +2002,7 @@ unsigned int Elem::compute_key (unsigned int n0,
 class Elem::PackedElem
 {
 private:
-    
+
   /**
    * Iterator pointing to the beginning of this packed element's index buffer.
    */
@@ -2011,26 +2011,26 @@ private:
 public:
 
   /**
-   * Constructor.  Takes an input iterator pointing to the 
+   * Constructor.  Takes an input iterator pointing to the
    * beginning of the connectivity block for this element.
    */
   PackedElem (const std::vector<int>::const_iterator _buf_in) :
     _buf_begin(_buf_in)
   {}
-    
+
   /**
-   * An \p Elem can be packed into an integer array which is 
+   * An \p Elem can be packed into an integer array which is
    * \p header_size + elem->n_nodes() in length.
    */
   static const unsigned int header_size; /* = 10 with AMR, 4 without */
-    
+
   /**
    * For each element it is of the form
-   * [ level p_level r_flag p_r_flag etype processor_id subdomain_id 
+   * [ level p_level r_flag p_r_flag etype processor_id subdomain_id
    *  self_ID parent_ID which_child node_0 node_1 ... node_n]
    * We cannot use unsigned int because parent_ID can be negative
    */
-  static void pack (std::vector<int> &conn, const Elem* elem);    
+  static void pack (std::vector<int> &conn, const Elem* elem);
 
   /**
    * Unpacks this packed element.  Returns a pointer to the new element.
@@ -2120,7 +2120,7 @@ public:
   {
     return static_cast<unsigned int>(*(_buf_begin+9));
   }
-    
+
   /**
    * \p return the number of nodes in this packed element
    */
@@ -2135,7 +2135,7 @@ public:
   unsigned int node (const unsigned int n) const
   {
     return static_cast<unsigned int>(*(_buf_begin+10+n));
-  }    
+  }
 }; // end class PackedElem
 
 
@@ -2154,7 +2154,7 @@ public:
       _parent(parent)
   {}
 
-    
+
   // Empty constructor.
   SideIter()
     : _side_number(libMesh::invalid_uint),
@@ -2197,7 +2197,7 @@ public:
     ++_side_number;
     return *this;
   }
-  
+
   // op==  Two side iterators are equal if they have
   // the same side number and the same parent element.
   bool operator == (const SideIter& other) const
@@ -2215,7 +2215,7 @@ public:
   {
     return this->_parent->neighbor(_side_number) == NULL;
   }
-    
+
 private:
   // Update the _side pointer by building the correct side.
   // This has to be called before dereferencing.
@@ -2228,10 +2228,10 @@ private:
     // by the AutoPtr.
     this->_side_ptr = _side.get();
   }
-    
+
   // A counter variable which keeps track of the side number
   unsigned int _side_number;
-    
+
   // AutoPtr to the actual side, handles memory management for
   // the sides which are created during the course of iteration.
   mutable AutoPtr<Elem> _side;
@@ -2244,7 +2244,7 @@ private:
   // which is not addressed by the iterators in libMesh.  Basically it
   // is a bad idea to ever call delete on an iterator from the library.
   mutable Elem* _side_ptr;
-  
+
   // Pointer to the parent Elem class which generated this iterator
   Elem* _parent;
 
@@ -2270,7 +2270,7 @@ Elem::SideIter Elem::_last_side()
 {
   return SideIter(this->n_neighbors(), this);
 }
-				
+
 
 
 

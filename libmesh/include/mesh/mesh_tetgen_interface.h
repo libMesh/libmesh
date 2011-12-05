@@ -1,18 +1,18 @@
 // $Id$
- 
+
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -67,11 +67,11 @@ namespace libMesh
 
     /**
      * Method invokes TetGen library to compute a Delaunay tetrahedrization
-     * from the nodes point set. 
+     * from the nodes point set.
      */
     void triangulate_pointset ();
 
-    /** 
+    /**
      * Method invokes TetGen library to compute a Delaunay tetrahedrization
      * from the nodes point set. Stores only 2D hull surface elements.
      */
@@ -79,7 +79,7 @@ namespace libMesh
 
     /**
      * Method invokes TetGen library to compute a Delaunay tetrahedrization
-     * from the nodes point set. Boundary constraints are taken from 
+     * from the nodes point set. Boundary constraints are taken from
      * elements array.
      */
     void triangulate_conformingDelaunayMesh (double quality_constraint=0.,
@@ -87,7 +87,7 @@ namespace libMesh
 
     /**
      * Method invokes TetGen library to compute a Delaunay tetrahedrization
-     * from the nodes point set. Boundary constraints are taken from 
+     * from the nodes point set. Boundary constraints are taken from
      * elements array. Include carve-out functionality.
      */
     void triangulate_conformingDelaunayMesh_carvehole (const std::vector<Point>& holes,
@@ -107,7 +107,7 @@ namespace libMesh
 
     /**
      * Assigns the node IDs contained in the 'node_labels'
-     * array to 'elem'. 
+     * array to 'elem'.
      */
     void assign_nodes_to_elem(unsigned* node_labels, Elem* elem);
 
@@ -134,7 +134,7 @@ namespace libMesh
     void process_hull_integrity_result(unsigned result);
 
     /**
-     * Delete original convex hull elements from the Mesh 
+     * Delete original convex hull elements from the Mesh
      * after performing a Delaunay tetrahedralization.
      */
     void delete_2D_hull_elements();
@@ -148,7 +148,7 @@ namespace libMesh
      * We should not assume libmesh nodes are numbered sequentially...
      * This is not the default behavior of ParallelMesh, for example,
      * unless you specify node IDs explicitly.  So this array allows us
-     * to keep a mapping between the sequential numbering in 
+     * to keep a mapping between the sequential numbering in
      * tetgen_data.pointlist.
      */
     std::vector<unsigned> _sequential_to_libmesh_node_map;
@@ -157,11 +157,11 @@ namespace libMesh
      * Tetgen only operates on serial meshes.
      */
     MeshSerializer _serializer;
-  
+
   };
 
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_TETGEN
 
-#endif // __mesh_tetgen_interface_h__ 
+#endif // __mesh_tetgen_interface_h__

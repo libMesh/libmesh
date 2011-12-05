@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -67,7 +67,7 @@ class GMVIO : public MeshInput<MeshBase>,
    * This constructor is required to let us read in a mesh.
    */
   GMVIO (MeshBase&);
-  
+
   /**
    * This method implements writing a mesh to a specified file.
    */
@@ -77,7 +77,7 @@ class GMVIO : public MeshInput<MeshBase>,
     * This method implements reading a mesh from a specified file.
     */
   virtual void read (const std::string& mesh_file);
-  
+
 //   /**
 //    * This method implements reading a mesh from a specified file.
 //    */
@@ -92,7 +92,7 @@ class GMVIO : public MeshInput<MeshBase>,
 //    */
 //   virtual void read_mesh_and_nodal_data (const std::string& ,
 // 					 EquationSystems* es=NULL);
-  
+
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
@@ -112,13 +112,13 @@ class GMVIO : public MeshInput<MeshBase>,
    * See the templated to_binary_stream() function below.
    */
   bool & binary ();
-   
+
   /**
    * Flag indicating whether or not to write the mesh
    * as discontinuous cell patches
    */
   bool & discontinuous();
-  
+
   /**
    * Flag indicating whether or not to write the partitioning
    * information for the mesh.
@@ -131,26 +131,26 @@ class GMVIO : public MeshInput<MeshBase>,
    * on user-defined subdomains, potentially creating a pretty picture.
    */
   bool & write_subdomain_id_as_material();
-  
+
   /**
    * Flag indicating whether or not to subdivide second order
    * elements
    */
   bool & subdivide_second_order();
-  
+
   /**
    * Flag indicating whether or not to write p level
    * information for p refined meshes
    */
   bool & p_levels();
-  
+
   /**
    * Writes a GMV file with discontinuous data
-   */ 
-  void write_discontinuous_gmv (const std::string& name, 
+   */
+  void write_discontinuous_gmv (const std::string& name,
 				const EquationSystems& es,
 				const bool write_partitioning) const;
-  
+
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -181,7 +181,7 @@ class GMVIO : public MeshInput<MeshBase>,
    * to copy that nodal solution into an EquationSystems object.
    */
   void copy_nodal_solution(EquationSystems& es);
-  
+
 private:
 
   /**
@@ -197,12 +197,12 @@ private:
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are optionally
-   * provided.  
+   * provided.
    */
   void write_binary (const std::string&,
 		     const std::vector<Number>* = NULL,
 		     const std::vector<std::string>* = NULL);
-  
+
   /**
    * Helper function for writing unsigned ints to an ostream in binary format.
    * Implemented via memcpy as suggested in the standard.
@@ -210,17 +210,17 @@ private:
   template <typename T>
   void to_binary_stream(std::ostream& out,
 			const T i);
-  
+
   /**
    * Flag to write binary data.
    */
   bool _binary;
- 
+
   /**
    * Flag to write the mesh as discontinuous patches.
    */
   bool _discontinuous;
- 
+
   /**
    * Flag to write the mesh partitioning.
    */
@@ -228,15 +228,15 @@ private:
 
   /**
    * Flag to write element subdomain_id's as GMV "materials" instead
-   * of element processor_id's.  
+   * of element processor_id's.
    */
   bool _write_subdomain_id_as_material;
-  
+
   /**
    * Flag to subdivide second order elements
    */
   bool _subdivide_second_order;
- 
+
   /**
    * Flag to write the mesh p refinement levels.
    */
@@ -270,7 +270,7 @@ inline
 GMVIO::GMVIO (const MeshBase& mesh) :
   MeshOutput<MeshBase>    (mesh),
   _binary                 (false),
-  _discontinuous          (false),  
+  _discontinuous          (false),
   _partitioning           (true),
   _write_subdomain_id_as_material (false),
   _subdivide_second_order (true),
@@ -284,7 +284,7 @@ GMVIO::GMVIO (MeshBase& mesh) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
   _binary (false),
-  _discontinuous          (false),  
+  _discontinuous          (false),
   _partitioning           (true),
   _write_subdomain_id_as_material (false),
   _subdivide_second_order (true),

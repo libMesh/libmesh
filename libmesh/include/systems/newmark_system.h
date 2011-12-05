@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -69,16 +69,16 @@ public:
    * Destructor.
    */
   ~NewmarkSystem ();
-  
+
 
   /**
    * The type of system.
    */
   typedef NewmarkSystem sys_type;
-  
+
   /**
    * Clear all the data structures associated with
-   * the system. 
+   * the system.
    */
   virtual void clear ();
 
@@ -93,7 +93,7 @@ public:
    * actually call the solver.
    */
   virtual void assemble ();
-  
+
   /**
    * @returns \p "Newmark".  Helps in identifying
    * the system type in an equation system file.
@@ -104,7 +104,7 @@ public:
   //---------------------------------------------------------
   // These members are specific to the Newmark system
   //
-  
+
   /**
    * Apply initial conditions.
    */
@@ -122,7 +122,7 @@ public:
   void update_rhs ();
 
   /**
-   * Update displacement, velocity and acceleration.  
+   * Update displacement, velocity and acceleration.
    */
   void update_u_v_a ();
 
@@ -155,8 +155,8 @@ private:
   /**
    * Returns true if the matrix assembly is finished.
    */
-  bool _finished_assemble;  
-  
+  bool _finished_assemble;
+
   /**
    * Default Newmark \p alpha
    */

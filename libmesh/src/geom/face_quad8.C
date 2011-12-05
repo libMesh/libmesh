@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -155,28 +155,28 @@ bool Quad8::has_affine_map() const
 }
 
 
- 
+
 unsigned int Quad8::key (const unsigned int s) const
 {
   libmesh_assert (s < this->n_sides());
-  
+
   switch (s)
     {
     case 0:
 
       return
 	this->compute_key (this->node(4));
-	      
+
     case 1:
 
       return
 	this->compute_key (this->node(5));
-	
+
     case 2:
 
       return
 	this->compute_key (this->node(6));
-	
+
     case 3:
 
       return
@@ -213,7 +213,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(0);
 	    edge->set_node(1) = this->get_node(1);
 	    edge->set_node(2) = this->get_node(4);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 1:
@@ -221,7 +221,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(1);
 	    edge->set_node(1) = this->get_node(2);
 	    edge->set_node(2) = this->get_node(5);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 2:
@@ -229,7 +229,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(2);
 	    edge->set_node(1) = this->get_node(3);
 	    edge->set_node(2) = this->get_node(6);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	case 3:
@@ -237,7 +237,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(3);
 	    edge->set_node(1) = this->get_node(0);
 	    edge->set_node(2) = this->get_node(7);
-	
+
 	    AutoPtr<Elem> ap(edge);  return ap;
 	  }
 	default:
@@ -247,7 +247,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	}
     }
 
-  // We will never get here...  
+  // We will never get here...
   AutoPtr<Elem> ap(NULL);  return ap;
 }
 
@@ -325,7 +325,7 @@ void Quad8::connectivity(const unsigned int sf,
 	  }
       }
 
-      
+
       // Note: VTK connectivity is output as four triangles with
       // a central quadrilateral.  Therefore most of the connectivity
       // arrays have length three.
@@ -381,7 +381,7 @@ void Quad8::connectivity(const unsigned int sf,
 
 	  case 4:
 	    conn.resize(4);
-      
+
 	    // linear sub-quad
 	    conn[0] = this->node(4);
 	    conn[1] = this->node(5);
@@ -407,12 +407,12 @@ void Quad8::connectivity(const unsigned int sf,
 
 unsigned short int Quad8::second_order_adjacent_vertex (const unsigned int n,
 							const unsigned int v) const
-{ 
+{
   libmesh_assert (n >= this->n_vertices());
   libmesh_assert (n <  this->n_nodes());
   libmesh_assert (v < 2);
   // use the matrix from \p face_quad.C
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v]; 
+  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
 

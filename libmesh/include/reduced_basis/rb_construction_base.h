@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -196,7 +196,7 @@ public:
    */
   void reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
 				const std::pair<std::string,std::string>& orig);
-  
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -224,7 +224,7 @@ public:
    * number generator seed.
    */
   int training_parameters_random_seed;
-  
+
 protected:
 
   /**
@@ -288,7 +288,7 @@ protected:
 
   /**
    * Set this string to specify an alternative solver used in the set_alternative_solver()
-   * function above.  Currently-supported values are: 
+   * function above.  Currently-supported values are:
    * .) unchanged, to continue using the default truth solve solver
    * .) amg, to use the BoomerAMG from Hypre (NOT for indefinite problems!)
    * .) mumps, to use a sparse direct solver

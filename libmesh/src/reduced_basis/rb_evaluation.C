@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -184,7 +184,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
                  << "of basis functions in rb_solve" << std::endl;
     libmesh_error();
   }
-  
+
   const std::vector<Real> mu = get_current_parameters();
 
   // Resize (and clear) the solution vector
@@ -213,7 +213,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
 
     RB_rhs.add(rb_theta_expansion->eval_theta_q_f(q_f, mu), RB_F_q_f);
   }
-  
+
   // Solve the linear system
   if(N > 0)
   {
@@ -232,7 +232,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
     }
   }
 
-  if(evaluate_RB_error_bound) // Calculate the error bounds  
+  if(evaluate_RB_error_bound) // Calculate the error bounds
   {
     // Evaluate the dual norm of the residual for RB_solution_vector
     Real epsilon_N = compute_residual_dual_norm(N);
@@ -377,14 +377,14 @@ Real RBEvaluation::eval_output_dual_norm(unsigned int n, const std::vector<Real>
       q++;
     }
   }
-    
+
   return libmesh_real(std::sqrt( output_bound_sq ));
 }
 
 void RBEvaluation::clear_riesz_representors()
 {
   START_LOG("clear_riesz_representors()", "RBEvaluation");
-  
+
   // Clear the A_q_representors
   for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
   {
@@ -397,7 +397,7 @@ void RBEvaluation::clear_riesz_representors()
       }
     }
   }
-  
+
   STOP_LOG("clear_riesz_representors()", "RBEvaluation");
 }
 
@@ -473,7 +473,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
         libmesh_error();
       }
       output_dual_norms_out.precision(precision_level);
-      
+
       unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
       for(unsigned int q=0; q<Q_l_hat; q++)
       {
@@ -540,7 +540,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
 //        }
 //      }
 //      output_out.close();
-    
+
     if(compute_RB_inner_product)
     {
       // Next write out the inner product matrix
@@ -716,7 +716,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     n_bfs_in >> n_bfs;
     n_bfs_in.close();
   }
-  
+
   resize_data_structures(n_bfs);
 
   // Next read in F_q representor norm data
@@ -755,7 +755,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       libMesh::err << "Error opening input " << n << " dual norms file" << std::endl;
       libmesh_error();
     }
-    
+
     unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
     for(unsigned int q=0; q<Q_l_hat; q++)
     {
@@ -823,7 +823,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
 //      }
 //    }
 //    output_in.close();
-  
+
   if(compute_RB_inner_product)
   {
     // Next read in the inner product matrix
@@ -973,7 +973,7 @@ void RBEvaluation::write_out_basis_functions(System& sys,
                                              const bool write_binary_basis_functions)
 {
   libMesh::out << "Writing out the basis functions..." << std::endl;
-  
+
   // Make sure processors are synced up before we begin
   Parallel::barrier();
 

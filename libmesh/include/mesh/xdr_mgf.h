@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -70,7 +70,7 @@ namespace libMesh
  *
  * There are essentially two inheritance trees and six classes:
  *       XdrMGF                         XdrHEAD
- *     ^        ^                    ^          ^   
+ *     ^        ^                    ^          ^
  *     |        |                    |          |
  *  XdrMESH  XdrSOLN             XdrMHEAD     XdrSHEAD
  *
@@ -80,7 +80,7 @@ namespace libMesh
  *
  * XdrMGF, XdrMESH, and XdrSOLN handle the "meat" of the files: everything
  * other than the headers.
- */ 
+ */
 class XdrMGF
 {
 public:
@@ -97,7 +97,7 @@ public:
   enum XdrIO_TYPE {UNKNOWN = -1, ENCODE=0, DECODE,
 		   W_ASCII , R_ASCII};
 
-     
+
   /**
    * Constructor.  Intializes
    * the access type, \p xdr file
@@ -106,7 +106,7 @@ public:
    * is a good default value for
    * the flag, since that is the
    * DEAL identifier.
-   * The \p xdr file handle 
+   * The \p xdr file handle
    * is a struct defined in the
    * standard C header \p rpc/rpc.h.
    */
@@ -115,7 +115,7 @@ public:
 #else
   XdrMGF() : _num_levels(0), m_type(UNKNOWN), orig_flag(LegacyXdrIO::LIBM), mp_fp(0) {}
 #endif
-    
+
   /**
    * Initialization of the \p xdr file.
    * This function performs the following
@@ -187,7 +187,7 @@ public:
    * Get number of levels
    */
   unsigned int get_num_levels() { return _num_levels; }
-  
+
 protected:
 
   /**
@@ -209,7 +209,7 @@ protected:
   XdrIO_TYPE m_type;
 
 #ifdef LIBMESH_HAVE_XDR
-  
+
   /**
    * Pointer to the standard \p{xdr}
    * struct.  See the standard
@@ -217,9 +217,9 @@ protected:
    * for more information.
    */
   XDR*  mp_xdr_handle;
-  
+
 #endif
-  
+
   /**
    * Flag indicating how much checking
    * we need to do.  We can read in
@@ -249,7 +249,7 @@ protected:
    * iostream
    */
   OFStream mp_out;
-  
+
 private:
   std::FILE* mp_fp;
 
@@ -276,5 +276,5 @@ private:
 
 } // namespace libMesh
 
-  
+
 #endif // #ifndef __xdr_mgf_h__

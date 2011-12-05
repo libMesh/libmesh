@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -26,7 +26,7 @@
 
 namespace libMesh
 {
- 
+
 
 
 void QGauss::init_1D(const ElemType,
@@ -41,11 +41,11 @@ void QGauss::init_1D(const ElemType,
       {
 	_points.resize (1);
 	_weights.resize(1);
-	
+
 	_points[0](0)  = 0.;
-	
+
 	_weights[0]    = 2.;
-	
+
 	return;
       }
     case SECOND:
@@ -53,7 +53,7 @@ void QGauss::init_1D(const ElemType,
       {
 	_points.resize (2);
 	_weights.resize(2);
-	      
+
 	_points[0](0) = -5.7735026918962576450914878050196e-01L; // -sqrt(3)/3
 	_points[1]    = -_points[0];
 
@@ -67,7 +67,7 @@ void QGauss::init_1D(const ElemType,
       {
 	_points.resize (3);
 	_weights.resize(3);
-	      
+
 	_points[ 0](0) = -7.7459666924148337703585307995648e-01L;
 	_points[ 1](0) = 0.;
 	_points[ 2]    = -_points[0];
@@ -83,7 +83,7 @@ void QGauss::init_1D(const ElemType,
       {
 	_points.resize (4);
 	_weights.resize(4);
-	      
+
 	_points[ 0](0) = -8.6113631159405257522394648889281e-01L;
 	_points[ 1](0) = -3.3998104358485626480266575910324e-01L;
 	_points[ 2]    = -_points[1];
@@ -101,7 +101,7 @@ void QGauss::init_1D(const ElemType,
       {
 	_points.resize (5);
 	_weights.resize(5);
-	      
+
 	_points[ 0](0) = -9.0617984593866399279762687829939e-01L;
 	_points[ 1](0) = -5.3846931010568309103631442070021e-01L;
 	_points[ 2](0) = 0.;
@@ -121,7 +121,7 @@ void QGauss::init_1D(const ElemType,
       {
 	_points.resize (6);
 	_weights.resize(6);
-	      
+
 	_points[ 0](0) = -9.3246951420315202781230155449399e-01L;
 	_points[ 1](0) = -6.6120938646626451366139959501991e-01L;
 	_points[ 2](0) = -2.3861918608319690863050172168071e-01L;
@@ -143,7 +143,7 @@ void QGauss::init_1D(const ElemType,
       {
 	_points.resize (7);
 	_weights.resize(7);
-	      
+
 	_points[ 0](0) = -9.4910791234275852452618968404785e-01L;
 	_points[ 1](0) = -7.4153118559939443986386477328079e-01L;
 	_points[ 2](0) = -4.0584515137739716690660641207696e-01L;
@@ -167,7 +167,7 @@ void QGauss::init_1D(const ElemType,
       {
 	_points.resize (8);
 	_weights.resize(8);
-	      
+
 	_points[ 0](0) = -9.6028985649753623168356086856947e-01L;
 	_points[ 1](0) = -7.9666647741362673959155393647583e-01L;
 	_points[ 2](0) = -5.2553240991632898581773904918925e-01L;
@@ -245,7 +245,7 @@ void QGauss::init_1D(const ElemType,
 	_weights[ 9]   = _weights[0];
 
 	return;
-      }      
+      }
 
     case TWENTIETH:
     case TWENTYFIRST:
@@ -313,7 +313,7 @@ void QGauss::init_1D(const ElemType,
 	_weights[11]   = _weights[0];
 
 	return;
-      }      
+      }
 
     case TWENTYFOURTH:
     case TWENTYFIFTH:
@@ -780,7 +780,7 @@ void QGauss::init_1D(const ElemType,
       {
 	libMesh::err << "Quadrature rule " << _order
 		      << " not supported!" << std::endl;
-	      
+
 	libmesh_error();
       }
     }
@@ -791,5 +791,5 @@ void QGauss::init_1D(const ElemType,
 }
 
 } // namespace libMesh
- 
+
 

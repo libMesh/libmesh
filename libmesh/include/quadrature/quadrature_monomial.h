@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -40,7 +40,7 @@ namespace libMesh
  * bi/tri-linear, bi/tri-quadratic, etc. (i.e. tensor product)
  * bases (which consist of incomplete polynomials up to degree=
  * dim*p) they are not optimal for the MONOMIAL or FEXYZ bases,
- * which consist of complete polynomials of degree=p. 
+ * which consist of complete polynomials of degree=p.
  *
  * This class is implemented to provide quadrature rules which are
  * more efficient than tensor product rules when they are available,
@@ -82,7 +82,7 @@ class QMonomial : public QBase
    */
   QuadratureType type() const { return QMONOMIAL; }
 
- 
+
  private:
 
   void init_1D (const ElemType,
@@ -97,15 +97,15 @@ class QMonomial : public QBase
    */
   void init_2D (const ElemType _type=INVALID_ELEM,
 		unsigned int p_level=0);
-  
+
   /**
    * More efficient rules for HEXes
    */
   void init_3D (const ElemType _type=INVALID_ELEM,
 		unsigned int p_level=0);
 
-     
-  
+
+
   /**
    * Wissmann published three interesting "partially symmetric" rules
    * for integrating degree 4, 6, and 8 polynomials exactly on QUADs.
@@ -113,8 +113,8 @@ class QMonomial : public QBase
    * reference element, and have fewer points than tensor-product
    * rules of equivalent order, making them superior to those rules
    * for monomial bases.
-   * 
-   * J. W. Wissman and T. Becker, Partially symmetric cubature 
+   *
+   * J. W. Wissman and T. Becker, Partially symmetric cubature
    * formulas for even degrees of exactness, SIAM J. Numer. Anal.  23
    * (1986), 676--685.
   */

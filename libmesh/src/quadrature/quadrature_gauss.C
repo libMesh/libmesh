@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -43,16 +43,16 @@ void QGauss::keast_rule(const Real rule_data[][4],
   // {a, b, c, w} = 12-permutation (a,a,b), (a,a,c), (b,a,a), (c,a,a), (a,b,a), (a,c,a)
   //                               (a,b,c), (a,c,b), (b,a,c), (b,c,a), (c,a,b), (c,b,a)
 
-  // Always insert into the points & weights vector relative to the offset 
+  // Always insert into the points & weights vector relative to the offset
   unsigned int offset=0;
-  
-  
+
+
   for (unsigned int p=0; p<n_pts; ++p)
     {
 
       // There must always be a non-zero entry to start the row
       libmesh_assert(rule_data[p][0] != static_cast<Real>(0.0));
-      
+
       // A zero weight may imply you did not set up the raw data correctly
       libmesh_assert(rule_data[p][3] != static_cast<Real>(0.0));
 
@@ -62,7 +62,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
       // Three non-zero entries               ? 6-perm point            = 6
       unsigned int pointtype=1;
 
-      if (rule_data[p][1] != static_cast<Real>(0.0))      
+      if (rule_data[p][1] != static_cast<Real>(0.0))
 	{
 	  if (rule_data[p][2] != static_cast<Real>(0.0))
 	    pointtype = 12;
@@ -76,7 +76,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    pointtype = 6;
 	}
 
-      
+
       switch (pointtype)
 	{
 	case 1:
@@ -85,7 +85,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    libmesh_assert(offset + 0 < _points.size());
 
 	    const Real a = rule_data[p][0];
-	    
+
 	    // The point has only a single permutation (the centroid!)
 	    _points[offset  + 0] = Point(a,a,a);
 
@@ -104,7 +104,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    const Real a = rule_data[p][0];
 	    const Real b = rule_data[p][1];
 	    const Real w = rule_data[p][3];
-	    
+
 	    // Here it's understood the second entry is to be used twice, and
 	    // thus there are three possible permutations.
 	    _points[offset + 0] = Point(a,b,b);
@@ -114,7 +114,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 
 	    for (unsigned int j=0; j<pointtype; ++j)
 	      _weights[offset + j] = w;
-	    
+
 	    offset += pointtype;
 	    break;
 	  }
@@ -127,7 +127,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    const Real a = rule_data[p][0];
 	    const Real b = rule_data[p][2];
 	    const Real w = rule_data[p][3];
-	    
+
 	    // Three individual entries with six permutations.
 	    _points[offset + 0] = Point(a,a,b);
 	    _points[offset + 1] = Point(a,b,b);
@@ -138,12 +138,12 @@ void QGauss::keast_rule(const Real rule_data[][4],
 
 	    for (unsigned int j=0; j<pointtype; ++j)
 	      _weights[offset + j] = w;
-	    
+
 	    offset += pointtype;
 	    break;
 	  }
 
-	  
+
 	case 12:
 	  {
 	    // Be sure we have enough space to insert these points
@@ -153,7 +153,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    const Real b = rule_data[p][1];
 	    const Real c = rule_data[p][2];
 	    const Real w = rule_data[p][3];
-	    
+
 	    // Three individual entries with six permutations.
 	    _points[offset + 0] = Point(a,a,b);  _points[offset + 6]  = Point(a,b,c);
 	    _points[offset + 1] = Point(a,a,c);	 _points[offset + 7]  = Point(a,c,b);
@@ -164,7 +164,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 
 	    for (unsigned int j=0; j<pointtype; ++j)
 	      _weights[offset + j] = w;
-	    
+
 	    offset += pointtype;
 	    break;
 	  }
@@ -175,16 +175,16 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    libmesh_error();
 	  }
 	}
-      
+
     }
-  
+
 }
 
 
 // A number of different rules for triangles can be described by
 // permutations of the following types of points:
 // I:   "1"-permutation, (1/3,1/3)  (single point only)
-// II:   3-permutation, (a,a,1-2a) 
+// II:   3-permutation, (a,a,1-2a)
 // III:  6-permutation, (a,b,1-a-b)
 // The weights for a given set of permutations are all the same.
 void QGauss::dunavant_rule2(const Real* wts,
@@ -203,10 +203,10 @@ void QGauss::dunavant_rule2(const Real* wts,
   // Resize point and weight vectors appropriately.
   _points.resize(total_pts);
   _weights.resize(total_pts);
-    
-  // Always insert into the points & weights vector relative to the offset 
+
+  // Always insert into the points & weights vector relative to the offset
   unsigned int offset=0;
-  
+
   for (unsigned int p=0; p<n_wts; ++p)
     {
       switch (permutation_ids[p])
@@ -217,7 +217,7 @@ void QGauss::dunavant_rule2(const Real* wts,
 	    // So we don't even need to look in the a or b arrays.
 	    _points [offset  + 0] = Point(1.0L/3.0L, 1.0L/3.0L);
 	    _weights[offset + 0] = wts[p];
-	    
+
 	    offset += 1;
 	    break;
 	  }
@@ -232,7 +232,7 @@ void QGauss::dunavant_rule2(const Real* wts,
 
 	    for (unsigned int j=0; j<3; ++j)
 	      _weights[offset + j] = wts[p];
-	    
+
 	    offset += 3;
 	    break;
 	  }
@@ -249,11 +249,11 @@ void QGauss::dunavant_rule2(const Real* wts,
 
 	    for (unsigned int j=0; j<6; ++j)
 	      _weights[offset + j] = wts[p];
-	    
+
 	    offset += 6;
 	    break;
 	  }
-	  
+
 	default:
 	  {
 	    libMesh::err << "Unknown permutation id: " << permutation_ids[p] << "!" << std::endl;
@@ -261,7 +261,7 @@ void QGauss::dunavant_rule2(const Real* wts,
 	  }
 	}
     }
-  
+
 }
 
 
@@ -274,16 +274,16 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
   // A zero in one of the first 3 columns implies the point is a 3-permutation.
   // Otherwise each point is assumed to be a 6-permutation.
 
-  // Always insert into the points & weights vector relative to the offset 
+  // Always insert into the points & weights vector relative to the offset
   unsigned int offset=0;
 
-  
+
   for (unsigned int p=0; p<n_pts; ++p)
     {
 
       // There must always be a non-zero entry to start the row
       libmesh_assert( rule_data[p][0] != static_cast<Real>(0.0) );
-      
+
       // A zero weight may imply you did not set up the raw data correctly
       libmesh_assert( rule_data[p][3] != static_cast<Real>(0.0) );
 
@@ -292,22 +292,22 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
       // Two non-zero entries in first 3 cols ? 3-perm point            = 3
       // Three non-zero entries               ? 6-perm point            = 6
       unsigned int pointtype=1;
-      
-      if (rule_data[p][1] != static_cast<Real>(0.0))      
+
+      if (rule_data[p][1] != static_cast<Real>(0.0))
 	{
 	  if (rule_data[p][2] != static_cast<Real>(0.0))
 	    pointtype = 6;
 	  else
 	    pointtype = 3;
 	}
-      
+
       switch (pointtype)
 	{
 	case 1:
 	  {
 	    // Be sure we have enough space to insert this point
 	    libmesh_assert(offset + 0 < _points.size());
-	    
+
 	    // The point has only a single permutation (the centroid!)
 	    _points[offset  + 0] = Point(rule_data[p][0], rule_data[p][0]);
 
@@ -322,7 +322,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 	  {
 	    // Be sure we have enough space to insert these points
 	    libmesh_assert(offset + 2 < _points.size());
-	    
+
 	    // Here it's understood the second entry is to be used twice, and
 	    // thus there are three possible permutations.
 	    _points[offset + 0] = Point(rule_data[p][0], rule_data[p][1]);
@@ -331,7 +331,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 
 	    for (unsigned int j=0; j<3; ++j)
 	      _weights[offset + j] = rule_data[p][3];
-	    
+
 	    offset += 3;
 	    break;
 	  }
@@ -340,7 +340,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 	  {
 	    // Be sure we have enough space to insert these points
 	    libmesh_assert(offset + 5 < _points.size());
-	    
+
 	    // Three individual entries with six permutations.
 	    _points[offset + 0] = Point(rule_data[p][0], rule_data[p][1]);
 	    _points[offset + 1] = Point(rule_data[p][0], rule_data[p][2]);
@@ -351,7 +351,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 
 	    for (unsigned int j=0; j<6; ++j)
 	      _weights[offset + j] = rule_data[p][3];
-	    
+
 	    offset += 6;
 	    break;
 	  }

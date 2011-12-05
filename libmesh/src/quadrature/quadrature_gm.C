@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -53,7 +53,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
 
   // Here we are considering only tetrahedra rules, so dim==3
   const unsigned int dim = 3;
-  
+
   // The number of points for rule of index s is
   // (dim+1+s)! / (dim+1)! / s!
   // In 3D, this is = 1/24 * P_{i=1}^4 (s+i)
@@ -90,7 +90,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
 	      static_cast<Real>(2.*permutations[p][j] + 1.) /
 	      static_cast<Real>(  degree + dim - 2.*i     );
 	}
-      
+
       // Compute the weight for this i, being careful to avoid overflow.
       // This technique is borrowed from Burkardt's code as well.
       // Use once for each of the points obtained from the permutations array.
@@ -100,7 +100,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
       // whichever is largest.
       const unsigned int weight_loop_index =
 	std::max(dim, std::max(degree, degree+dim-i));
-      
+
       for (unsigned int j=1; j<=weight_loop_index; ++j)
 	{
 	  if (j <= degree) // Accumulate (d+n-2i)^d term
@@ -119,7 +119,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
       // This is the weight for each of the points computed previously
       for (unsigned int j=0; j<permutations.size(); ++j)
 	_weights[offset+j] = weight;
-      
+
       // Change sign for next iteration
       one_pm = -one_pm;
 
@@ -133,7 +133,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
 
 // This routine for computing compositions and their permutations is
 // originall due to:
-// 
+//
 // Albert Nijenhuis, Herbert Wilf,
 // Combinatorial Algorithms for Computers and Calculators,
 // Second Edition,
@@ -153,26 +153,26 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
   // Allocate storage for a workspace.  The workspace will periodically
   // be copied into the result container.
   std::vector<unsigned int> workspace(p);
-  
+
   // The first result is always (s,0,...,0)
   workspace[0] = s;
   result.push_back(workspace);
 
   // the value of the first non-zero entry
-  unsigned int head_value=s; 
+  unsigned int head_value=s;
 
   // When head_index=-1, it refers to "off the front" of the array.  Therefore,
   // this needs to be a regular int rather than unsigned.  I initially tried to
   // do this with head_index unsigned and an else statement below, but then there
   // is the special case: (1,0,...,0) which does not work correctly.
   int head_index = -1;
-  
+
   // At the end, all the entries will be in the final slot of workspace
   while (workspace.back() != s)
     {
       // Uncomment for debugging
       //libMesh::out << "previous head_value=" << head_value << " -> ";
-      
+
       // If the previous head value is still larger than 1, reset the index
       // to "off the front" of the array
       if (head_value > 1)
@@ -180,7 +180,7 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
 
       // Either move the index onto the front of the array or on to
       // the next value.
-      head_index++;   
+      head_index++;
 
       // Get current value of the head entry
       head_value = workspace[head_index];
@@ -189,7 +189,7 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
       //std::copy(workspace.begin(), workspace.end(), std::ostream_iterator<int>(libMesh::out, " "));
       //libMesh::out << ", head_index=" << head_index;
       //libMesh::out << ", head_value=" << head_value << " -> ";
-      
+
       // Put a zero into the head_index of the array.  If head_index==0,
       // this will be overwritten in the next line with head_value-1.
       workspace[head_index] = 0;
@@ -200,7 +200,7 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
       libmesh_assert (head_value > 0);
       workspace[0] = head_value - 1;
 
-      // Increment the head+1 value 
+      // Increment the head+1 value
       workspace[head_index+1] += 1;
 
       // Save this composition in the results

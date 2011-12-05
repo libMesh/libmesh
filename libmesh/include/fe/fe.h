@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -68,17 +68,17 @@ template <unsigned int Dim, FEFamily T>
 class FE : public FEBase
 {
 public:
-  
+
   /**
    * Constructor.
    */
   FE(const FEType& fet);
-  
+
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method allows you to specify the imension,
    * element type, and order directly.  This allows the method to
-   * be static.  
+   * be static.
    *
    * On a p-refined element, \p o should be the total order of the element.
    */
@@ -99,7 +99,7 @@ public:
 		    const Order o,
 		    const unsigned int i,
 		    const Point& p);
-  
+
   /**
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at point \p p.  This method allows you to
@@ -172,7 +172,7 @@ public:
 				 const unsigned int i,
 				 const unsigned int j,
 				 const Point& p);
-  
+
   /**
    * Build the nodal soln from the element soln.
    * This is the solution that will be plotted.
@@ -231,13 +231,13 @@ public:
    * @returns the continuity level of the finite element.
    */
   virtual FEContinuity get_continuity() const;
-				       
+
   /**
    * @returns true if the finite element's higher order shape functions are
    * hierarchic
    */
   virtual bool is_hierarchic() const;
-				       
+
   /**
    * Fills the vector di with the local degree of freedom indices
    * associated with side \p s of element \p elem
@@ -288,11 +288,11 @@ public:
 			   std::vector<Point>&       reference_points,
 			   const Real tolerance = TOLERANCE,
 			   const bool secure = true);
-  
+
   /**
    * This is at the core of this class. Use this for each
-   * new element in the mesh.  Reinitializes all the physical 
-   * element-dependent data based on the current element 
+   * new element in the mesh.  Reinitializes all the physical
+   * element-dependent data based on the current element
    * \p elem.  By default the shape functions and associated
    * data are computed at the quadrature points specified
    * by the quadrature rule \p qrule, but may be any points
@@ -302,7 +302,7 @@ public:
   virtual void reinit (const Elem* elem,
 		       const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL);
-    
+
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of \p face.  The \p tolerance paremeter is passed to
@@ -321,10 +321,10 @@ public:
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p edge.  The \p tolerance paremeter is passed to the
-   * involved call to \p inverse_map().  By default the shape 
-   * functions and associated data are computed at the quadrature 
-   * points specified by the quadrature rule \p qrule, but may be any 
-   * points specified on the reference \em side element specified in 
+   * involved call to \p inverse_map().  By default the shape
+   * functions and associated data are computed at the quadrature
+   * points specified by the quadrature rule \p qrule, but may be any
+   * points specified on the reference \em side element specified in
    * the optional argument \p pts.
    */
   virtual void edge_reinit (const Elem* elem,
@@ -334,9 +334,9 @@ public:
                             const std::vector<Real>* const weights = NULL);
 
   /**
-   * Computes the reference space quadrature points on the side of 
+   * Computes the reference space quadrature points on the side of
    * an element based on the side quadrature points.
-   */  
+   */
   virtual void side_map (const Elem* elem,
                          const Elem* side,
                          const unsigned int s,
@@ -349,7 +349,7 @@ public:
    * to be calculated.
    */
   virtual void attach_quadrature_rule (QBase* q);
-  
+
   /**
    * @returns the total number of quadrature points.  Call this
    * to get an upper bound for the \p for loop in your simulation
@@ -360,7 +360,7 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Computes the constraint matrix contributions (for
-   * non-conforming adapted meshes) corresponding to 
+   * non-conforming adapted meshes) corresponding to
    * variable number \p var_number, using element-specific
    * optimizations if possible.
    */
@@ -369,7 +369,7 @@ public:
 				   const unsigned int variable_number,
 				   const Elem* elem);
 #endif // #ifdef LIBMESH_ENABLE_AMR
-  
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
@@ -383,13 +383,13 @@ public:
 
   /**
    * @returns \p true when the shape functions (for
-   * this \p FEFamily) depend on the particular 
+   * this \p FEFamily) depend on the particular
    * element, and therefore needs to be re-initialized
    * for each new element.  \p false otherwise.
    */
   virtual bool shapes_need_reinit() const;
-  
-  /** 
+
+  /**
    * Update the various member data fields \p phi,
    * \p dphidxi, \p dphideta, \p dphidzeta, etc.
    * for the current element.  These data will be computed
@@ -399,17 +399,17 @@ public:
   virtual void init_shape_functions(const std::vector<Point>& qp,
 				    const Elem* e);
 
-  /** 
+  /**
    * Same as before, but for a side. This is used for boundary
    * integration.
-   */  
+   */
   void init_face_shape_functions(const std::vector<Point>& qp,
 				 const Elem* side);
 
-  /** 
+  /**
    * Same as before, but for an edge. This is used for some projection
    * operators.
-   */  
+   */
   void init_edge_shape_functions(const std::vector<Point>& qp,
 				 const Elem* edge);
 
@@ -419,14 +419,14 @@ public:
    */
   static Point map (const Elem* elem,
 		    const Point& reference_point);
-  
+
   /**
    * @returns d(xyz)/dxi (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map_xi (const Elem* elem,
 		       const Point& reference_point);
-  
+
   /**
    * @returns d(xyz)/deta (in physical space) of the point
    * \p p located on the reference element.
@@ -469,7 +469,7 @@ protected:
 
 /**
  * Clough-Tocher finite elements.  Still templated on the dimension,
- * \p Dim.  
+ * \p Dim.
  *
  * \author Roy Stogner
  * \date 2004
@@ -494,7 +494,7 @@ public:
 
 /**
  * Hermite finite elements.  Still templated on the dimension,
- * \p Dim.  
+ * \p Dim.
  *
  * \author Roy Stogner
  * \date 2005
@@ -529,7 +529,7 @@ public:
 
 /**
  * Hierarchic finite elements.  Still templated on the dimension,
- * \p Dim.  
+ * \p Dim.
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
@@ -554,7 +554,7 @@ public:
 
 /**
  * Discontinuous Hierarchic finite elements.  Still templated on the dimension,
- * \p Dim.  
+ * \p Dim.
  *
  * \author Truman E. Ellis
  * \date 2011
@@ -659,13 +659,13 @@ template <unsigned int Dim>
 class FEXYZ : public FE<Dim,XYZ>
 {
 public:
-  
+
   /**
    * Constructor. Creates a monomial finite element
    * to be used in dimension \p Dim.
    */
   FEXYZ(const FEType& fet);
-    
+
   /**
    * Explicitly call base class method.  This prevents some
    * compilers being confused by partially overriding this virtual function.
@@ -688,7 +688,7 @@ public:
 
 protected:
 
-  /** 
+  /**
    * Update the various member data fields \p phi,
    * \p dphidxi, \p dphideta, \p dphidzeta, etc.
    * for the current element.  These data will be computed
@@ -698,10 +698,10 @@ protected:
   virtual void init_shape_functions(const std::vector<Point>& qp,
 				    const Elem* e);
 
-  /** 
+  /**
    * After having updated the jacobian and the transformation
    * from local to global coordinates in \p FEBase::compute_map(),
-   * the first derivatives of the shape functions are 
+   * the first derivatives of the shape functions are
    * transformed to global coordinates, giving \p dphi,
    * \p dphidx, \p dphidy, and \p dphidz. This method
    * should rarely be re-defined in derived classes, but
@@ -731,38 +731,38 @@ namespace FiniteElements
    * Clough-Tocher finite element.
    */
   typedef FEClough<2> FEClough2D;
-  
+
   /**
    * Convenient definition for a 1D
    * Hierarchic finite element.
    */
   typedef FE<1,HIERARCHIC> FEHierarchic1D;
-  
+
   /**
    * Convenient definition for a 2D
    * Hierarchic finite element.
    */
   typedef FE<2,HIERARCHIC> FEHierarchic2D;
-  
+
   /**
    * Convenient definition for a 3D
    * Hierarchic finite element.
    */
   typedef FE<3,HIERARCHIC> FEHierarchic3D;
-  
-  
+
+
   /**
    * Convenient definition for a 1D
    * Discontinuous Hierarchic finite element.
    */
   typedef FE<1,L2_HIERARCHIC> FEL2Hierarchic1D;
-  
+
   /**
    * Convenient definition for a 2D
    * Discontinuous Hierarchic finite element.
    */
   typedef FE<2,L2_HIERARCHIC> FEL2Hierarchic2D;
-  
+
   /**
    * Convenient definition for a 3D
    * Discontinuous Hierarchic finite element.
@@ -789,13 +789,13 @@ namespace FiniteElements
   typedef FE<3,LAGRANGE> FELagrange3D;
 
 
-  
+
   /**
    * Convenient definition for a 1D
    * Monomial finite element.
    */
   typedef FE<1,MONOMIAL> FEMonomial1D;
-  
+
   /**
    * Convenient definition for a 2D
    * Monomial finite element.

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,15 +48,15 @@ class PerfMon
   PerfMon  (std::string id,
 	    const unsigned int v=1,
 	    const unsigned int pid=0);
-	    
+
   ~PerfMon ();
   void reset ();
   double print (std::string msg="NULL", std::ostream &out = libMesh::out);
-  
+
  private:
 
   const std::string id_string;
-  
+
   struct timeval the_time_start;
   struct timeval the_time_stop;
 
@@ -79,7 +79,7 @@ PerfMon::reset ()
 
 #ifdef HAVE_PAPI_H
   Papi::PAPI_flops (&rtime, &ptime, &flpins, &mflops);
-#endif  
+#endif
 }
 
 
@@ -87,9 +87,9 @@ PerfMon::reset ()
 inline
 double
 PerfMon::print (std::string msg, std::ostream &out)
-{  
+{
   gettimeofday (&the_time_stop, NULL);
-  
+
 #ifdef HAVE_PAPI_H
   Papi::PAPI_flops (&rtime, &ptime, &flpins, &mflops);
 #endif
@@ -99,7 +99,7 @@ PerfMon::print (std::string msg, std::ostream &out)
 
   if (verbose)
     {
-      
+
       if (proc_id == 0)
 	{
 	  if (msg == "NULL")
@@ -112,7 +112,7 @@ PerfMon::print (std::string msg, std::ostream &out)
 		<< ": elapsed time: "
 		<< elapsed_time << " (sec)"
 		<< std::endl;
-	  
+
 #ifdef HAVE_PAPI_H
 	  if (msg == "NULL")
 	    out << " " << id_string
@@ -124,12 +124,12 @@ PerfMon::print (std::string msg, std::ostream &out)
 		<< ": mflops: "
 		<< mflops
 		<< std::endl;
-      
+
 #endif
 
 	}
     }
-  
+
   return elapsed_time;
 }
 

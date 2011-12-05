@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,7 +48,7 @@ namespace libMesh
     PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx);
     PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
   }
-  
+
 /**
  * This class provides an interface to PETSc
  * iterative solvers that is compatible with the \p libMesh
@@ -70,12 +70,12 @@ public:
    *  Constructor. Initializes Petsc data structures
    */
   PetscNonlinearSolver (sys_type& system);
-    
+
   /**
    * Destructor.
    */
   ~PetscNonlinearSolver ();
-  
+
   /**
    * Release all memory and clear data structures.
    */
@@ -90,7 +90,7 @@ public:
    * Returns the raw PETSc snes context pointer.
    */
   SNES snes() { this->init(); return _snes; }
-  
+
   /**
    * Call the Petsc solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
@@ -118,7 +118,7 @@ public:
    * Get the total number of linear iterations done in the last solve
    */
   virtual int get_total_linear_iterations();
-  
+
 private:
 
   /**

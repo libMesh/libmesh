@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -52,7 +52,7 @@ class UNVIO : public MeshInput<MeshBase>,
 {
 
  public:
-  
+
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
@@ -64,17 +64,17 @@ class UNVIO : public MeshInput<MeshBase>,
    * This constructor will only allow us to write the mesh.
    */
   UNVIO (const MeshBase& mesh, MeshData& mesh_data);
-  
+
   /**
    * Destructor.
    */
   virtual ~UNVIO ();
-  
+
   /**
    * This method implements reading a mesh from a specified file.
    */
   virtual void read (const std::string& );
-  
+
   /**
    * This method implements writing a mesh to a specified file.
    */
@@ -85,9 +85,9 @@ class UNVIO : public MeshInput<MeshBase>,
    */
   bool & verbose ();
 
-  
+
  private:
-  
+
 
   /**
    * The actual implementation of the read function.
@@ -102,7 +102,7 @@ class UNVIO : public MeshInput<MeshBase>,
    * type of stream to pass the implementation.
    */
   void write_implementation (std::ostream& out_stream);
-  
+
   /**
    * Clears the data structures to a pristine
    * state.
@@ -118,13 +118,13 @@ class UNVIO : public MeshInput<MeshBase>,
    * whether we need to convert from "D" to "e".
    */
   void count_nodes (std::istream& in_file);
-  
+
   /**
    * Method reads nodes from \p in_file and stores them in
    * vector<Node*> \p nodes in the order they come in.
    * The original node labels are being stored in
    * \p _assign_nodes in order to assign the elements to
-   * the correct nodes later.  In addition, provided it is 
+   * the correct nodes later.  In addition, provided it is
    * active, the \p MeshData gets to know the node id from
    * the Universal file, too.
    */
@@ -150,7 +150,7 @@ class UNVIO : public MeshInput<MeshBase>,
    * Adjusts the \p in_stream to the beginning of the
    * dataset \p ds_name.
    */
-  bool beginning_of_dataset (std::istream& in_file, 
+  bool beginning_of_dataset (std::istream& in_file,
 			     const std::string& ds_name) const;
 
   /**
@@ -207,7 +207,7 @@ class UNVIO : public MeshInput<MeshBase>,
   unsigned int _n_nodes;
 
   /**
-   * total number of elements, determined through 
+   * total number of elements, determined through
    * \p count_elements().  Primarily used when reading.
    */
   unsigned int _n_elements;
@@ -278,7 +278,7 @@ bool & UNVIO::verbose ()
 
 
 inline
-bool UNVIO::beginning_of_dataset (std::istream& in_file, 
+bool UNVIO::beginning_of_dataset (std::istream& in_file,
 				  const std::string& ds_name) const
 {
   libmesh_assert (in_file.good());
@@ -295,14 +295,14 @@ bool UNVIO::beginning_of_dataset (std::istream& in_file,
        * stop combing at the end of the file
        */
       while( ((olds != "-1") || (news == "-1") ) && !in_file.eof() )
-	{	  
+	{
 	  olds = news;
 	  in_file >> news;
 	}
 
       if (in_file.eof())
 	return false;
-      
+
       if (news == ds_name)
 	return true;
     }
@@ -317,7 +317,7 @@ bool UNVIO::beginning_of_dataset (std::istream& in_file,
 inline
 Real UNVIO::D_to_e (std::string& number) const
 {
-  /* find "D" in string, start looking at 
+  /* find "D" in string, start looking at
    * 6th element, to improve speed.
    * We dont expect a "D" earlier
    */
@@ -331,7 +331,7 @@ Real UNVIO::D_to_e (std::string& number) const
 #endif
 
   libmesh_assert (position != std::string::npos);
-  number.replace(position, 1, "e"); 
+  number.replace(position, 1, "e");
 
   return std::atof (number.c_str());
 }

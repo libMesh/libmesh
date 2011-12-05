@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -87,7 +87,7 @@ UnstructuredMesh::UnstructuredMesh (unsigned int d) :
 
 
 
-void UnstructuredMesh::copy_nodes_and_elements 
+void UnstructuredMesh::copy_nodes_and_elements
   (const UnstructuredMesh& other_mesh)
 {
   // We're assuming our subclass data needs no copy
@@ -99,7 +99,7 @@ void UnstructuredMesh::copy_nodes_and_elements
   {
     //Preallocate Memory if necessary
     this->reserve_nodes(other_mesh.n_nodes());
-    
+
     const_node_iterator it = other_mesh.nodes_begin();
     const_node_iterator end = other_mesh.nodes_end();
 
@@ -114,12 +114,12 @@ void UnstructuredMesh::copy_nodes_and_elements
 //        newn->processor_id() = oldn->processor_id();
       }
   }
-  
+
   //Copy in Elements
   {
     //Preallocate Memory if necessary
     this->reserve_elem(other_mesh.n_elem());
-    
+
     // Loop over the elements
     MeshBase::const_element_iterator it = other_mesh.elements_begin();
     const MeshBase::const_element_iterator end = other_mesh.elements_end();
@@ -153,7 +153,7 @@ void UnstructuredMesh::copy_nodes_and_elements
           unsigned int oldc = old->parent()->which_child_am_i(old);
           newparent->add_child(elem, oldc);
         }
-      
+
       // Copy the refinement flags
       elem->set_refinement_flag(old->refinement_flag());
       elem->set_p_refinement_flag(old->p_refinement_flag());
@@ -173,17 +173,17 @@ void UnstructuredMesh::copy_nodes_and_elements
       this->add_elem(elem);
     }
   }
-  
+
   //Finally prepare the Mesh for use
   this->prepare_for_use(/*skip_renumber =*/false);
 }
- 
- 
+
+
 
 UnstructuredMesh::~UnstructuredMesh ()
 {
 //  this->clear ();  // Nothing to clear at this level
-  
+
   libmesh_assert (!libMesh::closed());
 }
 
@@ -203,10 +203,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   parallel_only();
 
   START_LOG("find_neighbors()", "Mesh");
-  
-  
+
+
   const element_iterator el_end = this->elements_end();
-      
+
   //TODO:[BSK] This should be removed later?!
   if (reset_current_list)
     for (element_iterator el = this->elements_begin(); el != el_end; ++el)
@@ -217,7 +217,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 	      reset_remote_elements)
 	    elem->set_neighbor(s,NULL);
       }
-  
+
   // Find neighboring elements by first finding elements
   // with identical side keys and then check to see if they
   // are neighbors
@@ -226,12 +226,12 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     typedef unsigned int                    key_type;
     typedef std::pair<Elem*, unsigned char> val_type;
     typedef std::pair<key_type, val_type>   key_val_pair;
-    
-    typedef LIBMESH_BEST_UNORDERED_MULTIMAP<key_type, val_type> map_type;    
-    
-    // A map from side keys to corresponding elements & side numbers  
+
+    typedef LIBMESH_BEST_UNORDERED_MULTIMAP<key_type, val_type> map_type;
+
+    // A map from side keys to corresponding elements & side numbers
     map_type side_to_elem_map;
-  
+
 
 
     for (element_iterator el = this->elements_begin(); el != el_end; ++el)
@@ -249,11 +249,11 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 	      {
 		// Get the key for the side of this element
 		const unsigned int key = element->key(ms);
-		
+
 		// Look for elements that have an identical side key
 		std::pair <map_type::iterator, map_type::iterator>
 		  bounds = side_to_elem_map.equal_range(key);
-		
+
 		// May be multiple keys, check all the possible
 		// elements which _might_ be neighbors.
 		if (bounds.first != bounds.second)
@@ -266,22 +266,22 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 		      {
 			// Get the potential element
 			Elem* neighbor = bounds.first->second.first;
-			
+
 			// Get the side for the neighboring element
 			const unsigned int ns = bounds.first->second.second;
 			const AutoPtr<Elem> their_side(neighbor->side(ns));
                         //libmesh_assert (my_side.get() != NULL);
-                        //libmesh_assert (their_side.get() != NULL);			
+                        //libmesh_assert (their_side.get() != NULL);
 
 			// If found a match with my side
                         //
 			// We need special tests here for 1D:
 			// since parents and children have an equal
-			// side (i.e. a node), we need to check 
+			// side (i.e. a node), we need to check
 			// ns != ms, and we also check level() to
 			// avoid setting our neighbor pointer to
 			// any of our neighbor's descendants
-			if( (*my_side == *their_side) && 
+			if( (*my_side == *their_side) &&
                             (element->level() == neighbor->level()) &&
                             ((_dim != 1) || (ns != ms)) )
 			  {
@@ -289,7 +289,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 			    // of subactive and active/ancestor
 			    // elements?
                             // If not, then we're neighbors.
-			    // If so, then the subactive's neighbor is 
+			    // If so, then the subactive's neighbor is
 
                               if (element->subactive() ==
                                   neighbor->subactive())
@@ -310,21 +310,21 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                               side_to_elem_map.erase (bounds.first);
 
                               // get out of this nested crap
-                              goto next_side; 
+                              goto next_side;
 			  }
 
 			++bounds.first;
 		      }
 		  }
-		    
+
 		// didn't find a match...
 		// Build the map entry for this element
 		key_val_pair kvp;
-		
+
 		kvp.first         = key;
 		kvp.second.first  = element;
 		kvp.second.second = ms;
-		
+
 		// use the lower bound as a hint for
 		// where to put it.
 #if defined(LIBMESH_HAVE_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || defined(LIBMESH_HAVE_HASH_MAP) || defined(LIBMESH_HAVE_EXT_HASH_MAP)
@@ -337,14 +337,14 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       }
   }
 
-  
-  
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Here we look at all of the child elements.
    *
-   * If a child element has a NULL neighbor it is 
+   * If a child element has a NULL neighbor it is
    * either because it is on the boundary or because
    * its neighbor is at a different level.  In the
    * latter case we must get the neighbor from the
@@ -376,7 +376,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 //            if (elem->neighbor(s) == NULL ||
 //		(elem->neighbor(s) == remote_elem &&
 //		 parent->is_child_on_side(parent->which_child_am_i(elem), s)))
-            {	    
+            {
               Elem *neigh = elem->parent()->neighbor(s);
 
 	      // If neigh was refined and had non-subactive children
@@ -385,7 +385,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 	      // neighbor
               if (neigh && (neigh->ancestor()) && (!elem->subactive()))
                 {
-#ifdef DEBUG	    
+#ifdef DEBUG
                   // Let's make sure that "had children made remote"
 	          // situation is actually the case
 		  libmesh_assert(neigh->has_children());
@@ -406,23 +406,23 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 }
 
               elem->set_neighbor(s, neigh);
-#ifdef DEBUG	    
+#ifdef DEBUG
               if (neigh != NULL && neigh != remote_elem)
                 // We ignore subactive elements here because
                 // we don't care about neighbors of subactive element.
                 if ((!neigh->active()) && (!elem->subactive()))
                 {
-                  libMesh::err << "On processor " << libMesh::processor_id() 
+                  libMesh::err << "On processor " << libMesh::processor_id()
                                 << std::endl;
-                  libMesh::err << "Bad element ID = " << elem->id() 
+                  libMesh::err << "Bad element ID = " << elem->id()
                     << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
-                  libMesh::err << "Bad element proc_ID = " << elem->processor_id() 
+                  libMesh::err << "Bad element proc_ID = " << elem->processor_id()
                     << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
-                  libMesh::err << "Bad element size = " << elem->hmin() 
+                  libMesh::err << "Bad element size = " << elem->hmin()
                     << ", Bad neighbor size = " << neigh->hmin() << std::endl;
-                  libMesh::err << "Bad element center = " << elem->centroid() 
+                  libMesh::err << "Bad element center = " << elem->centroid()
                     << ", Bad neighbor center = " << neigh->centroid() << std::endl;
-                  libMesh::err << "ERROR: " 
+                  libMesh::err << "ERROR: "
                     << (elem->active()?"Active":"Ancestor")
                     << " Element at level "
                     << elem->level() << std::endl;
@@ -440,7 +440,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             }
         }
     }
-  
+
 #endif // AMR
 
 #ifdef DEBUG
@@ -481,7 +481,7 @@ void UnstructuredMesh::read (const std::string& name,
   else
     {
       std::ifstream in (name.c_str());
-    
+
       if (!in.good())
         {
 	  libMesh::err << "ERROR: cannot locate specified file:\n\t"
@@ -500,10 +500,10 @@ void UnstructuredMesh::read (const std::string& name,
     {
       skip_renumber_nodes_and_elements =  true;
     }
-  
+
   // Look for parallel formats first
   if (is_parallel_file_format(name))
-    {      
+    {
       // no need to handle bz2 files here -- the Xdr class does that.
       if ((name.rfind(".xda") < name.size()) ||
 	  (name.rfind(".xdr") < name.size()))
@@ -547,24 +547,24 @@ void UnstructuredMesh::read (const std::string& name,
 #else
 	  skip_renumber_nodes_and_elements = true;
 #endif
-	}      
+	}
       else if (name.rfind(".nem") < name.size() ||
 	       name.rfind(".n")   < name.size())
         Nemesis_IO(*this).read (name);
-	  
+
     }
 
   // Serial mesh formats
   else
     {
-      START_LOG("read()", "Mesh");  
-  
+      START_LOG("read()", "Mesh");
+
       // Read the file based on extension.  Only processor 0
       // needs to read the mesh.  It will then broadcast it and
       // the other processors will pick it up
       if (libMesh::processor_id() == 0)
 	{
-          OStringStream pid_suffix; 
+          OStringStream pid_suffix;
           pid_suffix << '_' << getpid();
 	  // Nasty hack for reading/writing zipped files
 	  std::string new_name = name;
@@ -605,18 +605,18 @@ void UnstructuredMesh::read (const std::string& name,
 
 	  if (new_name.rfind(".mat") < new_name.size())
 	    MatlabIO(*this).read(new_name);
-	  
+
 	  else if (new_name.rfind(".ucd") < new_name.size())
 	    UCDIO(*this).read (new_name);
-	  
+
 	  else if ((new_name.rfind(".off")  < new_name.size()) ||
 		   (new_name.rfind(".ogl")  < new_name.size()) ||
 		   (new_name.rfind(".oogl") < new_name.size()))
 	    OFFIO(*this).read (new_name);
-     
+
 	  else if (new_name.rfind(".mgf") < new_name.size())
 	    LegacyXdrIO(*this,true).read_mgf (new_name);
-      
+
 	  else if (new_name.rfind(".unv") < new_name.size())
 	    {
 	      if (mesh_data == NULL)
@@ -628,7 +628,7 @@ void UnstructuredMesh::read (const std::string& name,
 		}
 	      UNVIO(*this, *mesh_data).read (new_name);
 	    }
-      
+
 	  else if ((new_name.rfind(".node")  < new_name.size()) ||
 		   (new_name.rfind(".ele")   < new_name.size()))
 	    TetGenIO(*this,mesh_data).read (new_name);
@@ -636,7 +636,7 @@ void UnstructuredMesh::read (const std::string& name,
 	  else if (new_name.rfind(".exd") < new_name.size() ||
 		   new_name.rfind(".e") < new_name.size())
 	    ExodusII_IO(*this).read (new_name);
-	  
+
 	  else if (new_name.rfind(".msh") < new_name.size())
 	    GmshIO(*this).read (new_name);
 
@@ -648,7 +648,7 @@ void UnstructuredMesh::read (const std::string& name,
 
 	  else if (new_name.rfind(".inp") < new_name.size())
 	    AbaqusIO(*this).read(new_name);
-      
+
 	  else
 	    {
 	      libMesh::err << " ERROR: Unrecognized file extension: " << name
@@ -671,9 +671,9 @@ void UnstructuredMesh::read (const std::string& name,
 			<< "     *.xz   -- any above format xzipped\n"
 
 			<< std::endl;
-	      libmesh_error();	  
-	    }    
-	  
+	      libmesh_error();
+	    }
+
 	  // If we temporarily decompressed a file, remove the
 	  // uncompressed version
 	  if (name.size() - name.rfind(".bz2") == 4)
@@ -681,8 +681,8 @@ void UnstructuredMesh::read (const std::string& name,
 	  if (name.size() - name.rfind(".xz") == 3)
 	    std::remove(new_name.c_str());
 	}
-      
-  
+
+
       STOP_LOG("read()", "Mesh");
 
       // Send the mesh & bcs (which are now only on processor 0) to the other
@@ -690,7 +690,7 @@ void UnstructuredMesh::read (const std::string& name,
       MeshCommunication().broadcast (*this);
     }
 
-  
+
   // Done reading the mesh.  Now prepare it for use.
   this->prepare_for_use(skip_renumber_nodes_and_elements);
 
@@ -704,11 +704,11 @@ void UnstructuredMesh::write (const std::string& name,
   // parallel formats are special -- they may choose to write
   // separate files, let's not try to handle the zipping here.
   if (is_parallel_file_format(name))
-    {	
+    {
       // no need to handle bz2 files here -- the Xdr class does that.
       if (name.rfind(".xda") < name.size())
 	XdrIO(*this).write(name);
-	
+
       else if (name.rfind(".xdr") < name.size())
 	XdrIO(*this,true).write(name);
 
@@ -728,7 +728,7 @@ void UnstructuredMesh::write (const std::string& name,
       if (libMesh::processor_id() == 0)
         pid_0 = getpid();
       Parallel::broadcast(pid_0);
-      OStringStream pid_suffix; 
+      OStringStream pid_suffix;
       pid_suffix << '_' << pid_0;
 
       if (name.size() - name.rfind(".bz2") == 4)
@@ -741,19 +741,19 @@ void UnstructuredMesh::write (const std::string& name,
 	  new_name.erase(new_name.end() - 3, new_name.end());
           new_name += pid_suffix.str();
         }
-  
+
       // New scope so that io will close before we try to zip the file
       {
 	// Write the file based on extension
 	if (new_name.rfind(".dat") < new_name.size())
 	  TecplotIO(*this).write (new_name);
-	
+
 	else if (new_name.rfind(".plt") < new_name.size())
 	  TecplotIO(*this,true).write (new_name);
-	
+
 	else if (new_name.rfind(".ucd") < new_name.size())
 	  UCDIO (*this).write (new_name);
-	
+
 	else if (new_name.rfind(".gmv") < new_name.size())
 	  if (this->n_partitions() > 1)
 	    GMVIO(*this).write (new_name);
@@ -763,7 +763,7 @@ void UnstructuredMesh::write (const std::string& name,
 	      io.partitioning() = false;
 	      io.write (new_name);
 	    }
-	
+
 	else if (new_name.rfind(".ugrid") < new_name.size())
 	  DivaIO(*this).write(new_name);
         else if (new_name.rfind(".exd") < new_name.size() ||
@@ -771,7 +771,7 @@ void UnstructuredMesh::write (const std::string& name,
           ExodusII_IO(*this).write(new_name);
 	else if (new_name.rfind(".mgf")  < new_name.size())
 	  LegacyXdrIO(*this,true).write_mgf(new_name);
-	
+
 	else if (new_name.rfind(".unv") < new_name.size())
 	  {
 	    if (mesh_data == NULL)
@@ -783,22 +783,22 @@ void UnstructuredMesh::write (const std::string& name,
 	      }
 	    UNVIO(*this, *mesh_data).write (new_name);
 	  }
-	
+
 	else if (new_name.rfind(".mesh") < new_name.size())
 	  MEDITIO(*this).write (new_name);
-	
+
 	else if (new_name.rfind(".poly") < new_name.size())
 	  TetGenIO(*this).write (new_name);
-	
+
 	else if (new_name.rfind(".msh") < new_name.size())
 	  GmshIO(*this).write (new_name);
-	
+
 	else if (new_name.rfind(".fro") < new_name.size())
 	  FroIO(*this).write (new_name);
-	
+
 	else if (new_name.rfind(".vtu") < new_name.size())
 	  VTKIO(*this).write (new_name);
-	
+
 	else
 	  {
 	    libMesh::err
@@ -823,9 +823,9 @@ void UnstructuredMesh::write (const std::string& name,
               << "     *.xdr   -- libMesh binary format,\n"
               << std::endl
               << "\n Exiting without writing output\n";
-	  }    
+	  }
       }
-  
+
       // Nasty hack for reading/writing zipped files
       if (name.size() - name.rfind(".bz2") == 4)
 	{
@@ -855,9 +855,9 @@ void UnstructuredMesh::write (const std::string& name,
 	  Parallel::barrier();
 	  STOP_LOG("system(xz)", "Mesh");
 	}
-      
+
       STOP_LOG("write()", "Mesh");
-    }  
+    }
 }
 
 
@@ -871,10 +871,10 @@ void UnstructuredMesh::write (const std::string& name,
   // Write the file based on extension
   if (name.rfind(".dat") < name.size())
     TecplotIO(*this).write_nodal_data (name, v, vn);
-  
+
   else if (name.rfind(".plt") < name.size())
     TecplotIO(*this,true).write_nodal_data (name, v, vn);
-  
+
   else if (name.rfind(".gmv") < name.size())
     {
       if (n_subdomains() > 1)
@@ -885,7 +885,7 @@ void UnstructuredMesh::write (const std::string& name,
 	  io.partitioning() = false;
 	  io.write_nodal_data (name, v, vn);
 	}
-    }    
+    }
   else if (name.rfind(".pvtu") < name.size())
     {
       VTKIO(*this).write_nodal_data (name, v, vn);
@@ -932,14 +932,14 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh& pid_mesh,
 		    << std::endl;
     }
 #endif
-  
+
   // Create iterators to loop over the list of elements
 //   const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
 //   const const_active_pid_elem_iterator it_end(this->elements_end(), pid);
 
   const_element_iterator       it     = this->active_pid_elements_begin(pid);
   const const_element_iterator it_end = this->active_pid_elements_end(pid);
-    
+
   this->create_submesh (pid_mesh, it, it_end);
 }
 
@@ -962,36 +962,36 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
   // this function!  We will check this by making sure we did not just
   // clear ourself.
   libmesh_assert (this->n_nodes() != 0);
-  libmesh_assert (this->n_elem()  != 0); 
+  libmesh_assert (this->n_elem()  != 0);
 
   // How the nodes on this mesh will be renumbered to nodes
-  // on the new_mesh.  
+  // on the new_mesh.
   std::vector<unsigned int> new_node_numbers (this->n_nodes());
 
   std::fill (new_node_numbers.begin(),
 	     new_node_numbers.end(),
 	     libMesh::invalid_uint);
 
-  
-  
+
+
   // the number of nodes on the new mesh, will be incremented
   unsigned int n_new_nodes = 0;
   unsigned int n_new_elem  = 0;
-    
+
   for (; it != it_end; ++it)
     {
       // increment the new element counter
       n_new_elem++;
-	
+
       const Elem* old_elem = *it;
 
       // Add an equivalent element type to the new_mesh
-      Elem* new_elem = 
+      Elem* new_elem =
 	new_mesh.add_elem (Elem::build(old_elem->type()).release());
 
       libmesh_assert (new_elem != NULL);
-	
-      // Loop over the nodes on this element.  
+
+      // Loop over the nodes on this element.
       for (unsigned int n=0; n<old_elem->n_nodes(); n++)
 	{
 	  libmesh_assert (old_elem->node(n) < new_node_numbers.size());
@@ -1009,14 +1009,14 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 
 	  // Define this element's connectivity on the new mesh
 	  libmesh_assert (new_node_numbers[old_elem->node(n)] < new_mesh.n_nodes());
-	    
+
 	  new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
 	}
 
       // Copy ids for this element
       new_elem->subdomain_id() = old_elem->subdomain_id();
       new_elem->processor_id() = old_elem->processor_id();
-      
+
       // Maybe add boundary conditions for this element
       for (unsigned int s=0; s<old_elem->n_sides(); s++)
 // We're supporting boundary ids on internal sides now
@@ -1033,11 +1033,11 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
               }
           }
     } // end loop over elements
-  
+
 
   // Prepare the new_mesh for use
   new_mesh.prepare_for_use(/*skip_renumber =*/false);
-  
+
 }
 
 
@@ -1063,8 +1063,8 @@ bool UnstructuredMesh::contract ()
       }
   in = elements_begin();
 #endif
-  
-  // Loop over the elements.   
+
+  // Loop over the elements.
   for ( ; in != end; ++in)
     if (*in != NULL)
       {
@@ -1074,7 +1074,7 @@ bool UnstructuredMesh::contract ()
 	if (elem->subactive())
 	  {
 	    // No level-0 element should be subactive.
-	    // Note that we CAN'T test elem->level(), as that 
+	    // Note that we CAN'T test elem->level(), as that
 	    // touches elem->parent()->dim(), and elem->parent()
 	    // might have already been deleted!
 	    libmesh_assert (elem->parent() != NULL);
@@ -1083,7 +1083,7 @@ bool UnstructuredMesh::contract ()
 	    // This just sets a pointer to NULL, and doesn't
 	    // invalidate any iterators
 	    this->delete_elem(elem);
-	    
+
 	    // the mesh has certainly changed
 	    mesh_changed = true;
 	  }
@@ -1105,7 +1105,7 @@ bool UnstructuredMesh::contract ()
   this->clear_point_locator();
 
   STOP_LOG ("contract()", "Mesh");
-  
+
   return mesh_changed;
 }
 #endif // #ifdef LIBMESH_ENABLE_AMR

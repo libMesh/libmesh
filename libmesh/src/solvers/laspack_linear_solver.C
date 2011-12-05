@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -44,17 +44,17 @@ namespace libMesh
 // 			   IterIdType IterId)
 //     /* put out accuracy reached after each solver iteration */
 //   {
-    
+
 //     //FILE* out = fopen("residual.hist", "a");
 //     static int icall=0;
-    
+
 //     if (!icall)
 //       {
 // 	printf("Iter   ||r||/||f||\n");
 // 	printf("------------------\n");
 // 	icall=1;
 //       }
-    
+
 //     if ( Iter%1==0 && (IterId == CGIterId ||
 // 		       IterId == CGNIterId ||
 // 		       IterId == GMRESIterId ||
@@ -68,13 +68,13 @@ namespace libMesh
 // 	else
 // 	  printf("%d     (fnorm == 0)\n", Iter);
 //       }
-    
+
 //     //fclose(out);
 //   }
 
 // #ifndef LIBMESH_USE_COMPLEX_NUMBERS
 // }
-// #endif  
+// #endif
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
@@ -83,7 +83,7 @@ void LaspackLinearSolver<T>::clear ()
   if (this->initialized())
     {
       this->_is_initialized = false;
-      
+
       this->_solver_type         = GMRES;
       this->_preconditioner_type = ILU_PRECOND;
     }
@@ -106,7 +106,7 @@ void LaspackLinearSolver<T>::init ()
 
 
 template <typename T>
-std::pair<unsigned int, Real> 
+std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 			       NumericVector<T> &solution_in,
 			       NumericVector<T> &rhs_in,
@@ -125,7 +125,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   // iterations (?)
   //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...
   solution->zero();
-  
+
   // Close the matrix and vectors in case this wasn't already done.
   matrix->close ();
   solution->close ();
@@ -255,9 +255,9 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 	libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
 		      << this->_solver_type      << std::endl
 		      << "Continuing with GMRES" << std::endl;
-	
+
 	this->_solver_type = GMRES;
-	
+
 	return this->solve (*matrix,
 			    *solution,
 			    *rhs,
@@ -275,14 +275,14 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
     }
 
   STOP_LOG("solve()", "LaspackLinearSolver");
-  // Get the convergence step # and residual 
+  // Get the convergence step # and residual
   return std::make_pair(GetLastNoIter(), GetLastAccuracy());
 }
 
 
 
 template <typename T>
-std::pair<unsigned int, Real> 
+std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
 			       NumericVector<T>& /*solution_in*/,
 			       NumericVector<T>& /*rhs_in*/,
@@ -296,7 +296,7 @@ LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
 
 
 template <typename T>
-std::pair<unsigned int, Real> 
+std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
 			       const SparseMatrix<T>& /*precond_matrix*/,
 			       NumericVector<T>& /*solution_in*/,
@@ -333,7 +333,7 @@ void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
 		    << this->_preconditioner_type << std::endl
 		    << "Continuing with ILU"      << std::endl;
       this->_preconditioner_type = ILU_PRECOND;
-      this->set_laspack_preconditioner_type();      
+      this->set_laspack_preconditioner_type();
     }
 }
 
@@ -353,6 +353,6 @@ void LaspackLinearSolver<T>::print_converged_reason()
 template class LaspackLinearSolver<Number>;
 
 } // namespace libMesh
- 
+
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK

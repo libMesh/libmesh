@@ -2,22 +2,22 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
- 
+
 
 // C++ includes
 #include <iostream>
@@ -72,7 +72,7 @@ namespace {
   // replacing them in the destructor before program termination.
   std::streambuf* out_buf (NULL);
   std::streambuf* err_buf (NULL);
-  
+
   AutoPtr<libMesh::Threads::task_scheduler_init> task_scheduler (NULL);
 #if defined(LIBMESH_HAVE_MPI)
   bool libmesh_initialized_mpi = false;
@@ -97,12 +97,12 @@ namespace libMesh
    * pain to use, thus discouraging errors.
    */
   namespace libMeshPrivateData {
-    
+
     /**
      * Flag that tells if \p init() has been called.
      */
     extern bool _is_initialized;
-    
+
     /**
      * The default solver package to use.
      */
@@ -212,7 +212,7 @@ void _init (int &argc, char** & argv,
 {
   // should _not_ be initialized already.
   libmesh_assert (!libMesh::initialized());
-  
+
   // Build a command-line parser.
   command_line.reset (new GetPot (argc, argv));
 
@@ -224,14 +224,14 @@ void _init (int &argc, char** & argv,
 
   // Build a task scheduler
   {
-    // Get the requested number of threads, defaults to 1 to avoid MPI and 
-    // multithreading competition.  If you would like to use MPI and multithreading 
+    // Get the requested number of threads, defaults to 1 to avoid MPI and
+    // multithreading competition.  If you would like to use MPI and multithreading
     // at the same time then (n_mpi_processes_per_node)x(n_threads) should be the
     //  number of processing cores per node.
     std::vector<std::string> n_threads(2);
     n_threads[0] = "--n_threads";
     n_threads[1] = "--n-threads";
-    libMesh::libMeshPrivateData::_n_threads = 
+    libMesh::libMeshPrivateData::_n_threads =
       libMesh::command_line_value (n_threads, 1);
 
     task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
@@ -258,7 +258,7 @@ void _init (int &argc, char** & argv,
 	  MPI_Init (&argc, &argv);
 	  libmesh_initialized_mpi = true;
 	}
-      
+
       // Duplicate the input communicator for internal use
       MPI_Comm_dup (COMM_WORLD_IN, &libMesh::COMM_WORLD);
 
@@ -268,7 +268,7 @@ void _init (int &argc, char** & argv,
 
       //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
       //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
-      
+
       libMeshPrivateData::_processor_id = Parallel::Communicator_World.rank();
       libMeshPrivateData::_n_processors = Parallel::Communicator_World.size();
     }
@@ -281,9 +281,9 @@ void _init (int &argc, char** & argv,
   parallel_only();
 
 #endif
-      
+
 #if defined(LIBMESH_HAVE_PETSC)
-      
+
   // Allow the user to bypass PETSc initialization
   if (!libMesh::on_command_line ("--disable-petsc")
 
@@ -296,7 +296,7 @@ void _init (int &argc, char** & argv,
      )
     {
       int ierr=0;
-	  
+
       PETSC_COMM_WORLD = libMesh::COMM_WORLD;
 
       // Check whether the calling program has already initialized
@@ -359,7 +359,7 @@ void _init (int &argc, char** & argv,
       std::ostream* newerr = new std::ostream(std::cerr.rdbuf());
       libMesh::err = *newerr;
     }
-  
+
   // Honor the --redirect-stdout command-line option.
   // When this is specified each processor sends
   // libMesh::out/libMesh::err messages to
@@ -392,11 +392,11 @@ void _init (int &argc, char** & argv,
   // crash
   old_terminate_handler = std::set_terminate(libmesh_terminate_handler);
 #endif
-  
+
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
 
-  
+
   // Make sure these work.  Library methods
   // depend on these being implemented properly,
   // so this is a good time to test them!
@@ -440,7 +440,7 @@ int _close ()
     }
 #endif
 
-#if defined(LIBMESH_HAVE_PETSC) 
+#if defined(LIBMESH_HAVE_PETSC)
       // Allow the user to bypass PETSc finalization
   if (!libMesh::on_command_line ("--disable-petsc")
 #if defined(LIBMESH_HAVE_MPI)
@@ -477,14 +477,14 @@ int _close ()
   // when the last created object has been destroyed.
   // That does no good if we are leaking memory!
   ReferenceCounter::print_info ();
-  
+
 
   // Print an informative message if we detect a memory leak
   if (ReferenceCounter::n_objects() != 0)
     {
       libMesh::err << "Memory leak detected!"
 		    << std::endl;
-      
+
 #if !defined(LIBMESH_ENABLE_REFERENCE_COUNTING) || defined(NDEBUG)
 
       libMesh::err << "Compile in DEBUG mode with --enable-reference-counting"
@@ -492,7 +492,7 @@ int _close ()
 		    << "for more information"
 		    << std::endl;
 #endif
-  
+
     }
 
 
@@ -501,7 +501,7 @@ int _close ()
   //  that go out of scope after the following return)
   //std::cout.rdbuf(std::cerr.rdbuf());
 
-  
+
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
@@ -514,12 +514,12 @@ int _close ()
       // Now clear the logging object, we don't want it to print
       // a second time during the PerfLog destructor.
       libMesh::perflog.clear();
-      
+
       // If stdout/stderr were redirected to files, reset them now.
       libMesh::out.rdbuf (out_buf);
       libMesh::err.rdbuf (err_buf);
     }
-  
+
   // If we built our own output streams, we want to clean them up.
   if (libMesh::on_command_line ("--separate-libmeshout"))
     {
@@ -596,7 +596,7 @@ bool on_command_line (const std::string& arg)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert (command_line.get() != NULL);
-  
+
   return command_line->search (arg);
 }
 
@@ -607,10 +607,10 @@ T command_line_value (const std::string &name, T value)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert (command_line.get() != NULL);
-  
+
     // only if the variable exists in the file
     if (command_line->have_variable(name.c_str()))
-      value = (*command_line)(name.c_str(), value);      
+      value = (*command_line)(name.c_str(), value);
 
     return value;
 }
@@ -636,7 +636,7 @@ T command_line_value (const std::vector<std::string> &name, T value)
 SolverPackage default_solver_package ()
 {
   libmesh_assert (libMesh::initialized());
-  
+
   static bool called = false;
 
   // Check the command line.  Since the command line is
@@ -655,7 +655,7 @@ SolverPackage default_solver_package ()
 	  libMesh::on_command_line ("--disable-petsc"))
 	libMeshPrivateData::_solver_package = TRILINOS_SOLVERS;
 #endif
-      
+
 #ifdef LIBMESH_HAVE_LASPACK
       if (libMesh::on_command_line ("--use-laspack"  ) ||
 	  libMesh::on_command_line ("--disable-petsc"))
@@ -667,9 +667,9 @@ SolverPackage default_solver_package ()
 	  libMesh::on_command_line ("--disable-petsc"))
 	libMeshPrivateData::_solver_package = INVALID_SOLVER_PACKAGE;
     }
-  
-  
-  return libMeshPrivateData::_solver_package;  
+
+
+  return libMeshPrivateData::_solver_package;
 }
 
 

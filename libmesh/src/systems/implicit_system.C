@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -43,7 +43,7 @@ namespace libMesh
 ImplicitSystem::ImplicitSystem (EquationSystems& es,
 				const std::string& name,
 				const unsigned int number) :
-  
+
   Parent            (es, name, number),
   matrix            (NULL),
   _can_add_matrices (true)
@@ -97,7 +97,7 @@ void ImplicitSystem::init_data ()
 
   // Add the system matrix.
   this->add_system_matrix ();
-  
+
   // Initialize the matrices for the system
   this->init_matrices ();
 }
@@ -116,10 +116,10 @@ void ImplicitSystem::init_matrices ()
 
   // Get a reference to the DofMap
   DofMap& dof_map = this->get_dof_map();
-  
+
   // no chance to add other matrices
   _can_add_matrices = false;
-  
+
   // Tell the matrices about the dof map, and vice versa
   for (matrices_iterator pos = _matrices.begin();
        pos != _matrices.end(); ++pos)
@@ -127,19 +127,19 @@ void ImplicitSystem::init_matrices ()
       libmesh_assert (!pos->second->initialized());
       dof_map.attach_matrix (*(pos->second));
     }
-  
+
   // Compute the sparsity pattern for the current
   // mesh and DOF distribution.  This also updates
   // additional matrices, \p DofMap now knows them
   dof_map.compute_sparsity (this->get_mesh());
-  
+
   // Initialize matrices
-  for (matrices_iterator pos = _matrices.begin(); 
+  for (matrices_iterator pos = _matrices.begin();
        pos != _matrices.end(); ++pos)
     pos->second->init ();
-  
+
   // Set the additional matrices to 0.
-  for (matrices_iterator pos = _matrices.begin(); 
+  for (matrices_iterator pos = _matrices.begin();
        pos != _matrices.end(); ++pos)
     pos->second->zero ();
 }
@@ -149,7 +149,7 @@ void ImplicitSystem::init_matrices ()
 void ImplicitSystem::reinit ()
 {
   // initialize parent data
-  Parent::reinit();  
+  Parent::reinit();
 
   // Clear the matrices
   for (matrices_iterator pos = _matrices.begin();
@@ -209,10 +209,10 @@ const SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string& 
 {
   // Make sure the matrix exists
   const_matrices_iterator pos = _matrices.find (mat_name);
-  
+
   if (pos == _matrices.end())
     return NULL;
-  
+
   return pos->second;
 }
 
@@ -222,10 +222,10 @@ SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string& mat_na
 {
   // Make sure the matrix exists
   matrices_iterator pos = _matrices.find (mat_name);
-  
+
   if (pos == _matrices.end())
     return NULL;
-  
+
   return pos->second;
 }
 
@@ -235,16 +235,16 @@ const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_
 {
   // Make sure the matrix exists
   const_matrices_iterator pos = _matrices.find (mat_name);
-  
+
   if (pos == _matrices.end())
     {
       libMesh::err << "ERROR: matrix "
 		    << mat_name
 		    << " does not exist in this system!"
-		    << std::endl;      
+		    << std::endl;
       libmesh_error();
     }
-  
+
   return *(pos->second);
 }
 
@@ -254,16 +254,16 @@ SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_name)
 {
   // Make sure the matrix exists
   matrices_iterator pos = _matrices.find (mat_name);
-  
+
   if (pos == _matrices.end())
     {
       libMesh::err << "ERROR: matrix "
 		    << mat_name
 		    << " does not exist in this system!"
-		    << std::endl;      
+		    << std::endl;
       libmesh_error();
     }
-  
+
   return *(pos->second);
 }
 
@@ -357,7 +357,7 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
 
   // Reset and build the RHS from the QOI derivative
   this->assemble_qoi_derivative(qoi_indices);
-    
+
   // Our iteration counts and residuals will be sums of the individual
   // results
   std::pair<unsigned int, Real> solver_params =
@@ -366,7 +366,7 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
 
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
-      {	
+      {
 	const std::pair<unsigned int, Real> rval =
 	  linear_solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
 					this->get_adjoint_rhs(i),
@@ -374,9 +374,9 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
 					solver_params.first);
 
 	    totalrval.first  += rval.first;
-	    totalrval.second += rval.second;	  
+	    totalrval.second += rval.second;
       }
-      
+
   this->release_linear_solver(linear_solver);
 
   // The linear solver may not have fit our constraints exactly
@@ -669,7 +669,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   //
   // This implies that:
   // d/dp(R) = 0
-  // (partial R / partial p) + 
+  // (partial R / partial p) +
   // (partial R / partial u) * (partial u / partial p) = 0
 
   // We first do an adjoint solve:
@@ -687,7 +687,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   //         (partial u / partial p)
   // dq/dp = (partial q / partial p) + z * J *
   //         (partial u / partial p)
- 
+
   // Leading to our final formula:
   // dq/dp = (partial q / partial p) - z * (partial R / partial p)
 
@@ -761,7 +761,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   //
   // This implies that:
   // d/dp(R) = 0
-  // (partial R / partial p) + 
+  // (partial R / partial p) +
   // (partial R / partial u) * (partial u / partial p) = 0
 
   // We first solve for (partial u / partial p) for each parameter:
@@ -775,7 +775,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   // We use the identity:
   // dq/dp = (partial q / partial p) + (partial q / partial u) *
   //         (partial u / partial p)
- 
+
   // We get (partial q / partial u) from the user
   this->assemble_qoi_derivative(qoi_indices);
 
@@ -873,13 +873,13 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
     {
       // We approximate sum_l(w_l * Q''_{kl}) with a central
       // differencing pertubation:
-      // sum_l(w_l * Q''_{kl}) ~= 
+      // sum_l(w_l * Q''_{kl}) ~=
       // (Q(p + dp*w_l*e_l + dp*e_k) - Q(p - dp*w_l*e_l + dp*e_k) -
       // Q(p + dp*w_l*e_l - dp*e_k) + Q(p - dp*w_l*e_l - dp*e_k))/(4*dp^2)
 
       // The sum(w_l*R''_kl) term requires the same sort of pertubation,
       // and so we subtract it in at the same time:
-      // sum_l(w_l * R''_{kl}) ~= 
+      // sum_l(w_l * R''_{kl}) ~=
       // (R(p + dp*w_l*e_l + dp*e_k) - R(p - dp*w_l*e_l + dp*e_k) -
       // R(p + dp*w_l*e_l - dp*e_k) + R(p - dp*w_l*e_l - dp*e_k))/(4*dp^2)
 
@@ -952,7 +952,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
         if (qoi_indices.has_index(i))
           sensitivities[i][k] = partial2q_term[i] - partial2R_term[i];
 
-      // We get (partial q / partial u), R, and 
+      // We get (partial q / partial u), R, and
       // (partial R / partial u) from the user, but centrally
       // difference to get q_uk, R_k, and R_uk terms:
       // (partial R / partial k)
@@ -984,7 +984,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
                                     this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) -
                                     this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
           }
- 
+
       *parameters[k] = old_parameter - delta_p;
       this->assembly(true, true);
       this->rhs->close();
@@ -1040,7 +1040,7 @@ void ImplicitSystem::qoi_parameter_hessian
   // and residual R, as:
   //
   // q''_{kl} =
-  // Q''_{kl} + Q''_{uk}(u)*u'_l + Q''_{ul}(u) * u'_k + 
+  // Q''_{kl} + Q''_{uk}(u)*u'_l + Q''_{ul}(u) * u'_k +
   // Q''_{uu}(u)*u'_k*u'_l -
   // R''_{kl}(u,z) -
   // R''_{uk}(u,z)*u'_l - R''_{ul}(u,z)*u'_k -
@@ -1142,7 +1142,7 @@ void ImplicitSystem::qoi_parameter_hessian
           *parameters[k] = old_parameterk;
         }
 
-      // We get (partial q / partial u) and 
+      // We get (partial q / partial u) and
       // (partial R / partial u) from the user, but centrally
       // difference to get q_uk and R_uk terms:
       // (partial^2 q / partial u partial k)
@@ -1167,7 +1167,7 @@ void ImplicitSystem::qoi_parameter_hessian
             if (qoi_indices.has_index(i))
               {
                 this->get_adjoint_rhs(i).close();
-                Number current_terms = 
+                Number current_terms =
                   (this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) -
                    tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
                 sensitivities.second_derivative(i,k,l) += current_terms;
@@ -1178,7 +1178,7 @@ void ImplicitSystem::qoi_parameter_hessian
                 sensitivities.second_derivative(i,l,k) += current_terms;
               }
         }
- 
+
       *parameters[k] = old_parameterk - delta_p;
       this->assembly(false, true);
       this->matrix->close();
@@ -1191,7 +1191,7 @@ void ImplicitSystem::qoi_parameter_hessian
             if (qoi_indices.has_index(i))
               {
                 this->get_adjoint_rhs(i).close();
-                Number current_terms = 
+                Number current_terms =
                   (-this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) +
                    tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
                 sensitivities.second_derivative(i,k,l) += current_terms;
@@ -1205,7 +1205,7 @@ void ImplicitSystem::qoi_parameter_hessian
 
       // Don't leave the parameter perturbed
       *parameters[k] = old_parameterk;
- 
+
       // Our last remaining terms are -R_uu(u,z)*u_k*u_l and
       // Q_uu(u)*u_k*u_l
       //

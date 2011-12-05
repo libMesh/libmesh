@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -53,15 +53,15 @@ template <>
 Real DerivedRBConstruction<RBConstruction>::truth_solve(int plot_solution)
 {
   START_LOG("truth_solve()", "DerivedRBConstruction");
-  
+
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
 
   set_uber_current_parameters();
-  
+
   uber_system.rb_eval->set_current_parameters(uber_system.get_current_parameters());
   uber_system.rb_eval->rb_solve(uber_system.rb_eval->get_n_basis_functions());
-  
+
   if(plot_solution > 0)
   {
     uber_system.load_rb_solution();
@@ -72,7 +72,7 @@ Real DerivedRBConstruction<RBConstruction>::truth_solve(int plot_solution)
   }
 
   STOP_LOG("truth_solve()", "DerivedRBConstruction");
-  
+
   // Don't bother returning the norm of the uber solution
   return 0.;
 }
@@ -81,7 +81,7 @@ template <>
 void DerivedRBConstruction<RBConstruction>::enrich_RB_space()
 {
   START_LOG("enrich_RB_space()", "DerivedRBConstruction");
-  
+
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
   const unsigned int uber_size = uber_system.rb_eval->get_n_basis_functions();
@@ -119,7 +119,7 @@ void DerivedRBConstruction<RBConstruction>::update_RB_system_matrices()
 
   DerivedRBEvaluation<RBEvaluation>* der_rb_eval =
     libmesh_cast_ptr<DerivedRBEvaluation<RBEvaluation>*>(rb_eval);
-  
+
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
 
@@ -128,7 +128,7 @@ void DerivedRBConstruction<RBConstruction>::update_RB_system_matrices()
 
   const unsigned int Q_a = rb_theta_expansion->get_Q_a();
   const unsigned int Q_f = rb_theta_expansion->get_Q_f();
-  
+
   DenseVector<Number> temp_vector;
   for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
@@ -183,7 +183,7 @@ void DerivedRBConstruction<RBConstruction>::generate_residual_terms_wrt_truth()
   {
     // Set flag to compute residual wrt truth space
     drb_eval->residual_type_flag = SteadyDerivedRBEvaluation::RESIDUAL_WRT_TRUTH;
-    
+
     recompute_all_residual_terms(/*compute_inner_products = */ true);
   }
   STOP_LOG("generate_residual_terms_wrt_truth()", "DerivedRBConstruction");
@@ -193,18 +193,18 @@ template <>
 void DerivedRBConstruction<RBConstruction>::compute_Fq_representor_norms(bool compute_inner_products)
 {
   START_LOG("compute_Fq_representor_norms()", "DerivedRBConstruction");
-  
+
   // We don't short-circuit here even if Fq_representor_norms_computed = true because
   // the residual mode may have changed (this function is very cheap so not much
   // incentive to make sure we do not call it extra times)
-  
+
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
 
   SteadyDerivedRBEvaluation* drb_eval = libmesh_cast_ptr< SteadyDerivedRBEvaluation* >(rb_eval);
 
   const unsigned int Q_f = rb_theta_expansion->get_Q_f();
-  
+
   switch(drb_eval->residual_type_flag)
   {
     case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_UBER):
@@ -242,7 +242,7 @@ void DerivedRBConstruction<RBConstruction>::compute_Fq_representor_norms(bool co
 
       // Copy the Fq terms over from uber_system
       Fq_representor_norms = uber_system.Fq_representor_norms;
-      
+
       break;
     }
 
@@ -272,13 +272,13 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
 
   DerivedRBEvaluation<RBEvaluation>* der_rb_eval =
     libmesh_cast_ptr<DerivedRBEvaluation<RBEvaluation>*>(rb_eval);
-  
+
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
-  
+
   const unsigned int Q_a = rb_theta_expansion->get_Q_a();
   const unsigned int Q_f = rb_theta_expansion->get_Q_f();
-  
+
   switch(der_rb_eval->residual_type_flag)
   {
     case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_UBER):
@@ -338,7 +338,7 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
 
       break;
     }
-          
+
     case(SteadyDerivedRBEvaluation::RESIDUAL_WRT_TRUTH):
     {
       unsigned int RB_size = rb_eval->get_n_basis_functions();
@@ -380,7 +380,7 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
                   rb_eval->Aq_Aq_representor_norms[q][i][j] +=
                     der_rb_eval->derived_basis_functions[i](k)*der_rb_eval->derived_basis_functions[j](k_prime)*
                     uber_system.rb_eval->Aq_Aq_representor_norms[q][k][k_prime];
-                                                 
+
                   if(i != j)
                   {
                     rb_eval->Aq_Aq_representor_norms[q][j][i] +=

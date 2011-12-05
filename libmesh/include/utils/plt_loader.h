@@ -1,17 +1,17 @@
 // $Id$
 
 // Copyright (C) 2002-2007  Benjamin S. Kirk
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -56,21 +56,21 @@ public:
 
   /**
    * Destructor.
-   */ 
+   */
   ~PltLoader ();
 
   /**
    * Clear all data and return to a pristine state.
    */
   void clear ();
-  
+
   /**
    * Returns the verbosity.
    */
   bool verbose () const { return _verbose; }
-  
+
   /**
-   * Reads the .plt file specified by \p name.  
+   * Reads the .plt file specified by \p name.
    */
   void read (const std::string& name);
 
@@ -104,16 +104,16 @@ public:
 // 		  const bool gridonly=false) const;
 
 
-   
+
   //--------------------------------------------------------------
   // Data access
 
 
-  
+
   /**
    * Enum defining the zone type in the Tecplot binary file,
    * for use with the old .plt format.
-   */  
+   */
   enum OldZoneType { BLOCK=0,
 		     POINT,
 		     FEBLOCK,
@@ -122,7 +122,7 @@ public:
   /**
    * Enum defining the zone type in the Tecplot binary file,
    * for use with the new .plt format.
-   */  
+   */
   enum NewZoneType { ORDERED=0,
 		     FELINESEG,
 		     FETRIANGLE,
@@ -148,8 +148,8 @@ public:
 		TET,
 		HEX };
 
-  
-  
+
+
   //--------------------------------------------------------------
   // Public Data Access
 
@@ -168,7 +168,7 @@ public:
    * endian-swap on all input data.
    */
   bool is_foreign () const { return _is_foreign; }
-  
+
   /**
    * @returns the data set title
    */
@@ -243,13 +243,13 @@ public:
    * @returns a reference to the data read from the file
    */
   const std::vector<std::vector<std::vector<float> > > & get_data () const;
-  
+
   /**
    * Enum defining the number of nodes for each element type.
    */
   static const unsigned int NNodes[4];
 
-  
+
 private:
 
 
@@ -262,22 +262,22 @@ private:
    * Read data from the binary file.
    */
   void read_data (std::istream& in);
- 
+
   /**
    * Read data for the zth zone in BLOCK structured format.
    */
   void read_block_data (std::istream& in, const unsigned int zn);
- 
+
   /**
    * Read data for the zth zone in POINT structured format.
    */
   void read_point_data (std::istream& in, const unsigned int zn);
- 
+
   /**
    * Read data for the zth zone in FEBLOCK unstructured format.
    */
   void read_feblock_data (std::istream& in, const unsigned int zn);
- 
+
   /**
    * Read data for the zth zone in FEPOINT unstructured format.
    */
@@ -293,7 +293,7 @@ private:
    * @returns the Tecplot version number string.
    */
   std::string & version () { return _version; }
-  
+
   /**
    * @returns \p true if the binary type of the file is different than the
    * machine that is reading it.  If this is the case we must perform an
@@ -360,7 +360,7 @@ private:
   //--------------------------------------------------------------
   // Private Data
 
-  
+
   /**
    * Verbosity
    */
@@ -375,7 +375,7 @@ private:
    * Is the data foreign?
    */
   bool _is_foreign;
-  
+
   /**
    * The Tecplot data set title.
    */
@@ -462,7 +462,7 @@ PltLoader::PltLoader (const std::string& name, const bool v) :
   _is_foreign   (false),
   _n_vars       (0),
   _n_zones      (0)
-{ 
+{
   this->read (name);
 }
 
@@ -665,10 +665,10 @@ inline
 unsigned int PltLoader::n_nodes (const unsigned int z) const
 {
   libmesh_assert (z < this->n_zones());
-  
+
   // Only for unstructured zones!
   libmesh_assert (this->zone_type(z) > 1);
-  
+
   return this->imax(z);
 }
 
@@ -678,10 +678,10 @@ inline
 unsigned int PltLoader::n_elem (const unsigned int z) const
 {
   libmesh_assert (z < this->n_zones());
-  
+
   // Only for unstructured zones!
   libmesh_assert (this->zone_type(z) > 1);
-  
+
   return this->jmax(z);
 }
 
@@ -691,10 +691,10 @@ inline
 PltLoader::FEType PltLoader::elem_type (const unsigned int z) const
 {
   libmesh_assert (z < this->n_zones());
-  
+
   // Only for unstructured zones!
   libmesh_assert (this->zone_type(z) > 1);
-  
+
   return static_cast<FEType>(this->kmax(z));
 }
 

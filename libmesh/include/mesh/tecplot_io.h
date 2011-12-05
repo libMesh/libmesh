@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -54,12 +54,12 @@ class TecplotIO : public MeshOutput<MeshBase>
    * output files.
    */
   TecplotIO (const MeshBase&, const bool binary=false);
-  
+
   /**
    * This method implements writing a mesh to a specified file.
    */
   virtual void write (const std::string& );
-  
+
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
@@ -84,7 +84,7 @@ class TecplotIO : public MeshOutput<MeshBase>
   void write_ascii (const std::string&,
 		    const std::vector<Number>* = NULL,
 		    const std::vector<std::string>* = NULL);
-  
+
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are optionally
@@ -98,7 +98,7 @@ class TecplotIO : public MeshOutput<MeshBase>
 
   //---------------------------------------------------------------------------
   // local data
-  
+
   /**
    * Flag to write binary data.
    */

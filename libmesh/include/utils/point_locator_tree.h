@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -44,7 +44,7 @@ class Elem;
  * This is a point locator.  It locates points in space
  * using a tree: given a mesh they return the element
  * and local coordinates for a given point in global coordinates.
- * Use \p PointLocatorBase::build() to create objects of this 
+ * Use \p PointLocatorBase::build() to create objects of this
  * type at run time.
  *
  * @author Daniel Dreyer, 2003
@@ -59,24 +59,24 @@ public:
 
   /**
    * Constructor.  Needs the \p mesh in which the points
-   * should be located.  Optionally takes a master 
-   * interpolator.  This master helps in saving memory 
-   * by reducing the number of trees in use.  Only the 
-   * master locator holds a  tree, the others simply 
+   * should be located.  Optionally takes a master
+   * interpolator.  This master helps in saving memory
+   * by reducing the number of trees in use.  Only the
+   * master locator holds a  tree, the others simply
    * use the master's tree.
    */
   PointLocatorTree (const MeshBase& mesh,
 		    const PointLocatorBase* master = NULL);
 
-  
+
   /**
    * Constructor.  Needs the \p mesh in which the points
    * should be located.  Allows the user to specify the
    * method to use when building the tree.
    * Optionally takes a master interpolator.
-   * This master helps in saving memory 
-   * by reducing the number of trees in use.  Only the 
-   * master locator holds a  tree, the others simply 
+   * This master helps in saving memory
+   * by reducing the number of trees in use.  Only the
+   * master locator holds a  tree, the others simply
    * use the master's tree. Allows the user to specify
    * the build type.
    */
@@ -84,7 +84,7 @@ public:
 		    const Trees::BuildType build_type,
 		    const PointLocatorBase* master = NULL);
 
-    
+
 
 public:
 

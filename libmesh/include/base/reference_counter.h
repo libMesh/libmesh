@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -58,7 +58,7 @@ protected:
   ReferenceCounter ();
 
 public:
-  
+
   /**
    * Destructor.
    */
@@ -68,7 +68,7 @@ public:
    * Gets a string containing the reference information.
    */
   static std::string get_info ();
-  
+
   /**
    * Prints the reference information, by default to \p libMesh::out.
    */
@@ -87,28 +87,28 @@ public:
    */
   static void enable_print_counter_info();
   static void disable_print_counter_info();
-  
-  
+
+
 protected:
 
-  
+
   /**
    * Increments the construction counter. Should be called in
    * the constructor of any derived class that will be
    * reference counted.
    */
   void increment_constructor_count (const std::string& name);
-  
+
   /**
    * Increments the destruction counter. Should be called in
    * the destructor of any derived class that will be
    * reference counted.
-   */ 
+   */
   void increment_destructor_count (const std::string& name);
 
 
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-  
+
   /**
    * Data structure to log the information.  The log is
    * identified by the class name.
@@ -122,7 +122,7 @@ protected:
   static Counts _counts;
 
 #endif
-  
+
   /**
    * The number of objects.  Print the reference count
    * information when the number returns to 0.

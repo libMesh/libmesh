@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -44,7 +44,7 @@ namespace libMesh
 // void PetscVector<T>::init (const NumericVector<T>& v, const bool fast)
 // {
 //   libmesh_error();
-  
+
 //   init (v.local_size(), v.size(), fast);
 
 //   vec = libmesh_cast_ref<const PetscVector<T>&>(v).vec;
@@ -55,13 +55,13 @@ T PetscVector<T>::sum () const
 {
   this->_restore_array();
   libmesh_assert(this->closed());
-  
+
   int ierr=0;
   PetscScalar value=0.;
-  
+
   ierr = VecSum (_vec, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   return static_cast<T>(value);
 }
 
@@ -71,13 +71,13 @@ Real PetscVector<T>::l1_norm () const
 {
   this->_restore_array();
   libmesh_assert(this->closed());
-  
+
   int ierr=0;
   PetscReal value=0.;
-  
+
   ierr = VecNorm (_vec, NORM_1, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   return static_cast<Real>(value);
 }
 
@@ -88,13 +88,13 @@ Real PetscVector<T>::l2_norm () const
 {
   this->_restore_array();
   libmesh_assert(this->closed());
-  
+
   int ierr=0;
   PetscReal value=0.;
-  
+
   ierr = VecNorm (_vec, NORM_2, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   return static_cast<Real>(value);
 }
 
@@ -106,13 +106,13 @@ Real PetscVector<T>::linfty_norm () const
 {
   this->_restore_array();
   libmesh_assert(this->closed());
-  
+
   int ierr=0;
   PetscReal value=0.;
-  
+
   ierr = VecNorm (_vec, NORM_INFINITY, &value);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   return static_cast<Real>(value);
 }
 
@@ -125,9 +125,9 @@ PetscVector<T>::operator += (const NumericVector<T>& v)
 {
   this->_restore_array();
   libmesh_assert(this->closed());
-  
+
   this->add(1., v);
-  
+
   return *this;
 }
 
@@ -139,9 +139,9 @@ PetscVector<T>::operator -= (const NumericVector<T>& v)
 {
   this->_restore_array();
   libmesh_assert(this->closed());
-  
+
   this->add(-1., v);
-  
+
   return *this;
 }
 
@@ -152,7 +152,7 @@ void PetscVector<T>::set (const unsigned int i, const T value)
 {
   this->_restore_array();
   libmesh_assert(i<size());
-  
+
   int ierr=0;
   int i_val = static_cast<int>(i);
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
@@ -170,7 +170,7 @@ void PetscVector<T>::add (const unsigned int i, const T value)
 {
   this->_restore_array();
   libmesh_assert(i<size());
-  
+
   int ierr=0;
   int i_val = static_cast<int>(i);
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
@@ -222,9 +222,9 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
   A->close();
 
   // The const_cast<> is not elegant, but it is required since PETSc
-  // is not const-correct.  
+  // is not const-correct.
   ierr = MatMultAdd(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -254,9 +254,9 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T>& V_in,
   A->close();
 
   // The const_cast<> is not elegant, but it is required since PETSc
-  // is not const-correct.  
+  // is not const-correct.
   ierr = MatMultTransposeAdd(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec, _vec);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -267,27 +267,27 @@ void PetscVector<T>::add (const T v_in)
 
   int ierr=0;
   PetscScalar* values;
-  const PetscScalar v = static_cast<PetscScalar>(v_in);  
+  const PetscScalar v = static_cast<PetscScalar>(v_in);
 
   if(this->type() != GHOSTED)
     {
       const int n   = static_cast<int>(this->local_size());
       const int fli = static_cast<int>(this->first_local_index());
-      
+
       for (int i=0; i<n; i++)
 	{
 	  ierr = VecGetArray (_vec, &values);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  
-	  int ig = fli + i;      
-	  
+
+	  int ig = fli + i;
+
 	  PetscScalar value = (values[i] + v);
-	  
+
 	  ierr = VecRestoreArray (_vec, &values);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  
+
 	  ierr = VecSetValues (_vec, 1, &ig, &value, INSERT_VALUES);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
     }
   else
@@ -301,19 +301,19 @@ void PetscVector<T>::add (const T v_in)
       int n=0;
       ierr = VecGetSize(loc_vec, &n);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
       for (int i=0; i<n; i++)
 	{
 	  ierr = VecGetArray (loc_vec, &values);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  
+
 	  PetscScalar value = (values[i] + v);
-	  
+
 	  ierr = VecRestoreArray (loc_vec, &values);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  
+
 	  ierr = VecSetValues (loc_vec, 1, &i, &value, INSERT_VALUES);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr); 
+	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
 
       ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
@@ -346,7 +346,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   v->_restore_array();
 
   libmesh_assert(this->size() == v->size());
-  
+
   if(this->type() != GHOSTED)
     {
 #if PETSC_VERSION_LESS_THAN(2,3,0)
@@ -442,7 +442,7 @@ void PetscVector<T>::scale (const T factor_in)
 
   int ierr = 0;
   PetscScalar factor = static_cast<PetscScalar>(factor_in);
-  
+
   if(this->type() != GHOSTED)
     {
 #if PETSC_VERSION_LESS_THAN(2,3,0)
@@ -450,7 +450,7 @@ void PetscVector<T>::scale (const T factor_in)
       ierr = VecScale(&factor, _vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-      // 2.3.x & later style	 
+      // 2.3.x & later style
       ierr = VecScale(_vec, factor);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
@@ -466,7 +466,7 @@ void PetscVector<T>::scale (const T factor_in)
       ierr = VecScale(&factor, loc_vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-      // 2.3.x & later style	 
+      // 2.3.x & later style
       ierr = VecScale(loc_vec, factor);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
@@ -486,7 +486,7 @@ void PetscVector<T>::abs()
   if(this->type() != GHOSTED)
     {
       ierr = VecAbs(_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);  
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
   else
     {
@@ -495,7 +495,7 @@ void PetscVector<T>::abs()
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       ierr = VecAbs(loc_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);  
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -509,10 +509,10 @@ T PetscVector<T>::dot (const NumericVector<T>& V) const
 
   // Error flag
   int ierr = 0;
-  
+
   // Return value
   PetscScalar value=0.;
-  
+
   // Make sure the NumericVector passed in is really a PetscVector
   const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&V);
 
@@ -527,7 +527,7 @@ T PetscVector<T>::dot (const NumericVector<T>& V) const
 
 
 template <typename T>
-NumericVector<T>& 
+NumericVector<T>&
 PetscVector<T>::operator = (const T s_in)
 {
   this->_restore_array();
@@ -545,7 +545,7 @@ PetscVector<T>::operator = (const T s_in)
 	  ierr = VecSet(&s, _vec);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-	  // 2.3.x & later style	 
+	  // 2.3.x & later style
 	  ierr = VecSet(_vec, s);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
@@ -561,7 +561,7 @@ PetscVector<T>::operator = (const T s_in)
 	  ierr = VecSet(&s, loc_vec);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-	  // 2.3.x & later style	 
+	  // 2.3.x & later style
 	  ierr = VecSet(loc_vec, s);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
@@ -570,7 +570,7 @@ PetscVector<T>::operator = (const T s_in)
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 	}
     }
-  
+
   return *this;
 }
 
@@ -584,7 +584,7 @@ PetscVector<T>::operator = (const NumericVector<T>& v_in)
   const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&v_in);
 
   *this = *v;
-  
+
   return *this;
 }
 
@@ -603,7 +603,7 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
 
   int ierr = 0;
 
-  if (((this->type()==PARALLEL) && (v.type()==GHOSTED)) || 
+  if (((this->type()==PARALLEL) && (v.type()==GHOSTED)) ||
       ((this->type()==GHOSTED) && (v.type()==PARALLEL)) ||
       ((this->type()==GHOSTED) && (v.type()==SERIAL))   ||
       ((this->type()==SERIAL) && (v.type()==GHOSTED)))
@@ -620,7 +620,7 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
        type.  */
     libmesh_assert (this->_type == v._type);
     libmesh_assert (this->_global_to_local_map == v._global_to_local_map);
-      
+
     if (v.size() != 0)
     {
       if(this->type() != GHOSTED)
@@ -636,10 +636,10 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
         CHKERRABORT(libMesh::COMM_WORLD,ierr);
         ierr = VecGhostGetLocalForm (v._vec,&v_loc_vec);
         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	      
+
         ierr = VecCopy (v_loc_vec, loc_vec);
         CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	      
+
         ierr = VecGhostRestoreLocalForm (v._vec,&v_loc_vec);
         CHKERRABORT(libMesh::COMM_WORLD,ierr);
         ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
@@ -665,7 +665,7 @@ PetscVector<T>::operator = (const std::vector<T>& v)
   const unsigned int ioff = this->first_local_index();
   int ierr=0;
   PetscScalar* values;
-      
+
   /**
    * Case 1:  The vector is the same size of
    * The global vector.  Only add the local components.
@@ -677,7 +677,7 @@ PetscVector<T>::operator = (const std::vector<T>& v)
 
       for (unsigned int i=0; i<nl; i++)
 	values[i] =  static_cast<PetscScalar>(v[i+ioff]);
-      
+
       ierr = VecRestoreArray (_vec, &values);
 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -695,7 +695,7 @@ PetscVector<T>::operator = (const std::vector<T>& v)
 
       for (unsigned int i=0; i<nl; i++)
 	values[i] = static_cast<PetscScalar>(v[i]);
-      
+
       ierr = VecRestoreArray (_vec, &values);
 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -740,11 +740,11 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
 
   // Perform the scatter
 #if PETSC_VERSION_LESS_THAN(2,3,3)
-	 
+
   ierr = VecScatterBegin(_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   ierr = VecScatterEnd  (_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -753,7 +753,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   ierr = VecScatterBegin(scatter, _vec, v_local->_vec,
 			 INSERT_VALUES, SCATTER_FORWARD);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   ierr = VecScatterEnd  (scatter, _vec, v_local->_vec,
                          INSERT_VALUES, SCATTER_FORWARD);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -762,7 +762,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   // Clean up
   ierr = LibMeshISDestroy (&is);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   ierr = LibMeshVecScatterDestroy(&scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -786,7 +786,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
       v_local_in = *this;
       return;
     }
-  
+
   // Normal code path begins here
 
   this->_restore_array();
@@ -797,7 +797,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   libmesh_assert (v_local != NULL);
   libmesh_assert (v_local->size() == this->size());
   libmesh_assert (send_list.size()     <= v_local->size());
-  
+
   int ierr=0;
   const unsigned int n_sl = send_list.size();
 
@@ -805,12 +805,12 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   VecScatter scatter;
 
   std::vector<int> idx(n_sl + this->local_size());
-  
+
   for (unsigned int i=0; i<n_sl; i++)
     idx[i] = static_cast<int>(send_list[i]);
   for (unsigned int i = 0; i != this->local_size(); ++i)
     idx[n_sl+i] = i + this->first_local_index();
-  
+
   // Create the index set & scatter object
   if (idx.empty())
     ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
@@ -825,36 +825,36 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 			  &scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  
+
   // Perform the scatter
 #if PETSC_VERSION_LESS_THAN(2,3,3)
-	 
+
   ierr = VecScatterBegin(_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   ierr = VecScatterEnd  (_vec, v_local->_vec, INSERT_VALUES,
 			 SCATTER_FORWARD, scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #else
-	 
+
   // API argument order change in PETSc 2.3.3
   ierr = VecScatterBegin(scatter, _vec, v_local->_vec,
                          INSERT_VALUES, SCATTER_FORWARD);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   ierr = VecScatterEnd  (scatter, _vec, v_local->_vec,
                          INSERT_VALUES, SCATTER_FORWARD);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #endif
-	 
+
 
   // Clean up
   ierr = LibMeshISDestroy (&is);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   ierr = LibMeshVecScatterDestroy(&scatter);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -873,19 +873,19 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 
   libmesh_assert (send_list.size() <= this->size());
   libmesh_assert (last_local_idx+1 <= this->size());
-  
+
   const unsigned int size       = this->size();
   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
-  int ierr=0;  
-  
+  int ierr=0;
+
   // Don't bother for serial cases
 //  if ((first_local_idx == 0) &&
 //      (local_size == size))
   // But we do need to stay in sync for degenerate cases
   if (libMesh::n_processors() == 1)
     return;
-  
-  
+
+
   // Build a parallel vector, initialize it with the local
   // parts of (*this)
   PetscVector<T> parallel_vec;
@@ -903,7 +903,7 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
     Utility::iota (idx.begin(), idx.end(), first_local_idx);
 
     // Create the index set & scatter object
-    ierr = ISCreateLibMesh(libMesh::COMM_WORLD, local_size, 
+    ierr = ISCreateLibMesh(libMesh::COMM_WORLD, local_size,
                            local_size ? &idx[0] : NULL, PETSC_USE_POINTER, &is);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -918,28 +918,28 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
     ierr = VecScatterBegin(_vec, parallel_vec._vec, INSERT_VALUES,
 			   SCATTER_FORWARD, scatter);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
     ierr = VecScatterEnd  (_vec, parallel_vec._vec, INSERT_VALUES,
 			   SCATTER_FORWARD, scatter);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #else
-	   
+
       // API argument order change in PETSc 2.3.3
     ierr = VecScatterBegin(scatter, _vec, parallel_vec._vec,
 			   INSERT_VALUES, SCATTER_FORWARD);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
     ierr = VecScatterEnd  (scatter, _vec, parallel_vec._vec,
 			   INSERT_VALUES, SCATTER_FORWARD);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	   
+
 #endif
 
     // Clean up
     ierr = LibMeshISDestroy (&is);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
     ierr = LibMeshVecScatterDestroy(&scatter);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
   }
@@ -998,13 +998,13 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
   const int nl = local_size();
   PetscScalar *values;
 
-  
+
   v_local.resize(n);
 
-  
+
   // only one processor
   if (n == nl)
-    {      
+    {
       ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -1020,18 +1020,18 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
     {
       unsigned int ioff = this->first_local_index();
       std::vector<Real> local_values (n, 0.);
-      
+
       {
 	ierr = VecGetArray (_vec, &values);
 	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	
+
 	for (int i=0; i<nl; i++)
 	  local_values[i+ioff] = static_cast<Real>(values[i]);
-	
+
 	ierr = VecRestoreArray (_vec, &values);
 	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
       }
-      
+
 
       MPI_Reduce (&local_values[0], &v_local[0], n, MPI_REAL, MPI_SUM,
 		  pid, libMesh::COMM_WORLD);
@@ -1055,16 +1055,16 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
   const int nl = local_size();
   PetscScalar *values;
 
-  
+
   v_local.resize(n);
 
-  
+
   for (int i=0; i<n; i++)
     v_local[i] = 0.;
-  
+
   // only one processor
   if (n == nl)
-    {      
+    {
       ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -1089,7 +1089,7 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
       {
 	ierr = VecGetArray (_vec, &values);
 	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	
+
 	// provide my local share to the real and imag buffers
 	for (int i=0; i<nl; i++)
 	  {
@@ -1100,28 +1100,28 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
 	ierr = VecRestoreArray (_vec, &values);
 	       CHKERRABORT(libMesh::COMM_WORLD,ierr);
       }
-   
+
       /* have buffers of the real and imaginary part of v_local.
        * Once MPI_Reduce() collected all the real and imaginary
-       * parts in these std::vector<Real>, the values can be 
+       * parts in these std::vector<Real>, the values can be
        * copied to v_local
        */
       std::vector<Real> real_v_local(n);
       std::vector<Real> imag_v_local(n);
 
       // collect entries from other proc's in real_v_local, imag_v_local
-      MPI_Reduce (&real_local_values[0], &real_v_local[0], n, 
+      MPI_Reduce (&real_local_values[0], &real_v_local[0], n,
 		  MPI_REAL, MPI_SUM,
-		  pid, libMesh::COMM_WORLD);	
+		  pid, libMesh::COMM_WORLD);
 
-      MPI_Reduce (&imag_local_values[0], &imag_v_local[0], n, 
+      MPI_Reduce (&imag_local_values[0], &imag_v_local[0], n,
 		  MPI_REAL, MPI_SUM,
-		  pid, libMesh::COMM_WORLD);	
+		  pid, libMesh::COMM_WORLD);
 
       // copy real_v_local and imag_v_local to v_local
       for (int i=0; i<n; i++)
 	v_local[i] = Complex(real_v_local[i], imag_v_local[i]);
-    }  
+    }
 }
 
 #endif
@@ -1151,7 +1151,7 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
   libmesh_error();
 
 #else
-  
+
   if(this->type() != GHOSTED)
     {
       ierr = VecPointwiseMult(this->vec(),
@@ -1181,7 +1181,7 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
 	  ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
-      
+
 #endif
 
 }
@@ -1193,8 +1193,8 @@ void PetscVector<T>::print_matlab (const std::string name) const
 {
   this->_restore_array();
   libmesh_assert (this->closed());
-  
-  int ierr=0; 
+
+  int ierr=0;
   PetscViewer petsc_viewer;
 
 
@@ -1204,7 +1204,7 @@ void PetscVector<T>::print_matlab (const std::string name) const
 
   /**
    * Create an ASCII file containing the matrix
-   * if a filename was provided.  
+   * if a filename was provided.
    */
   if (name != "NULL")
     {
@@ -1212,11 +1212,11 @@ void PetscVector<T>::print_matlab (const std::string name) const
 				   name.c_str(),
 				   &petsc_viewer);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      
+
       ierr = PetscViewerSetFormat (petsc_viewer,
 				   PETSC_VIEWER_ASCII_MATLAB);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
       ierr = VecView (_vec, petsc_viewer);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -1229,7 +1229,7 @@ void PetscVector<T>::print_matlab (const std::string name) const
       ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
 				   PETSC_VIEWER_ASCII_MATLAB);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
       ierr = VecView (_vec, PETSC_VIEWER_STDOUT_WORLD);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
@@ -1256,10 +1256,10 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
   IS parent_is, subvector_is;
   VecScatter scatter;
   int ierr = 0;
-  
+
   // Make sure the passed in subvector is really a PetscVector
   PetscVector<T>* petsc_subvector = libmesh_cast_ptr<PetscVector<T>*>(&subvector);
-  
+
   // If the petsc_subvector is already initialized, we assume that the
   // user has already allocated the *correct* amount of space for it.
   // If not, we use the appropriate PETSc routines to initialize it.
@@ -1285,7 +1285,7 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
     {
       petsc_subvector->_restore_array();
     }
-  
+
   // Use iota to fill an array with entries [0,1,2,3,4,...rows.size()]
   std::vector<int> idx(rows.size());
   Utility::iota (idx.begin(), idx.end(), 0);
@@ -1337,8 +1337,8 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
 		       INSERT_VALUES,
 		       SCATTER_FORWARD); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
-  
-  // Clean up 
+
+  // Clean up
   ierr = LibMeshISDestroy(&parent_is);       CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = LibMeshISDestroy(&subvector_is);    CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = LibMeshVecScatterDestroy(&scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);

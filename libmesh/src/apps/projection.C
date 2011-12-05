@@ -41,12 +41,12 @@ T assert_argument (GetPot &cl,
     {
       std::cerr << ("No " + argname + " argument found!") << std::endl;
       usage_error(progname);
-    } 
+    }
   return cl.next(defaultarg);
 }
 
 // Global collections of MeshFunctions are necessary to work with
-// global functions fptr and gptr.  
+// global functions fptr and gptr.
 // TODO: libMesh needs functor-based alternatives to these types of
 // function arguments
 std::string current_sys_name;

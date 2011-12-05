@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -77,9 +77,9 @@ LinearSolver<T>::build(const SolverPackage solver_package)
 		    << std::endl;
       libmesh_error();
     }
-    
+
   AutoPtr<LinearSolver<T> > ap(NULL);
-  return ap;    
+  return ap;
 }
 
 template <typename T>
@@ -88,7 +88,7 @@ LinearSolver<T>::preconditioner_type () const
 {
   if(_preconditioner)
     return _preconditioner->type();
-    
+
   return _preconditioner_type;
 }
 
@@ -111,7 +111,7 @@ LinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
     libMesh::err<<"Preconditioner must be attached before the solver is initialized!"<<std::endl;
     libmesh_error();
   }
-  
+
   _preconditioner_type = SHELL_PRECOND;
   _preconditioner = preconditioner;
 }
@@ -144,24 +144,24 @@ LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
   {
     // Log how long the linear solve takes.
     START_LOG("adjoint_solve()", "LinearSolver");
-            
+
     // Take the discrete adjoint
     mat.close();
-    mat.get_transpose(mat);      
-                
+    mat.get_transpose(mat);
+
     // Call the solve function for the relevant linear algebra library and
     // solve the transpose matrix
-    const std::pair<unsigned int, Real> totalrval =  this->solve (mat, sol, rhs, tol, n_iter);      
-      
+    const std::pair<unsigned int, Real> totalrval =  this->solve (mat, sol, rhs, tol, n_iter);
+
     // Now transpose back and restore the original matrix
     // by taking the discrete adjoint
-    mat.get_transpose(mat); 
-    
+    mat.get_transpose(mat);
+
     // Stop logging the nonlinear solve
     STOP_LOG("adjoint_solve()", "LinearSolver");
-    
-    return totalrval;   
-    
+
+    return totalrval;
+
   }
 
 

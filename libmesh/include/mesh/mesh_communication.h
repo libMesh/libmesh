@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -90,15 +90,15 @@ public:
   void broadcast (MeshBase &) const;
 
   /**
-   * This method takes a parallel distributed mesh and redistributes 
-   * the elements.  Specifically, any elements stored on a given 
+   * This method takes a parallel distributed mesh and redistributes
+   * the elements.  Specifically, any elements stored on a given
    * processor are sent to the processor which "owns" them.  Similarly,
-   * any elements assigned to the current processor but stored on 
+   * any elements assigned to the current processor but stored on
    * another are received. Once this step is completed any required ghost
    * elements are updated.  The final result is that each processor stores
    * only the elements it actually owns and any ghost elements required
-   * to satisfy data dependencies. This method can be invoked after a 
-   * partitioning step to affect the new partitioning.   
+   * to satisfy data dependencies. This method can be invoked after a
+   * partitioning step to affect the new partitioning.
    */
   void redistribute (ParallelMesh &) const;
 
@@ -106,7 +106,7 @@ public:
    *
    */
   void gather_neighboring_elements (ParallelMesh &) const;
-  
+
   /**
    * This method takes an input \p ParallelMesh which may be
    * distributed among all the processors.  Each processor then
@@ -119,7 +119,7 @@ public:
 
   /**
    * This method takes an input \p ParallelMesh which may be
-   * distributed among all the processors.  Each processor 
+   * distributed among all the processors.  Each processor
    * deletes all elements which are neither local elements nor "ghost"
    * elements which touch local elements, and deletes all nodes which
    * are not contained in local or ghost elements.
@@ -136,11 +136,11 @@ public:
   /**
    * This method assigns globally unique, partition-agnostic
    * indices to the nodes and elements in the mesh.  The approach
-   * is to compute the Hilbert space-filling curve key and use its 
+   * is to compute the Hilbert space-filling curve key and use its
    * value to assign an index in [0,N_global). Since the Hilbert key
-   * is unique for each spatial location, two objects occupying the 
+   * is unique for each spatial location, two objects occupying the
    * same location will be assigned the same global id.  Thus, this
-   * method can also be useful for identifying duplicate nodes 
+   * method can also be useful for identifying duplicate nodes
    * which may occur during parallel refinement.
    */
   void assign_global_indices (MeshBase &) const;
@@ -216,4 +216,4 @@ private:
 
 } // namespace libMesh
 
-#endif // end #ifndef __mesh_communication_h__ 
+#endif // end #ifndef __mesh_communication_h__

@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -86,7 +86,7 @@ public:
      _miniter(miniter),
      _maxiter(maxiter),
      _miniterBC(miniterBC),
-     
+
      _metric(uniform),
      _adaptive_func(none),
      _theta(theta),
@@ -108,7 +108,7 @@ public:
      _miniter(miniter),
      _maxiter(maxiter),
      _miniterBC(miniterBC),
-     
+
      _metric(uniform),
      _adaptive_func(cell),
      _theta(theta),
@@ -116,7 +116,7 @@ public:
 
      _area_of_interest(NULL)
   {}
-  
+
   /**
    * Even more complicated constructor for mesh redistribution based on adapt_data with an
    * area of interest
@@ -187,22 +187,22 @@ private:
    * Max distance of the last set of movement.
    */
   double _distance;
-  
+
   /**
    * Dampening factor
    */
   const double _percent_to_move;
-  
+
   /**
    * Records a relative "distance moved"
    */
   double _dist_norm;
-  
+
   /**
    * Map for hanging_nodes
    */
   std::map<unsigned int, std::vector<unsigned int> > _hanging_nodes;
-  
+
   /**
    * Vector for holding adaptive data
    */
@@ -221,10 +221,10 @@ private:
    * Area of Interest Mesh
    */
   const UnstructuredMesh * _area_of_interest;
-  
+
   void adjust_adapt_data();
   float adapt_minimum() const;
-  
+
   /**
    *Imported stuff: ..........
    */
@@ -257,35 +257,35 @@ private:
   void adp_renew(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells,
                  LPDOUBLE afun, int adp, FILE *sout);
 
-  void full_smooth(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells, 
-                   int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me, 
+  void full_smooth(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
+                   int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me,
                    LPLPLPDOUBLE H, int adp, char *adap, int gr, FILE *sout);
 
-  double maxE(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells, LPINT mcells, 
-              int me, LPLPLPDOUBLE H, double v, double epsilon, double w, LPDOUBLE Gamma, 
+  double maxE(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells, LPINT mcells,
+              int me, LPLPLPDOUBLE H, double v, double epsilon, double w, LPDOUBLE Gamma,
               double *qmin, FILE *sout);
 
-  double minq(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells, LPINT mcells, 
+  double minq(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells, LPINT mcells,
               int me, LPLPLPDOUBLE H, double *vol, double *Vmin, FILE *sout);
 
   double minJ(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-              double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges, 
-              LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin, 
+              double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges,
+              LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin,
               int adp, LPDOUBLE afun, FILE *sout);
 
   double minJ_BC(int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int msglev, 
+                double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int msglev,
                 double *Vmin, double *emax, double *qmin, int adp, LPDOUBLE afun, int NCN, FILE *sout);
 
-  double localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell, LPINT mask, double epsilon, 
-                double w, int nvert, LPLPDOUBLE H, int me, double vol, int f, double *Vmin, 
+  double localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell, LPINT mask, double epsilon,
+                double w, int nvert, LPLPDOUBLE H, int me, double vol, int f, double *Vmin,
                 double *qmin, int adp, LPDOUBLE afun, LPDOUBLE Gloc, FILE *sout);
 
   double avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDOUBLE R, LPINT cell, int nvert, int adp, FILE *sout);
 
-  double vertex(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell, 
-                double epsilon, double w, int nvert, LPDOUBLE K, 
-                LPLPDOUBLE H, int me, double vol, int f, double *Vmin, int adp, 
+  double vertex(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell,
+                double epsilon, double w, int nvert, LPDOUBLE K,
+                LPLPDOUBLE H, int me, double vol, int f, double *Vmin, int adp,
                 LPDOUBLE G, double sigma, FILE *sout);
 
   void metr_data_gen(char grid[], char metr[], int n, int me, FILE *sout);
@@ -293,20 +293,20 @@ private:
   int solver(int n, LPINT ia, LPINT ja, LPDOUBLE a, LPDOUBLE x, LPDOUBLE b, double eps,
              int maxite, int msglev, FILE *sout);
 
-  int pcg_ic0(int n, LPINT ia, LPINT ja, LPDOUBLE a, LPDOUBLE u, LPDOUBLE x, LPDOUBLE b, LPDOUBLE r, 
+  int pcg_ic0(int n, LPINT ia, LPINT ja, LPDOUBLE a, LPDOUBLE u, LPDOUBLE x, LPDOUBLE b, LPDOUBLE r,
               LPDOUBLE p, LPDOUBLE z, double eps, int maxite, int msglev, FILE *sout);
 
   int pcg_par_check(int n, LPINT ia, LPINT ja, LPDOUBLE a, double eps, int maxite, int msglev, FILE *sout);
 
   void gener(char grid[], int n, FILE *sout);
-  
-  void local_sweep(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells, 
-                  int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me, 
+
+  void local_sweep(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
+                  int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me,
                       LPLPLPDOUBLE H, int adp, int OPT, FILE *sout);
-  
+
   double minJ_l(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-              double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges, 
-              LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin, 
+              double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges,
+              LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin,
               int adp, LPDOUBLE afun, FILE *sout);
 };
 

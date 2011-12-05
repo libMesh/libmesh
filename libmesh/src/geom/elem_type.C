@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -142,13 +142,13 @@ std::string ElementTypes::name(const ElemType t)
 	its_name = "Edge 2";
 	break;
       }
-      
+
     case EDGE3:
       {
 	its_name = "Edge 3";
 	break;
       }
-      
+
     case EDGE4:
       {
 	its_name = "Edge 4";
@@ -160,7 +160,7 @@ std::string ElementTypes::name(const ElemType t)
 	its_name = "Tri 3";
 	break;
       }
-      
+
     case TRI6:
       {
 	its_name = "Tri 6";
@@ -172,13 +172,13 @@ std::string ElementTypes::name(const ElemType t)
 	its_name = "Quad 4";
 	break;
       }
-      
+
     case QUAD8:
       {
 	its_name = "Quad 8";
 	break;
       }
-      
+
     case QUAD9:
       {
 	its_name = "Quad 9";
@@ -190,7 +190,7 @@ std::string ElementTypes::name(const ElemType t)
 	its_name = "Tet 4";
 	break;
       }
-      
+
     case TET10:
       {
 	its_name = "Tet 10";
@@ -202,13 +202,13 @@ std::string ElementTypes::name(const ElemType t)
 	its_name = "Hex 8";
 	break;
       }
-      
+
     case HEX20:
       {
 	its_name = "Hex 20";
 	break;
       }
-      
+
     case HEX27:
       {
 	its_name = "Hex 27";
@@ -220,7 +220,7 @@ std::string ElementTypes::name(const ElemType t)
 	its_name = "Prism 6";
 	break;
       }
-      
+
     case PRISM18:
       {
 	its_name = "Prism 8";
@@ -288,7 +288,7 @@ std::string ElementTypes::name(const ElemType t)
 #endif
 
 
-      
+
     default:
       {
 	libMesh::err << "Undefined element type!." << std::endl;

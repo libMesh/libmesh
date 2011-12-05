@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -83,7 +83,7 @@ MeshBase::~MeshBase()
 
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
-{  
+{
   parallel_only();
 
   // Renumber the nodes and elements so that they in contiguous
@@ -97,13 +97,13 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // solution, and the node ordering cannot be changed.
   if(!skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
-  
+
   // Let all the elements find their neighbors
   this->find_neighbors();
 
   // Partition the mesh.
   this->partition();
-  
+
   // If we're using ParallelMesh, we'll want it parallelized.
   this->delete_remote_elements();
 
@@ -143,10 +143,10 @@ unsigned int MeshBase::n_subdomains() const
   parallel_only();
 
   const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end(); 
+  const const_element_iterator end = this->active_elements_end();
 
   std::set<unsigned int> subdomain_ids;
-  
+
   for (; el!=end; ++el)
     subdomain_ids.insert((*el)->subdomain_id());
 
@@ -166,7 +166,7 @@ unsigned int MeshBase::n_nodes_on_proc (const unsigned int proc_id) const
   // nodes
   libmesh_assert (proc_id < libMesh::n_processors() ||
 	  proc_id == DofObject::invalid_processor_id);
-  
+
   return static_cast<unsigned int>(std::distance (this->pid_nodes_begin(proc_id),
 						  this->pid_nodes_end  (proc_id)));
 }
@@ -179,7 +179,7 @@ unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
   // elements
   libmesh_assert (proc_id < libMesh::n_processors() ||
 	  proc_id == DofObject::invalid_processor_id);
-  
+
   return static_cast<unsigned int>(std::distance (this->pid_elements_begin(proc_id),
 						  this->pid_elements_end  (proc_id)));
 }
@@ -192,7 +192,7 @@ unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
   return static_cast<unsigned int>(std::distance (this->active_pid_elements_begin(proc_id),
 						  this->active_pid_elements_end  (proc_id)));
 }
-  
+
 
 
 unsigned int MeshBase::n_sub_elem () const
@@ -200,10 +200,10 @@ unsigned int MeshBase::n_sub_elem () const
   unsigned int ne=0;
 
   const_element_iterator       el  = this->elements_begin();
-  const const_element_iterator end = this->elements_end(); 
+  const const_element_iterator end = this->elements_end();
 
   for (; el!=end; ++el)
-    ne += (*el)->n_sub_elem(); 
+    ne += (*el)->n_sub_elem();
 
   return ne;
 }
@@ -215,10 +215,10 @@ unsigned int MeshBase::n_active_sub_elem () const
   unsigned int ne=0;
 
   const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end(); 
+  const const_element_iterator end = this->active_elements_end();
 
   for (; el!=end; ++el)
-    ne += (*el)->n_sub_elem(); 
+    ne += (*el)->n_sub_elem();
 
   return ne;
 }
@@ -275,10 +275,10 @@ void MeshBase::partition (const unsigned int n_parts)
 unsigned int MeshBase::recalculate_n_partitions()
 {
   const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end(); 
+  const const_element_iterator end = this->active_elements_end();
 
   unsigned int max_proc_id=0;
-  
+
   for (; el!=end; ++el)
     max_proc_id = std::max(max_proc_id, static_cast<unsigned int>((*el)->processor_id()));
 

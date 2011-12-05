@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -51,7 +51,7 @@ class ParmetisPartitioner : public Partitioner
   ParmetisPartitioner () {}
 
   /**
-   * Creates a new partitioner of this type and returns it in 
+   * Creates a new partitioner of this type and returns it in
    * an \p AutoPtr.
    */
   virtual AutoPtr<Partitioner> clone () const {
@@ -88,7 +88,7 @@ private:
    * Initialize data structures.
    */
   void initialize (const MeshBase& mesh, const unsigned int n_sbdmns);
-  
+
   /**
    * Build the graph.
    */
@@ -105,12 +105,12 @@ private:
    * it will abort if any processor passes a NULL _part array.
    */
   std::vector<unsigned int> _n_active_elem_on_proc;
-  
+
   /**
    * Maps active element ids into a contiguous range, as needed by ParMETIS.
    */
   std::map<unsigned int, unsigned int> _global_index_by_pid_map;
-  
+
   /**
    * Data structures used by ParMETIS to describe the connectivity graph
    * of the mesh.  Consult the ParMETIS documentation.

@@ -24,15 +24,15 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
   PerfLog perf_log("main()");
-  
+
   const unsigned int dim = 3;
 
   if (argc < 6)
     {
-      std::cerr << "Usage: " << argv[0] 
+      std::cerr << "Usage: " << argv[0]
                 << " ivar m0.mesh m1.mesh s0.soln s1.soln"
                 << std::endl;
-      
+
       libmesh_error();
     }
 
@@ -69,7 +69,7 @@ int main (int argc, char** argv)
   LegacyXdrIO(mesh_fine,true).read_mgf_soln(std::string(argv[5]),
                                             fine_solution,
                                             fine_var_names);
-  
+
   libmesh_assert (fine_var_names == coarse_var_names);
 
   std::vector<Number>      diff_solution  (fine_solution.size());
@@ -113,14 +113,14 @@ int main (int argc, char** argv)
     // Use super--accurate quadrature to avoid superconvergent points
     //    QGauss qrule (dim, NINTH);
     QGauss qrule (dim, FIFTH);
-    
+
     // Declare second--order elements for our Hex27's
     FiniteElements::FELagrange3D fe_coarse (SECOND);
     FiniteElements::FELagrange3D fe_fine   (SECOND);
-  
+
     fe_coarse.attach_quadrature_rule (&qrule);
     fe_fine.attach_quadrature_rule   (&qrule);
-  
+
     const std::vector<Real>& JxW               = fe_fine.get_JxW();
     const std::vector<Point>& q_point          = fe_fine.get_xyz();
     const std::vector<std::vector<Real> >& phi = fe_fine.get_phi();
@@ -148,12 +148,12 @@ int main (int argc, char** argv)
             Number fine_soln=0., coarse_soln=0.;
 
             libmesh_assert (fe_fine.n_shape_functions() == fine_element->n_nodes());
-          
+
             for (unsigned int i=0; i<fe_fine.n_shape_functions(); i++)
               {
                 const unsigned int nv = fine_var_names.size();
                 const unsigned int gn = fine_element->node(i); // Global node number
-                              
+
                 fine_soln += fine_solution[gn*nv + ivar]*phi[i][gp];
               }
 
@@ -167,16 +167,16 @@ int main (int argc, char** argv)
                 perf_log.start_event("element lookup");
 
                 coarse_element = const_cast<Elem*>(octree_coarse.find_element(q_point[gp]));
-              
+
                 libmesh_assert (coarse_element != NULL);
-                              
+
                 // Recompute the element--specific data for the new coarse-mesh element.
                 fe_coarse.reinit (coarse_element);
-              
+
                 perf_log.stop_event("element lookup");
                 perf_log.restart_event("gp_loop");
               }
-          
+
 
             // Find the point on the coarse reference element corresponding to the current Gauss
             // point
@@ -184,10 +184,10 @@ int main (int argc, char** argv)
 
             // Interpolate the coarse grid solution.
             for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
-              {                
+              {
                 const unsigned int nv = coarse_var_names.size();
                 const unsigned int gn = coarse_element->node(i); // Global node number
-                              
+
                 coarse_soln += coarse_solution[gn*nv + ivar]*fe_coarse.shape(coarse_element,
                                                                              SECOND,
                                                                              i,
@@ -210,53 +210,53 @@ int main (int argc, char** argv)
     // Now lets compute the error at each node in the fine mesh and plot it out.
     {
       perf_log.start_event ("diff_soln_loop");
-    
+
       const unsigned int nv = diff_var_names.size();
 
       std::vector<unsigned char> already_done(mesh_fine.n_nodes(), 0);
 
       Elem* coarse_element = mesh_coarse.elem(0);
-    
+
       for (unsigned int e=0; e<mesh_fine.n_elem(); e++)
         for (unsigned int n=0; n<mesh_fine.elem(e)->n_nodes(); n++)
           {
             const unsigned int gn = mesh_fine.elem(e)->node(n);
-          
+
             if (!already_done[gn])
               {
                 already_done[gn] = 1;
-            
+
                 const Point& p = mesh_fine.point(gn);
-              
+
                 if (!coarse_element->contains_point(p))
                   {
                     perf_log.pause_event ("diff_soln_loop");
                     perf_log.start_event ("element lookup 2");
-                  
+
                     coarse_element = const_cast<Elem*>(octree_coarse.find_element(p));
-              
+
                     libmesh_assert (coarse_element != NULL);
-                  
+
                     // Recompute the element--specific data for the new coarse-mesh element.
                     fe_coarse.reinit (coarse_element);
-                  
+
                     perf_log.stop_event ("element lookup 2");
                     perf_log.restart_event ("diff_soln_loop");
                   }
-              
+
                 const Point mapped_point = fe_coarse.inverse_map(coarse_element, p);
-              
+
                 for (unsigned int c=0; c<nv; c++)
                   {
                     Number coarse_soln = 0.;
-                  
+
                     // Interpolate the coarse grid solution.
                     for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
                       coarse_soln += coarse_solution[coarse_element->node(i)*nv + c]*
                                      fe_coarse.shape(coarse_element, SECOND, i, mapped_point);
-                  
+
                     diff_solution[gn*nv + c] = coarse_soln - fine_solution[gn*nv + c];
-                  }            
+                  }
               }
           }
       perf_log.stop_event ("diff_soln_loop");
@@ -266,7 +266,7 @@ int main (int argc, char** argv)
     TecplotIO(mesh_fine).write_nodal_data(plot_name, diff_solution, diff_var_names);
 
   }
-  
+
   return 0;
 }
-  
+

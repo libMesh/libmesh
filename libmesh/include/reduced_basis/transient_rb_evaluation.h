@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -26,13 +26,13 @@ namespace libMesh
 {
 
 class TransientRBThetaExpansion;
-        
+
 /**
  * This class is part of the rbOOmit framework.
  *
  * TransientRBEvaluation extends RBEvaluation to
  * encapsulate the code and data required
- * to perform "online" RB evaluations for 
+ * to perform "online" RB evaluations for
  * Linear Time Invariant (LTI) transient problems.
  *
  * @author David J. Knezevic, 2011
@@ -61,7 +61,7 @@ public:
    */
   Real get_delta_t() const                { return _delta_t; }
   void set_delta_t(const Real delta_t_in) { _delta_t = delta_t_in; }
-  
+
   /**
    * Get/set euler_theta, parameter that determines
    * the temporal discretization.
@@ -81,14 +81,14 @@ public:
    */
   unsigned int get_n_time_steps() const       { return _n_time_steps; }
   void set_n_time_steps(const unsigned int K) { _n_time_steps = K; }
-  
+
 private:
 
   /**
    * The time-step size.
    */
   Real _delta_t;
-  
+
   /**
    * The parameter that determines the generalized Euler scheme
    * discretization that we employ.
@@ -172,7 +172,7 @@ public:
    * data.
    */
   virtual Real compute_residual_dual_norm(const unsigned int N);
-  
+
   /**
    * Compute the dual norm of the residual for the solution
    * saved in RB_solution. This function does not used the cached
@@ -207,7 +207,7 @@ public:
    * to initialize the system for Online solves.
    */
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
-  
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -265,7 +265,7 @@ public:
    * initial condition) for each N.
    */
   std::vector< DenseVector<Number> > RB_initial_condition_all_N;
-  
+
   /**
    * Vectors storing the residual representor inner products
    * to be used in computing the residuals online.
@@ -273,7 +273,7 @@ public:
   std::vector< std::vector< std::vector<Number> > > Fq_Mq_representor_norms;
   std::vector< std::vector< std::vector<Number> > > Mq_Mq_representor_norms;
   std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_Mq_representor_norms;
-  
+
 
   /**
    * Cached residual terms. These can be used to accelerate residual calculations

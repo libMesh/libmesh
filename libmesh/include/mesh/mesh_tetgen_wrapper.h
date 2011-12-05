@@ -1,18 +1,18 @@
 // $Id$
- 
+
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -53,37 +53,37 @@ namespace libMesh
      * Destructor.  Empty.
      */
     ~TetGenWrapper ();
-  
+
     /**
      * Method to set TetGen commandline switches
-     * -p	 Tetrahedralizes a piecewise linear complex (.poly or .smesh file). 
-     * -q	 Quality mesh generation. A minimum radius-edge ratio may be specified (default 2.0). 
-     * -a	 Applies a maximum tetrahedron volume constraint. 
-     * -A	 Assigns attributes to identify tetrahedra in certain regions. 
-     * -r	 Reconstructs and Refines a previously generated mesh. 
-     * -Y	 Suppresses boundary facets/segments splitting. 
-     * -i	 Inserts a list of additional points into mesh. 
-     * -M	 Does not merge coplanar facets. 
-     * -T	 Set a tolerance for coplanar test (default 1e-8). 
-     * -d	 Detect intersections of PLC facets. 
-     * -z	 Numbers all output items starting from zero. 
-     * -o2 Generates second-order subparametric elements. 
-     * -f	 Outputs faces (including non-boundary faces) to .face file. 
-     * -e	 Outputs subsegments to .edge file. 
-     * -n	 Outputs tetrahedra neighbors to .neigh file. 
-     * -g	 Outputs mesh to .mesh file for viewing by Medit. 
-     * -G	 Outputs mesh to .msh file for viewing by Gid. 
-     * -O	 Outputs mesh to .off file for viewing by Geomview. 
-     * -J	 No jettison of unused vertices from output .node file. 
-     * -B	 Suppresses output of boundary information. 
-     * -N	 Suppresses output of .node file. 
-     * -E	 Suppresses output of .ele file. 
-     * -F	 Suppresses output of .face file. 
-     * -I	 Suppresses mesh iteration numbers. 
-     * -C	 Checks the consistency of the final mesh. 
-     * -Q	 Quiet: No terminal output except errors. 
-     * -V	 Verbose: Detailed information, more terminal output. 
-     * -v	 Prints the version information. 
+     * -p	 Tetrahedralizes a piecewise linear complex (.poly or .smesh file).
+     * -q	 Quality mesh generation. A minimum radius-edge ratio may be specified (default 2.0).
+     * -a	 Applies a maximum tetrahedron volume constraint.
+     * -A	 Assigns attributes to identify tetrahedra in certain regions.
+     * -r	 Reconstructs and Refines a previously generated mesh.
+     * -Y	 Suppresses boundary facets/segments splitting.
+     * -i	 Inserts a list of additional points into mesh.
+     * -M	 Does not merge coplanar facets.
+     * -T	 Set a tolerance for coplanar test (default 1e-8).
+     * -d	 Detect intersections of PLC facets.
+     * -z	 Numbers all output items starting from zero.
+     * -o2 Generates second-order subparametric elements.
+     * -f	 Outputs faces (including non-boundary faces) to .face file.
+     * -e	 Outputs subsegments to .edge file.
+     * -n	 Outputs tetrahedra neighbors to .neigh file.
+     * -g	 Outputs mesh to .mesh file for viewing by Medit.
+     * -G	 Outputs mesh to .msh file for viewing by Gid.
+     * -O	 Outputs mesh to .off file for viewing by Geomview.
+     * -J	 No jettison of unused vertices from output .node file.
+     * -B	 Suppresses output of boundary information.
+     * -N	 Suppresses output of .node file.
+     * -E	 Suppresses output of .ele file.
+     * -F	 Suppresses output of .face file.
+     * -I	 Suppresses mesh iteration numbers.
+     * -C	 Checks the consistency of the final mesh.
+     * -Q	 Quiet: No terminal output except errors.
+     * -V	 Verbose: Detailed information, more terminal output.
+     * -v	 Prints the version information.
      * -h	 Help: A brief instruction for using TetGen.
      */
     void set_switches(const std::string& s);
@@ -167,7 +167,7 @@ namespace libMesh
      * Method returns attribute of element i in TetGen output.
      */
     REAL get_element_attribute(unsigned i);
-       
+
     /**
      * Method sets coordinates of hole i in TetGen input.
      */
@@ -219,7 +219,7 @@ namespace libMesh
      * TetGen input structure.
      */
     tetgenio   tetgen_data;
-  
+
     /**
      * TetGen output structure.
      */
@@ -229,11 +229,11 @@ namespace libMesh
      * TetGen mesh structure (from the TetGen library).
      */
     tetgenmesh      tetgen_mesh;
-  
+
     /**
      * TetGen control class (from the TetGen library).
      */
-    tetgenbehavior  tetgen_be; 
+    tetgenbehavior  tetgen_be;
   };
 
 

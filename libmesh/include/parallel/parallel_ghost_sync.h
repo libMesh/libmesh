@@ -3,17 +3,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -45,7 +45,7 @@ namespace Parallel {
    * their xyz location or a range of active ghost elements uniquely
    * identified by their centroids' xyz location.  Fulfill requests
    * with
-   * sync.gather_data(const std::vector<unsigned int>& ids, 
+   * sync.gather_data(const std::vector<unsigned int>& ids,
    *                  std::vector<sync::datum>& data),
    * by resizing and setting the values of the data vector.
    * Respond to fulfillment with
@@ -68,7 +68,7 @@ namespace Parallel {
   /**
    * Request data about a range of ghost dofobjects uniquely
    * identified by their id.  Fulfill requests with
-   * sync.gather_data(const std::vector<unsigned int>& ids, 
+   * sync.gather_data(const std::vector<unsigned int>& ids,
    *                  std::vector<sync::datum>& data),
    * by resizing and setting the values of the data vector.
    * Respond to fulfillment with
@@ -88,7 +88,7 @@ namespace Parallel {
    * Request data about a range of ghost elements uniquely
    * identified by their parent id and which child they are.
    * Fulfill requests with
-   * sync.gather_data(const std::vector<unsigned int>& ids, 
+   * sync.gather_data(const std::vector<unsigned int>& ids,
    *                  std::vector<sync::datum>& data),
    * by resizing and setting the values of the data vector.
    * Respond to fulfillment with

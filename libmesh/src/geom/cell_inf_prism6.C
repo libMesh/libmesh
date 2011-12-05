@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -129,14 +129,14 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i,
 	  libmesh_error();
 	}
     }
-  
+
   else
     {
       // FIXME: Find out how to return non-proxy side
       libmesh_error();
     }
 
-  
+
   // We will never get here...  Look at the code above.
   libmesh_error();
   AutoPtr<Elem> ap(NULL);  return ap;
@@ -163,9 +163,9 @@ bool InfPrism6::contains_point (const Point& p, Real tol) const
    * check whether point \p p is inside or outside
    * our relevant part of the envelope.  Note that
    * this is not exclusive: only when the distance is less,
-   * we are safe.  Otherwise, we cannot say anything. The 
+   * we are safe.  Otherwise, we cannot say anything. The
    * envelope may be non-spherical, the physical point may lie
-   * inside the envelope, outside the envelope, or even inside 
+   * inside the envelope, outside the envelope, or even inside
    * this infinite element.  Therefore if this fails,
    * fall back to the FEInterface::inverse_map()
    */
@@ -201,7 +201,7 @@ bool InfPrism6::contains_point (const Point& p, Real tol) const
        * and something else (not important) in radial direction.
        */
       FEType fe_type(default_order());
-  
+
       const Point mapped_point = FEInterface::inverse_map(dim(),
 							  fe_type,
 							  this,

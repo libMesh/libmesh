@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -83,22 +83,22 @@ void UNVIO::read (const std::string& file_name)
   if (file_name.rfind(".gz") < file_name.size())
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
-      
+
       igzstream in_stream (file_name.c_str());
       this->read_implementation (in_stream);
-      
+
 #else
-      
+
       libMesh::err << "ERROR:  You must have the zlib.h header "
 		    << "files and libraries to read and write "
 		    << "compressed streams."
 		    << std::endl;
       libmesh_error();
-      
+
 #endif
-      return;      
+      return;
     }
-  
+
   else
     {
       std::ifstream in_stream (file_name.c_str());
@@ -130,25 +130,25 @@ void UNVIO::read_implementation (std::istream& in_stream)
    // read.
   std::vector<std::string> order_of_datasets;
   order_of_datasets.reserve(2);
-  
+
   {
     // the first time we read the file,
     // merely to obtain overall info
     if ( !in_stream.good() )
       {
-        libMesh::err << "ERROR: Input file not good." 
+        libMesh::err << "ERROR: Input file not good."
 		      << std::endl;
 	libmesh_error();
       }
 
-    
-    // Count nodes and elements, then let 
-    // other methods read the element and 
+
+    // Count nodes and elements, then let
+    // other methods read the element and
     // node data.  Also remember which
     // dataset comes first: nodes or elements
     if (this->verbose())
       libMesh::out << "  Counting nodes and elements" << std::endl;
-    
+
 
 //    bool reached_eof = false;
     bool found_node  = false;
@@ -160,11 +160,11 @@ void UNVIO::read_implementation (std::istream& in_stream)
     while (in_stream.good())
       {
 	in_stream >> olds >> news;
-	
+
 	// a "-1" followed by a number means the beginning of a dataset
 	// stop combing at the end of the file
 	while ( ((olds != "-1") || (news == "-1") ) && !in_stream.eof() )
-	  {	  
+	  {
 	    olds = news;
 	    in_stream >> news;
 	  }
@@ -175,7 +175,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
 //  	    break;
 //  	  }
 
-	
+
 	// if beginning of dataset, buffer it in
 	// temp_buffer, if desired
 	if (news == _label_dataset_nodes)
@@ -224,10 +224,10 @@ void UNVIO::read_implementation (std::istream& in_stream)
 
     // Don't close, just seek to the beginning
     in_stream.seekg(0, std::ios::beg);
-    
+
     if (!in_stream.good() )
       {
-        libMesh::err << "ERROR: Cannot re-read input file." 
+        libMesh::err << "ERROR: Cannot re-read input file."
 		      << std::endl;
 	libmesh_error();
       }
@@ -238,7 +238,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
 
 
   // We finished scanning the file,
-  // and our member data 
+  // and our member data
   // \p this->_n_nodes,
   // \p this->_n_elements,
   // \p this->_need_D_to_e
@@ -277,14 +277,14 @@ void UNVIO::read_implementation (std::istream& in_stream)
       }
 #endif
 
-    // tell the MeshData object that we are finished 
+    // tell the MeshData object that we are finished
     // reading data
     this->_mesh_data.close_foreign_id_maps ();
 
     if (this->verbose())
       libMesh::out << "  Finished." << std::endl << std::endl;
   }
-  
+
   // save memory
   this->_assign_nodes.clear();
   this->_ds_position.clear();
@@ -299,23 +299,23 @@ void UNVIO::write (const std::string& file_name)
   if (file_name.rfind(".gz") < file_name.size())
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
-      
+
       ogzstream out_stream(file_name.c_str());
       this->write_implementation (out_stream);
-      
+
 #else
-      
+
       libMesh::err << "ERROR:  You must have the zlib.h header "
 		    << "files and libraries to read and write "
 		    << "compressed streams."
 		    << std::endl;
       libmesh_error();
-      
+
 #endif
-      
-      return;      
+
+      return;
     }
-  
+
   else
     {
       std::ofstream out_stream (file_name.c_str());
@@ -331,14 +331,14 @@ void UNVIO::write_implementation (std::ostream& out_file)
 {
   if ( !out_file.good() )
     {
-      libMesh::err << "ERROR: Output file not good." 
+      libMesh::err << "ERROR: Output file not good."
 		    << std::endl;
       libmesh_error();
     }
 
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
-  
+
   // already know these data, so initialize
   // them.  Does not hurt.
   this->_n_nodes      = mesh.n_nodes();
@@ -346,7 +346,7 @@ void UNVIO::write_implementation (std::ostream& out_file)
   this->_need_D_to_e  = false;
 
 
- 
+
   // we need the MeshData, otherwise we do not
   // know the foreign node id
   if (!this->_mesh_data.active())
@@ -377,11 +377,11 @@ void UNVIO::count_nodes (std::istream& in_file)
 {
   START_LOG("count_nodes()","UNVIO");
 
-  // if this->_n_nodes is not 0 the dataset 
+  // if this->_n_nodes is not 0 the dataset
   // has already been scanned
   if (this->_n_nodes != 0)
     {
-      libMesh::err << "Error: Trying to scan nodes twice!" 
+      libMesh::err << "Error: Trying to scan nodes twice!"
 		    << std::endl;
       libmesh_error();
     }
@@ -401,12 +401,12 @@ void UNVIO::count_nodes (std::istream& in_file)
       libmesh_error();
     }
 
- 
+
   // ignore the misc data for this node
-  in_file.ignore(256,'\n');	      
+  in_file.ignore(256,'\n');
 
 
-  
+
   // Now we are there to verify whether we need
   // to convert from D to e or not
   in_file >> data;
@@ -429,7 +429,7 @@ void UNVIO::count_nodes (std::istream& in_file)
     if (position!=std::string::npos) // npos means no position
       {
 	this->_need_D_to_e = true;
-	
+
 	if (this->verbose())
 	  libMesh::out << "  Convert from \"D\" to \"e\"" << std::endl;
       }
@@ -452,12 +452,12 @@ void UNVIO::count_nodes (std::istream& in_file)
   while (in_file.good())
     {
       // read the node label
-      in_file >> data; 
-	   	
+      in_file >> data;
+
       if (data == "-1")
 	// end of dataset is reached
 	break;
-      
+
       // ignore the remaining data (coord_sys_label, color etc)
       in_file.ignore (256, '\n');
       // ignore the coordinates
@@ -491,7 +491,7 @@ void UNVIO::count_elements (std::istream& in_file)
 
   if (this->_n_elements != 0)
     {
-      libMesh::err << "Error: Trying to scan elements twice!" 
+      libMesh::err << "Error: Trying to scan elements twice!"
 		    << std::endl;
       libmesh_error();
     }
@@ -500,7 +500,7 @@ void UNVIO::count_elements (std::istream& in_file)
   // Simply read the element
   // dataset for the @e only
   // purpose to count nodes!
-  
+
   std::string data;
   unsigned int fe_id;
 
@@ -508,11 +508,11 @@ void UNVIO::count_elements (std::istream& in_file)
     {
       // read element label
       in_file >> data;
-      
+
       // end of dataset?
-      if (data == "-1") 
+      if (data == "-1")
 	break;
-	
+
       // read fe_id
       in_file >> fe_id;
 
@@ -534,7 +534,7 @@ void UNVIO::count_elements (std::istream& in_file)
 	  in_file.ignore (256,'\n');
 	  in_file.ignore (256,'\n');
 	}
-     
+
       this->_n_elements++;
     }
 
@@ -571,13 +571,13 @@ void UNVIO::node_in (std::istream& in_file)
     }
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
-  
+
   unsigned int node_lab;           // label of the node
   unsigned int exp_coord_sys_num,  // export coordinate system number       (not supported yet)
                disp_coord_sys_num, // displacement coordinate system number (not supported yet)
                color;              // color                                 (not supported yet)
 
-  // allocate the correct amount 
+  // allocate the correct amount
   // of memory for the node vector
   this->_assign_nodes.reserve (this->_n_nodes);
 
@@ -586,7 +586,7 @@ void UNVIO::node_in (std::istream& in_file)
   // which dimensionality libMesh is in
   //std::vector<Real> xyz (3);
   Point xyz;
-      
+
   // depending on whether we have to convert each
   // coordinate (float), we offer two versions.
   // Note that \p count_nodes() already verified
@@ -615,8 +615,8 @@ void UNVIO::node_in (std::istream& in_file)
 
 	  // set up the id map
 	  this->_assign_nodes.push_back (node_lab);
-	  
-	  // add node to the Mesh & 
+
+	  // add node to the Mesh &
 	  // tell the MeshData object the foreign node id
 	  // (note that mesh.add_point() returns a pointer to the new node)
 	  this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz,i), node_lab);
@@ -641,8 +641,8 @@ void UNVIO::node_in (std::istream& in_file)
 
 	  // set up the id map
 	  this->_assign_nodes.push_back (node_lab);
-	  
-	  // add node to the Mesh & 
+
+	  // add node to the Mesh &
 	  // tell the MeshData object the foreign node id
 	  // (note that mesh.add_point() returns a pointer to the new node)
 	  this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz,i), node_lab);
@@ -706,18 +706,18 @@ void UNVIO::element_in (std::istream& in_file)
   // UNV is 1-based, we leave the 0th element of the vectors unused in order
   // to prevent confusion, this way we can store elements with up to 20 nodes
   unsigned int assign_elem_nodes[21];
-  
+
 
   // Get the beginning and end of the _assign_nodes vector
   // to eliminate repeated function calls
   const std::vector<unsigned int>::const_iterator it_begin =
     this->_assign_nodes.begin();
-  
+
   const std::vector<unsigned int>::const_iterator it_end   =
     this->_assign_nodes.end();
 
 
-      
+
   // read from the virtual file
   for (unsigned int i=0; i<this->_n_elements; i++)
     {
@@ -732,26 +732,26 @@ void UNVIO::element_in (std::istream& in_file)
 	in_file >> node_labels[j];       // read node labels
 
       Elem* elem = NULL;                 // element pointer
-      
+
       switch (fe_descriptor_id)
 	{
-	
+
 	case 41: // Plane Stress Linear Triangle
 	case 91: // Thin Shell   Linear Triangle
 	  {
 	    elem = new Tri3;  // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=2;
 	    assign_elem_nodes[3]=1;
 	    break;
 	  }
-	
+
 	case 42: // Plane Stress Quadratic Triangle
 	case 92: // Thin Shell   Quadratic Triangle
 	  {
 	    elem = new Tri6;  // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=5;
 	    assign_elem_nodes[3]=2;
@@ -760,33 +760,33 @@ void UNVIO::element_in (std::istream& in_file)
 	    assign_elem_nodes[6]=3;
 	    break;
 	  }
-	
+
 	case 43: // Plane Stress Cubic Triangle
 	  {
 	    libMesh::err << "ERROR: UNV-element type 43: Plane Stress Cubic Triangle"
-		          << " not supported." 
+		          << " not supported."
 		          << std::endl;
-	    libmesh_error();	    
+	    libmesh_error();
 	    break;
 	  }
-	
+
 	case 44: // Plane Stress Linear Quadrilateral
 	case 94: // Thin Shell   Linear Quadrilateral
 	  {
 	    elem = new Quad4; // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=3;
 	    assign_elem_nodes[3]=2;
 	    assign_elem_nodes[4]=1;
 	    break;
 	  }
-	
+
 	case 45: // Plane Stress Quadratic Quadrilateral
 	case 95: // Thin Shell   Quadratic Quadrilateral
 	  {
 	    elem = new Quad8; // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=7;
 	    assign_elem_nodes[3]=3;
@@ -797,11 +797,11 @@ void UNVIO::element_in (std::istream& in_file)
 	    assign_elem_nodes[8]=4;
 	    break;
 	  }
-	
+
 	case 300: // Thin Shell   Quadratic Quadrilateral (nine nodes)
 	  {
 	    elem = new Quad9; // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=7;
 	    assign_elem_nodes[3]=3;
@@ -813,20 +813,20 @@ void UNVIO::element_in (std::istream& in_file)
 	    assign_elem_nodes[9]=8;
 	    break;
 	  }
-	
+
 	case 46: // Plane Stress Cubic Quadrilateral
 	  {
 	    libMesh::err << "ERROR: UNV-element type 46: Plane Stress Cubic Quadrilateral"
-		          << " not supported." 
+		          << " not supported."
 		          << std::endl;
 	    libmesh_error();
 	    break;
 	  }
-	
+
 	case 111: // Solid Linear Tetrahedron
 	  {
 	    elem = new Tet4;  // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=1;
 	    assign_elem_nodes[3]=2;
@@ -837,7 +837,7 @@ void UNVIO::element_in (std::istream& in_file)
 	case 112: // Solid Linear Prism
 	  {
 	    elem = new Prism6;  // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=1;
 	    assign_elem_nodes[3]=2;
@@ -846,11 +846,11 @@ void UNVIO::element_in (std::istream& in_file)
 	    assign_elem_nodes[6]=5;
 	    break;
 	  }
-	
+
 	case 115: // Solid Linear Brick
 	  {
 	    elem = new Hex8;  // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=4;
 	    assign_elem_nodes[3]=5;
@@ -861,11 +861,11 @@ void UNVIO::element_in (std::istream& in_file)
 	    assign_elem_nodes[8]=2;
 	    break;
 	  }
-		
+
 	case 116: // Solid Quadratic Brick
 	  {
 	    elem = new Hex20; // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=12;
 	    assign_elem_nodes[3]=4;
@@ -889,21 +889,21 @@ void UNVIO::element_in (std::istream& in_file)
 	    assign_elem_nodes[19]=2;
 	    assign_elem_nodes[20]=10;
 	    break;
-	  }	
-	
+	  }
+
 	case 117: // Solid Cubic Brick
 	  {
 	    libMesh::err << "Error: UNV-element type 117: Solid Cubic Brick"
-		          << " not supported." 
+		          << " not supported."
 		          << std::endl;
-	    libmesh_error();	    
+	    libmesh_error();
 	    break;
 	  }
-	
+
 	case 118: // Solid Quadratic Tetrahedron
 	  {
 	    elem = new Tet10; // create new element
-	    
+
 	    assign_elem_nodes[1]=0;
 	    assign_elem_nodes[2]=4;
 	    assign_elem_nodes[3]=1;
@@ -915,15 +915,15 @@ void UNVIO::element_in (std::istream& in_file)
 	    assign_elem_nodes[9]=9;
 	    assign_elem_nodes[10]=3;
 	    break;
-	  }	
-	
+	  }
+
 	default: // Unrecognized element type
 	  {
-	    libMesh::err << "ERROR: UNV-element type " 
+	    libMesh::err << "ERROR: UNV-element type "
 		          << fe_descriptor_id
-		          << " not supported." 
+		          << " not supported."
 		      << std::endl;
-	    libmesh_error();	    
+	    libmesh_error();
 	    break;
 	  }
 	}
@@ -933,7 +933,7 @@ void UNVIO::element_in (std::istream& in_file)
 	{
 	  // Find the position of node_labels[j] in the _assign_nodes vector.
 	  const std::pair<std::vector<unsigned int>::const_iterator,
-	                  std::vector<unsigned int>::const_iterator>	    
+	                  std::vector<unsigned int>::const_iterator>
 	    it = std::equal_range (it_begin,
 				   it_end,
 				   node_labels[j]);
@@ -951,14 +951,14 @@ void UNVIO::element_in (std::istream& in_file)
 
 	  // Make sure we didn't get an out-of-bounds id
 	  libmesh_assert (assigned_node < this->_n_nodes);
-	  
+
 	  elem->set_node(assign_elem_nodes[j]) =
 	    mesh.node_ptr(assigned_node);
 	}
 
       elems_of_dimension[elem->dim()] = true;
 
-      // add elem to the Mesh & 
+      // add elem to the Mesh &
       // tell the MeshData object the foreign elem id
       // (note that mesh.add_elem() returns a pointer to the new element)
       elem->set_id(i);
@@ -975,7 +975,7 @@ void UNVIO::element_in (std::istream& in_file)
 
 void UNVIO::node_out (std::ostream& out_file)
 {
-  
+
   libmesh_assert (this->_mesh_data.active() ||
 	  this->_mesh_data.compatibility_mode());
 
@@ -985,7 +985,7 @@ void UNVIO::node_out (std::ostream& out_file)
 
   // Write beginning of dataset
   out_file << "    -1\n"
-	   << "  " 
+	   << "  "
 	   << _label_dataset_nodes
 	   << '\n';
 
@@ -1003,9 +1003,9 @@ void UNVIO::node_out (std::ostream& out_file)
   for (; nd != end; ++nd)
     {
       const Node* current_node = *nd;
-      
+
       char buf[78];
-      std::sprintf(buf, "%10d%10d%10d%10d\n", 
+      std::sprintf(buf, "%10d%10d%10d%10d\n",
 		   this->_mesh_data.node_to_foreign_id(current_node),
 		   exp_coord_sys_dummy,
 		   disp_coord_sys_dummy,
@@ -1014,22 +1014,22 @@ void UNVIO::node_out (std::ostream& out_file)
 
       // the coordinates
       if (mesh.spatial_dimension() == 3)
-	std::sprintf(buf, "%25.16E%25.16E%25.16E\n", 
+	std::sprintf(buf, "%25.16E%25.16E%25.16E\n",
 		     static_cast<double>((*current_node)(0)),
 		     static_cast<double>((*current_node)(1)),
 		     static_cast<double>((*current_node)(2)));
       else if (mesh.spatial_dimension() == 2)
-	std::sprintf(buf, "%25.16E%25.16E\n", 
+	std::sprintf(buf, "%25.16E%25.16E\n",
 		     static_cast<double>((*current_node)(0)),
 		     static_cast<double>((*current_node)(1)));
       else
-	std::sprintf(buf, "%25.16E\n", 
+	std::sprintf(buf, "%25.16E\n",
 		     static_cast<double>((*current_node)(0)));
-      
+
       out_file << buf;
     }
-  
-  
+
+
   // Write end of dataset
   out_file << "    -1\n";
 }
@@ -1046,14 +1046,14 @@ void UNVIO::element_out(std::ostream& out_file)
 
   if (this->verbose())
     libMesh::out << "  Writing elements" << std::endl;
-  
+
   // Write beginning of dataset
   out_file << "    -1\n"
-	   << "  " 
+	   << "  "
 	   << _label_dataset_elements
 	   << "\n";
 
-  unsigned long int fe_descriptor_id = 0;    // FE descriptor id 
+  unsigned long int fe_descriptor_id = 0;    // FE descriptor id
   unsigned long int phys_prop_tab_dummy = 2; // physical property (not supported yet)
   unsigned long int mat_prop_tab_dummy = 1;  // material property (not supported yet)
   unsigned long int color_dummy = 7;         // color (not supported yet)
@@ -1061,13 +1061,13 @@ void UNVIO::element_out(std::ostream& out_file)
 
   // vector that assigns element nodes to their correct position
   // currently only elements with up to 20 nodes
-  //  
+  //
   // Example:
   // QUAD4               | 44:plane stress
   //                     | linear quad
   // position in libMesh | UNV numbering
   // (note: 0-based)     | (note: 1-based)
-  //     
+  //
   // assign_elem_node[0]  = 0
   // assign_elem_node[1]  = 3
   // assign_elem_node[2]  = 2
@@ -1087,10 +1087,10 @@ void UNVIO::element_out(std::ostream& out_file)
       const Elem* elem = *it;
 
       elem->n_nodes();
-      
+
       switch (elem->type())
 	{
-	
+
 	case TRI3:
 	  {
 	    fe_descriptor_id = 41; // Plane Stress Linear Triangle
@@ -1111,7 +1111,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	    assign_elem_nodes[5] = 3;
 	    break;
 	  }
-	  
+
 	case QUAD4:
 	  {
 	    fe_descriptor_id = 44; // Plane Stress Linear Quadrilateral
@@ -1121,7 +1121,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	    assign_elem_nodes[3] = 1;
 	    break;
 	  }
-	
+
 	case QUAD8:
 	  {
 	    fe_descriptor_id = 45; // Plane Stress Quadratic Quadrilateral
@@ -1135,7 +1135,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	    assign_elem_nodes[7] = 4;
 	    break;
 	  }
-	
+
 	case QUAD9:
 	  {
 	    fe_descriptor_id = 300; // Plane Stress Quadratic Quadrilateral
@@ -1150,7 +1150,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	    assign_elem_nodes[8] = 8;
 	    break;
 	  }
-	
+
 	case TET4:
 	  {
 	    fe_descriptor_id = 111; // Solid Linear Tetrahedron
@@ -1186,7 +1186,7 @@ void UNVIO::element_out(std::ostream& out_file)
 	    assign_elem_nodes[7] = 2;
 	    break;
 	  }
-	
+
 	case HEX20:
 	  {
 	    fe_descriptor_id = 116; // Solid Quadratic Brick
@@ -1216,7 +1216,7 @@ void UNVIO::element_out(std::ostream& out_file)
 
 	    break;
 	  }
-		
+
 	case TET10:
 	  {
 	    fe_descriptor_id = 118; // Solid Quadratic Tetrahedron
@@ -1232,15 +1232,15 @@ void UNVIO::element_out(std::ostream& out_file)
 	    assign_elem_nodes[9] = 3;
 	    break;
 	  }
-		
+
 	default:
 	  {
-	    libMesh::err << "ERROR: Element type = " 
-		          << elem->type() 
+	    libMesh::err << "ERROR: Element type = "
+		          << elem->type()
 		          << " not supported in "
 		          << "UNVIO!"
 		          << std::endl;
-	    libmesh_error();	
+	    libmesh_error();
 	    break;
 	  }
 	}
@@ -1248,9 +1248,9 @@ void UNVIO::element_out(std::ostream& out_file)
 
       out_file << std::setw(10) << this->_mesh_data.elem_to_foreign_id(elem)  // element ID
 	       << std::setw(10) << fe_descriptor_id                           // type of element
-	       << std::setw(10) << phys_prop_tab_dummy                        // not supported 
-	       << std::setw(10) << mat_prop_tab_dummy                         // not supported 
-	       << std::setw(10) << color_dummy                                // not supported 
+	       << std::setw(10) << phys_prop_tab_dummy                        // not supported
+	       << std::setw(10) << mat_prop_tab_dummy                         // not supported
+	       << std::setw(10) << color_dummy                                // not supported
 	       << std::setw(10) << elem->n_nodes()                            // No. of nodes per element
 	       << '\n';
 

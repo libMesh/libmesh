@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -56,11 +56,11 @@ namespace Parallel {
 	  if (v[i] < v[i-1])
 	    return false;
 
-	return true;    
+	return true;
       }
 
     /**
-     * A utility function which converts whatever \p KeyType is to 
+     * A utility function which converts whatever \p KeyType is to
      * a \p double for the histogram bounds
      */
     template <typename KeyType>
@@ -71,8 +71,8 @@ namespace Parallel {
       }
 
     /**
-     * A utility to convert a \p double to some 
-     * sort of \p KeyType, for interpreting how 
+     * A utility to convert a \p double to some
+     * sort of \p KeyType, for interpreting how
      * histogram bounds relate to \p KeyType
      * positions.
      */
@@ -94,7 +94,7 @@ namespace Parallel {
 
     template <>
       inline
-      Hilbert::HilbertIndices 
+      Hilbert::HilbertIndices
       to_key_type (const double f)
       {
 	Hilbert::HilbertIndices bvt;

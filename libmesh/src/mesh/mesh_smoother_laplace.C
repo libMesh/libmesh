@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -86,7 +86,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 {
   if (!_initialized)
     this->init();
-  
+
   // Don't smooth the nodes on the boundary...
   // this would change the mesh geometry which
   // is probably not something we want!
@@ -107,7 +107,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   for (unsigned int n=0; n<n_iterations; n++)
     {
       new_positions.resize(_mesh.n_nodes());
-      
+
       {
 	MeshBase::node_iterator       it     = _mesh.local_nodes_begin();
 	const MeshBase::node_iterator it_end = _mesh.local_nodes_end();
@@ -150,7 +150,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 	      } // end if
 	  } // end for
       } // end scope
-      
+
 
       // now update the node positions (local node positions only)
       {
@@ -159,7 +159,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 	for (; it != it_end; ++it)
 	  {
 	    Node* node = *it;
-	  
+
 	    if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0))
 	      {
 		// Should call Point::op=
@@ -181,8 +181,8 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   // these nodes will be located between their adjacent nodes
   // do this element-wise
   MeshBase::element_iterator       el  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator end = _mesh.active_elements_end(); 
-	
+  const MeshBase::element_iterator end = _mesh.active_elements_end();
+
   for (; el != end; ++el)
     {
       // Constant handle for the element
@@ -192,7 +192,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
       // their element indices start at n_vertices and go to n_nodes
       const unsigned int son_begin = elem->n_vertices();
       const unsigned int son_end   = elem->n_nodes();
-      
+
       // loop over all second order nodes (son)
       for (unsigned int son=son_begin; son<son_end; son++)
         {
@@ -223,26 +223,26 @@ void LaplaceMeshSmoother::init()
 {
   switch (_mesh.mesh_dimension())
     {
-      
+
       // TODO:[BSK] Fix this to work for refined meshes...  I think
       // the implementation was done quickly for Damien, who did not have
       // refined grids.  Fix it here and in the original Mesh member.
-      
+
     case 2: // Stolen directly from build_L_graph in mesh_base.C
       {
 	// Initialize space in the graph.  It is n_nodes long.  Each
 	// node may be connected to an arbitrary number of other nodes
 	// via edges.
 	_graph.resize(_mesh.n_nodes());
-	
+
 	MeshBase::element_iterator       el  = _mesh.active_local_elements_begin();
 	const MeshBase::element_iterator end = _mesh.active_local_elements_end();
-	
+
 	for (; el != end; ++el)
 	  {
 	    // Constant handle for the element
 	    const Elem* elem = *el;
-	    
+
 	    for (unsigned int s=0; s<elem->n_neighbors(); s++)
 	      {
 		// Only operate on sides which are on the
@@ -266,7 +266,7 @@ void LaplaceMeshSmoother::init()
       {
 	// Initialize space in the graph.
 	_graph.resize(_mesh.n_nodes());
-	
+
 	MeshBase::element_iterator       el  = _mesh.active_local_elements_begin();
 	const MeshBase::element_iterator end = _mesh.active_local_elements_end();
 
@@ -274,20 +274,20 @@ void LaplaceMeshSmoother::init()
 	  {
 	    // Shortcut notation for simplicity
 	    const Elem* elem = *el;
-	    
+
 	    for (unsigned int f=0; f<elem->n_neighbors(); f++) // Loop over faces
 	      if ((elem->neighbor(f) == NULL) ||
 		  (elem->id() > elem->neighbor(f)->id()))
 		{
 		  // We need a full (i.e. non-proxy) element for the face, since we will
-		  // be looking at its sides as well! 
+		  // be looking at its sides as well!
 		  AutoPtr<Elem> face = elem->build_side(f, /*proxy=*/false);
-		
+
 		  for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
 		    {
 		      // Here we can use a proxy
 		      AutoPtr<Elem> side = face->build_side(s);
-		    
+
 		      // At this point, we just insert the node numbers
 		      // again.  At the end we'll call sort and unique
 		      // to make sure there are no duplicates

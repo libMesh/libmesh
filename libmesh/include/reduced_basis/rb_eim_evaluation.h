@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -75,7 +75,7 @@ public:
    * @return the EIM a posteriori error bound.
    */
   virtual Real rb_solve(unsigned int N);
-  
+
   /**
    * Calculate the EIM approximation for the given
    * right-hand side vector \p EIM_rhs. Store the
@@ -100,7 +100,7 @@ public:
    * to initialize the system for Online solves.
    */
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
-  
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -110,22 +110,22 @@ public:
 
   /**
    * Dense matrix that stores the lower triangular
-   * interpolation matrix that can be used 
+   * interpolation matrix that can be used
    */
   DenseMatrix<Number> interpolation_matrix;
-  
+
   /**
-   * The list of interpolation points, i.e. locations at 
+   * The list of interpolation points, i.e. locations at
    * which the basis functions are maximized.
    */
   std::vector<Point> interpolation_points;
-  
+
   /**
    * The corresponding list of variables indices at which
    * the interpolation points were identified.
    */
   std::vector<unsigned int> interpolation_points_var;
-  
+
   /**
    * We also need an extra interpolation point and associated
    * variable for the "extra" solve we do at the end of
@@ -133,7 +133,7 @@ public:
    */
   Point extra_interpolation_point;
   unsigned int extra_interpolation_point_var;
-  
+
   /**
    * We also need a DenseVector to represent the corresponding
    * "extra" row of the interpolation matrix.

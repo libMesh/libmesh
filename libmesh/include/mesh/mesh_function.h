@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -48,7 +48,7 @@ class PointLocatorBase;
 
 /**
  * This class provides function-like objects for data
- * distributed over a mesh.  
+ * distributed over a mesh.
  *
  * @author Daniel Dreyer, 2003
  */
@@ -116,14 +116,14 @@ public:
    * @returns the value of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
-  Number operator() (const Point& p, 
+  Number operator() (const Point& p,
 		     const Real time=0.);
 
   /**
    * @returns the first derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
-  Gradient gradient (const Point& p, 
+  Gradient gradient (const Point& p,
 		     const Real time=0.);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -131,7 +131,7 @@ public:
    * @returns the second derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
-  Tensor hessian (const Point& p, 
+  Tensor hessian (const Point& p,
 		  const Real time=0.);
 #endif
 
@@ -216,7 +216,7 @@ protected:
   const DofMap& _dof_map;
 
   /**
-   * The indices of the variables within the other system 
+   * The indices of the variables within the other system
    * for which data are to be gathered.
    */
   const std::vector<unsigned int> _system_vars;

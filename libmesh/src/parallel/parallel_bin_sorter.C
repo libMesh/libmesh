@@ -2,17 +2,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -59,7 +59,7 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
 				  KeyType min)
 {
   libmesh_assert (min < max);
-  
+
   // Build a histogram in parallel from our data.
   // Use this to create quasi-uniform bins.
   Parallel::Histogram<KeyType> phist (data);
@@ -78,22 +78,22 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
     unsigned int global_data_size = local_data_size;
 
     Parallel::sum(global_data_size);
-    
+
     std::vector<unsigned int> target_bin_size (nbins, global_data_size / nbins);
-    
+
     // Equally distribute the remainder
     for (unsigned int i=0; i<(global_data_size % nbins); i++)
       ++target_bin_size[i];
-    
+
     // Set the iterators corresponding to the bin boundaries
     {
       std::vector<double> bin_bounds (nbins+1);
       bin_iters.resize  (nbins+1, data.begin());
-      
+
       // Set the minimum bin boundary iterator
       bin_iters[0]  = data.begin();
       bin_bounds[0] = Parallel::Utils::to_double(min);
-      
+
       // The current location in the histogram
       unsigned int current_histogram_bin = 0;
 
@@ -103,30 +103,30 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
       // accept a slightly larger size for the next bin,
       // the goal being to keep the whole mess average
       int delta = 0;
-      
+
       // Set the internal bin boundary iterators
       for (unsigned int b=0; b<nbins; ++b)
 	{
 	  // The size of bin b.  We want this to
 	  // be ~= target_bin_size[b]
 	  int current_bin_size = 0;
-	  
+
 	  // Step through the histogram until we have the
-	  // desired bin size	  
+	  // desired bin size
 	  while ((current_bin_size + histogram[current_histogram_bin] + delta) <= target_bin_size[b])
 	    {
 	      // Don't index out of the histogram!
 	      if ((current_histogram_bin+1) == phist.n_bins())
 		break;
-	      
+
 	      current_bin_size += histogram[current_histogram_bin++];
 	    }
-	  
+
 	  delta += current_bin_size - target_bin_size[b];
-	  
+
 	  // Set the upper bound of the bin
-	  bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);	  
-	  bin_iters[b+1]  = std::lower_bound(bin_iters[b], data.end(), 
+	  bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
+	  bin_iters[b+1]  = std::lower_bound(bin_iters[b], data.end(),
 					     Parallel::Utils::to_key_type<KeyType>(bin_bounds[b+1]));
 	}
 
@@ -136,7 +136,7 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
     }
   }
 }
-  
+
 }
 
 
