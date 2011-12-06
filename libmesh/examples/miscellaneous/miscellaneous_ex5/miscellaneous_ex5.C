@@ -586,7 +586,9 @@ int main (int argc, char** argv)
   // Write out the solution
   // After solving the system write the solution
   // to a ExodusII-formatted plot file.
+#ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO (mesh).write_discontinuous_exodusII("lshaped_dg.e",equation_system);
+#endif
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
   
