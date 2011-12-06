@@ -32,9 +32,6 @@ DifferentiableSystem::DifferentiableSystem
                        const std::string& name,
                        const unsigned int number) :
   Parent      (es, name, number),
-  compute_internal_sides(false),
-  postprocess_sides(false),
-  assemble_qoi_sides(false),
   time_solver (NULL),
   deltat(1.),
   print_solution_norms(false),
@@ -58,7 +55,9 @@ DifferentiableSystem::~DifferentiableSystem ()
 
 void DifferentiableSystem::clear ()
 {
-  _time_evolving.resize(0);
+  this->clear_physics();
+
+  this->clear_qoi();
 
   use_fixed_solution = false;
 }
@@ -79,8 +78,8 @@ void DifferentiableSystem::reinit ()
 
 void DifferentiableSystem::init_data ()
 {
-  // give us flags for every variable that might be time evolving
-  _time_evolving.resize(this->n_vars(), false);
+  // Do any initialization our physics needs
+  this->init_physics(*this);
 
   // Do any initialization our solvers need
   libmesh_assert(time_solver.get() != NULL);
@@ -97,11 +96,10 @@ AutoPtr<DiffContext> DifferentiableSystem::build_context ()
 {
   AutoPtr<DiffContext> ap(new DiffContext(*this));
 
-  ap->set_deltat_pointer( &deltat );
+  ap->set_deltat_pointer( &this->deltat );
 
   return ap;
 }
-
 
 
 void DifferentiableSystem::assemble ()
