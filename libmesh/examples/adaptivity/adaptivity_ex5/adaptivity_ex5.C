@@ -286,18 +286,26 @@ int main (int argc, char** argv)
   if(!read_solution)
   {
     // Write out the initial condition
+#ifdef LIBMESH_HAVE_GMV
     GMVIO(mesh).write_equation_systems ("out.gmv.000",
                                         equation_systems);
+#endif
+#ifdef LIBMESH_HAVE_EXODUS_API
     ExodusII_IO(mesh).write_equation_systems ("out.e.000",
                                         equation_systems);
+#endif
   }
   else
   {
     // Write out the solution that was read in
+#ifdef LIBMESH_HAVE_GMV
     GMVIO(mesh).write_equation_systems ("solution_read_in.gmv",
                                         equation_systems);
+#endif
+#ifdef LIBMESH_HAVE_EXODUS_API
     ExodusII_IO(mesh).write_equation_systems ("solution_read_in.e",
                                         equation_systems);
+#endif
   }
   
 
@@ -469,15 +477,19 @@ int main (int argc, char** argv)
         {
           OStringStream file_name, exodus_file_name;
 
+#ifdef LIBMESH_HAVE_GMV
           file_name << "out.gmv.";
           OSSRealzeroright(file_name,3,0,t_step+1);
 
           GMVIO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);
+#endif
+#ifdef LIBMESH_HAVE_EXODUS_API
           exodus_file_name << "out.e.";
           OSSRealzeroright(exodus_file_name,3,0,t_step+1);
           ExodusII_IO(mesh).write_equation_systems (exodus_file_name.str(),
                                               equation_systems);
+#endif
         }
     }
 
@@ -493,10 +505,14 @@ int main (int argc, char** argv)
 
       mesh.write("saved_mesh.xda");
       equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
+#ifdef LIBMESH_HAVE_GMV
       GMVIO(mesh).write_equation_systems ("saved_solution.gmv",
                                           equation_systems);
+#endif
+#ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(mesh).write_equation_systems ("saved_solution.e",
                                           equation_systems);
+#endif
     }
 #endif // #ifndef LIBMESH_ENABLE_AMR
   

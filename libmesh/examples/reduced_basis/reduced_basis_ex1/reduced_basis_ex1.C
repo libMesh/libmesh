@@ -197,12 +197,16 @@ int main (int argc, char** argv)
       
       // Plot the solution
       rb_con.load_rb_solution();
+#ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
+#endif
       
       // Plot the first basis function that was generated from the train_reduced_basis
       // call in the Offline stage
       rb_con.load_basis_function(0);
+#ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(mesh).write_equation_systems ("bf0.e",equation_systems);
+#endif
     }
   }
 
