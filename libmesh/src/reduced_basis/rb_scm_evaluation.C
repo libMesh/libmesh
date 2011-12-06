@@ -227,7 +227,7 @@ Real RBSCMEvaluation::get_SCM_LB()
   unsigned int matrix_size = n_rows*rb_theta_expansion->get_Q_a();
   std::vector<int> ia(matrix_size+1);
   std::vector<int> ja(matrix_size+1);
-  std::vector<Real> ar(matrix_size+1);
+  std::vector<double> ar(matrix_size+1);
   unsigned int count=0;
   for(unsigned int m=0; m<n_rows; m++)
   {
