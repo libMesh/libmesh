@@ -35,6 +35,8 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
+// <h1>Reduced Basis: Example 3</h1>
+
 // In this example problem we use the Certified Reduced Basis method
 // to solve a transient convection-diffusion problem on the unit square.
 // The PDE is similar to reduced_basis_ex1, except there is a time-derivative
