@@ -37,8 +37,8 @@ using namespace libMesh;
 
 // In this example problem we use the Certified Reduced Basis method
 // to solve a transient convection-diffusion problem on the unit square.
-// The PDE is similar to Ex23, except there is a time-derivative in this
-// case.
+// The PDE is similar to reduced_basis_ex1, except there is a time-derivative
+// in this case.
 
 // The main program.
 int main (int argc, char** argv)
