@@ -53,7 +53,7 @@ using namespace libMesh;
 // reduced basis space is generated and written out to the directory
 // "offline_data". In Online mode, the reduced basis data in "offline_data"
 // is read in and used to solve the reduced problem for the parameters
-// specified in reduced_basis_ex01.in.
+// specified in reduced_basis_ex1.in.
 
 // We also attach four outputs to the system which are averages over certain
 // subregions of the domain. In Online mode, we print out the values of these

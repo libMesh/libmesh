@@ -3,8 +3,8 @@
 n_elem = 25                    # The number of elements in each dimension in the truth mesh
 store_basis_functions = true   # Do we store the basis functions in the offline_data directory once Offline finishes?
 
-online_N = 20         # If we're in Online mode, the number of basis functions we use for the reduced basis solve
-online_mu = '1 0.79' # Parameter vector for an Online solve
+online_N = 20         # If we're in online mode, the number of basis functions we use for the reduced basis solve
+online_mu = '1 0.79'  # Parameter vector for an Online solve
 
 # ========= RB system parameters =========
 
@@ -25,5 +25,5 @@ n_training_samples = 100    # The number of parameters in training set (must be 
 
 n_time_steps = 100  # The number of time steps
 delta_t = 0.01      # The time step size
-euler_theta = 1     # Generalized Euler method parameter, euler_theta=1 implies backward Euler
+euler_theta = 1     # Generalized Euler method parameter in [0,1], euler_theta=1 implies backward Euler
 

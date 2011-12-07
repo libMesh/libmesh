@@ -41,12 +41,12 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// In this example we extend ex23 to solve a steady convection-diffusion problem
-// on the unit square via the Reduced Basis Method. In this case, we modify the
-// PDE so that it no longer has a constant coercivity constant. Therefore, in
-// order to obtain an error bound, we need to employ the Successive Constraint
+// In this example we extend reduced_basis_ex1 to solve a steady convection-diffusion
+// problem on the unit square via the Reduced Basis Method. In this case, we modify the
+// PDE so that it no longer has a parameter-independent coercivity constant. Therefore,
+// in order to obtain an error bound, we need to employ the Successive Constraint
 // Method (SCM) implemented in RBSCMConstruction/RBSCMEvaluation to obtain a
-// lower bound for the coercivity constant.
+// parameter-dependent lower bound for the coercivity constant.
 
 // The PDE being solved is div(k*grad(u)) + Beta*grad(u) = f
 // k is the diffusion coefficient :
