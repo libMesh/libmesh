@@ -41,6 +41,8 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
+// <h1>Reduced Basis: Example 2</h1>
+
 // In this example we extend reduced_basis_ex1 to solve a steady convection-diffusion
 // problem on the unit square via the Reduced Basis Method. In this case, we modify the
 // PDE so that it no longer has a parameter-independent coercivity constant. Therefore,
