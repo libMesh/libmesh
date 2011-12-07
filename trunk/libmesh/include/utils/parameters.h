@@ -66,20 +66,20 @@ public:
   /**
    * Destructor.  Clears any allocated memory.
    */
-  ~Parameters ();
+  virtual ~Parameters ();
 
   /**
    * Assignment operator.  Removes all parameters in \p this
    * and inserts copies of all parameters from \p source
    */
-  Parameters& operator= (const Parameters& source);
+  virtual Parameters& operator= (const Parameters& source);
 
   /**
    * Addition/Assignment operator.  Inserts copies of all parameters
    * from \p source.  Any parameters of the same name already in \p
    * this are replaced.
    */
-  Parameters& operator+= (const Parameters& source);
+  virtual Parameters& operator+= (const Parameters& source);
 
   /**
    * @returns \p true if a parameter of type \p T
@@ -99,6 +99,14 @@ public:
   const T& get (const std::string&) const;
 
   /**
+   * Inserts a new Parameter into the object but does not return
+   * a writable reference.  The value of the newly inserted
+   * parameter may not be valid.
+   */
+  template <typename T>
+  void insert (const std::string&);
+
+  /**
    * @returns a writeable reference to the specified parameter.
    * This method will create the parameter if it does not exist,
    * so it can be used to define parameters which will later be
@@ -106,6 +114,12 @@ public:
    */
   template <typename T>
   T& set (const std::string&);
+
+  /**
+   * Overridable function to set any extended attributes for
+   * classes inheriting from this class.
+   */
+  virtual void set_attributes(const std::string&, bool /*inserted_only*/) {}
 
   /**
    * Removes the specified parameter from the list, if it exists.
@@ -128,7 +142,7 @@ public:
   /**
    * Clears internal data structures & frees any allocated memory.
    */
-  void clear ();
+  virtual void clear ();
 
   /**
    * Prints the contents, by default to libMesh::out.
@@ -246,7 +260,7 @@ public:
    */
   const_iterator end() const;
 
-private:
+protected:
 
   /**
    * Data structure to map names with values.
@@ -434,6 +448,15 @@ const T& Parameters::get (const std::string& name) const
   return libmesh_cast_ptr<Parameter<T>*>(it->second)->get();
 }
 
+template <typename T>
+inline
+void Parameters::insert (const std::string &name)
+{
+  if (!this->have_parameter<T>(name))
+    _values[name] = new Parameter<T>;
+
+  set_attributes(name, true);
+}
 
 
 template <typename T>
@@ -443,10 +466,10 @@ T& Parameters::set (const std::string& name)
   if (!this->have_parameter<T>(name))
     _values[name] = new Parameter<T>;
 
+  set_attributes(name, false);
+
   return libmesh_cast_ptr<Parameter<T>*>(_values[name])->set();
 }
-
-
 
 inline
 void Parameters::remove (const std::string& name)
