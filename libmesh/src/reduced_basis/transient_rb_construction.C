@@ -1101,7 +1101,8 @@ void TransientRBConstruction::enrich_RB_space()
   {
     libMesh::out << "eigenvalue " << i << " = " << W[eigen_size-1-i] << std::endl;
   }
-  libMesh::out << "eigenvalue K = " << W[0] << std::endl;
+  libMesh::out << "..." << std::endl;// << "." << std::endl << "." << std::endl;
+  libMesh::out << "last eigenvalue = " << W[0] << std::endl;
   libMesh::out << std::endl;
 
   // Now load the new basis functions
