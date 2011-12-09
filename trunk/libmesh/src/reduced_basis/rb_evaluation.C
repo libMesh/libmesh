@@ -41,6 +41,14 @@ RBEvaluation::RBEvaluation ()
   evaluate_RB_error_bound(true),
   compute_RB_inner_product(false)
 {
+  // initialize the string that defines the libMesh version information
+  // required for basis function IO
+  // This string generation code is the same as in System::read_header
+  io_version_string = "libMesh-0.7.2";
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  io_version_string += " with infinite elements";
+#endif
+
 }
 
 RBEvaluation::~RBEvaluation()
@@ -983,7 +991,7 @@ void RBEvaluation::write_out_basis_functions(System& sys,
   file_name << directory_name << "/bf_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
                   write_binary_basis_functions ? ENCODE : WRITE);
-  sys.write_header(header_data, "", false);
+  sys.write_header(header_data, io_version_string, false);
 
   // Use System::write_serialized_data to write out the basis functions
   // by copying them into this->solution one at a time.
@@ -1025,7 +1033,7 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   file_name << directory_name << "/bf_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
                   read_binary_basis_functions ? DECODE : READ);
-  sys.read_header(header_data, "", false);
+  sys.read_header(header_data, io_version_string, false);
 
   // Use System::read_serialized_data to read in the basis functions
   // into this->solution and then swap with the appropriate
