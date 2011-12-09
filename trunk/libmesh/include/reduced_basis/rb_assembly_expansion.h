@@ -61,10 +61,22 @@ public:
   void attach_A_q_assembly(ElemAssembly* A_q_assembly);
 
   /**
+   * Attach multiple ElemAssembly objects for the left-hand side
+   * (both interior and boundary assembly).
+   */
+  void attach_multiple_A_q_assembly(std::vector<ElemAssembly*> A_q_assembly);
+
+  /**
    * Attach ElemAssembly object for the right-hand side
    * (both interior and boundary assembly).
    */
   void attach_F_q_assembly(ElemAssembly* F_q_assembly);
+
+  /**
+   * Attach multiple ElemAssembly objects for the right-hand side
+   * (both interior and boundary assembly).
+   */
+  void attach_multiple_F_q_assembly(std::vector<ElemAssembly*> F_q_assembly);
 
   /**
    * Attach ElemAssembly object for an output

@@ -53,6 +53,11 @@ public:
   RBEIMEvaluation (RBEIMConstruction& rb_eim_con_in);
 
   /**
+   * Destructor.
+   */
+  virtual ~RBEIMEvaluation ();
+
+  /**
    * The type of the parent.
    */
   typedef RBEvaluation Parent;
@@ -84,10 +89,11 @@ public:
   void rb_solve(DenseVector<Number>& EIM_rhs);
 
   /**
-   * Build a new RBTheta object that accesses the i^th component
+   * Build a vector of RBTheta objects that accesses the components
    * of the RB_solution member variable of this RBEvaluation.
+   * Store these objects in the member vector rb_theta_objects.
    */
-  AutoPtr<RBTheta> build_rb_eim_theta(const unsigned int index);
+  void initialize_rb_theta_objects();
 
   /**
    * Write out all the data to text files in order to segregate the
@@ -139,6 +145,17 @@ public:
    * "extra" row of the interpolation matrix.
    */
   DenseVector<Number> extra_interpolation_matrix_row;
+  
+  /**
+   * The vector of RBTheta objects that are created to point to
+   * this RBEIMEvaluation.
+   */
+  std::vector<RBTheta*> rb_eim_theta_vector;
+
+  /**
+   * We initialize RBEIMEvaluation so that it has an "empty" RBAssemblyExpansion.
+   */
+  RBThetaExpansion empty_rb_theta_expansion;
 
 };
 

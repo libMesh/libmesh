@@ -27,7 +27,7 @@
 #include "dof_map.h"
 #include "libmesh_logging.h"
 #include "equation_systems.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "linear_solver.h"
 #include "getpot.h"
 #include "mesh_base.h"
@@ -290,6 +290,14 @@ void RBConstruction::print_info()
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
   libMesh::out << "parameter initialized to: " << std::endl;
   print_current_parameters();
+}
+
+RBAssemblyExpansion& RBConstruction::get_rb_assembly_expansion()
+{
+  // Assert that the expansion object is not NULL
+  libmesh_assert(rb_assembly_expansion);
+
+  return *rb_assembly_expansion;
 }
 
 void RBConstruction::initialize_rb_construction()
@@ -1186,9 +1194,10 @@ Real RBConstruction::truth_solve(int plot_solution)
 
   if(plot_solution > 0)
   {
-    const MeshBase& mesh = get_mesh();
-    GMVIO(mesh).write_equation_systems ("truth.gmv",
-                                        this->get_equation_systems());
+#ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO(get_mesh()).write_equation_systems ("truth.e",
+                                              this->get_equation_systems());
+#endif
   }
 
   // Get the X norm of the truth solution

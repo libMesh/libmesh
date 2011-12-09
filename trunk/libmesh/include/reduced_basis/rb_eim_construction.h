@@ -20,8 +20,12 @@
 #ifndef __rb_eim_construction_h__
 #define __rb_eim_construction_h__
 
-#include "rb_construction.h"
+// libMesh includes
 #include "mesh_function.h"
+
+// rbOOmit includes
+#include "rb_construction.h"
+#include "rb_assembly_expansion.h"
 
 namespace libMesh
 {
@@ -269,6 +273,16 @@ private:
    * in parallel.
    */
   AutoPtr< NumericVector<Number> > serialized_vector;
+
+  /**
+   * We initialize RBEIMConstruction so that it has an "empty" RBThetaExpansion.
+   */
+  RBThetaExpansion empty_rb_theta_expansion;
+
+  /**
+   * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion.
+   */
+  RBAssemblyExpansion empty_rb_assembly_expansion;
 
 };
 
