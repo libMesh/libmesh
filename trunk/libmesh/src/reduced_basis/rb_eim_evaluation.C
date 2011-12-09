@@ -245,10 +245,18 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
     }
     interpolation_points_out.precision(precision_level);
     for(unsigned int i=0; i<n_bfs; i++)
+    {
       interpolation_points_out << std::scientific
-          << interpolation_points[i](0) << " "
-          << interpolation_points[i](1) << " "
+        << interpolation_points[i](0) << " ";
+
+      if(LIBMESH_DIM >= 2)
+        interpolation_points_out << std::scientific
+          << interpolation_points[i](1) << " ";
+
+      if(LIBMESH_DIM >= 3)
+        interpolation_points_out << std::scientific
           << interpolation_points[i](2) << " ";
+    }
 
     // Also, write out the "extra" interpolation point
     std::ofstream extra_interpolation_point_out;
@@ -264,9 +272,16 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
     }
     extra_interpolation_point_out.precision(precision_level);
     extra_interpolation_point_out << std::scientific
-          << extra_interpolation_point(0) << " "
-          << extra_interpolation_point(1) << " "
-          << extra_interpolation_point(2) << " ";
+      << extra_interpolation_point(0) << " ";
+
+    if(LIBMESH_DIM >= 2)
+      extra_interpolation_point_out << std::scientific
+        << extra_interpolation_point(1) << " ";
+
+    if(LIBMESH_DIM >= 3)
+      extra_interpolation_point_out << std::scientific
+        << extra_interpolation_point(2) << " ";
+
     extra_interpolation_point_out.close();
 
     // Next write out interpolation_points_var
@@ -373,10 +388,15 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   }
   for(unsigned int i=0; i<n_bfs; i++)
   {
-    Real x_val, y_val, z_val;
+    Real x_val, y_val, z_val = 0.;
     interpolation_points_in >> x_val;
-    interpolation_points_in >> y_val;
-    interpolation_points_in >> z_val;
+    
+    if(LIBMESH_DIM >= 2)
+      interpolation_points_in >> y_val;
+
+    if(LIBMESH_DIM >= 3)
+      interpolation_points_in >> z_val;
+
     Point p(x_val, y_val, z_val);
     interpolation_points.push_back(p);
   }
@@ -396,10 +416,15 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   }
   for(unsigned int i=0; i<n_bfs; i++)
   {
-    Real x_val, y_val, z_val;
+    Real x_val, y_val, z_val = 0.;
     extra_interpolation_point_in >> x_val;
-    extra_interpolation_point_in >> y_val;
-    extra_interpolation_point_in >> z_val;
+
+    if(LIBMESH_DIM >= 2)
+      extra_interpolation_point_in >> y_val;
+
+    if(LIBMESH_DIM >= 3)
+      extra_interpolation_point_in >> z_val;
+
     Point p(x_val, y_val, z_val);
     extra_interpolation_point = p;
   }
