@@ -106,10 +106,22 @@ public:
   virtual void attach_theta_q_a(RBTheta* theta_q_a);
 
   /**
+   * Attach a vector of pointers to functor objects that each define one
+   * of the theta_q_a terms.
+   */
+  virtual void attach_multiple_theta_q_a(std::vector<RBTheta*> theta_q_a);
+
+  /**
    * Attach a pointer to a functor object that defines one
    * of the theta_q_a terms.
    */
   virtual void attach_theta_q_f(RBTheta* theta_q_f);
+
+  /**
+   * Attach a vector of pointers to functor objects that each define one
+   * of the theta_q_f terms.
+   */
+  virtual void attach_multiple_theta_q_f(std::vector<RBTheta*> theta_q_f);
 
   /**
    * Attach a vector of pointers to functor objects that define one

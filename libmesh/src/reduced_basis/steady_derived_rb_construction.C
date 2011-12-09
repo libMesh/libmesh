@@ -29,7 +29,7 @@
 #include "libmesh_logging.h"
 #include "equation_systems.h"
 #include "mesh_base.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 
 namespace libMesh
 {
@@ -66,9 +66,11 @@ Real DerivedRBConstruction<RBConstruction>::truth_solve(int plot_solution)
   {
     uber_system.load_rb_solution();
     *solution = *(uber_system.solution);
-    const MeshBase& mesh = get_mesh();
-    GMVIO(mesh).write_equation_systems ("unter_uber_truth.gmv",
-                                        this->get_equation_systems());
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO(get_mesh()).write_equation_systems ("unter_uber_truth.e",
+                                              this->get_equation_systems());
+#endif
   }
 
   STOP_LOG("truth_solve()", "DerivedRBConstruction");

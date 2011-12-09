@@ -36,7 +36,7 @@
 #include <fstream>
 #include <sstream>
 #include "o_string_stream.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "fem_context.h"
 
 #include "rb_eim_construction.h"
@@ -66,6 +66,10 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
   // for the Greedy to be the same on all
   // processors
   serial_training_set = true;
+
+  // attach empty RBThetaExpansion and RBAssemblyExpansion objects
+  attach_affine_expansion(empty_rb_theta_expansion,
+                          empty_rb_assembly_expansion);
 }
 
 RBEIMConstruction::~RBEIMConstruction ()
@@ -160,6 +164,7 @@ void RBEIMConstruction::initialize_rb_construction()
   if(!single_matrix_mode)
   {
     matrix->zero();
+    matrix->close();
     matrix->add(1., *inner_product_matrix);
   }
   else
@@ -518,9 +523,10 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
   if(plot_solution > 0)
   {
-    const MeshBase& mesh = get_mesh();
-    GMVIO(mesh).write_equation_systems ("truth.gmv",
-                                        this->get_equation_systems());
+#ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO(get_mesh()).write_equation_systems ("truth.e",
+                                                    this->get_equation_systems());
+#endif
   }
 
   STOP_LOG("truth_solve()", "RBEIMConstruction");
