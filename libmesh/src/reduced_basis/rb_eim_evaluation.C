@@ -33,8 +33,15 @@ RBEIMEvaluation::RBEIMEvaluation(RBEIMConstruction& rb_eim_con_in)
   // Indicate that we need to compute the RB
   // inner product matrix in this case
   compute_RB_inner_product = true;
+
+  // initialize to the empty RBThetaExpansion object
+  rb_theta_expansion = &empty_rb_theta_expansion;
 }
 
+RBEIMEvaluation::~RBEIMEvaluation()
+{
+  this->clear();
+}
 
 void RBEIMEvaluation::clear()
 {
@@ -42,6 +49,13 @@ void RBEIMEvaluation::clear()
 
   interpolation_points.clear();
   interpolation_points_var.clear();
+
+  // Delete any RBTheta objects that were created
+  for(unsigned int i=0; i<rb_eim_theta_vector.size(); i++)
+  {
+    delete rb_eim_theta_vector[i];
+  }
+  rb_eim_theta_vector.clear();
 }
 
 void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
@@ -155,9 +169,14 @@ void RBEIMEvaluation::rb_solve(DenseVector<Number>& EIM_rhs)
   STOP_LOG("rb_solve()", "RBEIMEvaluation");
 }
 
-AutoPtr<RBTheta> RBEIMEvaluation::build_rb_eim_theta(unsigned int index)
+void RBEIMEvaluation::initialize_rb_theta_objects()
 {
-  return AutoPtr<RBTheta>(new RBEIMTheta(*this, index));
+  // Initialize the rb_theta objects that access the solution from this rb_eim_evaluation
+  rb_eim_theta_vector.clear();
+  for(unsigned int i=0; i<get_n_basis_functions(); i++)
+  {
+    rb_eim_theta_vector.push_back(new RBEIMTheta(*this, i));
+  }
 }
 
 void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name)

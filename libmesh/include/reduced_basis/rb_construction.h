@@ -347,6 +347,11 @@ public:
    */
   unsigned int get_delta_N() const { return delta_N; }
 
+  /**
+   * @return the rb_assembly_expansion object
+   */
+  RBAssemblyExpansion& get_rb_assembly_expansion();
+
 
   //----------- PUBLIC DATA MEMBERS -----------//
 

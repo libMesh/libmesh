@@ -31,7 +31,7 @@
 #include "linear_solver.h"
 #include "o_string_stream.h"
 #include "equation_systems.h"
-#include "gmv_io.h"
+#include "exodusII_io.h"
 #include "getpot.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
@@ -708,8 +708,6 @@ Real TransientRBConstruction::truth_solve(int write_interval)
   const std::vector<Real> mu = get_current_parameters();
   const unsigned int n_time_steps = temporal_discretization.get_n_time_steps();
 
-  const MeshBase& mesh = get_mesh();
-
 //   // NumericVector for computing true L2 error
 //   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
 //   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
@@ -787,12 +785,13 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 
         OStringStream file_name;
 
-        // We write the file name in the gmv auto-read format.
-        file_name << "truth.gmv.";
+        file_name << "truth.e.";
         OSSRealzeroright(file_name,3,0, time_level);
 
-        GMVIO(mesh).write_equation_systems (file_name.str(),
-                                            this->get_equation_systems());
+#ifdef LIBMESH_HAVE_EXODUS_API
+        ExodusII_IO(get_mesh()).write_equation_systems (file_name.str(),
+                                                        this->get_equation_systems());
+#endif
       }
   }
 
