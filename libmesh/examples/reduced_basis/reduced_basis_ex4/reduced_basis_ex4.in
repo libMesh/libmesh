@@ -1,0 +1,7 @@
+# ========= Main function parameters =========
+
+n_elem = 25
+store_basis_functions = true
+
+online_mu = '-0.6 0.7'
+online_N = 15
