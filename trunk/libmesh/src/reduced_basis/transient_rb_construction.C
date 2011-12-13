@@ -60,6 +60,7 @@ TransientRBConstruction::TransientRBConstruction (EquationSystems& es,
 		                                  const unsigned int number)
   : Parent(es, name, number),
     L2_matrix(SparseMatrix<Number>::build()),
+    non_dirichlet_L2_matrix(SparseMatrix<Number>::build()),
     nonzero_initialization(false),
     compute_truth_projection_error(false),
     init_filename(""),
@@ -93,6 +94,18 @@ void TransientRBConstruction::clear()
     {
       delete M_q_vector[q];
       M_q_vector[q] = NULL;
+    }
+  }
+
+  if(store_non_dirichlet_operators)
+  {
+    for(unsigned int q=0; q<non_dirichlet_M_q_vector.size(); q++)
+    {
+      if(non_dirichlet_M_q_vector[q])
+      {
+        delete non_dirichlet_M_q_vector[q];
+        non_dirichlet_M_q_vector[q] = NULL;
+      }
     }
   }
 
@@ -210,6 +223,24 @@ void TransientRBConstruction::allocate_data_structures()
       M_q_vector[q]->init();
       M_q_vector[q]->zero();
     }
+
+    // We also need to initialize a second set of non-Dirichlet operators
+    if(store_non_dirichlet_operators)
+    {
+      dof_map.attach_matrix(*non_dirichlet_L2_matrix);
+      non_dirichlet_L2_matrix->init();
+      non_dirichlet_L2_matrix->zero();
+      
+      non_dirichlet_M_q_vector.resize(Q_m);
+      for(unsigned int q=0; q<Q_m; q++)
+      {
+        // Initialize the memory for the matrices
+        non_dirichlet_M_q_vector[q] = SparseMatrix<Number>::build().release();
+        dof_map.attach_matrix(*non_dirichlet_M_q_vector[q]);
+        non_dirichlet_M_q_vector[q]->init();
+        non_dirichlet_M_q_vector[q]->zero();
+      }
+    }
   }
 
   for(unsigned int i=0; i<n_time_levels; i++)
@@ -302,10 +333,42 @@ SparseMatrix<Number>* TransientRBConstruction::get_M_q(unsigned int q)
   return M_q_vector[q];
 }
 
-void TransientRBConstruction::assemble_L2_matrix(SparseMatrix<Number>* input_matrix)
+SparseMatrix<Number>* TransientRBConstruction::get_non_dirichlet_M_q(unsigned int q)
+{
+  if(!store_non_dirichlet_operators)
+  {
+    libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_M_q." << std::endl;
+    libmesh_error();
+  }
+
+  if(single_matrix_mode)
+  {
+    libMesh::err << "Error: The affine matrices are not stored in single-matrix mode." << std::endl;
+    libmesh_error();
+  }
+
+  TransientRBThetaExpansion& trans_theta_expansion =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+
+  if(q >= trans_theta_expansion.get_Q_m())
+  {
+    libMesh::err << "Error: We must have q < Q_m in get_M_q."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  return non_dirichlet_M_q_vector[q];
+}
+
+void TransientRBConstruction::assemble_L2_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
 {
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., L2_assembly, input_matrix, NULL);
+  add_scaled_matrix_and_vector(1.,
+                               L2_assembly,
+                               input_matrix,
+                               NULL,
+                               false, /* symmetrize */
+                               apply_dirichlet_bc);
 }
 
 void TransientRBConstruction::assemble_mass_matrix(SparseMatrix<Number>* input_matrix)
@@ -664,7 +727,7 @@ void TransientRBConstruction::attach_affine_expansion(RBThetaExpansion& rb_theta
   Parent::attach_affine_expansion(rb_theta_expansion_in, rb_assembly_expansion_in);
 }
 
-void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix)
+void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
 {
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
@@ -680,7 +743,12 @@ void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Nu
   }
 
   input_matrix->zero();
-  add_scaled_matrix_and_vector(1., trans_assembly_expansion.M_q_assembly_vector[q], input_matrix, NULL);
+  add_scaled_matrix_and_vector(1.,
+                               trans_assembly_expansion.M_q_assembly_vector[q],
+                               input_matrix,
+                               NULL,
+                               false, /* symmetrize */
+                               apply_dirichlet_bc);
 }
 
 void TransientRBConstruction::assemble_all_affine_operators()
@@ -692,11 +760,22 @@ void TransientRBConstruction::assemble_all_affine_operators()
 
   for(unsigned int q=0; q<trans_theta_expansion.get_Q_m(); q++)
     assemble_Mq_matrix(q, get_M_q(q));
+
+  if(store_non_dirichlet_operators)
+  {
+    for(unsigned int q=0; q<trans_theta_expansion.get_Q_m(); q++)
+      assemble_Mq_matrix(q, get_non_dirichlet_M_q(q), false);
+  }
 }
 
 void TransientRBConstruction::assemble_misc_matrices()
 {
   assemble_L2_matrix(L2_matrix.get());
+
+  if(store_non_dirichlet_operators)
+  {
+    assemble_L2_matrix(non_dirichlet_L2_matrix.get(), /* apply_dirichlet_bc = */ false);
+  }
 
   Parent::assemble_misc_matrices();
 }
