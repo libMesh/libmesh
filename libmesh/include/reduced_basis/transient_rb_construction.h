@@ -118,7 +118,7 @@ public:
   /**
    * Assemble the L2 matrix.
    */
-  void assemble_L2_matrix(SparseMatrix<Number>* input_matrix);
+  void assemble_L2_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
 
   /**
    * Assemble the mass matrix at the current parameter
@@ -161,12 +161,17 @@ public:
   /**
    * Assemble the q^th affine term of the mass matrix and store it in input_matrix.
    */
-  void assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix);
+  void assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
 
   /**
    * Get a pointer to M_q.
    */
   SparseMatrix<Number>* get_M_q(unsigned int q);
+
+  /**
+   * Get a pointer to non_dirichlet_M_q.
+   */
+  SparseMatrix<Number>* get_non_dirichlet_M_q(unsigned int q);
 
   /**
    * Assemble the truth system in the transient linear case.
@@ -244,9 +249,22 @@ public:
   AutoPtr< SparseMatrix<Number> > L2_matrix;
 
   /**
+   * The L2 matrix without Dirichlet conditions enforced.
+   * (This is only computed if store_non_dirichlet_operators == true.)
+   */
+  AutoPtr< SparseMatrix<Number> > non_dirichlet_L2_matrix;
+
+  /**
    * Vector storing the Q_m matrices from the mass operator
    */
   std::vector< SparseMatrix<Number>* > M_q_vector;
+
+  /**
+   * We sometimes also need a second set of M_q matrices
+   * that do not have the Dirichlet boundary conditions
+   * enforced.
+   */
+  std::vector< SparseMatrix<Number>* > non_dirichlet_M_q_vector;
 
   /**
    * The truth outputs for all time-levels from the
