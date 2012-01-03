@@ -280,10 +280,10 @@ void NoxNonlinearSolver<T>::init ()
 
 template <typename T>
 std::pair<unsigned int, Real>
-NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matrix
-                              NumericVector<T>& x_in,    // Solution vector
-                              NumericVector<T>& r_in,    // Residual vector
-                              const double,              // Stopping tolerance
+NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  /* jac_in */,  // System Jacobian Matrix
+                              NumericVector<T>& x_in,          // Solution vector
+                              NumericVector<T>& /* r_in */,    // Residual vector
+                              const double,                    // Stopping tolerance
                               const unsigned int)
 {
   this->init ();
