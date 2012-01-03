@@ -14,8 +14,10 @@ using namespace libMesh;
 
 // Function to assemble and compute the actual QoI, needed to compute parameter sensitivities
 
+// We only have one QoI, so we don't bother checking the qois argument
+// to see if it was requested from us
 void LaplaceSystem::element_qoi (DiffContext &context,
-			      const QoISet & qois)
+			         const QoISet & /* qois */ )
 
 {  
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);

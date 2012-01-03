@@ -209,11 +209,15 @@ int main (int argc, char** argv)
 	Elem* elem = *el;
 	const Point cent = elem->centroid();
         if (dim > 1)
-	  if ((cent(0) > 0) == (cent(1) > 0))
-	    elem->subdomain_id() = 1;	
+          {
+	    if ((cent(0) > 0) == (cent(1) > 0))
+	      elem->subdomain_id() = 1;	
+          }
         else
-	  if (cent(0) > 0)
-	    elem->subdomain_id() = 1;	
+          {
+	    if (cent(0) > 0)
+	      elem->subdomain_id() = 1;	
+          }
       }
   }
 
