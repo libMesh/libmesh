@@ -104,8 +104,7 @@ using namespace libMesh;
 
 void write_output(EquationSystems &es,		                   
 		  unsigned int a_step, // The adaptive step count
-		  std::string solution_type, // primal or adjoint solve
-                  FEMParameters &param)
+		  std::string solution_type) // primal or adjoint solve
 {
   MeshBase &mesh = es.get_mesh();
 
@@ -335,7 +334,7 @@ int main (int argc, char** argv)
 	system.solve();
 
 	// Write out the computed primal solution	
-	write_output(equation_systems, a_step, "primal", param);
+	write_output(equation_systems, a_step, "primal");
 	
 	// Get a pointer to the primal solution vector
 	NumericVector<Number> &primal_solution = *system.solution;
@@ -392,7 +391,7 @@ int main (int argc, char** argv)
 
 	// Swap the primal and dual solutions so we can write out the adjoint solution
 	primal_solution.swap(dual_solution_0);	    
-	write_output(equation_systems, a_step, "adjoint_0", param);
+	write_output(equation_systems, a_step, "adjoint_0");
 
 	// Swap back
 	primal_solution.swap(dual_solution_0);
@@ -458,7 +457,7 @@ int main (int argc, char** argv)
       {	    
 	system.solve();
 	
-	write_output(equation_systems, a_step, "primal", param);	    
+	write_output(equation_systems, a_step, "primal");
 
 	NumericVector<Number> &primal_solution = *system.solution;
 				     	
@@ -503,7 +502,7 @@ int main (int argc, char** argv)
 	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 	
 	primal_solution.swap(dual_solution_0);	    
-	write_output(equation_systems, a_step, "adjoint_0", param);
+	write_output(equation_systems, a_step, "adjoint_0");
 
 	primal_solution.swap(dual_solution_0);									
       }
