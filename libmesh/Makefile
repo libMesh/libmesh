@@ -103,8 +103,8 @@ test_headers:
 # Remove object files for the current mode
 #
 clean:
-	@test ! -d contrib || $(MAKE) -C contrib $(MAKECMDGOALS)
-	@test ! -d examples || $(MAKE) -C examples $(MAKECMDGOALS)
+	@test ! -d contrib || $(MAKE) -C contrib clean
+	@test ! -d examples || $(MAKE) -C examples clean
 	@rm -f *~ include/*~ include/*/*~ src/*/*~ src/*/*.$(obj-suffix) doc/html/*~
 
 #
@@ -112,8 +112,8 @@ clean:
 #
 clobber:
 	@$(MAKE) clean
-	@test ! -d contrib || $(MAKE) -C contrib $(MAKECMDGOALS)
-	@test ! -d examples || $(MAKE) -C examples $(MAKECMDGOALS)
+	@test ! -d contrib || $(MAKE) -C contrib clobber
+	@test ! -d examples || $(MAKE) -C examples clobber
 	@rm -rf config.status $(targ_dir) $(appbinfiles)
 
 #
@@ -123,8 +123,8 @@ clobber:
 distclean:
 	@rm -f src/*/*.$(hosttype).*.o
 	@$(MAKE) clobber
-	@test ! -d contrib || $(MAKE) -C contrib $(MAKECMDGOALS)
-	@test ! -d examples || $(MAKE) -C examples $(MAKECMDGOALS)
+	@test ! -d contrib || $(MAKE) -C contrib distclean
+	@test ! -d examples || $(MAKE) -C examples distclean
 	@rm -rf doc/man/man3
 	@rm -rf doc/html/doxygen/*.html # split these up, otherwise command line gets too long
 	@rm -rf doc/html/doxygen/*.php
