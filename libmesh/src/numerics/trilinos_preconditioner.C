@@ -45,7 +45,8 @@ namespace libMesh
 {
 
 template <typename T>
-void TrilinosPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
+void TrilinosPreconditioner<T>::apply(const NumericVector<T> & /* x */,
+                                      NumericVector<T> & /* y */ )
 {
 }
 
