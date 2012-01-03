@@ -231,16 +231,16 @@ void QGauss::init_2D(const ElemType _type,
 	      const unsigned int n_wts = 3;
 	      const Real wts[n_wts] =
 		{
-		  9.0L/80.0L,
-		  31.0L/480.0L + std::sqrt(15.0L)/2400.0L,
-		  31.0L/480.0L - std::sqrt(15.0L)/2400.0L
+		  static_cast<Real>(9.0L/80.0L),
+		  static_cast<Real>(31.0L/480.0L + std::sqrt(15.0L)/2400.0L),
+		  static_cast<Real>(31.0L/480.0L - std::sqrt(15.0L)/2400.0L)
 		};
 
 	      const Real a[n_wts] =
 		{
 		  0., // 'a' parameter not used for origin permutation
-		  2.0L/7.0L + std::sqrt(15.0L)/21.0L,
-		  2.0L/7.0L - std::sqrt(15.0L)/21.0L
+		  static_cast<Real>(2.0L/7.0L + std::sqrt(15.0L)/21.0L),
+		  static_cast<Real>(2.0L/7.0L - std::sqrt(15.0L)/21.0L)
 		};
 
 	      const Real b[n_wts] = {0., 0., 0.}; // not used
