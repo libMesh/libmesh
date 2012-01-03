@@ -455,8 +455,10 @@ bool xdr_translate(XDR* x, std::string& s) {
 
 template <typename T>
 bool xdr_translate(XDR* x, std::complex<T>& a) {
-  bool b1 = xdr_translate(x, a.real());
-  bool b2 = xdr_translate(x, a.imag());
+  T r = a.real(), i = a.imag();
+  bool b1 = xdr_translate(x, r);
+  bool b2 = xdr_translate(x, i);
+  a = std::complex<T>(r,i);
   return (b1 && b2);
 }
 
@@ -520,7 +522,9 @@ void Xdr::do_read(T& a) {
 
 template <typename T>
 void Xdr::do_read(std::complex<T>& a) {
-  *in >> a.real() >> a.imag();
+  T r, i;
+  *in >> r >> i;
+  a = std::complex<T>(r,i);
   in->getline(comm, comm_len);
 }
 
@@ -560,8 +564,10 @@ void Xdr::do_read(std::vector<std::complex<T> >& a) {
 
   for (unsigned int i=0; i<a.size(); i++)
     {
+      T r, im;
       libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-      *in >> a[i].real() >> a[i].imag();
+      *in >> r >> im;
+      a[i] = std::complex<T>(r,im);
     }
   in->getline(comm, comm_len);
 }
@@ -1070,8 +1076,9 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 	    if (mode == DECODE)
 	      for (unsigned int i=0, cnt=0; i<len; i++)
 		{
-		  val[i].real() = io_buffer[cnt++];
-		  val[i].imag() = io_buffer[cnt++];
+		  double re = io_buffer[cnt++];
+		  double im = io_buffer[cnt++];
+                  val[i] = std::complex<double>(re,im);
 		}
 	  }
 #else
@@ -1095,7 +1102,9 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 	for (unsigned int i=0; i<len; i++)
 	  {
 	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	    *in >> val[i].real() >> val[i].imag();
+            double re, im;
+	    *in >> re >> im;
+            val[i] = std::complex<double>(re,im);
 	  }
 
 	return;
@@ -1177,8 +1186,9 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 	    if (mode == DECODE)
 	      for (unsigned int i=0, cnt=0; i<len; i++)
 		{
-		  val[i].real() = io_buffer[cnt++];
-		  val[i].imag() = io_buffer[cnt++];
+		  double re = io_buffer[cnt++];
+		  double im = io_buffer[cnt++];
+		  val[i] = std::complex<long double>(re, im);
 		}
 	  }
 #else
@@ -1202,7 +1212,9 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 	for (unsigned int i=0; i<len; i++)
 	  {
 	    libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-	    *in >> val[i].real() >> val[i].imag();
+            long double re, im;
+	    *in >> re >> im;
+            val[i] = std::complex<long double>(re,im);
 	  }
 
 	return;
