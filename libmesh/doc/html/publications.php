@@ -58,7 +58,32 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_dissertation">1</a>]
+[<a name="Lee_dissertation">1</a>]
+</td>
+<td class="bibtexitem">
+K.&nbsp;Lee.
+ <em>Understanding new regimes for light-matter interactions</em>.
+ PhD thesis, Massachusetts Institute of Technology, June 2011.
+ <a href="http://dspace.mit.edu/handle/1721.1/66018">http://dspace.mit.edu/handle/1721.1/66018</a>.
+<a name="Lee_dissertation"></a><pre>
+@phdthesis{Lee_dissertation,
+  author = {K.~Lee},
+  school = {Massachusetts Institute of Technology},
+  title = {{Understanding new regimes for light-matter interactions}},
+  note = {\url{http://dspace.mit.edu/handle/1721.1/66018}},
+  month = jun,
+  year = {2011}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Nagler_dissertation">2</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler.
@@ -86,7 +111,7 @@ L.&nbsp;Nagler.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nenning_Dissertation">2</a>]
+[<a name="Nenning_Dissertation">3</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Nenning.
@@ -113,7 +138,7 @@ M.&nbsp;Nenning.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petrolati_Dissertation">3</a>]
+[<a name="Petrolati_Dissertation">4</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;Petrolati.
@@ -139,7 +164,7 @@ E.&nbsp;Petrolati.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_Dissertation">4</a>]
+[<a name="Stogner_Dissertation">5</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner.
@@ -167,7 +192,33 @@ R.&nbsp;H. Stogner.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Dissertation">5</a>]
+[<a name="Wang_Dissertation">6</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Wang.
+ <em>Krylov subspace methods for topology optimization on adaptive
+  meshes</em>.
+ PhD thesis, University of Illinois at Urbana-Champaign, May 2008.
+ <a href="http://gradworks.umi.com/32/90/3290423.html">http://gradworks.umi.com/32/90/3290423.html</a>.
+<a name="Wang_Dissertation"></a><pre>
+@phdthesis{Wang_Dissertation,
+  author = {S.~Wang},
+  school = {University of Illinois at Urbana-Champaign},
+  title = {{Krylov subspace methods for topology optimization on adaptive meshes}},
+  note = {\url{http://gradworks.umi.com/32/90/3290423.html}},
+  month = may,
+  year = {2008}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Peterson_Dissertation">7</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -194,7 +245,7 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_Dissertation">6</a>]
+[<a name="Knezevic_Dissertation">8</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic.
@@ -221,7 +272,7 @@ D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_Dissertation">7</a>]
+[<a name="Kirk_Dissertation">9</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -248,7 +299,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Thesis">8</a>]
+[<a name="Peterson_Thesis">10</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -316,51 +367,23 @@ O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2011b">2</a>]
+[<a name="Hussan_2011">2</a>]
 </td>
 <td class="bibtexitem">
-D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
- Certified reduced basis model validation: a frequentistic uncertainty
-  framework.
- <em>Computer Methods in Applied Mechanics and Engineering</em>, 2011.
- <a href="http://dx.doi.org/10.1016/j.cma.2011.09.011">http://dx.doi.org/10.1016/j.cma.2011.09.011</a>.
-<a name="Huynh_2011b"></a><pre>
-@article{Huynh_2011b,
-  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and A.~T.~Patera},
-  title = {Certified Reduced Basis Model Validation: a Frequentistic Uncertainty Framework},
-  journal = {Computer Methods in Applied Mechanics and Engineering},
-  year = {2011},
-  note = {\url{http://dx.doi.org/10.1016/j.cma.2011.09.011}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Stokes_2011">3</a>]
-</td>
-<td class="bibtexitem">
-Y.&nbsp;Stokes and G.&nbsp;F. Carey.
- On generalised penalty approaches for slip, free surface and related
-  boundary conditions in viscous flow simulation.
- <em>International Journal of Numerical Methods for Heat &amp; Fluid
-  Flow</em>, 21(6):668-702, 2011.
- <a href="http://dx.doi.org/10.1108/09615531111148455">http://dx.doi.org/10.1108/09615531111148455</a>.
-<a name="Stokes_2011"></a><pre>
-@article{Stokes_2011,
-  author = {Y.~Stokes and G.~F.~Carey},
-  title = {{On generalised penalty approaches for slip, free surface and 
-              related boundary conditions in viscous flow simulation}},
-  journal = {International Journal of Numerical Methods for Heat \& Fluid Flow},
+J.&nbsp;R. Hussan, P.&nbsp;J. Hunter, and M.&nbsp;L. Trew.
+ A clustering method for calculating membrane currents in cardiac
+  electrical models.
+ <em>Cardiovascular Engineering and Technology</em>, pages 1-14, 2011.
+ <a href="http://dx.doi.org/10.1007/s13239-011-0070-6">http://dx.doi.org/10.1007/s13239-011-0070-6</a>.
+<a name="Hussan_2011"></a><pre>
+@article{Hussan_2011,
+  author = {J.~R.~Hussan and P.~J.~Hunter and M.~L.~Trew},
+  title = {{A clustering method for calculating membrane currents in cardiac electrical models}},
+  journal = {Cardiovascular Engineering and Technology},
   year = 2011,
-  volume = 21,
-  number = 6,
-  pages = {668--702},
-  note = {\url{http://dx.doi.org/10.1108/09615531111148455}}
+  volume = <a href="#online">online</a>,
+  pages = {1--14},
+  note = {\url{http://dx.doi.org/10.1007/s13239-011-0070-6}}
 }
 </pre>
 
@@ -371,7 +394,7 @@ Y.&nbsp;Stokes and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bova_2011">4</a>]
+[<a name="Bova_2011">3</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;W. Bova and B.&nbsp;S. Kirk.
@@ -395,7 +418,7 @@ S.&nbsp;W. Bova and B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2011">5</a>]
+[<a name="Huynh_2011">4</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -422,37 +445,7 @@ approximation and a posteriori error estimation}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bordas_2011">6</a>]
-</td>
-<td class="bibtexitem">
-R.&nbsp;Bordas, K.&nbsp;Gillow, Q.&nbsp;Lou, I.&nbsp;R. Efimov, D.&nbsp;Gavaghan, P.&nbsp;Kohl, V.&nbsp;Grau, and
-  B.&nbsp;Rodriguez.
- Rabbit-specific ventricular model of cardiac electrophysiological
-  function including specialized conduction system.
- <em>Progress in Biophysics and Molecular Biology</em>, pages zz-zz,
-  2011.
- <a href="http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002">http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002</a>.
-<a name="Bordas_2011"></a><pre>
-@article{Bordas_2011,
-  author = {R.~Bordas and K.~Gillow and Q.~Lou and I.~R.~Efimov and D.~Gavaghan and P.~Kohl and V.~Grau and B.~Rodriguez},
-  title = {{Rabbit-specific ventricular model of cardiac electrophysiological function including specialized conduction system}},
-  journal = {Progress in Biophysics and Molecular Biology},
-  year = 2011,
-  volume = <a href="#x">x</a>,
-  number = <a href="#y">y</a>,
-  pages = {zz--zz},
-  note = {\url{http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Oliveira_2011">7</a>]
+[<a name="Oliveira_2011">5</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
@@ -478,7 +471,7 @@ S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2011">8</a>]
+[<a name="Camata_2011">6</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
@@ -507,7 +500,7 @@ J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2010b">9</a>]
+[<a name="Eftang_2010b">7</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -532,7 +525,7 @@ J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2010">10</a>]
+[<a name="Griffith_2010">8</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -557,7 +550,7 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010b">11</a>]
+[<a name="Knezevic_2010b">9</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
@@ -587,34 +580,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010">12</a>]
-</td>
-<td class="bibtexitem">
-S.&nbsp;Berrone and M.&nbsp;Verani.
- A new marking strategy for the adaptive finite element approximation
-  of optimal control constrained problems.
- <em>EARLY VIEW, Optimization Methods and Software</em>, June 2010.
- <a href="http://dx.doi.org/10.1080/10556788.2010.491866">http://dx.doi.org/10.1080/10556788.2010.491866</a>.
-<a name="Berrone_2010"></a><pre>
-@article{Berrone_2010,
-  author = {S.~Berrone and M.~Verani},
-  title = {{A new marking strategy for the adaptive finite element
-    approximation of optimal control constrained problems}},
-  journal = {EARLY VIEW, Optimization Methods and Software},
-  year = 2010,
-  month = jun,
-  note = {\url{http://dx.doi.org/10.1080/10556788.2010.491866}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Eftang_2010a">13</a>]
+[<a name="Eftang_2010a">10</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -638,7 +604,101 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 </td>
 </tr>
 </table><a name="Articles"></a>
-<h2>2011</h2>
+<h2>2012</h2>
+
+<!-- This document was automatically generated with bibtex2html 1.96
+     (see http://www.lri.fr/~filliatr/bibtex2html/),
+     with the following command:
+     bibtex2html -d -r --nodoc --single -nofooter twelve.bib  -->
+
+
+<table>
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Akkoyun_2012">1</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Akkoyun et&nbsp;al.
+ AGATA-Advanced GAmma Tracking Array.
+ <em>Nuclear Instruments and Methods in Physics Research Section A:
+  Accelerators, Spectrometers, Detectors and Associated Equipment</em>, 668:26-58,
+  March 2012.
+ <a href="http://dx.doi.org/10.1016/j.nima.2011.11.081">http://dx.doi.org/10.1016/j.nima.2011.11.081</a>.
+<a name="Akkoyun_2012"></a><pre>
+@article{Akkoyun_2012,
+  author = {S.~Akkoyun and others},
+  title = {{AGATA---Advanced GAmma Tracking Array}},
+  journal = {Nuclear Instruments and Methods in Physics Research Section A: Accelerators, Spectrometers, Detectors and Associated Equipment},
+  year = 2012,
+  volume = 668,
+  month = mar,
+  pages = {26--58},
+  note = {\url{http://dx.doi.org/10.1016/j.nima.2011.11.081}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Mahadevan_2012">2</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
+ A verification exercise in multiphysics simulations for coupled
+  reactor physics calculations.
+ <em>Progress in Nuclear Energy</em>, 55:12-32, March 2012.
+ <a href="http://dx.doi.org/10.1016/j.pnucene.2011.10.013">http://dx.doi.org/10.1016/j.pnucene.2011.10.013</a>.
+<a name="Mahadevan_2012"></a><pre>
+@article{Mahadevan_2012,
+  author = {V.~S.~Mahadevan and J.~C.~Ragusa and V.~A.~Mousseau},
+  title = {{A verification exercise in multiphysics simulations for coupled reactor physics calculations}},
+  journal = {Progress in Nuclear Energy},
+  year = {2012},
+  volume = 55,
+  month = mar,
+  pages = {12--32},
+  note = {\url{http://dx.doi.org/10.1016/j.pnucene.2011.10.013}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Huynh_2012">3</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
+ Certified reduced basis model validation: a frequentistic uncertainty
+  framework.
+ <em>Computer Methods in Applied Mechanics and Engineering</em>,
+  201-204:13-24, January 2012.
+ <a href="http://dx.doi.org/10.1016/j.cma.2011.09.011">http://dx.doi.org/10.1016/j.cma.2011.09.011</a>.
+<a name="Huynh_2012"></a><pre>
+@article{Huynh_2012,
+  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and A.~T.~Patera},
+  title = {Certified Reduced Basis Model Validation: a Frequentistic Uncertainty Framework},
+  journal = {Computer Methods in Applied Mechanics and Engineering},
+  year = {2012},
+  volume = {201--204},
+  month = jan,
+  pages = {13--24},
+  note = {\url{http://dx.doi.org/10.1016/j.cma.2011.09.011}}
+}
+</pre>
+
+
+</td>
+</tr>
+</table><h2>2011</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
@@ -650,7 +710,92 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2011b">1</a>]
+[<a name="Vetter_2011">1</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
+ Packing model for elastic wires in ellipsoidal cavities.
+ November&nbsp;22, 2011.
+ <a href="http://arxiv.org/abs/1111.5128v1">http://arxiv.org/abs/1111.5128v1</a>.
+<a name="Vetter_2011"></a><pre>
+@article{Vetter_2011,
+  author = {R.~Vetter and F.~K.~Wittel and N.~Stoop and H.~J.~Herrmann},
+  title = {{Packing model for elastic wires in ellipsoidal cavities}},
+  month = nov # {~22,},
+  year = {2011},
+  note = {\url{http://arxiv.org/abs/1111.5128v1}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gerner_2011">2</a>]
+</td>
+<td class="bibtexitem">
+A.-L. Gerner and K.&nbsp;Veroy.
+ Certified reduced basis method for parameterized saddle point
+  problems.
+ Technical Report AICES-2011/11-01, Aachen Institute for Advanced
+  Study in Computational Engineering Science, November 2011.
+ 
+  <a href="http://www.aices.rwth-aachen.de:8080/aices/preprint/documents/AICES-2011-11-01.pdf">http://www.aices.rwth-aachen.de:8080/aices/preprint/documents/AICES-2011-11-01.pdf</a>.
+<a name="Gerner_2011"></a><pre>
+@techreport{Gerner_2011,
+  author = {A.-L.~Gerner and K.~Veroy},
+  title = {{Certified reduced basis method for parameterized saddle point problems}},
+  institution = {Aachen Institute for Advanced Study in Computational Engineering Science},
+  day = {4},
+  month = nov,
+  year = {2011},
+  number = {AICES-2011/11-01},
+  note = {\url{http://www.aices.rwth-aachen.de:8080/aices/preprint/documents/AICES-2011-11-01.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bordas_2011">3</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;Bordas, K.&nbsp;Gillow, Q.&nbsp;Lou, I.&nbsp;R. Efimov, D.&nbsp;Gavaghan, P.&nbsp;Kohl, V.&nbsp;Grau, and
+  B.&nbsp;Rodriguez.
+ Rabbit-specific ventricular model of cardiac electrophysiological
+  function including specialized conduction system.
+ <em>Progress in Biophysics and Molecular Biology</em>, 107(1):90-100,
+  October 2011.
+ <a href="http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002">http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002</a>.
+<a name="Bordas_2011"></a><pre>
+@article{Bordas_2011,
+  author = {R.~Bordas and K.~Gillow and Q.~Lou and I.~R.~Efimov and D.~Gavaghan and P.~Kohl and V.~Grau and B.~Rodriguez},
+  title = {{Rabbit-specific ventricular model of cardiac electrophysiological function including specialized conduction system}},
+  journal = {Progress in Biophysics and Molecular Biology},
+  year = 2011,
+  volume = 107,
+  number = 1,
+  month = oct,
+  pages = {90--100},
+  note = {\url{http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Corsini_2011b">4</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, F.&nbsp;Rispoli, and E.&nbsp;Tuccimei.
@@ -677,7 +822,7 @@ A.&nbsp;Corsini, F.&nbsp;Rispoli, and E.&nbsp;Tuccimei.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2011">2</a>]
+[<a name="Vavourakis_2011">5</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, Y.&nbsp;Papaharilaou, and J.&nbsp;A. Ekaterinaris.
@@ -706,7 +851,40 @@ V.&nbsp;Vavourakis, Y.&nbsp;Papaharilaou, and J.&nbsp;A. Ekaterinaris.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Widmer_2011b">3</a>]
+[<a name="Berrone_2011">6</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Berrone and M.&nbsp;Verani.
+ A new marking strategy for the adaptive finite element approximation
+  of optimal control constrained problems.
+ <em>Optimization Methods and Software, Special Issue: Advances in
+  Shape and Topology Optimization: Theory, Numerics and New Application Areas</em>,
+  26(4-5):747-775, August-October 2011.
+ <a href="http://dx.doi.org/10.1080/10556788.2010.491866">http://dx.doi.org/10.1080/10556788.2010.491866</a>.
+<a name="Berrone_2011"></a><pre>
+@article{Berrone_2011,
+  author = {S.~Berrone and M.~Verani},
+  title = {{A new marking strategy for the adaptive finite element
+    approximation of optimal control constrained problems}},
+  journal = {Optimization Methods and Software, Special Issue: 
+    Advances in Shape and Topology Optimization: Theory, Numerics and New Application Areas},
+  year = 2011,
+  month = {August--October},
+  volume = 26,
+  number = {4--5},
+  pages = {747--775},
+  note = {\url{http://dx.doi.org/10.1080/10556788.2010.491866}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Widmer_2011b">7</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
@@ -734,7 +912,7 @@ R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brummelen_2011b">4</a>]
+[<a name="Brummelen_2011b">8</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
@@ -761,7 +939,7 @@ E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brummelen_2011">5</a>]
+[<a name="Brummelen_2011">9</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
@@ -789,7 +967,7 @@ E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2011">6</a>]
+[<a name="Carey_2011">10</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Carey and G.&nbsp;F. Carey.
@@ -819,7 +997,7 @@ V.&nbsp;Carey and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Arbree_2011">7</a>]
+[<a name="Arbree_2011">11</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
@@ -849,7 +1027,7 @@ A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vazquez_2011">8</a>]
+[<a name="Vazquez_2011">12</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;A. Vazquez and A.&nbsp;Castellanos.
@@ -877,7 +1055,7 @@ P.&nbsp;A. Vazquez and A.&nbsp;Castellanos.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gunther_2011">9</a>]
+[<a name="Gunther_2011">13</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
@@ -906,7 +1084,7 @@ A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010b">10</a>]
+[<a name="Peterson_2010b">14</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
@@ -937,7 +1115,7 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Feng_2011">11</a>]
+[<a name="Feng_2011">15</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Feng and D.&nbsp;Fuentes.
@@ -966,7 +1144,7 @@ Y.&nbsp;Feng and D.&nbsp;Fuentes.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="AufDerMaur_2011">12</a>]
+[<a name="AufDerMaur_2011">16</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&nbsp;Pecchia, and
@@ -996,7 +1174,7 @@ M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Curtis_2011a">13</a>]
+[<a name="Curtis_2011a">17</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
@@ -1027,7 +1205,7 @@ papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf}}
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">14</a>]
+[<a name="Huynh_2010">18</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
@@ -1061,7 +1239,7 @@ DOI:~\url{http://dx.doi.org/10.1016/j.compfluid.2010.07.007}    }
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2011">15</a>]
+[<a name="Knezevic_2011">19</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
@@ -1091,7 +1269,7 @@ D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2011">16</a>]
+[<a name="Botti_2011">20</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
@@ -1122,7 +1300,125 @@ L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2011">17</a>]
+[<a name="Knezevic_2011b">21</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
+ Reduced basis approximation and a posteriori error estimation for
+  the parametrized unsteady Boussinesq equations.
+ <em>Mathematical Models and Methods in Applied Sciences</em>,
+  21(7):1415-1442, 2011.
+ <a href="http://dx.doi.org/10.1142/S0218202511005441">http://dx.doi.org/10.1142/S0218202511005441</a>.
+<a name="Knezevic_2011b"></a><pre>
+@article{Knezevic_2011b,
+  author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
+  title = {{Reduced basis approximation and a posteriori 
+              error estimation for the parametrized unsteady 
+              Boussinesq equations}},
+  journal = {Mathematical Models and Methods in Applied Sciences},
+  year = 2011,
+  volume = 21,
+  number = 7,
+  pages = {1415--1442},
+  note = {\url{http://dx.doi.org/10.1142/S0218202511005441}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kroger_2011">22</a>]
+</td>
+<td class="bibtexitem">
+T.&nbsp;Kr&ouml;ger.
+ Numerical experiments on existence and non-uniqueness of solutions
+  of the thermistor problem with Helmholtz term.
+ <em>AIP Conference Proceedings</em>, 1368(1):37-40, 2011.
+ <a href="http://dx.doi.org/10.1063/1.3663454">http://dx.doi.org/10.1063/1.3663454</a>.
+<a name="Kroger_2011"></a><pre>
+@article{Kroger_2011,
+  author = {T.~Kr\"{o}ger},
+  editor = {Ilias Kotsireas and Roderick Melnik and Brian West},
+  title = {{Numerical experiments on existence and non-uniqueness of solutions of the thermistor problem with Helmholtz term}},
+  publisher = {AIP},
+  year = {2011},
+  journal = {AIP Conference Proceedings},
+  volume = {1368},
+  number = {1},
+  pages = {37--40},
+  note = {\url{http://dx.doi.org/10.1063/1.3663454}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Eftang_2011">23</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
+ An <em>hp</em> certified reduced basis method for parameterized parabolic
+  partial differential equations.
+ <em>Mathematical and Computer Modelling of Dynamical Systems,
+  Special Issue: Model order reduction of parameterized problems</em>,
+  17(4):395-422, 2011.
+ <a href="http://dx.doi.org/10.1080/13873954.2011.547670">http://dx.doi.org/10.1080/13873954.2011.547670</a>.
+<a name="Eftang_2011"></a><pre>
+@article{Eftang_2011,
+  author = {J.~L.~Eftang and D.~J.~Knezevic and A.~T.~Patera},
+  title = {{An $hp$ certified reduced basis method for parameterized parabolic partial differential equations}},
+  journal = {Mathematical and Computer Modelling of Dynamical Systems, Special Issue: Model order reduction of parameterized problems},
+  volume = 17,
+  number = 4,
+  pages = {395--422},
+  year = 2011,
+  note = {\url{http://dx.doi.org/10.1080/13873954.2011.547670}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Steiger_2011">24</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Steiger, M.&nbsp;Povolotskyi, H.-H. Park, T.&nbsp;Kubis, and G.&nbsp;Klimeck.
+ NEMO5: A parallel multiscale nanoelectronics modeling tool.
+ <em>IEEE Transactions on Nanotechnology</em>, 10(6):1464-1474, 2011.
+ <a href="http://dx.doi.org/10.1109/TNANO.2011.2166164">http://dx.doi.org/10.1109/TNANO.2011.2166164</a>.
+<a name="Steiger_2011"></a><pre>
+@article{Steiger_2011,
+  author = {S.~Steiger and M.~Povolotskyi and H.-H.~Park and T.~Kubis and G.~Klimeck},
+  title = {{NEMO5: A parallel multiscale nanoelectronics modeling tool}},
+  journal = {IEEE Transactions on Nanotechnology},
+  year = 2011,
+  volume = 10,
+  number = 6,
+  pages = {1464--1474},
+  note = {\url{http://dx.doi.org/10.1109/TNANO.2011.2166164}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fuentes_2011">25</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, C.&nbsp;Walker, A.&nbsp;Elliott, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J. Stafford.
@@ -1152,7 +1448,7 @@ D.&nbsp;Fuentes, C.&nbsp;Walker, A.&nbsp;Elliott, A.&nbsp;Shetty, J.&nbsp;D. Haz
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="widmer_2011">18</a>]
+[<a name="widmer_2011">26</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
@@ -1181,7 +1477,7 @@ R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hilscher_2011">19</a>]
+[<a name="Hilscher_2011">27</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;P. Hilscher, K.&nbsp;Imadera, J.&nbsp;Li, and Y.&nbsp;Kishimoto.
@@ -1214,7 +1510,7 @@ P.&nbsp;P. Hilscher, K.&nbsp;Imadera, J.&nbsp;Li, and Y.&nbsp;Kishimoto.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2011">20</a>]
+[<a name="Corsini_2011">28</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, F.&nbsp;Rispoli, and T.&nbsp;E. Tezduyar.
@@ -1252,7 +1548,35 @@ A.&nbsp;Corsini, F.&nbsp;Rispoli, and T.&nbsp;E. Tezduyar.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2010b">1</a>]
+[<a name="Burtscher_2010b">1</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Burtscher, B.-D. Kim, J.&nbsp;Diamond, J.&nbsp;McCalpin, L.&nbsp;Koesterke, and J.&nbsp;Browne.
+ PerfExpert: An easy-to-use performance diagnosis tool for HPC
+  applications.
+ In <em>2010 International Conference for High Performance Computing,
+  Networking, Storage and Analysis (SC)</em>, pages 1-11, November&nbsp;13-19, 2010.
+ <a href="http://dx.doi.org/10.1109/SC.2010.41">http://dx.doi.org/10.1109/SC.2010.41</a>.
+<a name="Burtscher_2010b"></a><pre>
+@inproceedings{Burtscher_2010b,
+  author = {M.~Burtscher and B.-D.~Kim and J.~Diamond and J.~McCalpin and L.~Koesterke and J.~Browne},
+  booktitle = {2010 International Conference for High Performance Computing, Networking, Storage and Analysis (SC)},
+  title = {{PerfExpert: An easy-to-use performance diagnosis tool for HPC applications}},
+  year = {2010},
+  month = nov # {~13--19,},
+  pages = {1--11},
+  note = {\url{http://dx.doi.org/10.1109/SC.2010.41}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kirk_2010b">2</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -1281,7 +1605,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2010b">2</a>]
+[<a name="Fuentes_2010b">3</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, R.&nbsp;Cardan, R.&nbsp;J. Stafford, J.&nbsp;Yung, G.&nbsp;D.&nbsp;Dodd III, and Y.&nbsp;Feng.
@@ -1312,7 +1636,7 @@ D.&nbsp;Fuentes, R.&nbsp;Cardan, R.&nbsp;J. Stafford, J.&nbsp;Yung, G.&nbsp;D.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brown_2010">3</a>]
+[<a name="Brown_2010">4</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Brown.
@@ -1341,7 +1665,31 @@ J.&nbsp;Brown.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Olivera_2010">4</a>]
+[<a name="Wang_2010">5</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Wang, E.&nbsp;De Sturler, and G.&nbsp;H. Paulino.
+ Dynamic adaptive mesh refinement for topology optimization.
+ September&nbsp;25, 2010.
+ <a href="http://arxiv.org/abs/1009.4975">http://arxiv.org/abs/1009.4975</a>.
+<a name="Wang_2010"></a><pre>
+@article{Wang_2010,
+  author = {S.~Wang and E.~De~Sturler and G.~H.~Paulino},
+  title = {{Dynamic adaptive mesh refinement for topology optimization}},
+  month = sep # {~25,},
+  year = {2010},
+  note = {\url{http://arxiv.org/abs/1009.4975}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Olivera_2010">6</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
@@ -1372,18 +1720,18 @@ S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Ragusa_2010">5</a>]
+[<a name="Ragusa_2010">7</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Ragusa, A.&nbsp;Siegel, and J.-M. Ruggieri.
- Neutronic/Thermalhydraulic Coupling Technigues for Sodium Cooled
+ Neutronic/Thermalhydraulic Coupling Techniques for Sodium Cooled
   Fast Reactor Simulations.
  Technical Report 14837, Department of Energy, September 2010.
  <a href="http://dx.doi.org/10.2172/992636">http://dx.doi.org/10.2172/992636</a>.
 <a name="Ragusa_2010"></a><pre>
 @techreport{Ragusa_2010,
   author = {J.~Ragusa and A.~Siegel and J.-M.~Ruggieri},
-  title = {{Neutronic/Thermalhydraulic Coupling Technigues for Sodium Cooled Fast Reactor Simulations}},
+  title = {{Neutronic/Thermalhydraulic Coupling Techniques for Sodium Cooled Fast Reactor Simulations}},
   institution = {Department of Energy},
   day = 28,
   month = sep,
@@ -1400,13 +1748,13 @@ J.&nbsp;Ragusa, A.&nbsp;Siegel, and J.-M. Ruggieri.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lu_2010">6</a>]
+[<a name="Lu_2010">8</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E.&nbsp;M. Sevick-Muraca.
  A parallel adaptive finite element simplified spherical harmonics
   approximation solver for frequency domain fluorescence molecular imaging.
- <em>Physics in Medicine and Biololgy</em>, 55(16):4625-4645, August
+ <em>Physics in Medicine and Biology</em>, 55(16):4625-4645, August
   2010.
  <a href="http://dx.doi.org/10.1088/0031-9155/55/16/002">http://dx.doi.org/10.1088/0031-9155/55/16/002</a>.
 <a name="Lu_2010"></a><pre>
@@ -1416,7 +1764,7 @@ Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E
   title = {{A parallel adaptive finite element simplified
               spherical harmonics approximation solver for
 	      frequency domain fluorescence molecular imaging}},
-  journal = {Physics in Medicine and Biololgy},
+  journal = {Physics in Medicine and Biology},
   year = 2010,
   volume = 55,
   number = 16,
@@ -1433,7 +1781,7 @@ Y.&nbsp;Lu, B.&nbsp;Zhu, H.&nbsp;Shen, J.&nbsp;C. Rasmussen, G.&nbsp;Wang, and E
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Pereira_2010">7</a>]
+[<a name="Pereira_2010">9</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
@@ -1464,7 +1812,7 @@ F.&nbsp;H. Pereira and S.&nbsp;I. Nabeta.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2010a">8</a>]
+[<a name="Kirk_2010a">10</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
@@ -1493,7 +1841,7 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Pecchia_2010">9</a>]
+[<a name="Pecchia_2010">11</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Pecchia.
@@ -1525,7 +1873,7 @@ A.&nbsp;Pecchia.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_2010">10</a>]
+[<a name="Nagler_2010">12</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler and M.&nbsp;Schanz.
@@ -1554,7 +1902,7 @@ L.&nbsp;Nagler and M.&nbsp;Schanz.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2010a">11</a>]
+[<a name="Fuentes_2010a">13</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNichols, J.&nbsp;T. Oden, and
@@ -1586,7 +1934,7 @@ D.&nbsp;Fuentes, Y.&nbsp;Feng, A.&nbsp;Elliott, A.&nbsp;Shetty, R.&nbsp;J. McNic
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2010a">12</a>]
+[<a name="Berrone_2010a">14</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone.
@@ -1617,7 +1965,7 @@ estimates for finite element discretizations of parabolic equations}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2010">13</a>]
+[<a name="Zhu_2010">15</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
@@ -1648,7 +1996,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, and R.&nbsp;W. Ogden.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Burtscher_2010">14</a>]
+[<a name="Burtscher_2010">16</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Burtscher, B.&nbsp;Kim, J.&nbsp;Diamond, J.&nbsp;McCalpin, L.&nbsp;Koesterke, and J.&nbsp;Browne.
@@ -1676,7 +2024,7 @@ M.&nbsp;Burtscher, B.&nbsp;Kim, J.&nbsp;Diamond, J.&nbsp;McCalpin, L.&nbsp;Koest
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2010">15</a>]
+[<a name="Podgorney_2010">17</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
@@ -1708,7 +2056,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rossa_2010">16</a>]
+[<a name="Rossa_2010">18</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;L. Rossa, J.&nbsp;J. Camata, and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
@@ -1739,7 +2087,7 @@ of coupled incompressible viscous flows and heat transfer}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010a">17</a>]
+[<a name="Knezevic_2010a">19</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -1769,7 +2117,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhengyong_2010">18</a>]
+[<a name="Zhengyong_2010">20</a>]
 </td>
 <td class="bibtexitem">
 Z.&nbsp;Ren and J.&nbsp;Tang.
@@ -1798,7 +2146,7 @@ Z.&nbsp;Ren and J.&nbsp;Tang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2010">19</a>]
+[<a name="Carey_2010">21</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -1828,7 +2176,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010">20</a>]
+[<a name="Peterson_2010">22</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -1858,7 +2206,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010">21</a>]
+[<a name="Botti_2010">23</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
@@ -2174,7 +2522,99 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, G.&nbsp;Romano, G.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Barone_2009">10</a>]
+[<a name="Gaston_2009c">10</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Gaston, G.&nbsp;Hansen, and C.&nbsp;Newman.
+ MOOSE: A parallel computational framework for coupled systems of
+  nonlinear equations.
+ In <em>International Conference on Mathematics, Computational
+  Methods &amp; Reactor Physics (M&amp;C 2009)</em>, Saratoga Springs, New York,
+  May&nbsp;7-9, 2009.
+ <a href="http://www.inl.gov/technicalpublications/Documents/4336141.pdf">http://www.inl.gov/technicalpublications/Documents/4336141.pdf</a>.
+<a name="Gaston_2009c"></a><pre>
+@conference{Gaston_2009c,
+  author = {D.~Gaston and G.~Hansen and C.~Newman},
+  title = {{MOOSE: A parallel computational framework for coupled systems of nonlinear equations}},
+  booktitle = {International Conference on Mathematics, Computational
+               Methods \& Reactor Physics (M\&C 2009)},
+  address = {Saratoga Springs, New York},
+  month = may # {~7--9,},
+  year = {2009},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/4336141.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Park_2009">11</a>]
+</td>
+<td class="bibtexitem">
+H.&nbsp;Park, D.&nbsp;Gaston, S.&nbsp;Kadioglu, D.&nbsp;Knoll, R.&nbsp;Martineau, W.&nbsp;Taitano, and
+  D.&nbsp;Lebrun-Grandi&eacute;.
+ Tightly coupled multiphysics simulations for pebble bed reactors.
+ In <em>International Conference on Mathematics, Computational
+  Methods &amp; Reactor Physics (M&amp;C 2009)</em>, Saratoga Springs, New York,
+  May&nbsp;7-9, 2009.
+ 
+  <a href="http://mathematicsandcomputation.freezoka.net/MC09/pdfs/201237.pdf">http://mathematicsandcomputation.freezoka.net/MC09/pdfs/201237.pdf</a>.
+<a name="Park_2009"></a><pre>
+@conference{Park_2009,
+  author = {H.~Park and D.~Gaston and S.~Kadioglu and D.~Knoll and R.~Martineau and W.~Taitano and D.~Lebrun-Grandi\'{e}},
+  title = {Tightly coupled multiphysics simulations for pebble bed reactors},
+  booktitle = {International Conference on Mathematics, Computational
+               Methods \& Reactor Physics (M\&C 2009)},
+  address = {Saratoga Springs, New York},
+  month = may # {~7--9,},
+  year = {2009},
+  note = {\url{http://mathematicsandcomputation.freezoka.net/MC09/pdfs/201237.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Mahadevan_2009">12</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;Mousseau.
+ Verification of multiphysics software: Space and time convergence
+  studies for nonlinearly coupled applications.
+ In <em>International Conference on Mathematics, Computational
+  Methods &amp; Reactor Physics (M&amp;C 2009)</em>, Saratoga Springs, New York,
+  May&nbsp;7-9, 2009.
+ <a href="http://www.inl.gov/technicalpublications/Documents/4247162.pdf">http://www.inl.gov/technicalpublications/Documents/4247162.pdf</a>.
+<a name="Mahadevan_2009"></a><pre>
+@conference{Mahadevan_2009,
+  author = {V.~S.~Mahadevan and J.~C.~Ragusa and V.~Mousseau},
+  title = {Verification of Multiphysics software: Space and time
+               convergence studies for nonlinearly coupled applications},
+  booktitle = {International Conference on Mathematics, Computational
+               Methods \& Reactor Physics (M\&C 2009)},
+  address = {Saratoga Springs, New York},
+  month = may # {~7--9,},
+  year = {2009},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/4247162.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Barone_2009">13</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;F. Barone, I.&nbsp;Kalashnikova, D.&nbsp;J. Segalman, and H.&nbsp;K. Thornquist.
@@ -2205,7 +2645,7 @@ M.&nbsp;F. Barone, I.&nbsp;Kalashnikova, D.&nbsp;J. Segalman, and H.&nbsp;K. Tho
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Polidori_2009">11</a>]
+[<a name="Polidori_2009">14</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Polidori.
@@ -2237,7 +2677,7 @@ M.&nbsp;Polidori.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="S_Lu_2009">12</a>]
+[<a name="S_Lu_2009">15</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Lu et&nbsp;al.
@@ -2266,7 +2706,7 @@ S.&nbsp;Lu et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Abukhdeir_2009">13</a>]
+[<a name="Abukhdeir_2009">16</a>]
 </td>
 <td class="bibtexitem">
 N.&nbsp;M. Abukhdeir and A.&nbsp;D. Rey.
@@ -2295,7 +2735,7 @@ N.&nbsp;M. Abukhdeir and A.&nbsp;D. Rey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Blome_2009">14</a>]
+[<a name="Blome_2009">17</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
@@ -2322,7 +2762,7 @@ M.&nbsp;Blome, H.&nbsp;R. Maurer, and K.&nbsp;Schmidt.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="AufderMaur_2009b">15</a>]
+[<a name="AufderMaur_2009b">18</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&nbsp;Romano,
@@ -2351,7 +2791,7 @@ M.&nbsp;Auf der Maur, M.&nbsp;Povolotskyi, F.&nbsp;Sacconi, A.&nbsp;Pecchia, G.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2009">16</a>]
+[<a name="Knezevic_2009">19</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and E.&nbsp;S&uuml;li.
@@ -2384,7 +2824,7 @@ D.&nbsp;J. Knezevic and E.&nbsp;S&uuml;li.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lu_2009">17</a>]
+[<a name="Lu_2009">20</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Lu, H.&nbsp;B. Machado, A.&nbsp;Douraghy, D.&nbsp;Stout, H.&nbsp;Herschman, and A.&nbsp;F.
@@ -2416,7 +2856,7 @@ Y.&nbsp;Lu, H.&nbsp;B. Machado, A.&nbsp;Douraghy, D.&nbsp;Stout, H.&nbsp;Herschm
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Xu_2009">18</a>]
+[<a name="Xu_2009">21</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
@@ -2446,18 +2886,18 @@ D.&nbsp;Xu, J.&nbsp;Stare, and A.&nbsp;L. Cooksy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2009b">19</a>]
+[<a name="Gaston_2009b">22</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Gaston, C.&nbsp;Newman, G.&nbsp;Hansen, and D.&nbsp;Lebrun-Grandi&eacute;.
- Moose: A parallel computational framework for coupled systems of
+ MOOSE: A parallel computational framework for coupled systems of
   nonlinear equations.
  <em>Nuclear Engineering and Design</em>, 239(10):1768-1778, 2009.
  <a href="http://dx.doi.org/10.1016/j.nucengdes.2009.05.021">http://dx.doi.org/10.1016/j.nucengdes.2009.05.021</a>.
 <a name="Gaston_2009b"></a><pre>
 @article{Gaston_2009b,
   author = {D.~Gaston and C.~Newman and G.~Hansen and D.~Lebrun-Grandi\'{e}},
-  title = {MOOSE: A parallel computational framework for coupled
+  title = {{MOOSE}: A parallel computational framework for coupled
              systems of nonlinear equations},
   journal = {Nuclear Engineering and Design},
   volume = {239},
@@ -2475,18 +2915,18 @@ D.&nbsp;Gaston, C.&nbsp;Newman, G.&nbsp;Hansen, and D.&nbsp;Lebrun-Grandi&eacute
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Jones_2009">20</a>]
+[<a name="Jones_2009">23</a>]
 </td>
 <td class="bibtexitem">
 I.&nbsp;A. Jones, W.&nbsp;Ruijter, and A.&nbsp;C. Long.
- A novel tetrahedal element for static and dynamic analysis of
+ A novel tetrahedral element for static and dynamic analysis of
   laminated composites.
  <em>Journal of Physics: Conference Series</em>, 181:012042 (8pp), 2009.
  <a href="http://dx.doi.org/10.1088/1742-6596/181/1/012042">http://dx.doi.org/10.1088/1742-6596/181/1/012042</a>.
 <a name="Jones_2009"></a><pre>
 @article{Jones_2009,
   author = {I.~A.~Jones and W.~Ruijter and A.~C.~Long},
-  title = {A novel tetrahedal element for static and dynamic analysis of laminated composites},
+  title = {A novel tetrahedral element for static and dynamic analysis of laminated composites},
   journal = {Journal of Physics: Conference Series},
   volume = {181},
   pages = {012042 (8pp)},
@@ -2502,36 +2942,7 @@ I.&nbsp;A. Jones, W.&nbsp;Ruijter, and A.&nbsp;C. Long.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2009">21</a>]
-</td>
-<td class="bibtexitem">
-V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;Mousseau.
- Verification of multiphysics software: Space and time convergence
-  studies for nonlinearly coupled applications.
- In <em>International Conference on Mathematics, Computaional Methods
-  &amp; Reactor Physics (M&amp;C 2009)</em>, Saratoga Springs, New York, 2009.
- <a href="http://www.inl.gov/technicalpublications/Documents/4247162.pdf">http://www.inl.gov/technicalpublications/Documents/4247162.pdf</a>.
-<a name="Mahadevan_2009"></a><pre>
-@conference{Mahadevan_2009,
-  author = {V.~S.~Mahadevan and J.~C.~Ragusa and V.~Mousseau},
-  title = {Verification of Multiphysics software: Space and time
-               convergence studies for nonlinearly coupled applications},
-  booktitle = {International Conference on Mathematics, Computaional
-               Methods \& Reactor Physics (M\&C 2009)},
-  address = {Saratoga Springs, New York},
-  year = {2009},
-  note = {\url{http://www.inl.gov/technicalpublications/Documents/4247162.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Gaston_2009">22</a>]
+[<a name="Gaston_2009">24</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Gaston, G.&nbsp;Hansen, S.&nbsp;Kadioglu, D.&nbsp;A. Knoll, C.&nbsp;Newman, H.&nbsp;Park, C.&nbsp;Permann,
@@ -2560,7 +2971,7 @@ D.&nbsp;Gaston, G.&nbsp;Hansen, S.&nbsp;Kadioglu, D.&nbsp;A. Knoll, C.&nbsp;Newm
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Luethi2009">23</a>]
+[<a name="Luethi2009">25</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;P. L&uuml;thi.
@@ -2587,7 +2998,7 @@ M.&nbsp;P. L&uuml;thi.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Valli_2009">24</a>]
+[<a name="Valli_2009">26</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&nbsp;A. Coutinho.
@@ -2616,7 +3027,7 @@ A.&nbsp;M.&nbsp;P. Valli, R.&nbsp;N. Elias, G.&nbsp;F. Carey, and A.&nbsp;L. G.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Biermann_2009">25</a>]
+[<a name="Biermann_2009">27</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Biermann, O.&nbsp;von Estorff, S.&nbsp;Petersen, and C.&nbsp;Wenterodt.
@@ -2646,7 +3057,7 @@ J.&nbsp;Biermann, O.&nbsp;von Estorff, S.&nbsp;Petersen, and C.&nbsp;Wenterodt.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2009">26</a>]
+[<a name="Kirk_2009">28</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -3131,14 +3542,14 @@ O.&nbsp;von Estorff, S.&nbsp;Petersen, and D.&nbsp;Dreyer.
 E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
  Topology optimization with adaptive mesh refinement.
  In J.&nbsp;F. Abel and J.&nbsp;R. Cooke, editors, <em>Proceedings of the 6th
-  Internation Conference on Computation of Shell and Spatial Structures
+  International Conference on Computation of Shell and Spatial Structures
   (IASS-IACM 2008)</em>, Ithaca, NY, 2008. Cornell University.
  <a href="http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf">http://www.math.vt.edu/people/sturler/publications/Proc-IASS-IACM_TopOptAMR_SturlerPaulinoWang_2008.pdf</a>.
 <a name="DeSturler_2008"></a><pre>
 @inproceedings{DeSturler_2008,
   author = {E.~{De Sturler} and G.~H.~Paulino and S.~Wang},
   title = {Topology Optimization with Adaptive Mesh Refinement},
-  booktitle = {{Proceedings of the 6th Internation Conference on
+  booktitle = {{Proceedings of the 6th International Conference on
                  Computation of Shell and Spatial Structures (IASS-IACM 2008)}},
   editor = {J.~F.~Abel and J.~R.~Cooke},
   publisher = {Cornell University},
