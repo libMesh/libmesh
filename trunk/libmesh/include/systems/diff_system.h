@@ -194,6 +194,19 @@ public:
    */
   bool print_element_jacobians;
 
+  /**
+   * Pointer to object to use for physics assembly evaluations.
+   * Defaults to \p this for backwards compatibility; in the future
+   * users should create separate physics objects.
+   */
+  DifferentiablePhysics *diff_physics;
+
+  /**
+   * Pointer to object to use for quantity of interest assembly
+   * evaluations.  Defaults to \p this for backwards compatibility; in
+   * the future users should create separate physics objects.
+   */
+  DifferentiableQoI *diff_qoi; 
 protected:
   /**
    * Initializes the member data fields associated with
