@@ -78,44 +78,44 @@ public:
    * Returns the value of the solution variable \p var at the quadrature
    * point \p qp on the current element interior
    */
-  Number interior_value(unsigned int var, unsigned int qp);
+  Number interior_value(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature
    * point \p qp on the current element side
    */
-  Number side_value(unsigned int var, unsigned int qp);
+  Number side_value(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the value of the solution variable \p var at the physical
    * point \p p on the current element
    */
-  Number point_value(unsigned int var, const Point &p);
+  Number point_value(unsigned int var, const Point &p) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
    * point \p qp on the current element interior
    */
-  Gradient interior_gradient(unsigned int var, unsigned int qp);
+  Gradient interior_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
    * point \p qp on the current element side
    */
-  Gradient side_gradient(unsigned int var, unsigned int qp);
+  Gradient side_gradient(unsigned int var, unsigned int qp) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
    * point \p qp on the current element interior
    */
-  Tensor interior_hessian(unsigned int var, unsigned int qp);
+  Tensor interior_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
    * point \p qp on the current element side
    */
-  Tensor side_hessian(unsigned int var, unsigned int qp);
+  Tensor side_hessian(unsigned int var, unsigned int qp) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -123,44 +123,44 @@ public:
    * Returns the value of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element interior
    */
-  Number fixed_interior_value(unsigned int var, unsigned int qp);
+  Number fixed_interior_value(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the value of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element side
    */
-  Number fixed_side_value(unsigned int var, unsigned int qp);
+  Number fixed_side_value(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the value of the fixed_solution variable \p var at the physical
    * point \p p on the current element
    */
-  Number fixed_point_value(unsigned int var, const Point &p);
+  Number fixed_point_value(unsigned int var, const Point &p) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element interior
    */
-  Gradient fixed_interior_gradient(unsigned int var, unsigned int qp);
+  Gradient fixed_interior_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element side
    */
-  Gradient fixed_side_gradient(unsigned int var, unsigned int qp);
+  Gradient fixed_side_gradient(unsigned int var, unsigned int qp) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element interior
    */
-  Tensor fixed_interior_hessian(unsigned int var, unsigned int qp);
+  Tensor fixed_interior_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element side
    */
-  Tensor fixed_side_hessian(unsigned int var, unsigned int qp);
+  Tensor fixed_side_hessian(unsigned int var, unsigned int qp) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
