@@ -140,7 +140,7 @@ FEMContext::~FEMContext()
 
 
 
-Number FEMContext::interior_value(unsigned int var, unsigned int qp)
+Number FEMContext::interior_value(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -166,7 +166,7 @@ Number FEMContext::interior_value(unsigned int var, unsigned int qp)
 
 
 
-Gradient FEMContext::interior_gradient(unsigned int var, unsigned int qp)
+Gradient FEMContext::interior_gradient(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -193,7 +193,7 @@ Gradient FEMContext::interior_gradient(unsigned int var, unsigned int qp)
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor FEMContext::interior_hessian(unsigned int var, unsigned int qp)
+Tensor FEMContext::interior_hessian(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -220,7 +220,7 @@ Tensor FEMContext::interior_hessian(unsigned int var, unsigned int qp)
 
 
 
-Number FEMContext::side_value(unsigned int var, unsigned int qp)
+Number FEMContext::side_value(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -246,7 +246,7 @@ Number FEMContext::side_value(unsigned int var, unsigned int qp)
 
 
 
-Gradient FEMContext::side_gradient(unsigned int var, unsigned int qp)
+Gradient FEMContext::side_gradient(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -273,7 +273,7 @@ Gradient FEMContext::side_gradient(unsigned int var, unsigned int qp)
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor FEMContext::side_hessian(unsigned int var, unsigned int qp)
+Tensor FEMContext::side_hessian(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -300,7 +300,7 @@ Tensor FEMContext::side_hessian(unsigned int var, unsigned int qp)
 
 
 
-Number FEMContext::point_value(unsigned int var, const Point &p)
+Number FEMContext::point_value(unsigned int var, const Point &p) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -326,7 +326,7 @@ Number FEMContext::point_value(unsigned int var, const Point &p)
 
 
 
-Number FEMContext::fixed_interior_value(unsigned int var, unsigned int qp)
+Number FEMContext::fixed_interior_value(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -352,7 +352,7 @@ Number FEMContext::fixed_interior_value(unsigned int var, unsigned int qp)
 
 
 
-Gradient FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp)
+Gradient FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -379,7 +379,7 @@ Gradient FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp)
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp)
+Tensor FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -406,7 +406,7 @@ Tensor FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp)
 
 
 
-Number FEMContext::fixed_side_value(unsigned int var, unsigned int qp)
+Number FEMContext::fixed_side_value(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -432,7 +432,7 @@ Number FEMContext::fixed_side_value(unsigned int var, unsigned int qp)
 
 
 
-Gradient FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp)
+Gradient FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -459,7 +459,7 @@ Gradient FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp)
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp)
+Tensor FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -486,7 +486,7 @@ Tensor FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp)
 
 
 
-Number FEMContext::fixed_point_value(unsigned int var, const Point &p)
+Number FEMContext::fixed_point_value(unsigned int var, const Point &p) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
