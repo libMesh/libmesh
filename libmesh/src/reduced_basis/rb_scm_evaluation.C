@@ -218,7 +218,7 @@ Real RBSCMEvaluation::get_SCM_LB()
   // Add rows to the LP: corresponds to the auxiliary
   // variables that define the constraints at each
   // mu \in C_J_M
-  unsigned int n_rows = C_J.size()+1;
+  unsigned int n_rows = C_J.size();
   glp_add_rows(lp, n_rows);
 
   // Now put current_parameters in saved_parameters
@@ -229,7 +229,7 @@ Real RBSCMEvaluation::get_SCM_LB()
   std::vector<int> ja(matrix_size+1);
   std::vector<double> ar(matrix_size+1);
   unsigned int count=0;
-  for(unsigned int m=0; m<n_rows-1; m++)
+  for(unsigned int m=0; m<n_rows; m++)
   {
     set_current_parameters_from_C_J(m);
 
@@ -255,25 +255,6 @@ Real RBSCMEvaluation::get_SCM_LB()
   // Now load the original parameters back into current_parameters
   // in order to set the coefficients of the objective function
   reload_current_parameters();
-
-  // Set the lower bound on the auxiliary variable
-  // to force positivity of the stability constant at mu_index
-  glp_set_row_bnds(lp, n_rows, GLP_LO, 0., 0.);
-
-  // Now define the matrix that relates the y's
-  // to the auxiliary variables at the current
-  // value of mu.
-  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
-      {
-        count++;
-
-        ia[count] = n_rows;
-        ja[count] = q+1;
-
-        // This can only handle Reals right now
-        ar[count] = libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()) );
-      }
-
 
   glp_load_matrix(lp, matrix_size, &ia[0], &ja[0], &ar[0]);
 
