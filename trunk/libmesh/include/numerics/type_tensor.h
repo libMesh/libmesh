@@ -408,7 +408,7 @@ template<typename T2>
 inline
 void TypeTensor<T>::assign (const TypeTensor<T2> &p)
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
     _coords[i] = p._coords[i];
 }
 
