@@ -1758,65 +1758,66 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
 
-  // Get ready to accumulate a value
   Number u = 0;
 
-  // Make sure we got an element on our partition
-  bool I_found_p = false;
-
-  if (e)
-    {
-      // Get the dof map to get the proper indices for our computation
-      const DofMap& dof_map = this->get_dof_map();
-
-      // Need dof_indices for phi[i][j]
-      std::vector<unsigned int> dof_indices;
-
-      // Fill in the dof_indices for our element
-      dof_map.dof_indices (e, dof_indices, var);
-
-      // Calculate a value for p, if we have enough local and ghosted
-      // data to do so.
-      if (dof_map.all_semilocal_indices(dof_indices))
-        {
-          I_found_p = true;
-
-          // Get the no of dofs assciated with this point
-          const unsigned int n_dofs  = dof_indices.size();
-
-          FEType fe_type = dof_map.variable_type(0);
-
-          // Build a FE so we can calculate u(p)
-          AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-
-          // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
-          // Build a vector of point co-ordinates to send to reinit
-          std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, e, p));
-
-          // Get the shape function values
-          const std::vector<std::vector<Real> >& phi = fe->get_phi();
-
-          // Reinitialize the element and compute the shape function values at coor
-          fe->reinit (e, &coor);
-
-          for (unsigned int l=0; l<n_dofs; l++)
-            {
-              u += phi[l][0]*this->current_solution (dof_indices[l]);
-            }
-        }
-    }
+  if (e && e->processor_id() == libMesh::processor_id())
+    u = point_value(var, p, e);
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
+  unsigned int lowest_owner =
+    (e && (e->processor_id() == libMesh::processor_id())) ?
+    libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
-  // If nobody admits owning the point, we may have a problem.
+  // If nobody admits owning the point, we have a problem.
   if (lowest_owner != libMesh::n_processors())
     Parallel::broadcast(u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
+
+  return u;
+}
+
+Number System::point_value(unsigned int var, const Point &p, const Elem &e) const
+{
+  libmesh_assert (e.processor_id() == libMesh::processor_id());
+
+  // Get the dof map to get the proper indices for our computation
+  const DofMap& dof_map = this->get_dof_map();
+
+  // Need dof_indices for phi[i][j]
+  std::vector<unsigned int> dof_indices;
+
+  // Fill in the dof_indices for our element
+  dof_map.dof_indices (&e, dof_indices, var);
+
+  // Get the no of dofs assciated with this point
+  const unsigned int n_dofs  = dof_indices.size();
+
+  FEType fe_type = dof_map.variable_type(0);
+
+  // Build a FE so we can calculate u(p)
+  AutoPtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+  // Build a vector of point co-ordinates to send to reinit
+  std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
+
+  // Get the shape function values
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+
+  // Reinitialize the element and compute the shape function values at coor
+  fe->reinit (&e, &coor);
+
+  // Get ready to accumulate a value
+  Number u = 0;
+
+  for (unsigned int l=0; l<n_dofs; l++)
+    {
+      u += phi[l][0]*this->current_solution (dof_indices[l]);
+    }
 
   return u;
 }
@@ -1838,9 +1839,6 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   // Get a reference to the mesh object associated with the system object that calls this function
   const MeshBase &mesh = this->get_mesh();
 
-  // Get the dimension of the mesh
-  const unsigned int dim = mesh.mesh_dimension();
-
   // Use an existing PointLocator or create a new one
   AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
@@ -1851,56 +1849,15 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
 
-  // Get ready to accumulate a gradient
   Gradient grad_u;
 
-  // Make sure we got an element on our partition
-  bool I_found_p = false;
-
-  if (e)
-    {
-      // Get the dof map to get the proper indices for our computation
-      const DofMap& dof_map = this->get_dof_map();
-
-      // Need dof_indices for phi[i][j]
-      std::vector<unsigned int> dof_indices;
-
-      // Fill in the dof_indices for our element
-      dof_map.dof_indices (e, dof_indices, var);
-
-      // Calculate a value for p, if we have enough local and ghosted
-      // data to do so.
-      if (dof_map.all_semilocal_indices(dof_indices))
-        {
-          I_found_p = true;
-
-          // Get the no of dofs assciated with this point
-          const unsigned int n_dofs  = dof_indices.size();
-
-          FEType fe_type = dof_map.variable_type(0);
-
-          // Build a FE again so we can calculate u(p)
-          AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-
-          // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
-          // Build a vector of point co-ordinates to send to reinit
-          std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, e, p));
-
-          // Get the values of the shape function derivatives
-	  const std::vector<std::vector<RealGradient> >&  dphi = fe->get_dphi();
-
-          // Reinitialize the element and compute the shape function values at coor
-          fe->reinit (e, &coor);
-
-          for (unsigned int l=0; l<n_dofs; l++)
-            {
-              grad_u.add_scaled (dphi[l][0], this->current_solution (dof_indices[l]));
-            }
-        }
-    }
+  if (e && e->processor_id() == libMesh::processor_id())
+    grad_u = point_gradient(var, p, e);
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
+  unsigned int lowest_owner =
+    (e && (e->processor_id() == libMesh::processor_id())) ?
+    libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
@@ -1914,6 +1871,48 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   return grad_u;
 }
 
+
+Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e) const
+{
+  libmesh_assert (e.processor_id() == libMesh::processor_id());
+
+  // Get the dof map to get the proper indices for our computation
+  const DofMap& dof_map = this->get_dof_map();
+
+  // Need dof_indices for phi[i][j]
+  std::vector<unsigned int> dof_indices;
+
+  // Fill in the dof_indices for our element
+  dof_map.dof_indices (&e, dof_indices, var);
+
+  // Get the no of dofs assciated with this point
+  const unsigned int n_dofs  = dof_indices.size();
+
+  FEType fe_type = dof_map.variable_type(0);
+
+  // Build a FE again so we can calculate u(p)
+  AutoPtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+  // Build a vector of point co-ordinates to send to reinit
+  std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
+
+  // Get the values of the shape function derivatives
+  const std::vector<std::vector<RealGradient> >&  dphi = fe->get_dphi();
+
+  // Reinitialize the element and compute the shape function values at coor
+  fe->reinit (&e, &coor);
+
+  // Get ready to accumulate a gradient
+  Gradient grad_u;
+
+  for (unsigned int l=0; l<n_dofs; l++)
+    {
+      grad_u.add_scaled (dphi[l][0], this->current_solution (dof_indices[l]));
+    }
+
+  return grad_u;
+}
 
 
 // We can only accumulate a hessian with --enable-second
@@ -1946,56 +1945,15 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   // Get a pointer to the element that contains P
   const Elem *e = locator(p);
 
-  // Get ready to accumulate a hessian
   Tensor hess_u;
 
-  // Make sure we got an element on our partition
-  bool I_found_p = false;
-
-  if (e)
-    {
-      // Get the dof map to get the proper indices for our computation
-      const DofMap& dof_map = this->get_dof_map();
-
-      // Need dof_indices for phi[i][j]
-      std::vector<unsigned int> dof_indices;
-
-      // Fill in the dof_indices for our element
-      dof_map.dof_indices (e, dof_indices, var);
-
-      // Calculate a value for p, if we have enough local and ghosted
-      // data to do so.
-      if (dof_map.all_semilocal_indices(dof_indices))
-        {
-          I_found_p = true;
-
-          // Get the no of dofs assciated with this point
-          const unsigned int n_dofs  = dof_indices.size();
-
-          FEType fe_type = dof_map.variable_type(0);
-
-          // Build a FE again so we can calculate u(p)
-          AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-
-          // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
-          // Build a vector of point co-ordinates to send to reinit
-          std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, e, p));
-
-          // Get the values of the shape function derivatives
-	  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
-
-          // Reinitialize the element and compute the shape function values at coor
-          fe->reinit (e, &coor);
-
-          for (unsigned int l=0; l<n_dofs; l++)
-            {
-              hess_u.add_scaled (d2phi[l][0], this->current_solution (dof_indices[l]));
-            }
-        }
-    }
+  if (e && e->processor_id() == libMesh::processor_id())
+    hess_u = point_hessian(var, p, e);
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner = I_found_p ? libMesh::processor_id() : libMesh::n_processors();
+  unsigned int lowest_owner =
+    (e && (e->processor_id() == libMesh::processor_id())) ?
+    libMesh::processor_id() : libMesh::n_processors();
   Parallel::min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
@@ -2008,8 +1966,59 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 
   return hess_u;
 }
+
+Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) const
+{
+  libmesh_assert (e.processor_id() == libMesh::processor_id());
+
+  // Get the dof map to get the proper indices for our computation
+  const DofMap& dof_map = this->get_dof_map();
+
+  // Need dof_indices for phi[i][j]
+  std::vector<unsigned int> dof_indices;
+
+  // Fill in the dof_indices for our element
+  dof_map.dof_indices (&e, dof_indices, var);
+
+  // Get the no of dofs assciated with this point
+  const unsigned int n_dofs  = dof_indices.size();
+
+  FEType fe_type = dof_map.variable_type(0);
+
+  // Build a FE again so we can calculate u(p)
+  AutoPtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+  // Build a vector of point co-ordinates to send to reinit
+  std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
+
+  // Get the values of the shape function derivatives
+  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
+
+  // Reinitialize the element and compute the shape function values at coor
+  fe->reinit (&e, &coor);
+
+  // Get ready to accumulate a hessian
+  Tensor hess_u;
+
+  for (unsigned int l=0; l<n_dofs; l++)
+    {
+      hess_u.add_scaled (d2phi[l][0], this->current_solution (dof_indices[l]));
+    }
+
+  return hess_u;
+}
 #else
 Tensor System::point_hessian(unsigned int, const Point &, const bool) const
+{
+  // We can only accumulate a hessian with --enable-second
+  libmesh_error();
+
+  // Avoid compiler warnings
+  return Tensor();
+}
+
+Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) const
 {
   // We can only accumulate a hessian with --enable-second
   libmesh_error();
