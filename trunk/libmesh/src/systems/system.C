@@ -1745,9 +1745,6 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   // Get a reference to the mesh object associated with the system object that calls this function
   const MeshBase &mesh = this->get_mesh();
 
-  // Get the dimension of the mesh
-  const unsigned int dim = mesh.mesh_dimension();
-
   // Use an existing PointLocator or create a new one
   AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase& locator = *locator_ptr;
@@ -1931,9 +1928,6 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 
   // Get a reference to the mesh object associated with the system object that calls this function
   const MeshBase &mesh = this->get_mesh();
-
-  // Get the dimension of the mesh
-  const unsigned int dim = mesh.mesh_dimension();
 
   // Use an existing PointLocator or create a new one
   AutoPtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
