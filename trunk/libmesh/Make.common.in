@@ -110,7 +110,7 @@ enable-exodus	     = @enableexodus@
 enable-netcdf	     = @enablenetcdf@
 enable-nemesis	     = @enablenemesis@
 enable-libhilbert    = @enablelibhilbert@
-
+enable-openmp        = @enableopenmp@
 #
 # Set the current directory.
 libmesh_dir := @PWD@
@@ -348,6 +348,13 @@ ifeq ($(enable-optional),yes)
   # header path and the lib
   libmesh_LIBS    += @TBB_LIBRARY@
   libmesh_INCLUDE += @TBB_INCLUDE@
+
+  # if OpenMP is used, modify the build and link flags
+  ifeq ($(enable-openmp),yes)
+    libmesh_CXXFLAGS += @OPENMP_CXXFLAGS@
+    libmesh_CFLAGS   += @OPENMP_CFLAGS@
+    libmesh_FFLAGS   += @OPENMP_FFLAGS@
+  endif
 
   # if gzstreams are used, we need the 
   # header path and the lib
