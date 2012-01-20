@@ -1,4 +1,4 @@
-// $Id: diff_system.C 4828 2011-08-30 19:39:38Z trumanellis $
+// $Id$
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
