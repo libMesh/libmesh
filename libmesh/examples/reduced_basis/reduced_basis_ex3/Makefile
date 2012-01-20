@@ -1,4 +1,4 @@
-# $Id: Makefile 4976 2011-11-15 23:18:27Z knezed01 $
+# $Id$
  
 # The location of the mesh library
 LIBMESH_DIR ?= ../../..
