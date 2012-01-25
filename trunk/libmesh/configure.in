@@ -6,7 +6,23 @@ dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
-AC_REVISION($Revision$)
+
+dnl Copy revision stamp revision-info into the configure script, with any
+dnl dollar signs or double-quotes removed. This macro lets you put a
+dnl revision stamp from `configure.ac' into configure without RCS or cvs
+dnl changing it when you check in configure. That way, you can determine
+dnl easily which revision of `configure.ac' a particular configure
+dnl corresponds to.
+dnl
+dnl For example, this line in `configure.ac':
+dnl
+dnl AC_REVISION($Revision: 1.30 $)
+dnl produces this in configure:
+dnl 
+dnl #! /bin/sh
+dnl # From configure.ac Revision: 1.30
+dnl
+dnl AC_REVISION($Revision$)
 
 
 AC_INIT
