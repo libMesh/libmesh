@@ -1,7 +1,3 @@
-dnl -------------------------------------------------------------
-dnl $Id$
-dnl -------------------------------------------------------------
-
 dnl @synopsis AX_PREFIX_CONFIG_H [(OUTPUT-HEADER [,PREFIX [,ORIG-HEADER]])]
 dnl
 dnl This is a new variant from ac_prefix_config_ this one will use a
