@@ -1,7 +1,5 @@
-// $Id$
-
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -52,7 +50,6 @@ typedef unsigned short int processor_id_type;
  *
  * \author Benjamin S. Kirk
  * \date 2003, 2011
- * \version $Revision$
  */
 
 class DofObject : public ReferenceCountedObject<DofObject>

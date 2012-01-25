@@ -1,7 +1,5 @@
-// $Id$
-
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2008 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -56,15 +54,14 @@ typedef unsigned int uint;
  * elements with a curved boundary edge or surface",
  * Journal of Computing and Information Science in Engineering, vol. 5(4), pp.302-308, 2005.
  *
- * 2) L. Branets, G. Carey, ¡ÈA local cell quality metric and variational grid
- * smoothing algorithm¡É, Engineering with Computers, vol. 21, pp.19-28, 2005.
+ * 2) L. Branets, G. Carey, "A local cell quality metric and variational grid
+ * smoothing algorithm", Engineering with Computers, vol. 21, pp.19-28, 2005.
  *
  * 3) L.V. Branets, "A variational grid optimization algorithm based on a local
  * cell quality metric", Ph.D. thesis, The University of Texas at Austin, 2005.
  *
  * \author Derek R. Gaston
  * \date 2006
- * \version $Revision$
  */
 
 
