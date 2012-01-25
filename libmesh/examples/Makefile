@@ -1,5 +1,3 @@
-# $Id$
-
 # The location of the mesh library
 LIBMESH_DIR ?= ..
 

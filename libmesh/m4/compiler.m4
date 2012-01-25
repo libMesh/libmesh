@@ -1,8 +1,4 @@
 dnl -------------------------------------------------------------
-dnl $Id$
-dnl -------------------------------------------------------------
-
-dnl -------------------------------------------------------------
 dnl Determine the C++ compiler in use. Return the name and possibly
 dnl version of this compiler in GXX_VERSION.
 dnl

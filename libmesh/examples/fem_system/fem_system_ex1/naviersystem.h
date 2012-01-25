@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* The Next Great Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 

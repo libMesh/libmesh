@@ -1,5 +1,3 @@
-# $Id$
-#
 # This is the Makefile for the libMesh library and helper
 # applications.  This file is specific to the project.
 # See the file Make.common for path configurations.
