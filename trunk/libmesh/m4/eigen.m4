@@ -1,7 +1,3 @@
-dnl -------------------------------------------------------------
-dnl $Id$
-dnl -------------------------------------------------------------
-
 dnl ----------------------------------------------------------------
 dnl Locate header files for the C++ linear algebra library Eigen.
 dnl Eigen is a header-only template library. By default we check for the

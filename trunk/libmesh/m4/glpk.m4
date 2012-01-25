@@ -1,7 +1,3 @@
-dnl -------------------------------------------------------------
-dnl $Id$
-dnl -------------------------------------------------------------
-
 dnl ----------------------------------------------------------------
 dnl Certain parts of rbOOmit require GLPK, the GNU Linear Programming
 dnl Kit.  By default we check for the GLPK installation files in 
