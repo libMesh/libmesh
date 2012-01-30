@@ -1,6 +1,6 @@
 
-#ifndef __parsedfunction_h__
-#define __parsedfunction_h__
+#ifndef __parsed_function_h__
+#define __parsed_function_h__
 
 #include <cmath>
 #include <string>
@@ -113,4 +113,4 @@ public:
 
 #endif // LIBMESH_HAVE_FPARSER
 
-#endif // __parsedfunction_h__
+#endif // __parsed_function_h__
