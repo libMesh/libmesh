@@ -1440,8 +1440,7 @@ namespace Parallel
   class StandardType<cxxtype> : public DataType \
   { \
   public: \
-    StandardType(const cxxtype* example = NULL) : DataType(mpitype) \
-      { /* make compiler think 'example' is used */ libmesh_ignore(example); } \
+    StandardType(const cxxtype* = NULL) : DataType(mpitype) {} \
   }; \
  \
   template<> \
@@ -1457,8 +1456,7 @@ namespace Parallel
   class StandardType<cxxtype> : public DataType \
   { \
   public: \
-    StandardType(const cxxtype* example = NULL) : DataType() \
-      { /* make compiler think 'example' is used */ libmesh_ignore(example); } \
+    StandardType(const cxxtype* = NULL) : DataType() {} \
   }; \
  \
   template<> \
