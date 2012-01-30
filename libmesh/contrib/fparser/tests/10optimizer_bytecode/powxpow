@@ -1,0 +1,6 @@
+# cPow  x    [IsIntegerConst(x)] cPow -> [x] cMul cPow
+T=d
+V=x
+R=-.1,.1,0.01
+F=(x^1.7)^1506
+C=fp_pow(fp_pow(x,1.7),1506)

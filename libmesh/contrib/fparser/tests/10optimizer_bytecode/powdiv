@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y
+R=-3,3,2
+F=x/pow(x,y)
+C=x/fp_pow(x,y)

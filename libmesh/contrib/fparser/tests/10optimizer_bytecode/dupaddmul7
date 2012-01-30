@@ -1,0 +1,7 @@
+# cDup   cAdd      x cMul
+
+T=d f ld mf li gi
+V=x
+R=-3,3,1
+F=(x+x)*7
+C=x*14

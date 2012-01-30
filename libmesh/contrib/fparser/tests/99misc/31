@@ -1,0 +1,15 @@
+T=d ld mf
+V=x,y,z
+R=.1,4,.35
+
+# This function is too complex for "float" accuracy
+
+F=x - (y*(y*(y*-1))*1) + log(x*exp(1.0)^y) - log(x^y) + \
+  exp(1.0)^log(x+6) + 10^(log(x+6)/log(y+6)*log(z+6)/log(10)) - \
+  exp(1.0)^(log(x+6)*y) - 5^(log(x+7)/log(5)) + (x*z+17)^3 * (x*z+17)^2 / \
+  (x*z+17)^4
+C=x - (y*(y*(y*-1))*1) + fp_log(x*fp_pow(fp_exp(1.0),y)) - fp_log(fp_pow(x,y)) + \
+  fp_pow(fp_exp(1.0),fp_log(x+6)) + \
+  fp_pow(10.0,fp_log(x+6)/fp_log(y+6)*fp_log(z+6)/fp_log(10.0)) - \
+  fp_pow(fp_exp(1.0), fp_log(x+6)*y) - fp_pow(5.0,fp_log(x+7)/fp_log(5.0)) + \
+  fp_pow(x*z+17,3) * fp_pow(x*z+17,2) / fp_pow(x*z+17,4)

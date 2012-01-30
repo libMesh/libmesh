@@ -1,0 +1,6 @@
+DEG=true
+T=mf
+V=x
+R=0,1,1
+F=asinh(1.1)+x
+C=r2d(MpfrFloat::asinh(1.1))+x

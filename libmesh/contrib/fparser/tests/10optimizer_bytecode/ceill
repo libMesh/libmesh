@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=0,1,1
+F=ceil(1.1)+x
+C=ceill(1.1)+x

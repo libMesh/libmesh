@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y
+R=-8,8,.2
+F=atan2(x,y)+max(x,y)
+C=fp_atan2(x,y) + (x>y ? x : y)

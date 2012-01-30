@@ -1,0 +1,10 @@
+T=d f ld mf
+V=x
+R=.25, 100, .25
+
+# 1.75e21 is an arbitrary value larger than 2^64, which
+# is the limit where repeated runs of the fprem opcode
+# on 387 is required.
+
+F=1.75e21%x
+C=fp_mod(1.75e21, x)

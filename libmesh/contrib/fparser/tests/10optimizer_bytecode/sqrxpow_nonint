@@ -1,0 +1,6 @@
+# cSqr x [!isEvenInteger(x+x)] cPow -> cAbs [x+x] cPow
+T=d
+V=x
+R=-10,10,0.1
+F=(x^2)^3.5
+C=fp_pow(x*x, 3.5)

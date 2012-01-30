@@ -1,0 +1,6 @@
+DEG=true
+T=ld
+V=x
+R=0,1,1
+F=atan2(5,4)+x
+C=r2d(atan2l(5,4))+x

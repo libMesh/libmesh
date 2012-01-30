@@ -1,0 +1,6 @@
+# cSqr x cPow -> [x+x] cPow
+T=d
+V=x
+R=-.1,.1,0.01
+F=(x^2)^2402
+C=fp_pow(x*x, 2402)

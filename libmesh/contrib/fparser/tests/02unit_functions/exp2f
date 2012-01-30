@@ -1,0 +1,5 @@
+T=f
+V=x
+R=-90, 90, 0.01
+F=exp2(x)
+C=expf(x*fp_const_log2<Value_t>())

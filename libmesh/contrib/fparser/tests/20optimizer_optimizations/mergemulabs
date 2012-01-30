@@ -1,0 +1,5 @@
+T=d ld f mf li gi cd cf cld
+V=x,y,z
+R=-1,1,1
+F=abs(x)*abs(y)*z
+C=fp_abs(x)*fp_abs(y)*z

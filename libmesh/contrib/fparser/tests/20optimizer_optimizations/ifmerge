@@ -1,0 +1,7 @@
+T=d ld f mf li gi cd cf cld
+V=b,d,x,y
+R=-1,1,1
+F=if(x,if(y,x,b),if(y,x,d)) + \
+  if(b,if(d,y,x),if(d,b,x))
+C=(fp_truth(x)!=0 ? (fp_truth(y)!=0?x:b) : (fp_truth(y)!=0?x:d)) + \
+  (fp_truth(b)!=0 ? (fp_truth(d)!=0?y:x) : (fp_truth(d)!=0?b:x))

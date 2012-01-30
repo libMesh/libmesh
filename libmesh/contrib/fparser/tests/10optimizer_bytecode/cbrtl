@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=0,1,1
+F=cbrt(1.1)+x
+C=fp_cbrt(1.1)+x

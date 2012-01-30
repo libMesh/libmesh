@@ -1,0 +1,6 @@
+T=d f ld mf
+V=x
+R=2, 1e9, 1.2e7
+F=sinh((log(x)/5+1)*5) + 1.2*cosh((log(x)/log(2)+1)*log(2)) + !(x | !(x/4))
+C=fp_sinh((fp_log(x)/5+1)*5) + 1.2*fp_cosh((fp_log(x)/fp_log(2)+1)*fp_log(2)) + \
+  fp_not(fp_or(fp_truth(x), fp_not(x/4)))

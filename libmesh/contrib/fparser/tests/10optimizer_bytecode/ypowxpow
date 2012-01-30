@@ -1,0 +1,6 @@
+# y [!IsIntegerConst(y)] cPow  x     [IsIntegerConst(x)] cPow
+T=d
+V=x
+R=0,10,0.01
+F=(x^38.5)^5
+C=fp_pow(fp_pow(x,38.5),5)

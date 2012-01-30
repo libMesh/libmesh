@@ -1,0 +1,7 @@
+T=d ld f mf cd cf cld
+V=x,y
+R=0.25, 1, 0.25
+F=log(x)+log(y)
+C=fp_log(x)+fp_log(y)
+
+# Expected result: log(x*y)
