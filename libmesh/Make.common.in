@@ -92,22 +92,24 @@ perl                 = @PERL@
 
 # Flag for optional packages
 enable-optional      = @enableoptional@
-enable-laspack	     = @enablelaspack@
-enable-metis	     = @enablemetis@
-enable-parmetis	     = @enableparmetis@
-enable-sfcurves	     = @enablesfc@
-enable-gzstream      = @enablegz@
-enable-tetgen        = @enabletetgen@
-enable-triangle      = @enabletriangle@
-enable-gmv           = @enablegmv@
-enable-vtk           = @enablevtk@
-enable-glpk          = @enableglpk@
 enable-eigen         = @enableeigen@
 enable-exodus	     = @enableexodus@
-enable-netcdf	     = @enablenetcdf@
-enable-nemesis	     = @enablenemesis@
+enable-fparser       = @enablefparser@
+enable-glpk          = @enableglpk@
+enable-gmv           = @enablegmv@
+enable-gzstream      = @enablegz@
+enable-laspack	     = @enablelaspack@
 enable-libhilbert    = @enablelibhilbert@
+enable-metis	     = @enablemetis@
+enable-nemesis	     = @enablenemesis@
+enable-netcdf	     = @enablenetcdf@
 enable-openmp        = @enableopenmp@
+enable-parmetis	     = @enableparmetis@
+enable-sfcurves	     = @enablesfc@
+enable-tetgen        = @enabletetgen@
+enable-triangle      = @enabletriangle@
+enable-vtk           = @enablevtk@
+
 #
 # Set the current directory.
 libmesh_dir := @PWD@

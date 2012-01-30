@@ -14,7 +14,7 @@ endif
 
 ifeq ($(enable-fparser),no)
   all::
-        @echo "<<< $(pkgname) is disabled, not building >>>"
+	@echo "<<< $(pkgname) is disabled, not building >>>"
 else
   all:: $(target)
 #  all:: $(target) testbed speedtest functioninfo
