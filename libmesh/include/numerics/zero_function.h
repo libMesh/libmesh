@@ -1,6 +1,6 @@
 
-#ifndef __parsedfunction_h__
-#define __parsedfunction_h__
+#ifndef __zero_function_h__
+#define __zero_function_h__
 
 #include <string>
 
@@ -30,4 +30,4 @@ class ZeroFunction : public FunctionBase
 };
 
 
-#endif // __parsedfunction_h__
+#endif // __zero_function_h__
