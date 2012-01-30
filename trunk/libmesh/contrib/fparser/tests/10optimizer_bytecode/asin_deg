@@ -1,0 +1,6 @@
+DEG=true
+T=d
+V=x
+R=0,1,1
+F=asin(0.7)+x
+C=r2d(asin(0.7))+x

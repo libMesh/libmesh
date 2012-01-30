@@ -1,0 +1,5 @@
+T=d li
+V=x
+R=0,1,1
+F=(5>=3)+x+(4>=8)
+C=fp_lessOrEq(3,5)+x+fp_lessOrEq(8,4)

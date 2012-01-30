@@ -1,0 +1,5 @@
+T=d f ld li
+V=x
+R=0,1,1
+F=(x!=0) + (0!=x)
+C=(fp_nequal(x,0)) + (fp_nequal(0,x))

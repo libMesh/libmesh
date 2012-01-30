@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=-90, 90, 0.01
+F=exp(x)
+C=expl(x)

@@ -1,0 +1,15 @@
+T=d f ld
+V=x
+R=-4,4,0.25
+F=1*(tanh(x)=tanh(0.75)) + \
+  2*(tanh(x)<tanh(0.75)) + \
+  4*(tanh(x)<=tanh(0.75)) + \
+  8*(tanh(x)>tanh(0.75)) + \
+  16*(tanh(x)>=tanh(0.75)) + \
+  32*(tanh(x)!=tanh(0.75))
+C=1*fp_equal(fp_tanh(x),fp_tanh(0.75)) + \
+  2*fp_less(fp_tanh(x),fp_tanh(0.75)) + \
+  4*fp_lessOrEq(fp_tanh(x),fp_tanh(0.75)) + \
+  8*fp_greater(fp_tanh(x),fp_tanh(0.75)) + \
+  16*fp_greaterOrEq(fp_tanh(x),fp_tanh(0.75)) + \
+  32*fp_nequal(fp_tanh(x),fp_tanh(0.75))

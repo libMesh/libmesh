@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x,y
+R=-7.25, 7.25, 0.5
+F=(x-0.25)/y
+C=(x-0.25)/y

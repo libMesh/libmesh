@@ -1,0 +1,24 @@
+T=d ld f mf cd cf cld
+V=x
+R=-6,6,1
+
+# Combine tests:
+#   cmplt_pow_imm_posneg
+#   cmple_pow_imm_posneg
+#   cmpgt_pow_imm_posneg
+#   cmpge_pow_imm_posneg
+#   cmpne_pow_imm_posneg
+#   cmpeq_pow_imm_posneg
+
+F=0x0001 * (pow(x,3) < -125) + \
+  0x0002 * (pow(x,3) <= -125) + \
+  0x0004 * (pow(x,3) > -125) + \
+  0x0008 * (pow(x,3) >= -125) + \
+  0x0010 * (pow(x,3) != -125) + \
+  0x0020 * (pow(x,3) = -125)
+C=0x0001 * fp_less(x*x*x, -125) + \
+  0x0002 * fp_lessOrEq(x*x*x, -125) + \
+  0x0004 * fp_greater(x*x*x, -125) + \
+  0x0008 * fp_greaterOrEq(x*x*x, -125) + \
+  0x0010 * fp_nequal(x*x*x, -125) + \
+  0x0020 * fp_equal(x*x*x, -125)

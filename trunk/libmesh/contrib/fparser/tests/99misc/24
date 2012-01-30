@@ -1,0 +1,7 @@
+# Note: Contains a duplicate of regressions 1 and 2
+
+T=d f ld mf li gi
+V=x
+R=-1000,1000,1
+F=(min(x, min(1,x)) + min(x, 1))/2 + min(x, 1)*3 + max(0, min(-2,0))
+C=(fp_min(x, fp_min(1,x)) + fp_min(x, 1))/2 + fp_min(x, 1)*3 + fp_max(0, fp_min(-2,0))

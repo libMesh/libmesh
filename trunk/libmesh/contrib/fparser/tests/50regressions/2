@@ -1,0 +1,7 @@
+# Bug fixed in commit 933cb4b9499535eb2718193897326811e62829a6
+
+T=d f ld mf li gi
+V=x
+R=-10,10,1
+F=min(x,min(1,x))
+C=fp_min(x,fp_min(1,x))

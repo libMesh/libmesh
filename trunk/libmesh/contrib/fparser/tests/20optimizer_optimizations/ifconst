@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x,y,z
+R=-1,1,0.5
+F=if(1, x,y) + if(0,z,y)
+C=x+y+z*0

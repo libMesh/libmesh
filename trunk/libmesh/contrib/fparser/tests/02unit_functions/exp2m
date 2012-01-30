@@ -1,0 +1,5 @@
+T=mf
+V=x
+R=-90, 90, 0.02
+F=exp2(x)
+C=MpfrFloat::exp2(x)

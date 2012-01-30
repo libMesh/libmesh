@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y
+R=-10,10,.5
+F= ( ((( ( x-y) -( ((y) *2) -3)) )* 4))+sin(x)*cos(y)-cos(x)*sin(y)
+C=( ((( ( x-y) -( ((y) *2) -3)) )* 4))+fp_sin(x)*fp_cos(y)-fp_cos(x)*fp_sin(y)

@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-1,1,0.5
+F=floor(-x)
+C=fp_floor(-x)

@@ -1,0 +1,5 @@
+T=mf
+V=x
+R=0,1,1
+F=tan(1.1)+x
+C=MpfrFloat::tan(1.1)+x

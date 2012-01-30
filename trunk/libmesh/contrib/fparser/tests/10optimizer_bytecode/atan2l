@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=0,1,1
+F=atan2(5,4)+x
+C=atan2l(5,4)+x

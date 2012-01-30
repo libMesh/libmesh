@@ -1,0 +1,7 @@
+T=d f ld
+V=x
+R=-3,3,0.5
+F=1*(exp2(x)=-4) + 2*(exp2(x)<-4) + 4*(exp2(x)<=-4) + \
+  8*(exp2(x)>-4) + 16*(exp2(x)>=-4) + 32*(exp2(x)!=-4)
+C=1*fp_equal(fp_exp2(x),-4) + 2*fp_less(fp_exp2(x),-4) + 4*fp_lessOrEq(fp_exp2(x),-4) + \
+  8*fp_greater(fp_exp2(x),-4) + 16*fp_greaterOrEq(fp_exp2(x),-4) + 32*fp_nequal(fp_exp2(x),-4)

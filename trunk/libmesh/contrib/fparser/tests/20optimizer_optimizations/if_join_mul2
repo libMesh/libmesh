@@ -1,0 +1,5 @@
+T=d ld f mf li gi cd cf cld
+V=x
+R=3,5,1
+F=x * 10 * if(x<4, 3,4)
+C=x * (fp_less(x,4)!=0 ? 30 : 40)

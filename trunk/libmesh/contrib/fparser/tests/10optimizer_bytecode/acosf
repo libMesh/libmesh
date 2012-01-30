@@ -1,0 +1,5 @@
+T=f
+V=x
+R=0,1,1
+F=acos(0.7)+x
+C=acosf(0.7)+x

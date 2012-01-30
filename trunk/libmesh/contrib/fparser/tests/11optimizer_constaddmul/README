@@ -1,0 +1,69 @@
+# Test topics:
+#
+# fparser.cc, CompileMul:
+#
+#    ... cInv 5 cMul      -->      ... 5 cRDiv		TEST 1
+#    5 ... cMul           -->      ... 5 cMul		TEST 2
+#    5 ... cDiv           --> cInv ... 5 cMul		TEST 3
+#    ::: 5 cMul ... cMul  --> ::: ... cMul 5 cMul	TEST 4
+#    ::: 5 cMul ... cDiv  --> ::: ... cDiv 5 cMul	TEST 5
+#    ::: cInv ... cMul    --> ::: ... cRDiv		TEST 6
+#    ::: cInv ... cDiv    --> ::: ... cMul cInv		TEST 7
+#    ::: ... 5 cMul cMul  --> ::: ... cMul 5 cMul	TEST 8
+#    ::: ... 5 cMul cDiv  --> ::: ... cDiv .2 cMul	TEST 9
+#    ::: ... 5 cRDiv cMul --> ::: ... cDiv 5 cMul	TEST 10
+#    ::: ... 5 cRDiv cDiv --> ::: ... cDiv .2 cMul	TEST 11
+#
+# fparser.cc, CompileAdd:
+#
+#    ... cNeg 5 cAdd      --> ... 5 cRSub		TEST 12
+#    5 ... cAdd           --> ... 5 cAdd		TEST 13
+#    5 ... cSub           --> ... cNeg 5 cAdd		TEST 14
+#    ::: 5 cAdd ... cAdd  --> ::: ... cAdd 5 cAdd	TEST 15
+#    ::: 5 cAdd ... cSub  --> ::: ... cSub 5 cAdd	TEST 16
+#    ::: cNeg ... cAdd    --> ::: ... cRSub		TEST 17
+#    ::: cNeg ... cSub    --> ::: ... cAdd cNeg		TEST 18
+#    ::: ... 5 cAdd cAdd  --> ::: ... cAdd 5 cAdd	TEST 19
+#    ::: ... 5 cAdd cSub  --> ::: ... cSub -5 cAdd	TEST 20
+#    ::: ... 5 cRSub cAdd --> ::: ... cSub 5 cAdd	TEST 21
+#    ::: ... 5 cRSub cSub --> ::: ... cAdd -5 cAdd	TEST 22
+#
+# bytecoderules (a,b = variables, P=non-negative opcode):
+#
+#   b cRDiv a cDiv       --> a cMul b cRDiv		TEST 23
+#   5 cRDiv a cDiv       --> a cMul 5 cRDiv		TEST 24
+#   5 cRDiv a cMul       --> a 5 cMul cRDiv		TEST 25
+#   b cDiv a cDiv        --> b a cMul cDiv		TEST 26
+#   b cDiv a cMul        --> a cMul b cDiv		TEST 27
+#   7 b cDiv 5 cMul      --> 35 b cDiv			Cannot achieve test case
+#   7 cMul b cDiv 5 cMul --> 35 cMul b cDiv		Cannot achieve test case
+#   cNeg b cDiv 5 cMul   --> -5 cMul b cDiv		TEST 28
+#   cRDiv a cMul         --> a cMul cRDiv		TEST 29 (possibly duplicate of 25)
+#   7 cRDiv 5 cMul       --> 35 cRDiv			TEST 30
+#   7 cMul cRDiv 5 cMul  --> 35 cMul cRDiv		Cannot achieve test case
+#   cNeg cRDiv 5 cMul    --> -5 cMul cRDiv		TEST 31
+#
+#   5 cRSub a cSub       --> a cAdd 5 cRSub		TEST 32
+#   5 cRSub a cAdd       --> a 5 cAdd cRSub		TEST 33
+#   7 b cSub 5 cAdd      --> 12 b cSub			Cannot achieve test case
+#   7 cAdd b cSub 5 cAdd --> 12 cAdd b cSub		TEST 34
+#   cNeg b cSub 5 cAdd   --> -5 cAdd b csub		TEST 35
+#   cRSub a cAdd         --> a cAdd cRSub		TEST 32 (duplicate)
+#   cRSub a cSub         --> a cSub cRSub		TEST 33 (duplicate)
+#   7 cRSub 5 cAdd       --> 12 cRSub			TEST 36
+#   7 cAdd cRSub 5 cAdd  --> 12 cAdd cRSub		TEST 37
+#   cNeg cRSub 5 cAdd    --> -5 cAdd cRSub		Cannot achieve test case
+#   P 0 cLess            --> P 0 cMul			TEST 38
+#
+#   7 cAdd 5 cMul        --> 5 cMul 35 cAdd		TEST 39
+#   a 7 cMul cAdd 5 cMul --> 5 cMul a 35 cMul cAdd	TEST 40
+#   a 7 cMul cSub 5 cMul --> 5 cMul a 35 cMul cSub	TEST 41
+#
+#   7 cAdd 5 cAdd        --> 12 cAdd                    TEST 42
+#   7 cMul 5 cMul        --> 35 cMul                    TEST 43
+#
+# Tests are done for a floating point type (double)
+# and an integer type (long int).
+# Some of these optimizations are not done for integers, and
+# testing will verify that int mathematics is not broken.
+#

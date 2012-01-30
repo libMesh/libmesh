@@ -1,0 +1,5 @@
+T=li gi
+V=x,y
+R=-40, 40, 3
+F=x-y
+C=x-y

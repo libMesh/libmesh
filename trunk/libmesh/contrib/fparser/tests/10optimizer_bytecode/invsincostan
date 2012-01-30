@@ -1,0 +1,62 @@
+T=ld
+V=x,y
+R=-0.7, 0.7, 0.28
+F=x/sin(y) + x/cos(y) + x/tan(y) + x/csc(y) + x/sec(y) + x/cot(y) + \
+  1/sin(y) + 1/cos(y) + 1/tan(y) + 1/csc(y) + 1/sec(y) + 1/cot(y)
+
+# Expected outcome after bytecode optimization:
+#     x*csc(y) + x*sec(y) + x*cot(y)
+#   + x*sin(y) + x*cos(y) + x*tan(y)
+#   + csc(y) + sec(y) + cot(y)
+#   + sin(y) + cos(y) + tan(y)
+
+# Expected intermediate form in tree optimization:
+#     x*sin(y)^-1 + x*cos(y)^-1 + x*cos(y)*sin(y)^-1
+#   + x*sin(y)    + x*cos(y)    + x*sin(y)*cos(y)^-1
+#   + sin(y)^-1 + cos(y)^-1 + cos(y)*sin(y)^-1
+#   + sin(y)    + cos(y)    + sin(y)*cos(y)^-1
+
+# One of possible outcomes after tree optimization:
+#  (x+1) * ( (sin(y)+cos(y)+tan(y)) + 1/(sin(y)+cos(y)+tan(y)) )
+
+# One of possible outcomes after tree optimization:
+#     (x+1) * (sin(y) * (1 + cos(y)^-1)
+#            + cos(y) * (1 + sin(y)^-1)
+#            + sin(y)^-1
+#            + cos(y)^-1)
+# Note: sin(y) and cos(y) are subject to CSE and use of sincos().
+# which would optimally result in the following bytecode:
+#     00  push y         [0=y]
+#     01  sincos         [0=sin,1=cos]
+#     02  dup            [2=cos]
+#     03  inv            [2=cos^-1]
+#     04  fetch 0        [3=sin]
+#     06  inv            [3=sin^-1]
+#     07  push x         [4=x]
+#     08  push 1         [5=1]
+#     09  add            [4=x+1]
+#     0A  fetch 0        [5=sin]
+#     0C  push 1         [6=1]
+#     0D  fetch 2        [7=cos^-1]
+#     0F  add            [6=1+cos^-1]
+#     10  mul            [5=sin * (1+cos^-1)]
+#     11  fetch 1        [6=sin]
+#     13  push 1         [7=1]
+#     14  fetch 3        [8=sin^-1]
+#     16  add            [7=1+sin^-1]
+#     17  mul            [6=cos * (1+cos^-1)]
+#     18  add            [5=sin * (1+cos^-1) + cos * (1+cos^-1)]
+#     19  fetch 3        [6=sin^-1]
+#     1B  add            [5=sin * (1+cos^-1) + cos * (1+cos^-1) + sin^-1]
+#     1C  fetch 2        [6=cos^-1]
+#     1E  add            [5=sin * (1+cos^-1) + cos * (1+cos^-1) + sin^-1 + cos^-1]
+#     1F  mul            [4=result]
+#     20  <end>
+
+# Unfortunately, the optimizer generates tan(), sec() and so on
+# before it realizes the opportunities for sincos() use.
+
+C=    x/fp_sin(y) + x/fp_cos(y) + x/fp_tan(y) \
+    + x*fp_sin(y) + x*fp_cos(y) + x*fp_tan(y) \
+    + 1/fp_sin(y) + 1/fp_cos(y) + 1/fp_tan(y) \
+    + 1*fp_sin(y) + 1*fp_cos(y) + 1*fp_tan(y)

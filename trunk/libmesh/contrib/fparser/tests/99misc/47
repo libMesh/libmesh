@@ -1,0 +1,7 @@
+T=d f ld mf
+V=x,y
+R=-3, 3, .1
+F=1.25*(exp(x)+exp(-x)) + 1.5*(exp(y)-exp(-y)) + \
+  1.75*((exp(-x)+exp(x))/2) + 2.0*((exp(-x)-exp(x))/2) + 2.25*(cosh(y)+sinh(y))
+C=1.25*(fp_exp(x)+fp_exp(-x)) + 1.5*(fp_exp(y)-fp_exp(-y)) + \
+  1.75*((fp_exp(-x)+fp_exp(x))/2) + 2.0*((fp_exp(-x)-fp_exp(x))/2) + 2.25*(fp_cosh(y)+fp_sinh(y))

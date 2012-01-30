@@ -1,0 +1,37 @@
+Functions / Classes needing explicit instantations, per module:
+
+codetree:		CodeTree<>
+
+readbytecode:		CodeTree::GenerateFrom()
+
+makebytecode:		CodeTree::SynthesizeByteCode()
+
+cse:			CodeTree::SynthCommonSubExpressions()
+
+transformations:	CodeTree::RecreateInversionsAndNegations()
+
+hash:			CodeTree::Rehash()
+			CodeTree::FixIncompleteHashes()
+			CodeTreeData::Recalculate_Hash_NoRecursion()
+			  -- ^needed because of linker bug
+
+optimize:		ApplyGrammars()
+optimize_debug:		DumpMatch()
+optimize_match:		TestParams()
+optimize_synth:		SynthesizeRule()
+
+rangeestimation:	CalculateResultBoundaries()
+
+constantfolding:	ConstantFolding()
+
+bytecodesynth:		SequenceOpcodes[]
+			AssembleSequence()
+
+debug:			DumpHashes()
+			DumpTree()
+			DumpTreeWithIndent()
+
+grammar:		DumpParams()
+			ParamSpec_Compare()
+
+grammar_data:		ParamSpec_Extract()  - NOTE: FROM .y FILE

@@ -1,0 +1,11 @@
+T=d f ld li cd cf cld
+V=x
+R=-1,1,1
+F=(abs(x) >= if(1,1,1)) + \
+  2*(if(1,1,1) <= abs(x)) + \
+  4*(abs(x) <= if(1,1,1)) + \
+  8*(if(1,1,1) >= abs(x))
+C=fp_greaterOrEq(fp_abs(x), 1) + \
+  2*fp_lessOrEq(1, fp_abs(x)) + \
+  4*fp_lessOrEq(fp_abs(x), 1) + \
+  8*fp_greaterOrEq(1, fp_abs(x))

@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x
+R=-6,6,1
+F=((((x*5/2)+x*x-2)) > ((x*5/2)+abs(x)))
+C=fp_greater(((x*5/2)+x*x-2), ((x*5/2)+fp_abs(x)))

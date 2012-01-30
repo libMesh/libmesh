@@ -16,7 +16,7 @@ dnl corresponds to.
 dnl
 dnl For example, this line in `configure.ac':
 dnl
-dnl AC_REVISION($Revision: 1.30 $)
+dnl AC_REVISION($Revision$)
 dnl produces this in configure:
 dnl 
 dnl #! /bin/sh
@@ -1160,16 +1160,29 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl libHilbert -- distributed in ./contrib,
 dnl               enabled by default
-dnl               currently disabled to workaround a bug
 dnl -------------------------------------------------------------
 AC_ARG_ENABLE(libHilbert,
               AC_HELP_STRING([--enable-libHilbert],
-                             [build with Chris Hamilton's libHilbert]),
+                             [build with libHilbert by Chris Hamilton]),
               enablelibhilbert=$enableval,
               enablelibhilbert=yes)
 
 CONFIGURE_LIBHILBERT
 dnl -------------------------------------------------------------
+
+dnl -------------------------------------------------------------
+dnl fparser -- distributed in ./contrib,
+dnl            enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(fparser,
+              AC_HELP_STRING([--enable-fparser],
+                             [build with fparser by Juha Nieminen, Joel Yliluoma]),
+              enablefparser=$enableval,
+              enablefparser=yes)
+
+CONFIGURE_FPARSER
+dnl -------------------------------------------------------------
+
 
 dnl end of --disable-optional test
    AC_MSG_RESULT(----------------------------------------------)

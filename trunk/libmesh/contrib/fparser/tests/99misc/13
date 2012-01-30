@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y
+R=-30,30,.5
+F=x^3 * x^4 + y^3 * y^5
+C=fp_pow(x,3) * fp_pow(x,4) + fp_pow(y,3) * fp_pow(y,5)

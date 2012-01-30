@@ -1,0 +1,16 @@
+T=d ld mf
+V=x,y,z
+R=-2, 2, .15
+
+# This function is too complex for "float" accuracy
+
+F=x*3+x*y+x*z+x*sin(y*z) - \
+  (sin(x)+cos(y))*4 + \
+  (sin(x)+cos(y))*x + \
+  (sin(x)+cos(y))*y + \
+  (sin(x)+cos(y))*z
+C=x*3+x*y+x*z+x*fp_sin(y*z) - \
+  (fp_sin(x)+fp_cos(y))*4 + \
+  (fp_sin(x)+fp_cos(y))*x + \
+  (fp_sin(x)+fp_cos(y))*y + \
+  (fp_sin(x)+fp_cos(y))*z

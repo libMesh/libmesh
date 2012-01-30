@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y,z
+R=-1,1,1
+F=if(x, y&z, y<1)
+C=fp_truth(x)!=0 ? fp_and(y,z) : fp_less(y,1)

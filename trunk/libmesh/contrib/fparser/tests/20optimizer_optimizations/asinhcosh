@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x
+R=-0.7, 0.7, 0.28
+F=cosh(if(1,asinh(x),0))
+C=fp_cosh(fp_asinh(x))

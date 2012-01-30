@@ -1,0 +1,8 @@
+T=d f ld mf
+V=x,y
+R=0, 10, 0.5
+F=(x&y) + 4*(int(x/10)|int(y/10)) + 8*((-!-!-x)+(!-!-!y)) + 16*(-------x + !!!!!!!y)
+C=fp_and(x,y) + 4*fp_or(fp_int(x/10), fp_int(y/10)) + \
+  8*((-fp_not(-fp_not(-x)))+ \
+     (fp_not(-fp_not(-fp_not(y))))) \
+  + 16*(-x + fp_not(y))

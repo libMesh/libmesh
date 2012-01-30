@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y
+R=-4,4,1
+F=(x+2) & !!x & (y+2)
+C=fp_and(x+2, fp_and(fp_notNot(x), y+2))

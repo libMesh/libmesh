@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x,y
+R=-6, 6, 0.5
+F=x+y
+C=x+y

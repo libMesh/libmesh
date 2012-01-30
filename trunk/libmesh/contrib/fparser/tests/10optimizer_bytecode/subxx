@@ -1,0 +1,5 @@
+T=d li f ld
+V=x
+R=-3,3,1
+F=x+(x-x)+x+(1-x+x)
+C=x+(x-x)+x+(1-x+x)

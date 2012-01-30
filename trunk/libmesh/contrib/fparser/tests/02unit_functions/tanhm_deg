@@ -1,0 +1,6 @@
+DEG=true
+T=mf
+V=x
+R=-40000, 40000, 5
+F=tanh(x)
+C=MpfrFloat::tanh(d2r(x))

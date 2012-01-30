@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=0,1,1
+F=hypot(5,4)+x
+C=sqrtl(5*5+4*4)+x
