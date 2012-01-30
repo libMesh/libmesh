@@ -230,7 +230,7 @@ util/tree_grammar_parser: \
 util/tree_grammar_parser.cc: \
 		util/tree_grammar_parser.y
 	bison --output=$@ $<
-	sed -i 's/ *$$//' $@
+	sed -i '' 's/ *$$//' $@
 
 util/cpp_compress: \
 		util/cpp_compress.$(obj-suffix) util/cpp_compress_main.$(obj-suffix)
@@ -357,7 +357,8 @@ testbed_tests.inc: $(TESTBED_TEST_FILES)
 
 .dep:
 	touch extrasrc/fp_opcode_add.inc
-	echo -n '' > .dep
+	rm -f .dep
+	touch .dep
 	- g++ -MM -MG $(fp_CPPFLAGS) $(wildcard *.cc) | sed "s|^\(.*\).o:|\1.$(obj-suffix):|" >> .dep
 	- g++ -MM $(fp_CPPFLAGS) $(wildcard examples/*.cc) | sed "s|^\(.*\).o:|examples/\1.$(obj-suffix):|" >> .dep
 	- g++ -MM $(fp_CPPFLAGS) $(wildcard fpoptimizer/*.cc) | sed "s|^\(.*\).o:|fpoptimizer/\1.$(obj-suffix):|" >> .dep
@@ -365,7 +366,7 @@ testbed_tests.inc: $(TESTBED_TEST_FILES)
 	- g++ -MM $(fp_CPPFLAGS) $(wildcard util/*.cc) | sed "s|^\(.*\).o:|util/\1.$(obj-suffix):|" >> .dep
 	- g++ -MM $(fp_CPPFLAGS) $(wildcard mpfr/*.cc) | sed "s|^\(.*\).o:|mpfr/\1.$(obj-suffix):|" >> .dep
 #	- g++ -MM $(fp_CPPFLAGS) $(wildcard lib/*.cc) | sed "s|^\(.*\).o:|lib/\1.$(obj-suffix):|" >> .dep
-	sed -i "s@`pwd`/@@" .dep
+	sed -i '' "s@`pwd`/@@" .dep
 
 -include .dep
 

@@ -59,3 +59,8 @@ doc/html/doxygen/doxygen.css
 doc/html/doxygen/jquery.js
 doc/html/doxygen/tabs.css
 contrib/bin/test_headers.log
+contrib/fparser/.dep
+contrib/fparser/util/bytecoderules_parser
+contrib/fparser/util/cpp_compress
+contrib/fparser/util/tree_grammar_parser
+contrib/fparser/extrasrc/fp_opcode_add.inc
