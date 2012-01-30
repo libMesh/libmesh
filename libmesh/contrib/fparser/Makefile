@@ -341,7 +341,9 @@ clean:
 		util/*.$(obj-suffix) \
 		*.$(obj-suffix) \
 		.dep \
-		util/tree_grammar_parser.output
+		util/tree_grammar_parser.output \
+		extrasrc/fp_opcode_add.inc \
+		extrasrc/fp_identifier_parser.inc
 
 release_clean:
 	rm -f testbed_release speedtest_release \
