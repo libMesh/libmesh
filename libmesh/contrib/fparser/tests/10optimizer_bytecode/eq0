@@ -1,0 +1,6 @@
+T=d f ld li
+V=x
+R=0,1,1
+F=(x=0) + (0=x)
+C=fp_equal(x,0) + fp_equal(0,x)
+

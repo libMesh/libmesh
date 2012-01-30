@@ -1,0 +1,6 @@
+DEG=true
+T=f
+V=x
+R=0,1,1
+F=tan(1.1)+x
+C=tanf(d2r(1.1))+x

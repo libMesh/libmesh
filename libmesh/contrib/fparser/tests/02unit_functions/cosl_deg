@@ -1,0 +1,6 @@
+DEG=true
+T=ld
+V=x
+R=-40000, 40000, 5
+F=cos(x)
+C=cosl(d2r(x))

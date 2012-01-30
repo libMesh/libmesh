@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y
+R=-4,4,1
+F=(x*y*-5) & (y+2)
+C=fp_and(x*y*-5, y+2)

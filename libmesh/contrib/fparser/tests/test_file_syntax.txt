@@ -1,0 +1,176 @@
+Each file documents a distinct function to test, and the conditions for testing.
+
+-------------------------
+D=defined(CONSTANT1) && !defined(CONSTANT2)
+-------------------------
+
+Optional.
+This line can be used to specify compile-time conditions which
+determine whether this rule should be tested at all.
+If your line is "D=xxx", the rule will be handled
+as if enclosed in "#if xxx" ... "#endif".
+
+This line, if used, must be indicated before the C line.
+
+-------------------------
+T=d f ld mf li gi
+-------------------------
+
+Mandatory!
+A line beginning with "T=" describes which datatypes this rule applies to.
+  d=double
+  f=float
+  ld=long double
+  mf=mpfr float
+  li=long int
+  gi=gmp int
+
+-------------------------
+DEG=true
+-------------------------
+
+Optional.
+This line, when exists, specifies that degrees conversion is to be
+requested from fparser. In the C++ function you must do your own
+degrees conversions.
+
+
+-------------------------
+V=x,y,z
+-------------------------
+
+Mandatory!
+This lists the parameters (variables) for the function.
+The number of parameters is automatically deduced from this.
+The variable names are to be written in a format accepted by fparser.
+If they are not valid C++ variable names, make_tests will rename them
+transparently.
+
+This line, must be indicated before the C line.
+
+
+-------------------------
+R=-100, 100, 0.5
+-------------------------
+
+Mandatory!
+This specifies the minimum, the maximum, and the step value
+that are used for iterating through the function parameters
+in the testing procedure.
+
+
+-------------------------
+F=x+y+z
+-------------------------
+
+Mandatory!
+This specifies the fparser function to test.
+
+You can use \ to continue the function to the next line.
+
+
+-------------------------
+C=x+y+z
+-------------------------
+
+Mandatory!
+This specifies the C++ function expression that corresponds
+the fparser function. You do not need to typecast your numeric
+constants; casts will be automatically added by make_tests.
+
+You can use \ to continue the function to the next line.
+
+The expression must not be a full statement; make_tests will
+automatically prefix it with "return " and add a ";" at the
+end of it.
+
+------------------------
+Calling PCall functions in the C++ code
+-----------------------
+In order to call PCall functions in the C++ code,
+use this syntax:
+
+  userDefFuncSub({x+1, y-1})
+
+This is equivalent to the fparser function Sub(x+1, y-1).
+
+make_tests will automatically translate this to code that
+sets up an array for the function parameters, and will place
+the expressions in that array, and pass the array pointer
+to the function as a parameter.
+
+
+
+------------------------
+Using recursion in the C++ code
+-----------------------
+In order to recurse in the C++ code,
+use this syntax:
+
+  Eval({x+1, y-1})
+
+This is equivalent to the fparser function eval(x+1, y-1).
+
+make_tests will automatically translate this to code that
+sets up an array for the function parameters, and will place
+the expressions in that array, and pass the array pointer
+to the same function as a parameter.
+
+
+------------------------
+Which tests go where
+------------------------
+
+01unit_operators:
+	These tests test each basic operator in the most
+	simple manner possible. The C++ functions used
+	to verify the operators should not use code that
+	depends on portions of fparser being implemented
+	correctly.
+
+02unit_functions:
+	These tests test each built-in function in the
+	most simple manner possble. The C++ functions used
+	to verify the operators should not use code that
+	depends on portions of fparser being implemented
+	correctly, aside from basic operators.
+	I.e. to test sin(), don't use fp_sin() to verify
+	it; verify it against math library's sin(), sinf(),
+	etc. directly.
+
+03unit_constants:
+	These tests verify that the fp_const_* functions
+	produce mathematically correct values.
+
+10optimizer_bytecode:
+	Unit tests for each bytecode optimization done
+	by the parser itself.
+
+11optimizer_constaddmul:
+	Unit tests for those bytecode optimizations done
+	by the parser itself, which pertain to the grouping
+	of numeric literal values.
+
+20optimizer_optimizations:
+	Testcases for categorigally each fpoptimizer optimization.
+	(Incomplete)
+
+21optimizer_trigcombinations:
+	This is a machine generated list of tests that stress
+	all combinations of sin/cos/tan/sinh/cos/tanh/exp
+	with exponents -2..+2 in multiplications and additions,
+	to catch any misoperations thereof. It is easy to
+	get them wrong, so an exhaustive testing is justified.
+
+50regressions:
+	Tests in this directory target specific bugs which
+	have been discovered. The test should contain nothing
+	but the minimal code to trigger the bug.
+	The test file should document the bug.
+
+99misc:
+	Put here tests which don't belong in other categories.
+	In the C++ functions, use the type-agnostic fp_* functions
+	to reduce the need to implement different versions for
+	each type. The validity of each fp_* function is expected
+	to have been verified in the unit tests.

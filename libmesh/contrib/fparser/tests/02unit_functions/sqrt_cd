@@ -1,0 +1,5 @@
+T=cd cf
+V=x
+R=-100000, 100000, 1000
+F=sqrt(x)
+C=std::sqrt(x)

@@ -1,0 +1,8 @@
+T=d ld mf
+V=x,y
+R=-2,2,.1
+
+# float accuracy just fails here.
+
+F=sin(sqrt(10-x*x+y*y))+cos(sqrt(15-x*x-y*y))+sin(x*x+y*y)
+C=fp_sin(fp_sqrt(10-x*x+y*y))+fp_cos(fp_sqrt(15-x*x-y*y))+fp_sin(x*x+y*y)

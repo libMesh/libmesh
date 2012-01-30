@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x,y
+R=3,5,0.5
+F=if(x<4, sin(y),cos(y+1)) + if(x<4, cos(y),sin(y+1))
+C=fp_less(x,4)!=0 ? (fp_sin(y)+fp_cos(y)) : (fp_cos(y+1)+fp_sin(y+1))

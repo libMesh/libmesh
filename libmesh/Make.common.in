@@ -424,6 +424,13 @@ ifeq ($(enable-optional),yes)
     libmesh_INCLUDE += @LIBHILBERT_INCLUDE@
   endif
 
+  # if fparser is used we need the header path
+  #  and the lib
+  ifeq ($(enable-fparser),yes)
+    libmesh_LIBS    += @FPARSER_LIBRARY@
+    libmesh_INCLUDE += @FPARSER_INCLUDE@
+  endif
+
   # Trilinos - at a minimum, we support the 
   # AztecOO linear solvers and requisite Epetra
   # data structures

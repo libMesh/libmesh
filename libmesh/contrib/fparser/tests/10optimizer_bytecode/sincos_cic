@@ -1,0 +1,5 @@
+T=d f ld
+V=x
+R=-0.7, 0.7, 0.28
+F=sec(x) + cos(x)
+C=1/fp_cos(x) + fp_cos(x)

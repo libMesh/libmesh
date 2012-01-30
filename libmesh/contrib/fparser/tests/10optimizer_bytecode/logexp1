@@ -1,0 +1,7 @@
+# x cLog cExp -> x (when not known whether x may be negative)
+
+T=d f
+V=x
+R=0, 3, 0.5
+F=exp(log(x))
+C=fp_exp(fp_log(x))

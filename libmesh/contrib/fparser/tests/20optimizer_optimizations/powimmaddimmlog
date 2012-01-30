@@ -1,0 +1,7 @@
+T=d ld f mf cd cf cld
+V=x
+R=0.25, 1, 0.25
+F=pow(5, log(x)+1)
+C=fp_pow(5, fp_log(x)+1)
+
+# Expected result: 5^1 * x^log(5)

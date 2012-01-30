@@ -6,41 +6,41 @@ all:
 	@echo "------- Building Contributed Packages --------"
 	@echo "----------------------------------------------"
 	@echo ""
+	@echo "--- Building fparser -------------------------"
+	@$(MAKE) -C fparser $(MAKECMDGOALS)
+	@echo ""
+	@echo "--- Building gmv -----------------------------"
+	@$(MAKE) -C gmv          $(MAKECMDGOALS)
+	@echo ""
 	@echo "--- Building LASPACK -------------------------"
 	@$(MAKE) -C laspack      $(MAKECMDGOALS)
-	@echo ""
-	@echo "--- Building Metis ---------------------------"
-	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
-	@echo ""
-	@echo "--- Building Parmetis ------------------------"
-	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
-	@echo ""
-	@echo "--- Building sfcurves ------------------------"
-	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
 	@echo ""
 	@echo "--- Building libgzstream ---------------------"
 	@$(MAKE) -C gzstream     $(MAKECMDGOALS)
 	@echo ""
-	@echo "--- Building TetGen ---------------------"
-	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
+	@echo "--- Building libHilbert ----------------------"
+	@$(MAKE) -C libHilbert $(MAKECMDGOALS)
 	@echo ""
-	@echo "--- Building triangle ---------------------"
-	@$(MAKE) -C triangle     $(MAKECMDGOALS)
+	@echo "--- Building Metis ---------------------------"
+	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
+	@echo "--- Building Parmetis ------------------------"
+	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@echo ""
-	@echo "--- Building gmv ---------------------"
-	@$(MAKE) -C gmv          $(MAKECMDGOALS)
-	@echo ""
-	@echo "--- Building netCDF ---------------------"
+	@echo "--- Building netCDF --------------------------"
 	@$(MAKE) -C netcdf/Lib   $(MAKECMDGOALS)
-	@echo ""
-	@echo "--- Building ExodusII ---------------------"
+	@echo "--- Building ExodusII ------------------------"
 	@$(MAKE) -C exodusii/Lib/src $(MAKECMDGOALS)
-	@echo ""
-	@echo "--- Building Nemesis ---------------------"
+	@echo "--- Building Nemesis -------------------------"
 	@$(MAKE) -C nemesis/Lib $(MAKECMDGOALS)
 	@echo ""
-	@echo "--- Building libHilbert ---------------------"
-	@$(MAKE) -C libHilbert $(MAKECMDGOALS)
+	@echo "--- Building sfcurves ------------------------"
+	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
+	@echo ""
+	@echo "--- Building TetGen --------------------------"
+	@$(MAKE) -C tetgen       $(MAKECMDGOALS)
+	@echo ""
+	@echo "--- Building triangle ------------------------"
+	@$(MAKE) -C triangle     $(MAKECMDGOALS)
 	@echo ""
 	@echo "----------------------------------------------"
 	@echo "----- Done Building Contributed Packages -----"
@@ -53,6 +53,7 @@ all:
 #
 clean:
 	@rm -f *~
+	@$(MAKE) -C fparser      $(MAKECMDGOALS)
 	@$(MAKE) -C laspack      $(MAKECMDGOALS)
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
@@ -71,6 +72,7 @@ clean:
 #
 clobber:
 	@$(MAKE) clean
+	@$(MAKE) -C fparser      $(MAKECMDGOALS)
 	@$(MAKE) -C laspack      $(MAKECMDGOALS)
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
@@ -89,6 +91,7 @@ clobber:
 #
 distclean:
 	@$(MAKE) clobber
+	@$(MAKE) -C fparser      $(MAKECMDGOALS)
 	@$(MAKE) -C laspack      $(MAKECMDGOALS)
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)

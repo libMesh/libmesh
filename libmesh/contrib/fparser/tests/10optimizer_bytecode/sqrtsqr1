@@ -1,0 +1,7 @@
+# x cSqrt cSqr -> x (when not known whether x may be negative)
+
+T=d f
+V=x
+R=0, 3, 0.5
+F=sqrt(x)^2
+C=fp_pow(fp_sqrt(x), 2)

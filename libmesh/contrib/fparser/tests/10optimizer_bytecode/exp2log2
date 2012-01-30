@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-3,3,0.1
+F=log2(exp2(x))
+C=fp_log2(fp_exp2(x))

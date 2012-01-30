@@ -1,0 +1,6 @@
+# x cMin x cMin -> x cMin
+T=d f ld li gi
+V=x,y
+R=-2,2,1
+F=sub(min(min(y,x),x), max(max(y,x),x))
+C=userDefFuncSub({fp_min(y,x), fp_max(y,x)})

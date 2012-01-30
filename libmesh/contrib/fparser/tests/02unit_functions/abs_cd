@@ -1,0 +1,5 @@
+T=cd cf
+V=x
+R=-400+200i, 400-200i, 0.5-0.25i
+F=abs(x)
+C=std::abs(x)

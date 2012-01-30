@@ -1,0 +1,9 @@
+# Bug fixed in commit 6a5cf0e5cbdf96464b17b9784c2b2fd9ff2bd3b9
+#        !x & !!x should be 0, became !!x
+
+T=d f ld mf li gi
+V=x
+R=-2, 2, 1
+F=sub(  (!x & !!x) ,  (!x | !!x)  )
+#C=-1
+C=userDefFuncSub({  fp_and(fp_not(x), fp_notNot(x)),  fp_or(fp_not(x), fp_notNot(x)) })

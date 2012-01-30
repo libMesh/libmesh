@@ -1,0 +1,6 @@
+DEG=1
+T=d f ld mf
+V=x
+R=-2,2,0.8
+F=cos(x*5)
+C=fp_cos(d2r(x+x+x+x+x))
