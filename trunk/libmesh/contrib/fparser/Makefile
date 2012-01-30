@@ -355,7 +355,7 @@ distclean: clean
 TESTBED_TEST_FILES = $(wildcard tests/*/*)
 testbed_tests.inc: $(TESTBED_TEST_FILES)
 
-.dep:
+.dep: extrasrc/fp_opcode_add.inc
 	echo -n '' > .dep
 	- g++ -MM -MG $(fp_CPPFLAGS) $(wildcard *.cc) | sed "s|^\(.*\).o:|\1.$(obj-suffix):|" >> .dep
 	- g++ -MM $(fp_CPPFLAGS) $(wildcard examples/*.cc) | sed "s|^\(.*\).o:|examples/\1.$(obj-suffix):|" >> .dep
