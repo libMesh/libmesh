@@ -17,7 +17,7 @@ ifeq ($(enable-fparser),no)
 	@echo "<<< $(pkgname) is disabled, not building >>>"
 else
   all:: $(target)
-#  all:: $(target) testbed speedtest functioninfo
+  extra:: examples/example examples/example2 ftest functioninfo powi_speedtest speedtest testbed
 endif
 
 
@@ -114,36 +114,27 @@ SRC = 	fparser.cc \
 OBJS   	:= $(patsubst %.cc, %.$(obj-suffix), $(SRC))
 
 testbed: testbed.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(BOOST_THREAD_LIB) -lfparser
+	$(CXX) -o $@ $< $(fp_LDFLAGS) $(BOOST_THREAD_LIB) -L$(EXTERNAL_LIBDIR) -lfparser
 
 fpoptimizer.$(obj-suffix): fpoptimizer.cc
 
-testbed_release: testbed.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(BOOST_THREAD_LIB) -lfparser
-
 speedtest: util/speedtest.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) -lfparser
-
-speedtest_release: util/speedtest.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) -lfparser
+	$(CXX) -o $@ $< $(fp_LDFLAGS) -L$(EXTERNAL_LIBDIR) -lfparser
 
 examples/example: examples/example.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) -lfparser
+	$(CXX) -o $@ $< $(fp_LDFLAGS) -L$(EXTERNAL_LIBDIR) -lfparser
 
 examples/example2: examples/example2.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) -lfparser
+	$(CXX) -o $@ $< $(fp_LDFLAGS) -L$(EXTERNAL_LIBDIR) -lfparser
 
 ftest: util/ftest.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) -lfparser
+	$(CXX) -o $@ $< $(fp_LDFLAGS) -L$(EXTERNAL_LIBDIR) -lfparser
 
 powi_speedtest: util/powi_speedtest.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) -lfparser
-
-koe: koe.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) -lfparser
+	$(CXX) -o $@ $< $(fp_LDFLAGS) -L$(EXTERNAL_LIBDIR) -lfparser
 
 functioninfo: util/functioninfo.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) -lfparser
+	$(CXX) -o $@ $< $(fp_LDFLAGS) -L$(EXTERNAL_LIBDIR) -lfparser
 
 fpoptimizer/grammar_data.cc: \
 		util/tree_grammar_parser \
