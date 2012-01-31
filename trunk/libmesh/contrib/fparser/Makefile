@@ -227,7 +227,7 @@ util/tree_grammar_parser: \
 util/tree_grammar_parser.cc: \
 		util/tree_grammar_parser.y
 	bison --output=$@ $<
-	$(perl) -ni -e 's/ *$$//' $@
+	$(perl) -pi -e 's/ *$$//' $@
 
 util/cpp_compress: \
 		util/cpp_compress.$(obj-suffix) util/cpp_compress_main.$(obj-suffix)
@@ -363,7 +363,7 @@ testbed_tests.inc: $(TESTBED_TEST_FILES)
 	- g++ -MM $(fp_CPPFLAGS) $(wildcard util/*.cc) | sed "s|^\(.*\).o:|util/\1.$(obj-suffix):|" >> .dep
 	- g++ -MM $(fp_CPPFLAGS) $(wildcard mpfr/*.cc) | sed "s|^\(.*\).o:|mpfr/\1.$(obj-suffix):|" >> .dep
 #	- g++ -MM $(fp_CPPFLAGS) $(wildcard lib/*.cc) | sed "s|^\(.*\).o:|lib/\1.$(obj-suffix):|" >> .dep
-	$(perl) -ni -e "s@`pwd`/@@" .dep
+	$(perl) -pi -e "s@`pwd`/@@" .dep
 
 -include .dep
 
