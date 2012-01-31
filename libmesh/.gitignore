@@ -64,3 +64,11 @@ contrib/fparser/util/bytecoderules_parser
 contrib/fparser/util/cpp_compress
 contrib/fparser/util/tree_grammar_parser
 contrib/fparser/extrasrc/fp_opcode_add.inc
+contrib/fparser/examples/example
+contrib/fparser/examples/example2
+contrib/fparser/ftest
+contrib/fparser/functioninfo
+contrib/fparser/powi_speedtest
+contrib/fparser/speedtest
+contrib/fparser/tests/make_tests
+contrib/fparser/testbed
