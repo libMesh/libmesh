@@ -44,9 +44,11 @@ FEATURE_FLAGS =
 FEATURE_FLAGS += -DFP_ENABLE_EVAL
 #FEATURE_FLAGS += -DFP_SUPPORT_TR1_MATH_FUNCS
 
-# The optimizer code is apparently buggy?  We are disabling it
-# in our builds for now.
-FEATURE_FLAGS += -DFP_NO_SUPPORT_OPTIMIZER
+# Mac OSX has trouble linking the optimizer stuff, so we disable
+# it on those systems.
+ifeq ($(findstring darwin,$(hostos)),darwin)
+  FEATURE_FLAGS += -DFP_NO_SUPPORT_OPTIMIZER
+endif
 
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
