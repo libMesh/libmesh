@@ -91,13 +91,17 @@ provided for solving both standard and generalized eigenvalue problems.
 
 <br>
 <br>
-The <code>libMesh</code> library has been actively developed at The
+The <code>libMesh</code> library was first created at The
 University of Texas at Austin in the 
-<a href="http://www.cfdlab.ae.utexas.edu">CFDLab</a> since March 2002.  Major 
+CFDLab since March 2002.  Major 
 contributions have come from developers at the Technische 
 Universit&auml;t Hamburg-Harburg
 <a href="http://www.mub.tu-harburg.de">Institute of Modelling and Computation</a>, 
 and recent contributions have been made by CFDLab associates at
+<a href="http://pecos.ices.utexas.edu/">the PECOS Center</a> at <a
+href="http://www.utexas.edu/">UT-Austin</a>, 
+<a href="https://inlportal.inl.gov/portal/server.pt?open=514&objID=1269&mode=2&featurestory=DA_574924">the
+Computational Frameworks Group</a> at
 <a href="http://www.inl.gov/">Idaho National Laboratory</a>,
 <a href="http://www.nasa.gov/">NASA</a> <a href="http://www.nasa.gov/centers/johnson/home/index.html">Lyndon B. Johnson Space Center</a>, 
 and <a href="http://augustine.mit.edu">MIT</a>.
