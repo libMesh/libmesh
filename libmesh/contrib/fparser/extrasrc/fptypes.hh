@@ -66,8 +66,8 @@ namespace FUNCTIONPARSERTYPES
                    * above [x]. Used for disposing of temporaries.
                    */
         cLog2by, /* log2by(x,y) = log2(x) * y */
-        cNop,    /* Used by fpoptimizer internally; should not occur in bytecode */
 #endif
+        cNop,    /* Used by fpoptimizer internally; should not occur in bytecode */
         cSinCos,   /* sin(x) followed by cos(x) (two values are pushed to stack) */
         cSinhCosh, /* hyperbolic equivalent of sincos */
         cAbsAnd,    /* As cAnd,       but assume both operands are absolute values */
