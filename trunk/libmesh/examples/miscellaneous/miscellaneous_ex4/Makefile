@@ -49,7 +49,7 @@ clobber:
 
 distclean:
 	@$(MAKE) clobber
-	@rm -f *.o *.g.o *.pg.o
+	@rm -f *.o *.g.o *.pg.o .depend
 
 
 run: $(target)
