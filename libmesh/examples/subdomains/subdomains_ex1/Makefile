@@ -48,7 +48,7 @@ clobber:
 
 distclean:
 	@$(MAKE) clobber
-	@rm -f *.o *.g.o *.pg.o
+	@rm -f *.o *.g.o *.pg.o .depend
 
 # Warning, the 3D problem may be extremely slow if you are running in debug mode.
 run: $(target)
