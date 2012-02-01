@@ -915,6 +915,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	  //  shouldn't happen
 	  if (secure)
 	    {
+	      // Print every time in devel/dbg modes
+#ifndef NDEBUG
 	      libmesh_here();
 	      libMesh::err << "WARNING: Newton scheme has not converged in "
 			    << cnt << " iterations:" << std::endl
@@ -931,6 +933,16 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			    << std::endl;
 
               elem->print_info(libMesh::err);
+#else
+	      // In optimized mode, just print once that an inverse_map() call
+	      // had trouble converging its Newton iteration.
+	      libmesh_do_once(libMesh::err << "WARNING: At least one element took more than "
+			      << max_cnt
+			      << " iterations to converge in inverse_map()...\n"
+			      << "Rerun in devel/dbg mode for more details."
+			      << std::endl;);
+
+#endif // NDEBUG
 
 	      if (cnt > 2*max_cnt)
 		{
