@@ -1488,8 +1488,49 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
 
 
 
+
 bool Elem::contains_point (const Point& p, Real tol) const
 {
+  // We currently allow the user to enlarge the bounding box by
+  // providing a tol > TOLERANCE (so this routine is identical to
+  // Elem::close_to_point()), but print a warning so that the
+  // user can eventually switch his code over to calling close_to_point()
+  // instead, which is intended to be used for this purpose.
+  if ( tol > TOLERANCE )
+    {
+      libmesh_do_once(libMesh::err
+		      << "WARNING: Resizing bounding box to match user-specified tolerance!\n"
+		      << "In the future, calls to Elem::contains_point() with tol > TOLERANCE\n"
+		      << "will be more optimized, but should not be used\n"
+		      << "to search for points 'close to' elements!\n"
+		      << "Instead, use Elem::close_to_point() for this purpose.\n"
+		      << std::endl;);
+      return this->point_test(p, tol, tol);
+    }
+  else
+    return this->point_test(p, TOLERANCE, tol);
+}
+
+
+
+
+bool Elem::close_to_point (const Point& p, Real tol) const
+{
+  // This test uses the user's passed-in tolerance for the
+  // bounding box test as well, thereby allowing the routine to
+  // find points which are not only "in" the element, but also
+  // "nearby" to within some tolerance.
+  return this->point_test(p, tol, tol);
+}
+
+
+
+
+bool Elem::point_test(const Point& p, Real box_tol, Real map_tol) const
+{
+  libmesh_assert (box_tol > 0.);
+  libmesh_assert (map_tol > 0.);
+
   // This is a great optimization on first order elements, but it
   // could return false negatives on higher orders
   if (this->default_order() == FIRST)
@@ -1508,18 +1549,21 @@ bool Elem::contains_point (const Point& p, Real tol) const
            point_above_min_x = false,
            point_below_max_x = false;
 
+      // For relative bounding box checks in physical space
+      const Real hmax = this->hmax();
+
       for (unsigned int n=0; n != this->n_nodes(); ++n)
         {
           Point pe = this->point(n);
-          point_above_min_x = point_above_min_x || (pe(0) - TOLERANCE < p(0));
-          point_below_max_x = point_below_max_x || (pe(0) + TOLERANCE > p(0));
+          point_above_min_x = point_above_min_x || (pe(0) - hmax*box_tol <= p(0));
+          point_below_max_x = point_below_max_x || (pe(0) + hmax*box_tol >= p(0));
 #if LIBMESH_DIM > 1
-          point_above_min_y = point_above_min_y || (pe(1) - TOLERANCE < p(1));
-          point_below_max_y = point_below_max_y || (pe(1) + TOLERANCE > p(1));
+          point_above_min_y = point_above_min_y || (pe(1) - hmax*box_tol <= p(1));
+          point_below_max_y = point_below_max_y || (pe(1) + hmax*box_tol >= p(1));
 #endif
 #if LIBMESH_DIM > 2
-          point_above_min_z = point_above_min_z || (pe(2) - TOLERANCE < p(2));
-          point_below_max_z = point_below_max_z || (pe(2) + TOLERANCE > p(2));
+          point_above_min_z = point_above_min_z || (pe(2) - hmax*box_tol <= p(2));
+          point_below_max_z = point_below_max_z || (pe(2) + hmax*box_tol >= p(2));
 #endif
         }
 
@@ -1537,19 +1581,23 @@ bool Elem::contains_point (const Point& p, Real tol) const
         return false;
     }
 
-  // Declare a basic FEType.  Will ue a Lagrange
+  // Declare a basic FEType.  Will be a Lagrange
   // element by default.
   FEType fe_type(this->default_order());
 
+  // To be on the safe side, we converge the inverse_map() iteration
+  // to a slightly tighter tolerance than that requested by the
+  // user...
   const Point mapped_point = FEInterface::inverse_map(this->dim(),
 						      fe_type,
 						      this,
 						      p,
-						      1.e-4,
-						      false);
+						      0.1*map_tol, // <- this is |dx| tolerance, the Newton residual should be ~ |dx|^2
+						      /*secure=*/ false);
 
-  return FEInterface::on_reference_element(mapped_point, this->type(), tol);
+  return FEInterface::on_reference_element(mapped_point, this->type(), map_tol);
 }
+
 
 
 
