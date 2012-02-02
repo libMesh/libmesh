@@ -1024,7 +1024,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                                               parameters,
                                               system.name(),
                                               system.variable_name(var));
-                      Gradient gxplus = gptr(nxminus,
+                      Gradient gxplus = gptr(nxplus,
                                              parameters,
                                              system.name(),
                                              system.variable_name(var));
