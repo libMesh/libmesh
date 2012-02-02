@@ -122,27 +122,27 @@ SRC = 	fparser.cc \
 OBJS   	:= $(patsubst %.cc, %.$(obj-suffix), $(SRC))
 
 testbed: testbed.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(BOOST_THREAD_LIB) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(BOOST_THREAD_LIB) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 fpoptimizer.$(obj-suffix): fpoptimizer.cc
 
 speedtest: util/speedtest.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 examples/example: examples/example.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 examples/example2: examples/example2.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 ftest: util/ftest.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 powi_speedtest: util/powi_speedtest.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 functioninfo: util/functioninfo.$(obj-suffix) $(target)
-	$(CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 fpoptimizer/grammar_data.cc: \
 		util/tree_grammar_parser \
@@ -162,7 +162,7 @@ extrasrc/fp_opcode_add.inc: \
 
 tests/make_tests: tests/make_tests.$(obj-suffix) \
                   util/cpp_compress.$(obj-suffix)
-	$(CXX) -o $@ $^ $(fp_LDFLAGS)
+	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
 
 testbed_tests.inc: tests/make_tests
 	tests/make_tests tests/*/* -o $@
@@ -224,7 +224,7 @@ fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
 util/tree_grammar_parser: \
 		util/tree_grammar_parser.$(obj-suffix) \
 		fpoptimizer/opcodename.$(obj-suffix)
-	$(CXX) -o $@ $^ $(fp_LDFLAGS)
+	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
 
 util/tree_grammar_parser.cc: \
 		util/tree_grammar_parser.y
@@ -235,17 +235,17 @@ util/tree_grammar_parser.cc: \
 
 util/cpp_compress: \
 		util/cpp_compress.$(obj-suffix) util/cpp_compress_main.$(obj-suffix)
-	$(CXX) -o $@ $^ $(fp_LDFLAGS)
+	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
 
 util/bytecoderules_parser: util/bytecoderules_parser.$(obj-suffix)
-	$(CXX) -o $@ $^ $(fp_LDFLAGS)
+	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
 
 
 util/version_changer: util/version_changer.cc
-	g++ -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
+	$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
 
 util/make_function_name_parser: util/make_function_name_parser.cc util/cpp_compress.$(obj-suffix)
-	g++ -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
+	$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
 
 util/powi_opt: \
 		util/powi_opt.$(obj-suffix) \
@@ -254,14 +254,14 @@ util/powi_opt: \
 		fpoptimizer/codetree.$(obj-suffix) \
 		fpoptimizer/valuerange.$(obj-suffix) \
 		fpoptimizer/rangeestimation.$(obj-suffix)
-	g++ -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
+	$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
 
 util/create_testrules_for_optimization_rules: \
 		util/create_testrules_for_optimization_rules.cc \
 		fpoptimizer/grammar_data.$(obj-suffix) \
 		fpoptimizer/opcodename.$(obj-suffix) \
 		fpoptimizer/grammar.$(obj-suffix)
-	g++ -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
+	$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
 
 fpoptimizer_tests.sh: util/create_testrules_for_optimization_rules
 	./$< > $@
@@ -360,13 +360,13 @@ testbed_tests.inc: $(TESTBED_TEST_FILES)
 	touch extrasrc/fp_opcode_add.inc
 	rm -f .dep
 	touch .dep
-	- g++ -MM -MG $(fp_CPPFLAGS) $(wildcard *.cc) | sed "s|^\(.*\).o:|\1.$(obj-suffix):|" >> .dep
-	- g++ -MM $(fp_CPPFLAGS) $(wildcard examples/*.cc) | sed "s|^\(.*\).o:|examples/\1.$(obj-suffix):|" >> .dep
-	- g++ -MM $(fp_CPPFLAGS) $(wildcard fpoptimizer/*.cc) | sed "s|^\(.*\).o:|fpoptimizer/\1.$(obj-suffix):|" >> .dep
-	- g++ -MM $(fp_CPPFLAGS) $(wildcard tests/*.cc) | sed "s|^\(.*\).o:|tests/\1.$(obj-suffix):|" >> .dep
-	- g++ -MM $(fp_CPPFLAGS) $(wildcard util/*.cc) | sed "s|^\(.*\).o:|util/\1.$(obj-suffix):|" >> .dep
-	- g++ -MM $(fp_CPPFLAGS) $(wildcard mpfr/*.cc) | sed "s|^\(.*\).o:|mpfr/\1.$(obj-suffix):|" >> .dep
-#	- g++ -MM $(fp_CPPFLAGS) $(wildcard lib/*.cc) | sed "s|^\(.*\).o:|lib/\1.$(obj-suffix):|" >> .dep
+	- $(libmesh_CXX) -MM -MG $(fp_CPPFLAGS) $(wildcard *.cc) | sed "s|^\(.*\).o:|\1.$(obj-suffix):|" >> .dep
+	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard examples/*.cc) | sed "s|^\(.*\).o:|examples/\1.$(obj-suffix):|" >> .dep
+	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard fpoptimizer/*.cc) | sed "s|^\(.*\).o:|fpoptimizer/\1.$(obj-suffix):|" >> .dep
+	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard tests/*.cc) | sed "s|^\(.*\).o:|tests/\1.$(obj-suffix):|" >> .dep
+	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard util/*.cc) | sed "s|^\(.*\).o:|util/\1.$(obj-suffix):|" >> .dep
+	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard mpfr/*.cc) | sed "s|^\(.*\).o:|mpfr/\1.$(obj-suffix):|" >> .dep
+#	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard lib/*.cc) | sed "s|^\(.*\).o:|lib/\1.$(obj-suffix):|" >> .dep
 # sed -i is non-POSIX, so make a temporary file and then copy it back
 	sed -e's@`pwd`/@@' .dep > backup.dep
 	mv backup.dep .dep
@@ -398,5 +398,5 @@ clobber: clean
 
 %.$(obj-suffix) : %.cc
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
-	@$(CXX) $(fp_CPPFLAGS) $(fp_CXXFLAGS) -c $< -o $@
+	@$(libmesh_CXX) $(fp_CPPFLAGS) $(fp_CXXFLAGS) -c $< -o $@
 
