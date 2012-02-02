@@ -540,12 +540,35 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns true if the point p is contained in this element,
    * false otherwise.
    *
-   * Since we are doing floating point comparisons here the parameter
-   * \p tol can be specified to indicate a tolerance.  For example,
-   * \f$ \xi \le 1 \f$  becomes \f$ \xi \le 1 + \epsilon \f$.
+   * For linear elements, performs an initial tight bounding box check
+   * (as an optimization step) and (if that passes) then uses the
+   * user-defined tolerance "tol" in a call to inverse_map() to actually
+   * test if the point is in the element.  For quadratic elements, the
+   * bounding box optimization is skipped, and only the inverse_map()
+   * steps are performed.
+   *
+   * Note that this routine should not be used to determine if a point
+   * is merely "nearby" an element to within some tolerance. For that,
+   * use Elem::close_to_point() instead.
    */
   virtual bool contains_point (const Point& p, Real tol=TOLERANCE) const;
 
+  /**
+   * @returns true if this element is "close" to the point p, where
+   * "close" is determined by the tolerance tol.
+   */
+  virtual bool close_to_point(const Point& p, Real tol) const;
+
+private:
+  /**
+   * Shared private implementation used by the contains_point()
+   * and close_to_point() routines.  The box_tol tolerance is
+   * used in the bounding box optimization, the map_tol tolerance is used
+   * in the calls to inverse_map() and on_reference_element().
+   */
+  bool point_test(const Point& p, Real box_tol, Real map_tol) const;
+
+public:
   /**
    * @returns true iff the element map is definitely affine (i.e. the same at
    * every quadrature point) within numerical tolerances
