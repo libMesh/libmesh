@@ -1058,7 +1058,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                                                   parameters,
                                                   system.name(),
                                                   system.variable_name(var));
-                          Gradient gyplus = gptr(nyminus,
+                          Gradient gyplus = gptr(nyplus,
                                                  parameters,
                                                  system.name(),
                                                  system.variable_name(var));
