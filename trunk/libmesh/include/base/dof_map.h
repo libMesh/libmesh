@@ -142,6 +142,38 @@ public:
   ~DofMap();
 
   /**
+   * Abstract base class to be used to add user-defined implicit
+   * degree of freedom couplings.
+   */
+  class AugmentSparsityPattern
+  {
+  public:
+    virtual ~AugmentSparsityPattern () {};
+
+    /**
+     * User-defined function to augment the sparsity pattern.
+     */
+    virtual void augment_sparsity_pattern (SparsityPattern::Graph & sparsity,
+					   std::vector<unsigned int> & n_nz,
+					   std::vector<unsigned int> & n_oz) = 0;
+  };
+
+  /**
+   * Abstract base class to be used to add user-defined parallel
+   * degree of freedom couplings.
+   */
+  class AugmentSendList
+  {
+  public:
+    virtual ~AugmentSendList () {};
+
+    /**
+     * User-defined function to augment the send list.
+     */
+    virtual void augment_send_list (std::vector<unsigned int> & send_list) = 0;
+  };
+   
+  /**
    * Additional matrices may be handled with this \p DofMap.
    * They are initialized to the same sparsity structure as
    * the major matrix.
@@ -163,6 +195,21 @@ public:
   void compute_sparsity (const MeshBase&);
 
   /**
+   * Attach an object to use to populate the
+   * sparsity pattern with extra entries.
+   *
+   * Care must be taken that when adding entries they are sorted into the Rows
+   *
+   * Further, you _must_ modify n_nz and n_oz properly!
+   *
+   * This is an advanced function... use at your own peril!
+   */
+  void attach_extra_sparsity_object (DofMap::AugmentSparsityPattern &asp)
+  {
+    _augment_sparsity_pattern = &asp;
+  }
+
+  /**
    * Attach a function pointer to use as a callback to populate the
    * sparsity pattern with extra entries.
    *
@@ -177,15 +224,27 @@ public:
                                                    std::vector<unsigned int> & n_oz,
                                                    void *),
                                       void * context = NULL)
-    { _extra_sparsity_function = func; _extra_sparsity_context = context; }
+  { _extra_sparsity_function = func; _extra_sparsity_context = context; }
+
+  /**
+   * Attach an object to populate the send_list with extra entries.
+   * This should only add to the send list, but no checking is done 
+   * to enforce this behavior.
+   *
+   * This is an advanced function... use at your own peril!
+   */
+  void attach_extra_send_list_object (DofMap::AugmentSendList &asl)
+  {
+    _augment_send_list = &asl;
+  }
 
   /**
    * Attach a function pointer to use as a callback to populate the
    * send_list with extra entries.
    */
   void attach_extra_send_list_function(void (*func)(std::vector<unsigned int> &, void *), void * context = NULL)
-    { _extra_send_list_function = func; _extra_send_list_context = context; }
-
+  { _extra_send_list_function = func; _extra_send_list_context = context; }
+  
   /**
    * Takes the \p _send_list vector (which may have duplicate entries)
    * and sorts it.  The duplicate entries are then removed, resulting in
@@ -824,6 +883,11 @@ private:
   std::vector<unsigned int> _send_list;
 
   /**
+   *
+   */
+  AugmentSparsityPattern *_augment_sparsity_pattern;
+
+  /**
    * A function pointer to a function to call to add extra entries to the sparsity pattern
    */
   void (*_extra_sparsity_function)(SparsityPattern::Graph &,
@@ -834,6 +898,11 @@ private:
    * A pointer associcated with the extra sparsity that can optionally be passed in
    */
   void * _extra_sparsity_context;
+
+  /**
+   * 
+   */
+  AugmentSendList *_augment_send_list;
 
   /**
    * A function pointer to a function to call to add extra entries to the send list

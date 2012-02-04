@@ -57,8 +57,10 @@ DofMap::DofMap(const unsigned int number) :
   _end_df(),
   _var_first_local_df(),
   _send_list(),
+  _augment_sparsity_pattern(NULL),
   _extra_sparsity_function(NULL),
   _extra_sparsity_context(NULL),
+  _augment_send_list(NULL),
   _extra_send_list_function(NULL),
   _extra_send_list_context(NULL),
   _n_nz(),
@@ -1239,8 +1241,21 @@ void DofMap::prepare_send_list ()
   START_LOG("prepare_send_list()", "DofMap");
 
   // Check to see if we have any extra stuff to add to the send_list
-  if(_extra_send_list_function != NULL)
-    _extra_send_list_function(_send_list, _extra_send_list_context);
+  if (_extra_send_list_function)
+    {
+      if (_augment_send_list)
+	{
+	  libmesh_here();
+	  libMesh::out << "WARNING:  You have specified both an extra send list function and object.\n"
+		       << "          Are you sure this is what you meant to do??"
+		       << std::endl;
+	}
+
+      _extra_send_list_function(_send_list, _extra_send_list_context);
+    }
+
+  if (_augment_send_list)
+    _augment_send_list->augment_send_list (_send_list);
 
   // First sort the send list.  After this
   // duplicated elements will be adjacent in the
@@ -1346,8 +1361,22 @@ void DofMap::compute_sparsity(const MeshBase& mesh)
 
   STOP_LOG("compute_sparsity()", "DofMap");
 
-  if(_extra_sparsity_function)
-    (*_extra_sparsity_function)(sp.sparsity_pattern, _n_nz, _n_oz, _extra_sparsity_context);
+  // Check to see if we have any extra stuff to add to the sparsity_pattern
+  if (_extra_sparsity_function)
+    {
+      if (_augment_sparsity_pattern)
+	{
+	  libmesh_here();
+	  libMesh::out << "WARNING:  You have specified both an extra sparsity function and object.\n"
+		       << "          Are you sure this is what you meant to do??"
+		       << std::endl;
+	}
+
+      _extra_sparsity_function(sp.sparsity_pattern, _n_nz, _n_oz, _extra_sparsity_context);
+    }
+
+  if (_augment_sparsity_pattern)
+    _augment_sparsity_pattern->augment_sparsity_pattern (sp.sparsity_pattern, _n_nz, _n_oz);
 
   // We are done with the sparsity_pattern.  However, quite a
   // lot has gone into computing it.  It is possible that some
