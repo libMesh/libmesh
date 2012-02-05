@@ -47,6 +47,8 @@ PerfLog::PerfLog(const std::string& ln,
   log_events(le),
   total_time(0.)
 {
+  gettimeofday (&tstart, NULL);
+
   if (log_events)
     this->clear();
 }
