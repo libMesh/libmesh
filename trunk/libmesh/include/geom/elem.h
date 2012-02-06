@@ -1202,7 +1202,15 @@ public:
   static const unsigned int _bp2;
 };
 
+// ------------------------------------------------------------
+// global Elem functions
 
+inline
+std::ostream& operator << (std::ostream& os, const Elem& e)
+{
+  e.print_info(os);
+  return os;
+}
 
 
 // ------------------------------------------------------------
