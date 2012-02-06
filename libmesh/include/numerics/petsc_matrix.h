@@ -424,6 +424,7 @@ unsigned int PetscMatrix<T>::m () const
   int petsc_m=0, petsc_n=0, ierr=0;
 
   ierr = MatGetSize (_mat, &petsc_m, &petsc_n);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   return static_cast<unsigned int>(petsc_m);
 }
@@ -439,6 +440,7 @@ unsigned int PetscMatrix<T>::n () const
   int petsc_m=0, petsc_n=0, ierr=0;
 
   ierr = MatGetSize (_mat, &petsc_m, &petsc_n);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   return static_cast<unsigned int>(petsc_n);
 }
