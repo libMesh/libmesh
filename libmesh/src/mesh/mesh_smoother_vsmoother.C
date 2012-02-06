@@ -378,12 +378,14 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
       //If there are actually less than that -1 must be used
       //to fill out the rest
       int num=0;
+/*
       int num_necessary = 0;
 
       if (_dim == 2)
 	num_necessary = 6;
       else
 	num_necessary = 10;
+*/
 
       if(_dim == 2)
       {
