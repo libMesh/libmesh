@@ -385,25 +385,6 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
       const std::vector<std::vector<Real> >& phi_coarse =
 	fe_coarse->get_phi();
 
-      // The gradients of the shape functions at the quadrature
-      // points on the child element.
-      const std::vector<std::vector<RealGradient> > *dphi_values =
-        NULL;
-      const std::vector<std::vector<RealGradient> > *dphi_coarse =
-        NULL;
-
-      const FEContinuity cont = fe->get_continuity();
-
-      if (cont == C_ONE)
-        {
-          const std::vector<std::vector<RealGradient> >&
-            ref_dphi_values = fe->get_dphi();
-          dphi_values = &ref_dphi_values;
-          const std::vector<std::vector<RealGradient> >&
-            ref_dphi_coarse = fe_coarse->get_dphi();
-          dphi_coarse = &ref_dphi_coarse;
-        }
-
       // The Jacobian * quadrature weight at the quadrature points
       const std::vector<Real>& JxW =
 	fe->get_JxW();
