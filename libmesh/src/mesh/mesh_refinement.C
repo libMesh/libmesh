@@ -313,8 +313,10 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
 
   bool failure = false;
 
+#ifndef NDEBUG
   Elem *failed_elem = NULL;
   Elem *failed_neighbor = NULL;
+#endif // !NDEBUG
 
   for ( ; elem_it != elem_end && !failure; ++elem_it)
     {
@@ -335,8 +337,10 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
               (neighbor->p_level() > elem->p_level() + 1))
             {
               failure = true;
+#ifndef NDEBUG
               failed_elem = elem;
               failed_neighbor = neighbor;
+#endif // !NDEBUG
               break;
             }
         }
@@ -349,6 +353,17 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
     {
       // We didn't pass the level one test, so libmesh_assert that
       // we're allowed not to
+#ifndef NDEBUG
+      if (libmesh_assert_pass)
+        {
+	  libMesh::out <<
+            "MeshRefinement Level one failure, element: " <<
+            *failed_elem << std::endl;
+	  libMesh::out <<
+            "MeshRefinement Level one failure, neighbor: " <<
+            *failed_neighbor << std::endl;
+        }
+#endif // !NDEBUG
       libmesh_assert(!libmesh_assert_pass);
       return false;
     }
@@ -368,7 +383,9 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
   MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
+#ifndef NDEBUG
   Elem *failed_elem = NULL;
+#endif
 
   for ( ; elem_it != elem_end; ++elem_it)
     {
@@ -381,7 +398,9 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
           elem->p_refinement_flag() == Elem::COARSEN)
         {
           found_flag = true;
+#ifndef NDEBUG
           failed_elem = elem;
+#endif
           break;
         }
     }
@@ -391,6 +410,14 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
 
   if (found_flag)
     {
+#ifndef NDEBUG
+      if (libmesh_assert_pass)
+        {
+	  libMesh::out <<
+	    "MeshRefinement test_unflagged failure, element: " <<
+             *failed_elem << std::endl;
+	}
+#endif
       // We didn't pass the "elements are unflagged" test,
       // so libmesh_assert that we're allowed not to
       libmesh_assert(!libmesh_assert_pass);
