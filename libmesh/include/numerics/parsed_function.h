@@ -50,6 +50,8 @@ public:
         fp.Parse(subexpression, variables);
         parsers.push_back(fp);
       }
+
+      this->initialized = true;
     }
 
   virtual Output operator() (const Point& p,
