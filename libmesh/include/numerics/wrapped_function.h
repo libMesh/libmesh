@@ -118,7 +118,7 @@ protected:
 template <typename Output>
 inline
 Output WrappedFunction<Output>::operator() (const Point& p,
-			                    const Real time)
+			                    const Real /*time*/)
 {
   libmesh_assert(_fptr);
   libmesh_assert(_parameters);
@@ -136,7 +136,7 @@ Output WrappedFunction<Output>::operator() (const Point& p,
 template <typename Output>
 inline
 void WrappedFunction<Output>::operator() (const Point& p,
-			                  const Real time,
+			                  const Real /*time*/,
 			                  DenseVector<Output>& output)
 {
   libmesh_assert(_fptr);
@@ -183,7 +183,7 @@ template <typename Output>
 inline
 Output WrappedFunction<Output>::component (unsigned int i,
                                            const Point& p,
-			                   Real time)
+			                   Real /*time*/)
 {
   libmesh_assert(_fptr);
   libmesh_assert(_parameters);
