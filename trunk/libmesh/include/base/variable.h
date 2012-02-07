@@ -87,6 +87,12 @@ public:
   { return _type; }
 
   /**
+   * The number of components of this variable.
+   */
+  unsigned int n_components() const
+  { return type().family == SCALAR ? _type.order : 1; }
+
+  /**
    * \p returns \p true if this variable is active on subdomain \p sid,
    * \p false otherwise.  Note that we interperet the special case of an
    * empty \p _active_subdomains container as active everywhere, i.e.

@@ -28,12 +28,14 @@
 #include "fe_interface.h"
 #include "numeric_vector.h"
 #include "libmesh_logging.h"
+#include "equation_systems.h"
 
 #include "dense_matrix.h"
 #include "fe_base.h"
 #include "quadrature_gauss.h"
 #include "dense_vector.h"
 #include "threads.h"
+#include "wrapped_function.h"
 
 namespace libMesh
 {
@@ -232,7 +234,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
 
 /**
- * This method projects an analytic function onto the solution via L2
+ * This method projects an arbitrary function onto the solution via L2
  * projections and nodal interpolations on each element.
  */
 void System::project_solution (Number fptr(const Point& p,
@@ -245,10 +247,26 @@ void System::project_solution (Number fptr(const Point& p,
                                              const std::string& unknown_name),
                                Parameters& parameters) const
 {
-  this->project_vector(fptr, gptr, parameters, *solution);
+  WrappedFunction<Number> f(*this, fptr, &parameters);
+  WrappedFunction<Gradient> g(*this, gptr, &parameters);
+  this->project_solution(&f, &g);
+}
+
+
+/**
+ * This method projects an analytic function onto the solution via L2
+ * projections and nodal interpolations on each element.
+ */
+void System::project_solution (FunctionBase<Number> *f,
+                               FunctionBase<Gradient> *g,
+                               Parameters* parameters) const
+{
+  this->project_vector(*solution, f, g, parameters);
 
   solution->localize(*current_local_solution);
 }
+
+
 
 
 
@@ -267,23 +285,43 @@ void System::project_vector (Number fptr(const Point& p,
                              Parameters& parameters,
                              NumericVector<Number>& new_vector) const
 {
+  WrappedFunction<Number> f(*this, fptr, &parameters);
+  WrappedFunction<Gradient> g(*this, gptr, &parameters);
+  this->project_vector(new_vector, &f, &g);
+}
+
+/**
+ * This method projects an analytic function via L2 projections and
+ * nodal interpolations on each element.
+ */
+void System::project_vector (NumericVector<Number>& new_vector,
+                             FunctionBase<Number> *f,
+                             FunctionBase<Gradient> *g,
+                             Parameters *parameters) const
+{
   START_LOG ("project_vector()", "System");
 
-  Threads::parallel_for (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-					 this->get_mesh().active_local_elements_end(),
-					 1000),
-			 ProjectSolution(*this,
-					 fptr,
-					 gptr,
-					 parameters,
-					 new_vector)
-			 );
+  Threads::parallel_for
+    (ConstElemRange (this->get_mesh().active_local_elements_begin(),
+		     this->get_mesh().active_local_elements_end(),
+		     1000),
+     ProjectSolution(*this, f, g,
+		     parameters ?
+		       *parameters :
+                       this->get_equation_systems().parameters,
+		     new_vector)
+    );
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
   if(libMesh::processor_id() == (libMesh::n_processors()-1))
   {
+    // We get different scalars as different
+    // components from a new-style f functor.
+    DenseVector<Number> fout(this->n_components());
+    (*f) (Point(), 0, fout);
+
     const DofMap& dof_map = this->get_dof_map();
     for (unsigned int var=0; var<this->n_vars(); var++)
       if(this->variable(var).type().family == SCALAR)
@@ -294,16 +332,10 @@ void System::project_vector (Number fptr(const Point& p,
 
           for (unsigned int i=0; i<n_SCALAR_dofs; i++)
           {
-            const unsigned int index = SCALAR_indices[i];
-
-            // We pass the point (i,0,0) to the fptr to distinguish
-            // the different scalars within the SCALAR variable
-            Point p_i(i,0,0);
-            new_vector.set( index, fptr(p_i,
-                                        parameters,
-                                        this->name(),
-                                        this->variable_name(var))
-                          );
+            const unsigned int global_index = SCALAR_indices[i];
+            const unsigned int component_index =
+              this->variable_scalar_number(var,i);
+            new_vector.set(global_index, fout(component_index));
           }
         }
   }
@@ -322,6 +354,7 @@ void System::project_vector (Number fptr(const Point& p,
 void System::ProjectVector::operator()(const ConstElemRange &) const
 {
   libmesh_error();
+}
 #else
 void System::ProjectVector::operator()(const ConstElemRange &range) const
 {
@@ -716,9 +749,8 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
     } // end variables loop
 
   STOP_LOG ("operator()","ProjectVector");
-
-#endif // LIBMESH_ENABLE_AMR
 }
+#endif // LIBMESH_ENABLE_AMR
 
 
 
@@ -746,6 +778,7 @@ void System::BuildProjectionList::unique()
 void System::BuildProjectionList::operator()(const ConstElemRange &)
 {
   libmesh_error();
+}
 #else
 void System::BuildProjectionList::operator()(const ConstElemRange &range)
 {
@@ -814,8 +847,8 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
         if (di[i] < first_old_dof || di[i] >= end_old_dof)
           this->send_list.push_back(di[i]);
     }  // end elem loop
-#endif // LIBMESH_ENABLE_AMR
 }
+#endif // LIBMESH_ENABLE_AMR
 
 
 
@@ -831,11 +864,11 @@ void System::BuildProjectionList::join(const BuildProjectionList &other)
 void System::ProjectSolution::operator()(const ConstElemRange &range) const
 {
   // We need data to project
-  libmesh_assert(fptr);
+  libmesh_assert(f);
 
   /**
    * This method projects an analytic solution to the current
-   * mesh.  The input function \p fptr gives the analytic solution,
+   * mesh.  The input function \p f gives the analytic solution,
    * while the \p new_vector (which should already be correctly sized)
    * gives the solution (to be computed) on the current mesh.
    */
@@ -869,6 +902,9 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
       if (fe_type.family == SCALAR)
         continue;
 
+      const unsigned int var_component =
+        system.variable_scalar_number(var, 0);
+
       // Get FE objects of the appropriate type
       AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
 
@@ -890,7 +926,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
       if (cont == C_ONE)
         {
           // We'll need gradient data for a C1 projection
-          libmesh_assert(gptr);
+          libmesh_assert(g);
 
           const std::vector<std::vector<RealGradient> >&
             ref_dphi = fe->get_dphi();
@@ -970,28 +1006,19 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
               else if (cont == C_ZERO)
                 {
                   libmesh_assert(nc == 1);
-		  Ue(current_dof) = fptr(elem->point(n),
-                                         parameters,
-                                         system.name(),
-                                         system.variable_name(var));
+		  Ue(current_dof) = (*f)(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                 }
               // The hermite element vertex shape functions are weird
               else if (fe_type.family == HERMITE)
                 {
-                  Ue(current_dof) = fptr(elem->point(n),
-                                         parameters,
-                                         system.name(),
-                                         system.variable_name(var));
+                  Ue(current_dof) = (*f)(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
-                  Gradient g = gptr(elem->point(n),
-                                    parameters,
-                                    system.name(),
-                                    system.variable_name(var));
+                  Gradient grad = (*g)(var_component,elem->point(n));
                   // x derivative
-                  Ue(current_dof) = g(0);
+                  Ue(current_dof) = grad(0);
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   if (dim > 1)
@@ -1001,16 +1028,10 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                             nxplus = elem->point(n);
                       nxminus(0) -= TOLERANCE;
                       nxplus(0) += TOLERANCE;
-                      Gradient gxminus = gptr(nxminus,
-                                              parameters,
-                                              system.name(),
-                                              system.variable_name(var));
-                      Gradient gxplus = gptr(nxplus,
-                                             parameters,
-                                             system.name(),
-                                             system.variable_name(var));
+                      Gradient gxminus = (*g)(var_component,nxminus);
+                      Gradient gxplus = (*g)(var_component,nxplus);
                       // y derivative
-                      Ue(current_dof) = g(1);
+                      Ue(current_dof) = grad(1);
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
                       // xy derivative
@@ -1022,7 +1043,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                       if (dim > 2)
                         {
                           // z derivative
-                          Ue(current_dof) = g(2);
+                          Ue(current_dof) = grad(2);
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // xz derivative
@@ -1035,14 +1056,8 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                                 nyplus = elem->point(n);
                           nyminus(1) -= TOLERANCE;
                           nyplus(1) += TOLERANCE;
-                          Gradient gyminus = gptr(nyminus,
-                                                  parameters,
-                                                  system.name(),
-                                                  system.variable_name(var));
-                          Gradient gyplus = gptr(nyplus,
-                                                 parameters,
-                                                 system.name(),
-                                                 system.variable_name(var));
+                          Gradient gyminus = (*g)(var_component,nyminus);
+                          Gradient gyplus = (*g)(var_component,nyplus);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
                                             / 2. / TOLERANCE;
@@ -1061,22 +1076,10 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                           nxpym(1) -= TOLERANCE;
                           nxpyp(0) += TOLERANCE;
                           nxpyp(1) += TOLERANCE;
-                          Gradient gxmym = gptr(nxmym,
-                                                parameters,
-                                                system.name(),
-                                                system.variable_name(var));
-                          Gradient gxmyp = gptr(nxmyp,
-                                                parameters,
-                                                system.name(),
-                                                system.variable_name(var));
-                          Gradient gxpym = gptr(nxpym,
-                                                parameters,
-                                                system.name(),
-                                                system.variable_name(var));
-                          Gradient gxpyp = gptr(nxpyp,
-                                                parameters,
-                                                system.name(),
-                                                system.variable_name(var));
+                          Gradient gxmym = (*g)(var_component,nxmym);
+                          Gradient gxmyp = (*g)(var_component,nxmyp);
+                          Gradient gxpym = (*g)(var_component,nxpym);
+                          Gradient gxpyp = (*g)(var_component,nxpyp);
                           Number gxzplus = (gxpyp(2) - gxmyp(2))
                                          / 2. / TOLERANCE;
                           Number gxzminus = (gxpym(2) - gxmym(2))
@@ -1095,19 +1098,13 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
               else if (cont == C_ONE)
                 {
                   libmesh_assert(nc == 1 + dim);
-		  Ue(current_dof) = fptr(elem->point(n),
-                                         parameters,
-                                         system.name(),
-                                         system.variable_name(var));
+		  Ue(current_dof) = (*f)(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
-                  Gradient g = gptr(elem->point(n),
-                                    parameters,
-                                    system.name(),
-                                    system.variable_name(var));
+                  Gradient grad = (*g)(var_component,elem->point(n));
                   for (unsigned int i=0; i!= dim; ++i)
                     {
-		      Ue(current_dof) = g(i);
+		      Ue(current_dof) = grad(i);
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
                     }
@@ -1148,16 +1145,11 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	        for (unsigned int qp=0; qp<n_qp; qp++)
 	          {
 	            // solution at the quadrature point
-	            Number fineval = fptr(xyz_values[qp],
-                                          parameters,
-                                          system.name(),
-                                          system.variable_name(var));
+	            Number fineval = (*f)(var_component,xyz_values[qp]);
 	            // solution grad at the quadrature point
 	            Gradient finegrad;
                     if (cont == C_ONE)
-                      finegrad = gptr(xyz_values[qp], parameters,
-                                      system.name(),
-				      system.variable_name(var));
+                      finegrad = (*g)(var_component,xyz_values[qp]);
 
                     // Form edge projection matrix
                     for (unsigned int sidei=0, freei=0;
@@ -1244,16 +1236,11 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	        for (unsigned int qp=0; qp<n_qp; qp++)
 	          {
 	            // solution at the quadrature point
-	            Number fineval = fptr(xyz_values[qp],
-                                          parameters,
-                                          system.name(),
-                                          system.variable_name(var));
+	            Number fineval = (*f)(var_component,xyz_values[qp]);
 	            // solution grad at the quadrature point
 	            Gradient finegrad;
                     if (cont == C_ONE)
-                      finegrad = gptr(xyz_values[qp], parameters,
-                                      system.name(),
-				      system.variable_name(var));
+                      finegrad = (*g)(var_component,xyz_values[qp]);
 
                     // Form side projection matrix
                     for (unsigned int sidei=0, freei=0;
@@ -1335,16 +1322,11 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	  for (unsigned int qp=0; qp<n_qp; qp++)
 	    {
 	      // solution at the quadrature point
-	      Number fineval = fptr(xyz_values[qp],
-                                    parameters,
-                                    system.name(),
-                                    system.variable_name(var));
+	      Number fineval = (*f)(var_component,xyz_values[qp]);
 	      // solution grad at the quadrature point
 	      Gradient finegrad;
               if (cont == C_ONE)
-                finegrad = gptr(xyz_values[qp], parameters,
-                                system.name(),
-				system.variable_name(var));
+                finegrad = (*g)(var_component,xyz_values[qp]);
 
               // Form interior projection matrix
               for (unsigned int i=0, freei=0; i != n_dofs; ++i)
