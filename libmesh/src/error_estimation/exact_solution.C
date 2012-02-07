@@ -123,6 +123,9 @@ void ExactSolution::attach_exact_values (std::vector<FunctionBase<Number> *> f)
 {
   // Clear out any previous _exact_values entries, then add a new
   // entry for each system.
+  for (unsigned int i=0; i != _exact_values.size(); ++i)
+    delete (_exact_values[i]);
+
   _exact_values.clear();
   _exact_values.resize(f.size(), NULL);
 
@@ -174,6 +177,9 @@ void ExactSolution::attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g
 {
   // Clear out any previous _exact_derivs entries, then add a new
   // entry for each system.
+  for (unsigned int i=0; i != _exact_derivs.size(); ++i)
+    delete (_exact_derivs[i]);
+
   _exact_derivs.clear();
   _exact_derivs.resize(g.size(), NULL);
 
@@ -225,6 +231,9 @@ void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h
 {
   // Clear out any previous _exact_hessians entries, then add a new
   // entry for each system.
+  for (unsigned int i=0; i != _exact_hessians.size(); ++i)
+    delete (_exact_hessians[i]);
+
   _exact_hessians.clear();
   _exact_hessians.resize(h.size(), NULL);
 
