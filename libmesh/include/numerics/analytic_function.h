@@ -46,7 +46,8 @@ class DenseVector;
 
 // ------------------------------------------------------------
 // AnalyticFunction class definition
-class AnalyticFunction : public FunctionBase
+template <typename Output=Number>
+class AnalyticFunction : public FunctionBase<Output>
 {
 public:
 
@@ -54,14 +55,14 @@ public:
    * Constructor.  Takes a function pointer for scalar
    * return values.
    */
-  AnalyticFunction (Number fptr(const Point& p,
+  AnalyticFunction (Output fptr(const Point& p,
 				const Real time));
 
   /**
    * Constructor.  Takes a function pointer for
    * vector valued functions.
    */
-  AnalyticFunction (void fptr(DenseVector<Number>& output,
+  AnalyticFunction (void fptr(DenseVector<Output>& output,
 			      const Point& p,
 			      const Real time));
   /**
@@ -75,13 +76,13 @@ public:
    * the boundary values when an analytical expression
    * is available.
    */
-  Number (* _number_fptr) (const Point& p,
+  Output (* _number_fptr) (const Point& p,
 			   const Real time);
 
   /**
    * Pointer to user-provided vector valued function.
    */
-  void (* _vector_fptr) (DenseVector<Number>& output,
+  void (* _vector_fptr) (DenseVector<Output>& output,
 			 const Point& p,
 			 const Real time);
 
@@ -99,7 +100,7 @@ public:
    * @returns the value at point \p p and time
    * \p time, which defaults to zero.
    */
-  Number operator() (const Point& p,
+  Output operator() (const Point& p,
 		     const Real time=0.);
 
   /**
@@ -108,7 +109,7 @@ public:
    */
   void operator() (const Point& p,
 		   const Real time,
-		   DenseVector<Number>& output);
+		   DenseVector<Output>& output);
 
 };
 
@@ -116,9 +117,10 @@ public:
 
 // ------------------------------------------------------------
 // AnalyticFunction inline methods
+template <typename Output>
 inline
-Number AnalyticFunction::operator() (const Point& p,
-				     const Real time)
+Output AnalyticFunction<Output>::operator() (const Point& p,
+				             const Real time)
 {
   libmesh_assert (this->initialized());
   return (this->_number_fptr(p, time));
@@ -126,14 +128,75 @@ Number AnalyticFunction::operator() (const Point& p,
 
 
 
+template <typename Output>
 inline
-void AnalyticFunction::operator() (const Point& p,
-				   const Real time,
-				   DenseVector<Number>& output)
+void AnalyticFunction<Output>::operator() (const Point& p,
+				           const Real time,
+				           DenseVector<Output>& output)
 {
   libmesh_assert (this->initialized());
   this->_vector_fptr(output, p, time);
   return;
+}
+
+
+
+template <typename Output>
+AnalyticFunction<Output>::AnalyticFunction (Output fptr(const Point& p,
+						        const Real time)) :
+  FunctionBase<Output> (),
+  _number_fptr (fptr)
+{
+  libmesh_assert (fptr != NULL);
+  this->_initialized = true;
+}
+
+
+
+template <typename Output>
+inline
+AnalyticFunction<Output>::AnalyticFunction (void fptr(DenseVector<Output>& output,
+					              const Point& p,
+					              const Real time)) :
+  FunctionBase<Output> (),
+  _vector_fptr (fptr)
+{
+  libmesh_assert (fptr != NULL);
+  this->_initialized = true;
+}
+
+
+
+template <typename Output>
+inline
+AnalyticFunction<Output>::~AnalyticFunction ()
+{
+}
+
+
+
+template <typename Output>
+void AnalyticFunction<Output>::init ()
+{
+  // dumb double-test
+  libmesh_assert ((_number_fptr != NULL) || (_vector_fptr != NULL));
+
+  // definitely ready
+  this->_initialized = true;
+}
+
+
+
+template <typename Output>
+inline
+void AnalyticFunction<Output>::clear ()
+{
+  // We probably need a method to reset these later...
+  _number_fptr = NULL;
+  _vector_fptr = NULL;
+
+  // definitely not ready
+  this->_initialized = false;
 }
 
 

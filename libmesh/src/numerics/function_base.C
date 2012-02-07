@@ -28,21 +28,6 @@ namespace libMesh
 
 
 
-
-//------------------------------------------------------------------
-// FunctionBase methods
-FunctionBase::FunctionBase (const FunctionBase* master) :
-  _master             (master),
-  _initialized        (false)
-{
-}
-
-
-
-FunctionBase::~FunctionBase ()
-{
-}
-
 } // namespace libMesh
 
 
