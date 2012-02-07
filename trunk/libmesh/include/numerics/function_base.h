@@ -123,9 +123,9 @@ public:
    * implementation is based on a vector evaluation, which is usually
    * unnecessarily inefficient.
    */
-  virtual Output operator() (const unsigned int i,
-                             const Point& p,
-			     const Real time=0.);
+  virtual Output component(unsigned int i,
+                           const Point& p,
+			   Real time=0.);
 
 
   /**
@@ -186,9 +186,9 @@ bool FunctionBase<Output>::initialized() const
 
 template <typename Output>
 inline
-Output FunctionBase<Output>::operator() (const unsigned int i,
-                                         const Point& p,
-			                 const Real time)
+Output FunctionBase<Output>::component (unsigned int i,
+                                        const Point& p,
+			                Real time)
 {
   DenseVector<Output> out(i+1);
   (*this)(p, time, out);
