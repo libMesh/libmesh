@@ -8,9 +8,10 @@
 #include "function_base.h"
 #include "point.h"
 
-class ZeroFunction : public FunctionBase
+template <typename Output=Number>
+class ZeroFunction : public FunctionBase<Output>
 {
-  virtual Number operator() (const Point&,
+  virtual Output operator() (const Point&,
                              const Real = 0)
     {
       return 0;
@@ -18,7 +19,7 @@ class ZeroFunction : public FunctionBase
 
   virtual void operator() (const Point&,
                            const Real,
-                           DenseVector<Number>& output)
+                           DenseVector<Output>& output)
     {
       unsigned int size = output.size();
       for (unsigned int i=0; i != size; ++i)

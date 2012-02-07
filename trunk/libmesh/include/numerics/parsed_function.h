@@ -13,7 +13,8 @@
 
 #include "fparser.hh"
 
-class ParsedFunction : public FunctionBase
+template <typename Output=Number>
+class ParsedFunction : public FunctionBase<Output>
 {
 public:
   ParsedFunction (const std::string& expression)
@@ -42,7 +43,7 @@ public:
         start = (end == std::string::npos) ?
                 std::string::npos : end + 1;
 
-        FunctionParser fp;
+        FunctionParserBase<Output> fp;
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
         fp.Parse(subexpression, variables);
@@ -50,7 +51,7 @@ public:
       }
     }
 
-  virtual Number operator() (const Point& p,
+  virtual Output operator() (const Point& p,
                              const Real time = 0)
     {
       _spacetime[0] = p(0);
@@ -66,7 +67,7 @@ public:
 
   virtual void operator() (const Point& p,
                            const Real time,
-                           DenseVector<Number>& output)
+                           DenseVector<Output>& output)
     {
       _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
@@ -88,13 +89,14 @@ public:
   virtual void clear() {}
 
 private:
-  Number _spacetime[LIBMESH_DIM+1];
-  std::vector<FunctionParserBase<Number> > parsers;
+  Output _spacetime[LIBMESH_DIM+1];
+  std::vector<FunctionParserBase<Output> > parsers;
 };
 
 #else
 
-class ParsedFunction : public FunctionBase
+template <typename Output>
+class ParsedFunction : public FunctionBase<Output>
 {
 public:
   ParsedFunction (std::string expression)
@@ -102,13 +104,16 @@ public:
       libmesh_not_implemented();
     }
 
-  virtual Number operator() (const Point&,
+  virtual Output operator() (const Point&,
                              const Real time = 0)
     { return 0.; }
 
   virtual void operator() (const Point&,
                            const Real time,
-                           DenseVector<Number>& output) {}
+                           DenseVector<Output>& output) {}
+
+  virtual void init() {}
+  virtual void clear() {}
 };
 
 #endif // LIBMESH_HAVE_FPARSER
