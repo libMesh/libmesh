@@ -36,6 +36,7 @@ class Point;
 class EquationSystems;
 class Parameters;
 class Mesh;
+template <typename Output> class FunctionBase;
 
 // Is there any way to simplify this?
 // All we need are Tensor and Gradient. - RHS
@@ -74,7 +75,7 @@ public:
   /**
    * Destructor.
    */
-  ~ExactSolution() {}
+  ~ExactSolution();
 
 
   /**
@@ -85,37 +86,69 @@ public:
   void attach_reference_solution (const EquationSystems* es_fine);
 
   /**
-   * Attach function similar to system.h which
-   * allows the user to attach an arbitrary function
-   * which computes the exact value of the solution
-   * at any point.
+   * Clone and attach arbitrary functors which compute the exact
+   * values of the EquationSystems' solutions at any point.
    */
-  void attach_exact_value ( Number fptr(const Point& p,
-					const Parameters& Parameters,
-					const std::string& sys_name,
-					const std::string& unknown_name));
+  void attach_exact_values (std::vector<FunctionBase<Number> *> f);
 
   /**
-   * Attach function similar to system.h which
-   * allows the user to attach an arbitrary function
-   * which computes the exact derivative of the solution
-   * at any point.
+   * Clone and attach an arbitrary functor which computes the exact
+   * value of the system \p sys_num solution at any point.
    */
-  void attach_exact_deriv ( Gradient fptr(const Point& p,
-					  const Parameters& parameters,
-					  const std::string& sys_name,
-					  const std::string& unknown_name));
+  void attach_exact_value (unsigned int sys_num,
+                           FunctionBase<Number>* f);
 
   /**
-   * Attach function similar to system.h which
-   * allows the user to attach an arbitrary function
-   * which computes the exact second derivatives of the solution
-   * at any point.
+   * Attach an arbitrary function which computes the exact value of
+   * the solution at any point.
    */
-  void attach_exact_hessian ( Tensor fptr(const Point& p,
-					  const Parameters& parameters,
-					  const std::string& sys_name,
-					  const std::string& unknown_name));
+  void attach_exact_value (Number fptr(const Point& p,
+                                       const Parameters& Parameters,
+                                       const std::string& sys_name,
+                                       const std::string& unknown_name));
+
+  /**
+   * Clone and attach arbitrary functors which compute the exact
+   * gradients of the EquationSystems' solutions at any point.
+   */
+  void attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g);
+
+  /**
+   * Clone and attach an arbitrary functor which computes the exact
+   * gradient of the system \p sys_num solution at any point.
+   */
+  void attach_exact_deriv (unsigned int sys_num,
+                           FunctionBase<Gradient>* g);
+
+  /**
+   * Attach an arbitrary function which computes the exact gradient of
+   * the solution at any point.
+   */
+  void attach_exact_deriv (Gradient gptr(const Point& p,
+					 const Parameters& parameters,
+					 const std::string& sys_name,
+					 const std::string& unknown_name));
+
+  /**
+   * Clone and attach arbitrary functors which compute the exact
+   * second derivatives of the EquationSystems' solutions at any point.
+   */
+  void attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h);
+
+  /**
+   * Clone and attach an arbitrary functor which computes the exact
+   * second derivatives of the system \p sys_num solution at any point.
+   */
+  void attach_exact_hessian (unsigned int sys_num,
+                             FunctionBase<Tensor>* h);
+  /**
+   * Attach an arbitrary function which computes the exact second
+   * derivatives of the solution at any point.
+   */
+  void attach_exact_hessian (Tensor hptr(const Point& p,
+					 const Parameters& parameters,
+					 const std::string& sys_name,
+					 const std::string& unknown_name));
 
   /**
    * Increases or decreases the order of the quadrature rule used for numerical
@@ -209,31 +242,22 @@ private:
                                    const std::string& unknown_name);
 
   /**
-   * Function pointer to user-provided function which
-   * computes the exact value of the solution.
+   * User-provided functors which compute the exact value of the
+   * solution for each system.
    */
-  Number (* _exact_value) (const Point& p,
-			   const Parameters& parameters,
-			   const std::string& sys_name,
-			   const std::string& unknown_name);
+  std::vector<FunctionBase<Number> *> _exact_values;
 
   /**
-   * Function pointer to user-provided function which
-   * computes the exact derivative of the solution.
+   * User-provided functors which compute the exact derivative of the
+   * solution for each system.
    */
-  Gradient (* _exact_deriv) (const Point& p,
-			     const Parameters& parameters,
-			     const std::string& sys_name,
-			     const std::string& unknown_name);
+  std::vector<FunctionBase<Gradient> *> _exact_derivs;
 
   /**
-   * Function pointer to user-provided function which
-   * computes the exact hessian of the solution.
+   * User-provided functors which compute the exact hessians of the
+   * solution for each system.
    */
-  Tensor (* _exact_hessian) (const Point& p,
-			     const Parameters& parameters,
-			     const std::string& sys_name,
-			     const std::string& unknown_name);
+  std::vector<FunctionBase<Tensor> *> _exact_hessians;
 
   /**
    * Data structure which stores the errors:
