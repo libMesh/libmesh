@@ -141,6 +141,7 @@ public:
    */
   void attach_exact_hessian (unsigned int sys_num,
                              FunctionBase<Tensor>* h);
+
   /**
    * Attach an arbitrary function which computes the exact second
    * derivatives of the solution at any point.
