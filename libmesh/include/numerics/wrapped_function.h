@@ -59,8 +59,8 @@ public:
                    const Parameters* parameters = NULL,
                    unsigned int varnum=0)
     : _sys(sys),
-      _parameters(parameters),
       _fptr(fptr),
+      _parameters(parameters),
       _varnum(varnum)
   {
     this->_initialized = true;
@@ -71,6 +71,8 @@ public:
   virtual void init () {}
 
   virtual void clear () {}
+
+  virtual AutoPtr<FunctionBase<Output> > clone ();
 
   /**
    * @returns the scalar value of variable varnum at coordinate \p p
@@ -100,12 +102,12 @@ protected:
 
   const System& _sys;
 
-  const Parameters* _parameters;
-
   Output (*_fptr)(const Point& p,
                   const Parameters& parameters,
                   const std::string& sys_name,
                   const std::string& unknown_name);
+
+  const Parameters* _parameters;
 
   unsigned int _varnum;
 };
@@ -127,6 +129,18 @@ Output WrappedFunction<Output>::operator() (const Point& p,
                _sys.name(),
                _sys.variable_name(_varnum));
 }
+
+
+template <typename Output>
+inline
+AutoPtr<FunctionBase<Output> >
+WrappedFunction<Output>::clone ()
+{
+  return AutoPtr<FunctionBase<Output> >
+    (new WrappedFunction<Output>
+      (_sys, _fptr, _parameters, _varnum));
+}
+
 
 /**
  * Return function for vectors.

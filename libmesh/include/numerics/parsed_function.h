@@ -17,7 +17,8 @@ template <typename Output=Number>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:
-  ParsedFunction (const std::string& expression)
+  ParsedFunction (const std::string& expression) 
+    : _expression(expression)
     {
       std::string variables = "x";
 #if LIBMESH_DIM > 1
@@ -54,6 +55,8 @@ public:
   virtual Output operator() (const Point& p,
                              const Real time = 0)
     {
+      Output _spacetime[LIBMESH_DIM+1];
+
       _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
       _spacetime[1] = p(1);
@@ -69,6 +72,8 @@ public:
                            const Real time,
                            DenseVector<Output>& output)
     {
+      Output _spacetime[LIBMESH_DIM+1];
+
       _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
       _spacetime[1] = p(1);
@@ -93,6 +98,8 @@ public:
                             const Point& p,
                             Real time)
     {
+      Output _spacetime[LIBMESH_DIM+1];
+
       _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
       _spacetime[1] = p(1);
@@ -109,9 +116,13 @@ public:
 
   virtual void init() {}
   virtual void clear() {}
+  virtual AutoPtr<FunctionBase<Output> > clone() {
+    return AutoPtr<FunctionBase<Output> >
+      (new ParsedFunction(_expression));
+  }
 
 private:
-  Output _spacetime[LIBMESH_DIM+1];
+  std::string _expression;
   std::vector<FunctionParserBase<Output> > parsers;
 };
 
@@ -121,21 +132,25 @@ template <typename Output>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:
-  ParsedFunction (std::string expression)
+  ParsedFunction (std::string /* expression */)
     {
       libmesh_not_implemented();
     }
 
   virtual Output operator() (const Point&,
-                             const Real time = 0)
+                             const Real /* time */ = 0)
     { return 0.; }
 
   virtual void operator() (const Point&,
-                           const Real time,
-                           DenseVector<Output>& output) {}
+                           const Real /* time */,
+                           DenseVector<Output>& /* output */) {}
 
   virtual void init() {}
   virtual void clear() {}
+  virtual AutoPtr<FunctionBase<Output> > clone() {
+    return AutoPtr<FunctionBase<Output> >
+      (new ParsedFunction<Output>(""));
+  }
 };
 
 #endif // LIBMESH_HAVE_FPARSER
