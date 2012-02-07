@@ -445,6 +445,19 @@ public:
 
   /**
    * Projects arbitrary functions onto the current solution.
+   * The function value \p f and its gradient \p g are
+   * user-provided cloneable functors.
+   * A gradient \p g is only required/used for projecting onto finite
+   * element spaces with continuous derivatives.
+   * If non-default \p Parameters are to be used, they can be provided
+   * in the \p parameters argument.
+   */
+  void project_solution (FunctionBase<Number> *f,
+                         FunctionBase<Gradient> *g = NULL,
+                         Parameters* parameters = NULL) const;
+
+  /**
+   * Projects arbitrary functions onto the current solution.
    * The function value \p fptr and its gradient \p gptr are
    * represented by function pointers.
    * A gradient \p gptr is only required/used for projecting onto
@@ -461,17 +474,19 @@ public:
 			 Parameters& parameters) const;
 
   /**
-   * Projects arbitrary functions onto the current solution.
+   * Projects arbitrary functions onto a vector of degree of freedom
+   * values for the current system.
    * The function value \p f and its gradient \p g are
-   * represented by functors.
+   * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
    * If non-default \p Parameters are to be used, they can be provided
    * in the \p parameters argument.
    */
-  void project_solution (FunctionBase<Number> *f,
-                         FunctionBase<Gradient> *g = NULL,
-                         Parameters* parameters = NULL) const;
+  void project_vector (NumericVector<Number>& new_vector,
+                       FunctionBase<Number> *f,
+                       FunctionBase<Gradient> *g = NULL,
+		       Parameters* parameters = NULL) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -491,21 +506,6 @@ public:
 				     const std::string& unknown_name),
 		       Parameters& parameters,
 		       NumericVector<Number>& new_vector) const;
-
-  /**
-   * Projects arbitrary functions onto a vector of degree of freedom
-   * values for the current system.
-   * The function value \p f and its gradient \p g are
-   * represented by functors.
-   * A gradient \p g is only required/used for projecting onto finite
-   * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
-   */
-  void project_vector (NumericVector<Number>& new_vector,
-                       FunctionBase<Number> *f,
-                       FunctionBase<Gradient> *g = NULL,
-		       Parameters* parameters = NULL) const;
 
   /**
    * @returns the system number.
@@ -1590,95 +1590,6 @@ private:
    * different dof indices.
    */
   std::vector<unsigned int> _written_var_indices;
-
-  /**
-   * This class implements projecting a vector from
-   * an old mesh to the newly refined mesh.  This
-   * may be executed in parallel on multiple threads.
-   */
-  class ProjectVector
-  {
-  private:
-    const System                &system;
-    const NumericVector<Number> &old_vector;
-    NumericVector<Number>       &new_vector;
-
-  public:
-    ProjectVector (const System &system_in,
-		   const NumericVector<Number> &old_v_in,
-		   NumericVector<Number> &new_v_in) :
-    system(system_in),
-    old_vector(old_v_in),
-    new_vector(new_v_in)
-    {}
-
-    void operator()(const ConstElemRange &range) const;
-  };
-
-
-  /**
-   * This class builds the send_list of old dof indices
-   * whose coefficients are needed to perform a projection.
-   * This may be executed in parallel on multiple threads.
-   * The end result is a \p send_list vector which is
-   * unsorted and may contain duplicate elements.
-   * The \p unique() method can be used to sort and
-   * create a unique list.
-   */
-  class BuildProjectionList
-  {
-  private:
-    const System              &system;
-
-  public:
-    BuildProjectionList (const System &system_in) :
-      system(system_in),
-      send_list()
-    {}
-
-    BuildProjectionList (BuildProjectionList &other, Threads::split) :
-      system(other.system),
-      send_list()
-    {}
-
-    void unique();
-    void operator()(const ConstElemRange &range);
-    void join (const BuildProjectionList &other);
-    std::vector<unsigned int> send_list;
-  };
-
-
-
-  /**
-   * This class implements projecting a vector from
-   * an old mesh to the newly refined mesh.  This
-   * may be exectued in parallel on multiple threads.
-   */
-  class ProjectSolution
-  {
-  private:
-    const System                &system;
-
-    FunctionBase<Number> *f;
-    FunctionBase<Gradient> *g;
-    const Parameters &parameters;
-    NumericVector<Number>       &new_vector;
-
-  public:
-    ProjectSolution (const System &system_in,
-		     FunctionBase<Number>* f_in,
-		     FunctionBase<Gradient>* g_in,
-		     const Parameters &parameters_in,
-		     NumericVector<Number> &new_v_in) :
-    system(system_in),
-    f(f_in),
-    g(g_in),
-    parameters(parameters_in),
-    new_vector(new_v_in)
-    {}
-
-    void operator()(const ConstElemRange &range) const;
-  };
 };
 
 
