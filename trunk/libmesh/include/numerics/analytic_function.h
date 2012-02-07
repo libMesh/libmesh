@@ -97,6 +97,11 @@ public:
   void clear ();
 
   /**
+   * Returns a new deep copy of the function.
+   */
+  virtual AutoPtr<FunctionBase<Output> > clone ();
+
+  /**
    * @returns the value at point \p p and time
    * \p time, which defaults to zero.
    */
@@ -197,6 +202,18 @@ void AnalyticFunction<Output>::clear ()
 
   // definitely not ready
   this->_initialized = false;
+}
+
+
+
+template <typename Output>
+inline
+AutoPtr<FunctionBase<Output> >
+AnalyticFunction<Output>::clone ()
+{
+  return _number_fptr ?
+    new AnalyticFunction<Output>(_number_fptr) :
+    new AnalyticFunction<Output>(_vector_fptr);
 }
 
 

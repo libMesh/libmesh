@@ -103,12 +103,21 @@ public:
    * The actual initialization process.  Takes an optional argument which
    * specifies the method to use when building a \p PointLocator
    */
-  void init (const Trees::BuildType point_locator_build_type);
+  virtual void init (const Trees::BuildType point_locator_build_type);
 
   /**
    * Clears the function.
    */
-  void clear ();
+  virtual void clear ();
+
+  /**
+   * Returns a new copy of the function.  The new copy uses the
+   * original as a master function to enable simultaneous evaluations
+   * of the copies in different threads.
+   * Note that this implies the copy should not be used after the
+   * original is destroyed.
+   */
+  virtual AutoPtr<FunctionBase<Number> > clone ();
 
   /**
    * @returns the value of variable 0 at point
