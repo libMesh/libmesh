@@ -40,6 +40,107 @@
 namespace libMesh
 {
 
+// ------------------------------------------------------------
+// Helper class definitions
+
+  /**
+   * This class implements projecting a vector from
+   * an old mesh to the newly refined mesh.  This
+   * may be executed in parallel on multiple threads.
+   */
+  class ProjectVector
+  {
+  private:
+    const System                &system;
+    const NumericVector<Number> &old_vector;
+    NumericVector<Number>       &new_vector;
+
+  public:
+    ProjectVector (const System &system_in,
+		   const NumericVector<Number> &old_v_in,
+		   NumericVector<Number> &new_v_in) :
+    system(system_in),
+    old_vector(old_v_in),
+    new_vector(new_v_in)
+    {}
+
+    void operator()(const ConstElemRange &range) const;
+  };
+
+
+  /**
+   * This class builds the send_list of old dof indices
+   * whose coefficients are needed to perform a projection.
+   * This may be executed in parallel on multiple threads.
+   * The end result is a \p send_list vector which is
+   * unsorted and may contain duplicate elements.
+   * The \p unique() method can be used to sort and
+   * create a unique list.
+   */
+  class BuildProjectionList
+  {
+  private:
+    const System              &system;
+
+  public:
+    BuildProjectionList (const System &system_in) :
+      system(system_in),
+      send_list()
+    {}
+
+    BuildProjectionList (BuildProjectionList &other, Threads::split) :
+      system(other.system),
+      send_list()
+    {}
+
+    void unique();
+    void operator()(const ConstElemRange &range);
+    void join (const BuildProjectionList &other);
+    std::vector<unsigned int> send_list;
+  };
+
+
+
+  /**
+   * This class implements projecting a vector from
+   * an old mesh to the newly refined mesh.  This
+   * may be exectued in parallel on multiple threads.
+   */
+  class ProjectSolution
+  {
+  private:
+    const System                &system;
+
+    AutoPtr<FunctionBase<Number> > f;
+    AutoPtr<FunctionBase<Gradient> > g;
+    const Parameters &parameters;
+    NumericVector<Number>       &new_vector;
+
+  public:
+    ProjectSolution (const System &system_in,
+		     FunctionBase<Number>* f_in,
+		     FunctionBase<Gradient>* g_in,
+		     const Parameters &parameters_in,
+		     NumericVector<Number> &new_v_in) :
+    system(system_in),
+    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
+    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    parameters(parameters_in),
+    new_vector(new_v_in)
+    {}
+
+    ProjectSolution (const ProjectSolution &in) :
+    system(in.system),
+    f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
+    g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    parameters(in.parameters),
+    new_vector(in.new_vector)
+    {}
+
+    void operator()(const ConstElemRange &range) const;
+  };
+
+
 
 // ------------------------------------------------------------
 // System implementation
@@ -351,12 +452,12 @@ void System::project_vector (NumericVector<Number>& new_vector,
 
 
 #ifndef LIBMESH_ENABLE_AMR
-void System::ProjectVector::operator()(const ConstElemRange &) const
+void ProjectVector::operator()(const ConstElemRange &) const
 {
   libmesh_error();
 }
 #else
-void System::ProjectVector::operator()(const ConstElemRange &range) const
+void ProjectVector::operator()(const ConstElemRange &range) const
 {
   START_LOG ("operator()","ProjectVector");
 
@@ -754,7 +855,7 @@ void System::ProjectVector::operator()(const ConstElemRange &range) const
 
 
 
-void System::BuildProjectionList::unique()
+void BuildProjectionList::unique()
 {
   // Sort the send list.  After this duplicated
   // elements will be adjacent in the vector
@@ -775,12 +876,12 @@ void System::BuildProjectionList::unique()
 
 
 #ifndef LIBMESH_ENABLE_AMR
-void System::BuildProjectionList::operator()(const ConstElemRange &)
+void BuildProjectionList::operator()(const ConstElemRange &)
 {
   libmesh_error();
 }
 #else
-void System::BuildProjectionList::operator()(const ConstElemRange &range)
+void BuildProjectionList::operator()(const ConstElemRange &range)
 {
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
@@ -852,7 +953,7 @@ void System::BuildProjectionList::operator()(const ConstElemRange &range)
 
 
 
-void System::BuildProjectionList::join(const BuildProjectionList &other)
+void BuildProjectionList::join(const BuildProjectionList &other)
 {
   // Joining simply requires I add the dof indices from the other object
   this->send_list.insert(this->send_list.end(),
@@ -861,10 +962,10 @@ void System::BuildProjectionList::join(const BuildProjectionList &other)
 }
 
 
-void System::ProjectSolution::operator()(const ConstElemRange &range) const
+void ProjectSolution::operator()(const ConstElemRange &range) const
 {
   // We need data to project
-  libmesh_assert(f);
+  libmesh_assert(f.get());
 
   /**
    * This method projects an analytic solution to the current
@@ -926,7 +1027,7 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
       if (cont == C_ONE)
         {
           // We'll need gradient data for a C1 projection
-          libmesh_assert(g);
+          libmesh_assert(g.get());
 
           const std::vector<std::vector<RealGradient> >&
             ref_dphi = fe->get_dphi();
