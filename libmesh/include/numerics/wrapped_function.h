@@ -92,9 +92,9 @@ public:
    * @returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
-  virtual Output operator() (const unsigned int i,
-                             const Point& p,
-			     const Real time=0.);
+  virtual Output component (unsigned int i,
+                            const Point& p,
+			    Real time=0.);
 
 protected:
 
@@ -181,9 +181,9 @@ void WrappedFunction<Output>::operator() (const Point& p,
  */
 template <typename Output>
 inline
-Output WrappedFunction<Output>::operator() (const unsigned int i,
-                                            const Point& p,
-			                    const Real time)
+Output WrappedFunction<Output>::component (unsigned int i,
+                                           const Point& p,
+			                   Real time)
 {
   libmesh_assert(_fptr);
   libmesh_assert(_parameters);

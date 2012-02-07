@@ -1006,17 +1006,17 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
               else if (cont == C_ZERO)
                 {
                   libmesh_assert(nc == 1);
-		  Ue(current_dof) = (*f)(var_component,elem->point(n));
+		  Ue(current_dof) = f->component(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                 }
               // The hermite element vertex shape functions are weird
               else if (fe_type.family == HERMITE)
                 {
-                  Ue(current_dof) = (*f)(var_component,elem->point(n));
+                  Ue(current_dof) = f->component(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
-                  Gradient grad = (*g)(var_component,elem->point(n));
+                  Gradient grad = g->component(var_component,elem->point(n));
                   // x derivative
                   Ue(current_dof) = grad(0);
                   dof_is_fixed[current_dof] = true;
@@ -1028,8 +1028,8 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                             nxplus = elem->point(n);
                       nxminus(0) -= TOLERANCE;
                       nxplus(0) += TOLERANCE;
-                      Gradient gxminus = (*g)(var_component,nxminus);
-                      Gradient gxplus = (*g)(var_component,nxplus);
+                      Gradient gxminus = g->component(var_component,nxminus);
+                      Gradient gxplus = g->component(var_component,nxplus);
                       // y derivative
                       Ue(current_dof) = grad(1);
                       dof_is_fixed[current_dof] = true;
@@ -1056,8 +1056,8 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                                 nyplus = elem->point(n);
                           nyminus(1) -= TOLERANCE;
                           nyplus(1) += TOLERANCE;
-                          Gradient gyminus = (*g)(var_component,nyminus);
-                          Gradient gyplus = (*g)(var_component,nyplus);
+                          Gradient gyminus = g->component(var_component,nyminus);
+                          Gradient gyplus = g->component(var_component,nyplus);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
                                             / 2. / TOLERANCE;
@@ -1076,10 +1076,10 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
                           nxpym(1) -= TOLERANCE;
                           nxpyp(0) += TOLERANCE;
                           nxpyp(1) += TOLERANCE;
-                          Gradient gxmym = (*g)(var_component,nxmym);
-                          Gradient gxmyp = (*g)(var_component,nxmyp);
-                          Gradient gxpym = (*g)(var_component,nxpym);
-                          Gradient gxpyp = (*g)(var_component,nxpyp);
+                          Gradient gxmym = g->component(var_component,nxmym);
+                          Gradient gxmyp = g->component(var_component,nxmyp);
+                          Gradient gxpym = g->component(var_component,nxpym);
+                          Gradient gxpyp = g->component(var_component,nxpyp);
                           Number gxzplus = (gxpyp(2) - gxmyp(2))
                                          / 2. / TOLERANCE;
                           Number gxzminus = (gxpym(2) - gxmym(2))
@@ -1098,10 +1098,10 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
               else if (cont == C_ONE)
                 {
                   libmesh_assert(nc == 1 + dim);
-		  Ue(current_dof) = (*f)(var_component,elem->point(n));
+		  Ue(current_dof) = f->component(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
-                  Gradient grad = (*g)(var_component,elem->point(n));
+                  Gradient grad = g->component(var_component,elem->point(n));
                   for (unsigned int i=0; i!= dim; ++i)
                     {
 		      Ue(current_dof) = grad(i);
@@ -1145,11 +1145,11 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	        for (unsigned int qp=0; qp<n_qp; qp++)
 	          {
 	            // solution at the quadrature point
-	            Number fineval = (*f)(var_component,xyz_values[qp]);
+	            Number fineval = f->component(var_component,xyz_values[qp]);
 	            // solution grad at the quadrature point
 	            Gradient finegrad;
                     if (cont == C_ONE)
-                      finegrad = (*g)(var_component,xyz_values[qp]);
+                      finegrad = g->component(var_component,xyz_values[qp]);
 
                     // Form edge projection matrix
                     for (unsigned int sidei=0, freei=0;
@@ -1236,11 +1236,11 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	        for (unsigned int qp=0; qp<n_qp; qp++)
 	          {
 	            // solution at the quadrature point
-	            Number fineval = (*f)(var_component,xyz_values[qp]);
+	            Number fineval = f->component(var_component,xyz_values[qp]);
 	            // solution grad at the quadrature point
 	            Gradient finegrad;
                     if (cont == C_ONE)
-                      finegrad = (*g)(var_component,xyz_values[qp]);
+                      finegrad = g->component(var_component,xyz_values[qp]);
 
                     // Form side projection matrix
                     for (unsigned int sidei=0, freei=0;
@@ -1322,11 +1322,11 @@ void System::ProjectSolution::operator()(const ConstElemRange &range) const
 	  for (unsigned int qp=0; qp<n_qp; qp++)
 	    {
 	      // solution at the quadrature point
-	      Number fineval = (*f)(var_component,xyz_values[qp]);
+	      Number fineval = f->component(var_component,xyz_values[qp]);
 	      // solution grad at the quadrature point
 	      Gradient finegrad;
               if (cont == C_ONE)
-                finegrad = (*g)(var_component,xyz_values[qp]);
+                finegrad = g->component(var_component,xyz_values[qp]);
 
               // Form interior projection matrix
               for (unsigned int i=0, freei=0; i != n_dofs; ++i)

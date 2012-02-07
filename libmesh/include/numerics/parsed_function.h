@@ -85,6 +85,28 @@ public:
         output(i) = parsers[i].Eval(_spacetime);
     }
 
+  /**
+   * @returns the vector component \p i at coordinate
+   * \p p and time \p time.
+   */
+  virtual Output component (unsigned int i,
+                            const Point& p,
+                            Real time)
+    {
+      _spacetime[0] = p(0);
+#if LIBMESH_DIM > 1
+      _spacetime[1] = p(1);
+#endif
+#if LIBMESH_DIM > 2
+      _spacetime[2] = p(2);
+#endif
+      _spacetime[LIBMESH_DIM] = time;
+
+      libmesh_assert(i < parsers.size());
+
+      return parsers[i].Eval(_spacetime);
+    }
+
   virtual void init() {}
   virtual void clear() {}
 
