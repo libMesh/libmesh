@@ -34,7 +34,6 @@ namespace libMesh
 
 // Forward Declarations
 template <typename T> class DenseVector;
-class FunctionBase;
 class Point;
 
 
@@ -56,6 +55,7 @@ class Point;
 
 // ------------------------------------------------------------
 // FunctionBase class definition
+template <typename Output=Number>
 class FunctionBase
 {
 protected:
@@ -91,7 +91,7 @@ public:
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
    */
-  virtual Number operator() (const Point& p,
+  virtual Output operator() (const Point& p,
 			     const Real time = 0.) = 0;
 
   /**
@@ -100,7 +100,7 @@ public:
    * coordinate \p p.
    */
   void operator() (const Point& p,
-		   DenseVector<Number>& output);
+		   DenseVector<Output>& output);
 
   /**
    * Return function for vectors.
@@ -111,7 +111,22 @@ public:
    */
   virtual void operator() (const Point& p,
 			   const Real time,
-			   DenseVector<Number>& output) = 0;
+			   DenseVector<Output>& output) = 0;
+
+  /**
+   * @returns the vector component \p i at coordinate
+   * \p p and time \p time.
+   * Subclasses aren't required to overload this, since the default
+   * implementation is based on the full vector evaluation, which is
+   * often correct.
+   * Subclasses are recommended to overload this, since the default
+   * implementation is based on a vector evaluation, which is usually
+   * unnecessarily inefficient.
+   */
+  virtual Output operator() (const unsigned int i,
+                             const Point& p,
+			     const Real time=0.);
+
 
   /**
    * @returns \p true when this object is properly initialized
@@ -141,17 +156,49 @@ protected:
 
 // ------------------------------------------------------------
 // FunctionBase inline methods
+
+template<typename Output>
 inline
-bool FunctionBase::initialized() const
+FunctionBase<Output>::FunctionBase (const FunctionBase* master) :
+  _master             (master),
+  _initialized        (false)
+{
+}
+
+
+
+template<typename Output>
+inline
+FunctionBase<Output>::~FunctionBase ()
+{
+}
+
+
+
+template <typename Output>
+inline
+bool FunctionBase<Output>::initialized() const
 {
   return (this->_initialized);
 }
 
 
 
+template <typename Output>
 inline
-void FunctionBase::operator() (const Point& p,
-			       DenseVector<Number>& output)
+Output FunctionBase<Output>::operator() (const unsigned int i,
+                                         const Point& p,
+			                 const Real time)
+{
+  DenseVector<Output> out(i+1);
+  (*this)(p, time, out);
+  return out(i);
+}
+
+template <typename Output>
+inline
+void FunctionBase<Output>::operator() (const Point& p,
+			               DenseVector<Output>& output)
 {
   // Call the time-dependent function with t=0.
   this->operator()(p, 0., output);

@@ -43,8 +43,8 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const NumericVector<Number>& vec,
 			    const DofMap& dof_map,
 			    const std::vector<unsigned int>& vars,
-			    const FunctionBase* master) :
-  FunctionBase   (master),
+			    const FunctionBase<>* master) :
+  FunctionBase<> (master),
   _eqn_systems   (eqn_systems),
   _vector        (vec),
   _dof_map       (dof_map),
@@ -61,8 +61,8 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const NumericVector<Number>& vec,
 			    const DofMap& dof_map,
 			    const unsigned int var,
-			    const FunctionBase* master) :
-  FunctionBase   (master),
+			    const FunctionBase<>* master) :
+  FunctionBase<> (master),
   _eqn_systems   (eqn_systems),
   _vector        (vec),
   _dof_map       (dof_map),
