@@ -27,6 +27,8 @@
 // Local Includes
 #include "libmesh_common.h"
 
+#include "auto_ptr.h"
+
 namespace libMesh
 {
 
@@ -81,6 +83,13 @@ public:
    * Clears the function.
    */
   virtual void clear () = 0;
+
+  /**
+   * Returns a new copy of the function.  The new copy should be as
+   * ``deep'' as necessary to allow independent destruction and
+   * simultaneous evaluations of the copies in different threads.
+   */
+  virtual AutoPtr<FunctionBase<Output> > clone () = 0;
 
 
   // ------------------------------------------------------

@@ -27,7 +27,13 @@ class ZeroFunction : public FunctionBase<Output>
     }
 
   virtual void init() {}
+
   virtual void clear() {}
+
+  virtual AutoPtr<FunctionBase<Number> > clone() {
+    return AutoPtr<FunctionBase<Number> > 
+      (new ZeroFunction<Number>());
+  }
 };
 
 

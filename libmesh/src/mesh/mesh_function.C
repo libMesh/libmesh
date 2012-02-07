@@ -166,6 +166,13 @@ MeshFunction::clear ()
 
 
 
+AutoPtr<FunctionBase<Number> > MeshFunction::clone ()
+{
+  return AutoPtr<FunctionBase<Number> >
+    (new MeshFunction
+      (_eqn_systems, _vector, _dof_map, _system_vars, this));
+}
+
 
 
 Number MeshFunction::operator() (const Point& p,
