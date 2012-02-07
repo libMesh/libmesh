@@ -24,6 +24,7 @@
 #include "exact_solution.h"
 #include "equation_systems.h"
 #include "fe_base.h"
+#include "function_base.h"
 #include "mesh_base.h"
 #include "mesh_function.h"
 #include "numeric_vector.h"
@@ -31,14 +32,12 @@
 #include "quadrature.h"
 #include "tensor_value.h"
 #include "vector_value.h"
+#include "wrapped_function.h"
 
 namespace libMesh
 {
 
 ExactSolution::ExactSolution(const EquationSystems& es) :
-  _exact_value (NULL),
-  _exact_deriv (NULL),
-  _exact_hessian (NULL),
   _equation_systems(es),
   _equation_systems_fine(NULL),
   _extra_order(0)
@@ -68,15 +67,31 @@ ExactSolution::ExactSolution(const EquationSystems& es) :
 }
 
 
+ExactSolution::~ExactSolution()
+{
+  // delete will clean up any cloned functors and no-op on any NULL
+  // pointers
+
+  for (unsigned int i=0; i != _exact_values.size(); ++i)
+    delete (_exact_values[i]);
+
+  for (unsigned int i=0; i != _exact_derivs.size(); ++i)
+    delete (_exact_derivs[i]);
+
+  for (unsigned int i=0; i != _exact_hessians.size(); ++i)
+    delete (_exact_hessians[i]);
+}
+
+
 void ExactSolution::attach_reference_solution (const EquationSystems* es_fine)
 {
   libmesh_assert (es_fine != NULL);
   _equation_systems_fine = es_fine;
 
   // If we're using a fine grid solution, we're not using exact values
-  _exact_value = NULL;
-  _exact_deriv = NULL;
-  _exact_hessian = NULL;
+  _exact_values.clear();
+  _exact_derivs.clear();
+  _exact_hessians.clear();
 }
 
 
@@ -86,39 +101,151 @@ void ExactSolution::attach_exact_value (Number fptr(const Point& p,
 						    const std::string& unknown_name))
 {
   libmesh_assert (fptr != NULL);
-  _exact_value = fptr;
+
+  // Clear out any previous _exact_values entries, then add a new
+  // entry for each system.
+  _exact_values.clear();
+
+  for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
+    {
+      const System& system = _equation_systems.get_system(sys);
+      _exact_values.push_back
+	(new WrappedFunction<Number>
+          (system, fptr, &_equation_systems.parameters));
+    }
 
   // If we're using exact values, we're not using a fine grid solution
   _equation_systems_fine = NULL;
 }
 
 
-void ExactSolution::attach_exact_deriv (Gradient fptr(const Point& p,
+void ExactSolution::attach_exact_values (std::vector<FunctionBase<Number> *> f)
+{
+  // Clear out any previous _exact_values entries, then add a new
+  // entry for each system.
+  _exact_values.clear();
+  _exact_values.resize(f.size(), NULL);
+
+  // We use clone() to get non-sliced copies of FunctionBase
+  // subclasses, but we can't put the resulting AutoPtrs into an STL
+  // container.
+  for (unsigned int i=0; i != f.size(); ++i)
+    if (f[i])
+      _exact_values[i] = f[i]->clone().release();
+}
+
+
+void ExactSolution::attach_exact_value (unsigned int sys_num,
+                                        FunctionBase<Number> * f)
+{
+  if (_exact_values.size() <= sys_num)
+  _exact_values.resize(sys_num+1, NULL);
+
+  if (f)
+    _exact_values[sys_num] = f->clone().release();
+}
+
+
+void ExactSolution::attach_exact_deriv (Gradient gptr(const Point& p,
 						      const Parameters& parameters,
 						      const std::string& sys_name,
 						      const std::string& unknown_name))
 {
-  libmesh_assert (fptr != NULL);
-  _exact_deriv = fptr;
+  libmesh_assert (gptr != NULL);
+
+  // Clear out any previous _exact_derivs entries, then add a new
+  // entry for each system.
+  _exact_derivs.clear();
+
+  for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
+    {
+      const System& system = _equation_systems.get_system(sys);
+      _exact_derivs.push_back
+	(new WrappedFunction<Gradient>
+          (system, gptr, &_equation_systems.parameters));
+    }
 
   // If we're using exact values, we're not using a fine grid solution
   _equation_systems_fine = NULL;
 }
 
 
-void ExactSolution::attach_exact_hessian (Tensor fptr(const Point& p,
+void ExactSolution::attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g)
+{
+  // Clear out any previous _exact_derivs entries, then add a new
+  // entry for each system.
+  _exact_derivs.clear();
+  _exact_derivs.resize(g.size(), NULL);
+
+  // We use clone() to get non-sliced copies of FunctionBase
+  // subclasses, but we can't put the resulting AutoPtrs into an STL
+  // container.
+  for (unsigned int i=0; i != g.size(); ++i)
+    if (g[i])
+      _exact_derivs[i] = g[i]->clone().release();
+}
+
+
+void ExactSolution::attach_exact_deriv (unsigned int sys_num,
+                                        FunctionBase<Gradient>* g)
+{
+  if (_exact_derivs.size() <= sys_num)
+  _exact_derivs.resize(sys_num+1, NULL);
+
+  if (g)
+    _exact_derivs[sys_num] = g->clone().release();
+}
+
+
+void ExactSolution::attach_exact_hessian (Tensor hptr(const Point& p,
 						      const Parameters& parameters,
 						      const std::string& sys_name,
 						      const std::string& unknown_name))
 {
-  libmesh_assert (fptr != NULL);
-  _exact_hessian = fptr;
+  libmesh_assert (hptr != NULL);
+
+  // Clear out any previous _exact_hessians entries, then add a new
+  // entry for each system.
+  _exact_hessians.clear();
+
+  for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
+    {
+      const System& system = _equation_systems.get_system(sys);
+      _exact_hessians.push_back
+	(new WrappedFunction<Tensor>
+          (system, hptr, &_equation_systems.parameters));
+    }
 
   // If we're using exact values, we're not using a fine grid solution
   _equation_systems_fine = NULL;
 }
 
 
+void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h)
+{
+  // Clear out any previous _exact_hessians entries, then add a new
+  // entry for each system.
+  _exact_hessians.clear();
+  _exact_hessians.resize(h.size(), NULL);
+
+  // We use clone() to get non-sliced copies of FunctionBase
+  // subclasses, but we can't put the resulting AutoPtrs into an STL
+  // container.
+  for (unsigned int i=0; i != h.size(); ++i)
+    if (h[i])
+      _exact_hessians[i] = h[i]->clone().release();
+}
+
+
+void ExactSolution::attach_exact_hessian (unsigned int sys_num,
+                                          FunctionBase<Tensor>* h)
+{
+  if (_exact_hessians.size() <= sys_num)
+  _exact_hessians.resize(sys_num+1, NULL);
+
+  if (h)
+    _exact_hessians[sys_num] = h->clone().release();
+}
 
 
 std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
@@ -127,15 +254,6 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
   // If no exact solution function or fine grid solution has been
   // attached, we now just compute the solution norm (i.e. the
   // difference from an "exact solution" of zero
-/*
-  if (_exact_value == NULL)
-    {
-      libMesh::err << "Cannot compute error, you must provide a "
-		    << "function which computes the exact solution."
-		    << std::endl;
-      libmesh_error();
-    }
-*/
 
   // Make sure the requested sys_name exists.
   std::map<std::string, SystemErrorMap>::iterator sys_iter =
@@ -288,15 +406,6 @@ Real ExactSolution::h1_error(const std::string& sys_name,
   // If the user has supplied no exact derivative function, we
   // just integrate the H1 norm of the solution; i.e. its
   // difference from an "exact solution" of zero.
-/*
-  if (_exact_deriv == NULL)
-    {
-      libMesh::err << "Cannot compute H1 error, you must provide a "
-		    << "function which computes the gradient of the exact solution."
-		    << std::endl;
-      libmesh_error();
-    }
-*/
 
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
@@ -317,18 +426,8 @@ Real ExactSolution::h2_error(const std::string& sys_name,
                              const std::string& unknown_name)
 {
   // If the user has supplied no exact derivative functions, we
-  // just integrate the H1 norm of the solution; i.e. its
+  // just integrate the H2 norm of the solution; i.e. its
   // difference from an "exact solution" of zero.
-/*
-  if (_exact_deriv == NULL || _exact_hessian == NULL)
-    {
-      libMesh::err << "Cannot compute H2 error, you must provide functions "
-		    << "which computes the gradient and hessian of the "
-                    << "exact solution."
-		    << std::endl;
-      libmesh_error();
-    }
-*/
 
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
@@ -354,7 +453,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   parallel_only();
 
   // Make sure we aren't "overconfigured"
-  libmesh_assert (!(_exact_value && _equation_systems_fine));
+  libmesh_assert (!(_exact_values.size() && _equation_systems_fine));
 
   // Get a reference to the system whose error is being computed.
   // If we have a fine grid, however, we'll integrate on that instead
@@ -362,6 +461,11 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   const System& computed_system = _equation_systems_fine ?
     _equation_systems_fine->get_system(sys_name) :
     _equation_systems.get_system (sys_name);
+
+  const unsigned int sys_num = computed_system.number();
+  const unsigned int var = computed_system.variable_number(unknown_name);
+  const unsigned int var_component =
+    computed_system.variable_scalar_number(var, 0);
 
   // Prepare a global solution and a MeshFunction of the coarse system if we need one
   AutoPtr<MeshFunction> coarse_values;
@@ -392,17 +496,14 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Zero the error before summation
   error_vals = std::vector<Real>(5, 0.);
 
-  // get the EquationSystems parameters for use with _exact_value
-  const Parameters& parameters = this->_equation_systems.parameters;
-
   // Get the current time, in case the exact solution depends on it.
   // Steady systems of equations do not have a time parameter, so this
   // routine needs to take that into account.
-  // FIXME!!!
-  // const Real time = 0.;//_equation_systems.parameter("time");
+
+  const Real time = _equation_systems.parameters.have_parameter<Real>("time") ?
+                    _equation_systems.parameters.get<Real>("time") : 0.;
 
   // Construct Quadrature rule based on default quadrature order
-  const unsigned int var = computed_system.variable_number(unknown_name);
   const FEType& fe_type  = computed_dof_map.variable_type(var);
 
   AutoPtr<QBase> qrule =
@@ -499,9 +600,10 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 	  // Compute the value of the error at this quadrature point
 	  Number exact_val = 0.0;
-          if (_exact_value)
-	    exact_val = _exact_value(q_point[qp], parameters,
-				     sys_name, unknown_name);
+          if (_exact_values.size() > sys_num && _exact_values[sys_num])
+	    exact_val =
+              _exact_values[sys_num]->
+		component(var_component, q_point[qp], time);
 	  else if (_equation_systems_fine)
 	    exact_val = (*coarse_values)(q_point[qp]);
 
@@ -516,9 +618,10 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  // Compute the value of the error in the gradient at this
 	  // quadrature point
           Gradient exact_grad;
-	  if (_exact_deriv)
-	    exact_grad = _exact_deriv(q_point[qp], parameters,
-				      sys_name, unknown_name);
+	  if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
+	    exact_grad =
+               _exact_derivs[sys_num]->
+                 component(var_component, q_point[qp], time);
 	  else if (_equation_systems_fine)
 	    exact_grad = coarse_values->gradient(q_point[qp]);
 
@@ -531,9 +634,10 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  // Compute the value of the error in the hessian at this
 	  // quadrature point
           Tensor exact_hess;
-	  if (_exact_hessian)
-	    exact_hess = _exact_hessian(q_point[qp], parameters,
-					sys_name, unknown_name);
+	  if (_exact_hessians.size() > sys_num && _exact_hessians[sys_num])
+	    exact_hess =
+              _exact_hessians[sys_num]->
+                component(var_component, q_point[qp], time);
 	  else if (_equation_systems_fine)
 	    exact_hess = coarse_values->hessian(q_point[qp]);
 
