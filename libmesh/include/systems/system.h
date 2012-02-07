@@ -48,6 +48,7 @@ class EquationSystems;
 class MeshBase;
 class Xdr;
 class DofMap;
+template <typename Output> class FunctionBase;
 class Parameters;
 class ParameterVector;
 class Point;
@@ -443,7 +444,11 @@ public:
   virtual std::string system_type () const { return "Basic"; }
 
   /**
-   * Projects the continuous functions onto the current solution.
+   * Projects arbitrary functions onto the current solution.
+   * The function value \p fptr and its gradient \p gptr are
+   * represented by function pointers.
+   * A gradient \p gptr is only required/used for projecting onto
+   * finite element spaces with continuous derivatives.
    */
   void project_solution (Number fptr(const Point& p,
 				     const Parameters& parameters,
@@ -456,7 +461,25 @@ public:
 			 Parameters& parameters) const;
 
   /**
-   * Projects the continuous functions onto the current mesh.
+   * Projects arbitrary functions onto the current solution.
+   * The function value \p f and its gradient \p g are
+   * represented by functors.
+   * A gradient \p g is only required/used for projecting onto finite
+   * element spaces with continuous derivatives.
+   * If non-default \p Parameters are to be used, they can be provided
+   * in the \p parameters argument.
+   */
+  void project_solution (FunctionBase<Number> *f,
+                         FunctionBase<Gradient> *g = NULL,
+                         Parameters* parameters = NULL) const;
+
+  /**
+   * Projects arbitrary functions onto a vector of degree of freedom
+   * values for the current system.
+   * The function value \p fptr and its gradient \p gptr are
+   * represented by function pointers.
+   * A gradient \p gptr is only required/used for projecting onto
+   * finite element spaces with continuous derivatives.
    */
   void project_vector (Number fptr(const Point& p,
 				   const Parameters& parameters,
@@ -468,6 +491,21 @@ public:
 				     const std::string& unknown_name),
 		       Parameters& parameters,
 		       NumericVector<Number>& new_vector) const;
+
+  /**
+   * Projects arbitrary functions onto a vector of degree of freedom
+   * values for the current system.
+   * The function value \p f and its gradient \p g are
+   * represented by functors.
+   * A gradient \p g is only required/used for projecting onto finite
+   * element spaces with continuous derivatives.
+   * If non-default \p Parameters are to be used, they can be provided
+   * in the \p parameters argument.
+   */
+  void project_vector (NumericVector<Number>& new_vector,
+                       FunctionBase<Number> *f,
+                       FunctionBase<Gradient> *g = NULL,
+		       Parameters* parameters = NULL) const;
 
   /**
    * @returns the system number.
@@ -796,6 +834,13 @@ public:
   unsigned int n_vars() const;
 
   /**
+   * @returns the total number of scalar components in the system's
+   * variables.  This will equal \p n_vars() in the case of all
+   * scalar-valued variables.
+   */
+  unsigned int n_components() const;
+
+  /**
    * @returns the number of degrees of freedom in the system
    */
   unsigned int n_dofs() const;
@@ -856,6 +901,33 @@ public:
    * the user-specified variable named \p var.
    */
   unsigned short int variable_number (const std::string& var) const;
+
+  /**
+   * @returns an index, starting from 0 for the first component of the
+   * first variable, and incrementing for each component of each
+   * (potentially vector-valued) variable in the system in order.
+   * For systems with only scalar-valued variables, this will be the
+   * same as \p variable_number(var)
+   *
+   * Irony: currently our only non-scalar-valued variable type is
+   * SCALAR.
+   */
+  unsigned short int variable_scalar_number (const std::string& var,
+                                             unsigned short component) const;
+
+  /**
+   * @returns an index, starting from 0 for the first component of the
+   * first variable, and incrementing for each component of each
+   * (potentially vector-valued) variable in the system in order.
+   * For systems with only scalar-valued variables, this will be the
+   * same as \p var_num
+   *
+   * Irony: currently our only non-scalar-valued variable type is
+   * SCALAR.
+   */
+  unsigned short int variable_scalar_number (unsigned short var_num,
+                                             unsigned short component) const;
+
 
   /**
    * @returns the finite element type variable number \p i.
@@ -1453,6 +1525,12 @@ private:
   std::map<std::string, unsigned short int> _variable_numbers;
 
   /**
+   * The variable scalar numbers for the first component of each
+   * variable.
+   */
+  std::vector<unsigned short> _variable_first_scalar;
+
+  /**
    * Flag stating if the system is active or not.
    */
   bool _active;
@@ -1581,34 +1659,20 @@ private:
   private:
     const System                &system;
 
-    Number (* fptr)(const Point& p,
-		    const Parameters& parameters,
-		    const std::string& sys_name,
-		    const std::string& unknown_name);
-
-    Gradient (* gptr)(const Point& p,
-		      const Parameters& parameters,
-		      const std::string& sys_name,
-		      const std::string& unknown_name);
-
-    Parameters &parameters;
+    FunctionBase<Number> *f;
+    FunctionBase<Gradient> *g;
+    const Parameters &parameters;
     NumericVector<Number>       &new_vector;
 
   public:
     ProjectSolution (const System &system_in,
-		     Number fptr_in(const Point& p,
-				    const Parameters& parameters,
-				    const std::string& sys_name,
-				    const std::string& unknown_name),
-		     Gradient gptr_in(const Point& p,
-				      const Parameters& parameters,
-				      const std::string& sys_name,
-				      const std::string& unknown_name),
-		     Parameters &parameters_in,
+		     FunctionBase<Number>* f_in,
+		     FunctionBase<Gradient>* g_in,
+		     const Parameters &parameters_in,
 		     NumericVector<Number> &new_v_in) :
     system(system_in),
-    fptr(fptr_in),
-    gptr(gptr_in),
+    f(f_in),
+    g(g_in),
     parameters(parameters_in),
     new_vector(new_v_in)
     {}
@@ -1710,6 +1774,14 @@ unsigned int System::n_vars() const
 
 
 inline
+unsigned int System::n_components() const
+{
+  return _variable_first_scalar[n_vars()];
+}
+
+
+
+inline
 const Variable & System::variable (const unsigned int i) const
 {
   libmesh_assert (i < _variables.size());
@@ -1725,6 +1797,26 @@ const std::string & System::variable_name (const unsigned int i) const
   libmesh_assert (i < _variables.size());
 
   return _variables[i].name();
+}
+
+
+
+inline
+unsigned short int 
+System::variable_scalar_number (const std::string& var,
+                                unsigned short component) const
+{
+  return variable_scalar_number(this->variable_number(var), component);
+}
+
+
+
+inline
+unsigned short int
+System::variable_scalar_number (unsigned short var_num, 
+                                unsigned short component) const
+{
+  return _variable_first_scalar[var_num] + component;
 }
 
 

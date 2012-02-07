@@ -81,6 +81,7 @@ System::System (EquationSystems& es,
   _mesh                             (es.get_mesh()),
   _sys_name                         (name),
   _sys_number                       (number),
+  _variable_first_scalar            (1, 0),
   _active                           (true),
   _solution_projection              (true),
   _basic_system_only                (false),
@@ -181,6 +182,9 @@ void System::clear ()
   _variables.clear();
 
   _variable_numbers.clear();
+
+  _variable_first_scalar.clear();
+  _variable_first_scalar.push_back(0);
 
   _dof_map->clear ();
 
@@ -1030,6 +1034,12 @@ unsigned int System::add_variable (const std::string& var,
   libmesh_assert ((curr_n_vars+1) == this->n_vars());
 
   _variable_numbers[var] = curr_n_vars;
+
+
+  libmesh_assert(_variable_first_scalar.size() == curr_n_vars+1);
+  _variable_first_scalar.push_back
+    (_variable_first_scalar[curr_n_vars] +
+     variable(curr_n_vars).n_components());
 
   // Add the variable to the _dof_map
   _dof_map->add_variable (_variables.back());
