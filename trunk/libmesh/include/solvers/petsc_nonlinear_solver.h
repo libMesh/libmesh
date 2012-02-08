@@ -117,6 +117,20 @@ public:
    */
   virtual int get_total_linear_iterations();
 
+  /**
+   * If called *during* the solve(), for example by the user-specified
+   * residual or Jacobian function, returns the current nonlinear iteration
+   * number.
+   */
+  virtual unsigned get_current_nonlinear_iteration_number() const { return _current_nonlinear_iteration_number; }
+
+  /**
+   * This public setter is necessary since the value is computed in the
+   * __libmesh_petsc_snes_residual()/jacobian() function and must be stored
+   * somehow.
+   */
+  void set_current_nonlinear_iteration_number(unsigned num) { _current_nonlinear_iteration_number = num; }
+
 private:
 
   /**
@@ -137,27 +151,13 @@ private:
    * Stores the total number of linear iterations from the last solve.
    */
   int _n_linear_iterations;
+
+  /**
+   * Stores the current nonlinear iteration number
+   */
+  unsigned _current_nonlinear_iteration_number;
 };
 
-
-/*----------------------- functions ----------------------------------*/
-template <typename T>
-inline
-PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system) :
-    NonlinearSolver<T>(system),
-    _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
-    _n_linear_iterations(0)
-{
-}
-
-
-
-template <typename T>
-inline
-PetscNonlinearSolver<T>::~PetscNonlinearSolver ()
-{
-  this->clear ();
-}
 
 
 } // namespace libMesh
