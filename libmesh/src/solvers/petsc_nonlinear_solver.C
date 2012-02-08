@@ -75,7 +75,7 @@ extern "C"
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the residual at X
   PetscErrorCode
-  __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx)
+  __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void *ctx)
   {
     START_LOG("residual()", "PetscNonlinearSolver");
 
@@ -87,6 +87,16 @@ extern "C"
 
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
+
+    // Get the current iteration number from the snes object,
+    // store it in the PetscNonlinearSolver object for possible use
+    // by the user's residual function.
+    {
+      int n_iterations = 0;
+      ierr = SNESGetIterationNumber(snes, &n_iterations);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
+    }
 
     NonlinearImplicitSystem &sys = solver->system();
 
@@ -143,7 +153,7 @@ extern "C"
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
   PetscErrorCode
-  __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx)
+  __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx)
   {
     START_LOG("jacobian()", "PetscNonlinearSolver");
 
@@ -153,6 +163,16 @@ extern "C"
 
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
+
+    // Get the current iteration number from the snes object,
+    // store it in the PetscNonlinearSolver object for possible use
+    // by the user's Jacobian function.
+    {
+      int n_iterations = 0;
+      ierr = SNESGetIterationNumber(snes, &n_iterations);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
+    }
 
     NonlinearImplicitSystem &sys = solver->system();
 
@@ -218,6 +238,25 @@ extern "C"
 
 //---------------------------------------------------------------------
 // PetscNonlinearSolver<> methods
+template <typename T>
+PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system) :
+    NonlinearSolver<T>(system),
+    _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
+    _n_linear_iterations(0),
+    _current_nonlinear_iteration_number(0)
+{
+}
+
+
+
+template <typename T>
+PetscNonlinearSolver<T>::~PetscNonlinearSolver ()
+{
+  this->clear ();
+}
+
+
+
 template <typename T>
 void PetscNonlinearSolver<T>::clear ()
 {

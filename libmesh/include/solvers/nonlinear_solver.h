@@ -113,6 +113,13 @@ public:
   virtual int get_total_linear_iterations() = 0;
 
   /**
+   * If called *during* the solve(), for example by the user-specified
+   * residual or Jacobian function, returns the current nonlinear iteration
+   * number.  Must be redefined in derived classes.
+   */
+  virtual unsigned get_current_nonlinear_iteration_number() const = 0;
+
+  /**
    * Function that computes the residual \p R(X) of the nonlinear system
    * at the input iterate \p X.
    */

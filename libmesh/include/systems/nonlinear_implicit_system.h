@@ -195,6 +195,12 @@ public:
    */
   Real final_nonlinear_residual() const { return _final_nonlinear_residual; }
 
+  /**
+   * If called *during* the solve(), for example by the user-specified
+   * residual or Jacobian function, return the current nonlinear iteration
+   * number.
+   */
+  unsigned get_current_nonlinear_iteration_number() const;
 
 protected:
 

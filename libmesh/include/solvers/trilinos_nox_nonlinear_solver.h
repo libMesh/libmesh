@@ -94,6 +94,13 @@ public:
    */
   virtual int get_total_linear_iterations();
 
+  /**
+   * If called *during* the solve(), for example by the user-specified
+   * residual or Jacobian function, returns the current nonlinear iteration
+   * number.  Not currently implemented.
+   */
+  virtual unsigned get_current_nonlinear_iteration_number() const { libmesh_not_implemented(); return 0; }
+
 private:
 
   /**
