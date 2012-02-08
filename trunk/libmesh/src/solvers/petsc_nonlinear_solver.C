@@ -268,6 +268,11 @@ void PetscNonlinearSolver<T>::clear ()
 
       ierr = LibMeshSNESDestroy(&_snes);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      // Reset the nonlinear iteration counter.  This information is only relevant
+      // *during* the solve().  After the solve is completed it should return to
+      // the default value of 0.
+      _current_nonlinear_iteration_number = 0;
     }
 }
 
