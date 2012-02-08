@@ -279,4 +279,14 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
     libmesh_assert(get_jacobian);  // I can't believe you really wanted to assemble *nothing*
 }
 
+
+
+
+unsigned NonlinearImplicitSystem::get_current_nonlinear_iteration_number() const
+{
+  return nonlinear_solver->get_current_nonlinear_iteration_number();
+}
+
+
+
 } // namespace libMesh
