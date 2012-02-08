@@ -497,6 +497,19 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       coarse_values->init();
     }
 
+  // Initialize any functors we're going to use
+  for (unsigned int i=0; i != _exact_values.size(); ++i)
+    if (_exact_values[i])
+      _exact_values[i]->init();
+
+  for (unsigned int i=0; i != _exact_derivs.size(); ++i)
+    if (_exact_derivs[i])
+      _exact_derivs[i]->init();
+
+  for (unsigned int i=0; i != _exact_hessians.size(); ++i)
+    if (_exact_hessians[i])
+      _exact_hessians[i]->init();
+
   // Get a reference to the dofmap and mesh for that system
   const DofMap& computed_dof_map = computed_system.get_dof_map();
 
