@@ -11,7 +11,8 @@
 template <typename Output=Number>
 class ZeroFunction : public FunctionBase<Output>
 {
-  ZeroFunction () { this->initialized = true; }
+public:
+  ZeroFunction () { this->_initialized = true; }
 
   virtual Output operator() (const Point&,
                              const Real = 0)
