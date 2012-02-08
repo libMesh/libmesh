@@ -51,7 +51,7 @@ public:
         parsers.push_back(fp);
       }
 
-      this->initialized = true;
+      this->_initialized = true;
     }
 
   virtual Output operator() (const Point& p,
