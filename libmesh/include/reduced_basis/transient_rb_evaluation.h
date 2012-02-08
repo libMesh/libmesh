@@ -148,6 +148,12 @@ public:
   virtual void resize_data_structures(const unsigned int Nmax);
 
   /**
+   * Read in the temporal discretization parameters from the file
+   * \p parameters_filename.
+   */
+  virtual void process_temporal_parameters_file (const std::string& parameters_filename);
+
+  /**
    * Perform online solve for current_params
    * with the N basis functions. Overridden
    * to perform a time-dependent solve.

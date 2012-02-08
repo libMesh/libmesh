@@ -27,8 +27,6 @@
 namespace libMesh
 {
 
-class RBEIMConstruction;
-
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -40,6 +38,27 @@ class RBEIMConstruction;
  * @author David J. Knezevic, 2011
  */
 
+/**
+ * Functor class in which we can define function to be approximated.
+ */
+class ParametrizedFunction
+{
+public:
+
+  /**
+   * Virtual evaluate() gives us a vtable, so there's no cost in adding a
+   * virtual destructor for safety's sake.
+   */
+  virtual ~ParametrizedFunction() {}
+
+  /**
+   * Evaluate this parametrized function for the parameter value
+   * \p mu at the point \p p.
+   */
+  virtual Number evaluate(std::vector<Real>& , const Point& ) { return 0.; }
+
+};
+
 // ------------------------------------------------------------
 // RBEIMEvaluation class definition
 
@@ -50,7 +69,7 @@ public:
   /**
    * Constructor.
    */
-  RBEIMEvaluation (RBEIMConstruction& rb_eim_con_in);
+  RBEIMEvaluation ();
 
   /**
    * Destructor.
@@ -72,6 +91,26 @@ public:
    * with this object.
    */
   virtual void resize_data_structures(const unsigned int Nmax);
+
+  /**
+   * Attach the parametrized function that we will approximate
+   * using the Empirical Interpolation Method.
+   */
+  void attach_paramerized_function(ParametrizedFunction* pf)
+    { parametrized_functions.push_back(pf); }
+
+  /**
+   * Get the number of parametrized functions that have
+   * been attached to this system.
+   */
+  unsigned int get_n_parametrized_functions() const
+    { return parametrized_functions.size(); }
+
+  /**
+   * @return the value of the parametrized function that is
+   * being approximated.
+   */
+  Number evaluate_parametrized_function(unsigned int index, const Point& p);
 
   /**
    * Calculate the EIM approximation to parametrized_function
@@ -108,11 +147,6 @@ public:
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
 
   //----------- PUBLIC DATA MEMBERS -----------//
-
-  /**
-   * A reference to an RBEIMConstruction object.
-   */
-  RBEIMConstruction& rb_eim_con;
 
   /**
    * Dense matrix that stores the lower triangular
@@ -156,6 +190,12 @@ public:
    * We initialize RBEIMEvaluation so that it has an "empty" RBAssemblyExpansion.
    */
   RBThetaExpansion empty_rb_theta_expansion;
+
+  /**
+   * This vector stores the parametrized functions
+   * that will be approximated in this EIM system.
+   */
+  std::vector<ParametrizedFunction*> parametrized_functions;
 
 };
 

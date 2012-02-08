@@ -87,35 +87,39 @@ int main (int argc, char** argv)
   // Initialize the EquationSystems object for this mesh and attach
   // the EIM and RB Construction objects
   EquationSystems equation_systems (mesh);
-  SimpleEIMConstruction & eim_construction =
-    equation_systems.add_system<SimpleEIMConstruction> ("EIM");
-  SimpleRBConstruction & rb_construction =
-    equation_systems.add_system<SimpleRBConstruction> ("RB");
-    
-  // Initialize the data structures for the equation system.
-  equation_systems.init ();
-  
-  // Print out some information about the "truth" discretization
-  mesh.print_info();
-  equation_systems.print_info();
-  
-  // Read data from input file and print state
-  eim_construction.process_parameters_file(eim_parameters);
-  eim_construction.print_info();
-  
-  // Read data from input file and print state
-  rb_construction.process_parameters_file(rb_parameters);
 
-  // Initialize the EIM RBEvaluation object
-  RBEIMEvaluation eim_rb_eval(eim_construction);
-  eim_construction.rb_eval = &eim_rb_eval;
-  
   // Initialize the standard RBEvaluation object
   SimpleRBEvaluation rb_eval;
-  rb_construction.rb_eval = &rb_eval;
-  
+
+  // Initialize the EIM RBEvaluation object
+  SimpleEIMEvaluation eim_rb_eval;
+
   if(!online_mode)
   {
+    SimpleEIMConstruction & eim_construction =
+      equation_systems.add_system<SimpleEIMConstruction> ("EIM");
+    SimpleRBConstruction & rb_construction =
+      equation_systems.add_system<SimpleRBConstruction> ("RB");
+    
+    // Initialize the data structures for the equation system.
+    equation_systems.init ();
+  
+    // Print out some information about the "truth" discretization
+    mesh.print_info();
+    equation_systems.print_info();
+
+    // Read data from input file and print state
+    eim_construction.process_parameters_file(eim_parameters);
+    eim_construction.print_info();
+  
+    // Read data from input file and print state
+    rb_construction.process_parameters_file(rb_parameters);
+    
+    // Set the rb_eval objects for the RBConstructions
+    eim_construction.rb_eval = &eim_rb_eval;
+    rb_construction.rb_eval = &rb_eval;
+  
+
     // Perform the EIM Greedy and write out the data
     eim_construction.initialize_rb_construction();
     eim_construction.train_reduced_basis();
@@ -142,13 +146,19 @@ int main (int argc, char** argv)
     // Write out the basis functions, if requested
     if(store_basis_functions)
     {
+      // If we want to be able to visualize the solution in the online stage,
+      // then we should also save the state of the equation_systems object
+      // so we can initialize it properly in the online stage
+      equation_systems.write("equation_systems.xda", WRITE);
+
+      // Write out the basis functions
       eim_construction.rb_eval->write_out_basis_functions(eim_construction,"eim_data");
       rb_construction.rb_eval->write_out_basis_functions(rb_construction,"rb_data");
     }
   }
   else
   {
-    eim_construction.rb_eval->read_offline_data_from_files("eim_data");
+    eim_rb_eval.read_offline_data_from_files("eim_data");
 
     // attach the EIM theta objects to rb_eval objects
     eim_rb_eval.initialize_rb_theta_objects();
@@ -159,8 +169,9 @@ int main (int argc, char** argv)
 
     // Get the parameters at which we will do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
-    std::vector<Real> online_mu_vector(rb_construction.get_n_params());
-    for(unsigned int i=0; i<rb_construction.get_n_params(); i++)
+    unsigned int n_parameters = infile("n_parameters",1);
+    std::vector<Real> online_mu_vector(n_parameters);
+    for(unsigned int i=0; i<n_parameters; i++)
     {
       online_mu_vector[i] = infile("online_mu", online_mu_vector[i], i);
     }
@@ -173,6 +184,17 @@ int main (int argc, char** argv)
     // plot the solution, if requested
     if(store_basis_functions)
     {
+      // initialize the EquationSystems object by reading in the state that
+      // was written out in the offline stage
+      equation_systems.read("equation_systems.xda", READ);
+      RBConstruction& rb_construction =
+        equation_systems.get_system<RBConstruction>("RB");
+      RBConstruction& eim_construction =
+        equation_systems.get_system<RBConstruction>("EIM");
+      rb_construction.rb_eval = &rb_eval;
+      eim_construction.rb_eval = &eim_rb_eval;
+
+      // read in the data from files
       eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
       rb_eval.read_in_basis_functions(rb_construction,"rb_data");
 

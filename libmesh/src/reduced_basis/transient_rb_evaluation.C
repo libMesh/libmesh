@@ -23,6 +23,7 @@
 #include "libmesh_logging.h"
 #include "xdr_cxx.h"
 #include "parallel.h"
+#include "getpot.h"
 
 #include "o_string_stream.h"
 #include <fstream>
@@ -147,6 +148,23 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax)
   }
 
   STOP_LOG("resize_data_structures()", "TransientRBEvaluation");
+}
+
+void TransientRBEvaluation::process_temporal_parameters_file (const std::string& parameters_filename)
+{
+  // Read in data from parameters_filename
+  GetPot infile(parameters_filename);
+
+  // Read in parameters related to temporal discretization
+  unsigned int n_time_steps_in = infile("n_time_steps", temporal_discretization.get_n_time_steps());
+  const Real delta_t_in        = infile("delta_t", temporal_discretization.get_delta_t());
+  const Real euler_theta_in    = infile("euler_theta", temporal_discretization.get_euler_theta());
+
+  // and set it's member variables
+  temporal_discretization.set_n_time_steps(n_time_steps_in);
+  temporal_discretization.set_delta_t(delta_t_in);
+  temporal_discretization.set_euler_theta(euler_theta_in);
+  temporal_discretization.set_time_step(0);
 }
 
 Real TransientRBEvaluation::rb_solve(unsigned int N)

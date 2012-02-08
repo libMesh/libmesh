@@ -272,12 +272,6 @@ public:
    * Boolean flag to indicate whether we compute the RB_inner_product_matrix.
    */
   bool compute_RB_inner_product;
-  
-  /**
-   * String that identifies the libMesh version info that is required for
-   * basis function IO.
-   */
-  std::string io_version_string;
 
 };
 

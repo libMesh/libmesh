@@ -41,27 +41,6 @@ namespace libMesh
  * @author David J. Knezevic, 2010
  */
 
-/**
- * Functor class in which we can define function to be approximated.
- */
-class ParametrizedFunction
-{
-public:
-
-  /**
-   * Virtual evaluate() gives us a vtable, so there's no cost in adding a
-   * virtual destructor for safety's sake.
-   */
-  virtual ~ParametrizedFunction() {}
-
-  /**
-   * Evaluate this parametrized function for the parameter value
-   * \p mu at the point \p p.
-   */
-  virtual Number evaluate(std::vector<Real>& , const Point& ) { return 0.; }
-
-};
-
 // ------------------------------------------------------------
 // RBEIMConstruction class definition
 
@@ -93,11 +72,6 @@ public:
    * The type of the parent.
    */
   typedef RBConstruction Parent;
-
-  /**
-   * @returns a string indicating the type of the system.
-   */
-  virtual std::string system_type () const;
 
   /**
    * Read parameters in from file and set up this system
@@ -141,20 +115,6 @@ public:
    * load_calN_parametrized_function.
    */
   virtual void init_context(FEMContext &c);
-
-  /**
-   * Attach the parametrized function that we will approximate
-   * using the Empirical Interpolation Method.
-   */
-  void attach_paramerized_function(ParametrizedFunction* pf)
-    { parametrized_functions.push_back(pf); }
-
-  /**
-   * Get the number of parametrized functions that have
-   * been attached to this system.
-   */
-  unsigned int get_n_parametrized_functions() const
-    { return parametrized_functions.size(); }
 
   /**
    * @return the value of the parametrized function that is
@@ -246,12 +206,6 @@ private:
    * all of our basis functions.
    */
   bool performing_extra_greedy_step;
-
-  /**
-   * This vector stores the parametrized functions
-   * that will be approximated in this EIM system.
-   */
-  std::vector<ParametrizedFunction*> parametrized_functions;
 
   /**
    * The current basis function that we sample to evaluate the

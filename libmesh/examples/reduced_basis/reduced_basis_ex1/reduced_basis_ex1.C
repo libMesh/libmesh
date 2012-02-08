@@ -107,38 +107,35 @@ int main (int argc, char** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // We override RBConstruction with SimpleRBConstruction in order to
-  // specialize a few functions for this particular problem.
-  SimpleRBConstruction & rb_con =
-    equation_systems.add_system<SimpleRBConstruction> ("RBConvectionDiffusion");
-
-
-  // Initialize the data structures for the equation system.
-  equation_systems.init ();
-
-  // Print out some information about the "truth" discretization
-  equation_systems.print_info();
-  mesh.print_info();
-
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
   SimpleRBEvaluation rb_eval;
-  
-  // We need to give the RBConstruction object a pointer to
-  // our RBEvaluation object
-  rb_con.rb_eval = &rb_eval;
-
-  // Read in the data that defines this problem from the specified text file
-  rb_con.process_parameters_file(parameters_filename);
-
-  // Print out info that describes the current setup of rb_con
-  rb_con.print_info();
-
-
 
   if(!online_mode) // Perform the Offline stage of the RB method
   {
+    // We override RBConstruction with SimpleRBConstruction in order to
+    // specialize a few functions for this particular problem.
+    SimpleRBConstruction & rb_con =
+      equation_systems.add_system<SimpleRBConstruction> ("RBConvectionDiffusion");
+
+    // Initialize the data structures for the equation system.
+    equation_systems.init ();
+
+    // Print out some information about the "truth" discretization
+    equation_systems.print_info();
+    mesh.print_info();
+  
+    // We need to give the RBConstruction object a pointer to
+    // our RBEvaluation object
+    rb_con.rb_eval = &rb_eval;
+
+    // Read in the data that defines this problem from the specified text file
+    rb_con.process_parameters_file(parameters_filename);
+
+    // Print out info that describes the current setup of rb_con
+    rb_con.print_info();
+
     // Prepare rb_con for the Construction stage of the RB method.
     // This sets up the necessary data structures and performs
     // initial assembly of the "truth" affine expansion of the PDE.
@@ -155,6 +152,12 @@ int main (int argc, char** argv)
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
+      // If we want to be able to visualize the solution in the online stage,
+      // then we should also save the state of the equation_systems object
+      // so we can initialize it properly in the online stage
+      equation_systems.write("equation_systems.xda", WRITE);
+      
+      // Write out the basis functions
       rb_con.rb_eval->write_out_basis_functions(rb_con);
     }
   }
@@ -165,8 +168,9 @@ int main (int argc, char** argv)
     
     // Get the parameters at which we do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
-    std::vector<Real> online_mu_vector(rb_con.get_n_params());
-    for(unsigned int i=0; i<rb_con.get_n_params(); i++)
+    unsigned int n_parameters = infile("n_parameters",1);
+    std::vector<Real> online_mu_vector(n_parameters);
+    for(unsigned int i=0; i<n_parameters; i++)
     {
       online_mu_vector[i] = infile("online_mu", online_mu_vector[i], i);
     }
@@ -194,6 +198,12 @@ int main (int argc, char** argv)
 
     if(store_basis_functions)
     {
+      // initialize the EquationSystems object by reading in the state that
+      // was written out in the offline stage
+      equation_systems.read("equation_systems.xda", READ);
+      RBConstruction& rb_con = equation_systems.get_system<RBConstruction>("RBConvectionDiffusion");
+      rb_con.rb_eval = &rb_eval;
+
       // Read in the basis functions
       rb_eval.read_in_basis_functions(rb_con);
       
