@@ -5,10 +5,26 @@
 #include "rb_eim_construction.h"
 #include "assembly.h"
 
-
-// A simple subclass of RBEIMConstruction. Overload
+// A simple subclass of RBEIMEvaluation. Overload
 // evaluate_parametrized_function to define the
 // function that we "empirically" interpolate.
+class SimpleEIMEvaluation : public RBEIMEvaluation
+{
+public:
+
+  SimpleEIMEvaluation()
+  {
+    attach_paramerized_function(&sg);
+  }
+
+  /** 
+   * Parametrized function that we approximate with EIM
+   */
+  ShiftedGaussian sg;
+
+};
+
+// A simple subclass of RBEIMConstruction.
 class SimpleEIMConstruction : public RBEIMConstruction
 {
 public:
@@ -50,7 +66,6 @@ public:
     Parent::init_data();
 
     attach_inner_prod_assembly(&ip);
-    attach_paramerized_function(&sg);
   }
 
   /**
@@ -75,12 +90,7 @@ public:
   /**
    * Inner product assembly object
    */
-  EIM_IP_assembly ip;  
-
-  /** 
-   * Parametrized function that we approximate with EIM
-   */
-  ShiftedGaussian sg;
+  EIM_IP_assembly ip;
   
   /**
    * The vector of EIM_F objects that are created to point to

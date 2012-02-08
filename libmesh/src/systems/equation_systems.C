@@ -27,6 +27,9 @@
 #include "mesh_refinement.h"
 #include "newmark_system.h"
 #include "nonlinear_implicit_system.h"
+#include "rb_construction.h"
+#include "transient_rb_construction.h"
+#include "eigen_system.h"
 #include "parallel.h"
 #include "transient_system.h"
 #include "dof_map.h"
@@ -372,6 +375,18 @@ System & EquationSystems::add_system (const std::string& sys_type,
   // build a nonlinear implicit system
   else if (sys_type == "NonlinearImplicit")
     this->add_system<NonlinearImplicitSystem> (name);
+
+  // build a Reduced Basis Construction system
+  else if (sys_type == "RBConstruction")
+    this->add_system<RBConstruction> (name);
+
+  // build a transient Reduced Basis Construction system
+  else if (sys_type == "TransientRBConstruction")
+    this->add_system<TransientRBConstruction> (name);
+
+  // build an eigen system
+  else if (sys_type == "Eigen")
+    this->add_system<EigenSystem> (name);
 
 #if defined(LIBMESH_USE_COMPLEX_NUMBERS)
   // build a frequency system
