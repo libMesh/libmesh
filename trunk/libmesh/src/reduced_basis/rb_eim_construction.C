@@ -78,21 +78,9 @@ RBEIMConstruction::~RBEIMConstruction ()
   mesh_function = NULL;
 }
 
-std::string RBEIMConstruction::system_type () const
-{
-  return "RBEIMConstruction";
-}
-
 void RBEIMConstruction::process_parameters_file (const std::string& parameters_filename)
 {
   Parent::process_parameters_file(parameters_filename);
-
-  if(n_vars() != get_n_parametrized_functions() )
-  {
-    libMesh::out << "Error: The number of parametrized_functions must match n_vars in RBEIMConstruction."
-                 << std::endl;
-    libmesh_error();
-  }
 
   GetPot infile(parameters_filename);
 
@@ -129,7 +117,6 @@ void RBEIMConstruction::print_info()
   {
     libMesh::out << "best fit type: eim" << std::endl;
   }
-  libMesh::out << "number of parametrized functions: " << get_n_parametrized_functions() << std::endl;
   libMesh::out << std::endl;
 }
 
@@ -176,14 +163,17 @@ void RBEIMConstruction::initialize_rb_construction()
 
 Number RBEIMConstruction::evaluate_parametrized_function(unsigned int index, const Point& p)
 {
-  if(index >= get_n_parametrized_functions())
+  RBEIMEvaluation* eim_eval = libmesh_cast_ptr<RBEIMEvaluation*>(rb_eval);
+  eim_eval->set_current_parameters( get_current_parameters() );
+  
+  if(index >= eim_eval->get_n_parametrized_functions())
   {
     libMesh::err << "Error: We must have index < get_n_parametrized_functions() in evaluate_parametrized_function."
                  << std::endl;
     libmesh_error();
   }
 
-  return parametrized_functions[index]->evaluate(get_current_parameters(), p);
+  return eim_eval->evaluate_parametrized_function(index, p);
 }
 
 unsigned int RBEIMConstruction::get_n_affine_functions() const

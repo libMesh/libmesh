@@ -100,12 +100,6 @@ public:
   virtual std::pair<Real, Real> get_eigenpair(unsigned int i);
 
   /**
-   * @returns \p "CondensedEigen".  Helps in identifying
-   * the system type in an equation system file.
-   */
-  virtual std::string system_type () const { return "CondensedEigen"; }
-
-  /**
    * The (condensed) system matrix for standard eigenvalue problems.
    */
   AutoPtr< SparseMatrix<Number> > condensed_matrix_A;

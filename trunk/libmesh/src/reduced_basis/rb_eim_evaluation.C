@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "rb_eim_evaluation.h"
-#include "rb_eim_construction.h"
 #include "rb_eim_theta.h"
 
 #include "libmesh_logging.h"
@@ -26,9 +25,7 @@
 namespace libMesh
 {
 
-RBEIMEvaluation::RBEIMEvaluation(RBEIMConstruction& rb_eim_con_in)
-  :
-  rb_eim_con(rb_eim_con_in)
+RBEIMEvaluation::RBEIMEvaluation()
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -71,6 +68,18 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   extra_interpolation_matrix_row.resize(Nmax);
 }
 
+Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int index, const Point& p)
+{
+  if(index >= get_n_parametrized_functions())
+  {
+    libMesh::err << "Error: We must have index < get_n_parametrized_functions() in evaluate_parametrized_function."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  return parametrized_functions[index]->evaluate(get_current_parameters(), p);
+}
+
 Real RBEIMEvaluation::rb_solve(unsigned int N)
 {
   START_LOG("rb_solve()", "RBEIMEvaluation");
@@ -87,15 +96,12 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
     libmesh_error();
   }
 
-  // This function uses rb_eim_con, so set rb_eim_con's parameter
-  rb_eim_con.set_current_parameters( get_current_parameters() );
-
   // Get the rhs by sampling parametrized_function
   // at the first N interpolation_points
   DenseVector<Number> EIM_rhs(N);
   for(unsigned int i=0; i<N; i++)
   {
-    EIM_rhs(i) = rb_eim_con.evaluate_parametrized_function(interpolation_points_var[i], interpolation_points[i]);
+    EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i], interpolation_points[i]);
   }
 
 
@@ -112,9 +118,9 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
     // First, sample the parametrized function at x_{N+1}
     Number g_at_next_x;
     if(N == get_n_basis_functions())
-      g_at_next_x = rb_eim_con.evaluate_parametrized_function(extra_interpolation_point_var, extra_interpolation_point);
+      g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var, extra_interpolation_point);
     else
-      g_at_next_x = rb_eim_con.evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
+      g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
 
     // Next, evaluate the EIM approximation at x_{N+1}
     Number EIM_approx_at_next_x = 0.;
