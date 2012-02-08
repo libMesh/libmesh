@@ -79,12 +79,22 @@ public:
    */
   ~ExactErrorEstimator() {}
 
+  /**
+   * Clone and attach arbitrary functors which compute the exact
+   * values of the EquationSystems' solutions at any point.
+   */
+  void attach_exact_values (std::vector<FunctionBase<Number> *> f);
 
   /**
-   * Attach function similar to system.h which
-   * allows the user to attach an arbitrary function
-   * which computes the exact value of the solution
-   * at any point.
+   * Clone and attach an arbitrary functor which computes the exact
+   * value of the system \p sys_num solution at any point.
+   */
+  void attach_exact_value (unsigned int sys_num,
+                           FunctionBase<Number>* f);
+
+  /**
+   * Attach an arbitrary function which computes the exact value of
+   * the solution at any point.
    */
   void attach_exact_value ( Number fptr(const Point& p,
                                         const Parameters& Parameters,
@@ -92,23 +102,45 @@ public:
                                         const std::string& unknown_name));
 
   /**
-   * Attach function similar to system.h which
-   * allows the user to attach an arbitrary function
-   * which computes the exact derivative of the solution
-   * at any point.
+   * Clone and attach arbitrary functors which compute the exact
+   * gradients of the EquationSystems' solutions at any point.
    */
-  void attach_exact_deriv ( Gradient fptr(const Point& p,
+  void attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g);
+
+  /**
+   * Clone and attach an arbitrary functor which computes the exact
+   * gradient of the system \p sys_num solution at any point.
+   */
+  void attach_exact_deriv (unsigned int sys_num,
+                           FunctionBase<Gradient>* g);
+
+  /**
+   * Attach an arbitrary function which computes the exact gradient of
+   * the solution at any point.
+   */
+  void attach_exact_deriv ( Gradient gptr(const Point& p,
                                           const Parameters& parameters,
                                           const std::string& sys_name,
                                           const std::string& unknown_name));
 
   /**
-   * Attach function similar to system.h which
-   * allows the user to attach an arbitrary function
-   * which computes the exact second derivatives of the solution
-   * at any point.
+   * Clone and attach arbitrary functors which compute the exact
+   * second derivatives of the EquationSystems' solutions at any point.
    */
-  void attach_exact_hessian ( Tensor fptr(const Point& p,
+  void attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h);
+
+  /**
+   * Clone and attach an arbitrary functor which computes the exact
+   * second derivatives of the system \p sys_num solution at any point.
+   */
+  void attach_exact_hessian (unsigned int sys_num,
+                             FunctionBase<Tensor>* h);
+
+  /**
+   * Attach an arbitrary function which computes the exact second
+   * derivatives of the solution at any point.
+   */
+  void attach_exact_hessian ( Tensor hptr(const Point& p,
                                           const Parameters& parameters,
                                           const std::string& sys_name,
                                           const std::string& unknown_name));
@@ -177,8 +209,26 @@ private:
 			     const std::string& unknown_name);
 
   /**
+   * User-provided functors which compute the exact value of the
+   * solution for each system.
+   */
+  std::vector<FunctionBase<Number> *> _exact_values;
+
+  /**
+   * User-provided functors which compute the exact derivative of the
+   * solution for each system.
+   */
+  std::vector<FunctionBase<Gradient> *> _exact_derivs;
+
+  /**
+   * User-provided functors which compute the exact hessians of the
+   * solution for each system.
+   */
+  std::vector<FunctionBase<Tensor> *> _exact_hessians;
+
+  /**
    * Constant pointer to the \p EquationSystems object
-   * containing the fine grid solution.
+   * containing a fine grid solution.
    */
   EquationSystems* _equation_systems_fine;
 
@@ -191,6 +241,11 @@ private:
                                    const DenseVector<Number> &Uelem,
                                    FEBase *fe,
 				   MeshFunction *fine_values) const;
+
+  /**
+   * Helper method for cleanup
+   */
+  void clear_functors ();
 
   /**
    * Extra order to use for quadrature rule
