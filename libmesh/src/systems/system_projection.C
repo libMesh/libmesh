@@ -127,7 +127,12 @@ namespace libMesh
     g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
     parameters(parameters_in),
     new_vector(new_v_in)
-    {}
+    {
+      libmesh_assert(f.get());
+      f->init();
+      if (g.get())
+        g->init();
+    }
 
     ProjectSolution (const ProjectSolution &in) :
     system(in.system),
@@ -135,7 +140,12 @@ namespace libMesh
     g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
     parameters(in.parameters),
     new_vector(in.new_vector)
-    {}
+    {
+      libmesh_assert(f.get());
+      f->init();
+      if (g.get())
+        g->init();
+    }
 
     void operator()(const ConstElemRange &range) const;
   };
