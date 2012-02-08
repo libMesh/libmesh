@@ -25,17 +25,15 @@
 
 
 // Local Includes
+#include "dense_vector.h"
+#include "equation_systems.h"
 #include "function_base.h"
 #include "libmesh_common.h"
+#include "point.h"
+#include "system.h"
 
 namespace libMesh
 {
-
-
-
-// Forward Declarations
-template <typename T> class DenseVector;
-class Point;
 
 
 /**
