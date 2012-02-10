@@ -54,6 +54,7 @@ public:
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
         fp.Parse(subexpression, variables);
+        fp.Optimize();
         parsers.push_back(fp);
       }
 
