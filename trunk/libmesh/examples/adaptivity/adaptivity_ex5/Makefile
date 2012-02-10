@@ -72,6 +72,18 @@ run: $(target)
 	@$(LIBMESH_RUN) $(target) -read_solution -n_timesteps $(n_timesteps) \
                    -output_freq $(output_freq) -init_timestep $(n_timesteps) $(LIBMESH_OPTIONS)
 	@echo " "
+	@$(LIBMESH_RUN) $(target) -n_timesteps $(n_timesteps) -n_refinements $(n_refinements) \
+                   -output_freq $(output_freq) -init_timestep 0 \
+                   -exact_solution '10*exp(-(pow(x-0.8*t-0.2,2) + pow(y-0.8*t-0.2,2))/(0.01*(4*t+1)))/(4*t+1)' \
+                   $(LIBMESH_OPTIONS)
+	@echo " "
+	@echo "***** Finished first" $(n_timesteps) "steps, now read in" \
+	       "saved solution and continue *****"
+	@echo " "
+	@$(LIBMESH_RUN) $(target) -read_solution -n_timesteps $(n_timesteps) \
+                   -output_freq $(output_freq) -init_timestep $(n_timesteps) \
+                   $(LIBMESH_OPTIONS)
+	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) \[-read_solution\] -n_timesteps $(n_timesteps) -init_timestep \[0\|$(n_timesteps)\] $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
