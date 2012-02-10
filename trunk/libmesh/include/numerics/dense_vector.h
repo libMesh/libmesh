@@ -241,7 +241,7 @@ private:
 template<typename T>
 inline
 DenseVector<T>::DenseVector(const unsigned int n) :
-  _val (n, 0.)
+  _val (n, T(0.))
 {
 }
 
@@ -322,7 +322,7 @@ void DenseVector<T>::zero()
 {
   std::fill (_val.begin(),
 	     _val.end(),
-	     0.);
+	     T(0.));
 }
 
 
