@@ -20,6 +20,9 @@
   // This example uses the same simple, linear transient
   // system as in example 10; however in this case periodic boundary
   // conditions are applied at the sides of the domain.
+  // 
+  // This code also contains an example use of ParsedFunction, to
+  // allow users to specify an exact solution on the command line.
  
 // C++ include files that we need
 #include <iostream>
@@ -43,6 +46,7 @@
 
 #include "periodic_boundaries.h"
 #include "mesh_generation.h"
+#include "parsed_function.h"
 
 #include "getpot.h"
 
@@ -102,7 +106,9 @@ Number exact_value (const Point& p,
   return exact_solution(p(0), p(1), parameters.get<Real> ("time"));
 }
 
-
+// With --enable-fparser, the user can also optionally set their own
+// exact solution equations.
+FunctionBase<Number>* parsed_solution = NULL;
 
 // Begin the main program.  Note that the first
 // statement in the program throws an error if
@@ -116,6 +122,9 @@ int main (int argc, char** argv)
 
 #if !defined(LIBMESH_ENABLE_AMR)
   libmesh_example_assert(false, "--enable-amr");
+#elif !defined(LIBMESH_HAVE_XDR)
+  // We use XDR support in our output here
+  libmesh_example_assert(false, "--enable-xdr");
 #elif !defined(LIBMESH_ENABLE_PERIODIC)
   libmesh_example_assert(false, "--enable-periodic");
 #elif defined(LIBMESH_ENABLE_PARMESH)
@@ -193,6 +202,15 @@ int main (int argc, char** argv)
       libmesh_error();
     }
 
+  // The user can specify a different exact solution on the command
+  // line, if we have an expression parser compiled in
+#ifdef LIBMESH_HAVE_FPARSER
+  const bool have_expression = command_line.search("-exact_solution");
+#else
+  const bool have_expression = false;
+#endif
+  if (have_expression)
+    parsed_solution = new ParsedFunction<Number>(command_line.next(std::string()));
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
@@ -245,13 +263,13 @@ int main (int argc, char** argv)
   else 
     {
       // Read in the mesh stored in "saved_mesh.xda"
-      mesh.read("saved_mesh.xda");
+      mesh.read("saved_mesh.xdr");
 
       // Print information about the mesh to the screen.
       mesh.print_info();
 
       // Read in the solution stored in "saved_solution.xda"
-      equation_systems.read("saved_solution.xda", libMeshEnums::READ);
+      equation_systems.read("saved_solution.xdr", libMeshEnums::DECODE);
 
       // Get a reference to the system so that we can call update() on it
       TransientLinearImplicitSystem & system = 
@@ -501,8 +519,8 @@ int main (int argc, char** argv)
 
       std::cout << "Final H1 norm = " << H1norm << std::endl << std::endl;
 
-      mesh.write("saved_mesh.xda");
-      equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
+      mesh.write("saved_mesh.xdr");
+      equation_systems.write("saved_solution.xdr", libMeshEnums::ENCODE);
 #ifdef LIBMESH_HAVE_GMV
       GMVIO(mesh).write_equation_systems ("saved_solution.gmv",
                                           equation_systems);
@@ -513,6 +531,9 @@ int main (int argc, char** argv)
 #endif
     }
 #endif // #ifndef LIBMESH_ENABLE_AMR
+
+  // We might have a parser to clean up
+  delete parsed_solution;
   
   return 0;
 }
@@ -535,7 +556,10 @@ void init_cd (EquationSystems& es,
   // Project initial conditions at time 0
   es.parameters.set<Real> ("time") = 0;
   
-  system.project_solution(exact_value, NULL, es.parameters);
+  if (parsed_solution)
+    system.project_solution(parsed_solution, NULL);
+  else
+    system.project_solution(exact_value, NULL, es.parameters);
 }
 
 
@@ -744,9 +768,11 @@ void assemble_cd (EquationSystems& es,
               
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
-                  const Number value = exact_solution (qface_points[qp](0),
-                                                       qface_points[qp](1),
-                                                       time);
+                  const Number value = 
+                    parsed_solution ?
+                      (*parsed_solution)(qface_points[qp], time) :
+                      exact_solution (qface_points[qp](0),
+                                      qface_points[qp](1), time);
                                                        
                   // RHS contribution
                   for (unsigned int i=0; i<psi.size(); i++)
