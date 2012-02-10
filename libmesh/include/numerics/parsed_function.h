@@ -29,18 +29,24 @@ public:
 #endif
       variables += ",t";
 
-      for (size_t start = 0, end = 0;
-           end != std::string::npos;
-           end = expression.find( ',', start ))
+      const char delimiter = '#';
+
+      size_t start = 0, end = 0;
+
+      while (end != std::string::npos)
       {
-          // We either want the whole end of the string (end ==
-          // npos) or a substring in the middle.
+        // Find any place where the expression is split into multiple
+        // subexpressions
+        end = expression.find(delimiter, start);
+
+	// We either want the whole end of the string (end == npos) or
+	// a substring in the middle.
         std::string subexpression =
           expression.substr(start, (end == std::string::npos) ?
                                     std::string::npos : end - start);
     
-          // If at end, use start=maxSize.  Else start at next
-          // character.
+	// If at end, use start=maxSize.  Else start at next
+	// character.
         start = (end == std::string::npos) ?
                 std::string::npos : end + 1;
 
