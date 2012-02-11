@@ -858,15 +858,12 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 
 	libmesh_assert (this->is_open());
 
-	// FIXME[RHS]: How to implement this for float?  I don't know
-	// enough about xdr or have the time.  We'll error out for
-	// now, and anyone who needs the functionality can send me a
-	// patch.  ;-)
-
-	libMesh::err << "Writing binary XDR files with single precision is not\n"
-		      << "currently supported." << std::endl;
-
-	libmesh_error();
+	if (len > 0)
+	  xdr_vector(xdrs,
+		     (char*) val,
+		     len,
+		     sizeof(float),
+		     (xdrproc_t) xdr_float);
 
 #else
 
@@ -885,9 +882,6 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
     case READ:
       {
 	libmesh_assert (in.get() != NULL); libmesh_assert (in->good());
-
-        // FIXME[RHS]: Not sure if this will work properly...
-        libmesh_experimental();
 
 	for (unsigned int i=0; i<len; i++)
 	  {
