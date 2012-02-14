@@ -49,12 +49,12 @@ namespace {
   {
     unsigned int       elem_id;
     unsigned short int side;
-    short int          bc_id;
+    boundary_id_type   bc_id;
 
     // Default constructor
     ElemBCData (unsigned int       elem_id_in=0,
 		unsigned short int side_in=0,
-		short int          bc_id_in=0) :
+		boundary_id_type   bc_id_in=0) :
       elem_id(elem_id_in),
       side(side_in),
       bc_id(bc_id_in)
@@ -737,11 +737,11 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
 // We're supporting boundary ids on internal sides now
 //	if (elem->neighbor(s) == NULL)
 	  {
-	    const std::vector<short int>& bc_ids =
+	    const std::vector<boundary_id_type>& bc_ids =
 	      boundary_info.boundary_ids (elem, s);
-	    for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+	    for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
 	      {
-		const short int bc_id = *id_it;
+		const boundary_id_type bc_id = *id_it;
 		if (bc_id != BoundaryInfo::invalid_id)
 		  {
 		    xfer_bcs.push_back (n_local_level_0_elem);

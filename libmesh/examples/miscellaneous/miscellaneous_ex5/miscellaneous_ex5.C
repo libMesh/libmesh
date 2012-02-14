@@ -43,7 +43,6 @@
 #include "dense_subvector.h"
 #include "numeric_vector.h"
 #include "linear_implicit_system.h"
-#include "boundary_info.h"
 #include "exodusII_io.h"
 #include "fe_interface.h"
 #include "getpot.h"

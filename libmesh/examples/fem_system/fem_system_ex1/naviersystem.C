@@ -390,7 +390,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
       // Set u = 1 on the top boundary, (which build_square() has
       // given boundary id 2, and build_cube() has called 5),
       // u = 0 everywhere else
-      short int boundary_id =
+      boundary_id_type boundary_id =
         this->get_mesh().boundary_info->boundary_id(c.elem, c.side);
       libmesh_assert (boundary_id != BoundaryInfo::invalid_id);
       const short int top_id = (dim==3) ? 5 : 2;

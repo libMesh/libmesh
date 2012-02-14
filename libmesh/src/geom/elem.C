@@ -737,8 +737,8 @@ Elem* Elem::topological_neighbor (const unsigned int i,
     // see if this is a periodic boundary in which case it will have a
     // topological neighbor
 
-    std::vector<short int> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
-    for (std::vector<short int>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
+    std::vector<boundary_id_type> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
+    for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
       if (pb->boundary(*j))
       {
         // Since the point locator inside of periodic boundaries

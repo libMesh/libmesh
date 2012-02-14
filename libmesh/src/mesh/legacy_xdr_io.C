@@ -944,7 +944,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
       //libMesh::out << "Preparing to write boundary conditions." << std::endl;
       std::vector<unsigned int> elem_list;
       std::vector<unsigned short int> side_list;
-      std::vector<short int> elem_id_list;
+      std::vector<boundary_id_type> elem_id_list;
 
       mesh.boundary_info->build_side_list (elem_list, side_list, elem_id_list);
 
