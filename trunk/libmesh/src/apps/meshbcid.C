@@ -73,7 +73,8 @@ int main(int argc, char** argv)
       std::cerr << "No --bcid argument found!" << std::endl;
       usage_error(argv[0]);
     }
-  unsigned int bcid = cl.next(0);
+  boundary_id_type bcid = 0;
+  bcid = cl.next(bcid);
 
   Point minnormal(-std::numeric_limits<Real>::max(),
                   -std::numeric_limits<Real>::max(),
@@ -122,11 +123,11 @@ std::cout << "min normal = " << minnormal << std::endl;
 std::cout << "max normal = " << maxnormal << std::endl;
 
   bool matcholdbcid = false;
-  int oldbcid = 0;
+  boundary_id_type oldbcid = 0;
   if (cl.search("--oldbcid"))
     {
       matcholdbcid = true;
-      oldbcid = cl.next(0);
+      oldbcid = cl.next(oldbcid);
       if (oldbcid < 0)
         oldbcid = BoundaryInfo::invalid_id;
     }

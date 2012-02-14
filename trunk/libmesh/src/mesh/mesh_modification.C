@@ -344,7 +344,7 @@ void UnstructuredMesh::all_first_order ()
 
       for (unsigned int s=0; s<so_elem->n_sides(); s++)
 	{
-	  const std::vector<short int> boundary_ids =
+	  const std::vector<boundary_id_type> boundary_ids =
 	    this->boundary_info->raw_boundary_ids (so_elem, s);
 
 	  this->boundary_info->add_side (lo_elem, s, boundary_ids);
@@ -628,7 +628,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
       for (unsigned int s=0; s<lo_elem->n_sides(); s++)
 	{
-	  const std::vector<short int> boundary_ids =
+	  const std::vector<boundary_id_type> boundary_ids =
 	    this->boundary_info->raw_boundary_ids (lo_elem, s);
 
 	  this->boundary_info->add_side (so_elem, s, boundary_ids);
@@ -690,7 +690,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   // Temporary vectors to store the new boundary element pointers, side numbers, and boundary ids
   std::vector<Elem*> new_bndry_elements;
   std::vector<unsigned short int> new_bndry_sides;
-  std::vector<short int> new_bndry_ids;
+  std::vector<boundary_id_type> new_bndry_ids;
 
   // Iterate over the elements, splitting QUADS into
   // pairs of conforming triangles.
@@ -890,10 +890,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      {
 		for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
 		  {
-                    const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*el, sn);
-                    for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                    const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(*el, sn);
+                    for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                       {
-                        const short int b_id = *id_it;
+                        const boundary_id_type b_id = *id_it;
 
 		        if (b_id != BoundaryInfo::invalid_id)
 		          {
@@ -1250,7 +1250,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
   // BoundaryInfo Storage for element ids, sides, and BC ids
   std::vector<Elem*>              saved_boundary_elements;
-  std::vector<short int>          saved_bc_ids;
+  std::vector<boundary_id_type>   saved_bc_ids;
   std::vector<unsigned short int> saved_bc_sides;
 
   // Reserve a reasonable amt. of space for each
@@ -1285,10 +1285,10 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	// to save the (elem, side, bc_id) triples
 	for (unsigned int s=0; s<elem->n_sides(); s++)
 	  {
-	    const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
-	    for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+	    const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
+	    for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
 	      {
-		const short int bc_id = *id_it;
+		const boundary_id_type bc_id = *id_it;
 
 		if (bc_id != BoundaryInfo::invalid_id)
 		  {
@@ -1357,8 +1357,8 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
 
 void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
-                                                  const short int old_id,
-                                                  const short int new_id)
+                                                  const boundary_id_type old_id,
+                                                  const boundary_id_type new_id)
 {
   // Only level-0 elements store BCs.  Loop over them.
   MeshBase::element_iterator           el = mesh.level_elements_begin(0);
@@ -1369,10 +1369,10 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
       unsigned int n_sides = elem->n_sides();
       for (unsigned int s=0; s != n_sides; ++s)
         {
-          const std::vector<short int>& old_ids = mesh.boundary_info->boundary_ids(elem, s);
+          const std::vector<boundary_id_type>& old_ids = mesh.boundary_info->boundary_ids(elem, s);
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
             {
-              std::vector<short int> new_ids(old_ids);
+              std::vector<boundary_id_type> new_ids(old_ids);
               std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
               mesh.boundary_info->remove_side(elem, s);
               mesh.boundary_info->add_side(elem, s, new_ids);
@@ -1384,8 +1384,8 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
 
 
 void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
-						   const short int old_id,
-						   const short int new_id)
+						   const subdomain_id_type old_id,
+						   const subdomain_id_type new_id)
 {
   MeshBase::element_iterator           el = mesh.elements_begin();
   const MeshBase::element_iterator end_el = mesh.elements_end();

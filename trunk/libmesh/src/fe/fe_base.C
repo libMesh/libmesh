@@ -2430,10 +2430,10 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
       if (elem->neighbor(s))
         continue;
 
-      const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids (elem, s);
-      for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+      const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
-          const unsigned int boundary_id = *id_it;
+          const boundary_id_type boundary_id = *id_it;
           const PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
           if (periodic && periodic->is_my_variable(variable_number))
             {
@@ -2681,10 +2681,10 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
       if (elem->neighbor(s))
         continue;
 
-      const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids (elem, s);
-      for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+      const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
-          const unsigned int boundary_id = *id_it;
+          const boundary_id_type boundary_id = *id_it;
           const PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
           if (periodic)
             {

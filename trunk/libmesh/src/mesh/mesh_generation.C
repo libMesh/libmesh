@@ -1341,7 +1341,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		  for (unsigned int s=0; s<base_hex->n_sides(); ++s)
 		    {
 		      // Get the boundary ID for this side
-		      short int b_id = mesh.boundary_info->boundary_id(*el, s);
+		      boundary_id_type b_id = mesh.boundary_info->boundary_id(*el, s);
 
 		      // Need to build the full-ordered side!
 		      AutoPtr<Elem> side = base_hex->build_side(s);
@@ -1976,7 +1976,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 	    // top = 2
 	    // left = 3
 	    // hole = 4
-	    short int bc_id=4;
+	    boundary_id_type bc_id=4;
 
 	    // bottom
 	    if      (std::fabs(side_midpoint(1) - ymin) < TOLERANCE)

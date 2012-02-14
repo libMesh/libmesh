@@ -103,20 +103,20 @@ void FroIO::write (const std::string& fname)
 
       // Write BCs.
       {
-	const std::set<short int>& bc_ids =
+	const std::set<boundary_id_type>& bc_ids =
 	  mesh.boundary_info->get_boundary_ids();
 
  	std::vector<unsigned int>       el;
  	std::vector<unsigned short int> sl;
- 	std::vector<short int>          il;
+ 	std::vector<boundary_id_type>   il;
 
  	mesh.boundary_info->build_side_list (el, sl, il);
 
 
 	// Map the boundary ids into [1,n_bc_ids],
 	// treat them one at a time.
-	short int bc_id=0;
-	for (std::set<short int>::const_iterator id = bc_ids.begin();
+	boundary_id_type bc_id=0;
+	for (std::set<boundary_id_type>::const_iterator id = bc_ids.begin();
 	     id != bc_ids.end(); ++id)
 	  {
 	    std::deque<unsigned int> node_list;

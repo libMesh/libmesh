@@ -1050,7 +1050,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     }
   }
 
-  std::vector<short int> side_boundary_ids;
+  std::vector<boundary_id_type> side_boundary_ids;
   mesh.boundary_info->build_side_boundary_ids(side_boundary_ids);
 
   for(unsigned int i = 0; i < side_boundary_ids.size(); i++)
@@ -1083,18 +1083,18 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   ExodusII_IO_Helper::ElementMaps em;
 
   std::vector< unsigned int > nl;
-  std::vector< short int > il;
+  std::vector< boundary_id_type > il;
 
   mesh.boundary_info->build_node_list(nl, il);
 
   //Maps from nodeset id to the nodes
-  std::map<short int, std::vector<int> > node;
+  std::map<boundary_id_type, std::vector<int> > node;
 
   //Accumulate the vectors to pass into ex_put_node_set
   for(unsigned int i = 0; i < nl.size(); i++)
     node[il[i]].push_back(nl[i]+1);
 
-  std::vector<short int> node_boundary_ids;
+  std::vector<boundary_id_type> node_boundary_ids;
   mesh.boundary_info->build_node_boundary_ids(node_boundary_ids);
 
   for(unsigned int i = 0; i < node_boundary_ids.size(); i++)
