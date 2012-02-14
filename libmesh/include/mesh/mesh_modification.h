@@ -26,6 +26,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
+#include "id_types.h" // for boundary_id_type, subdomain_id_type
 
 namespace libMesh
 {
@@ -132,16 +133,16 @@ namespace MeshTools
      * changes them to new_id
      */
     void change_boundary_id (MeshBase &mesh,
-			     const short int old_id,
-			     const short int new_id);
+			     const boundary_id_type old_id,
+			     const boundary_id_type new_id);
 
     /**
      * Finds any subdomain ids that are currently old_id,
      * changes them to new_id
      */
     void change_subdomain_id (MeshBase &mesh,
-			      const short int old_id,
-			      const short int new_id);
+			      const subdomain_id_type old_id,
+			      const subdomain_id_type new_id);
 
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools

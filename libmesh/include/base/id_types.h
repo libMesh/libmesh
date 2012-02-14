@@ -55,6 +55,15 @@ typedef int32_t subdomain_id_type;
 typedef uint16_t subdomain_id_type;
 #endif
 
+#if LIBMESH_BOUNDARY_ID_BYTES == 1
+typedef int8_t boundary_id_type;
+#elif LIBMESH_BOUNDARY_ID_BYTES == 4
+typedef int32_t boundary_id_type;
+#else // LIBMESH_BOUNDARY_ID_BYTES = 2 (default)
+typedef int16_t boundary_id_type;
+#endif
+
+
 } // namespace libMesh
 
 #endif // end #ifndef __id_types_h__

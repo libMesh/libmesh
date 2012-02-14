@@ -311,7 +311,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		nodes_sent[pid].push_back(Node::PackedNode(**node_it));
 
 		// add the node if it has BCs
-                std::vector<short int> bcs = mesh.boundary_info->boundary_ids(*node_it);
+                std::vector<boundary_id_type> bcs = mesh.boundary_info->boundary_ids(*node_it);
 
 		if (!bcs.empty())
 		  {
@@ -361,10 +361,10 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 // We're supporting boundary ids on internal sides now
 //		    if ((*elem_it)->neighbor(s) == NULL)
                       {
-                        const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*elem_it, s);
-                        for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                        const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(*elem_it, s);
+                        for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                           {
-                            const short int bc_id = *id_it;
+                            const boundary_id_type bc_id = *id_it;
 		            if (bc_id != mesh.boundary_info->invalid_id)
 			      {
 			        element_bcs_sent[pid].push_back ((*elem_it)->id());
@@ -1034,7 +1034,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 		nodes_sent[n_node_replies_sent].push_back (Node::PackedNode(**node_it));
 
 		// add the node if it has BCs
-                std::vector<short int> bcs = mesh.boundary_info->boundary_ids(*node_it);
+                std::vector<boundary_id_type> bcs = mesh.boundary_info->boundary_ids(*node_it);
 
 		if (!bcs.empty())
 		  {
@@ -1089,10 +1089,10 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 // We're supporting boundary ids on internal sides now
 //		    if ((*elem_it)->neighbor(s) == NULL)
                       {
-                        const std::vector<short int>& bc_ids = mesh.boundary_info->boundary_ids(*elem_it, s);
-                        for (std::vector<short int>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                        const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(*elem_it, s);
+                        for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                           {
-                            const short int bc_id = *id_it;
+                            const boundary_id_type bc_id = *id_it;
 		            if (bc_id != mesh.boundary_info->invalid_id)
 			      {
 			        element_bcs_sent.push_back ((*elem_it)->id());
@@ -1672,7 +1672,7 @@ void MeshCommunication::broadcast_bcs (const MeshBase& mesh,
   {
     std::vector<unsigned int>       el_id;
     std::vector<unsigned short int> side_id;
-    std::vector<short int>          bc_id;
+    std::vector<boundary_id_type>   bc_id;
 
     if (libMesh::processor_id() == 0)
       boundary_info.build_side_list (el_id, side_id, bc_id);
@@ -2126,7 +2126,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
   {
     std::vector<unsigned int>       el_id;
     std::vector<unsigned short int> side_id;
-    std::vector<short int>          bc_id;
+    std::vector<boundary_id_type>   bc_id;
 
     boundary_info.build_side_list (el_id, side_id, bc_id);
 
@@ -2162,8 +2162,8 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
 
   // Get the nodal boundary conditions
   {
-    std::vector<unsigned int> node_id;
-    std::vector<short int>    bc_id;
+    std::vector<unsigned int>     node_id;
+    std::vector<boundary_id_type> bc_id;
 
     boundary_info.build_node_list (node_id, bc_id);
 
@@ -2208,7 +2208,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
       {
 	const Elem* elem = mesh.elem(xfer_elem_bcs[cnt++]);
 	const unsigned short int side_id = xfer_elem_bcs[cnt++];
-	const short int bc_id = xfer_elem_bcs[cnt++];
+	const boundary_id_type bc_id = xfer_elem_bcs[cnt++];
 
 	boundary_info.add_side (elem, side_id, bc_id);
       }
@@ -2227,7 +2227,7 @@ void MeshCommunication::allgather_bcs (const ParallelMesh& mesh,
     for (unsigned int bc=0, cnt=0; bc<n_bcs; bc++)
       {
 	const Node* node = mesh.node_ptr (xfer_node_bcs[cnt++]);
-	const short int bc_id = xfer_node_bcs[cnt++];
+	const boundary_id_type bc_id = xfer_node_bcs[cnt++];
 
 	boundary_info.add_node (node, bc_id);
       }

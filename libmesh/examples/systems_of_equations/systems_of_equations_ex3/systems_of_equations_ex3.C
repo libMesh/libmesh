@@ -610,7 +610,7 @@ void assemble_stokes (EquationSystems& es,
               // 1=right
               // 2=top
               // 3=left
-              short int bc_id = mesh.boundary_info->boundary_id (elem,s);
+              boundary_id_type bc_id = mesh.boundary_info->boundary_id (elem,s);
               if (bc_id==BoundaryInfo::invalid_id)
                   libmesh_error();
 
