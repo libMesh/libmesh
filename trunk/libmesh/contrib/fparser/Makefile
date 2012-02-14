@@ -224,7 +224,7 @@ fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
 util/tree_grammar_parser: \
 		util/tree_grammar_parser.$(obj-suffix) \
 		fpoptimizer/opcodename.$(obj-suffix)
-	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
+	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
 
 util/tree_grammar_parser.cc: \
 		util/tree_grammar_parser.y
@@ -235,10 +235,10 @@ util/tree_grammar_parser.cc: \
 
 util/cpp_compress: \
 		util/cpp_compress.$(obj-suffix) util/cpp_compress_main.$(obj-suffix)
-	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
+	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
 
 util/bytecoderules_parser: util/bytecoderules_parser.$(obj-suffix)
-	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
+	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
 
 
 util/version_changer: util/version_changer.cc
