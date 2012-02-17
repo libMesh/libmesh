@@ -63,31 +63,21 @@ void PetscMatrix<T>::init (const unsigned int m,
   int n_nz     = static_cast<int>(nnz);
   int n_oz     = static_cast<int>(noz);
 
-  // create a sequential matrix on one processor
-  if (libMesh::n_processors() == 1)
-    {
-      libmesh_assert ((m_l == m) && (n_l == n));
-
-      // Create matrix.  Revisit later to do preallocation and make more efficient
-      ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, m_global, n_global,
-			      n_nz, PETSC_NULL, &_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-      ierr = MatSetFromOptions (_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
-
-  else
-    {
-      parallel_only();
-
-      ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD, m_local, n_local, m_global, n_global,
-			      n_nz, PETSC_NULL, n_oz, PETSC_NULL, &_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-      ierr = MatSetFromOptions (_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
+  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // Is prefix information available somewhere? Perhaps pass in the system name?
+  ierr = MatSetOptionsPrefix(_mat, "");
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetFromOptions(_mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSeqAIJSetPreallocation(_mat, nnz, PETSC_NULL);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatMPIAIJSetPreallocation(_mat, nnz, PETSC_NULL, noz, PETSC_NULL);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   this->zero ();
 }
@@ -130,44 +120,23 @@ void PetscMatrix<T>::init ()
   int m_local  = static_cast<int>(m_l);
   int n_local  = static_cast<int>(n_l);
 
-
-  // create a sequential matrix on one processor
-  if (libMesh::n_processors() == 1)
-    {
-      libmesh_assert ((m_l == m) && (n_l == n));
-      if (n_nz.empty())
-        ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, m_global, n_global,
-			        PETSC_NULL, (int*) PETSC_NULL, &_mat);
-      else
-        ierr = MatCreateSeqAIJ (libMesh::COMM_WORLD, m_global, n_global,
-			        PETSC_NULL, (int*) &n_nz[0], &_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-      ierr = MatSetFromOptions (_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
-
-  else
-    {
-      parallel_only();
-
-      if (n_nz.empty())
-        ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD,
-			        m_local, n_local,
-			        m_global, n_global,
-			        PETSC_NULL, (int*) PETSC_NULL,
-			        PETSC_NULL, (int*) PETSC_NULL, &_mat);
-      else
-        ierr = MatCreateMPIAIJ (libMesh::COMM_WORLD,
-			        m_local, n_local,
-			        m_global, n_global,
-			        PETSC_NULL, (int*) &n_nz[0],
-			        PETSC_NULL, (int*) &n_oz[0], &_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-      ierr = MatSetFromOptions (_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
+  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // Is prefix information available somewhere? Perhaps pass in the system name?
+  ierr = MatSetOptionsPrefix(_mat, "");
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetFromOptions(_mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if (!n_nz.empty()) {
+    ierr = MatSeqAIJSetPreallocation(_mat, 0, (int*)&n_nz[0]);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    ierr = MatMPIAIJSetPreallocation(_mat, 0, (int*)&n_nz[0], 0, (int*)&n_oz[0]);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  }
 
   this->zero();
 }
