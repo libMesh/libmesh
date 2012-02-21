@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x
+R=1.7, 3.7, 0.28
+F=sinh(if(1,acosh(x),0))
+C=fp_sinh(fp_acosh(x))

@@ -1,0 +1,5 @@
+T=d li cd
+V=a,b
+R=-15,15,2
+F=((5*b+abs(a))<0)*1 + ((abs(b))<0)*2
+C=fp_less((5*b+fp_abs(a)),0)*1 + fp_less((fp_abs(b)),0)*2

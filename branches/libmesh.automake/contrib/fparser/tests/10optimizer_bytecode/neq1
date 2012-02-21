@@ -1,0 +1,6 @@
+T=d f ld li
+V=x
+R=0,1,1
+F=(!x!=1)
+C=fp_nequal(fp_not(x),1)
+

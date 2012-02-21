@@ -1,0 +1,6 @@
+DEG=true
+T=d
+V=x
+R=0,1,1
+F=cos(1.1)+x
+C=cos(d2r(1.1))+x

@@ -1,0 +1,7 @@
+T=d f ld mf li gi
+V=A_very_long_variable_name_1,A_very_long_variable_name_2,Yet_a_third_very_long_variable_name
+R=-10,10,1
+F=A_very_long_variable_name_1-A_very_long_variable_name_2+ \
+  Yet_a_third_very_long_variable_name*A_very_long_variable_name_1
+C=A_very_long_variable_name_1-A_very_long_variable_name_2+ \
+  Yet_a_third_very_long_variable_name*A_very_long_variable_name_1

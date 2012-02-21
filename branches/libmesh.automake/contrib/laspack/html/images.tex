@@ -1,0 +1,109 @@
+\batchmode
+\documentstyle[html,twoside]{article}
+\makeatletter
+
+\textwidth160mm
+\textheight230mm
+
+\oddsidemargin0mm
+\evensidemargin0mm
+
+\topmargin4mm
+\headheight0mm
+\headsep0mm
+\topskip0mm
+
+\footskip10mm
+\footheight0mm
+
+
+\newcommand {\LASPack}{\mbox{\tt LASPack}}
+
+\newcommand {\DATE}{\today}
+
+\newcommand {\switch}[2]{{#2}}
+
+\newcommand {\mansection}[4]{\subsection{#1(#3)}}
+
+\newcommand {\mansubsection}[1]{\subsubsection*{#1}}
+
+\newcommand {\indexitem}[5]{\htmlref{{\tt #1}}{#4} {\tt #2} \htmlref{#3}{#5}}
+
+\newcommand {\mandummyitem}[1]{{\tt #1}}
+
+\makeatother
+\newenvironment{tex2html_wrap}{}{}
+\newwrite\lthtmlwrite
+\def\lthtmltypeout#1{{\let\protect\string\immediate\write\lthtmlwrite{#1}}}%
+\newbox\sizebox
+\begin{document}
+\pagestyle{empty}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+{\newpage
+\clearpage
+\samepage \begin{figure}[htb]
+  \htmlimage{scale=1.5}
+  
+\begin{center}
+  \unitlength0.8mm
+  \begin{picture}(156.0,119.0)
+    \thinlines
+    \put(14.0,95.0){\framebox(128.0,10.0){\Large \tt MLSOLV}}
+    \put(14.0,78.0){\framebox(128.0,10.0){\Large \tt ITERSOLV}}
+    \put(14.0,61.0){\makebox(128.0,17.0){\Large \tt RTC}}
+
+    \put(14.0,44.0){\framebox(96.0,10.0){\Large \tt PRECOND}}
+    \put(110.0,44.0){\framebox(32.0,10.0){\Large \tt EIGENVAL}}
+
+    \put(14.0,27.0){\framebox(80.0,10.0){\Large \tt OPERATS}}
+    \put(94.0,27.0){\framebox(48.0,10.0){\Large \tt FACTOR}}
+    \put(14.0,17.0){\framebox(32.0,10.0){\Large \tt VECTOR}}
+    \put(46.0,17.0){\framebox(32.0,10.0){\Large \tt MATRIX}}
+    \put(78.0,17.0){\framebox(64.0,10.0){\Large \tt QMATRIX}}
+
+    \put(14.0,0.0){\makebox(128.0,17.0){\Large \tt ERRHANDL}}
+
+    \thicklines
+    \put(14.0,95.0){\framebox(128.0,10.0){}}
+    \put(14.0,78.0){\framebox(128.0,10.0){}}
+    \put(7.0,61.0){\framebox(142.0,51.0){}}
+    \put(14.0,44.0){\framebox(128.0,10.0){}}
+    \put(14.0,17.0){\framebox(128.0,20.0){}}
+    \put(0.0,0.0){\framebox(156.0,119.0){}}
+  \end{picture}
+\end{center}
+
+  {}
+
+\end{figure}
+}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
+\stepcounter{section}
+
+\end{document}

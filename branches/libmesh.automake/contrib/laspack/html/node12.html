@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> Program  mlstest</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" Program  mlstest">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html288 HREF="node13.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html286 HREF="node8.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html282 HREF="node11.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html290 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html289 HREF="node13.html"> Copyright</A>
+<B>Up:</B> <A NAME=tex2html287 HREF="node8.html"> Optimizing and Example </A>
+<B> Previous:</B> <A NAME=tex2html283 HREF="node11.html"> Program  matropt</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00054000000000000000> Program  mlstest</A></H2>
+<P>
+
+<P>
+<H6><A NAME=SubsectionMLSTEST>&#160;</A></H6>
+<P>
+The program <tt> mlstest</tt> is an extensive example code
+demonstrating possibilities of usage of <tt> LASPack</tt>
+  routines.
+It solves a Poisson problem 
+
+in a 1D or 2D unit domain by a specified multilevel solver.
+<P>
+All input parameters have to be set interactively.
+The output contains the convergence history as well as the determined
+middle convergence rates.
+<P>
+For example, a three-grid solution by means of the V-cycle multigrid method 
+with the Gauss-Seidel smoothing
+(two pre-smoothing and one post-smoothing iteration)
+and the ILU preconditioned CG method on the coarsest grid (20 iterations)
+yields for a 65 x 65 grid on the finest level:
+<PRE>  0. iteration ... accuracy =  1.0000e+00
+  1. iteration ... accuracy =  4.3033e-02
+  2. iteration ... accuracy =  3.3534e-03
+  3. iteration ... accuracy =  2.8452e-04
+  4. iteration ... accuracy =  2.4934e-05
+  5. iteration ... accuracy =  2.2565e-06
+  6. iteration ... accuracy =  2.0996e-07
+  7. iteration ... accuracy =  1.9860e-08
+  8. iteration ... accuracy =  7.6893e-09
+
+  CPU time:    0.67 s
+
+Middle contraction rate
+  referred to one iteration:  9.677e-02
+  referred to 1 s CPU time:   7.751e-13
+</PRE>
+In this case, the input data corresponds to:
+<tt> 2</tt>, <tt> 3</tt>, <tt> 64</tt>,
+<tt> 1</tt>, <tt> n</tt>, <tt> 1</tt>, 
+<tt> 2</tt>, 
+<tt> 2</tt>, <tt> 2</tt>, <tt> 1</tt>, <tt> 0</tt>, <tt> 1.0</tt>,
+<tt> 6</tt>, <tt> 20</tt>, <tt> 3</tt>, <tt> 1.0</tt>,
+<tt> 100</tt>, <tt> 1e-8</tt>.
+<P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

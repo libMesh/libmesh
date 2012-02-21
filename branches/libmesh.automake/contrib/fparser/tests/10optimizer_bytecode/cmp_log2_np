@@ -1,0 +1,15 @@
+T=d f ld
+V=x
+R=0.5,3,0.5
+F=1*(log2(x)=log2(2)) + \
+  2*(log2(x)<log2(2)) + \
+  4*(log2(x)<=log2(2)) + \
+  8*(log2(x)>log2(2)) + \
+  16*(log2(x)>=log2(2)) + \
+  32*(log2(x)!=log2(2))
+C=1*fp_equal(fp_log2(x),fp_log2(2)) + \
+  2*fp_less(fp_log2(x),fp_log2(2)) + \
+  4*fp_lessOrEq(fp_log2(x),fp_log2(2)) + \
+  8*fp_greater(fp_log2(x),fp_log2(2)) + \
+  16*fp_greaterOrEq(fp_log2(x),fp_log2(2)) + \
+  32*fp_nequal(fp_log2(x),fp_log2(2))

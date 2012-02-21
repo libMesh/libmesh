@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-4000, 4000, 0.1
+F=int(x)
+C=fp_floor(x+0.5)

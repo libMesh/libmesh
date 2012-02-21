@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x,y
+R=-6,6,1
+F=(pow(2,x) <= pow(-4,y))
+C=fp_lessOrEq(fp_pow(2,x), fp_pow(-4,y))

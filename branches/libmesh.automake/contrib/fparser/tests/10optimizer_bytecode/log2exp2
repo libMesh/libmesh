@@ -1,0 +1,7 @@
+# x cLog2 cExp2 -> x (when x is never negative)
+
+T=d f
+V=x
+R=-1,0.75,0.25
+F=exp2(log2(acos(x)))
+C=fp_exp2(fp_log2(fp_acos(x)))

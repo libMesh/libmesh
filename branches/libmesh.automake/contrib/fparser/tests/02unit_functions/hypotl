@@ -1,0 +1,5 @@
+T=ld
+V=x,y
+R=-4, 4, 0.05
+F=hypot(x,y)
+C=sqrtl(x*x + y*y)

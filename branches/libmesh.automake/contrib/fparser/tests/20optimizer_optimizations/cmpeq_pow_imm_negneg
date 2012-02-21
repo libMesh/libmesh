@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x
+R=-5,5,2
+F=(pow(x,-3) = -0.015625)
+C=fp_equal(fp_pow(x,-3), -0.015625)
