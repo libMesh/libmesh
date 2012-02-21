@@ -357,7 +357,7 @@ ifeq ($(enable-optional),yes)
 
   # if gzstreams are used, we need the 
   # header path and the lib
-  libmesh_LIBS    += @GZSTREAM_LIB@
+  #libmesh_LIBS    += @GZSTREAM_LIB@
   libmesh_INCLUDE += @GZSTREAM_INCLUDE@
 
   # if Tecplot is used, link against tecio.a

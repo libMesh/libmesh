@@ -29,7 +29,6 @@ AC_CANONICAL_TARGET
 
 AC_CONFIG_FILES([Make.common
                  Makefile
-	         src/Makefile
 		 include/Makefile])
 		 
 AC_CONFIG_FILES([contrib/gmv/Makefile
@@ -892,12 +891,6 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl Compressed Streams with gzstream -- enabled by default
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(gzstreams,
-              AC_HELP_STRING([--enable-gzstreams],
-                             [build with gzstreams compressed I/O suppport]),
-              enablegz=$enableval,
-              enablegz=yes)
-
 CONFIGURE_GZ
 dnl -------------------------------------------------------------
 
@@ -1046,6 +1039,7 @@ dnl -------------------------------------------------------------
 dnl GMV -- file I/O API is enabled by default (it is distributed in contrib)
 dnl -------------------------------------------------------------
 CONFIGURE_GMV
+AM_CONDITIONAL(ENABLE_GMV, test x$enablegmv = xtrue)
 dnl -------------------------------------------------------------
 
 
@@ -1114,12 +1108,6 @@ CONFIGURE_NETCDF
      dnl Nemesis -- enabled by default (it is distributed in contrib)
      dnl (note that Nemesis requires netCDF and exodus)
      dnl -------------------------------------------------------------
-     AC_ARG_ENABLE(nemesis,
-	           AC_HELP_STRING([--enable-nemesis],
-        	   [build with Nemesis API support]),
-                   enablenemesis=$enableval,
-                   enablenemesis=yes)
-
      if (test "$enableexodus" != no -a "$have_netcdf" = yes -a "$enablenemesis" != no ) ; then
        CONFIGURE_NEMESIS
      fi

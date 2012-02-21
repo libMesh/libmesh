@@ -2,6 +2,9 @@ include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
+SUBDIRS =           # none, append below
+libmesh_la_LIBADD = # none, append below
+
 AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
@@ -372,27 +375,38 @@ libmesh_la_SOURCES = \
 # add contributed libraries that are conditionally compiled
 
 if ENABLE_GMV
-  libmesh_la_LIBADD = contrib/gmv/libgmv.la
+  SUBDIRS += contrib/gmv
+  libmesh_la_LIBADD += ../contrib/gmv/libgmv.la
 endif
 
 if ENABLE_NETCDF
-  libmesh_la_LIBADD = contrib/netcdf/Lib/libnetcdf.la
+  SUBDIRS += contrib/netcdf/Lib
+  libmesh_la_LIBADD += contrib/netcdf/Lib/libnetcdf.la
 endif
 
 if ENABLE_EXODUS
-  libmesh_la_LIBADD = contrib/exodusii/Lib/libexodusII.la
+  SUBDIRS += ../contrib/exodusii/Lib
+  libmesh_la_LIBADD += contrib/exodusii/Lib/libexodusII.la
 endif
 
 if ENABLE_NEMESIS
-  libmesh_la_LIBADD = contrib/nemesis/Lib/libnemesis.la
+  SUBDIRS += ../contrib/nemesis/Lib
+  libmesh_la_LIBADD += contrib/nemesis/Lib/libnemesis.la
 endif
 
 if ENABLE_TRIANGLE
-  libmesh_la_LIBADD = contrib/triangle/libtriangle.la
+  SUBDIRS += ../contrib/triangle
+  libmesh_la_LIBADD += contrib/triangle/libtriangle.la
 endif
 
 if ENABLE_TETGEN
-  libmesh_la_LIBADD = contrib/tetgen/libtetgen.la
+  SUBDIRS += ../contrib/tetgen
+  libmesh_la_LIBADD += contrib/tetgen/libtetgen.la
+endif
+
+if ENABLE_LIBHILBERT
+  SUBDIRS += ../contrib/libHilbert
+  libmesh_la_LIBADD += ../contrib/libHilbert/libHilbert.la
 endif
 
 
