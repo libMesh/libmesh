@@ -149,7 +149,7 @@ void System::read_header (Xdr& io,
 
 	// 6.1.)
 	std::set<subdomain_id_type> domains;
-	if (io.version() >= LIBMESH_VERSION(0,7,2))
+	if (io.version() >= LIBMESH_VERSION_ID(0,7,2))
 	{
 	  std::vector<subdomain_id_type> domain_array;
 	  if (libMesh::processor_id() == 0) io.data (domain_array);
