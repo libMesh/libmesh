@@ -6,6 +6,12 @@ dnl --------------------------------------------------------------
 
 AC_INIT([libmesh], [0.7.3rc1], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
 
+# by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
+# this causes a problem if we then declare a different optimization level. So
+# default them to empty, regardless of what the system supports.
+: ${CFLAGS=""}
+: ${CXXFLAGS=""}
+
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----------- Configuring libMesh -------------)
 AC_MSG_RESULT(---------------------------------------------)
@@ -13,6 +19,7 @@ AC_MSG_RESULT(---------------------------------------------)
 AC_REVISION($Revision$)
 
 AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl --------------------------------------------------------------
 dnl Compute the canonical target system type variable "target", and its
@@ -22,6 +29,7 @@ AC_CANONICAL_TARGET
 
 AC_CONFIG_FILES([Makefile src/Makefile include/Makefile])
 AC_CONFIG_FILES([Make.common])
+
 AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
@@ -1202,16 +1210,18 @@ AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 dnl -------------------------------------------------------------
 
+# Query configuration environment
+AX_SUMMARIZE_ENV
+
 
 AC_OUTPUT
+
+# Final summary
+AX_SUMMARIZE_CONFIG
+
 
 
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(--------- Done Configuring libMesh ----------)
 AC_MSG_RESULT(---------------------------------------------)
 # rm -f -r conftest* config.cache include/base/libmesh_config.h.tmp
-
-
-dnl Local Variables:
-dnl mode: m4
-dnl End:
