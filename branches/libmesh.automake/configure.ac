@@ -4,7 +4,7 @@ dnl --------------------------------------------------------------
 
 
 
-AC_INIT([fins], [0.14.pre], [benjamin.kirk@nasa.gov], [fins], [https://red.ices.utexas.edu/projects/fins])
+AC_INIT([libmesh], [0.7.3rc1], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
 
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----------- Configuring libMesh -------------)
