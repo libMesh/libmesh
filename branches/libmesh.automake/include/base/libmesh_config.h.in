@@ -1,4 +1,4 @@
-/* include/base/libmesh_config.h.in.  Generated from configure.in by autoheader.  */
+/* include/base/libmesh_config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* definition of the final detected unordered_map type */
 #undef BEST_UNORDERED_MAP
@@ -318,6 +318,13 @@
 /* header file for the final detected unordered_set type */
 #undef INCLUDE_UNORDERED_SET
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
+/* Name of package */
+#undef PACKAGE
+
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
@@ -374,6 +381,9 @@
 
 /* Flag indicating if the library should be built using real numbers */
 #undef USE_REAL_NUMBERS
+
+/* Version number of package */
+#undef VERSION
 
 /* Define to the equivalent of the C99 'restrict' keyword, or to
    nothing if this is not supported.  Do not define if restrict is

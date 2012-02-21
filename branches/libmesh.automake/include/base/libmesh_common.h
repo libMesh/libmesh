@@ -384,7 +384,7 @@ template<class T> inline void libmesh_ignore( const T& ) { }
 
 
 // build a integer representation of version
-#define LIBMESH_VERSION(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))
+#define LIBMESH_VERSION_ID(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))
 
 } // namespace libMesh
 

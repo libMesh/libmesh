@@ -284,21 +284,21 @@ libmesh_LIBS += $(mesh_library)
 
 #
 # The include directories for libMesh
-libmesh_INCLUDE += -I$(libmesh_dir)/include/base \
-                   -I$(libmesh_dir)/include/enums \
-                   -I$(libmesh_dir)/include/error_estimation \
-                   -I$(libmesh_dir)/include/fe \
-                   -I$(libmesh_dir)/include/geom \
-                   -I$(libmesh_dir)/include/mesh \
-                   -I$(libmesh_dir)/include/numerics \
-                   -I$(libmesh_dir)/include/parallel \
-                   -I$(libmesh_dir)/include/partitioning \
-                   -I$(libmesh_dir)/include/physics \
-                   -I$(libmesh_dir)/include/quadrature \
-                   -I$(libmesh_dir)/include/reduced_basis \
-                   -I$(libmesh_dir)/include/solvers \
-                   -I$(libmesh_dir)/include/systems \
-                   -I$(libmesh_dir)/include/utils
+libmesh_INCLUDE += -I$(top_srcdir)/include/base \
+                   -I$(top_srcdir)/include/enums \
+                   -I$(top_srcdir)/include/error_estimation \
+                   -I$(top_srcdir)/include/fe \
+                   -I$(top_srcdir)/include/geom \
+                   -I$(top_srcdir)/include/mesh \
+                   -I$(top_srcdir)/include/numerics \
+                   -I$(top_srcdir)/include/parallel \
+                   -I$(top_srcdir)/include/partitioning \
+                   -I$(top_srcdir)/include/physics \
+                   -I$(top_srcdir)/include/quadrature \
+                   -I$(top_srcdir)/include/reduced_basis \
+                   -I$(top_srcdir)/include/solvers \
+                   -I$(top_srcdir)/include/systems \
+                   -I$(top_srcdir)/include/utils
 
 
 
@@ -448,7 +448,7 @@ ifeq ($(enable-optional),yes)
           libmesh_INCLUDE += $(NOX_INCLUDES)
           libmesh_CPPFLAGS     += -DHAVE_CONFIG_H
       endif
-      
+
       # ML, an additional option if AztecOO is present
       ifeq ($(enable-ml),yes)
           include @ML_MAKEFILE_EXPORT@

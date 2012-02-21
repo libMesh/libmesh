@@ -1,4 +1,5 @@
 #! /bin/sh
+# $Id: bootstrap 469 2008-09-05 00:16:18Z rhys $
 #
 # bootstrap: Utility to easy autoconf/automake toolchain setup on
 #            checkout from revision control.
@@ -31,14 +32,23 @@ fi
 
 rm -f config.cache acconfig.h
 
-echo "- aclocal."             && \
+echo "- aclocal. (local)"     && \
 aclocal -I m4                 && \
-echo "- autoconf."            && \
-autoconf                      && \
 echo "- autoheader."          && \
 autoheader                    && \
-#echo "- automake."            && \
-#automake --add-missing --copy && \
+
+if type glibtoolize >/dev/null 2>&1; then
+    echo "- glibtool."
+    glibtoolize --automake --copy --force
+else
+    echo "- libtool."
+    libtoolize --automake --copy --force
+fi
+
+echo "- automake."            && \
+automake --add-missing --copy && \
+echo "- autoconf."            && \
+autoconf                      && \
 exit 0
 
 exit 1

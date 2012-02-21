@@ -1,32 +1,27 @@
-dnl Process this file with autoconf to produce a configure script.
+dnl --------------------------------------------------------------
+dnl $Id$
+dnl --------------------------------------------------------------
 
 
-dnl switch off caching, since that leads to insurmountable trouble if
-dnl you call ./configure subsequently on different systems without
-dnl clearing the cache 
-define([AC_CACHE_LOAD], )dnl
-define([AC_CACHE_SAVE], )dnl
 
-dnl Copy revision stamp revision-info into the configure script, with any
-dnl dollar signs or double-quotes removed. This macro lets you put a
-dnl revision stamp from `configure.ac' into configure without RCS or cvs
-dnl changing it when you check in configure. That way, you can determine
-dnl easily which revision of `configure.ac' a particular configure
-dnl corresponds to.
-dnl
-dnl For example, this line in `configure.ac':
-dnl
-dnl AC_REVISION($Revision$)
-dnl produces this in configure:
-dnl 
-dnl #! /bin/sh
-dnl # From configure.ac Revision: 1.30
-dnl
-dnl AC_REVISION($Revision$)
+AC_INIT([fins], [0.14.pre], [benjamin.kirk@nasa.gov], [fins], [https://red.ices.utexas.edu/projects/fins])
 
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(----------- Configuring libMesh -------------)
+AC_MSG_RESULT(---------------------------------------------)
 
-AC_INIT
-AC_CONFIG_FILES(Make.common)
+AC_REVISION($Revision$)
+
+AC_CONFIG_AUX_DIR([build-aux])
+
+dnl --------------------------------------------------------------
+dnl Compute the canonical target system type variable "target", and its
+dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
+dnl --------------------------------------------------------------
+AC_CANONICAL_TARGET
+
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile])
+AC_CONFIG_FILES([Make.common])
 AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
@@ -37,9 +32,10 @@ AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h
 dnl Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
 AX_PREFIX_CONFIG_H(include/base/libmesh_config.h,LIBMESH,include/base/libmesh_config.h.tmp)
 
-AC_MSG_RESULT(---------------------------------------------)
-AC_MSG_RESULT(----------- Configuring libMesh -------------)
-AC_MSG_RESULT(---------------------------------------------)
+AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
+
+
 
 
 dnl --------------------------------------------------------------
@@ -48,16 +44,10 @@ dnl --------------------------------------------------------------
 AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 run on `date`"], [Configuration information.])	
 
 dnl --------------------------------------------------------------
-dnl Compute the canonical target system type variable "target", and its
-dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
-dnl --------------------------------------------------------------
-AC_CANONICAL_TARGET
-
-dnl --------------------------------------------------------------
 dnl Do compilation tests using the compiler, preprocessor, and file extensions
 dnl of C++.  This uses the .C extension for test programs.
 dnl --------------------------------------------------------------
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 
 
 
@@ -161,6 +151,7 @@ dnl --------------------------------------------------------------
 AC_PROG_F77([$F77_TRY_LIST])
 dnl --------------------------------------------------------------
 
+AC_PROG_LIBTOOL
 
 dnl --------------------------------------------------------------
 dnl Real precision - double by default
@@ -588,25 +579,6 @@ elif test "$enable1D" != no ; then
   AC_MSG_RESULT(<<< Configuring library for 1D meshes only >>>)
 fi
 dnl -------------------------------------------------------------
-
-
-dnl dnl -------------------------------------------------------------
-dnl dnl Expensive Data Structures -- enabled by default
-dnl dnl -------------------------------------------------------------
-dnl AC_ARG_ENABLE(expensive,
-dnl               AC_HELP_STRING([--enable-expensive],
-dnl                              [build with expensive data structures]),
-dnl               enableexpensive=$enableval,
-dnl               enableexpensive=yes)
-dnl 
-dnl if test "$enableexpensive" != no ; then
-dnl   AC_DEFINE(ENABLE_EXPENSIVE_DATA_STRUCTURES, 1,
-dnl            [Flag indicating if the library should be built with expensive data structures])
-dnl   AC_MSG_RESULT(<<< Configuring library with expensive data structures enabled >>>)
-dnl else
-dnl   AC_MSG_RESULT(<<< Configuring library with lightweight data structures >>>)
-dnl fi
-dnl dnl -------------------------------------------------------------
 
 
 
@@ -1201,7 +1173,7 @@ else
    enablegmv=no
    enablevtk=no
    enableexodus=no
-   enablenetcdf=no
+    enablenetcdf=no
    enablenemesis=no
    enablelibhilbert=no
    dnl -----------------
@@ -1237,7 +1209,7 @@ AC_OUTPUT
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(--------- Done Configuring libMesh ----------)
 AC_MSG_RESULT(---------------------------------------------)
-rm -f -r conftest* config.cache include/base/libmesh_config.h.tmp
+# rm -f -r conftest* config.cache include/base/libmesh_config.h.tmp
 
 
 dnl Local Variables:
