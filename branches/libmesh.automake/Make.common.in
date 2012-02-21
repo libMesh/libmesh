@@ -26,7 +26,7 @@ libmesh_CC            = @CC@
 libmesh_F77           = @F77@
 libmesh_F90           = @FC@
 libmesh_LDFLAGS       = @LDFLAGS@
-libmesh_DLFLAGS       =
+#libmesh_DLFLAGS       =
 libmesh_LIBS          = @LIBS@
 libmesh_FLIBS         = @FLIBS@
 libmesh_FFLAGS        = @FFLAGS@
@@ -271,10 +271,10 @@ mesh_library_dir := $(libmesh_dir)/lib/$(hosttype)_$(METHOD)
 mesh_library     := $(mesh_library_dir)/libmesh$(static_libext)
 ifeq ($(enable-shared),yes) 
   mesh_library   := $(mesh_library_dir)/libmesh$(shared_libext)
-  libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(mesh_library_dir)
+#  libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(mesh_library_dir)
 endif
 
-libmesh_LIBS += $(mesh_library)
+#libmesh_LIBS += $(mesh_library)
 ###############################################################################
 
 
@@ -308,9 +308,9 @@ libmesh_INCLUDE += -I$(top_srcdir)/include/base \
 #
 # Contributed source & libraries
 EXTERNAL_LIBDIR := $(libmesh_dir)/contrib/lib/$(hosttype)_$(METHOD)
-ifeq ($(enable-shared),yes) 
-  libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR)
-endif
+# ifeq ($(enable-shared),yes) 
+#   libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR)
+# endif
 
 
 # # Include path for local boost header files.  Note, this
@@ -489,7 +489,7 @@ ifeq ($(enable-optional),yes)
 
     libmesh_LIBS += $(libs-SLEPC) $(ARPACK_LIB)
 
-    libmesh_DLFLAGS += $(SLEPC_LIB)
+    # libmesh_DLFLAGS += $(SLEPC_LIB)
 
   endif #end ifeq ($(enable-slepc),yes)
 
@@ -547,7 +547,7 @@ ifeq ($(enable-optional),yes)
 
     ifeq ($(enable-shared),yes)
       libmesh_CPPFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
-      libmesh_DLFLAGS      += $(libmesh_RPATHFLAG)$(PETSC_LIB)
+      # libmesh_DLFLAGS      += $(libmesh_RPATHFLAG)$(PETSC_LIB)
     endif
 
     # Get required PETSc link options from their variables
@@ -571,8 +571,8 @@ ifeq ($(enable-optional),yes)
 endif # End of disable-optional test
 
 
-# Finally, Append the linker flags to the libraries
-libmesh_LIBS += $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
+# # Finally, Append the linker flags to the libraries
+# libmesh_LIBS += $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
 
 
 ###############################################################################

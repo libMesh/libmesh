@@ -27,8 +27,10 @@ dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
 dnl --------------------------------------------------------------
 AC_CANONICAL_TARGET
 
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile])
-AC_CONFIG_FILES([Make.common])
+AC_CONFIG_FILES([Make.common
+                 Makefile
+	         src/Makefile
+		 include/Makefile])
 
 AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])

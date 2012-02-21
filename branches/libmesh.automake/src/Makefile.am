@@ -2,6 +2,8 @@ include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
+AM_CPPFLAGS = $(libmesh_CPPFLAGS)
+AM_CFLAGS   = $(libmesh_CFLAGS
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 INCLUDES = $(libmesh_INCLUDE)
@@ -365,3 +367,9 @@ libmesh_la_SOURCES = \
 		utils/tree_node.C \
 		utils/utility.C \
 		utils/xdr_cxx.C 
+
+
+bin_PROGRAMS = meshtool
+
+meshtool_SOURCES = apps/meshtool.C
+meshtool_LDADD   = libmesh.la $(libmesh_LIBS)
