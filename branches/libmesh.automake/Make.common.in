@@ -365,7 +365,7 @@ ifeq ($(enable-optional),yes)
   libmesh_INCLUDE += @TECPLOT_INCLUDE@
 
   # Link against the GMV APIs to read/write GMV files
-  libmesh_LIBS    += @GMV_LIBRARY@
+  #libmesh_LIBS    += @GMV_LIBRARY@
   libmesh_INCLUDE += @GMV_INCLUDE@
 
   # Link against the VTK APIs to read/write VTK files
@@ -400,7 +400,7 @@ ifeq ($(enable-optional),yes)
   # if Exodus is used we need the header path
   # and the lib
   ifeq ($(enable-exodus),yes)
-    libmesh_LIBS    += @EXODUS_LIBRARY@
+    #libmesh_LIBS    += @EXODUS_LIBRARY@
     libmesh_INCLUDE += @EXODUS_INCLUDE@
   endif
 
@@ -408,7 +408,7 @@ ifeq ($(enable-optional),yes)
   # (note that netCDF is required by exodus if available,
   # so we need to link to this _after_ exodus.
   ifeq ($(enable-netcdf),yes)
-    libmesh_LIBS    += @NETCDF_LIBRARY@
+    #libmesh_LIBS    += @NETCDF_LIBRARY@
     libmesh_INCLUDE += @NETCDF_INCLUDE@
   endif
 

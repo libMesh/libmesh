@@ -1,23 +1,35 @@
 dnl -------------------------------------------------------------
-dnl Nemesis
+dnl nemesis
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_NEMESIS], 
 [
-dnl Nemesis is distributed with libmesh, so we don't have to guess
-dnl where it might be installed...
+  AC_ARG_ENABLE(nemesis,
+                AC_HELP_STRING([--enable-nemesis],
+                               [build with NemesisII API support]),
+		[case "${enableval}" in
+		  yes)  enablenemesis=yes ;;
+		   no)  enablenemesis=no ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis) ;;
+		 esac],
+		 [enablenemesis=yes])
 
-  if (test $enablenetcdf = yes -a $enableexodus = yes -a $enablenemesis = yes); then
+
+		 
+  AM_CONDITIONAL(ENABLE_NEMESIS, test x$enablenemesis = xtrue)
+		
+  dnl The NEMESIS API is distributed with libmesh, so we don't have to guess
+  dnl where it might be installed...
+  if (test $enablenemesis = yes); then
      NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/Lib"
-     NEMESIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libnemesis\$(libext)"
-     AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
-     AC_MSG_RESULT(<<< Configuring library with Nemesis API support >>>)
+     AC_DEFINE(HAVE_NEMESIS, 1, [Flag indicating whether the library will be compiled with Nemesis support])
+     AC_MSG_RESULT(<<< Configuring library with Nemesis support >>>)
+     have_nemesis=yes
   else
      NEMESIS_INCLUDE=""
-     NEMESIS_LIBRARY=""
      enablenemesis=no
+     have_nemesis=no
   fi
 
   AC_SUBST(NEMESIS_INCLUDE)
-  AC_SUBST(NEMESIS_LIBRARY)	
   AC_SUBST(enablenemesis)
 ])

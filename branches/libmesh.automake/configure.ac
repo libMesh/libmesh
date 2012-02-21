@@ -31,6 +31,13 @@ AC_CONFIG_FILES([Make.common
                  Makefile
 	         src/Makefile
 		 include/Makefile])
+		 
+AC_CONFIG_FILES([contrib/gmv/Makefile
+	         contrib/netcdf/Lib/Makefile
+	         contrib/exodusii/Lib/Makefile
+	         contrib/nemesis/Lib/Makefile
+		 ])
+
 
 AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
@@ -1045,12 +1052,6 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl GMV -- file I/O API is enabled by default (it is distributed in contrib)
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(gmv,
-              AC_HELP_STRING([--enable-gmv],
-                             [build with GMV file I/O support]),
-              enablegmv=$enableval,
-              enablegmv=yes)
-
 CONFIGURE_GMV
 dnl -------------------------------------------------------------
 
@@ -1099,14 +1100,7 @@ dnl -------------------------------------------------------------
 dnl --------------------------------------------------------------
 dnl netCDF -- enabled by default (it is distributed in contrib)
 dnl --------------------------------------------------------------
-AC_ARG_ENABLE(netcdf,
-              AC_HELP_STRING([--enable-netcdf],
-                             [build with netCDF binary I/O]),
-              enablenetcdf=$enableval,
-              enablenetcdf=yes)
-
-if (test "$enablenetcdf" != no) ; then
-   CONFIGURE_NETCDF
+CONFIGURE_NETCDF
 
    dnl -------------------------------------------------------------
    dnl ExodusII -- enabled by default (it is distributed in contrib)
@@ -1136,9 +1130,10 @@ if (test "$enablenetcdf" != no) ; then
      fi
    fi
    dnl -------------------------------------------------------------
-fi
-dnl -------------------------------------------------------------
 
+
+
+   
 dnl -------------------------------------------------------------
 dnl libHilbert -- distributed in ./contrib,
 dnl               enabled by default

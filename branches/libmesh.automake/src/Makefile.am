@@ -3,7 +3,7 @@ include $(top_builddir)/Make.common
 AUTOMAKE_OPTIONS = subdir-objects 
 
 AM_CPPFLAGS = $(libmesh_CPPFLAGS)
-AM_CFLAGS   = $(libmesh_CFLAGS
+AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 INCLUDES = $(libmesh_INCLUDE)
@@ -367,6 +367,31 @@ libmesh_la_SOURCES = \
 		utils/tree_node.C \
 		utils/utility.C \
 		utils/xdr_cxx.C 
+
+###########################################################
+# add contributed libraries that are conditionally compiled
+
+if ENABLE_GMV
+  libmesh_la_LIBADD = contrib/gmv/libgmv.la
+endif
+
+if ENABLE_NETCDF
+  libmesh_la_LIBADD = contrib/netcdf/Lib/libnetcdf.la
+endif
+
+if ENABLE_EXODUS
+  libmesh_la_LIBADD = contrib/exodusii/Lib/libexodusII.la
+endif
+
+if ENABLE_NEMESIS
+  libmesh_la_LIBADD = contrib/nemesis/Lib/libnemesis.la
+endif
+
+
+###########################################################
+
+
+
 
 
 bin_PROGRAMS = meshtool

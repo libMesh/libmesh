@@ -136,7 +136,7 @@
 #undef HAVE_EIGEN
 
 /* Flag indicating whether the library will be compiled with Exodus support */
-#undef HAVE_EXODUS_API
+#undef HAVE_EXODUS
 
 /* define if the compiler supports __gnu_cxx::hash_map */
 #undef HAVE_EXT_HASH_MAP
@@ -212,7 +212,7 @@
 
 /* Flag indicating whether the library will be compiled with Nemesis support
    */
-#undef HAVE_NEMESIS_API
+#undef HAVE_NEMESIS
 
 /* Flag indicating whether the library will be compiled with Netcdf support */
 #undef HAVE_NETCDF
