@@ -387,13 +387,13 @@ ifeq ($(enable-optional),yes)
 
   # if TetGen is used:
   ifeq ($(enable-tetgen),yes)
-    libmesh_LIBS     += @TETGEN_LIBRARY@
+    #libmesh_LIBS     += @TETGEN_LIBRARY@
     libmesh_INCLUDE  += @TETGEN_INCLUDE@
   endif
 
   # if Triangle is used:
   ifeq ($(enable-triangle),yes)
-    libmesh_LIBS     += @TRIANGLE_LIBRARY@
+    #libmesh_LIBS     += @TRIANGLE_LIBRARY@
     libmesh_INCLUDE  += @TRIANGLE_INCLUDE@
   endif
 
@@ -415,14 +415,14 @@ ifeq ($(enable-optional),yes)
   # if Nemesis is used we need the header path
   # and the lib
   ifeq ($(enable-nemesis),yes)
-    libmesh_LIBS    += @NEMESIS_LIBRARY@
+    #libmesh_LIBS    += @NEMESIS_LIBRARY@
     libmesh_INCLUDE += @NEMESIS_INCLUDE@
   endif
 
   # if libHilbert is used we need the header path
   # and the lib
   ifeq ($(enable-libhilbert),yes)
-    libmesh_LIBS    += @LIBHILBERT_LIBRARY@
+    #libmesh_LIBS    += @LIBHILBERT_LIBRARY@
     libmesh_INCLUDE += @LIBHILBERT_INCLUDE@
   endif
 

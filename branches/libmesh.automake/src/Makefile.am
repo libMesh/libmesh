@@ -387,6 +387,14 @@ if ENABLE_NEMESIS
   libmesh_la_LIBADD = contrib/nemesis/Lib/libnemesis.la
 endif
 
+if ENABLE_TRIANGLE
+  libmesh_la_LIBADD = contrib/triangle/libtriangle.la
+endif
+
+if ENABLE_TETGEN
+  libmesh_la_LIBADD = contrib/tetgen/libtetgen.la
+endif
+
 
 ###########################################################
 

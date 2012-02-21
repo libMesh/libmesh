@@ -33,9 +33,12 @@ AC_CONFIG_FILES([Make.common
 		 include/Makefile])
 		 
 AC_CONFIG_FILES([contrib/gmv/Makefile
+	         contrib/triangle/Makefile
+	         contrib/tetgen/Makefile
 	         contrib/netcdf/Lib/Makefile
 	         contrib/exodusii/Lib/Makefile
 	         contrib/nemesis/Lib/Makefile
+	         contrib/libHilbert/Makefile
 		 ])
 
 
@@ -1026,12 +1029,6 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl TetGen -- enabled by default
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(tetgen,
-              AC_HELP_STRING([--enable-tetgen],
-                             [build with TetGen tetrahedrization library support]),
-              enabletetgen=$enableval,
-              enabletetgen=yes)
-
 CONFIGURE_TETGEN
 dnl -------------------------------------------------------------
 
@@ -1040,20 +1037,18 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl Triangle -- enabled by default (it is distributed in contrib)
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(triangle,
-              AC_HELP_STRING([--enable-triangle],
-                             [build with Triangle Delaunay triangulation library support]),
-              enabletriangle=$enableval,
-              enabletriangle=yes)
-
 CONFIGURE_TRIANGLE
 dnl -------------------------------------------------------------
+
+
 
 dnl -------------------------------------------------------------
 dnl GMV -- file I/O API is enabled by default (it is distributed in contrib)
 dnl -------------------------------------------------------------
 CONFIGURE_GMV
 dnl -------------------------------------------------------------
+
+
 
 dnl -------------------------------------------------------------
 dnl VTK -- Mesh I/O API is enabled by default
@@ -1138,14 +1133,9 @@ dnl -------------------------------------------------------------
 dnl libHilbert -- distributed in ./contrib,
 dnl               enabled by default
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(libHilbert,
-              AC_HELP_STRING([--enable-libHilbert],
-                             [build with libHilbert by Chris Hamilton]),
-              enablelibhilbert=$enableval,
-              enablelibhilbert=yes)
-
 CONFIGURE_LIBHILBERT
 dnl -------------------------------------------------------------
+
 
 dnl -------------------------------------------------------------
 dnl fparser -- distributed in ./contrib,

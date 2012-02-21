@@ -292,7 +292,7 @@
    interface */
 #undef HAVE_TECPLOT_API
 
-/* Flag indicating whether the library will be compiled with TetGen support */
+/* Flag indicating whether the library will be compiled with Tetgen support */
 #undef HAVE_TETGEN
 
 /* define if the compiler supports std::tr1::unordered_map */
