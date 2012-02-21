@@ -320,34 +320,34 @@ dnl  be augmented)
 dnl -------------------------------------------------------------
 AC_DEFUN([SET_CXX_FLAGS], dnl
 [
-  dnl Flag for creating shared objects; can be modified at a later stage
-  case "$target_os" in
-    *darwin*)
-      if test "$enableshared" = yes ; then
-        CXXFLAGS_OPT="-fno-common"
-        CXXFLAGS_DVL="-fno-common"
-        CXXFLAGS_DBG="-fno-common"
-        LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
-        if test $APPLE_GCC = true ; then
-          case "$GXX_VERSION_STRING" in
-            *4.0.* | *3.4.* | *3.3.* | *3.2.* | *3.1.* | *3.0.* | *2.97* | *2.96* | *2.95* | *"egcs-1.1"*)
-              CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
-              ;;
-            *)
-              CXXSHAREDFLAG="-ldylib1.o -dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace,-no_compact_linkedit"
-              ;;
-            *)
-          esac
-        else
-          CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
-        fi
-        CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
-      fi
-      ;;
-    *)  
-      CXXSHAREDFLAG="-shared"
-      ;;
-  esac
+  # dnl Flag for creating shared objects; can be modified at a later stage
+  # case "$target_os" in
+  #   *darwin*)
+  #     if test "$enableshared" = yes ; then
+  #       CXXFLAGS_OPT="-fno-common"
+  #       CXXFLAGS_DVL="-fno-common"
+  #       CXXFLAGS_DBG="-fno-common"
+  #       LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
+  #       if test $APPLE_GCC = true ; then
+  #         case "$GXX_VERSION_STRING" in
+  #           *4.0.* | *3.4.* | *3.3.* | *3.2.* | *3.1.* | *3.0.* | *2.97* | *2.96* | *2.95* | *"egcs-1.1"*)
+  #             CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+  #             ;;
+  #           *)
+  #             CXXSHAREDFLAG="-ldylib1.o -dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace,-no_compact_linkedit"
+  #             ;;
+  #           *)
+  #         esac
+  #       else
+  #         CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+  #       fi
+  #       CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
+  #     fi
+  #     ;;
+  #   *)  
+  #     CXXSHAREDFLAG="-shared"
+  #     ;;
+  # esac
 
   dnl Flag to add directories to the dynamic library search path; can
   dnl be changed at a later stage
@@ -372,18 +372,18 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
     CFLAGS_DVL="$CFLAGS_OPT -g -Wimplicit"
     CFLAGS_DBG="-g -Wimplicit"
 
-    dnl Position-independent code for shared libraries
-    if test "$enableshared" = yes ; then
-      CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
-      CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
-      CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
+    # dnl Position-independent code for shared libraries
+    # if test "$enableshared" = yes ; then
+    #   CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
+    #   CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
+    #   CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
 
-      CFLAGS_OPT="$CFLAGS_OPT -fPIC"
-      CFLAGS_DVL="$CFLAGS_DVL -fPIC"
-      CFLAGS_DBG="$CFLAGS_DBG -fPIC"
+    #   CFLAGS_OPT="$CFLAGS_OPT -fPIC"
+    #   CFLAGS_DVL="$CFLAGS_DVL -fPIC"
+    #   CFLAGS_DBG="$CFLAGS_DBG -fPIC"
 
-      FFLAGS="$FFLAGS -fPIC"
-    fi
+    #   FFLAGS="$FFLAGS -fPIC"
+    # fi
 
     dnl set some flags that are specific to some versions of the
     dnl compiler:
@@ -473,9 +473,9 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
           CFLAGS_DBG="-qansialias -g"
           CFLAGS_DVL="$CFLAGS_DBG"
-	  CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
-	  CSHAREDFLAG="-G -qmkshrobj"
-	  RPATHFLAG="-Qoption,link,-rpath,"
+	  # CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
+	  # CSHAREDFLAG="-G -qmkshrobj"
+	  # RPATHFLAG="-Qoption,link,-rpath,"
           ;;
   
       MIPSpro)
@@ -491,20 +491,20 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           dnl linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
 
-          dnl Position-independent code for shared libraries
-          if test "$enableshared" = yes ; then
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+          # dnl Position-independent code for shared libraries
+          # if test "$enableshared" = yes ; then
+          #   CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+          #   CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+          #   CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+          #   CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+          #   CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+          #   CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
-            FFLAGS="$FFLAGS -KPIC"
+          #   FFLAGS="$FFLAGS -KPIC"
 
-            LDFLAGS="$LDFLAGS -KPIC"
-          fi
+          #   LDFLAGS="$LDFLAGS -KPIC"
+          # fi
 
 	  dnl Augment CXXFLAGS to include -LANG:std if not there.  This is
           dnl needed to compile the remaining configure tests
@@ -679,41 +679,41 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
               ;;
         esac
 
-        dnl Position-independent code for shared libraries
-        if test "$enableshared" = yes ; then
+        # dnl Position-independent code for shared libraries
+        # if test "$enableshared" = yes ; then
 	        
-          dnl Specific flags for specific versions
-          case "$GXX_VERSION" in
+        #   dnl Specific flags for specific versions
+        #   case "$GXX_VERSION" in
 
-            dnl Intel ICC >= 10.0	
-            intel_*_v1?.*)
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
-              CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
+        #     dnl Intel ICC >= 10.0	
+        #     intel_*_v1?.*)
+        #       CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
+        #       CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
+        #       CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
         
-              CFLAGS_OPT="$CFLAGS_OPT -fPIC"
-              CFLAGS_DBG="$CFLAGS_DBG -fPIC"
-              CFLAGS_DVL="$CFLAGS_DVL -fPIC"
+        #       CFLAGS_OPT="$CFLAGS_OPT -fPIC"
+        #       CFLAGS_DBG="$CFLAGS_DBG -fPIC"
+        #       CFLAGS_DVL="$CFLAGS_DVL -fPIC"
 
-              FFLAGS="$FFLAGS -fPIC"
+        #       FFLAGS="$FFLAGS -fPIC"
 
-              LDFLAGS="$LDFLAGS -fPIC"
-	      ;;
-	    *)
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-              CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+        #       LDFLAGS="$LDFLAGS -fPIC"
+	#       ;;
+	#     *)
+        #       CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+        #       CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+        #       CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
         
-              CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-              CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-              CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+        #       CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+        #       CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+        #       CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
-	      FFLAGS="$FFLAGS -KPIC"
+	#       FFLAGS="$FFLAGS -KPIC"
 
-              LDFLAGS="$LDFLAGS -KPIC"
-	      ;;
-          esac
-        fi
+        #       LDFLAGS="$LDFLAGS -KPIC"
+	#       ;;
+        #   esac
+        # fi
       ;;
   
       compaq_cxx)
@@ -776,18 +776,18 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           LDFLAGS="$LDFLAGS -lm"
 
 
-          dnl Position-independent code for shared libraries
-          if test "$enableshared" = yes ; then
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -shared"
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -shared"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -shared"
+          # dnl Position-independent code for shared libraries
+          # if test "$enableshared" = yes ; then
+          #   CXXFLAGS_OPT="$CXXFLAGS_OPT -shared"
+          #   CXXFLAGS_DBG="$CXXFLAGS_DBG -shared"
+          #   CXXFLAGS_DVL="$CXXFLAGS_DVL -shared"
 
-            CFLAGS_OPT="$CFLAGS_OPT -shared"
-            CFLAGS_DBG="$CFLAGS_DBG -shared"
-            CFLAGS_DVL="$CFLAGS_DVL -shared"
+          #   CFLAGS_OPT="$CFLAGS_OPT -shared"
+          #   CFLAGS_DBG="$CFLAGS_DBG -shared"
+          #   CFLAGS_DVL="$CFLAGS_DVL -shared"
 
-            LDFLAGS="$LDFLAGS -shared"
-          fi
+          #   LDFLAGS="$LDFLAGS -shared"
+          # fi
           ;;
   
       sun_studio | sun_forte)
@@ -799,27 +799,27 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
           CFLAGS_OPT="-xO4"
           CFLAGS_DVL="$CFLAGS_DBG"
 
-          CXXSHAREDFLAG="-G"
-          CSHAREDFLAG="-G"
+          # CXXSHAREDFLAG="-G"
+          # CSHAREDFLAG="-G"
 
-          dnl Linker flags & librpcsvc for XDR
-          RPATHFLAG="-R"
+          # dnl Linker flags & librpcsvc for XDR
+          # RPATHFLAG="-R"
           LIBS="-lrpcsvc $LIBS"
 
-          dnl Position-independent code for shared libraries
-          if test "$enableshared" = yes ; then
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+          # dnl Position-independent code for shared libraries
+          # if test "$enableshared" = yes ; then
+          #   CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
+          #   CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
+          #   CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
 
-            CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-            CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-            CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+          #   CFLAGS_OPT="$CFLAGS_OPT -KPIC"
+          #   CFLAGS_DBG="$CFLAGS_DBG -KPIC"
+          #   CFLAGS_DVL="$CFLAGS_DVL -KPIC"
 
-	    FFLAGS="$FFLAGS -KPIC"
+	  #   FFLAGS="$FFLAGS -KPIC"
 
-            LDFLAGS="$LDFLAGS -KPIC"
-          fi
+          #   LDFLAGS="$LDFLAGS -KPIC"
+          # fi
           ;;
   
       portland_group)
@@ -840,27 +840,27 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
             CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
           fi
 
-          dnl Position-independent code for shared libraries
-          if test "$enableshared" = yes ; then
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -fpic"
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -fpic"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -fpic"
+          # dnl Position-independent code for shared libraries
+          # if test "$enableshared" = yes ; then
+          #   CXXFLAGS_OPT="$CXXFLAGS_OPT -fpic"
+          #   CXXFLAGS_DBG="$CXXFLAGS_DBG -fpic"
+          #   CXXFLAGS_DVL="$CXXFLAGS_DVL -fpic"
           
-            CFLAGS_OPT="$CFLAGS_OPT -fpic"
-            CFLAGS_DBG="$CFLAGS_DBG -fpic"
-            CFLAGS_DVL="$CFLAGS_DVL -fpic"
+          #   CFLAGS_OPT="$CFLAGS_OPT -fpic"
+          #   CFLAGS_DBG="$CFLAGS_DBG -fpic"
+          #   CFLAGS_DVL="$CFLAGS_DVL -fpic"
           
-            LDFLAGS="$LDFLAGS -fpic"
-          fi
+          #   LDFLAGS="$LDFLAGS -fpic"
+          # fi
 
-	  if test $target_cpu = "x86_64" ; then
-	    CXXFLAGS_DBG="$CXXFLAGS_DBG -tp amd64"
-	    CXXFLAGS_OPT="$CXXFLAGS_OPT -tp amd64"
-	    CXXFLAGS_DVL="$CXXFLAGS_DVL -tp amd64"
-	    CFLAGS_DBG="$CFLAGS_DBG -tp amd64"
-	    CFLAGS_OPT="$CFLAGS_OPT -tp amd64"
-	    CFLAGS_DVL="$CFLAGS_DVL -tp amd64"
-          fi
+	  # if test $target_cpu = "x86_64" ; then
+	  #   CXXFLAGS_DBG="$CXXFLAGS_DBG -tp amd64"
+	  #   CXXFLAGS_OPT="$CXXFLAGS_OPT -tp amd64"
+	  #   CXXFLAGS_DVL="$CXXFLAGS_DVL -tp amd64"
+	  #   CFLAGS_DBG="$CFLAGS_DBG -tp amd64"
+	  #   CFLAGS_OPT="$CFLAGS_OPT -tp amd64"
+	  #   CFLAGS_DVL="$CFLAGS_DVL -tp amd64"
+          # fi
           ;;
 
       hpux_acc)
@@ -898,9 +898,9 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
 	  CFLAGS_OPT="-G n"
 	  CFLAGS_DVL="-G n"
 
-	  CXXSHAREDFLAG=""
-	  CSHAREDFLAG=""
-	  RPATHFLAG=""
+	  # CXXSHAREDFLAG=""
+	  # CSHAREDFLAG=""
+	  # RPATHFLAG=""
 	  ;;
 
       *)

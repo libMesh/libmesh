@@ -31,15 +31,15 @@ libmesh_LIBS          = @LIBS@
 libmesh_FLIBS         = @FLIBS@
 libmesh_FFLAGS        = @FFLAGS@
 GXX-VERSION           = @GXX_VERSION@
-libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
-libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
-libmesh_RPATHFLAG     = @RPATHFLAG@
+# libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
+# libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
+# libmesh_RPATHFLAG     = @RPATHFLAG@
 
 # Use libmesh-specific compiler flags if available, otherwise
 # use general compiler flags from environment
-libmesh_CFLAGS       ?= $(CFLAGS)
-libmesh_CXXFLAGS     ?= $(CXXFLAGS)
-libmesh_CPPFLAGS     ?= $(CPPFLAGS)
+# libmesh_CFLAGS       ?= $(CFLAGS)
+# libmesh_CXXFLAGS     ?= $(CXXFLAGS)
+# libmesh_CPPFLAGS     ?= $(CPPFLAGS)
 NODEPRECATEDFLAG     = @NODEPRECATEDFLAG@
 
 # Complex variable support
