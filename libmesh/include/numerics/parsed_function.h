@@ -17,8 +17,14 @@ template <typename Output=Number>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:
-  ParsedFunction (const std::string& expression) 
-    : _expression(expression)
+  ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
+                  const std::vector<Output>* additional_vals=NULL)
+    : _expression(expression),
+      // Size the spacetime vector to account for space, time, and any additional
+      // variables passed
+      //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
+      _additional_vars(additional_vars),
+      _additional_vals(additional_vals)
     {
       std::string variables = "x";
 #if LIBMESH_DIM > 1
@@ -28,6 +34,21 @@ public:
       variables += ",z";
 #endif
       variables += ",t";
+
+      _spacetime.resize(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0));
+
+      // If additional vars were passed, append them to the string
+      // that we send to the function parser. Also add them to the
+      // end of our spacetime vector
+      if (additional_vars)
+      {
+        libmesh_assert(additional_vals != NULL && additional_vars->size() == additional_vals->size());
+        for (unsigned int i=0; i < additional_vars->size(); ++i)
+        {
+          variables += "," + (*additional_vars)[i];
+          _spacetime[LIBMESH_DIM+1 + i] = (*additional_vals)[i];
+        }
+      }
 
       const char delimiter = '#';
 
@@ -44,7 +65,7 @@ public:
         std::string subexpression =
           expression.substr(start, (end == std::string::npos) ?
                                     std::string::npos : end - start);
-    
+
 	// If at end, use start=maxSize.  Else start at next
 	// character.
         start = (end == std::string::npos) ?
@@ -64,8 +85,6 @@ public:
   virtual Output operator() (const Point& p,
                              const Real time = 0)
     {
-      Output _spacetime[LIBMESH_DIM+1];
-
       _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
       _spacetime[1] = p(1);
@@ -74,15 +93,16 @@ public:
       _spacetime[2] = p(2);
 #endif
       _spacetime[LIBMESH_DIM] = time;
-      return parsers[0].Eval(_spacetime);
+
+      // The remaining locations in _spacetime are currently fixed at construction
+      // but could potentially be made dynamic
+      return parsers[0].Eval(&_spacetime[0]);
     }
 
   virtual void operator() (const Point& p,
                            const Real time,
                            DenseVector<Output>& output)
     {
-      Output _spacetime[LIBMESH_DIM+1];
-
       _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
       _spacetime[1] = p(1);
@@ -93,10 +113,13 @@ public:
       _spacetime[LIBMESH_DIM] = time;
 
       unsigned int size = output.size();
+
       libmesh_assert(size == parsers.size());
 
+      // The remaining locations in _spacetime are currently fixed at construction
+      // but could potentially be made dynamic
       for (unsigned int i=0; i != size; ++i)
-        output(i) = parsers[i].Eval(_spacetime);
+        output(i) = parsers[i].Eval(&_spacetime[0]);
     }
 
   /**
@@ -107,8 +130,6 @@ public:
                             const Point& p,
                             Real time)
     {
-      Output _spacetime[LIBMESH_DIM+1];
-
       _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
       _spacetime[1] = p(1);
@@ -120,19 +141,26 @@ public:
 
       libmesh_assert(i < parsers.size());
 
-      return parsers[i].Eval(_spacetime);
+      // The remaining locations in _spacetime are currently fixed at construction
+      // but could potentially be made dynamic
+      return parsers[i].Eval(&_spacetime[0]);
     }
 
   virtual void init() {}
   virtual void clear() {}
   virtual AutoPtr<FunctionBase<Output> > clone() {
     return AutoPtr<FunctionBase<Output> >
-      (new ParsedFunction(_expression));
+      (new ParsedFunction(_expression, _additional_vars, _additional_vals));
   }
 
 private:
   std::string _expression;
   std::vector<FunctionParserBase<Output> > parsers;
+  std::vector<Output> _spacetime;
+
+  // Additional variables/values that can be parsed and handled by the function parser
+  const std::vector<std::string>* _additional_vars;
+  const std::vector<Output>* _additional_vals;
 };
 
 #else
