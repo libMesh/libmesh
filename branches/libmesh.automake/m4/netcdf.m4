@@ -7,7 +7,7 @@ dnl Netcdf is distributed with libmesh, so we don't have to guess
 dnl where it might be installed...
 
   if (test $enablenetcdf = yes); then
-     NETCDF_INCLUDE="-I$PWD/contrib/netcdf/Lib"
+     NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/Lib"
      NETCDF_LIBRARY="\$(EXTERNAL_LIBDIR)/libnetcdf\$(libext)"
      AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
      AC_MSG_RESULT(<<< Configuring library with Netcdf support >>>)

@@ -7,7 +7,7 @@ dnl Triangle is distributed with libmesh, so we don't have to guess
 dnl where it might be installed...
 
   if (test $enabletriangle = yes); then
-     TRIANGLE_INCLUDE="-I$PWD/contrib/triangle"
+     TRIANGLE_INCLUDE="-I\$(top_srcdir)/contrib/triangle"
      TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(libext)"
      AC_DEFINE(HAVE_TRIANGLE, 1, [Flag indicating whether the library will be compiled with Triangle support])
      AC_MSG_RESULT(<<< Configuring library with Triangle support >>>)

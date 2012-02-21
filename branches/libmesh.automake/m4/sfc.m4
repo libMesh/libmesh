@@ -14,7 +14,7 @@ AC_DEFUN([CONFIGURE_SFC],
 
 
   if (test $enablesfc = yes); then
-     SFC_INCLUDE="-I$PWD/contrib/sfcurves"
+     SFC_INCLUDE="-I\$(top_srcdir)/contrib/sfcurves"
      SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(libext)"
      AC_DEFINE(HAVE_SFCURVES, 1, [Flag indicating whether or not Space filling curves are available])
      AC_MSG_RESULT(<<< Configuring library with SFC support >>>)

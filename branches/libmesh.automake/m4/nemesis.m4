@@ -7,7 +7,7 @@ dnl Nemesis is distributed with libmesh, so we don't have to guess
 dnl where it might be installed...
 
   if (test $enablenetcdf = yes -a $enableexodus = yes -a $enablenemesis = yes); then
-     NEMESIS_INCLUDE="-I$PWD/contrib/nemesis/Lib"
+     NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/Lib"
      NEMESIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libnemesis\$(libext)"
      AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
      AC_MSG_RESULT(<<< Configuring library with Nemesis API support >>>)

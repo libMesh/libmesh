@@ -7,7 +7,7 @@ dnl fparser is distributed with libmesh, so we don't have to guess
 dnl where it might be installed...
 
   if (test $enablefparser = yes); then
-     FPARSER_INCLUDE="-I$PWD/contrib/fparser"
+     FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
      FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
      AC_DEFINE(HAVE_FPARSER, 1, [Flag indicating whether the library will be compiled with fparser support])
      AC_MSG_RESULT(<<< Configuring library with fparser support >>>)

@@ -16,7 +16,7 @@ fi
 
 if (test $enablelaspack = yes); then
 
-  LASPACK_INCLUDE="-I$PWD/contrib/laspack"
+  LASPACK_INCLUDE="-I\$(top_srcdir)/contrib/laspack"
   LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(libext)"
   AC_DEFINE(HAVE_LASPACK, 1, [Flag indicating whether or not LASPACK iterative solvers are available])
   laspack_version=`grep "define LASPACK_VERSION " $PWD/contrib/laspack/version.h | sed -e "s/[[^0-9.]]*//g"`
