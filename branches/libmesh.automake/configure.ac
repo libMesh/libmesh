@@ -32,6 +32,7 @@ AC_CONFIG_FILES([Make.common
 		 include/Makefile])
 		 
 AC_CONFIG_FILES([contrib/gmv/Makefile
+	         contrib/gzstream/Makefile
 	         contrib/triangle/Makefile
 	         contrib/tetgen/Makefile
 	         contrib/netcdf/Lib/Makefile

@@ -421,6 +421,11 @@ libmesh_la_SOURCES = \
   libmesh_la_LIBADD += contrib/gmv/libgmv.la
 #endif
 
+#if ENABLE_GZSTREAMS
+  SUBDIRS += contrib/gzstream
+  libmesh_la_LIBADD += contrib/gzstream/libgzstream.la
+#endif
+
 if ENABLE_NETCDF
   SUBDIRS += contrib/netcdf/Lib
   libmesh_la_LIBADD += contrib/netcdf/Lib/libnetcdf.la
