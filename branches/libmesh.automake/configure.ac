@@ -946,24 +946,16 @@ CONFIGURE_NETCDF
    dnl ExodusII -- enabled by default (it is distributed in contrib)
    dnl (note that ExodusII requires netCDF
    dnl -------------------------------------------------------------
-   AC_ARG_ENABLE(exodus,
-                 AC_HELP_STRING([--enable-exodus],
-                                [build with ExodusII API support]),
-                 enableexodus=$enableval,
-                 enableexodus=yes)
-   
-   if (test "$enableexodus" != no -a "$have_netcdf" = yes) ; then
-     CONFIGURE_EXODUS
+   CONFIGURE_EXODUS
 
-     dnl -------------------------------------------------------------
-     dnl Nemesis -- enabled by default (it is distributed in contrib)
-     dnl (note that Nemesis requires netCDF and exodus)
-     dnl -------------------------------------------------------------
-     if (test "$enableexodus" != no -a "$have_netcdf" = yes -a "$enablenemesis" != no ) ; then
-       CONFIGURE_NEMESIS
-     fi
-   fi
+      dnl -------------------------------------------------------------
+      dnl Nemesis -- enabled by default (it is distributed in contrib)
+      dnl (note that Nemesis requires netCDF and exodus)
+      dnl -------------------------------------------------------------
+      CONFIGURE_NEMESIS
+      dnl -------------------------------------------------------------
    dnl -------------------------------------------------------------
+dnl -------------------------------------------------------------
 
 
 
