@@ -1,5 +1,6 @@
 include $(top_builddir)/Make.common
 
 
-lib_LTLIBRARIES   = libgzstream.la
-libgzstream_la_SOURCES = gzstream.C
+noinst_LTLIBRARIES     = libgzstream.la
+libgzstream_la_SOURCES = gzstream.C gzstream.h
+libgzstream_la_LIBADD  = -lz

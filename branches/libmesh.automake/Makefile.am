@@ -488,13 +488,6 @@ svnexpand:
 # special things to do when running 'make dist'
 dist-hook:
 	rm -rf `find $(distdir) -name .svn`
-	rm -rf `find $(distdir)/test -name logs`
-	rm -rf `find $(distdir)/test -name output`
-	rm -rf `find $(distdir)/contrib/ablation -type d`
-	rm -rf `find $(distdir)/contrib/chemay -type d`
-	rm -rf `find $(distdir)/contrib/grvy -type d`
-	rm -rf `find $(distdir)/contrib/masa -type d`
-	rm -rf $(distdir)/contrib/install
 
 
 #
