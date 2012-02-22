@@ -865,12 +865,6 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl LASPACK iterative solvers -- enabled by default
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(laspack,
-              AC_HELP_STRING([--enable-laspack],
-                             [build with LASPACK iterative solver suppport]),
-              enablelaspack=$enableval,
-              enablelaspack=yes)
-
 CONFIGURE_LASPACK
 dnl -------------------------------------------------------------
 

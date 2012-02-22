@@ -324,7 +324,7 @@ ifeq ($(enable-optional),yes)
 
   # if Laspack is used we need the header path
   # and the lib
-  libmesh_LIBS    += @LASPACK_LIB@
+  #libmesh_LIBS    += @LASPACK_LIB@
   libmesh_INCLUDE += @LASPACK_INCLUDE@
 
   # if Paretis is used we need the header path

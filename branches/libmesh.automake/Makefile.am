@@ -456,6 +456,11 @@ if ENABLE_LIBHILBERT
   libmesh_la_LIBADD += contrib/libHilbert/libHilbert.la
 endif
 
+if ENABLE_LASPACK
+  SUBDIRS += contrib/laspack
+  libmesh_la_LIBADD += contrib/laspack/liblaspack.la
+endif
+
 if ENABLE_METIS
   SUBDIRS += contrib/metis/Lib
   libmesh_la_LIBADD += contrib/metis/Lib/libmetis.la
@@ -465,9 +470,6 @@ if ENABLE_PARMETIS
   SUBDIRS += contrib/parmetis/Lib
   libmesh_la_LIBADD += contrib/parmetis/Lib/libparmetis.la
 endif
-
-#SUBDIRS += $(GMV_DIR) $(TRIANGLE_DIR) $(TETGEN_DIR)
-#libmesh_la_LIBADD += $(GMV_LIB) $(TRIANGLE_LIB) $(TETGEN_LIB)
 ###########################################################
 
 
