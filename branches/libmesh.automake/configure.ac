@@ -32,7 +32,6 @@ AC_CONFIG_FILES([Make.common
 		 include/Makefile
 		 src/Makefile
 		 examples/Makefile
-		 examples/introduction/Makefile
 		 ])
 		 
 AC_CONFIG_FILES(doc/Doxyfile)
