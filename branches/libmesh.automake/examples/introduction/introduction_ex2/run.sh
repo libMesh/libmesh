@@ -8,7 +8,7 @@ example_path=introduction/$example_name
 PATH=.:$PATH
 
 echo "example_name=$example_name" 
-cd $example_path || exit 1
+#cd $example_path || exit 1
 
 
 echo "***************************************************************"
