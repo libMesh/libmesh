@@ -3,7 +3,6 @@ include $(top_builddir)/Make.common
 AUTOMAKE_OPTIONS = subdir-objects 
 
 SUBDIRS =           # none, append below
-libmesh_la_LIBADD = # none, append below
 
 AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
@@ -11,9 +10,12 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 INCLUDES = $(libmesh_INCLUDE)
 
-lib_LTLIBRARIES = libmesh.la
+# A convenience library to hold proper libMesh 
+# objects.  This will get appended with any contributed 
+# sources to create the final library.
+noinst_LTLIBRARIES = libmesh_local.la
 
-libmesh_la_SOURCES = \
+libmesh_local_la_SOURCES = \
 		base/dof_map.C \
 		base/dof_map_constraints.C \
 		base/dof_object.C \
@@ -371,52 +373,3 @@ libmesh_la_SOURCES = \
 		utils/utility.C \
 		utils/xdr_cxx.C 
 
-###########################################################
-# add contributed libraries that are conditionally compiled
-
-if ENABLE_GMV
-  SUBDIRS += contrib/gmv
-  libmesh_la_LIBADD += ../contrib/gmv/libgmv.la
-endif
-
-if ENABLE_NETCDF
-  SUBDIRS += contrib/netcdf/Lib
-  libmesh_la_LIBADD += contrib/netcdf/Lib/libnetcdf.la
-endif
-
-if ENABLE_EXODUS
-  SUBDIRS += ../contrib/exodusii/Lib
-  libmesh_la_LIBADD += contrib/exodusii/Lib/libexodusII.la
-endif
-
-if ENABLE_NEMESIS
-  SUBDIRS += ../contrib/nemesis/Lib
-  libmesh_la_LIBADD += contrib/nemesis/Lib/libnemesis.la
-endif
-
-if ENABLE_TRIANGLE
-  SUBDIRS += ../contrib/triangle
-  libmesh_la_LIBADD += contrib/triangle/libtriangle.la
-endif
-
-if ENABLE_TETGEN
-  SUBDIRS += ../contrib/tetgen
-  libmesh_la_LIBADD += contrib/tetgen/libtetgen.la
-endif
-
-if ENABLE_LIBHILBERT
-  SUBDIRS += ../contrib/libHilbert
-  libmesh_la_LIBADD += ../contrib/libHilbert/libHilbert.la
-endif
-
-
-###########################################################
-
-
-
-
-
-bin_PROGRAMS = meshtool
-
-meshtool_SOURCES = apps/meshtool.C
-meshtool_LDADD   = libmesh.la $(libmesh_LIBS)

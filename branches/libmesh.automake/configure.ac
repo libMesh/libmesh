@@ -29,7 +29,8 @@ AC_CANONICAL_TARGET
 
 AC_CONFIG_FILES([Make.common
                  Makefile
-		 include/Makefile])
+		 include/Makefile
+		 src/Makefile])
 		 
 AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
