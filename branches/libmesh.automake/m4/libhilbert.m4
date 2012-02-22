@@ -14,9 +14,7 @@ AC_DEFUN([CONFIGURE_LIBHILBERT],
 		 [enablelibhilbert=yes])
 
 		 
-		 
-  AM_CONDITIONAL(ENABLE_LIBHILBERT, test x$enablelibhilbert = xtrue)
-
+		
   dnl The LIBHILBERT API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enablelibhilbert = yes); then
@@ -33,4 +31,6 @@ AC_DEFUN([CONFIGURE_LIBHILBERT],
   AC_SUBST(LIBHILBERT_INCLUDE)
   #AC_SUBST(LIBHILBERT_LIBRARY)	
   AC_SUBST(enablelibhilbert)
+
+  AM_CONDITIONAL(ENABLE_LIBHILBERT, test x$enablelibhilbert = xyes)
 ])

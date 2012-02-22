@@ -14,9 +14,7 @@ AC_DEFUN([CONFIGURE_NETCDF],
 		 [enablenetcdf=yes])
 
 
-		 
-  AM_CONDITIONAL(ENABLE_NETCDF, test x$enablenetcdf = xtrue)
-		
+				
   dnl The NETCDF API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enablenetcdf = yes); then
@@ -32,4 +30,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
 
   AC_SUBST(NETCDF_INCLUDE)
   AC_SUBST(enablenetcdf)
+
+  AM_CONDITIONAL(ENABLE_NETCDF, test x$enablenetcdf = xyes)
 ])

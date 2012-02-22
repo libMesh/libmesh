@@ -11,11 +11,9 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
 		   no)  enabletriangle=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-triangle) ;;
 		 esac],
-		 [enabletriangle=yes])
+		 [enabletriangle=yes])			 
+  
 
-		 
-		 
-  AM_CONDITIONAL(ENABLE_TRIANGLE, test x$enabletriangle = xtrue)
 
   dnl The TRIANGLE API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
@@ -33,4 +31,6 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
   AC_SUBST(TRIANGLE_INCLUDE)
   #AC_SUBST(TRIANGLE_LIBRARY)	
   AC_SUBST(enabletriangle)
+
+  AM_CONDITIONAL(ENABLE_TRIANGLE, test x$enabletriangle = xyes)
 ])

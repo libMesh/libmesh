@@ -14,8 +14,6 @@ AC_DEFUN([CONFIGURE_EXODUS],
 		 [enableexodus=yes])
 
 
-		 
-  AM_CONDITIONAL(ENABLE_EXODUS, test x$enableexodus = xtrue)
 		
   dnl The EXODUS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
@@ -32,4 +30,6 @@ AC_DEFUN([CONFIGURE_EXODUS],
 
   AC_SUBST(EXODUS_INCLUDE)
   AC_SUBST(enableexodus)
+		 
+  AM_CONDITIONAL(ENABLE_EXODUS, test x$enableexodus = xyes)
 ])

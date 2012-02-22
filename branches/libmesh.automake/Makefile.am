@@ -416,15 +416,15 @@ libmesh_la_SOURCES = \
 ###########################################################
 # add contributed libraries that are conditionally compiled
 
-#if ENABLE_GMV
+if ENABLE_GMV
   SUBDIRS += contrib/gmv
   libmesh_la_LIBADD += contrib/gmv/libgmv.la
-#endif
+endif
 
-#if ENABLE_GZSTREAMS
+if ENABLE_GZSTREAMS
   SUBDIRS += contrib/gzstream
   libmesh_la_LIBADD += contrib/gzstream/libgzstream.la
-#endif
+endif
 
 if ENABLE_NETCDF
   SUBDIRS += contrib/netcdf/Lib
@@ -441,20 +441,20 @@ if ENABLE_NEMESIS
   libmesh_la_LIBADD += contrib/nemesis/Lib/libnemesis.la
 endif
 
-#if ENABLE_TRIANGLE
+if ENABLE_TRIANGLE
   SUBDIRS += contrib/triangle
   libmesh_la_LIBADD += contrib/triangle/libtriangle.la
-#endif
+endif
 
-#if ENABLE_TETGEN
+if ENABLE_TETGEN
   SUBDIRS += contrib/tetgen
   libmesh_la_LIBADD += contrib/tetgen/libtetgen.la
-#endif
+endif
 
-#if ENABLE_LIBHILBERT
+if ENABLE_LIBHILBERT
   SUBDIRS += contrib/libHilbert
   libmesh_la_LIBADD += contrib/libHilbert/libHilbert.la
-#endif
+endif
 
 #SUBDIRS += $(GMV_DIR) $(TRIANGLE_DIR) $(TETGEN_DIR)
 #libmesh_la_LIBADD += $(GMV_LIB) $(TRIANGLE_LIB) $(TETGEN_LIB)

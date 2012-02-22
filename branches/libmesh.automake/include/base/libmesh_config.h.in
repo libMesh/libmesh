@@ -147,7 +147,7 @@
 /* define if the compiler supports __gnu_cxx::hash_set */
 #undef HAVE_EXT_HASH_SET
 
-/* Flag indicating whether the library will be compiled with fparser support
+/* Flag indicating whether the library will be compiled with FPARSER support
    */
 #undef HAVE_FPARSER
 

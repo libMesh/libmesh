@@ -429,7 +429,7 @@ ifeq ($(enable-optional),yes)
   # if fparser is used we need the header path
   #  and the lib
   ifeq ($(enable-fparser),yes)
-    libmesh_LIBS    += @FPARSER_LIBRARY@
+    #libmesh_LIBS    += @FPARSER_LIBRARY@
     libmesh_INCLUDE += @FPARSER_INCLUDE@
   endif
 

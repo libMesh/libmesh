@@ -13,10 +13,8 @@ AC_DEFUN([CONFIGURE_TETGEN],
 		 esac],
 		 [enabletetgen=yes])
 
-		 
-		 
-  AM_CONDITIONAL(ENABLE_TETGEN, test x$enabletetgen = xtrue)
 
+		 		 
   dnl The TETGEN API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enabletetgen = yes); then
@@ -33,4 +31,6 @@ AC_DEFUN([CONFIGURE_TETGEN],
   AC_SUBST(TETGEN_INCLUDE)
   #AC_SUBST(TETGEN_LIBRARY)	
   AC_SUBST(enabletetgen)
+
+  AM_CONDITIONAL(ENABLE_TETGEN, test x$enabletetgen = xyes)
 ])

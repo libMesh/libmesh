@@ -1040,7 +1040,6 @@ dnl -------------------------------------------------------------
 dnl GMV -- file I/O API is enabled by default (it is distributed in contrib)
 dnl -------------------------------------------------------------
 CONFIGURE_GMV
-AM_CONDITIONAL(ENABLE_GMV, test x$enablegmv = xtrue)
 dnl -------------------------------------------------------------
 
 

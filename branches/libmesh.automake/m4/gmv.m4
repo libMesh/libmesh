@@ -13,9 +13,7 @@ AC_DEFUN([CONFIGURE_GMV],
 		 esac],
 		 [enablegmv=yes])
 
-		 
-		 
-  AM_CONDITIONAL(ENABLE_GMV, test x$enablegmv = xtrue)
+
 
   dnl The GMV API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
@@ -33,4 +31,6 @@ AC_DEFUN([CONFIGURE_GMV],
   AC_SUBST(GMV_INCLUDE)
   #AC_SUBST(GMV_LIBRARY)	
   AC_SUBST(enablegmv)
+
+  AM_CONDITIONAL(ENABLE_GMV, test x$enablegmv = xyes)		 
 ])

@@ -12,11 +12,9 @@ AC_DEFUN([CONFIGURE_GZ],
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gz) ;;
 		 esac],
 		 [enablegz=yes])
+		 
+	  
 
-		 
-		 
-  AM_CONDITIONAL(ENABLE_GZSTREAMS, test x$enablegz = xtrue)
-  
 if (test $enablegz = yes); then
   dnl First check for the required system headers and libraries
   AC_CHECK_HEADERS(zlib.h, have_zlib_h=yes)
@@ -39,4 +37,5 @@ AC_SUBST(GZSTREAM_INCLUDE)
 #AC_SUBST(GZSTREAM_LIB)	
 AC_SUBST(enablegz)
 
+AM_CONDITIONAL(ENABLE_GZSTREAMS, test x$enablegz = xyes)
 ])

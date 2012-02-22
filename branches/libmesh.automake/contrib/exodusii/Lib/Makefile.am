@@ -1,12 +1,17 @@
-include $(top_builddir)/Make.common
+#include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-INCLUDES = $(libmesh_INCLUDE)
+INCLUDES = -I$(srcdir)/include -I$(top_srcdir)/contrib/netcdf/Lib
 
-lib_LTLIBRARIES      = libexodusII.la
+noinst_LTLIBRARIES     = libexodusII.la
 
 libexodusII_la_SOURCES = \
+	include/exodusII_int.h \
+	include/exodusII.h \
+	include/doxygen.h \
+	include/exodusII_test.h \
+	include/exodusII_ext.h \
 	src/exclos.c \
 	src/excn2s.c \
 	src/ex_conv.c \
@@ -182,3 +187,4 @@ libexodusII_la_SOURCES = \
 	src/expvv.c \
 	src/exupda.c \
 	src/ex_utils.c
+

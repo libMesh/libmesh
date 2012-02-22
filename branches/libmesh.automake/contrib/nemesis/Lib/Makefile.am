@@ -1,9 +1,12 @@
-include $(top_builddir)/Make.common
+#include $(top_builddir)/Make.common
 
-INCLUDES = $(libmesh_INCLUDE)
+INCLUDES = -I$(top_srcdir)/contrib/exodusii/Lib/include \
+           -I$(top_srcdir)/contrib/netcdf/Lib
 
-lib_LTLIBRARIES       = libnemesis.la
+noinst_LTLIBRARIES    = libnemesis.la
 libnemesis_la_SOURCES = \
+	ne_nemesisI.h \
+	ne_nemesisI_int.h \
 	ne_gcmp.c \
 	ne_gebig.c \
 	ne_gelcm.c \

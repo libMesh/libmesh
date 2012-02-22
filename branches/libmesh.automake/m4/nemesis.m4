@@ -14,9 +14,7 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 		 [enablenemesis=yes])
 
 
-		 
-  AM_CONDITIONAL(ENABLE_NEMESIS, test x$enablenemesis = xtrue)
-		
+		 		
   dnl The NEMESIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enablenemesis = yes); then
@@ -32,4 +30,6 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 
   AC_SUBST(NEMESIS_INCLUDE)
   AC_SUBST(enablenemesis)
+
+  AM_CONDITIONAL(ENABLE_NEMESIS, test x$enablenemesis = xyes)
 ])
