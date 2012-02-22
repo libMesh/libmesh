@@ -162,6 +162,9 @@ amr_SOURCES   = src/apps/amr.C
 amr_LDADD     = libmesh.la $(libmesh_LIBS)
 
 
+###########################################################
+# Examples
+SUBDIRS += examples
 
 
 #
