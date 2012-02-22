@@ -197,7 +197,7 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Flag indicating whether or not Metis is available */
+/* Flag indicating whether the library will be compiled with Metis support */
 #undef HAVE_METIS
 
 /* Flag indicating whether the library shall be compiled to use the ML package
@@ -224,7 +224,8 @@
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP
 
-/* Flag indicating whether or not ParMetis is available */
+/* Flag indicating whether the library will be compiled with Parmetis support
+   */
 #undef HAVE_PARMETIS
 
 /* Flag indicating whether or not PETSc is available */

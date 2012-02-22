@@ -38,6 +38,8 @@ AC_CONFIG_FILES([contrib/gmv/Makefile
 	         contrib/netcdf/Lib/Makefile
 	         contrib/exodusii/Lib/Makefile
 	         contrib/nemesis/Lib/Makefile
+		 contrib/metis/Lib/Makefile
+		 contrib/parmetis/Lib/Makefile
 	         contrib/libHilbert/Makefile
 		 ])
 
@@ -959,14 +961,7 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl Metis Partitioning -- enabled by default
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(metis,
-              AC_HELP_STRING([--enable-metis],
-                             [build with Metis graph partitioning suppport]),
-              enablemetis=$enableval,
-              enablemetis=yes)
-
-if (test "$enablemetis" != no) ; then
-   CONFIGURE_METIS
+CONFIGURE_METIS
 
    dnl -------------------------------------------------------------
    dnl Parmetis Partitioning -- enabled by default
@@ -985,9 +980,6 @@ if (test "$enablemetis" != no) ; then
      enableparmetis=no
    fi
    dnl -------------------------------------------------------------
-else
-  enableparmetis=no
-fi
 AC_SUBST(enablemetis)
 AC_SUBST(enableparmetis)
 dnl -------------------------------------------------------------
