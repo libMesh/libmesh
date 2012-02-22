@@ -470,6 +470,11 @@ if ENABLE_PARMETIS
   SUBDIRS += contrib/parmetis/Lib
   libmesh_la_LIBADD += contrib/parmetis/Lib/libparmetis.la
 endif
+
+if ENABLE_SFC
+  SUBDIRS += contrib/sfcurves
+  libmesh_la_LIBADD += contrib/sfcurves/libsfcurves.la
+endif
 ###########################################################
 
 
@@ -480,6 +485,9 @@ bin_PROGRAMS = meshtool
 
 meshtool_SOURCES = src/apps/meshtool.C
 meshtool_LDADD   = libmesh.la $(libmesh_LIBS)
+
+
+
 
 #
 .PHONY: doc svnexpand

@@ -340,7 +340,7 @@ ifeq ($(enable-optional),yes)
 
   # if Space filling curves are used we need the
   # header path and the lib
-  libmesh_LIBS    += @SFC_LIB@
+  #libmesh_LIBS    += @SFC_LIB@
   libmesh_INCLUDE += @SFC_INCLUDE@
 
   # if TBB is used, we need the 

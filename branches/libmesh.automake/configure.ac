@@ -874,12 +874,6 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl Space filling curves -- enabled by default
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(sfc,
-              AC_HELP_STRING([--enable-sfc],
-                             [build with space-filling curves suppport]),
-              enablesfc=$enableval,
-              enablesfc=yes)
-
 CONFIGURE_SFC
 dnl -------------------------------------------------------------
 

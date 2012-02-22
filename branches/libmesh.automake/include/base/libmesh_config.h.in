@@ -241,8 +241,8 @@
 /* define if the compiler supports Run-Time Type Identification */
 #undef HAVE_RTTI
 
-/* Flag indicating whether or not Space filling curves are available */
-#undef HAVE_SFCURVES
+/* Flag indicating whether the library will be compiled with SFC support */
+#undef HAVE_SFC
 
 /* Flag indicating whether or not SLEPc is available */
 #undef HAVE_SLEPC
