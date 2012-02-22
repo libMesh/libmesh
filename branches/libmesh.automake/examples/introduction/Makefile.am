@@ -11,8 +11,11 @@ INCLUDES = $(libmesh_INCLUDE)
 
 check_PROGRAMS =
 
-check_PROGRAMS += introduction-ex1
-introduction_ex1_SOURCES = introduction_ex1/introduction_ex1.C
+#check_PROGRAMS += introduction-ex1
+#introduction_ex1_SOURCES = introduction_ex1/introduction_ex1.C
+
+check_PROGRAMS += introduction-ex2
+introduction_ex2_SOURCES = introduction_ex2/introduction_ex2.C
 
 #TESTS_ENVIRONMENT = 
 TESTS = $(check_PROGRAMS)
