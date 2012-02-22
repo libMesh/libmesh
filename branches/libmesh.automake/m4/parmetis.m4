@@ -33,6 +33,7 @@ AC_DEFUN([CONFIGURE_PARMETIS],
   AC_SUBST(enableparmetis)
 
   AM_CONDITIONAL(ENABLE_PARMETIS, test x$enableparmetis = xyes)		 
+  AC_CONFIG_FILES([contrib/parmetis/Lib/Makefile])
 ])
 
 

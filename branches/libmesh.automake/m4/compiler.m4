@@ -1,4 +1,111 @@
 dnl -------------------------------------------------------------
+dnl -------------------------------------------------------------
+AC_DEFUN([LIBMESH_SET_COMPILERS],
+[
+  dnl --------------------------------------------------------------
+  dnl look for a decent C++ compiler or honor --with-cxx=...
+  CXX_TRY_LIST="g++ icc pgCC c++"
+  
+     dnl -------------------------------------------------------------------
+     dnl MPI -- enabled by default.  Check for it now so we can be somewhat
+     dnl                             smart about which compilers to look for
+     dnl -------------------------------------------------------------------
+     AC_ARG_ENABLE(mpi,
+                   AC_HELP_STRING([--enable-mpi],
+                                  [build with MPI message passing support]),
+                   enablempi=$enableval,
+                   enablempi=yes)
+     
+  if  (test "$enablempi" != no) ; then
+    CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
+  fi
+  
+  AC_ARG_WITH([cxx],
+  	    AC_HELP_STRING([--with-cxx=CXX],
+                             [C++ compiler to use]),
+  	    [CXX="$withval"],
+  	    [])
+  
+  dnl --------------------------------------------------------------
+  dnl Determines a C++ compiler to use.  First checks if the variable CXX is
+  dnl already set.  If not, then searches under g++, c++, and other names.
+  dnl --------------------------------------------------------------
+  AC_PROG_CXX([$CXX_TRY_LIST])
+  dnl --------------------------------------------------------------
+  
+  
+  
+  dnl --------------------------------------------------------------
+  dnl See aclocal.m4 for the definition of this function.  It can
+  dnl figure out which version of a particular compiler, e.g. GCC 4.0,
+  dnl you are using.
+  dnl --------------------------------------------------------------
+  DETERMINE_CXX_BRAND
+  
+  
+  
+  dnl --------------------------------------------------------------
+  dnl look for a decent C compiler or honor --with-cc=...
+  CC_TRY_LIST="gcc icc pgcc cc"
+  if  (test "$enablempi" != no) ; then
+    CC_TRY_LIST="mpicc $CC_TRY_LIST"
+  fi
+  AC_ARG_WITH([cc],
+  	    AC_HELP_STRING([--with-cc=CC],
+                             [C compiler to use]),
+  	    [CC="$withval"],
+  	    [])
+  
+  dnl --------------------------------------------------------------
+  dnl Determine a C compiler to use.  If CC is not already set, checks for
+  dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
+  dnl --------------------------------------------------------------
+  AC_PROG_CC([$CC_TRY_LIST])
+  dnl --------------------------------------------------------------
+  
+  
+  
+  dnl look for a decent F90+ compiler or honor --with-fc=...
+  FC_TRY_LIST="gfortran ifort pgf90 xlf95"
+  if  (test "$enablempi" != no) ; then
+    FC_TRY_LIST="mpif90 $FC_TRY_LIST"
+  fi
+  AC_ARG_WITH([fc],
+  	    AC_HELP_STRING([--with-fc=FC],
+                             [Fortran compiler to use]),
+  	    [FC="$withval"],
+  	    [])
+  
+  dnl --------------------------------------------------------------
+  dnl Determine a F90+ compiler to use.
+  dnl --------------------------------------------------------------
+  AC_PROG_FC([$FC_TRY_LIST])
+  dnl --------------------------------------------------------------
+  
+  
+  
+  dnl --------------------------------------------------------------
+  dnl look for a decent F77 compiler or honor --with-77=...
+  FC_TRY_LIST="g77 gfortran ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
+  if  (test "$enablempi" != no) ; then
+    F77_TRY_LIST="mpif77 $F77_TRY_LIST"
+  fi
+  AC_ARG_WITH([f77],
+  	    AC_HELP_STRING([--with-f77=F77],
+                             [Fortran compiler to use]),
+  	    [F77="$withval"],
+  	    [])
+  
+  dnl --------------------------------------------------------------
+  dnl Determine a F77 compiler to use.
+  dnl --------------------------------------------------------------
+  AC_PROG_F77([$F77_TRY_LIST])
+  dnl --------------------------------------------------------------
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl Determine the C++ compiler in use. Return the name and possibly
 dnl version of this compiler in GXX_VERSION.
 dnl

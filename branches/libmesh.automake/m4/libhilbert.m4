@@ -33,4 +33,5 @@ AC_DEFUN([CONFIGURE_LIBHILBERT],
   AC_SUBST(enablelibhilbert)
 
   AM_CONDITIONAL(ENABLE_LIBHILBERT, test x$enablelibhilbert = xyes)
+  AC_CONFIG_FILES([contrib/libHilbert/Makefile])
 ])

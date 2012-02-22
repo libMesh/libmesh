@@ -33,4 +33,5 @@ AC_DEFUN([CONFIGURE_METIS],
   AC_SUBST(enablemetis)
 
   AM_CONDITIONAL(ENABLE_METIS, test x$enablemetis = xyes)		 
+  AC_CONFIG_FILES([contrib/metis/Lib/Makefile])
 ])

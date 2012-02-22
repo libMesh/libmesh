@@ -481,10 +481,36 @@ endif
 
 
 
-bin_PROGRAMS = meshtool
+###########################################################
+# Utility programs
+bin_PROGRAMS = # empty, append below
+bin_PROGRAMS     += meshtool
+meshtool_SOURCES  = src/apps/meshtool.C
+meshtool_LDADD    = libmesh.la $(libmesh_LIBS)
 
-meshtool_SOURCES = src/apps/meshtool.C
-meshtool_LDADD   = libmesh.la $(libmesh_LIBS)
+bin_PROGRAMS    += compare
+compare_SOURCES  = src/apps/compare.C
+compare_LDADD    = libmesh.la $(libmesh_LIBS)
+
+bin_PROGRAMS     += meshbcid
+meshbcid_SOURCES  = src/apps/meshbcid.C
+meshbcid_LDADD    = libmesh.la $(libmesh_LIBS)
+
+bin_PROGRAMS   += meshid
+meshid_SOURCES  = src/apps/meshid.C
+meshid_LDADD    = libmesh.la $(libmesh_LIBS)
+
+bin_PROGRAMS     += meshnorm
+meshnorm_SOURCES  = src/apps/meshnorm.C
+meshnorm_LDADD    = libmesh.la $(libmesh_LIBS)
+
+bin_PROGRAMS       += projection
+projection_SOURCES  = src/apps/projection.C
+projection_LDADD    = libmesh.la $(libmesh_LIBS)
+
+bin_PROGRAMS += amr
+amr_SOURCES   = src/apps/amr.C
+amr_LDADD     = libmesh.la $(libmesh_LIBS)
 
 
 

@@ -32,4 +32,5 @@ AC_DEFUN([CONFIGURE_EXODUS],
   AC_SUBST(enableexodus)
 		 
   AM_CONDITIONAL(ENABLE_EXODUS, test x$enableexodus = xyes)
+  AC_CONFIG_FILES([contrib/exodusii/Lib/Makefile])
 ])

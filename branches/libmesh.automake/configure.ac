@@ -31,19 +31,6 @@ AC_CONFIG_FILES([Make.common
                  Makefile
 		 include/Makefile])
 		 
-AC_CONFIG_FILES([contrib/gmv/Makefile
-	         contrib/gzstream/Makefile
-	         contrib/triangle/Makefile
-	         contrib/tetgen/Makefile
-	         contrib/netcdf/Lib/Makefile
-	         contrib/exodusii/Lib/Makefile
-	         contrib/nemesis/Lib/Makefile
-		 contrib/metis/Lib/Makefile
-		 contrib/parmetis/Lib/Makefile
-	         contrib/libHilbert/Makefile
-		 ])
-
-
 AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
@@ -74,111 +61,16 @@ AC_LANG([C++])
 
 
 dnl --------------------------------------------------------------
-dnl look for a decent C++ compiler or honor --with-cxx=...
-CXX_TRY_LIST="g++ icc pgCC c++"
-
-   dnl -------------------------------------------------------------------
-   dnl MPI -- enabled by default.  Check for it now so we can be somewhat
-   dnl                             smart about which compilers to look for
-   dnl -------------------------------------------------------------------
-   AC_ARG_ENABLE(mpi,
-                 AC_HELP_STRING([--enable-mpi],
-                                [build with MPI message passing support]),
-                 enablempi=$enableval,
-                 enablempi=yes)
-   
-if  (test "$enablempi" != no) ; then
-  CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
-fi
-
-AC_ARG_WITH([cxx],
-	    AC_HELP_STRING([--with-cxx=CXX],
-                           [C++ compiler to use]),
-	    [CXX="$withval"],
-	    [])
-
+dnl Set our preferred compilers
 dnl --------------------------------------------------------------
-dnl Determines a C++ compiler to use.  First checks if the variable CXX is
-dnl already set.  If not, then searches under g++, c++, and other names.
-dnl --------------------------------------------------------------
-AC_PROG_CXX([$CXX_TRY_LIST])
-dnl --------------------------------------------------------------
+LIBMESH_SET_COMPILERS
 
-
-
-dnl --------------------------------------------------------------
-dnl See aclocal.m4 for the definition of this function.  It can
-dnl figure out which version of a particular compiler, e.g. GCC 4.0,
-dnl you are using.
-dnl --------------------------------------------------------------
-DETERMINE_CXX_BRAND
-
-
-
-dnl --------------------------------------------------------------
-dnl look for a decent C compiler or honor --with-cc=...
-CC_TRY_LIST="gcc icc pgcc cc"
-if  (test "$enablempi" != no) ; then
-  CC_TRY_LIST="mpicc $CC_TRY_LIST"
-fi
-AC_ARG_WITH([cc],
-	    AC_HELP_STRING([--with-cc=CC],
-                           [C compiler to use]),
-	    [CC="$withval"],
-	    [])
-
-dnl --------------------------------------------------------------
-dnl Determine a C compiler to use.  If CC is not already set, checks for
-dnl gcc, cc, and other C compilers.  Then sets the CC variable to the result.
-dnl --------------------------------------------------------------
-AC_PROG_CC([$CC_TRY_LIST])
-dnl --------------------------------------------------------------
-
-
-
-dnl look for a decent F90+ compiler or honor --with-fc=...
-FC_TRY_LIST="gfortran ifort pgf90 xlf95"
-if  (test "$enablempi" != no) ; then
-  FC_TRY_LIST="mpif90 $FC_TRY_LIST"
-fi
-AC_ARG_WITH([fc],
-	    AC_HELP_STRING([--with-fc=FC],
-                           [Fortran compiler to use]),
-	    [FC="$withval"],
-	    [])
-
-dnl --------------------------------------------------------------
-dnl Determine a F90+ compiler to use.
-dnl --------------------------------------------------------------
-AC_PROG_FC([$FC_TRY_LIST])
-dnl --------------------------------------------------------------
-
-
-
-dnl --------------------------------------------------------------
-dnl look for a decent F77 compiler or honor --with-77=...
-FC_TRY_LIST="g77 gfortran ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
-if  (test "$enablempi" != no) ; then
-  F77_TRY_LIST="mpif77 $F77_TRY_LIST"
-fi
-AC_ARG_WITH([f77],
-	    AC_HELP_STRING([--with-f77=F77],
-                           [Fortran compiler to use]),
-	    [F77="$withval"],
-	    [])
-
-dnl --------------------------------------------------------------
-dnl Determine a F77 compiler to use.
-dnl --------------------------------------------------------------
-AC_PROG_F77([$F77_TRY_LIST])
-dnl --------------------------------------------------------------
 
 LT_INIT([disable-static])
 
 dnl --------------------------------------------------------------
 dnl Real precision - double by default
 dnl --------------------------------------------------------------
-
 ACX_CHOOSE_PRECISION
 
 
@@ -885,6 +777,8 @@ dnl -------------------------------------------------------------
 CONFIGURE_GZ
 dnl -------------------------------------------------------------
 
+
+
 dnl -------------------------------------------------------------
 dnl Compressed Files with bzip2
 dnl -------------------------------------------------------------
@@ -933,15 +827,7 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl Tecplot -- enabled by default
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(tecplot,
-              AC_HELP_STRING([--enable-tecplot],
-                             [build with Tecplot binary support]),
-              enabletecplot=$enableval,
-              enabletecplot=yes)
-
-if test "$enabletecplot" != no ; then
-  CONFIGURE_TECPLOT
-fi
+CONFIGURE_TECPLOT
 dnl -------------------------------------------------------------
 
 
@@ -951,25 +837,10 @@ dnl Metis Partitioning -- enabled by default
 dnl -------------------------------------------------------------
 CONFIGURE_METIS
 
-   dnl -------------------------------------------------------------
-   dnl Parmetis Partitioning -- enabled by default
-   dnl -------------------------------------------------------------
-   AC_ARG_ENABLE(parmetis,
-                 AC_HELP_STRING([--enable-parmetis],
-                                [build with Parmetis parallel partitioning suppport]),
-                 enableparmetis=$enableval,
-                 enableparmetis=yes)
-   
-   if (test "$enableparmetis" != no \
-         -a "$enablemetis"    != no \
-         -a "$enablempi"      != no) ; then
-      CONFIGURE_PARMETIS
-   else
-     enableparmetis=no
-   fi
-   dnl -------------------------------------------------------------
-AC_SUBST(enablemetis)
-AC_SUBST(enableparmetis)
+dnl -------------------------------------------------------------
+dnl Parmetis Partitioning -- enabled by default
+dnl -------------------------------------------------------------
+CONFIGURE_PARMETIS
 dnl -------------------------------------------------------------
 
 

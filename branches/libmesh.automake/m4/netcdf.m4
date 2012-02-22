@@ -32,4 +32,5 @@ AC_DEFUN([CONFIGURE_NETCDF],
   AC_SUBST(enablenetcdf)
 
   AM_CONDITIONAL(ENABLE_NETCDF, test x$enablenetcdf = xyes)
+  AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
 ])
