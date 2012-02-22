@@ -5,10 +5,8 @@ ACLOCAL_AMFLAGS  = -I m4
 #SUBDIRS          = include src
 
 # # additional files which must be included in 'make dist'
-# EXTRA_DIST = \
-# 	   LICENSE \
-# 	   data \
-# 	   dist_version
+ EXTRA_DIST = license\
+              reference_elements
 
 # Tools in the auxillary directory
 AUX_DIST = build-aux/install-sh    \
