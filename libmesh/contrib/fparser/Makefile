@@ -147,18 +147,22 @@ functioninfo: util/functioninfo.$(obj-suffix) $(target)
 fpoptimizer/grammar_data.cc: \
 		util/tree_grammar_parser \
 		fpoptimizer/treerules.dat
-	util/tree_grammar_parser < fpoptimizer/treerules.dat > $@
+	@echo "Parsing Grammar (in "$(mode)" mode) "$<"..."
+	@util/tree_grammar_parser < fpoptimizer/treerules.dat > $@
 
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
 		util/bytecoderules.dat \
 		util/bytecoderules_header.txt \
 		util/cpp_compress
-	cat util/bytecoderules_header.txt > $@
-	util/bytecoderules_parser \
+	@echo "Creating Bytecode (in "$(mode)" mode) "$<"..."
+	@cat util/bytecoderules_header.txt > $@
+	@util/bytecoderules_parser \
 		< util/bytecoderules.dat \
 		| util/cpp_compress \
 		>> $@
+
+fpoptimizer/bytecodesynth.$(obj-suffix): extrasrc/fp_opcode_add.inc
 
 tests/make_tests: tests/make_tests.$(obj-suffix) \
                   util/cpp_compress.$(obj-suffix)
@@ -210,42 +214,49 @@ fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
 		fpoptimizer/fpoptimizer_footer.txt \
 		$(FPOPTIMIZER_CC_FILES) \
 		util/cpp_compress
-	rm -f fpoptimizer.cc
-	cat fpoptimizer/fpoptimizer_header.txt  > $@
-	for file in $(FPOPTIMIZER_CC_FILES); do \
+	@echo "Processing Source (in "$(mode)" mode) "$<"..."
+	@rm -f fpoptimizer.cc
+	@cat fpoptimizer/fpoptimizer_header.txt  > $@
+	@for file in $(FPOPTIMIZER_CC_FILES); do \
 		echo "#line 1 \"$$file\""; \
 		sed -r "s@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@" < "$$file"; \
 		echo; \
 	done | sed 's@BEGIN_EXPLICIT_INSTANTATION.*@@;s@.*END_EXPLICIT_INSTANTATION@@' \
 	     | util/cpp_compress "lnxyceti" >> $@
 	#     >> $@
-	cat fpoptimizer/fpoptimizer_footer.txt >> $@
+	@cat fpoptimizer/fpoptimizer_footer.txt >> $@
 
 util/tree_grammar_parser: \
 		util/tree_grammar_parser.$(obj-suffix) \
 		fpoptimizer/opcodename.$(obj-suffix)
-	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
+	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
 
 util/tree_grammar_parser.cc: \
 		util/tree_grammar_parser.y
-	bison --output=$@ $<
+	@echo "Running Bison (in "$(mode)" mode) "$<"..."
+	@bison --output=$@ $<
 # sed -i is non-POSIX, so make a temporary file and then copy it back
-	sed -e's/ *$$//' $@ > backup
-	mv backup $@
+	@sed -e's/ *$$//' $@ > backup
+	@mv backup $@
 
 util/cpp_compress: \
 		util/cpp_compress.$(obj-suffix) util/cpp_compress_main.$(obj-suffix)
-	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
+	@echo "Linking (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
 
 util/bytecoderules_parser: util/bytecoderules_parser.$(obj-suffix)
-	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
+	@echo "Linking (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS) $(fp_CXXFLAGS)
 
 
 util/version_changer: util/version_changer.cc
-	$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
+	@echo "Building (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
 
 util/make_function_name_parser: util/make_function_name_parser.cc util/cpp_compress.$(obj-suffix)
-	$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
+	@echo "Building (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
 
 util/powi_opt: \
 		util/powi_opt.$(obj-suffix) \
@@ -254,14 +265,16 @@ util/powi_opt: \
 		fpoptimizer/codetree.$(obj-suffix) \
 		fpoptimizer/valuerange.$(obj-suffix) \
 		fpoptimizer/rangeestimation.$(obj-suffix)
-	$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
+	@echo "Building (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
 
 util/create_testrules_for_optimization_rules: \
 		util/create_testrules_for_optimization_rules.cc \
 		fpoptimizer/grammar_data.$(obj-suffix) \
 		fpoptimizer/opcodename.$(obj-suffix) \
 		fpoptimizer/grammar.$(obj-suffix)
-	$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
+	@echo "Building (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) -O3 $^ -s -o $@ $(fp_LDFLAGS) $(fp_CXXFLAGS) $(fp_CPPFLAGS)
 
 fpoptimizer_tests.sh: util/create_testrules_for_optimization_rules
 	./$< > $@
@@ -326,7 +339,7 @@ devel_pack:
 		util/functioninfo.cc
 
 clean:
-	rm -f	testbed testbed_release \
+	@rm -f	testbed testbed_release \
 		speedtest speedtest_release \
 		functioninfo \
 		examples/example examples/example2 ftest powi_speedtest \
@@ -346,30 +359,30 @@ clean:
 		extrasrc/fp_opcode_add.inc
 
 release_clean:
-	rm -f testbed_release speedtest_release \
+	@rm -f testbed_release speedtest_release \
 		testbed.$(obj-suffix) fparser.$(obj-suffix) fpoptimizer.$(obj-suffix)
 
 distclean: clean
-	rm -f	*~
+	@rm -f	*~
 	@rm -f $(libpath)/*/lib$(pkgname).*
 
 TESTBED_TEST_FILES = $(wildcard tests/*/*)
 testbed_tests.inc: $(TESTBED_TEST_FILES)
 
 .dep:
-	touch extrasrc/fp_opcode_add.inc
-	rm -f .dep
-	touch .dep
-	- $(libmesh_CXX) -MM -MG $(fp_CPPFLAGS) $(wildcard *.cc) | sed "s|^\(.*\).o:|\1.$(obj-suffix):|" >> .dep
-	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard examples/*.cc) | sed "s|^\(.*\).o:|examples/\1.$(obj-suffix):|" >> .dep
-	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard fpoptimizer/*.cc) | sed "s|^\(.*\).o:|fpoptimizer/\1.$(obj-suffix):|" >> .dep
-	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard tests/*.cc) | sed "s|^\(.*\).o:|tests/\1.$(obj-suffix):|" >> .dep
-	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard util/*.cc) | sed "s|^\(.*\).o:|util/\1.$(obj-suffix):|" >> .dep
-	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard mpfr/*.cc) | sed "s|^\(.*\).o:|mpfr/\1.$(obj-suffix):|" >> .dep
-#	- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard lib/*.cc) | sed "s|^\(.*\).o:|lib/\1.$(obj-suffix):|" >> .dep
+	@touch extrasrc/fp_opcode_add.inc
+	@rm -f .dep
+	@touch .dep
+	@- $(libmesh_CXX) -MM -MG $(fp_CPPFLAGS) $(wildcard *.cc) | sed "s|^\(.*\).o:|\1.$(obj-suffix):|" >> .dep
+	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard examples/*.cc) | sed "s|^\(.*\).o:|examples/\1.$(obj-suffix):|" >> .dep
+	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard fpoptimizer/*.cc) | sed "s|^\(.*\).o:|fpoptimizer/\1.$(obj-suffix):|" >> .dep
+	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard tests/*.cc) | sed "s|^\(.*\).o:|tests/\1.$(obj-suffix):|" >> .dep
+	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard util/*.cc) | sed "s|^\(.*\).o:|util/\1.$(obj-suffix):|" >> .dep
+	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard mpfr/*.cc) | sed "s|^\(.*\).o:|mpfr/\1.$(obj-suffix):|" >> .dep
+#	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard lib/*.cc) | sed "s|^\(.*\).o:|lib/\1.$(obj-suffix):|" >> .dep
 # sed -i is non-POSIX, so make a temporary file and then copy it back
-	sed -e's@`pwd`/@@' .dep > backup.dep
-	mv backup.dep .dep
+	@sed -e's@`pwd`/@@' .dep > backup.dep
+	@mv backup.dep .dep
 
 -include .dep
 
