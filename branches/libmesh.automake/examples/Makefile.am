@@ -24,24 +24,32 @@ examples_install_path=$(prefix)/examples
 #
 check_PROGRAMS += introduction_ex1
 check_SCRIPTS  += introduction/introduction_ex1/run.sh
-introduction_ex1_SOURCES = introduction/introduction_ex1/introduction_ex1.C introduction/introduction_ex1/run.sh
+introduction_ex1dir      = $(examples_install_path)/introduction/ex1
+introduction_ex1_DATA    = introduction/introduction_ex1/introduction_ex1.C
+introduction_ex1_SOURCES = $(introduction_ex1_DATA) introduction/introduction_ex1/run.sh
 introduction_ex1_LDADD   = $(top_builddir)/libmesh.la
 CLEANFILES += output.xda
 
 check_PROGRAMS += introduction_ex2
 check_SCRIPTS  += introduction/introduction_ex2/run.sh
-introduction_ex2_SOURCES = introduction/introduction_ex2/introduction_ex2.C introduction/introduction_ex2/run.sh
+introduction_ex2dir      = $(examples_install_path)/introduction/ex2
+introduction_ex2_DATA    = introduction/introduction_ex2/introduction_ex2.C
+introduction_ex2_SOURCES = $(introduction_ex2_DATA) introduction/introduction_ex2/run.sh
 introduction_ex2_LDADD   = $(top_builddir)/libmesh.la
 CLEANFILES += eqn_sys.dat
 
 check_PROGRAMS += introduction_ex3
 check_SCRIPTS  += introduction/introduction_ex3/run.sh
-introduction_ex3_SOURCES = introduction/introduction_ex3/introduction_ex3.C introduction/introduction_ex3/exact_solution.C introduction/introduction_ex3/run.sh
+introduction_ex3dir      = $(examples_install_path)/introduction/ex3
+introduction_ex3_DATA    = introduction/introduction_ex3/introduction_ex3.C introduction/introduction_ex3/exact_solution.C 
+introduction_ex3_SOURCES = $(introduction_ex3_DATA) introduction/introduction_ex3/run.sh
 introduction_ex3_LDADD   = $(top_builddir)/libmesh.la
 
 check_PROGRAMS += introduction_ex4
 check_SCRIPTS  += introduction/introduction_ex4/run.sh
-introduction_ex4_SOURCES = introduction/introduction_ex4/introduction_ex4.C introduction/introduction_ex3/exact_solution.C introduction/introduction_ex4/run.sh
+introduction_ex4dir      = $(examples_install_path)/introduction/ex4
+introduction_ex4_DATA    = introduction/introduction_ex4/introduction_ex4.C introduction/introduction_ex3/exact_solution.C 
+introduction_ex4_SOURCES = $(introduction_ex4_DATA) introduction/introduction_ex4/run.sh
 introduction_ex4_LDADD   = $(top_builddir)/libmesh.la
 CLEANFILES += out_1 out_1_data gnupl*
 
@@ -62,14 +70,14 @@ adaptivity_ex3_DATA    = adaptivity/adaptivity_ex3/adaptivity_ex3.C adaptivity/a
 adaptivity_ex3_SOURCES = $(adaptivity_ex3_DATA) adaptivity/adaptivity_ex3/run.sh
 adaptivity_ex3_LDADD   = $(top_builddir)/libmesh.la
 
-adaptivity/adaptivity_ex3/adaptivity_ex3.in:
-	$(LN_S) $(examples_source_path)/$< $@
+# adaptivity/adaptivity_ex3/adaptivity_ex3.in:
+# 	$(LN_S) $(examples_source_path)/$< $@
 
-adaptivity/adaptivity_ex3/lshaped.xda:
-	$(LN_S) $(examples_source_path)/$< $@
+# adaptivity/adaptivity_ex3/lshaped.xda:
+# 	$(LN_S) $(examples_source_path)/$< $@
 
-adaptivity/adaptivity_ex3/lshaped3D.xda:
-	$(LN_S) $(examples_source_path)/$< $@
+# adaptivity/adaptivity_ex3/lshaped3D.xda:
+# 	$(LN_S) $(examples_source_path)/$< $@
 
 
 #
