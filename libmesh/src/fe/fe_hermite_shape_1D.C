@@ -23,6 +23,10 @@
 #include "elem.h"
 #include "utility.h"
 
+#ifdef LIBMESH_HAVE_TBB_API
+#include "tbb/enumerable_thread_specific.h"
+#endif
+
 
 // Anonymous namespace for persistant variables.
 // This allows us to cache the global-to-local mapping transformation
@@ -37,20 +41,36 @@ namespace
   // global shape function corresponding to value 1 in terms of the
   // local shape function corresponding to normal derivative 2
   static Real d1xd1x, d2xd2x;
-#endif
+#else //LIBMESH_HAVE_TBB_API
+  static tbb::enumerable_thread_specific< unsigned int > old_elem_id_tls;
+  static tbb::enumerable_thread_specific< Real > d1xd1x_tls;
+  static tbb::enumerable_thread_specific< Real > d2xd2x_tls;
+#endif //LIBMESH_HAVE_TBB_API
 
-#ifndef LIBMESH_HAVE_TBB_API
   // Compute the static coefficients for an element
   void hermite_compute_coefs(const Elem* elem)
   {
+#ifndef LIBMESH_HAVE_TBB_API
     // Coefficients are cached from old elements
     if (elem->id() == old_elem_id)
       return;
 
     old_elem_id = elem->id();
 #else
-    void hermite_compute_coefs(const Elem* elem, Real & d1xd1x, Real & d2xd2x)
-  {
+    bool old_elem_id_exists = false;
+    unsigned int & old_elem_id = old_elem_id_tls.local(old_elem_id_exists);
+
+    if(!old_elem_id_exists)
+      old_elem_id = libMesh::invalid_uint;
+    
+    // Coefficients are cached from old elements
+    if (elem->id() == old_elem_id)
+      return;
+
+    old_elem_id = elem->id();
+
+    Real & d1xd1x = d1xd1x_tls.local();
+    Real & d2xd2x = d2xd2x_tls.local();
 #endif //LIBMESH_HAVE_TBB_API
 
   const Order mapping_order        (elem->default_order());
@@ -230,12 +250,11 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
-#else
-  Real d1xd1x, d2xd2x;
-
-  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+  
+#ifdef LIBMESH_HAVE_TBB_API
+  Real & d1xd1x = d1xd1x_tls.local();
+  Real & d2xd2x = d2xd2x_tls.local();
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
@@ -312,12 +331,11 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
-#else
-  Real d1xd1x, d2xd2x;
-
-  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+  
+#ifdef LIBMESH_HAVE_TBB_API
+  Real & d1xd1x = d1xd1x_tls.local();
+  Real & d2xd2x = d2xd2x_tls.local();
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
@@ -375,12 +393,11 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
-#else
-  Real d1xd1x, d2xd2x;
-
-  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+  
+#ifdef LIBMESH_HAVE_TBB_API
+  Real & d1xd1x = d1xd1x_tls.local();
+  Real & d2xd2x = d2xd2x_tls.local();
 #endif //LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
