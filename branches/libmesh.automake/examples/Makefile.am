@@ -51,7 +51,8 @@ introduction_ex4dir      = $(examples_install_path)/introduction/ex4
 introduction_ex4_DATA    = introduction/introduction_ex4/introduction_ex4.C introduction/introduction_ex3/exact_solution.C 
 introduction_ex4_SOURCES = $(introduction_ex4_DATA) introduction/introduction_ex4/run.sh
 introduction_ex4_LDADD   = $(top_builddir)/libmesh.la
-CLEANFILES += out_1 out_1_data gnupl*
+
+CLEANFILES += out_1 out_1_data gnupl* *.xdr 2D_hermite_adaptive.m # FIXME - make this stricter
 
 #
 # Adaptive Mesh Refinement
