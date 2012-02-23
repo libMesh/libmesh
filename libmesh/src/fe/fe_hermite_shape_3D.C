@@ -23,6 +23,9 @@
 #include "elem.h"
 #include "number_lookups.h"
 
+#ifdef LIBMESH_HAVE_TBB_API
+#include "tbb/enumerable_thread_specific.h"
+#endif
 
 // Anonymous namespace for persistant variables.
 // This allows us to cache the global-to-local mapping transformation
@@ -39,30 +42,74 @@ namespace
   static std::vector<Real> dzdxi(2), dxdeta(2), dydzeta(2);
 #endif
 
+#else //LIBMESH_HAVE_TBB_API
+static tbb::enumerable_thread_specific< unsigned int > old_elem_id_tls;
+static tbb::enumerable_thread_specific<std::vector<std::vector<Real> > > dxdxi_tls;
+
+#ifdef DEBUG
+static tbb::enumerable_thread_specific< std::vector<Real> > dydxi_tls, dzdeta_tls, dxdzeta_tls;
+static tbb::enumerable_thread_specific< std::vector<Real> > dzdxi_tls, dxdeta_tls, dydzeta_tls;
+#endif
+
 #endif //LIBMESH_HAVE_TBB_API
 
-#ifndef LIBMESH_HAVE_TBB_API
   // Compute the static coefficients for an element
   void hermite_compute_coefs(const Elem* elem)
   {
+#ifndef LIBMESH_HAVE_TBB_API
     // Coefficients are cached from old elements
     if (elem->id() == old_elem_id)
       return;
 
     old_elem_id = elem->id();
 #else
-  void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & dxdxi
+    bool old_elem_id_exists = false;
+    unsigned int & old_elem_id = old_elem_id_tls.local(old_elem_id_exists);
+
+    if(!old_elem_id_exists)
+      old_elem_id = libMesh::invalid_uint;
+    
+    // Coefficients are cached from old elements
+    if (elem->id() == old_elem_id)
+      return;
+
+    old_elem_id = elem->id();
+
+    bool dxdxi_exists = false;
+    std::vector< std::vector<Real> > & dxdxi = dxdxi_tls.local(dxdxi_exists);
+
+    // This allows us to just resize this once per thread
+    if(!dxdxi_exists)
+    {
+      dxdxi.resize(3);
+      for(unsigned int i=0; i<3; i++)
+        dxdxi[i].resize(2);
+    }
+      
 #ifdef DEBUG
-                             ,
-                             std::vector<Real> & dydxi,
-                             std::vector<Real> & dzdeta,
-                             std::vector<Real> & dxdzeta,
-                             std::vector<Real> & dzdxi,
-                             std::vector<Real> & dxdeta,
-                             std::vector<Real> & dydzeta
+
+    // We will just reuse dxdxi_exists, because if it didn't exist then neither did these!
+    std::vector<Real> & dydxi   = dydxi_tls.local();
+    std::vector<Real> & dzdeta  = dzdeta_tls.local();
+    std::vector<Real> & dxdzeta = dxdzeta_tls.local();
+    
+    std::vector<Real> & dzdxi   = dzdxi_tls.local();
+    std::vector<Real> & dxdeta  = dxdeta_tls.local();
+    std::vector<Real> & dydzeta = dydzeta_tls.local();
+
+    // This allows us to just resize this once per thread
+    if(!dxdxi_exists)
+    {
+      dydxi.resize(2);
+      dzdeta.resize(2);
+      dxdzeta.resize(2);
+      dzdxi.resize(2);
+      dxdeta.resize(2);
+      dydzeta.resize(2);
+    }
+
 #endif //DEBUG
-    )
-  {
+
 #endif //LIBMESH_HAVE_TBB_API
 
   const Order mapping_order        (elem->default_order());
@@ -417,21 +464,11 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
-#else
-  std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
 
-#ifdef DEBUG
-  std::vector<Real> dydxi(2), dzdeta(2), dxdzeta(2);
-  std::vector<Real> dzdxi(2), dxdeta(2), dydzeta(2);
-
-  hermite_compute_coefs(elem, dxdxi, dydxi, dzdeta, dxdzeta, dzdxi, dxdeta, dydzeta);
-#else //DEBUG
-  hermite_compute_coefs(elem, dxdxi);
-#endif //DEBUG
-
-#endif
+#ifdef LIBMESH_HAVE_TBB_API  
+  std::vector<std::vector<Real> > & dxdxi = dxdxi_tls.local();
+#endif // LIBMESH_HAVE_TBB_API
 
   const ElemType type = elem->type();
 
@@ -503,21 +540,10 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
   libmesh_assert (elem != NULL);
   libmesh_assert (j == 0 || j == 1 || j == 2);
 
-#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
-#else
-  std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
 
-#ifdef DEBUG
-  std::vector<Real> dydxi(2), dzdeta(2), dxdzeta(2);
-  std::vector<Real> dzdxi(2), dxdeta(2), dydzeta(2);
-
-  hermite_compute_coefs(elem, dxdxi, dydxi, dzdeta, dxdzeta, dzdxi, dxdeta, dydzeta);
-
-#else //DEBUG
-  hermite_compute_coefs(elem, dxdxi);
-#endif //DEBUG
-
+#ifdef LIBMESH_HAVE_TBB_API
+  std::vector<std::vector<Real> > & dxdxi = dxdxi_tls.local();
 #endif
 
   const ElemType type = elem->type();
@@ -590,21 +616,10 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
 {
   libmesh_assert (elem != NULL);
 
-#ifndef LIBMESH_HAVE_TBB_API
   hermite_compute_coefs(elem);
-#else
-  std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
 
-#ifdef DEBUG
-  std::vector<Real> dydxi(2), dzdeta(2), dxdzeta(2);
-  std::vector<Real> dzdxi(2), dxdeta(2), dydzeta(2);
-
-  hermite_compute_coefs(elem, dxdxi, dydxi, dzdeta, dxdzeta, dzdxi, dxdeta, dydzeta);
-
-#else //DEBUG
-  hermite_compute_coefs(elem, dxdxi);
-#endif //DEBUG
-
+#ifdef LIBMESH_HAVE_TBB_API
+  std::vector<std::vector<Real> > & dxdxi = dxdxi_tls.local();
 #endif
 
   const ElemType type = elem->type();
