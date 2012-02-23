@@ -54,7 +54,7 @@ INCLUDES = $(libmesh_INCLUDE)
 # building up libmesh.la - actually delegate the compilation
 # of the libMesh sources to our ./src subdirectoty.
 #
-lib_LTLIBRARIES = libmesh.la                 # !!! the final library that we will install
+lib_LTLIBRARIES    = libmesh.la              # !!! the final library that we will install
 libmesh_la_SOURCES =                         # !!! no local sources for this library             
 libmesh_la_LIBADD  = src/libmesh_local.la    # !!! but import 
 

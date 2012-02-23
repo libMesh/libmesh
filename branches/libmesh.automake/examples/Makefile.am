@@ -12,7 +12,12 @@ LIBS        = $(libmesh_LIBS)
 
 check_PROGRAMS =
 check_SCRIPTS = 
-CLEANFILES =
+CLEANFILES = biquadratic_h_adaptive.m
+
+
+examples_source_path=$(top_srcdir)/examples
+examples_install_path=$(prefix)/examples
+
 
 #
 # Introductory examples
@@ -38,8 +43,33 @@ check_PROGRAMS += introduction_ex4
 check_SCRIPTS  += introduction/introduction_ex4/run.sh
 introduction_ex4_SOURCES = introduction/introduction_ex4/introduction_ex4.C introduction/introduction_ex3/exact_solution.C introduction/introduction_ex4/run.sh
 introduction_ex4_LDADD   = $(top_builddir)/libmesh.la
+CLEANFILES += out_1 out_1_data gnupl*
 
+#
+# Adaptive Mesh Refinement
+# 
+check_PROGRAMS += adaptivity_ex1
+check_SCRIPTS  += adaptivity/adaptivity_ex1/run.sh
+adaptivity_ex1dir      = $(examples_install_path)/adaptivity/ex1
+adaptivity_ex1_DATA    = adaptivity/adaptivity_ex1/adaptivity_ex1.C
+adaptivity_ex1_SOURCES = $(adaptivity_ex1_DATA) adaptivity/adaptivity_ex1/run.sh
+adaptivity_ex1_LDADD   = $(top_builddir)/libmesh.la
 
+check_PROGRAMS += adaptivity_ex3
+check_SCRIPTS  += adaptivity/adaptivity_ex3/run.sh
+adaptivity_ex3dir      = $(examples_install_path)/adaptivity/ex3
+adaptivity_ex3_DATA    = adaptivity/adaptivity_ex3/adaptivity_ex3.C adaptivity/adaptivity_ex3/adaptivity_ex3.in adaptivity/adaptivity_ex3/lshaped.xda adaptivity/adaptivity_ex3/lshaped3D.xda
+adaptivity_ex3_SOURCES = $(adaptivity_ex3_DATA) adaptivity/adaptivity_ex3/run.sh
+adaptivity_ex3_LDADD   = $(top_builddir)/libmesh.la
+
+adaptivity/adaptivity_ex3/adaptivity_ex3.in:
+	$(LN_S) $(examples_source_path)/$< $@
+
+adaptivity/adaptivity_ex3/lshaped.xda:
+	$(LN_S) $(examples_source_path)/$< $@
+
+adaptivity/adaptivity_ex3/lshaped3D.xda:
+	$(LN_S) $(examples_source_path)/$< $@
 
 
 #
