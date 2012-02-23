@@ -50,33 +50,48 @@ public:
         }
       }
 
-      const char delimiter = '#';
-
-      size_t start = 0, end = 0;
+      size_t nextstart = 0, end = 0;
 
       while (end != std::string::npos)
       {
-        // Find any place where the expression is split into multiple
-        // subexpressions
-        end = expression.find(delimiter, start);
+        // If we're past the end of the string, we can't make any more
+        // subparsers
+        if (nextstart >= expression.size())
+          break;
+
+	// If we're at the start of a brace delimited section, then we
+	// parse just that section:
+        if (expression[nextstart] == '{')
+          {
+            nextstart++;
+            end = expression.find('}', nextstart);
+          }
+        // otherwise we parse the whole thing
+        else
+          end = std::string::npos;
 
 	// We either want the whole end of the string (end == npos) or
 	// a substring in the middle.
         std::string subexpression =
-          expression.substr(start, (end == std::string::npos) ?
-                                    std::string::npos : end - start);
+          expression.substr(nextstart, (end == std::string::npos) ?
+                                        std::string::npos : end - nextstart);
 
-	// If at end, use start=maxSize.  Else start at next
-	// character.
-        start = (end == std::string::npos) ?
-                std::string::npos : end + 1;
+        // fparser can crash on empty expressions
+        libmesh_assert(!subexpression.empty());
 
+        // Parse (and optimize if possible) the subexpression.
+        // Add some basic constants, to Real precision.
         FunctionParserBase<Output> fp;
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
         fp.Parse(subexpression, variables);
         fp.Optimize();
         parsers.push_back(fp);
+
+	// If at end, use nextstart=maxSize.  Else start at next
+	// character.
+        nextstart = (end == std::string::npos) ?
+                    std::string::npos : end + 1;
       }
 
       this->_initialized = true;
