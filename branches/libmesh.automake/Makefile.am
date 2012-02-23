@@ -13,10 +13,10 @@ AUX_DIST = build-aux/install-sh    \
            build-aux/missing
 
 # Support for pkgconfig
-pkgconfigdir     = $(libdir)/pkgconfig
-pkgconfig_DATA   = libmesh.pc
-configdir        = @prefix@/conf
-config_DATA      = Make.common
+#pkgconfigdir     = $(libdir)/pkgconfig
+#pkgconfig_DATA   = libmesh.pc
+configdir        = $(sysconfdir)/libmesh
+config_DATA      = Make.common Makefile libmesh.pc
 
 # Additional files to be deleted by 'make distclean'
 DISTCLEANFILES =  \
@@ -207,100 +207,100 @@ check-regression:
 
 
 
-#
-# 
-#
-.PHONY: echo echo_cxxflags echo_include echo_ldflags
+# #
+# # 
+# #
+# .PHONY: echo echo_cxxflags echo_include echo_ldflags
 
-#
-# Useful for checking make rules
-#
-echo:
-	@echo "C++ compiler:"
-	@echo "$(libmesh_CXX)"
-	@echo
-	@echo "Source Files:"
-	@echo "$(srcfiles)"
-	@echo
-	@echo "Object Files:"
-	@echo "$(objects)"
-	@echo
-	@echo "Application object Files:"
-	@echo "$(appobjects)"
-	@echo
-	@echo "Target:"
-	@echo "$(target)"
-	@echo
-	@echo "Examples Source Files:"
-	@echo "$(examplesrcfiles)"
-	@echo
-	@echo "libmesh_CPPFLAGS:"
-	@echo "$(libmesh_CPPFLAGS)"
-	@echo
-	@echo "libmesh_CFLAGS:"
-	@echo "$(libmesh_CFLAGS)"
-	@echo
-	@echo "libmesh_CXXFLAGS:"
-	@echo "$(libmesh_CXXFLAGS)"
-	@echo
-	@echo "libmesh_CXXSHAREDFLAG:"
-	@echo "$(libmesh_CXXSHAREDFLAG)"
-	@echo
-	@echo "libmesh_INCLUDE:"
-	@echo "$(libmesh_INCLUDE)"
-	@echo
-	@echo "libmesh_LIBS:"
-	@echo "$(libmesh_LIBS)"
-	@echo
-	@echo "libmesh_LDFLAGS:"
-	@echo "$(libmesh_LDFLAGS)"
-	@echo
-	@echo "libmesh_DLFLAGS:"
-	@echo "$(libmesh_DLFLAGS)"
-	@echo
-	@echo "EXAMPLES:"
-	@echo "$(examplesrcfiles)"
-	@echo
+# #
+# # Useful for checking make rules
+# #
+# echo:
+# 	@echo "C++ compiler:"
+# 	@echo "$(libmesh_CXX)"
+# 	@echo
+# 	@echo "Source Files:"
+# 	@echo "$(srcfiles)"
+# 	@echo
+# 	@echo "Object Files:"
+# 	@echo "$(objects)"
+# 	@echo
+# 	@echo "Application object Files:"
+# 	@echo "$(appobjects)"
+# 	@echo
+# 	@echo "Target:"
+# 	@echo "$(target)"
+# 	@echo
+# 	@echo "Examples Source Files:"
+# 	@echo "$(examplesrcfiles)"
+# 	@echo
+# 	@echo "libmesh_CPPFLAGS:"
+# 	@echo "$(libmesh_CPPFLAGS)"
+# 	@echo
+# 	@echo "libmesh_CFLAGS:"
+# 	@echo "$(libmesh_CFLAGS)"
+# 	@echo
+# 	@echo "libmesh_CXXFLAGS:"
+# 	@echo "$(libmesh_CXXFLAGS)"
+# 	@echo
+# 	@echo "libmesh_CXXSHAREDFLAG:"
+# 	@echo "$(libmesh_CXXSHAREDFLAG)"
+# 	@echo
+# 	@echo "libmesh_INCLUDE:"
+# 	@echo "$(libmesh_INCLUDE)"
+# 	@echo
+# 	@echo "libmesh_LIBS:"
+# 	@echo "$(libmesh_LIBS)"
+# 	@echo
+# 	@echo "libmesh_LDFLAGS:"
+# 	@echo "$(libmesh_LDFLAGS)"
+# 	@echo
+# 	@echo "libmesh_DLFLAGS:"
+# 	@echo "$(libmesh_DLFLAGS)"
+# 	@echo
+# 	@echo "EXAMPLES:"
+# 	@echo "$(examplesrcfiles)"
+# 	@echo
 
-#
-# Print the name of the C++ compiler, padded with whitespace
-#
-echo_cxx:
-	@echo  " " $(libmesh_CXX) " "
+# #
+# # Print the name of the C++ compiler, padded with whitespace
+# #
+# echo_cxx:
+# 	@echo  " " $(libmesh_CXX) " "
 
-#
-# Print the name of the C compiler, padded with whitespace
-#
-echo_cc:
-	@echo  " " $(libmesh_CC) " "
+# #
+# # Print the name of the C compiler, padded with whitespace
+# #
+# echo_cc:
+# 	@echo  " " $(libmesh_CC) " "
 
-#
-# Print the flags used for the C preprocessor, padded with whitespace
-#
-echo_cppflags:
-	@echo " " $(libmesh_CPPFLAGS) " "
+# #
+# # Print the flags used for the C preprocessor, padded with whitespace
+# #
+# echo_cppflags:
+# 	@echo " " $(libmesh_CPPFLAGS) " "
 
-#
-# Print the flags used for C++ compilation, padded with whitespace
-#
-echo_cxxflags:
-	@echo " " $(libmesh_CXXFLAGS) " "
+# #
+# # Print the flags used for C++ compilation, padded with whitespace
+# #
+# echo_cxxflags:
+# 	@echo " " $(libmesh_CXXFLAGS) " "
 
-#
-# Print the flags used for C compilation, padded with whitespace
-#
-echo_cflags:
-	@echo " " $(libmesh_CFLAGS) " "
+# #
+# # Print the flags used for C compilation, padded with whitespace
+# #
+# echo_cflags:
+# 	@echo " " $(libmesh_CFLAGS) " "
 
-#
-# Print C++ compiler include path, padded with whitespace
-#
-echo_include:
-	@echo " " $(libmesh_INCLUDE) " "
+# #
+# # Print C++ compiler include path, padded with whitespace
+# #
+# echo_include:
+# 	@echo " " $(libmesh_INCLUDE) " "
 
-#
-# Print the flags used to link, padded with whitespace
-#
-echo_ldflags:
-	@echo " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
+# #
+# # Print the flags used to link, padded with whitespace
+# #
+# echo_ldflags:
+# 	@echo " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
 

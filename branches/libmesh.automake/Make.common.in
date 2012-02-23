@@ -15,6 +15,11 @@
 #
 ###############################################################################
 
+
+# top-level source dir.  This is set by automake for internal builds, otherwise
+# it gets set to the installation prefix
+top_srcdir ?= @prefix@
+
 ###############################################################################
 # the following lines will be replaced by the output 
 # of ./configure
@@ -640,6 +645,81 @@ endif
 
 ###############################################################################
 
+#
+# 
+#
+.PHONY: echo echo_cxxflags echo_include echo_ldflags
+
+#
+# Useful for checking make rules
+#
+echo:
+	@echo "C++ compiler:"
+	@echo "$(libmesh_CXX)"
+	@echo
+	@echo "libmesh_CPPFLAGS:"
+	@echo "$(libmesh_CPPFLAGS)"
+	@echo
+	@echo "libmesh_CFLAGS:"
+	@echo "$(libmesh_CFLAGS)"
+	@echo
+	@echo "libmesh_CXXFLAGS:"
+	@echo "$(libmesh_CXXFLAGS)"
+	@echo
+	@echo "libmesh_INCLUDE:"
+	@echo "$(libmesh_INCLUDE)"
+	@echo
+	@echo "libmesh_LIBS:"
+	@echo "$(libmesh_LIBS)"
+	@echo
+	@echo "libmesh_LDFLAGS:"
+	@echo "$(libmesh_LDFLAGS)"
+	@echo
+	@echo "libmesh_DLFLAGS:"
+	@echo "$(libmesh_DLFLAGS)"
+	@echo
+
+#
+# Print the name of the C++ compiler, padded with whitespace
+#
+echo_cxx:
+	@echo  " " $(libmesh_CXX) " "
+
+#
+# Print the name of the C compiler, padded with whitespace
+#
+echo_cc:
+	@echo  " " $(libmesh_CC) " "
+
+#
+# Print the flags used for the C preprocessor, padded with whitespace
+#
+echo_cppflags:
+	@echo " " $(libmesh_CPPFLAGS) " "
+
+#
+# Print the flags used for C++ compilation, padded with whitespace
+#
+echo_cxxflags:
+	@echo " " $(libmesh_CXXFLAGS) " "
+
+#
+# Print the flags used for C compilation, padded with whitespace
+#
+echo_cflags:
+	@echo " " $(libmesh_CFLAGS) " "
+
+#
+# Print C++ compiler include path, padded with whitespace
+#
+echo_include:
+	@echo " " $(libmesh_INCLUDE) " "
+
+#
+# Print the flags used to link, padded with whitespace
+#
+echo_ldflags:
+	@echo " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
 
 
 # Local Variables:
