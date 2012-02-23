@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -x
+#set -x
 
 example_name=adaptivity_ex3
 example_dir=examples/adaptivity/$example_name
