@@ -12,6 +12,12 @@ ACLOCAL_AMFLAGS  = -I m4
 AUX_DIST = build-aux/install-sh    \
            build-aux/missing
 
+# Support for pkgconfig
+pkgconfigdir     = $(libdir)/pkgconfig
+pkgconfig_DATA   = libmesh.pc
+configdir        = @prefix@/conf
+config_DATA      = Make.common
+
 # Additional files to be deleted by 'make distclean'
 DISTCLEANFILES =  \
 	   _configs.sed

@@ -32,6 +32,7 @@ AC_CONFIG_FILES([Make.common
 		 include/Makefile
 		 src/Makefile
 		 examples/Makefile
+		 libmesh.pc
 		 ])
 		 
 AC_CONFIG_FILES(doc/Doxyfile)
