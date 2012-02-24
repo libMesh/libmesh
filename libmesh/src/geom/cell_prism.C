@@ -177,6 +177,18 @@ bool Prism::is_child_on_side(const unsigned int c,
 
 
 
+bool Prism::is_edge_on_side(const unsigned int e,
+                            const unsigned int s) const
+{
+  libmesh_assert (e < this->n_edges());
+  libmesh_assert (s < this->n_sides());
+
+  return (is_node_on_side(Prism6::edge_nodes_map[e][0],s) &&
+          is_node_on_side(Prism6::edge_nodes_map[e][1],s));
+}
+
+
+
 const unsigned short int Prism::_second_order_vertex_child_number[18] =
 {
   99,99,99,99,99,99, // Vertices

@@ -138,6 +138,10 @@ class NodeElem : public Elem
 			       const unsigned int) const
   { libmesh_error(); return false; }
 
+  virtual bool is_edge_on_side(const unsigned int e,
+			       const unsigned int s) const
+  { libmesh_error(); return false; }
+
   /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances

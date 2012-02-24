@@ -26,6 +26,7 @@
 
 // Local includes cont'd
 #include "cell_inf_hex.h"
+#include "cell_inf_hex8.h"
 #include "face_quad4.h"
 #include "face_inf_quad4.h"
 
@@ -207,6 +208,19 @@ bool InfHex::is_child_on_side(const unsigned int c,
 
   return (s == 0 || c+1 == s || c == s%4);
 }
+
+
+
+bool InfHex::is_edge_on_side (const unsigned int e,
+                              const unsigned int s) const
+{
+  libmesh_assert (e < this->n_edges());
+  libmesh_assert (s < this->n_sides());
+
+  return (is_node_on_side(InfHex8::edge_nodes_map[e][0],s) &&
+          is_node_on_side(InfHex8::edge_nodes_map[e][1],s));
+}
+
 
 
 
