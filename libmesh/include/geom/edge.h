@@ -99,8 +99,8 @@ class Edge : public Elem
   /*
    * @returns true iff the specified edge is on the specified side
    */
-  virtual bool is_edge_on_side(const unsigned int e,
-			       const unsigned int s) const
+  virtual bool is_edge_on_side(const unsigned int,
+			       const unsigned int) const
     { return false; }
 
   /*
