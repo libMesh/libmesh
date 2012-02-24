@@ -1691,9 +1691,6 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
    * gives the solution (to be computed) on the current mesh.
    */
 
-  // The number of variables in this system
-  const unsigned int n_variables = system.n_vars();
-
   // The dimensionality of the current mesh
   const unsigned int dim = system.get_mesh().mesh_dimension();
 
