@@ -508,6 +508,96 @@ public:
 		       NumericVector<Number>& new_vector) const;
 
   /**
+   * Projects arbitrary boundary functions onto a vector of degree of
+   * freedom values for the current system.
+   * Only degrees of freedom which affect the function's trace on a
+   * boundary in the set \p b are affected.
+   * Only degrees of freedom associated with the variables listed in
+   * the vector \p variables are projected.
+   * The function value \p f and its gradient \p g are
+   * user-provided cloneable functors.
+   * A gradient \p g is only required/used for projecting onto finite
+   * element spaces with continuous derivatives.
+   * If non-default \p Parameters are to be used, they can be provided
+   * in the \p parameters argument.
+   */
+  void boundary_project_solution (const std::set<boundary_id_type> &b,
+                                  const std::vector<unsigned int> &variables,
+                                  FunctionBase<Number> *f,
+                                  FunctionBase<Gradient> *g = NULL,
+		                  Parameters* parameters = NULL);
+
+  /**
+   * Projects arbitrary boundary functions onto a vector of degree of
+   * freedom values for the current system.
+   * Only degrees of freedom which affect the function's trace on a
+   * boundary in the set \p b are affected.
+   * Only degrees of freedom associated with the variables listed in
+   * the vector \p variables are projected.
+   * The function value \p fptr and its gradient \p gptr are
+   * represented by function pointers.
+   * A gradient \p gptr is only required/used for projecting onto
+   * finite element spaces with continuous derivatives.
+   */
+  void boundary_project_solution (const std::set<boundary_id_type> &b,
+                                  const std::vector<unsigned int> &variables,
+                                  Number fptr(const Point& p,
+				              const Parameters& parameters,
+                                              const std::string& sys_name,
+				              const std::string& unknown_name),
+                                  Gradient gptr(const Point& p,
+				                const Parameters& parameters,
+                                                const std::string& sys_name,
+				                const std::string& unknown_name),
+		                  Parameters& parameters);
+
+  /**
+   * Projects arbitrary boundary functions onto a vector of degree of
+   * freedom values for the current system.
+   * Only degrees of freedom which affect the function's trace on a
+   * boundary in the set \p b are affected.
+   * Only degrees of freedom associated with the variables listed in
+   * the vector \p variables are projected.
+   * The function value \p f and its gradient \p g are
+   * user-provided cloneable functors.
+   * A gradient \p g is only required/used for projecting onto finite
+   * element spaces with continuous derivatives.
+   * If non-default \p Parameters are to be used, they can be provided
+   * in the \p parameters argument.
+   */
+  void boundary_project_vector (const std::set<boundary_id_type> &b,
+                                const std::vector<unsigned int> &variables,
+                                NumericVector<Number>& new_vector,
+                                FunctionBase<Number> *f,
+                                FunctionBase<Gradient> *g = NULL,
+		                Parameters* parameters = NULL) const;
+
+  /**
+   * Projects arbitrary boundary functions onto a vector of degree of
+   * freedom values for the current system.
+   * Only degrees of freedom which affect the function's trace on a
+   * boundary in the set \p b are affected.
+   * Only degrees of freedom associated with the variables listed in
+   * the vector \p variables are projected.
+   * The function value \p fptr and its gradient \p gptr are
+   * represented by function pointers.
+   * A gradient \p gptr is only required/used for projecting onto
+   * finite element spaces with continuous derivatives.
+   */
+  void boundary_project_vector (const std::set<boundary_id_type> &b,
+                                const std::vector<unsigned int> &variables,
+                                Number fptr(const Point& p,
+				            const Parameters& parameters,
+                                            const std::string& sys_name,
+				            const std::string& unknown_name),
+                                Gradient gptr(const Point& p,
+				              const Parameters& parameters,
+                                              const std::string& sys_name,
+				              const std::string& unknown_name),
+		                Parameters& parameters,
+		                NumericVector<Number>& new_vector) const;
+
+  /**
    * @returns the system number.
    */
   unsigned int number () const;
