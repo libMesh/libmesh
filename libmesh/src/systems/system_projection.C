@@ -21,19 +21,19 @@
 #include <vector>
 
 // Local includes
-#include "system.h"
-#include "mesh_base.h"
-#include "elem.h"
-#include "dof_map.h"
-#include "fe_interface.h"
-#include "numeric_vector.h"
-#include "libmesh_logging.h"
-#include "equation_systems.h"
-
+#include "boundary_info.h"
 #include "dense_matrix.h"
-#include "fe_base.h"
-#include "quadrature_gauss.h"
 #include "dense_vector.h"
+#include "dof_map.h"
+#include "elem.h"
+#include "equation_systems.h"
+#include "fe_base.h"
+#include "fe_interface.h"
+#include "libmesh_logging.h"
+#include "mesh_base.h"
+#include "numeric_vector.h"
+#include "quadrature_gauss.h"
+#include "system.h"
 #include "threads.h"
 #include "wrapped_function.h"
 
@@ -102,8 +102,8 @@ namespace libMesh
 
 
   /**
-   * This class implements projecting a vector from
-   * an old mesh to the newly refined mesh.  This
+   * This class implements projecting an arbitrary
+   * function to the current mesh.  This
    * may be exectued in parallel on multiple threads.
    */
   class ProjectSolution
@@ -135,6 +135,65 @@ namespace libMesh
     }
 
     ProjectSolution (const ProjectSolution &in) :
+    system(in.system),
+    f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
+    g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    parameters(in.parameters),
+    new_vector(in.new_vector)
+    {
+      libmesh_assert(f.get());
+      f->init();
+      if (g.get())
+        g->init();
+    }
+
+    void operator()(const ConstElemRange &range) const;
+  };
+
+
+
+
+  /**
+   * This class implements projecting an arbitrary
+   * boundary function to the current mesh.  This
+   * may be exectued in parallel on multiple threads.
+   */
+  class BoundaryProjectSolution
+  {
+  private:
+    const std::set<boundary_id_type> &b;
+    const std::vector<unsigned int>  &variables;
+    const System                     &system;
+    AutoPtr<FunctionBase<Number> >    f;
+    AutoPtr<FunctionBase<Gradient> >  g;
+    const Parameters                 &parameters;
+    NumericVector<Number>            &new_vector;
+
+  public:
+    BoundaryProjectSolution (const std::set<boundary_id_type> &b_in,
+                             const std::vector<unsigned int> &variables_in,
+                             const System &system_in,
+		             FunctionBase<Number>* f_in,
+		             FunctionBase<Gradient>* g_in,
+		             const Parameters &parameters_in,
+		             NumericVector<Number> &new_v_in) :
+    b(b_in),
+    variables(variables_in),
+    system(system_in),
+    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
+    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    parameters(parameters_in),
+    new_vector(new_v_in)
+    {
+      libmesh_assert(f.get());
+      f->init();
+      if (g.get())
+        g->init();
+    }
+
+    BoundaryProjectSolution (const BoundaryProjectSolution &in) :
+    b(in.b),
+    variables(in.variables),
     system(in.system),
     f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
     g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
@@ -365,7 +424,7 @@ void System::project_solution (Number fptr(const Point& p,
 
 
 /**
- * This method projects an analytic function onto the solution via L2
+ * This method projects an arbitrary function onto the solution via L2
  * projections and nodal interpolations on each element.
  */
 void System::project_solution (FunctionBase<Number> *f,
@@ -382,7 +441,7 @@ void System::project_solution (FunctionBase<Number> *f,
 
 
 /**
- * This method projects an analytic function via L2 projections and
+ * This method projects an arbitrary function via L2 projections and
  * nodal interpolations on each element.
  */
 void System::project_vector (Number fptr(const Point& p,
@@ -402,7 +461,7 @@ void System::project_vector (Number fptr(const Point& p,
 }
 
 /**
- * This method projects an analytic function via L2 projections and
+ * This method projects an arbitrary function via L2 projections and
  * nodal interpolations on each element.
  */
 void System::project_vector (NumericVector<Number>& new_vector,
@@ -458,6 +517,112 @@ void System::project_vector (NumericVector<Number>& new_vector,
 #endif
 
   STOP_LOG("project_vector()", "System");
+}
+
+
+/**
+ * This method projects components of an arbitrary boundary function
+ * onto the solution via L2 projections and nodal interpolations on
+ * each element.
+ */
+void System::boundary_project_solution
+  (const std::set<boundary_id_type> &b,
+   const std::vector<unsigned int> &variables,
+   Number fptr(const Point& p,
+               const Parameters& parameters,
+               const std::string& sys_name,
+               const std::string& unknown_name),
+   Gradient gptr(const Point& p,
+                 const Parameters& parameters,
+                 const std::string& sys_name,
+                 const std::string& unknown_name),
+   Parameters& parameters)
+{
+  WrappedFunction<Number> f(*this, fptr, &parameters);
+  WrappedFunction<Gradient> g(*this, gptr, &parameters);
+  this->boundary_project_solution(b, variables, &f, &g);
+}
+
+
+/**
+ * This method projects an arbitary boundary function onto the
+ * solution via L2 projections and nodal interpolations on each
+ * element.
+ */
+void System::boundary_project_solution
+  (const std::set<boundary_id_type> &b,
+   const std::vector<unsigned int> &variables,
+   FunctionBase<Number> *f,
+   FunctionBase<Gradient> *g,
+   Parameters* parameters)
+{
+  this->boundary_project_vector(b, variables, *solution, f, g, parameters);
+
+  solution->localize(*current_local_solution);
+}
+
+
+
+
+
+/**
+ * This method projects an arbitrary boundary function via L2
+ * projections and nodal interpolations on each element.
+ */
+void System::boundary_project_vector
+  (const std::set<boundary_id_type> &b,
+   const std::vector<unsigned int> &variables,
+   Number fptr(const Point& p,
+               const Parameters& parameters,
+               const std::string& sys_name,
+               const std::string& unknown_name),
+   Gradient gptr(const Point& p,
+                 const Parameters& parameters,
+                 const std::string& sys_name,
+                 const std::string& unknown_name),
+   Parameters& parameters,
+   NumericVector<Number>& new_vector) const
+{
+  WrappedFunction<Number> f(*this, fptr, &parameters);
+  WrappedFunction<Gradient> g(*this, gptr, &parameters);
+  this->boundary_project_vector(b, variables, new_vector, &f, &g);
+}
+
+/**
+ * This method projects an arbitrary function via L2 projections and
+ * nodal interpolations on each element.
+ */
+void System::boundary_project_vector 
+  (const std::set<boundary_id_type> &b,
+   const std::vector<unsigned int> &variables,
+   NumericVector<Number>& new_vector,
+   FunctionBase<Number> *f,
+   FunctionBase<Gradient> *g,
+   Parameters *parameters) const
+{
+  START_LOG ("boundary_project_vector()", "System");
+
+  Threads::parallel_for
+    (ConstElemRange (this->get_mesh().active_local_elements_begin(),
+		     this->get_mesh().active_local_elements_end(),
+		     1000),
+     BoundaryProjectSolution(b, variables, *this, f, g,
+		             parameters ?
+		               *parameters :
+                               this->get_equation_systems().parameters,
+		             new_vector)
+    );
+
+  // We don't do SCALAR dofs when just projecting the boundary, so
+  // we're done here.
+
+  new_vector.close();
+
+#ifdef LIBMESH_ENABLE_AMR
+  this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
+#endif
+
+  STOP_LOG("boundary_project_vector()", "System");
 }
 
 
@@ -978,8 +1143,8 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
   libmesh_assert(f.get());
 
   /**
-   * This method projects an analytic solution to the current
-   * mesh.  The input function \p f gives the analytic solution,
+   * This method projects an arbitrary solution to the current
+   * mesh.  The input function \p f gives the arbitrary solution,
    * while the \p new_vector (which should already be correctly sized)
    * gives the solution (to be computed) on the current mesh.
    */
@@ -1512,5 +1677,501 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
         }  // end elem loop
     } // end variables loop
 }
+
+
+void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
+{
+  // We need data to project
+  libmesh_assert(f.get());
+
+  /**
+   * This method projects an arbitrary boundary solution to the current
+   * mesh.  The input function \p f gives the arbitrary solution,
+   * while the \p new_vector (which should already be correctly sized)
+   * gives the solution (to be computed) on the current mesh.
+   */
+
+  // The number of variables in this system
+  const unsigned int n_variables = system.n_vars();
+
+  // The dimensionality of the current mesh
+  const unsigned int dim = system.get_mesh().mesh_dimension();
+
+  // The DofMap for this system
+  const DofMap& dof_map = system.get_dof_map();
+
+  // Boundary info for the current mesh
+  const BoundaryInfo& boundary_info = *system.get_mesh().boundary_info;
+
+  // The element matrix and RHS for projections.
+  // Note that Ke is always real-valued, whereas
+  // Fe may be complex valued if complex number
+  // support is enabled
+  DenseMatrix<Real> Ke;
+  DenseVector<Number> Fe;
+  // The new element coefficients
+  DenseVector<Number> Ue;
+
+
+  // Loop over all the variables we've been requested to project
+  for (unsigned int v=0; v!=variables.size(); v++)
+    {
+      const unsigned int var = variables[v];
+
+      const Variable& variable = dof_map.variable(var);
+
+      const FEType& fe_type = variable.type();
+
+      if (fe_type.family == SCALAR)
+        continue;
+
+      const unsigned int var_component =
+        system.variable_scalar_number(var, 0);
+
+      // Get FE objects of the appropriate type
+      AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+
+      // Prepare variables for projection
+      AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
+      AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
+
+      // The values of the shape functions at the quadrature
+      // points
+      const std::vector<std::vector<Real> >& phi = fe->get_phi();
+
+      // The gradients of the shape functions at the quadrature
+      // points on the child element.
+      const std::vector<std::vector<RealGradient> > *dphi = NULL;
+
+      const FEContinuity cont = fe->get_continuity();
+
+      if (cont == C_ONE)
+        {
+          // We'll need gradient data for a C1 projection
+          libmesh_assert(g.get());
+
+          const std::vector<std::vector<RealGradient> >&
+            ref_dphi = fe->get_dphi();
+          dphi = &ref_dphi;
+        }
+
+      // The Jacobian * quadrature weight at the quadrature points
+      const std::vector<Real>& JxW =
+	fe->get_JxW();
+
+      // The XYZ locations of the quadrature points
+      const std::vector<Point>& xyz_values =
+	fe->get_xyz();
+
+      // The global DOF indices
+      std::vector<unsigned int> dof_indices;
+      // Side/edge DOF indices
+      std::vector<unsigned int> side_dofs;
+
+      // Iterate over all the elements in the range
+      for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
+	{
+	  const Elem* elem = *elem_it;
+
+          // Per-subdomain variables don't need to be projected on
+          // elements where they're not active
+          if (!variable.active_on_subdomain(elem->subdomain_id()))
+            continue;
+
+	  // Find out which nodes, edges and sides are on a requested
+	  // boundary:
+          std::vector<bool> is_boundary_node(elem->n_nodes(), false),
+                            is_boundary_edge(elem->n_edges(), false),
+                            is_boundary_side(elem->n_sides(), false);
+          for (unsigned char s=0; s != elem->n_sides(); ++s)
+            {
+              // First see if this side has been requested
+              const std::vector<boundary_id_type>& bc_ids =
+                boundary_info.boundary_ids (elem, s);
+              bool do_this_side = false;
+              for (unsigned int i=0; i != bc_ids.size(); ++i)
+                if (b.count(bc_ids[i]))
+                  {
+                    do_this_side = true;
+                    break;
+                  }
+              if (!do_this_side)
+                continue;
+
+              // Then see what nodes and what edges are on it
+              for (unsigned int n=0; n != elem->n_nodes(); ++n)
+                if (elem->is_node_on_side(n,s))
+                  is_boundary_node[n] = true;
+              for (unsigned int e=0; e != elem->n_edges(); ++e)
+                if (elem->is_edge_on_side(e,s))
+                  is_boundary_edge[e] = true;
+            }
+
+	  // Update the DOF indices for this element based on
+          // the current mesh
+	  dof_map.dof_indices (elem, dof_indices, var);
+
+	  // The number of DOFs on the element
+	  const unsigned int n_dofs = dof_indices.size();
+
+          // Fixed vs. free DoFs on edge/face projections
+          std::vector<char> dof_is_fixed(n_dofs, false); // bools
+          std::vector<int> free_dof(n_dofs, 0);
+
+	  // The element type
+	  const ElemType elem_type = elem->type();
+
+	  // The number of nodes on the new element
+	  const unsigned int n_nodes = elem->n_nodes();
+
+          // Zero the interpolated values
+          Ue.resize (n_dofs); Ue.zero();
+
+          // In general, we need a series of
+          // projections to ensure a unique and continuous
+	  // solution.  We start by interpolating boundary nodes, then
+	  // hold those fixed and project boundary edges, then hold
+	  // those fixed and project boundary faces,
+
+          // Interpolate node values first
+          unsigned int current_dof = 0;
+          for (unsigned int n=0; n!= n_nodes; ++n)
+            {
+              // FIXME: this should go through the DofMap,
+              // not duplicate dof_indices code badly!
+	      const unsigned int nc =
+		FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
+                                             n);
+              if (!elem->is_vertex(n) || !is_boundary_node[n])
+                {
+                  current_dof += nc;
+                  continue;
+                }
+              if (cont == DISCONTINUOUS)
+                {
+                  libmesh_assert(nc == 0);
+                }
+              // Assume that C_ZERO elements have a single nodal
+              // value shape function
+              else if (cont == C_ZERO)
+                {
+                  libmesh_assert(nc == 1);
+		  Ue(current_dof) = f->component(var_component,elem->point(n));
+                  dof_is_fixed[current_dof] = true;
+                  current_dof++;
+                }
+              // The hermite element vertex shape functions are weird
+              else if (fe_type.family == HERMITE)
+                {
+                  Ue(current_dof) = f->component(var_component,elem->point(n));
+                  dof_is_fixed[current_dof] = true;
+                  current_dof++;
+                  Gradient grad = g->component(var_component,elem->point(n));
+                  // x derivative
+                  Ue(current_dof) = grad(0);
+                  dof_is_fixed[current_dof] = true;
+                  current_dof++;
+                  if (dim > 1)
+                    {
+                      // We'll finite difference mixed derivatives
+                      Point nxminus = elem->point(n),
+                            nxplus = elem->point(n);
+                      nxminus(0) -= TOLERANCE;
+                      nxplus(0) += TOLERANCE;
+                      Gradient gxminus = g->component(var_component,nxminus);
+                      Gradient gxplus = g->component(var_component,nxplus);
+                      // y derivative
+                      Ue(current_dof) = grad(1);
+                      dof_is_fixed[current_dof] = true;
+                      current_dof++;
+                      // xy derivative
+                      Ue(current_dof) = (gxplus(1) - gxminus(1))
+                                        / 2. / TOLERANCE;
+                      dof_is_fixed[current_dof] = true;
+                      current_dof++;
+
+                      if (dim > 2)
+                        {
+                          // z derivative
+                          Ue(current_dof) = grad(2);
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                          // xz derivative
+                          Ue(current_dof) = (gxplus(2) - gxminus(2))
+                                            / 2. / TOLERANCE;
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                          // We need new points for yz
+                          Point nyminus = elem->point(n),
+                                nyplus = elem->point(n);
+                          nyminus(1) -= TOLERANCE;
+                          nyplus(1) += TOLERANCE;
+                          Gradient gyminus = g->component(var_component,nyminus);
+                          Gradient gyplus = g->component(var_component,nyplus);
+                          // xz derivative
+                          Ue(current_dof) = (gyplus(2) - gyminus(2))
+                                            / 2. / TOLERANCE;
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                          // Getting a 2nd order xyz is more tedious
+                          Point nxmym = elem->point(n),
+                                nxmyp = elem->point(n),
+                                nxpym = elem->point(n),
+                                nxpyp = elem->point(n);
+                          nxmym(0) -= TOLERANCE;
+                          nxmym(1) -= TOLERANCE;
+                          nxmyp(0) -= TOLERANCE;
+                          nxmyp(1) += TOLERANCE;
+                          nxpym(0) += TOLERANCE;
+                          nxpym(1) -= TOLERANCE;
+                          nxpyp(0) += TOLERANCE;
+                          nxpyp(1) += TOLERANCE;
+                          Gradient gxmym = g->component(var_component,nxmym);
+                          Gradient gxmyp = g->component(var_component,nxmyp);
+                          Gradient gxpym = g->component(var_component,nxpym);
+                          Gradient gxpyp = g->component(var_component,nxpyp);
+                          Number gxzplus = (gxpyp(2) - gxmyp(2))
+                                         / 2. / TOLERANCE;
+                          Number gxzminus = (gxpym(2) - gxmym(2))
+                                          / 2. / TOLERANCE;
+                          // xyz derivative
+                          Ue(current_dof) = (gxzplus - gxzminus)
+                                            / 2. / TOLERANCE;
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                        }
+                    }
+                }
+              // Assume that other C_ONE elements have a single nodal
+              // value shape function and nodal gradient component
+              // shape functions
+              else if (cont == C_ONE)
+                {
+                  libmesh_assert(nc == 1 + dim);
+		  Ue(current_dof) = f->component(var_component,elem->point(n));
+                  dof_is_fixed[current_dof] = true;
+                  current_dof++;
+                  Gradient grad = g->component(var_component,elem->point(n));
+                  for (unsigned int i=0; i!= dim; ++i)
+                    {
+		      Ue(current_dof) = grad(i);
+                      dof_is_fixed[current_dof] = true;
+                      current_dof++;
+                    }
+                }
+              else
+                libmesh_error();
+            }
+
+          // In 3D, project any edge values next
+          if (dim > 2 && cont != DISCONTINUOUS)
+            for (unsigned int e=0; e != elem->n_edges(); ++e)
+              {
+                if (!is_boundary_edge[e])
+                  continue;
+
+		FEInterface::dofs_on_edge(elem, dim, fe_type, e,
+                                          side_dofs);
+
+                // Some edge dofs are on nodes and already
+                // fixed, others are free to calculate
+                unsigned int free_dofs = 0;
+                for (unsigned int i=0; i != side_dofs.size(); ++i)
+                  if (!dof_is_fixed[side_dofs[i]])
+                    free_dof[free_dofs++] = i;
+
+                // There may be nothing to project
+                if (!free_dofs)
+                  continue;
+
+	        Ke.resize (free_dofs, free_dofs); Ke.zero();
+	        Fe.resize (free_dofs); Fe.zero();
+                // The new edge coefficients
+                DenseVector<Number> Uedge(free_dofs);
+
+                // Initialize FE data on the edge
+                fe->attach_quadrature_rule (qedgerule.get());
+	        fe->edge_reinit (elem, e);
+	        const unsigned int n_qp = qedgerule->n_points();
+
+	        // Loop over the quadrature points
+	        for (unsigned int qp=0; qp<n_qp; qp++)
+	          {
+	            // solution at the quadrature point
+	            Number fineval = f->component(var_component,xyz_values[qp]);
+	            // solution grad at the quadrature point
+	            Gradient finegrad;
+                    if (cont == C_ONE)
+                      finegrad = g->component(var_component,xyz_values[qp]);
+
+                    // Form edge projection matrix
+                    for (unsigned int sidei=0, freei=0;
+                         sidei != side_dofs.size(); ++sidei)
+                      {
+                        unsigned int i = side_dofs[sidei];
+                        // fixed DoFs aren't test functions
+                        if (dof_is_fixed[i])
+                          continue;
+			for (unsigned int sidej=0, freej=0;
+                             sidej != side_dofs.size(); ++sidej)
+                          {
+                            unsigned int j = side_dofs[sidej];
+                            if (dof_is_fixed[j])
+			      Fe(freei) -= phi[i][qp] * phi[j][qp] *
+                                           JxW[qp] * Ue(j);
+                            else
+                              Ke(freei,freej) += phi[i][qp] *
+						 phi[j][qp] * JxW[qp];
+                            if (cont == C_ONE)
+                              {
+                                if (dof_is_fixed[j])
+                                  Fe(freei) -= ((*dphi)[i][qp] *
+					        (*dphi)[j][qp]) *
+                                                JxW[qp] * Ue(j);
+                                else
+                                  Ke(freei,freej) += ((*dphi)[i][qp] *
+                                                      (*dphi)[j][qp])
+                                                      * JxW[qp];
+                              }
+                            if (!dof_is_fixed[j])
+                              freej++;
+                          }
+                        Fe(freei) += phi[i][qp] * fineval * JxW[qp];
+                        if (cont == C_ONE)
+			  Fe(freei) += (finegrad * (*dphi)[i][qp]) *
+                                       JxW[qp];
+                        freei++;
+                      }
+	          }
+
+                Ke.cholesky_solve(Fe, Uedge);
+
+                // Transfer new edge solutions to element
+		for (unsigned int i=0; i != free_dofs; ++i)
+                  {
+                    Number &ui = Ue(side_dofs[free_dof[i]]);
+                    libmesh_assert(std::abs(ui) < TOLERANCE ||
+                           std::abs(ui - Uedge(i)) < TOLERANCE);
+                    ui = Uedge(i);
+                    dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                  }
+              }
+
+	  // Project any side values (edges in 2D, faces in 3D)
+          if (dim > 1 && cont != DISCONTINUOUS)
+            for (unsigned int s=0; s != elem->n_sides(); ++s)
+              {
+                if (!is_boundary_side[s])
+                  continue;
+
+		FEInterface::dofs_on_side(elem, dim, fe_type, s,
+                                          side_dofs);
+
+		// Some side dofs are on nodes/edges and already
+                // fixed, others are free to calculate
+                unsigned int free_dofs = 0;
+                for (unsigned int i=0; i != side_dofs.size(); ++i)
+                  if (!dof_is_fixed[side_dofs[i]])
+                    free_dof[free_dofs++] = i;
+
+                // There may be nothing to project
+                if (!free_dofs)
+                  continue;
+
+	        Ke.resize (free_dofs, free_dofs); Ke.zero();
+	        Fe.resize (free_dofs); Fe.zero();
+                // The new side coefficients
+                DenseVector<Number> Uside(free_dofs);
+
+                // Initialize FE data on the side
+                fe->attach_quadrature_rule (qsiderule.get());
+	        fe->reinit (elem, s);
+	        const unsigned int n_qp = qsiderule->n_points();
+
+	        // Loop over the quadrature points
+	        for (unsigned int qp=0; qp<n_qp; qp++)
+	          {
+	            // solution at the quadrature point
+	            Number fineval = f->component(var_component,xyz_values[qp]);
+	            // solution grad at the quadrature point
+	            Gradient finegrad;
+                    if (cont == C_ONE)
+                      finegrad = g->component(var_component,xyz_values[qp]);
+
+                    // Form side projection matrix
+                    for (unsigned int sidei=0, freei=0;
+                         sidei != side_dofs.size(); ++sidei)
+                      {
+                        unsigned int i = side_dofs[sidei];
+                        // fixed DoFs aren't test functions
+                        if (dof_is_fixed[i])
+                          continue;
+			for (unsigned int sidej=0, freej=0;
+                             sidej != side_dofs.size(); ++sidej)
+                          {
+                            unsigned int j = side_dofs[sidej];
+                            if (dof_is_fixed[j])
+			      Fe(freei) -= phi[i][qp] * phi[j][qp] *
+                                           JxW[qp] * Ue(j);
+                            else
+			      Ke(freei,freej) += phi[i][qp] *
+						 phi[j][qp] * JxW[qp];
+                            if (cont == C_ONE)
+                              {
+                                if (dof_is_fixed[j])
+                                  Fe(freei) -= ((*dphi)[i][qp] *
+					        (*dphi)[j][qp]) *
+                                               JxW[qp] * Ue(j);
+                                else
+                                  Ke(freei,freej) += ((*dphi)[i][qp] *
+						      (*dphi)[j][qp])
+                                                     * JxW[qp];
+                              }
+                            if (!dof_is_fixed[j])
+                              freej++;
+                          }
+                        Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
+                        if (cont == C_ONE)
+			  Fe(freei) += (finegrad * (*dphi)[i][qp]) *
+                                       JxW[qp];
+                        freei++;
+                      }
+	          }
+
+                Ke.cholesky_solve(Fe, Uside);
+
+                // Transfer new side solutions to element
+		for (unsigned int i=0; i != free_dofs; ++i)
+                  {
+                    Number &ui = Ue(side_dofs[free_dof[i]]);
+                    libmesh_assert(std::abs(ui) < TOLERANCE ||
+                           std::abs(ui - Uside(i)) < TOLERANCE);
+                    ui = Uside(i);
+                    dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                  }
+              }
+
+	  const unsigned int
+	    first = new_vector.first_local_index(),
+	    last  = new_vector.last_local_index();
+
+	  // Lock the new_vector since it is shared among threads.
+	  {
+	    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+	    for (unsigned int i = 0; i < n_dofs; i++)
+	      // We may be projecting a new zero value onto
+	      // an old nonzero approximation - RHS
+	      // if (Ue(i) != 0.)
+	      if ((dof_indices[i] >= first) &&
+		  (dof_indices[i] <  last))
+                {
+                  new_vector.set(dof_indices[i], Ue(i));
+                }
+	  }
+        }  // end elem loop
+    } // end variables loop
+}
+
 
 } // namespace libMesh
