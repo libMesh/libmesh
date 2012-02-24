@@ -123,6 +123,10 @@ class RemoteElem : public Elem
 			        const unsigned int) const
   { libmesh_error(); return false; }
 
+  virtual bool is_edge_on_side(const unsigned int e,
+			       const unsigned int s) const
+  { libmesh_error(); return false; }
+
   virtual bool is_node_on_edge(const unsigned int,
 			       const unsigned int) const
   { libmesh_error(); return false; }
