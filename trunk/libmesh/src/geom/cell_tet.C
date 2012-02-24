@@ -174,6 +174,18 @@ bool Tet::is_child_on_side(const unsigned int c,
 
 
 
+bool Tet::is_edge_on_side(const unsigned int e,
+                          const unsigned int s) const
+{
+  libmesh_assert (e < this->n_edges());
+  libmesh_assert (s < this->n_sides());
+
+  return (is_node_on_side(Tet4::edge_nodes_map[e][0],s) &&
+          is_node_on_side(Tet4::edge_nodes_map[e][1],s));
+}
+
+
+
 Real Tet::quality(const ElemQuality q) const
 {
   return Elem::quality(q); // Not implemented

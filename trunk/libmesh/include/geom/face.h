@@ -74,6 +74,13 @@ public:
   AutoPtr<Elem> build_edge (const unsigned int i) const
     { return build_side(i); }
 
+  /*
+   * is_edge_on_side is trivial in 2D
+   */
+  virtual bool is_edge_on_side(const unsigned int e,
+			       const unsigned int s) const
+    { return (e == s); }
+
 //   /**
 //    * @returns 2
 //    */
