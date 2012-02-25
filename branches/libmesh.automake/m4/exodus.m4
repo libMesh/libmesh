@@ -19,7 +19,7 @@ AC_DEFUN([CONFIGURE_EXODUS],
   dnl where it might be installed...
   if (test $enableexodus = yes); then
      EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/Lib/include"
-     AC_DEFINE(HAVE_EXODUS, 1, [Flag indicating whether the library will be compiled with Exodus support])
+     AC_DEFINE(HAVE_EXODUS_API, 1, [Flag indicating whether the library will be compiled with Exodus support])
      AC_MSG_RESULT(<<< Configuring library with Exodus support >>>)
      have_exodus=yes
   else

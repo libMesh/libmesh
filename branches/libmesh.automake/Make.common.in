@@ -45,6 +45,9 @@ GXX-VERSION           = @GXX_VERSION@
 # libmesh_CFLAGS       ?= $(CFLAGS)
 # libmesh_CXXFLAGS     ?= $(CXXFLAGS)
 # libmesh_CPPFLAGS     ?= $(CPPFLAGS)
+libmesh_CFLAGS   =
+libmesh_CXXFLAGS =
+libmesh_CPPFLAGS =
 NODEPRECATEDFLAG     = @NODEPRECATEDFLAG@
 
 # Complex variable support

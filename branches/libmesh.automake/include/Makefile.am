@@ -5,8 +5,10 @@
 # cleaned by 'make distclean'
 DISTCLEANFILES = base/libmesh_config.h
 
-nodist_include_HEADERS = \
-        base/libmesh_config.h
+#
+# special things to do when running 'make dist'
+dist-hook:
+	rm -rf $(distdir)/include/base/libmesh_config.h
 
 
 nobase_include_HEADERS = \
@@ -20,6 +22,7 @@ nobase_include_HEADERS = \
 		base/libmesh_C_isnan.h \
 		base/libmesh_base.h \
 		base/libmesh_common.h \
+	        base/libmesh_config.h \
 		base/libmesh_documentation.h \
 		base/libmesh_exceptions.h \
 		base/libmesh_logging.h \

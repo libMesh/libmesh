@@ -1,4 +1,8 @@
-#include $(top_builddir)/Make.common
+include $(top_builddir)/Make.common
+
+AM_CPPFLAGS = $(libmesh_CPPFLAGS)
+AM_CFLAGS   = $(libmesh_CFLAGS)
+AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 INCLUDES = -I$(top_srcdir)/contrib/exodusii/Lib/include \
            -I$(top_srcdir)/contrib/netcdf/Lib

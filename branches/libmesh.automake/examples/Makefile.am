@@ -8,11 +8,10 @@ AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 INCLUDES    = $(libmesh_INCLUDE)
-LIBS        = $(libmesh_LIBS) 
 
 check_PROGRAMS =
 check_SCRIPTS = 
-CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda
+CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* #FIXME - tighten up!
 
 
 examples_source_path=$(top_srcdir)/examples
@@ -81,7 +80,7 @@ adaptivity_ex3_LDADD   = $(top_builddir)/libmesh.la
 check_PROGRAMS += adaptivity_ex4
 check_SCRIPTS  += adaptivity/adaptivity_ex4/run.sh
 adaptivity_ex4dir      = $(examples_install_path)/adaptivity/ex4
-adaptivity_ex4_DATA    = adaptivity/adaptivity_ex4/adaptivity_ex4.C
+adaptivity_ex4_DATA    = adaptivity/adaptivity_ex4/adaptivity_ex4.C adaptivity/adaptivity_ex4/adaptivity_ex4.in
 adaptivity_ex4_SOURCES = $(adaptivity_ex4_DATA) adaptivity/adaptivity_ex4/run.sh
 adaptivity_ex4_LDADD   = $(top_builddir)/libmesh.la
 CLEANFILES += biquadratic_h_adaptive.m

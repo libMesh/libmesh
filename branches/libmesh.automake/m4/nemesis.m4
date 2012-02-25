@@ -19,7 +19,7 @@ AC_DEFUN([CONFIGURE_NEMESIS],
   dnl where it might be installed...
   if (test $enablenemesis = yes); then
      NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/Lib"
-     AC_DEFINE(HAVE_NEMESIS, 1, [Flag indicating whether the library will be compiled with Nemesis support])
+     AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
      AC_MSG_RESULT(<<< Configuring library with Nemesis support >>>)
      have_nemesis=yes
   else

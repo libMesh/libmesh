@@ -1,15 +1,14 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-libdir=@libdir@
+libdir=@libdir@/dbg
 includedir=@includedir@
 
 Name: libmesh
 Description: The libMesh Finite Element Library
 Requires:
 Version: @VERSION@
-Libs: -L${libdir} -llibmesh
-Cflags: @CXXFLAGS_OPT@ \
-        `make -C $LIBMESH_ROOT echo_cxxflags` \
+Libs: -L${libdir} -lmesh
+Cflags: @CXXFLAGS_DBG@ \
         -I${includedir}/base -I${includedir}/enums -I${includedir}/error_estimation -I${includedir}/fe -I${includedir}/geom \
         -I${includedir}/mesh -I${includedir}/numerics -I${includedir}/parallel -I${includedir}/partitioning \
         -I${includedir}/physics -I${includedir}/quadrature -I${includedir}/reduced_basis -I${includedir}/solvers \

@@ -1,4 +1,8 @@
-#include $(top_builddir)/Make.common
+include $(top_builddir)/Make.common
+
+AM_CPPFLAGS = $(libmesh_CPPFLAGS)
+AM_CFLAGS   = $(libmesh_CFLAGS)
+AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 noinst_LTLIBRARIES    = libmetis.la
 libmetis_la_SOURCES = \

@@ -15,6 +15,10 @@ INCLUDES = $(libmesh_INCLUDE)
 # sources to create the final library.
 noinst_LTLIBRARIES = libmesh_local.la
 
+#libmesh_local_la_CPPFLAGS = $(libmesh_CPPFLAGS)
+#libmesh_local_la_CXXFLAGS = $(libmesh_CXXFLAGS)
+#libmesh_local_la_CFLAGS   = $(libmesh_CFLAGS)
+
 libmesh_local_la_SOURCES = \
 		base/dof_map.C \
 		base/dof_map_constraints.C \

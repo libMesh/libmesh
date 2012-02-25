@@ -30,7 +30,6 @@ AC_CANONICAL_TARGET
 AC_CONFIG_FILES([Make.common
                  Makefile
 		 include/Makefile
-		 src/Makefile
 		 examples/Makefile
 		 libmesh.pc
 		 ])
