@@ -38,7 +38,7 @@ libmesh_FFLAGS        = @FFLAGS@
 GXX-VERSION           = @GXX_VERSION@
 # libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
 # libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
-# libmesh_RPATHFLAG     = @RPATHFLAG@
+libmesh_RPATHFLAG     = @RPATHFLAG@
 NODEPRECATEDFLAG     = @NODEPRECATEDFLAG@
 
 # Complex variable support
