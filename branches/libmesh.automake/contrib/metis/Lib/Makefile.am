@@ -1,6 +1,6 @@
 include $(top_builddir)/Make.common
 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
+AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_METIS
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 

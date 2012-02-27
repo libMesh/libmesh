@@ -15,6 +15,11 @@
 #define	DEBUG		1
 #define	DMALLOC		1
 */
+#ifdef LIBMESH_IS_COMPILING_METIS
+#  if defined(__GNUC__)
+#    pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+#  endif
+#endif
 
 #include "./stdheaders.h"
 
