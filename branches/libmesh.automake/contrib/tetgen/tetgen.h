@@ -130,7 +130,7 @@
 
 
 #ifdef LIBMESH_IS_COMPILING_TETGEN
-#  if defined(__GNUC__)
+#  if defined(__GNUC__) && !defined(__INTEL_COMPILER) // intel can masquerade as GNUC...
 #    pragma GCC diagnostic ignored "-Wuninitialized"
 #    pragma GCC diagnostic ignored "-Warray-bounds"
 #  endif
