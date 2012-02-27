@@ -62,6 +62,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
        dnl If the Eigen headers were found, continue.
        if (test $enableeigen = yes); then
          EIGEN_INCLUDE="-I$EIGEN_INC"
+         libmesh_optional_INCLUDES="$EIGEN_INCLUDE $libmesh_optional_INCLUDES"
          AC_DEFINE(HAVE_EIGEN, 1, [Flag indicating whether the library will be compiled with Eigen support])
          AC_MSG_RESULT(<<< Configuring library with Eigen support >>>)
        fi

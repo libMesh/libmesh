@@ -2,6 +2,9 @@
 # -------------------------------------------------------------
 AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 [
+
+libmesh_optional_INCLUDES=""
+
 # --------------------------------------------------------------
 # Allow for disable-optional
 # --------------------------------------------------------------
@@ -325,5 +328,8 @@ if test "$enableoptional" != no ; then
    AC_MSG_RESULT(--- Done configuring for optional packages ---)
    AC_MSG_RESULT(----------------------------------------------)
 fi
+
+# substitute values
+AC_SUBST(libmesh_optional_INCLUDES)
 
 ])
