@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_METIS],
 		   no)  enablemetis=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-metis) ;;
 		 esac],
-		 [enablemetis=yes])
+		 [enablemetis=$enableoptional])
 
 
 

@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_VTK],
 		   no)  enablevtk=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-vtk) ;;
 		 esac],
-		 [enablevtk=yes])
+		 [enablevtk=$enableoptional])
 
 
   if (test $enablevtk = yes); then

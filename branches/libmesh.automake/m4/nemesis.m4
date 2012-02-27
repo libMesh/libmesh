@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 		   no)  enablenemesis=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis) ;;
 		 esac],
-		 [enablenemesis=yes])
+		 [enablenemesis=$enableoptional])
 
 
 		 		

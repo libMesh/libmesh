@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_LASPACK],
 		   no)  enablelaspack=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-laspack) ;;
 		 esac],
-		 [enablelaspack=yes])
+		 [enablelaspack=$enableoptional])
 
 
 

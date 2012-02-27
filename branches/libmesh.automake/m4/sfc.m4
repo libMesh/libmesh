@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_SFC],
 		   no)  enablesfc=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-sfc) ;;
 		 esac],
-		 [enablesfc=yes])
+		 [enablesfc=$enableoptional])
 
 
 

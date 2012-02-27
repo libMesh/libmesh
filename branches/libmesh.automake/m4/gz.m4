@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_GZ],
 		   no)  enablegz=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gz) ;;
 		 esac],
-		 [enablegz=yes])
+		 [enablegz=$enableoptional])
 		 
 	  
 

@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_GMV],
 		   no)  enablegmv=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gmv) ;;
 		 esac],
-		 [enablegmv=yes])
+		 [enablegmv=$enableoptional])
 
 
 

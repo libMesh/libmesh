@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_LIBHILBERT],
 		   no)  enablelibhilbert=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-libhilbert) ;;
 		 esac],
-		 [enablelibhilbert=yes])
+		 [enablelibhilbert=$enableoptional])
 
 		 
 		

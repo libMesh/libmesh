@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 		   no)  enabletecplot=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tecplot) ;;
 		 esac],
-		 [enabletecplot=yes])
+		 [enabletecplot=$enableoptional])
 
 
 

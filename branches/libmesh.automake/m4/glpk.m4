@@ -17,7 +17,7 @@ AC_DEFUN([CONFIGURE_GLPK],
 		   no)  enableglpk=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glpk) ;;
 		 esac],
-		 [enableglpk=yes])
+		 [enableglpk=$enableoptional])
 
 
   if (test $enableglpk = yes); then

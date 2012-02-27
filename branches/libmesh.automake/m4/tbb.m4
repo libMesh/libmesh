@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_TBB],
 		   no)  enabletbb=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tbb) ;;
 		 esac],
-		 [enabletbb=yes])
+		 [enabletbb=$enableoptional])
 
 
   if (test $enabletbb = yes); then

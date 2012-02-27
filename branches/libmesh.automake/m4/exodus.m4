@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_EXODUS],
 		   no)  enableexodus=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-exodus) ;;
 		 esac],
-		 [enableexodus=yes])
+		 [enableexodus=$enableoptional])
 
 
 		

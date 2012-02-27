@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
 		   no)  enabletriangle=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-triangle) ;;
 		 esac],
-		 [enabletriangle=yes])			 
+		 [enabletriangle=$enableoptional])			 
   
 
 

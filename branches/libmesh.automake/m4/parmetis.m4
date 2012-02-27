@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_PARMETIS],
 		   no)  enableparmetis=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-parmetis) ;;
 		 esac],
-		 [enableparmetis=yes])
+		 [enableparmetis=$enableoptional])
 
 
 

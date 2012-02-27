@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_TETGEN],
 		   no)  enabletetgen=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tetgen) ;;
 		 esac],
-		 [enabletetgen=yes])
+		 [enabletetgen=$enableoptional])
 
 
 		 		 
