@@ -20,6 +20,11 @@
 #define __cdecl
 #endif
 
+#ifdef LIBMESH_IS_COMPILING_PARMETIS
+#  if defined(__GNUC__)
+#    pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+#  endif
+#endif
 
 /*************************************************************************
 * Data-structures
