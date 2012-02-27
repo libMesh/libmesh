@@ -937,12 +937,6 @@ dnl -------------------------------------------------------------
 dnl GLPK -- Needed by the SCM routine of rbOOmit.
 dnl Enabled by default.
 dnl -------------------------------------------------------------
-AC_ARG_ENABLE(glpk,
-              AC_HELP_STRING([--enable-glpk],
-                             [build with GLPK support]),
-              enableglpk=$enableval,
-              enableglpk=yes)
-
 CONFIGURE_GLPK
 dnl -------------------------------------------------------------
 
