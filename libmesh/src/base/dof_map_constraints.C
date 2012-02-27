@@ -481,15 +481,8 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
       // Compute the matrix-vector product C^T F
       DenseVector<Number> old_rhs(rhs);
 
-      // resize the RHS vector & 0 before summation
-      rhs.resize(elem_dofs.size());
-      rhs.zero();
-
       // compute matrix/vector product
-      for (unsigned int i=0; i<elem_dofs.size(); i++)
-	for (unsigned int j=0; j<old_rhs.size(); j++)
-	  rhs(i) += C.transpose(i,j)*old_rhs(j);
-
+      C.vector_mult_transpose(rhs, old_rhs);
 
       libmesh_assert (elem_dofs.size() == rhs.size());
 
@@ -610,15 +603,7 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
     {
       // Compute the matrix-vector product
       DenseVector<Number> old_rhs(rhs);
-
-      // resize RHS & zero before summation
-      rhs.resize(row_dofs.size());
-      rhs.zero();
-
-      // compute matrix/vector product
-      for (unsigned int i=0; i<row_dofs.size(); i++)
-	for (unsigned int j=0; j<old_rhs.size(); j++)
-	  rhs(i) += R.transpose(i,j)*old_rhs(j);
+      R.vector_mult_transpose(rhs, old_rhs);
 
       libmesh_assert (row_dofs.size() == rhs.size());
 
@@ -662,17 +647,9 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
       DenseVector<Number> old_v(v);
       DenseVector<Number> old_w(w);
 
-      // resize RHS & zero before summation
-      v.resize(row_dofs.size());
-      w.resize(row_dofs.size());
-
       // compute matrix/vector product
-      for (unsigned int i=0; i<row_dofs.size(); i++)
-	for (unsigned int j=0; j<old_v.size(); j++)
-	  {
-	    v(i) += R.transpose(i,j)*old_v(j);
-	    w(i) += R.transpose(i,j)*old_w(j);
-	  }
+      R.vector_mult_transpose(v, old_v);
+      R.vector_mult_transpose(w, old_w);
 
       libmesh_assert (row_dofs.size() == v.size());
       libmesh_assert (row_dofs.size() == w.size());
