@@ -79,6 +79,12 @@ public:
   virtual bool is_child_on_side(const unsigned int c,
 			        const unsigned int s) const;
 
+  /*
+   * @returns true iff the specified edge is on the specified side
+   */
+  virtual bool is_edge_on_side(const unsigned int e,
+			       const unsigned int s) const;
+
   /**
    * @returns the side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.

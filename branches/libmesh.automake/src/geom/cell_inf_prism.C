@@ -25,6 +25,7 @@
 
 // Local includes cont'd
 #include "cell_inf_prism.h"
+#include "cell_inf_prism6.h"
 #include "face_tri3.h"
 #include "face_inf_quad4.h"
 
@@ -165,6 +166,20 @@ bool InfPrism::is_child_on_side(const unsigned int c,
 
   return (s == 0 || c+1 == s || c == s%3);
 }
+
+
+
+bool InfPrism::is_edge_on_side (const unsigned int e,
+                                const unsigned int s) const
+{
+  libmesh_assert (e < this->n_edges());
+  libmesh_assert (s < this->n_sides());
+
+  return (is_node_on_side(InfPrism6::edge_nodes_map[e][0],s) &&
+          is_node_on_side(InfPrism6::edge_nodes_map[e][1],s));
+}
+
+
 
 } // namespace libMesh
 
