@@ -433,7 +433,7 @@ void System::project_solution (FunctionBase<Number> *f,
 {
   this->project_vector(*solution, f, g, parameters);
 
-  solution->localize(*current_local_solution);
+  solution->localize(*current_local_solution, _dof_map->get_send_list());
 }
 
 
