@@ -1,7 +1,7 @@
 include $(top_builddir)/Make.common
 
-bindir=$(exec_prefix)/bin/$(METHOD)
-libdir=$(exec_prefix)/lib/$(METHOD)
+bindir=$(exec_prefix)/bin/@host@_@METHOD@
+libdir=$(exec_prefix)/lib/@host@_@METHOD@
 
 
 AUTOMAKE_OPTIONS = foreign subdir-objects 

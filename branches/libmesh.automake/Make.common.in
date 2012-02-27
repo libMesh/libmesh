@@ -39,15 +39,6 @@ GXX-VERSION           = @GXX_VERSION@
 # libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
 # libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
 # libmesh_RPATHFLAG     = @RPATHFLAG@
-
-# Use libmesh-specific compiler flags if available, otherwise
-# use general compiler flags from environment
-# libmesh_CFLAGS       ?= $(CFLAGS)
-# libmesh_CXXFLAGS     ?= $(CXXFLAGS)
-# libmesh_CPPFLAGS     ?= $(CPPFLAGS)
-libmesh_CFLAGS   =
-libmesh_CXXFLAGS =
-libmesh_CPPFLAGS =
 NODEPRECATEDFLAG     = @NODEPRECATEDFLAG@
 
 # Complex variable support
@@ -231,45 +222,9 @@ endif
 ###############################################################################
 
 
-
-###############################################################################
-# Compiler flags, different for optimized, debug, and profiler modes.
-ifeq ($(opt-mode),on)
-  libmesh_CPPFLAGS := -DNDEBUG $(libmesh_CPPFLAGS)
-  libmesh_CXXFLAGS := @CXXFLAGS_OPT@ $(libmesh_CXXFLAGS)
-  libmesh_CFLAGS   := @CFLAGS_OPT@ $(libmesh_CFLAGS)
-endif
-
-
-ifeq ($(devel-mode),on)
-  libmesh_CXXFLAGS := @CXXFLAGS_DVL@ $(libmesh_CXXFLAGS)
-  libmesh_CFLAGS   := @CFLAGS_DVL@ $(libmesh_CFLAGS)
-endif
-
-
-ifeq ($(debug-mode),on)
-  libmesh_CPPFLAGS := -DDEBUG $(libmesh_CPPFLAGS)
-  libmesh_CXXFLAGS := @CXXFLAGS_DBG@ $(libmesh_CXXFLAGS)
-  libmesh_CFLAGS   := @CFLAGS_DBG@  $(libmesh_CFLAGS)
-endif
-
-
-ifeq ($(prof-mode),on)
-  libmesh_CPPFLAGS := -DNDEBUG $(libmesh_CPPFLAGS)
-  libmesh_CXXFLAGS := @CXXFLAGS_OPT@ @PROFILING_FLAGS@ $(libmesh_CXXFLAGS)
-  libmesh_CFLAGS   := @CFLAGS_OPT@ @PROFILING_FLAGS@  $(libmesh_CFLAGS)
-  libmesh_LIBS := @PROFILING_FLAGS@ $(libmesh_LIBS)
-endif
-
-
-ifeq ($(oprof-mode),on)
-  libmesh_CPPFLAGS := -DNDEBUG
-  libmesh_CXXFLAGS := @CXXFLAGS_OPT@ @OPROFILE_FLAGS@ $(libmesh_CXXFLAGS)
-  libmesh_CFLAGS   := @CFLAGS_OPT@ @OPROFILE_FLAGS@ $(libmesh_CFLAGS)
-endif
-###############################################################################
-
-
+libmesh_CPPFLAGS := @CPPFLAGS_METHOD@ #$(libmesh_CPPFLAGS)
+libmesh_CXXFLAGS := @CXXFLAGS_METHOD@ #$(libmesh_CXXFLAGS)
+libmesh_CFLAGS   := @CFLAGS_METHOD@ #$(libmesh_CFLAGS)
 
 ###############################################################################
 # The mesh library

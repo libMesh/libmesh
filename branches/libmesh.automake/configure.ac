@@ -68,6 +68,14 @@ dnl Set our preferred compilers
 dnl --------------------------------------------------------------
 LIBMESH_SET_COMPILERS
 
+dnl --------------------------------------------------------------
+dnl See aclocal.m4 for the definition of this as well.  It uses the
+dnl output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
+dnl compilers.  For example, newer versions of GCC have additional C++ debugging
+dnl flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
+dnl --------------------------------------------------------------
+LIBMESH_SET_CXX_FLAGS
+LIBMESH_SET_METHOD
 
 LT_INIT([disable-static])
 
@@ -167,13 +175,6 @@ if test "$enableexceptions" != no ; then
 fi
 dnl --------------------------------------------------------------
 
-dnl --------------------------------------------------------------
-dnl See aclocal.m4 for the definition of this as well.  It uses the
-dnl output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
-dnl compilers.  For example, newer versions of GCC have additional C++ debugging
-dnl flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
-dnl --------------------------------------------------------------
-SET_CXX_FLAGS
 
 dnl --------------------------------------------------------------
 dnl The AC_SUBST(foo) command creates an output variable from a shell variable.
@@ -195,6 +196,7 @@ AC_SUBST(RPATHFLAG)
 AC_SUBST(PROFILING_FLAGS)
 AC_SUBST(OPROFILE_FLAGS)
 AC_SUBST(FLIBS)
+AC_SUBST(METHOD)
 
 dnl --------------------------------------------------------------
 dnl Check for important type sizes

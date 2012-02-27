@@ -425,7 +425,7 @@ dnl
 dnl (Note the CXXFLAGS and the CPPFLAGS used for further tests may
 dnl  be augmented)
 dnl -------------------------------------------------------------
-AC_DEFUN([SET_CXX_FLAGS], dnl
+AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 [
   # dnl Flag for creating shared objects; can be modified at a later stage
   # case "$target_os" in
