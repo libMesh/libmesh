@@ -8,6 +8,7 @@ AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 INCLUDES    = $(libmesh_INCLUDE)
+LIBS        = $(libmesh_LIBS)
 
 check_PROGRAMS =
 check_SCRIPTS = 

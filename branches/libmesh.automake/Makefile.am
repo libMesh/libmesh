@@ -74,6 +74,7 @@ AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 INCLUDES    = $(libmesh_INCLUDE)
+LIBS        = $(libmesh_LIBS)
 
 # A convenience library to hold proper libMesh 
 # objects.  This will get appended with any contributed 
@@ -529,7 +530,7 @@ endif
 
 ###########################################################
 # Finally, add external libraries which we require.
-libmesh_la_LIBADD += $(libmesh_LIBS)
+#libmesh_la_LIBADD += $(libmesh_LIBS)
 
 
 
