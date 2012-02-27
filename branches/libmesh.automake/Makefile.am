@@ -576,7 +576,7 @@ SUBDIRS += examples
 #
 # doxygen documentation
 doc:
-	mkdir -p $(top_srcdir)/doc/html
+	mkdir -p $(top_builddir)/doc/html
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
 
 #

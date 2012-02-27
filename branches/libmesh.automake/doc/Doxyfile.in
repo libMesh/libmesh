@@ -552,31 +552,31 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ./src/base \
-			 ./src/error_estimation \
-                         ./src/fe \
-                         ./src/geom \
-                         ./src/mesh \
-                         ./src/numerics \
-                         ./src/parallel \
-                         ./src/partitioning \
-                         ./src/quadrature \
-                         ./src/solvers \
-                         ./src/systems \
-                         ./src/utils \
-                         ./include/base \
-                         ./include/enums \
-			 ./include/error_estimation \
-                         ./include/fe \
-                         ./include/geom \
-                         ./include/mesh \
-                         ./include/numerics \
-                         ./include/parallel \
-                         ./include/partitioning \
-                         ./include/quadrature \
-                         ./include/solvers \
-                         ./include/systems \
-                         ./include/utils 
+INPUT                  = @abs_top_srcdir@/src/base \
+			 @abs_top_srcdir@/src/error_estimation \
+                         @abs_top_srcdir@/src/fe \
+                         @abs_top_srcdir@/src/geom \
+                         @abs_top_srcdir@/src/mesh \
+                         @abs_top_srcdir@/src/numerics \
+                         @abs_top_srcdir@/src/parallel \
+                         @abs_top_srcdir@/src/partitioning \
+                         @abs_top_srcdir@/src/quadrature \
+                         @abs_top_srcdir@/src/solvers \
+                         @abs_top_srcdir@/src/systems \
+                         @abs_top_srcdir@/src/utils \
+                         @abs_top_srcdir@/include/base \
+                         @abs_top_srcdir@/include/enums \
+			 @abs_top_srcdir@/include/error_estimation \
+                         @abs_top_srcdir@/include/fe \
+                         @abs_top_srcdir@/include/geom \
+                         @abs_top_srcdir@/include/mesh \
+                         @abs_top_srcdir@/include/numerics \
+                         @abs_top_srcdir@/include/parallel \
+                         @abs_top_srcdir@/include/partitioning \
+                         @abs_top_srcdir@/include/quadrature \
+                         @abs_top_srcdir@/include/solvers \
+                         @abs_top_srcdir@/include/systems \
+                         @abs_top_srcdir@/include/utils 
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -594,6 +594,7 @@ INPUT_ENCODING         = UTF-8
 # *.hpp *.h++ *.idl *.odl *.cs *.php *.php3 *.inc *.m *.mm *.py *.f90
 
 FILE_PATTERNS          = *.C \
+                         *.c \
                          *.h
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 
@@ -784,13 +785,13 @@ HTML_FILE_EXTENSION    = .php
 # each generated HTML page. If it is left blank doxygen will generate a 
 # standard header.
 
-HTML_HEADER            = ./doc/header.php
+HTML_HEADER            = @abs_top_srcdir@/doc/header.php
 
 # The HTML_FOOTER tag can be used to specify a personal HTML footer for 
 # each generated HTML page. If it is left blank doxygen will generate a 
 # standard footer.
 
-HTML_FOOTER            = ./doc/footer.php
+HTML_FOOTER            = @abs_top_srcdir@/doc/footer.php
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading 
 # style sheet that is used by each HTML page. It can be used to 
@@ -799,7 +800,7 @@ HTML_FOOTER            = ./doc/footer.php
 # the style sheet file to the HTML output directory, so don't put your own 
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET        = ./doc/stylesheet.css
+HTML_STYLESHEET        = @abs_top_srcdir@/doc/stylesheet.css
 
 # If the HTML_ALIGN_MEMBERS tag is set to YES, the members of classes, 
 # files or namespaces will be aligned in HTML using tables. If set to 
