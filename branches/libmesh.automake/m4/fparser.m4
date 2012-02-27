@@ -32,5 +32,5 @@ AC_DEFUN([CONFIGURE_FPARSER],
   #AC_SUBST(FPARSER_LIBRARY)	
   AC_SUBST(enablefparser)
 		 		 
-  AM_CONDITIONAL(ENABLE_FPARSER, test x$enablefparser = xyes)
+  AM_CONDITIONAL(LIBMESH_ENABLE_FPARSER, test x$enablefparser = xyes)
 ])

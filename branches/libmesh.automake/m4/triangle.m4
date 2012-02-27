@@ -32,6 +32,6 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
   #AC_SUBST(TRIANGLE_LIBRARY)	
   AC_SUBST(enabletriangle)
 
-  AM_CONDITIONAL(ENABLE_TRIANGLE, test x$enabletriangle = xyes)
+  AM_CONDITIONAL(LIBMESH_ENABLE_TRIANGLE, test x$enabletriangle = xyes)
   AC_CONFIG_FILES([contrib/triangle/Makefile])
 ])

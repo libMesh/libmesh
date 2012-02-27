@@ -31,6 +31,6 @@ AC_DEFUN([CONFIGURE_NEMESIS],
   AC_SUBST(NEMESIS_INCLUDE)
   AC_SUBST(enablenemesis)
 
-  AM_CONDITIONAL(ENABLE_NEMESIS, test x$enablenemesis = xyes)
+  AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS, test x$enablenemesis = xyes)
   AC_CONFIG_FILES([contrib/nemesis/Lib/Makefile])
 ])

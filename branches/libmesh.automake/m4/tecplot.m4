@@ -75,5 +75,5 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 
   AC_SUBST(enabletecplot)
 
-  AM_CONDITIONAL(ENABLE_TECPLOT, test x$enabletecplot = xyes)		 
+  AM_CONDITIONAL(LIBMESH_ENABLE_TECPLOT, test x$enabletecplot = xyes)		 
 ])

@@ -132,5 +132,5 @@ AC_DEFUN([CONFIGURE_VTK],
   AC_SUBST(VTK_LIBRARY)	
   AC_SUBST(enablevtk)
   
-  AM_CONDITIONAL(ENABLE_VTK, test x$enablevtk = xyes)
+  AM_CONDITIONAL(LIBMESH_ENABLE_VTK, test x$enablevtk = xyes)
 ])

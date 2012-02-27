@@ -467,62 +467,62 @@ libmesh_la_SOURCES = \
 ###########################################################
 # add contributed libraries that are conditionally compiled
 
-if ENABLE_GMV
+if LIBMESH_ENABLE_GMV
   SUBDIRS += contrib/gmv
   libmesh_la_LIBADD += contrib/gmv/libgmv.la
 endif
 
-if ENABLE_GZSTREAMS
+if LIBMESH_ENABLE_GZSTREAMS
   SUBDIRS += contrib/gzstream
   libmesh_la_LIBADD += contrib/gzstream/libgzstream.la
 endif
 
-if ENABLE_NETCDF
+if LIBMESH_ENABLE_NETCDF
   SUBDIRS += contrib/netcdf/Lib
   libmesh_la_LIBADD += contrib/netcdf/Lib/libnetcdf.la
 endif
 
-if ENABLE_EXODUS
+if LIBMESH_ENABLE_EXODUS
   SUBDIRS += contrib/exodusii/Lib
   libmesh_la_LIBADD += contrib/exodusii/Lib/libexodusII.la
 endif
 
-if ENABLE_NEMESIS
+if LIBMESH_ENABLE_NEMESIS
   SUBDIRS += contrib/nemesis/Lib
   libmesh_la_LIBADD += contrib/nemesis/Lib/libnemesis.la
 endif
 
-if ENABLE_TRIANGLE
+if LIBMESH_ENABLE_TRIANGLE
   SUBDIRS += contrib/triangle
   libmesh_la_LIBADD += contrib/triangle/libtriangle.la
 endif
 
-if ENABLE_TETGEN
+if LIBMESH_ENABLE_TETGEN
   SUBDIRS += contrib/tetgen
   libmesh_la_LIBADD += contrib/tetgen/libtetgen.la
 endif
 
-if ENABLE_LIBHILBERT
+if LIBMESH_ENABLE_LIBHILBERT
   SUBDIRS += contrib/libHilbert
   libmesh_la_LIBADD += contrib/libHilbert/libHilbert.la
 endif
 
-if ENABLE_LASPACK
+if LIBMESH_ENABLE_LASPACK
   SUBDIRS += contrib/laspack
   libmesh_la_LIBADD += contrib/laspack/liblaspack.la
 endif
 
-if ENABLE_METIS
+if LIBMESH_ENABLE_METIS
   SUBDIRS += contrib/metis/Lib
   libmesh_la_LIBADD += contrib/metis/Lib/libmetis.la
 endif
 
-if ENABLE_PARMETIS
+if LIBMESH_ENABLE_PARMETIS
   SUBDIRS += contrib/parmetis/Lib
   libmesh_la_LIBADD += contrib/parmetis/Lib/libparmetis.la
 endif
 
-if ENABLE_SFC
+if LIBMESH_ENABLE_SFC
   SUBDIRS += contrib/sfcurves
   libmesh_la_LIBADD += contrib/sfcurves/libsfcurves.la
 endif

@@ -123,5 +123,5 @@ AC_DEFUN([CONFIGURE_GLPK],
   AC_SUBST(GLPK_LIBRARY)	
   AC_SUBST(enableglpk)
   
-  AM_CONDITIONAL(ENABLE_GLPK, test x$enableglpk = xyes)
+  AM_CONDITIONAL(LIBMESH_ENABLE_GLPK, test x$enableglpk = xyes)
 ])

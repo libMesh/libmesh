@@ -32,6 +32,6 @@ AC_DEFUN([CONFIGURE_GMV],
   #AC_SUBST(GMV_LIBRARY)	
   AC_SUBST(enablegmv)
 
-  AM_CONDITIONAL(ENABLE_GMV, test x$enablegmv = xyes)		 
+  AM_CONDITIONAL(LIBMESH_ENABLE_GMV, test x$enablegmv = xyes)		 
   AC_CONFIG_FILES([contrib/gmv/Makefile])
 ])

@@ -32,7 +32,7 @@ AC_DEFUN([CONFIGURE_SFC],
   #AC_SUBST(SFC_LIBRARY)	
   AC_SUBST(enablesfc)
 
-  AM_CONDITIONAL(ENABLE_SFC, test x$enablesfc = xyes)		 
+  AM_CONDITIONAL(LIBMESH_ENABLE_SFC, test x$enablesfc = xyes)		 
   AC_CONFIG_FILES([contrib/sfcurves/Makefile])
 ])
 
