@@ -16,7 +16,7 @@
 #define	DMALLOC		1
 */
 #ifdef LIBMESH_IS_COMPILING_METIS
-#  if defined(__GNUC__)
+#  if defined(__GNUC__) && !defined(__INTEL_COMPILER) /* intel can masquerade as GNUC... */
 #    pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
 #  endif
 #endif
