@@ -1,6 +1,6 @@
-dnl --------------------------------------------------------------
-dnl $Id$
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# $Id$
+# --------------------------------------------------------------
 
 
 
@@ -21,10 +21,10 @@ AC_REVISION($Revision$)
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
-dnl --------------------------------------------------------------
-dnl Compute the canonical target system type variable "target", and its
-dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Compute the canonical target system type variable "target", and its
+# three individual parts: "target_cpu", "target_vendor", and "target_os"
+# --------------------------------------------------------------
 AC_CANONICAL_TARGET
 
 AC_CONFIG_FILES([Make.common
@@ -39,9 +39,9 @@ AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmes
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
 AC_CONFIG_FILES(contrib/bin/create_libmesh_release, [chmod +x contrib/bin/create_libmesh_release])
 AC_CONFIG_FILES(doc/dot,                            [chmod +x doc/dot])
-dnl Create a temporary file with e.g. HAVE_MPI
+# Create a temporary file with e.g. HAVE_MPI
 AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h.in)
-dnl Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
+# Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
 AX_PREFIX_CONFIG_H(include/base/libmesh_config.h,LIBMESH,include/base/libmesh_config.h.tmp)
 
 AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests])
@@ -50,87 +50,86 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
 
 
 
-dnl --------------------------------------------------------------
-dnl Print configuration info to the header file
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Print configuration info to the header file
+# --------------------------------------------------------------
 AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 run on `date`"], [Configuration information.])	
 
-dnl --------------------------------------------------------------
-dnl Do compilation tests using the compiler, preprocessor, and file extensions
-dnl of C++.  This uses the .C extension for test programs.
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Do compilation tests using the compiler, preprocessor, and file extensions
+# of C++.  This uses the .C extension for test programs.
+# --------------------------------------------------------------
 AC_LANG([C++])
 
 
-
-dnl --------------------------------------------------------------
-dnl Set our preferred compilers
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Set our preferred compilers
+# --------------------------------------------------------------
 LIBMESH_SET_COMPILERS
 
-dnl --------------------------------------------------------------
-dnl See aclocal.m4 for the definition of this as well.  It uses the
-dnl output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
-dnl compilers.  For example, newer versions of GCC have additional C++ debugging
-dnl flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# See aclocal.m4 for the definition of this as well.  It uses the
+# output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
+# compilers.  For example, newer versions of GCC have additional C++ debugging
+# flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
+# --------------------------------------------------------------
 LIBMESH_SET_CXX_FLAGS
 LIBMESH_SET_METHOD
 
 LT_INIT([disable-static])
 
-dnl --------------------------------------------------------------
-dnl Real precision - double by default
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Real precision - double by default
+# --------------------------------------------------------------
 ACX_CHOOSE_PRECISION
 
 
-dnl --------------------------------------------------------------
-dnl Determine support for the C99 "restrict" keyword in the C++
-dnl compiler.  This should place a pound-define statement in the
-dnl config file along the lines of:
-dnl
-dnl #define _libmesh_restrict __restrict
-dnl
-dnl The restrict keyword allows the compiler to make
-dnl certain optimizations which require non-overlapping pointer
-dnl addresses, i.e. in a call to:
-dnl
-dnl foo(int* restrict a, int* restrict b)
-dnl
-dnl the compiler may assume that the memory addresses pointed to
-dnl by a and b do not overlap, and therefore certain low-level
-dnl optimizations can be made.  From the Autoconf documentation:
-dnl
-dnl If the C compiler recognizes a variant spelling for the restrict
-dnl keyword (__restrict, __restrict__, or _Restrict), then define restrict
-dnl to that; this is more likely to do the right thing with compilers that
-dnl support language variants where plain restrict is not a
-dnl keyword. Otherwise, if the C compiler recognizes the restrict keyword,
-dnl don't do anything. Otherwise, define restrict to be empty. Thus,
-dnl programs may simply use restrict as if every C compiler supported it;
-dnl for those that do not, the makefile or configuration header defines it
-dnl away.
-dnl 
-dnl Although support in C++ for the restrict keyword is not required,
-dnl several C++ compilers do accept the keyword. This macro works for
-dnl them, too.
-dnl 
-dnl This macro caches 'no' in the ac_cv_c_restrict variable if restrict is
-dnl not supported, and a supported spelling otherwise.
+# --------------------------------------------------------------
+# Determine support for the C99 "restrict" keyword in the C++
+# compiler.  This should place a pound-define statement in the
+# config file along the lines of:
+#
+# #define _libmesh_restrict __restrict
+#
+# The restrict keyword allows the compiler to make
+# certain optimizations which require non-overlapping pointer
+# addresses, i.e. in a call to:
+#
+# foo(int* restrict a, int* restrict b)
+#
+# the compiler may assume that the memory addresses pointed to
+# by a and b do not overlap, and therefore certain low-level
+# optimizations can be made.  From the Autoconf documentation:
+#
+# If the C compiler recognizes a variant spelling for the restrict
+# keyword (__restrict, __restrict__, or _Restrict), then define restrict
+# to that; this is more likely to do the right thing with compilers that
+# support language variants where plain restrict is not a
+# keyword. Otherwise, if the C compiler recognizes the restrict keyword,
+# don't do anything. Otherwise, define restrict to be empty. Thus,
+# programs may simply use restrict as if every C compiler supported it;
+# for those that do not, the makefile or configuration header defines it
+# away.
+# 
+# Although support in C++ for the restrict keyword is not required,
+# several C++ compilers do accept the keyword. This macro works for
+# them, too.
+# 
+# This macro caches 'no' in the ac_cv_c_restrict variable if restrict is
+# not supported, and a supported spelling otherwise.
 AC_C_RESTRICT
 
 
-dnl --------------------------------------------------------------
-dnl getpwuid - enabled by default
-dnl Some systems, for example Crays, actually have getpwuid on the head-node
-dnl but (if I understand correctly) a dynamically-linked glibc is not available
-dnl on the backend, which is running a reduced operating system like Compute
-dnl Node Linux.  Thus functions like getpwuid cannot be called.  This makes
-dnl automatically testing for the existence of getpwuid on the login node
-dnl difficult.  If you know that you are on such a system, configure with
-dnl --disable-getpwuid.
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# getpwuid - enabled by default
+# Some systems, for example Crays, actually have getpwuid on the head-node
+# but (if I understand correctly) a dynamically-linked glibc is not available
+# on the backend, which is running a reduced operating system like Compute
+# Node Linux.  Thus functions like getpwuid cannot be called.  This makes
+# automatically testing for the existence of getpwuid on the login node
+# difficult.  If you know that you are on such a system, configure with
+# --disable-getpwuid.
+# --------------------------------------------------------------
 AC_ARG_ENABLE(getpwuid,
               AC_HELP_STRING([--enable-getpwuid],
                              [allow calls to getpwuid]),
@@ -142,26 +141,26 @@ if test "$enablegetpwuid" != no ; then
            [Flag indicating if the library should be built with calls to getpwuid()])
   AC_MSG_RESULT(<<< Configuring library with getpwuid >>>)
 fi
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
 
 
 
-dnl --------------------------------------------------------------
-dnl Shared libraries - enabled by default
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Shared libraries - enabled by default
+# --------------------------------------------------------------
 AC_ARG_ENABLE(shared,
               AC_HELP_STRING([--enable-shared],
                              [build shared libraries]),
               enableshared=$enableval,
               enableshared=yes)
 AC_SUBST(enableshared)	
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
 
 
 
-dnl --------------------------------------------------------------
-dnl C++ exceptions - enabled by default
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# C++ exceptions - enabled by default
+# --------------------------------------------------------------
 AC_ARG_ENABLE(exceptions,
               AC_HELP_STRING([--enable-exceptions],
                              [throw exceptions on unexpected errors]),
@@ -173,14 +172,14 @@ if test "$enableexceptions" != no ; then
            [Flag indicating if the library should be built to throw C++ exceptions on unexpected errors])
   AC_MSG_RESULT(<<< Configuring library with exception throwing support >>>)
 fi
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
 
 
-dnl --------------------------------------------------------------
-dnl The AC_SUBST(foo) command creates an output variable from a shell variable.
-dnl This command also causes AC_OUTPUT to replace all instances of @VAR@ with
-dnl the value of the shell variable VAR in the output files (e.g. one or more Makefiles).
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# The AC_SUBST(foo) command creates an output variable from a shell variable.
+# This command also causes AC_OUTPUT to replace all instances of @VAR@ with
+# the value of the shell variable VAR in the output files (e.g. one or more Makefiles).
+# --------------------------------------------------------------
 AC_SUBST(host)
 AC_SUBST(GXX_VERSION)
 AC_SUBST(CXXFLAGS_OPT)
@@ -198,9 +197,9 @@ AC_SUBST(OPROFILE_FLAGS)
 AC_SUBST(FLIBS)
 AC_SUBST(METHOD)
 
-dnl --------------------------------------------------------------
-dnl Check for important type sizes
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Check for important type sizes
+# --------------------------------------------------------------
 AC_CHECK_SIZEOF(short int)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(unsigned int)
@@ -208,17 +207,17 @@ AC_CHECK_SIZEOF(long int)
 AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
 AC_CHECK_SIZEOF(void *)
-dnl Check the size of a function pointer.  This is the same
-dnl as a void* on most systems which matter (POSIX).
-dnl It turns out that AC_CHECK_SIZEOF can't do this
-dnl automatically... so we use a kind of hack with the 3rd
-dnl argument to do it.
+# Check the size of a function pointer.  This is the same
+# as a void* on most systems which matter (POSIX).
+# It turns out that AC_CHECK_SIZEOF can't do this
+# automatically... so we use a kind of hack with the 3rd
+# argument to do it.
 AC_CHECK_SIZEOF([function_pointer], [], [typedef void (*function_pointer)();])
-dnl AC_CHECK_SIZEOF([void(*)(void)]) <-- Does not work! 
+# AC_CHECK_SIZEOF([void(*)(void)]) <-- Does not work! 
 
-dnl -------------------------------------------------------------
-dnl size of subdomain_id -- default 2
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# size of subdomain_id -- default 2
+# -------------------------------------------------------------
 AC_ARG_WITH([subdomain_id_bytes],
 	    AC_HELP_STRING([--with-subdomain-id-bytes=<1|2|4>],
                            [bytes of storage per element used to store the subdomain_id]),
@@ -241,23 +240,23 @@ else
   AC_MSG_RESULT(unrecognized subdomain_id size - configuring size...2)
 fi
 
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
-dnl --------------------------------------------------------------
-dnl Check for Run Time Type Identification support
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Check for Run Time Type Identification support
+# --------------------------------------------------------------
 AC_CXX_RTTI
 
 
-dnl --------------------------------------------------------------
-dnl Portable symbolic links
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Portable symbolic links
+# --------------------------------------------------------------
 AC_PROG_LN_S
 
-dnl --------------------------------------------------------------
-dnl Check for headers
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Check for headers
+# --------------------------------------------------------------
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(csignal)
 AC_CHECK_HEADERS(sys/resource.h)
@@ -271,8 +270,8 @@ AC_ARG_ENABLE(unordered-containers,
               enableunorderedcontainers=yes)
 
   if test "$enableunorderedcontainers" != no ; then
-    dnl The following routines, defined in unordered.m4, check to see if the compiler can compile programs using
-    dnl various quasi-standard hash containers.
+    # The following routines, defined in unordered.m4, check to see if the compiler can compile programs using
+    # various quasi-standard hash containers.
     ACX_BEST_UNORDERED_MULTIMAP
     ACX_BEST_UNORDERED_MAP
     ACX_BEST_UNORDERED_SET
@@ -287,14 +286,14 @@ AX_CXX_GCC_ABI_DEMANGLE
 AX_CXX_GLIBC_BACKTRACE
 
 
-dnl --------------------------------------------------------------
-dnl This is a special test for the mpCC (IBM) compiler.
-dnl mpCC fails the AC_LANG tests. Set the compiler to 
-dnl mpCC if it is there instead of xlC, but only do this
-dnl _after_ configure is finished using CXX!
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# This is a special test for the mpCC (IBM) compiler.
+# mpCC fails the AC_LANG tests. Set the compiler to 
+# mpCC if it is there instead of xlC, but only do this
+# _after_ configure is finished using CXX!
+# --------------------------------------------------------------
 if test "$CXX" = xlC_r; then
-  dnl           Var   | look for | name if found | name if not | where
+  #           Var   | look for | name if found | name if not | where
   AC_CHECK_PROG(MPCXX,  mpCC_r,      mpCC_r,           $CXX,         $PATH)
   CXX=$MPCXX
   if test "$CXX" = mpCC_r; then
@@ -302,49 +301,49 @@ if test "$CXX" = xlC_r; then
   fi
 fi
 if test "$CXX" = xlC; then
-  dnl           Var   | look for | name if found | name if not | where
+  #           Var   | look for | name if found | name if not | where
   AC_CHECK_PROG(MPCXX,  mpCC,      mpCC,           $CXX,         $PATH)
   CXX=$MPCXX
   if test "$CXX" = mpCC; then
     AC_MSG_RESULT(<<< Using $CXX instead of xlC to compile C++ >>>)
   fi
 fi
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
 
 
-dnl --------------------------------------------------------------
-dnl Get the source tree directory
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Get the source tree directory
+# --------------------------------------------------------------
 PWD=`pwd`
 AC_SUBST(PWD)
 
 
 
-dnl --------------------------------------------------------------
-dnl Look for a user or system-provided boost.  If there is not
-dnl one available then use the minimal ./contrib/boost provided.
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Look for a user or system-provided boost.  If there is not
+# one available then use the minimal ./contrib/boost provided.
+# --------------------------------------------------------------
 AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using external boost installation >>>))
-  dnl If that did not work, try using our builtin boost
+  # If that did not work, try using our builtin boost
   if test "x$BOOST_CPPFLAGS" = "x" ; then
     BOOST_ROOT="$PWD/contrib"
     AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using libmesh-provided boost in ./contrib >>>))
   fi
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
 
-dnl -------------------------------------------------------------
-dnl Allow user to specify --enable-everything
-dnl
-dnl This flag will cause all (non-conflicting) options to be
-dnl enabled for the purposes of configuration.  For example, by
-dnl performance logging is off by default, however
-dnl --enable-everything will change it to be on by default.
-dnl
-dnl Note specific flags will override --enable-everything for
-dnl that particular package, i.e.
-dnl  ./configure --enable-everything --disable-perflog
-dnl
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Allow user to specify --enable-everything
+#
+# This flag will cause all (non-conflicting) options to be
+# enabled for the purposes of configuration.  For example, by
+# performance logging is off by default, however
+# --enable-everything will change it to be on by default.
+#
+# Note specific flags will override --enable-everything for
+# that particular package, i.e.
+#  ./configure --enable-everything --disable-perflog
+#
+# -------------------------------------------------------------
 AC_ARG_ENABLE(everything,
               AC_HELP_STRING([--enable-everything],
                              [treat all applicable options as enabled]),
@@ -352,9 +351,9 @@ AC_ARG_ENABLE(everything,
               enableeverything=no)
 
 
-dnl --------------------------------------------------------------
-dnl Write stack trace output files on error() - disabled by default
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Write stack trace output files on error() - disabled by default
+# --------------------------------------------------------------
 AC_ARG_ENABLE(tracefiles,
               AC_HELP_STRING([--enable-tracefiles],
                              [write stack trace files on unexpected errors]),
@@ -366,12 +365,12 @@ if test "$enabletracefiles" != no ; then
            [Flag indicating if the library should be built to write stack trace files on unexpected errors])
   AC_MSG_RESULT(<<< Configuring library with stack trace file support >>>)
 fi
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
 
 
-dnl -------------------------------------------------------------
-dnl AMR -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# AMR -- enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(amr,
               AC_HELP_STRING([--enable-amr],
                              [build with adaptive mesh refinement (AMR) suppport]),
@@ -383,13 +382,13 @@ if test "$enableamr" != no ; then
            [Flag indicating if the library should be built with AMR support])
   AC_MSG_RESULT(<<< Configuring library with AMR support >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Variational smoother -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Variational smoother -- enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(vsmoother,
               AC_HELP_STRING([--enable-vsmoother],
                              [build with variational smoother suppport]),
@@ -401,13 +400,13 @@ if test "$enablevsmoother" != no ; then
            [Flag indicating if the library should be built with variational smoother support])
   AC_MSG_RESULT(<<< Configuring library with variational smoother support >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Periodic BCs -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Periodic BCs -- enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(periodic,
               AC_HELP_STRING([--enable-periodic],
                              [build with periodic boundary condition suppport]),
@@ -419,13 +418,13 @@ if test "$enableperiodic" != no ; then
            [Flag indicating if the library should be built with periodic boundary condition support])
   AC_MSG_RESULT(<<< Configuring library with periodic BC support >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl NodeConstraints -- disabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# NodeConstraints -- disabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(nodeconstraint,
               AC_HELP_STRING([--enable-nodeconstraint],
                              [build with node constraints suppport]),
@@ -437,13 +436,13 @@ if test "$enablenodeconstraint" != no ; then
            [Flag indicating if the library should be built with node constraints support])
   AC_MSG_RESULT(<<< Configuring library with nodeconstraints support >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Mesh == ParallelMesh -- disabled until it's debugged/finished
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Mesh == ParallelMesh -- disabled until it's debugged/finished
+# -------------------------------------------------------------
 AC_ARG_ENABLE(parmesh,
               AC_HELP_STRING([--enable-parmesh],
                              [Use experimental ParallelMesh as Mesh]),
@@ -456,13 +455,13 @@ if test "$enableparmesh" != no ; then
 ParallelMesh as its default Mesh type])
   AC_MSG_RESULT(<<< Configuring library to use ParallelMesh >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Ghosted instead of Serial local vectors -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Ghosted instead of Serial local vectors -- enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(ghosted,
               AC_HELP_STRING([--enable-ghosted],
                              [Use ghosted local vectors when available]),
@@ -474,13 +473,13 @@ if test "$enableghosted" != no ; then
 	   [Flag indicating if the library should use ghosted local vectors])
   AC_MSG_RESULT(<<< Configuring library to use ghosted local vectors >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl 1D or 1D/2D only -- disabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# 1D or 1D/2D only -- disabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(1D-only,
               AC_HELP_STRING([--enable-1D-only],
                              [build with support for 1D meshes only]),
@@ -502,13 +501,13 @@ elif test "$enable1D" != no ; then
            [Integer indicating the highest spatial dimensionality supported by libMesh])
   AC_MSG_RESULT(<<< Configuring library for 1D meshes only >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl higher order shapes -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# higher order shapes -- enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(pfem,
               AC_HELP_STRING([--enable-pfem],
                              [build with support for higher order p-FEM shapes]),
@@ -520,13 +519,13 @@ if test "$enablepfem" != no ; then
            [Flag indicating if the library should offer higher order p-FEM shapes])
   AC_MSG_RESULT(<<< Configuring library with higher order p-FEM shapes >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Infinite Elements  -- disabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Infinite Elements  -- disabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(ifem,
               AC_HELP_STRING([--enable-ifem],
                              [build with infinite elements]),
@@ -538,13 +537,13 @@ if test "$enableifem" != no ; then
            [Flag indicating if the library should be built with infinite elements])
   AC_MSG_RESULT(<<< Configuring library with infinite elements >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Second Derivative Calculations -- disabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Second Derivative Calculations -- disabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(second,
               AC_HELP_STRING([--enable-second],
                              [build with second derivatives]),
@@ -556,13 +555,13 @@ if test "$enablesecond" != no ; then
            [Flag indicating if the library should be built with second derivatives])
   AC_MSG_RESULT(<<< Configuring library with second derivatives >>>)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl --------------------------------------------------------------
-dnl XDR binary IO support - enabled by default
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# XDR binary IO support - enabled by default
+# --------------------------------------------------------------
 AC_ARG_ENABLE(xdr,
               AC_HELP_STRING([--enable-xdr],
                              [enable XDR platform-independent binary I/O]),
@@ -583,13 +582,13 @@ if test "$enablexdr" != no ; then
                     [enablexdr=no])
 fi
 AC_SUBST(enablexdr)	
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl complex numbers -- disabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# complex numbers -- disabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(complex,
               AC_HELP_STRING([--enable-complex],
                              [build with complex number support]),
@@ -608,13 +607,13 @@ else
   AC_MSG_RESULT(<<< Configuring library with real number support >>>)
   AC_SUBST(enablecomplex)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Reference Counting -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Reference Counting -- enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(reference-counting,
               AC_HELP_STRING([--enable-reference-counting],
                              [build with reference counting suppport]),
@@ -630,12 +629,12 @@ if test "$enablerefct" != no ; then
     AC_MSG_RESULT(<<< No RTTI: disabling reference counting support >>>)
   fi
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
-dnl -------------------------------------------------------------
-dnl Performance Logging -- disabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Performance Logging -- disabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(perflog,
               AC_HELP_STRING([--enable-perflog],
                              [build with performance logging turned on]),
@@ -647,11 +646,11 @@ if test "$enableperflog" != no ; then
            [Flag indicating if the library should be built with performance logging support])
   AC_MSG_RESULT(<<< Configuring library with performance logging support >>>)
 fi
-dnl ------------------------------------------------------------
+# ------------------------------------------------------------
 
-dnl --------------------------------------------------------------
-dnl Allow for disable-optional
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# Allow for disable-optional
+# --------------------------------------------------------------
 AC_ARG_ENABLE(optional,
               AC_HELP_STRING([--enable-optional],
                              [en/disable optional external libraries]),
@@ -666,9 +665,9 @@ if test "$enableoptional" != no ; then
 
 
 
-dnl -------------------------------------------------------------
-dnl Petsc -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Petsc -- enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(petsc,
               AC_HELP_STRING([--enable-petsc],
                              [build with PETSc iterative solver suppport]),
@@ -676,21 +675,21 @@ AC_ARG_ENABLE(petsc,
               enablepetsc=yes)
 
 
-dnl -------------------------------------------------------------
-dnl configure MPI separately only if PETSc fails
+# -------------------------------------------------------------
+# configure MPI separately only if PETSc fails
 if (test "$enablepetsc" !=  no) ; then
   CONFIGURE_PETSC
 else
   ACX_MPI
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
 
-dnl -------------------------------------------------------------
-dnl SLEPc  -- disabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# SLEPc  -- disabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(slepc,
               AC_HELP_STRING([--enable-slepc],
                              [build with SLEPc eigen solver support]),
@@ -700,16 +699,16 @@ AC_ARG_ENABLE(slepc,
 if test "$enableslepc" != no ; then
    CONFIGURE_SLEPC
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl "Trilinos" -- enabled by default unless we're building with
-dnl               complex numbers. This looks for the AztecOO
-dnl               linear solvers and requisite Epetra parallel 
-dnl               data structures
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# "Trilinos" -- enabled by default unless we're building with
+#               complex numbers. This looks for the AztecOO
+#               linear solvers and requisite Epetra parallel 
+#               data structures
+# -------------------------------------------------------------
 AC_ARG_ENABLE(trilinos,
               AC_HELP_STRING([--enable-trilinos],
                              [build with Trilinos support]),
@@ -717,35 +716,27 @@ AC_ARG_ENABLE(trilinos,
               enabletrilinos=yes)
 if test "$enablecomplex" = no ; then
    if test "$enabletrilinos" != no ; then
-      dnl -- try Trilinos 10 first
+      # -- try Trilinos 10 first
       CONFIGURE_TRILINOS_10
-      dnl -- then Trlinos 9
+      # -- then Trlinos 9
       if test "$enabletrilinos10" = no ; then
         CONFIGURE_TRILINOS_9
       fi
    fi
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Intel's Threading Building Blocks  -- enabled by default
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(tbb,
-             AC_HELP_STRING([--enable-tbb],
-                            [build with threading support via Threading Building Blocks]),
-             enabletbb=$enableval,
-             enabletbb=yes)
-if (test "$enabletbb" != no) ; then
-   CONFIGURE_TBB
-   AX_TLS
-fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Intel's Threading Building Blocks  -- enabled by default
+# -------------------------------------------------------------
+CONFIGURE_TBB
+# -------------------------------------------------------------
 
-dnl -------------------------------------------------------------
-dnl OpenMP Support  -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# OpenMP Support  -- enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(openmp,
              AC_HELP_STRING([--enable-openmp],
                             [Build with OpenMP Support]),
@@ -761,37 +752,37 @@ if (test "$enableopenmp" != no) ; then
    AC_SUBST(OPENMP_FFLAGS)
    AC_SUBST(enableopenmp)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
-dnl -------------------------------------------------------------
-dnl LASPACK iterative solvers -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# LASPACK iterative solvers -- enabled by default
+# -------------------------------------------------------------
 CONFIGURE_LASPACK
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
 
-dnl -------------------------------------------------------------
-dnl Space filling curves -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Space filling curves -- enabled by default
+# -------------------------------------------------------------
 CONFIGURE_SFC
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Compressed Streams with gzstream -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Compressed Streams with gzstream -- enabled by default
+# -------------------------------------------------------------
 CONFIGURE_GZ
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Compressed Files with bzip2
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Compressed Files with bzip2
+# -------------------------------------------------------------
 AC_ARG_ENABLE(bzip2,
               AC_HELP_STRING([--enable-bzip2],
                              [build with bzip2 compressed I/O suppport]),
@@ -799,7 +790,7 @@ AC_ARG_ENABLE(bzip2,
               enablebz2=yes)
 
 if (test "$enablebz2" != no) ; then
-   dnl           Var   | look for | name if found | name if not | where
+   #           Var   | look for | name if found | name if not | where
    AC_CHECK_PROG(BZIP2,  bzip2,      bzip2,           none,      $PATH)
    if test "$BZIP2" = bzip2; then
        AC_CHECK_PROG(BUNZIP2,  bunzip2,     bunzip2,        none,      $PATH)
@@ -810,12 +801,12 @@ if (test "$enablebz2" != no) ; then
        fi
    fi
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
-dnl -------------------------------------------------------------
-dnl Compressed Files with xz
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Compressed Files with xz
+# -------------------------------------------------------------
 AC_ARG_ENABLE(xz,
               AC_HELP_STRING([--enable-xz],
                              [build with xz compressed I/O suppport]),
@@ -823,7 +814,7 @@ AC_ARG_ENABLE(xz,
               enablexz=yes)
 
 if (test "$enablexz" != no) ; then
-   dnl           Var   | look for | name if found | name if not | where
+   #           Var   | look for | name if found | name if not | where
    AC_CHECK_PROG(XZ,  xz,      xz,           none,      $PATH)
    if test "$XZ" = xz; then
       AC_MSG_RESULT(<<< Using xz for writing/reading compressed .xz files >>>)
@@ -831,41 +822,41 @@ if (test "$enablexz" != no) ; then
                 [Flag indicating xz is available for handling compressed .xz files])
    fi
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
-dnl -------------------------------------------------------------
-dnl Tecplot -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Tecplot -- enabled by default
+# -------------------------------------------------------------
 CONFIGURE_TECPLOT
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Metis Partitioning -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Metis Partitioning -- enabled by default
+# -------------------------------------------------------------
 CONFIGURE_METIS
 
-dnl -------------------------------------------------------------
-dnl Parmetis Partitioning -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Parmetis Partitioning -- enabled by default
+# -------------------------------------------------------------
 CONFIGURE_PARMETIS
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
 
 
-dnl -------------------------------------------------------------
-dnl Doxygen - look for doxygen (a documentation tool)
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Doxygen - look for doxygen (a documentation tool)
+# -------------------------------------------------------------
 AC_PATH_PROG(DOXYGEN, doxygen)
 AC_SUBST(DOXYGEN)
 if test "x$DOXYGEN" != x ; then
-  dnl -----------------------------------------------------------
-  dnl Dot -- lets doxygen generate pretty class diagrams
-  dnl -----------------------------------------------------------
+  # -----------------------------------------------------------
+  # Dot -- lets doxygen generate pretty class diagrams
+  # -----------------------------------------------------------
   AC_PATH_PROG(DOT, dot)
   HAVE_DOT=NO
   if test "x$DOT" != x ; then
@@ -876,52 +867,46 @@ if test "x$DOXYGEN" != x ; then
   fi
   AC_SUBST(HAVE_DOT)
 fi
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
 
-dnl -------------------------------------------------------------
-dnl TetGen -- enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# TetGen -- enabled by default
+# -------------------------------------------------------------
 CONFIGURE_TETGEN
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Triangle -- enabled by default (it is distributed in contrib)
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Triangle -- enabled by default (it is distributed in contrib)
+# -------------------------------------------------------------
 CONFIGURE_TRIANGLE
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl GMV -- file I/O API is enabled by default (it is distributed in contrib)
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# GMV -- file I/O API is enabled by default (it is distributed in contrib)
+# -------------------------------------------------------------
 CONFIGURE_GMV
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl VTK -- Mesh I/O API is enabled by default
-dnl -------------------------------------------------------------
-AC_ARG_ENABLE(vtk,
-              AC_HELP_STRING([--enable-vtk],
-                             [build with VTK file I/O support]),
-              enablevtk=$enableval,
-              enablevtk=yes)
-
+# -------------------------------------------------------------
+# VTK -- Mesh I/O API is enabled by default
+# -------------------------------------------------------------
 CONFIGURE_VTK
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl Eigen -- Optimized linear algebra routines, disabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Eigen -- Optimized linear algebra routines, disabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(eigen,
               AC_HELP_STRING([--enable-eigen],
                              [build with Eigen linear algebra support]),
@@ -929,53 +914,53 @@ AC_ARG_ENABLE(eigen,
               enableeigen=yes)
 
 CONFIGURE_EIGEN
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
-dnl -------------------------------------------------------------
-dnl GLPK -- Needed by the SCM routine of rbOOmit.
-dnl Enabled by default.
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# GLPK -- Needed by the SCM routine of rbOOmit.
+# Enabled by default.
+# -------------------------------------------------------------
 CONFIGURE_GLPK
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
-dnl --------------------------------------------------------------
-dnl netCDF -- enabled by default (it is distributed in contrib)
-dnl --------------------------------------------------------------
+# --------------------------------------------------------------
+# netCDF -- enabled by default (it is distributed in contrib)
+# --------------------------------------------------------------
 CONFIGURE_NETCDF
 
-   dnl -------------------------------------------------------------
-   dnl ExodusII -- enabled by default (it is distributed in contrib)
-   dnl (note that ExodusII requires netCDF
-   dnl -------------------------------------------------------------
+   # -------------------------------------------------------------
+   # ExodusII -- enabled by default (it is distributed in contrib)
+   # (note that ExodusII requires netCDF
+   # -------------------------------------------------------------
    CONFIGURE_EXODUS
 
-      dnl -------------------------------------------------------------
-      dnl Nemesis -- enabled by default (it is distributed in contrib)
-      dnl (note that Nemesis requires netCDF and exodus)
-      dnl -------------------------------------------------------------
+      # -------------------------------------------------------------
+      # Nemesis -- enabled by default (it is distributed in contrib)
+      # (note that Nemesis requires netCDF and exodus)
+      # -------------------------------------------------------------
       CONFIGURE_NEMESIS
-      dnl -------------------------------------------------------------
-   dnl -------------------------------------------------------------
-dnl -------------------------------------------------------------
+      # -------------------------------------------------------------
+   # -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
 
    
-dnl -------------------------------------------------------------
-dnl libHilbert -- distributed in ./contrib,
-dnl               enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# libHilbert -- distributed in ./contrib,
+#               enabled by default
+# -------------------------------------------------------------
 CONFIGURE_LIBHILBERT
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
-dnl -------------------------------------------------------------
-dnl fparser -- distributed in ./contrib,
-dnl            enabled by default
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# fparser -- distributed in ./contrib,
+#            enabled by default
+# -------------------------------------------------------------
 AC_ARG_ENABLE(fparser,
               AC_HELP_STRING([--enable-fparser],
                              [build with fparser by Juha Nieminen, Joel Yliluoma]),
@@ -983,15 +968,15 @@ AC_ARG_ENABLE(fparser,
               enablefparser=yes)
 
 CONFIGURE_FPARSER
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 
-dnl end of --disable-optional test
+# end of --disable-optional test
    AC_MSG_RESULT(----------------------------------------------)
    AC_MSG_RESULT(--- Done configuring for optional packages ---)
    AC_MSG_RESULT(----------------------------------------------)
 else
-   dnl --disable-optional, so don't build any optional packages!
+   # --disable-optional, so don't build any optional packages!
    enablepetsc=no
    enablelaspack=no
    enablemetis=no
@@ -1006,7 +991,7 @@ else
     enablenetcdf=no
    enablenemesis=no
    enablelibhilbert=no
-   dnl -----------------
+   # -----------------
    AC_SUBST(enablepetsc)
    AC_SUBST(enablelaspack)
    AC_SUBST(enablemetis)
@@ -1022,15 +1007,15 @@ else
    AC_SUBST(enablenemesis)
    AC_SUBST(enablelibhilbert)
 fi
-dnl end of --disable-optional test 
+# end of --disable-optional test 
 
 
-dnl -------------------------------------------------------------
-dnl Perl - look for perl.  Perl is used to generate dependencies
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Perl - look for perl.  Perl is used to generate dependencies
+# -------------------------------------------------------------
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
 
 # Query configuration environment
 AX_SUMMARIZE_ENV
