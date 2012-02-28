@@ -94,28 +94,6 @@ CONFIGURE_TBB
 # -------------------------------------------------------------
 
 
-
-# -------------------------------------------------------------
-# OpenMP Support  -- enabled by default
-# -------------------------------------------------------------
-AC_ARG_ENABLE(openmp,
-             AC_HELP_STRING([--enable-openmp],
-                            [Build with OpenMP Support]),
-             enableopenmp=$enableval,
-             enableopenmp=$enableoptional)
-if (test "$enableopenmp" != no) ; then
-   AX_OPENMP
-   #The above call only sets the flag for C++
-   OPENMP_CFLAGS=$OPENMP_CXXFLAGS
-   OPENMP_FFLAGS=$OPENMP_CXXFLAGS
-   AC_SUBST(OPENMP_CXXFLAGS)
-   AC_SUBST(OPENMP_CFLAGS)
-   AC_SUBST(OPENMP_FFLAGS)
-   AC_SUBST(enableopenmp)
-fi
-# -------------------------------------------------------------
-
-
 # -------------------------------------------------------------
 # LASPACK iterative solvers -- enabled by default
 # -------------------------------------------------------------
