@@ -10,7 +10,20 @@ DISTCLEANFILES = base/libmesh_config.h
 dist-hook:
 	rm -rf $(distdir)/include/base/libmesh_config.h
 
+# These are headers we need to compile the libMesh library but should
+# not be installed.  These header files may have implementation
+# details which are not required for the public interface
+noinst_HEADERS = \
+		mesh/exodusII_io_helper.h \
+		mesh/nemesis_io_helper.h \
+		numerics/laspack_matrix.h \
+		numerics/laspack_vector.h \
+		solvers/laspack_linear_solver.h \
+		parallel/parallel_conversion_utils.h \
+		parallel/parallel_hilbert.h 
 
+# These are the headers we actually want to install and make available
+# to a user.  Consider these the public interface of libMesh.
 nobase_include_HEADERS = \
 		base/auto_ptr.h \
 		base/dof_map.h \
@@ -134,7 +147,6 @@ nobase_include_HEADERS = \
 		mesh/diva_io.h \
 		mesh/ensight_io.h \
 		mesh/exodusII_io.h \
-		mesh/exodusII_io_helper.h \
 		mesh/fro_io.h \
 		mesh/gmsh_io.h \
 		mesh/gmv_io.h \
@@ -164,7 +176,6 @@ nobase_include_HEADERS = \
 		mesh/mesh_triangle_interface.h \
 		mesh/mesh_triangle_wrapper.h \
 		mesh/nemesis_io.h \
-		mesh/nemesis_io_helper.h \
 		mesh/off_io.h \
 		mesh/parallel_mesh.h \
 		mesh/patch.h \
@@ -193,8 +204,6 @@ nobase_include_HEADERS = \
 		numerics/dense_vector_base.h \
 		numerics/distributed_vector.h \
 		numerics/function_base.h \
-		numerics/laspack_matrix.h \
-		numerics/laspack_vector.h \
 		numerics/numeric_vector.h \
 		numerics/parsed_function.h \
 		numerics/petsc_macro.h \
@@ -220,9 +229,7 @@ nobase_include_HEADERS = \
 		parallel/parallel.h \
 		parallel/parallel_algebra.h \
 		parallel/parallel_bin_sorter.h \
-		parallel/parallel_conversion_utils.h \
 		parallel/parallel_ghost_sync.h \
-		parallel/parallel_hilbert.h \
 		parallel/parallel_histogram.h \
 		parallel/parallel_sort.h \
 		parallel/threads.h \
@@ -277,7 +284,6 @@ nobase_include_HEADERS = \
 		solvers/eigen_time_solver.h \
 		solvers/euler2_solver.h \
 		solvers/euler_solver.h \
-		solvers/laspack_linear_solver.h \
 		solvers/linear.h \
 		solvers/linear_solver.h \
 		solvers/newton_solver.h \
@@ -359,5 +365,9 @@ nobase_include_HEADERS = \
 #
 # What to do for 'make installcheck'
 installcheck-local:
-	CXX="$(CXX)" TBB_DIR="$(TBB_DIR)" INCLUDEDIR="$(includedir)" HEADERS_TO_TEST="$(nobase_include_HEADERS)" $(top_srcdir)/contrib/bin/test_headers_AM.sh
+	echo "libmesh_optional_INCLUDES=$(libmesh_optional_INCLUDES)"
+	CXX="$(CXX)" libmesh_optional_INCLUDES="$(libmesh_optional_INCLUDES)" \
+	  INCLUDEDIR="$(includedir)" \
+	  HEADERS_TO_TEST="$(nobase_include_HEADERS)" \
+	  $(top_srcdir)/contrib/bin/test_headers_AM.sh
 

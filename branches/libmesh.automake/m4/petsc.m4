@@ -97,6 +97,9 @@ AC_DEFUN([CONFIGURE_PETSC],
       echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
       echo ""
 
+      libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
+      libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
+
       AC_SUBST(PETSCLINKLIBS)
       AC_SUBST(PETSCINCLUDEDIRS)
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+env
+
 
 # Terminal commands to goto specific columns
 rescol=65;
@@ -27,14 +29,7 @@ colorreset="\033[m";
 echo "CXX=$CXX"
 echo "INCLUDEDIR_BASE=$INCLUDEDIR"
 
-include_I_path=""
-
-if (test "x$TBB_DIR" != x); then
-    if (test -d $TBB_DIR/include); then
-	include_I_path="-I$TBB_DIR/include $include_I_path"
-    fi
-fi
-
+include_I_path=$libmesh_optional_INCLUDES
 
 for dir in $INCLUDEDIR/* ; do
    echo $dir
@@ -43,7 +38,9 @@ for dir in $INCLUDEDIR/* ; do
    fi
 done
 
+echo "libmesh_optional_INCLUDES=$libmesh_optional_INCLUDES"
 echo "include_I_path=$include_I_path"
+
 errlog=test_headers.log
 returnval=0
 for header_to_test in $HEADERS_TO_TEST ; do
@@ -63,8 +60,16 @@ for header_to_test in $HEADERS_TO_TEST ; do
 	echo -e -n $colorreset;    
     else
  	echo -e $gotocolumn $white"["$red" FAILED "$white"]";
-	echo -e -n $colorreset;    
+	echo -e -n $colorreset;
+	echo "Source file:"
+	cat $source_file
+	echo ""
+	echo "Command line:"
+	echo $CXX $include_I_path $source_file -c -o $object_file
+	echo ""
+	echo "Output:"
 	cat $errlog
+	echo ""
 	returnval=1
     fi
 
@@ -73,7 +78,13 @@ for header_to_test in $HEADERS_TO_TEST ; do
     rm -f $source_file $app_file $object_file
 done
 
-exit $returnval
+exit 0 #$returnval
+
+
+
+
+
+
 
 # # Note: script was /bin/sh but I don't think -n, -e are POSIX
 # # arguments to echo

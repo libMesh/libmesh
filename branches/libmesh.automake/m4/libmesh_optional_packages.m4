@@ -4,6 +4,7 @@ AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 [
 
 libmesh_optional_INCLUDES=""
+libmesh_optional_LIBS=""
 
 # --------------------------------------------------------------
 # Allow for disable-optional
@@ -309,5 +310,6 @@ fi
 
 # substitute values
 AC_SUBST(libmesh_optional_INCLUDES)
+AC_SUBST(libmesh_optional_LIBS)
 
 ])

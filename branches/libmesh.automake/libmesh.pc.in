@@ -8,7 +8,7 @@ Description: The libMesh Finite Element Library
 Requires:
 Version: @VERSION@-@METHOD@
 Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh
-Libs.private: @PETSCLINKLIBS@
+Libs.private: @libmesh_optional_LIBS@
 Cflags: @CPPFLAGS_METHOD@ @CXXFLAGS_METHOD@ \
         -I${includedir}/base -I${includedir}/enums -I${includedir}/error_estimation -I${includedir}/fe -I${includedir}/geom \
         -I${includedir}/mesh -I${includedir}/numerics -I${includedir}/parallel -I${includedir}/partitioning \
