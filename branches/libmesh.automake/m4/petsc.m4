@@ -63,19 +63,6 @@ AC_DEFUN([CONFIGURE_PETSC],
 
   dnl If we haven't been disabled yet, carry on!
   if (test $enablepetsc != no) ; then
-dnl      dnl look for a decent F77 compiler or honor --with-77=...
-dnl      FC_TRY_LIST="g77 gfortran ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
-dnl      AC_ARG_WITH([f77],
-dnl      	    AC_HELP_STRING([--with-f77=F77],
-dnl                                 [Fortran compiler to use]),
-dnl      	    [F77="$withval"],
-dnl      	    [])
-dnl      
-dnl      dnl --------------------------------------------------------------
-dnl      dnl Determine a F77 compiler to use.
-dnl      dnl --------------------------------------------------------------
-dnl      AC_PROG_F77([$F77_TRY_LIST])
-dnl      AC_F77_LIBRARY_LDFLAGS
 
       AC_SUBST(PETSC_ARCH) dnl Note: may be empty...
       AC_SUBST(PETSC_DIR)
@@ -102,11 +89,16 @@ dnl      AC_F77_LIBRARY_LDFLAGS
       dnl Print informative message about the version of PETSc we detected
       AC_MSG_RESULT([<<< Configuring library with PETSc version $petscversion support >>>])
 
-dnl      PETSCLINKLIBS=`cd $PETSC_DIR ; make getlinklibs`
-dnl      PETSCINCLUDEDIRS=`cd $PETSC_DIR ; make getincludedirs`
-dnl
-dnl      AC_SUBST(PETSCLINKLIBS)
-dnl      AC_SUBST(PETSCINCLUDEDIRS)
+      PETSCLINKLIBS=`cd $PETSC_DIR ; make getlinklibs`
+      PETSCINCLUDEDIRS=`cd $PETSC_DIR ; make getincludedirs`
+	
+      echo ""
+      echo "PETSCLINKLIBS=$PETSCLINKLIBS"
+      echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
+      echo ""
+
+      AC_SUBST(PETSCLINKLIBS)
+      AC_SUBST(PETSCINCLUDEDIRS)
 
       AC_SUBST(MPI_IMPL)
 
@@ -133,6 +125,7 @@ dnl      AC_SUBST(PETSCINCLUDEDIRS)
 
   
   AC_SUBST(enablepetsc)
+  AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)		 
 ])
 
 
