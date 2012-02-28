@@ -52,12 +52,13 @@ for header_to_test in $HEADERS_TO_TEST ; do
     header_name=`basename $header_to_test`
     app_file=`mktemp -t $header_name.XXXXXXXXXX`
     source_file=$app_file.cxx
+    object_file=$app_file.o
 
     echo "#include \"$header_name\"" >> $source_file
-    echo "int main () { return 0; }" >> $source_file
+    echo "int foo () { return 0; }" >> $source_file
 
     #echo $CXX $include_I_path $source_file -o $app_file
-    if $CXX $include_I_path $source_file -o $app_file >$errlog 2>&1 ; then
+    if $CXX $include_I_path $source_file -c -o $object_file >$errlog 2>&1 ; then
  	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
 	echo -e -n $colorreset;    
     else
@@ -69,7 +70,7 @@ for header_to_test in $HEADERS_TO_TEST ; do
 
     #echo -e -n $colorreset;    
     #cat $source_file
-    rm -f $source_file $app_file
+    rm -f $source_file $app_file $object_file
 done
 
 exit $returnval
