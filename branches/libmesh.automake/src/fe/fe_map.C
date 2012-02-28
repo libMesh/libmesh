@@ -696,6 +696,12 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       //  on the dimension that we are in.
       switch (Dim)
 	{
+	  // ------------------------------------------------------------------
+	  //  0D map inversion is trivial
+        case 0:
+          {
+            break;
+          }
 
 	  // ------------------------------------------------------------------
 	  //  1D map inversion

@@ -80,6 +80,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::n_shape_functions(t, o);
 
+	  case L2_LAGRANGE:
+	    return FE<0,L2_LAGRANGE>::n_shape_functions(t, o);
+
 	  case MONOMIAL:
 	    return FE<0,MONOMIAL>::n_shape_functions(t, o);
 
@@ -124,6 +127,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::n_shape_functions(t, o);
+
+	  case L2_LAGRANGE:
+	    return FE<1,L2_LAGRANGE>::n_shape_functions(t, o);
 
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_shape_functions(t, o);
@@ -171,6 +177,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::n_shape_functions(t, o);
 
+	  case L2_LAGRANGE:
+	    return FE<2,L2_LAGRANGE>::n_shape_functions(t, o);
+
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_shape_functions(t, o);
 
@@ -212,6 +221,9 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::n_shape_functions(t, o);
+
+	  case L2_LAGRANGE:
+	    return FE<3,L2_LAGRANGE>::n_shape_functions(t, o);
 
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_shape_functions(t, o);
@@ -286,6 +298,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::n_dofs(t, o);
 
+	  case L2_LAGRANGE:
+	    return FE<0,L2_LAGRANGE>::n_dofs(t, o);
+
 	  case MONOMIAL:
 	    return FE<0,MONOMIAL>::n_dofs(t, o);
 
@@ -329,6 +344,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::n_dofs(t, o);
+
+	  case L2_LAGRANGE:
+	    return FE<1,L2_LAGRANGE>::n_dofs(t, o);
 
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs(t, o);
@@ -375,6 +393,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::n_dofs(t, o);
 
+	  case L2_LAGRANGE:
+	    return FE<2,L2_LAGRANGE>::n_dofs(t, o);
+
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs(t, o);
 
@@ -416,6 +437,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::n_dofs(t, o);
+
+	  case L2_LAGRANGE:
+	    return FE<3,L2_LAGRANGE>::n_dofs(t, o);
 
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs(t, o);
@@ -490,6 +514,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::n_dofs_at_node(t, o, n);
 
+	  case L2_LAGRANGE:
+	    return FE<0,L2_LAGRANGE>::n_dofs_at_node(t, o, n);
+
 	  case MONOMIAL:
 	    return FE<0,MONOMIAL>::n_dofs_at_node(t, o, n);
 
@@ -533,6 +560,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::n_dofs_at_node(t, o, n);
+
+	  case L2_LAGRANGE:
+	    return FE<1,L2_LAGRANGE>::n_dofs_at_node(t, o, n);
 
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs_at_node(t, o, n);
@@ -579,6 +609,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::n_dofs_at_node(t, o, n);
 
+	  case L2_LAGRANGE:
+	    return FE<2,L2_LAGRANGE>::n_dofs_at_node(t, o, n);
+
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs_at_node(t, o, n);
 
@@ -620,6 +653,9 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::n_dofs_at_node(t, o, n);
+
+	  case L2_LAGRANGE:
+	    return FE<3,L2_LAGRANGE>::n_dofs_at_node(t, o, n);
 
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs_at_node(t, o, n);
@@ -694,6 +730,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::n_dofs_per_elem(t, o);
 
+	  case L2_LAGRANGE:
+	    return FE<0,L2_LAGRANGE>::n_dofs_per_elem(t, o);
+
 	  case MONOMIAL:
 	    return FE<0,MONOMIAL>::n_dofs_per_elem(t, o);
 
@@ -738,6 +777,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::n_dofs_per_elem(t, o);
+
+	  case L2_LAGRANGE:
+	    return FE<1,L2_LAGRANGE>::n_dofs_per_elem(t, o);
 
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::n_dofs_per_elem(t, o);
@@ -784,6 +826,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::n_dofs_per_elem(t, o);
 
+	  case L2_LAGRANGE:
+	    return FE<2,L2_LAGRANGE>::n_dofs_per_elem(t, o);
+
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::n_dofs_per_elem(t, o);
 
@@ -825,6 +870,9 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::n_dofs_per_elem(t, o);
+
+	  case L2_LAGRANGE:
+	    return FE<3,L2_LAGRANGE>::n_dofs_per_elem(t, o);
 
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::n_dofs_per_elem(t, o);
@@ -898,6 +946,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<0,LAGRANGE>::dofs_on_side(elem, o, s, di);
             return;
 
+	  case L2_LAGRANGE:
+	    FE<0,L2_LAGRANGE>::dofs_on_side(elem, o, s, di);
+            return;
+
 	  case MONOMIAL:
 	    FE<0,MONOMIAL>::dofs_on_side(elem, o, s, di);
             return;
@@ -951,6 +1003,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 
 	  case LAGRANGE:
 	    FE<1,LAGRANGE>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  case L2_LAGRANGE:
+	    FE<1,L2_LAGRANGE>::dofs_on_side(elem, o, s, di);
             return;
 
 	  case MONOMIAL:
@@ -1008,6 +1064,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 	    FE<2,LAGRANGE>::dofs_on_side(elem, o, s, di);
             return;
 
+	  case L2_LAGRANGE:
+	    FE<2,L2_LAGRANGE>::dofs_on_side(elem, o, s, di);
+            return;
+
 	  case MONOMIAL:
 	    FE<2,MONOMIAL>::dofs_on_side(elem, o, s, di);
             return;
@@ -1057,6 +1117,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 
 	  case LAGRANGE:
 	    FE<3,LAGRANGE>::dofs_on_side(elem, o, s, di);
+            return;
+
+	  case L2_LAGRANGE:
+	    FE<3,L2_LAGRANGE>::dofs_on_side(elem, o, s, di);
             return;
 
 	  case MONOMIAL:
@@ -1133,6 +1197,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<0,LAGRANGE>::dofs_on_edge(elem, o, e, di);
             return;
 
+	  case L2_LAGRANGE:
+	    FE<0,L2_LAGRANGE>::dofs_on_edge(elem, o, e, di);
+            return;
+
 	  case MONOMIAL:
 	    FE<0,MONOMIAL>::dofs_on_edge(elem, o, e, di);
             return;
@@ -1186,6 +1254,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 
 	  case LAGRANGE:
 	    FE<1,LAGRANGE>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  case L2_LAGRANGE:
+	    FE<1,L2_LAGRANGE>::dofs_on_edge(elem, o, e, di);
             return;
 
 	  case MONOMIAL:
@@ -1243,6 +1315,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 	    FE<2,LAGRANGE>::dofs_on_edge(elem, o, e, di);
             return;
 
+	  case L2_LAGRANGE:
+	    FE<2,L2_LAGRANGE>::dofs_on_edge(elem, o, e, di);
+            return;
+
 	  case MONOMIAL:
 	    FE<2,MONOMIAL>::dofs_on_edge(elem, o, e, di);
             return;
@@ -1292,6 +1368,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 
 	  case LAGRANGE:
 	    FE<3,LAGRANGE>::dofs_on_edge(elem, o, e, di);
+            return;
+
+	  case L2_LAGRANGE:
+	    FE<3,L2_LAGRANGE>::dofs_on_edge(elem, o, e, di);
             return;
 
 	  case MONOMIAL:
@@ -1384,6 +1464,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
+	  case L2_LAGRANGE:
+	    FE<0,L2_LAGRANGE>::nodal_soln(elem, order,
+				       elem_soln, nodal_soln);
+	    return;
+
 	  case MONOMIAL:
 	    FE<0,MONOMIAL>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
@@ -1446,6 +1531,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 	  case LAGRANGE:
 	    FE<1,LAGRANGE>::nodal_soln(elem, order,
+				       elem_soln, nodal_soln);
+	    return;
+
+	  case L2_LAGRANGE:
+	    FE<1,L2_LAGRANGE>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
 
@@ -1514,6 +1604,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 				       elem_soln, nodal_soln);
 	    return;
 
+	  case L2_LAGRANGE:
+	    FE<2,L2_LAGRANGE>::nodal_soln(elem, order,
+				       elem_soln, nodal_soln);
+	    return;
+
 	  case MONOMIAL:
 	    FE<2,MONOMIAL>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
@@ -1571,6 +1666,11 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 	  case LAGRANGE:
 	    FE<3,LAGRANGE>::nodal_soln(elem, order,
+				       elem_soln, nodal_soln);
+	    return;
+
+	  case L2_LAGRANGE:
+	    FE<3,L2_LAGRANGE>::nodal_soln(elem, order,
 				       elem_soln, nodal_soln);
 	    return;
 
@@ -1653,6 +1753,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 
+	  case L2_LAGRANGE:
+	    return FE<0,L2_LAGRANGE>::inverse_map(elem, p, tolerance, secure);
+
 	  case MONOMIAL:
 	    return FE<0,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
@@ -1697,6 +1800,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
+
+	  case L2_LAGRANGE:
+	    return FE<1,L2_LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
@@ -1743,6 +1849,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 
+	  case L2_LAGRANGE:
+	    return FE<2,L2_LAGRANGE>::inverse_map(elem, p, tolerance, secure);
+
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
 
@@ -1783,6 +1892,9 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::inverse_map(elem, p, tolerance, secure);
+
+	  case L2_LAGRANGE:
+	    return FE<3,L2_LAGRANGE>::inverse_map(elem, p, tolerance, secure);
 
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::inverse_map(elem, p, tolerance, secure);
@@ -1887,6 +1999,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<0,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
+	  case L2_LAGRANGE:
+	    FE<0,L2_LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+
 	  case MONOMIAL:
 	    FE<0,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
@@ -1940,6 +2056,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 
 	  case LAGRANGE:
 	    FE<1,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+
+	  case L2_LAGRANGE:
+	    FE<1,L2_LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 	  case MONOMIAL:
@@ -1997,6 +2117,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 	    FE<2,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
+	  case L2_LAGRANGE:
+	    FE<2,L2_LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+
 	  case MONOMIAL:
 	    FE<2,MONOMIAL>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
@@ -2046,6 +2170,10 @@ void FEInterface::inverse_map (const unsigned int dim,
 
 	  case LAGRANGE:
 	    FE<3,LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+	    return;
+
+	  case L2_LAGRANGE:
+	    FE<3,L2_LAGRANGE>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
 	    return;
 
 	  case MONOMIAL:
@@ -2136,6 +2264,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::shape(t,o,i,p);
 
+	  case L2_LAGRANGE:
+	    return FE<0,L2_LAGRANGE>::shape(t,o,i,p);
+
 	  case MONOMIAL:
 	    return FE<0,MONOMIAL>::shape(t,o,i,p);
 
@@ -2179,6 +2310,9 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::shape(t,o,i,p);
+
+	  case L2_LAGRANGE:
+	    return FE<1,L2_LAGRANGE>::shape(t,o,i,p);
 
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::shape(t,o,i,p);
@@ -2225,6 +2359,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::shape(t,o,i,p);
 
+	  case L2_LAGRANGE:
+	    return FE<2,L2_LAGRANGE>::shape(t,o,i,p);
+
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::shape(t,o,i,p);
 
@@ -2266,6 +2403,9 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::shape(t,o,i,p);
+
+	  case L2_LAGRANGE:
+	    return FE<3,L2_LAGRANGE>::shape(t,o,i,p);
 
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::shape(t,o,i,p);
@@ -2341,6 +2481,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<0,LAGRANGE>::shape(elem,o,i,p);
 
+	  case L2_LAGRANGE:
+	    return FE<0,L2_LAGRANGE>::shape(elem,o,i,p);
+
 	  case MONOMIAL:
 	    return FE<0,MONOMIAL>::shape(elem,o,i,p);
 
@@ -2384,6 +2527,9 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<1,LAGRANGE>::shape(elem,o,i,p);
+
+	  case L2_LAGRANGE:
+	    return FE<1,L2_LAGRANGE>::shape(elem,o,i,p);
 
 	  case MONOMIAL:
 	    return FE<1,MONOMIAL>::shape(elem,o,i,p);
@@ -2430,6 +2576,9 @@ Real FEInterface::shape(const unsigned int dim,
 	  case LAGRANGE:
 	    return FE<2,LAGRANGE>::shape(elem,o,i,p);
 
+	  case L2_LAGRANGE:
+	    return FE<2,L2_LAGRANGE>::shape(elem,o,i,p);
+
 	  case MONOMIAL:
 	    return FE<2,MONOMIAL>::shape(elem,o,i,p);
 
@@ -2471,6 +2620,9 @@ Real FEInterface::shape(const unsigned int dim,
 
 	  case LAGRANGE:
 	    return FE<3,LAGRANGE>::shape(elem,o,i,p);
+
+	  case L2_LAGRANGE:
+	    return FE<3,L2_LAGRANGE>::shape(elem,o,i,p);
 
 	  case MONOMIAL:
 	    return FE<3,MONOMIAL>::shape(elem,o,i,p);
@@ -2686,6 +2838,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
   switch (fe_t.family)
     {
       case LAGRANGE:
+      case L2_LAGRANGE: // TODO: L2_LAGRANGE can have higher "max_order" than LAGRANGE
 	switch (el_t)
 	  {
 	    case EDGE2:
@@ -2977,6 +3130,7 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
   switch (fe_t.family)
     {
       case LAGRANGE:
+      case L2_LAGRANGE:
       case MONOMIAL:
       case L2_HIERARCHIC:
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES

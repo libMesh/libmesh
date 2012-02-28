@@ -139,6 +139,11 @@ libmesh_la_SOURCES = \
 		src/fe/fe_l2_hierarchic_shape_1D.C \
 		src/fe/fe_l2_hierarchic_shape_2D.C \
 		src/fe/fe_l2_hierarchic_shape_3D.C \
+		src/fe/fe_l2_lagrange.C \
+		src/fe/fe_l2_lagrange_shape_0D.C \
+		src/fe/fe_l2_lagrange_shape_1D.C \
+		src/fe/fe_l2_lagrange_shape_2D.C \
+		src/fe/fe_l2_lagrange_shape_3D.C \
 		src/fe/fe_lagrange.C \
 		src/fe/fe_lagrange_shape_0D.C \
 		src/fe/fe_lagrange_shape_1D.C \
