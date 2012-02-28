@@ -15,6 +15,12 @@
 #
 ###############################################################################
 
+#############################################################################
+# Certain PETSc's define DESTDIR - which is very, very bad for us.  Of course
+# we are asking for it by including their Makefile variables here.
+# Guard against that.
+libmesh_save_DESTDIR := $(DESTDIR)
+
 
 # top-level source dir.  This is set by automake for internal builds, otherwise
 # it gets set to the installation prefix
@@ -426,6 +432,7 @@ ifeq ($(enable-optional),yes)
       libmesh_INCLUDE += $(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS)      	
   endif	
 
+
   #############################################################################
   # SLEPc
   ifeq ($(enable-slepc),yes)
@@ -539,6 +546,11 @@ endif # End of disable-optional test
 
 
 ###############################################################################
+
+
+
+# Restore our DESTDIR.  Really, FIXME: Don't include strangers Makefiles!
+DESTDIR=$(libmesh_save_DESTDIR)
 
 
 
