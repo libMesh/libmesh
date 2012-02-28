@@ -593,6 +593,23 @@ public:
 };
 
 
+/**
+ * Discontinuous Lagrange finite elements.
+ */
+//-------------------------------------------------------------
+// FEL2Lagrange class definition
+template <unsigned int Dim>
+class FEL2Lagrange : public FE<Dim,L2_LAGRANGE>
+{
+public:
+
+  /**
+   * Constructor. Creates a discontinuous Lagrange finite element
+   * to be used in dimension \p Dim.
+   */
+  FEL2Lagrange(const FEType& fet);
+};
+
 
 /**
  * Monomial finite elements.  Still templated on the dimension,
@@ -779,6 +796,24 @@ namespace FiniteElements
   typedef FE<3,LAGRANGE> FELagrange3D;
 
 
+  /**
+   * Convenient definition for a 1D
+   * Discontinuous Lagrange finite element.
+   */
+  typedef FE<1,L2_LAGRANGE> FEL2Lagrange1D;
+
+  /**
+   * Convenient definition for a 2D
+   * Discontinuous Lagrange finite element.
+   */
+  typedef FE<2,L2_LAGRANGE> FEL2Lagrange2D;
+
+  /**
+   * Convenient definition for a 3D
+   * Discontinuous Lagrange finite element.
+   */
+  typedef FE<3,L2_LAGRANGE> FEL2Lagrange3D;
+
 
   /**
    * Convenient definition for a 1D
@@ -870,6 +905,17 @@ template <unsigned int Dim>
 inline
 FELagrange<Dim>::FELagrange (const FEType& fet) :
   FE<Dim,LAGRANGE> (fet)
+{
+}
+
+
+
+// ------------------------------------------------------------
+// FELagrange class inline members
+template <unsigned int Dim>
+inline
+FEL2Lagrange<Dim>::FEL2Lagrange (const FEType& fet) :
+  FE<Dim,L2_LAGRANGE> (fet)
 {
 }
 

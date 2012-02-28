@@ -33,8 +33,9 @@ namespace libMeshEnums {
 		 HIERARCHIC   = 1,
 
 		 // discontinuous, in local coordinates
-		 MONOMIAL     = 2,
-     L2_HIERARCHIC = 6,
+		 MONOMIAL      = 2,
+                 L2_HIERARCHIC = 6,
+                 L2_LAGRANGE   = 7,
 
 		 // higher-order
 		 BERNSTEIN    = 3,
