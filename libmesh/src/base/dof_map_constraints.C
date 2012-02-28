@@ -190,7 +190,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
   // constraint equations
   if (dim == 1 
 #ifdef LIBMESH_ENABLE_PERIODIC
-      && !_periodic_boundaries->empty()
+      && _periodic_boundaries->empty()
 #endif
      )
   {
