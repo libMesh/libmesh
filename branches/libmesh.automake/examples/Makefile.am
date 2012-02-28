@@ -10,6 +10,8 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 INCLUDES    = $(libmesh_INCLUDE)
 LIBS        = $(libmesh_LIBS)
 
+EXTRA_DIST = run_common.sh
+
 check_PROGRAMS =
 check_SCRIPTS = 
 CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu #FIXME - tighten up!
