@@ -74,6 +74,9 @@ SIDEMAP_ERROR(0, L2_HIERARCHIC, side_map)
 REINIT_ERROR(0, LAGRANGE, reinit)
 REINIT_ERROR(0, LAGRANGE, edge_reinit)
 SIDEMAP_ERROR(0, LAGRANGE, side_map)
+REINIT_ERROR(0, L2_LAGRANGE, reinit)
+REINIT_ERROR(0, L2_LAGRANGE, edge_reinit)
+SIDEMAP_ERROR(0, L2_LAGRANGE, side_map)
 REINIT_ERROR(0, MONOMIAL, reinit)
 REINIT_ERROR(0, MONOMIAL, edge_reinit)
 SIDEMAP_ERROR(0, MONOMIAL, side_map)
@@ -97,6 +100,7 @@ REINIT_ERROR(1, HERMITE, edge_reinit)
 REINIT_ERROR(1, HIERARCHIC, edge_reinit)
 REINIT_ERROR(1, L2_HIERARCHIC, edge_reinit)
 REINIT_ERROR(1, LAGRANGE, edge_reinit)
+REINIT_ERROR(1, L2_LAGRANGE, edge_reinit)
 REINIT_ERROR(1, XYZ, edge_reinit)
 REINIT_ERROR(1, MONOMIAL, edge_reinit)
 REINIT_ERROR(1, SCALAR, edge_reinit)
@@ -862,6 +866,8 @@ void FEBase::compute_edge_map(const std::vector<Real>& qw,
 // Explicit instantiations
 template void FE<1,LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<1,LAGRANGE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
+template void FE<1,L2_LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<1,L2_LAGRANGE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<1,HIERARCHIC>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<1,HIERARCHIC>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<1,L2_HIERARCHIC>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
@@ -886,6 +892,9 @@ template void FE<1,XYZ>::side_map(Elem const*, Elem const*, const unsigned int, 
 template void FE<2,LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<2,LAGRANGE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<2,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,L2_LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,L2_LAGRANGE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
+template void FE<2,L2_LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<2,HIERARCHIC>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<2,HIERARCHIC>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<2,HIERARCHIC>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
@@ -922,6 +931,9 @@ template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point>&, co
 template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<3,LAGRANGE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<3,LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,L2_LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,L2_LAGRANGE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
+template void FE<3,L2_LAGRANGE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<3,HIERARCHIC>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<3,HIERARCHIC>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<3,HIERARCHIC>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);

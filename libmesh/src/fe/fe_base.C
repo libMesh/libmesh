@@ -73,6 +73,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 
+	  case L2_LAGRANGE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<0,L2_LAGRANGE>(fet));
+	      return ap;
+	    }
+
 	  case HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<0,HIERARCHIC>(fet));
@@ -142,6 +148,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case L2_LAGRANGE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<1,L2_LAGRANGE>(fet));
 	      return ap;
 	    }
 
@@ -219,6 +231,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	      return ap;
 	    }
 
+	  case L2_LAGRANGE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<2,L2_LAGRANGE>(fet));
+	      return ap;
+	    }
+
 	  case HIERARCHIC:
 	    {
 	      AutoPtr<FEBase> ap(new FE<2,HIERARCHIC>(fet));
@@ -291,6 +309,12 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case L2_LAGRANGE:
+	    {
+	      AutoPtr<FEBase> ap(new FE<3,L2_LAGRANGE>(fet));
 	      return ap;
 	    }
 

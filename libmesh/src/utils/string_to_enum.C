@@ -234,6 +234,7 @@ namespace {
     if (fefamily_to_enum.empty())
       {
 	fefamily_to_enum["LAGRANGE"    ]=LAGRANGE;
+	fefamily_to_enum["L2_LAGRANGE"    ]=L2_LAGRANGE;
 	fefamily_to_enum["HIERARCHIC"  ]=HIERARCHIC;
 	fefamily_to_enum["L2_HIERARCHIC"  ]=L2_HIERARCHIC;
 	fefamily_to_enum["MONOMIAL"    ]=MONOMIAL;
