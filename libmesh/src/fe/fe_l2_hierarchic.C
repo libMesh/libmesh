@@ -185,10 +185,10 @@ namespace libMesh
   template <> unsigned int FE<3,L2_HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
 
   // L2 Hierarchic FEMs are C^0 continuous
-  template <> FEContinuity FE<0,L2_HIERARCHIC>::get_continuity() const { return C_ZERO; }
-  template <> FEContinuity FE<1,L2_HIERARCHIC>::get_continuity() const { return C_ZERO; }
-  template <> FEContinuity FE<2,L2_HIERARCHIC>::get_continuity() const { return C_ZERO; }
-  template <> FEContinuity FE<3,L2_HIERARCHIC>::get_continuity() const { return C_ZERO; }
+  template <> FEContinuity FE<0,L2_HIERARCHIC>::get_continuity() const { return DISCONTINUOUS; }
+  template <> FEContinuity FE<1,L2_HIERARCHIC>::get_continuity() const { return DISCONTINUOUS; }
+  template <> FEContinuity FE<2,L2_HIERARCHIC>::get_continuity() const { return DISCONTINUOUS; }
+  template <> FEContinuity FE<3,L2_HIERARCHIC>::get_continuity() const { return DISCONTINUOUS; }
 
   // L2 Hierarchic FEMs are hierarchic (duh!)
   template <> bool FE<0,L2_HIERARCHIC>::is_hierarchic() const { return true; }
@@ -197,20 +197,20 @@ namespace libMesh
   template <> bool FE<3,L2_HIERARCHIC>::is_hierarchic() const { return true; }
 
 #ifdef LIBMESH_ENABLE_AMR
-  // compute_constraints() specializations are only needed for 2 and 3D
+  // compute_constraints() is a NOOP for DISCONTINOUS FE's
   template <>
-  void FE<2,L2_HIERARCHIC>::compute_constraints (DofConstraints &constraints,
-						 DofMap &dof_map,
-						 const unsigned int variable_number,
-						 const Elem* elem)
-  { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
+  void FE<2,L2_HIERARCHIC>::compute_constraints (DofConstraints &,
+						 DofMap &,
+						 const unsigned int,
+						 const Elem*)
+  { }
 
   template <>
-  void FE<3,L2_HIERARCHIC>::compute_constraints (DofConstraints &constraints,
-						 DofMap &dof_map,
-						 const unsigned int variable_number,
-						 const Elem* elem)
-  { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
+  void FE<3,L2_HIERARCHIC>::compute_constraints (DofConstraints &,
+						 DofMap &,
+						 const unsigned int,
+						 const Elem*)
+  { }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
   // L2-Hierarchic FEM shapes need reinit
