@@ -44,7 +44,7 @@ for dir in $INCLUDEDIR/* ; do
 done
 
 echo "include_I_path=$include_I_path"
-
+errlog=test_headers.log
 returnval=0
 for header_to_test in $HEADERS_TO_TEST ; do
     echo -n "Testing Header $header_to_test ... "
@@ -57,14 +57,17 @@ for header_to_test in $HEADERS_TO_TEST ; do
     echo "int main () { return 0; }" >> $source_file
 
     #echo $CXX $include_I_path $source_file -o $app_file
-    if $CXX $include_I_path $source_file -o $app_file >/dev/null 2>&1; then
+    if $CXX $include_I_path $source_file -o $app_file >$errlog 2>&1 ; then
  	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
+	echo -e -n $colorreset;    
     else
  	echo -e $gotocolumn $white"["$red" FAILED "$white"]";
+	echo -e -n $colorreset;    
+	cat $errlog
 	returnval=1
     fi
 
-    echo -e -n $colorreset;    
+    #echo -e -n $colorreset;    
     #cat $source_file
     rm -f $source_file $app_file
 done
