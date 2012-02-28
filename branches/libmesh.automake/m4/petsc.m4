@@ -3,6 +3,10 @@ dnl PETSc
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_PETSC], 
 [
+  AC_ARG_VAR([PETSC_DIR],  [path to PETSc installation])
+  AC_ARG_VAR([PETSC_ARCH], [PETSc build architecture])
+
+  
   dnl AC_REQUIRE:
   dnl If the M4 macro AC_PROG_F77 has not already been called, call
   dnl it (without any arguments). Make sure to quote AC_PROG_F77 with
@@ -92,10 +96,10 @@ AC_DEFUN([CONFIGURE_PETSC],
       PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
       PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
 	
-      echo ""
-      echo "PETSCLINKLIBS=$PETSCLINKLIBS"
-      echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
-      echo ""
+      #echo ""
+      #echo "PETSCLINKLIBS=$PETSCLINKLIBS"
+      #echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
+      #echo ""
 
       libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
       libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"

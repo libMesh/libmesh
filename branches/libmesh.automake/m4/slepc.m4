@@ -3,6 +3,8 @@ dnl SLEPc
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_SLEPC],
 [
+  AC_ARG_VAR([SLEPC_DIR], [path to SLEPc installation])
+  
   dnl Although PETSc 3.x does not require PETSC_ARCH, it appears that
   dnl SLEPc 3.x may (based on patches sent in by Jed Brown)?  
   dnl If that's the case, we should probably uncomment 
@@ -39,6 +41,9 @@ AC_DEFUN([CONFIGURE_SLEPC],
       AC_SUBST(slepcversion)
       AC_SUBST(SLEPC_DIR)
 
+      libmesh_optional_INCLUDES="-I$SLEPC_DIR/include $libmesh_optional_INCLUDES"
+
+      
       if (test $slepcversion != $petscversion) ; then
         AC_MSG_RESULT(WARNING:)
         AC_MSG_RESULT(>>> Different version numbers for SLEPc and PETSc <<<)
