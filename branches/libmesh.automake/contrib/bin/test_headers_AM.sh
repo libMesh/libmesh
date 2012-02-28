@@ -41,7 +41,7 @@ done
 echo "libmesh_optional_INCLUDES=$libmesh_optional_INCLUDES"
 echo "include_I_path=$include_I_path"
 
-errlog=test_headers.log
+
 returnval=0
 for header_to_test in $HEADERS_TO_TEST ; do
     echo -n "Testing Header $header_to_test ... "
@@ -50,7 +50,8 @@ for header_to_test in $HEADERS_TO_TEST ; do
     app_file=`mktemp -t $header_name.XXXXXXXXXX`
     source_file=$app_file.cxx
     object_file=$app_file.o
-
+    errlog=$app_file.log
+    
     echo "#include \"$header_name\"" >> $source_file
     echo "int foo () { return 0; }" >> $source_file
 
@@ -75,7 +76,7 @@ for header_to_test in $HEADERS_TO_TEST ; do
 
     #echo -e -n $colorreset;    
     #cat $source_file
-    rm -f $source_file $app_file $object_file
+    rm -f $source_file $app_file $object_file $errlog
 done
 
 exit 0 #$returnval
