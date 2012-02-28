@@ -347,3 +347,17 @@ nobase_include_HEADERS = \
 		utils/tree_node.h \
 		utils/utility.h \
 		utils/xdr_cxx.h
+
+
+# #
+# # What to do for 'make check'
+# check_SCRIPTS = ../contrib/bin/test_headers_AM.sh
+
+# TESTS_ENVIRONMENT = CXX="$(CXX)" INCLUDEDIR="$(srcdir)" HEADERS_TO_TEST="$(nobase_include_HEADERS)" LIBMESH_DIR=$(abs_top_srcdir)
+# TESTS = $(check_SCRIPTS)
+
+#
+# What to do for 'make installcheck'
+installcheck-local:
+	CXX="$(CXX)" TBB_DIR="$(TBB_DIR)" INCLUDEDIR="$(includedir)" HEADERS_TO_TEST="$(nobase_include_HEADERS)" $(top_srcdir)/contrib/bin/test_headers_AM.sh
+
