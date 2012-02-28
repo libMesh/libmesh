@@ -85,16 +85,17 @@ LIBMESH_COMPILER_FEATURES
 
 
 
-# --------------------------------------------------------------
-# Shared libraries - enabled by default
-# --------------------------------------------------------------
-AC_ARG_ENABLE(shared,
-              AC_HELP_STRING([--enable-shared],
-                             [build shared libraries]),
-              enableshared=$enableval,
-              enableshared=yes)
-AC_SUBST(enableshared)	
-# --------------------------------------------------------------
+# let libtool handle the sharedness of our libraries
+# # --------------------------------------------------------------
+# # Shared libraries - enabled by default
+# # --------------------------------------------------------------
+# AC_ARG_ENABLE(shared,
+#               AC_HELP_STRING([--enable-shared],
+#                              [build shared libraries]),
+#               enableshared=$enableval,
+#               enableshared=yes)
+# AC_SUBST(enableshared)	
+# # --------------------------------------------------------------
 
 
 # --------------------------------------------------------------
