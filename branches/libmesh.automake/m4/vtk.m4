@@ -3,6 +3,9 @@ dnl VTK Mesh I/O API (by Wout Ruijter) requires VTK headers and lib
 dnl ----------------------------------------------------------------
 AC_DEFUN([CONFIGURE_VTK], 
 [
+  AC_ARG_VAR([VTK_INCLUDE], [path to VTK header files])
+  AC_ARG_VAR([VTK_DIR],     [path to VTK installation])
+  
   AC_ARG_ENABLE(vtk,
                 AC_HELP_STRING([--enable-vtk],
                                [build with VTK file I/O support]),
@@ -15,12 +18,19 @@ AC_DEFUN([CONFIGURE_VTK],
 
 
   if (test $enablevtk = yes); then
-  
+
+    dnl Honor VTK_DIR if it is set
+    if test "x$VTK_DIR" = x; then
+       VTK_DIR=/usr
+    fi	
+ 
     dnl Look for VTK location in the environment, then default paths
-    VTK_LS_CHECK=$(dirname $(ls -d /usr/include/vtk*/vtkConfigure.h 2>/dev/null | tail -n 1) 2>/dev/null)
+    VTK_LS_CHECK=$(dirname $(ls -d $VTK_DIR/include/vtk*/vtkConfigure.h 2>/dev/null | tail -n 1) 2>/dev/null)
     if test "x$VTK_INC" = x; then
       if test "x$VTK_INCLUDE" != x; then
-        VTK_INC=$VTK_INCLUDE
+        if test -d $VTK_INCLUDE ; then
+          VTK_INC=$VTK_INCLUDE
+	fi	
       elif test "x$VTK_DIR" != x; then
         VTK_INC=$VTK_DIR/include
       elif (test -d $VTK_LS_CHECK); then
@@ -78,7 +88,7 @@ AC_DEFUN([CONFIGURE_VTK],
        dnl Discover the major, minor, and build versions of VTK by looking in
        dnl vtkConfigure.h.  This may eventually be useful for linking against
        dnl different subsets of libraries.
-       if (test $enablevtk = yes); then
+       if (test x$enablevtk = xyes); then
          vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MAJOR_VERSION[ ]*//g"`
          vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MINOR_VERSION[ ]*//g"`
          vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_BUILD_VERSION[ ]*//g"`
@@ -86,7 +96,7 @@ AC_DEFUN([CONFIGURE_VTK],
          AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
        fi
   
-       if (test $enablevtk = yes); then
+       if (test x$enablevtk = xyes); then
          dnl Also Check for existence of required libraries.  This is not really
          dnl right way to do it -- it's not portable to Macs, where .so's are called
          dnl .dylib's instead.
@@ -118,11 +128,15 @@ AC_DEFUN([CONFIGURE_VTK],
        fi
        
        dnl If both the header file and the required libs were found, continue.
-       if (test $enablevtk = yes); then
+       if (test x$enablevtk = xyes); then
          VTK_INCLUDE="-I$VTK_INC"
          VTK_LIBRARY="\$(libmesh_RPATHFLAG)$VTK_LIB -L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
          AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
+	 
+         libmesh_optional_INCLUDES="$VTK_INCLUDE $libmesh_optional_INCLUDES"
+         libmesh_optional_LIBS="$VTK_LIBRARY $libmesh_optional_LIBS"
+	 
        fi
     fi
   fi
