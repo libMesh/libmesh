@@ -89,8 +89,8 @@ AC_DEFUN([CONFIGURE_PETSC],
       dnl Print informative message about the version of PETSc we detected
       AC_MSG_RESULT([<<< Configuring library with PETSc version $petscversion support >>>])
 
-      PETSCLINKLIBS=`cd $PETSC_DIR ; make getlinklibs`
-      PETSCINCLUDEDIRS=`cd $PETSC_DIR ; make getincludedirs`
+      PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
+      PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
 	
       echo ""
       echo "PETSCLINKLIBS=$PETSCLINKLIBS"
@@ -100,8 +100,8 @@ AC_DEFUN([CONFIGURE_PETSC],
       libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
       libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
 
-      AC_SUBST(PETSCLINKLIBS)
-      AC_SUBST(PETSCINCLUDEDIRS)
+      #AC_SUBST(PETSCLINKLIBS)
+      #AC_SUBST(PETSCINCLUDEDIRS)
 
       AC_SUBST(MPI_IMPL)
 
