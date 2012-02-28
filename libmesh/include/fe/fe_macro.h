@@ -36,6 +36,7 @@
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), L2_HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
+                               template class FE< (_dim), L2LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SCALAR>;   \
                                template class FE< (_dim), XYZ>
@@ -46,6 +47,7 @@
   template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,L2_HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
+  template void FE<_dim,L2_LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,SCALAR>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)
@@ -57,6 +59,7 @@
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), L2_HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
+                               template class FE< (_dim), L2_LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SCALAR>;   \
                                template class FE< (_dim), BERNSTEIN>;     \
@@ -69,6 +72,7 @@
   template void  FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,L2_HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
+  template void  FE<_dim,L2_LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,SCALAR>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
   template void  FE<_dim,BERNSTEIN>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
