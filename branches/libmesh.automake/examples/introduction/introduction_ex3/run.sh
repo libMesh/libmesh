@@ -2,7 +2,7 @@
 
 #set -x
 
-source ./run_common.sh
+source $LIBMESH_DIR/examples/run_common.sh
 
 example_name=introduction_ex3
 

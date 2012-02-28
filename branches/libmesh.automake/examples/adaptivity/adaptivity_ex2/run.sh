@@ -2,7 +2,7 @@
 
 #set -x
 
-source ./run_common.sh
+source $LIBMESH_DIR/examples/run_common.sh
 
 example_name=adaptivity_ex2
 example_dir=examples/adaptivity/$example_name
