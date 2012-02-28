@@ -1,16 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
 #set -x
 
+source ./run_common.sh
+
 example_name=introduction_ex1
 
-echo "***************************************************************"
-echo "* Running Example " $LIBMESH_RUN $example_name $LIBMESH_OPTIONS
-echo "***************************************************************"
-echo " "
-$LIBMESH_RUN ./$example_name -d 3 $LIBMESH_DIR/reference_elements/3D/one_hex27.xda $LIBMESH_OPTIONS || exit 1
-$LIBMESH_RUN ./$example_name -d 3 $LIBMESH_DIR/reference_elements/3D/one_hex27.xda -o output.xda $LIBMESH_OPTIONS || exit 1
-echo " "
-echo "***************************************************************"
-echo "* Done Running Example " $LIBMESH_RUN $example_name $LIBMESH_OPTIONS
-echo "***************************************************************"
+message_running "$example_name" 
+
+options="-d 3 $LIBMESH_DIR/reference_elements/3D/one_hex27.xda"
+run_example "$example_name" "$options"
+
+options="-d 3 $LIBMESH_DIR/reference_elements/3D/one_hex27.xda -o output.xda"
+run_example "$example_name" "$options"
+
+message_done_running "$example_name"

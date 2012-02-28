@@ -1,15 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 #set -x
 
+source ./run_common.sh
+
 example_name=introduction_ex3
 
-echo "***************************************************************"
-echo "* Running Example " $LIBMESH_RUN $example_name $LIBMESH_OPTIONS
-echo "***************************************************************"
-echo " "
-$LIBMESH_RUN ./$example_name $LIBMESH_OPTIONS || exit 1
-echo " "
-echo "***************************************************************"
-echo "* Done Running Example " $LIBMESH_RUN $example_name $LIBMESH_OPTIONS
-echo "***************************************************************"
+message_running "$example_name" 
+run_example "$example_name"
+message_done_running "$example_name"

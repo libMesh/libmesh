@@ -1,17 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
 #set -x
 
+source ./run_common.sh
+
 example_name=introduction_ex2
 
-echo "***************************************************************"
-echo "* Running Example " $LIBMESH_RUN $example_name $LIBMESH_OPTIONS
-echo "***************************************************************"
+message_running "$example_name" 
+run_example "$example_name"
 echo " "
-$LIBMESH_RUN ./$example_name $LIBMESH_OPTIONS || exit 1
-echo " "
-$LIBMESH_RUN ./$example_name eqn_sys.dat $LIBMESH_OPTIONS || exit 1
-echo " "
-echo "***************************************************************"
-echo "* Done Running Example " $LIBMESH_RUN $example_name $LIBMESH_OPTIONS
-echo "***************************************************************"
+options="eqn_sys.dat"
+run_example "$example_name" "$options"
+message_done_running "$example_name"
