@@ -549,10 +549,12 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 	if (this->is_constrained_dof(row_dofs[i]))
 	  {
 	    for (unsigned int j=0; j<matrix.n(); j++)
-	      matrix(i,j) = 0.;
-
-	    // If the DOF is constrained
-	    matrix(i,i) = 1.;
+            {
+              if(row_dofs[j] != col_dofs[j])
+                matrix(i,j) = 0.;
+              else // If the DOF is constrained
+                matrix(i,j) = 1.;
+            }
 
             if (asymmetric_constraint_rows)
               {
