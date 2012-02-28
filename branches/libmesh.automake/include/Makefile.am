@@ -362,6 +362,9 @@ nobase_include_HEADERS = \
 # TESTS_ENVIRONMENT = CXX="$(CXX)" INCLUDEDIR="$(srcdir)" HEADERS_TO_TEST="$(nobase_include_HEADERS)" LIBMESH_DIR=$(abs_top_srcdir)
 # TESTS = $(check_SCRIPTS)
 
+# include our header checking script when doing 'make dist'
+EXTRA_DIST = ../contrib/bin/test_headers_AM.sh
+
 #
 # What to do for 'make installcheck'
 installcheck-local:
