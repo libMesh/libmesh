@@ -384,6 +384,8 @@ void get_dirichlet_dofs(EquationSystems& es,
                         const std::string& system_name,
                         std::set<unsigned int>& dirichlet_dof_ids)
 {
+#ifdef LIBMESH_HAVE_SLEPC
+
   dirichlet_dof_ids.clear();
 
   // It is a good idea to make sure we are assembling
@@ -447,6 +449,8 @@ void get_dirichlet_dofs(EquationSystems& es,
       }
 
     } // end of element loop
+
+#endif // LIBMESH_HAVE_SLEPC
 
   /**
    * All done!
