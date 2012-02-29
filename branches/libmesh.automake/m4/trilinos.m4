@@ -184,8 +184,8 @@ EOF
 
     #echo "$tmp_makefile="
     #cat $tmp_makefile
-    AZTECOO_INCLUDES=`make -f $tmp_makefile echo_include`
-    AZTECOO_LIBS=`make -f $tmp_makefile echo_libs`
+    AZTECOO_INCLUDES=`make -sf $tmp_makefile echo_include`
+    AZTECOO_LIBS=`make -sf $tmp_makefile echo_libs`
 
     #echo AZTECOO_LIBS=$AZTECOO_LIBS
     #echo AZTECOO_INCLUDES=$AZTECOO_INCLUDES
@@ -211,8 +211,8 @@ EOF
 
     #echo "$tmp_makefile="
     #cat $tmp_makefile
-    NOX_INCLUDES=`make -f $tmp_makefile echo_include`
-    NOX_LIBS=`make -f $tmp_makefile echo_libs`
+    NOX_INCLUDES=`make -sf $tmp_makefile echo_include`
+    NOX_LIBS=`make -sf $tmp_makefile echo_libs`
 
     #echo NOX_LIBS=$NOX_LIBS
     #echo NOX_INCLUDES=$NOX_INCLUDES
@@ -238,8 +238,8 @@ EOF
 
     #echo "$tmp_makefile="
     #cat $tmp_makefile
-    ML_INCLUDES=`make -f $tmp_makefile echo_include`
-    ML_LIBS=`make -f $tmp_makefile echo_libs`
+    ML_INCLUDES=`make -sf $tmp_makefile echo_include`
+    ML_LIBS=`make -sf $tmp_makefile echo_libs`
 
     #echo ML_LIBS=$ML_LIBS
     #echo ML_INCLUDES=$ML_INCLUDES
