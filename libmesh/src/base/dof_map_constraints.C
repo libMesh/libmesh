@@ -550,7 +550,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 	  {
 	    for (unsigned int j=0; j<matrix.n(); j++)
             {
-              if(row_dofs[j] != col_dofs[j])
+              if(row_dofs[i] != col_dofs[j])
                 matrix(i,j) = 0.;
               else // If the DOF is constrained
                 matrix(i,j) = 1.;
