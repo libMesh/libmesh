@@ -1,45 +1,32 @@
 #!/bin/bash
 set -e
-env
-
+#env
 
 # Terminal commands to goto specific columns
 rescol=65;
 
-
-# [JWP] My Mac did not recognize the \e commands below, but it did
-# recognize \033 commands, and they seem to work on Linux as well.  
-
 # Terminal commands for setting the color
-# gotocolumn="\e["$rescol"G";
-# white="\e[01;37m";
-# green="\e[01;32m";
-# red="\e[01;31m";
-# #grey="\e[00;37m";
-# colorreset="\e[m"; # Terminal command to reset to terminal default
-
-
 gotocolumn="\033["$rescol"G";
 white="\033[01;37m";
 green="\033[01;32m";
 red="\033[01;31m";
 #grey="\033[00;37m";
-colorreset="\033[m";
+colorreset="\033[m"; # Terminal command to reset to terminal default
 
-echo "CXX=$CXX"
-echo "INCLUDEDIR_BASE=$INCLUDEDIR"
+#echo "CXX=$CXX"
+#echo "INCLUDEDIR_BASE=$INCLUDEDIR"
 
 include_I_path=$libmesh_optional_INCLUDES
 
 for dir in $INCLUDEDIR/* ; do
-   echo $dir
+   #echo $dir
    if (test -d $INCLUDEDIR); then
      include_I_path="-I$dir $include_I_path"
    fi
 done
 
-echo "libmesh_optional_INCLUDES=$libmesh_optional_INCLUDES"
-echo "include_I_path=$include_I_path"
+#echo "libmesh_optional_INCLUDES=$libmesh_optional_INCLUDES"
+#echo "include_I_path=$include_I_path"
 
 
 returnval=0

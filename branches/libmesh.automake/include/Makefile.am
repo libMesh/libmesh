@@ -368,8 +368,10 @@ EXTRA_DIST = ../contrib/bin/test_headers_AM.sh
 #
 # What to do for 'make installcheck'
 installcheck-local:
-	echo "libmesh_optional_INCLUDES=$(libmesh_optional_INCLUDES)"
-	CXX="$(CXX)" libmesh_optional_INCLUDES="$(libmesh_optional_INCLUDES)" \
+	@echo " "
+	@echo "Checking for standalone headers..."
+	@echo " "
+	@CXX="$(CXX)" libmesh_optional_INCLUDES="$(libmesh_optional_INCLUDES)" \
 	  INCLUDEDIR="$(includedir)" \
 	  HEADERS_TO_TEST="$(nobase_include_HEADERS)" \
 	  $(top_srcdir)/contrib/bin/test_headers_AM.sh
