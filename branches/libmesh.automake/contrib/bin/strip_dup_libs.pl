@@ -1,4 +1,8 @@
 #!/usr/bin/perl -w
+
+#
+# Courtesy of Trilinos v9
+#
 # This perl script removes duplicate libraries from the right to the left and
 # removes duplicate -L library paths from the left to the right
 use strict;
@@ -21,10 +25,24 @@ foreach( reverse @all_libs ) {
 }
 
 #
+# Move from right to left and remove duplicate -Wl linker run paths
+#
+my @cleaned_up_libs_second;
+foreach( @cleaned_up_libs_first ) {
+        $_ = remove_rel_paths($_);
+        if( !($_=~/-Wl/) ) {
+                push @cleaned_up_libs_second, $_;
+        }
+        elsif( !entry_exists($_,\@cleaned_up_libs_second) ) {
+                push @cleaned_up_libs_second, $_;
+        }
+}
+
+#
 # Move from right to left and remove duplicate -L library paths
 #
 my @cleaned_up_libs;
-foreach( @cleaned_up_libs_first ) {
+foreach( @cleaned_up_libs_second ) {
         $_ = remove_rel_paths($_);
         if( !($_=~/-L/) ) {
                 push @cleaned_up_libs, $_;

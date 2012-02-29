@@ -1,4 +1,8 @@
 #!/usr/bin/perl -w
+
+#
+# Courtesy of Trilinos v9
+#
 # This perl script removes duplicate include paths left to the right
 use strict;
 my @all_incl_paths = @ARGV;
