@@ -66,7 +66,7 @@ for header_to_test in $HEADERS_TO_TEST ; do
     rm -f $source_file $app_file $object_file $errlog
 done
 
-exit 0 #$returnval
+exit $returnval
 
 
 
