@@ -166,4 +166,88 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   AC_SUBST(ML_MAKEFILE_EXPORT)
   AC_SUBST(enableml)
 
+  #########################################################
+  # get requisite include and library variables by snarfing
+  # them from the exported makefiles
+  # 
+  # AztecOO
+  if (test $enableaztecoo != no); then
+    tmp_makefile=`mktemp`
+    cat <<EOF >$tmp_makefile
+include $AZTECOO_MAKEFILE_EXPORT
+echo_libs:
+	@echo \$(AZTECOO_LIBS)
+
+echo_include:
+	@echo \$(AZTECOO_INCLUDES)
+EOF
+
+    #echo "$tmp_makefile="
+    #cat $tmp_makefile
+    AZTECOO_INCLUDES=`make -f $tmp_makefile echo_include`
+    AZTECOO_LIBS=`make -f $tmp_makefile echo_libs`
+
+    #echo AZTECOO_LIBS=$AZTECOO_LIBS
+    #echo AZTECOO_INCLUDES=$AZTECOO_INCLUDES
+
+    libmesh_optional_INCLUDES="$AZTECOO_INCLUDES $libmesh_optional_INCLUDES"
+    libmesh_optional_LIBS="$AZTECOO_LIBS $libmesh_optional_LIBS"
+
+    rm -f $tmp_makefile
+  fi
+
+  # 
+  # Nox
+  if (test $enablenox != no); then
+    tmp_makefile=`mktemp`
+    cat <<EOF >$tmp_makefile
+include $NOX_MAKEFILE_EXPORT
+echo_libs:
+	@echo \$(NOX_LIBS)
+
+echo_include:
+	@echo \$(NOX_INCLUDES)
+EOF
+
+    #echo "$tmp_makefile="
+    #cat $tmp_makefile
+    NOX_INCLUDES=`make -f $tmp_makefile echo_include`
+    NOX_LIBS=`make -f $tmp_makefile echo_libs`
+
+    #echo NOX_LIBS=$NOX_LIBS
+    #echo NOX_INCLUDES=$NOX_INCLUDES
+
+    libmesh_optional_INCLUDES="$NOX_INCLUDES $libmesh_optional_INCLUDES"
+    libmesh_optional_LIBS="$NOX_LIBS $libmesh_optional_LIBS"
+
+    rm -f $tmp_makefile
+  fi
+
+  # 
+  # ML
+  if (test $enableml != no); then
+    tmp_makefile=`mktemp`
+    cat <<EOF >$tmp_makefile
+include $ML_MAKEFILE_EXPORT
+echo_libs:
+	@echo \$(ML_LIBS)
+
+echo_include:
+	@echo \$(ML_INCLUDES)
+EOF
+
+    #echo "$tmp_makefile="
+    #cat $tmp_makefile
+    ML_INCLUDES=`make -f $tmp_makefile echo_include`
+    ML_LIBS=`make -f $tmp_makefile echo_libs`
+
+    #echo ML_LIBS=$ML_LIBS
+    #echo ML_INCLUDES=$ML_INCLUDES
+
+    libmesh_optional_INCLUDES="$ML_INCLUDES $libmesh_optional_INCLUDES"
+    libmesh_optional_LIBS="$ML_LIBS $libmesh_optional_LIBS"
+
+    rm -f $tmp_makefile
+  fi
+
 ])
