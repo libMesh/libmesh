@@ -63,4 +63,5 @@ dnl      fi
   fi
 
   AC_SUBST(enableslepc)
+  AM_CONDITIONAL(SLEPC_ENABLED,test x$HAVE_SLEPC = x1)
 ])
