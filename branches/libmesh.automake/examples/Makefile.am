@@ -137,16 +137,16 @@ eigenproblems_ex2_DATA    = eigenproblems/eigenproblems_ex2/eigenproblems_ex2.C
 eigenproblems_ex2_SOURCES = $(eigenproblems_ex2_DATA) eigenproblems/eigenproblems_ex2/run.sh
 eigenproblems_ex2_LDADD   = $(top_builddir)/libmesh.la
 
-if SLEPC_ENABLED #FIXME: Remove this when example is working again.
-check_PROGRAMS += eigenproblems_ex3
-eigenproblems_ex3dir      = $(examples_install_path)/eigenproblems/ex3
-eigenproblems_ex3_DATA    = eigenproblems/eigenproblems_ex3/eigenproblems_ex3.C eigenproblems/eigenproblems_ex3/drum1_mesh.e  eigenproblems/eigenproblems_ex3/drum2_mesh.e
-eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) eigenproblems/eigenproblems_ex3/run.sh
-eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
+if LIBMESH_ENABLE_SLEPC #FIXME: Remove this when example is working again.
+  check_PROGRAMS += eigenproblems_ex3
+  eigenproblems_ex3dir      = $(examples_install_path)/eigenproblems/ex3
+  eigenproblems_ex3_DATA    = eigenproblems/eigenproblems_ex3/eigenproblems_ex3.C eigenproblems/eigenproblems_ex3/drum1_mesh.e  eigenproblems/eigenproblems_ex3/drum2_mesh.e
+  eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) eigenproblems/eigenproblems_ex3/run.sh
+  eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
 endif
 
 # Only *run* the tests if SLEPc is actually enabled
-if SLEPC_ENABLED
+if LIBMESH_ENABLE_SLEPC
   check_SCRIPTS  += eigenproblems/eigenproblems_ex1/run.sh
   check_SCRIPTS  += eigenproblems/eigenproblems_ex2/run.sh
   check_SCRIPTS  += eigenproblems/eigenproblems_ex3/run.sh
