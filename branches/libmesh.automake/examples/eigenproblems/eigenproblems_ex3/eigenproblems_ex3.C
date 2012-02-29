@@ -28,7 +28,7 @@
 // If we know all the eigenvalues of a drum, can we uniquely determine it's shape?
 // This question was resolved in 1992, when Gordon, Webb, and Wolpert constructed
 // a pair of regions in 2D that have different shapes but identical eigenvalues.
-// So the answer to Kac's question is negative: the spectrum of the Laplacian does
+// So the answer to Kac's question is no: the spectrum of the Laplacian does
 // not uniquely determine the shape of the domain.
 
 // In this example, we compute the first few eigenvalues of the two domains proposed
@@ -36,6 +36,14 @@
 // problem in each case. The computed eigenvalues are stored in drum1_evals.txt and
 // drum2_evals.txt. We can compare these to the (highly accurate) values reported in:
 // T.A. Driscoll, "Eigenmodes of Isospectral Drums", SIAM Review, Vol. 39, No. 1, pp. 1-17, 1997.
+//
+// The first five eigenvalues from Driscoll are listed below (the author states that
+// "all digits shown are believed to be correct"):
+//  2.53794399980
+//  3.65550971352
+//  5.17555935622
+//  6.53755744376
+//  7.24807786256
 
 
 // C++ include files
@@ -376,6 +384,8 @@ void get_dirichlet_dofs(EquationSystems& es,
                         const std::string& system_name,
                         std::set<unsigned int>& dirichlet_dof_ids)
 {
+#ifdef LIBMESH_HAVE_SLEPC
+
   dirichlet_dof_ids.clear();
 
   // It is a good idea to make sure we are assembling
@@ -439,6 +449,8 @@ void get_dirichlet_dofs(EquationSystems& es,
       }
 
     } // end of element loop
+
+#endif // LIBMESH_HAVE_SLEPC
 
   /**
    * All done!
