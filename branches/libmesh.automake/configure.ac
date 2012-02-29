@@ -85,43 +85,6 @@ LIBMESH_COMPILER_FEATURES
 
 
 
-# let libtool handle the sharedness of our libraries
-# # --------------------------------------------------------------
-# # Shared libraries - enabled by default
-# # --------------------------------------------------------------
-# AC_ARG_ENABLE(shared,
-#               AC_HELP_STRING([--enable-shared],
-#                              [build shared libraries]),
-#               enableshared=$enableval,
-#               enableshared=yes)
-# AC_SUBST(enableshared)	
-# # --------------------------------------------------------------
-
-
-# --------------------------------------------------------------
-# The AC_SUBST(foo) command creates an output variable from a shell variable.
-# This command also causes AC_OUTPUT to replace all instances of @VAR@ with
-# the value of the shell variable VAR in the output files (e.g. one or more Makefiles).
-# --------------------------------------------------------------
-AC_SUBST(host)
-AC_SUBST(GXX_VERSION)
-AC_SUBST(CXXFLAGS_OPT)
-AC_SUBST(CXXFLAGS_DBG)
-AC_SUBST(CXXFLAGS_DVL)
-AC_SUBST(CFLAGS_OPT)
-AC_SUBST(CFLAGS_DBG)
-AC_SUBST(CFLAGS_DVL)
-AC_SUBST(LDFLAGS)
-AC_SUBST(NODEPRECATEDFLAG)
-AC_SUBST(CXXSHAREDFLAG)
-AC_SUBST(RPATHFLAG)
-AC_SUBST(PROFILING_FLAGS)
-AC_SUBST(OPROFILE_FLAGS)
-AC_SUBST(FLIBS)
-AC_SUBST(METHOD)
-
-
-
 # --------------------------------------------------------------
 # Portable symbolic links
 # --------------------------------------------------------------

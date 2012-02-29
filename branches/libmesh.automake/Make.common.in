@@ -406,30 +406,42 @@ ifeq ($(enable-optional),yes)
   # AztecOO linear solvers and requisite Epetra
   # data structures
   ifeq ($(enable-aztecoo),yes)
-      include @AZTECOO_MAKEFILE_EXPORT@
-      libmesh_LIBS    += $(AZTECOO_LIBS)
-      libmesh_INCLUDE += $(AZTECOO_INCLUDES)
+      #include @AZTECOO_MAKEFILE_EXPORT@
+      #libmesh_LIBS    += $(AZTECOO_LIBS)
+      #libmesh_INCLUDE += $(AZTECOO_INCLUDES)
+
+      libmesh_LIBS    += @AZTECOO_LIBS@
+      libmesh_INCLUDE += @AZTECOO_INCLUDES@
 
       # Nox, an additional option if AztecOO is present
       ifeq ($(enable-nox),yes)
-          include @NOX_MAKEFILE_EXPORT@
-          libmesh_LIBS    += $(NOX_LIBS)
-          libmesh_INCLUDE += $(NOX_INCLUDES)
-          libmesh_CPPFLAGS     += -DHAVE_CONFIG_H
+          #include @NOX_MAKEFILE_EXPORT@
+          #libmesh_LIBS    += $(NOX_LIBS)
+          #libmesh_INCLUDE += $(NOX_INCLUDES)
+
+          libmesh_LIBS     += @NOX_LIBS@
+          libmesh_INCLUDE  += @NOX_INCLUDES@
+          libmesh_CPPFLAGS += -DHAVE_CONFIG_H
       endif
 
       # ML, an additional option if AztecOO is present
       ifeq ($(enable-ml),yes)
-          include @ML_MAKEFILE_EXPORT@
-          libmesh_LIBS    += $(ML_LIBS)
-          libmesh_INCLUDE += $(ML_INCLUDES)
+          #include @ML_MAKEFILE_EXPORT@
+          #libmesh_LIBS    += $(ML_LIBS)
+          #libmesh_INCLUDE += $(ML_INCLUDES)
+
+          libmesh_LIBS    += @ML_LIBS@
+          libmesh_INCLUDE += @ML_INCLUDES@
       endif
   endif	
 
   ifeq ($(enable-trilinos-10),yes)
-      include @TRILINOS_MAKEFILE_EXPORT@
-      libmesh_LIBS    += $(Trilinos_LIBRARIES) $(Trilinos_LIBRARY_DIRS) $(Trilinos_TPL_LIBRARIES) $(Trilinos_TPL_LIBRARY_DIRS)
-      libmesh_INCLUDE += $(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS)      	
+      #include @TRILINOS_MAKEFILE_EXPORT@
+      #libmesh_LIBS    += $(Trilinos_LIBRARIES) $(Trilinos_LIBRARY_DIRS) $(Trilinos_TPL_LIBRARIES) $(Trilinos_TPL_LIBRARY_DIRS)
+      #libmesh_INCLUDE += $(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS)      	
+
+      libmesh_LIBS    += @TRILINOS_LIBS@
+      libmesh_INCLUDE += @TRILINOS_INCLUDES@
   endif	
 
 

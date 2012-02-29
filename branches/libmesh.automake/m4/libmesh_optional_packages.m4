@@ -65,25 +65,9 @@ fi
 
 # -------------------------------------------------------------
 # "Trilinos" -- enabled by default unless we're building with
-#               complex numbers. This looks for the AztecOO
-#               linear solvers and requisite Epetra parallel 
-#               data structures
+#               complex numbers.
 # -------------------------------------------------------------
-AC_ARG_ENABLE(trilinos,
-              AC_HELP_STRING([--enable-trilinos],
-                             [build with Trilinos support]),
-              enabletrilinos=$enableval,
-              enabletrilinos=$enableoptional)
-if test "$enablecomplex" = no ; then
-   if test "$enabletrilinos" != no ; then
-      # -- try Trilinos 10 first
-      CONFIGURE_TRILINOS_10
-      # -- then Trlinos 9
-      if test "$enabletrilinos10" = no ; then
-        CONFIGURE_TRILINOS_9
-      fi
-   fi
-fi
+CONFIGURE_TRILINOS
 # -------------------------------------------------------------
 
 

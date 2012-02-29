@@ -76,7 +76,41 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
 
   AC_SUBST(TRILINOS_MAKEFILE_EXPORT)
   AC_SUBST(enabletrilinos10)
+  
+  #########################################################
+  # get requisite include and library variables by snarfing
+  # them from the exported makefiles
+  if (test $enabletrilinos10 != no); then
+    tmp_makefile=`mktemp`
+    cat <<EOF >$tmp_makefile
+include $TRILINOS_MAKEFILE_EXPORT
+echo_libs:
+	@echo \$(Trilinos_LIBRARIES) \$(Trilinos_LIBRARY_DIRS) \$(Trilinos_TPL_LIBRARIES) \$(Trilinos_TPL_LIBRARY_DIRS)
+
+echo_include:
+	@echo \$(Trilinos_INCLUDE_DIRS) \$(Trilinos_TPL_INCLUDE_DIRS)
+EOF
+
+    #echo "$tmp_makefile="
+    #cat $tmp_makefile
+    TRILINOS_INCLUDES=`make -sf $tmp_makefile echo_include`
+    TRILINOS_LIBS=`make -sf $tmp_makefile echo_libs`
+
+    #echo TRILINOS_LIBS=$TRILINOS_LIBS
+    #echo TRILINOS_INCLUDES=$TRILINOS_INCLUDES
+
+    libmesh_optional_INCLUDES="$TRILINOS_INCLUDES $libmesh_optional_INCLUDES"
+    libmesh_optional_LIBS="$TRILINOS_LIBS $libmesh_optional_LIBS"
+
+    rm -f $tmp_makefile
+  fi
+
+  AC_SUBST(TRILINOS_LIBS)
+  AC_SUBST(TRILINOS_INCLUDES)
 ])
+dnl -------------------------------------------------------------
+
+
 
 
 dnl -------------------------------------------------------------
@@ -250,4 +284,44 @@ EOF
     rm -f $tmp_makefile
   fi
 
+
+  AC_SUBST(AZTECOO_LIBS)
+  AC_SUBST(AZTECOO_INCLUDES)
+  AC_SUBST(NOX_LIBS)
+  AC_SUBST(NOX_INCLUDES)
+  AC_SUBST(ML_LIBS)
+  AC_SUBST(ML_INCLUDES)
+
 ])
+dnl -------------------------------------------------------------
+
+
+
+dnl -------------------------------------------------------------
+dnl Trilinos -- wrapper for v9 and v10
+dnl -------------------------------------------------------------
+AC_DEFUN([CONFIGURE_TRILINOS], 
+[
+  AC_ARG_ENABLE(trilinos,
+                AC_HELP_STRING([--enable-trilinos],
+                               [build with Trilinos support]),
+		[case "${enableval}" in
+		  yes)  enabletrilinos=yes ;;
+		   no)  enabletrilinos=no ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-trilinos) ;;
+		 esac],
+		 [enabletrilinos=$enableoptional])
+  
+  if test "$enablecomplex" = no ; then
+      if test "$enabletrilinos" != no ; then
+          # -- try Trilinos 10 first
+	  CONFIGURE_TRILINOS_10
+          # -- then Trlinos 9
+	  if test "$enabletrilinos10" = no ; then
+              CONFIGURE_TRILINOS_9
+	  fi
+      fi
+  fi
+
+])
+dnl -------------------------------------------------------------
