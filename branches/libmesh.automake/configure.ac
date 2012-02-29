@@ -45,7 +45,7 @@ AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h
 # Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
 AX_PREFIX_CONFIG_H(include/base/libmesh_config.h,LIBMESH,include/base/libmesh_config.h.tmp)
 
-AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests])
+AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
 
 
