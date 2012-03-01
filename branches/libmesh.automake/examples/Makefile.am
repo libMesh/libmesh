@@ -179,6 +179,30 @@ subdomains_ex2_SOURCES = $(subdomains_ex2_DATA) subdomains/subdomains_ex2/run.sh
 subdomains_ex2_LDADD   = $(top_builddir)/libmesh.la
 
 #
+# Systems of equations
+#
+check_PROGRAMS += systems_of_equations_ex1
+check_SCRIPTS  += systems_of_equations/systems_of_equations_ex1/run.sh
+systems_of_equations_ex1dir      = $(examples_install_path)/systems_of_equations/ex1
+systems_of_equations_ex1_DATA    = systems_of_equations/systems_of_equations_ex1/systems_of_equations_ex1.C
+systems_of_equations_ex1_SOURCES = $(systems_of_equations_ex1_DATA) systems_of_equations/systems_of_equations_ex1/run.sh
+systems_of_equations_ex1_LDADD   = $(top_builddir)/libmesh.la
+
+check_PROGRAMS += systems_of_equations_ex2
+check_SCRIPTS  += systems_of_equations/systems_of_equations_ex2/run.sh
+systems_of_equations_ex2dir      = $(examples_install_path)/systems_of_equations/ex2
+systems_of_equations_ex2_DATA    = systems_of_equations/systems_of_equations_ex2/systems_of_equations_ex2.C systems_of_equations/systems_of_equations_ex2/gmv_attributes.attr  systems_of_equations/systems_of_equations_ex2/movie.sh
+systems_of_equations_ex2_SOURCES = $(systems_of_equations_ex2_DATA) systems_of_equations/systems_of_equations_ex2/run.sh
+systems_of_equations_ex2_LDADD   = $(top_builddir)/libmesh.la
+
+check_PROGRAMS += systems_of_equations_ex3
+check_SCRIPTS  += systems_of_equations/systems_of_equations_ex3/run.sh
+systems_of_equations_ex3dir      = $(examples_install_path)/systems_of_equations/ex3
+systems_of_equations_ex3_DATA    = systems_of_equations/systems_of_equations_ex3/systems_of_equations_ex3.C
+systems_of_equations_ex3_SOURCES = $(systems_of_equations_ex3_DATA) systems_of_equations/systems_of_equations_ex3/run.sh
+systems_of_equations_ex3_LDADD   = $(top_builddir)/libmesh.la
+
+#
 # Running the tests
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir)
