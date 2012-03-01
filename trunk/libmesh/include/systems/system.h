@@ -917,6 +917,14 @@ public:
    * This is the size of the \p _vectors map
    */
   unsigned int n_vectors () const;
+  
+  /**
+   * @returns the number of matrices
+   * handled by this system.
+   *
+   * This will return 0 by default but can be overriden.
+   */
+  virtual unsigned int n_matrices () const;
 
   /**
    * @returns the number of variables in the system
@@ -1860,6 +1868,12 @@ inline
 unsigned int System::n_vectors () const
 {
   return _vectors.size();
+}
+
+inline
+unsigned int System::n_matrices () const
+{
+  return 0;
 }
 
 inline
