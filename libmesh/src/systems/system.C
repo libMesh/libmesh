@@ -1482,6 +1482,7 @@ std::string System::get_info() const
 #endif
 
   out << "    " << "n_vectors()="  << this->n_vectors()  << '\n';
+  out << "    " << "n_matrices()="  << this->n_matrices()  << '\n';
 //   out << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << '\n';
 
   out << this->get_dof_map().get_info();
