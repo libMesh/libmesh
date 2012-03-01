@@ -117,6 +117,11 @@ public:
   virtual std::string system_type () const { return "Eigen"; }
 
   /**
+   * @returns the number of matrices handled by this system
+   */
+  virtual unsigned int n_matrices () const;
+
+  /**
    * @returns the number of converged eigenpairs.
    */
   unsigned int get_n_converged () const {return _n_converged_eigenpairs;}
@@ -213,6 +218,15 @@ private:
 
 // ------------------------------------------------------------
 // EigenSystem inline methods
+inline
+unsigned int EigenSystem::n_matrices () const
+{
+  if(_is_generalized_eigenproblem)
+    return 2;
+  
+  return 1;  
+}
+
 
 } // namespace libMesh
 
