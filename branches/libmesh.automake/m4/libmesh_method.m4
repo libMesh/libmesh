@@ -47,7 +47,7 @@ AC_DEFUN([LIBMESH_SET_METHOD],
     devel)
        CPPFLAGS_METHOD="$libmesh_CPPFLAGS"
        CXXFLAGS_METHOD="$CXXFLAGS_DVL $libmesh_CXXFLAGS"
-       CFLAGS_METHOD="$CFLAGS_DVL $libmesh_CXXFLAGS"
+       CFLAGS_METHOD="$CFLAGS_DVL $libmesh_CFLAGS"
        ;;
     oprofile)
        CPPFLAGS_METHOD="-DNDEBUG  $libmesh_CPPFLAGS"
