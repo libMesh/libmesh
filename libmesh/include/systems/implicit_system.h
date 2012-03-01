@@ -317,7 +317,7 @@ public:
   /**
    * @returns the number of matrices handled by this system
    */
-  unsigned int n_matrices () const;
+  virtual unsigned int n_matrices () const;
 
   /**
    * The system matrix.  Implicit systems are characterized by
