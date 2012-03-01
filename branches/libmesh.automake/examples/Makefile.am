@@ -14,7 +14,7 @@ EXTRA_DIST = run_common.sh
 
 check_PROGRAMS =
 check_SCRIPTS = 
-CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in #FIXME - tighten up!
+CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res #FIXME - tighten up!
 
 
 examples_source_path=$(top_srcdir)/examples
@@ -201,6 +201,24 @@ systems_of_equations_ex3dir      = $(examples_install_path)/systems_of_equations
 systems_of_equations_ex3_DATA    = systems_of_equations/systems_of_equations_ex3/systems_of_equations_ex3.C
 systems_of_equations_ex3_SOURCES = $(systems_of_equations_ex3_DATA) systems_of_equations/systems_of_equations_ex3/run.sh
 systems_of_equations_ex3_LDADD   = $(top_builddir)/libmesh.la
+
+#
+# Transient
+#
+check_PROGRAMS += transient_ex1
+check_SCRIPTS  += transient/transient_ex1/run.sh
+transient_ex1dir      = $(examples_install_path)/transient/ex1
+transient_ex1_DATA    = transient/transient_ex1/transient_ex1.C transient/transient_ex1/exact_solution.C
+transient_ex1_SOURCES = $(transient_ex1_DATA) transient/transient_ex1/run.sh
+transient_ex1_LDADD   = $(top_builddir)/libmesh.la
+
+check_PROGRAMS += transient_ex2
+check_SCRIPTS  += transient/transient_ex2/run.sh
+transient_ex2dir      = $(examples_install_path)/transient/ex2
+transient_ex2_DATA    = transient/transient_ex2/transient_ex2.C transient/transient_ex2/pipe-mesh.unv
+transient_ex2_SOURCES = $(transient_ex2_DATA) transient/transient_ex2/run.sh
+transient_ex2_LDADD   = $(top_builddir)/libmesh.la
+
 
 #
 # Running the tests
