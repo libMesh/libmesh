@@ -21,6 +21,8 @@ examples_source_path=$(top_srcdir)/examples
 examples_install_path=$(prefix)/examples
 
 
+
+######################################################################
 #
 # Introductory examples
 #
@@ -64,6 +66,9 @@ introduction_ex5_LDADD   = $(top_builddir)/libmesh.la
 
 CLEANFILES += out_1 out_1_data gnupl* *.xdr 2D_hermite_adaptive.m # FIXME - make this stricter
 
+
+
+######################################################################
 #
 # Adaptive Mesh Refinement
 # 
@@ -104,6 +109,8 @@ adaptivity_ex5_SOURCES = $(adaptivity_ex5_DATA) adaptivity/adaptivity_ex5/run.sh
 adaptivity_ex5_LDADD   = $(top_builddir)/libmesh.la
 
 
+
+######################################################################
 #
 # Adjoints
 # 
@@ -122,6 +129,8 @@ adjoints_ex2_SOURCES = $(adjoints_ex2_DATA) adjoints/adjoints_ex2/run.sh
 adjoints_ex2_LDADD   = $(top_builddir)/libmesh.la
 
 
+
+######################################################################
 #
 # Eigenproblems
 # 
@@ -151,6 +160,9 @@ if LIBMESH_ENABLE_SLEPC
   check_SCRIPTS  += eigenproblems/eigenproblems_ex3/run.sh
 endif
 
+
+
+######################################################################
 #
 # FEMSystem
 #
@@ -162,6 +174,8 @@ fem_system_ex1_SOURCES = $(fem_system_ex1_DATA) fem_system/fem_system_ex1/run.sh
 fem_system_ex1_LDADD   = $(top_builddir)/libmesh.la
 
 
+
+######################################################################
 #
 # Subdomains
 #
@@ -179,6 +193,9 @@ subdomains_ex2_DATA    = subdomains/subdomains_ex2/subdomains_ex2.C introduction
 subdomains_ex2_SOURCES = $(subdomains_ex2_DATA) subdomains/subdomains_ex2/run.sh
 subdomains_ex2_LDADD   = $(top_builddir)/libmesh.la
 
+
+
+######################################################################
 #
 # Systems of equations
 #
@@ -203,6 +220,9 @@ systems_of_equations_ex3_DATA    = systems_of_equations/systems_of_equations_ex3
 systems_of_equations_ex3_SOURCES = $(systems_of_equations_ex3_DATA) systems_of_equations/systems_of_equations_ex3/run.sh
 systems_of_equations_ex3_LDADD   = $(top_builddir)/libmesh.la
 
+
+
+######################################################################
 #
 # Transient
 #
@@ -221,8 +241,27 @@ transient_ex2_SOURCES = $(transient_ex2_DATA) transient/transient_ex2/run.sh
 transient_ex2_LDADD   = $(top_builddir)/libmesh.la
 
 
+
+######################################################################
 #
 # Running the tests
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir)
 TESTS = $(check_SCRIPTS)
+
+
+# include our header checking script when doing 'make dist'
+EXTRA_DIST += ../contrib/bin/test_installed_examples.sh
+
+#
+######################################################################
+#
+# What to do for 'make installcheck'
+installcheck-local:
+	@echo " "
+	@echo "Checking for self-sufficient examples..."
+	@echo " "
+	@echo " bindir=$(bindir)"
+	@CXX="$(CXX)" \
+	  examples_install_path=$(examples_install_path) \
+	  $(top_srcdir)/contrib/bin/test_installed_examples.sh

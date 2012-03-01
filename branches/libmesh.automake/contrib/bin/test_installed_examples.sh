@@ -29,6 +29,8 @@ set -e
 ##echo "include_I_path=$include_I_path"
 
 
+echo "Testing examples in $examples_install_path"
+
 returnval=0
 exit $returnval
 

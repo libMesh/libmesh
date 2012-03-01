@@ -363,7 +363,7 @@ nobase_include_HEADERS = \
 # TESTS = $(check_SCRIPTS)
 
 # include our header checking script when doing 'make dist'
-EXTRA_DIST = ../contrib/bin/test_headers_AM.sh
+EXTRA_DIST = ../contrib/bin/test_installed_headers.sh
 
 #
 # What to do for 'make installcheck'
