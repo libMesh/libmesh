@@ -945,6 +945,8 @@ template <typename T>
 inline
 void PetscVector<T>::zero ()
 {
+  libmesh_assert(this->closed());
+
   this->_restore_array();
 
   int ierr=0;

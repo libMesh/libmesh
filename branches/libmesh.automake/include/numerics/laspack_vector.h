@@ -612,6 +612,7 @@ template <typename T> inline
 void LaspackVector<T>::zero ()
 {
   libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
 
   V_SetAllCmp (&_vec, 0.);
 }
