@@ -54,9 +54,8 @@ for exdir in */* ; do
 	echo ""
 	returnval=1	
     fi
-
     
+    rm -f $app_to_link $errlog    
 done
 
-rm -f $app_to_link $errlog
 exit $returnval
