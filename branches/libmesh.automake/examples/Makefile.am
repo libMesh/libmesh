@@ -14,7 +14,7 @@ EXTRA_DIST = run_common.sh
 
 check_PROGRAMS =
 check_SCRIPTS = 
-CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res #FIXME - tighten up!
+CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res out.exd #FIXME - tighten up!
 
 
 examples_source_path=$(top_srcdir)/examples
@@ -142,6 +142,7 @@ eigenproblems_ex3dir      = $(examples_install_path)/eigenproblems/ex3
 eigenproblems_ex3_DATA    = eigenproblems/eigenproblems_ex3/eigenproblems_ex3.C eigenproblems/eigenproblems_ex3/drum1_mesh.e  eigenproblems/eigenproblems_ex3/drum2_mesh.e
 eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) eigenproblems/eigenproblems_ex3/run.sh
 eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
+CLEANFILES += drum1_evals.txt drum2_evals.txt
 
 # Only *run* the tests if SLEPc is actually enabled
 if LIBMESH_ENABLE_SLEPC
