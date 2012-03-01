@@ -24,7 +24,7 @@ installed_LIBS=`pkg-config libmesh --libs`
 
 returnval=0
 
-app_to_link=`mktemp --tmpdir ex.XXXXXXXXXX`
+app_to_link="ex_app"
 errlog=$app_to_link.log
 
 #echo " "
