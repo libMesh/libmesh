@@ -253,15 +253,20 @@ TESTS = $(check_SCRIPTS)
 # include our header checking script when doing 'make dist'
 EXTRA_DIST += ../contrib/bin/test_installed_examples.sh
 
-#
+
 ######################################################################
 #
 # What to do for 'make installcheck'
+libdir=$(exec_prefix)/lib/@host@_@METHOD@
+pkgconfigdir=$(libdir)/pkgconfig
+
 installcheck-local:
 	@echo " "
 	@echo "Checking for self-sufficient examples..."
 	@echo " "
 	@echo " bindir=$(bindir)"
+	@echo " pkgconfigdir=$(pkgconfigdir)"
 	@CXX="$(CXX)" \
 	  examples_install_path=$(examples_install_path) \
+	  PKG_CONFIG_PATH=$(pkgconfigdir) \
 	  $(top_srcdir)/contrib/bin/test_installed_examples.sh

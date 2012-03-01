@@ -13,6 +13,6 @@ Cflags: @CPPFLAGS_METHOD@ @CXXFLAGS_METHOD@ \
         -I${includedir}/base -I${includedir}/enums -I${includedir}/error_estimation -I${includedir}/fe -I${includedir}/geom \
         -I${includedir}/mesh -I${includedir}/numerics -I${includedir}/parallel -I${includedir}/partitioning \
         -I${includedir}/physics -I${includedir}/quadrature -I${includedir}/reduced_basis -I${includedir}/solvers \
-        -I${includedir}/systems -I${includedir}/utils \
+        -I${includedir}/systems -I${includedir}/utils -I${includedir}/contrib \
 	@libmesh_optional_INCLUDES@
 

@@ -365,14 +365,18 @@ nobase_include_HEADERS = \
 # include our header checking script when doing 'make dist'
 EXTRA_DIST = ../contrib/bin/test_installed_headers.sh
 
+######################################################################
 #
 # What to do for 'make installcheck'
+libdir=$(exec_prefix)/lib/@host@_@METHOD@
+pkgconfigdir=$(libdir)/pkgconfig
+
 installcheck-local:
 	@echo " "
 	@echo "Checking for standalone headers..."
 	@echo " "
-	@CXX="$(CXX)" libmesh_optional_INCLUDES="$(libmesh_optional_INCLUDES)" \
-	  INCLUDEDIR="$(includedir)" \
+	@CXX="$(CXX)" \
 	  HEADERS_TO_TEST="$(nobase_include_HEADERS)" \
+	  PKG_CONFIG_PATH=$(pkgconfigdir) \
 	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
 
