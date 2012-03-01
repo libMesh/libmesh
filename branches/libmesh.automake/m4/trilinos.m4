@@ -81,8 +81,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
   # get requisite include and library variables by snarfing
   # them from the exported makefiles
   if (test $enabletrilinos10 != no); then
-    tmp_makefile=`mktemp`
-    cat <<EOF >$tmp_makefile
+    cat <<EOF >Makefile_config_trilinos
 include $TRILINOS_MAKEFILE_EXPORT
 echo_libs:
 	@echo \$(Trilinos_LIBRARIES) \$(Trilinos_LIBRARY_DIRS) \$(Trilinos_TPL_LIBRARIES) \$(Trilinos_TPL_LIBRARY_DIRS)
@@ -91,10 +90,10 @@ echo_include:
 	@echo \$(Trilinos_INCLUDE_DIRS) \$(Trilinos_TPL_INCLUDE_DIRS)
 EOF
 
-    #echo "$tmp_makefile="
-    #cat $tmp_makefile
-    TRILINOS_INCLUDES=`make -sf $tmp_makefile echo_include`
-    TRILINOS_LIBS=`make -sf $tmp_makefile echo_libs`
+    #echo "Makefile_config_trilinos="
+    #cat Makefile_config_trilinos
+    TRILINOS_INCLUDES=`make -sf Makefile_config_trilinos echo_include`
+    TRILINOS_LIBS=`make -sf Makefile_config_trilinos echo_libs`
 
     #echo TRILINOS_LIBS=$TRILINOS_LIBS
     #echo TRILINOS_INCLUDES=$TRILINOS_INCLUDES
@@ -102,7 +101,7 @@ EOF
     libmesh_optional_INCLUDES="$TRILINOS_INCLUDES $libmesh_optional_INCLUDES"
     libmesh_optional_LIBS="$TRILINOS_LIBS $libmesh_optional_LIBS"
 
-    rm -f $tmp_makefile
+    rm -f Makefile_config_trilinos
   fi
 
   AC_SUBST(TRILINOS_LIBS)
@@ -206,8 +205,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   # 
   # AztecOO
   if (test $enableaztecoo != no); then
-    tmp_makefile=`mktemp`
-    cat <<EOF >$tmp_makefile
+    cat <<EOF >Makefile_config_trilinos
 include $AZTECOO_MAKEFILE_EXPORT
 echo_libs:
 	@echo \$(AZTECOO_LIBS)
@@ -216,10 +214,10 @@ echo_include:
 	@echo \$(AZTECOO_INCLUDES)
 EOF
 
-    #echo "$tmp_makefile="
-    #cat $tmp_makefile
-    AZTECOO_INCLUDES=`make -sf $tmp_makefile echo_include`
-    AZTECOO_LIBS=`make -sf $tmp_makefile echo_libs`
+    #echo "Makefile_config_trilinos="
+    #cat Makefile_config_trilinos
+    AZTECOO_INCLUDES=`make -sf Makefile_config_trilinos echo_include`
+    AZTECOO_LIBS=`make -sf Makefile_config_trilinos echo_libs`
 
     #echo AZTECOO_LIBS=$AZTECOO_LIBS
     #echo AZTECOO_INCLUDES=$AZTECOO_INCLUDES
@@ -227,14 +225,13 @@ EOF
     libmesh_optional_INCLUDES="$AZTECOO_INCLUDES $libmesh_optional_INCLUDES"
     libmesh_optional_LIBS="$AZTECOO_LIBS $libmesh_optional_LIBS"
 
-    rm -f $tmp_makefile
+    rm -f Makefile_config_trilinos
   fi
 
   # 
   # Nox
   if (test $enablenox != no); then
-    tmp_makefile=`mktemp`
-    cat <<EOF >$tmp_makefile
+    cat <<EOF >Makefile_config_trilinos
 include $NOX_MAKEFILE_EXPORT
 echo_libs:
 	@echo \$(NOX_LIBS)
@@ -243,10 +240,10 @@ echo_include:
 	@echo \$(NOX_INCLUDES)
 EOF
 
-    #echo "$tmp_makefile="
-    #cat $tmp_makefile
-    NOX_INCLUDES=`make -sf $tmp_makefile echo_include`
-    NOX_LIBS=`make -sf $tmp_makefile echo_libs`
+    #echo "Makefile_config_trilinos="
+    #cat Makefile_config_trilinos
+    NOX_INCLUDES=`make -sf Makefile_config_trilinos echo_include`
+    NOX_LIBS=`make -sf Makefile_config_trilinos echo_libs`
 
     #echo NOX_LIBS=$NOX_LIBS
     #echo NOX_INCLUDES=$NOX_INCLUDES
@@ -254,14 +251,13 @@ EOF
     libmesh_optional_INCLUDES="$NOX_INCLUDES $libmesh_optional_INCLUDES"
     libmesh_optional_LIBS="$NOX_LIBS $libmesh_optional_LIBS"
 
-    rm -f $tmp_makefile
+    rm -f Makefile_config_trilinos
   fi
 
   # 
   # ML
   if (test $enableml != no); then
-    tmp_makefile=`mktemp`
-    cat <<EOF >$tmp_makefile
+    cat <<EOF >Makefile_config_trilinos
 include $ML_MAKEFILE_EXPORT
 echo_libs:
 	@echo \$(ML_LIBS)
@@ -270,10 +266,10 @@ echo_include:
 	@echo \$(ML_INCLUDES)
 EOF
 
-    #echo "$tmp_makefile="
-    #cat $tmp_makefile
-    ML_INCLUDES=`make -sf $tmp_makefile echo_include`
-    ML_LIBS=`make -sf $tmp_makefile echo_libs`
+    #echo "Makefile_config_trilinos="
+    #cat Makefile_config_trilinos
+    ML_INCLUDES=`make -sf Makefile_config_trilinos echo_include`
+    ML_LIBS=`make -sf Makefile_config_trilinos echo_libs`
 
     #echo ML_LIBS=$ML_LIBS
     #echo ML_INCLUDES=$ML_INCLUDES
@@ -281,7 +277,7 @@ EOF
     libmesh_optional_INCLUDES="$ML_INCLUDES $libmesh_optional_INCLUDES"
     libmesh_optional_LIBS="$ML_LIBS $libmesh_optional_LIBS"
 
-    rm -f $tmp_makefile
+    rm -f Makefile_config_trilinos
   fi
 
 
