@@ -850,6 +850,7 @@ inline
 void EpetraVector<T>::zero ()
 {
   libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
 
   _vec->PutScalar(0.0);
 }
