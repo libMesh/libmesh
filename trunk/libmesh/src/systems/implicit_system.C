@@ -777,6 +777,13 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   // We get (partial q / partial u) from the user
   this->assemble_qoi_derivative(qoi_indices);
 
+  // We don't need these to be closed() in this function, but libMesh
+  // standard practice is to have them closed() by the time the
+  // function exits
+  for (unsigned int i=0; i != this->qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      this->get_adjoint_rhs(i).close();
+
   for (unsigned int j=0; j != Np; ++j)
     {
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
