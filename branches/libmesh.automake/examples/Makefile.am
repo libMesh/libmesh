@@ -137,13 +137,11 @@ eigenproblems_ex2_DATA    = eigenproblems/eigenproblems_ex2/eigenproblems_ex2.C
 eigenproblems_ex2_SOURCES = $(eigenproblems_ex2_DATA) eigenproblems/eigenproblems_ex2/run.sh
 eigenproblems_ex2_LDADD   = $(top_builddir)/libmesh.la
 
-if LIBMESH_ENABLE_SLEPC #FIXME: Remove this when example is working again.
-  check_PROGRAMS += eigenproblems_ex3
-  eigenproblems_ex3dir      = $(examples_install_path)/eigenproblems/ex3
-  eigenproblems_ex3_DATA    = eigenproblems/eigenproblems_ex3/eigenproblems_ex3.C eigenproblems/eigenproblems_ex3/drum1_mesh.e  eigenproblems/eigenproblems_ex3/drum2_mesh.e
-  eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) eigenproblems/eigenproblems_ex3/run.sh
-  eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
-endif
+check_PROGRAMS += eigenproblems_ex3
+eigenproblems_ex3dir      = $(examples_install_path)/eigenproblems/ex3
+eigenproblems_ex3_DATA    = eigenproblems/eigenproblems_ex3/eigenproblems_ex3.C eigenproblems/eigenproblems_ex3/drum1_mesh.e  eigenproblems/eigenproblems_ex3/drum2_mesh.e
+eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) eigenproblems/eigenproblems_ex3/run.sh
+eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
 
 # Only *run* the tests if SLEPc is actually enabled
 if LIBMESH_ENABLE_SLEPC
@@ -162,6 +160,23 @@ fem_system_ex1_DATA    = fem_system/fem_system_ex1/fem_system_ex1.C fem_system/f
 fem_system_ex1_SOURCES = $(fem_system_ex1_DATA) fem_system/fem_system_ex1/run.sh
 fem_system_ex1_LDADD   = $(top_builddir)/libmesh.la
 
+
+#
+# Subdomains
+#
+check_PROGRAMS += subdomains_ex1
+check_SCRIPTS  += subdomains/subdomains_ex1/run.sh
+subdomains_ex1dir      = $(examples_install_path)/subdomains/ex1
+subdomains_ex1_DATA    = subdomains/subdomains_ex1/subdomains_ex1.C introduction/introduction_ex3/exact_solution.C
+subdomains_ex1_SOURCES = $(subdomains_ex1_DATA) subdomains/subdomains_ex1/run.sh
+subdomains_ex1_LDADD   = $(top_builddir)/libmesh.la
+
+check_PROGRAMS += subdomains_ex2
+check_SCRIPTS  += subdomains/subdomains_ex2/run.sh
+subdomains_ex2dir      = $(examples_install_path)/subdomains/ex2
+subdomains_ex2_DATA    = subdomains/subdomains_ex2/subdomains_ex2.C introduction/introduction_ex3/exact_solution.C
+subdomains_ex2_SOURCES = $(subdomains_ex2_DATA) subdomains/subdomains_ex2/run.sh
+subdomains_ex2_LDADD   = $(top_builddir)/libmesh.la
 
 #
 # Running the tests
