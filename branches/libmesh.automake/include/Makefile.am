@@ -374,5 +374,5 @@ installcheck-local:
 	@CXX="$(CXX)" libmesh_optional_INCLUDES="$(libmesh_optional_INCLUDES)" \
 	  INCLUDEDIR="$(includedir)" \
 	  HEADERS_TO_TEST="$(nobase_include_HEADERS)" \
-	  $(top_srcdir)/contrib/bin/test_headers_AM.sh
+	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
 
