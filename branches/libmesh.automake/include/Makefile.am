@@ -8,7 +8,7 @@ DISTCLEANFILES = base/libmesh_config.h
 #
 # special things to do when running 'make dist'
 dist-hook:
-	rm -rf $(distdir)/include/base/libmesh_config.h
+	rm -rf $(distdir)/base/libmesh_config.h
 
 # These are headers we need to compile the libMesh library but should
 # not be installed.  These header files may have implementation
