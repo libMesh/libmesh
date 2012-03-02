@@ -36,7 +36,7 @@
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), L2_HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
-                               template class FE< (_dim), L2LAGRANGE>;   \
+                               template class FE< (_dim), L2_LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SCALAR>;   \
                                template class FE< (_dim), XYZ>

@@ -100,6 +100,12 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--disable-singleprecision");
 #endif
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  // SLEPc currently gives us an "inner product not well defined" with
+  // Number==complex
+  libmesh_example_assert(false, "--disable-complex");
+#endif
+
   // Tell the user what we are doing.
   {
     std::cout << "Running " << argv[0];
