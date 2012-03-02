@@ -22,7 +22,7 @@
 #include "errhandl.h"
 #include "copyrght.h"
 
-void V_Constr(QVector *V, char *Name, size_t Dim, InstanceType Instance,
+void V_Constr(QVector *V, const char *Name, size_t Dim, InstanceType Instance,
               _LPBoolean OwnData)
 /* constructor of the type QVector */
 {
@@ -62,7 +62,7 @@ void V_Destr(QVector *V)
   }
 }
 
-void V_SetName(QVector *V, char *Name)
+void V_SetName(QVector *V, const char *Name)
 /* (re)set name of the vector V */
 {
     if (LASResult() == LASOK) {

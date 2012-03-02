@@ -26,7 +26,7 @@ static ElType ZeroEl = { 0, 0.0 };
 
 static int ElCompar(const void *El1, const void *El2);
 
-void Q_Constr(QMatrix *Q, char *Name, size_t Dim, _LPBoolean Symmetry,
+void Q_Constr(QMatrix *Q, const char *Name, size_t Dim, _LPBoolean Symmetry,
               ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData)
 /* constructor of the type QMatrix */
 {
@@ -164,7 +164,7 @@ void Q_Destr(QMatrix *Q)
     }
 }
 
-void Q_SetName(QMatrix *Q, char *Name)
+void Q_SetName(QMatrix *Q, const char *Name)
 /* (re)set name of the matrix Q */
 {
     if (LASResult() == LASOK) {

@@ -26,7 +26,7 @@ static ElType ZeroEl = { 0, 0.0 };
 
 static int ElCompar(const void *El1, const void *El2);
 
-void M_Constr(Matrix *M, char *Name, size_t RowDim, size_t ClmDim,
+void M_Constr(Matrix *M, const char *Name, size_t RowDim, size_t ClmDim,
               ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData)
 /* constructor of the type Matrix */
 {
@@ -105,7 +105,7 @@ void M_Destr(Matrix *M)
     }
 }
 
-void M_SetName(Matrix *M, char *Name)
+void M_SetName(Matrix *M, const char *Name)
 /* (re)set name of the matrix M */
 {
     if (LASResult() == LASOK) {
@@ -118,7 +118,7 @@ void M_SetName(Matrix *M, char *Name)
     }
 }
 
-char *M_GetName(Matrix *M)
+const char *M_GetName(Matrix *M)
 /* returns the name of the matrix M */
 {
     if (LASResult() == LASOK)
