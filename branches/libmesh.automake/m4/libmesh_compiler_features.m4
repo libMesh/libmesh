@@ -2,6 +2,10 @@
 # -------------------------------------------------------------
 AC_DEFUN([LIBMESH_COMPILER_FEATURES],
 [
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(------- Configuring compiler features -------)
+AC_MSG_RESULT(---------------------------------------------)
+
 # --------------------------------------------------------------
 # Real precision - double by default
 # --------------------------------------------------------------
@@ -522,4 +526,10 @@ if test "$enableperflog" != no ; then
   AC_MSG_RESULT(<<< Configuring library with performance logging support >>>)
 fi
 # ------------------------------------------------------------
+
+
+
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(----- Done configuring compiler features ----)
+AC_MSG_RESULT(---------------------------------------------)
 ])

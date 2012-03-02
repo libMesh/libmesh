@@ -2,6 +2,11 @@
 # -------------------------------------------------------------
 AC_DEFUN([LIBMESH_CORE_FEATURES],
 [
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(----- Configuring core library features -----)
+AC_MSG_RESULT(---------------------------------------------)
+
+
 # -------------------------------------------------------------
 # size of subdomain_id -- default 2
 # -------------------------------------------------------------
@@ -292,12 +297,16 @@ AC_SUBST(enablexdr)
 AC_ARG_ENABLE(complex,
               AC_HELP_STRING([--enable-complex],
                              [build with complex number support]),
-              enablecomplex=$enableval,
-              enablecomplex=no)
+ 	      [case "${enableval}" in
+	          yes)  enablecomplex=yes ;;
+		   no)  enablecomplex=no ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-complex) ;;
+	       esac],
+	       [enablecomplex=no])
 
 if test "$enablecomplex" != no ; then
   AC_DEFINE(USE_COMPLEX_NUMBERS, 1,
-     [Flag indicating if the library should be built using complex numbers])
+     [Flag indicating if the library should be built using complxex numbers])
   AC_MSG_RESULT(<<< Configuring library with complex number support >>>)
   AC_SUBST(enablecomplex)
 
@@ -307,6 +316,8 @@ else
   AC_MSG_RESULT(<<< Configuring library with real number support >>>)
   AC_SUBST(enablecomplex)
 fi
+
+AM_CONDITIONAL(LIBMESH_ENABLE_COMPLEX, test x$enablecomplex = xyes)
 # -------------------------------------------------------------
 
 
@@ -348,4 +359,7 @@ if test "$enableperflog" != no ; then
 fi
 # ------------------------------------------------------------
 
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(-- Done configuring core library features ---)
+AC_MSG_RESULT(---------------------------------------------)
 ])

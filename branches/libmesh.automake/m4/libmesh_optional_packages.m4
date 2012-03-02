@@ -16,6 +16,9 @@ AC_ARG_ENABLE(optional,
               enableoptional=yes)
 AC_SUBST(enableoptional)	
 
+# Note that even when optional packages are disabled we need to
+# run their m4 macros to get proper AM_CONDITIONALs.  Just be
+# quiet about it...
 if test "$enableoptional" != no ; then
    AC_MSG_RESULT(---------------------------------------------)
    AC_MSG_RESULT(----- Configuring for optional packages -----)
@@ -26,39 +29,15 @@ fi
 # -------------------------------------------------------------
 # Petsc -- enabled by default
 # -------------------------------------------------------------
-AC_ARG_ENABLE(petsc,
-              AC_HELP_STRING([--enable-petsc],
-                             [build with PETSc iterative solver suppport]),
-              enablepetsc=$enableval,
-              enablepetsc=$enableoptional)
-
-
-# -------------------------------------------------------------
-# configure MPI separately only if PETSc fails
-if (test "$enablepetsc" !=  no) ; then
-  CONFIGURE_PETSC
-else
-  if (test "$enableoptional" != no) ; then
-    ACX_MPI
-  fi	
-fi
+CONFIGURE_PETSC
 # -------------------------------------------------------------
 
 
 
-
 # -------------------------------------------------------------
-# SLEPc  -- disabled by default
+# SLEPc -- enabled by default
 # -------------------------------------------------------------
-AC_ARG_ENABLE(slepc,
-              AC_HELP_STRING([--enable-slepc],
-                             [build with SLEPc eigen solver support]),
-     enableslepc=$enableval,
-     enableslepc=$enableoptional)
-
-if test "$enableslepc" != no ; then
-   CONFIGURE_SLEPC
-fi
+CONFIGURE_SLEPC
 # -------------------------------------------------------------
 
 
@@ -73,7 +52,7 @@ CONFIGURE_TRILINOS
 
 
 # -------------------------------------------------------------
-# Intel's Threading Building Blocks  -- enabled by default
+# Intel's Threading Building Blocks -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_TBB
 # -------------------------------------------------------------
@@ -149,24 +128,28 @@ fi
 # -------------------------------------------------------------
 
 
+
 # -------------------------------------------------------------
 # Tecplot -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_TECPLOT
 # -------------------------------------------------------------
 
+
+
 # -------------------------------------------------------------
 # Metis Partitioning -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_METIS
+# -------------------------------------------------------------
+
+
 
 # -------------------------------------------------------------
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_PARMETIS
 # -------------------------------------------------------------
-
-
 
 
 
@@ -190,7 +173,6 @@ if test "x$DOXYGEN" != x ; then
   AC_SUBST(HAVE_DOT)
 fi
 # -------------------------------------------------------------
-
 
 
 
@@ -242,6 +224,7 @@ CONFIGURE_GLPK
 # -------------------------------------------------------------
 
 
+
 # --------------------------------------------------------------
 # netCDF -- enabled by default (it is distributed in contrib)
 # --------------------------------------------------------------
@@ -263,7 +246,6 @@ CONFIGURE_NETCDF
 # -------------------------------------------------------------
 
 
-
    
 # -------------------------------------------------------------
 # libHilbert -- distributed in ./contrib,
@@ -271,6 +253,7 @@ CONFIGURE_NETCDF
 # -------------------------------------------------------------
 CONFIGURE_LIBHILBERT
 # -------------------------------------------------------------
+
 
 
 # -------------------------------------------------------------
@@ -285,6 +268,8 @@ AC_ARG_ENABLE(fparser,
 
 CONFIGURE_FPARSER
 # -------------------------------------------------------------
+
+
 
 if test "$enableoptional" != no ; then
    AC_MSG_RESULT(----------------------------------------------)

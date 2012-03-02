@@ -1,10 +1,11 @@
 include $(top_builddir)/Make.common
 
 AM_CPPFLAGS = $(libmesh_CPPFLAGS)
-AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
+AM_CFLAGS   = $(libmesh_CFLAGS)
 
 noinst_LTLIBRARIES = liblaspack.la
+
 liblaspack_la_SOURCES  = \
 	copyrght.h \
 	eigenval.h \
@@ -22,14 +23,14 @@ liblaspack_la_SOURCES  = \
 	qvector.h \
 	rtc.h \
 	version.h \
-	eigenval.c \
-	errhandl.c \
-	factor.c \
-	itersolv.c \
-	matrix.c \
-	mlsolv.c \
-	operats.c \
-	precond.c \
-	qmatrix.c \
-	qvector.c \
-	rtc.c
+	eigenval.C \
+	errhandl.C \
+	factor.C \
+	itersolv.C \
+	matrix.C \
+	mlsolv.C \
+	operats.C \
+	precond.C \
+	qmatrix.C \
+	qvector.C \
+	rtc.C
