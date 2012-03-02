@@ -18,13 +18,13 @@ class ParsedFunction : public FunctionBase<Output>
 {
 public:
   ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
-                  const std::vector<Output>* additional_vals=NULL)
+                  const std::vector<Output>* initial_vals=NULL)
     : _expression(expression),
+      _additional_vars(NULL),
+      _initial_vals(NULL)
       // Size the spacetime vector to account for space, time, and any additional
       // variables passed
       //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
-      _additional_vars(additional_vars),
-      _additional_vals(additional_vals)
     {
       std::string variables = "x";
 #if LIBMESH_DIM > 1
@@ -42,11 +42,17 @@ public:
       // end of our spacetime vector
       if (additional_vars)
       {
-        libmesh_assert(additional_vals != NULL && additional_vars->size() == additional_vals->size());
+        if (initial_vals)
+          std::copy(initial_vals->begin(), initial_vals->end(), std::back_inserter(_initial_vals));
+
+        std::copy(additional_vars->begin(), additional_vars->end(), std::back_inserter(_additional_vars));
+
         for (unsigned int i=0; i < additional_vars->size(); ++i)
         {
           variables += "," + (*additional_vars)[i];
-          _spacetime[LIBMESH_DIM+1 + i] = (*additional_vals)[i];
+          // Initialize extra variables to the vector passed in or zero
+          // Note: The initial_vals vector can be shorter than the additional_vars vector
+          _spacetime[LIBMESH_DIM+1 + i] = (initial_vals && i < initial_vals->size()) ? (*initial_vals)[i] : 0;
         }
       }
 
@@ -163,9 +169,29 @@ public:
 
   virtual void init() {}
   virtual void clear() {}
+
+  /**
+   * @returns the address of a parsed variable so you can supply a parameterized value
+   */
+  virtual Output & getVarAddress(const std::string & variable_name)
+    {
+      const std::vector<std::string>::iterator it =
+          std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
+
+      if (it == _additional_vars.end())
+      {
+        std::cerr << "ERROR: Requested variable not found in parsed function\n" << std::endl;
+        libmesh_error();
+      }
+
+      // Iterator Arithmetic (How far from the end of the array is our target address?)
+      return _spacetime[_spacetime.size() - (_additional_vars.end() - it)];
+    }
+
+
   virtual AutoPtr<FunctionBase<Output> > clone() {
     return AutoPtr<FunctionBase<Output> >
-      (new ParsedFunction(_expression, _additional_vars, _additional_vals));
+      (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
   }
 
 private:
@@ -174,8 +200,8 @@ private:
   std::vector<Output> _spacetime;
 
   // Additional variables/values that can be parsed and handled by the function parser
-  const std::vector<std::string>* _additional_vars;
-  const std::vector<Output>* _additional_vals;
+  std::vector<std::string> _additional_vars;
+  std::vector<Output> _initial_vals;
 };
 
 #else
@@ -199,6 +225,7 @@ public:
 
   virtual void init() {}
   virtual void clear() {}
+  virtual Output & getVarAddress() {}
   virtual AutoPtr<FunctionBase<Output> > clone() {
     return AutoPtr<FunctionBase<Output> >
       (new ParsedFunction<Output>(""));
