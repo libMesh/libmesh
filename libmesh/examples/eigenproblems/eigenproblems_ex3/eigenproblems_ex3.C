@@ -85,6 +85,11 @@ int main (int argc, char** argv)
   // Initialize libMesh and the dependent libraries.
   LibMeshInit init (argc, argv);
 
+  // This example uses an ExodusII input file
+#ifndef LIBMESH_HAVE_EXODUS_API
+  libmesh_example_assert(false, "--enable-exodus");
+#endif
+
   // This example is designed for the SLEPc eigen solver interface.
 #ifndef LIBMESH_HAVE_SLEPC
   if (libMesh::processor_id() == 0)
