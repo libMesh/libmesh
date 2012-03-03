@@ -22,8 +22,10 @@ echo '----------------------------------- SUMMARY ------------------------------
 echo
 echo Package version............... : $PACKAGE-$VERSION
 echo
-echo C++ compiler.................. : $CXX
 echo C++ compiler type............. : $GXX_VERSION
+echo C++ compiler.................. : $CXX
+echo C compiler.................... : $CC
+echo Fortran compiler.............. : $FC
 echo Build Method.................. : $METHOD
 echo CPPFLAGS...................... : $CPPFLAGS_METHOD
 echo CXXFLAGS...................... : $CXXFLAGS_METHOD
