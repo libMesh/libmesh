@@ -13,6 +13,10 @@ AC_DEFUN([CONFIGURE_PARMETIS],
 		 esac],
 		 [enableparmetis=$enableoptional])
 
+  dnl Trump --enable-parmetis with --disable-mpi
+  if (test "x$enablempi" = xno); then
+    enableparmetis=no
+  fi	
 
 
   dnl The PARMETIS API is distributed with libmesh, so we don't have to guess

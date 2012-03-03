@@ -11,9 +11,13 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 		   no)  enablenemesis=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis) ;;
 		 esac],
-		 [enablenemesis=$enableoptional])
+		 [enablenemesis=$enableexodus]) # if unspecified, depend on exodus
 
 
+  dnl Trump --enable-nemesis with --disable-mpi
+  if (test "x$enablempi" = xno); then
+    enablenemesis=no
+  fi	
 		 		
   dnl The NEMESIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...

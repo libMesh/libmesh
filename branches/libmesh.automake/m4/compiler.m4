@@ -4,7 +4,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
 [
   dnl --------------------------------------------------------------
   dnl look for a decent C++ compiler or honor --with-cxx=...
-  CXX_TRY_LIST="g++ icc pgCC c++"
+  CXX_TRY_LIST="g++ icpc icc pgCC c++"
   
      dnl -------------------------------------------------------------------
      dnl MPI -- enabled by default.  Check for it now so we can be somewhat
@@ -13,11 +13,17 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
      AC_ARG_ENABLE(mpi,
                    AC_HELP_STRING([--enable-mpi],
                                   [build with MPI message passing support]),
-                   enablempi=$enableval,
-                   enablempi=yes)
+   		   [case "${enableval}" in
+   		     yes)  enablempi=yes ;;
+   		      no)  enablempi=no ;;
+    		       *)  AC_MSG_ERROR(bad value ${enableval} for --enable-mpi) ;;
+   		    esac],
+   		    [enablempi=$enableoptional])
      
   if  (test "$enablempi" != no) ; then
     CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
+  else
+    AC_MSG_RESULT(>>> Disabling MPI per user request <<<)
   fi
   
   AC_ARG_WITH([cxx],
