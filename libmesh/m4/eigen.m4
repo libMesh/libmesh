@@ -25,7 +25,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
     EIGEN_INC="$witheigeninc"
   elif test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen/Eigen; then
     echo "Environment EIGEN_INC=$EIGEN_INC"
-  elif test -f /usr/include/eigen3/Eigen/Eigen
+  elif test -f /usr/include/eigen3/Eigen/Eigen ; then
     EIGEN_INC="/usr/include/eigen3"
   else
     EIGEN_INC="/usr/include"
