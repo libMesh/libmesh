@@ -113,6 +113,8 @@ AC_DEFUN([CONFIGURE_GLPK],
          GLPK_LIBRARY="\$(libmesh_RPATHFLAG)$GLPK_LIB -L$GLPK_LIB -lglpk"
          AC_DEFINE(HAVE_GLPK, 1, [Flag indicating whether the library will be compiled with GLPK support])
          AC_MSG_RESULT(<<< Configuring library with GLPK support >>>)
+	 libmesh_optional_INCLUDES="$GLPK_INCLUDE $libmesh_optional_INCLUDES"
+	 libmesh_optional_LIBS="$GLPK_LIBRARY $libmesh_optional_LIBS"
        fi
     fi
   fi

@@ -264,8 +264,6 @@ installcheck-local:
 	@echo " "
 	@echo "Checking for self-sufficient examples..."
 	@echo " "
-	@echo " bindir=$(bindir)"
-	@echo " pkgconfigdir=$(pkgconfigdir)"
 	@CXX="$(CXX)" \
 	  examples_install_path=$(examples_install_path) \
 	  PKG_CONFIG_PATH=$(pkgconfigdir) \
