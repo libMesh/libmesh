@@ -18,7 +18,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
    		      no)  enablempi=no ;;
     		       *)  AC_MSG_ERROR(bad value ${enableval} for --enable-mpi) ;;
    		    esac],
-   		    [enablempi=$enableoptional])
+   		    [enablempi=yes])
      
   if  (test "$enablempi" != no) ; then
     CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"

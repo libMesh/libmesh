@@ -67,6 +67,27 @@ echo SVN revision number........... : $BUILD_VERSION
 
 
 ######################################################################################
+echo
+echo Library Features:
+echo '  'adaptive mesh refinement.... : $enableamr
+echo '  'complex variables........... : $enablecomplex
+echo '  'ghosted vectors............. : $enableghosted
+echo '  'high-order shape functions.. : $enablepfem
+echo '  'infinite elements........... : $enableifem
+echo '  'node constraints............ : $enablenodeconstraint
+echo '  'parallel mesh............... : $enableparmesh
+echo '  'performance logging......... : $enableperflog
+echo '  'periodic boundary conditions : $enableperiodic
+echo '  'reference counting.......... : $enablerefct
+echo '  'shape function 2nd derivs... : $enablesecond
+echo '  'stack trace files........... : $enabletracefiles
+echo '  'subdomain id size........... : $subdomain_bytes bytes
+echo '  'variational smoother........ : $enablevsmoother
+echo '  'xdr binary I/O.............. : $enablexdr
+
+
+		   
+######################################################################################
 if test "x$enableoptional" = "xyes"; then
   echo
   echo External Packages:
