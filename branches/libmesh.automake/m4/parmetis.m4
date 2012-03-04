@@ -26,6 +26,7 @@ AC_DEFUN([CONFIGURE_PARMETIS],
      #PARMETIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
      AC_DEFINE(HAVE_PARMETIS, 1, [Flag indicating whether the library will be compiled with Parmetis support])
      AC_MSG_RESULT(<<< Configuring library with Parmetis support >>>)
+     libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
   else
      PARMETIS_INCLUDE=""
      #PARMETIS_LIBRARY=""

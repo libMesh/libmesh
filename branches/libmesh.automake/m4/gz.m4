@@ -25,7 +25,8 @@ if (test $enablegz = yes); then
     GZSTREAM_INCLUDE="-I\$(top_srcdir)/contrib/gzstream"
     #GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
     AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
-    AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
+    AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)     
+    libmesh_contrib_INCLUDES="$GZSTREAM_INCLUDE $libmesh_contrib_INCLUDES"
 
   dnl Otherwise do not enable gzstreams
   else

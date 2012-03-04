@@ -69,22 +69,6 @@ MPI_IMPL             = @MPI_IMPL@
 MPI_INCLUDE          = @MPI_INCLUDES_PATHS@
 MPI_LIB              = @MPI_LIBS_PATHS@ @MPI_LIBS@
 
-# Trilinos configuration
-enable-trilinos-10       = @enabletrilinos10@
-TRILINOS_MAKEFILE_EXPORT = @TRILINOS_MAKEFILE_EXPORT@
-
-# AztecOO configuration
-enable-aztecoo          = @enableaztecoo@
-AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
-
-# Nox configuration
-enable-nox          = @enablenox@
-NOX_MAKEFILE_EXPORT = @NOX_MAKEFILE_EXPORT@
-
-# ML configuration
-enable-ml          = @enableml@
-ML_MAKEFILE_EXPORT = @ML_MAKEFILE_EXPORT@
-
 # Boost Configuration - currently using header-only libraries
 libmesh_INCLUDE += @BOOST_CPPFLAGS@
 #libmesh_LIBS     += @BOOST_LDFLAGS@
@@ -97,28 +81,28 @@ perl                 = @PERL@
 
 # Flag for optional packages
 enable-optional      = @enableoptional@
-enable-eigen         = @enableeigen@
-enable-exodus	     = @enableexodus@
-enable-fparser       = @enablefparser@
-enable-glpk          = @enableglpk@
-enable-gmv           = @enablegmv@
-enable-gzstream      = @enablegz@
-enable-laspack	     = @enablelaspack@
-enable-libhilbert    = @enablelibhilbert@
-enable-metis	     = @enablemetis@
-enable-nemesis	     = @enablenemesis@
-enable-netcdf	     = @enablenetcdf@
-enable-openmp        = @enableopenmp@
-enable-parmetis	     = @enableparmetis@
-enable-sfcurves	     = @enablesfc@
-enable-tetgen        = @enabletetgen@
-enable-triangle      = @enabletriangle@
-enable-vtk           = @enablevtk@
+# enable-eigen         = @enableeigen@
+# enable-exodus	     = @enableexodus@
+# enable-fparser       = @enablefparser@
+# enable-glpk          = @enableglpk@
+# enable-gmv           = @enablegmv@
+# enable-gzstream      = @enablegz@
+# enable-laspack	     = @enablelaspack@
+# enable-libhilbert    = @enablelibhilbert@
+# enable-metis	     = @enablemetis@
+# enable-nemesis	     = @enablenemesis@
+# enable-netcdf	     = @enablenetcdf@
+# enable-openmp        = @enableopenmp@
+# enable-parmetis	     = @enableparmetis@
+# enable-sfcurves	     = @enablesfc@
+# enable-tetgen        = @enabletetgen@
+# enable-triangle      = @enabletriangle@
+# enable-vtk           = @enablevtk@
 
-#
-# Set the current directory.
-libmesh_dir := @PWD@
-export libmesh_dir
+# #
+# # Set the current directory.
+# libmesh_dir := @PWD@
+# export libmesh_dir
 ###############################################################################
 
 
@@ -209,22 +193,22 @@ ifeq ($(mode),"INVALID")
   $(error Invalid environment variable METHOD=$(METHOD) specified)
 endif
 
-# The file extension for object files.
-# foo.C is compiled to foo.$(obj-suffix)
-obj-suffix := @host@.$(METHOD).o
+# # The file extension for object files.
+# # foo.C is compiled to foo.$(obj-suffix)
+# obj-suffix := @host@.$(METHOD).o
 
-#
-# Define the right lib-extension for shared libraries
-static_libext := .a
-shared_libext := .so
-ifeq ($(findstring darwin,$(hostos)),darwin)
-  shared_libext := .dylib
-endif
+# #
+# # Define the right lib-extension for shared libraries
+# static_libext := .a
+# shared_libext := .so
+# ifeq ($(findstring darwin,$(hostos)),darwin)
+#   shared_libext := .dylib
+# endif
 
-libext := $(static_libext)
-ifeq ($(enable-shared),yes) 
-  libext := $(shared_libext)
-endif
+# libext := $(static_libext)
+# ifeq ($(enable-shared),yes) 
+#   libext := $(shared_libext)
+# endif
 ###############################################################################
 
 
@@ -232,16 +216,16 @@ libmesh_CPPFLAGS := @CPPFLAGS_METHOD@ #$(libmesh_CPPFLAGS)
 libmesh_CXXFLAGS := @CXXFLAGS_METHOD@ #$(libmesh_CXXFLAGS)
 libmesh_CFLAGS   := @CFLAGS_METHOD@ #$(libmesh_CFLAGS)
 
-###############################################################################
-# The mesh library
-#
-mesh_library_dir := $(libmesh_dir)/lib/$(hosttype)_$(METHOD)
+# ###############################################################################
+# # The mesh library
+# #
+# mesh_library_dir := $(libmesh_dir)/lib/$(hosttype)_$(METHOD)
 
-mesh_library     := $(mesh_library_dir)/libmesh$(static_libext)
-ifeq ($(enable-shared),yes) 
-  mesh_library   := $(mesh_library_dir)/libmesh$(shared_libext)
-#  libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(mesh_library_dir)
-endif
+# mesh_library     := $(mesh_library_dir)/libmesh$(static_libext)
+# ifeq ($(enable-shared),yes) 
+#   mesh_library   := $(mesh_library_dir)/libmesh$(shared_libext)
+# #  libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(mesh_library_dir)
+# endif
 
 #libmesh_LIBS += $(mesh_library)
 ###############################################################################
@@ -269,181 +253,29 @@ libmesh_INCLUDE += -I$(top_srcdir)/include/base \
                    -I$(top_srcdir)/include/systems \
                    -I$(top_srcdir)/include/utils
 
-
-
-#
-# Package-specific stuff
-
-#
-# Contributed source & libraries
-EXTERNAL_LIBDIR := $(libmesh_dir)/contrib/lib/$(hosttype)_$(METHOD)
-# ifeq ($(enable-shared),yes) 
-#   libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR)
-# endif
-
-
-# # Include path for local boost header files.  Note, this
-# # will probably not be an "optional" package if we really
-# # do end up using it.
-# libmesh_INCLUDE += -I$(libmesh_dir)/contrib/boost
-
 #
 # Optional packages
 ifeq ($(enable-optional),yes)
+  libmesh_INCLUDE += @libmesh_optional_INCLUDES@
+  libmesh_LIBS    += @libmesh_optional_LIBS@
 
-  # if Laspack is used we need the header path
-  # and the lib
-  #libmesh_LIBS    += @LASPACK_LIB@
-  libmesh_INCLUDE += @LASPACK_INCLUDE@
+#   # if OpenMP is used, modify the build and link flags
+#   ifeq ($(enable-openmp),yes)
+#     libmesh_CXXFLAGS += @OPENMP_CXXFLAGS@
+#     libmesh_CFLAGS   += @OPENMP_CFLAGS@
+#     libmesh_FFLAGS   += @OPENMP_FFLAGS@
+#   endif
 
-  # if Paretis is used we need the header path
-  # and the lib
-  # (Parmetis must precede Metis for static linking)
-  #libmesh_LIBS    += @PARMETIS_LIB@
-  libmesh_INCLUDE += @PARMETIS_INCLUDE@
+#       # Nox, an additional option if AztecOO is present
+#       ifeq ($(enable-nox),yes)
+#           #include @NOX_MAKEFILE_EXPORT@
+#           #libmesh_LIBS    += $(NOX_LIBS)
+#           #libmesh_INCLUDE += $(NOX_INCLUDES)
 
-  # if Metis is used we need the header path
-  # and the lib
-  #libmesh_LIBS    += @METIS_LIB@
-  libmesh_INCLUDE += @METIS_INCLUDE@
-
-  # if Space filling curves are used we need the
-  # header path and the lib
-  #libmesh_LIBS    += @SFC_LIB@
-  libmesh_INCLUDE += @SFC_INCLUDE@
-
-  # if TBB is used, we need the 
-  # header path and the lib
-  libmesh_LIBS    += @TBB_LIBRARY@
-  libmesh_INCLUDE += @TBB_INCLUDE@
-
-  # if OpenMP is used, modify the build and link flags
-  ifeq ($(enable-openmp),yes)
-    libmesh_CXXFLAGS += @OPENMP_CXXFLAGS@
-    libmesh_CFLAGS   += @OPENMP_CFLAGS@
-    libmesh_FFLAGS   += @OPENMP_FFLAGS@
-  endif
-
-  # if gzstreams are used, we need the 
-  # header path and the lib
-  #libmesh_LIBS    += @GZSTREAM_LIB@
-  libmesh_INCLUDE += @GZSTREAM_INCLUDE@
-
-  # if Tecplot is used, link against tecio.a
-  libmesh_LIBS    += @TECPLOT_LIBRARY@
-  libmesh_INCLUDE += @TECPLOT_INCLUDE@
-
-  # Link against the GMV APIs to read/write GMV files
-  #libmesh_LIBS    += @GMV_LIBRARY@
-  libmesh_INCLUDE += @GMV_INCLUDE@
-
-  # Link against the VTK APIs to read/write VTK files
-  ifeq ($(enable-vtk),yes)
-    libmesh_LIBS    += @VTK_LIBRARY@
-    libmesh_INCLUDE += @VTK_INCLUDE@
-  endif
-
-  # Link against the GLPK APIs to perform linear programs
-  ifeq ($(enable-glpk),yes)
-    libmesh_LIBS    += @GLPK_LIBRARY@
-    libmesh_INCLUDE += @GLPK_INCLUDE@
-  endif
-
-  # Add Eigen header files to include paths
-  ifeq ($(enable-eigen),yes)
-    libmesh_INCLUDE += @EIGEN_INCLUDE@
-  endif
-
-  # if TetGen is used:
-  ifeq ($(enable-tetgen),yes)
-    #libmesh_LIBS     += @TETGEN_LIBRARY@
-    libmesh_INCLUDE  += @TETGEN_INCLUDE@
-  endif
-
-  # if Triangle is used:
-  ifeq ($(enable-triangle),yes)
-    #libmesh_LIBS     += @TRIANGLE_LIBRARY@
-    libmesh_INCLUDE  += @TRIANGLE_INCLUDE@
-  endif
-
-  # if Exodus is used we need the header path
-  # and the lib
-  ifeq ($(enable-exodus),yes)
-    #libmesh_LIBS    += @EXODUS_LIBRARY@
-    libmesh_INCLUDE += @EXODUS_INCLUDE@
-  endif
-
-  # if netCDF is used, link against libnetcdf.a
-  # (note that netCDF is required by exodus if available,
-  # so we need to link to this _after_ exodus.
-  ifeq ($(enable-netcdf),yes)
-    #libmesh_LIBS    += @NETCDF_LIBRARY@
-    libmesh_INCLUDE += @NETCDF_INCLUDE@
-  endif
-
-  # if Nemesis is used we need the header path
-  # and the lib
-  ifeq ($(enable-nemesis),yes)
-    #libmesh_LIBS    += @NEMESIS_LIBRARY@
-    libmesh_INCLUDE += @NEMESIS_INCLUDE@
-  endif
-
-  # if libHilbert is used we need the header path
-  # and the lib
-  ifeq ($(enable-libhilbert),yes)
-    #libmesh_LIBS    += @LIBHILBERT_LIBRARY@
-    libmesh_INCLUDE += @LIBHILBERT_INCLUDE@
-  endif
-
-  # if fparser is used we need the header path
-  #  and the lib
-  ifeq ($(enable-fparser),yes)
-    #libmesh_LIBS    += @FPARSER_LIBRARY@
-    libmesh_INCLUDE += @FPARSER_INCLUDE@
-  endif
-
-  # Trilinos - at a minimum, we support the 
-  # AztecOO linear solvers and requisite Epetra
-  # data structures
-  ifeq ($(enable-aztecoo),yes)
-      #include @AZTECOO_MAKEFILE_EXPORT@
-      #libmesh_LIBS    += $(AZTECOO_LIBS)
-      #libmesh_INCLUDE += $(AZTECOO_INCLUDES)
-
-      libmesh_LIBS    += @AZTECOO_LIBS@
-      libmesh_INCLUDE += @AZTECOO_INCLUDES@
-
-      # Nox, an additional option if AztecOO is present
-      ifeq ($(enable-nox),yes)
-          #include @NOX_MAKEFILE_EXPORT@
-          #libmesh_LIBS    += $(NOX_LIBS)
-          #libmesh_INCLUDE += $(NOX_INCLUDES)
-
-          libmesh_LIBS     += @NOX_LIBS@
-          libmesh_INCLUDE  += @NOX_INCLUDES@
-          libmesh_CPPFLAGS += -DHAVE_CONFIG_H
-      endif
-
-      # ML, an additional option if AztecOO is present
-      ifeq ($(enable-ml),yes)
-          #include @ML_MAKEFILE_EXPORT@
-          #libmesh_LIBS    += $(ML_LIBS)
-          #libmesh_INCLUDE += $(ML_INCLUDES)
-
-          libmesh_LIBS    += @ML_LIBS@
-          libmesh_INCLUDE += @ML_INCLUDES@
-      endif
-  endif	
-
-  ifeq ($(enable-trilinos-10),yes)
-      #include @TRILINOS_MAKEFILE_EXPORT@
-      #libmesh_LIBS    += $(Trilinos_LIBRARIES) $(Trilinos_LIBRARY_DIRS) $(Trilinos_TPL_LIBRARIES) $(Trilinos_TPL_LIBRARY_DIRS)
-      #libmesh_INCLUDE += $(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS)      	
-
-      libmesh_LIBS    += @TRILINOS_LIBS@
-      libmesh_INCLUDE += @TRILINOS_INCLUDES@
-  endif	
-
+#           libmesh_LIBS     += @NOX_LIBS@
+#           libmesh_INCLUDE  += @NOX_INCLUDES@
+#           libmesh_CPPFLAGS += -DHAVE_CONFIG_H
+#       endif
 
   #############################################################################
   # SLEPc
@@ -474,77 +306,6 @@ ifeq ($(enable-optional),yes)
     # libmesh_DLFLAGS += $(SLEPC_LIB)
 
   endif #end ifeq ($(enable-slepc),yes)
-
-
-  #############################################################################
-  # Petsc
-  ifeq ($(enable-petsc),yes)
-
-    # define BOPT first since it may be used in the packages file
-    ifeq ($(enable-complex),yes)
-      libmesh_CPPFLAGS     += -DPETSC_USE_COMPLEX
-      PETSC_BOPT.g = g_complex
-      PETSC_BOPT.o = O_complex
-    else
-      PETSC_BOPT.g = g
-      PETSC_BOPT.o = O
-    endif
-
-    ifeq ($(debug-mode),on)
-      BOPT = $(PETSC_BOPT.g)
-    else
-      BOPT = $(PETSC_BOPT.o)
-    endif
-    # Depending on petsc version, we include different files
-    ifeq ($(petsc-version),2.1.0)
-      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
-    else
-      C_CLINKER_SLFLAG = $(libmesh_RPATHFLAG)# necessary for PETSc >= 2.1.6
-      ifeq ($(petsc-major),3)  # 3.0.x & newer style
-        include $(PETSC_DIR)/conf/variables
-      else
-        include $(PETSC_DIR)/bmake/common/variables  # 2.1.1 or later style
-      endif      
-    endif
-
-#     # As of PETSc 2.1.x we can extract the libraries and include paths
-#     # from the PETSc make file
-#     LIBS    += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getlinklibs`
-#     INCLUDE += `$(MAKE) -C $(PETSC_DIR) BOPT=$(BOPT) getincludedirs`
-
-    #                    (needed by all petsc)  (needed by versions <= 2.3.3)      (needed by versions >= 3.0.0)
-    libmesh_INCLUDE += -I$(PETSC_DIR)/include -I$(PETSC_DIR)/bmake/$(PETSC_ARCH) -I$(PETSC_DIR)/$(PETSC_ARCH)/include \
-                         $(BLOCKSOLVE_INCLUDE) $(HYPRE_INCLUDE) $(PACKAGES_INCLUDES)
-
-    # Depending on petsc version, libs live in different locations
-    ifeq ($(petsc-major-minor),2.3.x) # 2.3.x does not use BOPT, has lib/ARCH/...
-      PETSC_LIB = $(PETSC_DIR)/lib/$(PETSC_ARCH)
-    else
-      ifeq ($(petsc-major),3) # 3.0.x & newer does not use BOPT, has ARCH/lib/...
-        PETSC_LIB = $(PETSC_DIR)/$(PETSC_ARCH)/lib
-      else # old-schol lib/lib$BOPT/ARCH format
-        PETSC_LIB = $(PETSC_DIR)/lib/lib$(BOPT)/$(PETSC_ARCH)
-      endif
-    endif
-
-    ifeq ($(enable-shared),yes)
-      libmesh_CPPFLAGS     += -DPETSC_USE_DYNAMIC_LIBRARIES
-      # libmesh_DLFLAGS      += $(libmesh_RPATHFLAG)$(PETSC_LIB)
-    endif
-
-    # Get required PETSc link options from their variables
-    libmesh_LIBS += $(PETSC_SNES_LIB)
-
-  endif #end ifeq ($(enable-petsc),yes)
-
-  #############################################################################
-  # SLEPc again. When linking slepc-2.3.x to external libraries
-  # e.g. ARPACK this needs to be included after PETSc.
-  ifeq ($(enable-slepc),yes)
-    ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
-      include $(SLEPC_DIR)/bmake/slepc_common_variables
-    endif
-  endif
 
   # MPI configuration when Petsc is absent
   libmesh_LIBS    += $(MPI_LIB)

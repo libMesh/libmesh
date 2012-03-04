@@ -3,8 +3,22 @@
 AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 [
 
+
+# initialize these empty - append below
+# note that 
+# libmesh_optional_INCLUDES and 
+# libmesh_optional_LIBS should point to third party packages
+# outside the libMesh source and installation tree, and will
+# be exported to the installation environment.  
+#
+# By contrast, libmesh_contrib_INCLUDES point inside the 
+# source tree for building contributed packages that do not 
+# need to be exported as part of the installation environment.
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
+libmesh_contrib_INCLUDES=""
+
+
 
 # --------------------------------------------------------------
 # Allow for disable-optional
@@ -280,5 +294,6 @@ fi
 # substitute values
 AC_SUBST(libmesh_optional_INCLUDES)
 AC_SUBST(libmesh_optional_LIBS)
+AC_SUBST(libmesh_contrib_INCLUDES)
 
 ])

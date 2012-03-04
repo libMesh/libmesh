@@ -73,7 +73,7 @@ SUBDIRS = include #src include
 AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-INCLUDES    = $(libmesh_INCLUDE)
+INCLUDES    = $(libmesh_INCLUDE) $(libmesh_contrib_INCLUDES)
 LIBS        = $(libmesh_LIBS)
 
 # A convenience library to hold proper libMesh 
@@ -81,9 +81,6 @@ LIBS        = $(libmesh_LIBS)
 # sources to create the final library.
 lib_LTLIBRARIES = libmesh.la
 
-#libmesh_la_CPPFLAGS = $(libmesh_CPPFLAGS)
-#libmesh_la_CXXFLAGS = $(libmesh_CXXFLAGS)
-#libmesh_la_CFLAGS   = $(libmesh_CFLAGS)
 libmesh_la_LIBADD = # start empty, append below
 libmesh_la_SOURCES = \
 		src/base/dof_map.C \

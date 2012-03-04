@@ -59,6 +59,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
                      AC_DEFINE(HAVE_TECPLOT_API, 1,
                                [Flag indicating whether the library shall be compiled to use the Tecplot interface])
                      AC_MSG_RESULT(<<< Configuring library with Tecplot API support >>>)
+		     libmesh_contrib_INCLUDES="$TECPLOT_INCLUDE $libmesh_contrib_INCLUDES"
                   ],
                   [
                      AC_MSG_RESULT( [WARNING: Found $TECPLOT_LIBRARY_PATH/tecio.a but cannot link with it!] )

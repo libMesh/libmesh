@@ -22,6 +22,7 @@ AC_DEFUN([CONFIGURE_METIS],
      #METIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
      AC_DEFINE(HAVE_METIS, 1, [Flag indicating whether the library will be compiled with Metis support])
      AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
+     libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"
   else
      METIS_INCLUDE=""
      #METIS_LIBRARY=""

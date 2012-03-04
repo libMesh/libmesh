@@ -22,6 +22,7 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
      #TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(libext)"
      AC_DEFINE(HAVE_TRIANGLE, 1, [Flag indicating whether the library will be compiled with Triangle support])
      AC_MSG_RESULT(<<< Configuring library with Triangle support >>>)
+     libmesh_contrib_INCLUDES="$TRIANGLE_INCLUDE $libmesh_contrib_INCLUDES"
   else
      TRIANGLE_INCLUDE=""
      #TRIANGLE_LIBRARY=""

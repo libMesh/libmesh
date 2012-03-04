@@ -21,6 +21,7 @@ AC_DEFUN([CONFIGURE_NETCDF],
      NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/Lib"
      AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
      AC_MSG_RESULT(<<< Configuring library with Netcdf support >>>)
+     libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"
      have_netcdf=yes
   else
      NETCDF_INCLUDE=""

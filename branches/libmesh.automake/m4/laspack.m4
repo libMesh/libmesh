@@ -21,7 +21,8 @@ AC_DEFUN([CONFIGURE_LASPACK],
      LASPACK_INCLUDE="-I\$(top_srcdir)/contrib/laspack"
      #LASPACK_LIBRARY="\$(EXTERNAL_LIBDIR)/liblaspack\$(libext)"
      AC_DEFINE(HAVE_LASPACK, 1, [Flag indicating whether the library will be compiled with LASPACK support])
-     AC_MSG_RESULT(<<< Configuring library with LASPACK support >>>)
+     AC_MSG_RESULT(<<< Configuring library with Laspack support >>>)
+     libmesh_contrib_INCLUDES="$LASPACK_INCLUDE $libmesh_contrib_INCLUDES"
   else
      LASPACK_INCLUDE=""
      #LASPACK_LIBRARY=""

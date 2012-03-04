@@ -22,6 +22,7 @@ AC_DEFUN([CONFIGURE_GMV],
      #GMV_LIBRARY="\$(EXTERNAL_LIBDIR)/libgmv\$(libext)"
      AC_DEFINE(HAVE_GMV, 1, [Flag indicating whether the library will be compiled with GMV support])
      AC_MSG_RESULT(<<< Configuring library with GMV support >>>)
+     libmesh_contrib_INCLUDES="$GMV_INCLUDE $libmesh_contrib_INCLUDES"
   else
      GMV_INCLUDE=""
      #GMV_LIBRARY=""

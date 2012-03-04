@@ -22,6 +22,7 @@ AC_DEFUN([CONFIGURE_SFC],
      #SFC_LIBRARY="\$(EXTERNAL_LIBDIR)/libsfc\$(libext)"
      AC_DEFINE(HAVE_SFC, 1, [Flag indicating whether the library will be compiled with SFC support])
      AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
+     libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
   else
      SFC_INCLUDE=""
      #SFC_LIBRARY=""
