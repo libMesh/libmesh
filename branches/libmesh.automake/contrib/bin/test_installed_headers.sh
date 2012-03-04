@@ -6,12 +6,20 @@ set -e
 rescol=65;
 
 # Terminal commands for setting the color
-gotocolumn="\033["$rescol"G";
-white="\033[01;37m";
-green="\033[01;32m";
-red="\033[01;31m";
-#grey="\033[00;37m";
-colorreset="\033[m"; # Terminal command to reset to terminal default
+gotocolumn=;
+white=;
+green=;
+red=;
+grey=;
+colorreset=;
+if (test "X$TERM" != Xdumb); then
+  gotocolumn="\033["$rescol"G";
+  white="\033[01;37m";
+  green="\033[01;32m";
+  red="\033[01;31m";
+  grey="\033[00;37m";
+  colorreset="\033[m"; # Terminal command to reset to terminal default
+fi
 
 #echo "CXX=$CXX"
 

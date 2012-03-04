@@ -90,7 +90,7 @@ echo '  'xdr binary I/O.............. : $enablexdr
 ######################################################################################
 if test "x$enableoptional" = "xyes"; then
   echo
-  echo External Packages:
+  echo Optional Packages:
   echo '  'eigen....................... : $enableeigen
   echo '  'exodus...................... : $enableexodus
   echo '  'fparser..................... : $enablefparser
