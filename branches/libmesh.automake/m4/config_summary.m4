@@ -67,62 +67,35 @@ echo SVN revision number........... : $BUILD_VERSION
 
 
 ######################################################################################
-# echo
-# echo External Packages:
-
-# if test "x$enable_cantera" = "xyes"; then
-#   echo '   'Link with Cantera.......... : yes
-#   echo '      'CANTERA_INCLUDE......... : $CANTERA_INCLUDE
-#   echo '      'CANTERA_LIB............. : $CANTERA_LIB
-#   echo 
-# else
-#   echo '   'Link with Cantera.......... : no
-# fi
-
-# if test "x$HAVE_CHEMAY" = "x1"; then
-#   echo '   'Link with Chemay........... : yes
-#   echo '      'CHEMAY_CPPFLAGS......... : $CHEMAY_CPPFLAGS
-#   echo '      'CHEMAY_LIBS............. : $CHEMAY_LIBS
-#   echo 
-# else
-#   echo '   'Link with Chemay........... : no
-# fi
-
-# if test "x$ENABLE_ABLATION" = "x1"; then
-#   echo '   'PECOS Ablating surfaces.... : yes
-#   echo '      'ABLATION_CFLAGS......... : $ABLATION_CFLAGS
-#   echo '      'ABLATION_LIBS........... : $ABLATION_LIBS
-#   echo 
-# else
-#   echo '   'PECOS Ablating surfaces.... : no
-# fi
-
-# if test "x$enable_boost" = "xyes"; then
-#   echo '   'Link with Boost............ : yes
-#   echo '      'BOOST_CPPFLAGS.......... : $BOOST_CPPFLAGS
-#   echo '      'Boost LD Flags.......... : $BOOST_UNIT_TEST_FRAMEWORK_LDFLAGS
-#   echo '      'Boost Unit Test......... : yes
-#   echo
-# else
-#   echo '   'Link with Boost............ : no
-
-# fi	
-
-# if test "x$HAVE_MASA" = "x1"; then
-#   echo '   'Link with MASA............. : yes
-#   echo '      'MASA_CXXFLAGS........... : $MASA_CXXFLAGS
-#   echo '      'MASA_LIBS............... : $MASA_LIBS
-#   echo
-# else
-#   echo '   'Link with MASA............. : no
-# fi
-
-# if test "x$HAVE_GCOV_TOOLS" = "x1"; then
-#   echo '   'Enable gcov code coverage.. : yes
-# else
-#   echo '   'Enable gcov code coverage.. : no
-# fi
-
+if test "x$enableoptional" = "xyes"; then
+  echo
+  echo External Packages:
+  echo '  'eigen....................... : $enableeigen
+  echo '  'exodus...................... : $enableexodus
+  echo '  'fparser..................... : $enablefparser
+  echo '  'glpk........................ : $enableglpk
+  echo '  'gmv......................... : $enablegmv
+  echo '  'gzstream.................... : $enablegz
+  echo '  'laspack..................... : $enablelaspack
+  echo '  'libhilbert.................. : $enablelibhilbert
+  echo '  'metis....................... : $enablemetis
+  echo '  'mpi......................... : $enablempi
+  echo '  'nemesis..................... : $enablenemesis
+  echo '  'netcdf...................... : $enablenetcdf
+  echo '  'openmp...................... : $enableopenmp
+  echo '  'parmetis.................... : $enableparmetis
+  echo '  'petsc....................... : $enablepetsc
+  echo '  'sfcurves.................... : $enablesfc
+  echo '  'slepc....................... : $enableslepc
+  echo '  'tbb......................... : $enabletbb
+  echo '  'tetgen...................... : $enabletetgen
+  echo '  'triangle.................... : $enabletriangle
+  echo '  'trilinos.................... : $enabletrilinos
+  echo '  'vtk......................... : $enablevtk
+  echo
+  echo '  'libmesh_optional_INCLUDES... : $libmesh_optional_INCLUDES
+  echo '  'libmesh_optional_LIBS....... : $libmesh_optional_LIBS
+fi
 		   
 echo
 echo '-------------------------------------------------------------------------------'
