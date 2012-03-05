@@ -5,6 +5,7 @@
 
 
 AC_INIT([libmesh], [0.7.3rc1], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
+AC_PREREQ([2.61]) # require autoconf 2.61 - I havent tried anything older
 
 # by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
 # this causes a problem if we then declare a different optimization level. So
@@ -50,8 +51,8 @@ AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h
 # Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
 AX_PREFIX_CONFIG_H(include/base/libmesh_config.h,LIBMESH,include/base/libmesh_config.h.tmp)
 
-AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
+AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar 1.10]) # require automake 1.10 - I havent tried anything older
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) # use silent rules where available - automake 1.11
 
 
 
