@@ -120,7 +120,9 @@ AC_DEFUN([CONFIGURE_GLPK],
          GLPK_INCLUDE="-I$GLPK_INC"
          GLPK_LIBRARY="-L$GLPK_LIB -lglpk"
 	 if (test "x$RPATHFLAG" != "x" -a -d $GLPK_LIB); then # add the GLPK_LIB to the linker run path, if it is a directory
-	   GLPK_LIBRARY="${RPATHFLAG}${GLPK_LIB} $GLPK_LIBRARY"
+	   if (test "$GLPK_LIB" != "/usr/lib" -a "$GLPK_LIB" != "/usr/lib64"); then
+	      GLPK_LIBRARY="${RPATHFLAG}${GLPK_LIB} $GLPK_LIBRARY"
+	   fi				    
 	 fi
          AC_DEFINE(HAVE_GLPK, 1, [Flag indicating whether the library will be compiled with GLPK support])
          AC_MSG_RESULT(<<< Configuring library with GLPK support >>>)
