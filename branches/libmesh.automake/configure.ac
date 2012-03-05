@@ -12,6 +12,9 @@ AC_INIT([libmesh], [0.7.3rc1], [libmesh-users@lists.sourceforge.net], [libmesh],
 : ${CFLAGS=""}
 : ${CXXFLAGS=""}
 
+# Infer the source directory as the path to the ./configure script
+srcdir=`dirname $0`
+
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----------- Configuring libMesh -------------)
 AC_MSG_RESULT(---------------------------------------------)
@@ -31,14 +34,16 @@ AC_CONFIG_FILES([Make.common
                  Makefile
 		 include/Makefile
 		 examples/Makefile
+		 doc/Doxyfile
 		 libmesh.pc
 		 ])
 		 
-AC_CONFIG_FILES(doc/Doxyfile)
-AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
-AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
-AC_CONFIG_FILES(contrib/bin/create_libmesh_release, [chmod +x contrib/bin/create_libmesh_release])
-AC_CONFIG_FILES(doc/dot,                            [chmod +x doc/dot])
+AC_CONFIG_FILES(contrib/bin/libmesh-config,          [chmod +x contrib/bin/libmesh-config])
+#AC_CONFIG_FILES(contrib/bin/strip_dup_libs.pl,       [chmod +x contrib/bin/strip_dup_libs.pl])
+#AC_CONFIG_FILES(contrib/bin/strip_dup_incl_paths.pl, [chmod +x contrib/bin/strip_dup_incl_paths.pl])
+AC_CONFIG_FILES(contrib/bin/xda2mgf,                 [chmod +x contrib/bin/xda2mgf])
+AC_CONFIG_FILES(contrib/bin/create_libmesh_release,  [chmod +x contrib/bin/create_libmesh_release])
+AC_CONFIG_FILES(doc/dot,                             [chmod +x doc/dot])
 
 # Create a temporary file with e.g. HAVE_MPI
 AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h.in)
@@ -79,7 +84,6 @@ LIBMESH_SET_METHOD
 
 LT_INIT([disable-static])
 
-
 LIBMESH_COMPILER_FEATURES
 
 # --------------------------------------------------------------
@@ -111,6 +115,17 @@ AC_SUBST(METHOD)
 # Portable symbolic links
 # --------------------------------------------------------------
 AC_PROG_LN_S
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# Perl - look for perl.  Perl is used to generate dependencies
+# -------------------------------------------------------------
+AC_PATH_PROG(PERL, perl)
+AC_SUBST(PERL)
+# -------------------------------------------------------------
+
 
 
 # --------------------------------------------------------------
@@ -173,13 +188,6 @@ LIBMESH_CORE_FEATURES
 LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 
 
-
-# -------------------------------------------------------------
-# Perl - look for perl.  Perl is used to generate dependencies
-# -------------------------------------------------------------
-AC_PATH_PROG(PERL, perl)
-AC_SUBST(PERL)
-# -------------------------------------------------------------
 
 # Query configuration environment
 AX_SUMMARIZE_ENV

@@ -10,7 +10,9 @@ ACLOCAL_AMFLAGS  = -I m4
 
 # additional files which must be included in 'make dist'
 EXTRA_DIST = license \
-             reference_elements
+             reference_elements \
+	     contrib/bin/strip_dup_incl_paths.pl \
+	     contrib/bin/strip_dup_libs.pl
 
 nobase_data_DATA = \
 	reference_elements/2D/one_quad.xda \

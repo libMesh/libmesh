@@ -291,6 +291,21 @@ if test "$enableoptional" != no ; then
    AC_MSG_RESULT(----------------------------------------------)
 fi
 
+# clean up values, if we have perl.  This step is purely cosmetic, but
+# helps create readable (and easier to debug) compile and link lines
+# by stripping out repeated entries.  This can happen for example when
+# several optional packages all want to include and link agains the
+# same MPI.
+if (test -x $PERL); then
+  if (test -f $srcdir/contrib/bin/strip_dup_incl_paths.pl); then
+     AC_MSG_RESULT(removing duplicate include paths...)
+     libmesh_optional_INCLUDES=`$(PERL) $srcdir/contrib/bin/strip_dup_incl_paths.pl $libmesh_optional_INCLUDES`
+  fi   
+  if (test -f $srcdir/contrib/bin/strip_dup_libs.pl); then
+     AC_MSG_RESULT(removing duplicate libraries...)
+     libmesh_optional_LIBS=`$(PERL) $srcdir/contrib/bin/strip_dup_libs.pl $libmesh_optional_LIBS`
+  fi   
+fi
 # substitute values
 AC_SUBST(libmesh_optional_INCLUDES)
 AC_SUBST(libmesh_optional_LIBS)
