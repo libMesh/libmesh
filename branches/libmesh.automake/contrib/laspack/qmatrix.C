@@ -177,7 +177,7 @@ void Q_SetName(QMatrix *Q, const char *Name)
     }
 }
 
-char *Q_GetName(QMatrix *Q)
+const char *Q_GetName(QMatrix *Q)
 /* returns the name of the matrix Q */
 {
     if (LASResult() == LASOK)

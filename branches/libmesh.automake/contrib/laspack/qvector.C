@@ -75,7 +75,7 @@ void V_SetName(QVector *V, const char *Name)
     }
 }
 
-char *V_GetName(QVector *V)
+const char *V_GetName(QVector *V)
 /* returns the name of the vector V */
 {
     if (LASResult() == LASOK)
