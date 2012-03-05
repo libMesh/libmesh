@@ -299,11 +299,11 @@ fi
 if (test -x $PERL); then
   if (test -f $srcdir/contrib/bin/strip_dup_incl_paths.pl); then
      AC_MSG_RESULT(removing duplicate include paths...)
-     libmesh_optional_INCLUDES=`$(PERL) $srcdir/contrib/bin/strip_dup_incl_paths.pl $libmesh_optional_INCLUDES`
+     libmesh_optional_INCLUDES=`$PERL $srcdir/contrib/bin/strip_dup_incl_paths.pl $libmesh_optional_INCLUDES`
   fi   
   if (test -f $srcdir/contrib/bin/strip_dup_libs.pl); then
      AC_MSG_RESULT(removing duplicate libraries...)
-     libmesh_optional_LIBS=`$(PERL) $srcdir/contrib/bin/strip_dup_libs.pl $libmesh_optional_LIBS`
+     libmesh_optional_LIBS=`$PERL $srcdir/contrib/bin/strip_dup_libs.pl $libmesh_optional_LIBS`
   fi   
 fi
 # substitute values
