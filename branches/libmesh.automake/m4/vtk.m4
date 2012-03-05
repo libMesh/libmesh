@@ -31,10 +31,10 @@ AC_DEFUN([CONFIGURE_VTK],
         if test -d $VTK_INCLUDE ; then
           VTK_INC=$VTK_INCLUDE
 	fi	
-      elif test "x$VTK_DIR" != x; then
-        VTK_INC=$VTK_DIR/include
       elif (test -d $VTK_LS_CHECK); then
         VTK_INC=$VTK_LS_CHECK
+      elif test "x$VTK_DIR" != x; then
+        VTK_INC=$VTK_DIR/include
       else
         VTK_INC="/usr/include/vtk"
       fi
