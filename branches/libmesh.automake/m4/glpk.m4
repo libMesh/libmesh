@@ -41,6 +41,8 @@ AC_DEFUN([CONFIGURE_GLPK],
       echo "Environment GLPK_INC=$GLPK_INC"
     elif test "x$GLPK_DIR" != x -a -f $GLPK_DIR/include/glpk.h; then
       GLPK_INC="$GLPK_DIR/include"
+    elif test -f /usr/include/glpk/glpk.h; then # RHEL6 puts glpk here
+      GLPK_INC="/usr/include/glpk"
     elif test -f /usr/local/include/glpk.h; then
       GLPK_INC="/usr/local/include"
     else
@@ -53,6 +55,12 @@ AC_DEFUN([CONFIGURE_GLPK],
       echo "Environment GLPK_LIB=$GLPK_INC"
     elif test "x$GLPK_DIR" != x; then
       GLPK_LIB="$GLPK_DIR/lib"
+    elif test -f /usr/include/glpk/glpk.h; then # RHEL6 puts glpk here
+      if test -f /usr/lib64/libglpk.so -o -f /usr/lib64/libglpk.a; then 
+        GLPK_LIB="/usr/lib64"
+      elif test -f /usr/lib/libglpk.so -o -f /usr/lib/libglpk.a; then
+        GLPK_LIB="/usr/lib"
+      fi
     elif test -f /usr/local/include/glpk.h; then
       GLPK_LIB="/usr/local/lib"
     else
@@ -110,7 +118,10 @@ AC_DEFUN([CONFIGURE_GLPK],
        dnl If both the header file and the required libs were found, continue.
        if (test $enableglpk = yes); then
          GLPK_INCLUDE="-I$GLPK_INC"
-         GLPK_LIBRARY="\$(libmesh_RPATHFLAG)$GLPK_LIB -L$GLPK_LIB -lglpk"
+         GLPK_LIBRARY="-L$GLPK_LIB -lglpk"
+	 if (test "x$RPATHFLAG" != "x" -a -d $GLPK_LIB); then # add the GLPK_LIB to the linker run path, if it is a directory
+	   GLPK_LIBRARY="${RPATHFLAG}${GLPK_LIB} $GLPK_LIBRARY"
+	 fi
          AC_DEFINE(HAVE_GLPK, 1, [Flag indicating whether the library will be compiled with GLPK support])
          AC_MSG_RESULT(<<< Configuring library with GLPK support >>>)
 	 libmesh_optional_INCLUDES="$GLPK_INCLUDE $libmesh_optional_INCLUDES"

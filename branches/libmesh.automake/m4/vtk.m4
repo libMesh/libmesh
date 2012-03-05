@@ -130,7 +130,10 @@ AC_DEFUN([CONFIGURE_VTK],
        dnl If both the header file and the required libs were found, continue.
        if (test x$enablevtk = xyes); then
          VTK_INCLUDE="-I$VTK_INC"
-         VTK_LIBRARY="\$(libmesh_RPATHFLAG)$VTK_LIB -L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+         VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
+	   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
+	 fi
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
          AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
 	 
