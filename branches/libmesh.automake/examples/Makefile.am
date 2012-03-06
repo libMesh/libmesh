@@ -14,7 +14,7 @@ EXTRA_DIST = run_common.sh
 
 check_PROGRAMS =
 check_SCRIPTS = 
-CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res out.exd #FIXME - tighten up!
+CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res out.exd miscellaneous_ex5.in #FIXME - tighten up!
 
 
 examples_source_path=$(top_srcdir)/examples
@@ -173,6 +173,59 @@ fem_system_ex1_DATA    = fem_system/fem_system_ex1/fem_system_ex1.C fem_system/f
 fem_system_ex1_SOURCES = $(fem_system_ex1_DATA) fem_system/fem_system_ex1/run.sh
 fem_system_ex1_LDADD   = $(top_builddir)/libmesh.la
 
+
+######################################################################
+#
+# Miscellaneous
+#
+check_PROGRAMS += miscellaneous_ex1
+miscellaneous_ex1dir      = $(examples_install_path)/miscellaneous/ex1
+miscellaneous_ex1_DATA    = miscellaneous/miscellaneous_ex1/miscellaneous_ex1.C
+miscellaneous_ex1_SOURCES = $(miscellaneous_ex1_DATA) miscellaneous/miscellaneous_ex1/run.sh
+miscellaneous_ex1_LDADD   = $(top_builddir)/libmesh.la
+
+if LIBMESH_ENABLE_INFINITE_ELEMENTS
+  check_SCRIPTS  += miscellaneous/miscellaneous_ex1/run.sh
+endif
+
+check_PROGRAMS += miscellaneous_ex2
+miscellaneous_ex2dir      = $(examples_install_path)/miscellaneous/ex2
+miscellaneous_ex2_DATA    = miscellaneous/miscellaneous_ex2/miscellaneous_ex2.C miscellaneous/miscellaneous_ex2/lshape.unv  miscellaneous/miscellaneous_ex2/lshape_data.unv
+miscellaneous_ex2_SOURCES = $(miscellaneous_ex2_DATA) miscellaneous/miscellaneous_ex2/run.sh
+miscellaneous_ex2_LDADD   = $(top_builddir)/libmesh.la
+
+if LIBMESH_ENABLE_COMPLEX
+  check_SCRIPTS  += miscellaneous/miscellaneous_ex2/run.sh
+endif
+
+
+check_PROGRAMS += miscellaneous_ex3
+miscellaneous_ex3dir      = $(examples_install_path)/miscellaneous/ex3
+miscellaneous_ex3_DATA    = miscellaneous/miscellaneous_ex3/miscellaneous_ex3.C adjoints/adjoints_ex1/lshaped.xda
+miscellaneous_ex3_SOURCES = $(miscellaneous_ex3_DATA) miscellaneous/miscellaneous_ex3/run.sh
+miscellaneous_ex3_LDADD   = $(top_builddir)/libmesh.la
+check_SCRIPTS  += miscellaneous/miscellaneous_ex3/run.sh
+
+check_PROGRAMS += miscellaneous_ex4
+miscellaneous_ex4dir      = $(examples_install_path)/miscellaneous/ex4
+miscellaneous_ex4_DATA    = miscellaneous/miscellaneous_ex4/miscellaneous_ex4.C
+miscellaneous_ex4_SOURCES = $(miscellaneous_ex4_DATA) miscellaneous/miscellaneous_ex4/run.sh
+miscellaneous_ex4_LDADD   = $(top_builddir)/libmesh.la
+check_SCRIPTS  += miscellaneous/miscellaneous_ex4/run.sh
+
+check_PROGRAMS += miscellaneous_ex5
+miscellaneous_ex5dir      = $(examples_install_path)/miscellaneous/ex5
+miscellaneous_ex5_DATA    = miscellaneous/miscellaneous_ex5/miscellaneous_ex5.C adjoints/adjoints_ex1/lshaped.xda miscellaneous/miscellaneous_ex5/lshaped3D.xda miscellaneous/miscellaneous_ex5/miscellaneous_ex5.in
+miscellaneous_ex5_SOURCES = $(miscellaneous_ex5_DATA) miscellaneous/miscellaneous_ex5/run.sh
+miscellaneous_ex5_LDADD   = $(top_builddir)/libmesh.la
+check_SCRIPTS  += miscellaneous/miscellaneous_ex5/run.sh
+
+check_PROGRAMS += miscellaneous_ex6
+miscellaneous_ex6dir      = $(examples_install_path)/miscellaneous/ex6
+miscellaneous_ex6_DATA    = miscellaneous/miscellaneous_ex6/miscellaneous_ex6.C
+miscellaneous_ex6_SOURCES = $(miscellaneous_ex6_DATA) miscellaneous/miscellaneous_ex6/run.sh
+miscellaneous_ex6_LDADD   = $(top_builddir)/libmesh.la
+check_SCRIPTS  += miscellaneous/miscellaneous_ex6/run.sh
 
 
 ######################################################################

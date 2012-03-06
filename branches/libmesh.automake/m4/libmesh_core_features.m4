@@ -242,6 +242,9 @@ if test "$enableifem" != no ; then
            [Flag indicating if the library should be built with infinite elements])
   AC_MSG_RESULT(<<< Configuring library with infinite elements >>>)
 fi
+
+AM_CONDITIONAL(LIBMESH_ENABLE_INFINITE_ELEMENTS, test x$enableifem != no )
+
 # -------------------------------------------------------------
 
 
