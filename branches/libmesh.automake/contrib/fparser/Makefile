@@ -1,7 +1,5 @@
 
-LIBMESH_DIR ?= ../..
-
-include $(LIBMESH_DIR)/Make.common
+include ../../Make.common
 
 # Package name and additional flags required for library compilation
 pkgname  := fparser
@@ -95,7 +93,7 @@ BOOST_THREAD_LIB = -lboost_thread-mt
 endif
 endif
 
-fp_CPPFLAGS += -I$(LIBMESH_DIR)/contrib/fparser
+fp_CPPFLAGS += -I.
 
 SRC = 	fparser.cc \
 		fpoptimizer/grammar_data.cc \
