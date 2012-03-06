@@ -20,40 +20,52 @@ if [ "$#" = "0" ] ; then
     usage $0
 fi
 
-echo_list=""
+return_val=""
 
 #
 # Process the command-line arguments, build up
-# echo_list
+# return_val
 #
 while [ "x$1" != "x" ]; do
     case "$1" in
 	"--cxx")
-	    echo_list="echo_cxx $echo_list"
+	    return_val="@CXX@ $return_val"
 	    ;;
 
 	"--cc")
-	    echo_list="echo_cc $echo_list"
+	    return_val="@CC@ $return_val"
+	    ;;
+
+	"--f77")
+	    return_val="@F77@ $return_val"
+	    ;;
+
+	"--fc")
+	    return_val="@FC@ $return_val"
 	    ;;
 
 	"--cppflags")
-	    echo_list="echo_cppflags $echo_list"
+	    return_val="@CPPFLAGS_METHOD@ $return_val"
 	    ;;
 	
 	"--cxxflags")
-	    echo_list="echo_cxxflags $echo_list"
+	    return_val="@CXXFLAGS_METHOD@ $return_val"
 	    ;;
 	
 	"--cflags")
-	    echo_list="echo_cflags $echo_list"
+	    return_val="@CFLAGS_METHOD@ $return_val"
+	    ;;
+	
+	"--fflags")
+	    return_val="@FFLAGS@ $return_val"
 	    ;;
 	
 	"--include")
-	    echo_list="echo_include $echo_list"
+	    return_val="@libmesh_optional_INCLUDES@ $return_val"
 	    ;;
 	
 	"--ldflags")
-	    echo_list="echo_ldflags $echo_list"
+	    return_val="@LDFLAGS@ $return_val"
 	    ;;
 	
 	*)
@@ -63,11 +75,7 @@ while [ "x$1" != "x" ]; do
     shift
 done
 
-
-#
-# Use make to process the echo_list
-#
-make --no-print-directory -C @PWD@ -f Makefile.const $echo_list
+echo $return_val
 
 # Local Variables:
 # mode: shell-script
