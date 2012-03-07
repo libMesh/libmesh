@@ -416,7 +416,7 @@ void System::project_solution (Number fptr(const Point& p,
                                              const Parameters& parameters,
                                              const std::string& sys_name,
                                              const std::string& unknown_name),
-                               Parameters& parameters) const
+                               const Parameters& parameters) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
@@ -429,10 +429,9 @@ void System::project_solution (Number fptr(const Point& p,
  * projections and nodal interpolations on each element.
  */
 void System::project_solution (FunctionBase<Number> *f,
-                               FunctionBase<Gradient> *g,
-                               Parameters* parameters) const
+                               FunctionBase<Gradient> *g) const
 {
-  this->project_vector(*solution, f, g, parameters);
+  this->project_vector(*solution, f, g);
 
   solution->localize(*current_local_solution, _dof_map->get_send_list());
 }
@@ -453,7 +452,7 @@ void System::project_vector (Number fptr(const Point& p,
                                            const Parameters& parameters,
                                            const std::string& sys_name,
                                            const std::string& unknown_name),
-                             Parameters& parameters,
+                             const Parameters& parameters,
                              NumericVector<Number>& new_vector) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
@@ -467,8 +466,7 @@ void System::project_vector (Number fptr(const Point& p,
  */
 void System::project_vector (NumericVector<Number>& new_vector,
                              FunctionBase<Number> *f,
-                             FunctionBase<Gradient> *g,
-                             Parameters *parameters) const
+                             FunctionBase<Gradient> *g) const
 {
   START_LOG ("project_vector()", "System");
 
@@ -477,9 +475,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
 		     this->get_mesh().active_local_elements_end(),
 		     1000),
      ProjectSolution(*this, f, g,
-		     parameters ?
-		       *parameters :
-                       this->get_equation_systems().parameters,
+                     this->get_equation_systems().parameters,
 		     new_vector)
     );
 
@@ -537,7 +533,7 @@ void System::boundary_project_solution
                  const Parameters& parameters,
                  const std::string& sys_name,
                  const std::string& unknown_name),
-   Parameters& parameters)
+   const Parameters& parameters)
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
@@ -554,10 +550,9 @@ void System::boundary_project_solution
   (const std::set<boundary_id_type> &b,
    const std::vector<unsigned int> &variables,
    FunctionBase<Number> *f,
-   FunctionBase<Gradient> *g,
-   Parameters* parameters)
+   FunctionBase<Gradient> *g)
 {
-  this->boundary_project_vector(b, variables, *solution, f, g, parameters);
+  this->boundary_project_vector(b, variables, *solution, f, g);
 
   solution->localize(*current_local_solution);
 }
@@ -581,7 +576,7 @@ void System::boundary_project_vector
                  const Parameters& parameters,
                  const std::string& sys_name,
                  const std::string& unknown_name),
-   Parameters& parameters,
+   const Parameters& parameters,
    NumericVector<Number>& new_vector) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
@@ -598,8 +593,7 @@ void System::boundary_project_vector
    const std::vector<unsigned int> &variables,
    NumericVector<Number>& new_vector,
    FunctionBase<Number> *f,
-   FunctionBase<Gradient> *g,
-   Parameters *parameters) const
+   FunctionBase<Gradient> *g) const
 {
   START_LOG ("boundary_project_vector()", "System");
 
@@ -608,9 +602,7 @@ void System::boundary_project_vector
 		     this->get_mesh().active_local_elements_end(),
 		     1000),
      BoundaryProjectSolution(b, variables, *this, f, g,
-		             parameters ?
-		               *parameters :
-                               this->get_equation_systems().parameters,
+                             this->get_equation_systems().parameters,
 		             new_vector)
     );
 
