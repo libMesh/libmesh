@@ -252,7 +252,8 @@ public:
   /**
    * Takes the \p _send_list vector (which may have duplicate entries)
    * and sorts it.  The duplicate entries are then removed, resulting in
-   * a sorted \p _send_list with unique entries.
+   * a sorted \p _send_list with unique entries.  Also calls any user-provided
+   * methods for adding to the send list.
    */
   void prepare_send_list ();
 
