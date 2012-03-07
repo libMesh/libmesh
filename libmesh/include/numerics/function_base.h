@@ -26,7 +26,7 @@
 
 // Local Includes
 #include "libmesh_common.h"
-
+#include "dense_vector.h" // required to instantiate a DenseVector<> below
 #include "auto_ptr.h"
 
 namespace libMesh
@@ -35,7 +35,6 @@ namespace libMesh
 
 
 // Forward Declarations
-template <typename T> class DenseVector;
 class Point;
 
 
@@ -203,6 +202,8 @@ Output FunctionBase<Output>::component (unsigned int i,
   (*this)(p, time, out);
   return out(i);
 }
+
+
 
 template <typename Output>
 inline
