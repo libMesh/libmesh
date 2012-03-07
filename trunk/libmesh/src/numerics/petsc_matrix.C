@@ -74,9 +74,9 @@ void PetscMatrix<T>::init (const unsigned int m,
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatSetFromOptions(_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = MatSeqAIJSetPreallocation(_mat, nnz, PETSC_NULL);
+  ierr = MatSeqAIJSetPreallocation(_mat, n_nz, PETSC_NULL);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = MatMPIAIJSetPreallocation(_mat, nnz, PETSC_NULL, noz, PETSC_NULL);
+  ierr = MatMPIAIJSetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   this->zero ();
