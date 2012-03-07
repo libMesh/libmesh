@@ -79,9 +79,9 @@ typedef std::map<unsigned int, Real,
  * a pointer-to-std::map; the destructor isn't virtual!
  */
 class DofConstraints : public std::map<unsigned int,
-                                       DofConstraintRow,
+                                       std::pair<DofConstraintRow,Number>,
                                        std::less<unsigned int>,
-                                       Threads::scalable_allocator<std::pair<const unsigned int, DofConstraintRow> > >
+                                       Threads::scalable_allocator<std::pair<const unsigned int, std::pair<DofConstraintRow,Number> > > >
 {
 };
 
@@ -103,9 +103,9 @@ typedef std::map<const Node *, Real,
  * a pointer-to-std::map; the destructor isn't virtual!
  */
 class NodeConstraints : public std::map<const Node *,
-                                       NodeConstraintRow,
-                                       std::less<const Node *>,
-                                       Threads::scalable_allocator<std::pair<const Node * const, NodeConstraintRow> > >
+                                        std::pair<NodeConstraintRow,Point>,
+                                        std::less<const Node *>,
+                                        Threads::scalable_allocator<std::pair<const Node * const, std::pair<NodeConstraintRow,Point> > > >
 {
 };
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -475,12 +475,23 @@ public:
   void process_constraints ();
 
   /**
-   * Adds a copy of the user-defined row to the constraint matrix.
+   * Adds a copy of the user-defined row to the constraint matrix, using
+   * an inhomogeneous right-hand-side for the constraint equation.
+   */
+  void add_constraint_row (const unsigned int dof_number,
+                           const DofConstraintRow& constraint_row,
+                           const Number constraint_rhs,
+                           const bool forbid_constraint_overwrite);
+
+  /**
+   * Adds a copy of the user-defined row to the constraint matrix, using
+   * a homogeneous right-hand-side for the constraint equation.
    * By default, produces an error if the DOF was already constrained.
    */
   void add_constraint_row (const unsigned int dof_number,
-			   const DofConstraintRow& constraint_row,
-			   const bool forbid_constraint_overwrite = true);
+                           const DofConstraintRow& constraint_row,
+                           const bool forbid_constraint_overwrite = true)
+    { add_constraint_row(dof_number, constraint_row, 0., forbid_constraint_overwrite); }
 
   /**
    * Returns an iterator pointing to the first DoF constraint row
@@ -593,6 +604,28 @@ public:
 					    DenseVector<Number>& rhs,
 					    std::vector<unsigned int>& elem_dofs,
 					    bool asymmetric_constraint_rows = true) const;
+  /**
+   * Constrains the element matrix and vector.  This method requires
+   * the element matrix to be square, in which case the elem_dofs
+   * correspond to the global DOF indices of both the rows and
+   * columns of the element matrix.  For this case the rows
+   * and columns of the matrix necessarily correspond to variables
+   * of the same approximation order.
+   *
+   * The heterogenous version of this method creates linear systems in
+   * which heterogenously constrained degrees of freedom will solve to
+   * their correct offset values, as would be appropriate for finding
+   * a solution to a linear problem in a single algebraic solve.  The
+   * non-heterogenous version of this method creates linear systems in
+   * which even heterogenously constrained degrees of freedom are
+   * solved without offset values taken into account, as would be
+   * appropriate for finding linearized updates to a solution in which
+   * heterogenous constraints are already satisfied.
+   */
+  void heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
+                                                           DenseVector<Number>& rhs,
+                                                           std::vector<unsigned int>& elem_dofs,
+                                                           bool asymmetric_constraint_rows = true) const;
 
   /**
    * Constrains a dyadic element matrix B = v w'.  This method
@@ -821,6 +854,21 @@ private:
   void build_constraint_matrix (DenseMatrix<Number>& C,
 				std::vector<unsigned int>& elem_dofs,
 				const bool called_recursively=false) const;
+
+  /**
+   * Build the constraint matrix C and the forcing vector H
+   * associated with the element degree of freedom indices elem_dofs.
+   * The optional parameter \p called_recursively should be left at
+   * the default value \p false.  This is used to handle the special
+   * case of an element's degrees of freedom being constrained in
+   * terms of other, local degrees of freedom.  The usual case is for
+   * an elements DOFs to be constrained by some other, external DOFs
+   * and/or Dirichlet conditions.
+   */
+  void build_constraint_matrix_and_vector (DenseMatrix<Number>& C,
+                                           DenseVector<Number>& H,
+                                           std::vector<unsigned int>& elem_dofs,
+                                           const bool called_recursively=false) const;
 
   /**
    * Finds all the DOFS associated with the element DOFs elem_dofs.
