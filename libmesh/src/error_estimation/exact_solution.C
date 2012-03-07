@@ -471,6 +471,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
     _equation_systems_fine->get_system(sys_name) :
     _equation_systems.get_system (sys_name);
 
+  const Real time = _equation_systems.get_system(sys_name).time;
+
   const unsigned int sys_num = computed_system.number();
   const unsigned int var = computed_system.variable_number(unknown_name);
   const unsigned int var_component =
@@ -517,13 +519,6 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
   // Zero the error before summation
   error_vals = std::vector<Real>(5, 0.);
-
-  // Get the current time, in case the exact solution depends on it.
-  // Steady systems of equations do not have a time parameter, so this
-  // routine needs to take that into account.
-
-  const Real time = _equation_systems.parameters.have_parameter<Real>("time") ?
-                    _equation_systems.parameters.get<Real>("time") : 0.;
 
   // Construct Quadrature rule based on default quadrature order
   const FEType& fe_type  = computed_dof_map.variable_type(var);
