@@ -26,6 +26,7 @@ noinst_HEADERS = \
 # to a user.  Consider these the public interface of libMesh.
 nobase_include_HEADERS = \
 		base/auto_ptr.h \
+	        base/dirichlet_boundaries.h \
 		base/dof_map.h \
 		base/dof_object.h \
 		base/factory.h \

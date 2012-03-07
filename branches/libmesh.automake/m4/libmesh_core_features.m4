@@ -128,6 +128,24 @@ fi
 
 
 # -------------------------------------------------------------
+# Dirichlet BC constraints -- enabled by default
+# -------------------------------------------------------------
+AC_ARG_ENABLE(dirichlet,
+              AC_HELP_STRING([--enable-dirichlet],
+                             [build with Dirichlet boundary constraint support]),
+              enabledirichlet=$enableval,
+              enabledirichlet=yes)
+
+if test "$enabledirichlet" != no ; then
+  AC_DEFINE(ENABLE_DIRICHLET, 1,
+           [Flag indicating if the library should be built with Dirichlet boundary constraint support])
+  AC_MSG_RESULT(<<< Configuring library with Dirichlet constraint support >>>)
+fi
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # NodeConstraints -- disabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(nodeconstraint,
@@ -139,7 +157,7 @@ AC_ARG_ENABLE(nodeconstraint,
 if test "$enablenodeconstraint" != no ; then
   AC_DEFINE(ENABLE_NODE_CONSTRAINTS, 1,
            [Flag indicating if the library should be built with node constraints support])
-  AC_MSG_RESULT(<<< Configuring library with nodeconstraints support >>>)
+  AC_MSG_RESULT(<<< Configuring library with node constraints support >>>)
 fi
 # -------------------------------------------------------------
 

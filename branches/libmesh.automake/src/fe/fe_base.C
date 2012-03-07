@@ -2214,7 +2214,7 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 		      DofConstraintRow& constraint_row =
-			constraints[my_dof_g];
+			constraints[my_dof_g].first;
 
 		      constraint_row.insert(std::make_pair(their_dof_g,
 							   their_dof_value));
@@ -2349,7 +2349,7 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 		      // A reference to the constraint row.
-		      NodeConstraintRow& constraint_row = constraints[my_node];
+		      NodeConstraintRow& constraint_row = constraints[my_node].first;
 
 		      constraint_row.insert(std::make_pair (their_node,
 							    0.));
@@ -2365,7 +2365,7 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
 		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 		      // A reference to the constraint row.
-		      NodeConstraintRow& constraint_row = constraints[my_node];
+		      NodeConstraintRow& constraint_row = constraints[my_node].first;
 
 		      constraint_row.insert(std::make_pair (their_node,
 							    their_value));
@@ -2595,7 +2595,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
                         continue;
 
                       DofConstraintRow& their_constraint_row =
-                        constraints[their_dof_g];
+                        constraints[their_dof_g].first;
 
 	              for (unsigned int js = 0; js != n_side_dofs; ++js)
 	                {
@@ -2643,7 +2643,7 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 			    DofConstraintRow& constraint_row =
-			      constraints[my_dof_g];
+			      constraints[my_dof_g].first;
 
 			    constraint_row.insert(std::make_pair(their_dof_g,
 							         their_dof_value));
@@ -2801,7 +2801,7 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
                               continue;
 
                             const NodeConstraintRow& their_constraint_row =
-                              constraints[their_node];
+                              constraints[their_node].first;
 
 	                    for (unsigned int orig_side_n=0;
 	                         orig_side_n < n_side_nodes;
@@ -2858,7 +2858,7 @@ void FEBase::compute_periodic_node_constraints (NodeConstraints &constraints,
 			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 			    NodeConstraintRow& constraint_row =
-			      constraints[my_node];
+			      constraints[my_node].first;
 
 			    constraint_row.insert(std::make_pair(their_node,
 							         their_value));

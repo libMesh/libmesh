@@ -74,6 +74,7 @@ echo '  'complex variables........... : $enablecomplex
 echo '  'ghosted vectors............. : $enableghosted
 echo '  'high-order shape functions.. : $enablepfem
 echo '  'infinite elements........... : $enableifem
+echo '  'Dirichlet constraints....... : $enabledirichlet
 echo '  'node constraints............ : $enablenodeconstraint
 echo '  'parallel mesh............... : $enableparmesh
 echo '  'performance logging......... : $enableperflog

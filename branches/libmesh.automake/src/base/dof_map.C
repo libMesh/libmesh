@@ -25,6 +25,7 @@
 #include "coupling_matrix.h"
 #include "dense_matrix.h"
 #include "dense_vector_base.h"
+#include "dirichlet_boundaries.h"
 #include "dof_map.h"
 #include "elem.h"
 #include "fe_interface.h"
@@ -78,6 +79,9 @@ DofMap::DofMap(const unsigned int number) :
 #ifdef LIBMESH_ENABLE_PERIODIC
   , _periodic_boundaries(new PeriodicBoundaries)
 #endif
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  , _dirichlet_boundaries(new DirichletBoundaries)
+#endif
 {
   _matrices.clear();
 }
@@ -90,6 +94,9 @@ DofMap::~DofMap()
   this->clear();
 #ifdef LIBMESH_ENABLE_PERIODIC
   delete _periodic_boundaries;
+#endif
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  delete _dirichlet_boundaries;
 #endif
 }
 
@@ -1973,7 +1980,7 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 
 	libmesh_assert (pos != _dof_constraints.end());
 
-	const DofConstraintRow& constraint_row = pos->second;
+	const DofConstraintRow& constraint_row = pos->second.first;
 
 // adaptive p refinement currently gives us lots of empty constraint
 // rows - we should optimize those DoFs away in the future.  [RHS]
@@ -2502,34 +2509,41 @@ std::string DofMap::get_info() const
 
 #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
 
-  unsigned int n_constraints = 0, max_constraint_length = 0;
+  unsigned int n_constraints = 0, max_constraint_length = 0,
+               n_rhss = 0;
   long double avg_constraint_length = 0.;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  unsigned int n_hanging_nodes = 0, max_node_constraint_length = 0;
+  unsigned int n_node_constraints = 0, max_node_constraint_length = 0,
+               n_node_rhss = 0;
   long double avg_node_constraint_length = 0.;
 #endif
 
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
     {
-      const DofConstraintRow& row = it->second;
+      const DofConstraintRow& row = it->second.first;
       unsigned int rowsize = row.size();
 
       max_constraint_length = std::max(max_constraint_length,
                                        rowsize);
       avg_constraint_length += rowsize;
       n_constraints++;
+
+      if (it->second.second)
+        n_rhss++;
     }
 
   os << "    DofMap Constraints\n      Number of DoF Constraints = "
      << n_constraints;
+  if (n_rhss)
+    os << '\n'
+       << "      Number of heterogenous constraints= " << n_rhss;
   if (n_constraints)
     {
       avg_constraint_length /= n_constraints;
 
-      os << "    DofMap Constraints\n      Number of Constraints = " << n_constraints
-         << '\n'
+      os << '\n'
          << "      Average DoF Constraint Length= " << avg_constraint_length;
     }
 
@@ -2537,19 +2551,25 @@ std::string DofMap::get_info() const
   for (NodeConstraints::const_iterator it=_node_constraints.begin();
        it != _node_constraints.end(); ++it)
     {
-      const NodeConstraintRow& row = it->second;
+      const NodeConstraintRow& row = it->second.first;
       unsigned int rowsize = row.size();
 
       max_node_constraint_length = std::max(max_node_constraint_length,
                                             rowsize);
       avg_node_constraint_length += rowsize;
-      n_hanging_nodes++;
+      n_node_constraints++;
+
+      if (it->second.second != Point(0))
+        n_node_rhss++;
     }
 
-  if (n_hanging_nodes)
+  os << "\n      Number of Node Constraints = " << n_node_constraints;
+  if (n_rhss)
+    os << '\n'
+       << "      Number of heterogenous node constraints= " << n_node_rhss;
+  if (n_node_constraints)
     {
-      os << "\n      Number of Node Constraints = " << n_hanging_nodes;
-      avg_node_constraint_length /= n_hanging_nodes;
+      avg_node_constraint_length /= n_node_constraints;
       os << "\n      Maximum Node Constraint Length= " << max_node_constraint_length
          << '\n'
          << "      Average Node Constraint Length= " << avg_node_constraint_length;
