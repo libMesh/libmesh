@@ -230,10 +230,8 @@ int main (int argc, char** argv)
   equation_systems.parameters.set<Real>("speed")          = 1000.;
   equation_systems.parameters.set<Real>("fluid density")  = 1000.;
 
-  // Store the current time as an
-  // \p EquationSystems parameter, so that
-  // \p fill_dirichlet_bc() can access it.
-  equation_systems.parameters.set<Real>("time")           = 0.;
+  // Start time integration from t=0
+  t_system.time = 0.;
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -262,18 +260,16 @@ int main (int argc, char** argv)
   // also update the \p EquationSystems parameter
   // Start with t_time = 0 and write a short header
   // to the nodal result file
-  Real t_time = 0.;
   res_out << "# pressure at node " << res_node_no << "\n"
           << "# time\tpressure\n"
-          << t_time << "\t" << 0 << std::endl;
+          << t_system.time << "\t" << 0 << std::endl;
 
 
   for (unsigned int time_step=0; time_step<n_time_steps; time_step++)
     {
       // Update the time.  Both here and in the
       // \p EquationSystems object
-      t_time += delta_t;
-      equation_systems.parameters.set<Real>("time")  = t_time;
+      t_system.time += delta_t;
 
       // Update the rhs.
       t_system.update_rhs();
@@ -340,7 +336,7 @@ int main (int argc, char** argv)
       // Write nodal results to file.  The results can then
       // be viewed with e.g. gnuplot (run gnuplot and type
       // 'plot "pressure_node.res" with lines' in the command line)
-      res_out << t_time << "\t"
+      res_out << t_system.time << "\t"
               << global_displacement[dof_no]
               << std::endl;
     }
@@ -627,9 +623,6 @@ void fill_dirichlet_bc(EquationSystems& es,
   const bool do_for_matrix =
     es.parameters.get<bool>("Newmark set BC for Matrix");
 
-  // Ge the current time from \p EquationSystems
-  const Real current_time = es.parameters.get<Real>("time");
-
   // Number of nodes in the mesh.
   unsigned int n_nodes = mesh.n_nodes();
 
@@ -656,8 +649,8 @@ void fill_dirichlet_bc(EquationSystems& es,
           // Here we apply sinusoidal pressure values for 0<t<0.002
           // at one end of the pipe-mesh.
           Real p_value;
-          if (current_time < .002 )
-            p_value = sin(2*pi*current_time/.002);
+          if (t_system.time < .002 )
+            p_value = sin(2*pi*t_system.time/.002);
           else
             p_value = .0;
 

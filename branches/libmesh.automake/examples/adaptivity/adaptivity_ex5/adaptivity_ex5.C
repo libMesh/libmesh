@@ -340,13 +340,15 @@ int main (int argc, char** argv)
   // looping over the specified time interval and calling the
   // \p solve() member at each time step.  This will assemble the
   // system and call the linear solver.
-  const Real dt = 0.025;
-  Real time     = init_timestep*dt;
 
-  // Creating and attaching Periodic Boundaries
   TransientLinearImplicitSystem& system =
 	equation_systems.get_system<TransientLinearImplicitSystem>
           ("Convection-Diffusion");
+
+  const Real dt = 0.025;
+  system.time   = init_timestep*dt;
+
+  // Creating and attaching Periodic Boundaries
   DofMap & dof_map = system.get_dof_map();
 
   
@@ -387,9 +389,9 @@ int main (int argc, char** argv)
     {
       // Increment the time counter, set the time and the
       // time step size as parameters in the EquationSystem.
-      time += dt;
+      system.time += dt;
 
-      equation_systems.parameters.set<Real> ("time") = time;
+      equation_systems.parameters.set<Real> ("time") = system.time;
       equation_systems.parameters.set<Real> ("dt")   = dt;
 
       // A pretty update message
@@ -403,7 +405,7 @@ int main (int argc, char** argv)
 
         OSSInt(out,2,t_step);
         out << ", time=";
-        OSSRealzeroleft(out,6,3,time);
+        OSSRealzeroleft(out,6,3,system.time);
         out <<  "...";
         std::cout << out.str() << std::endl;
       }
@@ -554,7 +556,7 @@ void init_cd (EquationSystems& es,
     es.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
 
   // Project initial conditions at time 0
-  es.parameters.set<Real> ("time") = 0;
+  es.parameters.set<Real> ("time") = system.time = 0;
   
   if (parsed_solution)
     system.project_solution(parsed_solution, NULL);

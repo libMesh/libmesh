@@ -541,6 +541,7 @@ endif
 ###########################################################
 # Utility programs
 bin_PROGRAMS = # empty, append below
+bin_SCRIPTS  = # empty, append below
 bin_PROGRAMS     += meshtool
 meshtool_SOURCES  = src/apps/meshtool.C
 meshtool_LDADD    = libmesh.la
@@ -569,6 +570,7 @@ bin_PROGRAMS += amr
 amr_SOURCES   = src/apps/amr.C
 amr_LDADD     = libmesh.la
 
+bin_SCRIPTS += contrib/bin/libmesh-config 
 
 ###########################################################
 # Examples

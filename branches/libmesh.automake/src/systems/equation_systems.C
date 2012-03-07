@@ -177,7 +177,7 @@ void EquationSystems::reinit ()
         sys.get_dof_map().distribute_dofs(_mesh);
 
         // Recreate any hanging node constraints
-        sys.get_dof_map().create_dof_constraints(_mesh);
+        sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
 
         // Apply any user-defined constraints
         sys.user_constrain();
@@ -211,7 +211,7 @@ void EquationSystems::reinit ()
           if (!dof_constraints_created)
             {
               sys.get_dof_map().distribute_dofs(_mesh);
-              sys.get_dof_map().create_dof_constraints(_mesh);
+              sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
               sys.user_constrain();
               sys.get_dof_map().process_constraints();
               sys.get_dof_map().prepare_send_list();
@@ -238,7 +238,7 @@ void EquationSystems::reinit ()
           if (!dof_constraints_created)
             {
               sys.get_dof_map().distribute_dofs(_mesh);
-              sys.get_dof_map().create_dof_constraints(_mesh);
+              sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
               sys.user_constrain();
               sys.get_dof_map().process_constraints();
               sys.get_dof_map().prepare_send_list();
@@ -302,7 +302,7 @@ void EquationSystems::allgather ()
       // The user probably won't need constraint equations or the
       // send_list after an allgather, but let's keep it in consistent
       // shape just in case.
-      dof_map.create_dof_constraints(_mesh);
+      dof_map.create_dof_constraints(_mesh, sys.time);
       sys.user_constrain();
       dof_map.process_constraints();
 #endif

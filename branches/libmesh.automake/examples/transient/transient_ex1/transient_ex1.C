@@ -174,15 +174,15 @@ int main (int argc, char** argv)
   // solve() member at each time step.  This will assemble the
   // system and call the linear solver.
   const Real dt = 0.025;
-  Real time     = 0.;
+  system.time   = 0.;
   
   for (unsigned int t_step = 0; t_step < 50; t_step++)
     {
       // Incremenet the time counter, set the time and the
       // time step size as parameters in the EquationSystem.
-      time += dt;
+      system.time += dt;
 
-      equation_systems.parameters.set<Real> ("time") = time;
+      equation_systems.parameters.set<Real> ("time") = system.time;
       equation_systems.parameters.set<Real> ("dt")   = dt;
 
       // A pretty update message
@@ -200,7 +200,7 @@ int main (int argc, char** argv)
 
         OSSInt(out,2,t_step);
         out << ", time=";
-        OSSRealzeroleft(out,6,3,time);
+        OSSRealzeroleft(out,6,3,system.time);
         out <<  "...";
         std::cout << out.str() << std::endl;
       }
@@ -256,7 +256,7 @@ void init_cd (EquationSystems& es,
     es.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
 
   // Project initial conditions at time 0
-  es.parameters.set<Real> ("time") = 0;
+  es.parameters.set<Real> ("time") = system.time = 0;
   
   system.project_solution(exact_value, NULL, es.parameters);
 }
@@ -345,7 +345,6 @@ void assemble_cd (EquationSystems& es,
     es.parameters.get<RealVectorValue> ("velocity");
 
   const Real dt = es.parameters.get<Real>   ("dt");
-  const Real time = es.parameters.get<Real> ("time");
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
@@ -467,7 +466,7 @@ void assemble_cd (EquationSystems& es,
                 {
                   const Number value = exact_solution (qface_points[qp](0),
                                                        qface_points[qp](1),
-                                                       time);
+                                                       system.time);
                                                        
                   // RHS contribution
                   for (unsigned int i=0; i<psi.size(); i++)
