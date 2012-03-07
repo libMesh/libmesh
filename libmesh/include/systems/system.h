@@ -453,8 +453,7 @@ public:
    * in the \p parameters argument.
    */
   void project_solution (FunctionBase<Number> *f,
-                         FunctionBase<Gradient> *g = NULL,
-                         Parameters* parameters = NULL) const;
+                         FunctionBase<Gradient> *g = NULL) const;
 
   /**
    * Projects arbitrary functions onto the current solution.
@@ -471,7 +470,7 @@ public:
 				       const Parameters& parameters,
                                        const std::string& sys_name,
 				       const std::string& unknown_name),
-			 Parameters& parameters) const;
+			 const Parameters& parameters) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -485,8 +484,7 @@ public:
    */
   void project_vector (NumericVector<Number>& new_vector,
                        FunctionBase<Number> *f,
-                       FunctionBase<Gradient> *g = NULL,
-		       Parameters* parameters = NULL) const;
+                       FunctionBase<Gradient> *g = NULL) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -504,7 +502,7 @@ public:
 				     const Parameters& parameters,
                                      const std::string& sys_name,
 				     const std::string& unknown_name),
-		       Parameters& parameters,
+		       const Parameters& parameters,
 		       NumericVector<Number>& new_vector) const;
 
   /**
@@ -524,8 +522,7 @@ public:
   void boundary_project_solution (const std::set<boundary_id_type> &b,
                                   const std::vector<unsigned int> &variables,
                                   FunctionBase<Number> *f,
-                                  FunctionBase<Gradient> *g = NULL,
-		                  Parameters* parameters = NULL);
+                                  FunctionBase<Gradient> *g = NULL);
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -549,7 +546,7 @@ public:
 				                const Parameters& parameters,
                                                 const std::string& sys_name,
 				                const std::string& unknown_name),
-		                  Parameters& parameters);
+                                  const Parameters& parameters);
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -569,8 +566,7 @@ public:
                                 const std::vector<unsigned int> &variables,
                                 NumericVector<Number>& new_vector,
                                 FunctionBase<Number> *f,
-                                FunctionBase<Gradient> *g = NULL,
-		                Parameters* parameters = NULL) const;
+                                FunctionBase<Gradient> *g = NULL) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -594,7 +590,7 @@ public:
 				              const Parameters& parameters,
                                               const std::string& sys_name,
 				              const std::string& unknown_name),
-		                Parameters& parameters,
+		                const Parameters& parameters,
 		                NumericVector<Number>& new_vector) const;
 
   /**
