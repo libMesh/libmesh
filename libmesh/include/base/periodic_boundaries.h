@@ -117,11 +117,9 @@ protected:
 
 
 /**
- * The constraint matrix storage format.
  * We're using a class instead of a typedef to allow forward
- * declarations and future flexibility.  Is there some issue with
- * deriving from standard containers, i.e. don't do it because they
- * don't have virtual destructors?
+ * declarations and future flexibility.  Note that std::map has no
+ * virtual destructor, so downcasting here would be dangerous.
  */
 class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary *>
 {

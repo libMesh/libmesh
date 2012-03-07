@@ -25,6 +25,7 @@
 #include "coupling_matrix.h"
 #include "dense_matrix.h"
 #include "dense_vector_base.h"
+#include "dirichlet_boundaries.h"
 #include "dof_map.h"
 #include "elem.h"
 #include "fe_interface.h"
@@ -78,6 +79,9 @@ DofMap::DofMap(const unsigned int number) :
 #ifdef LIBMESH_ENABLE_PERIODIC
   , _periodic_boundaries(new PeriodicBoundaries)
 #endif
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  , _dirichlet_boundaries(new DirichletBoundaries)
+#endif
 {
   _matrices.clear();
 }
@@ -90,6 +94,9 @@ DofMap::~DofMap()
   this->clear();
 #ifdef LIBMESH_ENABLE_PERIODIC
   delete _periodic_boundaries;
+#endif
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  delete _dirichlet_boundaries;
 #endif
 }
 
