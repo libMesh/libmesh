@@ -47,9 +47,11 @@ public:
    */
   Variable (const std::string &var_name,
 	    const unsigned int var_number,
+	    const unsigned int first_scalar_number,
 	    const FEType &var_type) :
     _name(var_name),
     _number(var_number),
+    _first_scalar_number(first_scalar_number),
     _type(var_type),
     _active_subdomains()
   {}
@@ -60,10 +62,12 @@ public:
    */
   Variable (const std::string &var_name,
 	    const unsigned int var_number,
+	    const unsigned int first_scalar_number,
 	    const FEType &var_type,
 	    const std::set<subdomain_id_type> &var_active_subdomains) :
     _name(var_name),
     _number(var_number),
+    _first_scalar_number(first_scalar_number),
     _type(var_type),
     _active_subdomains(var_active_subdomains)
   {}
@@ -79,6 +83,13 @@ public:
    */
   unsigned int number() const
   { return _number; }
+
+  /**
+   * The index of the first scalar component of this variable in the
+   * system.
+   */
+  unsigned int first_scalar_number() const
+  { return _first_scalar_number; }
 
   /**
    * The \p FEType for this variable.
@@ -118,6 +129,7 @@ public:
 private:
   std::string             _name;
   unsigned int            _number;
+  unsigned int            _first_scalar_number;
   FEType                  _type;
   std::set<subdomain_id_type> _active_subdomains;
 };
