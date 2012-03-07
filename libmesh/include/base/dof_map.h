@@ -462,8 +462,10 @@ public:
 
   /**
    * Rebuilds the raw degree of freedom and DofObject constraints.
+   * A time is specified for use in building time-dependent Dirichlet
+   * constraints.
    */
-  void create_dof_constraints (const MeshBase&);
+  void create_dof_constraints (const MeshBase&, Real time=0);
 
   /**
    * Gathers any relevant constraint equations from other processors

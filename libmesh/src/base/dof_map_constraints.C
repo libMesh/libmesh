@@ -181,19 +181,23 @@ using namespace libMesh;
   private:
     DofMap                  &dof_map;
     const MeshBase          &mesh;
+    const Real               time;
     const DirichletBoundary  dirichlet;
 
   public:
     ConstrainDirichlet (DofMap &dof_map_in,
 		        const MeshBase &mesh_in,
+		        const Real time_in,
 		        const DirichletBoundary &dirichlet_in) :
     dof_map(dof_map_in),
     mesh(mesh_in),
+    time(time_in),
     dirichlet(dirichlet_in) { }
 
     ConstrainDirichlet (const ConstrainDirichlet &in) :
     dof_map(in.dof_map),
     mesh(in.mesh),
+    time(in.time),
     dirichlet(in.dirichlet) { }
 
     void operator()(const ConstElemRange &range) const
@@ -370,17 +374,23 @@ using namespace libMesh;
 		  else if (cont == C_ZERO)
 		    {
 		      libmesh_assert(nc == 1);
-		      Ue(current_dof) = f->component(var_component,elem->point(n));
+		      Ue(current_dof) =
+                        f->component(var_component,
+                                     elem->point(n), time);
 		      dof_is_fixed[current_dof] = true;
 		      current_dof++;
 		    }
 		  // The hermite element vertex shape functions are weird
 		  else if (fe_type.family == HERMITE)
 		    {
-		      Ue(current_dof) = f->component(var_component,elem->point(n));
+		      Ue(current_dof) =
+                        f->component(var_component,
+                                     elem->point(n), time);
 		      dof_is_fixed[current_dof] = true;
 		      current_dof++;
-		      Gradient grad = g->component(var_component,elem->point(n));
+		      Gradient grad =
+                        g->component(var_component,
+                                     elem->point(n), time);
 		      // x derivative
 		      Ue(current_dof) = grad(0);
 		      dof_is_fixed[current_dof] = true;
@@ -392,8 +402,12 @@ using namespace libMesh;
                             nxplus = elem->point(n);
 			  nxminus(0) -= TOLERANCE;
 			  nxplus(0) += TOLERANCE;
-			  Gradient gxminus = g->component(var_component,nxminus);
-			  Gradient gxplus = g->component(var_component,nxplus);
+			  Gradient gxminus =
+                            g->component(var_component,
+                                         nxminus, time);
+			  Gradient gxplus =
+                            g->component(var_component,
+                                         nxplus, time);
 			  // y derivative
 			  Ue(current_dof) = grad(1);
 			  dof_is_fixed[current_dof] = true;
@@ -420,8 +434,12 @@ using namespace libMesh;
                                 nyplus = elem->point(n);
 			      nyminus(1) -= TOLERANCE;
 			      nyplus(1) += TOLERANCE;
-			      Gradient gyminus = g->component(var_component,nyminus);
-			      Gradient gyplus = g->component(var_component,nyplus);
+			      Gradient gyminus =
+                                g->component(var_component,
+                                             nyminus, time);
+			      Gradient gyplus =
+                                g->component(var_component,
+                                             nyplus, time);
 			      // xz derivative
 			      Ue(current_dof) = (gyplus(2) - gyminus(2))
 				/ 2. / TOLERANCE;
@@ -440,10 +458,18 @@ using namespace libMesh;
 			      nxpym(1) -= TOLERANCE;
 			      nxpyp(0) += TOLERANCE;
 			      nxpyp(1) += TOLERANCE;
-			      Gradient gxmym = g->component(var_component,nxmym);
-			      Gradient gxmyp = g->component(var_component,nxmyp);
-			      Gradient gxpym = g->component(var_component,nxpym);
-			      Gradient gxpyp = g->component(var_component,nxpyp);
+			      Gradient gxmym =
+                                g->component(var_component,
+                                             nxmym, time);
+			      Gradient gxmyp =
+                                g->component(var_component,
+                                             nxmyp, time);
+			      Gradient gxpym =
+                                g->component(var_component,
+                                             nxpym, time);
+			      Gradient gxpyp =
+                                g->component(var_component,
+                                             nxpyp, time);
 			      Number gxzplus = (gxpyp(2) - gxmyp(2))
 				/ 2. / TOLERANCE;
 			      Number gxzminus = (gxpym(2) - gxmym(2))
@@ -462,10 +488,14 @@ using namespace libMesh;
 		  else if (cont == C_ONE)
 		    {
 		      libmesh_assert(nc == 1 + dim);
-		      Ue(current_dof) = f->component(var_component,elem->point(n));
+		      Ue(current_dof) =
+                        f->component(var_component,
+                                     elem->point(n), time);
 		      dof_is_fixed[current_dof] = true;
 		      current_dof++;
-		      Gradient grad = g->component(var_component,elem->point(n));
+		      Gradient grad =
+                        g->component(var_component,
+                                     elem->point(n), time);
 		      for (unsigned int i=0; i!= dim; ++i)
 			{
 			  Ue(current_dof) = grad(i);
@@ -512,11 +542,15 @@ using namespace libMesh;
 		    for (unsigned int qp=0; qp<n_qp; qp++)
 		      {
 			// solution at the quadrature point
-			Number fineval = f->component(var_component,xyz_values[qp]);
+			Number fineval =
+                          f->component(var_component,
+                                       xyz_values[qp], time);
 			// solution grad at the quadrature point
 			Gradient finegrad;
 			if (cont == C_ONE)
-			  finegrad = g->component(var_component,xyz_values[qp]);
+			  finegrad =
+                            g->component(var_component,
+                                         xyz_values[qp], time);
 
 			// Form edge projection matrix
 			for (unsigned int sidei=0, freei=0;
@@ -606,11 +640,15 @@ using namespace libMesh;
 		    for (unsigned int qp=0; qp<n_qp; qp++)
 		      {
 			// solution at the quadrature point
-			Number fineval = f->component(var_component,xyz_values[qp]);
+			Number fineval =
+                          f->component(var_component,
+                                       xyz_values[qp], time);
 			// solution grad at the quadrature point
 			Gradient finegrad;
 			if (cont == C_ONE)
-			  finegrad = g->component(var_component,xyz_values[qp]);
+			  finegrad =
+                            g->component(var_component,
+                                         xyz_values[qp], time);
 
 			// Form side projection matrix
 			for (unsigned int sidei=0, freei=0;
@@ -695,9 +733,11 @@ namespace libMesh
 // ------------------------------------------------------------
 // DofMap member functions
 
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || \
+    defined(LIBMESH_ENABLE_PERIODIC) || \
+    defined(LIBMESH_ENABLE_DIRICHLET)
 
-void DofMap::create_dof_constraints(const MeshBase& mesh)
+void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 {
   START_LOG("create_dof_constraints()", "DofMap");
 
@@ -790,7 +830,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh)
        i != _dirichlet_boundaries->end(); ++i, range.reset())
     Threads::parallel_for
       (range,
-       ConstrainDirichlet(*this, mesh, **i)
+       ConstrainDirichlet(*this, mesh, time, **i)
       );
 #endif // LIBMESH_ENABLE_DIRICHLET
 
