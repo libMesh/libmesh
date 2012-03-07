@@ -432,9 +432,6 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 
   const Parameters& parameters = system.get_equation_systems().parameters;
 
-  const Real time = parameters.have_parameter<Real>("time") ?
-                    parameters.get<Real>("time") : 0.;
-
   // reinitialize the element-specific data
   // for the current element
   fe->reinit (elem);
@@ -494,7 +491,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	    val_error -= _exact_value(q_point[qp],parameters,sys_name,var_name);
           else if (_exact_values.size() > sys_num && _exact_values[sys_num])
 	    val_error -= _exact_values[sys_num]->
-              component(var_component, q_point[qp], time);
+              component(var_component, q_point[qp], system.time);
           else if (_equation_systems_fine)
 	    val_error -= (*fine_values)(q_point[qp]);
 
@@ -513,7 +510,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	    grad_error -= _exact_deriv(q_point[qp],parameters,sys_name,var_name);
           else if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
 	    grad_error -= _exact_derivs[sys_num]->
-              component(var_component, q_point[qp], time);
+              component(var_component, q_point[qp], system.time);
 	  else if(_equation_systems_fine)
 	    grad_error -= fine_values->gradient(q_point[qp]);
 
@@ -532,7 +529,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	    grad2_error -= _exact_hessian(q_point[qp],parameters,sys_name,var_name);
           else if (_exact_hessians.size() > sys_num && _exact_hessians[sys_num])
 	    grad2_error -= _exact_hessians[sys_num]->
-              component(var_component, q_point[qp], time);
+              component(var_component, q_point[qp], system.time);
 	  else if (_equation_systems_fine)
 	    grad2_error -= fine_values->hessian(q_point[qp]);
 

@@ -145,10 +145,14 @@ int main (int argc, char** argv)
   // Create a performance-logging object for this example
   PerfLog perf_log("Example 13");
   
+  // Get a reference to the Stokes system to use later.
+  TransientLinearImplicitSystem&  navier_stokes_system =
+        equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
+
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations.
   const Real dt = 0.01;
-  Real time     = 0.0;
+  navier_stokes_system.time     = 0.0;
   const unsigned int n_timesteps = 15;
 
   // The number of steps and the stopping criterion are also required
@@ -165,10 +169,6 @@ int main (int argc, char** argv)
   // then reference this parameter.
   equation_systems.parameters.set<Real> ("dt")   = dt;
 
-  // Get a reference to the Stokes system to use later.
-  TransientLinearImplicitSystem&  navier_stokes_system =
-        equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
-
   // The first thing to do is to get a copy of the solution at
   // the current nonlinear iteration.  This value will be used to
   // determine if we can exit the nonlinear loop.
@@ -177,17 +177,14 @@ int main (int argc, char** argv)
 
   for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
     {
-      // Incremenet the time counter, set the time and the
-      // time step size as parameters in the EquationSystem.
-      time += dt;
-
-      // Let the system of equations know the current time.
-      // This might be necessary for a time-dependent forcing
-      // function for example.
-      equation_systems.parameters.set<Real> ("time") = time;
+      // Incremenet the time counter, set the time step size as
+      // a parameter in the EquationSystem.
+      navier_stokes_system.time += dt;
 
       // A pretty update message
-      std::cout << "\n\n*** Solving time step " << t_step << ", time = " << time << " ***" << std::endl;
+      std::cout << "\n\n*** Solving time step " << t_step <<
+                   ", time = " << navier_stokes_system.time <<
+                   " ***" << std::endl;
 
       // Now we need to update the solution vector from the
       // previous time step.  This is done directly through
@@ -396,7 +393,6 @@ void assemble_stokes (EquationSystems& es,
   // timesteps.  If you monitor the initial nonlinear residual for this
   // simulation, you should see that it is monotonically decreasing in time.
   const Real dt    = es.parameters.get<Real>("dt");
-  // const Real time  = es.parameters.get<Real>("time");
   const Real theta = 1.;
     
   // Now we will loop over all the elements in the mesh that

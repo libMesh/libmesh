@@ -308,8 +308,16 @@ int main (int argc, char** argv)
   // looping over the specified time interval and calling the
   // \p solve() member at each time step.  This will assemble the
   // system and call the linear solver.
+
+  // Since only \p TransientLinearImplicitSystems (and systems
+  // derived from them) contain old solutions, to use the
+  // old_local_solution later we now need to specify the system
+  // type when we ask for it.
+  TransientLinearImplicitSystem &  system =
+    equation_systems.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
+
   const Real dt = 0.025;
-  Real time     = init_timestep*dt;
+  system.time   = init_timestep*dt;
   
   // We do 25 timesteps both before and after writing out the
   // intermediate solution
@@ -319,9 +327,9 @@ int main (int argc, char** argv)
     {
       // Increment the time counter, set the time and the
       // time step size as parameters in the EquationSystem.
-      time += dt;
+      system.time += dt;
 
-      equation_systems.parameters.set<Real> ("time") = time;
+      equation_systems.parameters.set<Real> ("time") = system.time;
       equation_systems.parameters.set<Real> ("dt")   = dt;
 
       // A pretty update message
@@ -343,13 +351,7 @@ int main (int argc, char** argv)
       // At this point we need to update the old
       // solution vector.  The old solution vector
       // will be the current solution vector from the
-      // previous time step.  We will do this by extracting the
-      // system from the \p EquationSystems object and using
-      // vector assignment.  Since only \p TransientLinearImplicitSystems
-      // (and systems derived from them) contain old solutions
-      // we need to specify the system type when we ask for it.
-      TransientLinearImplicitSystem &  system =
-        equation_systems.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
+      // previous time step.
 
       *system.old_local_solution = *system.current_local_solution;
       
@@ -469,7 +471,7 @@ void init_cd (EquationSystems& es,
     es.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
 
   // Project initial conditions at time 0
-  es.parameters.set<Real> ("time") = 0;
+  es.parameters.set<Real> ("time") = system.time = 0;
   
   system.project_solution(exact_value, NULL, es.parameters);
 }
@@ -562,7 +564,6 @@ void assemble_cd (EquationSystems& es,
     es.parameters.get<Real> ("diffusivity");
 
   const Real dt = es.parameters.get<Real>   ("dt");
-  const Real time = es.parameters.get<Real> ("time");
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
@@ -682,7 +683,7 @@ void assemble_cd (EquationSystems& es,
                 {
                   const Number value = exact_solution (qface_points[qp](0),
                                                        qface_points[qp](1),
-                                                       time);
+                                                       system.time);
                                                        
                   // RHS contribution
                   for (unsigned int i=0; i<psi.size(); i++)
