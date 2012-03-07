@@ -89,10 +89,8 @@ public:
   ~DirichletBoundaries();
 };
 
-
+} // namespace libMesh
 
 #endif // LIBMESH_ENABLE_DIRICHLET
-
-} // namespace libMesh
 
 #endif // __dirichlet_boundaries_h__
