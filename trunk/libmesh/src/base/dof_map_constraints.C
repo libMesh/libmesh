@@ -1912,7 +1912,7 @@ void DofMap::constrain_p_dofs (unsigned int var,
 #endif // LIBMESH_ENABLE_AMR
 
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_DIRICHLET
 void DofMap::add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary)
 {
   _dirichlet_boundaries->push_back(new DirichletBoundary(dirichlet_boundary));
