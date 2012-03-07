@@ -24,6 +24,7 @@
 #include "boundary_info.h"
 #include "dense_matrix.h"
 #include "dense_vector.h"
+#include "dirichlet_boundaries.h"
 #include "dof_map.h"
 #include "elem.h"
 #include "equation_systems.h"
@@ -624,6 +625,7 @@ void System::boundary_project_vector
 
   STOP_LOG("boundary_project_vector()", "System");
 }
+
 
 
 #ifndef LIBMESH_ENABLE_AMR
