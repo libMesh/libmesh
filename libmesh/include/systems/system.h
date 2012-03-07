@@ -1623,12 +1623,6 @@ private:
   std::map<std::string, unsigned short int> _variable_numbers;
 
   /**
-   * The variable scalar numbers for the first component of each
-   * variable.
-   */
-  std::vector<unsigned short> _variable_first_scalar;
-
-  /**
    * Flag stating if the system is active or not.
    */
   bool _active;
@@ -1785,7 +1779,11 @@ unsigned int System::n_vars() const
 inline
 unsigned int System::n_components() const
 {
-  return _variable_first_scalar[n_vars()];
+  if (_variables.empty())
+    return 0;
+
+  const Variable& last = _variables.back();
+  return last.first_scalar_number() + last.n_components();
 }
 
 
@@ -1825,7 +1823,7 @@ unsigned short int
 System::variable_scalar_number (unsigned short var_num, 
                                 unsigned short component) const
 {
-  return _variable_first_scalar[var_num] + component;
+  return _variables[var_num].first_scalar_number() + component;
 }
 
 
