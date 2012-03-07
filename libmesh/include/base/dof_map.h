@@ -43,6 +43,8 @@ namespace libMesh
 
 // Forward Declarations
 class CouplingMatrix;
+class DirichletBoundary;
+class DirichletBoundaries;
 class DofMap;
 class DofObject;
 class Elem;
@@ -64,7 +66,9 @@ template <typename T> class NumericVector;
 // ------------------------------------------------------------
 // AMR constraint matrix types
 
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || \
+    defined(LIBMESH_ENABLE_PERIODIC) || \
+    defined(LIBMESH_ENABLE_DIRICHLET)
 /**
  * A row of the Dof constraint matrix.
  */
@@ -692,6 +696,24 @@ public:
 #endif // LIBMESH_ENABLE_PERIODIC
 
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
+
+  //--------------------------------------------------------------------
+  // DirichletBoundary-specific methods
+
+  /**
+   * Adds a copy of the specified Dirichlet boundary to the system.
+   */
+  void add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
+
+  DirichletBoundaries * get_dirichlet_boundaries()
+    {
+      return _dirichlet_boundaries;
+    }
+
+#endif // LIBMESH_ENABLE_DIRICHLET
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   //--------------------------------------------------------------------
@@ -1030,6 +1052,14 @@ private:
   PeriodicBoundaries *_periodic_boundaries;
 #endif
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  /**
+   * Data structure containing Dirichlet functions.  The ith
+   * entry is the constraint matrix row for boundaryid i.
+   */
+  DirichletBoundaries *_dirichlet_boundaries;
+#endif
+
   friend class SparsityPattern::Build;
 };
 
@@ -1105,7 +1135,9 @@ inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number>&,
 inline void DofMap::enforce_constraints_exactly (const System &,
 				                 NumericVector<Number> *) const {}
 
-#endif // !defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_PERIODIC)
+#endif // !defined(LIBMESH_ENABLE_AMR) &&
+       // !defined(LIBMESH_ENABLE_PERIODIC) &&
+       // !defined(LIBMESH_ENABLE_DIRICHLET)
 
 } // namespace libMesh
 
