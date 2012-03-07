@@ -1353,7 +1353,8 @@ void DofMap::constrain_nothing (std::vector<unsigned int>& dofs) const
 
 
 void DofMap::enforce_constraints_exactly (const System &system,
-                                          NumericVector<Number> *v) const
+                                          NumericVector<Number> *v,
+                                          bool homogeneous) const
 {
   parallel_only();
 
@@ -1426,7 +1427,8 @@ void DofMap::enforce_constraints_exactly (const System &system,
 
       const DofConstraintRow constraint_row = c_it->second.first;
 
-      Number exact_value = c_it->second.second;
+      Number exact_value = homogeneous ?
+        0 : c_it->second.second;
       for (DofConstraintRow::const_iterator
 	   j=constraint_row.begin(); j != constraint_row.end();
 	   ++j)

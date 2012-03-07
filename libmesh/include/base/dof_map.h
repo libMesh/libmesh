@@ -662,9 +662,15 @@ public:
    * tolerance.
    *
    * If \p v == NULL, the system solution vector is constrained
+   *
+   * If \p homogeneous == true, heterogeneous constraints are enforced
+   * as if they were homogeneous.  This might be appropriate for e.g. a
+   * vector representing a difference between two
+   * heterogeneously-constrained solutions.
    */
   void enforce_constraints_exactly (const System &system,
-				    NumericVector<Number> *v = NULL) const;
+				    NumericVector<Number> *v = NULL,
+                                    bool homogeneous = false) const;
 
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -1106,7 +1112,9 @@ unsigned int DofMap::sys_number() const
 }
 
 
-#if !defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_PERIODIC)
+#if !defined(LIBMESH_ENABLE_AMR) && \
+    !defined(LIBMESH_ENABLE_PERIODIC) && \
+    !defined(LIBMESH_ENABLE_DIRICHLET)
   //--------------------------------------------------------------------
   // Constraint-specific methods get inlined into nothing if
   // constraints are disabled, so there's no reason for users not to
@@ -1136,7 +1144,8 @@ inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number>&,
 				                   bool) const {}
 
 inline void DofMap::enforce_constraints_exactly (const System &,
-				                 NumericVector<Number> *) const {}
+				                 NumericVector<Number> *,
+                                                 bool = false) const {}
 
 #endif // !defined(LIBMESH_ENABLE_AMR) &&
        // !defined(LIBMESH_ENABLE_PERIODIC) &&
