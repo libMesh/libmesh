@@ -284,6 +284,13 @@ void ImplicitSystem::add_system_matrix ()
 
 
 
+void ImplicitSystem::disable_cache () {
+  this->assemble_before_solve = true;
+  this->get_linear_solver()->reuse_preconditioner(false);
+}
+
+
+
 std::pair<unsigned int, Real>
 ImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
 {
@@ -349,6 +356,11 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
 {
   // Log how long the linear solve takes.
   START_LOG("adjoint_solve()", "ImplicitSystem");
+
+  if (this->assemble_before_solve)
+    // Assemble the linear system
+    this->assembly (/* get_residual = */ false,
+                    /* get_jacobian = */ true);
 
   // The adjoint problem is linear
   LinearSolver<Number> *linear_solver = this->get_linear_solver();
