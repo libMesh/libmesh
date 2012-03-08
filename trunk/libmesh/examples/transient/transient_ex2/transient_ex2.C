@@ -140,7 +140,7 @@ int main (int argc, char** argv)
   if (libMesh::default_solver_package() == LASPACK_SOLVERS)
     {
       std::cout << "WARNING! It appears you are using the\n"
-                << "LasPack solvers.  ex8 may not converge\n"
+                << "LasPack solvers.  This example may not converge\n"
                 << "using LasPack, but should work OK with PETSc.\n"
                 << "http://www.mcs.anl.gov/petsc/\n"
                 << std::endl;
