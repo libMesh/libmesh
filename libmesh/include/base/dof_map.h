@@ -114,7 +114,7 @@ class NodeConstraints : public std::map<const Node *,
 };
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC || LIBMESH_ENABLE_DIRICHLET
 
 
 
@@ -442,7 +442,9 @@ public:
 			     DenseVectorBase<Number>& Ue) const;
 
 
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || \
+    defined(LIBMESH_ENABLE_PERIODIC) || \
+    defined(LIBMESH_ENABLE_DIRICHLET)
 
   //--------------------------------------------------------------------
   // Constraint-specific methods
@@ -555,7 +557,7 @@ public:
   std::pair<Real, Real> max_constraint_error(const System &system,
 					     NumericVector<Number> *v = NULL) const;
 
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC || LIBMESH_ENABLE_DIRICHLET
 
   //--------------------------------------------------------------------
   // Constraint-specific methods
@@ -870,7 +872,9 @@ private:
    */
   void add_neighbors_to_send_list(MeshBase& mesh);
 
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || \
+    defined(LIBMESH_ENABLE_PERIODIC) || \
+    defined(LIBMESH_ENABLE_DIRICHLET)
 
   /**
    * Build the constraint matrix C associated with the element
@@ -920,7 +924,7 @@ private:
    */
   void add_constraints_to_send_list();
 
-#endif
+#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC || LIBMESH_ENABLE_DIRICHLET
 
 
   /**
@@ -1035,7 +1039,9 @@ private:
 
 #endif
 
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#if defined(LIBMESH_ENABLE_AMR) || \
+    defined(LIBMESH_ENABLE_PERIODIC) || \
+    defined(LIBMESH_ENABLE_DIRICHLET)
 
   /**
    * Data structure containing DOF constraints.  The ith
@@ -1076,7 +1082,16 @@ private:
 // ------------------------------------------------------------
 // Dof Map inline member functions
 
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+inline
+unsigned int DofMap::sys_number() const
+{
+  return _sys_number;
+}
+
+
+#if defined(LIBMESH_ENABLE_AMR) || \
+    defined(LIBMESH_ENABLE_PERIODIC) || \
+    defined(LIBMESH_ENABLE_DIRICHLET)
 
 inline
 bool DofMap::is_constrained_dof (const unsigned int dof) const
@@ -1102,19 +1117,8 @@ node
   return false;
 }
 
-#endif
+#else
 
-
-inline
-unsigned int DofMap::sys_number() const
-{
-  return _sys_number;
-}
-
-
-#if !defined(LIBMESH_ENABLE_AMR) && \
-    !defined(LIBMESH_ENABLE_PERIODIC) && \
-    !defined(LIBMESH_ENABLE_DIRICHLET)
   //--------------------------------------------------------------------
   // Constraint-specific methods get inlined into nothing if
   // constraints are disabled, so there's no reason for users not to
@@ -1147,9 +1151,7 @@ inline void DofMap::enforce_constraints_exactly (const System &,
 				                 NumericVector<Number> *,
                                                  bool = false) const {}
 
-#endif // !defined(LIBMESH_ENABLE_AMR) &&
-       // !defined(LIBMESH_ENABLE_PERIODIC) &&
-       // !defined(LIBMESH_ENABLE_DIRICHLET)
+#endif // LIBMESH_ENABLE_AMR, LIBMESH_ENABLE_PERIODIC, LIBMESH_ENABLE_DIRICHLET
 
 } // namespace libMesh
 
