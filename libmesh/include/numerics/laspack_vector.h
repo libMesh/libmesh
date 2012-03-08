@@ -538,6 +538,9 @@ void LaspackVector<T>::init (const unsigned int n,
   V_Constr(&_vec, const_cast<char*>(foo), n, Normal, _LPTrue);
 
   this->_is_initialized = true;
+#ifndef NDEBUG
+  this->_is_closed = true;
+#endif
 
   // Optionally zero out all components
   if (fast == false)
@@ -589,7 +592,9 @@ void LaspackVector<T>::close ()
 {
   libmesh_assert (this->initialized());
 
+#ifndef NDEBUG
   this->_is_closed = true;
+#endif
 }
 
 
@@ -603,7 +608,10 @@ void LaspackVector<T>::clear ()
       V_Destr (&_vec);
     }
 
-  this->_is_closed = this->_is_initialized = false;
+  this->_is_initialized = false;
+#ifndef NDEBUG
+  this->_is_closed = false;
+#endif
 }
 
 
@@ -699,6 +707,10 @@ void LaspackVector<T>::set (const unsigned int i, const T value)
   libmesh_assert (i < this->size());
 
   V_SetCmp (&_vec, i+1, value);
+
+#ifndef NDEBUG
+  this->_is_closed = false;
+#endif
 }
 
 
@@ -711,6 +723,10 @@ void LaspackVector<T>::add (const unsigned int i, const T value)
   libmesh_assert (i < this->size());
 
   V_AddCmp (&_vec, i+1, value);
+
+#ifndef NDEBUG
+  this->_is_closed = false;
+#endif
 }
 
 
