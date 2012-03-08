@@ -32,12 +32,12 @@
 #include "libmesh.h"
 #include "mesh_serializer.h"
 
-// Forward Declarations
-
-class UnstructuredMesh;
-
 namespace libMesh
 {
+
+  // Forward Declarations
+
+  class UnstructuredMesh;
 
   /**
    * A C++ interface between LibMesh and the Triangle library written by
