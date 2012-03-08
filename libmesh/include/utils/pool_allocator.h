@@ -26,6 +26,8 @@
 #  include <boost/pool/pool_alloc.hpp>
 #endif
 
+#include <memory> // std::allocator
+
 namespace libMesh
 {
   // If Boost is enabled, wrappers to use their allocators.
