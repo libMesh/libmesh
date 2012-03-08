@@ -48,6 +48,7 @@
 #include "mesh_modification.h"
 #include "mesh_smoother_laplace.h"
 #include "node_elem.h"
+#include "vector_value.h"
 
 namespace libMesh
 {
@@ -1886,6 +1887,179 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
 
+
+// Meshes the tensor product of a 1D and a 1D-or-2D domain.
+void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
+                                             const MeshBase& cross_section,
+                                             const unsigned int nz,
+                                             RealVectorValue extrusion_vector)
+{
+  if (!cross_section.n_elem())
+    return;
+
+  START_LOG("build_extrusion()", "MeshTools::Generation");
+
+  unsigned int orig_elem = cross_section.n_elem();
+  unsigned int orig_nodes = cross_section.n_nodes();
+
+  unsigned int order = 1;
+
+  // We know a priori how many elements we'll need
+  mesh.reserve_elem(nz*orig_elem);
+
+  // For straightforward meshes we need one or two additional layers per
+  // element.
+  if ((*cross_section.elements_begin())->default_order() == SECOND)
+    order = 2;
+
+  mesh.reserve_nodes((order*nz+1)*orig_nodes);
+
+  MeshBase::const_node_iterator       nd  = cross_section.nodes_begin();
+  const MeshBase::const_node_iterator nend = cross_section.nodes_end();
+  for (; nd!=nend; ++nd)
+    {
+      Node* node = *nd;
+
+      for (unsigned int k=0; k != order*nz+1; ++k)
+        mesh.add_point(*node + (extrusion_vector * k / nz / order),
+                       node->id() + (k * orig_nodes),
+                       node->processor_id());
+    }
+
+  MeshBase::const_element_iterator       el  = cross_section.elements_begin();
+  const MeshBase::const_element_iterator end = cross_section.elements_end();
+  for (; el!=end; ++el)
+    {
+      Elem* elem = *el;
+      const ElemType etype = elem->type();
+
+      // build_extrusion currently only works on coarse meshes
+      libmesh_assert (elem->parent() == NULL);
+
+      for (unsigned int k=0; k != nz; ++k)
+        {
+          Elem *new_elem;
+          switch (etype)
+            {
+            case EDGE2:
+              {
+                new_elem = new Quad4;
+                new_elem->set_node(0) = mesh.node_ptr(elem->get_node(0)->id() + (k * orig_nodes));
+                new_elem->set_node(1) = mesh.node_ptr(elem->get_node(1)->id() + (k * orig_nodes));
+                new_elem->set_node(2) = mesh.node_ptr(elem->get_node(1)->id() + ((k+1) * orig_nodes));
+                new_elem->set_node(3) = mesh.node_ptr(elem->get_node(0)->id() + ((k+1) * orig_nodes));
+                break;
+              }
+            case EDGE3:
+              {
+                new_elem = new Quad9;
+                new_elem->set_node(0) = mesh.node_ptr(elem->get_node(0)->id() + (2*k * orig_nodes));
+                new_elem->set_node(1) = mesh.node_ptr(elem->get_node(1)->id() + (2*k * orig_nodes));
+                new_elem->set_node(2) = mesh.node_ptr(elem->get_node(1)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(3) = mesh.node_ptr(elem->get_node(0)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(4) = mesh.node_ptr(elem->get_node(2)->id() + (2*k * orig_nodes));
+                new_elem->set_node(5) = mesh.node_ptr(elem->get_node(1)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(6) = mesh.node_ptr(elem->get_node(2)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(7) = mesh.node_ptr(elem->get_node(0)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(8) = mesh.node_ptr(elem->get_node(2)->id() + ((2*k+1) * orig_nodes));
+                break;
+              }
+            case TRI3:
+              {
+                new_elem = new Prism6;
+                new_elem->set_node(0) = mesh.node_ptr(elem->get_node(0)->id() + (k * orig_nodes));
+                new_elem->set_node(1) = mesh.node_ptr(elem->get_node(1)->id() + (k * orig_nodes));
+                new_elem->set_node(2) = mesh.node_ptr(elem->get_node(2)->id() + (k * orig_nodes));
+                new_elem->set_node(3) = mesh.node_ptr(elem->get_node(0)->id() + ((k+1) * orig_nodes));
+                new_elem->set_node(4) = mesh.node_ptr(elem->get_node(1)->id() + ((k+1) * orig_nodes));
+                new_elem->set_node(5) = mesh.node_ptr(elem->get_node(2)->id() + ((k+1) * orig_nodes));
+                break;
+              }
+            case TRI6:
+              {
+                new_elem = new Prism18;
+                new_elem->set_node(0) = mesh.node_ptr(elem->get_node(0)->id() + (2*k * orig_nodes));
+                new_elem->set_node(1) = mesh.node_ptr(elem->get_node(1)->id() + (2*k * orig_nodes));
+                new_elem->set_node(2) = mesh.node_ptr(elem->get_node(2)->id() + (2*k * orig_nodes));
+                new_elem->set_node(3) = mesh.node_ptr(elem->get_node(0)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(4) = mesh.node_ptr(elem->get_node(1)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(5) = mesh.node_ptr(elem->get_node(2)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(6) = mesh.node_ptr(elem->get_node(3)->id() + (2*k * orig_nodes));
+                new_elem->set_node(7) = mesh.node_ptr(elem->get_node(4)->id() + (2*k * orig_nodes));
+                new_elem->set_node(8) = mesh.node_ptr(elem->get_node(5)->id() + (2*k * orig_nodes));
+                new_elem->set_node(9) = mesh.node_ptr(elem->get_node(0)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(10) = mesh.node_ptr(elem->get_node(1)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(11) = mesh.node_ptr(elem->get_node(2)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(12) = mesh.node_ptr(elem->get_node(3)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(13) = mesh.node_ptr(elem->get_node(4)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(14) = mesh.node_ptr(elem->get_node(5)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(15) = mesh.node_ptr(elem->get_node(3)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(16) = mesh.node_ptr(elem->get_node(4)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(17) = mesh.node_ptr(elem->get_node(5)->id() + ((2*k+1) * orig_nodes));
+                break;
+              }
+            case QUAD4:
+              {
+                new_elem = new Hex8;
+                new_elem->set_node(0) = mesh.node_ptr(elem->get_node(0)->id() + (k * orig_nodes));
+                new_elem->set_node(1) = mesh.node_ptr(elem->get_node(1)->id() + (k * orig_nodes));
+                new_elem->set_node(2) = mesh.node_ptr(elem->get_node(2)->id() + (k * orig_nodes));
+                new_elem->set_node(3) = mesh.node_ptr(elem->get_node(3)->id() + (k * orig_nodes));
+                new_elem->set_node(4) = mesh.node_ptr(elem->get_node(0)->id() + ((k+1) * orig_nodes));
+                new_elem->set_node(5) = mesh.node_ptr(elem->get_node(1)->id() + ((k+1) * orig_nodes));
+                new_elem->set_node(6) = mesh.node_ptr(elem->get_node(2)->id() + ((k+1) * orig_nodes));
+                new_elem->set_node(7) = mesh.node_ptr(elem->get_node(3)->id() + ((k+1) * orig_nodes));
+                break;
+              }
+            case QUAD9:
+              {
+                new_elem = new Hex27;
+                new_elem->set_node(0) = mesh.node_ptr(elem->get_node(0)->id() + (2*k * orig_nodes));
+                new_elem->set_node(1) = mesh.node_ptr(elem->get_node(1)->id() + (2*k * orig_nodes));
+                new_elem->set_node(2) = mesh.node_ptr(elem->get_node(2)->id() + (2*k * orig_nodes));
+                new_elem->set_node(3) = mesh.node_ptr(elem->get_node(3)->id() + (2*k * orig_nodes));
+                new_elem->set_node(4) = mesh.node_ptr(elem->get_node(0)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(5) = mesh.node_ptr(elem->get_node(1)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(6) = mesh.node_ptr(elem->get_node(2)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(7) = mesh.node_ptr(elem->get_node(3)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(8) = mesh.node_ptr(elem->get_node(4)->id() + (2*k * orig_nodes));
+                new_elem->set_node(9) = mesh.node_ptr(elem->get_node(5)->id() + (2*k * orig_nodes));
+                new_elem->set_node(10) = mesh.node_ptr(elem->get_node(6)->id() + (2*k * orig_nodes));
+                new_elem->set_node(11) = mesh.node_ptr(elem->get_node(7)->id() + (2*k * orig_nodes));
+                new_elem->set_node(12) = mesh.node_ptr(elem->get_node(0)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(13) = mesh.node_ptr(elem->get_node(1)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(14) = mesh.node_ptr(elem->get_node(2)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(15) = mesh.node_ptr(elem->get_node(3)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(16) = mesh.node_ptr(elem->get_node(4)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(17) = mesh.node_ptr(elem->get_node(5)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(18) = mesh.node_ptr(elem->get_node(6)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(19) = mesh.node_ptr(elem->get_node(7)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(20) = mesh.node_ptr(elem->get_node(8)->id() + (2*k * orig_nodes));
+                new_elem->set_node(21) = mesh.node_ptr(elem->get_node(4)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(22) = mesh.node_ptr(elem->get_node(5)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(23) = mesh.node_ptr(elem->get_node(6)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(24) = mesh.node_ptr(elem->get_node(7)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(25) = mesh.node_ptr(elem->get_node(8)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(26) = mesh.node_ptr(elem->get_node(8)->id() + ((2*k+1) * orig_nodes));
+                break;
+              }
+            default:
+              {
+                libmesh_not_implemented();
+                break;
+              }
+            }
+          new_elem->set_id(elem->id() + (k * orig_elem));
+          new_elem->processor_id() = elem->processor_id();
+          mesh.add_elem(new_elem);
+        }
+    }
+
+  STOP_LOG("build_extrusion()", "MeshTools::Generation");
+
+  // Done building the mesh.  Now prepare it for use.
+  mesh.prepare_for_use(/*skip_renumber =*/ false);
+}
 
 
 
