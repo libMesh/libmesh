@@ -1441,6 +1441,9 @@ void DofMap::enforce_constraints_exactly (const System &system,
   // to other processors
   if (v->type() == SERIAL)
     {
+#ifndef NDEBUG
+      v_global->close();
+#endif
       v_global->localize (*v);
     }
   v->close();
