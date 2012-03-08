@@ -29,8 +29,8 @@
 // #include "libmesh_common.h" // needed for Real
 #include "libmesh.h"
 #include "enum_elem_type.h"
-//#include "point.h"
 #include "mesh_triangle_interface.h"
+#include "vector_value.h"
 
 namespace libMesh
 {
@@ -113,6 +113,13 @@ namespace MeshTools
 		       const unsigned int nr=2,
 		       const ElemType type=INVALID_ELEM);
 
+    /**
+     * Meshes the tensor product of a 1D and a 1D-or-2D domain.
+     */
+    void build_extrusion (UnstructuredMesh& mesh,
+                          const MeshBase& cross_section,
+                          const unsigned int nz,
+                          RealVectorValue extrusion_vector);
 
 #ifdef LIBMESH_HAVE_TRIANGLE
     /**
