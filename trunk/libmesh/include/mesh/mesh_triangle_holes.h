@@ -24,6 +24,7 @@
 
 // Local includes
 #include "mesh_triangle_interface.h"
+#include "point.h"
 
 namespace libMesh
 {
