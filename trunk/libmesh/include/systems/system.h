@@ -1267,6 +1267,12 @@ public:
   bool assemble_before_solve;
 
   /**
+   * Avoids use of any cached data that might affect any solve result.  Should
+   * be overloaded in derived systems.
+   */
+  virtual void disable_cache ();
+
+  /**
    * A boolean to be set to true by systems using elem_fixed_solution,
    * for optional use by e.g. stabilized methods.
    * False by default.
@@ -1899,6 +1905,9 @@ void System::assemble_residual_derivatives (const ParameterVector&)
 {
   libmesh_not_implemented();
 }
+
+inline
+void System::disable_cache () { assemble_before_solve = true; }
 
 inline
 std::pair<unsigned int, Real>
