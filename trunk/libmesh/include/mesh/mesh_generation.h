@@ -36,6 +36,7 @@ namespace libMesh
 {
 
 // forward declarations
+class MeshBase;
 class UnstructuredMesh;
 
 
