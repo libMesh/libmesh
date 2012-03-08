@@ -2530,7 +2530,7 @@ std::string DofMap::get_info() const
       avg_constraint_length += rowsize;
       n_constraints++;
 
-      if (it->second.second)
+      if (it->second.second == Number(0))
         n_rhss++;
     }
 
