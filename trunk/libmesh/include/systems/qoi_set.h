@@ -44,7 +44,7 @@ public:
   class iterator
   {
   public:
-    iterator(unsigned int i, std::vector<bool>& v) : _i(i), _vecbool(v)
+    iterator(unsigned int i, const std::vector<bool>& v) : _i(i), _vecbool(v)
       {
         while (_i < _vecbool.size() && !_vecbool[_i])
           _i++;
@@ -80,7 +80,7 @@ public:
 
     unsigned int _i;
 
-    std::vector<bool>& _vecbool;
+    const std::vector<bool>& _vecbool;
   };
 
   /**
@@ -156,6 +156,11 @@ public:
    * Return whether or not this index is in the set to be calculated
    */
   bool has_index(unsigned int) const;
+
+  /**
+   * Return an iterator pointing to the first index in the set
+   */
+  iterator begin() const { return iterator(0, _indices); }
 
 private:
   /**
