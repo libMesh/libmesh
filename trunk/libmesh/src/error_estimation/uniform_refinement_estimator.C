@@ -283,10 +283,36 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                                 system.get_dof_map().get_send_list());
     }
 
+  // Are we doing a forward or an adjoint solve?
+  bool solve_adjoint = false;
+  if (solution_vectors)
+    {
+      System *sys = system_list[0];
+      libmesh_assert(solution_vectors->find(sys) !=
+                     solution_vectors->end());
+      const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
+      for (unsigned int j=0; j != sys->qoi.size(); ++j)
+        {
+          OStringStream adjoint_name;
+          adjoint_name << "adjoint_solution" << j;
+
+          if (vec == sys->request_vector(adjoint_name.str()))
+            {
+              solve_adjoint = true;
+              break;
+            }
+        }
+    }
+
   // Get the uniformly refined solution.
 
   if (_es)
     {
+      // Even if we had a decent preconditioner, valid matrix etc. before
+      // refinement, we don't any more.
+      for (unsigned int i=0; i != es.n_systems(); ++i)
+        es.get_system(i).disable_cache();
+
       // No specified vectors == forward solve
       if (!solution_vectors)
         es.solve();
@@ -295,10 +321,6 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           libmesh_assert(solution_vectors->size() == es.n_systems());
 	  libmesh_assert(solution_vectors->find(system_list[0]) !=
 			 solution_vectors->end());
-	  const bool solve_adjoint =
-            (system_list[0]->have_vector("adjoint_solution0") &&
-             (solution_vectors->find(system_list[0])->second ==
-	      &system_list[0]->get_adjoint_solution()));
 	  libmesh_assert(solve_adjoint ||
 	    (solution_vectors->find(system_list[0])->second ==
 	     system_list[0]->solution.get()) ||
@@ -307,29 +329,65 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 #ifdef DEBUG
 	  for (unsigned int i=0; i != system_list.size(); ++i)
 	    {
-	      libmesh_assert(solution_vectors->find(system_list[i]) !=
+              System *sys = system_list[i];
+	      libmesh_assert(solution_vectors->find(sys) !=
 			     solution_vectors->end());
-	      libmesh_assert(!solve_adjoint ||
-			     solution_vectors->find(system_list[i])->second ==
-			     &system_list[i]->get_adjoint_solution());
-	      libmesh_assert(solve_adjoint ||
-			     solution_vectors->find(system_list[i])->second ==
-			     system_list[i]->solution.get() ||
-			     !solution_vectors->find(system_list[i])->second);
+              const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
+              if (solve_adjoint)
+                {
+                  bool found_vec = false;
+	          for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                    {
+                      OStringStream adjoint_name;
+                      adjoint_name << "adjoint_solution" << j;
+
+                      if (vec == sys->request_vector(adjoint_name.str()))
+                        {
+                          found_vec = true;
+                          break;
+                        }
+                    }
+	          libmesh_assert(found_vec);
+                }
+              else
+	        libmesh_assert(vec == sys->solution.get() || !vec);
 	    }
 #endif
 
           if (solve_adjoint)
             {
+	      std::vector<unsigned int> adjs(system_list.size(),
+                                             libMesh::invalid_uint);
               // Set up proper initial guesses
 	      for (unsigned int i=0; i != system_list.size(); ++i)
-	        system_list[i]->get_adjoint_solution() = *system_list[i]->solution;
+                {
+                  System *sys = system_list[i];
+	          libmesh_assert(solution_vectors->find(sys) !=
+			         solution_vectors->end());
+                  const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
+	          for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                    {
+                      OStringStream adjoint_name;
+                      adjoint_name << "adjoint_solution" << j;
+
+                      if (vec == sys->request_vector(adjoint_name.str()))
+                        {
+                          adjs[i] = j;
+                          break;
+                        }
+                    }
+                  libmesh_assert(adjs[i] != libMesh::invalid_uint);
+		  system_list[i]->get_adjoint_solution(adjs[i]) =
+                    *system_list[i]->solution;
+                }
+
               es.adjoint_solve();
+
               // Put the adjoint_solution into solution for
               // comparisons
 	      for (unsigned int i=0; i != system_list.size(); ++i)
                 {
-	          system_list[i]->get_adjoint_solution().swap(*system_list[i]->solution);
+	          system_list[i]->get_adjoint_solution(adjs[i]).swap(*system_list[i]->solution);
 	          system_list[i]->update();
                 }
             }
@@ -339,36 +397,53 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     }
   else
     {
+      System *sys = system_list[0];
+
+      // Even if we had a decent preconditioner, valid matrix etc. before
+      // refinement, we don't any more.
+      sys->disable_cache();
+
       // No specified vectors == forward solve
       if (!solution_vectors)
-        system_list[0]->solve();
+        sys->solve();
       else
         {
-	  libmesh_assert(solution_vectors->find(system_list[0]) !=
+	  libmesh_assert(solution_vectors->find(sys) !=
 			 solution_vectors->end());
 
-	  const bool solve_adjoint =
-            (system_list[0]->have_vector("adjoint_solution0") &&
-             (solution_vectors->find(system_list[0])->second ==
-	      &system_list[0]->get_adjoint_solution()));
+          const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
+
 	  libmesh_assert(solve_adjoint ||
-	    (solution_vectors->find(system_list[0])->second ==
-	     system_list[0]->solution.get()) ||
-	    !solution_vectors->find(system_list[0])->second);
+	    (solution_vectors->find(sys)->second ==
+	     sys->solution.get()) ||
+	    !solution_vectors->find(sys)->second);
 
           if (solve_adjoint)
             {
-              // Set up proper initial guesses
-	      for (unsigned int i=0; i != system_list.size(); ++i)
-	        system_list[0]->get_adjoint_solution() = *system_list[0]->solution;
-              system_list[0]->adjoint_solve();
+              unsigned int adj = libMesh::invalid_uint;
+	      for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                {
+                  OStringStream adjoint_name;
+                  adjoint_name << "adjoint_solution" << j;
+
+                  if (vec == sys->request_vector(adjoint_name.str()))
+                    {
+                      adj = j;
+                      break;
+                    }
+                }
+              libmesh_assert(adj != libMesh::invalid_uint);
+
+              // Set up proper initial guess
+	      sys->get_adjoint_solution(adj) = *sys->solution;
+              sys->adjoint_solve();
               // Put the adjoint_solution into solution for
               // comparisons
-	      system_list[0]->get_adjoint_solution().swap(*system_list[0]->solution);
-	      system_list[0]->update();
+	      sys->get_adjoint_solution(adj).swap(*sys->solution);
+	      sys->update();
             }
 	  else
-            system_list[0]->solve();
+            sys->solve();
         }
     }
 
