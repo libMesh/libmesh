@@ -2190,6 +2190,8 @@ mesh
                                  procup, dof_filled_keys);
           Parallel::send_receive(procdown, dof_row_vals,
                                  procup, dof_filled_vals);
+          Parallel::send_receive(procdown, dof_row_rhss,
+                                 procup, dof_filled_rhss);
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
           Parallel::send_receive(procdown, node_row_keys,
                                  procup, node_filled_keys);
