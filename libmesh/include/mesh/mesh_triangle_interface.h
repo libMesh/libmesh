@@ -29,10 +29,12 @@
 
 // Local Includes
 #include "enum_elem_type.h"
-#include "point.h"
 #include "libmesh.h"
 #include "mesh_serializer.h"
-#include "unstructured_mesh.h"
+
+// Forward Declarations
+
+class UnstructuredMesh;
 
 namespace libMesh
 {
