@@ -1921,10 +1921,24 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
       Node* node = *nd;
 
       for (unsigned int k=0; k != order*nz+1; ++k)
-        mesh.add_point(*node + (extrusion_vector * k / nz / order),
-                       node->id() + (k * orig_nodes),
-                       node->processor_id());
+        {
+          Node *new_node = 
+	    mesh.add_point(*node +
+                           (extrusion_vector * k / nz / order),
+                           node->id() + (k * orig_nodes),
+                           node->processor_id());
+
+          const std::vector<boundary_id_type> ids_to_copy =
+            cross_section.boundary_info->boundary_ids(node);
+
+          mesh.boundary_info->add_node(new_node, ids_to_copy);
+        }
     }
+
+  const std::set<boundary_id_type> &side_ids =
+    cross_section.boundary_info->get_side_boundary_ids();
+  const boundary_id_type next_side_id = side_ids.empty() ?
+    0 : *side_ids.rbegin();
 
   MeshBase::const_element_iterator       el  = cross_section.elements_begin();
   const MeshBase::const_element_iterator end = cross_section.elements_end();
@@ -1935,6 +1949,10 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 
       // build_extrusion currently only works on coarse meshes
       libmesh_assert (elem->parent() == NULL);
+
+      // We need a map from low-D to high-D sides for boundary id
+      // setting
+      std::vector<unsigned char> sidemap(4);
 
       for (unsigned int k=0; k != nz; ++k)
         {
@@ -2051,7 +2069,22 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
             }
           new_elem->set_id(elem->id() + (k * orig_elem));
           new_elem->processor_id() = elem->processor_id();
-          mesh.add_elem(new_elem);
+          new_elem = mesh.add_elem(new_elem);
+
+          // Copy any old boundary ids on all sides
+          for (unsigned int s = 0; s != elem->n_sides(); ++s)
+            {
+              const std::vector<boundary_id_type> ids_to_copy =
+                cross_section.boundary_info->boundary_ids(elem, s);
+
+              mesh.boundary_info->add_side(new_elem, s+1, ids_to_copy);
+            }
+
+          // Give new boundary ids to bottom and top
+          if (k == 0)
+            mesh.boundary_info->add_side(new_elem, 0, next_side_id);
+          if (k == nz-1)
+            mesh.boundary_info->add_side(new_elem, elem->n_sides(), next_side_id+1);
         }
     }
 
