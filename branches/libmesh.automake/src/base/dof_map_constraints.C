@@ -1441,6 +1441,9 @@ void DofMap::enforce_constraints_exactly (const System &system,
   // to other processors
   if (v->type() == SERIAL)
     {
+#ifndef NDEBUG
+      v_global->close();
+#endif
       v_global->localize (*v);
     }
   v->close();
@@ -2187,6 +2190,8 @@ mesh
                                  procup, dof_filled_keys);
           Parallel::send_receive(procdown, dof_row_vals,
                                  procup, dof_filled_vals);
+          Parallel::send_receive(procdown, dof_row_rhss,
+                                 procup, dof_filled_rhss);
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
           Parallel::send_receive(procdown, node_row_keys,
                                  procup, node_filled_keys);

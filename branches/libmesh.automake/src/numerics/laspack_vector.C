@@ -112,6 +112,10 @@ void LaspackVector<T>::add (const T v)
 
   for (unsigned int i=0; i<n; i++)
     this->add (i, v);
+
+#ifndef NDEBUG
+  this->_is_closed = false;
+#endif
 }
 
 
@@ -131,11 +135,19 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
   // Make sure the vector passed in is really a LaspackVector
   const LaspackVector* v = libmesh_cast_ptr<const LaspackVector*>(&v_in);
 
+#ifndef NDEBUG
+  const bool was_closed = this->_is_closed;
+#endif
+
   libmesh_assert (v != NULL);
   libmesh_assert (this->size() == v->size());
 
   for (unsigned int i=0; i<v->size(); i++)
     this->add (i, a*(*v)(i));
+
+#ifndef NDEBUG
+  this->_is_closed = was_closed;
+#endif
 }
 
 
@@ -291,6 +303,7 @@ NumericVector<T>&
 LaspackVector<T>::operator = (const T s)
 {
   libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
 
   V_SetAllCmp (&_vec, s);
 
@@ -321,14 +334,17 @@ LaspackVector<T>&
 LaspackVector<T>::operator = (const LaspackVector<T>& v)
 {
   libmesh_assert (this->initialized());
+  libmesh_assert (v.closed());
   libmesh_assert (this->size() == v.size());
-
-  this->_is_closed = v._is_closed;
 
   if (v.size() != 0)
     Asgn_VV (const_cast<QVector*>(&_vec),
 	     const_cast<QVector*>(&v._vec)
 	     );
+
+#ifndef NDEBUG
+  this->_is_closed = true;
+#endif
 
   return *this;
 }
@@ -393,6 +409,10 @@ void LaspackVector<T>::localize (const unsigned int libmesh_dbg_var(first_local_
   libmesh_assert (last_local_idx+1 == this->size());
 
   libmesh_assert (send_list.size() <= this->size());
+
+#ifndef NDEBUG
+  this->_is_closed = true;
+#endif
 }
 
 

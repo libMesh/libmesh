@@ -101,6 +101,13 @@ public:
 //    */
 //   virtual void solve ();
 
+
+  /**
+   * Avoids use of any cached data that might affect any solve result.  Should
+   * be overloaded in derived systems.
+   */
+  virtual void disable_cache ();
+
   /**
    * @returns \p "Implicit".  Helps in identifying
    * the system type in an equation system file.
@@ -378,7 +385,6 @@ unsigned int ImplicitSystem::n_matrices () const
 {
  return _matrices.size();
 }
-
 
 } // namespace libMesh
 
