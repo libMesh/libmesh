@@ -537,6 +537,53 @@ void BoundaryInfo::add_node(const Node* node,
   _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
 }
 
+void BoundaryInfo::add_node(const Node* node,
+			    const std::vector<boundary_id_type>& ids)
+{
+  if (ids.empty())
+    return;
+
+  libmesh_assert (node != NULL);
+
+  // A convenient typedef
+  typedef std::multimap<const Node*, boundary_id_type>::const_iterator Iter;
+
+  // Don't add the same ID twice
+  std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
+
+  for (unsigned int i=0; i!= ids.size(); ++i)
+    {
+      boundary_id_type id=ids[i];
+
+      if (id == invalid_id)
+        {
+          libMesh::err << "ERROR: You may not set a boundary ID of "
+		        << invalid_id << std::endl
+		        << " That is reserved for internal use.\n"
+		        << std::endl;
+
+          libmesh_error();
+        }
+
+      bool already_inserted = false;
+      for (Iter p = pos.first;p != pos.second; ++p)
+        if (p->second == id)
+          {
+            already_inserted = true;
+            break;
+          }
+      if (already_inserted)
+        continue;
+
+      std::pair<const Node*, boundary_id_type> kv (node, id);
+
+      _boundary_node_id.insert(kv);
+      _boundary_ids.insert(id);
+      _node_boundary_ids.insert(id); // Also add this ID to the set of node boundary IDs
+    }
+}
+
+
 void BoundaryInfo::clear_boundary_node_ids()
 {
   _boundary_node_id.clear();
