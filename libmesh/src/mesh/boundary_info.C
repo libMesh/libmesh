@@ -626,10 +626,16 @@ void BoundaryInfo::add_side(const Elem* elem,
           libmesh_error();
         }
 
+      bool already_inserted = false;
       for (Iter p = pos.first;p != pos.second; ++p)
         if (p->second.first == side &&
             p->second.second == id)
-          continue;
+          {
+            already_inserted = true;
+            break;
+          }
+      if (already_inserted)
+        continue;
 
       std::pair<unsigned short int, boundary_id_type> p(side,id);
       std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
