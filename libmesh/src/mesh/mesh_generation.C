@@ -1792,9 +1792,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
     default:
       libmesh_error();
 
+
+
     } // end switch (dim)
-
-
 
   // Now we have the beginnings of a sphere.
   // Add some more elements by doing uniform refinements and
@@ -1877,6 +1877,20 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
   // The meshes could probably use some smoothing.
   LaplaceMeshSmoother smoother(mesh);
   smoother.smooth(2);
+
+  // We'll give the whole sphere surface a boundary id of 0
+  {
+    MeshBase::element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator end = mesh.active_elements_end();
+
+    for (; it != end; ++it)
+      {
+        Elem* elem = *it;
+        for (unsigned int s=0; s != elem->n_sides(); ++s)
+          if (!elem->neighbor(s))
+            mesh.boundary_info->add_side(elem, s, 0);
+      }
+  }
 
   STOP_LOG("build_sphere()", "MeshTools::Generation");
 
