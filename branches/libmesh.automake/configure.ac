@@ -175,20 +175,6 @@ AC_SUBST(PWD)
 
 
 # --------------------------------------------------------------
-# Look for a user or system-provided boost.  If there is not
-# one available then use the minimal ./contrib/boost provided.
-# --------------------------------------------------------------
-AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using external boost installation >>>))
-  # If that did not work, try using our builtin boost
-  if test "x$BOOST_CPPFLAGS" = "x" ; then
-    BOOST_ROOT="$PWD/contrib"
-    AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using libmesh-provided boost in ./contrib >>>))
-  fi
-# --------------------------------------------------------------
-
-
-
-# --------------------------------------------------------------
 # configure parts of the libmesh core
 # --------------------------------------------------------------
 LIBMESH_CORE_FEATURES

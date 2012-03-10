@@ -40,6 +40,23 @@ if test "$enableoptional" != no ; then
 fi
 
 
+
+# --------------------------------------------------------------
+# Look for a user or system-provided boost.  If there is not
+# one available then use the minimal ./contrib/boost provided.
+# --------------------------------------------------------------
+AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using external boost installation >>>))
+  # If that did not work, try using our builtin boost
+  if test "x$BOOST_CPPFLAGS" = "x" ; then
+    BOOST_ROOT="$srcdir/contrib"
+    AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using libmesh-provided boost in ./contrib >>>))
+  fi
+# currently only using boost headers
+libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
+#libmesh_optional_LIBS="$BOOST_LDFLAGS $libmesh_optional_LIBS"
+# --------------------------------------------------------------
+
+
 # -------------------------------------------------------------
 # Petsc -- enabled by default
 # -------------------------------------------------------------
@@ -72,12 +89,12 @@ CONFIGURE_TBB
 # -------------------------------------------------------------
 
 
+
 # -------------------------------------------------------------
 # LASPACK iterative solvers -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_LASPACK
 # -------------------------------------------------------------
-
 
 
 
