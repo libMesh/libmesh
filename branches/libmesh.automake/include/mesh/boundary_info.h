@@ -137,6 +137,13 @@ public:
 		 const boundary_id_type id);
 
   /**
+   * Add \p Node \p node with boundary ids \p ids to the boundary
+   * information data structure.
+   */
+  void add_node (const Node* node,
+		 const std::vector<boundary_id_type>& ids);
+
+  /**
    * Clears all the boundary information from all of the nodes in the mesh
    */
   void clear_boundary_node_ids();
