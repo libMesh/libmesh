@@ -38,35 +38,6 @@ echo Build architecture............ : $BUILD_ARCH
 echo SVN revision number........... : $BUILD_VERSION
 
 ######################################################################################
-# echo
-# echo Solver Configuration:
-
-#  if test "x$ENABLE_COMP_NS" = "x1"; then
-#    echo '   'Compressible Navier-Stokes.......... : yes
-#  else
-#    echo '   'Compressible Navier-Stokes.......... : no
-#  fi
-
-# # if test "x$ENABLE_PRIM_NS" = "x1"; then
-# #   echo '   'Primitive Navier-Stokes.... : yes
-# # else
-# #   echo '   'Primitive Navier-Stokes.... : no
-# # fi
-
-#  if test "x$ENABLE_HEAT_TRANSFER" = "x1"; then
-#    echo '   'Heat transfer support............... : yes
-#  else
-#    echo '   'Heat transfer support............... : no
-#  fi
-
-#  if test "x$ENABLE_FASTMATH" = "x1"; then
-#    echo '   'Fast math function approximations... : yes
-#  else
-#    echo '   'Fast math function approximations... : no
-#  fi
-
-
-######################################################################################
 echo
 echo Library Features:
 echo '  'adaptive mesh refinement.... : $enableamr
@@ -89,7 +60,7 @@ echo '  'xdr binary I/O.............. : $enablexdr
 
 		   
 ######################################################################################
-if test "x$enableoptional" = "xyes"; then
+if (test "x$enableoptional" = "xyes"); then
   echo
   echo Optional Packages:
   echo '  'eigen....................... : $enableeigen
@@ -115,11 +86,15 @@ if test "x$enableoptional" = "xyes"; then
   echo '  'trilinos.................... : $enabletrilinos
   echo '  'vtk......................... : $enablevtk
   echo
-  echo '  'libmesh_optional_INCLUDES... : $libmesh_optional_INCLUDES
-  echo '  'libmesh_optional_LIBS....... : $libmesh_optional_LIBS
-fi
-		   
-echo
+  if (test "x$libmesh_optional_INCLUDES" != "x"); then
+    echo '  'libmesh_optional_INCLUDES... : $libmesh_optional_INCLUDES
+    echo
+  fi
+  if (test "x$libmesh_optional_LIBS" != "x"); then
+    echo '  'libmesh_optional_LIBS....... : $libmesh_optional_LIBS
+    echo
+  fi	
+fi		   
 echo '-------------------------------------------------------------------------------'
 
 echo Configure complete, now type \'make\' and then \'make install\'.
