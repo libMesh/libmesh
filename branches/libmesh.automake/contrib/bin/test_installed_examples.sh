@@ -29,7 +29,7 @@ if (test "x$PKG_CONFIG" != "xno"); then
     installed_LIBS=`pkg-config libmesh --libs`
 
 elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
-    installed_CXXFLAG=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
+    installed_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
     installed_LIBS=`$LIBMESH_CONFIG_PATH/libmesh-config --libs`
 
 else
