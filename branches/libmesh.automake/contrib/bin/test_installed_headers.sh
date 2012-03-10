@@ -23,7 +23,17 @@ fi
 
 #echo "CXX=$CXX"
 
-installed_CXXFLAGS=`pkg-config libmesh --cflags`
+if (test "x$PKG_CONFIG" != "xno"); then
+    installed_CXXFLAGS=`pkg-config libmesh --cflags`
+
+elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
+    installed_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
+
+else
+    echo "Cannot query package installation!!"
+    exit 1
+fi
+
 
 
 returnval=0

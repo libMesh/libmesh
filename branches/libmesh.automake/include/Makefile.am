@@ -369,6 +369,7 @@ EXTRA_DIST = ../contrib/bin/test_installed_headers.sh
 ######################################################################
 #
 # What to do for 'make installcheck'
+bindir=$(exec_prefix)/bin/@host@_@METHOD@
 libdir=$(exec_prefix)/lib/@host@_@METHOD@
 pkgconfigdir=$(libdir)/pkgconfig
 
@@ -378,6 +379,8 @@ installcheck-local:
 	@echo " "
 	@CXX="$(CXX)" \
 	  HEADERS_TO_TEST="$(nobase_include_HEADERS)" \
+	  PKG_CONFIG=$(PKG_CONFIG) \
 	  PKG_CONFIG_PATH=$(pkgconfigdir) \
+	  LIBMESH_CONFIG_PATH=$(bindir) \
 	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
 

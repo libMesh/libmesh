@@ -129,6 +129,18 @@ AC_SUBST(PERL)
 
 
 
+# -------------------------------------------------------------
+# pkg-config - used to configure installed pakages.  We can
+# use it to query our installed targets, if it exists.
+# Otherwise we caln fall back to libmesh-config.
+# -------------------------------------------------------------
+if (test -z "$PKG_CONFIG"); then
+  AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+fi
+# -------------------------------------------------------------
+ 
+
+
 # --------------------------------------------------------------
 # This is a special test for the mpCC (IBM) compiler.
 # mpCC fails the AC_LANG tests. Set the compiler to 

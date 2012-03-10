@@ -310,6 +310,7 @@ EXTRA_DIST += ../contrib/bin/test_installed_examples.sh
 ######################################################################
 #
 # What to do for 'make installcheck'
+bindir=$(exec_prefix)/bin/@host@_@METHOD@
 libdir=$(exec_prefix)/lib/@host@_@METHOD@
 pkgconfigdir=$(libdir)/pkgconfig
 
@@ -319,5 +320,7 @@ installcheck-local:
 	@echo " "
 	@CXX="$(CXX)" \
 	  examples_install_path=$(examples_install_path) \
+	  PKG_CONFIG=$(PKG_CONFIG) \
 	  PKG_CONFIG_PATH=$(pkgconfigdir) \
+	  LIBMESH_CONFIG_PATH=$(bindir) \
 	  $(top_srcdir)/contrib/bin/test_installed_examples.sh

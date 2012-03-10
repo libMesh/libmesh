@@ -24,8 +24,20 @@ fi
 
 echo "Testing examples in $examples_install_path"
 
-installed_CXXFLAGS=`pkg-config libmesh --cflags`
-installed_LIBS=`pkg-config libmesh --libs`
+if (test "x$PKG_CONFIG" != "xno"); then
+    installed_CXXFLAGS=`pkg-config libmesh --cflags`
+    installed_LIBS=`pkg-config libmesh --libs`
+
+elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
+    installed_CXXFLAG=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
+    installed_LIBS=`$LIBMESH_CONFIG_PATH/libmesh-config --libs`
+
+else
+    echo "Cannot query package installation!!"
+    exit 1
+fi
+
+
 
 #echo "installed_CXXFLAGS=$installed_CXXFLAGS"
 #echo "installed_LIBS=$installed_LIBS"
