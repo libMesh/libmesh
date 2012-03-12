@@ -139,6 +139,11 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual Node* get_node (const unsigned int i) const;
 
   /**
+   * @returns the local index for the \p Node pointer \p node_ptr.
+   */
+  unsigned int get_node_index (const Node* node_ptr) const;
+
+  /**
    * @returns the pointer to local \p Node \p i as a writeable reference.
    */
   virtual Node* & set_node (const unsigned int i);
@@ -1329,7 +1334,6 @@ unsigned int Elem::node (const unsigned int i) const
 }
 
 
-
 inline
 unsigned int Elem::local_node (const unsigned int i) const
 {
@@ -1351,6 +1355,18 @@ Node* Elem::get_node (const unsigned int i) const
   libmesh_assert (_nodes[i] != NULL);
 
   return _nodes[i];
+}
+
+
+
+inline
+unsigned int Elem::get_node_index (const Node* node_ptr) const
+{
+  for (unsigned int n=0; n != this->n_nodes(); ++n)
+    if (this->_nodes[n] == node_ptr)
+      return n;
+
+  return Node::invalid_id;
 }
 
 
