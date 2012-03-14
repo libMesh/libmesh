@@ -710,7 +710,8 @@ using namespace libMesh;
 		for (unsigned int i = 0; i < n_dofs; i++)
 		  {
 		    DofConstraintRow empty_row;
-		    if (!dof_map.is_constrained_dof(dof_indices[i]))
+		    if (dof_is_fixed[i] &&
+                        !dof_map.is_constrained_dof(dof_indices[i]))
 		      dof_map.add_constraint_row
 		        (dof_indices[i], empty_row, 
 		         Ue(i), /* forbid_constraint_overwrite = */ true);
