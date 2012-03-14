@@ -2151,10 +2151,8 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
 	    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
 	    for (unsigned int i = 0; i < n_dofs; i++)
-	      // We may be projecting a new zero value onto
-	      // an old nonzero approximation - RHS
-	      // if (Ue(i) != 0.)
-	      if ((dof_indices[i] >= first) &&
+	      if (dof_is_fixed[i] &&
+                  (dof_indices[i] >= first) &&
 		  (dof_indices[i] <  last))
                 {
                   new_vector.set(dof_indices[i], Ue(i));
