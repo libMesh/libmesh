@@ -751,11 +751,14 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 
   // Hanging node constraints never occur in 1D, and none of our
   // existing elements have p-adaptivity constraints in 1D, but we
-  // might have periodic boundary conditions in 1D that will generate
+  // might have boundary conditions in 1D that will generate
   // constraint equations
   if (dim == 1 
 #ifdef LIBMESH_ENABLE_PERIODIC
       && _periodic_boundaries->empty()
+#endif
+#ifdef LIBMESH_ENABLE_DIRICHLET
+      && _dirichlet_boundaries->empty()
 #endif
      )
   {
