@@ -1918,6 +1918,10 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 
   unsigned int order = 1;
 
+  // If cross_section is distributed, so is its extrusion
+  if (!cross_section.is_serial())
+    mesh.delete_remote_elements();
+
   // We know a priori how many elements we'll need
   mesh.reserve_elem(nz*orig_elem);
 
@@ -1952,7 +1956,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   const std::set<boundary_id_type> &side_ids =
     cross_section.boundary_info->get_side_boundary_ids();
   const boundary_id_type next_side_id = side_ids.empty() ?
-    0 : *side_ids.rbegin();
+    0 : *side_ids.rbegin() + 1;
 
   MeshBase::const_element_iterator       el  = cross_section.elements_begin();
   const MeshBase::const_element_iterator end = cross_section.elements_end();
@@ -2081,6 +2085,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                 break;
               }
             }
+
           new_elem->set_id(elem->id() + (k * orig_elem));
           new_elem->processor_id() = elem->processor_id();
           new_elem = mesh.add_elem(new_elem);
@@ -2098,7 +2103,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           if (k == 0)
             mesh.boundary_info->add_side(new_elem, 0, next_side_id);
           if (k == nz-1)
-            mesh.boundary_info->add_side(new_elem, elem->n_sides(), next_side_id+1);
+            mesh.boundary_info->add_side(new_elem, elem->n_sides()+1, next_side_id+1);
         }
     }
 
