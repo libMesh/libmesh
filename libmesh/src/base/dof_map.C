@@ -2530,7 +2530,7 @@ std::string DofMap::get_info() const
       avg_constraint_length += rowsize;
       n_constraints++;
 
-      if (it->second.second == Number(0))
+      if (it->second.second != Number(0))
         n_rhss++;
     }
 
@@ -2538,7 +2538,7 @@ std::string DofMap::get_info() const
      << n_constraints;
   if (n_rhss)
     os << '\n'
-       << "      Number of heterogenous constraints= " << n_rhss;
+       << "      Number of Heterogenous Constraints= " << n_rhss;
   if (n_constraints)
     {
       avg_constraint_length /= n_constraints;
@@ -2564,9 +2564,9 @@ std::string DofMap::get_info() const
     }
 
   os << "\n      Number of Node Constraints = " << n_node_constraints;
-  if (n_rhss)
+  if (n_node_rhss)
     os << '\n'
-       << "      Number of heterogenous node constraints= " << n_node_rhss;
+       << "      Number of Heterogenous Node Constraints= " << n_node_rhss;
   if (n_node_constraints)
     {
       avg_node_constraint_length /= n_node_constraints;
