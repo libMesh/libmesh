@@ -189,7 +189,8 @@ public:
     inline unsigned        vector_variable_size(const std::string& VarName) const;
     inline STRING_VECTOR   get_variable_names() const;
     inline STRING_VECTOR   get_section_names() const;
-
+    inline
+    std::set<std::string>  get_overridden_variables() const;
 
     // (*) cursor oriented functions -------------------------------------------
     inline void            set_prefix(const char* Prefix) { prefix = std::string(Prefix); }
@@ -304,6 +305,7 @@ private:
     //                                     // reaching end of arg array ?
     bool                  search_failed_f; // flag indicating a failed search() operation
     //                                     // (e.g. next() functions react with 'missed')
+    std::set<std::string> overridden_vars; // vector of variables that were supplied more than once during parsing
 
     //     --  nominus vector
     int                   nominus_cursor;  // cursor for nominus_pointers
@@ -1791,7 +1793,10 @@ GetPot::_set_variable(const char* VarName, const char* Value, const bool Request
 {
     const GetPot::variable* Var = Requested ? _request_variable(VarName) : _find_variable(VarName);
     if( Var == 0 ) variables.push_back(variable(VarName, Value, _field_separator.c_str()));
-    else           ((GetPot::variable*)Var)->take(Value, _field_separator.c_str());
+    else {
+      overridden_vars.insert(VarName);
+      ((GetPot::variable*)Var)->take(Value, _field_separator.c_str());
+    }
 }
 
 template <typename T>
@@ -1851,6 +1856,10 @@ GetPot::get_variable_names() const
 inline STRING_VECTOR
 GetPot::get_section_names() const
 { return section_list; }
+
+inline std::set<std::string>
+GetPot::get_overridden_variables() const
+{ return overridden_vars; }
 
 inline const GetPot::variable*
 GetPot::_find_variable(const char* VarName) const
