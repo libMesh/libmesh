@@ -316,6 +316,8 @@ using namespace libMesh;
 		  if (!do_this_side)
 		    continue;
 
+                  is_boundary_side[s] = true;
+
 		  // Then see what nodes and what edges are on it
 		  for (unsigned int n=0; n != elem->n_nodes(); ++n)
 		    if (elem->is_node_on_side(n,s))
