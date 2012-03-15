@@ -354,7 +354,8 @@ unsigned int NewtonSolver::solve()
       _system.update ();
       // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_AMR
-      _system.get_dof_map().enforce_constraints_exactly(_system, &linear_solution);
+      _system.get_dof_map().enforce_constraints_exactly
+        (_system, &linear_solution, /* homogeneous = */ true);
 #endif
 
       const unsigned int linear_steps = rval.first;
