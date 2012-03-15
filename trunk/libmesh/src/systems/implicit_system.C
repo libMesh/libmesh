@@ -338,7 +338,8 @@ ImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
 #ifdef LIBMESH_ENABLE_AMR
   for (unsigned int p=0; p != parameters.size(); ++p)
     this->get_dof_map().enforce_constraints_exactly
-      (*this, &this->get_sensitivity_solution(p));
+      (*this, &this->get_sensitivity_solution(p),
+       /* homogeneous = */ true);
 #endif
 
   this->release_linear_solver(linear_solver);
@@ -395,6 +396,8 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_constraints_exactly
         (*this, &this->get_adjoint_solution(i));
+  // FIXME - should this be heterogenous or homogenous in the
+  // Dirichlet case??
 #endif
 
   // Stop logging the nonlinear solve
@@ -534,6 +537,8 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_constraints_exactly
         (*this, &this->get_weighted_sensitivity_adjoint_solution(i));
+  // FIXME - should this be heterogenous or homogenous in the
+  // Dirichlet case??
 #endif
 
   // Stop logging the nonlinear solve
@@ -616,7 +621,8 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_AMR
   this->get_dof_map().enforce_constraints_exactly
-    (*this, &this->get_weighted_sensitivity_solution());
+    (*this, &this->get_weighted_sensitivity_solution(),
+     /* homogeneous = */ true);
 #endif
 
   // Stop logging the nonlinear solve
