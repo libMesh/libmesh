@@ -1282,7 +1282,7 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
           
             libmesh_assert (pos != _dof_constraints.end());
 
-	    rhs(i) = -pos->second.second;
+	    rhs(i) = 0;
 	  }
     } // end if the RHS is constrained.
 
@@ -1336,7 +1336,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
           
             libmesh_assert (pos != _dof_constraints.end());
 
-	    v(i) = -pos->second.second;
+	    v(i) = 0;
 	  }
     } // end if the RHS is constrained.
 
