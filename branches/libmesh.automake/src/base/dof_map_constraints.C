@@ -316,6 +316,8 @@ using namespace libMesh;
 		  if (!do_this_side)
 		    continue;
 
+                  is_boundary_side[s] = true;
+
 		  // Then see what nodes and what edges are on it
 		  for (unsigned int n=0; n != elem->n_nodes(); ++n)
 		    if (elem->is_node_on_side(n,s))
@@ -710,9 +712,11 @@ using namespace libMesh;
 		for (unsigned int i = 0; i < n_dofs; i++)
 		  {
 		    DofConstraintRow empty_row;
-		    dof_map.add_constraint_row
-		      (dof_indices[i], empty_row, 
-		       Ue(i), /* forbid_constraint_overwrite = */ true);
+		    if (dof_is_fixed[i] &&
+                        !dof_map.is_constrained_dof(dof_indices[i]))
+		      dof_map.add_constraint_row
+		        (dof_indices[i], empty_row, 
+		         Ue(i), /* forbid_constraint_overwrite = */ true);
 		  }
 	      }
 	    }  // end elem loop
@@ -747,11 +751,14 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 
   // Hanging node constraints never occur in 1D, and none of our
   // existing elements have p-adaptivity constraints in 1D, but we
-  // might have periodic boundary conditions in 1D that will generate
+  // might have boundary conditions in 1D that will generate
   // constraint equations
   if (dim == 1 
 #ifdef LIBMESH_ENABLE_PERIODIC
       && _periodic_boundaries->empty()
+#endif
+#ifdef LIBMESH_ENABLE_DIRICHLET
+      && _dirichlet_boundaries->empty()
 #endif
      )
   {
@@ -1275,7 +1282,7 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
           
             libmesh_assert (pos != _dof_constraints.end());
 
-	    rhs(i) = -pos->second.second;
+	    rhs(i) = 0;
 	  }
     } // end if the RHS is constrained.
 
@@ -1329,7 +1336,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
           
             libmesh_assert (pos != _dof_constraints.end());
 
-	    v(i) = -pos->second.second;
+	    v(i) = 0;
 	  }
     } // end if the RHS is constrained.
 
