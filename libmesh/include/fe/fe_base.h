@@ -216,15 +216,6 @@ public:
                                         const unsigned int variable_number,
                                         const Elem* elem);
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  /**
-   * Computes the nodal constraint contributions (for
-   * non-conforming adapted meshes), using Lagrange geometry
-   */
-  static void compute_node_constraints (NodeConstraints &constraints,
-                                        const Elem* elem);
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-
   /**
    * Creates a local projection on \p coarse_elem, based on the
    * DoF values in \p global_vector for it's children.
@@ -238,6 +229,15 @@ public:
 			           const bool use_old_dof_indices = false);
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  /**
+   * Computes the nodal constraint contributions (for
+   * non-conforming adapted meshes), using Lagrange geometry
+   */
+  static void compute_node_constraints (NodeConstraints &constraints,
+                                        const Elem* elem);
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 

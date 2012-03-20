@@ -145,9 +145,24 @@ unsigned int System::n_dofs() const
 
 unsigned int System::n_constrained_dofs() const
 {
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 
   return _dof_map->n_constrained_dofs();
+
+#else
+
+  return 0;
+
+#endif
+}
+
+
+
+unsigned int System::n_local_constrained_dofs() const
+{
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+
+  return _dof_map->n_local_constrained_dofs();
 
 #else
 
@@ -235,7 +250,7 @@ void System::init_data ()
   // Distribute the degrees of freedom on the mesh
   _dof_map->distribute_dofs (mesh);
 
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 
   // Recreate any hanging node constraints
   _dof_map->create_dof_constraints(mesh);
@@ -1471,7 +1486,7 @@ std::string System::get_info() const
 
   out << "    n_dofs()="             << this->n_dofs()             << '\n';
   out << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   out << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
 #endif
 

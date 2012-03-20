@@ -298,7 +298,7 @@ void EquationSystems::allgather ()
       DofMap &dof_map = sys.get_dof_map();
       dof_map.distribute_dofs(_mesh);
 
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
       // The user probably won't need constraint equations or the
       // send_list after an allgather, but let's keep it in consistent
       // shape just in case.
