@@ -737,9 +737,29 @@ namespace libMesh
 // ------------------------------------------------------------
 // DofMap member functions
 
-#if defined(LIBMESH_ENABLE_AMR) || \
-    defined(LIBMESH_ENABLE_PERIODIC) || \
-    defined(LIBMESH_ENABLE_DIRICHLET)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+
+
+unsigned int DofMap::n_constrained_dofs() const
+{
+  parallel_only();
+
+  unsigned int n_dofs = this->n_local_constrained_dofs();
+  Parallel::sum(n_dofs);
+  return n_dofs;
+}
+
+
+unsigned int DofMap::n_local_constrained_dofs() const
+{
+  const DofConstraints::const_iterator lower =
+    _dof_constraints.lower_bound(this->first_dof()),
+                                       upper =
+    _dof_constraints.upper_bound(this->end_dof());
+
+  return std::distance(lower, upper);
+}
+
 
 void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 {
@@ -934,7 +954,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   libmesh_assert (elem_dofs.size() == matrix.n());
 
   // check for easy return
-  if (this->n_constrained_dofs() == 0)
+  if (this->_dof_constraints.empty())
     return;
 
   // The constrained matrix is built up as C^T K C.
@@ -1004,7 +1024,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
   libmesh_assert (elem_dofs.size() == rhs.size());
 
   // check for easy return
-  if (this->n_constrained_dofs() == 0)
+  if (this->_dof_constraints.empty())
     return;
 
   // The constrained matrix is built up as C^T K C.
@@ -1086,7 +1106,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
   libmesh_assert (elem_dofs.size() == rhs.size());
 
   // check for easy return
-  if (this->n_constrained_dofs() == 0)
+  if (this->_dof_constraints.empty())
     return;
 
   // The constrained matrix is built up as C^T K C.
@@ -1172,7 +1192,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   libmesh_assert (col_dofs.size() == matrix.n());
 
   // check for easy return
-  if (this->n_constrained_dofs() == 0)
+  if (this->_dof_constraints.empty())
     return;
 
   // The constrained matrix is built up as R^T K C.
@@ -1253,7 +1273,7 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
   libmesh_assert (rhs.size() == row_dofs.size());
 
   // check for easy return
-  if (this->n_constrained_dofs() == 0)
+  if (this->_dof_constraints.empty())
     return;
 
   // The constrained RHS is built up as R^T F.
@@ -1300,7 +1320,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
   libmesh_assert (w.size() == row_dofs.size());
 
   // check for easy return
-  if (this->n_constrained_dofs() == 0)
+  if (this->_dof_constraints.empty())
     return;
 
   // The constrained RHS is built up as R^T F.
@@ -1348,7 +1368,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 void DofMap::constrain_nothing (std::vector<unsigned int>& dofs) const
 {
   // check for easy return
-  if (this->n_constrained_dofs() == 0)
+  if (this->_dof_constraints.empty())
     return;
 
   // All the work is done by \p build_constraint_matrix.  We just need
@@ -1365,9 +1385,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
 {
   parallel_only();
 
-  unsigned int local_constraints = this->n_constrained_dofs();
-  Parallel::max(local_constraints);
-  if (!local_constraints)
+  if (!this->n_constrained_dofs())
     return;
 
   START_LOG("enforce_constraints_exactly()","DofMap");
@@ -2380,7 +2398,7 @@ void DofMap::add_constraints_to_send_list()
 
 
 
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
 
 #ifdef LIBMESH_ENABLE_AMR
