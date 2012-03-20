@@ -73,7 +73,7 @@ DofMap::DofMap(const unsigned int number) :
   _first_old_df(),
   _end_old_df()
 #endif
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   , _dof_constraints()
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -1955,7 +1955,7 @@ void DofMap::augment_send_list_for_projection(const MeshBase& mesh)
 #endif // LIBMESH_ENABLE_AMR
 
 
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 
 void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
 {
@@ -2020,7 +2020,7 @@ void DofMap::find_connected_dofs (std::vector<unsigned int>& elem_dofs) const
     } // end if (!done)
 }
 
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
 
 
@@ -2066,7 +2066,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 
 	  // Get the global indices of the DOFs with support on this element
 	  dof_map.dof_indices (elem, element_dofs);
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 	  dof_map.find_connected_dofs (element_dofs);
 #endif
 
@@ -2165,7 +2165,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 			      const Elem *neighbor = active_neighbors[a];
 
 			      dof_map.dof_indices (neighbor, neighbor_dofs);
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 			      dof_map.find_connected_dofs (neighbor_dofs);
 #endif
 			      const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
@@ -2217,7 +2217,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 
 	    // Find element dofs for variable vi
 	    dof_map.dof_indices (elem, element_dofs_i, vi);
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 	    dof_map.find_connected_dofs (element_dofs_i);
 #endif
 
@@ -2234,7 +2234,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		  if (vi != vj)
 		    {
 		      dof_map.dof_indices (elem, element_dofs_j, vj);
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 		      dof_map.find_connected_dofs (element_dofs_j);
 #endif
 
@@ -2342,7 +2342,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
          			      const Elem *neighbor = active_neighbors[a];
 
          			      dof_map.dof_indices (neighbor, neighbor_dofs);
-     #if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+     #ifdef LIBMESH_ENABLE_CONSTRAINTS
      			            dof_map.find_connected_dofs (neighbor_dofs);
      #endif
      			            const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
@@ -2507,17 +2507,11 @@ std::string DofMap::get_info() const
   os << "      Maximum Off-Processor Bandwidth"
      << may_equal << max_n_oz << std::endl;
 
-#if defined(LIBMESH_ENABLE_AMR) || defined(LIBMESH_ENABLE_PERIODIC)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 
   unsigned int n_constraints = 0, max_constraint_length = 0,
                n_rhss = 0;
   long double avg_constraint_length = 0.;
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  unsigned int n_node_constraints = 0, max_node_constraint_length = 0,
-               n_node_rhss = 0;
-  long double avg_node_constraint_length = 0.;
-#endif
 
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
@@ -2548,6 +2542,10 @@ std::string DofMap::get_info() const
     }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  unsigned int n_node_constraints = 0, max_node_constraint_length = 0,
+               n_node_rhss = 0;
+  long double avg_node_constraint_length = 0.;
+
   for (NodeConstraints::const_iterator it=_node_constraints.begin();
        it != _node_constraints.end(); ++it)
     {
@@ -2578,7 +2576,7 @@ std::string DofMap::get_info() const
 
   os << std::endl;
 
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
   return os.str();
 }
