@@ -509,7 +509,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
 
   new_vector.close();
 
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
 #endif
 
@@ -611,7 +611,7 @@ void System::boundary_project_vector
 
   new_vector.close();
 
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
 #endif
 
