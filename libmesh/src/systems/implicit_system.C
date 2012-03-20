@@ -335,7 +335,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
     }
 
   // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   for (unsigned int p=0; p != parameters.size(); ++p)
     this->get_dof_map().enforce_constraints_exactly
       (*this, &this->get_sensitivity_solution(p),
@@ -391,7 +391,7 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
   this->release_linear_solver(linear_solver);
 
   // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_constraints_exactly
@@ -532,7 +532,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
       delete temprhs[i];
 
   // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_constraints_exactly
@@ -619,7 +619,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
   this->release_linear_solver(linear_solver);
 
   // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   this->get_dof_map().enforce_constraints_exactly
     (*this, &this->get_weighted_sensitivity_solution(),
      /* homogeneous = */ true);

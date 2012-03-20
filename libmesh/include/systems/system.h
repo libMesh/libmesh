@@ -946,10 +946,16 @@ public:
   unsigned int n_active_dofs() const;
 
   /**
-   * @returns the number of constrained degrees of freedom
+   * @returns the total number of constrained degrees of freedom
    * in the system.
    */
   unsigned int n_constrained_dofs() const;
+
+  /**
+   * @returns the number of constrained degrees of freedom
+   * on this processor.
+   */
+  unsigned int n_local_constrained_dofs() const;
 
   /**
    * @returns the number of degrees of freedom local
