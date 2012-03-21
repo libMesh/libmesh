@@ -405,17 +405,37 @@ AC_SUBST(PWD)
 
 
 
-dnl --------------------------------------------------------------
-dnl Look for a user or system-provided boost.  If there is not
-dnl one available then use the minimal ./contrib/boost provided.
-dnl --------------------------------------------------------------
-AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using external boost installation >>>))
-  dnl If that did not work, try using our builtin boost
-  if test "x$BOOST_CPPFLAGS" = "x" ; then
-    BOOST_ROOT="$PWD/contrib"
-    AX_BOOST_BASE([], AC_MSG_RESULT(<<< Using libmesh-provided boost in ./contrib >>>))
+dnl -------------------------------------------------------------
+dnl Boost -- enabled by default
+dnl -------------------------------------------------------------
+AC_ARG_ENABLE(boost,
+              AC_HELP_STRING([--enable-boost],
+                             [build with either external or built-in BOOST support]),
+              enableboost=$enableval,
+              enableboost=yes)
+
+if (test "$enableboost" !=  no) ; then
+  dnl --------------------------------------------------------------
+  dnl Look for a user or system-provided boost.  If there is not
+  dnl one available then use the minimal ./contrib/boost provided.
+  dnl --------------------------------------------------------------
+  external_boost_found=yes
+  AX_BOOST_BASE([1.20.0], [AC_MSG_RESULT(<<< Using external boost installation >>>)], [external_boost_found=no], [])
+  
+  dnl If that did not work, try using our builtin boost.
+  if test "$external_boost_found" = "no" ; then
+    AC_MSG_RESULT(<<< External boost installation *not* found... will try to configure for libmesh's internal boost >>>)
+  
+    dnl Note: 4th argument is libmesh's builtin boost.
+    internal_boost_found=yes
+    AX_BOOST_BASE([1.20.0], [AC_MSG_RESULT(<<< Using libmesh-provided boost in ./contrib >>>)], [internal_boost_found=no], [$PWD/contrib/boost])
+  
+    if test "$internal_boost_found" = "no" ; then
+      AC_MSG_RESULT(<<< Libmesh boost installation *not* found >>>)
+    fi
   fi
-dnl --------------------------------------------------------------
+  dnl --------------------------------------------------------------
+fi
 
 dnl -------------------------------------------------------------
 dnl Allow user to specify --enable-everything

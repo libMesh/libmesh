@@ -116,3 +116,7 @@ contrib/fparser/powi_speedtest
 contrib/fparser/speedtest
 contrib/fparser/tests/make_tests
 contrib/fparser/testbed
+examples/reduced_basis/reduced_basis_ex1/equation_systems.xda
+examples/reduced_basis/reduced_basis_ex1/equation_systems.xda.0000
+examples/reduced_basis/reduced_basis_ex4/equation_systems.xda
+examples/reduced_basis/reduced_basis_ex4/equation_systems.xda.0000

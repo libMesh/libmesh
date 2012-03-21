@@ -4,7 +4,7 @@
 #
 # SYNOPSIS
 #
-#   AX_BOOST_BASE([MINIMUM-VERSION], [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_BOOST_BASE([MINIMUM-VERSION], [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND], [OVERRIDE-WITH-BOOST])
 #
 # DESCRIPTION
 #
@@ -37,6 +37,15 @@
 
 AC_DEFUN([AX_BOOST_BASE],
 [
+  dnl Don't check --with-boost if there is a 4th argument.  In that case
+  dnl we just set want_boost=yes and ac_boost_path=$4.  This way we can configure
+  dnl for boost in a known location without the user explicitly asking for it
+  dnl by --with-boost=/known/location
+  if test "x$4" != "x"; then
+    want_boost="yes"
+    ac_boost_path="$4"
+  else
+    dnl Use whatever the user passed in --with-boost
 AC_ARG_WITH([boost],
   [AS_HELP_STRING([--with-boost@<:@=ARG@:>@],
     [use Boost library from a standard location (ARG=yes),
@@ -68,8 +77,9 @@ AC_ARG_WITH([boost-libdir],
                 AC_MSG_ERROR(--with-boost-libdir expected directory name)
         fi
         ],
-        [ac_boost_lib_path=""]
-)
+        [ac_boost_lib_path=""])
+  fi
+
 
 if test "x$want_boost" = "xyes"; then
     boost_lib_version_req=ifelse([$1], ,1.20.0,$1)
