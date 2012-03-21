@@ -55,6 +55,16 @@ AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar 1.10]) # require automake 1.10 - I havent
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) # use silent rules where available - automake 1.11
 
 
+dnl Release versioning
+AX_SPLIT_VERSION
+
+GENERIC_MAJOR_VERSION=$AX_MAJOR_VERSION
+GENERIC_MINOR_VERSION=$AX_MINOR_VERSION
+GENERIC_MICRO_VERSION=$AX_POINT_VERSION
+
+AC_SUBST(GENERIC_MAJOR_VERSION)
+AC_SUBST(GENERIC_MINOR_VERSION)
+AC_SUBST(GENERIC_MICRO_VERSION)
 
 
 # --------------------------------------------------------------
