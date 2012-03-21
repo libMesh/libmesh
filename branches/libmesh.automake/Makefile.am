@@ -75,7 +75,8 @@ SUBDIRS = include #src include
 AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-INCLUDES    = $(libmesh_INCLUDE) $(libmesh_contrib_INCLUDES)
+INCLUDES    = $(libmesh_INCLUDE) $(libmesh_contrib_INCLUDES) -I$(top_builddir)/include/utils # required for libmesh_version.h
+
 LIBS        = $(libmesh_LIBS)
 
 # A convenience library to hold proper libMesh 
