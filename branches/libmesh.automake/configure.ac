@@ -4,7 +4,7 @@
 
 
 
-AC_INIT([libmesh], [0.7.3rc1], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
+AC_INIT([libmesh], [0.7.3], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
 AC_PREREQ([2.61]) # require autoconf 2.61 - I havent tried anything older
 
 # by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
@@ -34,6 +34,7 @@ AC_CANONICAL_TARGET
 AC_CONFIG_FILES([Make.common
                  Makefile
 		 include/Makefile
+                 include/utils/libmesh_version.h
 		 examples/Makefile
 		 doc/Doxyfile
 		 libmesh.pc

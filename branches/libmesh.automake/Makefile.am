@@ -429,6 +429,7 @@ libmesh_la_SOURCES = \
 		src/systems/transient_system.C \
 		src/utils/error_vector.C \
 		src/utils/hashword.C \
+		src/utils/libmesh_version.C \
 		src/utils/location_maps.C \
 		src/utils/number_lookups.C \
 		src/utils/o_f_stream.C \
@@ -569,6 +570,10 @@ projection_LDADD    = libmesh.la
 bin_PROGRAMS += amr
 amr_SOURCES   = src/apps/amr.C
 amr_LDADD     = libmesh.la
+
+bin_PROGRAMS += output_libmesh_version
+output_libmesh_version_SOURCES = src/utils/output_libmesh_version.C
+output_libmesh_version_LDADD = libmesh.la
 
 bin_SCRIPTS += contrib/bin/libmesh-config 
 

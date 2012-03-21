@@ -359,6 +359,7 @@ libmesh_local_la_SOURCES = \
 		systems/transient_system.C \
 		utils/error_vector.C \
 		utils/hashword.C \
+                utils/libmesh_version.C \
 		utils/location_maps.C \
 		utils/number_lookups.C \
 		utils/o_f_stream.C \
@@ -376,4 +377,6 @@ libmesh_local_la_SOURCES = \
 		utils/tree_node.C \
 		utils/utility.C \
 		utils/xdr_cxx.C 
+
+
 

@@ -331,6 +331,7 @@ nobase_include_HEADERS = \
 		utils/error_vector.h \
 		utils/hashword.h \
 		utils/ignore_warnings.h \
+		utils/libmesh_version.h \
 		utils/location_maps.h \
 		utils/mapvector.h \
 		utils/number_lookups.h \
