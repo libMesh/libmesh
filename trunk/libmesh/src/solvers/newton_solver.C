@@ -397,11 +397,13 @@ unsigned int NewtonSolver::solve()
 
           // don't fiddle around if we've already converged
           if (test_convergence(current_residual, norm_delta,
-                               linear_solve_finished))
+                               linear_solve_finished &&
+                               current_residual <= last_residual))
             {
               if (!quiet)
                 print_convergence(_outer_iterations, current_residual,
-                                  norm_delta, linear_solve_finished);
+                                  norm_delta, linear_solve_finished &&
+                                  current_residual <= last_residual);
               _outer_iterations++;
               break; // out of _outer_iterations for loop
             }
