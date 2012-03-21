@@ -64,11 +64,18 @@ template <typename T> class NumericVector;
 
 
 // ------------------------------------------------------------
-// AMR constraint matrix types
+// Do we need constraints for anything?
 
 #if defined(LIBMESH_ENABLE_AMR) || \
     defined(LIBMESH_ENABLE_PERIODIC) || \
     defined(LIBMESH_ENABLE_DIRICHLET)
+#  define LIBMESH_ENABLE_CONSTRAINTS 1
+#endif
+
+// ------------------------------------------------------------
+// AMR constraint matrix types
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 /**
  * A row of the Dof constraint matrix.
  */
@@ -114,7 +121,7 @@ class NodeConstraints : public std::map<const Node *,
 };
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC || LIBMESH_ENABLE_DIRICHLET
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
 
 
@@ -442,9 +449,7 @@ public:
 			     DenseVectorBase<Number>& Ue) const;
 
 
-#if defined(LIBMESH_ENABLE_AMR) || \
-    defined(LIBMESH_ENABLE_PERIODIC) || \
-    defined(LIBMESH_ENABLE_DIRICHLET)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 
   //--------------------------------------------------------------------
   // Constraint-specific methods
@@ -452,7 +457,13 @@ public:
    * @returns the total number of constrained degrees of freedom
    * in the problem.
    */
-  unsigned int n_constrained_dofs() const { return _dof_constraints.size(); }
+  unsigned int n_constrained_dofs() const;
+
+  /**
+   * @returns the number of constrained degrees of freedom
+   * on this processor.
+   */
+  unsigned int n_local_constrained_dofs() const;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
@@ -557,7 +568,7 @@ public:
   std::pair<Real, Real> max_constraint_error(const System &system,
 					     NumericVector<Number> *v = NULL) const;
 
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC || LIBMESH_ENABLE_DIRICHLET
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
   //--------------------------------------------------------------------
   // Constraint-specific methods
@@ -872,9 +883,7 @@ private:
    */
   void add_neighbors_to_send_list(MeshBase& mesh);
 
-#if defined(LIBMESH_ENABLE_AMR) || \
-    defined(LIBMESH_ENABLE_PERIODIC) || \
-    defined(LIBMESH_ENABLE_DIRICHLET)
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
 
   /**
    * Build the constraint matrix C associated with the element
@@ -924,7 +933,7 @@ private:
    */
   void add_constraints_to_send_list();
 
-#endif // LIBMESH_ENABLE_AMR || LIBMESH_ENABLE_PERIODIC || LIBMESH_ENABLE_DIRICHLET
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
 
   /**
@@ -1039,15 +1048,13 @@ private:
 
 #endif
 
-#if defined(LIBMESH_ENABLE_AMR) || \
-    defined(LIBMESH_ENABLE_PERIODIC) || \
-    defined(LIBMESH_ENABLE_DIRICHLET)
-
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   /**
    * Data structure containing DOF constraints.  The ith
    * entry is the constraint matrix row for DOF i.
    */
   DofConstraints _dof_constraints;
+#endif
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
@@ -1055,8 +1062,6 @@ private:
    */
   NodeConstraints _node_constraints;
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-
-#endif
 
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -1088,20 +1093,6 @@ unsigned int DofMap::sys_number() const
   return _sys_number;
 }
 
-
-#if defined(LIBMESH_ENABLE_AMR) || \
-    defined(LIBMESH_ENABLE_PERIODIC) || \
-    defined(LIBMESH_ENABLE_DIRICHLET)
-
-inline
-bool DofMap::is_constrained_dof (const unsigned int dof) const
-{
-  if (_dof_constraints.count(dof))
-    return true;
-
-  return false;
-}
-
 inline
 bool DofMap::is_constrained_node (const Node*
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -1113,6 +1104,17 @@ node
   if (_node_constraints.count(node))
     return true;
 #endif
+
+  return false;
+}
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+
+inline
+bool DofMap::is_constrained_dof (const unsigned int dof) const
+{
+  if (_dof_constraints.count(dof))
+    return true;
 
   return false;
 }
@@ -1151,7 +1153,7 @@ inline void DofMap::enforce_constraints_exactly (const System &,
 				                 NumericVector<Number> *,
                                                  bool = false) const {}
 
-#endif // LIBMESH_ENABLE_AMR, LIBMESH_ENABLE_PERIODIC, LIBMESH_ENABLE_DIRICHLET
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
 } // namespace libMesh
 

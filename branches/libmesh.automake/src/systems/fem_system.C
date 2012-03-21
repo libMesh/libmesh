@@ -239,7 +239,7 @@ namespace {
 #endif // ifdef DEBUG
             }
 
-#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
           // We turn off the asymmetric constraint application;
           // enforce_constraints_exactly() should be called in the solver
           if (_get_residual && _get_jacobian)
@@ -252,7 +252,7 @@ namespace {
           else if (_get_jacobian)
             _sys.get_dof_map().constrain_element_matrix
               (_femcontext.elem_jacobian, _femcontext.dof_indices, false);
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
           if (_get_jacobian && _sys.print_element_jacobians)
             {
