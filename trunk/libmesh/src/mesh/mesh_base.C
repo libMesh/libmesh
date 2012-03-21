@@ -268,6 +268,11 @@ void MeshBase::partition (const unsigned int n_parts)
     if (partitioner().get()) // "NULL" means don't partition
       partitioner()->partition (*this, n_parts);
   }
+  else
+  {
+    // Make sure our cached n_partitions() is still correct
+    this->recalculate_n_partitions();
+  }
 }
 
 unsigned int MeshBase::recalculate_n_partitions()
