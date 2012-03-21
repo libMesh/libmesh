@@ -1488,6 +1488,7 @@ std::string System::get_info() const
   out << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   out << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
+  out << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
 #endif
 
   out << "    " << "n_vectors()="  << this->n_vectors()  << '\n';
