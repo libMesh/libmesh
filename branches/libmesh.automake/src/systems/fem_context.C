@@ -577,7 +577,7 @@ void FEMContext::elem_fe_reinit ()
 
 void FEMContext::side_fe_reinit ()
 {
-  // Initialize all the interior FE objects on elem/side.
+  // Initialize all the side FE objects on elem/side.
   // Logging of FE::reinit is done in the FE functions
   std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
   for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
