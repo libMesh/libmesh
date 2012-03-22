@@ -1,3 +1,20 @@
+0.7.2 -> 0.7.3
+  * Templated FunctionBase and subclass functors
+  * Functor-based versions of more system APIs
+  * Integrated function parser based functor
+  * More flexible PetscMatrix responds to -mat_type
+  * Elem::close_to_point() method for contact problems
+  * Heterogenous constraint equation support
+  * Dirichlet constraint equation support
+  * More methods are ParallelMesh-compatible
+  * Mesh extrusion generation
+  * UniformRefinement error estimates for more adjoint options
+  * Element truth table written in ExodusII output
+  * GetPot detection of overridden variables
+  * Reorganized examples by category
+  * C++11 compatibility fixes
+  * Many assorted bug fixes
+
 0.7.1 -> 0.7.2
   * Discontinuous hierarchic FE basis
   * PatchRecoveryErrorEstimator patch reuse option
