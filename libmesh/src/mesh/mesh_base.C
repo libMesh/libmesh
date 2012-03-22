@@ -263,14 +263,14 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  if(!skip_partitioning())
+  // NULL partitioner means don't partition
+  if(!skip_partitioning() && partitioner().get())
   {
-    if (partitioner().get()) // "NULL" means don't partition
-      partitioner()->partition (*this, n_parts);
+    partitioner()->partition (*this, n_parts);
   }
   else
   {
-    // Make sure our cached n_partitions() is still correct
+    // Make sure our cached n_partitions() is correct
     this->recalculate_n_partitions();
   }
 }
