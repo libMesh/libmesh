@@ -356,7 +356,7 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  exio_helper->initialize_element_variables( mesh, names );
+  exio_helper->initialize_element_variables( names );
   exio_helper->write_element_values(mesh,soln,_timestep);
 }
 

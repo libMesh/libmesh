@@ -485,7 +485,7 @@ public:
   /**
    * Sets up the nodal variables
    */
-  void initialize_element_variables(const MeshBase & mesh, std::vector<std::string> names);
+  void initialize_element_variables(std::vector<std::string> names);
 
   /**
    * Sets up the nodal variables
