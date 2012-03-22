@@ -1,0 +1,7 @@
+# log10(exp(x)) = log(exp(x)) / log(10) = x / log(10)
+
+T=d f ld mf
+V=x
+R=-3,3,0.1
+F=log10(exp(x))
+C=x/fp_const_log10<Value_t>()

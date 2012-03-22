@@ -1,0 +1,5 @@
+T=d f cd cf
+V=x
+R=-1,1,0.25
+F=x>=if(1,0.5,0)
+C=fp_greaterOrEq(x, 0.5)

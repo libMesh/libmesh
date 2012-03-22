@@ -1,0 +1,297 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+#include "diff_system.h"
+#include "dof_map.h"
+#include "libmesh_logging.h"
+#include "petsc_diff_solver.h"
+#include "petsc_matrix.h"
+#include "petsc_vector.h"
+
+#ifdef LIBMESH_HAVE_PETSC
+
+namespace libMesh
+{
+
+//--------------------------------------------------------------------
+// Functions with C linkage to pass to PETSc.  PETSc will call these
+// methods as needed.
+//
+// Since they must have C linkage they have no knowledge of a namespace.
+// Give them an obscure name to avoid namespace pollution.
+extern "C"
+{
+  // Older versions of PETSc do not have the different int typedefs.
+  // On 64-bit machines, PetscInt may actually be a long long int.
+  // This change occurred in Petsc-2.2.1.
+#if PETSC_VERSION_LESS_THAN(2,2,1)
+  typedef int PetscErrorCode;
+  typedef int PetscInt;
+#endif
+
+// Function to hand to PETSc's SNES,
+// which monitors convergence at X
+PetscErrorCode
+__libmesh_petsc_diff_solver_monitor (SNES, PetscInt its,
+                                     PetscReal fnorm, void *ctx)
+{
+  PetscDiffSolver& solver =
+    *(static_cast<PetscDiffSolver*> (ctx));
+
+  if (solver.verbose)
+    libMesh::out << "  PetscDiffSolver step " << its
+                 << ", |residual|_2 = " << fnorm << std::endl;
+
+  return 0;
+}
+
+// Functions to hand to PETSc's SNES,
+// which compute the residual or jacobian at X
+PetscErrorCode
+__libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
+{
+  libmesh_assert (x   != NULL);
+  libmesh_assert (r   != NULL);
+  libmesh_assert (ctx != NULL);
+
+  PetscDiffSolver& solver =
+    *(static_cast<PetscDiffSolver*> (ctx));
+  ImplicitSystem &sys = solver.system();
+
+  if (solver.verbose)
+    libMesh::out << "Assembling the residual" << std::endl;
+
+  PetscVector<Number>& X_system =
+    *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
+  PetscVector<Number>& R_system =
+    *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
+  PetscVector<Number> X_input(x), R_input(r);
+
+  // DiffSystem assembles from the solution and into the rhs, so swap
+  // those with our input vectors before assembling.  They'll probably
+  // already be references to the same vectors, but PETSc might do
+  // something tricky.
+  X_input.swap(X_system);
+  R_input.swap(R_system);
+
+  // We may need to correct a non-conforming solution
+  sys.get_dof_map().enforce_constraints_exactly(sys);
+
+  // We may need to localize a parallel solution
+  sys.update();
+
+  // Do DiffSystem assembly
+  sys.assembly(true, false);
+  R_system.close();
+
+  // Swap back
+  X_input.swap(X_system);
+  R_input.swap(R_system);
+
+  // No errors, we hope
+  return 0;
+}
+
+
+PetscErrorCode
+__libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *libmesh_dbg_var(j), Mat *pc,
+                                      MatStructure *msflag, void *ctx)
+{
+  libmesh_assert (x   != NULL);
+  libmesh_assert (j   != NULL);
+//  libmesh_assert (pc  == j);  // We don't use separate preconditioners yet
+  libmesh_assert (ctx != NULL);
+
+  PetscDiffSolver& solver =
+    *(static_cast<PetscDiffSolver*> (ctx));
+  ImplicitSystem &sys = solver.system();
+
+  if (solver.verbose)
+    libMesh::out << "Assembling the Jacobian" << std::endl;
+
+  PetscVector<Number>& X_system =
+    *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
+  PetscVector<Number> X_input(x);
+
+  PetscMatrix<Number> J_input(*pc);
+  PetscMatrix<Number>& J_system =
+    *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
+
+  // DiffSystem assembles from the solution and into the jacobian, so
+  // swap those with our input vectors before assembling.  They'll
+  // probably already be references to the same vectors, but PETSc
+  // might do something tricky.
+  X_input.swap(X_system);
+  J_input.swap(J_system);
+
+  // We may need to correct a non-conforming solution
+  sys.get_dof_map().enforce_constraints_exactly(sys);
+
+  // We may need to localize a parallel solution
+  sys.update();
+
+  // Do DiffSystem assembly
+  sys.assembly(false, true);
+  J_system.close();
+
+  // Swap back
+  X_input.swap(X_system);
+  J_input.swap(J_system);
+
+  *msflag = SAME_NONZERO_PATTERN;
+
+  // No errors, we hope
+  return 0;
+}
+
+} // extern "C"
+
+
+PetscDiffSolver::PetscDiffSolver (sys_type& s)
+  : Parent(s)
+{
+}
+
+
+void PetscDiffSolver::init ()
+{
+  START_LOG("init()", "PetscDiffSolver");
+
+  Parent::init();
+
+  int ierr=0;
+
+#if PETSC_VERSION_LESS_THAN(2,1,2)
+  // At least until Petsc 2.1.1, the SNESCreate had a different
+  // calling syntax.  The second argument was of type SNESProblemType,
+  // and could have a value of either SNES_NONLINEAR_EQUATIONS or
+  // SNES_UNCONSTRAINED_MINIMIZATION.
+  ierr = SNESCreate(libMesh::COMM_WORLD, SNES_NONLINEAR_EQUATIONS, &_snes);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#else
+  ierr = SNESCreate(libMesh::COMM_WORLD,&_snes);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+#endif
+
+#if PETSC_VERSION_LESS_THAN(2,3,3)
+  ierr = SNESSetMonitor (_snes, __libmesh_petsc_diff_solver_monitor,
+                         this, PETSC_NULL);
+#else
+  // API name change in PETSc 2.3.3
+  ierr = SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
+                         this, PETSC_NULL);
+#endif
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  ierr = SNESSetFromOptions(_snes);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  STOP_LOG("init()", "PetscDiffSolver");
+}
+
+
+
+PetscDiffSolver::~PetscDiffSolver ()
+{
+}
+
+
+
+void PetscDiffSolver::clear()
+{
+  START_LOG("clear()", "PetscDiffSolver");
+
+  int ierr=0;
+
+  ierr = LibMeshSNESDestroy(&_snes);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  STOP_LOG("clear()", "PetscDiffSolver");
+}
+
+
+
+void PetscDiffSolver::reinit()
+{
+  Parent::reinit();
+}
+
+
+
+unsigned int PetscDiffSolver::solve()
+{
+  this->init();
+
+  START_LOG("solve()", "PetscDiffSolver");
+
+  PetscVector<Number> &x =
+    *(libmesh_cast_ptr<PetscVector<Number>*>(_system.solution.get()));
+  PetscMatrix<Number> &jac =
+    *(libmesh_cast_ptr<PetscMatrix<Number>*>(_system.matrix));
+  PetscVector<Number> &r =
+    *(libmesh_cast_ptr<PetscVector<Number>*>(_system.rhs));
+
+  x.close();
+  r.close();
+  jac.close();
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  _system.get_dof_map().enforce_constraints_exactly(_system);
+#endif
+
+  int ierr = 0;
+
+  ierr = SNESSetFunction (_snes, r.vec(),
+                          __libmesh_petsc_diff_solver_residual, this);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  ierr = SNESSetJacobian (_snes, jac.mat(), jac.mat(),
+                          __libmesh_petsc_diff_solver_jacobian, this);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+# if PETSC_VERSION_LESS_THAN(2,2,0)
+
+  ierr = SNESSolve (_snes, x.vec(), &_outer_iterations);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+// 2.2.x style
+#elif PETSC_VERSION_LESS_THAN(2,3,0)
+
+  ierr = SNESSolve (_snes, x.vec());
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+// 2.3.x & newer style
+#else
+
+  ierr = SNESSolve (_snes, PETSC_NULL, x.vec());
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#endif
+
+  STOP_LOG("solve()", "PetscDiffSolver");
+
+  this->clear();
+
+  // FIXME - We'll worry about getting the solve result right later...
+
+  return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+}
+
+} // namespace libMesh
+
+#endif // LIBMESH_HAVE_PETSC

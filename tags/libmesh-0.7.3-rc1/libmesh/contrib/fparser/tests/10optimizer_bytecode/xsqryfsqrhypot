@@ -1,0 +1,5 @@
+T=d f ld
+V=x
+R=0.5,3,0.7
+F=sqrt(log(x)^2+log2(x)^2)
+C=fp_hypot(fp_log(x),fp_log2(x))

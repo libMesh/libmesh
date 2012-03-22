@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x,y
+R=-1.75, 1.75, 0.25
+F=x>=y
+C=x>=y

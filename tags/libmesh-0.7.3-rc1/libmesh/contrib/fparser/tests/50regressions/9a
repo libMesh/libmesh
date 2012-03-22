@@ -1,0 +1,8 @@
+# Bug: a:=x;a*0 begets a half cFetch opcode
+# Introduced in commit 547195b5f155cf7a706e3a5cca796e9cb7d33c38
+# Fixed in commit 7146fbe79611e0a6bb77ff983448fa23909336c6
+T=d li
+V=x
+R=-1,1,1
+F=a:=x;a*0
+C=x*0

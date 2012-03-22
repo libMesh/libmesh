@@ -1,0 +1,11 @@
+T=d ld mf
+V=x,y
+R=-4,4,.1
+
+# This function is too complex for "float" accuracy
+
+F=3.5doubled + 10*x tripled - sin(y)doubled + \
+  100*(x doubled-y tripled)doubled + 5/2doubled + 1.1^x doubled + \
+  1.1doubled^x doubled
+C=(3.5*2) + 10*(x*3) - (fp_sin(y)*2) + 100*((x*2)-(y*3))*2 + 5.0/(2*2) + \
+  fp_pow(1.1, x*2) + fp_pow(1.1*2, x*2)

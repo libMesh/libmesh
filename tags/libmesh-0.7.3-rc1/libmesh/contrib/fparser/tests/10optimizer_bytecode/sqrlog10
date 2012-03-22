@@ -1,0 +1,6 @@
+# cSqr cLog   -> cAbs cLog   cDup cAdd
+T=d f ld mf
+V=x
+R=-10,10,0.8
+F=log10(x^2)
+C=fp_log10(x*x)

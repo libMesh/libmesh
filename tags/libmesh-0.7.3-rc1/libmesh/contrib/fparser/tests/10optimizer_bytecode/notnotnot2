@@ -1,0 +1,5 @@
+T=d f li ld mf gi
+V=x
+R=-1,1,1
+F=!x&!x
+C=fp_not(x)
