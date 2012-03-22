@@ -1136,32 +1136,31 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & mesh,
   ex_err = exII::ex_put_var_param(ex_id, "e", num_elem_vars);
   check_err(ex_err, "Error setting number of element vars.");
 
-  //Form the element variable truth table and send to Exodus.
-  //This tells which variables are written to which blocks,
-  //and can dramatically speed up writing element variables
-
+  // Form the element variable truth table and send to Exodus.
+  // This tells which variables are written to which blocks,
+  // and can dramatically speed up writing element variables
   std::vector<int> truth_tab(num_elem_blk*num_elem_vars,0);
   std::set<subdomain_id_type> subdomain_set;
 
-  MeshBase::const_element_iterator mesh_it(mesh.active_elements_begin());
+  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for(mesh_it = mesh.active_elements_begin(); mesh_it != end; ++mesh_it)
-  {
-    Elem * elem = *mesh_it;
-    subdomain_id_type cur_subdomain = elem->subdomain_id();
-    subdomain_set.insert(cur_subdomain);
-  }
+  for (; mesh_it != end; ++mesh_it)
+    {
+      Elem* elem = *mesh_it;
+      subdomain_id_type cur_subdomain = elem->subdomain_id();
+      subdomain_set.insert(cur_subdomain);
+    }
   libmesh_assert (num_elem_blk == subdomain_set.size());
 
-  std::set<subdomain_id_type>::iterator it( subdomain_set.begin() );
-  for(unsigned int j(0); it != subdomain_set.end(); ++it, ++j)
-  {
-    int block_id=get_block_id(j);
-    for(unsigned int ivar(0); ivar<num_elem_vars; ++ivar)
+  std::set<subdomain_id_type>::iterator it = subdomain_set.begin();
+  for (unsigned int j=0; it != subdomain_set.end(); ++it, ++j)
     {
-      truth_tab[num_elem_blk*ivar+block_id-1]=1;
+      int block_id = get_block_id(j);
+      for(unsigned int ivar = 0; ivar<num_elem_vars; ++ivar)
+	{
+	  truth_tab[num_elem_blk*ivar+block_id-1]=1;
+	}
     }
-  }
 
   ex_err = exII::ex_put_elem_var_tab(ex_id, num_elem_blk, num_elem_vars, &truth_tab[0]);
   check_err(ex_err, "Error writing element truth table.");
