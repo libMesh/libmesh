@@ -150,7 +150,8 @@ template <typename Output>
 AnalyticFunction<Output>::AnalyticFunction (Output fptr(const Point& p,
 						        const Real time)) :
   FunctionBase<Output> (),
-  _number_fptr (fptr)
+  _number_fptr (fptr),
+  _vector_fptr (NULL)
 {
   libmesh_assert (fptr != NULL);
   this->_initialized = true;
@@ -164,6 +165,7 @@ AnalyticFunction<Output>::AnalyticFunction (void fptr(DenseVector<Output>& outpu
 					              const Point& p,
 					              const Real time)) :
   FunctionBase<Output> (),
+  _number_fptr (NULL),
   _vector_fptr (fptr)
 {
   libmesh_assert (fptr != NULL);
@@ -211,9 +213,10 @@ inline
 AutoPtr<FunctionBase<Output> >
 AnalyticFunction<Output>::clone ()
 {
-  return _number_fptr ?
-    new AnalyticFunction<Output>(_number_fptr) :
-    new AnalyticFunction<Output>(_vector_fptr);
+  return AutoPtr<FunctionBase<Output> >
+    ( _number_fptr ?
+        new AnalyticFunction<Output>(_number_fptr) :
+        new AnalyticFunction<Output>(_vector_fptr) );
 }
 
 
