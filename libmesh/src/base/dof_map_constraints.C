@@ -1746,9 +1746,10 @@ void DofMap::build_constraint_matrix_and_vector
       std::vector<unsigned int> new_elem_dofs (dof_set.begin(),
 					       dof_set.end());
 
-      // Now we can build the constraint matrix.
-      // Note that resize also zeros for a DenseMatrix<Number>.
+      // Now we can build the constraint matrix and vector.
+      // Note that resize also zeros for a DenseMatrix and DenseVector
       C.resize (elem_dofs.size(), new_elem_dofs.size());
+      H.resize (new_elem_dofs.size());
 
       // Create the C constraint matrix.
       for (unsigned int i=0; i<elem_dofs.size(); i++)
@@ -1771,6 +1772,8 @@ void DofMap::build_constraint_matrix_and_vector
 	      for (unsigned int j=0; j<new_elem_dofs.size(); j++)
 		if (new_elem_dofs[j] == it->first)
 		  C(i,j) = it->second;
+
+            H(i) = pos->second.second;
 	  }
 	else
 	  {
@@ -1789,13 +1792,15 @@ void DofMap::build_constraint_matrix_and_vector
 
       this->build_constraint_matrix_and_vector (Cnew, Hnew, elem_dofs, true);
 
-      // If x = Cy + h and y = Dz + g
-      // Then x = (CD)z + (Cg + h)
-      C.vector_mult_add(H, 1, Hnew);
-
       if ((C.n() == Cnew.m()) &&          // If the constraint matrix
 	  (Cnew.n() == elem_dofs.size())) // is constrained...
-	C.right_multiply(Cnew);
+        {
+	  C.right_multiply(Cnew);
+
+          // If x = Cy + h and y = Dz + g
+          // Then x = (CD)z + (Cg + h)
+          C.vector_mult_add(H, 1, Hnew);
+        }
 
       libmesh_assert (C.n() == elem_dofs.size());
     }
