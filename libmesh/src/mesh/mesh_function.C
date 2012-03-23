@@ -43,15 +43,15 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const NumericVector<Number>& vec,
 			    const DofMap& dof_map,
 			    const std::vector<unsigned int>& vars,
-			    const FunctionBase<>* master) :
-  FunctionBase<> (master),
-  _eqn_systems   (eqn_systems),
-  _vector        (vec),
-  _dof_map       (dof_map),
-  _system_vars   (vars),
-  _point_locator (NULL),
-  _out_of_mesh_mode(false),
-  _out_of_mesh_value()
+			    const FunctionBase<Number>* master) :
+  FunctionBase<Number> (master),
+  _eqn_systems         (eqn_systems),
+  _vector              (vec),
+  _dof_map             (dof_map),
+  _system_vars         (vars),
+  _point_locator       (NULL),
+  _out_of_mesh_mode    (false),
+  _out_of_mesh_value   ()
 {
 }
 
@@ -61,15 +61,15 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const NumericVector<Number>& vec,
 			    const DofMap& dof_map,
 			    const unsigned int var,
-			    const FunctionBase<>* master) :
-  FunctionBase<> (master),
-  _eqn_systems   (eqn_systems),
-  _vector        (vec),
-  _dof_map       (dof_map),
-  _system_vars   (1,var),
-  _point_locator (NULL),
-  _out_of_mesh_mode(false),
-  _out_of_mesh_value()
+			    const FunctionBase<Number>* master) :
+  FunctionBase<Number> (master),
+  _eqn_systems         (eqn_systems),
+  _vector              (vec),
+  _dof_map             (dof_map),
+  _system_vars         (1,var),
+  _point_locator       (NULL),
+  _out_of_mesh_mode    (false),
+  _out_of_mesh_value   ()
 {
 //   std::vector<unsigned int> buf (1);
 //   buf[0] = var;
