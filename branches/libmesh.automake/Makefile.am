@@ -466,7 +466,7 @@ libmesh_la_SOURCES = \
 # # This rule will be run after install
 # install-exec-hook:
 # 	cd $(DESTDIR)$(bindir) && \
-#  	  mkdir -p $(hosttype)_$(METHOD) && \
+#  	  $(MKDIR_P) $(hosttype)_$(METHOD) && \
 # 	  mv -f meshtool $(hosttype)_$(METHOD) && \
 # 	  $(LN_S) $(hosttype)_$(METHOD)/meshtool meshtool
 
@@ -595,7 +595,7 @@ SUBDIRS += examples
 #
 # doxygen documentation
 doc:
-	mkdir -p $(top_builddir)/doc/html
+	$(MKDIR_P) $(top_builddir)/doc/html
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
 
 #

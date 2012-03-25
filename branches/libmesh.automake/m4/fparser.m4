@@ -11,20 +11,36 @@ AC_DEFUN([CONFIGURE_FPARSER],
 		   no)  enablefparser=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser) ;;
 		 esac],
-		 [enablefparser=no])
-		 #[enablefparser=$enableoptional])
+		 [enablefparser=$enableoptional])
 
+  AC_ARG_ENABLE(fparser-optimizer,
+                AC_HELP_STRING([--enable-fparser-optimizer],
+                               [use fparser optimization where possible]),
+		[case "${enableval}" in
+		  yes)  enablefparseroptimizer=yes ;;
+		   no)  enablefparseroptimizer=no ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
+		 esac],
+		 [enablefparseroptimizer=yes])
 
+  AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)
+  AM_CONDITIONAL(FPARSER_SUPPORT_OPTIMIZER,    test x$enablefparseroptimizer = xyes)
 
   dnl The FPARSER API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enablefparser = yes); then
+     AC_PROG_MKDIR_P
+     AC_PROG_SED
      AC_PROG_YACC
      FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
      #FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
      AC_DEFINE(HAVE_FPARSER, 1, [Flag indicating whether the library will be compiled with FPARSER support])
      libmesh_contrib_INCLUDES="$FPARSER_INCLUDE $libmesh_contrib_INCLUDES"
-     AC_MSG_RESULT(<<< Configuring library with fparser support >>>)
+     if (test $enablefparseroptimizer = yes); then
+       AC_MSG_RESULT(<<< Configuring library with fparser support (with optimizer) >>>)
+     else
+       AC_MSG_RESULT(<<< Configuring library with fparser support (without optimizer) >>>)
+     fi	
   else
      FPARSER_INCLUDE=""
      #FPARSER_LIBRARY=""

@@ -4,11 +4,10 @@ FEATURE_FLAGS =
 FEATURE_FLAGS += -DFP_ENABLE_EVAL
 #FEATURE_FLAGS += -DFP_SUPPORT_TR1_MATH_FUNCS
 
-# # Mac OSX has trouble linking the optimizer stuff, so we disable
-# # it on those systems.
-# ifeq ($(findstring darwin,$(hostos)),darwin)
-#   FEATURE_FLAGS += -DFP_NO_SUPPORT_OPTIMIZER
-# endif
+# some systems have trouble with the fparser optimizer
+if FPARSER_NO_SUPPORT_OPTIMIZER
+  FEATURE_FLAGS += -DFP_NO_SUPPORT_OPTIMIZER
+endif
 
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
@@ -34,13 +33,18 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-INCLUDES = -I$(srcdir)/include  -I$(srcdir)/fpoptimizer
-EXTRA_DIST = # none, append below
+INCLUDES = -I$(srcdir)/fpoptimizer
+
+EXTRA_DIST    = # none, append below
+BUILT_SOURCES = # none, append below
+
+
 
 # Build up utility programs used to define parsing, not needed
 # for installation
-noinst_PROGRAMS                   = util/bytecoderules_parser
-util_bytecoderules_parser_SOURCES = util/bytecoderules_parser.cc
+noinst_PROGRAMS                    = util/bytecoderules_parser
+util_bytecoderules_parser_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
+util_bytecoderules_parser_SOURCES  = util/bytecoderules_parser.cc
 
 # 'util/make_function_name_parser' is used to create extrasrc/fp_identifier_parser.inc,
 # but it seems to only define a snippet.  So for now we use the distributed version
@@ -49,6 +53,7 @@ util_bytecoderules_parser_SOURCES = util/bytecoderules_parser.cc
 # util_make_function_name_parser_SOURCES  = util/make_function_name_parser.cc util/cpp_compress.cc 
 
 noinst_PROGRAMS           += util/cpp_compress
+util_cpp_compress_CXXFLAGS = -O2 # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
 util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
 
 # using rule-specific CXXFLAGS here will compile target-specific objects,
@@ -56,8 +61,10 @@ util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_
 # the issue of 'object created both with libtool and without' that would
 # otherwise occur when we build objects directly for our temporary utility
 # programs and when constructing the final library.
-noinst_PROGRAMS                   +=  util/tree_grammar_parser
-util_tree_grammar_parser_CXXFLAGS  = $(AM_CXXFLAGS)
+if FPARSER_SUPPORT_OPTIMIZER
+  noinst_PROGRAMS                 +=  util/tree_grammar_parser
+endif
+util_tree_grammar_parser_CXXFLAGS  = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
 util_tree_grammar_parser_SOURCES   = \
                                  util/tree_grammar_parser.yy fpoptimizer/opcodename.cc fpoptimizer/opcodename.hh \
                                  mpfr/MpfrFloat.hh \
@@ -89,25 +96,26 @@ util_tree_grammar_parser_SOURCES   = \
                                  extrasrc/fptypes.hh \
                                  fparser_gmpint.hh extrasrc/fp_identifier_parser.inc
 
-BUILT_SOURCES = extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc
-CLEANFILES = $(BUILT_SOURCES)
-
 # Eventually I think we want to build this generated source as well,
 # but as of v4.4.3 the 'util/make_function_name_parser' only creates
 # a snippet.
 # extrasrc/fp_identifier_parser.inc: \
 # 		util/make_function_name_parser
 # 	@echo "Creating "$@
-# 	@mkdir -p extrasrc
+# 	@$(MKDIR_P) extrasrc
 # 	@util/make_function_name_parser > $@
 
+
+
+# extrasrc/fp_opcode_add.inc is a generated source, and this rule specifies how we build it.
+BUILT_SOURCES += extrasrc/fp_opcode_add.inc
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
 		util/bytecoderules.dat \
 		util/bytecoderules_header.txt \
 		util/cpp_compress
 	@echo "Creating system-specific Bytecode in "$@" ..."
-	@mkdir -p extrasrc
+	@$(MKDIR_P) extrasrc
 	@cat $(srcdir)/util/bytecoderules_header.txt > $@
 	@util/bytecoderules_parser \
 		< $(srcdir)/util/bytecoderules.dat \
@@ -116,6 +124,12 @@ extrasrc/fp_opcode_add.inc: \
 
 EXTRA_DIST += util/bytecoderules.dat util/bytecoderules_header.txt
 
+
+
+# fpoptimizer/grammar_data.cc is a generated source, and this rule specifies how we build it.
+if FPARSER_SUPPORT_OPTIMIZER
+  BUILT_SOURCES += fpoptimizer/grammar_data.cc
+endif
 fpoptimizer/grammar_data.cc: \
 		util/tree_grammar_parser \
 		fpoptimizer/treerules.dat
@@ -123,6 +137,8 @@ fpoptimizer/grammar_data.cc: \
 	@util/tree_grammar_parser < $(srcdir)/fpoptimizer/treerules.dat > $@
 
 EXTRA_DIST += fpoptimizer/treerules.dat
+
+
 
 # generally we do not install contributed headers, but for fparser.hh we
 # must because it can optionally be included directly by our
@@ -169,42 +185,50 @@ FPOPTIMIZER_CC_FILES=\
 	    fpoptimizer/transformations.cc \
 	    fpoptimizer/cse.cc \
 	    fpoptimizer/optimize_main.cc
+
+EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptimizer/fpoptimizer_footer.txt
+
+# fpoptimizer.cc is a generated source, and this rule specifies how we build it.
+# this rule is expanded from the upstream makefile because we need to account for
+# VPATH builds, in which the FPOPTIMIZER_CC_FILES are scattered around the source
+# and build trees.  So I have introduced the if/else and file_to_include construct.
+if FPARSER_SUPPORT_OPTIMIZER
+  BUILT_SOURCES += fpoptimizer.cc
+endif
 fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
 		fpoptimizer/fpoptimizer_footer.txt \
 		$(FPOPTIMIZER_CC_FILES) \
 		util/cpp_compress
-	@echo "Processing Source (in "$(mode)" mode) "$<"..."
+	@echo "Generating source file "$@"..."
 	@rm -f fpoptimizer.cc
-	@cat fpoptimizer/fpoptimizer_header.txt  > $@
+	@cat $(srcdir)/fpoptimizer/fpoptimizer_header.txt  > $@
 	@for file in $(FPOPTIMIZER_CC_FILES); do \
-		echo "#line 1 \"$$file\""; \
-		sed -r "s@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@" < "$$file"; \
+                file_to_include="" ;\
+	        if (test -f $(srcdir)/$$file); then \
+                  file_to_include=$(srcdir)/$$file ; \
+                elif (test -f $$file); then \
+                  file_to_include=$$file ; \
+                else \
+                  echo "ERROR: Cannot find $$file in source or build tree!" ; \
+	          exit 1 ; \
+                fi ; \
+		echo "#line 1 \"$$file_to_include\""; \
+		$(SED) -r "s@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@" < "$$file_to_include"; \
 		echo; \
-	done | sed 's@BEGIN_EXPLICIT_INSTANTATION.*@@;s@.*END_EXPLICIT_INSTANTATION@@' \
+	done | $(SED) 's@BEGIN_EXPLICIT_INSTANTATION.*@@;s@.*END_EXPLICIT_INSTANTATION@@' \
 	     | util/cpp_compress "lnxyceti" >> $@
-	@cat fpoptimizer/fpoptimizer_footer.txt >> $@
+	@cat $(srcdir)/fpoptimizer/fpoptimizer_footer.txt >> $@
+
+
 
 noinst_LTLIBRARIES    = libfparser.la
-libfparser_la_SOURCES = \
-                $(builddir)/extrasrc/fp_opcode_add.inc \
-                fparser.cc \
-		fpoptimizer/grammar_data.cc \
-		fpoptimizer/optimize_main.cc \
-		fpoptimizer/readbytecode.cc \
-		fpoptimizer/makebytecode.cc \
-		fpoptimizer/codetree.cc \
-		fpoptimizer/grammar.cc \
-		fpoptimizer/optimize.cc \
-		fpoptimizer/optimize_match.cc \
-		fpoptimizer/optimize_synth.cc \
-		fpoptimizer/optimize_debug.cc \
-		fpoptimizer/constantfolding.cc \
-		fpoptimizer/valuerange.cc \
-		fpoptimizer/rangeestimation.cc \
-		fpoptimizer/opcodename.cc \
-		fpoptimizer/bytecodesynth.cc \
-		fpoptimizer/transformations.cc \
-		fpoptimizer/cse.cc \
-		fpoptimizer/debug.cc \
-		fpoptimizer/hash.cc \
-		fpoptimizer/consts.hh
+libfparser_la_SOURCES = fparser.cc
+if FPARSER_SUPPORT_OPTIMIZER 
+  libfparser_la_SOURCES += fpoptimizer.cc
+endif
+
+
+
+# when doing 'make clean' we need to remove the generated sources
+CLEANFILES = extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc fpoptimizer.cc
+DISTCLEANFILES = util/tree_grammar_parser # in case it wasn't conditionally built 
