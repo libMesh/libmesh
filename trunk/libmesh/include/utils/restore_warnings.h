@@ -20,7 +20,7 @@
 #include "libmesh_config.h"
 
 #ifndef NDEBUG
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
 #if __GNUC__ > 3 && __GNUC_MINOR__ > 1
 // TODO: use the gcc 4.6 push/pop when available
 #pragma GCC diagnostic warning "-Wunused-parameter"
