@@ -131,6 +131,59 @@ includedir = $(prefix)/include/contrib
 
 include_HEADERS       =  fparser.hh
 
+FPOPTIMIZER_CC_FILES=\
+	    lib/crc32.hh \
+	    lib/autoptr.hh \
+	    lib/functional.hh \
+	    fpoptimizer/hash.hh \
+	    fpoptimizer/codetree.hh \
+	    fpoptimizer/grammar.hh \
+	    fpoptimizer/consts.hh \
+	    fpoptimizer/optimize.hh \
+	    fpoptimizer/opcodename.hh \
+	    fpoptimizer/opcodename.cc \
+	    fpoptimizer/bytecodesynth.hh \
+	    fpoptimizer/bytecodesynth.cc \
+	    fpoptimizer/valuerange.hh \
+	    fpoptimizer/rangeestimation.hh \
+	    fpoptimizer/constantfolding.hh \
+	    fpoptimizer/logic_boolgroups.hh \
+	    fpoptimizer/logic_collections.hh \
+	    fpoptimizer/logic_ifoperations.hh \
+	    fpoptimizer/logic_powoperations.hh \
+	    fpoptimizer/logic_comparisons.hh \
+	    fpoptimizer/codetree.cc \
+	    fpoptimizer/debug.cc \
+	    fpoptimizer/grammar.cc \
+	    fpoptimizer/grammar_data.cc \
+	    fpoptimizer/optimize.cc \
+	    fpoptimizer/optimize_match.cc \
+	    fpoptimizer/optimize_synth.cc \
+	    fpoptimizer/optimize_debug.cc \
+	    fpoptimizer/hash.cc \
+	    fpoptimizer/makebytecode.cc \
+	    fpoptimizer/readbytecode.cc \
+	    fpoptimizer/constantfolding.cc \
+	    fpoptimizer/valuerange.cc \
+	    fpoptimizer/rangeestimation.cc \
+	    fpoptimizer/transformations.cc \
+	    fpoptimizer/cse.cc \
+	    fpoptimizer/optimize_main.cc
+fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
+		fpoptimizer/fpoptimizer_footer.txt \
+		$(FPOPTIMIZER_CC_FILES) \
+		util/cpp_compress
+	@echo "Processing Source (in "$(mode)" mode) "$<"..."
+	@rm -f fpoptimizer.cc
+	@cat fpoptimizer/fpoptimizer_header.txt  > $@
+	@for file in $(FPOPTIMIZER_CC_FILES); do \
+		echo "#line 1 \"$$file\""; \
+		sed -r "s@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@" < "$$file"; \
+		echo; \
+	done | sed 's@BEGIN_EXPLICIT_INSTANTATION.*@@;s@.*END_EXPLICIT_INSTANTATION@@' \
+	     | util/cpp_compress "lnxyceti" >> $@
+	@cat fpoptimizer/fpoptimizer_footer.txt >> $@
+
 noinst_LTLIBRARIES    = libfparser.la
 libfparser_la_SOURCES = \
                 $(builddir)/extrasrc/fp_opcode_add.inc \

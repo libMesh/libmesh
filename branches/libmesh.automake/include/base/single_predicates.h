@@ -39,7 +39,7 @@ namespace libMesh
 namespace Predicates
 {
   // Forward declaration
-  template <typename T> class abstract_multi_predicate;
+  template <typename T> struct abstract_multi_predicate;
 
   // abstract single predicate.  Derived classes must implement the clone()
   // function.  Be careful using it since it allocates memory!  The clone()
@@ -53,7 +53,7 @@ namespace Predicates
 
 
   protected:
-    friend class abstract_multi_predicate<T>;
+    friend struct abstract_multi_predicate<T>;
     virtual predicate* clone() const = 0;
 
   };

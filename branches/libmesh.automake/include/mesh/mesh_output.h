@@ -200,7 +200,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
 
   // We may need to gather a ParallelMesh to output it, making that
   // const qualifier in our constructor a dirty lie
-  MeshSerializer(const_cast<MT&>(*_obj), !_is_parallel_format);
+  MeshSerializer serialize(const_cast<MT&>(*_obj), !_is_parallel_format);
 
   // Build the nodal solution values & get the variable
   // names from the EquationSystems object

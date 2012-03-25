@@ -202,7 +202,7 @@ namespace Threads
 #endif
 
        if (libMesh::n_threads() > 1)
-	 tbb::parallel_reduce (range, body);
+	 tbb::parallel_reduce (range, body, partitioner);
 
        else
 	 body(range);

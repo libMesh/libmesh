@@ -389,16 +389,23 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   	                AC_MSG_RESULT(<<< C++ compiler is HP-UX C++ >>>)
     	                GXX_VERSION=hpux_acc
   	              else
-	
-	
-                        dnl No recognized compiler found...
-			dnl warn the user and continue
-			AC_MSG_RESULT( WARNING:)
-                        AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
-			AC_MSG_RESULT( You will likely need to modify)
-			AC_MSG_RESULT( Make.common directly to specify)
-			AC_MSG_RESULT( proper compiler flags)
-			GXX_VERSION=unknown
+
+		        dnl Clang LLVM C++?
+			is_clang="`($CXX --version 2>&1) | grep 'clang'`" 
+  	                if test "x$is_clang" != "x" ; then
+                          AC_MSG_RESULT(<<< C++ compiler is LLVM Clang C++ >>>)
+	                  GXX_VERSION=clang
+			else
+
+                          dnl No recognized compiler found...
+			  dnl warn the user and continue
+			  AC_MSG_RESULT( WARNING:)
+                          AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
+			  AC_MSG_RESULT( You will likely need to modify)
+			  AC_MSG_RESULT( Make.common directly to specify)
+			  AC_MSG_RESULT( proper compiler flags)
+			  GXX_VERSION=unknown
+			fi
                       fi
                     fi
                   fi
@@ -1014,6 +1021,17 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 	  # CXXSHAREDFLAG=""
 	  # CSHAREDFLAG=""
 	  # RPATHFLAG=""
+	  ;;
+
+      clang)
+          CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
+	  CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized"
+	  CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses"
+	  NODEPRECATEDFLAG="-Wno-deprecated"
+
+	  CFLAGS_OPT="-O2"
+	  CFLAGS_DVL="$CFLAGS_OPT -g -Wimplicit"
+	  CFLAGS_DBG="-g -Wimplicit"
 	  ;;
 
       *)
