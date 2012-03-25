@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <string>
+#include <algorithm> // std::find 
 
 #include "dense_vector.h"
 #include "function_base.h"
