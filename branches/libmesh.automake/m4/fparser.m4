@@ -1,6 +1,6 @@
-dnl -------------------------------------------------------------
-dnl fparser
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# fparser
+# -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_FPARSER], 
 [
   AC_ARG_ENABLE(fparser,
@@ -23,15 +23,22 @@ AC_DEFUN([CONFIGURE_FPARSER],
 		 esac],
 		 [enablefparseroptimizer=yes])
 
-  AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)
-  AM_CONDITIONAL(FPARSER_SUPPORT_OPTIMIZER,    test x$enablefparseroptimizer = xyes)
-
-  dnl The FPARSER API is distributed with libmesh, so we don't have to guess
-  dnl where it might be installed...
+  # The FPARSER API is distributed with libmesh, so we don't have to guess
+  # where it might be installed...
   if (test $enablefparser = yes); then
      AC_PROG_MKDIR_P
      AC_PROG_SED
      AC_PROG_YACC
+
+     # note - fparser optimization currently fails on OSX, to disable it regardless
+     case "${host_os}" in
+       *darwin*) 
+         enablefparseroptimizer=no 
+         AC_MSG_RESULT(>>> Disabling fparser optimization on ${host_os} <<<)
+         ;;
+         *) ;;
+     esac	
+
      FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
      #FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
      AC_DEFINE(HAVE_FPARSER, 1, [Flag indicating whether the library will be compiled with FPARSER support])
@@ -51,6 +58,8 @@ AC_DEFUN([CONFIGURE_FPARSER],
   #AC_SUBST(FPARSER_LIBRARY)	
   AC_SUBST(enablefparser)
 		 		 
+  AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)
+  AM_CONDITIONAL(FPARSER_SUPPORT_OPTIMIZER,    test x$enablefparseroptimizer = xyes)
   AM_CONDITIONAL(LIBMESH_ENABLE_FPARSER, test x$enablefparser = xyes)
   AC_CONFIG_FILES([contrib/fparser/Makefile])
 ])
