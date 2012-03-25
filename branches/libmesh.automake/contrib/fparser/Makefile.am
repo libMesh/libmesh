@@ -56,6 +56,11 @@ noinst_PROGRAMS           += util/cpp_compress
 util_cpp_compress_CXXFLAGS = -O2 # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
 util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
 
+
+# util/tree_grammar_parser is a utility which is required to build 
+# fpoptimizer/grammar_data.cc.  But this file itself is only needed
+# when we are compiling with optimization support enabled.
+# 
 # using rule-specific CXXFLAGS here will compile target-specific objects,
 # e.g. fpoptimizer/util_tree_grammar_parser-opcodename.o, which gets around
 # the issue of 'object created both with libtool and without' that would
@@ -65,7 +70,7 @@ if FPARSER_SUPPORT_OPTIMIZER
   noinst_PROGRAMS                 +=  util/tree_grammar_parser
 endif
 util_tree_grammar_parser_CXXFLAGS  = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
-util_tree_grammar_parser_SOURCES   = \
+util_tree_grammar_parser_SOURCES   = \ # many of these .hh files are overkill I think but this gets them in the distribiution
                                  util/tree_grammar_parser.yy fpoptimizer/opcodename.cc fpoptimizer/opcodename.hh \
                                  mpfr/MpfrFloat.hh \
                                  mpfr/GmpInt.hh \
@@ -188,48 +193,51 @@ FPOPTIMIZER_CC_FILES=\
 
 EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptimizer/fpoptimizer_footer.txt
 
-# fpoptimizer.cc is a generated source, and this rule specifies how we build it.
-# this rule is expanded from the upstream makefile because we need to account for
-# VPATH builds, in which the FPOPTIMIZER_CC_FILES are scattered around the source
-# and build trees.  So I have introduced the if/else and file_to_include construct.
-if FPARSER_SUPPORT_OPTIMIZER
-  BUILT_SOURCES += fpoptimizer.cc
-endif
-fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
-		fpoptimizer/fpoptimizer_footer.txt \
-	        extrasrc/fp_opcode_add.inc \
-		$(FPOPTIMIZER_CC_FILES) \
-		util/cpp_compress
-	@echo "Generating source file "$@"..."
-	@rm -f fpoptimizer.cc
-	@cat $(srcdir)/fpoptimizer/fpoptimizer_header.txt  > $@
-	@for file in $(FPOPTIMIZER_CC_FILES); do \
-                file_to_include="" ;\
-	        if (test -f $(srcdir)/$$file); then \
-                  file_to_include=$(srcdir)/$$file ; \
-                elif (test -f $$file); then \
-                  file_to_include=$$file ; \
-                else \
-                  echo "ERROR: Cannot find $$file in source or build tree!" ; \
-	          exit 1 ; \
-                fi ; \
-		echo "#line 1 \"$$file_to_include\""; \
-		$(SED) 's@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@' < "$$file_to_include"; \
-		echo; \
-	done | $(SED) 's@BEGIN_EXPLICIT_INSTANTATION.*@@;s@.*END_EXPLICIT_INSTANTATION@@' \
-	     | util/cpp_compress "lnxyceti" >> $@
-	@cat $(srcdir)/fpoptimizer/fpoptimizer_footer.txt >> $@
+# # fpoptimizer.cc is a generated source, and this rule specifies how we build it.
+# # this rule is expanded from the upstream makefile because we need to account for
+# # VPATH builds, in which the FPOPTIMIZER_CC_FILES are scattered around the source
+# # and build trees.  So I have introduced the if/else and file_to_include construct.
+# if FPARSER_SUPPORT_OPTIMIZER
+#   BUILT_SOURCES += fpoptimizer.cc
+# endif
+# fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
+# 		fpoptimizer/fpoptimizer_footer.txt \
+# 	        extrasrc/fp_opcode_add.inc \
+# 		$(FPOPTIMIZER_CC_FILES) \
+# 		util/cpp_compress
+# 	@echo "Generating source file "$@"..."
+# 	@rm -f fpoptimizer.cc
+# 	@cat $(srcdir)/fpoptimizer/fpoptimizer_header.txt  > $@
+# 	@for file in $(FPOPTIMIZER_CC_FILES); do \
+#                 file_to_include="" ;\
+# 	        if (test -f $(srcdir)/$$file); then \
+#                   file_to_include=$(srcdir)/$$file ; \
+#                 elif (test -f $$file); then \
+#                   file_to_include=$$file ; \
+#                 else \
+#                   echo "ERROR: Cannot find $$file in source or build tree!" ; \
+# 	          exit 1 ; \
+#                 fi ; \
+# 		echo "#line 1 \"$$file_to_include\""; \
+# 		$(SED) 's@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@' < "$$file_to_include"; \
+# 		echo; \
+# 	done | $(SED) 's@BEGIN_EXPLICIT_INSTANTATION.*@@;s@.*END_EXPLICIT_INSTANTATION@@' \
+# 	     | util/cpp_compress "lnxyceti" >> $@
+# 	@cat $(srcdir)/fpoptimizer/fpoptimizer_footer.txt >> $@
 
 
-
+# On OSX, compiling the $(FPOPTIMIZER_CC_FILES) files separately and linking
+# them into libfparser.la seems to get around the multiple definition problem.
+# note the upstream approach is to pack all the sources into fpoptimizer.cc 
+# and compress it.
 noinst_LTLIBRARIES    = libfparser.la
 libfparser_la_SOURCES = fparser.cc
 if FPARSER_SUPPORT_OPTIMIZER 
-  libfparser_la_SOURCES += fpoptimizer.cc
+  libfparser_la_SOURCES += $(FPOPTIMIZER_CC_FILES) #fpoptimizer.cc
 endif
 
 
 
 # when doing 'make clean' we need to remove the generated sources
 CLEANFILES = extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc fpoptimizer.cc
-DISTCLEANFILES = util/tree_grammar_parser # in case it wasn't conditionally built 
+DISTCLEANFILES = util/tree_grammar_parser # in case it wasn't conditionally cleaned
