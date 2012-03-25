@@ -7,6 +7,7 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 AUTOMAKE_OPTIONS = subdir-objects 
 
 INCLUDES = -I$(srcdir)/include
+EXTRA_DIST = # none, append below
 
 # Build up utility programs used to define parsing, not needed
 # for installation
@@ -19,12 +20,15 @@ util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_
 noinst_PROGRAMS +=  util/tree_grammar_parser
 util_tree_grammar_parser_SOURCES = util/tree_grammar_parser.cc fpoptimizer/opcodename.cc fpoptimizer/opcodename.hh
 
+BUILT_SOURCES = extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc
+CLEANFILES = $(BUILT_SOURCES)
+
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
 		util/bytecoderules.dat \
 		util/bytecoderules_header.txt \
 		util/cpp_compress
-	@echo "Creating Bytecode (in "$(mode)" mode) "$<"..."
+	@echo "Creating Bytecode from "$<"..."
 	@mkdir -p extrasrc
 	@cat $(srcdir)/util/bytecoderules_header.txt > $@
 	@util/bytecoderules_parser \
@@ -32,12 +36,15 @@ extrasrc/fp_opcode_add.inc: \
 		| util/cpp_compress \
 		>> $@
 
+EXTRA_DIST += util/bytecoderules.dat util/bytecoderules_header.txt
+
 fpoptimizer/grammar_data.cc: \
 		util/tree_grammar_parser \
 		fpoptimizer/treerules.dat
-	@echo "Parsing Grammar (in "$(mode)" mode) "$<"..."
+	@echo "Parsing Grammar "$<"..."
 	@util/tree_grammar_parser < $(srcdir)/fpoptimizer/treerules.dat > $@
 
+EXTRA_DIST += fpoptimizer/treerules.dat
 
 FEATURE_FLAGS =
 FEATURE_FLAGS += -DFP_ENABLE_EVAL
