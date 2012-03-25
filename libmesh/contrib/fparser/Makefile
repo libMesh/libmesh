@@ -369,18 +369,7 @@ testbed_tests.inc: $(TESTBED_TEST_FILES)
 
 .dep:
 	@touch extrasrc/fp_opcode_add.inc
-	@rm -f .dep
-	@touch .dep
-	@- $(libmesh_CXX) -MM -MG $(fp_CPPFLAGS) $(wildcard *.cc) | sed "s|^\(.*\).o:|\1.$(obj-suffix):|" >> .dep
-	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard examples/*.cc) | sed "s|^\(.*\).o:|examples/\1.$(obj-suffix):|" >> .dep
-	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard fpoptimizer/*.cc) | sed "s|^\(.*\).o:|fpoptimizer/\1.$(obj-suffix):|" >> .dep
-	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard tests/*.cc) | sed "s|^\(.*\).o:|tests/\1.$(obj-suffix):|" >> .dep
-	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard util/*.cc) | sed "s|^\(.*\).o:|util/\1.$(obj-suffix):|" >> .dep
-	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard mpfr/*.cc) 2>/dev/null | sed "s|^\(.*\).o:|mpfr/\1.$(obj-suffix):|" >> .dep
-#	@- $(libmesh_CXX) -MM $(fp_CPPFLAGS) $(wildcard lib/*.cc) | sed "s|^\(.*\).o:|lib/\1.$(obj-suffix):|" >> .dep
-# sed -i is non-POSIX, so make a temporary file and then copy it back
-	@sed -e's@`pwd`/@@' .dep > backup.dep
-	@mv backup.dep .dep
+	$(perl) ../bin/make_dependencies.pl $(foreach i, $(wildcard */) ., -I./$(i)) "-S\$$(obj-suffix)" $(wildcard *.cc) $(wildcard examples/*.cc) $(wildcard fpoptimizer/*.cc) $(wildcard tests/*.cc) $(wildcard util/*.cc) $(wildcard mpfr/*.cc) > .dep
 
 -include .dep
 
