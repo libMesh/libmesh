@@ -60,9 +60,9 @@ foreach $file (keys %include_files) {
 foreach $file (sort @input_files) {
     $file =~ /(.*)\.([Cc])/;
 
-    # replace the .C or .c with .$object_suffix
+    # replace the .C or .c or .cc with .$object_suffix
     $rulename = $file;
-    $rulename =~ s/\.[Cc]/.$object_suffix/g;
+    $rulename =~ s/\.[Cc]c?\s*$/.$object_suffix/g;
 
 
     
