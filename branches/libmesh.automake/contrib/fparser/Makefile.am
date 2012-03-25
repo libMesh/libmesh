@@ -214,7 +214,7 @@ fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
 	          exit 1 ; \
                 fi ; \
 		echo "#line 1 \"$$file_to_include\""; \
-		$(SED) -r "s@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@" < "$$file_to_include"; \
+		$(SED) 's@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@' < "$$file_to_include"; \
 		echo; \
 	done | $(SED) 's@BEGIN_EXPLICIT_INSTANTATION.*@@;s@.*END_EXPLICIT_INSTANTATION@@' \
 	     | util/cpp_compress "lnxyceti" >> $@
