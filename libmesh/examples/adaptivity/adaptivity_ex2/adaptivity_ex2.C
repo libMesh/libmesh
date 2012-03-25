@@ -343,7 +343,7 @@ int main (int argc, char** argv)
 
         OSSInt(out,2,t_step);
         out << ", time=";
-        OSSRealzeroleft(out,6,3,time);
+        OSSRealzeroleft(out,6,3,system.time);
         out <<  "...";
         std::cout << out.str() << std::endl;
       }
