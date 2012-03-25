@@ -6,7 +6,7 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-INCLUDES = -I$(srcdir)/include
+INCLUDES = -I$(srcdir)/include  -I$(srcdir)/fpoptimizer
 EXTRA_DIST = # none, append below
 
 # Build up utility programs used to define parsing, not needed
@@ -18,7 +18,36 @@ noinst_PROGRAMS           += util/cpp_compress
 util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
 
 noinst_PROGRAMS +=  util/tree_grammar_parser
-util_tree_grammar_parser_SOURCES = util/tree_grammar_parser.cc fpoptimizer/opcodename.cc fpoptimizer/opcodename.hh
+util_tree_grammar_parser_SOURCES = \
+                                 util/tree_grammar_parser.yy fpoptimizer/opcodename.cc fpoptimizer/opcodename.hh \
+                                 mpfr/MpfrFloat.hh \
+                                 mpfr/GmpInt.hh \
+                                 fparser_mpfr.hh \
+                                 fparser.hh \
+                                 fpoptimizer/logic_comparisons.hh \
+                                 fpoptimizer/constantfolding.hh \
+                                 fpoptimizer/logic_ifoperations.hh \
+                                 fpoptimizer/instantiate.hh \
+                                 fpoptimizer/opcodename.hh \
+                                 fpoptimizer/consts.hh \
+                                 fpoptimizer/optimize.hh \
+                                 fpoptimizer/bytecodesynth.hh \
+                                 fpoptimizer/valuerange.hh \
+                                 fpoptimizer/codetree.hh \
+                                 fpoptimizer/logic_collections.hh \
+                                 fpoptimizer/hash.hh \
+                                 fpoptimizer/grammar.hh \
+                                 fpoptimizer/rangeestimation.hh \
+                                 fpoptimizer/logic_boolgroups.hh \
+                                 fpoptimizer/logic_powoperations.hh \
+                                 util/cpp_compress.hh \
+                                 fpconfig.hh \
+                                 lib/functional.hh \
+                                 lib/crc32.hh \
+                                 lib/autoptr.hh \
+                                 extrasrc/fpaux.hh \
+                                 extrasrc/fptypes.hh \
+                                 fparser_gmpint.hh
 
 BUILT_SOURCES = extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc
 CLEANFILES = $(BUILT_SOURCES)
@@ -81,7 +110,7 @@ includedir = $(prefix)/include/contrib
 include_HEADERS       =  fparser.hh
 
 noinst_LTLIBRARIES    = libfparser.la
-libfparser_la_CPPFLAGS = $(AM_CPPFLAGS) $(FEATURE_FLAGS) -I$(srcdir)/fpoptimizer
+libfparser_la_CPPFLAGS = $(AM_CPPFLAGS) $(FEATURE_FLAGS)
 libfparser_la_CXXFLAGS = $(AM_CXXFLAGS)
 libfparser_la_SOURCES  = \
                 $(builddir)/extrasrc/fp_opcode_add.inc \
