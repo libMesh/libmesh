@@ -896,13 +896,18 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
 void DofMap::print_dof_constraints(std::ostream& os) const
 {
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  os << "Node Constraints:"
+  os << "Local Node Constraints:"
      << std::endl;
 
   for (NodeConstraints::const_iterator it=_node_constraints.begin();
        it != _node_constraints.end(); ++it)
     {
       const Node *node = it->first;
+
+      // Skip non-local nodes
+      if (node->processor_id() != libMesh::processor_id())
+        continue;
+
       const NodeConstraintRow& row = it->second.first;
       const Point& offset = it->second.second;
 
@@ -920,13 +925,19 @@ void DofMap::print_dof_constraints(std::ostream& os) const
     }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-  os << "DoF Constraints:"
+  os << "Local DoF Constraints:"
      << std::endl;
 
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
     {
       const unsigned int i = it->first;
+
+      // Skip non-local dofs
+      if ((i < this->first_dof()) ||
+          (i >= this->end_dof()))
+        continue;
+
       const DofConstraintRow& row = it->second.first;
       const Number rhs = it->second.second;
 
@@ -1170,7 +1181,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
 		    if (elem_dofs[j] == it->first)
 		      matrix(i,j) = -it->second;
 
-		rhs(i) = -pos->second.second;
+		rhs(i) = pos->second.second;
               }
 	    else
               rhs(i) = 0.;
@@ -1746,9 +1757,10 @@ void DofMap::build_constraint_matrix_and_vector
       std::vector<unsigned int> new_elem_dofs (dof_set.begin(),
 					       dof_set.end());
 
-      // Now we can build the constraint matrix.
-      // Note that resize also zeros for a DenseMatrix<Number>.
+      // Now we can build the constraint matrix and vector.
+      // Note that resize also zeros for a DenseMatrix and DenseVector
       C.resize (elem_dofs.size(), new_elem_dofs.size());
+      H.resize (new_elem_dofs.size());
 
       // Create the C constraint matrix.
       for (unsigned int i=0; i<elem_dofs.size(); i++)
@@ -1771,6 +1783,8 @@ void DofMap::build_constraint_matrix_and_vector
 	      for (unsigned int j=0; j<new_elem_dofs.size(); j++)
 		if (new_elem_dofs[j] == it->first)
 		  C(i,j) = it->second;
+
+            H(i) = pos->second.second;
 	  }
 	else
 	  {
@@ -1789,13 +1803,15 @@ void DofMap::build_constraint_matrix_and_vector
 
       this->build_constraint_matrix_and_vector (Cnew, Hnew, elem_dofs, true);
 
-      // If x = Cy + h and y = Dz + g
-      // Then x = (CD)z + (Cg + h)
-      C.vector_mult_add(H, 1, Hnew);
-
       if ((C.n() == Cnew.m()) &&          // If the constraint matrix
 	  (Cnew.n() == elem_dofs.size())) // is constrained...
-	C.right_multiply(Cnew);
+        {
+	  C.right_multiply(Cnew);
+
+          // If x = Cy + h and y = Dz + g
+          // Then x = (CD)z + (Cg + h)
+          C.vector_mult_add(H, 1, Hnew);
+        }
 
       libmesh_assert (C.n() == elem_dofs.size());
     }

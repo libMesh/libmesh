@@ -69,7 +69,7 @@ public:
 		const NumericVector<Number>& vec,
 		const DofMap& dof_map,
 		const std::vector<unsigned int>& vars,
-		const FunctionBase<>* master=NULL);
+		const FunctionBase<Number>* master=NULL);
 
   /**
    * Constructor for mesh based functions with a number
@@ -83,7 +83,7 @@ public:
 		const NumericVector<Number>& vec,
 		const DofMap& dof_map,
 		const unsigned int var,
-		const FunctionBase<>* master=NULL);
+		const FunctionBase<Number>* master=NULL);
 
   /**
    * Destructor.

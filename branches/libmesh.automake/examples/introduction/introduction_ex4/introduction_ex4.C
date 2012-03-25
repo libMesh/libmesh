@@ -39,6 +39,7 @@
 #include <iostream>
 #include <algorithm>
 #include <math.h>
+#include <set>
 
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
@@ -74,6 +75,10 @@
 // The definition of a geometric element
 #include "elem.h"
 
+// To impose Dirichlet boundary conditions
+#include "dirichlet_boundaries.h"
+#include "analytic_function.h"
+
 #include "string_to_enum.h"
 #include "getpot.h"
 
@@ -93,8 +98,16 @@ void assemble_poisson(EquationSystems& es,
 
 // Exact solution function prototype.
 Real exact_solution (const Real x,
-                     const Real y = 0.,
-                     const Real z = 0.);
+		     const Real y,
+		     const Real z = 0.);
+
+// Define a wrapper for exact_solution that will be needed below
+void exact_solution_wrapper (DenseVector<Number>& output,
+                             const Point& p,
+                             const Real)
+{
+  output(0) = exact_solution(p(0),p(1),p(2));
+}
 
 // Begin the main program.
 int main (int argc, char** argv)
@@ -225,14 +238,53 @@ int main (int argc, char** argv)
   
   // Add the variable "u" to "Poisson".  "u"
   // will be approximated using second-order approximation.
-  system.add_variable("u",
-                      Utility::string_to_enum<Order>   (order),
-                      Utility::string_to_enum<FEFamily>(family));
+  unsigned int u_var = system.add_variable("u",
+                                           Utility::string_to_enum<Order>   (order),
+                                           Utility::string_to_enum<FEFamily>(family));
 
   // Give the system a pointer to the matrix assembly
   // function.
   system.attach_assemble_function (assemble_poisson);
+
+  // Construct a Dirichlet boundary condition object
   
+  // Indicate which boundary IDs we impose the BC on
+  // We either build a line, a square or a cube, and
+  // here we indicate the boundaries IDs in each case
+  std::set<boundary_id_type> boundary_ids;
+  // the dim==1 mesh has two boundaries with IDs 0 and 1
+  boundary_ids.insert(0);
+  boundary_ids.insert(1);
+  // the dim==2 mesh has four boundaries with IDs 0, 1, 2 and 3
+  if(dim>=2)
+  {
+    boundary_ids.insert(2);
+    boundary_ids.insert(3);
+  }
+  // the dim==3 mesh has four boundaries with IDs 0, 1, 2, 3, 4 and 5
+  if(dim==3)
+  {
+    boundary_ids.insert(4);
+    boundary_ids.insert(5);
+  }
+
+  // Create a vector storing the variable numbers which the BC applies to
+  std::vector<unsigned int> variables(1);
+  variables[0] = u_var;
+  
+  // Create an AnalyticFunction object that we use to project the BC
+  // This function just calls the function exact_solution via exact_solution_wrapper
+  AnalyticFunction<> exact_solution_object(exact_solution_wrapper);
+  
+  DirichletBoundary dirichlet_bc(boundary_ids,
+                                 variables,
+                                 &exact_solution_object);
+
+  // We must add the Dirichlet boundary condition _before_ 
+  // we call equation_systems.init()
+  system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
@@ -241,7 +293,7 @@ int main (int argc, char** argv)
   mesh.print_info();
 
   // Solve the system "Poisson", just like example 2.
-  equation_systems.get_system("Poisson").solve();
+  system.solve();
 
   // After solving the system write the solution
   // to a GMV-formatted plot file.
@@ -265,14 +317,10 @@ int main (int argc, char** argv)
 
 
 
-//
-//
-//
 // We now define the matrix assembly function for the
 // Poisson system.  We need to first compute element
 // matrices and right-hand sides, and then take into
-// account the boundary conditions, which will be handled
-// via a penalty method.
+// account the boundary conditions.
 void assemble_poisson(EquationSystems& es,
                       const std::string& system_name)
 {
@@ -495,87 +543,12 @@ void assemble_poisson(EquationSystems& es,
       
       // Stop logging the right-hand-side computation
       perf_log.pop ("Fe");
-
-      // At this point the interior element integration has
-      // been completed.  However, we have not yet addressed
-      // boundary conditions.  For this example we will only
-      // consider simple Dirichlet boundary conditions imposed
-      // via the penalty method. This is discussed at length in
-      // example 3.
-      {
-        
-        // Start logging the boundary condition computation
-        perf_log.push ("BCs");
-
-        // The following loops over the sides of the element.
-        // If the element has no neighbor on a side then that
-        // side MUST live on a boundary of the domain.
-        for (unsigned int side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor(side) == NULL)
-            {
-            
-              // The penalty value.  \frac{1}{\epsilon}
-              // in the discussion above.
-              const Real penalty = 1.e10;
-
-              // The value of the shape functions at the quadrature
-              // points.
-              const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
-
-              // The Jacobian * Quadrature Weight at the quadrature
-              // points on the face.
-              const std::vector<Real>& JxW_face = fe_face->get_JxW();
-
-              // The XYZ locations (in physical space) of the
-              // quadrature points on the face.  This is where
-              // we will interpolate the boundary value function.
-              const std::vector<Point >& qface_point = fe_face->get_xyz();
-
-              // Compute the shape function values on the element
-              // face.
-              fe_face->reinit(elem, side);
-
-              // Loop over the face quadrature points for integration.
-              for (unsigned int qp=0; qp<qface.n_points(); qp++)
-              {
-                // The location on the boundary of the current
-                // face quadrature point.
-                const Real xf = qface_point[qp](0);
-#if LIBMESH_DIM > 1
-                const Real yf = qface_point[qp](1);
-#else
-                const Real yf = 0.;
-#endif
-#if LIBMESH_DIM > 2
-                const Real zf = qface_point[qp](2);
-#else
-                const Real zf = 0.;
-#endif
-
-
-                // The boundary value.
-                const Real value = exact_solution(xf, yf, zf);
-
-                // Matrix contribution of the L2 projection. 
-                for (unsigned int i=0; i<phi_face.size(); i++)
-                  for (unsigned int j=0; j<phi_face.size(); j++)
-                    Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-
-                // Right-hand-side contribution of the L2
-                // projection.
-                for (unsigned int i=0; i<phi_face.size(); i++)
-                  Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-              } 
-            }
-            
-        
-        // Stop logging the boundary condition computation
-        perf_log.pop ("BCs");
-      } 
       
       // If this assembly program were to be used on an adaptive mesh,
       // we would have to apply any hanging node constraint equations
-      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+      // Also, note that here we call heterogenously_constrain_element_matrix_and_vector
+      // to impose a inhomogeneous Dirichlet boundary conditions.
+      dof_map.heterogenously_constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and

@@ -246,10 +246,6 @@ unsigned int PetscDiffSolver::solve()
   PetscVector<Number> &r =
     *(libmesh_cast_ptr<PetscVector<Number>*>(_system.rhs));
 
-  x.close();
-  r.close();
-  jac.close();
-
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif

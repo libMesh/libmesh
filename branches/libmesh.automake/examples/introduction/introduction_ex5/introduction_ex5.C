@@ -62,6 +62,10 @@
 // indexing.
 #include "dof_map.h"
 
+// To impose Dirichlet boundary conditions
+#include "dirichlet_boundaries.h"
+#include "analytic_function.h"
+
 // The definition of a geometric element
 #include "elem.h"
 
@@ -84,6 +88,14 @@ void assemble_poisson(EquationSystems& es,
 Real exact_solution (const Real x,
                      const Real y,
                      const Real z = 0.);
+
+// Define a wrapper for exact_solution that will be needed below
+void exact_solution_wrapper (DenseVector<Number>& output,
+                             const Point& p,
+                             const Real)
+{
+  output(0) = exact_solution(p(0),p(1),p(2));
+}
 
 
 // The quadrature type the user requests.
@@ -164,9 +176,39 @@ int main (int argc, char** argv)
   
   equation_systems.add_system<LinearImplicitSystem> ("Poisson");
   
-  equation_systems.get_system("Poisson").add_variable("u", FIRST);
+  unsigned int u_var = equation_systems.get_system("Poisson").add_variable("u", FIRST);
 
   equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+
+  // Construct a Dirichlet boundary condition object
+  
+  // Indicate which boundary IDs we impose the BC on
+  // We either build a line, a square or a cube, and
+  // here we indicate the boundaries IDs in each case
+  std::set<boundary_id_type> boundary_ids;
+  // the dim==1 mesh has two boundaries with IDs 0 and 1
+  boundary_ids.insert(0);
+  boundary_ids.insert(1);
+  boundary_ids.insert(2);
+  boundary_ids.insert(3);
+  boundary_ids.insert(4);
+  boundary_ids.insert(5);
+
+  // Create a vector storing the variable numbers which the BC applies to
+  std::vector<unsigned int> variables(1);
+  variables[0] = u_var;
+  
+  // Create an AnalyticFunction object that we use to project the BC
+  // This function just calls the function exact_solution via exact_solution_wrapper
+  AnalyticFunction<> exact_solution_object(exact_solution_wrapper);
+  
+  DirichletBoundary dirichlet_bc(boundary_ids,
+                                 variables,
+                                 &exact_solution_object);
+
+  // We must add the Dirichlet boundary condition _before_ 
+  // we call equation_systems.init()
+  equation_systems.get_system("Poisson").get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 
   equation_systems.init();
   
@@ -359,62 +401,13 @@ void assemble_poisson(EquationSystems& es,
           // Add the RHS contribution
           for (unsigned int i=0; i<phi.size(); i++)
             Fe(i) += JxW[qp]*fxy*phi[i][qp];          
-        }
-
-
-
-
-      
-      
-      // Most of this has already been seen before, except
-      // for the build routines of QBase, described below
-      {
-        for (unsigned int side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor(side) == NULL)
-            {              
-              const std::vector<std::vector<Real> >& phi_face    = fe_face->get_phi();
-              const std::vector<Real>&               JxW_face    = fe_face->get_JxW();              
-              const std::vector<Point >&             qface_point = fe_face->get_xyz();
-              
-              
-              // Compute the shape function values on the element
-              // face.
-              fe_face->reinit(elem, side);
-              
-              
-              // Loop over the face quadrature points for integration.
-              // Note that the \p AutoPtr<QBase> overloaded the operator->,
-              // so that QBase methods may safely be accessed.  It may
-              // be said: accessing an \p AutoPtr<Xyz> through the
-              // "." operator returns \p AutoPtr methods, while access
-              // through the "->" operator returns Xyz methods.
-              // This allows almost no change in syntax when switching
-              // to "safe pointers".
-              for (unsigned int qp=0; qp<qface->n_points(); qp++)
-                {
-                  const Real xf = qface_point[qp](0);
-                  const Real yf = qface_point[qp](1);
-                  const Real zf = qface_point[qp](2);
-                  
-                  const Real penalty = 1.e10;
-                  
-                  const Real value = exact_solution(xf, yf, zf);
-                  
-                  for (unsigned int i=0; i<phi_face.size(); i++)
-                    for (unsigned int j=0; j<phi_face.size(); j++)
-                      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-                  
-                  
-                  for (unsigned int i=0; i<phi_face.size(); i++)
-                    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                  
-                } // end face quadrature point loop          
-            } // end if (elem->neighbor(side) == NULL)
-      } // end boundary condition section          
+        }     
       
       // If this assembly program were to be used on an adaptive mesh,
       // we would have to apply any hanging node constraint equations
-      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+      // Call heterogenously_constrain_element_matrix_and_vector to impose
+      // non-homogeneous Dirichlet BCs
+      dof_map.heterogenously_constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
       
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
