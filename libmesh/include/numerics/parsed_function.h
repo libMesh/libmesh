@@ -19,8 +19,7 @@ class ParsedFunction : public FunctionBase<Output>
 public:
   ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
                   const std::vector<Output>* initial_vals=NULL)
-    : _expression(expression),
-      _additional_vars(NULL)
+    : _expression(expression)
       // Size the spacetime vector to account for space, time, and any additional
       // variables passed
       //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
