@@ -421,8 +421,9 @@ const T & TypeTensor<T>::operator () (const unsigned int i,
   libmesh_assert (j<3);
 
 #if LIBMESH_DIM < 3
+  const static T my_zero = 0;
   if (i >= LIBMESH_DIM || j >= LIBMESH_DIM)
-    return 0.;
+    return my_zero;
 #endif
 
   return _coords[i*LIBMESH_DIM+j];
