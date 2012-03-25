@@ -14,6 +14,9 @@ EXTRA_DIST = # none, append below
 noinst_PROGRAMS                   = util/bytecoderules_parser
 util_bytecoderules_parser_SOURCES = util/bytecoderules_parser.cc
 
+noinst_PROGRAMS                        += util/make_function_name_parser
+util_make_function_name_parser_SOURCES  = util/make_function_name_parser.cc util/cpp_compress.cc 
+ 
 noinst_PROGRAMS           += util/cpp_compress
 util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
 
@@ -47,17 +50,23 @@ util_tree_grammar_parser_SOURCES = \
                                  lib/autoptr.hh \
                                  extrasrc/fpaux.hh \
                                  extrasrc/fptypes.hh \
-                                 fparser_gmpint.hh
+                                 fparser_gmpint.hh extrasrc/fp_identifier_parser.inc
 
 BUILT_SOURCES = extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc
 CLEANFILES = $(BUILT_SOURCES)
+
+# extrasrc/fp_identifier_parser.inc: \
+# 		util/make_function_name_parser
+# 	@echo "Creating "$@
+# 	@mkdir -p extrasrc
+# 	@util/make_function_name_parser > $@
 
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
 		util/bytecoderules.dat \
 		util/bytecoderules_header.txt \
 		util/cpp_compress
-	@echo "Creating Bytecode from "$<"..."
+	@echo "Creating Bytecode in "$@
 	@mkdir -p extrasrc
 	@cat $(srcdir)/util/bytecoderules_header.txt > $@
 	@util/bytecoderules_parser \
