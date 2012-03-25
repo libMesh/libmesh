@@ -10,6 +10,10 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 INCLUDES    = $(libmesh_INCLUDE)
 LIBS        = $(libmesh_LIBS)
 
+if LIBMESH_ENABLE_FPARSER
+  INCLUDES +=  -I$(top_srcdir)/contrib/fparser
+endif
+
 EXTRA_DIST = run_common.sh
 
 check_PROGRAMS =

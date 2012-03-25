@@ -12,6 +12,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser) ;;
 		 esac],
 		 [enablefparser=no])
+		 #[enablefparser=$enableoptional])
 
 
 
@@ -21,6 +22,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
      FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
      #FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
      AC_DEFINE(HAVE_FPARSER, 1, [Flag indicating whether the library will be compiled with FPARSER support])
+     libmesh_contrib_INCLUDES="$FPARSER_INCLUDE $libmesh_contrib_INCLUDES"
      AC_MSG_RESULT(<<< Configuring library with fparser support >>>)
   else
      FPARSER_INCLUDE=""
@@ -33,4 +35,5 @@ AC_DEFUN([CONFIGURE_FPARSER],
   AC_SUBST(enablefparser)
 		 		 
   AM_CONDITIONAL(LIBMESH_ENABLE_FPARSER, test x$enablefparser = xyes)
+  AC_CONFIG_FILES([contrib/fparser/Makefile])
 ])

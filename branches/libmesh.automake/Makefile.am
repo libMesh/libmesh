@@ -532,6 +532,12 @@ if LIBMESH_ENABLE_SFC
   SUBDIRS += contrib/sfcurves
   libmesh_la_LIBADD += contrib/sfcurves/libsfcurves.la
 endif
+
+if LIBMESH_ENABLE_FPARSER
+  SUBDIRS += contrib/fparser
+  libmesh_la_LIBADD += contrib/fparser/libfparser.la
+endif
+
 ###########################################################
 
 ###########################################################

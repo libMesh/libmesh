@@ -327,12 +327,6 @@ CONFIGURE_LIBHILBERT
 # fparser -- distributed in ./contrib,
 #            enabled by default
 # -------------------------------------------------------------
-AC_ARG_ENABLE(fparser,
-              AC_HELP_STRING([--enable-fparser],
-                             [build with fparser by Juha Nieminen, Joel Yliluoma]),
-              enablefparser=$enableval,
-              enablefparser=$enableoptional)
-
 CONFIGURE_FPARSER
 # -------------------------------------------------------------
 
