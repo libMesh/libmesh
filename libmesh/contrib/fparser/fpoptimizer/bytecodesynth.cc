@@ -620,7 +620,7 @@ namespace FPoptimizer_ByteCode
 namespace FPoptimizer_ByteCode
 {
 #define FP_INSTANTIATE(type) \
-    template class SequenceOpcodes<type>; \
+    template struct SequenceOpcodes<type>; \
     template void ByteCodeSynth<type>::AddFunctionOpcode(unsigned); \
     template void ByteCodeSynth<type>::AddFunctionOpcode(unsigned, \
                  Specializer< bool(FUNCTIONPARSERTYPES::IsIntType<type>::result), \
