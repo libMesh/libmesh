@@ -30,14 +30,14 @@ AC_DEFUN([CONFIGURE_FPARSER],
      AC_PROG_SED
      AC_PROG_YACC
 
-#     # note - fparser optimization currently fails on OSX, to disable it regardless
-#     case "${host_os}" in
-#       *darwin*) 
-#         enablefparseroptimizer=no 
-#         AC_MSG_RESULT(>>> Disabling fparser optimization on ${host_os} <<<)
-#         ;;
-#         *) ;;
-#     esac	
+    # note - fparser optimization currently fails on OSX, to disable it regardless
+    case "${host_os}" in
+      *darwin*) 
+        enablefparseroptimizer=no 
+        AC_MSG_RESULT(>>> Disabling fparser optimization on ${host_os} <<<)
+        ;;
+        *) ;;
+    esac	
 
      FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
      #FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
