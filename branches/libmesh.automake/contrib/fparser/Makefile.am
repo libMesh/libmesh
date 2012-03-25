@@ -70,7 +70,7 @@ if FPARSER_SUPPORT_OPTIMIZER
   noinst_PROGRAMS                 +=  util/tree_grammar_parser
 endif
 util_tree_grammar_parser_CXXFLAGS  = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
-util_tree_grammar_parser_SOURCES   = \ # many of these .hh files are overkill I think but this gets them in the distribiution
+util_tree_grammar_parser_SOURCES   = \
                                  util/tree_grammar_parser.yy fpoptimizer/opcodename.cc fpoptimizer/opcodename.hh \
                                  mpfr/MpfrFloat.hh \
                                  mpfr/GmpInt.hh \
