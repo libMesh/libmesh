@@ -20,8 +20,8 @@
 #include "libmesh_config.h"
 
 #ifndef NDEBUG
-// TODO: icpc options
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+// TODO: icpc, clang options
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
 #if __GNUC__ > 3 && __GNUC_MINOR__ > 1
 // These two don't work?
 #pragma GCC diagnostic ignored "-pedantic"
