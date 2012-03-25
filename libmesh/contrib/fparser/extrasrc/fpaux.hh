@@ -38,6 +38,26 @@
 #ifdef ONCE_FPARSER_H_
 namespace FUNCTIONPARSERTYPES
 {
+    // Forward declarations
+    template<typename Value_t>
+    inline Value_t fp_exp(const Value_t&);
+
+    template<typename Value_t>
+    inline Value_t fp_log(const Value_t&);
+
+    template<typename Value_t>
+    inline Value_t fp_pow_base(const Value_t& x, const Value_t& y);
+
+    template<typename Value_t>
+    inline bool isInteger(const Value_t&);
+
+    template<typename Value_t>
+    inline bool isLongInteger(const Value_t&);
+
+    template<typename Value_t>
+    inline long makeLongInteger(const Value_t&);
+
+    // Definitions
     template<typename>
     struct IsIntType
     {
@@ -1135,12 +1155,22 @@ namespace FUNCTIONPARSERTYPES
         return (long) fp_int(value);
     }
 
-#ifdef FP_SUPPORT_COMPLEX_NUMBERS
-    template<typename T>
-    inline long makeLongInteger(const std::complex<T>& value)
-    {
-        return (long) fp_int( std::abs(value) );
-    }
+#ifdef FP_SUPPORT_COMPLEX_FLOAT_TYPE
+    template<>
+    inline long makeLongInteger(const std::complex<float>& value)
+    { return (long) fp_int( std::abs(value) ); }
+#endif
+
+#ifdef FP_SUPPORT_COMPLEX_DOUBLE_TYPE
+    template<>
+    inline long makeLongInteger(const std::complex<double>& value)
+    { return (long) fp_int( std::abs(value) ); }
+#endif
+
+#ifdef FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
+    template<>
+    inline long makeLongInteger(const std::complex<long double>& value)
+    { return (long) fp_int( std::abs(value) ); }
 #endif
 
 #ifdef FP_SUPPORT_LONG_INT_TYPE
