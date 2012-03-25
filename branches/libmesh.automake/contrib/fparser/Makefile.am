@@ -197,6 +197,7 @@ if FPARSER_SUPPORT_OPTIMIZER
 endif
 fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
 		fpoptimizer/fpoptimizer_footer.txt \
+	        extrasrc/fp_opcode_add.inc \
 		$(FPOPTIMIZER_CC_FILES) \
 		util/cpp_compress
 	@echo "Generating source file "$@"..."
