@@ -440,6 +440,12 @@ int main (int argc, char** argv)
             
 	// Dont forget to reinit the system after each adaptive refinement !
 	equation_systems.reinit();
+
+        std::cout << "Refined mesh to "
+                  << mesh.n_active_elem()
+                  << " active elements and "
+                  << equation_systems.n_active_dofs()
+                  << " active dofs." << std::endl;
       }
 
     // Do one last solve if necessary

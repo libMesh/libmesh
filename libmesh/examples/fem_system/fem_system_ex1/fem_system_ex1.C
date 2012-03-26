@@ -237,16 +237,12 @@ int main (int argc, char** argv)
 
           // Print out status at each adaptive step.
           Real global_error = error.l2_norm();
-          std::cout << "adaptive step " << a_step << ": ";
+          std::cout << "Adaptive step " << a_step << ": " << std::endl;
           if (global_tolerance != 0.)
-            std::cout << "global_error = " << global_error
-                      << " with ";
-          std::cout << mesh.n_active_elem()
-                    << " active elements and "
-                    << equation_systems.n_active_dofs()
-                    << " active dofs." << std::endl;
+            std::cout << "Global_error = " << global_error 
+                      << std::endl;
           if (global_tolerance != 0.)
-            std::cout << "worst element error = " << error.maximum()
+            std::cout << "Worst element error = " << error.maximum()
                       << ", mean = " << error.mean() << std::endl;
 
           if (global_tolerance != 0.)
@@ -273,6 +269,12 @@ int main (int argc, char** argv)
           // Carry out the adaptive mesh refinement/coarsening
           mesh_refinement.refine_and_coarsen_elements();
           equation_systems.reinit();
+
+          std::cout << "Refined mesh to "
+                    << mesh.n_active_elem()
+                    << " active elements and "
+                    << equation_systems.n_active_dofs()
+                    << " active dofs." << std::endl;
         }
       // Do one last solve if necessary
       if (a_step == max_adaptivesteps)
