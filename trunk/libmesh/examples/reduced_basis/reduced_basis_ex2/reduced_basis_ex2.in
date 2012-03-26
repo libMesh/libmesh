@@ -4,7 +4,7 @@ n_elem = 25                    # The number of elements in each dimension in the
 store_basis_functions = true   # Do we store the basis functions in the offline_data directory once Offline finishes?
 
 online_N = 6            # If we're in Online mode, the number of basis functions we use for the reduced basis solve
-online_mu = '0.2 0.7 3' # Parameter vector for an Online solve
+online_mu = '0.2 0.7 0.1' # Parameter vector for an Online solve
 
 # ========= RB system parameters =========
 
