@@ -1277,8 +1277,8 @@ Real System::calculate_norm(const NumericVector<Number>& v,
   // which we'll want to square then sum then square root) with norms
   // like L_inf (for which we'll just want to take an absolute value
   // and then sum).
-  bool can_add_hilbert_norm = true,
-       can_add_nonhilbert_norm = true;
+  bool using_hilbert_norm = true,
+       using_nonhilbert_norm = true;
 
   // Loop over all variables
   for (unsigned int var=0; var != this->n_vars(); ++var)
@@ -1297,16 +1297,18 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 	 (norm_type==H1_SEMINORM) ||
 	 (norm_type==H2_SEMINORM))
         {
-          if (!can_add_hilbert_norm)
+          if (!using_hilbert_norm)
             libmesh_not_implemented();
-          can_add_nonhilbert_norm = false;
+          using_nonhilbert_norm = false;
         }
       else if ((norm_type==L1) ||
-	       (norm_type==L_INF))
+	       (norm_type==L_INF) ||
+	       (norm_type==W1_INF_SEMINORM) ||
+	       (norm_type==W2_INF_SEMINORM))
         {
-          if (!can_add_nonhilbert_norm)
+          if (!using_nonhilbert_norm)
             libmesh_not_implemented();
-          can_add_hilbert_norm = false;
+          using_hilbert_norm = false;
         }
       else
 	libmesh_not_implemented();
@@ -1330,12 +1332,14 @@ Real System::calculate_norm(const NumericVector<Number>& v,
       const std::vector<std::vector<RealGradient> >* dphi = NULL;
       if (norm_type == H1 ||
           norm_type == H2 ||
-          norm_type == H1_SEMINORM)
+          norm_type == H1_SEMINORM ||
+          norm_type == W1_INF_SEMINORM)
         dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       const std::vector<std::vector<RealTensor> >*   d2phi = NULL;
       if (norm_type == H2 ||
-          norm_type == H2_SEMINORM)
+          norm_type == H2_SEMINORM ||
+          norm_type == W2_INF_SEMINORM)
         d2phi = &(fe->get_d2phi());
 #endif
 
@@ -1401,6 +1405,14 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                             JxW[qp] * grad_u_h.size_sq();
                 }
 
+              if (norm_type == W1_INF_SEMINORM)
+                {
+                  Gradient grad_u_h;
+                  for (unsigned int i=0; i != n_sf; ++i)
+                    grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
+	          v_norm = std::max(v_norm, norm_weight * grad_u_h.size());
+                }
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               if (norm_type == H2 ||
                   norm_type == H2_SEMINORM)
@@ -1411,16 +1423,32 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   v_norm += norm_weight_sq *
                             JxW[qp] * hess_u_h.size_sq();
                 }
+
+              if (norm_type == W2_INF_SEMINORM)
+                {
+                  Tensor hess_u_h;
+                  for (unsigned int i=0; i != n_sf; ++i)
+                    hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
+	          v_norm = std::max(v_norm, norm_weight * hess_u_h.size());
+                }
 #endif
             }
         }
     }
 
-  Parallel::sum(v_norm);
+  if (using_hilbert_norm)
+    {
+      Parallel::sum(v_norm);
+      v_norm = std::sqrt(v_norm);
+    }
+  else
+    {
+      Parallel::max(v_norm);
+    }
 
   STOP_LOG ("calculate_norm()", "System");
 
-  return std::sqrt(v_norm);
+  return v_norm;
 }
 
 
