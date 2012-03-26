@@ -1118,7 +1118,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 }
 
 
-void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & mesh,
+void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh */,
                                                       std::vector<std::string> names)
 {
   if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
