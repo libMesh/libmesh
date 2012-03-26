@@ -33,6 +33,7 @@
 #include "mesh_refinement.h"
 #include "mesh_base.h"
 #include "parallel.h"
+#include "remote_elem.h"
 
 namespace libMesh
 {
@@ -271,29 +272,34 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // Create an vector with active element errors and ids,
   // sorted by highest errors first
+  const unsigned int n_elem = _mesh.n_elem();
   std::vector<std::pair<float, unsigned int> > sorted_error;
 
   sorted_error.reserve (n_active_elem);
 
-  // FIXME - this won't work on a non-serialized mesh yet
-  if (!_mesh.is_serial())
-    {
-      if (libMesh::processor_id() == 0)
-        libMesh::err << "flag_elements_by_nelem_target does not yet "
-                      << "work on a parallel mesh." << std::endl;
-      libmesh_error();
-    }
+  // On a ParallelMesh, we need to communicate to know which remote ids
+  // correspond to active elements.
+  {
+    std::vector<bool> is_active(n_elem, false);
 
-  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+    MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
+    const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
+    for (; elem_it != elem_end; ++elem_it)
+      {
+        const unsigned int eid = (*elem_it)->id();
+        is_active[eid] = true;
+      }
+    Parallel::max(is_active);
 
-  for (; elem_it != elem_end; ++elem_it)
-    {
-      unsigned int eid = (*elem_it)->id();
-      libmesh_assert(eid < error_per_cell.size());
-      sorted_error.push_back
-        (std::make_pair(error_per_cell[eid], eid));
-    }
+    for (unsigned int eid=0; eid != n_elem; ++eid)
+      {
+        if (!is_active[eid])
+          continue;
+        libmesh_assert(eid < error_per_cell.size());
+        sorted_error.push_back
+          (std::make_pair(error_per_cell[eid], eid));
+      }
+  }
 
   // Default sort works since pairs are sorted lexicographically
   std::sort (sorted_error.begin(), sorted_error.end());
@@ -357,22 +363,38 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     refine_count++;
   }
 
-  if (refine_count > max_elem_refine)
-    refine_count = max_elem_refine;
+  // On a ParallelMesh, we need to communicate to know which remote ids
+  // correspond to refinable elements
   unsigned int successful_refine_count = 0;
-  for (unsigned int i=0; i != sorted_error.size(); ++i)
-    {
-      if (successful_refine_count >= refine_count)
-        break;
+  {
+    std::vector<bool> is_refinable(n_elem, false);
 
-      unsigned int eid = sorted_error[i].second;
-      Elem *elem = _mesh.elem(eid);
-      if (elem->level() < _max_h_level)
-        {
-	  elem->set_refinement_flag(Elem::REFINE);
-	  successful_refine_count++;
-        }
-    }
+    for (unsigned int i=0; i != sorted_error.size(); ++i)
+      {
+        unsigned int eid = sorted_error[i].second;
+        Elem *elem = _mesh.elem(eid);
+        if (elem && elem->level() < _max_h_level)
+	  is_refinable[eid] = true;
+      }
+    Parallel::max(is_refinable);
+
+    if (refine_count > max_elem_refine)
+      refine_count = max_elem_refine;
+    for (unsigned int i=0; i != sorted_error.size(); ++i)
+      {
+        if (successful_refine_count >= refine_count)
+          break;
+
+        unsigned int eid = sorted_error[i].second;
+        Elem *elem = _mesh.elem(eid);
+        if (is_refinable[eid])
+          {
+            if (elem)
+	      elem->set_refinement_flag(Elem::REFINE);
+	    successful_refine_count++;
+          }
+      }
+  }
 
   // If we couldn't refine enough elements, don't coarsen too many
   // either
@@ -383,22 +405,32 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   if (coarsen_count > max_elem_coarsen)
     coarsen_count = max_elem_coarsen;
-  unsigned int successful_coarsen_count = 0;
-  for (unsigned int i=0; i != sorted_parent_error.size(); ++i)
-    {
-      if (successful_coarsen_count >= coarsen_count * twotodim)
-        break;
 
-      unsigned int parent_id = sorted_parent_error[i].second;
-      Elem *parent = _mesh.elem(parent_id);
-      libmesh_assert(parent->has_children());
-      for (unsigned int c=0; c != parent->n_children(); ++c)
+  unsigned int successful_coarsen_count = 0;
+  if (coarsen_count)
+    {
+      for (unsigned int i=0; i != sorted_parent_error.size(); ++i)
         {
-          Elem *elem = parent->child(c);
-          if (elem->active())
+          if (successful_coarsen_count >= coarsen_count * twotodim)
+            break;
+
+          unsigned int parent_id = sorted_parent_error[i].second;
+          Elem *parent = _mesh.elem(parent_id);
+
+          // On a ParallelMesh we skip remote elements
+          if (!parent)
+            continue;
+
+          libmesh_assert(parent->has_children());
+          for (unsigned int c=0; c != parent->n_children(); ++c)
             {
-              elem->set_refinement_flag(Elem::COARSEN);
-              successful_coarsen_count++;
+              Elem *elem = parent->child(c);
+              if (elem && elem != remote_elem)
+                {
+                  libmesh_assert(elem->active());
+                  elem->set_refinement_flag(Elem::COARSEN);
+                  successful_coarsen_count++;
+                }
             }
         }
     }
