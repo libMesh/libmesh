@@ -247,6 +247,7 @@ struct Ex02DirichletDofAssembly : DirichletDofAssembly
     FEInterface::dofs_on_side(c.elem, c.dim, c.element_fe_var[u_var]->get_fe_type(),
                               3, side_dofs);
 
+    if (c.side == 3)
     for(unsigned int ii=0; ii<side_dofs.size(); ii++)
     {
       dirichlet_dofs_set.insert(c.dof_indices[side_dofs[ii]]);
@@ -279,7 +280,7 @@ struct Ex02RBThetaExpansion : RBThetaExpansion
   // The RBTheta member variables
   ThetaA0 theta_a_0;
   ThetaA1 theta_a_1;
-  ThetaA1 theta_a_2;
+  ThetaA2 theta_a_2;
   RBTheta rb_theta; // Default RBTheta object, just returns 1.
 };
 
