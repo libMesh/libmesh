@@ -46,6 +46,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 						      const Real coarsen_frac,
 						      const unsigned int max_l)
 {
+  parallel_only();
+
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
@@ -172,6 +174,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
 void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_per_cell_in)
 {
+  parallel_only();
+
   // Check for valid fractions..
   // The fraction values must be in [0,1]
   libmesh_assert (_coarsen_threshold  >= 0. && _refine_fraction  <= 1.);
@@ -234,6 +238,8 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 
 bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per_cell)
 {
+  parallel_only();
+
   // Check for valid fractions..
   // The fraction values must be in [0,1]
   libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
@@ -412,6 +418,8 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 						     const Real coarsen_frac,
 						     const unsigned int max_l)
 {
+  parallel_only();
+
   // FIXME - this won't work on a non-serialized mesh yet
   if (!_mesh.is_serial())
     {
