@@ -1118,7 +1118,8 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 }
 
 
-void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names)
+void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & mesh,
+                                                      std::vector<std::string> names)
 {
   if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
     return;
@@ -1134,6 +1135,22 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
 
   ex_err = exII::ex_put_var_param(ex_id, "e", num_elem_vars);
   check_err(ex_err, "Error setting number of element vars.");
+
+  // Form the element variable truth table and send to Exodus.
+  // This tells which variables are written to which blocks,
+  // and can dramatically speed up writing element variables
+
+  // We really should initialize all entries in the truth table to 0
+  // and then loop over all subdomains, setting their entries to 1
+  // if a given variable exists on that subdomain.  However,
+  // we don't have that information, and the element variables
+  // passed to us are padded with zeroes for the blocks where
+  // they aren't defined.  To be consistent with that, fill
+  // the truth table with ones.
+
+  std::vector<int> truth_tab(num_elem_blk*num_elem_vars,1);
+  ex_err = exII::ex_put_elem_var_tab(ex_id, num_elem_blk, num_elem_vars, &truth_tab[0]);
+  check_err(ex_err, "Error writing element truth table.");
 
   // Use the vvc and strings objects to emulate the behavior of
   // a char** object.
