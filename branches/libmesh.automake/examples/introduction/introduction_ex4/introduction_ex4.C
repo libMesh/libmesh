@@ -106,7 +106,9 @@ void exact_solution_wrapper (DenseVector<Number>& output,
                              const Point& p,
                              const Real)
 {
-  output(0) = exact_solution(p(0),p(1),p(2));
+  output(0) = exact_solution(p(0),
+			     (LIBMESH_DIM>1)?p(1):0,
+			     (LIBMESH_DIM>2)?p(2):0);
 }
 
 // Begin the main program.
