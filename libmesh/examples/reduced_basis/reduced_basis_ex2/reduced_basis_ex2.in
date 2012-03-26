@@ -13,8 +13,8 @@ training_tolerance = 1.e-5 # The Reduced Basis training algorithm terminates whe
 
 n_parameters = 3           # The number of parameters in the problem
 
-mu_min = '0.1 0.1 1'               # The "lower corner" of the parameter domain
-mu_max = '1 1 10'                  # The "upper corner" of the parameter domain
+mu_min = '0.1 0.1 0.01'               # The "lower corner" of the parameter domain
+mu_max = '1 1 0.1'                  # The "upper corner" of the parameter domain
 log_scaling = '1 1 1'              # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
 
 deterministic_training = false        # Are the training points generated randomly or deterministically
