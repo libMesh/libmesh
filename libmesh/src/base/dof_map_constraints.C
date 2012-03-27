@@ -1008,7 +1008,11 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 
 	        const DofConstraintRow& constraint_row = pos->second.first;
 
-	        libmesh_assert (!constraint_row.empty());
+		// This is an overzealous assertion in the presence of
+		// heterogenous constraints: we now can constrain "u_i = c"
+		// with no other u_j terms involved.
+		//
+	        // libmesh_assert (!constraint_row.empty());
 
 	        for (DofConstraintRow::const_iterator
 		       it=constraint_row.begin(); it != constraint_row.end();
