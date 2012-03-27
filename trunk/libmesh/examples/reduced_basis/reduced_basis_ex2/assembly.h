@@ -19,7 +19,6 @@
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
-using libMesh::DirichletDofAssembly;
 using libMesh::ElemAssembly;
 using libMesh::FEInterface;
 using libMesh::FEMContext;
@@ -229,31 +228,48 @@ struct OutputAssembly : ElemAssembly
   Real min_x, max_x, min_y, max_y;
 };
 
-// Build up the dirichlet_dofs_set, which stores all the Dirichlet degrees of freedom
-// in this problem. In this case all boundary dofs are Dirichlet.
-struct Ex02DirichletDofAssembly : DirichletDofAssembly
-{
-  virtual void boundary_assembly(FEMContext &c)
-  {
-    const unsigned int u_var = 0;
-
-    std::vector<unsigned int> side_dofs;
-    
-    // Impose a Dirichlet boundary condition only on left side of the domain
-    // Since, by default, boundary_assembly only gets called on boundary elements, we
-    // can just get the dof IDs on element boundary 3 (the left side of the QUAD element)
-    // (More generally, one should use Mesh boundary_ids to decide which dofs are on
-    // which boundary.)
-    FEInterface::dofs_on_side(c.elem, c.dim, c.element_fe_var[u_var]->get_fe_type(),
-                              3, side_dofs);
-
-    if (c.side == 3)
-    for(unsigned int ii=0; ii<side_dofs.size(); ii++)
-    {
-      dirichlet_dofs_set.insert(c.dof_indices[side_dofs[ii]]);
-    }
-  }
-};
+//// Build up the dirichlet_dofs_set, which stores all the Dirichlet degrees of freedom
+//// in this problem. In this case all boundary dofs are Dirichlet.
+//struct Ex02DirichletDofAssembly : DirichletDofAssembly
+//{
+//  virtual void boundary_assembly(FEMContext &c)
+//  {
+//    const unsigned int u_var = 0;
+//
+//    std::vector<unsigned int> side_dofs;
+//    
+//    // Impose a Dirichlet boundary condition only on left side of the domain
+//    // Since, by default, boundary_assembly only gets called on boundary elements, we
+//    // can just get the dof IDs on element boundary 3 (the left side of the QUAD element)
+//    // (More generally, one should use Mesh boundary_ids to decide which dofs are on
+//    // which boundary.)
+//    FEInterface::dofs_on_side(c.elem, c.dim, c.element_fe_var[u_var]->get_fe_type(),
+//                              3, side_dofs);
+//
+//    for(unsigned int ii=0; ii<side_dofs.size(); ii++)
+//    {
+//      dirichlet_dofs_set.insert(c.dof_indices[side_dofs[ii]]);
+//    }
+//  }
+//};
+//
+//    std::vector<unsigned int> side_dofs;
+//    
+//    // Impose a Dirichlet boundary condition only on left side of the domain
+//    // Since, by default, boundary_assembly only gets called on boundary elements, we
+//    // can just get the dof IDs on element boundary 3 (the left side of the QUAD element)
+//    // (More generally, one should use Mesh boundary_ids to decide which dofs are on
+//    // which boundary.)
+//    FEInterface::dofs_on_side(c.elem, c.dim, c.element_fe_var[u_var]->get_fe_type(),
+//                              3, side_dofs);
+//
+//    if (c.side == 3)
+//    for(unsigned int ii=0; ii<side_dofs.size(); ii++)
+//    {
+//      dirichlet_dofs_set.insert(c.dof_indices[side_dofs[ii]]);
+//    }
+//  }
+//};
 
 // Define an RBThetaExpansion class for this PDE
 struct Ex02RBThetaExpansion : RBThetaExpansion
