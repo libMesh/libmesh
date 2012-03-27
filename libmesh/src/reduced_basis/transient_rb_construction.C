@@ -493,7 +493,7 @@ void TransientRBConstruction::truth_assembly()
       temp_vec->scale( trans_theta_expansion.eval_theta_q_f(q_f,mu) );
       rhs->add(*temp_vec);
     }
-    zero_dirichlet_dofs_on_rhs();
+//    zero_dirichlet_dofs_on_rhs();
 
     if(constrained_problem)
       matrix->add(1., *constraint_matrix);
@@ -596,7 +596,7 @@ void TransientRBConstruction::truth_assembly()
         }
       }
 
-      // Constrain the dofs to impose hanging node or periodic constraints
+      // Constrain the dofs to impose Dirichlet, hanging node or periodic constraints
       for(unsigned int q_m=0; q_m<Q_m; q_m++)
       {
         this->get_dof_map().constrain_element_matrix_and_vector
@@ -613,35 +613,6 @@ void TransientRBConstruction::truth_assembly()
       {
         this->get_dof_map().constrain_element_matrix_and_vector
           (Fq_context[q_f]->elem_jacobian, Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
-      }
-
-      // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
-      // Note that this cannot be inside the side-loop since non-boundary
-      // elements may contain boundary dofs
-      std::set<unsigned int>::const_iterator iter;
-      for(unsigned int n=0; n<Aq_context[0]->dof_indices.size(); n++)
-      {
-	iter = global_dirichlet_dofs_set.find( Aq_context[0]->dof_indices[n] );
-	if(iter != global_dirichlet_dofs_set.end())
-	{
-	  for(unsigned int q_a=0; q_a<Q_a; q_a++)
-	  {
-	    Aq_context[q_a]->elem_jacobian.condense
-	      (n,n,0.,Aq_context[q_a]->elem_residual);
-	  }
-
-	  for(unsigned int q_f=0; q_f<Q_f; q_f++)
-	  {
-	    Fq_context[q_f]->elem_jacobian.condense
-	      (n,n,0.,Fq_context[q_f]->elem_residual);
-	  }
-
-	  for(unsigned int q_m=0; q_m<Q_m; q_m++)
-	  {
-	    Mq_context[q_m]->elem_jacobian.condense
-	      (n,n,0.,Mq_context[q_m]->elem_residual);
-	  }
-	}
       }
 
       // Finally, add local matrices/vectors to the global system
@@ -944,7 +915,7 @@ Number TransientRBConstruction::set_error_temporal_data()
       matrix->vector_mult(*temp, *solution);
     }
 
-    zero_dirichlet_dofs_on_vector(*temp);
+//    zero_dirichlet_dofs_on_vector(*temp);
 
     // Do not assume that RB_stiffness matrix is diagonal,
     // diagonality degrades as N increases
@@ -1462,7 +1433,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                                *rhs,
                                rb_eval->get_basis_function(i));
       }
-      zero_dirichlet_dofs_on_rhs();
+//      zero_dirichlet_dofs_on_rhs();
 
       solution->zero();
 

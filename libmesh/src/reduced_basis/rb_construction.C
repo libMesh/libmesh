@@ -36,6 +36,8 @@
 #include "timestamp.h"
 #include "petsc_linear_solver.h"
 #include "fem_context.h"
+#include "dirichlet_boundaries.h"
+#include "zero_function.h"
 
 // For creating a directory
 #include <sys/types.h>
@@ -75,8 +77,7 @@ RBConstruction::RBConstruction (EquationSystems& es,
     constraint_assembly(NULL),
     output_dual_norms_computed(false),
     Fq_representor_norms_computed(false),
-    training_tolerance(-1.),
-    _dirichlet_list_init(NULL)
+    training_tolerance(-1.)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -309,9 +310,6 @@ void RBConstruction::initialize_rb_construction()
 
 void RBConstruction::assemble_affine_expansion()
 {
-  // Initialize the non-Dirichlet and Dirichlet dofs lists
-  this->initialize_dirichlet_dofs();
-
   // Assemble and store all of the matrices if we're
   // not in single-matrix mode
   if(!single_matrix_mode)
@@ -429,82 +427,6 @@ void RBConstruction::allocate_data_structures()
   truth_outputs.resize(this->rb_theta_expansion->get_n_outputs());
 }
 
-void RBConstruction::attach_dirichlet_dof_initialization (DirichletDofAssembly* dirichlet_init)
-{
-  libmesh_assert (dirichlet_init != NULL);
-
-  _dirichlet_list_init = dirichlet_init;
-}
-
-void RBConstruction::initialize_dirichlet_dofs()
-{
-  // Short-circuit if _dirichlet_list_init is NULL
-  if(!_dirichlet_list_init)
-  {
-    return;
-  }
-
-  START_LOG("initialize_dirichlet_dofs()", "RBConstruction");
-
-  // Initialize the lists of Dirichlet and non-Dirichlet degrees-of-freedom
-  // Clear the set to store the Dirichlet dofs on this processor
-  _dirichlet_list_init->dirichlet_dofs_set.clear();
-
-  const MeshBase& mesh = this->get_equation_systems().get_mesh();
-
-  AutoPtr<FEMContext> c = this->build_context();
-  FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
-
-  this->init_context(context);
-
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
-  {
-    context.pre_fe_reinit(*this, *el);
-    context.elem_fe_reinit();
-
-    for (context.side = 0;
-         context.side != context.elem->n_sides();
-       ++context.side)
-    {
-      // Skip over non-boundary sides if we don't have internal Dirichlet BCs
-      if ( (context.elem->neighbor(context.side) != NULL) && !impose_internal_dirichlet_BCs )
-	continue;
-
-      context.side_fe_reinit();
-      _dirichlet_list_init->boundary_assembly(context);
-    }
-  }
-
-  // Initialize the dirichlet dofs vector on each processor
-  std::vector<unsigned int> dirichlet_dofs_vector;
-  dirichlet_dofs_vector.clear();
-
-  std::set<unsigned int>::iterator iter     = _dirichlet_list_init->dirichlet_dofs_set.begin();
-  std::set<unsigned int>::iterator iter_end = _dirichlet_list_init->dirichlet_dofs_set.end();
-
-  for ( ; iter != iter_end; ++iter)
-  {
-    unsigned int dirichlet_dof_index = *iter;
-    dirichlet_dofs_vector.push_back(dirichlet_dof_index);
-  }
-
-  // Now take the union over all processors
-  Parallel::allgather(dirichlet_dofs_vector);
-
-  // Also, initialize the member data structure global_dirichlet_dofs_set
-  global_dirichlet_dofs_set.clear();
-
-  for (unsigned int ii=0; ii<dirichlet_dofs_vector.size(); ii++)
-  {
-    global_dirichlet_dofs_set.insert(dirichlet_dofs_vector[ii]);
-  }
-
-  STOP_LOG("initialize_dirichlet_dofs()", "RBConstruction");
-}
-
 AutoPtr<FEMContext> RBConstruction::build_context ()
 {
   return AutoPtr<FEMContext>(new FEMContext(*this));
@@ -515,7 +437,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                                                   SparseMatrix<Number>* input_matrix,
                                                   NumericVector<Number>* input_vector,
                                                   bool symmetrize,
-                                                  bool apply_dirichlet_bc)
+                                                  bool apply_dof_constraints)
 {
   START_LOG("add_scaled_matrix_and_vector()", "RBConstruction");
 
@@ -564,25 +486,11 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       context.elem_jacobian *= 0.5;
     }
 
-    // Apply constraints, e.g. periodic constraints
-    this->get_dof_map().constrain_element_matrix_and_vector
-      (context.elem_jacobian, context.elem_residual, context.dof_indices);
-
-    if(apply_dirichlet_bc)
+    if(apply_dof_constraints)
     {
-      // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
-      // Note that this cannot be inside the side-loop since non-boundary
-      // elements may contain boundary dofs
-      std::set<unsigned int>::const_iterator iter;
-      for(unsigned int n=0; n<context.dof_indices.size(); n++)
-      {
-        iter = global_dirichlet_dofs_set.find( context.dof_indices[n] );
-        if(iter != global_dirichlet_dofs_set.end())
-        {
-	  context.elem_jacobian.condense
-	    (n,n,0.,context.elem_residual);
-        }
-      }
+      // Apply constraints, e.g. Dirichlet and periodic constraints
+      this->get_dof_map().constrain_element_matrix_and_vector
+        (context.elem_jacobian, context.elem_residual, context.dof_indices);
     }
 
     // Scale and add to global matrix and/or vector
@@ -661,22 +569,9 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
     context.elem_jacobian.vector_mult(context.elem_residual, context.elem_solution);
     context.elem_residual *= scalar;
 
-    // Apply constraints, e.g. periodic constraints
+    // Apply dof constraints, e.g. Dirichlet or periodic constraints
     this->get_dof_map().constrain_element_matrix_and_vector
       (context.elem_jacobian, context.elem_residual, context.dof_indices);
-
-    // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
-    // This zeros the Dirichlet dofs in context.elem_residual
-    std::set<unsigned int>::const_iterator iter;
-    for(unsigned int n=0; n<context.dof_indices.size(); n++)
-    {
-      iter = global_dirichlet_dofs_set.find( context.dof_indices[n] );
-      if(iter != global_dirichlet_dofs_set.end())
-      {
-        context.elem_jacobian.condense
-          (n,n,0.,context.elem_residual);
-      }
-    }
 
     dest.add_vector (context.elem_residual,
                       context.dof_indices);
@@ -795,7 +690,7 @@ void RBConstruction::truth_assembly()
         }
       }
 
-      // Constrain the dofs to impose hanging node or periodic constraints
+      // Constrain the dofs to impose Dirichlet BCs, hanging node or periodic constraints
       for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
       {
         this->get_dof_map().constrain_element_matrix
@@ -806,29 +701,6 @@ void RBConstruction::truth_assembly()
       {
         this->get_dof_map().constrain_element_vector
           (Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
-      }
-
-      // Apply Dirichlet boundary conditions, we assume zero Dirichlet BCs
-      // Note that this cannot be inside the side-loop since non-boundary
-      // elements may contain boundary dofs
-      std::set<unsigned int>::const_iterator iter;
-      for(unsigned int n=0; n<Aq_context[0]->dof_indices.size(); n++)
-      {
-	iter = global_dirichlet_dofs_set.find( Aq_context[0]->dof_indices[n] );
-	if(iter != global_dirichlet_dofs_set.end())
-	{
-	  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
-	  {
-	    Aq_context[q_a]->elem_jacobian.condense
-	      (n,n,0.,Aq_context[q_a]->elem_residual);
-	  }
-
-	  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
-	  {
-	    Fq_context[q_f]->elem_jacobian.condense
-	      (n,n,0.,Fq_context[q_f]->elem_residual);
-	  }
-	}
       }
 
       // Finally add local matrices/vectors to global system
@@ -874,7 +746,7 @@ void RBConstruction::truth_assembly()
   STOP_LOG("truth_assembly()", "RBConstruction");
 }
 
-void RBConstruction::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
+void RBConstruction::assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dof_constraints)
 {
   input_matrix->zero();
   add_scaled_matrix_and_vector(1.,
@@ -882,7 +754,7 @@ void RBConstruction::assemble_inner_product_matrix(SparseMatrix<Number>* input_m
                                input_matrix,
                                NULL,
                                false, /* symmetrize */
-                               apply_dirichlet_bc);
+                               apply_dof_constraints);
 }
 
 void RBConstruction::assemble_constraint_matrix(SparseMatrix<Number>* input_matrix)
@@ -896,7 +768,7 @@ void RBConstruction::assemble_and_add_constraint_matrix(SparseMatrix<Number>* in
   add_scaled_matrix_and_vector(1., constraint_assembly, input_matrix, NULL);
 }
 
-void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
+void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dof_constraints)
 {
   if(q >= rb_theta_expansion->get_Q_a())
   {
@@ -912,7 +784,7 @@ void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* in
                                input_matrix,
                                NULL,
                                false, /* symmetrize */
-                               apply_dirichlet_bc);
+                               apply_dof_constraints);
 }
 
 void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix<Number>* input_matrix, bool symmetrize)
@@ -955,7 +827,7 @@ void RBConstruction::assemble_misc_matrices()
 
   if(store_non_dirichlet_operators)
   {
-    assemble_inner_product_matrix(non_dirichlet_inner_product_matrix.get(), /* apply_dirichlet_bc = */ false);
+    assemble_inner_product_matrix(non_dirichlet_inner_product_matrix.get(), /* apply_dof_constraints = */ false);
   }
 
   if( constrained_problem )
@@ -997,7 +869,7 @@ void RBConstruction::assemble_all_affine_vectors()
 
 void RBConstruction::assemble_Fq_vector(unsigned int q,
                                         NumericVector<Number>* input_vector,
-                                        bool apply_dirichlet_bc)
+                                        bool apply_dof_constraints)
 {
   if(q >= rb_theta_expansion->get_Q_f())
   {
@@ -1013,7 +885,7 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
                                NULL,
                                input_vector,
                                false,             /* symmetrize */
-                               apply_dirichlet_bc /* apply_dirichlet_bc */);
+                               apply_dof_constraints /* apply_dof_constraints */);
 }
 
 void RBConstruction::assemble_all_output_vectors()
@@ -1575,24 +1447,24 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
                                rb_eval->get_basis_function(i));
       }
       rhs->scale(-1.);
-      zero_dirichlet_dofs_on_rhs();
+//      zero_dirichlet_dofs_on_rhs();
 
       solution->zero();
       if (!is_quiet())
-	    {
+      {
         libMesh::out << "Starting solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBConstruction::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
-	    }
+      }
 
       solve();
 
       if (!is_quiet())
-	    {
+      {
         libMesh::out << "Finished solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBConstruction::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
         libMesh::out << this->n_linear_iterations() << " iterations, final residual "
                      << this->final_linear_residual() << std::endl;
-	    }
+      }
 
       // Make sure we didn't max out the number of iterations
       if( (this->n_linear_iterations() >=
@@ -1772,7 +1644,7 @@ void RBConstruction::compute_output_dual_norms()
       {
         rhs->zero();
         rhs->add(1., *get_output_vector(n,q_l));
-        zero_dirichlet_dofs_on_rhs();
+//        zero_dirichlet_dofs_on_rhs();
 
         solution->zero();
 
@@ -1908,7 +1780,7 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
 
       rhs->zero();
       rhs->add(1., *get_F_q(q_f));
-      zero_dirichlet_dofs_on_rhs();
+//      zero_dirichlet_dofs_on_rhs();
 
       solution->zero();
 
@@ -2191,33 +2063,16 @@ NumericVector<Number>* RBConstruction::get_output_vector(unsigned int n, unsigne
   return outputs_vector[n][q_l];
 }
 
-void RBConstruction::zero_dirichlet_dofs_on_rhs()
+AutoPtr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()
 {
-  this->zero_dirichlet_dofs_on_vector(*rhs);
+  ZeroFunction<> zf;
+  
+  std::set<boundary_id_type> dirichlet_ids;
+  std::vector<unsigned int> variables;
+  
+  // The DirichletBoundary constructor clones zf, so it's OK that zf is only in local scope
+  return AutoPtr<DirichletBoundary> (new DirichletBoundary(dirichlet_ids, variables, &zf));
 }
-
-void RBConstruction::zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp)
-{
-  START_LOG("zero_dirichlet_dofs_on_vector()", "RBConstruction");
-
-  std::set<unsigned int>::iterator iter     = global_dirichlet_dofs_set.begin();
-  std::set<unsigned int>::iterator iter_end = global_dirichlet_dofs_set.end();
-
-  DofMap& dof_map = this->get_dof_map();
-  for ( ; iter != iter_end; ++iter)
-  {
-    unsigned int index = *iter;
-    if( (dof_map.first_dof() <= index) && (index < dof_map.end_dof()) )
-    {
-      temp.set(index, 0.);
-    }
-  }
-  temp.close();
-
-  STOP_LOG("zero_dirichlet_dofs_on_vector()", "RBConstruction");
-}
-
-
 
 void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_representors_dir,
                                                        const bool write_binary_residual_representors)

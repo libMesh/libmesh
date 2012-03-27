@@ -30,6 +30,7 @@
 #include "dense_matrix.h"
 #include "fem_context.h"
 #include "elem_assembly.h"
+#include "dirichlet_boundaries.h"
 
 namespace libMesh
 {
@@ -46,18 +47,6 @@ class RBAssemblyExpansion;
  * @author David J. Knezevic, 2009
  */
 
-
-/**
- * First, define a class that allows us to assemble a list of Dirichlet
- * dofs. This list is used by RBConstruction to impose homoegenous Dirichlet
- * boundary conditions (in the RB method, non-homogeneous Dirichlet
- * boundary conditions should be imposed via lifting functions).
- */
-class DirichletDofAssembly : public ElemAssembly
-{
-public:
-  std::set<unsigned int> dirichlet_dofs_set;
-};
 
 // ------------------------------------------------------------
 // RBConstruction class definition
@@ -186,17 +175,6 @@ public:
   virtual void load_rb_solution();
 
   /**
-   * Register a user-defined object to be used in initializing the
-   * lists of Dirichlet dofs.
-   */
-  void attach_dirichlet_dof_initialization (DirichletDofAssembly* dirichlet_init);
-
-  /**
-   * Call the user-defined Dirichlet dof initialization function.
-   */
-  void initialize_dirichlet_dofs();
-
-  /**
    * Attach user-defined assembly routine
    * for the inner-product matrix.
    */
@@ -270,7 +248,7 @@ public:
   /**
    * Assemble the inner product matrix and store it in input_matrix.
    */
-  void assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
+  void assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dof_constraints=true);
 
   /**
    * Assemble the constraint matrix and store it in input_matrix.
@@ -285,12 +263,12 @@ public:
   /**
    * Assemble the q^th affine matrix and store it in input_matrix.
    */
-  void assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
+  void assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dof_constraints=true);
 
   /**
    * Assemble the q^th affine vector and store it in input_matrix.
    */
-  void assemble_Fq_vector(unsigned int q, NumericVector<Number>* input_vector, bool apply_dirichlet_bc=true);
+  void assemble_Fq_vector(unsigned int q, NumericVector<Number>* input_vector, bool apply_dof_constraints=true);
 
   /**
    * Add the scaled q^th affine matrix to input_matrix. If symmetrize==true, then
@@ -351,6 +329,12 @@ public:
    * @return the rb_assembly_expansion object
    */
   RBAssemblyExpansion& get_rb_assembly_expansion();
+
+  /**
+   * It's helpful to be able to generate a DirichletBoundary that stores a ZeroFunction in order
+   * to impose Dirichlet boundary conditions.
+   */
+  static AutoPtr<DirichletBoundary> build_zero_dirichlet_boundary_object();
 
 
   //----------- PUBLIC DATA MEMBERS -----------//
@@ -416,12 +400,6 @@ public:
    * are stored in RBEvaluation.
    */
   std::vector<Number> Fq_representor_norms;
-
-  /**
-   * Set storing the global Dirichlet dof indices.
-   * We update this set in initialize_dirichlet_dofs().
-   */
-  std::set<unsigned int> global_dirichlet_dofs_set;
 
   /**
    * Boolean flag to indicate whether this is a constrained problem
@@ -559,7 +537,7 @@ protected:
                                     SparseMatrix<Number>* input_matrix,
                                     NumericVector<Number>* input_vector,
                                     bool symmetrize=false,
-                                    bool apply_dirichlet_bc=true);
+                                    bool apply_dof_constraints=true);
 
   /**
    * Set current_local_solution = vec so that we can access vec
@@ -661,20 +639,6 @@ protected:
    */
   virtual void init_context(FEMContext& ) {}
 
-  /**
-   * Set the dofs on the Dirichlet boundary (stored in
-   * the set global_dirichlet_dofs) to zero
-   * in the right-hand side vector.
-   */
-  void zero_dirichlet_dofs_on_rhs();
-
-  /**
-   * Set the dofs on the Dirichlet boundary (stored in
-   * the set global_dirichlet_dofs) to zero
-   * in the vector temp.
-   */
-  void zero_dirichlet_dofs_on_vector(NumericVector<Number>& temp);
-
   //----------- PROTECTED DATA MEMBERS -----------//
 
   /**
@@ -731,6 +695,13 @@ private:
   //----------- PRIVATE DATA MEMBERS -----------//
 
   /**
+   * DirichletBoundaryies object which defines the Dirichlet boundary conditions
+   * for this problem. Note that in the RB framework, we typically enforce
+   * zero Dirichlet BCs and non-homogeneous conditions are imposed via lifting.
+   */
+  DirichletBoundaries dirichlet_conditions;
+
+  /**
    * Vector storing the Q_a matrices from the affine expansion
    */
   std::vector< SparseMatrix<Number>* > A_q_vector;
@@ -759,11 +730,6 @@ private:
    * Tolerance for training reduced basis using the Greedy scheme.
    */
   Real training_tolerance;
-
-  /**
-   * Assembly object that is used to initialize the list of Dirichlet dofs.
-   */
-  DirichletDofAssembly* _dirichlet_list_init;
 
 };
 

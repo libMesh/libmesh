@@ -26,22 +26,6 @@ struct ShiftedGaussian : public ParametrizedFunction
   }
 };
 
-struct EimDirichletDofAssembly : DirichletDofAssembly
-{
-  virtual void boundary_assembly(FEMContext &c)
-  {
-    const unsigned int u_var = 0;
-
-    std::vector<unsigned int> side_dofs;
-    FEInterface::dofs_on_side(c.elem, c.dim, c.element_fe_var[u_var]->get_fe_type(),
-                              c.side, side_dofs);
-
-    for(unsigned int ii=0; ii<side_dofs.size(); ii++)
-      dirichlet_dofs_set.insert(c.dof_indices[side_dofs[ii]]);
- 
-  }
-};
-
 // Expansion of the PDE operator
 struct ThetaA0 : RBTheta { virtual Number evaluate(const std::vector<Real>& )   { return 0.05;  } };
 

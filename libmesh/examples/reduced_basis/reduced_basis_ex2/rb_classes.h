@@ -111,6 +111,17 @@ public:
   {
     u_var = this->add_variable ("u", FIRST);
 
+    // Generate a DirichletBoundary object
+    dirichlet_bc = build_zero_dirichlet_boundary_object();
+    
+    // Set the Dirichet boundary IDs
+    // and the Dirichlet boundary variable numbers
+    dirichlet_bc->b.insert(3);
+    dirichlet_bc->variables.push_back(u_var);
+    
+    // Attach dirichlet_bc (must do this _before_ Parent::init_data)
+    get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
+
     Parent::init_data();
     
     // Attach rb_theta_expansion and rb_assembly_expansion
@@ -118,10 +129,6 @@ public:
     // This also checks that the expansion objects are sized consistently
     attach_affine_expansion(ex02_rb_theta_expansion,
                             ex02_rb_assembly_expansion);
-
-
-    // Attach the object that determines the Dirichlet boundary conditions for the PDE
-    attach_dirichlet_dof_initialization(&dirichlet_assembly);
 
     // We need to define an inner product matrix for this problem
     attach_inner_prod_assembly(&ex02_rb_assembly_expansion.B_assembly);
@@ -162,7 +169,7 @@ public:
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
-  Ex02DirichletDofAssembly dirichlet_assembly;
+  AutoPtr<DirichletBoundary> dirichlet_bc;
 
 };
 
