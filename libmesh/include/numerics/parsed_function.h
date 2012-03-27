@@ -185,7 +185,7 @@ public:
     }
 
 
-  virtual AutoPtr<FunctionBase<Output> > clone() {
+  virtual AutoPtr<FunctionBase<Output> > clone() const {
     return AutoPtr<FunctionBase<Output> >
       (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
   }

@@ -10,7 +10,7 @@ class ZeroFunction : public ConstFunction<Output>
 public:
   ZeroFunction () : ConstFunction<Output>(0) {}
 
-  virtual AutoPtr<FunctionBase<Output> > clone() {
+  virtual AutoPtr<FunctionBase<Output> > clone() const {
     return AutoPtr<FunctionBase<Output> > 
       (new ZeroFunction<Output>());
   }
