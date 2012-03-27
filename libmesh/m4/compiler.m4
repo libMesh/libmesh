@@ -319,6 +319,7 @@ dnl CXXFLAGS_OPT    : flags for optimized mode
 dnl CXXFLAGS_DVL    : flags for development mode
 dnl CXXFLAGS_DBG    : flags for debug mode
 dnl PROFILING_FLAGS : flags to enable code profiling
+dnl ASSEMBLY_FLAGS  : flags to enable assembly language output
 dnl
 dnl Usage: SET_CXX_FLAGS
 dnl
@@ -363,6 +364,9 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
   dnl Flag for profiling mode; can me modified at a later stage
   PROFILING_FLAGS="-pg"
 
+  dnl Flag for assembly-output mode; can me modified at a later stage
+  ASSEMBLY_FLAGS="-S"
+
   dnl The -g flag is necessary for OProfile to produce annotations
   dnl -fno-omit-frame-pointer flag turns off an optimization that
   dnl interferes with OProfile callgraphs
@@ -378,6 +382,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
     CFLAGS_OPT="-O2"
     CFLAGS_DVL="$CFLAGS_OPT -g -Wimplicit"
     CFLAGS_DBG="-g -Wimplicit"
+    ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
     dnl Position-independent code for shared libraries
     if test "$enableshared" = yes ; then
@@ -528,6 +533,9 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
 
         dnl Intel compilers use -qp for profiling
         PROFILING_FLAGS="-qp"
+
+        dnl Intel options for annotated assembly
+        ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
 
 	dnl The -g flag is all OProfile needs to produce annotations
         OPROFILE_FLAGS="-g"
