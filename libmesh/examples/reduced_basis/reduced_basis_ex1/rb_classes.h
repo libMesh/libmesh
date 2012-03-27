@@ -73,13 +73,14 @@ public:
   SimpleRBConstruction (EquationSystems& es,
                         const std::string& name,
                         const unsigned int number)
-  : Parent(es, name, number)
+  : Parent(es, name, number),
+    dirichlet_bc(AutoPtr<DirichletBoundary>(NULL))
   {}
 
   /**
    * Destructor.
    */
-  virtual ~SimpleRBConstruction () {}
+  virtual ~SimpleRBConstruction () { }
 
   /**
    * The type of system.
@@ -97,6 +98,20 @@ public:
   virtual void init_data()
   {
     u_var = this->add_variable ("u", FIRST);
+    
+    // Generate a DirichletBoundary object
+    dirichlet_bc = build_zero_dirichlet_boundary_object();
+    
+    // Set the Dirichet boundary IDs
+    // and the Dirichlet boundary variable numbers
+    dirichlet_bc->b.insert(0);
+    dirichlet_bc->b.insert(1);
+    dirichlet_bc->b.insert(2);
+    dirichlet_bc->b.insert(3);
+    dirichlet_bc->variables.push_back(u_var);
+    
+    // Attach dirichlet_bc (must do this _before_ Parent::init_data)
+    get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
 
     Parent::init_data();
 
@@ -105,10 +120,6 @@ public:
     // This also checks that the expansion objects are sized consistently
     attach_affine_expansion(cd_rb_theta_expansion,
                             cd_rb_assembly_expansion);
-
-
-    // Attach the object that determines the Dirichlet boundary conditions for the PDE
-    attach_dirichlet_dof_initialization(&dirichlet_assembly);
 
     // We need to define an inner product matrix for this problem
     attach_inner_prod_assembly(&cd_rb_assembly_expansion.A0_assembly);
@@ -148,7 +159,7 @@ public:
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
-  CDDirichletDofAssembly dirichlet_assembly;
+  AutoPtr<DirichletBoundary> dirichlet_bc;
 
 };
 
