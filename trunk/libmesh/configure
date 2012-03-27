@@ -698,6 +698,7 @@ EGREP
 GREP
 CXXCPP
 FLIBS
+ASSEMBLY_FLAGS
 OPROFILE_FLAGS
 PROFILING_FLAGS
 RPATHFLAG
@@ -796,6 +797,8 @@ enable_unordered_containers
 enable_boost
 with_boost
 with_boost_libdir
+with_boost
+with_boost_libdir
 enable_everything
 enable_tracefiles
 enable_amr
@@ -818,8 +821,11 @@ enable_optional
 enable_petsc
 with_mpi
 with_gm
+with_mpi
+with_gm
 enable_slepc
 enable_trilinos
+with_trilinos
 with_trilinos
 with_nox
 with_ml
@@ -864,11 +870,19 @@ CPPFLAGS
 CCC
 CC
 CFLAGS
+LDFLAGS
+LIBS
+CPPFLAGS
 FC
 FCFLAGS
+LDFLAGS
+LIBS
 F77
 FFLAGS
-CXXCPP'
+LDFLAGS
+LIBS
+CXXCPP
+CPPFLAGS'
 
 
 # Initialize some variables set by options.
@@ -3656,8 +3670,8 @@ $as_echo "<<< C++ compiler is HP-UX C++ >>>" >&6; }
 
 		        			is_clang="`($CXX --version 2>&1) | grep 'clang'`"
   	                if test "x$is_clang" != "x" ; then
-                          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Clang C++ >>>" >&5
-$as_echo "<<< C++ compiler is Clang C++ >>>" >&6; }
+                          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is LLVM Clang C++ >>>" >&5
+$as_echo "<<< C++ compiler is LLVM Clang C++ >>>" >&6; }
 	                  GXX_VERSION=clang
 			else
 
@@ -4697,6 +4711,8 @@ fi
 
     PROFILING_FLAGS="-pg"
 
+    ASSEMBLY_FLAGS="-S"
+
         OPROFILE_FLAGS="-g -fno-omit-frame-pointer"
 
     if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
@@ -4708,6 +4724,7 @@ fi
     CFLAGS_OPT="-O2"
     CFLAGS_DVL="$CFLAGS_OPT -g -Wimplicit"
     CFLAGS_DBG="-g -Wimplicit"
+    ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
         if test "$enableshared" = yes ; then
       CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
@@ -4831,6 +4848,8 @@ fi
                 NODEPRECATEDFLAG="-Wno-deprecated"
 
                 PROFILING_FLAGS="-qp"
+
+                ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
 
 	        OPROFILE_FLAGS="-g"
 
@@ -5118,6 +5137,7 @@ $as_echo "No specific options for this C++ compiler known" >&6; }
 	  ;;
     esac
   fi
+
 
 
 

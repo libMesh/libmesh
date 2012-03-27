@@ -34,6 +34,7 @@ GXX-VERSION           = @GXX_VERSION@
 libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
 libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
 libmesh_RPATHFLAG     = @RPATHFLAG@
+libmesh_ASSEMBLYFLAGS = @ASSEMBLY_FLAGS@
 
 # Use libmesh-specific compiler flags if available, otherwise
 # use general compiler flags from environment
@@ -587,11 +588,19 @@ libmesh_LIBS += $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
 ##################################
 
 #
-# How to compile C++
+# How to compile C++ to an object file
 #
 %.$(obj-suffix) : %.C
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
 	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+#
+# How to compile C++ to an assembly file for human examination
+#
+%.$(obj-suffix).S : %.C
+	@echo "C++ (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) $(libmesh_ASSEMBLYFLAGS) $< -o $@
+
 
 ##################################
 # C rules                        #
