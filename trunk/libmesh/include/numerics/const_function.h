@@ -27,7 +27,7 @@ public:
         output(i) = _c;
     }
 
-  virtual AutoPtr<FunctionBase<Output> > clone() {
+  virtual AutoPtr<FunctionBase<Output> > clone() const {
     return AutoPtr<FunctionBase<Output> > 
       (new ConstFunction<Output>(_c));
   }
