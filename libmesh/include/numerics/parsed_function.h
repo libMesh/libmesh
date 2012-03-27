@@ -166,9 +166,6 @@ public:
       return parsers[i].Eval(&_spacetime[0]);
     }
 
-  virtual void init() {}
-  virtual void clear() {}
-
   /**
    * @returns the address of a parsed variable so you can supply a parameterized value
    */
