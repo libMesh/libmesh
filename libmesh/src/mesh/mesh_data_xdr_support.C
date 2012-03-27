@@ -164,7 +164,9 @@ void MeshData::read_xdr (const std::string& name,
   unsigned int n_elem = 0;
   io.data (n_elem);
 
+#ifdef DEBUG
   unsigned int previous_values_size = 0;
+#endif
 
   for (unsigned int n_cnt=0; n_cnt < n_node; n_cnt++)
     {
@@ -218,7 +220,9 @@ void MeshData::read_xdr (const std::string& name,
 
 
 
+#ifdef DEBUG
   previous_values_size = 0;
+#endif
 
   for (unsigned int n_cnt=0; n_cnt < n_elem; n_cnt++)
     {
