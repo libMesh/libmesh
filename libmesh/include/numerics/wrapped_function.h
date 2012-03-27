@@ -66,10 +66,6 @@ public:
       _parameters = &sys.get_equation_systems().parameters;
   }
 
-  virtual void init () {}
-
-  virtual void clear () {}
-
   virtual AutoPtr<FunctionBase<Output> > clone ();
 
   /**
