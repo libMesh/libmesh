@@ -62,22 +62,6 @@ public:
   unsigned int index;
 };
 
-RBEIMTheta::RBEIMTheta(RBEIMEvaluation& rb_eim_eval_in, unsigned int index_in)
-  :
-  rb_eim_eval(rb_eim_eval_in),
-  index(index_in)
-{}
-
-Number RBEIMTheta::evaluate(const std::vector<Real>& mu)
-{
-  rb_eim_eval.set_current_parameters(mu);
-  rb_eim_eval.rb_solve(rb_eim_eval.get_n_basis_functions());
-
-  return rb_eim_eval.RB_solution(index);
-}
-
-
-
 }
 
 #endif
