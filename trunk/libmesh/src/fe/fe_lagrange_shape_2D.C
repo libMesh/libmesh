@@ -211,9 +211,8 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
     }
 
   libmesh_error();
+#endif // LIBMESH_DIM > 1
   return 0.;
-
-#endif
 }
 
 
@@ -567,9 +566,8 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
 
 
   libmesh_error();
+#endif // LIBMESH_DIM > 1
   return 0.;
-
-#endif
 }
 
 
@@ -974,8 +972,8 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 
   libmesh_error();
-  return 0.;
 #endif // LIBMESH_DIM > 1
+  return 0.;
 }
 
 
