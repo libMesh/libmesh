@@ -51,7 +51,7 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
   es.parameters.set<unsigned int>("nonlinear solver maximum iterations") = 50;
   es.parameters.set<unsigned int>("nonlinear solver maximum function evaluations") = 10000;
 
-  es.parameters.set<Real>("nonlinear solver absolute residual tolerance") = 1e-50;
+  es.parameters.set<Real>("nonlinear solver absolute residual tolerance") = 1e-35;
   es.parameters.set<Real>("nonlinear solver relative residual tolerance") = 1e-8;
   es.parameters.set<Real>("nonlinear solver absolute step tolerance") = 1e-8;
   es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-8;
