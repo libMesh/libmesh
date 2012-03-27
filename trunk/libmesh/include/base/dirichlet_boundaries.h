@@ -44,8 +44,8 @@ class DirichletBoundary
 public:
   DirichletBoundary(const std::set<boundary_id_type> &b_in,
                     const std::vector<unsigned int>& variables_in,
-                    FunctionBase<Number> *f_in,
-                    FunctionBase<Gradient> *g_in = NULL) :
+                    const FunctionBase<Number> *f_in,
+                    const FunctionBase<Gradient> *g_in = NULL) :
     b(b_in),
     variables(variables_in),
     f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
