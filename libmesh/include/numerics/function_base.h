@@ -88,7 +88,7 @@ public:
    * ``deep'' as necessary to allow independent destruction and
    * simultaneous evaluations of the copies in different threads.
    */
-  virtual AutoPtr<FunctionBase<Output> > clone () = 0;
+  virtual AutoPtr<FunctionBase<Output> > clone () const = 0;
 
 
   // ------------------------------------------------------
