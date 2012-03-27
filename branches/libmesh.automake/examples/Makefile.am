@@ -18,8 +18,10 @@ EXTRA_DIST = run_common.sh
 
 check_PROGRAMS =
 check_SCRIPTS = 
-CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res out.exd miscellaneous_ex5.in #FIXME - tighten up!
+CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res out.exd miscellaneous_ex5.in reduced_basis_ex1.in reduced_basis_ex2.in reduced_basis_ex3.in reduced_basis_ex4.in eim.in rb.in #FIXME - tighten up!
 
+clean-local:
+	-rm -rf eim_data offline_data rb_data
 
 examples_source_path=$(top_srcdir)/examples
 examples_install_path=$(prefix)/examples
@@ -230,6 +232,49 @@ miscellaneous_ex6_DATA    = miscellaneous/miscellaneous_ex6/miscellaneous_ex6.C
 miscellaneous_ex6_SOURCES = $(miscellaneous_ex6_DATA) miscellaneous/miscellaneous_ex6/run.sh
 miscellaneous_ex6_LDADD   = $(top_builddir)/libmesh.la
 check_SCRIPTS  += miscellaneous/miscellaneous_ex6/run.sh
+
+
+######################################################################
+#
+# Reduced Basis
+#
+check_PROGRAMS += reduced_basis_ex1
+check_SCRIPTS  += reduced_basis/reduced_basis_ex1/run.sh
+reduced_basis_ex1dir      = $(examples_install_path)/reduced_basis/ex1
+reduced_basis_ex1_DATA    = reduced_basis/reduced_basis_ex1/reduced_basis_ex1.C reduced_basis/reduced_basis_ex1/assembly.h  reduced_basis/reduced_basis_ex1/rb_classes.h reduced_basis/reduced_basis_ex1/reduced_basis_ex1.in
+reduced_basis_ex1_SOURCES = $(reduced_basis_ex1_DATA) reduced_basis/reduced_basis_ex1/run.sh
+reduced_basis_ex1_LDADD   = $(top_builddir)/libmesh.la
+
+check_PROGRAMS += reduced_basis_ex2
+reduced_basis_ex2dir      = $(examples_install_path)/reduced_basis/ex2
+reduced_basis_ex2_DATA    = reduced_basis/reduced_basis_ex2/reduced_basis_ex2.C reduced_basis/reduced_basis_ex2/assembly.h  reduced_basis/reduced_basis_ex2/rb_classes.h reduced_basis/reduced_basis_ex2/reduced_basis_ex2.in
+reduced_basis_ex2_SOURCES = $(reduced_basis_ex2_DATA) reduced_basis/reduced_basis_ex2/run.sh
+reduced_basis_ex2_LDADD   = $(top_builddir)/libmesh.la
+
+# Only *run* the tests if SLEPc and GLPK is actually enabled
+if LIBMESH_ENABLE_SLEPC
+if LIBMESH_ENABLE_GLPK
+  check_SCRIPTS  += reduced_basis/reduced_basis_ex2/run.sh
+endif
+endif
+
+check_PROGRAMS += reduced_basis_ex3
+reduced_basis_ex3dir      = $(examples_install_path)/reduced_basis/ex3
+reduced_basis_ex3_DATA    = reduced_basis/reduced_basis_ex3/reduced_basis_ex3.C reduced_basis/reduced_basis_ex3/assembly.h  reduced_basis/reduced_basis_ex3/rb_classes.h reduced_basis/reduced_basis_ex3/reduced_basis_ex3.in
+reduced_basis_ex3_SOURCES = $(reduced_basis_ex3_DATA) reduced_basis/reduced_basis_ex3/run.sh
+reduced_basis_ex3_LDADD   = $(top_builddir)/libmesh.la
+
+# Only *run* the tests if SLEPc is actually enabled
+if LIBMESH_ENABLE_SLEPC
+  check_SCRIPTS  += reduced_basis/reduced_basis_ex3/run.sh
+endif
+
+check_PROGRAMS += reduced_basis_ex4
+check_SCRIPTS  += reduced_basis/reduced_basis_ex4/run.sh
+reduced_basis_ex4dir      = $(examples_install_path)/reduced_basis/ex4
+reduced_basis_ex4_DATA    = reduced_basis/reduced_basis_ex4/reduced_basis_ex4.C reduced_basis/reduced_basis_ex4/assembly.h reduced_basis/reduced_basis_ex4/eim_classes.h reduced_basis/reduced_basis_ex4/rb_classes.h reduced_basis/reduced_basis_ex4/reduced_basis_ex4.in reduced_basis/reduced_basis_ex4/eim.in  reduced_basis/reduced_basis_ex4/rb.in
+reduced_basis_ex4_SOURCES = $(reduced_basis_ex4_DATA) reduced_basis/reduced_basis_ex4/run.sh
+reduced_basis_ex4_LDADD   = $(top_builddir)/libmesh.la
 
 
 ######################################################################
