@@ -301,6 +301,20 @@ RBAssemblyExpansion& RBConstruction::get_rb_assembly_expansion()
   return *rb_assembly_expansion;
 }
 
+void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number>& vector)
+{
+  const DofMap& dof_map = get_dof_map();
+  
+  for(unsigned int i=dof_map.first_dof(); i<dof_map.end_dof(); i++)
+  {
+    if(get_dof_map().is_constrained_dof(i))
+    {
+      vector.set(i, 0.);
+    }
+  }
+  vector.close();
+}
+
 void RBConstruction::initialize_rb_construction()
 {
   // Perform the initialization

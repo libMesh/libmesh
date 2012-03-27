@@ -331,11 +331,16 @@ public:
   RBAssemblyExpansion& get_rb_assembly_expansion();
 
   /**
+   * It is sometimes useful to be able to zero vector entries
+   * that correspond to constrained dofs.
+   */
+  void zero_constrained_dofs_on_vector(NumericVector<Number>& vector);
+
+  /**
    * It's helpful to be able to generate a DirichletBoundary that stores a ZeroFunction in order
    * to impose Dirichlet boundary conditions.
    */
   static AutoPtr<DirichletBoundary> build_zero_dirichlet_boundary_object();
-
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
