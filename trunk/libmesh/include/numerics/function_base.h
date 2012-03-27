@@ -76,12 +76,12 @@ public:
   /**
    * The actual initialization process.
    */
-  virtual void init () = 0;
+  virtual void init () {}
 
   /**
    * Clears the function.
    */
-  virtual void clear () = 0;
+  virtual void clear () {}
 
   /**
    * Returns a new copy of the function.  The new copy should be as
