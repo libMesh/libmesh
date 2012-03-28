@@ -163,7 +163,8 @@ public:
    * time_evolving() to prepare data structures.
    */
   virtual void time_evolving (unsigned int var) {
-    libmesh_assert(_time_evolving.size() > var);
+    if (_time_evolving.size() <= var)
+      _time_evolving.resize(var+1, false);
     _time_evolving[var] = true;
   }
 

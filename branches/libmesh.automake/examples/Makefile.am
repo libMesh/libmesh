@@ -18,7 +18,7 @@ EXTRA_DIST = run_common.sh
 
 check_PROGRAMS =
 check_SCRIPTS = 
-CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res out.exd miscellaneous_ex5.in reduced_basis_ex1.in reduced_basis_ex2.in reduced_basis_ex3.in reduced_basis_ex4.in eim.in rb.in #FIXME - tighten up!
+CLEANFILES = biquadratic_h_adaptive.m *.gmv* *.xda *.e *.e.* *.vtu *.pvtu adaptivity_ex3.in  general.in  l-shaped.in navier.in fem_system_ex1.in pipe-mesh.unv pressure_node.res out.exd miscellaneous_ex5.in reduced_basis_ex1.in reduced_basis_ex2.in reduced_basis_ex3.in reduced_basis_ex4.in eim.in rb.in equation_systems.dat #FIXME - tighten up!
 
 clean-local:
 	-rm -rf eim_data offline_data rb_data
