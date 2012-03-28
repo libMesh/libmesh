@@ -1,6 +1,6 @@
-dnl -------------------------------------------------------------
-dnl PETSc
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# PETSc
+# -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_PETSC], 
 [
   AC_ARG_ENABLE(petsc,
@@ -14,7 +14,7 @@ AC_DEFUN([CONFIGURE_PETSC],
 		 [enablepetsc=$enableoptional])
 
 
-  dnl Trump --enable-petsc with --disable-mpi
+  # Trump --enable-petsc with --disable-mpi
   if (test "x$enablempi" = xno); then
     enablepetsc=no
   fi	
@@ -24,29 +24,36 @@ AC_DEFUN([CONFIGURE_PETSC],
 
   
   if (test "$enablepetsc" !=  no) ; then
-    dnl AC_REQUIRE:
-    dnl If the M4 macro AC_PROG_F77 has not already been called, call
-    dnl it (without any arguments). Make sure to quote AC_PROG_F77 with
-    dnl square brackets. AC_PROG_F77 must have been defined using
-    dnl AC_DEFUN or else contain a call to AC_PROVIDE to indicate
-    dnl that it has been called.
+    # AC_REQUIRE:
+    # If the M4 macro AC_PROG_F77 has not already been called, call
+    # it (without any arguments). Make sure to quote AC_PROG_F77 with
+    # square brackets. AC_PROG_F77 must have been defined using
+    # AC_DEFUN or else contain a call to AC_PROVIDE to indicate
+    # that it has been called.
     AC_REQUIRE([AC_PROG_F77])
   
-    dnl If the user doesn't have any PETSC directory specified, let's check to
-    dnl see if it's installed via Ubuntu module
-    if test "x$PETSC_DIR" = x ; then
-      PETSC_DIR=/usr/lib/petsc
-      PETSC_ARCH=linux-gnu-c-opt
+    # If the user doesn't have any PETSC directory specified, let's check to
+    # see if it's installed via Ubuntu module
+    if (test "x$PETSC_DIR" = x); then
+      AC_PATH_PROG(PETSCARCH, petscarch)
+      if (test "x$PETSCARCH" != x); then
+        export PETSC_DIR=/usr/lib/petsc
+        export PETSC_ARCH=`$PETSCARCH`
+	if (test -d $PETSC_DIR); then
+  	  AC_MSG_RESULT([using system-provided PETSC_DIR $PETSC_DIR])
+	  AC_MSG_RESULT([using system-provided PETSC_ARCH $PETSC_ARCH])
+        fi
+      fi	
     fi
   
     AC_CHECK_FILE($PETSC_DIR/include/petsc.h,
                   PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
   
-    dnl Grab PETSc version and substitute into Makefile.
-    dnl If version 2.x, also check that PETSC_ARCH is set
+    # Grab PETSc version and substitute into Makefile.
+    # If version 2.x, also check that PETSC_ARCH is set
     if (test -r $PETSC_DIR/include/petsc.h) ; then
-      dnl Some tricks to discover the version of petsc.
-      dnl You have to have grep and sed for this to work.
+      # Some tricks to discover the version of petsc.
+      # You have to have grep and sed for this to work.
       petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
       petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
       petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
@@ -70,32 +77,32 @@ AC_DEFUN([CONFIGURE_PETSC],
         if test "x$PETSC_ARCH" = x ; then
           enablepetsc=no
           AC_MSG_RESULT([<<< PETSc 2.x detected and "\$PETSC_ARCH" not set.  PETSc disabled. >>>])
-          dnl PETSc config failed.  We will try MPI at the end of this function.
-          dnl ACX_MPI
+          # PETSc config failed.  We will try MPI at the end of this function.
+          # ACX_MPI
         fi
       fi
   
-    else dnl petsc.h was not readable
+    else # petsc.h was not readable
         enablepetsc=no
     fi
   
   
   
   
-    dnl If we haven't been disabled yet, carry on!
+    # If we haven't been disabled yet, carry on!
     if (test $enablepetsc != no) ; then
   
-        AC_SUBST(PETSC_ARCH) dnl Note: may be empty...
+        AC_SUBST(PETSC_ARCH) # Note: may be empty...
         AC_SUBST(PETSC_DIR)
         AC_DEFINE(HAVE_PETSC, 1,
     	      [Flag indicating whether or not PETSc is available])
   
-        dnl Check for snoopable MPI
-        if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
+        # Check for snoopable MPI
+        if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x	
         	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni` 
-        elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
+        elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
         	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
-        elif (test -r $PETSC_DIR/conf/petscvariables) ; then dnl 3.0.x
+        elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
         	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
         fi		 
         if test "x$PETSC_MPI" != x ; then
@@ -107,12 +114,30 @@ AC_DEFUN([CONFIGURE_PETSC],
   	AC_MSG_RESULT(<<< Warning: configuring in serial - no MPI in PETSC config >>>)
         fi
   
-        dnl Print informative message about the version of PETSc we detected
+        # Print informative message about the version of PETSc we detected
         AC_MSG_RESULT([<<< Configuring library with PETSc version $petscversion support >>>])
-  
-        PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
-        PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
   	
+	
+        # If we have a full petsc distro with a makefile query it to get the includes and link libs
+	if (test -r $PETSC_DIR/makefile); then
+          PETSCLINKLIBS=`make -s -f $PETSC_DIR/makefile getlinklibs`
+          PETSCINCLUDEDIRS=`make -s -f $PETSC_DIR/makefile getincludedirs`
+
+	# otherwise create a simple makefile to provide what we want, then query it.
+  	elif (test -r $PETSC_DIR/conf/variables); then
+ 	  cat <<EOF >Makefile_config_petsc
+include $PETSC_DIR/conf/variables
+getincludedirs:
+	echo -I\$(PETSC_DIR)/include -I\$(PETSC_DIR)/\$(PETSC_ARCH)/include \$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)
+
+getlinklibs:
+	echo \$(PETSC_SNES_LIB)\$(libmesh_LIBS)
+EOF
+	  # cat Makefile_config_petsc
+          PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
+          PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
+	  rm -f Makefile_config_petsc
+	fi
         #echo ""
         #echo "PETSCLINKLIBS=$PETSCLINKLIBS"
         #echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
@@ -126,12 +151,12 @@ AC_DEFUN([CONFIGURE_PETSC],
   
         AC_SUBST(MPI_IMPL)
   
-        dnl Check for Hypre
-        if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
+        # Check for Hypre
+        if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           # 2.3.x	
         	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf` 
-        elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
+        elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then # 3.0.x
         	 HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
-        elif (test -r $PETSC_DIR/conf/petscvariables) ; then dnl 3.0.x 
+        elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x 
            HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
         fi
   		 
@@ -141,7 +166,7 @@ AC_DEFUN([CONFIGURE_PETSC],
         fi
     
     else 
-        dnl PETSc config failed.  Try MPI.
+        # PETSc config failed.  Try MPI.
         AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
         ACX_MPI
     fi
@@ -159,9 +184,9 @@ AC_DEFUN([CONFIGURE_PETSC],
 
 
 
-dnl ----------------------------------------------------------------------------
-dnl check for the required PETSc library
-dnl ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# check for the required PETSc library
+# ----------------------------------------------------------------------------
 AC_DEFUN([ACX_PETSc], [
 AC_REQUIRE([ACX_LAPACK])
 BLAS_LIBS="$BLAS_LIBS $FLIBS"
@@ -317,4 +342,4 @@ AC_SUBST( PETSc_LIBS_PATH )
 AC_SUBST( PETSc_LIBS_PATHS )
 AC_SUBST( PETSc_INCLUDES_PATH )
 AC_SUBST( PETSc_INCLUDES_PATHS )
-])dnl ACX_PETSc ------------------------------------------------------------
+])# ACX_PETSc ------------------------------------------------------------
