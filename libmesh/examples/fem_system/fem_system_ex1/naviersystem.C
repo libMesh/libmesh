@@ -20,14 +20,51 @@
 #include "naviersystem.h"
 
 #include "boundary_info.h"
+#include "dirichlet_boundaries.h"
+#include "dof_map.h"
 #include "fe_base.h"
 #include "fe_interface.h"
 #include "fem_context.h"
 #include "mesh.h"
 #include "quadrature.h"
+#include "zero_function.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
+
+
+// Boundary conditions for the 3D test case
+class BdyFunction : public FunctionBase<Number>
+{
+public:
+  BdyFunction (unsigned int u_var,
+               unsigned int v_var,
+               unsigned int w_var,
+               Real Reynolds)
+    : _u_var(u_var), _v_var(v_var), _w_var(w_var), _Re(Reynolds)
+    { this->_initialized = true; }
+
+  virtual Number operator() (const Point&, const Real = 0)
+    { libmesh_not_implemented(); }
+
+  virtual void operator() (const Point& p,
+                           const Real,
+                           DenseVector<Number>& output)
+    {
+      output.zero();
+      const Real x=p(0), y=p(1), z=p(2);
+      output(_u_var) = (_Re+1)*(y*y + z*z);
+      output(_v_var) = (_Re+1)*(x*x + z*z);
+      output(_w_var) = (_Re+1)*(x*x + y*y);
+    }
+
+  virtual AutoPtr<FunctionBase<Number> > clone() const
+    { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
+
+private:
+  const unsigned int _u_var, _v_var, _w_var;
+  const Real _Re;
+};
 
 
 void NavierSystem::init_data ()
@@ -49,9 +86,6 @@ void NavierSystem::init_data ()
 
   p_var = this->add_variable ("p", FIRST);
 
-  // Do the parent's initialization after variables are defined
-  FEMSystem::init_data();
-
   // Tell the system to march velocity forward in time, but 
   // leave p as a constraint only
   this->time_evolving(u_var);
@@ -59,7 +93,7 @@ void NavierSystem::init_data ()
   if (dim == 3)
     this->time_evolving(w_var);
 
-  // Check the input file for Reynolds number
+  // Check the input file for Reynolds number, application type
   GetPot infile("navier.in");
   Reynolds = infile("Reynolds", 1.);
   application = infile("application", 0);
@@ -69,6 +103,56 @@ void NavierSystem::init_data ()
   this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
   this->print_jacobians = infile("print_jacobians", false);
   this->print_element_jacobians = infile("print_element_jacobians", false);
+
+  // Set Dirichlet boundary conditions
+  const boundary_id_type top_id = (dim==3) ? 5 : 2;
+  
+  std::set<boundary_id_type> top_bdys;
+  top_bdys.insert(top_id);
+
+  const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
+  std::set<boundary_id_type> all_bdys(all_ids, all_ids+(dim*2));
+
+  std::set<boundary_id_type> nontop_bdys = all_bdys;
+  nontop_bdys.erase(top_id);
+
+  std::vector<unsigned int> u_only(1, u_var);
+  std::vector<unsigned int> vw(1, v_var), uvw(1, u_var);
+  uvw.push_back(v_var);
+  if (dim == 3)
+    {
+      vw.push_back(w_var);
+      uvw.push_back(w_var);
+    }
+
+  ZeroFunction<Number> zero;
+  ConstFunction<Number> one(1);
+  // For lid-driven cavity, set u=1,v=w=0 on the lid and u=v=w=0 elsewhere
+  if (application == 0)
+    {
+      this->get_dof_map().add_dirichlet_boundary
+        (DirichletBoundary (top_bdys, u_only, &one));
+      this->get_dof_map().add_dirichlet_boundary
+        (DirichletBoundary (top_bdys, vw, &zero));
+      this->get_dof_map().add_dirichlet_boundary
+        (DirichletBoundary (nontop_bdys, uvw, &zero));
+    }
+  // For forcing with zero wall velocity, set homogeneous Dirichlet BCs
+  else if (application == 1)
+    {
+      this->get_dof_map().add_dirichlet_boundary
+        (DirichletBoundary (all_bdys, uvw, &zero));
+    }
+  // For 3D test case with quadratic velocity field, set that field on walls
+  else if (application == 2)
+    {
+      BdyFunction bdy(u_var,v_var,w_var,Reynolds);
+      this->get_dof_map().add_dirichlet_boundary
+        (DirichletBoundary (all_bdys, uvw, &bdy));
+    }
+
+  // Do the parent's initialization after variables and boundary constraints are defined
+  FEMSystem::init_data();
 }
 
 
@@ -346,102 +430,6 @@ bool NavierSystem::side_constraint (bool request_jacobian,
                                     DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
-
-  // Here we define some references to cell-specific data that
-  // will be used to assemble the linear system.
-
-  // Element Jacobian * quadrature weight for side integration
-  const std::vector<Real> &JxW_side = c.side_fe_var[u_var]->get_JxW();
-
-  // The velocity shape functions at side quadrature points.
-  const std::vector<std::vector<Real> >& phi_side =
-    c.side_fe_var[u_var]->get_phi();
-
-  // Physical location of the quadrature points on the side
-  const std::vector<Point>& qpoint = c.side_fe_var[u_var]->get_xyz();
-
-  // The number of local degrees of freedom in u and v
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size(); 
-
-  // The subvectors and submatrices we need to fill:
-  const unsigned int dim = this->get_mesh().mesh_dimension();
-  DenseSubMatrix<Number> &Kuu = *c.elem_subjacobians[u_var][u_var];
-  DenseSubMatrix<Number> &Kvv = *c.elem_subjacobians[v_var][v_var];
-  DenseSubMatrix<Number> &Kww = *c.elem_subjacobians[w_var][w_var];
-
-  DenseSubVector<Number> &Fu = *c.elem_subresiduals[u_var];
-  DenseSubVector<Number> &Fv = *c.elem_subresiduals[v_var];
-  DenseSubVector<Number> &Fw = *c.elem_subresiduals[w_var];
-
-  // For this example we will use Dirichlet velocity boundary
-  // conditions imposed at each timestep via the penalty method.
-
-  // The penalty value.  \f$ \frac{1}{\epsilon} \f$
-  const Real penalty = 1.e10;
-
-  unsigned int n_sidepoints = c.side_qrule->n_points();
-  for (unsigned int qp=0; qp != n_sidepoints; qp++)
-    {
-      // Compute the solution at the old Newton iterate
-      Number u = c.side_value(u_var, qp),
-             v = c.side_value(v_var, qp),
-             w = c.side_value(w_var, qp);
-
-      // Set u = 1 on the top boundary, (which build_square() has
-      // given boundary id 2, and build_cube() has called 5),
-      // u = 0 everywhere else
-      boundary_id_type boundary_id =
-        this->get_mesh().boundary_info->boundary_id(c.elem, c.side);
-      libmesh_assert (boundary_id != BoundaryInfo::invalid_id);
-      const short int top_id = (dim==3) ? 5 : 2;
-
-      // Boundary data coming from true solution
-      Real
-	u_value = 0.,
-	v_value = 0.,
-	w_value = 0.;
-
-      // For lid-driven cavity, set u=1 on the lid.
-      if ((application == 0) && (boundary_id == top_id))
-	u_value = 1.;
-
-      if (application == 2)
-	{
-	  const Real x=qpoint[qp](0);
-	  const Real y=qpoint[qp](1);
-	  const Real z=qpoint[qp](2);
-	  u_value=(Reynolds+1)*(y*y + z*z);
-	  v_value=(Reynolds+1)*(x*x + z*z);
-	  w_value=(Reynolds+1)*(x*x + y*y);
-	}
-      
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        {
-          Fu(i) += JxW_side[qp] * penalty *
-                   (u - u_value) * phi_side[i][qp];
-          Fv(i) += JxW_side[qp] * penalty *
-                   (v - v_value) * phi_side[i][qp];
-          if (dim == 3)
-            Fw(i) += JxW_side[qp] * penalty *
-                     (w - w_value) * phi_side[i][qp];
-
-          if (request_jacobian && c.elem_solution_derivative)
-            {
-              libmesh_assert (c.elem_solution_derivative == 1.0);
-
-              for (unsigned int j=0; j != n_u_dofs; j++)
-                {
-                  Kuu(i,j) += JxW_side[qp] * penalty *
-                              phi_side[i][qp] * phi_side[j][qp];
-                  Kvv(i,j) += JxW_side[qp] * penalty *
-                              phi_side[i][qp] * phi_side[j][qp];
-                  if (dim == 3)
-                    Kww(i,j) += JxW_side[qp] * penalty *
-                                phi_side[i][qp] * phi_side[j][qp];
-                }
-            }
-        }
-    }
 
   // Pin p = 0 at the origin
   const Point zero(0.,0.);
