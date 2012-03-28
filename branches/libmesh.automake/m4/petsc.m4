@@ -120,8 +120,8 @@ AC_DEFUN([CONFIGURE_PETSC],
 	
         # If we have a full petsc distro with a makefile query it to get the includes and link libs
 	if (test -r $PETSC_DIR/makefile); then
-          PETSCLINKLIBS=`make -s -f $PETSC_DIR/makefile getlinklibs`
-          PETSCINCLUDEDIRS=`make -s -f $PETSC_DIR/makefile getincludedirs`
+          PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
+          PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
 
 	# otherwise create a simple makefile to provide what we want, then query it.
   	elif (test -r $PETSC_DIR/conf/variables); then
