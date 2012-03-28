@@ -53,6 +53,9 @@ public:
   virtual bool mass_residual (bool request_jacobian,
                               DiffContext& context);
 
+  // Postprocessed output
+  virtual void postprocess ();
+
   // Indices for each variable;
   unsigned int p_var, u_var, v_var, w_var;
 
