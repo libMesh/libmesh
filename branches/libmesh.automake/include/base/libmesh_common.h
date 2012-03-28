@@ -325,7 +325,13 @@ inline Tnew libmesh_cast_ref(Told& oldvar)
     }
   catch (std::bad_cast)
     {
-      libmesh_assert (false);
+      libMesh::err << "Failed to convert " << typeid(Told).name() 
+                   << " reference to " << typeid(Tnew).name()
+                   << std::endl;
+      libMesh::err << "The " << typeid(Told).name()
+                   << " appears to be a "
+		   << typeid(*(&oldvar)).name() << std::endl;
+      libmesh_error();
     }
 #else
   return(static_cast<Tnew>(oldvar));
@@ -341,8 +347,12 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
   Tnew newvar = dynamic_cast<Tnew>(oldvar);
   if (!newvar)
     {
-      libMesh::err << "Failed to convert " << typeid(Told).name() <<
-                      " pointer to " << typeid(Tnew).name() << std::endl;
+      libMesh::err << "Failed to convert " << typeid(Told).name()
+                   << " pointer to " << typeid(Tnew).name()
+                   << std::endl;
+      libMesh::err << "The " << typeid(Told).name()
+                   << " appears to be a "
+		   << typeid(*oldvar).name() << std::endl;
       libmesh_error();
     }
   return newvar;

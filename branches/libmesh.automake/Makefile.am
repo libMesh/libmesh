@@ -370,6 +370,7 @@ libmesh_la_SOURCES = \
 		src/reduced_basis/rb_construction_base.C \
 		src/reduced_basis/rb_eim_construction.C \
 		src/reduced_basis/rb_eim_evaluation.C \
+		src/reduced_basis/rb_eim_theta.C \
 		src/reduced_basis/rb_evaluation.C \
 		src/reduced_basis/rb_param_subdomain_node.C \
 		src/reduced_basis/rb_param_subdomain_tree.C \

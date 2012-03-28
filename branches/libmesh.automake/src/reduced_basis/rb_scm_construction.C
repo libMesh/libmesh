@@ -181,12 +181,22 @@ void RBSCMConstruction::perform_SCM_greedy()
 {
   START_LOG("perform_SCM_greedy()", "RBSCMConstruction");
 
-  // Copy the local parts of the Dirichlet and
-  // non-Dirichlet dofs lists over from
-  // the associated RBConstruction
+  // Get a list of constrained dofs from rb_system
+  std::set<unsigned int> constrained_dofs_set;
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
-  this->initialize_condensed_dofs(rb_system.global_dirichlet_dofs_set);
+  
+  for(unsigned int i=0; i<rb_system.n_dofs(); i++)
+  {
+    if( rb_system.get_dof_map().is_constrained_dof(i) )
+    {
+      constrained_dofs_set.insert(i);
+    }
+  }
+
+  // Use these constrained dofs to identify which dofs we want to "get rid of"
+  // (i.e. condense) in our eigenproblems.
+  this->initialize_condensed_dofs(constrained_dofs_set);
 
   // Copy the inner product matrix over from rb_system to be used as matrix_B
   load_matrix_B();

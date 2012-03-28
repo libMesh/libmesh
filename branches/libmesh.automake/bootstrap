@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 # $Id: bootstrap 469 2008-09-05 00:16:18Z rhys $
 #
 # bootstrap: Utility to easy autoconf/automake toolchain setup on

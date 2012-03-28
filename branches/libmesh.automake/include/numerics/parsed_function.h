@@ -166,9 +166,6 @@ public:
       return parsers[i].Eval(&_spacetime[0]);
     }
 
-  virtual void init() {}
-  virtual void clear() {}
-
   /**
    * @returns the address of a parsed variable so you can supply a parameterized value
    */
@@ -188,7 +185,7 @@ public:
     }
 
 
-  virtual AutoPtr<FunctionBase<Output> > clone() {
+  virtual AutoPtr<FunctionBase<Output> > clone() const {
     return AutoPtr<FunctionBase<Output> >
       (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
   }

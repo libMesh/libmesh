@@ -166,7 +166,7 @@ MeshFunction::clear ()
 
 
 
-AutoPtr<FunctionBase<Number> > MeshFunction::clone ()
+AutoPtr<FunctionBase<Number> > MeshFunction::clone () const
 {
   return AutoPtr<FunctionBase<Number> >
     (new MeshFunction

@@ -174,6 +174,11 @@ void MeshRefinement::create_parent_error_vector
       libmesh_assert(!isnan(error_per_cell[i]));
   #endif
     }
+
+  // Use a reference to std::vector to avoid confusing
+  // Parallel::verify
+  std::vector<ErrorVectorReal> &epc = error_per_parent;
+  Parallel::verify(epc);
 #endif // #ifdef DEBUG
 
   // error values on uncoarsenable elements will be left at -1

@@ -196,6 +196,7 @@ nobase_include_HEADERS = \
 		mesh/xdr_shead.h \
 		mesh/xdr_soln.h \
 		numerics/analytic_function.h \
+	        numerics/const_function.h \
 		numerics/coupling_matrix.h \
 		numerics/dense_matrix.h \
 		numerics/dense_matrix_base.h \

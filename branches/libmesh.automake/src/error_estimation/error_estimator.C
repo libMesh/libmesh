@@ -115,7 +115,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
           std::vector<Real> weights(n_vars, 0.0);
           weights[v] = 1.0;
 	  this->error_norm =
-            SystemNorm(std::vector<FEMNormType>(n_vars, old_error_norm.type(0)),
+            SystemNorm(std::vector<FEMNormType>(n_vars, old_error_norm.type(v)),
                        weights);
 
           const NumericVector<Number>* solution_vector = NULL;

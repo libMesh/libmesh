@@ -76,19 +76,19 @@ public:
   /**
    * The actual initialization process.
    */
-  virtual void init () = 0;
+  virtual void init () {}
 
   /**
    * Clears the function.
    */
-  virtual void clear () = 0;
+  virtual void clear () {}
 
   /**
    * Returns a new copy of the function.  The new copy should be as
    * ``deep'' as necessary to allow independent destruction and
    * simultaneous evaluations of the copies in different threads.
    */
-  virtual AutoPtr<FunctionBase<Output> > clone () = 0;
+  virtual AutoPtr<FunctionBase<Output> > clone () const = 0;
 
 
   // ------------------------------------------------------
