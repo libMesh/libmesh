@@ -1,0 +1,24 @@
+T=d ld li f mf gi cd cf cld
+V=x
+R=-6,6,1
+
+# Combine tests:
+#   cmplt_add_reduce
+#   cmple_add_reduce
+#   cmpgt_add_reduce
+#   cmpge_add_reduce
+#   cmpne_add_reduce
+#   cmpeq_add_reduce
+
+F=0x0001 * ((((x*5/2)+x*x-2)) < ((x*5/2)+abs(x))) + \
+  0x0002 * ((((x*5/2)+x*x-2)) <= ((x*5/2)+abs(x))) + \
+  0x0004 * ((((x*5/2)+x*x-2)) > ((x*5/2)+abs(x))) + \
+  0x0008 * ((((x*5/2)+x*x-2)) >= ((x*5/2)+abs(x))) + \
+  0x0010 * ((((x*5/2)+x*x-2)) != ((x*5/2)+abs(x))) + \
+  0x0020 * ((((x*5/2)+x*x-2)) = ((x*5/2)+abs(x)))
+C=0x0001 * fp_less(((x*5/2)+x*x-2), ((x*5/2)+fp_abs(x))) + \
+  0x0002 * fp_lessOrEq(((x*5/2)+x*x-2), ((x*5/2)+fp_abs(x))) + \
+  0x0004 * fp_greater(((x*5/2)+x*x-2), ((x*5/2)+fp_abs(x))) + \
+  0x0008 * fp_greaterOrEq(((x*5/2)+x*x-2), ((x*5/2)+fp_abs(x))) + \
+  0x0010 * fp_nequal(((x*5/2)+x*x-2), ((x*5/2)+fp_abs(x))) + \
+  0x0020 * fp_equal(((x*5/2)+x*x-2), ((x*5/2)+fp_abs(x)))

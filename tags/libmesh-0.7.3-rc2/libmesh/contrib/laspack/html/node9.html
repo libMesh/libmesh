@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> Program  lastest</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" Program  lastest">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html257 HREF="node10.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html255 HREF="node8.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html249 HREF="node8.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html259 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html258 HREF="node10.html"> Program  vectopt</A>
+<B>Up:</B> <A NAME=tex2html256 HREF="node8.html"> Optimizing and Example </A>
+<B> Previous:</B> <A NAME=tex2html250 HREF="node8.html"> Optimizing and Example </A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00051000000000000000> Program  lastest</A></H2>
+<P>
+
+<P>
+<H6><A NAME=SubsectionLASTEST>&#160;</A></H6>
+<P>
+The program <tt> lastest</tt> show efficiency of basic operations
+implemented in <tt> LASPack</tt>
+ .
+The output contains the following data:
+
+<PRE>Results:    (for dimension 100000, cycles 100)
+--------
+
+   #   with LASPack  in-line code  efficiency     description
+-------------------------------------------------------------------------
+   1       ---            ---          ---       vector constr. &amp; destr.
+   2     0.00900 s        ---          ---       vector generation
+   3     0.06316 s        ---          ---       matrix constr. &amp; destr.
+   4     1.32628 s        ---          ---       matrix generation
+   5     0.02283 s      0.02283 s    100.00 %    a = b
+   6     0.04033 s      0.03850 s     95.45 %    a = b + c
+   7     0.02283 s      0.02283 s    100.00 %    a = s * b
+   8     0.04316 s      0.04333 s    100.39 %    s = b * c
+   9     0.26699 s      0.27116 s    101.56 %    a = L * b
+  10     0.03000 s      0.02983 s     99.44 %    a = a + b
+  11     0.01933 s      0.01967 s    101.72 %    a = s * a
+  12     0.04250 s      0.04183 s     98.43 %    a = b + s * c
+  13     0.03267 s      0.03300 s    101.02 %    a = a + s * b
+-------------------------------------------------------------------------
+</PRE>
+<P>
+Here <tt> s</tt> is a scalar, <tt> a</tt>, <tt> b</tt>, <tt> c</tt> are vectors, 
+and <tt> L</tt> is a matrix.
+The in-line routines are simplified in comparison with <tt> LASPack</tt>
+  and
+can therefore be a little faster.
+<P>
+
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

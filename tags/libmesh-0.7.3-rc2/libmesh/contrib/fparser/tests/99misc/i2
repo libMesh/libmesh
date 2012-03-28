@@ -1,0 +1,7 @@
+T=li gi
+V=x,y,z
+R=-7,7,1
+F=if(abs(x*y) < 20 | x+y > 30 & z > 5, min(x,2*y), max(y,z*2))
+C=((fp_abs(x*y) < 20) \
+  || (((x+y) > 30) \
+   && (z > 5))) ? fp_min(x,2*y) : fp_max(y,z*2)

@@ -1,0 +1,5 @@
+T=d li
+V=x
+R=0,1,1
+F=(abs(x)=0) + (0=abs(x))
+C=fp_equal(fp_abs(x),0) + fp_equal(0,fp_abs(x))

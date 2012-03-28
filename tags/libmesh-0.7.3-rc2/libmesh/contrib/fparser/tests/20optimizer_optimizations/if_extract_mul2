@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y
+R=-2,2,1
+F=if(x, y, y*2)
+C=fp_truth(x)!=0 ? y : (y*2)

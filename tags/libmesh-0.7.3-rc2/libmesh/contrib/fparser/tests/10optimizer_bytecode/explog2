@@ -1,0 +1,7 @@
+# log2(exp(x)) = log(exp(x)) / log(2) = x / log(2)
+
+T=d f ld mf
+V=x
+R=-3,3,0.1
+F=log2(exp(x))
+C=x/fp_const_log2<Value_t>()

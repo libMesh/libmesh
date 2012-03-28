@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=-400, 400, 0.1
+F=trunc(x)
+C=fp_trunc(x)
