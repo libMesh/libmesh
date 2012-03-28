@@ -189,6 +189,8 @@ int main (int argc, char** argv)
         {
           system.solve();
 
+          system.postprocess();
+
           ErrorVector error;
 
           AutoPtr<ErrorEstimator> error_estimator;
@@ -280,6 +282,8 @@ int main (int argc, char** argv)
       if (a_step == max_adaptivesteps)
         {
           system.solve();
+
+          system.postprocess();
         }
 
       // Advance to the next timestep in a transient problem
