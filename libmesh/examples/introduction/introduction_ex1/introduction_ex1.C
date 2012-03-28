@@ -43,13 +43,13 @@ int main (int argc, char** argv)
 
   // Check for proper usage. The program is designed to be run
   // as follows:
-  // ./ex1 -d DIM input_mesh_name [output_mesh_name]
+  // ./ex1 -d DIM input_mesh_name [-o output_mesh_name]
   // where [output_mesh_name] is an optional parameter giving
   // a filename to write the mesh into.
   if (argc < 4)
     {
       if (libMesh::processor_id() == 0)
-        std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [out.mesh]"
+        std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [-o out.mesh]"
                   << std::endl;
       
       // This handy function will print the file name, line number,
