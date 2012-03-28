@@ -1805,7 +1805,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   Number u = 0;
 
   if (e && e->processor_id() == libMesh::processor_id())
-    u = point_value(var, p, e);
+    u = point_value(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
   unsigned int lowest_owner =
@@ -1896,7 +1896,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   Gradient grad_u;
 
   if (e && e->processor_id() == libMesh::processor_id())
-    grad_u = point_gradient(var, p, e);
+    grad_u = point_gradient(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
   unsigned int lowest_owner =
@@ -1989,7 +1989,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   Tensor hess_u;
 
   if (e && e->processor_id() == libMesh::processor_id())
-    hess_u = point_hessian(var, p, e);
+    hess_u = point_hessian(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
   unsigned int lowest_owner =
