@@ -174,7 +174,7 @@ void WrappedFunction<Output>::operator() (const Point& p,
 	  // We pass the point (j,0,0) to an old-style fptr function
 	  // pointer to distinguish the different scalars within the
 	  // SCALAR variable.
-          for (unsigned int j=1; j != n_components; ++j)
+          for (unsigned int j=0; j != n_components; ++j)
             output(_sys.variable_scalar_number(v,j)) =
 	       _fptr(Point(j,0,0), *_parameters,
                      _sys.name(), _sys.variable_name(v));
