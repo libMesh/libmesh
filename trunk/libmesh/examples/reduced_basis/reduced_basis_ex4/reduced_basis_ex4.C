@@ -149,7 +149,7 @@ int main (int argc, char** argv)
       // If we want to be able to visualize the solution in the online stage,
       // then we should also save the state of the equation_systems object
       // so we can initialize it properly in the online stage
-      equation_systems.write("equation_systems.xda", WRITE);
+      equation_systems.write("equation_systems.dat", WRITE);
 
       // Write out the basis functions
       eim_construction.rb_eval->write_out_basis_functions(eim_construction,"eim_data");
@@ -186,7 +186,7 @@ int main (int argc, char** argv)
     {
       // initialize the EquationSystems object by reading in the state that
       // was written out in the offline stage
-      equation_systems.read("equation_systems.xda", READ);
+      equation_systems.read("equation_systems.dat", READ);
       RBConstruction& rb_construction =
         equation_systems.get_system<RBConstruction>("RB");
       RBConstruction& eim_construction =
