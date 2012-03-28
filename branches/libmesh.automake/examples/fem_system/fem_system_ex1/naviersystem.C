@@ -563,6 +563,24 @@ bool NavierSystem::mass_residual (bool request_jacobian,
 
 
 
+void NavierSystem::postprocess()
+{  
+  const unsigned int dim = this->get_mesh().mesh_dimension();
+
+  Point p(1./3., 1./3.);
+  Number u = point_value(u_var, p),
+         v = point_value(v_var, p),
+         w = (dim == 3) ? point_value(w_var, p) : 0;
+
+  std::cout << "u(1/3,1/3) = (" 
+            << u << ", " 
+            << v << ", " 
+            << w << ")" << std::endl;
+}
+
+
+
+
 Point NavierSystem::forcing(const Point& p)
 {
   switch (application)
