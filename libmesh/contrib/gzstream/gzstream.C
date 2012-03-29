@@ -29,8 +29,6 @@
 // Local includes
 #include "gzstream.h"
 
-#ifdef LIBMESH_HAVE_ZLIB_H
-
 
 // System includes
 #include <iostream>
@@ -202,4 +200,3 @@ void gzstreambase::close() {
 
 // ============================================================================
 // EOF //
-#endif // LIBMESH_HAVE_ZLIB_H
