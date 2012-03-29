@@ -9,7 +9,7 @@ AC_DEFUN([CONFIGURE_SFC],
 
   dnl Sanity check: make sure the user really has the contrib directory
   if (test $enablesfc = yes); then
-    AC_CHECK_FILE(./contrib/sfcurves/sfcurves.h, [enablesfc=yes], [enablesfc=no])
+    AC_CHECK_HEADER(./contrib/sfcurves/sfcurves.h, [enablesfc=yes], [enablesfc=no])
   fi
 
 

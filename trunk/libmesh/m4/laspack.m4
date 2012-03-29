@@ -10,7 +10,7 @@ LASPACK_LIB=""
 
 dnl Sanity check: make sure the user really has the contrib directory
 if (test $enablelaspack = yes); then
-  AC_CHECK_FILE(./contrib/laspack/lastypes.h, [enablelaspack=yes], [enablelaspack=no])
+  AC_CHECK_HEADER(./contrib/laspack/lastypes.h, [enablelaspack=yes], [enablelaspack=no])
 fi
 
 

@@ -25,8 +25,8 @@ AC_DEFUN([CONFIGURE_SLEPC],
     AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly to enable SLEPc. >>>)
 
   else
-    AC_CHECK_FILE($SLEPC_DIR/include/slepc.h,
-                  SLEPC_H_PATH=$SLEPC_DIR/include/slepc.h)
+    AC_CHECK_HEADER($SLEPC_DIR/include/slepc.h,
+                    SLEPC_H_PATH=$SLEPC_DIR/include/slepc.h)
                                                                                          
     if (test -r $SLEPC_DIR/include/slepc.h) ; then
   

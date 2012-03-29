@@ -17,7 +17,7 @@ AC_DEFUN([CONFIGURE_TBB],
     if test "x$withtbb" = x ; then
       withtbb=/usr
     fi
-    AC_CHECK_FILE($withtbb/include/tbb/task_scheduler_init.h,
+    AC_CHECK_HEADER($withtbb/include/tbb/task_scheduler_init.h,
                       TBB_INCLUDE_PATH=$withtbb/include)
     if test "x$withtbblib" != "x" ; then
       TBB_LIBS=$withtbblib
