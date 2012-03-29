@@ -166,7 +166,6 @@ int main (int argc, char** argv)
     rb_eval.read_offline_data_from_files();
     
     // Get the parameters at which we do a reduced basis solve
-    unsigned int online_N = infile("online_N",1);
     unsigned int n_parameters = infile("n_parameters",1);
     std::vector<Real> online_mu_vector(n_parameters);
     for(unsigned int i=0; i<n_parameters; i++)
@@ -179,7 +178,7 @@ int main (int argc, char** argv)
     rb_eval.print_current_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
-    rb_eval.rb_solve(online_N);
+    rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
 
     if(store_basis_functions)
     {
