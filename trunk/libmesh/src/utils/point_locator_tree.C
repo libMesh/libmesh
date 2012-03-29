@@ -198,9 +198,9 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 	       libmesh_error() since in the case of curved elements, the
 	       bounding box computed in \p TreeNode::insert(const
 	       Elem*) might be slightly inaccurate.  */
-            START_LOG("linear search", "PointLocatorTree");
 	    if(!_out_of_mesh_mode)
 	      {
+                START_LOG("linear search", "PointLocatorTree");
 		MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
 		const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
 
@@ -222,8 +222,8 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 			          << p;
 		    libmesh_error();
 		  }
+                STOP_LOG("linear search", "PointLocatorTree");
 	      }
-            STOP_LOG("linear search", "PointLocatorTree");
 	  }
     }
 
