@@ -474,6 +474,10 @@ libmesh_la_SOURCES = \
 ###########################################################
 # add contributed libraries that are conditionally compiled
 
+if LIBMESH_INSTALL_INTERNAL_BOOST
+   SUBDIRS += contrib/boost/include
+endif
+
 if LIBMESH_ENABLE_GMV
   SUBDIRS += contrib/gmv
   libmesh_la_LIBADD += contrib/gmv/libgmv.la
@@ -537,10 +541,6 @@ endif
 if LIBMESH_ENABLE_FPARSER
   SUBDIRS += contrib/fparser
   libmesh_la_LIBADD += contrib/fparser/libfparser.la
-endif
-
-if LIBMESH_INSTALL_INTERNAL_BOOST
-   SUBDIRS += contrib/boost/include
 endif
 ###########################################################
 
