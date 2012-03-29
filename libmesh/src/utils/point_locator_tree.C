@@ -212,6 +212,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 		      return this->_element = (*pos);
                     }
 
+/*
 		if (this->_element == NULL)
 		  {
 		    libMesh::err << std::endl
@@ -222,6 +223,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 			          << p;
 		    libmesh_error();
 		  }
+*/
                 STOP_LOG("linear search", "PointLocatorTree");
 	      }
 	  }
