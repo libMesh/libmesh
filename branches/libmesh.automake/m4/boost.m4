@@ -7,12 +7,11 @@ AC_DEFUN([CONFIGURE_BOOST],
   AC_ARG_ENABLE(boost,
                 AC_HELP_STRING([--enable-boost],
                                [build with either external or built-in BOOST support]),
-                enableboost=$enableval,
-  	      [case "${enableval}" in
+   	        [case "${enableval}" in
   	      	  yes)  enableboost=yes ;;
   		   no)  enableboost=no ;;
    		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-boost) ;;
-  	      esac],
+  	        esac],
                 enableboost=$enableoptional)
   
   install_internal_boost=no
