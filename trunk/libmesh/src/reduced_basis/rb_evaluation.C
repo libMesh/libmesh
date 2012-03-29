@@ -980,10 +980,11 @@ void RBEvaluation::write_out_basis_functions(System& sys,
   std::ostringstream file_name;
   const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
 
-// Don't write the header... assume we save the EquationSystems object using EquationSystems::write
+//  // Should we write the header or not?
 //  file_name << directory_name << "/bf_header" << basis_function_suffix;
 //  Xdr header_data(file_name.str(),
 //                  write_binary_basis_functions ? ENCODE : WRITE);
+//  const std::string io_version_string = "libMesh-0.7.2";
 //  sys.write_header(header_data, io_version_string, false);
 
   // Use System::write_serialized_data to write out the basis functions
@@ -1023,10 +1024,11 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
   struct stat stat_info;
 
-// Don't read the header... assume we initialize the EquationSystems object using EquationSystems::read
+//  // Should we read the header or not?
 //  file_name << directory_name << "/bf_header" << basis_function_suffix;
 //  Xdr header_data(file_name.str(),
 //                  read_binary_basis_functions ? DECODE : READ);
+//  const std::string io_version_string = "libMesh-0.7.2";
 //  sys.read_header(header_data, io_version_string, false);
 
   // Use System::read_serialized_data to read in the basis functions
