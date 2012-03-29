@@ -64,6 +64,7 @@ AC_ARG_ENABLE(boost,
               enableboost=$enableval,
               enableboost=yes)
 
+install_internal_boost=no
 if (test "$enableboost" !=  no) ; then
   # --------------------------------------------------------------
   # Look for a user or system-provided boost.  If there is not
@@ -82,6 +83,8 @@ if (test "$enableboost" !=  no) ; then
   
     if test "$internal_boost_found" = "no" ; then
       AC_MSG_RESULT(<<< Libmesh boost installation *not* found >>>)
+    else
+      install_internal_boost=yes
     fi
   fi
 
@@ -89,6 +92,8 @@ if (test "$enableboost" !=  no) ; then
   libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
   #libmesh_optional_LIBS="$BOOST_LDFLAGS $libmesh_optional_LIBS"
 fi
+AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_BOOST, test x$install_internal_boost = xyes)
+AC_CONFIG_FILES([contrib/boost/include/Makefile])		
 # --------------------------------------------------------------
 
 
