@@ -173,7 +173,7 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
 		boost/smart_ptr/shared_ptr.hpp \
 		boost/smart_ptr/weak_ptr.hpp \
 		boost/static_assert.hpp \
-		boost/test_boost.C
+		boost/test_boost.C \
 		boost/throw_exception.hpp \
 		boost/type_traits/add_const.hpp \
 		boost/type_traits/add_cv.hpp \
