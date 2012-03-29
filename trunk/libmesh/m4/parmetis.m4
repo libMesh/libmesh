@@ -12,7 +12,7 @@ AC_DEFUN([CONFIGURE_PARMETIS],
     AC_REQUIRE([CONFIGURE_METIS])
 
     if (test $enablemetis = yes) ; then
-      AC_CHECK_HEADER(./contrib/parmetis/Lib/parmetis.h,
+      AC_CHECK_FILE(./contrib/parmetis/Lib/parmetis.h,
       	        [
       		  
       	          PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib

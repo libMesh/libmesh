@@ -10,7 +10,7 @@ GZSTREAM_LIB=""
 
 dnl Sanity check: make sure the user really has the contrib directory
 if (test $enablegz = yes); then
-  AC_CHECK_HEADER(./contrib/gzstream/gzstream.h, [enablegz=yes], [enablegz=no])
+  AC_CHECK_FILE(./contrib/gzstream/gzstream.h, [enablegz=yes], [enablegz=no])
 fi
 
 

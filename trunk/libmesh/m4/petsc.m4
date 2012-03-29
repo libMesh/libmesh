@@ -18,8 +18,8 @@ AC_DEFUN([CONFIGURE_PETSC],
     PETSC_ARCH=linux-gnu-c-opt
   fi
 
-  AC_CHECK_HEADER($PETSC_DIR/include/petsc.h,
-                  PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
+  AC_CHECK_FILE($PETSC_DIR/include/petsc.h,
+                PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
 
   dnl Grab PETSc version and substitute into Makefile.
   dnl If version 2.x, also check that PETSC_ARCH is set
