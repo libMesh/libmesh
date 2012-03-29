@@ -198,8 +198,8 @@ const Elem* PointLocatorList::operator() (const Point& p) const
 	  }
       }
 
-    // the element should be active
-    libmesh_assert (last_elem->active());
+    // If we found an element, it should be active
+    libmesh_assert (!last_elem || last_elem->active());
 
     STOP_LOG("operator()", "PointLocatorList");
 
