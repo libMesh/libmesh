@@ -539,6 +539,9 @@ if LIBMESH_ENABLE_FPARSER
   libmesh_la_LIBADD += contrib/fparser/libfparser.la
 endif
 
+if LIBMESH_INSTALL_INTERNAL_BOOST
+   SUBDIRS += contrib/boost/include
+endif
 ###########################################################
 
 ###########################################################
