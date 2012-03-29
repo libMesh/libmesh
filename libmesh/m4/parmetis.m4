@@ -12,7 +12,10 @@ AC_DEFUN([CONFIGURE_PARMETIS],
     AC_REQUIRE([CONFIGURE_METIS])
 
     if (test $enablemetis = yes) ; then
-      AC_CHECK_FILE(./contrib/parmetis/Lib/parmetis.h,
+      AC_LANG_PUSH([C])
+      OLD_CPPFLAGS=$CPPFLAGS
+      CPPFLAGS="$MPI_INCLUDES_PATHS -Icontrib/metis/Lib -Icontrib/parmetis/Lib $CPPFLAGS"
+      AC_CHECK_HEADER(parmetis.h,
       	        [
       		  
       	          PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib
@@ -26,6 +29,8 @@ AC_DEFUN([CONFIGURE_PARMETIS],
       	          enableparmetis=yes
                     ],
                     [enableparmetis=no])
+      CPPFLAGS=$OLD_CPPFLAGS
+      AC_LANG_POP([C])
     else
       enableparmetis=no
     fi  

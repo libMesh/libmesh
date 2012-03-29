@@ -3,7 +3,10 @@ dnl Metis
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_METIS], 
 [
-  AC_CHECK_FILE(./contrib/metis/Lib/metis.h,
+  AC_LANG_PUSH([C])
+  OLD_CPPFLAGS=$CPPFLAGS
+  CPPFLAGS="-Icontrib/metis/Lib $CPPFLAGS"
+  AC_CHECK_HEADER(metis.h,
 	        [ 
 	          METIS_INCLUDE_PATH=$PWD/contrib/metis/Lib
                   METIS_INCLUDE=-I$METIS_INCLUDE_PATH
@@ -16,4 +19,6 @@ AC_DEFUN([CONFIGURE_METIS],
 	          enablemetis=yes
                 ],
                 [enablemetis=no])
+  CPPFLAGS=$OLD_CPPFLAGS
+  AC_LANG_POP([C])
 ])
