@@ -9,12 +9,7 @@ LASPACK_INCLUDE=""
 LASPACK_LIB=""
 
 dnl Sanity check: make sure the user really has the contrib directory
-if (test $enablelaspack = yes); then
-  AC_CHECK_FILE(./contrib/laspack/lastypes.h, [enablelaspack=yes], [enablelaspack=no])
-fi
-
-
-if (test $enablelaspack = yes); then
+if (test $enablelaspack = yes && test -r contrib/laspack/lastypes.h); then
 
   LASPACK_INCLUDE="-I$PWD/contrib/laspack"
   LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(libext)"

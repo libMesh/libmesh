@@ -8,16 +8,22 @@ dnl Initialize variables
 GZSTREAM_INCLUDE=""
 GZSTREAM_LIB=""
 
-dnl Sanity check: make sure the user really has the contrib directory
 if (test $enablegz = yes); then
-  AC_CHECK_FILE(./contrib/gzstream/gzstream.h, [enablegz=yes], [enablegz=no])
+  dnl First check for C++-compatible system headers and libraries,
+  dnl then to make sure the user really has the contrib directory
+  AC_LANG_PUSH([C++])
+  OLD_CPPFLAGS=$CPPFLAGS
+  CPPFLAGS="-Icontrib/gzstream $CPPFLAGS"
+  AC_CHECK_HEADERS(zlib.h,
+    [AC_CHECK_LIB(z, gzopen,
+      [AC_CHECK_HEADER(gzstream.h,
+                       [enablegz=yes], [enablegz=no])])])
+  CPPFLAGS=$OLD_CPPFLAGS
+  AC_LANG_POP([C++])
 fi
 
 
 if (test $enablegz = yes); then
-  dnl First check for the required system headers and libraries
-  AC_CHECK_HEADERS(zlib.h, have_zlib_h=yes)
-  AC_CHECK_LIB(z, gzopen, have_libz=yes)
 
   dnl If both tests succeded, continue the configuration process.
   if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then

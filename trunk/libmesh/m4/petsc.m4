@@ -18,8 +18,8 @@ AC_DEFUN([CONFIGURE_PETSC],
     PETSC_ARCH=linux-gnu-c-opt
   fi
 
-  AC_CHECK_FILE($PETSC_DIR/include/petsc.h,
-                PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
+  dnl AC_CHECK_HEADER($PETSC_DIR/include/petsc.h,
+  dnl                PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
 
   dnl Grab PETSc version and substitute into Makefile.
   dnl If version 2.x, also check that PETSC_ARCH is set
@@ -85,10 +85,13 @@ dnl      AC_F77_LIBRARY_LDFLAGS
       dnl Check for snoopable MPI
       if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni` 
+         MPI_INCLUDES_PATHS="`grep MPI_INCLUDE $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | sed 's/.*= *//'`"
       elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
+         MPI_INCLUDES_PATHS="`grep MPI_INCLUDE $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | sed 's/.*= *//'`"
       elif (test -r $PETSC_DIR/conf/petscvariables) ; then dnl 3.0.x
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
+         MPI_INCLUDES_PATHS="`grep MPI_INCLUDE $PETSC_DIR/conf/petscvariables | sed 's/.*= *//'`"
       fi		 
       if test "x$PETSC_MPI" != x ; then
         AC_DEFINE(HAVE_MPI, 1,
@@ -109,6 +112,7 @@ dnl      AC_SUBST(PETSCLINKLIBS)
 dnl      AC_SUBST(PETSCINCLUDEDIRS)
 
       AC_SUBST(MPI_IMPL)
+      AC_SUBST(MPI_INCLUDES_PATHS)
 
       dnl Check for Hypre
       if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
