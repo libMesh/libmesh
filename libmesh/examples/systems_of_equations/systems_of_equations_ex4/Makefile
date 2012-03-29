@@ -55,7 +55,7 @@ run: $(target)
 	@echo "* Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) -ksp_type cg $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
