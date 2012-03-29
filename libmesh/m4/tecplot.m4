@@ -11,13 +11,13 @@ AC_DEFUN([CONFIGURE_TECPLOT],
   if test "$withtecplot" = no ; then
     AC_CHECK_FILE(./contrib/tecplot/lib/$host/tecio.a,
 	  	  TECPLOT_LIBRARY_PATH=$PWD/contrib/tecplot/lib/$host)
-    AC_CHECK_HEADER(./contrib/tecplot/include/TECIO.h,
+    AC_CHECK_FILE(./contrib/tecplot/include/TECIO.h,
  	  	  TECPLOT_INCLUDE_PATH=$PWD/contrib/tecplot/include)
   else
     AC_CHECK_FILE($withtecplot/lib/tecio.a,
 	  	  TECPLOT_LIBRARY_PATH=$withtecplot/lib)
-    AC_CHECK_HEADER($withtecplot/include/TECIO.h,
- 	  	    TECPLOT_INCLUDE_PATH=$withtecplot/include)
+    AC_CHECK_FILE($withtecplot/include/TECIO.h,
+ 	  	  TECPLOT_INCLUDE_PATH=$withtecplot/include)
   fi
 
   if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then

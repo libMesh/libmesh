@@ -3,7 +3,7 @@ dnl Metis
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_METIS], 
 [
-  AC_CHECK_HEADER(./contrib/metis/Lib/metis.h,
+  AC_CHECK_FILE(./contrib/metis/Lib/metis.h,
 	        [ 
 	          METIS_INCLUDE_PATH=$PWD/contrib/metis/Lib
                   METIS_INCLUDE=-I$METIS_INCLUDE_PATH
