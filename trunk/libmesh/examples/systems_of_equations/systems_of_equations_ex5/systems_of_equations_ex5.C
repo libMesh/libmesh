@@ -29,7 +29,7 @@
  // The system we solve, therefore, is of the form:
  //   a(u,v) + \lambda g(v) = f(v)
  //                    g(u) = 0
- // Here \lambda tells us the traction required to enforce the constraint.
+ // Here \lambda tells us the traction required to satisfy the constraint.
 
 // C++ include files that we need
 #include <iostream>
