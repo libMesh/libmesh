@@ -798,8 +798,6 @@ enable_unordered_containers
 enable_boost
 with_boost
 with_boost_libdir
-with_boost
-with_boost_libdir
 enable_everything
 enable_tracefiles
 enable_amr
@@ -822,11 +820,8 @@ enable_optional
 enable_petsc
 with_mpi
 with_gm
-with_mpi
-with_gm
 enable_slepc
 enable_trilinos
-with_trilinos
 with_trilinos
 with_nox
 with_ml
@@ -871,19 +866,11 @@ CPPFLAGS
 CCC
 CC
 CFLAGS
-LDFLAGS
-LIBS
-CPPFLAGS
 FC
 FCFLAGS
-LDFLAGS
-LIBS
 F77
 FFLAGS
-LDFLAGS
-LIBS
 CXXCPP
-CPPFLAGS
 CPP'
 
 
@@ -9991,31 +9978,44 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
     OLD_CPPFLAGS=$CPPFLAGS
-    CPPFLAGS="-I$withtbb/include $CPPFLAGS"
     ac_fn_cxx_check_header_mongrel "$LINENO" "tbb/task_scheduler_init.h" "ac_cv_header_tbb_task_scheduler_init_h" "$ac_includes_default"
 if test "x$ac_cv_header_tbb_task_scheduler_init_h" = xyes; then :
-  TBB_INCLUDE_PATH=$withtbb/include
+  TBB_INCLUDE=''
+       withtbb=builtin
+else
+  CPPFLAGS="-I$withtbb/include $CPPFLAGS"
+       ac_fn_cxx_check_header_mongrel "$LINENO" "tbb/task_scheduler_init.h" "ac_cv_header_tbb_task_scheduler_init_h" "$ac_includes_default"
+if test "x$ac_cv_header_tbb_task_scheduler_init_h" = xyes; then :
+  TBB_INCLUDE='-I$withtbb/include'
+else
+  withtbb=no
 fi
 
 
-    CPPFLAGS=$OLD_CPPFLAGS
+       CPPFLAGS=$OLD_CPPFLAGS
+fi
+
+
     ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-
-    if test "x$withtbblib" != "x" ; then
-      TBB_LIBS=$withtbblib
-    else
-      TBB_LIBS=$withtbb/lib
-    fi
   fi
 
-  if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
+  if test "$withtbb" != no ; then
+    if test "x$withtbblib" != "x" ; then
+      TBB_LIBS="-L$withtbblib -ltbb -ltbbmalloc"
+    else
+      if test "$withtbb" != "builtin" ; then
+        TBB_LIBS="-L$withtbb/lib -ltbb -ltbbmalloc"
+      else
+        TBB_LIBS="-ltbb -ltbbmalloc"
+      fi
+    fi
+
     TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
-    TBB_INCLUDE=-I$TBB_INCLUDE_PATH
 
 
 
