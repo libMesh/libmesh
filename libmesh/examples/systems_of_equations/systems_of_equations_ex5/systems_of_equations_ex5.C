@@ -110,6 +110,8 @@ int main (int argc, char** argv)
   // Add two displacement variables, u and v, to the system
   unsigned int u_var      = system.add_variable("u", SECOND, LAGRANGE);
   unsigned int v_var      = system.add_variable("v", SECOND, LAGRANGE);
+  
+  // Add a SCALAR variable for the Lagrange multiplier to enforce our constraint
   unsigned int lambda_var = system.add_variable("lambda", FIRST, SCALAR);
 
 
