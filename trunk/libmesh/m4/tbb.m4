@@ -20,22 +20,29 @@ AC_DEFUN([CONFIGURE_TBB],
 
     AC_LANG_PUSH([C++])
     OLD_CPPFLAGS=$CPPFLAGS
-    CPPFLAGS="-I$withtbb/include $CPPFLAGS"
     AC_CHECK_HEADER(tbb/task_scheduler_init.h,
-                    TBB_INCLUDE_PATH=$withtbb/include)
-    CPPFLAGS=$OLD_CPPFLAGS
+      [TBB_INCLUDE=''
+       withtbb=builtin],
+      [CPPFLAGS="-I$withtbb/include $CPPFLAGS"
+       AC_CHECK_HEADER(tbb/task_scheduler_init.h,
+                       TBB_INCLUDE='-I$withtbb/include',
+                       withtbb=no)
+       CPPFLAGS=$OLD_CPPFLAGS])
     AC_LANG_POP([C++])
-
-    if test "x$withtbblib" != "x" ; then
-      TBB_LIBS=$withtbblib
-    else	
-      TBB_LIBS=$withtbb/lib
-    fi
   fi
 
-  if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
+  if test "$withtbb" != no ; then
+    if test "x$withtbblib" != "x" ; then
+      TBB_LIBS="-L$withtbblib -ltbb -ltbbmalloc"
+    else	
+      if test "$withtbb" != "builtin" ; then
+        TBB_LIBS="-L$withtbb/lib -ltbb -ltbbmalloc"
+      else
+        TBB_LIBS="-ltbb -ltbbmalloc"
+      fi
+    fi
+
     TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
-    TBB_INCLUDE=-I$TBB_INCLUDE_PATH
     AC_SUBST(TBB_LIBRARY)
     AC_SUBST(TBB_INCLUDE)
     AC_DEFINE(HAVE_TBB_API, 1,
