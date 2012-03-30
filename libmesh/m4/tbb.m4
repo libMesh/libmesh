@@ -33,12 +33,12 @@ AC_DEFUN([CONFIGURE_TBB],
 
   if test "$withtbb" != no ; then
     if test "x$withtbblib" != "x" ; then
-      TBB_LIBRARY="-L$withtbblib -ltbb -ltbbmalloc"
+      TBB_LIBRARY="-L$withtbblib -ltbb -ltbbmalloc -lpthread"
     else	
       if test "$withtbb" != "builtin" ; then
-        TBB_LIBRARY="-L$withtbb/lib -ltbb -ltbbmalloc"
+        TBB_LIBRARY="-L$withtbb/lib -ltbb -ltbbmalloc -lpthread"
       else
-        TBB_LIBRARY="-ltbb -ltbbmalloc"
+        TBB_LIBRARY="-ltbb -ltbbmalloc -lpthread"
       fi
     fi
 
