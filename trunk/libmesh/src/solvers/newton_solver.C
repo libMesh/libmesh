@@ -479,8 +479,10 @@ unsigned int NewtonSolver::solve()
   STOP_LOG("solve()", "NewtonSolver");
 
   // Make sure we are returning something sensible as the
-  // _solve_result.
-  libmesh_assert (_solve_result != DiffSolver::INVALID_SOLVE_RESULT);
+  // _solve_result, except in the edge case where we weren't really asked to
+  // solve.
+  libmesh_assert (_solve_result != DiffSolver::INVALID_SOLVE_RESULT ||
+                  !max_nonlinear_iterations);
 
   return _solve_result;
 }
