@@ -33,16 +33,15 @@ AC_DEFUN([CONFIGURE_TBB],
 
   if test "$withtbb" != no ; then
     if test "x$withtbblib" != "x" ; then
-      TBB_LIBS="-L$withtbblib -ltbb -ltbbmalloc"
+      TBB_LIBRARY="-L$withtbblib -ltbb -ltbbmalloc"
     else	
       if test "$withtbb" != "builtin" ; then
-        TBB_LIBS="-L$withtbb/lib -ltbb -ltbbmalloc"
+        TBB_LIBRARY="-L$withtbb/lib -ltbb -ltbbmalloc"
       else
-        TBB_LIBS="-ltbb -ltbbmalloc"
+        TBB_LIBRARY="-ltbb -ltbbmalloc"
       fi
     fi
 
-    TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
     AC_SUBST(TBB_LIBRARY)
     AC_SUBST(TBB_INCLUDE)
     AC_DEFINE(HAVE_TBB_API, 1,
