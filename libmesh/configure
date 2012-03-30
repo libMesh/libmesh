@@ -10006,16 +10006,15 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
   if test "$withtbb" != no ; then
     if test "x$withtbblib" != "x" ; then
-      TBB_LIBS="-L$withtbblib -ltbb -ltbbmalloc"
+      TBB_LIBRARY="-L$withtbblib -ltbb -ltbbmalloc"
     else
       if test "$withtbb" != "builtin" ; then
-        TBB_LIBS="-L$withtbb/lib -ltbb -ltbbmalloc"
+        TBB_LIBRARY="-L$withtbb/lib -ltbb -ltbbmalloc"
       else
-        TBB_LIBS="-ltbb -ltbbmalloc"
+        TBB_LIBRARY="-ltbb -ltbbmalloc"
       fi
     fi
 
-    TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
 
 
 
