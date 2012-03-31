@@ -206,7 +206,7 @@ template <typename Output>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:
-  ParsedFunction (std::string /* expression */)
+  ParsedFunction (std::string /* expression */) : _dummy(0)
     {
       libmesh_not_implemented();
     }
@@ -221,11 +221,13 @@ public:
 
   virtual void init() {}
   virtual void clear() {}
-  virtual Output & getVarAddress() {}
-  virtual AutoPtr<FunctionBase<Output> > clone() {
+  virtual Output & getVarAddress() { return _dummy; }
+  virtual AutoPtr<FunctionBase<Output> > clone() const {
     return AutoPtr<FunctionBase<Output> >
       (new ParsedFunction<Output>(""));
   }
+private:
+  Output _dummy;
 };
 
 #endif // LIBMESH_HAVE_FPARSER
