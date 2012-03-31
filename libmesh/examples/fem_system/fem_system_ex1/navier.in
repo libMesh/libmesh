@@ -17,3 +17,8 @@ print_element_jacobians = false
 #     'n_timesteps=1' in the input file, ex18.in.  Finally, there is no
 #     1D version of this application available.
 application = 0
+
+# The polynomial order and finite element type to use for the pressure
+# variable.
+pressure_p = 1
+fe_family = 'LAGRANGE'

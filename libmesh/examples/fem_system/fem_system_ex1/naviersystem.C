@@ -27,6 +27,7 @@
 #include "fem_context.h"
 #include "mesh.h"
 #include "quadrature.h"
+#include "string_to_enum.h"
 #include "zero_function.h"
 
 // Bring in everything from the libMesh namespace
@@ -71,20 +72,42 @@ void NavierSystem::init_data ()
 {
   const unsigned int dim = this->get_mesh().mesh_dimension();
 
-  // Add the pressure variable "p". This will
-  // be approximated with a first-order basis,
-  // providing an LBB-stable pressure-velocity pair.
+  // Check the input file for Reynolds number, application type,
+  // approximation type
+  GetPot infile("navier.in");
+  Reynolds = infile("Reynolds", 1.);
+  application = infile("application", 0);
+  unsigned int pressure_p = infile("pressure_p", 1);
+  std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
+
+  // LBB needs better-than-quadratic velocities for better-than-linear
+  // pressures, and libMesh needs non-Lagrange elements for
+  // better-than-quadratic velocities.
+  libmesh_assert((pressure_p == 1) || (fe_family != "LAGRANGE"));
+
+  FEFamily fefamily = Utility::string_to_enum<FEFamily>(fe_family);
+
   // Add the velocity components "u" & "v".  They
   // will be approximated using second-order approximation.
-  u_var = this->add_variable ("u", SECOND);
-  v_var = this->add_variable ("v", SECOND);
+  u_var = this->add_variable ("u", static_cast<Order>(pressure_p+1),
+			      fefamily);
+  v_var = this->add_variable ("v",
+			      static_cast<Order>(pressure_p+1),
+			      fefamily);
 
   if (dim == 3)
-    w_var = this->add_variable ("w", SECOND);
+    w_var = this->add_variable ("w",
+			        static_cast<Order>(pressure_p+1),
+			        fefamily);
   else
     w_var = u_var;
 
-  p_var = this->add_variable ("p", FIRST);
+  // Add the pressure variable "p". This will
+  // be approximated with a first-order basis,
+  // providing an LBB-stable pressure-velocity pair.
+  p_var = this->add_variable ("p",
+			      static_cast<Order>(pressure_p),
+			      fefamily);
 
   // Tell the system to march velocity forward in time, but 
   // leave p as a constraint only
@@ -92,11 +115,6 @@ void NavierSystem::init_data ()
   this->time_evolving(v_var);
   if (dim == 3)
     this->time_evolving(w_var);
-
-  // Check the input file for Reynolds number, application type
-  GetPot infile("navier.in");
-  Reynolds = infile("Reynolds", 1.);
-  application = infile("application", 0);
 
   // Useful debugging options
   // Set verify_analytic_jacobians to 1e-6 to use
