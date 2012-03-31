@@ -16,22 +16,23 @@ AC_ARG_WITH([subdomain_id_bytes],
 	    [subdomain_bytes="$withval"],
 	    [subdomain_bytes=2])
 
-if test "$subdomain_bytes" == 1 ; then
-  AC_DEFINE(SUBDOMAIN_ID_BYTES, 1,
-           [size of subdomain_id])
-  AC_MSG_RESULT(configuring size of subdomain_id... 1)
-elif test "$subdomain_bytes" == 2 ; then
-  AC_DEFINE(SUBDOMAIN_ID_BYTES, 2,
-           [size of subdomain_id])
-  AC_MSG_RESULT(configuring size of subdomain_id... 2)
-elif test "$subdomain_bytes" == 4 ; then
-  AC_DEFINE(SUBDOMAIN_ID_BYTES, 4,
-           [size of subdomain_id])
-  AC_MSG_RESULT(configuring size of subdomain_id... 4)
-else
-  AC_MSG_RESULT(unrecognized subdomain_id size - configuring size...2)
-fi
-
+case "$subdomain_bytes" in
+    1)
+	AC_DEFINE(SUBDOMAIN_ID_BYTES, 1, [size of subdomain_id])
+	;;
+    2)
+	AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id])
+	;;
+    4)
+	AC_DEFINE(SUBDOMAIN_ID_BYTES, 4, [size of subdomain_id])
+	;;
+    *)
+	AC_MSG_RESULT([>>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2])
+	AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id])
+	subdomain_bytes=2
+	;;
+esac
+AC_MSG_RESULT([configuring size of subdomain_id... $subdomain_bytes])
 # -------------------------------------------------------------
 
 
