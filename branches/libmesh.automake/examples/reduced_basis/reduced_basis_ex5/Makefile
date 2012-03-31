@@ -26,7 +26,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   :=  ./systems_of_equations_ex4-$(METHOD)
+target 	   :=  ./reduced_basis_ex5-$(METHOD)
 
 
 all:: $(target)
@@ -55,7 +55,8 @@ run: $(target)
 	@echo "* Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) -ksp_type cg $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) -ksp_type cg -online_mode 0 $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) -online_mode 1  $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)

@@ -26,7 +26,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   :=  ./systems_of_equations_ex4-$(METHOD)
+target 	   :=  ./systems_of_equations_ex5-$(METHOD)
 
 
 all:: $(target)
