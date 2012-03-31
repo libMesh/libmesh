@@ -52,6 +52,8 @@ AC_DEFUN([CONFIGURE_TBB],
 
       dnl look for thread-local storage
       AX_TLS
+    else
+      enabletbb=no
     fi
   fi	
 ])

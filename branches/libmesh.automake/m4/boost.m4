@@ -33,6 +33,7 @@ AC_DEFUN([CONFIGURE_BOOST],
     
       if test "$internal_boost_found" = "no" ; then
         AC_MSG_RESULT(<<< Libmesh boost installation *not* found >>>)
+	enableboost=no
       else
         install_internal_boost=yes
       fi
