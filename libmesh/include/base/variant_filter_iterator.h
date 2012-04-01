@@ -44,10 +44,11 @@
  * @author John W. Peterson, 2004.
  */
 template<class Predicate, class Type, class ReferenceType = Type&, class PointerType = Type*>
+class variant_filter_iterator :
 #if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
-class variant_filter_iterator : public std::forward_iterator<std::forward_iterator_tag, Type>
+    public std::forward_iterator<std::forward_iterator_tag, Type>
 #else
-class variant_filter_iterator : public std::iterator<std::forward_iterator_tag,  Type>
+    public std::iterator<std::forward_iterator_tag,  Type>
 #endif
 {
 public:
