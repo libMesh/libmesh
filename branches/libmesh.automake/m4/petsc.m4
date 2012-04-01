@@ -173,7 +173,7 @@ EOF
 
 
   else # --disable-petsc
-    if (test "$enableoptional" != no) ; then
+    if (test "$enablempi" != no) ; then
       ACX_MPI
     fi	
   fi
