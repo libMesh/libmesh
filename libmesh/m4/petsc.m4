@@ -85,13 +85,13 @@ dnl      AC_F77_LIBRARY_LDFLAGS
       dnl Check for snoopable MPI
       if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni` 
-         MPI_INCLUDES_PATHS="`grep MPI_INCLUDE $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | sed 's/.*= *//'`"
+         MPI_INCLUDES_PATHS="`grep -m 1 "MPI_INCLUDE *=" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | sed 's/.*= *//'`"
       elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
-         MPI_INCLUDES_PATHS="`grep MPI_INCLUDE $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | sed 's/.*= *//'`"
+         MPI_INCLUDES_PATHS="`grep -m 1 "MPI_INCLUDE *=" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | sed 's/.*= *//'`"
       elif (test -r $PETSC_DIR/conf/petscvariables) ; then dnl 3.0.x
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
-         MPI_INCLUDES_PATHS="`grep MPI_INCLUDE $PETSC_DIR/conf/petscvariables | sed 's/.*= *//'`"
+         MPI_INCLUDES_PATHS="`grep -m 1 "MPI_INCLUDE *=" $PETSC_DIR/conf/petscvariables | sed 's/.*= *//'`"
       fi		 
       if test "x$PETSC_MPI" != x ; then
         AC_DEFINE(HAVE_MPI, 1,
