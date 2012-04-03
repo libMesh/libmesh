@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x,y
+R=-1,1,0.25
+F=!(!(x&y))
+C=fp_not(fp_not(fp_and(x,y)))

@@ -1,0 +1,311 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> MLSOLV(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" MLSOLV(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html410 HREF="node23.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html408 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html402 HREF="node21.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html412 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html411 HREF="node23.html"> OPERATS(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html409 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html403 HREF="node21.html"> MATRIX(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00087000000000000000>&#160;</A><A NAME=MLSOLV> MLSOLV(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION00087100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> MGStep</tt>, <tt> MGIter</tt>, <tt> NestedMGIter</tt>,
+<tt> MGPCGIter</tt>,
+<tt> BPXPrecond</tt>, <tt> BPXPCGIter</tt>
+-- multilevel solvers
+<P>
+<H3><A NAME=SECTION00087200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/mlsolv.h&gt;
+
+Vector *MGStep(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+            Matrix *R, Matrix *P, int Level, int Gamma, 
+            IterProcType SmoothProc, int Nu1, int Nu2, 
+            PrecondProcType PrecondProc, double Omega,
+            IterProcType SolvProc, int NuC,
+            PrecondProcType PrecondProcC, double OmegaC);
+Vector *MGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+       	    Matrix *R, Matrix *P, int MaxIter, int Gamma,
+            IterProcType SmoothProc, int Nu1, int Nu2,
+       	    PrecondProcType PrecondProc, double Omega,
+            IterProcType SolvProc, int NuC,
+       	    PrecondProcType PrecondProcC, double OmegaC);
+Vector *NestedMGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+       	    Matrix *R, Matrix *P, int Gamma,
+            IterProcType SmoothProc, int Nu1, int Nu2,
+       	    PrecondProcType PrecondProc, double Omega,
+            IterProcType SolvProc, int NuC,
+       	    PrecondProcType PrecondProcC, double OmegaC);
+Vector *MGPCGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+       	    Matrix *R, Matrix *P, int MaxIter, int NoMGIter, int Gamma,
+            IterProcType SmoothProc, int Nu1, int Nu2,
+       	    PrecondProcType PrecondProc, double Omega,
+            IterProcType SolvProc, int NuC,
+       	    PrecondProcType PrecondProcC, double OmegaC);
+Vector *BPXPrecond(int NoLevels, QMatrix *A, Vector *y, Vector *c,
+            Matrix *R, Matrix *P, int Level,
+            IterProcType SmoothProc, int Nu, 
+            PrecondProcType PrecondProc, double Omega,
+            IterProcType SmoothProcC, int NuC,
+            PrecondProcType PrecondProcC, double OmegaC);
+Vector *BPXPCGIter(int NoLevels, QMatrix *A, Vector *x, Vector *b,
+       	    Matrix *R, Matrix *P, int MaxIter,
+            IterProcType SmoothProc, int Nu,
+       	    PrecondProcType PrecondProc, double Omega,
+            IterProcType SmoothProcC, int NuC,
+       	    PrecondProcType PrecondProcC, double OmegaC);
+</PRE>
+<H3><A NAME=SECTION00087300000000000000> DESCRIPTION</A></H3>
+<P>
+<H6><A NAME=MGStep>&#160;</A></H6>
+The procedure <tt> MGStep</tt> performs one multigrid step based
+on a recursive use of a two-grid iteration.
+It forms the basic algorithm from which all the other multigrid solvers
+are derived.
+<P>
+The number of grid levels is set by the parameter <tt> NoLevels</tt>.
+Matrices <tt> A[i]</tt> and vectors <tt> x[i]</tt> and <tt> b[i]</tt> 
+should be defined on each level,
+from the coarsest level <tt> (i = 0)</tt>
+ to 
+the finest level
+<tt> (i = NoLevels - 1).</tt>
+
+Furthermore, the initial approach <tt> x[Level]</tt> of the solution vector
+and the right hand side vector <tt> b[Level]</tt>
+are required on the actual level <tt> Level</tt>.
+<P>
+Matrices <tt> R[i]</tt> <tt> (0 &lt;= i &lt;= NoLevels - 2)</tt>
+ should define restriction operators
+which map a vector from level <tt> i</tt> + 1 to level <tt> i</tt>.
+Prolongation operators are set
+by matrices <tt> P[i]</tt> (<tt> 1 &lt;= i &lt;= NoLevels - 1)</tt>
+
+which have to map a vector from level level <tt> i</tt> - 1 to level <tt> i</tt>.
+If no prolongation is specified (i.e. if <tt> P == NULL</tt>),
+the transpose of <tt> R[i - 1]</tt> is used instead of <tt> P[i]</tt>.
+<P>
+The type of the multigrid iteration is defined by the parameter <tt> Gamma</tt>:
+1 corresponds to a V-cycle, 2 to a W-cycle.
+<P>
+The parameters <tt> SmoothProc</tt> and <tt> SolvProc</tt> should 
+address routines with the prototype:
+
+<PRE>  Vector *(*IterProcType)(QMatrix *, Vector *, Vector *, int, 
+                          PrecondProcType, double)
+</PRE>
+
+<P>
+The procedure <tt> SmoothProc</tt> is applied as the smoothing method.
+For pre-smoothing, <tt> Nu1</tt> iterations are carried out,
+for post-smoothing, <tt> Nu2</tt> iterations.
+Preconditioning can be specified by the procedure <tt> PrecondProc</tt>
+with the prototype:
+
+<PRE>  Vector *(*PrecondProcType)(QMatrix *, Vector *, Vector *, double)
+</PRE>
+
+The parameter <tt> Omega</tt> is used as relaxation parameter.
+<P>
+The system of equations on the coarsest grid is solved by the
+procedure <tt> SolvProc</tt> with parameters <tt> NuC</tt>, <tt> PrecondProcC</tt>,
+and <tt> OmegaC</tt>.
+<P>
+If any preconditioner was specified by the procedures
+<tt> PrecondProc</tt> and <tt> PrecondProcC</tt>
+(i.e. if <tt> PrecondProc != NULL</tt> and <tt> PrecondProcC != NULL</tt>, 
+respectively),
+the preconditioned variant of the corresponding iterative methods
+is used (if it is available).
+In this case, the parameters <tt> Omega</tt> and <tt> OmegaC</tt> are passed 
+to the preconditioner as relaxation parameters.
+<P>
+<H6><A NAME=MGIter>&#160;</A></H6>
+The procedure <tt> MGIter</tt> carries out multigrid iterations of a system
+of <tt> NoLevels</tt> grids.
+The meaning of the parameters agrees with that of <tt> MGStep</tt>.
+<P>
+<H6><A NAME=NestedMGIter>&#160;</A></H6>
+The procedure <tt> NestedMGIter</tt> performs nested multigrid iterations
+(also referred to as Full Multigrid Method).
+The parameters correspond to those of <tt> MGStep</tt>.
+<P>
+<H6><A NAME=MGPCGIter>&#160;</A></H6>
+The procedure <tt> MGPCGIter</tt> is a multilevel solver based
+on the preconditioned conjugate gradient method.
+For preconditioning, <tt> NoMGIter</tt> multigrid iterations are applied
+to <tt> NoLevels</tt> grid levels.
+The meaning of the parameters agrees with that of <tt> MGStep</tt>.
+<P>
+<H6><A NAME=BPXPrecond>&#160;</A><A NAME=BPXPCGIter>&#160;</A></H6>
+The procedure <tt> BPXPCGIter</tt> carries out the conjugate gradient method
+in connection with the BPX multilevel preconditioner,
+which is implemented as the procedure <tt> BPXPrecond</tt>.
+At the preconditioning step,
+residuals are smoothed on each level.
+The procedure <tt> SmoothProc</tt> with parameters <tt> Nu</tt>, 
+<tt> PrecondProc</tt>, and <tt> Omega</tt> is used as the smoothing method.
+In order to keep efficiency
+even if the system of equations on the coarsest level has 
+a fairly high dimension,
+for this level is the the smoother given separately by the parameters
+<tt> SmoothProcC</tt>, <tt> NuC</tt>, <tt> PrecondProcC</tt>, and <tt> OmegaC</tt>.
+All remaining parameters correspond to those of <tt> MGStep</tt>.
+<P>
+In all the above solvers,
+the solution process is terminated either after <tt> MaxIter</tt> iteration steps
+or if the residual on the finest grid satisfies the condition
+
+<PRE>    || r ||_2 = || b - A x ||_2 &lt;= eps || b ||_2,
+</PRE>
+<P>
+where <tt> eps</tt>
+ is the accuracy defined
+by the <tt> LASPack</tt>
+  termination control (module <A HREF="node26.html#RTC"><b> RTC</b></A>).
+<P>
+For systems with singular matrices,
+orthogonalization of the solution vector to the null space of the matrix
+(which should be specified)
+is applied to ensure a unique solution as well as convergence
+in the resulting subspace.
+<P>
+<H3><A NAME=SECTION00087400000000000000> REFERENCES</A></H3>
+<P>
+The multigrid algorithms and their theoretical foundation
+are described in
+
+<blockquote> W. Hackbusch:
+  Multi-Grid Methods and Applications,
+  Springer-Verlag, Berlin, 1985.
+<P>
+  S. F. McCormick:
+  Multigrid Methods,
+  SIAM, Philadelphia, 1987.
+</blockquote>
+
+The implementation of the BPX preconditioner is based on the theory given in
+
+<blockquote> J. H. Bramble, J. E. Pasciak, J. Xu:
+  Parallel multilevel preconditioners,
+  Mathematics of Computations,
+  55 (1990), pp. 1-22.
+</blockquote><H3><A NAME=SECTION00087500000000000000> FILES</A></H3>
+<P>
+  <tt> mlsolv.h ... </tt> header file <BR> 
+
+  <tt> mlsolv.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION00087600000000000000> EXAMPLE</A></H3>
+<P>
+In the following code fragment,
+a simple Poisson boundary value problem
+
+<PRE>   - u''(x)  = 1     for  0 &lt;= x &lt;= 1, 
+
+     u(0)    = 0, 
+     u(1)    = 0
+</PRE>
+<P>
+should be solved by means of the two-grid V-cycle multigrid method.
+For simplicity, equidistant grids with 7 and 3 inner points are used.
+<P>
+The SSOR method with one pre-smoothing and one post-smoothing step
+is applied as smoother.
+The relaxation parameter is set to 1.2.
+Solution on the coarse grid should be carried out by the CG method
+with diagonal preconditioning.
+The maximum number of iterations is set to 10.
+<P>
+The multigrid iterations should be terminated
+if the accuracy of 1e-5
+ is reached,
+but at least after 100 iterations.
+<P>
+For generation of the matrices <tt> L[0]</tt> and <tt> L[1]</tt>
+and of the restriction operator <tt> R[0]</tt>,
+look at examples of the modules <A HREF="node25.html#QMATRIXExample"><b> QMATRIX</b></A> and
+<A HREF="node21.html#MATRIXExample"><b> MATRIX</b></A>.
+<P>
+<PRE>QMatrix A[2];
+Vector x[2], b[2];
+Matrix R[2];
+size_t Row, Ind;
+double h; 
+
+Q_Constr(&amp;A[0], &quot;A[0]&quot;, 3, True, Rowws, Normal, True);
+Q_Constr(&amp;A[1], &quot;A[1]&quot;, 7, True, Rowws, Normal, True);
+V_Constr(&amp;x[0], &quot;x[0]&quot;, 3, Normal, True);
+V_Constr(&amp;x[1], &quot;x[1]&quot;, 7, Normal, True);
+V_Constr(&amp;b[0], &quot;b[0]&quot;, 3, Normal, True);
+V_Constr(&amp;b[1], &quot;b[1]&quot;, 7, Normal, True);
+M_Constr(&amp;R[0], &quot;R[0]&quot;, 3, 7, Rowws, Normal, True);
+
+
+/* generation of the matrix A[0] for the coarse grid */
+h = 1.0 / 4.0;
+...
+
+/* generation of the matrix A[1] for the fine grid */
+h = 1.0 / 8.0;
+...
+
+/* generation of the right hand side vector for the fine grid */
+h = 1.0 / 8.0;
+V_SetAllCmp(&amp;b[1], h);
+
+/* generation of the restriction operator R[0] */
+
+...
+
+/* solution of the system of equations by the multigrid solver */
+SetRTCAccuracy(1e-5); 
+V_SetAllCmp(&amp;x, 0.0);
+MGIter(2, &amp;A, &amp;x, &amp;b, &amp;R, NULL, 100, 1, 
+       SSORIter, 1, 1, NULL, 1.2,
+       CGIter, 10, JacobiPrecond, 1.0);
+    
+/* output of the solution vector */
+for (Ind = 1; Ind &lt;= Dim; Ind++)
+    printf(&quot;%d %12.5e\n&quot;, Ind, V_GetCmp(&amp;x[1], Ind));
+
+Q_Destr(&amp;A[0]);
+Q_Destr(&amp;A[1]);
+V_Destr(&amp;x[0]);
+V_Destr(&amp;x[1]);
+V_Destr(&amp;b[0]);
+V_Destr(&amp;b[1]);
+V_Destr(&amp;R[0]);
+</PRE>
+<P>
+<H3><A NAME=SECTION00087700000000000000> SEE ALSO</A></H3>
+<P>
+<A HREF="node25.html#QMATRIX">qmatrix(3LAS)</A>, <A HREF="node27.html#VECTOR">vector(3LAS)</A>, 
+<A HREF="node21.html#MATRIX">matrix(3LAS)</A>, <A HREF="node20.html#ITERSOLV">itersolv(3LAS)</A>,
+<A HREF="node26.html#RTC">rtc(3LAS)</A>
+<P>
+<BR> <HR><A NAME=tex2html410 HREF="node23.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html408 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html402 HREF="node21.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html412 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html411 HREF="node23.html"> OPERATS(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html409 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html403 HREF="node21.html"> MATRIX(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

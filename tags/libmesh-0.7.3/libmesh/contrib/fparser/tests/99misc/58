@@ -1,0 +1,15 @@
+# Also test number i4
+
+T=d f ld mf li gi
+V=x,y
+R=-11, 11, 1
+F=(-x < 3) + (x*-1 > 5) + (x*-3 < 10) + (x*-3 < y*7) + \
+  (x*4 < y*7) + (x*6 < y*-3) + (-x < 11) + (5 < -y)
+C=fp_less(-x,  3) + \
+  fp_greater(x*-1, 5) + \
+  fp_less(x*-3,  10) + \
+  fp_less(x*-3,  y*7) + \
+  fp_less(x*4,  y*7) + \
+  fp_less(x*6,  y*-3) + \
+  fp_less(-x,  11) + \
+  fp_less(5,  -y)

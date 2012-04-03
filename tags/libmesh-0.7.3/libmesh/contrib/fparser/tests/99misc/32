@@ -1,0 +1,43 @@
+T=d f ld mf
+V=x,y,z
+R=1,2,.05
+F=x\
+    +y/y-min(3,4)-x-max(4,3)+max(3,4)-min(4,3)+0+(z*1)\
+    +(x-2+2)+(x*0.5*2)+y*0\
+    +min(min(min(4.0,x),1.0),min(x,min(min(y,4.0),z)))\
+    +max(max(max(4.0,x),1.0),max(x,max(max(y,4.0),z)))\
+    +(abs(1)+acos(1.0)+asin(1.0)+atan(1.0)+ceil(1.1)+cos(0.0)\
+     +cosh(0.0)+floor(1.1)+log(1.0)+sin(0.0)+sinh(0.0)+tan(1.0)\
+     +tanh(1.0)+atan2(1.0,1.0))\
+    +(x-(y-z))\
+    +(x+y) + (x*y)\
+    +max(x,max(x,max(x,max(x,x))))*-1.0\
+    +(z-z)\
+    +1/sin(x/5) + 1/cos(y/5) + 1/tan(z/5)\
+    +log10(cot(z/5) + csc(y/5) + sec(x/5))\
+    +log(30+x)*log(40+y)/log(50+z)\
+    +sin(x/57.295779513082320877)\
+    +asin(x/10)*57.295779513082320877\
+    +floor(-x) + 1/ceil(x)\
+    +sqrt(5 * 0.2)\
+    +(-x+-x+-x+-x+-x+-x)
+C=x\
+    +y/y-fp_min(3,4)-x-fp_max(4,3)+fp_max(3,4)-fp_min(4,3)+0+(z*1)\
+    +(x-2+2)+(x*0.5*2)+y*0\
+    +fp_min(fp_min(fp_min(4.0,x),1.0),fp_min(x,fp_min(fp_min(y,4.0),z)))\
+    +fp_max(fp_max(fp_max(4.0,x),1.0),fp_max(x,fp_max(fp_max(y,4.0),z)))\
+    +(fp_abs(1)+fp_acos(1.0)+fp_asin(1.0)+fp_atan(1.0)+fp_ceil(1.1)+fp_cos(0.0)\
+     +fp_cosh(0.0)+fp_floor(1.1)+fp_log(1.0)+fp_sin(0.0)+fp_sinh(0.0)+fp_tan(1.0)\
+     +fp_tanh(1.0)+fp_atan2(1.0,1.0))\
+    +(x-(y-z))\
+    +(x+y) + (x*y)\
+    +fp_max(x,fp_max(x,fp_max(x,fp_max(x,x))))*-1.0\
+    +(z-z)\
+    +1/fp_sin(x/5) + 1/fp_cos(y/5) + 1/fp_tan(z/5)\
+    +fp_log10(1/fp_tan(z/5) + 1/fp_sin(y/5) + 1/fp_cos(x/5))\
+    +fp_log(30+x)*fp_log(40+y)/fp_log(50+z)\
+    +fp_sin(x/57.295779513082320877)\
+    +fp_asin(x/10)*57.295779513082320877\
+    +fp_floor(-x) + 1/fp_ceil(x)\
+    +fp_sqrt(5 * 0.2)\
+    +(-x+-x+-x+-x+-x+-x)

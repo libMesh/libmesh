@@ -1,0 +1,6 @@
+# multiplications by zero
+T=d f
+V=x,y
+R=0.1,10,0.1
+F=(x*y+1)+(sin(x)+sin(y))*log(x)*y*x*0
+C=(x*y+1)+(fp_sin(x)+fp_sin(y))*fp_log(x)*y*x*0
