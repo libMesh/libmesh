@@ -86,12 +86,15 @@ dnl      AC_F77_LIBRARY_LDFLAGS
       if (test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf) ; then           dnl 2.3.x	
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | grep -v mpiexec.uni` 
          MPI_INCLUDES_PATHS="`grep -m 1 "MPI_INCLUDE *=" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf | sed 's/.*= *//'`"
+         PETSc_INCLUDES_PATHS="-I$PETSC_DIR/bmake/$PETSC_ARCH/include -I$PETSC_DIR/include"
       elif (test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables) ; then dnl 3.0.x
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | grep -v mpiexec.uni`
          MPI_INCLUDES_PATHS="`grep -m 1 "MPI_INCLUDE *=" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables | sed 's/.*= *//'`"
+         PETSc_INCLUDES_PATHS="-I$PETSC_DIR/$PETSC_ARCH/include -I$PETSC_DIR/include"
       elif (test -r $PETSC_DIR/conf/petscvariables) ; then dnl 3.0.x
       	 PETSC_MPI=`grep MPIEXEC $PETSC_DIR/conf/petscvariables | grep -v mpiexec.uni`
          MPI_INCLUDES_PATHS="`grep -m 1 "MPI_INCLUDE *=" $PETSC_DIR/conf/petscvariables | sed 's/.*= *//'`"
+         PETSc_INCLUDES_PATHS="-I$PETSC_DIR/include"
       fi		 
       if test "x$PETSC_MPI" != x ; then
         AC_DEFINE(HAVE_MPI, 1,
@@ -110,6 +113,8 @@ dnl      PETSCINCLUDEDIRS=`cd $PETSC_DIR ; make getincludedirs`
 dnl
 dnl      AC_SUBST(PETSCLINKLIBS)
 dnl      AC_SUBST(PETSCINCLUDEDIRS)
+
+      AC_SUBST(PETSc_INCLUDES_PATHS)
 
       AC_SUBST(MPI_IMPL)
       AC_SUBST(MPI_INCLUDES_PATHS)

@@ -27,7 +27,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
 
        AC_LANG_PUSH([C++])
        OLD_CPPFLAGS=$CPPFLAGS
-       CPPFLAGS="-I$withtrilinosdir/include -I$withtrilinosdir/packages/aztecoo/src -I$withtrilinosdir/packages/nox/src -I$withtrilinosdir/packages/ml/src/Include $CPPFLAGS"
+       CPPFLAGS="$MPI_INCLUDES_PATHS $PETSc_INCLUDES_PATHS -I$withtrilinosdir/include -I$withtrilinosdir/packages/aztecoo/src -I$withtrilinosdir/packages/nox/src -I$withtrilinosdir/packages/ml/src/Include $CPPFLAGS"
        
        dnl ------------------------------------------------------
        dnl AztecOO
