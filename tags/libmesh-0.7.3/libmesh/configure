@@ -9992,7 +9992,7 @@ fi
       CPPFLAGS="-I$withtbb/include $CPPFLAGS"
       ac_fn_cxx_check_header_mongrel "$LINENO" "tbb/task_scheduler_init.h" "ac_cv_header_tbb_task_scheduler_init_h" "$ac_includes_default"
 if test "x$ac_cv_header_tbb_task_scheduler_init_h" = xyes; then :
-  TBB_INCLUDE='-I$withtbb/include'
+  TBB_INCLUDE="-I$withtbb/include"
 else
   withtbb=no
 fi
