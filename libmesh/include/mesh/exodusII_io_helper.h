@@ -25,6 +25,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "mesh_base.h"
 
@@ -333,10 +334,40 @@ public:
   void read_block_info();
 
   /**
-   * Get's the block number
-   * for the given block.
+   * Get the block number
+   * for the given block index.
    */
-  int get_block_id(int block);
+  int get_block_id(int index);
+
+  /**
+   * Get the block name for the given block index if supplied in
+   * the mesh file.  Otherwise an empty string is returned.
+   */
+  std::string get_block_name(int index);
+
+  /**
+   * Get the side set id
+   * for the given side set index.
+   */
+  int get_side_set_id(int index);
+
+  /**
+   * Get the side set name for the given side set index if supplied in
+   * the mesh file.  Otherwise an empty string is returned.
+   */
+  std::string get_side_set_name(int index);
+
+  /**
+   * Get the node set id
+   * for the given node set index.
+   */
+  int get_node_set_id(int index);
+
+  /**
+   * Get the node set name for the given node set index if supplied in
+   * the mesh file.  Otherwise an empty string is returned.
+   */
+  std::string get_node_set_name(int index);
 
   /**
    * Reads all of the element
@@ -547,6 +578,12 @@ public:
    */
   class ElementMaps;
 
+  /**
+   * This is the \p ExodusII_IO_Helper NamesData class.
+   * It manages the C datastructure necessary for writing out named
+   * entities to ExodusII files.
+   */
+  class NamesData;
 
   //private:
 
@@ -649,6 +686,13 @@ public:
   // allocation ourselves.
   std::vector<std::vector<char> > vvc;
   std::vector<char*> strings; // vector of pointers into vvc
+
+  /**
+   * Maps of Ids to named entities
+   */
+  std::map<int, std::string> id_to_block_names;
+  std::map<int, std::string> id_to_ss_names;
+  std::map<int, std::string> id_to_ns_names;
 
  protected:
   bool _created; // This flag gets set after the the create() function has been successfully called.
@@ -1079,6 +1123,32 @@ public:
    * @returns a conversion object given an element type.
    */
   ExodusII_IO_Helper::Conversion assign_conversion(const ElemType type);
+};
+
+/**
+ * This class is useful for managing the names for named entities in an ExodusII
+ * fortmat
+ */
+class ExodusII_IO_Helper::NamesData
+{
+public:
+  NamesData(size_t size);
+  ~NamesData();
+
+  /**
+   * Adds another name to the current data table
+   */
+  void push_back_entry(const std::string & name);
+
+  /**
+   * Writes the datastructure to the specified ExodusII file
+   */
+  int write_to_exodus(int ex_id, exII::ex_entity_type type);
+
+private:
+  char **data_table;
+  size_t counter;
+  size_t table_size;
 };
 
 

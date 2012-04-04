@@ -318,6 +318,24 @@ public:
   void print_summary (std::ostream& out=libMesh::out) const;
 
   /**
+   * Returns a writable reference for getting/setting an optional
+   * name for a sideset name.
+   */
+  std::string& sideset_name(boundary_id_type id);
+
+  /**
+   * Returns a writable reference for getting/setting an optional
+   * name for a nodeset name.
+   */
+  std::string& nodeset_name(boundary_id_type id);
+
+  /**
+   * Returns a the id of the requested boundary by name.  Throws an error
+   * if a sideset or nodeset by name is not found
+   */
+  boundary_id_type get_id_by_name(const std::string& name) const;
+
+  /**
    * Number used for internal use. This is the return value
    * if a boundary condition is not specified.
    */
@@ -366,6 +384,19 @@ public:
    */
   std::set<boundary_id_type> _node_boundary_ids;
 
+  /**
+   * This structure maintains the mapping of named side sets
+   * for file formats that support named blocks.  Currently
+   * this is only implemented for ExodusII
+   */
+  std::map<boundary_id_type, std::string> _ss_id_to_name;
+
+  /**
+   * This structure maintains the mapping of named node sets
+   * for file formats that support named blocks.  Currently
+   * this is only implemented for ExodusII
+   */
+  std::map<boundary_id_type, std::string> _ns_id_to_name;
 
 
 //   /**
@@ -379,8 +410,8 @@ public:
 //     void operator() (const std::pair<const Node*, short int>& np) const
 //     {
 //       libMesh::out << "  (" << np.first->id()
-// 		      << ", "  << np.second
-// 		      << ")"  << std::endl;
+//		      << ", "  << np.second
+//		      << ")"  << std::endl;
 //     }
 //   };
 
@@ -397,9 +428,9 @@ public:
 //     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
 //     {
 //       libMesh::out << "  (" << sp.first->id()
-// 		      << ", "  << sp.second.first
-// 		      << ", "  << sp.second.second
-// 		      << ")"   << std::endl;
+//		      << ", "  << sp.second.first
+//		      << ", "  << sp.second.second
+//		      << ")"   << std::endl;
 //     }
 //   };
 

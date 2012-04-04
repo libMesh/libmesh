@@ -1192,8 +1192,8 @@ void BoundaryInfo::print_info(std::ostream& out) const
 	  << "  (Node No., ID)               " << std::endl;
 
 //       std::for_each(_boundary_node_id.begin(),
-// 		    _boundary_node_id.end(),
-// 		    PrintNodeInfo());
+//		    _boundary_node_id.end(),
+//		    PrintNodeInfo());
 
       std::multimap<const Node*, boundary_id_type>::const_iterator it        = _boundary_node_id.begin();
       const std::multimap<const Node*, boundary_id_type>::const_iterator end = _boundary_node_id.end();
@@ -1213,8 +1213,8 @@ void BoundaryInfo::print_info(std::ostream& out) const
 	  << "  (Elem No., Side No., ID)      " << std::endl;
 
 //       std::for_each(_boundary_side_id.begin(),
-// 		    _boundary_side_id.end(),
-//   		    PrintSideInfo());
+//		    _boundary_side_id.end(),
+//		    PrintSideInfo());
 
       std::multimap<const Elem*,
 	std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_side_id.begin();
@@ -1283,6 +1283,42 @@ void BoundaryInfo::print_summary(std::ostream& out) const
 	    << ", "  << (*ID_it).second
 	    << ")"  << std::endl;
     }
+}
+
+std::string& BoundaryInfo::sideset_name(boundary_id_type id)
+{
+  return _ss_id_to_name[id];
+}
+
+std::string& BoundaryInfo::nodeset_name(boundary_id_type id)
+{
+  return _ns_id_to_name[id];
+}
+
+boundary_id_type BoundaryInfo::get_id_by_name(const std::string& name) const
+{
+  // This function is searching the keys of the map
+  // We might want to make this more efficient
+  std::map<boundary_id_type, std::string>::const_iterator iter = _ss_id_to_name.begin();
+  std::map<boundary_id_type, std::string>::const_iterator end_iter = _ss_id_to_name.end();
+
+  for ( ; iter != end_iter; ++iter)
+  {
+    if (iter->second == name)
+      return iter->first;
+  }
+
+  // Loop over nodesets
+  iter = _ns_id_to_name.begin();
+  end_iter = _ns_id_to_name.end();
+  for ( ; iter != end_iter; ++iter)
+  {
+    if (iter->second == name)
+      return iter->first;
+  }
+
+  std::cerr << "The sideset/nodeset name does not exist in mesh";
+  libmesh_error();
 }
 
 } // namespace libMesh
