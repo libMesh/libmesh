@@ -134,6 +134,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   else 
       # when --disable-fortran is specified, explicitly set these
       # to "no" to instruct libtool not to bother with them.
+      AC_MSG_RESULT(>>> Disabling Fortran language support per user request <<<)
       FC=no
       F77=no
   fi # end enablefortran   
