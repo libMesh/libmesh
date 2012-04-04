@@ -58,11 +58,14 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        dnl ML
        dnl ------------------------------------------------------
-       AC_CHECK_HEADER($withtrilinosdir/include/ml_include.h,
-                       enableml=yes,
-                       enableml=no)
+dnl - there's a conflict between HAVE_PETSC from our petsc.m4 and
+dnl   HAVE_PETSC in the trilinos headers.
+dnl       AC_CHECK_HEADER($withtrilinosdir/include/ml_MultiLevelPreconditioner.h,
+dnl                       enableml=yes,
+dnl                       enableml=no)
                      
-       if test "$enableml" != no ; then
+dnl       if test "$enableml" != no ; then
+       if test -f $withtrilinosdir/include/ml_MultiLevelPreconditioner.h; then
           AC_DEFINE(HAVE_ML, 1,
                     [Flag indicating whether the library shall be compiled to use the Trilinos ML package])
           AC_MSG_RESULT(<<< Configuring library with ML support >>>)
