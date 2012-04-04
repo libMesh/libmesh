@@ -31,6 +31,7 @@
 #include "system.h"
 #include "numeric_vector.h"
 
+#include <cstring>
 
 #ifdef DEBUG
 #include "mesh_tools.h"  // for elem_types warning
@@ -278,18 +279,60 @@ void ExodusII_IO_Helper::read_block_info()
 
   check_err(ex_err, "Error getting block IDs.");
   message("All block IDs retrieved successfully.");
+
+  char name_buffer[MAX_STR_LENGTH+1];
+  for (int i=0; i<num_elem_blk; ++i)
+  {
+    ex_err = exII::ex_get_name(ex_id, exII::EX_ELEM_BLOCK,
+                               block_ids[i], name_buffer);
+    check_err(ex_err, "Error getting block name.");
+    id_to_block_names[block_ids[i]] = name_buffer;
+  }
+  message("All block mames retrieved successfully.");
 }
 
 
-
-int ExodusII_IO_Helper::get_block_id(int block)
+int ExodusII_IO_Helper::get_block_id(int index)
 {
-  libmesh_assert (static_cast<unsigned int>(block) < block_ids.size());
+  libmesh_assert (static_cast<unsigned int>(index) < block_ids.size());
 
-  return block_ids[block];
+  return block_ids[index];
 }
 
+std::string ExodusII_IO_Helper::get_block_name(int index)
+{
+  libmesh_assert (static_cast<unsigned int>(index) < block_ids.size());
 
+  return id_to_block_names[block_ids[index]];
+}
+
+int ExodusII_IO_Helper::get_side_set_id(int index)
+{
+  libmesh_assert (static_cast<unsigned int>(index) < ss_ids.size());
+
+  return ss_ids[index];
+}
+
+std::string ExodusII_IO_Helper::get_side_set_name(int index)
+{
+  libmesh_assert (static_cast<unsigned int>(index) < ss_ids.size());
+
+  return id_to_ss_names[ss_ids[index]];
+}
+
+int ExodusII_IO_Helper::get_node_set_id(int index)
+{
+  libmesh_assert (static_cast<unsigned int>(index) < nodeset_ids.size());
+
+  return nodeset_ids[index];
+}
+
+std::string ExodusII_IO_Helper::get_node_set_name(int index)
+{
+  libmesh_assert (static_cast<unsigned int>(index) < nodeset_ids.size());
+
+  return id_to_ns_names[nodeset_ids[index]];
+}
 
 void ExodusII_IO_Helper::read_elem_in_block(int block)
 {
@@ -382,6 +425,16 @@ void ExodusII_IO_Helper::read_sideset_info()
       side_list.resize (num_elem_all_sidesets);
       id_list.resize   (num_elem_all_sidesets);
     }
+
+  char name_buffer[MAX_STR_LENGTH+1];
+  for (int i=0; i<num_side_sets; ++i)
+  {
+    ex_err = exII::ex_get_name(ex_id, exII::EX_SIDE_SET,
+                               ss_ids[i], name_buffer);
+    check_err(ex_err, "Error getting side set name.");
+    id_to_ss_names[ss_ids[i]] = name_buffer;
+  }
+  message("All side set mames retrieved successfully.");
 }
 
 void ExodusII_IO_Helper::read_nodeset_info()
@@ -398,6 +451,16 @@ void ExodusII_IO_Helper::read_nodeset_info()
       num_nodes_per_set.resize(num_node_sets);
       num_node_df_per_set.resize(num_node_sets);
     }
+
+  char name_buffer[MAX_STR_LENGTH+1];
+  for (int i=0; i<num_node_sets; ++i)
+  {
+    ex_err = exII::ex_get_name(ex_id, exII::EX_NODE_SET,
+                               nodeset_ids[i], name_buffer);
+    check_err(ex_err, "Error getting node set name.");
+    id_to_ns_names[nodeset_ids[i]] = name_buffer;
+  }
+  message("All node set mames retrieved successfully.");
 }
 
 
@@ -647,12 +710,6 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
       Elem * elem = *it;
       subdomain_id_type cur_subdomain = elem->subdomain_id();
 
-/*
-      if(cur_subdomain == 0)
-        // We are mapping 0 to the maximum size that ExodusII allows
-        cur_subdomain = std::numeric_limits<int>::max();
-*/
-
       subdomain_map[cur_subdomain].push_back(elem->id());
     }
   num_elem_blk = subdomain_map.size();
@@ -704,13 +761,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     Elem * elem = *it;
     subdomain_id_type cur_subdomain = elem->subdomain_id();
 
-/*
-    if(cur_subdomain == 0)
-      // We are mapping 0 to the maximum size that ExodusII allows
-      cur_subdomain = std::numeric_limits<int>::max();
-*/
-
-      subdomain_map[cur_subdomain].push_back(elem->id());
+    subdomain_map[cur_subdomain].push_back(elem->id());
   }
   num_elem_blk = subdomain_map.size();
 
@@ -840,12 +891,6 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
     unsigned int cur_subdomain = elem->subdomain_id();
 
-/*
-    if(cur_subdomain == 0)
-      // We are mapping 0 to the maximum size that ExodusII allows
-      cur_subdomain = std::numeric_limits<int>::max();
-*/
-
     subdomain_map[cur_subdomain].push_back(elem->id());
   }
 
@@ -854,12 +899,22 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
 
   // element map vector
-  block_ids.clear();
+  num_elem_blk = subdomain_map.size();
+  block_ids.resize(num_elem_blk);
   std::vector<unsigned int> elem_map(n_active_elem);
   std::vector<unsigned int>::iterator curr_elem_map_end = elem_map.begin();
+
+  // Note: It appears that there is a bug in exodusII::ex_put_name where
+  // the index returned from the ex_id_lkup is erronously used.  For now
+  // the work around is to use the alternative function ex_put_names, but
+  // this function requires a char** datastructure.
+  NamesData names_table(num_elem_blk);
+
+  unsigned int counter=0;
   for(it = subdomain_map.begin() ; it != subdomain_map.end(); it++)
     {
-      block_ids.push_back((*it).first);
+      block_ids[counter] = (*it).first;
+      names_table.push_back_entry(mesh.subdomain_name((*it).first));
 
       std::vector<unsigned int> & tmp_vec = (*it).second;
 
@@ -912,10 +967,15 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
                    std::bind2nd(std::plus<unsigned int>(), 1));  // Add one to each id for exodus!
     ex_err = exII::ex_put_elem_num_map(ex_id, (int *)&elem_map[0]);
     check_err(ex_err, "Error writing element map");
-  }
 
+    counter++;
+  }
 //  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
   check_err(ex_err, "Error writing element connectivities");
+
+  // Write out the block names
+  ex_err = names_table.write_to_exodus(ex_id, exII::EX_ELEM_BLOCK);
+  check_err(ex_err, "Error writing element names");
 }
 
 
@@ -939,12 +999,6 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
       if(elem->active())
       {
         unsigned int cur_subdomain = elem->subdomain_id();
-
-/*
-        if(cur_subdomain == 0)
-          // We are mapping 0 to the maximum size that ExodusII allows
-          cur_subdomain = std::numeric_limits<int>::max();
-*/
 
         subdomain_map[cur_subdomain].push_back(elem->id());
       }
@@ -1052,6 +1106,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
   std::vector<boundary_id_type> side_boundary_ids;
   mesh.boundary_info->build_side_boundary_ids(side_boundary_ids);
+  NamesData names_table(side_boundary_ids.size());
 
   for(unsigned int i = 0; i < side_boundary_ids.size(); i++)
   {
@@ -1059,11 +1114,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
     int actual_id = ss_id;
 
-/*
-    if(actual_id == 0)
-      // We are mapping 0 to the maximum size that ExodusII allows
-      actual_id = std::numeric_limits<int>::max();
-*/
+    names_table.push_back_entry(mesh.boundary_info->sideset_name(ss_id));
 
     ex_err = exII::ex_put_side_set_param(ex_id, actual_id, elem[ss_id].size(), 0);
     check_err(ex_err, "Error writing sideset parameters");
@@ -1071,6 +1122,10 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     ex_err = exII::ex_put_side_set(ex_id, actual_id, &elem[ss_id][0], &side[ss_id][0]);
     check_err(ex_err, "Error writing sidesets");
   }
+
+  // Write out the sideset names
+  ex_err = names_table.write_to_exodus(ex_id, exII::EX_SIDE_SET);
+  check_err(ex_err, "Error writing sideset names");
 }
 
 
@@ -1096,6 +1151,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
   std::vector<boundary_id_type> node_boundary_ids;
   mesh.boundary_info->build_node_boundary_ids(node_boundary_ids);
+  NamesData names_table(node_boundary_ids.size());
 
   for(unsigned int i = 0; i < node_boundary_ids.size(); i++)
   {
@@ -1103,11 +1159,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
     int actual_id = nodeset_id;
 
-/*
-    if(nodeset_id == 0)
-      // We are mapping 0 to the maximum size that ExodusII allows
-      actual_id = std::numeric_limits<int>::max();
-*/
+    names_table.push_back_entry(mesh.boundary_info->nodeset_name(nodeset_id));
 
     ex_err = exII::ex_put_node_set_param(ex_id, actual_id, node[nodeset_id].size(), 0);
     check_err(ex_err, "Error writing nodeset parameters");
@@ -1115,6 +1167,10 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
     ex_err = exII::ex_put_node_set(ex_id, actual_id, &node[nodeset_id][0]);
     check_err(ex_err, "Error writing nodesets");
   }
+
+  // Write out the nodeset names
+  ex_err = names_table.write_to_exodus(ex_id, exII::EX_NODE_SET);
+  check_err(ex_err, "Error writing nodeset names");
 }
 
 
@@ -1313,12 +1369,6 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
       if(elem->active())
       {
         unsigned int cur_subdomain = elem->subdomain_id();
-
-/*
-        if(cur_subdomain == 0)
-          // We are mapping 0 to the maximum size that ExodusII allows
-          cur_subdomain = std::numeric_limits<int>::max();
-*/
 
         subdomain_map[cur_subdomain].push_back(elem->id());
       }
@@ -1762,6 +1812,37 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 			TRI3,
 			"TRI3");
   return conv;
+}
+
+ExodusII_IO_Helper::NamesData::NamesData(size_t size) :
+    data_table(new char *[size]),
+    counter(0),
+    table_size(size)
+{
+  for (size_t i=0; i<size; ++i)
+    data_table[i] = new char[MAX_STR_LENGTH];
+}
+
+ExodusII_IO_Helper::NamesData::~NamesData()
+{
+  for (size_t i=0; i<table_size; ++i)
+    delete [] data_table[i];
+  delete [] data_table;
+}
+
+void ExodusII_IO_Helper::NamesData::push_back_entry(const std::string & name)
+{
+  libmesh_assert(counter < table_size);
+
+  data_table[counter][ name.copy(data_table[counter], name.length()) ] = '\0';
+  ++counter;
+}
+
+int ExodusII_IO_Helper::NamesData::write_to_exodus(int ex_id, exII::ex_entity_type type)
+{
+  if (table_size)
+    return exII::ex_put_names(ex_id, type, data_table);
+  return 0; // EX_NOERR
 }
 
 } // namespace libMesh

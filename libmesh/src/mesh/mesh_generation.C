@@ -455,6 +455,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	for (unsigned int p=0; p<mesh.n_nodes(); p++)
 	  mesh.node(p)(0) = (mesh.node(p)(0))*(xmax-xmin) + xmin;
 
+        // Add sideset names to boundary info
+        mesh.boundary_info->sideset_name(0) = "left";
+        mesh.boundary_info->sideset_name(1) = "right";
+
 	break;
       }
 
@@ -805,6 +809,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    mesh.node(p)(1) = (mesh.node(p)(1))*(ymax-ymin) + ymin;
 	  }
 
+        // Add sideset names to boundary info
+        mesh.boundary_info->sideset_name(0) = "bottom";
+        mesh.boundary_info->sideset_name(1) = "right";
+        mesh.boundary_info->sideset_name(2) = "top";
+        mesh.boundary_info->sideset_name(3) = "left";
 
 	break;
       }
@@ -1419,6 +1428,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    mesh.all_second_order();
 	  }
 
+        // Add sideset names to boundary info (Z axis out of the screen)
+        mesh.boundary_info->sideset_name(0) = "back";
+        mesh.boundary_info->sideset_name(1) = "bottom";
+        mesh.boundary_info->sideset_name(2) = "right";
+        mesh.boundary_info->sideset_name(3) = "top";
+        mesh.boundary_info->sideset_name(4) = "left";
+        mesh.boundary_info->sideset_name(5) = "front";
 
 	break;
       } // end case dim==3
@@ -1940,7 +1956,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 
       for (unsigned int k=0; k != order*nz+1; ++k)
         {
-          Node *new_node = 
+          Node *new_node =
 	    mesh.add_point(*node +
                            (extrusion_vector * k / nz / order),
                            node->id() + (k * orig_nodes),
