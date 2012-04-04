@@ -231,6 +231,9 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	// as the active ones for data structure consistency.  We also
 	// ship any nodes connected to these elements.  Note some of these nodes
 	// and elements may be replicated from other processors, but that is OK.
+	//
+	// FIXME - this ends up serializing meshes with only one
+	// top_parent!!!
 	std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
 	std::set<const Node*> connected_nodes;
 	{
