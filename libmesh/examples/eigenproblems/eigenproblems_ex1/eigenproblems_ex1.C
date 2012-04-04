@@ -17,7 +17,7 @@
 
 
 
-// <h1>Example 16 - Solving an Eigen Problem</h1>
+// <h1>Eigenproblems Example 1 - Solving an Eigen Problem</h1>
 //
 // This example introduces the EigenSystem and shows
 // how libMesh can be used for eigenvalue analysis.

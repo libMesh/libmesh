@@ -17,7 +17,7 @@
 
 
 
-// <h1>Example 17 - Solving a generalized Eigen Problem</h1>
+// <h1>Eigenproblems Example 2 - Solving a generalized Eigen Problem</h1>
 //
 // This example shows how the previous EigenSolver example 
 // can be adapted to solve generailzed eigenvalue problems.

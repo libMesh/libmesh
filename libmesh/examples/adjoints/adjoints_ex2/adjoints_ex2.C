@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  U$ */
 
-// <h1>Example 27 - Laplace Equation in the L-Shaped Domain with
+// <h1>Adjoints Example 2 - Laplace Equation in the L-Shaped Domain with
 // Adjoint based sensitivity</h1>
  //
  // This example solves the Laplace equation on the classic "L-shaped"

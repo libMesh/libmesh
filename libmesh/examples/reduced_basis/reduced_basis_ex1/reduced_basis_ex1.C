@@ -41,7 +41,7 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// <h1>Reduced Basis: Example 1</h1>
+// <h1>Reduced Basis Example 1 - Certified Reduced Basis Method</h1>
  
 // In this example problem we use the Certified Reduced Basis method
 // to solve a steady convection-diffusion problem on the unit square.

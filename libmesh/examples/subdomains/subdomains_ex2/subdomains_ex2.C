@@ -17,8 +17,7 @@
 
 
 
- // <h1>Example 28 - Solving a Problem with Subdomain-Restricted
- // Variables</h1>
+ // <h1>Subdomains Example 2 - Subdomain-Restricted Variables</h1>
  //
  // This example builds on the fourth example program by showing how
  // to restrict solution fields to a subdomain (or union of

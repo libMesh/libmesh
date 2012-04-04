@@ -17,7 +17,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// <h1>Reduced Basis: Example 4</h1>
+// <h1>Reduced Basis Example 4 - Empirical Interpolation Method</h1>
 
 // In this example problem we develop a reduced basis approximation for a parametrized
 // PDE that has "non-affine" parameter dependence. This requires the use of the

@@ -41,7 +41,7 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// <h1>Reduced Basis: Example 5</h1>
+// <h1>Reduced Basis: Example 5 - Reduced Cantilever Problem</h1>
 // Reduced Basis version of systems_of_equations_ex4: 2D cantilever
 
 // In this example we consider the same problem as systems_of_equations_ex4,

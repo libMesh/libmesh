@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Example 13 - Unsteady Navier-Stokes Equations - Unsteady Nonlinear Systems of Equations</h1>
+ // <h1>Systems Example 2 - Unsteady Nonlinear Navier-Stokes</h1>
  //
  // This example shows how a simple, unsteady, nonlinear system of equations
  // can be solved in parallel.  The system of equations are the familiar

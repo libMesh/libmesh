@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-  // <h1>Example 24 - Periodic Boundary Conditions with Adaptive Mesh Refinement</h1>
+  // <h1>Adaptivity Example 5 - Periodic Boundary Conditions with Adaptive Mesh Refinement</h1>
   // 
   // This example uses the same simple, linear transient
   // system as in example 10; however in this case periodic boundary

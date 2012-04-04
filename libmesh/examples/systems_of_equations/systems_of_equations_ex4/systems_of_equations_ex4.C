@@ -17,7 +17,7 @@
 
 
 
- // <h1> Systems of Equations 4 - Linear elastic cantilever </h1>
+ // <h1> Systems Example 4 - Linear Elastic Cantilever </h1>
  //      By David Knezevic
  //
  // In this example we model a homogeneous isotropic cantilever
