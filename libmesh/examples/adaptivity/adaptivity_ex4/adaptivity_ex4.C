@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Example 15 - Biharmonic Equation</h1>
+ // <h1>Adaptivity Example 4 - Biharmonic Equation</h1>
  //
  // This example solves the Biharmonic equation on a square or cube,
  // using a Galerkin formulation with C1 elements approximating the

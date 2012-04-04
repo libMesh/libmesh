@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Example 0 - Solving 1D PDE Using Adaptive Mesh Refinement</h1>
+ // <h1>Adaptivity Example 1 - Solving 1D PDE Using Adaptive Mesh Refinement</h1>
  // 
  // This example demonstrates how to solve a simple 1D problem
  // using adaptive mesh refinement. The PDE that is solved is:

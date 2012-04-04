@@ -17,7 +17,7 @@
 
 
 
- // <h1> Systems of Equations 5 - Linear elastic cantilever with constraint </h1>
+ // <h1> Systems Example 5 - Linear Elastic Cantilever with Constraint </h1>
  //      By David Knezevic
  //
  // In this example we extend systems_of_equations_ex4 to enforce a constraint.

@@ -16,7 +16,7 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 
- // <h1>Example 3 - Solving a Poisson Problem</h1>
+ // <h1>Introduction Example 3 - Solving a Poisson Problem</h1>
  //
  // This is the third example program.  It builds on
  // the second example program by showing how to solve a simple

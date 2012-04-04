@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-  // <h1>Example 10 - Solving a Transient System with Adaptive Mesh Refinement</h1>
+  // <h1>Adaptivity Example 2 - Solving a Transient System with Adaptive Mesh Refinement</h1>
   // 
   // This example shows how a simple, linear transient
   // system can be solved in parallel.  The system is simple

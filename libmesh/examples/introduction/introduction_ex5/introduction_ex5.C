@@ -18,7 +18,7 @@
 
 
 
- // <h1>Example 5 - Run-Time Quadrature Rule Selection</h1>
+ // <h1>Introduction Example 5 - Run-Time Quadrature Rule Selection</h1>
  //
  // This is the fifth example program.  It builds on
  // the previous two examples, and extends the use

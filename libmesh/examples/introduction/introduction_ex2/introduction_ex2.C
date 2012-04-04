@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Example 2 - Defining a Simple System</h1>
+ // <h1>Introduction Example 2 - Defining a Simple System</h1>
  //
  // This is the second example program.  It demonstrates how to
  // create an equation system for a simple scalar system.  This
