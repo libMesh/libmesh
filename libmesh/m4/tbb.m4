@@ -23,7 +23,7 @@ AC_DEFUN([CONFIGURE_TBB],
       OLD_CPPFLAGS=$CPPFLAGS
       CPPFLAGS="-I$withtbb/include $CPPFLAGS"
       AC_CHECK_HEADER(tbb/task_scheduler_init.h,
-                      TBB_INCLUDE='-I$withtbb/include',
+                      TBB_INCLUDE="-I$withtbb/include",
                       withtbb=no)
       CPPFLAGS=$OLD_CPPFLAGS
     fi
