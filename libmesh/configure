@@ -9686,17 +9686,8 @@ $as_echo "#define HAVE_NOX 1" >>confdefs.h
 $as_echo "<<< Configuring library with NOX support >>>" >&6; }
        fi
 
-                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/ml_include.h" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/ml_include.h" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
-  enableml=yes
-else
-  enableml=no
-fi
 
-
-
-       if test "$enableml" != no ; then
+       if test -f $withtrilinosdir/include/ml_MultiLevelPreconditioner.h; then
 
 $as_echo "#define HAVE_ML 1" >>confdefs.h
 
