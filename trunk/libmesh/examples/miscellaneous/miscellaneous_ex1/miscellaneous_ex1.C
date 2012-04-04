@@ -18,7 +18,7 @@
 
 
 
- // <h1>Example 6 - Infinite Elements for the Wave Equation</h1>
+ // <h1>Miscellaneous Example 1 - Infinite Elements for the Wave Equation</h1>
  //
  // This is the sixth example program.  It builds on
  // the previous examples, and introduces the Infinite

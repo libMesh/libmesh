@@ -17,7 +17,7 @@
 
 
 
- // <h1>Example 19 - Solving the 2D Young Laplace Problem using nonlinear solvers</h1>
+ // <h1>Miscellaneous Example 3 - 2D Laplace-Young Problem Using Nonlinear Solvers</h1>
  //
  // This example shows how to use the NonlinearImplicitSystem class
  // to efficiently solve nonlinear problems in parallel.
