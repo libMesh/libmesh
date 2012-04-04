@@ -14,20 +14,19 @@ AC_DEFUN([CONFIGURE_TBB],
               withtbblib=$TBB_LIB_PATH)
 
   if test "$withtbb" != no ; then
-    if test "x$withtbb" = x ; then
-      withtbb=/usr
-    fi
-
     AC_LANG_PUSH([C++])
-    OLD_CPPFLAGS=$CPPFLAGS
-    AC_CHECK_HEADER(tbb/task_scheduler_init.h,
-      [TBB_INCLUDE=''
-       withtbb=builtin],
-      [CPPFLAGS="-I$withtbb/include $CPPFLAGS"
-       AC_CHECK_HEADER(tbb/task_scheduler_init.h,
-                       TBB_INCLUDE='-I$withtbb/include',
-                       withtbb=no)
-       CPPFLAGS=$OLD_CPPFLAGS])
+    if test "x$withtbb" = x ; then
+      AC_CHECK_HEADER(tbb/task_scheduler_init.h,
+        [TBB_INCLUDE=''
+         withtbb=builtin],)
+    else
+      OLD_CPPFLAGS=$CPPFLAGS
+      CPPFLAGS="-I$withtbb/include $CPPFLAGS"
+      AC_CHECK_HEADER(tbb/task_scheduler_init.h,
+                      TBB_INCLUDE='-I$withtbb/include',
+                      withtbb=no)
+      CPPFLAGS=$OLD_CPPFLAGS
+    fi
     AC_LANG_POP([C++])
   fi
 

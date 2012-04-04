@@ -9973,24 +9973,24 @@ fi
 
 
   if test "$withtbb" != no ; then
-    if test "x$withtbb" = x ; then
-      withtbb=/usr
-    fi
-
     ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    OLD_CPPFLAGS=$CPPFLAGS
-    ac_fn_cxx_check_header_mongrel "$LINENO" "tbb/task_scheduler_init.h" "ac_cv_header_tbb_task_scheduler_init_h" "$ac_includes_default"
+    if test "x$withtbb" = x ; then
+      ac_fn_cxx_check_header_mongrel "$LINENO" "tbb/task_scheduler_init.h" "ac_cv_header_tbb_task_scheduler_init_h" "$ac_includes_default"
 if test "x$ac_cv_header_tbb_task_scheduler_init_h" = xyes; then :
   TBB_INCLUDE=''
-       withtbb=builtin
-else
-  CPPFLAGS="-I$withtbb/include $CPPFLAGS"
-       ac_fn_cxx_check_header_mongrel "$LINENO" "tbb/task_scheduler_init.h" "ac_cv_header_tbb_task_scheduler_init_h" "$ac_includes_default"
+         withtbb=builtin
+fi
+
+
+    else
+      OLD_CPPFLAGS=$CPPFLAGS
+      CPPFLAGS="-I$withtbb/include $CPPFLAGS"
+      ac_fn_cxx_check_header_mongrel "$LINENO" "tbb/task_scheduler_init.h" "ac_cv_header_tbb_task_scheduler_init_h" "$ac_includes_default"
 if test "x$ac_cv_header_tbb_task_scheduler_init_h" = xyes; then :
   TBB_INCLUDE='-I$withtbb/include'
 else
@@ -9998,10 +9998,8 @@ else
 fi
 
 
-       CPPFLAGS=$OLD_CPPFLAGS
-fi
-
-
+      CPPFLAGS=$OLD_CPPFLAGS
+    fi
     ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
