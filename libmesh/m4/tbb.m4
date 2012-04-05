@@ -18,7 +18,8 @@ AC_DEFUN([CONFIGURE_TBB],
     if test "x$withtbb" = x ; then
       AC_CHECK_HEADER(tbb/task_scheduler_init.h,
         [TBB_INCLUDE=''
-         withtbb=builtin],)
+         withtbb=builtin],
+        withtbb=no)
     else
       OLD_CPPFLAGS=$CPPFLAGS
       CPPFLAGS="-I$withtbb/include $CPPFLAGS"
@@ -46,5 +47,7 @@ AC_DEFUN([CONFIGURE_TBB],
     AC_DEFINE(HAVE_TBB_API, 1,
               [Flag indicating whether the library shall be compiled to use the Threading Building Blocks])
     AC_MSG_RESULT(<<< Configuring library with Intel TBB threading support >>>)
+  else
+    AC_MSG_RESULT(<<< No Intel TBB found.  Threading support disabled. >>>)
   fi
 ])
