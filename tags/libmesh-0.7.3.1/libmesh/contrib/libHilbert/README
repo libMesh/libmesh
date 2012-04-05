@@ -1,0 +1,17 @@
+Compact Hilbert Indices
+=======================
+
+The newest version of this code can be found at
+
+  http://cs.dal.ca/~chamilto/hilbert/
+
+Building and Installation
+-------------------------
+
+The library is built in the typical way:
+
+./configure
+make
+make install
+
+Copyright 2006-2007 Chris Hamilton <chamilton@cs.dal.ca>

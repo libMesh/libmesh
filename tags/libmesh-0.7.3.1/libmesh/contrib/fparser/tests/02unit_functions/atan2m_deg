@@ -1,0 +1,6 @@
+DEG=true
+T=mf
+V=x,y
+R=-4, 4, 0.15
+F=atan2(x,y)
+C=r2d(MpfrFloat::atan2(x,y))

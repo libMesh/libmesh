@@ -1,0 +1,7 @@
+T=d ld f mf li gi cd cf cld
+V=x,y
+R=-3,3,2
+F=-5 + (if(1,5,0)*x*y)
+C=-5 + (5*x*y)
+
+# Expected result: (1 - x*y) * -5

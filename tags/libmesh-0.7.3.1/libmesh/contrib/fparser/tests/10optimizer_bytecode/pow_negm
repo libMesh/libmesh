@@ -1,0 +1,5 @@
+T=mf
+V=x
+R=0,1,1
+F=pow(-0.25,4)+x
+C=MpfrFloat::pow(-0.25,4)+x

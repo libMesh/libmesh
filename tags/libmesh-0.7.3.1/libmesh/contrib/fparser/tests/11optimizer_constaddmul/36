@@ -1,0 +1,5 @@
+T=d li cd
+V=a
+R=-15,15,2
+F=(7-abs(a))+5
+C=(7-fp_abs(a))+5
