@@ -93,7 +93,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
 		 [enablefortran=yes])
 
   
-  if (test "x$enablefortran" = yes); then
+  if (test "x$enablefortran" = xyes); then
   
     # look for a decent F90+ compiler or honor --with-fc=...
     FC_TRY_LIST="gfortran ifort pgf90 xlf95"
