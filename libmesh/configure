@@ -9975,6 +9975,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 if test "x$ac_cv_header_tbb_task_scheduler_init_h" = xyes; then :
   TBB_INCLUDE=''
          withtbb=builtin
+else
+  withtbb=no
 fi
 
 
@@ -10017,6 +10019,9 @@ $as_echo "#define HAVE_TBB_API 1" >>confdefs.h
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Intel TBB threading support >>>" >&5
 $as_echo "<<< Configuring library with Intel TBB threading support >>>" >&6; }
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< No Intel TBB found.  Threading support disabled. >>>" >&5
+$as_echo "<<< No Intel TBB found.  Threading support disabled. >>>" >&6; }
   fi
 
 
