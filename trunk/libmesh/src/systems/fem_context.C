@@ -324,6 +324,84 @@ Number FEMContext::point_value(unsigned int var, const Point &p) const
 
 
 
+Gradient FEMContext::point_gradient(unsigned int var, const Point &p) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+
+  // Get current local coefficients
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Build a FE for calculating u(p)
+  FEType fe_type = element_fe_var[var]->get_fe_type();
+  AutoPtr<FEBase> fe (FEBase::build(elem->dim(), fe_type));
+
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+  // Build a vector of point co-ordinates to send to reinit
+  std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, elem, p));
+
+  // Get the values of the shape function derivatives
+  const std::vector<std::vector<RealGradient> >&  dphi = fe->get_dphi();
+
+  // Reinitialize the element and compute the shape function values at coor
+  fe->reinit (elem, &coor);
+
+  Gradient grad_u;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    grad_u.add_scaled(dphi[l][0], coef(l));
+
+  return grad_u;
+}
+
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+Tensor FEMContext::point_hessian(unsigned int var, const Point &p) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+
+  // Get current local coefficients
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Build a FE for calculating u(p)
+  FEType fe_type = element_fe_var[var]->get_fe_type();
+  AutoPtr<FEBase> fe (FEBase::build(elem->dim(), fe_type));
+
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+  // Build a vector of point co-ordinates to send to reinit
+  std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, elem, p));
+
+  // Get the values of the shape function derivatives
+  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
+
+  // Reinitialize the element and compute the shape function values at coor
+  fe->reinit (elem, &coor);
+
+  Tensor hess_u;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    hess_u.add_scaled(d2phi[l][0], coef(l));
+
+  return hess_u;
+}
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+
+
+
 Number FEMContext::fixed_interior_value(unsigned int var, unsigned int qp) const
 {
   // Get local-to-global dof index lookup
@@ -507,6 +585,85 @@ Number FEMContext::fixed_point_value(unsigned int var, const Point &p) const
 
   return u;
 }
+
+
+
+Gradient FEMContext::fixed_point_gradient(unsigned int var, const Point &p) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+
+  // Get current local coefficients
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  // Build a FE for calculating u(p)
+  FEType fe_type = element_fe_var[var]->get_fe_type();
+  AutoPtr<FEBase> fe (FEBase::build(elem->dim(), fe_type));
+
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+  // Build a vector of point co-ordinates to send to reinit
+  std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, elem, p));
+
+  // Get the values of the shape function derivatives
+  const std::vector<std::vector<RealGradient> >&  dphi = fe->get_dphi();
+
+  // Reinitialize the element and compute the shape function values at coor
+  fe->reinit (elem, &coor);
+
+  Gradient grad_u;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    grad_u.add_scaled(dphi[l][0], coef(l));
+
+  return grad_u;
+}
+
+
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+Tensor FEMContext::fixed_point_hessian(unsigned int var, const Point &p) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+
+  // Get current local coefficients
+  libmesh_assert (elem_fixed_subsolutions.size() > var);
+  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+
+  // Build a FE for calculating u(p)
+  FEType fe_type = element_fe_var[var]->get_fe_type();
+  AutoPtr<FEBase> fe (FEBase::build(elem->dim(), fe_type));
+
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
+  // Build a vector of point co-ordinates to send to reinit
+  std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, elem, p));
+
+  // Get the values of the shape function derivatives
+  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
+
+  // Reinitialize the element and compute the shape function values at coor
+  fe->reinit (elem, &coor);
+
+  Tensor hess_u;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    hess_u.add_scaled(d2phi[l][0], coef(l));
+
+  return hess_u;
+}
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+
 
 
 

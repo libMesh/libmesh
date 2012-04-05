@@ -102,6 +102,12 @@ public:
    */
   Gradient side_gradient(unsigned int var, unsigned int qp) const;
 
+  /**
+   * Returns the gradient of the solution variable \p var at the physical
+   * point \p p on the current element
+   */
+  Gradient point_gradient(unsigned int var, const Point &p) const;
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
@@ -114,6 +120,12 @@ public:
    * point \p qp on the current element side
    */
   Tensor side_hessian(unsigned int var, unsigned int qp) const;
+
+  /**
+   * Returns the hessian of the solution variable \p var at the physical
+   * point \p p on the current element
+   */
+  Tensor point_hessian(unsigned int var, const Point &p) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -147,6 +159,12 @@ public:
    */
   Gradient fixed_side_gradient(unsigned int var, unsigned int qp) const;
 
+  /**
+   * Returns the gradient of the fixed_solution variable \p var at the physical
+   * point \p p on the current element
+   */
+  Gradient fixed_point_gradient(unsigned int var, const Point &p) const;
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
@@ -159,6 +177,12 @@ public:
    * point \p qp on the current element side
    */
   Tensor fixed_side_hessian(unsigned int var, unsigned int qp) const;
+
+  /**
+   * Returns the hessian of the fixed_solution variable \p var at the physical
+   * point \p p on the current element
+   */
+  Tensor fixed_point_hessian (unsigned int var, const Point &p) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
