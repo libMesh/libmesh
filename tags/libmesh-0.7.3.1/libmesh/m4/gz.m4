@@ -23,19 +23,15 @@ if (test $enablegz = yes); then
 fi
 
 
+dnl by now, enablegz is only yes if zlib.h was found, and we have libz, and gzstream.h
+dnl so we are good.
 if (test $enablegz = yes); then
 
-  dnl If both tests succeded, continue the configuration process.
-  if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then
-    GZSTREAM_INCLUDE="-I$PWD/contrib/gzstream"
-    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
-    AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
-    AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
-
-  dnl Otherwise do not enable gzstreams
-  else
-    enablegz=no;
-  fi
+  GZSTREAM_INCLUDE="-I$PWD/contrib/gzstream"
+  GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
+  AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
+  AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
+  
 fi
 
 AC_SUBST(GZSTREAM_INCLUDE)

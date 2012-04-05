@@ -10478,18 +10478,14 @@ fi
 
 if (test $enablegz = yes); then
 
-    if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then
-    GZSTREAM_INCLUDE="-I$PWD/contrib/gzstream"
-    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
+  GZSTREAM_INCLUDE="-I$PWD/contrib/gzstream"
+  GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
 
 $as_echo "#define HAVE_GZSTREAM 1" >>confdefs.h
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with gzstreams support >>>" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with gzstreams support >>>" >&5
 $as_echo "<<< Configuring library with gzstreams support >>>" >&6; }
 
-    else
-    enablegz=no;
-  fi
 fi
 
 
