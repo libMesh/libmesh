@@ -335,4 +335,33 @@ void MeshBase::clear_point_locator ()
 
 
 
+std::string& MeshBase::subdomain_name(subdomain_id_type id)
+{
+  return _block_id_to_name[id];
+}
+
+const std::string& MeshBase::subdomain_name(subdomain_id_type id) const
+{
+  std::map<subdomain_id_type, std::string>::const_iterator iter = _block_id_to_name.find(id);
+  if (iter == _block_id_to_name.end())
+    return empty;
+  else
+    return iter->second;
+}
+
+subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
+{
+  // This function is searching the keys of the map
+  // We might want to make this more efficient
+  std::map<subdomain_id_type, std::string>::const_iterator iter = _block_id_to_name.begin();
+  std::map<subdomain_id_type, std::string>::const_iterator end_iter = _block_id_to_name.end();
+
+  for ( ; iter != end_iter; ++iter)
+  {
+    if (iter->second == name)
+      return iter->first;
+  }
+  std::cerr << "Block name does not exist in mesh";
+  libmesh_error();
+}
 

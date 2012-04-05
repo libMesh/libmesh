@@ -603,6 +603,19 @@ public:
    */
   virtual void libmesh_assert_valid_parallel_ids() const {}
 
+  /**
+   * Returns a writable reference for getting/setting an optional
+   * name for a subdomain.
+   */
+  std::string& subdomain_name(subdomain_id_type id);
+  const std::string& subdomain_name(subdomain_id_type id) const;
+
+  /**
+   * Returns a the id of the requested block by name.  Throws an error
+   * if a block by name is not found
+   */
+  subdomain_id_type get_id_by_name(const std::string& name) const;
+
 public:
 
 
@@ -786,6 +799,19 @@ protected:
    * If this is true then no partitioning should be done.
    */
   bool _skip_partitioning;
+
+  /**
+   * This structure maintains the mapping of named blocks
+   * for file formats that support named blocks.  Currently
+   * this is only implemented for ExodusII
+   */
+  std::map<subdomain_id_type, std::string> _block_id_to_name;
+
+  /**
+   * An empty string that can be used as a constant reference when
+   * a non-existent name is requested
+   */
+  const std::string empty;
 
   /**
    * The partitioner class is a friend so that it can set

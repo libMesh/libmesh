@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  U$ */
 
- // <h1>Example 26 - Laplace Equation in the L-Shaped Domain with Adjoint based mesh refinement</h1>
+ // <h1>Adjoints Example 1 - Laplace Equation in the L-Shaped Domain with Adjoint based mesh refinement</h1>
  //
  // This example solves the Laplace equation on the classic "L-shaped"
  // domain with adaptive mesh refinement. The exact

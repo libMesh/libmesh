@@ -17,7 +17,7 @@
 
 
 
- // <h1>Example 4 - Solving a 1D, 2D or 3D Poisson Problem in Parallel</h1>
+ // <h1>Introduction Example 4 - Solving a 1D, 2D or 3D Poisson Problem in Parallel</h1>
  //
  // This is the fourth example program.  It builds on
  // the third example program by showing how to formulate
@@ -31,7 +31,7 @@
  // for bottlenecks where we should focus optimization efforts.
  //
  // This example also shows how to extend example 3 to run in
- // parallel.  Notice how litte has changed!  The significant
+ // parallel.  Notice how little has changed!  The significant
  // differences are marked with "PARALLEL CHANGE".
 
 

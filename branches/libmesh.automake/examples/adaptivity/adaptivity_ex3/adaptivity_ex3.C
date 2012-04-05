@@ -15,7 +15,7 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Example 14 - Laplace Equation in the L-Shaped Domain</h1>
+ // <h1>Adaptivity Example 3 - Laplace Equation in the L-Shaped Domain</h1>
  //
  // This example solves the Laplace equation on the classic "L-shaped"
  // domain with adaptive mesh refinement.  In this case, the exact

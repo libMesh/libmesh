@@ -86,7 +86,9 @@ void
 TrilinosPreconditioner<T>::compute()
 {
   Ifpack_Preconditioner * ifpack = NULL;
+#ifdef LIBMESH_HAVE_ML
   ML_Epetra::MultiLevelPreconditioner * ml = NULL;
+#endif
 
   switch (this->_preconditioner_type)
   {
@@ -117,7 +119,10 @@ void
 TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & preconditioner_type)
 {
   Ifpack_Preconditioner * pc = NULL;
+#ifdef LIBMESH_HAVE_ML
   ML_Epetra::MultiLevelPreconditioner * ml = NULL;
+#endif
+
   switch (preconditioner_type)
   {
   case IDENTITY_PRECOND:

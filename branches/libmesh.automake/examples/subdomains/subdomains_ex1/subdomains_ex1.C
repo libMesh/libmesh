@@ -17,7 +17,7 @@
 
 
 
- // <h1>Example 25 - Solving a 1D, 2D, or 3D Poisson on a subdomain</h1>
+ // <h1>Subdomains Example 1 - Solving on a Subdomain</h1>
  //
  // This example builds on the example 4 by showing what to do in
  // order to solve an equation only on a subdomain.

@@ -18,7 +18,7 @@
 
 
 
- // <h1>Example 7 - Introduction to Complex Numbers and the "FrequencySystem"</h1>
+ // <h1>Miscellaneous Example 2 - Complex Numbers and the "FrequencySystem"</h1>
  //
  // This is the seventh example program.  It builds on
  // the previous example programs, introduces complex
