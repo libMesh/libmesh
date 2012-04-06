@@ -69,6 +69,8 @@ void PetscMatrix<T>::init (const unsigned int m,
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
   // Is prefix information available somewhere? Perhaps pass in the system name?
   ierr = MatSetOptionsPrefix(_mat, "");
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
