@@ -544,16 +544,14 @@ if LIBMESH_ENABLE_FPARSER
 endif
 ###########################################################
 
-###########################################################
-# Finally, add external libraries which we require.
-#libmesh_la_LIBADD += $(libmesh_LIBS)
-
 
 
 ###########################################################
 # Utility programs
 bin_PROGRAMS = # empty, append below
 bin_SCRIPTS  = # empty, append below
+CLEANFILES   = # empty, append below
+
 bin_PROGRAMS     += meshtool
 meshtool_SOURCES  = src/apps/meshtool.C
 meshtool_LDADD    = libmesh.la
@@ -586,7 +584,18 @@ bin_PROGRAMS += output_libmesh_version
 output_libmesh_version_SOURCES = src/utils/output_libmesh_version.C
 output_libmesh_version_LDADD = libmesh.la
 
-bin_SCRIPTS += contrib/bin/libmesh-config 
+# create a METHOD-specific configure script - will need to clean it too!
+bin_SCRIPTS += contrib/bin/@host@_@METHOD@/libmesh-config
+CLEANFILES  += contrib/bin/@host@_@METHOD@/libmesh-config
+
+contrib/bin/@host@_@METHOD@/libmesh-config : contrib/bin/libmesh-config-METHOD
+	@echo "copying $< to $@"
+	@$(MKDIR_P) contrib/bin/@host@_@METHOD@
+	@cp $< $@
+
+# Support for libmesh-config-METHOD in $(exec_prefix)/bin
+libmesh_configdir      = $(exec_prefix)/bin
+libmesh_config_SCRIPTS = contrib/bin/libmesh-config
 
 ###########################################################
 # Examples
