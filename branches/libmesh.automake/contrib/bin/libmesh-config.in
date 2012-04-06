@@ -42,9 +42,9 @@ if (test -d $script_path); then
 	echo "Installed builds are:"
 	echo `ls -d $script_path/@host@*`
 	echo " "
-	echo "Did you 'make && make install' a METHOD=$METHOD build?"
-	return 1
+	echo "Did you 'make install' a METHOD=$METHOD build?"
+	exit 1
     fi	    
 fi
 
-return 0
+exit 0
