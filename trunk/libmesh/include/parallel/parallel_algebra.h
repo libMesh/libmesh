@@ -69,7 +69,7 @@ namespace Parallel {
       if (!_is_initialized)
         {
 #ifdef LIBMESH_HAVE_MPI
-          StandardType<T> T_type(&((*example)(0)));
+          StandardType<T> T_type(&((*ex)(0)));
           int blocklengths[LIBMESH_DIM+2];
           MPI_Aint displs[LIBMESH_DIM+2];
           MPI_Datatype types[LIBMESH_DIM+2];
@@ -128,7 +128,7 @@ namespace Parallel {
       if (!_is_initialized)
         {
 #ifdef LIBMESH_HAVE_MPI
-          StandardType<T> T_type(&((*example)(0)));
+          StandardType<T> T_type(&((*ex)(0)));
           int blocklengths[LIBMESH_DIM+2];
           MPI_Aint displs[LIBMESH_DIM+2];
           MPI_Datatype types[LIBMESH_DIM+2];
@@ -187,7 +187,7 @@ namespace Parallel {
       if (!_is_initialized)
         {
 #ifdef LIBMESH_HAVE_MPI
-          StandardType<Real> T_type(&((*example)(0)));
+          StandardType<Real> T_type(&((*ex)(0)));
           int blocklengths[LIBMESH_DIM+2];
           MPI_Aint displs[LIBMESH_DIM+2];
           MPI_Datatype types[LIBMESH_DIM+2];
