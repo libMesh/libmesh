@@ -1690,16 +1690,14 @@ The "matrix" and "rhs" are now ready for solution
 Compiling C++ (in optimized mode) miscellaneous_ex2.C...
 Linking miscellaneous_ex2-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./miscellaneous_ex2-opt -f .5 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./miscellaneous_ex2-opt -f .5
 ***************************************************************
  
-./miscellaneous_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Assertion `false' failed.  Configuring libMesh with --enable-complex may be required to run this code.
+ 
+***************************************************************
+* Done Running Example  ./miscellaneous_ex2-opt -f .5
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

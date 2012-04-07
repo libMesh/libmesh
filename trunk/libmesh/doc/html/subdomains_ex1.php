@@ -1825,16 +1825,463 @@ it will print its log to the screen. Pretty easy, huh?
 Compiling C++ (in optimized mode) subdomains_ex1.C...
 Linking subdomains_ex1-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./subdomains_ex1-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./subdomains_ex1-opt
 ***************************************************************
  
-./subdomains_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./subdomains_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./subdomains_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./subdomains_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./subdomains_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./subdomains_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Running ./subdomains_ex1-opt -d 1 -n 40
+
+ Mesh Information:
+  mesh_dimension()=1
+  spatial_dimension()=3
+  n_nodes()=43
+    n_local_nodes()=43
+  n_elem()=44
+    n_local_elem()=44
+    n_active_elem()=42
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Poisson"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=43
+    n_local_dofs()=43
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 2.95349
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 3
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+ Mesh Information:
+  mesh_dimension()=1
+  spatial_dimension()=3
+  n_nodes()=43
+    n_local_nodes()=43
+  n_elem()=44
+    n_local_elem()=44
+    n_active_elem()=42
+  n_subdomains()=2
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:03:06 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------
+| Matrix Assembly Performance: Alive time=0.001519, Active time=0.001018                                    |
+ -----------------------------------------------------------------------------------------------------------
+| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------|
+|                                                                                                           |
+| BCs                           34        0.0001      0.000003    0.0001      0.000003    11.59    11.59    |
+| Fe                            34        0.0003      0.000010    0.0003      0.000010    32.71    32.71    |
+| Ke                            34        0.0000      0.000001    0.0000      0.000001    2.36     2.36     |
+| elem init                     34        0.0005      0.000014    0.0005      0.000014    45.58    45.58    |
+| matrix insertion              34        0.0001      0.000002    0.0001      0.000002    7.76     7.76     |
+ -----------------------------------------------------------------------------------------------------------
+| Totals:                       170       0.0010                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------
+
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.079995, Active time=0.006212                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 1         0.0001      0.000053    0.0001      0.000053    0.85     0.85     |
+|   compute_sparsity()           1         0.0003      0.000296    0.0004      0.000358    4.76     5.76     |
+|   create_dof_constraints()     1         0.0000      0.000002    0.0000      0.000002    0.03     0.03     |
+|   distribute_dofs()            1         0.0001      0.000108    0.0003      0.000299    1.74     4.81     |
+|   dof_indices()                152       0.0002      0.000001    0.0002      0.000001    2.43     2.43     |
+|   prepare_send_list()          1         0.0000      0.000002    0.0000      0.000002    0.03     0.03     |
+|   reinit()                     1         0.0002      0.000190    0.0002      0.000190    3.06     3.06     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      1         0.0002      0.000174    0.0002      0.000226    2.80     3.64     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         36        0.0000      0.000001    0.0000      0.000001    0.80     0.80     |
+|   compute_face_map()           2         0.0000      0.000003    0.0000      0.000003    0.10     0.10     |
+|   compute_shape_functions()    36        0.0000      0.000001    0.0000      0.000001    0.45     0.45     |
+|   init_face_shape_functions()  1         0.0000      0.000009    0.0000      0.000009    0.14     0.14     |
+|   init_shape_functions()       3         0.0001      0.000027    0.0001      0.000027    1.30     1.30     |
+|                                                                                                            |
+| GnuPlotIO                                                                                                  |
+|   write_nodal_data()           1         0.0007      0.000730    0.0007      0.000730    11.75    11.75    |
+|                                                                                                            |
+| LocationMap                                                                                                |
+|   find()                       4         0.0000      0.000003    0.0000      0.000003    0.18     0.18     |
+|   init()                       1         0.0001      0.000053    0.0001      0.000053    0.85     0.85     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             2         0.0003      0.000163    0.0003      0.000163    5.26     5.26     |
+|   renumber_nodes_and_elem()    4         0.0000      0.000003    0.0000      0.000003    0.23     0.23     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     1         0.0000      0.000042    0.0010      0.001000    0.68     16.10    |
+|                                                                                                            |
+| MeshRefinement                                                                                             |
+|   _refine_elements()           1         0.0001      0.000099    0.0001      0.000136    1.59     2.19     |
+|   add_point()                  4         0.0000      0.000006    0.0000      0.000009    0.37     0.60     |
+|   make_refinement_compatible() 1         0.0000      0.000024    0.0000      0.000024    0.39     0.39     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0002      0.000155    0.0002      0.000155    2.50     2.50     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  1         0.0000      0.000001    0.0000      0.000001    0.02     0.02     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           2         0.0000      0.000018    0.0000      0.000018    0.58     0.58     |
+|                                                                                                            |
+| PetscLinearSolver                                                                                          |
+|   solve()                      1         0.0020      0.002034    0.0020      0.002034    32.74    32.74    |
+|                                                                                                            |
+| System                                                                                                     |
+|   assemble()                   1         0.0015      0.001513    0.0018      0.001758    24.36    28.30    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        262       0.0062                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+Running ./subdomains_ex1-opt -d 2 -n 30
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=1329
+    n_local_nodes()=1329
+  n_elem()=1268
+    n_local_elem()=1268
+    n_active_elem()=1176
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Poisson"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=1329
+    n_local_dofs()=1329
+    n_constrained_dofs()=184
+    n_local_constrained_dofs()=184
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 9.2167
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 15
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 184
+      Average DoF Constraint Length= 2
+      Number of Node Constraints = 368
+      Maximum Node Constraint Length= 3
+      Average Node Constraint Length= 2.5
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=1329
+    n_local_nodes()=1329
+  n_elem()=1268
+    n_local_elem()=1268
+    n_active_elem()=1176
+  n_subdomains()=2
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:03:06 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------
+| Matrix Assembly Performance: Alive time=0.022208, Active time=0.014648                                    |
+ -----------------------------------------------------------------------------------------------------------
+| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------|
+|                                                                                                           |
+| BCs                           628       0.0041      0.000007    0.0041      0.000007    28.12    28.12    |
+| Fe                            628       0.0051      0.000008    0.0051      0.000008    34.71    34.71    |
+| Ke                            628       0.0007      0.000001    0.0007      0.000001    4.49     4.49     |
+| elem init                     628       0.0039      0.000006    0.0039      0.000006    26.65    26.65    |
+| matrix insertion              628       0.0009      0.000001    0.0009      0.000001    6.03     6.03     |
+ -----------------------------------------------------------------------------------------------------------
+| Totals:                       3140      0.0146                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------
+
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.149911, Active time=0.074249                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 1         0.0008      0.000768    0.0008      0.000768    1.03     1.03     |
+|   build_constraint_matrix()    628       0.0011      0.000002    0.0011      0.000002    1.54     1.54     |
+|   cnstrn_elem_mat_vec()        628       0.0030      0.000005    0.0030      0.000005    4.09     4.09     |
+|   compute_sparsity()           1         0.0035      0.003460    0.0048      0.004785    4.66     6.44     |
+|   create_dof_constraints()     1         0.0049      0.004853    0.0070      0.007009    6.54     9.44     |
+|   distribute_dofs()            1         0.0010      0.001035    0.0040      0.004003    1.39     5.39     |
+|   dof_indices()                5520      0.0041      0.000001    0.0041      0.000001    5.49     5.49     |
+|   prepare_send_list()          1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                     1         0.0030      0.002967    0.0030      0.002967    4.00     4.00     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      2         0.0028      0.001404    0.0050      0.002489    3.78     6.70     |
+|                                                                                                            |
+| ExodusII_IO                                                                                                |
+|   write_nodal_data()           1         0.0026      0.002579    0.0026      0.002579    3.47     3.47     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         828       0.0009      0.000001    0.0009      0.000001    1.16     1.16     |
+|   compute_face_map()           200       0.0009      0.000004    0.0018      0.000009    1.17     2.44     |
+|   compute_shape_functions()    828       0.0005      0.000001    0.0005      0.000001    0.61     0.61     |
+|   init_face_shape_functions()  1         0.0000      0.000010    0.0000      0.000010    0.01     0.01     |
+|   init_shape_functions()       201       0.0006      0.000003    0.0006      0.000003    0.86     0.86     |
+|   inverse_map()                2072      0.0022      0.000001    0.0022      0.000001    2.92     2.92     |
+|                                                                                                            |
+| GMVIO                                                                                                      |
+|   write_nodal_data()           1         0.0078      0.007781    0.0078      0.007781    10.48    10.48    |
+|                                                                                                            |
+| LocationMap                                                                                                |
+|   find()                       1104      0.0016      0.000001    0.0016      0.000001    2.10     2.10     |
+|   init()                       1         0.0006      0.000618    0.0006      0.000618    0.83     0.83     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             2         0.0075      0.003734    0.0075      0.003734    10.06    10.06    |
+|   renumber_nodes_and_elem()    4         0.0004      0.000112    0.0004      0.000112    0.60     0.60     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     2         0.0001      0.000027    0.0154      0.007697    0.07     20.73    |
+|                                                                                                            |
+| MeshRefinement                                                                                             |
+|   _refine_elements()           1         0.0028      0.002788    0.0072      0.007191    3.75     9.68     |
+|   add_point()                  1104      0.0021      0.000002    0.0041      0.000004    2.89     5.46     |
+|   make_refinement_compatible() 1         0.0001      0.000106    0.0001      0.000106    0.14     0.14     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0016      0.001598    0.0016      0.001598    2.15     2.15     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           2         0.0003      0.000154    0.0003      0.000154    0.42     0.42     |
+|                                                                                                            |
+| PetscLinearSolver                                                                                          |
+|   solve()                      1         0.0043      0.004284    0.0043      0.004284    5.77     5.77     |
+|                                                                                                            |
+| System                                                                                                     |
+|   assemble()                   1         0.0134      0.013371    0.0224      0.022367    18.01    30.12    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        13141     0.0742                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+Running ./subdomains_ex1-opt -d 3 -n 15
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=10854
+    n_local_nodes()=10854
+  n_elem()=8767
+    n_local_elem()=8767
+    n_active_elem()=8093
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Poisson"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=10854
+    n_local_dofs()=10854
+    n_constrained_dofs()=4068
+    n_local_constrained_dofs()=4068
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 29.7157
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 78
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 4068
+      Average DoF Constraint Length= 2.66667
+      Number of Node Constraints = 5428
+      Maximum Node Constraint Length= 13
+      Average Node Constraint Length= 6.24613
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=10854
+    n_local_nodes()=10854
+  n_elem()=8767
+    n_local_elem()=8767
+    n_active_elem()=8093
+  n_subdomains()=2
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:03:07 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------
+| Matrix Assembly Performance: Alive time=0.378895, Active time=0.297449                                    |
+ -----------------------------------------------------------------------------------------------------------
+| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------|
+|                                                                                                           |
+| BCs                           2931      0.1352      0.000046    0.1352      0.000046    45.44    45.44    |
+| Fe                            2931      0.0807      0.000028    0.0807      0.000028    27.13    27.13    |
+| Ke                            2931      0.0236      0.000008    0.0236      0.000008    7.94     7.94     |
+| elem init                     2931      0.0389      0.000013    0.0389      0.000013    13.09    13.09    |
+| matrix insertion              2931      0.0190      0.000006    0.0190      0.000006    6.40     6.40     |
+ -----------------------------------------------------------------------------------------------------------
+| Totals:                       14655     0.2974                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------
+
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=1.22689, Active time=1.08058                                               |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 1         0.0075      0.007451    0.0075      0.007451    0.69     0.69     |
+|   build_constraint_matrix()    2931      0.0259      0.000009    0.0259      0.000009    2.40     2.40     |
+|   cnstrn_elem_mat_vec()        2931      0.0379      0.000013    0.0379      0.000013    3.51     3.51     |
+|   compute_sparsity()           1         0.0822      0.082197    0.1079      0.107898    7.61     9.99     |
+|   create_dof_constraints()     1         0.1197      0.119702    0.2219      0.221950    11.08    20.54    |
+|   distribute_dofs()            1         0.0113      0.011324    0.0324      0.032366    1.05     3.00     |
+|   dof_indices()                40989     0.0586      0.000001    0.0586      0.000001    5.42     5.42     |
+|   prepare_send_list()          1         0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|   reinit()                     1         0.0210      0.021041    0.0210      0.021041    1.95     1.95     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      2         0.0265      0.013267    0.0431      0.021559    2.46     3.99     |
+|                                                                                                            |
+| ExodusII_IO                                                                                                |
+|   write_nodal_data()           1         0.0179      0.017940    0.0179      0.017940    1.66     1.66     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         5649      0.0168      0.000003    0.0168      0.000003    1.56     1.56     |
+|   compute_face_map()           2718      0.0079      0.000003    0.0079      0.000003    0.73     0.73     |
+|   compute_shape_functions()    5649      0.0097      0.000002    0.0097      0.000002    0.89     0.89     |
+|   init_face_shape_functions()  1         0.0000      0.000020    0.0000      0.000020    0.00     0.00     |
+|   init_shape_functions()       2719      0.0638      0.000023    0.0638      0.000023    5.90     5.90     |
+|   inverse_map()                43392     0.0817      0.000002    0.0817      0.000002    7.56     7.56     |
+|                                                                                                            |
+| GMVIO                                                                                                      |
+|   write_nodal_data()           1         0.0764      0.076440    0.0764      0.076440    7.07     7.07     |
+|                                                                                                            |
+| LocationMap                                                                                                |
+|   find()                       37744     0.0236      0.000001    0.0236      0.000001    2.18     2.18     |
+|   init()                       1         0.0018      0.001792    0.0018      0.001792    0.17     0.17     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             2         0.0464      0.023207    0.0464      0.023207    4.30     4.30     |
+|   renumber_nodes_and_elem()    4         0.0063      0.001574    0.0063      0.001574    0.58     0.58     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     2         0.0001      0.000037    0.1376      0.068786    0.01     12.73    |
+|                                                                                                            |
+| MeshRefinement                                                                                             |
+|   _refine_elements()           1         0.0455      0.045523    0.1160      0.115999    4.21     10.73    |
+|   add_point()                  37744     0.0337      0.000001    0.0639      0.000002    3.11     5.91     |
+|   make_refinement_compatible() 1         0.0003      0.000284    0.0003      0.000284    0.03     0.03     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0054      0.005395    0.0054      0.005395    0.50     0.50     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           2         0.0013      0.000635    0.0013      0.000635    0.12     0.12     |
+|                                                                                                            |
+| PetscLinearSolver                                                                                          |
+|   solve()                      1         0.0448      0.044756    0.0448      0.044756    4.14     4.14     |
+|                                                                                                            |
+| System                                                                                                     |
+|   assemble()                   1         0.2066      0.206639    0.3791      0.379101    19.12    35.08    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        182494    1.0806                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./subdomains_ex1-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

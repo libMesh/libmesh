@@ -2190,16 +2190,312 @@ it will print its log to the screen. Pretty easy, huh?
 Compiling C++ (in optimized mode) adaptivity_ex4.C...
 Linking adaptivity_ex4-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./adaptivity_ex4-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./adaptivity_ex4-opt
 ***************************************************************
  
-./adaptivity_ex4-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex4-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex4-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex4-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex4-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex4-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+ EquationSystems
+  n_systems()=1
+   System #0, "Biharmonic"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="HERMITE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="THIRD", "THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 21.7778
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 36
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=25
+    n_local_nodes()=25
+  n_elem()=4
+    n_local_elem()=4
+    n_active_elem()=4
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Biharmonic"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="HERMITE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="THIRD", "THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 21.7778
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 36
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Beginning Solve 0
+Linear solver converged at step: 5, final residual: 2.30574e-13
+L2-Norm is: 0.384025
+H1-Norm is: 1.98976
+H2-Norm is: 14.3417
+
+L2-Error is: 0.0335358
+H1-Error is: 0.267039
+H2-Error is: 3.51162
+
+  Refining the mesh...
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=81
+    n_local_nodes()=81
+  n_elem()=20
+    n_local_elem()=20
+    n_active_elem()=16
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Biharmonic"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="HERMITE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="THIRD", "THIRD" 
+    n_dofs()=100
+    n_local_dofs()=100
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 27.04
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 36
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Beginning Solve 1
+Linear solver converged at step: 7, final residual: 1.23838e-11
+L2-Norm is: 0.404988
+H1-Norm is: 2.02995
+H2-Norm is: 14.7459
+
+L2-Error is: 0.0020746
+H1-Error is: 0.0316727
+H2-Error is: 0.822125
+
+  Refining the mesh...
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=289
+    n_local_nodes()=289
+  n_elem()=84
+    n_local_elem()=84
+    n_active_elem()=64
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Biharmonic"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="HERMITE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="THIRD", "THIRD" 
+    n_dofs()=324
+    n_local_dofs()=324
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 30.8642
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 36
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Beginning Solve 2
+Linear solver converged at step: 14, final residual: 7.14966e-12
+L2-Norm is: 0.406264
+H1-Norm is: 2.03164
+H2-Norm is: 14.7676
+
+L2-Error is: 0.000129445
+H1-Error is: 0.00390589
+H2-Error is: 0.202531
+
+  Refining the mesh...
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=1089
+    n_local_nodes()=1089
+  n_elem()=340
+    n_local_elem()=340
+    n_active_elem()=256
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Biharmonic"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="HERMITE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="THIRD", "THIRD" 
+    n_dofs()=1156
+    n_local_dofs()=1156
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 33.2318
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 36
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Beginning Solve 3
+Linear solver converged at step: 26, final residual: 3.41875e-10
+L2-Norm is: 0.406344
+H1-Norm is: 2.03174
+H2-Norm is: 14.7689
+
+L2-Error is: 8.07721e-06
+H1-Error is: 0.000486566
+H2-Error is: 0.050454
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:55:38 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.259792, Active time=0.160548                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 4         0.0003      0.000070    0.0003      0.000070    0.18     0.18     |
+|   compute_sparsity()           4         0.0049      0.001229    0.0053      0.001324    3.06     3.30     |
+|   create_dof_constraints()     4         0.0010      0.000254    0.0010      0.000254    0.63     0.63     |
+|   distribute_dofs()            4         0.0007      0.000170    0.0021      0.000513    0.42     1.28     |
+|   dof_indices()                1952      0.0031      0.000002    0.0031      0.000002    1.95     1.95     |
+|   old_dof_indices()            672       0.0008      0.000001    0.0008      0.000001    0.47     0.47     |
+|   prepare_send_list()          4         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                     4         0.0014      0.000341    0.0014      0.000341    0.85     0.85     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      1         0.0067      0.006653    0.0070      0.006988    4.14     4.35     |
+|                                                                                                            |
+| ExodusII_IO                                                                                                |
+|   write_nodal_data()           1         0.0017      0.001695    0.0017      0.001695    1.06     1.06     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         1812      0.0052      0.000003    0.0052      0.000003    3.21     3.21     |
+|   compute_face_map()           120       0.0011      0.000009    0.0025      0.000021    0.68     1.54     |
+|   compute_shape_functions()    804       0.0006      0.000001    0.0006      0.000001    0.38     0.38     |
+|   init_face_shape_functions()  120       0.0002      0.000001    0.0002      0.000001    0.10     0.10     |
+|   init_shape_functions()       804       0.0606      0.000075    0.0606      0.000075    37.74    37.74    |
+|   inverse_map()                5856      0.0157      0.000003    0.0157      0.000003    9.80     9.80     |
+|                                                                                                            |
+| LocationMap                                                                                                |
+|   find()                       1680      0.0021      0.000001    0.0021      0.000001    1.30     1.30     |
+|   init()                       6         0.0006      0.000097    0.0006      0.000097    0.36     0.36     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   all_second_order()           1         0.0001      0.000150    0.0001      0.000150    0.09     0.09     |
+|   contract()                   3         0.0001      0.000022    0.0001      0.000043    0.04     0.08     |
+|   find_neighbors()             5         0.0014      0.000283    0.0014      0.000283    0.88     0.88     |
+|   renumber_nodes_and_elem()    13        0.0002      0.000015    0.0002      0.000015    0.13     0.13     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     1         0.0000      0.000034    0.0087      0.008717    0.02     5.43     |
+|                                                                                                            |
+| MeshRefinement                                                                                             |
+|   _coarsen_elements()          3         0.0000      0.000012    0.0000      0.000012    0.02     0.02     |
+|   _refine_elements()           6         0.0030      0.000505    0.0082      0.001364    1.89     5.10     |
+|   add_point()                  1680      0.0024      0.000001    0.0048      0.000003    1.52     3.01     |
+|   make_coarsening_compatible() 3         0.0002      0.000083    0.0002      0.000083    0.16     0.16     |
+|   make_refinement_compatible() 3         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0002      0.000164    0.0002      0.000164    0.10     0.10     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  4         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           5         0.0001      0.000021    0.0001      0.000021    0.07     0.07     |
+|                                                                                                            |
+| PetscLinearSolver                                                                                          |
+|   solve()                      4         0.0145      0.003635    0.0145      0.003635    9.06     9.06     |
+|                                                                                                            |
+| ProjectVector                                                                                              |
+|   operator()                   3         0.0163      0.005441    0.0850      0.028330    10.17    52.94    |
+|                                                                                                            |
+| System                                                                                                     |
+|   assemble()                   4         0.0143      0.003563    0.0269      0.006714    8.88     16.73    |
+|   project_vector()             3         0.0010      0.000341    0.0864      0.028805    0.64     53.83    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        15594     0.1605                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./adaptivity_ex4-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>
