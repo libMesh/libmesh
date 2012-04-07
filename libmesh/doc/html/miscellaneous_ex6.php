@@ -899,16 +899,48 @@ Node pointer assigned from input mesh
 Compiling C++ (in optimized mode) miscellaneous_ex6.C...
 Linking miscellaneous_ex6-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./miscellaneous_ex6-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./miscellaneous_ex6-opt
 ***************************************************************
  
-./miscellaneous_ex6-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex6-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex6-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex6-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex6-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex6-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Triangulating an L-shaped domain with holes
+Tetrahedralizing a prismatic domain with a hole
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:00:41 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.162801, Active time=0.009924                                            |
+ -----------------------------------------------------------------------------------------------------------
+| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------|
+|                                                                                                           |
+|                                                                                                           |
+| Mesh                                                                                                      |
+|   find_neighbors()            5         0.0063      0.001254    0.0063      0.001254    63.16    63.16    |
+|   renumber_nodes_and_elem()   4         0.0000      0.000001    0.0000      0.000001    0.04     0.04     |
+|   write()                     2         0.0035      0.001736    0.0035      0.001736    34.99    34.99    |
+|                                                                                                           |
+| MeshTools::Generation                                                                                     |
+|   build_cube()                2         0.0001      0.000051    0.0001      0.000051    1.02     1.02     |
+|                                                                                                           |
+| Partitioner                                                                                               |
+|   single_partition()          3         0.0001      0.000026    0.0001      0.000026    0.80     0.80     |
+ -----------------------------------------------------------------------------------------------------------
+| Totals:                       16        0.0099                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./miscellaneous_ex6-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

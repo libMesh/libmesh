@@ -1784,16 +1784,234 @@ That's it.
 Compiling C++ (in optimized mode) systems_of_equations_ex3.C...
 Linking systems_of_equations_ex3-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./systems_of_equations_ex3-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./systems_of_equations_ex3-opt
 ***************************************************************
  
-./systems_of_equations_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./systems_of_equations_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./systems_of_equations_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./systems_of_equations_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./systems_of_equations_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./systems_of_equations_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=1681
+    n_local_nodes()=1681
+  n_elem()=400
+    n_local_elem()=400
+    n_active_elem()=400
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Navier-Stokes"
+    Type "TransientLinearImplicit"
+    Variables="u" "v" "p" "alpha" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "SCALAR", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" "CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" "SECOND", "THIRD" "FIRST", "THIRD" "FIRST", "THIRD" 
+    n_dofs()=3804
+    n_local_dofs()=3804
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 40.9611
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 3804
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+
+
+*** Solving time step 0, time = 0.01 ***
+Linear solver converged at step: 51, final residual: 0.000282517  Nonlinear convergence: ||u - u_old|| = 351.27
+Linear solver converged at step: 28, final residual: 1.94432e-05  Nonlinear convergence: ||u - u_old|| = 0.669457
+Linear solver converged at step: 26, final residual: 9.9625e-08  Nonlinear convergence: ||u - u_old|| = 0.00106343
+Linear solver converged at step: 51, final residual: 2.2288e-12  Nonlinear convergence: ||u - u_old|| = 1.31862e-06
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 1, time = 0.02 ***
+Linear solver converged at step: 43, final residual: 0.000268252  Nonlinear convergence: ||u - u_old|| = 28.9407
+Linear solver converged at step: 22, final residual: 2.0474e-05  Nonlinear convergence: ||u - u_old|| = 0.0406759
+Linear solver converged at step: 24, final residual: 1.13606e-07  Nonlinear convergence: ||u - u_old|| = 0.000291006
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 2, time = 0.03 ***
+Linear solver converged at step: 37, final residual: 0.000211185  Nonlinear convergence: ||u - u_old|| = 5.51324
+Linear solver converged at step: 22, final residual: 1.01956e-05  Nonlinear convergence: ||u - u_old|| = 0.010152
+Linear solver converged at step: 27, final residual: 2.19341e-08  Nonlinear convergence: ||u - u_old|| = 8.11809e-05
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 3, time = 0.04 ***
+Linear solver converged at step: 28, final residual: 0.000239596  Nonlinear convergence: ||u - u_old|| = 1.98656
+Linear solver converged at step: 18, final residual: 1.40382e-05  Nonlinear convergence: ||u - u_old|| = 0.00597138
+Linear solver converged at step: 26, final residual: 3.45223e-08  Nonlinear convergence: ||u - u_old|| = 0.000788902
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 4, time = 0.05 ***
+Linear solver converged at step: 23, final residual: 0.000271516  Nonlinear convergence: ||u - u_old|| = 0.90308
+Linear solver converged at step: 19, final residual: 2.05125e-05  Nonlinear convergence: ||u - u_old|| = 0.00911334
+Linear solver converged at step: 24, final residual: 1.2497e-07  Nonlinear convergence: ||u - u_old|| = 0.000231117
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 5, time = 0.06 ***
+Linear solver converged at step: 23, final residual: 0.000286766  Nonlinear convergence: ||u - u_old|| = 0.465784
+Linear solver converged at step: 15, final residual: 2.37663e-05  Nonlinear convergence: ||u - u_old|| = 0.00319799
+Linear solver converged at step: 22, final residual: 1.4492e-07  Nonlinear convergence: ||u - u_old|| = 0.00021429
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 6, time = 0.07 ***
+Linear solver converged at step: 20, final residual: 0.000214988  Nonlinear convergence: ||u - u_old|| = 0.257426
+Linear solver converged at step: 18, final residual: 9.75458e-06  Nonlinear convergence: ||u - u_old|| = 0.00379964
+Linear solver converged at step: 28, final residual: 1.82153e-08  Nonlinear convergence: ||u - u_old|| = 0.000121368
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 7, time = 0.08 ***
+Linear solver converged at step: 16, final residual: 0.000288175  Nonlinear convergence: ||u - u_old|| = 0.147923
+Linear solver converged at step: 17, final residual: 1.39429e-05  Nonlinear convergence: ||u - u_old|| = 0.00294817
+Linear solver converged at step: 27, final residual: 5.86368e-08  Nonlinear convergence: ||u - u_old|| = 0.000675384
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 8, time = 0.09 ***
+Linear solver converged at step: 12, final residual: 0.00026664  Nonlinear convergence: ||u - u_old|| = 0.0836352
+Linear solver converged at step: 16, final residual: 1.74409e-05  Nonlinear convergence: ||u - u_old|| = 0.0149322
+Linear solver converged at step: 26, final residual: 4.51411e-08  Nonlinear convergence: ||u - u_old|| = 0.00101604
+Linear solver converged at step: 58, final residual: 4.63147e-13  Nonlinear convergence: ||u - u_old|| = 1.22349e-06
+ Nonlinear solver converged at step 3
+
+
+*** Solving time step 9, time = 0.1 ***
+Linear solver converged at step: 11, final residual: 0.000222266  Nonlinear convergence: ||u - u_old|| = 0.0505015
+Linear solver converged at step: 16, final residual: 1.40075e-05  Nonlinear convergence: ||u - u_old|| = 0.0133331
+Linear solver converged at step: 26, final residual: 4.76113e-08  Nonlinear convergence: ||u - u_old|| = 0.000708594
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 10, time = 0.11 ***
+Linear solver converged at step: 10, final residual: 0.0002334  Nonlinear convergence: ||u - u_old|| = 0.0312642
+Linear solver converged at step: 16, final residual: 1.53859e-05  Nonlinear convergence: ||u - u_old|| = 0.0114389
+Linear solver converged at step: 25, final residual: 4.4058e-08  Nonlinear convergence: ||u - u_old|| = 0.000595688
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 11, time = 0.12 ***
+Linear solver converged at step: 10, final residual: 0.000145708  Nonlinear convergence: ||u - u_old|| = 0.0205172
+Linear solver converged at step: 18, final residual: 5.57254e-06  Nonlinear convergence: ||u - u_old|| = 0.00789617
+Linear solver converged at step: 28, final residual: 7.8298e-09  Nonlinear convergence: ||u - u_old|| = 0.000107391
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 12, time = 0.13 ***
+Linear solver converged at step: 9, final residual: 0.000231891  Nonlinear convergence: ||u - u_old|| = 0.0134976
+Linear solver converged at step: 16, final residual: 1.0847e-05  Nonlinear convergence: ||u - u_old|| = 0.00715589
+Linear solver converged at step: 22, final residual: 3.57505e-08  Nonlinear convergence: ||u - u_old|| = 0.000140108
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 13, time = 0.14 ***
+Linear solver converged at step: 8, final residual: 0.000250689  Nonlinear convergence: ||u - u_old|| = 0.00869476
+Linear solver converged at step: 15, final residual: 1.78541e-05  Nonlinear convergence: ||u - u_old|| = 0.0058858
+Linear solver converged at step: 23, final residual: 8.44376e-08  Nonlinear convergence: ||u - u_old|| = 0.000295337
+ Nonlinear solver converged at step 2
+
+
+*** Solving time step 14, time = 0.15 ***
+Linear solver converged at step: 7, final residual: 0.00027844  Nonlinear convergence: ||u - u_old|| = 0.00371045
+Linear solver converged at step: 14, final residual: 1.81545e-05  Nonlinear convergence: ||u - u_old|| = 0.00336089
+Linear solver converged at step: 25, final residual: 1.0133e-07  Nonlinear convergence: ||u - u_old|| = 0.000575618
+ Nonlinear solver converged at step 2
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:04:16 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------
+| Example 13 Performance: Alive time=4.7448, Active time=4.652                                              |
+ -----------------------------------------------------------------------------------------------------------
+| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------|
+|                                                                                                           |
+| linear solve                  47        4.6520      0.098979    4.6520      0.098979    100.00   100.00   |
+ -----------------------------------------------------------------------------------------------------------
+| Totals:                       47        4.6520                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------
+
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=4.85156, Active time=4.7016                                                |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   SCALAR_dof_indices()         44000     0.0211      0.000000    0.0211      0.000000    0.45     0.45     |
+|   add_neighbors_to_send_list() 1         0.0003      0.000269    0.0003      0.000269    0.01     0.01     |
+|   compute_sparsity()           1         0.0133      0.013300    0.0171      0.017075    0.28     0.36     |
+|   create_dof_constraints()     1         0.0002      0.000212    0.0002      0.000212    0.00     0.00     |
+|   distribute_dofs()            1         0.0010      0.001004    0.0028      0.002805    0.02     0.06     |
+|   dof_indices()                118400    0.1394      0.000001    0.1677      0.000001    2.96     3.57     |
+|   prepare_send_list()          1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                     1         0.0018      0.001799    0.0018      0.001799    0.04     0.04     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      15        0.0303      0.002022    0.0564      0.003759    0.65     1.20     |
+|                                                                                                            |
+| ExodusII_IO                                                                                                |
+|   write_nodal_data()           15        0.0281      0.001873    0.0281      0.001873    0.60     0.60     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         37600     0.0641      0.000002    0.0641      0.000002    1.36     1.36     |
+|   compute_shape_functions()    37600     0.0276      0.000001    0.0276      0.000001    0.59     0.59     |
+|   init_shape_functions()       94        0.0037      0.000039    0.0037      0.000039    0.08     0.08     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             1         0.0008      0.000794    0.0008      0.000794    0.02     0.02     |
+|   renumber_nodes_and_elem()    2         0.0001      0.000058    0.0001      0.000058    0.00     0.00     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     15        0.0003      0.000022    0.0848      0.005655    0.01     1.80     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0008      0.000833    0.0008      0.000833    0.02     0.02     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           1         0.0001      0.000093    0.0001      0.000093    0.00     0.00     |
+|                                                                                                            |
+| PetscLinearSolver                                                                                          |
+|   solve()                      47        2.7025      0.057501    2.7025      0.057501    57.48    57.48    |
+|                                                                                                            |
+| System                                                                                                     |
+|   assemble()                   47        1.6661      0.035449    1.9308      0.041080    35.44    41.07    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        237845    4.7016                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./systems_of_equations_ex3-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

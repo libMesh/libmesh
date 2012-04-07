@@ -646,16 +646,505 @@ Updated .depend
 Compiling C++ (in optimized mode) reduced_basis_ex1.C...
 Linking reduced_basis_ex1-opt...
 ***************************************************************
-* Running  mpirun -np 6 ./reduced_basis_ex1-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running  ./reduced_basis_ex1-opt
 ***************************************************************
  
-./reduced_basis_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+*** Warning, This code is untested, experimental, or likely to see future API changes: src/reduced_basis/rb_parametrized_object.C, line 31, compiled Apr  7 2012 at 15:51:42 ***
+ EquationSystems
+  n_systems()=1
+   System #0, "RBConvectionDiffusion"
+    Type "RBConstruction"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=2601
+    n_local_dofs()=2601
+    n_constrained_dofs()=200
+    n_local_constrained_dofs()=200
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 8.76624
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 200
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=2601
+    n_local_nodes()=2601
+  n_elem()=2500
+    n_local_elem()=2500
+    n_active_elem()=2500
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+Initializing training parameters with deterministic training set...
+Parameter 0: log scaling = 0
+Parameter 1: log scaling = 0
+
+
+RBConstruction parameters:
+system name: RBConvectionDiffusion
+constrained_problem: 0
+Nmax: 20
+A_q operators attached: 3
+F_q functions attached: 1
+n_outputs: 4
+output 0, Q_l = 1
+output 1, Q_l = 1
+output 2, Q_l = 1
+output 3, Q_l = 1
+Number of parameters: 2
+Parameter 0: Min = -2, Max = 2
+Parameter 1: Min = -2, Max = 2
+n_training_samples: 100
+single-matrix mode? 0
+reuse preconditioner? 1
+use a relative error bound in greedy? 0
+write out data during basis training? 0
+quiet mode? 1
+parameter initialized to: 
+mu[0] = -2
+mu[1] = -2
+
+Compute output dual norms
+output_dual_norms[0][0] = 0.323675
+output_dual_norms[1][0] = 0.323675
+output_dual_norms[2][0] = 0.323675
+output_dual_norms[3][0] = 0.323675
+
+---- Performing Greedy basis enrichment ----
+
+---- Basis dimension: 0 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 3.74824
+
+Performing truth solve at parameter:
+mu[0] = -2
+mu[1] = -2
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 1 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 6.67625
+
+Performing truth solve at parameter:
+mu[0] = 2
+mu[1] = 2
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 2 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 5.18295
+
+Performing truth solve at parameter:
+mu[0] = -2
+mu[1] = 2
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 3 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 3.59028
+
+Performing truth solve at parameter:
+mu[0] = 2
+mu[1] = -2
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 4 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 2.71338
+
+Performing truth solve at parameter:
+mu[0] = 0.222222
+mu[1] = 0.222222
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 5 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 2.50784
+
+Performing truth solve at parameter:
+mu[0] = -0.666667
+mu[1] = -0.222222
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 6 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 2.15653
+
+Performing truth solve at parameter:
+mu[0] = 0.222222
+mu[1] = -0.666667
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 7 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 1.71352
+
+Performing truth solve at parameter:
+mu[0] = -0.222222
+mu[1] = 1.11111
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 8 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 1.61442
+
+Performing truth solve at parameter:
+mu[0] = 1.55556
+mu[1] = -0.222222
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 9 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 1.09712
+
+Performing truth solve at parameter:
+mu[0] = -2
+mu[1] = 0.222222
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 10 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.9794
+
+Performing truth solve at parameter:
+mu[0] = -0.222222
+mu[1] = -2
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 11 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.763958
+
+Performing truth solve at parameter:
+mu[0] = -0.222222
+mu[1] = 0.222222
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 12 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.616746
+
+Performing truth solve at parameter:
+mu[0] = 1.11111
+mu[1] = 1.11111
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 13 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.530181
+
+Performing truth solve at parameter:
+mu[0] = 0.222222
+mu[1] = 2
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 14 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.475932
+
+Performing truth solve at parameter:
+mu[0] = 0.666667
+mu[1] = -0.222222
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 15 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.440399
+
+Performing truth solve at parameter:
+mu[0] = -1.11111
+mu[1] = 0.666667
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 16 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.423537
+
+Performing truth solve at parameter:
+mu[0] = 1.11111
+mu[1] = -1.11111
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 17 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.408558
+
+Performing truth solve at parameter:
+mu[0] = -0.666667
+mu[1] = -1.11111
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 18 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.333764
+
+Performing truth solve at parameter:
+mu[0] = -0.222222
+mu[1] = -0.222222
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 19 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.196867
+
+Performing truth solve at parameter:
+mu[0] = 0.222222
+mu[1] = 0.666667
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 20 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.191475
+
+Maximum number of basis functions reached: Nmax = 20
+Writing out the basis functions...
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:00:57 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=3.32218, Active time=3.01249                                                 |
+ --------------------------------------------------------------------------------------------------------------
+| Event                            nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                            w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|--------------------------------------------------------------------------------------------------------------|
+|                                                                                                              |
+|                                                                                                              |
+| DofMap                                                                                                       |
+|   add_neighbors_to_send_list()   1         0.0014      0.001403    0.0014      0.001403    0.05     0.05     |
+|   build_constraint_matrix()      22500     0.0138      0.000001    0.0138      0.000001    0.46     0.46     |
+|   cnstrn_elem_mat_vec()          22500     0.0295      0.000001    0.0295      0.000001    0.98     0.98     |
+|   compute_sparsity()             1         0.0071      0.007074    0.0131      0.013052    0.23     0.43     |
+|   create_dof_constraints()       1         0.0086      0.008613    0.0121      0.012079    0.29     0.40     |
+|   distribute_dofs()              1         0.0021      0.002113    0.0083      0.008334    0.07     0.28     |
+|   dof_indices()                  50000     0.0476      0.000001    0.0476      0.000001    1.58     1.58     |
+|   prepare_send_list()            1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                       1         0.0062      0.006218    0.0062      0.006218    0.21     0.21     |
+|                                                                                                              |
+| EquationSystems                                                                                              |
+|   write()                        1         0.0147      0.014702    0.0151      0.015058    0.49     0.50     |
+|                                                                                                              |
+| FE                                                                                                           |
+|   compute_affine_map()           24300     0.0180      0.000001    0.0180      0.000001    0.60     0.60     |
+|   compute_face_map()             1800      0.0055      0.000003    0.0118      0.000007    0.18     0.39     |
+|   compute_shape_functions()      24300     0.0117      0.000000    0.0117      0.000000    0.39     0.39     |
+|   init_face_shape_functions()    9         0.0000      0.000003    0.0000      0.000003    0.00     0.00     |
+|   init_shape_functions()         1809      0.0078      0.000004    0.0078      0.000004    0.26     0.26     |
+|   inverse_map()                  3600      0.0056      0.000002    0.0056      0.000002    0.19     0.19     |
+|                                                                                                              |
+| Mesh                                                                                                         |
+|   find_neighbors()               1         0.0078      0.007810    0.0078      0.007810    0.26     0.26     |
+|   renumber_nodes_and_elem()      2         0.0007      0.000326    0.0007      0.000326    0.02     0.02     |
+|                                                                                                              |
+| MeshCommunication                                                                                            |
+|   assign_global_indices()        1         0.0509      0.050876    0.0509      0.050910    1.69     1.69     |
+|                                                                                                              |
+| MeshTools::Generation                                                                                        |
+|   build_cube()                   1         0.0041      0.004102    0.0041      0.004102    0.14     0.14     |
+|                                                                                                              |
+| Parallel                                                                                                     |
+|   allgather()                    5         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   receive()                      84        0.0003      0.000004    0.0003      0.000004    0.01     0.01     |
+|   send()                         84        0.0009      0.000011    0.0009      0.000011    0.03     0.03     |
+|   send_receive()                 4         0.0000      0.000007    0.0000      0.000007    0.00     0.00     |
+|                                                                                                              |
+| Partitioner                                                                                                  |
+|   single_partition()             1         0.0004      0.000372    0.0004      0.000372    0.01     0.01     |
+|                                                                                                              |
+| PetscLinearSolver                                                                                            |
+|   solve()                        85        1.7594      0.020699    1.7594      0.020699    58.40    58.40    |
+|                                                                                                              |
+| RBConstruction                                                                                               |
+|   add_scaled_matrix_and_vector() 9         0.1615      0.017948    0.3166      0.035173    5.36     10.51    |
+|   clear()                        1         0.0004      0.000403    0.0004      0.000403    0.01     0.01     |
+|   compute_Fq_representor_norms() 1         0.0011      0.001054    0.0202      0.020173    0.03     0.67     |
+|   compute_max_error_bound()      21        0.0097      0.000462    0.0971      0.004624    0.32     3.22     |
+|   compute_output_dual_norms()    1         0.1690      0.168958    0.2610      0.260952    5.61     8.66     |
+|   enrich_RB_space()              20        0.0298      0.001489    0.0298      0.001489    0.99     0.99     |
+|   train_reduced_basis()          1         0.0038      0.003792    2.6010      2.600975    0.13     86.34    |
+|   truth_assembly()               20        0.0521      0.002603    0.0521      0.002603    1.73     1.73     |
+|   truth_solve()                  20        0.0052      0.000259    0.3732      0.018658    0.17     12.39    |
+|   update_RB_system_matrices()    20        0.1570      0.007850    0.1570      0.007850    5.21     5.21     |
+|   update_residual_terms()        20        0.3265      0.016324    1.6589      0.082943    10.84    55.07    |
+|                                                                                                              |
+| RBEvaluation                                                                                                 |
+|   clear()                        1         0.0001      0.000080    0.0002      0.000210    0.00     0.01     |
+|   clear_riesz_representors()     2         0.0001      0.000064    0.0001      0.000064    0.00     0.00     |
+|   compute_residual_dual_norm()   2100      0.0576      0.000027    0.0576      0.000027    1.91     1.91     |
+|   rb_solve()                     2100      0.0291      0.000014    0.0871      0.000041    0.97     2.89     |
+|   resize_data_structures()       1         0.0001      0.000083    0.0001      0.000083    0.00     0.00     |
+|   write_offline_data_to_files()  1         0.0055      0.005486    0.0055      0.005486    0.18     0.18     |
+ --------------------------------------------------------------------------------------------------------------
+| Totals:                          155432    3.0125                                          100.00            |
+ --------------------------------------------------------------------------------------------------------------
+
+*** Warning, This code is untested, experimental, or likely to see future API changes: src/reduced_basis/rb_parametrized_object.C, line 31, compiled Apr  7 2012 at 15:51:42 ***
+mu[0] = -2
+mu[1] = 0.79
+
+output 1, value = 0.12248, bound = 0.0659666
+output 2, value = 0.370889, bound = 0.0659666
+output 3, value = 0.254934, bound = 0.0659666
+output 4, value = 0.114764, bound = 0.0659666
+
+Reading in the basis functions...
+Finished reading in the basis functions...
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:00:58 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.367923, Active time=0.128905                                               |
+ --------------------------------------------------------------------------------------------------------------
+| Event                            nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                            w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|--------------------------------------------------------------------------------------------------------------|
+|                                                                                                              |
+|                                                                                                              |
+| DofMap                                                                                                       |
+|   add_neighbors_to_send_list()   1         0.0007      0.000702    0.0007      0.000702    0.54     0.54     |
+|   compute_sparsity()             1         0.0052      0.005184    0.0095      0.009525    4.02     7.39     |
+|   create_dof_constraints()       1         0.0006      0.000611    0.0006      0.000611    0.47     0.47     |
+|   distribute_dofs()              1         0.0012      0.001154    0.0060      0.005954    0.90     4.62     |
+|   dof_indices()                  7500      0.0087      0.000001    0.0087      0.000001    6.71     6.71     |
+|   prepare_send_list()            1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                       1         0.0048      0.004799    0.0048      0.004799    3.72     3.72     |
+|                                                                                                              |
+| EquationSystems                                                                                              |
+|   build_solution_vector()        2         0.0064      0.003206    0.0120      0.006000    4.97     9.31     |
+|   read()                         1         0.0160      0.015952    0.0892      0.089240    12.38    69.23    |
+|   update()                       1         0.0001      0.000062    0.0001      0.000062    0.05     0.05     |
+|                                                                                                              |
+| ExodusII_IO                                                                                                  |
+|   write_nodal_data()             2         0.0069      0.003429    0.0069      0.003429    5.32     5.32     |
+|                                                                                                              |
+| Mesh                                                                                                         |
+|   find_neighbors()               1         0.0077      0.007681    0.0077      0.007681    5.96     5.96     |
+|   renumber_nodes_and_elem()      2         0.0006      0.000325    0.0006      0.000325    0.50     0.50     |
+|                                                                                                              |
+| MeshCommunication                                                                                            |
+|   assign_global_indices()        1         0.0564      0.056407    0.0564      0.056433    43.76    43.78    |
+|                                                                                                              |
+| MeshOutput                                                                                                   |
+|   write_equation_systems()       2         0.0000      0.000025    0.0189      0.009454    0.04     14.67    |
+|                                                                                                              |
+| MeshTools::Generation                                                                                        |
+|   build_cube()                   1         0.0040      0.004009    0.0040      0.004009    3.11     3.11     |
+|                                                                                                              |
+| Parallel                                                                                                     |
+|   allgather()                    47        0.0001      0.000001    0.0001      0.000001    0.05     0.05     |
+|   send_receive()                 4         0.0000      0.000005    0.0000      0.000005    0.02     0.02     |
+|                                                                                                              |
+| Partitioner                                                                                                  |
+|   single_partition()             1         0.0004      0.000352    0.0004      0.000352    0.27     0.27     |
+|                                                                                                              |
+| RBConstruction                                                                                               |
+|   clear()                        2         0.0002      0.000092    0.0002      0.000092    0.14     0.14     |
+|   load_basis_function()          1         0.0000      0.000045    0.0000      0.000045    0.03     0.03     |
+|   load_rb_solution()             1         0.0002      0.000205    0.0002      0.000205    0.16     0.16     |
+|                                                                                                              |
+| RBEvaluation                                                                                                 |
+|   clear()                        1         0.0001      0.000144    0.0001      0.000146    0.11     0.11     |
+|   clear_riesz_representors()     2         0.0000      0.000003    0.0000      0.000003    0.00     0.00     |
+|   compute_residual_dual_norm()   1         0.0002      0.000177    0.0002      0.000177    0.14     0.14     |
+|   rb_solve()                     1         0.0006      0.000581    0.0008      0.000758    0.45     0.59     |
+|   read_offline_data_from_files() 1         0.0078      0.007759    0.0080      0.007951    6.02     6.17     |
+|   resize_data_structures()       1         0.0002      0.000186    0.0002      0.000192    0.14     0.15     |
+ --------------------------------------------------------------------------------------------------------------
+| Totals:                          7582      0.1289                                          100.00            |
+ --------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running  ./reduced_basis_ex1-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

@@ -445,16 +445,277 @@ checks for leaked memory.
 Compiling C++ (in optimized mode) introduction_ex2.C...
 Linking introduction_ex2-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./introduction_ex2-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./introduction_ex2-opt
 ***************************************************************
  
-./introduction_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Running ./introduction_ex2-opt
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=36
+    n_local_nodes()=36
+  n_elem()=25
+    n_local_elem()=25
+    n_active_elem()=25
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=2
+   System #1, "Complex System"
+    Type "Explicit"
+    Variables="c" "T" "dv" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "FIRST", "THIRD" "SECOND", "THIRD" 
+    n_dofs()=222
+    n_local_dofs()=222
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #0, "Simple System"
+    Type "TransientLinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.11111
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:59:04 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.067965, Active time=0.001492                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 2         0.0001      0.000035    0.0001      0.000035    4.69     4.69     |
+|   compute_sparsity()           1         0.0003      0.000263    0.0003      0.000295    17.63    19.77    |
+|   create_dof_constraints()     2         0.0001      0.000042    0.0001      0.000042    5.70     5.70     |
+|   distribute_dofs()            2         0.0002      0.000101    0.0006      0.000279    13.54    37.47    |
+|   dof_indices()                25        0.0000      0.000001    0.0000      0.000001    2.01     2.01     |
+|   prepare_send_list()          2         0.0000      0.000002    0.0000      0.000002    0.20     0.20     |
+|   reinit()                     2         0.0004      0.000177    0.0004      0.000177    23.79    23.79    |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             1         0.0003      0.000275    0.0003      0.000275    18.43    18.43    |
+|   renumber_nodes_and_elem()    2         0.0000      0.000005    0.0000      0.000005    0.74     0.74     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0002      0.000173    0.0002      0.000173    11.60    11.60    |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  2         0.0000      0.000000    0.0000      0.000000    0.07     0.07     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           1         0.0000      0.000024    0.0000      0.000024    1.61     1.61     |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        43        0.0015                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+Running ./introduction_ex2-opt eqn_sys.dat
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=36
+    n_local_nodes()=36
+  n_elem()=25
+    n_local_elem()=25
+    n_active_elem()=25
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=2
+   System #1, "Complex System"
+    Type "Explicit"
+    Variables="c" "T" "dv" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "FIRST", "THIRD" "SECOND", "THIRD" 
+    n_dofs()=222
+    n_local_dofs()=222
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #0, "Simple System"
+    Type "TransientLinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.11111
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+<<< Writing system to file eqn_sys.dat
+>>> Reading system from file eqn_sys.dat
+
+ EquationSystems
+  n_systems()=2
+   System #0, "Complex System"
+    Type "Explicit"
+    Variables="c" "T" "dv" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "FIRST", "THIRD" "SECOND", "THIRD" 
+    n_dofs()=222
+    n_local_dofs()=222
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+   System #1, "Simple System"
+    Type "TransientLinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=36
+    n_local_dofs()=36
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.11111
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:59:04 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.143054, Active time=0.06691                                              |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 4         0.0001      0.000027    0.0001      0.000027    0.16     0.16     |
+|   compute_sparsity()           2         0.0004      0.000199    0.0005      0.000226    0.59     0.68     |
+|   create_dof_constraints()     4         0.0001      0.000034    0.0001      0.000034    0.20     0.20     |
+|   distribute_dofs()            4         0.0004      0.000097    0.0009      0.000237    0.58     1.42     |
+|   dof_indices()                50        0.0000      0.000001    0.0000      0.000001    0.07     0.07     |
+|   prepare_send_list()          4         0.0000      0.000001    0.0000      0.000001    0.01     0.01     |
+|   reinit()                     4         0.0006      0.000139    0.0006      0.000139    0.83     0.83     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   read()                       1         0.0260      0.025951    0.0271      0.027124    38.78    40.54    |
+|   update()                     1         0.0001      0.000084    0.0001      0.000084    0.13     0.13     |
+|   write()                      1         0.0356      0.035637    0.0361      0.036054    53.26    53.88    |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             1         0.0003      0.000279    0.0003      0.000279    0.42     0.42     |
+|   renumber_nodes_and_elem()    2         0.0000      0.000005    0.0000      0.000005    0.01     0.01     |
+|                                                                                                            |
+| MeshCommunication                                                                                          |
+|   assign_global_indices()      2         0.0027      0.001329    0.0027      0.001337    3.97     4.00     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0002      0.000200    0.0002      0.000200    0.30     0.30     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  20        0.0000      0.000001    0.0000      0.000001    0.02     0.02     |
+|   receive()                    16        0.0000      0.000003    0.0000      0.000003    0.07     0.07     |
+|   send()                       16        0.0004      0.000022    0.0004      0.000022    0.54     0.54     |
+|   send_receive()               8         0.0000      0.000001    0.0000      0.000001    0.01     0.01     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           1         0.0000      0.000024    0.0000      0.000024    0.04     0.04     |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        142       0.0669                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./introduction_ex2-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>
