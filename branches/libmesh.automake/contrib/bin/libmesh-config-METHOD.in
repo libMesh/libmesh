@@ -17,6 +17,8 @@ usage ()
   echo "usage: $0 --cppflags --cxxflags --include --libs"
   echo "       $0 --cxx"
   echo "       $0 --cc"
+  echo "       $0 --fc"
+  echo "       $0 --version"
   exit
 }
 
@@ -93,6 +95,10 @@ while [ "x$1" != "x" ]; do
 	    return_val="@libmesh_optional_LIBS@ 
                         -Wl,-rpath,${libdir} -L${libdir} -lmesh 
                         $return_val"
+	    ;;
+
+	"--version")
+	    return_val="@VERSION@"
 	    ;;
 	
 	*)
