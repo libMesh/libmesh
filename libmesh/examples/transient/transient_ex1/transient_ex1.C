@@ -17,7 +17,7 @@
 
 
 
- // <h1>Example 9 - Solving a Transient Linear System in Parallel</h1>
+ // <h1>Transient Example 1 - Solving a Transient Linear System in Parallel</h1>
  //
  // This example shows how a simple, linear transient
  // system can be solved in parallel.  The system is simple
