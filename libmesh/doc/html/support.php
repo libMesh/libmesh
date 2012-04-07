@@ -25,7 +25,7 @@ Many of the technologies employed in libMesh were implemented because Dr. Carey 
 
 <br>
 <br>
-Dr. Carey passed away on Friday, September 16, 2011  at the age of 66.  We hope that if you have found this library useful in your work you would consider a donation to <a href="http://www.ices.utexas.edu/memorial/GrahamCarey">The Graham F. Carey Computational Science Scholarship</a> to help train the next generation of libMesh developers.
+Dr. Carey passed away on Friday, September 16, 2011  at the age of 66.  We hope that if you have found this library useful in your work you would consider a donation to <a href="http://www.ices.utexas.edu/memorial/GrahamCarey/careyscholarshipfund/">The Graham F. Carey Computational Science Scholarship</a> to help train the next generation of libMesh developers.
 
 
 </div>
