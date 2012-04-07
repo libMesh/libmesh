@@ -19,7 +19,7 @@
 
 
 
- // <h1>Example 8 - The Newmark System and the Wave Equation</h1>
+ // <h1>Transient Example 2 - The Newmark System and the Wave Equation</h1>
  //
  // This is the eighth example program. It builds on
  // the previous example programs.  It introduces the
