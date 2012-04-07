@@ -1314,16 +1314,142 @@ All done!
 Compiling C++ (in optimized mode) miscellaneous_ex1.C...
 Linking miscellaneous_ex1-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./miscellaneous_ex1-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./miscellaneous_ex1-opt
 ***************************************************************
  
-./miscellaneous_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Running ex6 with dim = 3
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=125
+    n_local_nodes()=125
+  n_elem()=64
+    n_local_elem()=64
+    n_active_elem()=64
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ Verbose mode disabled in non-debug mode.
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=223
+    n_local_nodes()=223
+  n_elem()=160
+    n_local_elem()=160
+    n_active_elem()=160
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Wave"
+    Type "LinearImplicit"
+    Variables="p" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=419
+    n_local_dofs()=419
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 36.2458
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 45
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Second derivatives for Infinite elements are not yet implemented!
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:59:48 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.120811, Active time=0.049147                                              |
+ -------------------------------------------------------------------------------------------------------------
+| Event                           nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                           w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-------------------------------------------------------------------------------------------------------------|
+|                                                                                                             |
+|                                                                                                             |
+| DofMap                                                                                                      |
+|   add_neighbors_to_send_list()  1         0.0002      0.000162    0.0002      0.000162    0.33     0.33     |
+|   compute_sparsity()            1         0.0034      0.003432    0.0038      0.003799    6.98     7.73     |
+|   create_dof_constraints()      1         0.0001      0.000118    0.0001      0.000118    0.24     0.24     |
+|   distribute_dofs()             1         0.0002      0.000243    0.0010      0.001005    0.49     2.04     |
+|   dof_indices()                 320       0.0006      0.000002    0.0006      0.000002    1.28     1.28     |
+|   prepare_send_list()           1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                      1         0.0008      0.000759    0.0008      0.000759    1.54     1.54     |
+|                                                                                                             |
+| EquationSystems                                                                                             |
+|   write()                       1         0.0102      0.010150    0.0104      0.010432    20.65    21.23    |
+|                                                                                                             |
+| FE                                                                                                          |
+|   compute_affine_map()          64        0.0001      0.000002    0.0001      0.000002    0.24     0.24     |
+|   compute_map()                 96        0.0011      0.000012    0.0011      0.000012    2.33     2.33     |
+|   compute_shape_functions()     64        0.0001      0.000001    0.0001      0.000001    0.14     0.14     |
+|   init_shape_functions()        2         0.0002      0.000081    0.0002      0.000081    0.33     0.33     |
+|                                                                                                             |
+| InfElemBuilder                                                                                              |
+|   build_inf_elem()              1         0.0005      0.000496    0.0005      0.000496    1.01     1.01     |
+|                                                                                                             |
+| InfFE                                                                                                       |
+|   combine_base_radial()         96        0.0011      0.000011    0.0011      0.000011    2.22     2.22     |
+|   compute_shape_functions()     96        0.0005      0.000005    0.0005      0.000005    1.03     1.03     |
+|   init_radial_shape_functions() 1         0.0000      0.000018    0.0000      0.000018    0.04     0.04     |
+|   init_shape_functions()        1         0.0002      0.000174    0.0002      0.000174    0.35     0.35     |
+|                                                                                                             |
+| Mesh                                                                                                        |
+|   find_neighbors()              4         0.0028      0.000711    0.0028      0.000711    5.79     5.79     |
+|   renumber_nodes_and_elem()     4         0.0001      0.000030    0.0001      0.000030    0.25     0.25     |
+|                                                                                                             |
+| MeshCommunication                                                                                           |
+|   assign_global_indices()       1         0.0046      0.004587    0.0046      0.004596    9.33     9.35     |
+|                                                                                                             |
+| MeshTools::Generation                                                                                       |
+|   build_cube()                  1         0.0004      0.000366    0.0004      0.000366    0.74     0.74     |
+|                                                                                                             |
+| Parallel                                                                                                    |
+|   allgather()                   5         0.0000      0.000001    0.0000      0.000001    0.01     0.01     |
+|   receive()                     4         0.0000      0.000005    0.0000      0.000005    0.04     0.04     |
+|   send()                        4         0.0003      0.000065    0.0003      0.000065    0.53     0.53     |
+|   send_receive()                4         0.0000      0.000001    0.0000      0.000001    0.01     0.01     |
+|                                                                                                             |
+| Partitioner                                                                                                 |
+|   single_partition()            2         0.0001      0.000032    0.0001      0.000032    0.13     0.13     |
+|                                                                                                             |
+| PetscLinearSolver                                                                                           |
+|   solve()                       1         0.0039      0.003861    0.0039      0.003861    7.86     7.86     |
+|                                                                                                             |
+| System                                                                                                      |
+|   assemble()                    1         0.0177      0.017737    0.0214      0.021444    36.09    43.63    |
+ -------------------------------------------------------------------------------------------------------------
+| Totals:                         779       0.0491                                          100.00            |
+ -------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./miscellaneous_ex1-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

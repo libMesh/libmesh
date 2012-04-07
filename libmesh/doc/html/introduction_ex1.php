@@ -229,16 +229,108 @@ checks for leaked memory.
 Compiling C++ (in optimized mode) introduction_ex1.C...
 Linking introduction_ex1-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./introduction_ex1-opt -d 3 /h2/roystgnr/libmesh/svn/reference_elements/3D/one_hex27.xda [-o output.xda] -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./introduction_ex1-opt -d 3 /home/benkirk/codes/libmesh/reference_elements/3D/one_hex27.xda [-o output.xda]
 ***************************************************************
  
-./introduction_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./introduction_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=27
+    n_local_nodes()=27
+  n_elem()=1
+    n_local_elem()=1
+    n_active_elem()=1
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:58:56 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.081479, Active time=0.000461                                            |
+ -----------------------------------------------------------------------------------------------------------
+| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------|
+|                                                                                                           |
+|                                                                                                           |
+| Mesh                                                                                                      |
+|   find_neighbors()            2         0.0001      0.000038    0.0001      0.000038    16.49    16.49    |
+|   renumber_nodes_and_elem()   2         0.0000      0.000002    0.0000      0.000002    0.65     0.65     |
+|                                                                                                           |
+| Partitioner                                                                                               |
+|   set_node_processor_ids()    1         0.0000      0.000036    0.0000      0.000036    7.81     7.81     |
+|   single_partition()          1         0.0000      0.000004    0.0000      0.000004    0.87     0.87     |
+|                                                                                                           |
+| XdrIO                                                                                                     |
+|   read()                      1         0.0003      0.000342    0.0003      0.000342    74.19    74.19    |
+ -----------------------------------------------------------------------------------------------------------
+| Totals:                       7         0.0005                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------
+
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=27
+    n_local_nodes()=27
+  n_elem()=1
+    n_local_elem()=1
+    n_active_elem()=1
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:58:56 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.054565, Active time=0.000855                                            |
+ -----------------------------------------------------------------------------------------------------------
+| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------|
+|                                                                                                           |
+|                                                                                                           |
+| Mesh                                                                                                      |
+|   find_neighbors()            2         0.0001      0.000041    0.0001      0.000041    9.71     9.71     |
+|   renumber_nodes_and_elem()   2         0.0000      0.000001    0.0000      0.000001    0.23     0.23     |
+|                                                                                                           |
+| Partitioner                                                                                               |
+|   set_node_processor_ids()    1         0.0000      0.000039    0.0000      0.000039    4.56     4.56     |
+|   single_partition()          1         0.0000      0.000004    0.0000      0.000004    0.47     0.47     |
+|                                                                                                           |
+| XdrIO                                                                                                     |
+|   read()                      1         0.0004      0.000380    0.0004      0.000380    44.44    44.44    |
+|   write()                     1         0.0003      0.000347    0.0003      0.000347    40.58    40.58    |
+ -----------------------------------------------------------------------------------------------------------
+| Totals:                       8         0.0009                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./introduction_ex1-opt -d 3 /home/benkirk/codes/libmesh/reference_elements/3D/one_hex27.xda [-o output.xda]
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

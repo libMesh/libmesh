@@ -1490,16 +1490,134 @@ All done.
 Compiling C++ (in optimized mode) miscellaneous_ex3.C...
 Linking miscellaneous_ex3-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./miscellaneous_ex3-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./miscellaneous_ex3-opt
 ***************************************************************
  
-./miscellaneous_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./miscellaneous_ex3-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Running ./miscellaneous_ex3-opt -r 3 -o FIRST
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=225
+    n_local_nodes()=225
+  n_elem()=255
+    n_local_elem()=255
+    n_active_elem()=192
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Laplace-Young"
+    Type "NonlinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=225
+    n_local_dofs()=225
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 8.11111
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+  NL step  0, |residual|_2 = 2.000000e-01
+  NL step  1, |residual|_2 = 4.432961e-03
+  NL step  2, |residual|_2 = 2.163781e-04
+  NL step  3, |residual|_2 = 1.157690e-05
+  NL step  4, |residual|_2 = 6.567452e-07
+  NL step  5, |residual|_2 = 3.849499e-08
+  NL step  6, |residual|_2 = 2.293601e-09
+Laplace-Young system solved at nonlinear iteration 6 , final nonlinear residual norm: 2.293601e-09
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:00:09 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.114851, Active time=0.039378                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 1         0.0001      0.000080    0.0001      0.000080    0.20     0.20     |
+|   compute_sparsity()           1         0.0006      0.000571    0.0007      0.000709    1.45     1.80     |
+|   create_dof_constraints()     1         0.0002      0.000199    0.0002      0.000199    0.51     0.51     |
+|   distribute_dofs()            1         0.0001      0.000149    0.0005      0.000511    0.38     1.30     |
+|   dof_indices()                2880      0.0019      0.000001    0.0019      0.000001    4.82     4.82     |
+|   prepare_send_list()          1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                     1         0.0004      0.000362    0.0004      0.000362    0.92     0.92     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      1         0.0003      0.000308    0.0004      0.000437    0.78     1.11     |
+|                                                                                                            |
+| ExodusII_IO                                                                                                |
+|   write_nodal_data()           1         0.0008      0.000843    0.0008      0.000843    2.14     2.14     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         2944      0.0030      0.000001    0.0030      0.000001    7.52     7.52     |
+|   compute_face_map()           448       0.0021      0.000005    0.0042      0.000009    5.21     10.63    |
+|   compute_shape_functions()    2944      0.0017      0.000001    0.0017      0.000001    4.29     4.29     |
+|   init_face_shape_functions()  7         0.0000      0.000004    0.0000      0.000004    0.07     0.07     |
+|   init_shape_functions()       461       0.0015      0.000003    0.0015      0.000003    3.79     3.79     |
+|   inverse_map()                1344      0.0019      0.000001    0.0019      0.000001    4.93     4.93     |
+|                                                                                                            |
+| LocationMap                                                                                                |
+|   find()                       756       0.0010      0.000001    0.0010      0.000001    2.46     2.46     |
+|   init()                       3         0.0001      0.000027    0.0001      0.000027    0.21     0.21     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             2         0.0012      0.000620    0.0012      0.000620    3.15     3.15     |
+|   renumber_nodes_and_elem()    2         0.0001      0.000032    0.0001      0.000032    0.16     0.16     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     1         0.0000      0.000035    0.0013      0.001316    0.09     3.34     |
+|                                                                                                            |
+| MeshRefinement                                                                                             |
+|   _refine_elements()           3         0.0018      0.000602    0.0047      0.001551    4.58     11.82    |
+|   add_point()                  756       0.0014      0.000002    0.0026      0.000003    3.60     6.64     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  1         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           2         0.0001      0.000028    0.0001      0.000028    0.14     0.14     |
+|                                                                                                            |
+| PetscNonlinearSolver                                                                                       |
+|   jacobian()                   6         0.0064      0.001069    0.0097      0.001611    16.28    24.55    |
+|   residual()                   7         0.0087      0.001248    0.0191      0.002724    22.19    48.42    |
+|   solve()                      1         0.0040      0.003960    0.0327      0.032699    10.06    83.04    |
+|                                                                                                            |
+| System                                                                                                     |
+|   solve()                      1         0.0000      0.000022    0.0327      0.032721    0.06     83.09    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        12577     0.0394                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./miscellaneous_ex3-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>
