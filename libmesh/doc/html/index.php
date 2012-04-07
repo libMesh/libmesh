@@ -93,7 +93,7 @@ provided for solving both standard and generalized eigenvalue problems.
 <br>
 The <code>libMesh</code> library was first created at The
 University of Texas at Austin in the 
-CFDLab since March 2002.  Major 
+CFDLab in March 2002.  Major 
 contributions have come from developers at the Technische 
 Universit&auml;t Hamburg-Harburg
 <a href="http://www.mub.tu-harburg.de">Institute of Modelling and Computation</a>, 
