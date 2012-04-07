@@ -1845,16 +1845,128 @@ if desired.
 Compiling C++ (in optimized mode) transient_ex2.C...
 Linking transient_ex2-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./transient_ex2-opt pipe-mesh.unv -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./transient_ex2-opt pipe-mesh.unv
 ***************************************************************
  
-./transient_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./transient_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./transient_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./transient_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./transient_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./transient_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Running ./transient_ex2-opt pipe-mesh.unv
+
+Mesh file is: pipe-mesh.unv
+*** Warning, This code is deprecated, and likely to be removed in future library versions! src/mesh/mesh_data.C, line 49, compiled Apr  7 2012 at 15:51:00 ***
+ Mesh Information:
+  mesh_dimension()=3
+  spatial_dimension()=3
+  n_nodes()=3977
+    n_local_nodes()=3977
+  n_elem()=3520
+    n_local_elem()=3520
+    n_active_elem()=3520
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Wave"
+    Type "Newmark"
+    Variables="p" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=3977
+    n_local_dofs()=3977
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=9
+    n_matrices()=4
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 23.3968
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 27
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:05:08 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=4.89017, Active time=4.68839                                               |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 1         0.0019      0.001903    0.0019      0.001903    0.04     0.04     |
+|   compute_sparsity()           1         0.0136      0.013575    0.0186      0.018647    0.29     0.40     |
+|   create_dof_constraints()     1         0.0011      0.001125    0.0011      0.001125    0.02     0.02     |
+|   distribute_dofs()            1         0.0023      0.002291    0.0085      0.008456    0.05     0.18     |
+|   dof_indices()                21120     0.0199      0.000001    0.0199      0.000001    0.43     0.43     |
+|   prepare_send_list()          1         0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|   reinit()                     1         0.0062      0.006164    0.0062      0.006164    0.13     0.13     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      4         0.0193      0.004827    0.0323      0.008080    0.41     0.69     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         2880      0.0047      0.000002    0.0047      0.000002    0.10     0.10     |
+|   compute_map()                640       0.0026      0.000004    0.0026      0.000004    0.05     0.05     |
+|   compute_shape_functions()    3520      0.0037      0.000001    0.0037      0.000001    0.08     0.08     |
+|   init_shape_functions()       8         0.0004      0.000049    0.0004      0.000049    0.01     0.01     |
+|                                                                                                            |
+| GMVIO                                                                                                      |
+|   write_nodal_data()           4         0.1120      0.028012    0.1120      0.028012    2.39     2.39     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             1         0.0126      0.012600    0.0126      0.012600    0.27     0.27     |
+|   read()                       1         0.0008      0.000845    0.0451      0.045081    0.02     0.96     |
+|   renumber_nodes_and_elem()    2         0.0011      0.000538    0.0011      0.000538    0.02     0.02     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     4         0.0001      0.000029    0.1445      0.036122    0.00     3.08     |
+|                                                                                                            |
+| NewmarkSystem                                                                                              |
+|   initial_conditions ()        1         0.0001      0.000063    0.0001      0.000063    0.00     0.00     |
+|   update_rhs ()                300       0.4745      0.001582    0.4745      0.001582    10.12    10.12    |
+|   update_u_v_a ()              300       0.0385      0.000128    0.0385      0.000128    0.82     0.82     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           1         0.0003      0.000251    0.0003      0.000251    0.01     0.01     |
+|                                                                                                            |
+| PetscLinearSolver                                                                                          |
+|   solve()                      300       3.8421      0.012807    3.8421      0.012807    81.95    81.95    |
+|                                                                                                            |
+| System                                                                                                     |
+|   assemble()                   1         0.0865      0.086488    0.1043      0.104324    1.84     2.23     |
+|                                                                                                            |
+| UNVIO                                                                                                      |
+|   count_elements()             1         0.0043      0.004316    0.0043      0.004316    0.09     0.09     |
+|   count_nodes()                1         0.0042      0.004203    0.0042      0.004203    0.09     0.09     |
+|   element_in()                 1         0.0137      0.013727    0.0137      0.013727    0.29     0.29     |
+|   node_in()                    1         0.0220      0.021989    0.0220      0.021989    0.47     0.47     |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        29098     4.6884                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./transient_ex2-opt pipe-mesh.unv
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

@@ -1,21 +1,34 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
-//
-//     This file is part of rbOOmit.
+/* rbOOmit: An implementation of the Certified Reduced Basis method. */
+/* Copyright (C) 2009, 2010 David J. Knezevic */
+/*     This file is part of rbOOmit. */
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+/* rbOOmit is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
   
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+/* rbOOmit is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
   
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+
+// <h1>Reduced Basis: Example 5 - Reduced Basis Cantilever</h1>
+// Reduced Basis version of systems_of_equations_ex4: 2D cantilever
+
+// In this example we consider the same problem as systems_of_equations_ex4,
+// but we introduce one parameter, which is the thickness of the cantilever.
+// (Note that for simplicity we do not consider a rigorous lower bound for
+// the coercivity constant --- to compute this bound one can use the rbOOmit
+// SCM classes.)
+//
+// We consider three parameters in this problem:
+//  mu_0: scale the mesh in the y-direction
+//  mu_1: the traction in the x-direction on the right boundary of the cantilever
+//  mu_2: the traction in the y-direction on the right boundary of the cantilever
 
 // C++ include files that we need
 #include <iostream>
@@ -40,20 +53,6 @@
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
-
-// <h1>Reduced Basis: Example 5 - Reduced Cantilever Problem</h1>
-// Reduced Basis version of systems_of_equations_ex4: 2D cantilever
-
-// In this example we consider the same problem as systems_of_equations_ex4,
-// but we introduce one parameter, which is the thickness of the cantilever.
-// (Note that for simplicity we do not consider a rigorous lower bound for
-// the coercivity constant --- to compute this bound one can use the rbOOmit
-// SCM classes.)
-//
-// We consider two parameters in this problem:
-//  mu_0: scale the mesh in the y-direction
-//  mu_1: the traction in the x-direction on the right boundary of the cantilever
-//  mu_2: the traction in the y-direction on the right boundary of the cantilever
 
 // Define a function to scale the mesh according to the parameter.
 void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::string& filename);

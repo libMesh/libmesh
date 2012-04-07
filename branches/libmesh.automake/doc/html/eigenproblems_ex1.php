@@ -887,16 +887,118 @@ overall matrix.
 Compiling C++ (in optimized mode) eigenproblems_ex1.C...
 Linking eigenproblems_ex1-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./eigenproblems_ex1-opt -n 5 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./eigenproblems_ex1-opt -n 5
 ***************************************************************
  
-./eigenproblems_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./eigenproblems_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./eigenproblems_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./eigenproblems_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./eigenproblems_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./eigenproblems_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Running ./eigenproblems_ex1-opt -n 5
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=441
+    n_local_nodes()=441
+  n_elem()=400
+    n_local_elem()=400
+    n_active_elem()=400
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Eigensystem"
+    Type "Eigen"
+    Variables="p" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=441
+    n_local_dofs()=441
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=0
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 8.43764
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+Number of converged eigenpairs: 5
+
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:57:51 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.118615, Active time=0.044723                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 1         0.0002      0.000229    0.0002      0.000229    0.51     0.51     |
+|   compute_sparsity()           1         0.0018      0.001830    0.0024      0.002424    4.09     5.42     |
+|   create_dof_constraints()     1         0.0002      0.000240    0.0002      0.000240    0.54     0.54     |
+|   distribute_dofs()            1         0.0004      0.000397    0.0014      0.001420    0.89     3.18     |
+|   dof_indices()                1200      0.0013      0.000001    0.0013      0.000001    2.90     2.90     |
+|   prepare_send_list()          1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                     1         0.0010      0.001021    0.0010      0.001021    2.28     2.28     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      1         0.0005      0.000485    0.0008      0.000810    1.08     1.81     |
+|                                                                                                            |
+| ExodusII_IO                                                                                                |
+|   write_nodal_data()           1         0.0015      0.001493    0.0015      0.001493    3.34     3.34     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         400       0.0006      0.000002    0.0006      0.000002    1.43     1.43     |
+|   compute_shape_functions()    400       0.0002      0.000001    0.0002      0.000001    0.48     0.48     |
+|   init_shape_functions()       1         0.0001      0.000081    0.0001      0.000081    0.18     0.18     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()             1         0.0016      0.001608    0.0016      0.001608    3.60     3.60     |
+|   renumber_nodes_and_elem()    2         0.0001      0.000046    0.0001      0.000046    0.21     0.21     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     1         0.0000      0.000038    0.0023      0.002341    0.08     5.23     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0008      0.000817    0.0008      0.000817    1.83     1.83     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  1         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           1         0.0001      0.000091    0.0001      0.000091    0.20     0.20     |
+|                                                                                                            |
+| SlepcEigenSolver                                                                                           |
+|   solve_standard()             1         0.0317      0.031736    0.0317      0.031736    70.96    70.96    |
+|                                                                                                            |
+| System                                                                                                     |
+|   assemble()                   1         0.0024      0.002413    0.0043      0.004262    5.40     9.53     |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        2018      0.0447                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./eigenproblems_ex1-opt -n 5
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

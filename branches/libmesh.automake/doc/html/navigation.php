@@ -39,6 +39,8 @@ function load_style($root)
 	<?php } ?>
  
     <?php echo "<a class=\"L1\" href = \"", $root, "presentations.php\">Presentations</a><BR>"; ?>
+
+    <?php echo "<a class=\"L1\" href = \"", $root, "support.php\">Support</a><BR>"; ?>
 	
     <?php echo "<a class=\"L1\" href = \"", $root, "installation.php\" title=\"Download & Installation Instructions\">Download</a><BR>"; ?>
         <?php if ($mode=="download") { ?>

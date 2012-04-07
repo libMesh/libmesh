@@ -1362,18 +1362,193 @@ All done.
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
 Compiling C++ (in optimized mode) adjoints_ex2.C...
+Compiling C++ (in optimized mode) element_qoi.C...
+Compiling C++ (in optimized mode) element_qoi_derivative.C...
+Compiling C++ (in optimized mode) femparameters.C...
+Compiling C++ (in optimized mode) L-shaped.C...
 Linking ./adjoints_ex2-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./adjoints_ex2-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./adjoints_ex2-opt
 ***************************************************************
  
-./adjoints_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adjoints_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adjoints_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adjoints_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adjoints_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adjoints_ex2-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+Started ./adjoints_ex2-opt
+Reading in and building the mesh
+Building system
+Initializing systems
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=833
+    n_local_nodes()=833
+  n_elem()=255
+    n_local_elem()=255
+    n_active_elem()=192
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "LaplaceSystem"
+    Type "Implicit"
+    Variables="T" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" 
+    n_dofs()=833
+    n_local_dofs()=833
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 15.06
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 25
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+  Nonlinear solver converged, step 0, residual reduction 1.18002e-13 < 1e-09
+Adaptive step 0, we have 192 active elements and 833 active dofs.
+Sensitivity of QoI one to Parameter one is 0.00543647
+Sensitivity of QoI one to Parameter two is 0.0108729
+The relative error in sensitivity QoI_0_0 is 0.00012463024667683093
+The relative error in sensitivity QoI_0_1 is 0.00012463023657107274
+
+Refining Uniformly
+
+Refined mesh to 768 active elements and 3201 active dofs.
+  Nonlinear solver converged, step 0, residual reduction 2.537150574096903e-11 < 1.0000000000000001e-09
+Adaptive step 1, we have 768 active elements and 3201 active dofs.
+Sensitivity of QoI one to Parameter one is 0.0054368750523949884
+Sensitivity of QoI one to Parameter two is 0.010873750103319355
+The relative error in sensitivity QoI_0_0 is 5.0121160008591931e-05
+The relative error in sensitivity QoI_0_1 is 5.0121295246669185e-05
+
+Refining Uniformly
+
+Refined mesh to 3072 active elements and 12545 active dofs.
+  Nonlinear solver converged, step 0, residual reduction 2.1735620101414059e-10 < 1.0000000000000001e-09
+Adaptive step 2, we have 3072 active elements and 12545 active dofs.
+Sensitivity of QoI one to Parameter one is 0.005437039030023595
+Sensitivity of QoI one to Parameter two is 0.010874078058810081
+The relative error in sensitivity QoI_0_0 is 1.9962400008134908e-05
+The relative error in sensitivity QoI_0_1 is 1.9962513772373264e-05
+
+Refining Uniformly
+
+Refined mesh to 12288 active elements and 49665 active dofs.
+  Nonlinear solver reached maximum step 1, latest evaluated residual 2.9189471512256663e-05
+  Continuing...
+Adaptive step 3, we have 12288 active elements and 49665 active dofs.
+Sensitivity of QoI one to Parameter one is 0.0054371043992110322
+Sensitivity of QoI one to Parameter two is 0.010874208797892675
+The error in sensitivity QoI_0_0 is 7.9397012284596045e-06
+The error in sensitivity QoI_0_1 is 7.9397499107471927e-06
+
+[0] Completing output.
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:57:41 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=31.0199, Active time=30.5695                                               |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 4         0.0232      0.005793    0.0232      0.005793    0.08     0.08     |
+|   compute_sparsity()           4         0.0789      0.019733    0.1073      0.026832    0.26     0.35     |
+|   create_dof_constraints()     4         0.0299      0.007480    0.0299      0.007480    0.10     0.10     |
+|   distribute_dofs()            4         0.0695      0.017371    0.1695      0.042376    0.23     0.55     |
+|   dof_indices()                538176    0.9448      0.000002    0.9448      0.000002    3.09     3.09     |
+|   old_dof_indices()            64512     0.0627      0.000001    0.0627      0.000001    0.21     0.21     |
+|   prepare_send_list()          4         0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|   reinit()                     4         0.1000      0.025004    0.1000      0.025004    0.33     0.33     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      8         0.0749      0.009363    0.1265      0.015813    0.25     0.41     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         241920    0.3932      0.000002    0.3932      0.000002    1.29     1.29     |
+|   compute_face_map()           13440     0.0833      0.000006    0.1897      0.000014    0.27     0.62     |
+|   compute_shape_functions()    241920    0.2437      0.000001    0.2437      0.000001    0.80     0.80     |
+|   init_face_shape_functions()  56        0.0002      0.000004    0.0002      0.000004    0.00     0.00     |
+|   init_shape_functions()       13496     0.1276      0.000009    0.1276      0.000009    0.42     0.42     |
+|   inverse_map()                171142    0.4912      0.000003    0.4912      0.000003    1.61     1.61     |
+|                                                                                                            |
+| FEMSystem                                                                                                  |
+|   assemble_qoi()               20        0.3532      0.017658    1.1107      0.055535    1.16     3.63     |
+|   assemble_qoi_derivative()    4         0.1243      0.031071    0.2659      0.066464    0.41     0.87     |
+|   assembly()                   8         0.5871      0.073383    0.8331      0.104141    1.92     2.73     |
+|   assembly(get_jacobian)       4         0.2520      0.062999    0.3695      0.092369    0.82     1.21     |
+|   assembly(get_residual)       20        0.5869      0.029345    1.2550      0.062752    1.92     4.11     |
+|                                                                                                            |
+| GMVIO                                                                                                      |
+|   write_nodal_data()           8         0.7992      0.099905    0.7992      0.099905    2.61     2.61     |
+|                                                                                                            |
+| ImplicitSystem                                                                                             |
+|   adjoint_solve()              4         0.0003      0.000069    8.7111      2.177781    0.00     28.50    |
+|                                                                                                            |
+| LocationMap                                                                                                |
+|   find()                       81900     0.1718      0.000002    0.1718      0.000002    0.56     0.56     |
+|   init()                       9         0.0482      0.005353    0.0482      0.005353    0.16     0.16     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   all_second_order()           1         0.0001      0.000118    0.0001      0.000118    0.00     0.00     |
+|   contract()                   3         0.0020      0.000656    0.0112      0.003728    0.01     0.04     |
+|   find_neighbors()             6         0.1082      0.018027    0.1082      0.018027    0.35     0.35     |
+|   renumber_nodes_and_elem()    13        0.0285      0.002192    0.0285      0.002192    0.09     0.09     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     8         0.0002      0.000021    0.9259      0.115739    0.00     3.03     |
+|                                                                                                            |
+| MeshRefinement                                                                                             |
+|   _coarsen_elements()          3         0.0012      0.000416    0.0012      0.000416    0.00     0.00     |
+|   _refine_elements()           9         0.1337      0.014851    0.4250      0.047222    0.44     1.39     |
+|   add_point()                  81900     0.0929      0.000001    0.2782      0.000003    0.30     0.91     |
+|   make_coarsening_compatible() 3         0.0380      0.012655    0.0380      0.012655    0.12     0.12     |
+|   make_refinement_compatible() 3         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                            |
+| NewtonSolver                                                                                               |
+|   solve()                      4         0.0032      0.000806    16.7382     4.184555    0.01     54.75    |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  4         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           6         0.0056      0.000936    0.0056      0.000936    0.02     0.02     |
+|                                                                                                            |
+| PetscLinearSolver                                                                                          |
+|   solve()                      8         24.1441     3.018018    24.1441     3.018018    78.98    78.98    |
+|                                                                                                            |
+| ProjectVector                                                                                              |
+|   operator()                   6         0.3163      0.052711    0.8268      0.137794    1.03     2.70     |
+|                                                                                                            |
+| System                                                                                                     |
+|   project_vector()             6         0.0496      0.008264    0.9139      0.152323    0.16     2.99     |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        1448654   30.5695                                         100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./adjoints_ex2-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

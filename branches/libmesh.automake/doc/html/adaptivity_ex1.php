@@ -846,16 +846,100 @@ Add Ke and Fe to the global matrix and right-hand-side.
 Compiling C++ (in optimized mode) adaptivity_ex1.C...
 Linking adaptivity_ex1-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./adaptivity_ex1-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example  ./adaptivity_ex1-opt
 ***************************************************************
  
-./adaptivity_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./adaptivity_ex1-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 15:54:49 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.084985, Active time=0.013362                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| DofMap                                                                                                     |
+|   add_neighbors_to_send_list() 6         0.0002      0.000028    0.0002      0.000028    1.25     1.25     |
+|   compute_sparsity()           6         0.0006      0.000106    0.0007      0.000123    4.74     5.51     |
+|   create_dof_constraints()     6         0.0000      0.000001    0.0000      0.000001    0.03     0.03     |
+|   distribute_dofs()            6         0.0003      0.000053    0.0008      0.000132    2.40     5.94     |
+|   dof_indices()                464       0.0003      0.000001    0.0003      0.000001    2.51     2.51     |
+|   old_dof_indices()            200       0.0001      0.000001    0.0001      0.000001    1.00     1.00     |
+|   prepare_send_list()          6         0.0000      0.000001    0.0000      0.000001    0.03     0.03     |
+|   reinit()                     6         0.0005      0.000076    0.0005      0.000076    3.42     3.42     |
+|                                                                                                            |
+| EquationSystems                                                                                            |
+|   build_solution_vector()      1         0.0001      0.000087    0.0001      0.000114    0.65     0.85     |
+|                                                                                                            |
+| FE                                                                                                         |
+|   compute_affine_map()         218       0.0002      0.000001    0.0002      0.000001    1.38     1.38     |
+|   compute_face_map()           57        0.0001      0.000001    0.0001      0.000001    0.40     0.40     |
+|   compute_shape_functions()    218       0.0001      0.000000    0.0001      0.000000    0.79     0.79     |
+|   init_face_shape_functions()  5         0.0000      0.000006    0.0000      0.000006    0.22     0.22     |
+|   init_shape_functions()       120       0.0004      0.000003    0.0004      0.000003    2.62     2.62     |
+|   inverse_map()                210       0.0002      0.000001    0.0002      0.000001    1.43     1.43     |
+|                                                                                                            |
+| GnuPlotIO                                                                                                  |
+|   write_nodal_data()           1         0.0008      0.000800    0.0008      0.000800    5.99     5.99     |
+|                                                                                                            |
+| JumpErrorEstimator                                                                                         |
+|   estimate_error()             5         0.0011      0.000220    0.0018      0.000364    8.22     13.61    |
+|                                                                                                            |
+| LocationMap                                                                                                |
+|   find()                       76        0.0002      0.000002    0.0002      0.000002    1.32     1.32     |
+|   init()                       10        0.0002      0.000017    0.0002      0.000017    1.26     1.26     |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   contract()                   5         0.0000      0.000006    0.0000      0.000008    0.21     0.30     |
+|   find_neighbors()             6         0.0006      0.000101    0.0006      0.000101    4.56     4.56     |
+|   renumber_nodes_and_elem()    17        0.0000      0.000003    0.0000      0.000003    0.32     0.32     |
+|                                                                                                            |
+| MeshOutput                                                                                                 |
+|   write_equation_systems()     1         0.0000      0.000033    0.0009      0.000947    0.25     7.09     |
+|                                                                                                            |
+| MeshRefinement                                                                                             |
+|   _coarsen_elements()          10        0.0000      0.000004    0.0000      0.000004    0.28     0.28     |
+|   _refine_elements()           10        0.0004      0.000043    0.0008      0.000081    3.20     6.05     |
+|   add_point()                  76        0.0002      0.000002    0.0004      0.000005    1.30     2.73     |
+|   make_coarsening_compatible() 11        0.0004      0.000039    0.0004      0.000039    3.22     3.22     |
+|   make_refinement_compatible() 11        0.0000      0.000004    0.0000      0.000004    0.34     0.34     |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                 1         0.0001      0.000113    0.0001      0.000113    0.85     0.85     |
+|                                                                                                            |
+| Parallel                                                                                                   |
+|   allgather()                  6         0.0000      0.000002    0.0000      0.000002    0.10     0.10     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()           6         0.0001      0.000010    0.0001      0.000010    0.44     0.44     |
+|                                                                                                            |
+| PetscLinearSolver                                                                                          |
+|   solve()                      6         0.0041      0.000679    0.0041      0.000679    30.50    30.50    |
+|                                                                                                            |
+| ProjectVector                                                                                              |
+|   operator()                   5         0.0006      0.000112    0.0009      0.000177    4.18     6.61     |
+|                                                                                                            |
+| System                                                                                                     |
+|   assemble()                   6         0.0007      0.000118    0.0011      0.000189    5.29     8.51     |
+|   project_vector()             5         0.0007      0.000142    0.0017      0.000335    5.30     12.53    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                        1803      0.0134                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example  ./adaptivity_ex1-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>

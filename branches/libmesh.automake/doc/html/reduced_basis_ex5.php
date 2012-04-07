@@ -670,16 +670,371 @@ Updated .depend
 Compiling C++ (in optimized mode) reduced_basis_ex5.C...
 Linking reduced_basis_ex5-opt...
 ***************************************************************
-* Running  mpirun -np 6 ./reduced_basis_ex5-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running  ./reduced_basis_ex5-opt
 ***************************************************************
  
-./reduced_basis_ex5-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex5-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex5-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex5-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex5-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-./reduced_basis_ex5-opt: error while loading shared libraries: librythmos.so: cannot open shared object file: No such file or directory
-make[1]: *** [run] Error 127
+*** Warning, This code is untested, experimental, or likely to see future API changes: src/reduced_basis/rb_parametrized_object.C, line 31, compiled Apr  7 2012 at 15:51:42 ***
+ EquationSystems
+  n_systems()=1
+   System #0, "RBElasticity"
+    Type "RBConstruction"
+    Variables="u" "v" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" "SECOND", "THIRD" 
+    n_dofs()=4242
+    n_local_dofs()=4242
+    n_constrained_dofs()=42
+    n_local_constrained_dofs()=42
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 30.628
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 50
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 42
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+ Mesh Information:
+  mesh_dimension()=2
+  spatial_dimension()=3
+  n_nodes()=2121
+    n_local_nodes()=2121
+  n_elem()=500
+    n_local_elem()=500
+    n_active_elem()=500
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+Initializing training parameters with random training set...
+Parameter 0: log scaling = 1
+Parameter 1: log scaling = 0
+Parameter 2: log scaling = 0
+
+
+RBConstruction parameters:
+system name: RBElasticity
+constrained_problem: 0
+Nmax: 15
+Basis training error tolerance: 0.001
+A_q operators attached: 3
+F_q functions attached: 2
+n_outputs: 0
+Number of parameters: 3
+Parameter 0: Min = 0.5, Max = 2
+Parameter 1: Min = -1, Max = 1
+Parameter 2: Min = -1, Max = 1
+n_training_samples: 100
+single-matrix mode? 0
+reuse preconditioner? 1
+use a relative error bound in greedy? 1
+write out data during basis training? 0
+quiet mode? 1
+parameter initialized to: 
+mu[0] = 0.5
+mu[1] = -1
+mu[2] = -1
+
+
+---- Performing Greedy basis enrichment ----
+
+---- Basis dimension: 0 ----
+Performing RB solves on training set
+Maximum (relative) error bound is inf
+
+Performing truth solve at parameter:
+mu[0] = 0.772358
+mu[1] = 0.884244
+mu[2] = 0.0699808
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 1 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 8.95836
+
+Performing truth solve at parameter:
+mu[0] = 1.46047
+mu[1] = -0.82615
+mu[2] = 0.193106
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 2 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 3.9299
+
+Performing truth solve at parameter:
+mu[0] = 1.25721
+mu[1] = -0.926689
+mu[2] = -0.0695853
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 3 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.330827
+
+Performing truth solve at parameter:
+mu[0] = 0.690529
+mu[1] = -0.781569
+mu[2] = 0.039813
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 4 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.0587815
+
+Performing truth solve at parameter:
+mu[0] = 0.512761
+mu[1] = 0.141972
+mu[2] = 0.534986
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 5 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.0116996
+
+Performing truth solve at parameter:
+mu[0] = 1.99223
+mu[1] = -0.399658
+mu[2] = -0.242387
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 6 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.00531057
+
+Performing truth solve at parameter:
+mu[0] = 1.01308
+mu[1] = -0.892211
+mu[2] = 0.251325
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 7 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.00229261
+
+Performing truth solve at parameter:
+mu[0] = 1.96949
+mu[1] = -0.975587
+mu[2] = 0.865347
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 8 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.00121006
+
+Performing truth solve at parameter:
+mu[0] = 0.887242
+mu[1] = -0.583442
+mu[2] = -0.00375969
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 9 ----
+Performing RB solves on training set
+Maximum (relative) error bound is 0.000214682
+
+Specified error tolerance reached.
+Writing out the basis functions...
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:02:54 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=18.4147, Active time=18.1771                                                 |
+ --------------------------------------------------------------------------------------------------------------
+| Event                            nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                            w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|--------------------------------------------------------------------------------------------------------------|
+|                                                                                                              |
+|                                                                                                              |
+| DofMap                                                                                                       |
+|   add_neighbors_to_send_list()   1         0.0005      0.000524    0.0005      0.000524    0.00     0.00     |
+|   build_constraint_matrix()      3000      0.0033      0.000001    0.0033      0.000001    0.02     0.02     |
+|   cnstrn_elem_mat_vec()          3000      0.0026      0.000001    0.0026      0.000001    0.01     0.01     |
+|   compute_sparsity()             1         0.0156      0.015618    0.0189      0.018915    0.09     0.10     |
+|   create_dof_constraints()       1         0.0044      0.004389    0.0071      0.007107    0.02     0.04     |
+|   distribute_dofs()              1         0.0017      0.001724    0.0049      0.004941    0.01     0.03     |
+|   dof_indices()                  10500     0.0166      0.000002    0.0166      0.000002    0.09     0.09     |
+|   prepare_send_list()            1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                       1         0.0032      0.003215    0.0032      0.003215    0.02     0.02     |
+|                                                                                                              |
+| EquationSystems                                                                                              |
+|   write()                        1         0.0217      0.021725    0.0221      0.022080    0.12     0.12     |
+|                                                                                                              |
+| FE                                                                                                           |
+|   compute_affine_map()           3740      0.0064      0.000002    0.0064      0.000002    0.04     0.04     |
+|   compute_face_map()             740       0.0045      0.000006    0.0122      0.000017    0.02     0.07     |
+|   compute_shape_functions()      3740      0.0046      0.000001    0.0046      0.000001    0.03     0.03     |
+|   init_face_shape_functions()    26        0.0001      0.000003    0.0001      0.000003    0.00     0.00     |
+|   init_shape_functions()         746       0.0099      0.000013    0.0099      0.000013    0.05     0.05     |
+|   inverse_map()                  2220      0.0074      0.000003    0.0074      0.000003    0.04     0.04     |
+|                                                                                                              |
+| Mesh                                                                                                         |
+|   find_neighbors()               1         0.0016      0.001618    0.0016      0.001618    0.01     0.01     |
+|   renumber_nodes_and_elem()      2         0.0003      0.000133    0.0003      0.000133    0.00     0.00     |
+|                                                                                                              |
+| MeshCommunication                                                                                            |
+|   assign_global_indices()        1         0.0283      0.028350    0.0284      0.028366    0.16     0.16     |
+|                                                                                                              |
+| MeshTools::Generation                                                                                        |
+|   build_cube()                   1         0.0022      0.002165    0.0022      0.002165    0.01     0.01     |
+|                                                                                                              |
+| Parallel                                                                                                     |
+|   allgather()                    5         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   receive()                      80        0.0002      0.000003    0.0002      0.000003    0.00     0.00     |
+|   send()                         80        0.0008      0.000010    0.0008      0.000010    0.00     0.00     |
+|   send_receive()                 4         0.0000      0.000003    0.0000      0.000003    0.00     0.00     |
+|                                                                                                              |
+| Partitioner                                                                                                  |
+|   single_partition()             1         0.0002      0.000191    0.0002      0.000191    0.00     0.00     |
+|                                                                                                              |
+| PetscLinearSolver                                                                                            |
+|   solve()                        38        14.1540     0.372474    14.1540     0.372474    77.87    77.87    |
+|                                                                                                              |
+| RBConstruction                                                                                               |
+|   add_scaled_matrix_and_vector() 6         0.1128      0.018804    0.1671      0.027843    0.62     0.92     |
+|   clear()                        1         0.0003      0.000316    0.0003      0.000316    0.00     0.00     |
+|   compute_Fq_representor_norms() 1         2.9638      2.963800    3.6747      3.674687    16.31    20.22    |
+|   compute_max_error_bound()      10        0.0039      0.000391    0.0183      0.001835    0.02     0.10     |
+|   enrich_RB_space()              9         0.0336      0.003735    0.0336      0.003735    0.18     0.18     |
+|   train_reduced_basis()          1         0.0027      0.002730    17.9265     17.926470   0.02     98.62    |
+|   truth_assembly()               9         0.1226      0.013625    0.1226      0.013625    0.67     0.67     |
+|   truth_solve()                  9         0.0092      0.001028    3.9224      0.435824    0.05     21.58    |
+|   update_RB_system_matrices()    9         0.2090      0.023226    0.2090      0.023226    1.15     1.15     |
+|   update_residual_terms()        9         0.4130      0.045885    10.0656     1.118395    2.27     55.37    |
+|                                                                                                              |
+| RBEvaluation                                                                                                 |
+|   clear()                        1         0.0000      0.000049    0.0001      0.000112    0.00     0.00     |
+|   clear_riesz_representors()     2         0.0001      0.000032    0.0001      0.000032    0.00     0.00     |
+|   compute_residual_dual_norm()   1000      0.0081      0.000008    0.0081      0.000008    0.04     0.04     |
+|   rb_solve()                     1000      0.0060      0.000006    0.0143      0.000014    0.03     0.08     |
+|   resize_data_structures()       1         0.0001      0.000058    0.0001      0.000059    0.00     0.00     |
+|   write_offline_data_to_files()  1         0.0017      0.001674    0.0017      0.001674    0.01     0.01     |
+ --------------------------------------------------------------------------------------------------------------
+| Totals:                          30001     18.1771                                         100.00            |
+ --------------------------------------------------------------------------------------------------------------
+
+*** Warning, This code is untested, experimental, or likely to see future API changes: src/reduced_basis/rb_parametrized_object.C, line 31, compiled Apr  7 2012 at 15:51:42 ***
+mu[0] = 0.5
+mu[1] = 0.5
+mu[2] = -0.5
+
+Reading in the basis functions...
+Finished reading in the basis functions...
+
+-------------------------------------------------------------------
+| Time:           Sat Apr  7 16:02:54 2012                         |
+| OS:             Linux                                            |
+| HostName:       lkirk-home                                       |
+| OS Release:     3.0.0-17-generic                                 |
+| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| Machine:        x86_64                                           |
+| Username:       benkirk                                          |
+| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+-------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.281891, Active time=0.07565                                                |
+ --------------------------------------------------------------------------------------------------------------
+| Event                            nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                            w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|--------------------------------------------------------------------------------------------------------------|
+|                                                                                                              |
+|                                                                                                              |
+| DofMap                                                                                                       |
+|   add_neighbors_to_send_list()   1         0.0005      0.000497    0.0005      0.000497    0.66     0.66     |
+|   compute_sparsity()             1         0.0068      0.006785    0.0076      0.007560    8.97     9.99     |
+|   create_dof_constraints()       1         0.0003      0.000301    0.0003      0.000301    0.40     0.40     |
+|   distribute_dofs()              1         0.0016      0.001638    0.0048      0.004811    2.17     6.36     |
+|   dof_indices()                  1500      0.0013      0.000001    0.0013      0.000001    1.72     1.72     |
+|   prepare_send_list()            1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                       1         0.0032      0.003170    0.0032      0.003170    4.19     4.19     |
+|                                                                                                              |
+| EquationSystems                                                                                              |
+|   build_solution_vector()        1         0.0013      0.001345    0.0021      0.002131    1.78     2.82     |
+|   read()                         1         0.0245      0.024525    0.0654      0.065368    32.42    86.41    |
+|   update()                       1         0.0001      0.000066    0.0001      0.000066    0.09     0.09     |
+|                                                                                                              |
+| ExodusII_IO                                                                                                  |
+|   write_nodal_data()             1         0.0021      0.002091    0.0021      0.002091    2.76     2.76     |
+|                                                                                                              |
+| Mesh                                                                                                         |
+|   find_neighbors()               1         0.0015      0.001532    0.0015      0.001532    2.03     2.03     |
+|   renumber_nodes_and_elem()      2         0.0002      0.000122    0.0002      0.000122    0.32     0.32     |
+|                                                                                                              |
+| MeshCommunication                                                                                            |
+|   assign_global_indices()        1         0.0276      0.027595    0.0276      0.027610    36.48    36.50    |
+|                                                                                                              |
+| MeshOutput                                                                                                   |
+|   write_equation_systems()       1         0.0000      0.000037    0.0043      0.004260    0.05     5.63     |
+|                                                                                                              |
+| MeshTools::Generation                                                                                        |
+|   build_cube()                   1         0.0014      0.001389    0.0014      0.001389    1.84     1.84     |
+|                                                                                                              |
+| Parallel                                                                                                     |
+|   allgather()                    45        0.0000      0.000001    0.0000      0.000001    0.06     0.06     |
+|   send_receive()                 4         0.0000      0.000002    0.0000      0.000002    0.01     0.01     |
+|                                                                                                              |
+| Partitioner                                                                                                  |
+|   single_partition()             1         0.0002      0.000169    0.0002      0.000169    0.22     0.22     |
+|                                                                                                              |
+| RBConstruction                                                                                               |
+|   clear()                        2         0.0002      0.000088    0.0002      0.000088    0.23     0.23     |
+|   load_rb_solution()             1         0.0002      0.000180    0.0002      0.000180    0.24     0.24     |
+|                                                                                                              |
+| RBEvaluation                                                                                                 |
+|   clear()                        1         0.0001      0.000061    0.0001      0.000062    0.08     0.08     |
+|   clear_riesz_representors()     2         0.0000      0.000003    0.0000      0.000003    0.01     0.01     |
+|   compute_residual_dual_norm()   1         0.0000      0.000046    0.0000      0.000046    0.06     0.06     |
+|   rb_solve()                     1         0.0005      0.000504    0.0006      0.000551    0.67     0.73     |
+|   read_offline_data_from_files() 1         0.0018      0.001808    0.0019      0.001938    2.39     2.56     |
+|   resize_data_structures()       1         0.0001      0.000124    0.0001      0.000130    0.16     0.17     |
+ --------------------------------------------------------------------------------------------------------------
+| Totals:                          1576      0.0756                                          100.00            |
+ --------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running  ./reduced_basis_ex5-opt
+***************************************************************
 </pre>
 </div>
 <?php make_footer() ?>
