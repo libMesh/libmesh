@@ -131,8 +131,6 @@ public:
    */
   void set_current_nonlinear_iteration_number(unsigned num) { _current_nonlinear_iteration_number = num; }
 
-private:
-
   /**
    * Nonlinear solver context
    */

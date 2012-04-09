@@ -166,6 +166,18 @@ public:
    */
   NonlinearImplicitSystem::ComputeResidualandJacobian *residual_and_jacobian_object;
 
+  /**
+   * Function that computes the lower and upper bounds \p XL and \p XU on the solution of the nonlinear system.
+   */
+  void (* bounds) (NumericVector<Number>& XL,
+		   NumericVector<Number>& XU,
+		   sys_type& S);
+
+  /**
+   * Object that computes the bounds vectors  \f$ XL \f$ and \f$ XU \f$.
+   */
+  NonlinearImplicitSystem::ComputeBounds *bounds_object;
+
   void (* user_presolve)(sys_type& S);
 
   /**
@@ -273,6 +285,8 @@ NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   jacobian_object              (NULL),
   matvec                       (NULL),
   residual_and_jacobian_object (NULL),
+  bounds                       (NULL),
+  bounds_object                (NULL),
   user_presolve                (NULL),
   max_nonlinear_iterations(0),
   max_function_evaluations(0),
