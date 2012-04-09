@@ -108,6 +108,25 @@ public:
 			   sys_type& S) = 0;
   };
 
+
+  /**
+   * Abstract base class to be used to calculate the bounds
+   * on the degrees of freedom of a nonlinear system.
+   */
+  class ComputeBounds
+  {
+  public:
+    virtual ~ComputeBounds () {};
+
+    /**
+     * This function will be called to compute the bounds vector and
+     * must be implemented by the user in a derived class.
+     */
+    virtual void bounds (NumericVector<Number>& XL,
+			 NumericVector<Number>& XU,
+			 sys_type& S) = 0;
+  };
+
   /**
    * Abstract base class to be used to calculate the residual and Jacobian
    * simultaneously of a nonlinear system.
@@ -201,6 +220,7 @@ public:
    * number.
    */
   unsigned get_current_nonlinear_iteration_number() const;
+
 
 protected:
 

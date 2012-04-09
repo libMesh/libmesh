@@ -631,6 +631,26 @@ T command_line_value (const std::vector<std::string> &name, T value)
 }
 
 
+
+
+template <typename T>
+void command_line_vector (const std::string &name, std::vector<T>& vec)
+{
+  // Make sure the command line parser is ready for use
+  libmesh_assert (command_line.get() != NULL);
+
+  // only if the variable exists on the command line
+  if (command_line->have_variable(name.c_str()))
+    {
+      unsigned size = command_line->vector_variable_size(name.c_str());
+      vec.resize(size);
+
+      for (unsigned i=0; i<size; ++i)
+	vec[i] = (*command_line)(name.c_str(), vec[i], i);
+    }
+}
+
+
 SolverPackage default_solver_package ()
 {
   libmesh_assert (libMesh::initialized());
@@ -676,5 +696,6 @@ SolverPackage default_solver_package ()
 template int          command_line_value<int>         (const std::string&, int);
 template Real         command_line_value<Real>        (const std::string&, Real);
 template std::string  command_line_value<std::string> (const std::string&, std::string);
+template void         command_line_vector<Real>       (const std::string&, std::vector<Real>&);
 
 } // namespace libMesh

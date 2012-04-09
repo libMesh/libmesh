@@ -148,6 +148,13 @@ public:
   template <typename T>
   T command_line_value (const std::vector<std::string> &, T);
 
+  /**
+   * \returns the array of values associated with name on the command line if it is specified,
+   * otherwise return the default, provided array.
+   */
+  template <typename T>
+  void command_line_vector (const std::string &, std::vector<T>&);
+
  /**
    * The imaginary unit, \f$ \sqrt{-1} \f$.
    */
