@@ -211,15 +211,6 @@ void ExodusII_IO::read (const std::string& fname)
     if (elems_of_dimension[i])
       mesh.set_mesh_dimension(i);
 
-  // Currently cannot read meshes in 1-D.
-  if( mesh.mesh_dimension() == 1 )
-    {
-      libMesh::err << "Error: ExodusII API cannot handle side sets in 1-D and \n"
-		   << "libMesh cannot currently read ExodusII format in 1-D."
-		   << std::endl;
-      libmesh_error();
-    }
-
   // Read in sideset information -- this is useful for applying boundary conditions
   {
     exio_helper->read_sideset_info(); // Get basic information about ALL sidesets
