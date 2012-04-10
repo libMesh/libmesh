@@ -48,7 +48,7 @@ public:
    */
   SimpleRBEvaluation()
   {
-    rb_theta_expansion = &cd_rb_theta_expansion;
+    set_rb_theta_expansion(cd_rb_theta_expansion);
   }
 
   /**
@@ -115,17 +115,14 @@ public:
 
     Parent::init_data();
 
-    // Attach rb_theta_expansion and rb_assembly_expansion
-    // to this Construction object.
-    // This also checks that the expansion objects are sized consistently
-    attach_affine_expansion(cd_rb_theta_expansion,
-                            cd_rb_assembly_expansion);
+    // Set the rb_assembly_expansion for this Construction object.
+    set_rb_assembly_expansion(cd_rb_assembly_expansion);
 
     // We need to define an inner product matrix for this problem
-    attach_inner_prod_assembly(&cd_rb_assembly_expansion.A0_assembly);
+    set_inner_product_assembly(cd_rb_assembly_expansion.A0_assembly);
 
     // We also need an "L2 matrix" in order to compute the time-dependent error bound
-    attach_L2_assembly(&cd_rb_assembly_expansion.M0_assembly);
+    set_L2_assembly(cd_rb_assembly_expansion.M0_assembly);
   }
 
   /**
@@ -145,12 +142,6 @@ public:
    * Variable number for u.
    */
   unsigned int u_var;
-
-  /**
-   * The object that stores the "theta" expansion of the parameter dependent PDE,
-   * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
-   */
-  CDRBThetaExpansion cd_rb_theta_expansion;
   
   /**
    * The object that stores the "assembly" expansion of the parameter dependent PDE,

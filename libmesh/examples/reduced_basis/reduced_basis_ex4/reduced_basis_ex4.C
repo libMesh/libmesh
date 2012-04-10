@@ -106,28 +106,26 @@ int main (int argc, char** argv)
     // Print out some information about the "truth" discretization
     mesh.print_info();
     equation_systems.print_info();
+    
+    // Set the rb_eval objects for the RBConstructions
+    eim_construction.set_rb_evaluation(eim_rb_eval);
 
     // Read data from input file and print state
     eim_construction.process_parameters_file(eim_parameters);
     eim_construction.print_info();
   
-    // Read data from input file and print state
-    rb_construction.process_parameters_file(rb_parameters);
-    
-    // Set the rb_eval objects for the RBConstructions
-    eim_construction.rb_eval = &eim_rb_eval;
-    rb_construction.rb_eval = &rb_eval;
-  
-
     // Perform the EIM Greedy and write out the data
     eim_construction.initialize_rb_construction();
     eim_construction.train_reduced_basis();
-    eim_construction.rb_eval->write_offline_data_to_files("eim_data");
+    eim_construction.get_rb_evaluation().write_offline_data_to_files("eim_data");
+
+    // Read data from input file and print state
+    rb_construction.process_parameters_file(rb_parameters);
 
     // attach the EIM theta objects to the RBConstruction and RBEvaluation objects
     eim_rb_eval.initialize_rb_theta_objects();
-    rb_construction.rb_theta_expansion->attach_multiple_theta_q_f(eim_rb_eval.rb_eim_theta_vector);
-    rb_construction.rb_eval->rb_theta_expansion->attach_multiple_theta_q_f(eim_rb_eval.rb_eim_theta_vector);
+    rb_eval.get_rb_theta_expansion().attach_multiple_theta_q_f(eim_rb_eval.rb_eim_theta_vector);
+    rb_construction.set_rb_evaluation(rb_eval);
     
     // attach the EIM assembly objects to the RBConstruction object
     eim_construction.initialize_EIM_F_objects();
@@ -140,7 +138,7 @@ int main (int argc, char** argv)
     // the system knows how many affine terms there are
     rb_construction.initialize_rb_construction();
     rb_construction.train_reduced_basis();
-    rb_construction.rb_eval->write_offline_data_to_files("rb_data");
+    rb_construction.get_rb_evaluation().write_offline_data_to_files("rb_data");
 
     // Write out the basis functions, if requested
     if(store_basis_functions)
@@ -151,8 +149,8 @@ int main (int argc, char** argv)
       equation_systems.write("equation_systems.dat", WRITE);
 
       // Write out the basis functions
-      eim_construction.rb_eval->write_out_basis_functions(eim_construction,"eim_data");
-      rb_construction.rb_eval->write_out_basis_functions(rb_construction,"rb_data");
+      eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,"eim_data");
+      rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,"rb_data");
     }
   }
   else
@@ -161,7 +159,7 @@ int main (int argc, char** argv)
 
     // attach the EIM theta objects to rb_eval objects
     eim_rb_eval.initialize_rb_theta_objects();
-    rb_eval.rb_theta_expansion->attach_multiple_theta_q_f(eim_rb_eval.rb_eim_theta_vector);
+    rb_eval.get_rb_theta_expansion().attach_multiple_theta_q_f(eim_rb_eval.rb_eim_theta_vector);
     
     // Read in the offline data for rb_eval
     rb_eval.read_offline_data_from_files("rb_data");
@@ -190,8 +188,8 @@ int main (int argc, char** argv)
         equation_systems.get_system<RBConstruction>("RB");
       RBConstruction& eim_construction =
         equation_systems.get_system<RBConstruction>("EIM");
-      rb_construction.rb_eval = &rb_eval;
-      eim_construction.rb_eval = &eim_rb_eval;
+      rb_construction.set_rb_evaluation(rb_eval);
+      eim_construction.set_rb_evaluation(eim_rb_eval);
 
       // read in the data from files
       eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");

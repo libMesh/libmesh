@@ -58,6 +58,16 @@ public:
   virtual ~RBSCMEvaluation ();
 
   /**
+   * Set the RBThetaExpansion object.
+   */
+  void set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in);
+  
+  /**
+   * Get a reference to the rb_theta_expansion.
+   */
+  RBThetaExpansion& get_rb_theta_expansion();
+
+  /**
    * Evaluate single SCM lower bound.
    */
   virtual Real get_SCM_LB();
@@ -82,7 +92,6 @@ public:
    * of C_J.
    */
   void set_C_J_stability_constraint(unsigned int j, Real stability_constraint_in);
-
 
   /**
    * Get entries of SCM_UB_vector, which stores the
@@ -137,6 +146,9 @@ public:
    */
   virtual void reload_current_parameters();
 
+  /**
+   * Set parameters based on values saved in "C_J"
+   */
   virtual void set_current_parameters_from_C_J(unsigned int C_J_index);
 
   /**
@@ -152,13 +164,6 @@ public:
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
 
   //----------- PUBLIC DATA MEMBERS -----------//
-
-   /**
-   * A pointer to to the object that stores the theta expansion.
-   * This is not an AutoPtr since we may want to share it.
-   * (Note: a shared_ptr would be a good option here.)
-   */
-  RBThetaExpansion* rb_theta_expansion;
 
   /**
    * B_min, B_max define the bounding box.
@@ -191,6 +196,15 @@ public:
    * in get_SCM_LB, for example.
    */
   std::vector<Real> saved_parameters;
+
+private:
+
+   /**
+   * A pointer to to the object that stores the theta expansion.
+   * This is not an AutoPtr since we may want to share it.
+   * (Note: a shared_ptr would be a good option here.)
+   */
+  RBThetaExpansion* rb_theta_expansion;
 
 };
 

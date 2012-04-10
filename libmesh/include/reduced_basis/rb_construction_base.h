@@ -200,13 +200,6 @@ public:
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
-   * A pointer to to the object that stores the theta expansion.
-   * This is not an AutoPtr since we may want to share it.
-   * (Note: a shared_ptr would be a good option here.)
-   */
-  RBThetaExpansion* rb_theta_expansion;
-
-  /**
    * Boolean flag to indicate whether or not the
    * parameter ranges have been initialized.
    */

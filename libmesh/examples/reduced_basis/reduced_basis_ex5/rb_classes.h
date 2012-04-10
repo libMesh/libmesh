@@ -46,7 +46,7 @@ public:
    */
   SimpleRBEvaluation()
   {
-    rb_theta_expansion = &elasticity_theta_expansion;
+    set_rb_theta_expansion(elasticity_theta_expansion);
   }
 
   /**
@@ -111,14 +111,11 @@ public:
 
     Parent::init_data();
 
-    // Attach rb_theta_expansion and rb_assembly_expansion
-    // to this Construction object.
-    // This also checks that the expansion objects are sized consistently
-    attach_affine_expansion(elasticity_theta_expansion,
-                            elasticity_assembly_expansion);
+    // Set the rb_assembly_expansion for this Construction object
+    set_rb_assembly_expansion(elasticity_assembly_expansion);
 
     // We need to define an inner product matrix for this problem
-    attach_inner_prod_assembly(&ip_assembly);
+    set_inner_product_assembly(ip_assembly);
   }
 
   /**
