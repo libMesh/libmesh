@@ -79,7 +79,7 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax)
   RB_L2_matrix.resize(Nmax,Nmax);
 
   TransientRBThetaExpansion& trans_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+    libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
@@ -181,7 +181,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   const std::vector<Real> mu = get_current_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+    libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
@@ -399,7 +399,7 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   const std::vector<Real> mu = get_current_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+    libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
@@ -576,7 +576,7 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   const std::vector<Real> mu = get_current_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+    libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
@@ -727,7 +727,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
   Parent::write_offline_data_to_files(directory_name);
 
   TransientRBThetaExpansion& trans_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+    libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();
@@ -905,7 +905,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   Parent::read_offline_data_from_files(directory_name);
 
   TransientRBThetaExpansion& trans_theta_expansion =
-    libmesh_cast_ref<TransientRBThetaExpansion&>(*rb_theta_expansion);
+    libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_Q_m();
   const unsigned int Q_a = trans_theta_expansion.get_Q_a();
   const unsigned int Q_f = trans_theta_expansion.get_Q_f();

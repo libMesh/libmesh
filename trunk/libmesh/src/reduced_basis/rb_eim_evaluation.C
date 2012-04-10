@@ -32,7 +32,7 @@ RBEIMEvaluation::RBEIMEvaluation()
   compute_RB_inner_product = true;
 
   // initialize to the empty RBThetaExpansion object
-  rb_theta_expansion = &empty_rb_theta_expansion;
+  set_rb_theta_expansion(empty_rb_theta_expansion);
 }
 
 RBEIMEvaluation::~RBEIMEvaluation()

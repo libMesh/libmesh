@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_scm_system_h__
-#define __rb_scm_system_h__
+#ifndef __rb_scm_construction_h__
+#define __rb_scm_construction_h__
 
 // Configuration data
 #include "libmesh_config.h"
@@ -81,6 +81,21 @@ public:
    * the system.
    */
   virtual void clear ();
+  
+  /**
+   * Set the RBSCMEvaluation object.
+   */
+  void set_rb_scm_evaluation(RBSCMEvaluation& rb_scm_eval_in);
+  
+  /**
+   * Get a reference to the RBSCMEvaluation object.
+   */
+  RBSCMEvaluation& get_rb_scm_evaluation();
+
+  /**
+   * Get a reference to the RBThetaExpansion object.
+   */
+  RBThetaExpansion& get_rb_theta_expansion();
 
   /**
    * Clear and resize the SCM data vectors. Overload
@@ -137,14 +152,6 @@ public:
    * vector.
    */
   virtual void attach_deflation_space() {}
-
-  //----------- PUBLIC DATA MEMBERS -----------//
-
-  /**
-   * The current RBSCMEvaluation object we are using to
-   * perform the Evaluation stage of the SCM.
-   */
-  RBSCMEvaluation* rb_scm_eval;
 
 protected:
 
@@ -221,6 +228,12 @@ protected:
   std::string RB_system_name;
 
 private:
+
+  /**
+   * The current RBSCMEvaluation object we are using to
+   * perform the Evaluation stage of the SCM.
+   */
+  RBSCMEvaluation* rb_scm_eval;
 
 };
 

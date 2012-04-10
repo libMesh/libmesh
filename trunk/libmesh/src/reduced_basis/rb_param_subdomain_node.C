@@ -98,7 +98,7 @@ unsigned int RBParamSubdomainNode::n_global_training_parameters() const
 
 void RBParamSubdomainNode::hp_greedy(bool store_basis_functions)
 {
-    _rb_construction.rb_eval->clear();
+    _rb_construction.get_rb_evaluation().clear();
 
     // Load the (full or subsampled) training set
     if(_tree.n_subsampled_training_points >= n_global_training_parameters())
@@ -192,7 +192,7 @@ Real RBParamSubdomainNode::perform_p_stage(Real greedy_bound)
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy
     if ( (greedy_bound > _tree.p_tol) ||
-         (_rb_construction.rb_eval->get_n_basis_functions() < _rb_construction.get_Nmax()) )
+         (_rb_construction.get_rb_evaluation().get_n_basis_functions() < _rb_construction.get_Nmax()) )
     {
         greedy_bound = _rb_construction.train_reduced_basis();
     }
@@ -212,11 +212,11 @@ void RBParamSubdomainNode::write_subdomain_data_to_files(bool store_basis_functi
     std::stringstream dir_name_stream;
     dir_name_stream << "offline_data_hp" << _tree.leaf_node_index;
     const std::string& directory_name = dir_name_stream.str();
-    _rb_construction.rb_eval->write_offline_data_to_files(directory_name);
+    _rb_construction.get_rb_evaluation().write_offline_data_to_files(directory_name);
 
     if(store_basis_functions)
     {
-      _rb_construction.rb_eval->write_out_basis_functions(_rb_construction,
+      _rb_construction.get_rb_evaluation().write_out_basis_functions(_rb_construction,
                                                           directory_name,
                                                           /*write_binary*/ true);
     }

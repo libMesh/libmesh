@@ -59,6 +59,22 @@ RBSCMEvaluation::~RBSCMEvaluation ()
 {
 }
 
+void RBSCMEvaluation::set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in)
+{
+  rb_theta_expansion = &rb_theta_expansion_in;
+}
+
+RBThetaExpansion& RBSCMEvaluation::get_rb_theta_expansion()
+{
+  if(!rb_theta_expansion)
+  {
+    libMesh::out << "Error: rb_theta_expansion hasn't been initialized yet" << std::endl;
+    libmesh_error();
+  }
+  
+  return *rb_theta_expansion;
+}
+
 void RBSCMEvaluation::set_C_J_stability_constraint(unsigned int j, Real stability_const_in)
 {
   if(j >= C_J_stability_vector.size())

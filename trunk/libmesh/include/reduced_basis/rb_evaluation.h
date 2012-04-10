@@ -65,6 +65,16 @@ public:
    * and clear and extra data in subclasses.
    */
   virtual void clear();
+  
+  /**
+   * Set the RBThetaExpansion object.
+   */
+  void set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in);
+  
+  /**
+   * Get a reference to the rb_theta_expansion.
+   */
+  RBThetaExpansion& get_rb_theta_expansion();
 
   /**
    * Resize and clear the data vectors corresponding to the
@@ -175,13 +185,6 @@ public:
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
-   * A pointer to to the object that stores the theta expansion.
-   * This is not an AutoPtr since we may want to share it.
-   * (Note: a shared_ptr would be a good option here.)
-   */
-  RBThetaExpansion* rb_theta_expansion;
-
-  /**
    * The libMesh vectors storing the finite element coefficients
    * of the RB basis functions.
    */
@@ -272,6 +275,15 @@ public:
    * Boolean flag to indicate whether we compute the RB_inner_product_matrix.
    */
   bool compute_RB_inner_product;
+
+private:
+
+  /**
+   * A pointer to to the object that stores the theta expansion.
+   * This is not an AutoPtr since we may want to share it.
+   * (Note: a shared_ptr would be a good option here.)
+   */
+  RBThetaExpansion* rb_theta_expansion;
 
 };
 

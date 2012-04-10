@@ -35,6 +35,7 @@
 namespace libMesh
 {
 
+class RBThetaExpansion;
 class RBAssemblyExpansion;
 
 /**
@@ -72,6 +73,37 @@ public:
    * The type of system.
    */
   typedef RBConstruction sys_type;
+
+  /**
+   * Set the RBEvaluation object.
+   */
+  void set_rb_evaluation(RBEvaluation& rb_eval_in);
+  
+  /**
+   * Get a reference to the RBEvaluation object.
+   */
+  RBEvaluation& get_rb_evaluation();
+  
+  /**
+   * @return true if rb_eval is initialized. False, otherwise.
+   */
+  bool is_rb_eval_initialized() const;
+
+  /**
+   * Get a reference to the RBThetaExpansion object that
+   * that belongs to rb_eval.
+   */
+  RBThetaExpansion& get_rb_theta_expansion();
+
+  /**
+   * Set the rb_assembly_expansion object.
+   */
+  void set_rb_assembly_expansion(RBAssemblyExpansion& rb_assembly_expansion_in);
+
+  /**
+   * @return a reference to the rb_assembly_expansion object
+   */
+  RBAssemblyExpansion& get_rb_assembly_expansion();
 
   /**
    * @returns a clever pointer to the system.
@@ -173,27 +205,6 @@ public:
    * into this system's solution vector.
    */
   virtual void load_rb_solution();
-
-  /**
-   * Attach user-defined assembly routine
-   * for the inner-product matrix.
-   */
-  void attach_inner_prod_assembly(ElemAssembly* IP_assembly);
-
-  /**
-   * Attach user-defined assembly routine
-   * for the constraint matrix.
-   */
-  void attach_constraint_assembly(ElemAssembly* constraint_assembly_in);
-
-  /**
-   * Attach the affine expansion associated with this system.
-   * The affine expansion is defined by the set of parameter-dependent
-   * functions (defined in \p rb_theta_expansion_in) and parameter-independent
-   * operators (defined in \p rb_assembly_expansion_in).
-   */
-  virtual void attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
-                                       RBAssemblyExpansion& rb_assembly_expansion_in);
 
   /**
    * Get a pointer to inner_product_matrix. Accessing via this
@@ -326,9 +337,24 @@ public:
   unsigned int get_delta_N() const { return delta_N; }
 
   /**
-   * @return the rb_assembly_expansion object
+   * Set the rb_assembly_expansion object.
    */
-  RBAssemblyExpansion& get_rb_assembly_expansion();
+  void set_inner_product_assembly(ElemAssembly& inner_product_assembly_in);
+
+  /**
+   * @return a reference to the inner product assembly object
+   */
+  ElemAssembly& get_inner_product_assembly();
+
+  /**
+   * Set the rb_assembly_expansion object.
+   */
+  void set_constraint_assembly(ElemAssembly& constraint_assembly_in);
+
+  /**
+   * @return a reference to the constraint assembly object
+   */
+  ElemAssembly& get_constraint_assembly();
 
   /**
    * It is sometimes useful to be able to zero vector entries
@@ -343,13 +369,6 @@ public:
   static AutoPtr<DirichletBoundary> build_zero_dirichlet_boundary_object();
 
   //----------- PUBLIC DATA MEMBERS -----------//
-
-  /**
-   * The current RBEvaluation object we are using to
-   * perform the Evaluation stage of the reduced basis
-   * method.
-   */
-  RBEvaluation* rb_eval;
 
   /**
    * Vector storing the values of the error bound
@@ -665,23 +684,6 @@ protected:
   bool quiet_mode;
 
   /**
-   * This member holds the (parameter independent) assembly functors
-   * that define the "affine expansion" of the PDE that we are solving.
-   */
-  RBAssemblyExpansion* rb_assembly_expansion;
-
-  /**
-   * Pointer to inner product assembly.
-   */
-  ElemAssembly* inner_prod_assembly;
-
-  /**
-   * Function pointer for assembling the constraint
-   * matrix.
-   */
-  ElemAssembly* constraint_assembly;
-
-  /**
    * A boolean flag to indicate whether or not the output dual norms
    * have already been computed --- used to make sure that we don't
    * recompute them unnecessarily.
@@ -700,11 +702,28 @@ private:
   //----------- PRIVATE DATA MEMBERS -----------//
 
   /**
-   * DirichletBoundaryies object which defines the Dirichlet boundary conditions
-   * for this problem. Note that in the RB framework, we typically enforce
-   * zero Dirichlet BCs and non-homogeneous conditions are imposed via lifting.
+   * The current RBEvaluation object we are using to
+   * perform the Evaluation stage of the reduced basis
+   * method.
    */
-  DirichletBoundaries dirichlet_conditions;
+  RBEvaluation* rb_eval;
+
+  /**
+   * This member holds the (parameter independent) assembly functors
+   * that define the "affine expansion" of the PDE that we are solving.
+   */
+  RBAssemblyExpansion* rb_assembly_expansion;
+
+  /**
+   * Pointer to inner product assembly.
+   */
+  ElemAssembly* inner_product_assembly;
+
+  /**
+   * Function pointer for assembling the constraint
+   * matrix.
+   */
+  ElemAssembly* constraint_assembly;
 
   /**
    * Vector storing the Q_a matrices from the affine expansion
