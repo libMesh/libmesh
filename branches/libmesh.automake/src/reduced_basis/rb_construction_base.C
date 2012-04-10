@@ -45,7 +45,6 @@ RBConstructionBase<Base>::RBConstructionBase (EquationSystems& es,
                                               const std::string& name,
                                               const unsigned int number)
   : Base(es, name, number),
-    rb_theta_expansion(NULL),
     training_parameters_initialized(false),
     training_parameters_random_seed(-1), // by default, use std::time to seed RNG
     serial_training_set(false),

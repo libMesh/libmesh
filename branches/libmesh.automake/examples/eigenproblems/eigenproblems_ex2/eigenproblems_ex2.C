@@ -185,7 +185,7 @@ int main (int argc, char** argv)
       
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write the eigen vector to file.
-      ExodusII_IO (mesh).write_equation_systems ("out.exd", equation_systems);
+      ExodusII_IO (mesh).write_equation_systems ("out.e", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }
   else

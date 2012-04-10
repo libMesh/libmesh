@@ -144,3 +144,6 @@ examples/reduced_basis/reduced_basis_ex5/offline_data/
 examples/systems_of_equations/systems_of_equations_ex4/displacement.e
 examples/systems_of_equations/systems_of_equations_ex5/displacement.e
 examples/transient/transient_ex2/pressure_node.res
+examples/miscellaneous/miscellaneous_ex7/bih.1.e
+examples/miscellaneous/miscellaneous_ex7/bih.2.e
+examples/miscellaneous/miscellaneous_ex7/bih.3.e

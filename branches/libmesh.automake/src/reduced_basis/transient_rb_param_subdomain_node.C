@@ -73,7 +73,7 @@ void TransientRBParamSubdomainNode::add_child(const std::vector<Real>& new_ancho
 
 void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
 {
-    _rb_construction.rb_eval->clear();
+    _rb_construction.get_rb_evaluation().clear();
 
     // Load the (full or subsampled) training set
     if(_tree.n_subsampled_training_points >= n_global_training_parameters())
@@ -118,7 +118,7 @@ void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
     trans_rb.set_delta_N(saved_delta_N);
 
     trans_rb.set_current_parameters(this->anchor);
-    Real RB_error = trans_rb.rb_eval->rb_solve(trans_rb.rb_eval->get_n_basis_functions());
+    Real RB_error = trans_rb.get_rb_evaluation().rb_solve(trans_rb.get_rb_evaluation().get_n_basis_functions());
     if (RB_error > _tree.h_tol/trans_tree.conserv_factor)
     {
         libMesh::out << "Error: The h-tolerance was not satisfied at the "
@@ -185,7 +185,7 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound)
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy
     if ( (greedy_bound > _tree.p_tol) ||
-         (_rb_construction.rb_eval->get_n_basis_functions() < _rb_construction.get_Nmax()) )
+         (_rb_construction.get_rb_evaluation().get_n_basis_functions() < _rb_construction.get_Nmax()) )
     {
         greedy_bound = _rb_construction.train_reduced_basis();
     }
@@ -233,7 +233,7 @@ void TransientRBParamSubdomainNode::split_this_subdomain(bool h_stage_split)
     {
         if (anchors_are_equal)
         {
-            for (unsigned int i=2; i< _rb_construction.rb_eval->greedy_param_list.size() ; i++)
+            for (unsigned int i=2; i< _rb_construction.get_rb_evaluation().greedy_param_list.size() ; i++)
             {
                 bool parameters_are_equal = true;
                 for (unsigned int  j = 0; j < left_child->anchor.size(); j++)

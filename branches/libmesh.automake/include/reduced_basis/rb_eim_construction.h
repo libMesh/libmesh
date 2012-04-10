@@ -127,7 +127,7 @@ public:
    * approximation. Each function is typically used in an associated
    * reduced basis approximation.
    */
-  virtual unsigned int get_n_affine_functions() const;
+  virtual unsigned int get_n_affine_functions();
 
   /**
    * Evaluate the basis function \p index at the points \p qpoints

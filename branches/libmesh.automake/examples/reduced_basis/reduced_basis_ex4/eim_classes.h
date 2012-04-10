@@ -65,7 +65,7 @@ public:
 
     Parent::init_data();
 
-    attach_inner_prod_assembly(&ip);
+    set_inner_product_assembly(ip);
   }
 
   /**
@@ -76,7 +76,7 @@ public:
   {
     // Initialize the EIM_F objects
     rb_eim_f_vector.clear();
-    for(unsigned int i=0; i<rb_eval->get_n_basis_functions(); i++)
+    for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
     {
       rb_eim_f_vector.push_back(new EIM_F(*this, i));
     }

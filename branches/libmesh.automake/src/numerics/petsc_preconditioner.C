@@ -28,8 +28,8 @@
 #include "petsc_vector.h"
 #include "libmesh_common.h"
 
-// PCBJacobiGetSubKSP was defined in petscksp.h in PETSc 2.3.3
-#if PETSC_VERSION_LESS_THAN(3,0,0)
+// PCBJacobiGetSubKSP was defined in petscksp.h in PETSc 2.3.3, 3.1.0
+#if PETSC_VERSION_LESS_THAN(3,1,0)
 
 EXTERN_C_FOR_PETSC_BEGIN
 #include "petscksp.h"

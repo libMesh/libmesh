@@ -396,6 +396,7 @@ libmesh_la_SOURCES = \
 		src/solvers/newton_solver.C \
 		src/solvers/nonlinear_solver.C \
 		src/solvers/petsc_diff_solver.C \
+		src/solvers/petsc_dm_nonlinear_solver.C \
 		src/solvers/petsc_linear_solver.C \
 		src/solvers/petsc_nonlinear_solver.C \
 		src/solvers/slepc_eigen_solver.C \
