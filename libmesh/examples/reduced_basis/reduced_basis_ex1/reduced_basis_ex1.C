@@ -51,7 +51,6 @@
 #include "equation_systems.h"
 #include "dof_map.h"
 #include "getpot.h"
-#include "o_string_stream.h"
 #include "elem.h"
 
 // local includes
@@ -127,7 +126,7 @@ int main (int argc, char** argv)
   
     // We need to give the RBConstruction object a pointer to
     // our RBEvaluation object
-    rb_con.rb_eval = &rb_eval;
+    rb_con.set_rb_evaluation(rb_eval);
 
     // Read in the data that defines this problem from the specified text file
     rb_con.process_parameters_file(parameters_filename);
@@ -146,7 +145,7 @@ int main (int argc, char** argv)
     rb_con.train_reduced_basis();
     
     // Write out the data that will subsequently be required for the Evaluation stage
-    rb_con.rb_eval->write_offline_data_to_files();
+    rb_con.get_rb_evaluation().write_offline_data_to_files();
     
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
@@ -157,7 +156,7 @@ int main (int argc, char** argv)
       equation_systems.write("equation_systems.dat", WRITE);
       
       // Write out the basis functions
-      rb_con.rb_eval->write_out_basis_functions(rb_con);
+      rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
     }
   }
   else // Perform the Online stage of the RB method
@@ -201,7 +200,7 @@ int main (int argc, char** argv)
       // was written out in the offline stage
       equation_systems.read("equation_systems.dat", READ);
       RBConstruction& rb_con = equation_systems.get_system<RBConstruction>("RBConvectionDiffusion");
-      rb_con.rb_eval = &rb_eval;
+      rb_con.set_rb_evaluation(rb_eval);
 
       // Read in the basis functions
       rb_eval.read_in_basis_functions(rb_con);

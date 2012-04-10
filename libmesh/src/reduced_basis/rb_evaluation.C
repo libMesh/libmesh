@@ -39,7 +39,8 @@ namespace libMesh
 RBEvaluation::RBEvaluation ()
   :
   evaluate_RB_error_bound(true),
-  compute_RB_inner_product(false)
+  compute_RB_inner_product(false),
+  rb_theta_expansion(NULL)
 {
 }
 
@@ -72,6 +73,22 @@ void RBEvaluation::clear()
   greedy_param_list.clear();
 
   STOP_LOG("clear()", "RBEvaluation");
+}
+
+void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in)
+{
+  rb_theta_expansion = &rb_theta_expansion_in;
+}
+
+RBThetaExpansion& RBEvaluation::get_rb_theta_expansion()
+{
+  if(!rb_theta_expansion)
+  {
+    libMesh::out << "Error: rb_theta_expansion hasn't been initialized yet" << std::endl;
+    libmesh_error();
+  }
+  
+  return *rb_theta_expansion;
 }
 
 void RBEvaluation::resize_data_structures(const unsigned int Nmax)

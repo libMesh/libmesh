@@ -67,9 +67,8 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
   // processors
   serial_training_set = true;
 
-  // attach empty RBThetaExpansion and RBAssemblyExpansion objects
-  attach_affine_expansion(empty_rb_theta_expansion,
-                          empty_rb_assembly_expansion);
+  // attach empty RBAssemblyExpansion object
+  set_rb_assembly_expansion(empty_rb_assembly_expansion);
 }
 
 RBEIMConstruction::~RBEIMConstruction ()
@@ -163,22 +162,22 @@ void RBEIMConstruction::initialize_rb_construction()
 
 Number RBEIMConstruction::evaluate_parametrized_function(unsigned int index, const Point& p)
 {
-  RBEIMEvaluation* eim_eval = libmesh_cast_ptr<RBEIMEvaluation*>(rb_eval);
-  eim_eval->set_current_parameters( get_current_parameters() );
+  RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+  eim_eval.set_current_parameters( get_current_parameters() );
   
-  if(index >= eim_eval->get_n_parametrized_functions())
+  if(index >= eim_eval.get_n_parametrized_functions())
   {
     libMesh::err << "Error: We must have index < get_n_parametrized_functions() in evaluate_parametrized_function."
                  << std::endl;
     libmesh_error();
   }
 
-  return eim_eval->evaluate_parametrized_function(index, p);
+  return eim_eval.evaluate_parametrized_function(index, p);
 }
 
-unsigned int RBEIMConstruction::get_n_affine_functions() const
+unsigned int RBEIMConstruction::get_n_affine_functions()
 {
-  return n_vars() * rb_eval->get_n_basis_functions();
+  return n_vars() * get_rb_evaluation().get_n_basis_functions();
 }
 
 std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int bf_index,
@@ -243,7 +242,7 @@ void RBEIMConstruction::set_current_basis_function(unsigned int basis_function_i
     unsigned int basis_function_id = current_bf_index/n_vars();
 
     // and create a ghosted version of the appropriate basis function
-    rb_eval->get_basis_function(basis_function_id).localize
+    get_rb_evaluation().get_basis_function(basis_function_id).localize
       (*current_ghosted_bf, this->get_dof_map().get_send_list());
   }
 
@@ -254,30 +253,30 @@ void RBEIMConstruction::enrich_RB_space()
 {
   START_LOG("enrich_RB_space()", "RBEIMConstruction");
 
-  RBEIMEvaluation* eim_eval = libmesh_cast_ptr<RBEIMEvaluation*>(rb_eval);
+  RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
 
   // If we have at least one basis function we need to use
   // rb_solve, otherwise just use new_bf as is
-  if(rb_eval->get_n_basis_functions() > 0)
+  if(get_rb_evaluation().get_n_basis_functions() > 0)
   {
     // get the right-hand side vector for the EIM approximation
     // by sampling the parametrized function (stored in solution)
     // at the interpolation points
-    unsigned int RB_size = rb_eval->get_n_basis_functions();
+    unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
     DenseVector<Number> EIM_rhs(RB_size);
     for(unsigned int i=0; i<RB_size; i++)
     {
-      EIM_rhs(i) = (*mesh_function)(eim_eval->interpolation_points[i]);
+      EIM_rhs(i) = (*mesh_function)(eim_eval.interpolation_points[i]);
     }
 
-    eim_eval->set_current_parameters( get_current_parameters() );
-    eim_eval->rb_solve(EIM_rhs);
+    eim_eval.set_current_parameters( get_current_parameters() );
+    eim_eval.rb_solve(EIM_rhs);
 
     // Load the "EIM residual" into solution by subtracting
     // the EIM approximation
-    for(unsigned int i=0; i<rb_eval->get_n_basis_functions(); i++)
+    for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
     {
-      solution->add(-eim_eval->RB_solution(i), rb_eval->get_basis_function(i));
+      solution->add(-eim_eval.RB_solution(i), get_rb_evaluation().get_basis_function(i));
     }
   }
 
@@ -343,18 +342,18 @@ void RBEIMConstruction::enrich_RB_space()
   // Store optimal point in interpolation_points
   if(!performing_extra_greedy_step)
   {
-    eim_eval->interpolation_points.push_back(optimal_point);
-    eim_eval->interpolation_points_var.push_back(optimal_var);
+    eim_eval.interpolation_points.push_back(optimal_point);
+    eim_eval.interpolation_points_var.push_back(optimal_var);
 
     NumericVector<Number>* new_bf = NumericVector<Number>::build().release();
     new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     *new_bf = *solution;
-    rb_eval->basis_functions.push_back( new_bf );
+    get_rb_evaluation().basis_functions.push_back( new_bf );
   }
   else
   {
-    eim_eval->extra_interpolation_point = optimal_point;
-    eim_eval->extra_interpolation_point_var = optimal_var;
+    eim_eval.extra_interpolation_point = optimal_point;
+    eim_eval.extra_interpolation_point_var = optimal_var;
   }
 
   STOP_LOG("enrich_RB_space()", "RBEIMConstruction");
@@ -364,7 +363,7 @@ Real RBEIMConstruction::compute_best_fit_error()
 {
   START_LOG("compute_best_fit_error()", "RBEIMConstruction");
 
-  const unsigned int RB_size = rb_eval->get_n_basis_functions();
+  const unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
   // load the parametrized function into the solution vector
   truth_solve(-1);
@@ -385,24 +384,24 @@ Real RBEIMConstruction::compute_best_fit_error()
         {
           matrix->vector_mult(*inner_product_storage_vector, *solution);
         }
-        best_fit_rhs(i) = inner_product_storage_vector->dot(rb_eval->get_basis_function(i));
+        best_fit_rhs(i) = inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(i));
       }
 
       // Now compute the best fit by an LU solve
-      rb_eval->RB_solution.resize(RB_size);
+      get_rb_evaluation().RB_solution.resize(RB_size);
       DenseMatrix<Number> RB_inner_product_matrix_N(RB_size);
-      rb_eval->RB_inner_product_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
+      get_rb_evaluation().RB_inner_product_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
 
-      RB_inner_product_matrix_N.lu_solve(best_fit_rhs, rb_eval->RB_solution);
+      RB_inner_product_matrix_N.lu_solve(best_fit_rhs, get_rb_evaluation().RB_solution);
       break;
     }
     case(EIM_BEST_FIT):
     {
       // Turn off error estimation here, we use the linfty norm instead
-      rb_eval->evaluate_RB_error_bound = false;
-      rb_eval->set_current_parameters( get_current_parameters() );
-      rb_eval->rb_solve(RB_size);
-      rb_eval->evaluate_RB_error_bound = true;
+      get_rb_evaluation().evaluate_RB_error_bound = false;
+      get_rb_evaluation().set_current_parameters( get_current_parameters() );
+      get_rb_evaluation().rb_solve(RB_size);
+      get_rb_evaluation().evaluate_RB_error_bound = true;
       break;
     }
     default:
@@ -413,9 +412,9 @@ Real RBEIMConstruction::compute_best_fit_error()
   }
 
   // load the error into solution
-  for(unsigned int i=0; i<rb_eval->get_n_basis_functions(); i++)
+  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
   {
-    solution->add(-rb_eval->RB_solution(i), rb_eval->get_basis_function(i));
+    solution->add(-get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
   }
 
   Real best_fit_error = solution->linfty_norm();
@@ -542,26 +541,26 @@ void RBEIMConstruction::update_RB_system_matrices()
 
   Parent::update_RB_system_matrices();
 
-  unsigned int RB_size = rb_eval->get_n_basis_functions();
+  unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  RBEIMEvaluation* eim_eval = libmesh_cast_ptr<RBEIMEvaluation*>(rb_eval);
+  RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
 
   // update the EIM interpolation matrix
   for(unsigned int j=0; j<RB_size; j++)
   {
     // Sample the basis functions at the
     // new interpolation point
-    rb_eval->get_basis_function(j).localize(*serialized_vector);
+    get_rb_evaluation().get_basis_function(j).localize(*serialized_vector);
 
     if(!performing_extra_greedy_step)
     {
-      eim_eval->interpolation_matrix(RB_size-1,j) =
-        (*mesh_function)(eim_eval->interpolation_points[RB_size-1]);
+      eim_eval.interpolation_matrix(RB_size-1,j) =
+        (*mesh_function)(eim_eval.interpolation_points[RB_size-1]);
     }
     else
     {
-      eim_eval->extra_interpolation_matrix_row(j) =
-        (*mesh_function)(eim_eval->extra_interpolation_point);
+      eim_eval.extra_interpolation_matrix_row(j) =
+        (*mesh_function)(eim_eval.extra_interpolation_point);
     }
   }
 
@@ -593,7 +592,7 @@ bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
     return false;
   }
 
-  if(rb_eval->get_n_basis_functions() >= this->get_Nmax())
+  if(get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
   {
     libMesh::out << "Maximum number of basis functions reached: Nmax = "
               << get_Nmax() << "." << std::endl

@@ -73,6 +73,16 @@ public:
   virtual void clear ();
 
   /**
+   * Allocate all the data structures necessary for the construction
+   * stage of the RB method. This function also performs
+   * matrix and vector assembly of the "truth" affine expansion.
+   *
+   * Override to check that theta and assembly expansions are consistently
+   * sized.
+   */
+  virtual void initialize_rb_construction();
+
+  /**
    * Perform a truth solve at the current parameter.
    */
   virtual Real truth_solve(int write_interval);
@@ -142,21 +152,14 @@ public:
                                  NumericVector<Number>& arg);
 
   /**
-   * Attach user-defined assembly routine
-   * for the L2 matrix.
+   * Set the L2 object.
    */
-  void attach_L2_assembly(ElemAssembly* L2_assembly);
+  void set_L2_assembly(ElemAssembly& L2_assembly_in);
 
   /**
-   * Attach the affine expansion associated with this system.
-   * The affine expansion is defined by the set of parameter-dependent
-   * functions (defined in \p rb_theta_expansion_in) and parameter-independent
-   * operators (defined in \p rb_assembly_expansion_in).
-   * Override to also check that the time-derivative expansions are sized
-   * consistently.
+   * @return a reference to the L2 assembly object
    */
-  virtual void attach_affine_expansion(RBThetaExpansion& rb_theta_expansion_in,
-                                       RBAssemblyExpansion& rb_assembly_expansion_in);
+  ElemAssembly& get_L2_assembly();
 
   /**
    * Assemble the q^th affine term of the mass matrix and store it in input_matrix.
