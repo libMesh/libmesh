@@ -25,10 +25,10 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 
     # unspecified - look in contrib  
     if test "$withtecplot" = no ; then
-      AC_CHECK_FILE($top_srcdir/contrib/tecplot/lib/$host/tecio.a,
-  	  	  TECPLOT_LIBRARY_PATH=$PWD/contrib/tecplot/lib/$host)
-      AC_CHECK_FILE($top_srcdir/contrib/tecplot/include/TECIO.h,
-   	  	  TECPLOT_INCLUDE_PATH=$PWD/contrib/tecplot/include)
+      AC_CHECK_FILE($srcdir/contrib/tecplot/lib/$host/tecio.a,
+  	  	  TECPLOT_LIBRARY_PATH=$srcdir/contrib/tecplot/lib/$host)
+      AC_CHECK_FILE($srcdir/contrib/tecplot/include/TECIO.h,
+   	  	  TECPLOT_INCLUDE_PATH=$srcdir/contrib/tecplot/include)
 
     # specified - look there
     else
@@ -49,8 +49,16 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       CPPFLAGS="-I$TECPLOT_INCLUDE_PATH $CPPFLAGS"
       LIBS="$TECPLOT_LIBRARY_PATH/tecio.a $LIBS"
   
-      AC_TRY_LINK([#include <TECIO.h>],
-                  [ int ierr = TECEND ();],
+      AC_LINK_IFELSE(
+                  [	
+#include <TECIO.h>
+
+int main (int, char**)
+{
+   int ierr = TECEND ();
+   return ierr;
+}
+                  ],
                   [
                      TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
                      TECPLOT_INCLUDE=-I$TECPLOT_INCLUDE_PATH

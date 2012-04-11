@@ -504,6 +504,10 @@ if LIBMESH_ENABLE_NEMESIS
   libmesh_la_LIBADD += contrib/nemesis/Lib/libnemesis.la
 endif
 
+if LIBMESH_ENABLE_TECPLOT
+  libmesh_la_LIBADD += @TECPLOT_LIBRARY@
+endif
+
 if LIBMESH_ENABLE_TRIANGLE
   SUBDIRS += contrib/triangle
   libmesh_la_LIBADD += contrib/triangle/libtriangle.la
