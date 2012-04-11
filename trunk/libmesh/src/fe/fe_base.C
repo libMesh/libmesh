@@ -1222,7 +1222,10 @@ bool FEBase::on_reference_element(const Point& p, const ElemType t, const Real e
 
   switch (t)
     {
-
+    case NODEELEM:
+      {
+        return (!xi && !eta && !zeta);
+      }
     case EDGE2:
     case EDGE3:
     case EDGE4:
