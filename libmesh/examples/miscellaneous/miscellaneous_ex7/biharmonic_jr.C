@@ -185,6 +185,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> &u,
 					   SparseMatrix<Number> *J,
 					   NonlinearImplicitSystem&)
 {
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (!R && !J)
     return;
 
@@ -464,6 +465,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> &u,
 	J->add_matrix(Je, dof_indices);
       }
   } // for el
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 }
 
 
