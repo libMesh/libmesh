@@ -206,9 +206,6 @@ Biharmonic::Biharmonic(Mesh* m) :
     // Dimension
     _dim = command_line_value("dim",1);
 
-    // Skip higher-dimensional examples on a lower-dimensional libMesh build
-    libmesh_example_assert(_dim <= LIBMESH_DIM, "2D/3D support");
-
     ASSERT((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
 
     // Build the mesh
