@@ -41,10 +41,15 @@ int main(int argc, char** argv)
   else
     {
 #if !defined(LIBMESH_ENABLE_SECOND_DERIVATIVES)
-  libmesh_example_assert(false, "--enable-second");
+      libmesh_example_assert(false, "--enable-second");
 #elif !defined(LIBMESH_ENABLE_PERIODIC)
-  libmesh_example_assert(false, "--enable-periodic");
+      libmesh_example_assert(false, "--enable-periodic");
 #endif
+
+      const int dim = command_line_value("dim",1);
+
+      // Skip higher-dimensional examples on a lower-dimensional libMesh build
+      libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
 
       Biharmonic* biharmonic;
       Biharmonic::Create(&biharmonic);
