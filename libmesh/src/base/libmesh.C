@@ -694,8 +694,14 @@ SolverPackage default_solver_package ()
 
 //-------------------------------------------------------------------------------
 template int          command_line_value<int>         (const std::string&, int);
-template Real         command_line_value<Real>        (const std::string&, Real);
+template float        command_line_value<float>       (const std::string&, float);
+template double       command_line_value<double>      (const std::string&, double);
+template long double  command_line_value<long double> (const std::string&, long double);
 template std::string  command_line_value<std::string> (const std::string&, std::string);
-template void         command_line_vector<Real>       (const std::string&, std::vector<Real>&);
+
+template void         command_line_vector<int>         (const std::string&, std::vector<int>&);
+template void         command_line_vector<float>       (const std::string&, std::vector<float>&);
+template void         command_line_vector<double>      (const std::string&, std::vector<double>&);
+template void         command_line_vector<long double> (const std::string&, std::vector<long double>&);
 
 } // namespace libMesh
