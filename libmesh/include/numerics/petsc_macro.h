@@ -122,6 +122,10 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 #  define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
 #endif
 
+#else // LIBMESH_HAVE_PETSC
+
+#define PETSC_VERSION_LESS_THAN(major,minor,subminor) 1
+
 #endif // LIBMESH_HAVE_PETSC
 
 #endif // __petsc_macro_h__
