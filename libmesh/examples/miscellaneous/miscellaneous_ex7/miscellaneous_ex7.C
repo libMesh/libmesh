@@ -40,6 +40,12 @@ int main(int argc, char** argv)
     print_help(argc, argv);
   else
     {
+#if !defined(LIBMESH_ENABLE_SECOND_DERIVATIVES)
+  libmesh_example_assert(false, "--enable-second");
+#elif !defined(LIBMESH_ENABLE_PERIODIC)
+  libmesh_example_assert(false, "--enable-periodic");
+#endif
+
       Biharmonic* biharmonic;
       Biharmonic::Create(&biharmonic);
       biharmonic->viewParameters();
