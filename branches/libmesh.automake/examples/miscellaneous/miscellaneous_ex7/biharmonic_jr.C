@@ -24,6 +24,8 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
 #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
   ERROR("Must have second derivatives enabled");
 #endif
+
+#ifdef LIBMESH_ENABLE_PERIODIC
   // Add periodicity to the mesh
   DofMap& dof_map = get_dof_map();
   PeriodicBoundary xbdry(RealVectorValue(1.0, 0.0, 0.0));
@@ -56,6 +58,7 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
       dof_map.add_periodic_boundary(zbdry);
       break;
     }
+#endif // LIBMESH_ENABLE_PERIODIC
 
   // Adaptivity stuff is commented out for now...
   // #ifndef   LIBMESH_ENABLE_AMR
@@ -182,6 +185,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> &u,
 					   SparseMatrix<Number> *J,
 					   NonlinearImplicitSystem&)
 {
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (!R && !J)
     return;
 
@@ -461,6 +465,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> &u,
 	J->add_matrix(Je, dof_indices);
       }
   } // for el
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 }
 
 

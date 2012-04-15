@@ -205,6 +205,7 @@ Biharmonic::Biharmonic(Mesh* m) :
 
     // Dimension
     _dim = command_line_value("dim",1);
+
     ASSERT((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
 
     // Build the mesh

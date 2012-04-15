@@ -565,6 +565,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
     }
 
   // Is this definitely necessary? [RHS]
+  // Yes. [RHS 2012]
   if (get_jacobian)
     matrix->zero();
   if (get_residual)
