@@ -46,6 +46,9 @@ int main(int argc, char** argv)
       libmesh_example_assert(false, "--enable-periodic");
 #endif
 
+      // This is a PETSc-specific solver
+      libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+
       const int dim = command_line_value("dim",1);
 
       // Skip higher-dimensional examples on a lower-dimensional libMesh build

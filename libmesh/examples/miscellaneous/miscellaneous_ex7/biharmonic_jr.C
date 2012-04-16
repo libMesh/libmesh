@@ -29,8 +29,12 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
   // Add periodicity to the mesh
   DofMap& dof_map = get_dof_map();
   PeriodicBoundary xbdry(RealVectorValue(1.0, 0.0, 0.0));
+#if LIBMESH_DIM > 1
   PeriodicBoundary ybdry(RealVectorValue(0.0, 1.0, 0.0));
+#endif
+#if LIBMESH_DIM > 2
   PeriodicBoundary zbdry(RealVectorValue(0.0, 0.0, 1.0));
+#endif
 
   switch(_biharmonic._dim)
     {
@@ -39,6 +43,7 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
       xbdry.pairedboundary = 1;
       dof_map.add_periodic_boundary(xbdry);
       break;
+#if LIBMESH_DIM > 1
     case 2:
       xbdry.myboundary = 3;
       xbdry.pairedboundary = 1;
@@ -46,6 +51,9 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
       ybdry.myboundary = 0;
       ybdry.pairedboundary = 2;
       dof_map.add_periodic_boundary(ybdry);
+      break;
+#endif
+#if LIBMESH_DIM > 2
     case 3:
       xbdry.myboundary = 4;
       xbdry.pairedboundary = 2;
@@ -57,6 +65,9 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
       zbdry.pairedboundary = 5;
       dof_map.add_periodic_boundary(zbdry);
       break;
+#endif
+    default:
+      libmesh_error();
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 
