@@ -362,8 +362,40 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 	break;
       } // case 4
 
+      // How to refine a BinaryTree Node
+    case 2:
+      {
+	const Real xmin = bounding_box.first(0);
+
+	const Real xmax = bounding_box.second(0);
+
+	const Real xc = xmin + .5*(xmax - xmin);
+
+	switch (c)
+	  {
+	  case 0:
+	    {
+	      return std::make_pair (Point(xmin), Point(xc));
+	      break;
+	    }
+
+	  case 1:
+	    {
+	      return std::make_pair (Point(xc), Point(xmax));
+	      break;
+	    }
+
+	  default:
+	    libMesh::err << "c >= N!" << std::endl;
+	    libmesh_error();
+	  }
+
+	break;
+      } // case 2
+
+
     default:
-      libMesh::err << "Only implemented for Octrees and QuadTrees!" << std::endl;
+      libMesh::err << "Only implemented for Octrees, QuadTrees, and Binary Trees!" << std::endl;
       libmesh_error();
 
     }
@@ -606,6 +638,7 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
 
 // ------------------------------------------------------------
 // Explicit Instantiations
+template class TreeNode<2>;
 template class TreeNode<4>;
 template class TreeNode<8>;
 
