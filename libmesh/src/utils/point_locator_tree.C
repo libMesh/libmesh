@@ -133,7 +133,11 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
 		_tree = new Trees::OctTree (this->_mesh, 200, build_type);
 	      else
 #endif
+#if LIBMESH_DIM > 1
 		_tree = new Trees::QuadTree (this->_mesh, 200, build_type);
+#else
+		_tree = new Trees::BinaryTree (this->_mesh, 200, build_type);
+#endif
 	    }
 
           STOP_LOG("init(no master)", "PointLocatorTree");

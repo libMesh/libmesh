@@ -89,6 +89,7 @@ const Elem* Tree<N>::find_element(const Point& p) const
 
 // ------------------------------------------------------------
 // Explicit Instantiations
+template class Tree<2>;
 template class Tree<4>;
 template class Tree<8>;
 
