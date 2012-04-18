@@ -714,6 +714,15 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
     }
   num_elem_blk = subdomain_map.size();
 
+  if (str_title.size() > MAX_LINE_LENGTH)
+    {
+      libMesh::err << "Warning, Exodus files cannot have titles longer than "
+		   << MAX_LINE_LENGTH
+		   << " characters.  Your title will be truncated."
+		   << std::endl;
+      str_title.resize(MAX_LINE_LENGTH);
+    }
+
   ex_err = exII::ex_put_init(ex_id,
 			     str_title.c_str(),
 			     num_dim,
@@ -764,6 +773,15 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     subdomain_map[cur_subdomain].push_back(elem->id());
   }
   num_elem_blk = subdomain_map.size();
+
+  if (str_title.size() > MAX_LINE_LENGTH)
+    {
+      libMesh::err << "Warning, Exodus files cannot have titles longer than "
+		   << MAX_LINE_LENGTH
+		   << " characters.  Your title will be truncated."
+		   << std::endl;
+      str_title.resize(MAX_LINE_LENGTH);
+    }
 
   ex_err = exII::ex_put_init(ex_id,
 			     str_title.c_str(),
@@ -1414,17 +1432,28 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number
 
 
 
-void ExodusII_IO_Helper::write_information_records(const std::vector<std::string> & records)
+void ExodusII_IO_Helper::write_information_records(const std::vector<std::string>& records)
 {
   if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
     return;
 
   int num_records = records.size();
-  std::vector<char *> info(num_records);
-  for ( int i(0); i < num_records;  ++i )
+  std::vector<char*> info(num_records);
+
+  // This is an abuse of the const char* returned by std::string, we trust that Exodus won't
+  // modify these when it's writing them out...
+  for (unsigned i=0; i<records.size(); ++i)
   {
-    info[i] = (char*)records[i].c_str();
+    // Records cannot be longer than MAX_LINE_LENGTH, as defined in exodusII.h
+    if (records[i].size() > MAX_LINE_LENGTH)
+      {
+	libMesh::err << "Error, cannot write records longer than " << MAX_LINE_LENGTH << " characters!" << std::endl;
+	libmesh_error();
+      }
+
+    info[i] = const_cast<char*>(records[i].c_str());
   }
+
   ex_err = exII::ex_put_info(ex_id, num_records, &info[0]);
   check_err(ex_err, "Error writing global values.");
 
