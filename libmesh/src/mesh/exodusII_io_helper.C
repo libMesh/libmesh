@@ -21,7 +21,6 @@
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
-#include <cstring>
 #include <algorithm>
 #include <functional>
 
@@ -30,8 +29,6 @@
 #include "elem.h"
 #include "system.h"
 #include "numeric_vector.h"
-
-#include <cstring>
 
 #ifdef DEBUG
 #include "mesh_tools.h"  // for elem_types warning
@@ -1233,10 +1230,12 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
 
   // For each string in names, allocate enough space in vvc and copy from
   // the C++ string into vvc for passing to the C interface.
-  for (int i(0); i < num_elem_vars; ++i)
+  for (int i=0; i<num_elem_vars; ++i)
     {
-      vvc[i].resize(names[i].size()+1);
-      std::strcpy(&(vvc[i][0]), names[i].c_str());
+      // Note: the one additional character is to hold the trailing '\0'
+      vvc[i].resize(names[i].size() + 1);
+      //std::strcpy(&(vvc[i][0]), names[i].c_str());
+      vvc[i][ names[i].copy(&vvc[i][0], vvc[i].size()-1) ] = '\0';
     }
 
   for (int i=0; i<num_elem_vars; ++i)
@@ -1279,7 +1278,8 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   for (int i=0; i<num_nodal_vars; i++)
     {
       vvc[i].resize(names[i].size()+1);
-      std::strcpy(&(vvc[i][0]), names[i].c_str());
+      //std::strcpy(&(vvc[i][0]), names[i].c_str());
+      vvc[i][ names[i].copy(&vvc[i][0], vvc[i].size()-1) ] = '\0';
     }
 
   for (int i=0; i<num_nodal_vars; i++)
@@ -1328,7 +1328,8 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
   for (int i=0; i<num_globals; i++)
     {
       vvc[i].resize(names[i].size()+1);
-      std::strcpy(&(vvc[i][0]), names[i].c_str());
+      // std::strcpy(&(vvc[i][0]), names[i].c_str());
+      vvc[i][ names[i].copy(&vvc[i][0], vvc[i].size()-1) ] = '\0';
     }
 
   for (int i=0; i<num_globals; i++)
@@ -1337,7 +1338,7 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
   if (_verbose)
     {
       libMesh::out << "Writing variable name(s) to file: " << std::endl;
-      for (int i(0); i < num_globals; ++i)
+      for (int i=0; i < num_globals; ++i)
 	libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
     }
 
