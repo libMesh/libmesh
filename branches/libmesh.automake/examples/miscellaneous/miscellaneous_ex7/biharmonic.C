@@ -63,7 +63,7 @@ void Biharmonic::viewParameters()
   if (_initialState == BALL)
     libMesh::out << "initial state:             ball\n";
 
-  libMesh::out << "initial state center     = (" << _initialCenter(0) << "," <<  _initialCenter(1) << "," <<  _initialCenter(2) << ")\n";
+  libMesh::out << "initial state center     = " << _initialCenter(0) << "\n";
   libMesh::out << "initial state width      = " << _initialWidth << "\n";
   libMesh::out << "initial time (min_time)  = " << _t0 << "\n";
   libMesh::out << "integration time         = " << _T  << "\n";

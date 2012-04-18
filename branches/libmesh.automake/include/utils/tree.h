@@ -113,6 +113,12 @@ private:
 namespace Trees
 {
   /**
+   * A BinaryTree is a tree appropriate
+   * for 1D meshes.
+   */
+  typedef Tree<2> BinaryTree;
+
+  /**
    * A QuadTree is a tree appropriate
    * for 2D meshes.
    */

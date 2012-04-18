@@ -44,7 +44,13 @@ int main(int argc, char** argv)
       libmesh_example_assert(false, "--enable-second");
 #elif !defined(LIBMESH_ENABLE_PERIODIC)
       libmesh_example_assert(false, "--enable-periodic");
+#elif defined(LIBMESH_ENABLE_PARMESH)
+      // ParallelMesh doesn't yet understand periodic BCs
+      libmesh_example_assert(false, "--disable-parmesh");
 #endif
+
+      // This is a PETSc-specific solver
+      libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
       const int dim = command_line_value("dim",1);
 
