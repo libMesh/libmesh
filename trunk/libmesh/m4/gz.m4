@@ -1,41 +1,42 @@
-dnl -------------------------------------------------------------
-dnl Read/Write Compressed Streams with gzstream
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Read/Write Compressed Streams with gzstream
+# -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_GZ], 
 [
-
-dnl Initialize variables
-GZSTREAM_INCLUDE=""
-GZSTREAM_LIB=""
+  AC_ARG_ENABLE(gzstreams,
+                AC_HELP_STRING([--enable-gzstreams],
+                               [build with gzstreams compressed I/O suppport]),
+		[case "${enableval}" in
+		  yes)  enablegz=yes ;;
+		   no)  enablegz=no ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gz) ;;
+		 esac],
+		 [enablegz=$enableoptional])
+		 
+	  
 
 if (test $enablegz = yes); then
-  dnl First check for C++-compatible system headers and libraries,
-  dnl then to make sure the user really has the contrib directory
-  AC_LANG_PUSH([C++])
-  OLD_CPPFLAGS=$CPPFLAGS
-  CPPFLAGS="-Icontrib/gzstream $CPPFLAGS"
-  AC_CHECK_HEADERS(zlib.h,
-    [AC_CHECK_LIB(z, gzopen,
-      [AC_CHECK_HEADER(gzstream.h,
-                       [enablegz=yes], [enablegz=no])])])
-  CPPFLAGS=$OLD_CPPFLAGS
-  AC_LANG_POP([C++])
-fi
+  # First check for the required system headers and libraries
+  AC_CHECK_HEADERS(zlib.h, have_zlib_h=yes)
+  AC_CHECK_LIB(z, gzopen, have_libz=yes)
 
-
-dnl by now, enablegz is only yes if zlib.h was found, and we have libz, and gzstream.h
-dnl so we are good.
-if (test $enablegz = yes); then
-
-  GZSTREAM_INCLUDE="-I$PWD/contrib/gzstream"
-  GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
-  AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
-  AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
-  
+  # If both tests succeded, continue the configuration process.
+  if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then
+    GZSTREAM_INCLUDE="-I\$(top_srcdir)/contrib/gzstream"
+    #GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
+    AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
+    AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)     
+    libmesh_contrib_INCLUDES="$GZSTREAM_INCLUDE $libmesh_contrib_INCLUDES"
+    libmesh_optional_LIBS="-lz $libmesh_optional_LIBS"
+  # Otherwise do not enable gzstreams
+  else
+    enablegz=no;
+  fi
 fi
 
 AC_SUBST(GZSTREAM_INCLUDE)
-AC_SUBST(GZSTREAM_LIB)	
+#AC_SUBST(GZSTREAM_LIB)	
 AC_SUBST(enablegz)
 
+AM_CONDITIONAL(LIBMESH_ENABLE_GZSTREAMS, test x$enablegz = xyes)
 ])
