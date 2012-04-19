@@ -376,14 +376,14 @@ bindir=$(exec_prefix)/bin/@host@_@METHOD@
 libdir=$(exec_prefix)/lib/@host@_@METHOD@
 pkgconfigdir=$(libdir)/pkgconfig
 
-   # the actual header files we want to test for self-sufficiency
-   headers_to_test = $(nobase_include_HEADERS)
-   if LIBMESH_ENABLE_EXODUS
-     headers_to_test += contrib/exodusII.h
-   endif
-   if LIBMESH_ENABLE_FPARSER
-     headers_to_test += contrib/fparser.hh
-   endif 
+# the actual header files we want to test for self-sufficiency
+headers_to_test = $(nobase_include_HEADERS)
+if LIBMESH_ENABLE_EXODUS
+  headers_to_test += contrib/exodusII.h
+endif
+if LIBMESH_ENABLE_FPARSER
+  headers_to_test += contrib/fparser.hh
+endif 
 
 installcheck-local:
 	@echo " "
