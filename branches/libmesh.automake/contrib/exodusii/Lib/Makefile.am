@@ -10,6 +10,14 @@ INCLUDES = -I$(srcdir)/include -I$(top_srcdir)/contrib/netcdf/Lib
 
 noinst_LTLIBRARIES     = libexodusII.la
 
+# generally we do not install contributed headers, but Moose and
+# some client apps expect exodusII.h to be there when libMesh
+# is present. since we've implicitly guaranteed this for ~10 years
+# no need to break that trust now.
+includedir      = $(prefix)/include/contrib
+include_HEADERS = include/exodusII.h include/exodusII_ext.h
+
+# the files required to actually build libexodusII.la
 libexodusII_la_SOURCES = \
 	include/exodusII_int.h \
 	include/exodusII.h \

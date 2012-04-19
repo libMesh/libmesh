@@ -381,7 +381,8 @@ installcheck-local:
 	@echo "Checking for standalone headers..."
 	@echo " "
 	@CXX="$(CXX)" \
-	  HEADERS_TO_TEST="$(nobase_include_HEADERS)" \
+	  HEADERS_TO_TEST="contrib/fparser.hh contrib/exodusII.h \
+                           $(nobase_include_HEADERS)" \
 	  PKG_CONFIG=$(PKG_CONFIG) \
 	  PKG_CONFIG_PATH=$(pkgconfigdir) \
 	  LIBMESH_CONFIG_PATH=$(bindir) \
