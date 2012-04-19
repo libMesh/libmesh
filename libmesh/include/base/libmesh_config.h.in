@@ -133,7 +133,7 @@
 /* define if the compiler supports __gnu_cxx::hash_set */
 #undef HAVE_EXT_HASH_SET
 
-/* Flag indicating whether the library will be compiled with fparser support
+/* Flag indicating whether the library will be compiled with FPARSER support
    */
 #undef HAVE_FPARSER
 
@@ -170,7 +170,8 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Flag indicating whether or not LASPACK iterative solvers are available */
+/* Flag indicating whether the library will be compiled with LASPACK support
+   */
 #undef HAVE_LASPACK
 
 /* Flag indicating whether the library will be compiled with libHilbert
@@ -183,7 +184,7 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Flag indicating whether or not Metis is available */
+/* Flag indicating whether the library will be compiled with Metis support */
 #undef HAVE_METIS
 
 /* Flag indicating whether the library shall be compiled to use the ML package
@@ -210,7 +211,8 @@
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP
 
-/* Flag indicating whether or not ParMetis is available */
+/* Flag indicating whether the library will be compiled with Parmetis support
+   */
 #undef HAVE_PARMETIS
 
 /* Flag indicating whether or not PETSc is available */
@@ -225,7 +227,7 @@
 /* define if the compiler supports Run-Time Type Identification */
 #undef HAVE_RTTI
 
-/* Flag indicating whether or not Space filling curves are available */
+/* Flag indicating whether the library will be compiled with SFC support */
 #undef HAVE_SFCURVES
 
 /* Flag indicating whether or not SLEPc is available */
@@ -278,7 +280,7 @@
    interface */
 #undef HAVE_TECPLOT_API
 
-/* Flag indicating whether the library will be compiled with TetGen support */
+/* Flag indicating whether the library will be compiled with Tetgen support */
 #undef HAVE_TETGEN
 
 /* define if the compiler supports std::tr1::unordered_map */
@@ -334,6 +336,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -380,11 +385,12 @@
    nothing if this is not supported.  Do not define if restrict is
    supported directly.  */
 #undef restrict
-/* Work around a bug in Sun C++: it does not support _Restrict, even
-   though the corresponding Sun C compiler does, which causes
-   "#define restrict _Restrict" in the previous line.  Perhaps some future
-   version of Sun C++ will work with _Restrict; if so, it'll probably
-   define __RESTRICT, just as Sun C does.  */
+/* Work around a bug in Sun C++: it does not support _Restrict or
+   __restrict__, even though the corresponding Sun C compiler ends up with
+   "#define restrict _Restrict" or "#define restrict __restrict__" in the
+   previous line.  Perhaps some future version of Sun C++ will work with
+   restrict; if so, hopefully it defines __RESTRICT like Sun C does.  */
 #if defined __SUNPRO_CC && !defined __RESTRICT
 # define _Restrict
+# define __restrict__
 #endif
