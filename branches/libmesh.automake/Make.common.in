@@ -91,7 +91,9 @@ libmesh_CFLAGS   := @CFLAGS_METHOD@
 
 #
 # The include directories for libMesh
+#    note that include/contrib only lives in installed trees
 libmesh_INCLUDE += -I$(top_srcdir)/include/base \
+	           -I$(top_srcdir)/include/contrib \
                    -I$(top_srcdir)/include/enums \
                    -I$(top_srcdir)/include/error_estimation \
                    -I$(top_srcdir)/include/fe \

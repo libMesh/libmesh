@@ -38,7 +38,7 @@ AC_CONFIG_FILES([Make.common.$METHOD:Make.common.in
 	         contrib/utils/Make.common
 		 examples/Makefile
 		 doc/Doxyfile
-		 libmesh.pc
+		 contrib/utils/libmesh.pc
 		 ])
 
 AC_CONFIG_FILES(contrib/bin/libmesh-config,          [chmod +x contrib/bin/libmesh-config])
