@@ -1,6 +1,6 @@
-dnl -------------------------------------------------------------
-dnl Tecplot
-dnl -------------------------------------------------------------
+# -------------------------------------------------------------
+# Tecplot
+# -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_TECPLOT],
 [
   AC_ARG_ENABLE(tecplot,
@@ -15,8 +15,8 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 
 
 
-  dnl The Tecplot API is distributed with libmesh, but we want to support external installations
-  dnl on platforms we may not have the binaries for...
+  # The Tecplot API is distributed with libmesh, but we want to support external installations
+  # on platforms we may not have the binaries for...
   if (test $enabletecplot = yes); then
     AC_ARG_WITH(tecplot,
                 AC_HELP_STRING([--with-tecplot=PATH],[Specify the path where Tecplot is installed]),
@@ -40,9 +40,9 @@ AC_DEFUN([CONFIGURE_TECPLOT],
   
     if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
   
-      dnl--------------------------------------------------------------------------
-      dnl OK, the library and header are there, how about linking with the library?
-      dnl--------------------------------------------------------------------------
+      #--------------------------------------------------------------------------
+      # OK, the library and header are there, how about linking with the library?
+      #--------------------------------------------------------------------------
       save_CPPFLAGS=$CPPFLAGS
       save_LIBS=$LIBS
   
@@ -50,14 +50,9 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       LIBS="$TECPLOT_LIBRARY_PATH/tecio.a $LIBS"
   
       AC_LINK_IFELSE(
-                  [	
-#include <TECIO.h>
-
-int main (int, char**)
-{
-   int ierr = TECEND ();
-   return ierr;
-}
+                  [
+                     AC_LANG_PROGRAM([#include <TECIO.h>], 
+                                     [int ierr = TECEND ();])
                   ],
                   [
                      TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
