@@ -74,6 +74,4 @@ AC_DEFUN([CONFIGURE_EIGEN],
   dnl Substitute the substitution variables
   AC_SUBST(EIGEN_INCLUDE)	
   AC_SUBST(enableeigen)
-  
-  AM_CONDITIONAL(LIBMESH_ENABLE_EIGEN, test x$enableeigen = xyes)
 ])

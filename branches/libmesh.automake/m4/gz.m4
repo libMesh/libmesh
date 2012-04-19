@@ -39,5 +39,4 @@ AC_SUBST(GZSTREAM_INCLUDE)
 AC_SUBST(enablegz)
 
 AM_CONDITIONAL(LIBMESH_ENABLE_GZSTREAMS, test x$enablegz = xyes)
-AC_CONFIG_FILES([contrib/gzstream/Makefile])
 ])

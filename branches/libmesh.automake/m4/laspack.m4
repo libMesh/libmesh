@@ -34,7 +34,6 @@ AC_DEFUN([CONFIGURE_LASPACK],
   AC_SUBST(enablelaspack)
 
   AM_CONDITIONAL(LIBMESH_ENABLE_LASPACK, test x$enablelaspack = xyes)		 
-  AC_CONFIG_FILES([contrib/laspack/Makefile])
 ])
 
 

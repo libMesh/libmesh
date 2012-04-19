@@ -44,6 +44,5 @@ AC_DEFUN([CONFIGURE_BOOST],
     #libmesh_optional_LIBS="$BOOST_LDFLAGS $libmesh_optional_LIBS"
   fi
   AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_BOOST, test x$install_internal_boost = xyes)
-  AC_CONFIG_FILES([contrib/boost/include/Makefile])		
   # --------------------------------------------------------------
 ])

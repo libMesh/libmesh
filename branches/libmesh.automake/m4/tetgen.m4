@@ -34,5 +34,4 @@ AC_DEFUN([CONFIGURE_TETGEN],
   AC_SUBST(enabletetgen)
 
   AM_CONDITIONAL(LIBMESH_ENABLE_TETGEN, test x$enabletetgen = xyes)
-  AC_CONFIG_FILES([contrib/tetgen/Makefile])
 ])

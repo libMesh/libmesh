@@ -61,5 +61,4 @@ AC_DEFUN([CONFIGURE_FPARSER],
   AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)
   AM_CONDITIONAL(FPARSER_SUPPORT_OPTIMIZER,    test x$enablefparseroptimizer = xyes)
   AM_CONDITIONAL(LIBMESH_ENABLE_FPARSER, test x$enablefparser = xyes)
-  AC_CONFIG_FILES([contrib/fparser/Makefile])
 ])

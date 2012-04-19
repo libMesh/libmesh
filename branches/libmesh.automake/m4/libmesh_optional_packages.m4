@@ -45,6 +45,7 @@ fi
 # Boost -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_BOOST
+AC_CONFIG_FILES([contrib/boost/include/Makefile])		
 # --------------------------------------------------------------
 
 
@@ -86,6 +87,7 @@ CONFIGURE_TBB
 # LASPACK iterative solvers -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_LASPACK
+AC_CONFIG_FILES([contrib/laspack/Makefile])
 # -------------------------------------------------------------
 
 
@@ -94,6 +96,7 @@ CONFIGURE_LASPACK
 # Space filling curves -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_SFC
+AC_CONFIG_FILES([contrib/sfcurves/Makefile])
 # -------------------------------------------------------------
 
 
@@ -102,6 +105,7 @@ CONFIGURE_SFC
 # Compressed Streams with gzstream -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_GZ
+AC_CONFIG_FILES([contrib/gzstream/Makefile])
 # -------------------------------------------------------------
 
 
@@ -164,6 +168,7 @@ CONFIGURE_TECPLOT
 # Metis Partitioning -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_METIS
+AC_CONFIG_FILES([contrib/metis/Lib/Makefile])
 # -------------------------------------------------------------
 
 
@@ -172,6 +177,7 @@ CONFIGURE_METIS
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_PARMETIS
+AC_CONFIG_FILES([contrib/parmetis/Lib/Makefile])
 # -------------------------------------------------------------
 
 
@@ -203,6 +209,7 @@ fi
 # TetGen -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_TETGEN
+AC_CONFIG_FILES([contrib/tetgen/Makefile])
 # -------------------------------------------------------------
 
 
@@ -211,6 +218,7 @@ CONFIGURE_TETGEN
 # Triangle -- enabled by default (it is distributed in contrib)
 # -------------------------------------------------------------
 CONFIGURE_TRIANGLE
+AC_CONFIG_FILES([contrib/triangle/Makefile])
 # -------------------------------------------------------------
 
 
@@ -219,6 +227,7 @@ CONFIGURE_TRIANGLE
 # GMV -- file I/O API is enabled by default (it is distributed in contrib)
 # -------------------------------------------------------------
 CONFIGURE_GMV
+AC_CONFIG_FILES([contrib/gmv/Makefile])
 # -------------------------------------------------------------
 
 
@@ -227,6 +236,7 @@ CONFIGURE_GMV
 # VTK -- Mesh I/O API is enabled by default
 # -------------------------------------------------------------
 CONFIGURE_VTK
+AM_CONDITIONAL(LIBMESH_ENABLE_VTK, test x$enablevtk = xyes)
 # -------------------------------------------------------------
 
 
@@ -235,6 +245,7 @@ CONFIGURE_VTK
 # Eigen -- Optimized linear algebra routines, enabled by default
 # -------------------------------------------------------------
 CONFIGURE_EIGEN
+AM_CONDITIONAL(LIBMESH_ENABLE_EIGEN, test x$enableeigen = xyes)
 # -------------------------------------------------------------
 
 
@@ -244,6 +255,7 @@ CONFIGURE_EIGEN
 # Enabled by default.
 # -------------------------------------------------------------
 CONFIGURE_GLPK
+AM_CONDITIONAL(LIBMESH_ENABLE_GLPK, test x$enableglpk = xyes)
 # -------------------------------------------------------------
 
 
@@ -252,18 +264,21 @@ CONFIGURE_GLPK
 # netCDF -- enabled by default (it is distributed in contrib)
 # --------------------------------------------------------------
 CONFIGURE_NETCDF
+AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
 
    # -------------------------------------------------------------
    # ExodusII -- enabled by default (it is distributed in contrib)
    # (note that ExodusII requires netCDF
    # -------------------------------------------------------------
    CONFIGURE_EXODUS
+   AC_CONFIG_FILES([contrib/exodusii/Lib/Makefile])
 
       # -------------------------------------------------------------
       # Nemesis -- enabled by default (it is distributed in contrib)
       # (note that Nemesis requires netCDF and exodus)
       # -------------------------------------------------------------
       CONFIGURE_NEMESIS
+      AC_CONFIG_FILES([contrib/nemesis/Lib/Makefile])
       # -------------------------------------------------------------
    # -------------------------------------------------------------
 # -------------------------------------------------------------
@@ -275,6 +290,7 @@ CONFIGURE_NETCDF
 #               enabled by default
 # -------------------------------------------------------------
 CONFIGURE_LIBHILBERT
+AC_CONFIG_FILES([contrib/libHilbert/Makefile])
 # -------------------------------------------------------------
 
 
@@ -284,6 +300,7 @@ CONFIGURE_LIBHILBERT
 #            enabled by default
 # -------------------------------------------------------------
 CONFIGURE_FPARSER
+AC_CONFIG_FILES([contrib/fparser/Makefile])
 # -------------------------------------------------------------
 
 
