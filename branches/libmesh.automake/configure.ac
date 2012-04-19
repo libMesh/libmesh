@@ -35,6 +35,7 @@ AC_CONFIG_FILES([Make.common
                  Makefile
 		 include/Makefile
                  include/utils/libmesh_version.h
+	         contrib/utils/Make.common
 		 examples/Makefile
 		 doc/Doxyfile
 		 libmesh.pc
@@ -153,6 +154,9 @@ AC_SUBST(PERL)
 # pkg-config - used to configure installed pakages.  We can
 # use it to query our installed targets, if it exists.
 # Otherwise we caln fall back to libmesh-config.
+#
+# Not required to build libmesh, but we can install a config
+# file so that users can use 'pkg-config libmesh ...'
 # -------------------------------------------------------------
 if (test -z "$PKG_CONFIG"); then
   AC_PATH_PROG(PKG_CONFIG, pkg-config, no)

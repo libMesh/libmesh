@@ -36,9 +36,9 @@ AUX_DIST = build-aux/install-sh    \
 
 # Support for pkgconfig
 pkgconfigdir     = $(libdir)/pkgconfig
-pkgconfig_DATA   = Make.common Makefile libmesh.pc
+pkgconfig_DATA   = Make.common libmesh.pc
 configdir        = $(sysconfdir)/libmesh
-config_DATA      = Make.common Makefile libmesh.pc
+config_DATA      = contrib/utils/Make.common libmesh.pc
 
 # Additional files to be deleted by 'make distclean'
 DISTCLEANFILES =  \

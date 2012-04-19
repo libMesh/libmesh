@@ -6,15 +6,6 @@
 ##   ./configure in the top level directory
 ###############################################################################
 
-###############################################################################
-#
-# The Make.common file defines the build environment for libMesh
-# and all its helper applications.  If you want to build an application
-# that makes use of libMesh it is highly recommended that you include
-# this file in your project's Makefile.
-#
-###############################################################################
-
 #############################################################################
 # Certain PETSc's define DESTDIR - which is very, very bad for us.  Of course
 # we are asking for it by including their Makefile variables here.
@@ -106,115 +97,10 @@ enable-optional      = @enableoptional@
 ###############################################################################
 
 
-
-
 ###############################################################################
-# Set the option to determine if shared libraries will be built
-enable-shared := @enableshared@
-#
-# Figure out the compilation mode based on the
-# environment variable METHOD.
-opt-mode   := off
-debug-mode := off
-prof-mode  := off
-oprof-mode := off
-syn-mode   := off
-devel-mode := off
-
-# Unless we find a valid or an unset METHOD 
-# variable, there's something wrong.
-mode := "INVALID"
-
-# If the user has no environment variable
-# called METHOD, he gets optimized mode.
-ifeq (x$(METHOD),x)
-  METHOD := opt
-endif
-
-# If METHOD=opt, compile in optimized mode.
-ifeq ($(METHOD),optimized)
-  METHOD := opt
-endif
-
-ifeq ($(METHOD),opt)
-  opt-mode := on
-  mode     := "optimized"
-endif
-
-#
-# If METHOD=devel, compile in development mode.
-ifeq ($(METHOD),development)
-  METHOD := devel
-endif
-
-ifeq ($(METHOD),devel)
-  devel-mode := on
-  mode       := "development"
-endif
-
-#
-# If METHOD=dbg, compile in debug mode.
-ifeq ($(METHOD),debug)
-  METHOD := dbg
-endif
-ifeq ($(METHOD),dbg)
-  debug-mode := on
-  mode       := "debug"
-endif
-
-#
-# If METHOD=prof, compile in profiling mode
-ifeq ($(METHOD),profiling)
-  METHOD := pro
-endif
-ifeq ($(METHOD),prof)
-  METHOD := pro
-endif
-ifeq ($(METHOD),pro)
-  prof-mode     := on
-  mode          := "profiling"
-  enable-shared := no
-endif
-
-#
-# If METHOD=oprof, compile in OProfile mode
-ifeq ($(METHOD),oprofile)
-  METHOD := oprof
-endif
-ifeq ($(METHOD),oprof)
-  oprof-mode    := on
-  mode          := "oprofile"
-endif
-
-# If the user had a METHOD variable we didn't
-# recognize, there's been some mistake.  Let's
-# yell at them.
-ifeq ($(mode),"INVALID")
-  $(error Invalid environment variable METHOD=$(METHOD) specified)
-endif
-
-# # The file extension for object files.
-# # foo.C is compiled to foo.$(obj-suffix)
-# obj-suffix := @host@.$(METHOD).o
-
-# #
-# # Define the right lib-extension for shared libraries
-# static_libext := .a
-# shared_libext := .so
-# ifeq ($(findstring darwin,$(hostos)),darwin)
-#   shared_libext := .dylib
-# endif
-
-# libext := $(static_libext)
-# ifeq ($(enable-shared),yes) 
-#   libext := $(shared_libext)
-# endif
-###############################################################################
-
-
-libmesh_CPPFLAGS := @CPPFLAGS_METHOD@ #$(libmesh_CPPFLAGS)
-libmesh_CXXFLAGS := @CXXFLAGS_METHOD@ #$(libmesh_CXXFLAGS)
-libmesh_CFLAGS   := @CFLAGS_METHOD@ #$(libmesh_CFLAGS)
+libmesh_CPPFLAGS := @CPPFLAGS_METHOD@
+libmesh_CXXFLAGS := @CXXFLAGS_METHOD@
+libmesh_CFLAGS   := @CFLAGS_METHOD@
 
 # ###############################################################################
 # # The mesh library
@@ -328,68 +214,6 @@ DESTDIR=$(libmesh_save_DESTDIR)
 
 
 ###############################################################################
-# Build rules
-
-##################################
-# C++ rules                      #
-##################################
-
-#
-# How to compile C++
-#
-%.$(obj-suffix) : %.C
-	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
-
-
-
-##################################
-# C rules                        #
-##################################
-
-# do not show this to the LASPACK Makefile
-ifeq (x$(included-from-laspack),x)
-  #
-  # How to compile C
-  #
-%.$(obj-suffix) : %.c
-	@echo "Compiling C (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
-
-else
-
-  # only visible for LASPACK Makefile
-  ifeq ($(enable-complex),yes)
-
-    # complex: C++ rules for .c Laspack code
-%.$(obj-suffix) : %.c
-	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
-
-  else
-
-    # real: C rules for .c Laspack code
-%.$(obj-suffix) : %.c
-	@echo "Compiling C (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
-
-  endif
-endif
-
-##################################
-# Fortran rules                  #
-##################################
-
-%.$(obj-suffix) : %.f
-	@echo "Compiling Fortan (in "$(mode)" mode) "$<"..."
-	@$(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
-
-%.$(obj-suffix) : %.f90
-	@echo "Compiling Fortan90 (in "$(mode)" mode) "$<"..."
-	@$(libmesh_F90) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
-
-###############################################################################
-
 #
 # 
 #
