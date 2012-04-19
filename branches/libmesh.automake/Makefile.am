@@ -1,4 +1,4 @@
-include $(top_builddir)/Make.common
+include $(top_builddir)/Make.common.@METHOD@
 
 bindir=$(exec_prefix)/bin/@host@_@METHOD@
 libdir=$(exec_prefix)/lib/@host@_@METHOD@
@@ -36,12 +36,13 @@ AUX_DIST = build-aux/install-sh    \
 
 # Support for pkgconfig
 pkgconfigdir     = $(libdir)/pkgconfig
-pkgconfig_DATA   = Make.common libmesh.pc
+pkgconfig_DATA   = Make.common.@METHOD@ libmesh.pc
 configdir        = $(sysconfdir)/libmesh
 config_DATA      = contrib/utils/Make.common libmesh.pc
 
 # Additional files to be deleted by 'make distclean'
 DISTCLEANFILES =  \
+           Make.common.@METHOD@ \
 	   _configs.sed
 
 # # Additional files to be deleted by 'make maintainer-clean'

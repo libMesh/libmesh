@@ -17,41 +17,24 @@
 ###############################################################################
 
 # Where libMesh is installed.
-prefix      := @prefix@
-exec_prefix := @exec_prefix@
+prefix              := @prefix@
+exec_prefix         := @exec_prefix@
 libmesh_install_dir := $(prefix)
 
 ###############################################################################
 # the following lines will be replaced by the output 
 # of ./configure
-hosttype              = @host@
-hostos                = @host_os@
-
-# libmesh_CXX           = @CXX@
-# libmesh_CC            = @CC@
-# libmesh_F77           = @F77@
-# libmesh_F90           = @FC@
-# libmesh_LDFLAGS       = @LDFLAGS@
-# #libmesh_DLFLAGS       =
-# libmesh_LIBS          = @LIBS@
-# libmesh_FLIBS         = @FLIBS@
-# libmesh_FFLAGS        = @FFLAGS@
-# GXX-VERSION           = @GXX_VERSION@
-# # libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
-# # libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
-# libmesh_RPATHFLAG     = @RPATHFLAG@
-# NODEPRECATEDFLAG     = @NODEPRECATEDFLAG@
+hosttype            := @host@
+hostos              := @host_os@
 
 # Perl for making .depend
-perl                 = @PERL@
+perl                := @PERL@
 ###############################################################################
 
 
 
 
 ###############################################################################
-# Set the option to determine if shared libraries will be built
-enable-shared := @enableshared@
 #
 # Figure out the compilation mode based on the
 # environment variable METHOD.
@@ -114,7 +97,6 @@ endif
 ifeq ($(METHOD),pro)
   prof-mode     := on
   mode          := "profiling"
-  enable-shared := no
 endif
 
 #
@@ -141,7 +123,7 @@ obj-suffix := @host@.$(METHOD).o
 
 
 # include the proper Make.common depending on the build method
-include @exec_prefix@/lib/@host@_$(METHOD)/pkgconfig/Make.common
+include @exec_prefix@/lib/@host@_$(METHOD)/pkgconfig/Make.common.$(METHOD)
 
 # append the actual installed library
 libmesh_LIBS += -L@exec_prefix@/lib/@host@_$(METHOD) @RPATHFLAG@@exec_prefix@/lib/@host@_$(METHOD) -lmesh

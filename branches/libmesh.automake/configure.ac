@@ -31,7 +31,7 @@ AC_CONFIG_MACRO_DIR([m4])
 # --------------------------------------------------------------
 AC_CANONICAL_TARGET
 
-AC_CONFIG_FILES([Make.common
+AC_CONFIG_FILES([Make.common.$METHOD:Make.common.in
                  Makefile
 		 include/Makefile
                  include/utils/libmesh_version.h
@@ -40,7 +40,7 @@ AC_CONFIG_FILES([Make.common
 		 doc/Doxyfile
 		 libmesh.pc
 		 ])
-		 
+
 AC_CONFIG_FILES(contrib/bin/libmesh-config,          [chmod +x contrib/bin/libmesh-config])
 AC_CONFIG_FILES(contrib/bin/libmesh-config-METHOD,   [chmod +x contrib/bin/libmesh-config-METHOD])
 #AC_CONFIG_FILES(contrib/bin/strip_dup_libs.pl,       [chmod +x contrib/bin/strip_dup_libs.pl])

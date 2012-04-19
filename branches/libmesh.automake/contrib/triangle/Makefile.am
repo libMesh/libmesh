@@ -1,4 +1,4 @@
-include $(top_builddir)/Make.common
+include $(top_builddir)/Make.common.@METHOD@
 
 AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DTRILIBRARY -DANSI_DECLARATORS
 AM_CFLAGS   = $(libmesh_CFLAGS) 

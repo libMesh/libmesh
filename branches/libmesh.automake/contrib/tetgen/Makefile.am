@@ -1,4 +1,4 @@
-include $(top_builddir)/Make.common
+include $(top_builddir)/Make.common.@METHOD@
 
 AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DTETLIBRARY -DLIBMESH_IS_COMPILING_TETGEN
 AM_CFLAGS   = $(libmesh_CFLAGS)

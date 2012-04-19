@@ -1,9 +1,16 @@
 ###############################################################################
-## Please note:
-##   The ./configure script generates Make.common from 
-##   Make.common.in, so if you want to change something,
-##   then do it in the latter file (here!) and re-run
-##   ./configure in the top level directory
+# libMesh's Make.common.@METHOD@ file defines exactly that -
+# common Make variables and flags used to build the library on a particular
+# system in the requested build method.
+###############################################################################
+
+
+###############################################################################
+# Please note:
+#   The ./configure script generates Make.common.@METHOD@ from 
+#   Make.common.in, so if you want to change something,
+#   then do it in the latter file (here!) and re-run
+#   ./configure in the top level directory
 ###############################################################################
 
 #############################################################################
@@ -20,22 +27,19 @@ top_srcdir ?= @prefix@
 ###############################################################################
 # the following lines will be replaced by the output 
 # of ./configure
-hosttype              = @host@
-hostos                = @host_os@
+hosttype             = @host@
+hostos               = @host_os@
 
-libmesh_CXX           = @CXX@
-libmesh_CC            = @CC@
-libmesh_F77           = @F77@
-libmesh_F90           = @FC@
-libmesh_LDFLAGS       = @LDFLAGS@
-#libmesh_DLFLAGS       =
-libmesh_LIBS          = @LIBS@
-libmesh_FLIBS         = @FLIBS@
-libmesh_FFLAGS        = @FFLAGS@
-GXX-VERSION           = @GXX_VERSION@
-# libmesh_CXXSHAREDFLAG = @CXXSHAREDFLAG@
-# libmesh_CSHAREDFLAG   = @CXXSHAREDFLAG@
-libmesh_RPATHFLAG     = @RPATHFLAG@
+libmesh_CXX          = @CXX@
+libmesh_CC           = @CC@
+libmesh_F77          = @F77@
+libmesh_F90          = @FC@
+libmesh_LDFLAGS      = @LDFLAGS@
+libmesh_LIBS         = @LIBS@
+libmesh_FLIBS        = @FLIBS@
+libmesh_FFLAGS       = @FFLAGS@
+GXX-VERSION          = @GXX_VERSION@
+libmesh_RPATHFLAG    = @RPATHFLAG@
 NODEPRECATEDFLAG     = @NODEPRECATEDFLAG@
 
 # Complex variable support
@@ -72,28 +76,6 @@ perl                 = @PERL@
 
 # Flag for optional packages
 enable-optional      = @enableoptional@
-# enable-eigen         = @enableeigen@
-# enable-exodus	     = @enableexodus@
-# enable-fparser       = @enablefparser@
-# enable-glpk          = @enableglpk@
-# enable-gmv           = @enablegmv@
-# enable-gzstream      = @enablegz@
-# enable-laspack	     = @enablelaspack@
-# enable-libhilbert    = @enablelibhilbert@
-# enable-metis	     = @enablemetis@
-# enable-nemesis	     = @enablenemesis@
-# enable-netcdf	     = @enablenetcdf@
-# enable-openmp        = @enableopenmp@
-# enable-parmetis	     = @enableparmetis@
-# enable-sfcurves	     = @enablesfc@
-# enable-tetgen        = @enabletetgen@
-# enable-triangle      = @enabletriangle@
-# enable-vtk           = @enablevtk@
-
-# #
-# # Set the current directory.
-# libmesh_dir := @PWD@
-# export libmesh_dir
 ###############################################################################
 
 
@@ -101,20 +83,6 @@ enable-optional      = @enableoptional@
 libmesh_CPPFLAGS := @CPPFLAGS_METHOD@
 libmesh_CXXFLAGS := @CXXFLAGS_METHOD@
 libmesh_CFLAGS   := @CFLAGS_METHOD@
-
-# ###############################################################################
-# # The mesh library
-# #
-# mesh_library_dir := $(libmesh_dir)/lib/$(hosttype)_$(METHOD)
-
-# mesh_library     := $(mesh_library_dir)/libmesh$(static_libext)
-# ifeq ($(enable-shared),yes) 
-#   mesh_library   := $(mesh_library_dir)/libmesh$(shared_libext)
-# #  libmesh_DLFLAGS += $(libmesh_RPATHFLAG)$(mesh_library_dir)
-# endif
-
-#libmesh_LIBS += $(mesh_library)
-###############################################################################
 
 
 
@@ -145,24 +113,6 @@ ifeq ($(enable-optional),yes)
   libmesh_INCLUDE += @libmesh_optional_INCLUDES@
   libmesh_LIBS    += @libmesh_optional_LIBS@
 
-#   # if OpenMP is used, modify the build and link flags
-#   ifeq ($(enable-openmp),yes)
-#     libmesh_CXXFLAGS += @OPENMP_CXXFLAGS@
-#     libmesh_CFLAGS   += @OPENMP_CFLAGS@
-#     libmesh_FFLAGS   += @OPENMP_FFLAGS@
-#   endif
-
-#       # Nox, an additional option if AztecOO is present
-#       ifeq ($(enable-nox),yes)
-#           #include @NOX_MAKEFILE_EXPORT@
-#           #libmesh_LIBS    += $(NOX_LIBS)
-#           #libmesh_INCLUDE += $(NOX_INCLUDES)
-
-#           libmesh_LIBS     += @NOX_LIBS@
-#           libmesh_INCLUDE  += @NOX_INCLUDES@
-#           libmesh_CPPFLAGS += -DHAVE_CONFIG_H
-#       endif
-
   #############################################################################
   # SLEPc
   ifeq ($(enable-slepc),yes)
@@ -189,8 +139,6 @@ ifeq ($(enable-optional),yes)
 
     libmesh_LIBS += $(libs-SLEPC) $(ARPACK_LIB)
 
-    # libmesh_DLFLAGS += $(SLEPC_LIB)
-
   endif #end ifeq ($(enable-slepc),yes)
 
   # MPI configuration when Petsc is absent
@@ -201,7 +149,7 @@ endif # End of disable-optional test
 
 
 # # Finally, Append the linker flags to the libraries
-# libmesh_LIBS += $(libmesh_DLFLAGS) $(libmesh_LDFLAGS)
+# libmesh_LIBS += $(libmesh_LDFLAGS)
 
 
 ###############################################################################
@@ -217,7 +165,7 @@ DESTDIR=$(libmesh_save_DESTDIR)
 #
 # 
 #
-.PHONY: echo echo_cxxflags echo_include echo_ldflags
+.PHONY: echo echo_cxx echo_cc echo_cppflags echo_cxxflags echo_cflags echo_include echo_ldflags
 
 #
 # Useful for checking make rules
@@ -243,9 +191,6 @@ echo:
 	@echo
 	@echo "libmesh_LDFLAGS:"
 	@echo "$(libmesh_LDFLAGS)"
-	@echo
-	@echo "libmesh_DLFLAGS:"
-	@echo "$(libmesh_DLFLAGS)"
 	@echo
 
 #
@@ -288,7 +233,7 @@ echo_include:
 # Print the flags used to link, padded with whitespace
 #
 echo_ldflags:
-	@echo " " $(libmesh_LIBS) $(libmesh_LDFLAGS) $(libmesh_DLFLAGS) " "
+	@echo " " $(libmesh_LIBS) $(libmesh_LDFLAGS) " "
 
 
 # Local Variables:

@@ -1,4 +1,4 @@
-include $(top_builddir)/Make.common
+include $(top_builddir)/Make.common.@METHOD@
 
 FEATURE_FLAGS =
 FEATURE_FLAGS += -DFP_ENABLE_EVAL
