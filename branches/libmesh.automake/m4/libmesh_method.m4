@@ -38,21 +38,25 @@ AC_DEFUN([LIBMESH_SET_METHOD],
        CPPFLAGS_METHOD="-DNDEBUG $libmesh_CPPFLAGS"
        CXXFLAGS_METHOD="$CXXFLAGS_OPT $libmesh_CXXFLAGS"
        CFLAGS_METHOD="$CFLAGS_OPT $libmesh_CFLAGS"
+       AC_CONFIG_FILES(Make.common.opt:Make.common.in)
        ;;
     dbg)
        CPPFLAGS_METHOD="-DDEBUG $libmesh_CPPFLAGS"
        CXXFLAGS_METHOD="$CXXFLAGS_DBG $libmesh_CXXFLAGS"
        CFLAGS_METHOD="$CFLAGS_DBG $libmesh_CFLAGS"
+       AC_CONFIG_FILES(Make.common.dbg:Make.common.in)
        ;;
     devel)
        CPPFLAGS_METHOD="$libmesh_CPPFLAGS"
        CXXFLAGS_METHOD="$CXXFLAGS_DVL $libmesh_CXXFLAGS"
        CFLAGS_METHOD="$CFLAGS_DVL $libmesh_CFLAGS"
+       AC_CONFIG_FILES(Make.common.devel:Make.common.in)
        ;;
     oprofile)
        CPPFLAGS_METHOD="-DNDEBUG  $libmesh_CPPFLAGS"
        CXXFLAGS_METHOD="$CXXFLAGS_OPT $OPROFILE_FLAGS $libmesh_CXXFLAGS"
        CFLAGS_METHOD="$CFLAGS_OPT $OPROFILE_FLAGS $libmesh_CFLAGS"
+       AC_CONFIG_FILES(Make.common.oprof:Make.common.in)
        ;;       
 
     *)

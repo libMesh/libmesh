@@ -613,7 +613,7 @@ SUBDIRS += examples
 
 #
 # doxygen documentation
-doc:
+doc html:
 	$(MKDIR_P) $(top_builddir)/doc/html
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
 

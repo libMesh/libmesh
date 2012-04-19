@@ -31,8 +31,7 @@ AC_CONFIG_MACRO_DIR([m4])
 # --------------------------------------------------------------
 AC_CANONICAL_TARGET
 
-AC_CONFIG_FILES([Make.common.$METHOD:Make.common.in
-                 Makefile
+AC_CONFIG_FILES([Makefile
 		 include/Makefile
                  include/utils/libmesh_version.h
 	         contrib/utils/Make.common
