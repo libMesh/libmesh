@@ -178,6 +178,11 @@ public:
 				       NumericVector<T> &solution_in);
 
   /**
+   * Same as above, but does not copy the eigenvector.
+   */
+  std::pair<Real, Real> get_eigenvalue (unsigned int i);
+
+  /**
    * @returns the relative error ||A*x-lambda*x||/|lambda*x|
    * of the ith eigenpair. (or the equivalent for a general eigenvalue problem)
    */

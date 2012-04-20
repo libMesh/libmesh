@@ -47,7 +47,7 @@ if test $# -gt 1; then
     echo "<a name=\"output\"></a> "                           >> $output_file;
     echo "<br><br><br> <h1> The console output of the program: </h1> " >> $output_file;
     echo "<pre>" >> $output_file;
-    $2 >> $output_file 2>&1;
+    $2 2>&1 | tee -a $output_file;
     echo "</pre>" >> $output_file;
 fi;
 

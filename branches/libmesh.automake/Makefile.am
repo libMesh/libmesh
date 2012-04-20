@@ -3,10 +3,16 @@ include $(top_builddir)/Make.common.@METHOD@
 bindir=$(exec_prefix)/bin/@host@_@METHOD@
 libdir=$(exec_prefix)/lib/@host@_@METHOD@
 
+SUBDIRS = include #src
 
 AUTOMAKE_OPTIONS = foreign subdir-objects 
 ACLOCAL_AMFLAGS  = -I m4
-#SUBDIRS          = include src
+AM_CPPFLAGS      = $(libmesh_CPPFLAGS)
+AM_CFLAGS        = $(libmesh_CFLAGS)
+AM_CXXFLAGS      = $(libmesh_CXXFLAGS)
+INCLUDES         = $(libmesh_INCLUDE) $(libmesh_contrib_INCLUDES) -I$(top_builddir)/include/utils # required for libmesh_version.h
+
+LIBS             = $(libmesh_LIBS)
 
 # additional files which must be included in 'make dist'
 EXTRA_DIST = license \
@@ -31,7 +37,7 @@ nobase_data_DATA = \
 	reference_elements/3D/one_tet10.xda
 
 # Tools in the auxillary directory
-AUX_DIST = build-aux/install-sh    \
+AUX_DIST = build-aux/install-sh \
            build-aux/missing
 
 # Support for pkgconfig
@@ -40,9 +46,18 @@ pkgconfig_DATA   = Make.common.@METHOD@ contrib/utils/libmesh.pc
 configdir        = $(sysconfdir)/libmesh
 config_DATA      = contrib/utils/Make.common contrib/utils/libmesh.pc
 
+# install the old make_dependencies.pl script for backwards compatibility
+contribbindir      = $(prefix)/contrib/bin
+contribbin_SCRIPTS = contrib/bin/make_dependencies.pl
+EXTRA_DIST        += contrib/bin/make_dependencies.pl
+
+# when doing 'make install, symlik etc/libmesh/Make.common
+install-data-hook:
+	cd $(DESTDIR)$(prefix) && $(LN_S) etc/libmesh/Make.common Make.common
+
 # Additional files to be deleted by 'make distclean'
+# _configs.sed seems to be leftover by prefix_config
 DISTCLEANFILES =  \
-           Make.common.@METHOD@ \
 	   _configs.sed
 
 # # Additional files to be deleted by 'make maintainer-clean'
@@ -71,14 +86,6 @@ DISTCLEANFILES =  \
 
 
 
-SUBDIRS = include #src include
-
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-INCLUDES    = $(libmesh_INCLUDE) $(libmesh_contrib_INCLUDES) -I$(top_builddir)/include/utils # required for libmesh_version.h
-
-LIBS        = $(libmesh_LIBS)
 
 # A convenience library to hold proper libMesh 
 # objects.  This will get appended with any contributed 

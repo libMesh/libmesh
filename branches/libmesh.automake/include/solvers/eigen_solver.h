@@ -199,6 +199,12 @@ public:
 					       NumericVector<T> &solution) = 0;
 
   /**
+   * Returns the \p ith eigenvalue (real and imaginary part).
+   * Same as above function, except it does copy the eigenvector.
+   */
+  virtual std::pair<Real, Real> get_eigenvalue (unsigned int i) = 0;
+
+  /**
    * Attach a deflation space defined by a single vector.
    */
   virtual void attach_deflation_space(NumericVector<T> &deflation_vector) = 0;
