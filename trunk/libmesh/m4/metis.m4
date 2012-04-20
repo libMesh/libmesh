@@ -19,18 +19,18 @@ AC_DEFUN([CONFIGURE_METIS],
   dnl where it might be installed...
   if (test $enablemetis = yes); then
      METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/Lib"
-     #METIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
+     METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
      AC_DEFINE(HAVE_METIS, 1, [Flag indicating whether the library will be compiled with Metis support])
      AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
      libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"
   else
      METIS_INCLUDE=""
-     #METIS_LIBRARY=""
+     METIS_LIB=""
      enablemetis=no
   fi
 
   AC_SUBST(METIS_INCLUDE)
-  #AC_SUBST(METIS_LIBRARY)	
+  AC_SUBST(METIS_LIB)	
   AC_SUBST(enablemetis)
 
   AM_CONDITIONAL(LIBMESH_ENABLE_METIS, test x$enablemetis = xyes)		 
