@@ -18,6 +18,7 @@
 #ifndef __single_predicates_h__
 #define __single_predicates_h__
 
+#include <cstddef>
 #include <vector>
 #include "enum_elem_type.h"
 #include "id_types.h"
