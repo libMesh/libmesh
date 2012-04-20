@@ -11002,15 +11002,15 @@ fi
 
     # unspecified - look in contrib
     if test "$withtecplot" = no ; then
-      as_ac_File=`$as_echo "ac_cv_file_$srcdir/contrib/tecplot/lib/$host/tecio.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $srcdir/contrib/tecplot/lib/$host/tecio.a" >&5
-$as_echo_n "checking for $srcdir/contrib/tecplot/lib/$host/tecio.a... " >&6; }
+      as_ac_File=`$as_echo "ac_cv_file_$top_srcdir/contrib/tecplot/lib/$host/tecio.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $top_srcdir/contrib/tecplot/lib/$host/tecio.a" >&5
+$as_echo_n "checking for $top_srcdir/contrib/tecplot/lib/$host/tecio.a... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$srcdir/contrib/tecplot/lib/$host/tecio.a"; then
+if test -r "$top_srcdir/contrib/tecplot/lib/$host/tecio.a"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -11020,18 +11020,18 @@ eval ac_res=\$$as_ac_File
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  TECPLOT_LIBRARY_PATH=$srcdir/contrib/tecplot/lib/$host
+  TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/lib/$host
 fi
 
-      as_ac_File=`$as_echo "ac_cv_file_$srcdir/contrib/tecplot/include/TECIO.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $srcdir/contrib/tecplot/include/TECIO.h" >&5
-$as_echo_n "checking for $srcdir/contrib/tecplot/include/TECIO.h... " >&6; }
+      as_ac_File=`$as_echo "ac_cv_file_$top_srcdir/contrib/tecplot/include/TECIO.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $top_srcdir/contrib/tecplot/include/TECIO.h" >&5
+$as_echo_n "checking for $top_srcdir/contrib/tecplot/include/TECIO.h... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$srcdir/contrib/tecplot/include/TECIO.h"; then
+if test -r "$top_srcdir/contrib/tecplot/include/TECIO.h"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -11041,7 +11041,7 @@ eval ac_res=\$$as_ac_File
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  TECPLOT_INCLUDE_PATH=$srcdir/contrib/tecplot/include
+  TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/include
 fi
 
 
