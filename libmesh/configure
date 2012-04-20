@@ -850,6 +850,8 @@ enable_unordered_containers
 enable_boost
 with_boost
 with_boost_libdir
+with_boost
+with_boost_libdir
 enable_everything
 enable_tracefiles
 enable_amr
@@ -870,42 +872,61 @@ enable_reference_counting
 enable_perflog
 enable_optional
 enable_petsc
+enable_petsc
+with_mpi
+with_gm
+with_mpi
+with_gm
 with_mpi
 with_gm
 enable_slepc
+enable_slepc
 enable_trilinos
+with_trilinos
 with_trilinos
 with_nox
 with_ml
+enable_tbb
 enable_tbb
 with_tbb
 with_tbb_lib
 enable_openmp
 enable_laspack
 enable_sfc
+enable_sfc
 enable_gzstreams
 enable_bzip2
 enable_xz
 enable_tecplot
+enable_tecplot
 with_tecplot
 enable_metis
 enable_parmetis
+enable_parmetis
+enable_tetgen
 enable_tetgen
 enable_triangle
+enable_triangle
 enable_gmv
+enable_gmv
+enable_vtk
 enable_vtk
 with_vtk_include
 with_vtk_lib
 enable_eigen
 with_eigen_include
 enable_glpk
+enable_glpk
 with_glpk_include
 with_glpk_lib
 enable_netcdf
 enable_exodus
+enable_exodus
+enable_nemesis
 enable_nemesis
 enable_libHilbert
 enable_libhilbert
+enable_fparser
 enable_fparser
 enable_fparser_optimizer
 '
@@ -920,11 +941,19 @@ CPPFLAGS
 CCC
 CC
 CFLAGS
+LDFLAGS
+LIBS
+CPPFLAGS
 FC
 FCFLAGS
+LDFLAGS
+LIBS
 F77
 FFLAGS
+LDFLAGS
+LIBS
 CXXCPP
+CPPFLAGS
 PETSC_DIR
 PETSC_ARCH
 SLEPC_DIR
@@ -11163,7 +11192,7 @@ fi
 
       if (test $enablesfc = yes); then
      SFC_INCLUDE="-I\$(top_srcdir)/contrib/sfcurves"
-     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfc\$(libext)"
+     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfcurves\$(libext)"
 
 $as_echo "#define HAVE_SFCURVES 1" >>confdefs.h
 
@@ -12761,7 +12790,7 @@ fi
 
       if (test $enablelibhilbert = yes); then
      LIBHILBERT_INCLUDE="-I\$(top_srcdir)/contrib/libHilbert/include"
-     LIBHILBERT_LIBRARY="\$(EXTERNAL_LIBDIR)/liblibhilbert\$(libext)"
+     LIBHILBERT_LIBRARY="\$(EXTERNAL_LIBDIR)/libHilbert\$(libext)"
 
 $as_echo "#define HAVE_LIBHILBERT 1" >>confdefs.h
 

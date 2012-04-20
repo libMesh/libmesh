@@ -19,7 +19,7 @@ AC_DEFUN([CONFIGURE_LIBHILBERT],
   dnl where it might be installed...
   if (test $enablelibhilbert = yes); then
      LIBHILBERT_INCLUDE="-I\$(top_srcdir)/contrib/libHilbert/include"
-     LIBHILBERT_LIBRARY="\$(EXTERNAL_LIBDIR)/liblibhilbert\$(libext)"
+     LIBHILBERT_LIBRARY="\$(EXTERNAL_LIBDIR)/libHilbert\$(libext)"
      AC_DEFINE(HAVE_LIBHILBERT, 1, [Flag indicating whether the library will be compiled with libHilbert support])
      AC_MSG_RESULT(<<< Configuring library with libHilbert support >>>)
      libmesh_contrib_INCLUDES="$LIBHILBERT_INCLUDE $libmesh_contrib_INCLUDES"
