@@ -850,8 +850,6 @@ enable_unordered_containers
 enable_boost
 with_boost
 with_boost_libdir
-with_boost
-with_boost_libdir
 enable_everything
 enable_tracefiles
 enable_amr
@@ -872,61 +870,41 @@ enable_reference_counting
 enable_perflog
 enable_optional
 enable_petsc
-enable_petsc
 with_mpi
 with_gm
-with_mpi
-with_gm
-with_mpi
-with_gm
-enable_slepc
 enable_slepc
 enable_trilinos
 with_trilinos
-with_trilinos
 with_nox
 with_ml
-enable_tbb
 enable_tbb
 with_tbb
 with_tbb_lib
 enable_openmp
 enable_laspack
 enable_sfc
-enable_sfc
 enable_gzstreams
 enable_bzip2
 enable_xz
 enable_tecplot
-enable_tecplot
 with_tecplot
 enable_metis
 enable_parmetis
-enable_parmetis
-enable_tetgen
 enable_tetgen
 enable_triangle
-enable_triangle
 enable_gmv
-enable_gmv
-enable_vtk
 enable_vtk
 with_vtk_include
 with_vtk_lib
 enable_eigen
 with_eigen_include
 enable_glpk
-enable_glpk
 with_glpk_include
 with_glpk_lib
 enable_netcdf
 enable_exodus
-enable_exodus
 enable_nemesis
-enable_nemesis
-enable_libHilbert
 enable_libhilbert
-enable_fparser
 enable_fparser
 enable_fparser_optimizer
 '
@@ -941,19 +919,11 @@ CPPFLAGS
 CCC
 CC
 CFLAGS
-LDFLAGS
-LIBS
-CPPFLAGS
 FC
 FCFLAGS
-LDFLAGS
-LIBS
 F77
 FFLAGS
-LDFLAGS
-LIBS
 CXXCPP
-CPPFLAGS
 PETSC_DIR
 PETSC_ARCH
 SLEPC_DIR
@@ -1619,10 +1589,8 @@ Optional Features:
   --enable-gzstreams      build with gzstreams compressed I/O suppport
   --enable-bzip2          build with bzip2 compressed I/O suppport
   --enable-xz             build with xz compressed I/O suppport
-  --enable-tecplot        build with Tecplot binary support
   --enable-tecplot        build with Tecplot binary file I/O support
   --enable-metis          build with Metis graph partitioning suppport
-  --enable-parmetis       build with Parmetis parallel partitioning suppport
   --enable-parmetis       build with Parmetis parallel graph partitioning
                           suppport
   --enable-tetgen         build with TetGen tetrahedrization library support
@@ -1634,11 +1602,8 @@ Optional Features:
   --enable-glpk           build with GLPK support
   --enable-netcdf         build with netCDF binary I/O
   --enable-exodus         build with ExodusII API support
-  --enable-nemesis        build with Nemesis API support
   --enable-nemesis        build with NemesisII API support
-  --enable-libHilbert     build with libHilbert by Chris Hamilton
   --enable-libHilbert     build with libHilbert, from Chris Hamilton
-  --enable-fparser        build with fparser by Juha Nieminen, Joel Yliluoma
   --enable-fparser        build with fparser, from Juha Nieminen, Joel
                           Yliluoma
   --enable-fparser-optimizer
@@ -8518,16 +8483,6 @@ $as_echo "---------------------------------------------" >&6; }
 
 
 
-# Check whether --enable-petsc was given.
-if test "${enable_petsc+set}" = set; then :
-  enableval=$enable_petsc; enablepetsc=$enableval
-else
-  enablepetsc=yes
-fi
-
-
-
-if (test "$enablepetsc" !=  no) ; then
 
   # Check whether --enable-petsc was given.
 if test "${enable_petsc+set}" = set; then :
@@ -9639,444 +9594,10 @@ else
 fi
 
 
-else
 
 
-# if MPIHOME is empty, set it to /usr
-if (test "x$MPIHOME" = x) ; then
-  MPIHOME="/usr"
-fi
 
 
-# Check whether --with-mpi was given.
-if test "${with_mpi+set}" = set; then :
-  withval=$with_mpi; MPI="$withval"
-else
-
-              echo "note: MPI library path not given... trying prefix=$MPIHOME"
-	      MPI=$MPIHOME
-
-fi
-
-
-if test -z "$MPI"; then
-	MPI="/usr"
-fi
-
-
-
-MPI_LIBS_PATH="$MPI/lib"
-MPI_INCLUDES_PATH="$MPI/include"
-
-# Check that the compiler uses the library we specified...
-
-# look for LAM or other MPI implementation
-if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
-
-
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
-
-	ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
-
-	# look for lam_version_show in liblam.(a/so)
-	# (this is needed in addition to libmpi.(a/so) for
-        # LAM MPI
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lam_show_version in -llam" >&5
-$as_echo_n "checking for lam_show_version in -llam... " >&6; }
-if ${ac_cv_lib_lam_lam_show_version+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-llam  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char lam_show_version ();
-int
-main ()
-{
-return lam_show_version ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_lam_lam_show_version=yes
-else
-  ac_cv_lib_lam_lam_show_version=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lam_lam_show_version" >&5
-$as_echo "$ac_cv_lib_lam_lam_show_version" >&6; }
-if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
-
-                       LIBS="-llam $LIBS"
-                       MPI_LIBS="-llam $MPI_LIBS"
-
-fi
-
-
-	# Quadricss MPI requires the elan library to be included too
-	if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
-	  echo "note: MPI found to use Quadrics switch, looking for elan library"
-		 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
-$as_echo_n "checking for elan_init in -lelan... " >&6; }
-if ${ac_cv_lib_elan_elan_init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lelan  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char elan_init ();
-int
-main ()
-{
-return elan_init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_elan_elan_init=yes
-else
-  ac_cv_lib_elan_elan_init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_elan_elan_init" >&5
-$as_echo "$ac_cv_lib_elan_elan_init" >&6; }
-if test "x$ac_cv_lib_elan_elan_init" = xyes; then :
-
-                                LIBS="-lelan $LIBS"
-                                MPI_LIBS="-lelan $MPI_LIBS"
-
-else
-  as_fn_error $? "Could not find elan library... exiting " "$LINENO" 5
-fi
-
-	fi
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpi" >&5
-$as_echo_n "checking for MPI_Init in -lmpi... " >&6; }
-if ${ac_cv_lib_mpi_MPI_Init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmpi  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char MPI_Init ();
-int
-main ()
-{
-return MPI_Init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_mpi_MPI_Init=yes
-else
-  ac_cv_lib_mpi_MPI_Init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mpi_MPI_Init" >&5
-$as_echo "$ac_cv_lib_mpi_MPI_Init" >&6; }
-if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
-
-		       MPI_LIBS="-lmpi $MPI_LIBS"
-	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpi"
-                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
-$as_echo "Found valid MPI installlaion..." >&6; }
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
-$as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-fi
-
-
-	ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-	LIBS=$tmpLIBS
-fi
-
-if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
-	echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
-
-	# Ensure the comiler finds the library...
-	tmpLIBS=$LIBS
-
-	ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-	LIBS="-L$MPI_LIBS_PATH $LIBS"
-
-	# Myricomm MPICH requires the gm library to be included too
-	if (nm $MPI_LIBS_PATH/libmpich.* | grep gm_open > /dev/null); then
-	  echo "note: MPICH found to use Myricomm's Myrinet, looking for gm library"
-
-          if (test "x$GMHOME" = x) ; then
-            GMHOME="/usr"
-          fi
-
-# Check whether --with-gm was given.
-if test "${with_gm+set}" = set; then :
-  withval=$with_gm; GM="$withval"
-else
-
-                        echo "note: GM library path not given... trying prefix=$MPIHOME"
-	                GM=$GMHOME
-
-fi
-
-
-          LIBS="-L$GM/lib $LIBS"
-          MPI_LIBS="-L$GM/lib $MPI_LIBS"
-
-          { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gm_open in -lgm" >&5
-$as_echo_n "checking for gm_open in -lgm... " >&6; }
-if ${ac_cv_lib_gm_gm_open+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgm  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char gm_open ();
-int
-main ()
-{
-return gm_open ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_gm_gm_open=yes
-else
-  ac_cv_lib_gm_gm_open=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gm_gm_open" >&5
-$as_echo "$ac_cv_lib_gm_gm_open" >&6; }
-if test "x$ac_cv_lib_gm_gm_open" = xyes; then :
-
-                         LIBS="$LIBS -lgm"
-                         MPI_LIBS="$MPI_LIBS -lgm"
-
-else
-  as_fn_error $? "Could not find gm library... exiting " "$LINENO" 5
-fi
-
-	fi
-
-	# look for MPI_Init in libmpich.(a/so)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
-$as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
-if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmpich  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char MPI_Init ();
-int
-main ()
-{
-return MPI_Init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_mpich_MPI_Init=yes
-else
-  ac_cv_lib_mpich_MPI_Init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mpich_MPI_Init" >&5
-$as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
-if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
-
-		       MPI_LIBS="-lmpich $MPI_LIBS"
-		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpich"
-                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
-$as_echo "Found valid MPICH installation..." >&6; }
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
-$as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
-fi
-
-
-	ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-	LIBS=$tmpLIBS
-fi
-
-if (test "x$MPI_IMPL" != x) ; then
-
-	# Ensure the comiler finds the header file...
-	if test -e $MPI_INCLUDES_PATH/mpi.h; then
-		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-		tmpCPPFLAGS=$CPPFLAGS
-
-		ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
-if test "x$ac_cv_header_mpi_h" = xyes; then :
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
-$as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
-fi
-
-
-		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-		ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-		CPPFLAGS=$tmpCPPFLAGS
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
-$as_echo "Could not find MPI header <mpi.h>..." >&6; }
-                enablempi=no
-	fi
-else
-
-	# no MPI install found, see if the compiler supports it
-      	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <mpi.h>
-int
-main ()
-{
-int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-	                 MPI_IMPL="built-in"
-                         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
-$as_echo "$CXX Compiler Supports MPI " >&6; }
-
-$as_echo "#define HAVE_MPI 1" >>confdefs.h
-
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
-$as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-
-# Save variables...
-
-
-
-
-
-
-
-
-fi
-
-
-
-
-# Check whether --enable-slepc was given.
-if test "${enable_slepc+set}" = set; then :
-  enableval=$enable_slepc; enableslepc=$enableval
-else
-  enableslepc=yes
-fi
-
-
-if test "$enableslepc" != no ; then
 
   # Check whether --enable-slepc was given.
 if test "${enable_slepc+set}" = set; then :
@@ -10172,7 +9693,6 @@ else
 fi
 
 
-fi
 
 
 
@@ -10839,14 +10359,6 @@ fi
 
 
 
-# Check whether --enable-tbb was given.
-if test "${enable_tbb+set}" = set; then :
-  enableval=$enable_tbb; enabletbb=$enableval
-else
-  enabletbb=yes
-fi
-
-if (test "$enabletbb" != no) ; then
 
   # Check whether --enable-tbb was given.
 if test "${enable_tbb+set}" = set; then :
@@ -11033,7 +10545,6 @@ _ACEOF
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_tls" >&5
 $as_echo "$ac_cv_tls" >&6; }
 
-fi
 
 # Check whether --enable-openmp was given.
 if test "${enable_openmp+set}" = set; then :
@@ -11113,14 +10624,6 @@ fi
 fi
 
 
-# Check whether --enable-laspack was given.
-if test "${enable_laspack+set}" = set; then :
-  enableval=$enable_laspack; enablelaspack=$enableval
-else
-  enablelaspack=yes
-fi
-
-
 
   # Check whether --enable-laspack was given.
 if test "${enable_laspack+set}" = set; then :
@@ -11168,15 +10671,6 @@ fi
 
 
 
-# Check whether --enable-sfc was given.
-if test "${enable_sfc+set}" = set; then :
-  enableval=$enable_sfc; enablesfc=$enableval
-else
-  enablesfc=yes
-fi
-
-
-
   # Check whether --enable-sfc was given.
 if test "${enable_sfc+set}" = set; then :
   enableval=$enable_sfc; case "${enableval}" in
@@ -11220,14 +10714,6 @@ fi
 
 
 
-
-
-# Check whether --enable-gzstreams was given.
-if test "${enable_gzstreams+set}" = set; then :
-  enableval=$enable_gzstreams; enablegz=$enableval
-else
-  enablegz=yes
-fi
 
 
 
@@ -11487,15 +10973,6 @@ $as_echo "#define HAVE_XZ 1" >>confdefs.h
 fi
 
 
-# Check whether --enable-tecplot was given.
-if test "${enable_tecplot+set}" = set; then :
-  enableval=$enable_tecplot; enabletecplot=$enableval
-else
-  enabletecplot=yes
-fi
-
-
-if test "$enabletecplot" != no ; then
 
   # Check whether --enable-tecplot was given.
 if test "${enable_tecplot+set}" = set; then :
@@ -11680,19 +11157,9 @@ else
 fi
 
 
-fi
 
 
 
-# Check whether --enable-metis was given.
-if test "${enable_metis+set}" = set; then :
-  enableval=$enable_metis; enablemetis=$enableval
-else
-  enablemetis=yes
-fi
-
-
-if (test "$enablemetis" != no) ; then
 
   # Check whether --enable-metis was given.
 if test "${enable_metis+set}" = set; then :
@@ -11737,17 +11204,6 @@ fi
 
 
 
-            # Check whether --enable-parmetis was given.
-if test "${enable_parmetis+set}" = set; then :
-  enableval=$enable_parmetis; enableparmetis=$enableval
-else
-  enableparmetis=yes
-fi
-
-
-   if (test "$enableparmetis" != no \
-         -a "$enablemetis"    != no \
-         -a "$enablempi"      != no) ; then
 
   # Check whether --enable-parmetis was given.
 if test "${enable_parmetis+set}" = set; then :
@@ -11791,14 +11247,6 @@ $as_echo "<<< Configuring library with Parmetis support >>>" >&6; }
 else
   LIBMESH_ENABLE_PARMETIS_TRUE='#'
   LIBMESH_ENABLE_PARMETIS_FALSE=
-fi
-
-
-   else
-     enableparmetis=no
-   fi
-   else
-  enableparmetis=no
 fi
 
 
@@ -11902,14 +11350,6 @@ fi
 
 
 
-# Check whether --enable-tetgen was given.
-if test "${enable_tetgen+set}" = set; then :
-  enableval=$enable_tetgen; enabletetgen=$enableval
-else
-  enabletetgen=yes
-fi
-
-
 
   # Check whether --enable-tetgen was given.
 if test "${enable_tetgen+set}" = set; then :
@@ -11956,14 +11396,6 @@ fi
 
 
 
-# Check whether --enable-triangle was given.
-if test "${enable_triangle+set}" = set; then :
-  enableval=$enable_triangle; enabletriangle=$enableval
-else
-  enabletriangle=yes
-fi
-
-
 
   # Check whether --enable-triangle was given.
 if test "${enable_triangle+set}" = set; then :
@@ -12008,14 +11440,6 @@ fi
 
 
 
-# Check whether --enable-gmv was given.
-if test "${enable_gmv+set}" = set; then :
-  enableval=$enable_gmv; enablegmv=$enableval
-else
-  enablegmv=yes
-fi
-
-
 
   # Check whether --enable-gmv was given.
 if test "${enable_gmv+set}" = set; then :
@@ -12058,14 +11482,6 @@ else
   LIBMESH_ENABLE_GMV_FALSE=
 fi
 
-
-
-# Check whether --enable-vtk was given.
-if test "${enable_vtk+set}" = set; then :
-  enableval=$enable_vtk; enablevtk=$enableval
-else
-  enablevtk=yes
-fi
 
 
 
@@ -12328,14 +11744,6 @@ $as_echo "<<< Configuring library with VTK support >>>" >&6; }
 
 
 
-# Check whether --enable-eigen was given.
-if test "${enable_eigen+set}" = set; then :
-  enableval=$enable_eigen; enableeigen=$enableval
-else
-  enableeigen=yes
-fi
-
-
 
   # Check whether --enable-eigen was given.
 if test "${enable_eigen+set}" = set; then :
@@ -12412,14 +11820,6 @@ $as_echo "<<< Configuring library with Eigen support >>>" >&6; }
 
 
 
-
-
-# Check whether --enable-glpk was given.
-if test "${enable_glpk+set}" = set; then :
-  enableval=$enable_glpk; enableglpk=$enableval
-else
-  enableglpk=yes
-fi
 
 
 
@@ -12595,15 +11995,6 @@ $as_echo "<<< Configuring library with GLPK support >>>" >&6; }
 
 
 
-# Check whether --enable-netcdf was given.
-if test "${enable_netcdf+set}" = set; then :
-  enableval=$enable_netcdf; enablenetcdf=$enableval
-else
-  enablenetcdf=yes
-fi
-
-
-if (test "$enablenetcdf" != no) ; then
 
   # Check whether --enable-netcdf was given.
 if test "${enable_netcdf+set}" = set; then :
@@ -12650,15 +12041,6 @@ fi
 
 
 
-               # Check whether --enable-exodus was given.
-if test "${enable_exodus+set}" = set; then :
-  enableval=$enable_exodus; enableexodus=$enableval
-else
-  enableexodus=yes
-fi
-
-
-   if (test "$enableexodus" != no -a "$have_netcdf" = yes) ; then
 
   # Check whether --enable-exodus was given.
 if test "${enable_exodus+set}" = set; then :
@@ -12705,15 +12087,6 @@ fi
 
 
 
-                         # Check whether --enable-nemesis was given.
-if test "${enable_nemesis+set}" = set; then :
-  enableval=$enable_nemesis; enablenemesis=$enableval
-else
-  enablenemesis=yes
-fi
-
-
-     if (test "$enableexodus" != no -a "$have_netcdf" = yes -a "$enablenemesis" != no ) ; then
 
   # Check whether --enable-nemesis was given.
 if test "${enable_nemesis+set}" = set; then :
@@ -12762,16 +12135,7 @@ else
 fi
 
 
-     fi
-   fi
-   fi
 
-# Check whether --enable-libHilbert was given.
-if test "${enable_libHilbert+set}" = set; then :
-  enableval=$enable_libHilbert; enablelibhilbert=$enableval
-else
-  enablelibhilbert=yes
-fi
 
 
 
@@ -12818,12 +12182,6 @@ fi
 
 
 
-# Check whether --enable-fparser was given.
-if test "${enable_fparser+set}" = set; then :
-  enableval=$enable_fparser; enablefparser=$enableval
-else
-  enablefparser=yes
-fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a thread-safe mkdir -p" >&5
@@ -13066,6 +12424,7 @@ else
   LIBMESH_ENABLE_FPARSER_TRUE='#'
   LIBMESH_ENABLE_FPARSER_FALSE=
 fi
+
 
 
 
