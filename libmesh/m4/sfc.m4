@@ -19,18 +19,18 @@ AC_DEFUN([CONFIGURE_SFC],
   dnl where it might be installed...
   if (test $enablesfc = yes); then
      SFC_INCLUDE="-I\$(top_srcdir)/contrib/sfcurves"
-     #SFC_LIBRARY="\$(EXTERNAL_LIBDIR)/libsfc\$(libext)"
+     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfc\$(libext)"
      AC_DEFINE(HAVE_SFCURVES, 1, [Flag indicating whether the library will be compiled with SFC support])
      AC_MSG_RESULT(<<< Configuring library with SFC support >>>)
      libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
   else
      SFC_INCLUDE=""
-     #SFC_LIBRARY=""
+     SFC_LIB=""
      enablesfc=no
   fi
 
   AC_SUBST(SFC_INCLUDE)
-  #AC_SUBST(SFC_LIBRARY)	
+  AC_SUBST(SFC_LIB)	
   AC_SUBST(enablesfc)
 
   AM_CONDITIONAL(LIBMESH_ENABLE_SFC, test x$enablesfc = xyes)		 

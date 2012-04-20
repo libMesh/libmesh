@@ -19,18 +19,18 @@ AC_DEFUN([CONFIGURE_TETGEN],
   dnl where it might be installed...
   if (test $enabletetgen = yes); then
      TETGEN_INCLUDE="-I\$(top_srcdir)/contrib/tetgen"
-     #TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(libext)"
+     TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(libext)"
      AC_DEFINE(HAVE_TETGEN, 1, [Flag indicating whether the library will be compiled with Tetgen support])
      AC_MSG_RESULT(<<< Configuring library with Tetgen support >>>)
      libmesh_contrib_INCLUDES="$TETGEN_INCLUDE $libmesh_contrib_INCLUDES"
   else
      TETGEN_INCLUDE=""
-     #TETGEN_LIBRARY=""
+     TETGEN_LIBRARY=""
      enabletetgen=no
   fi
 
   AC_SUBST(TETGEN_INCLUDE)
-  #AC_SUBST(TETGEN_LIBRARY)	
+  AC_SUBST(TETGEN_LIBRARY)	
   AC_SUBST(enabletetgen)
 
   AM_CONDITIONAL(LIBMESH_ENABLE_TETGEN, test x$enabletetgen = xyes)

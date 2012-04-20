@@ -23,17 +23,20 @@ AC_DEFUN([CONFIGURE_NEMESIS],
   dnl where it might be installed...
   if (test $enablenemesis = yes); then
      NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/Lib"
+     NEMESIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libnemesis\$(libext)"
      AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
      AC_MSG_RESULT(<<< Configuring library with Nemesis support >>>)
      libmesh_contrib_INCLUDES="$NEMESIS_INCLUDE $libmesh_contrib_INCLUDES"
      have_nemesis=yes
   else
      NEMESIS_INCLUDE=""
+     NEMESIS_LIBRARY=""
      enablenemesis=no
      have_nemesis=no
   fi
 
   AC_SUBST(NEMESIS_INCLUDE)
+  AC_SUBST(NEMESIS_LIBRARY)
   AC_SUBST(enablenemesis)
 
   AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS, test x$enablenemesis = xyes)
