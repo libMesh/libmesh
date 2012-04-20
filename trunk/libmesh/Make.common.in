@@ -114,6 +114,7 @@ enable-vtk           = @enablevtk@
 #
 # Set the current directory.
 libmesh_dir := @PWD@
+top_srcdir  := @PWD@
 export libmesh_dir
 ###############################################################################
 
