@@ -40,7 +40,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
     esac	
 
      FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
-     #FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
+     FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
      AC_DEFINE(HAVE_FPARSER, 1, [Flag indicating whether the library will be compiled with FPARSER support])
      libmesh_contrib_INCLUDES="$FPARSER_INCLUDE $libmesh_contrib_INCLUDES"
      if (test $enablefparseroptimizer = yes); then
@@ -50,12 +50,12 @@ AC_DEFUN([CONFIGURE_FPARSER],
      fi	
   else
      FPARSER_INCLUDE=""
-     #FPARSER_LIBRARY=""
+     FPARSER_LIBRARY=""
      enablefparser=no
   fi
 
   AC_SUBST(FPARSER_INCLUDE)
-  #AC_SUBST(FPARSER_LIBRARY)	
+  AC_SUBST(FPARSER_LIBRARY)	
   AC_SUBST(enablefparser)
 		 		 
   AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)

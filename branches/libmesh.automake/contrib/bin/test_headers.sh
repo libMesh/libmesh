@@ -60,13 +60,13 @@ for i in $headers_to_test; do
     # Use make -s for silent operation
     if make -s -C $LIBMESH_DIR contrib/bin/$app_name 2>> $errlog; then
 	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
+        rm -f $source_file $app_file
     else
 	echo -e $gotocolumn $white"["$red" FAILED "$white"]";
         returnval=1
     fi
     
     echo -e -n $colorreset;    
-    rm -f $source_file $app_file
 done
 
 exit $returnval

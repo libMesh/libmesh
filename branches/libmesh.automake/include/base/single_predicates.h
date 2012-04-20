@@ -18,6 +18,7 @@
 #ifndef __single_predicates_h__
 #define __single_predicates_h__
 
+#include <cstddef>
 #include <vector>
 #include <cstddef>         // for NULL with gcc 4.6.2 - I'm serious!
 #include "enum_elem_type.h"
