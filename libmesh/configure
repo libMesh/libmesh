@@ -11149,7 +11149,7 @@ fi
 
 
       if (test $enablesfc = yes); then
-     SFC_INCLUDE="-I\$(top_srcdir)/contrib/sfc"
+     SFC_INCLUDE="-I\$(top_srcdir)/contrib/sfcurves"
      #SFC_LIBRARY="\$(EXTERNAL_LIBDIR)/libsfc\$(libext)"
 
 $as_echo "#define HAVE_SFCURVES 1" >>confdefs.h
