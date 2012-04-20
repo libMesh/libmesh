@@ -7541,6 +7541,7 @@ fi
 
 PWD=`pwd`
 
+top_srcdir=$PWD
 
 
 

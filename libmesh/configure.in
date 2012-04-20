@@ -403,6 +403,7 @@ dnl Get the source tree directory
 dnl --------------------------------------------------------------
 PWD=`pwd`
 AC_SUBST(PWD)
+top_srcdir=$PWD
 
 
 
