@@ -608,6 +608,7 @@ FPARSER_SUPPORT_OPTIMIZER_TRUE
 FPARSER_NO_SUPPORT_OPTIMIZER_FALSE
 FPARSER_NO_SUPPORT_OPTIMIZER_TRUE
 enablefparser
+FPARSER_LIBRARY
 FPARSER_INCLUDE
 YFLAGS
 YACC
@@ -616,18 +617,22 @@ MKDIR_P
 LIBMESH_ENABLE_LIBHILBERT_FALSE
 LIBMESH_ENABLE_LIBHILBERT_TRUE
 enablelibhilbert
+LIBHILBERT_LIBRARY
 LIBHILBERT_INCLUDE
 LIBMESH_ENABLE_NEMESIS_FALSE
 LIBMESH_ENABLE_NEMESIS_TRUE
 enablenemesis
+NEMESIS_LIBRARY
 NEMESIS_INCLUDE
 LIBMESH_ENABLE_EXODUS_FALSE
 LIBMESH_ENABLE_EXODUS_TRUE
 enableexodus
+EXODUS_LIBRARY
 EXODUS_INCLUDE
 LIBMESH_ENABLE_NETCDF_FALSE
 LIBMESH_ENABLE_NETCDF_TRUE
 enablenetcdf
+NETCDF_LIBRARY
 NETCDF_INCLUDE
 enableglpk
 GLPK_LIBRARY
@@ -641,14 +646,17 @@ VTK_INCLUDE
 LIBMESH_ENABLE_GMV_FALSE
 LIBMESH_ENABLE_GMV_TRUE
 enablegmv
+GMV_LIBRARY
 GMV_INCLUDE
 LIBMESH_ENABLE_TRIANGLE_FALSE
 LIBMESH_ENABLE_TRIANGLE_TRUE
 enabletriangle
+TRIANGLE_LIBRARY
 TRIANGLE_INCLUDE
 LIBMESH_ENABLE_TETGEN_FALSE
 LIBMESH_ENABLE_TETGEN_TRUE
 enabletetgen
+TETGEN_LIBRARY
 TETGEN_INCLUDE
 HAVE_DOT
 DOTPATH
@@ -657,10 +665,12 @@ DOXYGEN
 LIBMESH_ENABLE_PARMETIS_FALSE
 LIBMESH_ENABLE_PARMETIS_TRUE
 enableparmetis
+PARMETIS_LIB
 PARMETIS_INCLUDE
 LIBMESH_ENABLE_METIS_FALSE
 LIBMESH_ENABLE_METIS_TRUE
 enablemetis
+METIS_LIB
 METIS_INCLUDE
 LIBMESH_ENABLE_TECPLOT_FALSE
 LIBMESH_ENABLE_TECPLOT_TRUE
@@ -673,14 +683,17 @@ BZIP2
 LIBMESH_ENABLE_GZSTREAMS_FALSE
 LIBMESH_ENABLE_GZSTREAMS_TRUE
 enablegz
+GZSTREAM_LIB
 GZSTREAM_INCLUDE
 LIBMESH_ENABLE_SFC_FALSE
 LIBMESH_ENABLE_SFC_TRUE
 enablesfc
+SFC_LIB
 SFC_INCLUDE
 LIBMESH_ENABLE_LASPACK_FALSE
 LIBMESH_ENABLE_LASPACK_TRUE
 enablelaspack
+LASPACK_LIB
 LASPACK_INCLUDE
 enableopenmp
 OPENMP_FFLAGS
@@ -11095,7 +11108,7 @@ fi
 
       if (test $enablelaspack = yes); then
      LASPACK_INCLUDE="-I\$(top_srcdir)/contrib/laspack"
-     #LASPACK_LIBRARY="\$(EXTERNAL_LIBDIR)/liblaspack\$(libext)"
+     LASPACK_LIB="\$(EXTERNAL_LIBDIR)/liblaspack\$(libext)"
 
 $as_echo "#define HAVE_LASPACK 1" >>confdefs.h
 
@@ -11104,12 +11117,12 @@ $as_echo "<<< Configuring library with Laspack support >>>" >&6; }
      libmesh_contrib_INCLUDES="$LASPACK_INCLUDE $libmesh_contrib_INCLUDES"
   else
      LASPACK_INCLUDE=""
-     #LASPACK_LIBRARY=""
+     LASPACK_LIB=""
      enablelaspack=no
   fi
 
 
-  #AC_SUBST(LASPACK_LIBRARY)
+
 
 
    if test x$enablelaspack = xyes; then
@@ -11150,7 +11163,7 @@ fi
 
       if (test $enablesfc = yes); then
      SFC_INCLUDE="-I\$(top_srcdir)/contrib/sfcurves"
-     #SFC_LIBRARY="\$(EXTERNAL_LIBDIR)/libsfc\$(libext)"
+     SFC_LIB="\$(EXTERNAL_LIBDIR)/libsfc\$(libext)"
 
 $as_echo "#define HAVE_SFCURVES 1" >>confdefs.h
 
@@ -11159,12 +11172,12 @@ $as_echo "<<< Configuring library with SFC support >>>" >&6; }
      libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
   else
      SFC_INCLUDE=""
-     #SFC_LIBRARY=""
+     SFC_LIB=""
      enablesfc=no
   fi
 
 
-  #AC_SUBST(SFC_LIBRARY)
+
 
 
    if test x$enablesfc = xyes; then
@@ -11260,7 +11273,7 @@ fi
   # If both tests succeded, continue the configuration process.
   if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then
     GZSTREAM_INCLUDE="-I\$(top_srcdir)/contrib/gzstream"
-    #GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
+    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
 
 $as_echo "#define HAVE_GZSTREAM 1" >>confdefs.h
 
@@ -11270,12 +11283,14 @@ $as_echo "<<< Configuring library with gzstreams support >>>" >&6; }
     libmesh_optional_LIBS="-lz $libmesh_optional_LIBS"
   # Otherwise do not enable gzstreams
   else
+    GZSTREAM_INCLUDE=""
+    GZSTREAM_LIB=""
     enablegz=no;
   fi
 fi
 
 
-#AC_SUBST(GZSTREAM_LIB)
+
 
 
  if test x$enablegz = xyes; then
@@ -11665,7 +11680,7 @@ fi
 
       if (test $enablemetis = yes); then
      METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/Lib"
-     #METIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
+     METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
 
 $as_echo "#define HAVE_METIS 1" >>confdefs.h
 
@@ -11674,12 +11689,12 @@ $as_echo "<<< Configuring library with Metis support >>>" >&6; }
      libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"
   else
      METIS_INCLUDE=""
-     #METIS_LIBRARY=""
+     METIS_LIB=""
      enablemetis=no
   fi
 
 
-  #AC_SUBST(METIS_LIBRARY)
+
 
 
    if test x$enablemetis = xyes; then
@@ -11723,7 +11738,7 @@ fi
 
       if (test $enableparmetis = yes); then
      PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/Lib"
-     #PARMETIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
+     PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
 
 $as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
 
@@ -11732,12 +11747,12 @@ $as_echo "<<< Configuring library with Parmetis support >>>" >&6; }
      libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
   else
      PARMETIS_INCLUDE=""
-     #PARMETIS_LIBRARY=""
+     PARMETIS_LIB=""
      enableparmetis=no
   fi
 
 
-  #AC_SUBST(PARMETIS_LIBRARY)
+
 
 
    if test x$enableparmetis = xyes; then
@@ -11882,7 +11897,7 @@ fi
 
       if (test $enabletetgen = yes); then
      TETGEN_INCLUDE="-I\$(top_srcdir)/contrib/tetgen"
-     #TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(libext)"
+     TETGEN_LIBRARY="\$(EXTERNAL_LIBDIR)/libtetgen\$(libext)"
 
 $as_echo "#define HAVE_TETGEN 1" >>confdefs.h
 
@@ -11891,12 +11906,12 @@ $as_echo "<<< Configuring library with Tetgen support >>>" >&6; }
      libmesh_contrib_INCLUDES="$TETGEN_INCLUDE $libmesh_contrib_INCLUDES"
   else
      TETGEN_INCLUDE=""
-     #TETGEN_LIBRARY=""
+     TETGEN_LIBRARY=""
      enabletetgen=no
   fi
 
 
-  #AC_SUBST(TETGEN_LIBRARY)
+
 
 
    if test x$enabletetgen = xyes; then
@@ -11936,7 +11951,7 @@ fi
 
       if (test $enabletriangle = yes); then
      TRIANGLE_INCLUDE="-I\$(top_srcdir)/contrib/triangle"
-     #TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(libext)"
+     TRIANGLE_LIBRARY="\$(EXTERNAL_LIBDIR)/libtriangle\$(libext)"
 
 $as_echo "#define HAVE_TRIANGLE 1" >>confdefs.h
 
@@ -11945,12 +11960,12 @@ $as_echo "<<< Configuring library with Triangle support >>>" >&6; }
      libmesh_contrib_INCLUDES="$TRIANGLE_INCLUDE $libmesh_contrib_INCLUDES"
   else
      TRIANGLE_INCLUDE=""
-     #TRIANGLE_LIBRARY=""
+     TRIANGLE_LIBRARY=""
      enabletriangle=no
   fi
 
 
-  #AC_SUBST(TRIANGLE_LIBRARY)
+
 
 
    if test x$enabletriangle = xyes; then
@@ -11988,7 +12003,7 @@ fi
 
       if (test $enablegmv = yes); then
      GMV_INCLUDE="-I\$(top_srcdir)/contrib/gmv"
-     #GMV_LIBRARY="\$(EXTERNAL_LIBDIR)/libgmv\$(libext)"
+     GMV_LIBRARY="\$(EXTERNAL_LIBDIR)/libgmv\$(libext)"
 
 $as_echo "#define HAVE_GMV 1" >>confdefs.h
 
@@ -11997,12 +12012,12 @@ $as_echo "<<< Configuring library with GMV support >>>" >&6; }
      libmesh_contrib_INCLUDES="$GMV_INCLUDE $libmesh_contrib_INCLUDES"
   else
      GMV_INCLUDE=""
-     #GMV_LIBRARY=""
+     GMV_LIBRARY=""
      enablegmv=no
   fi
 
 
-  #AC_SUBST(GMV_LIBRARY)
+
 
 
    if test x$enablegmv = xyes; then
@@ -12576,6 +12591,7 @@ fi
 
       if (test $enablenetcdf = yes); then
      NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/Lib"
+     NETCDF_LIBRARY="\$(EXTERNAL_LIBDIR)/libnetcdf\$(libext)"
 
 $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
@@ -12585,9 +12601,11 @@ $as_echo "<<< Configuring library with Netcdf support >>>" >&6; }
      have_netcdf=yes
   else
      NETCDF_INCLUDE=""
+     NETCDF_LIBRARY=""
      enablenetcdf=no
      have_netcdf=no
   fi
+
 
 
 
@@ -12628,6 +12646,7 @@ fi
 
       if (test $enableexodus = yes); then
      EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/Lib/include"
+     EXODUS_LIBRARY="\$(EXTERNAL_LIBDIR)/libexodusii\$(libext)"
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
@@ -12637,9 +12656,11 @@ $as_echo "<<< Configuring library with Exodus support >>>" >&6; }
      have_exodus=yes
   else
      EXODUS_INCLUDE=""
+     EXODUS_LIBRARY=""
      enableexodus=no
      have_exodus=no
   fi
+
 
 
 
@@ -12683,6 +12704,7 @@ fi
 
       if (test $enablenemesis = yes); then
      NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/Lib"
+     NEMESIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libnemesis\$(libext)"
 
 $as_echo "#define HAVE_NEMESIS_API 1" >>confdefs.h
 
@@ -12692,9 +12714,11 @@ $as_echo "<<< Configuring library with Nemesis support >>>" >&6; }
      have_nemesis=yes
   else
      NEMESIS_INCLUDE=""
+     NEMESIS_LIBRARY=""
      enablenemesis=no
      have_nemesis=no
   fi
+
 
 
 
@@ -12737,7 +12761,7 @@ fi
 
       if (test $enablelibhilbert = yes); then
      LIBHILBERT_INCLUDE="-I\$(top_srcdir)/contrib/libHilbert/include"
-     #LIBHILBERT_LIBRARY="\$(EXTERNAL_LIBDIR)/liblibhilbert\$(libext)"
+     LIBHILBERT_LIBRARY="\$(EXTERNAL_LIBDIR)/liblibhilbert\$(libext)"
 
 $as_echo "#define HAVE_LIBHILBERT 1" >>confdefs.h
 
@@ -12746,12 +12770,12 @@ $as_echo "<<< Configuring library with libHilbert support >>>" >&6; }
      libmesh_contrib_INCLUDES="$LIBHILBERT_INCLUDE $libmesh_contrib_INCLUDES"
   else
      LIBHILBERT_INCLUDE=""
-     #LIBHILBERT_LIBRARY=""
+     LIBHILBERT_LIBRARY=""
      enablelibhilbert=no
   fi
 
 
-  #AC_SUBST(LIBHILBERT_LIBRARY)
+
 
 
    if test x$enablelibhilbert = xyes; then
@@ -12967,7 +12991,7 @@ $as_echo ">>> Disabling fparser optimization on ${host_os} <<<" >&6; }
     esac
 
      FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
-     #FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
+     FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
 
 $as_echo "#define HAVE_FPARSER 1" >>confdefs.h
 
@@ -12981,12 +13005,12 @@ $as_echo "<<< Configuring library with fparser support (without optimizer) >>>" 
      fi
   else
      FPARSER_INCLUDE=""
-     #FPARSER_LIBRARY=""
+     FPARSER_LIBRARY=""
      enablefparser=no
   fi
 
 
-  #AC_SUBST(FPARSER_LIBRARY)
+
 
 
    if test x$enablefparseroptimizer = xno; then
