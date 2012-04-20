@@ -680,6 +680,31 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
 
 
 template <typename T>
+std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(unsigned int i)
+{
+  int ierr=0;
+
+  PetscReal re, im;
+
+  // real and imaginary part of the ith eigenvalue.
+  PetscScalar kr, ki;
+
+  ierr = EPSGetEigenvalue(_eps, i, &kr, &ki);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  re = PetscRealPart(kr);
+  im = PetscImaginaryPart(kr);
+#else
+  re = kr;
+  im = ki;
+#endif
+
+  return std::make_pair(re, im);
+}
+
+
+template <typename T>
 Real SlepcEigenSolver<T>::get_relative_error(unsigned int i)
 {
   int ierr=0;

@@ -92,6 +92,50 @@ void PetscMatrix<T>::init (const unsigned int m,
 }
 
 
+template <typename T>
+void PetscMatrix<T>::init (const unsigned int m,
+			   const unsigned int n,
+			   const unsigned int m_l,
+			   const unsigned int n_l,
+			   const std::vector<unsigned int>& n_nz,
+			   const std::vector<unsigned int>& n_oz)
+{
+  // Clear initialized matrices
+  if (this->initialized())
+    this->clear();
+
+  this->_is_initialized = true;
+
+  // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
+  libmesh_assert (n_nz.size() == n_l);
+  libmesh_assert (n_oz.size() == n_l);
+
+  int ierr     = 0;
+  int m_global = static_cast<int>(m);
+  int n_global = static_cast<int>(n);
+  int m_local  = static_cast<int>(m_l);
+  int n_local  = static_cast<int>(n_l);
+
+  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // Is prefix information available somewhere? Perhaps pass in the system name?
+  ierr = MatSetOptionsPrefix(_mat, "");
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatSetFromOptions(_mat);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if (!n_nz.empty()) {
+    ierr = MatSeqAIJSetPreallocation(_mat, 0, (int*)&n_nz[0]);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    ierr = MatMPIAIJSetPreallocation(_mat, 0, (int*)&n_nz[0], 0, (int*)&n_oz[0]);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  }
+
+  this->zero();
+}
 
 
 template <typename T>

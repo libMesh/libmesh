@@ -126,6 +126,21 @@ public:
 	     const unsigned int noz=10);
 
   /**
+   * Initialize a Petsc matrix that is of global
+   * dimension \f$ m \times  n \f$ with local dimensions
+   * \f$ m_l \times n_l \f$.  \p nnz is the number of on-processor
+   * nonzeros per row.
+   * \p noz is the number of off-processor
+   * nonzeros per row.
+   */
+  void init (const unsigned int m,
+	     const unsigned int n,
+	     const unsigned int m_l,
+	     const unsigned int n_l,
+	     const std::vector<unsigned int>& n_nz,
+	     const std::vector<unsigned int>& n_oz);
+
+  /**
    * Initialize using sparsity structure computed by \p dof_map.
    */
   void init ();
