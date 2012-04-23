@@ -354,7 +354,8 @@ clean:
 		*.$(obj-suffix) \
 		.dep \
 		util/tree_grammar_parser.output \
-		extrasrc/fp_opcode_add.inc
+		extrasrc/fp_opcode_add.inc \
+                fpoptimizer/grammar_data.cc
 
 release_clean:
 	@rm -f testbed_release speedtest_release \
