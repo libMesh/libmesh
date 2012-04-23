@@ -16,6 +16,8 @@
 #
 ###############################################################################
 
+default: all
+
 # Where libMesh is installed.
 prefix              := @prefix@
 exec_prefix         := @exec_prefix@

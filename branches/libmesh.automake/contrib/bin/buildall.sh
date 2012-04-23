@@ -3,7 +3,7 @@
 ./bootstrap
 
 top_dir=`pwd`
-install_dir=/tmp/foo
+install_dir=/lustre/work/benkirk/codes/install/aerolab_workstations
 
 rm -rf $install_dir
 
