@@ -25,18 +25,17 @@
 #if defined(LIBMESH_HAVE_LASPACK)
 //#if defined(LIBMESH_HAVE_LASPACK) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
-
-// C++ includes
+// Laspack includes
+#include <itersolv.h>
+#include <rtc.h>
+#include <errhandl.h>
 
 // Local includes
 #include "linear_solver.h"
 #include "laspack_vector.h"
 #include "laspack_matrix.h"
 
-
-#include <itersolv.h>
-#include <rtc.h>
-#include <errhandl.h>
+// C++ includes
 
 namespace libMesh
 {

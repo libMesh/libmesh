@@ -18,17 +18,17 @@
 #ifndef __xdr_mgf_h__
 #define __xdr_mgf_h__
 
+// Local includes
+#include "legacy_xdr_io.h"          // for LegacyXdrIO::FileFormat
+#include "libmesh_config.h"  // for LIBMESH_HAVE_XDR
+#include "o_f_stream.h"      // for OFStream
+
 // C++ includes
 #include <cstdio>  // for std::FILE
 #include <string>
 #include <cstring> // std::strlen, std::strcmp
 #include <fstream> // for std::ifstream
 #include <sstream>
-
-// Local includes
-#include "legacy_xdr_io.h"          // for LegacyXdrIO::FileFormat
-#include "libmesh_config.h"  // for LIBMESH_HAVE_XDR
-#include "o_f_stream.h"      // for OFStream
 
 // Forward Declarations
 

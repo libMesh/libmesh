@@ -20,16 +20,14 @@
 #ifndef __sum_shell_matrix_h__
 #define __sum_shell_matrix_h__
 
-
-// C++ includes
-#include <vector>
-
-
 // Local includes
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
 #include "libmesh.h"
 #include "shell_matrix.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

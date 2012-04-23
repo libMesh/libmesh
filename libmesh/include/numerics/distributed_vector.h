@@ -24,17 +24,14 @@
 #ifndef __distributed_vector_h__
 #define __distributed_vector_h__
 
-
-
+// Local includes
+#include "numeric_vector.h"
+#include "parallel.h"
 
 // C++ includes
 #include <vector>
 #include <algorithm>
 #include <limits>
-
-// Local includes
-#include "numeric_vector.h"
-#include "parallel.h"
 
 namespace libMesh
 {

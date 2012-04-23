@@ -24,11 +24,6 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-// C++ includes
-#include <vector>
-
-// Local includes
-#include "linear_solver.h"
 #include "petsc_macro.h"
 
 /**
@@ -42,6 +37,13 @@ EXTERN_C_FOR_PETSC_BEGIN
 #  include <petscksp.h>
 #endif
 EXTERN_C_FOR_PETSC_END
+
+// Local includes
+#include "linear_solver.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these

@@ -20,10 +20,10 @@
 #ifndef __surface_h__
 #define __surface_h__
 
-// C++ includes
-
 // Local includes
 #include "point.h"
+
+// C++ includes
 
 namespace libMesh
 {

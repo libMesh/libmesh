@@ -2,11 +2,13 @@
 #ifndef __const_function_h__
 #define __const_function_h__
 
-#include <string>
-
+// Local includes
 #include "dense_vector.h"
 #include "function_base.h"
 #include "point.h"
+
+// C++ includes
+#include <string>
 
 template <typename Output=Number>
 class ConstFunction : public FunctionBase<Output>

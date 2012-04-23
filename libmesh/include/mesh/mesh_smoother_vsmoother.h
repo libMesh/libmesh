@@ -23,13 +23,14 @@
 #include "libmesh_config.h"
 #ifdef LIBMESH_ENABLE_VSMOOTHER
 
-// C++ Includes   -----------------------------------
-#include <vector>
-#include <map>
-
 // Local Includes -----------------------------------
 #include "mesh_smoother.h"
 #include "unstructured_mesh.h"
+
+// C++ Includes   -----------------------------------
+#include <cstddef>
+#include <vector>
+#include <map>
 
 namespace libMesh
 {

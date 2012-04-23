@@ -21,10 +21,11 @@
 #ifndef __fem_system_h__
 #define __fem_system_h__
 
-// C++ includes
-
 // Local Includes
 #include "diff_system.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

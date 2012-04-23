@@ -20,13 +20,12 @@
 #ifndef __sphere_h__
 #define __sphere_h__
 
-// C++ includes
-#include <cmath>
-
-
 // Local includes
 #include "surface.h"
 #include "libmesh.h"
+
+// C++ includes
+#include <cmath>
 
 namespace libMesh
 {

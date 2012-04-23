@@ -20,13 +20,14 @@
 #ifndef __diff_context_h__
 #define __diff_context_h__
 
-// C++ includes
-
 // Local Includes
 #include "dense_matrix.h"
 #include "dense_submatrix.h"
 #include "dense_subvector.h"
 #include "dense_vector.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

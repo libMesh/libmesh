@@ -20,17 +20,16 @@
 #ifndef __mesh_generation_h__
 #define __mesh_generation_h__
 
-
-
-// C++ Includes   -----------------------------------
-#include <vector>
-
 // Local Includes -----------------------------------
 // #include "libmesh_common.h" // needed for Real
 #include "libmesh.h"
 #include "enum_elem_type.h"
 #include "mesh_triangle_interface.h"
 #include "vector_value.h"
+
+// C++ Includes   -----------------------------------
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

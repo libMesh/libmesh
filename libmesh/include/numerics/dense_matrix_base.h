@@ -20,11 +20,11 @@
 #ifndef __dense_matrix_base_h__
 #define __dense_matrix_base_h__
 
-// C++ includes
-
 // Local Includes
 #include "libmesh_common.h"
 #include "compare_types.h"
+
+// C++ includes
 
 namespace libMesh
 {

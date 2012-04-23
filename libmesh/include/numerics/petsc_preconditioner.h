@@ -24,8 +24,6 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-// C++ includes
-
 // Local includes
 #include "preconditioner.h"
 #include "libmesh_common.h"
@@ -39,6 +37,8 @@
 EXTERN_C_FOR_PETSC_BEGIN
 #include "petscpc.h"
 EXTERN_C_FOR_PETSC_END
+
+// C++ includes
 
 namespace libMesh
 {

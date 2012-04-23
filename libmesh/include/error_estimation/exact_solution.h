@@ -19,13 +19,13 @@
 #define __exact_solution_h__
 
 
-// C++ includes
-#include <map>
-#include <vector>
-
 // Local Includes
 #include "libmesh_common.h" // for Number
 #include "enum_norm_type.h"
+
+// C++ includes
+#include <map>
+#include <vector>
 
 namespace libMesh
 {

@@ -20,10 +20,11 @@
 #ifndef __cell_hex20_h__
 #define __cell_hex20_h__
 
-// C++ includes
-
 // Local includes
 #include "cell_hex.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

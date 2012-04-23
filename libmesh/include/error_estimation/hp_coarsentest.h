@@ -20,9 +20,6 @@
 #ifndef __hp_coarsentest_h__
 #define __hp_coarsentest_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "auto_ptr.h"
 #include "dense_matrix.h"
@@ -32,6 +29,9 @@
 
 #include "fe.h"         // MipsPro requires fe.h and quadrature.h in order to
 #include "quadrature.h" //  delete AutoPtrs<> upon destruction
+
+// C++ includes
+#include <vector>
 
 #ifdef LIBMESH_ENABLE_AMR
 

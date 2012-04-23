@@ -20,19 +20,20 @@
 #ifndef __petsc_diff_solver_h__
 #define __petsc_diff_solver_h__
 
-// C++ includes
-
-// Local includes
 #include "libmesh_common.h"
-#include "diff_solver.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
+// Local includes
+#include "diff_solver.h"
 #include "petsc_macro.h"
 
+// PETSc includes
 EXTERN_C_FOR_PETSC_BEGIN
 # include <petscsnes.h>
 EXTERN_C_FOR_PETSC_END
+
+// C++ includes
 
 namespace libMesh
 {

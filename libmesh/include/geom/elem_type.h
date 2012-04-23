@@ -20,12 +20,12 @@
 #ifndef __elem_type_h__
 #define __elem_type_h__
 
-// C++ includes
-#include <string>
-
 // Local includes
 #include "libmesh_common.h"
 #include "enum_elem_type.h"
+
+// C++ includes
+#include <string>
 
 namespace libMesh
 {

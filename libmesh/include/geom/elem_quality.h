@@ -20,13 +20,13 @@
 #ifndef __elem_quality_h__
 #define __elem_quality_h__
 
-// C++ includes
-#include <vector>
-#include <string>
-
 // Local includes
 #include "enum_elem_type.h"
 #include "enum_elem_quality.h"
+
+// C++ includes
+#include <vector>
+#include <string>
 
 namespace libMesh
 {

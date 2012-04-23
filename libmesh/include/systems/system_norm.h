@@ -20,13 +20,13 @@
 #ifndef __system_norm_h__
 #define __system_norm_h__
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "libmesh_common.h" // for Real
 #include "enum_norm_type.h"
 #include "system.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

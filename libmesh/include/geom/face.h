@@ -20,8 +20,6 @@
 #ifndef __face_h__
 #define __face_h__
 
-// C++ includes
-
 // Local includes
 #include "elem.h"
 

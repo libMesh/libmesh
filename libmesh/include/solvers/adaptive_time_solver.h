@@ -20,11 +20,11 @@
 #ifndef __adaptive_time_solver_h__
 #define __adaptive_time_solver_h__
 
-// C++ includes
-
 // Local includes
 #include "system_norm.h"
 #include "unsteady_solver.h"
+
+// C++ includes
 
 namespace libMesh
 {

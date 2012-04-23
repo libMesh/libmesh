@@ -20,8 +20,6 @@
 #ifndef __cell_pyramid_h__
 #define __cell_pyramid_h__
 
-// C++ includes
-
 // Local includes
 #include "cell.h"
 

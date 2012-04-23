@@ -20,10 +20,10 @@
 #ifndef __vector_value_h__
 #define __vector_value_h__
 
-// C++ includes
-
 // Local includes
 #include "type_vector.h"
+
+// C++ includes
 
 namespace libMesh
 {

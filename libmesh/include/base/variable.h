@@ -18,13 +18,13 @@
 #ifndef __variable_h__
 #define __variable_h__
 
-// C++ includes
-#include <set>
-#include <string>
-
 // Local Includes
 #include "fe_type.h"
 #include "id_types.h"
+
+// C++ includes
+#include <set>
+#include <string>
 
 namespace libMesh {
 

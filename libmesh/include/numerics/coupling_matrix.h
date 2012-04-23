@@ -20,11 +20,11 @@
 #ifndef __coupling_matrix_h__
 #define __coupling_matrix_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "libmesh_common.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

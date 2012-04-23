@@ -20,9 +20,14 @@
 #ifndef __transient_rb_construction_h__
 #define __transient_rb_construction_h__
 
-#include "transient_system.h"
+// rbOOmit includes
 #include "rb_construction.h"
 #include "transient_rb_evaluation.h"
+
+// libMesh includes
+#include "transient_system.h"
+
+// C++ includes
 
 namespace libMesh
 {

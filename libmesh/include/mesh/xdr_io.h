@@ -21,14 +21,14 @@
 #define __xdr_io_h__
 
 
-// C++ inludes
-#include <string>
-#include <vector>
-
 // Local includes
 #include "libmesh.h"
 #include "mesh_input.h"
 #include "mesh_output.h"
+
+// C++ includes
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

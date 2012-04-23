@@ -19,12 +19,12 @@
 #ifndef __plt_loader_h__
 #define __plt_loader_h__
 
+// Local includes
+#include "libmesh_common.h"
+
 // C++ includes
 #include <string>
 #include <vector>
-
-// Local includes
-#include "libmesh_common.h"
 
 namespace libMesh
 {

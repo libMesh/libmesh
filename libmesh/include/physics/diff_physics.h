@@ -21,12 +21,12 @@
 #ifndef __diff_physics_h__
 #define __diff_physics_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "auto_ptr.h"
 #include "diff_context.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

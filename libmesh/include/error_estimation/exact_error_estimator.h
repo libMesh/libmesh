@@ -20,12 +20,13 @@
 #ifndef __exact_error_estimator_h__
 #define __exact_error_estimator_h__
 
-// C++ includes
-#include <vector>
-#include <string>
-
 // Local Includes
 #include "error_estimator.h"
+
+// C++ includes
+#include <cstddef>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

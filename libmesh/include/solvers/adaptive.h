@@ -20,8 +20,6 @@
 #ifndef __adaptive_h__
 #define __adaptive_h__
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "linear.h"
@@ -29,6 +27,8 @@
 #include "kelly_error_estimator.h"
 #include "mesh_refinement.h"
 #include "mesh.h"
+
+// C++ includes
 
 namespace libMesh
 {

@@ -27,20 +27,15 @@
 
 #ifdef LIBMESH_HAVE_LASPACK
 
-
-
+// Local includes
+#include "numeric_vector.h"
 
 // C++ includes
 #include <cstdio> // for std::sprintf
 
-// Local includes
-#include "numeric_vector.h"
-
-
-
-
-#include <qvector.h>
+// Laspack includes
 #include <operats.h>
+#include <qvector.h>
 
 namespace libMesh
 {

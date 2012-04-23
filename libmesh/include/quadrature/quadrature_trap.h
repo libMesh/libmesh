@@ -20,10 +20,10 @@
 #ifndef __quadrature_trap_h__
 #define __quadrature_trap_h__
 
-// C++ includes
-
 // Local includes
 #include "quadrature.h"
+
+// C++ includes
 
 namespace libMesh
 {

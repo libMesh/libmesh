@@ -20,11 +20,11 @@
 #ifndef __system_subset_h__
 #define __system_subset_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "reference_counted_object.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

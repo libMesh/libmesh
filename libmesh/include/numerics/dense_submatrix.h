@@ -20,12 +20,12 @@
 #ifndef __dense_submatrix_h__
 #define __dense_submatrix_h__
 
-// C++ includes
-
 // Local Includes
 #include "libmesh_common.h"
 #include "dense_matrix.h"
 #include "dense_subvector.h"
+
+// C++ includes
 
 namespace libMesh
 {

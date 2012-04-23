@@ -18,13 +18,13 @@
 #ifndef __xdr_mhead_h__
 #define __xdr_mhead_h__
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "xdr_head.h" // for base class
 #include "xdr_mesh.h" // for friend
 #include "enum_elem_type.h" // for ElemType
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

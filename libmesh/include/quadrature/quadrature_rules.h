@@ -20,11 +20,11 @@
 #ifndef __quadrature_rules_h__
 #define __quadrature_rules_h__
 
-// C++ includes
-#include <string>
-
 // Local includes
 #include "enum_quadrature_type.h"
+
+// C++ includes
+#include <string>
 
 namespace libMesh
 {

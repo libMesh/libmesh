@@ -21,14 +21,15 @@
 #define __mesh_input_h__
 
 
-// C++ inludes
-#include <istream>
-#include <string>
-#include <vector>
-
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_base.h"
+
+// C++ includes
+#include <cstddef>
+#include <istream>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

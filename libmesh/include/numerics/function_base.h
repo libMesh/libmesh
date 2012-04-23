@@ -20,14 +20,13 @@
 #ifndef __function_base_h__
 #define __function_base_h__
 
-// C++ includes
-
-
-
 // Local Includes
 #include "libmesh_common.h"
 #include "dense_vector.h" // required to instantiate a DenseVector<> below
 #include "auto_ptr.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

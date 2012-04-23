@@ -23,13 +23,13 @@
 
 #include "libmesh_config.h"
 
-// C++ Includes   -----------------------------------
-#include LIBMESH_INCLUDE_UNORDERED_MAP
-#include <vector>
-
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "point.h"
+
+// C++ Includes   -----------------------------------
+#include LIBMESH_INCLUDE_UNORDERED_MAP
+#include <vector>
 
 namespace libMesh
 {

@@ -20,13 +20,13 @@
 #ifndef __slepc_eigen_solver_h__
 #define __slepc_eigen_solver_h__
 
-// C++ includes
+#include "libmesh_config.h"
+
+#ifdef LIBMESH_HAVE_SLEPC
 
 // Local includes
 #include "eigen_solver.h"
 #include "slepc_macro.h"
-
-#ifdef LIBMESH_HAVE_SLEPC
 
 /**
  * SLEPc include files.
@@ -34,6 +34,8 @@
 EXTERN_C_FOR_SLEPC_BEGIN
 # include <slepceps.h>
 EXTERN_C_FOR_SLEPC_END
+
+// C++ includes
 
 
 namespace libMesh

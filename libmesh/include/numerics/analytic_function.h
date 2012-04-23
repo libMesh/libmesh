@@ -20,11 +20,11 @@
 #ifndef __analytic_function_h__
 #define __analytic_function_h__
 
-// C++ includes
-
-
 // Local Includes
 #include "function_base.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

@@ -20,10 +20,10 @@
 #ifndef __nonlinear_implicit_system_h__
 #define __nonlinear_implicit_system_h__
 
-// C++ includes
-
 // Local Includes
 #include "implicit_system.h"
+
+// C++ includes
 
 namespace libMesh
 {

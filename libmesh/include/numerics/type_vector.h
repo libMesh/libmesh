@@ -20,12 +20,12 @@
 #ifndef __type_vector_h__
 #define __type_vector_h__
 
-// C++ includes
-#include <cmath>
-
 // Local includes
 #include "libmesh_common.h"
 #include "compare_types.h"
+
+// C++ includes
+#include <cmath>
 
 namespace libMesh
 {

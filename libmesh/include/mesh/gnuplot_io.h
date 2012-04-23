@@ -20,7 +20,11 @@
 #ifndef __gnuplot_io_h__
 #define __gnuplot_io_h__
 
+// Local includes
 #include "mesh_output.h"
+
+// C++ includes
+#include <cstddef>
 
 
 namespace libMesh

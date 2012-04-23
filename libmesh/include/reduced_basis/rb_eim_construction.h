@@ -20,12 +20,14 @@
 #ifndef __rb_eim_construction_h__
 #define __rb_eim_construction_h__
 
-// libMesh includes
-#include "mesh_function.h"
-
 // rbOOmit includes
 #include "rb_construction.h"
 #include "rb_assembly_expansion.h"
+
+// libMesh includes
+#include "mesh_function.h"
+
+// C++ includes
 
 namespace libMesh
 {

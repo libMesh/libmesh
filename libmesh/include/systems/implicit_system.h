@@ -20,10 +20,11 @@
 #ifndef __implicit_system_h__
 #define __implicit_system_h__
 
-// C++ includes
-
 // Local Includes
 #include "explicit_system.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

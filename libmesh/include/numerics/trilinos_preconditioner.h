@@ -24,8 +24,6 @@
 
 #ifdef LIBMESH_HAVE_TRILINOS
 
-// C++ includes
-
 // Local includes
 #include "preconditioner.h"
 #include "libmesh_common.h"
@@ -34,9 +32,13 @@
 #include "reference_counted_object.h"
 #include "libmesh.h"
 
+// Trilinos includes
 #include "Epetra_Operator.h"
 #include "Epetra_FECrsMatrix.h"
 #include "Teuchos_ParameterList.hpp"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

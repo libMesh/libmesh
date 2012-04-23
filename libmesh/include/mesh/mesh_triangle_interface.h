@@ -24,13 +24,14 @@
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "enum_elem_type.h"
 #include "libmesh.h"
 #include "mesh_serializer.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

@@ -20,13 +20,6 @@
 #ifndef __dof_map_h__
 #define __dof_map_h__
 
-// C++ Includes   -----------------------------------
-#include <vector>
-#include <map>
-#include <string>
-#include <algorithm>
-#include <iterator>
-
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "enum_order.h"
@@ -37,6 +30,14 @@
 #include "threads_allocators.h"
 #include "elem_range.h"
 #include "sparsity_pattern.h"
+
+// C++ Includes   -----------------------------------
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <map>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

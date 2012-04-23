@@ -22,12 +22,14 @@
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
+// Local includes
+#include "mesh_base.h"
+
+// C++ includes
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
-
-#include "mesh_base.h"
 
 namespace libMesh
 {

@@ -20,10 +20,10 @@
 #ifndef __continuation_system_h__
 #define __continuation_system_h__
 
-// C++ includes
-
 // Local Includes
 #include "fem_system.h"
+
+// C++ includes
 
 namespace libMesh
 {

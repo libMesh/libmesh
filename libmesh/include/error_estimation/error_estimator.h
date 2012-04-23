@@ -20,14 +20,15 @@
 #ifndef __error_estimator_h__
 #define __error_estimator_h__
 
-// C++ includes
-#include <map>
-#include <string>
-#include <vector>
-
 // Local Includes
 #include "libmesh_common.h"
 #include "system_norm.h"
+
+// C++ includes
+#include <cstddef>
+#include <map>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

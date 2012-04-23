@@ -20,13 +20,13 @@
 #ifndef __unsteady_solver_h__
 #define __unsteady_solver_h__
 
-// C++ includes
-
 // Local includes
 #include "auto_ptr.h"
 #include "libmesh_common.h"
 #include "numeric_vector.h"
 #include "time_solver.h"
+
+// C++ includes
 
 namespace libMesh
 {

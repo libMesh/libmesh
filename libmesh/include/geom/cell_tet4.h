@@ -20,10 +20,11 @@
 #ifndef __cell_tet4_h__
 #define __cell_tet4_h__
 
-// C++ includes
-
 // Local includes
 #include "cell_tet.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

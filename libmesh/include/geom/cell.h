@@ -20,8 +20,6 @@
 #ifndef __cell_h__
 #define __cell_h__
 
-// C++ includes
-
 // Local includes
 #include "elem.h"
 

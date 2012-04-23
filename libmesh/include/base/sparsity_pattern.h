@@ -19,12 +19,12 @@
 #ifndef __sparsity_pattern_h__
 #define __sparsity_pattern_h__
 
+// Local Includes
+#include "elem_range.h"
+#include "threads_allocators.h"
+
 // C++ includes
 #include <vector>
-
-// Local Includes
-#include "threads_allocators.h"
-#include "elem_range.h"
 
 namespace libMesh
 {

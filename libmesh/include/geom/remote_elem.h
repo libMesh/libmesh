@@ -23,6 +23,9 @@
 // Local includes
 #include "elem.h"
 
+// C++ includes
+#include <cstddef>
+
 namespace libMesh
 {
 

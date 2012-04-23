@@ -20,8 +20,11 @@
 #ifndef __derived_rb_evaluation_h__
 #define __derived_rb_evaluation_h__
 
+// Local includes
 #include "dense_vector.h"
 #include "rb_evaluation.h"
+
+// C++ includes
 
 namespace libMesh
 {

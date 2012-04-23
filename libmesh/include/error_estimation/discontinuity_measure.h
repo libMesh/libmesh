@@ -20,12 +20,13 @@
 #ifndef __discontinuity_measure_h___
 #define __discontinuity_measure_h__
 
-// C++ includes
-#include <vector>
-#include <string>
-
 // Local Includes
 #include "jump_error_estimator.h"
+
+// C++ includes
+#include <cstddef>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

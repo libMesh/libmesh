@@ -20,8 +20,6 @@
 #ifndef __cell_hex_h__
 #define __cell_hex_h__
 
-// C++ includes
-
 // Local includes
 #include "cell.h"
 

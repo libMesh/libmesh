@@ -20,13 +20,13 @@
 #ifndef __fe_interface_h__
 #define __fe_interface_h__
 
-// C++ includes
-#include <vector>
-#include <map>
-
 // Local includes
 #include "libmesh_common.h"
 #include "enum_elem_type.h"
+
+// C++ includes
+#include <map>
+#include <vector>
 
 namespace libMesh
 {

@@ -20,12 +20,14 @@
 #ifndef __derived_rb_construction_h__
 #define __derived_rb_construction_h__
 
-#include "linear_implicit_system.h"
+// Local includes
 #include "dense_vector.h"
 #include "dense_matrix.h"
 #include "fem_context.h"
-
+#include "linear_implicit_system.h"
 #include "rb_construction.h"
+
+// C++ includes
 
 namespace libMesh
 {

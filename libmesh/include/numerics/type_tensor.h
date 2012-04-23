@@ -20,12 +20,12 @@
 #ifndef __type_tensor_h__
 #define __type_tensor_h__
 
-// C++ includes
-#include <cmath>
-
 // Local includes
 #include "libmesh_common.h"
 #include "type_vector.h"
+
+// C++ includes
+#include <cmath>
 
 namespace libMesh
 {

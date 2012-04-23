@@ -20,12 +20,13 @@
 #ifndef __parmetis_partitioner_h__
 #define __parmetis_partitioner_h__
 
-// C++ Includes   -----------------------------------
-#include <vector>
-#include <map>
-
 // Local Includes -----------------------------------
 #include "partitioner.h"
+
+// C++ Includes   -----------------------------------
+#include <cstddef>
+#include <map>
+#include <vector>
 
 namespace libMesh
 {

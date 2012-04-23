@@ -22,11 +22,11 @@
 
 
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "id_types.h" // for boundary_id_type, subdomain_id_type
+
+// C++ Includes   -----------------------------------
 
 namespace libMesh
 {

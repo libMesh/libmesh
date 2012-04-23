@@ -20,15 +20,16 @@
 #ifndef __gmv_io_h__
 #define __gmv_io_h__
 
-// C++ includes
-#include <cstring>  // for memcpy
-#include <map>
-
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_output.h"
 #include "mesh_input.h"
 #include "enum_elem_type.h"
+
+// C++ includes
+#include <cstddef>
+#include <cstring>  // for memcpy
+#include <map>
 
 namespace libMesh
 {

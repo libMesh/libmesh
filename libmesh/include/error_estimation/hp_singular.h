@@ -20,12 +20,12 @@
 #ifndef __hp_singular_h__
 #define __hp_singular_h__
 
-// C++ includes
-#include <list>
-
 // Local Includes
 #include "libmesh_common.h"
 #include "point.h"
+
+// C++ includes
+#include <list>
 
 #ifdef LIBMESH_ENABLE_AMR
 

@@ -20,12 +20,6 @@
 #ifndef __equation_systems_h__
 #define __equation_systems_h__
 
-// C++ includes
-#include <set>
-#include <map>
-#include <vector>
-#include <string>
-
 // Local Includes
 #include "libmesh_common.h"
 #include "parameters.h"
@@ -39,6 +33,13 @@
 # include "newmark_system.h"
 # include "steady_system.h"
 #endif
+
+// C++ includes
+#include <cstddef>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

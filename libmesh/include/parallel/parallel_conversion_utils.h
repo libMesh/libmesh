@@ -20,13 +20,15 @@
 #ifndef __parallel_conversion_utils_h__
 #define __parallel_conversion_utils_h__
 
-#include <vector>
-
+// Local includes
 #include "libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_LIBHILBERT
 #include "hilbert.h"
 #endif
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {
