@@ -15,6 +15,8 @@ AC_PREREQ([2.61]) # require autoconf 2.61 - I havent tried anything older
 
 # Infer the source directory as the path to the ./configure script
 srcdir=`dirname $0`
+top_srcdir=`dirname $0`
+
 
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----------- Configuring libMesh -------------)
