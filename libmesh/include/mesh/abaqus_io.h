@@ -19,12 +19,12 @@
 #ifndef __abaqus_io_h__
 #define __abaqus_io_h__
 
-// C++ includes
-#include <set>
-
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_input.h"
+
+// C++ includes
+#include <set>
 
 namespace libMesh
 {

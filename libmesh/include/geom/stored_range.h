@@ -20,11 +20,11 @@
 #ifndef __stored_range_h__
 #define __stored_range_h__
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "threads.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

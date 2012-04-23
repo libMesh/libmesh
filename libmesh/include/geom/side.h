@@ -20,11 +20,12 @@
 #ifndef __side_h__
 #define __side_h__
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "elem.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

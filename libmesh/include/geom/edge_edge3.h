@@ -25,6 +25,9 @@
 #include "libmesh_common.h"
 #include "edge.h"
 
+// C++ includes
+#include <cstddef>
+
 namespace libMesh
 {
 

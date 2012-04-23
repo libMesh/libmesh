@@ -21,8 +21,9 @@
 #define __id_types_h__
 
 #include <limits>
-#include "libmesh_config.h"
 #include <stdint.h>
+
+#include "libmesh_config.h"
 
 namespace libMesh
 {

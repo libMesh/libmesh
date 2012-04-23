@@ -20,11 +20,11 @@
 #ifndef __dense_subvector_h__
 #define __dense_subvector_h__
 
-// C++ includes
-
 // Local Includes
 #include "libmesh_common.h"
 #include "dense_vector.h"
+
+// C++ includes
 
 namespace libMesh
 {

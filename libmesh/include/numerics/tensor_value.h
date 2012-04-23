@@ -20,10 +20,10 @@
 #ifndef __tensor_value_h__
 #define __tensor_value_h__
 
-// C++ includes
-
 // Local includes
 #include "type_tensor.h"
+
+// C++ includes
 
 namespace libMesh
 {

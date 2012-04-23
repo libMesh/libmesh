@@ -22,9 +22,6 @@
 
 
 
-// C++ Includes   -----------------------------------
-#include <string>
-
 // Local Includes -----------------------------------
 #include "auto_ptr.h"
 #include "dof_object.h" // for invalid_processor_id
@@ -34,6 +31,10 @@
 #include "partitioner.h" // AutoPtr needs a real declaration
 #include "point_locator_base.h"
 #include "variant_filter_iterator.h"
+
+// C++ Includes   -----------------------------------
+#include <cstddef>
+#include <string>
 
 namespace libMesh
 {

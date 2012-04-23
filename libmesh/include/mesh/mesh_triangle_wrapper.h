@@ -27,6 +27,9 @@
 #include "libmesh_common.h" // Real
 #include "enum_elem_type.h" // For ElemType declaration below
 
+// C++ includes
+#include <cstddef>
+
 namespace libMesh
 {
   // Forward declarations

@@ -33,12 +33,13 @@
 #endif // WINDOWS or SOLARIS or gcc 2.* or HP aCC
 
 #include <algorithm>
-#include <stdexcept>
+#include <cstddef>
 #include <fstream>
 #include <iostream> // not every compiler distribution includes <iostream>
 //                  // with <fstream>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 

@@ -20,10 +20,10 @@
 #ifndef __plane_h__
 #define __plane_h__
 
-// C++ includes
-
 // Local includes
 #include "surface.h"
+
+// C++ includes
 
 namespace libMesh
 {

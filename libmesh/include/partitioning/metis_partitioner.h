@@ -20,10 +20,10 @@
 #ifndef __metis_partitioner_h__
 #define __metis_partitioner_h__
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "partitioner.h"
+
+// C++ Includes   -----------------------------------
 
 namespace libMesh
 {

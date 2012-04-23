@@ -18,10 +18,13 @@
 #ifndef __single_predicates_h__
 #define __single_predicates_h__
 
-#include <cstddef>
-#include <vector>
+// Local includes
 #include "enum_elem_type.h"
 #include "id_types.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

@@ -20,13 +20,13 @@
 #ifndef __newton_solver_h__
 #define __newton_solver_h__
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "linear_solver.h"
 #include "reference_counted_object.h"
 #include "diff_solver.h"
+
+// C++ includes
 
 namespace libMesh
 {

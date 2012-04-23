@@ -20,14 +20,15 @@
 #ifndef __parameters_h__
 #define __parameters_h__
 
-// C++ includes
-#include <typeinfo>
-#include <string>
-#include <map>
-
 // Local includes
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
+
+// C++ includes
+#include <cstddef>
+#include <map>
+#include <string>
+#include <typeinfo>
 
 namespace libMesh
 {

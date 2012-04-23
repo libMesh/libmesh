@@ -20,11 +20,11 @@
 #ifndef __sfc_partitioner_h__
 #define __sfc_partitioner_h__
 
-// C++ Includes   -----------------------------------
-#include <string>
-
 // Local Includes -----------------------------------
 #include "partitioner.h"
+
+// C++ Includes   -----------------------------------
+#include <string>
 
 namespace libMesh
 {

@@ -20,10 +20,11 @@
 #ifndef __error_vector_h__
 #define __error_vector_h__
 
-// C++ includes
-
 // Local Includes
 #include "statistics.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

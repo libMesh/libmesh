@@ -20,12 +20,12 @@
 #ifndef __statistics_h__
 #define __statistics_h__
 
+// Local includes
+#include "libmesh_common.h"
+
 // C++ includes
 #include <vector>
 #include <cmath>
-
-// Local includes
-#include "libmesh_common.h"
 
 namespace libMesh
 {

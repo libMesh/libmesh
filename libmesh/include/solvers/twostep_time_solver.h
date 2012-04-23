@@ -20,10 +20,10 @@
 #ifndef __twostep_time_solver_h__
 #define __twostep_time_solver_h__
 
-// C++ includes
-
 // Local includes
 #include "adaptive_time_solver.h"
+
+// C++ includes
 
 namespace libMesh
 {

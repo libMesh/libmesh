@@ -20,11 +20,11 @@
 #ifndef __tree_h__
 #define __tree_h__
 
-// C++ includes
-
 // Local includes
 #include "tree_node.h"
 #include "tree_base.h"
+
+// C++ includes
 
 namespace libMesh
 {

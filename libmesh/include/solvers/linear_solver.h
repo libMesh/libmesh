@@ -20,10 +20,6 @@
 #ifndef __linear_solver_h__
 #define __linear_solver_h__
 
-
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "libmesh_common.h"
 #include "enum_solver_package.h"
@@ -32,6 +28,10 @@
 #include "enum_subset_solve_mode.h"
 #include "reference_counted_object.h"
 #include "libmesh.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

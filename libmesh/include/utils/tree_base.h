@@ -20,10 +20,10 @@
 #ifndef __tree_base_h__
 #define __tree_base_h__
 
-// C++ includes
-
 // Local includes
 #include "reference_counted_object.h"
+
+// C++ includes
 
 namespace libMesh
 {

@@ -20,11 +20,6 @@
 #ifndef __quadrature_h__
 #define __quadrature_h__
 
-// C++ includes
-#include <vector>
-#include <string>
-#include <utility>
-
 // Local includes
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
@@ -33,6 +28,11 @@
 #include "enum_order.h"
 #include "enum_quadrature_type.h"
 #include "auto_ptr.h"
+
+// C++ includes
+#include <vector>
+#include <string>
+#include <utility>
 
 namespace libMesh
 {

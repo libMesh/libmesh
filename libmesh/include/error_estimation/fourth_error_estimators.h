@@ -20,12 +20,12 @@
 #ifndef __fourth_error_estimators_h__
 #define __fourth_error_estimators_h__
 
+// Local Includes
+#include "jump_error_estimator.h"
+
 // C++ includes
 #include <vector>
 #include <string>
-
-// Local Includes
-#include "jump_error_estimator.h"
 
 namespace libMesh
 {

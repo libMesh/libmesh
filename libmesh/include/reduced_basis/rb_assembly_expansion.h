@@ -24,7 +24,7 @@
 #include "elem_assembly.h"
 #include "reference_counted_object.h"
 
-// misc includes
+// C++ includes
 #include <vector>
 
 

@@ -20,13 +20,13 @@
 #ifndef __node_h__
 #define __node_h__
 
-// C++ includes
-
 // Local includes
 #include "point.h"
 #include "dof_object.h"
 #include "reference_counted_object.h"
 #include "auto_ptr.h"
+
+// C++ includes
 
 namespace libMesh
 {

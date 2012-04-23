@@ -21,11 +21,11 @@
 #define __parameter_vector_h__
 
 
-// C++ Includes   -----------------------------------
-#include <vector>
-
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
+
+// C++ Includes   -----------------------------------
+#include <vector>
 
 namespace libMesh
 {

@@ -20,10 +20,11 @@
 #ifndef __unstructured_mesh_h__
 #define __unstructured_mesh_h__
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "mesh_base.h"
+
+// C++ Includes   -----------------------------------
+#include <cstddef>
 
 namespace libMesh
 {

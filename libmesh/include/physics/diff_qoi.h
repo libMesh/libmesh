@@ -21,11 +21,11 @@
 #ifndef __diff_qoi_h__
 #define __diff_qoi_h__
 
-// C++ includes
-
 // Local Includes
 #include "diff_context.h"
 #include "qoi_set.h"
+
+// C++ includes
 
 namespace libMesh
 {

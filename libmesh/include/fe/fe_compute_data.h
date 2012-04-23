@@ -19,12 +19,11 @@
 #ifndef __fe_compute_data_h__
 #define __fe_compute_data_h__
 
-// C++ includes
-#include <vector>
-
-
 // Local includes
 #include "libmesh.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

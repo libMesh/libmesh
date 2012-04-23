@@ -19,15 +19,16 @@
 #ifndef __parallel_h__
 #define __parallel_h__
 
-// System includes
-#include <set>
-#include <string>
-#include <vector>
-#include <map>
-
 // Local includes
 #include "libmesh_common.h" // for libmesh_assert
 #include "libmesh_logging.h"
+
+// C++ includes
+#include <cstddef>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

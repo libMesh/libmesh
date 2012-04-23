@@ -19,13 +19,13 @@
 #ifndef __centroid_partitioner_h__
 #define __centroid_partitioner_h__
 
-// C++ includes
-#include <utility> // pair
-#include <vector>
-
 // Local includes
 #include "partitioner.h"
 #include "point.h"
+
+// C++ includes
+#include <utility> // pair
+#include <vector>
 
 namespace libMesh
 {

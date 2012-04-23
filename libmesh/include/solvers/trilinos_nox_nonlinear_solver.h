@@ -22,8 +22,6 @@
 
 #ifdef LIBMESH_HAVE_NOX
 
-// C++ includes
-
 // Local includes
 #include "nonlinear_solver.h"
 
@@ -35,6 +33,9 @@
 #include "NOX_Epetra_Interface_Jacobian.H" // base class
 #include "NOX_Epetra_Interface_Preconditioner.H" // base class
 #include "NOX.H"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

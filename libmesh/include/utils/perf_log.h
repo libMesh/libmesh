@@ -26,9 +26,10 @@
 #include "o_string_stream.h"
 
 // C++ includes
-#include <string>
-#include <stack>
+#include <cstddef>
 #include <map>
+#include <stack>
+#include <string>
 #include <sys/time.h>
 
 namespace libMesh

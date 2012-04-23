@@ -22,6 +22,8 @@
 #include "xdr_head.h" // for base class
 #include "xdr_soln.h" // for friend
 
+// C++ includes
+
 namespace libMesh
 {
 

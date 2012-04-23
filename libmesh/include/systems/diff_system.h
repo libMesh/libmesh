@@ -21,14 +21,14 @@
 #ifndef __diff_system_h__
 #define __diff_system_h__
 
-// C++ includes
-
 // Local Includes
 #include "auto_ptr.h"
 #include "diff_context.h"
 #include "diff_physics.h"
 #include "diff_qoi.h"
 #include "implicit_system.h"
+
+// C++ includes
 
 namespace libMesh
 {

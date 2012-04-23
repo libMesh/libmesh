@@ -20,6 +20,7 @@
 #ifndef __timestamp_h__
 #define __timestamp_h__
 
+// C++ includes
 #include <iostream>
 #include <string>
 

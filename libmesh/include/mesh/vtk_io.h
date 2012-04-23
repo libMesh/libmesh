@@ -19,13 +19,14 @@
 #ifndef __vtk_io_h__
 #define __vtk_io_h__
 
-// C++ includes
-#include <map>
-
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_input.h"
 #include "mesh_output.h"
+
+// C++ includes
+#include <cstddef>
+#include <map>
 
 // Forward declarations
 

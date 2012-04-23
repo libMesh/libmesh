@@ -22,14 +22,14 @@
 
 
 #include "libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-
-// C++ includes
-
 
 // Local includes
 #include "face_inf_quad.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

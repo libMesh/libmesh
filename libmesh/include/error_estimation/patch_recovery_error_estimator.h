@@ -20,15 +20,16 @@
 #ifndef __patch_recovery_error_estimator_h__
 #define __patch_recovery_error_estimator_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "error_estimator.h"
 #include "enum_order.h"
 #include "patch.h"
 #include "point.h"
 #include "elem_range.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

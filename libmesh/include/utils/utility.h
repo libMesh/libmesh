@@ -19,13 +19,13 @@
 #ifndef __utility_h__
 #define __utility_h__
 
+// Local includes
+#include "libmesh_common.h" // for Real
+
 // System includes
 #include <string>
 #include <vector>
 #include <algorithm> // for std::lower_bound
-
-// Local includes
-#include "libmesh_common.h" // for Real
 
 namespace libMesh
 {

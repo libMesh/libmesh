@@ -20,13 +20,15 @@
 #ifndef __inf_fe_h__
 #define __inf_fe_h__
 
-// C++ includes
-
-// Local includes
 #include "libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
+// Local includes
 #include "fe_base.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

@@ -21,15 +21,16 @@
 #define __sparse_matrix_h__
 
 
-// C++ includes
-#include <iomanip>
-#include <vector>
-
 // Local includes
 #include "libmesh_common.h"
 #include "auto_ptr.h"
 #include "reference_counted_object.h"
 #include "libmesh.h"
+
+// C++ includes
+#include <cstddef>
+#include <iomanip>
+#include <vector>
 
 namespace libMesh
 {

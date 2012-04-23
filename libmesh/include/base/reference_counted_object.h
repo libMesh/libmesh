@@ -20,11 +20,11 @@
 #ifndef __reference_counted_object_h__
 #define __reference_counted_object_h__
 
-// C++ includes
-#include <typeinfo>
-
 // Local includes
 #include "reference_counter.h"
+
+// C++ includes
+#include <typeinfo>
 
 namespace libMesh
 {

@@ -20,9 +20,6 @@
 #ifndef __fe_base_h__
 #define __fe_base_h__
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "reference_counted_object.h"
 #include "point.h"
@@ -30,6 +27,10 @@
 #include "enum_elem_type.h"
 #include "fe_type.h"
 #include "auto_ptr.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "tensor_value.h"

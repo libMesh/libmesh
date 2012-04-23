@@ -20,12 +20,13 @@
 #ifndef __uniform_refinement_estimator_h__
 #define __uniform_refinement_estimator_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "error_estimator.h"
 #include "libmesh.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 #ifdef LIBMESH_ENABLE_AMR
 

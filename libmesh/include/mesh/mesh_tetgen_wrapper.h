@@ -21,13 +21,13 @@
 #include "libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
 
-// C++ includes
-#include <string>
-
 // Local includes
 
 // TetGen include file
 #include "tetgen.h"  // Defines REAL and other Tetgen types
+
+// C++ includes
+#include <string>
 
 namespace libMesh
 {

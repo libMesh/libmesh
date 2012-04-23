@@ -19,15 +19,17 @@
 #define __variant_filter_iterator_h__
 
 
-
-#include <iterator>
+// C++ includes
 #include <algorithm> // for std::swap
+#include <cstddef>
 #include <cstdlib>   // for std::abort()
+#include <iterator>
 
 #if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
 #include <typeinfo>
 #endif
 
+// Local includes
 #include "libmesh_common.h" // for libmesh_cast_ptr()
 
 /**
