@@ -53,7 +53,7 @@ EXTRA_DIST        += contrib/bin/make_dependencies.pl
 
 # when doing 'make install, symlik etc/libmesh/Make.common
 install-data-hook:
-	cd $(DESTDIR)$(prefix) && $(LN_S) etc/libmesh/Make.common Make.common
+	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) etc/libmesh/Make.common Make.common
 
 # Additional files to be deleted by 'make distclean'
 # _configs.sed seems to be leftover by prefix_config
