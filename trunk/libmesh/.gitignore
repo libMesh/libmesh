@@ -147,3 +147,4 @@ examples/transient/transient_ex2/pressure_node.res
 examples/miscellaneous/miscellaneous_ex7/bih.1.e
 examples/miscellaneous/miscellaneous_ex7/bih.2.e
 examples/miscellaneous/miscellaneous_ex7/bih.3.e
+contrib/fparser/fpoptimizer/grammar_data.cc
