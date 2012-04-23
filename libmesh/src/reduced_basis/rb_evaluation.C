@@ -82,13 +82,25 @@ void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_i
 
 RBThetaExpansion& RBEvaluation::get_rb_theta_expansion()
 {
-  if(!rb_theta_expansion)
+  if(!is_rb_theta_expansion_initialized())
   {
     libMesh::out << "Error: rb_theta_expansion hasn't been initialized yet" << std::endl;
     libmesh_error();
   }
   
   return *rb_theta_expansion;
+}
+
+bool RBEvaluation::is_rb_theta_expansion_initialized() const
+{
+  if(rb_theta_expansion)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void RBEvaluation::resize_data_structures(const unsigned int Nmax)

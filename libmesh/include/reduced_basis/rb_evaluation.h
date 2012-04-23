@@ -75,6 +75,11 @@ public:
    * Get a reference to the rb_theta_expansion.
    */
   RBThetaExpansion& get_rb_theta_expansion();
+  
+  /**
+   * @return true if the theta expansion has been initialized.
+   */
+  bool is_rb_theta_expansion_initialized() const;
 
   /**
    * Resize and clear the data vectors corresponding to the
