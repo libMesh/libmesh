@@ -19,12 +19,12 @@
 #ifndef __parallel_sort_h__
 #define __parallel_sort_h__
 
-// System Includes
-#include <vector>
-
 // Local Includes
 #include "parallel.h"
 #include "libmesh_common.h"
+
+// C++ Includes
+#include <vector>
 
 namespace libMesh
 {

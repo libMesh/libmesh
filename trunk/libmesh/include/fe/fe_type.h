@@ -20,14 +20,14 @@
 #ifndef __fe_type_h__
 #define __fe_type_h__
 
-// C++ includes
-
 // Local includes
 #include "auto_ptr.h"
 #include "libmesh_config.h"
 #include "enum_order.h"
 #include "enum_fe_family.h"
 #include "enum_inf_map_type.h"
+
+// C++ includes
 
 namespace libMesh
 {

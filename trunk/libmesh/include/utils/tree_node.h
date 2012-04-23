@@ -20,12 +20,13 @@
 #ifndef __tree_node_h__
 #define __tree_node_h__
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "libmesh_common.h"
 #include "point.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

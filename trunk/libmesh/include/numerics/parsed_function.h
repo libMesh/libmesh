@@ -2,17 +2,23 @@
 #ifndef __parsed_function_h__
 #define __parsed_function_h__
 
-#include <cmath>
-#include <string>
-#include <algorithm> // std::find 
+#include "libmesh_config.h"
 
+#ifdef LIBMESH_HAVE_FPARSER
+
+// Local includes
 #include "dense_vector.h"
 #include "function_base.h"
 #include "point.h"
 
-#ifdef LIBMESH_HAVE_FPARSER
-
+// FParser includes
 #include "fparser.hh"
+
+// C++ includes
+#include <algorithm> // std::find 
+#include <cmath>
+#include <cstddef>
+#include <string>
 
 template <typename Output=Number>
 class ParsedFunction : public FunctionBase<Output>

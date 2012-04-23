@@ -20,10 +20,11 @@
 #ifndef __cell_prism18_h__
 #define __cell_prism18_h__
 
-// C++ includes
-
 // Local includes
 #include "cell_prism.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

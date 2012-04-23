@@ -23,10 +23,10 @@
 #include "libmesh_config.h"
 #ifdef LIBMESH_HAVE_SLEPC
 
-// C++ includes
-
 // Local includes
 #include "time_solver.h"
+
+// C++ includes
 
 namespace libMesh
 {

@@ -19,8 +19,6 @@
 #ifndef __threads_h__
 #define __threads_h__
 
-// System includes
-
 // Local includes
 #include "libmesh_config.h"
 #include "libmesh_common.h"  // for libmesh_assert
@@ -38,6 +36,8 @@
 #  include "tbb/recursive_mutex.h"
 #  include "tbb/atomic.h"
 #endif
+
+// C++ includes
 
 namespace libMesh
 {

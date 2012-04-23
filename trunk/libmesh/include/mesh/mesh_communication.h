@@ -22,11 +22,11 @@
 
 
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "mesh_tools.h"
+
+// C++ Includes   -----------------------------------
 
 namespace libMesh
 {

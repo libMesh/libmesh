@@ -20,15 +20,16 @@
 #ifndef __jump_error_estimator_h__
 #define __jump_error_estimator_h__
 
-// C++ includes
-#include <vector>
-#include <string>
-
 // Local Includes
 #include "auto_ptr.h"
 #include "dense_vector.h"
 #include "error_estimator.h"
 #include "fe_base.h"
+
+// C++ includes
+#include <cstddef>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

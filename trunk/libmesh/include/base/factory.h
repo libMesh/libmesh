@@ -21,13 +21,14 @@
 #define __factory_h__
 
 
-// System & C++ includes
-#include <string>
-#include <map>
-
 // Local includes
 #include "libmesh_common.h"
 #include "auto_ptr.h"
+
+// C++ includes
+#include <cstddef>
+#include <map>
+#include <string>
 
 namespace libMesh
 {

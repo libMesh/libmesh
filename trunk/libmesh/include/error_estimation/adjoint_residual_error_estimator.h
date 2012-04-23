@@ -20,14 +20,15 @@
 #ifndef __adjoint_residual_error_estimator_h__
 #define __adjoint_residual_error_estimator_h__
 
-// C++ includes
-#include <vector>
-#include <string>
-
 // Local Includes
 #include "auto_ptr.h"
 #include "error_estimator.h"
 #include "qoi_set.h"
+
+// C++ includes
+#include <cstddef>
+#include <string>
+#include <vector>
 
 // Forward Declarations
 

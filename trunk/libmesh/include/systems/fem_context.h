@@ -21,9 +21,6 @@
 #ifndef __fem_context_h__
 #define __fem_context_h__
 
-// C++ includes
-#include <map>
-
 // Local Includes
 #include "diff_context.h"
 #include "vector_value.h"
@@ -32,6 +29,9 @@
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "tensor_value.h"
 #endif
+
+// C++ includes
+#include <map>
 
 namespace libMesh
 {

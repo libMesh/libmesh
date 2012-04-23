@@ -18,9 +18,11 @@
 #ifndef __print_trace_h__
 #define __print_trace_h__
 
-#include <iostream>
-
+// Local includes
 #include "libmesh_config.h"
+
+// C++ includes
+#include <iostream>
 
 namespace libMesh
 {

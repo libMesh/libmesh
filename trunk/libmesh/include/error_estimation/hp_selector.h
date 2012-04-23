@@ -20,11 +20,11 @@
 #ifndef __hp_selector_h__
 #define __hp_selector_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "libmesh_common.h"
+
+// C++ includes
+#include <vector>
 
 #ifdef LIBMESH_ENABLE_AMR
 

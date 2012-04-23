@@ -20,11 +20,11 @@
 #ifndef __transient_h__
 #define __transient_h__
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "linear.h"
+
+// C++ includes
 
 namespace libMesh
 {

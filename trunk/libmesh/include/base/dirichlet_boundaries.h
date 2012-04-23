@@ -24,17 +24,18 @@
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
-// C++ Includes   -----------------------------------
-#include <set>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <iterator>
-
 // Local Includes -----------------------------------
 #include "function_base.h"
 #include "id_types.h"
 #include "vector_value.h"
+
+// C++ Includes   -----------------------------------
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

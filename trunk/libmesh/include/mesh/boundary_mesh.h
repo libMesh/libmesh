@@ -20,10 +20,10 @@
 #ifndef __boundary_mesh_h__
 #define __boundary_mesh_h__
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "mesh.h"
+
+// C++ Includes   -----------------------------------
 
 namespace libMesh
 {

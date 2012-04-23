@@ -23,13 +23,16 @@
 // Templated on the type of keys you will be sorting and the
 // type of iterator you will be using.
 
-
 #include "libmesh_config.h"
 
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 
+// Local includes
 #include "hilbert.h"
 #include "parallel.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh {
 namespace Parallel {

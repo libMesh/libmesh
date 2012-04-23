@@ -20,11 +20,11 @@
 #ifndef __linear_h__
 #define __linear_h__
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "solver.h"
+
+// C++ includes
 
 namespace libMesh
 {

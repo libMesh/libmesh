@@ -20,15 +20,15 @@
 #ifndef __nonlinear_solver_h__
 #define __nonlinear_solver_h__
 
-
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "enum_solver_package.h"
 #include "reference_counted_object.h"
 #include "nonlinear_implicit_system.h"
 #include "libmesh.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

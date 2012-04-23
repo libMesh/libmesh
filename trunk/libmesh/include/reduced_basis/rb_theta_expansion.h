@@ -24,7 +24,7 @@
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
 
-// misc includes
+// C++ includes
 #include <vector>
 
 

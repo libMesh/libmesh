@@ -24,12 +24,7 @@
 
 #include "libmesh_config.h"
 
-
 #ifdef LIBMESH_HAVE_PETSC
-
-// C++ includes
-#include <vector>
-#include "string.h" // Needed for strcmp with gcc-4.4.3
 
 // Local includes
 #include "numeric_vector.h"
@@ -42,6 +37,11 @@
 EXTERN_C_FOR_PETSC_BEGIN
 # include <petscvec.h>
 EXTERN_C_FOR_PETSC_END
+
+// C++ includes
+#include <cstddef>
+#include <cstring>
+#include <vector>
 
 namespace libMesh
 {
@@ -501,7 +501,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling LibMeshVecDestroy()!
    */
-  Vec vec () { libmesh_assert (_vec != NULL); return _vec; }
+  Vec vec () { libmesh_assert (_vec); return _vec; }
 
 
 
@@ -672,7 +672,7 @@ PetscVector<T>::PetscVector (Vec v)
   ierr = VecGetType(_vec, &type);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  if((strcmp(type,VECSHARED) == 0) || (strcmp(type,VECMPI) == 0))
+  if((std::strcmp(type,VECSHARED) == 0) || (std::strcmp(type,VECMPI) == 0))
   {
 #if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
     ISLocalToGlobalMapping mapping = _vec->mapping;

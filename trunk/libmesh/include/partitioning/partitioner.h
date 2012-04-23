@@ -20,11 +20,12 @@
 #ifndef __partitioner_h__
 #define __partitioner_h__
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "libmesh.h"
 #include "auto_ptr.h"
+
+// C++ Includes   -----------------------------------
+#include <cstddef>
 
 namespace libMesh
 {

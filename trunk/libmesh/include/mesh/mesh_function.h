@@ -20,16 +20,16 @@
 #ifndef __mesh_function_h__
 #define __mesh_function_h__
 
-// C++ includes
-#include <vector>
-
-
 // Local Includes
 #include "function_base.h"
 #include "dense_vector.h"
 #include "vector_value.h"
 #include "tensor_value.h"
 #include "tree_base.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

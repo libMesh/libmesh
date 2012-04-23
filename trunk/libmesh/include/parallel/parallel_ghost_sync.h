@@ -20,7 +20,6 @@
 
 #ifndef __parallel_ghost_sync_h__
 #define __parallel_ghost_sync_h__
-// C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
 #include "auto_ptr.h"
@@ -28,6 +27,8 @@
 #include "location_maps.h"
 #include "mesh_base.h"
 #include "parallel.h"
+
+// C++ Includes   -----------------------------------
 
 namespace libMesh
 {

@@ -20,10 +20,11 @@
 #ifndef __edge_h__
 #define __edge_h__
 
-// C++ includes
-
 // Local includes
 #include "elem.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

@@ -20,11 +20,9 @@
 #ifndef __elem_range_h__
 #define __elem_range_h__
 
-// C++ includes
-
 // Local includes
-#include "mesh_base.h"
 #include "elem.h"
+#include "mesh_base.h"
 #include "stored_range.h"
 
 namespace libMesh

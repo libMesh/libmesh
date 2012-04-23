@@ -24,10 +24,12 @@
 // type of iterator you will be using.
 
 
+// C++ includes
+#include "libmesh_common.h" // for libmesh_assert()
+
+// Local includes
 #include <vector>
 #include <iterator>
-
-#include "libmesh_common.h" // for libmesh_assert()
 
 namespace libMesh
 {

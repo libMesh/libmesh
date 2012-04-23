@@ -22,10 +22,6 @@
 
 
 
-// C++ Includes   -----------------------------------
-#include <vector>
-#include <set>
-
 // Local Includes -----------------------------------
 #include "libmesh.h"
 #include "enum_elem_type.h"
@@ -33,6 +29,10 @@
 #include "mesh_base.h"
 #include "point.h" // some compilers want the full definition - I think so they can do
                    // return-value-optimization for BoundingBox'es - BSK
+
+// C++ Includes   -----------------------------------
+#include <vector>
+#include <set>
 
 namespace libMesh
 {

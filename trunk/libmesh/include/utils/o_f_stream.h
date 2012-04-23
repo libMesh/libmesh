@@ -20,16 +20,13 @@
 #ifndef __o_f_stream_h__
 #define __o_f_stream_h__
 
+// Local Includes
+#include "libmesh_common.h"
+
 // C++ includes
 #include <fstream>
 #include <string>
 #include <vector>
-
-
-// Local Includes
-#include "libmesh_common.h"
-
-
 
 /*
  * Some compilers, at least HP \p aCC do not even

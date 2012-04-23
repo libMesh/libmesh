@@ -20,10 +20,11 @@
 #ifndef __cell_pyramid5_h__
 #define __cell_pyramid5_h__
 
-// C++ includes
-
 // Local includes
 #include "cell_pyramid.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

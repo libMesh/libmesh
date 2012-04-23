@@ -20,11 +20,11 @@
 #ifndef __cell_inf_h__
 #define __cell_inf_h__
 
-// C++ includes
+#include "libmesh_config.h"
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // Local includes
-#include "libmesh_config.h"
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "elem.h"
 
 namespace libMesh

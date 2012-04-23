@@ -21,11 +21,12 @@
 #define __tri6_h__
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "face_tri.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

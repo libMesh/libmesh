@@ -18,9 +18,12 @@
 #ifndef __multi_predicates_h__
 #define __multi_predicates_h__
 
-#include <vector>
+// Local includes
 #include "libmesh_base.h" // for libMesh::processor_id()
 #include "single_predicates.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {
@@ -72,7 +75,7 @@ namespace Predicates
 	{
 	  const predicate<T>* pred = _predicates[i];
 
-	  libmesh_assert (pred != NULL);
+	  libmesh_assert (pred);
 
 	  if ( ! (*pred)(it) )
 	    return false;

@@ -20,21 +20,21 @@
 #ifndef __petsc_nonlinear_solver_h__
 #define __petsc_nonlinear_solver_h__
 
-// C++ includes
-
-// Local includes
 #include "libmesh_config.h"
-
 
 // Petsc include files.
 #ifdef LIBMESH_HAVE_PETSC
 
+// Local includes
 #include "nonlinear_solver.h"
 #include "petsc_macro.h"
 
+// PETSc includes
 EXTERN_C_FOR_PETSC_BEGIN
 # include <petscsnes.h>
 EXTERN_C_FOR_PETSC_END
+
+// C++ includes
 
 namespace libMesh
 {

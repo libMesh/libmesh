@@ -20,14 +20,15 @@
 #ifndef __boundary_info_h__
 #define __boundary_info_h__
 
-// C++ includes
-#include <vector>
-#include <map>
-#include <set>
-
 // Local includes
 #include "libmesh_common.h"
 #include "id_types.h"
+
+// C++ includes
+#include <cstddef>
+#include <map>
+#include <set>
+#include <vector>
 
 namespace libMesh
 {

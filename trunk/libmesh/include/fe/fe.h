@@ -20,11 +20,12 @@
 #ifndef __fe_h__
 #define __fe_h__
 
-// C++ includes
-
 // Local includes
 #include "fe_base.h"
 #include "libmesh.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

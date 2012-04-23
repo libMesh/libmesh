@@ -20,13 +20,12 @@
 #ifndef __point_locator_tree_h__
 #define __point_locator_tree_h__
 
-// C++ includes
-
-
-
 // Local Includes
 #include "point_locator_base.h"
 #include "tree_base.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

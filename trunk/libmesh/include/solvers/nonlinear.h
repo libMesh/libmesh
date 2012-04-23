@@ -20,12 +20,12 @@
 #ifndef __nonlinear_h__
 #define __nonlinear_h__
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "numeric_vector.h"
 #include "linear.h"
+
+// C++ includes
 
 namespace libMesh
 {

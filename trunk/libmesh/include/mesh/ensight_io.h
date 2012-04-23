@@ -19,16 +19,16 @@
 #ifndef __ensight_io_h__
 #define __ensight_io_h__
 
-// The c++ include
-#include <string>
-#include <map>
-#include <vector>
-
 // libMesh includes
 #include "libmesh.h"
 #include "enum_elem_type.h"
 #include "mesh_base.h"
 #include "mesh_output.h"
+
+// C++ includes
+#include <map>
+#include <string>
+#include <vector>
 
 namespace libMesh
 {

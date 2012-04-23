@@ -26,14 +26,14 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
-// C++ Includes   -----------------------------------
-#include <vector>
-
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
 #include "libmesh.h" // libMesh::invalid_uint
 #include "location_maps.h"
 #include "elem.h"
+
+// C++ Includes   -----------------------------------
+#include <vector>
 
 namespace libMesh
 {

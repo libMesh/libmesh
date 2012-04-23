@@ -20,16 +20,15 @@
 #ifndef __point_locator_base_h__
 #define __point_locator_base_h__
 
-// C++ includes
-#include <vector>
-
-
-
 // Local Includes
 #include "reference_counted_object.h"
 #include "libmesh_common.h"
 #include "auto_ptr.h"
 #include "enum_point_locator_type.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

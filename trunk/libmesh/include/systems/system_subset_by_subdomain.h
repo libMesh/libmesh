@@ -20,12 +20,13 @@
 #ifndef __system_subset_by_subdomain_h__
 #define __system_subset_by_subdomain_h__
 
-// C++ includes
-#include <set>
-
 // Local Includes
 #include "system_subset.h"
 #include "id_types.h"
+
+// C++ includes
+#include <cstddef>
+#include <set>
 
 namespace libMesh
 {

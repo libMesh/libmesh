@@ -2,7 +2,10 @@
 #ifndef __zero_function_h__
 #define __zero_function_h__
 
+// Local includes
 #include "const_function.h"
+
+// C++ includes
 
 template <typename Output=Number>
 class ZeroFunction : public ConstFunction<Output>

@@ -20,9 +20,12 @@
 #ifndef __rb_eim_evaluation_h__
 #define __rb_eim_evaluation_h__
 
-#include "rb_evaluation.h"
-#include "point.h"
+// libMesh includes
 #include "auto_ptr.h"
+#include "point.h"
+#include "rb_evaluation.h"
+
+// C++ includes
 
 namespace libMesh
 {

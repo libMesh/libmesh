@@ -20,12 +20,12 @@
 #ifndef __parallel_mesh_h__
 #define __parallel_mesh_h__
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "mapvector.h"
 #include "unstructured_mesh.h"
 
+// C++ Includes   -----------------------------------
+#include <cstddef>
 #include <set>
 
 namespace libMesh

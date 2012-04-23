@@ -20,10 +20,10 @@
 #ifndef __euler2_solver_h__
 #define __euler2_solver_h__
 
-// C++ includes
-
 // Local includes
 #include "unsteady_solver.h"
+
+// C++ includes
 
 namespace libMesh
 {
