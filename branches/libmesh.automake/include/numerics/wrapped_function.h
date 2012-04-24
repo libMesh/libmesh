@@ -20,10 +20,6 @@
 #ifndef __wrapped_function_h__
 #define __wrapped_function_h__
 
-// C++ includes
-
-
-
 // Local Includes
 #include "dense_vector.h"
 #include "equation_systems.h"
@@ -31,6 +27,9 @@
 #include "libmesh_common.h"
 #include "point.h"
 #include "system.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

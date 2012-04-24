@@ -20,12 +20,12 @@
 #ifndef __solver_h__
 #define __solver_h__
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
 #include "equation_systems.h"
+
+// C++ includes
 
 namespace libMesh
 {

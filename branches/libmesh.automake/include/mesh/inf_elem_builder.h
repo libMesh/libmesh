@@ -24,13 +24,14 @@
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-// C++ includes
-#include <vector>
-#include <set>
-#include <utility>
-
 // Local includes
 #include "point.h"
+
+// C++ includes
+#include <cstddef>
+#include <set>
+#include <utility>
+#include <vector>
 
 namespace libMesh
 {

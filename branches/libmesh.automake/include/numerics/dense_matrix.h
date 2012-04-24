@@ -20,14 +20,14 @@
 #ifndef __dense_matrix_h__
 #define __dense_matrix_h__
 
+// Local Includes
+#include "libmesh_common.h"
+#include "dense_matrix_base.h"
+
 // C++ includes
 #include <vector>
 #include <algorithm>
 #include <cstring> // std::memset
-
-// Local Includes
-#include "libmesh_common.h"
-#include "dense_matrix_base.h"
 
 namespace libMesh
 {

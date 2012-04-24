@@ -19,9 +19,9 @@
 #ifndef __mesh_serializer_h__
 #define __mesh_serializer_h__
 
-// C++ includes
-
 // Local includes
+
+// C++ includes
 
 
 namespace libMesh

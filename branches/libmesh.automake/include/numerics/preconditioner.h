@@ -21,8 +21,6 @@
 #define __preconditioner_h__
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh_common.h"
 #include "enum_solver_package.h"
@@ -30,6 +28,9 @@
 #include "enum_preconditioner_type.h"
 #include "reference_counted_object.h"
 #include "libmesh.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

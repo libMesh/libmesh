@@ -20,10 +20,11 @@
 #ifndef __serial_mesh_h__
 #define __serial_mesh_h__
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "unstructured_mesh.h"
+
+// C++ Includes   -----------------------------------
+#include <cstddef>
 
 namespace libMesh
 {

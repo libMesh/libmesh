@@ -20,14 +20,14 @@
 #ifndef __time_solver_h__
 #define __time_solver_h__
 
-// C++ includes
-
 // Local includes
 #include "auto_ptr.h"
 #include "libmesh_common.h"
 #include "linear_solver.h"
 #include "numeric_vector.h"
 #include "reference_counted_object.h"
+
+// C++ includes
 
 namespace libMesh
 {

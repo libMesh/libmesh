@@ -20,14 +20,14 @@
 #ifndef __postscript_io_h__
 #define __postscript_io_h__
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "libmesh_common.h"
 #include "mesh_output.h"
 //#include "dense_matrix.h"
 #include "point.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

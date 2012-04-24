@@ -21,12 +21,10 @@
 #define __mesh_smoother_laplace_h__
 
 
+// forward declarations
 
 // C++ Includes   -----------------------------------
 #include <vector>
-
-// forward declarations
-
 
 // Local Includes -----------------------------------
 #include "libmesh.h" // libMesh::out/err

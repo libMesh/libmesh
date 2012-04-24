@@ -20,11 +20,11 @@
 #ifndef __refinement_selector_h__
 #define __refinement_selector_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "libmesh_common.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

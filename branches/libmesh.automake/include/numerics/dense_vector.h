@@ -20,13 +20,13 @@
 #ifndef __dense_vector_h__
 #define __dense_vector_h__
 
-// C++ includes
-#include <vector>
-
 // Local Includes
 #include "libmesh_common.h"
 #include "compare_types.h"
 #include "dense_vector_base.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

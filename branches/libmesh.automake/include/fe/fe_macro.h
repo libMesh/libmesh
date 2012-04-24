@@ -20,7 +20,6 @@
 #define __fe_macro_h__
 
 
-// Local includes
 
 
 /**

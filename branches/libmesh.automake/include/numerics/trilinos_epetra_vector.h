@@ -24,9 +24,6 @@
 
 #ifdef LIBMESH_HAVE_TRILINOS
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "numeric_vector.h"
 
@@ -36,6 +33,12 @@
 #include <Epetra_MultiVector.h>
 #include <Epetra_Vector.h>
 #include <Epetra_MpiComm.h>
+
+// C++ includes
+#include <cstddef>
+#include <vector>
+
+// Forward declarations
 class Epetra_IntSerialDenseVector;
 class Epetra_SerialDenseVector;
 

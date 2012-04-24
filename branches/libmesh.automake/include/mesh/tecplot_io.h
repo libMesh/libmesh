@@ -24,6 +24,9 @@
 #include "libmesh_common.h"
 #include "mesh_output.h"
 
+// C++ Includes
+#include <cstddef>
+
 namespace libMesh
 {
 

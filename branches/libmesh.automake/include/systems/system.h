@@ -20,10 +20,6 @@
 #ifndef __system_h__
 #define __system_h__
 
-// C++ includes
-#include <vector>
-#include <set>
-
 // Local Includes
 #include "auto_ptr.h"
 #include "elem_range.h"
@@ -37,6 +33,11 @@
 #include "qoi_set.h"
 #include "reference_counted_object.h"
 #include "variable.h"
+
+// C++ includes
+#include <cstddef>
+#include <set>
+#include <vector>
 
 namespace libMesh
 {

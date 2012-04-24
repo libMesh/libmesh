@@ -24,13 +24,13 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-// C++ includes
-#include <algorithm>
-
 // Local includes
 #include "sparse_matrix.h"
 #include "petsc_macro.h"
 #include "parallel.h"
+
+// C++ includes
+#include <algorithm>
 
 // Macro to identify and debug functions which should be called in
 // parallel on parallel matrices but which may be called in serial on
@@ -340,7 +340,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling LibMeshMatDestroy()!
    */
-  Mat mat () { libmesh_assert (_mat != NULL); return _mat; }
+  Mat mat () { libmesh_assert (_mat); return _mat; }
 
 protected:
 
@@ -558,7 +558,7 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   PetscScalar     a = static_cast<PetscScalar>      (a_in);
   PetscMatrix<T>* X = libmesh_cast_ptr<PetscMatrix<T>*> (&X_in);
 
-  libmesh_assert (X != NULL);
+  libmesh_assert (X);
 
   int ierr=0;
 

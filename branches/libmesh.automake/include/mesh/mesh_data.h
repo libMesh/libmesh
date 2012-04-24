@@ -20,13 +20,14 @@
 #ifndef __mesh_data_h__
 #define __mesh_data_h__
 
-// C++ includes
-#include <map>
-#include <vector>
-
 // Local Includes
 #include "libmesh.h"
 #include "enum_xdr_mode.h"
+
+// C++ includes
+#include <cstddef>
+#include <map>
+#include <vector>
 
 namespace libMesh
 {

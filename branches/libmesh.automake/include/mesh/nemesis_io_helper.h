@@ -22,12 +22,12 @@
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
+// Local headers
+#include "exodusII_io_helper.h"
+
 // C++ headers
 #include <set>
 #include <vector>
-
-// Local headers
-#include "exodusII_io_helper.h"
 
 namespace libMesh
 {

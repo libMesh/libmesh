@@ -19,10 +19,6 @@
 #ifndef __threads_allocators_h__
 #define __threads_allocators_h__
 
-// System includes
-#include <memory> // for std::allocator
-#include <cstddef>
-
 // Local includes
 #include "libmesh_config.h"
 #include "threads.h"
@@ -31,6 +27,10 @@
 #ifdef LIBMESH_HAVE_TBB_API
 #  include "tbb/scalable_allocator.h"
 #endif
+
+// C++ includes
+#include <memory> // for std::allocator
+#include <cstddef>
 
 namespace libMesh
 {

@@ -20,14 +20,15 @@
 #ifndef __dof_object_h__
 #define __dof_object_h__
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "libmesh_config.h"
 #include "libmesh_common.h"
 #include "libmesh.h" // libMesh::invalid_uint
 #include "reference_counted_object.h"
+
+// C++ includes
+#include <cstddef>
+#include <vector>
 
 namespace libMesh
 {

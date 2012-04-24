@@ -21,10 +21,10 @@
 #ifndef __steady_solver_h__
 #define __steady_solver_h__
 
-// C++ includes
-
 // Local includes
 #include "time_solver.h"
+
+// C++ includes
 
 namespace libMesh
 {

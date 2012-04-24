@@ -20,10 +20,10 @@
 #ifndef __morton_sfc_partitioner_h__
 #define __morton_sfc_partitioner_h__
 
-// C++ Includes   -----------------------------------
-
 // Local Includes -----------------------------------
 #include "sfc_partitioner.h"
+
+// C++ Includes   -----------------------------------
 
 namespace libMesh
 {

@@ -20,13 +20,13 @@
 #ifndef __diff_solver_h__
 #define __diff_solver_h__
 
-// C++ includes
-#include <vector>
-
 // Local includes
 #include "auto_ptr.h"
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
+
+// C++ includes
+#include <vector>
 
 namespace libMesh
 {

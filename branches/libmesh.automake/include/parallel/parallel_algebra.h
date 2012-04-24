@@ -24,6 +24,7 @@
 // type of iterator you will be using.
 
 
+// Local Includes
 #include "libmesh_config.h"
 
 #include "auto_ptr.h"
@@ -31,6 +32,9 @@
 #include "point.h"
 #include "tensor_value.h"
 #include "vector_value.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh {
 namespace Parallel {

@@ -24,14 +24,15 @@
 
 #ifdef LIBMESH_HAVE_LASPACK
 
-// C++ includes
-#include <algorithm>
-
 // Local includes
 #include "sparse_matrix.h"
 
-
+// Laspack includes
 #include <qmatrix.h>
+
+// C++ includes
+#include <algorithm>
+#include <cstddef>
 
 namespace libMesh
 {

@@ -21,12 +21,11 @@
 #define __quad_h__
 
 
-// C++ includes
-
-
 // Local includes
 #include "libmesh_common.h"
 #include "face.h"
+
+// C++ includes
 
 namespace libMesh
 {

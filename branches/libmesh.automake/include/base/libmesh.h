@@ -21,14 +21,14 @@
 #define __libmesh_h__
 
 
-// C++ includes
-#include <string>
-#include <vector>
-
 // Local includes
 #include "libmesh_common.h"
 #include "libmesh_base.h"
 #include "enum_solver_package.h"
+
+// C++ includes
+#include <string>
+#include <vector>
 
 /**
  * The \p libMesh namespace provides an interface to certain functionality

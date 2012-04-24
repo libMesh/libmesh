@@ -29,11 +29,12 @@
 #include <Epetra_Map.h>
 #include <Epetra_MpiComm.h>
 
-// C++ includes
-#include <algorithm>
-
 // Local includes
 #include "sparse_matrix.h"
+
+// C++ includes
+#include <algorithm>
+#include <cstddef>
 
 namespace libMesh
 {

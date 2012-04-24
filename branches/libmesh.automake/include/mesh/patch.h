@@ -21,6 +21,8 @@
 #ifndef __patch_h__
 #define __patch_h__
 
+// Local includes
+
 // C++ includes
 #include <vector>
 #include <string>

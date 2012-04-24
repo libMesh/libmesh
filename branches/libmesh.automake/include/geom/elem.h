@@ -20,12 +20,6 @@
 #ifndef __elem_h__
 #define __elem_h__
 
-// C++ includes
-#include <algorithm>
-#include <set>
-#include <vector>
-#include <limits.h> // CHAR_BIT
-
 // Local includes
 #include "libmesh_common.h"
 #include "dof_object.h"
@@ -40,6 +34,13 @@
 #include "multi_predicates.h"
 #include "variant_filter_iterator.h"
 #include "hashword.h" // Used in compute_key() functions
+
+// C++ includes
+#include <algorithm>
+#include <cstddef>
+#include <limits.h> // CHAR_BIT
+#include <set>
+#include <vector>
 
 namespace libMesh
 {

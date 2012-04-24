@@ -27,15 +27,16 @@
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-// C++ Includes   -----------------------------------
-#include <map>
-#include <set>
-
 // Local Includes -----------------------------------
 #include "point.h"
 #include "vector_value.h" // RealVectorValue
 #include "libmesh.h" // libMesh::invalid_uint
 #include "point_locator_base.h"
+
+// C++ Includes   -----------------------------------
+#include <cstddef>
+#include <map>
+#include <set>
 
 namespace libMesh {
 

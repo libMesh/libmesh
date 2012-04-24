@@ -25,11 +25,11 @@
 // if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC)
 
-// C++ includes
-
 // Local Includes
 #include "system.h"
 #include "eigen_solver.h"
+
+// C++ includes
 
 namespace libMesh
 {

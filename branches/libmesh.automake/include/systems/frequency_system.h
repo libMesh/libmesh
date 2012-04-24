@@ -25,12 +25,12 @@
 // Frequency domain solutions only possible with complex arithmetic
 #if defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
+// Local Includes
+#include "linear_implicit_system.h"
+
 // C++ includes
 #include <string>
 #include <vector>
-
-// Local Includes
-#include "linear_implicit_system.h"
 
 namespace libMesh
 {

@@ -20,13 +20,15 @@
 #ifndef __cell_inf_hex8_h__
 #define __cell_inf_hex8_h__
 
-// C++ includes
-
-// Local includes
 #include "libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
+// Local includes
 #include "cell_inf_hex.h"
+
+// C++ includes
+#include <cstddef>
 
 namespace libMesh
 {

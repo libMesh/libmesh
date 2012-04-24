@@ -20,11 +20,6 @@
 #ifndef __numeric_vector_h__
 #define __numeric_vector_h__
 
-
-// C++ includes
-#include <vector>
-#include <set>
-
 // Local includes
 #include "libmesh_common.h"
 #include "auto_ptr.h"
@@ -32,6 +27,11 @@
 #include "enum_solver_package.h"
 #include "reference_counted_object.h"
 #include "libmesh.h"
+
+// C++ includes
+#include <cstddef>
+#include <set>
+#include <vector>
 
 namespace libMesh
 {

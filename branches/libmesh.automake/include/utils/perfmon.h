@@ -21,11 +21,6 @@
 #define __perfmon_h__
 
 
-// C++ includes
-#include <string>
-#include <sys/time.h>
-
-
 // Local includes
 #include "libmesh_common.h"
 
@@ -34,6 +29,11 @@ namespace Papi {
 #  include <papi.h>
 }
 #endif
+
+// C++ includes
+#include <cstddef>
+#include <string>
+#include <sys/time.h>
 
 namespace libMesh
 {

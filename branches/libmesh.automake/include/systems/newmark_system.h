@@ -20,10 +20,10 @@
 #ifndef __newmark_system_h__
 #define __newmark_system_h__
 
-// C++ includes
-
 // Local Includes
 #include "linear_implicit_system.h"
+
+// C++ includes
 
 namespace libMesh
 {

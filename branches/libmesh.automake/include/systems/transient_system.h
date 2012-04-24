@@ -20,10 +20,10 @@
 #ifndef __transient_system_h__
 #define __transient_system_h__
 
-// C++ includes
-
 // Local Includes
 #include "system.h"
+
+// C++ includes
 
 
 namespace libMesh
