@@ -26,16 +26,22 @@ AC_DEFUN([CONFIGURE_TECPLOT],
     # unspecified - look in contrib  
     if test "$withtecplot" = no ; then
       AC_CHECK_FILE($top_srcdir/contrib/tecplot/lib/$host/tecio.a,
-  	  	  TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/lib/$host)
+  	  	    TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/lib/$host)
       AC_CHECK_FILE($top_srcdir/contrib/tecplot/include/TECIO.h,
-   	  	  TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/include)
+                    [
+   	  	      TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/include
+   	  	      TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/include"
+		    ])
 
     # specified - look there
     else
       AC_CHECK_FILE($withtecplot/lib/tecio.a,
-  	  	  TECPLOT_LIBRARY_PATH=$withtecplot/lib)
+   	  	    TECPLOT_LIBRARY_PATH=$withtecplot/lib)
       AC_CHECK_FILE($withtecplot/include/TECIO.h,
-   	  	  TECPLOT_INCLUDE_PATH=$withtecplot/include)
+		    [
+   	  	      TECPLOT_INCLUDE_PATH=$withtecplot/include
+   	  	      TECPLOT_INCLUDE="-I$withtecplot/include"
+		    ])
     fi
   
     if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
@@ -56,7 +62,6 @@ AC_DEFUN([CONFIGURE_TECPLOT],
                   ],
                   [
                      TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
-                     TECPLOT_INCLUDE=-I$TECPLOT_INCLUDE_PATH
                      AC_SUBST(TECPLOT_LIBRARY)
                      AC_SUBST(TECPLOT_INCLUDE)
                      AC_DEFINE(HAVE_TECPLOT_API, 1,
