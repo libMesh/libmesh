@@ -2494,6 +2494,27 @@ void DofMap::add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary
 }
 
 
+void DofMap::remove_dirichlet_boundary (const DirichletBoundary& boundary_to_remove)
+{
+  // Find a boundary condition matching the one to be removed
+  std::vector<DirichletBoundary *>::iterator it = _dirichlet_boundaries->begin();
+  std::vector<DirichletBoundary *>::iterator end = _dirichlet_boundaries->end();
+  for (; it != end; ++it)
+    {
+      DirichletBoundary *bdy = *it;
+
+      if ((bdy->b == boundary_to_remove.b) &&
+	   bdy->variables == boundary_to_remove.variables)
+	break;
+    }
+
+  // Delete it and remove it
+  libmesh_assert (it != end);
+  delete *it;
+  _dirichlet_boundaries->erase(it);
+}
+
+
 DirichletBoundaries::~DirichletBoundaries()
 {
   for (std::vector<DirichletBoundary *>::iterator it = begin(); it != end(); ++it)
