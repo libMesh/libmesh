@@ -729,6 +729,11 @@ public:
    */
   void add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
 
+  /**
+   * Removes the specified Dirichlet boundary from the system.
+   */
+  void remove_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
+
   DirichletBoundaries * get_dirichlet_boundaries()
     {
       return _dirichlet_boundaries;
