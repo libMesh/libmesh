@@ -1828,6 +1828,11 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
 {
   libmesh_assert (e.processor_id() == libMesh::processor_id());
 
+  // Ensuring that the given point is really in the element is an
+  // expensive assert, but as long as debugging is turned on we might
+  // as well try to catch a particularly nasty potential error
+  libmesh_assert (e.contains_point(p));
+
   // Get the dof map to get the proper indices for our computation
   const DofMap& dof_map = this->get_dof_map();
 
@@ -1920,6 +1925,11 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
 {
   libmesh_assert (e.processor_id() == libMesh::processor_id());
 
+  // Ensuring that the given point is really in the element is an
+  // expensive assert, but as long as debugging is turned on we might
+  // as well try to catch a particularly nasty potential error
+  libmesh_assert (e.contains_point(p));
+
   // Get the dof map to get the proper indices for our computation
   const DofMap& dof_map = this->get_dof_map();
 
@@ -2011,6 +2021,11 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) const
 {
   libmesh_assert (e.processor_id() == libMesh::processor_id());
+
+  // Ensuring that the given point is really in the element is an
+  // expensive assert, but as long as debugging is turned on we might
+  // as well try to catch a particularly nasty potential error
+  libmesh_assert (e.contains_point(p));
 
   // Get the dof map to get the proper indices for our computation
   const DofMap& dof_map = this->get_dof_map();
