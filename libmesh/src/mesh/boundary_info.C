@@ -171,10 +171,14 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
   unsigned int next_node_id = libMesh::processor_id(),
                next_elem_id = libMesh::processor_id();
 
-  // We'll pass through our own part of the mesh once first to build
+  // We'll pass through the mesh once first to build
   // the maps and count boundary nodes and elements
-  const MeshBase::const_element_iterator end_el = _mesh.local_elements_end();
-  for (MeshBase::const_element_iterator el = _mesh.local_elements_begin();
+  // We have to examine all elements here rather than just local
+  // elements, because it's possible to have a local boundary node
+  // that's not on a local boundary element, e.g. at the tip of a
+  // triangle.
+  const MeshBase::const_element_iterator end_el = _mesh.elements_end();
+  for (MeshBase::const_element_iterator el = _mesh.elements_begin();
        el != end_el; ++el)
     {
       const Elem *elem = *el;
