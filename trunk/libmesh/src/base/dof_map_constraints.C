@@ -2327,6 +2327,8 @@ void DofMap::process_constraints ()
 
 	DofConstraintRow& constraint_row = pos->second.first;
 
+	Number& constraint_rhs = pos->second.second;
+
 	std::vector<unsigned int> constraints_to_expand;
 
 	for (DofConstraintRow::const_iterator
@@ -2343,6 +2345,8 @@ void DofMap::process_constraints ()
 	  {
             unsigned int expandable = constraints_to_expand[j];
 
+            const Number this_coef = constraint_row[expandable];
+
 	    DofConstraints::const_iterator
 	      subpos = _dof_constraints.find(expandable);
 
@@ -2354,9 +2358,10 @@ void DofMap::process_constraints ()
 	           it=subconstraint_row.begin();
 		   it != subconstraint_row.end(); ++it)
               {
-		constraint_row[it->first] += it->second *
-				constraint_row[expandable];
+		constraint_row[it->first] += it->second * this_coef;
 	      }
+            constraint_rhs += subpos->second.second * this_coef;
+
 	    constraint_row.erase(expandable);
           }
 
