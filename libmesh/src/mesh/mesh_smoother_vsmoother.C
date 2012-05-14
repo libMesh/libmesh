@@ -83,7 +83,12 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   nedges=_hanging_nodes.size();
   //nedges=0;
-  if(s!=n){ fprintf(sout,"Error: dim in input file is inconsistent with dim in .cfg \n"); return _dist_norm; }
+  if(s!=n)
+    {
+      fprintf(sout,"Error: dim in input file is inconsistent with dim in .cfg \n");
+      fclose(sout);
+      return _dist_norm;
+    }
 
   mask=alloc_i_n1(N);
   edges=alloc_i_n1(2*nedges);
@@ -103,9 +108,19 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   /*----------initial grid---------*/
   err=readgr(n,N,R,mask,ncells,cells,mcells,nedges,edges,hnodes,sout);
-  if(err<0) {fprintf(sout,"Error reading input mesh file\n"); return _dist_norm;}
+  if(err<0)
+    {
+      fprintf(sout,"Error reading input mesh file\n");
+      fclose(sout);
+      return _dist_norm;
+    }
   if(me>1) err=readmetr(metr,H,ncells,n,sout);
-  if(err<0) {fprintf(sout,"Error reading metric file\n"); return _dist_norm;}
+  if(err<0)
+    { 
+      fprintf(sout,"Error reading metric file\n");
+      fclose(sout);
+      return _dist_norm;
+    }
 
   iter[0]=miniter; iter[1]=maxiter; iter[2]=miniterBC;
 
@@ -138,8 +153,10 @@ double VariationalMeshSmoother::smooth(unsigned int)
   free(edges);
   free(mcells);
   free(hnodes);
-  //fclose(sout);
+  fclose(sout);
   libmesh_assert(_dist_norm > 0);
+
+  syntax_error();
 
   return _dist_norm;
 }
