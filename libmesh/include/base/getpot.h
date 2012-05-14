@@ -417,10 +417,10 @@ private:
 						      STRING_VECTOR& section_stack);
 
     //      -- dollar bracket expressions
-    std::string               _DBE_expand_string(const std::string str);
-    std::string               _DBE_expand(const std::string str);
-    const GetPot::variable*   _DBE_get_variable(const std::string str);
-    STRING_VECTOR             _DBE_get_expr_list(const std::string str, const unsigned ExpectedNumber);
+    std::string               _DBE_expand_string(const std::string& str);
+    std::string               _DBE_expand(const std::string& str);
+    const GetPot::variable*   _DBE_get_variable(const std::string& str);
+    STRING_VECTOR             _DBE_get_expr_list(const std::string& str, const unsigned ExpectedNumber);
 
     template <typename T>
     static std::string _convert_from_type(const T& Value) {
@@ -644,6 +644,7 @@ GetPot::GetPot(const GetPot& Other) :
   cursor(Other.cursor),
   search_loop_f(Other.search_loop_f),
   search_failed_f(Other.search_failed_f),
+  overridden_vars(),
   nominus_cursor(Other.nominus_cursor),
   idx_nominus(Other.idx_nominus),
   variables(Other.variables),
@@ -677,7 +678,7 @@ GetPot::~GetPot()
     // // may be some return strings had to be created, delete now !
     std::set<const char*, ltstr>::const_iterator        it = _internal_string_container.begin();
     const std::set<const char*, ltstr>::const_iterator end = _internal_string_container.end();
-    for(; it != end; it++)
+    for(; it != end; ++it)
         delete [] *it;
 }
 
@@ -694,6 +695,7 @@ GetPot::operator=(const GetPot& Other)
     search_loop_f        = Other.search_loop_f;
     search_failed_f      = Other.search_failed_f;
     nominus_cursor       = Other.nominus_cursor;
+    overridden_vars      = Other.overridden_vars;
     idx_nominus          = Other.idx_nominus;
     variables            = Other.variables;
     _comment_start       = Other._comment_start;
@@ -710,7 +712,7 @@ GetPot::operator=(const GetPot& Other)
     const std::set<const char*, ltstr>::const_iterator my_end =
       _internal_string_container.end();
 
-    for(; my_it != my_end; my_it++)
+    for(; my_it != my_end; ++my_it)
         delete [] *my_it;
 
     _internal_string_container.clear();
@@ -772,7 +774,7 @@ GetPot::clear_requests()
 inline void
 GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 {
-    if( ARGV.size() == 0 ) return;
+    if( ARGV.empty() ) return;
 
     // build internal databases:
     //   1) array with no-minus arguments (usually used as filenames)
@@ -790,7 +792,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 
     // -- loop over remaining arguments
     unsigned i=1;
-    for(; it != ARGV.end(); it++, i++) {
+    for(; it != ARGV.end(); ++it, ++i) {
 	std::string arg = *it;
 
 	if( arg.length() == 0 ) continue;
@@ -1094,7 +1096,7 @@ GetPot::_process_section_label(const std::string& Section,
 	section_stack.push_back(sname);
     }
     std::string section = "";
-    if( section_stack.size() != 0 ) {
+    if( !section_stack.empty() ) {
 	victorate(std::string, section_stack, it)
 	    section += *it + "/";
     }
@@ -1519,7 +1521,7 @@ GetPot::options_contain(const char* FlagList) const
     // go through all arguments that start with a '-' (but not '--')
     std::string str;
     STRING_VECTOR::const_iterator it = argv.begin();
-    for(; it != argv.end(); it++) {
+    for(; it != argv.end(); ++it) {
 	str = _get_remaining_string(*it, prefix);
 
 	if( str.length() >= 2 && str[0] == '-' && str[1] != '-' )
@@ -1575,7 +1577,7 @@ GetPot::nominus_vector() const
 {
     STRING_VECTOR nv;
     std::vector<unsigned>::const_iterator it = idx_nominus.begin();
-    for(; it != idx_nominus.end(); it++) {
+    for(; it != idx_nominus.end(); ++it) {
 	nv.push_back(argv[*it]);
 
 	// (*) record for later ufo-detection
@@ -1847,7 +1849,7 @@ GetPot::get_variable_names() const
 {
     STRING_VECTOR  result;
     std::vector<GetPot::variable>::const_iterator it = variables.begin();
-    for(; it != variables.end(); it++) {
+    for(; it != variables.end(); ++it) {
 	const std::string Tmp = _get_remaining_string((*it).name, prefix);
 	if( Tmp != "" ) result.push_back(Tmp);
     }
@@ -1868,7 +1870,7 @@ GetPot::_find_variable(const char* VarName) const
     const std::string Name = prefix + VarName;
 
     std::vector<variable>::const_iterator it = variables.begin();
-    for(; it != variables.end(); it++) {
+    for(; it != variables.end(); ++it) {
 	if( (*it).name == Name ) return &(*it);
     }
     return 0;
@@ -1892,7 +1894,7 @@ GetPot::print(std::ostream &out_stream) const
 {
     out_stream << "argc = " << argv.size() << std::endl;
     STRING_VECTOR::const_iterator it = argv.begin();
-    for(; it != argv.end(); it++)
+    for(; it != argv.end(); ++it)
 	out_stream << *it << std::endl;
     out_stream << std::endl;
     return 1;
@@ -1968,7 +1970,7 @@ GetPot::print(const char* prefix, std::ostream &out_stream, unsigned int skip_co
 //           Each sub-expression is expanded using expand().
 //---------------------------------------------------------------------------
 inline std::string
-GetPot::_DBE_expand_string(const std::string str)
+GetPot::_DBE_expand_string(const std::string& str)
 {
     // Parses for closing operators '${ }' and expands them letting
     // white spaces and other letters as they are.
@@ -1995,7 +1997,7 @@ GetPot::_DBE_expand_string(const std::string str)
 }
 
 inline STRING_VECTOR
-GetPot::_DBE_get_expr_list(const std::string str_, const unsigned ExpectedNumber)
+GetPot::_DBE_get_expr_list(const std::string& str_, const unsigned ExpectedNumber)
     // ensures that the resulting vector has the expected number
     // of arguments, but they may contain an error message
 {
@@ -2069,7 +2071,7 @@ GetPot::_DBE_get_expr_list(const std::string str_, const unsigned ExpectedNumber
 }
 
 inline const GetPot::variable*
-GetPot::_DBE_get_variable(std::string VarName)
+GetPot::_DBE_get_variable(const std::string& VarName)
 {
     static GetPot::variable ev;
     std::string secure_Prefix = prefix;
@@ -2093,7 +2095,7 @@ GetPot::_DBE_get_variable(std::string VarName)
 }
 
 inline std::string
-GetPot::_DBE_expand(const std::string expr)
+GetPot::_DBE_expand(const std::string& expr)
 {
     // ${: } pure text
     if( expr[0] == ':' )
@@ -2105,7 +2107,7 @@ GetPot::_DBE_expand(const std::string expr)
 
 	STRING_VECTOR::const_iterator it = A.begin();
 	std::string result = *it++;
-	for(; it != A.end(); it++) result += *it;
+	for(; it != A.end(); ++it) result += *it;
 
 	return result;
     }
@@ -2125,7 +2127,7 @@ GetPot::_DBE_expand(const std::string expr)
 	STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 2);
 	STRING_VECTOR::const_iterator it = A.begin();
 	double result = _convert_to_type(*it++, 0.0);
-	for(; it != A.end(); it++)
+	for(; it != A.end(); ++it)
 	    result += _convert_to_type(*it, 0.0);
 
 	return _convert_from_type(result);
@@ -2134,7 +2136,7 @@ GetPot::_DBE_expand(const std::string expr)
 	STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 2);
 	STRING_VECTOR::const_iterator it = A.begin();
 	double result = _convert_to_type(*it++, 0.0);
-	for(; it != A.end(); it++)
+	for(; it != A.end(); ++it)
 	    result -= _convert_to_type(*it, 0.0);
 
 	return _convert_from_type(result);
@@ -2143,7 +2145,7 @@ GetPot::_DBE_expand(const std::string expr)
 	STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 2);
 	STRING_VECTOR::const_iterator it = A.begin();
 	double result = _convert_to_type(*it++, 0.0);
-	for(; it != A.end(); it++)
+	for(; it != A.end(); ++it)
 	    result *= _convert_to_type(*it, 0.0);
 
 	return _convert_from_type(result);
@@ -2155,7 +2157,7 @@ GetPot::_DBE_expand(const std::string expr)
 	if( result == 0 ) {
             return "0.0";
         }
-	for(; it != A.end(); it++) {
+	for(; it != A.end(); ++it) {
 	    const double Q = _convert_to_type(*it, 0.0);
 	    result /= Q;
 	}
@@ -2167,7 +2169,7 @@ GetPot::_DBE_expand(const std::string expr)
 	STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 2);
 	STRING_VECTOR::const_iterator it = A.begin();
 	double result = _convert_to_type(*it++, 0.0);
-	for(; it != A.end(); it++)
+	for(; it != A.end(); ++it)
 	    result = pow(result, _convert_to_type(*it, 0.0));
 	return _convert_from_type(result);
     }
@@ -2194,7 +2196,7 @@ GetPot::_DBE_expand(const std::string expr)
 	unsigned i = 1;
 
 	STRING_VECTOR::const_iterator y_orig = a.begin();
-	for(y_orig++; y_orig != a.end(); y_orig++) {
+	for(y_orig++; y_orig != a.end(); ++y_orig) {
 	    double y = _convert_to_type(*y_orig, 1e37);
 
 	    // set the strings as reference if one wasn't a number
@@ -2368,8 +2370,8 @@ GetPot::unidentified_arguments(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
     STRING_VECTOR::const_iterator it = argv.begin();
-    it++; // forget about argv[0] (application or filename)
-    for(; it != argv.end(); it++) {
+    ++it; // forget about argv[0] (application or filename)
+    for(; it != argv.end(); ++it) {
 	// -- argument belongs to prefixed section ?
 	const std::string arg = _get_remaining_string(*it, prefix);
 	if( arg == "" ) continue;
@@ -2426,8 +2428,8 @@ GetPot::unidentified_options(const std::set<std::string>& Knowns) const
 {
     STRING_VECTOR ufos;
     STRING_VECTOR::const_iterator it = argv.begin();
-    it++; // forget about argv[0] (application or filename)
-    for(; it != argv.end(); it++) {
+    ++it; // forget about argv[0] (application or filename)
+    for(; it != argv.end(); ++it) {
 	// -- argument belongs to prefixed section ?
 	const std::string arg = _get_remaining_string(*it, prefix);
 	if( arg == "" ) continue;
@@ -2457,7 +2459,7 @@ GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) con
     if( ArgumentNumber == -1 ) {
 	STRING_VECTOR::const_iterator it = argv.begin();
 	it++; // forget about argv[0] (application or filename)
-	for(; it != argv.end(); it++) {
+	for(; it != argv.end(); ++it) {
 	    // -- argument belongs to prefixed section ?
 	    const std::string arg = _get_remaining_string(*it, prefix);
 	    if( arg == "" ) continue;
@@ -2652,8 +2654,8 @@ GetPot::unidentified_nominuses(const std::set<std::string>& Knowns) const
 
     // (2) iterate over all arguments
     STRING_VECTOR::const_iterator it = argv.begin();
-    it++; // forget about argv[0] (application or filename)
-    for(; it != argv.end(); it++) {
+    ++it; // forget about argv[0] (application or filename)
+    for(; it != argv.end(); ++it) {
 	// -- check if nominus part of prefix
 	const std::string arg = _get_remaining_string(*it, prefix);
 	if( arg == "" )                                         continue;
@@ -2684,6 +2686,9 @@ GetPot::unidentified_nominuses(const std::set<std::string>& Knowns) const
 //
 inline
 GetPot::variable::variable()
+ : name(),
+   value(),
+   original()
 {}
 
 inline
