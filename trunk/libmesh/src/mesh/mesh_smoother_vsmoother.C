@@ -156,8 +156,6 @@ double VariationalMeshSmoother::smooth(unsigned int)
   fclose(sout);
   libmesh_assert(_dist_norm > 0);
 
-  syntax_error();
-
   return _dist_norm;
 }
 
