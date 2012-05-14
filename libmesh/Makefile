@@ -244,6 +244,12 @@ TODO:
 	| perl -pi -e 's#\s*//\s*TODO:\s*(\[.+\])\s*#\n\1     #i;'
 
 
+#
+# Run static analysis tools
+#
+static_analysis:
+	if type cppcheck >/dev/null 2>&1; then (for file in include/*/*.h src/*/*.C; do cppcheck `contrib/bin/libmesh-config --include` --enable=all -f $$file; done) 2>&1 | tee cppcheck.txt; fi
+
 
 #
 # Dependencies
