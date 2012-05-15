@@ -40,6 +40,7 @@ namespace libMesh
     /**
      * Constructor.  Takes a writeable reference to a mesh object.
      */
+    explicit
     AbaqusIO (MeshBase& mesh);
 
     /**

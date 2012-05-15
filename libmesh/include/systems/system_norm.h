@@ -58,6 +58,9 @@ public:
    * Constructor, for discrete vector norms, systems with one variable,
    * and systems for which the same norm type should be used with a
    * weight of one on each variable.
+   *
+   * This is deliberately an implicit constructor; we want user code
+   * to be able to include lines like "error_norm = L2"
    */
   SystemNorm(const FEMNormType &t);
 
@@ -68,6 +71,7 @@ public:
    * For a system with n variables, the final norm will be the l2 norm of the
    * n-vector of the norms in each variable.
    */
+  explicit
   SystemNorm(const std::vector<FEMNormType> &norms);
 
   /**

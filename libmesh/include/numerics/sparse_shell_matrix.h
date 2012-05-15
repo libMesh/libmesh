@@ -46,6 +46,7 @@ public:
    * Constructor; takes references to the sparse matrix.  The sparse
    * matrix itself has to be stored elsewhere.
    */
+  explicit
   SparseShellMatrix (const SparseMatrix<T>& m);
 
   /**

@@ -59,6 +59,7 @@ public:
    * Constructor. Requires a reference to the system
    * to be solved.
    */
+  explicit
   Euler2Solver (sys_type& s);
 
   /**

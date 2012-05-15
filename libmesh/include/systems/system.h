@@ -98,7 +98,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~Initialization () {};
+    virtual ~Initialization () {}
 
     /**
      * Initialization function.  This function will be called
@@ -122,7 +122,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~Assembly () {};
+    virtual ~Assembly () {}
 
     /**
      * Assembly function.  This function will be called
@@ -146,7 +146,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~Constraint () {};
+    virtual ~Constraint () {}
 
     /**
      * Constraint function.  This function will be called
@@ -170,7 +170,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~QOI () {};
+    virtual ~QOI () {}
 
     /**
      * Quantitiy of interest function.  This function will be called
@@ -194,7 +194,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~QOIDerivative () {};
+    virtual ~QOIDerivative () {}
 
     /**
      * Quantitiy of interest derivative function. This function will

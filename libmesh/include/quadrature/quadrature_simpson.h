@@ -49,6 +49,7 @@ class QSimpson : public QBase
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
+  explicit
   QSimpson (const unsigned int _dim);
 
   /**

@@ -96,12 +96,14 @@ public:
    * Default constructor: "calculate all QoIs in the System",
    * "give every QoI weight 1.0"
    */
+  explicit
   QoISet(const System &sys);
 
   /**
    * Constructor-from-vector-of-bool: "calculate the QoIs for which
    * \p indices[q] is true"
    */
+  explicit
   QoISet(const std::vector<bool> &indices) :
     _indices(indices), _weights() {}
 
@@ -109,6 +111,7 @@ public:
    * Constructor-from-vector: "calculate the listed QoIs", "give every
    * QoI weight 1.0"
    */
+  explicit
   QoISet(const std::vector<unsigned int> &indices);
 
   /**

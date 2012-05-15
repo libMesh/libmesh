@@ -57,12 +57,14 @@ class GmshIO : public MeshInput<MeshBase>,
    * Constructor.  Takes a non-const Mesh reference which it
    * will fill up with elements via the read() command.
    */
+  explicit
   GmshIO (MeshBase& mesh);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
+  explicit
   GmshIO (const MeshBase& mesh);
 
   /**

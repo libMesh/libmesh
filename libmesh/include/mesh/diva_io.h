@@ -52,6 +52,7 @@ public:
    * not a mesh generator.
    */
   //TODO:[JWP] figure out how to implement a const write method!
+  explicit
   DivaIO (const MeshBase&);
 
   /**

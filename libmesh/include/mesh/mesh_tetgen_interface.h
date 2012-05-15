@@ -57,6 +57,7 @@ namespace libMesh
     /**
      * Constructor. Takes a reference to the mesh.
      */
+    explicit
     TetGenMeshInterface (UnstructuredMesh& mesh);
 
     /**

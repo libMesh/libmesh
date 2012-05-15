@@ -54,6 +54,7 @@ public:
   /**
    * Constructor.
    */
+  explicit
   InfElemBuilder(MeshBase& mesh) : _mesh(mesh) {}
 
   /**

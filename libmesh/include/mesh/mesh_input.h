@@ -56,12 +56,14 @@ class MeshInput
    * Default constructor. Will set the _obj to NULL, effectively
    * rendering this object useless.
    */
+  explicit
   MeshInput (bool is_parallel_format = false);
 
   /**
    * Constructor.  Takes a writeable reference to an object.
    * This is the constructor required to read an object.
    */
+  explicit
   MeshInput (MT&, const bool is_parallel_format = false);
 
  public:

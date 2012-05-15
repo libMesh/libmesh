@@ -55,7 +55,9 @@ class Problem_Interface : public NOX::Epetra::Interface::Required,
                           public NOX::Epetra::Interface::Preconditioner
 {
 public:
+  explicit
   Problem_Interface(NoxNonlinearSolver<Number> * solver);
+
   ~Problem_Interface();
 
   //! Compute and return F

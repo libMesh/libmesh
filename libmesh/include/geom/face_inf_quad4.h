@@ -59,6 +59,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   InfQuad4 (Elem* p=NULL) :
     InfQuad(InfQuad4::n_nodes(), p, _nodelinks_data) {}
 

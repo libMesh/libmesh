@@ -62,12 +62,14 @@ public:
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
+  explicit
   VTKIO (MeshBase& mesh, MeshData* mesh_data=NULL);
 
   /**
    * Constructor.  Takes a read-only reference to a mesh object.
    * This is the constructor required to write a mesh.
    */
+  explicit
   VTKIO (const MeshBase& mesh, MeshData* mesh_data=NULL);
 
  /**

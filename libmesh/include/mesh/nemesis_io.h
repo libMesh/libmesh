@@ -59,6 +59,7 @@ class Nemesis_IO_Helper;
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
+  explicit
   Nemesis_IO (MeshBase& mesh);
 
   /**

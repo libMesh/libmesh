@@ -63,6 +63,7 @@ protected:
   /**
    * Constructor.  Optionally takes a master.
    */
+  explicit
   FunctionBase (const FunctionBase* master = NULL);
 
 public:

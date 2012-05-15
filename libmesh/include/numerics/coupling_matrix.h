@@ -46,6 +46,7 @@ public:
   /**
    * Constructor.
    */
+  explicit
   CouplingMatrix (const unsigned int n=0);
 
   /**

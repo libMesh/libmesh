@@ -62,6 +62,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   Quad4 (Elem* p=NULL) :
     Quad(Quad::n_nodes(), p, _nodelinks_data) {}
 

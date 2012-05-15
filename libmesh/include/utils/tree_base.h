@@ -63,6 +63,7 @@ protected:
   /**
    * Constructor.  Protected.
    */
+  explicit
   TreeBase (const MeshBase& m);
 
 

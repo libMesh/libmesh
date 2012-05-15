@@ -64,6 +64,7 @@ public:
    * Constructor. Requires a reference to the system
    * to be solved.
    */
+  explicit
   SteadySolver (sys_type& s) : Parent(s) {}
 
   /**

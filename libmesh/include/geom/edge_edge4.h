@@ -49,6 +49,7 @@ class Edge4 : public Edge
   /**
    * Constructor. By default this element has no parent.
    */
+  explicit
   Edge4 (Elem* p=NULL) :
     Edge(Edge4::n_nodes(), p, _nodelinks_data) {}
 

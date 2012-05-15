@@ -61,6 +61,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   Hex8  (Elem* p=NULL);
 
   /**

@@ -52,6 +52,7 @@ public:
    * Constructor.  Sets the mesh reference
    * in the protected data section of the class.
    */
+  explicit
   MeshSmoother(UnstructuredMesh& mesh) : _mesh(mesh) {}
 
   /**

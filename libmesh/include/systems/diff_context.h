@@ -58,6 +58,7 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
+  explicit
   DiffContext (const System &);
 
   /**

@@ -63,6 +63,7 @@ class LegacyXdrIO : public MeshInput<MeshBase>,
    * between ASCII (\p false, the default) or binary (\p true)
    * files.
    */
+  explicit
   LegacyXdrIO (MeshBase&,       const bool=false);
 
   /**
@@ -72,6 +73,7 @@ class LegacyXdrIO : public MeshInput<MeshBase>,
    * between ASCII (\p false, the default) or binary (\p true)
    * files.
    */
+  explicit
   LegacyXdrIO (const MeshBase&, const bool=false);
 
   /**

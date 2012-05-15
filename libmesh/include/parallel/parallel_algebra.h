@@ -54,7 +54,8 @@ namespace Parallel {
   class StandardType<TypeVector<T> > : public DataType
   {
   public:
-    inline StandardType(const TypeVector<T> *example=NULL) {
+    explicit
+    StandardType(const TypeVector<T> *example=NULL) {
       // We need an example for MPI_Address to use
       TypeVector<T> *ex;
       AutoPtr<TypeVector<T> > temp;
@@ -113,7 +114,8 @@ namespace Parallel {
   class StandardType<VectorValue<T> > : public DataType
   {
   public:
-    inline StandardType(const VectorValue<T> *example=NULL) {
+    explicit
+    StandardType(const VectorValue<T> *example=NULL) {
       // We need an example for MPI_Address to use
       VectorValue<T> *ex;
       AutoPtr<VectorValue<T> > temp;
@@ -172,7 +174,8 @@ namespace Parallel {
   class StandardType<Point> : public DataType
   {
   public:
-    inline StandardType(const Point *example=NULL) {
+    explicit
+    StandardType(const Point *example=NULL) {
       // We need an example for MPI_Address to use
       Point *ex;
       AutoPtr<Point> temp;
@@ -238,7 +241,8 @@ namespace Parallel {
   class StandardType<TypeTensor<T> > : public DataType
   {
   public:
-    inline StandardType(const TypeTensor<T> *example=NULL) :
+    explicit
+    StandardType(const TypeTensor<T> *example=NULL) :
       DataType(StandardType<T>(example ?  &((*example)(0,0)) : NULL), LIBMESH_DIM*LIBMESH_DIM) {}
 
     inline ~StandardType() { this->free(); }
@@ -248,7 +252,8 @@ namespace Parallel {
   class StandardType<TensorValue<T> > : public DataType
   {
   public:
-    inline StandardType(const TensorValue<T> *example=NULL) :
+    explicit
+    StandardType(const TensorValue<T> *example=NULL) :
       DataType(StandardType<T>(example ?  &((*example)(0,0)) : NULL), LIBMESH_DIM*LIBMESH_DIM) {}
 
     inline ~StandardType() { this->free(); }

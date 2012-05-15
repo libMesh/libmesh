@@ -38,7 +38,7 @@
 # include <complex>
 #endif
 
-#define xdr_MAX_STRING_LENGTH 256
+const unsigned int xdr_MAX_STRING_LENGTH=256;
 
 #ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
 #define xdr_REAL xdr_double

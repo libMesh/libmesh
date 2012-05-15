@@ -290,6 +290,7 @@ namespace {
     /**
      * constructor to set context
      */
+    explicit
     PostprocessContributions(FEMSystem &sys) : _sys(sys) {}
 
     /**
@@ -343,6 +344,7 @@ namespace {
     /**
      * constructor to set context
      */
+    explicit
     QoIContributions(FEMSystem &sys) :
       qoi(sys.qoi.size(), 0.), _sys(sys) {}
 

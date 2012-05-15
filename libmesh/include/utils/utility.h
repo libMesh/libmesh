@@ -258,6 +258,7 @@ namespace Utility
      * Constructor.  Takes a bool, determines if we will actually
      * do byte reversing.
      */
+    explicit
     ReverseBytes (const bool dr);
 
     /**
@@ -272,7 +273,7 @@ namespace Utility
     /**
      * Returns the value of the reverse flag.
      */
-    bool reverse () const { return _do_reverse; };
+    bool reverse () const { return _do_reverse; }
 
     /**
      * flag

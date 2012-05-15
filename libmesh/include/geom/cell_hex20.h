@@ -75,6 +75,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   Hex20  (Elem* p=NULL);
 
   /**
