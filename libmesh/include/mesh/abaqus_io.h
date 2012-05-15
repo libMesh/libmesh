@@ -184,19 +184,21 @@ namespace libMesh
     std::map<unsigned, unsigned> _abaqus_to_libmesh_elem_mapping;
 
     /**
+     * Map from abaqus node number -> sequential, 0-based libmesh node numbering.
+     * Note that in every Abaqus file I've ever seen the node numbers were 1-based,
+     * sequential, and all in order, so that this map is probably overkill.
+     * Nevertheless, it is the most general solution in case we come across a
+     * weird Abaqus file some day.
+     */
+    std::map<unsigned, unsigned> _abaqus_to_libmesh_node_mapping;
+
+    /**
      * This flag gets set to true after the first "*PART" section
      * we see.  If it is still true when we see a second PART
      * section, we will print an error message... we don't currently
      * handle input files with multiple parts.
      */
     bool _already_seen_part;
-
-    /**
-     * The largest number of comma-separated entries on a single line.
-     * I haven't seen this defined anywhere, but it does seem to be
-     * the case in all the files I've seen so far.
-     */
-    const unsigned _max_csv_per_line;
   };
 
 } // namespace
