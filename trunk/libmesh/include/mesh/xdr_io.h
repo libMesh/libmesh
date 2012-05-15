@@ -60,6 +60,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * between ASCII (\p false, the default) or binary (\p true)
    * files.
    */
+  explicit
   XdrIO (MeshBase&,       const bool=false);
 
   /**
@@ -69,6 +70,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * between ASCII (\p false, the default) or binary (\p true)
    * files.
    */
+  explicit
   XdrIO (const MeshBase&, const bool=false);
 
   /**
@@ -89,14 +91,14 @@ class XdrIO : public MeshInput<MeshBase>,
   /**
    * Get/Set the flag indicating if we should read/write binary.
    */
-  bool   binary() const { return _binary; };
-  bool & binary()       { return _binary; };
+  bool   binary() const { return _binary; }
+  bool & binary()       { return _binary; }
 
   /**
    * Get/Set the flag indicating if we should read/write legacy.
    */
-  bool   legacy() const { return _legacy; };
-  bool & legacy()       { return _legacy; };
+  bool   legacy() const { return _legacy; }
+  bool & legacy()       { return _legacy; }
 
   /**
    * Report whether we should write parallel files.
@@ -126,32 +128,32 @@ class XdrIO : public MeshInput<MeshBase>,
      \p LegacyXdrIO class will be used to read older
      (pre version 0.7.0) mesh files.
    */
-  const std::string & version () const { return _version; };
-  std::string &       version ()       { return _version; };
+  const std::string & version () const { return _version; }
+  std::string &       version ()       { return _version; }
 
   /**
    * Get/Set the boundary condition file name.
    */
-  const std::string & boundary_condition_file_name() const { return _bc_file_name; };
-  std::string &       boundary_condition_file_name()       { return _bc_file_name; };
+  const std::string & boundary_condition_file_name() const { return _bc_file_name; }
+  std::string &       boundary_condition_file_name()       { return _bc_file_name; }
 
   /**
    * Get/Set the partitioning file name.
    */
-  const std::string & partition_map_file_name() const { return _partition_map_file; };
-  std::string &       partition_map_file_name()       { return _partition_map_file; };
+  const std::string & partition_map_file_name() const { return _partition_map_file; }
+  std::string &       partition_map_file_name()       { return _partition_map_file; }
 
   /**
    * Get/Set the subdomain file name.
    */
-  const std::string & subdomain_map_file_name() const { return _subdomain_map_file; };
-  std::string &       subdomain_map_file_name()       { return _subdomain_map_file; };
+  const std::string & subdomain_map_file_name() const { return _subdomain_map_file; }
+  std::string &       subdomain_map_file_name()       { return _subdomain_map_file; }
 
   /**
    * Get/Set the polynomial degree file name.
    */
-  const std::string & polynomial_level_file_name() const { return _p_level_file; };
-  std::string &       polynomial_level_file_name()       { return _p_level_file; };
+  const std::string & polynomial_level_file_name() const { return _p_level_file; }
+  std::string &       polynomial_level_file_name()       { return _p_level_file; }
 
 
  private:

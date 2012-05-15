@@ -54,7 +54,7 @@ public:
   /**
    * Default constructor.  Does nothing.
    */
-  Parameters () {};
+  Parameters () {}
 
   /**
    * Copy constructor.
@@ -159,7 +159,7 @@ private:
     /**
      * Destructor.
      */
-    virtual ~Value() {};
+    virtual ~Value() {}
 
 #ifdef LIBMESH_HAVE_RTTI
     /**

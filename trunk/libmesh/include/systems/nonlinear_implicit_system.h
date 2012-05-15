@@ -79,7 +79,7 @@ public:
   class ComputeResidual
   {
   public:
-    virtual ~ComputeResidual () {};
+    virtual ~ComputeResidual () {}
     /**
      * Residual function.  This function will be called to compute the
      * residual and must be implemented by the user in a derived class.
@@ -97,7 +97,7 @@ public:
   class ComputeJacobian
   {
   public:
-    virtual ~ComputeJacobian () {};
+    virtual ~ComputeJacobian () {}
 
     /**
      * Jacobian function.  This function will be called to compute the
@@ -116,7 +116,7 @@ public:
   class ComputeBounds
   {
   public:
-    virtual ~ComputeBounds () {};
+    virtual ~ComputeBounds () {}
 
     /**
      * This function will be called to compute the bounds vector and
@@ -134,7 +134,7 @@ public:
   class ComputeResidualandJacobian
   {
   public:
-    virtual ~ComputeResidualandJacobian () {};
+    virtual ~ComputeResidualandJacobian () {}
 
     /**
      * Residual & Jacobian function, calculated simultaneously.

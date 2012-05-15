@@ -803,7 +803,7 @@ public:
   /**
    * Returns the string corresponding to the Exodus type for this element
    */
-  std::string exodus_elem_type() const { return exodus_type; };
+  std::string exodus_elem_type() const { return exodus_type; }
 
 
 private:
@@ -1134,6 +1134,7 @@ public:
 class ExodusII_IO_Helper::NamesData
 {
 public:
+  explicit
   NamesData(size_t size);
   ~NamesData();
 

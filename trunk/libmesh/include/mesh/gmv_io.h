@@ -59,12 +59,14 @@ class GMVIO : public MeshInput<MeshBase>,
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
+  explicit
   GMVIO (const MeshBase&);
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
    * This constructor is required to let us read in a mesh.
    */
+  explicit
   GMVIO (MeshBase&);
 
   /**

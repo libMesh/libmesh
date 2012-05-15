@@ -112,12 +112,12 @@ namespace libMesh
   /**
    * Default constructor.
    */
-  OFStream () {};
+  OFStream () {}
 
   /**
    * Default destructor.
    */
-  ~OFStream () {};
+  ~OFStream () {}
 
   /**
    * convenient typedef

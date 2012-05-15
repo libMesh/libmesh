@@ -244,6 +244,7 @@ public:
    * method to build specific instantiations of \p InfFE at
    * run time.
    */
+  explicit
   InfFE(const FEType& fet);
 
   /**

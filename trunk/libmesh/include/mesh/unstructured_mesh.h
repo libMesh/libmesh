@@ -57,6 +57,7 @@ class UnstructuredMesh : public MeshBase
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
+  explicit
   UnstructuredMesh (unsigned int dim=1);
 
   /**

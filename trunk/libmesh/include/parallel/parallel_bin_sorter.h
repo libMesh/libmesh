@@ -44,6 +44,7 @@ class BinSorter
 public:
 
   // Constructor
+  explicit
   BinSorter (const std::vector<KeyType>& d);
 
   // The actual function which sorts the data into

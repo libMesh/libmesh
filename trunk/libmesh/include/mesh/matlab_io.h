@@ -93,6 +93,7 @@ public:
    *  Constructor.  Takes a non-const Mesh reference which it
    * will fill up with elements.
    */
+  explicit
   MatlabIO (MeshBase&);
 
   /**

@@ -56,6 +56,7 @@ public:
   /**
    * Constructor that passes a vector of shell matrices.
    */
+  explicit
   SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat);
 
   /**

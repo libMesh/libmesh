@@ -67,6 +67,7 @@ public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
+  explicit
   PetscNonlinearSolver (sys_type& system);
 
   /**

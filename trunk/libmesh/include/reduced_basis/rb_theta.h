@@ -48,12 +48,12 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  RBTheta () {};
+  RBTheta () {}
 
   /**
    * Destructor.
    */
-  virtual ~RBTheta () {};
+  virtual ~RBTheta () {}
 
   /**
    * Evaluate the functor object for the given parameter.

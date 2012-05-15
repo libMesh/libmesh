@@ -851,7 +851,7 @@ void VariationalMeshSmoother::full_smooth(int n, int N, LPLPDOUBLE R, LPINT mask
 
   epsilon=0.000000001;
   //compute max distortion measure over all cells
-  if(qmin<0){eps=sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol);} else eps=epsilon;
+  eps= qmin < 0 ? sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol) : epsilon;
   emax=maxE(n, N, R, ncells, cells, mcells, me, H, vol, eps, w, Gamma, &qmin, sout);
   if(msglev>=1) fprintf(sout," emax=%e \n",emax);
 
@@ -1777,8 +1777,7 @@ for(i=0;i<ncells;i++) G[i]=alloc_d_n1(6);
 		  if(fabs(J)<eps) {
 		      constr[I*4]=1.0/(R[k][0]-R[j][0]); constr[I*4+1]=-1.0/(R[k][1]-R[j][1]);
 		      constr[I*4+2]=R[i][0]; constr[I*4+3]=R[i][1];
-} else //circle
-{
+                  } else { //circle
 		      x0=((R[k][1]-R[j][1])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
 			  (R[j][1]-R[i][1])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
 		      y0=((R[j][0]-R[k][0])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
@@ -1881,7 +1880,7 @@ for(nz=0;nz<5;nz++){
       //----end of constraints----
       if(msglev>=3) fprintf(sout," tau=%f J=%f \n",tau,J);
    }
-   if(j==-30) T=0; else {
+   if(j==-30) { T=0; } else {
       Jpr=L; qq=J;
       for(i=0;i<N;i++){
 	  for(k=0;k<2;k++) Rpr[i][k]=R[i][k]+tau*0.5*P[i][k];}
@@ -2138,9 +2137,11 @@ double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDO
 	  df0=jac2(qu[0],qu[1],a2[0],a2[1])/det;
 	  df1=jac2(a1[0],a1[1],qu[0],qu[1])/det;
 		  g=(1+df0*df0+df1*df1);
-		  if(adp==2){//directional adaptation G=diag(g_i)
+		  if(adp==2) { //directional adaptation G=diag(g_i)
 			  G[0]=1+df0*df0; G[1]=1+df1*df1;
-		  } else for(i=0;i<n;i++) G[i]=g; //simple adaptation G=gI
+		  } else {
+			  for(i=0;i<n;i++) G[i]=g; //simple adaptation G=gI
+		  }
 	  } else {
 		  df0=(qu[0]*(a2[1]*a3[2]-a2[2]*a3[1])+qu[1]*(a2[2]*a3[0]-a2[0]*a3[2])+qu[2]*(a2[0]*a3[1]-a2[1]*a3[0]))/det;
 	  df1=(qu[0]*(a3[1]*a1[2]-a3[2]*a1[1])+qu[1]*(a3[2]*a1[0]-a3[0]*a1[2])+qu[2]*(a3[0]*a1[1]-a3[1]*a1[0]))/det;
@@ -2148,7 +2149,9 @@ double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDO
 		  g=(1+df0*df0+df1*df1+df2*df2);
 	  if(adp==2){//directional adaptation G=diag(g_i)
 			  G[0]=1+df0*df0; G[1]=1+df1*df1; G[2]=1+df2*df2;
-		  } else for(i=0;i<n;i++) G[i]=g; //simple adaptation G=gI
+		  } else {
+			  for(i=0;i<n;i++) G[i]=g; //simple adaptation G=gI
+		  }
 	  }
   } else {g=1.0; for(i=0;i<n;i++) G[i]=g;}
 

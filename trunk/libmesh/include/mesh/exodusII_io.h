@@ -58,6 +58,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
+  explicit
   ExodusII_IO (MeshBase& mesh);
 
   /**

@@ -42,12 +42,12 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  ElemAssembly () {};
+  ElemAssembly () {}
 
   /**
    * Destructor.
    */
-  virtual ~ElemAssembly () {};
+  virtual ~ElemAssembly () {}
 
   /**
    * Perform the element interior assembly.

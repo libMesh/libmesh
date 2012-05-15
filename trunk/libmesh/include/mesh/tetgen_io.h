@@ -56,12 +56,14 @@ class TetGenIO : public MeshInput<MeshBase>,
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
+  explicit
   TetGenIO (MeshBase& mesh, MeshData* mesh_data=NULL);
 
   /**
    * Constructor.  Takes a read-only reference to a mesh object.
    * This is the constructor required to write a mesh.
    */
+  explicit
   TetGenIO (const MeshBase& mesh, MeshData* mesh_data=NULL);
 
   /**

@@ -64,6 +64,7 @@ public:
   /**
    *  Constructor. Initializes Nox data structures
    */
+  explicit
   NoxNonlinearSolver (sys_type& system);
 
   /**

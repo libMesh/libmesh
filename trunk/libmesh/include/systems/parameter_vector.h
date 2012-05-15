@@ -46,6 +46,7 @@ public:
   /**
    * Constructor-from-vector-of-Number*: each points to a parameter
    */
+  explicit
   ParameterVector(const std::vector<Number *> &params) : _params(params) {}
 
   /**

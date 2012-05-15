@@ -105,7 +105,7 @@ public:
    * Initializes the locator, so that the \p operator() methods can
    * be used.  This function allocates dynamic memory with "new".
    */
-  virtual void init() { this->init(Trees::NODES); };
+  virtual void init() { this->init(Trees::NODES); }
 
   /**
    * Locates the element in which the point with global coordinates

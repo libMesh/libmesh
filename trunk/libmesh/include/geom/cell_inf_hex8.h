@@ -65,6 +65,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   InfHex8  (Elem* p=NULL);
 
   /**

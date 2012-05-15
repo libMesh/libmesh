@@ -55,6 +55,7 @@ namespace libMesh
      * specified, a convex hull will be computed for the set of input points
      * and the convex hull will be meshed.
      */
+    explicit
     TriangleInterface(UnstructuredMesh& mesh);
 
     /**

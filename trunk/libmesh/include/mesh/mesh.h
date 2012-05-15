@@ -56,6 +56,7 @@ class Mesh : public DefaultMesh
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
+  explicit
   Mesh (unsigned int dim=1) : DefaultMesh(dim) {}
 
   /**

@@ -59,6 +59,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   Tri3 (Elem* p=NULL) :
     Tri(Tri3::n_nodes(), p, _nodelinks_data) {}
 
