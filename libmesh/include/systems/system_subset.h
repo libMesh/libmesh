@@ -48,6 +48,7 @@ public:
   /**
    * Constructor.
    */
+  explicit
   SystemSubset (const System& system);
 
 public:

@@ -52,6 +52,7 @@ class SerialMesh : public UnstructuredMesh
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
+  explicit
   SerialMesh (unsigned int dim=1);
 
   /**

@@ -60,6 +60,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   Pyramid5  (Elem* p=NULL);
 
   /**

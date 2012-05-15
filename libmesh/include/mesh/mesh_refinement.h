@@ -64,6 +64,7 @@ public:
   /**
    * Constructor.
    */
+  explicit
   MeshRefinement (MeshBase& mesh);
 
 private:

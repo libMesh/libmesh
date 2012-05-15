@@ -58,6 +58,7 @@ public:
    * Constructor. Requires a reference to the system
    * to be solved.
    */
+  explicit
   PetscDiffSolver (sys_type& system);
 
   /**

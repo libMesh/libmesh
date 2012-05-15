@@ -52,6 +52,7 @@ public:
   /**
    * Constructor. Requires a reference to a system to be solved.
    */
+  explicit
   Adaptive (EquationSystems& es);
 
   /**

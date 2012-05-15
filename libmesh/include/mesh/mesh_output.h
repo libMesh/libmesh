@@ -60,12 +60,14 @@ class MeshOutput
    * Default constructor. Will set the _obj to NULL, effectively
    * rendering this object useless.
    */
+  explicit
   MeshOutput (const bool is_parallel_format = false);
 
   /**
    * Constructor.  Takes a reference to a constant object.
    * This constructor will only allow us to write the object.
    */
+  explicit
   MeshOutput (const MT&, const bool is_parallel_format = false);
 
 

@@ -45,6 +45,7 @@ namespace libMesh
     {
       // The constructor.  You need a reference to the mesh where you will
       // be setting/getting nodal positions.
+      explicit
       SyncNodalPositions(MeshBase& m);
 
       // The datum typedef is required of this functor, so that the

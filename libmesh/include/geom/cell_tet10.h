@@ -67,6 +67,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   Tet10  (Elem* p=NULL);
 
   /**

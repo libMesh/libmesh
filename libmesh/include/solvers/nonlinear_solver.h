@@ -62,6 +62,7 @@ public:
   /**
    *  Constructor. Initializes Solver data structures
    */
+  explicit
   NonlinearSolver (sys_type& s);
 
   /**

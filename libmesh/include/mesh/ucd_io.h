@@ -52,12 +52,14 @@ class UCDIO : public MeshInput<MeshBase>,
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
+  explicit
   UCDIO (MeshBase&);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
+  explicit
   UCDIO (const MeshBase&);
 
   /**

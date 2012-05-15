@@ -290,7 +290,7 @@ namespace Parallel
   template<typename T>
   struct Attributes
   {
-    const static bool has_min_max = false;
+    static const bool has_min_max = false;
   };
 
   //-------------------------------------------------------------------
@@ -486,11 +486,13 @@ namespace Parallel
       _datatype()
     {}
 
+    explicit
     Status (const data_type &type) :
       _status(),
       _datatype(type)
     {}
 
+    explicit
     Status (const status &status) :
       _status(status),
       _datatype()
@@ -1441,13 +1443,14 @@ namespace Parallel
   class StandardType<cxxtype> : public DataType \
   { \
   public: \
+    explicit \
     StandardType(const cxxtype* = NULL) : DataType(mpitype) {} \
   }; \
  \
   template<> \
   struct Attributes<cxxtype> \
   { \
-    const static bool has_min_max = true; \
+    static const bool has_min_max = true; \
   }
 
 #else
@@ -1457,13 +1460,14 @@ namespace Parallel
   class StandardType<cxxtype> : public DataType \
   { \
   public: \
+    explicit \
     StandardType(const cxxtype* = NULL) : DataType() {} \
   }; \
  \
   template<> \
   struct Attributes<cxxtype> \
   { \
-    const static bool has_min_max = true; \
+    static const bool has_min_max = true; \
   }
 
 #endif
@@ -1487,6 +1491,7 @@ namespace Parallel
   class StandardType<std::pair<T1, T2> > : public DataType
   {
   public:
+    explicit
     StandardType(const std::pair<T1, T2> *example = NULL) {
       // We need an example for MPI_Address to use
       libmesh_assert(example);
@@ -1514,17 +1519,18 @@ namespace Parallel
 #endif // LIBMESH_HAVE_MPI
     }
 
-    inline ~StandardType() { this->free(); }
+    ~StandardType() { this->free(); }
   };
 
   template<typename T>
   class StandardType<std::complex<T> > : public DataType
   {
   public:
-    inline StandardType(const std::complex<T> *example = NULL) :
+    explicit
+    StandardType(const std::complex<T> *example = NULL) :
       DataType(StandardType<T>(example ? &(example->real()) : NULL), 2) {}
 
-    inline ~StandardType() { this->free(); }
+    ~StandardType() { this->free(); }
   };
 
 #ifdef LIBMESH_HAVE_MPI

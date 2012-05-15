@@ -146,6 +146,7 @@ public:
    * Constructor.  Requires the number of the system for which we
    * will be numbering degrees of freedom.
    */
+  explicit
   DofMap(const unsigned int sys_number);
 
   /**
@@ -160,7 +161,7 @@ public:
   class AugmentSparsityPattern
   {
   public:
-    virtual ~AugmentSparsityPattern () {};
+    virtual ~AugmentSparsityPattern () {}
 
     /**
      * User-defined function to augment the sparsity pattern.
@@ -177,7 +178,7 @@ public:
   class AugmentSendList
   {
   public:
-    virtual ~AugmentSendList () {};
+    virtual ~AugmentSendList () {}
 
     /**
      * User-defined function to augment the send list.

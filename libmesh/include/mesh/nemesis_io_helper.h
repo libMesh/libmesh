@@ -56,6 +56,7 @@ public:
   /**
    * Constructor.
    */
+  explicit
   Nemesis_IO_Helper(bool verbose=false);
 
   /**

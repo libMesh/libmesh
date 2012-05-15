@@ -54,6 +54,7 @@ class TecplotIO : public MeshOutput<MeshBase>
    * between ASCII (\p false, the default) or binary (\p true)
    * output files.
    */
+  explicit
   TecplotIO (const MeshBase&, const bool binary=false);
 
   /**
