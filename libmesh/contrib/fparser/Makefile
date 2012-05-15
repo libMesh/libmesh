@@ -370,7 +370,7 @@ testbed_tests.inc: $(TESTBED_TEST_FILES)
 
 .dep:
 	@touch extrasrc/fp_opcode_add.inc
-	$(perl) ../bin/make_dependencies.pl $(foreach i, $(wildcard */) ., -I./$(i)) "-S\$$(obj-suffix)" $(wildcard *.cc) $(wildcard examples/*.cc) $(wildcard fpoptimizer/*.cc) $(wildcard tests/*.cc) $(wildcard util/*.cc) $(wildcard mpfr/*.cc) > .dep
+	@$(perl) ../bin/make_dependencies.pl $(foreach i, $(wildcard */) ., -I./$(i)) "-S\$$(obj-suffix)" $(wildcard *.cc) $(wildcard examples/*.cc) $(wildcard fpoptimizer/*.cc) $(wildcard tests/*.cc) $(wildcard util/*.cc) $(wildcard mpfr/*.cc) > .dep
 
 -include .dep
 
