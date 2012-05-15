@@ -248,7 +248,7 @@ TODO:
 # Run static analysis tools
 #
 static_analysis:
-	contrib/bin/cpplint.py --filter=-whitespace,-build/include,-runtime/int,-runtime/references,-readability/streams,-build/namespaces,-build/header_guard include/*/*.h src/*/*.C 2>&1 > cpplint.txt
+	contrib/bin/cpplint.py --filter=-whitespace,-build/include,-runtime/int,-runtime/references,-readability/streams,-build/namespaces,-build/header_guard include/*/*.h src/*/*.C 2>&1 | tee cpplint.txt
 	if type cppcheck >/dev/null 2>&1; then (for file in include/*/*.h src/*/*.C; do cppcheck `contrib/bin/libmesh-config --include` --enable=all -f $$file; done) 2>&1 | tee cppcheck.txt; fi
 
 
