@@ -65,15 +65,14 @@ void TypeVector<T>::print(std::ostream& os) const
 {
 #if LIBMESH_DIM == 1
 
-  os << "x=" << (*this)(0) << '\n';
+  os << "x=" << (*this)(0);
 
 #endif
 #if LIBMESH_DIM == 2
 
   os << "(x,y)=("
      << std::setw(8) << (*this)(0) << ", "
-     << std::setw(8) << (*this)(1) << ")"
-     << '\n';
+     << std::setw(8) << (*this)(1) << ")";
 
 #endif
 #if LIBMESH_DIM == 3
@@ -81,8 +80,7 @@ void TypeVector<T>::print(std::ostream& os) const
   os <<  "(x,y,z)=("
      << std::setw(8) << (*this)(0) << ", "
      << std::setw(8) << (*this)(1) << ", "
-     << std::setw(8) << (*this)(2) << ")"
-     << '\n';
+     << std::setw(8) << (*this)(2) << ")";
 #endif
 }
 
