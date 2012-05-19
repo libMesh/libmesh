@@ -2345,7 +2345,7 @@ void DofMap::process_constraints ()
 	  {
             unsigned int expandable = constraints_to_expand[j];
 
-            const Number this_coef = constraint_row[expandable];
+            const Real this_coef = constraint_row[expandable];
 
 	    DofConstraints::const_iterator
 	      subpos = _dof_constraints.find(expandable);
