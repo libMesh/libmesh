@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_parametrized_object_h__
-#define __rb_parametrized_object_h__
+#ifndef __rb_parametrized_h__
+#define __rb_parametrized_h__
 
 // libMesh includes
 #include "reference_counted_object.h"
@@ -28,32 +28,45 @@
 
 namespace libMesh
 {
-
+    
 /**
  * This class is part of the rbOOmit framework.
  *
- * This class defines a parametrized object, which
- * is fundamental in the Reduced Basis method.
+ * This class defines basic functionality of
+ * a parametrized object.
  *
  * @author David J. Knezevic, 2011
  */
-
-
 // ------------------------------------------------------------
-// RBParametrizedObject class definition
-class RBParametrizedObject : public ReferenceCountedObject<RBParametrizedObject>
+// RBParametrized class definition
+class RBParametrized : public ReferenceCountedObject<RBParametrized>
 {
 public:
 
   /**
    * Constructor.
    */
-  RBParametrizedObject ();
+  RBParametrized ();
 
   /**
    * Destructor.
    */
-  virtual ~RBParametrizedObject ();
+  virtual ~RBParametrized ();
+
+  /**
+   * Clear all the data structures associated with
+   * the system.
+   */
+  virtual void clear ();
+
+  /**
+   * Initialize the parameter ranges and set current_parameters.
+   */
+  void initialize_parameters(std::vector<Real> mu_min_in,
+                             std::vector<Real> mu_max_in,
+                             std::vector<Real> mu_in);
+
+  void initialize_parameters(RBParametrized& rb_parametrized);
 
   /**
    * Get the number of parameters.
@@ -61,39 +74,54 @@ public:
   unsigned int get_n_params() const;
 
   /**
-   * Set the number of parameters.
-   */
-  void set_n_params(unsigned int n_params_in);
-
-  /**
    * Get the current parameters.
    */
-  std::vector<Real>& get_current_parameters();
+  std::vector<Real> get_current_parameters() const;
 
   /**
    * Set the current parameters to \p params
    */
-  virtual void set_current_parameters(const std::vector<Real>& params);
+  void set_current_parameters(const std::vector<Real>& params);
+
+  /**
+   * Get minimum allowable value of parameter \p i.
+   */
+  Real get_parameter_min(unsigned int i) const;
+
+  /**
+   * Get maximum allowable value of parameter \p i.
+   */
+  Real get_parameter_max(unsigned int i) const;
 
   /**
    * Print the current parameters.
    */
   void print_current_parameters();
 
+private:
+
   /**
-   * Broadcasts current_parameters on processor proc_id
-   * to all processors.
+   * Helper function to check that \p params is valid.
    */
-  void broadcast_current_parameters(unsigned int proc_id);
+  bool valid_params(const std::vector<Real>& params);
 
-protected:
+  //--------------- PRIVATE DATA MEMBERS ---------------//
 
-  //----------- PROTECTED DATA MEMBERS -----------//
+  /**
+   * Flag indicating whether the parameters have been initialized.
+   */
+  bool parameters_initialized;
 
   /**
    * Vector storing the current parameters.
    */
   std::vector<Real> current_parameters;
+
+  /**
+   * Vector of parameter ranges.
+   */
+  std::vector<Real> mu_min_vector;
+  std::vector<Real> mu_max_vector;
 
 };
 

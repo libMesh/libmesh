@@ -358,12 +358,12 @@ void RBSCMEvaluation::set_current_parameters_from_C_J(unsigned int C_J_index)
 
 void RBSCMEvaluation::save_current_parameters()
 {
-  saved_parameters = current_parameters;
+  saved_parameters = get_current_parameters();
 }
 
 void RBSCMEvaluation::reload_current_parameters()
 {
-  current_parameters = saved_parameters;
+  set_current_parameters(saved_parameters);
 }
 
 void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_name)

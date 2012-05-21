@@ -64,6 +64,7 @@ void RBConstructionBase<Base>::clear ()
 {
   // clear the parent data
   Base::clear();
+  RBParametrized::clear();
 
   for(unsigned int i=0; i<training_parameters.size(); i++)
   {
@@ -74,62 +75,6 @@ void RBConstructionBase<Base>::clear ()
     }
   }
   training_parameters.resize(0);
-}
-
-template <class Base>
-void RBConstructionBase<Base>::set_parameter_range(std::vector<Real> mu_min_in,
-                                                   std::vector<Real> mu_max_in)
-{
-  libmesh_assert( mu_min_in.size() == get_n_params() &&
-                  mu_max_in.size() == get_n_params() );
-
-  mu_min_vector = mu_min_in;
-  mu_max_vector = mu_max_in;
-}
-
-template <class Base>
-Real RBConstructionBase<Base>::get_parameter_min(unsigned int i) const
-{
-  libmesh_assert(i < get_n_params());
-
-  return mu_min_vector[i];
-}
-
-template <class Base>
-Real RBConstructionBase<Base>::get_parameter_max(unsigned int i) const
-{
-  libmesh_assert(i < get_n_params());
-
-  return mu_max_vector[i];
-}
-
-template <class Base>
-void RBConstructionBase<Base>::set_current_parameters(const std::vector<Real>& params)
-{
-  libmesh_assert( valid_params(params) );
-
-  RBParametrizedObject::set_current_parameters(params);
-}
-
-template <class Base>
-bool RBConstructionBase<Base>::valid_params(const std::vector<Real>& params)
-{
-  bool valid = ( params.size() == get_n_params() );
-
-  if(!valid)
-  {
-   return false;
-  }
-  else
-  {
-    for(unsigned int i=0; i<params.size(); i++)
-    {
-      valid = valid && ( (mu_min_vector[i] <= params[i]) &&
-                         (params[i] <= mu_max_vector[i]) );
-    }
-  }
-
-  return valid;
 }
 
 template <class Base>
@@ -202,8 +147,6 @@ void RBConstructionBase<Base>::initialize_training_parameters(const std::vector<
                                                               const std::vector<bool> log_param_scale,
                                                               const bool deterministic)
 {
-  set_parameter_range(mu_min_vector, mu_max_vector);
-
   // Print out some info about the training set initialization
   libMesh::out << "Initializing training parameters with "
                << (deterministic ? "deterministic " : "random " )
@@ -691,6 +634,17 @@ void RBConstructionBase<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Num
     }
 
 #endif
+}
+
+
+template <class Base>
+void RBConstructionBase<Base>::broadcast_current_parameters(unsigned int proc_id)
+{
+  libmesh_assert(proc_id < libMesh::n_processors());
+
+  std::vector<Real> current_parameters = get_current_parameters();
+  Parallel::broadcast(current_parameters, proc_id);
+  set_current_parameters(current_parameters);
 }
 
 

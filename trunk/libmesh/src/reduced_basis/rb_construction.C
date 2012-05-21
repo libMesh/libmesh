@@ -199,8 +199,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
 
-  set_n_params( n_parameters );
-
   // String which selects an alternate pc/solver combo for the update_residual_terms solves.
   // Possible values are:
   // "unchanged" -- use whatever we were using for truth solves
@@ -268,16 +266,14 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
     log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
   }
 
+  // Initialize the parameter ranges and set the parameters to mu_min_vector
+  initialize_parameters(mu_min_in, mu_max_in, mu_min_in);
+
   initialize_training_parameters(mu_min_in,
                                  mu_max_in,
                                  n_training_samples,
                                  log_scaling,
                                  deterministic_training);   // use deterministic parameters
-
-
-
-  // Set the initial parameter value to the minimum parameters
-  set_current_parameters(mu_min_vector);
 }
 
 void RBConstruction::print_info()
@@ -306,7 +302,8 @@ void RBConstruction::print_info()
   {
     libMesh::out <<   "Parameter " << i
                  << ": Min = " << get_parameter_min(i)
-                 << ", Max = " << get_parameter_max(i) << std::endl;
+                 << ", Max = " << get_parameter_max(i) 
+                 << ", value = " << get_current_parameters()[i] << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
@@ -314,8 +311,6 @@ void RBConstruction::print_info()
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
-  libMesh::out << "parameter initialized to: " << std::endl;
-  print_current_parameters();
 }
 
 void RBConstruction::set_rb_assembly_expansion(RBAssemblyExpansion& rb_assembly_expansion_in)
@@ -996,6 +991,9 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
   START_LOG("train_reduced_basis()", "RBConstruction");
 
   int count = 0;
+  
+  // initialize rb_eval's parameters
+  get_rb_evaluation().initialize_parameters(*this);
 
   // possibly resize data structures according to Nmax
   if(resize_rb_eval_data)

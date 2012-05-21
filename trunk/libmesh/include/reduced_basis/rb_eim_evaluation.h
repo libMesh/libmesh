@@ -58,7 +58,7 @@ public:
    * Evaluate this parametrized function for the parameter value
    * \p mu at the point \p p.
    */
-  virtual Number evaluate(std::vector<Real>& , const Point& ) { return 0.; }
+  virtual Number evaluate(std::vector<Real> , const Point& ) { return 0.; }
 
 };
 

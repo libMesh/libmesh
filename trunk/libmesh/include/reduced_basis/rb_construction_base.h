@@ -21,7 +21,7 @@
 #define __rb_construction_base_h__
 
 // rbOOmit includes
-#include "rb_parametrized_object.h"
+#include "rb_parametrized.h"
 #include "rb_theta_expansion.h"
 #include "rb_theta.h"
 
@@ -54,7 +54,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // RBConstructionBase class definition
 template<class Base>
-class RBConstructionBase : public Base, public RBParametrizedObject
+class RBConstructionBase : public Base, public RBParametrized
 {
 public:
 
@@ -86,34 +86,6 @@ public:
    * the system.
    */
   virtual void clear ();
-
-  /**
-   * Set the current parameters to \p params. Override
-   * to also check that \p params is within the
-   * allowable parameter range.
-   */
-  virtual void set_current_parameters(const std::vector<Real>& params);
-
-  /**
-   * Set the parameter range for this RB object.
-   */
-  void set_parameter_range(std::vector<Real> mu_min, std::vector<Real> mu_max);
-
-  /**
-   * Get minimum allowable value of parameter \p i.
-   */
-  Real get_parameter_min(unsigned int i) const;
-
-  /**
-   * Get maximum allowable value of parameter \p i.
-   */
-  Real get_parameter_max(unsigned int i) const;
-
-  /**
-   * @return true is params is within the parameter range defined by
-   * mu_min_vector, mu_max_vector, false otherwise.
-   */
-  bool valid_params(const std::vector<Real>& params);
 
   /**
    * Get the total number of training samples.
@@ -197,6 +169,12 @@ public:
   void reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
 				const std::pair<std::string,std::string>& orig);
 
+  /**
+   * Broadcasts current_parameters on processor proc_id
+   * to all processors.
+   */
+  void broadcast_current_parameters(unsigned int proc_id);
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -241,8 +219,8 @@ protected:
                                                   const unsigned int n_training_samples_in,
                                                   const std::vector<Real>& min_parameters,
                                                   const std::vector<Real>& max_parameters,
-						  int training_parameters_random_seed=-1,
-						  bool serial_training_set=false);
+                                                  int training_parameters_random_seed=-1,
+                                                  bool serial_training_set=false);
 
   /**
    * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
@@ -253,16 +231,10 @@ protected:
                                                          const unsigned int n_training_samples_in,
                                                          const std::vector<Real>& min_parameters,
                                                          const std::vector<Real>& max_parameters,
-						         bool serial_training_set=false);
+                                                         bool serial_training_set=false);
 
 
   //----------- PROTECTED DATA MEMBERS -----------//
-
-  /**
-   * Vector of parameter ranges.
-   */
-  std::vector<Real> mu_min_vector;
-  std::vector<Real> mu_max_vector;
 
   /**
    * This boolean flag indicates whether or not the training set should
