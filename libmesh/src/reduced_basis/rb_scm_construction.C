@@ -106,8 +106,6 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   training_parameters_random_seed = infile("training_parameters_random_seed",
 					   training_parameters_random_seed);
 
-  set_n_params( n_parameters );
-
   // SCM Greedy termination tolerance
   const Real SCM_training_tolerance_in = infile("SCM_training_tolerance", SCM_training_tolerance);
   set_SCM_training_tolerance(SCM_training_tolerance_in);
@@ -127,6 +125,9 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
     // int... this implies log_scaling = '1 1 1...' in the input file.
     log_scaling[i] = static_cast<bool>(infile("SCM_log_scaling", static_cast<int>(log_scaling[i]), i));
   }
+
+  // Initialize the parameter ranges and set the parameters to mu_min_vector
+  initialize_parameters(mu_min_vector, mu_max_vector, mu_min_vector);
 
   // Make sure this generates training parameters properly!
   initialize_training_parameters(mu_min_vector,
@@ -201,6 +202,9 @@ void RBSCMConstruction::load_matrix_B()
 void RBSCMConstruction::perform_SCM_greedy()
 {
   START_LOG("perform_SCM_greedy()", "RBSCMConstruction");
+
+  // initialize rb_scm_eval's parameters
+  rb_scm_eval->initialize_parameters(*this);
 
   // Get a list of constrained dofs from rb_system
   std::set<unsigned int> constrained_dofs_set;

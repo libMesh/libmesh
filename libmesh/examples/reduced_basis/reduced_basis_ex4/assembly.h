@@ -19,7 +19,7 @@
 
 struct ShiftedGaussian : public ParametrizedFunction
 {
-  virtual Number evaluate(std::vector<Real>& mu,
+  virtual Number evaluate(std::vector<Real> mu,
                           const Point& p)
   {
     return exp( -2.*(pow(mu[0]-p(0),2.) + pow(mu[1]-p(1),2.)) );

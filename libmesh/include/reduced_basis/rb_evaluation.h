@@ -21,12 +21,13 @@
 #define __rb_evaluation_h__
 
 // rbOOmit includes
-#include "rb_parametrized_object.h"
+#include "rb_parametrized.h"
 #include "rb_theta_expansion.h"
 
 // libMesh includes
 #include "dense_matrix.h"
 #include "dense_vector.h"
+#include "auto_ptr.h"
 
 // C++ includes
 
@@ -48,7 +49,7 @@ template <typename T> class NumericVector;
 // ------------------------------------------------------------
 // RBEvaluation class definition
 
-class RBEvaluation : public RBParametrizedObject
+class RBEvaluation : public RBParametrized
 {
 public:
 
