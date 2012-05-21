@@ -22,7 +22,7 @@
 #define __rb_scm_evaluation_h__
 
 // rbOOmit includes
-#include "rb_parametrized_object.h"
+#include "rb_parametrized.h"
 #include "rb_theta_expansion.h"
 
 // libMesh includes
@@ -45,7 +45,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // RBSCMEvaluation class definition
 
-class RBSCMEvaluation : public RBParametrizedObject
+class RBSCMEvaluation : public RBParametrized
 {
 public:
 
