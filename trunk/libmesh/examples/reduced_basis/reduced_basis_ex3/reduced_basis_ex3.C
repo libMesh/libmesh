@@ -153,23 +153,9 @@ int main (int argc, char** argv)
     // Read in the reduced basis data
     rb_eval.read_offline_data_from_files();
     
-    // Get the parameters at which we do a reduced basis solve
+    // Read in online_N and initialize online parameters
     unsigned int online_N = infile("online_N",1);
-    unsigned int n_parameters = infile("n_parameters",1);
-    std::vector<Real> mu_min_vector(n_parameters);
-    std::vector<Real> mu_max_vector(n_parameters);
-    std::vector<Real> online_mu_vector(n_parameters);
-    for(unsigned int i=0; i<n_parameters; i++)
-    {
-      mu_min_vector[i] = infile("mu_min", mu_min_vector[i], i);
-      mu_max_vector[i] = infile("mu_max", mu_max_vector[i], i);
-      online_mu_vector[i] = infile("online_mu", online_mu_vector[i], i);
-    }
-
-    // Set the parameters to online_mu_vector
-    rb_eval.initialize_parameters(mu_min_vector,
-                                  mu_max_vector,
-                                  online_mu_vector);
+    rb_eval.initialize_parameters(parameters_filename);
     rb_eval.process_temporal_parameters_file(parameters_filename);
     rb_eval.print_parameters();
 
