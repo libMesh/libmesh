@@ -17,6 +17,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// libMesh includes
+#include "getpot.h"
+
+// rbOOmit includes
 #include "rb_parametrized.h"
 
 namespace libMesh
@@ -84,18 +88,33 @@ void RBParametrized::initialize_parameters(std::vector<Real> mu_min_in,
 
 void RBParametrized::initialize_parameters(RBParametrized& rb_parametrized)
 {
-  const unsigned int n_params = rb_parametrized.get_n_params();
-  std::vector<Real> mu_min_vector(n_params);
-  std::vector<Real> mu_max_vector(n_params);
-  for(unsigned int i=0; i<n_params; i++)
+  initialize_parameters(rb_parametrized.get_parameters_min_vector(),
+                        rb_parametrized.get_parameters_max_vector(),
+                        rb_parametrized.get_parameters());
+}
+
+void RBParametrized::initialize_parameters (const std::string& parameters_filename)
+{
+  GetPot infile(parameters_filename);
+
+  const unsigned int n_parameters = infile("n_parameters",1);
+  std::vector<Real> mu_min_in(n_parameters);
+  std::vector<Real> mu_max_in(n_parameters);
+  std::vector<Real> initial_mu_in(n_parameters);
+  for(unsigned int i=0; i<n_parameters; i++)
   {
-    mu_min_vector[i] = rb_parametrized.get_parameter_min(i);
-    mu_max_vector[i] = rb_parametrized.get_parameter_max(i);
+    // Read vector-based mu_min values.
+    mu_min_in[i] = infile("mu_min", mu_min_in[i], i);
+
+    // Read vector-based mu_max values.
+    mu_max_in[i] = infile("mu_max", mu_max_in[i], i);
+    
+    // read in parameters to initialize to (default to mu_min)
+    initial_mu_in[i] = infile("initial_parameters", mu_min_in[i], i);
   }
 
-  initialize_parameters(mu_min_vector,
-                        mu_max_vector,
-                        rb_parametrized.get_parameters());
+  // Initialize the parameter ranges and set the parameters to mu_min_vector
+  initialize_parameters(mu_min_in, mu_max_in, initial_mu_in);
 }
 
 unsigned int RBParametrized::get_n_params() const
@@ -143,6 +162,28 @@ std::vector<Real> RBParametrized::get_parameters() const
   }
 
   return parameters;
+}
+
+std::vector<Real> RBParametrized::get_parameters_min_vector() const
+{
+  if(!parameters_initialized)
+  {
+    libMesh::err << "Error: parameters not initialized in RBParametrized::get_parameter_min_vector" << std::endl;
+    libmesh_error();
+  }
+
+  return parameters_min_vector;
+}
+
+std::vector<Real> RBParametrized::get_parameters_max_vector() const
+{
+  if(!parameters_initialized)
+  {
+    libMesh::err << "Error: parameters not initialized in RBParametrized::get_parameter_max_vector" << std::endl;
+    libmesh_error();
+  }
+
+  return parameters_max_vector;
 }
 
 Real RBParametrized::get_parameter_min(unsigned int i) const
