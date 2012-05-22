@@ -192,10 +192,9 @@ RBThetaExpansion& RBConstruction::get_rb_theta_expansion()
 
 void RBConstruction::process_parameters_file (const std::string& parameters_filename)
 {
-  // First read in data from parameters_filename
+  // First read in data from input_filename
   GetPot infile(parameters_filename);
 
-  const unsigned int n_parameters = infile("n_parameters",1);
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
 
@@ -249,28 +248,19 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
                                             training_tolerance);
   set_training_tolerance(training_tolerance_in);
 
+  // Initialize the parameter ranges and the parameters themselves
+  initialize_parameters(parameters_filename);
 
-  std::vector<Real> mu_min_in(n_parameters);
-  std::vector<Real> mu_max_in(n_parameters);
-  std::vector<bool> log_scaling(n_parameters);
-  for(unsigned int i=0; i<n_parameters; i++)
+  std::vector<bool> log_scaling(get_n_params());
+  for(unsigned int i=0; i<get_n_params(); i++)
   {
-    // Read vector-based mu_min values.
-    mu_min_in[i] = infile("mu_min", mu_min_in[i], i);
-
-    // Read vector-based mu_max values.
-    mu_max_in[i] = infile("mu_max", mu_max_in[i], i);
-
     // Read vector-based log scaling values.  Note the intermediate conversion to
     // int... this implies log_scaling = '1 1 1...' in the input file.
     log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
   }
 
-  // Initialize the parameter ranges and set the parameters to mu_min_vector
-  initialize_parameters(mu_min_in, mu_max_in, mu_min_in);
-
-  initialize_training_parameters(mu_min_in,
-                                 mu_max_in,
+  initialize_training_parameters(this->get_parameters_min_vector(),
+                                 this->get_parameters_max_vector(),
                                  n_training_samples,
                                  log_scaling,
                                  deterministic_training);   // use deterministic parameters

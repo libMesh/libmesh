@@ -6,5 +6,5 @@ store_basis_functions = true
 n_parameters = 2
 mu_min = '-1 -1'
 mu_max = '1 1'
-online_mu = '-0.6 0.7'
+initial_parameters = '-0.6 0.7'
 online_N = 15

@@ -66,7 +66,16 @@ public:
                              std::vector<Real> mu_max_in,
                              std::vector<Real> mu_in);
 
+  /**
+   * Initialize the parameter ranges and set current_parameters.
+   */
   void initialize_parameters(RBParametrized& rb_parametrized);
+  
+  /**
+   * Initialize the parameter ranges and set current_parameters by
+   * reading in data from the file \p input_filename
+   */
+  virtual void initialize_parameters(const std::string& parameters_filename);
 
   /**
    * Get the number of parameters.
@@ -82,6 +91,18 @@ public:
    * Set the current parameters to \p params
    */
   void set_parameters(const std::vector<Real>& params);
+
+  /**
+   * Get a vector that specifies the minimum allowable value
+   * for each parameter.
+   */
+  std::vector<Real> get_parameters_min_vector() const;
+
+  /**
+   * Get a vector that specifies the maximum allowable value
+   * for each parameter.
+   */
+  std::vector<Real> get_parameters_max_vector() const;
 
   /**
    * Get minimum allowable value of parameter \p i.
