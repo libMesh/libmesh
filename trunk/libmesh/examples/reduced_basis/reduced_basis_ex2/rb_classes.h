@@ -59,7 +59,7 @@ public:
    */
   virtual Real get_stability_lower_bound()
   { 
-    rb_scm_eval->set_current_parameters( get_current_parameters() );
+    rb_scm_eval->set_parameters( get_parameters() );
     return rb_scm_eval->get_SCM_LB() ;
   }
 

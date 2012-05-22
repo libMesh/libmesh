@@ -182,7 +182,7 @@ int main (int argc, char** argv)
                                   mu_max_vector,
                                   online_mu_vector);
     eim_rb_eval.initialize_parameters(rb_eval);
-    rb_eval.print_current_parameters();
+    rb_eval.print_parameters();
     rb_eval.rb_solve(online_N);
 
     // plot the solution, if requested

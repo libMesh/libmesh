@@ -163,7 +163,7 @@ void RBEIMConstruction::initialize_rb_construction()
 Number RBEIMConstruction::evaluate_parametrized_function(unsigned int index, const Point& p)
 {
   RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
-  eim_eval.set_current_parameters( get_current_parameters() );
+  eim_eval.set_parameters( get_parameters() );
   
   if(index >= eim_eval.get_n_parametrized_functions())
   {
@@ -269,7 +269,7 @@ void RBEIMConstruction::enrich_RB_space()
       EIM_rhs(i) = (*mesh_function)(eim_eval.interpolation_points[i]);
     }
 
-    eim_eval.set_current_parameters( get_current_parameters() );
+    eim_eval.set_parameters( get_parameters() );
     eim_eval.rb_solve(EIM_rhs);
 
     // Load the "EIM residual" into solution by subtracting
@@ -399,7 +399,7 @@ Real RBEIMConstruction::compute_best_fit_error()
     {
       // Turn off error estimation here, we use the linfty norm instead
       get_rb_evaluation().evaluate_RB_error_bound = false;
-      get_rb_evaluation().set_current_parameters( get_current_parameters() );
+      get_rb_evaluation().set_parameters( get_parameters() );
       get_rb_evaluation().rb_solve(RB_size);
       get_rb_evaluation().evaluate_RB_error_bound = true;
       break;

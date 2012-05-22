@@ -50,7 +50,7 @@ TransientRBParamSubdomainTree::TransientRBParamSubdomainTree
 void TransientRBParamSubdomainTree::build_root_node()
 {
   libmesh_assert(root_node == NULL);
-  root_node = new TransientRBParamSubdomainNode(*this, _rb_construction.get_current_parameters());
+  root_node = new TransientRBParamSubdomainNode(*this, _rb_construction.get_parameters());
 }
 
 } // namespace libMesh

@@ -178,7 +178,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
     libmesh_error();
   }
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
@@ -396,7 +396,7 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
 {
   START_LOG("cache_online_residual_terms()", "TransientRBEvaluation");
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
@@ -573,7 +573,7 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   // Use the stored representor inner product values
   // to evaluate the residual norm
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());

@@ -171,7 +171,7 @@ int main (int argc, char** argv)
                                   mu_max_vector,
                                   online_mu_vector);
     rb_eval.process_temporal_parameters_file(parameters_filename);
-    rb_eval.print_current_parameters();
+    rb_eval.print_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
     Real error_bound_final_time = rb_eval.rb_solve(online_N);

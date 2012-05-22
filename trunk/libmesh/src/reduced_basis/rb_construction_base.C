@@ -118,7 +118,7 @@ std::vector<Real> RBConstructionBase<Base>::get_training_parameter(unsigned int 
 template <class Base>
 void RBConstructionBase<Base>::load_training_parameter_locally(unsigned int index)
 {
-  set_current_parameters( get_training_parameter(index) );
+  set_parameters( get_training_parameter(index) );
 }
 
 template <class Base>
@@ -137,7 +137,7 @@ void RBConstructionBase<Base>::load_training_parameter_globally(unsigned int ind
   Parallel::sum(root_id);
   Parallel::broadcast(new_param, root_id);
 
-  set_current_parameters(new_param);
+  set_parameters(new_param);
 }
 
 template <class Base>
@@ -638,13 +638,13 @@ void RBConstructionBase<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Num
 
 
 template <class Base>
-void RBConstructionBase<Base>::broadcast_current_parameters(unsigned int proc_id)
+void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
 {
   libmesh_assert(proc_id < libMesh::n_processors());
 
-  std::vector<Real> current_parameters = get_current_parameters();
+  std::vector<Real> current_parameters = get_parameters();
   Parallel::broadcast(current_parameters, proc_id);
-  set_current_parameters(current_parameters);
+  set_parameters(current_parameters);
 }
 
 

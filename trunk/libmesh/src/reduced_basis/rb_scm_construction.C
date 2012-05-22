@@ -340,7 +340,7 @@ void RBSCMConstruction::evaluate_stability_constant()
   matrix_A->zero();
   for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_a(); q++)
   {
-    add_scaled_symm_Aq(q, get_rb_theta_expansion().eval_theta_q_a(q,get_current_parameters()));
+    add_scaled_symm_Aq(q, get_rb_theta_expansion().eval_theta_q_a(q,get_parameters()));
   }
 
   set_eigensolver_properties(-1);
@@ -417,7 +417,7 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
   for(unsigned int i=0; i<get_local_n_training_samples(); i++)
   {
     load_training_parameter_locally(first_index+i);
-    rb_scm_eval->set_current_parameters( get_current_parameters() );
+    rb_scm_eval->set_parameters( get_parameters() );
     Real LB = rb_scm_eval->get_SCM_LB();
     Real UB = rb_scm_eval->get_SCM_UB();
 
@@ -445,7 +445,7 @@ void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
 
   load_training_parameter_globally(new_C_J_index);
 
-  rb_scm_eval->C_J.push_back(get_current_parameters());
+  rb_scm_eval->C_J.push_back(get_parameters());
 
   libMesh::out << std::endl << "SCM: Added mu = (";
   for(unsigned int i=0; i<get_n_params(); i++)
