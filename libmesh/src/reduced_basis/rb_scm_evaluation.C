@@ -264,7 +264,7 @@ Real RBSCMEvaluation::get_SCM_LB()
         ja[count] = q+1;
 
         // This can only handle Reals right now
-        ar[count] = libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()) );
+        ar[count] = libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_parameters()) );
       }
   }
 
@@ -276,7 +276,7 @@ Real RBSCMEvaluation::get_SCM_LB()
 
   for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
     {
-      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()) ) );
+      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_parameters()) ) );
     }
 
   // Use this command to initialize the basis for the LP
@@ -337,7 +337,7 @@ Real RBSCMEvaluation::get_SCM_UB()
     Real J_obj = 0.;
     for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
       {
-        J_obj += libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_current_parameters()) )*UB_vector[q];
+        J_obj += libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_parameters()) )*UB_vector[q];
       }
 
     if( (m==0) || (J_obj < min_J_obj) )
@@ -353,17 +353,17 @@ Real RBSCMEvaluation::get_SCM_UB()
 
 void RBSCMEvaluation::set_current_parameters_from_C_J(unsigned int C_J_index)
 {
-  set_current_parameters(C_J[C_J_index]);
+  set_parameters(C_J[C_J_index]);
 }
 
 void RBSCMEvaluation::save_current_parameters()
 {
-  saved_parameters = get_current_parameters();
+  saved_parameters = get_parameters();
 }
 
 void RBSCMEvaluation::reload_current_parameters()
 {
-  set_current_parameters(saved_parameters);
+  set_parameters(saved_parameters);
 }
 
 void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_name)

@@ -217,7 +217,7 @@ int main (int argc, char** argv)
                                   mu_max_vector,
                                   online_mu_vector);
     rb_scm_eval.initialize_parameters(rb_eval);
-    rb_eval.print_current_parameters();
+    rb_eval.print_parameters();
     
     // Read in the reduced basis data
     rb_eval.read_offline_data_from_files();

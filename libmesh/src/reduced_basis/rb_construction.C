@@ -303,7 +303,7 @@ void RBConstruction::print_info()
     libMesh::out <<   "Parameter " << i
                  << ": Min = " << get_parameter_min(i)
                  << ", Max = " << get_parameter_max(i) 
-                 << ", value = " << get_current_parameters()[i] << std::endl;
+                 << ", value = " << get_parameters()[i] << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
@@ -671,7 +671,7 @@ void RBConstruction::truth_assembly()
 {
   START_LOG("truth_assembly()", "RBConstruction");
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   this->matrix->zero();
   this->rhs->zero();
@@ -1059,7 +1059,7 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
     }
 
     libMesh::out << "Performing truth solve at parameter:" << std::endl;
-    print_current_parameters();
+    print_parameters();
 
     // Update the list of Greedily selected parameters
     this->update_greedy_param_list();
@@ -1102,7 +1102,7 @@ bool RBConstruction::greedy_termination_test(Real training_greedy_error, int)
 
 void RBConstruction::update_greedy_param_list()
 {
-  get_rb_evaluation().greedy_param_list.push_back( get_current_parameters() );
+  get_rb_evaluation().greedy_param_list.push_back( get_parameters() );
 }
 
 std::vector<Real> RBConstruction::get_greedy_parameter(unsigned int i)
@@ -1127,7 +1127,7 @@ Real RBConstruction::truth_solve(int plot_solution)
   solution->zero();
   solve();
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   // Make sure we didn't max out the number of iterations
   if( (this->n_linear_iterations() >=
@@ -1275,7 +1275,7 @@ void RBConstruction::update_system()
 
 Real RBConstruction::get_RB_error_bound()
 {
-  get_rb_evaluation().set_current_parameters( get_current_parameters() );
+  get_rb_evaluation().set_parameters( get_parameters() );
 
   Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
 
@@ -1325,7 +1325,7 @@ Real RBConstruction::compute_max_error_bound()
   {
     // Load training parameter i, this is only loaded
     // locally since the RB solves are local.
-    set_current_parameters( get_training_parameter(first_index+i) );
+    set_parameters( get_training_parameter(first_index+i) );
 
     training_error_bounds[i] = get_RB_error_bound();
 
@@ -1344,12 +1344,12 @@ Real RBConstruction::compute_max_error_bound()
   if( (get_first_local_training_index() <= error_pair.first) &&
       (error_pair.first < get_last_local_training_index()) )
   {
-    set_current_parameters( get_training_parameter(error_pair.first) );
+    set_parameters( get_training_parameter(error_pair.first) );
     root_id = libMesh::processor_id();
   }
 
   Parallel::sum(root_id); // root_id is only non-zero on one processor
-  broadcast_current_parameters(root_id);
+  broadcast_parameters(root_id);
 
   STOP_LOG("compute_max_error_bound()", "RBConstruction");
 

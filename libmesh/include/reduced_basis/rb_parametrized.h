@@ -76,12 +76,12 @@ public:
   /**
    * Get the current parameters.
    */
-  std::vector<Real> get_current_parameters() const;
+  std::vector<Real> get_parameters() const;
 
   /**
    * Set the current parameters to \p params
    */
-  void set_current_parameters(const std::vector<Real>& params);
+  void set_parameters(const std::vector<Real>& params);
 
   /**
    * Get minimum allowable value of parameter \p i.
@@ -96,7 +96,7 @@ public:
   /**
    * Print the current parameters.
    */
-  void print_current_parameters();
+  void print_parameters();
 
 private:
 
@@ -115,13 +115,13 @@ private:
   /**
    * Vector storing the current parameters.
    */
-  std::vector<Real> current_parameters;
+  std::vector<Real> parameters;
 
   /**
-   * Vector of parameter ranges.
+   * Vectors that define the ranges (min and max) for the parameters.
    */
-  std::vector<Real> mu_min_vector;
-  std::vector<Real> mu_max_vector;
+  std::vector<Real> parameters_min_vector;
+  std::vector<Real> parameters_max_vector;
 
 };
 

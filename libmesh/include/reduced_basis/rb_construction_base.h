@@ -170,10 +170,10 @@ public:
 				const std::pair<std::string,std::string>& orig);
 
   /**
-   * Broadcasts current_parameters on processor proc_id
+   * Broadcasts parameters on processor proc_id
    * to all processors.
    */
-  void broadcast_current_parameters(unsigned int proc_id);
+  void broadcast_parameters(unsigned int proc_id);
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
