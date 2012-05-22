@@ -412,7 +412,6 @@ Real RBEvaluation::eval_output_dual_norm(unsigned int n, const std::vector<Real>
 
 void RBEvaluation::clear_riesz_representors()
 {
-  START_LOG("clear_riesz_representors()", "RBEvaluation");
 
   // Clear the A_q_representors
   for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
@@ -427,7 +426,6 @@ void RBEvaluation::clear_riesz_representors()
     }
   }
 
-  STOP_LOG("clear_riesz_representors()", "RBEvaluation");
 }
 
 void RBEvaluation::write_offline_data_to_files(const std::string& directory_name)
