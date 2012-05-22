@@ -181,7 +181,7 @@ int main (int argc, char** argv)
     rb_eval.initialize_parameters(mu_min_vector,
                                   mu_max_vector,
                                   online_mu_vector);
-    rb_eval.print_current_parameters();
+    rb_eval.print_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
     rb_eval.rb_solve(online_N);

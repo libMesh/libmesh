@@ -77,7 +77,7 @@ Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int index, const
     libmesh_error();
   }
 
-  return parametrized_functions[index]->evaluate(get_current_parameters(), p);
+  return parametrized_functions[index]->evaluate(get_parameters(), p);
 }
 
 Real RBEIMEvaluation::rb_solve(unsigned int N)

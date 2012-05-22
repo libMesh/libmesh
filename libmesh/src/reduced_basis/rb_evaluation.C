@@ -214,7 +214,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
     libmesh_error();
   }
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   // Resize (and clear) the solution vector
   RB_solution.resize(N);
@@ -302,7 +302,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
   START_LOG("compute_residual_dual_norm()", "RBEvaluation");
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   // Use the stored representor inner product values
   // to evaluate the residual norm
