@@ -270,6 +270,26 @@ public:
    */
   static const processor_id_type invalid_processor_id = static_cast<processor_id_type>(-1);
 
+  /**
+   * If we pack our indices into an buffer for communications, how
+   * many ints do we need?
+   */
+  unsigned int packed_indexing_size() const { return _idx_buf.size() + 1; }
+
+protected:
+  /**
+   * A method for creating our index buffer from packed data -
+   * basically with our current implementation we investigate the size
+   * term and then copy.
+   */
+  void unpack_indexing(std::vector<int>::const_iterator begin);
+
+  /**
+   * A method for creating packed data from our index buffer -
+   * basically a copy with prepended size with our current
+   * implementation.
+   */
+  void pack_indexing(std::back_insert_iterator<std::vector<int> > target) const;
 
 private:
 
