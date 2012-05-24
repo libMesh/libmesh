@@ -148,6 +148,7 @@ public:
       z(0.)
     {}
 
+    explicit
     PackedNode (const Node &node) :
       id(node.id()),
       pid(node.processor_id()),

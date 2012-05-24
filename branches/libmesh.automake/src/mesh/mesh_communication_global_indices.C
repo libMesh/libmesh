@@ -49,7 +49,7 @@ namespace { // anonymous namespace for helper functions
   {
     static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
 
-    const double // put (x,y,z) in [0,1]^3 (don't divide by 0)
+    const long double // put (x,y,z) in [0,1]^3 (don't divide by 0)
       x = ((bbox.first(0) == bbox.second(0)) ? 0. :
 	   (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
 
@@ -67,7 +67,7 @@ namespace { // anonymous namespace for helper functions
       z = 0.;
 #endif
 
-    // (iccords) in [0,max_inttype]^3
+    // (icoords) in [0,max_inttype]^3
     icoords[0] = static_cast<Hilbert::inttype>(x*max_inttype);
     icoords[1] = static_cast<Hilbert::inttype>(y*max_inttype);
     icoords[2] = static_cast<Hilbert::inttype>(z*max_inttype);
@@ -210,6 +210,36 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 			 mesh.local_nodes_end());
       node_keys.resize (nr.size());
       Threads::parallel_for (nr, ComputeHilbertKeys (bbox, node_keys));
+
+#ifndef NDEBUG
+    // It's O(N^2) to check that these keys don't duplicate before the
+    // sort...
+      MeshBase::const_node_iterator nodei = mesh.local_nodes_begin();
+      for (unsigned int i = 0; i != node_keys.size(); ++i, ++nodei)
+        {
+          MeshBase::const_node_iterator nodej = mesh.local_nodes_begin();
+          for (unsigned int j = 0; j != i; ++j, ++nodej)
+            {
+              if (node_keys[i] == node_keys[j])
+                {
+		  std::cerr << "Error: nodes with duplicate Hilbert keys!" <<
+                    std::endl;
+                  CFixBitVec icoords[3], jcoords[3];
+                  get_hilbert_coords(**nodej, bbox, jcoords);
+		  std::cerr <<
+		    "node " << (*nodej)->id() << ", " <<
+		    *(Point*)(*nodej) << " has HilbertIndices " <<
+		    node_keys[j] << std::endl;
+                  get_hilbert_coords(**nodei, bbox, icoords);
+		  std::cerr <<
+		    "node " << (*nodei)->id() << ", " <<
+		    *(Point*)(*nodei) << " has HilbertIndices " <<
+		    node_keys[i] << std::endl;
+                  libmesh_error();
+                }
+            }
+        }
+#endif
     }
 
     // Elements next
@@ -218,6 +248,43 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 			 mesh.local_elements_end());
       elem_keys.resize (er.size());
       Threads::parallel_for (er, ComputeHilbertKeys (bbox, elem_keys));
+
+#ifndef NDEBUG
+    // For elements, the keys can be (and in the case of TRI, are
+    // expected to be) duplicates, but only if the elements are at
+    // different levels
+      MeshBase::const_element_iterator elemi = mesh.local_elements_begin();
+      for (unsigned int i = 0; i != elem_keys.size(); ++i, ++elemi)
+        {
+          MeshBase::const_element_iterator elemj = mesh.local_elements_begin();
+          for (unsigned int j = 0; j != i; ++j, ++elemj)
+            {
+              if ((elem_keys[i] == elem_keys[j]) &&
+                  ((*elemi)->level() == (*elemj)->level()))
+                {
+		  std::cerr <<
+                    "Error: level " << (*elemi)->level() <<
+                    " elements with duplicate Hilbert keys!" <<
+                    std::endl;
+		  std::cerr <<
+		    "level " << (*elemj)->level() << " elem\n" <<
+                    (**elemj) << " centroid " <<
+		    (*elemj)->centroid() << " has HilbertIndices " <<
+		    elem_keys[j] << " or " <<
+		    get_hilbert_index((*elemj)->centroid(), bbox) <<
+                    std::endl;
+		  std::cerr <<
+		    "level " << (*elemi)->level() << " elem\n" <<
+                    (**elemi) << " centroid " <<
+		    (*elemi)->centroid() << " has HilbertIndices " <<
+		    elem_keys[i] << " or " <<
+		    get_hilbert_index((*elemi)->centroid(), bbox) <<
+                    std::endl;
+                  libmesh_error();
+                }
+            }
+        }
+#endif
     }
   } // done computing Hilbert keys
 

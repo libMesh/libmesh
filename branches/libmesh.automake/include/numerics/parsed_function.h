@@ -24,6 +24,7 @@ template <typename Output=Number>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:
+  explicit
   ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
                   const std::vector<Output>* initial_vals=NULL)
     : _expression(expression)

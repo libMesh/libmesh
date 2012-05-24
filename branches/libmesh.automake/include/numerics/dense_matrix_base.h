@@ -52,13 +52,13 @@ protected:
    * Protected so that there is no way the user can create one.
    */
   DenseMatrixBase(const unsigned int m=0,
-		  const unsigned int n=0) : _m(m), _n(n) {};
+		  const unsigned int n=0) : _m(m), _n(n) {}
 
 public:
   /**
    * Destructor. Empty.
    */
-  virtual ~DenseMatrixBase() {};
+  virtual ~DenseMatrixBase() {}
 
   /**
    * Set every element in the matrix to 0.  You must redefine

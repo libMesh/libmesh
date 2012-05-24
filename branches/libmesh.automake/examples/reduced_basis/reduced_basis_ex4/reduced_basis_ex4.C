@@ -166,16 +166,9 @@ int main (int argc, char** argv)
 
     // Get the parameters at which we will do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
-    unsigned int n_parameters = infile("n_parameters",1);
-    std::vector<Real> online_mu_vector(n_parameters);
-    for(unsigned int i=0; i<n_parameters; i++)
-    {
-      online_mu_vector[i] = infile("online_mu", online_mu_vector[i], i);
-    }
-    
-    // compute the RB solution
-    rb_eval.set_current_parameters(online_mu_vector);
-    rb_eval.print_current_parameters();
+    rb_eval.initialize_parameters(main_parameters);
+    eim_rb_eval.initialize_parameters(rb_eval);
+    rb_eval.print_parameters();
     rb_eval.rb_solve(online_N);
 
     // plot the solution, if requested
@@ -194,10 +187,6 @@ int main (int argc, char** argv)
       // read in the data from files
       eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
       rb_eval.read_in_basis_functions(rb_construction,"rb_data");
-
-      // load the EIM approximation for online_mu
-      eim_rb_eval.set_current_parameters(online_mu_vector);
-      eim_rb_eval.rb_solve(eim_rb_eval.get_n_basis_functions());
 
       eim_construction.load_rb_solution();
       rb_construction.load_rb_solution();

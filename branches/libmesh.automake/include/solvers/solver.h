@@ -53,6 +53,7 @@ protected:
    * to be solved. The constructor is protected since
    * it should not be instantiated by users.
    */
+  explicit
   Solver (EquationSystems& es);
 
   /**

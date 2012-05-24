@@ -86,7 +86,7 @@ void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
       _rb_construction.load_training_set( subsampled_training_set );
     }
 
-    _rb_construction.set_current_parameters( this->anchor );
+    _rb_construction.set_parameters( this->anchor );
     _rb_construction.set_training_tolerance(_tree.h_tol);
 
     Real greedy_bound;
@@ -117,7 +117,7 @@ void TransientRBParamSubdomainNode::hp_greedy(bool store_basis_functions)
     // Reload delta_N
     trans_rb.set_delta_N(saved_delta_N);
 
-    trans_rb.set_current_parameters(this->anchor);
+    trans_rb.set_parameters(this->anchor);
     Real RB_error = trans_rb.get_rb_evaluation().rb_solve(trans_rb.get_rb_evaluation().get_n_basis_functions());
     if (RB_error > _tree.h_tol/trans_tree.conserv_factor)
     {
@@ -180,7 +180,7 @@ Real TransientRBParamSubdomainNode::perform_p_stage(Real greedy_bound)
 
     // Clear the reduced basis and reinitialize the greedy to the anchor point
     trans_rb.clear();
-    trans_rb.set_current_parameters( this->anchor );
+    trans_rb.set_parameters( this->anchor );
 
     // Checking if p-tol is already satisfied or Nmax has been reached
     // if not do another (standard) greedy

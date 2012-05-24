@@ -50,6 +50,7 @@ class Edge2 : public Edge
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   Edge2 (Elem* p=NULL) :
     Edge(Edge2::n_nodes(), p, _nodelinks_data) {}
 

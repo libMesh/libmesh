@@ -44,7 +44,8 @@ namespace Parallel {
   class StandardType<Hilbert::HilbertIndices> : public DataType
   {
   public:
-    inline StandardType(const Hilbert::HilbertIndices* =NULL) {
+    explicit
+    StandardType(const Hilbert::HilbertIndices* =NULL) {
       // _static_type never gets freed, but it only gets committed once
       // so it's not a *huge* memory leak...
       static DataType _static_type;

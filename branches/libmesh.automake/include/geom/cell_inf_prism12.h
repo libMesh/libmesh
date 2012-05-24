@@ -70,6 +70,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   InfPrism12  (Elem* p=NULL);
 
   /**

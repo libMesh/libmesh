@@ -268,7 +268,7 @@ nobase_include_HEADERS = \
 		reduced_basis/rb_evaluation.h \
 		reduced_basis/rb_param_subdomain_node.h \
 		reduced_basis/rb_param_subdomain_tree.h \
-		reduced_basis/rb_parametrized_object.h \
+		reduced_basis/rb_parametrized.h \
 		reduced_basis/rb_scm_construction.h \
 		reduced_basis/rb_scm_evaluation.h \
 		reduced_basis/rb_theta.h \

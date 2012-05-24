@@ -45,6 +45,7 @@ class QTrap : public QBase
   /**
    * Constructor.  Declares the dimension of the quadrature rule.
    */
+  explicit
   QTrap (const unsigned int _dim);
 
   /**

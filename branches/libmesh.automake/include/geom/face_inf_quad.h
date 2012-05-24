@@ -66,6 +66,7 @@ public:
   /**
    * Constructor.  Derived classes implement 'true' elements.
    */
+  explicit
   InfQuad (const unsigned int nn,
 	   Elem* p,
            Node** nodelinkdata) :

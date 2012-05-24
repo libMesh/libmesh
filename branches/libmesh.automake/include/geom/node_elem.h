@@ -47,6 +47,7 @@ class NodeElem : public Elem
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   NodeElem (Elem* p=NULL) :
     Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data, _nodelinks_data) {}
 

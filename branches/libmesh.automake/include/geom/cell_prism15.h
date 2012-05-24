@@ -78,6 +78,7 @@ public:
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   Prism15  (Elem* p=NULL);
 
   /**

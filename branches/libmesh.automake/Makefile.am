@@ -382,7 +382,7 @@ libmesh_la_SOURCES = \
 		src/reduced_basis/rb_evaluation.C \
 		src/reduced_basis/rb_param_subdomain_node.C \
 		src/reduced_basis/rb_param_subdomain_tree.C \
-		src/reduced_basis/rb_parametrized_object.C \
+		src/reduced_basis/rb_parametrized.C \
 		src/reduced_basis/rb_scm_construction.C \
 		src/reduced_basis/rb_scm_evaluation.C \
 		src/reduced_basis/rb_theta_expansion.C \

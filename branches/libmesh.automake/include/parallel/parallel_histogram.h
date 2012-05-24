@@ -49,6 +49,7 @@ class Histogram
 public:
 
   // Constructor
+  explicit
   Histogram (const std::vector<KeyType>& d);
 
   // The actual function which sorts the data into

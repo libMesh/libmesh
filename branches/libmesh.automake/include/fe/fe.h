@@ -70,6 +70,7 @@ public:
   /**
    * Constructor.
    */
+  explicit
   FE(const FEType& fet);
 
   /**
@@ -484,6 +485,7 @@ public:
    * Constructor. Creates a hierarchic finite element
    * to be used in dimension \p Dim.
    */
+  explicit
   FEClough(const FEType& fet);
 };
 
@@ -508,6 +510,7 @@ public:
    * Constructor. Creates a hierarchic finite element
    * to be used in dimension \p Dim.
    */
+  explicit
   FEHermite(const FEType& fet);
 
   /**
@@ -542,6 +545,7 @@ public:
    * Constructor. Creates a hierarchic finite element
    * to be used in dimension \p Dim.
    */
+  explicit
   FEHierarchic(const FEType& fet);
 };
 
@@ -566,6 +570,7 @@ public:
    * Constructor. Creates a hierarchic finite element
    * to be used in dimension \p Dim.
    */
+  explicit
   FEL2Hierarchic(const FEType& fet);
 };
 
@@ -590,6 +595,7 @@ public:
    * Constructor. Creates a Lagrange finite element
    * to be used in dimension \p Dim.
    */
+  explicit
   FELagrange(const FEType& fet);
 };
 
@@ -608,6 +614,7 @@ public:
    * Constructor. Creates a discontinuous Lagrange finite element
    * to be used in dimension \p Dim.
    */
+  explicit
   FEL2Lagrange(const FEType& fet);
 };
 
@@ -631,6 +638,7 @@ public:
    * Constructor. Creates a monomial finite element
    * to be used in dimension \p Dim.
    */
+  explicit
   FEMonomial(const FEType& fet);
 };
 
@@ -648,6 +656,7 @@ public:
    * extra DOFs coupled to all other DOFs in
    * the system.
    */
+  explicit
   FEScalar(const FEType& fet);
 };
 
@@ -672,6 +681,7 @@ public:
    * Constructor. Creates a monomial finite element
    * to be used in dimension \p Dim.
    */
+  explicit
   FEXYZ(const FEType& fet);
 
   /**

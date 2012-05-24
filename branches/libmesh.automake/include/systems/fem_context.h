@@ -65,6 +65,7 @@ public:
   /**
    * Constructor.  Allocates some but fills no data structures.
    */
+  explicit
   FEMContext (const System &sys);
 
   /**

@@ -81,6 +81,7 @@ public:
    * Constructor. Requires a reference to the system
    * to be solved.
    */
+  explicit
   EigenTimeSolver (sys_type& s);
 
   /**

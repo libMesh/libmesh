@@ -14,6 +14,7 @@ template <typename Output=Number>
 class ConstFunction : public FunctionBase<Output>
 {
 public:
+  explicit
   ConstFunction (const Output &c) : _c(c) { this->_initialized = true; }
 
   virtual Output operator() (const Point&,

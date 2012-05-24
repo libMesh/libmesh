@@ -69,6 +69,7 @@ public:
    * Constructor.  Takes the \p CentroidSortMethod to use, which
    * defaults to \p X ordering.
    */
+  explicit
   CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
 
   /**

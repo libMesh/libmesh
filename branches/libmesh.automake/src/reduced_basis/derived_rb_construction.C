@@ -62,7 +62,7 @@ void DerivedRBConstruction<Base>::set_uber_current_parameters()
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
 
-  uber_system.set_current_parameters( Base::get_current_parameters() );
+  uber_system.set_parameters( Base::get_parameters() );
 }
 
 template <class Base>

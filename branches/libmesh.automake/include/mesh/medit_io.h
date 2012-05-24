@@ -56,6 +56,7 @@ class MEDITIO : public MeshOutput<MeshBase>
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
+  explicit
   MEDITIO (const MeshBase&);
 
   /**

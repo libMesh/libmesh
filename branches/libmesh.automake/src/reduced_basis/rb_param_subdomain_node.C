@@ -111,7 +111,7 @@ void RBParamSubdomainNode::hp_greedy(bool store_basis_functions)
       _rb_construction.load_training_set( subsampled_training_set );
     }
 
-    _rb_construction.set_current_parameters( this->anchor );
+    _rb_construction.set_parameters( this->anchor );
     _rb_construction.set_training_tolerance(_tree.h_tol);
 
     // Save _rb_construction's Nmax and set Nmax to N_bar

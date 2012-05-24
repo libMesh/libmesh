@@ -70,6 +70,7 @@ public:
    * must be initialized with an EquationSystems
    * object.
    */
+  explicit
   ExactSolution (const EquationSystems& es);
 
   /**

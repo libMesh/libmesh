@@ -100,6 +100,7 @@ public:
      * Constructor.  Does not take a copy of the \p list, so make sure
      * that the \p list does not go out of scope before \p *this does.
      */
+    explicit
     SubdomainSelectionByList (const std::set<subdomain_id_type>& list);
 
     /**

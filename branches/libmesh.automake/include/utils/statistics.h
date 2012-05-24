@@ -79,6 +79,7 @@ class StatisticsVector : public std::vector<T>
   /**
    * Call the std::vector constructor.
    */
+  explicit
   StatisticsVector(unsigned int i=0) : std::vector<T> (i) {}
 
   /**

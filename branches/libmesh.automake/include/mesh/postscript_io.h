@@ -53,6 +53,7 @@ class PostscriptIO : public MeshOutput<MeshBase>
   /**
    * Constructor.
    */
+  explicit
   PostscriptIO (const MeshBase& mesh);
 
   /**

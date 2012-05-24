@@ -49,6 +49,7 @@ public:
   /**
    * Constructor. Requires a reference to a system to be solved.
    */
+  explicit
   Nonlinear (EquationSystems& es);
 
   /**

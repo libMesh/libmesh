@@ -106,8 +106,6 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   training_parameters_random_seed = infile("training_parameters_random_seed",
 					   training_parameters_random_seed);
 
-  set_n_params( n_parameters );
-
   // SCM Greedy termination tolerance
   const Real SCM_training_tolerance_in = infile("SCM_training_tolerance", SCM_training_tolerance);
   set_SCM_training_tolerance(SCM_training_tolerance_in);
@@ -127,6 +125,9 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
     // int... this implies log_scaling = '1 1 1...' in the input file.
     log_scaling[i] = static_cast<bool>(infile("SCM_log_scaling", static_cast<int>(log_scaling[i]), i));
   }
+
+  // Initialize the parameter ranges and set the parameters to mu_min_vector
+  initialize_parameters(mu_min_vector, mu_max_vector, mu_min_vector);
 
   // Make sure this generates training parameters properly!
   initialize_training_parameters(mu_min_vector,
@@ -201,6 +202,9 @@ void RBSCMConstruction::load_matrix_B()
 void RBSCMConstruction::perform_SCM_greedy()
 {
   START_LOG("perform_SCM_greedy()", "RBSCMConstruction");
+
+  // initialize rb_scm_eval's parameters
+  rb_scm_eval->initialize_parameters(*this);
 
   // Get a list of constrained dofs from rb_system
   std::set<unsigned int> constrained_dofs_set;
@@ -336,7 +340,7 @@ void RBSCMConstruction::evaluate_stability_constant()
   matrix_A->zero();
   for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_a(); q++)
   {
-    add_scaled_symm_Aq(q, get_rb_theta_expansion().eval_theta_q_a(q,get_current_parameters()));
+    add_scaled_symm_Aq(q, get_rb_theta_expansion().eval_theta_q_a(q,get_parameters()));
   }
 
   set_eigensolver_properties(-1);
@@ -413,7 +417,7 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
   for(unsigned int i=0; i<get_local_n_training_samples(); i++)
   {
     load_training_parameter_locally(first_index+i);
-    rb_scm_eval->set_current_parameters( get_current_parameters() );
+    rb_scm_eval->set_parameters( get_parameters() );
     Real LB = rb_scm_eval->get_SCM_LB();
     Real UB = rb_scm_eval->get_SCM_UB();
 
@@ -441,7 +445,7 @@ void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
 
   load_training_parameter_globally(new_C_J_index);
 
-  rb_scm_eval->C_J.push_back(get_current_parameters());
+  rb_scm_eval->C_J.push_back(get_parameters());
 
   libMesh::out << std::endl << "SCM: Added mu = (";
   for(unsigned int i=0; i<get_n_params(); i++)

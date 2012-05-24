@@ -192,14 +192,11 @@ RBThetaExpansion& RBConstruction::get_rb_theta_expansion()
 
 void RBConstruction::process_parameters_file (const std::string& parameters_filename)
 {
-  // First read in data from parameters_filename
+  // First read in data from input_filename
   GetPot infile(parameters_filename);
 
-  const unsigned int n_parameters = infile("n_parameters",1);
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
-
-  set_n_params( n_parameters );
 
   // String which selects an alternate pc/solver combo for the update_residual_terms solves.
   // Possible values are:
@@ -251,33 +248,22 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
                                             training_tolerance);
   set_training_tolerance(training_tolerance_in);
 
+  // Initialize the parameter ranges and the parameters themselves
+  initialize_parameters(parameters_filename);
 
-  std::vector<Real> mu_min_in(n_parameters);
-  std::vector<Real> mu_max_in(n_parameters);
-  std::vector<bool> log_scaling(n_parameters);
-  for(unsigned int i=0; i<n_parameters; i++)
+  std::vector<bool> log_scaling(get_n_params());
+  for(unsigned int i=0; i<get_n_params(); i++)
   {
-    // Read vector-based mu_min values.
-    mu_min_in[i] = infile("mu_min", mu_min_in[i], i);
-
-    // Read vector-based mu_max values.
-    mu_max_in[i] = infile("mu_max", mu_max_in[i], i);
-
     // Read vector-based log scaling values.  Note the intermediate conversion to
     // int... this implies log_scaling = '1 1 1...' in the input file.
     log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
   }
 
-  initialize_training_parameters(mu_min_in,
-                                 mu_max_in,
+  initialize_training_parameters(this->get_parameters_min_vector(),
+                                 this->get_parameters_max_vector(),
                                  n_training_samples,
                                  log_scaling,
                                  deterministic_training);   // use deterministic parameters
-
-
-
-  // Set the initial parameter value to the minimum parameters
-  set_current_parameters(mu_min_vector);
 }
 
 void RBConstruction::print_info()
@@ -306,7 +292,8 @@ void RBConstruction::print_info()
   {
     libMesh::out <<   "Parameter " << i
                  << ": Min = " << get_parameter_min(i)
-                 << ", Max = " << get_parameter_max(i) << std::endl;
+                 << ", Max = " << get_parameter_max(i) 
+                 << ", value = " << get_parameters()[i] << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
@@ -314,8 +301,6 @@ void RBConstruction::print_info()
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
-  libMesh::out << "parameter initialized to: " << std::endl;
-  print_current_parameters();
 }
 
 void RBConstruction::set_rb_assembly_expansion(RBAssemblyExpansion& rb_assembly_expansion_in)
@@ -676,7 +661,7 @@ void RBConstruction::truth_assembly()
 {
   START_LOG("truth_assembly()", "RBConstruction");
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   this->matrix->zero();
   this->rhs->zero();
@@ -996,6 +981,9 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
   START_LOG("train_reduced_basis()", "RBConstruction");
 
   int count = 0;
+  
+  // initialize rb_eval's parameters
+  get_rb_evaluation().initialize_parameters(*this);
 
   // possibly resize data structures according to Nmax
   if(resize_rb_eval_data)
@@ -1061,7 +1049,7 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
     }
 
     libMesh::out << "Performing truth solve at parameter:" << std::endl;
-    print_current_parameters();
+    print_parameters();
 
     // Update the list of Greedily selected parameters
     this->update_greedy_param_list();
@@ -1104,7 +1092,7 @@ bool RBConstruction::greedy_termination_test(Real training_greedy_error, int)
 
 void RBConstruction::update_greedy_param_list()
 {
-  get_rb_evaluation().greedy_param_list.push_back( get_current_parameters() );
+  get_rb_evaluation().greedy_param_list.push_back( get_parameters() );
 }
 
 std::vector<Real> RBConstruction::get_greedy_parameter(unsigned int i)
@@ -1129,7 +1117,7 @@ Real RBConstruction::truth_solve(int plot_solution)
   solution->zero();
   solve();
 
-  const std::vector<Real> mu = get_current_parameters();
+  const std::vector<Real> mu = get_parameters();
 
   // Make sure we didn't max out the number of iterations
   if( (this->n_linear_iterations() >=
@@ -1277,7 +1265,7 @@ void RBConstruction::update_system()
 
 Real RBConstruction::get_RB_error_bound()
 {
-  get_rb_evaluation().set_current_parameters( get_current_parameters() );
+  get_rb_evaluation().set_parameters( get_parameters() );
 
   Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
 
@@ -1327,7 +1315,7 @@ Real RBConstruction::compute_max_error_bound()
   {
     // Load training parameter i, this is only loaded
     // locally since the RB solves are local.
-    set_current_parameters( get_training_parameter(first_index+i) );
+    set_parameters( get_training_parameter(first_index+i) );
 
     training_error_bounds[i] = get_RB_error_bound();
 
@@ -1346,12 +1334,12 @@ Real RBConstruction::compute_max_error_bound()
   if( (get_first_local_training_index() <= error_pair.first) &&
       (error_pair.first < get_last_local_training_index()) )
   {
-    set_current_parameters( get_training_parameter(error_pair.first) );
+    set_parameters( get_training_parameter(error_pair.first) );
     root_id = libMesh::processor_id();
   }
 
   Parallel::sum(root_id); // root_id is only non-zero on one processor
-  broadcast_current_parameters(root_id);
+  broadcast_parameters(root_id);
 
   STOP_LOG("compute_max_error_bound()", "RBConstruction");
 

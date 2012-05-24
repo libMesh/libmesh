@@ -67,7 +67,7 @@ public:
   /**
    * Destructor.  Empty.
    */
-  virtual ~DenseSubMatrix() {};
+  virtual ~DenseSubMatrix() {}
 
 
   /**

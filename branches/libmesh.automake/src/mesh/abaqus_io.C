@@ -17,6 +17,7 @@
 
 // C++ includes
 #include <string>
+#include <cstdlib> // std::strtol
 
 // Local includes
 #include "abaqus_io.h"
@@ -168,8 +169,7 @@ namespace libMesh
   AbaqusIO::AbaqusIO (MeshBase& mesh) :
     MeshInput<MeshBase> (mesh),
     build_sidesets_from_nodesets(false),
-    _already_seen_part(false),
-    _max_csv_per_line(16)
+    _already_seen_part(false)
   {
   }
 
@@ -291,6 +291,9 @@ namespace libMesh
 		    libmesh_error();
 		  }
 
+		// Debugging
+		// libMesh::out << "Processing ELSET: " << elset_name << std::endl;
+
 		// Process any lines of comments that may be present
 		this->process_and_discard_comments();
 
@@ -323,7 +326,6 @@ namespace libMesh
 		// libMesh::out << "Read " << _sideset_ids[sideset_name].size() << " sides in " << sideset_name << std::endl;
 	      }
 
-
 	    continue;
 	  } // if (_in)
 
@@ -333,7 +335,8 @@ namespace libMesh
 	  break;
 
 	// If !in and !in.eof(), stream is in a bad state!
-	libMesh::err << "Stream is bad!" << std::endl;
+	libMesh::err << "Stream is bad!\n";
+	libMesh::err << "Perhaps the file: " << fname << " does not exist?" << std::endl;
 	libmesh_error();
       } // while
 
@@ -395,6 +398,13 @@ namespace libMesh
     // Get a reference to the mesh we are reading
     MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
+    // Debugging: print node count
+    // libMesh::out << "Before read_nodes(), mesh contains "
+    // 		 << mesh.n_elem()
+    // 		 << " elements, and "
+    // 		 << mesh.n_nodes()
+    // 		 << " nodes." << std::endl;
+
     // In the input file I have, Abaqus neither tells what
     // the mesh dimension is nor how many nodes it has...
 
@@ -404,29 +414,33 @@ namespace libMesh
     // The z-coordinate will only be present for 3D meshes
 
     // Temporary variables for parsing lines of text
-    unsigned node_id=0;
+    unsigned abaqus_node_id=0;
     Real x=0, y=0, z=0;
     char c;
     std::string dummy;
+
+    // Defines the sequential node numbering used by libmesh
+    unsigned libmesh_node_id = 0;
 
     // We will read nodes until the next line begins with *, since that will be the
     // next section.
     // TODO: Is Abaqus guaranteed to start the line with '*' or can there be leading white space?
     while (_in.peek() != '*' && _in.peek() != EOF)
       {
-	node_id=0;
+	// Re-Initialize variables to be read in from file
+	abaqus_node_id=0;
 	x = y = z = 0.;
 
 	// Note: we assume *at least* 2D points here, should we worry about
 	// trying to read 1D Abaqus meshes?
-	_in >> node_id >> c >> x >> c >> y;
+	_in >> abaqus_node_id >> c >> x >> c >> y;
 
 	// Peek at the next character.  If it is a comma, then there is another
 	// value to read!
 	if (_in.peek() == ',')
 	  _in >> c >> z;
 
-	// Print what we just read in.
+	// Debugging: Print what we just read in.
 	// libMesh::out << "node_id=" << node_id
 	// 	     << ", x=" << x
 	// 	     << ", y=" << y
@@ -438,11 +452,24 @@ namespace libMesh
 	// loop doesn't read the newline character, for example.
 	std::getline(_in, dummy);
 
-	// Add the point to the mesh using the Abaqus numbering.
-	// Note that the Abaqus node IDs are not in general in order
-	// in the input file!
-	mesh.add_point(Point(x,y,z), node_id);
+	// Set up the abaqus -> libmesh node mapping.  This is usually just the
+	// "off-by-one" map.
+	_abaqus_to_libmesh_node_mapping[abaqus_node_id] = libmesh_node_id;
+
+	// Add the point to the mesh using libmesh's numbering,
+	// and post-increment the libmesh node counter.
+	mesh.add_point(Point(x,y,z), libmesh_node_id++);
       } // while
+
+    // Debugging: print node count.  Note: in serial mesh, this count may
+    // be off by one, since Abaqus uses one-based numbering, and libmesh
+    // just reports the length of its _nodes vector for the number of nodes.
+    // libMesh::out << "After read_nodes(), mesh contains "
+    //              << mesh.n_elem()
+    //              << " elements, and "
+    //              << mesh.n_nodes()
+    //              << " nodes." << std::endl;
+
   } // read_nodes()
 
 
@@ -533,7 +560,10 @@ namespace libMesh
     // created one with an uninitialized struct.  Check for that here...
     if (eledef.abaqus_zero_based_node_id_to_libmesh_node_id.size() == 0)
       {
-	libMesh::err << "No Abaqus->LibMesh mapping information for ElemType " << Utility::enum_to_string(elem_type) << "!" << std::endl;
+	// libMesh::err << "No Abaqus->LibMesh mapping information for ElemType "
+	// 	     << Utility::enum_to_string(elem_type)
+	// 	     << "!"
+	// 	     << std::endl;
 	libmesh_error();
       }
 
@@ -547,6 +577,8 @@ namespace libMesh
 	unsigned abaqus_elem_id = 0;
 	char c;
 	_in >> abaqus_elem_id >> c;
+
+	// Debugging:
 	// libMesh::out << "Reading data for element " << abaqus_elem_id << std::endl;
 
 	// Add an element of the appropriate type to the Mesh.
@@ -559,77 +591,66 @@ namespace libMesh
 	// The count of the total number of IDs read for the current element.
 	unsigned id_count=0;
 
-	// The count of IDs read from the current line.  This must always be
-	// less than or equatl to _max_csv_per_line!  This is initialized to
-	// 1 since we have already read the elem_id on this line...
-	unsigned current_line_id_count=1;
-
-	// Read all the node IDs for this element, which may be spread across > 1 line.
-	// 1.) 9999
-	// 2.) 9999, 9999
-	// 3.) 9999, 9999, 9999,
-	while (true)
+	// Continue reading line-by-line until we have read enough nodes for this element
+	while (id_count < n_nodes_per_elem)
 	  {
-	    // Read in the value from file
-	    unsigned node_id = 0;
-	    _in >> node_id;
+	    // Read entire line (up to carriage return) of comma-separated values
+	    std::string csv_line;
+	    std::getline(_in, csv_line);
 
-	    // Grab the node pointer from the mesh for this ID
-	    Node* node = mesh.node_ptr(node_id);
+	    // Create a stream object out of the current line
+	    std::stringstream line_stream(csv_line);
 
-	    // If node_ptr() returns NULL, it may mean we have not yet read the
-	    // *Nodes section, though I assumed that always came before the *Elements section...
-	    if (node == NULL)
+	    // Process the comma-separated values
+	    std::string cell;
+	    while (std::getline(line_stream, cell, ','))
 	      {
-		libMesh::err << "Error!  Mesh returned NULL Node pointer.\n";
-		libMesh::err << "Either no node exists with ID " << node_id
-			     << " or perhaps this input file has *Elements defined before *Nodes?" << std::endl;
-		libmesh_error();
-	      }
+		// FIXME: factor out this strtol stuff into a utility function.
+		char* endptr;
+		long abaqus_global_node_id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
 
-	    // Note: id_count is the zero-based abaqus node index.  We therefore map
-	    // it to a libmesh local node index using the element definition map
-	    unsigned libmesh_node_id =
-	      eledef.abaqus_zero_based_node_id_to_libmesh_node_id[id_count];
+		if (abaqus_global_node_id!=0 || cell.c_str() != endptr)
+		  {
+		    // Use the global node number mapping to determine the corresponding libmesh global node id
+		    unsigned libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
 
-	    // Set this node pointer within the element.
-	    elem->set_node(libmesh_node_id) = node;
+		    // Grab the node pointer from the mesh for this ID
+		    Node* node = mesh.node_ptr(libmesh_global_node_id);
 
-	    // Increment the count of IDs read for this element
-	    id_count++;
+		    // Debugging:
+		    // libMesh::out << "Assigning global node id: " << abaqus_global_node_id
+		    //              << "(Abaqus), " << node->id() << "(LibMesh)" << std::endl;
 
-	    // Increment the number of values read from the current line
-	    current_line_id_count++;
+		    // If node_ptr() returns NULL, it may mean we have not yet read the
+		    // *Nodes section, though I assumed that always came before the *Elements section...
+		    if (node == NULL)
+		      {
+			libMesh::err << "Error!  Mesh returned NULL Node pointer.\n";
+			libMesh::err << "Either no node exists with ID " << libmesh_global_node_id
+				     << " or perhaps this input file has *Elements defined before *Nodes?" << std::endl;
+			libmesh_error();
+		      }
 
-	    // Check to see if the next character is a comma.  If not, this could be
-	    // the last number on the line.
-	    bool found_comma = (_in.peek() == ',');
+		    // Note: id_count is the zero-based abaqus (elem local) node index.  We therefore map
+		    // it to a libmesh elem local node index using the element definition map
+		    unsigned libmesh_elem_local_node_id =
+		      eledef.abaqus_zero_based_node_id_to_libmesh_node_id[id_count];
 
-	    // Read comma from stream if found.
-	    if (found_comma)
-	      _in >> c;
+		    // Set this node pointer within the element.
+		    elem->set_node(libmesh_elem_local_node_id) = node;
 
-	    // If we didn't read a comma, then this is the last node
-	    // ID to be read, and we need to discard the rest of this
-	    // line and break out of the while!
-	    if (!found_comma)
-	      {
-		std::getline(_in, dummy);
-		break;
-	      }
+		    // Debugging:
+		    // libMesh::out << "Setting elem " << elem->id()
+		    //              << ", local node " << libmesh_elem_local_node_id
+		    //              << " to global node " << node->id() << std::endl;
 
-	    // On the other hand, if we've already read _max_csv_per_line entries from
-	    // this line, it's time to reset the current_line_id_count to zero, extract
-	    // and discard the rest of this line from the file, and then continue with
-	    // the while loop.
-	    if (current_line_id_count == _max_csv_per_line)
-	      {
-		current_line_id_count = 0;
-		std::getline(_in, dummy);
-	      }
-	  } // while
+		    // Increment the count of IDs read for this element
+		    id_count++;
+		  } // end if strtol success
+	      } // end while getline(',')
+	  } // end while (id_count)
 
-	// Ensure that we read as many nodes as we were expecting to.
+	// Ensure that we read *exactly* as many nodes as we were expecting to, no more.
 	if (id_count != n_nodes_per_elem)
 	  {
 	    libMesh::err << "Error: Needed to read "
@@ -648,8 +669,7 @@ namespace libMesh
 	    // libMesh::out << "Adding Elem " << abaqus_elem_id << " to Elmset " << elset_name << std::endl;
 	    _elemset_ids[elset_name].push_back(abaqus_elem_id);
 	  }
-
-      } // while
+      } // end while (peek)
   } // read_elements()
 
 
@@ -688,50 +708,47 @@ namespace libMesh
 
   void AbaqusIO::read_ids(std::string set_name, container_t& container)
   {
+    // Debugging
+    // libMesh::out << "Reading ids for set: " << set_name << std::endl;
+
     // Grab a reference to a vector that will hold all the IDs
     std::vector<unsigned>& id_storage = container[set_name];
 
     // Read until the start of another section is detected, or EOF is encountered
     while (_in.peek() != '*' && _in.peek() != EOF)
       {
-	unsigned id=0;
-	char c;
-	unsigned id_count=0;
-	std::string dummy;
+	// Read entire comma-separated line into a string
+	std::string csv_line;
+	std::getline(_in, csv_line);
 
-	// Read a single line of IDs.  There are 3 possibilities to handle:
-	// 1.) 9999
-	// 2.) 9999, 9999
-	// 3.) 9999, 9999, 9999,
-	while (true)
+	// On that line, use std::getline again to parse each
+	// comma-separated entry.
+	std::string cell;
+	std::stringstream line_stream(csv_line);
+	while (std::getline(line_stream, cell, ','))
 	  {
-	    // Read in the actual value, store in array
-	    _in >> id;
-	    id_storage.push_back(id);
+	    // If no conversion can be performed by strtol, 0 is returned.
+	    //
+	    // If endptr is not NULL, strtol() stores the address of the
+	    // first invalid character in *endptr.  If there were no
+	    // digits at all, however, strtol() stores the original
+	    // value of str in *endptr.
+	    char* endptr;
+	    long id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
 
-	    // Increment the count of IDs read
-	    id_count++;
-
-	    // Check to see if the next character is a comma.  If not, this could be
-	    // the last number on the line.
-	    bool found_comma = (_in.peek() == ',');
-
-	    // Read comma from stream if found.
-	    if (found_comma)
-	      _in >> c;
-
-	    // If we didn't read a comma or we have
-	    // already read max_id_count values, read any
-	    // remaining whitespace and the newline
-	    // character, and then break out of this while
-	    // loop
-	    if (!found_comma || id_count == _max_csv_per_line)
+	    // Note that lists of comma-separated values in abaqus also
+	    // *end* with a comma, so the last call to getline on a given
+	    // line will get an empty string, which we must detect.
+	    if (id!=0 || cell.c_str() != endptr)
 	      {
-		std::getline(_in, dummy);
-		break;
+		// Debugging
+		// libMesh::out << "Read id: " << id << std::endl;
+
+		// 'cell' is now a string with an integer id in it
+		id_storage.push_back( id );
 	      }
-	  } // while
-      } // while
+	  }
+      }
 
     // Status message
     // libMesh::out << "Read " << id_storage.size() << " ID(s) for the set " << set_name << std::endl;
@@ -848,8 +865,11 @@ namespace libMesh
 
 	for (unsigned i=0; i<nodeset_ids.size(); ++i)
 	  {
+	    // Map the Abaqus global node ID to the libmesh node ID
+	    unsigned libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[nodeset_ids[i]];
+
 	    // Get node pointer from the mesh
-	    Node* node = mesh.node_ptr(nodeset_ids[i]);
+	    Node* node = mesh.node_ptr(libmesh_global_node_id);
 
 	    if (node == NULL)
 	      {
@@ -858,7 +878,7 @@ namespace libMesh
 	      }
 
 	    // Add this node with the current_id (which is determined by the
-	    // alphabetical ordering of the map)
+	    // alphabetical ordering of the map) to the BoundaryInfo object
 	    mesh.boundary_info->add_node(node, current_id);
 	  }
       }

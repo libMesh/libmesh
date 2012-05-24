@@ -62,6 +62,7 @@ namespace Threads
    */
   class BoolAcquire {
   public:
+    explicit
     BoolAcquire(bool& b) : _b(b) { libmesh_assert(!_b); _b = true; }
 
     ~BoolAcquire() { libmesh_assert(_b); _b = false; }
@@ -251,9 +252,9 @@ namespace Threads
   {
   public:
     static const int automatic = -1;
-    task_scheduler_init (int = automatic) {};
-    void initialize (int = automatic) {};
-    void terminate () {};
+    explicit task_scheduler_init (int = automatic) {}
+    void initialize (int = automatic) {}
+    void terminate () {}
   };
 
   //-------------------------------------------------------------------
@@ -331,7 +332,7 @@ namespace Threads
     {
     public:
       scoped_lock () {}
-      scoped_lock ( spin_mutex&  ) {}
+      explicit scoped_lock ( spin_mutex&  ) {}
       void acquire ( spin_mutex& ) {}
       void release () {}
     };
@@ -351,7 +352,7 @@ namespace Threads
     {
     public:
       scoped_lock () {}
-      scoped_lock ( recursive_mutex&  ) {}
+      explicit scoped_lock ( recursive_mutex&  ) {}
       void acquire ( recursive_mutex& ) {}
       void release () {}
     };
@@ -394,7 +395,7 @@ namespace Threads
      * smallest chunk the range may be broken into for parallel
      * execution.
      */
-    BlockedRange (const unsigned int grainsize = 1000) :
+    explicit BlockedRange (const unsigned int grainsize = 1000) :
       _grainsize(grainsize)
     {}
 

@@ -164,17 +164,9 @@ int main (int argc, char** argv)
     // Read in the reduced basis data
     rb_eval.read_offline_data_from_files();
     
-    // Get the parameters at which we do a reduced basis solve
-    unsigned int n_parameters = infile("n_parameters",1);
-    std::vector<Real> online_mu_vector(n_parameters);
-    for(unsigned int i=0; i<n_parameters; i++)
-    {
-      online_mu_vector[i] = infile("online_mu", online_mu_vector[i], i);
-    }
-
-    // Set the parameters to online_mu_vector
-    rb_eval.set_current_parameters(online_mu_vector);
-    rb_eval.print_current_parameters();
+    // Iinitialize online parameters
+    rb_eval.initialize_parameters(parameters_filename);
+    rb_eval.print_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
     rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
@@ -193,7 +185,8 @@ int main (int argc, char** argv)
       // Plot the solution
       rb_con.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-      scale_mesh_and_plot(equation_systems, online_mu_vector, "RB_displacement.e");
+      std::vector<Real> rb_eval_params = rb_eval.get_parameters();
+      scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_displacement.e");
 #endif
     }
   }

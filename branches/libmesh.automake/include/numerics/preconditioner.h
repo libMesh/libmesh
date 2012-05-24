@@ -99,7 +99,7 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init () {};
+  virtual void init () {}
 
   /**
    * Sets the matrix P to be preconditioned.

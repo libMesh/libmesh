@@ -83,6 +83,7 @@ public:
   /**
    *  Constructor. Initializes PETSc data structures
    */
+  explicit
   PetscDMNonlinearSolver (sys_type& system);
 
   /**

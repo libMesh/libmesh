@@ -58,6 +58,7 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    * GnuPlotIO::PlottingProperties enumerations,
    * e.g. GnuPlotIO::GRID_ON | GnuPlotIO::PNG_OUTPUT
    */
+  explicit
   GnuPlotIO (const MeshBase&,
 	     const std::string& = std::string("FE 1D Solution"),
              int properties=0);

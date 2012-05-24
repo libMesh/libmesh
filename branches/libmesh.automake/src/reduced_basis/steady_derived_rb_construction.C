@@ -59,7 +59,7 @@ Real DerivedRBConstruction<RBConstruction>::truth_solve(int plot_solution)
 
   set_uber_current_parameters();
 
-  uber_system.get_rb_evaluation().set_current_parameters(uber_system.get_current_parameters());
+  uber_system.get_rb_evaluation().set_parameters(uber_system.get_parameters());
   uber_system.get_rb_evaluation().rb_solve(uber_system.get_rb_evaluation().get_n_basis_functions());
 
   if(plot_solution > 0)

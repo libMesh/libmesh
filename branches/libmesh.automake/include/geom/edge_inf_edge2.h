@@ -59,6 +59,7 @@ class InfEdge2 : public Edge
   /**
    * Constructor.  By default this element has no parent.
    */
+  explicit
   InfEdge2 (Elem* p=NULL) :
     Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
 

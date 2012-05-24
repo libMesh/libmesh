@@ -319,7 +319,7 @@ public:
   virtual void recompute_all_residual_terms(const bool compute_inner_products=true);
 
   /**
-   * Read in the parameters from file specified by \p parameters_filename
+   * Read in from the file specified by \p parameters_filename
    * and set the this system's member variables accordingly.
    */
   virtual void process_parameters_file(const std::string& parameters_filename);

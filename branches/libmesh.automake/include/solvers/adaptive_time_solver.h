@@ -60,6 +60,7 @@ public:
    * Constructor. Requires a reference to the system
    * to be solved.
    */
+  explicit
   AdaptiveTimeSolver (sys_type& s);
 
   /**
