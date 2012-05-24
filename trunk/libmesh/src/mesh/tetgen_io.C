@@ -233,8 +233,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
 	}
       elem->set_id(i);
 
-      // Since we know the ID, it's more correct to call insert_elem() here than add_elem()
-      mesh.insert_elem (elem);
+      mesh.add_elem (elem);
 
       libmesh_assert (elem != NULL);
       libmesh_assert (elem->n_nodes() == n_nodes);
