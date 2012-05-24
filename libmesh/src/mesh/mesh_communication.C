@@ -18,6 +18,7 @@
 
 
 // C++ Includes   -----------------------------------
+#include <numeric>
 
 // Local Includes -----------------------------------
 #include "boundary_info.h"
@@ -638,7 +639,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	      }
 
 	    // properly position cnt for the next element
-	    cnt += Elem::PackedElem::header_size + packed_elem.n_nodes();
+	    cnt += packed_elem.packed_size();
 	    current_elem++;
 	  }
 	libmesh_assert (current_elem == n_elem_received);
@@ -1268,7 +1269,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 		}
 
 	      // properly position cnt for the next element
-	      cnt += Elem::PackedElem::header_size + packed_elem.n_nodes();
+	      cnt += packed_elem.packed_size();
 	    } // done adding elements
 
 	  // add any element bcs
@@ -1409,13 +1410,22 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
   // Explicitly clear the mesh on all but processor 0.
   if (libMesh::processor_id() != 0)
     mesh.clear();
-
+  
   // Get important sizes
   unsigned int n_nodes      = mesh.n_nodes();
   unsigned int n_elem       = mesh.n_elem();
-  unsigned int n_levels     = MeshTools::n_levels(mesh);
-  unsigned int total_weight = MeshTools::total_weight(mesh);
   unsigned int dimension    = mesh.mesh_dimension();
+
+  unsigned int total_weight = 0,
+               n_levels = 0;
+  MeshBase::const_element_iterator       it     = mesh.elements_begin();
+  const MeshBase::const_element_iterator it_end = mesh.elements_end();
+  for (; it != it_end; ++it)
+    {
+      const Elem *elem = *it;
+      total_weight   += elem->n_nodes() + elem->packed_indexing_size();
+      n_levels = std::max(n_levels, elem->level()+1);
+    }
 
   // Broadcast the sizes
   {
@@ -1507,7 +1517,8 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
     // Pack all this information into one communication to avoid two latency hits
     // For each element it is of the form
     // [ level p_level r_flag p_flag etype subdomain_id
-    //   self_ID parent_ID which_child node_0 node_1 ... node_n]
+    //   self_ID parent_ID which_child node_0 node_1 ... node_n
+    //   dofobject_indices_buffer ]
     // We cannot use unsigned int because parent_ID can be negative
     std::vector<int> conn;
 
@@ -1616,7 +1627,7 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
             // children to be added later
             parents.insert(std::make_pair(elem->id(),elem));
 
-	    cnt += Elem::PackedElem::header_size + packed_elem.n_nodes();
+	    cnt += packed_elem.packed_size();
 	  } // end while cnt < conn.size
 
         // Iterate in ascending elem ID order
@@ -1868,6 +1879,10 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
       global_n_elem  += n_elem[p];
     }
 
+#ifndef NDEBUG
+  // Do as much error checking as we can, if appropriate
+  const unsigned int n_p_levels = MeshTools::n_p_levels(mesh);
+#endif
 
 
   //-------------------------------------------------
@@ -1931,11 +1946,19 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
   //----------------------------------------------------
   // Gather the element connectivity from each processor.
   {
-    // Get the sum of elem->n_nodes() for all local elements.  This
-    // will allow for efficient preallocation.
-    const unsigned int
-      local_weight   = MeshTools::weight(mesh),
-      local_n_levels = MeshTools::n_local_levels(mesh);
+    // Get the sum of elem->n_nodes() plus packed indexing size for
+    // all local elements.  This will allow for efficient
+    // preallocation.
+    unsigned int local_weight = 0,
+                 local_n_levels = 0;
+    MeshBase::const_element_iterator       it     = mesh.local_elements_begin();
+    const MeshBase::const_element_iterator it_end = mesh.local_elements_end();
+    for (; it != it_end; ++it)
+      {
+        const Elem *elem = *it;
+        local_weight   += elem->n_nodes() + elem->packed_indexing_size();
+        local_n_levels = std::max(local_n_levels, elem->level()+1);
+      }
 
     unsigned int global_n_levels = local_n_levels;
     Parallel::max (global_n_levels);
@@ -1982,7 +2005,11 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     // Get the element connectivity from all the other processors
     Parallel::allgather (conn);
 
-
+#ifndef NDEBUG
+    const unsigned int total_conn_size =
+      std::accumulate(conn_size.begin(), conn_size.end(), 0);
+    libmesh_assert(conn.size() == total_conn_size);
+#endif
 
     // ...and add them to our mesh.
     // This is a little tricky.  We need to insure that parents are added before children.
@@ -1990,7 +2017,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     // processor [0] has a parent on processor [1].  But we also need to add the elements
     // processor-wise so that we can set the processor_id() properly.
     // So, loop on levels/processors
-    for (unsigned int level=0; level<=global_n_levels; level++)
+    for (unsigned int level=0; level!=global_n_levels; level++)
       for (unsigned int p=0; p<libMesh::n_processors(); p++)
 	if (p != libMesh::processor_id()) // We've already got our
           {                               // own local elements!
@@ -2011,6 +2038,13 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		// Unpack the element
 		Elem::PackedElem packed_elem (conn.begin()+cnt);
 
+ 		// Sanity check that this element really came from p
+                libmesh_assert(packed_elem.processor_id() == p);
+
+ 		// A bad level would also indicate a corrupted buffer
+                libmesh_assert(packed_elem.level() < global_n_levels);
+                libmesh_assert(packed_elem.p_level() < n_p_levels);
+
  		// We require contiguous numbering on each processor
  		// for elements.
  		libmesh_assert (packed_elem.id() >= first_global_idx);
@@ -2021,7 +2055,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
 		// Ignore elements not matching the current level.
 		if (packed_elem.level() > level) // skip all entries in the conn array for this element.
-		  cnt += Elem::PackedElem::header_size + packed_elem.n_nodes();
+		  cnt += packed_elem.packed_size();
 
                 else
 #endif
@@ -2049,7 +2083,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 		    libmesh_assert (elem->id()                == packed_elem.id());
 		    libmesh_assert (elem->n_nodes()           == packed_elem.n_nodes());
 
-		    cnt += Elem::PackedElem::header_size + packed_elem.n_nodes();
+		    cnt += packed_elem.packed_size();
 		  }
 		// Those are the easy cases...
 		// now elem_level == level and we don't have it
@@ -2090,7 +2124,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
 		    libmesh_assert (elem->n_nodes() == packed_elem.n_nodes());
 
-		    cnt += Elem::PackedElem::header_size + packed_elem.n_nodes();
+		    cnt += packed_elem.packed_size();
 
 		  } // end elem_level == level
 	      }
