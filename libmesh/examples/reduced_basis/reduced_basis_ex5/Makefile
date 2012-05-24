@@ -52,14 +52,14 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
+	@echo "* Running " $(LIBMESH_RUN) $(target) -ksp_type cg -online_mode ? #$(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
 	@$(LIBMESH_RUN) $(target) -ksp_type cg -online_mode 0 #$(LIBMESH_OPTIONS)
 	@$(LIBMESH_RUN) $(target) -online_mode 1  $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
+	@echo "* Done Running " $(LIBMESH_RUN) $(target) -ksp_type cg -online_mode ? #$(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 
