@@ -1097,6 +1097,7 @@ public:
    */
   class PackedElem;
 
+  unsigned int packed_size() const;
 
  protected:
 
@@ -2077,7 +2078,7 @@ public:
    */
   static const unsigned int header_size; /* = 10 with AMR, 4 without */
 
-  unsigned int packed_size()
+  unsigned int packed_size() const
   {
     return this->header_size + this->n_nodes() + *this->indices() + 1;
   }
@@ -2152,7 +2153,8 @@ public:
   unsigned int processor_id () const
   {
     libmesh_assert(*(_buf_begin+5) >= 0);
-    libmesh_assert(*(_buf_begin+5) < libMesh::n_processors() ||
+    libmesh_assert(static_cast<unsigned int>(*(_buf_begin+5)) <
+                   libMesh::n_processors() ||
                    *(_buf_begin+5) == DofObject::invalid_processor_id);
     return static_cast<unsigned int>(*(_buf_begin+5));
   }
@@ -2210,7 +2212,6 @@ public:
     return _buf_begin+header_size+this->n_nodes();
   }
 }; // end class PackedElem
-
 
 /**
  * The definition of the protected nested SideIter class.
@@ -2364,6 +2365,14 @@ variant_filter_iterator<Elem::Predicate,
 			    Elem*>(d,e,p) {}
 };
 
+
+inline
+unsigned int
+Elem::packed_size() const
+{
+  return PackedElem::header_size + this->n_nodes() +
+         this->packed_indexing_size();
+}
 
 
 } // namespace libMesh
