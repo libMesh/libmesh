@@ -1423,7 +1423,7 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
   for (; it != it_end; ++it)
     {
       const Elem *elem = *it;
-      total_weight   += elem->n_nodes() + elem->packed_indexing_size();
+      total_weight   += elem->packed_size();
       n_levels = std::max(n_levels, elem->level()+1);
     }
 
@@ -1526,7 +1526,7 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
     // broadcast it to the other processors.
     if (libMesh::processor_id() == 0)
       {
-	conn.reserve (Elem::PackedElem::header_size*n_elem + total_weight);
+	conn.reserve (total_weight);
 
 	// We start from level 0. This is a bit simpler than in xdr_io.C
 	// because we do not have to worry about economizing by group elements
@@ -1550,10 +1550,10 @@ void MeshCommunication::broadcast_mesh (MeshBase& mesh) const
 	  }
       }
     else
-      conn.resize (Elem::PackedElem::header_size*n_elem + total_weight);
+      conn.resize (total_weight);
 
     // Sanity check for all processors
-    libmesh_assert (conn.size() == (Elem::PackedElem::header_size*n_elem + total_weight));
+    libmesh_assert (conn.size() == (total_weight));
 
     // Broadcast the element connectivity
     Parallel::broadcast (conn);
@@ -1956,7 +1956,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     for (; it != it_end; ++it)
       {
         const Elem *elem = *it;
-        local_weight   += elem->n_nodes() + elem->packed_indexing_size();
+        local_weight   += elem->packed_size();
         local_n_levels = std::max(local_n_levels, elem->level()+1);
       }
 
@@ -1964,8 +1964,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     Parallel::max (global_n_levels);
 
     // The conn array contains the information needed to construct each element.
-    std::vector<int> conn; conn.reserve
-      (Elem::PackedElem::header_size*n_elem[libMesh::processor_id()] + local_weight);
+    std::vector<int> conn; conn.reserve (local_weight);
 
     for (unsigned int level=0; level<=local_n_levels; level++)
       {
@@ -1989,8 +1988,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  }
       } // ...that was easy.
 
-    libmesh_assert (conn.size() ==
-      Elem::PackedElem::header_size*n_elem[libMesh::processor_id()] + local_weight);
+    libmesh_assert (conn.size() == local_weight);
 
     // Get the size of the connectivity array on each processor
     std::vector<unsigned int>
